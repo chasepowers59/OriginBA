@@ -34,6 +34,7 @@ jobs:
           chmod +x deploy/build_report_unit_scorecard.sh
           chmod +x deploy/build_report_unit_collections.sh
           chmod +x deploy/build_report_unit_ops_hub.sh
+          chmod +x deploy/build_report_unit_map.sh
           chmod +x deploy/deploy_jasper.sh
           chmod +x deploy/batch_export_pdf.sh
 
@@ -47,6 +48,8 @@ jobs:
           xmllint --noout reports/collections_prioritization.jrxml
           xmllint --noout reports/ops_hub_dashboard.jrxml
           xmllint --noout reports/lookup_description_completeness_audit.jrxml
+          xmllint --noout reports/map_meters_coverage.jrxml
+          xmllint --noout reports/subreports/line_items_fieldwork.jrxml
 
       - name: Compile JRXML with JasperStarter (containerized)
         run: |
@@ -80,6 +83,16 @@ jobs:
             -w /work \
             ghcr.io/akingde/jasperstarter:3.7.0 \
             cp reports/lookup_description_completeness_audit.jrxml -o reports
+          docker run --rm \
+            -v "$PWD:/work" \
+            -w /work \
+            ghcr.io/akingde/jasperstarter:3.7.0 \
+            cp reports/map_meters_coverage.jrxml -o reports
+          docker run --rm \
+            -v "$PWD:/work" \
+            -w /work \
+            ghcr.io/akingde/jasperstarter:3.7.0 \
+            cp reports/subreports/line_items_fieldwork.jrxml -o reports/subreports
 
       - name: Build report unit bundle zips
         run: |
@@ -88,11 +101,13 @@ jobs:
           ./deploy/build_report_unit_collections.sh
           ./deploy/build_report_unit_ops_hub.sh
           pwsh -File deploy/build_report_unit_lookup_audit.ps1
+          ./deploy/build_report_unit_map.sh
           test -s deploy/billing_master_report_unit.zip
           test -s deploy/client_value_scorecard_report_unit.zip
           test -s deploy/collections_prioritization_report_unit.zip
           test -s deploy/ops_hub_dashboard_report_unit.zip
           test -s deploy/lookup_description_completeness_audit_report_unit.zip
+          test -s deploy/map_meters_coverage_report_unit.zip
 
       - name: Source-of-truth SQL validation
         run: |
@@ -137,10 +152,13 @@ jobs:
             reports/collections_prioritization.jasper
             reports/ops_hub_dashboard.jasper
             reports/lookup_description_completeness_audit.jasper
+            reports/map_meters_coverage.jasper
+            reports/subreports/line_items_fieldwork.jasper
             deploy/billing_master_report_unit.zip
             deploy/client_value_scorecard_report_unit.zip
             deploy/collections_prioritization_report_unit.zip
             deploy/ops_hub_dashboard_report_unit.zip
+            deploy/map_meters_coverage_report_unit.zip
             deploy/lookup_description_completeness_audit_report_unit.zip
             smoke_report.pdf
           if-no-files-found: warn
