@@ -1,0 +1,84 @@
+-- GOVERNED: Client Value Scorecard (Jaspersoft-ready, read-only)
+-- Purpose: provide a single KPI list for executive/client review.
+-- Binds:
+--   :client_id VARCHAR2 (matches CISADM.CI_ACCT.CIS_DIVISION; optional)
+--   :start_ts  TIMESTAMP
+--   :end_ts    TIMESTAMP
+
+SELECT 'TOTAL_DEBT' AS METRIC_NAME,
+       NVL(SUM(CASE
+                 WHEN FT.FREEZE_SW = 'Y'
+                  AND FT.NOT_IN_ARS_SW = 'N'
+                  AND FT.FT_TYPE_FLG NOT IN ('PS', 'PX')
+                  AND FT.ARS_DT IS NOT NULL
+                 THEN FT.CUR_AMT
+                 ELSE 0
+               END), 0) AS METRIC_VALUE
+FROM CISADM.CI_FT FT
+JOIN CISADM.CI_SA SA ON SA.SA_ID = FT.SA_ID
+JOIN CISADM.CI_ACCT A ON A.ACCT_ID = SA.ACCT_ID
+WHERE FT.CRE_DTTM >= :start_ts
+  AND FT.CRE_DTTM <  :end_ts
+  AND (:client_id IS NULL OR A.CIS_DIVISION = :client_id)
+UNION ALL
+SELECT 'DEBT_OVER_60',
+       NVL(SUM(CASE
+                 WHEN FT.FREEZE_SW = 'Y'
+                  AND FT.NOT_IN_ARS_SW = 'N'
+                  AND FT.FT_TYPE_FLG NOT IN ('PS', 'PX')
+                  AND FT.ARS_DT IS NOT NULL
+                  AND (TRUNC(:end_ts) - FT.ARS_DT) > 60
+                 THEN FT.CUR_AMT
+                 ELSE 0
+               END), 0)
+FROM CISADM.CI_FT FT
+JOIN CISADM.CI_SA SA ON SA.SA_ID = FT.SA_ID
+JOIN CISADM.CI_ACCT A ON A.ACCT_ID = SA.ACCT_ID
+WHERE FT.CRE_DTTM >= :start_ts
+  AND FT.CRE_DTTM <  :end_ts
+  AND (:client_id IS NULL OR A.CIS_DIVISION = :client_id)
+UNION ALL
+SELECT 'ACTIVE_ACCOUNTS',
+       COUNT(*)
+FROM CISADM.CI_ACCT A
+WHERE (:client_id IS NULL OR A.CIS_DIVISION = :client_id)
+UNION ALL
+SELECT 'OPEN_BILLS',
+       COUNT(*)
+FROM CISADM.CI_BILL B
+JOIN CISADM.CI_ACCT A ON A.ACCT_ID = B.ACCT_ID
+WHERE B.CRE_DTTM >= :start_ts
+  AND B.CRE_DTTM <  :end_ts
+  AND NULLIF(TRIM(B.BILL_STAT_FLG), '') <> '60'
+  AND (:client_id IS NULL OR A.CIS_DIVISION = :client_id)
+UNION ALL
+SELECT 'PAYMENT_EVENTS',
+       COUNT(*)
+FROM CISADM.CI_PAY_EVENT PE
+JOIN CISADM.CI_PAY P ON P.PAY_EVENT_ID = PE.PAY_EVENT_ID
+JOIN CISADM.CI_ACCT A ON A.ACCT_ID = P.ACCT_ID
+WHERE PE.CRE_DTTM >= :start_ts
+  AND PE.CRE_DTTM <  :end_ts
+  AND (:client_id IS NULL OR A.CIS_DIVISION = :client_id)
+UNION ALL
+SELECT 'CONTACT_LETTER_DEFECTS',
+       COUNT(*)
+FROM CISADM.CI_CC CC
+JOIN CISADM.CI_ACCT A ON A.ACCT_ID = CC.ACCT_ID
+LEFT JOIN CISADM.CI_LETTER_TMPL LT ON LT.LTR_TMPL_CD = CC.LTR_TMPL_CD
+LEFT JOIN CISADM.CI_PER_NAME PN ON PN.PER_ID = CC.PER_ID AND PN.PRIM_NAME_SW = 'Y'
+LEFT JOIN CISADM.CI_PREM PR ON PR.PREM_ID = CC.PREM_ID
+WHERE CC.PRINT_LETTER_SW = 'Y'
+  AND CC.CC_DTTM >= :start_ts
+  AND CC.CC_DTTM <  :end_ts
+  AND (:client_id IS NULL OR A.CIS_DIVISION = :client_id)
+  AND (
+      LT.LTR_TMPL_CD IS NULL
+      OR NULLIF(TRIM(PN.ENTITY_NAME), '') IS NULL
+      OR NULLIF(TRIM(PR.ADDRESS1), '') IS NULL
+  )
+ORDER BY METRIC_NAME;
+
+-- EXPLAIN PLAN FOR
+-- SELECT ... (paste query above);
+-- SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY(NULL, NULL, 'BASIC +PREDICATE +ALIAS +NOTE'));

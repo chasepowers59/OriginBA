@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="customer_contact_letter"
+    pageWidth="595"
+    pageHeight="842"
+    columnWidth="555"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="1f0b6f6f-92df-4a59-8f4f-f383f6c9d2b8">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="C2M_DEV_DS"/>
+
+    <parameter name="CC_ID" class="java.lang.String"/>
+    <parameter name="ACCT_ID" class="java.lang.String"/>
+    <parameter name="START_TS" class="java.sql.Timestamp"/>
+    <parameter name="END_TS" class="java.sql.Timestamp"/>
+    <parameter name="CLIENT_LOGO_URL" class="java.lang.String" isForPrompting="false"/>
+    <parameter name="AGENT_NAME" class="java.lang.String"/>
+    <parameter name="LETTER_DATE" class="java.sql.Timestamp"/>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT
+    CC.CC_ID,
+    CC.ACCT_ID,
+    CC.PER_ID,
+    CC.PREM_ID,
+    CC.CC_DTTM,
+    CC.CC_TYPE_CD,
+    CC.CC_CL_CD,
+    CC.CONTACT_METH_FLG,
+    CC.PRINT_LETTER_SW,
+    CC.LETTER_PRINT_DTTM,
+    CC.LTR_TMPL_CD,
+    NULLIF(TRIM(PN.ENTITY_NAME), '') AS CONTACT_NAME,
+    NULLIF(TRIM(PR.ADDRESS1), '') AS ADDRESS1,
+    NULLIF(TRIM(PR.ADDRESS2), '') AS ADDRESS2,
+    NULLIF(TRIM(PR.ADDRESS3), '') AS ADDRESS3,
+    NULLIF(TRIM(PR.ADDRESS4), '') AS ADDRESS4,
+    NULLIF(TRIM(PR.CITY), '') AS CITY,
+    NULLIF(TRIM(PR.STATE), '') AS STATE,
+    NULLIF(TRIM(PR.POSTAL), '') AS POSTAL,
+    NULLIF(TRIM(CC.DESCRLONG), '') AS LETTER_BODY_TEXT
+FROM CISADM.CI_CC CC
+LEFT JOIN CISADM.CI_PER_NAME PN
+  ON PN.PER_ID = CC.PER_ID
+ AND PN.PRIM_NAME_SW = 'Y'
+LEFT JOIN CISADM.CI_PREM PR
+  ON PR.PREM_ID = CC.PREM_ID
+WHERE CC.PRINT_LETTER_SW = 'Y'
+  AND (
+      ( $P{CC_ID} IS NOT NULL AND CC.CC_ID = $P{CC_ID} )
+      OR
+      ( $P{CC_ID} IS NULL
+        AND $P{ACCT_ID} IS NOT NULL
+        AND CC.ACCT_ID = $P{ACCT_ID}
+        AND CC.CC_DTTM >= $P{START_TS}
+        AND CC.CC_DTTM <  $P{END_TS}
+      )
+  )
+ORDER BY CC.CC_DTTM DESC
+        ]]>
+    </queryString>
+
+    <field name="CC_ID" class="java.lang.String"/>
+    <field name="ACCT_ID" class="java.lang.String"/>
+    <field name="CC_DTTM" class="java.sql.Timestamp"/>
+    <field name="CC_TYPE_CD" class="java.lang.String"/>
+    <field name="LTR_TMPL_CD" class="java.lang.String"/>
+    <field name="CONTACT_NAME" class="java.lang.String"/>
+    <field name="ADDRESS1" class="java.lang.String"/>
+    <field name="ADDRESS2" class="java.lang.String"/>
+    <field name="ADDRESS3" class="java.lang.String"/>
+    <field name="ADDRESS4" class="java.lang.String"/>
+    <field name="CITY" class="java.lang.String"/>
+    <field name="STATE" class="java.lang.String"/>
+    <field name="POSTAL" class="java.lang.String"/>
+    <field name="LETTER_BODY_TEXT" class="java.lang.String"/>
+
+    <title>
+        <band height="100">
+            <image scaleImage="RetainShape">
+                <reportElement x="0" y="0" width="120" height="52" uuid="2ae1eb00-17b9-4ae8-a64f-7d60525f150e"/>
+                <imageExpression><![CDATA[$P{CLIENT_LOGO_URL}]]></imageExpression>
+            </image>
+            <staticText>
+                <reportElement x="130" y="0" width="425" height="24" uuid="445159d7-4b8b-44cd-98fc-16d594dc53e8"/>
+                <textElement>
+                    <font size="16" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Customer Contact Letter]]></text>
+            </staticText>
+            <textField pattern="yyyy-MM-dd">
+                <reportElement x="130" y="28" width="200" height="16" uuid="f2ab8979-fbe2-4f64-9dcb-d7df80e8ab18"/>
+                <textFieldExpression><![CDATA[$P{LETTER_DATE}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="130" y="48" width="425" height="18" uuid="4e41f8bf-5c30-4789-857f-d84944cc17a7"/>
+                <textFieldExpression><![CDATA["Account: " + $F{ACCT_ID} + " | Contact ID: " + $F{CC_ID} + " | Type: " + $F{CC_TYPE_CD}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <detail>
+        <band height="600" splitType="Stretch">
+            <textField>
+                <reportElement x="0" y="0" width="555" height="18" uuid="8f274d56-f37a-435f-b29f-756dbf5306e9"/>
+                <textElement><font size="12" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{CONTACT_NAME}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="20" width="555" height="14" uuid="2734be9c-040d-4742-ab37-f0c7d9feeaaf"/>
+                <textFieldExpression><![CDATA[$F{ADDRESS1}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="36" width="555" height="14" uuid="4a1598cd-0d7d-4ec4-975c-20874ba11967"/>
+                <textFieldExpression><![CDATA[$F{ADDRESS2}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="52" width="555" height="14" uuid="16f61d63-7d66-412f-bf89-540d37f0a641"/>
+                <textFieldExpression><![CDATA[$F{ADDRESS3}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="68" width="555" height="14" uuid="44a955d7-3e08-4f16-be68-2b8f15b8c8bb"/>
+                <textFieldExpression><![CDATA[$F{ADDRESS4}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="84" width="555" height="14" uuid="9e2a32db-20fe-4196-a649-d03f326aaec4"/>
+                <textFieldExpression><![CDATA[$F{CITY} + ", " + $F{STATE} + " " + $F{POSTAL}]]></textFieldExpression>
+            </textField>
+
+            <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+                <reportElement x="0" y="130" width="555" height="360" uuid="1572da4a-71ad-4f37-9270-798ad9312b17"/>
+                <textElement verticalAlignment="Top">
+                    <font size="11"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{LETTER_BODY_TEXT}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="520" width="555" height="18" uuid="a5203570-75e2-4d91-b8f4-19464011112e"/>
+                <textFieldExpression><![CDATA["Sincerely,"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="548" width="555" height="18" uuid="373485cd-c040-4554-8e09-f0bd702bf208"/>
+                <textFieldExpression><![CDATA[$P{AGENT_NAME}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+</jasperReport>

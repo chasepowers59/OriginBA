@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="client_value_scorecard"
+    pageWidth="595"
+    pageHeight="842"
+    columnWidth="555"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="9d83ef40-82f8-4fd6-9128-fe404e3b9fb7">
+
+    <parameter name="CLIENT_ID" class="java.lang.String"/>
+    <parameter name="START_TS" class="java.sql.Timestamp"/>
+    <parameter name="END_TS" class="java.sql.Timestamp"/>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT 'TOTAL_DEBT' AS METRIC_NAME,
+       NVL(SUM(CASE
+                 WHEN FT.FREEZE_SW = 'Y'
+                  AND FT.NOT_IN_ARS_SW = 'N'
+                  AND FT.FT_TYPE_FLG NOT IN ('PS', 'PX')
+                  AND FT.ARS_DT IS NOT NULL
+                 THEN FT.CUR_AMT
+                 ELSE 0
+               END), 0) AS METRIC_VALUE
+FROM CISADM.CI_FT FT
+JOIN CISADM.CI_SA SA ON SA.SA_ID = FT.SA_ID
+JOIN CISADM.CI_ACCT A ON A.ACCT_ID = SA.ACCT_ID
+WHERE FT.CRE_DTTM >= $P{START_TS}
+  AND FT.CRE_DTTM <  $P{END_TS}
+  AND ($P{CLIENT_ID} IS NULL OR A.CIS_DIVISION = $P{CLIENT_ID})
+UNION ALL
+SELECT 'CONTACT_LETTER_DEFECTS' AS METRIC_NAME,
+       COUNT(*) AS METRIC_VALUE
+FROM CISADM.CI_CC CC
+JOIN CISADM.CI_ACCT A ON A.ACCT_ID = CC.ACCT_ID
+LEFT JOIN CISADM.CI_LETTER_TMPL LT ON LT.LTR_TMPL_CD = CC.LTR_TMPL_CD
+LEFT JOIN CISADM.CI_PER_NAME PN ON PN.PER_ID = CC.PER_ID AND PN.PRIM_NAME_SW = 'Y'
+LEFT JOIN CISADM.CI_PREM PR ON PR.PREM_ID = CC.PREM_ID
+WHERE CC.PRINT_LETTER_SW = 'Y'
+  AND CC.CC_DTTM >= $P{START_TS}
+  AND CC.CC_DTTM <  $P{END_TS}
+  AND ($P{CLIENT_ID} IS NULL OR A.CIS_DIVISION = $P{CLIENT_ID})
+  AND (LT.LTR_TMPL_CD IS NULL OR NULLIF(TRIM(PN.ENTITY_NAME), '') IS NULL OR NULLIF(TRIM(PR.ADDRESS1), '') IS NULL)
+        ]]>
+    </queryString>
+
+    <field name="METRIC_NAME" class="java.lang.String"/>
+    <field name="METRIC_VALUE" class="java.math.BigDecimal"/>
+
+    <title>
+        <band height="36">
+            <staticText>
+                <reportElement x="0" y="6" width="555" height="24" uuid="58caeb02-d0f6-4fe9-b901-83f4c646ea49"/>
+                <textElement>
+                    <font size="16" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Client Value Scorecard]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="20">
+            <staticText>
+                <reportElement x="0" y="0" width="280" height="20" uuid="f8c2d0f2-f2dd-4cb8-89ab-4ce58b4d1532"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Metric]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="300" y="0" width="255" height="20" uuid="ea1700ff-5424-428c-95bc-68af19fce5ef"/>
+                <textElement textAlignment="Right"><font isBold="true"/></textElement>
+                <text><![CDATA[Value]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="280" height="18" uuid="7405d412-f45e-4c6d-8253-fe95e2952be2"/>
+                <textFieldExpression><![CDATA[$F{METRIC_NAME}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement x="300" y="0" width="255" height="18" uuid="47f3ebb7-c265-4c07-a2ca-578fe2cc0504"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{METRIC_VALUE}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+</jasperReport>

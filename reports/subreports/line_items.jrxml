@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="line_items"
+    pageWidth="540"
+    pageHeight="100"
+    columnWidth="540"
+    leftMargin="0"
+    rightMargin="0"
+    topMargin="0"
+    bottomMargin="0"
+    uuid="9d3f5ff9-2d4f-47fc-b8a4-63d85bf75441">
+
+    <parameter name="CLIENT_ID" class="java.lang.String"/>
+    <parameter name="BILL_ID" class="java.lang.String"/>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT
+    S.BSEG_ID AS LINE_ID,
+    S.SA_ID AS ITEM_CODE,
+    'BSEG_STATUS_' || S.BSEG_STAT_FLG AS ITEM_DESCRIPTION,
+    1 AS QUANTITY,
+    0 AS UNIT_PRICE,
+    0 AS LINE_AMOUNT
+FROM CISADM.CI_BSEG S
+WHERE S.BILL_ID = $P{BILL_ID}
+ORDER BY S.BSEG_ID
+        ]]>
+    </queryString>
+
+    <field name="LINE_ID" class="java.lang.String"/>
+    <field name="ITEM_CODE" class="java.lang.String"/>
+    <field name="ITEM_DESCRIPTION" class="java.lang.String"/>
+    <field name="QUANTITY" class="java.math.BigDecimal"/>
+    <field name="UNIT_PRICE" class="java.math.BigDecimal"/>
+    <field name="LINE_AMOUNT" class="java.math.BigDecimal"/>
+
+    <columnHeader>
+        <band height="14">
+            <staticText><reportElement x="0" y="0" width="55" height="14" uuid="29ec47bc-549b-414b-bf0c-c7cf72869f5d"/><text><![CDATA[Line]]></text></staticText>
+            <staticText><reportElement x="58" y="0" width="70" height="14" uuid="6b95f450-f55e-4a88-8f9e-e56017f7f151"/><text><![CDATA[Code]]></text></staticText>
+            <staticText><reportElement x="130" y="0" width="220" height="14" uuid="2f71875f-0801-40e7-ac53-b802fcebec2e"/><text><![CDATA[Description]]></text></staticText>
+            <staticText><reportElement x="352" y="0" width="60" height="14" uuid="c6586dc0-b2a0-4a96-b0f4-91e8f7bc633b"/><text><![CDATA[Qty]]></text></staticText>
+            <staticText><reportElement x="415" y="0" width="60" height="14" uuid="07828252-1712-4f12-8cc7-45f820a9af8c"/><text><![CDATA[Unit]]></text></staticText>
+            <staticText><reportElement x="478" y="0" width="62" height="14" uuid="855653d7-f069-4e7f-8044-1cd44f4eaec6"/><text><![CDATA[Amount]]></text></staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="14">
+            <textField><reportElement x="0" y="0" width="55" height="14" uuid="af5ca14d-2c9f-4954-b695-5c362b36256e"/><textFieldExpression><![CDATA[$F{LINE_ID}]]></textFieldExpression></textField>
+            <textField><reportElement x="58" y="0" width="70" height="14" uuid="18ca7cb1-b08e-4557-a8d5-13fdfd4819ec"/><textFieldExpression><![CDATA[$F{ITEM_CODE}]]></textFieldExpression></textField>
+            <textField><reportElement x="130" y="0" width="220" height="14" uuid="2fa14f11-9f7d-4f7a-a6ee-c06f373e40c6"/><textFieldExpression><![CDATA[$F{ITEM_DESCRIPTION}]]></textFieldExpression></textField>
+            <textField pattern="#,##0.###"><reportElement x="352" y="0" width="60" height="14" uuid="6d443719-6ee9-4f59-a23e-6778f97718b4"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{QUANTITY}]]></textFieldExpression></textField>
+            <textField pattern="#,##0.00"><reportElement x="415" y="0" width="60" height="14" uuid="6db213c5-72f2-4d9e-8f4a-f67f3e783dbf"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{UNIT_PRICE}]]></textFieldExpression></textField>
+            <textField pattern="#,##0.00"><reportElement x="478" y="0" width="62" height="14" uuid="f2fcb9b7-fc94-4b87-be9b-5d81f16eafe4"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{LINE_AMOUNT}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+</jasperReport>

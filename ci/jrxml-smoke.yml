@@ -1,0 +1,109 @@
+name: jrxml-smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "reports/**/*.jrxml"
+      - "sql/**/*.sql"
+      - "server/input_controls/*.json"
+      - "ci/jrxml-smoke.yml"
+
+jobs:
+  compile-and-smoke:
+    runs-on: ubuntu-latest
+    env:
+      JRS_URL: ${{ secrets.JRS_URL }}
+      JRS_USER: ${{ secrets.JRS_USER }}
+      JRS_PASSWORD: ${{ secrets.JRS_PASSWORD }}
+      JRS_REPORT_URI: ${{ secrets.JRS_REPORT_URI }}
+      SMOKE_CLIENT_ID: ${{ secrets.SMOKE_CLIENT_ID }}
+      SMOKE_START_TS: ${{ secrets.SMOKE_START_TS }}
+      SMOKE_END_TS: ${{ secrets.SMOKE_END_TS }}
+      ORACLE_USER: ${{ secrets.ORACLE_USER }}
+      ORACLE_PASSWORD: ${{ secrets.ORACLE_PASSWORD }}
+      ORACLE_DSN: ${{ secrets.ORACLE_DSN }}
+      ORACLE_CLIENT_LIB_DIR: ${{ secrets.ORACLE_CLIENT_LIB_DIR }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure deploy scripts executable
+        run: |
+          chmod +x deploy/build_report_unit.sh
+          chmod +x deploy/build_report_unit_scorecard.sh
+          chmod +x deploy/build_report_unit_collections.sh
+          chmod +x deploy/deploy_jasper.sh
+          chmod +x deploy/batch_export_pdf.sh
+
+      - name: XML lint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils
+          xmllint --noout reports/billing_master.jrxml
+          xmllint --noout reports/subreports/line_items.jrxml
+          xmllint --noout reports/client_value_scorecard.jrxml
+          xmllint --noout reports/collections_prioritization.jrxml
+
+      - name: Compile JRXML with JasperStarter (containerized)
+        run: |
+          docker run --rm \
+            -v "$PWD:/work" \
+            -w /work \
+            ghcr.io/akingde/jasperstarter:3.7.0 \
+            cp reports/billing_master.jrxml -o reports
+          docker run --rm \
+            -v "$PWD:/work" \
+            -w /work \
+            ghcr.io/akingde/jasperstarter:3.7.0 \
+            cp reports/subreports/line_items.jrxml -o reports/subreports
+          docker run --rm \
+            -v "$PWD:/work" \
+            -w /work \
+            ghcr.io/akingde/jasperstarter:3.7.0 \
+            cp reports/client_value_scorecard.jrxml -o reports
+          docker run --rm \
+            -v "$PWD:/work" \
+            -w /work \
+            ghcr.io/akingde/jasperstarter:3.7.0 \
+            cp reports/collections_prioritization.jrxml -o reports
+
+      - name: Build report unit bundle zips
+        run: |
+          ./deploy/build_report_unit.sh
+          ./deploy/build_report_unit_scorecard.sh
+          ./deploy/build_report_unit_collections.sh
+          test -s deploy/billing_master_report_unit.zip
+          test -s deploy/client_value_scorecard_report_unit.zip
+          test -s deploy/collections_prioritization_report_unit.zip
+
+      - name: Read-only Oracle validation + completeness gate
+        if: ${{ env.ORACLE_USER != '' && env.ORACLE_PASSWORD != '' && env.ORACLE_DSN != '' }}
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r pipeline/requirements.txt
+          python -m pipeline.validate_tables
+          python scripts/check_config_completeness_gate.py output/config_completeness.json
+
+      - name: Smoke render PDF via JasperReports Server REST v2
+        if: ${{ env.JRS_URL != '' && env.JRS_USER != '' && env.JRS_PASSWORD != '' && env.JRS_REPORT_URI != '' }}
+        run: |
+          curl -sS -u "${JRS_USER}:${JRS_PASSWORD}" \
+            "${JRS_URL}/rest_v2/reports/${JRS_REPORT_URI}.pdf?CLIENT_ID=${SMOKE_CLIENT_ID}&START_TS=${SMOKE_START_TS}&END_TS=${SMOKE_END_TS}" \
+            -o smoke_report.pdf
+          test -s smoke_report.pdf
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: jasper-build-artifacts
+          path: |
+            reports/billing_master.jasper
+            reports/subreports/line_items.jasper
+            reports/client_value_scorecard.jasper
+            reports/collections_prioritization.jasper
+            deploy/billing_master_report_unit.zip
+            deploy/client_value_scorecard_report_unit.zip
+            deploy/collections_prioritization_report_unit.zip
+            smoke_report.pdf
+          if-no-files-found: warn

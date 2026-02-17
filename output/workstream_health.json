@@ -1,0 +1,78 @@
+{
+  "workstreams": {
+    "billing": {
+      "has_recent": true,
+      "count_7d": 13,
+      "primary_table": "CISADM.CI_BILL",
+      "date_col": "CRE_DTTM",
+      "error": null
+    },
+    "cashiering": {
+      "has_recent": true,
+      "count_7d": 2,
+      "primary_table": "CISADM.CI_PAY_EVENT",
+      "date_col": "CRE_DTTM",
+      "error": null
+    },
+    "meter_ops": {
+      "has_recent": false,
+      "count_7d": 0,
+      "primary_table": "CISADM.D1_INSTALL_EVT",
+      "date_col": "D1_INSTALL_DTTM",
+      "error": null
+    },
+    "customer_ops": {
+      "has_recent": true,
+      "count_7d": 11,
+      "primary_table": "CISADM.CI_ACCT",
+      "date_col": "SETUP_DT",
+      "error": null
+    },
+    "new_services": {
+      "has_recent": true,
+      "count_7d": 1409,
+      "primary_table": "CISADM.CI_SA",
+      "date_col": "START_DT",
+      "error": null
+    },
+    "finance": {
+      "has_recent": true,
+      "count_7d": 37,
+      "primary_table": "CISADM.CI_FT",
+      "date_col": "CRE_DTTM",
+      "error": null
+    },
+    "common": {
+      "has_recent": null,
+      "count_7d": 12149,
+      "primary_table": "CISADM.CI_PREM",
+      "date_col": null,
+      "error": null
+    },
+    "debt_mgmt": {
+      "has_recent": true,
+      "count_7d": 37,
+      "primary_table": "CISADM.CI_FT",
+      "date_col": "CRE_DTTM",
+      "error": null
+    },
+    "field_ops": {
+      "has_recent": false,
+      "count_7d": 0,
+      "primary_table": "CISADM.CI_SP",
+      "date_col": "INSTALL_DT",
+      "error": null
+    },
+    "field_tasks": {
+      "has_recent": null,
+      "count_7d": null,
+      "primary_table": "CISADM.F1_TSK",
+      "date_col": "CRE_DTTM",
+      "error": "Execution failed on sql 'SELECT COUNT(*) AS cnt FROM CISADM.F1_TSK WHERE CRE_DTTM >= TRUNC(SYSDATE) - 7': (oracledb.exceptions.DatabaseError) ORA-00942: table or view does not exist\nHelp: https://docs.oracle.com/error-help/db/ora-00942/\n[SQL: SELECT COUNT(*) AS cnt FROM CISADM.F1_TSK WHERE CRE_DTTM >= TRUNC(SYSDATE) - 7]\n(Background on this error at: https://sqlalche.me/e/20/4xp6)"
+    }
+  },
+  "stale_workstreams": [
+    "meter_ops",
+    "field_ops"
+  ]
+}
