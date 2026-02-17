@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="line_items_fieldwork"
+    pageWidth="364"
+    pageHeight="470"
+    columnWidth="364"
+    leftMargin="0"
+    rightMargin="0"
+    topMargin="0"
+    bottomMargin="0"
+    uuid="4dce7f58-9354-4d95-857b-a7636b2304a8">
+
+    <parameter name="CLIENT_ID" class="java.lang.String"/>
+    <parameter name="START_TS" class="java.sql.Timestamp"/>
+    <parameter name="END_TS" class="java.sql.Timestamp"/>
+    <parameter name="REGION" class="java.lang.String"/>
+
+    <queryString language="SQL"><![CDATA[
+SELECT
+    FW.WORK_ID,
+    FW.METER_ID,
+    FW.WORK_STATUS,
+    FW.ASSIGNED_DATE,
+    FW.TECHNICIAN_ID,
+    FW.WORK_REGION
+FROM CISADM.FIELD_WORK_LOG FW
+WHERE FW.CLIENT_ID = $P{CLIENT_ID}
+  AND FW.WORK_STATUS IN ('Assigned', 'In Progress')
+  AND FW.ASSIGNED_DATE >= $P{START_TS}
+  AND FW.ASSIGNED_DATE <  $P{END_TS}
+  AND ($P{REGION} IS NULL OR FW.WORK_REGION = $P{REGION})
+ORDER BY FW.ASSIGNED_DATE DESC
+    ]]></queryString>
+
+    <field name="WORK_ID" class="java.math.BigDecimal"/>
+    <field name="METER_ID" class="java.math.BigDecimal"/>
+    <field name="WORK_STATUS" class="java.lang.String"/>
+    <field name="ASSIGNED_DATE" class="java.sql.Timestamp"/>
+    <field name="TECHNICIAN_ID" class="java.lang.String"/>
+    <field name="WORK_REGION" class="java.lang.String"/>
+
+    <columnHeader>
+        <band height="18">
+            <staticText><reportElement x="0" y="0" width="60" height="18" uuid="3148ea44-941f-40f8-b06b-c8fb87ef0647"/><text><![CDATA[ID]]></text></staticText>
+            <staticText><reportElement x="62" y="0" width="62" height="18" uuid="72c03dc1-6ed3-4c0c-b833-cbc397af01f8"/><text><![CDATA[METER]]></text></staticText>
+            <staticText><reportElement x="126" y="0" width="90" height="18" uuid="d5f8fda7-9937-45ab-9c99-52b97fd9d7de"/><text><![CDATA[STATUS]]></text></staticText>
+            <staticText><reportElement x="218" y="0" width="146" height="18" uuid="2862f84e-b8e4-4610-b6af-2e7f6f223f95"/><text><![CDATA[ASSIGNED_DATE]]></text></staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="18">
+            <textField><reportElement x="0" y="0" width="60" height="18" uuid="4ad2485e-fc06-45fd-ab4d-9949378ea01f"/><textFieldExpression><![CDATA[$F{WORK_ID}]]></textFieldExpression></textField>
+            <textField><reportElement x="62" y="0" width="62" height="18" uuid="cf87dbd8-a4fc-443b-be05-6cdfd5029ecf"/><textFieldExpression><![CDATA[$F{METER_ID}]]></textFieldExpression></textField>
+            <textField><reportElement x="126" y="0" width="90" height="18" uuid="9f9c5f8c-d0f8-4a42-b0d6-f7523e0ffb0c"/><textFieldExpression><![CDATA[$F{WORK_STATUS}]]></textFieldExpression></textField>
+            <textField pattern="yyyy-MM-dd HH:mm:ss"><reportElement x="218" y="0" width="146" height="18" uuid="c3350c47-a501-40cd-b8ad-9f64a0b44655"/><textFieldExpression><![CDATA[$F{ASSIGNED_DATE}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+</jasperReport>

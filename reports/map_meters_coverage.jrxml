@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="map_meters_coverage"
+    pageWidth="1190"
+    pageHeight="842"
+    orientation="Landscape"
+    columnWidth="1150"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="2c9a2d85-b992-4fa2-8646-4a4e4b2cf873">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+
+    <parameter name="CLIENT_ID" class="java.lang.String"/>
+    <parameter name="START_TS" class="java.sql.Timestamp"/>
+    <parameter name="END_TS" class="java.sql.Timestamp"/>
+    <parameter name="THRESHOLD_HOURS" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[24]]></defaultValueExpression>
+    </parameter>
+    <parameter name="REGION" class="java.lang.String"/>
+    <parameter name="CLIENT_LOGO_URL" class="java.lang.String" isForPrompting="false"/>
+    <parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+        <defaultValueExpression><![CDATA["reports/subreports/"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="SQL"><![CDATA[SELECT 1 AS REPORT_ANCHOR FROM DUAL]]></queryString>
+    <field name="REPORT_ANCHOR" class="java.lang.Integer"/>
+
+    <subDataset name="MAP_DATASET" uuid="bc4fa64c-1fce-4fcb-a10e-c83aa9ab9447">
+        <parameter name="CLIENT_ID" class="java.lang.String"/>
+        <parameter name="START_TS" class="java.sql.Timestamp"/>
+        <parameter name="END_TS" class="java.sql.Timestamp"/>
+        <parameter name="THRESHOLD_HOURS" class="java.lang.Integer"/>
+        <parameter name="REGION" class="java.lang.String"/>
+        <queryString language="SQL"><![CDATA[
+WITH PARAMS AS (
+    SELECT (:END_TS - NUMTODSINTERVAL(:THRESHOLD_HOURS, 'HOUR')) AS THRESHOLD_TS FROM DUAL
+),
+RMAX AS (
+    SELECT R.METER_ID, MAX(R.READING_TS) AS LAST_READING_TS
+    FROM CISADM.METER_READINGS R
+    WHERE R.READING_TS >= :START_TS
+      AND R.READING_TS <  :END_TS
+    GROUP BY R.METER_ID
+)
+SELECT
+    M.METER_ID,
+    M.LAT AS LATITUDE,
+    M.LON AS LONGITUDE,
+    RM.LAST_READING_TS,
+    CASE
+      WHEN RM.LAST_READING_TS IS NULL THEN 'NO_DATA'
+      WHEN RM.LAST_READING_TS < (SELECT THRESHOLD_TS FROM PARAMS) THEN 'NO_DATA'
+      ELSE 'OK'
+    END AS STATUS,
+    M.ADDRESS,
+    M.WORK_REGION AS REGION
+FROM CISADM.METERS M
+LEFT JOIN RMAX RM ON RM.METER_ID = M.METER_ID
+WHERE M.CLIENT_ID = :CLIENT_ID
+  AND (:REGION IS NULL OR M.WORK_REGION = :REGION)
+  AND M.LAT IS NOT NULL
+  AND M.LON IS NOT NULL
+        ]]></queryString>
+        <field name="METER_ID" class="java.math.BigDecimal"/>
+        <field name="LATITUDE" class="java.math.BigDecimal"/>
+        <field name="LONGITUDE" class="java.math.BigDecimal"/>
+        <field name="LAST_READING_TS" class="java.sql.Timestamp"/>
+        <field name="STATUS" class="java.lang.String"/>
+        <field name="ADDRESS" class="java.lang.String"/>
+        <field name="REGION" class="java.lang.String"/>
+    </subDataset>
+
+    <title>
+        <band height="64">
+            <staticText>
+                <reportElement x="0" y="0" width="740" height="24" uuid="a8b3f5a9-88f9-4b9f-b3f2-78bda0fbc5ee"/>
+                <textElement><font size="16" isBold="true"/></textElement>
+                <text><![CDATA[Meter Coverage + Active Field Work]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="0" y="30" width="980" height="18" uuid="49df0578-9360-493b-a5ca-f0e53259bd00"/>
+                <textFieldExpression><![CDATA["CLIENT_ID=" + $P{CLIENT_ID} + " | START_TS=" + $P{START_TS} + " | END_TS=" + $P{END_TS} + " | THRESHOLD_HOURS=" + $P{THRESHOLD_HOURS} + " | REGION=" + ($P{REGION} == null ? "ALL" : $P{REGION})]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <detail>
+        <band height="690" splitType="Stretch">
+            <frame>
+                <reportElement x="0" y="0" width="760" height="510" uuid="f7e5fba7-17ca-426a-a457-5aaae57dff8f"/>
+                <box><pen lineWidth="0.5"/></box>
+                <staticText>
+                    <reportElement x="8" y="8" width="744" height="18" uuid="fba727ee-0a8e-4e5f-a9a9-0c949c72d529"/>
+                    <textElement><font size="12" isBold="true"/></textElement>
+                    <text><![CDATA[Map Layer Placeholder (Studio Pro Map Component / HTML5 Map)]]></text>
+                </staticText>
+                <staticText>
+                    <reportElement x="8" y="30" width="744" height="44" uuid="5d6e9717-bf90-4947-b946-64f0c2315d8f"/>
+                    <text><![CDATA[Bind markers to MAP_DATASET fields: LATITUDE, LONGITUDE, STATUS, METER_ID, LAST_READING_TS.
+Color rule: NO_DATA=red, OK=green.]]></text>
+                </staticText>
+            </frame>
+
+            <frame>
+                <reportElement x="770" y="0" width="380" height="510" uuid="4163e0c2-3ccd-4d22-8f37-37ba3642bc95"/>
+                <box><pen lineWidth="0.5"/></box>
+                <staticText>
+                    <reportElement x="8" y="8" width="364" height="18" uuid="86080259-8b24-4e8f-965e-9d8dcb4ba4b5"/>
+                    <textElement><font size="12" isBold="true"/></textElement>
+                    <text><![CDATA[Field Work Sidebar]]></text>
+                </staticText>
+                <subreport>
+                    <reportElement x="8" y="30" width="364" height="470" uuid="7cb0d9cc-b3a6-4674-a485-8d251a73e0da"/>
+                    <subreportParameter name="CLIENT_ID"><subreportParameterExpression><![CDATA[$P{CLIENT_ID}]]></subreportParameterExpression></subreportParameter>
+                    <subreportParameter name="START_TS"><subreportParameterExpression><![CDATA[$P{START_TS}]]></subreportParameterExpression></subreportParameter>
+                    <subreportParameter name="END_TS"><subreportParameterExpression><![CDATA[$P{END_TS}]]></subreportParameterExpression></subreportParameter>
+                    <subreportParameter name="REGION"><subreportParameterExpression><![CDATA[$P{REGION}]]></subreportParameterExpression></subreportParameter>
+                    <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                    <subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "line_items_fieldwork.jasper"]]></subreportExpression>
+                </subreport>
+            </frame>
+        </band>
+    </detail>
+</jasperReport>

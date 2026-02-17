@@ -1,0 +1,53 @@
+{
+  "version": "2",
+  "label": "map_meters_input_controls",
+  "uri": "/organizations/Origin_DEV/reports/maps/map_meters_input_controls",
+  "permissionMask": 0,
+  "organization": "Origin_DEV",
+  "datasourceHint": "ORIGIN_DEV_DS",
+  "controls": [
+    {
+      "id": "CLIENT_ID",
+      "label": "Client",
+      "type": "singleSelectQuery",
+      "mandatory": true,
+      "visible": true,
+      "dataType": "text",
+      "query": "SELECT C.CLIENT_ID AS VALUE_COL, C.CLIENT_NAME AS LABEL_COL FROM CISADM.CLIENTS C ORDER BY C.CLIENT_NAME"
+    },
+    {
+      "id": "START_TS",
+      "label": "Start Timestamp",
+      "type": "dateTime",
+      "mandatory": true,
+      "visible": true,
+      "dataType": "date"
+    },
+    {
+      "id": "END_TS",
+      "label": "End Timestamp",
+      "type": "dateTime",
+      "mandatory": true,
+      "visible": true,
+      "dataType": "date"
+    },
+    {
+      "id": "THRESHOLD_HOURS",
+      "label": "No-Read Threshold (Hours)",
+      "type": "singleValueNumber",
+      "mandatory": true,
+      "visible": true,
+      "dataType": "number",
+      "defaultValue": 24
+    },
+    {
+      "id": "REGION",
+      "label": "Region",
+      "type": "singleSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "dataType": "text",
+      "query": "SELECT DISTINCT FW.WORK_REGION AS VALUE_COL, FW.WORK_REGION AS LABEL_COL FROM CISADM.FIELD_WORK_LOG FW WHERE FW.CLIENT_ID = $P{CLIENT_ID} AND FW.WORK_REGION IS NOT NULL ORDER BY FW.WORK_REGION"
+    }
+  ]
+}
