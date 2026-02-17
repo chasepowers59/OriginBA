@@ -61,7 +61,7 @@ Keep this process running (or run it as a service) so your IDE can connect to it
 ### Cursor
 
 1. Open Cursor Settings (or create/edit MCP configuration).
-2. Point the MCP settings to your SQLcl path. Example configuration in `mcp.json` (see repo root or `.cursor/mcp.json`):
+2. Point the MCP settings to your SQLcl path. Example configuration in `mcp.json` (see `mcp.json.example` in repo root):
 
 ```json
 {
@@ -90,10 +90,10 @@ If SQLcl is not on PATH, use the full path to the executable (use forward slashe
 See [mcp.json.example](../mcp.json.example) in the repo root for a copy-paste config with this path.
 
 **Run MCP every time you use Cursor:**  
-This project includes [.cursor/mcp.json](.cursor/mcp.json) so Cursor starts the SQLcl MCP server automatically when you open the OriginBA workspace. You do **not** need to run `sql.exe -mcp` in a terminal each time. Requirements:
+Create a local `.cursor/mcp.json` from `mcp.json.example` so Cursor starts the SQLcl MCP server automatically when you open the OriginBA workspace. This local file is machine-specific and not tracked in git.
 
 - **JAVA_HOME** is set permanently to your Java 17 install (e.g. `C:\Program Files\Eclipse Adoptium\jdk-17.0.18.8-hotspot`). Cursor will pass it to the SQLcl process when it starts.
-- The `command` path in `.cursor/mcp.json` points to your `sql.exe`. If you move SQLcl, update that path.
+- The `command` path in your local `.cursor/mcp.json` points to your `sql.exe`. If you move SQLcl, update that path.
 
 After opening the project, give Cursor a moment to start the MCP server; then schema discovery in chat will use it. If the server does not start automatically, your Cursor version may use global MCP settings: open **Settings > Cursor Settings > MCP** and add the same server (command and args) there.
 
