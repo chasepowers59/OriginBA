@@ -33,6 +33,7 @@ jobs:
           chmod +x deploy/build_report_unit.sh
           chmod +x deploy/build_report_unit_scorecard.sh
           chmod +x deploy/build_report_unit_collections.sh
+          chmod +x deploy/build_report_unit_ops_hub.sh
           chmod +x deploy/deploy_jasper.sh
           chmod +x deploy/batch_export_pdf.sh
 
@@ -44,6 +45,8 @@ jobs:
           xmllint --noout reports/subreports/line_items.jrxml
           xmllint --noout reports/client_value_scorecard.jrxml
           xmllint --noout reports/collections_prioritization.jrxml
+          xmllint --noout reports/ops_hub_dashboard.jrxml
+          xmllint --noout reports/lookup_description_completeness_audit.jrxml
 
       - name: Compile JRXML with JasperStarter (containerized)
         run: |
@@ -67,15 +70,45 @@ jobs:
             -w /work \
             ghcr.io/akingde/jasperstarter:3.7.0 \
             cp reports/collections_prioritization.jrxml -o reports
+          docker run --rm \
+            -v "$PWD:/work" \
+            -w /work \
+            ghcr.io/akingde/jasperstarter:3.7.0 \
+            cp reports/ops_hub_dashboard.jrxml -o reports
+          docker run --rm \
+            -v "$PWD:/work" \
+            -w /work \
+            ghcr.io/akingde/jasperstarter:3.7.0 \
+            cp reports/lookup_description_completeness_audit.jrxml -o reports
 
       - name: Build report unit bundle zips
         run: |
           ./deploy/build_report_unit.sh
           ./deploy/build_report_unit_scorecard.sh
           ./deploy/build_report_unit_collections.sh
+          ./deploy/build_report_unit_ops_hub.sh
+          pwsh -File deploy/build_report_unit_lookup_audit.ps1
           test -s deploy/billing_master_report_unit.zip
           test -s deploy/client_value_scorecard_report_unit.zip
           test -s deploy/collections_prioritization_report_unit.zip
+          test -s deploy/ops_hub_dashboard_report_unit.zip
+          test -s deploy/lookup_description_completeness_audit_report_unit.zip
+
+      - name: Source-of-truth SQL validation
+        run: |
+          python scripts/validate_source_of_truth_sql.py \
+            sql/smartcity_9_workstream_kpis.sql \
+            sql/client_value_scorecard.sql \
+            sql/collections_prioritization.sql \
+            sql/customer_contact_readiness_kpi.sql
+
+      - name: Build CD Field Inventory
+        run: |
+          python scripts/build_cd_field_inventory.py
+
+      - name: Report Lookup Coverage Gate
+        run: |
+          python scripts/check_report_lookup_coverage.py
 
       - name: Read-only Oracle validation + completeness gate
         if: ${{ env.ORACLE_USER != '' && env.ORACLE_PASSWORD != '' && env.ORACLE_DSN != '' }}
@@ -102,8 +135,12 @@ jobs:
             reports/subreports/line_items.jasper
             reports/client_value_scorecard.jasper
             reports/collections_prioritization.jasper
+            reports/ops_hub_dashboard.jasper
+            reports/lookup_description_completeness_audit.jasper
             deploy/billing_master_report_unit.zip
             deploy/client_value_scorecard_report_unit.zip
             deploy/collections_prioritization_report_unit.zip
+            deploy/ops_hub_dashboard_report_unit.zip
+            deploy/lookup_description_completeness_audit_report_unit.zip
             smoke_report.pdf
           if-no-files-found: warn

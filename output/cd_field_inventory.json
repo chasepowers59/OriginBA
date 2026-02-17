@@ -1,0 +1,382 @@
+{
+  "source_of_truth": [
+    "output/workstream_reporting_dictionary.json",
+    "Domain Designs.xlsx",
+    "output/domain_designs_metadata.json"
+  ],
+  "fields": {
+    "ACCT_STATUS_CD": {
+      "files": [
+        "pipeline/queries.py"
+      ],
+      "lookup": null
+    },
+    "ALERT_TYPE_CD": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/queries.py",
+        "reports/collections_prioritization.jrxml",
+        "sql/bankruptcy_monitor.sql",
+        "sql/c2m_business_use_cases.sql",
+        "sql/collections_prioritization.sql"
+      ],
+      "lookup": {
+        "source_table": "CISADM.CI_ALERT_TYPE_L",
+        "join": "ALERT_TYPE_CD + LANGUAGE_CD='EN'",
+        "descr_col": "DESCR80"
+      }
+    },
+    "BATCH_CD": {
+      "files": [
+        "pipeline/queries.py",
+        "pipeline/validate_tables.py"
+      ],
+      "lookup": null
+    },
+    "BILL_CYC_CD": {
+      "files": [
+        "pipeline/queries.py",
+        "pipeline/validate_tables.py",
+        "reports/billing_master.jrxml",
+        "sql/vw_billing_summary.sql"
+      ],
+      "lookup": null
+    },
+    "BILL_STATUS_CD": {
+      "files": [
+        "reports/billing_master.jrxml"
+      ],
+      "lookup": null
+    },
+    "BILL_STAT_FLG": {
+      "files": [
+        "pipeline/queries.py",
+        "reports/billing_master.jrxml",
+        "reports/ops_hub_dashboard.jrxml",
+        "sql/client_value_scorecard.sql",
+        "sql/smartcity_9_workstream_kpis.sql",
+        "sql/vw_billing_summary.sql"
+      ],
+      "lookup": {
+        "source_table": "CISADM.CI_LOOKUP_VAL",
+        "join": "TRIM(FIELD_NAME)='BILL_STAT_FLG' + TRIM(FIELD_VALUE)=value",
+        "descr_col": "VALUE_NAME"
+      }
+    },
+    "BO_STATUS_CD": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/queries.py"
+      ],
+      "lookup": null
+    },
+    "BO_STATUS_REASON_CD": {
+      "files": [
+        "pipeline/queries.py"
+      ],
+      "lookup": null
+    },
+    "BSEG_STAT_FLG": {
+      "files": [
+        "reports/subreports/line_items.jrxml"
+      ],
+      "lookup": {
+        "source_table": "CISADM.CI_LOOKUP_VAL",
+        "join": "TRIM(FIELD_NAME)='BSEG_STAT_FLG' + TRIM(FIELD_VALUE)=value",
+        "descr_col": "VALUE_NAME"
+      }
+    },
+    "BUS_OBJ_CD": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/queries.py"
+      ],
+      "lookup": null
+    },
+    "CC_CL_CD": {
+      "files": [
+        "reports/customer_contact_letter.jrxml",
+        "sql/c2m_business_use_cases.sql",
+        "sql/customer_contact_letter.sql"
+      ],
+      "lookup": {
+        "source_table": "CISADM.CI_CC_CL_L",
+        "join": "CC_CL_CD + LANGUAGE_CD='EN'",
+        "descr_col": "DESCR"
+      }
+    },
+    "CC_TYPE_CD": {
+      "files": [
+        "reports/customer_contact_letter.jrxml",
+        "sql/c2m_business_use_cases.sql",
+        "sql/customer_contact_letter.sql"
+      ],
+      "lookup": {
+        "source_table": "CISADM.CI_CC_TYPE_L",
+        "join": "CC_CL_CD + CC_TYPE_CD + LANGUAGE_CD='EN'",
+        "descr_col": "DESCR"
+      }
+    },
+    "COLL_CL_CD": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/queries.py",
+        "reports/collections_prioritization.jrxml",
+        "sql/c2m_business_use_cases.sql",
+        "sql/collections_prioritization.sql",
+        "sql/vw_debt_mgmt_account.sql"
+      ],
+      "lookup": {
+        "source_table": "CISADM.CI_COLL_CL_L",
+        "join": "COLL_CL_CD + LANGUAGE_CD='EN'",
+        "descr_col": "DESCR"
+      }
+    },
+    "CONTACT_METH_FLG": {
+      "files": [
+        "reports/customer_contact_letter.jrxml",
+        "sql/c2m_business_use_cases.sql",
+        "sql/customer_contact_letter.sql"
+      ],
+      "lookup": {
+        "source_table": "CISADM.CI_LOOKUP_VAL",
+        "join": "TRIM(FIELD_NAME)='CONTACT_METH_FLG' + TRIM(FIELD_VALUE)=value",
+        "descr_col": "VALUE_NAME"
+      }
+    },
+    "CUSTOMER_COLL_CL_CD": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/generate_narrative.py"
+      ],
+      "lookup": null
+    },
+    "CUSTOMER_CUST_CL_CD": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/generate_narrative.py"
+      ],
+      "lookup": null
+    },
+    "CUST_CL_CD": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/queries.py",
+        "pipeline/validate_tables.py"
+      ],
+      "lookup": null
+    },
+    "DEBT_CL_CD": {
+      "files": [
+        "pipeline/queries.py",
+        "pipeline/validate_tables.py",
+        "sql/arrears_strategic.sql"
+      ],
+      "lookup": null
+    },
+    "DEBT_MGMT_COLL_CL_CD": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/generate_narrative.py"
+      ],
+      "lookup": null
+    },
+    "DEP_CTL_STATUS_FLG": {
+      "files": [
+        "pipeline/queries.py",
+        "reports/ops_hub_dashboard.jrxml",
+        "sql/c2m_business_use_cases.sql",
+        "sql/deposit_reconciliation.sql",
+        "sql/smartcity_9_workstream_kpis.sql"
+      ],
+      "lookup": null
+    },
+    "DEVICE_TYPE_CD": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/generate_narrative.py",
+        "pipeline/queries.py"
+      ],
+      "lookup": null
+    },
+    "DIVISION_CD": {
+      "files": [
+        "sql/hourly_rollup.sql"
+      ],
+      "lookup": null
+    },
+    "FIELD_OPS_SP_STATUS_FLG": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/generate_narrative.py"
+      ],
+      "lookup": null
+    },
+    "FT_TYPE_FLG": {
+      "files": [
+        "pipeline/queries.py",
+        "pipeline/validate_tables.py",
+        "reports/billing_master.jrxml",
+        "reports/client_value_scorecard.jrxml",
+        "reports/collections_prioritization.jrxml",
+        "reports/ops_hub_dashboard.jrxml",
+        "sql/arrears_detailed.sql",
+        "sql/arrears_strategic.sql",
+        "sql/bankruptcy_monitor.sql",
+        "sql/c2m_business_use_cases.sql",
+        "sql/client_value_scorecard.sql",
+        "sql/collections_prioritization.sql",
+        "sql/duplicate_payment.sql",
+        "sql/governance_snippets.sql",
+        "sql/smartcity_9_workstream_kpis.sql"
+      ],
+      "lookup": null
+    },
+    "LANGUAGE_CD": {
+      "files": [
+        "pipeline/queries.py",
+        "reports/collections_prioritization.jrxml",
+        "reports/customer_contact_letter.jrxml",
+        "sql/c2m_business_use_cases.sql",
+        "sql/collections_prioritization.sql",
+        "sql/customer_contact_letter.sql"
+      ],
+      "lookup": null
+    },
+    "LTR_TMPL_CD": {
+      "files": [
+        "pipeline/validate_tables.py",
+        "reports/client_value_scorecard.jrxml",
+        "reports/customer_contact_letter.jrxml",
+        "reports/ops_hub_dashboard.jrxml",
+        "sql/c2m_business_use_cases.sql",
+        "sql/client_value_scorecard.sql",
+        "sql/customer_contact_letter.sql",
+        "sql/customer_contact_readiness_kpi.sql",
+        "sql/smartcity_9_workstream_kpis.sql"
+      ],
+      "lookup": null
+    },
+    "PAY_STATUS_FLG": {
+      "files": [
+        "pipeline/queries.py",
+        "sql/deposit_reconciliation.sql",
+        "sql/governance_snippets.sql"
+      ],
+      "lookup": null
+    },
+    "POSTAL_CD": {
+      "files": [
+        "pipeline/queries.py"
+      ],
+      "lookup": null
+    },
+    "RATE_RS_CD": {
+      "files": [
+        "pipeline/queries.py",
+        "pipeline/validate_tables.py"
+      ],
+      "lookup": null
+    },
+    "RS_CD": {
+      "files": [
+        "pipeline/generate_narrative.py",
+        "pipeline/queries.py"
+      ],
+      "lookup": null
+    },
+    "SA_STATUS_FLG": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/generate_narrative.py",
+        "pipeline/queries.py",
+        "pipeline/validate_tables.py",
+        "reports/collections_prioritization.jrxml",
+        "reports/ops_hub_dashboard.jrxml",
+        "sql/arrears_strategic.sql",
+        "sql/c2m_business_use_cases.sql",
+        "sql/collections_prioritization.sql",
+        "sql/duplicate_payment.sql",
+        "sql/governance_snippets.sql",
+        "sql/premise_to_acct_mapping.sql",
+        "sql/smartcity_9_workstream_kpis.sql"
+      ],
+      "lookup": {
+        "source_table": "CISADM.CI_LOOKUP_VAL",
+        "join": "TRIM(FIELD_NAME)='SA_STATUS_FLG' + TRIM(FIELD_VALUE)=value",
+        "descr_col": "VALUE_NAME"
+      }
+    },
+    "SA_TYPE_CD": {
+      "files": [
+        "pipeline/queries.py",
+        "sql/arrears_strategic.sql"
+      ],
+      "lookup": null
+    },
+    "SP_STATUS_FLG": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/queries.py",
+        "pipeline/validate_tables.py"
+      ],
+      "lookup": null
+    },
+    "STATE_CD": {
+      "files": [
+        "pipeline/queries.py"
+      ],
+      "lookup": null
+    },
+    "STATUS_CD": {
+      "files": [
+        "pipeline/queries.py",
+        "pipeline/validate_tables.py"
+      ],
+      "lookup": null
+    },
+    "STATUS_FLG": {
+      "files": [
+        "sql/plsql_bulk_collect_forall_harness.sql"
+      ],
+      "lookup": null
+    },
+    "TASK_STATUS_CD": {
+      "files": [
+        "pipeline/queries.py"
+      ],
+      "lookup": null
+    },
+    "TENDER_TYPE_CD": {
+      "files": [
+        "pipeline/queries.py",
+        "sql/c2m_business_use_cases.sql",
+        "sql/deposit_reconciliation.sql"
+      ],
+      "lookup": {
+        "source_table": "CISADM.CI_TENDER_TYPE_L",
+        "join": "TENDER_TYPE_CD + LANGUAGE_CD='EN'",
+        "descr_col": "DESCR"
+      }
+    },
+    "TNDR_SOURCE_CD": {
+      "files": [
+        "sql/c2m_business_use_cases.sql",
+        "sql/deposit_reconciliation.sql"
+      ],
+      "lookup": null
+    },
+    "TNDR_STATUS_FLG": {
+      "files": [
+        "pipeline/fetch_usage.py",
+        "pipeline/queries.py",
+        "sql/c2m_business_use_cases.sql"
+      ],
+      "lookup": {
+        "source_table": "CISADM.CI_LOOKUP_VAL",
+        "join": "TRIM(FIELD_NAME)='TNDR_STATUS_FLG' + TRIM(FIELD_VALUE)=value",
+        "descr_col": "VALUE_NAME"
+      }
+    }
+  }
+}

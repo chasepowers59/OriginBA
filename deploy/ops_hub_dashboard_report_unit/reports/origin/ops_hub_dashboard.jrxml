@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="ops_hub_dashboard"
+    pageWidth="595"
+    pageHeight="842"
+    columnWidth="555"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="78762b41-fc9f-4947-a327-daa01ae27296">
+
+    <parameter name="CLIENT_ID" class="java.lang.String"/>
+    <parameter name="START_TS" class="java.sql.Timestamp"/>
+    <parameter name="END_TS" class="java.sql.Timestamp"/>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT WORKSTREAM_NAME, KPI_NAME, KPI_VALUE
+FROM (
+    SELECT 'billing' AS WORKSTREAM_NAME, 'OPEN_BILLS' AS KPI_NAME, COUNT(*) AS KPI_VALUE
+    FROM CISADM.CI_BILL B
+    JOIN CISADM.CI_ACCT A ON A.ACCT_ID = B.ACCT_ID
+    WHERE B.CRE_DTTM >= $P{START_TS}
+      AND B.CRE_DTTM <  $P{END_TS}
+      AND NULLIF(TRIM(B.BILL_STAT_FLG), '') <> '60'
+      AND ($P{CLIENT_ID} IS NULL OR A.CIS_DIVISION = $P{CLIENT_ID})
+    UNION ALL
+    SELECT 'cashiering', 'UNRESOLVED_TENDER_CONTROLS', COUNT(*)
+    FROM CISADM.CI_PAY_EVENT PE
+    JOIN CISADM.CI_PAY P ON P.PAY_EVENT_ID = PE.PAY_EVENT_ID
+    JOIN CISADM.CI_PAY_TNDR PT ON PT.PAY_EVENT_ID = PE.PAY_EVENT_ID
+    LEFT JOIN CISADM.CI_TNDR_CTL TC ON TC.TNDR_CTL_ID = PT.TNDR_CTL_ID
+    LEFT JOIN CISADM.CI_DEP_CTL DC ON DC.DEP_CTL_ID = TC.DEP_CTL_ID
+    JOIN CISADM.CI_ACCT A ON A.ACCT_ID = P.ACCT_ID
+    WHERE PE.CRE_DTTM >= $P{START_TS}
+      AND PE.CRE_DTTM <  $P{END_TS}
+      AND ($P{CLIENT_ID} IS NULL OR A.CIS_DIVISION = $P{CLIENT_ID})
+      AND (DC.DEP_CTL_ID IS NULL OR NULLIF(TRIM(DC.DEP_CTL_STATUS_FLG), '') <> '25')
+    UNION ALL
+    SELECT 'meter_ops', 'INSTALL_EVENTS', COUNT(*)
+    FROM CISADM.D1_INSTALL_EVT IE
+    WHERE IE.D1_INSTALL_DTTM >= $P{START_TS}
+      AND IE.D1_INSTALL_DTTM <  $P{END_TS}
+    UNION ALL
+    SELECT 'customer_ops', 'CONTACT_LETTER_DEFECTS', COUNT(*)
+    FROM CISADM.CI_CC CC
+    JOIN CISADM.CI_ACCT A ON A.ACCT_ID = CC.ACCT_ID
+    LEFT JOIN CISADM.CI_LETTER_TMPL LT ON LT.LTR_TMPL_CD = CC.LTR_TMPL_CD
+    LEFT JOIN CISADM.CI_PER_NAME PN ON PN.PER_ID = CC.PER_ID AND PN.PRIM_NAME_SW = 'Y'
+    LEFT JOIN CISADM.CI_PREM PR ON PR.PREM_ID = CC.PREM_ID
+    WHERE CC.PRINT_LETTER_SW = 'Y'
+      AND CC.CC_DTTM >= $P{START_TS}
+      AND CC.CC_DTTM <  $P{END_TS}
+      AND ($P{CLIENT_ID} IS NULL OR A.CIS_DIVISION = $P{CLIENT_ID})
+      AND (LT.LTR_TMPL_CD IS NULL OR NULLIF(TRIM(PN.ENTITY_NAME), '') IS NULL OR NULLIF(TRIM(PR.ADDRESS1), '') IS NULL)
+    UNION ALL
+    SELECT 'new_services', 'STALE_PENDING_SA', COUNT(*)
+    FROM CISADM.CI_SA SA
+    JOIN CISADM.CI_ACCT A ON A.ACCT_ID = SA.ACCT_ID
+    WHERE NULLIF(TRIM(SA.SA_STATUS_FLG), '') = '10'
+      AND SA.START_DT IS NOT NULL
+      AND TRUNC(SA.START_DT) < TRUNC($P{END_TS})
+      AND ($P{CLIENT_ID} IS NULL OR A.CIS_DIVISION = $P{CLIENT_ID})
+    UNION ALL
+    SELECT 'finance', 'FT_MISSING_GL_STATUS', COUNT(*)
+    FROM CISADM.CI_FT FT
+    JOIN CISADM.CI_SA SA ON SA.SA_ID = FT.SA_ID
+    JOIN CISADM.CI_ACCT A ON A.ACCT_ID = SA.ACCT_ID
+    WHERE FT.CRE_DTTM >= $P{START_TS}
+      AND FT.CRE_DTTM <  $P{END_TS}
+      AND NULLIF(TRIM(FT.GL_DISTRIB_STATUS), '') IS NULL
+      AND ($P{CLIENT_ID} IS NULL OR A.CIS_DIVISION = $P{CLIENT_ID})
+    UNION ALL
+    SELECT 'common', 'INACTIVE_LOOKUP_VALUES', COUNT(*)
+    FROM CISADM.CI_LOOKUP_VAL LV
+    WHERE NULLIF(TRIM(LV.EFF_STATUS), '') <> 'A'
+    UNION ALL
+    SELECT 'debt_mgmt', 'DEBT_OVER_60',
+           NVL(SUM(CASE
+                     WHEN FT.FREEZE_SW = 'Y'
+                      AND FT.NOT_IN_ARS_SW = 'N'
+                      AND FT.FT_TYPE_FLG NOT IN ('PS', 'PX')
+                      AND FT.ARS_DT IS NOT NULL
+                      AND (TRUNC($P{END_TS}) - FT.ARS_DT) > 60
+                     THEN FT.CUR_AMT
+                     ELSE 0
+                   END), 0)
+    FROM CISADM.CI_FT FT
+    JOIN CISADM.CI_SA SA ON SA.SA_ID = FT.SA_ID
+    JOIN CISADM.CI_ACCT A ON A.ACCT_ID = SA.ACCT_ID
+    WHERE FT.CRE_DTTM >= $P{START_TS}
+      AND FT.CRE_DTTM <  $P{END_TS}
+      AND ($P{CLIENT_ID} IS NULL OR A.CIS_DIVISION = $P{CLIENT_ID})
+    UNION ALL
+    SELECT 'field_ops', 'SP_WITHOUT_INSTALL_EVENT', COUNT(*)
+    FROM CISADM.CI_SP SP
+    LEFT JOIN CISADM.D1_INSTALL_EVT IE ON IE.D1_SP_ID = SP.SP_ID
+    WHERE IE.D1_SP_ID IS NULL
+)
+ORDER BY WORKSTREAM_NAME, KPI_NAME
+        ]]>
+    </queryString>
+
+    <field name="WORKSTREAM_NAME" class="java.lang.String"/>
+    <field name="KPI_NAME" class="java.lang.String"/>
+    <field name="KPI_VALUE" class="java.math.BigDecimal"/>
+
+    <title>
+        <band height="44">
+            <staticText>
+                <reportElement x="0" y="6" width="555" height="24" uuid="8ac00ecf-bf8f-47fe-957d-e8b1de4bad88"/>
+                <textElement><font size="16" isBold="true"/></textElement>
+                <text><![CDATA[SmartCity Ops Hub KPI Dashboard]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="20">
+            <staticText><reportElement x="0" y="0" width="170" height="20" uuid="7278eb1e-cb8d-4959-9a39-8a4797f6e111"/><textElement><font isBold="true"/></textElement><text><![CDATA[Workstream]]></text></staticText>
+            <staticText><reportElement x="175" y="0" width="260" height="20" uuid="d2bfc6e5-8bf4-4f29-a82f-ee486e07e41b"/><textElement><font isBold="true"/></textElement><text><![CDATA[KPI]]></text></staticText>
+            <staticText><reportElement x="440" y="0" width="115" height="20" uuid="1cbd027b-c09d-43c6-9b75-c57181cd0569"/><textElement textAlignment="Right"><font isBold="true"/></textElement><text><![CDATA[Value]]></text></staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="18">
+            <textField><reportElement x="0" y="0" width="170" height="18" uuid="02e8e6eb-0f19-4c71-814f-d2866b7f7dcf"/><textFieldExpression><![CDATA[$F{WORKSTREAM_NAME}]]></textFieldExpression></textField>
+            <textField><reportElement x="175" y="0" width="260" height="18" uuid="20fe37cd-f27f-4fcd-8697-8cf2c7784500"/><textFieldExpression><![CDATA[$F{KPI_NAME}]]></textFieldExpression></textField>
+            <textField pattern="#,##0.00"><reportElement x="440" y="0" width="115" height="18" uuid="85c89f3b-1565-48ca-a6f0-574ff47ca395"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{KPI_VALUE}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+</jasperReport>

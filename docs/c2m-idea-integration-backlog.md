@@ -34,6 +34,17 @@ Convert ideas into repeatable client value with governed SQL, Jaspersoft templat
 - Assets: `sql/hourly_rollup.sql`, `output/workstream_health.json`
 - Integration: flag stale install/read streams before billing cycles close.
 
+4. SmartCity Ops Hub (All 9 Workstreams)
+- Assets: `reports/ops_hub_dashboard.jrxml`, `sql/smartcity_9_workstream_kpis.sql`
+- Input controls: `server/input_controls/ops_hub_dashboard_input_controls.json`
+- Packaging: `deploy/build_report_unit_ops_hub.sh`
+
+5. Lookup Description Completeness Audit
+- Assets: `sql/lookup_description_completeness_audit.sql`, `reports/lookup_description_completeness_audit.jrxml`
+- Input controls: `server/input_controls/lookup_description_completeness_audit_input_controls.json`
+- Packaging: `deploy/build_report_unit_lookup_audit.ps1`
+- Value: identify missing code descriptions before client-facing releases.
+
 ## Enablement Pattern (Each Idea)
 1. Validate SQL with bind variables and explain plan in DEV/QA.
 2. Add/update Input Controls payload in `server/input_controls/`.

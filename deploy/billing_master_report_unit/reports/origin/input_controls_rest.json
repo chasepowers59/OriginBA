@@ -1,0 +1,45 @@
+{
+  "version": "2",
+  "label": "billing_master_input_controls",
+  "uri": "/reports/origin/billing_master_input_controls",
+  "permissionMask": 0,
+  "controls": [
+    {
+      "id": "CLIENT_ID",
+      "label": "Bill Cycle",
+      "type": "singleSelectQuery",
+      "mandatory": true,
+      "visible": true,
+      "dataType": "text",
+      "query": "SELECT DISTINCT TRIM(BILL_CYC_CD) AS VALUE_COL, TRIM(BILL_CYC_CD) AS LABEL_COL FROM CISADM.CI_BILL WHERE NULLIF(TRIM(BILL_CYC_CD), '') IS NOT NULL ORDER BY TRIM(BILL_CYC_CD)"
+    },
+    {
+      "id": "START_TS",
+      "label": "Start Timestamp",
+      "type": "dateTime",
+      "mandatory": true,
+      "visible": true,
+      "dataType": "date"
+    },
+    {
+      "id": "END_TS",
+      "label": "End Timestamp",
+      "type": "dateTime",
+      "mandatory": true,
+      "visible": true,
+      "dataType": "date"
+    },
+    {
+      "id": "CLIENT_LOGO_URL",
+      "label": "Client Logo URL",
+      "type": "singleValueText",
+      "mandatory": false,
+      "visible": false,
+      "dataType": "text"
+    }
+  ],
+  "multiSelectPattern": {
+    "collectionParameterExample": "ITEM_CODE_LIST",
+    "oracleUsageSql": "AND ITEM_CODE IN (SELECT COLUMN_VALUE FROM TABLE(:ITEM_CODE_LIST))"
+  }
+}
