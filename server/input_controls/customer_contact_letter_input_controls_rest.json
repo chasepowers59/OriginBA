@@ -1,0 +1,73 @@
+{
+  "version": "2",
+  "label": "customer_contact_letter_input_controls",
+  "uri": "/reports/origin/customer_contact_letter_input_controls",
+  "permissionMask": 0,
+  "controls": [
+    {
+      "id": "CC_ID",
+      "label": "Customer Contact ID",
+      "type": "singleSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "dataType": "text",
+      "query": "SELECT TO_CHAR(CC_ID) AS VALUE_COL, TO_CHAR(CC_ID) || ' | ' || TO_CHAR(CC_DTTM, 'YYYY-MM-DD HH24:MI') || ' | ' || NVL(CC_TYPE_CD, '-') AS LABEL_COL FROM CISADM.CI_CC WHERE PRINT_LETTER_SW = 'Y' ORDER BY CC_DTTM DESC FETCH FIRST 200 ROWS ONLY"
+    },
+    {
+      "id": "ACCT_ID",
+      "label": "Account ID (fallback mode)",
+      "type": "singleValueText",
+      "mandatory": false,
+      "visible": true,
+      "dataType": "text"
+    },
+    {
+      "id": "START_TS",
+      "label": "Start Timestamp",
+      "type": "dateTime",
+      "mandatory": false,
+      "visible": true,
+      "dataType": "date"
+    },
+    {
+      "id": "END_TS",
+      "label": "End Timestamp",
+      "type": "dateTime",
+      "mandatory": false,
+      "visible": true,
+      "dataType": "date"
+    },
+    {
+      "id": "AGENT_NAME",
+      "label": "Agent Name",
+      "type": "singleValueText",
+      "mandatory": true,
+      "visible": true,
+      "dataType": "text"
+    },
+    {
+      "id": "AGENT_TITLE",
+      "label": "Agent Title",
+      "type": "singleValueText",
+      "mandatory": false,
+      "visible": true,
+      "dataType": "text"
+    },
+    {
+      "id": "LETTER_DATE",
+      "label": "Letter Date",
+      "type": "dateTime",
+      "mandatory": true,
+      "visible": true,
+      "dataType": "date"
+    },
+    {
+      "id": "CLIENT_LOGO_URL",
+      "label": "Client Logo URL",
+      "type": "singleValueText",
+      "mandatory": false,
+      "visible": false,
+      "dataType": "text"
+    }
+  ]
+}

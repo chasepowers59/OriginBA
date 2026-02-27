@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="field_ops_action_queue"
+    pageWidth="1190"
+    pageHeight="842"
+    orientation="Landscape"
+    columnWidth="1150"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="2d3df622-4a57-4f8f-8f4b-39c7d7c2cc6a">
+
+    <property name="ireport.domainUri" value="/SmartCity/Report/Workstreams/Field_Operations/Field_Activity/Field_Activity___Domain"/>
+    <property name="com.jaspersoft.jrs.data.source" value="/SmartCity/Report/Workstreams/Field_Operations/Field_Activity/Field_Activity___Domain"/>
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+
+    <style name="Base" fontName="Aptos" fontSize="11"/>
+    <style name="TitleBlue" style="Base" forecolor="#F5F0EB" fontSize="20" isBold="true"/>
+    <style name="MetaBlue" style="Base" forecolor="#F5F0EB" fontSize="11"/>
+    <style name="HeaderBlue" style="Base" backcolor="#006FAC" forecolor="#F5F0EB" mode="Opaque" isBold="true"/>
+    <style name="DetailText" style="Base" forecolor="#000000" fontSize="10"/>
+    <style name="SummaryBlue" style="Base" backcolor="#F5F0EB" mode="Opaque" forecolor="#1348AB"/>
+    <style name="PainFlagCell" style="Base" mode="Opaque" backcolor="#E5E7EB" forecolor="#111827" isBold="true">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[
+($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{CRITICAL_DAYS}.intValue())
+            ]]></conditionExpression>
+            <style backcolor="#B91C1C" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+        <conditionalStyle>
+            <conditionExpression><![CDATA[
+($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null) && !($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{CRITICAL_DAYS}.intValue())
+            ]]></conditionExpression>
+            <style backcolor="#C2410C" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+        <conditionalStyle>
+            <conditionExpression><![CDATA[
+($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{HIGH_DAYS}.intValue()) && !($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{CRITICAL_DAYS}.intValue()) && !($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null)
+            ]]></conditionExpression>
+            <style backcolor="#D97706" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+        <conditionalStyle>
+            <conditionExpression><![CDATA[
+!($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{HIGH_DAYS}.intValue()) && !($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null)
+            ]]></conditionExpression>
+            <style backcolor="#047857" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+    </style>
+    <style name="DaysOldCell" style="Base" mode="Opaque" backcolor="#F8FAFC" forecolor="#0F172A">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{CRITICAL_DAYS}.intValue()]]></conditionExpression>
+            <style backcolor="#FEE2E2" forecolor="#7F1D1D" isBold="true"/>
+        </conditionalStyle>
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{HIGH_DAYS}.intValue() && $F{DAYS_OLD}.intValue() < $P{CRITICAL_DAYS}.intValue()]]></conditionExpression>
+            <style backcolor="#FFEDD5" forecolor="#9A3412" isBold="true"/>
+        </conditionalStyle>
+    </style>
+
+    <parameter name="LoggedInUser" class="com.jaspersoft.jasperserver.api.metadata.user.domain.User" isForPrompting="false"/>
+    <parameter name="LoggedInUsername" class="java.lang.String" isForPrompting="false"/>
+    <parameter name="REGION" class="java.lang.String"/>
+    <parameter name="DIVISION_CD" class="java.lang.String"/>
+    <parameter name="STATUS_TEXT" class="java.lang.String"/>
+    <parameter name="STATUS_EXACT" class="java.lang.String"/>
+    <parameter name="PAIN_FLAG_FILTER" class="java.lang.String"/>
+    <parameter name="GEO_STATUS" class="java.lang.String"/>
+    <parameter name="MAX_DAYS_OLD" class="java.lang.Integer"/>
+    <parameter name="ACTIVITY_TYPE_TEXT" class="java.lang.String"/>
+    <parameter name="CRITICAL_DAYS" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[14]]></defaultValueExpression>
+    </parameter>
+    <parameter name="HIGH_DAYS" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[7]]></defaultValueExpression>
+    </parameter>
+    <parameter name="PRIORITY_ONLY" class="java.lang.Boolean">
+        <defaultValueExpression><![CDATA[Boolean.FALSE]]></defaultValueExpression>
+    </parameter>
+    <parameter name="DETAIL_URL_BASE" class="java.lang.String">
+        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+    </parameter>
+    <parameter name="MIN_DAYS_OLD" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[3]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ONLY_GEO_MISSING" class="java.lang.Boolean">
+        <defaultValueExpression><![CDATA[Boolean.FALSE]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["INTERNAL USE ONLY"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="domain"><![CDATA[
+<query>
+    <queryFields>
+        <queryField id="D1_SP_ID"/>
+        <queryField id="CITY"/>
+        <queryField id="POSTAL"/>
+        <queryField id="DIVISION_CD"/>
+        <queryField id="ADDRESS1"/>
+        <queryField id="EXTERNAL_ACCT_ID"/>
+        <queryField id="D1_CUSTOMERNAME"/>
+        <queryField id="BO_STATUS_CD"/>
+        <queryField id="DESCR_1"/>
+        <queryField id="DESCR100"/>
+        <queryField id="START_DTTM"/>
+        <queryField id="D1_GEO_LAT"/>
+        <queryField id="D1_GEO_LONG"/>
+        <queryField id="ACTIVITY_ID_DISTINCT"/>
+        <queryField id="DAYS_OLD"/>
+    </queryFields>
+</query>
+    ]]></queryString>
+
+    <field name="D1_SP_ID" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="D1_SP_ID"/>
+    </field>
+    <field name="CITY" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="CITY"/>
+    </field>
+    <field name="POSTAL" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="POSTAL"/>
+    </field>
+    <field name="DIVISION_CD" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="DIVISION_CD"/>
+    </field>
+    <field name="ADDRESS1" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="ADDRESS1"/>
+    </field>
+    <field name="EXTERNAL_ACCT_ID" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="EXTERNAL_ACCT_ID"/>
+    </field>
+    <field name="D1_CUSTOMERNAME" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="D1_CUSTOMERNAME"/>
+    </field>
+    <field name="BO_STATUS_CD" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="BO_STATUS_CD"/>
+    </field>
+    <field name="STATUS_DESCR" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="DESCR_1"/>
+    </field>
+    <field name="ACTIVITY_TYPE_DESCR" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="DESCR100"/>
+    </field>
+    <field name="START_DTTM" class="java.sql.Timestamp">
+        <property name="net.sf.jasperreports.query.field.id" value="START_DTTM"/>
+    </field>
+    <field name="D1_GEO_LAT" class="java.math.BigDecimal">
+        <property name="net.sf.jasperreports.query.field.id" value="D1_GEO_LAT"/>
+    </field>
+    <field name="D1_GEO_LONG" class="java.math.BigDecimal">
+        <property name="net.sf.jasperreports.query.field.id" value="D1_GEO_LONG"/>
+    </field>
+    <field name="ACTIVITY_COUNT" class="java.lang.Long">
+        <property name="net.sf.jasperreports.query.field.id" value="ACTIVITY_ID_DISTINCT"/>
+    </field>
+    <field name="DAYS_OLD" class="java.math.BigDecimal">
+        <property name="net.sf.jasperreports.query.field.id" value="DAYS_OLD"/>
+    </field>
+
+    <sortField name="DAYS_OLD" order="Descending"/>
+
+    <variable name="TOTAL_ROWS" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{D1_SP_ID}]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="CRITICAL_CNT" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{CRITICAL_DAYS}.intValue()) ? 1 : 0
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="GEO_MISSING_CNT" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null) ? 1 : 0
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="HIGH_GEO_CNT" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null) && !($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{CRITICAL_DAYS}.intValue()) ? 1 : 0
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="HIGH_CNT" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{HIGH_DAYS}.intValue() && $F{DAYS_OLD}.intValue() < $P{CRITICAL_DAYS}.intValue() && !($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null)) ? 1 : 0
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="NORMAL_CNT" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+(!($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{HIGH_DAYS}.intValue()) && !($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null)) ? 1 : 0
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="AVG_DAYS_OLD" class="java.lang.Double" calculation="Average">
+        <variableExpression><![CDATA[$F{DAYS_OLD} == null ? null : Double.valueOf($F{DAYS_OLD}.doubleValue())]]></variableExpression>
+    </variable>
+
+    <filterExpression><![CDATA[
+($F{D1_SP_ID} != null)
+&& ($P{REGION} == null || $P{REGION}.trim().length() == 0
+    || ("UNKNOWN".equalsIgnoreCase($P{REGION}.trim()) && (($F{CITY} == null || $F{CITY}.trim().length() == 0) && ($F{DIVISION_CD} == null || $F{DIVISION_CD}.trim().length() == 0)))
+    || ($F{CITY} != null && $F{CITY}.toUpperCase().contains($P{REGION}.trim().toUpperCase()))
+    || ($F{DIVISION_CD} != null && $F{DIVISION_CD}.toUpperCase().contains($P{REGION}.trim().toUpperCase())))
+&& ($P{DIVISION_CD} == null || $P{DIVISION_CD}.trim().length() == 0 || ($F{DIVISION_CD} != null && $F{DIVISION_CD}.equalsIgnoreCase($P{DIVISION_CD})))
+&& ($P{STATUS_TEXT} == null || $P{STATUS_TEXT}.trim().length() == 0 || (($F{STATUS_DESCR} != null && $F{STATUS_DESCR}.toUpperCase().contains($P{STATUS_TEXT}.trim().toUpperCase())) || ($F{BO_STATUS_CD} != null && $F{BO_STATUS_CD}.toUpperCase().contains($P{STATUS_TEXT}.trim().toUpperCase()))))
+&& ($P{STATUS_EXACT} == null || $P{STATUS_EXACT}.trim().length() == 0 || (($F{STATUS_DESCR} != null && $F{STATUS_DESCR}.equalsIgnoreCase($P{STATUS_EXACT}.trim())) || ($F{BO_STATUS_CD} != null && $F{BO_STATUS_CD}.equalsIgnoreCase($P{STATUS_EXACT}.trim()))))
+&& ($P{ACTIVITY_TYPE_TEXT} == null || $P{ACTIVITY_TYPE_TEXT}.trim().length() == 0 || ($F{ACTIVITY_TYPE_DESCR} != null && $F{ACTIVITY_TYPE_DESCR}.toUpperCase().contains($P{ACTIVITY_TYPE_TEXT}.trim().toUpperCase())))
+&& ($P{MIN_DAYS_OLD} == null || $F{DAYS_OLD} == null || $F{DAYS_OLD}.intValue() >= $P{MIN_DAYS_OLD}.intValue())
+&& ($P{MAX_DAYS_OLD} == null || $F{DAYS_OLD} == null || $F{DAYS_OLD}.intValue() <= $P{MAX_DAYS_OLD}.intValue())
+&& ($P{GEO_STATUS} == null || $P{GEO_STATUS}.trim().length() == 0 || ("MISSING".equalsIgnoreCase($P{GEO_STATUS}.trim()) ? ($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null) : ("PRESENT".equalsIgnoreCase($P{GEO_STATUS}.trim()) ? ($F{D1_GEO_LAT} != null && $F{D1_GEO_LONG} != null) : true)))
+&& ($P{PAIN_FLAG_FILTER} == null || $P{PAIN_FLAG_FILTER}.trim().length() == 0 || (
+((($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{CRITICAL_DAYS}.intValue()) ? "CRITICAL" : (($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null) ? "HIGH_GEO" : (($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{HIGH_DAYS}.intValue()) ? "HIGH" : "NORMAL")))).equalsIgnoreCase($P{PAIN_FLAG_FILTER}.trim())
+))
+&& ($P{PRIORITY_ONLY} == null || !$P{PRIORITY_ONLY}.booleanValue() || (($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{HIGH_DAYS}.intValue()) || ($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null))
+)
+&& ($P{ONLY_GEO_MISSING} == null || !$P{ONLY_GEO_MISSING}.booleanValue() || ($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null))
+    ]]></filterExpression>
+
+    <title>
+        <band height="250">
+            <frame>
+                <reportElement x="0" y="0" width="1150" height="70" uuid="ef553aa3-03cb-4bf4-bf13-570d053f24fc" mode="Opaque" backcolor="#1348AB"/>
+            </frame>
+            <staticText>
+                <reportElement style="TitleBlue" x="20" y="12" width="860" height="24" uuid="22a24ee1-c5ec-4f35-ab65-2b7eb9ea956f"/>
+                <text><![CDATA[Field Operations Action Queue]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="MetaBlue" x="20" y="42" width="1110" height="18" uuid="2dc5a0d4-e615-49d5-a888-7a5f6f8ab64e"/>
+                <textFieldExpression><![CDATA[
+"REGION=" + (($P{REGION} == null || $P{REGION}.trim().length() == 0) ? "ALL" : $P{REGION}.trim())
++ " | DIVISION=" + (($P{DIVISION_CD} == null || $P{DIVISION_CD}.trim().length() == 0) ? "ALL" : $P{DIVISION_CD}.trim())
++ " | STATUS=" + (($P{STATUS_TEXT} == null || $P{STATUS_TEXT}.trim().length() == 0) ? "ALL" : $P{STATUS_TEXT}.trim())
++ " | STATUS_EXACT=" + (($P{STATUS_EXACT} == null || $P{STATUS_EXACT}.trim().length() == 0) ? "ALL" : $P{STATUS_EXACT}.trim())
++ " | PAIN=" + (($P{PAIN_FLAG_FILTER} == null || $P{PAIN_FLAG_FILTER}.trim().length() == 0) ? "ALL" : $P{PAIN_FLAG_FILTER}.trim())
++ " | GEO=" + (($P{GEO_STATUS} == null || $P{GEO_STATUS}.trim().length() == 0) ? "ALL" : $P{GEO_STATUS}.trim())
++ " | TYPE=" + (($P{ACTIVITY_TYPE_TEXT} == null || $P{ACTIVITY_TYPE_TEXT}.trim().length() == 0) ? "ALL" : $P{ACTIVITY_TYPE_TEXT}.trim())
++ " | DAYS=" + ($P{MIN_DAYS_OLD} == null ? "MIN" : $P{MIN_DAYS_OLD}) + "-" + ($P{MAX_DAYS_OLD} == null ? "MAX" : $P{MAX_DAYS_OLD})
+ + " | THRESHOLDS(HIGH/CRITICAL)=" + $P{HIGH_DAYS} + "/" + $P{CRITICAL_DAYS}
+ + " | PRIORITY_ONLY=" + (($P{PRIORITY_ONLY} != null && $P{PRIORITY_ONLY}.booleanValue()) ? "Y" : "N")
+                ]]></textFieldExpression>
+            </textField>
+            <frame>
+                <reportElement style="SummaryBlue" x="0" y="78" width="560" height="160" uuid="e8a84856-6aa6-4fa1-be99-e2a2165fd243"/>
+                <box><pen lineWidth="0.5"/></box>
+                <staticText>
+                    <reportElement x="10" y="8" width="540" height="16" uuid="778a3f95-4cf6-49b0-81a4-c78bc484f04e"/>
+                    <textElement><font isBold="true"/></textElement>
+                    <text><![CDATA[Operational KPIs]]></text>
+                </staticText>
+                <textField evaluationTime="Report">
+                    <reportElement x="10" y="32" width="250" height="16" uuid="1e6239db-f4af-4d81-aaee-a7ba8f32ea61"/>
+                    <textFieldExpression><![CDATA["Queue Rows: " + $V{TOTAL_ROWS}]]></textFieldExpression>
+                </textField>
+                <textField evaluationTime="Report">
+                    <reportElement x="10" y="52" width="250" height="16" uuid="ec66f55a-2b34-49b0-ad04-2db67d29375d"/>
+                    <textFieldExpression><![CDATA["Critical: " + $V{CRITICAL_CNT}]]></textFieldExpression>
+                </textField>
+                <textField evaluationTime="Report">
+                    <reportElement x="10" y="72" width="250" height="16" uuid="2b3ce355-67b1-43c8-b230-e2fce8f18317"/>
+                    <textFieldExpression><![CDATA["Geo Missing: " + $V{GEO_MISSING_CNT}]]></textFieldExpression>
+                </textField>
+                <textField evaluationTime="Report">
+                    <reportElement x="10" y="92" width="250" height="16" uuid="7ac2ecb5-d7d0-444b-a58e-67814eb999d8"/>
+                    <textFieldExpression><![CDATA["Avg Days Old: " + ($V{AVG_DAYS_OLD} == null ? "N/A" : new java.text.DecimalFormat("#0.0").format($V{AVG_DAYS_OLD}))]]></textFieldExpression>
+                </textField>
+                <textField evaluationTime="Report">
+                    <reportElement x="280" y="32" width="260" height="16" uuid="779af03b-df05-4f43-851d-6a1e8d1f912f"/>
+                    <textFieldExpression><![CDATA["High Geo: " + $V{HIGH_GEO_CNT}]]></textFieldExpression>
+                </textField>
+                <textField evaluationTime="Report">
+                    <reportElement x="280" y="52" width="260" height="16" uuid="18812cf6-bf7e-4b52-9094-6189d2f96ca6"/>
+                    <textFieldExpression><![CDATA["High Aging: " + $V{HIGH_CNT}]]></textFieldExpression>
+                </textField>
+                <textField evaluationTime="Report">
+                    <reportElement x="280" y="72" width="260" height="16" uuid="836f9a72-411e-4928-bf00-ba617e89aa6f"/>
+                    <textFieldExpression><![CDATA["Normal: " + $V{NORMAL_CNT}]]></textFieldExpression>
+                </textField>
+            </frame>
+            <barChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="570" y="78" width="580" height="160" uuid="160fb4f5-cf2e-4e26-bfb3-d130f8ea9268"/>
+                    <chartTitle>
+                        <titleExpression><![CDATA["Pain Bucket Distribution"]]></titleExpression>
+                    </chartTitle>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Critical"]]></seriesExpression>
+                        <categoryExpression><![CDATA["Queue"]]></categoryExpression>
+                        <valueExpression><![CDATA[$V{CRITICAL_CNT}]]></valueExpression>
+                    </categorySeries>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["High Geo"]]></seriesExpression>
+                        <categoryExpression><![CDATA["Queue"]]></categoryExpression>
+                        <valueExpression><![CDATA[$V{HIGH_GEO_CNT}]]></valueExpression>
+                    </categorySeries>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["High Aging"]]></seriesExpression>
+                        <categoryExpression><![CDATA["Queue"]]></categoryExpression>
+                        <valueExpression><![CDATA[$V{HIGH_CNT}]]></valueExpression>
+                    </categorySeries>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Normal"]]></seriesExpression>
+                        <categoryExpression><![CDATA["Queue"]]></categoryExpression>
+                        <valueExpression><![CDATA[$V{NORMAL_CNT}]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <barPlot>
+                    <plot/>
+                    <categoryAxisFormat>
+                        <axisFormat/>
+                    </categoryAxisFormat>
+                    <valueAxisFormat>
+                        <axisFormat/>
+                    </valueAxisFormat>
+                </barPlot>
+            </barChart>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="24">
+            <staticText><reportElement style="HeaderBlue" x="0" y="0" width="60" height="24" uuid="4a9fe30f-ec57-4e20-b44f-436a9ced7446"/><text><![CDATA[PRI]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="60" y="0" width="110" height="24" uuid="5f0c6f4f-a905-41e3-95ea-544496f28668"/><text><![CDATA[PAIN_FLAG]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="170" y="0" width="90" height="24" uuid="3221ee0d-8a36-4926-9e94-3be2cbcbc4f1"/><text><![CDATA[DAYS_OLD]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="260" y="0" width="95" height="24" uuid="b359d31e-0c32-4b31-ba3e-6e3a8f0122c4"/><text><![CDATA[SP_ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="355" y="0" width="80" height="24" uuid="7f4cad0a-bf60-4cc9-bdbe-59eb6ebd2fd6"/><text><![CDATA[CITY]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="435" y="0" width="80" height="24" uuid="3be4ee4b-0e7f-4e31-82ec-c0c86e5b24d0"/><text><![CDATA[DIVISION]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="515" y="0" width="190" height="24" uuid="4743f04f-0d80-4de7-a5f9-b37f2f9ce7aa"/><text><![CDATA[ADDRESS]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="705" y="0" width="95" height="24" uuid="692a8da7-2e02-4375-8ec7-4d7e3b6290cb"/><text><![CDATA[STATUS]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="800" y="0" width="75" height="24" uuid="2fac50f0-22df-4768-9c11-4f19f8f2067e"/><text><![CDATA[WORKLOAD]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="875" y="0" width="85" height="24" uuid="42ca5514-dceb-4e66-b777-6d8f4e1431c4"/><text><![CDATA[SLA]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="960" y="0" width="90" height="24" uuid="ff1d28f5-8b44-4b7b-967b-b86284ec0fbb"/><text><![CDATA[OWNER]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="1050" y="0" width="100" height="24" uuid="57b4981e-31d9-4043-8561-2f2c77d0b0f7"/><text><![CDATA[ACTION]]></text></staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="20">
+            <textField>
+                <reportElement style="DetailText" x="0" y="2" width="60" height="16" uuid="11c03f4f-3630-42cc-8388-0164c4f1961b"/>
+                <textFieldExpression><![CDATA[
+($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{CRITICAL_DAYS}.intValue()) ? "!!!"
+ : (($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null) ? "!!"
+ : (($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{HIGH_DAYS}.intValue()) ? "!" : "."))
+                ]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="PainFlagCell" x="60" y="2" width="110" height="16" uuid="3f021d53-a734-4b0f-aa2d-743ea445ccfc"/>
+                <textFieldExpression><![CDATA[
+($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{CRITICAL_DAYS}.intValue()) ? "CRITICAL"
+ : (($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null) ? "HIGH_GEO"
+ : (($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{HIGH_DAYS}.intValue()) ? "HIGH" : "NORMAL"))
+                ]]></textFieldExpression>
+            </textField>
+            <textField><reportElement style="DaysOldCell" x="170" y="2" width="90" height="16" uuid="4fd6dc0d-a69b-4bf0-8f1e-d32a2892c7fd"/><textFieldExpression><![CDATA[$F{DAYS_OLD} == null ? null : $F{DAYS_OLD}.intValue()]]></textFieldExpression></textField>
+            <textField hyperlinkType="Reference" hyperlinkTarget="Blank">
+                <reportElement style="DetailText" x="260" y="2" width="95" height="16" uuid="13ce4cca-3da1-4cb4-98df-a67a3115b993" forecolor="#006FAC"/>
+                <textFieldExpression><![CDATA[$F{D1_SP_ID}]]></textFieldExpression>
+                <hyperlinkReferenceExpression><![CDATA[
+($P{DETAIL_URL_BASE} == null || $P{DETAIL_URL_BASE}.trim().length() == 0 || $F{D1_SP_ID} == null) ? null : ($P{DETAIL_URL_BASE}.trim() + $F{D1_SP_ID})
+                ]]></hyperlinkReferenceExpression>
+            </textField>
+            <textField><reportElement style="DetailText" x="355" y="2" width="80" height="16" uuid="3cf70efc-f267-4ad7-887d-e7dc0903ff16"/><textFieldExpression><![CDATA[($F{CITY} == null || $F{CITY}.trim().length() == 0) ? "UNKNOWN" : $F{CITY}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="435" y="2" width="80" height="16" uuid="ad9f3e66-b865-4c37-a46d-3d0342cfa7f4"/><textFieldExpression><![CDATA[($F{DIVISION_CD} == null || $F{DIVISION_CD}.trim().length() == 0) ? "UNKNOWN" : $F{DIVISION_CD}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="515" y="2" width="190" height="16" uuid="5a8f2152-43bf-4a47-95b5-f66704976a13"/><textFieldExpression><![CDATA[$F{ADDRESS1}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="705" y="2" width="95" height="16" uuid="88d56a08-6ec3-4856-b3f6-05ceec9bf5cb"/><textFieldExpression><![CDATA[($F{STATUS_DESCR} != null && $F{STATUS_DESCR}.trim().length() > 0) ? $F{STATUS_DESCR} : (($F{BO_STATUS_CD} != null && $F{BO_STATUS_CD}.trim().length() > 0) ? $F{BO_STATUS_CD} : "UNKNOWN")]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="800" y="2" width="75" height="16" uuid="dbb313ca-a8db-41b1-a1af-0cc7ee2b07e3"/><textFieldExpression><![CDATA[$F{ACTIVITY_COUNT} == null ? 0 : $F{ACTIVITY_COUNT}]]></textFieldExpression></textField>
+            <textField>
+                <reportElement style="DetailText" x="875" y="2" width="85" height="16" uuid="9ad662f0-8f92-4e0b-9666-2f0dc6ab164d"/>
+                <textFieldExpression><![CDATA[
+($F{DAYS_OLD} == null) ? "UNKNOWN" : (($F{DAYS_OLD}.intValue() >= $P{CRITICAL_DAYS}.intValue()) ? "BREACH" : (($F{DAYS_OLD}.intValue() >= $P{HIGH_DAYS}.intValue()) ? "WARNING" : "OK"))
+                ]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="DetailText" x="960" y="2" width="90" height="16" uuid="4c8c8bff-ebc4-4b99-8d57-28b6a4f2b072"/>
+                <textFieldExpression><![CDATA[
+($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{CRITICAL_DAYS}.intValue()) ? "Supervisor"
+ : (($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null) ? "GIS Team"
+ : (($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{HIGH_DAYS}.intValue()) ? "Dispatcher" : "Ops Queue"))
+                ]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="DetailText" x="1050" y="2" width="100" height="16" uuid="d960e6f0-2e49-4ec0-b4d5-765d8920d706"/>
+                <textFieldExpression><![CDATA[
+($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{CRITICAL_DAYS}.intValue()) ? "Dispatch supervisor review today"
+ : (($F{D1_GEO_LAT} == null || $F{D1_GEO_LONG} == null) ? "Create geocode remediation ticket"
+ : (($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{HIGH_DAYS}.intValue()) ? "Prioritize dispatch" : "Monitor"))
+                ]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="1150" height="16" uuid="de8ff004-5996-4dc5-a307-99f48844ac0f"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Aptos" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA["@2025, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <summary>
+        <band height="300">
+            <frame>
+                <reportElement style="SummaryBlue" x="0" y="0" width="1150" height="100" uuid="9c6f4554-1db0-4eb1-b552-f601dbe486ea"/>
+                <box><pen lineWidth="0.5"/></box>
+                <textField>
+                    <reportElement x="10" y="12" width="1130" height="18" uuid="2fe25d5f-7e98-43d0-b3da-96dc96357b4b"/>
+                    <textFieldExpression><![CDATA["Queue Rows: " + $V{TOTAL_ROWS} + " | Critical: " + $V{CRITICAL_CNT} + " | High Geo: " + $V{HIGH_GEO_CNT} + " | High Aging: " + $V{HIGH_CNT} + " | Geo Missing: " + $V{GEO_MISSING_CNT}]]></textFieldExpression>
+                </textField>
+                <staticText>
+                    <reportElement x="10" y="36" width="1130" height="52" uuid="7e6f4f4d-e963-4239-a88d-c6ff98695ccb"/>
+                    <text><![CDATA[Standup workflow: 1) Clear CRITICAL first, 2) clear HIGH_GEO geocode backlog, 3) handle HIGH aging queue, 4) monitor NORMAL. Use REGION/DIVISION and PRIORITY_ONLY filters to focus city-level crews.]]></text>
+                </staticText>
+            </frame>
+            <barChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="0" y="110" width="570" height="180" uuid="e46f915f-2f6e-40bb-8521-37d5b0ec104d"/>
+                    <chartTitle>
+                        <titleExpression><![CDATA["Workload by City"]]></titleExpression>
+                    </chartTitle>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Rows"]]></seriesExpression>
+                        <categoryExpression><![CDATA[$F{CITY} == null ? "UNKNOWN" : $F{CITY}]]></categoryExpression>
+                        <valueExpression><![CDATA[1]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <barPlot>
+                    <plot/>
+                    <categoryAxisFormat>
+                        <axisFormat/>
+                    </categoryAxisFormat>
+                    <valueAxisFormat>
+                        <axisFormat/>
+                    </valueAxisFormat>
+                </barPlot>
+            </barChart>
+            <lineChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="580" y="110" width="570" height="180" uuid="4cfe6959-c5ca-43e3-80a5-4dadd12138ee"/>
+                    <chartTitle>
+                        <titleExpression><![CDATA["Activity Trend by Month"]]></titleExpression>
+                    </chartTitle>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Rows"]]></seriesExpression>
+                        <categoryExpression><![CDATA[$F{START_DTTM} == null ? "UNKNOWN" : new java.text.SimpleDateFormat("yyyy-MM").format($F{START_DTTM})]]></categoryExpression>
+                        <valueExpression><![CDATA[1]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <linePlot>
+                    <plot/>
+                    <categoryAxisFormat>
+                        <axisFormat/>
+                    </categoryAxisFormat>
+                    <valueAxisFormat>
+                        <axisFormat/>
+                    </valueAxisFormat>
+                </linePlot>
+            </lineChart>
+        </band>
+    </summary>
+
+</jasperReport>

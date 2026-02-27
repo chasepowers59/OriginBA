@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="billing_missing_bill_exceptions"
+    pageWidth="1190"
+    pageHeight="842"
+    orientation="Landscape"
+    columnWidth="1150"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="f31495c2-6659-4d57-bf6e-f2e263f42bc8">
+
+    <property name="ireport.domainUri" value="/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Billing_Detail_Summary___Domain"/>
+    <property name="com.jaspersoft.jrs.data.source" value="/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Billing_Detail_Summary___Domain"/>
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+
+    <style name="Base" fontName="Aptos" fontSize="10"/>
+    <style name="TitleBlue" style="Base" forecolor="#F5F0EB" fontSize="20" isBold="true"/>
+    <style name="MetaBlue" style="Base" forecolor="#F5F0EB" fontSize="11"/>
+    <style name="HeaderBlue" style="Base" backcolor="#006FAC" forecolor="#F5F0EB" mode="Opaque" isBold="true"/>
+    <style name="DetailText" style="Base" forecolor="#000000"/>
+    <style name="SeverityCell" style="Base" mode="Opaque" backcolor="#E5E7EB" forecolor="#0F172A" isBold="true">
+        <conditionalStyle>
+            <conditionExpression><![CDATA["MISSING_BILL".equals($F{RECONCILIATION_RESULT})]]></conditionExpression>
+            <style backcolor="#B91C1C" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+        <conditionalStyle>
+            <conditionExpression><![CDATA["MISSING_BSEG".equals($F{RECONCILIATION_RESULT})]]></conditionExpression>
+            <style backcolor="#C2410C" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+        <conditionalStyle>
+            <conditionExpression><![CDATA["PRESENT".equals($F{RECONCILIATION_RESULT})]]></conditionExpression>
+            <style backcolor="#047857" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+    </style>
+
+    <parameter name="LoggedInUser" class="com.jaspersoft.jasperserver.api.metadata.user.domain.User" isForPrompting="false"/>
+    <parameter name="LoggedInUsername" class="java.lang.String" isForPrompting="false"/>
+    <parameter name="BILL_CYCLE_CODE" class="java.lang.String"/>
+    <parameter name="START_DATE" class="java.sql.Date"/>
+    <parameter name="END_DATE" class="java.sql.Date"/>
+    <parameter name="RECONCILIATION_FILTER" class="java.lang.String">
+        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["INTERNAL USE ONLY"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="domain"><![CDATA[
+<query>
+  <queryFields>
+    <queryField id="BILL_CYCLE_CODE"/>
+    <queryField id="BILL_CYCLE_DESCRIPTION"/>
+    <queryField id="BILL_DATE"/>
+    <queryField id="BILL_CREATE_DATE"/>
+    <queryField id="BILL_SEGMENT_CREATE_DATE"/>
+    <queryField id="EVENT_DATE_FOR_FILTER"/>
+    <queryField id="ACCOUNT_ID"/>
+    <queryField id="SERVICE_AGREEMENT_ID"/>
+    <queryField id="PREMISE_ID"/>
+    <queryField id="BILL_ID"/>
+    <queryField id="BILL_STATUS_CODE"/>
+    <queryField id="BILL_STATUS_DESCRIPTION"/>
+    <queryField id="BILL_SEGMENT_ID"/>
+    <queryField id="BILL_SEGMENT_STATUS_CODE"/>
+    <queryField id="BILL_SEGMENT_STATUS_DESCRIPTION"/>
+    <queryField id="RECONCILIATION_RESULT"/>
+  </queryFields>
+</query>
+    ]]></queryString>
+
+    <field name="BILL_CYCLE_CODE" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_CYCLE_CODE"/></field>
+    <field name="BILL_CYCLE_DESCRIPTION" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_CYCLE_DESCRIPTION"/></field>
+    <field name="BILL_DATE" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="BILL_DATE"/></field>
+    <field name="BILL_CREATE_DATE" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="BILL_CREATE_DATE"/></field>
+    <field name="BILL_SEGMENT_CREATE_DATE" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="BILL_SEGMENT_CREATE_DATE"/></field>
+    <field name="EVENT_DATE_FOR_FILTER" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="EVENT_DATE_FOR_FILTER"/></field>
+    <field name="ACCOUNT_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="ACCOUNT_ID"/></field>
+    <field name="SERVICE_AGREEMENT_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="SERVICE_AGREEMENT_ID"/></field>
+    <field name="PREMISE_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="PREMISE_ID"/></field>
+    <field name="BILL_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_ID"/></field>
+    <field name="BILL_STATUS_CODE" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_STATUS_CODE"/></field>
+    <field name="BILL_STATUS_DESCRIPTION" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_STATUS_DESCRIPTION"/></field>
+    <field name="BILL_SEGMENT_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_SEGMENT_ID"/></field>
+    <field name="BILL_SEGMENT_STATUS_CODE" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_SEGMENT_STATUS_CODE"/></field>
+    <field name="BILL_SEGMENT_STATUS_DESCRIPTION" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_SEGMENT_STATUS_DESCRIPTION"/></field>
+    <field name="RECONCILIATION_RESULT" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="RECONCILIATION_RESULT"/></field>
+
+    <sortField name="EVENT_DATE_FOR_FILTER" order="Descending"/>
+    <sortField name="BILL_CYCLE_CODE" order="Ascending"/>
+
+    <variable name="TOTAL_ROWS" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{ACCOUNT_ID}]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="MISSING_BILL_CNT" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA["MISSING_BILL".equals($F{RECONCILIATION_RESULT}) ? 1 : 0]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="MISSING_BSEG_CNT" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA["MISSING_BSEG".equals($F{RECONCILIATION_RESULT}) ? 1 : 0]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+
+    <filterExpression><![CDATA[
+($F{BILL_CYCLE_CODE} != null)
+&& ($P{BILL_CYCLE_CODE} == null || $P{BILL_CYCLE_CODE}.trim().length() == 0 || $F{BILL_CYCLE_CODE}.equalsIgnoreCase($P{BILL_CYCLE_CODE}.trim()))
+&& ($P{START_DATE} == null || ($F{EVENT_DATE_FOR_FILTER} != null && !$F{EVENT_DATE_FOR_FILTER}.before($P{START_DATE})))
+&& ($P{END_DATE} == null || ($F{EVENT_DATE_FOR_FILTER} != null && $F{EVENT_DATE_FOR_FILTER}.before(new java.sql.Timestamp($P{END_DATE}.getTime() + 86400000L))))
+&& ($P{RECONCILIATION_FILTER} == null || $P{RECONCILIATION_FILTER}.trim().length() == 0
+    || ("MISSING".equalsIgnoreCase($P{RECONCILIATION_FILTER}.trim()) && ("MISSING_BILL".equals($F{RECONCILIATION_RESULT}) || "MISSING_BSEG".equals($F{RECONCILIATION_RESULT})))
+    || ($F{RECONCILIATION_RESULT} != null && $F{RECONCILIATION_RESULT}.equalsIgnoreCase($P{RECONCILIATION_FILTER}.trim()))
+)
+    ]]></filterExpression>
+
+    <title>
+        <band height="112">
+            <frame>
+                <reportElement x="0" y="0" width="1150" height="64" uuid="99ad4f50-4fdf-4f40-af55-85ece30d368f" mode="Opaque" backcolor="#1348AB"/>
+            </frame>
+            <staticText>
+                <reportElement style="TitleBlue" x="18" y="12" width="880" height="24" uuid="0474a0be-ac76-4f74-8708-6651ba43d3ac"/>
+                <text><![CDATA[Billing Missing Bill Exceptions]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="MetaBlue" x="18" y="40" width="1110" height="18" uuid="2b0c90ef-65ed-42a7-802e-21950476f73d"/>
+                <textFieldExpression><![CDATA[
+"BILL_CYCLE=" + (($P{BILL_CYCLE_CODE} == null || $P{BILL_CYCLE_CODE}.trim().length()==0) ? "ALL" : $P{BILL_CYCLE_CODE}.trim())
++ " | FILTER=" + (($P{RECONCILIATION_FILTER} == null || $P{RECONCILIATION_FILTER}.trim().length()==0) ? "ALL" : $P{RECONCILIATION_FILTER}.trim())
+                ]]></textFieldExpression>
+            </textField>
+            <frame>
+                <reportElement x="0" y="72" width="1150" height="40" uuid="cb3b2541-f486-49db-b8cb-2f93a88aaff3" mode="Opaque" backcolor="#F5F0EB"/>
+                <box><pen lineWidth="0.5"/></box>
+                <textField evaluationTime="Report"><reportElement x="10" y="12" width="360" height="16" uuid="18b1c0eb-f5ca-454e-a4c1-d8638b4d5974"/><textFieldExpression><![CDATA["Exception Rows: " + $V{TOTAL_ROWS}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="380" y="12" width="360" height="16" uuid="a4f65a24-b8f5-4d99-afab-e7f558f73c28"/><textFieldExpression><![CDATA["Missing Bill: " + $V{MISSING_BILL_CNT}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="750" y="12" width="380" height="16" uuid="26920dc5-f8be-4312-b44c-275caeec12dc"/><textFieldExpression><![CDATA["Missing Bill Segment: " + $V{MISSING_BSEG_CNT}]]></textFieldExpression></textField>
+            </frame>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="24">
+            <staticText><reportElement style="HeaderBlue" x="0" y="0" width="90" height="24" uuid="9f5fb7e8-fe53-4b2f-aede-18b3cb2d9daa"/><text><![CDATA[Result]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="90" y="0" width="95" height="24" uuid="9c0a944c-bf72-4a75-a8a9-9a4f6f2f9d45"/><text><![CDATA[Bill Cycle]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="185" y="0" width="150" height="24" uuid="30af8448-256a-4220-a3c7-4d5c04d4c7d8"/><text><![CDATA[Bill Date]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="335" y="0" width="150" height="24" uuid="1f80ea45-8d45-4dc9-9a8b-0436e782f7e8"/><text><![CDATA[Bill Create Date]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="485" y="0" width="110" height="24" uuid="d75ec45a-bf66-43ca-aa7d-df6f9c0f5ac4"/><text><![CDATA[Account]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="595" y="0" width="110" height="24" uuid="91ca6481-d6d5-4d6b-9261-a2c0619f70ab"/><text><![CDATA[SA ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="705" y="0" width="100" height="24" uuid="159f4893-ae85-4ab7-8a66-89a5ef2e55ea"/><text><![CDATA[Premise]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="805" y="0" width="100" height="24" uuid="e986530f-c3f4-4af5-9425-a8d1c82a889f"/><text><![CDATA[Bill ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="905" y="0" width="100" height="24" uuid="c73f61ca-836f-4a68-9f6b-8fcd848f07e4"/><text><![CDATA[Segment ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="1005" y="0" width="145" height="24" uuid="eb0c8fbe-7c3d-4602-a078-41594ea4e206"/><text><![CDATA[Action]]></text></staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="20">
+            <textField><reportElement style="SeverityCell" x="0" y="2" width="90" height="16" uuid="81cbf8a1-90c7-4fe9-9d84-a264f38ca1af"/><textFieldExpression><![CDATA[$F{RECONCILIATION_RESULT}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="90" y="2" width="95" height="16" uuid="edca7e16-d137-4d10-a847-0511be180f2c"/><textFieldExpression><![CDATA[$F{BILL_CYCLE_CODE} == null || $F{BILL_CYCLE_CODE}.trim().length() == 0 ? "UNASSIGNED" : $F{BILL_CYCLE_CODE}.trim()]]></textFieldExpression></textField>
+            <textField pattern="yyyy-MM-dd"><reportElement style="DetailText" x="185" y="2" width="150" height="16" uuid="f8b5e593-c435-4b2a-8bd0-28f9d1274fda"/><textFieldExpression><![CDATA[$F{BILL_DATE}]]></textFieldExpression></textField>
+            <textField pattern="yyyy-MM-dd HH:mm"><reportElement style="DetailText" x="335" y="2" width="150" height="16" uuid="25726b7c-1dad-4de0-bf41-a8ca5f75213e"/><textFieldExpression><![CDATA[$F{BILL_CREATE_DATE}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="485" y="2" width="110" height="16" uuid="a7d3a140-7187-433d-9107-6f893ae98cc6"/><textFieldExpression><![CDATA[$F{ACCOUNT_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="595" y="2" width="110" height="16" uuid="1ed4d5ff-b294-4120-bab5-e9c90f4eb70c"/><textFieldExpression><![CDATA[$F{SERVICE_AGREEMENT_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="705" y="2" width="100" height="16" uuid="7f339a15-0dd5-4ec4-b5f2-c11de0a30a96"/><textFieldExpression><![CDATA[$F{PREMISE_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="805" y="2" width="100" height="16" uuid="7f83ac3e-799e-4929-80c0-d319b58c195d"/><textFieldExpression><![CDATA[$F{BILL_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="905" y="2" width="100" height="16" uuid="b499b9d2-e1ef-4fd8-ae92-afe615ec3dbd"/><textFieldExpression><![CDATA[$F{BILL_SEGMENT_ID}]]></textFieldExpression></textField>
+            <textField>
+                <reportElement style="DetailText" x="1005" y="2" width="145" height="16" uuid="4511f68a-0571-4b26-9734-c94ea7888e95"/>
+                <textFieldExpression><![CDATA[
+"MISSING_BILL".equals($F{RECONCILIATION_RESULT}) ? "Verify Bill generation run"
+ : ("MISSING_BSEG".equals($F{RECONCILIATION_RESULT}) ? "Verify segment generation/status" : "No action")
+                ]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="1150" height="16" uuid="af1650ad-3a8b-4f36-8630-93cc6b0b59bb"/>
+                <textElement textAlignment="Center"><font fontName="Aptos" size="9"/></textElement>
+                <textFieldExpression><![CDATA["@2025, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <noData>
+        <band height="80">
+            <frame>
+                <reportElement x="0" y="8" width="1150" height="64" uuid="c1bdbc44-220e-405f-a4d2-5d560f4ca625" mode="Opaque" backcolor="#F5F0EB"/>
+                <box><pen lineWidth="0.5" lineColor="#006FAC"/></box>
+            </frame>
+            <staticText>
+                <reportElement x="20" y="28" width="1110" height="20" uuid="7929c90d-447d-4a77-a715-a75dbb7f1f3f"/>
+                <textElement textAlignment="Center"><font fontName="Aptos" size="12" isBold="true"/></textElement>
+                <text><![CDATA[No rows returned for the selected filters. Clear RECONCILIATION_FILTER or expand date range.]]></text>
+            </staticText>
+        </band>
+    </noData>
+
+</jasperReport>

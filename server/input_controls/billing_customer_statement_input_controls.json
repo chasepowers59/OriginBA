@@ -1,0 +1,27 @@
+{
+  "reportUnitUri": "/reports/origin/billing_customer_statement",
+  "dataSources": {
+    "DEV": "ORIGIN_DEV_DS",
+    "QA": "C2M_QA_DS",
+    "PROD": "C2M_PROD_DS"
+  },
+  "inputControls": [
+    {
+      "id": "BILL_ID",
+      "label": "Bill ID",
+      "type": "singleSelectQuery",
+      "mandatory": true,
+      "visible": true,
+      "valueColumn": "BILL_ID",
+      "visibleColumn": "BILL_LABEL",
+      "query": "SELECT TO_CHAR(B.BILL_ID) AS BILL_ID, TO_CHAR(B.BILL_ID) || ' | ' || TO_CHAR(B.BILL_DT, 'YYYY-MM-DD') || ' | ACCT ' || TO_CHAR(B.ACCT_ID) AS BILL_LABEL FROM CISADM.CI_BILL B ORDER BY B.BILL_DT DESC FETCH FIRST 500 ROWS ONLY"
+    },
+    {
+      "id": "CLIENT_LOGO_URL",
+      "label": "Client Logo URL",
+      "type": "singleValueText",
+      "mandatory": false,
+      "visible": false
+    }
+  ]
+}

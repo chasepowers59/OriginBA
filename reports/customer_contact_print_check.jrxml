@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="customer_contact_print_check"
+    pageWidth="842"
+    pageHeight="595"
+    orientation="Landscape"
+    columnWidth="802"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="b06888ef-f5df-4ab5-9f61-f40be4f1ea6f">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+
+    <parameter name="CC_ID" class="java.lang.String"/>
+    <parameter name="ACCT_ID" class="java.lang.String"/>
+    <parameter name="START_TS" class="java.sql.Timestamp"/>
+    <parameter name="END_TS" class="java.sql.Timestamp"/>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT
+    cc.cc_id,
+    cc.acct_id,
+    cc.cc_dttm,
+    cc.cc_type_cd,
+    cc.contact_meth_flg,
+    cc.print_letter_sw,
+    cc.ltr_tmpl_cd,
+    cc.letter_print_dttm,
+    NULLIF(TRIM(pn.entity_name), '') AS recipient_name,
+    NULLIF(TRIM(pr.address1), '') AS address1,
+    NULLIF(TRIM(pr.city), '') AS city,
+    NULLIF(TRIM(pr.state), '') AS state,
+    NULLIF(TRIM(pr.postal), '') AS postal,
+    CASE
+        WHEN NVL(TRIM(cc.print_letter_sw), 'N') <> 'Y' THEN 'NOT_PRINTABLE'
+        WHEN NVL(TRIM(cc.ltr_tmpl_cd), '') = '' THEN 'NOT_PRINTABLE'
+        WHEN NVL(TRIM(pn.entity_name), '') = '' THEN 'NOT_PRINTABLE'
+        WHEN NVL(TRIM(pr.address1), '') = '' OR NVL(TRIM(pr.city), '') = '' OR NVL(TRIM(pr.state), '') = '' OR NVL(TRIM(pr.postal), '') = '' THEN 'NOT_PRINTABLE'
+        ELSE 'PRINTABLE'
+    END AS print_status,
+    CASE
+        WHEN NVL(TRIM(cc.print_letter_sw), 'N') <> 'Y' THEN 'Print switch is not Y'
+        WHEN NVL(TRIM(cc.ltr_tmpl_cd), '') = '' THEN 'Missing letter template code'
+        WHEN NVL(TRIM(pn.entity_name), '') = '' THEN 'Missing recipient name'
+        WHEN NVL(TRIM(pr.address1), '') = '' OR NVL(TRIM(pr.city), '') = '' OR NVL(TRIM(pr.state), '') = '' OR NVL(TRIM(pr.postal), '') = '' THEN 'Incomplete mailing address'
+        ELSE 'Ready to print'
+    END AS block_reason
+FROM CISADM.CI_CC cc
+LEFT JOIN CISADM.CI_PER_NAME pn
+  ON pn.per_id = cc.per_id
+ AND pn.prim_name_sw = 'Y'
+LEFT JOIN CISADM.CI_PREM pr
+  ON pr.prem_id = cc.prem_id
+WHERE ($P{CC_ID} IS NULL OR cc.cc_id = $P{CC_ID})
+  AND ($P{ACCT_ID} IS NULL OR cc.acct_id = $P{ACCT_ID})
+  AND ($P{START_TS} IS NULL OR cc.cc_dttm >= $P{START_TS})
+  AND ($P{END_TS} IS NULL OR cc.cc_dttm < $P{END_TS})
+ORDER BY cc.cc_dttm DESC
+        ]]>
+    </queryString>
+
+    <field name="CC_ID" class="java.lang.String"/>
+    <field name="ACCT_ID" class="java.lang.String"/>
+    <field name="CC_DTTM" class="java.sql.Timestamp"/>
+    <field name="CC_TYPE_CD" class="java.lang.String"/>
+    <field name="CONTACT_METH_FLG" class="java.lang.String"/>
+    <field name="PRINT_LETTER_SW" class="java.lang.String"/>
+    <field name="LTR_TMPL_CD" class="java.lang.String"/>
+    <field name="LETTER_PRINT_DTTM" class="java.sql.Timestamp"/>
+    <field name="RECIPIENT_NAME" class="java.lang.String"/>
+    <field name="ADDRESS1" class="java.lang.String"/>
+    <field name="CITY" class="java.lang.String"/>
+    <field name="STATE" class="java.lang.String"/>
+    <field name="POSTAL" class="java.lang.String"/>
+    <field name="PRINT_STATUS" class="java.lang.String"/>
+    <field name="BLOCK_REASON" class="java.lang.String"/>
+
+    <title>
+        <band height="40">
+            <staticText>
+                <reportElement x="0" y="0" width="802" height="24" uuid="bb8ad492-b0f8-4cef-a172-fc7096b5dfd5"/>
+                <textElement>
+                    <font size="16" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Customer Contact Letter Printability Check]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="24">
+            <staticText><reportElement x="0" y="0" width="80" height="24" uuid="bb90ef3a-70cf-4eb3-8be1-4f07cdb4f4b5"/><text><![CDATA[CC_ID]]></text></staticText>
+            <staticText><reportElement x="80" y="0" width="80" height="24" uuid="fdbf2f81-3753-41ea-b2d3-70061a4fc280"/><text><![CDATA[ACCT_ID]]></text></staticText>
+            <staticText><reportElement x="160" y="0" width="125" height="24" uuid="65d92d9a-311d-4b45-b26b-6ca22f31d648"/><text><![CDATA[CC_DTTM]]></text></staticText>
+            <staticText><reportElement x="285" y="0" width="105" height="24" uuid="d6f8b1ad-0cad-4bcb-b9f6-bc50e9d5bef8"/><text><![CDATA[STATUS]]></text></staticText>
+            <staticText><reportElement x="390" y="0" width="220" height="24" uuid="c5f3cc63-6be0-46b8-ab8d-f02e2898d3d7"/><text><![CDATA[REASON]]></text></staticText>
+            <staticText><reportElement x="610" y="0" width="192" height="24" uuid="11f5bccf-8491-4f91-96e5-2f87dbf398f4"/><text><![CDATA[RECIPIENT / ADDRESS]]></text></staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="32">
+            <textField><reportElement x="0" y="0" width="80" height="16" uuid="91c894b7-47dc-4739-b3f8-5260139f9aa2"/><textFieldExpression><![CDATA[$F{CC_ID}]]></textFieldExpression></textField>
+            <textField><reportElement x="80" y="0" width="80" height="16" uuid="3a816972-ef3d-43f7-8228-8f45bc9946aa"/><textFieldExpression><![CDATA[$F{ACCT_ID}]]></textFieldExpression></textField>
+            <textField pattern="yyyy-MM-dd HH:mm"><reportElement x="160" y="0" width="125" height="16" uuid="f7069397-7aef-4676-b9d6-c85bf6f5fe25"/><textFieldExpression><![CDATA[$F{CC_DTTM}]]></textFieldExpression></textField>
+            <textField><reportElement x="285" y="0" width="105" height="16" uuid="b5138f57-8b45-4379-bf00-7c8e0fd53f3d"/><textFieldExpression><![CDATA[$F{PRINT_STATUS}]]></textFieldExpression></textField>
+            <textField isStretchWithOverflow="true"><reportElement x="390" y="0" width="220" height="16" uuid="836909da-2eb6-4af9-b09e-494eb2f37ea7"/><textFieldExpression><![CDATA[$F{BLOCK_REASON}]]></textFieldExpression></textField>
+            <textField isStretchWithOverflow="true"><reportElement x="610" y="0" width="192" height="30" uuid="581d53c5-8d75-4f27-b507-5cc5f2f4fa7d"/><textFieldExpression><![CDATA[($F{RECIPIENT_NAME} == null ? "-" : $F{RECIPIENT_NAME}) + " | " + ($F{ADDRESS1} == null ? "-" : $F{ADDRESS1}) + ", " + ($F{CITY} == null ? "-" : $F{CITY}) + ", " + ($F{STATE} == null ? "-" : $F{STATE}) + " " + ($F{POSTAL} == null ? "-" : $F{POSTAL})]]></textFieldExpression></textField>
+        </band>
+    </detail>
+</jasperReport>

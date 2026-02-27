@@ -21,3 +21,19 @@ Repository organization cleanup focused on reducing tracked generated artifacts 
 1. Keep generated report-unit files untracked; generate in CI/release only.
 2. Continue using `git clean -ndX` before release to verify ignored build outputs.
 3. If historical secrets were committed previously, rotate credentials and scrub history with `git filter-repo` in a controlled process.
+
+## Incremental Cleanup - 2026-02-19
+1. Removed temporary workspace artifacts:
+   - `tmp/`
+   - `scripts/__pycache__/`
+2. Removed transient domain export packages from repo root:
+   - `Customer Contact Domain.zip`
+   - `Field Activity Domain.zip`
+   - `General Ledger Domain.zip`
+3. Removed outdated/non-production artifacts:
+   - `reports/smoke_db_connection.jrxml`
+   - `reports/BillingRatesArrearsAnalysisMonthly.jrxml`
+   - `sql/plsql_bulk_collect_forall_harness.sql`
+4. Archived legacy SQL views (instead of hard delete):
+   - `archive/2026-02-19/sql/vw_billing_summary.sql`
+   - `archive/2026-02-19/sql/vw_debt_mgmt_account.sql`

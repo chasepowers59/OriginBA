@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="general_ledger_batch_executive_packet"
+    pageWidth="1190"
+    pageHeight="842"
+    orientation="Landscape"
+    columnWidth="1150"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="2f34db73-d3d7-4a87-a454-2e43f9af8f91">
+
+    <property name="ireport.domainUri" value="/SmartCity/Report/Workstreams/Finance/General_Ledger/General_Ledger___Domain"/>
+    <property name="com.jaspersoft.jrs.data.source" value="/SmartCity/Report/Workstreams/Finance/General_Ledger/General_Ledger___Domain"/>
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+
+    <style name="Base" fontName="Aptos" fontSize="10"/>
+    <style name="HeaderBlue" style="Base" backcolor="#006FAC" forecolor="#F5F0EB" mode="Opaque" isBold="true"/>
+    <style name="TitleBlue" style="Base" forecolor="#F5F0EB" fontSize="20" isBold="true"/>
+    <style name="SectionTitle" style="Base" backcolor="#1348AB" forecolor="#F5F0EB" mode="Opaque" isBold="true"/>
+    <style name="DetailText" style="Base" forecolor="#000000"/>
+    <style name="FlagCell" style="Base" mode="Opaque" backcolor="#047857" forecolor="#FFFFFF" isBold="true">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[
+($F{GL_ACCT} == null || $F{GL_ACCT}.trim().length() == 0)
+|| ($F{AMOUNT} == null || $F{AMOUNT}.compareTo(java.math.BigDecimal.ZERO) == 0)
+            ]]></conditionExpression>
+            <style backcolor="#B91C1C" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+        <conditionalStyle>
+            <conditionExpression><![CDATA[
+!(($F{GL_ACCT} == null || $F{GL_ACCT}.trim().length() == 0)
+  || ($F{AMOUNT} == null || $F{AMOUNT}.compareTo(java.math.BigDecimal.ZERO) == 0))
+&& ($F{GL_DISTRIB_STATUS_DESC} == null
+    || !($F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains("DISTRIBUT")
+         || $F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains("COMPLETE")
+         || $F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains("POST")))
+            ]]></conditionExpression>
+            <style backcolor="#D97706" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+    </style>
+
+    <parameter name="LoggedInUser" class="com.jaspersoft.jasperserver.api.metadata.user.domain.User" isForPrompting="false"/>
+    <parameter name="LoggedInUsername" class="java.lang.String" isForPrompting="false"/>
+    <parameter name="ONLY_LATEST_BATCH" class="java.lang.Boolean">
+        <defaultValueExpression><![CDATA[Boolean.TRUE]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ONLY_EXCEPTIONS" class="java.lang.Boolean">
+        <defaultValueExpression><![CDATA[Boolean.TRUE]]></defaultValueExpression>
+    </parameter>
+    <parameter name="BATCH_NBR_FILTER" class="java.lang.String"/>
+    <parameter name="GL_STATUS_FILTER" class="java.lang.String"/>
+    <parameter name="MIN_ABS_AMOUNT" class="java.math.BigDecimal">
+        <defaultValueExpression><![CDATA[new java.math.BigDecimal("0")]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["INTERNAL USE ONLY"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="domain"><![CDATA[
+<query>
+  <queryFields>
+    <queryField id="BATCH_NBR"/>
+    <queryField id="IS_LATEST_BATCH_NBR"/>
+    <queryField id="FT_ID"/>
+    <queryField id="ACCT_ID"/>
+    <queryField id="GL_DISTRIB_STATUS_DESC"/>
+    <queryField id="GL_ACCT"/>
+    <queryField id="AMOUNT"/>
+    <queryField id="CREDIT_AMOUNT"/>
+    <queryField id="DEBIT_AMOUNT"/>
+    <queryField id="ACCOUNTING_DT"/>
+    <queryField id="GL_DIVISION"/>
+    <queryField id="CIS_DIVISION"/>
+    <queryField id="FT_TYPE_FLG_DESC"/>
+    <queryField id="ENTITY_NAME_UPR"/>
+    <queryField id="CITY"/>
+    <queryField id="STATE"/>
+  </queryFields>
+</query>
+    ]]></queryString>
+
+    <field name="BATCH_NBR" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="BATCH_NBR"/></field>
+    <field name="IS_LATEST_BATCH_NBR" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="IS_LATEST_BATCH_NBR"/></field>
+    <field name="FT_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="FT_ID"/></field>
+    <field name="ACCT_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="ACCT_ID"/></field>
+    <field name="GL_DISTRIB_STATUS_DESC" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="GL_DISTRIB_STATUS_DESC"/></field>
+    <field name="GL_ACCT" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="GL_ACCT"/></field>
+    <field name="AMOUNT" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="AMOUNT"/></field>
+    <field name="CREDIT_AMOUNT" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="CREDIT_AMOUNT"/></field>
+    <field name="DEBIT_AMOUNT" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="DEBIT_AMOUNT"/></field>
+    <field name="ACCOUNTING_DT" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="ACCOUNTING_DT"/></field>
+    <field name="GL_DIVISION" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="GL_DIVISION"/></field>
+    <field name="CIS_DIVISION" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="CIS_DIVISION"/></field>
+    <field name="FT_TYPE_FLG_DESC" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="FT_TYPE_FLG_DESC"/></field>
+    <field name="ENTITY_NAME_UPR" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="ENTITY_NAME_UPR"/></field>
+    <field name="CITY" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="CITY"/></field>
+    <field name="STATE" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="STATE"/></field>
+
+    <sortField name="BATCH_NBR" order="Descending"/>
+    <sortField name="ACCOUNTING_DT" order="Descending"/>
+
+    <variable name="TOTAL_ROWS" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{FT_ID}]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="ERROR_ROWS" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+(($F{GL_ACCT} == null || $F{GL_ACCT}.trim().length() == 0)
+ || ($F{AMOUNT} == null || $F{AMOUNT}.compareTo(java.math.BigDecimal.ZERO) == 0)) ? 1 : 0
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="WARN_ROWS" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+!(($F{GL_ACCT} == null || $F{GL_ACCT}.trim().length() == 0)
+  || ($F{AMOUNT} == null || $F{AMOUNT}.compareTo(java.math.BigDecimal.ZERO) == 0))
+&& ($F{GL_DISTRIB_STATUS_DESC} == null
+    || !($F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains("DISTRIBUT")
+         || $F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains("COMPLETE")
+         || $F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains("POST"))) ? 1 : 0
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+
+    <filterExpression><![CDATA[
+($F{FT_ID} != null)
+&& ($P{ONLY_LATEST_BATCH} == null || !$P{ONLY_LATEST_BATCH}.booleanValue()
+    || ("Y".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR})
+        || "YES".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR})
+        || "TRUE".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR})
+        || "1".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR}))
+)
+&& ($P{BATCH_NBR_FILTER} == null || $P{BATCH_NBR_FILTER}.trim().length() == 0
+    || ($F{BATCH_NBR} != null && $F{BATCH_NBR}.toPlainString().equals($P{BATCH_NBR_FILTER}.trim()))
+)
+&& ($P{GL_STATUS_FILTER} == null || $P{GL_STATUS_FILTER}.trim().length() == 0
+    || ($F{GL_DISTRIB_STATUS_DESC} != null && $F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains($P{GL_STATUS_FILTER}.trim().toUpperCase()))
+)
+&& ($P{MIN_ABS_AMOUNT} == null || $F{AMOUNT} == null || $F{AMOUNT}.abs().compareTo($P{MIN_ABS_AMOUNT}) >= 0)
+&& ($P{ONLY_EXCEPTIONS} == null || !$P{ONLY_EXCEPTIONS}.booleanValue()
+    || (
+      ($F{GL_ACCT} == null || $F{GL_ACCT}.trim().length() == 0)
+      || ($F{AMOUNT} == null || $F{AMOUNT}.compareTo(java.math.BigDecimal.ZERO) == 0)
+      || ($F{GL_DISTRIB_STATUS_DESC} == null
+          || !($F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains("DISTRIBUT")
+               || $F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains("COMPLETE")
+               || $F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains("POST")))
+    )
+)
+    ]]></filterExpression>
+
+    <group name="BATCH_GROUP">
+        <groupExpression><![CDATA[$F{BATCH_NBR} == null ? "UNKNOWN" : $F{BATCH_NBR}.toPlainString()]]></groupExpression>
+        <groupHeader>
+            <band height="20">
+                <textField>
+                    <reportElement style="SectionTitle" x="0" y="0" width="1150" height="20" uuid="7c9ee3ba-6153-49ab-97ac-3597f86628c5"/>
+                    <textFieldExpression><![CDATA["Batch " + ($F{BATCH_NBR} == null ? "UNKNOWN" : $F{BATCH_NBR}.toPlainString()) + " - Exceptions"]]></textFieldExpression>
+                </textField>
+            </band>
+        </groupHeader>
+    </group>
+
+    <title>
+        <band height="120">
+            <frame>
+                <reportElement x="0" y="0" width="1150" height="64" uuid="f4fd0630-c47a-4b71-9198-ae24f4389a08" mode="Opaque" backcolor="#1348AB"/>
+            </frame>
+            <staticText>
+                <reportElement style="TitleBlue" x="18" y="12" width="900" height="24" uuid="f32431b8-dcd8-4fa5-914c-dce89653763f"/>
+                <text><![CDATA[General Ledger Executive Exception Packet]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="Base" x="18" y="40" width="1115" height="18" uuid="8de615f8-6b4e-4add-a00f-57b2f52ea9ac" forecolor="#F5F0EB"/>
+                <textFieldExpression><![CDATA[
+"LATEST_ONLY=" + (($P{ONLY_LATEST_BATCH} != null && $P{ONLY_LATEST_BATCH}.booleanValue()) ? "Y" : "N")
++ " | EXCEPTIONS_ONLY=" + (($P{ONLY_EXCEPTIONS} != null && $P{ONLY_EXCEPTIONS}.booleanValue()) ? "Y" : "N")
++ " | BATCH=" + (($P{BATCH_NBR_FILTER} == null || $P{BATCH_NBR_FILTER}.trim().length() == 0) ? "ALL" : $P{BATCH_NBR_FILTER}.trim())
+                ]]></textFieldExpression>
+            </textField>
+
+            <frame>
+                <reportElement x="0" y="72" width="1150" height="46" uuid="9909300c-6ce2-40b5-a2c1-2d31dba03df5" mode="Opaque" backcolor="#F5F0EB"/>
+                <box><pen lineWidth="0.5"/></box>
+                <textField evaluationTime="Report"><reportElement x="10" y="6" width="300" height="16" uuid="16777af8-fe96-42d6-9f87-c507f5b6dbf9"/><textFieldExpression><![CDATA["Total Rows: " + $V{TOTAL_ROWS}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="320" y="6" width="300" height="16" uuid="0ad3fe89-21ca-4fd1-b45a-a214d7f4d491"/><textFieldExpression><![CDATA["Critical Errors: " + $V{ERROR_ROWS}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="630" y="6" width="300" height="16" uuid="0f4e6885-af9d-4301-8cc1-5f8e2d8f4ec1"/><textFieldExpression><![CDATA["Warnings: " + $V{WARN_ROWS}]]></textFieldExpression></textField>
+                <staticText><reportElement x="10" y="24" width="1130" height="16" uuid="91f31dc1-4dec-4e01-b695-e0f5c16de4e8"/><text><![CDATA[Severity: ERROR = missing GL account or zero amount. WARN = GL distribution status not in complete/distributed/post family.]]></text></staticText>
+            </frame>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="24">
+            <staticText><reportElement style="HeaderBlue" x="0" y="0" width="70" height="24" uuid="6a26a502-6af6-48f7-8be3-b5f5f5962f79"/><text><![CDATA[SEVERITY]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="70" y="0" width="80" height="24" uuid="e4eb6ea7-c513-4e6b-ac27-fe4bb24dcead"/><text><![CDATA[FT_ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="150" y="0" width="80" height="24" uuid="32784ec8-fcef-49a1-b24d-b39db96c4b45"/><text><![CDATA[ACCT_ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="230" y="0" width="120" height="24" uuid="d9fe4f4a-83f7-4f72-a755-c7667c43330e"/><text><![CDATA[GL_STATUS]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="350" y="0" width="100" height="24" uuid="253ad6d6-fe66-453f-b425-1fd4863392fc"/><text><![CDATA[GL_ACCT]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="450" y="0" width="90" height="24" uuid="ca54e3cf-c5f0-47d3-bdbf-bfef4aaf52ed"/><text><![CDATA[AMOUNT]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="540" y="0" width="90" height="24" uuid="9fdd653e-50f6-4f0b-b4fd-f4e4c8b031eb"/><text><![CDATA[ACCT_DT]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="630" y="0" width="80" height="24" uuid="80663f43-1676-46d5-9f58-e7f20341cd08"/><text><![CDATA[DIVISION]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="710" y="0" width="80" height="24" uuid="79315c8f-7d86-4a1d-ae96-d2eaf27fe486"/><text><![CDATA[CITY]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="790" y="0" width="110" height="24" uuid="abf90d25-f49d-40d5-a253-e0f3263834d7"/><text><![CDATA[FT_TYPE]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="900" y="0" width="160" height="24" uuid="89e63f9d-e331-4efd-9692-a4fffbf611cc"/><text><![CDATA[CUSTOMER]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="1060" y="0" width="90" height="24" uuid="00daea8e-df4b-4d65-b2ca-5e9c2b57c83a"/><text><![CDATA[ACTION]]></text></staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="20">
+            <textField>
+                <reportElement style="FlagCell" x="0" y="2" width="70" height="16" uuid="a87f56c2-1506-4bb7-8768-b67c02581a7b"/>
+                <textFieldExpression><![CDATA[
+(($F{GL_ACCT} == null || $F{GL_ACCT}.trim().length() == 0)
+ || ($F{AMOUNT} == null || $F{AMOUNT}.compareTo(java.math.BigDecimal.ZERO) == 0)) ? "ERROR" : "WARN"
+                ]]></textFieldExpression>
+            </textField>
+            <textField><reportElement style="DetailText" x="70" y="2" width="80" height="16" uuid="e53ed518-2b70-48d0-9edc-1e770514aeec"/><textFieldExpression><![CDATA[$F{FT_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="150" y="2" width="80" height="16" uuid="e9a81f37-f4d8-41ff-bb8c-8114ec9e4258"/><textFieldExpression><![CDATA[$F{ACCT_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="230" y="2" width="120" height="16" uuid="eaab21af-21db-40c3-a7d8-016b4f1978a3"/><textFieldExpression><![CDATA[$F{GL_DISTRIB_STATUS_DESC} == null ? "UNKNOWN" : $F{GL_DISTRIB_STATUS_DESC}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="350" y="2" width="100" height="16" uuid="8018af5c-7fef-4eb1-b35f-f7162c0f2ea8"/><textFieldExpression><![CDATA[$F{GL_ACCT} == null ? "MISSING" : $F{GL_ACCT}]]></textFieldExpression></textField>
+            <textField pattern="#,##0.00"><reportElement style="DetailText" x="450" y="2" width="90" height="16" uuid="57f8e661-c728-412e-ae8e-5c1d96ae9550"/><textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression></textField>
+            <textField pattern="yyyy-MM-dd"><reportElement style="DetailText" x="540" y="2" width="90" height="16" uuid="7c5fd0df-913b-46f8-9d23-df4660c7147b"/><textFieldExpression><![CDATA[$F{ACCOUNTING_DT}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="630" y="2" width="80" height="16" uuid="2246d8e6-09d2-4d10-a06d-e7fa69f7e869"/><textFieldExpression><![CDATA[$F{GL_DIVISION} == null ? $F{CIS_DIVISION} : $F{GL_DIVISION}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="710" y="2" width="80" height="16" uuid="07cd80e7-bd5a-45f7-ad02-95e3f2546d0a"/><textFieldExpression><![CDATA[$F{CITY} == null ? "UNKNOWN" : $F{CITY}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="790" y="2" width="110" height="16" uuid="1d7ed377-f28c-42b8-9fbf-bf9d83a9d452"/><textFieldExpression><![CDATA[$F{FT_TYPE_FLG_DESC} == null ? "UNKNOWN" : $F{FT_TYPE_FLG_DESC}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="900" y="2" width="160" height="16" uuid="ce5a53f8-556b-43dc-8bd7-b5f8432ff5d7"/><textFieldExpression><![CDATA[$F{ENTITY_NAME_UPR} == null ? "UNKNOWN" : $F{ENTITY_NAME_UPR}]]></textFieldExpression></textField>
+            <textField>
+                <reportElement style="DetailText" x="1060" y="2" width="90" height="16" uuid="9ce34584-233b-435e-aa28-0fd66c72ec3a"/>
+                <textFieldExpression><![CDATA[
+(($F{GL_ACCT} == null || $F{GL_ACCT}.trim().length() == 0)
+ || ($F{AMOUNT} == null || $F{AMOUNT}.compareTo(java.math.BigDecimal.ZERO) == 0)) ? "Fix & repost" : "Review status"
+                ]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="1150" height="16" uuid="0403f3c8-ff44-4e1d-bd06-f417c200afdb"/>
+                <textElement textAlignment="Center"><font fontName="Aptos" size="9"/></textElement>
+                <textFieldExpression><![CDATA["@2025, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+</jasperReport>

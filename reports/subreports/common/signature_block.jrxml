@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="signature_block"
+    pageWidth="555"
+    pageHeight="90"
+    columnWidth="555"
+    leftMargin="0"
+    rightMargin="0"
+    topMargin="0"
+    bottomMargin="0"
+    uuid="fcaacb40-332f-4f5f-8a4e-231b9eed3edf">
+
+    <parameter name="SIGN_OFF_TEXT" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Sincerely,"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="AGENT_NAME" class="java.lang.String"/>
+    <parameter name="AGENT_TITLE" class="java.lang.String"/>
+
+    <queryString language="SQL"><![CDATA[SELECT 1 AS REPORT_ANCHOR FROM DUAL]]></queryString>
+    <field name="REPORT_ANCHOR" class="java.lang.Integer"/>
+
+    <detail>
+        <band height="80">
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="0" width="555" height="16" uuid="7940f330-ae53-4168-8bcc-1f6833f9c4dd"/>
+                <textFieldExpression><![CDATA[$P{SIGN_OFF_TEXT}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="28" width="555" height="16" uuid="8a57f82d-ce4a-4bcc-9024-cf59ece13d02"/>
+                <textFieldExpression><![CDATA[$P{AGENT_NAME}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="46" width="555" height="16" uuid="3b6560be-6d77-44e9-b70d-5e513f4cf80e"/>
+                <textFieldExpression><![CDATA[$P{AGENT_TITLE}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+</jasperReport>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="base_letter_template"
+    pageWidth="595"
+    pageHeight="842"
+    columnWidth="555"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="6f7f52a1-e88a-4a35-bf38-a231f626f6cc">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+
+    <parameter name="CLIENT_LOGO_URL" class="java.lang.String" isForPrompting="false"/>
+    <parameter name="LETTER_TITLE" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Customer Letter"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="LETTER_DATE" class="java.sql.Timestamp"/>
+    <parameter name="RECIPIENT_NAME" class="java.lang.String"/>
+    <parameter name="ADDRESS1" class="java.lang.String"/>
+    <parameter name="ADDRESS2" class="java.lang.String"/>
+    <parameter name="ADDRESS3" class="java.lang.String"/>
+    <parameter name="ADDRESS4" class="java.lang.String"/>
+    <parameter name="CITY" class="java.lang.String"/>
+    <parameter name="STATE" class="java.lang.String"/>
+    <parameter name="POSTAL" class="java.lang.String"/>
+    <parameter name="BODY_TEXT" class="java.lang.String"/>
+    <parameter name="AGENT_NAME" class="java.lang.String"/>
+    <parameter name="AGENT_TITLE" class="java.lang.String"/>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["INTERNAL USE ONLY"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="SQL"><![CDATA[SELECT 1 AS REPORT_ANCHOR FROM DUAL]]></queryString>
+    <field name="REPORT_ANCHOR" class="java.lang.Integer"/>
+
+    <title>
+        <band height="90">
+            <image scaleImage="RetainShape">
+                <reportElement x="0" y="0" width="120" height="48" uuid="ce9f5b95-a84a-461d-8891-6fce146f80fd"/>
+                <imageExpression><![CDATA[$P{CLIENT_LOGO_URL}]]></imageExpression>
+            </image>
+            <textField>
+                <reportElement x="130" y="0" width="425" height="28" uuid="4d12c044-d309-48f8-85bf-2f008607ba5f"/>
+                <textElement><font fontName="Aptos" size="20" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{LETTER_TITLE}]]></textFieldExpression>
+            </textField>
+            <textField pattern="yyyy-MM-dd">
+                <reportElement x="130" y="32" width="200" height="18" uuid="bff60d66-1139-4f45-b843-7945aaf1b0a9"/>
+                <textFieldExpression><![CDATA[$P{LETTER_DATE}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <detail>
+        <band height="620" splitType="Stretch">
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="0" width="555" height="18" uuid="431ae0f7-3226-4aa8-9925-0128ef41d8c2"/>
+                <textElement><font size="12" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{RECIPIENT_NAME}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="22" width="555" height="16" uuid="ed329439-01da-4fef-96d1-cd1f684e80cb"/>
+                <textFieldExpression><![CDATA[$P{ADDRESS1}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="40" width="555" height="16" uuid="d57b86aa-6165-4ff1-97a3-e7d6afd8f2e2"/>
+                <textFieldExpression><![CDATA[$P{ADDRESS2}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="58" width="555" height="16" uuid="6efc6327-e51b-4f5a-a216-1e9eb74489a5"/>
+                <textFieldExpression><![CDATA[$P{ADDRESS3}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="76" width="555" height="16" uuid="db585f09-d289-42f0-871d-50d12f6f2423"/>
+                <textFieldExpression><![CDATA[$P{ADDRESS4}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="94" width="555" height="16" uuid="1b5f0f77-b496-446f-8e8f-a5a7de2f990a"/>
+                <textFieldExpression><![CDATA[
+($P{CITY} == null ? "" : $P{CITY}) + ", "
++ ($P{STATE} == null ? "" : $P{STATE}) + " "
++ ($P{POSTAL} == null ? "" : $P{POSTAL})
+                ]]></textFieldExpression>
+            </textField>
+
+            <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+                <reportElement x="0" y="140" width="555" height="360" uuid="c4f691bc-2e0f-497f-958c-16cf7037be35"/>
+                <textElement verticalAlignment="Top"><font size="11"/></textElement>
+                <textFieldExpression><![CDATA[$P{BODY_TEXT}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="0" y="530" width="555" height="18" uuid="22793a67-25c3-4b1c-b6f9-4a6f6daa0e8d"/>
+                <text><![CDATA[Sincerely,]]></text>
+            </staticText>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="554" width="555" height="18" uuid="f76ec4c4-e215-4b6c-a9e4-3062d6d5072b"/>
+                <textFieldExpression><![CDATA[$P{AGENT_NAME}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="576" width="555" height="18" uuid="2a701727-c371-4b3f-a368-f9f53f6c8bc2"/>
+                <textFieldExpression><![CDATA[$P{AGENT_TITLE}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="555" height="16" uuid="df6b8c64-fb9c-454e-83f6-5d5e00e22f89"/>
+                <textElement textAlignment="Center"><font fontName="Aptos" size="9"/></textElement>
+                <textFieldExpression><![CDATA["@2025, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>

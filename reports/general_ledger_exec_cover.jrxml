@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="general_ledger_exec_cover"
+    pageWidth="1190"
+    pageHeight="842"
+    orientation="Landscape"
+    columnWidth="1150"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="dc5885cb-ec2d-4fd0-b097-21d8bd150800">
+
+    <property name="ireport.domainUri" value="/SmartCity/Report/Workstreams/Finance/General_Ledger/General_Ledger___Domain"/>
+    <property name="com.jaspersoft.jrs.data.source" value="/SmartCity/Report/Workstreams/Finance/General_Ledger/General_Ledger___Domain"/>
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+
+    <style name="Base" fontName="Aptos" fontSize="10"/>
+    <style name="TitleBlue" style="Base" forecolor="#F5F0EB" fontSize="20" isBold="true"/>
+    <style name="HeaderBlue" style="Base" backcolor="#006FAC" forecolor="#F5F0EB" mode="Opaque" isBold="true"/>
+    <style name="SummaryBox" style="Base" backcolor="#F5F0EB" mode="Opaque" forecolor="#1348AB"/>
+
+    <parameter name="LoggedInUser" class="com.jaspersoft.jasperserver.api.metadata.user.domain.User" isForPrompting="false"/>
+    <parameter name="LoggedInUsername" class="java.lang.String" isForPrompting="false"/>
+    <parameter name="ONLY_LATEST_BATCH" class="java.lang.Boolean">
+        <defaultValueExpression><![CDATA[Boolean.TRUE]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["INTERNAL USE ONLY"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="domain"><![CDATA[
+<query>
+  <queryFields>
+    <queryField id="BATCH_NBR"/>
+    <queryField id="IS_LATEST_BATCH_NBR"/>
+    <queryField id="FT_ID"/>
+    <queryField id="GL_DISTRIB_STATUS_DESC"/>
+    <queryField id="GL_ACCT"/>
+    <queryField id="AMOUNT"/>
+    <queryField id="ACCOUNTING_DT"/>
+    <queryField id="GL_DIVISION"/>
+  </queryFields>
+</query>
+    ]]></queryString>
+
+    <field name="BATCH_NBR" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="BATCH_NBR"/></field>
+    <field name="IS_LATEST_BATCH_NBR" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="IS_LATEST_BATCH_NBR"/></field>
+    <field name="FT_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="FT_ID"/></field>
+    <field name="GL_DISTRIB_STATUS_DESC" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="GL_DISTRIB_STATUS_DESC"/></field>
+    <field name="GL_ACCT" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="GL_ACCT"/></field>
+    <field name="AMOUNT" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="AMOUNT"/></field>
+    <field name="ACCOUNTING_DT" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="ACCOUNTING_DT"/></field>
+    <field name="GL_DIVISION" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="GL_DIVISION"/></field>
+
+    <variable name="TOTAL_ROWS" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{FT_ID}]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="BAD_ROWS" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+(($F{GL_ACCT} == null || $F{GL_ACCT}.trim().length() == 0)
+|| ($F{AMOUNT} == null || $F{AMOUNT}.compareTo(java.math.BigDecimal.ZERO) == 0)
+|| ($F{GL_DISTRIB_STATUS_DESC} == null
+    || !($F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains("DISTRIBUT")
+         || $F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains("COMPLETE")
+         || $F{GL_DISTRIB_STATUS_DESC}.toUpperCase().contains("POST")))) ? 1 : 0
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="LATEST_BATCH" class="java.lang.String">
+        <variableExpression><![CDATA[$F{BATCH_NBR} == null ? null : $F{BATCH_NBR}.toPlainString()]]></variableExpression>
+    </variable>
+
+    <filterExpression><![CDATA[
+($F{FT_ID} != null)
+&& ($P{ONLY_LATEST_BATCH} == null || !$P{ONLY_LATEST_BATCH}.booleanValue()
+    || ("Y".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR})
+        || "YES".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR})
+        || "TRUE".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR})
+        || "1".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR}))
+)
+    ]]></filterExpression>
+
+    <title>
+        <band height="260">
+            <frame>
+                <reportElement x="0" y="0" width="1150" height="74" uuid="435235b8-78db-4148-83b6-5fca6f95c059" mode="Opaque" backcolor="#1348AB"/>
+            </frame>
+            <staticText>
+                <reportElement style="TitleBlue" x="20" y="14" width="840" height="24" uuid="5501069e-c876-4cfd-878a-a3c55eb8fda8"/>
+                <text><![CDATA[General Ledger Executive Cover Sheet]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="20" y="42" width="900" height="18" uuid="5fca10d6-f783-475a-b9c3-f3b4dd412f1d"/>
+                <textElement><font fontName="Aptos" size="11" isBold="true"/></textElement>
+                <text><![CDATA[Batch health, exception density, and immediate triage priority for leadership review.]]></text>
+            </staticText>
+
+            <frame>
+                <reportElement style="SummaryBox" x="0" y="84" width="1150" height="120" uuid="e89fef6e-9b73-4d58-8bf2-a9edc79f34d8"/>
+                <box><pen lineWidth="0.5"/></box>
+                <textField evaluationTime="Report"><reportElement x="20" y="14" width="350" height="18" uuid="fd97ef9c-0850-46cf-ac8b-7cae4e2f1810"/><textElement><font isBold="true" size="14"/></textElement><textFieldExpression><![CDATA["Batch Scope: " + ($V{LATEST_BATCH} == null ? "LATEST" : $V{LATEST_BATCH})]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="20" y="44" width="300" height="18" uuid="073522b5-2bf6-42fb-a4a5-c678f547f1f0"/><textFieldExpression><![CDATA["Rows Reviewed: " + $V{TOTAL_ROWS}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="20" y="66" width="300" height="18" uuid="12dadf6d-8e96-42d1-b61d-9c96e36d3c0d"/><textFieldExpression><![CDATA["Rows with Exceptions: " + $V{BAD_ROWS}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="20" y="88" width="420" height="18" uuid="153d6f84-07fe-45fd-bdcc-8f84f0ca138d"/><textFieldExpression><![CDATA["Exception Rate: " + (($V{TOTAL_ROWS} == null || $V{TOTAL_ROWS}.intValue() == 0) ? "0.0%" : new java.text.DecimalFormat("#0.0").format(($V{BAD_ROWS}.doubleValue()*100.0)/$V{TOTAL_ROWS}.doubleValue()) + "%")]]></textFieldExpression></textField>
+                <staticText><reportElement x="500" y="20" width="620" height="74" uuid="1a5bc75d-5894-44ef-ae69-9a8e8ebb0b90"/><text><![CDATA[Decision guidance:
+1) If Exception Rate > 5%, hold close and run exception packet.
+2) Prioritize missing GL account mapping, then zero amount anomalies.
+3) Validate distribution status recovery before posting to GL.]]></text></staticText>
+            </frame>
+
+            <barChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="0" y="210" width="560" height="50" uuid="524f7dcf-df7d-45a0-b88c-f5c0fd491f06"/>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Rows"]]></seriesExpression>
+                        <categoryExpression><![CDATA["Exceptions"]]></categoryExpression>
+                        <valueExpression><![CDATA[$V{BAD_ROWS}]]></valueExpression>
+                    </categorySeries>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Rows"]]></seriesExpression>
+                        <categoryExpression><![CDATA["Clean"]]></categoryExpression>
+                        <valueExpression><![CDATA[$V{TOTAL_ROWS} - $V{BAD_ROWS}]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <barPlot><plot/><categoryAxisFormat><axisFormat/></categoryAxisFormat><valueAxisFormat><axisFormat/></valueAxisFormat></barPlot>
+            </barChart>
+        </band>
+    </title>
+
+    <detail>
+        <band height="1">
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="0" width="1" height="1" uuid="dcfd8a44-3d4b-477f-a43f-5a4d7b3ffef2" forecolor="#FFFFFF"/>
+                <textFieldExpression><![CDATA[$F{FT_ID}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="1150" height="16" uuid="7ce8b611-d11e-4b03-a43a-cb03d1f01f70"/>
+                <textElement textAlignment="Center"><font fontName="Aptos" size="9"/></textElement>
+                <textFieldExpression><![CDATA["@2025, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+</jasperReport>

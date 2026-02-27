@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="base_customer_bill_template"
+    pageWidth="595"
+    pageHeight="842"
+    columnWidth="555"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="dd344c75-352f-4836-b2ed-4fa24c3df885">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+
+    <parameter name="BILL_ID" class="java.lang.String"/>
+    <parameter name="CLIENT_LOGO_URL" class="java.lang.String" isForPrompting="false"/>
+    <parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+        <defaultValueExpression><![CDATA["subreports/"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["INTERNAL USE ONLY"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="SQL"><![CDATA[
+SELECT
+    B.BILL_ID,
+    B.ACCT_ID,
+    NVL(PN.ENTITY_NAME, 'N/A') AS CUSTOMER_NAME,
+    B.BILL_DT,
+    B.DUE_DT,
+    B.BILL_STAT_FLG,
+    NVL(SUM(FT.CUR_AMT), 0) AS BILL_TOTAL
+FROM CISADM.CI_BILL B
+LEFT JOIN CISADM.CI_ACCT_PER AP
+  ON AP.ACCT_ID = B.ACCT_ID
+ AND AP.MAIN_CUST_SW = 'Y'
+LEFT JOIN CISADM.CI_PER_NAME PN
+  ON PN.PER_ID = AP.PER_ID
+ AND PN.PRIM_NAME_SW = 'Y'
+LEFT JOIN CISADM.CI_FT FT
+  ON FT.BILL_ID = B.BILL_ID
+ AND FT.FREEZE_SW = 'Y'
+ AND FT.FT_TYPE_FLG NOT IN ('PS', 'PX')
+WHERE B.BILL_ID = $P{BILL_ID}
+GROUP BY
+    B.BILL_ID,
+    B.ACCT_ID,
+    PN.ENTITY_NAME,
+    B.BILL_DT,
+    B.DUE_DT,
+    B.BILL_STAT_FLG
+    ]]></queryString>
+
+    <field name="BILL_ID" class="java.lang.String"/>
+    <field name="ACCT_ID" class="java.lang.String"/>
+    <field name="CUSTOMER_NAME" class="java.lang.String"/>
+    <field name="BILL_DT" class="java.sql.Timestamp"/>
+    <field name="DUE_DT" class="java.sql.Timestamp"/>
+    <field name="BILL_STAT_FLG" class="java.lang.String"/>
+    <field name="BILL_TOTAL" class="java.math.BigDecimal"/>
+
+    <title>
+        <band height="72">
+            <image scaleImage="RetainShape">
+                <reportElement x="0" y="0" width="120" height="48" uuid="87ea92f5-8fdb-4ec5-9f29-962944ce8e5a"/>
+                <imageExpression><![CDATA[$P{CLIENT_LOGO_URL}]]></imageExpression>
+            </image>
+            <staticText>
+                <reportElement x="130" y="0" width="425" height="24" uuid="3f0216a1-9022-4545-ae39-a51d8f98bffa"/>
+                <textElement><font fontName="Aptos" size="20" isBold="true"/></textElement>
+                <text><![CDATA[Customer Bill Statement]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="130" y="28" width="425" height="18" uuid="83be9552-644a-4d34-b63a-706cfa8049b0"/>
+                <textFieldExpression><![CDATA["Bill ID: " + $F{BILL_ID} + " | Account: " + $F{ACCT_ID} + " | Customer: " + $F{CUSTOMER_NAME}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="130" y="50" width="425" height="18" uuid="cb2aa22f-8cf7-4bcf-9f6b-3954872d552f"/>
+                <textFieldExpression><![CDATA["Bill Date: " + $F{BILL_DT} + " | Due Date: " + $F{DUE_DT} + " | Status: " + $F{BILL_STAT_FLG}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <detail>
+        <band height="120">
+            <textField pattern="#,##0.00">
+                <reportElement x="0" y="0" width="555" height="22" uuid="4288dc6e-eef1-4517-96f4-7d2a5a72ec08"/>
+                <textElement textAlignment="Right"><font size="14" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{BILL_TOTAL}]]></textFieldExpression>
+            </textField>
+
+            <subreport>
+                <reportElement x="0" y="28" width="555" height="88" uuid="84597f1a-16d9-447a-beee-9851ae603ee6"/>
+                <subreportParameter name="CLIENT_ID">
+                    <subreportParameterExpression><![CDATA[""]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="BILL_ID">
+                    <subreportParameterExpression><![CDATA[$F{BILL_ID}]]></subreportParameterExpression>
+                </subreportParameter>
+                <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                <subreportExpression><![CDATA["repo:subreports/line_items"]]></subreportExpression>
+            </subreport>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="555" height="16" uuid="b72a8779-4700-44c4-a2df-83a90c4adcf5"/>
+                <textElement textAlignment="Center"><font fontName="Aptos" size="9"/></textElement>
+                <textFieldExpression><![CDATA["@2025, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>

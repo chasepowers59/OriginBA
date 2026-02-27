@@ -6,6 +6,7 @@ Validate SQL table references against source-of-truth metadata:
 Usage:
   python scripts/validate_source_of_truth_sql.py
   python scripts/validate_source_of_truth_sql.py sql/smartcity_9_workstream_kpis.sql
+  python scripts/validate_source_of_truth_sql.py sql/performance/bill_cycle/bill_cycle_active_validation.sql
 """
 
 from __future__ import annotations
@@ -62,7 +63,7 @@ def _load_known_tables() -> set[str]:
 def _iter_sql_files(args: list[str]) -> list[Path]:
     if args:
         return [Path(a).resolve() for a in args]
-    return sorted(DEFAULT_SQL_DIR.glob("*.sql"))
+    return sorted(DEFAULT_SQL_DIR.rglob("*.sql"))
 
 
 def _extract_table_refs(sql_text: str) -> set[str]:

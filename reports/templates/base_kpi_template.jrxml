@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="base_kpi_template"
+    pageWidth="842"
+    pageHeight="595"
+    orientation="Landscape"
+    columnWidth="802"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="3cbf050f-7e10-4319-b74d-3272b11e2f74">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+
+    <parameter name="REPORT_TITLE" class="java.lang.String">
+        <defaultValueExpression><![CDATA["KPI Report"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_ID" class="java.lang.String"/>
+    <parameter name="START_TS" class="java.sql.Timestamp"/>
+    <parameter name="END_TS" class="java.sql.Timestamp"/>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["INTERNAL USE ONLY"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="SQL"><![CDATA[
+SELECT 'KPI_SAMPLE' AS KPI_NAME, 0 AS KPI_VALUE FROM DUAL
+    ]]></queryString>
+
+    <field name="KPI_NAME" class="java.lang.String"/>
+    <field name="KPI_VALUE" class="java.math.BigDecimal"/>
+
+    <title>
+        <band height="48">
+            <textField>
+                <reportElement x="0" y="0" width="802" height="26" uuid="41766f95-1551-4af7-a67e-39c19d5372e6"/>
+                <textElement><font fontName="Aptos" size="20" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="28" width="802" height="18" uuid="c925b233-f67e-489f-96da-d89bc9a76a8d"/>
+                <textElement><font fontName="Aptos" size="11"/></textElement>
+                <textFieldExpression><![CDATA["CLIENT_ID=" + $P{CLIENT_ID} + " | START_TS=" + $P{START_TS} + " | END_TS=" + $P{END_TS}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="20">
+            <staticText><reportElement x="0" y="0" width="550" height="20" uuid="35db3ef5-25ac-47f2-b79a-44750f4b731d"/><textElement><font isBold="true"/></textElement><text><![CDATA[KPI]]></text></staticText>
+            <staticText><reportElement x="555" y="0" width="247" height="20" uuid="466bb111-a2fd-4654-ad5f-9fe6204ff146"/><textElement textAlignment="Right"><font isBold="true"/></textElement><text><![CDATA[Value]]></text></staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="20">
+            <textField><reportElement x="0" y="0" width="550" height="20" uuid="49d6f122-96b6-4ecb-ae03-c577032258eb"/><textFieldExpression><![CDATA[$F{KPI_NAME}]]></textFieldExpression></textField>
+            <textField pattern="#,##0.00"><reportElement x="555" y="0" width="247" height="20" uuid="8455f268-c6a6-4f23-8f51-7a86fd361753"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{KPI_VALUE}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="802" height="16" uuid="e33839be-ccf6-4a7d-af7f-802c84336cc5"/>
+                <textElement textAlignment="Center"><font fontName="Aptos" size="9"/></textElement>
+                <textFieldExpression><![CDATA["@2025, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>

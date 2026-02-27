@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="field_activity_operational_intelligence"
+    pageWidth="1190"
+    pageHeight="842"
+    orientation="Landscape"
+    columnWidth="1150"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="8dc76be1-4f9b-44f2-bcd5-b99087f13cc0">
+
+    <property name="ireport.domainUri" value="/SmartCity/Report/Workstreams/Field_Operations/Field_Activity/Field_Activity___Domain"/>
+    <property name="com.jaspersoft.jrs.data.source" value="/SmartCity/Report/Workstreams/Field_Operations/Field_Activity/Field_Activity___Domain"/>
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+
+    <style name="Base" fontName="Aptos" fontSize="10"/>
+    <style name="TitleBlue" style="Base" forecolor="#F5F0EB" fontSize="20" isBold="true"/>
+    <style name="MetaBlue" style="Base" forecolor="#F5F0EB" fontSize="11"/>
+    <style name="HeaderBlue" style="Base" backcolor="#006FAC" forecolor="#F5F0EB" mode="Opaque" isBold="true"/>
+    <style name="DetailText" style="Base" forecolor="#000000"/>
+    <style name="SummaryBlue" style="Base" backcolor="#F5F0EB" mode="Opaque" forecolor="#1348AB"/>
+    <style name="SeverityCell" style="Base" mode="Opaque" backcolor="#047857" forecolor="#FFFFFF" isBold="true">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[
+($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{STALE_DAYS}.intValue())
+|| ($F{CANCEL_REASON} != null && $F{CANCEL_REASON}.trim().length() > 0)
+            ]]></conditionExpression>
+            <style backcolor="#B91C1C" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+        <conditionalStyle>
+            <conditionExpression><![CDATA[
+!(($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{STALE_DAYS}.intValue())
+  || ($F{CANCEL_REASON} != null && $F{CANCEL_REASON}.trim().length() > 0))
+&& ("Y".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "YES".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "1".equalsIgnoreCase($F{APPOINTMENT_FLG}))
+&& ($F{STATUS_UPD_DTTM} == null)
+            ]]></conditionExpression>
+            <style backcolor="#D97706" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+    </style>
+
+    <parameter name="LoggedInUser" class="com.jaspersoft.jasperserver.api.metadata.user.domain.User" isForPrompting="false"/>
+    <parameter name="LoggedInUsername" class="java.lang.String" isForPrompting="false"/>
+    <parameter name="REGION" class="java.lang.String"/>
+    <parameter name="DIVISION_CD" class="java.lang.String"/>
+    <parameter name="STATUS_TEXT" class="java.lang.String"/>
+    <parameter name="ACTIVITY_TYPE_TEXT" class="java.lang.String"/>
+    <parameter name="STALE_DAYS" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[5]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ONLY_OPEN" class="java.lang.Boolean">
+        <defaultValueExpression><![CDATA[Boolean.FALSE]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ONLY_EXCEPTIONS" class="java.lang.Boolean">
+        <defaultValueExpression><![CDATA[Boolean.FALSE]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["INTERNAL USE ONLY"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="domain"><![CDATA[
+<query>
+  <queryFields>
+    <queryField id="D1_ACTIVITY_ID"/>
+    <queryField id="DESCR100"/>
+    <queryField id="START_DTTM"/>
+    <queryField id="END_DTTM"/>
+    <queryField id="CRE_DTTM"/>
+    <queryField id="STATUS_UPD_DTTM"/>
+    <queryField id="BO_STATUS_CD"/>
+    <queryField id="DESCR_1"/>
+    <queryField id="DAYS_OLD"/>
+    <queryField id="DAYS_COMPLETED"/>
+    <queryField id="CANCEL_REASON"/>
+    <queryField id="DESCR_3"/>
+    <queryField id="APPOINTMENT_FLG"/>
+    <queryField id="APPOINTMENT_WINDOW_END_DTTM"/>
+    <queryField id="D1_CUSTOMERNAME"/>
+    <queryField id="D1_CONTACTNAME"/>
+    <queryField id="D1_SP_ID"/>
+    <queryField id="CITY"/>
+    <queryField id="DIVISION_CD"/>
+    <queryField id="ADDRESS1"/>
+    <queryField id="ACTIVITY_ID_DISTINCT"/>
+  </queryFields>
+</query>
+    ]]></queryString>
+
+    <field name="D1_ACTIVITY_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="D1_ACTIVITY_ID"/></field>
+    <field name="ACTIVITY_TYPE_DESCR" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="DESCR100"/></field>
+    <field name="START_DTTM" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="START_DTTM"/></field>
+    <field name="END_DTTM" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="END_DTTM"/></field>
+    <field name="CRE_DTTM" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="CRE_DTTM"/></field>
+    <field name="STATUS_UPD_DTTM" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="STATUS_UPD_DTTM"/></field>
+    <field name="BO_STATUS_CD" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BO_STATUS_CD"/></field>
+    <field name="STATUS_DESCR" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="DESCR_1"/></field>
+    <field name="DAYS_OLD" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="DAYS_OLD"/></field>
+    <field name="DAYS_COMPLETED" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="DAYS_COMPLETED"/></field>
+    <field name="CANCEL_REASON" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="CANCEL_REASON"/></field>
+    <field name="CANCEL_REASON_DESCR" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="DESCR_3"/></field>
+    <field name="APPOINTMENT_FLG" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="APPOINTMENT_FLG"/></field>
+    <field name="APPOINTMENT_WINDOW_END_DTTM" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="APPOINTMENT_WINDOW_END_DTTM"/></field>
+    <field name="D1_CUSTOMERNAME" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="D1_CUSTOMERNAME"/></field>
+    <field name="D1_CONTACTNAME" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="D1_CONTACTNAME"/></field>
+    <field name="D1_SP_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="D1_SP_ID"/></field>
+    <field name="CITY" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="CITY"/></field>
+    <field name="DIVISION_CD" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="DIVISION_CD"/></field>
+    <field name="ADDRESS1" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="ADDRESS1"/></field>
+    <field name="ACTIVITY_COUNT" class="java.lang.Long"><property name="net.sf.jasperreports.query.field.id" value="ACTIVITY_ID_DISTINCT"/></field>
+
+    <sortField name="DAYS_OLD" order="Descending"/>
+
+    <variable name="TOTAL_ACTIVITIES" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{D1_ACTIVITY_ID}]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="STALE_CNT" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+((($F{STATUS_DESCR} != null && $F{STATUS_DESCR}.toUpperCase().contains("COMPLETE"))
+ || ($F{BO_STATUS_CD} != null && $F{BO_STATUS_CD}.toUpperCase().contains("COMPLETE"))) ? 0 :
+ (($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{STALE_DAYS}.intValue()) ? 1 : 0))
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="CANCELLED_CNT" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+(($F{CANCEL_REASON} != null && $F{CANCEL_REASON}.trim().length() > 0)
+ || ($F{STATUS_DESCR} != null && $F{STATUS_DESCR}.toUpperCase().contains("CANCEL"))
+ || ($F{BO_STATUS_CD} != null && $F{BO_STATUS_CD}.toUpperCase().contains("CANCEL"))) ? 1 : 0
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="APPT_REQUIRED_CNT" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+("Y".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "YES".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "1".equalsIgnoreCase($F{APPOINTMENT_FLG})) ? 1 : 0
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="APPT_AT_RISK_CNT" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+(("Y".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "YES".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "1".equalsIgnoreCase($F{APPOINTMENT_FLG}))
+&& !($F{STATUS_DESCR} != null && $F{STATUS_DESCR}.toUpperCase().contains("COMPLETE"))
+&& !($F{BO_STATUS_CD} != null && $F{BO_STATUS_CD}.toUpperCase().contains("COMPLETE"))
+&& ($F{STATUS_UPD_DTTM} == null || ($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= 1))) ? 1 : 0
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="AVG_DAYS_COMPLETE" class="java.lang.Double" calculation="Average">
+        <variableExpression><![CDATA[$F{DAYS_COMPLETED} == null ? null : Double.valueOf($F{DAYS_COMPLETED}.doubleValue())]]></variableExpression>
+    </variable>
+
+    <filterExpression><![CDATA[
+($F{D1_ACTIVITY_ID} != null)
+&& ($P{REGION} == null || $P{REGION}.trim().length() == 0
+    || ($F{CITY} != null && $F{CITY}.toUpperCase().contains($P{REGION}.trim().toUpperCase()))
+)
+&& ($P{DIVISION_CD} == null || $P{DIVISION_CD}.trim().length() == 0
+    || ($F{DIVISION_CD} != null && $F{DIVISION_CD}.equalsIgnoreCase($P{DIVISION_CD}.trim()))
+)
+&& ($P{STATUS_TEXT} == null || $P{STATUS_TEXT}.trim().length() == 0
+    || (($F{STATUS_DESCR} != null && $F{STATUS_DESCR}.toUpperCase().contains($P{STATUS_TEXT}.trim().toUpperCase()))
+        || ($F{BO_STATUS_CD} != null && $F{BO_STATUS_CD}.toUpperCase().contains($P{STATUS_TEXT}.trim().toUpperCase())))
+)
+&& ($P{ACTIVITY_TYPE_TEXT} == null || $P{ACTIVITY_TYPE_TEXT}.trim().length() == 0
+    || ($F{ACTIVITY_TYPE_DESCR} != null && $F{ACTIVITY_TYPE_DESCR}.toUpperCase().contains($P{ACTIVITY_TYPE_TEXT}.trim().toUpperCase()))
+)
+&& ($P{ONLY_OPEN} == null || !$P{ONLY_OPEN}.booleanValue()
+    || (!($F{STATUS_DESCR} != null && $F{STATUS_DESCR}.toUpperCase().contains("COMPLETE"))
+        && !($F{BO_STATUS_CD} != null && $F{BO_STATUS_CD}.toUpperCase().contains("COMPLETE")))
+)
+&& ($P{ONLY_EXCEPTIONS} == null || !$P{ONLY_EXCEPTIONS}.booleanValue()
+    || (($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{STALE_DAYS}.intValue())
+        || ($F{CANCEL_REASON} != null && $F{CANCEL_REASON}.trim().length() > 0)
+        || (("Y".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "YES".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "1".equalsIgnoreCase($F{APPOINTMENT_FLG})) && ($F{STATUS_UPD_DTTM} == null)))
+)
+    ]]></filterExpression>
+
+    <title>
+        <band height="250">
+            <frame>
+                <reportElement x="0" y="0" width="1150" height="70" uuid="8d9fb441-f800-49ca-a665-bd41f189cb92" mode="Opaque" backcolor="#1348AB"/>
+            </frame>
+            <staticText>
+                <reportElement style="TitleBlue" x="18" y="12" width="830" height="24" uuid="2e64038c-3935-4f85-b988-e36de1f628db"/>
+                <text><![CDATA[Field Activity Operational Intelligence]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="MetaBlue" x="18" y="42" width="1115" height="18" uuid="ee8532e3-5a47-436b-862d-9d3f9eb027d0"/>
+                <textFieldExpression><![CDATA[
+"REGION=" + (($P{REGION} == null || $P{REGION}.trim().length()==0) ? "ALL" : $P{REGION}.trim())
++ " | DIVISION=" + (($P{DIVISION_CD} == null || $P{DIVISION_CD}.trim().length()==0) ? "ALL" : $P{DIVISION_CD}.trim())
++ " | STATUS=" + (($P{STATUS_TEXT} == null || $P{STATUS_TEXT}.trim().length()==0) ? "ALL" : $P{STATUS_TEXT}.trim())
++ " | TYPE=" + (($P{ACTIVITY_TYPE_TEXT} == null || $P{ACTIVITY_TYPE_TEXT}.trim().length()==0) ? "ALL" : $P{ACTIVITY_TYPE_TEXT}.trim())
++ " | STALE_DAYS=" + $P{STALE_DAYS}
+                ]]></textFieldExpression>
+            </textField>
+
+            <frame>
+                <reportElement style="SummaryBlue" x="0" y="78" width="560" height="160" uuid="6a6020a2-a3bc-4da1-b0be-3f2922f76295"/>
+                <box><pen lineWidth="0.5"/></box>
+                <staticText><reportElement x="10" y="8" width="540" height="16" uuid="03c8e2e3-f0eb-4299-9cd4-20b585628df0"/><textElement><font isBold="true"/></textElement><text><![CDATA[Performance Snapshot]]></text></staticText>
+                <textField evaluationTime="Report"><reportElement x="10" y="32" width="260" height="16" uuid="e63b77f3-fb71-4deb-a488-30fb8f1748aa"/><textFieldExpression><![CDATA["Total Activities: " + $V{TOTAL_ACTIVITIES}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="10" y="52" width="260" height="16" uuid="c55f2f61-c4e5-453a-bd31-1c6c9dd3a52f"/><textFieldExpression><![CDATA["Stale Activities: " + $V{STALE_CNT}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="10" y="72" width="260" height="16" uuid="f7d7ec2f-0784-42be-87dc-91be645afe09"/><textFieldExpression><![CDATA["Cancelled: " + $V{CANCELLED_CNT}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="280" y="32" width="260" height="16" uuid="92ace9f2-84e8-41c1-ac45-f56fd7c71c01"/><textFieldExpression><![CDATA["Appointments Required: " + $V{APPT_REQUIRED_CNT}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="280" y="52" width="260" height="16" uuid="d58dcf72-7182-413a-8641-0341ec9360fd"/><textFieldExpression><![CDATA["Appointment At Risk: " + $V{APPT_AT_RISK_CNT}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="280" y="72" width="260" height="16" uuid="2f9e8c58-c858-43cd-bd88-ff63e3d00e38"/><textFieldExpression><![CDATA["Avg Days to Complete: " + ($V{AVG_DAYS_COMPLETE} == null ? "N/A" : new java.text.DecimalFormat("#0.0").format($V{AVG_DAYS_COMPLETE}))]]></textFieldExpression></textField>
+            </frame>
+
+            <barChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="570" y="78" width="580" height="160" uuid="dfed9282-8b77-450f-b16c-e9fff69d7f5b"/>
+                    <chartTitle><titleExpression><![CDATA["Backlog and Activity Mix"]]></titleExpression></chartTitle>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Stale/Open"]]></seriesExpression>
+                        <categoryExpression><![CDATA[$F{STATUS_DESCR} == null ? ($F{BO_STATUS_CD} == null ? "UNKNOWN" : $F{BO_STATUS_CD}) : $F{STATUS_DESCR}]]></categoryExpression>
+                        <valueExpression><![CDATA[
+((($F{STATUS_DESCR} != null && $F{STATUS_DESCR}.toUpperCase().contains("COMPLETE"))
+ || ($F{BO_STATUS_CD} != null && $F{BO_STATUS_CD}.toUpperCase().contains("COMPLETE"))) ? 0 :
+ (($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{STALE_DAYS}.intValue()) ? 1 : 0))
+                        ]]></valueExpression>
+                    </categorySeries>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Volume"]]></seriesExpression>
+                        <categoryExpression><![CDATA[$F{ACTIVITY_TYPE_DESCR} == null ? "UNKNOWN" : $F{ACTIVITY_TYPE_DESCR}]]></categoryExpression>
+                        <valueExpression><![CDATA[1]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <barPlot><plot/><categoryAxisFormat><axisFormat/></categoryAxisFormat><valueAxisFormat><axisFormat/></valueAxisFormat></barPlot>
+            </barChart>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="24">
+            <staticText><reportElement style="HeaderBlue" x="0" y="0" width="70" height="24" uuid="67af553d-06c4-4f25-8f71-f076996db95f"/><text><![CDATA[SEVERITY]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="70" y="0" width="90" height="24" uuid="8e32cc7a-8a73-4f98-b6a5-dd247f3f25f1"/><text><![CDATA[ACTIVITY_ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="160" y="0" width="140" height="24" uuid="f7d35c1f-0212-4108-8477-0f57bf89aa74"/><text><![CDATA[ACTIVITY_TYPE]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="300" y="0" width="100" height="24" uuid="2a973f7c-c354-4f6f-9f71-f1dbb0546f11"/><text><![CDATA[STATUS]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="400" y="0" width="70" height="24" uuid="f4f58719-4f30-4cb7-b5fd-d82013276fbe"/><text><![CDATA[DAYS_OLD]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="470" y="0" width="80" height="24" uuid="f127f2ac-c375-4653-8dcb-9a11a952f8e4"/><text><![CDATA[DAYS_COMP]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="550" y="0" width="100" height="24" uuid="f00a7e5d-f66d-458b-a6ca-47d4f24b5989"/><text><![CDATA[APPOINTMENT]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="650" y="0" width="120" height="24" uuid="e8a8cc1a-e3c4-4929-b62b-8742dd3c1661"/><text><![CDATA[CANCEL_REASON]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="770" y="0" width="80" height="24" uuid="e6735a10-55f4-4453-87e3-630dddb6d68e"/><text><![CDATA[CITY]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="850" y="0" width="80" height="24" uuid="0ff98822-b697-4d31-98e2-51410d90fd1d"/><text><![CDATA[DIVISION]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="930" y="0" width="220" height="24" uuid="05d0eb46-e9ce-4978-a5f5-80a349faba6d"/><text><![CDATA[ACTION]]></text></staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="20">
+            <textField>
+                <reportElement style="SeverityCell" x="0" y="2" width="70" height="16" uuid="4ef0f9c8-65ff-4a54-90ec-8f2d8fb6e8c1"/>
+                <textFieldExpression><![CDATA[
+(($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{STALE_DAYS}.intValue()) || ($F{CANCEL_REASON} != null && $F{CANCEL_REASON}.trim().length() > 0)) ? "HIGH"
+ : ((("Y".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "YES".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "1".equalsIgnoreCase($F{APPOINTMENT_FLG})) && ($F{STATUS_UPD_DTTM} == null)) ? "MED" : "NORMAL")
+                ]]></textFieldExpression>
+            </textField>
+            <textField><reportElement style="DetailText" x="70" y="2" width="90" height="16" uuid="95f9de73-48a8-4bcc-a26f-c8ea52f78f4a"/><textFieldExpression><![CDATA[$F{D1_ACTIVITY_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="160" y="2" width="140" height="16" uuid="d46eeef0-096c-4c13-95c6-4a8b5dce4113"/><textFieldExpression><![CDATA[$F{ACTIVITY_TYPE_DESCR} == null ? "UNKNOWN" : $F{ACTIVITY_TYPE_DESCR}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="300" y="2" width="100" height="16" uuid="fb80d45f-5f65-4aa2-bd45-e30302bfec99"/><textFieldExpression><![CDATA[$F{STATUS_DESCR} == null ? ($F{BO_STATUS_CD} == null ? "UNKNOWN" : $F{BO_STATUS_CD}) : $F{STATUS_DESCR}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="400" y="2" width="70" height="16" uuid="69e1f635-a2e5-4dbf-beca-b64243d08379"/><textFieldExpression><![CDATA[$F{DAYS_OLD} == null ? null : $F{DAYS_OLD}.intValue()]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="470" y="2" width="80" height="16" uuid="07da7ae9-79f8-4bcb-966a-c61bff9f9265"/><textFieldExpression><![CDATA[$F{DAYS_COMPLETED} == null ? null : $F{DAYS_COMPLETED}.intValue()]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="550" y="2" width="100" height="16" uuid="4fd1b65f-f05b-4fe8-bce8-f9d5ebbf3e90"/><textFieldExpression><![CDATA[("Y".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "YES".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "1".equalsIgnoreCase($F{APPOINTMENT_FLG})) ? "REQUIRED" : "NO"]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="650" y="2" width="120" height="16" uuid="04a4c0a5-95cb-4073-b204-53be24beddd8"/><textFieldExpression><![CDATA[$F{CANCEL_REASON_DESCR} == null ? ($F{CANCEL_REASON} == null ? "" : $F{CANCEL_REASON}) : $F{CANCEL_REASON_DESCR}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="770" y="2" width="80" height="16" uuid="335f90df-7338-4807-b6ac-7f27aa357f04"/><textFieldExpression><![CDATA[$F{CITY} == null ? "UNKNOWN" : $F{CITY}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="850" y="2" width="80" height="16" uuid="b234f67a-2907-4670-b86c-99fdd3f6c4af"/><textFieldExpression><![CDATA[$F{DIVISION_CD} == null ? "UNKNOWN" : $F{DIVISION_CD}]]></textFieldExpression></textField>
+            <textField>
+                <reportElement style="DetailText" x="930" y="2" width="220" height="16" uuid="651e6050-751e-4ad2-a696-f6587a99243b"/>
+                <textFieldExpression><![CDATA[
+($F{CANCEL_REASON} != null && $F{CANCEL_REASON}.trim().length() > 0) ? "Analyze cancel root cause + customer comms"
+ : (($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{STALE_DAYS}.intValue()) ? "Dispatch escalation; clear stale queue"
+ : ((("Y".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "YES".equalsIgnoreCase($F{APPOINTMENT_FLG}) || "1".equalsIgnoreCase($F{APPOINTMENT_FLG})) && ($F{STATUS_UPD_DTTM} == null)) ? "Confirm appointment adherence" : "Monitor"))
+                ]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="1150" height="16" uuid="bbf0e290-f09e-4efe-a8f7-bfd125c22172"/>
+                <textElement textAlignment="Center"><font fontName="Aptos" size="9"/></textElement>
+                <textFieldExpression><![CDATA["@2025, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <summary>
+        <band height="190">
+            <barChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="0" y="0" width="560" height="190" uuid="9edb5cf8-8268-4abc-8f66-cb96960708c9"/>
+                    <chartTitle><titleExpression><![CDATA["Backlog by Status (Stale Only)"]]></titleExpression></chartTitle>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Stale"]]></seriesExpression>
+                        <categoryExpression><![CDATA[$F{STATUS_DESCR} == null ? ($F{BO_STATUS_CD} == null ? "UNKNOWN" : $F{BO_STATUS_CD}) : $F{STATUS_DESCR}]]></categoryExpression>
+                        <valueExpression><![CDATA[
+((($F{STATUS_DESCR} != null && $F{STATUS_DESCR}.toUpperCase().contains("COMPLETE"))
+ || ($F{BO_STATUS_CD} != null && $F{BO_STATUS_CD}.toUpperCase().contains("COMPLETE"))) ? 0 :
+ (($F{DAYS_OLD} != null && $F{DAYS_OLD}.intValue() >= $P{STALE_DAYS}.intValue()) ? 1 : 0))
+                        ]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <barPlot><plot/><categoryAxisFormat><axisFormat/></categoryAxisFormat><valueAxisFormat><axisFormat/></valueAxisFormat></barPlot>
+            </barChart>
+            <barChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="580" y="0" width="570" height="190" uuid="e4ed48ea-b9fc-4539-b374-13e53bd7bbf3"/>
+                    <chartTitle><titleExpression><![CDATA["Cancellation Root Cause by Activity Type"]]></titleExpression></chartTitle>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA[$F{ACTIVITY_TYPE_DESCR} == null ? "UNKNOWN" : $F{ACTIVITY_TYPE_DESCR}]]></seriesExpression>
+                        <categoryExpression><![CDATA[$F{CANCEL_REASON_DESCR} == null ? ($F{CANCEL_REASON} == null ? "NONE" : $F{CANCEL_REASON}) : $F{CANCEL_REASON_DESCR}]]></categoryExpression>
+                        <valueExpression><![CDATA[(($F{CANCEL_REASON} != null && $F{CANCEL_REASON}.trim().length() > 0) || ($F{STATUS_DESCR} != null && $F{STATUS_DESCR}.toUpperCase().contains("CANCEL"))) ? 1 : 0]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <barPlot><plot/><categoryAxisFormat><axisFormat/></categoryAxisFormat><valueAxisFormat><axisFormat/></valueAxisFormat></barPlot>
+            </barChart>
+        </band>
+    </summary>
+
+</jasperReport>

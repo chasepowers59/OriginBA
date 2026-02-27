@@ -1,0 +1,25 @@
+{
+  "version": "2",
+  "label": "billing_customer_statement_input_controls",
+  "uri": "/reports/origin/billing_customer_statement_input_controls",
+  "permissionMask": 0,
+  "controls": [
+    {
+      "id": "BILL_ID",
+      "label": "Bill ID",
+      "type": "singleSelectQuery",
+      "mandatory": true,
+      "visible": true,
+      "dataType": "text",
+      "query": "SELECT TO_CHAR(B.BILL_ID) AS VALUE_COL, TO_CHAR(B.BILL_ID) || ' | ' || TO_CHAR(B.BILL_DT, 'YYYY-MM-DD') || ' | ACCT ' || TO_CHAR(B.ACCT_ID) AS LABEL_COL FROM CISADM.CI_BILL B ORDER BY B.BILL_DT DESC FETCH FIRST 500 ROWS ONLY"
+    },
+    {
+      "id": "CLIENT_LOGO_URL",
+      "label": "Client Logo URL",
+      "type": "singleValueText",
+      "mandatory": false,
+      "visible": false,
+      "dataType": "text"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="address_block"
+    pageWidth="555"
+    pageHeight="120"
+    columnWidth="555"
+    leftMargin="0"
+    rightMargin="0"
+    topMargin="0"
+    bottomMargin="0"
+    uuid="4f1043b5-97fb-4ec2-bdd3-75bb4ee89f79">
+
+    <parameter name="RECIPIENT_NAME" class="java.lang.String"/>
+    <parameter name="ADDRESS1" class="java.lang.String"/>
+    <parameter name="ADDRESS2" class="java.lang.String"/>
+    <parameter name="ADDRESS3" class="java.lang.String"/>
+    <parameter name="ADDRESS4" class="java.lang.String"/>
+    <parameter name="CITY" class="java.lang.String"/>
+    <parameter name="STATE" class="java.lang.String"/>
+    <parameter name="POSTAL" class="java.lang.String"/>
+
+    <queryString language="SQL"><![CDATA[SELECT 1 AS REPORT_ANCHOR FROM DUAL]]></queryString>
+    <field name="REPORT_ANCHOR" class="java.lang.Integer"/>
+
+    <detail>
+        <band height="110">
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="0" width="555" height="16" uuid="a568e4f8-18b5-4be9-b934-7536bc8395d3"/>
+                <textElement><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{RECIPIENT_NAME}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true"><reportElement x="0" y="18" width="555" height="14" uuid="00dc3268-fc63-438c-b2a0-b54fce84e664"/><textFieldExpression><![CDATA[$P{ADDRESS1}]]></textFieldExpression></textField>
+            <textField isBlankWhenNull="true"><reportElement x="0" y="34" width="555" height="14" uuid="78be5f27-8fe4-43e4-8507-df377627f80a"/><textFieldExpression><![CDATA[$P{ADDRESS2}]]></textFieldExpression></textField>
+            <textField isBlankWhenNull="true"><reportElement x="0" y="50" width="555" height="14" uuid="4a53a7ca-b4d4-474a-b4b8-2d48980da7bc"/><textFieldExpression><![CDATA[$P{ADDRESS3}]]></textFieldExpression></textField>
+            <textField isBlankWhenNull="true"><reportElement x="0" y="66" width="555" height="14" uuid="fb2db766-5359-480a-a506-13ab6a677f6f"/><textFieldExpression><![CDATA[$P{ADDRESS4}]]></textFieldExpression></textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="82" width="555" height="14" uuid="1401d360-f595-4d96-aaf7-61d73e411a00"/>
+                <textFieldExpression><![CDATA[
+($P{CITY} == null ? "" : $P{CITY}) + ", "
++ ($P{STATE} == null ? "" : $P{STATE}) + " "
++ ($P{POSTAL} == null ? "" : $P{POSTAL})
+                ]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+</jasperReport>
