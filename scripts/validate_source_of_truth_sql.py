@@ -37,6 +37,30 @@ SUPPLEMENTAL_ALLOWED_TABLES = {
     "CI_SA_TYPE",
     "CI_ALERT_TYPE_L",
     "CI_TENDER_TYPE_L",
+    # Core usage/reporting tables may be absent from partial metadata snapshots.
+    "CI_ACCT",
+    "CI_SA",
+    "C1_USAGE",
+    "D1_USAGE",
+    "D1_USAGE_SCALAR_DTL",
+    "CI_CUST_CL_L",
+    "CI_BILL_CYC_L",
+    "CI_LOOKUP_VAL_L",
+    "CI_SA_SP",
+    "CI_ACCT_PER",
+    "CI_TNDR_SRCE_L",
+    # Oracle dictionary views used by read-only preflight checks.
+    "SESSION_PRIVS",
+    "USER_TAB_PRIVS_RECD",
+    # Oracle dictionary views used by discovery workflows.
+    "ALL_TABLES",
+    "ALL_TAB_COMMENTS",
+    "ALL_TAB_COLUMNS",
+    "ALL_COL_COMMENTS",
+    "ALL_CONSTRAINTS",
+    "ALL_CONS_COLUMNS",
+    "ALL_INDEXES",
+    "ALL_IND_COLUMNS",
 }
 
 
@@ -61,9 +85,17 @@ def _load_known_tables() -> set[str]:
 
 
 def _iter_sql_files(args: list[str]) -> list[Path]:
-    if args:
-        return [Path(a).resolve() for a in args]
-    return sorted(DEFAULT_SQL_DIR.rglob("*.sql"))
+    if not args:
+        return sorted(DEFAULT_SQL_DIR.rglob("*.sql"))
+
+    files: list[Path] = []
+    for a in args:
+        p = Path(a).resolve()
+        if p.is_file() and p.suffix.lower() == ".sql":
+            files.append(p)
+        elif p.is_dir():
+            files.extend(sorted(p.rglob("*.sql")))
+    return files
 
 
 def _extract_table_refs(sql_text: str) -> set[str]:

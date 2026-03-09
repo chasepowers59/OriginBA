@@ -1,0 +1,57 @@
+﻿name: sql-quality
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "sql/**/*.sql"
+      - "scripts/validate_source_of_truth_sql.py"
+      - "scripts/repo/sql_read_only_guard.py"
+      - "scripts/performance/build_cisadm_dictionary_coverage.py"
+      - "scripts/performance/build_prefilter_candidates.py"
+      - ".github/workflows/sql-quality.yml"
+  push:
+    paths:
+      - "sql/**/*.sql"
+      - "scripts/validate_source_of_truth_sql.py"
+      - "scripts/repo/sql_read_only_guard.py"
+      - "scripts/performance/build_cisadm_dictionary_coverage.py"
+      - "scripts/performance/build_prefilter_candidates.py"
+      - ".github/workflows/sql-quality.yml"
+
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile quality scripts
+        run: |
+          python -m py_compile scripts/validate_source_of_truth_sql.py
+          python -m py_compile scripts/repo/sql_read_only_guard.py
+          python -m py_compile scripts/performance/build_cisadm_dictionary_coverage.py
+          python -m py_compile scripts/performance/build_prefilter_candidates.py
+
+      - name: Source-of-truth SQL validation (governed scopes)
+        shell: bash
+        run: |
+          files=$(find \
+            sql/performance/billed_usage/validation \
+            sql/performance/bill_cycle \
+            sql/reconciliation/billing \
+            sql/diagnostics/cisadm_dictionary \
+            -name "*.sql" -type f | sort)
+          python scripts/validate_source_of_truth_sql.py $files
+
+      - name: Read-only SQL guard (governed read-only packs)
+        run: |
+          python scripts/repo/sql_read_only_guard.py \
+            sql/performance/billed_usage/validation \
+            sql/diagnostics/cisadm_dictionary

@@ -126,6 +126,12 @@ jobs:
             sql/collections_prioritization.sql \
             sql/customer_contact_readiness_kpi.sql
 
+      - name: Read-only SQL guard (validation packs)
+        run: |
+          python scripts/repo/sql_read_only_guard.py \
+            sql/performance/billed_usage/validation \
+            sql/diagnostics/cisadm_dictionary
+
       - name: Build CD Field Inventory
         run: |
           python scripts/build_cd_field_inventory.py
