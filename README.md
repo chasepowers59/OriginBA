@@ -32,9 +32,11 @@ Professional workspace for Oracle Utilities C2M (CISADM schema), Jaspersoft Doma
 
 ## Jaspersoft Assets
 - Concrete report: `reports/billing_customer_statement.jrxml`
+- Billing verification flow: `reports/billing_verification_flow.jrxml`
 - Usage/device dashboard: `reports/usage_device_dashboard.jrxml`
 - Base template: `reports/templates/base_customer_bill_template.jrxml`
 - Controls: `server/input_controls/billing_customer_statement_input_controls.json`
+- Billing verification controls: `server/input_controls/billing_verification_flow_input_controls.json`
 - Usage/device controls: `server/input_controls/usage_device_dashboard_input_controls.json`
 - Bundle build:
   - `deploy/build_report_unit_billing_statement.sh`
@@ -45,6 +47,12 @@ Professional workspace for Oracle Utilities C2M (CISADM schema), Jaspersoft Doma
   - `domains/exports/billed_usage_domain.zip`
   - `domains/exports/billed_usage_domain_optimized_v1_copy.zip`
   - `domains/exports/bill_segment_domain_legacy_1.zip`
+- Manual import bundles retained from prior root-level exports:
+  - `domains/exports/manual_imports/FinalDomain.zip`
+  - `domains/exports/manual_imports/New Bill Cycle Domain.zip`
+  - `domains/exports/manual_imports/New Export Billing.zip`
+- Archived one-off ZIP bundles and patch variants:
+  - `archive/2026-03-10/root_zip_cleanup/`
 
 ## Regenerate Deployment Bundles
 - PowerShell: `pwsh -File deploy/build_report_units.ps1`
@@ -67,6 +75,7 @@ Professional workspace for Oracle Utilities C2M (CISADM schema), Jaspersoft Doma
 ## Domain Report Standards
 - Build/checklist guide: `docs/jaspersoft_domain_report_build_standards.md`
 - Origin 2025 styling implementation: `docs/jaspersoft_origin_2025_style_implementation.md`
+- Delivery playbook: `docs/c2m_jaspersoft_delivery_playbook.md`
 
 ## SQL + Jaspersoft Skills Workflow
 - Workflow runbook: `docs/sql_jaspersoft_workflow_implementation.md`

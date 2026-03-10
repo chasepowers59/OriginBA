@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="billing_verification_flow"
+    whenNoDataType="AllSectionsNoDetail"
+    pageWidth="1190"
+    pageHeight="842"
+    orientation="Landscape"
+    columnWidth="1150"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="a7b5d42f-9a69-42da-9f8f-4c72a1c56d11">
+
+    <property name="ireport.domainUri" value="/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Billing_Requirements_Domain"/>
+    <property name="com.jaspersoft.jrs.data.source" value="/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Billing_Requirements_Domain"/>
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+
+    <style name="Base" fontName="Aptos" fontSize="10"/>
+    <style name="TitleBlue" style="Base" forecolor="#F5F0EB" fontSize="20" isBold="true"/>
+    <style name="MetaBlue" style="Base" forecolor="#F5F0EB" fontSize="11"/>
+    <style name="HeaderBlue" style="Base" backcolor="#006FAC" forecolor="#F5F0EB" mode="Opaque" isBold="true"/>
+    <style name="DetailText" style="Base" forecolor="#0F172A"/>
+    <style name="SummaryBlue" style="Base" backcolor="#F5F0EB" mode="Opaque" forecolor="#1348AB"/>
+    <style name="FlowExpected" style="Base" mode="Opaque" backcolor="#EAF4FF" forecolor="#1348AB"/>
+    <style name="FlowActual" style="Base" mode="Opaque" backcolor="#E6FFFB" forecolor="#0F766E"/>
+    <style name="FlowBills" style="Base" mode="Opaque" backcolor="#FFF7ED" forecolor="#C2410C"/>
+    <style name="FlowSegments" style="Base" mode="Opaque" backcolor="#FEF3C7" forecolor="#92400E"/>
+    <style name="GapStatusCell" style="Base" mode="Opaque" backcolor="#DCFCE7" forecolor="#14532D" isBold="true">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[
+($F{MISSING_ACTIVE_ACCOUNT_COUNT} != null && $F{MISSING_ACTIVE_ACCOUNT_COUNT}.doubleValue() > 0d)
+|| ($F{MISSING_ACTIVE_SA_COUNT} != null && $F{MISSING_ACTIVE_SA_COUNT}.doubleValue() > 0d)
+            ]]></conditionExpression>
+            <style backcolor="#FEE2E2" forecolor="#991B1B"/>
+        </conditionalStyle>
+    </style>
+    <style name="ExceptionCell" style="Base" mode="Opaque" backcolor="#FEF2F2" forecolor="#7F1D1D" isBold="true"/>
+    <style name="CycleFooterCell" style="Base" mode="Opaque" backcolor="#EFF6FF" forecolor="#1E3A8A"/>
+
+    <parameter name="LoggedInUser" class="com.jaspersoft.jasperserver.api.metadata.user.domain.User" isForPrompting="false"/>
+    <parameter name="LoggedInUsername" class="java.lang.String" isForPrompting="false"/>
+    <parameter name="BILL_CYCLE_CODE" class="java.lang.String"/>
+    <parameter name="MOST_RECENT_ONLY" class="java.lang.Boolean">
+        <defaultValueExpression><![CDATA[Boolean.TRUE]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["INTERNAL USE ONLY"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="domain"><![CDATA[
+<query>
+  <queryFields>
+    <queryField id="BILL_CYCLE_CODE"/>
+    <queryField id="BILL_CYCLE_DESCRIPTION"/>
+    <queryField id="EXPECTED_ACTIVE_ACCOUNT_COUNT"/>
+    <queryField id="EXPECTED_ACTIVE_SA_COUNT"/>
+    <queryField id="ACTUAL_BILLED_ACCOUNT_COUNT"/>
+    <queryField id="ACTUAL_BILLED_SA_COUNT"/>
+    <queryField id="ACTUAL_BILL_COUNT"/>
+    <queryField id="ACTUAL_BILL_SEGMENT_COUNT"/>
+    <queryField id="MISSING_ACTIVE_ACCOUNT_COUNT"/>
+    <queryField id="MISSING_ACTIVE_SA_COUNT"/>
+    <queryField id="RECON_CYCLE_LAST_EVENT_DATE"/>
+    <queryField id="MOST_RECENT_BILL_CYCLE_SW_RECON"/>
+    <queryField id="ACCOUNT_ID"/>
+    <queryField id="SERVICE_AGREEMENT_ID"/>
+    <queryField id="PREMISE_ID"/>
+    <queryField id="BILL_ID_DETAIL"/>
+    <queryField id="BILL_SEGMENT_ID_DETAIL"/>
+    <queryField id="BILL_DATE"/>
+    <queryField id="BILL_CREATE_DATE"/>
+    <queryField id="BSEG_CREATE_DATE"/>
+    <queryField id="BILL_STATUS_DESCRIPTION"/>
+    <queryField id="BSEG_STATUS_DESCRIPTION"/>
+    <queryField id="IS_ERROR_SW"/>
+    <queryField id="ERROR_REASON"/>
+  </queryFields>
+</query>
+    ]]></queryString>
+
+    <field name="BILL_CYCLE_CODE" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_CYCLE_CODE"/></field>
+    <field name="BILL_CYCLE_DESCRIPTION" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_CYCLE_DESCRIPTION"/></field>
+    <field name="EXPECTED_ACTIVE_ACCOUNT_COUNT" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="EXPECTED_ACTIVE_ACCOUNT_COUNT"/></field>
+    <field name="EXPECTED_ACTIVE_SA_COUNT" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="EXPECTED_ACTIVE_SA_COUNT"/></field>
+    <field name="ACTUAL_BILLED_ACCOUNT_COUNT" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="ACTUAL_BILLED_ACCOUNT_COUNT"/></field>
+    <field name="ACTUAL_BILLED_SA_COUNT" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="ACTUAL_BILLED_SA_COUNT"/></field>
+    <field name="ACTUAL_BILL_COUNT" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="ACTUAL_BILL_COUNT"/></field>
+    <field name="ACTUAL_BILL_SEGMENT_COUNT" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="ACTUAL_BILL_SEGMENT_COUNT"/></field>
+    <field name="MISSING_ACTIVE_ACCOUNT_COUNT" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="MISSING_ACTIVE_ACCOUNT_COUNT"/></field>
+    <field name="MISSING_ACTIVE_SA_COUNT" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="MISSING_ACTIVE_SA_COUNT"/></field>
+    <field name="RECON_CYCLE_LAST_EVENT_DATE" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="RECON_CYCLE_LAST_EVENT_DATE"/></field>
+    <field name="MOST_RECENT_BILL_CYCLE_SW_RECON" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="MOST_RECENT_BILL_CYCLE_SW_RECON"/></field>
+    <field name="ACCOUNT_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="ACCOUNT_ID"/></field>
+    <field name="SERVICE_AGREEMENT_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="SERVICE_AGREEMENT_ID"/></field>
+    <field name="PREMISE_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="PREMISE_ID"/></field>
+    <field name="BILL_ID_DETAIL" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_ID_DETAIL"/></field>
+    <field name="BILL_SEGMENT_ID_DETAIL" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_SEGMENT_ID_DETAIL"/></field>
+    <field name="BILL_DATE" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="BILL_DATE"/></field>
+    <field name="BILL_CREATE_DATE" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="BILL_CREATE_DATE"/></field>
+    <field name="BSEG_CREATE_DATE" class="java.sql.Timestamp"><property name="net.sf.jasperreports.query.field.id" value="BSEG_CREATE_DATE"/></field>
+    <field name="BILL_STATUS_DESCRIPTION" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_STATUS_DESCRIPTION"/></field>
+    <field name="BSEG_STATUS_DESCRIPTION" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BSEG_STATUS_DESCRIPTION"/></field>
+    <field name="IS_ERROR_SW" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="IS_ERROR_SW"/></field>
+    <field name="ERROR_REASON" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="ERROR_REASON"/></field>
+
+    <sortField name="BILL_CYCLE_CODE" order="Ascending"/>
+    <sortField name="ACCOUNT_ID" order="Ascending"/>
+
+    <variable name="CYCLE_COUNT" class="java.lang.Long" calculation="DistinctCount">
+        <variableExpression><![CDATA[$F{BILL_CYCLE_CODE}]]></variableExpression>
+        <initialValueExpression><![CDATA[0L]]></initialValueExpression>
+    </variable>
+    <variable name="CYCLES_WITH_GAPS" class="java.lang.Long" calculation="DistinctCount">
+        <variableExpression><![CDATA[
+(($F{MISSING_ACTIVE_ACCOUNT_COUNT} != null && $F{MISSING_ACTIVE_ACCOUNT_COUNT}.doubleValue() > 0d)
+|| ($F{MISSING_ACTIVE_SA_COUNT} != null && $F{MISSING_ACTIVE_SA_COUNT}.doubleValue() > 0d)) ? $F{BILL_CYCLE_CODE} : null
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0L]]></initialValueExpression>
+    </variable>
+    <variable name="CYCLES_WITH_ERRORS" class="java.lang.Long" calculation="DistinctCount">
+        <variableExpression><![CDATA["Y".equalsIgnoreCase($F{IS_ERROR_SW}) ? $F{BILL_CYCLE_CODE} : null]]></variableExpression>
+        <initialValueExpression><![CDATA[0L]]></initialValueExpression>
+    </variable>
+    <variable name="ERROR_ROWS_IN_REPORT" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA["Y".equalsIgnoreCase($F{IS_ERROR_SW}) ? 1 : 0]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="ERROR_ROWS_IN_CYCLE" class="java.lang.Integer" calculation="Sum" resetType="Group" resetGroup="BILL_CYCLE_GROUP">
+        <variableExpression><![CDATA["Y".equalsIgnoreCase($F{IS_ERROR_SW}) ? 1 : 0]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+
+    <filterExpression><![CDATA[
+($F{BILL_CYCLE_CODE} != null)
+&& ($P{BILL_CYCLE_CODE} == null || $P{BILL_CYCLE_CODE}.trim().length() == 0 || $F{BILL_CYCLE_CODE}.equalsIgnoreCase($P{BILL_CYCLE_CODE}.trim()))
+&& ($P{MOST_RECENT_ONLY} == null || !$P{MOST_RECENT_ONLY}.booleanValue() || "Y".equalsIgnoreCase($F{MOST_RECENT_BILL_CYCLE_SW_RECON}))
+    ]]></filterExpression>
+
+    <group name="BILL_CYCLE_GROUP">
+        <groupExpression><![CDATA[$F{BILL_CYCLE_CODE}]]></groupExpression>
+        <groupHeader>
+            <band height="118">
+                <frame>
+                    <reportElement style="SummaryBlue" x="0" y="0" width="1150" height="26" uuid="5995db82-f0c9-44d0-bcc9-5db4f09f06df"/>
+                    <box><pen lineWidth="0.5"/></box>
+                    <textField>
+                        <reportElement x="10" y="5" width="660" height="16" uuid="d168dc57-6c4a-438f-b646-f1f4910c2081"/>
+                        <textElement><font isBold="true"/></textElement>
+                        <textFieldExpression><![CDATA[
+"Bill Cycle " + ($F{BILL_CYCLE_CODE} == null ? "UNASSIGNED" : $F{BILL_CYCLE_CODE})
++ " | " + ($F{BILL_CYCLE_DESCRIPTION} == null ? "No description" : $F{BILL_CYCLE_DESCRIPTION})
+                        ]]></textFieldExpression>
+                    </textField>
+                    <textField pattern="yyyy-MM-dd">
+                        <reportElement x="760" y="5" width="380" height="16" uuid="27f7c3f8-432a-4cfa-9ff0-c8ca13cdf66d"/>
+                        <textElement textAlignment="Right"/>
+                        <textFieldExpression><![CDATA[
+"Latest Event Date: " + ($F{RECON_CYCLE_LAST_EVENT_DATE} == null ? "N/A" : new java.text.SimpleDateFormat("yyyy-MM-dd").format($F{RECON_CYCLE_LAST_EVENT_DATE}))
+                        ]]></textFieldExpression>
+                    </textField>
+                </frame>
+
+                <frame>
+                    <reportElement style="FlowExpected" x="0" y="34" width="223" height="62" uuid="cd0558e0-4cd1-49ec-bc17-b20fbe1db4e2"/>
+                    <box><pen lineWidth="0.5" lineColor="#BFDBFE"/></box>
+                    <staticText><reportElement x="8" y="8" width="200" height="14" uuid="4220150c-6b57-498c-a832-11e62b0aa345"/><textElement><font isBold="true"/></textElement><text><![CDATA[1. Expected Active]]></text></staticText>
+                    <textField>
+                        <reportElement x="8" y="30" width="207" height="18" uuid="49c1144f-04f8-4d06-ac4f-ac277ec64f72"/>
+                        <textFieldExpression><![CDATA[
+"Accounts: " + ($F{EXPECTED_ACTIVE_ACCOUNT_COUNT} == null ? "0" : new java.text.DecimalFormat("#,##0").format($F{EXPECTED_ACTIVE_ACCOUNT_COUNT}))
++ " | SAs: " + ($F{EXPECTED_ACTIVE_SA_COUNT} == null ? "0" : new java.text.DecimalFormat("#,##0").format($F{EXPECTED_ACTIVE_SA_COUNT}))
+                        ]]></textFieldExpression>
+                    </textField>
+                </frame>
+
+                <frame>
+                    <reportElement style="FlowActual" x="231" y="34" width="223" height="62" uuid="c16c9e5b-3af5-4f55-9678-ae1141fb86fb"/>
+                    <box><pen lineWidth="0.5" lineColor="#99F6E4"/></box>
+                    <staticText><reportElement x="8" y="8" width="200" height="14" uuid="9ee6df43-f316-46ee-baf3-e588c90dba11"/><textElement><font isBold="true"/></textElement><text><![CDATA[2. Actual Billed]]></text></staticText>
+                    <textField>
+                        <reportElement x="8" y="30" width="207" height="18" uuid="93091d90-19ee-44c8-a50f-c89fb4510207"/>
+                        <textFieldExpression><![CDATA[
+"Accounts: " + ($F{ACTUAL_BILLED_ACCOUNT_COUNT} == null ? "0" : new java.text.DecimalFormat("#,##0").format($F{ACTUAL_BILLED_ACCOUNT_COUNT}))
++ " | SAs: " + ($F{ACTUAL_BILLED_SA_COUNT} == null ? "0" : new java.text.DecimalFormat("#,##0").format($F{ACTUAL_BILLED_SA_COUNT}))
+                        ]]></textFieldExpression>
+                    </textField>
+                </frame>
+
+                <frame>
+                    <reportElement style="FlowBills" x="462" y="34" width="223" height="62" uuid="1bcdf6dc-1b0a-446a-a37a-e922bb36cb73"/>
+                    <box><pen lineWidth="0.5" lineColor="#FED7AA"/></box>
+                    <staticText><reportElement x="8" y="8" width="200" height="14" uuid="9ca58ee1-443c-4de7-b47d-e8f44fa2d9a9"/><textElement><font isBold="true"/></textElement><text><![CDATA[3. Bills Generated]]></text></staticText>
+                    <textField>
+                        <reportElement x="8" y="30" width="207" height="18" uuid="8ad2a1d3-804a-412a-9fe9-95920cba62e6"/>
+                        <textFieldExpression><![CDATA[
+"Bills: " + ($F{ACTUAL_BILL_COUNT} == null ? "0" : new java.text.DecimalFormat("#,##0").format($F{ACTUAL_BILL_COUNT}))
+                        ]]></textFieldExpression>
+                    </textField>
+                </frame>
+
+                <frame>
+                    <reportElement style="FlowSegments" x="693" y="34" width="223" height="62" uuid="1fd7da59-b847-4d2d-b9e4-c9df809e1457"/>
+                    <box><pen lineWidth="0.5" lineColor="#FDE68A"/></box>
+                    <staticText><reportElement x="8" y="8" width="200" height="14" uuid="4713b810-5aa3-4fd8-a1a3-8a3af0a8d97c"/><textElement><font isBold="true"/></textElement><text><![CDATA[4. Bill Segments]]></text></staticText>
+                    <textField>
+                        <reportElement x="8" y="30" width="207" height="18" uuid="ee30d0af-7ac1-423f-95d1-b84f11c95d4e"/>
+                        <textFieldExpression><![CDATA[
+"Segments: " + ($F{ACTUAL_BILL_SEGMENT_COUNT} == null ? "0" : new java.text.DecimalFormat("#,##0").format($F{ACTUAL_BILL_SEGMENT_COUNT}))
+                        ]]></textFieldExpression>
+                    </textField>
+                </frame>
+
+                <frame>
+                    <reportElement style="SummaryBlue" x="924" y="34" width="226" height="62" uuid="7595513f-f2f2-4d76-bad7-be657f3dd3ea"/>
+                    <box><pen lineWidth="0.5" lineColor="#CBD5E1"/></box>
+                    <staticText><reportElement x="8" y="8" width="210" height="14" uuid="81844bbc-1141-44aa-9a59-3c8dceece5d7"/><textElement><font isBold="true"/></textElement><text><![CDATA[5. Gap Check]]></text></staticText>
+                    <textField>
+                        <reportElement x="8" y="24" width="210" height="14" uuid="422aa52c-2b59-48af-8f65-fd229e574c1e"/>
+                        <textFieldExpression><![CDATA[
+"Missing Accounts: " + ($F{MISSING_ACTIVE_ACCOUNT_COUNT} == null ? "0" : new java.text.DecimalFormat("#,##0").format($F{MISSING_ACTIVE_ACCOUNT_COUNT}))
+                        ]]></textFieldExpression>
+                    </textField>
+                    <textField>
+                        <reportElement x="8" y="38" width="120" height="16" uuid="e001e84f-df8a-4e20-b0bb-79333dfb6140"/>
+                        <textFieldExpression><![CDATA[
+"Missing SAs: " + ($F{MISSING_ACTIVE_SA_COUNT} == null ? "0" : new java.text.DecimalFormat("#,##0").format($F{MISSING_ACTIVE_SA_COUNT}))
+                        ]]></textFieldExpression>
+                    </textField>
+                    <textField>
+                        <reportElement style="GapStatusCell" x="132" y="36" width="86" height="18" uuid="9c8ae44f-1b6f-4188-bcb9-9f3302d63372"/>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression><![CDATA[
+(($F{MISSING_ACTIVE_ACCOUNT_COUNT} != null && $F{MISSING_ACTIVE_ACCOUNT_COUNT}.doubleValue() > 0d)
+|| ($F{MISSING_ACTIVE_SA_COUNT} != null && $F{MISSING_ACTIVE_SA_COUNT}.doubleValue() > 0d)) ? "ATTN" : "OK"
+                        ]]></textFieldExpression>
+                    </textField>
+                </frame>
+            </band>
+        </groupHeader>
+        <groupFooter>
+            <band height="24">
+                <frame>
+                    <reportElement style="CycleFooterCell" x="0" y="2" width="1150" height="20" uuid="cc6fce94-c6e4-46ba-aea9-bee955abf98f"/>
+                    <box><pen lineWidth="0.5" lineColor="#BFDBFE"/></box>
+                    <textField>
+                        <reportElement x="10" y="2" width="1130" height="16" uuid="46a53f85-d769-4585-a888-ac9f991e968f"/>
+                        <textFieldExpression><![CDATA[
+"Cycle result: "
++ (((($F{MISSING_ACTIVE_ACCOUNT_COUNT} != null && $F{MISSING_ACTIVE_ACCOUNT_COUNT}.doubleValue() > 0d)
+  || ($F{MISSING_ACTIVE_SA_COUNT} != null && $F{MISSING_ACTIVE_SA_COUNT}.doubleValue() > 0d)
+  || ($V{ERROR_ROWS_IN_CYCLE} != null && $V{ERROR_ROWS_IN_CYCLE}.intValue() > 0))) ? "ATTENTION REQUIRED" : "ON TRACK")
++ " | Error rows shown: " + ($V{ERROR_ROWS_IN_CYCLE} == null ? "0" : $V{ERROR_ROWS_IN_CYCLE}.toString())
++ (((($F{MISSING_ACTIVE_ACCOUNT_COUNT} != null && $F{MISSING_ACTIVE_ACCOUNT_COUNT}.doubleValue() > 0d)
+   || ($F{MISSING_ACTIVE_SA_COUNT} != null && $F{MISSING_ACTIVE_SA_COUNT}.doubleValue() > 0d))
+   && ($V{ERROR_ROWS_IN_CYCLE} == null || $V{ERROR_ROWS_IN_CYCLE}.intValue() == 0)) ? " | No bill/segment status errors were returned for this cycle. Review upstream billing completeness." : "")
+                        ]]></textFieldExpression>
+                    </textField>
+                </frame>
+            </band>
+        </groupFooter>
+    </group>
+
+    <title>
+        <band height="138">
+            <frame>
+                <reportElement x="0" y="0" width="1150" height="64" uuid="01076dba-8d4d-488e-9b7d-23c801e68b0a" mode="Opaque" backcolor="#1348AB"/>
+            </frame>
+            <staticText>
+                <reportElement style="TitleBlue" x="18" y="12" width="900" height="24" uuid="66c47662-63d8-41f4-9a24-4d5299bac0c1"/>
+                <text><![CDATA[Billing Verification Flow]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="MetaBlue" x="18" y="40" width="1110" height="18" uuid="23476211-7111-42de-aa53-e697042efdb8"/>
+                <textFieldExpression><![CDATA[
+"BILL_CYCLE=" + (($P{BILL_CYCLE_CODE} == null || $P{BILL_CYCLE_CODE}.trim().length() == 0) ? "ALL" : $P{BILL_CYCLE_CODE}.trim())
++ " | MOST_RECENT_ONLY=" + (($P{MOST_RECENT_ONLY} == null || !$P{MOST_RECENT_ONLY}.booleanValue()) ? "NO" : "YES")
+                ]]></textFieldExpression>
+            </textField>
+
+            <frame>
+                <reportElement style="SummaryBlue" x="0" y="74" width="1150" height="56" uuid="a4bc8ff2-0312-49b6-a06a-f2a0b38f67f6"/>
+                <box><pen lineWidth="0.5"/></box>
+                <textField evaluationTime="Report"><reportElement x="10" y="10" width="1125" height="16" uuid="ad48f397-c705-4ac4-92cb-48c54e312ca1"/><textFieldExpression><![CDATA[
+"Cycles in scope: " + $V{CYCLE_COUNT}
++ " | Cycles with gaps: " + $V{CYCLES_WITH_GAPS}
++ " | Cycles with caught status errors: " + $V{CYCLES_WITH_ERRORS}
++ " | Error rows shown: " + $V{ERROR_ROWS_IN_REPORT}
+                ]]></textFieldExpression></textField>
+                <staticText>
+                    <reportElement x="10" y="30" width="1125" height="18" uuid="08fd2f0c-33d8-435c-8efb-7bc7e2aa7eb1"/>
+                    <text><![CDATA[Read each cycle left to right: expected active population, actual billed population, bills created, bill segments created, then the remaining gap. Exception rows below show caught bill or segment status issues for the same cycle.]]></text>
+                </staticText>
+            </frame>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="24">
+            <staticText><reportElement style="HeaderBlue" x="0" y="0" width="110" height="24" uuid="7851f936-c4ad-4827-b0f4-0edc28be48d8"/><text><![CDATA[Account]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="110" y="0" width="110" height="24" uuid="e6cd77a1-74c4-44c1-bcb4-676762338cf3"/><text><![CDATA[Service Agmt]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="220" y="0" width="80" height="24" uuid="c2709dc5-2857-4942-812a-7184b5a25039"/><text><![CDATA[Premise]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="300" y="0" width="90" height="24" uuid="6ef95fc7-f981-4427-a71d-dd2a7aa8cbf8"/><text><![CDATA[Bill ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="390" y="0" width="110" height="24" uuid="11ebf2e9-4f24-4f45-843d-4a18f3420d8d"/><text><![CDATA[Segment ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="500" y="0" width="140" height="24" uuid="3d0f14f9-a4d5-4c1c-b9b9-dceb70556a94"/><text><![CDATA[Bill Status]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="640" y="0" width="160" height="24" uuid="ca531b5d-ef96-4db6-8894-8e5addcb4ef0"/><text><![CDATA[Segment Status]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="800" y="0" width="170" height="24" uuid="503f8f91-f840-4f16-ae57-9ba6c8b4a85f"/><text><![CDATA[Error Reason]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="970" y="0" width="180" height="24" uuid="0446bc28-f1c2-4020-aa45-c8c8eb41e55c"/><text><![CDATA[Recommended Action]]></text></staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="20">
+            <printWhenExpression><![CDATA["Y".equalsIgnoreCase($F{IS_ERROR_SW})]]></printWhenExpression>
+            <textField><reportElement style="DetailText" x="0" y="2" width="110" height="16" uuid="cbf4ddfe-7468-451d-8d91-00cd4af5eb4d"/><textFieldExpression><![CDATA[$F{ACCOUNT_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="110" y="2" width="110" height="16" uuid="18344d3e-dc54-4e11-bc49-f4ae6933df8c"/><textFieldExpression><![CDATA[$F{SERVICE_AGREEMENT_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="220" y="2" width="80" height="16" uuid="f2bdad3e-cfa2-4d0e-a46d-c317c45e4187"/><textFieldExpression><![CDATA[$F{PREMISE_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="300" y="2" width="90" height="16" uuid="de46d998-3cff-4a28-bb31-9d6022b10c7d"/><textFieldExpression><![CDATA[$F{BILL_ID_DETAIL}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="390" y="2" width="110" height="16" uuid="951e06ce-9099-4852-afb3-4c7b3e1aa27d"/><textFieldExpression><![CDATA[$F{BILL_SEGMENT_ID_DETAIL}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="500" y="2" width="140" height="16" uuid="5d420a1d-675e-44a0-af9a-d19d9a8ea15b"/><textFieldExpression><![CDATA[$F{BILL_STATUS_DESCRIPTION}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="640" y="2" width="160" height="16" uuid="c695f926-ec17-4635-adca-6e32484ec03d"/><textFieldExpression><![CDATA[$F{BSEG_STATUS_DESCRIPTION}]]></textFieldExpression></textField>
+            <textField><reportElement style="ExceptionCell" x="800" y="2" width="170" height="16" uuid="dcfbb4c7-b8f6-49cc-bb8d-c797ebd4e7e1"/><textFieldExpression><![CDATA[$F{ERROR_REASON} == null ? "Status exception" : $F{ERROR_REASON}]]></textFieldExpression></textField>
+            <textField>
+                <reportElement style="DetailText" x="970" y="2" width="180" height="16" uuid="76f72b6d-b71b-4da1-8c36-c6dd9c0d3690"/>
+                <textFieldExpression><![CDATA[
+($F{ERROR_REASON} != null && $F{ERROR_REASON}.toUpperCase().contains("BILL")) ? "Review bill status and batch outcome"
+ : (($F{ERROR_REASON} != null && $F{ERROR_REASON}.toUpperCase().contains("SEG")) ? "Review bill segment status and rerun path"
+ : "Review billing cycle exception and batch logs")
+                ]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="1150" height="16" uuid="5f73c1ff-f2c1-4403-95ff-177a1d7eb5bd"/>
+                <textElement textAlignment="Center"><font fontName="Aptos" size="9"/></textElement>
+                <textFieldExpression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <noData>
+        <band height="78">
+            <frame>
+                <reportElement x="0" y="8" width="1150" height="62" uuid="26be539f-1fed-43ab-81bd-1cfde29f08c6" mode="Opaque" backcolor="#F5F0EB"/>
+                <box><pen lineWidth="0.5" lineColor="#006FAC"/></box>
+            </frame>
+            <staticText>
+                <reportElement x="20" y="28" width="1110" height="20" uuid="f1d57edb-0558-40c9-92ba-b77ad770d437"/>
+                <textElement textAlignment="Center"><font fontName="Aptos" size="12" isBold="true"/></textElement>
+                <text><![CDATA[No billing verification rows returned for the selected filters. Clear BILL_CYCLE_CODE or disable MOST_RECENT_ONLY to expand the scope.]]></text>
+            </staticText>
+        </band>
+    </noData>
+
+</jasperReport>

@@ -1,6 +1,7 @@
 # Domain Packaging Layout
 
 - `exports/`: import-ready Jaspersoft domain ZIP packages.
+- `exports/manual_imports/`: manually retained import bundles that were cleaned out of the repo root.
 - `working/`: local extracted copies for safe domain editing and validation.
 
 Keep production-safe artifacts in `exports/`; use `working/` for temporary edits only.
@@ -34,14 +35,23 @@ Keep production-safe artifacts in `exports/`; use `working/` for temporary edits
 - One-page domain chooser for business users:
 - `working/manual_designs/DOMAIN_DECISION_MATRIX.md`
 
-## Bill Cycle Domain (New Bill Cycle Domain.zip)
+## Manual Import Bundles
+
+- `exports/manual_imports/FinalDomain.zip`
+- `exports/manual_imports/New Bill Cycle Domain.zip`
+- `exports/manual_imports/New Export Billing.zip`
+
+Archived patch and backup variants are in:
+- `../archive/2026-03-10/root_zip_cleanup/domain_variants/`
+
+## Bill Cycle Domain (`exports/manual_imports/New Bill Cycle Domain.zip`)
 
 - Updated domain model now includes:
 - `BC_CYCLE_NUMBERS_FAST`
 - `BC_EXPECTED_VS_ACTUAL_FAST`
 - `BC_SEGMENT_STATUS_DRILLDOWN_V2`
 - Primary verification fields now cover expected vs actual billing totals, detailed bill and bill segment status, and error flags (`IS_ERROR_SW`, `ERROR_REASON`).
-- Datasource resources are intentionally excluded from `New Bill Cycle Domain.zip`; imports bind to existing repository alias/reference only.
+- Datasource resources are intentionally excluded from `exports/manual_imports/New Bill Cycle Domain.zip`; imports bind to existing repository alias/reference only.
 - Read-only Oracle index inspection confirms key lead-index prefilter columns in this area are mostly IDs/cycle keys, not `CI_BSEG.CRE_DTTM`.
 - Recommended ad hoc prefilters for performance:
 - `BILL_CYCLE_CODE` (from `CI_BILL_CYC_L.BILL_CYC_CD`)
