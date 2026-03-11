@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="Collections Process Effectiveness Debt Reduction | LEAN_180D" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+
+  <itemGroups>
+    <itemGroup id="SET_PROCESS" label="Collection Process" resourceId="JoinTree_1">
+      <items>
+        <item id="COLL_PROC_ID" label="Collection Process ID" resourceId="JoinTree_1.COLL_PROC_BASE_180D.COLL_PROC_ID"></item>
+        <item id="ACCT_ID" label="Account ID" resourceId="JoinTree_1.COLL_PROC_BASE_180D.ACCT_ID"></item>
+        <item id="PROCESS_TEMPLATE_CODE" label="Collection Process Template Code" resourceId="JoinTree_1.COLL_PROC_BASE_180D.COLL_PROC_TMPL_CD"></item>
+        <item id="PROCESS_TEMPLATE_DESCR" label="Collection Process Template Description" resourceId="JoinTree_1.CI_COLL_PROC_TM_L.DESCR"></item>
+        <item id="COLL_CL_CNTL_CODE" label="Collection Class Control Code" resourceId="JoinTree_1.COLL_PROC_BASE_180D.COLL_CL_CNTL_CD"></item>
+        <item id="COLL_CL_CNTL_DESCR" label="Collection Class Control Description" resourceId="JoinTree_1.CI_COLL_CL_CNTL_L.DESCR"></item>
+        <item id="COLL_STATUS_CODE" label="Collection Status Code" resourceId="JoinTree_1.COLL_PROC_BASE_180D.COLL_STATUS_FLG"></item>
+        <item id="COLL_STATUS_DESCR" label="Collection Status Description" resourceId="JoinTree_1.LKP_COLL_STATUS.DESCR"></item>
+        <item id="COLL_STATUS_RSN_CODE" label="Collection Status Reason Code" resourceId="JoinTree_1.COLL_PROC_BASE_180D.COLL_STAT_RSN_FLG"></item>
+        <item id="COLL_STATUS_RSN_DESCR" label="Collection Status Reason Description" resourceId="JoinTree_1.LKP_COLL_STAT_RSN.DESCR"></item>
+        <item id="PROCESS_CREATE_DTTM" label="Process Create Date/Time" resourceId="JoinTree_1.COLL_PROC_BASE_180D.CRE_DTTM"></item>
+        <item id="ARREARS_DATE" label="Arrears Date" resourceId="JoinTree_1.COLL_PROC_BASE_180D.COLL_ARS_DT"></item>
+        <item id="ARREARS_AMT_START" label="Arrears Amount At Process Start" resourceId="JoinTree_1.COLL_PROC_BASE_180D.ARS_AMT"></item>
+        <item id="CURRENCY_CD" label="Currency Code" resourceId="JoinTree_1.COLL_PROC_BASE_180D.CURRENCY_CD"></item>
+        <item id="TRIGGER_BP_SW" label="Trigger Business Process Switch" resourceId="JoinTree_1.COLL_PROC_BASE_180D.TRIGGER_BP_SW"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_OUTCOME" label="Debt Reduction Outcome" resourceId="JoinTree_1">
+      <items>
+        <item id="NEXT_COLL_PROC_ID" label="Next Collection Process ID" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.NEXT_COLL_PROC_ID"></item>
+        <item id="NEXT_PROC_CREATE_DTTM" label="Next Process Create Date/Time" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.NEXT_PROC_CRE_DTTM"></item>
+        <item id="NEXT_ARREARS_AMT" label="Next Process Arrears Amount" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.NEXT_ARS_AMT"></item>
+        <item id="ARREARS_CHANGE_TO_NEXT" label="Arrears Change To Next Process" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.ARS_CHANGE_TO_NEXT"></item>
+        <item id="ARREARS_REDUCTION_POS" label="Arrears Reduction Amount (Positive Only)" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.ARS_REDUCTION_POS"></item>
+        <item id="DAYS_TO_NEXT_PROC" label="Days To Next Process" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.DAYS_TO_NEXT_PROC"></item>
+        <item id="HAS_NEXT_PROC_SW" label="Has Next Process" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.HAS_NEXT_PROC_SW"></item>
+        <item id="DEBT_REDUCED_BY_NEXT_SW" label="Debt Reduced By Next Process" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.DEBT_REDUCED_BY_NEXT_SW"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_EVENTS" label="Event Summary" resourceId="JoinTree_1">
+      <items>
+        <item id="EVENT_COUNT" label="Event Count" resourceId="JoinTree_1.COLL_EVT_AGG.EVT_COUNT"></item>
+        <item id="COMPLETED_EVENT_COUNT" label="Completed Event Count" resourceId="JoinTree_1.COLL_EVT_AGG.EVT_COMPLETED_COUNT"></item>
+        <item id="OPEN_EVENT_COUNT" label="Open Event Count" resourceId="JoinTree_1.COLL_EVT_AGG.EVT_OPEN_COUNT"></item>
+        <item id="FIRST_EVENT_TRIGGER_DTTM" label="First Event Trigger Date/Time" resourceId="JoinTree_1.COLL_EVT_AGG.FIRST_EVT_TRIGGER_DT"></item>
+        <item id="LAST_EVENT_COMPLETION_DTTM" label="Last Event Completion Date/Time" resourceId="JoinTree_1.COLL_EVT_AGG.LAST_EVT_COMPLETION_DT"></item>
+        <item id="NEXT_OPEN_EVT_SEQ" label="Next Open Event Sequence" resourceId="JoinTree_1.COLL_EVT_AGG.NEXT_OPEN_EVT_SEQ"></item>
+        <item id="HAS_OPEN_EVT_SW" label="Has Open Event" resourceId="JoinTree_1.COLL_EVT_AGG.HAS_OPEN_EVT_SW"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_ACCOUNT" label="Account Segmentation" resourceId="JoinTree_1">
+      <items>
+        <item id="CIS_DIVISION" label="CIS Division" resourceId="JoinTree_1.CI_ACCT_1.CIS_DIVISION"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle Code" resourceId="JoinTree_1.CI_ACCT_1.BILL_CYC_CD"></item>
+        <item id="BILL_CYC_DESCR" label="Bill Cycle Description" resourceId="JoinTree_1.CI_BILL_CYC_L.DESCR"></item>
+        <item id="CUST_CL_CD" label="Customer Class Code" resourceId="JoinTree_1.CI_ACCT_1.CUST_CL_CD"></item>
+        <item id="CUST_CL_DESCR" label="Customer Class Description" resourceId="JoinTree_1.CI_CUST_CL_L.DESCR"></item>
+        <item id="COLL_CL_CD" label="Collection Class Code" resourceId="JoinTree_1.CI_ACCT_1.COLL_CL_CD"></item>
+        <item id="COLL_CL_DESCR" label="Collection Class Description" resourceId="JoinTree_1.CI_COLL_CL_L.DESCR"></item>
+        <item id="ACCT_MGMT_GRP_CD" label="Account Management Group Code" resourceId="JoinTree_1.CI_ACCT_1.ACCT_MGMT_GRP_CD"></item>
+        <item id="ACCT_MGMT_GRP_DESCR" label="Account Management Group Description" resourceId="JoinTree_1.CI_ACCT_MGMT_GR_L.DESCR"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_MEASURES" label="Measures" resourceId="JoinTree_1">
+      <items>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="PROCESS_COUNT" label="Collection Process Count" resourceId="JoinTree_1.COLL_PROC_BASE_180D.COLL_PROC_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="ACCOUNT_COUNT" label="Account Count" resourceId="JoinTree_1.COLL_PROC_BASE_180D.ACCT_ID"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="START_ARREARS_TOTAL" label="Start Arrears Amount Total" resourceId="JoinTree_1.COLL_PROC_BASE_180D.ARS_AMT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="NEXT_ARREARS_TOTAL" label="Next Arrears Amount Total" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.NEXT_ARS_AMT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="ARREARS_CHANGE_TOTAL" label="Arrears Change Total" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.ARS_CHANGE_TO_NEXT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="ARREARS_REDUCTION_TOTAL" label="Arrears Reduction Total (Positive Only)" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.ARS_REDUCTION_POS"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="EFFECTIVE_PROCESS_COUNT" label="Effective Process Count (Debt Reduced)" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.EFFECTIVE_PROC_CNT_ROW"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="INEFFECTIVE_PROCESS_COUNT" label="Ineffective Process Count (No Reduction)" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.INEFFECTIVE_PROC_CNT_ROW"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="NO_FOLLOWUP_PROCESS_COUNT" label="No Follow-Up Process Count" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.NO_FOLLOWUP_PROC_CNT_ROW"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="WITH_FOLLOWUP_PROCESS_COUNT" label="With Follow-Up Process Count" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.HAS_NEXT_PROC_CNT_ROW"></item>
+        <item defaultAgg="Average" dimensionOrMeasure="Measure" id="AVG_DAYS_TO_NEXT_PROCESS" label="Average Days To Next Process" resourceId="JoinTree_1.COLL_NEXT_PROC_CTX.DAYS_TO_NEXT_PROC"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="EVENT_COUNT_TOTAL" label="Event Count Total" resourceId="JoinTree_1.COLL_EVT_AGG.EVT_COUNT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="COMPLETED_EVENT_COUNT_TOTAL" label="Completed Event Count Total" resourceId="JoinTree_1.COLL_EVT_AGG.EVT_COMPLETED_COUNT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="OPEN_EVENT_COUNT_TOTAL" label="Open Event Count Total" resourceId="JoinTree_1.COLL_EVT_AGG.EVT_OPEN_COUNT"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+
+  <resources>
+    <jdbcQuery id="COLL_PROC_BASE_180D" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="COLL_PROC_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="COLL_PROC_TMPL_CD" type="java.lang.String"></field>
+        <field id="COLL_CL_CNTL_CD" type="java.lang.String"></field>
+        <field id="COLL_STATUS_FLG" type="java.lang.String"></field>
+        <field id="COLL_STAT_RSN_FLG" type="java.lang.String"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="COLL_ARS_DT" type="java.sql.Timestamp"></field>
+        <field id="ARS_AMT" type="java.math.BigDecimal"></field>
+        <field id="CURRENCY_CD" type="java.lang.String"></field>
+        <field id="TRIGGER_BP_SW" type="java.lang.String"></field>
+      </fieldList>
+      <query>select p.coll_proc_id, p.acct_id, p.coll_proc_tmpl_cd, p.coll_cl_cntl_cd, p.coll_status_flg, p.coll_stat_rsn_flg, p.cre_dttm, p.coll_ars_dt, nvl(p.ars_amt, 0) as ars_amt, p.currency_cd, p.trigger_bp_sw from cisadm.ci_coll_proc p where p.cre_dttm >= trunc(sysdate) - 180 and p.cre_dttm &lt; trunc(sysdate) + 1 and p.coll_proc_id is not null and p.acct_id is not null</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="COLL_EVT_AGG" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="COLL_PROC_ID" type="java.lang.String"></field>
+        <field id="EVT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="EVT_COMPLETED_COUNT" type="java.math.BigDecimal"></field>
+        <field id="EVT_OPEN_COUNT" type="java.math.BigDecimal"></field>
+        <field id="FIRST_EVT_TRIGGER_DT" type="java.sql.Timestamp"></field>
+        <field id="LAST_EVT_COMPLETION_DT" type="java.sql.Timestamp"></field>
+        <field id="NEXT_OPEN_EVT_SEQ" type="java.math.BigDecimal"></field>
+        <field id="HAS_OPEN_EVT_SW" type="java.lang.String"></field>
+      </fieldList>
+      <query>select ce.coll_proc_id, count(*) as evt_count, sum(case when ce.completion_dt is not null then 1 else 0 end) as evt_completed_count, sum(case when ce.completion_dt is null then 1 else 0 end) as evt_open_count, min(ce.trigger_dt) as first_evt_trigger_dt, max(ce.completion_dt) as last_evt_completion_dt, min(case when ce.completion_dt is null then ce.evt_seq end) as next_open_evt_seq, case when sum(case when ce.completion_dt is null then 1 else 0 end) &gt; 0 then 'Y' else 'N' end as has_open_evt_sw from cisadm.ci_coll_evt ce join (select p.coll_proc_id from cisadm.ci_coll_proc p where p.cre_dttm >= trunc(sysdate) - 180 and p.cre_dttm &lt; trunc(sysdate) + 1) bp on bp.coll_proc_id = ce.coll_proc_id group by ce.coll_proc_id</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="COLL_NEXT_PROC_CTX" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="COLL_PROC_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PROC_CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ARS_AMT_START" type="java.math.BigDecimal"></field>
+        <field id="NEXT_COLL_PROC_ID" type="java.lang.String"></field>
+        <field id="NEXT_PROC_CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="NEXT_ARS_AMT" type="java.math.BigDecimal"></field>
+        <field id="ARS_CHANGE_TO_NEXT" type="java.math.BigDecimal"></field>
+        <field id="ARS_REDUCTION_POS" type="java.math.BigDecimal"></field>
+        <field id="DAYS_TO_NEXT_PROC" type="java.math.BigDecimal"></field>
+        <field id="HAS_NEXT_PROC_SW" type="java.lang.String"></field>
+        <field id="DEBT_REDUCED_BY_NEXT_SW" type="java.lang.String"></field>
+        <field id="HAS_NEXT_PROC_CNT_ROW" type="java.math.BigDecimal"></field>
+        <field id="NO_FOLLOWUP_PROC_CNT_ROW" type="java.math.BigDecimal"></field>
+        <field id="EFFECTIVE_PROC_CNT_ROW" type="java.math.BigDecimal"></field>
+        <field id="INEFFECTIVE_PROC_CNT_ROW" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select y.coll_proc_id, y.acct_id, y.cre_dttm as proc_cre_dttm, y.ars_amt as ars_amt_start, y.next_coll_proc_id, y.next_proc_cre_dttm, y.next_ars_amt, case when y.next_ars_amt is null then null else nvl(y.ars_amt, 0) - nvl(y.next_ars_amt, 0) end as ars_change_to_next, case when y.next_ars_amt is null then 0 when nvl(y.ars_amt, 0) - nvl(y.next_ars_amt, 0) &gt; 0 then nvl(y.ars_amt, 0) - nvl(y.next_ars_amt, 0) else 0 end as ars_reduction_pos, case when y.next_proc_cre_dttm is null then null else round(cast(y.next_proc_cre_dttm as date) - cast(y.cre_dttm as date), 6) end as days_to_next_proc, case when y.next_coll_proc_id is null then 'N' else 'Y' end as has_next_proc_sw, case when y.next_coll_proc_id is null then 'N' when nvl(y.ars_amt, 0) - nvl(y.next_ars_amt, 0) &gt; 0 then 'Y' else 'N' end as debt_reduced_by_next_sw, case when y.next_coll_proc_id is null then 0 else 1 end as has_next_proc_cnt_row, case when y.next_coll_proc_id is null then 1 else 0 end as no_followup_proc_cnt_row, case when y.next_coll_proc_id is not null and (nvl(y.ars_amt, 0) - nvl(y.next_ars_amt, 0)) &gt; 0 then 1 else 0 end as effective_proc_cnt_row, case when y.next_coll_proc_id is not null and (nvl(y.ars_amt, 0) - nvl(y.next_ars_amt, 0)) &lt;= 0 then 1 else 0 end as ineffective_proc_cnt_row from (select x.coll_proc_id, x.acct_id, x.cre_dttm, nvl(x.ars_amt, 0) as ars_amt, lead(x.coll_proc_id) over (partition by x.acct_id order by x.cre_dttm, lpad(trim(x.coll_proc_id), 30, '0'), x.coll_proc_id) as next_coll_proc_id, lead(x.cre_dttm) over (partition by x.acct_id order by x.cre_dttm, lpad(trim(x.coll_proc_id), 30, '0'), x.coll_proc_id) as next_proc_cre_dttm, lead(nvl(x.ars_amt, 0)) over (partition by x.acct_id order by x.cre_dttm, lpad(trim(x.coll_proc_id), 30, '0'), x.coll_proc_id) as next_ars_amt from cisadm.ci_coll_proc x where x.cre_dttm >= trunc(sysdate) - 180 and x.cre_dttm &lt; trunc(sysdate) + 1 and x.coll_proc_id is not null and x.acct_id is not null) y</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="LKP_COLL_STATUS" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <query>select l.field_value, l.descr from cisadm.ci_lookup_val_l l where l.field_name = 'COLL_STATUS_FLG' and l.language_cd = 'ENG'</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="LKP_COLL_STAT_RSN" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <query>select l.field_value, l.descr from cisadm.ci_lookup_val_l l where l.field_name = 'COLL_STAT_RSN_FLG' and l.language_cd = 'ENG'</query>
+    </jdbcQuery>
+
+    <jdbcTable id="CI_ACCT_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="COLL_CL_CD" type="java.lang.String"></field>
+        <field id="ACCT_MGMT_GRP_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_COLL_PROC_TM_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_COLL_PROC_TM_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="COLL_PROC_TMPL_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_COLL_CL_CNTL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_COLL_CL_CNTL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="COLL_CL_CNTL_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_BILL_CYC_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BILL_CYC_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_CUST_CL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_CUST_CL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_COLL_CL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_COLL_CL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="COLL_CL_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_ACCT_MGMT_GR_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT_MGMT_GR_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_MGMT_GRP_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_COLL_PROC" schemaAlias="CISADM">
+      <fieldList>
+        <field id="COLL_PROC_BASE_180D.COLL_PROC_ID" type="java.lang.String"></field>
+        <field id="COLL_PROC_BASE_180D.ACCT_ID" type="java.lang.String"></field>
+        <field id="COLL_PROC_BASE_180D.COLL_PROC_TMPL_CD" type="java.lang.String"></field>
+        <field id="COLL_PROC_BASE_180D.COLL_CL_CNTL_CD" type="java.lang.String"></field>
+        <field id="COLL_PROC_BASE_180D.COLL_STATUS_FLG" type="java.lang.String"></field>
+        <field id="COLL_PROC_BASE_180D.COLL_STAT_RSN_FLG" type="java.lang.String"></field>
+        <field id="COLL_PROC_BASE_180D.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="COLL_PROC_BASE_180D.COLL_ARS_DT" type="java.sql.Timestamp"></field>
+        <field id="COLL_PROC_BASE_180D.ARS_AMT" type="java.math.BigDecimal"></field>
+        <field id="COLL_PROC_BASE_180D.CURRENCY_CD" type="java.lang.String"></field>
+        <field id="COLL_PROC_BASE_180D.TRIGGER_BP_SW" type="java.lang.String"></field>
+
+        <field id="COLL_EVT_AGG.COLL_PROC_ID" type="java.lang.String"></field>
+        <field id="COLL_EVT_AGG.EVT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="COLL_EVT_AGG.EVT_COMPLETED_COUNT" type="java.math.BigDecimal"></field>
+        <field id="COLL_EVT_AGG.EVT_OPEN_COUNT" type="java.math.BigDecimal"></field>
+        <field id="COLL_EVT_AGG.FIRST_EVT_TRIGGER_DT" type="java.sql.Timestamp"></field>
+        <field id="COLL_EVT_AGG.LAST_EVT_COMPLETION_DT" type="java.sql.Timestamp"></field>
+        <field id="COLL_EVT_AGG.NEXT_OPEN_EVT_SEQ" type="java.math.BigDecimal"></field>
+        <field id="COLL_EVT_AGG.HAS_OPEN_EVT_SW" type="java.lang.String"></field>
+
+        <field id="COLL_NEXT_PROC_CTX.COLL_PROC_ID" type="java.lang.String"></field>
+        <field id="COLL_NEXT_PROC_CTX.NEXT_COLL_PROC_ID" type="java.lang.String"></field>
+        <field id="COLL_NEXT_PROC_CTX.NEXT_PROC_CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="COLL_NEXT_PROC_CTX.NEXT_ARS_AMT" type="java.math.BigDecimal"></field>
+        <field id="COLL_NEXT_PROC_CTX.ARS_CHANGE_TO_NEXT" type="java.math.BigDecimal"></field>
+        <field id="COLL_NEXT_PROC_CTX.ARS_REDUCTION_POS" type="java.math.BigDecimal"></field>
+        <field id="COLL_NEXT_PROC_CTX.DAYS_TO_NEXT_PROC" type="java.math.BigDecimal"></field>
+        <field id="COLL_NEXT_PROC_CTX.HAS_NEXT_PROC_SW" type="java.lang.String"></field>
+        <field id="COLL_NEXT_PROC_CTX.DEBT_REDUCED_BY_NEXT_SW" type="java.lang.String"></field>
+        <field id="COLL_NEXT_PROC_CTX.HAS_NEXT_PROC_CNT_ROW" type="java.math.BigDecimal"></field>
+        <field id="COLL_NEXT_PROC_CTX.NO_FOLLOWUP_PROC_CNT_ROW" type="java.math.BigDecimal"></field>
+        <field id="COLL_NEXT_PROC_CTX.EFFECTIVE_PROC_CNT_ROW" type="java.math.BigDecimal"></field>
+        <field id="COLL_NEXT_PROC_CTX.INEFFECTIVE_PROC_CNT_ROW" type="java.math.BigDecimal"></field>
+
+        <field id="CI_ACCT_1.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_1.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CI_ACCT_1.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_1.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_1.COLL_CL_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_1.ACCT_MGMT_GRP_CD" type="java.lang.String"></field>
+
+        <field id="CI_COLL_PROC_TM_L.COLL_PROC_TMPL_CD" type="java.lang.String"></field>
+        <field id="CI_COLL_PROC_TM_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_COLL_PROC_TM_L.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_COLL_CL_CNTL_L.COLL_CL_CNTL_CD" type="java.lang.String"></field>
+        <field id="CI_COLL_CL_CNTL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_COLL_CL_CNTL_L.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_BILL_CYC_L.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_BILL_CYC_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_BILL_CYC_L.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_CUST_CL_L.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CI_CUST_CL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_CUST_CL_L.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_COLL_CL_L.COLL_CL_CD" type="java.lang.String"></field>
+        <field id="CI_COLL_CL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_COLL_CL_L.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_MGMT_GR_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_MGMT_GR_L.DESCR" type="java.lang.String"></field>
+
+        <field id="LKP_COLL_STATUS.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LKP_COLL_STATUS.DESCR" type="java.lang.String"></field>
+        <field id="LKP_COLL_STAT_RSN.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LKP_COLL_STAT_RSN.DESCR" type="java.lang.String"></field>
+      </fieldList>
+
+      <joinInfo alias="COLL_PROC_BASE_180D" referenceId="COLL_PROC_BASE_180D"></joinInfo>
+      <joinList>
+        <join expr="COLL_PROC_BASE_180D.COLL_PROC_ID == COLL_EVT_AGG.COLL_PROC_ID" left="COLL_PROC_BASE_180D" right="COLL_EVT_AGG" type="leftOuter" weight="1"></join>
+        <join expr="COLL_PROC_BASE_180D.COLL_PROC_ID == COLL_NEXT_PROC_CTX.COLL_PROC_ID" left="COLL_PROC_BASE_180D" right="COLL_NEXT_PROC_CTX" type="leftOuter" weight="1"></join>
+        <join expr="COLL_PROC_BASE_180D.ACCT_ID == CI_ACCT_1.ACCT_ID" left="COLL_PROC_BASE_180D" right="CI_ACCT_1" type="leftOuter" weight="1"></join>
+        <join expr="COLL_PROC_BASE_180D.COLL_PROC_TMPL_CD == CI_COLL_PROC_TM_L.COLL_PROC_TMPL_CD and CI_COLL_PROC_TM_L.LANGUAGE_CD == 'ENG'" left="COLL_PROC_BASE_180D" right="CI_COLL_PROC_TM_L" type="leftOuter" weight="1"></join>
+        <join expr="COLL_PROC_BASE_180D.COLL_CL_CNTL_CD == CI_COLL_CL_CNTL_L.COLL_CL_CNTL_CD and CI_COLL_CL_CNTL_L.LANGUAGE_CD == 'ENG'" left="COLL_PROC_BASE_180D" right="CI_COLL_CL_CNTL_L" type="leftOuter" weight="1"></join>
+        <join expr="COLL_PROC_BASE_180D.COLL_STATUS_FLG == LKP_COLL_STATUS.FIELD_VALUE" left="COLL_PROC_BASE_180D" right="LKP_COLL_STATUS" type="leftOuter" weight="1"></join>
+        <join expr="COLL_PROC_BASE_180D.COLL_STAT_RSN_FLG == LKP_COLL_STAT_RSN.FIELD_VALUE" left="COLL_PROC_BASE_180D" right="LKP_COLL_STAT_RSN" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_1.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT_1" right="CI_BILL_CYC_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_1.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT_1" right="CI_CUST_CL_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_1.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT_1" right="CI_COLL_CL_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_1.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT_1" right="CI_ACCT_MGMT_GR_L" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="COLL_PROC_BASE_180D" tableId="COLL_PROC_BASE_180D"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="COLL_EVT_AGG" tableId="COLL_EVT_AGG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="COLL_NEXT_PROC_CTX" tableId="COLL_NEXT_PROC_CTX"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_1" tableId="CI_ACCT_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_COLL_PROC_TM_L" tableId="CI_COLL_PROC_TM_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_COLL_CL_CNTL_L" tableId="CI_COLL_CL_CNTL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="LKP_COLL_STATUS" tableId="LKP_COLL_STATUS"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="LKP_COLL_STAT_RSN" tableId="LKP_COLL_STAT_RSN"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BILL_CYC_L" tableId="CI_BILL_CYC_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_CUST_CL_L" tableId="CI_CUST_CL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_COLL_CL_L" tableId="CI_COLL_CL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_MGMT_GR_L" tableId="CI_ACCT_MGMT_GR_L"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

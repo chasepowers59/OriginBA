@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="D1 Usage Device Account Outlier | LEAN_180D" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+
+  <itemGroups>
+    <itemGroup id="SET_USAGE" label="Usage Readings" resourceId="JoinTree_1">
+      <items>
+        <item id="D1_USAGE_ID" label="Usage ID" resourceId="JoinTree_1.D1_USAGE_BASE_180D.D1_USAGE_ID"></item>
+        <item id="US_ID" label="Usage Subscription ID" resourceId="JoinTree_1.D1_USAGE_BASE_180D.US_ID"></item>
+        <item id="US_TYPE_CD" label="Usage Type Code" resourceId="JoinTree_1.D1_US.US_TYPE_CD"></item>
+        <item id="US_TYPE_DESCR" label="Usage Type Description" resourceId="JoinTree_1.D1_US_TYPE_L.DESCR100"></item>
+        <item id="USAGE_START_DTTM" label="Usage Start Date/Time" resourceId="JoinTree_1.D1_USAGE_BASE_180D.USAGE_START_DTTM"></item>
+        <item id="USAGE_END_DTTM" label="Usage End Date/Time" resourceId="JoinTree_1.D1_USAGE_BASE_180D.USAGE_END_DTTM"></item>
+        <item id="USG_GRP_CD" label="Usage Group Code" resourceId="JoinTree_1.D1_USAGE_BASE_180D.USG_GRP_CD"></item>
+        <item id="MSRMT_CYC_CD" label="Measurement Cycle Code" resourceId="JoinTree_1.D1_USAGE_BASE_180D.MSRMT_CYC_CD"></item>
+        <item id="MSRMT_CYC_RTE_CD" label="Measurement Cycle Route Code" resourceId="JoinTree_1.D1_USAGE_BASE_180D.MSRMT_CYC_RTE_CD"></item>
+        <item id="SCALAR_SEQ_NUM" label="Scalar Sequence Number" resourceId="JoinTree_1.D1_USAGE_BASE_180D.SCALAR_SEQ_NUM"></item>
+        <item id="D1_SP_ID" label="Service Point ID" resourceId="JoinTree_1.D1_USAGE_BASE_180D.D1_SP_ID"></item>
+        <item id="MEASR_COMP_ID" label="Measurement Component ID" resourceId="JoinTree_1.D1_USAGE_BASE_180D.MEASR_COMP_ID"></item>
+        <item id="D1_UOM_CD" label="UOM Code" resourceId="JoinTree_1.D1_USAGE_BASE_180D.D1_UOM_CD"></item>
+        <item id="UOM_DESCR" label="UOM Description" resourceId="JoinTree_1.D1_UOM_L.DESCR100"></item>
+        <item id="D1_TOU_CD" label="TOU Code" resourceId="JoinTree_1.D1_USAGE_BASE_180D.D1_TOU_CD"></item>
+        <item id="TOU_DESCR" label="TOU Description" resourceId="JoinTree_1.D1_TOU_L.DESCR100"></item>
+        <item id="D1_SQI_CD" label="SQI Code" resourceId="JoinTree_1.D1_USAGE_BASE_180D.D1_SQI_CD"></item>
+        <item id="SQI_DESCR" label="SQI Description" resourceId="JoinTree_1.D1_SQI_L.DESCR100"></item>
+        <item id="SCALAR_START_DTTM" label="Scalar Start Date/Time" resourceId="JoinTree_1.D1_USAGE_BASE_180D.SCALAR_START_DTTM"></item>
+        <item id="SCALAR_END_DTTM" label="Scalar End Date/Time" resourceId="JoinTree_1.D1_USAGE_BASE_180D.SCALAR_END_DTTM"></item>
+        <item id="USAGE_QTY" label="Usage Quantity" resourceId="JoinTree_1.D1_USAGE_BASE_180D.USAGE_QTY"></item>
+        <item id="INTERVAL_DAYS" label="Interval Days" resourceId="JoinTree_1.D1_USAGE_BASE_180D.INTERVAL_DAYS"></item>
+        <item id="USAGE_QTY_PER_DAY" label="Usage Quantity Per Day" resourceId="JoinTree_1.D1_USAGE_BASE_180D.USAGE_QTY_PER_DAY"></item>
+        <item id="USED_ON_BILL_FLG" label="Used On Bill Flag" resourceId="JoinTree_1.D1_USAGE_BASE_180D.USED_ON_BILL_FLG"></item>
+        <item id="USG_SRC_FLG" label="Usage Source Flag" resourceId="JoinTree_1.D1_USAGE_BASE_180D.USG_SRC_FLG"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_DEVICE" label="Device And Meter Context" resourceId="JoinTree_1">
+      <items>
+        <item id="D1_DEVICE_ID" label="Device ID" resourceId="JoinTree_1.USAGE_DEVICE_CTX_180D.D1_DEVICE_ID"></item>
+        <item id="DEVICE_TYPE_CD" label="Device Type Code" resourceId="JoinTree_1.D1_DVC.DEVICE_TYPE_CD"></item>
+        <item id="DEVICE_TYPE_DESCR" label="Device Type Description" resourceId="JoinTree_1.D1_DVC_TYPE_L.DESCR100"></item>
+        <item id="DVC_STATUS_CODE" label="Device Status Code" resourceId="JoinTree_1.D1_DVC.BO_STATUS_CD"></item>
+        <item id="MANUFACTURER_CD" label="Manufacturer Code" resourceId="JoinTree_1.D1_DVC.MANUFACTURER_CD"></item>
+        <item id="MODEL_CD" label="Model Code" resourceId="JoinTree_1.D1_DVC.D1_MODEL_CD"></item>
+        <item id="MEASR_COMP_USAGE_FLG" label="Measurement Component Usage Flag" resourceId="JoinTree_1.D1_MEASR_COMP.MEASR_COMP_USAGE_FLG"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_SERVICE_POINT" label="Service Point Context" resourceId="JoinTree_1">
+      <items>
+        <item id="SP_TYPE_CD" label="Service Point Type Code" resourceId="JoinTree_1.D1_SP.D1_SP_TYPE_CD"></item>
+        <item id="SP_TYPE_DESCR" label="Service Point Type Description" resourceId="JoinTree_1.D1_SP_TYPE_L.DESCR100"></item>
+        <item id="SP_CITY" label="Service Point City" resourceId="JoinTree_1.D1_SP.CITY"></item>
+        <item id="SP_STATE" label="Service Point State" resourceId="JoinTree_1.D1_SP.STATE"></item>
+        <item id="SP_POSTAL" label="Service Point Postal" resourceId="JoinTree_1.D1_SP.POSTAL"></item>
+        <item id="SP_DIVISION_CD" label="Service Point Division Code" resourceId="JoinTree_1.D1_SP.DIVISION_CD"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_ACCOUNT_CUSTOMER" label="Account And Customer" resourceId="JoinTree_1">
+      <items>
+        <item id="SA_ID" label="Service Agreement ID" resourceId="JoinTree_1.USAGE_ACCT_CTX_180D.SA_ID"></item>
+        <item id="ACCT_ID" label="Account ID" resourceId="JoinTree_1.USAGE_ACCT_CTX_180D.ACCT_ID"></item>
+        <item id="CIS_DIVISION" label="CIS Division" resourceId="JoinTree_1.CI_ACCT.CIS_DIVISION"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle Code" resourceId="JoinTree_1.CI_ACCT.BILL_CYC_CD"></item>
+        <item id="CUST_CL_CD" label="Customer Class Code" resourceId="JoinTree_1.CI_ACCT.CUST_CL_CD"></item>
+        <item id="CUST_CL_DESCR" label="Customer Class Description" resourceId="JoinTree_1.CI_CUST_CL_L.DESCR"></item>
+        <item id="CUSTOMER_NAME" label="Customer Name" resourceId="JoinTree_1.CI_PER_NAME.ENTITY_NAME"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_DEVICE_ACCOUNT_LINK" label="Device Account Association" resourceId="JoinTree_1">
+      <items>
+        <item id="LINK_D1_DEVICE_ID" label="Linked Device ID" resourceId="JoinTree_1.DEVICE_ACCT_LINK_180D.D1_DEVICE_ID"></item>
+        <item id="LINK_ACCT_ID" label="Linked Account ID" resourceId="JoinTree_1.DEVICE_ACCT_LINK_180D.ACCT_ID"></item>
+        <item id="LINK_SA_ID" label="Linked Service Agreement ID" resourceId="JoinTree_1.DEVICE_ACCT_LINK_180D.SA_ID"></item>
+        <item id="LINK_D1_SP_ID" label="Linked Service Point ID" resourceId="JoinTree_1.DEVICE_ACCT_LINK_180D.D1_SP_ID"></item>
+        <item id="LINK_MEASR_COMP_ID" label="Linked Measurement Component ID" resourceId="JoinTree_1.DEVICE_ACCT_LINK_180D.MEASR_COMP_ID"></item>
+        <item id="LINK_USAGE_START_DTTM" label="Linked Usage Start Date/Time" resourceId="JoinTree_1.DEVICE_ACCT_LINK_180D.USAGE_START_DTTM"></item>
+        <item id="LINK_DEVICE_ACCT_KEY" label="Device Account Pair Key" resourceId="JoinTree_1.DEVICE_ACCT_LINK_180D.DEVICE_ACCT_KEY"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_MEASURES" label="Measures" resourceId="JoinTree_1">
+      <items>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="USAGE_EVENT_COUNT" label="Usage Event Count" resourceId="JoinTree_1.D1_USAGE_BASE_180D.D1_USAGE_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="SP_COUNT" label="Service Point Count" resourceId="JoinTree_1.D1_USAGE_BASE_180D.D1_SP_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="DEVICE_COUNT" label="Device Count" resourceId="JoinTree_1.USAGE_DEVICE_CTX_180D.D1_DEVICE_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="ACCOUNT_COUNT" label="Account Count" resourceId="JoinTree_1.USAGE_ACCT_CTX_180D.ACCT_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="DEVICE_ACCOUNT_PAIR_COUNT" label="Device-Account Pair Count" resourceId="JoinTree_1.DEVICE_ACCT_LINK_180D.DEVICE_ACCT_KEY"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_USAGE_QTY" label="Total Usage Quantity" resourceId="JoinTree_1.D1_USAGE_BASE_180D.USAGE_QTY"></item>
+        <item defaultAgg="Average" dimensionOrMeasure="Measure" id="AVG_USAGE_QTY" label="Average Usage Quantity" resourceId="JoinTree_1.D1_USAGE_BASE_180D.USAGE_QTY"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="MAX_USAGE_QTY" label="Max Usage Quantity" resourceId="JoinTree_1.D1_USAGE_BASE_180D.USAGE_QTY"></item>
+        <item defaultAgg="Average" dimensionOrMeasure="Measure" id="AVG_USAGE_QTY_PER_DAY" label="Average Usage Quantity Per Day" resourceId="JoinTree_1.D1_USAGE_BASE_180D.USAGE_QTY_PER_DAY"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="MAX_USAGE_QTY_PER_DAY" label="Max Usage Quantity Per Day" resourceId="JoinTree_1.D1_USAGE_BASE_180D.USAGE_QTY_PER_DAY"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+
+  <resources>
+    <jdbcQuery id="D1_USAGE_BASE_180D" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="US_ID" type="java.lang.String"></field>
+        <field id="USG_GRP_CD" type="java.lang.String"></field>
+        <field id="MSRMT_CYC_CD" type="java.lang.String"></field>
+        <field id="MSRMT_CYC_RTE_CD" type="java.lang.String"></field>
+        <field id="USAGE_START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="USAGE_END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="USED_ON_BILL_FLG" type="java.lang.String"></field>
+        <field id="USG_SRC_FLG" type="java.lang.String"></field>
+        <field id="SCALAR_SEQ_NUM" type="java.math.BigDecimal"></field>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="D1_UOM_CD" type="java.lang.String"></field>
+        <field id="D1_TOU_CD" type="java.lang.String"></field>
+        <field id="D1_SQI_CD" type="java.lang.String"></field>
+        <field id="SCALAR_START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="SCALAR_END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="USAGE_QTY" type="java.math.BigDecimal"></field>
+        <field id="INTERVAL_DAYS" type="java.math.BigDecimal"></field>
+        <field id="USAGE_QTY_PER_DAY" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select u.d1_usage_id, u.us_id, u.usg_grp_cd, u.msrmt_cyc_cd, u.msrmt_cyc_rte_cd, u.start_dttm as usage_start_dttm, u.end_dttm as usage_end_dttm, u.used_on_bill_flg, u.usg_src_flg, d.seq_num as scalar_seq_num, d.d1_sp_id, d.measr_comp_id, d.d1_uom_cd, d.d1_tou_cd, d.d1_sqi_cd, d.start_dttm as scalar_start_dttm, d.end_dttm as scalar_end_dttm, nvl(psq.period_qty, nvl(d.quantity, 0)) as usage_qty, case when d.end_dttm is not null and d.start_dttm is not null and d.end_dttm &gt; d.start_dttm then cast(d.end_dttm as date) - cast(d.start_dttm as date) else null end as interval_days, case when d.end_dttm is not null and d.start_dttm is not null and d.end_dttm &gt; d.start_dttm then nvl(psq.period_qty, nvl(d.quantity, 0)) / (cast(d.end_dttm as date) - cast(d.start_dttm as date)) else null end as usage_qty_per_day from cisadm.d1_usage u join cisadm.d1_usage_scalar_dtl d on d.d1_usage_id = u.d1_usage_id left join (select p.d1_usage_id, p.d1_sp_id, p.measr_comp_id, p.d1_uom_cd, p.d1_tou_cd, p.d1_sqi_cd, sum(nvl(p.quantity, 0)) as period_qty from cisadm.d1_usage_period_sq p join cisadm.d1_usage u2 on u2.d1_usage_id = p.d1_usage_id where u2.start_dttm >= trunc(sysdate) - 180 and u2.start_dttm &lt; trunc(sysdate) + 1 and trim(u2.bus_obj_cd) = 'D2-UsageTransaction' group by p.d1_usage_id, p.d1_sp_id, p.measr_comp_id, p.d1_uom_cd, p.d1_tou_cd, p.d1_sqi_cd) psq on psq.d1_usage_id = d.d1_usage_id and psq.d1_sp_id = d.d1_sp_id and psq.measr_comp_id = d.measr_comp_id and nvl(psq.d1_uom_cd, '~') = nvl(d.d1_uom_cd, '~') and nvl(psq.d1_tou_cd, '~') = nvl(d.d1_tou_cd, '~') and nvl(psq.d1_sqi_cd, '~') = nvl(d.d1_sqi_cd, '~') where u.start_dttm >= trunc(sysdate) - 180 and u.start_dttm &lt; trunc(sysdate) + 1 and u.d1_usage_id is not null and trim(u.bus_obj_cd) = 'D2-UsageTransaction'</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="USAGE_ACCT_CTX_180D" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+      </fieldList>
+      <query>select z.d1_usage_id, z.d1_sp_id, z.sa_id, z.acct_id from (select uk.d1_usage_id, uk.d1_sp_id, sasp.sa_id, sa.acct_id, row_number() over (partition by uk.d1_usage_id, uk.d1_sp_id order by nvl(sasp.stop_dttm, date '2999-12-31') desc, nvl(sasp.start_dttm, date '1900-01-01') desc, sasp.sa_id) as rn from (select distinct u.d1_usage_id, d.d1_sp_id, u.start_dttm as usage_start_dttm from cisadm.d1_usage u join cisadm.d1_usage_scalar_dtl d on d.d1_usage_id = u.d1_usage_id where u.start_dttm >= trunc(sysdate) - 180 and u.start_dttm &lt; trunc(sysdate) + 1 and d.d1_sp_id is not null and trim(u.bus_obj_cd) = 'D2-UsageTransaction') uk left join cisadm.ci_sa_sp sasp on sasp.sp_id = uk.d1_sp_id and (sasp.start_dttm is null or sasp.start_dttm &lt;= uk.usage_start_dttm) and (sasp.stop_dttm is null or sasp.stop_dttm &gt; uk.usage_start_dttm) left join cisadm.ci_sa sa on sa.sa_id = sasp.sa_id) z where z.rn = 1</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="USAGE_DEVICE_CTX_180D" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+      </fieldList>
+      <query>select k.d1_usage_id, k.d1_sp_id, k.measr_comp_id, cfg.d1_device_id from (select distinct u.d1_usage_id, d.d1_sp_id, d.measr_comp_id from cisadm.d1_usage u join cisadm.d1_usage_scalar_dtl d on d.d1_usage_id = u.d1_usage_id where u.start_dttm >= trunc(sysdate) - 180 and u.start_dttm &lt; trunc(sysdate) + 1 and d.measr_comp_id is not null and trim(u.bus_obj_cd) = 'D2-UsageTransaction') k left join cisadm.d1_measr_comp mc on mc.measr_comp_id = k.measr_comp_id left join (select c.device_config_id, c.d1_device_id, row_number() over (partition by c.device_config_id order by nvl(c.eff_dttm, date '1900-01-01') desc, nvl(c.cre_dttm, date '1900-01-01') desc, c.d1_device_id) as rn from cisadm.d1_dvc_cfg c) cfg on cfg.device_config_id = mc.device_config_id and cfg.rn = 1</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="DEVICE_ACCT_LINK_180D" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="USAGE_START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="DEVICE_ACCT_KEY" type="java.lang.String"></field>
+      </fieldList>
+      <query>select ud.d1_usage_id, ud.d1_sp_id, ud.measr_comp_id, ud.usage_start_dttm, ud.d1_device_id, ua.acct_id, ua.sa_id, ud.d1_device_id || '|' || ua.acct_id as device_acct_key from (select k.d1_usage_id, k.d1_sp_id, k.measr_comp_id, k.usage_start_dttm, cfg.d1_device_id from (select distinct u.d1_usage_id, u.start_dttm as usage_start_dttm, d.d1_sp_id, d.measr_comp_id from cisadm.d1_usage u join cisadm.d1_usage_scalar_dtl d on d.d1_usage_id = u.d1_usage_id where u.start_dttm >= trunc(sysdate) - 180 and u.start_dttm &lt; trunc(sysdate) + 1 and d.measr_comp_id is not null and trim(u.bus_obj_cd) = 'D2-UsageTransaction') k left join cisadm.d1_measr_comp mc on mc.measr_comp_id = k.measr_comp_id left join (select c.device_config_id, c.d1_device_id, row_number() over (partition by c.device_config_id order by nvl(c.eff_dttm, date '1900-01-01') desc, nvl(c.cre_dttm, date '1900-01-01') desc, c.d1_device_id) as rn from cisadm.d1_dvc_cfg c) cfg on cfg.device_config_id = mc.device_config_id and cfg.rn = 1) ud join (select z.d1_usage_id, z.d1_sp_id, z.sa_id, z.acct_id from (select uk.d1_usage_id, uk.d1_sp_id, sasp.sa_id, sa.acct_id, row_number() over (partition by uk.d1_usage_id, uk.d1_sp_id order by nvl(sasp.stop_dttm, date '2999-12-31') desc, nvl(sasp.start_dttm, date '1900-01-01') desc, sasp.sa_id) as rn from (select distinct u.d1_usage_id, d.d1_sp_id, u.start_dttm as usage_start_dttm from cisadm.d1_usage u join cisadm.d1_usage_scalar_dtl d on d.d1_usage_id = u.d1_usage_id where u.start_dttm >= trunc(sysdate) - 180 and u.start_dttm &lt; trunc(sysdate) + 1 and d.d1_sp_id is not null and trim(u.bus_obj_cd) = 'D2-UsageTransaction') uk left join cisadm.ci_sa_sp sasp on sasp.sp_id = uk.d1_sp_id and (sasp.start_dttm is null or sasp.start_dttm &lt;= uk.usage_start_dttm) and (sasp.stop_dttm is null or sasp.stop_dttm &gt; uk.usage_start_dttm) left join cisadm.ci_sa sa on sa.sa_id = sasp.sa_id) z where z.rn = 1) ua on ua.d1_usage_id = ud.d1_usage_id and ua.d1_sp_id = ud.d1_sp_id where ud.d1_device_id is not null and ua.acct_id is not null</query>
+    </jdbcQuery>
+
+    <jdbcTable id="D1_US" datasourceId="Origin_DEV_DS" datasourceTableName="D1_US" schemaAlias="CISADM">
+      <fieldList>
+        <field id="US_ID" type="java.lang.String"></field>
+        <field id="US_TYPE_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="D1_US_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_US_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="US_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="D1_DVC" datasourceId="Origin_DEV_DS" datasourceTableName="D1_DVC" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="DEVICE_TYPE_CD" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="MANUFACTURER_CD" type="java.lang.String"></field>
+        <field id="D1_MODEL_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="D1_DVC_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_DVC_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="DEVICE_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="D1_MEASR_COMP" datasourceId="Origin_DEV_DS" datasourceTableName="D1_MEASR_COMP" schemaAlias="CISADM">
+      <fieldList>
+        <field id="MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="MEASR_COMP_USAGE_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="D1_SP" datasourceId="Origin_DEV_DS" datasourceTableName="D1_SP" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_SP_TYPE_CD" type="java.lang.String"></field>
+        <field id="CITY" type="java.lang.String"></field>
+        <field id="STATE" type="java.lang.String"></field>
+        <field id="POSTAL" type="java.lang.String"></field>
+        <field id="DIVISION_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="D1_SP_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_SP_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_SP_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="D1_UOM_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_UOM_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_UOM_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="D1_TOU_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_TOU_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_TOU_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="D1_SQI_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_SQI_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_SQI_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_ACCT" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_CUST_CL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_CUST_CL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_ACCT_PER" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT_PER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="MAIN_CUST_SW" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_PER_NAME" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PER_NAME" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="D1_USAGE" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_USAGE_BASE_180D.D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE_BASE_180D.US_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE_BASE_180D.USG_GRP_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_BASE_180D.MSRMT_CYC_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_BASE_180D.MSRMT_CYC_RTE_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_BASE_180D.USAGE_START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE_BASE_180D.USAGE_END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE_BASE_180D.USED_ON_BILL_FLG" type="java.lang.String"></field>
+        <field id="D1_USAGE_BASE_180D.USG_SRC_FLG" type="java.lang.String"></field>
+        <field id="D1_USAGE_BASE_180D.SCALAR_SEQ_NUM" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE_BASE_180D.D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE_BASE_180D.MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE_BASE_180D.D1_UOM_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_BASE_180D.D1_TOU_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_BASE_180D.D1_SQI_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_BASE_180D.SCALAR_START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE_BASE_180D.SCALAR_END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE_BASE_180D.USAGE_QTY" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE_BASE_180D.INTERVAL_DAYS" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE_BASE_180D.USAGE_QTY_PER_DAY" type="java.math.BigDecimal"></field>
+
+        <field id="USAGE_ACCT_CTX_180D.D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="USAGE_ACCT_CTX_180D.D1_SP_ID" type="java.lang.String"></field>
+        <field id="USAGE_ACCT_CTX_180D.SA_ID" type="java.lang.String"></field>
+        <field id="USAGE_ACCT_CTX_180D.ACCT_ID" type="java.lang.String"></field>
+
+        <field id="USAGE_DEVICE_CTX_180D.D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="USAGE_DEVICE_CTX_180D.D1_SP_ID" type="java.lang.String"></field>
+        <field id="USAGE_DEVICE_CTX_180D.MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="USAGE_DEVICE_CTX_180D.D1_DEVICE_ID" type="java.lang.String"></field>
+
+        <field id="DEVICE_ACCT_LINK_180D.D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="DEVICE_ACCT_LINK_180D.D1_SP_ID" type="java.lang.String"></field>
+        <field id="DEVICE_ACCT_LINK_180D.MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="DEVICE_ACCT_LINK_180D.USAGE_START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="DEVICE_ACCT_LINK_180D.D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="DEVICE_ACCT_LINK_180D.ACCT_ID" type="java.lang.String"></field>
+        <field id="DEVICE_ACCT_LINK_180D.SA_ID" type="java.lang.String"></field>
+        <field id="DEVICE_ACCT_LINK_180D.DEVICE_ACCT_KEY" type="java.lang.String"></field>
+
+        <field id="D1_US.US_ID" type="java.lang.String"></field>
+        <field id="D1_US.US_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_US_TYPE_L.US_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_US_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_US_TYPE_L.DESCR100" type="java.lang.String"></field>
+
+        <field id="D1_DVC.D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="D1_DVC.DEVICE_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_DVC.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="D1_DVC.MANUFACTURER_CD" type="java.lang.String"></field>
+        <field id="D1_DVC.D1_MODEL_CD" type="java.lang.String"></field>
+        <field id="D1_DVC_TYPE_L.DEVICE_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_DVC_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_DVC_TYPE_L.DESCR100" type="java.lang.String"></field>
+
+        <field id="D1_MEASR_COMP.MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="D1_MEASR_COMP.MEASR_COMP_USAGE_FLG" type="java.lang.String"></field>
+
+        <field id="D1_SP.D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_SP.D1_SP_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_SP.CITY" type="java.lang.String"></field>
+        <field id="D1_SP.STATE" type="java.lang.String"></field>
+        <field id="D1_SP.POSTAL" type="java.lang.String"></field>
+        <field id="D1_SP.DIVISION_CD" type="java.lang.String"></field>
+        <field id="D1_SP_TYPE_L.D1_SP_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_SP_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_SP_TYPE_L.DESCR100" type="java.lang.String"></field>
+
+        <field id="D1_UOM_L.D1_UOM_CD" type="java.lang.String"></field>
+        <field id="D1_UOM_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_UOM_L.DESCR100" type="java.lang.String"></field>
+        <field id="D1_TOU_L.D1_TOU_CD" type="java.lang.String"></field>
+        <field id="D1_TOU_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_TOU_L.DESCR100" type="java.lang.String"></field>
+        <field id="D1_SQI_L.D1_SQI_CD" type="java.lang.String"></field>
+        <field id="D1_SQI_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_SQI_L.DESCR100" type="java.lang.String"></field>
+
+        <field id="CI_ACCT.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CI_ACCT.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CI_CUST_CL_L.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CI_CUST_CL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_CUST_CL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.PER_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.PER_ID" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.ENTITY_NAME" type="java.lang.String"></field>
+      </fieldList>
+
+      <joinInfo alias="D1_USAGE_BASE_180D" referenceId="D1_USAGE_BASE_180D"></joinInfo>
+      <joinList>
+        <join expr="D1_USAGE_BASE_180D.D1_USAGE_ID == USAGE_ACCT_CTX_180D.D1_USAGE_ID and D1_USAGE_BASE_180D.D1_SP_ID == USAGE_ACCT_CTX_180D.D1_SP_ID" left="D1_USAGE_BASE_180D" right="USAGE_ACCT_CTX_180D" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_BASE_180D.D1_USAGE_ID == USAGE_DEVICE_CTX_180D.D1_USAGE_ID and D1_USAGE_BASE_180D.D1_SP_ID == USAGE_DEVICE_CTX_180D.D1_SP_ID and D1_USAGE_BASE_180D.MEASR_COMP_ID == USAGE_DEVICE_CTX_180D.MEASR_COMP_ID" left="D1_USAGE_BASE_180D" right="USAGE_DEVICE_CTX_180D" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_BASE_180D.D1_USAGE_ID == DEVICE_ACCT_LINK_180D.D1_USAGE_ID and D1_USAGE_BASE_180D.D1_SP_ID == DEVICE_ACCT_LINK_180D.D1_SP_ID and D1_USAGE_BASE_180D.MEASR_COMP_ID == DEVICE_ACCT_LINK_180D.MEASR_COMP_ID" left="D1_USAGE_BASE_180D" right="DEVICE_ACCT_LINK_180D" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_BASE_180D.US_ID == D1_US.US_ID" left="D1_USAGE_BASE_180D" right="D1_US" type="leftOuter" weight="1"></join>
+        <join expr="D1_US.US_TYPE_CD == D1_US_TYPE_L.US_TYPE_CD and D1_US_TYPE_L.LANGUAGE_CD == 'ENG'" left="D1_US" right="D1_US_TYPE_L" type="leftOuter" weight="1"></join>
+        <join expr="USAGE_DEVICE_CTX_180D.D1_DEVICE_ID == D1_DVC.D1_DEVICE_ID" left="USAGE_DEVICE_CTX_180D" right="D1_DVC" type="leftOuter" weight="1"></join>
+        <join expr="D1_DVC.DEVICE_TYPE_CD == D1_DVC_TYPE_L.DEVICE_TYPE_CD and D1_DVC_TYPE_L.LANGUAGE_CD == 'ENG'" left="D1_DVC" right="D1_DVC_TYPE_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_BASE_180D.MEASR_COMP_ID == D1_MEASR_COMP.MEASR_COMP_ID" left="D1_USAGE_BASE_180D" right="D1_MEASR_COMP" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_BASE_180D.D1_SP_ID == D1_SP.D1_SP_ID" left="D1_USAGE_BASE_180D" right="D1_SP" type="leftOuter" weight="1"></join>
+        <join expr="D1_SP.D1_SP_TYPE_CD == D1_SP_TYPE_L.D1_SP_TYPE_CD and D1_SP_TYPE_L.LANGUAGE_CD == 'ENG'" left="D1_SP" right="D1_SP_TYPE_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_BASE_180D.D1_UOM_CD == D1_UOM_L.D1_UOM_CD and D1_UOM_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE_BASE_180D" right="D1_UOM_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_BASE_180D.D1_TOU_CD == D1_TOU_L.D1_TOU_CD and D1_TOU_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE_BASE_180D" right="D1_TOU_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_BASE_180D.D1_SQI_CD == D1_SQI_L.D1_SQI_CD and D1_SQI_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE_BASE_180D" right="D1_SQI_L" type="leftOuter" weight="1"></join>
+        <join expr="USAGE_ACCT_CTX_180D.ACCT_ID == CI_ACCT.ACCT_ID" left="USAGE_ACCT_CTX_180D" right="CI_ACCT" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT" right="CI_CUST_CL_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'" left="CI_ACCT" right="CI_ACCT_PER" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'" left="CI_ACCT_PER" right="CI_PER_NAME" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_USAGE_BASE_180D" tableId="D1_USAGE_BASE_180D"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="USAGE_ACCT_CTX_180D" tableId="USAGE_ACCT_CTX_180D"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="USAGE_DEVICE_CTX_180D" tableId="USAGE_DEVICE_CTX_180D"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DEVICE_ACCT_LINK_180D" tableId="DEVICE_ACCT_LINK_180D"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_US" tableId="D1_US"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_US_TYPE_L" tableId="D1_US_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_DVC" tableId="D1_DVC"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_DVC_TYPE_L" tableId="D1_DVC_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_MEASR_COMP" tableId="D1_MEASR_COMP"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_SP" tableId="D1_SP"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_SP_TYPE_L" tableId="D1_SP_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_UOM_L" tableId="D1_UOM_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_TOU_L" tableId="D1_TOU_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_SQI_L" tableId="D1_SQI_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT" tableId="CI_ACCT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_CUST_CL_L" tableId="CI_CUST_CL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>
+

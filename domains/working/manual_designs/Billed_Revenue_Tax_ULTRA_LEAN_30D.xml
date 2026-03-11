@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="Billed Revenue Tax | ULTRA_LEAN_30D_FT_TAX" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+
+  <itemGroups>
+    <itemGroup id="SET_CONTEXT" label="Billing Context" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCOUNTING_DT" label="Accounting Date" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.ACCOUNTING_DT"></item>
+        <item id="BILL_ID" label="Bill ID" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.BILL_ID"></item>
+        <item id="BSEG_ID" label="Bill Segment ID" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.BSEG_ID"></item>
+        <item id="SA_ID" label="Service Agreement ID" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.SA_ID"></item>
+        <item id="ACCT_ID" label="Account ID" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.ACCT_ID"></item>
+        <item id="RS_CD" label="Rate Schedule Code" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.RS_CD"></item>
+        <item id="FT_TYPE_FLG" label="FT Type Code" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.FT_TYPE_FLG"></item>
+        <item id="FT_TYPE_DESCR" label="FT Type Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_3.DESCR"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_MEASURES" label="Tax Measures" resourceId="JoinTree_1">
+      <items>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TAX_AMT_NET" label="Tax Amount (Net)" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.FT_GL_TAX_AMT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TAX_AMT_GROSS" label="Tax Amount (Gross)" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.TAX_AMT_GROSS"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TAX_AMT_CREDITS" label="Tax Amount (Credits)" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.TAX_AMT_CREDITS"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_FT_AMT" label="Total FT Amount" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.TOT_AMT"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="BILL_COUNT" label="Bill Count" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.BILL_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="BSEG_COUNT" label="Bill Segment Count" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.BSEG_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="ACCOUNT_COUNT" label="Account Count" resourceId="JoinTree_1.C1_BI_FT_TAX_30D.ACCT_ID"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+
+  <resources>
+    <jdbcQuery id="C1_BI_FT_TAX_30D" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="RS_CD" type="java.lang.String"></field>
+        <field id="FT_TYPE_FLG" type="java.lang.String"></field>
+        <field id="ACCOUNTING_DT" type="java.sql.Timestamp"></field>
+        <field id="FT_GL_TAX_AMT" type="java.math.BigDecimal"></field>
+        <field id="TAX_AMT_GROSS" type="java.math.BigDecimal"></field>
+        <field id="TAX_AMT_CREDITS" type="java.math.BigDecimal"></field>
+        <field id="TOT_AMT" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select f.bill_id,
+       f.bseg_id,
+       f.sa_id,
+       f.acct_id,
+       f.rs_cd,
+       f.ft_type_flg,
+       f.accounting_dt,
+       nvl(f.ft_gl_tax_amt, 0) as ft_gl_tax_amt,
+       case when nvl(f.ft_gl_tax_amt, 0) &gt; 0 then nvl(f.ft_gl_tax_amt, 0) else 0 end as tax_amt_gross,
+       case when nvl(f.ft_gl_tax_amt, 0) &lt; 0 then -1 * nvl(f.ft_gl_tax_amt, 0) else 0 end as tax_amt_credits,
+       nvl(f.tot_amt, 0) as tot_amt
+from cisadm.c1_bi_ft_vw f
+where f.accounting_dt &gt;= trunc(sysdate) - 30
+  and f.accounting_dt &lt; trunc(sysdate) + 1
+  and f.bill_id is not null
+  and nvl(f.ft_gl_tax_amt, 0) &lt;&gt; 0</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="CI_LOOKUP_VAL_L_3" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <query>select 'FT_TYPE_FLG' as field_name, l.field_value, 'ENG' as language_cd, l.descr from cisadm.ci_lookup_val_l l where l.field_name = 'FT_TYPE_FLG' and l.language_cd = 'ENG'</query>
+    </jdbcQuery>
+
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="C1_BI_FT_VW" schemaAlias="CISADM">
+      <fieldList>
+        <field id="C1_BI_FT_TAX_30D.BILL_ID" type="java.lang.String"></field>
+        <field id="C1_BI_FT_TAX_30D.BSEG_ID" type="java.lang.String"></field>
+        <field id="C1_BI_FT_TAX_30D.SA_ID" type="java.lang.String"></field>
+        <field id="C1_BI_FT_TAX_30D.ACCT_ID" type="java.lang.String"></field>
+        <field id="C1_BI_FT_TAX_30D.RS_CD" type="java.lang.String"></field>
+        <field id="C1_BI_FT_TAX_30D.FT_TYPE_FLG" type="java.lang.String"></field>
+        <field id="C1_BI_FT_TAX_30D.ACCOUNTING_DT" type="java.sql.Timestamp"></field>
+        <field id="C1_BI_FT_TAX_30D.FT_GL_TAX_AMT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FT_TAX_30D.TAX_AMT_GROSS" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FT_TAX_30D.TAX_AMT_CREDITS" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FT_TAX_30D.TOT_AMT" type="java.math.BigDecimal"></field>
+
+        <field id="CI_LOOKUP_VAL_L_3.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_3.DESCR" type="java.lang.String"></field>
+      </fieldList>
+
+      <joinInfo alias="C1_BI_FT_TAX_30D" referenceId="C1_BI_FT_TAX_30D"></joinInfo>
+      <joinList>
+        <join expr="C1_BI_FT_TAX_30D.FT_TYPE_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE" left="C1_BI_FT_TAX_30D" right="CI_LOOKUP_VAL_L_3" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="C1_BI_FT_TAX_30D" tableId="C1_BI_FT_TAX_30D"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_3" tableId="CI_LOOKUP_VAL_L_3"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

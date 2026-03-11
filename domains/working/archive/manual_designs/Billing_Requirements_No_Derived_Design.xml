@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="Billing Requirements (No Derived)" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+
+  <items>
+    <item id="BILL_SEGMENT_ID" label="Bill Segment ID" resourceId="JoinTree_1.CI_BSEG.BSEG_ID"></item>
+    <item id="BILL_ID" label="Bill ID" resourceId="JoinTree_1.CI_BSEG.BILL_ID"></item>
+    <item id="SERVICE_AGREEMENT_ID" label="Service Agreement ID" resourceId="JoinTree_1.CI_BSEG.SA_ID"></item>
+    <item id="ACCOUNT_ID" label="Account ID" resourceId="JoinTree_1.CI_SA.ACCT_ID"></item>
+    <item id="PREMISE_ID" label="Premise ID" resourceId="JoinTree_1.CI_BSEG.PREM_ID"></item>
+    <item id="REBILL_SEGMENT_ID" label="Rebill Segment ID" resourceId="JoinTree_1.CI_BSEG.REBILL_SEG_ID"></item>
+
+    <item id="BILL_CYCLE_CODE" label="Bill Cycle Code" resourceId="JoinTree_1.CI_BSEG.BILL_CYC_CD"></item>
+    <item id="BILL_CYCLE_DESCRIPTION" label="Bill Cycle Description" resourceId="JoinTree_1.CI_BILL_CYC_L.DESCR"></item>
+
+    <item id="BILL_DATE" label="Bill Date" resourceId="JoinTree_1.CI_BILL.BILL_DT"></item>
+    <item id="BILL_CREATE_DATE" label="Bill Create Date" resourceId="JoinTree_1.CI_BILL.CRE_DTTM"></item>
+    <item id="BSEG_CREATE_DATE" label="Bill Segment Create Date" resourceId="JoinTree_1.CI_BSEG.CRE_DTTM"></item>
+
+    <item id="BILL_STATUS_CODE" label="Bill Status Code" resourceId="JoinTree_1.CI_BILL.BILL_STAT_FLG"></item>
+    <item id="BILL_STATUS_DESCRIPTION" label="Bill Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+    <item id="BSEG_STATUS_CODE" label="Bill Segment Status Code" resourceId="JoinTree_1.CI_BSEG.BSEG_STAT_FLG"></item>
+    <item id="BSEG_STATUS_DESCRIPTION" label="Bill Segment Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_1.DESCR"></item>
+
+    <item defaultAgg="CountAll" dimensionOrMeasure="Measure" id="TOTAL_BILL_SEGMENTS" label="Total Bill Segments" resourceId="JoinTree_1.CI_BSEG.BSEG_ID"></item>
+    <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="TOTAL_BILLS" label="Total Bills" resourceId="JoinTree_1.CI_BSEG.BILL_ID"></item>
+    <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="TOTAL_SERVICE_AGREEMENTS" label="Total Service Agreements" resourceId="JoinTree_1.CI_BSEG.SA_ID"></item>
+    <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="TOTAL_ACCOUNTS" label="Total Accounts" resourceId="JoinTree_1.CI_SA.ACCT_ID"></item>
+  </items>
+
+  <resources>
+    <jdbcTable id="CI_BSEG" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BSEG" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="REBILL_SEG_ID" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="BSEG_STAT_FLG" type="java.lang.String"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_BILL" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BILL" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="BILL_STAT_FLG" type="java.lang.String"></field>
+        <field id="BILL_DT" type="java.sql.Timestamp"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_SA" datasourceId="Origin_DEV_DS" datasourceTableName="CI_SA" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_ACCT" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_BILL_CYC_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BILL_CYC_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_LOOKUP_VAL_L_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BSEG" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CI_BSEG.BSEG_ID" type="java.lang.String"></field>
+        <field id="CI_BSEG.BILL_ID" type="java.lang.String"></field>
+        <field id="CI_BSEG.SA_ID" type="java.lang.String"></field>
+        <field id="CI_BSEG.PREM_ID" type="java.lang.String"></field>
+        <field id="CI_BSEG.REBILL_SEG_ID" type="java.lang.String"></field>
+        <field id="CI_BSEG.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_BSEG.BSEG_STAT_FLG" type="java.lang.String"></field>
+        <field id="CI_BSEG.CRE_DTTM" type="java.sql.Timestamp"></field>
+
+        <field id="CI_BILL.BILL_ID" type="java.lang.String"></field>
+        <field id="CI_BILL.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_BILL.BILL_STAT_FLG" type="java.lang.String"></field>
+        <field id="CI_BILL.BILL_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_BILL.CRE_DTTM" type="java.sql.Timestamp"></field>
+
+        <field id="CI_SA.SA_ID" type="java.lang.String"></field>
+        <field id="CI_SA.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_SA.SA_STATUS_FLG" type="java.lang.String"></field>
+
+        <field id="CI_ACCT.ACCT_ID" type="java.lang.String"></field>
+
+        <field id="CI_BILL_CYC_L.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_BILL_CYC_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_BILL_CYC_L.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_LOOKUP_VAL_L_1.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.DESCR" type="java.lang.String"></field>
+      </fieldList>
+
+      <filterString>trim(CI_BSEG.BILL_CYC_CD) != ''</filterString>
+      <joinInfo alias="CI_BSEG" referenceId="CI_BSEG"></joinInfo>
+
+      <joinList>
+        <join expr="CI_BSEG.BILL_ID == CI_BILL.BILL_ID" left="CI_BSEG" right="CI_BILL" type="leftOuter" weight="1"></join>
+        <join expr="CI_BSEG.SA_ID == CI_SA.SA_ID and CI_SA.SA_STATUS_FLG == '20'" left="CI_BSEG" right="CI_SA" type="inner" weight="1"></join>
+        <join expr="CI_SA.ACCT_ID == CI_ACCT.ACCT_ID" left="CI_SA" right="CI_ACCT" type="inner" weight="1"></join>
+        <join expr="trim(CI_BSEG.BILL_CYC_CD) == trim(CI_BILL_CYC_L.BILL_CYC_CD) and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'" left="CI_BSEG" right="CI_BILL_CYC_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_BILL.BILL_STAT_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and trim(CI_LOOKUP_VAL_L.FIELD_NAME) == 'BILL_STAT_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="CI_BILL" right="CI_LOOKUP_VAL_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_BSEG.BSEG_STAT_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and trim(CI_LOOKUP_VAL_L_1.FIELD_NAME) == 'BSEG_STAT_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'" left="CI_BSEG" right="CI_LOOKUP_VAL_L_1" type="leftOuter" weight="1"></join>
+      </joinList>
+
+      <joinOptions></joinOptions>
+
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BSEG" tableId="CI_BSEG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BILL" tableId="CI_BILL"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_SA" tableId="CI_SA"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT" tableId="CI_ACCT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BILL_CYC_L" tableId="CI_BILL_CYC_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

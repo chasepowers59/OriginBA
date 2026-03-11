@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="Unbilled Revenue Snapshot (Perf)" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+
+  <itemGroups>
+    <itemGroup id="SET_CONTEXT" label="Snapshot Context" resourceId="JoinTree_1">
+      <items>
+        <item id="AS_OF_DT" label="As Of Date" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.AS_OF_DT"></item>
+        <item id="CALC_METHOD_CD" label="Calculation Method" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.CALC_METHOD_CD"></item>
+        <item id="LOAD_DTTM" label="Load Date Time" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.LOAD_DTTM"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_ACCOUNT_SA" label="Account And Service Agreement" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID" label="Account ID" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.ACCT_ID"></item>
+        <item id="SA_ID" label="Service Agreement ID" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.SA_ID"></item>
+        <item id="CIS_DIVISION" label="CIS Division" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.CIS_DIVISION"></item>
+        <item id="SA_TYPE_CD" label="SA Type Code" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.SA_TYPE_CD"></item>
+        <item id="SA_TYPE_DESCR" label="SA Type Description" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.SA_TYPE_DESCR"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle Code" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.BILL_CYC_CD"></item>
+        <item id="BILL_CYC_DESCR" label="Bill Cycle Description" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.BILL_CYC_DESCR"></item>
+        <item id="CUST_CL_CD" label="Customer Class Code" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.CUST_CL_CD"></item>
+        <item id="CUST_CLASS_DESCR" label="Customer Class Description" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.CUST_CLASS_DESCR"></item>
+        <item id="COLL_CL_CD" label="Collection Class Code" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.COLL_CL_CD"></item>
+        <item id="COLL_CLASS_DESCR" label="Collection Class Description" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.COLL_CLASS_DESCR"></item>
+        <item id="RATE_SCHEDULE_CD" label="Rate Schedule Code" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.RATE_SCHEDULE_CD"></item>
+        <item id="RATE_SCHEDULE_DESCR" label="Rate Schedule Description" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.RATE_SCHEDULE_DESCR"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_WINDOW" label="Unbilled Window" resourceId="JoinTree_1">
+      <items>
+        <item id="LAST_BSEG_END_DT" label="Last Billed Segment End Date" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.LAST_BSEG_END_DT"></item>
+        <item id="LAST_BILL_ACCOUNTING_DT" label="Last Bill Accounting Date" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.LAST_BILL_ACCOUNTING_DT"></item>
+        <item id="UNBILLED_DAYS" label="Unbilled Days" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.UNBILLED_DAYS"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_ESTIMATES" label="Estimated Unbilled Revenue" resourceId="JoinTree_1">
+      <items>
+        <item id="UNBILLED_USAGE_QTY" label="Unbilled Usage Quantity" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.UNBILLED_USAGE_QTY"></item>
+        <item id="EST_USAGE_AMT" label="Estimated Usage Amount" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.EST_USAGE_AMT"></item>
+        <item id="EST_OTHER_AMT" label="Estimated Other Amount" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.EST_OTHER_AMT"></item>
+        <item id="EST_TAX_RATE" label="Estimated Tax Rate" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.EST_TAX_RATE"></item>
+        <item id="EST_TAX_AMT" label="Estimated Tax Amount" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.EST_TAX_AMT"></item>
+        <item id="EST_TOTAL_AMT" label="Estimated Total Unbilled Amount" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.EST_TOTAL_AMT"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_MEASURES" label="Measures" resourceId="JoinTree_1">
+      <items>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="ACCOUNT_COUNT" label="Account Count" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.ACCT_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="SA_COUNT" label="Service Agreement Count" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.SA_ID"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_UNBILLED_USAGE_QTY" label="Total Unbilled Usage Quantity" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.UNBILLED_USAGE_QTY"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_EST_USAGE_AMT" label="Total Estimated Usage Amount" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.EST_USAGE_AMT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_EST_OTHER_AMT" label="Total Estimated Other Amount" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.EST_OTHER_AMT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_EST_TAX_AMT" label="Total Estimated Tax Amount" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.EST_TAX_AMT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_EST_UNBILLED_AMT" label="Total Estimated Unbilled Amount" resourceId="JoinTree_1.C1_BI_UNBILLED_REV_SNAP.EST_TOTAL_AMT"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+
+  <resources>
+    <jdbcTable id="C1_BI_UNBILLED_REV_SNAP" datasourceId="Origin_DEV_DS" datasourceTableName="C1_BI_UNBILLED_REV_SNAP" schemaAlias="CISADM">
+      <fieldList>
+        <field id="AS_OF_DT" type="java.sql.Timestamp"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="SA_TYPE_DESCR" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="BILL_CYC_DESCR" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CUST_CLASS_DESCR" type="java.lang.String"></field>
+        <field id="COLL_CL_CD" type="java.lang.String"></field>
+        <field id="COLL_CLASS_DESCR" type="java.lang.String"></field>
+        <field id="RATE_SCHEDULE_CD" type="java.lang.String"></field>
+        <field id="RATE_SCHEDULE_DESCR" type="java.lang.String"></field>
+        <field id="LAST_BSEG_END_DT" type="java.sql.Timestamp"></field>
+        <field id="LAST_BILL_ACCOUNTING_DT" type="java.sql.Timestamp"></field>
+        <field id="UNBILLED_DAYS" type="java.math.BigDecimal"></field>
+        <field id="UNBILLED_USAGE_QTY" type="java.math.BigDecimal"></field>
+        <field id="EST_USAGE_AMT" type="java.math.BigDecimal"></field>
+        <field id="EST_OTHER_AMT" type="java.math.BigDecimal"></field>
+        <field id="EST_TAX_RATE" type="java.math.BigDecimal"></field>
+        <field id="EST_TAX_AMT" type="java.math.BigDecimal"></field>
+        <field id="EST_TOTAL_AMT" type="java.math.BigDecimal"></field>
+        <field id="CALC_METHOD_CD" type="java.lang.String"></field>
+        <field id="LOAD_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="C1_BI_UNBILLED_REV_SNAP" schemaAlias="CISADM">
+      <fieldList>
+        <field id="C1_BI_UNBILLED_REV_SNAP.AS_OF_DT" type="java.sql.Timestamp"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.ACCT_ID" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.SA_ID" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.SA_TYPE_DESCR" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.BILL_CYC_DESCR" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.CUST_CLASS_DESCR" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.COLL_CL_CD" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.COLL_CLASS_DESCR" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.RATE_SCHEDULE_CD" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.RATE_SCHEDULE_DESCR" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.LAST_BSEG_END_DT" type="java.sql.Timestamp"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.LAST_BILL_ACCOUNTING_DT" type="java.sql.Timestamp"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.UNBILLED_DAYS" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.UNBILLED_USAGE_QTY" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.EST_USAGE_AMT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.EST_OTHER_AMT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.EST_TAX_RATE" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.EST_TAX_AMT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.EST_TOTAL_AMT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.CALC_METHOD_CD" type="java.lang.String"></field>
+        <field id="C1_BI_UNBILLED_REV_SNAP.LOAD_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <filterString>C1_BI_UNBILLED_REV_SNAP.AS_OF_DT >= ts'2025-09-01'</filterString>
+      <joinInfo alias="C1_BI_UNBILLED_REV_SNAP" referenceId="C1_BI_UNBILLED_REV_SNAP"></joinInfo>
+      <joinList></joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="C1_BI_UNBILLED_REV_SNAP" tableId="C1_BI_UNBILLED_REV_SNAP"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

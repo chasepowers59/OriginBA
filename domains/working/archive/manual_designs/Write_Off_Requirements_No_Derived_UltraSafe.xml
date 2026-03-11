@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="Write Off Requirements (UltraSafe)" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="WRITE_OFF_PROCESS_ID" label="Write Off Process ID" resourceId="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_ID"></item>
+    <item id="ACCOUNT_ID" label="Account ID" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ACCT_ID"></item>
+    <item id="PROCESS_START_DTTM" label="Process Start DTTM" resourceId="JoinTree_1.C1_BI_WOPROC_VW.CRE_DTTM"></item>
+    <item id="PROCESS_COMPLETE_DT" label="Process Complete Date" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_COMPL_DT"></item>
+    <item id="PROCESS_DURATION_DAYS" label="Process Duration (Days)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_DUR"></item>
+    <item id="WO_STATUS_CODE" label="Write Off Status Code" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_STATUS_FLG"></item>
+    <item id="WO_STATUS_REASON_CODE" label="Write Off Status Reason Code" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_STAT_RSN_FLG"></item>
+    <item id="UNCOLL_PROC_STATUS_CODE" label="Uncoll Process Status Code" resourceId="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_STAT_FLG"></item>
+    <item id="COMMENTS" label="Comments" resourceId="JoinTree_1.C1_BI_WOPROC_VW.COMMENTS"></item>
+    <item id="INIT_OUTSTANDING_AMT" label="Initial Outstanding Amount" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ARS_AT_START"></item>
+    <item id="END_OUTSTANDING_AMT" label="End Outstanding Amount" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ARS_AT_END"></item>
+    <item id="OUTSTANDING_DIFF_AMT" label="Outstanding Difference Amount" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ARS_DIFF"></item>
+    <item id="ACTIVE_WO_PROC_CNT" label="Active Write Off Process Count (Row)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ACTIVE_WO_PROC_CNT"></item>
+    <item id="COMPL_WO_PROC_CNT" label="Completed Write Off Process Count (Row)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.COMPL_WO_PROC_CNT"></item>
+
+    <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="WRITE_OFF_PROCESS_COUNT" label="Write Off Process Count" resourceId="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_ID"></item>
+    <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="ACCOUNT_COUNT" label="Account Count" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ACCT_ID"></item>
+    <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="INIT_OUTSTANDING_AMT_TOTAL" label="Initial Outstanding Amount Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ARS_AT_START"></item>
+    <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="END_OUTSTANDING_AMT_TOTAL" label="End Outstanding Amount Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ARS_AT_END"></item>
+    <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="OUTSTANDING_DIFF_AMT_TOTAL" label="Outstanding Difference Amount Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ARS_DIFF"></item>
+    <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="ACTIVE_WO_PROC_CNT_TOTAL" label="Active Write Off Process Count Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ACTIVE_WO_PROC_CNT"></item>
+    <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="COMPL_WO_PROC_CNT_TOTAL" label="Completed Write Off Process Count Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.COMPL_WO_PROC_CNT"></item>
+  </items>
+  <resources>
+    <jdbcTable id="C1_BI_WOPROC_VW" datasourceId="Origin_DEV_DS" datasourceTableName="C1_BI_WOPROC_VW" schemaAlias="CISADM">
+      <fieldList>
+        <field id="UNCOLL_PROC_ID" type="java.lang.String"></field>
+        <field id="WO_STATUS_FLG" type="java.lang.String"></field>
+        <field id="WO_STAT_RSN_FLG" type="java.lang.String"></field>
+        <field id="UNCOLL_PROC_STAT_FLG" type="java.lang.String"></field>
+        <field id="COMMENTS" type="java.lang.String"></field>
+        <field id="ACTIVE_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="COMPL_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="ARS_AT_START" type="java.math.BigDecimal"></field>
+        <field id="ARS_AT_END" type="java.math.BigDecimal"></field>
+        <field id="ARS_DIFF" type="java.math.BigDecimal"></field>
+        <field id="UNCOLL_PROC_DUR" type="java.math.BigDecimal"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="WO_PROC_COMPL_DT" type="java.sql.Timestamp"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="C1_BI_WOPROC_VW" schemaAlias="CISADM">
+      <fieldList>
+        <field id="C1_BI_WOPROC_VW.UNCOLL_PROC_ID" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.WO_STATUS_FLG" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.WO_STAT_RSN_FLG" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.UNCOLL_PROC_STAT_FLG" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.COMMENTS" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.ACTIVE_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.COMPL_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.ARS_AT_START" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.ARS_AT_END" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.ARS_DIFF" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.UNCOLL_PROC_DUR" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.ACCT_ID" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.WO_PROC_COMPL_DT" type="java.sql.Timestamp"></field>
+        <field id="C1_BI_WOPROC_VW.CRE_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <filterString>C1_BI_WOPROC_VW.CRE_DTTM >= ts'2025-09-01'</filterString>
+      <joinInfo alias="C1_BI_WOPROC_VW" referenceId="C1_BI_WOPROC_VW"></joinInfo>
+      <joinList></joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="C1_BI_WOPROC_VW" tableId="C1_BI_WOPROC_VW"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

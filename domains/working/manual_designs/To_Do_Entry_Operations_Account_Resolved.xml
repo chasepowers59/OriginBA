@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="To Do Entry Operations | ACCOUNT_RESOLVED" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+
+  <itemGroups>
+    <itemGroup id="SET_TODO_ENTRY" label="To Do Entry" resourceId="JoinTree_1">
+      <items>
+        <item id="TD_ENTRY_ID" label="To Do ID" resourceId="JoinTree_1.CI_TD_ENTRY.TD_ENTRY_ID"></item>
+        <item id="CRE_DTTM" label="Create Date/Time" resourceId="JoinTree_1.CI_TD_ENTRY.CRE_DTTM"></item>
+        <item id="ASSIGNED_DTTM" label="Assigned Date/Time" resourceId="JoinTree_1.CI_TD_ENTRY.ASSIGNED_DTTM"></item>
+        <item id="COMPLETE_DTTM" label="Completion Date/Time" resourceId="JoinTree_1.CI_TD_ENTRY.COMPLETE_DTTM"></item>
+        <item id="ASSIGNED_TO" label="Assigned To User ID" resourceId="JoinTree_1.CI_TD_ENTRY.ASSIGNED_TO"></item>
+        <item id="ASSIGNED_TO_NAME" label="Assigned To User Name" resourceId="JoinTree_1.ASSIGNED_TO_NAME"></item>
+        <item id="ASSIGNED_USER_ID" label="Assigned By User ID" resourceId="JoinTree_1.CI_TD_ENTRY.ASSIGNED_USER_ID"></item>
+        <item id="ASSIGNED_USER_ID_NAME" label="Assigned By User Name" resourceId="JoinTree_1.ASSIGNED_USER_ID_NAME"></item>
+        <item id="COMPLETE_USER_ID" label="Completed By User ID" resourceId="JoinTree_1.CI_TD_ENTRY.COMPLETE_USER_ID"></item>
+        <item id="COMPLETE_USER_ID_NAME" label="Completed By User Name" resourceId="JoinTree_1.COMPLETE_USER_ID_NAME"></item>
+        <item id="ENTRY_STATUS_FLG" label="Status Code" resourceId="JoinTree_1.CI_TD_ENTRY.ENTRY_STATUS_FLG"></item>
+        <item id="ENTRY_STATUS_DESCR" label="Status Description" resourceId="JoinTree_1.LKP_ENTRY_STATUS.DESCR"></item>
+        <item id="TD_PRIORITY_FLG" label="Priority Code" resourceId="JoinTree_1.CI_TD_ENTRY.TD_PRIORITY_FLG"></item>
+        <item id="TD_PRIORITY_DESCR" label="Priority Description" resourceId="JoinTree_1.LKP_TD_PRIORITY.DESCR"></item>
+        <item id="TD_TYPE_CD" label="To Do Type Code" resourceId="JoinTree_1.CI_TD_ENTRY.TD_TYPE_CD"></item>
+        <item id="TD_TYPE_DESCR" label="To Do Type Description" resourceId="JoinTree_1.CI_TD_TYPE_L.DESCR"></item>
+        <item id="ROLE_ID" label="Role ID" resourceId="JoinTree_1.CI_TD_ENTRY.ROLE_ID"></item>
+        <item id="ROLE_DESCR" label="Role Description" resourceId="JoinTree_1.CI_ROLE_L.DESCR"></item>
+        <item id="BATCH_CD" label="Batch Code" resourceId="JoinTree_1.CI_TD_ENTRY.BATCH_CD"></item>
+        <item id="BATCH_NBR" label="Batch Number" resourceId="JoinTree_1.CI_TD_ENTRY.BATCH_NBR"></item>
+        <item id="MESSAGE_CAT_NBR" label="Message Category Number" resourceId="JoinTree_1.CI_TD_ENTRY.MESSAGE_CAT_NBR"></item>
+        <item id="MESSAGE_NBR" label="Message Number" resourceId="JoinTree_1.CI_TD_ENTRY.MESSAGE_NBR"></item>
+        <item id="MESSAGE_TEXT" label="Message Text" resourceId="JoinTree_1.CI_MSG_L.MESSAGE_TEXT"></item>
+        <item id="COMMENTS" label="Comments" resourceId="JoinTree_1.CI_TD_ENTRY.COMMENTS"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_CONTEXT_KEYS" label="Resolved Foreign Key Context" resourceId="JoinTree_1">
+      <items>
+        <item id="SA_ID" label="Service Agreement ID" resourceId="JoinTree_1.CMS_TD_ENTRY_CTX_RESOLVED.SA_ID"></item>
+        <item id="ACCT_ID_DIRECT" label="Account ID (Direct FK)" resourceId="JoinTree_1.CMS_TD_ENTRY_CTX_RESOLVED.ACCT_ID_DIRECT"></item>
+        <item id="ACCT_ID_RESOLVED" label="Account ID (Resolved)" resourceId="JoinTree_1.CMS_TD_ENTRY_CTX_RESOLVED.ACCT_ID_RESOLVED"></item>
+        <item id="PER_ID" label="Person ID" resourceId="JoinTree_1.CMS_TD_ENTRY_CTX_RESOLVED.PER_ID"></item>
+        <item id="PREM_ID" label="Premise ID" resourceId="JoinTree_1.CMS_TD_ENTRY_CTX_RESOLVED.PREM_ID"></item>
+        <item id="D1_SP_ID" label="Service Point ID" resourceId="JoinTree_1.CMS_TD_ENTRY_CTX_RESOLVED.D1_SP_ID"></item>
+        <item id="D1_DEVICE_ID" label="Device ID" resourceId="JoinTree_1.CMS_TD_ENTRY_CTX_RESOLVED.D1_DEVICE_ID"></item>
+        <item id="MEASR_COMP_ID" label="Measuring Component ID" resourceId="JoinTree_1.CMS_TD_ENTRY_CTX_RESOLVED.MEASR_COMP_ID"></item>
+        <item id="CONTACT_ID" label="Contact ID" resourceId="JoinTree_1.CMS_TD_ENTRY_CTX_RESOLVED.CONTACT_ID"></item>
+        <item id="US_ID" label="Usage Subscription ID" resourceId="JoinTree_1.CMS_TD_ENTRY_CTX_RESOLVED.US_ID"></item>
+        <item id="ASSET_ID" label="Asset ID" resourceId="JoinTree_1.CMS_TD_ENTRY_CTX_RESOLVED.ASSET_ID"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_ACCOUNT" label="Account Context" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID" label="Account ID" resourceId="JoinTree_1.CMS_TD_ENTRY_CTX_RESOLVED.ACCT_ID_RESOLVED"></item>
+        <item id="CIS_DIVISION" label="CIS Division" resourceId="JoinTree_1.CI_ACCT_1.CIS_DIVISION"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle Code" resourceId="JoinTree_1.CI_ACCT_1.BILL_CYC_CD"></item>
+        <item id="BILL_CYC_DESCR" label="Bill Cycle Description" resourceId="JoinTree_1.CI_BILL_CYC_L.DESCR"></item>
+        <item id="CUST_CL_CD" label="Customer Class Code" resourceId="JoinTree_1.CI_ACCT_1.CUST_CL_CD"></item>
+        <item id="CUST_CL_DESCR" label="Customer Class Description" resourceId="JoinTree_1.CI_CUST_CL_L.DESCR"></item>
+        <item id="COLL_CL_CD" label="Collection Class Code" resourceId="JoinTree_1.CI_ACCT_1.COLL_CL_CD"></item>
+        <item id="COLL_CL_DESCR" label="Collection Class Description" resourceId="JoinTree_1.CI_COLL_CL_L.DESCR"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_PERSON_PREMISE" label="Person And Premise" resourceId="JoinTree_1">
+      <items>
+        <item id="ENTITY_NAME_UPR" label="Person Name" resourceId="JoinTree_1.CI_PER_NAME.ENTITY_NAME_UPR"></item>
+        <item id="PREM_ADDRESS1" label="Premise Address" resourceId="JoinTree_1.CI_PREM.ADDRESS1"></item>
+        <item id="PREM_CITY" label="Premise City" resourceId="JoinTree_1.CI_PREM.CITY"></item>
+        <item id="PREM_POSTAL" label="Premise Postal" resourceId="JoinTree_1.CI_PREM.POSTAL"></item>
+        <item id="POSTAL_5" label="Premise Postal (First Five)" resourceId="JoinTree_1.POSTAL_5"></item>
+        <item id="PREM_TYPE_CD" label="Premise Type Code" resourceId="JoinTree_1.CI_PREM.PREM_TYPE_CD"></item>
+        <item id="PREM_TYPE_DESCR" label="Premise Type Description" resourceId="JoinTree_1.CI_PREM_TYPE_L.DESCR"></item>
+        <item id="TREND_AREA_CD" label="Trend Area Code" resourceId="JoinTree_1.CI_PREM.TREND_AREA_CD"></item>
+        <item id="TREND_AREA_DESCR" label="Trend Area Description" resourceId="JoinTree_1.CI_TREND_AREA_L.DESCR"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_TIMES" label="Age And Durations" resourceId="JoinTree_1">
+      <items>
+        <item id="DAYS_OLD" label="Days Old" resourceId="JoinTree_1.DAYS_OLD"></item>
+        <item id="UNASSIGNED_TM_DAYS" label="Unassigned Duration (Days)" resourceId="JoinTree_1.CMS_TD_ENTRY_TIMES.UNASSIGNED_TM_DAYS"></item>
+        <item id="UNASSIGNED_TM_MINS" label="Unassigned Duration (Minutes)" resourceId="JoinTree_1.CMS_TD_ENTRY_TIMES.UNASSIGNED_TM_MINS"></item>
+        <item id="ASSIGNED_TM_DAYS" label="Assigned Duration (Days)" resourceId="JoinTree_1.CMS_TD_ENTRY_TIMES.ASSIGNED_TM_DAYS"></item>
+        <item id="ASSIGNED_TM_MINS" label="Assigned Duration (Minutes)" resourceId="JoinTree_1.CMS_TD_ENTRY_TIMES.ASSIGNED_TM_MINS"></item>
+        <item id="COMPLETE_TM_DAYS" label="Completion Duration (Days)" resourceId="JoinTree_1.CMS_TD_ENTRY_TIMES.COMPLETE_TM_DAYS"></item>
+        <item id="COMPLETE_TM_MINS" label="Completion Duration (Minutes)" resourceId="JoinTree_1.CMS_TD_ENTRY_TIMES.COMPLETE_TM_MINS"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_MEASURES" label="Measures" resourceId="JoinTree_1">
+      <items>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="TD_ENTRY_COUNT" label="Distinct To Do Count" resourceId="JoinTree_1.CI_TD_ENTRY.TD_ENTRY_ID"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="OPEN_TODO_COUNT" label="Open To Do Count" resourceId="JoinTree_1.OPEN_TD_ROW"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="WORKING_TODO_COUNT" label="Working To Do Count" resourceId="JoinTree_1.WORKING_TD_ROW"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="COMPLETED_TODO_COUNT" label="Completed To Do Count" resourceId="JoinTree_1.COMPLETE_TD_ROW"></item>
+        <item defaultAgg="Average" dimensionOrMeasure="Measure" id="AVG_UNASSIGNED_DAYS" label="Average Unassigned Days" resourceId="JoinTree_1.CMS_TD_ENTRY_TIMES.UNASSIGNED_TM_DAYS"></item>
+        <item defaultAgg="Average" dimensionOrMeasure="Measure" id="AVG_ASSIGNED_DAYS" label="Average Assigned Days" resourceId="JoinTree_1.CMS_TD_ENTRY_TIMES.ASSIGNED_TM_DAYS"></item>
+        <item defaultAgg="Average" dimensionOrMeasure="Measure" id="AVG_COMPLETE_DAYS" label="Average Complete Days" resourceId="JoinTree_1.CMS_TD_ENTRY_TIMES.COMPLETE_TM_DAYS"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+
+  <resources>
+    <jdbcQuery id="CI_TD_ENTRY" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="TD_ENTRY_ID" type="java.lang.String"></field>
+        <field id="BATCH_CD" type="java.lang.String"></field>
+        <field id="BATCH_NBR" type="java.math.BigDecimal"></field>
+        <field id="MESSAGE_CAT_NBR" type="java.math.BigDecimal"></field>
+        <field id="MESSAGE_NBR" type="java.math.BigDecimal"></field>
+        <field id="ASSIGNED_TO" type="java.lang.String"></field>
+        <field id="TD_TYPE_CD" type="java.lang.String"></field>
+        <field id="ROLE_ID" type="java.lang.String"></field>
+        <field id="ENTRY_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ASSIGNED_DTTM" type="java.sql.Timestamp"></field>
+        <field id="COMPLETE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="COMPLETE_USER_ID" type="java.lang.String"></field>
+        <field id="COMMENTS" type="java.lang.String"></field>
+        <field id="ASSIGNED_USER_ID" type="java.lang.String"></field>
+        <field id="TD_PRIORITY_FLG" type="java.lang.String"></field>
+      </fieldList>
+      <query>select tde.td_entry_id, tde.batch_cd, tde.batch_nbr, tde.message_cat_nbr, tde.message_nbr, tde.assigned_to, tde.td_type_cd, tde.role_id, tde.entry_status_flg, tde.cre_dttm, tde.assigned_dttm, tde.complete_dttm, tde.complete_user_id, tde.comments, tde.assigned_user_id, tde.td_priority_flg from cisadm.ci_td_entry tde where tde.cre_dttm >= trunc(sysdate) - 365 and tde.cre_dttm &lt; trunc(sysdate) + 1 and tde.td_entry_id is not null</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="CMS_TD_ENTRY_CTX_RESOLVED" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="TD_ENTRY_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID_DIRECT" type="java.lang.String"></field>
+        <field id="ACCT_ID_RESOLVED" type="java.lang.String"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="CONTACT_ID" type="java.lang.String"></field>
+        <field id="US_ID" type="java.lang.String"></field>
+        <field id="ASSET_ID" type="java.lang.String"></field>
+      </fieldList>
+      <query>select td.td_entry_id, max(case when trim(fkr.tbl_name) = 'CI_SA' then trim(tdc.char_val_fk1) end) as sa_id, max(case when trim(fkr.tbl_name) = 'CI_ACCT' then trim(tdc.char_val_fk1) end) as acct_id_direct, coalesce(max(case when trim(fkr.tbl_name) = 'CI_ACCT' then trim(tdc.char_val_fk1) end), max(case when trim(fkr.tbl_name) = 'CI_SA' then sa.acct_id end)) as acct_id_resolved, max(case when trim(fkr.tbl_name) = 'CI_PER' then trim(tdc.char_val_fk1) end) as per_id, max(case when trim(fkr.tbl_name) = 'CI_PREM' then trim(tdc.char_val_fk1) end) as prem_id, max(case when trim(fkr.tbl_name) = 'D1_SP' then trim(tdc.char_val_fk1) end) as d1_sp_id, max(case when trim(fkr.tbl_name) = 'D1_DVC' then trim(tdc.char_val_fk1) end) as d1_device_id, max(case when trim(fkr.tbl_name) = 'D1_MEASR_COMP' then trim(tdc.char_val_fk1) end) as measr_comp_id, max(case when trim(fkr.tbl_name) = 'D1_CONTACT' then trim(tdc.char_val_fk1) end) as contact_id, max(case when trim(fkr.tbl_name) = 'D1_US' then trim(tdc.char_val_fk1) end) as us_id, max(case when trim(fkr.tbl_name) = 'W1_ASSET' then trim(tdc.char_val_fk1) end) as asset_id from cisadm.ci_td_entry td left join cisadm.ci_td_entry_cha tdc on tdc.td_entry_id = td.td_entry_id left join cisadm.ci_char_type ct on ct.char_type_cd = tdc.char_type_cd and ct.char_type_flg = 'FKV' left join cisadm.ci_fk_ref fkr on fkr.fk_ref_cd = ct.fk_ref_cd and trim(fkr.tbl_name) in ('CI_SA', 'CI_ACCT', 'CI_PER', 'CI_PREM', 'D1_SP', 'D1_DVC', 'D1_MEASR_COMP', 'D1_CONTACT', 'D1_US', 'W1_ASSET') left join cisadm.ci_sa sa on trim(fkr.tbl_name) = 'CI_SA' and sa.sa_id = trim(tdc.char_val_fk1) where td.cre_dttm >= trunc(sysdate) - 365 and td.cre_dttm &lt; trunc(sysdate) + 1 group by td.td_entry_id</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="CMS_TD_ENTRY_TIMES" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="TD_ENTRY_ID" type="java.lang.String"></field>
+        <field id="UNASSIGNED_TM_MINS" type="java.math.BigDecimal"></field>
+        <field id="ASSIGNED_TM_MINS" type="java.math.BigDecimal"></field>
+        <field id="COMPLETE_TM_MINS" type="java.math.BigDecimal"></field>
+        <field id="UNASSIGNED_TM_DAYS" type="java.math.BigDecimal"></field>
+        <field id="ASSIGNED_TM_DAYS" type="java.math.BigDecimal"></field>
+        <field id="COMPLETE_TM_DAYS" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select tde.td_entry_id, case when tde.entry_status_flg = 'O' then round(current_date - tde.cre_dttm, 2) * 24 * 60 else round(tde.assigned_dttm - tde.cre_dttm, 2) * 24 * 60 end as unassigned_tm_mins, case when tde.entry_status_flg = 'W' then round(current_date - tde.assigned_dttm, 2) * 24 * 60 when tde.entry_status_flg = 'C' then round(tde.complete_dttm - tde.assigned_dttm, 2) * 24 * 60 else 0 end as assigned_tm_mins, case when tde.entry_status_flg = 'C' then round(tde.complete_dttm - tde.cre_dttm, 2) * 24 * 60 else 0 end as complete_tm_mins, case when tde.entry_status_flg = 'O' then round(current_date - tde.cre_dttm, 0) else round(tde.assigned_dttm - tde.cre_dttm, 0) end as unassigned_tm_days, case when tde.entry_status_flg = 'W' then round(current_date - tde.assigned_dttm, 0) when tde.entry_status_flg = 'C' then round(tde.complete_dttm - tde.assigned_dttm, 0) else 0 end as assigned_tm_days, case when tde.entry_status_flg = 'C' then round(tde.complete_dttm - tde.cre_dttm, 0) else 0 end as complete_tm_days from cisadm.ci_td_entry tde where tde.cre_dttm >= trunc(sysdate) - 365 and tde.cre_dttm &lt; trunc(sysdate) + 1</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="LKP_ENTRY_STATUS" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <query>select l.field_value, l.descr from cisadm.ci_lookup_val_l l where l.field_name = 'ENTRY_STATUS_FLG' and l.language_cd = 'ENG'</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="LKP_TD_PRIORITY" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <query>select l.field_value, l.descr from cisadm.ci_lookup_val_l l where l.field_name = 'TD_PRIORITY_FLG' and l.language_cd = 'ENG'</query>
+    </jdbcQuery>
+
+    <jdbcTable id="CI_TD_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_TD_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="TD_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_ROLE_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ROLE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ROLE_ID" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="SC_USER" datasourceId="Origin_DEV_DS" datasourceTableName="SC_USER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="FIRST_NAME" type="java.lang.String"></field>
+        <field id="LAST_NAME" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="SC_USER_1" datasourceId="Origin_DEV_DS" datasourceTableName="SC_USER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="FIRST_NAME" type="java.lang.String"></field>
+        <field id="LAST_NAME" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="SC_USER_2" datasourceId="Origin_DEV_DS" datasourceTableName="SC_USER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="FIRST_NAME" type="java.lang.String"></field>
+        <field id="LAST_NAME" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_MSG_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_MSG_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="MESSAGE_CAT_NBR" type="java.math.BigDecimal"></field>
+        <field id="MESSAGE_NBR" type="java.math.BigDecimal"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="MESSAGE_TEXT" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_PER_NAME" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PER_NAME" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="ENTITY_NAME_UPR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_PREM" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PREM" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="PREM_TYPE_CD" type="java.lang.String"></field>
+        <field id="TREND_AREA_CD" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="CITY" type="java.lang.String"></field>
+        <field id="POSTAL" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_PREM_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PREM_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PREM_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_TREND_AREA_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_TREND_AREA_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="TREND_AREA_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_ACCT_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="COLL_CL_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_BILL_CYC_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BILL_CYC_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_CUST_CL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_CUST_CL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_COLL_CL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_COLL_CL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="COLL_CL_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_TD_ENTRY" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CI_TD_ENTRY.TD_ENTRY_ID" type="java.lang.String"></field>
+        <field id="CI_TD_ENTRY.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_TD_ENTRY.ASSIGNED_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_TD_ENTRY.COMPLETE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_TD_ENTRY.ASSIGNED_TO" type="java.lang.String"></field>
+        <field id="CI_TD_ENTRY.ASSIGNED_USER_ID" type="java.lang.String"></field>
+        <field id="CI_TD_ENTRY.COMPLETE_USER_ID" type="java.lang.String"></field>
+        <field id="CI_TD_ENTRY.ENTRY_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CI_TD_ENTRY.TD_PRIORITY_FLG" type="java.lang.String"></field>
+        <field id="CI_TD_ENTRY.TD_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_TD_ENTRY.ROLE_ID" type="java.lang.String"></field>
+        <field id="CI_TD_ENTRY.BATCH_CD" type="java.lang.String"></field>
+        <field id="CI_TD_ENTRY.BATCH_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_TD_ENTRY.MESSAGE_CAT_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_TD_ENTRY.MESSAGE_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_TD_ENTRY.COMMENTS" type="java.lang.String"></field>
+
+        <field id="CMS_TD_ENTRY_CTX_RESOLVED.TD_ENTRY_ID" type="java.lang.String"></field>
+        <field id="CMS_TD_ENTRY_CTX_RESOLVED.SA_ID" type="java.lang.String"></field>
+        <field id="CMS_TD_ENTRY_CTX_RESOLVED.ACCT_ID_DIRECT" type="java.lang.String"></field>
+        <field id="CMS_TD_ENTRY_CTX_RESOLVED.ACCT_ID_RESOLVED" type="java.lang.String"></field>
+        <field id="CMS_TD_ENTRY_CTX_RESOLVED.PER_ID" type="java.lang.String"></field>
+        <field id="CMS_TD_ENTRY_CTX_RESOLVED.PREM_ID" type="java.lang.String"></field>
+        <field id="CMS_TD_ENTRY_CTX_RESOLVED.D1_SP_ID" type="java.lang.String"></field>
+        <field id="CMS_TD_ENTRY_CTX_RESOLVED.D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="CMS_TD_ENTRY_CTX_RESOLVED.MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="CMS_TD_ENTRY_CTX_RESOLVED.CONTACT_ID" type="java.lang.String"></field>
+        <field id="CMS_TD_ENTRY_CTX_RESOLVED.US_ID" type="java.lang.String"></field>
+        <field id="CMS_TD_ENTRY_CTX_RESOLVED.ASSET_ID" type="java.lang.String"></field>
+
+        <field id="CMS_TD_ENTRY_TIMES.TD_ENTRY_ID" type="java.lang.String"></field>
+        <field id="CMS_TD_ENTRY_TIMES.UNASSIGNED_TM_MINS" type="java.math.BigDecimal"></field>
+        <field id="CMS_TD_ENTRY_TIMES.ASSIGNED_TM_MINS" type="java.math.BigDecimal"></field>
+        <field id="CMS_TD_ENTRY_TIMES.COMPLETE_TM_MINS" type="java.math.BigDecimal"></field>
+        <field id="CMS_TD_ENTRY_TIMES.UNASSIGNED_TM_DAYS" type="java.math.BigDecimal"></field>
+        <field id="CMS_TD_ENTRY_TIMES.ASSIGNED_TM_DAYS" type="java.math.BigDecimal"></field>
+        <field id="CMS_TD_ENTRY_TIMES.COMPLETE_TM_DAYS" type="java.math.BigDecimal"></field>
+
+        <field id="LKP_ENTRY_STATUS.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LKP_ENTRY_STATUS.DESCR" type="java.lang.String"></field>
+        <field id="LKP_TD_PRIORITY.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LKP_TD_PRIORITY.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_TD_TYPE_L.TD_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_TD_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_TD_TYPE_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_ROLE_L.ROLE_ID" type="java.lang.String"></field>
+        <field id="CI_ROLE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_ROLE_L.DESCR" type="java.lang.String"></field>
+
+        <field id="SC_USER.USER_ID" type="java.lang.String"></field>
+        <field id="SC_USER.FIRST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER.LAST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER_1.USER_ID" type="java.lang.String"></field>
+        <field id="SC_USER_1.FIRST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER_1.LAST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER_2.USER_ID" type="java.lang.String"></field>
+        <field id="SC_USER_2.FIRST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER_2.LAST_NAME" type="java.lang.String"></field>
+
+        <field id="CI_MSG_L.MESSAGE_CAT_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_MSG_L.MESSAGE_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_MSG_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_MSG_L.MESSAGE_TEXT" type="java.lang.String"></field>
+
+        <field id="CI_PER_NAME.PER_ID" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.ENTITY_NAME_UPR" type="java.lang.String"></field>
+
+        <field id="CI_PREM.PREM_ID" type="java.lang.String"></field>
+        <field id="CI_PREM.PREM_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_PREM.TREND_AREA_CD" type="java.lang.String"></field>
+        <field id="CI_PREM.ADDRESS1" type="java.lang.String"></field>
+        <field id="CI_PREM.CITY" type="java.lang.String"></field>
+        <field id="CI_PREM.POSTAL" type="java.lang.String"></field>
+
+        <field id="CI_PREM_TYPE_L.PREM_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_PREM_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_PREM_TYPE_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_TREND_AREA_L.TREND_AREA_CD" type="java.lang.String"></field>
+        <field id="CI_TREND_AREA_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_TREND_AREA_L.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_ACCT_1.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_1.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CI_ACCT_1.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_1.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_1.COLL_CL_CD" type="java.lang.String"></field>
+        <field id="CI_BILL_CYC_L.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_BILL_CYC_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_BILL_CYC_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_CUST_CL_L.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CI_CUST_CL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_CUST_CL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_COLL_CL_L.COLL_CL_CD" type="java.lang.String"></field>
+        <field id="CI_COLL_CL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_COLL_CL_L.DESCR" type="java.lang.String"></field>
+
+        <field id="ASSIGNED_TO_NAME" dataSetExpression="Concatenate(SC_USER.FIRST_NAME, ' ', SC_USER.LAST_NAME)" type="java.lang.String"></field>
+        <field id="ASSIGNED_USER_ID_NAME" dataSetExpression="Concatenate(SC_USER_1.FIRST_NAME, ' ', SC_USER_1.LAST_NAME)" type="java.lang.String"></field>
+        <field id="COMPLETE_USER_ID_NAME" dataSetExpression="Concatenate(SC_USER_2.FIRST_NAME, ' ', SC_USER_2.LAST_NAME)" type="java.lang.String"></field>
+        <field id="POSTAL_5" dataSetExpression="Substr(CI_PREM.POSTAL, 1, 5)" type="java.lang.String"></field>
+        <field id="DAYS_OLD" dataSetExpression="ElapsedDays(CI_TD_ENTRY.CRE_DTTM, Today(0))" type="java.math.BigDecimal"></field>
+        <field id="OPEN_TD_ROW" dataSetExpression="IF(CI_TD_ENTRY.ENTRY_STATUS_FLG == 'O', 1, 0)" type="java.math.BigDecimal"></field>
+        <field id="WORKING_TD_ROW" dataSetExpression="IF(CI_TD_ENTRY.ENTRY_STATUS_FLG == 'W', 1, 0)" type="java.math.BigDecimal"></field>
+        <field id="COMPLETE_TD_ROW" dataSetExpression="IF(CI_TD_ENTRY.ENTRY_STATUS_FLG == 'C', 1, 0)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <joinInfo alias="CI_TD_ENTRY" referenceId="CI_TD_ENTRY"></joinInfo>
+      <joinList>
+        <join expr="CI_TD_ENTRY.TD_ENTRY_ID == CMS_TD_ENTRY_CTX_RESOLVED.TD_ENTRY_ID" left="CI_TD_ENTRY" right="CMS_TD_ENTRY_CTX_RESOLVED" type="leftOuter" weight="1"></join>
+        <join expr="CI_TD_ENTRY.TD_ENTRY_ID == CMS_TD_ENTRY_TIMES.TD_ENTRY_ID" left="CI_TD_ENTRY" right="CMS_TD_ENTRY_TIMES" type="leftOuter" weight="1"></join>
+        <join expr="CI_TD_ENTRY.ENTRY_STATUS_FLG == LKP_ENTRY_STATUS.FIELD_VALUE" left="CI_TD_ENTRY" right="LKP_ENTRY_STATUS" type="leftOuter" weight="1"></join>
+        <join expr="CI_TD_ENTRY.TD_PRIORITY_FLG == LKP_TD_PRIORITY.FIELD_VALUE" left="CI_TD_ENTRY" right="LKP_TD_PRIORITY" type="leftOuter" weight="1"></join>
+        <join expr="CI_TD_ENTRY.TD_TYPE_CD == CI_TD_TYPE_L.TD_TYPE_CD and CI_TD_TYPE_L.LANGUAGE_CD == 'ENG'" left="CI_TD_ENTRY" right="CI_TD_TYPE_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_TD_ENTRY.ROLE_ID == CI_ROLE_L.ROLE_ID and CI_ROLE_L.LANGUAGE_CD == 'ENG'" left="CI_TD_ENTRY" right="CI_ROLE_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_TD_ENTRY.ASSIGNED_TO == SC_USER.USER_ID" left="CI_TD_ENTRY" right="SC_USER" type="leftOuter" weight="1"></join>
+        <join expr="CI_TD_ENTRY.ASSIGNED_USER_ID == SC_USER_1.USER_ID" left="CI_TD_ENTRY" right="SC_USER_1" type="leftOuter" weight="1"></join>
+        <join expr="CI_TD_ENTRY.COMPLETE_USER_ID == SC_USER_2.USER_ID" left="CI_TD_ENTRY" right="SC_USER_2" type="leftOuter" weight="1"></join>
+        <join expr="CI_TD_ENTRY.MESSAGE_CAT_NBR == CI_MSG_L.MESSAGE_CAT_NBR and CI_TD_ENTRY.MESSAGE_NBR == CI_MSG_L.MESSAGE_NBR and CI_MSG_L.LANGUAGE_CD == 'ENG'" left="CI_TD_ENTRY" right="CI_MSG_L" type="leftOuter" weight="1"></join>
+        <join expr="CMS_TD_ENTRY_CTX_RESOLVED.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'" left="CMS_TD_ENTRY_CTX_RESOLVED" right="CI_PER_NAME" type="leftOuter" weight="1"></join>
+        <join expr="CMS_TD_ENTRY_CTX_RESOLVED.PREM_ID == CI_PREM.PREM_ID" left="CMS_TD_ENTRY_CTX_RESOLVED" right="CI_PREM" type="leftOuter" weight="1"></join>
+        <join expr="CI_PREM.PREM_TYPE_CD == CI_PREM_TYPE_L.PREM_TYPE_CD and CI_PREM_TYPE_L.LANGUAGE_CD == 'ENG'" left="CI_PREM" right="CI_PREM_TYPE_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_PREM.TREND_AREA_CD == CI_TREND_AREA_L.TREND_AREA_CD and CI_TREND_AREA_L.LANGUAGE_CD == 'ENG'" left="CI_PREM" right="CI_TREND_AREA_L" type="leftOuter" weight="1"></join>
+        <join expr="CMS_TD_ENTRY_CTX_RESOLVED.ACCT_ID_RESOLVED == CI_ACCT_1.ACCT_ID" left="CMS_TD_ENTRY_CTX_RESOLVED" right="CI_ACCT_1" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_1.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT_1" right="CI_BILL_CYC_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_1.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT_1" right="CI_CUST_CL_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_1.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT_1" right="CI_COLL_CL_L" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_TD_ENTRY" tableId="CI_TD_ENTRY"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CMS_TD_ENTRY_CTX_RESOLVED" tableId="CMS_TD_ENTRY_CTX_RESOLVED"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CMS_TD_ENTRY_TIMES" tableId="CMS_TD_ENTRY_TIMES"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="LKP_ENTRY_STATUS" tableId="LKP_ENTRY_STATUS"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="LKP_TD_PRIORITY" tableId="LKP_TD_PRIORITY"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_TD_TYPE_L" tableId="CI_TD_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ROLE_L" tableId="CI_ROLE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_USER" tableId="SC_USER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_USER_1" tableId="SC_USER_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_USER_2" tableId="SC_USER_2"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_MSG_L" tableId="CI_MSG_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PREM" tableId="CI_PREM"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PREM_TYPE_L" tableId="CI_PREM_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_TREND_AREA_L" tableId="CI_TREND_AREA_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_1" tableId="CI_ACCT_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BILL_CYC_L" tableId="CI_BILL_CYC_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_CUST_CL_L" tableId="CI_CUST_CL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_COLL_CL_L" tableId="CI_COLL_CL_L"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

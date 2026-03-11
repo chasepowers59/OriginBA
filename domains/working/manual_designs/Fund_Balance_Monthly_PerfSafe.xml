@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="Fund Balance Monthly Perf Safe" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="ACCOUNTING_MONTH" label="Accounting Month (YYYYMM)" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.ACCOUNTING_MONTH"></item>
+    <item id="BEGIN_ACCOUNTING_DT" label="Begin Accounting Date" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.BEGIN_ACCOUNTING_DT"></item>
+    <item id="GL_DIVISION" label="GL Division" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.GL_DIVISION"></item>
+    <item id="CIS_DIVISION" label="CIS Division" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.CIS_DIVISION"></item>
+    <item id="CUSTOMER_CLASS" label="Customer Class" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.CUST_CL_CD"></item>
+    <item id="SA_TYPE_CD" label="SA Type" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.SA_TYPE_CD"></item>
+    <item id="RS_CD" label="Rate Schedule" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.RS_CD"></item>
+    <item id="FT_TYPE_FLG" label="FT Type Code" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_TYPE_FLG"></item>
+    <item id="FT_TYPE_DESC" label="FT Type Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+    <item id="GL_ACCT" label="GL Account" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.GL_ACCT"></item>
+    <item id="DST_ID" label="Distribution Code ID" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.DST_ID"></item>
+    <item id="FUND_CD" label="Fund Code" resourceId="JoinTree_1.CI_DST_CODE_EFF.FUND_CD"></item>
+    <item id="FUND_DESCR" label="Fund Description" resourceId="JoinTree_1.CI_FUND_L.DESCR"></item>
+    <item id="FUND_TYPE_FLG" label="Fund Type Code" resourceId="JoinTree_1.CI_FUND.FUND_TYPE_FLG"></item>
+    <item id="FUND_TYPE_DESC" label="Fund Type Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_1.DESCR"></item>
+
+    <item id="FT_GL_DEBIT_AMT" label="GL Debit Amount" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_GL_DEBIT_AMT"></item>
+    <item id="FT_GL_CREDIT_AMT" label="GL Credit Amount" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_GL_CREDIT_AMT"></item>
+    <item id="FT_GL_REV_AMT" label="GL Revenue Amount" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_GL_REV_AMT"></item>
+    <item id="FT_GL_TAX_AMT" label="GL Tax Amount" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_GL_TAX_AMT"></item>
+    <item id="FT_GL_AMT" label="GL Net Amount" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_GL_AMT"></item>
+    <item id="STATISTIC_AMT" label="Statistic Amount" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.STATISTIC_AMT"></item>
+    <item id="FT_GL_CNT" label="GL Line Count (Monthly)" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_GL_CNT"></item>
+
+    <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_GL_NET_AMOUNT" label="Total GL Net Amount" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_GL_AMT"></item>
+    <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_GL_DEBIT_AMOUNT" label="Total GL Debit Amount" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_GL_DEBIT_AMT"></item>
+    <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_GL_CREDIT_AMOUNT" label="Total GL Credit Amount" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_GL_CREDIT_AMT"></item>
+    <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_GL_REVENUE_AMOUNT" label="Total GL Revenue Amount" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_GL_REV_AMT"></item>
+    <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_GL_TAX_AMOUNT" label="Total GL Tax Amount" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_GL_TAX_AMT"></item>
+    <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_GL_LINE_COUNT" label="Total GL Line Count" resourceId="JoinTree_1.C1_BI_FTGL_MONTHLY_A.FT_GL_CNT"></item>
+  </items>
+  <resources>
+    <jdbcTable id="C1_BI_FTGL_MONTHLY_A" datasourceId="Origin_DEV_DS" datasourceTableName="C1_BI_FTGL_MONTHLY_A" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCOUNTING_MONTH" type="java.math.BigDecimal"></field>
+        <field id="GL_DIVISION" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="RS_CD" type="java.lang.String"></field>
+        <field id="FT_TYPE_FLG" type="java.lang.String"></field>
+        <field id="GL_ACCT" type="java.lang.String"></field>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="FT_GL_DEBIT_AMT" type="java.math.BigDecimal"></field>
+        <field id="FT_GL_CREDIT_AMT" type="java.math.BigDecimal"></field>
+        <field id="FT_GL_REV_AMT" type="java.math.BigDecimal"></field>
+        <field id="FT_GL_TAX_AMT" type="java.math.BigDecimal"></field>
+        <field id="FT_GL_AMT" type="java.math.BigDecimal"></field>
+        <field id="STATISTIC_AMT" type="java.math.BigDecimal"></field>
+        <field id="FT_GL_CNT" type="java.math.BigDecimal"></field>
+        <field id="BEGIN_ACCOUNTING_DT" type="java.sql.Timestamp"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_DST_CODE_EFF" datasourceId="Origin_DEV_DS" datasourceTableName="CI_DST_CODE_EFF" schemaAlias="CISADM">
+      <fieldList>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="EFFDT" type="java.sql.Timestamp"></field>
+        <field id="EFF_STATUS" type="java.lang.String"></field>
+        <field id="GL_ACCT" type="java.lang.String"></field>
+        <field id="FUND_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_FUND" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FUND" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FUND_CD" type="java.lang.String"></field>
+        <field id="FUND_TYPE_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_FUND_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FUND_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FUND_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="C1_BI_FTGL_MONTHLY_A" schemaAlias="CISADM">
+      <fieldList>
+        <field id="C1_BI_FTGL_MONTHLY_A.ACCOUNTING_MONTH" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.BEGIN_ACCOUNTING_DT" type="java.sql.Timestamp"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.GL_DIVISION" type="java.lang.String"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.RS_CD" type="java.lang.String"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.FT_TYPE_FLG" type="java.lang.String"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.GL_ACCT" type="java.lang.String"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.DST_ID" type="java.lang.String"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.FT_GL_DEBIT_AMT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.FT_GL_CREDIT_AMT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.FT_GL_REV_AMT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.FT_GL_TAX_AMT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.FT_GL_AMT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.STATISTIC_AMT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FTGL_MONTHLY_A.FT_GL_CNT" type="java.math.BigDecimal"></field>
+
+        <field id="CI_DST_CODE_EFF.DST_ID" type="java.lang.String"></field>
+        <field id="CI_DST_CODE_EFF.EFFDT" type="java.sql.Timestamp"></field>
+        <field id="CI_DST_CODE_EFF.EFF_STATUS" type="java.lang.String"></field>
+        <field id="CI_DST_CODE_EFF.GL_ACCT" type="java.lang.String"></field>
+        <field id="CI_DST_CODE_EFF.FUND_CD" type="java.lang.String"></field>
+
+        <field id="CI_FUND.FUND_CD" type="java.lang.String"></field>
+        <field id="CI_FUND.FUND_TYPE_FLG" type="java.lang.String"></field>
+
+        <field id="CI_FUND_L.FUND_CD" type="java.lang.String"></field>
+        <field id="CI_FUND_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_FUND_L.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_LOOKUP_VAL_L_1.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>C1_BI_FTGL_MONTHLY_A.ACCOUNTING_MONTH >= 202602</filterString>
+      <joinInfo alias="C1_BI_FTGL_MONTHLY_A" referenceId="C1_BI_FTGL_MONTHLY_A"></joinInfo>
+      <joinList>
+        <join expr="C1_BI_FTGL_MONTHLY_A.FT_TYPE_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'FT_TYPE_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="C1_BI_FTGL_MONTHLY_A" right="CI_LOOKUP_VAL_L" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_FTGL_MONTHLY_A.DST_ID == CI_DST_CODE_EFF.DST_ID and C1_BI_FTGL_MONTHLY_A.GL_ACCT == CI_DST_CODE_EFF.GL_ACCT and CI_DST_CODE_EFF.EFF_STATUS == 'A'" left="C1_BI_FTGL_MONTHLY_A" right="CI_DST_CODE_EFF" type="leftOuter" weight="1"></join>
+        <join expr="CI_DST_CODE_EFF.FUND_CD == CI_FUND.FUND_CD" left="CI_DST_CODE_EFF" right="CI_FUND" type="leftOuter" weight="1"></join>
+        <join expr="CI_FUND.FUND_CD == CI_FUND_L.FUND_CD and CI_FUND_L.LANGUAGE_CD == 'ENG'" left="CI_FUND" right="CI_FUND_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_FUND.FUND_TYPE_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'FUND_TYPE_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'" left="CI_FUND" right="CI_LOOKUP_VAL_L_1" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="C1_BI_FTGL_MONTHLY_A" tableId="C1_BI_FTGL_MONTHLY_A"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_DST_CODE_EFF" tableId="CI_DST_CODE_EFF"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_FUND" tableId="CI_FUND"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_FUND_L" tableId="CI_FUND_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

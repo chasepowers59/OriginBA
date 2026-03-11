@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="Write Off Requirements Final (DB Validated)" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+
+  <itemGroups>
+    <itemGroup id="SET_PROCESS" label="Process Core" resourceId="JoinTree_1">
+      <items>
+        <item id="WRITE_OFF_PROCESS_ID" label="Write Off Process ID" resourceId="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_ID"></item>
+        <item id="ACCOUNT_ID" label="Account ID" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ACCT_ID"></item>
+        <item id="PERSON_ID" label="Person ID" resourceId="JoinTree_1.C1_BI_WOPROC_VW.PER_ID"></item>
+        <item id="PERSON_NAME" label="Person Name" resourceId="JoinTree_1.CI_PER_NAME.ENTITY_NAME"></item>
+        <item id="CURRENCY_CODE" label="Currency Code" resourceId="JoinTree_1.C1_BI_WOPROC_VW.CURRENCY_CD"></item>
+
+        <item id="PROCESS_START_DTTM" label="Process Start DTTM" resourceId="JoinTree_1.C1_BI_WOPROC_VW.CRE_DTTM"></item>
+        <item id="PROCESS_COMPLETE_DT" label="Process Complete Date" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_COMPL_DT"></item>
+        <item id="PROCESS_DURATION_DAYS" label="Process Duration (Days)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_DUR"></item>
+
+        <item id="WO_STATUS_CODE" label="Write Off Status Code" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_STATUS_FLG"></item>
+        <item id="WO_STATUS_DESCRIPTION" label="Write Off Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+        <item id="UNCOLL_PROC_STATUS_CODE" label="Uncoll Process Status Code" resourceId="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_STAT_FLG"></item>
+        <item id="UNCOLL_PROC_STATUS_DESCRIPTION" label="Uncoll Process Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_1.DESCR"></item>
+        <item id="WO_STATUS_REASON_CODE" label="Write Off Status Reason Code" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_STAT_RSN_FLG"></item>
+        <item id="WO_STATUS_REASON_DESCRIPTION" label="Write Off Status Reason Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_2.DESCR"></item>
+
+        <item id="COMMENTS" label="Comments" resourceId="JoinTree_1.C1_BI_WOPROC_VW.COMMENTS"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_PROCESS_CONFIG" label="Process Configuration" resourceId="JoinTree_1">
+      <items>
+        <item id="WO_CONTROL_CODE" label="Write Off Control Code" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_CNTL_CD"></item>
+        <item id="WO_CONTROL_DESCRIPTION" label="Write Off Control Description" resourceId="JoinTree_1.CI_WO_CNTL_L.DESCR"></item>
+
+        <item id="WO_TEMPLATE_CODE" label="Write Off Template Code" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_TMPL_CD"></item>
+        <item id="WO_TEMPLATE_DESCRIPTION" label="Write Off Template Description" resourceId="JoinTree_1.CI_WO_PROC_TMPL_L.DESCR"></item>
+
+        <item id="EFF_EVENT_TYPE_CODE" label="Effective Event Type Code" resourceId="JoinTree_1.C1_BI_WOPROC_VW.EFF_WO_EVT_TYP_CD"></item>
+        <item id="EFF_EVENT_TYPE_DESCRIPTION" label="Effective Event Type Description" resourceId="JoinTree_1.CI_WO_EVT_TYP_L.DESCR"></item>
+
+        <item id="NEXT_EVENT_TYPE_CODE" label="Next Event Type Code" resourceId="JoinTree_1.C1_BI_WOPROC_VW.NEXT_WO_EVT_TYP_CD"></item>
+        <item id="NEXT_EVENT_TYPE_DESCRIPTION" label="Next Event Type Description" resourceId="JoinTree_1.CI_WO_EVT_TYP_L_1.DESCR"></item>
+        <item id="NEXT_EVENT_TRIGGER_DATE" label="Next Event Trigger Date" resourceId="JoinTree_1.C1_BI_WOPROC_VW.NEXT_WO_EVT_TRIGGER_DT"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_AMOUNTS" label="Debt And Recovery" resourceId="JoinTree_1">
+      <items>
+        <item id="INIT_OUTSTANDING_AMT" label="Initial Outstanding Amount" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ARS_AT_START"></item>
+        <item id="END_OUTSTANDING_AMT" label="End Outstanding Amount" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ARS_AT_END"></item>
+        <item id="OUTSTANDING_DIFF_AMT" label="Outstanding Difference Amount" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ARS_DIFF"></item>
+        <item id="RECOVERY_AMT_EST_ROW" label="Recovery Amount Est (Row)" resourceId="JoinTree_1.RECOVERY_AMT_EST_ROW"></item>
+        <item id="PAY_SEG_AMT_IN_WINDOW_ROW" label="Payment Amount In Process Window (Row)" resourceId="JoinTree_1.PAY_SEG_AMT_IN_WINDOW_ROW"></item>
+        <item id="RECOVERY_RATE_EST_ROW" label="Estimated Recovery Rate (Row)" resourceId="JoinTree_1.RECOVERY_RATE_EST_ROW"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_PROCESS_COUNTS" label="Process Counters" resourceId="JoinTree_1">
+      <items>
+        <item id="ACTIVE_WO_PROC_CNT_ROW" label="Active Process Count (Row)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ACTIVE_WO_PROC_CNT"></item>
+        <item id="INACTIVE_WO_PROC_CNT_ROW" label="Inactive Process Count (Row)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.INACTIVE_WO_PROC_CNT"></item>
+        <item id="COMPL_WO_PROC_CNT_ROW" label="Completed Process Count (Row)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.COMPL_WO_PROC_CNT"></item>
+        <item id="CANCL_SYS_WO_PROC_CNT_ROW" label="Cancelled by System Count (Row)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.CANCL_SYS_WO_PROC_CNT"></item>
+        <item id="CANCL_USER_WO_PROC_CNT_ROW" label="Cancelled by User Count (Row)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.CANCL_USER_WO_PROC_CNT"></item>
+        <item id="EFF_WO_PROC_CNT_ROW" label="Effective Process Count (Row)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.EFF_WO_PROC_CNT"></item>
+        <item id="INEFF_WO_PROC_CNT_ROW" label="Ineffective Process Count (Row)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.INEFF_WO_PROC_CNT"></item>
+        <item id="TOTAL_SA_COUNT_ROW" label="Total SA Count (Row)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_TOT_SA_CNT"></item>
+        <item id="ACTIVE_SA_COUNT_ROW" label="Active SA Count (Row)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_ACT_SA_CNT"></item>
+        <item id="INACTIVE_SA_COUNT_ROW" label="Inactive SA Count (Row)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_INACT_SA_CNT"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_SA_PAYMENT" label="Payment Aggregates" resourceId="JoinTree_1">
+      <items>
+        <item id="PAYMENT_SEGMENT_COUNT_ROW" label="Payment Segment Count (Row)" resourceId="JoinTree_1.WO_PAY_AGG.PAY_SEGMENT_COUNT"></item>
+        <item id="PAYMENT_EVENT_COUNT_ROW" label="Payment Event Count (Row)" resourceId="JoinTree_1.WO_PAY_AGG.PAYMENT_EVENT_COUNT"></item>
+        <item id="PAY_SEG_AMT_TOTAL_ROW" label="Payment Segment Amount Total (Row)" resourceId="JoinTree_1.WO_PAY_AGG.PAY_SEG_AMT_TOTAL"></item>
+        <item id="FIRST_PAY_DT" label="First Payment Date" resourceId="JoinTree_1.WO_PAY_AGG.FIRST_PAY_DT"></item>
+        <item id="LAST_PAY_DT" label="Last Payment Date" resourceId="JoinTree_1.WO_PAY_AGG.LAST_PAY_DT"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_METRICS" label="Measures" resourceId="JoinTree_1">
+      <items>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="WRITE_OFF_PROCESS_COUNT" label="Write Off Process Count" resourceId="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="ACCOUNT_COUNT" label="Account Count" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ACCT_ID"></item>
+
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="INIT_OUTSTANDING_AMT_TOTAL" label="Initial Outstanding Amount Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ARS_AT_START"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="END_OUTSTANDING_AMT_TOTAL" label="End Outstanding Amount Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ARS_AT_END"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="OUTSTANDING_DIFF_AMT_TOTAL" label="Outstanding Difference Amount Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.ARS_DIFF"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="RECOVERY_AMT_EST_TOTAL" label="Recovery Amount Est Total" resourceId="JoinTree_1.RECOVERY_AMT_EST_ROW"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="PAY_SEG_AMT_IN_WINDOW_TOTAL" label="Payment Amount In Process Window Total" resourceId="JoinTree_1.PAY_SEG_AMT_IN_WINDOW_ROW"></item>
+        <item defaultAgg="Average" dimensionOrMeasure="Measure" id="AVG_RECOVERY_RATE_EST" label="Average Estimated Recovery Rate" resourceId="JoinTree_1.RECOVERY_RATE_EST_ROW"></item>
+
+        <item defaultAgg="Average" dimensionOrMeasure="Measure" id="AVG_PROCESS_DURATION_DAYS" label="Average Process Duration (Days)" resourceId="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_DUR"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="PAYMENT_SEGMENT_COUNT" label="Payment Segment Count (Agg Sum)" resourceId="JoinTree_1.WO_PAY_AGG.PAY_SEGMENT_COUNT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="PAYMENT_EVENT_COUNT" label="Payment Event Count (Agg Sum)" resourceId="JoinTree_1.WO_PAY_AGG.PAYMENT_EVENT_COUNT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="PAY_SEG_AMT_TOTAL" label="Payment Segment Amount Total" resourceId="JoinTree_1.WO_PAY_AGG.PAY_SEG_AMT_TOTAL"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_SA_COUNT_TOTAL" label="Total SA Count Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_TOT_SA_CNT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="ACTIVE_SA_COUNT_TOTAL" label="Active SA Count Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_ACT_SA_CNT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="INACTIVE_SA_COUNT_TOTAL" label="Inactive SA Count Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_INACT_SA_CNT"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+
+  <resources>
+    <jdbcTable id="C1_BI_WOPROC_VW" datasourceId="Origin_DEV_DS" datasourceTableName="C1_BI_WOPROC_VW" schemaAlias="CISADM">
+      <fieldList>
+        <field id="UNCOLL_PROC_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="CURRENCY_CD" type="java.lang.String"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="WO_PROC_COMPL_DT" type="java.sql.Timestamp"></field>
+        <field id="UNCOLL_PROC_DUR" type="java.math.BigDecimal"></field>
+        <field id="WO_STATUS_FLG" type="java.lang.String"></field>
+        <field id="UNCOLL_PROC_STAT_FLG" type="java.lang.String"></field>
+        <field id="WO_STAT_RSN_FLG" type="java.lang.String"></field>
+        <field id="COMMENTS" type="java.lang.String"></field>
+        <field id="WO_CNTL_CD" type="java.lang.String"></field>
+        <field id="WO_PROC_TMPL_CD" type="java.lang.String"></field>
+        <field id="EFF_WO_EVT_TYP_CD" type="java.lang.String"></field>
+        <field id="NEXT_WO_EVT_TYP_CD" type="java.lang.String"></field>
+        <field id="NEXT_WO_EVT_TRIGGER_DT" type="java.sql.Timestamp"></field>
+        <field id="ARS_AT_START" type="java.math.BigDecimal"></field>
+        <field id="ARS_AT_END" type="java.math.BigDecimal"></field>
+        <field id="ARS_DIFF" type="java.math.BigDecimal"></field>
+        <field id="ACTIVE_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="INACTIVE_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="COMPL_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="CANCL_SYS_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="CANCL_USER_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="EFF_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="INEFF_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="WO_PROC_TOT_SA_CNT" type="java.math.BigDecimal"></field>
+        <field id="WO_PROC_ACT_SA_CNT" type="java.math.BigDecimal"></field>
+        <field id="WO_PROC_INACT_SA_CNT" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_PER_NAME" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PER_NAME" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_LOOKUP_VAL_L_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_LOOKUP_VAL_L_2" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_WO_CNTL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_WO_CNTL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="WO_CNTL_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_WO_PROC_TMPL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_WO_PROC_TMPL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="WO_PROC_TMPL_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_WO_EVT_TYP_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_WO_EVT_TYP_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="WO_EVT_TYP_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_WO_EVT_TYP_L_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_WO_EVT_TYP_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="WO_EVT_TYP_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcQuery id="WO_PAY_AGG" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="UNCOLL_PROC_ID" type="java.lang.String"></field>
+        <field id="PAY_SEGMENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="PAYMENT_EVENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="PAY_SEG_AMT_TOTAL" type="java.math.BigDecimal"></field>
+        <field id="PAY_SEG_AMT_IN_WINDOW" type="java.math.BigDecimal"></field>
+        <field id="FIRST_PAY_DT" type="java.sql.Timestamp"></field>
+        <field id="LAST_PAY_DT" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>select w.uncoll_proc_id, count(distinct ps.pay_seg_id) as pay_segment_count, count(distinct pe.pay_event_id) as payment_event_count, nvl(sum(case when pe.pay_event_id is not null then nvl(ps.pay_seg_amt, 0) else 0 end), 0) as pay_seg_amt_total, nvl(sum(case when pe.pay_dt &gt;= w.cre_dttm and (w.wo_proc_compl_dt is null or pe.pay_dt &lt;= w.wo_proc_compl_dt) then nvl(ps.pay_seg_amt, 0) else 0 end), 0) as pay_seg_amt_in_window, min(pe.pay_dt) as first_pay_dt, max(pe.pay_dt) as last_pay_dt from cisadm.c1_bi_woproc_vw w left join cisadm.ci_wo_proc_sa s on s.wo_proc_id = w.uncoll_proc_id left join cisadm.ci_pay_seg ps on ps.sa_id = s.sa_id left join cisadm.ci_pay_tndr pt on pt.pay_tender_id = ps.pay_id left join cisadm.ci_pay_event pe on pe.pay_event_id = pt.pay_event_id and pe.pay_dt &gt;= date '2025-09-01' where w.cre_dttm &gt;= date '2025-09-01' group by w.uncoll_proc_id</query>
+    </jdbcQuery>
+
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="C1_BI_WOPROC_VW" schemaAlias="CISADM">
+      <fieldList>
+        <field id="C1_BI_WOPROC_VW.UNCOLL_PROC_ID" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.ACCT_ID" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.PER_ID" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.CURRENCY_CD" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="C1_BI_WOPROC_VW.WO_PROC_COMPL_DT" type="java.sql.Timestamp"></field>
+        <field id="C1_BI_WOPROC_VW.UNCOLL_PROC_DUR" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.WO_STATUS_FLG" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.UNCOLL_PROC_STAT_FLG" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.WO_STAT_RSN_FLG" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.COMMENTS" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.WO_CNTL_CD" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.WO_PROC_TMPL_CD" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.EFF_WO_EVT_TYP_CD" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.NEXT_WO_EVT_TYP_CD" type="java.lang.String"></field>
+        <field id="C1_BI_WOPROC_VW.NEXT_WO_EVT_TRIGGER_DT" type="java.sql.Timestamp"></field>
+        <field id="C1_BI_WOPROC_VW.ARS_AT_START" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.ARS_AT_END" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.ARS_DIFF" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.ACTIVE_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.INACTIVE_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.COMPL_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.CANCL_SYS_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.CANCL_USER_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.EFF_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.INEFF_WO_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.WO_PROC_TOT_SA_CNT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.WO_PROC_ACT_SA_CNT" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_WOPROC_VW.WO_PROC_INACT_SA_CNT" type="java.math.BigDecimal"></field>
+
+        <field id="CI_PER_NAME.PER_ID" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.ENTITY_NAME" type="java.lang.String"></field>
+
+        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_2.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_2.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_2.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_2.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_WO_CNTL_L.WO_CNTL_CD" type="java.lang.String"></field>
+        <field id="CI_WO_CNTL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_WO_CNTL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_WO_PROC_TMPL_L.WO_PROC_TMPL_CD" type="java.lang.String"></field>
+        <field id="CI_WO_PROC_TMPL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_WO_PROC_TMPL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_WO_EVT_TYP_L.WO_EVT_TYP_CD" type="java.lang.String"></field>
+        <field id="CI_WO_EVT_TYP_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_WO_EVT_TYP_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_WO_EVT_TYP_L_1.WO_EVT_TYP_CD" type="java.lang.String"></field>
+        <field id="CI_WO_EVT_TYP_L_1.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_WO_EVT_TYP_L_1.DESCR" type="java.lang.String"></field>
+
+        <field id="WO_PAY_AGG.UNCOLL_PROC_ID" type="java.lang.String"></field>
+        <field id="WO_PAY_AGG.PAY_SEGMENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="WO_PAY_AGG.PAYMENT_EVENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="WO_PAY_AGG.PAY_SEG_AMT_TOTAL" type="java.math.BigDecimal"></field>
+        <field id="WO_PAY_AGG.PAY_SEG_AMT_IN_WINDOW" type="java.math.BigDecimal"></field>
+        <field id="WO_PAY_AGG.FIRST_PAY_DT" type="java.sql.Timestamp"></field>
+        <field id="WO_PAY_AGG.LAST_PAY_DT" type="java.sql.Timestamp"></field>
+
+        <field id="RECOVERY_AMT_EST_ROW" dataSetExpression="CaseWhen(C1_BI_WOPROC_VW.ARS_AT_START - C1_BI_WOPROC_VW.ARS_AT_END &gt;= 0, C1_BI_WOPROC_VW.ARS_AT_START - C1_BI_WOPROC_VW.ARS_AT_END, 0)" type="java.math.BigDecimal"></field>
+        <field id="PAY_SEG_AMT_IN_WINDOW_ROW" dataSetExpression="WO_PAY_AGG.PAY_SEG_AMT_IN_WINDOW" type="java.math.BigDecimal"></field>
+        <field id="RECOVERY_RATE_EST_ROW" dataSetExpression="CaseWhen(C1_BI_WOPROC_VW.ARS_AT_START &gt; 0, CaseWhen(C1_BI_WOPROC_VW.ARS_AT_START - C1_BI_WOPROC_VW.ARS_AT_END &gt;= 0, C1_BI_WOPROC_VW.ARS_AT_START - C1_BI_WOPROC_VW.ARS_AT_END, 0) / C1_BI_WOPROC_VW.ARS_AT_START, 0)" type="java.math.BigDecimal"></field>
+      </fieldList>
+
+      <filterString>C1_BI_WOPROC_VW.CRE_DTTM >= ts'2025-09-01'</filterString>
+      <joinInfo alias="C1_BI_WOPROC_VW" referenceId="C1_BI_WOPROC_VW"></joinInfo>
+      <joinList>
+        <join expr="C1_BI_WOPROC_VW.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'" left="C1_BI_WOPROC_VW" right="CI_PER_NAME" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_WOPROC_VW.WO_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'WO_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="C1_BI_WOPROC_VW" right="CI_LOOKUP_VAL_L" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_WOPROC_VW.UNCOLL_PROC_STAT_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'UNCOLL_PROC_STAT_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'" left="C1_BI_WOPROC_VW" right="CI_LOOKUP_VAL_L_1" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_WOPROC_VW.WO_STAT_RSN_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'WO_STAT_RSN_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'" left="C1_BI_WOPROC_VW" right="CI_LOOKUP_VAL_L_2" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_WOPROC_VW.WO_CNTL_CD == CI_WO_CNTL_L.WO_CNTL_CD and CI_WO_CNTL_L.LANGUAGE_CD == 'ENG'" left="C1_BI_WOPROC_VW" right="CI_WO_CNTL_L" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_WOPROC_VW.WO_PROC_TMPL_CD == CI_WO_PROC_TMPL_L.WO_PROC_TMPL_CD and CI_WO_PROC_TMPL_L.LANGUAGE_CD == 'ENG'" left="C1_BI_WOPROC_VW" right="CI_WO_PROC_TMPL_L" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_WOPROC_VW.EFF_WO_EVT_TYP_CD == CI_WO_EVT_TYP_L.WO_EVT_TYP_CD and CI_WO_EVT_TYP_L.LANGUAGE_CD == 'ENG'" left="C1_BI_WOPROC_VW" right="CI_WO_EVT_TYP_L" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_WOPROC_VW.NEXT_WO_EVT_TYP_CD == CI_WO_EVT_TYP_L_1.WO_EVT_TYP_CD and CI_WO_EVT_TYP_L_1.LANGUAGE_CD == 'ENG'" left="C1_BI_WOPROC_VW" right="CI_WO_EVT_TYP_L_1" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_WOPROC_VW.UNCOLL_PROC_ID == WO_PAY_AGG.UNCOLL_PROC_ID" left="C1_BI_WOPROC_VW" right="WO_PAY_AGG" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="C1_BI_WOPROC_VW" tableId="C1_BI_WOPROC_VW"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_2" tableId="CI_LOOKUP_VAL_L_2"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_WO_CNTL_L" tableId="CI_WO_CNTL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_WO_PROC_TMPL_L" tableId="CI_WO_PROC_TMPL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_WO_EVT_TYP_L" tableId="CI_WO_EVT_TYP_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_WO_EVT_TYP_L_1" tableId="CI_WO_EVT_TYP_L_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="WO_PAY_AGG" tableId="WO_PAY_AGG"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

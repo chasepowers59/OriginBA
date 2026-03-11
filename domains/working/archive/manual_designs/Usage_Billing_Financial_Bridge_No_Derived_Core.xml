@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="Usage Billing Financial Bridge (Core PerfFast 6M)" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+
+  <itemGroups>
+    <itemGroup id="SET_KEYS" label="Keys And Dates" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCOUNTING_DT" label="Accounting Date" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.ACCOUNTING_DT"></item>
+        <item id="BILL_DT" label="Bill Date" resourceId="JoinTree_1.CI_BILL.BILL_DT"></item>
+        <item id="BILL_ID" label="Bill ID" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.BILL_ID"></item>
+        <item id="BSEG_ID" label="Bill Segment ID" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.BSEG_ID"></item>
+        <item id="SA_ID" label="Service Agreement ID" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.SA_ID"></item>
+        <item id="ACCT_ID" label="Account ID" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.ACCT_ID"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_USAGE" label="Usage Context" resourceId="JoinTree_1">
+      <items>
+        <item id="RS_CD" label="Rate Schedule Code" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.RS_CD"></item>
+        <item id="UOM_CD" label="UOM Code" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.UOM_CD"></item>
+        <item id="TOU_CD" label="TOU Code" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.TOU_CD"></item>
+        <item id="SQI_CD" label="SQI Code" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.SQI_CD"></item>
+        <item id="BSEG_START_DT" label="Bill Segment Start Date" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.BSEG_START_DT"></item>
+        <item id="BSEG_END_DT" label="Bill Segment End Date" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.BSEG_END_DT"></item>
+        <item id="BILL_SQ" label="Billed Usage Quantity" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.BILL_SQ"></item>
+        <item id="BILLED_AMT" label="Billed Usage Amount" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.BILLED_AMT"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_FINANCIALS" label="Financial Amounts (Aggregated)" resourceId="JoinTree_1">
+      <items>
+        <item id="FT_GL_REV_AMT_TOTAL_ROW" label="FT GL Revenue Amount (Row)" resourceId="JoinTree_1.C1_BI_FT_VW_AGG.FT_GL_REV_AMT_TOTAL"></item>
+        <item id="FT_GL_TAX_AMT_TOTAL_ROW" label="FT GL Tax Amount (Row)" resourceId="JoinTree_1.C1_BI_FT_VW_AGG.FT_GL_TAX_AMT_TOTAL"></item>
+        <item id="FT_OTHER_AMT_TOTAL_ROW" label="FT Other Amount (Row)" resourceId="JoinTree_1.C1_BI_FT_VW_AGG.FT_OTHER_AMT_TOTAL"></item>
+        <item id="FT_TOT_AMT_TOTAL_ROW" label="FT Total Amount (Row)" resourceId="JoinTree_1.C1_BI_FT_VW_AGG.FT_TOT_AMT_TOTAL"></item>
+        <item id="FT_CNT_TOTAL_ROW" label="FT Row Count (Row)" resourceId="JoinTree_1.C1_BI_FT_VW_AGG.FT_CNT_TOTAL"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_STATUS" label="Statuses" resourceId="JoinTree_1">
+      <items>
+        <item id="BILL_STAT_FLG" label="Bill Status Code" resourceId="JoinTree_1.CI_BILL.BILL_STAT_FLG"></item>
+        <item id="BILL_STATUS_DESCR" label="Bill Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+        <item id="BSEG_STAT_FLG" label="Bill Segment Status Code" resourceId="JoinTree_1.CI_BSEG.BSEG_STAT_FLG"></item>
+        <item id="BSEG_STATUS_DESCR" label="Bill Segment Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_1.DESCR"></item>
+        <item id="SA_STATUS_FLG" label="SA Status Code" resourceId="JoinTree_1.CI_SA.SA_STATUS_FLG"></item>
+        <item id="SA_STATUS_DESCR" label="SA Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_2.DESCR"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_MEASURES" label="Measures" resourceId="JoinTree_1">
+      <items>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="BILL_COUNT" label="Bill Count" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.BILL_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="BSEG_COUNT" label="Bill Segment Count" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.BSEG_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="SA_COUNT" label="Service Agreement Count" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.SA_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="ACCOUNT_COUNT" label="Account Count" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.ACCT_ID"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_BILLED_USAGE_QTY" label="Total Billed Usage Quantity" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.BILL_SQ"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_BILLED_USAGE_AMT" label="Total Billed Usage Amount" resourceId="JoinTree_1.C1_BI_BILLED_USAGE_VW.BILLED_AMT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_FT_GL_REV_AMT" label="Total FT GL Revenue Amount" resourceId="JoinTree_1.C1_BI_FT_VW_AGG.FT_GL_REV_AMT_TOTAL"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_FT_GL_TAX_AMT" label="Total FT GL Tax Amount" resourceId="JoinTree_1.C1_BI_FT_VW_AGG.FT_GL_TAX_AMT_TOTAL"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_FT_OTHER_AMT" label="Total FT Other Amount" resourceId="JoinTree_1.C1_BI_FT_VW_AGG.FT_OTHER_AMT_TOTAL"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_FT_TOT_AMT" label="Total FT Total Amount" resourceId="JoinTree_1.C1_BI_FT_VW_AGG.FT_TOT_AMT_TOTAL"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_FT_CNT" label="Total FT Row Count" resourceId="JoinTree_1.C1_BI_FT_VW_AGG.FT_CNT_TOTAL"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+
+  <resources>
+    <jdbcQuery id="C1_BI_BILLED_USAGE_VW" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="RS_CD" type="java.lang.String"></field>
+        <field id="UOM_CD" type="java.lang.String"></field>
+        <field id="TOU_CD" type="java.lang.String"></field>
+        <field id="SQI_CD" type="java.lang.String"></field>
+        <field id="ACCOUNTING_DT" type="java.sql.Timestamp"></field>
+        <field id="BSEG_START_DT" type="java.sql.Timestamp"></field>
+        <field id="BSEG_END_DT" type="java.sql.Timestamp"></field>
+        <field id="BILL_SQ" type="java.math.BigDecimal"></field>
+        <field id="BILLED_AMT" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select u.bill_id,
+       u.bseg_id,
+       u.sa_id,
+       u.acct_id,
+       u.rs_cd,
+       u.uom_cd,
+       u.tou_cd,
+       u.sqi_cd,
+       u.accounting_dt,
+       u.bseg_start_dt,
+       u.bseg_end_dt,
+       u.bill_sq,
+       u.billed_amt
+from cisadm.c1_bi_billed_usage_vw u
+where u.accounting_dt &gt;= add_months(trunc(sysdate), -6)
+  and u.accounting_dt &lt; trunc(sysdate) + 1
+  and u.bill_id is not null
+  and u.bseg_id is not null
+  and u.rs_cd is not null</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="C1_BI_FT_VW_AGG" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="RS_CD" type="java.lang.String"></field>
+        <field id="FT_GL_REV_AMT_TOTAL" type="java.math.BigDecimal"></field>
+        <field id="FT_GL_TAX_AMT_TOTAL" type="java.math.BigDecimal"></field>
+        <field id="FT_OTHER_AMT_TOTAL" type="java.math.BigDecimal"></field>
+        <field id="FT_TOT_AMT_TOTAL" type="java.math.BigDecimal"></field>
+        <field id="FT_CNT_TOTAL" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select f.bill_id, f.bseg_id, f.rs_cd, nvl(sum(nvl(f.ft_gl_rev_amt, 0)), 0) as ft_gl_rev_amt_total, nvl(sum(nvl(f.ft_gl_tax_amt, 0)), 0) as ft_gl_tax_amt_total, nvl(sum(nvl(f.ft_other_amt, 0)), 0) as ft_other_amt_total, nvl(sum(nvl(f.tot_amt, 0)), 0) as ft_tot_amt_total, nvl(sum(nvl(f.ft_cnt, 0)), 0) as ft_cnt_total from cisadm.c1_bi_ft_vw f where f.accounting_dt &gt;= add_months(trunc(sysdate), -6) and f.accounting_dt &lt; trunc(sysdate) + 1 and f.bill_id is not null and f.bseg_id is not null and f.rs_cd is not null and exists (select 1 from cisadm.c1_bi_billed_usage_vw u where u.accounting_dt &gt;= add_months(trunc(sysdate), -6) and u.accounting_dt &lt; trunc(sysdate) + 1 and u.bill_id = f.bill_id and u.bseg_id = f.bseg_id and u.rs_cd = f.rs_cd) group by f.bill_id, f.bseg_id, f.rs_cd</query>
+    </jdbcQuery>
+
+    <jdbcTable id="CI_BILL" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BILL" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="BILL_DT" type="java.sql.Timestamp"></field>
+        <field id="BILL_STAT_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_BSEG" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BSEG" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="BSEG_STAT_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_SA" datasourceId="Origin_DEV_DS" datasourceTableName="CI_SA" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcQuery id="CI_LOOKUP_VAL_L" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <query>select 'BILL_STAT_FLG' as field_name, l.field_value, 'ENG' as language_cd, l.descr from cisadm.ci_lookup_val_l l where l.field_name = 'BILL_STAT_FLG' and l.language_cd = 'ENG'</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="CI_LOOKUP_VAL_L_1" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <query>select 'BSEG_STAT_FLG' as field_name, l.field_value, 'ENG' as language_cd, l.descr from cisadm.ci_lookup_val_l l where l.field_name = 'BSEG_STAT_FLG' and l.language_cd = 'ENG'</query>
+    </jdbcQuery>
+
+    <jdbcQuery id="CI_LOOKUP_VAL_L_2" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <query>select 'SA_STATUS_FLG' as field_name, l.field_value, 'ENG' as language_cd, l.descr from cisadm.ci_lookup_val_l l where l.field_name = 'SA_STATUS_FLG' and l.language_cd = 'ENG'</query>
+    </jdbcQuery>
+
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="C1_BI_BILLED_USAGE_VW" schemaAlias="CISADM">
+      <fieldList>
+        <field id="C1_BI_BILLED_USAGE_VW.BILL_ID" type="java.lang.String"></field>
+        <field id="C1_BI_BILLED_USAGE_VW.BSEG_ID" type="java.lang.String"></field>
+        <field id="C1_BI_BILLED_USAGE_VW.SA_ID" type="java.lang.String"></field>
+        <field id="C1_BI_BILLED_USAGE_VW.ACCT_ID" type="java.lang.String"></field>
+        <field id="C1_BI_BILLED_USAGE_VW.RS_CD" type="java.lang.String"></field>
+        <field id="C1_BI_BILLED_USAGE_VW.UOM_CD" type="java.lang.String"></field>
+        <field id="C1_BI_BILLED_USAGE_VW.TOU_CD" type="java.lang.String"></field>
+        <field id="C1_BI_BILLED_USAGE_VW.SQI_CD" type="java.lang.String"></field>
+        <field id="C1_BI_BILLED_USAGE_VW.ACCOUNTING_DT" type="java.sql.Timestamp"></field>
+        <field id="C1_BI_BILLED_USAGE_VW.BSEG_START_DT" type="java.sql.Timestamp"></field>
+        <field id="C1_BI_BILLED_USAGE_VW.BSEG_END_DT" type="java.sql.Timestamp"></field>
+        <field id="C1_BI_BILLED_USAGE_VW.BILL_SQ" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_BILLED_USAGE_VW.BILLED_AMT" type="java.math.BigDecimal"></field>
+
+        <field id="C1_BI_FT_VW_AGG.BILL_ID" type="java.lang.String"></field>
+        <field id="C1_BI_FT_VW_AGG.BSEG_ID" type="java.lang.String"></field>
+        <field id="C1_BI_FT_VW_AGG.RS_CD" type="java.lang.String"></field>
+        <field id="C1_BI_FT_VW_AGG.FT_GL_REV_AMT_TOTAL" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FT_VW_AGG.FT_GL_TAX_AMT_TOTAL" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FT_VW_AGG.FT_OTHER_AMT_TOTAL" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FT_VW_AGG.FT_TOT_AMT_TOTAL" type="java.math.BigDecimal"></field>
+        <field id="C1_BI_FT_VW_AGG.FT_CNT_TOTAL" type="java.math.BigDecimal"></field>
+
+        <field id="CI_BILL.BILL_ID" type="java.lang.String"></field>
+        <field id="CI_BILL.BILL_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_BILL.BILL_STAT_FLG" type="java.lang.String"></field>
+        <field id="CI_BSEG.BSEG_ID" type="java.lang.String"></field>
+        <field id="CI_BSEG.BSEG_STAT_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.SA_ID" type="java.lang.String"></field>
+        <field id="CI_SA.SA_STATUS_FLG" type="java.lang.String"></field>
+
+        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_2.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_2.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_2.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_2.DESCR" type="java.lang.String"></field>
+      </fieldList>
+
+      <joinInfo alias="C1_BI_BILLED_USAGE_VW" referenceId="C1_BI_BILLED_USAGE_VW"></joinInfo>
+      <joinList>
+        <join expr="C1_BI_BILLED_USAGE_VW.BILL_ID == C1_BI_FT_VW_AGG.BILL_ID and C1_BI_BILLED_USAGE_VW.BSEG_ID == C1_BI_FT_VW_AGG.BSEG_ID and C1_BI_BILLED_USAGE_VW.RS_CD == C1_BI_FT_VW_AGG.RS_CD" left="C1_BI_BILLED_USAGE_VW" right="C1_BI_FT_VW_AGG" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_BILLED_USAGE_VW.BILL_ID == CI_BILL.BILL_ID" left="C1_BI_BILLED_USAGE_VW" right="CI_BILL" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_BILLED_USAGE_VW.BSEG_ID == CI_BSEG.BSEG_ID" left="C1_BI_BILLED_USAGE_VW" right="CI_BSEG" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_BILLED_USAGE_VW.SA_ID == CI_SA.SA_ID" left="C1_BI_BILLED_USAGE_VW" right="CI_SA" type="leftOuter" weight="1"></join>
+        <join expr="CI_BILL.BILL_STAT_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'BILL_STAT_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="CI_BILL" right="CI_LOOKUP_VAL_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_BSEG.BSEG_STAT_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'BSEG_STAT_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'" left="CI_BSEG" right="CI_LOOKUP_VAL_L_1" type="leftOuter" weight="1"></join>
+        <join expr="CI_SA.SA_STATUS_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'SA_STATUS_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'" left="CI_SA" right="CI_LOOKUP_VAL_L_2" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="C1_BI_BILLED_USAGE_VW" tableId="C1_BI_BILLED_USAGE_VW"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="C1_BI_FT_VW_AGG" tableId="C1_BI_FT_VW_AGG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BILL" tableId="CI_BILL"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BSEG" tableId="CI_BSEG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_SA" tableId="CI_SA"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_2" tableId="CI_LOOKUP_VAL_L_2"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>
