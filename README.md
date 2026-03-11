@@ -33,6 +33,7 @@ Professional workspace for Oracle Utilities C2M (CISADM schema), Jaspersoft Doma
 ## Jaspersoft Assets
 - Concrete report: `reports/billing_customer_statement.jrxml`
 - Billing verification flow: `reports/billing_verification_flow.jrxml`
+- Billing verification v2 validation runbook: `docs/billing_verification_v2_validation_runbook.md`
 - Usage/device dashboard: `reports/usage_device_dashboard.jrxml`
 - Base template: `reports/templates/base_customer_bill_template.jrxml`
 - Controls: `server/input_controls/billing_customer_statement_input_controls.json`
@@ -47,6 +48,8 @@ Professional workspace for Oracle Utilities C2M (CISADM schema), Jaspersoft Doma
   - `domains/exports/billed_usage_domain.zip`
   - `domains/exports/billed_usage_domain_optimized_v1_copy.zip`
   - `domains/exports/bill_segment_domain_legacy_1.zip`
+- Working billing verification v2 domain package:
+  - `domains/working/billing_requirements_domain_v2/`
 - Manual import bundles retained from prior root-level exports:
   - `domains/exports/manual_imports/FinalDomain.zip`
   - `domains/exports/manual_imports/New Bill Cycle Domain.zip`

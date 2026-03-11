@@ -14,8 +14,8 @@
     bottomMargin="20"
     uuid="a7b5d42f-9a69-42da-9f8f-4c72a1c56d11">
 
-    <property name="ireport.domainUri" value="/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Billing_Requirements_Domain"/>
-    <property name="com.jaspersoft.jrs.data.source" value="/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Billing_Requirements_Domain"/>
+    <property name="ireport.domainUri" value="/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Billing_Requirements_Domain_v2"/>
+    <property name="com.jaspersoft.jrs.data.source" value="/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Billing_Requirements_Domain_v2"/>
     <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
 
     <style name="Base" fontName="Aptos" fontSize="10"/>
@@ -77,6 +77,8 @@
     <queryField id="BSEG_STATUS_DESCRIPTION"/>
     <queryField id="IS_ERROR_SW"/>
     <queryField id="ERROR_REASON"/>
+    <queryField id="EXCEPTION_TYPE"/>
+    <queryField id="RECOMMENDED_ACTION"/>
   </queryFields>
 </query>
     ]]></queryString>
@@ -105,6 +107,8 @@
     <field name="BSEG_STATUS_DESCRIPTION" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BSEG_STATUS_DESCRIPTION"/></field>
     <field name="IS_ERROR_SW" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="IS_ERROR_SW"/></field>
     <field name="ERROR_REASON" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="ERROR_REASON"/></field>
+    <field name="EXCEPTION_TYPE" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="EXCEPTION_TYPE"/></field>
+    <field name="RECOMMENDED_ACTION" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="RECOMMENDED_ACTION"/></field>
 
     <sortField name="BILL_CYCLE_CODE" order="Ascending"/>
     <sortField name="ACCOUNT_ID" order="Ascending"/>
@@ -248,14 +252,14 @@
                     <textField>
                         <reportElement x="10" y="2" width="1130" height="16" uuid="46a53f85-d769-4585-a888-ac9f991e968f"/>
                         <textFieldExpression><![CDATA[
-"Cycle result: "
+ "Cycle result: "
 + (((($F{MISSING_ACTIVE_ACCOUNT_COUNT} != null && $F{MISSING_ACTIVE_ACCOUNT_COUNT}.doubleValue() > 0d)
   || ($F{MISSING_ACTIVE_SA_COUNT} != null && $F{MISSING_ACTIVE_SA_COUNT}.doubleValue() > 0d)
   || ($V{ERROR_ROWS_IN_CYCLE} != null && $V{ERROR_ROWS_IN_CYCLE}.intValue() > 0))) ? "ATTENTION REQUIRED" : "ON TRACK")
-+ " | Error rows shown: " + ($V{ERROR_ROWS_IN_CYCLE} == null ? "0" : $V{ERROR_ROWS_IN_CYCLE}.toString())
++ " | Exception rows shown: " + ($V{ERROR_ROWS_IN_CYCLE} == null ? "0" : $V{ERROR_ROWS_IN_CYCLE}.toString())
 + (((($F{MISSING_ACTIVE_ACCOUNT_COUNT} != null && $F{MISSING_ACTIVE_ACCOUNT_COUNT}.doubleValue() > 0d)
    || ($F{MISSING_ACTIVE_SA_COUNT} != null && $F{MISSING_ACTIVE_SA_COUNT}.doubleValue() > 0d))
-   && ($V{ERROR_ROWS_IN_CYCLE} == null || $V{ERROR_ROWS_IN_CYCLE}.intValue() == 0)) ? " | No bill/segment status errors were returned for this cycle. Review upstream billing completeness." : "")
+   && ($V{ERROR_ROWS_IN_CYCLE} == null || $V{ERROR_ROWS_IN_CYCLE}.intValue() == 0)) ? " | No exception detail rows were returned for this cycle. Review upstream billing completeness." : "")
                         ]]></textFieldExpression>
                     </textField>
                 </frame>
@@ -286,12 +290,12 @@
                 <textField evaluationTime="Report"><reportElement x="10" y="10" width="1125" height="16" uuid="ad48f397-c705-4ac4-92cb-48c54e312ca1"/><textFieldExpression><![CDATA[
 "Cycles in scope: " + $V{CYCLE_COUNT}
 + " | Cycles with gaps: " + $V{CYCLES_WITH_GAPS}
-+ " | Cycles with caught status errors: " + $V{CYCLES_WITH_ERRORS}
-+ " | Error rows shown: " + $V{ERROR_ROWS_IN_REPORT}
++ " | Cycles with exceptions: " + $V{CYCLES_WITH_ERRORS}
++ " | Exception rows shown: " + $V{ERROR_ROWS_IN_REPORT}
                 ]]></textFieldExpression></textField>
                 <staticText>
                     <reportElement x="10" y="30" width="1125" height="18" uuid="08fd2f0c-33d8-435c-8efb-7bc7e2aa7eb1"/>
-                    <text><![CDATA[Read each cycle left to right: expected active population, actual billed population, bills created, bill segments created, then the remaining gap. Exception rows below show caught bill or segment status issues for the same cycle.]]></text>
+                    <text><![CDATA[Read each cycle left to right: expected active population, actual billed population, bills created, bill segments created, then the remaining gap. Exception rows below show missing bills, missing segments, orphan segments, and caught status issues for the same cycle.]]></text>
                 </staticText>
             </frame>
         </band>
@@ -304,10 +308,10 @@
             <staticText><reportElement style="HeaderBlue" x="220" y="0" width="80" height="24" uuid="c2709dc5-2857-4942-812a-7184b5a25039"/><text><![CDATA[Premise]]></text></staticText>
             <staticText><reportElement style="HeaderBlue" x="300" y="0" width="90" height="24" uuid="6ef95fc7-f981-4427-a71d-dd2a7aa8cbf8"/><text><![CDATA[Bill ID]]></text></staticText>
             <staticText><reportElement style="HeaderBlue" x="390" y="0" width="110" height="24" uuid="11ebf2e9-4f24-4f45-843d-4a18f3420d8d"/><text><![CDATA[Segment ID]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="500" y="0" width="140" height="24" uuid="3d0f14f9-a4d5-4c1c-b9b9-dceb70556a94"/><text><![CDATA[Bill Status]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="640" y="0" width="160" height="24" uuid="ca531b5d-ef96-4db6-8894-8e5addcb4ef0"/><text><![CDATA[Segment Status]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="800" y="0" width="170" height="24" uuid="503f8f91-f840-4f16-ae57-9ba6c8b4a85f"/><text><![CDATA[Error Reason]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="970" y="0" width="180" height="24" uuid="0446bc28-f1c2-4020-aa45-c8c8eb41e55c"/><text><![CDATA[Recommended Action]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="500" y="0" width="140" height="24" uuid="3d0f14f9-a4d5-4c1c-b9b9-dceb70556a94"/><text><![CDATA[Exception Type]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="640" y="0" width="180" height="24" uuid="ca531b5d-ef96-4db6-8894-8e5addcb4ef0"/><text><![CDATA[Status Detail]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="820" y="0" width="170" height="24" uuid="503f8f91-f840-4f16-ae57-9ba6c8b4a85f"/><text><![CDATA[Exception Detail]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="990" y="0" width="160" height="24" uuid="0446bc28-f1c2-4020-aa45-c8c8eb41e55c"/><text><![CDATA[Recommended Action]]></text></staticText>
         </band>
     </columnHeader>
 
@@ -319,16 +323,16 @@
             <textField><reportElement style="DetailText" x="220" y="2" width="80" height="16" uuid="f2bdad3e-cfa2-4d0e-a46d-c317c45e4187"/><textFieldExpression><![CDATA[$F{PREMISE_ID}]]></textFieldExpression></textField>
             <textField><reportElement style="DetailText" x="300" y="2" width="90" height="16" uuid="de46d998-3cff-4a28-bb31-9d6022b10c7d"/><textFieldExpression><![CDATA[$F{BILL_ID_DETAIL}]]></textFieldExpression></textField>
             <textField><reportElement style="DetailText" x="390" y="2" width="110" height="16" uuid="951e06ce-9099-4852-afb3-4c7b3e1aa27d"/><textFieldExpression><![CDATA[$F{BILL_SEGMENT_ID_DETAIL}]]></textFieldExpression></textField>
-            <textField><reportElement style="DetailText" x="500" y="2" width="140" height="16" uuid="5d420a1d-675e-44a0-af9a-d19d9a8ea15b"/><textFieldExpression><![CDATA[$F{BILL_STATUS_DESCRIPTION}]]></textFieldExpression></textField>
-            <textField><reportElement style="DetailText" x="640" y="2" width="160" height="16" uuid="c695f926-ec17-4635-adca-6e32484ec03d"/><textFieldExpression><![CDATA[$F{BSEG_STATUS_DESCRIPTION}]]></textFieldExpression></textField>
-            <textField><reportElement style="ExceptionCell" x="800" y="2" width="170" height="16" uuid="dcfbb4c7-b8f6-49cc-bb8d-c797ebd4e7e1"/><textFieldExpression><![CDATA[$F{ERROR_REASON} == null ? "Status exception" : $F{ERROR_REASON}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="500" y="2" width="140" height="16" uuid="5d420a1d-675e-44a0-af9a-d19d9a8ea15b"/><textFieldExpression><![CDATA[$F{EXCEPTION_TYPE}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="640" y="2" width="180" height="16" uuid="c695f926-ec17-4635-adca-6e32484ec03d"/><textFieldExpression><![CDATA[
+($F{BILL_STATUS_DESCRIPTION} == null ? "" : "Bill: " + $F{BILL_STATUS_DESCRIPTION})
++ (($F{BILL_STATUS_DESCRIPTION} != null && $F{BSEG_STATUS_DESCRIPTION} != null) ? " | " : "")
++ ($F{BSEG_STATUS_DESCRIPTION} == null ? "" : "Segment: " + $F{BSEG_STATUS_DESCRIPTION})
+            ]]></textFieldExpression></textField>
+            <textField><reportElement style="ExceptionCell" x="820" y="2" width="170" height="16" uuid="dcfbb4c7-b8f6-49cc-bb8d-c797ebd4e7e1"/><textFieldExpression><![CDATA[$F{ERROR_REASON} == null ? "Billing verification exception" : $F{ERROR_REASON}]]></textFieldExpression></textField>
             <textField>
-                <reportElement style="DetailText" x="970" y="2" width="180" height="16" uuid="76f72b6d-b71b-4da1-8c36-c6dd9c0d3690"/>
-                <textFieldExpression><![CDATA[
-($F{ERROR_REASON} != null && $F{ERROR_REASON}.toUpperCase().contains("BILL")) ? "Review bill status and batch outcome"
- : (($F{ERROR_REASON} != null && $F{ERROR_REASON}.toUpperCase().contains("SEG")) ? "Review bill segment status and rerun path"
- : "Review billing cycle exception and batch logs")
-                ]]></textFieldExpression>
+                <reportElement style="DetailText" x="990" y="2" width="160" height="16" uuid="76f72b6d-b71b-4da1-8c36-c6dd9c0d3690"/>
+                <textFieldExpression><![CDATA[$F{RECOMMENDED_ACTION} == null ? "Review billing exception and supporting batch logs" : $F{RECOMMENDED_ACTION}]]></textFieldExpression>
             </textField>
         </band>
     </detail>
