@@ -12,6 +12,8 @@ Create one domain and two report views:
 For each `BILL_CYC_CD` and billing window/date:
 1. Compute **generated Bills** from `CI_BILL`.
 2. Compute **generated Bill Segments** from `CI_BSEG`.
+3. Anchor each cycle on the latest materially complete billing day rather than the absolute latest row activity.
+4. Treat a billing day as materially complete when its distinct billed-account volume is at least 80% of that cycle's peak billed-account volume in the lookback window.
 3. Compare and flag reconciliation outcomes:
    - `MISSING_BSEG`: Bill exists but no Bill Segment.
    - `ORPHAN_BSEG`: Bill Segment exists without Bill.
