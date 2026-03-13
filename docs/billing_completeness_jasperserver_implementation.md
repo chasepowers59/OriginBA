@@ -39,6 +39,7 @@ It provides:
 ## Recommended Report Pair
 1. `billing_cycle_completion_monitor` (from summary derived table)
 2. `billing_missing_bill_exceptions` (from detail derived table)
+   - Detail layout now includes `EXCEPTION_TYPE` so operators can distinguish missing-bill, missing-segment, orphan-segment, and status-exception rows without opening the raw domain.
 
 ## Business-Friendly Field Names Included
 The SQL aliases are already business-oriented, including:

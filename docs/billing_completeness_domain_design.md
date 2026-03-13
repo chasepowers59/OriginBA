@@ -14,10 +14,17 @@ For each `BILL_CYC_CD` and billing window/date:
 2. Compute **generated Bill Segments** from `CI_BSEG`.
 3. Anchor each cycle on the latest materially complete billing day rather than the absolute latest row activity.
 4. Treat a billing day as materially complete when its distinct billed-account volume is at least 80% of that cycle's peak billed-account volume in the lookback window.
-3. Compare and flag reconciliation outcomes:
+5. Define the expected SA population as in-cycle SAs that are `Active` or `Pending Stop`, started more than 7 days before the anchored day, and exclude validated non-billable SA types.
+6. Current excluded SA types: `EXCSCRED`, `DEP-RES`, `FEES`, `SSMRES`, `DEP-COM`, `SSMCOM`, `SSMIND`, `SSMPA`.
+7. Compare and flag reconciliation outcomes:
    - `MISSING_BSEG`: Bill exists but no Bill Segment.
    - `ORPHAN_BSEG`: Bill Segment exists without Bill.
-   - `PRESENT`: Bill and Bill Segment both present.
+   - `BILL_STATUS_EXCEPTION`: bill header status code `P` (`Pending`).
+   - `BSEG_STATUS_EXCEPTION`: bill segment status codes `10` (`Incomplete`), `20` (`Error`), or `40` (`Pending Cancel`).
+8. The domain now exposes two summary measure sets:
+   - legacy reconciliation measures that compare expected population to all billed activity on the anchored day
+   - matched reconciliation measures that compare expected population only to billed SAs/accounts from that same expected population, using create-date-based operational actuals on the anchored day
+9. The detail dataset is aligned to the matched summary set and now returns one row per expected-population SA that did not produce a matched billed segment on the anchored operational run date.
 
 ## Source-of-Truth Tables (from Bill Segment domain export)
 1. `CISADM.CI_BILL`

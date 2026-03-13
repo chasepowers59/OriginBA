@@ -68,6 +68,7 @@
     <queryField id="BILL_SEGMENT_STATUS_CODE"/>
     <queryField id="BILL_SEGMENT_STATUS_DESCRIPTION"/>
     <queryField id="RECONCILIATION_RESULT"/>
+    <queryField id="EXCEPTION_TYPE"/>
   </queryFields>
 </query>
     ]]></queryString>
@@ -88,6 +89,7 @@
     <field name="BILL_SEGMENT_STATUS_CODE" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_SEGMENT_STATUS_CODE"/></field>
     <field name="BILL_SEGMENT_STATUS_DESCRIPTION" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="BILL_SEGMENT_STATUS_DESCRIPTION"/></field>
     <field name="RECONCILIATION_RESULT" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="RECONCILIATION_RESULT"/></field>
+    <field name="EXCEPTION_TYPE" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="EXCEPTION_TYPE"/></field>
 
     <sortField name="EVENT_DATE_FOR_FILTER" order="Descending"/>
     <sortField name="BILL_CYCLE_CODE" order="Ascending"/>
@@ -145,31 +147,33 @@
     <columnHeader>
         <band height="24">
             <staticText><reportElement style="HeaderBlue" x="0" y="0" width="90" height="24" uuid="9f5fb7e8-fe53-4b2f-aede-18b3cb2d9daa"/><text><![CDATA[Result]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="90" y="0" width="95" height="24" uuid="9c0a944c-bf72-4a75-a8a9-9a4f6f2f9d45"/><text><![CDATA[Bill Cycle]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="185" y="0" width="150" height="24" uuid="30af8448-256a-4220-a3c7-4d5c04d4c7d8"/><text><![CDATA[Bill Date]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="335" y="0" width="150" height="24" uuid="1f80ea45-8d45-4dc9-9a8b-0436e782f7e8"/><text><![CDATA[Bill Create Date]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="485" y="0" width="110" height="24" uuid="d75ec45a-bf66-43ca-aa7d-df6f9c0f5ac4"/><text><![CDATA[Account]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="595" y="0" width="110" height="24" uuid="91ca6481-d6d5-4d6b-9261-a2c0619f70ab"/><text><![CDATA[SA ID]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="705" y="0" width="100" height="24" uuid="159f4893-ae85-4ab7-8a66-89a5ef2e55ea"/><text><![CDATA[Premise]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="805" y="0" width="100" height="24" uuid="e986530f-c3f4-4af5-9425-a8d1c82a889f"/><text><![CDATA[Bill ID]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="905" y="0" width="100" height="24" uuid="c73f61ca-836f-4a68-9f6b-8fcd848f07e4"/><text><![CDATA[Segment ID]]></text></staticText>
-            <staticText><reportElement style="HeaderBlue" x="1005" y="0" width="145" height="24" uuid="eb0c8fbe-7c3d-4602-a078-41594ea4e206"/><text><![CDATA[Action]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="90" y="0" width="135" height="24" uuid="3f5d11d2-bf70-42ad-a25f-1f357f6258f3"/><text><![CDATA[Exception Type]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="225" y="0" width="90" height="24" uuid="9c0a944c-bf72-4a75-a8a9-9a4f6f2f9d45"/><text><![CDATA[Bill Cycle]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="315" y="0" width="120" height="24" uuid="30af8448-256a-4220-a3c7-4d5c04d4c7d8"/><text><![CDATA[Bill Date]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="435" y="0" width="130" height="24" uuid="1f80ea45-8d45-4dc9-9a8b-0436e782f7e8"/><text><![CDATA[Bill Create Date]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="565" y="0" width="100" height="24" uuid="d75ec45a-bf66-43ca-aa7d-df6f9c0f5ac4"/><text><![CDATA[Account]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="665" y="0" width="100" height="24" uuid="91ca6481-d6d5-4d6b-9261-a2c0619f70ab"/><text><![CDATA[SA ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="765" y="0" width="90" height="24" uuid="159f4893-ae85-4ab7-8a66-89a5ef2e55ea"/><text><![CDATA[Premise]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="855" y="0" width="90" height="24" uuid="e986530f-c3f4-4af5-9425-a8d1c82a889f"/><text><![CDATA[Bill ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="945" y="0" width="90" height="24" uuid="c73f61ca-836f-4a68-9f6b-8fcd848f07e4"/><text><![CDATA[Segment ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="1035" y="0" width="115" height="24" uuid="eb0c8fbe-7c3d-4602-a078-41594ea4e206"/><text><![CDATA[Action]]></text></staticText>
         </band>
     </columnHeader>
 
     <detail>
         <band height="20">
             <textField><reportElement style="SeverityCell" x="0" y="2" width="90" height="16" uuid="81cbf8a1-90c7-4fe9-9d84-a264f38ca1af"/><textFieldExpression><![CDATA[$F{RECONCILIATION_RESULT}]]></textFieldExpression></textField>
-            <textField><reportElement style="DetailText" x="90" y="2" width="95" height="16" uuid="edca7e16-d137-4d10-a847-0511be180f2c"/><textFieldExpression><![CDATA[$F{BILL_CYCLE_CODE} == null || $F{BILL_CYCLE_CODE}.trim().length() == 0 ? "UNASSIGNED" : $F{BILL_CYCLE_CODE}.trim()]]></textFieldExpression></textField>
-            <textField pattern="yyyy-MM-dd"><reportElement style="DetailText" x="185" y="2" width="150" height="16" uuid="f8b5e593-c435-4b2a-8bd0-28f9d1274fda"/><textFieldExpression><![CDATA[$F{BILL_DATE}]]></textFieldExpression></textField>
-            <textField pattern="yyyy-MM-dd HH:mm"><reportElement style="DetailText" x="335" y="2" width="150" height="16" uuid="25726b7c-1dad-4de0-bf41-a8ca5f75213e"/><textFieldExpression><![CDATA[$F{BILL_CREATE_DATE}]]></textFieldExpression></textField>
-            <textField><reportElement style="DetailText" x="485" y="2" width="110" height="16" uuid="a7d3a140-7187-433d-9107-6f893ae98cc6"/><textFieldExpression><![CDATA[$F{ACCOUNT_ID}]]></textFieldExpression></textField>
-            <textField><reportElement style="DetailText" x="595" y="2" width="110" height="16" uuid="1ed4d5ff-b294-4120-bab5-e9c90f4eb70c"/><textFieldExpression><![CDATA[$F{SERVICE_AGREEMENT_ID}]]></textFieldExpression></textField>
-            <textField><reportElement style="DetailText" x="705" y="2" width="100" height="16" uuid="7f339a15-0dd5-4ec4-b5f2-c11de0a30a96"/><textFieldExpression><![CDATA[$F{PREMISE_ID}]]></textFieldExpression></textField>
-            <textField><reportElement style="DetailText" x="805" y="2" width="100" height="16" uuid="7f83ac3e-799e-4929-80c0-d319b58c195d"/><textFieldExpression><![CDATA[$F{BILL_ID}]]></textFieldExpression></textField>
-            <textField><reportElement style="DetailText" x="905" y="2" width="100" height="16" uuid="b499b9d2-e1ef-4fd8-ae92-afe615ec3dbd"/><textFieldExpression><![CDATA[$F{BILL_SEGMENT_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="90" y="2" width="135" height="16" uuid="3288df3f-cf93-4cd4-b99d-ae9dc93d807c"/><textFieldExpression><![CDATA[$F{EXCEPTION_TYPE}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="225" y="2" width="90" height="16" uuid="edca7e16-d137-4d10-a847-0511be180f2c"/><textFieldExpression><![CDATA[$F{BILL_CYCLE_CODE} == null || $F{BILL_CYCLE_CODE}.trim().length() == 0 ? "UNASSIGNED" : $F{BILL_CYCLE_CODE}.trim()]]></textFieldExpression></textField>
+            <textField pattern="yyyy-MM-dd"><reportElement style="DetailText" x="315" y="2" width="120" height="16" uuid="f8b5e593-c435-4b2a-8bd0-28f9d1274fda"/><textFieldExpression><![CDATA[$F{BILL_DATE}]]></textFieldExpression></textField>
+            <textField pattern="yyyy-MM-dd HH:mm"><reportElement style="DetailText" x="435" y="2" width="130" height="16" uuid="25726b7c-1dad-4de0-bf41-a8ca5f75213e"/><textFieldExpression><![CDATA[$F{BILL_CREATE_DATE}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="565" y="2" width="100" height="16" uuid="a7d3a140-7187-433d-9107-6f893ae98cc6"/><textFieldExpression><![CDATA[$F{ACCOUNT_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="665" y="2" width="100" height="16" uuid="1ed4d5ff-b294-4120-bab5-e9c90f4eb70c"/><textFieldExpression><![CDATA[$F{SERVICE_AGREEMENT_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="765" y="2" width="90" height="16" uuid="7f339a15-0dd5-4ec4-b5f2-c11de0a30a96"/><textFieldExpression><![CDATA[$F{PREMISE_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="855" y="2" width="90" height="16" uuid="7f83ac3e-799e-4929-80c0-d319b58c195d"/><textFieldExpression><![CDATA[$F{BILL_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="945" y="2" width="90" height="16" uuid="b499b9d2-e1ef-4fd8-ae92-afe615ec3dbd"/><textFieldExpression><![CDATA[$F{BILL_SEGMENT_ID}]]></textFieldExpression></textField>
             <textField>
-                <reportElement style="DetailText" x="1005" y="2" width="145" height="16" uuid="4511f68a-0571-4b26-9734-c94ea7888e95"/>
+                <reportElement style="DetailText" x="1035" y="2" width="115" height="16" uuid="4511f68a-0571-4b26-9734-c94ea7888e95"/>
                 <textFieldExpression><![CDATA[
 "MISSING_BILL".equals($F{RECONCILIATION_RESULT}) ? "Verify Bill generation run"
  : ("MISSING_BSEG".equals($F{RECONCILIATION_RESULT}) ? "Verify segment generation/status" : "No action")
