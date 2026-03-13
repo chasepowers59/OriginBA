@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="Billing Verification v2" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CityCorp_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="SET_RECON_CONTEXT" label="Reconciliation Context" resourceId="JoinTree_1">
+      <items>
+        <item id="BILL_CYCLE_CODE" label="Bill Cycle Code" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_V2.BILL_CYCLE_CODE"></item>
+        <item id="BILL_CYCLE_DESCRIPTION" label="Bill Cycle Description" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_V2.BILL_CYCLE_DESCRIPTION"></item>
+        <item id="RECON_CYCLE_LAST_EVENT_DATE" label="Reconciliation Cycle Last Event Date" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_V2.CYCLE_LAST_EVENT_DATE"></item>
+        <item id="MOST_RECENT_BILL_CYCLE_SW_RECON" label="Most Recent Bill Cycle (Reconciliation)" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_V2.MOST_RECENT_BILL_CYCLE_SW"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SET_RECON_MEASURES" label="Reconciliation Measures" resourceId="JoinTree_1">
+      <items>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="EXPECTED_ACTIVE_SA_COUNT" label="Expected Active SA Count" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_V2.EXPECTED_ACTIVE_SA_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="EXPECTED_ACTIVE_ACCOUNT_COUNT" label="Expected Active Account Count" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_V2.EXPECTED_ACTIVE_ACCOUNT_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTUAL_BILLED_SA_COUNT" label="Actual Billed SA Count" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_V2.ACTUAL_BILLED_SA_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTUAL_BILLED_ACCOUNT_COUNT" label="Actual Billed Account Count" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_V2.ACTUAL_BILLED_ACCOUNT_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTUAL_BILL_SEGMENT_COUNT" label="Actual Bill Segment Count" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_V2.ACTUAL_BILL_SEGMENT_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTUAL_BILL_COUNT" label="Actual Bill Count" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_V2.ACTUAL_BILL_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="MISSING_ACTIVE_SA_COUNT" label="Missing Active SA Count" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_V2.MISSING_ACTIVE_SA_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="MISSING_ACTIVE_ACCOUNT_COUNT" label="Missing Active Account Count" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_V2.MISSING_ACTIVE_ACCOUNT_COUNT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SET_RECON_MEASURES_MATCHED" label="Reconciliation Measures (Expected Population Matched)" resourceId="JoinTree_1">
+      <items>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="EXPECTED_ACTIVE_SA_COUNT_MATCHED" label="Expected Active SA Count (Matched)" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_MATCHED_V2.EXPECTED_ACTIVE_SA_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="EXPECTED_ACTIVE_ACCOUNT_COUNT_MATCHED" label="Expected Active Account Count (Matched)" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_MATCHED_V2.EXPECTED_ACTIVE_ACCOUNT_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTUAL_BILLED_SA_COUNT_MATCHED" label="Actual Billed SA Count (Matched)" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_MATCHED_V2.ACTUAL_BILLED_SA_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTUAL_BILLED_ACCOUNT_COUNT_MATCHED" label="Actual Billed Account Count (Matched)" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_MATCHED_V2.ACTUAL_BILLED_ACCOUNT_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTUAL_BILL_SEGMENT_COUNT_MATCHED" label="Actual Bill Segment Count (Matched)" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_MATCHED_V2.ACTUAL_BILL_SEGMENT_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTUAL_BILL_COUNT_MATCHED" label="Actual Bill Count (Matched)" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_MATCHED_V2.ACTUAL_BILL_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="MISSING_ACTIVE_SA_COUNT_MATCHED" label="Missing Active SA Count (Matched)" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_MATCHED_V2.MISSING_ACTIVE_SA_COUNT"></item>
+        <item defaultAgg="Max" dimensionOrMeasure="Measure" id="MISSING_ACTIVE_ACCOUNT_COUNT_MATCHED" label="Missing Active Account Count (Matched)" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_RECON_MATCHED_V2.MISSING_ACTIVE_ACCOUNT_COUNT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SET_DETAIL_KEYS" label="Detail Keys" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCOUNT_ID" label="Account ID" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.ACCOUNT_ID"></item>
+        <item id="SERVICE_AGREEMENT_ID" label="Service Agreement ID" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.SERVICE_AGREEMENT_ID"></item>
+        <item id="PREMISE_ID" label="Premise ID" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.PREMISE_ID"></item>
+        <item id="BILL_ID_DETAIL" label="Bill ID" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.BILL_ID"></item>
+        <item id="BILL_SEGMENT_ID_DETAIL" label="Bill Segment ID" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.BILL_SEGMENT_ID"></item>
+        <item id="MOST_RECENT_BILL_CYCLE_SW_DETAIL" label="Most Recent Bill Cycle (Detail)" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.MOST_RECENT_BILL_CYCLE_SW"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SET_DETAIL_STATUS_DATES" label="Detail Status And Dates" resourceId="JoinTree_1">
+      <items>
+        <item id="BILL_DATE" label="Bill Date" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.BILL_DATE"></item>
+        <item id="BILL_CREATE_DATE" label="Bill Create Date" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.BILL_CREATE_DATE"></item>
+        <item id="BSEG_CREATE_DATE" label="Bill Segment Create Date" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.BSEG_CREATE_DATE"></item>
+        <item id="EVENT_DATE" label="Event Date" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.EVENT_DATE"></item>
+        <item id="BILL_STATUS_DESCRIPTION" label="Bill Status Description" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.BILL_STATUS_DESCRIPTION"></item>
+        <item id="BSEG_STATUS_DESCRIPTION" label="Bill Segment Status Description" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.BSEG_STATUS_DESCRIPTION"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SET_DETAIL_EXCEPTIONS" label="Detail Exceptions" resourceId="JoinTree_1">
+      <items>
+        <item id="IS_ERROR_SW" label="Is Exception" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.IS_ERROR_SW"></item>
+        <item id="EXCEPTION_TYPE" label="Exception Type" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.EXCEPTION_TYPE"></item>
+        <item id="ERROR_REASON" label="Exception Detail" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.ERROR_REASON"></item>
+        <item id="RECOMMENDED_ACTION" label="Recommended Action" resourceId="JoinTree_1.BC_BILLING_VERIFICATION_DETAIL_V2.RECOMMENDED_ACTION"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcQuery id="BC_BILLING_VERIFICATION_DETAIL_V2" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="BILL_CYCLE_CODE" type="java.lang.String"></field>
+        <field id="ACCOUNT_ID" type="java.lang.String"></field>
+        <field id="SERVICE_AGREEMENT_ID" type="java.lang.String"></field>
+        <field id="PREMISE_ID" type="java.lang.String"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="BILL_SEGMENT_ID" type="java.lang.String"></field>
+        <field id="BILL_DATE" type="java.sql.Timestamp"></field>
+        <field id="BILL_CREATE_DATE" type="java.sql.Timestamp"></field>
+        <field id="BSEG_CREATE_DATE" type="java.sql.Timestamp"></field>
+        <field id="BILL_STATUS_DESCRIPTION" type="java.lang.String"></field>
+        <field id="BSEG_STATUS_DESCRIPTION" type="java.lang.String"></field>
+        <field id="IS_ERROR_SW" type="java.lang.String"></field>
+        <field id="ERROR_REASON" type="java.lang.String"></field>
+        <field id="EXCEPTION_TYPE" type="java.lang.String"></field>
+        <field id="RECOMMENDED_ACTION" type="java.lang.String"></field>
+        <field id="EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="MOST_RECENT_BILL_CYCLE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT q.bill_cycle_code,q.account_id,q.service_agreement_id,q.premise_id,q.bill_id,q.bill_segment_id,q.bill_date,q.bill_create_date,q.bseg_create_date,q.bill_status_description,q.bseg_status_description,q.is_error_sw,q.error_reason,q.exception_type,q.recommended_action,q.event_date,q.most_recent_bill_cycle_sw FROM (WITH bill_day_volume AS (SELECT NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), '') AS bill_cycle_code,TRUNC(NVL(b.bill_dt, b.cre_dttm)) AS event_date,COUNT(DISTINCT b.acct_id) AS acct_count FROM cisadm.ci_bill b LEFT JOIN cisadm.ci_acct ac ON ac.acct_id = b.acct_id WHERE NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), '') IS NOT NULL AND NVL(b.bill_dt, b.cre_dttm) &gt;= ADD_MONTHS(TRUNC(SYSDATE), -18) AND NVL(b.bill_dt, b.cre_dttm) &lt; TRUNC(SYSDATE) + 1 GROUP BY NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), ''),TRUNC(NVL(b.bill_dt, b.cre_dttm))), cycle_anchor AS (SELECT bill_cycle_code,MAX(event_date) AS cycle_anchor_date FROM (SELECT bdv.bill_cycle_code,bdv.event_date,bdv.acct_count,MAX(bdv.acct_count) OVER (PARTITION BY bdv.bill_cycle_code) AS max_acct_count FROM bill_day_volume bdv) WHERE acct_count &gt;= GREATEST(1, CEIL(max_acct_count * 0.80)) GROUP BY bill_cycle_code), expected_population AS (SELECT DISTINCT NULLIF(TRIM(ac.bill_cyc_cd), '') AS bill_cycle_code,sa.acct_id,sa.sa_id FROM cisadm.ci_sa sa JOIN cisadm.ci_acct ac ON ac.acct_id = sa.acct_id JOIN cycle_anchor ca ON ca.bill_cycle_code = NULLIF(TRIM(ac.bill_cyc_cd), '') WHERE TRIM(sa.sa_status_flg) IN ('20','30') AND NULLIF(TRIM(ac.bill_cyc_cd), '') IS NOT NULL AND (sa.start_dt IS NULL OR TRUNC(sa.start_dt) &lt; ca.cycle_anchor_date - 7) AND (sa.end_dt IS NULL OR TRUNC(sa.end_dt) &gt; ca.cycle_anchor_date) AND TRIM(sa.sa_type_cd) NOT IN ('EXCSCRED','DEP-RES','FEES','SSMRES','DEP-COM','SSMCOM','SSMIND','SSMPA')), actual_expected_segments AS (SELECT DISTINCT ep.bill_cycle_code,ep.sa_id FROM expected_population ep JOIN cycle_anchor ca ON ca.bill_cycle_code = ep.bill_cycle_code JOIN cisadm.ci_bseg s ON s.sa_id = ep.sa_id LEFT JOIN cisadm.ci_bill b ON b.bill_id = s.bill_id LEFT JOIN cisadm.ci_sa sa ON sa.sa_id = s.sa_id LEFT JOIN cisadm.ci_acct ac ON ac.acct_id = NVL(b.acct_id, sa.acct_id) WHERE NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), '') = ep.bill_cycle_code AND TRUNC(NVL(b.cre_dttm, s.cre_dttm)) = ca.cycle_anchor_date) SELECT ep.bill_cycle_code,ep.acct_id AS account_id,ep.sa_id AS service_agreement_id,CAST(NULL AS VARCHAR2(60)) AS premise_id,CAST(NULL AS VARCHAR2(60)) AS bill_id,CAST(NULL AS VARCHAR2(60)) AS bill_segment_id,CAST(NULL AS DATE) AS bill_date,CAST(NULL AS DATE) AS bill_create_date,CAST(NULL AS DATE) AS bseg_create_date,CAST(NULL AS VARCHAR2(200)) AS bill_status_description,CAST(NULL AS VARCHAR2(200)) AS bseg_status_description,'Y' AS is_error_sw,'Expected service agreement did not produce a matched billed segment on the anchored operational run date.' AS error_reason,'MISSING_EXPECTED_BILL' AS exception_type,'Review billing completion for the service agreement on the anchored operational run date.' AS recommended_action,ca.cycle_anchor_date AS event_date,CASE WHEN ca.cycle_anchor_date = (SELECT MAX(cycle_anchor_date) FROM cycle_anchor) THEN 'Y' ELSE 'N' END AS most_recent_bill_cycle_sw FROM expected_population ep JOIN cycle_anchor ca ON ca.bill_cycle_code = ep.bill_cycle_code LEFT JOIN actual_expected_segments aes ON aes.bill_cycle_code = ep.bill_cycle_code AND aes.sa_id = ep.sa_id WHERE aes.sa_id IS NULL) q</query>
+    </jdbcQuery>
+    <jdbcQuery id="BC_BILLING_VERIFICATION_RECON_V2" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="BILL_CYCLE_CODE" type="java.lang.String"></field>
+        <field id="BILL_CYCLE_DESCRIPTION" type="java.lang.String"></field>
+        <field id="EXPECTED_ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="EXPECTED_ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTUAL_BILLED_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTUAL_BILLED_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTUAL_BILL_SEGMENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTUAL_BILL_COUNT" type="java.math.BigDecimal"></field>
+        <field id="MISSING_ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="MISSING_ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="CYCLE_LAST_EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="MOST_RECENT_BILL_CYCLE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT q.bill_cycle_code,q.bill_cycle_description,q.expected_active_sa_count,q.expected_active_account_count,q.actual_billed_sa_count,q.actual_billed_account_count,q.actual_bill_segment_count,q.actual_bill_count,q.missing_active_sa_count,q.missing_active_account_count,q.cycle_last_event_date,q.most_recent_bill_cycle_sw FROM (WITH bill_day_volume AS (SELECT NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), '') AS bill_cycle_code,TRUNC(NVL(b.bill_dt, b.cre_dttm)) AS event_date,COUNT(DISTINCT b.acct_id) AS acct_count,COUNT(DISTINCT b.bill_id) AS bill_count FROM cisadm.ci_bill b LEFT JOIN cisadm.ci_acct ac ON ac.acct_id = b.acct_id WHERE NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), '') IS NOT NULL AND NVL(b.bill_dt, b.cre_dttm) &gt;= ADD_MONTHS(TRUNC(SYSDATE), -18) AND NVL(b.bill_dt, b.cre_dttm) &lt; TRUNC(SYSDATE) + 1 GROUP BY NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), ''),TRUNC(NVL(b.bill_dt, b.cre_dttm))), cycle_anchor AS (SELECT bill_cycle_code,MAX(event_date) AS cycle_last_event_date FROM (SELECT bdv.bill_cycle_code,bdv.event_date,bdv.acct_count,MAX(bdv.acct_count) OVER (PARTITION BY bdv.bill_cycle_code) AS max_acct_count FROM bill_day_volume bdv) WHERE acct_count &gt;= GREATEST(1, CEIL(max_acct_count * 0.80)) GROUP BY bill_cycle_code), cycle_catalog AS (SELECT DISTINCT NULLIF(TRIM(ac.bill_cyc_cd), '') AS bill_cycle_code FROM cisadm.ci_sa sa JOIN cisadm.ci_acct ac ON ac.acct_id = sa.acct_id JOIN cycle_anchor ca ON ca.bill_cycle_code = NULLIF(TRIM(ac.bill_cyc_cd), '') WHERE TRIM(sa.sa_status_flg) IN ('20','30') AND NULLIF(TRIM(ac.bill_cyc_cd), '') IS NOT NULL AND (sa.start_dt IS NULL OR TRUNC(sa.start_dt) &lt; ca.cycle_last_event_date - 7) AND (sa.end_dt IS NULL OR TRUNC(sa.end_dt) &gt; ca.cycle_last_event_date) AND TRIM(sa.sa_type_cd) NOT IN ('EXCSCRED','DEP-RES','FEES','SSMRES','DEP-COM','SSMCOM','SSMIND','SSMPA') UNION SELECT bill_cycle_code FROM cycle_anchor), expected_counts AS (SELECT NULLIF(TRIM(ac.bill_cyc_cd), '') AS bill_cycle_code,COUNT(DISTINCT sa.sa_id) AS expected_active_sa_count,COUNT(DISTINCT sa.acct_id) AS expected_active_account_count FROM cisadm.ci_sa sa JOIN cisadm.ci_acct ac ON ac.acct_id = sa.acct_id JOIN cycle_anchor ca ON ca.bill_cycle_code = NULLIF(TRIM(ac.bill_cyc_cd), '') WHERE TRIM(sa.sa_status_flg) IN ('20','30') AND NULLIF(TRIM(ac.bill_cyc_cd), '') IS NOT NULL AND (sa.start_dt IS NULL OR TRUNC(sa.start_dt) &lt; ca.cycle_last_event_date - 7) AND (sa.end_dt IS NULL OR TRUNC(sa.end_dt) &gt; ca.cycle_last_event_date) AND TRIM(sa.sa_type_cd) NOT IN ('EXCSCRED','DEP-RES','FEES','SSMRES','DEP-COM','SSMCOM','SSMIND','SSMPA') GROUP BY NULLIF(TRIM(ac.bill_cyc_cd), '')), anchor_bill_header_counts AS (SELECT ca.bill_cycle_code,COUNT(DISTINCT b.bill_id) AS actual_bill_count,COUNT(DISTINCT b.acct_id) AS actual_billed_account_count FROM cycle_anchor ca JOIN cisadm.ci_bill b ON TRUNC(NVL(b.bill_dt, b.cre_dttm)) = ca.cycle_last_event_date LEFT JOIN cisadm.ci_acct ac ON ac.acct_id = b.acct_id WHERE NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), '') = ca.bill_cycle_code AND NVL(b.bill_dt, b.cre_dttm) &gt;= ADD_MONTHS(TRUNC(SYSDATE), -18) AND NVL(b.bill_dt, b.cre_dttm) &lt; TRUNC(SYSDATE) + 1 GROUP BY ca.bill_cycle_code), anchor_segment_counts AS (SELECT ca.bill_cycle_code,COUNT(DISTINCT seg.bseg_id) AS actual_bill_segment_count,COUNT(DISTINCT seg.sa_id) AS actual_billed_sa_count FROM cycle_anchor ca JOIN (SELECT NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), '') AS bill_cycle_code,s.sa_id,s.bseg_id,TRUNC(NVL(b.bill_dt, s.cre_dttm)) AS event_date FROM cisadm.ci_bseg s LEFT JOIN cisadm.ci_bill b ON b.bill_id = s.bill_id LEFT JOIN cisadm.ci_sa sa ON sa.sa_id = s.sa_id LEFT JOIN cisadm.ci_acct ac ON ac.acct_id = NVL(b.acct_id, sa.acct_id) WHERE NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), '') IS NOT NULL AND NVL(b.bill_dt, s.cre_dttm) &gt;= ADD_MONTHS(TRUNC(SYSDATE), -18) AND NVL(b.bill_dt, s.cre_dttm) &lt; TRUNC(SYSDATE) + 1) seg ON seg.bill_cycle_code = ca.bill_cycle_code AND seg.event_date = ca.cycle_last_event_date GROUP BY ca.bill_cycle_code), actual_counts AS (SELECT ca.bill_cycle_code,ca.cycle_last_event_date,NVL(ascs.actual_billed_sa_count,0) AS actual_billed_sa_count,NVL(abhc.actual_billed_account_count,0) AS actual_billed_account_count,NVL(ascs.actual_bill_segment_count,0) AS actual_bill_segment_count,NVL(abhc.actual_bill_count,0) AS actual_bill_count FROM cycle_anchor ca LEFT JOIN anchor_bill_header_counts abhc ON abhc.bill_cycle_code = ca.bill_cycle_code LEFT JOIN anchor_segment_counts ascs ON ascs.bill_cycle_code = ca.bill_cycle_code), cycle_desc AS (SELECT TRIM(bill_cyc_cd) AS bill_cycle_code,MAX(descr) AS bill_cycle_description FROM cisadm.ci_bill_cyc_l WHERE language_cd IN ('ENG','EN') GROUP BY TRIM(bill_cyc_cd)) SELECT c.bill_cycle_code,NVL(d.bill_cycle_description,'Cycle ' || c.bill_cycle_code) AS bill_cycle_description,NVL(e.expected_active_sa_count,0) AS expected_active_sa_count,NVL(e.expected_active_account_count,0) AS expected_active_account_count,NVL(a.actual_billed_sa_count,0) AS actual_billed_sa_count,NVL(a.actual_billed_account_count,0) AS actual_billed_account_count,NVL(a.actual_bill_segment_count,0) AS actual_bill_segment_count,NVL(a.actual_bill_count,0) AS actual_bill_count,GREATEST(NVL(e.expected_active_sa_count,0)-NVL(a.actual_billed_sa_count,0),0) AS missing_active_sa_count,GREATEST(NVL(e.expected_active_account_count,0)-NVL(a.actual_billed_account_count,0),0) AS missing_active_account_count,a.cycle_last_event_date,CASE WHEN a.cycle_last_event_date = MAX(a.cycle_last_event_date) OVER () THEN 'Y' ELSE 'N' END AS most_recent_bill_cycle_sw FROM cycle_catalog c LEFT JOIN expected_counts e ON e.bill_cycle_code = c.bill_cycle_code LEFT JOIN actual_counts a ON a.bill_cycle_code = c.bill_cycle_code LEFT JOIN cycle_desc d ON d.bill_cycle_code = c.bill_cycle_code WHERE c.bill_cycle_code IS NOT NULL) q</query>
+    </jdbcQuery>
+    <jdbcQuery id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="BILL_CYCLE_CODE" type="java.lang.String"></field>
+        <field id="BILL_CYCLE_DESCRIPTION" type="java.lang.String"></field>
+        <field id="EXPECTED_ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="EXPECTED_ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTUAL_BILLED_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTUAL_BILLED_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTUAL_BILL_SEGMENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTUAL_BILL_COUNT" type="java.math.BigDecimal"></field>
+        <field id="MISSING_ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="MISSING_ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="CYCLE_LAST_EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="MOST_RECENT_BILL_CYCLE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT q.bill_cycle_code,q.bill_cycle_description,q.expected_active_sa_count,q.expected_active_account_count,q.actual_billed_sa_count,q.actual_billed_account_count,q.actual_bill_segment_count,q.actual_bill_count,q.missing_active_sa_count,q.missing_active_account_count,q.cycle_last_event_date,q.most_recent_bill_cycle_sw FROM (WITH bill_day_volume AS (SELECT NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), '') AS bill_cycle_code,TRUNC(NVL(b.bill_dt, b.cre_dttm)) AS event_date,COUNT(DISTINCT b.acct_id) AS acct_count,COUNT(DISTINCT b.bill_id) AS bill_count FROM cisadm.ci_bill b LEFT JOIN cisadm.ci_acct ac ON ac.acct_id = b.acct_id WHERE NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), '') IS NOT NULL AND NVL(b.bill_dt, b.cre_dttm) &gt;= ADD_MONTHS(TRUNC(SYSDATE), -18) AND NVL(b.bill_dt, b.cre_dttm) &lt; TRUNC(SYSDATE) + 1 GROUP BY NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), ''),TRUNC(NVL(b.bill_dt, b.cre_dttm))), cycle_anchor AS (SELECT bill_cycle_code,MAX(event_date) AS cycle_last_event_date FROM (SELECT bdv.bill_cycle_code,bdv.event_date,bdv.acct_count,MAX(bdv.acct_count) OVER (PARTITION BY bdv.bill_cycle_code) AS max_acct_count FROM bill_day_volume bdv) WHERE acct_count &gt;= GREATEST(1, CEIL(max_acct_count * 0.80)) GROUP BY bill_cycle_code), expected_population AS (SELECT DISTINCT NULLIF(TRIM(ac.bill_cyc_cd), '') AS bill_cycle_code,sa.acct_id,sa.sa_id FROM cisadm.ci_sa sa JOIN cisadm.ci_acct ac ON ac.acct_id = sa.acct_id JOIN cycle_anchor ca ON ca.bill_cycle_code = NULLIF(TRIM(ac.bill_cyc_cd), '') WHERE TRIM(sa.sa_status_flg) IN ('20','30') AND NULLIF(TRIM(ac.bill_cyc_cd), '') IS NOT NULL AND (sa.start_dt IS NULL OR TRUNC(sa.start_dt) &lt; ca.cycle_last_event_date - 7) AND (sa.end_dt IS NULL OR TRUNC(sa.end_dt) &gt; ca.cycle_last_event_date) AND TRIM(sa.sa_type_cd) NOT IN ('EXCSCRED','DEP-RES','FEES','SSMRES','DEP-COM','SSMCOM','SSMIND','SSMPA')), cycle_catalog AS (SELECT DISTINCT bill_cycle_code FROM expected_population UNION SELECT bill_cycle_code FROM cycle_anchor), expected_counts AS (SELECT bill_cycle_code,COUNT(DISTINCT sa_id) AS expected_active_sa_count,COUNT(DISTINCT acct_id) AS expected_active_account_count FROM expected_population GROUP BY bill_cycle_code), actual_expected_segments AS (SELECT ep.bill_cycle_code,ep.acct_id,ep.sa_id,s.bseg_id,b.bill_id FROM expected_population ep JOIN cycle_anchor ca ON ca.bill_cycle_code = ep.bill_cycle_code JOIN cisadm.ci_bseg s ON s.sa_id = ep.sa_id LEFT JOIN cisadm.ci_bill b ON b.bill_id = s.bill_id LEFT JOIN cisadm.ci_sa sa ON sa.sa_id = s.sa_id LEFT JOIN cisadm.ci_acct ac ON ac.acct_id = NVL(b.acct_id, sa.acct_id) WHERE NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), '') = ep.bill_cycle_code AND TRUNC(NVL(b.cre_dttm, s.cre_dttm)) = ca.cycle_last_event_date), actual_expected_accounts AS (SELECT DISTINCT ep.bill_cycle_code,ep.acct_id FROM expected_population ep JOIN cycle_anchor ca ON ca.bill_cycle_code = ep.bill_cycle_code JOIN cisadm.ci_bseg s ON 1 = 1 LEFT JOIN cisadm.ci_bill b ON b.bill_id = s.bill_id LEFT JOIN cisadm.ci_sa sa ON sa.sa_id = s.sa_id LEFT JOIN cisadm.ci_acct ac ON ac.acct_id = NVL(b.acct_id, sa.acct_id) WHERE NVL(b.acct_id, sa.acct_id) = ep.acct_id AND NULLIF(TRIM(NVL(b.bill_cyc_cd, ac.bill_cyc_cd)), '') = ep.bill_cycle_code AND TRUNC(NVL(b.cre_dttm, s.cre_dttm)) = ca.cycle_last_event_date), actual_counts AS (SELECT ca.bill_cycle_code,ca.cycle_last_event_date,COUNT(DISTINCT aes.sa_id) AS actual_billed_sa_count,COUNT(DISTINCT aea.acct_id) AS actual_billed_account_count,COUNT(DISTINCT aes.bseg_id) AS actual_bill_segment_count,COUNT(DISTINCT aes.bill_id) AS actual_bill_count FROM cycle_anchor ca LEFT JOIN actual_expected_segments aes ON aes.bill_cycle_code = ca.bill_cycle_code LEFT JOIN actual_expected_accounts aea ON aea.bill_cycle_code = ca.bill_cycle_code GROUP BY ca.bill_cycle_code,ca.cycle_last_event_date), cycle_desc AS (SELECT TRIM(bill_cyc_cd) AS bill_cycle_code,MAX(descr) AS bill_cycle_description FROM cisadm.ci_bill_cyc_l WHERE language_cd IN ('ENG','EN') GROUP BY TRIM(bill_cyc_cd)) SELECT c.bill_cycle_code,NVL(d.bill_cycle_description,'Cycle ' || c.bill_cycle_code) AS bill_cycle_description,NVL(e.expected_active_sa_count,0) AS expected_active_sa_count,NVL(e.expected_active_account_count,0) AS expected_active_account_count,NVL(a.actual_billed_sa_count,0) AS actual_billed_sa_count,NVL(a.actual_billed_account_count,0) AS actual_billed_account_count,NVL(a.actual_bill_segment_count,0) AS actual_bill_segment_count,NVL(a.actual_bill_count,0) AS actual_bill_count,GREATEST(NVL(e.expected_active_sa_count,0)-NVL(a.actual_billed_sa_count,0),0) AS missing_active_sa_count,GREATEST(NVL(e.expected_active_account_count,0)-NVL(a.actual_billed_account_count,0),0) AS missing_active_account_count,a.cycle_last_event_date,CASE WHEN a.cycle_last_event_date = MAX(a.cycle_last_event_date) OVER () THEN 'Y' ELSE 'N' END AS most_recent_bill_cycle_sw FROM cycle_catalog c LEFT JOIN expected_counts e ON e.bill_cycle_code = c.bill_cycle_code LEFT JOIN actual_counts a ON a.bill_cycle_code = c.bill_cycle_code LEFT JOIN cycle_desc d ON d.bill_cycle_code = c.bill_cycle_code WHERE c.bill_cycle_code IS NOT NULL) q</query>
+    </jdbcQuery>
+    <jdbcTable id="JoinTree_1" datasourceId="CityCorp_DS" datasourceTableName="BC_BILLING_VERIFICATION_RECON_V2" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BC_BILLING_VERIFICATION_RECON_V2.BILL_CYCLE_CODE" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_V2.BILL_CYCLE_DESCRIPTION" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_V2.EXPECTED_ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_V2.EXPECTED_ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_V2.ACTUAL_BILLED_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_V2.ACTUAL_BILLED_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_V2.ACTUAL_BILL_SEGMENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_V2.ACTUAL_BILL_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_V2.MISSING_ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_V2.MISSING_ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_V2.CYCLE_LAST_EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_V2.MOST_RECENT_BILL_CYCLE_SW" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2.BILL_CYCLE_CODE" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2.BILL_CYCLE_DESCRIPTION" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2.EXPECTED_ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2.EXPECTED_ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2.ACTUAL_BILLED_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2.ACTUAL_BILLED_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2.ACTUAL_BILL_SEGMENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2.ACTUAL_BILL_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2.MISSING_ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2.MISSING_ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2.CYCLE_LAST_EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="BC_BILLING_VERIFICATION_RECON_MATCHED_V2.MOST_RECENT_BILL_CYCLE_SW" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.BILL_CYCLE_CODE" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.ACCOUNT_ID" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.SERVICE_AGREEMENT_ID" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.PREMISE_ID" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.BILL_ID" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.BILL_SEGMENT_ID" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.BILL_DATE" type="java.sql.Timestamp"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.BILL_CREATE_DATE" type="java.sql.Timestamp"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.BSEG_CREATE_DATE" type="java.sql.Timestamp"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.BILL_STATUS_DESCRIPTION" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.BSEG_STATUS_DESCRIPTION" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.IS_ERROR_SW" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.ERROR_REASON" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.EXCEPTION_TYPE" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.RECOMMENDED_ACTION" type="java.lang.String"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="BC_BILLING_VERIFICATION_DETAIL_V2.MOST_RECENT_BILL_CYCLE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <joinInfo alias="BC_BILLING_VERIFICATION_RECON_V2" referenceId="BC_BILLING_VERIFICATION_RECON_V2"></joinInfo>
+      <joinList>
+        <join expr="BC_BILLING_VERIFICATION_RECON_V2.BILL_CYCLE_CODE == BC_BILLING_VERIFICATION_RECON_MATCHED_V2.BILL_CYCLE_CODE" left="BC_BILLING_VERIFICATION_RECON_V2" right="BC_BILLING_VERIFICATION_RECON_MATCHED_V2" type="leftOuter" weight="1"></join>
+        <join expr="BC_BILLING_VERIFICATION_RECON_V2.BILL_CYCLE_CODE == BC_BILLING_VERIFICATION_DETAIL_V2.BILL_CYCLE_CODE" left="BC_BILLING_VERIFICATION_RECON_V2" right="BC_BILLING_VERIFICATION_DETAIL_V2" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="BC_BILLING_VERIFICATION_RECON_V2" tableId="BC_BILLING_VERIFICATION_RECON_V2"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="BC_BILLING_VERIFICATION_RECON_MATCHED_V2" tableId="BC_BILLING_VERIFICATION_RECON_MATCHED_V2"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="BC_BILLING_VERIFICATION_DETAIL_V2" tableId="BC_BILLING_VERIFICATION_DETAIL_V2"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

@@ -21,10 +21,8 @@ For each `BILL_CYC_CD` and billing window/date:
    - `ORPHAN_BSEG`: Bill Segment exists without Bill.
    - `BILL_STATUS_EXCEPTION`: bill header status code `P` (`Pending`).
    - `BSEG_STATUS_EXCEPTION`: bill segment status codes `10` (`Incomplete`), `20` (`Error`), or `40` (`Pending Cancel`).
-8. The domain now exposes two summary measure sets:
-   - legacy reconciliation measures that compare expected population to all billed activity on the anchored day
-   - matched reconciliation measures that compare expected population only to billed SAs/accounts from that same expected population, using create-date-based operational actuals on the anchored day
-9. The detail dataset is aligned to the matched summary set and now returns one row per expected-population SA that did not produce a matched billed segment on the anchored operational run date.
+8. The active domain uses a matched operational reconciliation summary that compares the expected population only to billed SAs/accounts from that same expected population, using create-date-based operational actuals on the anchored day.
+9. The detail dataset is aligned to that summary and returns one row per expected-population SA that did not produce a matched billed segment on the anchored operational run date.
 
 ## Source-of-Truth Tables (from Bill Segment domain export)
 1. `CISADM.CI_BILL`
