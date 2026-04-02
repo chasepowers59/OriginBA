@@ -84,6 +84,12 @@ Professional workspace for Oracle Utilities C2M (CISADM schema), Jaspersoft Doma
 - Workflow runbook: `docs/sql_jaspersoft_workflow_implementation.md`
 - Local skills: `skills/README.md`
 - Knowledge base: `knowledge_base/README.md`
+- CISADM vocabulary guide: `docs/cisadm_workstream_vocabulary_guide.md`
+- CISADM SQL cheat sheet: `docs/cisadm_sql_cheat_sheet.md`
+- CISADM workstream study deck: `docs/cisadm_workstream_study_deck.md`
+- CISADM relationship map: `docs/cisadm_relationship_map.md`
+- C2M CISADM analyst handbook: `docs/c2m_cisadm_analyst_handbook.md`
+- CISADM starter SQL patterns: `docs/cisadm_starter_sql_patterns.md`
 
 ## SQL Quality Workflow
 - Dedicated CI workflow: `.github/workflows/sql-quality.yml`

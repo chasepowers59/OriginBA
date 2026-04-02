@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="Bill Cycle Verification" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="BILL_CYCLE_CODE" label="Bill Cycle Code" resourceId="JoinTree_1.CI_BILL_CYC_L.BILL_CYC_CD"></item>
+    <item id="BILL_CYCLE_DESCRIPTION" label="Bill Cycle Description" resourceId="JoinTree_1.CI_BILL_CYC_L.DESCR"></item>
+
+    <item defaultAgg="Max" dimensionOrMeasure="Measure" id="EXPECTED_ACTIVE_SA_COUNT" label="Expected Active SA Count" resourceId="JoinTree_1.BC_EXPECTED_VS_ACTUAL_FAST.EXPECTED_ACTIVE_SA_COUNT"></item>
+    <item defaultAgg="Max" dimensionOrMeasure="Measure" id="EXPECTED_ACTIVE_ACCOUNT_COUNT" label="Expected Active Account Count" resourceId="JoinTree_1.BC_EXPECTED_VS_ACTUAL_FAST.EXPECTED_ACTIVE_ACCOUNT_COUNT"></item>
+    <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTUAL_BILLED_SA_COUNT" label="Actual Billed SA Count" resourceId="JoinTree_1.BC_EXPECTED_VS_ACTUAL_FAST.ACTUAL_BILLED_SA_COUNT"></item>
+    <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTUAL_BILLED_ACCOUNT_COUNT" label="Actual Billed Account Count" resourceId="JoinTree_1.BC_EXPECTED_VS_ACTUAL_FAST.ACTUAL_BILLED_ACCOUNT_COUNT"></item>
+    <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTUAL_BILL_SEGMENT_COUNT" label="Actual Bill Segment Count" resourceId="JoinTree_1.BC_EXPECTED_VS_ACTUAL_FAST.ACTUAL_BILL_SEGMENT_COUNT"></item>
+    <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTUAL_BILL_COUNT" label="Actual Bill Count" resourceId="JoinTree_1.BC_EXPECTED_VS_ACTUAL_FAST.ACTUAL_BILL_COUNT"></item>
+    <item defaultAgg="Max" dimensionOrMeasure="Measure" id="MISSING_ACTIVE_SA_COUNT" label="Missing Active SA Count" resourceId="JoinTree_1.BC_EXPECTED_VS_ACTUAL_FAST.MISSING_ACTIVE_SA_COUNT"></item>
+    <item defaultAgg="Max" dimensionOrMeasure="Measure" id="MISSING_ACTIVE_ACCOUNT_COUNT" label="Missing Active Account Count" resourceId="JoinTree_1.BC_EXPECTED_VS_ACTUAL_FAST.MISSING_ACTIVE_ACCOUNT_COUNT"></item>
+    <item id="RECON_CYCLE_LAST_EVENT_DATE" label="Reconciliation Cycle Last Event Date" resourceId="JoinTree_1.BC_EXPECTED_VS_ACTUAL_FAST.CYCLE_LAST_EVENT_DATE"></item>
+    <item id="MOST_RECENT_BILL_CYCLE_SW_RECON" label="Most Recent Bill Cycle (Reconciliation)" resourceId="JoinTree_1.BC_EXPECTED_VS_ACTUAL_FAST.MOST_RECENT_BILL_CYCLE_SW"></item>
+
+    <item defaultAgg="Max" dimensionOrMeasure="Measure" id="BILL_SEGMENT_COUNT" label="Bill Segment Count" resourceId="JoinTree_1.BC_CYCLE_NUMBERS_FAST.BILL_SEGMENT_COUNT"></item>
+    <item defaultAgg="Max" dimensionOrMeasure="Measure" id="BILL_COUNT" label="Bill Count" resourceId="JoinTree_1.BC_CYCLE_NUMBERS_FAST.BILL_COUNT"></item>
+    <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTIVE_SERVICE_AGREEMENT_COUNT" label="Active Service Agreement Count" resourceId="JoinTree_1.BC_CYCLE_NUMBERS_FAST.ACTIVE_SERVICE_AGREEMENT_COUNT"></item>
+    <item defaultAgg="Max" dimensionOrMeasure="Measure" id="ACTIVE_ACCOUNT_COUNT" label="Active Account Count" resourceId="JoinTree_1.BC_CYCLE_NUMBERS_FAST.ACTIVE_ACCOUNT_COUNT"></item>
+    <item id="LAST_BILL_DATE" label="Last Bill Date" resourceId="JoinTree_1.BC_CYCLE_NUMBERS_FAST.LAST_BILL_DATE"></item>
+    <item id="MOST_RECENT_BILL_CYCLE_SW_NUMBERS" label="Most Recent Bill Cycle (Cycle Numbers)" resourceId="JoinTree_1.BC_CYCLE_NUMBERS_FAST.MOST_RECENT_BILL_CYCLE_SW"></item>
+
+    <item id="ACCOUNT_ID" label="Account ID" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.ACCOUNT_ID"></item>
+    <item id="SERVICE_AGREEMENT_ID" label="Service Agreement ID" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.SERVICE_AGREEMENT_ID"></item>
+    <item id="PREMISE_ID" label="Premise ID" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.PREMISE_ID"></item>
+    <item id="BILL_ID_DETAIL" label="Bill ID" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_ID"></item>
+    <item id="BILL_SEGMENT_ID_DETAIL" label="Bill Segment ID" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_SEGMENT_ID"></item>
+    <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="DETAIL_BILL_COUNT" label="Detail Bill Count" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_ID"></item>
+    <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="DETAIL_BILL_SEGMENT_COUNT" label="Detail Bill Segment Count" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_SEGMENT_ID"></item>
+    <item id="BILL_DATE" label="Bill Date" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_DATE"></item>
+    <item id="BILL_CREATE_DATE" label="Bill Create Date" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_CREATE_DATE"></item>
+    <item id="BSEG_CREATE_DATE" label="Bill Segment Create Date" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.BSEG_CREATE_DATE"></item>
+    <item id="BILL_STATUS_DESCRIPTION" label="Bill Status Description" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_STATUS_DESCRIPTION"></item>
+    <item id="BSEG_STATUS_DESCRIPTION" label="Bill Segment Status Description" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.BSEG_STATUS_DESCRIPTION"></item>
+    <item id="IS_ERROR_SW" label="Is Error" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.IS_ERROR_SW"></item>
+    <item id="ERROR_REASON" label="Error Reason" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.ERROR_REASON"></item>
+    <item id="EVENT_DATE" label="Event Date" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.EVENT_DATE"></item>
+    <item id="MOST_RECENT_BILL_CYCLE_SW_DETAIL" label="Most Recent Bill Cycle (Detail)" resourceId="JoinTree_1.BC_SEGMENT_STATUS_DRILLDOWN_V2.MOST_RECENT_BILL_CYCLE_SW"></item>
+  </items>
+  <resources>
+    <jdbcTable id="CI_BILL_CYC_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BILL_CYC_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcQuery id="BC_CYCLE_NUMBERS_FAST" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="BILL_CYCLE_CODE" type="java.lang.String"></field>
+        <field id="BILL_SEGMENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BILL_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTIVE_SERVICE_AGREEMENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="LAST_BILL_DATE" type="java.sql.Timestamp"></field>
+        <field id="MOST_RECENT_BILL_CYCLE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT X.BILL_CYCLE_CODE,COUNT(*) AS BILL_SEGMENT_COUNT,COUNT(DISTINCT X.BILL_ID) AS BILL_COUNT,COUNT(DISTINCT X.SA_ID) AS ACTIVE_SERVICE_AGREEMENT_COUNT,COUNT(DISTINCT X.ACCT_ID) AS ACTIVE_ACCOUNT_COUNT,MAX(X.EVENT_DATE) AS LAST_BILL_DATE,CASE WHEN MAX(X.CYCLE_LAST_EVENT_DATE)=MAX(MAX(X.CYCLE_LAST_EVENT_DATE)) OVER () THEN 'Y' ELSE 'N' END AS MOST_RECENT_BILL_CYCLE_SW FROM (SELECT NULLIF(TRIM(S.BILL_CYC_CD),'') AS BILL_CYCLE_CODE,S.BILL_ID,S.SA_ID,SA.ACCT_ID,TRUNC(NVL(B.BILL_DT,S.CRE_DTTM)) AS EVENT_DATE,MAX(TRUNC(NVL(B.BILL_DT,S.CRE_DTTM))) OVER (PARTITION BY NULLIF(TRIM(S.BILL_CYC_CD),'')) AS CYCLE_LAST_EVENT_DATE FROM CISADM.CI_BSEG S JOIN CISADM.CI_SA SA ON SA.SA_ID=S.SA_ID AND SA.SA_STATUS_FLG='20' LEFT JOIN CISADM.CI_BILL B ON B.BILL_ID=S.BILL_ID WHERE NULLIF(TRIM(S.BILL_CYC_CD),'') IS NOT NULL AND S.CRE_DTTM &gt;= ADD_MONTHS(TRUNC(SYSDATE),-18) AND S.CRE_DTTM &lt; TRUNC(SYSDATE)+1) X WHERE X.EVENT_DATE=X.CYCLE_LAST_EVENT_DATE GROUP BY X.BILL_CYCLE_CODE</query>
+    </jdbcQuery>
+    <jdbcQuery id="BC_EXPECTED_VS_ACTUAL_FAST" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="BILL_CYCLE_CODE" type="java.lang.String"></field>
+        <field id="EXPECTED_ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="EXPECTED_ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTUAL_BILLED_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTUAL_BILLED_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTUAL_BILL_SEGMENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="ACTUAL_BILL_COUNT" type="java.math.BigDecimal"></field>
+        <field id="MISSING_ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="MISSING_ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="CYCLE_LAST_EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="MOST_RECENT_BILL_CYCLE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT E.BILL_CYCLE_CODE,E.EXPECTED_ACTIVE_SA_COUNT,E.EXPECTED_ACTIVE_ACCOUNT_COUNT,NVL(A.ACTUAL_BILLED_SA_COUNT,0) AS ACTUAL_BILLED_SA_COUNT,NVL(A.ACTUAL_BILLED_ACCOUNT_COUNT,0) AS ACTUAL_BILLED_ACCOUNT_COUNT,NVL(A.ACTUAL_BILL_SEGMENT_COUNT,0) AS ACTUAL_BILL_SEGMENT_COUNT,NVL(A.ACTUAL_BILL_COUNT,0) AS ACTUAL_BILL_COUNT,E.EXPECTED_ACTIVE_SA_COUNT-NVL(A.ACTUAL_BILLED_SA_COUNT,0) AS MISSING_ACTIVE_SA_COUNT,E.EXPECTED_ACTIVE_ACCOUNT_COUNT-NVL(A.ACTUAL_BILLED_ACCOUNT_COUNT,0) AS MISSING_ACTIVE_ACCOUNT_COUNT,A.CYCLE_LAST_EVENT_DATE,CASE WHEN A.CYCLE_LAST_EVENT_DATE=MAX(A.CYCLE_LAST_EVENT_DATE) OVER () THEN 'Y' ELSE 'N' END AS MOST_RECENT_BILL_CYCLE_SW FROM (SELECT NULLIF(TRIM(AC.BILL_CYC_CD),'') AS BILL_CYCLE_CODE,COUNT(DISTINCT SA.SA_ID) AS EXPECTED_ACTIVE_SA_COUNT,COUNT(DISTINCT SA.ACCT_ID) AS EXPECTED_ACTIVE_ACCOUNT_COUNT FROM CISADM.CI_SA SA JOIN CISADM.CI_ACCT AC ON AC.ACCT_ID=SA.ACCT_ID WHERE SA.SA_STATUS_FLG='20' AND NULLIF(TRIM(AC.BILL_CYC_CD),'') IS NOT NULL GROUP BY NULLIF(TRIM(AC.BILL_CYC_CD),'')) E LEFT JOIN (SELECT X.BILL_CYCLE_CODE,COUNT(*) AS ACTUAL_BILL_SEGMENT_COUNT,COUNT(DISTINCT X.BILL_ID) AS ACTUAL_BILL_COUNT,COUNT(DISTINCT X.SA_ID) AS ACTUAL_BILLED_SA_COUNT,COUNT(DISTINCT X.ACCT_ID) AS ACTUAL_BILLED_ACCOUNT_COUNT,MAX(X.CYCLE_LAST_EVENT_DATE) AS CYCLE_LAST_EVENT_DATE FROM (SELECT NULLIF(TRIM(S.BILL_CYC_CD),'') AS BILL_CYCLE_CODE,S.BILL_ID,S.SA_ID,SA.ACCT_ID,TRUNC(NVL(B.BILL_DT,S.CRE_DTTM)) AS EVENT_DATE,MAX(TRUNC(NVL(B.BILL_DT,S.CRE_DTTM))) OVER (PARTITION BY NULLIF(TRIM(S.BILL_CYC_CD),'')) AS CYCLE_LAST_EVENT_DATE FROM CISADM.CI_BSEG S JOIN CISADM.CI_SA SA ON SA.SA_ID=S.SA_ID AND SA.SA_STATUS_FLG='20' LEFT JOIN CISADM.CI_BILL B ON B.BILL_ID=S.BILL_ID WHERE NULLIF(TRIM(S.BILL_CYC_CD),'') IS NOT NULL AND S.CRE_DTTM &gt;= ADD_MONTHS(TRUNC(SYSDATE),-18) AND S.CRE_DTTM &lt; TRUNC(SYSDATE)+1) X WHERE X.EVENT_DATE=X.CYCLE_LAST_EVENT_DATE GROUP BY X.BILL_CYCLE_CODE) A ON A.BILL_CYCLE_CODE=E.BILL_CYCLE_CODE</query>
+    </jdbcQuery>
+    <jdbcQuery id="BC_SEGMENT_STATUS_DRILLDOWN_V2" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="BILL_CYCLE_CODE" type="java.lang.String"></field>
+        <field id="ACCOUNT_ID" type="java.lang.String"></field>
+        <field id="SERVICE_AGREEMENT_ID" type="java.lang.String"></field>
+        <field id="PREMISE_ID" type="java.lang.String"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="BILL_SEGMENT_ID" type="java.lang.String"></field>
+        <field id="BILL_DATE" type="java.sql.Timestamp"></field>
+        <field id="BILL_CREATE_DATE" type="java.sql.Timestamp"></field>
+        <field id="BSEG_CREATE_DATE" type="java.sql.Timestamp"></field>
+        <field id="BILL_STATUS_DESCRIPTION" type="java.lang.String"></field>
+        <field id="BSEG_STATUS_DESCRIPTION" type="java.lang.String"></field>
+        <field id="IS_ERROR_SW" type="java.lang.String"></field>
+        <field id="ERROR_REASON" type="java.lang.String"></field>
+        <field id="EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="MOST_RECENT_BILL_CYCLE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT X.BILL_CYCLE_CODE,X.ACCT_ID AS ACCOUNT_ID,X.SA_ID AS SERVICE_AGREEMENT_ID,X.PREM_ID AS PREMISE_ID,X.BILL_ID,X.BSEG_ID AS BILL_SEGMENT_ID,X.BILL_DATE,X.BILL_CREATE_DATE,X.BSEG_CREATE_DATE,NVL(BS.STATUS_DESCRIPTION,'BILL_STATUS_'||X.BILL_STAT_FLG) AS BILL_STATUS_DESCRIPTION,NVL(SS.STATUS_DESCRIPTION,'BSEG_STATUS_'||X.BSEG_STAT_FLG) AS BSEG_STATUS_DESCRIPTION,CASE WHEN REGEXP_LIKE(UPPER(NVL(SS.STATUS_DESCRIPTION,'')),'ERROR|EXCEPTION|FAIL|CANCEL') OR REGEXP_LIKE(UPPER(NVL(BS.STATUS_DESCRIPTION,'')),'ERROR|EXCEPTION|FAIL|CANCEL') THEN 'Y' ELSE 'N' END AS IS_ERROR_SW,CASE WHEN REGEXP_LIKE(UPPER(NVL(SS.STATUS_DESCRIPTION,'')),'ERROR|EXCEPTION|FAIL|CANCEL') THEN SS.STATUS_DESCRIPTION WHEN REGEXP_LIKE(UPPER(NVL(BS.STATUS_DESCRIPTION,'')),'ERROR|EXCEPTION|FAIL|CANCEL') THEN BS.STATUS_DESCRIPTION ELSE NULL END AS ERROR_REASON,X.EVENT_DATE,CASE WHEN X.CYCLE_LAST_EVENT_DATE=MAX(X.CYCLE_LAST_EVENT_DATE) OVER () THEN 'Y' ELSE 'N' END AS MOST_RECENT_BILL_CYCLE_SW FROM (SELECT NULLIF(TRIM(S.BILL_CYC_CD),'') AS BILL_CYCLE_CODE,SA.ACCT_ID,S.SA_ID,S.PREM_ID,S.BILL_ID,S.BSEG_ID,B.BILL_STAT_FLG,S.BSEG_STAT_FLG,TRUNC(B.BILL_DT) AS BILL_DATE,TRUNC(B.CRE_DTTM) AS BILL_CREATE_DATE,TRUNC(S.CRE_DTTM) AS BSEG_CREATE_DATE,TRUNC(NVL(B.BILL_DT,S.CRE_DTTM)) AS EVENT_DATE,MAX(TRUNC(NVL(B.BILL_DT,S.CRE_DTTM))) OVER (PARTITION BY NULLIF(TRIM(S.BILL_CYC_CD),'')) AS CYCLE_LAST_EVENT_DATE FROM CISADM.CI_BSEG S JOIN CISADM.CI_SA SA ON SA.SA_ID=S.SA_ID AND SA.SA_STATUS_FLG='20' LEFT JOIN CISADM.CI_BILL B ON B.BILL_ID=S.BILL_ID WHERE NULLIF(TRIM(S.BILL_CYC_CD),'') IS NOT NULL AND S.CRE_DTTM &gt;= ADD_MONTHS(TRUNC(SYSDATE),-18) AND S.CRE_DTTM &lt; TRUNC(SYSDATE)+1) X LEFT JOIN (SELECT FIELD_VALUE AS STATUS_CODE,MAX(DESCR) AS STATUS_DESCRIPTION FROM CISADM.CI_LOOKUP_VAL_L WHERE FIELD_NAME='BILL_STAT_FLG' AND LANGUAGE_CD='ENG' GROUP BY FIELD_VALUE) BS ON BS.STATUS_CODE=X.BILL_STAT_FLG LEFT JOIN (SELECT FIELD_VALUE AS STATUS_CODE,MAX(DESCR) AS STATUS_DESCRIPTION FROM CISADM.CI_LOOKUP_VAL_L WHERE FIELD_NAME='BSEG_STAT_FLG' AND LANGUAGE_CD='ENG' GROUP BY FIELD_VALUE) SS ON SS.STATUS_CODE=X.BSEG_STAT_FLG WHERE X.EVENT_DATE=X.CYCLE_LAST_EVENT_DATE</query>
+    </jdbcQuery>
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BILL_CYC_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CI_BILL_CYC_L.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_BILL_CYC_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_BILL_CYC_L.DESCR" type="java.lang.String"></field>
+        <field id="BC_EXPECTED_VS_ACTUAL_FAST.BILL_CYCLE_CODE" type="java.lang.String"></field>
+        <field id="BC_EXPECTED_VS_ACTUAL_FAST.EXPECTED_ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_EXPECTED_VS_ACTUAL_FAST.EXPECTED_ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_EXPECTED_VS_ACTUAL_FAST.ACTUAL_BILLED_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_EXPECTED_VS_ACTUAL_FAST.ACTUAL_BILLED_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_EXPECTED_VS_ACTUAL_FAST.ACTUAL_BILL_SEGMENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_EXPECTED_VS_ACTUAL_FAST.ACTUAL_BILL_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_EXPECTED_VS_ACTUAL_FAST.MISSING_ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_EXPECTED_VS_ACTUAL_FAST.MISSING_ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_EXPECTED_VS_ACTUAL_FAST.CYCLE_LAST_EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="BC_EXPECTED_VS_ACTUAL_FAST.MOST_RECENT_BILL_CYCLE_SW" type="java.lang.String"></field>
+        <field id="BC_CYCLE_NUMBERS_FAST.BILL_CYCLE_CODE" type="java.lang.String"></field>
+        <field id="BC_CYCLE_NUMBERS_FAST.BILL_SEGMENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_CYCLE_NUMBERS_FAST.BILL_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_CYCLE_NUMBERS_FAST.ACTIVE_SERVICE_AGREEMENT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_CYCLE_NUMBERS_FAST.ACTIVE_ACCOUNT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="BC_CYCLE_NUMBERS_FAST.LAST_BILL_DATE" type="java.sql.Timestamp"></field>
+        <field id="BC_CYCLE_NUMBERS_FAST.MOST_RECENT_BILL_CYCLE_SW" type="java.lang.String"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_CYCLE_CODE" type="java.lang.String"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.ACCOUNT_ID" type="java.lang.String"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.SERVICE_AGREEMENT_ID" type="java.lang.String"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.PREMISE_ID" type="java.lang.String"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_ID" type="java.lang.String"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_SEGMENT_ID" type="java.lang.String"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_DATE" type="java.sql.Timestamp"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_CREATE_DATE" type="java.sql.Timestamp"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.BSEG_CREATE_DATE" type="java.sql.Timestamp"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_STATUS_DESCRIPTION" type="java.lang.String"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.BSEG_STATUS_DESCRIPTION" type="java.lang.String"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.IS_ERROR_SW" type="java.lang.String"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.ERROR_REASON" type="java.lang.String"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="BC_SEGMENT_STATUS_DRILLDOWN_V2.MOST_RECENT_BILL_CYCLE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>CI_BILL_CYC_L.LANGUAGE_CD == 'ENG' and trim(CI_BILL_CYC_L.BILL_CYC_CD) != ''</filterString>
+      <joinInfo alias="CI_BILL_CYC_L" referenceId="CI_BILL_CYC_L"></joinInfo>
+      <joinList>
+        <join expr="trim(CI_BILL_CYC_L.BILL_CYC_CD) == BC_EXPECTED_VS_ACTUAL_FAST.BILL_CYCLE_CODE" left="CI_BILL_CYC_L" right="BC_EXPECTED_VS_ACTUAL_FAST" type="leftOuter" weight="1"></join>
+        <join expr="trim(CI_BILL_CYC_L.BILL_CYC_CD) == BC_CYCLE_NUMBERS_FAST.BILL_CYCLE_CODE" left="CI_BILL_CYC_L" right="BC_CYCLE_NUMBERS_FAST" type="leftOuter" weight="1"></join>
+        <join expr="trim(CI_BILL_CYC_L.BILL_CYC_CD) == BC_SEGMENT_STATUS_DRILLDOWN_V2.BILL_CYCLE_CODE" left="CI_BILL_CYC_L" right="BC_SEGMENT_STATUS_DRILLDOWN_V2" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BILL_CYC_L" tableId="CI_BILL_CYC_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="BC_EXPECTED_VS_ACTUAL_FAST" tableId="BC_EXPECTED_VS_ACTUAL_FAST"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="BC_CYCLE_NUMBERS_FAST" tableId="BC_CYCLE_NUMBERS_FAST"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="BC_SEGMENT_STATUS_DRILLDOWN_V2" tableId="BC_SEGMENT_STATUS_DRILLDOWN_V2"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>
