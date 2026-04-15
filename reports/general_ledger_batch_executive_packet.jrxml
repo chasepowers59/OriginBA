@@ -46,7 +46,7 @@
     <parameter name="LoggedInUser" class="com.jaspersoft.jasperserver.api.metadata.user.domain.User" isForPrompting="false"/>
     <parameter name="LoggedInUsername" class="java.lang.String" isForPrompting="false"/>
     <parameter name="ONLY_LATEST_BATCH" class="java.lang.Boolean">
-        <defaultValueExpression><![CDATA[Boolean.TRUE]]></defaultValueExpression>
+        <defaultValueExpression><![CDATA[Boolean.FALSE]]></defaultValueExpression>
     </parameter>
     <parameter name="ONLY_EXCEPTIONS" class="java.lang.Boolean">
         <defaultValueExpression><![CDATA[Boolean.TRUE]]></defaultValueExpression>
@@ -64,7 +64,6 @@
 <query>
   <queryFields>
     <queryField id="BATCH_NBR"/>
-    <queryField id="IS_LATEST_BATCH_NBR"/>
     <queryField id="FT_ID"/>
     <queryField id="ACCT_ID"/>
     <queryField id="GL_DISTRIB_STATUS_DESC"/>
@@ -84,7 +83,6 @@
     ]]></queryString>
 
     <field name="BATCH_NBR" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="BATCH_NBR"/></field>
-    <field name="IS_LATEST_BATCH_NBR" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="IS_LATEST_BATCH_NBR"/></field>
     <field name="FT_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="FT_ID"/></field>
     <field name="ACCT_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="ACCT_ID"/></field>
     <field name="GL_DISTRIB_STATUS_DESC" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="GL_DISTRIB_STATUS_DESC"/></field>
@@ -128,12 +126,6 @@
 
     <filterExpression><![CDATA[
 ($F{FT_ID} != null)
-&& ($P{ONLY_LATEST_BATCH} == null || !$P{ONLY_LATEST_BATCH}.booleanValue()
-    || ("Y".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR})
-        || "YES".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR})
-        || "TRUE".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR})
-        || "1".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR}))
-)
 && ($P{BATCH_NBR_FILTER} == null || $P{BATCH_NBR_FILTER}.trim().length() == 0
     || ($F{BATCH_NBR} != null && $F{BATCH_NBR}.toPlainString().equals($P{BATCH_NBR_FILTER}.trim()))
 )

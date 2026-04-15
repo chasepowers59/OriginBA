@@ -40,6 +40,16 @@ Keep production-safe artifacts in `exports/`; use `working/` for temporary edits
 - `exports/manual_imports/FinalDomain.zip`
 - `exports/manual_imports/New Bill Cycle Domain.zip`
 - `exports/manual_imports/New Export Billing.zip`
+- `exports/manual_imports/D1_USAGE_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/D1_MSRMT_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/D1_USAGE_SCALAR_DTL_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/BSEG_BILLED_USAGE_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/BSEG_SQ_USAGE_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/ACCT_DEBT_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/COLL_PROC_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/PAY_TNDR_CASH_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/FT_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/FT_GL_DISTRIBUTION_RPT_CURR_End_User_Friendly.xml`
 
 Archived patch and backup variants are in:
 - `../archive/2026-03-10/root_zip_cleanup/domain_variants/`

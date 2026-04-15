@@ -16,6 +16,7 @@ It is meant to help you:
   - `knowledge_base/c2m_cisadm/cisadm_core_model.md`
   - `output/domain_designs_metadata.json`
   - `domains/working/manual_designs/DOMAIN_BUSINESS_CATALOG.md`
+  - `sql/performance/snapshots/docs/workstream_snapshot_catalog.md`
   - `docs/smartcity_9_workstream_product_plan.md`
 - Current curated coverage: 10 workstreams and 73 aligned tables.
 

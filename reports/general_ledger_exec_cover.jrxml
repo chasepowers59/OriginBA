@@ -25,7 +25,7 @@
     <parameter name="LoggedInUser" class="com.jaspersoft.jasperserver.api.metadata.user.domain.User" isForPrompting="false"/>
     <parameter name="LoggedInUsername" class="java.lang.String" isForPrompting="false"/>
     <parameter name="ONLY_LATEST_BATCH" class="java.lang.Boolean">
-        <defaultValueExpression><![CDATA[Boolean.TRUE]]></defaultValueExpression>
+        <defaultValueExpression><![CDATA[Boolean.FALSE]]></defaultValueExpression>
     </parameter>
     <parameter name="CLIENT_NAME" class="java.lang.String">
         <defaultValueExpression><![CDATA["INTERNAL USE ONLY"]]></defaultValueExpression>
@@ -35,7 +35,6 @@
 <query>
   <queryFields>
     <queryField id="BATCH_NBR"/>
-    <queryField id="IS_LATEST_BATCH_NBR"/>
     <queryField id="FT_ID"/>
     <queryField id="GL_DISTRIB_STATUS_DESC"/>
     <queryField id="GL_ACCT"/>
@@ -47,7 +46,6 @@
     ]]></queryString>
 
     <field name="BATCH_NBR" class="java.math.BigDecimal"><property name="net.sf.jasperreports.query.field.id" value="BATCH_NBR"/></field>
-    <field name="IS_LATEST_BATCH_NBR" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="IS_LATEST_BATCH_NBR"/></field>
     <field name="FT_ID" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="FT_ID"/></field>
     <field name="GL_DISTRIB_STATUS_DESC" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="GL_DISTRIB_STATUS_DESC"/></field>
     <field name="GL_ACCT" class="java.lang.String"><property name="net.sf.jasperreports.query.field.id" value="GL_ACCT"/></field>
@@ -76,12 +74,6 @@
 
     <filterExpression><![CDATA[
 ($F{FT_ID} != null)
-&& ($P{ONLY_LATEST_BATCH} == null || !$P{ONLY_LATEST_BATCH}.booleanValue()
-    || ("Y".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR})
-        || "YES".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR})
-        || "TRUE".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR})
-        || "1".equalsIgnoreCase($F{IS_LATEST_BATCH_NBR}))
-)
     ]]></filterExpression>
 
     <title>
@@ -102,7 +94,7 @@
             <frame>
                 <reportElement style="SummaryBox" x="0" y="84" width="1150" height="120" uuid="e89fef6e-9b73-4d58-8bf2-a9edc79f34d8"/>
                 <box><pen lineWidth="0.5"/></box>
-                <textField evaluationTime="Report"><reportElement x="20" y="14" width="350" height="18" uuid="fd97ef9c-0850-46cf-ac8b-7cae4e2f1810"/><textElement><font isBold="true" size="14"/></textElement><textFieldExpression><![CDATA["Batch Scope: " + ($V{LATEST_BATCH} == null ? "LATEST" : $V{LATEST_BATCH})]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="20" y="14" width="350" height="18" uuid="fd97ef9c-0850-46cf-ac8b-7cae4e2f1810"/><textElement><font isBold="true" size="14"/></textElement><textFieldExpression><![CDATA["Batch Scope: " + ($V{LATEST_BATCH} == null ? "ALL" : $V{LATEST_BATCH})]]></textFieldExpression></textField>
                 <textField evaluationTime="Report"><reportElement x="20" y="44" width="300" height="18" uuid="073522b5-2bf6-42fb-a4a5-c678f547f1f0"/><textFieldExpression><![CDATA["Rows Reviewed: " + $V{TOTAL_ROWS}]]></textFieldExpression></textField>
                 <textField evaluationTime="Report"><reportElement x="20" y="66" width="300" height="18" uuid="12dadf6d-8e96-42d1-b61d-9c96e36d3c0d"/><textFieldExpression><![CDATA["Rows with Exceptions: " + $V{BAD_ROWS}]]></textFieldExpression></textField>
                 <textField evaluationTime="Report"><reportElement x="20" y="88" width="420" height="18" uuid="153d6f84-07fe-45fd-bdcc-8f84f0ca138d"/><textFieldExpression><![CDATA["Exception Rate: " + (($V{TOTAL_ROWS} == null || $V{TOTAL_ROWS}.intValue() == 0) ? "0.0%" : new java.text.DecimalFormat("#0.0").format(($V{BAD_ROWS}.doubleValue()*100.0)/$V{TOTAL_ROWS}.doubleValue()) + "%")]]></textFieldExpression></textField>

@@ -6,7 +6,7 @@ Use the Domain or Topic backed by `D1_USAGE_RPT_CURR` as the starting source.
 - Add `Usage Start Date/Time` (`start_dttm`) or `Usage Status Date/Time` (`status_upd_dttm`) as the first filter in every view.
 - Default to a bounded recent window such as the last 7, 30, or 90 days.
 - Treat this as a usage-header fact: one row per `D1_USAGE_ID`.
-- Use aggregated quantity fields from the header snapshot, not child-row counts, for quantity summaries.
+- Use this snapshot for process monitoring and segmentation, not quantity.
 - Use a table for exception and trace views.
 
 ## View 1: Usage Status Monitor
@@ -53,48 +53,26 @@ Use the Domain or Topic backed by `D1_USAGE_RPT_CURR` as the starting source.
 ### Best use
 - Seeing how much processed usage actually bridges into billing
 
-## View 3: Estimate And Skip Monitor
+## View 3: Customer Class Usage Volume
 ### Visual
-- Stacked bar chart
+- Horizontal bar chart
 
 ### Category
-- `Is Estimated` (`is_estimate_desc`)
-
-### Series
-- `Skip Flag` (`skip_flg`)
+- `Customer Class Description` (`cust_cl_desc`)
 
 ### Measure
 - `Count of Usage Transaction ID` (`d1_usage_id`)
 
 ### Filters
 - `Usage Start Date/Time` (`start_dttm`)
-- `Calculation Group` (`usg_grp_cd`)
-- `Measurement Cycle` (`msrmt_cyc_cd`)
-- `Route` (`msrmt_cyc_rte_cd`)
-
-### Best use
-- Monitoring estimate and skip behavior in the usage process
-
-## View 4: Usage Quantity By Sole UOM
-### Visual
-- Horizontal bar chart
-
-### Category
-- `Period SQ Sole UOM Code` (`period_sq_sole_uom_cd`)
-
-### Measure
-- `Sum of Period SQ Total Quantity` (`period_sq_total_quantity`)
-
-### Filters
-- `Usage Start Date/Time` (`start_dttm`)
-- `Period SQ Sole UOM Code` (`period_sq_sole_uom_cd`)
-- `Calculation Group` (`usg_grp_cd`)
+- `Usage Status` (`bo_status_cd`)
 - `Service Provider` (`d1_spr_cd`)
+- `SA Type` (`sa_type_cd`)
 
 ### Best use
-- High-level usage quantity by sole resolved UOM at header grain
+- Comparing usage-transaction volume by customer class
 
-## View 5: Route And Cycle Operational Workload
+## View 4: Route And Cycle Operational Workload
 ### Visual
 - Crosstab or table
 
@@ -105,7 +83,7 @@ Use the Domain or Topic backed by `D1_USAGE_RPT_CURR` as the starting source.
 
 ### Table layout
 - Rows: `Measurement Cycle` (`msrmt_cyc_desc`), `Route` (`msrmt_cyc_rte_desc`)
-- Measures: `Count of Usage Transaction ID` (`d1_usage_id`), `Sum of Period SQ Total Quantity` (`period_sq_total_quantity`)
+- Measure: `Count of Usage Transaction ID` (`d1_usage_id`)
 
 ### Filters
 - `Usage Start Date/Time` (`start_dttm`)
@@ -115,7 +93,7 @@ Use the Domain or Topic backed by `D1_USAGE_RPT_CURR` as the starting source.
 ### Best use
 - Operational workload by route and cycle
 
-## View 6: Billing Bridge Coverage
+## View 5: Billing Bridge Coverage
 ### Visual
 - Bar chart
 
@@ -137,7 +115,7 @@ Use the Domain or Topic backed by `D1_USAGE_RPT_CURR` as the starting source.
 ### Best use
 - Validating how the usage header is resolving into billing context
 
-## View 7: Unbridged Usage Exceptions
+## View 6: Unbridged Usage Exceptions
 ### Visual
 - Table
 
@@ -163,7 +141,7 @@ Use the Domain or Topic backed by `D1_USAGE_RPT_CURR` as the starting source.
 ### Best use
 - Investigating usage transactions that did not bridge into billing context
 
-## View 8: Usage Header Trace
+## View 7: Usage Header Trace
 ### Visual
 - Table
 
@@ -177,12 +155,12 @@ Use the Domain or Topic backed by `D1_USAGE_RPT_CURR` as the starting source.
 - `Service Provider` (`d1_spr_desc`)
 - `Usage Start Date/Time` (`start_dttm`)
 - `Usage End Date/Time` (`end_dttm`)
-- `Period SQ Total Quantity` (`period_sq_total_quantity`)
-- `Scalar Total Final Quantity` (`scalar_total_final_quantity`)
 - `Bridge Method` (`bridge_method`)
 - `Service Agreement ID` (`sa_id`)
 - `Account ID` (`acct_id`)
 - `Customer Name` (`customer_name`)
+- `Customer Class Description` (`cust_cl_desc`)
+- `Premise ID` (`prem_id`)
 
 ### Filters
 - `Usage Start Date/Time` (`start_dttm`)
@@ -206,16 +184,15 @@ Use the Domain or Topic backed by `D1_USAGE_RPT_CURR` as the starting source.
 - `Measurement Cycle` (`msrmt_cyc_cd`)
 - `Route` (`msrmt_cyc_rte_cd`)
 - `Used On Bill` (`used_on_bill_flg`)
+- `Customer Class` (`cust_cl_cd`)
 
 ## Measure guidance
-- `Count of Usage Transaction ID` (`d1_usage_id`): safest volume KPI
-- `Sum of Period SQ Total Quantity` (`period_sq_total_quantity`): default aggregated usage quantity
-- `Sum of Scalar Total Final Quantity` (`scalar_total_final_quantity`): scalar-detail quantity proxy
-- `Period SQ Row Count` and `Scalar Row Count`: structural detail measures, not the primary KPI
+- `Count of Usage Transaction ID` (`d1_usage_id`): safest and primary KPI for the header snapshot
 
 ## Avoid
 - Treating this as determinant-grain quantity truth
+- Summing usage quantity from this snapshot
 - Assuming every row has valid billing context
 - Starting with no date filter
 
-For determinant-level usage analysis, use a future child snapshot such as `D1_USAGE_PERIOD_SQ_RPT_CURR` or `D1_USAGE_SCALAR_DTL_RPT_CURR`.
+For quantity analysis, use `D1_USAGE_SCALAR_DTL_RPT_CURR`.
