@@ -1,22 +1,40 @@
 CREATE OR REPLACE PROCEDURE cisadm.refresh_d1_usage_scalar_dtl_rpt_curr AS
-    v_batch_start       TIMESTAMP;
-    v_batch_end         TIMESTAMP;
-    v_batch_upper_bound TIMESTAMP;
+    c_window_months      CONSTANT PLS_INTEGER := 12;
+    c_batch_months       CONSTANT PLS_INTEGER := 3;
+    v_window_start       TIMESTAMP;
+    v_batch_start        TIMESTAMP;
+    v_batch_end          TIMESTAMP;
+    v_batch_upper_bound  TIMESTAMP;
 BEGIN
-    DELETE FROM cisadm.d1_usage_scalar_dtl_rpt_curr;
+    v_window_start := CAST(ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -c_window_months) AS TIMESTAMP);
+
+    DELETE FROM cisadm.d1_usage_scalar_dtl_rpt_curr t
+    WHERE EXISTS (
+        SELECT 1
+        FROM cisadm.d1_usage u
+        WHERE u.d1_usage_id = t.d1_usage_id
+          AND NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) >= v_window_start
+    );
     COMMIT;
 
     SELECT
-        CAST(TRUNC(MIN(NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm))), 'MM') AS TIMESTAMP),
-        CAST(ADD_MONTHS(TRUNC(MAX(NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm))), 'MM'), 1) AS TIMESTAMP)
+        v_window_start,
+        GREATEST(
+            CAST(ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1) AS TIMESTAMP),
+            CAST(ADD_MONTHS(TRUNC(MAX(NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm))), 'MM'), 1) AS TIMESTAMP)
+        )
     INTO
         v_batch_start,
         v_batch_upper_bound
     FROM cisadm.d1_usage u
-    WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) IS NOT NULL;
+    WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) >= v_window_start;
 
     WHILE v_batch_start < v_batch_upper_bound LOOP
-        v_batch_end := ADD_MONTHS(v_batch_start, 1);
+        v_batch_end := ADD_MONTHS(v_batch_start, c_batch_months);
+
+        IF v_batch_end > v_batch_upper_bound THEN
+            v_batch_end := v_batch_upper_bound;
+        END IF;
 
         INSERT INTO cisadm.d1_usage_scalar_dtl_rpt_curr (
             d1_usage_id,
@@ -140,26 +158,6 @@ BEGIN
             WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) >= v_batch_start
               AND NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) < v_batch_end
         ),
-        customer_choice AS (
-            SELECT
-                ap.acct_id,
-                ap.per_id,
-                pn.entity_name_upr AS customer_name,
-                ROW_NUMBER() OVER (
-                    PARTITION BY ap.acct_id
-                    ORDER BY
-                        CASE WHEN ap.fin_resp_sw = 'Y' THEN 0 ELSE 1 END,
-                        CASE WHEN ap.main_cust_sw = 'Y' THEN 0 ELSE 1 END,
-                        CASE WHEN pn.prim_name_sw = 'Y' THEN 0 ELSE 1 END,
-                        pn.seq_num,
-                        pn.per_id
-                ) AS rn
-            FROM cisadm.ci_acct_per ap
-            JOIN cisadm.ci_per_name pn
-                ON pn.per_id = ap.per_id
-            WHERE ap.main_cust_sw = 'Y'
-              AND (pn.prim_name_sw = 'Y' OR pn.name_type_flg = 'PRIM')
-        ),
         c1_usage_bridge AS (
             SELECT
                 bridge.d1_usage_id,
@@ -200,6 +198,45 @@ BEGIN
                 WHERE u.usg_ext_id IS NOT NULL
             ) bridge
             WHERE bridge.rn = 1
+        ),
+        batch_sa AS (
+            SELECT DISTINCT
+                COALESCE(bridge.c1_sa_id, bseg.sa_id) AS sa_id
+            FROM batch_usage u
+            LEFT JOIN c1_usage_bridge bridge
+                ON bridge.d1_usage_id = u.d1_usage_id
+            LEFT JOIN cisadm.ci_bseg bseg
+                ON bseg.bseg_id = bridge.c1_bseg_id
+            WHERE COALESCE(bridge.c1_sa_id, bseg.sa_id) IS NOT NULL
+        ),
+        batch_accounts AS (
+            SELECT DISTINCT sa.acct_id
+            FROM batch_sa bsa
+            JOIN cisadm.ci_sa sa
+                ON sa.sa_id = bsa.sa_id
+            WHERE sa.acct_id IS NOT NULL
+        ),
+        customer_choice AS (
+            SELECT
+                ap.acct_id,
+                ap.per_id,
+                pn.entity_name_upr AS customer_name,
+                ROW_NUMBER() OVER (
+                    PARTITION BY ap.acct_id
+                    ORDER BY
+                        CASE WHEN ap.fin_resp_sw = 'Y' THEN 0 ELSE 1 END,
+                        CASE WHEN ap.main_cust_sw = 'Y' THEN 0 ELSE 1 END,
+                        CASE WHEN pn.prim_name_sw = 'Y' THEN 0 ELSE 1 END,
+                        pn.seq_num,
+                        pn.per_id
+                ) AS rn
+            FROM batch_accounts ba
+            JOIN cisadm.ci_acct_per ap
+                ON ap.acct_id = ba.acct_id
+            JOIN cisadm.ci_per_name pn
+                ON pn.per_id = ap.per_id
+            WHERE ap.main_cust_sw = 'Y'
+              AND (pn.prim_name_sw = 'Y' OR pn.name_type_flg = 'PRIM')
         )
         SELECT
             u.d1_usage_id,

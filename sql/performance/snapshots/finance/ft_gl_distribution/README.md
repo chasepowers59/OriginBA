@@ -68,6 +68,17 @@ The snapshot now also persists tender-report-friendly finance derivations:
 
 These are derived from the sign of `GL_AMOUNT` and keep repeated JRXML-level debit/credit formulas out of downstream reports.
 
+Current refresh operating model:
+- one-time baseline: `02a_full_history_refresh_procedure.sql`
+- ongoing maintenance: `02_refresh_snapshot_procedure.sql`
+- active maintenance pattern: rolling `12-month` `DELETE + INSERT + COMMIT`
+- archived design scaffold: `02b_rolling_refresh_candidate_procedure.sql`
+
+Why the rolling model was adopted:
+- the latest observed FT-GL runtime became the slowest active snapshot refresh
+- diagnostics showed current activity does not back-post into accounting periods older than `12` months
+- a 12-month maintenance window keeps the active slice while preserving older baseline history in place
+
 ## Known legacy domain defects to validate
 1. `CI_FT` to `CI_ADJ` joins `PARENT_ID` to `ADJ_TYPE_CD`, which is almost certainly incorrect.
 2. The child joins to `CI_BSEG`, `CI_ADJ`, and `CI_PAY_SEG` do not include FT-type filters in the join condition.
@@ -94,9 +105,17 @@ These are derived from the sign of `GL_AMOUNT` and keep repeated JRXML-level deb
 - `01_create_snapshot_table.sql`
 - `01a_alter_existing_snapshot_table.sql`
 - `02_refresh_snapshot_procedure.sql`
+- `02a_full_history_refresh_procedure.sql`
+- `02b_rolling_refresh_candidate_procedure.sql`
 - `03_schedule_snapshot_job.sql`
 - `04_validation_queries.sql`
 - `05_intensive_qa_queries.sql`
 - `06_qa_results_template.md`
 - `07_master_technical_guide.md`
+- `08_index_candidate_tests.sql`
+- `09_index_benchmark_checklist.md`
+- `10_refresh_strategy_diagnostics.sql`
+- `11a_fast_before_after_validation.sql`
+- `11b_ultra_fast_before_after_validation.sql`
+- `11_before_after_validation.sql`
 - `FT_GL_DISTRIBUTION_RPT_CURR_End_User_Friendly.xml`

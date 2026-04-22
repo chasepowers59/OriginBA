@@ -23,7 +23,7 @@ Object summary:
 - importable Domain XML: `domains/exports/manual_imports/BSEG_SQ_USAGE_RPT_CURR_End_User_Friendly.xml`
 - Domain resource root: `BSEG_SQ_USAGE_RPT_CURR`
 - refresh pattern: `TRUNCATE + INSERT + COMMIT`
-- scheduler interval: every 6 hours
+- scheduler interval: every 6 hours at `02:00`, `08:00`, `14:00`, and `20:00 GMT`
 - source population: completed bill segments only, where `CI_BILL.BILL_STAT_FLG = 'C '`
 - primary business measure: `TOTAL_BILL_SQ`
 - supporting quantity field: `TOTAL_INIT_SQ`
@@ -416,17 +416,17 @@ BEGIN
         job_type        => 'STORED_PROCEDURE',
         job_action      => 'CISADM.REFRESH_BSEG_SQ_USAGE_RPT_CURR',
         start_date      => SYSTIMESTAMP,
-        repeat_interval => 'FREQ=HOURLY;INTERVAL=6',
+        repeat_interval => 'FREQ=DAILY;BYHOUR=2,8,14,20;BYMINUTE=0;BYSECOND=0',
         enabled         => TRUE,
-        comments        => 'Refresh billed usage determinant snapshot every 6 hours'
+        comments        => 'Refresh billed usage determinant snapshot every 6 hours at 02:00, 08:00, 14:00, and 20:00 GMT'
     );
 END;
 /
 ```
 
 Operational meaning:
-- refresh starts immediately when created
-- then runs every 6 hours
+- first eligible run is the next `02:00`, `08:00`, `14:00`, or `20:00 GMT` scheduler slot after creation
+- then runs every 6 hours at `02:00`, `08:00`, `14:00`, and `20:00 GMT`
 - because the pattern is full rebuild, users should avoid querying during the refresh window if empty-table exposure matters
 
 ## Domain Contract

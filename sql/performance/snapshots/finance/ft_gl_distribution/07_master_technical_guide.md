@@ -22,8 +22,8 @@ Object summary:
 - workspace Domain XML: `sql/performance/snapshots/finance/ft_gl_distribution/FT_GL_DISTRIBUTION_RPT_CURR_End_User_Friendly.xml`
 - importable Domain XML: `domains/exports/manual_imports/FT_GL_DISTRIBUTION_RPT_CURR_End_User_Friendly.xml`
 - Domain resource root: `FT_GL_DISTRIBUTION_RPT_CURR`
-- refresh pattern: `TRUNCATE + INSERT + COMMIT`
-- scheduler interval: every 6 hours
+- refresh pattern: one-time baseline full rebuild, then rolling `12-month` `DELETE + INSERT + COMMIT`
+- scheduler interval: every 6 hours at `03:00`, `09:00`, `15:00`, and `21:00 GMT`
 - primary additive measures: `GL_AMOUNT`, `STATISTIC_AMOUNT`
 - derived reporting measures stored in the snapshot: `DEBIT_AMT`, `CREDIT_AMT`
 - batch provenance fields: `BATCH_CD` and `BATCH_NBR` from the latest `CI_FT_PROC` row per `FT_ID`; `IS_LATEST_BATCH_NBR` retained but not populated in the current release
@@ -614,7 +614,8 @@ END;
 
 ## Why The Final Procedure Looks This Way
 Specific final design decisions:
-- `TRUNCATE` was kept because a short empty-window refresh was accepted and the simpler full rebuild pattern is faster and easier to support
+- the active procedure now refreshes only the last `12` accounting months because diagnostics showed no recent back-posting into periods older than `12` months
+- the full-history `TRUNCATE + INSERT + COMMIT` version is still preserved separately for one-time baseline loads
 - `STATISTIC_AMOUNT` is stored without forced two-decimal scale so the source precision is not lost
 - the parent FT filter is applied in the `INNER JOIN` to `CI_FT` so only non-redundant FT populations survive
 - batch metadata is sourced from the latest ranked `CI_FT_PROC` row per `FT_ID`
@@ -632,18 +633,18 @@ BEGIN
         job_type        => 'STORED_PROCEDURE',
         job_action      => 'CISADM.REFRESH_FT_GL_DISTRIBUTION_RPT_CURR',
         start_date      => SYSTIMESTAMP,
-        repeat_interval => 'FREQ=HOURLY;INTERVAL=6',
+        repeat_interval => 'FREQ=DAILY;BYHOUR=3,9,15,21;BYMINUTE=0;BYSECOND=0',
         enabled         => TRUE,
-        comments        => 'Refresh FT GL distribution snapshot every 6 hours'
+        comments        => 'Refresh FT GL distribution snapshot every 6 hours at 03:00, 09:00, 15:00, and 21:00 GMT'
     );
 END;
 /
 ```
 
 Operational meaning:
-- refresh starts immediately when created
-- then runs every 6 hours
-- because the pattern is full rebuild, users should avoid querying during the refresh window if empty-table exposure matters
+- first eligible run is the next `03:00`, `09:00`, `15:00`, or `21:00 GMT` scheduler slot after creation
+- then runs every 6 hours at `03:00`, `09:00`, `15:00`, and `21:00 GMT`
+- because the active pattern is rolling-window maintenance, the empty-table exposure risk is reduced compared with the original full rebuild
 
 ## Domain Contract
 The final Domain is a single-table JDBC Domain on `FT_GL_DISTRIBUTION_RPT_CURR` using datasource alias `Origin_DEV_DS` and schema alias `CISADM`.

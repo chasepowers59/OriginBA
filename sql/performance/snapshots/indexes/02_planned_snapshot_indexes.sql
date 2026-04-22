@@ -1,0 +1,5 @@
+-- Planned approved snapshot-table index candidates
+--
+-- Keep the next preferred candidate indexes here until they are adopted.
+--
+-- No planned snapshot-table indexes are currently pending.

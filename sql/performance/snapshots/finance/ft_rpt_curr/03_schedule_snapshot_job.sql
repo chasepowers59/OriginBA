@@ -4,9 +4,9 @@ BEGIN
         job_type        => 'STORED_PROCEDURE',
         job_action      => 'CISADM.REFRESH_FT_RPT_CURR',
         start_date      => SYSTIMESTAMP,
-        repeat_interval => 'FREQ=HOURLY;INTERVAL=6',
+        repeat_interval => 'FREQ=DAILY;BYHOUR=1,7,13,19;BYMINUTE=0;BYSECOND=0',
         enabled         => TRUE,
-        comments        => 'Refresh FT header snapshot every 6 hours'
+        comments        => 'Refresh FT header snapshot every 6 hours at 01:00, 07:00, 13:00, and 19:00 GMT'
     );
 END;
 /

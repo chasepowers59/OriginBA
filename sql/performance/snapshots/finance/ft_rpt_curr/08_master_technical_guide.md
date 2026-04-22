@@ -22,7 +22,7 @@ Object summary:
 - importable Domain XML: `domains/exports/manual_imports/FT_RPT_CURR_End_User_Friendly.xml`
 - Domain resource root: `FT_RPT_CURR`
 - refresh pattern: `TRUNCATE + INSERT + COMMIT`
-- scheduler interval: every 6 hours
+- scheduler interval: every 6 hours at `01:00`, `07:00`, `13:00`, and `19:00 GMT`
 - primary additive measure: `CUR_AMT`
 - secondary amount carried for payoff-oriented analysis: `TOT_AMT`
 - source population: all non-redundant FT rows where `CI_FT.REDUNDANT_SW = 'N'`
@@ -541,17 +541,17 @@ BEGIN
         job_type        => 'STORED_PROCEDURE',
         job_action      => 'CISADM.REFRESH_FT_RPT_CURR',
         start_date      => SYSTIMESTAMP,
-        repeat_interval => 'FREQ=HOURLY;INTERVAL=6',
+        repeat_interval => 'FREQ=DAILY;BYHOUR=1,7,13,19;BYMINUTE=0;BYSECOND=0',
         enabled         => TRUE,
-        comments        => 'Refresh FT header snapshot every 6 hours'
+        comments        => 'Refresh FT header snapshot every 6 hours at 01:00, 07:00, 13:00, and 19:00 GMT'
     );
 END;
 /
 ```
 
 Operational meaning:
-- refresh starts immediately when created
-- then runs every 6 hours
+- first eligible run is the next `01:00`, `07:00`, `13:00`, or `19:00 GMT` scheduler slot after creation
+- then runs every 6 hours at `01:00`, `07:00`, `13:00`, and `19:00 GMT`
 - because the pattern is full rebuild, users should avoid querying during the refresh window if empty-table exposure matters
 
 ## Domain Contract

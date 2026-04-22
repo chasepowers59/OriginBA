@@ -1,0 +1,114 @@
+-- Fast before/after validation for FT_GL_DISTRIBUTION_RPT_CURR refresh-strategy changes.
+--
+-- Use this when:
+--   - you need a quick baseline before a procedure cutover
+--   - the full 11_before_after_validation.sql pack is too slow for rapid iteration
+--
+-- Keeps only the highest-signal checks:
+--   1. whole-table footprint
+--   2. rolling 12-month source versus snapshot parity
+--   3. duplicate natural-key check
+--   4. current snapshot versus source total parity
+
+PROMPT ============================================================================
+PROMPT 11a_fast_1. Whole-table footprint
+PROMPT ============================================================================
+
+SELECT
+    COUNT(*) AS snapshot_rows,
+    COUNT(DISTINCT ft_id) AS distinct_ft_id,
+    MIN(accounting_dt) AS min_accounting_dt,
+    MAX(accounting_dt) AS max_accounting_dt,
+    MIN(load_dttm) AS min_load_dttm,
+    MAX(load_dttm) AS max_load_dttm,
+    ROUND(SUM(gl_amount), 2) AS total_gl_amount,
+    SUM(statistic_amount) AS total_statistic_amount
+FROM cisadm.ft_gl_distribution_rpt_curr;
+
+PROMPT
+PROMPT ============================================================================
+PROMPT 11a_fast_2. Rolling 12-month source versus snapshot parity
+PROMPT ============================================================================
+
+WITH source_monthly AS (
+    SELECT
+        TRUNC(ft.accounting_dt, 'MM') AS accounting_month,
+        COUNT(*) AS raw_rows,
+        ROUND(SUM(gl.amount), 2) AS raw_gl_amount,
+        SUM(gl.statistic_amount) AS raw_statistic_amount
+    FROM cisadm.ci_ft_gl gl
+    JOIN cisadm.ci_ft ft
+        ON ft.ft_id = gl.ft_id
+    WHERE ft.redundant_sw = 'N'
+      AND ft.accounting_dt >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12)
+    GROUP BY TRUNC(ft.accounting_dt, 'MM')
+),
+snapshot_monthly AS (
+    SELECT
+        TRUNC(accounting_dt, 'MM') AS accounting_month,
+        COUNT(*) AS snapshot_rows,
+        ROUND(SUM(gl_amount), 2) AS snapshot_gl_amount,
+        SUM(statistic_amount) AS snapshot_statistic_amount
+    FROM cisadm.ft_gl_distribution_rpt_curr
+    WHERE accounting_dt >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12)
+    GROUP BY TRUNC(accounting_dt, 'MM')
+)
+SELECT
+    COALESCE(s.accounting_month, t.accounting_month) AS accounting_month,
+    s.raw_rows,
+    t.snapshot_rows,
+    NVL(t.snapshot_rows, 0) - NVL(s.raw_rows, 0) AS snapshot_minus_raw_rows,
+    s.raw_gl_amount,
+    t.snapshot_gl_amount,
+    ROUND(NVL(t.snapshot_gl_amount, 0) - NVL(s.raw_gl_amount, 0), 2) AS snapshot_minus_raw_gl_amount,
+    s.raw_statistic_amount,
+    t.snapshot_statistic_amount,
+    NVL(t.snapshot_statistic_amount, 0) - NVL(s.raw_statistic_amount, 0) AS snapshot_minus_raw_statistic_amount
+FROM source_monthly s
+FULL OUTER JOIN snapshot_monthly t
+    ON t.accounting_month = s.accounting_month
+ORDER BY accounting_month;
+
+PROMPT
+PROMPT ============================================================================
+PROMPT 11a_fast_3. Duplicate natural-key check
+PROMPT ============================================================================
+
+SELECT
+    ft_id,
+    gl_seq_nbr,
+    COUNT(*) AS row_count
+FROM cisadm.ft_gl_distribution_rpt_curr
+GROUP BY
+    ft_id,
+    gl_seq_nbr
+HAVING COUNT(*) > 1;
+
+PROMPT
+PROMPT ============================================================================
+PROMPT 11a_fast_4. Current snapshot versus source total parity
+PROMPT ============================================================================
+
+SELECT
+    (SELECT COUNT(*)
+     FROM cisadm.ci_ft_gl gl
+     JOIN cisadm.ci_ft ft
+       ON ft.ft_id = gl.ft_id
+    WHERE ft.redundant_sw = 'N') AS source_rows,
+    (SELECT COUNT(*)
+     FROM cisadm.ft_gl_distribution_rpt_curr) AS snapshot_rows,
+    (SELECT ROUND(SUM(gl.amount), 2)
+     FROM cisadm.ci_ft_gl gl
+     JOIN cisadm.ci_ft ft
+       ON ft.ft_id = gl.ft_id
+    WHERE ft.redundant_sw = 'N') AS source_gl_amount,
+    (SELECT ROUND(SUM(gl_amount), 2)
+     FROM cisadm.ft_gl_distribution_rpt_curr) AS snapshot_gl_amount,
+    (SELECT SUM(gl.statistic_amount)
+     FROM cisadm.ci_ft_gl gl
+     JOIN cisadm.ci_ft ft
+       ON ft.ft_id = gl.ft_id
+    WHERE ft.redundant_sw = 'N') AS source_statistic_amount,
+    (SELECT SUM(statistic_amount)
+     FROM cisadm.ft_gl_distribution_rpt_curr) AS snapshot_statistic_amount
+FROM dual;

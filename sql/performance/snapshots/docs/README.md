@@ -11,6 +11,7 @@ The matching Domain XML files are now also copied into each active snapshot work
 - `snapshot_modernization_checklist.md`
 - `snapshot_sqldeveloper_runbook.md`
 - `snapshot_impact_assessment.md`
+- `snapshot_measured_resource_impact_summary_2026-04-17.md`
 - `snapshot_xml_inventory.md`
 - `workstream_snapshot_catalog.md`
 - `business_question_snapshot_coverage.md`

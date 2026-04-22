@@ -1,10 +1,10 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
   <dataIslands>
     <itemGroup id="JoinTree_1" label="Fund Balance Final DB Validated" resourceId="JoinTree_1"></itemGroup>
   </dataIslands>
   <dataSources>
-    <jdbcDataSource id="Origin_DEV_DS">
+    <jdbcDataSource id="Odessa_DS">
       <schemaMap>
         <entry key="defaultSchema">
           <string></string>
@@ -19,10 +19,11 @@
   <itemGroups>
     <itemGroup id="SET_TRANSACTION" label="Transaction Context" resourceId="JoinTree_1">
       <items>
-        <item id="FT_ID" label="Financial Transaction ID" resourceId="JoinTree_1.CI_FT.FT_ID"></item>
+        <item id="FT_ID" label="Financial Transaction ID" resourceId="JoinTree_1.CI_FT_GL.FT_ID"></item>
+        <item id="GL_SEQ_NBR" label="GL Sequence Number" resourceId="JoinTree_1.CI_FT_GL.GL_SEQ_NBR"></item>
         <item id="SA_ID" label="Service Agreement ID" resourceId="JoinTree_1.CI_FT.SA_ID"></item>
         <item id="BILL_ID" label="Bill ID" resourceId="JoinTree_1.CI_FT.BILL_ID"></item>
-        <item defaultAgg="None" dimensionOrMeasure="Dimension" id="BATCH_NBR" label="Batch Number" resourceId="JoinTree_1.CI_FT_PROC.BATCH_NBR"></item>
+        <item defaultAgg="None" dimensionOrMeasure="Dimension" id="BATCH_NBR" label="Batch Number" resourceId="JoinTree_1.FT_PROC_LATEST.BATCH_NBR"></item>
       </items>
     </itemGroup>
 
@@ -30,15 +31,16 @@
       <items>
         <item id="ACCOUNTING_DT" label="Accounting Date" resourceId="JoinTree_1.CI_FT.ACCOUNTING_DT"></item>
         <item id="FREEZE_DTTM" label="Freeze Date Time" resourceId="JoinTree_1.CI_FT.FREEZE_DTTM"></item>
+        <item id="FUND_MAP_EFFDT" label="Fund Map Effective Date" resourceId="JoinTree_1.FUND_MAP_RESOLVED.EFFDT"></item>
       </items>
     </itemGroup>
 
     <itemGroup id="SET_STATUS" label="Status And Type Descriptions" resourceId="JoinTree_1">
       <items>
         <item id="GL_DISTRIB_STATUS" label="GL Distribution Status Code" resourceId="JoinTree_1.CI_FT.GL_DISTRIB_STATUS"></item>
-        <item id="GL_DISTRIB_STATUS_DESC" label="GL Distribution Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_1.DESCR"></item>
+        <item id="GL_DISTRIB_STATUS_DESC" label="GL Distribution Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_GL_STATUS.DESCR"></item>
         <item id="FT_TYPE_FLG" label="FT Type Code" resourceId="JoinTree_1.CI_FT.FT_TYPE_FLG"></item>
-        <item id="FT_TYPE_DESC" label="FT Type Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+        <item id="FT_TYPE_DESC" label="FT Type Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_FT_TYPE.DESCR"></item>
       </items>
     </itemGroup>
 
@@ -50,9 +52,11 @@
         <item id="DST_DESCR" label="Distribution Code Description" resourceId="JoinTree_1.CI_DST_CODE_L.DESCR"></item>
         <item id="GL_ACCT" label="GL Account" resourceId="JoinTree_1.CI_FT_GL.GL_ACCT"></item>
         <item id="STATISTIC_AMOUNT" label="Statistic Amount" resourceId="JoinTree_1.CI_FT_GL.STATISTIC_AMOUNT"></item>
-        <item id="FUND_CD_RAW" label="Fund Code (Raw)" resourceId="JoinTree_1.CI_DST_CODE_EFF.FUND_CD"></item>
+        <item id="FUND_CD_RAW" label="Fund Code" resourceId="JoinTree_1.FUND_MAP_RESOLVED.FUND_CD"></item>
+        <item id="FUND_DESCR" label="Fund Description" resourceId="JoinTree_1.CI_FUND_L.DESCR"></item>
         <item id="FUND_TYPE_FLG" label="Fund Type Code" resourceId="JoinTree_1.CI_FUND.FUND_TYPE_FLG"></item>
-        <item id="FUND_TYPE_DESC" label="Fund Type Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_2.DESCR"></item>
+        <item id="FUND_TYPE_DESC" label="Fund Type Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_FUND_TYPE.DESCR"></item>
+        <item id="FUND_MAP_STATUS" label="Fund Map Status" resourceId="JoinTree_1.FUND_MAP_RESOLVED.FUND_MAP_STATUS"></item>
         <item id="CHAR_TYPE_CD" label="GL Characteristic Type" resourceId="JoinTree_1.CI_FT_GL.CHAR_TYPE_CD"></item>
         <item id="CHAR_VAL" label="GL Characteristic Value" resourceId="JoinTree_1.CI_FT_GL.CHAR_VAL"></item>
       </items>
@@ -68,10 +72,11 @@
 
     <itemGroup id="SET_METRICS" label="Counts And Totals" resourceId="JoinTree_1">
       <items>
-        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="FT_COUNT" label="FT Count" resourceId="JoinTree_1.CI_FT.FT_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="FT_COUNT" label="FT Count" resourceId="JoinTree_1.CI_FT_GL.FT_ID"></item>
         <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="SA_COUNT" label="Service Agreement Count" resourceId="JoinTree_1.CI_FT.SA_ID"></item>
         <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="GL_ACCOUNT_COUNT" label="GL Account Count" resourceId="JoinTree_1.CI_FT_GL.GL_ACCT"></item>
         <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="DST_COUNT" label="Distribution Code Count" resourceId="JoinTree_1.CI_FT_GL.DST_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="FUND_COUNT" label="Fund Count" resourceId="JoinTree_1.FUND_MAP_RESOLVED.FUND_CD"></item>
         <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_GL_AMOUNT" label="Total GL Amount" resourceId="JoinTree_1.CI_FT_GL.AMOUNT"></item>
         <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_DEBIT_AMOUNT" label="Total Debit Amount" resourceId="JoinTree_1.DEBIT_AMOUNT"></item>
         <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_CREDIT_AMOUNT" label="Total Credit Amount" resourceId="JoinTree_1.CREDIT_AMOUNT"></item>
@@ -80,85 +85,154 @@
   </itemGroups>
 
   <resources>
-    <jdbcTable id="CI_FT" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FT" schemaAlias="CISADM">
-      <fieldList>
-        <field id="FT_ID" type="java.lang.String"></field>
-        <field id="SA_ID" type="java.lang.String"></field>
-        <field id="BILL_ID" type="java.lang.String"></field>
-        <field id="GL_DIVISION" type="java.lang.String"></field>
-        <field id="CIS_DIVISION" type="java.lang.String"></field>
-        <field id="FT_TYPE_FLG" type="java.lang.String"></field>
-        <field id="FREEZE_SW" type="java.lang.String"></field>
-        <field id="FREEZE_DTTM" type="java.sql.Timestamp"></field>
-        <field id="ACCOUNTING_DT" type="java.sql.Timestamp"></field>
-        <field id="GL_DISTRIB_STATUS" type="java.lang.String"></field>
-      </fieldList>
-    </jdbcTable>
-
-    <jdbcTable id="CI_FT_GL" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FT_GL" schemaAlias="CISADM">
+    <jdbcTable id="CI_FT_GL" datasourceId="Odessa_DS" datasourceTableName="CI_FT_GL" schemaAlias="CISADM">
       <fieldList>
         <field id="FT_ID" type="java.lang.String"></field>
         <field id="GL_SEQ_NBR" type="java.math.BigDecimal"></field>
         <field id="DST_ID" type="java.lang.String"></field>
         <field id="GL_ACCT" type="java.lang.String"></field>
-        <field id="AMOUNT" type="java.math.BigDecimal"></field>
         <field id="STATISTIC_AMOUNT" type="java.math.BigDecimal"></field>
         <field id="CHAR_TYPE_CD" type="java.lang.String"></field>
         <field id="CHAR_VAL" type="java.lang.String"></field>
+        <field id="AMOUNT" type="java.math.BigDecimal"></field>
       </fieldList>
     </jdbcTable>
 
-    <jdbcTable id="CI_FT_PROC" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FT_PROC" schemaAlias="CISADM">
+    <jdbcTable id="CI_FT" datasourceId="Odessa_DS" datasourceTableName="CI_FT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FT_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="ACCOUNTING_DT" type="java.sql.Timestamp"></field>
+        <field id="FREEZE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="GL_DISTRIB_STATUS" type="java.lang.String"></field>
+        <field id="FT_TYPE_FLG" type="java.lang.String"></field>
+        <field id="GL_DIVISION" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="REDUNDANT_SW" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcQuery id="FT_PROC_LATEST" datasourceId="Odessa_DS">
       <fieldList>
         <field id="FT_ID" type="java.lang.String"></field>
         <field id="BATCH_NBR" type="java.math.BigDecimal"></field>
       </fieldList>
+      <query>select q.ft_id, q.batch_nbr
+from (
+    select
+        p.ft_id,
+        p.batch_nbr,
+        row_number() over (
+            partition by p.ft_id
+            order by
+                p.seq_num desc,
+                p.batch_nbr desc nulls last,
+                p.batch_cd desc nulls last
+        ) as rn
+    from cisadm.ci_ft_proc p
+) q
+where q.rn = 1</query>
+    </jdbcQuery>
+
+    <jdbcTable id="CI_LOOKUP_VAL_L_FT_TYPE" datasourceId="Odessa_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
     </jdbcTable>
 
-    <jdbcTable id="CI_DST_CODE_EFF" datasourceId="Origin_DEV_DS" datasourceTableName="CI_DST_CODE_EFF" schemaAlias="CISADM">
+    <jdbcTable id="CI_LOOKUP_VAL_L_GL_STATUS" datasourceId="Odessa_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_DST_CODE_L" datasourceId="Odessa_DS" datasourceTableName="CI_DST_CODE_L" schemaAlias="CISADM">
       <fieldList>
         <field id="DST_ID" type="java.lang.String"></field>
-        <field id="EFFDT" type="java.sql.Timestamp"></field>
-        <field id="EFF_STATUS" type="java.lang.String"></field>
-        <field id="GL_ACCT" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcQuery id="FUND_MAP_RESOLVED" datasourceId="Odessa_DS">
+      <fieldList>
+        <field id="FT_ID" type="java.lang.String"></field>
+        <field id="GL_SEQ_NBR" type="java.math.BigDecimal"></field>
         <field id="FUND_CD" type="java.lang.String"></field>
+        <field id="EFFDT" type="java.sql.Timestamp"></field>
+        <field id="FUND_MAP_STATUS" type="java.lang.String"></field>
       </fieldList>
-    </jdbcTable>
+      <query>select
+    ranked.ft_id,
+    ranked.gl_seq_nbr,
+    ranked.fund_cd,
+    cast(ranked.effdt as timestamp) as effdt,
+    case
+        when ranked.dst_id is null or ranked.gl_acct is null then 'No Distribution Key'
+        when ranked.fund_cd is null then 'No Active Fund Mapping'
+        else 'Mapped'
+    end as fund_map_status
+from (
+    select
+        gl.ft_id,
+        gl.gl_seq_nbr,
+        gl.dst_id,
+        gl.gl_acct,
+        d.fund_cd,
+        d.effdt,
+        row_number() over (
+            partition by gl.ft_id, gl.gl_seq_nbr
+            order by
+                case
+                    when d.effdt is not null
+                     and ft.accounting_dt is not null
+                     and d.effdt &lt;= ft.accounting_dt then 0
+                    when d.effdt is null then 1
+                    else 2
+                end,
+                case
+                    when d.effdt is not null
+                     and ft.accounting_dt is not null
+                     and d.effdt &lt;= ft.accounting_dt then d.effdt
+                end desc nulls last,
+                d.effdt desc nulls last,
+                d.fund_cd
+        ) as rn
+    from cisadm.ci_ft_gl gl
+    join cisadm.ci_ft ft
+      on ft.ft_id = gl.ft_id
+     and ft.redundant_sw = 'N'
+    left join cisadm.ci_dst_code_eff d
+      on d.dst_id = gl.dst_id
+     and d.gl_acct = gl.gl_acct
+     and d.eff_status = 'A'
+) ranked
+where ranked.rn = 1</query>
+    </jdbcQuery>
 
-    <jdbcTable id="CI_DST_CODE_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_DST_CODE_L" schemaAlias="CISADM">
-      <fieldList>
-        <field id="DST_ID" type="java.lang.String"></field>
-        <field id="LANGUAGE_CD" type="java.lang.String"></field>
-        <field id="DESCR" type="java.lang.String"></field>
-      </fieldList>
-    </jdbcTable>
-
-    <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
-      <fieldList>
-        <field id="FIELD_NAME" type="java.lang.String"></field>
-        <field id="FIELD_VALUE" type="java.lang.String"></field>
-        <field id="LANGUAGE_CD" type="java.lang.String"></field>
-        <field id="DESCR" type="java.lang.String"></field>
-      </fieldList>
-    </jdbcTable>
-
-    <jdbcTable id="CI_LOOKUP_VAL_L_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
-      <fieldList>
-        <field id="FIELD_NAME" type="java.lang.String"></field>
-        <field id="FIELD_VALUE" type="java.lang.String"></field>
-        <field id="LANGUAGE_CD" type="java.lang.String"></field>
-        <field id="DESCR" type="java.lang.String"></field>
-      </fieldList>
-    </jdbcTable>
-
-    <jdbcTable id="CI_FUND" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FUND" schemaAlias="CISADM">
+    <jdbcTable id="CI_FUND" datasourceId="Odessa_DS" datasourceTableName="CI_FUND" schemaAlias="CISADM">
       <fieldList>
         <field id="FUND_CD" type="java.lang.String"></field>
         <field id="FUND_TYPE_FLG" type="java.lang.String"></field>
       </fieldList>
     </jdbcTable>
 
-    <jdbcTable id="CI_LOOKUP_VAL_L_2" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+    <jdbcTable id="CI_FUND_L" datasourceId="Odessa_DS" datasourceTableName="CI_FUND_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FUND_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_LOOKUP_VAL_L_FUND_TYPE" datasourceId="Odessa_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
       <fieldList>
         <field id="FIELD_NAME" type="java.lang.String"></field>
         <field id="FIELD_VALUE" type="java.lang.String"></field>
@@ -167,88 +241,92 @@
       </fieldList>
     </jdbcTable>
 
-    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FT" schemaAlias="CISADM">
+    <jdbcTable id="JoinTree_1" datasourceId="Odessa_DS" datasourceTableName="CI_FT_GL" schemaAlias="CISADM">
       <fieldList>
-        <field id="CI_FT.FT_ID" type="java.lang.String"></field>
-        <field id="CI_FT.SA_ID" type="java.lang.String"></field>
-        <field id="CI_FT.BILL_ID" type="java.lang.String"></field>
-        <field id="CI_FT.GL_DIVISION" type="java.lang.String"></field>
-        <field id="CI_FT.CIS_DIVISION" type="java.lang.String"></field>
-        <field id="CI_FT.FT_TYPE_FLG" type="java.lang.String"></field>
-        <field id="CI_FT.FREEZE_SW" type="java.lang.String"></field>
-        <field id="CI_FT.FREEZE_DTTM" type="java.sql.Timestamp"></field>
-        <field id="CI_FT.ACCOUNTING_DT" type="java.sql.Timestamp"></field>
-        <field id="CI_FT.GL_DISTRIB_STATUS" type="java.lang.String"></field>
-
         <field id="CI_FT_GL.FT_ID" type="java.lang.String"></field>
         <field id="CI_FT_GL.GL_SEQ_NBR" type="java.math.BigDecimal"></field>
         <field id="CI_FT_GL.DST_ID" type="java.lang.String"></field>
         <field id="CI_FT_GL.GL_ACCT" type="java.lang.String"></field>
-        <field id="CI_FT_GL.AMOUNT" type="java.math.BigDecimal"></field>
         <field id="CI_FT_GL.STATISTIC_AMOUNT" type="java.math.BigDecimal"></field>
         <field id="CI_FT_GL.CHAR_TYPE_CD" type="java.lang.String"></field>
         <field id="CI_FT_GL.CHAR_VAL" type="java.lang.String"></field>
+        <field id="CI_FT_GL.AMOUNT" type="java.math.BigDecimal"></field>
 
-        <field id="CI_FT_PROC.FT_ID" type="java.lang.String"></field>
-        <field id="CI_FT_PROC.BATCH_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_FT.FT_ID" type="java.lang.String"></field>
+        <field id="CI_FT.SA_ID" type="java.lang.String"></field>
+        <field id="CI_FT.BILL_ID" type="java.lang.String"></field>
+        <field id="CI_FT.ACCOUNTING_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_FT.FREEZE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_FT.GL_DISTRIB_STATUS" type="java.lang.String"></field>
+        <field id="CI_FT.FT_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_FT.GL_DIVISION" type="java.lang.String"></field>
+        <field id="CI_FT.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CI_FT.REDUNDANT_SW" type="java.lang.String"></field>
 
-        <field id="CI_DST_CODE_EFF.DST_ID" type="java.lang.String"></field>
-        <field id="CI_DST_CODE_EFF.EFFDT" type="java.sql.Timestamp"></field>
-        <field id="CI_DST_CODE_EFF.EFF_STATUS" type="java.lang.String"></field>
-        <field id="CI_DST_CODE_EFF.GL_ACCT" type="java.lang.String"></field>
-        <field id="CI_DST_CODE_EFF.FUND_CD" type="java.lang.String"></field>
+        <field id="FT_PROC_LATEST.FT_ID" type="java.lang.String"></field>
+        <field id="FT_PROC_LATEST.BATCH_NBR" type="java.math.BigDecimal"></field>
 
-        <field id="CI_FUND.FUND_CD" type="java.lang.String"></field>
-        <field id="CI_FUND.FUND_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_FT_TYPE.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_FT_TYPE.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_FT_TYPE.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_FT_TYPE.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_LOOKUP_VAL_L_GL_STATUS.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_GL_STATUS.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_GL_STATUS.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_GL_STATUS.DESCR" type="java.lang.String"></field>
 
         <field id="CI_DST_CODE_L.DST_ID" type="java.lang.String"></field>
         <field id="CI_DST_CODE_L.LANGUAGE_CD" type="java.lang.String"></field>
         <field id="CI_DST_CODE_L.DESCR" type="java.lang.String"></field>
 
-        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
-        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
-        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
-        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+        <field id="FUND_MAP_RESOLVED.FT_ID" type="java.lang.String"></field>
+        <field id="FUND_MAP_RESOLVED.GL_SEQ_NBR" type="java.math.BigDecimal"></field>
+        <field id="FUND_MAP_RESOLVED.FUND_CD" type="java.lang.String"></field>
+        <field id="FUND_MAP_RESOLVED.EFFDT" type="java.sql.Timestamp"></field>
+        <field id="FUND_MAP_RESOLVED.FUND_MAP_STATUS" type="java.lang.String"></field>
 
-        <field id="CI_LOOKUP_VAL_L_1.FIELD_NAME" type="java.lang.String"></field>
-        <field id="CI_LOOKUP_VAL_L_1.FIELD_VALUE" type="java.lang.String"></field>
-        <field id="CI_LOOKUP_VAL_L_1.LANGUAGE_CD" type="java.lang.String"></field>
-        <field id="CI_LOOKUP_VAL_L_1.DESCR" type="java.lang.String"></field>
+        <field id="CI_FUND.FUND_CD" type="java.lang.String"></field>
+        <field id="CI_FUND.FUND_TYPE_FLG" type="java.lang.String"></field>
 
-        <field id="CI_LOOKUP_VAL_L_2.FIELD_NAME" type="java.lang.String"></field>
-        <field id="CI_LOOKUP_VAL_L_2.FIELD_VALUE" type="java.lang.String"></field>
-        <field id="CI_LOOKUP_VAL_L_2.LANGUAGE_CD" type="java.lang.String"></field>
-        <field id="CI_LOOKUP_VAL_L_2.DESCR" type="java.lang.String"></field>
+        <field id="CI_FUND_L.FUND_CD" type="java.lang.String"></field>
+        <field id="CI_FUND_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_FUND_L.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_LOOKUP_VAL_L_FUND_TYPE.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_FUND_TYPE.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_FUND_TYPE.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_FUND_TYPE.DESCR" type="java.lang.String"></field>
 
         <field id="DEBIT_AMOUNT" dataSetExpression="CaseWhen(CI_FT_GL.AMOUNT &gt;= 0, CI_FT_GL.AMOUNT, 0)" type="java.math.BigDecimal"></field>
-        <field id="CREDIT_AMOUNT" dataSetExpression="CaseWhen(CI_FT_GL.AMOUNT &lt;= 0, -1 * CI_FT_GL.AMOUNT, 0)" type="java.math.BigDecimal"></field>
+        <field id="CREDIT_AMOUNT" dataSetExpression="CaseWhen(CI_FT_GL.AMOUNT &lt; 0, -1 * CI_FT_GL.AMOUNT, 0)" type="java.math.BigDecimal"></field>
       </fieldList>
 
-      <filterString>CI_FT.ACCOUNTING_DT >= ts'2025-09-01' and CI_FT.GL_DISTRIB_STATUS == 'D' and CI_FT.FREEZE_SW == 'Y'</filterString>
-      <joinInfo alias="CI_FT" referenceId="CI_FT"></joinInfo>
+      <joinInfo alias="CI_FT_GL" referenceId="CI_FT_GL"></joinInfo>
       <joinList>
-        <join expr="CI_FT.FT_ID == CI_FT_GL.FT_ID" left="CI_FT" right="CI_FT_GL" type="inner" weight="1"></join>
-        <join expr="CI_FT.FT_ID == CI_FT_PROC.FT_ID" left="CI_FT" right="CI_FT_PROC" type="leftOuter" weight="1"></join>
-        <join expr="CI_FT.FT_TYPE_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'FT_TYPE_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="CI_FT" right="CI_LOOKUP_VAL_L" type="leftOuter" weight="1"></join>
-        <join expr="CI_FT.GL_DISTRIB_STATUS == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'GL_DISTRIB_STATUS' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'" left="CI_FT" right="CI_LOOKUP_VAL_L_1" type="leftOuter" weight="1"></join>
-        <join expr="CI_FT_GL.DST_ID == CI_DST_CODE_EFF.DST_ID and CI_FT_GL.GL_ACCT == CI_DST_CODE_EFF.GL_ACCT and CI_DST_CODE_EFF.EFF_STATUS == 'A'" left="CI_FT_GL" right="CI_DST_CODE_EFF" type="leftOuter" weight="1"></join>
-        <join expr="CI_DST_CODE_EFF.FUND_CD == CI_FUND.FUND_CD" left="CI_DST_CODE_EFF" right="CI_FUND" type="leftOuter" weight="1"></join>
-        <join expr="CI_FUND.FUND_TYPE_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'FUND_TYPE_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'" left="CI_FUND" right="CI_LOOKUP_VAL_L_2" type="leftOuter" weight="1"></join>
+        <join expr="CI_FT_GL.FT_ID == CI_FT.FT_ID and CI_FT.REDUNDANT_SW == 'N'" left="CI_FT_GL" right="CI_FT" type="leftOuter" weight="1"></join>
+        <join expr="CI_FT.FT_ID == FT_PROC_LATEST.FT_ID" left="CI_FT" right="FT_PROC_LATEST" type="leftOuter" weight="1"></join>
+        <join expr="CI_FT.FT_TYPE_FLG == CI_LOOKUP_VAL_L_FT_TYPE.FIELD_VALUE and CI_LOOKUP_VAL_L_FT_TYPE.FIELD_NAME == 'FT_TYPE_FLG' and CI_LOOKUP_VAL_L_FT_TYPE.LANGUAGE_CD == 'ENG'" left="CI_FT" right="CI_LOOKUP_VAL_L_FT_TYPE" type="leftOuter" weight="1"></join>
+        <join expr="CI_FT.GL_DISTRIB_STATUS == CI_LOOKUP_VAL_L_GL_STATUS.FIELD_VALUE and CI_LOOKUP_VAL_L_GL_STATUS.FIELD_NAME == 'GL_DISTRIB_STATUS' and CI_LOOKUP_VAL_L_GL_STATUS.LANGUAGE_CD == 'ENG'" left="CI_FT" right="CI_LOOKUP_VAL_L_GL_STATUS" type="leftOuter" weight="1"></join>
         <join expr="CI_FT_GL.DST_ID == CI_DST_CODE_L.DST_ID and CI_DST_CODE_L.LANGUAGE_CD == 'ENG'" left="CI_FT_GL" right="CI_DST_CODE_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_FT_GL.FT_ID == FUND_MAP_RESOLVED.FT_ID and CI_FT_GL.GL_SEQ_NBR == FUND_MAP_RESOLVED.GL_SEQ_NBR" left="CI_FT_GL" right="FUND_MAP_RESOLVED" type="leftOuter" weight="1"></join>
+        <join expr="FUND_MAP_RESOLVED.FUND_CD == CI_FUND.FUND_CD" left="FUND_MAP_RESOLVED" right="CI_FUND" type="leftOuter" weight="1"></join>
+        <join expr="CI_FUND.FUND_CD == CI_FUND_L.FUND_CD and CI_FUND_L.LANGUAGE_CD == 'ENG'" left="CI_FUND" right="CI_FUND_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_FUND.FUND_TYPE_FLG == CI_LOOKUP_VAL_L_FUND_TYPE.FIELD_VALUE and CI_LOOKUP_VAL_L_FUND_TYPE.FIELD_NAME == 'FUND_TYPE_FLG' and CI_LOOKUP_VAL_L_FUND_TYPE.LANGUAGE_CD == 'ENG'" left="CI_FUND" right="CI_LOOKUP_VAL_L_FUND_TYPE" type="leftOuter" weight="1"></join>
       </joinList>
       <joinOptions></joinOptions>
       <tableRefList>
-        <tableRef alwaysIncludeTable="false" tableAlias="CI_FT" tableId="CI_FT"></tableRef>
         <tableRef alwaysIncludeTable="false" tableAlias="CI_FT_GL" tableId="CI_FT_GL"></tableRef>
-        <tableRef alwaysIncludeTable="false" tableAlias="CI_FT_PROC" tableId="CI_FT_PROC"></tableRef>
-        <tableRef alwaysIncludeTable="false" tableAlias="CI_DST_CODE_EFF" tableId="CI_DST_CODE_EFF"></tableRef>
-        <tableRef alwaysIncludeTable="false" tableAlias="CI_FUND" tableId="CI_FUND"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_FT" tableId="CI_FT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FT_PROC_LATEST" tableId="FT_PROC_LATEST"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_FT_TYPE" tableId="CI_LOOKUP_VAL_L_FT_TYPE"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_GL_STATUS" tableId="CI_LOOKUP_VAL_L_GL_STATUS"></tableRef>
         <tableRef alwaysIncludeTable="false" tableAlias="CI_DST_CODE_L" tableId="CI_DST_CODE_L"></tableRef>
-        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
-        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"></tableRef>
-        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_2" tableId="CI_LOOKUP_VAL_L_2"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FUND_MAP_RESOLVED" tableId="FUND_MAP_RESOLVED"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_FUND" tableId="CI_FUND"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_FUND_L" tableId="CI_FUND_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_FUND_TYPE" tableId="CI_LOOKUP_VAL_L_FUND_TYPE"></tableRef>
       </tableRefList>
     </jdbcTable>
   </resources>
 </schema>
-

@@ -1,6 +1,8 @@
 CREATE OR REPLACE PROCEDURE cisadm.refresh_ft_gl_distribution_rpt_curr AS
+    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12);
 BEGIN
-    EXECUTE IMMEDIATE 'TRUNCATE TABLE cisadm.ft_gl_distribution_rpt_curr';
+    DELETE FROM cisadm.ft_gl_distribution_rpt_curr
+    WHERE accounting_dt >= v_window_start;
 
     INSERT INTO cisadm.ft_gl_distribution_rpt_curr (
         ft_id,
@@ -223,6 +225,7 @@ BEGIN
     INNER JOIN cisadm.ci_ft ft
         ON ft.ft_id = ft_gl.ft_id
        AND ft.redundant_sw = 'N'
+       AND ft.accounting_dt >= v_window_start
     LEFT JOIN cisadm.ci_ft_proc_vw ft_proc_vw
         ON ft_proc_vw.ft_id = ft.ft_id
     LEFT JOIN cisadm.ci_ft_proc ft_proc

@@ -21,9 +21,9 @@ Object summary:
 - workspace Domain XML: `sql/performance/snapshots/meter_ops/d1_usage/D1_USAGE_RPT_CURR_End_User_Friendly.xml`
 - importable Domain XML: `domains/exports/manual_imports/D1_USAGE_RPT_CURR_End_User_Friendly.xml`
 - Domain resource root: `D1_USAGE_RPT_CURR`
-- refresh pattern: `DELETE + monthly batched INSERT + COMMIT`
-- scheduler interval: every 6 hours
-- source population: all `D1_USAGE` rows where `NVL(START_DTTM, NVL(CRE_DTTM, STATUS_UPD_DTTM)) IS NOT NULL`
+- refresh pattern: `rolling 12-month DELETE by D1_USAGE_ID + 3-month batched INSERT + COMMIT`
+- scheduler interval: every 6 hours at `03:30`, `09:30`, `15:30`, and `21:30 GMT`
+- rolling refresh slice: `D1_USAGE` rows where `NVL(START_DTTM, NVL(CRE_DTTM, STATUS_UPD_DTTM)) >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12)`
 - final QA status: `Pass`
 - ready for ad hoc use: `Yes`
 
@@ -83,11 +83,13 @@ The final design preserves every qualifying usage header first, then overlays bi
 ### 4. Lower-grain quantity logic was removed from the header snapshot
 The final snapshot does not attempt to carry scalar-detail or period-SQ quantity logic.
 
-### 5. Full-history refreshes are batched by month
+### 5. Nightly refreshes rebuild only the rolling 12-month window
 The refresh uses the best available usage timestamp:
 - `START_DTTM`
 - then `CRE_DTTM`
 - then `STATUS_UPD_DTTM`
+
+The deployed optimization target is to avoid reprocessing stable historical usage rows every day.
 
 ### 6. Code-only business fields were reviewed and accepted as-is
 The final snapshot intentionally keeps:
@@ -109,17 +111,19 @@ That means:
 - lower-grain quantity facts are intentionally excluded
 
 ## Population Boundary
-Current governed population:
+Current rolling refresh population:
 
 ```sql
-WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) IS NOT NULL
+WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12)
 ```
 
 Included population:
-- all `D1_USAGE` rows with at least one usable timestamp among `START_DTTM`, `CRE_DTTM`, or `STATUS_UPD_DTTM`
+- nightly rebuild scope: all `D1_USAGE` rows in the rolling 12-month driver window
+- retained snapshot scope: older previously loaded history remains in the table until a wider rebuild is run
 
 Excluded population:
-- only `D1_USAGE` rows with all three timestamps null
+- rows older than the rolling 12-month rebuild window are not touched by the nightly refresh
+- rows with all three timestamps null are still outside the governed source population entirely
 
 ## Grain And Join Safety Rules
 The grain is one row per `D1_USAGE_ID`.
@@ -153,20 +157,26 @@ Most important field decisions:
 - quantity and determinant-detail fields are intentionally excluded
 
 ## Final Refresh Procedure
-The final procedure implementation is in `02_refresh_snapshot_procedure.sql`.
+The packaged procedure implementations are:
+- `02a_full_history_refresh_procedure.sql` for the one-time historical baseline load
+- `02_refresh_snapshot_procedure.sql` for the ongoing rolling 12-month nightly refresh
 
 The final procedure behavior is:
-- clear the snapshot with `DELETE`
-- detect the minimum and maximum batchable usage month from source
-- load the snapshot month by month
+- compute a rolling 12-month window start at the first day of the month
+- delete snapshot rows whose `D1_USAGE_ID` is still present in the current rolling source window
+- detect the rolling source upper bound from the greater of next month start and the latest qualifying source month
+- load the window in 3-month batches
 - drive each batch from `D1_USAGE`
 - enrich with subscription, billing bridge, bill segment, service agreement, account, customer, and premise context
 - stamp `LOAD_DTTM` with `SYSTIMESTAMP`
-- commit each month
+- commit each 3-month batch
 
 Key implementation decisions:
 - `DELETE` was kept instead of `TRUNCATE` so refreshes are less likely to fail with `ORA-00054` while the table is open in another session
-- monthly batching was kept to reduce Oracle TEMP pressure during large rebuilds
+- the delete is keyed by `D1_USAGE_ID` from the live rolling source slice so rows moving into the 12-month window are refreshed safely without duplicate snapshot rows
+- rolling-window rebuild was adopted after diagnostics showed most nightly runtime was spent reprocessing history older than 12 months
+- 3-month batching was chosen as the middle ground between the old monthly loop and an all-at-once single-pass load that may exhaust TEMP or UNDO
+- the rolling nightly procedure must be deployed only after a one-time full-history baseline load has been completed successfully
 - the `C1_USAGE` bridge is ranked with `ROW_NUMBER()` so one resolved bridge row is chosen per `D1_USAGE_ID`
 - customer name is resolved through one ranked account-person row
 - the three accepted code-only fields remain raw codes by design
@@ -177,6 +187,18 @@ The effective bridge rule is:
 JOIN cisadm.c1_usage cu
     ON cu.usage_id = u.usg_ext_id
    AND cu.bo_status_cd = 'BD-PROC'
+```
+
+The rolling delete rule is:
+
+```sql
+DELETE FROM cisadm.d1_usage_rpt_curr t
+WHERE EXISTS (
+    SELECT 1
+    FROM cisadm.d1_usage u
+    WHERE u.d1_usage_id = t.d1_usage_id
+      AND NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) >= v_window_start
+)
 ```
 
 The batch driver rule is:
@@ -196,18 +218,18 @@ BEGIN
         job_type        => 'STORED_PROCEDURE',
         job_action      => 'CISADM.REFRESH_D1_USAGE_RPT_CURR',
         start_date      => SYSTIMESTAMP,
-        repeat_interval => 'FREQ=HOURLY;INTERVAL=6',
+        repeat_interval => 'FREQ=DAILY;BYHOUR=3,9,15,21;BYMINUTE=30;BYSECOND=0',
         enabled         => TRUE,
-        comments        => 'Refresh usage header snapshot every 6 hours'
+        comments        => 'Refresh usage header snapshot every 6 hours at 03:30, 09:30, 15:30, and 21:30 GMT'
     );
 END;
 /
 ```
 
 Operational meaning:
-- refresh starts immediately when created
-- then runs every 6 hours
-- because the pattern is full rebuild by monthly batches, users should avoid querying during the refresh window if partial-refresh exposure matters
+- first eligible run is the next `03:30`, `09:30`, `15:30`, or `21:30 GMT` scheduler slot after creation
+- then runs every 6 hours at `03:30`, `09:30`, `15:30`, and `21:30 GMT`
+- because the pattern is a rolling-window rebuild by 3-month batches, users should still avoid querying during the refresh window if partial-refresh exposure matters
 
 ## Domain Contract
 The final Domain is a single-table JDBC Domain on `D1_USAGE_RPT_CURR` using datasource alias `Origin_DEV_DS` and schema alias `CISADM`.
@@ -233,13 +255,15 @@ Final exposure logic:
 ## Build And Validation Workflow
 ### Build from scratch
 1. Create the table using `01_create_snapshot_table.sql`.
-2. Create or replace the procedure using `02_refresh_snapshot_procedure.sql`.
-3. Run the manual refresh.
-4. Run `04_validation_queries.sql`.
-5. Run `05_status_cross_validation.sql`.
-6. Run `06_intensive_qa_queries.sql`.
-7. If validation and QA pass, create the scheduler job with `03_schedule_snapshot_job.sql`.
-8. Publish or reimport the Domain XML.
+2. Deploy and run `02a_full_history_refresh_procedure.sql` for the one-time full-history baseline load.
+3. Validate that the snapshot contains the expected full historical baseline.
+4. Create or replace the procedure using `02_refresh_snapshot_procedure.sql` so nightly processing switches to the rolling 12-month pattern.
+5. Run the manual refresh.
+6. Run `04_validation_queries.sql`.
+7. Run `05_status_cross_validation.sql`.
+8. Run `06_intensive_qa_queries.sql`.
+9. If validation and QA pass, create the scheduler job with `03_schedule_snapshot_job.sql`.
+10. Publish or reimport the Domain XML.
 
 ### Manual refresh
 ```sql
@@ -279,8 +303,32 @@ Final recorded QA result:
 - source rows missing in snapshot: `0`
 - snapshot rows not in source: `0`
 
+Interpretation:
+- this parity evidence reflects the established full-history baseline before the rolling nightly optimization
+- once the nightly job rebuilds only the last 12 months, older history remains by retention rather than by nightly re-extraction
+- periodic wider rebuilds may still be required if older historical source data is corrected after the baseline load
+
+Deployment note:
+- the first production cutover to this pattern should preserve or create a full-history snapshot baseline before the rolling nightly procedure is enabled
+
 ### Monthly parity
 - all `36` returned usage months matched exactly
+
+### Rolling-window cutover validation
+Cutover validation date:
+- `2026-04-20`
+
+Validated comparison:
+- before/after whole-table snapshot row count stayed at `684,214`
+- before/after monthly snapshot counts remained unchanged across all `36` returned months
+- rolling 12-month source vs snapshot monthly parity remained exact with `0` differences in every returned month
+- older-than-window retained history remained unchanged after the rolling refresh
+- duplicate-key check remained clean with no duplicate `D1_USAGE_ID` rows
+
+Final interpretation:
+- the rolling 12-month nightly procedure refreshed the intended current window
+- the optimization did not change the established historical baseline
+- the optimization is validated for production use as a replacement nightly refresh strategy once the full-history baseline exists
 
 ### Billing bridge and context coverage
 - rows with `C1_USAGE` in source: `623,557`
@@ -347,16 +395,16 @@ WHERE owner = 'CISADM'
 ## How To Debug Common Problems
 ### If row counts do not match source
 Check:
-1. whether the base source still uses `NVL(START_DTTM, NVL(CRE_DTTM, STATUS_UPD_DTTM)) IS NOT NULL`
+1. whether the base source still uses the expected rolling-window driver expression on `NVL(START_DTTM, NVL(CRE_DTTM, STATUS_UPD_DTTM))`
 2. whether someone changed a `LEFT JOIN` to an `INNER JOIN`
-3. whether the batch window logic was altered
+3. whether the rolling 12-month window or 3-month batch logic was altered
 4. whether anti-join results identify missing or extra `D1_USAGE_ID` values
 
 ### If monthly parity drifts
 Check:
 1. whether the batch driver still uses the same best-available timestamp expression
 2. whether the snapshot month still uses the same fallback ordering
-3. whether a date conversion or truncation rule changed
+3. whether a date conversion, truncation rule, or rolling-window start changed
 
 ### If billing bridge coverage looks wrong
 Check:

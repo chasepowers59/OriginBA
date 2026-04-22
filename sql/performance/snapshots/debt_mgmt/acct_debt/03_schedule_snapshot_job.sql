@@ -5,8 +5,12 @@ BEGIN
         job_action      => 'CISADM.REFRESH_ACCT_DEBT_RPT_CURR',
         start_date      => SYSTIMESTAMP,
         repeat_interval => 'FREQ=HOURLY;INTERVAL=6',
+        -- Fixed-time alternative:
+        -- repeat_interval => 'FREQ=DAILY;BYHOUR=7,12;BYMINUTE=0;BYSECOND=0',
         enabled         => TRUE,
         comments        => 'Refresh account debt snapshot every 6 hours'
+        -- Fixed-time alternative comment:
+        -- comments        => 'Refresh account debt snapshot daily at 7:00 AM and 12:00 PM'
     );
 END;
 /

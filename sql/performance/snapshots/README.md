@@ -15,6 +15,15 @@ Examples:
 
 This keeps snapshot DDL, refresh procedures, scheduler jobs, validation SQL, subset-level READMEs, and colocated Domain XML copies together without mixing them with broader validation or diagnostic folders.
 
+For the current 6-hour staggered cadence across the active governed snapshot jobs, use:
+- `sql/performance/snapshots/apply_6hour_staggered_schedule_1am_base.sql`
+
+For governed snapshot-table indexes that are active or planned, use:
+- `sql/performance/snapshots/indexes/`
+
+For centralized deployment sequencing across the active 7 scheduled snapshots, use:
+- `sql/performance/snapshots/deployment_steps/`
+
 For active governed snapshots, each snapshot workspace now also carries its matching end-user Domain XML so a developer can review:
 - the Oracle snapshot build assets
 - the QA and results template

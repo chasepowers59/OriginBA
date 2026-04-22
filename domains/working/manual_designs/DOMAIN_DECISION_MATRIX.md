@@ -15,7 +15,7 @@ Use this page to pick the right domain fast.
 | Reconciliation between billed usage and financial postings | `Usage_Billing_Financial_Bridge_PerfFast_6M.xml` | Bridge model with performance-focused structure |
 | Same bridge use case, but safer/fallback version | `Usage_Billing_Financial_Bridge_No_Derived_UltraSafe.xml` | Minimal join fallback |
 | Current unbilled revenue estimate (usage + non-usage + tax) | `Unbilled_Revenue_Snapshot_Perf.xml` | Fast single-table daily snapshot model |
-| GL/fund mapping and fund balance detail at transaction level | `Fund_Balance_Final_DB_Validated.xml` | DB-validated detailed fund path |
+| GL/fund mapping and fund balance detail at transaction level | `Fund_Balance_Final_DB_Validated.xml` | DB-validated detailed fund path with effective-dated fund resolution |
 | Fund balance trends by month | `Fund_Balance_Monthly_PerfSafe.xml` | Aggregated monthly model for speed |
 | Write-off operations, debt movement, recovery effectiveness | `Write_Off_Requirements_Final_DB_Validated.xml` | Full write-off KPI and recovery context |
 | Collections process effectiveness at reducing overdue debt | `Collections_Process_Effectiveness_Debt_Reduction_180D.xml` | Process-level arrears deltas to next process with event summary |

@@ -53,6 +53,12 @@ Use `snapshots/finance/ft_gl_distribution/` for those subjects.
 - Child joins are gated by `FT_TYPE_FLG` so adjustment, bill-segment, and payment fields only populate for the matching FT families.
 - The supplied DDL keeps several ID columns at `VARCHAR2(30)`. Repo metadata for source tables shows some upstream IDs are wider than 30, so widen those columns before rollout if your environment contains full-width source keys.
 
+Rolling-window evaluation assets now included:
+- baseline full-history procedure: `02a_full_history_refresh_procedure.sql`
+- refresh-strategy diagnostics: `10a_refresh_strategy_diagnostics.sql`
+- before/after validation: `11_before_after_validation.sql`
+- rolling refresh candidate scaffold: `12_rolling_refresh_candidate_procedure.sql`
+
 ## Workflow
 1. Create the snapshot table with `01_create_snapshot_table.sql`.
 2. For an existing deployed table, run `01a_alter_existing_snapshot_table.sql`.
@@ -73,10 +79,17 @@ Use `snapshots/finance/ft_gl_distribution/` for those subjects.
 - `01_create_snapshot_table.sql`
 - `01a_alter_existing_snapshot_table.sql`
 - `02_refresh_snapshot_procedure.sql`
+- `02a_full_history_refresh_procedure.sql`
 - `03_schedule_snapshot_job.sql`
 - `04_validation_queries.sql`
 - `05_materialized_view_cutover_runbook.md`
 - `06_intensive_qa_queries.sql`
 - `07_qa_results_template.md`
 - `08_master_technical_guide.md`
+- `09_index_candidate_tests.sql`
+- `10_index_benchmark_checklist.md`
+- `10a_refresh_strategy_diagnostics.sql`
+- `11a_fast_before_after_validation.sql`
+- `11_before_after_validation.sql`
+- `12_rolling_refresh_candidate_procedure.sql`
 - `FT_RPT_CURR_End_User_Friendly.xml`

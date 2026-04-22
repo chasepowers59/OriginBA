@@ -1,6 +1,8 @@
 CREATE OR REPLACE PROCEDURE cisadm.refresh_ft_rpt_curr AS
+    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12);
 BEGIN
-    EXECUTE IMMEDIATE 'TRUNCATE TABLE cisadm.ft_rpt_curr';
+    DELETE FROM cisadm.ft_rpt_curr
+    WHERE accounting_dt >= v_window_start;
 
     INSERT INTO cisadm.ft_rpt_curr (
         ft_id,
@@ -155,7 +157,8 @@ BEGIN
     LEFT JOIN cisadm.ci_adj_type_l adj_type
         ON adj_type.adj_type_cd  = adj.adj_type_cd
        AND adj_type.language_cd  = 'ENG'
-    WHERE ft.redundant_sw = 'N';
+    WHERE ft.redundant_sw = 'N'
+      AND ft.accounting_dt >= v_window_start;
 
     COMMIT;
 END;

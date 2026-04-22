@@ -48,10 +48,22 @@ That means determinant-level dollars should come from a separate calc-line artif
 ## Implemented snapshot
 - `01_create_snapshot_table.sql`
 - `02_refresh_snapshot_procedure.sql`
+- `02a_full_history_refresh_procedure.sql`
 - `03_schedule_snapshot_job.sql`
 - `04_validation_queries.sql`
 - `05_bseg_determinant_trace.sql`
 - `06_intensive_qa_queries.sql`
 - `07_qa_results_template.md`
 - `08_master_technical_guide.md`
+- `09_refresh_strategy_diagnostics.sql`
+- `10_fast_before_after_validation.sql`
+- `11_rolling_refresh_candidate_procedure.sql`
 - `BSEG_SQ_USAGE_RPT_CURR_End_User_Friendly.xml`
+
+## Rolling-window candidate status
+- The active procedure remains the current full refresh.
+- `02a_full_history_refresh_procedure.sql` preserves the baseline full-history version explicitly.
+- `11_rolling_refresh_candidate_procedure.sql` is a prepared `12-month` rolling-window candidate keyed on `BILL_DT`.
+- Validate with:
+  - `09_refresh_strategy_diagnostics.sql`
+  - `10_fast_before_after_validation.sql`

@@ -21,9 +21,9 @@ Object summary:
 - workspace Domain XML: `sql/performance/snapshots/meter_ops/d1_usage_scalar_dtl/D1_USAGE_SCALAR_DTL_RPT_CURR_End_User_Friendly.xml`
 - importable Domain XML: `domains/exports/manual_imports/D1_USAGE_SCALAR_DTL_RPT_CURR_End_User_Friendly.xml`
 - Domain resource root: `D1_USAGE_SCALAR_DTL_RPT_CURR`
-- refresh pattern: `DELETE + monthly batched INSERT + COMMIT`
-- scheduler interval: daily at `03:30`
-- source population: all scalar-detail rows whose parent `D1_USAGE` row has at least one usable timestamp among `START_DTTM`, `CRE_DTTM`, or `STATUS_UPD_DTTM`
+- refresh pattern: `rolling 12-month DELETE by D1_USAGE_ID + 3-month batched INSERT + COMMIT`
+- scheduler interval: every 6 hours at `04:00`, `10:00`, `16:00`, and `22:00 GMT`
+- rolling refresh slice: scalar-detail rows whose parent `D1_USAGE` row satisfies `NVL(START_DTTM, NVL(CRE_DTTM, STATUS_UPD_DTTM)) >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12)`
 - primary additive measures: `QUANTITY`, `FINAL_QUANTITY`
 - final QA status: `Pass`
 - ready for ad hoc use: `Yes`
@@ -102,24 +102,26 @@ That means:
 - header and billing context are support fields, not the grain
 
 ## Population Boundary
-Current governed population is based on the parent usage timestamp rule:
+Current rolling refresh population is based on the parent usage timestamp rule:
 
 ```sql
-WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) IS NOT NULL
+WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12)
 ```
 
 Included population:
-- all scalar-detail rows whose parent usage satisfies the timestamp rule
+- nightly rebuild scope: all scalar-detail rows whose parent usage is in the rolling 12-month driver window
+- retained snapshot scope: older previously loaded history remains in the table until a wider rebuild is run
 
 Excluded population:
-- only scalar-detail rows whose parent usage has all three batch-driving timestamps null
+- rows older than the rolling 12-month rebuild window are not touched by the nightly refresh
+- scalar-detail rows whose parent usage has all three batch-driving timestamps null are outside the governed source population entirely
 
 ## Grain And Join Safety Rules
 The grain is one row per `D1_USAGE_ID`, `SEQ_NUM`.
 
 This is protected by:
 - driving from `D1_USAGE_SCALAR_DTL`
-- batching from parent `D1_USAGE` month windows
+- driving the rebuild from one qualifying `D1_USAGE` working set
 - using `LEFT JOIN`s for optional subscription, billing, customer, and premise context
 - resolving the `C1_USAGE` bridge through one ranked match per `D1_USAGE_ID`
 - resolving one chosen customer row per account
@@ -147,26 +149,43 @@ Most important field decisions:
 - `DIVISION_CD`, `BO_STATUS_REASON_CD`, and `US_BO_STATUS_REASON_CD` remain code-only by accepted business decision
 
 ## Final Refresh Procedure
-The final procedure implementation is in `02_refresh_snapshot_procedure.sql`.
+The packaged procedure implementations are:
+- `02a_full_history_refresh_procedure.sql` for the one-time historical baseline load
+- `02_refresh_snapshot_procedure.sql` for the ongoing rolling 12-month nightly refresh
 
 The final procedure behavior is:
-- clear the snapshot with `DELETE`
-- find the minimum and maximum batchable usage month from source
-- load the snapshot month by month
-- drive each batch from `D1_USAGE`
-- join to `D1_USAGE_SCALAR_DTL` for the scalar-detail rows
+- compute a rolling 12-month window start at the first day of the month
+- delete snapshot rows whose parent `D1_USAGE_ID` is still present in the current rolling source window
+- detect the rolling source upper bound from the greater of next month start and the latest qualifying source month
+- load the window in 3-month batches
+- join to `D1_USAGE_SCALAR_DTL` for the scalar-detail rows in each batch
 - enrich with usage, subscription, billing bridge, bill segment, SA, account, customer, and premise context
 - stamp `LOAD_DTTM` with `SYSTIMESTAMP`
-- commit each month
+- commit each 3-month batch
 
 Key implementation decisions:
-- `DELETE` was kept instead of `TRUNCATE`
-- monthly batching was kept to reduce Oracle pressure during full-history rebuilds
+- the one-time full-history baseline procedure keeps the original full rebuild pattern for initial population
+- the nightly rolling procedure deletes only the current 12-month source slice so older history remains in place
+- 3-month batching was chosen as the middle ground between the old monthly loop and an all-at-once rolling-window insert that may exhaust TEMP or UNDO
+- customer resolution is scoped to the accounts present in the current rebuild population instead of re-ranking the full account population repeatedly
 - the `C1_USAGE` bridge is ranked so one resolved bridge row is chosen per `D1_USAGE_ID`
 - customer name is resolved through one ranked account-person row
+- the rolling nightly procedure must be deployed only after a one-time full-history baseline load has been completed successfully
 - the three accepted code-only fields remain raw codes by design
 
-The effective batch driver rule is:
+The rolling delete rule is:
+
+```sql
+DELETE FROM cisadm.d1_usage_scalar_dtl_rpt_curr t
+WHERE EXISTS (
+    SELECT 1
+    FROM cisadm.d1_usage u
+    WHERE u.d1_usage_id = t.d1_usage_id
+      AND NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) >= v_window_start
+)
+```
+
+The batch driver rule is:
 
 ```sql
 WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) >= v_batch_start
@@ -183,9 +202,9 @@ BEGIN
         job_type        => 'STORED_PROCEDURE',
         job_action      => 'CISADM.REFRESH_D1_USAGE_SCALAR_DTL_RPT_CURR',
         start_date      => SYSTIMESTAMP,
-        repeat_interval => 'FREQ=DAILY;BYHOUR=3;BYMINUTE=30;BYSECOND=0',
+        repeat_interval => 'FREQ=DAILY;BYHOUR=4,10,16,22;BYMINUTE=0;BYSECOND=0',
         enabled         => TRUE,
-        comments        => 'Refresh D1 usage scalar-detail reporting snapshot daily'
+        comments        => 'Refresh D1 usage scalar-detail reporting snapshot every 6 hours at 04:00, 10:00, 16:00, and 22:00 GMT'
     );
 END;
 /
@@ -253,11 +272,31 @@ Interpretation:
 - the snapshot preserves scalar-detail population and additive quantity truth exactly
 - the remaining missing description columns are accepted business choices, not snapshot defects
 
+### Rolling-window cutover validation
+Cutover validation date:
+- `2026-04-20`
+
+Validated comparison:
+- before/after whole-table snapshot row count remained unchanged
+- before/after additive `QUANTITY` total remained unchanged
+- before/after additive `FINAL_QUANTITY` total remained unchanged
+- the rolling-window refresh preserved the established historical baseline while rebuilding only the current 12-month slice
+- duplicate natural-key validation remained the required target state of zero duplicate `D1_USAGE_ID`, `SEQ_NUM` rows
+
+Final interpretation:
+- the rolling 12-month nightly scalar-detail procedure preserved the existing snapshot totals and row counts during cutover validation
+- the optimization is validated for production use as a replacement nightly refresh strategy once the full-history baseline exists
+
+Deployment note:
+- the first production cutover to this pattern should preserve or create a full-history snapshot baseline before the rolling nightly procedure is enabled
+
 ## Deployment Or Replication Steps
 1. Run `01_create_snapshot_table.sql` in Oracle.
-2. Create or replace the procedure with `02_refresh_snapshot_procedure.sql`.
-3. Create the scheduler job with `03_schedule_snapshot_job.sql`.
-4. Run a manual refresh:
+2. Deploy and run `02a_full_history_refresh_procedure.sql` for the one-time full-history baseline load.
+3. Validate that the snapshot contains the expected full historical baseline.
+4. Create or replace the procedure with `02_refresh_snapshot_procedure.sql` so nightly processing switches to the rolling 12-month pattern.
+5. Create the scheduler job with `03_schedule_snapshot_job.sql`.
+6. Run a manual refresh:
 
 ```sql
 BEGIN
@@ -266,9 +305,10 @@ END;
 /
 ```
 
-5. Run `04_validation_queries.sql`.
-6. Run `05_intensive_qa_queries.sql`.
-7. Import or reimport `domains/exports/manual_imports/D1_USAGE_SCALAR_DTL_RPT_CURR_End_User_Friendly.xml`.
+7. Run `04_validation_queries.sql`.
+8. Run `05_intensive_qa_queries.sql`.
+9. Run `10_before_after_validation.sql` for cutover verification when changing refresh strategy.
+10. Import or reimport `domains/exports/manual_imports/D1_USAGE_SCALAR_DTL_RPT_CURR_End_User_Friendly.xml`.
 
 ## Debugging Guidance
 Use SQL Developer to inspect the current state:

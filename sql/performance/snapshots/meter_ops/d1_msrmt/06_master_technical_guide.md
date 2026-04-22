@@ -22,7 +22,7 @@ Object summary:
 - importable Domain XML: `domains/exports/manual_imports/D1_MSRMT_RPT_CURR_End_User_Friendly.xml`
 - Domain resource root: `D1_MSRMT_RPT_CURR`
 - refresh pattern: `TRUNCATE + INSERT + COMMIT`
-- scheduler interval: every 6 hours
+- scheduler interval: every 6 hours at `02:30`, `08:30`, `14:30`, and `20:30 GMT`
 - source population: all rows in `CISADM.D1_MSRMT`
 - final QA status: `Pass`
 - ready for ad hoc use: `Yes`
@@ -159,9 +159,9 @@ BEGIN
         job_type        => 'STORED_PROCEDURE',
         job_action      => 'CISADM.REFRESH_D1_MSRMT_RPT_CURR',
         start_date      => SYSTIMESTAMP,
-        repeat_interval => 'FREQ=HOURLY;INTERVAL=6',
+        repeat_interval => 'FREQ=DAILY;BYHOUR=2,8,14,20;BYMINUTE=30;BYSECOND=0',
         enabled         => TRUE,
-        comments        => 'Refresh final measurement reporting snapshot every 6 hours'
+        comments        => 'Refresh final measurement reporting snapshot every 6 hours at 02:30, 08:30, 14:30, and 20:30 GMT'
     );
 END;
 /

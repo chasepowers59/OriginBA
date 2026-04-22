@@ -1,22 +1,40 @@
 CREATE OR REPLACE PROCEDURE cisadm.refresh_d1_usage_rpt_curr AS
+    c_window_months      CONSTANT PLS_INTEGER := 12;
+    c_batch_months       CONSTANT PLS_INTEGER := 3;
+    v_window_start       TIMESTAMP;
     v_batch_start       TIMESTAMP;
     v_batch_end         TIMESTAMP;
     v_batch_upper_bound TIMESTAMP;
 BEGIN
-    DELETE FROM cisadm.d1_usage_rpt_curr;
+    v_window_start := CAST(ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -c_window_months) AS TIMESTAMP);
+
+    DELETE FROM cisadm.d1_usage_rpt_curr t
+    WHERE EXISTS (
+        SELECT 1
+        FROM cisadm.d1_usage u
+        WHERE u.d1_usage_id = t.d1_usage_id
+          AND NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) >= v_window_start
+    );
     COMMIT;
 
     SELECT
-        CAST(TRUNC(MIN(NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm))), 'MM') AS TIMESTAMP),
-        CAST(ADD_MONTHS(TRUNC(MAX(NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm))), 'MM'), 1) AS TIMESTAMP)
+        v_window_start,
+        GREATEST(
+            CAST(ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1) AS TIMESTAMP),
+            CAST(ADD_MONTHS(TRUNC(MAX(NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm))), 'MM'), 1) AS TIMESTAMP)
+        )
     INTO
         v_batch_start,
         v_batch_upper_bound
     FROM cisadm.d1_usage u
-    WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) IS NOT NULL;
+    WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) >= v_window_start;
 
     WHILE v_batch_start < v_batch_upper_bound LOOP
-        v_batch_end := ADD_MONTHS(v_batch_start, 1);
+        v_batch_end := ADD_MONTHS(v_batch_start, c_batch_months);
+
+        IF v_batch_end > v_batch_upper_bound THEN
+            v_batch_end := v_batch_upper_bound;
+        END IF;
 
         INSERT INTO cisadm.d1_usage_rpt_curr (
             d1_usage_id,

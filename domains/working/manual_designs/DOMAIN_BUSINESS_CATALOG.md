@@ -51,9 +51,9 @@ Quick picker for business users:
 - Why active: import/performance fallback.
 
 ### `Fund_Balance_Final_DB_Validated.xml`
-- Business view: detailed GL/fund mapping and fund balance outcomes from validated table path.
-- Answers: fund-coded revenue/amount balances, FT status/type and fund mapping quality.
-- Why active: most DB-validated detailed fund balance design.
+- Business view: detailed GL/fund mapping and fund balance outcomes from a validated GL-line path with effective-dated fund resolution.
+- Answers: fund-coded revenue/amount balances, FT status/type, distribution-code to fund mapping, and fund mapping quality.
+- Why active: most DB-validated detailed fund balance design; current version resolves one effective-dated `CI_DST_CODE_EFF` row per GL line, exposes `CI_FUND_L` description, and avoids the older hardcoded accounting-date window.
 
 ### `Fund_Balance_Monthly_PerfSafe.xml`
 - Business view: month-level fund balance summary.

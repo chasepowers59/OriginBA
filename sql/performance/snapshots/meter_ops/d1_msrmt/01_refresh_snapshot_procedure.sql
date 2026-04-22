@@ -1,6 +1,8 @@
 CREATE OR REPLACE PROCEDURE cisadm.refresh_d1_msrmt_rpt_curr AS
+    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12);
 BEGIN
-    EXECUTE IMMEDIATE 'TRUNCATE TABLE cisadm.d1_msrmt_rpt_curr';
+    DELETE FROM cisadm.d1_msrmt_rpt_curr
+    WHERE msrmt_dttm >= v_window_start;
 
     INSERT INTO cisadm.d1_msrmt_rpt_curr (
         measr_comp_id,
@@ -387,7 +389,8 @@ BEGIN
        AND sp_disconn.language_cd = 'ENG'
     LEFT JOIN cisadm.ci_acc_grp_l sp_acc_grp
         ON sp_acc_grp.access_grp_cd = sp.access_grp_cd
-       AND sp_acc_grp.language_cd = 'ENG';
+       AND sp_acc_grp.language_cd = 'ENG'
+    WHERE msrmt.msrmt_dttm >= v_window_start;
 
     COMMIT;
 END;

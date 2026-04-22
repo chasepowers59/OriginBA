@@ -8,6 +8,7 @@ Low-level troubleshooting SQL for mappings, lineage checks, row-level diagnostic
 - `bseg_to_usage_scalar_measurement_trace.sql`: one-bill-segment lineage trace from `CI_BSEG_SQ` / `CI_BSEG_CALC` through `CI_SA`, `C1_USAGE`, `D1_USAGE`, `D1_USAGE_SCALAR_DTL`, and best-effort processed measurement rows.
 - `cisadm_data_dictionary_extract.sql`: legacy one-shot extract kept for compatibility.
 - `d1_usage_to_sa_mapping_diagnostic.sql`: deep usage-to-SA lineage and join diagnostics.
+- `f1_w1_x1_reporting_opportunity_discovery.sql`: discovery pack for `F1_*`, `W1_*`, and `X1_*` objects, including inventory, column profiling, theme scoring, natural join candidates back to `CI` / `D1` / `C1`, and an optional dynamic row-count / recent-date profile.
 - `find_bill_cycle_numbers.sql`: bill-cycle lookup diagnostics.
 
 ## Discovery Automation
