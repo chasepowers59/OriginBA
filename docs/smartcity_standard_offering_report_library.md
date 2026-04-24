@@ -164,7 +164,7 @@ Arrears monitoring, write-off tracking, collections and severance process manage
 | Report Name | Source | Description | Primary Use |
 |---|---|---|---|
 | Collection Process - Arrears by Customer Class | Live Domain | Arrears by customer class. | Debt segmentation by customer class. |
-| Collection Process - Arrears by Debt Class | Live Domain | Arrears by debt class. | Debt portfolio analysis by debt class. |
+| Collection Process - Arrears by Debt Class | Live Domain | Arrears by debt class. | Current-state debt portfolio analysis by debt class; target-state standard layer should move to `ACCT_DEBT_RPT_CURR` once refreshed and scheduled. |
 | Write Offs - Debt Written Off Trend | Live Domain | Written-off debt trends over time. | Write-off trend analysis. |
 | Write Offs - Average Process Duration | Live Domain | Time taken for write-off process completion. | Write-off process duration review. |
 | Collection Process - Active Collections | Live Domain | Active collection processes. | Active collections workload monitoring. |

@@ -105,6 +105,11 @@ For the **Personalized Monthly Statement** report, you can use this adapter for 
 
 Use the **same** username, password, host, port, and service name (or TNS name) in all three.
 
+For long-running snapshot procedure tests from the local Python runner, keep
+ `DB_CALL_TIMEOUT_MS=900000` (`15` minutes) in `.env`. The governed snapshot
+ procedures are expected to finish well below that threshold, but the longer
+ timeout prevents false client-side failures during manual validation runs.
+
 ---
 
 ## Oracle permissions (read-only)

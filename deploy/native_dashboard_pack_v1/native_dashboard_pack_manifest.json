@@ -1,0 +1,64 @@
+{
+  "name": "SmartCity Native Dashboard Pack V1",
+  "version": "2026-04-24",
+  "delivery_model": "dashboardModelResource",
+  "target_root_uri": "/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Dashboard_Pack_V1",
+  "priority_order": [
+    "Financial Transaction Dashboard",
+    "General Ledger Dashboard",
+    "Billing Dashboard",
+    "Usage Dashboard"
+  ],
+  "dashboards": [
+    {
+      "label": "Financial Transaction Dashboard",
+      "source_folder": "/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Workstreams/Finance/Financial_Transaction",
+      "source_member_name": "Financial_Transaction_Dashboard.xml",
+      "workstream": "Finance",
+      "governed_snapshot_family": [
+        "FT_RPT_CURR"
+      ]
+    },
+    {
+      "label": "General Ledger Dashboard",
+      "source_folder": "/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Workstreams/Finance/General_Ledger",
+      "source_member_name": "General_Ledger_Dashboard.xml",
+      "workstream": "Finance",
+      "governed_snapshot_family": [
+        "FT_GL_DISTRIBUTION_RPT_CURR"
+      ]
+    },
+    {
+      "label": "Billing Dashboard",
+      "source_folder": "/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Workstreams/Development/Snapshots/Billed_Usage/Amount_Billed",
+      "source_member_name": "Billing_Dashboard.xml",
+      "workstream": "Billing_and_Rates",
+      "governed_snapshot_family": [
+        "BSEG_BILLED_USAGE_RPT_CURR",
+        "BSEG_SQ_USAGE_RPT_CURR"
+      ]
+    },
+    {
+      "label": "Usage Dashboard",
+      "source_folder": "/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Workstreams/Development/Snapshots/Meter_Operations/Scalar_Usage",
+      "source_member_name": "Usage_Dashboard.xml",
+      "workstream": "Meter_Operations",
+      "governed_snapshot_family": [
+        "D1_USAGE_RPT_CURR",
+        "D1_USAGE_SCALAR_DTL_RPT_CURR",
+        "D1_MSRMT_RPT_CURR"
+      ]
+    }
+  ],
+  "dependency_rules": {
+    "allow_workstreams_paths_in_final_package": false,
+    "allow_public_template_dependencies": false,
+    "allow_temp_dashlet_ids_without_rewrite": false,
+    "require_governed_domain_or_adhoc_targets": true
+  },
+  "next_required_tooling": [
+    "native_dashboard_inventory_audit",
+    "native_dashboard_packager"
+  ],
+  "reference_doc": "/Users/chase/OriginBA-3/docs/smartcity_native_dashboard_pack_v1.md"
+}

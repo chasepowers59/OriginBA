@@ -68,11 +68,11 @@ The SmartCity standard offering should stay aligned to these 9 workstreams:
 | `billing` | determinant detail | `Billed Usage - Segment Determinant` | Snapshot | Core | Essential determinant truth layer |
 | `billing` | tiered billed usage | `Billed Usage - Tiered Billed Usage` | Snapshot | Core | Useful if tier logic is business-relevant in this client |
 | `cashiering` | deposit control balancing | `Deposit Control - Ending Balances` | Existing Domain | Core | Broad cashiering control report |
-| `cashiering` | payment application/account review | `Payment Segments - Account View` | Existing Domain | Core | Good operational detail layer |
+| `cashiering` | payment application/account review | `Payment Segments - Account View` | Existing Domain | Exclude | Current live-domain assessment found this is not truly payment-segment grain and should not be used as a standard cashiering report |
 | `cashiering` | online payment trend | `OriginPay - Payment Count and Amount Trends` | Existing Domain | Core | Valuable digital-channel KPI |
 | `cashiering` | payment plan health | `Pay Plan - Health Status` | Existing Domain | Core | Important customer/payment operations process |
-| `cashiering` | autopay operations | `AutoPay Drafts By Scheduled Date` | Existing Domain | Core | Broad operational value |
-| `cashiering` | autopay exception / population review | `Autopay Accounts With Active Deposits` | Existing Domain | Secondary | Keep as optional unless used broadly |
+| `cashiering` | autopay operations | `AutoPay Drafts By Scheduled Date` | Existing Domain | Exclude | Current live-domain assessment found the autopay domain is a custom mashup and should not be used as standard content until rebuilt |
+| `cashiering` | autopay exception / population review | `Autopay Accounts With Active Deposits` | Existing Domain | Exclude | Current live-domain assessment found the autopay domain is not trustworthy as a governed standard layer |
 | `common` | batch operations health | `Batch Process Dashboard` | Existing Domain Dashboard | Core | Strong common-workstream monitor |
 | `common` | batch status monitoring | `Batch Run by Status` | Existing Domain | Core | Broad technical operations view |
 | `common` | incomplete batch review | `Incomplete Batch Runs` | Existing Domain | Core | Important support control |
@@ -98,7 +98,7 @@ The SmartCity standard offering should stay aligned to these 9 workstreams:
 | `debt_mgmt` | collections dashboard | `Collections Performance Dashboard` | Existing Domain Dashboard | Core | Main debt-management summary |
 | `debt_mgmt` | aging portfolio | `Age of Unpaid Bills` | Existing Domain | Core | Essential debt process report |
 | `debt_mgmt` | arrears by segment | `Arrears by Customer Class` | Existing Domain | Core | Good portfolio segmentation |
-| `debt_mgmt` | arrears by debt class | `Arrears by Debt Class` | Existing Domain | Core | Good operational and executive use case |
+| `debt_mgmt` | arrears by debt class | `Arrears by Debt Class` | Existing Domain | Core | Active current-state report, but the governed target-state layer should be `ACCT_DEBT_RPT_CURR`; keep as live until debt snapshot scheduling is restored |
 | `debt_mgmt` | collections account drill | `Collection Process - Account Details` | Existing Domain | Core | Strong operational detail |
 | `debt_mgmt` | collections effectiveness | `Collection Process - Effectiveness` | Existing Domain | Core | High-value management metric |
 | `debt_mgmt` | severance operations | `Severance Process - Account Details` | Existing Domain | Core | Important utility process |

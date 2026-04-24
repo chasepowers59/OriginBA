@@ -1,0 +1,773 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="adhocReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="692c6c8a-c157-41f1-8378-d73be6d32fac">
+	<property name="adhoc.topic.escape.variable.chars"/>
+	<property name="DESCR_1" value="Non Sufficient Funds"/>
+	<property name="adhoc.metadata.version" value="1719"/>
+	<property name="has.modified.presentation" value="false"/>
+	<property name="base.datasource.version" value="0"/>
+	<property name="use.datasource.presentation" value="true"/>
+	<property name="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.TopicReportUnit" value="/temp/sl_topic_d858175c-b568-46cd-92c9-2f978e769f18"/>
+	<parameter name="CRE_DTTM_1" class="net.sf.jasperreports.types.date.TimestampRange">
+		<defaultValueExpression><![CDATA[com.jaspersoft.jasperserver.api.common.util.rd.DateRangeFactory.getInstance("MONTH-6",java.sql.Timestamp.class)]]></defaultValueExpression>
+	</parameter>
+	<queryString language="domain">
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema">
+  <queryFields>
+    <queryField id="CI_PAY_EVENT.CRE_DTTM"></queryField>
+    <queryField id="CI_PAY_EVENT.DOC_ID"></queryField>
+    <queryField id="CI_PAY_EVENT.ILM_ARCH_SW"></queryField>
+    <queryField id="CI_PAY_EVENT.ILM_DT"></queryField>
+    <queryField id="CI_PAY_EVENT.PAY_DT"></queryField>
+    <queryField id="CI_PAY_EVENT.PAY_EVENT_ID"></queryField>
+    <queryField id="CI_PAY_EVENT.VERSION"></queryField>
+    <queryField id="CI_PAY_TNDR.ADJ_ID"></queryField>
+    <queryField id="CI_PAY_TNDR.ALT_CURRENCY_CD"></queryField>
+    <queryField id="CI_PAY_TNDR.ALT_TENDER_AMT"></queryField>
+    <queryField id="CI_PAY_TNDR.CAN_RSN_CD"></queryField>
+    <queryField id="CI_PAY_TNDR.CHECK_NBR"></queryField>
+    <queryField id="CI_PAY_TNDR.CURRENCY_CD"></queryField>
+    <queryField id="CI_PAY_TNDR.CUST_ID"></queryField>
+    <queryField id="CI_PAY_TNDR.ENCR_MICR_ID"></queryField>
+    <queryField id="CI_PAY_TNDR.EXT_REFERENCE_ID"></queryField>
+    <queryField id="CI_PAY_TNDR.HASH_MICR_ID"></queryField>
+    <queryField id="CI_PAY_TNDR.IN_TNDR_CTL_BAL_SW"></queryField>
+    <queryField id="CI_PAY_TNDR.MICR_ID"></queryField>
+    <queryField id="CI_PAY_TNDR.NAME1"></queryField>
+    <queryField id="CI_PAY_TNDR.PAY_EVENT_ID_1"></queryField>
+    <queryField id="CI_PAY_TNDR.PAY_TENDER_ID"></queryField>
+    <queryField id="CI_PAY_TNDR.PAYOR_ACCT_ID"></queryField>
+    <queryField id="CI_PAY_TNDR.TENDER_AMT"></queryField>
+    <queryField id="CI_PAY_TNDR.TENDER_TYPE_CD"></queryField>
+    <queryField id="CI_PAY_TNDR.TNDR_CTL_ID"></queryField>
+    <queryField id="CI_PAY_TNDR.TNDR_STATUS_FLG"></queryField>
+    <queryField id="CI_PAY_TNDR.VERSION_1"></queryField>
+    <queryField id="CI_PER_PRIM_VW.ENTITY_NAME"></queryField>
+    <queryField id="CI_PER_PRIM_VW.PER_ID"></queryField>
+    <queryField id="NewSet1.DESCR_2"></queryField>
+    <queryField id="NewSet1.DESCR_1"></queryField>
+    <queryField id="NewSet1.DESCR"></queryField>
+    <queryField id="NewSet2.DAYS_OLD"></queryField>
+    <queryField id="NewSet2.PAY_EVENT_ID_DISTINCT"></queryField>
+    <queryField id="NewSet2.PAY_TENDER_ID_DISTINCT"></queryField>
+  </queryFields>
+</query>]]>
+	</queryString>
+	<field name="CI_PAY_EVENT.CRE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Create Date/Time"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_EVENT/CRE_DTTM"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_EVENT/CRE_DTTM"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_EVENT.CRE_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.tree.labels">
+			<![CDATA[[{"uri":"/CI_PAY_EVENT","resourceId":"JoinTree_1","label":"1.) Payment Event"},{"uri":"/CI_PAY_TNDR","resourceId":"JoinTree_1","label":"1.) Payment Tender"},{"uri":"/CI_TNDR_CTL","resourceId":"JoinTree_1","label":"1.) Tender Control"},{"uri":"/NewSet1","resourceId":"JoinTree_1","label":"1.) Description"},{"uri":"/NewSet2","resourceId":"JoinTree_1","label":"1.) Formulas"}]]]>
+		</property>
+		<property name="semantic.tree.sort.order">
+			<![CDATA[{"CI_PAY_EVENT":1,"CRE_DTTM":2,"DOC_ID":3,"PAY_DT":4,"PAY_EVENT_ID":5,"CI_PAY_TNDR":6,"ADJ_ID":7,"ALT_CURRENCY_CD":8,"ALT_TENDER_AMT":9,"CAN_RSN_CD":10,"CHECK_NBR":11,"CURRENCY_CD":12,"CUST_ID":13,"ENCR_MICR_ID":14,"HASH_MICR_ID":15,"IN_TNDR_CTL_BAL_SW":16,"MICR_ID":17,"NAME1":18,"PAY_EVENT_ID_1":19,"PAY_TENDER_ID":20,"PAYOR_ACCT_ID":21,"TENDER_AMT":22,"TENDER_TYPE_CD":23,"TNDR_CTL_ID":24,"TNDR_STATUS_FLG":25,"CI_TNDR_CTL":26,"ALL_OPERATORS_SW":27,"ARCHIVE_SW":28,"BALANCED_DTTM":29,"BALANCED_USER_ID":30,"BATCH_CD":31,"BATCH_NBR":32,"COMMENTS":33,"CRE_DTTM_1":34,"CURRENCY_CD_1":35,"DEP_CTL_ID":36,"END_BALANCE":37,"EXT_TRANSMIT_ID":38,"START_BALANCE":39,"TNDR_CTL_ID_1":40,"TNDR_CTL_ST_FLG":41,"TNDR_SOURCE_CD":42,"USER_ID":43,"NewSet1":44,"DESCR":45,"TNDR_CTL_BAL_USER_NAME":46,"FIELD_VALUE":47,"TNDR_CTL_USER_NAME":48,"DESCR_2":49,"DESCR_1":50,"DESCR_3":51,"NewSet2":52,"DAYS_OLD":53,"PAY_EVENT_ID_DISTINCT":54,"PAY_TENDER_ID_DISTINCT":55,"ACCT_ID_DISTINCT":56,"ENTITY_NAME_UPR":57}]]>
+		</property>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_EVENT/CRE_DTTM"/>
+		<property name="previous.display" value="Create Date/Time"/>
+		<property name="semantic.item.label" value="Create Date/Time"/>
+		<property name="adhoc.chosen.tree.labels">
+			<![CDATA[[{"uri":"/CI_PAY_EVENT","resourceId":"JoinTree_1","label":"1.) Payment Event"},{"uri":"/CI_TNDR_CTL","resourceId":"JoinTree_1","label":"1.) Tender Control"},{"uri":"/CI_PAY_TNDR","resourceId":"JoinTree_1","label":"1.) Payment Tender"},{"uri":"/NewSet1","resourceId":"JoinTree_1","label":"1.) Description"},{"uri":"/NewSet2","resourceId":"JoinTree_1","label":"1.) Formulas"}]]]>
+		</property>
+		<property name="adhoc.chosen.tree.order">
+			<![CDATA[{"CI_PAY_EVENT":1,"CRE_DTTM":2,"DOC_ID":3,"ILM_ARCH_SW":4,"ILM_DT":5,"PAY_DT":6,"PAY_EVENT_ID":7,"VERSION":8,"CI_PAY_TNDR":9,"ADJ_ID":10,"ALT_CURRENCY_CD":11,"ALT_TENDER_AMT":12,"CAN_RSN_CD":13,"CHECK_NBR":14,"CURRENCY_CD":15,"CUST_ID":16,"ENCR_MICR_ID":17,"EXT_REFERENCE_ID":18,"HASH_MICR_ID":19,"IN_TNDR_CTL_BAL_SW":20,"MICR_ID":21,"NAME1":22,"PAY_EVENT_ID_1":23,"PAY_TENDER_ID":24,"PAYOR_ACCT_ID":25,"TENDER_AMT":26,"TENDER_TYPE_CD":27,"TNDR_CTL_ID":28,"TNDR_STATUS_FLG":29,"VERSION_1":30,"CI_PER_PRIM_VW":31,"ENTITY_NAME":32,"PER_ID":33,"NewSet1":34,"DESCR_2":35,"DESCR_1":36,"DESCR":37,"NewSet2":38,"DAYS_OLD":39,"PAY_EVENT_ID_DISTINCT":40,"PAY_TENDER_ID_DISTINCT":41}]]>
+		</property>
+		<property name="slIsTableAsList" value="false"/>
+		<property name="adhoc.chosen.tree.is.flattened" value="false"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_EVENT.CRE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_PAY_EVENT.DOC_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Document Number"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_EVENT/DOC_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_EVENT/DOC_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_EVENT.DOC_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_EVENT/DOC_ID"/>
+		<property name="previous.display" value="Document Number"/>
+		<property name="semantic.item.label" value="Document Number"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_EVENT.DOC_ID)"/>
+	</field>
+	<field name="CI_PAY_EVENT.PAY_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Payment Date"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_EVENT/PAY_DT"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_EVENT/PAY_DT"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_EVENT.PAY_DT"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_EVENT/PAY_DT"/>
+		<property name="previous.display" value="Payment Date"/>
+		<property name="semantic.item.label" value="Payment Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_EVENT.PAY_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_PAY_EVENT.PAY_EVENT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Payment Event ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_EVENT/PAY_EVENT_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_EVENT/PAY_EVENT_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_EVENT.PAY_EVENT_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_EVENT/PAY_EVENT_ID"/>
+		<property name="previous.display" value="Payment Event ID"/>
+		<property name="semantic.item.label" value="Payment Event ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_EVENT.PAY_EVENT_ID)"/>
+	</field>
+	<field name="CI_TNDR_CTL.ALL_OPERATORS_SW" class="java.lang.String">
+		<property name="adhoc.display" value="All Users                     "/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/ALL_OPERATORS_SW"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/ALL_OPERATORS_SW"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.ALL_OPERATORS_SW"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/ALL_OPERATORS_SW"/>
+		<property name="previous.display" value="All Users                     "/>
+		<property name="semantic.item.label" value="All Users                     "/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.ALL_OPERATORS_SW)"/>
+	</field>
+	<field name="CI_TNDR_CTL.ARCHIVE_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Archived"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/ARCHIVE_SW"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/ARCHIVE_SW"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.ARCHIVE_SW"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/ARCHIVE_SW"/>
+		<property name="previous.display" value="Archived"/>
+		<property name="semantic.item.label" value="Archived"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.ARCHIVE_SW)"/>
+	</field>
+	<field name="CI_TNDR_CTL.BALANCED_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Balanced Date/Time"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/BALANCED_DTTM"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/BALANCED_DTTM"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.BALANCED_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/BALANCED_DTTM"/>
+		<property name="previous.display" value="Balanced Date/Time"/>
+		<property name="semantic.item.label" value="Balanced Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.BALANCED_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_TNDR_CTL.BALANCED_USER_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Balanced User ID"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/BALANCED_USER_ID"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/BALANCED_USER_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.BALANCED_USER_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/BALANCED_USER_ID"/>
+		<property name="previous.display" value="Balanced User ID"/>
+		<property name="semantic.item.label" value="Balanced User ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.BALANCED_USER_ID)"/>
+	</field>
+	<field name="CI_TNDR_CTL.BATCH_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Batch Control"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/BATCH_CD"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/BATCH_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.BATCH_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/BATCH_CD"/>
+		<property name="previous.display" value="Batch Control"/>
+		<property name="semantic.item.label" value="Batch Control"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.BATCH_CD)"/>
+	</field>
+	<field name="CI_TNDR_CTL.BATCH_NBR" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Batch Number"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/BATCH_NBR"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/BATCH_NBR"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.BATCH_NBR"/>
+		<property name="dimensionOrMeasure" value="Dimension"/>
+		<property name="defaultAgg" value="None"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="null"/>
+		<property name="aggregateType" value="java.lang.Object"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/BATCH_NBR"/>
+		<property name="previous.display" value="Batch Number"/>
+		<property name="semantic.item.label" value="Batch Number"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_TNDR_CTL.COMMENTS" class="java.lang.String">
+		<property name="adhoc.display" value="Comments"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/COMMENTS"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/COMMENTS"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.COMMENTS"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/COMMENTS"/>
+		<property name="previous.display" value="Comments"/>
+		<property name="semantic.item.label" value="Comments"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.COMMENTS)"/>
+	</field>
+	<field name="CI_TNDR_CTL.CRE_DTTM_1" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Create Date/Time"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/CRE_DTTM_1"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/CRE_DTTM_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.CRE_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/CRE_DTTM_1"/>
+		<property name="previous.display" value="Create Date/Time"/>
+		<property name="semantic.item.label" value="Create Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.CRE_DTTM_1)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_TNDR_CTL.CURRENCY_CD_1" class="java.lang.String">
+		<property name="adhoc.display" value="Currency Code"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/CURRENCY_CD_1"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/CURRENCY_CD_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.CURRENCY_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/CURRENCY_CD_1"/>
+		<property name="previous.display" value="Currency Code"/>
+		<property name="semantic.item.label" value="Currency Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.CURRENCY_CD_1)"/>
+	</field>
+	<field name="CI_TNDR_CTL.DEP_CTL_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Deposit Control ID"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/DEP_CTL_ID"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/DEP_CTL_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.DEP_CTL_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/DEP_CTL_ID"/>
+		<property name="previous.display" value="Deposit Control ID"/>
+		<property name="semantic.item.label" value="Deposit Control ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.DEP_CTL_ID)"/>
+	</field>
+	<field name="CI_TNDR_CTL.END_BALANCE" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Ending Balance"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/END_BALANCE"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/END_BALANCE"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.END_BALANCE"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/END_BALANCE"/>
+		<property name="previous.display" value="Ending Balance"/>
+		<property name="semantic.item.label" value="Ending Balance"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(CI_TNDR_CTL.END_BALANCE)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_TNDR_CTL.EXT_TRANSMIT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="External Transmission ID"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/EXT_TRANSMIT_ID"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/EXT_TRANSMIT_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.EXT_TRANSMIT_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/EXT_TRANSMIT_ID"/>
+		<property name="previous.display" value="External Transmission ID"/>
+		<property name="semantic.item.label" value="External Transmission ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.EXT_TRANSMIT_ID)"/>
+	</field>
+	<field name="CI_TNDR_CTL.START_BALANCE" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Starting Balance"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/START_BALANCE"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/START_BALANCE"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.START_BALANCE"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/START_BALANCE"/>
+		<property name="previous.display" value="Starting Balance"/>
+		<property name="semantic.item.label" value="Starting Balance"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(CI_TNDR_CTL.START_BALANCE)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_TNDR_CTL.TNDR_CTL_ID_1" class="java.lang.String">
+		<property name="adhoc.display" value="Tender Control ID"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/TNDR_CTL_ID_1"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/TNDR_CTL_ID_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.TNDR_CTL_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/TNDR_CTL_ID_1"/>
+		<property name="previous.display" value="Tender Control ID"/>
+		<property name="semantic.item.label" value="Tender Control ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.TNDR_CTL_ID_1)"/>
+	</field>
+	<field name="CI_TNDR_CTL.TNDR_CTL_ST_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Status         "/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/TNDR_CTL_ST_FLG"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/TNDR_CTL_ST_FLG"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.TNDR_CTL_ST_FLG"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/TNDR_CTL_ST_FLG"/>
+		<property name="previous.display" value="Status         "/>
+		<property name="semantic.item.label" value="Status         "/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.TNDR_CTL_ST_FLG)"/>
+	</field>
+	<field name="CI_TNDR_CTL.TNDR_SOURCE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Tender Source"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/TNDR_SOURCE_CD"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/TNDR_SOURCE_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.TNDR_SOURCE_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/TNDR_SOURCE_CD"/>
+		<property name="previous.display" value="Tender Source"/>
+		<property name="semantic.item.label" value="Tender Source"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.TNDR_SOURCE_CD)"/>
+	</field>
+	<field name="CI_TNDR_CTL.USER_ID" class="java.lang.String">
+		<property name="adhoc.display" value="User"/>
+		<property name="adhoc.tree.uri" value="/CI_TNDR_CTL/USER_ID"/>
+		<property name="semantic.tree.uri" value="/CI_TNDR_CTL/USER_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_CTL.USER_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_TNDR_CTL/USER_ID"/>
+		<property name="previous.display" value="User"/>
+		<property name="semantic.item.label" value="User"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_TNDR_CTL.USER_ID)"/>
+	</field>
+	<field name="CI_PAY_TNDR.ADJ_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Adjustment ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/ADJ_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/ADJ_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.ADJ_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/ADJ_ID"/>
+		<property name="previous.display" value="Adjustment ID"/>
+		<property name="semantic.item.label" value="Adjustment ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.ADJ_ID)"/>
+	</field>
+	<field name="CI_PAY_TNDR.ALT_CURRENCY_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Alternate Currency Code"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/ALT_CURRENCY_CD"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/ALT_CURRENCY_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.ALT_CURRENCY_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/ALT_CURRENCY_CD"/>
+		<property name="previous.display" value="Alternate Currency Code"/>
+		<property name="semantic.item.label" value="Alternate Currency Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.ALT_CURRENCY_CD)"/>
+	</field>
+	<field name="CI_PAY_TNDR.ALT_TENDER_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Alternate Amount"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/ALT_TENDER_AMT"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/ALT_TENDER_AMT"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.ALT_TENDER_AMT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/ALT_TENDER_AMT"/>
+		<property name="previous.display" value="Alternate Amount"/>
+		<property name="semantic.item.label" value="Alternate Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(CI_PAY_TNDR.ALT_TENDER_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_PAY_TNDR.CAN_RSN_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Cancel Reason"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/CAN_RSN_CD"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/CAN_RSN_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.CAN_RSN_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/CAN_RSN_CD"/>
+		<property name="previous.display" value="Cancel Reason"/>
+		<property name="semantic.item.label" value="Cancel Reason"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.CAN_RSN_CD)"/>
+	</field>
+	<field name="CI_PAY_TNDR.CHECK_NBR" class="java.lang.String">
+		<property name="adhoc.display" value="Check Number"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/CHECK_NBR"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/CHECK_NBR"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.CHECK_NBR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/CHECK_NBR"/>
+		<property name="previous.display" value="Check Number"/>
+		<property name="semantic.item.label" value="Check Number"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.CHECK_NBR)"/>
+	</field>
+	<field name="CI_PAY_TNDR.CURRENCY_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Currency Code"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/CURRENCY_CD"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/CURRENCY_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.CURRENCY_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/CURRENCY_CD"/>
+		<property name="previous.display" value="Currency Code"/>
+		<property name="semantic.item.label" value="Currency Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.CURRENCY_CD)"/>
+	</field>
+	<field name="CI_PAY_TNDR.CUST_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Customer ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/CUST_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/CUST_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.CUST_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/CUST_ID"/>
+		<property name="previous.display" value="Customer ID"/>
+		<property name="semantic.item.label" value="Customer ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.CUST_ID)"/>
+	</field>
+	<field name="CI_PAY_TNDR.ENCR_MICR_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Encrypted Micr ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/ENCR_MICR_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/ENCR_MICR_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.ENCR_MICR_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/ENCR_MICR_ID"/>
+		<property name="previous.display" value="Encrypted Micr ID"/>
+		<property name="semantic.item.label" value="Encrypted Micr ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.ENCR_MICR_ID)"/>
+	</field>
+	<field name="CI_PAY_TNDR.HASH_MICR_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Hash MICR ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/HASH_MICR_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/HASH_MICR_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.HASH_MICR_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/HASH_MICR_ID"/>
+		<property name="previous.display" value="Hash MICR ID"/>
+		<property name="semantic.item.label" value="Hash MICR ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.HASH_MICR_ID)"/>
+	</field>
+	<field name="CI_PAY_TNDR.IN_TNDR_CTL_BAL_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Included in Tender Ctl Balance"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/IN_TNDR_CTL_BAL_SW"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/IN_TNDR_CTL_BAL_SW"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.IN_TNDR_CTL_BAL_SW"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/IN_TNDR_CTL_BAL_SW"/>
+		<property name="previous.display" value="Included in Tender Ctl Balance"/>
+		<property name="semantic.item.label" value="Included in Tender Ctl Balance"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.IN_TNDR_CTL_BAL_SW)"/>
+	</field>
+	<field name="CI_PAY_TNDR.MICR_ID" class="java.lang.String">
+		<property name="adhoc.display" value="MICR ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/MICR_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/MICR_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.MICR_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/MICR_ID"/>
+		<property name="previous.display" value="MICR ID"/>
+		<property name="semantic.item.label" value="MICR ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.MICR_ID)"/>
+	</field>
+	<field name="CI_PAY_TNDR.NAME1" class="java.lang.String">
+		<property name="adhoc.display" value="Name"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/NAME1"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/NAME1"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.NAME1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/NAME1"/>
+		<property name="previous.display" value="Name"/>
+		<property name="semantic.item.label" value="Name"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.NAME1)"/>
+	</field>
+	<field name="CI_PAY_TNDR.PAY_EVENT_ID_1" class="java.lang.String">
+		<property name="adhoc.display" value="Payment Event ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/PAY_EVENT_ID_1"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/PAY_EVENT_ID_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.PAY_EVENT_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/PAY_EVENT_ID_1"/>
+		<property name="previous.display" value="Payment Event ID"/>
+		<property name="semantic.item.label" value="Payment Event ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.PAY_EVENT_ID_1)"/>
+	</field>
+	<field name="CI_PAY_TNDR.PAY_TENDER_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Pay Tender ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/PAY_TENDER_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/PAY_TENDER_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.PAY_TENDER_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/PAY_TENDER_ID"/>
+		<property name="previous.display" value="Pay Tender ID"/>
+		<property name="semantic.item.label" value="Pay Tender ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.PAY_TENDER_ID)"/>
+	</field>
+	<field name="CI_PAY_TNDR.PAYOR_ACCT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Payor Account ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/PAYOR_ACCT_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/PAYOR_ACCT_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.PAYOR_ACCT_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/PAYOR_ACCT_ID"/>
+		<property name="previous.display" value="Payor Account ID"/>
+		<property name="semantic.item.label" value="Payor Account ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.PAYOR_ACCT_ID)"/>
+	</field>
+	<field name="CI_PAY_TNDR.TENDER_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Tender Amount"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/TENDER_AMT"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/TENDER_AMT"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.TENDER_AMT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/TENDER_AMT"/>
+		<property name="previous.display" value="Tender Amount"/>
+		<property name="semantic.item.label" value="Tender Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(CI_PAY_TNDR.TENDER_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_PAY_TNDR.TENDER_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Tender Type"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/TENDER_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/TENDER_TYPE_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.TENDER_TYPE_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/TENDER_TYPE_CD"/>
+		<property name="previous.display" value="Tender Type"/>
+		<property name="semantic.item.label" value="Tender Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.TENDER_TYPE_CD)"/>
+	</field>
+	<field name="CI_PAY_TNDR.TNDR_CTL_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Tender Control ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/TNDR_CTL_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/TNDR_CTL_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.TNDR_CTL_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/TNDR_CTL_ID"/>
+		<property name="previous.display" value="Tender Control ID"/>
+		<property name="semantic.item.label" value="Tender Control ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.TNDR_CTL_ID)"/>
+	</field>
+	<field name="CI_PAY_TNDR.TNDR_STATUS_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Tender Status"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_TNDR/TNDR_STATUS_FLG"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_TNDR/TNDR_STATUS_FLG"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_TNDR.TNDR_STATUS_FLG"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_TNDR/TNDR_STATUS_FLG"/>
+		<property name="previous.display" value="Tender Status"/>
+		<property name="semantic.item.label" value="Tender Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_TNDR.TNDR_STATUS_FLG)"/>
+	</field>
+	<field name="NewSet1.FIELD_VALUE" class="java.lang.String">
+		<property name="adhoc.display" value="Tender Control Status Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/FIELD_VALUE"/>
+		<property name="semantic.tree.uri" value="/NewSet1/FIELD_VALUE"/>
+		<property name="resourceId" value="JoinTree_1.CI_LOOKUP_VAL_L_1.FIELD_VALUE"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/FIELD_VALUE"/>
+		<property name="previous.display" value="Tender Control Status Description"/>
+		<property name="semantic.item.label" value="Tender Control Status Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.FIELD_VALUE)"/>
+	</field>
+	<field name="NewSet1.TNDR_CTL_USER_NAME" class="java.lang.String">
+		<property name="adhoc.display" value="Tender Control User (Name)"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/TNDR_CTL_USER_NAME"/>
+		<property name="semantic.tree.uri" value="/NewSet1/TNDR_CTL_USER_NAME"/>
+		<property name="resourceId" value="JoinTree_1.TNDR_CTL_USER_NAME"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/TNDR_CTL_USER_NAME"/>
+		<property name="previous.display" value="Tender Control User (Name)"/>
+		<property name="semantic.item.label" value="Tender Control User (Name)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.TNDR_CTL_USER_NAME)"/>
+	</field>
+	<field name="NewSet1.DESCR_3" class="java.lang.String">
+		<property name="adhoc.display" value="Tender Source Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_3"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_3"/>
+		<property name="resourceId" value="JoinTree_1.CI_TNDR_SRCE_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_3"/>
+		<property name="previous.display" value="Tender Source Description"/>
+		<property name="semantic.item.label" value="Tender Source Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_3)"/>
+	</field>
+	<field name="NewSet1.DESCR_2" class="java.lang.String">
+		<property name="adhoc.display" value="Tender Status Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_2"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_2"/>
+		<property name="resourceId" value="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_2"/>
+		<property name="previous.display" value="Tender Status Description"/>
+		<property name="semantic.item.label" value="Tender Status Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_2)"/>
+	</field>
+	<field name="NewSet1.TNDR_CTL_BAL_USER_NAME" class="java.lang.String">
+		<property name="adhoc.display" value="Tender Control Balanced By (Name)"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/TNDR_CTL_BAL_USER_NAME"/>
+		<property name="semantic.tree.uri" value="/NewSet1/TNDR_CTL_BAL_USER_NAME"/>
+		<property name="resourceId" value="JoinTree_1.TNDR_CTL_BAL_USER_NAME"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/TNDR_CTL_BAL_USER_NAME"/>
+		<property name="previous.display" value="Tender Control Balanced By (Name)"/>
+		<property name="semantic.item.label" value="Tender Control Balanced By (Name)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.TNDR_CTL_BAL_USER_NAME)"/>
+	</field>
+	<field name="NewSet1.DESCR_1" class="java.lang.String">
+		<property name="adhoc.display" value="Tender Type Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_1"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_TENDER_TYPE_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_1"/>
+		<property name="previous.display" value="Tender Type Description"/>
+		<property name="semantic.item.label" value="Tender Type Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_1)"/>
+	</field>
+	<field name="NewSet1.DESCR" class="java.lang.String">
+		<property name="adhoc.display" value="Cancel Reason Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_CAN_RSN_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR"/>
+		<property name="previous.display" value="Cancel Reason Description"/>
+		<property name="semantic.item.label" value="Cancel Reason Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR)"/>
+	</field>
+	<field name="NewSet2.DAYS_OLD" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Days Old"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/DAYS_OLD"/>
+		<property name="semantic.tree.uri" value="/NewSet2/DAYS_OLD"/>
+		<property name="resourceId" value="JoinTree_1.DAYS_OLD"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/DAYS_OLD"/>
+		<property name="previous.display" value="Days Old"/>
+		<property name="semantic.item.label" value="Days Old"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.DAYS_OLD)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="NewSet2.ACCT_ID_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distnct Payor Account ID"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/ACCT_ID_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet2/ACCT_ID_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.ACCT_ID_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/ACCT_ID_DISTINCT"/>
+		<property name="previous.display" value="Distnct Payor Account ID"/>
+		<property name="semantic.item.label" value="Distnct Payor Account ID"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.ACCT_ID_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet2.ENTITY_NAME_UPR" class="java.lang.String">
+		<property name="adhoc.display" value="Payor (Name)"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/ENTITY_NAME_UPR"/>
+		<property name="semantic.tree.uri" value="/NewSet2/ENTITY_NAME_UPR"/>
+		<property name="resourceId" value="JoinTree_1.CI_PER_NAME.ENTITY_NAME_UPR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/ENTITY_NAME_UPR"/>
+		<property name="previous.display" value="Payor (Name)"/>
+		<property name="semantic.item.label" value="Payor (Name)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet2.ENTITY_NAME_UPR)"/>
+	</field>
+	<field name="NewSet2.PAY_EVENT_ID_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct Payment Event ID"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/PAY_EVENT_ID_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet2/PAY_EVENT_ID_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.PAY_EVENT_ID_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/PAY_EVENT_ID_DISTINCT"/>
+		<property name="previous.display" value="Distinct Payment Event ID"/>
+		<property name="semantic.item.label" value="Distinct Payment Event ID"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.PAY_EVENT_ID_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet2.PAY_TENDER_ID_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct Pay Tender ID"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/PAY_TENDER_ID_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet2/PAY_TENDER_ID_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.PAY_TENDER_ID_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/PAY_TENDER_ID_DISTINCT"/>
+		<property name="previous.display" value="Distinct Pay Tender ID"/>
+		<property name="semantic.item.label" value="Distinct Pay Tender ID"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.PAY_TENDER_ID_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+</jasperReport>

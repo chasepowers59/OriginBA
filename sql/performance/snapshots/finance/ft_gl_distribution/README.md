@@ -71,13 +71,13 @@ These are derived from the sign of `GL_AMOUNT` and keep repeated JRXML-level deb
 Current refresh operating model:
 - one-time baseline: `02a_full_history_refresh_procedure.sql`
 - ongoing maintenance: `02_refresh_snapshot_procedure.sql`
-- active maintenance pattern: rolling `12-month` `DELETE + INSERT + COMMIT`
+- active maintenance pattern: rolling `6-month` `DELETE + INSERT + COMMIT`
 - archived design scaffold: `02b_rolling_refresh_candidate_procedure.sql`
 
 Why the rolling model was adopted:
 - the latest observed FT-GL runtime became the slowest active snapshot refresh
-- diagnostics showed current activity does not back-post into accounting periods older than `12` months
-- a 12-month maintenance window keeps the active slice while preserving older baseline history in place
+- diagnostics showed current activity does not back-post into accounting periods older than `6` months
+- a 6-month maintenance window keeps the active slice while preserving older baseline history in place
 
 ## Known legacy domain defects to validate
 1. `CI_FT` to `CI_ADJ` joins `PARENT_ID` to `ADJ_TYPE_CD`, which is almost certainly incorrect.

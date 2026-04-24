@@ -1,5 +1,5 @@
 CREATE OR REPLACE PROCEDURE cisadm.refresh_ft_gl_distribution_rpt_curr AS
-    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12);
+    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -6);
 BEGIN
     DELETE FROM cisadm.ft_gl_distribution_rpt_curr
     WHERE accounting_dt >= v_window_start;

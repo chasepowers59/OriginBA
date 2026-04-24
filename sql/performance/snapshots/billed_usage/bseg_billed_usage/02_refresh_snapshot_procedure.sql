@@ -1,6 +1,8 @@
 CREATE OR REPLACE PROCEDURE cisadm.refresh_bseg_billed_usage_rpt_curr AS
+    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12);
 BEGIN
-    EXECUTE IMMEDIATE 'TRUNCATE TABLE cisadm.bseg_billed_usage_rpt_curr';
+    DELETE FROM cisadm.bseg_billed_usage_rpt_curr
+    WHERE bill_dt >= v_window_start;
 
     INSERT INTO cisadm.bseg_billed_usage_rpt_curr (
         bseg_id,
@@ -102,17 +104,11 @@ BEGIN
         sq_agg.determinant_count,
         sq_agg.total_init_sq,
         sq_agg.total_bill_sq,
-        CASE
-            WHEN sq_agg.determinant_count = 1 THEN sq_agg.min_uom_cd
-        END AS sole_uom_cd,
+        CASE WHEN sq_agg.determinant_count = 1 THEN sq_agg.min_uom_cd END,
         sole_uom_l.descr,
-        CASE
-            WHEN sq_agg.determinant_count = 1 THEN sq_agg.min_tou_cd
-        END AS sole_tou_cd,
+        CASE WHEN sq_agg.determinant_count = 1 THEN sq_agg.min_tou_cd END,
         sole_tou_l.descr,
-        CASE
-            WHEN sq_agg.determinant_count = 1 THEN sq_agg.min_sqi_cd
-        END AS sole_sqi_cd,
+        CASE WHEN sq_agg.determinant_count = 1 THEN sq_agg.min_sqi_cd END,
         sole_sqi_l.descr,
         read_agg.read_line_count,
         read_agg.total_msr_qty,
@@ -122,9 +118,7 @@ BEGIN
         calc_agg.calc_header_count,
         calc_agg.total_calc_amt,
         calc_agg.rs_count,
-        CASE
-            WHEN calc_agg.rs_count = 1 THEN calc_agg.min_rs_cd
-        END AS sole_rs_cd,
+        CASE WHEN calc_agg.rs_count = 1 THEN calc_agg.min_rs_cd END,
         sole_rs_l.descr,
         calc_agg.min_calc_effdt,
         calc_agg.max_calc_effdt,
@@ -141,6 +135,7 @@ BEGIN
     INNER JOIN cisadm.ci_bill bill
         ON bill.bill_id = bseg.bill_id
        AND bill.bill_stat_flg = 'C '
+       AND bill.bill_dt >= v_window_start
     LEFT JOIN cisadm.ci_sa sa
         ON sa.sa_id = bseg.sa_id
     LEFT JOIN (
@@ -165,12 +160,9 @@ BEGIN
     LEFT JOIN cisadm.ci_acct acct
         ON acct.acct_id = bill.acct_id
     LEFT JOIN (
-        SELECT
-            st.sa_type_cd,
-            MIN(st.svc_type_cd) AS svc_type_cd
+        SELECT st.sa_type_cd, MIN(st.svc_type_cd) AS svc_type_cd
         FROM cisadm.ci_sa_type st
-        GROUP BY
-            st.sa_type_cd
+        GROUP BY st.sa_type_cd
     ) sa_type_base
         ON sa_type_base.sa_type_cd = sa.sa_type_cd
     LEFT JOIN (
@@ -181,14 +173,10 @@ BEGIN
             SUM(NVL(sq.init_sq, 0)) AS total_init_sq,
             SUM(NVL(sq.bill_sq, 0)) AS total_bill_sq,
             MIN(sq.uom_cd) AS min_uom_cd,
-            MAX(sq.uom_cd) AS max_uom_cd,
             MIN(sq.tou_cd) AS min_tou_cd,
-            MAX(sq.tou_cd) AS max_tou_cd,
-            MIN(sq.sqi_cd) AS min_sqi_cd,
-            MAX(sq.sqi_cd) AS max_sqi_cd
+            MIN(sq.sqi_cd) AS min_sqi_cd
         FROM cisadm.ci_bseg_sq sq
-        GROUP BY
-            sq.bseg_id
+        GROUP BY sq.bseg_id
     ) sq_agg
         ON sq_agg.bseg_id = bseg.bseg_id
     LEFT JOIN (
@@ -200,8 +188,7 @@ BEGIN
             MIN(rd.start_read_dttm) AS min_start_read_dttm,
             MAX(rd.end_read_dttm) AS max_end_read_dttm
         FROM cisadm.ci_bseg_read rd
-        GROUP BY
-            rd.bseg_id
+        GROUP BY rd.bseg_id
     ) read_agg
         ON read_agg.bseg_id = bseg.bseg_id
     LEFT JOIN (
@@ -211,12 +198,10 @@ BEGIN
             SUM(NVL(calc.calc_amt, 0)) AS total_calc_amt,
             COUNT(DISTINCT calc.rs_cd) AS rs_count,
             MIN(calc.rs_cd) AS min_rs_cd,
-            MAX(calc.rs_cd) AS max_rs_cd,
             MIN(calc.effdt) AS min_calc_effdt,
             MAX(calc.effdt) AS max_calc_effdt
         FROM cisadm.ci_bseg_calc calc
-        GROUP BY
-            calc.bseg_id
+        GROUP BY calc.bseg_id
     ) calc_agg
         ON calc_agg.bseg_id = bseg.bseg_id
     LEFT JOIN cisadm.ci_lookup_val_l bill_status_l

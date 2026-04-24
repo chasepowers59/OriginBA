@@ -47,7 +47,11 @@ Lookup and presentation tables:
 Use `snapshots/finance/ft_gl_distribution/` for those subjects.
 
 ## Current implementation notes
-- The load uses `TRUNCATE` and a full reload, matching the supplied implementation.
+- The active nightly procedure uses a rolling `12-month` `DELETE + INSERT`
+  maintenance pattern.
+- The original full-history baseline procedure is preserved in
+  `02a_full_history_refresh_procedure.sql` for first-time deployment into a new
+  environment.
 - FT and GL status descriptions are derived with `CASE` expressions.
 - Customer class, collection class, bill cycle, and account-management-group descriptions are resolved into the snapshot for business-facing ad hoc use.
 - Child joins are gated by `FT_TYPE_FLG` so adjustment, bill-segment, and payment fields only populate for the matching FT families.

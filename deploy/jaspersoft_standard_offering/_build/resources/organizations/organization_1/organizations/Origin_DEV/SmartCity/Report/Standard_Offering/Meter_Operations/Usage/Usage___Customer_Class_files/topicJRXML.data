@@ -1,0 +1,1768 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="adhocReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="8b32867a-7bdc-48bd-9328-5e0615da3e89">
+	<property name="adhoc.topic.escape.variable.chars"/>
+	<property name="adhoc.metadata.version" value="791"/>
+	<property name="has.modified.presentation" value="false"/>
+	<property name="base.datasource.version" value="1"/>
+	<property name="use.datasource.presentation" value="true"/>
+	<property name="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.TopicReportUnit" value="/temp/sl_topic_275cc9de-b13e-44ce-88a3-20ad38d21496"/>
+	<property name="CUST_CL_DESC_1" value="Commercial,Municipal,Residential,University"/>
+	<parameter name="CUST_CL_DESC_1" class="java.util.Collection" nestedType="java.lang.String">
+		<defaultValueExpression><![CDATA[java.util.Arrays.asList(($P{JASPER_REPORT}.getProperty("CUST_CL_DESC_1")).split("(?<!\\\\),",-1))]]></defaultValueExpression>
+	</parameter>
+	<parameter name="USAGE_START_DTTM_1" class="net.sf.jasperreports.types.date.TimestampRange">
+		<defaultValueExpression><![CDATA[com.jaspersoft.jasperserver.api.common.util.rd.DateRangeFactory.getInstance("MONTH-4",java.sql.Timestamp.class)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="USAGE_START_DTTM_2" class="net.sf.jasperreports.types.date.TimestampRange">
+		<defaultValueExpression><![CDATA[com.jaspersoft.jasperserver.api.common.util.rd.DateRangeFactory.getInstance("DAY-0",java.sql.Timestamp.class)]]></defaultValueExpression>
+	</parameter>
+	<queryString language="domain">
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema">
+  <queryFields>
+    <queryField id="D1_USAGE_SCALAR_AUDIT.D1_USAGE_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_AUDIT.SEQ_NUM"></queryField>
+    <queryField id="D1_USAGE_SCALAR_AUDIT.LOAD_DTTM"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.US_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.USG_EXT_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.ORG_USAGE_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.USAGE_START_DTTM"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.USAGE_END_DTTM"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.USAGE_STATUS_UPD_DTTM"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.USAGE_CRE_DTTM"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.BUS_OBJ_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.BUS_OBJ_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.BO_STATUS_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.BO_STATUS_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.BO_STATUS_REASON_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.USG_GRP_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.USG_GRP_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.D1_USG_CAL_TYPE_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.D1_USG_CAL_TYPE_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.USG_SRC_FLG"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.USG_SRC_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.D1_SPR_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.D1_SPR_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.MSRMT_CYC_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.MSRMT_CYC_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.MSRMT_CYC_RTE_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.MSRMT_CYC_RTE_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.USED_ON_BILL_FLG"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.USED_ON_BILL_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.LINKED_TO_FRZN_BSEG_FLG"></queryField>
+    <queryField id="D1_USAGE_SCALAR_USAGE.LINKED_TO_FRZN_BSEG_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.D1_SP_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.MEASR_COMP_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.D1_UOM_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.D1_UOM_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.D1_TOU_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.D1_TOU_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.D1_SQI_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.D1_SQI_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.START_DTTM"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.END_DTTM"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.START_MSRMT"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.END_MSRMT"></queryField>
+    <queryField id="D1_USAGE_SCALAR_DETAIL.QUANTITY"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.D1_FINAL_UOM_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.D1_FINAL_UOM_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.D1_FINAL_TOU_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.D1_FINAL_TOU_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.D1_FINAL_SQI_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.D1_FINAL_SQI_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.FINAL_QUANTITY"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.D1_USAGE_FLG"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.D1_USAGE_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.MEASR_COMP_USAGE_FLG"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.MEASR_COMP_USAGE_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.MSR_PEAK_QTY_FLG"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.MSR_PEAK_QTY_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.APPLIED_MLTR"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.USE_PERCENT"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.SCALAR_USG_GRP_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.SCALAR_USG_GRP_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.USG_RULE_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.USG_RULE_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.MSRMT_COND_FLG"></queryField>
+    <queryField id="D1_USAGE_SCALAR_FINAL.MSRMT_COND_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_SUB.US_BO_STATUS_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_SUB.US_BO_STATUS_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_SUB.US_TYPE_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_SUB.US_TYPE_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_SUB.D1_BILL_CYC_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_SUB.D1_BILL_CYC_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_SUB.DIVISION_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_SUB.TIME_ZONE_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_SUB.TIME_ZONE_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_SUB.ACCESS_GRP_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_SUB.ACCESS_GRP_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.BRIDGE_METHOD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.C1_MATCH_COUNT"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.C1_USAGE_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.C1_MASTER_USAGE_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.C1_SA_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.C1_SP_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.C1_BSEG_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.C1_BILL_CYC_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.C1_BILL_CYC_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.C1_BO_STATUS_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.C1_BO_STATUS_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.BILL_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.BSEG_STAT_FLG"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.BSEG_STAT_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.BSEG_START_DT"></queryField>
+    <queryField id="D1_USAGE_SCALAR_BILLING.BSEG_END_DT"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.SA_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.ACCT_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.CUST_CL_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.CUST_CL_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.COLL_CL_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.COLL_CL_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.ACCT_MGMT_GRP_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.ACCT_MGMT_GRP_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.BUD_PLAN_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.BUD_PLAN_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.PER_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.CUSTOMER_NAME"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.SA_TYPE_CD"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.SA_TYPE_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.SA_STATUS_FLG"></queryField>
+    <queryField id="D1_USAGE_SCALAR_CUSTOMER.SA_STATUS_DESC"></queryField>
+    <queryField id="D1_USAGE_SCALAR_PREMISE.PREM_ID"></queryField>
+    <queryField id="D1_USAGE_SCALAR_PREMISE.ADDRESS1"></queryField>
+    <queryField id="D1_USAGE_SCALAR_PREMISE.CITY"></queryField>
+    <queryField id="D1_USAGE_SCALAR_PREMISE.STATE"></queryField>
+    <queryField id="D1_USAGE_SCALAR_PREMISE.POSTAL"></queryField>
+  </queryFields>
+</query>]]>
+	</queryString>
+	<field name="D1_USAGE_SCALAR_AUDIT.D1_USAGE_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Transaction ID"/>
+		<property name="semantic.item.label" value="Usage Transaction ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_AUDIT/D1_USAGE_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_USAGE_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_AUDIT/D1_USAGE_ID"/>
+		<property name="semantic.tree.sort.order">
+			<![CDATA[{"D1_USAGE_SCALAR_AUDIT":1,"D1_USAGE_ID":2,"SEQ_NUM":3,"LOAD_DTTM":4,"D1_USAGE_SCALAR_USAGE":5,"US_ID":6,"USG_EXT_ID":7,"ORG_USAGE_ID":8,"USAGE_START_DTTM":9,"USAGE_END_DTTM":10,"USAGE_STATUS_UPD_DTTM":11,"USAGE_CRE_DTTM":12,"BUS_OBJ_CD":13,"BUS_OBJ_DESC":14,"BO_STATUS_CD":15,"BO_STATUS_DESC":16,"BO_STATUS_REASON_CD":17,"USG_GRP_CD":18,"USG_GRP_DESC":19,"D1_USG_CAL_TYPE_CD":20,"D1_USG_CAL_TYPE_DESC":21,"USG_SRC_FLG":22,"USG_SRC_DESC":23,"D1_SPR_CD":24,"D1_SPR_DESC":25,"MSRMT_CYC_CD":26,"MSRMT_CYC_DESC":27,"MSRMT_CYC_RTE_CD":28,"MSRMT_CYC_RTE_DESC":29,"USED_ON_BILL_FLG":30,"USED_ON_BILL_DESC":31,"LINKED_TO_FRZN_BSEG_FLG":32,"LINKED_TO_FRZN_BSEG_DESC":33,"D1_USAGE_SCALAR_DETAIL":34,"D1_SP_ID":35,"MEASR_COMP_ID":36,"D1_UOM_CD":37,"D1_UOM_DESC":38,"D1_TOU_CD":39,"D1_TOU_DESC":40,"D1_SQI_CD":41,"D1_SQI_DESC":42,"START_DTTM":43,"END_DTTM":44,"START_MSRMT":45,"END_MSRMT":46,"QUANTITY":47,"D1_USAGE_SCALAR_FINAL":48,"D1_FINAL_UOM_CD":49,"D1_FINAL_UOM_DESC":50,"D1_FINAL_TOU_CD":51,"D1_FINAL_TOU_DESC":52,"D1_FINAL_SQI_CD":53,"D1_FINAL_SQI_DESC":54,"FINAL_QUANTITY":55,"D1_USAGE_FLG":56,"D1_USAGE_DESC":57,"MEASR_COMP_USAGE_FLG":58,"MEASR_COMP_USAGE_DESC":59,"MSR_PEAK_QTY_FLG":60,"MSR_PEAK_QTY_DESC":61,"APPLIED_MLTR":62,"USE_PERCENT":63,"SCALAR_USG_GRP_CD":64,"SCALAR_USG_GRP_DESC":65,"USG_RULE_CD":66,"USG_RULE_DESC":67,"MSRMT_COND_FLG":68,"MSRMT_COND_DESC":69,"D1_USAGE_SCALAR_SUB":70,"US_BO_STATUS_CD":71,"US_BO_STATUS_DESC":72,"US_TYPE_CD":73,"US_TYPE_DESC":74,"D1_BILL_CYC_CD":75,"D1_BILL_CYC_DESC":76,"DIVISION_CD":77,"TIME_ZONE_CD":78,"TIME_ZONE_DESC":79,"ACCESS_GRP_CD":80,"ACCESS_GRP_DESC":81,"D1_USAGE_SCALAR_BILLING":82,"BRIDGE_METHOD":83,"C1_MATCH_COUNT":84,"C1_USAGE_ID":85,"C1_MASTER_USAGE_ID":86,"C1_SA_ID":87,"C1_SP_ID":88,"C1_BSEG_ID":89,"C1_BILL_CYC_CD":90,"C1_BILL_CYC_DESC":91,"C1_BO_STATUS_CD":92,"C1_BO_STATUS_DESC":93,"BILL_ID":94,"BSEG_STAT_FLG":95,"BSEG_STAT_DESC":96,"BSEG_START_DT":97,"BSEG_END_DT":98,"D1_USAGE_SCALAR_CUSTOMER":99,"SA_ID":100,"ACCT_ID":101,"CUST_CL_CD":102,"CUST_CL_DESC":103,"COLL_CL_CD":104,"COLL_CL_DESC":105,"ACCT_MGMT_GRP_CD":106,"ACCT_MGMT_GRP_DESC":107,"BUD_PLAN_CD":108,"BUD_PLAN_DESC":109,"PER_ID":110,"CUSTOMER_NAME":111,"SA_TYPE_CD":112,"SA_TYPE_DESC":113,"SA_STATUS_FLG":114,"SA_STATUS_DESC":115,"D1_USAGE_SCALAR_PREMISE":116,"PREM_ID":117,"ADDRESS1":118,"CITY":119,"STATE":120,"POSTAL":121}]]>
+		</property>
+		<property name="adhoc.tree.labels">
+			<![CDATA[[{"uri":"/D1_USAGE_SCALAR_AUDIT","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Snapshot Audit"},{"uri":"/D1_USAGE_SCALAR_USAGE","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Usage Header"},{"uri":"/D1_USAGE_SCALAR_DETAIL","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Scalar Detail"},{"uri":"/D1_USAGE_SCALAR_FINAL","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Final Quantity Output"},{"uri":"/D1_USAGE_SCALAR_SUB","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Usage Subscription"},{"uri":"/D1_USAGE_SCALAR_BILLING","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Billing Bridge"},{"uri":"/D1_USAGE_SCALAR_CUSTOMER","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Service Agreement And Customer"},{"uri":"/D1_USAGE_SCALAR_PREMISE","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Premise"}]]]>
+		</property>
+		<property name="slIsTableAsList" value="false"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_AUDIT/D1_USAGE_ID"/>
+		<property name="previous.display" value="Usage Transaction ID"/>
+		<property name="adhoc.chosen.tree.labels">
+			<![CDATA[[{"uri":"/D1_USAGE_SCALAR_AUDIT","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Snapshot Audit"},{"uri":"/D1_USAGE_SCALAR_USAGE","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Usage Header"},{"uri":"/D1_USAGE_SCALAR_DETAIL","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Scalar Detail"},{"uri":"/D1_USAGE_SCALAR_FINAL","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Final Quantity Output"},{"uri":"/D1_USAGE_SCALAR_SUB","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Usage Subscription"},{"uri":"/D1_USAGE_SCALAR_BILLING","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Billing Bridge"},{"uri":"/D1_USAGE_SCALAR_CUSTOMER","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Service Agreement And Customer"},{"uri":"/D1_USAGE_SCALAR_PREMISE","resourceId":"D1_USAGE_SCALAR_DTL_RPT_CURR","label":"Premise"}]]]>
+		</property>
+		<property name="adhoc.chosen.tree.order">
+			<![CDATA[{"START_DTTM":43,"BO_STATUS_CD":15,"MSRMT_COND_FLG":68,"TIME_ZONE_DESC":79,"BILL_ID":94,"US_BO_STATUS_DESC":72,"USG_GRP_DESC":19,"USG_SRC_DESC":23,"D1_TOU_CD":39,"USAGE_END_DTTM":10,"SA_ID":100,"START_MSRMT":45,"ACCESS_GRP_DESC":81,"FINAL_QUANTITY":55,"D1_FINAL_SQI_DESC":54,"BUS_OBJ_CD":13,"D1_USAGE_SCALAR_PREMISE":116,"D1_FINAL_TOU_CD":51,"SA_TYPE_CD":112,"D1_UOM_DESC":38,"LINKED_TO_FRZN_BSEG_DESC":33,"C1_MASTER_USAGE_ID":86,"END_DTTM":44,"CUST_CL_DESC":103,"BUD_PLAN_CD":108,"END_MSRMT":46,"US_TYPE_DESC":74,"SA_STATUS_FLG":114,"D1_USAGE_SCALAR_FINAL":48,"SA_STATUS_DESC":115,"BSEG_START_DT":97,"LINKED_TO_FRZN_BSEG_FLG":32,"D1_FINAL_UOM_DESC":50,"D1_USAGE_SCALAR_SUB":70,"COLL_CL_DESC":105,"USE_PERCENT":63,"MEASR_COMP_USAGE_DESC":59,"D1_SP_ID":35,"MSRMT_CYC_RTE_DESC":29,"D1_FINAL_TOU_DESC":52,"BSEG_STAT_DESC":96,"SEQ_NUM":3,"ACCT_MGMT_GRP_CD":106,"LOAD_DTTM":4,"MEASR_COMP_USAGE_FLG":58,"SCALAR_USG_GRP_DESC":65,"CUST_CL_CD":102,"ACCT_ID":101,"D1_USAGE_SCALAR_AUDIT":1,"USAGE_CRE_DTTM":12,"D1_FINAL_UOM_CD":49,"D1_USAGE_SCALAR_DETAIL":34,"USG_RULE_DESC":67,"CITY":119,"D1_SQI_CD":41,"SA_TYPE_DESC":113,"D1_FINAL_SQI_CD":53,"C1_BO_STATUS_CD":92,"APPLIED_MLTR":62,"D1_UOM_CD":37,"D1_BILL_CYC_CD":75,"ORG_USAGE_ID":8,"D1_TOU_DESC":40,"PREM_ID":117,"QUANTITY":47,"US_ID":6,"ACCESS_GRP_CD":80,"BRIDGE_METHOD":83,"BUD_PLAN_DESC":109,"BUS_OBJ_DESC":14,"D1_USAGE_SCALAR_USAGE":5,"D1_USG_CAL_TYPE_DESC":21,"USG_EXT_ID":7,"C1_BO_STATUS_DESC":93,"COLL_CL_CD":104,"C1_BILL_CYC_DESC":91,"MSRMT_CYC_CD":26,"ACCT_MGMT_GRP_DESC":107,"D1_USAGE_SCALAR_CUSTOMER":99,"MSRMT_CYC_DESC":27,"TIME_ZONE_CD":78,"DIVISION_CD":77,"MSR_PEAK_QTY_DESC":61,"BO_STATUS_DESC":16,"D1_USAGE_FLG":56,"C1_SA_ID":87,"D1_SPR_CD":24,"D1_USAGE_ID":2,"USAGE_START_DTTM":9,"C1_USAGE_ID":85,"USG_SRC_FLG":22,"POSTAL":121,"BO_STATUS_REASON_CD":17,"STATE":120,"USG_RULE_CD":66,"USED_ON_BILL_FLG":30,"D1_SQI_DESC":42,"MEASR_COMP_ID":36,"MSRMT_CYC_RTE_CD":28,"D1_BILL_CYC_DESC":76,"ADDRESS1":118,"C1_SP_ID":88,"D1_SPR_DESC":25,"D1_USAGE_SCALAR_BILLING":82,"BSEG_END_DT":98,"BSEG_STAT_FLG":95,"MSRMT_COND_DESC":69,"US_BO_STATUS_CD":71,"PER_ID":110,"US_TYPE_CD":73,"USAGE_STATUS_UPD_DTTM":11,"MSR_PEAK_QTY_FLG":60,"C1_BILL_CYC_CD":90,"D1_USG_CAL_TYPE_CD":20,"CUSTOMER_NAME":111,"USED_ON_BILL_DESC":31,"C1_MATCH_COUNT":84,"USG_GRP_CD":18,"SCALAR_USG_GRP_CD":64,"C1_BSEG_ID":89,"D1_USAGE_DESC":57}]]>
+		</property>
+		<property name="adhoc.chosen.tree.is.flattened" value="false"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_AUDIT.D1_USAGE_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_AUDIT.SEQ_NUM" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Sequence"/>
+		<property name="semantic.item.label" value="Sequence"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_AUDIT/SEQ_NUM"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.SEQ_NUM"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_AUDIT/SEQ_NUM"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_AUDIT/SEQ_NUM"/>
+		<property name="previous.display" value="Sequence"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_USAGE_SCALAR_AUDIT.SEQ_NUM)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_AUDIT.LOAD_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Snapshot Load Date Time"/>
+		<property name="semantic.item.label" value="Snapshot Load Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_AUDIT/LOAD_DTTM"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.LOAD_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_AUDIT/LOAD_DTTM"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_AUDIT/LOAD_DTTM"/>
+		<property name="previous.display" value="Snapshot Load Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_AUDIT.LOAD_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.US_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Subscription ID"/>
+		<property name="semantic.item.label" value="Usage Subscription ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/US_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.US_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/US_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/US_ID"/>
+		<property name="previous.display" value="Usage Subscription ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.US_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.USG_EXT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Usage External ID"/>
+		<property name="semantic.item.label" value="Usage External ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_EXT_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USG_EXT_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_EXT_ID"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_EXT_ID"/>
+		<property name="previous.display" value="Usage External ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.USG_EXT_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.ORG_USAGE_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Original Usage ID"/>
+		<property name="semantic.item.label" value="Original Usage ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/ORG_USAGE_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.ORG_USAGE_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/ORG_USAGE_ID"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/ORG_USAGE_ID"/>
+		<property name="previous.display" value="Original Usage ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.ORG_USAGE_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.USAGE_START_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Usage Start Date Time"/>
+		<property name="semantic.item.label" value="Usage Start Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USAGE_START_DTTM"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USAGE_START_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USAGE_START_DTTM"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USAGE_START_DTTM"/>
+		<property name="previous.display" value="Usage Start Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.USAGE_START_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.USAGE_END_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Usage End Date Time"/>
+		<property name="semantic.item.label" value="Usage End Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USAGE_END_DTTM"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USAGE_END_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USAGE_END_DTTM"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USAGE_END_DTTM"/>
+		<property name="previous.display" value="Usage End Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.USAGE_END_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.USAGE_STATUS_UPD_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Usage Status Updated Date Time"/>
+		<property name="semantic.item.label" value="Usage Status Updated Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USAGE_STATUS_UPD_DTTM"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USAGE_STATUS_UPD_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USAGE_STATUS_UPD_DTTM"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USAGE_STATUS_UPD_DTTM"/>
+		<property name="previous.display" value="Usage Status Updated Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.USAGE_STATUS_UPD_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.USAGE_CRE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Usage Created Date Time"/>
+		<property name="semantic.item.label" value="Usage Created Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USAGE_CRE_DTTM"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USAGE_CRE_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USAGE_CRE_DTTM"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USAGE_CRE_DTTM"/>
+		<property name="previous.display" value="Usage Created Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.USAGE_CRE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.BUS_OBJ_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Business Object Code"/>
+		<property name="semantic.item.label" value="Usage Business Object Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BUS_OBJ_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BUS_OBJ_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BUS_OBJ_CD"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BUS_OBJ_CD"/>
+		<property name="previous.display" value="Usage Business Object Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.BUS_OBJ_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.BUS_OBJ_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Business Object"/>
+		<property name="semantic.item.label" value="Usage Business Object"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BUS_OBJ_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BUS_OBJ_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BUS_OBJ_DESC"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BUS_OBJ_DESC"/>
+		<property name="previous.display" value="Usage Business Object"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.BUS_OBJ_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.BO_STATUS_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Status Code"/>
+		<property name="semantic.item.label" value="Usage Status Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BO_STATUS_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BO_STATUS_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BO_STATUS_CD"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BO_STATUS_CD"/>
+		<property name="previous.display" value="Usage Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.BO_STATUS_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.BO_STATUS_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Status"/>
+		<property name="semantic.item.label" value="Usage Status"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BO_STATUS_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BO_STATUS_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BO_STATUS_DESC"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BO_STATUS_DESC"/>
+		<property name="previous.display" value="Usage Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.BO_STATUS_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.BO_STATUS_REASON_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Status Reason Code"/>
+		<property name="semantic.item.label" value="Usage Status Reason Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BO_STATUS_REASON_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BO_STATUS_REASON_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BO_STATUS_REASON_CD"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/BO_STATUS_REASON_CD"/>
+		<property name="previous.display" value="Usage Status Reason Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.BO_STATUS_REASON_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.USG_GRP_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Calculation Group Code"/>
+		<property name="semantic.item.label" value="Usage Calculation Group Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_GRP_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USG_GRP_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_GRP_CD"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_GRP_CD"/>
+		<property name="previous.display" value="Usage Calculation Group Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.USG_GRP_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.USG_GRP_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Calculation Group"/>
+		<property name="semantic.item.label" value="Usage Calculation Group"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_GRP_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USG_GRP_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_GRP_DESC"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_GRP_DESC"/>
+		<property name="previous.display" value="Usage Calculation Group"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.USG_GRP_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.D1_USG_CAL_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Calculation Type Code"/>
+		<property name="semantic.item.label" value="Usage Calculation Type Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/D1_USG_CAL_TYPE_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_USG_CAL_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/D1_USG_CAL_TYPE_CD"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/D1_USG_CAL_TYPE_CD"/>
+		<property name="previous.display" value="Usage Calculation Type Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.D1_USG_CAL_TYPE_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.D1_USG_CAL_TYPE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Calculation Type"/>
+		<property name="semantic.item.label" value="Usage Calculation Type"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/D1_USG_CAL_TYPE_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_USG_CAL_TYPE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/D1_USG_CAL_TYPE_DESC"/>
+		<property name="semantic.tree.sort.order" value="15"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/D1_USG_CAL_TYPE_DESC"/>
+		<property name="previous.display" value="Usage Calculation Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.D1_USG_CAL_TYPE_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.USG_SRC_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Source Code"/>
+		<property name="semantic.item.label" value="Usage Source Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_SRC_FLG"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USG_SRC_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_SRC_FLG"/>
+		<property name="semantic.tree.sort.order" value="16"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_SRC_FLG"/>
+		<property name="previous.display" value="Usage Source Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.USG_SRC_FLG)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.USG_SRC_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Source"/>
+		<property name="semantic.item.label" value="Usage Source"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_SRC_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USG_SRC_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_SRC_DESC"/>
+		<property name="semantic.tree.sort.order" value="17"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USG_SRC_DESC"/>
+		<property name="previous.display" value="Usage Source"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.USG_SRC_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.D1_SPR_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Service Provider Code"/>
+		<property name="semantic.item.label" value="Service Provider Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/D1_SPR_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_SPR_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/D1_SPR_CD"/>
+		<property name="semantic.tree.sort.order" value="18"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/D1_SPR_CD"/>
+		<property name="previous.display" value="Service Provider Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.D1_SPR_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.D1_SPR_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Provider"/>
+		<property name="semantic.item.label" value="Service Provider"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/D1_SPR_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_SPR_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/D1_SPR_DESC"/>
+		<property name="semantic.tree.sort.order" value="19"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/D1_SPR_DESC"/>
+		<property name="previous.display" value="Service Provider"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.D1_SPR_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.MSRMT_CYC_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Cycle Code"/>
+		<property name="semantic.item.label" value="Measurement Cycle Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/MSRMT_CYC_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.MSRMT_CYC_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/MSRMT_CYC_CD"/>
+		<property name="semantic.tree.sort.order" value="20"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/MSRMT_CYC_CD"/>
+		<property name="previous.display" value="Measurement Cycle Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.MSRMT_CYC_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.MSRMT_CYC_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Cycle"/>
+		<property name="semantic.item.label" value="Measurement Cycle"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/MSRMT_CYC_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.MSRMT_CYC_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/MSRMT_CYC_DESC"/>
+		<property name="semantic.tree.sort.order" value="21"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/MSRMT_CYC_DESC"/>
+		<property name="previous.display" value="Measurement Cycle"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.MSRMT_CYC_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.MSRMT_CYC_RTE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Route Code"/>
+		<property name="semantic.item.label" value="Route Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/MSRMT_CYC_RTE_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.MSRMT_CYC_RTE_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/MSRMT_CYC_RTE_CD"/>
+		<property name="semantic.tree.sort.order" value="22"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/MSRMT_CYC_RTE_CD"/>
+		<property name="previous.display" value="Route Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.MSRMT_CYC_RTE_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.MSRMT_CYC_RTE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Route"/>
+		<property name="semantic.item.label" value="Route"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/MSRMT_CYC_RTE_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.MSRMT_CYC_RTE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/MSRMT_CYC_RTE_DESC"/>
+		<property name="semantic.tree.sort.order" value="23"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/MSRMT_CYC_RTE_DESC"/>
+		<property name="previous.display" value="Route"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.MSRMT_CYC_RTE_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.USED_ON_BILL_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Used On Bill Code"/>
+		<property name="semantic.item.label" value="Used On Bill Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USED_ON_BILL_FLG"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USED_ON_BILL_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USED_ON_BILL_FLG"/>
+		<property name="semantic.tree.sort.order" value="24"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USED_ON_BILL_FLG"/>
+		<property name="previous.display" value="Used On Bill Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.USED_ON_BILL_FLG)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.USED_ON_BILL_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Used On Bill"/>
+		<property name="semantic.item.label" value="Used On Bill"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USED_ON_BILL_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USED_ON_BILL_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USED_ON_BILL_DESC"/>
+		<property name="semantic.tree.sort.order" value="25"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/USED_ON_BILL_DESC"/>
+		<property name="previous.display" value="Used On Bill"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.USED_ON_BILL_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.LINKED_TO_FRZN_BSEG_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Linked To Frozen Bill Segment Code"/>
+		<property name="semantic.item.label" value="Linked To Frozen Bill Segment Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/LINKED_TO_FRZN_BSEG_FLG"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.LINKED_TO_FRZN_BSEG_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/LINKED_TO_FRZN_BSEG_FLG"/>
+		<property name="semantic.tree.sort.order" value="26"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/LINKED_TO_FRZN_BSEG_FLG"/>
+		<property name="previous.display" value="Linked To Frozen Bill Segment Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.LINKED_TO_FRZN_BSEG_FLG)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_USAGE.LINKED_TO_FRZN_BSEG_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Linked To Frozen Bill Segment"/>
+		<property name="semantic.item.label" value="Linked To Frozen Bill Segment"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_USAGE/LINKED_TO_FRZN_BSEG_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.LINKED_TO_FRZN_BSEG_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_USAGE/LINKED_TO_FRZN_BSEG_DESC"/>
+		<property name="semantic.tree.sort.order" value="27"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_USAGE/LINKED_TO_FRZN_BSEG_DESC"/>
+		<property name="previous.display" value="Linked To Frozen Bill Segment"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_USAGE.LINKED_TO_FRZN_BSEG_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.D1_SP_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point ID"/>
+		<property name="semantic.item.label" value="Service Point ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_SP_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_SP_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_SP_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_SP_ID"/>
+		<property name="previous.display" value="Service Point ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_DETAIL.D1_SP_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.MEASR_COMP_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component ID"/>
+		<property name="semantic.item.label" value="Measuring Component ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/MEASR_COMP_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.MEASR_COMP_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/MEASR_COMP_ID"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/MEASR_COMP_ID"/>
+		<property name="previous.display" value="Measuring Component ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_DETAIL.MEASR_COMP_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.D1_UOM_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Raw Unit Of Measure Code"/>
+		<property name="semantic.item.label" value="Raw Unit Of Measure Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_UOM_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_UOM_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_UOM_CD"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_UOM_CD"/>
+		<property name="previous.display" value="Raw Unit Of Measure Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_DETAIL.D1_UOM_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.D1_UOM_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Raw Unit Of Measure"/>
+		<property name="semantic.item.label" value="Raw Unit Of Measure"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_UOM_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_UOM_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_UOM_DESC"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_UOM_DESC"/>
+		<property name="previous.display" value="Raw Unit Of Measure"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_DETAIL.D1_UOM_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.D1_TOU_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Raw Time Of Use Code"/>
+		<property name="semantic.item.label" value="Raw Time Of Use Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_TOU_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_TOU_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_TOU_CD"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_TOU_CD"/>
+		<property name="previous.display" value="Raw Time Of Use Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_DETAIL.D1_TOU_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.D1_TOU_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Raw Time Of Use"/>
+		<property name="semantic.item.label" value="Raw Time Of Use"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_TOU_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_TOU_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_TOU_DESC"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_TOU_DESC"/>
+		<property name="previous.display" value="Raw Time Of Use"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_DETAIL.D1_TOU_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.D1_SQI_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Raw Service Quantity Identifier Code"/>
+		<property name="semantic.item.label" value="Raw Service Quantity Identifier Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_SQI_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_SQI_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_SQI_CD"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_SQI_CD"/>
+		<property name="previous.display" value="Raw Service Quantity Identifier Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_DETAIL.D1_SQI_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.D1_SQI_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Raw Service Quantity Identifier"/>
+		<property name="semantic.item.label" value="Raw Service Quantity Identifier"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_SQI_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_SQI_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_SQI_DESC"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/D1_SQI_DESC"/>
+		<property name="previous.display" value="Raw Service Quantity Identifier"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_DETAIL.D1_SQI_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.START_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Scalar Start Date Time"/>
+		<property name="semantic.item.label" value="Scalar Start Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/START_DTTM"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.START_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/START_DTTM"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/START_DTTM"/>
+		<property name="previous.display" value="Scalar Start Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_DETAIL.START_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.END_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Scalar End Date Time"/>
+		<property name="semantic.item.label" value="Scalar End Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/END_DTTM"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.END_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/END_DTTM"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/END_DTTM"/>
+		<property name="previous.display" value="Scalar End Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_DETAIL.END_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.START_MSRMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Start Measurement"/>
+		<property name="semantic.item.label" value="Start Measurement"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/START_MSRMT"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.START_MSRMT"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/START_MSRMT"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/START_MSRMT"/>
+		<property name="previous.display" value="Start Measurement"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_USAGE_SCALAR_DETAIL.START_MSRMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.END_MSRMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="End Measurement"/>
+		<property name="semantic.item.label" value="End Measurement"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/END_MSRMT"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.END_MSRMT"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/END_MSRMT"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/END_MSRMT"/>
+		<property name="previous.display" value="End Measurement"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_USAGE_SCALAR_DETAIL.END_MSRMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_DETAIL.QUANTITY" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Raw Quantity"/>
+		<property name="semantic.item.label" value="Raw Quantity"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/QUANTITY"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.QUANTITY"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/QUANTITY"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_DETAIL/QUANTITY"/>
+		<property name="previous.display" value="Raw Quantity"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_USAGE_SCALAR_DETAIL.QUANTITY)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.D1_FINAL_UOM_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Final Unit Of Measure Code"/>
+		<property name="semantic.item.label" value="Final Unit Of Measure Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_UOM_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_FINAL_UOM_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_UOM_CD"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_UOM_CD"/>
+		<property name="previous.display" value="Final Unit Of Measure Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.D1_FINAL_UOM_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.D1_FINAL_UOM_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Final Unit Of Measure"/>
+		<property name="semantic.item.label" value="Final Unit Of Measure"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_UOM_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_FINAL_UOM_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_UOM_DESC"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_UOM_DESC"/>
+		<property name="previous.display" value="Final Unit Of Measure"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.D1_FINAL_UOM_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.D1_FINAL_TOU_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Final Time Of Use Code"/>
+		<property name="semantic.item.label" value="Final Time Of Use Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_TOU_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_FINAL_TOU_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_TOU_CD"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_TOU_CD"/>
+		<property name="previous.display" value="Final Time Of Use Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.D1_FINAL_TOU_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.D1_FINAL_TOU_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Final Time Of Use"/>
+		<property name="semantic.item.label" value="Final Time Of Use"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_TOU_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_FINAL_TOU_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_TOU_DESC"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_TOU_DESC"/>
+		<property name="previous.display" value="Final Time Of Use"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.D1_FINAL_TOU_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.D1_FINAL_SQI_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Final Service Quantity Identifier Code"/>
+		<property name="semantic.item.label" value="Final Service Quantity Identifier Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_SQI_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_FINAL_SQI_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_SQI_CD"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_SQI_CD"/>
+		<property name="previous.display" value="Final Service Quantity Identifier Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.D1_FINAL_SQI_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.D1_FINAL_SQI_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Final Service Quantity Identifier"/>
+		<property name="semantic.item.label" value="Final Service Quantity Identifier"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_SQI_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_FINAL_SQI_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_SQI_DESC"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_FINAL_SQI_DESC"/>
+		<property name="previous.display" value="Final Service Quantity Identifier"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.D1_FINAL_SQI_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.FINAL_QUANTITY" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Final Quantity"/>
+		<property name="semantic.item.label" value="Final Quantity"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/FINAL_QUANTITY"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.FINAL_QUANTITY"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/FINAL_QUANTITY"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/FINAL_QUANTITY"/>
+		<property name="previous.display" value="Final Quantity"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_USAGE_SCALAR_FINAL.FINAL_QUANTITY)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.D1_USAGE_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Flag Code"/>
+		<property name="semantic.item.label" value="Usage Flag Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_USAGE_FLG"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_USAGE_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_USAGE_FLG"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_USAGE_FLG"/>
+		<property name="previous.display" value="Usage Flag Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.D1_USAGE_FLG)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.D1_USAGE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Flag"/>
+		<property name="semantic.item.label" value="Usage Flag"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_USAGE_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_USAGE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_USAGE_DESC"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/D1_USAGE_DESC"/>
+		<property name="previous.display" value="Usage Flag"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.D1_USAGE_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.MEASR_COMP_USAGE_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Usage Code"/>
+		<property name="semantic.item.label" value="Measuring Component Usage Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MEASR_COMP_USAGE_FLG"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.MEASR_COMP_USAGE_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MEASR_COMP_USAGE_FLG"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MEASR_COMP_USAGE_FLG"/>
+		<property name="previous.display" value="Measuring Component Usage Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.MEASR_COMP_USAGE_FLG)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.MEASR_COMP_USAGE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Usage"/>
+		<property name="semantic.item.label" value="Measuring Component Usage"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MEASR_COMP_USAGE_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.MEASR_COMP_USAGE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MEASR_COMP_USAGE_DESC"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MEASR_COMP_USAGE_DESC"/>
+		<property name="previous.display" value="Measuring Component Usage"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.MEASR_COMP_USAGE_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.MSR_PEAK_QTY_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Peak Quantity Code"/>
+		<property name="semantic.item.label" value="Peak Quantity Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MSR_PEAK_QTY_FLG"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.MSR_PEAK_QTY_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MSR_PEAK_QTY_FLG"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MSR_PEAK_QTY_FLG"/>
+		<property name="previous.display" value="Peak Quantity Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.MSR_PEAK_QTY_FLG)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.MSR_PEAK_QTY_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Peak Quantity"/>
+		<property name="semantic.item.label" value="Peak Quantity"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MSR_PEAK_QTY_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.MSR_PEAK_QTY_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MSR_PEAK_QTY_DESC"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MSR_PEAK_QTY_DESC"/>
+		<property name="previous.display" value="Peak Quantity"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.MSR_PEAK_QTY_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.APPLIED_MLTR" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Applied Multiplier"/>
+		<property name="semantic.item.label" value="Applied Multiplier"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/APPLIED_MLTR"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.APPLIED_MLTR"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/APPLIED_MLTR"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/APPLIED_MLTR"/>
+		<property name="previous.display" value="Applied Multiplier"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_USAGE_SCALAR_FINAL.APPLIED_MLTR)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.USE_PERCENT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Use Percent"/>
+		<property name="semantic.item.label" value="Use Percent"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/USE_PERCENT"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USE_PERCENT"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/USE_PERCENT"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/USE_PERCENT"/>
+		<property name="previous.display" value="Use Percent"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_USAGE_SCALAR_FINAL.USE_PERCENT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.SCALAR_USG_GRP_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Scalar Usage Group Code"/>
+		<property name="semantic.item.label" value="Scalar Usage Group Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/SCALAR_USG_GRP_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.SCALAR_USG_GRP_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/SCALAR_USG_GRP_CD"/>
+		<property name="semantic.tree.sort.order" value="15"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/SCALAR_USG_GRP_CD"/>
+		<property name="previous.display" value="Scalar Usage Group Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.SCALAR_USG_GRP_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.SCALAR_USG_GRP_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Scalar Usage Group"/>
+		<property name="semantic.item.label" value="Scalar Usage Group"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/SCALAR_USG_GRP_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.SCALAR_USG_GRP_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/SCALAR_USG_GRP_DESC"/>
+		<property name="semantic.tree.sort.order" value="16"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/SCALAR_USG_GRP_DESC"/>
+		<property name="previous.display" value="Scalar Usage Group"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.SCALAR_USG_GRP_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.USG_RULE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Rule Code"/>
+		<property name="semantic.item.label" value="Usage Rule Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/USG_RULE_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USG_RULE_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/USG_RULE_CD"/>
+		<property name="semantic.tree.sort.order" value="17"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/USG_RULE_CD"/>
+		<property name="previous.display" value="Usage Rule Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.USG_RULE_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.USG_RULE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Usage Rule"/>
+		<property name="semantic.item.label" value="Usage Rule"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/USG_RULE_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.USG_RULE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/USG_RULE_DESC"/>
+		<property name="semantic.tree.sort.order" value="18"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/USG_RULE_DESC"/>
+		<property name="previous.display" value="Usage Rule"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.USG_RULE_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.MSRMT_COND_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Condition Code"/>
+		<property name="semantic.item.label" value="Measurement Condition Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MSRMT_COND_FLG"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.MSRMT_COND_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MSRMT_COND_FLG"/>
+		<property name="semantic.tree.sort.order" value="19"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MSRMT_COND_FLG"/>
+		<property name="previous.display" value="Measurement Condition Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.MSRMT_COND_FLG)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_FINAL.MSRMT_COND_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Condition"/>
+		<property name="semantic.item.label" value="Measurement Condition"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MSRMT_COND_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.MSRMT_COND_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MSRMT_COND_DESC"/>
+		<property name="semantic.tree.sort.order" value="20"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_FINAL/MSRMT_COND_DESC"/>
+		<property name="previous.display" value="Measurement Condition"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_FINAL.MSRMT_COND_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_SUB.US_BO_STATUS_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Subscription Status Code"/>
+		<property name="semantic.item.label" value="Subscription Status Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_SUB/US_BO_STATUS_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.US_BO_STATUS_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_SUB/US_BO_STATUS_CD"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_SUB/US_BO_STATUS_CD"/>
+		<property name="previous.display" value="Subscription Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_SUB.US_BO_STATUS_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_SUB.US_BO_STATUS_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Subscription Status"/>
+		<property name="semantic.item.label" value="Subscription Status"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_SUB/US_BO_STATUS_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.US_BO_STATUS_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_SUB/US_BO_STATUS_DESC"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_SUB/US_BO_STATUS_DESC"/>
+		<property name="previous.display" value="Subscription Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_SUB.US_BO_STATUS_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_SUB.US_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Subscription Type Code"/>
+		<property name="semantic.item.label" value="Subscription Type Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_SUB/US_TYPE_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.US_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_SUB/US_TYPE_CD"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_SUB/US_TYPE_CD"/>
+		<property name="previous.display" value="Subscription Type Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_SUB.US_TYPE_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_SUB.US_TYPE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Subscription Type"/>
+		<property name="semantic.item.label" value="Subscription Type"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_SUB/US_TYPE_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.US_TYPE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_SUB/US_TYPE_DESC"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_SUB/US_TYPE_DESC"/>
+		<property name="previous.display" value="Subscription Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_SUB.US_TYPE_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_SUB.D1_BILL_CYC_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Subscription Bill Cycle Code"/>
+		<property name="semantic.item.label" value="Subscription Bill Cycle Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_SUB/D1_BILL_CYC_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_BILL_CYC_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_SUB/D1_BILL_CYC_CD"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_SUB/D1_BILL_CYC_CD"/>
+		<property name="previous.display" value="Subscription Bill Cycle Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_SUB.D1_BILL_CYC_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_SUB.D1_BILL_CYC_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Subscription Bill Cycle"/>
+		<property name="semantic.item.label" value="Subscription Bill Cycle"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_SUB/D1_BILL_CYC_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.D1_BILL_CYC_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_SUB/D1_BILL_CYC_DESC"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_SUB/D1_BILL_CYC_DESC"/>
+		<property name="previous.display" value="Subscription Bill Cycle"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_SUB.D1_BILL_CYC_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_SUB.DIVISION_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Subscription Division Code"/>
+		<property name="semantic.item.label" value="Subscription Division Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_SUB/DIVISION_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.DIVISION_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_SUB/DIVISION_CD"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_SUB/DIVISION_CD"/>
+		<property name="previous.display" value="Subscription Division Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_SUB.DIVISION_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_SUB.TIME_ZONE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Subscription Time Zone Code"/>
+		<property name="semantic.item.label" value="Subscription Time Zone Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_SUB/TIME_ZONE_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.TIME_ZONE_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_SUB/TIME_ZONE_CD"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_SUB/TIME_ZONE_CD"/>
+		<property name="previous.display" value="Subscription Time Zone Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_SUB.TIME_ZONE_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_SUB.TIME_ZONE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Subscription Time Zone"/>
+		<property name="semantic.item.label" value="Subscription Time Zone"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_SUB/TIME_ZONE_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.TIME_ZONE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_SUB/TIME_ZONE_DESC"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_SUB/TIME_ZONE_DESC"/>
+		<property name="previous.display" value="Subscription Time Zone"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_SUB.TIME_ZONE_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_SUB.ACCESS_GRP_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Subscription Access Group Code"/>
+		<property name="semantic.item.label" value="Subscription Access Group Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_SUB/ACCESS_GRP_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.ACCESS_GRP_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_SUB/ACCESS_GRP_CD"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_SUB/ACCESS_GRP_CD"/>
+		<property name="previous.display" value="Subscription Access Group Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_SUB.ACCESS_GRP_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_SUB.ACCESS_GRP_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Subscription Access Group"/>
+		<property name="semantic.item.label" value="Subscription Access Group"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_SUB/ACCESS_GRP_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.ACCESS_GRP_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_SUB/ACCESS_GRP_DESC"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_SUB/ACCESS_GRP_DESC"/>
+		<property name="previous.display" value="Subscription Access Group"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_SUB.ACCESS_GRP_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.BRIDGE_METHOD" class="java.lang.String">
+		<property name="adhoc.display" value="Bridge Method"/>
+		<property name="semantic.item.label" value="Bridge Method"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BRIDGE_METHOD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BRIDGE_METHOD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BRIDGE_METHOD"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BRIDGE_METHOD"/>
+		<property name="previous.display" value="Bridge Method"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.BRIDGE_METHOD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.C1_MATCH_COUNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="C1 Match Count"/>
+		<property name="semantic.item.label" value="C1 Match Count"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_MATCH_COUNT"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.C1_MATCH_COUNT"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_MATCH_COUNT"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_MATCH_COUNT"/>
+		<property name="previous.display" value="C1 Match Count"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_USAGE_SCALAR_BILLING.C1_MATCH_COUNT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.C1_USAGE_ID" class="java.lang.String">
+		<property name="adhoc.display" value="C1 Usage ID"/>
+		<property name="semantic.item.label" value="C1 Usage ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_USAGE_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.C1_USAGE_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_USAGE_ID"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_USAGE_ID"/>
+		<property name="previous.display" value="C1 Usage ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.C1_USAGE_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.C1_MASTER_USAGE_ID" class="java.lang.String">
+		<property name="adhoc.display" value="C1 Master Usage ID"/>
+		<property name="semantic.item.label" value="C1 Master Usage ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_MASTER_USAGE_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.C1_MASTER_USAGE_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_MASTER_USAGE_ID"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_MASTER_USAGE_ID"/>
+		<property name="previous.display" value="C1 Master Usage ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.C1_MASTER_USAGE_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.C1_SA_ID" class="java.lang.String">
+		<property name="adhoc.display" value="C1 Service Agreement ID"/>
+		<property name="semantic.item.label" value="C1 Service Agreement ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_SA_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.C1_SA_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_SA_ID"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_SA_ID"/>
+		<property name="previous.display" value="C1 Service Agreement ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.C1_SA_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.C1_SP_ID" class="java.lang.String">
+		<property name="adhoc.display" value="C1 Service Point ID"/>
+		<property name="semantic.item.label" value="C1 Service Point ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_SP_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.C1_SP_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_SP_ID"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_SP_ID"/>
+		<property name="previous.display" value="C1 Service Point ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.C1_SP_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.C1_BSEG_ID" class="java.lang.String">
+		<property name="adhoc.display" value="C1 Bill Segment ID"/>
+		<property name="semantic.item.label" value="C1 Bill Segment ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BSEG_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.C1_BSEG_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BSEG_ID"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BSEG_ID"/>
+		<property name="previous.display" value="C1 Bill Segment ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.C1_BSEG_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.C1_BILL_CYC_CD" class="java.lang.String">
+		<property name="adhoc.display" value="C1 Bill Cycle Code"/>
+		<property name="semantic.item.label" value="C1 Bill Cycle Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BILL_CYC_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.C1_BILL_CYC_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BILL_CYC_CD"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BILL_CYC_CD"/>
+		<property name="previous.display" value="C1 Bill Cycle Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.C1_BILL_CYC_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.C1_BILL_CYC_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="C1 Bill Cycle"/>
+		<property name="semantic.item.label" value="C1 Bill Cycle"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BILL_CYC_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.C1_BILL_CYC_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BILL_CYC_DESC"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BILL_CYC_DESC"/>
+		<property name="previous.display" value="C1 Bill Cycle"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.C1_BILL_CYC_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.C1_BO_STATUS_CD" class="java.lang.String">
+		<property name="adhoc.display" value="C1 Usage Status Code"/>
+		<property name="semantic.item.label" value="C1 Usage Status Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BO_STATUS_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.C1_BO_STATUS_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BO_STATUS_CD"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BO_STATUS_CD"/>
+		<property name="previous.display" value="C1 Usage Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.C1_BO_STATUS_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.C1_BO_STATUS_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="C1 Usage Status"/>
+		<property name="semantic.item.label" value="C1 Usage Status"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BO_STATUS_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.C1_BO_STATUS_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BO_STATUS_DESC"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/C1_BO_STATUS_DESC"/>
+		<property name="previous.display" value="C1 Usage Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.C1_BO_STATUS_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.BILL_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Bill ID"/>
+		<property name="semantic.item.label" value="Bill ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BILL_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BILL_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BILL_ID"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BILL_ID"/>
+		<property name="previous.display" value="Bill ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.BILL_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.BSEG_STAT_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Status Code"/>
+		<property name="semantic.item.label" value="Bill Segment Status Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BSEG_STAT_FLG"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BSEG_STAT_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BSEG_STAT_FLG"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BSEG_STAT_FLG"/>
+		<property name="previous.display" value="Bill Segment Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.BSEG_STAT_FLG)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.BSEG_STAT_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Status"/>
+		<property name="semantic.item.label" value="Bill Segment Status"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BSEG_STAT_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BSEG_STAT_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BSEG_STAT_DESC"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BSEG_STAT_DESC"/>
+		<property name="previous.display" value="Bill Segment Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.BSEG_STAT_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.BSEG_START_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Bill Segment Start Date"/>
+		<property name="semantic.item.label" value="Bill Segment Start Date"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BSEG_START_DT"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BSEG_START_DT"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BSEG_START_DT"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BSEG_START_DT"/>
+		<property name="previous.display" value="Bill Segment Start Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.BSEG_START_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_BILLING.BSEG_END_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Bill Segment End Date"/>
+		<property name="semantic.item.label" value="Bill Segment End Date"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BSEG_END_DT"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BSEG_END_DT"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BSEG_END_DT"/>
+		<property name="semantic.tree.sort.order" value="15"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_BILLING/BSEG_END_DT"/>
+		<property name="previous.display" value="Bill Segment End Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_BILLING.BSEG_END_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.SA_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Service Agreement ID"/>
+		<property name="semantic.item.label" value="Service Agreement ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.SA_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_ID"/>
+		<property name="previous.display" value="Service Agreement ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.SA_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.ACCT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Account ID"/>
+		<property name="semantic.item.label" value="Account ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/ACCT_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.ACCT_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/ACCT_ID"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/ACCT_ID"/>
+		<property name="previous.display" value="Account ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.ACCT_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.CUST_CL_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Customer Class Code"/>
+		<property name="semantic.item.label" value="Customer Class Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/CUST_CL_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.CUST_CL_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/CUST_CL_CD"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/CUST_CL_CD"/>
+		<property name="previous.display" value="Customer Class Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.CUST_CL_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.CUST_CL_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Customer Class"/>
+		<property name="semantic.item.label" value="Customer Class"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/CUST_CL_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.CUST_CL_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/CUST_CL_DESC"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/CUST_CL_DESC"/>
+		<property name="previous.display" value="Customer Class"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.CUST_CL_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.COLL_CL_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Collection Class Code"/>
+		<property name="semantic.item.label" value="Collection Class Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/COLL_CL_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.COLL_CL_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/COLL_CL_CD"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/COLL_CL_CD"/>
+		<property name="previous.display" value="Collection Class Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.COLL_CL_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.COLL_CL_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Collection Class"/>
+		<property name="semantic.item.label" value="Collection Class"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/COLL_CL_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.COLL_CL_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/COLL_CL_DESC"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/COLL_CL_DESC"/>
+		<property name="previous.display" value="Collection Class"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.COLL_CL_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.ACCT_MGMT_GRP_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Account Management Group Code"/>
+		<property name="semantic.item.label" value="Account Management Group Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/ACCT_MGMT_GRP_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.ACCT_MGMT_GRP_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/ACCT_MGMT_GRP_CD"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/ACCT_MGMT_GRP_CD"/>
+		<property name="previous.display" value="Account Management Group Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.ACCT_MGMT_GRP_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.ACCT_MGMT_GRP_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Account Management Group"/>
+		<property name="semantic.item.label" value="Account Management Group"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/ACCT_MGMT_GRP_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.ACCT_MGMT_GRP_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/ACCT_MGMT_GRP_DESC"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/ACCT_MGMT_GRP_DESC"/>
+		<property name="previous.display" value="Account Management Group"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.ACCT_MGMT_GRP_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.BUD_PLAN_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Budget Plan Code"/>
+		<property name="semantic.item.label" value="Budget Plan Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/BUD_PLAN_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BUD_PLAN_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/BUD_PLAN_CD"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/BUD_PLAN_CD"/>
+		<property name="previous.display" value="Budget Plan Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.BUD_PLAN_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.BUD_PLAN_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Budget Plan"/>
+		<property name="semantic.item.label" value="Budget Plan"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/BUD_PLAN_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.BUD_PLAN_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/BUD_PLAN_DESC"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/BUD_PLAN_DESC"/>
+		<property name="previous.display" value="Budget Plan"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.BUD_PLAN_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.PER_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Person ID"/>
+		<property name="semantic.item.label" value="Person ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/PER_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.PER_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/PER_ID"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/PER_ID"/>
+		<property name="previous.display" value="Person ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.PER_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.CUSTOMER_NAME" class="java.lang.String">
+		<property name="adhoc.display" value="Customer Name"/>
+		<property name="semantic.item.label" value="Customer Name"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/CUSTOMER_NAME"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.CUSTOMER_NAME"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/CUSTOMER_NAME"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/CUSTOMER_NAME"/>
+		<property name="previous.display" value="Customer Name"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.CUSTOMER_NAME)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.SA_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Service Type Code"/>
+		<property name="semantic.item.label" value="Service Type Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_TYPE_CD"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.SA_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_TYPE_CD"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_TYPE_CD"/>
+		<property name="previous.display" value="Service Type Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.SA_TYPE_CD)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.SA_TYPE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Type"/>
+		<property name="semantic.item.label" value="Service Type"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_TYPE_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.SA_TYPE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_TYPE_DESC"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_TYPE_DESC"/>
+		<property name="previous.display" value="Service Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.SA_TYPE_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.SA_STATUS_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Service Agreement Status Code"/>
+		<property name="semantic.item.label" value="Service Agreement Status Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_STATUS_FLG"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.SA_STATUS_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_STATUS_FLG"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_STATUS_FLG"/>
+		<property name="previous.display" value="Service Agreement Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.SA_STATUS_FLG)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_CUSTOMER.SA_STATUS_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Agreement Status"/>
+		<property name="semantic.item.label" value="Service Agreement Status"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_STATUS_DESC"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.SA_STATUS_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_STATUS_DESC"/>
+		<property name="semantic.tree.sort.order" value="15"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_CUSTOMER/SA_STATUS_DESC"/>
+		<property name="previous.display" value="Service Agreement Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_CUSTOMER.SA_STATUS_DESC)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_PREMISE.PREM_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Premise ID"/>
+		<property name="semantic.item.label" value="Premise ID"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/PREM_ID"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.PREM_ID"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/PREM_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/PREM_ID"/>
+		<property name="previous.display" value="Premise ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_PREMISE.PREM_ID)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_PREMISE.ADDRESS1" class="java.lang.String">
+		<property name="adhoc.display" value="Address"/>
+		<property name="semantic.item.label" value="Address"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/ADDRESS1"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.ADDRESS1"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/ADDRESS1"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/ADDRESS1"/>
+		<property name="previous.display" value="Address"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_PREMISE.ADDRESS1)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_PREMISE.CITY" class="java.lang.String">
+		<property name="adhoc.display" value="City"/>
+		<property name="semantic.item.label" value="City"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/CITY"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.CITY"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/CITY"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/CITY"/>
+		<property name="previous.display" value="City"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_PREMISE.CITY)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_PREMISE.STATE" class="java.lang.String">
+		<property name="adhoc.display" value="State"/>
+		<property name="semantic.item.label" value="State"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/STATE"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.STATE"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/STATE"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/STATE"/>
+		<property name="previous.display" value="State"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_PREMISE.STATE)"/>
+	</field>
+	<field name="D1_USAGE_SCALAR_PREMISE.POSTAL" class="java.lang.String">
+		<property name="adhoc.display" value="Postal Code"/>
+		<property name="semantic.item.label" value="Postal Code"/>
+		<property name="adhoc.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/POSTAL"/>
+		<property name="resourceId" value="D1_USAGE_SCALAR_DTL_RPT_CURR.POSTAL"/>
+		<property name="semantic.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/POSTAL"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_USAGE_SCALAR_PREMISE/POSTAL"/>
+		<property name="previous.display" value="Postal Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_USAGE_SCALAR_PREMISE.POSTAL)"/>
+	</field>
+</jasperReport>

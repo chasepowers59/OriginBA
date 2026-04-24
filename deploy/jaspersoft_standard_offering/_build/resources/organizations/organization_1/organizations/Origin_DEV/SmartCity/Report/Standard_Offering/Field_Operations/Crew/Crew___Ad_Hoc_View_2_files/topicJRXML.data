@@ -1,0 +1,992 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="adhocReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="9c547bca-f91f-4c11-821e-8ce885bf3a3d">
+	<property name="adhoc.topic.escape.variable.chars"/>
+	<property name="DESCR_5_1" value="Discarded,Completed"/>
+	<property name="adhoc.metadata.version" value="2079"/>
+	<property name="has.modified.presentation" value="false"/>
+	<property name="base.datasource.version" value="0"/>
+	<property name="use.datasource.presentation" value="true"/>
+	<property name="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.TopicReportUnit" value="/temp/sl_topic_996e10a2-9606-40f6-ac2e-f26d912e16bf"/>
+	<parameter name="DESCR100_1" class="java.util.Collection" nestedType="java.lang.String">
+		<defaultValueExpression><![CDATA[java.util.Arrays.asList(new Object[]{})]]></defaultValueExpression>
+	</parameter>
+	<parameter name="CRE_DTTM_2_1" class="net.sf.jasperreports.types.date.TimestampRange">
+		<defaultValueExpression><![CDATA[com.jaspersoft.jasperserver.api.common.util.rd.DateRangeFactory.getInstance("MONTH-3",java.sql.Timestamp.class)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DESCR_8_1" class="java.util.Collection" nestedType="java.lang.String">
+		<defaultValueExpression><![CDATA[java.util.Arrays.asList(new Object[]{})]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DESCR_5_1" class="java.util.Collection" nestedType="java.lang.String">
+		<defaultValueExpression><![CDATA[java.util.Arrays.asList(($P{JASPER_REPORT}.getProperty("DESCR_5_1")).split("(?<!\\\\),",-1))]]></defaultValueExpression>
+	</parameter>
+	<queryString language="domain">
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema">
+  <queryFields>
+    <queryField id="C1_REPRESENTATIVE.BO_STATUS_CD"></queryField>
+    <queryField id="C1_REPRESENTATIVE.BO_STATUS_REASON_CD"></queryField>
+    <queryField id="C1_REPRESENTATIVE.BUS_OBJ_CD"></queryField>
+    <queryField id="C1_REPRESENTATIVE.C1_REPRESENTATIVE_CD"></queryField>
+    <queryField id="C1_REPRESENTATIVE.C1_REPRESENTATIVE_TYPE_FLG"></queryField>
+    <queryField id="C1_REPRESENTATIVE.CRE_DTTM"></queryField>
+    <queryField id="C1_REPRESENTATIVE.NT_XID_CD"></queryField>
+    <queryField id="C1_REPRESENTATIVE.PER_ID"></queryField>
+    <queryField id="C1_REPRESENTATIVE.STATUS_UPD_DTTM"></queryField>
+    <queryField id="C1_REPRESENTATIVE.USER_ID"></queryField>
+    <queryField id="D1_ACTIVITY_1.ACTIVITY_TYPE_CD_1"></queryField>
+    <queryField id="D1_ACTIVITY_1.BO_STATUS_CD_2"></queryField>
+    <queryField id="D1_ACTIVITY_1.BO_STATUS_REASON_CD_2"></queryField>
+    <queryField id="D1_ACTIVITY_1.BUS_OBJ_CD_2"></queryField>
+    <queryField id="D1_ACTIVITY_1.CANCEL_REASON_1"></queryField>
+    <queryField id="D1_ACTIVITY_1.CRE_DTTM_2"></queryField>
+    <queryField id="D1_ACTIVITY_1.D1_ACTIVITY_ID_1"></queryField>
+    <queryField id="D1_ACTIVITY_1.EFF_DTTM_1"></queryField>
+    <queryField id="D1_ACTIVITY_1.END_DTTM_1"></queryField>
+    <queryField id="D1_ACTIVITY_1.FIELD_TASK_TYPE_1"></queryField>
+    <queryField id="D1_ACTIVITY_1.RESCHEDULE_REASON_1"></queryField>
+    <queryField id="D1_ACTIVITY_1.RETENTION_PERIOD_1"></queryField>
+    <queryField id="D1_ACTIVITY_1.START_DTTM_1"></queryField>
+    <queryField id="D1_ACTIVITY_1.STATUS_UPD_DTTM_2"></queryField>
+    <queryField id="NewSet2.D1_ACTIVITY_ID_DISTINCT"></queryField>
+    <queryField id="NewSet2.C1_REPRESENTATIVE_CD_DISTINCT"></queryField>
+  </queryFields>
+</query>]]>
+	</queryString>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_COMMENTS" class="java.lang.String">
+		<property name="adhoc.display" value="Appointment Comments"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_COMMENTS"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_COMMENTS"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_COMMENTS"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.tree.labels">
+			<![CDATA[[{"uri":"/C1_REPRESENTATIVE","resourceId":"JoinTree_1","label":"1.) Representative / Crew"},{"uri":"/CMS_C1_REPRESENTATIVE_BODA_VW","resourceId":"JoinTree_1","label":"1.) Representative / Crew Details"},{"uri":"/D1_ACTIVITY_1","resourceId":"JoinTree_1","label":"1.) Activity"},{"uri":"/CMS_D1_ACTIVITY_D1FA_BODA_VW","resourceId":"JoinTree_1","label":"1.) Activity Details"},{"uri":"/CMS_D1_ACTIVITY_CHAR_VW_2","resourceId":"JoinTree_1","label":"1.) Activity Details (for MobileLite)"},{"uri":"/NewSet1","resourceId":"JoinTree_1","label":"1.) Descriptions"},{"uri":"/NewSet2","resourceId":"JoinTree_1","label":"1.) Formulas"}]]]>
+		</property>
+		<property name="semantic.tree.sort.order">
+			<![CDATA[{"C1_REPRESENTATIVE":1,"BO_STATUS_CD":2,"BO_STATUS_REASON_CD":3,"BUS_OBJ_CD":4,"C1_REPRESENTATIVE_CD":5,"CRE_DTTM":6,"NT_XID_CD":7,"PER_ID":8,"STATUS_UPD_DTTM":9,"USER_ID":10,"CMS_C1_REPRESENTATIVE_BODA_VW":11,"C1_REPRESENTATIVE_CD_1":12,"CM_ML_SVC_AREA":13,"CM_ML_WORKER_CAPABILITY":14,"D1_ACTIVITY_1":15,"ACTIVITY_TYPE_CD_1":16,"BO_STATUS_CD_2":17,"BO_STATUS_REASON_CD_2":18,"BUS_OBJ_CD_2":19,"CANCEL_REASON_1":20,"CRE_DTTM_2":21,"D1_ACTIVITY_ID_1":22,"EFF_DTTM_1":23,"END_DTTM_1":24,"FIELD_TASK_TYPE_1":25,"RESCHEDULE_REASON_1":26,"RETENTION_PERIOD_1":27,"START_DTTM_1":28,"STATUS_UPD_DTTM_2":29,"CMS_D1_ACTIVITY_D1FA_BODA_VW":30,"APPOINTMENT_COMMENTS":31,"APPOINTMENT_FLG":32,"APPOINTMENT_TAKEN_BY":33,"APPOINTMENT_TAKEN_DATE":34,"APPOINTMENT_WINDOW_END_DTTM":35,"APPOINTMENT_WINDOW_START_DTTM":36,"CM_ML_IS_PICKUP_FLG":37,"COMMENTS":38,"CR_REQUESTER_USER":39,"D1_ACTIVITY_ID":40,"D1_CELLPHONE":41,"D1_CONT_EXTERNAL_ID":42,"D1_CONTACTNAME":43,"D1_CUSTOMERNAME":44,"D1_INSTRUCTIONS":45,"D1_MAINPHONE":46,"EMAIL_VALUE":47,"EXPIRATION_DTTM":48,"EXT_REFERENCE_ID":49,"EXTERNAL_ACCT_ID":50,"CMS_D1_ACTIVITY_CHAR_VW_2":51,"D1_ACTIVITY_ID_3":52,"FA_INT_STATUS_FLG_2":53,"FA_PRIORITY_FLG_2":54,"NewSet1":55,"DESCR100_1":56,"DESCR_4":57,"DESCR":58,"DESCR_7":59,"DESCR50":60,"DESCR_8":61,"DESCR_10":62,"DESCR_9":63,"DESCR_5":64,"DESCR_1":65,"DESCR_6":66,"DESCR_2":67,"NewSet2":68,"DAYS_OLD":69,"DAYS_COMPLETED":70,"DAYS_STARTED_SINCE_CREATE":71,"D1_ACTIVITY_ID_DISTINCT":72,"D1_COMPLETED_ACTIVITY_ID_DISTINCT":73,"C1_REPRESENTATIVE_CD_DISTINCT":74,"DESCR100":75,"REQUESTER_USER_NAME":76,"USER_ID_NAME":77}]]>
+		</property>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_COMMENTS"/>
+		<property name="previous.display" value="Appointment Comments"/>
+		<property name="semantic.item.label" value="Appointment Comments"/>
+		<property name="adhoc.chosen.tree.labels">
+			<![CDATA[[{"uri":"/CMS_D1_ACTIVITY_D1FA_BODA_VW","resourceId":"JoinTree_1","label":"1.) Activity Details"},{"uri":"/CMS_C1_REPRESENTATIVE_BODA_VW","resourceId":"JoinTree_1","label":"1.) Representative / Crew Details"},{"uri":"/NewSet1","resourceId":"JoinTree_1","label":"1.) Descriptions"},{"uri":"/CMS_D1_ACTIVITY_CHAR_VW_2","resourceId":"JoinTree_1","label":"1.) Activity Details (for MobileLite)"},{"uri":"/C1_REPRESENTATIVE","resourceId":"JoinTree_1","label":"1.) Representative / Crew"},{"uri":"/D1_ACTIVITY_1","resourceId":"JoinTree_1","label":"1.) Activity"},{"uri":"/NewSet2","resourceId":"JoinTree_1","label":"1.) Formulas"}]]]>
+		</property>
+		<property name="adhoc.chosen.tree.order">
+			<![CDATA[{"C1_REPRESENTATIVE":1,"BO_STATUS_CD":2,"BO_STATUS_REASON_CD":3,"BUS_OBJ_CD":4,"C1_REPRESENTATIVE_CD":5,"CRE_DTTM":6,"NT_XID_CD":7,"PER_ID":8,"STATUS_UPD_DTTM":9,"USER_ID":10,"D1_ACTIVITY_1":11,"ACTIVITY_TYPE_CD_1":12,"BO_STATUS_CD_2":13,"BO_STATUS_REASON_CD_2":14,"BUS_OBJ_CD_2":15,"CANCEL_REASON_1":16,"CRE_DTTM_2":17,"D1_ACTIVITY_ID_1":18,"EFF_DTTM_1":19,"END_DTTM_1":20,"FIELD_TASK_TYPE_1":21,"RESCHEDULE_REASON_1":22,"RETENTION_PERIOD_1":23,"START_DTTM_1":24,"STATUS_UPD_DTTM_2":25,"CMS_D1_ACTIVITY_D1FA_BODA_VW":26,"APPOINTMENT_COMMENTS":27,"APPOINTMENT_FLG":28,"APPOINTMENT_TAKEN_BY":29,"APPOINTMENT_TAKEN_DATE":30,"APPOINTMENT_WINDOW_END_DTTM":31,"APPOINTMENT_WINDOW_START_DTTM":32,"COMMENTS":33,"CR_REQUESTER_USER":34,"D1_ACTIVITY_ID":35,"D1_CELLPHONE":36,"D1_CONT_EXTERNAL_ID":37,"D1_CONTACTNAME":38,"D1_CUSTOMERNAME":39,"D1_INSTRUCTIONS":40,"D1_MAINPHONE":41,"EMAIL_VALUE":42,"EXPIRATION_DTTM":43,"EXT_REFERENCE_ID":44,"EXTERNAL_ACCT_ID":45,"CMS_D1_ACTIVITY_CHAR_VW_2":46,"D1_ACTIVITY_ID_3":47,"FA_INT_STATUS_FLG_2":48,"FA_PRIORITY_FLG_2":49,"NewSet1":50,"DESCR100_1":51,"DESCR_4":52,"DESCR":53,"DESCR_7":54,"DESCR50":55,"DESCR_8":56,"DESCR_10":57,"DESCR100":58,"DESCR_9":59,"DESCR_5":60,"DESCR_1":61,"DESCR_6":62,"DESCR_2":63,"NewSet2":64,"DAYS_OLD":65,"DAYS_COMPLETED":66,"DAYS_STARTED_SINCE_CREATE":67,"D1_ACTIVITY_ID_DISTINCT":68,"C1_REPRESENTATIVE_CD_DISTINCT":69,"REQUESTER_USER_NAME":70,"USER_ID_NAME":71}]]>
+		</property>
+		<property name="slIsTableAsList" value="false"/>
+		<property name="adhoc.chosen.tree.is.flattened" value="false"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_COMMENTS)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.CM_ML_IS_PICKUP_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Pickup Order"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/CM_ML_IS_PICKUP_FLG"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/CM_ML_IS_PICKUP_FLG"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.CM_ML_IS_PICKUP_FLG"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/CM_ML_IS_PICKUP_FLG"/>
+		<property name="previous.display" value="Pickup Order"/>
+		<property name="semantic.item.label" value="Pickup Order"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.CM_ML_IS_PICKUP_FLG)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Appointment Necessary"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_FLG"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_FLG"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_FLG"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_FLG"/>
+		<property name="previous.display" value="Appointment Necessary"/>
+		<property name="semantic.item.label" value="Appointment Necessary"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_FLG)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_TAKEN_BY" class="java.lang.String">
+		<property name="adhoc.display" value="Appointment Taken By"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_TAKEN_BY"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_TAKEN_BY"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_TAKEN_BY"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_TAKEN_BY"/>
+		<property name="previous.display" value="Appointment Taken By"/>
+		<property name="semantic.item.label" value="Appointment Taken By"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_TAKEN_BY)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_TAKEN_DATE" class="java.lang.String">
+		<property name="adhoc.display" value="Appointment Taken Date"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_TAKEN_DATE"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_TAKEN_DATE"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_TAKEN_DATE"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_TAKEN_DATE"/>
+		<property name="previous.display" value="Appointment Taken Date"/>
+		<property name="semantic.item.label" value="Appointment Taken Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_TAKEN_DATE)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_WINDOW_END_DTTM" class="java.lang.String">
+		<property name="adhoc.display" value="Appointment End Date Time"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_WINDOW_END_DTTM"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_WINDOW_END_DTTM"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_WINDOW_END_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_WINDOW_END_DTTM"/>
+		<property name="previous.display" value="Appointment End Date Time"/>
+		<property name="semantic.item.label" value="Appointment End Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_WINDOW_END_DTTM)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_WINDOW_START_DTTM" class="java.lang.String">
+		<property name="adhoc.display" value="Appointment Window Date Time"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_WINDOW_START_DTTM"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_WINDOW_START_DTTM"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_WINDOW_START_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/APPOINTMENT_WINDOW_START_DTTM"/>
+		<property name="previous.display" value="Appointment Window Date Time"/>
+		<property name="semantic.item.label" value="Appointment Window Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.APPOINTMENT_WINDOW_START_DTTM)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.COMMENTS" class="java.lang.String">
+		<property name="adhoc.display" value="Comments"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/COMMENTS"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/COMMENTS"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.COMMENTS"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/COMMENTS"/>
+		<property name="previous.display" value="Comments"/>
+		<property name="semantic.item.label" value="Comments"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.COMMENTS)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.CR_REQUESTER_USER" class="java.lang.String">
+		<property name="adhoc.display" value="Requester User"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/CR_REQUESTER_USER"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/CR_REQUESTER_USER"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.CR_REQUESTER_USER"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/CR_REQUESTER_USER"/>
+		<property name="previous.display" value="Requester User"/>
+		<property name="semantic.item.label" value="Requester User"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.CR_REQUESTER_USER)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_ACTIVITY_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Activity ID"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_ACTIVITY_ID"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_ACTIVITY_ID"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_ACTIVITY_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_ACTIVITY_ID"/>
+		<property name="previous.display" value="Activity ID"/>
+		<property name="semantic.item.label" value="Activity ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_ACTIVITY_ID)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_CELLPHONE" class="java.lang.String">
+		<property name="adhoc.display" value="Cell Phone"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_CELLPHONE"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_CELLPHONE"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_CELLPHONE"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_CELLPHONE"/>
+		<property name="previous.display" value="Cell Phone"/>
+		<property name="semantic.item.label" value="Cell Phone"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_CELLPHONE)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_CONT_EXTERNAL_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Contact External ID"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_CONT_EXTERNAL_ID"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_CONT_EXTERNAL_ID"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_CONT_EXTERNAL_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_CONT_EXTERNAL_ID"/>
+		<property name="previous.display" value="Contact External ID"/>
+		<property name="semantic.item.label" value="Contact External ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_CONT_EXTERNAL_ID)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_CONTACTNAME" class="java.lang.String">
+		<property name="adhoc.display" value="Contact Name"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_CONTACTNAME"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_CONTACTNAME"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_CONTACTNAME"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_CONTACTNAME"/>
+		<property name="previous.display" value="Contact Name"/>
+		<property name="semantic.item.label" value="Contact Name"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_CONTACTNAME)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_CUSTOMERNAME" class="java.lang.String">
+		<property name="adhoc.display" value="Customer Name"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_CUSTOMERNAME"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_CUSTOMERNAME"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_CUSTOMERNAME"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_CUSTOMERNAME"/>
+		<property name="previous.display" value="Customer Name"/>
+		<property name="semantic.item.label" value="Customer Name"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_CUSTOMERNAME)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_INSTRUCTIONS" class="java.lang.String">
+		<property name="adhoc.display" value="Instructions"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_INSTRUCTIONS"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_INSTRUCTIONS"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_INSTRUCTIONS"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_INSTRUCTIONS"/>
+		<property name="previous.display" value="Instructions"/>
+		<property name="semantic.item.label" value="Instructions"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_INSTRUCTIONS)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_MAINPHONE" class="java.lang.String">
+		<property name="adhoc.display" value="Main Phone"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_MAINPHONE"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_MAINPHONE"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_MAINPHONE"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/D1_MAINPHONE"/>
+		<property name="previous.display" value="Main Phone"/>
+		<property name="semantic.item.label" value="Main Phone"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_MAINPHONE)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.EMAIL_VALUE" class="java.lang.String">
+		<property name="adhoc.display" value="Email"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/EMAIL_VALUE"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/EMAIL_VALUE"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.EMAIL_VALUE"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/EMAIL_VALUE"/>
+		<property name="previous.display" value="Email"/>
+		<property name="semantic.item.label" value="Email"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.EMAIL_VALUE)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.EXPIRATION_DTTM" class="java.lang.String">
+		<property name="adhoc.display" value="Expiration Date/Time"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/EXPIRATION_DTTM"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/EXPIRATION_DTTM"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.EXPIRATION_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/EXPIRATION_DTTM"/>
+		<property name="previous.display" value="Expiration Date/Time"/>
+		<property name="semantic.item.label" value="Expiration Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.EXPIRATION_DTTM)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.EXT_REFERENCE_ID" class="java.lang.String">
+		<property name="adhoc.display" value="External Reference ID"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/EXT_REFERENCE_ID"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/EXT_REFERENCE_ID"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.EXT_REFERENCE_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/EXT_REFERENCE_ID"/>
+		<property name="previous.display" value="External Reference ID"/>
+		<property name="semantic.item.label" value="External Reference ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.EXT_REFERENCE_ID)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_D1FA_BODA_VW.EXTERNAL_ACCT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="External Account ID"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/EXTERNAL_ACCT_ID"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/EXTERNAL_ACCT_ID"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW.EXTERNAL_ACCT_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_D1FA_BODA_VW/EXTERNAL_ACCT_ID"/>
+		<property name="previous.display" value="External Account ID"/>
+		<property name="semantic.item.label" value="External Account ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_D1FA_BODA_VW.EXTERNAL_ACCT_ID)"/>
+	</field>
+	<field name="CMS_C1_REPRESENTATIVE_BODA_VW.C1_REPRESENTATIVE_CD_1" class="java.lang.String">
+		<property name="adhoc.display" value="Representative/Crew"/>
+		<property name="adhoc.tree.uri" value="/CMS_C1_REPRESENTATIVE_BODA_VW/C1_REPRESENTATIVE_CD_1"/>
+		<property name="semantic.tree.uri" value="/CMS_C1_REPRESENTATIVE_BODA_VW/C1_REPRESENTATIVE_CD_1"/>
+		<property name="resourceId" value="JoinTree_1.CMS_C1_REPRESENTATIVE_BODA_VW.C1_REPRESENTATIVE_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_C1_REPRESENTATIVE_BODA_VW/C1_REPRESENTATIVE_CD_1"/>
+		<property name="previous.display" value="Representative/Crew"/>
+		<property name="semantic.item.label" value="Representative/Crew"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_C1_REPRESENTATIVE_BODA_VW.C1_REPRESENTATIVE_CD_1)"/>
+	</field>
+	<field name="CMS_C1_REPRESENTATIVE_BODA_VW.CM_ML_SVC_AREA" class="java.lang.String">
+		<property name="adhoc.display" value="Service Area"/>
+		<property name="adhoc.tree.uri" value="/CMS_C1_REPRESENTATIVE_BODA_VW/CM_ML_SVC_AREA"/>
+		<property name="semantic.tree.uri" value="/CMS_C1_REPRESENTATIVE_BODA_VW/CM_ML_SVC_AREA"/>
+		<property name="resourceId" value="JoinTree_1.CMS_C1_REPRESENTATIVE_BODA_VW.CM_ML_SVC_AREA"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_C1_REPRESENTATIVE_BODA_VW/CM_ML_SVC_AREA"/>
+		<property name="previous.display" value="Service Area"/>
+		<property name="semantic.item.label" value="Service Area"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_C1_REPRESENTATIVE_BODA_VW.CM_ML_SVC_AREA)"/>
+	</field>
+	<field name="CMS_C1_REPRESENTATIVE_BODA_VW.CM_ML_WORKER_CAPABILITY" class="java.lang.String">
+		<property name="adhoc.display" value="Worker Capability"/>
+		<property name="adhoc.tree.uri" value="/CMS_C1_REPRESENTATIVE_BODA_VW/CM_ML_WORKER_CAPABILITY"/>
+		<property name="semantic.tree.uri" value="/CMS_C1_REPRESENTATIVE_BODA_VW/CM_ML_WORKER_CAPABILITY"/>
+		<property name="resourceId" value="JoinTree_1.CMS_C1_REPRESENTATIVE_BODA_VW.CM_ML_WORKER_CAPABILITY"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_C1_REPRESENTATIVE_BODA_VW/CM_ML_WORKER_CAPABILITY"/>
+		<property name="previous.display" value="Worker Capability"/>
+		<property name="semantic.item.label" value="Worker Capability"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_C1_REPRESENTATIVE_BODA_VW.CM_ML_WORKER_CAPABILITY)"/>
+	</field>
+	<field name="NewSet1.DESCR100_1" class="java.lang.String">
+		<property name="adhoc.display" value="Activity Type Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR100_1"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR100_1"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY_TYPE_L.DESCR100"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR100_1"/>
+		<property name="previous.display" value="Activity Type Description"/>
+		<property name="semantic.item.label" value="Activity Type Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR100_1)"/>
+	</field>
+	<field name="NewSet1.DESCR" class="java.lang.String">
+		<property name="adhoc.display" value="Business Object Description (Representative)"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR"/>
+		<property name="resourceId" value="JoinTree_1.F1_BUS_OBJ_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR"/>
+		<property name="previous.display" value="Business Object Description (Representative)"/>
+		<property name="semantic.item.label" value="Business Object Description (Representative)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR)"/>
+	</field>
+	<field name="NewSet1.DESCR_4" class="java.lang.String">
+		<property name="adhoc.display" value="Business Object Description (Activity)"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_4"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_4"/>
+		<property name="resourceId" value="JoinTree_1.F1_BUS_OBJ_L_1.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_4"/>
+		<property name="previous.display" value="Business Object Description (Activity)"/>
+		<property name="semantic.item.label" value="Business Object Description (Activity)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_4)"/>
+	</field>
+	<field name="NewSet1.DESCR50" class="java.lang.String">
+		<property name="adhoc.display" value="External System Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR50"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR50"/>
+		<property name="resourceId" value="JoinTree_1.CI_NT_XID_L.DESCR50"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR50"/>
+		<property name="previous.display" value="External System Description"/>
+		<property name="semantic.item.label" value="External System Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR50)"/>
+	</field>
+	<field name="NewSet1.DESCR_7" class="java.lang.String">
+		<property name="adhoc.display" value="Cancel Reason Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_7"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_7"/>
+		<property name="resourceId" value="JoinTree_1.F1_EXT_LOOKUP_VAL_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_7"/>
+		<property name="previous.display" value="Cancel Reason Description"/>
+		<property name="semantic.item.label" value="Cancel Reason Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_7)"/>
+	</field>
+	<field name="NewSet1.DESCR_8" class="java.lang.String">
+		<property name="adhoc.display" value="Field Task Type Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_8"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_8"/>
+		<property name="resourceId" value="JoinTree_1.F1_EXT_LOOKUP_VAL_L_1.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_8"/>
+		<property name="previous.display" value="Field Task Type Description"/>
+		<property name="semantic.item.label" value="Field Task Type Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_8)"/>
+	</field>
+	<field name="NewSet1.DESCR_1" class="java.lang.String">
+		<property name="adhoc.display" value="Status Description (Representative)"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_1"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_1"/>
+		<property name="resourceId" value="JoinTree_1.F1_BUS_OBJ_STATUS_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_1"/>
+		<property name="previous.display" value="Status Description (Representative)"/>
+		<property name="semantic.item.label" value="Status Description (Representative)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_1)"/>
+	</field>
+	<field name="NewSet1.DESCR_10" class="java.lang.String">
+		<property name="adhoc.display" value="Intermediate Status Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_10"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_10"/>
+		<property name="resourceId" value="JoinTree_1.CI_LOOKUP_VAL_L_1.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_10"/>
+		<property name="previous.display" value="Intermediate Status Description"/>
+		<property name="semantic.item.label" value="Intermediate Status Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_10)"/>
+	</field>
+	<field name="NewSet1.DESCR_2" class="java.lang.String">
+		<property name="adhoc.display" value="Status Reason Description (Representative)"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_2"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_2"/>
+		<property name="resourceId" value="JoinTree_1.F1_BUS_OBJ_STATUS_RSN_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_2"/>
+		<property name="previous.display" value="Status Reason Description (Representative)"/>
+		<property name="semantic.item.label" value="Status Reason Description (Representative)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_2)"/>
+	</field>
+	<field name="NewSet1.DESCR_9" class="java.lang.String">
+		<property name="adhoc.display" value="Reschedule Reason Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_9"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_9"/>
+		<property name="resourceId" value="JoinTree_1.F1_EXT_LOOKUP_VAL_L_2.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_9"/>
+		<property name="previous.display" value="Reschedule Reason Description"/>
+		<property name="semantic.item.label" value="Reschedule Reason Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_9)"/>
+	</field>
+	<field name="NewSet1.DESCR_5" class="java.lang.String">
+		<property name="adhoc.display" value="Status Description (Activity)"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_5"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_5"/>
+		<property name="resourceId" value="JoinTree_1.F1_BUS_OBJ_STATUS_L_1.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_5"/>
+		<property name="previous.display" value="Status Description (Activity)"/>
+		<property name="semantic.item.label" value="Status Description (Activity)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_5)"/>
+	</field>
+	<field name="NewSet1.DESCR_6" class="java.lang.String">
+		<property name="adhoc.display" value="Status Reason Description (Activity)"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_6"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_6"/>
+		<property name="resourceId" value="JoinTree_1.F1_BUS_OBJ_STATUS_RSN_L_1.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_6"/>
+		<property name="previous.display" value="Status Reason Description (Activity)"/>
+		<property name="semantic.item.label" value="Status Reason Description (Activity)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_6)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_CHAR_VW_2.D1_ACTIVITY_ID_3" class="java.lang.String">
+		<property name="adhoc.display" value="Activity ID"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_CHAR_VW_2/D1_ACTIVITY_ID_3"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_CHAR_VW_2/D1_ACTIVITY_ID_3"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_CHAR_VW.D1_ACTIVITY_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_CHAR_VW_2/D1_ACTIVITY_ID_3"/>
+		<property name="previous.display" value="Activity ID"/>
+		<property name="semantic.item.label" value="Activity ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_CHAR_VW_2.D1_ACTIVITY_ID_3)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_CHAR_VW_2.FA_INT_STATUS_FLG_2" class="java.lang.String">
+		<property name="adhoc.display" value="Intermediate Status"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_CHAR_VW_2/FA_INT_STATUS_FLG_2"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_CHAR_VW_2/FA_INT_STATUS_FLG_2"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_CHAR_VW.FA_INT_STATUS_FLG"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_CHAR_VW_2/FA_INT_STATUS_FLG_2"/>
+		<property name="previous.display" value="Intermediate Status"/>
+		<property name="semantic.item.label" value="Intermediate Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_CHAR_VW_2.FA_INT_STATUS_FLG_2)"/>
+	</field>
+	<field name="CMS_D1_ACTIVITY_CHAR_VW_2.FA_PRIORITY_FLG_2" class="java.lang.String">
+		<property name="adhoc.display" value="Field Activity Priority"/>
+		<property name="adhoc.tree.uri" value="/CMS_D1_ACTIVITY_CHAR_VW_2/FA_PRIORITY_FLG_2"/>
+		<property name="semantic.tree.uri" value="/CMS_D1_ACTIVITY_CHAR_VW_2/FA_PRIORITY_FLG_2"/>
+		<property name="resourceId" value="JoinTree_1.CMS_D1_ACTIVITY_CHAR_VW.FA_PRIORITY_FLG"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CMS_D1_ACTIVITY_CHAR_VW_2/FA_PRIORITY_FLG_2"/>
+		<property name="previous.display" value="Field Activity Priority"/>
+		<property name="semantic.item.label" value="Field Activity Priority"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CMS_D1_ACTIVITY_CHAR_VW_2.FA_PRIORITY_FLG_2)"/>
+	</field>
+	<field name="C1_REPRESENTATIVE.BO_STATUS_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Status (Representative/Crew)"/>
+		<property name="adhoc.tree.uri" value="/C1_REPRESENTATIVE/BO_STATUS_CD"/>
+		<property name="semantic.tree.uri" value="/C1_REPRESENTATIVE/BO_STATUS_CD"/>
+		<property name="resourceId" value="JoinTree_1.C1_REPRESENTATIVE.BO_STATUS_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/C1_REPRESENTATIVE/BO_STATUS_CD"/>
+		<property name="previous.display" value="Status (Representative/Crew)"/>
+		<property name="semantic.item.label" value="Status (Representative/Crew)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(C1_REPRESENTATIVE.BO_STATUS_CD)"/>
+	</field>
+	<field name="C1_REPRESENTATIVE.BO_STATUS_REASON_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Status Reason (Representative/Crew)"/>
+		<property name="adhoc.tree.uri" value="/C1_REPRESENTATIVE/BO_STATUS_REASON_CD"/>
+		<property name="semantic.tree.uri" value="/C1_REPRESENTATIVE/BO_STATUS_REASON_CD"/>
+		<property name="resourceId" value="JoinTree_1.C1_REPRESENTATIVE.BO_STATUS_REASON_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/C1_REPRESENTATIVE/BO_STATUS_REASON_CD"/>
+		<property name="previous.display" value="Status Reason (Representative/Crew)"/>
+		<property name="semantic.item.label" value="Status Reason (Representative/Crew)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(C1_REPRESENTATIVE.BO_STATUS_REASON_CD)"/>
+	</field>
+	<field name="C1_REPRESENTATIVE.BUS_OBJ_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Business Object (Representative/Crew)"/>
+		<property name="adhoc.tree.uri" value="/C1_REPRESENTATIVE/BUS_OBJ_CD"/>
+		<property name="semantic.tree.uri" value="/C1_REPRESENTATIVE/BUS_OBJ_CD"/>
+		<property name="resourceId" value="JoinTree_1.C1_REPRESENTATIVE.BUS_OBJ_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/C1_REPRESENTATIVE/BUS_OBJ_CD"/>
+		<property name="previous.display" value="Business Object (Representative/Crew)"/>
+		<property name="semantic.item.label" value="Business Object (Representative/Crew)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(C1_REPRESENTATIVE.BUS_OBJ_CD)"/>
+	</field>
+	<field name="C1_REPRESENTATIVE.C1_REPRESENTATIVE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Representative/Crew"/>
+		<property name="adhoc.tree.uri" value="/C1_REPRESENTATIVE/C1_REPRESENTATIVE_CD"/>
+		<property name="semantic.tree.uri" value="/C1_REPRESENTATIVE/C1_REPRESENTATIVE_CD"/>
+		<property name="resourceId" value="JoinTree_1.C1_REPRESENTATIVE.C1_REPRESENTATIVE_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/C1_REPRESENTATIVE/C1_REPRESENTATIVE_CD"/>
+		<property name="previous.display" value="Representative/Crew"/>
+		<property name="semantic.item.label" value="Representative/Crew"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(C1_REPRESENTATIVE.C1_REPRESENTATIVE_CD)"/>
+	</field>
+	<field name="C1_REPRESENTATIVE.CRE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Create Date/Time (Representative/Crew)"/>
+		<property name="adhoc.tree.uri" value="/C1_REPRESENTATIVE/CRE_DTTM"/>
+		<property name="semantic.tree.uri" value="/C1_REPRESENTATIVE/CRE_DTTM"/>
+		<property name="resourceId" value="JoinTree_1.C1_REPRESENTATIVE.CRE_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/C1_REPRESENTATIVE/CRE_DTTM"/>
+		<property name="previous.display" value="Create Date/Time (Representative/Crew)"/>
+		<property name="semantic.item.label" value="Create Date/Time (Representative/Crew)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(C1_REPRESENTATIVE.CRE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="C1_REPRESENTATIVE.NT_XID_CD" class="java.lang.String">
+		<property name="adhoc.display" value="External System"/>
+		<property name="adhoc.tree.uri" value="/C1_REPRESENTATIVE/NT_XID_CD"/>
+		<property name="semantic.tree.uri" value="/C1_REPRESENTATIVE/NT_XID_CD"/>
+		<property name="resourceId" value="JoinTree_1.C1_REPRESENTATIVE.NT_XID_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/C1_REPRESENTATIVE/NT_XID_CD"/>
+		<property name="previous.display" value="External System"/>
+		<property name="semantic.item.label" value="External System"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(C1_REPRESENTATIVE.NT_XID_CD)"/>
+	</field>
+	<field name="C1_REPRESENTATIVE.PER_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Person ID"/>
+		<property name="adhoc.tree.uri" value="/C1_REPRESENTATIVE/PER_ID"/>
+		<property name="semantic.tree.uri" value="/C1_REPRESENTATIVE/PER_ID"/>
+		<property name="resourceId" value="JoinTree_1.C1_REPRESENTATIVE.PER_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/C1_REPRESENTATIVE/PER_ID"/>
+		<property name="previous.display" value="Person ID"/>
+		<property name="semantic.item.label" value="Person ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(C1_REPRESENTATIVE.PER_ID)"/>
+	</field>
+	<field name="C1_REPRESENTATIVE.STATUS_UPD_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Status Date/Time (Representative/Crew)"/>
+		<property name="adhoc.tree.uri" value="/C1_REPRESENTATIVE/STATUS_UPD_DTTM"/>
+		<property name="semantic.tree.uri" value="/C1_REPRESENTATIVE/STATUS_UPD_DTTM"/>
+		<property name="resourceId" value="JoinTree_1.C1_REPRESENTATIVE.STATUS_UPD_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/C1_REPRESENTATIVE/STATUS_UPD_DTTM"/>
+		<property name="previous.display" value="Status Date/Time (Representative/Crew)"/>
+		<property name="semantic.item.label" value="Status Date/Time (Representative/Crew)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(C1_REPRESENTATIVE.STATUS_UPD_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="C1_REPRESENTATIVE.USER_ID" class="java.lang.String">
+		<property name="adhoc.display" value="User"/>
+		<property name="adhoc.tree.uri" value="/C1_REPRESENTATIVE/USER_ID"/>
+		<property name="semantic.tree.uri" value="/C1_REPRESENTATIVE/USER_ID"/>
+		<property name="resourceId" value="JoinTree_1.C1_REPRESENTATIVE.USER_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/C1_REPRESENTATIVE/USER_ID"/>
+		<property name="previous.display" value="User"/>
+		<property name="semantic.item.label" value="User"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(C1_REPRESENTATIVE.USER_ID)"/>
+	</field>
+	<field name="D1_ACTIVITY_1.ACTIVITY_TYPE_CD_1" class="java.lang.String">
+		<property name="adhoc.display" value="Activity Type"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/ACTIVITY_TYPE_CD_1"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/ACTIVITY_TYPE_CD_1"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.ACTIVITY_TYPE_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/ACTIVITY_TYPE_CD_1"/>
+		<property name="previous.display" value="Activity Type"/>
+		<property name="semantic.item.label" value="Activity Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.ACTIVITY_TYPE_CD_1)"/>
+	</field>
+	<field name="D1_ACTIVITY_1.BO_STATUS_CD_2" class="java.lang.String">
+		<property name="adhoc.display" value="Status (Activity)"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/BO_STATUS_CD_2"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/BO_STATUS_CD_2"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.BO_STATUS_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/BO_STATUS_CD_2"/>
+		<property name="previous.display" value="Status (Activity)"/>
+		<property name="semantic.item.label" value="Status (Activity)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.BO_STATUS_CD_2)"/>
+	</field>
+	<field name="D1_ACTIVITY_1.BO_STATUS_REASON_CD_2" class="java.lang.String">
+		<property name="adhoc.display" value="Status Reason (Activity)"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/BO_STATUS_REASON_CD_2"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/BO_STATUS_REASON_CD_2"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.BO_STATUS_REASON_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/BO_STATUS_REASON_CD_2"/>
+		<property name="previous.display" value="Status Reason (Activity)"/>
+		<property name="semantic.item.label" value="Status Reason (Activity)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.BO_STATUS_REASON_CD_2)"/>
+	</field>
+	<field name="D1_ACTIVITY_1.BUS_OBJ_CD_2" class="java.lang.String">
+		<property name="adhoc.display" value="Business Object (Activity)"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/BUS_OBJ_CD_2"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/BUS_OBJ_CD_2"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.BUS_OBJ_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/BUS_OBJ_CD_2"/>
+		<property name="previous.display" value="Business Object (Activity)"/>
+		<property name="semantic.item.label" value="Business Object (Activity)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.BUS_OBJ_CD_2)"/>
+	</field>
+	<field name="D1_ACTIVITY_1.CANCEL_REASON_1" class="java.lang.String">
+		<property name="adhoc.display" value="Cancel Reason"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/CANCEL_REASON_1"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/CANCEL_REASON_1"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.CANCEL_REASON"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/CANCEL_REASON_1"/>
+		<property name="previous.display" value="Cancel Reason"/>
+		<property name="semantic.item.label" value="Cancel Reason"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.CANCEL_REASON_1)"/>
+	</field>
+	<field name="D1_ACTIVITY_1.CRE_DTTM_2" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Create Date/Time (Activity)"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/CRE_DTTM_2"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/CRE_DTTM_2"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.CRE_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/CRE_DTTM_2"/>
+		<property name="previous.display" value="Create Date/Time (Activity)"/>
+		<property name="semantic.item.label" value="Create Date/Time (Activity)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.CRE_DTTM_2)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_ACTIVITY_1.D1_ACTIVITY_ID_1" class="java.lang.String">
+		<property name="adhoc.display" value="Activity ID"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/D1_ACTIVITY_ID_1"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/D1_ACTIVITY_ID_1"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.D1_ACTIVITY_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/D1_ACTIVITY_ID_1"/>
+		<property name="previous.display" value="Activity ID"/>
+		<property name="semantic.item.label" value="Activity ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.D1_ACTIVITY_ID_1)"/>
+	</field>
+	<field name="D1_ACTIVITY_1.EFF_DTTM_1" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Effective Date/Time"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/EFF_DTTM_1"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/EFF_DTTM_1"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.EFF_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/EFF_DTTM_1"/>
+		<property name="previous.display" value="Effective Date/Time"/>
+		<property name="semantic.item.label" value="Effective Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.EFF_DTTM_1)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_ACTIVITY_1.END_DTTM_1" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="End Date/Time"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/END_DTTM_1"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/END_DTTM_1"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.END_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/END_DTTM_1"/>
+		<property name="previous.display" value="End Date/Time"/>
+		<property name="semantic.item.label" value="End Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.END_DTTM_1)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_ACTIVITY_1.FIELD_TASK_TYPE_1" class="java.lang.String">
+		<property name="adhoc.display" value="Field Task Type"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/FIELD_TASK_TYPE_1"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/FIELD_TASK_TYPE_1"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.FIELD_TASK_TYPE"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/FIELD_TASK_TYPE_1"/>
+		<property name="previous.display" value="Field Task Type"/>
+		<property name="semantic.item.label" value="Field Task Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.FIELD_TASK_TYPE_1)"/>
+	</field>
+	<field name="D1_ACTIVITY_1.RESCHEDULE_REASON_1" class="java.lang.String">
+		<property name="adhoc.display" value="Reschedule Reason"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/RESCHEDULE_REASON_1"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/RESCHEDULE_REASON_1"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.RESCHEDULE_REASON"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/RESCHEDULE_REASON_1"/>
+		<property name="previous.display" value="Reschedule Reason"/>
+		<property name="semantic.item.label" value="Reschedule Reason"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.RESCHEDULE_REASON_1)"/>
+	</field>
+	<field name="D1_ACTIVITY_1.RETENTION_PERIOD_1" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Retention Period"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/RETENTION_PERIOD_1"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/RETENTION_PERIOD_1"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.RETENTION_PERIOD"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/RETENTION_PERIOD_1"/>
+		<property name="previous.display" value="Retention Period"/>
+		<property name="semantic.item.label" value="Retention Period"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_ACTIVITY_1.RETENTION_PERIOD_1)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_ACTIVITY_1.START_DTTM_1" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Start Date/Time"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/START_DTTM_1"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/START_DTTM_1"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.START_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/START_DTTM_1"/>
+		<property name="previous.display" value="Start Date/Time"/>
+		<property name="semantic.item.label" value="Start Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.START_DTTM_1)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_ACTIVITY_1.STATUS_UPD_DTTM_2" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Status Date/Time (Representative/Crew)"/>
+		<property name="adhoc.tree.uri" value="/D1_ACTIVITY_1/STATUS_UPD_DTTM_2"/>
+		<property name="semantic.tree.uri" value="/D1_ACTIVITY_1/STATUS_UPD_DTTM_2"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY.STATUS_UPD_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_ACTIVITY_1/STATUS_UPD_DTTM_2"/>
+		<property name="previous.display" value="Status Date/Time (Representative/Crew)"/>
+		<property name="semantic.item.label" value="Status Date/Time (Representative/Crew)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_ACTIVITY_1.STATUS_UPD_DTTM_2)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="NewSet2.DAYS_OLD" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Days Old"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/DAYS_OLD"/>
+		<property name="semantic.tree.uri" value="/NewSet2/DAYS_OLD"/>
+		<property name="resourceId" value="JoinTree_1.DAYS_OLD"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/DAYS_OLD"/>
+		<property name="previous.display" value="Days Old"/>
+		<property name="semantic.item.label" value="Days Old"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.DAYS_OLD)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="NewSet2.DESCR100" class="java.lang.String">
+		<property name="adhoc.display" value="Representative/Crew (Name)"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/DESCR100"/>
+		<property name="semantic.tree.uri" value="/NewSet2/DESCR100"/>
+		<property name="resourceId" value="JoinTree_1.C1_REPRESENTATIVE_L.DESCR100"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/DESCR100"/>
+		<property name="previous.display" value="Representative/Crew (Name)"/>
+		<property name="semantic.item.label" value="Representative/Crew (Name)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet2.DESCR100)"/>
+	</field>
+	<field name="NewSet2.D1_ACTIVITY_ID_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Total # of Activities"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/D1_ACTIVITY_ID_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet2/D1_ACTIVITY_ID_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.D1_ACTIVITY_ID_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/D1_ACTIVITY_ID_DISTINCT"/>
+		<property name="previous.display" value="Distinct Activity"/>
+		<property name="semantic.item.label" value="Total # of Activities"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.D1_ACTIVITY_ID_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet2.DAYS_COMPLETED" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Days Completion"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/DAYS_COMPLETED"/>
+		<property name="semantic.tree.uri" value="/NewSet2/DAYS_COMPLETED"/>
+		<property name="resourceId" value="JoinTree_1.DAYS_COMPLETED"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/DAYS_COMPLETED"/>
+		<property name="previous.display" value="Days Completion"/>
+		<property name="semantic.item.label" value="Days Completion"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.DAYS_COMPLETED)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="NewSet2.USER_ID_NAME" class="java.lang.String">
+		<property name="adhoc.display" value="User (Name)"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/USER_ID_NAME"/>
+		<property name="semantic.tree.uri" value="/NewSet2/USER_ID_NAME"/>
+		<property name="resourceId" value="JoinTree_1.USER_ID_NAME"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/USER_ID_NAME"/>
+		<property name="previous.display" value="User (Name)"/>
+		<property name="semantic.item.label" value="User (Name)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet2.USER_ID_NAME)"/>
+	</field>
+	<field name="NewSet2.DAYS_STARTED_SINCE_CREATE" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Days Started Since Creation"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/DAYS_STARTED_SINCE_CREATE"/>
+		<property name="semantic.tree.uri" value="/NewSet2/DAYS_STARTED_SINCE_CREATE"/>
+		<property name="resourceId" value="JoinTree_1.DAYS_STARTED_SINCE_CREATE"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/DAYS_STARTED_SINCE_CREATE"/>
+		<property name="previous.display" value="Days Started Since Creation"/>
+		<property name="semantic.item.label" value="Days Started Since Creation"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.DAYS_STARTED_SINCE_CREATE)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="NewSet2.C1_REPRESENTATIVE_CD_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct Representative/Crew"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/C1_REPRESENTATIVE_CD_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet2/C1_REPRESENTATIVE_CD_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.C1_REPRESENTATIVE_CD_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/C1_REPRESENTATIVE_CD_DISTINCT"/>
+		<property name="previous.display" value="Distinct Representative/Crew"/>
+		<property name="semantic.item.label" value="Distinct Representative/Crew"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.C1_REPRESENTATIVE_CD_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet2.REQUESTER_USER_NAME" class="java.lang.String">
+		<property name="adhoc.display" value="Requester User (Name)"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/REQUESTER_USER_NAME"/>
+		<property name="semantic.tree.uri" value="/NewSet2/REQUESTER_USER_NAME"/>
+		<property name="resourceId" value="JoinTree_1.REQUESTER_USER_NAME"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/REQUESTER_USER_NAME"/>
+		<property name="previous.display" value="Requester User (Name)"/>
+		<property name="semantic.item.label" value="Requester User (Name)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet2.REQUESTER_USER_NAME)"/>
+	</field>
+</jasperReport>

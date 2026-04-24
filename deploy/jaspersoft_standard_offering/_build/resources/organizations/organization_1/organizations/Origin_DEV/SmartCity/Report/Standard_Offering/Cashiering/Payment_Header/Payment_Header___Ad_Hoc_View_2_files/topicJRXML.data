@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="adhocReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="6cbc522c-c986-4e19-b2ce-e20f602d1268">
+	<property name="adhoc.topic.escape.variable.chars"/>
+	<property name="DESCR_2_1" value="Canceled"/>
+	<property name="adhoc.metadata.version" value="944"/>
+	<property name="has.modified.presentation" value="false"/>
+	<property name="base.datasource.version" value="0"/>
+	<property name="use.datasource.presentation" value="true"/>
+	<property name="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.TopicReportUnit" value="/temp/sl_topic_34a2fc6e-65b4-418f-a0ff-dc6de139f1ae"/>
+	<parameter name="CRE_DTTM_1_1" class="net.sf.jasperreports.types.date.TimestampRange">
+		<defaultValueExpression><![CDATA[com.jaspersoft.jasperserver.api.common.util.rd.DateRangeFactory.getInstance("MONTH-6",java.sql.Timestamp.class)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DESCR_2_1" class="java.util.Collection" nestedType="java.lang.String">
+		<defaultValueExpression><![CDATA[java.util.Arrays.asList(($P{JASPER_REPORT}.getProperty("DESCR_2_1")).split("(?<!\\\\),",-1))]]></defaultValueExpression>
+	</parameter>
+	<queryString language="domain">
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema">
+  <queryFields>
+    <queryField id="CI_PAY.CI_PAY_EVENT.CRE_DTTM"></queryField>
+    <queryField id="CI_PAY.CI_PAY_EVENT.DOC_ID"></queryField>
+    <queryField id="CI_PAY.CI_PAY_EVENT.ILM_ARCH_SW_1"></queryField>
+    <queryField id="CI_PAY.CI_PAY_EVENT.ILM_DT_1"></queryField>
+    <queryField id="CI_PAY.CI_PAY_EVENT.PAY_DT"></queryField>
+    <queryField id="CI_PAY.CI_PAY_EVENT.PAY_EVENT_ID_1"></queryField>
+    <queryField id="CI_PAY.CI_PAY_EVENT.VERSION_1"></queryField>
+    <queryField id="CI_PAY.ACCT_ID"></queryField>
+    <queryField id="CI_PAY.CAN_RSN_CD"></queryField>
+    <queryField id="CI_PAY.CURRENCY_CD"></queryField>
+    <queryField id="CI_PAY.ILM_ARCH_SW"></queryField>
+    <queryField id="CI_PAY.ILM_DT"></queryField>
+    <queryField id="CI_PAY.MATCH_TYPE_CD"></queryField>
+    <queryField id="CI_PAY.MATCH_VAL"></queryField>
+    <queryField id="CI_PAY.NON_CIS_COMMENT"></queryField>
+    <queryField id="CI_PAY.NON_CIS_NAME"></queryField>
+    <queryField id="CI_PAY.NON_CIS_REF_NBR"></queryField>
+    <queryField id="CI_PAY.PAY_AMT"></queryField>
+    <queryField id="CI_PAY.PAY_EVENT_ID"></queryField>
+    <queryField id="CI_PAY.PAY_ID"></queryField>
+    <queryField id="CI_PAY.PAY_STATUS_FLG"></queryField>
+    <queryField id="CI_PAY.VERSION"></queryField>
+    <queryField id="CI_PAY_EVENT_1.CRE_DTTM_1"></queryField>
+    <queryField id="CI_PAY_EVENT_1.DOC_ID_1"></queryField>
+    <queryField id="CI_PAY_EVENT_1.ILM_ARCH_SW_2"></queryField>
+    <queryField id="CI_PAY_EVENT_1.ILM_DT_2"></queryField>
+    <queryField id="CI_PAY_EVENT_1.PAY_DT_1"></queryField>
+    <queryField id="CI_PAY_EVENT_1.PAY_EVENT_ID_2"></queryField>
+    <queryField id="CI_PAY_EVENT_1.VERSION_2"></queryField>
+    <queryField id="NewSet2.PAY_EVENT_ID_DISTINCT"></queryField>
+    <queryField id="NewSet2.PAY_ID_DISTINCT"></queryField>
+  </queryFields>
+</query>]]>
+	</queryString>
+	<field name="NewSet1.DESCR" class="java.lang.String">
+		<property name="adhoc.display" value="Match Type Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR"/>
+		<property name="resourceId" value="JoinTree_1.CI_MATCH_TYPE_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.tree.labels">
+			<![CDATA[[{"uri":"/CI_PAY","resourceId":"JoinTree_1","label":"1.) Payment Header"},{"uri":"/CI_PAY_EVENT_1","resourceId":"JoinTree_1","label":"1.) Payment Event"},{"uri":"/NewSet1","resourceId":"JoinTree_1","label":"1.) Descriptions"},{"uri":"/NewSet2","resourceId":"JoinTree_1","label":"1.) Formulas"}]]]>
+		</property>
+		<property name="semantic.tree.sort.order">
+			<![CDATA[{"CI_PAY":1,"ACCT_ID":2,"CAN_RSN_CD":3,"CURRENCY_CD":4,"MATCH_TYPE_CD":5,"MATCH_VAL":6,"NON_CIS_COMMENT":7,"NON_CIS_NAME":8,"NON_CIS_REF_NBR":9,"PAY_AMT":10,"PAY_EVENT_ID":11,"PAY_ID":12,"PAY_STATUS_FLG":13,"CI_PAY_EVENT_1":14,"CRE_DTTM_1":15,"DOC_ID_1":16,"PAY_DT_1":17,"PAY_EVENT_ID_2":18,"NewSet1":19,"DESCR_1":20,"DESCR":21,"DESCR_2":22,"NewSet2":23,"ACCT_ID_DISTINCT":24,"PAY_EVENT_ID_DISTINCT":25,"PAY_ID_DISTINCT":26,"DAYS_OLD":27,"ENTITY_NAME_UPR":28}]]>
+		</property>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR"/>
+		<property name="previous.display" value="Match Type Description"/>
+		<property name="semantic.item.label" value="Match Type Description"/>
+		<property name="adhoc.chosen.tree.labels">
+			<![CDATA[[{"uri":"/NewSet1","resourceId":"JoinTree_1","label":"1.) Descriptions"},{"uri":"/CI_PAY","resourceId":"JoinTree_1","label":"1.) Payment Header"},{"uri":"/CI_PAY_EVENT_1","resourceId":"JoinTree_1","label":"1.) Payment Event"},{"uri":"/NewSet2","resourceId":"JoinTree_1","label":"1.) Formulas"}]]]>
+		</property>
+		<property name="adhoc.chosen.tree.order">
+			<![CDATA[{"CI_PER_PRIM_VW":1,"ENTITY_NAME":2,"PER_ID":3,"CI_PAY":4,"ACCT_ID":5,"CAN_RSN_CD":6,"CURRENCY_CD":7,"ILM_ARCH_SW":8,"ILM_DT":9,"MATCH_TYPE_CD":10,"MATCH_VAL":11,"NON_CIS_COMMENT":12,"NON_CIS_NAME":13,"NON_CIS_REF_NBR":14,"PAY_AMT":15,"PAY_EVENT_ID":16,"PAY_ID":17,"PAY_STATUS_FLG":18,"VERSION":19,"CI_PAY_EVENT_1":20,"CRE_DTTM_1":21,"DOC_ID_1":22,"ILM_ARCH_SW_2":23,"ILM_DT_2":24,"PAY_DT_1":25,"PAY_EVENT_ID_2":26,"VERSION_2":27,"NewSet1":28,"DESCR":29,"DESCR_2":30,"DESCR_1":31,"NewSet2":32,"DAYS_OLD":33,"PAY_EVENT_ID_DISTINCT":34,"PAY_ID_DISTINCT":35}]]>
+		</property>
+		<property name="slIsTableAsList" value="false"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR)"/>
+		<property name="adhoc.chosen.tree.is.flattened" value="false"/>
+	</field>
+	<field name="NewSet1.DESCR_2" class="java.lang.String">
+		<property name="adhoc.display" value="Payment Status Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_2"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_2"/>
+		<property name="resourceId" value="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_2"/>
+		<property name="previous.display" value="Payment Status Description"/>
+		<property name="semantic.item.label" value="Payment Status Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_2)"/>
+	</field>
+	<field name="NewSet1.DESCR_1" class="java.lang.String">
+		<property name="adhoc.display" value="Cancel Reason Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_1"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_CAN_RSN_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_1"/>
+		<property name="previous.display" value="Cancel Reason Description"/>
+		<property name="semantic.item.label" value="Cancel Reason Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_1)"/>
+	</field>
+	<field name="CI_PAY.ACCT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Account ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY/ACCT_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY/ACCT_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY.ACCT_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY/ACCT_ID"/>
+		<property name="previous.display" value="Account ID"/>
+		<property name="semantic.item.label" value="Account ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY.ACCT_ID)"/>
+	</field>
+	<field name="CI_PAY.CAN_RSN_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Cancel Reason"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY/CAN_RSN_CD"/>
+		<property name="semantic.tree.uri" value="/CI_PAY/CAN_RSN_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY.CAN_RSN_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY/CAN_RSN_CD"/>
+		<property name="previous.display" value="Cancel Reason"/>
+		<property name="semantic.item.label" value="Cancel Reason"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY.CAN_RSN_CD)"/>
+	</field>
+	<field name="CI_PAY.CURRENCY_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Currency Code"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY/CURRENCY_CD"/>
+		<property name="semantic.tree.uri" value="/CI_PAY/CURRENCY_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY.CURRENCY_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY/CURRENCY_CD"/>
+		<property name="previous.display" value="Currency Code"/>
+		<property name="semantic.item.label" value="Currency Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY.CURRENCY_CD)"/>
+	</field>
+	<field name="CI_PAY.MATCH_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Match Type"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY/MATCH_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/CI_PAY/MATCH_TYPE_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY.MATCH_TYPE_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY/MATCH_TYPE_CD"/>
+		<property name="previous.display" value="Match Type"/>
+		<property name="semantic.item.label" value="Match Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY.MATCH_TYPE_CD)"/>
+	</field>
+	<field name="CI_PAY.MATCH_VAL" class="java.lang.String">
+		<property name="adhoc.display" value="Match Value"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY/MATCH_VAL"/>
+		<property name="semantic.tree.uri" value="/CI_PAY/MATCH_VAL"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY.MATCH_VAL"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY/MATCH_VAL"/>
+		<property name="previous.display" value="Match Value"/>
+		<property name="semantic.item.label" value="Match Value"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY.MATCH_VAL)"/>
+	</field>
+	<field name="CI_PAY.NON_CIS_COMMENT" class="java.lang.String">
+		<property name="adhoc.display" value="Non CIS Comments"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY/NON_CIS_COMMENT"/>
+		<property name="semantic.tree.uri" value="/CI_PAY/NON_CIS_COMMENT"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY.NON_CIS_COMMENT"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY/NON_CIS_COMMENT"/>
+		<property name="previous.display" value="Non CIS Comments"/>
+		<property name="semantic.item.label" value="Non CIS Comments"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY.NON_CIS_COMMENT)"/>
+	</field>
+	<field name="CI_PAY.NON_CIS_NAME" class="java.lang.String">
+		<property name="adhoc.display" value="Non CIS Name"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY/NON_CIS_NAME"/>
+		<property name="semantic.tree.uri" value="/CI_PAY/NON_CIS_NAME"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY.NON_CIS_NAME"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY/NON_CIS_NAME"/>
+		<property name="previous.display" value="Non CIS Name"/>
+		<property name="semantic.item.label" value="Non CIS Name"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY.NON_CIS_NAME)"/>
+	</field>
+	<field name="CI_PAY.NON_CIS_REF_NBR" class="java.lang.String">
+		<property name="adhoc.display" value="Reference Number"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY/NON_CIS_REF_NBR"/>
+		<property name="semantic.tree.uri" value="/CI_PAY/NON_CIS_REF_NBR"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY.NON_CIS_REF_NBR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY/NON_CIS_REF_NBR"/>
+		<property name="previous.display" value="Reference Number"/>
+		<property name="semantic.item.label" value="Reference Number"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY.NON_CIS_REF_NBR)"/>
+	</field>
+	<field name="CI_PAY.PAY_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Payment Amount"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY/PAY_AMT"/>
+		<property name="semantic.tree.uri" value="/CI_PAY/PAY_AMT"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY.PAY_AMT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY/PAY_AMT"/>
+		<property name="previous.display" value="Payment Amount"/>
+		<property name="semantic.item.label" value="Payment Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(CI_PAY.PAY_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_PAY.PAY_EVENT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Payment Event ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY/PAY_EVENT_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY/PAY_EVENT_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY.PAY_EVENT_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY/PAY_EVENT_ID"/>
+		<property name="previous.display" value="Payment Event ID"/>
+		<property name="semantic.item.label" value="Payment Event ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY.PAY_EVENT_ID)"/>
+	</field>
+	<field name="CI_PAY.PAY_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Payment ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY/PAY_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PAY/PAY_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY.PAY_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY/PAY_ID"/>
+		<property name="previous.display" value="Payment ID"/>
+		<property name="semantic.item.label" value="Payment ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY.PAY_ID)"/>
+	</field>
+	<field name="CI_PAY.PAY_STATUS_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Payment Status"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY/PAY_STATUS_FLG"/>
+		<property name="semantic.tree.uri" value="/CI_PAY/PAY_STATUS_FLG"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY.PAY_STATUS_FLG"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY/PAY_STATUS_FLG"/>
+		<property name="previous.display" value="Payment Status"/>
+		<property name="semantic.item.label" value="Payment Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY.PAY_STATUS_FLG)"/>
+	</field>
+	<field name="CI_PAY_EVENT_1.CRE_DTTM_1" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Create Date/Time"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_EVENT_1/CRE_DTTM_1"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_EVENT_1/CRE_DTTM_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_EVENT.CRE_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_EVENT_1/CRE_DTTM_1"/>
+		<property name="previous.display" value="Create Date/Time"/>
+		<property name="semantic.item.label" value="Create Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_EVENT_1.CRE_DTTM_1)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_PAY_EVENT_1.DOC_ID_1" class="java.lang.String">
+		<property name="adhoc.display" value="Document Number"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_EVENT_1/DOC_ID_1"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_EVENT_1/DOC_ID_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_EVENT.DOC_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_EVENT_1/DOC_ID_1"/>
+		<property name="previous.display" value="Document Number"/>
+		<property name="semantic.item.label" value="Document Number"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_EVENT_1.DOC_ID_1)"/>
+	</field>
+	<field name="CI_PAY_EVENT_1.PAY_DT_1" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Payment Date"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_EVENT_1/PAY_DT_1"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_EVENT_1/PAY_DT_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_EVENT.PAY_DT"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_EVENT_1/PAY_DT_1"/>
+		<property name="previous.display" value="Payment Date"/>
+		<property name="semantic.item.label" value="Payment Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_EVENT_1.PAY_DT_1)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_PAY_EVENT_1.PAY_EVENT_ID_2" class="java.lang.String">
+		<property name="adhoc.display" value="Payment Event ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PAY_EVENT_1/PAY_EVENT_ID_2"/>
+		<property name="semantic.tree.uri" value="/CI_PAY_EVENT_1/PAY_EVENT_ID_2"/>
+		<property name="resourceId" value="JoinTree_1.CI_PAY_EVENT.PAY_EVENT_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PAY_EVENT_1/PAY_EVENT_ID_2"/>
+		<property name="previous.display" value="Payment Event ID"/>
+		<property name="semantic.item.label" value="Payment Event ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PAY_EVENT_1.PAY_EVENT_ID_2)"/>
+	</field>
+	<field name="NewSet2.DAYS_OLD" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Days Old"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/DAYS_OLD"/>
+		<property name="semantic.tree.uri" value="/NewSet2/DAYS_OLD"/>
+		<property name="resourceId" value="JoinTree_1.DAYS_OLD"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/DAYS_OLD"/>
+		<property name="previous.display" value="Days Old"/>
+		<property name="semantic.item.label" value="Days Old"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.DAYS_OLD)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="NewSet2.ACCT_ID_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct  Account ID"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/ACCT_ID_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet2/ACCT_ID_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.ACCT_ID_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/ACCT_ID_DISTINCT"/>
+		<property name="previous.display" value="Distinct  Account ID"/>
+		<property name="semantic.item.label" value="Distinct  Account ID"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.ACCT_ID_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet2.ENTITY_NAME_UPR" class="java.lang.String">
+		<property name="adhoc.display" value="Name"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/ENTITY_NAME_UPR"/>
+		<property name="semantic.tree.uri" value="/NewSet2/ENTITY_NAME_UPR"/>
+		<property name="resourceId" value="JoinTree_1.CI_PER_NAME.ENTITY_NAME_UPR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/ENTITY_NAME_UPR"/>
+		<property name="previous.display" value="Name"/>
+		<property name="semantic.item.label" value="Name"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet2.ENTITY_NAME_UPR)"/>
+	</field>
+	<field name="NewSet2.PAY_EVENT_ID_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct Payment Event ID"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/PAY_EVENT_ID_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet2/PAY_EVENT_ID_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.PAY_EVENT_ID_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/PAY_EVENT_ID_DISTINCT"/>
+		<property name="previous.display" value="Distinct Payment Event ID"/>
+		<property name="semantic.item.label" value="Distinct Payment Event ID"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.PAY_EVENT_ID_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet2.PAY_ID_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct Payment ID"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/PAY_ID_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet2/PAY_ID_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.PAY_ID_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/PAY_ID_DISTINCT"/>
+		<property name="previous.display" value="Distinct Payment ID"/>
+		<property name="semantic.item.label" value="Distinct Payment ID"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.PAY_ID_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+</jasperReport>

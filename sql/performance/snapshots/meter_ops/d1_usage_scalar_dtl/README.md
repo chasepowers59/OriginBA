@@ -12,6 +12,13 @@ Natural key:
 - `D1_USAGE_ID`
 - `SEQ_NUM`
 
+Current validation note:
+- in the connected test environment, source data contains `48` duplicate
+  `(D1_USAGE_ID, SEQ_NUM)` pairs
+- the snapshot mirrors those same duplicates, so the procedure is source-
+  consistent but the documented natural key is not a guaranteed unique key in
+  this environment
+
 ## Use for
 - quantity and final quantity analysis by `UOM / TOU / SQI`
 - customer class, service type, and premise consumption reporting
@@ -45,6 +52,9 @@ If `D1_USAGE_SCALAR_DTL_RPT_CURR` is empty and you deploy the rolling procedure 
 
 Validated cutover note:
 - on `2026-04-20`, before/after validation confirmed that the rolling 12-month nightly procedure preserved the existing scalar snapshot row counts and additive usage totals while keeping historical rows in place
+- on `2026-04-24`, follow-up review confirmed rolling-window quantity parity is
+  still exact, but duplicate `(D1_USAGE_ID, SEQ_NUM)` pairs remain present in
+  both source and snapshot and need separate grain-definition review
 
 ## Domain XML
 - Workspace copy: `D1_USAGE_SCALAR_DTL_RPT_CURR_End_User_Friendly.xml`

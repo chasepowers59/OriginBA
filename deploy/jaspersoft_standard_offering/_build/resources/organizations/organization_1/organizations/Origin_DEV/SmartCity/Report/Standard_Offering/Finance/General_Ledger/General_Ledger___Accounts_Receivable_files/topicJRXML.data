@@ -1,0 +1,1476 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="adhocReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="2f25da48-69d5-47ad-af5e-7746a9400695">
+	<property name="has.modified.presentation" value="false"/>
+	<property name="base.datasource.version" value="2"/>
+	<property name="use.datasource.presentation" value="true"/>
+	<property name="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.TopicReportUnit" value="/temp/sl_topic_2328e102-edd8-418f-a740-abf74af140bc"/>
+	<property name="adhoc.metadata.version" value="279"/>
+	<property name="adhoc.topic.escape.variable.chars"/>
+	<property name="DST_DESC_1" value="Accounts Receivable - Pay Arrangement,Accounts Receivable - Payment Arrangement - Water"/>
+	<parameter name="DST_DESC_1" class="java.util.Collection" nestedType="java.lang.String">
+		<defaultValueExpression><![CDATA[java.util.Arrays.asList(($P{JASPER_REPORT}.getProperty("DST_DESC_1")).split("(?<!\\\\),",-1))]]></defaultValueExpression>
+	</parameter>
+	<queryString language="domain">
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema">
+  <queryFields>
+    <queryField id="GL_LINE.FT_ID"></queryField>
+    <queryField id="GL_LINE.GL_SEQ_NBR"></queryField>
+    <queryField id="GL_LINE.GL_ACCT"></queryField>
+    <queryField id="GL_LINE.DST_DESC"></queryField>
+    <queryField id="GL_LINE.DST_ID"></queryField>
+    <queryField id="GL_LINE.GL_AMOUNT"></queryField>
+    <queryField id="GL_LINE.STATISTIC_AMOUNT"></queryField>
+    <queryField id="GL_LINE.TOT_AMT_SW"></queryField>
+    <queryField id="GL_LINE.CHAR_TYPE_CD"></queryField>
+    <queryField id="GL_LINE.CHAR_VAL"></queryField>
+    <queryField id="FT_CORE.FT_TYPE_FLG_DESC"></queryField>
+    <queryField id="FT_CORE.FT_TYPE_FLG"></queryField>
+    <queryField id="FT_CORE.ACCOUNTING_DT"></queryField>
+    <queryField id="FT_CORE.ARS_DT"></queryField>
+    <queryField id="FT_CORE.FT_CRE_DTTM"></queryField>
+    <queryField id="FT_CORE.CUR_AMT"></queryField>
+    <queryField id="FT_CORE.TOT_AMT"></queryField>
+    <queryField id="FT_CORE.CURRENCY_CD"></queryField>
+    <queryField id="FT_CORE.BILL_ID"></queryField>
+    <queryField id="FT_CORE.PARENT_ID"></queryField>
+    <queryField id="FT_CORE.SIBLING_ID"></queryField>
+    <queryField id="FT_CORE.GL_DISTRIB_STATUS_DESC"></queryField>
+    <queryField id="FT_CORE.GL_DISTRIB_STATUS"></queryField>
+    <queryField id="FT_CORE.GL_DIVISION_DESC"></queryField>
+    <queryField id="FT_CORE.GL_DIVISION"></queryField>
+    <queryField id="FT_CORE.CIS_DIVISION"></queryField>
+    <queryField id="FT_CORE.SCHED_DISTRIB_DT"></queryField>
+    <queryField id="FT_CORE.XFERRED_OUT_SW"></queryField>
+    <queryField id="FT_CORE.XFER_TO_GL_DT"></queryField>
+    <queryField id="FT_CORE.MATCH_EVT_ID"></queryField>
+    <queryField id="FT_CORE.CORRECTION_SW"></queryField>
+    <queryField id="FT_CORE.NEW_DEBIT_SW"></queryField>
+    <queryField id="FT_CORE.SHOW_ON_BILL_SW"></queryField>
+    <queryField id="FT_CORE.NOT_IN_ARS_SW"></queryField>
+    <queryField id="ACCT_SERVICE.CUSTOMER_NAME_UPR"></queryField>
+    <queryField id="ACCT_SERVICE.PER_ID"></queryField>
+    <queryField id="ACCT_SERVICE.ACCT_ID"></queryField>
+    <queryField id="ACCT_SERVICE.SA_ID"></queryField>
+    <queryField id="ACCT_SERVICE.SA_STATUS_DESC"></queryField>
+    <queryField id="ACCT_SERVICE.SA_STATUS_FLG"></queryField>
+    <queryField id="ACCT_SERVICE.SA_TYPE_DESC"></queryField>
+    <queryField id="ACCT_SERVICE.SA_TYPE_CD"></queryField>
+    <queryField id="ACCT_SERVICE.CHAR_PREM_ID"></queryField>
+    <queryField id="ACCT_SERVICE.BILL_CYC_DESC"></queryField>
+    <queryField id="ACCT_SERVICE.BILL_CYC_CD"></queryField>
+    <queryField id="ACCT_SERVICE.CUST_CL_DESC"></queryField>
+    <queryField id="ACCT_SERVICE.CUST_CL_CD"></queryField>
+    <queryField id="ACCT_SERVICE.COLL_CL_DESC"></queryField>
+    <queryField id="ACCT_SERVICE.COLL_CL_CD"></queryField>
+    <queryField id="ACCT_SERVICE.ACCT_MGMT_GRP_DESC"></queryField>
+    <queryField id="ACCT_SERVICE.ACCT_MGMT_GRP_CD"></queryField>
+    <queryField id="BALANCE_CONTROL.BAL_CTL_GRP_ID"></queryField>
+    <queryField id="BALANCE_CONTROL.BALANCING_STAT_DESC"></queryField>
+    <queryField id="BALANCE_CONTROL.BALANCING_STAT_FLG"></queryField>
+    <queryField id="BALANCE_CONTROL.BCG_CUR_AMT"></queryField>
+    <queryField id="BALANCE_CONTROL.BCG_TOT_AMT"></queryField>
+    <queryField id="BALANCE_CONTROL.BCG_CUR_BAL"></queryField>
+    <queryField id="BALANCE_CONTROL.BCG_TOT_BAL"></queryField>
+    <queryField id="BALANCE_CONTROL.BCG_CRE_DTTM"></queryField>
+    <queryField id="BILL_SEGMENT.BSEG_ID"></queryField>
+    <queryField id="BILL_SEGMENT.BSEG_STAT_DESC"></queryField>
+    <queryField id="BILL_SEGMENT.BSEG_STAT_FLG"></queryField>
+    <queryField id="BILL_SEGMENT.BSEG_BILL_CYC_DESC"></queryField>
+    <queryField id="BILL_SEGMENT.BSEG_BILL_CYC_CD"></queryField>
+    <queryField id="BILL_SEGMENT.BSEG_START_DT"></queryField>
+    <queryField id="BILL_SEGMENT.BSEG_END_DT"></queryField>
+    <queryField id="BILL_SEGMENT.BSEG_PREM_ID"></queryField>
+    <queryField id="BILL_SEGMENT.BSEG_EST_SW"></queryField>
+    <queryField id="BILL_SEGMENT.BSEG_CLOSING_SW"></queryField>
+    <queryField id="BILL_SEGMENT.BSEG_CAN_RSN_DESC"></queryField>
+    <queryField id="BILL_SEGMENT.BSEG_CAN_RSN_CD"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.ADJ_ID"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.ADJ_STATUS_DESC"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.ADJ_STATUS_FLG"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.ADJ_TYPE_DESC"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.ADJ_TYPE_CD"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.ADJ_CAN_RSN_DESC"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.ADJ_CAN_RSN_CD"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.ADJ_AMT"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.XFER_ADJ_ID"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.BEHALF_SA_ID"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.BASE_AMT"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.GEN_REF_DT"></queryField>
+    <queryField id="ADJUSTMENT_TRACE.APPR_REQ_ID"></queryField>
+    <queryField id="PAYMENT_SEGMENT.PAY_SEG_ID"></queryField>
+    <queryField id="PAYMENT_SEGMENT.PAY_ID"></queryField>
+    <queryField id="PAYMENT_SEGMENT.PAY_SEG_AMT"></queryField>
+    <queryField id="PAYMENT_SEGMENT.PAY_MATCH_EVT_ID"></queryField>
+    <queryField id="SNAPSHOT_AUDIT.FREEZE_SW"></queryField>
+    <queryField id="SNAPSHOT_AUDIT.FREEZE_DTTM"></queryField>
+    <queryField id="SNAPSHOT_AUDIT.FREEZE_USER_NAME"></queryField>
+    <queryField id="SNAPSHOT_AUDIT.FREEZE_USER_ID"></queryField>
+    <queryField id="SNAPSHOT_AUDIT.LOAD_DTTM"></queryField>
+  </queryFields>
+</query>]]>
+	</queryString>
+	<field name="GL_LINE.FT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Financial Transaction ID"/>
+		<property name="semantic.item.label" value="Financial Transaction ID"/>
+		<property name="adhoc.tree.uri" value="/GL_LINE/FT_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.FT_ID"/>
+		<property name="semantic.tree.uri" value="/GL_LINE/FT_ID"/>
+		<property name="semantic.tree.sort.order">
+			<![CDATA[{"GL_LINE":1,"FT_ID":2,"GL_SEQ_NBR":3,"GL_ACCT":4,"DST_DESC":5,"DST_ID":6,"GL_AMOUNT":7,"STATISTIC_AMOUNT":8,"TOT_AMT_SW":9,"CHAR_TYPE_CD":10,"CHAR_VAL":11,"FT_CORE":12,"FT_TYPE_FLG_DESC":13,"FT_TYPE_FLG":14,"ACCOUNTING_DT":15,"ARS_DT":16,"FT_CRE_DTTM":17,"CUR_AMT":18,"TOT_AMT":19,"CURRENCY_CD":20,"BILL_ID":21,"PARENT_ID":22,"SIBLING_ID":23,"GL_DISTRIB_STATUS_DESC":24,"GL_DISTRIB_STATUS":25,"GL_DIVISION_DESC":26,"GL_DIVISION":27,"CIS_DIVISION":28,"SCHED_DISTRIB_DT":29,"XFERRED_OUT_SW":30,"XFER_TO_GL_DT":31,"MATCH_EVT_ID":32,"CORRECTION_SW":33,"NEW_DEBIT_SW":34,"SHOW_ON_BILL_SW":35,"NOT_IN_ARS_SW":36,"ACCT_SERVICE":37,"CUSTOMER_NAME_UPR":38,"PER_ID":39,"ACCT_ID":40,"SA_ID":41,"SA_STATUS_DESC":42,"SA_STATUS_FLG":43,"SA_TYPE_DESC":44,"SA_TYPE_CD":45,"CHAR_PREM_ID":46,"BILL_CYC_DESC":47,"BILL_CYC_CD":48,"CUST_CL_DESC":49,"CUST_CL_CD":50,"COLL_CL_DESC":51,"COLL_CL_CD":52,"ACCT_MGMT_GRP_DESC":53,"ACCT_MGMT_GRP_CD":54,"BALANCE_CONTROL":55,"BAL_CTL_GRP_ID":56,"BALANCING_STAT_DESC":57,"BALANCING_STAT_FLG":58,"BCG_CUR_AMT":59,"BCG_TOT_AMT":60,"BCG_CUR_BAL":61,"BCG_TOT_BAL":62,"BCG_CRE_DTTM":63,"BILL_SEGMENT":64,"BSEG_ID":65,"BSEG_STAT_DESC":66,"BSEG_STAT_FLG":67,"BSEG_BILL_CYC_DESC":68,"BSEG_BILL_CYC_CD":69,"BSEG_START_DT":70,"BSEG_END_DT":71,"BSEG_PREM_ID":72,"BSEG_EST_SW":73,"BSEG_CLOSING_SW":74,"BSEG_CAN_RSN_DESC":75,"BSEG_CAN_RSN_CD":76,"ADJUSTMENT_TRACE":77,"ADJ_ID":78,"ADJ_STATUS_DESC":79,"ADJ_STATUS_FLG":80,"ADJ_TYPE_DESC":81,"ADJ_TYPE_CD":82,"ADJ_CAN_RSN_DESC":83,"ADJ_CAN_RSN_CD":84,"ADJ_AMT":85,"XFER_ADJ_ID":86,"BEHALF_SA_ID":87,"BASE_AMT":88,"GEN_REF_DT":89,"APPR_REQ_ID":90,"PAYMENT_SEGMENT":91,"PAY_SEG_ID":92,"PAY_ID":93,"PAY_SEG_AMT":94,"PAY_MATCH_EVT_ID":95,"SNAPSHOT_AUDIT":96,"FREEZE_SW":97,"FREEZE_DTTM":98,"FREEZE_USER_NAME":99,"FREEZE_USER_ID":100,"LOAD_DTTM":101}]]>
+		</property>
+		<property name="adhoc.tree.labels">
+			<![CDATA[[{"uri":"/GL_LINE","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"GL Line"},{"uri":"/FT_CORE","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Financial Transaction"},{"uri":"/ACCT_SERVICE","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Account And Service"},{"uri":"/BALANCE_CONTROL","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Balance Control"},{"uri":"/BILL_SEGMENT","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Bill Segment"},{"uri":"/ADJUSTMENT_TRACE","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Adjustment Trace"},{"uri":"/PAYMENT_SEGMENT","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Payment Segment"},{"uri":"/SNAPSHOT_AUDIT","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Snapshot Audit"}]]]>
+		</property>
+		<property name="slIsTableAsList" value="false"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/GL_LINE/FT_ID"/>
+		<property name="previous.display" value="Financial Transaction ID"/>
+		<property name="adhoc.chosen.tree.labels">
+			<![CDATA[[{"uri":"/GL_LINE","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"GL Line"},{"uri":"/FT_CORE","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Financial Transaction"},{"uri":"/ACCT_SERVICE","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Account And Service"},{"uri":"/BALANCE_CONTROL","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Balance Control"},{"uri":"/BILL_SEGMENT","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Bill Segment"},{"uri":"/ADJUSTMENT_TRACE","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Adjustment Trace"},{"uri":"/PAYMENT_SEGMENT","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Payment Segment"},{"uri":"/SNAPSHOT_AUDIT","resourceId":"FT_GL_DISTRIBUTION_RPT_CURR","label":"Snapshot Audit"}]]]>
+		</property>
+		<property name="adhoc.chosen.tree.order">
+			<![CDATA[{"CURRENCY_CD":20,"CORRECTION_SW":33,"BILL_CYC_DESC":47,"CUSTOMER_NAME_UPR":38,"GL_DIVISION_DESC":26,"ADJ_TYPE_CD":82,"BCG_TOT_BAL":62,"BILL_ID":21,"PAY_SEG_AMT":94,"BSEG_CAN_RSN_CD":76,"MATCH_EVT_ID":32,"SA_ID":41,"ADJ_ID":78,"BALANCING_STAT_FLG":58,"SA_TYPE_CD":45,"ADJ_TYPE_DESC":81,"BASE_AMT":88,"ACCT_SERVICE":37,"SCHED_DISTRIB_DT":29,"FT_ID":2,"GL_DISTRIB_STATUS_DESC":24,"GL_DISTRIB_STATUS":25,"BEHALF_SA_ID":87,"CUST_CL_DESC":49,"DST_ID":6,"ADJ_STATUS_FLG":80,"ARS_DT":16,"SHOW_ON_BILL_SW":35,"SA_STATUS_FLG":43,"SA_STATUS_DESC":42,"ADJ_CAN_RSN_CD":84,"BCG_CUR_AMT":59,"ADJ_AMT":85,"XFER_TO_GL_DT":31,"BSEG_START_DT":70,"BCG_TOT_AMT":60,"ADJ_CAN_RSN_DESC":83,"BILL_CYC_CD":48,"COLL_CL_DESC":51,"BSEG_BILL_CYC_CD":69,"ADJ_STATUS_DESC":79,"ACCOUNTING_DT":15,"NEW_DEBIT_SW":34,"PAY_SEG_ID":92,"SIBLING_ID":23,"NOT_IN_ARS_SW":36,"BSEG_STAT_DESC":66,"GL_AMOUNT":7,"ACCT_MGMT_GRP_CD":54,"CUST_CL_CD":50,"LOAD_DTTM":101,"ACCT_ID":40,"FREEZE_USER_NAME":99,"PAY_ID":93,"SA_TYPE_DESC":44,"CHAR_TYPE_CD":10,"BSEG_EST_SW":73,"FT_TYPE_FLG":14,"GEN_REF_DT":89,"GL_SEQ_NBR":3,"BCG_CUR_BAL":61,"FT_TYPE_FLG_DESC":13,"TOT_AMT":19,"FT_CRE_DTTM":17,"FREEZE_DTTM":98,"FREEZE_USER_ID":100,"COLL_CL_CD":52,"ACCT_MGMT_GRP_DESC":53,"CHAR_PREM_ID":46,"PAY_MATCH_EVT_ID":95,"PARENT_ID":22,"CIS_DIVISION":28,"FREEZE_SW":97,"GL_DIVISION":27,"GL_ACCT":4,"BSEG_ID":65,"DST_DESC":5,"BSEG_CLOSING_SW":74,"CHAR_VAL":11,"FT_CORE":12,"SNAPSHOT_AUDIT":96,"BCG_CRE_DTTM":63,"BSEG_PREM_ID":72,"APPR_REQ_ID":90,"BSEG_END_DT":71,"GL_LINE":1,"STATISTIC_AMOUNT":8,"BSEG_STAT_FLG":67,"PER_ID":39,"BALANCING_STAT_DESC":57,"PAYMENT_SEGMENT":91,"XFERRED_OUT_SW":30,"CUR_AMT":18,"BALANCE_CONTROL":55,"BSEG_CAN_RSN_DESC":75,"BSEG_BILL_CYC_DESC":68,"ADJUSTMENT_TRACE":77,"XFER_ADJ_ID":86,"TOT_AMT_SW":9,"BILL_SEGMENT":64,"BAL_CTL_GRP_ID":56}]]>
+		</property>
+		<property name="adhoc.chosen.tree.is.flattened" value="false"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(GL_LINE.FT_ID)"/>
+	</field>
+	<field name="GL_LINE.GL_SEQ_NBR" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="GL Sequence Number"/>
+		<property name="semantic.item.label" value="GL Sequence Number"/>
+		<property name="adhoc.tree.uri" value="/GL_LINE/GL_SEQ_NBR"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.GL_SEQ_NBR"/>
+		<property name="semantic.tree.uri" value="/GL_LINE/GL_SEQ_NBR"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/GL_LINE/GL_SEQ_NBR"/>
+		<property name="previous.display" value="GL Sequence Number"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(GL_LINE.GL_SEQ_NBR)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="GL_LINE.GL_ACCT" class="java.lang.String">
+		<property name="adhoc.display" value="GL Account"/>
+		<property name="semantic.item.label" value="GL Account"/>
+		<property name="adhoc.tree.uri" value="/GL_LINE/GL_ACCT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.GL_ACCT"/>
+		<property name="semantic.tree.uri" value="/GL_LINE/GL_ACCT"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/GL_LINE/GL_ACCT"/>
+		<property name="previous.display" value="GL Account"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(GL_LINE.GL_ACCT)"/>
+	</field>
+	<field name="GL_LINE.DST_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Distribution Code"/>
+		<property name="semantic.item.label" value="Distribution Code"/>
+		<property name="adhoc.tree.uri" value="/GL_LINE/DST_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.DST_DESC"/>
+		<property name="semantic.tree.uri" value="/GL_LINE/DST_DESC"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/GL_LINE/DST_DESC"/>
+		<property name="previous.display" value="Distribution Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(GL_LINE.DST_DESC)"/>
+	</field>
+	<field name="GL_LINE.DST_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Distribution Code ID"/>
+		<property name="semantic.item.label" value="Distribution Code ID"/>
+		<property name="adhoc.tree.uri" value="/GL_LINE/DST_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.DST_ID"/>
+		<property name="semantic.tree.uri" value="/GL_LINE/DST_ID"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/GL_LINE/DST_ID"/>
+		<property name="previous.display" value="Distribution Code ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(GL_LINE.DST_ID)"/>
+	</field>
+	<field name="GL_LINE.GL_AMOUNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="GL Amount"/>
+		<property name="semantic.item.label" value="GL Amount"/>
+		<property name="adhoc.tree.uri" value="/GL_LINE/GL_AMOUNT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.GL_AMOUNT"/>
+		<property name="semantic.tree.uri" value="/GL_LINE/GL_AMOUNT"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/GL_LINE/GL_AMOUNT"/>
+		<property name="previous.display" value="GL Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(GL_LINE.GL_AMOUNT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="GL_LINE.STATISTIC_AMOUNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Statistic Amount"/>
+		<property name="semantic.item.label" value="Statistic Amount"/>
+		<property name="adhoc.tree.uri" value="/GL_LINE/STATISTIC_AMOUNT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.STATISTIC_AMOUNT"/>
+		<property name="semantic.tree.uri" value="/GL_LINE/STATISTIC_AMOUNT"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/GL_LINE/STATISTIC_AMOUNT"/>
+		<property name="previous.display" value="Statistic Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(GL_LINE.STATISTIC_AMOUNT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="GL_LINE.TOT_AMT_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Total Amount Switch"/>
+		<property name="semantic.item.label" value="Total Amount Switch"/>
+		<property name="adhoc.tree.uri" value="/GL_LINE/TOT_AMT_SW"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.TOT_AMT_SW"/>
+		<property name="semantic.tree.uri" value="/GL_LINE/TOT_AMT_SW"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/GL_LINE/TOT_AMT_SW"/>
+		<property name="previous.display" value="Total Amount Switch"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(GL_LINE.TOT_AMT_SW)"/>
+	</field>
+	<field name="GL_LINE.CHAR_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Characteristic Type Code"/>
+		<property name="semantic.item.label" value="Characteristic Type Code"/>
+		<property name="adhoc.tree.uri" value="/GL_LINE/CHAR_TYPE_CD"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.CHAR_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/GL_LINE/CHAR_TYPE_CD"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/GL_LINE/CHAR_TYPE_CD"/>
+		<property name="previous.display" value="Characteristic Type Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(GL_LINE.CHAR_TYPE_CD)"/>
+	</field>
+	<field name="GL_LINE.CHAR_VAL" class="java.lang.String">
+		<property name="adhoc.display" value="Characteristic Value"/>
+		<property name="semantic.item.label" value="Characteristic Value"/>
+		<property name="adhoc.tree.uri" value="/GL_LINE/CHAR_VAL"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.CHAR_VAL"/>
+		<property name="semantic.tree.uri" value="/GL_LINE/CHAR_VAL"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/GL_LINE/CHAR_VAL"/>
+		<property name="previous.display" value="Characteristic Value"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(GL_LINE.CHAR_VAL)"/>
+	</field>
+	<field name="FT_CORE.FT_TYPE_FLG_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Financial Transaction Type"/>
+		<property name="semantic.item.label" value="Financial Transaction Type"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/FT_TYPE_FLG_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.FT_TYPE_FLG_DESC"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/FT_TYPE_FLG_DESC"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/FT_TYPE_FLG_DESC"/>
+		<property name="previous.display" value="Financial Transaction Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.FT_TYPE_FLG_DESC)"/>
+	</field>
+	<field name="FT_CORE.FT_TYPE_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Financial Transaction Type Code"/>
+		<property name="semantic.item.label" value="Financial Transaction Type Code"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/FT_TYPE_FLG"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.FT_TYPE_FLG"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/FT_TYPE_FLG"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/FT_TYPE_FLG"/>
+		<property name="previous.display" value="Financial Transaction Type Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.FT_TYPE_FLG)"/>
+	</field>
+	<field name="FT_CORE.ACCOUNTING_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Accounting Date"/>
+		<property name="semantic.item.label" value="Accounting Date"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/ACCOUNTING_DT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ACCOUNTING_DT"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/ACCOUNTING_DT"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/ACCOUNTING_DT"/>
+		<property name="previous.display" value="Accounting Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.ACCOUNTING_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="FT_CORE.ARS_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Arrears Date"/>
+		<property name="semantic.item.label" value="Arrears Date"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/ARS_DT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ARS_DT"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/ARS_DT"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/ARS_DT"/>
+		<property name="previous.display" value="Arrears Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.ARS_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="FT_CORE.FT_CRE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Created Date Time"/>
+		<property name="semantic.item.label" value="Created Date Time"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/FT_CRE_DTTM"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.FT_CRE_DTTM"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/FT_CRE_DTTM"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/FT_CRE_DTTM"/>
+		<property name="previous.display" value="Created Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.FT_CRE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="FT_CORE.CUR_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Current Amount"/>
+		<property name="semantic.item.label" value="Current Amount"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/CUR_AMT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.CUR_AMT"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/CUR_AMT"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/CUR_AMT"/>
+		<property name="previous.display" value="Current Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(FT_CORE.CUR_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="FT_CORE.TOT_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Payoff Amount"/>
+		<property name="semantic.item.label" value="Payoff Amount"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/TOT_AMT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.TOT_AMT"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/TOT_AMT"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/TOT_AMT"/>
+		<property name="previous.display" value="Payoff Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(FT_CORE.TOT_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="FT_CORE.CURRENCY_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Currency Code"/>
+		<property name="semantic.item.label" value="Currency Code"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/CURRENCY_CD"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.CURRENCY_CD"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/CURRENCY_CD"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/CURRENCY_CD"/>
+		<property name="previous.display" value="Currency Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.CURRENCY_CD)"/>
+	</field>
+	<field name="FT_CORE.BILL_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Bill ID"/>
+		<property name="semantic.item.label" value="Bill ID"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/BILL_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BILL_ID"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/BILL_ID"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/BILL_ID"/>
+		<property name="previous.display" value="Bill ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.BILL_ID)"/>
+	</field>
+	<field name="FT_CORE.PARENT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Parent ID"/>
+		<property name="semantic.item.label" value="Parent ID"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/PARENT_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.PARENT_ID"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/PARENT_ID"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/PARENT_ID"/>
+		<property name="previous.display" value="Parent ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.PARENT_ID)"/>
+	</field>
+	<field name="FT_CORE.SIBLING_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Sibling ID"/>
+		<property name="semantic.item.label" value="Sibling ID"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/SIBLING_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.SIBLING_ID"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/SIBLING_ID"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/SIBLING_ID"/>
+		<property name="previous.display" value="Sibling ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.SIBLING_ID)"/>
+	</field>
+	<field name="FT_CORE.GL_DISTRIB_STATUS_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="GL Distribution Status"/>
+		<property name="semantic.item.label" value="GL Distribution Status"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/GL_DISTRIB_STATUS_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.GL_DISTRIB_STATUS_DESC"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/GL_DISTRIB_STATUS_DESC"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/GL_DISTRIB_STATUS_DESC"/>
+		<property name="previous.display" value="GL Distribution Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.GL_DISTRIB_STATUS_DESC)"/>
+	</field>
+	<field name="FT_CORE.GL_DISTRIB_STATUS" class="java.lang.String">
+		<property name="adhoc.display" value="GL Distribution Status Code"/>
+		<property name="semantic.item.label" value="GL Distribution Status Code"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/GL_DISTRIB_STATUS"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.GL_DISTRIB_STATUS"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/GL_DISTRIB_STATUS"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/GL_DISTRIB_STATUS"/>
+		<property name="previous.display" value="GL Distribution Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.GL_DISTRIB_STATUS)"/>
+	</field>
+	<field name="FT_CORE.GL_DIVISION_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="GL Division"/>
+		<property name="semantic.item.label" value="GL Division"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/GL_DIVISION_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.GL_DIVISION_DESC"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/GL_DIVISION_DESC"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/GL_DIVISION_DESC"/>
+		<property name="previous.display" value="GL Division"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.GL_DIVISION_DESC)"/>
+	</field>
+	<field name="FT_CORE.GL_DIVISION" class="java.lang.String">
+		<property name="adhoc.display" value="GL Division Code"/>
+		<property name="semantic.item.label" value="GL Division Code"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/GL_DIVISION"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.GL_DIVISION"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/GL_DIVISION"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/GL_DIVISION"/>
+		<property name="previous.display" value="GL Division Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.GL_DIVISION)"/>
+	</field>
+	<field name="FT_CORE.CIS_DIVISION" class="java.lang.String">
+		<property name="adhoc.display" value="CIS Division"/>
+		<property name="semantic.item.label" value="CIS Division"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/CIS_DIVISION"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.CIS_DIVISION"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/CIS_DIVISION"/>
+		<property name="semantic.tree.sort.order" value="15"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/CIS_DIVISION"/>
+		<property name="previous.display" value="CIS Division"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.CIS_DIVISION)"/>
+	</field>
+	<field name="FT_CORE.SCHED_DISTRIB_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Scheduled Distribution Date"/>
+		<property name="semantic.item.label" value="Scheduled Distribution Date"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/SCHED_DISTRIB_DT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.SCHED_DISTRIB_DT"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/SCHED_DISTRIB_DT"/>
+		<property name="semantic.tree.sort.order" value="16"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/SCHED_DISTRIB_DT"/>
+		<property name="previous.display" value="Scheduled Distribution Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.SCHED_DISTRIB_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="FT_CORE.XFERRED_OUT_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Transferred Out"/>
+		<property name="semantic.item.label" value="Transferred Out"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/XFERRED_OUT_SW"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.XFERRED_OUT_SW"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/XFERRED_OUT_SW"/>
+		<property name="semantic.tree.sort.order" value="17"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/XFERRED_OUT_SW"/>
+		<property name="previous.display" value="Transferred Out"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.XFERRED_OUT_SW)"/>
+	</field>
+	<field name="FT_CORE.XFER_TO_GL_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Transfer To GL Date"/>
+		<property name="semantic.item.label" value="Transfer To GL Date"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/XFER_TO_GL_DT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.XFER_TO_GL_DT"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/XFER_TO_GL_DT"/>
+		<property name="semantic.tree.sort.order" value="18"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/XFER_TO_GL_DT"/>
+		<property name="previous.display" value="Transfer To GL Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.XFER_TO_GL_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="FT_CORE.MATCH_EVT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Match Event ID"/>
+		<property name="semantic.item.label" value="Match Event ID"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/MATCH_EVT_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.MATCH_EVT_ID"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/MATCH_EVT_ID"/>
+		<property name="semantic.tree.sort.order" value="19"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/MATCH_EVT_ID"/>
+		<property name="previous.display" value="Match Event ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.MATCH_EVT_ID)"/>
+	</field>
+	<field name="FT_CORE.CORRECTION_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Correction"/>
+		<property name="semantic.item.label" value="Correction"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/CORRECTION_SW"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.CORRECTION_SW"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/CORRECTION_SW"/>
+		<property name="semantic.tree.sort.order" value="20"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/CORRECTION_SW"/>
+		<property name="previous.display" value="Correction"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.CORRECTION_SW)"/>
+	</field>
+	<field name="FT_CORE.NEW_DEBIT_SW" class="java.lang.String">
+		<property name="adhoc.display" value="New Debit"/>
+		<property name="semantic.item.label" value="New Debit"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/NEW_DEBIT_SW"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.NEW_DEBIT_SW"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/NEW_DEBIT_SW"/>
+		<property name="semantic.tree.sort.order" value="21"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/NEW_DEBIT_SW"/>
+		<property name="previous.display" value="New Debit"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.NEW_DEBIT_SW)"/>
+	</field>
+	<field name="FT_CORE.SHOW_ON_BILL_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Show On Bill"/>
+		<property name="semantic.item.label" value="Show On Bill"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/SHOW_ON_BILL_SW"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.SHOW_ON_BILL_SW"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/SHOW_ON_BILL_SW"/>
+		<property name="semantic.tree.sort.order" value="22"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/SHOW_ON_BILL_SW"/>
+		<property name="previous.display" value="Show On Bill"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.SHOW_ON_BILL_SW)"/>
+	</field>
+	<field name="FT_CORE.NOT_IN_ARS_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Excluded From Arrears"/>
+		<property name="semantic.item.label" value="Excluded From Arrears"/>
+		<property name="adhoc.tree.uri" value="/FT_CORE/NOT_IN_ARS_SW"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.NOT_IN_ARS_SW"/>
+		<property name="semantic.tree.uri" value="/FT_CORE/NOT_IN_ARS_SW"/>
+		<property name="semantic.tree.sort.order" value="23"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/FT_CORE/NOT_IN_ARS_SW"/>
+		<property name="previous.display" value="Excluded From Arrears"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(FT_CORE.NOT_IN_ARS_SW)"/>
+	</field>
+	<field name="ACCT_SERVICE.CUSTOMER_NAME_UPR" class="java.lang.String">
+		<property name="adhoc.display" value="Customer Name"/>
+		<property name="semantic.item.label" value="Customer Name"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/CUSTOMER_NAME_UPR"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.CUSTOMER_NAME_UPR"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/CUSTOMER_NAME_UPR"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/CUSTOMER_NAME_UPR"/>
+		<property name="previous.display" value="Customer Name"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.CUSTOMER_NAME_UPR)"/>
+	</field>
+	<field name="ACCT_SERVICE.PER_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Person ID"/>
+		<property name="semantic.item.label" value="Person ID"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/PER_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.PER_ID"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/PER_ID"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/PER_ID"/>
+		<property name="previous.display" value="Person ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.PER_ID)"/>
+	</field>
+	<field name="ACCT_SERVICE.ACCT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Account ID"/>
+		<property name="semantic.item.label" value="Account ID"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/ACCT_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ACCT_ID"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/ACCT_ID"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/ACCT_ID"/>
+		<property name="previous.display" value="Account ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.ACCT_ID)"/>
+	</field>
+	<field name="ACCT_SERVICE.SA_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Service Agreement ID"/>
+		<property name="semantic.item.label" value="Service Agreement ID"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/SA_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.SA_ID"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/SA_ID"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/SA_ID"/>
+		<property name="previous.display" value="Service Agreement ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.SA_ID)"/>
+	</field>
+	<field name="ACCT_SERVICE.SA_STATUS_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Agreement Status"/>
+		<property name="semantic.item.label" value="Service Agreement Status"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/SA_STATUS_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.SA_STATUS_DESC"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/SA_STATUS_DESC"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/SA_STATUS_DESC"/>
+		<property name="previous.display" value="Service Agreement Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.SA_STATUS_DESC)"/>
+	</field>
+	<field name="ACCT_SERVICE.SA_STATUS_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Service Agreement Status Code"/>
+		<property name="semantic.item.label" value="Service Agreement Status Code"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/SA_STATUS_FLG"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.SA_STATUS_FLG"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/SA_STATUS_FLG"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/SA_STATUS_FLG"/>
+		<property name="previous.display" value="Service Agreement Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.SA_STATUS_FLG)"/>
+	</field>
+	<field name="ACCT_SERVICE.SA_TYPE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Type"/>
+		<property name="semantic.item.label" value="Service Type"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/SA_TYPE_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.SA_TYPE_DESC"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/SA_TYPE_DESC"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/SA_TYPE_DESC"/>
+		<property name="previous.display" value="Service Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.SA_TYPE_DESC)"/>
+	</field>
+	<field name="ACCT_SERVICE.SA_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Service Type Code"/>
+		<property name="semantic.item.label" value="Service Type Code"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/SA_TYPE_CD"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.SA_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/SA_TYPE_CD"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/SA_TYPE_CD"/>
+		<property name="previous.display" value="Service Type Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.SA_TYPE_CD)"/>
+	</field>
+	<field name="ACCT_SERVICE.CHAR_PREM_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Premise ID"/>
+		<property name="semantic.item.label" value="Premise ID"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/CHAR_PREM_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.CHAR_PREM_ID"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/CHAR_PREM_ID"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/CHAR_PREM_ID"/>
+		<property name="previous.display" value="Premise ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.CHAR_PREM_ID)"/>
+	</field>
+	<field name="ACCT_SERVICE.BILL_CYC_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Cycle"/>
+		<property name="semantic.item.label" value="Bill Cycle"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/BILL_CYC_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BILL_CYC_DESC"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/BILL_CYC_DESC"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/BILL_CYC_DESC"/>
+		<property name="previous.display" value="Bill Cycle"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.BILL_CYC_DESC)"/>
+	</field>
+	<field name="ACCT_SERVICE.BILL_CYC_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Cycle Code"/>
+		<property name="semantic.item.label" value="Bill Cycle Code"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/BILL_CYC_CD"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BILL_CYC_CD"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/BILL_CYC_CD"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/BILL_CYC_CD"/>
+		<property name="previous.display" value="Bill Cycle Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.BILL_CYC_CD)"/>
+	</field>
+	<field name="ACCT_SERVICE.CUST_CL_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Customer Class"/>
+		<property name="semantic.item.label" value="Customer Class"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/CUST_CL_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.CUST_CL_DESC"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/CUST_CL_DESC"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/CUST_CL_DESC"/>
+		<property name="previous.display" value="Customer Class"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.CUST_CL_DESC)"/>
+	</field>
+	<field name="ACCT_SERVICE.CUST_CL_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Customer Class Code"/>
+		<property name="semantic.item.label" value="Customer Class Code"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/CUST_CL_CD"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.CUST_CL_CD"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/CUST_CL_CD"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/CUST_CL_CD"/>
+		<property name="previous.display" value="Customer Class Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.CUST_CL_CD)"/>
+	</field>
+	<field name="ACCT_SERVICE.COLL_CL_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Collection Class"/>
+		<property name="semantic.item.label" value="Collection Class"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/COLL_CL_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.COLL_CL_DESC"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/COLL_CL_DESC"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/COLL_CL_DESC"/>
+		<property name="previous.display" value="Collection Class"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.COLL_CL_DESC)"/>
+	</field>
+	<field name="ACCT_SERVICE.COLL_CL_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Collection Class Code"/>
+		<property name="semantic.item.label" value="Collection Class Code"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/COLL_CL_CD"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.COLL_CL_CD"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/COLL_CL_CD"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/COLL_CL_CD"/>
+		<property name="previous.display" value="Collection Class Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.COLL_CL_CD)"/>
+	</field>
+	<field name="ACCT_SERVICE.ACCT_MGMT_GRP_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Account Management Group"/>
+		<property name="semantic.item.label" value="Account Management Group"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/ACCT_MGMT_GRP_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ACCT_MGMT_GRP_DESC"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/ACCT_MGMT_GRP_DESC"/>
+		<property name="semantic.tree.sort.order" value="15"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/ACCT_MGMT_GRP_DESC"/>
+		<property name="previous.display" value="Account Management Group"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.ACCT_MGMT_GRP_DESC)"/>
+	</field>
+	<field name="ACCT_SERVICE.ACCT_MGMT_GRP_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Account Management Group Code"/>
+		<property name="semantic.item.label" value="Account Management Group Code"/>
+		<property name="adhoc.tree.uri" value="/ACCT_SERVICE/ACCT_MGMT_GRP_CD"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ACCT_MGMT_GRP_CD"/>
+		<property name="semantic.tree.uri" value="/ACCT_SERVICE/ACCT_MGMT_GRP_CD"/>
+		<property name="semantic.tree.sort.order" value="16"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ACCT_SERVICE/ACCT_MGMT_GRP_CD"/>
+		<property name="previous.display" value="Account Management Group Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ACCT_SERVICE.ACCT_MGMT_GRP_CD)"/>
+	</field>
+	<field name="BALANCE_CONTROL.BAL_CTL_GRP_ID" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Balance Control Group ID"/>
+		<property name="semantic.item.label" value="Balance Control Group ID"/>
+		<property name="adhoc.tree.uri" value="/BALANCE_CONTROL/BAL_CTL_GRP_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BAL_CTL_GRP_ID"/>
+		<property name="semantic.tree.uri" value="/BALANCE_CONTROL/BAL_CTL_GRP_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BALANCE_CONTROL/BAL_CTL_GRP_ID"/>
+		<property name="previous.display" value="Balance Control Group ID"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BALANCE_CONTROL.BAL_CTL_GRP_ID)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BALANCE_CONTROL.BALANCING_STAT_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Balancing Status"/>
+		<property name="semantic.item.label" value="Balancing Status"/>
+		<property name="adhoc.tree.uri" value="/BALANCE_CONTROL/BALANCING_STAT_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BALANCING_STAT_DESC"/>
+		<property name="semantic.tree.uri" value="/BALANCE_CONTROL/BALANCING_STAT_DESC"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BALANCE_CONTROL/BALANCING_STAT_DESC"/>
+		<property name="previous.display" value="Balancing Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BALANCE_CONTROL.BALANCING_STAT_DESC)"/>
+	</field>
+	<field name="BALANCE_CONTROL.BALANCING_STAT_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Balancing Status Code"/>
+		<property name="semantic.item.label" value="Balancing Status Code"/>
+		<property name="adhoc.tree.uri" value="/BALANCE_CONTROL/BALANCING_STAT_FLG"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BALANCING_STAT_FLG"/>
+		<property name="semantic.tree.uri" value="/BALANCE_CONTROL/BALANCING_STAT_FLG"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BALANCE_CONTROL/BALANCING_STAT_FLG"/>
+		<property name="previous.display" value="Balancing Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BALANCE_CONTROL.BALANCING_STAT_FLG)"/>
+	</field>
+	<field name="BALANCE_CONTROL.BCG_CUR_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Current Amount"/>
+		<property name="semantic.item.label" value="Current Amount"/>
+		<property name="adhoc.tree.uri" value="/BALANCE_CONTROL/BCG_CUR_AMT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BCG_CUR_AMT"/>
+		<property name="semantic.tree.uri" value="/BALANCE_CONTROL/BCG_CUR_AMT"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BALANCE_CONTROL/BCG_CUR_AMT"/>
+		<property name="previous.display" value="Current Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BALANCE_CONTROL.BCG_CUR_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BALANCE_CONTROL.BCG_TOT_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Total Amount"/>
+		<property name="semantic.item.label" value="Total Amount"/>
+		<property name="adhoc.tree.uri" value="/BALANCE_CONTROL/BCG_TOT_AMT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BCG_TOT_AMT"/>
+		<property name="semantic.tree.uri" value="/BALANCE_CONTROL/BCG_TOT_AMT"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BALANCE_CONTROL/BCG_TOT_AMT"/>
+		<property name="previous.display" value="Total Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BALANCE_CONTROL.BCG_TOT_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BALANCE_CONTROL.BCG_CUR_BAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Current Balance"/>
+		<property name="semantic.item.label" value="Current Balance"/>
+		<property name="adhoc.tree.uri" value="/BALANCE_CONTROL/BCG_CUR_BAL"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BCG_CUR_BAL"/>
+		<property name="semantic.tree.uri" value="/BALANCE_CONTROL/BCG_CUR_BAL"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BALANCE_CONTROL/BCG_CUR_BAL"/>
+		<property name="previous.display" value="Current Balance"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BALANCE_CONTROL.BCG_CUR_BAL)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BALANCE_CONTROL.BCG_TOT_BAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Total Balance"/>
+		<property name="semantic.item.label" value="Total Balance"/>
+		<property name="adhoc.tree.uri" value="/BALANCE_CONTROL/BCG_TOT_BAL"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BCG_TOT_BAL"/>
+		<property name="semantic.tree.uri" value="/BALANCE_CONTROL/BCG_TOT_BAL"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BALANCE_CONTROL/BCG_TOT_BAL"/>
+		<property name="previous.display" value="Total Balance"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BALANCE_CONTROL.BCG_TOT_BAL)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BALANCE_CONTROL.BCG_CRE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Created Date Time"/>
+		<property name="semantic.item.label" value="Created Date Time"/>
+		<property name="adhoc.tree.uri" value="/BALANCE_CONTROL/BCG_CRE_DTTM"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BCG_CRE_DTTM"/>
+		<property name="semantic.tree.uri" value="/BALANCE_CONTROL/BCG_CRE_DTTM"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BALANCE_CONTROL/BCG_CRE_DTTM"/>
+		<property name="previous.display" value="Created Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BALANCE_CONTROL.BCG_CRE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="BILL_SEGMENT.BSEG_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment ID"/>
+		<property name="semantic.item.label" value="Bill Segment ID"/>
+		<property name="adhoc.tree.uri" value="/BILL_SEGMENT/BSEG_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BSEG_ID"/>
+		<property name="semantic.tree.uri" value="/BILL_SEGMENT/BSEG_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BILL_SEGMENT/BSEG_ID"/>
+		<property name="previous.display" value="Bill Segment ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BILL_SEGMENT.BSEG_ID)"/>
+	</field>
+	<field name="BILL_SEGMENT.BSEG_STAT_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Status"/>
+		<property name="semantic.item.label" value="Bill Segment Status"/>
+		<property name="adhoc.tree.uri" value="/BILL_SEGMENT/BSEG_STAT_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BSEG_STAT_DESC"/>
+		<property name="semantic.tree.uri" value="/BILL_SEGMENT/BSEG_STAT_DESC"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BILL_SEGMENT/BSEG_STAT_DESC"/>
+		<property name="previous.display" value="Bill Segment Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BILL_SEGMENT.BSEG_STAT_DESC)"/>
+	</field>
+	<field name="BILL_SEGMENT.BSEG_STAT_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Status Code"/>
+		<property name="semantic.item.label" value="Bill Segment Status Code"/>
+		<property name="adhoc.tree.uri" value="/BILL_SEGMENT/BSEG_STAT_FLG"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BSEG_STAT_FLG"/>
+		<property name="semantic.tree.uri" value="/BILL_SEGMENT/BSEG_STAT_FLG"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BILL_SEGMENT/BSEG_STAT_FLG"/>
+		<property name="previous.display" value="Bill Segment Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BILL_SEGMENT.BSEG_STAT_FLG)"/>
+	</field>
+	<field name="BILL_SEGMENT.BSEG_BILL_CYC_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Cycle"/>
+		<property name="semantic.item.label" value="Bill Segment Cycle"/>
+		<property name="adhoc.tree.uri" value="/BILL_SEGMENT/BSEG_BILL_CYC_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BSEG_BILL_CYC_DESC"/>
+		<property name="semantic.tree.uri" value="/BILL_SEGMENT/BSEG_BILL_CYC_DESC"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BILL_SEGMENT/BSEG_BILL_CYC_DESC"/>
+		<property name="previous.display" value="Bill Segment Cycle"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BILL_SEGMENT.BSEG_BILL_CYC_DESC)"/>
+	</field>
+	<field name="BILL_SEGMENT.BSEG_BILL_CYC_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Cycle Code"/>
+		<property name="semantic.item.label" value="Bill Segment Cycle Code"/>
+		<property name="adhoc.tree.uri" value="/BILL_SEGMENT/BSEG_BILL_CYC_CD"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BSEG_BILL_CYC_CD"/>
+		<property name="semantic.tree.uri" value="/BILL_SEGMENT/BSEG_BILL_CYC_CD"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BILL_SEGMENT/BSEG_BILL_CYC_CD"/>
+		<property name="previous.display" value="Bill Segment Cycle Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BILL_SEGMENT.BSEG_BILL_CYC_CD)"/>
+	</field>
+	<field name="BILL_SEGMENT.BSEG_START_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Bill Segment Start Date"/>
+		<property name="semantic.item.label" value="Bill Segment Start Date"/>
+		<property name="adhoc.tree.uri" value="/BILL_SEGMENT/BSEG_START_DT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BSEG_START_DT"/>
+		<property name="semantic.tree.uri" value="/BILL_SEGMENT/BSEG_START_DT"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BILL_SEGMENT/BSEG_START_DT"/>
+		<property name="previous.display" value="Bill Segment Start Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BILL_SEGMENT.BSEG_START_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="BILL_SEGMENT.BSEG_END_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Bill Segment End Date"/>
+		<property name="semantic.item.label" value="Bill Segment End Date"/>
+		<property name="adhoc.tree.uri" value="/BILL_SEGMENT/BSEG_END_DT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BSEG_END_DT"/>
+		<property name="semantic.tree.uri" value="/BILL_SEGMENT/BSEG_END_DT"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BILL_SEGMENT/BSEG_END_DT"/>
+		<property name="previous.display" value="Bill Segment End Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BILL_SEGMENT.BSEG_END_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="BILL_SEGMENT.BSEG_PREM_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Premise ID"/>
+		<property name="semantic.item.label" value="Bill Segment Premise ID"/>
+		<property name="adhoc.tree.uri" value="/BILL_SEGMENT/BSEG_PREM_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BSEG_PREM_ID"/>
+		<property name="semantic.tree.uri" value="/BILL_SEGMENT/BSEG_PREM_ID"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BILL_SEGMENT/BSEG_PREM_ID"/>
+		<property name="previous.display" value="Bill Segment Premise ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BILL_SEGMENT.BSEG_PREM_ID)"/>
+	</field>
+	<field name="BILL_SEGMENT.BSEG_EST_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Estimated Bill Segment"/>
+		<property name="semantic.item.label" value="Estimated Bill Segment"/>
+		<property name="adhoc.tree.uri" value="/BILL_SEGMENT/BSEG_EST_SW"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BSEG_EST_SW"/>
+		<property name="semantic.tree.uri" value="/BILL_SEGMENT/BSEG_EST_SW"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BILL_SEGMENT/BSEG_EST_SW"/>
+		<property name="previous.display" value="Estimated Bill Segment"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BILL_SEGMENT.BSEG_EST_SW)"/>
+	</field>
+	<field name="BILL_SEGMENT.BSEG_CLOSING_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Closing Bill Segment"/>
+		<property name="semantic.item.label" value="Closing Bill Segment"/>
+		<property name="adhoc.tree.uri" value="/BILL_SEGMENT/BSEG_CLOSING_SW"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BSEG_CLOSING_SW"/>
+		<property name="semantic.tree.uri" value="/BILL_SEGMENT/BSEG_CLOSING_SW"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BILL_SEGMENT/BSEG_CLOSING_SW"/>
+		<property name="previous.display" value="Closing Bill Segment"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BILL_SEGMENT.BSEG_CLOSING_SW)"/>
+	</field>
+	<field name="BILL_SEGMENT.BSEG_CAN_RSN_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Cancel Reason"/>
+		<property name="semantic.item.label" value="Bill Segment Cancel Reason"/>
+		<property name="adhoc.tree.uri" value="/BILL_SEGMENT/BSEG_CAN_RSN_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BSEG_CAN_RSN_DESC"/>
+		<property name="semantic.tree.uri" value="/BILL_SEGMENT/BSEG_CAN_RSN_DESC"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BILL_SEGMENT/BSEG_CAN_RSN_DESC"/>
+		<property name="previous.display" value="Bill Segment Cancel Reason"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BILL_SEGMENT.BSEG_CAN_RSN_DESC)"/>
+	</field>
+	<field name="BILL_SEGMENT.BSEG_CAN_RSN_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Cancel Reason Code"/>
+		<property name="semantic.item.label" value="Bill Segment Cancel Reason Code"/>
+		<property name="adhoc.tree.uri" value="/BILL_SEGMENT/BSEG_CAN_RSN_CD"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BSEG_CAN_RSN_CD"/>
+		<property name="semantic.tree.uri" value="/BILL_SEGMENT/BSEG_CAN_RSN_CD"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BILL_SEGMENT/BSEG_CAN_RSN_CD"/>
+		<property name="previous.display" value="Bill Segment Cancel Reason Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BILL_SEGMENT.BSEG_CAN_RSN_CD)"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.ADJ_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Adjustment ID"/>
+		<property name="semantic.item.label" value="Adjustment ID"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ADJ_ID"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_ID"/>
+		<property name="previous.display" value="Adjustment ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ADJUSTMENT_TRACE.ADJ_ID)"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.ADJ_STATUS_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Adjustment Status"/>
+		<property name="semantic.item.label" value="Adjustment Status"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_STATUS_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ADJ_STATUS_DESC"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_STATUS_DESC"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_STATUS_DESC"/>
+		<property name="previous.display" value="Adjustment Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ADJUSTMENT_TRACE.ADJ_STATUS_DESC)"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.ADJ_STATUS_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Adjustment Status Code"/>
+		<property name="semantic.item.label" value="Adjustment Status Code"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_STATUS_FLG"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ADJ_STATUS_FLG"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_STATUS_FLG"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_STATUS_FLG"/>
+		<property name="previous.display" value="Adjustment Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ADJUSTMENT_TRACE.ADJ_STATUS_FLG)"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.ADJ_TYPE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Adjustment Type"/>
+		<property name="semantic.item.label" value="Adjustment Type"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_TYPE_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ADJ_TYPE_DESC"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_TYPE_DESC"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_TYPE_DESC"/>
+		<property name="previous.display" value="Adjustment Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ADJUSTMENT_TRACE.ADJ_TYPE_DESC)"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.ADJ_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Adjustment Type Code"/>
+		<property name="semantic.item.label" value="Adjustment Type Code"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_TYPE_CD"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ADJ_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_TYPE_CD"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_TYPE_CD"/>
+		<property name="previous.display" value="Adjustment Type Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ADJUSTMENT_TRACE.ADJ_TYPE_CD)"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.ADJ_CAN_RSN_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Adjustment Cancel Reason"/>
+		<property name="semantic.item.label" value="Adjustment Cancel Reason"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_CAN_RSN_DESC"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ADJ_CAN_RSN_DESC"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_CAN_RSN_DESC"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_CAN_RSN_DESC"/>
+		<property name="previous.display" value="Adjustment Cancel Reason"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ADJUSTMENT_TRACE.ADJ_CAN_RSN_DESC)"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.ADJ_CAN_RSN_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Adjustment Cancel Reason Code"/>
+		<property name="semantic.item.label" value="Adjustment Cancel Reason Code"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_CAN_RSN_CD"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ADJ_CAN_RSN_CD"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_CAN_RSN_CD"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_CAN_RSN_CD"/>
+		<property name="previous.display" value="Adjustment Cancel Reason Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ADJUSTMENT_TRACE.ADJ_CAN_RSN_CD)"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.ADJ_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Adjustment Amount"/>
+		<property name="semantic.item.label" value="Adjustment Amount"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_AMT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.ADJ_AMT"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_AMT"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/ADJ_AMT"/>
+		<property name="previous.display" value="Adjustment Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(ADJUSTMENT_TRACE.ADJ_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.XFER_ADJ_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Transfer Adjustment ID"/>
+		<property name="semantic.item.label" value="Transfer Adjustment ID"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/XFER_ADJ_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.XFER_ADJ_ID"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/XFER_ADJ_ID"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/XFER_ADJ_ID"/>
+		<property name="previous.display" value="Transfer Adjustment ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ADJUSTMENT_TRACE.XFER_ADJ_ID)"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.BEHALF_SA_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Behalf Service Agreement ID"/>
+		<property name="semantic.item.label" value="Behalf Service Agreement ID"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/BEHALF_SA_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BEHALF_SA_ID"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/BEHALF_SA_ID"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/BEHALF_SA_ID"/>
+		<property name="previous.display" value="Behalf Service Agreement ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ADJUSTMENT_TRACE.BEHALF_SA_ID)"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.BASE_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Base Amount"/>
+		<property name="semantic.item.label" value="Base Amount"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/BASE_AMT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.BASE_AMT"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/BASE_AMT"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/BASE_AMT"/>
+		<property name="previous.display" value="Base Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(ADJUSTMENT_TRACE.BASE_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.GEN_REF_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Generated Reference Date"/>
+		<property name="semantic.item.label" value="Generated Reference Date"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/GEN_REF_DT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.GEN_REF_DT"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/GEN_REF_DT"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/GEN_REF_DT"/>
+		<property name="previous.display" value="Generated Reference Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ADJUSTMENT_TRACE.GEN_REF_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="ADJUSTMENT_TRACE.APPR_REQ_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Approval Request ID"/>
+		<property name="semantic.item.label" value="Approval Request ID"/>
+		<property name="adhoc.tree.uri" value="/ADJUSTMENT_TRACE/APPR_REQ_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.APPR_REQ_ID"/>
+		<property name="semantic.tree.uri" value="/ADJUSTMENT_TRACE/APPR_REQ_ID"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/ADJUSTMENT_TRACE/APPR_REQ_ID"/>
+		<property name="previous.display" value="Approval Request ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(ADJUSTMENT_TRACE.APPR_REQ_ID)"/>
+	</field>
+	<field name="PAYMENT_SEGMENT.PAY_SEG_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Payment Segment ID"/>
+		<property name="semantic.item.label" value="Payment Segment ID"/>
+		<property name="adhoc.tree.uri" value="/PAYMENT_SEGMENT/PAY_SEG_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.PAY_SEG_ID"/>
+		<property name="semantic.tree.uri" value="/PAYMENT_SEGMENT/PAY_SEG_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/PAYMENT_SEGMENT/PAY_SEG_ID"/>
+		<property name="previous.display" value="Payment Segment ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(PAYMENT_SEGMENT.PAY_SEG_ID)"/>
+	</field>
+	<field name="PAYMENT_SEGMENT.PAY_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Payment ID"/>
+		<property name="semantic.item.label" value="Payment ID"/>
+		<property name="adhoc.tree.uri" value="/PAYMENT_SEGMENT/PAY_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.PAY_ID"/>
+		<property name="semantic.tree.uri" value="/PAYMENT_SEGMENT/PAY_ID"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/PAYMENT_SEGMENT/PAY_ID"/>
+		<property name="previous.display" value="Payment ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(PAYMENT_SEGMENT.PAY_ID)"/>
+	</field>
+	<field name="PAYMENT_SEGMENT.PAY_SEG_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Payment Segment Amount"/>
+		<property name="semantic.item.label" value="Payment Segment Amount"/>
+		<property name="adhoc.tree.uri" value="/PAYMENT_SEGMENT/PAY_SEG_AMT"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.PAY_SEG_AMT"/>
+		<property name="semantic.tree.uri" value="/PAYMENT_SEGMENT/PAY_SEG_AMT"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/PAYMENT_SEGMENT/PAY_SEG_AMT"/>
+		<property name="previous.display" value="Payment Segment Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(PAYMENT_SEGMENT.PAY_SEG_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="PAYMENT_SEGMENT.PAY_MATCH_EVT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Payment Match Event ID"/>
+		<property name="semantic.item.label" value="Payment Match Event ID"/>
+		<property name="adhoc.tree.uri" value="/PAYMENT_SEGMENT/PAY_MATCH_EVT_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.PAY_MATCH_EVT_ID"/>
+		<property name="semantic.tree.uri" value="/PAYMENT_SEGMENT/PAY_MATCH_EVT_ID"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/PAYMENT_SEGMENT/PAY_MATCH_EVT_ID"/>
+		<property name="previous.display" value="Payment Match Event ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(PAYMENT_SEGMENT.PAY_MATCH_EVT_ID)"/>
+	</field>
+	<field name="SNAPSHOT_AUDIT.FREEZE_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Frozen"/>
+		<property name="semantic.item.label" value="Frozen"/>
+		<property name="adhoc.tree.uri" value="/SNAPSHOT_AUDIT/FREEZE_SW"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.FREEZE_SW"/>
+		<property name="semantic.tree.uri" value="/SNAPSHOT_AUDIT/FREEZE_SW"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SNAPSHOT_AUDIT/FREEZE_SW"/>
+		<property name="previous.display" value="Frozen"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SNAPSHOT_AUDIT.FREEZE_SW)"/>
+	</field>
+	<field name="SNAPSHOT_AUDIT.FREEZE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Freeze Date Time"/>
+		<property name="semantic.item.label" value="Freeze Date Time"/>
+		<property name="adhoc.tree.uri" value="/SNAPSHOT_AUDIT/FREEZE_DTTM"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.FREEZE_DTTM"/>
+		<property name="semantic.tree.uri" value="/SNAPSHOT_AUDIT/FREEZE_DTTM"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SNAPSHOT_AUDIT/FREEZE_DTTM"/>
+		<property name="previous.display" value="Freeze Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SNAPSHOT_AUDIT.FREEZE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="SNAPSHOT_AUDIT.FREEZE_USER_NAME" class="java.lang.String">
+		<property name="adhoc.display" value="Freeze User Name"/>
+		<property name="semantic.item.label" value="Freeze User Name"/>
+		<property name="adhoc.tree.uri" value="/SNAPSHOT_AUDIT/FREEZE_USER_NAME"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.FREEZE_USER_NAME"/>
+		<property name="semantic.tree.uri" value="/SNAPSHOT_AUDIT/FREEZE_USER_NAME"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SNAPSHOT_AUDIT/FREEZE_USER_NAME"/>
+		<property name="previous.display" value="Freeze User Name"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SNAPSHOT_AUDIT.FREEZE_USER_NAME)"/>
+	</field>
+	<field name="SNAPSHOT_AUDIT.FREEZE_USER_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Freeze User ID"/>
+		<property name="semantic.item.label" value="Freeze User ID"/>
+		<property name="adhoc.tree.uri" value="/SNAPSHOT_AUDIT/FREEZE_USER_ID"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.FREEZE_USER_ID"/>
+		<property name="semantic.tree.uri" value="/SNAPSHOT_AUDIT/FREEZE_USER_ID"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SNAPSHOT_AUDIT/FREEZE_USER_ID"/>
+		<property name="previous.display" value="Freeze User ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SNAPSHOT_AUDIT.FREEZE_USER_ID)"/>
+	</field>
+	<field name="SNAPSHOT_AUDIT.LOAD_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Snapshot Load Date Time"/>
+		<property name="semantic.item.label" value="Snapshot Load Date Time"/>
+		<property name="adhoc.tree.uri" value="/SNAPSHOT_AUDIT/LOAD_DTTM"/>
+		<property name="resourceId" value="FT_GL_DISTRIBUTION_RPT_CURR.LOAD_DTTM"/>
+		<property name="semantic.tree.uri" value="/SNAPSHOT_AUDIT/LOAD_DTTM"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SNAPSHOT_AUDIT/LOAD_DTTM"/>
+		<property name="previous.display" value="Snapshot Load Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SNAPSHOT_AUDIT.LOAD_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+</jasperReport>

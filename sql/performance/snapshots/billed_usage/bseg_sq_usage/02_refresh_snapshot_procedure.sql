@@ -1,6 +1,8 @@
 CREATE OR REPLACE PROCEDURE cisadm.refresh_bseg_sq_usage_rpt_curr AS
+    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12);
 BEGIN
-    EXECUTE IMMEDIATE 'TRUNCATE TABLE cisadm.bseg_sq_usage_rpt_curr';
+    DELETE FROM cisadm.bseg_sq_usage_rpt_curr
+    WHERE bill_dt >= v_window_start;
 
     INSERT INTO cisadm.bseg_sq_usage_rpt_curr (
         bseg_id,
@@ -120,6 +122,7 @@ BEGIN
         INNER JOIN cisadm.ci_bill bill
             ON bill.bill_id = bseg.bill_id
            AND bill.bill_stat_flg = 'C '
+           AND bill.bill_dt >= v_window_start
         GROUP BY
             sq.bseg_id,
             sq.uom_cd,
@@ -131,6 +134,7 @@ BEGIN
     INNER JOIN cisadm.ci_bill bill
         ON bill.bill_id = bseg.bill_id
        AND bill.bill_stat_flg = 'C '
+       AND bill.bill_dt >= v_window_start
     LEFT JOIN cisadm.ci_sa sa
         ON sa.sa_id = bseg.sa_id
     LEFT JOIN (
@@ -155,12 +159,9 @@ BEGIN
     LEFT JOIN cisadm.ci_acct acct
         ON acct.acct_id = bill.acct_id
     LEFT JOIN (
-        SELECT
-            st.sa_type_cd,
-            MIN(st.svc_type_cd) AS svc_type_cd
+        SELECT st.sa_type_cd, MIN(st.svc_type_cd) AS svc_type_cd
         FROM cisadm.ci_sa_type st
-        GROUP BY
-            st.sa_type_cd
+        GROUP BY st.sa_type_cd
     ) sa_type_base
         ON sa_type_base.sa_type_cd = sa.sa_type_cd
     LEFT JOIN (
@@ -173,8 +174,8 @@ BEGIN
         INNER JOIN cisadm.ci_bill bill
             ON bill.bill_id = bseg.bill_id
            AND bill.bill_stat_flg = 'C '
-        GROUP BY
-            sq.bseg_id
+           AND bill.bill_dt >= v_window_start
+        GROUP BY sq.bseg_id
     ) sq_bseg_agg
         ON sq_bseg_agg.bseg_id = sq_det.bseg_id
     LEFT JOIN cisadm.ci_lookup_val_l bill_status_l

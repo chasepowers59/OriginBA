@@ -1,0 +1,80 @@
+{
+  "name": "SmartCity Snapshot Dashboard Pack V1",
+  "version": "2026-04-24",
+  "delivery_model": "jrxml_dashboard_reports",
+  "packaged_item_count_target": 3,
+  "shared_parameter_contract": [
+    "START_DT",
+    "END_DT",
+    "CIS_DIVISION"
+  ],
+  "dashboards": [
+    {
+      "id": "billing_integrity_dashboard",
+      "label": "Billing Integrity Dashboard",
+      "workstream": "Billing_and_Rates",
+      "primary_subject": "billing",
+      "planned_report_path": "/Users/chase/OriginBA-3/reports/billing_integrity_dashboard.jrxml",
+      "planned_input_controls_path": "/Users/chase/OriginBA-3/server/input_controls/billing_integrity_dashboard_input_controls.json",
+      "governed_sources": [
+        "BSEG_BILLED_USAGE_RPT_CURR",
+        "BSEG_SQ_USAGE_RPT_CURR"
+      ],
+      "drill_assets": [
+        "Billed Amount - Canceled Segments",
+        "Billed Amount - Rebills",
+        "Billed Amount - Estimated Segment",
+        "Billed Usage - Segment Determinant",
+        "Billed Usage - Account Level View"
+      ]
+    },
+    {
+      "id": "usage_meter_health_dashboard",
+      "label": "Usage and Meter Health Dashboard",
+      "workstream": "Meter_Operations",
+      "primary_subject": "usage_meter_ops",
+      "planned_report_path": "/Users/chase/OriginBA-3/reports/usage_meter_health_dashboard.jrxml",
+      "planned_input_controls_path": "/Users/chase/OriginBA-3/server/input_controls/usage_meter_health_dashboard_input_controls.json",
+      "governed_sources": [
+        "D1_USAGE_RPT_CURR",
+        "D1_MSRMT_RPT_CURR",
+        "D1_USAGE_SCALAR_DTL_RPT_CURR"
+      ],
+      "drill_assets": [
+        "Measurement - IMD Summary",
+        "Measurement - Measurement Conditions",
+        "Measurements - Estimated",
+        "Usage - Account View",
+        "Usage - Highest Usage Customers",
+        "Usage - by Measuring Component ID"
+      ]
+    },
+    {
+      "id": "finance_reconciliation_dashboard",
+      "label": "Finance Reconciliation Dashboard",
+      "workstream": "Finance",
+      "primary_subject": "finance_recon",
+      "planned_report_path": "/Users/chase/OriginBA-3/reports/finance_reconciliation_dashboard.jrxml",
+      "planned_input_controls_path": "/Users/chase/OriginBA-3/server/input_controls/finance_reconciliation_dashboard_input_controls.json",
+      "governed_sources": [
+        "FT_RPT_CURR",
+        "FT_GL_DISTRIBUTION_RPT_CURR"
+      ],
+      "drill_assets": [
+        "Financial Transaction - Bill Cycle Transactions",
+        "Financial Transaction - GL Distribution Status",
+        "Financial Transaction - Total Transactions by Type",
+        "Financial Transaction - Payment Account Detail",
+        "General Ledger - Accounts Receivable",
+        "General Ledger - GL Account and Distribution",
+        "General Ledger - by Batch Number"
+      ]
+    }
+  ],
+  "reference_assets": [
+    "/Users/chase/OriginBA-3/reports/ops_hub_dashboard.jrxml",
+    "/Users/chase/OriginBA-3/reports/usage_device_dashboard.jrxml",
+    "/Users/chase/OriginBA-3/docs/jaspersoft_dashboard_build_plan_billing_usage_ft_gl.md",
+    "/Users/chase/OriginBA-3/docs/smartcity_snapshot_dashboard_pack_v1.md"
+  ]
+}

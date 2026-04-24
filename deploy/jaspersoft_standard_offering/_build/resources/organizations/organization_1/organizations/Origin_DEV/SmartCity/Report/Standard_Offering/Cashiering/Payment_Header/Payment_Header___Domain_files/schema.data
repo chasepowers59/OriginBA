@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="CI_PAY" label="1.) Payment Header" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID" label="Account ID" resourceId="JoinTree_1.CI_PAY.ACCT_ID"></item>
+        <item id="CAN_RSN_CD" label="Cancel Reason" resourceId="JoinTree_1.CI_PAY.CAN_RSN_CD"></item>
+        <item id="CURRENCY_CD" label="Currency Code" resourceId="JoinTree_1.CI_PAY.CURRENCY_CD"></item>
+        <item id="MATCH_TYPE_CD" label="Match Type" resourceId="JoinTree_1.CI_PAY.MATCH_TYPE_CD"></item>
+        <item id="MATCH_VAL" label="Match Value" resourceId="JoinTree_1.CI_PAY.MATCH_VAL"></item>
+        <item id="NON_CIS_COMMENT" label="Non CIS Comments" resourceId="JoinTree_1.CI_PAY.NON_CIS_COMMENT"></item>
+        <item id="NON_CIS_NAME" label="Non CIS Name" resourceId="JoinTree_1.CI_PAY.NON_CIS_NAME"></item>
+        <item id="NON_CIS_REF_NBR" label="Reference Number" resourceId="JoinTree_1.CI_PAY.NON_CIS_REF_NBR"></item>
+        <item id="PAY_AMT" label="Payment Amount" resourceId="JoinTree_1.CI_PAY.PAY_AMT"></item>
+        <item id="PAY_EVENT_ID" label="Payment Event ID" resourceId="JoinTree_1.CI_PAY.PAY_EVENT_ID"></item>
+        <item id="PAY_ID" label="Payment ID" resourceId="JoinTree_1.CI_PAY.PAY_ID"></item>
+        <item id="PAY_STATUS_FLG" label="Payment Status" resourceId="JoinTree_1.CI_PAY.PAY_STATUS_FLG"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="CI_PAY_EVENT_1" label="1.) Payment Event" resourceId="JoinTree_1">
+      <items>
+        <item id="CRE_DTTM_1" label="Create Date/Time" resourceId="JoinTree_1.CI_PAY_EVENT.CRE_DTTM"></item>
+        <item id="DOC_ID_1" label="Document Number" resourceId="JoinTree_1.CI_PAY_EVENT.DOC_ID"></item>
+        <item id="PAY_DT_1" label="Payment Date" resourceId="JoinTree_1.CI_PAY_EVENT.PAY_DT"></item>
+        <item id="PAY_EVENT_ID_2" label="Payment Event ID" resourceId="JoinTree_1.CI_PAY_EVENT.PAY_EVENT_ID"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet1" label="1.) Descriptions" resourceId="JoinTree_1">
+      <items>
+        <item id="DESCR_1" label="Cancel Reason Description" resourceId="JoinTree_1.CI_PAY_CAN_RSN_L.DESCR"></item>
+        <item id="DESCR" label="Match Type Description" resourceId="JoinTree_1.CI_MATCH_TYPE_L.DESCR"></item>
+        <item id="DESCR_2" label="Payment Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet2" label="1.) Formulas" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID_DISTINCT" label="Distinct  Account ID" resourceId="JoinTree_1.ACCT_ID_DISTINCT"></item>
+        <item id="PAY_EVENT_ID_DISTINCT" label="Distinct Payment Event ID" resourceId="JoinTree_1.PAY_EVENT_ID_DISTINCT"></item>
+        <item id="PAY_ID_DISTINCT" label="Distinct Payment ID" resourceId="JoinTree_1.PAY_ID_DISTINCT"></item>
+        <item id="DAYS_OLD" label="Days Old" resourceId="JoinTree_1.DAYS_OLD"></item>
+        <item id="ENTITY_NAME_UPR" label="Name" resourceId="JoinTree_1.CI_PER_NAME.ENTITY_NAME_UPR"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="CI_PAY_EVENT" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PAY_EVENT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PAY_EVENT_ID" type="java.lang.String"></field>
+        <field id="PAY_DT" type="java.sql.Timestamp"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="DOC_ID" type="java.lang.String"></field>
+        <field id="ILM_DT" type="java.sql.Timestamp"></field>
+        <field id="ILM_ARCH_SW" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_PAY" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PAY" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PAY_ID" type="java.lang.String"></field>
+        <field id="PAY_EVENT_ID" type="java.lang.String"></field>
+        <field id="CAN_RSN_CD" type="java.lang.String"></field>
+        <field id="CURRENCY_CD" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PAY_STATUS_FLG" type="java.lang.String"></field>
+        <field id="PAY_AMT" type="java.math.BigDecimal"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="NON_CIS_NAME" type="java.lang.String"></field>
+        <field id="NON_CIS_REF_NBR" type="java.lang.String"></field>
+        <field id="NON_CIS_COMMENT" type="java.lang.String"></field>
+        <field id="MATCH_TYPE_CD" type="java.lang.String"></field>
+        <field id="MATCH_VAL" type="java.lang.String"></field>
+        <field id="ILM_DT" type="java.sql.Timestamp"></field>
+        <field id="ILM_ARCH_SW" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_PAY_CAN_RSN_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PAY_CAN_RSN_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CAN_RSN_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="DESCR_OVRD" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG' and FIELD_NAME == 'PAY_STATUS_FLG                '</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_ACCT_PER" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT_PER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ACCT_REL_TYPE_CD" type="java.lang.String"></field>
+        <field id="BILL_ADDR_SRCE_FLG" type="java.lang.String"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="FIN_RESP_SW" type="java.lang.String"></field>
+        <field id="THRD_PTY_SW" type="java.lang.String"></field>
+        <field id="RECEIVE_COPY_SW" type="java.lang.String"></field>
+        <field id="BILL_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="BILL_FORMAT_FLG" type="java.lang.String"></field>
+        <field id="NBR_BILL_COPIES" type="java.math.BigDecimal"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="CUST_PO_ID" type="java.lang.String"></field>
+        <field id="NOTIFY_SW" type="java.lang.String"></field>
+        <field id="NAME_PFX_SFX" type="java.lang.String"></field>
+        <field id="PFX_SFX_FLG" type="java.lang.String"></field>
+        <field id="QTE_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="RECV_QTE_SW" type="java.lang.String"></field>
+        <field id="WEB_ACCESS_FLG" type="java.lang.String"></field>
+        <field id="ALW_PREF_FLG" type="java.lang.String"></field>
+        <field id="CSS_ACCESS_ROLE_FLG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>MAIN_CUST_SW == 'Y'</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_MATCH_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_MATCH_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="MATCH_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_PER_NAME" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PER_NAME" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="SEQ_NUM" type="java.math.BigDecimal"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="PRIM_NAME_SW" type="java.lang.String"></field>
+        <field id="ENTITY_NAME_UPR" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>NAME_TYPE_FLG == 'PRIM'</filterString>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PAY" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CI_PER_NAME.PER_ID" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.SEQ_NUM" type="java.math.BigDecimal"></field>
+        <field id="CI_PER_NAME.ENTITY_NAME" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_PER_NAME.PRIM_NAME_SW" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.ENTITY_NAME_UPR" type="java.lang.String"></field>
+        <field id="CI_PAY.PAY_ID" type="java.lang.String"></field>
+        <field id="CI_PAY.PAY_EVENT_ID" type="java.lang.String"></field>
+        <field id="CI_PAY.CAN_RSN_CD" type="java.lang.String"></field>
+        <field id="CI_PAY.CURRENCY_CD" type="java.lang.String"></field>
+        <field id="CI_PAY.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_PAY.PAY_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CI_PAY.PAY_AMT" type="java.math.BigDecimal"></field>
+        <field id="CI_PAY.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_PAY.NON_CIS_NAME" type="java.lang.String"></field>
+        <field id="CI_PAY.NON_CIS_REF_NBR" type="java.lang.String"></field>
+        <field id="CI_PAY.NON_CIS_COMMENT" type="java.lang.String"></field>
+        <field id="CI_PAY.MATCH_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_PAY.MATCH_VAL" type="java.lang.String"></field>
+        <field id="CI_PAY.ILM_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_PAY.ILM_ARCH_SW" type="java.lang.String"></field>
+        <field id="CI_PAY_EVENT.PAY_EVENT_ID" type="java.lang.String"></field>
+        <field id="CI_PAY_EVENT.PAY_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_PAY_EVENT.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_PAY_EVENT.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_PAY_EVENT.DOC_ID" type="java.lang.String"></field>
+        <field id="CI_PAY_EVENT.ILM_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_PAY_EVENT.ILM_ARCH_SW" type="java.lang.String"></field>
+        <field id="CI_PAY_CAN_RSN_L.CAN_RSN_CD" type="java.lang.String"></field>
+        <field id="CI_PAY_CAN_RSN_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_PAY_CAN_RSN_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_PAY_CAN_RSN_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.ACCT_REL_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.BILL_ADDR_SRCE_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.PER_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.FIN_RESP_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.THRD_PTY_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.RECEIVE_COPY_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.BILL_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.BILL_FORMAT_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.NBR_BILL_COPIES" type="java.math.BigDecimal"></field>
+        <field id="CI_ACCT_PER.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_ACCT_PER.CUST_PO_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.NOTIFY_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.NAME_PFX_SFX" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.PFX_SFX_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.QTE_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.RECV_QTE_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.WEB_ACCESS_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.ALW_PREF_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.CSS_ACCESS_ROLE_FLG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR_OVRD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCRLONG" type="java.lang.String"></field>
+        <field id="CI_MATCH_TYPE_L.MATCH_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_MATCH_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_MATCH_TYPE_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_MATCH_TYPE_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="PAY_EVENT_ID_DISTINCT" dataSetExpression="CountDistinct(CI_PAY_EVENT.PAY_EVENT_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="PAY_ID_DISTINCT" dataSetExpression="CountDistinct(CI_PAY.PAY_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="DAYS_OLD" dataSetExpression="ElapsedDays(Today(0), CI_PAY_EVENT.CRE_DTTM)" type="java.math.BigDecimal"></field>
+        <field id="ACCT_ID_DISTINCT" dataSetExpression="CountDistinct(CI_PAY.ACCT_ID, 'Current')" type="java.lang.Long"></field>
+      </fieldList>
+      <filterString>CI_ACCT_PER.MAIN_CUST_SW == 'Y' and CI_LOOKUP_VAL_L.FIELD_NAME == 'PAY_STATUS_FLG                ' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG' and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'</filterString>
+      <joinInfo alias="CI_PAY" referenceId="CI_PAY"></joinInfo>
+      <joinList>
+        <join expr="CI_PAY.PAY_EVENT_ID == CI_PAY_EVENT.PAY_EVENT_ID" left="CI_PAY" right="CI_PAY_EVENT" type="inner" weight="1"></join>
+        <join expr="CI_PAY.CAN_RSN_CD == CI_PAY_CAN_RSN_L.CAN_RSN_CD and CI_PAY_CAN_RSN_L.LANGUAGE_CD == 'ENG'" left="CI_PAY" right="CI_PAY_CAN_RSN_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_PAY.MATCH_TYPE_CD == CI_MATCH_TYPE_L.MATCH_TYPE_CD and CI_MATCH_TYPE_L.LANGUAGE_CD == 'ENG'" left="CI_PAY" right="CI_MATCH_TYPE_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_PAY.PAY_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'PAY_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="CI_PAY" right="CI_LOOKUP_VAL_L" type="inner" weight="1"></join>
+        <join expr="CI_PAY.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'" left="CI_PAY" right="CI_ACCT_PER" type="inner" weight="1"></join>
+        <join expr="CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM' and CI_ACCT_PER.MAIN_CUST_SW == 'Y'" left="CI_ACCT_PER" right="CI_PER_NAME" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_CAN_RSN_L" tableId="CI_PAY_CAN_RSN_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PAY" tableId="CI_PAY"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_EVENT" tableId="CI_PAY_EVENT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_MATCH_TYPE_L" tableId="CI_MATCH_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

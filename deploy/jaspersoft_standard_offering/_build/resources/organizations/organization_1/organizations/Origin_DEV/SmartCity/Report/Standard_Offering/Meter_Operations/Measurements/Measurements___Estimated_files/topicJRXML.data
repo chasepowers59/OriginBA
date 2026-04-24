@@ -1,0 +1,2111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="adhocReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="440eee6c-037f-4805-9657-136f7083d464">
+	<property name="has.modified.presentation" value="false"/>
+	<property name="base.datasource.version" value="1"/>
+	<property name="use.datasource.presentation" value="true"/>
+	<property name="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.TopicReportUnit" value="/temp/sl_topic_239a5092-a601-4e13-aaa0-b67264852ddb"/>
+	<property name="adhoc.metadata.version" value="396"/>
+	<property name="adhoc.topic.escape.variable.chars"/>
+	<property name="MSRMT_COND_DESC_1" value="Office Estimate,External Estimate,System Estimate"/>
+	<parameter name="MSRMT_DTTM_2" class="net.sf.jasperreports.types.date.TimestampRange">
+		<defaultValueExpression><![CDATA[com.jaspersoft.jasperserver.api.common.util.rd.DateRangeFactory.getInstance("DAY-0",java.sql.Timestamp.class)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="MSRMT_DTTM_1" class="net.sf.jasperreports.types.date.TimestampRange">
+		<defaultValueExpression><![CDATA[com.jaspersoft.jasperserver.api.common.util.rd.DateRangeFactory.getInstance("MONTH-1",java.sql.Timestamp.class)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="MSRMT_COND_DESC_1" class="java.util.Collection" nestedType="java.lang.String">
+		<defaultValueExpression><![CDATA[java.util.Arrays.asList(($P{JASPER_REPORT}.getProperty("MSRMT_COND_DESC_1")).split("(?<!\\\\),",-1))]]></defaultValueExpression>
+	</parameter>
+	<queryString language="domain">
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema">
+  <queryFields>
+    <queryField id="D1_MSRMT_AUDIT.MEASR_COMP_ID"></queryField>
+    <queryField id="D1_MSRMT_AUDIT.MSRMT_DTTM"></queryField>
+    <queryField id="D1_MSRMT_AUDIT.MSRMT_LOCAL_DTTM"></queryField>
+    <queryField id="D1_MSRMT_AUDIT.LOAD_DTTM"></queryField>
+    <queryField id="D1_MSRMT_CORE.MSRMT_BUS_OBJ_CD"></queryField>
+    <queryField id="D1_MSRMT_CORE.MSRMT_BUS_OBJ_DESC"></queryField>
+    <queryField id="D1_MSRMT_CORE.MSRMT_BO_STATUS_CD"></queryField>
+    <queryField id="D1_MSRMT_CORE.MSRMT_BO_STATUS_DESC"></queryField>
+    <queryField id="D1_MSRMT_CORE.MSRMT_COND_FLG"></queryField>
+    <queryField id="D1_MSRMT_CORE.MSRMT_COND_DESC"></queryField>
+    <queryField id="D1_MSRMT_CORE.MSRMT_USE_FLG"></queryField>
+    <queryField id="D1_MSRMT_CORE.MSRMT_USE_DESC"></queryField>
+    <queryField id="D1_MSRMT_CORE.USER_EDITED_FLG"></queryField>
+    <queryField id="D1_MSRMT_CORE.USER_EDITED_DESC"></queryField>
+    <queryField id="D1_MSRMT_CORE.ORIG_INIT_MSRMT_ID"></queryField>
+    <queryField id="D1_MSRMT_CORE.PREV_MSRMT_DTTM"></queryField>
+    <queryField id="D1_MSRMT_CORE.MSRMT_CRE_DTTM"></queryField>
+    <queryField id="D1_MSRMT_CORE.MSRMT_STATUS_UPD_DTTM"></queryField>
+    <queryField id="D1_MSRMT_CORE.MSRMT_LAST_UPDATE_DTTM"></queryField>
+    <queryField id="D1_MSRMT_VALUES.READING_COND_FLG"></queryField>
+    <queryField id="D1_MSRMT_VALUES.READING_COND_DESC"></queryField>
+    <queryField id="D1_MSRMT_VALUES.READING_VAL"></queryField>
+    <queryField id="D1_MSRMT_VALUES.COMBINED_MULTIPLIER"></queryField>
+    <queryField id="D1_MSRMT_VALUES.MSRMT_VAL"></queryField>
+    <queryField id="D1_MSRMT_VALUES.MSRMT_VAL1"></queryField>
+    <queryField id="D1_MSRMT_VALUES.MSRMT_VAL2"></queryField>
+    <queryField id="D1_MSRMT_VALUES.MSRMT_VAL3"></queryField>
+    <queryField id="D1_MSRMT_VALUES.MSRMT_VAL4"></queryField>
+    <queryField id="D1_MSRMT_VALUES.MSRMT_VAL5"></queryField>
+    <queryField id="D1_MSRMT_VALUES.MSRMT_VAL6"></queryField>
+    <queryField id="D1_MSRMT_VALUES.MSRMT_VAL7"></queryField>
+    <queryField id="D1_MSRMT_VALUES.MSRMT_VAL8"></queryField>
+    <queryField id="D1_MSRMT_VALUES.MSRMT_VAL9"></queryField>
+    <queryField id="D1_MSRMT_VALUES.MSRMT_VAL10"></queryField>
+    <queryField id="D1_MSRMT_IMD.INIT_MSRMT_DATA_ID"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_EXT_ID"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_FROM_DTTM"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_TO_DTTM"></queryField>
+    <queryField id="D1_MSRMT_IMD.DATA_SRC_FLG"></queryField>
+    <queryField id="D1_MSRMT_IMD.DATA_SRC_DESC"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_TIME_ZONE_CD"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_TIME_ZONE_DESC"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_BUS_OBJ_CD"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_BUS_OBJ_DESC"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_BO_STATUS_CD"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_BO_STATUS_DESC"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_BO_STATUS_REASON_CD"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_CRE_DTTM"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_STATUS_UPD_DTTM"></queryField>
+    <queryField id="D1_MSRMT_IMD.IMD_LAST_UPDATE_DTTM"></queryField>
+    <queryField id="D1_MSRMT_IMD.RETENTION_PERIOD"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.DEVICE_CONFIG_ID"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MEASR_COMP_TYPE_CD"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MEASR_COMP_TYPE_DESC"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MEASR_COMP_USAGE_FLG"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MEASR_COMP_USAGE_DESC"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_BUS_OBJ_CD"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_BUS_OBJ_DESC"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_BO_STATUS_CD"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_BO_STATUS_DESC"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_BO_STATUS_REASON_CD"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.D1_NBR_OF_DGTS_LFT"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.D1_NBR_OF_DGTS_RGT"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MEASR_COMP_MULTIPLIER"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.D1_FULL_SCALE"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.D1_READ_SEQ"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_TIME_ZONE_CD"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_TIME_ZONE_DESC"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.LATEST_MSRMT_DTTM"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MOST_RECENT_MSRMT_DTTM"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MOST_RECENT_NON_EST_MSRMT_DTTM"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.ADJ_LATEST_MSRMT_DTTM"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MOST_RECENT_MSRMT_READING_VAL"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MOST_RECENT_MSRMT_READING_COND"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MOST_RECENT_MSRMT_READING_COND_DESC"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_USER_ID"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_USER_NAME"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_ACCESS_GRP_CD"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_ACCESS_GRP_DESC"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.ATTR_VAL_ID"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_CRE_DTTM"></queryField>
+    <queryField id="D1_MSRMT_COMPONENT.MC_STATUS_UPD_DTTM"></queryField>
+    <queryField id="D1_MSRMT_INSTALL.INSTALL_EVT_ID"></queryField>
+    <queryField id="D1_MSRMT_INSTALL.INSTALL_BO_STATUS_CD"></queryField>
+    <queryField id="D1_MSRMT_INSTALL.INSTALL_BO_STATUS_REASON_CD"></queryField>
+    <queryField id="D1_MSRMT_INSTALL.INSTALL_DTTM"></queryField>
+    <queryField id="D1_MSRMT_INSTALL.REMOVAL_DTTM"></queryField>
+    <queryField id="D1_MSRMT_INSTALL.INSTALLATION_CONST"></queryField>
+    <queryField id="D1_MSRMT_INSTALL.ARM_STAT_FLG"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.D1_SP_ID"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.D1_SP_TYPE_CD"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.D1_SP_TYPE_DESC"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_BUS_OBJ_CD"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_BUS_OBJ_DESC"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_BO_STATUS_CD"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_BO_STATUS_DESC"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_BO_STATUS_REASON_CD"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_SRC_STAT_FLG"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_SRC_STAT_DESC"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.DISCONN_LOC_FLG"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.DISCONN_LOC_DESC"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.DIVISION_CD"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.MKT_CD"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.D1_LS_SL_FLG"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.D1_LS_SL_DESCR"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.MSRMT_CYC_CD"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.MSRMT_CYC_DESC"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.MSRMT_CYC_RTE_CD"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.MSRMT_CYC_RTE_DESC"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.MSRMT_CYC_RTE_SEQ"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_TIME_ZONE_CD"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_TIME_ZONE_DESC"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_ACCESS_GRP_CD"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_ACCESS_GRP_DESC"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.COUNTRY"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.POSTAL"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.ADDRESS1"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.ADDRESS2"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.ADDRESS3"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.ADDRESS4"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.CITY"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.COUNTY"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.STATE"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.GEO_CODE"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.HOUSE_TYPE"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.IN_CITY_LIMIT"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.NUM1"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.NUM2"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.D1_GEO_LAT"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.D1_GEO_LONG"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_CRE_DTTM"></queryField>
+    <queryField id="D1_MSRMT_SERVICE_POINT.SP_STATUS_UPD_DTTM"></queryField>
+  </queryFields>
+</query>]]>
+	</queryString>
+	<field name="D1_MSRMT_AUDIT.MEASR_COMP_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component ID"/>
+		<property name="semantic.item.label" value="Measuring Component ID"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_AUDIT/MEASR_COMP_ID"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MEASR_COMP_ID"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_AUDIT/MEASR_COMP_ID"/>
+		<property name="semantic.tree.sort.order">
+			<![CDATA[{"D1_MSRMT_AUDIT":1,"MEASR_COMP_ID":2,"MSRMT_DTTM":3,"MSRMT_LOCAL_DTTM":4,"LOAD_DTTM":5,"D1_MSRMT_CORE":6,"MSRMT_BUS_OBJ_CD":7,"MSRMT_BUS_OBJ_DESC":8,"MSRMT_BO_STATUS_CD":9,"MSRMT_BO_STATUS_DESC":10,"MSRMT_COND_FLG":11,"MSRMT_COND_DESC":12,"MSRMT_USE_FLG":13,"MSRMT_USE_DESC":14,"USER_EDITED_FLG":15,"USER_EDITED_DESC":16,"ORIG_INIT_MSRMT_ID":17,"PREV_MSRMT_DTTM":18,"MSRMT_CRE_DTTM":19,"MSRMT_STATUS_UPD_DTTM":20,"MSRMT_LAST_UPDATE_DTTM":21,"D1_MSRMT_VALUES":22,"READING_COND_FLG":23,"READING_COND_DESC":24,"READING_VAL":25,"COMBINED_MULTIPLIER":26,"MSRMT_VAL":27,"MSRMT_VAL1":28,"MSRMT_VAL2":29,"MSRMT_VAL3":30,"MSRMT_VAL4":31,"MSRMT_VAL5":32,"MSRMT_VAL6":33,"MSRMT_VAL7":34,"MSRMT_VAL8":35,"MSRMT_VAL9":36,"MSRMT_VAL10":37,"D1_MSRMT_IMD":38,"INIT_MSRMT_DATA_ID":39,"IMD_EXT_ID":40,"IMD_FROM_DTTM":41,"IMD_TO_DTTM":42,"DATA_SRC_FLG":43,"DATA_SRC_DESC":44,"IMD_TIME_ZONE_CD":45,"IMD_TIME_ZONE_DESC":46,"IMD_BUS_OBJ_CD":47,"IMD_BUS_OBJ_DESC":48,"IMD_BO_STATUS_CD":49,"IMD_BO_STATUS_DESC":50,"IMD_BO_STATUS_REASON_CD":51,"IMD_CRE_DTTM":52,"IMD_STATUS_UPD_DTTM":53,"IMD_LAST_UPDATE_DTTM":54,"RETENTION_PERIOD":55,"D1_MSRMT_COMPONENT":56,"DEVICE_CONFIG_ID":57,"MEASR_COMP_TYPE_CD":58,"MEASR_COMP_TYPE_DESC":59,"MEASR_COMP_USAGE_FLG":60,"MEASR_COMP_USAGE_DESC":61,"MC_BUS_OBJ_CD":62,"MC_BUS_OBJ_DESC":63,"MC_BO_STATUS_CD":64,"MC_BO_STATUS_DESC":65,"MC_BO_STATUS_REASON_CD":66,"D1_NBR_OF_DGTS_LFT":67,"D1_NBR_OF_DGTS_RGT":68,"MEASR_COMP_MULTIPLIER":69,"D1_FULL_SCALE":70,"D1_READ_SEQ":71,"MC_TIME_ZONE_CD":72,"MC_TIME_ZONE_DESC":73,"LATEST_MSRMT_DTTM":74,"MOST_RECENT_MSRMT_DTTM":75,"MOST_RECENT_NON_EST_MSRMT_DTTM":76,"ADJ_LATEST_MSRMT_DTTM":77,"MOST_RECENT_MSRMT_READING_VAL":78,"MOST_RECENT_MSRMT_READING_COND":79,"MOST_RECENT_MSRMT_READING_COND_DESC":80,"MC_USER_ID":81,"MC_USER_NAME":82,"MC_ACCESS_GRP_CD":83,"MC_ACCESS_GRP_DESC":84,"ATTR_VAL_ID":85,"MC_CRE_DTTM":86,"MC_STATUS_UPD_DTTM":87,"D1_MSRMT_INSTALL":88,"INSTALL_EVT_ID":89,"INSTALL_BO_STATUS_CD":90,"INSTALL_BO_STATUS_REASON_CD":91,"INSTALL_DTTM":92,"REMOVAL_DTTM":93,"INSTALLATION_CONST":94,"ARM_STAT_FLG":95,"D1_MSRMT_SERVICE_POINT":96,"D1_SP_ID":97,"D1_SP_TYPE_CD":98,"D1_SP_TYPE_DESC":99,"SP_BUS_OBJ_CD":100,"SP_BUS_OBJ_DESC":101,"SP_BO_STATUS_CD":102,"SP_BO_STATUS_DESC":103,"SP_BO_STATUS_REASON_CD":104,"SP_SRC_STAT_FLG":105,"SP_SRC_STAT_DESC":106,"DISCONN_LOC_FLG":107,"DISCONN_LOC_DESC":108,"DIVISION_CD":109,"MKT_CD":110,"D1_LS_SL_FLG":111,"D1_LS_SL_DESCR":112,"MSRMT_CYC_CD":113,"MSRMT_CYC_DESC":114,"MSRMT_CYC_RTE_CD":115,"MSRMT_CYC_RTE_DESC":116,"MSRMT_CYC_RTE_SEQ":117,"SP_TIME_ZONE_CD":118,"SP_TIME_ZONE_DESC":119,"SP_ACCESS_GRP_CD":120,"SP_ACCESS_GRP_DESC":121,"COUNTRY":122,"POSTAL":123,"ADDRESS1":124,"ADDRESS2":125,"ADDRESS3":126,"ADDRESS4":127,"CITY":128,"COUNTY":129,"STATE":130,"GEO_CODE":131,"HOUSE_TYPE":132,"IN_CITY_LIMIT":133,"NUM1":134,"NUM2":135,"D1_GEO_LAT":136,"D1_GEO_LONG":137,"SP_CRE_DTTM":138,"SP_STATUS_UPD_DTTM":139}]]>
+		</property>
+		<property name="adhoc.tree.labels">
+			<![CDATA[[{"uri":"/D1_MSRMT_AUDIT","resourceId":"D1_MSRMT_RPT_CURR","label":"Snapshot Audit"},{"uri":"/D1_MSRMT_CORE","resourceId":"D1_MSRMT_RPT_CURR","label":"Measurement Core"},{"uri":"/D1_MSRMT_VALUES","resourceId":"D1_MSRMT_RPT_CURR","label":"Measurement Values"},{"uri":"/D1_MSRMT_IMD","resourceId":"D1_MSRMT_RPT_CURR","label":"Source IMD"},{"uri":"/D1_MSRMT_COMPONENT","resourceId":"D1_MSRMT_RPT_CURR","label":"Measuring Component"},{"uri":"/D1_MSRMT_INSTALL","resourceId":"D1_MSRMT_RPT_CURR","label":"Install Event"},{"uri":"/D1_MSRMT_SERVICE_POINT","resourceId":"D1_MSRMT_RPT_CURR","label":"Service Point"}]]]>
+		</property>
+		<property name="slIsTableAsList" value="false"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_AUDIT/MEASR_COMP_ID"/>
+		<property name="previous.display" value="Measuring Component ID"/>
+		<property name="adhoc.chosen.tree.labels">
+			<![CDATA[[{"uri":"/D1_MSRMT_AUDIT","resourceId":"D1_MSRMT_RPT_CURR","label":"Snapshot Audit"},{"uri":"/D1_MSRMT_CORE","resourceId":"D1_MSRMT_RPT_CURR","label":"Measurement Core"},{"uri":"/D1_MSRMT_VALUES","resourceId":"D1_MSRMT_RPT_CURR","label":"Measurement Values"},{"uri":"/D1_MSRMT_IMD","resourceId":"D1_MSRMT_RPT_CURR","label":"Source IMD"},{"uri":"/D1_MSRMT_COMPONENT","resourceId":"D1_MSRMT_RPT_CURR","label":"Measuring Component"},{"uri":"/D1_MSRMT_INSTALL","resourceId":"D1_MSRMT_RPT_CURR","label":"Install Event"},{"uri":"/D1_MSRMT_SERVICE_POINT","resourceId":"D1_MSRMT_RPT_CURR","label":"Service Point"}]]]>
+		</property>
+		<property name="adhoc.chosen.tree.order">
+			<![CDATA[{"MOST_RECENT_MSRMT_READING_COND_DESC":80,"READING_COND_FLG":23,"MC_TIME_ZONE_CD":72,"MOST_RECENT_MSRMT_READING_VAL":78,"DATA_SRC_FLG":43,"DISCONN_LOC_DESC":108,"READING_COND_DESC":24,"MSRMT_COND_FLG":11,"MOST_RECENT_MSRMT_DTTM":75,"MC_BUS_OBJ_DESC":63,"MC_ACCESS_GRP_CD":83,"IMD_EXT_ID":40,"IMD_BO_STATUS_DESC":50,"D1_MSRMT_INSTALL":88,"COMBINED_MULTIPLIER":26,"DISCONN_LOC_FLG":107,"SP_BUS_OBJ_CD":100,"SP_TIME_ZONE_DESC":119,"USER_EDITED_FLG":15,"INSTALLATION_CONST":94,"D1_MSRMT_SERVICE_POINT":96,"D1_NBR_OF_DGTS_RGT":68,"D1_MSRMT_AUDIT":1,"D1_LS_SL_FLG":111,"D1_LS_SL_DESCR":112,"IMD_TIME_ZONE_CD":45,"MC_ACCESS_GRP_DESC":84,"USER_EDITED_DESC":16,"DATA_SRC_DESC":44,"MSRMT_CYC_RTE_SEQ":117,"MSRMT_VAL":27,"IN_CITY_LIMIT":133,"MC_CRE_DTTM":86,"HOUSE_TYPE":132,"MSRMT_USE_FLG":13,"LATEST_MSRMT_DTTM":74,"D1_MSRMT_CORE":6,"MEASR_COMP_USAGE_DESC":61,"MOST_RECENT_NON_EST_MSRMT_DTTM":76,"D1_SP_ID":97,"SP_SRC_STAT_FLG":105,"MSRMT_CYC_RTE_DESC":116,"MSRMT_VAL6":33,"SP_BO_STATUS_DESC":103,"MSRMT_VAL5":32,"MSRMT_VAL8":35,"MSRMT_VAL7":34,"LOAD_DTTM":5,"MSRMT_VAL9":36,"MEASR_COMP_USAGE_FLG":60,"ARM_STAT_FLG":95,"INSTALL_DTTM":92,"MKT_CD":110,"MSRMT_BO_STATUS_CD":9,"IMD_TO_DTTM":42,"SP_STATUS_UPD_DTTM":139,"INSTALL_BO_STATUS_REASON_CD":91,"CITY":128,"MSRMT_VAL10":37,"MSRMT_BUS_OBJ_CD":7,"REMOVAL_DTTM":93,"D1_MSRMT_COMPONENT":56,"MSRMT_STATUS_UPD_DTTM":20,"MC_USER_NAME":82,"ORIG_INIT_MSRMT_ID":17,"D1_NBR_OF_DGTS_LFT":67,"ATTR_VAL_ID":85,"PREV_MSRMT_DTTM":18,"IMD_CRE_DTTM":52,"GEO_CODE":131,"RETENTION_PERIOD":55,"COUNTRY":122,"SP_BO_STATUS_CD":102,"MC_BO_STATUS_CD":64,"MSRMT_VAL2":29,"D1_MSRMT_IMD":38,"MSRMT_VAL1":28,"MSRMT_VAL4":31,"SP_SRC_STAT_DESC":106,"MSRMT_VAL3":30,"D1_READ_SEQ":71,"COUNTY":129,"SP_BO_STATUS_REASON_CD":104,"MC_BUS_OBJ_CD":62,"MSRMT_CYC_CD":113,"MSRMT_CYC_DESC":114,"NUM2":135,"DIVISION_CD":109,"MC_STATUS_UPD_DTTM":87,"MOST_RECENT_MSRMT_READING_COND":79,"NUM1":134,"INSTALL_BO_STATUS_CD":90,"IMD_LAST_UPDATE_DTTM":54,"D1_MSRMT_VALUES":22,"MSRMT_CRE_DTTM":19,"SP_ACCESS_GRP_DESC":121,"READING_VAL":25,"IMD_BUS_OBJ_DESC":48,"MC_BO_STATUS_DESC":65,"D1_GEO_LONG":137,"MC_BO_STATUS_REASON_CD":66,"MSRMT_LAST_UPDATE_DTTM":21,"DEVICE_CONFIG_ID":57,"ADJ_LATEST_MSRMT_DTTM":77,"POSTAL":123,"STATE":130,"MEASR_COMP_ID":2,"MEASR_COMP_MULTIPLIER":69,"IMD_TIME_ZONE_DESC":46,"SP_CRE_DTTM":138,"MSRMT_LOCAL_DTTM":4,"D1_SP_TYPE_DESC":99,"SP_TIME_ZONE_CD":118,"MSRMT_CYC_RTE_CD":115,"D1_GEO_LAT":136,"D1_SP_TYPE_CD":98,"INIT_MSRMT_DATA_ID":39,"MEASR_COMP_TYPE_DESC":59,"ADDRESS1":124,"ADDRESS3":126,"MSRMT_BUS_OBJ_DESC":8,"ADDRESS2":125,"ADDRESS4":127,"IMD_STATUS_UPD_DTTM":53,"MEASR_COMP_TYPE_CD":58,"IMD_BUS_OBJ_CD":47,"SP_BUS_OBJ_DESC":101,"MC_TIME_ZONE_DESC":73,"MSRMT_COND_DESC":12,"MSRMT_DTTM":3,"IMD_BO_STATUS_CD":49,"IMD_FROM_DTTM":41,"MC_USER_ID":81,"SP_ACCESS_GRP_CD":120,"MSRMT_USE_DESC":14,"INSTALL_EVT_ID":89,"D1_FULL_SCALE":70,"IMD_BO_STATUS_REASON_CD":51,"MSRMT_BO_STATUS_DESC":10}]]>
+		</property>
+		<property name="adhoc.chosen.tree.is.flattened" value="false"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_AUDIT.MEASR_COMP_ID)"/>
+	</field>
+	<field name="D1_MSRMT_AUDIT.MSRMT_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Measurement Date Time"/>
+		<property name="semantic.item.label" value="Measurement Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_AUDIT/MSRMT_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_AUDIT/MSRMT_DTTM"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_AUDIT/MSRMT_DTTM"/>
+		<property name="previous.display" value="Measurement Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_AUDIT.MSRMT_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_AUDIT.MSRMT_LOCAL_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Measurement Local Date Time"/>
+		<property name="semantic.item.label" value="Measurement Local Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_AUDIT/MSRMT_LOCAL_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_LOCAL_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_AUDIT/MSRMT_LOCAL_DTTM"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_AUDIT/MSRMT_LOCAL_DTTM"/>
+		<property name="previous.display" value="Measurement Local Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_AUDIT.MSRMT_LOCAL_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_AUDIT.LOAD_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Snapshot Load Date Time"/>
+		<property name="semantic.item.label" value="Snapshot Load Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_AUDIT/LOAD_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.LOAD_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_AUDIT/LOAD_DTTM"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_AUDIT/LOAD_DTTM"/>
+		<property name="previous.display" value="Snapshot Load Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_AUDIT.LOAD_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_CORE.MSRMT_BUS_OBJ_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Business Object Code"/>
+		<property name="semantic.item.label" value="Measurement Business Object Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/MSRMT_BUS_OBJ_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_BUS_OBJ_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/MSRMT_BUS_OBJ_CD"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/MSRMT_BUS_OBJ_CD"/>
+		<property name="previous.display" value="Measurement Business Object Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.MSRMT_BUS_OBJ_CD)"/>
+	</field>
+	<field name="D1_MSRMT_CORE.MSRMT_BUS_OBJ_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Business Object"/>
+		<property name="semantic.item.label" value="Measurement Business Object"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/MSRMT_BUS_OBJ_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_BUS_OBJ_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/MSRMT_BUS_OBJ_DESC"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/MSRMT_BUS_OBJ_DESC"/>
+		<property name="previous.display" value="Measurement Business Object"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.MSRMT_BUS_OBJ_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_CORE.MSRMT_BO_STATUS_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Status Code"/>
+		<property name="semantic.item.label" value="Measurement Status Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/MSRMT_BO_STATUS_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_BO_STATUS_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/MSRMT_BO_STATUS_CD"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/MSRMT_BO_STATUS_CD"/>
+		<property name="previous.display" value="Measurement Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.MSRMT_BO_STATUS_CD)"/>
+	</field>
+	<field name="D1_MSRMT_CORE.MSRMT_BO_STATUS_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Status"/>
+		<property name="semantic.item.label" value="Measurement Status"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/MSRMT_BO_STATUS_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_BO_STATUS_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/MSRMT_BO_STATUS_DESC"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/MSRMT_BO_STATUS_DESC"/>
+		<property name="previous.display" value="Measurement Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.MSRMT_BO_STATUS_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_CORE.MSRMT_COND_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Condition Code"/>
+		<property name="semantic.item.label" value="Measurement Condition Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/MSRMT_COND_FLG"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_COND_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/MSRMT_COND_FLG"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/MSRMT_COND_FLG"/>
+		<property name="previous.display" value="Measurement Condition Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.MSRMT_COND_FLG)"/>
+	</field>
+	<field name="D1_MSRMT_CORE.MSRMT_COND_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Condition"/>
+		<property name="semantic.item.label" value="Measurement Condition"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/MSRMT_COND_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_COND_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/MSRMT_COND_DESC"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/MSRMT_COND_DESC"/>
+		<property name="previous.display" value="Measurement Condition"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.MSRMT_COND_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_CORE.MSRMT_USE_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Use Code"/>
+		<property name="semantic.item.label" value="Measurement Use Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/MSRMT_USE_FLG"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_USE_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/MSRMT_USE_FLG"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/MSRMT_USE_FLG"/>
+		<property name="previous.display" value="Measurement Use Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.MSRMT_USE_FLG)"/>
+	</field>
+	<field name="D1_MSRMT_CORE.MSRMT_USE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Use"/>
+		<property name="semantic.item.label" value="Measurement Use"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/MSRMT_USE_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_USE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/MSRMT_USE_DESC"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/MSRMT_USE_DESC"/>
+		<property name="previous.display" value="Measurement Use"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.MSRMT_USE_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_CORE.USER_EDITED_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="User Edited Code"/>
+		<property name="semantic.item.label" value="User Edited Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/USER_EDITED_FLG"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.USER_EDITED_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/USER_EDITED_FLG"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/USER_EDITED_FLG"/>
+		<property name="previous.display" value="User Edited Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.USER_EDITED_FLG)"/>
+	</field>
+	<field name="D1_MSRMT_CORE.USER_EDITED_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="User Edited"/>
+		<property name="semantic.item.label" value="User Edited"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/USER_EDITED_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.USER_EDITED_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/USER_EDITED_DESC"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/USER_EDITED_DESC"/>
+		<property name="previous.display" value="User Edited"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.USER_EDITED_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_CORE.ORIG_INIT_MSRMT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Original Initial Measurement Data ID"/>
+		<property name="semantic.item.label" value="Original Initial Measurement Data ID"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/ORIG_INIT_MSRMT_ID"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.ORIG_INIT_MSRMT_ID"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/ORIG_INIT_MSRMT_ID"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/ORIG_INIT_MSRMT_ID"/>
+		<property name="previous.display" value="Original Initial Measurement Data ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.ORIG_INIT_MSRMT_ID)"/>
+	</field>
+	<field name="D1_MSRMT_CORE.PREV_MSRMT_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Previous Measurement Date Time"/>
+		<property name="semantic.item.label" value="Previous Measurement Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/PREV_MSRMT_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.PREV_MSRMT_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/PREV_MSRMT_DTTM"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/PREV_MSRMT_DTTM"/>
+		<property name="previous.display" value="Previous Measurement Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.PREV_MSRMT_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_CORE.MSRMT_CRE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Measurement Created Date Time"/>
+		<property name="semantic.item.label" value="Measurement Created Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/MSRMT_CRE_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_CRE_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/MSRMT_CRE_DTTM"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/MSRMT_CRE_DTTM"/>
+		<property name="previous.display" value="Measurement Created Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.MSRMT_CRE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_CORE.MSRMT_STATUS_UPD_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Measurement Status Updated Date Time"/>
+		<property name="semantic.item.label" value="Measurement Status Updated Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/MSRMT_STATUS_UPD_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_STATUS_UPD_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/MSRMT_STATUS_UPD_DTTM"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/MSRMT_STATUS_UPD_DTTM"/>
+		<property name="previous.display" value="Measurement Status Updated Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.MSRMT_STATUS_UPD_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_CORE.MSRMT_LAST_UPDATE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Measurement Last Updated Date Time"/>
+		<property name="semantic.item.label" value="Measurement Last Updated Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_CORE/MSRMT_LAST_UPDATE_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_LAST_UPDATE_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_CORE/MSRMT_LAST_UPDATE_DTTM"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_CORE/MSRMT_LAST_UPDATE_DTTM"/>
+		<property name="previous.display" value="Measurement Last Updated Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_CORE.MSRMT_LAST_UPDATE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.READING_COND_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Reading Condition Code"/>
+		<property name="semantic.item.label" value="Reading Condition Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/READING_COND_FLG"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.READING_COND_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/READING_COND_FLG"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/READING_COND_FLG"/>
+		<property name="previous.display" value="Reading Condition Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_VALUES.READING_COND_FLG)"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.READING_COND_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Reading Condition"/>
+		<property name="semantic.item.label" value="Reading Condition"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/READING_COND_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.READING_COND_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/READING_COND_DESC"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/READING_COND_DESC"/>
+		<property name="previous.display" value="Reading Condition"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_VALUES.READING_COND_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.READING_VAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Reading Value"/>
+		<property name="semantic.item.label" value="Reading Value"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/READING_VAL"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.READING_VAL"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/READING_VAL"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/READING_VAL"/>
+		<property name="previous.display" value="Reading Value"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.READING_VAL)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.COMBINED_MULTIPLIER" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Combined Multiplier"/>
+		<property name="semantic.item.label" value="Combined Multiplier"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/COMBINED_MULTIPLIER"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.COMBINED_MULTIPLIER"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/COMBINED_MULTIPLIER"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/COMBINED_MULTIPLIER"/>
+		<property name="previous.display" value="Combined Multiplier"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.COMBINED_MULTIPLIER)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.MSRMT_VAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measurement Value"/>
+		<property name="semantic.item.label" value="Measurement Value"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_VAL"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL"/>
+		<property name="previous.display" value="Measurement Value"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.MSRMT_VAL)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.MSRMT_VAL1" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measurement Value 1"/>
+		<property name="semantic.item.label" value="Measurement Value 1"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL1"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_VAL1"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL1"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL1"/>
+		<property name="previous.display" value="Measurement Value 1"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.MSRMT_VAL1)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.MSRMT_VAL2" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measurement Value 2"/>
+		<property name="semantic.item.label" value="Measurement Value 2"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL2"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_VAL2"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL2"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL2"/>
+		<property name="previous.display" value="Measurement Value 2"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.MSRMT_VAL2)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.MSRMT_VAL3" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measurement Value 3"/>
+		<property name="semantic.item.label" value="Measurement Value 3"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL3"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_VAL3"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL3"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL3"/>
+		<property name="previous.display" value="Measurement Value 3"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.MSRMT_VAL3)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.MSRMT_VAL4" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measurement Value 4"/>
+		<property name="semantic.item.label" value="Measurement Value 4"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL4"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_VAL4"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL4"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL4"/>
+		<property name="previous.display" value="Measurement Value 4"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.MSRMT_VAL4)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.MSRMT_VAL5" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measurement Value 5"/>
+		<property name="semantic.item.label" value="Measurement Value 5"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL5"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_VAL5"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL5"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL5"/>
+		<property name="previous.display" value="Measurement Value 5"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.MSRMT_VAL5)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.MSRMT_VAL6" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measurement Value 6"/>
+		<property name="semantic.item.label" value="Measurement Value 6"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL6"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_VAL6"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL6"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL6"/>
+		<property name="previous.display" value="Measurement Value 6"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.MSRMT_VAL6)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.MSRMT_VAL7" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measurement Value 7"/>
+		<property name="semantic.item.label" value="Measurement Value 7"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL7"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_VAL7"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL7"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL7"/>
+		<property name="previous.display" value="Measurement Value 7"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.MSRMT_VAL7)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.MSRMT_VAL8" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measurement Value 8"/>
+		<property name="semantic.item.label" value="Measurement Value 8"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL8"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_VAL8"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL8"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL8"/>
+		<property name="previous.display" value="Measurement Value 8"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.MSRMT_VAL8)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.MSRMT_VAL9" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measurement Value 9"/>
+		<property name="semantic.item.label" value="Measurement Value 9"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL9"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_VAL9"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL9"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL9"/>
+		<property name="previous.display" value="Measurement Value 9"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.MSRMT_VAL9)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_VALUES.MSRMT_VAL10" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measurement Value 10"/>
+		<property name="semantic.item.label" value="Measurement Value 10"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL10"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_VAL10"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL10"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_VALUES/MSRMT_VAL10"/>
+		<property name="previous.display" value="Measurement Value 10"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_VALUES.MSRMT_VAL10)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_IMD.INIT_MSRMT_DATA_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Initial Measurement Data ID"/>
+		<property name="semantic.item.label" value="Initial Measurement Data ID"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/INIT_MSRMT_DATA_ID"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.INIT_MSRMT_DATA_ID"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/INIT_MSRMT_DATA_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/INIT_MSRMT_DATA_ID"/>
+		<property name="previous.display" value="Initial Measurement Data ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.INIT_MSRMT_DATA_ID)"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_EXT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="IMD External ID"/>
+		<property name="semantic.item.label" value="IMD External ID"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_EXT_ID"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_EXT_ID"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_EXT_ID"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_EXT_ID"/>
+		<property name="previous.display" value="IMD External ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_EXT_ID)"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_FROM_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="IMD From Date Time"/>
+		<property name="semantic.item.label" value="IMD From Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_FROM_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_FROM_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_FROM_DTTM"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_FROM_DTTM"/>
+		<property name="previous.display" value="IMD From Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_FROM_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_TO_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="IMD To Date Time"/>
+		<property name="semantic.item.label" value="IMD To Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_TO_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_TO_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_TO_DTTM"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_TO_DTTM"/>
+		<property name="previous.display" value="IMD To Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_TO_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_IMD.DATA_SRC_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Data Source Code"/>
+		<property name="semantic.item.label" value="Data Source Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/DATA_SRC_FLG"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.DATA_SRC_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/DATA_SRC_FLG"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/DATA_SRC_FLG"/>
+		<property name="previous.display" value="Data Source Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.DATA_SRC_FLG)"/>
+	</field>
+	<field name="D1_MSRMT_IMD.DATA_SRC_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Data Source"/>
+		<property name="semantic.item.label" value="Data Source"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/DATA_SRC_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.DATA_SRC_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/DATA_SRC_DESC"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/DATA_SRC_DESC"/>
+		<property name="previous.display" value="Data Source"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.DATA_SRC_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_TIME_ZONE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="IMD Time Zone Code"/>
+		<property name="semantic.item.label" value="IMD Time Zone Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_TIME_ZONE_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_TIME_ZONE_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_TIME_ZONE_CD"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_TIME_ZONE_CD"/>
+		<property name="previous.display" value="IMD Time Zone Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_TIME_ZONE_CD)"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_TIME_ZONE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="IMD Time Zone"/>
+		<property name="semantic.item.label" value="IMD Time Zone"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_TIME_ZONE_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_TIME_ZONE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_TIME_ZONE_DESC"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_TIME_ZONE_DESC"/>
+		<property name="previous.display" value="IMD Time Zone"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_TIME_ZONE_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_BUS_OBJ_CD" class="java.lang.String">
+		<property name="adhoc.display" value="IMD Business Object Code"/>
+		<property name="semantic.item.label" value="IMD Business Object Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_BUS_OBJ_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_BUS_OBJ_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_BUS_OBJ_CD"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_BUS_OBJ_CD"/>
+		<property name="previous.display" value="IMD Business Object Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_BUS_OBJ_CD)"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_BUS_OBJ_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="IMD Business Object"/>
+		<property name="semantic.item.label" value="IMD Business Object"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_BUS_OBJ_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_BUS_OBJ_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_BUS_OBJ_DESC"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_BUS_OBJ_DESC"/>
+		<property name="previous.display" value="IMD Business Object"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_BUS_OBJ_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_BO_STATUS_CD" class="java.lang.String">
+		<property name="adhoc.display" value="IMD Status Code"/>
+		<property name="semantic.item.label" value="IMD Status Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_BO_STATUS_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_BO_STATUS_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_BO_STATUS_CD"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_BO_STATUS_CD"/>
+		<property name="previous.display" value="IMD Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_BO_STATUS_CD)"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_BO_STATUS_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="IMD Status"/>
+		<property name="semantic.item.label" value="IMD Status"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_BO_STATUS_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_BO_STATUS_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_BO_STATUS_DESC"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_BO_STATUS_DESC"/>
+		<property name="previous.display" value="IMD Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_BO_STATUS_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_BO_STATUS_REASON_CD" class="java.lang.String">
+		<property name="adhoc.display" value="IMD Status Reason Code"/>
+		<property name="semantic.item.label" value="IMD Status Reason Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_BO_STATUS_REASON_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_BO_STATUS_REASON_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_BO_STATUS_REASON_CD"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_BO_STATUS_REASON_CD"/>
+		<property name="previous.display" value="IMD Status Reason Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_BO_STATUS_REASON_CD)"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_CRE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="IMD Created Date Time"/>
+		<property name="semantic.item.label" value="IMD Created Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_CRE_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_CRE_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_CRE_DTTM"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_CRE_DTTM"/>
+		<property name="previous.display" value="IMD Created Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_CRE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_STATUS_UPD_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="IMD Status Updated Date Time"/>
+		<property name="semantic.item.label" value="IMD Status Updated Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_STATUS_UPD_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_STATUS_UPD_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_STATUS_UPD_DTTM"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_STATUS_UPD_DTTM"/>
+		<property name="previous.display" value="IMD Status Updated Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_STATUS_UPD_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_IMD.IMD_LAST_UPDATE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="IMD Last Updated Date Time"/>
+		<property name="semantic.item.label" value="IMD Last Updated Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/IMD_LAST_UPDATE_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IMD_LAST_UPDATE_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/IMD_LAST_UPDATE_DTTM"/>
+		<property name="semantic.tree.sort.order" value="15"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/IMD_LAST_UPDATE_DTTM"/>
+		<property name="previous.display" value="IMD Last Updated Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_IMD.IMD_LAST_UPDATE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_IMD.RETENTION_PERIOD" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Retention Period"/>
+		<property name="semantic.item.label" value="Retention Period"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_IMD/RETENTION_PERIOD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.RETENTION_PERIOD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_IMD/RETENTION_PERIOD"/>
+		<property name="semantic.tree.sort.order" value="16"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_IMD/RETENTION_PERIOD"/>
+		<property name="previous.display" value="Retention Period"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_IMD.RETENTION_PERIOD)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.DEVICE_CONFIG_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Device Configuration ID"/>
+		<property name="semantic.item.label" value="Device Configuration ID"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/DEVICE_CONFIG_ID"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.DEVICE_CONFIG_ID"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/DEVICE_CONFIG_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/DEVICE_CONFIG_ID"/>
+		<property name="previous.display" value="Device Configuration ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.DEVICE_CONFIG_ID)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MEASR_COMP_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Type Code"/>
+		<property name="semantic.item.label" value="Measuring Component Type Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_TYPE_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MEASR_COMP_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_TYPE_CD"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_TYPE_CD"/>
+		<property name="previous.display" value="Measuring Component Type Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MEASR_COMP_TYPE_CD)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MEASR_COMP_TYPE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Type"/>
+		<property name="semantic.item.label" value="Measuring Component Type"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_TYPE_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MEASR_COMP_TYPE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_TYPE_DESC"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_TYPE_DESC"/>
+		<property name="previous.display" value="Measuring Component Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MEASR_COMP_TYPE_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MEASR_COMP_USAGE_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Usage Code"/>
+		<property name="semantic.item.label" value="Measuring Component Usage Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_USAGE_FLG"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MEASR_COMP_USAGE_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_USAGE_FLG"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_USAGE_FLG"/>
+		<property name="previous.display" value="Measuring Component Usage Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MEASR_COMP_USAGE_FLG)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MEASR_COMP_USAGE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Usage"/>
+		<property name="semantic.item.label" value="Measuring Component Usage"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_USAGE_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MEASR_COMP_USAGE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_USAGE_DESC"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_USAGE_DESC"/>
+		<property name="previous.display" value="Measuring Component Usage"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MEASR_COMP_USAGE_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_BUS_OBJ_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Business Object Code"/>
+		<property name="semantic.item.label" value="Measuring Component Business Object Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BUS_OBJ_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_BUS_OBJ_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BUS_OBJ_CD"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BUS_OBJ_CD"/>
+		<property name="previous.display" value="Measuring Component Business Object Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_BUS_OBJ_CD)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_BUS_OBJ_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Business Object"/>
+		<property name="semantic.item.label" value="Measuring Component Business Object"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BUS_OBJ_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_BUS_OBJ_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BUS_OBJ_DESC"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BUS_OBJ_DESC"/>
+		<property name="previous.display" value="Measuring Component Business Object"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_BUS_OBJ_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_BO_STATUS_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Status Code"/>
+		<property name="semantic.item.label" value="Measuring Component Status Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BO_STATUS_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_BO_STATUS_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BO_STATUS_CD"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BO_STATUS_CD"/>
+		<property name="previous.display" value="Measuring Component Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_BO_STATUS_CD)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_BO_STATUS_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Status"/>
+		<property name="semantic.item.label" value="Measuring Component Status"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BO_STATUS_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_BO_STATUS_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BO_STATUS_DESC"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BO_STATUS_DESC"/>
+		<property name="previous.display" value="Measuring Component Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_BO_STATUS_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_BO_STATUS_REASON_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Status Reason Code"/>
+		<property name="semantic.item.label" value="Measuring Component Status Reason Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BO_STATUS_REASON_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_BO_STATUS_REASON_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BO_STATUS_REASON_CD"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_BO_STATUS_REASON_CD"/>
+		<property name="previous.display" value="Measuring Component Status Reason Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_BO_STATUS_REASON_CD)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.D1_NBR_OF_DGTS_LFT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Digits Left Of Decimal"/>
+		<property name="semantic.item.label" value="Digits Left Of Decimal"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/D1_NBR_OF_DGTS_LFT"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.D1_NBR_OF_DGTS_LFT"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/D1_NBR_OF_DGTS_LFT"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/D1_NBR_OF_DGTS_LFT"/>
+		<property name="previous.display" value="Digits Left Of Decimal"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_COMPONENT.D1_NBR_OF_DGTS_LFT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.D1_NBR_OF_DGTS_RGT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Digits Right Of Decimal"/>
+		<property name="semantic.item.label" value="Digits Right Of Decimal"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/D1_NBR_OF_DGTS_RGT"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.D1_NBR_OF_DGTS_RGT"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/D1_NBR_OF_DGTS_RGT"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/D1_NBR_OF_DGTS_RGT"/>
+		<property name="previous.display" value="Digits Right Of Decimal"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_COMPONENT.D1_NBR_OF_DGTS_RGT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MEASR_COMP_MULTIPLIER" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measuring Component Multiplier"/>
+		<property name="semantic.item.label" value="Measuring Component Multiplier"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_MULTIPLIER"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MEASR_COMP_MULTIPLIER"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_MULTIPLIER"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MEASR_COMP_MULTIPLIER"/>
+		<property name="previous.display" value="Measuring Component Multiplier"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_COMPONENT.MEASR_COMP_MULTIPLIER)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.D1_FULL_SCALE" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Full Scale"/>
+		<property name="semantic.item.label" value="Full Scale"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/D1_FULL_SCALE"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.D1_FULL_SCALE"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/D1_FULL_SCALE"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/D1_FULL_SCALE"/>
+		<property name="previous.display" value="Full Scale"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_COMPONENT.D1_FULL_SCALE)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.D1_READ_SEQ" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Read Sequence"/>
+		<property name="semantic.item.label" value="Read Sequence"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/D1_READ_SEQ"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.D1_READ_SEQ"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/D1_READ_SEQ"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/D1_READ_SEQ"/>
+		<property name="previous.display" value="Read Sequence"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_COMPONENT.D1_READ_SEQ)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_TIME_ZONE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Time Zone Code"/>
+		<property name="semantic.item.label" value="Measuring Component Time Zone Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_TIME_ZONE_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_TIME_ZONE_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_TIME_ZONE_CD"/>
+		<property name="semantic.tree.sort.order" value="15"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_TIME_ZONE_CD"/>
+		<property name="previous.display" value="Measuring Component Time Zone Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_TIME_ZONE_CD)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_TIME_ZONE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Time Zone"/>
+		<property name="semantic.item.label" value="Measuring Component Time Zone"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_TIME_ZONE_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_TIME_ZONE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_TIME_ZONE_DESC"/>
+		<property name="semantic.tree.sort.order" value="16"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_TIME_ZONE_DESC"/>
+		<property name="previous.display" value="Measuring Component Time Zone"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_TIME_ZONE_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.LATEST_MSRMT_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Latest Measurement Date Time"/>
+		<property name="semantic.item.label" value="Latest Measurement Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/LATEST_MSRMT_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.LATEST_MSRMT_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/LATEST_MSRMT_DTTM"/>
+		<property name="semantic.tree.sort.order" value="17"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/LATEST_MSRMT_DTTM"/>
+		<property name="previous.display" value="Latest Measurement Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.LATEST_MSRMT_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MOST_RECENT_MSRMT_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Most Recent Measurement Date Time"/>
+		<property name="semantic.item.label" value="Most Recent Measurement Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_MSRMT_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MOST_RECENT_MSRMT_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_MSRMT_DTTM"/>
+		<property name="semantic.tree.sort.order" value="18"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_MSRMT_DTTM"/>
+		<property name="previous.display" value="Most Recent Measurement Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MOST_RECENT_MSRMT_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MOST_RECENT_NON_EST_MSRMT_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Most Recent Non Estimated Measurement Date Time"/>
+		<property name="semantic.item.label" value="Most Recent Non Estimated Measurement Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_NON_EST_MSRMT_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MOST_RECENT_NON_EST_MSRMT_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_NON_EST_MSRMT_DTTM"/>
+		<property name="semantic.tree.sort.order" value="19"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_NON_EST_MSRMT_DTTM"/>
+		<property name="previous.display" value="Most Recent Non Estimated Measurement Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MOST_RECENT_NON_EST_MSRMT_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.ADJ_LATEST_MSRMT_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Adjusted Latest Measurement Date Time"/>
+		<property name="semantic.item.label" value="Adjusted Latest Measurement Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/ADJ_LATEST_MSRMT_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.ADJ_LATEST_MSRMT_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/ADJ_LATEST_MSRMT_DTTM"/>
+		<property name="semantic.tree.sort.order" value="20"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/ADJ_LATEST_MSRMT_DTTM"/>
+		<property name="previous.display" value="Adjusted Latest Measurement Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.ADJ_LATEST_MSRMT_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MOST_RECENT_MSRMT_READING_VAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Most Recent Reading Value"/>
+		<property name="semantic.item.label" value="Most Recent Reading Value"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_MSRMT_READING_VAL"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MOST_RECENT_MSRMT_READING_VAL"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_MSRMT_READING_VAL"/>
+		<property name="semantic.tree.sort.order" value="21"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_MSRMT_READING_VAL"/>
+		<property name="previous.display" value="Most Recent Reading Value"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_COMPONENT.MOST_RECENT_MSRMT_READING_VAL)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MOST_RECENT_MSRMT_READING_COND" class="java.lang.String">
+		<property name="adhoc.display" value="Most Recent Reading Condition Code"/>
+		<property name="semantic.item.label" value="Most Recent Reading Condition Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_MSRMT_READING_COND"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MOST_RECENT_MSRMT_READING_COND"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_MSRMT_READING_COND"/>
+		<property name="semantic.tree.sort.order" value="22"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_MSRMT_READING_COND"/>
+		<property name="previous.display" value="Most Recent Reading Condition Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MOST_RECENT_MSRMT_READING_COND)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MOST_RECENT_MSRMT_READING_COND_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Most Recent Reading Condition"/>
+		<property name="semantic.item.label" value="Most Recent Reading Condition"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_MSRMT_READING_COND_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MOST_RECENT_MSRMT_READING_COND_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_MSRMT_READING_COND_DESC"/>
+		<property name="semantic.tree.sort.order" value="23"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MOST_RECENT_MSRMT_READING_COND_DESC"/>
+		<property name="previous.display" value="Most Recent Reading Condition"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MOST_RECENT_MSRMT_READING_COND_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_USER_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component User ID"/>
+		<property name="semantic.item.label" value="Measuring Component User ID"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_USER_ID"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_USER_ID"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_USER_ID"/>
+		<property name="semantic.tree.sort.order" value="24"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_USER_ID"/>
+		<property name="previous.display" value="Measuring Component User ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_USER_ID)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_USER_NAME" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component User Name"/>
+		<property name="semantic.item.label" value="Measuring Component User Name"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_USER_NAME"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_USER_NAME"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_USER_NAME"/>
+		<property name="semantic.tree.sort.order" value="25"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_USER_NAME"/>
+		<property name="previous.display" value="Measuring Component User Name"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_USER_NAME)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_ACCESS_GRP_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Access Group Code"/>
+		<property name="semantic.item.label" value="Measuring Component Access Group Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_ACCESS_GRP_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_ACCESS_GRP_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_ACCESS_GRP_CD"/>
+		<property name="semantic.tree.sort.order" value="26"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_ACCESS_GRP_CD"/>
+		<property name="previous.display" value="Measuring Component Access Group Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_ACCESS_GRP_CD)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_ACCESS_GRP_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measuring Component Access Group"/>
+		<property name="semantic.item.label" value="Measuring Component Access Group"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_ACCESS_GRP_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_ACCESS_GRP_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_ACCESS_GRP_DESC"/>
+		<property name="semantic.tree.sort.order" value="27"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_ACCESS_GRP_DESC"/>
+		<property name="previous.display" value="Measuring Component Access Group"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_ACCESS_GRP_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.ATTR_VAL_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Attribute Value ID"/>
+		<property name="semantic.item.label" value="Attribute Value ID"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/ATTR_VAL_ID"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.ATTR_VAL_ID"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/ATTR_VAL_ID"/>
+		<property name="semantic.tree.sort.order" value="28"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/ATTR_VAL_ID"/>
+		<property name="previous.display" value="Attribute Value ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.ATTR_VAL_ID)"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_CRE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Measuring Component Created Date Time"/>
+		<property name="semantic.item.label" value="Measuring Component Created Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_CRE_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_CRE_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_CRE_DTTM"/>
+		<property name="semantic.tree.sort.order" value="29"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_CRE_DTTM"/>
+		<property name="previous.display" value="Measuring Component Created Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_CRE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_COMPONENT.MC_STATUS_UPD_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Measuring Component Status Updated Date Time"/>
+		<property name="semantic.item.label" value="Measuring Component Status Updated Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_COMPONENT/MC_STATUS_UPD_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MC_STATUS_UPD_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_COMPONENT/MC_STATUS_UPD_DTTM"/>
+		<property name="semantic.tree.sort.order" value="30"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_COMPONENT/MC_STATUS_UPD_DTTM"/>
+		<property name="previous.display" value="Measuring Component Status Updated Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_COMPONENT.MC_STATUS_UPD_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_INSTALL.INSTALL_EVT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Install Event ID"/>
+		<property name="semantic.item.label" value="Install Event ID"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_INSTALL/INSTALL_EVT_ID"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.INSTALL_EVT_ID"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_INSTALL/INSTALL_EVT_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_INSTALL/INSTALL_EVT_ID"/>
+		<property name="previous.display" value="Install Event ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_INSTALL.INSTALL_EVT_ID)"/>
+	</field>
+	<field name="D1_MSRMT_INSTALL.INSTALL_BO_STATUS_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Install Event Status Code"/>
+		<property name="semantic.item.label" value="Install Event Status Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_INSTALL/INSTALL_BO_STATUS_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.INSTALL_BO_STATUS_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_INSTALL/INSTALL_BO_STATUS_CD"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_INSTALL/INSTALL_BO_STATUS_CD"/>
+		<property name="previous.display" value="Install Event Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_INSTALL.INSTALL_BO_STATUS_CD)"/>
+	</field>
+	<field name="D1_MSRMT_INSTALL.INSTALL_BO_STATUS_REASON_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Install Event Status Reason Code"/>
+		<property name="semantic.item.label" value="Install Event Status Reason Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_INSTALL/INSTALL_BO_STATUS_REASON_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.INSTALL_BO_STATUS_REASON_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_INSTALL/INSTALL_BO_STATUS_REASON_CD"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_INSTALL/INSTALL_BO_STATUS_REASON_CD"/>
+		<property name="previous.display" value="Install Event Status Reason Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_INSTALL.INSTALL_BO_STATUS_REASON_CD)"/>
+	</field>
+	<field name="D1_MSRMT_INSTALL.INSTALL_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Install Date Time"/>
+		<property name="semantic.item.label" value="Install Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_INSTALL/INSTALL_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.INSTALL_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_INSTALL/INSTALL_DTTM"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_INSTALL/INSTALL_DTTM"/>
+		<property name="previous.display" value="Install Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_INSTALL.INSTALL_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_INSTALL.REMOVAL_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Removal Date Time"/>
+		<property name="semantic.item.label" value="Removal Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_INSTALL/REMOVAL_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.REMOVAL_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_INSTALL/REMOVAL_DTTM"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_INSTALL/REMOVAL_DTTM"/>
+		<property name="previous.display" value="Removal Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_INSTALL.REMOVAL_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_INSTALL.INSTALLATION_CONST" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Installation Constant"/>
+		<property name="semantic.item.label" value="Installation Constant"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_INSTALL/INSTALLATION_CONST"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.INSTALLATION_CONST"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_INSTALL/INSTALLATION_CONST"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_INSTALL/INSTALLATION_CONST"/>
+		<property name="previous.display" value="Installation Constant"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_INSTALL.INSTALLATION_CONST)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_INSTALL.ARM_STAT_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Arm Status Code"/>
+		<property name="semantic.item.label" value="Arm Status Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_INSTALL/ARM_STAT_FLG"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.ARM_STAT_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_INSTALL/ARM_STAT_FLG"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_INSTALL/ARM_STAT_FLG"/>
+		<property name="previous.display" value="Arm Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_INSTALL.ARM_STAT_FLG)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.D1_SP_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point ID"/>
+		<property name="semantic.item.label" value="Service Point ID"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_SP_ID"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.D1_SP_ID"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_SP_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_SP_ID"/>
+		<property name="previous.display" value="Service Point ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.D1_SP_ID)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.D1_SP_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Type Code"/>
+		<property name="semantic.item.label" value="Service Point Type Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_SP_TYPE_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.D1_SP_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_SP_TYPE_CD"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_SP_TYPE_CD"/>
+		<property name="previous.display" value="Service Point Type Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.D1_SP_TYPE_CD)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.D1_SP_TYPE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Type"/>
+		<property name="semantic.item.label" value="Service Point Type"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_SP_TYPE_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.D1_SP_TYPE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_SP_TYPE_DESC"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_SP_TYPE_DESC"/>
+		<property name="previous.display" value="Service Point Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.D1_SP_TYPE_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_BUS_OBJ_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Business Object Code"/>
+		<property name="semantic.item.label" value="Service Point Business Object Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BUS_OBJ_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_BUS_OBJ_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BUS_OBJ_CD"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BUS_OBJ_CD"/>
+		<property name="previous.display" value="Service Point Business Object Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_BUS_OBJ_CD)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_BUS_OBJ_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Business Object"/>
+		<property name="semantic.item.label" value="Service Point Business Object"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BUS_OBJ_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_BUS_OBJ_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BUS_OBJ_DESC"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BUS_OBJ_DESC"/>
+		<property name="previous.display" value="Service Point Business Object"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_BUS_OBJ_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_BO_STATUS_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Status Code"/>
+		<property name="semantic.item.label" value="Service Point Status Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BO_STATUS_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_BO_STATUS_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BO_STATUS_CD"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BO_STATUS_CD"/>
+		<property name="previous.display" value="Service Point Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_BO_STATUS_CD)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_BO_STATUS_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Status"/>
+		<property name="semantic.item.label" value="Service Point Status"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BO_STATUS_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_BO_STATUS_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BO_STATUS_DESC"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BO_STATUS_DESC"/>
+		<property name="previous.display" value="Service Point Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_BO_STATUS_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_BO_STATUS_REASON_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Status Reason Code"/>
+		<property name="semantic.item.label" value="Service Point Status Reason Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BO_STATUS_REASON_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_BO_STATUS_REASON_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BO_STATUS_REASON_CD"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_BO_STATUS_REASON_CD"/>
+		<property name="previous.display" value="Service Point Status Reason Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_BO_STATUS_REASON_CD)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_SRC_STAT_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Source Status Code"/>
+		<property name="semantic.item.label" value="Service Point Source Status Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_SRC_STAT_FLG"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_SRC_STAT_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_SRC_STAT_FLG"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_SRC_STAT_FLG"/>
+		<property name="previous.display" value="Service Point Source Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_SRC_STAT_FLG)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_SRC_STAT_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Source Status"/>
+		<property name="semantic.item.label" value="Service Point Source Status"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_SRC_STAT_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_SRC_STAT_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_SRC_STAT_DESC"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_SRC_STAT_DESC"/>
+		<property name="previous.display" value="Service Point Source Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_SRC_STAT_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.DISCONN_LOC_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Disconnect Location Code"/>
+		<property name="semantic.item.label" value="Disconnect Location Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/DISCONN_LOC_FLG"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.DISCONN_LOC_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/DISCONN_LOC_FLG"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/DISCONN_LOC_FLG"/>
+		<property name="previous.display" value="Disconnect Location Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.DISCONN_LOC_FLG)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.DISCONN_LOC_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Disconnect Location"/>
+		<property name="semantic.item.label" value="Disconnect Location"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/DISCONN_LOC_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.DISCONN_LOC_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/DISCONN_LOC_DESC"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/DISCONN_LOC_DESC"/>
+		<property name="previous.display" value="Disconnect Location"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.DISCONN_LOC_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.DIVISION_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Division Code"/>
+		<property name="semantic.item.label" value="Division Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/DIVISION_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.DIVISION_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/DIVISION_CD"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/DIVISION_CD"/>
+		<property name="previous.display" value="Division Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.DIVISION_CD)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.MKT_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Market Code"/>
+		<property name="semantic.item.label" value="Market Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MKT_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MKT_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MKT_CD"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MKT_CD"/>
+		<property name="previous.display" value="Market Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.MKT_CD)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.D1_LS_SL_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Life Support Special Load Code"/>
+		<property name="semantic.item.label" value="Life Support Special Load Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_LS_SL_FLG"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.D1_LS_SL_FLG"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_LS_SL_FLG"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_LS_SL_FLG"/>
+		<property name="previous.display" value="Life Support Special Load Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.D1_LS_SL_FLG)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.D1_LS_SL_DESCR" class="java.lang.String">
+		<property name="adhoc.display" value="Life Support Special Load"/>
+		<property name="semantic.item.label" value="Life Support Special Load"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_LS_SL_DESCR"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.D1_LS_SL_DESCR"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_LS_SL_DESCR"/>
+		<property name="semantic.tree.sort.order" value="15"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_LS_SL_DESCR"/>
+		<property name="previous.display" value="Life Support Special Load"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.D1_LS_SL_DESCR)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.MSRMT_CYC_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Cycle Code"/>
+		<property name="semantic.item.label" value="Measurement Cycle Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_CYC_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_CD"/>
+		<property name="semantic.tree.sort.order" value="16"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_CD"/>
+		<property name="previous.display" value="Measurement Cycle Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.MSRMT_CYC_CD)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.MSRMT_CYC_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Measurement Cycle"/>
+		<property name="semantic.item.label" value="Measurement Cycle"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_CYC_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_DESC"/>
+		<property name="semantic.tree.sort.order" value="17"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_DESC"/>
+		<property name="previous.display" value="Measurement Cycle"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.MSRMT_CYC_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.MSRMT_CYC_RTE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Route Code"/>
+		<property name="semantic.item.label" value="Route Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_RTE_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_CYC_RTE_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_RTE_CD"/>
+		<property name="semantic.tree.sort.order" value="18"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_RTE_CD"/>
+		<property name="previous.display" value="Route Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.MSRMT_CYC_RTE_CD)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.MSRMT_CYC_RTE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Route"/>
+		<property name="semantic.item.label" value="Route"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_RTE_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_CYC_RTE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_RTE_DESC"/>
+		<property name="semantic.tree.sort.order" value="19"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_RTE_DESC"/>
+		<property name="previous.display" value="Route"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.MSRMT_CYC_RTE_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.MSRMT_CYC_RTE_SEQ" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Route Sequence"/>
+		<property name="semantic.item.label" value="Route Sequence"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_RTE_SEQ"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.MSRMT_CYC_RTE_SEQ"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_RTE_SEQ"/>
+		<property name="semantic.tree.sort.order" value="20"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/MSRMT_CYC_RTE_SEQ"/>
+		<property name="previous.display" value="Route Sequence"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_SERVICE_POINT.MSRMT_CYC_RTE_SEQ)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_TIME_ZONE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Time Zone Code"/>
+		<property name="semantic.item.label" value="Service Point Time Zone Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_TIME_ZONE_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_TIME_ZONE_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_TIME_ZONE_CD"/>
+		<property name="semantic.tree.sort.order" value="21"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_TIME_ZONE_CD"/>
+		<property name="previous.display" value="Service Point Time Zone Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_TIME_ZONE_CD)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_TIME_ZONE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Time Zone"/>
+		<property name="semantic.item.label" value="Service Point Time Zone"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_TIME_ZONE_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_TIME_ZONE_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_TIME_ZONE_DESC"/>
+		<property name="semantic.tree.sort.order" value="22"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_TIME_ZONE_DESC"/>
+		<property name="previous.display" value="Service Point Time Zone"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_TIME_ZONE_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_ACCESS_GRP_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Access Group Code"/>
+		<property name="semantic.item.label" value="Service Point Access Group Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_ACCESS_GRP_CD"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_ACCESS_GRP_CD"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_ACCESS_GRP_CD"/>
+		<property name="semantic.tree.sort.order" value="23"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_ACCESS_GRP_CD"/>
+		<property name="previous.display" value="Service Point Access Group Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_ACCESS_GRP_CD)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_ACCESS_GRP_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Point Access Group"/>
+		<property name="semantic.item.label" value="Service Point Access Group"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_ACCESS_GRP_DESC"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_ACCESS_GRP_DESC"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_ACCESS_GRP_DESC"/>
+		<property name="semantic.tree.sort.order" value="24"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_ACCESS_GRP_DESC"/>
+		<property name="previous.display" value="Service Point Access Group"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_ACCESS_GRP_DESC)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.COUNTRY" class="java.lang.String">
+		<property name="adhoc.display" value="Country"/>
+		<property name="semantic.item.label" value="Country"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/COUNTRY"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.COUNTRY"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/COUNTRY"/>
+		<property name="semantic.tree.sort.order" value="25"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/COUNTRY"/>
+		<property name="previous.display" value="Country"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.COUNTRY)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.POSTAL" class="java.lang.String">
+		<property name="adhoc.display" value="Postal Code"/>
+		<property name="semantic.item.label" value="Postal Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/POSTAL"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.POSTAL"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/POSTAL"/>
+		<property name="semantic.tree.sort.order" value="26"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/POSTAL"/>
+		<property name="previous.display" value="Postal Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.POSTAL)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.ADDRESS1" class="java.lang.String">
+		<property name="adhoc.display" value="Address 1"/>
+		<property name="semantic.item.label" value="Address 1"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/ADDRESS1"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.ADDRESS1"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/ADDRESS1"/>
+		<property name="semantic.tree.sort.order" value="27"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/ADDRESS1"/>
+		<property name="previous.display" value="Address 1"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.ADDRESS1)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.ADDRESS2" class="java.lang.String">
+		<property name="adhoc.display" value="Address 2"/>
+		<property name="semantic.item.label" value="Address 2"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/ADDRESS2"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.ADDRESS2"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/ADDRESS2"/>
+		<property name="semantic.tree.sort.order" value="28"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/ADDRESS2"/>
+		<property name="previous.display" value="Address 2"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.ADDRESS2)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.ADDRESS3" class="java.lang.String">
+		<property name="adhoc.display" value="Address 3"/>
+		<property name="semantic.item.label" value="Address 3"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/ADDRESS3"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.ADDRESS3"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/ADDRESS3"/>
+		<property name="semantic.tree.sort.order" value="29"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/ADDRESS3"/>
+		<property name="previous.display" value="Address 3"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.ADDRESS3)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.ADDRESS4" class="java.lang.String">
+		<property name="adhoc.display" value="Address 4"/>
+		<property name="semantic.item.label" value="Address 4"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/ADDRESS4"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.ADDRESS4"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/ADDRESS4"/>
+		<property name="semantic.tree.sort.order" value="30"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/ADDRESS4"/>
+		<property name="previous.display" value="Address 4"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.ADDRESS4)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.CITY" class="java.lang.String">
+		<property name="adhoc.display" value="City"/>
+		<property name="semantic.item.label" value="City"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/CITY"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.CITY"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/CITY"/>
+		<property name="semantic.tree.sort.order" value="31"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/CITY"/>
+		<property name="previous.display" value="City"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.CITY)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.COUNTY" class="java.lang.String">
+		<property name="adhoc.display" value="County"/>
+		<property name="semantic.item.label" value="County"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/COUNTY"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.COUNTY"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/COUNTY"/>
+		<property name="semantic.tree.sort.order" value="32"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/COUNTY"/>
+		<property name="previous.display" value="County"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.COUNTY)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.STATE" class="java.lang.String">
+		<property name="adhoc.display" value="State"/>
+		<property name="semantic.item.label" value="State"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/STATE"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.STATE"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/STATE"/>
+		<property name="semantic.tree.sort.order" value="33"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/STATE"/>
+		<property name="previous.display" value="State"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.STATE)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.GEO_CODE" class="java.lang.String">
+		<property name="adhoc.display" value="Geo Code"/>
+		<property name="semantic.item.label" value="Geo Code"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/GEO_CODE"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.GEO_CODE"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/GEO_CODE"/>
+		<property name="semantic.tree.sort.order" value="34"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/GEO_CODE"/>
+		<property name="previous.display" value="Geo Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.GEO_CODE)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.HOUSE_TYPE" class="java.lang.String">
+		<property name="adhoc.display" value="House Type"/>
+		<property name="semantic.item.label" value="House Type"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/HOUSE_TYPE"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.HOUSE_TYPE"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/HOUSE_TYPE"/>
+		<property name="semantic.tree.sort.order" value="35"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/HOUSE_TYPE"/>
+		<property name="previous.display" value="House Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.HOUSE_TYPE)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.IN_CITY_LIMIT" class="java.lang.String">
+		<property name="adhoc.display" value="In City Limit"/>
+		<property name="semantic.item.label" value="In City Limit"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/IN_CITY_LIMIT"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.IN_CITY_LIMIT"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/IN_CITY_LIMIT"/>
+		<property name="semantic.tree.sort.order" value="36"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/IN_CITY_LIMIT"/>
+		<property name="previous.display" value="In City Limit"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.IN_CITY_LIMIT)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.NUM1" class="java.lang.String">
+		<property name="adhoc.display" value="Address Number 1"/>
+		<property name="semantic.item.label" value="Address Number 1"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/NUM1"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.NUM1"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/NUM1"/>
+		<property name="semantic.tree.sort.order" value="37"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/NUM1"/>
+		<property name="previous.display" value="Address Number 1"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.NUM1)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.NUM2" class="java.lang.String">
+		<property name="adhoc.display" value="Address Number 2"/>
+		<property name="semantic.item.label" value="Address Number 2"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/NUM2"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.NUM2"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/NUM2"/>
+		<property name="semantic.tree.sort.order" value="38"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/NUM2"/>
+		<property name="previous.display" value="Address Number 2"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.NUM2)"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.D1_GEO_LAT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Latitude"/>
+		<property name="semantic.item.label" value="Latitude"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_GEO_LAT"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.D1_GEO_LAT"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_GEO_LAT"/>
+		<property name="semantic.tree.sort.order" value="39"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_GEO_LAT"/>
+		<property name="previous.display" value="Latitude"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_SERVICE_POINT.D1_GEO_LAT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.D1_GEO_LONG" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Longitude"/>
+		<property name="semantic.item.label" value="Longitude"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_GEO_LONG"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.D1_GEO_LONG"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_GEO_LONG"/>
+		<property name="semantic.tree.sort.order" value="40"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/D1_GEO_LONG"/>
+		<property name="previous.display" value="Longitude"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(D1_MSRMT_SERVICE_POINT.D1_GEO_LONG)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_CRE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Service Point Created Date Time"/>
+		<property name="semantic.item.label" value="Service Point Created Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_CRE_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_CRE_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_CRE_DTTM"/>
+		<property name="semantic.tree.sort.order" value="41"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_CRE_DTTM"/>
+		<property name="previous.display" value="Service Point Created Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_CRE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="D1_MSRMT_SERVICE_POINT.SP_STATUS_UPD_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Service Point Status Updated Date Time"/>
+		<property name="semantic.item.label" value="Service Point Status Updated Date Time"/>
+		<property name="adhoc.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_STATUS_UPD_DTTM"/>
+		<property name="resourceId" value="D1_MSRMT_RPT_CURR.SP_STATUS_UPD_DTTM"/>
+		<property name="semantic.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_STATUS_UPD_DTTM"/>
+		<property name="semantic.tree.sort.order" value="42"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/D1_MSRMT_SERVICE_POINT/SP_STATUS_UPD_DTTM"/>
+		<property name="previous.display" value="Service Point Status Updated Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(D1_MSRMT_SERVICE_POINT.SP_STATUS_UPD_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+</jasperReport>

@@ -20,6 +20,7 @@ Professional workspace for Oracle Utilities C2M (CISADM schema), Jaspersoft Doma
 - `reports/subreports/common/` reusable subreport components
 - `sample_data/` small seeds for smoke testing
 - `scripts/` utility validation and metadata scripts
+- `scripts/jaspersoft/` client promotion and repository package verification tools
 - `scripts/performance/` validation runners and perf automation
 - `scripts/repo/` repo hygiene and structure checks
 - `server/input_controls/` JRS input control payloads
@@ -68,6 +69,9 @@ Professional workspace for Oracle Utilities C2M (CISADM schema), Jaspersoft Doma
 - `python scripts/validate_source_of_truth_sql.py sql/smartcity_9_workstream_kpis.sql`
 - `python scripts/repo/sql_read_only_guard.py sql/performance/billed_usage/validation`
 - `python scripts/repo/sql_read_only_guard.py sql/diagnostics/cisadm_dictionary`
+- `python scripts/jaspersoft/run_client_import_pipeline.py --help`
+- `python scripts/jaspersoft/verify_prepared_import.py --help`
+- `python scripts/jaspersoft/inventory_jaspersoft_artifacts.py --help`
 - `pwsh -File scripts/repo/repo_structure_audit.ps1`
 - `pwsh -File scripts/performance/run_sql_quality_workflow.ps1`
 - `pwsh -File scripts/repo/pre_merge_sql_gate.ps1`
@@ -79,6 +83,14 @@ Professional workspace for Oracle Utilities C2M (CISADM schema), Jaspersoft Doma
 - Build/checklist guide: `docs/jaspersoft_domain_report_build_standards.md`
 - Origin 2025 styling implementation: `docs/jaspersoft_origin_2025_style_implementation.md`
 - Delivery playbook: `docs/c2m_jaspersoft_delivery_playbook.md`
+- Client promotion pipeline: `docs/jaspersoft_client_promotion_pipeline.md`
+
+## Jaspersoft Repository Promotion
+- Scope: standalone Jaspersoft repository export rewrite and client import preparation
+- Scripts: `scripts/jaspersoft/`
+- Staging area: `deploy/jaspersoft_client_promotion/`
+- Not part of the DB / SQL / snapshot optimization workflow
+- Artifact inventory: `docs/jaspersoft_artifact_inventory.md`
 
 ## SQL + Jaspersoft Skills Workflow
 - Workflow runbook: `docs/sql_jaspersoft_workflow_implementation.md`

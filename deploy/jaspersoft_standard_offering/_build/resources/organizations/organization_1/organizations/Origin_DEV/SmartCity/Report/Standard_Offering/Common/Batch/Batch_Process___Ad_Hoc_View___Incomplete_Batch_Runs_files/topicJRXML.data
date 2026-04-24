@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="adhocReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="1d0b40a8-22ac-461d-898d-6379655a9959">
+	<property name="adhoc.topic.escape.variable.chars"/>
+	<property name="adhoc.metadata.version" value="2572"/>
+	<property name="has.modified.presentation" value="false"/>
+	<property name="base.datasource.version" value="0"/>
+	<property name="use.datasource.presentation" value="true"/>
+	<property name="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.TopicReportUnit" value="/temp/sl_topic_6b68bd60-d631-4f28-b92b-00e1ad90f412"/>
+	<parameter name="BATCH_BUS_DT_1_1" class="net.sf.jasperreports.types.date.TimestampRange">
+		<defaultValueExpression><![CDATA[com.jaspersoft.jasperserver.api.common.util.rd.DateRangeFactory.getInstance("2026-01-01 00:00:00",java.util.TimeZone.getDefault(),java.sql.Timestamp.class)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REC_ERR_CNT_1" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[new java.lang.Integer("0")]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DESCR_1" class="java.util.Collection" nestedType="java.lang.String">
+		<defaultValueExpression><![CDATA[java.util.Arrays.asList(new Object[]{})]]></defaultValueExpression>
+	</parameter>
+	<queryString language="domain">
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema">
+  <queryFields>
+    <queryField id="CI_BATCH_INST.CI_BATCH_RUN.BATCH_BUS_DT"></queryField>
+    <queryField id="CI_BATCH_INST.CI_BATCH_RUN.BATCH_CD"></queryField>
+    <queryField id="CI_BATCH_INST.CI_BATCH_RUN.BATCH_NBR_1"></queryField>
+    <queryField id="CI_BATCH_INST.CI_BATCH_RUN.BATCH_RERUN_NBR_1"></queryField>
+    <queryField id="CI_BATCH_INST.CI_BATCH_RUN.DO_NOT_RESTART_SW"></queryField>
+    <queryField id="CI_BATCH_INST.CI_BATCH_RUN.END_DTTM_1"></queryField>
+    <queryField id="CI_BATCH_INST.CI_BATCH_RUN.LOG_FILE_NAME"></queryField>
+    <queryField id="CI_BATCH_INST.CI_BATCH_RUN.RUN_STATUS"></queryField>
+    <queryField id="CI_BATCH_INST.CI_BATCH_RUN.START_DTTM_1"></queryField>
+    <queryField id="CI_BATCH_INST.CI_BATCH_RUN.VERSION"></queryField>
+    <queryField id="CI_BATCH_INST.BATCH_CD_1"></queryField>
+    <queryField id="CI_BATCH_INST.BATCH_NBR"></queryField>
+    <queryField id="CI_BATCH_INST.BATCH_RERUN_NBR"></queryField>
+    <queryField id="CI_BATCH_INST.BATCH_THREAD_NBR"></queryField>
+    <queryField id="CI_BATCH_INST.END_DTTM"></queryField>
+    <queryField id="CI_BATCH_INST.FILE_DETAILS"></queryField>
+    <queryField id="CI_BATCH_INST.REC_ERR_CNT"></queryField>
+    <queryField id="CI_BATCH_INST.REC_PROC_CNT"></queryField>
+    <queryField id="CI_BATCH_INST.RESTART_DATA"></queryField>
+    <queryField id="CI_BATCH_INST.SCHEDULER_ID"></queryField>
+    <queryField id="CI_BATCH_INST.START_DTTM"></queryField>
+    <queryField id="CI_BATCH_INST.VERSION_1"></queryField>
+    <queryField id="CI_BATCH_RUN_1.BATCH_BUS_DT_1"></queryField>
+    <queryField id="CI_BATCH_RUN_1.BATCH_CD_2"></queryField>
+    <queryField id="CI_BATCH_RUN_1.BATCH_NBR_2"></queryField>
+    <queryField id="CI_BATCH_RUN_1.BATCH_RERUN_NBR_2"></queryField>
+    <queryField id="CI_BATCH_RUN_1.DO_NOT_RESTART_SW_1"></queryField>
+    <queryField id="CI_BATCH_RUN_1.END_DTTM_2"></queryField>
+    <queryField id="CI_BATCH_RUN_1.LOG_FILE_NAME_1"></queryField>
+    <queryField id="CI_BATCH_RUN_1.RUN_STATUS_1"></queryField>
+    <queryField id="CI_BATCH_RUN_1.START_DTTM_2"></queryField>
+    <queryField id="CI_BATCH_RUN_1.VERSION_2"></queryField>
+    <queryField id="NewSet2.DESCR"></queryField>
+  </queryFields>
+</query>]]>
+	</queryString>
+	<field name="CI_BATCH_THD.BATCH_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Batch Control"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_THD/BATCH_CD"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_THD/BATCH_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_THD.BATCH_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.tree.labels">
+			<![CDATA[[{"uri":"/CI_BATCH_INST","resourceId":"JoinTree_1","label":"1.) Batch Thread Instance"},{"uri":"/CI_BATCH_RUN_1","resourceId":"JoinTree_1","label":"1.) Batch Run"},{"uri":"/CI_BATCH_THD","resourceId":"JoinTree_1","label":"1.) Batch Thread"},{"uri":"/NewSet1","resourceId":"JoinTree_1","label":"1.) Formulas"},{"uri":"/NewSet2","resourceId":"JoinTree_1","label":"1.) Descriptions"}]]]>
+		</property>
+		<property name="semantic.tree.sort.order">
+			<![CDATA[{"CI_BATCH_INST":1,"BATCH_CD_1":2,"BATCH_NBR":3,"BATCH_RERUN_NBR":4,"BATCH_THREAD_NBR":5,"END_DTTM":6,"FILE_DETAILS":7,"REC_ERR_CNT":8,"REC_PROC_CNT":9,"RESTART_DATA":10,"SCHEDULER_ID":11,"START_DTTM":12,"CI_BATCH_RUN_1":13,"BATCH_BUS_DT_1":14,"BATCH_CD_2":15,"BATCH_NBR_2":16,"BATCH_RERUN_NBR_2":17,"DO_NOT_RESTART_SW_1":18,"END_DTTM_2":19,"RUN_STATUS_1":20,"START_DTTM_2":21,"CI_BATCH_THD":22,"BATCH_CD":23,"BATCH_NBR_1":24,"BATCH_RERUN_NBR_1":25,"BATCH_THREAD_NBR_1":26,"LOG_FILE_NAME":27,"THD_RETRY_CNT":28,"THREAD_STATUS":29,"NewSet1":30,"SCHEDULER_ID_DISTINCT":31,"BATCH_RUN_DISTINCT":32,"BATCH_THREAD_DISTINCT":33,"SCHEDULER_ID_DURATION_HOURS":34,"SCHEDULER_ID_DURATION":35,"NewSet2":36,"BATCH_CD_DESCR":37,"DESCR":38,"DESCR_1":39}]]>
+		</property>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_THD/BATCH_CD"/>
+		<property name="previous.display" value="Batch Control"/>
+		<property name="semantic.item.label" value="Batch Control"/>
+		<property name="adhoc.chosen.tree.labels">
+			<![CDATA[[{"uri":"/CI_BATCH_THD","resourceId":"JoinTree_1","label":"1.) Batch Thread"},{"uri":"/CI_BATCH_INST","resourceId":"JoinTree_1","label":"1.) Batch Thread Instance"},{"uri":"/NewSet2","resourceId":"JoinTree_1","label":"1.) Descriptions"},{"uri":"/NewSet1","resourceId":"JoinTree_1","label":"1.) Formulas"},{"uri":"/CI_BATCH_RUN_1","resourceId":"JoinTree_1","label":"1.) Batch Run"}]]]>
+		</property>
+		<property name="adhoc.chosen.tree.order">
+			<![CDATA[{"CI_BATCH_INST":1,"BATCH_CD_1":2,"BATCH_NBR":3,"BATCH_RERUN_NBR":4,"BATCH_THREAD_NBR":5,"END_DTTM":6,"FILE_DETAILS":7,"REC_ERR_CNT":8,"REC_PROC_CNT":9,"RESTART_DATA":10,"SCHEDULER_ID":11,"START_DTTM":12,"CI_BATCH_RUN_1":13,"BATCH_BUS_DT_1":14,"BATCH_CD_2":15,"BATCH_NBR_2":16,"BATCH_RERUN_NBR_2":17,"DO_NOT_RESTART_SW_1":18,"END_DTTM_2":19,"RUN_STATUS_1":20,"START_DTTM_2":21,"CI_BATCH_THD":22,"BATCH_CD":23,"BATCH_NBR_1":24,"BATCH_RERUN_NBR_1":25,"BATCH_THREAD_NBR_1":26,"LOG_FILE_NAME":27,"THD_RETRY_CNT":28,"THREAD_STATUS":29,"NewSet1":30,"SCHEDULER_ID_DURATION":31,"SCHEDULER_ID_DURATION_HOURS":32,"SCHEDULER_ID_DISTINCT":33,"NewSet2":34,"BATCH_CD_DESCR":35,"DESCR_1":36,"DESCR":37}]]>
+		</property>
+		<property name="slIsTableAsList" value="false"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_THD.BATCH_CD)"/>
+		<property name="adhoc.chosen.tree.is.flattened" value="false"/>
+	</field>
+	<field name="CI_BATCH_THD.BATCH_NBR_1" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Batch Number"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_THD/BATCH_NBR_1"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_THD/BATCH_NBR_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_THD.BATCH_NBR"/>
+		<property name="dimensionOrMeasure" value="Dimension"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_THD.BATCH_NBR_1)"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_THD/BATCH_NBR_1"/>
+		<property name="previous.display" value="Batch Number"/>
+		<property name="semantic.item.label" value="Batch Number"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_THD.BATCH_RERUN_NBR_1" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Batch Rerun Number"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_THD/BATCH_RERUN_NBR_1"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_THD/BATCH_RERUN_NBR_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_THD.BATCH_RERUN_NBR"/>
+		<property name="dimensionOrMeasure" value="Dimension"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_THD.BATCH_RERUN_NBR_1)"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_THD/BATCH_RERUN_NBR_1"/>
+		<property name="previous.display" value="Batch Rerun Number"/>
+		<property name="semantic.item.label" value="Batch Rerun Number"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_THD.BATCH_THREAD_NBR_1" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Thread Nbr"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_THD/BATCH_THREAD_NBR_1"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_THD/BATCH_THREAD_NBR_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_THD.BATCH_THREAD_NBR"/>
+		<property name="dimensionOrMeasure" value="Dimension"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_THD.BATCH_THREAD_NBR_1)"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_THD/BATCH_THREAD_NBR_1"/>
+		<property name="previous.display" value="Thread Nbr"/>
+		<property name="semantic.item.label" value="Thread Nbr"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_THD.LOG_FILE_NAME" class="java.lang.String">
+		<property name="adhoc.display" value="Log File Name"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_THD/LOG_FILE_NAME"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_THD/LOG_FILE_NAME"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_THD.LOG_FILE_NAME"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_THD/LOG_FILE_NAME"/>
+		<property name="previous.display" value="Log File Name"/>
+		<property name="semantic.item.label" value="Log File Name"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_THD.LOG_FILE_NAME)"/>
+	</field>
+	<field name="CI_BATCH_THD.THD_RETRY_CNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Thread Retries Count"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_THD/THD_RETRY_CNT"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_THD/THD_RETRY_CNT"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_THD.THD_RETRY_CNT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_THD/THD_RETRY_CNT"/>
+		<property name="previous.display" value="Thread Retries Count"/>
+		<property name="semantic.item.label" value="Thread Retries Count"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(CI_BATCH_THD.THD_RETRY_CNT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_THD.THREAD_STATUS" class="java.lang.String">
+		<property name="adhoc.display" value="Thread Status"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_THD/THREAD_STATUS"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_THD/THREAD_STATUS"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_THD.THREAD_STATUS"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_THD/THREAD_STATUS"/>
+		<property name="previous.display" value="Thread Status"/>
+		<property name="semantic.item.label" value="Thread Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_THD.THREAD_STATUS)"/>
+	</field>
+	<field name="CI_BATCH_INST.BATCH_CD_1" class="java.lang.String">
+		<property name="adhoc.display" value="Batch Control"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_INST/BATCH_CD_1"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_INST/BATCH_CD_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_INST.BATCH_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_INST/BATCH_CD_1"/>
+		<property name="previous.display" value="Batch Control"/>
+		<property name="semantic.item.label" value="Batch Control"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_INST.BATCH_CD_1)"/>
+	</field>
+	<field name="CI_BATCH_INST.BATCH_NBR" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Batch Number"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_INST/BATCH_NBR"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_INST/BATCH_NBR"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_INST.BATCH_NBR"/>
+		<property name="dimensionOrMeasure" value="Dimension"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_INST.BATCH_NBR)"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_INST/BATCH_NBR"/>
+		<property name="previous.display" value="Batch Number"/>
+		<property name="semantic.item.label" value="Batch Number"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_INST.BATCH_RERUN_NBR" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Batch Rerun Number"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_INST/BATCH_RERUN_NBR"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_INST/BATCH_RERUN_NBR"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_INST.BATCH_RERUN_NBR"/>
+		<property name="dimensionOrMeasure" value="Dimension"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_INST.BATCH_RERUN_NBR)"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_INST/BATCH_RERUN_NBR"/>
+		<property name="previous.display" value="Batch Rerun Number"/>
+		<property name="semantic.item.label" value="Batch Rerun Number"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_INST.BATCH_THREAD_NBR" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Thread Nbr"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_INST/BATCH_THREAD_NBR"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_INST/BATCH_THREAD_NBR"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_INST.BATCH_THREAD_NBR"/>
+		<property name="dimensionOrMeasure" value="Dimension"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_INST.BATCH_THREAD_NBR)"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_INST/BATCH_THREAD_NBR"/>
+		<property name="previous.display" value="Thread Nbr"/>
+		<property name="semantic.item.label" value="Thread Nbr"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_INST.END_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="End Date/Time"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_INST/END_DTTM"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_INST/END_DTTM"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_INST.END_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_INST/END_DTTM"/>
+		<property name="previous.display" value="End Date/Time"/>
+		<property name="semantic.item.label" value="End Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_INST.END_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_BATCH_INST.FILE_DETAILS" class="java.lang.String">
+		<property name="adhoc.display" value="File Details"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_INST/FILE_DETAILS"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_INST/FILE_DETAILS"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_INST.FILE_DETAILS"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_INST/FILE_DETAILS"/>
+		<property name="previous.display" value="File Details"/>
+		<property name="semantic.item.label" value="File Details"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_INST.FILE_DETAILS)"/>
+	</field>
+	<field name="CI_BATCH_INST.REC_ERR_CNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Records in Error"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_INST/REC_ERR_CNT"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_INST/REC_ERR_CNT"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_INST.REC_ERR_CNT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_INST/REC_ERR_CNT"/>
+		<property name="previous.display" value="Records in Error"/>
+		<property name="semantic.item.label" value="Records in Error"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(CI_BATCH_INST.REC_ERR_CNT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_INST.REC_PROC_CNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Records Processed"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_INST/REC_PROC_CNT"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_INST/REC_PROC_CNT"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_INST.REC_PROC_CNT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_INST/REC_PROC_CNT"/>
+		<property name="previous.display" value="Records Processed"/>
+		<property name="semantic.item.label" value="Records Processed"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(CI_BATCH_INST.REC_PROC_CNT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_INST.RESTART_DATA" class="java.lang.String">
+		<property name="adhoc.display" value="Restart Data"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_INST/RESTART_DATA"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_INST/RESTART_DATA"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_INST.RESTART_DATA"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_INST/RESTART_DATA"/>
+		<property name="previous.display" value="Restart Data"/>
+		<property name="semantic.item.label" value="Restart Data"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_INST.RESTART_DATA)"/>
+	</field>
+	<field name="CI_BATCH_INST.SCHEDULER_ID" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Batch Instance"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_INST/SCHEDULER_ID"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_INST/SCHEDULER_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_INST.SCHEDULER_ID"/>
+		<property name="dimensionOrMeasure" value="Dimension"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_INST.SCHEDULER_ID)"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_INST/SCHEDULER_ID"/>
+		<property name="previous.display" value="Batch Instance"/>
+		<property name="semantic.item.label" value="Batch Instance"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_INST.START_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Start Date/Time"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_INST/START_DTTM"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_INST/START_DTTM"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_INST.START_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_INST/START_DTTM"/>
+		<property name="previous.display" value="Start Date/Time"/>
+		<property name="semantic.item.label" value="Start Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_INST.START_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="NewSet2.BATCH_CD_DESCR" class="java.lang.String">
+		<property name="adhoc.display" value="Batch Control (with Description)"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/BATCH_CD_DESCR"/>
+		<property name="semantic.tree.uri" value="/NewSet2/BATCH_CD_DESCR"/>
+		<property name="resourceId" value="JoinTree_1.BATCH_CD_DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/BATCH_CD_DESCR"/>
+		<property name="previous.display" value="Batch Control (with Description)"/>
+		<property name="semantic.item.label" value="Batch Control (with Description)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet2.BATCH_CD_DESCR)"/>
+	</field>
+	<field name="NewSet2.DESCR_1" class="java.lang.String">
+		<property name="adhoc.display" value="Thread Status Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/DESCR_1"/>
+		<property name="semantic.tree.uri" value="/NewSet2/DESCR_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_LOOKUP_VAL_L_1.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/DESCR_1"/>
+		<property name="previous.display" value="Thread Status Description"/>
+		<property name="semantic.item.label" value="Thread Status Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet2.DESCR_1)"/>
+	</field>
+	<field name="NewSet2.DESCR" class="java.lang.String">
+		<property name="adhoc.display" value="Run Status Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/DESCR"/>
+		<property name="semantic.tree.uri" value="/NewSet2/DESCR"/>
+		<property name="resourceId" value="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/DESCR"/>
+		<property name="previous.display" value="Run Status Description"/>
+		<property name="semantic.item.label" value="Run Status Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet2.DESCR)"/>
+	</field>
+	<field name="NewSet1.SCHEDULER_ID_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct Batch Instance"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/SCHEDULER_ID_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet1/SCHEDULER_ID_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.SCHEDULER_ID_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/SCHEDULER_ID_DISTINCT"/>
+		<property name="previous.display" value="Distinct Batch Instance"/>
+		<property name="semantic.item.label" value="Distinct Batch Instance"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet1.SCHEDULER_ID_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet1.BATCH_THREAD_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct Batch Thread"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/BATCH_THREAD_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet1/BATCH_THREAD_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.BATCH_THREAD_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/BATCH_THREAD_DISTINCT"/>
+		<property name="previous.display" value="Distinct Batch Thread"/>
+		<property name="semantic.item.label" value="Distinct Batch Thread"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet1.BATCH_THREAD_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet1.BATCH_RUN_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct Batch Run"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/BATCH_RUN_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet1/BATCH_RUN_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.BATCH_RUN_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/BATCH_RUN_DISTINCT"/>
+		<property name="previous.display" value="Distinct Batch Run"/>
+		<property name="semantic.item.label" value="Distinct Batch Run"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet1.BATCH_RUN_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet1.SCHEDULER_ID_DURATION_HOURS" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Duration (in Hours)"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/SCHEDULER_ID_DURATION_HOURS"/>
+		<property name="semantic.tree.uri" value="/NewSet1/SCHEDULER_ID_DURATION_HOURS"/>
+		<property name="resourceId" value="JoinTree_1.SCHEDULER_ID_DURATION_HOURS"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/SCHEDULER_ID_DURATION_HOURS"/>
+		<property name="previous.display" value="Duration (in Hours)"/>
+		<property name="semantic.item.label" value="Duration (in Hours)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet1.SCHEDULER_ID_DURATION_HOURS)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="NewSet1.SCHEDULER_ID_DURATION" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Duration (in Minutes)"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/SCHEDULER_ID_DURATION"/>
+		<property name="semantic.tree.uri" value="/NewSet1/SCHEDULER_ID_DURATION"/>
+		<property name="resourceId" value="JoinTree_1.SCHEDULER_ID_DURATION_MINS"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/SCHEDULER_ID_DURATION"/>
+		<property name="previous.display" value="Duration (in Minutes)"/>
+		<property name="semantic.item.label" value="Duration (in Minutes)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet1.SCHEDULER_ID_DURATION)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_RUN_1.BATCH_BUS_DT_1" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Batch Business Date"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_RUN_1/BATCH_BUS_DT_1"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_RUN_1/BATCH_BUS_DT_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_RUN.BATCH_BUS_DT"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_RUN_1/BATCH_BUS_DT_1"/>
+		<property name="previous.display" value="Batch Business Date"/>
+		<property name="semantic.item.label" value="Batch Business Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_RUN_1.BATCH_BUS_DT_1)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_BATCH_RUN_1.BATCH_CD_2" class="java.lang.String">
+		<property name="adhoc.display" value="Batch Control"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_RUN_1/BATCH_CD_2"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_RUN_1/BATCH_CD_2"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_RUN.BATCH_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_RUN_1/BATCH_CD_2"/>
+		<property name="previous.display" value="Batch Control"/>
+		<property name="semantic.item.label" value="Batch Control"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_RUN_1.BATCH_CD_2)"/>
+	</field>
+	<field name="CI_BATCH_RUN_1.BATCH_NBR_2" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Batch Number"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_RUN_1/BATCH_NBR_2"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_RUN_1/BATCH_NBR_2"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_RUN.BATCH_NBR"/>
+		<property name="dimensionOrMeasure" value="Dimension"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_RUN_1.BATCH_NBR_2)"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_RUN_1/BATCH_NBR_2"/>
+		<property name="previous.display" value="Batch Number"/>
+		<property name="semantic.item.label" value="Batch Number"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_RUN_1.BATCH_RERUN_NBR_2" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Batch Rerun Number"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_RUN_1/BATCH_RERUN_NBR_2"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_RUN_1/BATCH_RERUN_NBR_2"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_RUN.BATCH_RERUN_NBR"/>
+		<property name="dimensionOrMeasure" value="Dimension"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_RUN_1.BATCH_RERUN_NBR_2)"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_RUN_1/BATCH_RERUN_NBR_2"/>
+		<property name="previous.display" value="Batch Rerun Number"/>
+		<property name="semantic.item.label" value="Batch Rerun Number"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="CI_BATCH_RUN_1.DO_NOT_RESTART_SW_1" class="java.lang.String">
+		<property name="adhoc.display" value="Do Not Attempt Restart"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_RUN_1/DO_NOT_RESTART_SW_1"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_RUN_1/DO_NOT_RESTART_SW_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_RUN.DO_NOT_RESTART_SW"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_RUN_1/DO_NOT_RESTART_SW_1"/>
+		<property name="previous.display" value="Do Not Attempt Restart"/>
+		<property name="semantic.item.label" value="Do Not Attempt Restart"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_RUN_1.DO_NOT_RESTART_SW_1)"/>
+	</field>
+	<field name="CI_BATCH_RUN_1.END_DTTM_2" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="End Date/Time"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_RUN_1/END_DTTM_2"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_RUN_1/END_DTTM_2"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_RUN.END_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_RUN_1/END_DTTM_2"/>
+		<property name="previous.display" value="End Date/Time"/>
+		<property name="semantic.item.label" value="End Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_RUN_1.END_DTTM_2)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_BATCH_RUN_1.RUN_STATUS_1" class="java.lang.String">
+		<property name="adhoc.display" value="Run Status"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_RUN_1/RUN_STATUS_1"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_RUN_1/RUN_STATUS_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_RUN.RUN_STATUS"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_RUN_1/RUN_STATUS_1"/>
+		<property name="previous.display" value="Run Status"/>
+		<property name="semantic.item.label" value="Run Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_RUN_1.RUN_STATUS_1)"/>
+	</field>
+	<field name="CI_BATCH_RUN_1.START_DTTM_2" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Start Date/Time"/>
+		<property name="adhoc.tree.uri" value="/CI_BATCH_RUN_1/START_DTTM_2"/>
+		<property name="semantic.tree.uri" value="/CI_BATCH_RUN_1/START_DTTM_2"/>
+		<property name="resourceId" value="JoinTree_1.CI_BATCH_RUN.START_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_BATCH_RUN_1/START_DTTM_2"/>
+		<property name="previous.display" value="Start Date/Time"/>
+		<property name="semantic.item.label" value="Start Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_BATCH_RUN_1.START_DTTM_2)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+</jasperReport>
