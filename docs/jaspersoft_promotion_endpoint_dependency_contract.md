@@ -73,6 +73,85 @@ These objects are mandatory for import stability:
 
 Breaking any invariant can produce partial imports or unresolved references.
 
+## Add-on import wrapper contract (critical)
+
+This section captures the exact failure mode encountered while packaging new Standard Offering add-ons and defines the mandatory wrapper format to avoid repeats.
+
+### Why this is critical
+
+Jaspersoft import failures like:
+
+- `Folder details for folder ".../Standard_Offering/Customer_Operations" were not found in the import information`
+
+are usually wrapper/manifest consistency failures, not report logic failures.
+
+### Canonical wrapper pattern (must match known-good package)
+
+Use `deploy/jaspersoft_standard_offering/Standard_Offering_import.zip` as wrapper template.
+
+Required `index.xml` behavior:
+
+1. keep properties as in known-good package (`keyalias`, `pathProcessorId`, `rootTenantId`, `jsVersion`, `encrypted`)
+2. module folder:
+   - `/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering`
+3. module resources for this package family should follow the known-good pattern:
+   - include root Standard Offering resource and ensure folder details are resolvable from packaged metadata
+4. never mix wrapper strategies between iterations (for example custom multi-resource one run, single-root next run) without full rebuild + revalidation
+
+Required folder metadata behavior:
+
+1. `.folder.xml` files under `Standard_Offering` should follow the same style as the known-good package
+2. avoid hand-crafted folder trees when a working exported `.folder.xml` pattern exists
+3. if copying folder descriptors from a template package, ensure they are compatible with packaged paths and do not reference unrelated roots
+
+### Non-negotiable anti-patterns (do not ship)
+
+1. mixed repository roots in one ZIP (for example both `Standard_Offering` and `Standard_Offering_Add_Ons`)
+2. stale resources left in `_build` that are no longer represented in `index.xml`
+3. `.folder.xml` child folder declarations that do not resolve in import context
+4. packaging from an incrementally edited `_build` without a clean rebuild sweep
+
+### Full preflight validation (required before push/import)
+
+Before every add-on ZIP build:
+
+1. confirm only one target root exists in `_build/resources`:
+   - `.../Report/Standard_Offering`
+2. confirm no alternate root subtree exists:
+   - `.../Report/Standard_Offering_Add_Ons` (must be absent for Standard_Offering-targeted package)
+3. verify `index.xml` module folder matches target root exactly
+4. verify every path family referenced by folder metadata exists in packaged resources
+5. verify no forbidden/stale path tokens remain:
+   - previous root names, old org tokens, old datasource tokens
+6. rebuild ZIP from current `_build` only (no append/update-in-place)
+
+### Single-test package contract
+
+Single-test ZIPs used for import diagnostics must:
+
+1. use the same wrapper convention as the known-good package
+2. include:
+   - target Ad Hoc XML + `_files`
+   - required Domain XML + `_files`
+   - required `.folder.xml` chain for the target path
+   - valid `index.xml` module folder/resource contract
+3. exclude unrelated ad hoc/domain payloads unless required for wrapper consistency
+
+### Incident summary (April 2026)
+
+Observed break cause:
+
+1. iterative rebuilds introduced wrapper drift
+2. stale alternate root content remained in package
+3. folder-detail resolution failed on `Customer_Operations`
+
+Corrective actions applied:
+
+1. removed alternate root subtree from `_build`
+2. realigned `index.xml` to known-good wrapper strategy
+3. realigned `.folder.xml` style to known-good package conventions
+4. rebuilt full and single-test ZIPs from clean state
+
 ## Standard Offering specific contract
 
 Current reporting source-of-truth package:

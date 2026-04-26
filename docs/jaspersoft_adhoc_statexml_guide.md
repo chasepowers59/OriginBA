@@ -282,3 +282,17 @@ Packaging updates:
 - `index.xml` resource list updated to include each new repository URI
 - rebuilt import package:
   - `deploy/standard_offering_add_ons/Standard_Offering_Add_Ons_import.zip`
+
+## Packaging guardrails for future AI runs
+
+To avoid repeat import failures, treat package wrapper integrity as a separate deliverable from Ad Hoc logic:
+
+1. do not edit `stateXML` and wrapper structure in the same step without a full manifest revalidation pass
+2. use a known-good package wrapper style (`Standard_Offering_import.zip`) as the baseline
+3. keep only one active repository root in `_build` for a given target package
+4. verify all `.folder.xml` and `index.xml` paths resolve before building ZIP
+5. build a single-test ZIP first, validate import, then publish the full pack
+
+Authoritative wrapper contract and checklist:
+
+- `docs/jaspersoft_promotion_endpoint_dependency_contract.md` (see **Add-on import wrapper contract** section)
