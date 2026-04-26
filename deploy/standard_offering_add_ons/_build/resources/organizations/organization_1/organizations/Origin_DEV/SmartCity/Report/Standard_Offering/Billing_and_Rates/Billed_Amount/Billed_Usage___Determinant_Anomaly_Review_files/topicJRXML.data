@@ -1,0 +1,1012 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="adhocReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="58be95fe-d545-4b7f-8e0c-a959f5ad4c78">
+	<property name="adhoc.topic.escape.variable.chars"/>
+	<property name="adhoc.metadata.version" value="310"/>
+	<property name="has.modified.presentation" value="false"/>
+	<property name="base.datasource.version" value="6"/>
+	<property name="use.datasource.presentation" value="true"/>
+	<property name="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.TopicReportUnit" value="/temp/sl_topic_f0800150-20e7-444a-94a1-dda7da0040d8"/>
+	<parameter name="CUST_CL_DESC_1" class="java.util.Collection" nestedType="java.lang.String">
+		<defaultValueExpression><![CDATA[java.util.Arrays.asList(new Object[]{})]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BILL_DT_1" class="net.sf.jasperreports.types.date.TimestampRange">
+		<defaultValueExpression><![CDATA[com.jaspersoft.jasperserver.api.common.util.rd.DateRangeFactory.getInstance("MONTH-3",java.sql.Timestamp.class)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BILL_DT_2" class="net.sf.jasperreports.types.date.TimestampRange">
+		<defaultValueExpression><![CDATA[com.jaspersoft.jasperserver.api.common.util.rd.DateRangeFactory.getInstance("DAY-0",java.sql.Timestamp.class)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EST_SW_1" class="java.lang.String">
+		<defaultValueExpression><![CDATA["Y"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="domain">
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema">
+  <queryFields>
+    <queryField id="BSEG_CUSTOMER.CUSTOMER_NAME"></queryField>
+    <queryField id="BSEG_CUSTOMER.ACCT_ID"></queryField>
+    <queryField id="BSEG_CUSTOMER.SA_ID"></queryField>
+    <queryField id="BSEG_CUSTOMER.SA_TYPE_DESC"></queryField>
+    <queryField id="BSEG_CUSTOMER.SA_TYPE_CD"></queryField>
+    <queryField id="BSEG_CUSTOMER.UTILITY_TYPE_CD"></queryField>
+    <queryField id="BSEG_CUSTOMER.PREM_ID"></queryField>
+    <queryField id="BSEG_BILLING.BILL_ID"></queryField>
+    <queryField id="BSEG_BILLING.BSEG_ID"></queryField>
+    <queryField id="BSEG_BILLING.BILL_DT"></queryField>
+    <queryField id="BSEG_BILLING.DUE_DT"></queryField>
+    <queryField id="BSEG_BILLING.BSEG_START_DT"></queryField>
+    <queryField id="BSEG_BILLING.BSEG_END_DT"></queryField>
+    <queryField id="BSEG_BILLING.WIN_START_DT"></queryField>
+    <queryField id="BSEG_BILLING.BILL_STAT_DESC"></queryField>
+    <queryField id="BSEG_BILLING.BILL_STAT_FLG"></queryField>
+    <queryField id="BSEG_BILLING.BSEG_STAT_DESC"></queryField>
+    <queryField id="BSEG_BILLING.BSEG_STAT_FLG"></queryField>
+    <queryField id="BSEG_BILLING.BILL_BILL_CYC_DESC"></queryField>
+    <queryField id="BSEG_BILLING.BILL_BILL_CYC_CD"></queryField>
+    <queryField id="BSEG_BILLING.BSEG_BILL_CYC_DESC"></queryField>
+    <queryField id="BSEG_BILLING.BSEG_BILL_CYC_CD"></queryField>
+    <queryField id="BSEG_USAGE.TOTAL_BILL_SQ"></queryField>
+    <queryField id="BSEG_USAGE.TOTAL_CALC_AMT"></queryField>
+    <queryField id="BSEG_USAGE.TOTAL_INIT_SQ"></queryField>
+    <queryField id="BSEG_USAGE.TOTAL_MSR_QTY"></queryField>
+    <queryField id="BSEG_USAGE.TOTAL_FINAL_REG_QTY"></queryField>
+    <queryField id="BSEG_USAGE.SQ_LINE_COUNT"></queryField>
+    <queryField id="BSEG_USAGE.CALC_HEADER_COUNT"></queryField>
+    <queryField id="BSEG_USAGE.READ_LINE_COUNT"></queryField>
+    <queryField id="BSEG_USAGE.DETERMINANT_COUNT"></queryField>
+    <queryField id="BSEG_DETERMINANTS.SOLE_UOM_DESC"></queryField>
+    <queryField id="BSEG_DETERMINANTS.SOLE_UOM_CD"></queryField>
+    <queryField id="BSEG_DETERMINANTS.SOLE_TOU_DESC"></queryField>
+    <queryField id="BSEG_DETERMINANTS.SOLE_TOU_CD"></queryField>
+    <queryField id="BSEG_DETERMINANTS.SOLE_SQI_DESC"></queryField>
+    <queryField id="BSEG_DETERMINANTS.SOLE_SQI_CD"></queryField>
+    <queryField id="BSEG_DETERMINANTS.SOLE_RS_DESC"></queryField>
+    <queryField id="BSEG_DETERMINANTS.SOLE_RS_CD"></queryField>
+    <queryField id="BSEG_DETERMINANTS.RS_COUNT"></queryField>
+    <queryField id="BSEG_SEGMENTATION.CUST_CL_DESC"></queryField>
+    <queryField id="BSEG_SEGMENTATION.CUST_CL_CD"></queryField>
+    <queryField id="BSEG_SEGMENTATION.COLL_CL_DESC"></queryField>
+    <queryField id="BSEG_SEGMENTATION.COLL_CL_CD"></queryField>
+    <queryField id="BSEG_SEGMENTATION.ACCT_MGMT_GRP_DESC"></queryField>
+    <queryField id="BSEG_SEGMENTATION.ACCT_MGMT_GRP_CD"></queryField>
+    <queryField id="BSEG_SEGMENTATION.BUD_PLAN_DESC"></queryField>
+    <queryField id="BSEG_SEGMENTATION.BUD_PLAN_CD"></queryField>
+    <queryField id="BSEG_READS.MIN_START_READ_DTTM"></queryField>
+    <queryField id="BSEG_READS.MAX_END_READ_DTTM"></queryField>
+    <queryField id="BSEG_READS.MIN_CALC_EFFDT"></queryField>
+    <queryField id="BSEG_READS.MAX_CALC_EFFDT"></queryField>
+    <queryField id="BSEG_FLAGS.EST_SW"></queryField>
+    <queryField id="BSEG_FLAGS.CLOSING_BSEG_SW"></queryField>
+    <queryField id="BSEG_FLAGS.SQ_OVERRIDE_SW"></queryField>
+    <queryField id="BSEG_FLAGS.ITEM_OVERRIDE_SW"></queryField>
+    <queryField id="BSEG_FLAGS.CAN_RSN_DESC"></queryField>
+    <queryField id="BSEG_FLAGS.CAN_RSN_CD"></queryField>
+    <queryField id="BSEG_FLAGS.REBILL_SEG_ID"></queryField>
+    <queryField id="BSEG_FLAGS.CAN_BSEG_ID"></queryField>
+    <queryField id="BSEG_FLAGS.MASTER_BSEG_ID"></queryField>
+    <queryField id="BSEG_AUDIT.LOAD_DTTM"></queryField>
+  </queryFields>
+</query>]]>
+	</queryString>
+	<field name="BSEG_CUSTOMER.CUSTOMER_NAME" class="java.lang.String">
+		<property name="adhoc.display" value="Customer Name"/>
+		<property name="semantic.item.label" value="Customer Name"/>
+		<property name="adhoc.tree.uri" value="/BSEG_CUSTOMER/CUSTOMER_NAME"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.CUSTOMER_NAME"/>
+		<property name="semantic.tree.uri" value="/BSEG_CUSTOMER/CUSTOMER_NAME"/>
+		<property name="semantic.tree.sort.order">
+			<![CDATA[{"BSEG_CUSTOMER":1,"CUSTOMER_NAME":2,"ACCT_ID":3,"SA_ID":4,"SA_TYPE_DESC":5,"SA_TYPE_CD":6,"UTILITY_TYPE_CD":7,"PREM_ID":8,"BSEG_BILLING":9,"BILL_ID":10,"BSEG_ID":11,"BILL_DT":12,"DUE_DT":13,"BSEG_START_DT":14,"BSEG_END_DT":15,"WIN_START_DT":16,"BILL_STAT_DESC":17,"BILL_STAT_FLG":18,"BSEG_STAT_DESC":19,"BSEG_STAT_FLG":20,"BILL_BILL_CYC_DESC":21,"BILL_BILL_CYC_CD":22,"BSEG_BILL_CYC_DESC":23,"BSEG_BILL_CYC_CD":24,"BSEG_USAGE":25,"TOTAL_BILL_SQ":26,"TOTAL_CALC_AMT":27,"TOTAL_INIT_SQ":28,"TOTAL_MSR_QTY":29,"TOTAL_FINAL_REG_QTY":30,"SQ_LINE_COUNT":31,"CALC_HEADER_COUNT":32,"READ_LINE_COUNT":33,"DETERMINANT_COUNT":34,"BSEG_DETERMINANTS":35,"SOLE_UOM_DESC":36,"SOLE_UOM_CD":37,"SOLE_TOU_DESC":38,"SOLE_TOU_CD":39,"SOLE_SQI_DESC":40,"SOLE_SQI_CD":41,"SOLE_RS_DESC":42,"SOLE_RS_CD":43,"RS_COUNT":44,"BSEG_SEGMENTATION":45,"CUST_CL_DESC":46,"CUST_CL_CD":47,"COLL_CL_DESC":48,"COLL_CL_CD":49,"ACCT_MGMT_GRP_DESC":50,"ACCT_MGMT_GRP_CD":51,"BUD_PLAN_DESC":52,"BUD_PLAN_CD":53,"BSEG_READS":54,"MIN_START_READ_DTTM":55,"MAX_END_READ_DTTM":56,"MIN_CALC_EFFDT":57,"MAX_CALC_EFFDT":58,"BSEG_FLAGS":59,"EST_SW":60,"CLOSING_BSEG_SW":61,"SQ_OVERRIDE_SW":62,"ITEM_OVERRIDE_SW":63,"CAN_RSN_DESC":64,"CAN_RSN_CD":65,"REBILL_SEG_ID":66,"CAN_BSEG_ID":67,"MASTER_BSEG_ID":68,"BSEG_AUDIT":69,"LOAD_DTTM":70}]]>
+		</property>
+		<property name="adhoc.tree.labels">
+			<![CDATA[[{"uri":"/BSEG_CUSTOMER","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Customer And Service"},{"uri":"/BSEG_BILLING","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Billing Context"},{"uri":"/BSEG_USAGE","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Usage And Billed Amount"},{"uri":"/BSEG_DETERMINANTS","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Determinant Detail"},{"uri":"/BSEG_SEGMENTATION","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Account Segmentation"},{"uri":"/BSEG_READS","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Read And Calculation Timing"},{"uri":"/BSEG_FLAGS","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Flags And Exceptions"},{"uri":"/BSEG_AUDIT","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Snapshot Audit"}]]]>
+		</property>
+		<property name="slIsTableAsList" value="false"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_CUSTOMER/CUSTOMER_NAME"/>
+		<property name="previous.display" value="Customer Name"/>
+		<property name="adhoc.chosen.tree.labels">
+			<![CDATA[[{"uri":"/BSEG_CUSTOMER","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Customer And Service"},{"uri":"/BSEG_BILLING","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Billing Context"},{"uri":"/BSEG_USAGE","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Usage And Billed Amount"},{"uri":"/BSEG_DETERMINANTS","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Determinant Detail"},{"uri":"/BSEG_SEGMENTATION","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Account Segmentation"},{"uri":"/BSEG_READS","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Read And Calculation Timing"},{"uri":"/BSEG_FLAGS","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Flags And Exceptions"},{"uri":"/BSEG_AUDIT","resourceId":"BSEG_BILLED_USAGE_RPT_CURR","label":"Snapshot Audit"}]]]>
+		</property>
+		<property name="adhoc.chosen.tree.order">
+			<![CDATA[{"PREM_ID":8,"DUE_DT":13,"MASTER_BSEG_ID":68,"BUD_PLAN_DESC":52,"MAX_END_READ_DTTM":56,"BILL_ID":10,"MIN_CALC_EFFDT":57,"SOLE_TOU_DESC":38,"BSEG_READS":54,"SA_ID":4,"TOTAL_INIT_SQ":28,"SOLE_UOM_CD":37,"SQ_OVERRIDE_SW":62,"CAN_RSN_DESC":64,"SQ_LINE_COUNT":31,"COLL_CL_CD":49,"BSEG_FLAGS":59,"CLOSING_BSEG_SW":61,"MAX_CALC_EFFDT":58,"ACCT_MGMT_GRP_DESC":50,"SA_TYPE_CD":6,"SOLE_RS_CD":43,"SOLE_TOU_CD":39,"EST_SW":60,"BSEG_AUDIT":69,"WIN_START_DT":16,"CUST_CL_DESC":46,"BUD_PLAN_CD":53,"ITEM_OVERRIDE_SW":63,"BILL_STAT_DESC":17,"UTILITY_TYPE_CD":7,"BILL_STAT_FLG":18,"RS_COUNT":44,"BSEG_BILLING":9,"DETERMINANT_COUNT":34,"BSEG_ID":11,"TOTAL_CALC_AMT":27,"CAN_BSEG_ID":67,"BSEG_START_DT":14,"SOLE_RS_DESC":42,"BSEG_SEGMENTATION":45,"COLL_CL_DESC":48,"BSEG_BILL_CYC_CD":24,"TOTAL_BILL_SQ":26,"MIN_START_READ_DTTM":55,"TOTAL_MSR_QTY":29,"BSEG_DETERMINANTS":35,"BILL_BILL_CYC_CD":22,"TOTAL_FINAL_REG_QTY":30,"REBILL_SEG_ID":66,"BSEG_STAT_DESC":19,"READ_LINE_COUNT":33,"SOLE_SQI_CD":41,"ACCT_MGMT_GRP_CD":51,"BSEG_END_DT":15,"BSEG_CUSTOMER":1,"CUST_CL_CD":47,"LOAD_DTTM":70,"ACCT_ID":3,"SOLE_SQI_DESC":40,"BSEG_STAT_FLG":20,"CAN_RSN_CD":65,"BSEG_USAGE":25,"CUSTOMER_NAME":2,"SOLE_UOM_DESC":36,"SA_TYPE_DESC":5,"BILL_DT":12,"BSEG_BILL_CYC_DESC":23,"CALC_HEADER_COUNT":32,"BILL_BILL_CYC_DESC":21}]]>
+		</property>
+		<property name="adhoc.chosen.tree.is.flattened" value="false"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_CUSTOMER.CUSTOMER_NAME)"/>
+	</field>
+	<field name="BSEG_CUSTOMER.ACCT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Account ID"/>
+		<property name="semantic.item.label" value="Account ID"/>
+		<property name="adhoc.tree.uri" value="/BSEG_CUSTOMER/ACCT_ID"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.ACCT_ID"/>
+		<property name="semantic.tree.uri" value="/BSEG_CUSTOMER/ACCT_ID"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_CUSTOMER/ACCT_ID"/>
+		<property name="previous.display" value="Account ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_CUSTOMER.ACCT_ID)"/>
+	</field>
+	<field name="BSEG_CUSTOMER.SA_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Service Agreement ID"/>
+		<property name="semantic.item.label" value="Service Agreement ID"/>
+		<property name="adhoc.tree.uri" value="/BSEG_CUSTOMER/SA_ID"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SA_ID"/>
+		<property name="semantic.tree.uri" value="/BSEG_CUSTOMER/SA_ID"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_CUSTOMER/SA_ID"/>
+		<property name="previous.display" value="Service Agreement ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_CUSTOMER.SA_ID)"/>
+	</field>
+	<field name="BSEG_CUSTOMER.SA_TYPE_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Type"/>
+		<property name="semantic.item.label" value="Service Type"/>
+		<property name="adhoc.tree.uri" value="/BSEG_CUSTOMER/SA_TYPE_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SA_TYPE_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_CUSTOMER/SA_TYPE_DESC"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_CUSTOMER/SA_TYPE_DESC"/>
+		<property name="previous.display" value="Service Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_CUSTOMER.SA_TYPE_DESC)"/>
+	</field>
+	<field name="BSEG_CUSTOMER.SA_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Service Type Code"/>
+		<property name="semantic.item.label" value="Service Type Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_CUSTOMER/SA_TYPE_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SA_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_CUSTOMER/SA_TYPE_CD"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_CUSTOMER/SA_TYPE_CD"/>
+		<property name="previous.display" value="Service Type Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_CUSTOMER.SA_TYPE_CD)"/>
+	</field>
+	<field name="BSEG_CUSTOMER.UTILITY_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Utility / Service Category Code"/>
+		<property name="semantic.item.label" value="Utility / Service Category Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_CUSTOMER/UTILITY_TYPE_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.UTILITY_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_CUSTOMER/UTILITY_TYPE_CD"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_CUSTOMER/UTILITY_TYPE_CD"/>
+		<property name="previous.display" value="Utility / Service Category Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_CUSTOMER.UTILITY_TYPE_CD)"/>
+	</field>
+	<field name="BSEG_CUSTOMER.PREM_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Premise ID"/>
+		<property name="semantic.item.label" value="Premise ID"/>
+		<property name="adhoc.tree.uri" value="/BSEG_CUSTOMER/PREM_ID"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.PREM_ID"/>
+		<property name="semantic.tree.uri" value="/BSEG_CUSTOMER/PREM_ID"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_CUSTOMER/PREM_ID"/>
+		<property name="previous.display" value="Premise ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_CUSTOMER.PREM_ID)"/>
+	</field>
+	<field name="BSEG_BILLING.BILL_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Bill ID"/>
+		<property name="semantic.item.label" value="Bill ID"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BILL_ID"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BILL_ID"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BILL_ID"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BILL_ID"/>
+		<property name="previous.display" value="Bill ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BILL_ID)"/>
+	</field>
+	<field name="BSEG_BILLING.BSEG_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment ID"/>
+		<property name="semantic.item.label" value="Bill Segment ID"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BSEG_ID"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BSEG_ID"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BSEG_ID"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BSEG_ID"/>
+		<property name="previous.display" value="Bill Segment ID"/>
+		<property name="adhoc.metadata.kind" value="MEASURE"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BSEG_ID)"/>
+	</field>
+	<field name="BSEG_BILLING.BILL_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Bill Date"/>
+		<property name="semantic.item.label" value="Bill Date"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BILL_DT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BILL_DT"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BILL_DT"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BILL_DT"/>
+		<property name="previous.display" value="Bill Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BILL_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="BSEG_BILLING.DUE_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Due Date"/>
+		<property name="semantic.item.label" value="Due Date"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/DUE_DT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.DUE_DT"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/DUE_DT"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/DUE_DT"/>
+		<property name="previous.display" value="Due Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.DUE_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="BSEG_BILLING.BSEG_START_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Bill Segment Start Date"/>
+		<property name="semantic.item.label" value="Bill Segment Start Date"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BSEG_START_DT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BSEG_START_DT"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BSEG_START_DT"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BSEG_START_DT"/>
+		<property name="previous.display" value="Bill Segment Start Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BSEG_START_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="BSEG_BILLING.BSEG_END_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Bill Segment End Date"/>
+		<property name="semantic.item.label" value="Bill Segment End Date"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BSEG_END_DT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BSEG_END_DT"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BSEG_END_DT"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BSEG_END_DT"/>
+		<property name="previous.display" value="Bill Segment End Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BSEG_END_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="BSEG_BILLING.WIN_START_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Window Start Date"/>
+		<property name="semantic.item.label" value="Window Start Date"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/WIN_START_DT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.WIN_START_DT"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/WIN_START_DT"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/WIN_START_DT"/>
+		<property name="previous.display" value="Window Start Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.WIN_START_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="BSEG_BILLING.BILL_STAT_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Status"/>
+		<property name="semantic.item.label" value="Bill Status"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BILL_STAT_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BILL_STAT_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BILL_STAT_DESC"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BILL_STAT_DESC"/>
+		<property name="previous.display" value="Bill Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BILL_STAT_DESC)"/>
+	</field>
+	<field name="BSEG_BILLING.BILL_STAT_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Status Code"/>
+		<property name="semantic.item.label" value="Bill Status Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BILL_STAT_FLG"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BILL_STAT_FLG"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BILL_STAT_FLG"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BILL_STAT_FLG"/>
+		<property name="previous.display" value="Bill Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BILL_STAT_FLG)"/>
+	</field>
+	<field name="BSEG_BILLING.BSEG_STAT_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Status"/>
+		<property name="semantic.item.label" value="Bill Segment Status"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BSEG_STAT_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BSEG_STAT_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BSEG_STAT_DESC"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BSEG_STAT_DESC"/>
+		<property name="previous.display" value="Bill Segment Status"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BSEG_STAT_DESC)"/>
+	</field>
+	<field name="BSEG_BILLING.BSEG_STAT_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Status Code"/>
+		<property name="semantic.item.label" value="Bill Segment Status Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BSEG_STAT_FLG"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BSEG_STAT_FLG"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BSEG_STAT_FLG"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BSEG_STAT_FLG"/>
+		<property name="previous.display" value="Bill Segment Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BSEG_STAT_FLG)"/>
+	</field>
+	<field name="BSEG_BILLING.BILL_BILL_CYC_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Cycle"/>
+		<property name="semantic.item.label" value="Bill Cycle"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BILL_BILL_CYC_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BILL_BILL_CYC_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BILL_BILL_CYC_DESC"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BILL_BILL_CYC_DESC"/>
+		<property name="previous.display" value="Bill Cycle"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BILL_BILL_CYC_DESC)"/>
+	</field>
+	<field name="BSEG_BILLING.BILL_BILL_CYC_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Cycle Code"/>
+		<property name="semantic.item.label" value="Bill Cycle Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BILL_BILL_CYC_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BILL_BILL_CYC_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BILL_BILL_CYC_CD"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BILL_BILL_CYC_CD"/>
+		<property name="previous.display" value="Bill Cycle Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BILL_BILL_CYC_CD)"/>
+	</field>
+	<field name="BSEG_BILLING.BSEG_BILL_CYC_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Cycle"/>
+		<property name="semantic.item.label" value="Bill Segment Cycle"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BSEG_BILL_CYC_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BSEG_BILL_CYC_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BSEG_BILL_CYC_DESC"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BSEG_BILL_CYC_DESC"/>
+		<property name="previous.display" value="Bill Segment Cycle"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BSEG_BILL_CYC_DESC)"/>
+	</field>
+	<field name="BSEG_BILLING.BSEG_BILL_CYC_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Segment Cycle Code"/>
+		<property name="semantic.item.label" value="Bill Segment Cycle Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_BILLING/BSEG_BILL_CYC_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BSEG_BILL_CYC_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_BILLING/BSEG_BILL_CYC_CD"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_BILLING/BSEG_BILL_CYC_CD"/>
+		<property name="previous.display" value="Bill Segment Cycle Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_BILLING.BSEG_BILL_CYC_CD)"/>
+	</field>
+	<field name="BSEG_USAGE.TOTAL_BILL_SQ" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Total Billed Usage"/>
+		<property name="semantic.item.label" value="Total Billed Usage"/>
+		<property name="adhoc.tree.uri" value="/BSEG_USAGE/TOTAL_BILL_SQ"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.TOTAL_BILL_SQ"/>
+		<property name="semantic.tree.uri" value="/BSEG_USAGE/TOTAL_BILL_SQ"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_USAGE/TOTAL_BILL_SQ"/>
+		<property name="previous.display" value="Total Billed Usage"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BSEG_USAGE.TOTAL_BILL_SQ)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BSEG_USAGE.TOTAL_CALC_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Total Billed Amount"/>
+		<property name="semantic.item.label" value="Total Billed Amount"/>
+		<property name="adhoc.tree.uri" value="/BSEG_USAGE/TOTAL_CALC_AMT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.TOTAL_CALC_AMT"/>
+		<property name="semantic.tree.uri" value="/BSEG_USAGE/TOTAL_CALC_AMT"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_USAGE/TOTAL_CALC_AMT"/>
+		<property name="previous.display" value="Total Billed Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BSEG_USAGE.TOTAL_CALC_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BSEG_USAGE.TOTAL_INIT_SQ" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Total Initial Usage"/>
+		<property name="semantic.item.label" value="Total Initial Usage"/>
+		<property name="adhoc.tree.uri" value="/BSEG_USAGE/TOTAL_INIT_SQ"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.TOTAL_INIT_SQ"/>
+		<property name="semantic.tree.uri" value="/BSEG_USAGE/TOTAL_INIT_SQ"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_USAGE/TOTAL_INIT_SQ"/>
+		<property name="previous.display" value="Total Initial Usage"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BSEG_USAGE.TOTAL_INIT_SQ)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BSEG_USAGE.TOTAL_MSR_QTY" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Total Measured Quantity"/>
+		<property name="semantic.item.label" value="Total Measured Quantity"/>
+		<property name="adhoc.tree.uri" value="/BSEG_USAGE/TOTAL_MSR_QTY"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.TOTAL_MSR_QTY"/>
+		<property name="semantic.tree.uri" value="/BSEG_USAGE/TOTAL_MSR_QTY"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_USAGE/TOTAL_MSR_QTY"/>
+		<property name="previous.display" value="Total Measured Quantity"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BSEG_USAGE.TOTAL_MSR_QTY)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BSEG_USAGE.TOTAL_FINAL_REG_QTY" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Total Final Register Quantity"/>
+		<property name="semantic.item.label" value="Total Final Register Quantity"/>
+		<property name="adhoc.tree.uri" value="/BSEG_USAGE/TOTAL_FINAL_REG_QTY"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.TOTAL_FINAL_REG_QTY"/>
+		<property name="semantic.tree.uri" value="/BSEG_USAGE/TOTAL_FINAL_REG_QTY"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_USAGE/TOTAL_FINAL_REG_QTY"/>
+		<property name="previous.display" value="Total Final Register Quantity"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BSEG_USAGE.TOTAL_FINAL_REG_QTY)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BSEG_USAGE.SQ_LINE_COUNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Service Quantity Line Count"/>
+		<property name="semantic.item.label" value="Service Quantity Line Count"/>
+		<property name="adhoc.tree.uri" value="/BSEG_USAGE/SQ_LINE_COUNT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SQ_LINE_COUNT"/>
+		<property name="semantic.tree.uri" value="/BSEG_USAGE/SQ_LINE_COUNT"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_USAGE/SQ_LINE_COUNT"/>
+		<property name="previous.display" value="Service Quantity Line Count"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BSEG_USAGE.SQ_LINE_COUNT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BSEG_USAGE.CALC_HEADER_COUNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Calculation Header Count"/>
+		<property name="semantic.item.label" value="Calculation Header Count"/>
+		<property name="adhoc.tree.uri" value="/BSEG_USAGE/CALC_HEADER_COUNT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.CALC_HEADER_COUNT"/>
+		<property name="semantic.tree.uri" value="/BSEG_USAGE/CALC_HEADER_COUNT"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_USAGE/CALC_HEADER_COUNT"/>
+		<property name="previous.display" value="Calculation Header Count"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BSEG_USAGE.CALC_HEADER_COUNT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BSEG_USAGE.READ_LINE_COUNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Read Line Count"/>
+		<property name="semantic.item.label" value="Read Line Count"/>
+		<property name="adhoc.tree.uri" value="/BSEG_USAGE/READ_LINE_COUNT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.READ_LINE_COUNT"/>
+		<property name="semantic.tree.uri" value="/BSEG_USAGE/READ_LINE_COUNT"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_USAGE/READ_LINE_COUNT"/>
+		<property name="previous.display" value="Read Line Count"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BSEG_USAGE.READ_LINE_COUNT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BSEG_USAGE.DETERMINANT_COUNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Determinant Count"/>
+		<property name="semantic.item.label" value="Determinant Count"/>
+		<property name="adhoc.tree.uri" value="/BSEG_USAGE/DETERMINANT_COUNT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.DETERMINANT_COUNT"/>
+		<property name="semantic.tree.uri" value="/BSEG_USAGE/DETERMINANT_COUNT"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_USAGE/DETERMINANT_COUNT"/>
+		<property name="previous.display" value="Determinant Count"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BSEG_USAGE.DETERMINANT_COUNT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BSEG_DETERMINANTS.SOLE_UOM_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Unit Of Measure"/>
+		<property name="semantic.item.label" value="Unit Of Measure"/>
+		<property name="adhoc.tree.uri" value="/BSEG_DETERMINANTS/SOLE_UOM_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SOLE_UOM_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_DETERMINANTS/SOLE_UOM_DESC"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_DETERMINANTS/SOLE_UOM_DESC"/>
+		<property name="previous.display" value="Unit Of Measure"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_DETERMINANTS.SOLE_UOM_DESC)"/>
+	</field>
+	<field name="BSEG_DETERMINANTS.SOLE_UOM_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Unit Of Measure Code"/>
+		<property name="semantic.item.label" value="Unit Of Measure Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_DETERMINANTS/SOLE_UOM_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SOLE_UOM_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_DETERMINANTS/SOLE_UOM_CD"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_DETERMINANTS/SOLE_UOM_CD"/>
+		<property name="previous.display" value="Unit Of Measure Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_DETERMINANTS.SOLE_UOM_CD)"/>
+	</field>
+	<field name="BSEG_DETERMINANTS.SOLE_TOU_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Time Of Use"/>
+		<property name="semantic.item.label" value="Time Of Use"/>
+		<property name="adhoc.tree.uri" value="/BSEG_DETERMINANTS/SOLE_TOU_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SOLE_TOU_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_DETERMINANTS/SOLE_TOU_DESC"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_DETERMINANTS/SOLE_TOU_DESC"/>
+		<property name="previous.display" value="Time Of Use"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_DETERMINANTS.SOLE_TOU_DESC)"/>
+	</field>
+	<field name="BSEG_DETERMINANTS.SOLE_TOU_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Time Of Use Code"/>
+		<property name="semantic.item.label" value="Time Of Use Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_DETERMINANTS/SOLE_TOU_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SOLE_TOU_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_DETERMINANTS/SOLE_TOU_CD"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_DETERMINANTS/SOLE_TOU_CD"/>
+		<property name="previous.display" value="Time Of Use Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_DETERMINANTS.SOLE_TOU_CD)"/>
+	</field>
+	<field name="BSEG_DETERMINANTS.SOLE_SQI_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Service Quantity Identifier"/>
+		<property name="semantic.item.label" value="Service Quantity Identifier"/>
+		<property name="adhoc.tree.uri" value="/BSEG_DETERMINANTS/SOLE_SQI_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SOLE_SQI_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_DETERMINANTS/SOLE_SQI_DESC"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_DETERMINANTS/SOLE_SQI_DESC"/>
+		<property name="previous.display" value="Service Quantity Identifier"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_DETERMINANTS.SOLE_SQI_DESC)"/>
+	</field>
+	<field name="BSEG_DETERMINANTS.SOLE_SQI_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Service Quantity Identifier Code"/>
+		<property name="semantic.item.label" value="Service Quantity Identifier Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_DETERMINANTS/SOLE_SQI_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SOLE_SQI_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_DETERMINANTS/SOLE_SQI_CD"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_DETERMINANTS/SOLE_SQI_CD"/>
+		<property name="previous.display" value="Service Quantity Identifier Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_DETERMINANTS.SOLE_SQI_CD)"/>
+	</field>
+	<field name="BSEG_DETERMINANTS.SOLE_RS_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Rate Schedule"/>
+		<property name="semantic.item.label" value="Rate Schedule"/>
+		<property name="adhoc.tree.uri" value="/BSEG_DETERMINANTS/SOLE_RS_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SOLE_RS_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_DETERMINANTS/SOLE_RS_DESC"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_DETERMINANTS/SOLE_RS_DESC"/>
+		<property name="previous.display" value="Rate Schedule"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_DETERMINANTS.SOLE_RS_DESC)"/>
+	</field>
+	<field name="BSEG_DETERMINANTS.SOLE_RS_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Rate Schedule Code"/>
+		<property name="semantic.item.label" value="Rate Schedule Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_DETERMINANTS/SOLE_RS_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SOLE_RS_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_DETERMINANTS/SOLE_RS_CD"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_DETERMINANTS/SOLE_RS_CD"/>
+		<property name="previous.display" value="Rate Schedule Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_DETERMINANTS.SOLE_RS_CD)"/>
+	</field>
+	<field name="BSEG_DETERMINANTS.RS_COUNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Rate Schedule Count"/>
+		<property name="semantic.item.label" value="Rate Schedule Count"/>
+		<property name="adhoc.tree.uri" value="/BSEG_DETERMINANTS/RS_COUNT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.RS_COUNT"/>
+		<property name="semantic.tree.uri" value="/BSEG_DETERMINANTS/RS_COUNT"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_DETERMINANTS/RS_COUNT"/>
+		<property name="previous.display" value="Rate Schedule Count"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(BSEG_DETERMINANTS.RS_COUNT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="BSEG_SEGMENTATION.CUST_CL_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Customer Class"/>
+		<property name="semantic.item.label" value="Customer Class"/>
+		<property name="adhoc.tree.uri" value="/BSEG_SEGMENTATION/CUST_CL_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.CUST_CL_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_SEGMENTATION/CUST_CL_DESC"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_SEGMENTATION/CUST_CL_DESC"/>
+		<property name="previous.display" value="Customer Class"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_SEGMENTATION.CUST_CL_DESC)"/>
+	</field>
+	<field name="BSEG_SEGMENTATION.CUST_CL_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Customer Class Code"/>
+		<property name="semantic.item.label" value="Customer Class Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_SEGMENTATION/CUST_CL_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.CUST_CL_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_SEGMENTATION/CUST_CL_CD"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_SEGMENTATION/CUST_CL_CD"/>
+		<property name="previous.display" value="Customer Class Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_SEGMENTATION.CUST_CL_CD)"/>
+	</field>
+	<field name="BSEG_SEGMENTATION.COLL_CL_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Collection Class"/>
+		<property name="semantic.item.label" value="Collection Class"/>
+		<property name="adhoc.tree.uri" value="/BSEG_SEGMENTATION/COLL_CL_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.COLL_CL_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_SEGMENTATION/COLL_CL_DESC"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_SEGMENTATION/COLL_CL_DESC"/>
+		<property name="previous.display" value="Collection Class"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_SEGMENTATION.COLL_CL_DESC)"/>
+	</field>
+	<field name="BSEG_SEGMENTATION.COLL_CL_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Collection Class Code"/>
+		<property name="semantic.item.label" value="Collection Class Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_SEGMENTATION/COLL_CL_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.COLL_CL_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_SEGMENTATION/COLL_CL_CD"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_SEGMENTATION/COLL_CL_CD"/>
+		<property name="previous.display" value="Collection Class Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_SEGMENTATION.COLL_CL_CD)"/>
+	</field>
+	<field name="BSEG_SEGMENTATION.ACCT_MGMT_GRP_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Account Management Group"/>
+		<property name="semantic.item.label" value="Account Management Group"/>
+		<property name="adhoc.tree.uri" value="/BSEG_SEGMENTATION/ACCT_MGMT_GRP_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.ACCT_MGMT_GRP_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_SEGMENTATION/ACCT_MGMT_GRP_DESC"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_SEGMENTATION/ACCT_MGMT_GRP_DESC"/>
+		<property name="previous.display" value="Account Management Group"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_SEGMENTATION.ACCT_MGMT_GRP_DESC)"/>
+	</field>
+	<field name="BSEG_SEGMENTATION.ACCT_MGMT_GRP_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Account Management Group Code"/>
+		<property name="semantic.item.label" value="Account Management Group Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_SEGMENTATION/ACCT_MGMT_GRP_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.ACCT_MGMT_GRP_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_SEGMENTATION/ACCT_MGMT_GRP_CD"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_SEGMENTATION/ACCT_MGMT_GRP_CD"/>
+		<property name="previous.display" value="Account Management Group Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_SEGMENTATION.ACCT_MGMT_GRP_CD)"/>
+	</field>
+	<field name="BSEG_SEGMENTATION.BUD_PLAN_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Budget Plan"/>
+		<property name="semantic.item.label" value="Budget Plan"/>
+		<property name="adhoc.tree.uri" value="/BSEG_SEGMENTATION/BUD_PLAN_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BUD_PLAN_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_SEGMENTATION/BUD_PLAN_DESC"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_SEGMENTATION/BUD_PLAN_DESC"/>
+		<property name="previous.display" value="Budget Plan"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_SEGMENTATION.BUD_PLAN_DESC)"/>
+	</field>
+	<field name="BSEG_SEGMENTATION.BUD_PLAN_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Budget Plan Code"/>
+		<property name="semantic.item.label" value="Budget Plan Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_SEGMENTATION/BUD_PLAN_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.BUD_PLAN_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_SEGMENTATION/BUD_PLAN_CD"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_SEGMENTATION/BUD_PLAN_CD"/>
+		<property name="previous.display" value="Budget Plan Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_SEGMENTATION.BUD_PLAN_CD)"/>
+	</field>
+	<field name="BSEG_READS.MIN_START_READ_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="First Read Start Date Time"/>
+		<property name="semantic.item.label" value="First Read Start Date Time"/>
+		<property name="adhoc.tree.uri" value="/BSEG_READS/MIN_START_READ_DTTM"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.MIN_START_READ_DTTM"/>
+		<property name="semantic.tree.uri" value="/BSEG_READS/MIN_START_READ_DTTM"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_READS/MIN_START_READ_DTTM"/>
+		<property name="previous.display" value="First Read Start Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_READS.MIN_START_READ_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="BSEG_READS.MAX_END_READ_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Last Read End Date Time"/>
+		<property name="semantic.item.label" value="Last Read End Date Time"/>
+		<property name="adhoc.tree.uri" value="/BSEG_READS/MAX_END_READ_DTTM"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.MAX_END_READ_DTTM"/>
+		<property name="semantic.tree.uri" value="/BSEG_READS/MAX_END_READ_DTTM"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_READS/MAX_END_READ_DTTM"/>
+		<property name="previous.display" value="Last Read End Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_READS.MAX_END_READ_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="BSEG_READS.MIN_CALC_EFFDT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="First Calculation Effective Date"/>
+		<property name="semantic.item.label" value="First Calculation Effective Date"/>
+		<property name="adhoc.tree.uri" value="/BSEG_READS/MIN_CALC_EFFDT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.MIN_CALC_EFFDT"/>
+		<property name="semantic.tree.uri" value="/BSEG_READS/MIN_CALC_EFFDT"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_READS/MIN_CALC_EFFDT"/>
+		<property name="previous.display" value="First Calculation Effective Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_READS.MIN_CALC_EFFDT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="BSEG_READS.MAX_CALC_EFFDT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Last Calculation Effective Date"/>
+		<property name="semantic.item.label" value="Last Calculation Effective Date"/>
+		<property name="adhoc.tree.uri" value="/BSEG_READS/MAX_CALC_EFFDT"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.MAX_CALC_EFFDT"/>
+		<property name="semantic.tree.uri" value="/BSEG_READS/MAX_CALC_EFFDT"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_READS/MAX_CALC_EFFDT"/>
+		<property name="previous.display" value="Last Calculation Effective Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_READS.MAX_CALC_EFFDT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="BSEG_FLAGS.EST_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Estimated Segment"/>
+		<property name="semantic.item.label" value="Estimated Segment"/>
+		<property name="adhoc.tree.uri" value="/BSEG_FLAGS/EST_SW"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.EST_SW"/>
+		<property name="semantic.tree.uri" value="/BSEG_FLAGS/EST_SW"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_FLAGS/EST_SW"/>
+		<property name="previous.display" value="Estimated Segment"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_FLAGS.EST_SW)"/>
+	</field>
+	<field name="BSEG_FLAGS.CLOSING_BSEG_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Closing Bill Segment"/>
+		<property name="semantic.item.label" value="Closing Bill Segment"/>
+		<property name="adhoc.tree.uri" value="/BSEG_FLAGS/CLOSING_BSEG_SW"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.CLOSING_BSEG_SW"/>
+		<property name="semantic.tree.uri" value="/BSEG_FLAGS/CLOSING_BSEG_SW"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_FLAGS/CLOSING_BSEG_SW"/>
+		<property name="previous.display" value="Closing Bill Segment"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_FLAGS.CLOSING_BSEG_SW)"/>
+	</field>
+	<field name="BSEG_FLAGS.SQ_OVERRIDE_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Service Quantity Override"/>
+		<property name="semantic.item.label" value="Service Quantity Override"/>
+		<property name="adhoc.tree.uri" value="/BSEG_FLAGS/SQ_OVERRIDE_SW"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.SQ_OVERRIDE_SW"/>
+		<property name="semantic.tree.uri" value="/BSEG_FLAGS/SQ_OVERRIDE_SW"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_FLAGS/SQ_OVERRIDE_SW"/>
+		<property name="previous.display" value="Service Quantity Override"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_FLAGS.SQ_OVERRIDE_SW)"/>
+	</field>
+	<field name="BSEG_FLAGS.ITEM_OVERRIDE_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Item Override"/>
+		<property name="semantic.item.label" value="Item Override"/>
+		<property name="adhoc.tree.uri" value="/BSEG_FLAGS/ITEM_OVERRIDE_SW"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.ITEM_OVERRIDE_SW"/>
+		<property name="semantic.tree.uri" value="/BSEG_FLAGS/ITEM_OVERRIDE_SW"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_FLAGS/ITEM_OVERRIDE_SW"/>
+		<property name="previous.display" value="Item Override"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_FLAGS.ITEM_OVERRIDE_SW)"/>
+	</field>
+	<field name="BSEG_FLAGS.CAN_RSN_DESC" class="java.lang.String">
+		<property name="adhoc.display" value="Cancel Reason"/>
+		<property name="semantic.item.label" value="Cancel Reason"/>
+		<property name="adhoc.tree.uri" value="/BSEG_FLAGS/CAN_RSN_DESC"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.CAN_RSN_DESC"/>
+		<property name="semantic.tree.uri" value="/BSEG_FLAGS/CAN_RSN_DESC"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_FLAGS/CAN_RSN_DESC"/>
+		<property name="previous.display" value="Cancel Reason"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_FLAGS.CAN_RSN_DESC)"/>
+	</field>
+	<field name="BSEG_FLAGS.CAN_RSN_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Cancel Reason Code"/>
+		<property name="semantic.item.label" value="Cancel Reason Code"/>
+		<property name="adhoc.tree.uri" value="/BSEG_FLAGS/CAN_RSN_CD"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.CAN_RSN_CD"/>
+		<property name="semantic.tree.uri" value="/BSEG_FLAGS/CAN_RSN_CD"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_FLAGS/CAN_RSN_CD"/>
+		<property name="previous.display" value="Cancel Reason Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_FLAGS.CAN_RSN_CD)"/>
+	</field>
+	<field name="BSEG_FLAGS.REBILL_SEG_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Rebill Segment ID"/>
+		<property name="semantic.item.label" value="Rebill Segment ID"/>
+		<property name="adhoc.tree.uri" value="/BSEG_FLAGS/REBILL_SEG_ID"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.REBILL_SEG_ID"/>
+		<property name="semantic.tree.uri" value="/BSEG_FLAGS/REBILL_SEG_ID"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_FLAGS/REBILL_SEG_ID"/>
+		<property name="previous.display" value="Rebill Segment ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_FLAGS.REBILL_SEG_ID)"/>
+	</field>
+	<field name="BSEG_FLAGS.CAN_BSEG_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Cancelled Bill Segment ID"/>
+		<property name="semantic.item.label" value="Cancelled Bill Segment ID"/>
+		<property name="adhoc.tree.uri" value="/BSEG_FLAGS/CAN_BSEG_ID"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.CAN_BSEG_ID"/>
+		<property name="semantic.tree.uri" value="/BSEG_FLAGS/CAN_BSEG_ID"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_FLAGS/CAN_BSEG_ID"/>
+		<property name="previous.display" value="Cancelled Bill Segment ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_FLAGS.CAN_BSEG_ID)"/>
+	</field>
+	<field name="BSEG_FLAGS.MASTER_BSEG_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Master Bill Segment ID"/>
+		<property name="semantic.item.label" value="Master Bill Segment ID"/>
+		<property name="adhoc.tree.uri" value="/BSEG_FLAGS/MASTER_BSEG_ID"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.MASTER_BSEG_ID"/>
+		<property name="semantic.tree.uri" value="/BSEG_FLAGS/MASTER_BSEG_ID"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_FLAGS/MASTER_BSEG_ID"/>
+		<property name="previous.display" value="Master Bill Segment ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_FLAGS.MASTER_BSEG_ID)"/>
+	</field>
+	<field name="BSEG_AUDIT.LOAD_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Snapshot Load Date Time"/>
+		<property name="semantic.item.label" value="Snapshot Load Date Time"/>
+		<property name="adhoc.tree.uri" value="/BSEG_AUDIT/LOAD_DTTM"/>
+		<property name="resourceId" value="BSEG_BILLED_USAGE_RPT_CURR.LOAD_DTTM"/>
+		<property name="semantic.tree.uri" value="/BSEG_AUDIT/LOAD_DTTM"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/BSEG_AUDIT/LOAD_DTTM"/>
+		<property name="previous.display" value="Snapshot Load Date Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(BSEG_AUDIT.LOAD_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+</jasperReport>

@@ -1,0 +1,1023 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="adhocReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="7ddcf119-7089-406c-bb54-51c614fb368c">
+	<property name="has.modified.presentation" value="false"/>
+	<property name="base.datasource.version" value="3"/>
+	<property name="use.datasource.presentation" value="true"/>
+	<property name="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.TopicReportUnit" value="/temp/sl_topic_036b0b8d-cdb1-4178-90d0-e425ac6be2c2"/>
+	<property name="adhoc.metadata.version" value="180"/>
+	<property name="adhoc.topic.escape.variable.chars"/>
+	<parameter name="PROCESS_COMPLETE_DT_1" class="net.sf.jasperreports.types.date.TimestampRange">
+		<defaultValueExpression><![CDATA[com.jaspersoft.jasperserver.api.common.util.rd.DateRangeFactory.getInstance("MONTH-4",java.sql.Timestamp.class)]]></defaultValueExpression>
+	</parameter>
+	<queryString language="domain">
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema">
+  <queryFields>
+    <queryField id="SET_PROCESS.WRITE_OFF_PROCESS_ID"></queryField>
+    <queryField id="SET_PROCESS.ACCOUNT_ID"></queryField>
+    <queryField id="SET_PROCESS.PERSON_ID"></queryField>
+    <queryField id="SET_PROCESS.PERSON_NAME"></queryField>
+    <queryField id="SET_PROCESS.CURRENCY_CODE"></queryField>
+    <queryField id="SET_PROCESS.PROCESS_START_DTTM"></queryField>
+    <queryField id="SET_PROCESS.PROCESS_COMPLETE_DT"></queryField>
+    <queryField id="SET_PROCESS.PROCESS_DURATION_DAYS"></queryField>
+    <queryField id="SET_PROCESS.WO_STATUS_CODE"></queryField>
+    <queryField id="SET_PROCESS.WO_STATUS_DESCRIPTION"></queryField>
+    <queryField id="SET_PROCESS.UNCOLL_PROC_STATUS_CODE"></queryField>
+    <queryField id="SET_PROCESS.UNCOLL_PROC_STATUS_DESCRIPTION"></queryField>
+    <queryField id="SET_PROCESS.WO_STATUS_REASON_CODE"></queryField>
+    <queryField id="SET_PROCESS.WO_STATUS_REASON_DESCRIPTION"></queryField>
+    <queryField id="SET_PROCESS.COMMENTS"></queryField>
+    <queryField id="SET_PROCESS_CONFIG.WO_CONTROL_CODE"></queryField>
+    <queryField id="SET_PROCESS_CONFIG.WO_CONTROL_DESCRIPTION"></queryField>
+    <queryField id="SET_PROCESS_CONFIG.WO_TEMPLATE_CODE"></queryField>
+    <queryField id="SET_PROCESS_CONFIG.WO_TEMPLATE_DESCRIPTION"></queryField>
+    <queryField id="SET_PROCESS_CONFIG.EFF_EVENT_TYPE_CODE"></queryField>
+    <queryField id="SET_PROCESS_CONFIG.EFF_EVENT_TYPE_DESCRIPTION"></queryField>
+    <queryField id="SET_PROCESS_CONFIG.NEXT_EVENT_TYPE_CODE"></queryField>
+    <queryField id="SET_PROCESS_CONFIG.NEXT_EVENT_TYPE_DESCRIPTION"></queryField>
+    <queryField id="SET_PROCESS_CONFIG.NEXT_EVENT_TRIGGER_DATE"></queryField>
+    <queryField id="SET_AMOUNTS.INIT_OUTSTANDING_AMT"></queryField>
+    <queryField id="SET_AMOUNTS.END_OUTSTANDING_AMT"></queryField>
+    <queryField id="SET_AMOUNTS.OUTSTANDING_DIFF_AMT"></queryField>
+    <queryField id="SET_AMOUNTS.RECOVERY_AMT_EST_ROW"></queryField>
+    <queryField id="SET_AMOUNTS.PAY_SEG_AMT_IN_WINDOW_ROW"></queryField>
+    <queryField id="SET_AMOUNTS.RECOVERY_RATE_EST_ROW"></queryField>
+    <queryField id="SET_PROCESS_COUNTS.ACTIVE_WO_PROC_CNT_ROW"></queryField>
+    <queryField id="SET_PROCESS_COUNTS.INACTIVE_WO_PROC_CNT_ROW"></queryField>
+    <queryField id="SET_PROCESS_COUNTS.COMPL_WO_PROC_CNT_ROW"></queryField>
+    <queryField id="SET_PROCESS_COUNTS.CANCL_SYS_WO_PROC_CNT_ROW"></queryField>
+    <queryField id="SET_PROCESS_COUNTS.CANCL_USER_WO_PROC_CNT_ROW"></queryField>
+    <queryField id="SET_PROCESS_COUNTS.EFF_WO_PROC_CNT_ROW"></queryField>
+    <queryField id="SET_PROCESS_COUNTS.INEFF_WO_PROC_CNT_ROW"></queryField>
+    <queryField id="SET_PROCESS_COUNTS.TOTAL_SA_COUNT_ROW"></queryField>
+    <queryField id="SET_PROCESS_COUNTS.ACTIVE_SA_COUNT_ROW"></queryField>
+    <queryField id="SET_PROCESS_COUNTS.INACTIVE_SA_COUNT_ROW"></queryField>
+    <queryField id="SET_SA_PAYMENT.PAYMENT_SEGMENT_COUNT_ROW"></queryField>
+    <queryField id="SET_SA_PAYMENT.PAYMENT_EVENT_COUNT_ROW"></queryField>
+    <queryField id="SET_SA_PAYMENT.PAY_SEG_AMT_TOTAL_ROW"></queryField>
+    <queryField id="SET_SA_PAYMENT.FIRST_PAY_DT"></queryField>
+    <queryField id="SET_SA_PAYMENT.LAST_PAY_DT"></queryField>
+    <queryField id="SET_METRICS.WRITE_OFF_PROCESS_COUNT"></queryField>
+    <queryField id="SET_METRICS.ACCOUNT_COUNT"></queryField>
+    <queryField id="SET_METRICS.INIT_OUTSTANDING_AMT_TOTAL"></queryField>
+    <queryField id="SET_METRICS.END_OUTSTANDING_AMT_TOTAL"></queryField>
+    <queryField id="SET_METRICS.OUTSTANDING_DIFF_AMT_TOTAL"></queryField>
+    <queryField id="SET_METRICS.RECOVERY_AMT_EST_TOTAL"></queryField>
+    <queryField id="SET_METRICS.PAY_SEG_AMT_IN_WINDOW_TOTAL"></queryField>
+    <queryField id="SET_METRICS.AVG_RECOVERY_RATE_EST"></queryField>
+    <queryField id="SET_METRICS.AVG_PROCESS_DURATION_DAYS"></queryField>
+    <queryField id="SET_METRICS.PAYMENT_SEGMENT_COUNT"></queryField>
+    <queryField id="SET_METRICS.PAYMENT_EVENT_COUNT"></queryField>
+    <queryField id="SET_METRICS.PAY_SEG_AMT_TOTAL"></queryField>
+    <queryField id="SET_METRICS.TOTAL_SA_COUNT_TOTAL"></queryField>
+    <queryField id="SET_METRICS.ACTIVE_SA_COUNT_TOTAL"></queryField>
+    <queryField id="SET_METRICS.INACTIVE_SA_COUNT_TOTAL"></queryField>
+  </queryFields>
+</query>]]>
+	</queryString>
+	<field name="SET_PROCESS.WRITE_OFF_PROCESS_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Write Off Process ID"/>
+		<property name="semantic.item.label" value="Write Off Process ID"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/WRITE_OFF_PROCESS_ID"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_ID"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/WRITE_OFF_PROCESS_ID"/>
+		<property name="semantic.tree.sort.order">
+			<![CDATA[{"SET_PROCESS":1,"WRITE_OFF_PROCESS_ID":2,"ACCOUNT_ID":3,"PERSON_ID":4,"PERSON_NAME":5,"CURRENCY_CODE":6,"PROCESS_START_DTTM":7,"PROCESS_COMPLETE_DT":8,"PROCESS_DURATION_DAYS":9,"WO_STATUS_CODE":10,"WO_STATUS_DESCRIPTION":11,"UNCOLL_PROC_STATUS_CODE":12,"UNCOLL_PROC_STATUS_DESCRIPTION":13,"WO_STATUS_REASON_CODE":14,"WO_STATUS_REASON_DESCRIPTION":15,"COMMENTS":16,"SET_PROCESS_CONFIG":17,"WO_CONTROL_CODE":18,"WO_CONTROL_DESCRIPTION":19,"WO_TEMPLATE_CODE":20,"WO_TEMPLATE_DESCRIPTION":21,"EFF_EVENT_TYPE_CODE":22,"EFF_EVENT_TYPE_DESCRIPTION":23,"NEXT_EVENT_TYPE_CODE":24,"NEXT_EVENT_TYPE_DESCRIPTION":25,"NEXT_EVENT_TRIGGER_DATE":26,"SET_AMOUNTS":27,"INIT_OUTSTANDING_AMT":28,"END_OUTSTANDING_AMT":29,"OUTSTANDING_DIFF_AMT":30,"RECOVERY_AMT_EST_ROW":31,"PAY_SEG_AMT_IN_WINDOW_ROW":32,"RECOVERY_RATE_EST_ROW":33,"SET_PROCESS_COUNTS":34,"ACTIVE_WO_PROC_CNT_ROW":35,"INACTIVE_WO_PROC_CNT_ROW":36,"COMPL_WO_PROC_CNT_ROW":37,"CANCL_SYS_WO_PROC_CNT_ROW":38,"CANCL_USER_WO_PROC_CNT_ROW":39,"EFF_WO_PROC_CNT_ROW":40,"INEFF_WO_PROC_CNT_ROW":41,"TOTAL_SA_COUNT_ROW":42,"ACTIVE_SA_COUNT_ROW":43,"INACTIVE_SA_COUNT_ROW":44,"SET_SA_PAYMENT":45,"PAYMENT_SEGMENT_COUNT_ROW":46,"PAYMENT_EVENT_COUNT_ROW":47,"PAY_SEG_AMT_TOTAL_ROW":48,"FIRST_PAY_DT":49,"LAST_PAY_DT":50,"SET_METRICS":51,"WRITE_OFF_PROCESS_COUNT":52,"ACCOUNT_COUNT":53,"INIT_OUTSTANDING_AMT_TOTAL":54,"END_OUTSTANDING_AMT_TOTAL":55,"OUTSTANDING_DIFF_AMT_TOTAL":56,"RECOVERY_AMT_EST_TOTAL":57,"PAY_SEG_AMT_IN_WINDOW_TOTAL":58,"AVG_RECOVERY_RATE_EST":59,"AVG_PROCESS_DURATION_DAYS":60,"PAYMENT_SEGMENT_COUNT":61,"PAYMENT_EVENT_COUNT":62,"PAY_SEG_AMT_TOTAL":63,"TOTAL_SA_COUNT_TOTAL":64,"ACTIVE_SA_COUNT_TOTAL":65,"INACTIVE_SA_COUNT_TOTAL":66}]]>
+		</property>
+		<property name="adhoc.tree.labels">
+			<![CDATA[[{"uri":"/SET_PROCESS","resourceId":"JoinTree_1","label":"Process Core"},{"uri":"/SET_PROCESS_CONFIG","resourceId":"JoinTree_1","label":"Process Configuration"},{"uri":"/SET_AMOUNTS","resourceId":"JoinTree_1","label":"Debt And Recovery"},{"uri":"/SET_PROCESS_COUNTS","resourceId":"JoinTree_1","label":"Process Counters"},{"uri":"/SET_SA_PAYMENT","resourceId":"JoinTree_1","label":"Payment Aggregates"},{"uri":"/SET_METRICS","resourceId":"JoinTree_1","label":"Measures"}]]]>
+		</property>
+		<property name="slIsTableAsList" value="false"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/WRITE_OFF_PROCESS_ID"/>
+		<property name="previous.display" value="Write Off Process ID"/>
+		<property name="adhoc.chosen.tree.labels">
+			<![CDATA[[{"uri":"/SET_PROCESS","resourceId":"JoinTree_1","label":"Process Core"},{"uri":"/SET_PROCESS_CONFIG","resourceId":"JoinTree_1","label":"Process Configuration"},{"uri":"/SET_AMOUNTS","resourceId":"JoinTree_1","label":"Debt And Recovery"},{"uri":"/SET_PROCESS_COUNTS","resourceId":"JoinTree_1","label":"Process Counters"},{"uri":"/SET_SA_PAYMENT","resourceId":"JoinTree_1","label":"Payment Aggregates"},{"uri":"/SET_METRICS","resourceId":"JoinTree_1","label":"Measures"}]]]>
+		</property>
+		<property name="adhoc.chosen.tree.order">
+			<![CDATA[{"PERSON_NAME":5,"EFF_EVENT_TYPE_DESCRIPTION":23,"ACCOUNT_ID":3,"TOTAL_SA_COUNT_ROW":42,"WO_CONTROL_CODE":18,"WRITE_OFF_PROCESS_ID":2,"PAY_SEG_AMT_TOTAL":63,"RECOVERY_AMT_EST_ROW":31,"AVG_RECOVERY_RATE_EST":59,"INIT_OUTSTANDING_AMT":28,"PAY_SEG_AMT_IN_WINDOW_TOTAL":58,"AVG_PROCESS_DURATION_DAYS":60,"WO_STATUS_CODE":10,"OUTSTANDING_DIFF_AMT_TOTAL":56,"TOTAL_SA_COUNT_TOTAL":64,"WO_STATUS_DESCRIPTION":11,"SET_SA_PAYMENT":45,"SET_PROCESS":1,"SET_METRICS":51,"PAYMENT_EVENT_COUNT_ROW":47,"INEFF_WO_PROC_CNT_ROW":41,"FIRST_PAY_DT":49,"PAYMENT_EVENT_COUNT":62,"NEXT_EVENT_TRIGGER_DATE":26,"ACCOUNT_COUNT":53,"NEXT_EVENT_TYPE_DESCRIPTION":25,"SET_AMOUNTS":27,"WO_STATUS_REASON_CODE":14,"PROCESS_COMPLETE_DT":8,"INIT_OUTSTANDING_AMT_TOTAL":54,"PERSON_ID":4,"UNCOLL_PROC_STATUS_CODE":12,"WO_TEMPLATE_CODE":20,"LAST_PAY_DT":50,"RECOVERY_RATE_EST_ROW":33,"CANCL_USER_WO_PROC_CNT_ROW":39,"SET_PROCESS_COUNTS":34,"UNCOLL_PROC_STATUS_DESCRIPTION":13,"COMMENTS":16,"PAY_SEG_AMT_IN_WINDOW_ROW":32,"CURRENCY_CODE":6,"WRITE_OFF_PROCESS_COUNT":52,"COMPL_WO_PROC_CNT_ROW":37,"PAYMENT_SEGMENT_COUNT_ROW":46,"INACTIVE_WO_PROC_CNT_ROW":36,"PAY_SEG_AMT_TOTAL_ROW":48,"ACTIVE_SA_COUNT_ROW":43,"PROCESS_START_DTTM":7,"ACTIVE_SA_COUNT_TOTAL":65,"EFF_EVENT_TYPE_CODE":22,"CANCL_SYS_WO_PROC_CNT_ROW":38,"SET_PROCESS_CONFIG":17,"PAYMENT_SEGMENT_COUNT":61,"END_OUTSTANDING_AMT":29,"OUTSTANDING_DIFF_AMT":30,"ACTIVE_WO_PROC_CNT_ROW":35,"END_OUTSTANDING_AMT_TOTAL":55,"NEXT_EVENT_TYPE_CODE":24,"WO_TEMPLATE_DESCRIPTION":21,"WO_STATUS_REASON_DESCRIPTION":15,"RECOVERY_AMT_EST_TOTAL":57,"PROCESS_DURATION_DAYS":9,"INACTIVE_SA_COUNT_TOTAL":66,"INACTIVE_SA_COUNT_ROW":44,"WO_CONTROL_DESCRIPTION":19,"EFF_WO_PROC_CNT_ROW":40}]]>
+		</property>
+		<property name="adhoc.chosen.tree.is.flattened" value="false"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.WRITE_OFF_PROCESS_ID)"/>
+	</field>
+	<field name="SET_PROCESS.ACCOUNT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Account ID"/>
+		<property name="semantic.item.label" value="Account ID"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/ACCOUNT_ID"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.ACCT_ID"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/ACCOUNT_ID"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/ACCOUNT_ID"/>
+		<property name="previous.display" value="Account ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.ACCOUNT_ID)"/>
+	</field>
+	<field name="SET_PROCESS.PERSON_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Person ID"/>
+		<property name="semantic.item.label" value="Person ID"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/PERSON_ID"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.PER_ID"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/PERSON_ID"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/PERSON_ID"/>
+		<property name="previous.display" value="Person ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.PERSON_ID)"/>
+	</field>
+	<field name="SET_PROCESS.PERSON_NAME" class="java.lang.String">
+		<property name="adhoc.display" value="Person Name"/>
+		<property name="semantic.item.label" value="Person Name"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/PERSON_NAME"/>
+		<property name="resourceId" value="JoinTree_1.CI_PER_NAME.ENTITY_NAME"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/PERSON_NAME"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/PERSON_NAME"/>
+		<property name="previous.display" value="Person Name"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.PERSON_NAME)"/>
+	</field>
+	<field name="SET_PROCESS.CURRENCY_CODE" class="java.lang.String">
+		<property name="adhoc.display" value="Currency Code"/>
+		<property name="semantic.item.label" value="Currency Code"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/CURRENCY_CODE"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.CURRENCY_CD"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/CURRENCY_CODE"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/CURRENCY_CODE"/>
+		<property name="previous.display" value="Currency Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.CURRENCY_CODE)"/>
+	</field>
+	<field name="SET_PROCESS.PROCESS_START_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Process Start DTTM"/>
+		<property name="semantic.item.label" value="Process Start DTTM"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/PROCESS_START_DTTM"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.CRE_DTTM"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/PROCESS_START_DTTM"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/PROCESS_START_DTTM"/>
+		<property name="previous.display" value="Process Start DTTM"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.PROCESS_START_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="SET_PROCESS.PROCESS_COMPLETE_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Process Complete Date"/>
+		<property name="semantic.item.label" value="Process Complete Date"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/PROCESS_COMPLETE_DT"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_COMPL_DT"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/PROCESS_COMPLETE_DT"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/PROCESS_COMPLETE_DT"/>
+		<property name="previous.display" value="Process Complete Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.PROCESS_COMPLETE_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="SET_PROCESS.PROCESS_DURATION_DAYS" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Process Duration (Days)"/>
+		<property name="semantic.item.label" value="Process Duration (Days)"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/PROCESS_DURATION_DAYS"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_DUR"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/PROCESS_DURATION_DAYS"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/PROCESS_DURATION_DAYS"/>
+		<property name="previous.display" value="Process Duration (Days)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_PROCESS.PROCESS_DURATION_DAYS)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_PROCESS.WO_STATUS_CODE" class="java.lang.String">
+		<property name="adhoc.display" value="Write Off Status Code"/>
+		<property name="semantic.item.label" value="Write Off Status Code"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/WO_STATUS_CODE"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.WO_STATUS_FLG"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/WO_STATUS_CODE"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/WO_STATUS_CODE"/>
+		<property name="previous.display" value="Write Off Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.WO_STATUS_CODE)"/>
+	</field>
+	<field name="SET_PROCESS.WO_STATUS_DESCRIPTION" class="java.lang.String">
+		<property name="adhoc.display" value="Write Off Status Description"/>
+		<property name="semantic.item.label" value="Write Off Status Description"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/WO_STATUS_DESCRIPTION"/>
+		<property name="resourceId" value="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/WO_STATUS_DESCRIPTION"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/WO_STATUS_DESCRIPTION"/>
+		<property name="previous.display" value="Write Off Status Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.WO_STATUS_DESCRIPTION)"/>
+	</field>
+	<field name="SET_PROCESS.UNCOLL_PROC_STATUS_CODE" class="java.lang.String">
+		<property name="adhoc.display" value="Uncoll Process Status Code"/>
+		<property name="semantic.item.label" value="Uncoll Process Status Code"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/UNCOLL_PROC_STATUS_CODE"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_STAT_FLG"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/UNCOLL_PROC_STATUS_CODE"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/UNCOLL_PROC_STATUS_CODE"/>
+		<property name="previous.display" value="Uncoll Process Status Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.UNCOLL_PROC_STATUS_CODE)"/>
+	</field>
+	<field name="SET_PROCESS.UNCOLL_PROC_STATUS_DESCRIPTION" class="java.lang.String">
+		<property name="adhoc.display" value="Uncoll Process Status Description"/>
+		<property name="semantic.item.label" value="Uncoll Process Status Description"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/UNCOLL_PROC_STATUS_DESCRIPTION"/>
+		<property name="resourceId" value="JoinTree_1.CI_LOOKUP_VAL_L_1.DESCR"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/UNCOLL_PROC_STATUS_DESCRIPTION"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/UNCOLL_PROC_STATUS_DESCRIPTION"/>
+		<property name="previous.display" value="Uncoll Process Status Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.UNCOLL_PROC_STATUS_DESCRIPTION)"/>
+	</field>
+	<field name="SET_PROCESS.WO_STATUS_REASON_CODE" class="java.lang.String">
+		<property name="adhoc.display" value="Write Off Status Reason Code"/>
+		<property name="semantic.item.label" value="Write Off Status Reason Code"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/WO_STATUS_REASON_CODE"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.WO_STAT_RSN_FLG"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/WO_STATUS_REASON_CODE"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/WO_STATUS_REASON_CODE"/>
+		<property name="previous.display" value="Write Off Status Reason Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.WO_STATUS_REASON_CODE)"/>
+	</field>
+	<field name="SET_PROCESS.WO_STATUS_REASON_DESCRIPTION" class="java.lang.String">
+		<property name="adhoc.display" value="Write Off Status Reason Description"/>
+		<property name="semantic.item.label" value="Write Off Status Reason Description"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/WO_STATUS_REASON_DESCRIPTION"/>
+		<property name="resourceId" value="JoinTree_1.CI_LOOKUP_VAL_L_2.DESCR"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/WO_STATUS_REASON_DESCRIPTION"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/WO_STATUS_REASON_DESCRIPTION"/>
+		<property name="previous.display" value="Write Off Status Reason Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.WO_STATUS_REASON_DESCRIPTION)"/>
+	</field>
+	<field name="SET_PROCESS.COMMENTS" class="java.lang.String">
+		<property name="adhoc.display" value="Comments"/>
+		<property name="semantic.item.label" value="Comments"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS/COMMENTS"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.COMMENTS"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS/COMMENTS"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS/COMMENTS"/>
+		<property name="previous.display" value="Comments"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS.COMMENTS)"/>
+	</field>
+	<field name="SET_PROCESS_CONFIG.WO_CONTROL_CODE" class="java.lang.String">
+		<property name="adhoc.display" value="Write Off Control Code"/>
+		<property name="semantic.item.label" value="Write Off Control Code"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_CONFIG/WO_CONTROL_CODE"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.WO_CNTL_CD"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_CONFIG/WO_CONTROL_CODE"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_CONFIG/WO_CONTROL_CODE"/>
+		<property name="previous.display" value="Write Off Control Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS_CONFIG.WO_CONTROL_CODE)"/>
+	</field>
+	<field name="SET_PROCESS_CONFIG.WO_CONTROL_DESCRIPTION" class="java.lang.String">
+		<property name="adhoc.display" value="Write Off Control Description"/>
+		<property name="semantic.item.label" value="Write Off Control Description"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_CONFIG/WO_CONTROL_DESCRIPTION"/>
+		<property name="resourceId" value="JoinTree_1.CI_WO_CNTL_L.DESCR"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_CONFIG/WO_CONTROL_DESCRIPTION"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_CONFIG/WO_CONTROL_DESCRIPTION"/>
+		<property name="previous.display" value="Write Off Control Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS_CONFIG.WO_CONTROL_DESCRIPTION)"/>
+	</field>
+	<field name="SET_PROCESS_CONFIG.WO_TEMPLATE_CODE" class="java.lang.String">
+		<property name="adhoc.display" value="Write Off Template Code"/>
+		<property name="semantic.item.label" value="Write Off Template Code"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_CONFIG/WO_TEMPLATE_CODE"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_TMPL_CD"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_CONFIG/WO_TEMPLATE_CODE"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_CONFIG/WO_TEMPLATE_CODE"/>
+		<property name="previous.display" value="Write Off Template Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS_CONFIG.WO_TEMPLATE_CODE)"/>
+	</field>
+	<field name="SET_PROCESS_CONFIG.WO_TEMPLATE_DESCRIPTION" class="java.lang.String">
+		<property name="adhoc.display" value="Write Off Template Description"/>
+		<property name="semantic.item.label" value="Write Off Template Description"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_CONFIG/WO_TEMPLATE_DESCRIPTION"/>
+		<property name="resourceId" value="JoinTree_1.CI_WO_PROC_TMPL_L.DESCR"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_CONFIG/WO_TEMPLATE_DESCRIPTION"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_CONFIG/WO_TEMPLATE_DESCRIPTION"/>
+		<property name="previous.display" value="Write Off Template Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS_CONFIG.WO_TEMPLATE_DESCRIPTION)"/>
+	</field>
+	<field name="SET_PROCESS_CONFIG.EFF_EVENT_TYPE_CODE" class="java.lang.String">
+		<property name="adhoc.display" value="Effective Event Type Code"/>
+		<property name="semantic.item.label" value="Effective Event Type Code"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_CONFIG/EFF_EVENT_TYPE_CODE"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.EFF_WO_EVT_TYP_CD"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_CONFIG/EFF_EVENT_TYPE_CODE"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_CONFIG/EFF_EVENT_TYPE_CODE"/>
+		<property name="previous.display" value="Effective Event Type Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS_CONFIG.EFF_EVENT_TYPE_CODE)"/>
+	</field>
+	<field name="SET_PROCESS_CONFIG.EFF_EVENT_TYPE_DESCRIPTION" class="java.lang.String">
+		<property name="adhoc.display" value="Effective Event Type Description"/>
+		<property name="semantic.item.label" value="Effective Event Type Description"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_CONFIG/EFF_EVENT_TYPE_DESCRIPTION"/>
+		<property name="resourceId" value="JoinTree_1.CI_WO_EVT_TYP_L.DESCR"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_CONFIG/EFF_EVENT_TYPE_DESCRIPTION"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_CONFIG/EFF_EVENT_TYPE_DESCRIPTION"/>
+		<property name="previous.display" value="Effective Event Type Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS_CONFIG.EFF_EVENT_TYPE_DESCRIPTION)"/>
+	</field>
+	<field name="SET_PROCESS_CONFIG.NEXT_EVENT_TYPE_CODE" class="java.lang.String">
+		<property name="adhoc.display" value="Next Event Type Code"/>
+		<property name="semantic.item.label" value="Next Event Type Code"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_CONFIG/NEXT_EVENT_TYPE_CODE"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.NEXT_WO_EVT_TYP_CD"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_CONFIG/NEXT_EVENT_TYPE_CODE"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_CONFIG/NEXT_EVENT_TYPE_CODE"/>
+		<property name="previous.display" value="Next Event Type Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS_CONFIG.NEXT_EVENT_TYPE_CODE)"/>
+	</field>
+	<field name="SET_PROCESS_CONFIG.NEXT_EVENT_TYPE_DESCRIPTION" class="java.lang.String">
+		<property name="adhoc.display" value="Next Event Type Description"/>
+		<property name="semantic.item.label" value="Next Event Type Description"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_CONFIG/NEXT_EVENT_TYPE_DESCRIPTION"/>
+		<property name="resourceId" value="JoinTree_1.CI_WO_EVT_TYP_L_1.DESCR"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_CONFIG/NEXT_EVENT_TYPE_DESCRIPTION"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_CONFIG/NEXT_EVENT_TYPE_DESCRIPTION"/>
+		<property name="previous.display" value="Next Event Type Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS_CONFIG.NEXT_EVENT_TYPE_DESCRIPTION)"/>
+	</field>
+	<field name="SET_PROCESS_CONFIG.NEXT_EVENT_TRIGGER_DATE" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Next Event Trigger Date"/>
+		<property name="semantic.item.label" value="Next Event Trigger Date"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_CONFIG/NEXT_EVENT_TRIGGER_DATE"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.NEXT_WO_EVT_TRIGGER_DT"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_CONFIG/NEXT_EVENT_TRIGGER_DATE"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_CONFIG/NEXT_EVENT_TRIGGER_DATE"/>
+		<property name="previous.display" value="Next Event Trigger Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_PROCESS_CONFIG.NEXT_EVENT_TRIGGER_DATE)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="SET_AMOUNTS.INIT_OUTSTANDING_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Initial Outstanding Amount"/>
+		<property name="semantic.item.label" value="Initial Outstanding Amount"/>
+		<property name="adhoc.tree.uri" value="/SET_AMOUNTS/INIT_OUTSTANDING_AMT"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.ARS_AT_START"/>
+		<property name="semantic.tree.uri" value="/SET_AMOUNTS/INIT_OUTSTANDING_AMT"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_AMOUNTS/INIT_OUTSTANDING_AMT"/>
+		<property name="previous.display" value="Initial Outstanding Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_AMOUNTS.INIT_OUTSTANDING_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_AMOUNTS.END_OUTSTANDING_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="End Outstanding Amount"/>
+		<property name="semantic.item.label" value="End Outstanding Amount"/>
+		<property name="adhoc.tree.uri" value="/SET_AMOUNTS/END_OUTSTANDING_AMT"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.ARS_AT_END"/>
+		<property name="semantic.tree.uri" value="/SET_AMOUNTS/END_OUTSTANDING_AMT"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_AMOUNTS/END_OUTSTANDING_AMT"/>
+		<property name="previous.display" value="End Outstanding Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_AMOUNTS.END_OUTSTANDING_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_AMOUNTS.OUTSTANDING_DIFF_AMT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Outstanding Difference Amount"/>
+		<property name="semantic.item.label" value="Outstanding Difference Amount"/>
+		<property name="adhoc.tree.uri" value="/SET_AMOUNTS/OUTSTANDING_DIFF_AMT"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.ARS_DIFF"/>
+		<property name="semantic.tree.uri" value="/SET_AMOUNTS/OUTSTANDING_DIFF_AMT"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_AMOUNTS/OUTSTANDING_DIFF_AMT"/>
+		<property name="previous.display" value="Outstanding Difference Amount"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_AMOUNTS.OUTSTANDING_DIFF_AMT)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_AMOUNTS.RECOVERY_AMT_EST_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Recovery Amount Est (Row)"/>
+		<property name="semantic.item.label" value="Recovery Amount Est (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_AMOUNTS/RECOVERY_AMT_EST_ROW"/>
+		<property name="resourceId" value="JoinTree_1.RECOVERY_AMT_EST_ROW"/>
+		<property name="semantic.tree.uri" value="/SET_AMOUNTS/RECOVERY_AMT_EST_ROW"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_AMOUNTS/RECOVERY_AMT_EST_ROW"/>
+		<property name="previous.display" value="Recovery Amount Est (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_AMOUNTS.RECOVERY_AMT_EST_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_AMOUNTS.PAY_SEG_AMT_IN_WINDOW_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Payment Amount In Process Window (Row)"/>
+		<property name="semantic.item.label" value="Payment Amount In Process Window (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_AMOUNTS/PAY_SEG_AMT_IN_WINDOW_ROW"/>
+		<property name="resourceId" value="JoinTree_1.PAY_SEG_AMT_IN_WINDOW_ROW"/>
+		<property name="semantic.tree.uri" value="/SET_AMOUNTS/PAY_SEG_AMT_IN_WINDOW_ROW"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_AMOUNTS/PAY_SEG_AMT_IN_WINDOW_ROW"/>
+		<property name="previous.display" value="Payment Amount In Process Window (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_AMOUNTS.PAY_SEG_AMT_IN_WINDOW_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_AMOUNTS.RECOVERY_RATE_EST_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Estimated Recovery Rate (Row)"/>
+		<property name="semantic.item.label" value="Estimated Recovery Rate (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_AMOUNTS/RECOVERY_RATE_EST_ROW"/>
+		<property name="resourceId" value="JoinTree_1.RECOVERY_RATE_EST_ROW"/>
+		<property name="semantic.tree.uri" value="/SET_AMOUNTS/RECOVERY_RATE_EST_ROW"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_AMOUNTS/RECOVERY_RATE_EST_ROW"/>
+		<property name="previous.display" value="Estimated Recovery Rate (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_AMOUNTS.RECOVERY_RATE_EST_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_PROCESS_COUNTS.ACTIVE_WO_PROC_CNT_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Active Process Count (Row)"/>
+		<property name="semantic.item.label" value="Active Process Count (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_COUNTS/ACTIVE_WO_PROC_CNT_ROW"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.ACTIVE_WO_PROC_CNT"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_COUNTS/ACTIVE_WO_PROC_CNT_ROW"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_COUNTS/ACTIVE_WO_PROC_CNT_ROW"/>
+		<property name="previous.display" value="Active Process Count (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_PROCESS_COUNTS.ACTIVE_WO_PROC_CNT_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_PROCESS_COUNTS.INACTIVE_WO_PROC_CNT_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Inactive Process Count (Row)"/>
+		<property name="semantic.item.label" value="Inactive Process Count (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_COUNTS/INACTIVE_WO_PROC_CNT_ROW"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.INACTIVE_WO_PROC_CNT"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_COUNTS/INACTIVE_WO_PROC_CNT_ROW"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_COUNTS/INACTIVE_WO_PROC_CNT_ROW"/>
+		<property name="previous.display" value="Inactive Process Count (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_PROCESS_COUNTS.INACTIVE_WO_PROC_CNT_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_PROCESS_COUNTS.COMPL_WO_PROC_CNT_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Completed Process Count (Row)"/>
+		<property name="semantic.item.label" value="Completed Process Count (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_COUNTS/COMPL_WO_PROC_CNT_ROW"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.COMPL_WO_PROC_CNT"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_COUNTS/COMPL_WO_PROC_CNT_ROW"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_COUNTS/COMPL_WO_PROC_CNT_ROW"/>
+		<property name="previous.display" value="Completed Process Count (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_PROCESS_COUNTS.COMPL_WO_PROC_CNT_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_PROCESS_COUNTS.CANCL_SYS_WO_PROC_CNT_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Cancelled by System Count (Row)"/>
+		<property name="semantic.item.label" value="Cancelled by System Count (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_COUNTS/CANCL_SYS_WO_PROC_CNT_ROW"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.CANCL_SYS_WO_PROC_CNT"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_COUNTS/CANCL_SYS_WO_PROC_CNT_ROW"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_COUNTS/CANCL_SYS_WO_PROC_CNT_ROW"/>
+		<property name="previous.display" value="Cancelled by System Count (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_PROCESS_COUNTS.CANCL_SYS_WO_PROC_CNT_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_PROCESS_COUNTS.CANCL_USER_WO_PROC_CNT_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Cancelled by User Count (Row)"/>
+		<property name="semantic.item.label" value="Cancelled by User Count (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_COUNTS/CANCL_USER_WO_PROC_CNT_ROW"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.CANCL_USER_WO_PROC_CNT"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_COUNTS/CANCL_USER_WO_PROC_CNT_ROW"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_COUNTS/CANCL_USER_WO_PROC_CNT_ROW"/>
+		<property name="previous.display" value="Cancelled by User Count (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_PROCESS_COUNTS.CANCL_USER_WO_PROC_CNT_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_PROCESS_COUNTS.EFF_WO_PROC_CNT_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Effective Process Count (Row)"/>
+		<property name="semantic.item.label" value="Effective Process Count (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_COUNTS/EFF_WO_PROC_CNT_ROW"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.EFF_WO_PROC_CNT"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_COUNTS/EFF_WO_PROC_CNT_ROW"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_COUNTS/EFF_WO_PROC_CNT_ROW"/>
+		<property name="previous.display" value="Effective Process Count (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_PROCESS_COUNTS.EFF_WO_PROC_CNT_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_PROCESS_COUNTS.INEFF_WO_PROC_CNT_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Ineffective Process Count (Row)"/>
+		<property name="semantic.item.label" value="Ineffective Process Count (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_COUNTS/INEFF_WO_PROC_CNT_ROW"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.INEFF_WO_PROC_CNT"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_COUNTS/INEFF_WO_PROC_CNT_ROW"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_COUNTS/INEFF_WO_PROC_CNT_ROW"/>
+		<property name="previous.display" value="Ineffective Process Count (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_PROCESS_COUNTS.INEFF_WO_PROC_CNT_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_PROCESS_COUNTS.TOTAL_SA_COUNT_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Total SA Count (Row)"/>
+		<property name="semantic.item.label" value="Total SA Count (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_COUNTS/TOTAL_SA_COUNT_ROW"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_TOT_SA_CNT"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_COUNTS/TOTAL_SA_COUNT_ROW"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_COUNTS/TOTAL_SA_COUNT_ROW"/>
+		<property name="previous.display" value="Total SA Count (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_PROCESS_COUNTS.TOTAL_SA_COUNT_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_PROCESS_COUNTS.ACTIVE_SA_COUNT_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Active SA Count (Row)"/>
+		<property name="semantic.item.label" value="Active SA Count (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_COUNTS/ACTIVE_SA_COUNT_ROW"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_ACT_SA_CNT"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_COUNTS/ACTIVE_SA_COUNT_ROW"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_COUNTS/ACTIVE_SA_COUNT_ROW"/>
+		<property name="previous.display" value="Active SA Count (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_PROCESS_COUNTS.ACTIVE_SA_COUNT_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_PROCESS_COUNTS.INACTIVE_SA_COUNT_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Inactive SA Count (Row)"/>
+		<property name="semantic.item.label" value="Inactive SA Count (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_PROCESS_COUNTS/INACTIVE_SA_COUNT_ROW"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_INACT_SA_CNT"/>
+		<property name="semantic.tree.uri" value="/SET_PROCESS_COUNTS/INACTIVE_SA_COUNT_ROW"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_PROCESS_COUNTS/INACTIVE_SA_COUNT_ROW"/>
+		<property name="previous.display" value="Inactive SA Count (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_PROCESS_COUNTS.INACTIVE_SA_COUNT_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_SA_PAYMENT.PAYMENT_SEGMENT_COUNT_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Payment Segment Count (Row)"/>
+		<property name="semantic.item.label" value="Payment Segment Count (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_SA_PAYMENT/PAYMENT_SEGMENT_COUNT_ROW"/>
+		<property name="resourceId" value="JoinTree_1.WO_PAY_AGG.PAY_SEGMENT_COUNT"/>
+		<property name="semantic.tree.uri" value="/SET_SA_PAYMENT/PAYMENT_SEGMENT_COUNT_ROW"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_SA_PAYMENT/PAYMENT_SEGMENT_COUNT_ROW"/>
+		<property name="previous.display" value="Payment Segment Count (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_SA_PAYMENT.PAYMENT_SEGMENT_COUNT_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_SA_PAYMENT.PAYMENT_EVENT_COUNT_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Payment Event Count (Row)"/>
+		<property name="semantic.item.label" value="Payment Event Count (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_SA_PAYMENT/PAYMENT_EVENT_COUNT_ROW"/>
+		<property name="resourceId" value="JoinTree_1.WO_PAY_AGG.PAYMENT_EVENT_COUNT"/>
+		<property name="semantic.tree.uri" value="/SET_SA_PAYMENT/PAYMENT_EVENT_COUNT_ROW"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_SA_PAYMENT/PAYMENT_EVENT_COUNT_ROW"/>
+		<property name="previous.display" value="Payment Event Count (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_SA_PAYMENT.PAYMENT_EVENT_COUNT_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_SA_PAYMENT.PAY_SEG_AMT_TOTAL_ROW" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Payment Segment Amount Total (Row)"/>
+		<property name="semantic.item.label" value="Payment Segment Amount Total (Row)"/>
+		<property name="adhoc.tree.uri" value="/SET_SA_PAYMENT/PAY_SEG_AMT_TOTAL_ROW"/>
+		<property name="resourceId" value="JoinTree_1.WO_PAY_AGG.PAY_SEG_AMT_TOTAL"/>
+		<property name="semantic.tree.uri" value="/SET_SA_PAYMENT/PAY_SEG_AMT_TOTAL_ROW"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_SA_PAYMENT/PAY_SEG_AMT_TOTAL_ROW"/>
+		<property name="previous.display" value="Payment Segment Amount Total (Row)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(SET_SA_PAYMENT.PAY_SEG_AMT_TOTAL_ROW)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_SA_PAYMENT.FIRST_PAY_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="First Payment Date"/>
+		<property name="semantic.item.label" value="First Payment Date"/>
+		<property name="adhoc.tree.uri" value="/SET_SA_PAYMENT/FIRST_PAY_DT"/>
+		<property name="resourceId" value="JoinTree_1.WO_PAY_AGG.FIRST_PAY_DT"/>
+		<property name="semantic.tree.uri" value="/SET_SA_PAYMENT/FIRST_PAY_DT"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_SA_PAYMENT/FIRST_PAY_DT"/>
+		<property name="previous.display" value="First Payment Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_SA_PAYMENT.FIRST_PAY_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="SET_SA_PAYMENT.LAST_PAY_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Last Payment Date"/>
+		<property name="semantic.item.label" value="Last Payment Date"/>
+		<property name="adhoc.tree.uri" value="/SET_SA_PAYMENT/LAST_PAY_DT"/>
+		<property name="resourceId" value="JoinTree_1.WO_PAY_AGG.LAST_PAY_DT"/>
+		<property name="semantic.tree.uri" value="/SET_SA_PAYMENT/LAST_PAY_DT"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_SA_PAYMENT/LAST_PAY_DT"/>
+		<property name="previous.display" value="Last Payment Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(SET_SA_PAYMENT.LAST_PAY_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="SET_METRICS.WRITE_OFF_PROCESS_COUNT" class="java.lang.String">
+		<property name="adhoc.display" value="Write Off Process Count"/>
+		<property name="semantic.item.label" value="Write Off Process Count"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/WRITE_OFF_PROCESS_COUNT"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_ID"/>
+		<property name="defaultAgg" value="CountDistinct"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/WRITE_OFF_PROCESS_COUNT"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="0"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="aggregateExpression" value="CountDistinct(SET_METRICS.WRITE_OFF_PROCESS_COUNT)"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/WRITE_OFF_PROCESS_COUNT"/>
+		<property name="previous.display" value="Write Off Process Count"/>
+	</field>
+	<field name="SET_METRICS.ACCOUNT_COUNT" class="java.lang.String">
+		<property name="adhoc.display" value="Account Count"/>
+		<property name="semantic.item.label" value="Account Count"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/ACCOUNT_COUNT"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.ACCT_ID"/>
+		<property name="defaultAgg" value="CountDistinct"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/ACCOUNT_COUNT"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="aggregateExpression" value="CountDistinct(SET_METRICS.ACCOUNT_COUNT)"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/ACCOUNT_COUNT"/>
+		<property name="previous.display" value="Account Count"/>
+	</field>
+	<field name="SET_METRICS.INIT_OUTSTANDING_AMT_TOTAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Initial Outstanding Amount Total"/>
+		<property name="semantic.item.label" value="Initial Outstanding Amount Total"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/INIT_OUTSTANDING_AMT_TOTAL"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.ARS_AT_START"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/INIT_OUTSTANDING_AMT_TOTAL"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Sum(SET_METRICS.INIT_OUTSTANDING_AMT_TOTAL)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/INIT_OUTSTANDING_AMT_TOTAL"/>
+		<property name="previous.display" value="Initial Outstanding Amount Total"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_METRICS.END_OUTSTANDING_AMT_TOTAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="End Outstanding Amount Total"/>
+		<property name="semantic.item.label" value="End Outstanding Amount Total"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/END_OUTSTANDING_AMT_TOTAL"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.ARS_AT_END"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/END_OUTSTANDING_AMT_TOTAL"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Sum(SET_METRICS.END_OUTSTANDING_AMT_TOTAL)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/END_OUTSTANDING_AMT_TOTAL"/>
+		<property name="previous.display" value="End Outstanding Amount Total"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_METRICS.OUTSTANDING_DIFF_AMT_TOTAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Outstanding Difference Amount Total"/>
+		<property name="semantic.item.label" value="Outstanding Difference Amount Total"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/OUTSTANDING_DIFF_AMT_TOTAL"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.ARS_DIFF"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/OUTSTANDING_DIFF_AMT_TOTAL"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Sum(SET_METRICS.OUTSTANDING_DIFF_AMT_TOTAL)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/OUTSTANDING_DIFF_AMT_TOTAL"/>
+		<property name="previous.display" value="Outstanding Difference Amount Total"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_METRICS.RECOVERY_AMT_EST_TOTAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Recovery Amount Est Total"/>
+		<property name="semantic.item.label" value="Recovery Amount Est Total"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/RECOVERY_AMT_EST_TOTAL"/>
+		<property name="resourceId" value="JoinTree_1.RECOVERY_AMT_EST_ROW"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/RECOVERY_AMT_EST_TOTAL"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Sum(SET_METRICS.RECOVERY_AMT_EST_TOTAL)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/RECOVERY_AMT_EST_TOTAL"/>
+		<property name="previous.display" value="Recovery Amount Est Total"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_METRICS.PAY_SEG_AMT_IN_WINDOW_TOTAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Payment Amount In Process Window Total"/>
+		<property name="semantic.item.label" value="Payment Amount In Process Window Total"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/PAY_SEG_AMT_IN_WINDOW_TOTAL"/>
+		<property name="resourceId" value="JoinTree_1.PAY_SEG_AMT_IN_WINDOW_ROW"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/PAY_SEG_AMT_IN_WINDOW_TOTAL"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Sum(SET_METRICS.PAY_SEG_AMT_IN_WINDOW_TOTAL)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/PAY_SEG_AMT_IN_WINDOW_TOTAL"/>
+		<property name="previous.display" value="Payment Amount In Process Window Total"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_METRICS.AVG_RECOVERY_RATE_EST" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Average Estimated Recovery Rate"/>
+		<property name="semantic.item.label" value="Average Estimated Recovery Rate"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/AVG_RECOVERY_RATE_EST"/>
+		<property name="resourceId" value="JoinTree_1.RECOVERY_RATE_EST_ROW"/>
+		<property name="defaultAgg" value="Average"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/AVG_RECOVERY_RATE_EST"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Average(SET_METRICS.AVG_RECOVERY_RATE_EST)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/AVG_RECOVERY_RATE_EST"/>
+		<property name="previous.display" value="Average Estimated Recovery Rate"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_METRICS.AVG_PROCESS_DURATION_DAYS" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Average Process Duration (Days)"/>
+		<property name="semantic.item.label" value="Average Process Duration (Days)"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/AVG_PROCESS_DURATION_DAYS"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.UNCOLL_PROC_DUR"/>
+		<property name="defaultAgg" value="Average"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/AVG_PROCESS_DURATION_DAYS"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Average(SET_METRICS.AVG_PROCESS_DURATION_DAYS)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/AVG_PROCESS_DURATION_DAYS"/>
+		<property name="previous.display" value="Average Process Duration (Days)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_METRICS.PAYMENT_SEGMENT_COUNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Payment Segment Count (Agg Sum)"/>
+		<property name="semantic.item.label" value="Payment Segment Count (Agg Sum)"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/PAYMENT_SEGMENT_COUNT"/>
+		<property name="resourceId" value="JoinTree_1.WO_PAY_AGG.PAY_SEGMENT_COUNT"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/PAYMENT_SEGMENT_COUNT"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Sum(SET_METRICS.PAYMENT_SEGMENT_COUNT)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/PAYMENT_SEGMENT_COUNT"/>
+		<property name="previous.display" value="Payment Segment Count (Agg Sum)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_METRICS.PAYMENT_EVENT_COUNT" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Payment Event Count (Agg Sum)"/>
+		<property name="semantic.item.label" value="Payment Event Count (Agg Sum)"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/PAYMENT_EVENT_COUNT"/>
+		<property name="resourceId" value="JoinTree_1.WO_PAY_AGG.PAYMENT_EVENT_COUNT"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/PAYMENT_EVENT_COUNT"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Sum(SET_METRICS.PAYMENT_EVENT_COUNT)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/PAYMENT_EVENT_COUNT"/>
+		<property name="previous.display" value="Payment Event Count (Agg Sum)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_METRICS.PAY_SEG_AMT_TOTAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Payment Segment Amount Total"/>
+		<property name="semantic.item.label" value="Payment Segment Amount Total"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/PAY_SEG_AMT_TOTAL"/>
+		<property name="resourceId" value="JoinTree_1.WO_PAY_AGG.PAY_SEG_AMT_TOTAL"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/PAY_SEG_AMT_TOTAL"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="11"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Sum(SET_METRICS.PAY_SEG_AMT_TOTAL)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/PAY_SEG_AMT_TOTAL"/>
+		<property name="previous.display" value="Payment Segment Amount Total"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_METRICS.TOTAL_SA_COUNT_TOTAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Total SA Count Total"/>
+		<property name="semantic.item.label" value="Total SA Count Total"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/TOTAL_SA_COUNT_TOTAL"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_TOT_SA_CNT"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/TOTAL_SA_COUNT_TOTAL"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="12"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Sum(SET_METRICS.TOTAL_SA_COUNT_TOTAL)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/TOTAL_SA_COUNT_TOTAL"/>
+		<property name="previous.display" value="Total SA Count Total"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_METRICS.ACTIVE_SA_COUNT_TOTAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Active SA Count Total"/>
+		<property name="semantic.item.label" value="Active SA Count Total"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/ACTIVE_SA_COUNT_TOTAL"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_ACT_SA_CNT"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/ACTIVE_SA_COUNT_TOTAL"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="13"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Sum(SET_METRICS.ACTIVE_SA_COUNT_TOTAL)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/ACTIVE_SA_COUNT_TOTAL"/>
+		<property name="previous.display" value="Active SA Count Total"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="SET_METRICS.INACTIVE_SA_COUNT_TOTAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Inactive SA Count Total"/>
+		<property name="semantic.item.label" value="Inactive SA Count Total"/>
+		<property name="adhoc.tree.uri" value="/SET_METRICS/INACTIVE_SA_COUNT_TOTAL"/>
+		<property name="resourceId" value="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_INACT_SA_CNT"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="semantic.tree.uri" value="/SET_METRICS/INACTIVE_SA_COUNT_TOTAL"/>
+		<property name="dimensionOrMeasure" value="Measure"/>
+		<property name="semantic.tree.sort.order" value="14"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateExpression" value="Sum(SET_METRICS.INACTIVE_SA_COUNT_TOTAL)"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/SET_METRICS/INACTIVE_SA_COUNT_TOTAL"/>
+		<property name="previous.display" value="Inactive SA Count Total"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+</jasperReport>

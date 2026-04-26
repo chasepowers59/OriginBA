@@ -1,0 +1,1294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="adhocReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="5c7fb325-6389-4e2b-9fc8-963d51506f3c">
+	<property name="adhoc.topic.escape.variable.chars"/>
+	<property name="DESCR_1_1" value="Open"/>
+	<property name="DESCR_1" value="Bankruptcy"/>
+	<property name="adhoc.metadata.version" value="3791"/>
+	<property name="has.modified.presentation" value="false"/>
+	<property name="base.datasource.version" value="0"/>
+	<property name="use.datasource.presentation" value="true"/>
+	<property name="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.TopicReportUnit" value="/temp/sl_topic_4a2b7038-3e1f-43e2-aeed-abdad6d5a4ec"/>
+	<parameter name="CASE_CRE_DTTM_1" class="net.sf.jasperreports.types.date.TimestampRange">
+		<defaultValueExpression><![CDATA[com.jaspersoft.jasperserver.api.common.util.rd.DateRangeFactory.getInstance("QUARTER-4",java.sql.Timestamp.class)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DESCR_1" class="java.util.Collection" nestedType="java.lang.String">
+		<defaultValueExpression><![CDATA[java.util.Arrays.asList(($P{JASPER_REPORT}.getProperty("DESCR_1")).split("(?<!\\\\),",-1))]]></defaultValueExpression>
+	</parameter>
+	<queryString language="domain">
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema">
+  <queryFields>
+    <queryField id="CI_CASE.ACCT_ID"></queryField>
+    <queryField id="CI_CASE.C1_CONTACT_ID"></queryField>
+    <queryField id="CI_CASE.CASE_COND_FLG"></queryField>
+    <queryField id="CI_CASE.CASE_ID"></queryField>
+    <queryField id="CI_CASE.CASE_STATUS_CD"></queryField>
+    <queryField id="CI_CASE.CASE_TYPE_CD"></queryField>
+    <queryField id="CI_CASE.COMMENT_LONG"></queryField>
+    <queryField id="CI_CASE.CONTACT_INSTR"></queryField>
+    <queryField id="CI_CASE.CONTACT_METH_FLG"></queryField>
+    <queryField id="CI_CASE.CONTACT_PER_ID"></queryField>
+    <queryField id="CI_CASE.EXTENSION"></queryField>
+    <queryField id="CI_CASE.ILM_ARCH_SW"></queryField>
+    <queryField id="CI_CASE.ILM_DT"></queryField>
+    <queryField id="CI_CASE.PER_ID"></queryField>
+    <queryField id="CI_CASE.PHONE"></queryField>
+    <queryField id="CI_CASE.PHONE_TYPE_CD"></queryField>
+    <queryField id="CI_CASE.PREM_ID"></queryField>
+    <queryField id="CI_CASE.USER_ID"></queryField>
+    <queryField id="CI_CASE.VERSION"></queryField>
+    <queryField id="NewSet1.DESCR"></queryField>
+    <queryField id="NewSet1.DESCR_1"></queryField>
+    <queryField id="NewSet1.DESCRLONG"></queryField>
+    <queryField id="NewSet2.CASE_ID_DISTINCT"></queryField>
+  </queryFields>
+</query>]]>
+	</queryString>
+	<field name="CI_ACCT.ACCESS_GRP_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Access Group"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/ACCESS_GRP_CD"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/ACCESS_GRP_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.ACCESS_GRP_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.tree.labels">
+			<![CDATA[[{"uri":"/CI_CASE","resourceId":"JoinTree_1","label":"1.) Case"},{"uri":"/CI_ACCT","resourceId":"JoinTree_1","label":"1.) Account"},{"uri":"/CI_PREM","resourceId":"JoinTree_1","label":"1.) Premise"},{"uri":"/NewSet1","resourceId":"JoinTree_1","label":"1.) Descriptions"},{"uri":"/NewSet2","resourceId":"JoinTree_1","label":"1.) Formulas"}]]]>
+		</property>
+		<property name="semantic.tree.sort.order">
+			<![CDATA[{"CI_CASE":1,"ACCT_ID":2,"C1_CONTACT_ID":3,"CASE_COND_FLG":4,"CASE_ID":5,"CASE_STATUS_CD":6,"CASE_TYPE_CD":7,"COMMENT_LONG":8,"CONTACT_INSTR":9,"CONTACT_METH_FLG":10,"CONTACT_PER_ID":11,"EXTENSION":12,"PER_ID":13,"PHONE":14,"PHONE_TYPE_CD":15,"PREM_ID":16,"USER_ID":17,"CI_ACCT":18,"ACCESS_GRP_CD":19,"ACCT_ID_1":20,"ACCT_MGMT_GRP_CD":21,"ALERT_INFO":22,"BILL_AFTER_DT":23,"BILL_CYC_CD":24,"BILL_PRT_INTERCEPT":25,"BUD_PLAN_CD":26,"CIS_DIVISION":27,"COLL_CL_CD":28,"CR_REVIEW_DT":29,"CURRENCY_CD":30,"CUST_CL_CD":31,"INT_CR_REVIEW_SW":32,"MAILING_PREM_ID":33,"NO_DEP_RVW_SW":34,"POSTPONE_CR_RVW_DT":35,"PROTECT_CYC_SW":36,"PROTECT_DIV_SW":37,"PROTECT_PREM_SW":38,"SETUP_DT":39,"CI_PREM":40,"ADDRESS1":41,"ADDRESS1_UPR":42,"ADDRESS2":43,"ADDRESS3":44,"ADDRESS4":45,"CIS_DIVISION_1":46,"CITY":47,"CITY_UPR":48,"COUNTRY":49,"COUNTY":50,"GEO_CODE":51,"HOUSE_TYPE":52,"IN_CITY_LIMIT":53,"KEY_ID":54,"KEY_SW":55,"LL_ID":56,"LS_SL_DESCR":57,"LS_SL_FLG":58,"MAIL_ADDR_SW":59,"MR_INSTR_CD":60,"MR_INSTR_DETAILS":61,"MR_WARN_CD":62,"NUM1":63,"NUM2":64,"OK_TO_ENTER_SW":65,"POSTAL":66,"PREM_ID_1":67,"PREM_TYPE_CD":68,"PRNT_PREM_ID":69,"STATE":70,"TIME_ZONE_CD":71,"TREND_AREA_CD":72,"NewSet1":73,"DESCR_4":74,"DESCR_3":75,"DESCR_7":76,"DESCR_1":77,"STATUS_LBL":78,"DESCR":79,"DESCR_5":80,"DESCR_6":81,"DESCR_9":82,"DESCR_10":83,"DESCR_8":84,"DESCR_2":85,"DESCR_13":86,"DESCR_11":87,"NewSet2":88,"CASE_DUR_DAYS":89,"CASE_DUR":90,"CLOSED_DTTM":91,"CASE_CRE_DTTM":92,"ACCT_ID_DISTINCT":93,"CASE_ID_DISTINCT":94,"PER_ID_DISTINCT":95,"PREM_ID_DISTINCT":96,"ENTITY_NAME_UPR":97,"USER_NAME":98}]]>
+		</property>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/ACCESS_GRP_CD"/>
+		<property name="previous.display" value="Access Group"/>
+		<property name="semantic.item.label" value="Access Group"/>
+		<property name="adhoc.chosen.tree.labels">
+			<![CDATA[[{"uri":"/CI_ACCT","resourceId":"JoinTree_1","label":"1.) Account"},{"uri":"/CI_CASE","resourceId":"JoinTree_1","label":"1.) Case"},{"uri":"/CI_PREM","resourceId":"JoinTree_1","label":"1.) Premise"},{"uri":"/NewSet1","resourceId":"JoinTree_1","label":"1.) Descriptions"},{"uri":"/NewSet2","resourceId":"JoinTree_1","label":"1.) Formulas"}]]]>
+		</property>
+		<property name="adhoc.chosen.tree.order">
+			<![CDATA[{"CI_CASE":1,"ACCT_ID":2,"C1_CONTACT_ID":3,"CASE_COND_FLG":4,"CASE_ID":5,"CASE_STATUS_CD":6,"CASE_TYPE_CD":7,"COMMENT_LONG":8,"CONTACT_INSTR":9,"CONTACT_METH_FLG":10,"CONTACT_PER_ID":11,"EXTENSION":12,"PER_ID":13,"PHONE":14,"PHONE_TYPE_CD":15,"PREM_ID":16,"USER_ID":17,"CI_ACCT":18,"ACCESS_GRP_CD":19,"ACCT_ID_1":20,"ACCT_MGMT_GRP_CD":21,"ALERT_INFO":22,"BILL_AFTER_DT":23,"BILL_CYC_CD":24,"BILL_PRT_INTERCEPT":25,"BUD_PLAN_CD":26,"CIS_DIVISION":27,"COLL_CL_CD":28,"CR_REVIEW_DT":29,"CURRENCY_CD":30,"CUST_CL_CD":31,"INT_CR_REVIEW_SW":32,"MAILING_PREM_ID":33,"NO_DEP_RVW_SW":34,"POSTPONE_CR_RVW_DT":35,"PROTECT_CYC_SW":36,"PROTECT_DIV_SW":37,"PROTECT_PREM_SW":38,"SETUP_DT":39,"CI_PREM":40,"ADDRESS1":41,"ADDRESS1_UPR":42,"ADDRESS2":43,"ADDRESS3":44,"ADDRESS4":45,"CIS_DIVISION_1":46,"CITY":47,"CITY_UPR":48,"COUNTRY":49,"COUNTY":50,"GEO_CODE":51,"HOUSE_TYPE":52,"IN_CITY_LIMIT":53,"KEY_ID":54,"KEY_SW":55,"LL_ID":56,"LS_SL_DESCR":57,"LS_SL_FLG":58,"MAIL_ADDR_SW":59,"MR_INSTR_CD":60,"MR_INSTR_DETAILS":61,"MR_WARN_CD":62,"NUM1":63,"NUM2":64,"OK_TO_ENTER_SW":65,"POSTAL":66,"PREM_ID_1":67,"PREM_TYPE_CD":68,"PRNT_PREM_ID":69,"STATE":70,"TIME_ZONE_CD":71,"TREND_AREA_CD":72,"NewSet1":73,"DESCR_4":74,"DESCR_3":75,"DESCR_7":76,"DESCR_1":77,"STATUS_LBL":78,"DESCR":79,"DESCR_5":80,"DESCR_6":81,"DESCR_9":82,"DESCR_10":83,"DESCR_8":84,"DESCR_2":85,"DESCR_13":86,"DESCR_11":87,"NewSet2":88,"CASE_DUR_DAYS":89,"CASE_DUR":90,"CLOSED_DTTM":91,"ACCT_ID_DISTINCT":92,"CASE_ID_DISTINCT":93,"PER_ID_DISTINCT":94,"PREM_ID_DISTINCT":95,"ENTITY_NAME_UPR":96,"USER_NAME":97}]]>
+		</property>
+		<property name="slIsTableAsList" value="false"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.ACCESS_GRP_CD)"/>
+		<property name="adhoc.chosen.tree.is.flattened" value="false"/>
+	</field>
+	<field name="CI_ACCT.ACCT_ID_1" class="java.lang.String">
+		<property name="adhoc.display" value="Account ID"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/ACCT_ID_1"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/ACCT_ID_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.ACCT_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/ACCT_ID_1"/>
+		<property name="previous.display" value="Account ID"/>
+		<property name="semantic.item.label" value="Account ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.ACCT_ID_1)"/>
+	</field>
+	<field name="CI_ACCT.ACCT_MGMT_GRP_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Account Management Group"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/ACCT_MGMT_GRP_CD"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/ACCT_MGMT_GRP_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.ACCT_MGMT_GRP_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/ACCT_MGMT_GRP_CD"/>
+		<property name="previous.display" value="Account Management Group"/>
+		<property name="semantic.item.label" value="Account Management Group"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.ACCT_MGMT_GRP_CD)"/>
+	</field>
+	<field name="CI_ACCT.ALERT_INFO" class="java.lang.String">
+		<property name="adhoc.display" value="Alert Information"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/ALERT_INFO"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/ALERT_INFO"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.ALERT_INFO"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/ALERT_INFO"/>
+		<property name="previous.display" value="Alert Information"/>
+		<property name="semantic.item.label" value="Alert Information"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.ALERT_INFO)"/>
+	</field>
+	<field name="CI_ACCT.BILL_AFTER_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Bill After                    "/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/BILL_AFTER_DT"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/BILL_AFTER_DT"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.BILL_AFTER_DT"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/BILL_AFTER_DT"/>
+		<property name="previous.display" value="Bill After                    "/>
+		<property name="semantic.item.label" value="Bill After                    "/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.BILL_AFTER_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_ACCT.BILL_CYC_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Cycle"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/BILL_CYC_CD"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/BILL_CYC_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.BILL_CYC_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/BILL_CYC_CD"/>
+		<property name="previous.display" value="Bill Cycle"/>
+		<property name="semantic.item.label" value="Bill Cycle"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.BILL_CYC_CD)"/>
+	</field>
+	<field name="CI_ACCT.BILL_PRT_INTERCEPT" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Print Intercept"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/BILL_PRT_INTERCEPT"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/BILL_PRT_INTERCEPT"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.BILL_PRT_INTERCEPT"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/BILL_PRT_INTERCEPT"/>
+		<property name="previous.display" value="Bill Print Intercept"/>
+		<property name="semantic.item.label" value="Bill Print Intercept"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.BILL_PRT_INTERCEPT)"/>
+	</field>
+	<field name="CI_ACCT.BUD_PLAN_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Budget Plan"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/BUD_PLAN_CD"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/BUD_PLAN_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.BUD_PLAN_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/BUD_PLAN_CD"/>
+		<property name="previous.display" value="Budget Plan"/>
+		<property name="semantic.item.label" value="Budget Plan"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.BUD_PLAN_CD)"/>
+	</field>
+	<field name="CI_ACCT.CIS_DIVISION" class="java.lang.String">
+		<property name="adhoc.display" value="CIS Division"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/CIS_DIVISION"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/CIS_DIVISION"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.CIS_DIVISION"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/CIS_DIVISION"/>
+		<property name="previous.display" value="CIS Division"/>
+		<property name="semantic.item.label" value="CIS Division"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.CIS_DIVISION)"/>
+	</field>
+	<field name="CI_ACCT.COLL_CL_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Collection Class"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/COLL_CL_CD"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/COLL_CL_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.COLL_CL_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/COLL_CL_CD"/>
+		<property name="previous.display" value="Collection Class"/>
+		<property name="semantic.item.label" value="Collection Class"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.COLL_CL_CD)"/>
+	</field>
+	<field name="CI_ACCT.CR_REVIEW_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Last Credit Review Date"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/CR_REVIEW_DT"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/CR_REVIEW_DT"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.CR_REVIEW_DT"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/CR_REVIEW_DT"/>
+		<property name="previous.display" value="Last Credit Review Date"/>
+		<property name="semantic.item.label" value="Last Credit Review Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.CR_REVIEW_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_ACCT.CURRENCY_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Currency Code"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/CURRENCY_CD"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/CURRENCY_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.CURRENCY_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/CURRENCY_CD"/>
+		<property name="previous.display" value="Currency Code"/>
+		<property name="semantic.item.label" value="Currency Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.CURRENCY_CD)"/>
+	</field>
+	<field name="CI_ACCT.CUST_CL_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Customer Class"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/CUST_CL_CD"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/CUST_CL_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.CUST_CL_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/CUST_CL_CD"/>
+		<property name="previous.display" value="Customer Class"/>
+		<property name="semantic.item.label" value="Customer Class"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.CUST_CL_CD)"/>
+	</field>
+	<field name="CI_ACCT.INT_CR_REVIEW_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Internal Credit Review"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/INT_CR_REVIEW_SW"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/INT_CR_REVIEW_SW"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.INT_CR_REVIEW_SW"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/INT_CR_REVIEW_SW"/>
+		<property name="previous.display" value="Internal Credit Review"/>
+		<property name="semantic.item.label" value="Internal Credit Review"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.INT_CR_REVIEW_SW)"/>
+	</field>
+	<field name="CI_ACCT.MAILING_PREM_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Mailing Premise ID"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/MAILING_PREM_ID"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/MAILING_PREM_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.MAILING_PREM_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/MAILING_PREM_ID"/>
+		<property name="previous.display" value="Mailing Premise ID"/>
+		<property name="semantic.item.label" value="Mailing Premise ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.MAILING_PREM_ID)"/>
+	</field>
+	<field name="CI_ACCT.NO_DEP_RVW_SW" class="java.lang.String">
+		<property name="adhoc.display" value="No Deposit Review Switch"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/NO_DEP_RVW_SW"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/NO_DEP_RVW_SW"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.NO_DEP_RVW_SW"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/NO_DEP_RVW_SW"/>
+		<property name="previous.display" value="No Deposit Review Switch"/>
+		<property name="semantic.item.label" value="No Deposit Review Switch"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.NO_DEP_RVW_SW)"/>
+	</field>
+	<field name="CI_ACCT.POSTPONE_CR_RVW_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Postpone Credit Review Until"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/POSTPONE_CR_RVW_DT"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/POSTPONE_CR_RVW_DT"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.POSTPONE_CR_RVW_DT"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/POSTPONE_CR_RVW_DT"/>
+		<property name="previous.display" value="Postpone Credit Review Until"/>
+		<property name="semantic.item.label" value="Postpone Credit Review Until"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.POSTPONE_CR_RVW_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_ACCT.PROTECT_CYC_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Protect Bill Cycle"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/PROTECT_CYC_SW"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/PROTECT_CYC_SW"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.PROTECT_CYC_SW"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/PROTECT_CYC_SW"/>
+		<property name="previous.display" value="Protect Bill Cycle"/>
+		<property name="semantic.item.label" value="Protect Bill Cycle"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.PROTECT_CYC_SW)"/>
+	</field>
+	<field name="CI_ACCT.PROTECT_DIV_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Protect Division"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/PROTECT_DIV_SW"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/PROTECT_DIV_SW"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.PROTECT_DIV_SW"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/PROTECT_DIV_SW"/>
+		<property name="previous.display" value="Protect Division"/>
+		<property name="semantic.item.label" value="Protect Division"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.PROTECT_DIV_SW)"/>
+	</field>
+	<field name="CI_ACCT.PROTECT_PREM_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Protect Mailing Premise"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/PROTECT_PREM_SW"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/PROTECT_PREM_SW"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.PROTECT_PREM_SW"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/PROTECT_PREM_SW"/>
+		<property name="previous.display" value="Protect Mailing Premise"/>
+		<property name="semantic.item.label" value="Protect Mailing Premise"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.PROTECT_PREM_SW)"/>
+	</field>
+	<field name="CI_ACCT.SETUP_DT" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Set Up Date"/>
+		<property name="adhoc.tree.uri" value="/CI_ACCT/SETUP_DT"/>
+		<property name="semantic.tree.uri" value="/CI_ACCT/SETUP_DT"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT.SETUP_DT"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_ACCT/SETUP_DT"/>
+		<property name="previous.display" value="Set Up Date"/>
+		<property name="semantic.item.label" value="Set Up Date"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_ACCT.SETUP_DT)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="CI_CASE.ACCT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Account ID"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/ACCT_ID"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/ACCT_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.ACCT_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/ACCT_ID"/>
+		<property name="previous.display" value="Account ID"/>
+		<property name="semantic.item.label" value="Account ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.ACCT_ID)"/>
+	</field>
+	<field name="CI_CASE.C1_CONTACT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Person Contact"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/C1_CONTACT_ID"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/C1_CONTACT_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.C1_CONTACT_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/C1_CONTACT_ID"/>
+		<property name="previous.display" value="Person Contact"/>
+		<property name="semantic.item.label" value="Person Contact"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.C1_CONTACT_ID)"/>
+	</field>
+	<field name="CI_CASE.CASE_COND_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Case Condition"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/CASE_COND_FLG"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/CASE_COND_FLG"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.CASE_COND_FLG"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/CASE_COND_FLG"/>
+		<property name="previous.display" value="Case Condition"/>
+		<property name="semantic.item.label" value="Case Condition"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.CASE_COND_FLG)"/>
+	</field>
+	<field name="CI_CASE.CASE_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Case ID"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/CASE_ID"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/CASE_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.CASE_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/CASE_ID"/>
+		<property name="previous.display" value="Case ID"/>
+		<property name="semantic.item.label" value="Case ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.CASE_ID)"/>
+	</field>
+	<field name="CI_CASE.CASE_STATUS_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Status (Case)"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/CASE_STATUS_CD"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/CASE_STATUS_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.CASE_STATUS_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/CASE_STATUS_CD"/>
+		<property name="previous.display" value="Status (Case)"/>
+		<property name="semantic.item.label" value="Status (Case)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.CASE_STATUS_CD)"/>
+	</field>
+	<field name="CI_CASE.CASE_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Case Type"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/CASE_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/CASE_TYPE_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.CASE_TYPE_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/CASE_TYPE_CD"/>
+		<property name="previous.display" value="Case Type"/>
+		<property name="semantic.item.label" value="Case Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.CASE_TYPE_CD)"/>
+	</field>
+	<field name="CI_CASE.COMMENT_LONG" class="java.lang.String">
+		<property name="adhoc.display" value="Comments"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/COMMENT_LONG"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/COMMENT_LONG"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.COMMENT_LONG"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/COMMENT_LONG"/>
+		<property name="previous.display" value="Comments"/>
+		<property name="semantic.item.label" value="Comments"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.COMMENT_LONG)"/>
+	</field>
+	<field name="CI_CASE.CONTACT_INSTR" class="java.lang.String">
+		<property name="adhoc.display" value="Contact Instructions"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/CONTACT_INSTR"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/CONTACT_INSTR"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.CONTACT_INSTR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/CONTACT_INSTR"/>
+		<property name="previous.display" value="Contact Instructions"/>
+		<property name="semantic.item.label" value="Contact Instructions"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.CONTACT_INSTR)"/>
+	</field>
+	<field name="CI_CASE.CONTACT_METH_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Preferred Contact Method"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/CONTACT_METH_FLG"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/CONTACT_METH_FLG"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.CONTACT_METH_FLG"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/CONTACT_METH_FLG"/>
+		<property name="previous.display" value="Preferred Contact Method"/>
+		<property name="semantic.item.label" value="Preferred Contact Method"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.CONTACT_METH_FLG)"/>
+	</field>
+	<field name="CI_CASE.CONTACT_PER_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Contact Person"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/CONTACT_PER_ID"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/CONTACT_PER_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.CONTACT_PER_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/CONTACT_PER_ID"/>
+		<property name="previous.display" value="Contact Person"/>
+		<property name="semantic.item.label" value="Contact Person"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.CONTACT_PER_ID)"/>
+	</field>
+	<field name="CI_CASE.EXTENSION" class="java.lang.String">
+		<property name="adhoc.display" value="Extension"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/EXTENSION"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/EXTENSION"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.EXTENSION"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/EXTENSION"/>
+		<property name="previous.display" value="Extension"/>
+		<property name="semantic.item.label" value="Extension"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.EXTENSION)"/>
+	</field>
+	<field name="CI_CASE.PER_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Person ID"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/PER_ID"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/PER_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.PER_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/PER_ID"/>
+		<property name="previous.display" value="Person ID"/>
+		<property name="semantic.item.label" value="Person ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.PER_ID)"/>
+	</field>
+	<field name="CI_CASE.PHONE" class="java.lang.String">
+		<property name="adhoc.display" value="Phone Number"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/PHONE"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/PHONE"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.PHONE"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/PHONE"/>
+		<property name="previous.display" value="Phone Number"/>
+		<property name="semantic.item.label" value="Phone Number"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.PHONE)"/>
+	</field>
+	<field name="CI_CASE.PHONE_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Phone Type"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/PHONE_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/PHONE_TYPE_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.PHONE_TYPE_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/PHONE_TYPE_CD"/>
+		<property name="previous.display" value="Phone Type"/>
+		<property name="semantic.item.label" value="Phone Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.PHONE_TYPE_CD)"/>
+	</field>
+	<field name="CI_CASE.PREM_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Premise ID"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/PREM_ID"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/PREM_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.PREM_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/PREM_ID"/>
+		<property name="previous.display" value="Premise ID"/>
+		<property name="semantic.item.label" value="Premise ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.PREM_ID)"/>
+	</field>
+	<field name="CI_CASE.USER_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Responsible User"/>
+		<property name="adhoc.tree.uri" value="/CI_CASE/USER_ID"/>
+		<property name="semantic.tree.uri" value="/CI_CASE/USER_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE.USER_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_CASE/USER_ID"/>
+		<property name="previous.display" value="Responsible User"/>
+		<property name="semantic.item.label" value="Responsible User"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_CASE.USER_ID)"/>
+	</field>
+	<field name="CI_PREM.ADDRESS1" class="java.lang.String">
+		<property name="adhoc.display" value="Address"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/ADDRESS1"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/ADDRESS1"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.ADDRESS1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/ADDRESS1"/>
+		<property name="previous.display" value="Address"/>
+		<property name="semantic.item.label" value="Address"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.ADDRESS1)"/>
+	</field>
+	<field name="CI_PREM.ADDRESS1_UPR" class="java.lang.String">
+		<property name="adhoc.display" value="Address Uppercase"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/ADDRESS1_UPR"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/ADDRESS1_UPR"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.ADDRESS1_UPR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/ADDRESS1_UPR"/>
+		<property name="previous.display" value="Address Uppercase"/>
+		<property name="semantic.item.label" value="Address Uppercase"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.ADDRESS1_UPR)"/>
+	</field>
+	<field name="CI_PREM.ADDRESS2" class="java.lang.String">
+		<property name="adhoc.display" value="Address 2"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/ADDRESS2"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/ADDRESS2"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.ADDRESS2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/ADDRESS2"/>
+		<property name="previous.display" value="Address 2"/>
+		<property name="semantic.item.label" value="Address 2"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.ADDRESS2)"/>
+	</field>
+	<field name="CI_PREM.ADDRESS3" class="java.lang.String">
+		<property name="adhoc.display" value="Address 3"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/ADDRESS3"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/ADDRESS3"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.ADDRESS3"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/ADDRESS3"/>
+		<property name="previous.display" value="Address 3"/>
+		<property name="semantic.item.label" value="Address 3"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.ADDRESS3)"/>
+	</field>
+	<field name="CI_PREM.ADDRESS4" class="java.lang.String">
+		<property name="adhoc.display" value="Address 4"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/ADDRESS4"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/ADDRESS4"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.ADDRESS4"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/ADDRESS4"/>
+		<property name="previous.display" value="Address 4"/>
+		<property name="semantic.item.label" value="Address 4"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.ADDRESS4)"/>
+	</field>
+	<field name="CI_PREM.CIS_DIVISION_1" class="java.lang.String">
+		<property name="adhoc.display" value="CIS Division"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/CIS_DIVISION_1"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/CIS_DIVISION_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.CIS_DIVISION"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/CIS_DIVISION_1"/>
+		<property name="previous.display" value="CIS Division"/>
+		<property name="semantic.item.label" value="CIS Division"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.CIS_DIVISION_1)"/>
+	</field>
+	<field name="CI_PREM.CITY" class="java.lang.String">
+		<property name="adhoc.display" value="City"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/CITY"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/CITY"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.CITY"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/CITY"/>
+		<property name="previous.display" value="City"/>
+		<property name="semantic.item.label" value="City"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.CITY)"/>
+	</field>
+	<field name="CI_PREM.CITY_UPR" class="java.lang.String">
+		<property name="adhoc.display" value="City Uppercase"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/CITY_UPR"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/CITY_UPR"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.CITY_UPR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/CITY_UPR"/>
+		<property name="previous.display" value="City Uppercase"/>
+		<property name="semantic.item.label" value="City Uppercase"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.CITY_UPR)"/>
+	</field>
+	<field name="CI_PREM.COUNTRY" class="java.lang.String">
+		<property name="adhoc.display" value="Country"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/COUNTRY"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/COUNTRY"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.COUNTRY"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/COUNTRY"/>
+		<property name="previous.display" value="Country"/>
+		<property name="semantic.item.label" value="Country"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.COUNTRY)"/>
+	</field>
+	<field name="CI_PREM.COUNTY" class="java.lang.String">
+		<property name="adhoc.display" value="County"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/COUNTY"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/COUNTY"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.COUNTY"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/COUNTY"/>
+		<property name="previous.display" value="County"/>
+		<property name="semantic.item.label" value="County"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.COUNTY)"/>
+	</field>
+	<field name="CI_PREM.GEO_CODE" class="java.lang.String">
+		<property name="adhoc.display" value="Geographical Code"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/GEO_CODE"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/GEO_CODE"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.GEO_CODE"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/GEO_CODE"/>
+		<property name="previous.display" value="Geographical Code"/>
+		<property name="semantic.item.label" value="Geographical Code"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.GEO_CODE)"/>
+	</field>
+	<field name="CI_PREM.HOUSE_TYPE" class="java.lang.String">
+		<property name="adhoc.display" value="House Type"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/HOUSE_TYPE"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/HOUSE_TYPE"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.HOUSE_TYPE"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/HOUSE_TYPE"/>
+		<property name="previous.display" value="House Type"/>
+		<property name="semantic.item.label" value="House Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.HOUSE_TYPE)"/>
+	</field>
+	<field name="CI_PREM.IN_CITY_LIMIT" class="java.lang.String">
+		<property name="adhoc.display" value="In City Limit"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/IN_CITY_LIMIT"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/IN_CITY_LIMIT"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.IN_CITY_LIMIT"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/IN_CITY_LIMIT"/>
+		<property name="previous.display" value="In City Limit"/>
+		<property name="semantic.item.label" value="In City Limit"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.IN_CITY_LIMIT)"/>
+	</field>
+	<field name="CI_PREM.KEY_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Key ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/KEY_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/KEY_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.KEY_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/KEY_ID"/>
+		<property name="previous.display" value="Key ID"/>
+		<property name="semantic.item.label" value="Key ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.KEY_ID)"/>
+	</field>
+	<field name="CI_PREM.KEY_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Key"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/KEY_SW"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/KEY_SW"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.KEY_SW"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/KEY_SW"/>
+		<property name="previous.display" value="Key"/>
+		<property name="semantic.item.label" value="Key"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.KEY_SW)"/>
+	</field>
+	<field name="CI_PREM.LL_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Landlord Agreement ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/LL_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/LL_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.LL_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/LL_ID"/>
+		<property name="previous.display" value="Landlord Agreement ID"/>
+		<property name="semantic.item.label" value="Landlord Agreement ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.LL_ID)"/>
+	</field>
+	<field name="CI_PREM.LS_SL_DESCR" class="java.lang.String">
+		<property name="adhoc.display" value="Life Support / Sensitive Load Details"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/LS_SL_DESCR"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/LS_SL_DESCR"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.LS_SL_DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/LS_SL_DESCR"/>
+		<property name="previous.display" value="Life Support / Sensitive Load Details"/>
+		<property name="semantic.item.label" value="Life Support / Sensitive Load Details"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.LS_SL_DESCR)"/>
+	</field>
+	<field name="CI_PREM.LS_SL_FLG" class="java.lang.String">
+		<property name="adhoc.display" value="Life Support / Sensitive Load"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/LS_SL_FLG"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/LS_SL_FLG"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.LS_SL_FLG"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/LS_SL_FLG"/>
+		<property name="previous.display" value="Life Support / Sensitive Load"/>
+		<property name="semantic.item.label" value="Life Support / Sensitive Load"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.LS_SL_FLG)"/>
+	</field>
+	<field name="CI_PREM.MAIL_ADDR_SW" class="java.lang.String">
+		<property name="adhoc.display" value="Mailing Address"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/MAIL_ADDR_SW"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/MAIL_ADDR_SW"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.MAIL_ADDR_SW"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/MAIL_ADDR_SW"/>
+		<property name="previous.display" value="Mailing Address"/>
+		<property name="semantic.item.label" value="Mailing Address"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.MAIL_ADDR_SW)"/>
+	</field>
+	<field name="CI_PREM.MR_INSTR_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Meter Read Instruction"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/MR_INSTR_CD"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/MR_INSTR_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.MR_INSTR_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/MR_INSTR_CD"/>
+		<property name="previous.display" value="Meter Read Instruction"/>
+		<property name="semantic.item.label" value="Meter Read Instruction"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.MR_INSTR_CD)"/>
+	</field>
+	<field name="CI_PREM.MR_INSTR_DETAILS" class="java.lang.String">
+		<property name="adhoc.display" value="Instruction Details"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/MR_INSTR_DETAILS"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/MR_INSTR_DETAILS"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.MR_INSTR_DETAILS"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/MR_INSTR_DETAILS"/>
+		<property name="previous.display" value="Instruction Details"/>
+		<property name="semantic.item.label" value="Instruction Details"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.MR_INSTR_DETAILS)"/>
+	</field>
+	<field name="CI_PREM.MR_WARN_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Meter Read Warning"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/MR_WARN_CD"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/MR_WARN_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.MR_WARN_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/MR_WARN_CD"/>
+		<property name="previous.display" value="Meter Read Warning"/>
+		<property name="semantic.item.label" value="Meter Read Warning"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.MR_WARN_CD)"/>
+	</field>
+	<field name="CI_PREM.NUM1" class="java.lang.String">
+		<property name="adhoc.display" value="Number 1"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/NUM1"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/NUM1"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.NUM1"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/NUM1"/>
+		<property name="previous.display" value="Number 1"/>
+		<property name="semantic.item.label" value="Number 1"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.NUM1)"/>
+	</field>
+	<field name="CI_PREM.NUM2" class="java.lang.String">
+		<property name="adhoc.display" value="Number 2"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/NUM2"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/NUM2"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.NUM2"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/NUM2"/>
+		<property name="previous.display" value="Number 2"/>
+		<property name="semantic.item.label" value="Number 2"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.NUM2)"/>
+	</field>
+	<field name="CI_PREM.OK_TO_ENTER_SW" class="java.lang.String">
+		<property name="adhoc.display" value="OK to Enter"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/OK_TO_ENTER_SW"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/OK_TO_ENTER_SW"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.OK_TO_ENTER_SW"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/OK_TO_ENTER_SW"/>
+		<property name="previous.display" value="OK to Enter"/>
+		<property name="semantic.item.label" value="OK to Enter"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.OK_TO_ENTER_SW)"/>
+	</field>
+	<field name="CI_PREM.POSTAL" class="java.lang.String">
+		<property name="adhoc.display" value="Postal"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/POSTAL"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/POSTAL"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.POSTAL"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/POSTAL"/>
+		<property name="previous.display" value="Postal"/>
+		<property name="semantic.item.label" value="Postal"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.POSTAL)"/>
+	</field>
+	<field name="CI_PREM.PREM_ID_1" class="java.lang.String">
+		<property name="adhoc.display" value="Premise ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/PREM_ID_1"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/PREM_ID_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.PREM_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/PREM_ID_1"/>
+		<property name="previous.display" value="Premise ID"/>
+		<property name="semantic.item.label" value="Premise ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.PREM_ID_1)"/>
+	</field>
+	<field name="CI_PREM.PREM_TYPE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Premise Type"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/PREM_TYPE_CD"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/PREM_TYPE_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.PREM_TYPE_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/PREM_TYPE_CD"/>
+		<property name="previous.display" value="Premise Type"/>
+		<property name="semantic.item.label" value="Premise Type"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.PREM_TYPE_CD)"/>
+	</field>
+	<field name="CI_PREM.PRNT_PREM_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Parent Premise ID"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/PRNT_PREM_ID"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/PRNT_PREM_ID"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.PRNT_PREM_ID"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/PRNT_PREM_ID"/>
+		<property name="previous.display" value="Parent Premise ID"/>
+		<property name="semantic.item.label" value="Parent Premise ID"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.PRNT_PREM_ID)"/>
+	</field>
+	<field name="CI_PREM.STATE" class="java.lang.String">
+		<property name="adhoc.display" value="State"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/STATE"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/STATE"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.STATE"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/STATE"/>
+		<property name="previous.display" value="State"/>
+		<property name="semantic.item.label" value="State"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.STATE)"/>
+	</field>
+	<field name="CI_PREM.TIME_ZONE_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Time Zone"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/TIME_ZONE_CD"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/TIME_ZONE_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.TIME_ZONE_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/TIME_ZONE_CD"/>
+		<property name="previous.display" value="Time Zone"/>
+		<property name="semantic.item.label" value="Time Zone"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.TIME_ZONE_CD)"/>
+	</field>
+	<field name="CI_PREM.TREND_AREA_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Trend Area"/>
+		<property name="adhoc.tree.uri" value="/CI_PREM/TREND_AREA_CD"/>
+		<property name="semantic.tree.uri" value="/CI_PREM/TREND_AREA_CD"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM.TREND_AREA_CD"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/CI_PREM/TREND_AREA_CD"/>
+		<property name="previous.display" value="Trend Area"/>
+		<property name="semantic.item.label" value="Trend Area"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(CI_PREM.TREND_AREA_CD)"/>
+	</field>
+	<field name="NewSet1.DESCR_4" class="java.lang.String">
+		<property name="adhoc.display" value="Account Management Group Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_4"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_4"/>
+		<property name="resourceId" value="JoinTree_1.CI_ACCT_MGMT_GR_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_4"/>
+		<property name="previous.display" value="Account Management Group Description"/>
+		<property name="semantic.item.label" value="Account Management Group Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_4)"/>
+	</field>
+	<field name="NewSet1.DESCR_3" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Cycle Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_3"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_3"/>
+		<property name="resourceId" value="JoinTree_1.CI_BILL_CYC_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_3"/>
+		<property name="previous.display" value="Bill Cycle Description"/>
+		<property name="semantic.item.label" value="Bill Cycle Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_3)"/>
+	</field>
+	<field name="NewSet1.DESCR_7" class="java.lang.String">
+		<property name="adhoc.display" value="Budget Plan Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_7"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_7"/>
+		<property name="resourceId" value="JoinTree_1.CI_BUD_PLAN_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_7"/>
+		<property name="previous.display" value="Budget Plan Description"/>
+		<property name="semantic.item.label" value="Budget Plan Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_7)"/>
+	</field>
+	<field name="NewSet1.STATUS_LBL" class="java.lang.String">
+		<property name="adhoc.display" value="Status Description (Case)"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/STATUS_LBL"/>
+		<property name="semantic.tree.uri" value="/NewSet1/STATUS_LBL"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE_STATUS_L.STATUS_LBL"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/STATUS_LBL"/>
+		<property name="previous.display" value="Status Description (Case)"/>
+		<property name="semantic.item.label" value="Status Description (Case)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.STATUS_LBL)"/>
+	</field>
+	<field name="NewSet1.DESCR_5" class="java.lang.String">
+		<property name="adhoc.display" value="Collection Class Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_5"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_5"/>
+		<property name="resourceId" value="JoinTree_1.CI_COLL_CL_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_5"/>
+		<property name="previous.display" value="Collection Class Description"/>
+		<property name="semantic.item.label" value="Collection Class Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_5)"/>
+	</field>
+	<field name="NewSet1.DESCR_2" class="java.lang.String">
+		<property name="adhoc.display" value="Phone Type Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_2"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_2"/>
+		<property name="resourceId" value="JoinTree_1.CI_PHONE_TYPE_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_2"/>
+		<property name="previous.display" value="Phone Type Description"/>
+		<property name="semantic.item.label" value="Phone Type Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_2)"/>
+	</field>
+	<field name="NewSet1.DESCR" class="java.lang.String">
+		<property name="adhoc.display" value="Case Type Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR"/>
+		<property name="resourceId" value="JoinTree_1.CI_CASE_TYPE_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR"/>
+		<property name="previous.display" value="Case Type Description"/>
+		<property name="semantic.item.label" value="Case Type Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR)"/>
+	</field>
+	<field name="NewSet1.DESCR_6" class="java.lang.String">
+		<property name="adhoc.display" value="Customer Class Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_6"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_6"/>
+		<property name="resourceId" value="JoinTree_1.CI_CUST_CL_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_6"/>
+		<property name="previous.display" value="Customer Class Description"/>
+		<property name="semantic.item.label" value="Customer Class Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_6)"/>
+	</field>
+	<field name="NewSet1.DESCR_1" class="java.lang.String">
+		<property name="adhoc.display" value="Case Condition Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_1"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_1"/>
+		<property name="resourceId" value="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_1"/>
+		<property name="previous.display" value="Case Condition Description"/>
+		<property name="semantic.item.label" value="Case Condition Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_1)"/>
+	</field>
+	<field name="NewSet1.DESCR_9" class="java.lang.String">
+		<property name="adhoc.display" value="Meter Read Instruction Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_9"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_9"/>
+		<property name="resourceId" value="JoinTree_1.CI_MR_INSTR_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_9"/>
+		<property name="previous.display" value="Meter Read Instruction Description"/>
+		<property name="semantic.item.label" value="Meter Read Instruction Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_9)"/>
+	</field>
+	<field name="NewSet1.DESCR_10" class="java.lang.String">
+		<property name="adhoc.display" value="Meter Read Warning Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_10"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_10"/>
+		<property name="resourceId" value="JoinTree_1.CI_MR_WARN_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_10"/>
+		<property name="previous.display" value="Meter Read Warning Description"/>
+		<property name="semantic.item.label" value="Meter Read Warning Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_10)"/>
+	</field>
+	<field name="NewSet1.DESCR_8" class="java.lang.String">
+		<property name="adhoc.display" value="Premise Type Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_8"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_8"/>
+		<property name="resourceId" value="JoinTree_1.CI_PREM_TYPE_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_8"/>
+		<property name="previous.display" value="Premise Type Description"/>
+		<property name="semantic.item.label" value="Premise Type Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_8)"/>
+	</field>
+	<field name="NewSet1.DESCR_13" class="java.lang.String">
+		<property name="adhoc.display" value="Time Zone Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_13"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_13"/>
+		<property name="resourceId" value="JoinTree_1.CI_TIME_ZONE_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_13"/>
+		<property name="previous.display" value="Time Zone Description"/>
+		<property name="semantic.item.label" value="Time Zone Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_13)"/>
+	</field>
+	<field name="NewSet1.DESCR_11" class="java.lang.String">
+		<property name="adhoc.display" value="Trend Area Description"/>
+		<property name="adhoc.tree.uri" value="/NewSet1/DESCR_11"/>
+		<property name="semantic.tree.uri" value="/NewSet1/DESCR_11"/>
+		<property name="resourceId" value="JoinTree_1.CI_TREND_AREA_L.DESCR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet1/DESCR_11"/>
+		<property name="previous.display" value="Trend Area Description"/>
+		<property name="semantic.item.label" value="Trend Area Description"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet1.DESCR_11)"/>
+	</field>
+	<field name="NewSet2.CLOSED_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Closed Date/Time"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/CLOSED_DTTM"/>
+		<property name="semantic.tree.uri" value="/NewSet2/CLOSED_DTTM"/>
+		<property name="resourceId" value="JoinTree_1.CMS_CI_CASE_VW.CLOSED_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/CLOSED_DTTM"/>
+		<property name="previous.display" value="Closed Date/Time"/>
+		<property name="semantic.item.label" value="Closed Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet2.CLOSED_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="NewSet2.CASE_CRE_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Create Date/Time"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/CASE_CRE_DTTM"/>
+		<property name="semantic.tree.uri" value="/NewSet2/CASE_CRE_DTTM"/>
+		<property name="resourceId" value="JoinTree_1.CMS_CI_CASE_VW.CASE_CRE_DTTM"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_timestamp_0"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/CASE_CRE_DTTM"/>
+		<property name="previous.display" value="Create Date/Time"/>
+		<property name="semantic.item.label" value="Create Date/Time"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet2.CASE_CRE_DTTM)"/>
+		<property name="defaultMask" value="medium,hide"/>
+	</field>
+	<field name="NewSet2.ACCT_ID_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct Account ID"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/ACCT_ID_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet2/ACCT_ID_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.ACCT_ID_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/ACCT_ID_DISTINCT"/>
+		<property name="previous.display" value="Distinct Account ID"/>
+		<property name="semantic.item.label" value="Distinct Account ID"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.ACCT_ID_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet2.CASE_DUR_DAYS" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Case Duration (in Days)"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/CASE_DUR_DAYS"/>
+		<property name="semantic.tree.uri" value="/NewSet2/CASE_DUR_DAYS"/>
+		<property name="resourceId" value="JoinTree_1.CASE_DUR_DAYS"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/CASE_DUR_DAYS"/>
+		<property name="previous.display" value="Case Duration (in Days)"/>
+		<property name="semantic.item.label" value="Case Duration (in Days)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.CASE_DUR_DAYS)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="NewSet2.CASE_ID_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct Case ID"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/CASE_ID_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet2/CASE_ID_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.CASE_ID_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/CASE_ID_DISTINCT"/>
+		<property name="previous.display" value="Distinct Case ID"/>
+		<property name="semantic.item.label" value="Distinct Case ID"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.CASE_ID_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet2.CASE_DUR" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Case Duration (in minutes)"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/CASE_DUR"/>
+		<property name="semantic.tree.uri" value="/NewSet2/CASE_DUR"/>
+		<property name="resourceId" value="JoinTree_1.CMS_CI_CASE_VW.CASE_DUR"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_dec_0"/>
+		<property name="aggregateType" value="java.math.BigDecimal"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/CASE_DUR"/>
+		<property name="previous.display" value="Case Duration (in minutes)"/>
+		<property name="semantic.item.label" value="Case Duration (in minutes)"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.CASE_DUR)"/>
+		<property name="defaultMask" value="#,##0.00"/>
+	</field>
+	<field name="NewSet2.PREM_ID_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct Premise ID"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/PREM_ID_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet2/PREM_ID_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.PREM_ID_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/PREM_ID_DISTINCT"/>
+		<property name="previous.display" value="Distinct Premise ID"/>
+		<property name="semantic.item.label" value="Distinct Premise ID"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.PREM_ID_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet2.ENTITY_NAME_UPR" class="java.lang.String">
+		<property name="adhoc.display" value="Name"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/ENTITY_NAME_UPR"/>
+		<property name="semantic.tree.uri" value="/NewSet2/ENTITY_NAME_UPR"/>
+		<property name="resourceId" value="JoinTree_1.CI_PER_NAME.ENTITY_NAME_UPR"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/ENTITY_NAME_UPR"/>
+		<property name="previous.display" value="Name"/>
+		<property name="semantic.item.label" value="Name"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet2.ENTITY_NAME_UPR)"/>
+	</field>
+	<field name="NewSet2.PER_ID_DISTINCT" class="java.lang.Long">
+		<property name="adhoc.display" value="Distinct Person ID"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/PER_ID_DISTINCT"/>
+		<property name="semantic.tree.uri" value="/NewSet2/PER_ID_DISTINCT"/>
+		<property name="resourceId" value="JoinTree_1.PER_ID_DISTINCT"/>
+		<property name="kind" value="MEASURE"/>
+		<property name="defaultMaskId" value="ADH_100_MASK_int_0"/>
+		<property name="aggregateType" value="java.math.BigInteger"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/PER_ID_DISTINCT"/>
+		<property name="previous.display" value="Distinct Person ID"/>
+		<property name="semantic.item.label" value="Distinct Person ID"/>
+		<property name="defaultAgg" value="Sum"/>
+		<property name="aggregateExpression" value="Sum(NewSet2.PER_ID_DISTINCT)"/>
+		<property name="defaultMask" value="#,##0"/>
+	</field>
+	<field name="NewSet2.USER_NAME" class="java.lang.String">
+		<property name="adhoc.display" value="Responsible User (Name)"/>
+		<property name="adhoc.tree.uri" value="/NewSet2/USER_NAME"/>
+		<property name="semantic.tree.uri" value="/NewSet2/USER_NAME"/>
+		<property name="resourceId" value="JoinTree_1.USER_NAME"/>
+		<property name="kind" value="DIMENSION"/>
+		<property name="aggregateType" value="java.lang.Long"/>
+		<property name="adhoc.chosen.tree.uri" value="/NewSet2/USER_NAME"/>
+		<property name="previous.display" value="Responsible User (Name)"/>
+		<property name="semantic.item.label" value="Responsible User (Name)"/>
+		<property name="defaultAgg" value="CountAll"/>
+		<property name="aggregateExpression" value="CountAll(NewSet2.USER_NAME)"/>
+	</field>
+</jasperReport>
