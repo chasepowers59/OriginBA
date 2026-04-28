@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="C2M Unified Characteristics" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+
+  <itemGroups>
+    <itemGroup id="SET_GRAIN" label="Characteristic Record Keys" resourceId="JoinTree_1">
+      <items>
+        <item id="OBJECT_TYPE" label="C2M Object Type" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.OBJECT_TYPE"></item>
+        <item id="OBJECT_ID" label="C2M Object ID" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.OBJECT_ID"></item>
+        <item id="CHAR_TYPE_CD" label="Characteristic Type Code" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.CHAR_TYPE_CD"></item>
+        <item id="CHAR_TYPE_DESCR" label="Characteristic Type Description" resourceId="JoinTree_1.CI_CHAR_TYPE_L.DESCR"></item>
+        <item id="CHAR_EFFDT" label="Characteristic Effective Date" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.CHAR_EFFDT"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_CHAR_VALUES" label="Characteristic Values" resourceId="JoinTree_1">
+      <items>
+        <item id="CHAR_VAL" label="Characteristic Value" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.CHAR_VAL"></item>
+        <item id="ADHOC_CHAR_VAL" label="Ad Hoc Characteristic Value" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.ADHOC_CHAR_VAL"></item>
+        <item id="SRCH_CHAR_VAL" label="Searchable Characteristic Value" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.SRCH_CHAR_VAL"></item>
+        <item id="CHAR_VAL_FK1" label="Characteristic Reference Value 1" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.CHAR_VAL_FK1"></item>
+        <item id="CHAR_VAL_FK2" label="Characteristic Reference Value 2" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.CHAR_VAL_FK2"></item>
+        <item id="CHAR_VAL_FK3" label="Characteristic Reference Value 3" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.CHAR_VAL_FK3"></item>
+        <item id="CHAR_VAL_FK4" label="Characteristic Reference Value 4" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.CHAR_VAL_FK4"></item>
+        <item id="CHAR_VAL_FK5" label="Characteristic Reference Value 5" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.CHAR_VAL_FK5"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_PERSON_CTX" label="Person Context" resourceId="JoinTree_1">
+      <items>
+        <item id="PER_ID" label="Person ID" resourceId="JoinTree_1.CI_PER.PER_ID"></item>
+        <item id="PERSON_ENTITY_NAME" label="Person Primary Name" resourceId="JoinTree_1.CI_PER_NAME.ENTITY_NAME"></item>
+        <item id="MAIN_ACCT_ID" label="Main Customer Account ID" resourceId="JoinTree_1.CI_ACCT_PER.ACCT_ID"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_ACCOUNT_CTX" label="Account Context" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID" label="Account ID" resourceId="JoinTree_1.CI_ACCT.ACCT_ID"></item>
+        <item id="CIS_DIVISION" label="CIS Division" resourceId="JoinTree_1.CI_ACCT.CIS_DIVISION"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle Code" resourceId="JoinTree_1.CI_ACCT.BILL_CYC_CD"></item>
+        <item id="CUST_CL_CD" label="Customer Class Code" resourceId="JoinTree_1.CI_ACCT.CUST_CL_CD"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_SA_CTX" label="Service Agreement Context" resourceId="JoinTree_1">
+      <items>
+        <item id="SA_ID" label="Service Agreement ID" resourceId="JoinTree_1.CI_SA.SA_ID"></item>
+        <item id="SA_TYPE_CD" label="Service Agreement Type" resourceId="JoinTree_1.CI_SA.SA_TYPE_CD"></item>
+        <item id="SA_STATUS_FLG" label="Service Agreement Status" resourceId="JoinTree_1.CI_SA.SA_STATUS_FLG"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_SP_CTX" label="Service Point Context" resourceId="JoinTree_1">
+      <items>
+        <item id="SP_ID" label="Service Point ID" resourceId="JoinTree_1.D1_SP.D1_SP_ID"></item>
+        <item id="SP_TYPE_CD" label="Service Point Type" resourceId="JoinTree_1.D1_SP.D1_SP_TYPE_CD"></item>
+        <item id="SP_CITY" label="Service Point City" resourceId="JoinTree_1.D1_SP.CITY"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_PREM_CTX" label="Premise Context" resourceId="JoinTree_1">
+      <items>
+        <item id="PREM_ID" label="Premise ID" resourceId="JoinTree_1.CI_PREM.PREM_ID"></item>
+        <item id="PREM_CITY" label="Premise City" resourceId="JoinTree_1.CI_PREM.CITY"></item>
+        <item id="PREM_POSTAL" label="Premise Postal" resourceId="JoinTree_1.CI_PREM.POSTAL"></item>
+      </items>
+    </itemGroup>
+
+    <itemGroup id="SET_SAFE_MEASURES" label="Safe Measures (Distinct)" resourceId="JoinTree_1">
+      <items>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="DISTINCT_OBJECT_COUNT" label="Distinct Object Count" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.OBJECT_ID"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="DISTINCT_CHAR_TYPE_COUNT" label="Distinct Characteristic Type Count" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.CHAR_TYPE_CD"></item>
+        <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="DISTINCT_CHAR_ROW_COUNT" label="Distinct Characteristic Record Count" resourceId="JoinTree_1.CHAR_UNIFIED_RAW.CHAR_ROW_KEY"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+
+  <resources>
+    <jdbcQuery id="CHAR_UNIFIED_RAW" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="OBJECT_TYPE" type="java.lang.String"></field>
+        <field id="OBJECT_ID" type="java.lang.String"></field>
+        <field id="CHAR_TYPE_CD" type="java.lang.String"></field>
+        <field id="CHAR_VAL" type="java.lang.String"></field>
+        <field id="ADHOC_CHAR_VAL" type="java.lang.String"></field>
+        <field id="SRCH_CHAR_VAL" type="java.lang.String"></field>
+        <field id="CHAR_VAL_FK1" type="java.lang.String"></field>
+        <field id="CHAR_VAL_FK2" type="java.lang.String"></field>
+        <field id="CHAR_VAL_FK3" type="java.lang.String"></field>
+        <field id="CHAR_VAL_FK4" type="java.lang.String"></field>
+        <field id="CHAR_VAL_FK5" type="java.lang.String"></field>
+        <field id="CHAR_EFFDT" type="java.sql.Timestamp"></field>
+        <field id="CHAR_VERSION" type="java.math.BigDecimal"></field>
+        <field id="CHAR_ROW_KEY" type="java.lang.String"></field>
+      </fieldList>
+      <query>select
+    'PERSON' as object_type,
+    c.per_id as object_id,
+    c.char_type_cd,
+    c.char_val,
+    c.adhoc_char_val,
+    c.srch_char_val,
+    c.char_val_fk1,
+    c.char_val_fk2,
+    c.char_val_fk3,
+    c.char_val_fk4,
+    c.char_val_fk5,
+    c.effdt as char_effdt,
+    c.version as char_version,
+    c.per_id || '|' || c.char_type_cd || '|' || to_char(c.effdt, 'YYYY-MM-DD HH24:MI:SS') as char_row_key
+from cisadm.ci_per_char c
+union all
+select
+    'ACCOUNT' as object_type,
+    c.acct_id as object_id,
+    c.char_type_cd,
+    c.char_val,
+    c.adhoc_char_val,
+    c.srch_char_val,
+    c.char_val_fk1,
+    c.char_val_fk2,
+    c.char_val_fk3,
+    c.char_val_fk4,
+    c.char_val_fk5,
+    c.effdt as char_effdt,
+    c.version as char_version,
+    c.acct_id || '|' || c.char_type_cd || '|' || to_char(c.effdt, 'YYYY-MM-DD HH24:MI:SS') as char_row_key
+from cisadm.ci_acct_char c
+union all
+select
+    'SA' as object_type,
+    c.sa_id as object_id,
+    c.char_type_cd,
+    c.char_val,
+    c.adhoc_char_val,
+    c.srch_char_val,
+    c.char_val_fk1,
+    c.char_val_fk2,
+    c.char_val_fk3,
+    c.char_val_fk4,
+    c.char_val_fk5,
+    c.effdt as char_effdt,
+    c.version as char_version,
+    c.sa_id || '|' || c.char_type_cd || '|' || to_char(c.effdt, 'YYYY-MM-DD HH24:MI:SS') as char_row_key
+from cisadm.ci_sa_char c
+union all
+select
+    'PREMISE' as object_type,
+    c.prem_id as object_id,
+    c.char_type_cd,
+    c.char_val,
+    c.adhoc_char_val,
+    c.srch_char_val,
+    c.char_val_fk1,
+    c.char_val_fk2,
+    c.char_val_fk3,
+    c.char_val_fk4,
+    c.char_val_fk5,
+    c.effdt as char_effdt,
+    c.version as char_version,
+    c.prem_id || '|' || c.char_type_cd || '|' || to_char(c.effdt, 'YYYY-MM-DD HH24:MI:SS') as char_row_key
+from cisadm.ci_prem_char c
+union all
+select
+    'SP' as object_type,
+    c.d1_sp_id as object_id,
+    c.char_type_cd,
+    c.char_val,
+    c.adhoc_char_val,
+    c.srch_char_val,
+    c.char_val_fk1,
+    c.char_val_fk2,
+    c.char_val_fk3,
+    c.char_val_fk4,
+    c.char_val_fk5,
+    c.effdt as char_effdt,
+    c.version as char_version,
+    c.d1_sp_id || '|' || c.char_type_cd || '|' || to_char(c.effdt, 'YYYY-MM-DD HH24:MI:SS') as char_row_key
+from cisadm.d1_sp_char c</query>
+    </jdbcQuery>
+
+    <jdbcTable id="CI_CHAR_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_CHAR_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CHAR_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_PER" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PER_ID" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_PER_NAME" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PER_NAME" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_ACCT_PER" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT_PER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="MAIN_CUST_SW" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_ACCT" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_SA" datasourceId="Origin_DEV_DS" datasourceTableName="CI_SA" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="CI_PREM" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PREM" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="CITY" type="java.lang.String"></field>
+        <field id="POSTAL" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="D1_SP" datasourceId="Origin_DEV_DS" datasourceTableName="D1_SP" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_SP_TYPE_CD" type="java.lang.String"></field>
+        <field id="CITY" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CHAR_UNIFIED_RAW.OBJECT_TYPE" type="java.lang.String"></field>
+        <field id="CHAR_UNIFIED_RAW.OBJECT_ID" type="java.lang.String"></field>
+        <field id="CHAR_UNIFIED_RAW.CHAR_TYPE_CD" type="java.lang.String"></field>
+        <field id="CHAR_UNIFIED_RAW.CHAR_VAL" type="java.lang.String"></field>
+        <field id="CHAR_UNIFIED_RAW.ADHOC_CHAR_VAL" type="java.lang.String"></field>
+        <field id="CHAR_UNIFIED_RAW.SRCH_CHAR_VAL" type="java.lang.String"></field>
+        <field id="CHAR_UNIFIED_RAW.CHAR_VAL_FK1" type="java.lang.String"></field>
+        <field id="CHAR_UNIFIED_RAW.CHAR_VAL_FK2" type="java.lang.String"></field>
+        <field id="CHAR_UNIFIED_RAW.CHAR_VAL_FK3" type="java.lang.String"></field>
+        <field id="CHAR_UNIFIED_RAW.CHAR_VAL_FK4" type="java.lang.String"></field>
+        <field id="CHAR_UNIFIED_RAW.CHAR_VAL_FK5" type="java.lang.String"></field>
+        <field id="CHAR_UNIFIED_RAW.CHAR_EFFDT" type="java.sql.Timestamp"></field>
+        <field id="CHAR_UNIFIED_RAW.CHAR_VERSION" type="java.math.BigDecimal"></field>
+        <field id="CHAR_UNIFIED_RAW.CHAR_ROW_KEY" type="java.lang.String"></field>
+
+        <field id="CI_CHAR_TYPE_L.CHAR_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_CHAR_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_CHAR_TYPE_L.DESCR" type="java.lang.String"></field>
+
+        <field id="CI_PER.PER_ID" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.PER_ID" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.ENTITY_NAME" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.PER_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CI_ACCT.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CI_SA.SA_ID" type="java.lang.String"></field>
+        <field id="CI_SA.SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_SA.SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CI_PREM.PREM_ID" type="java.lang.String"></field>
+        <field id="CI_PREM.CITY" type="java.lang.String"></field>
+        <field id="CI_PREM.POSTAL" type="java.lang.String"></field>
+        <field id="D1_SP.D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_SP.D1_SP_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_SP.CITY" type="java.lang.String"></field>
+      </fieldList>
+
+      <joinInfo alias="CHAR_UNIFIED_RAW" referenceId="CHAR_UNIFIED_RAW"></joinInfo>
+      <joinList>
+        <join expr="CHAR_UNIFIED_RAW.CHAR_TYPE_CD == CI_CHAR_TYPE_L.CHAR_TYPE_CD and CI_CHAR_TYPE_L.LANGUAGE_CD == 'ENG'" left="CHAR_UNIFIED_RAW" right="CI_CHAR_TYPE_L" type="leftOuter" weight="1"></join>
+
+        <join expr="CHAR_UNIFIED_RAW.OBJECT_TYPE == 'PERSON' and CHAR_UNIFIED_RAW.OBJECT_ID == CI_PER.PER_ID" left="CHAR_UNIFIED_RAW" right="CI_PER" type="leftOuter" weight="1"></join>
+        <join expr="CI_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'" left="CI_PER" right="CI_PER_NAME" type="leftOuter" weight="1"></join>
+        <join expr="CI_PER.PER_ID == CI_ACCT_PER.PER_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'" left="CI_PER" right="CI_ACCT_PER" type="leftOuter" weight="1"></join>
+
+        <join expr="CHAR_UNIFIED_RAW.OBJECT_TYPE == 'ACCOUNT' and CHAR_UNIFIED_RAW.OBJECT_ID == CI_ACCT.ACCT_ID" left="CHAR_UNIFIED_RAW" right="CI_ACCT" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_PER.ACCT_ID == CI_ACCT.ACCT_ID" left="CI_ACCT_PER" right="CI_ACCT" type="leftOuter" weight="1"></join>
+
+        <join expr="CHAR_UNIFIED_RAW.OBJECT_TYPE == 'SA' and CHAR_UNIFIED_RAW.OBJECT_ID == CI_SA.SA_ID" left="CHAR_UNIFIED_RAW" right="CI_SA" type="leftOuter" weight="1"></join>
+        <join expr="CHAR_UNIFIED_RAW.OBJECT_TYPE == 'PREMISE' and CHAR_UNIFIED_RAW.OBJECT_ID == CI_PREM.PREM_ID" left="CHAR_UNIFIED_RAW" right="CI_PREM" type="leftOuter" weight="1"></join>
+        <join expr="CHAR_UNIFIED_RAW.OBJECT_TYPE == 'SP' and CHAR_UNIFIED_RAW.OBJECT_ID == D1_SP.D1_SP_ID" left="CHAR_UNIFIED_RAW" right="D1_SP" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CHAR_UNIFIED_RAW" tableId="CHAR_UNIFIED_RAW"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_CHAR_TYPE_L" tableId="CI_CHAR_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PER" tableId="CI_PER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT" tableId="CI_ACCT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_SA" tableId="CI_SA"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PREM" tableId="CI_PREM"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_SP" tableId="D1_SP"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>
