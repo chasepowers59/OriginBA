@@ -20,6 +20,7 @@ STEPS = {
     "deploy-baseline-procs": "sql/performance/snapshots/deployment_steps/02_deploy_all_initial_full_history_procedures.sql",
     "schedule-baseline": "sql/performance/snapshots/deployment_steps/03a_schedule_all_initial_full_history_refreshes.sql",
     "baseline-status": "sql/performance/snapshots/deployment_steps/03b_capture_initial_full_history_job_status.sql",
+    "retry-bseg-billed-baseline": "sql/performance/snapshots/deployment_steps/03c_schedule_bseg_billed_baseline_retry.sql",
     "validate": "sql/performance/snapshots/deployment_steps/04_validate_all_active_snapshots.sql",
     "deploy-rolling-procs": "sql/performance/snapshots/deployment_steps/05_deploy_all_rolling_window_updates.sql",
     "run-operational": "sql/performance/snapshots/deployment_steps/06_run_all_operational_refreshes.sql",

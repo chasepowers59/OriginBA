@@ -271,3 +271,33 @@ After rolling procedure cutover:
 - D1 usage scalar detail has a wider effective grain than `(D1_USAGE_ID, SEQ_NUM)`.
 - Jaspersoft Domains should not be repointed to these snapshots until the target
   client database has passed baseline and operational validation.
+
+## TEMP Exhaustion Handling
+
+If a baseline full-history job fails with `ORA-01652 unable to extend temp
+segment`, do not assume the snapshot logic is wrong. This usually means the
+single baseline load exceeded the client's available TEMP while aggregating a
+large C2M history slice.
+
+For `BSEG_BILLED_USAGE_RPT_CURR`, the full-history procedure is intentionally
+batched by billing month. The procedure still truncates and rebuilds the full
+target table, but each month:
+
+- restricts the driving population to completed bills in that billing month
+- aggregates `CI_BSEG_SQ`, `CI_BSEG_READ`, and `CI_BSEG_CALC` only for that
+  month's eligible bill segments
+- commits after the month finishes
+
+This preserves the report grain of one row per `BSEG_ID` while reducing TEMP
+pressure versus one global full-history insert. If a later month fails, rerun
+the procedure after resolving capacity or load contention; it truncates the
+target at the start and rebuilds from the beginning.
+
+When retrying a failed baseline job:
+
+- verify the procedure is `VALID`
+- check `ALL_SCHEDULER_RUNNING_JOBS` first
+- avoid stacking the retry on top of other active full-history jobs
+- use `python3 scripts/local/run_snapshot_rollout_step.py --step retry-bseg-billed-baseline --clients <client>` to queue the retry two hours out
+- validate row count, summed billed usage, summed initial usage, summed calc
+  amount, and `COUNT(*) - COUNT(DISTINCT BSEG_ID)` after success
