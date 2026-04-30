@@ -8,11 +8,11 @@ PROMPT [1/7] FT_RPT_CURR operational procedure
 @@..\finance\ft_rpt_curr\02_refresh_snapshot_procedure.sql
 
 PROMPT [2/7] BSEG_BILLED_USAGE_RPT_CURR operational procedure
-PROMPT No rolling-window variant approved; current full-refresh procedure remains active.
+PROMPT Deploy approved 12-month rolling-window procedure.
 @@..\billed_usage\bseg_billed_usage\02_refresh_snapshot_procedure.sql
 
 PROMPT [3/7] BSEG_SQ_USAGE_RPT_CURR operational procedure
-PROMPT No rolling-window variant approved; current full-refresh procedure remains active.
+PROMPT Deploy approved 12-month rolling-window procedure.
 @@..\billed_usage\bseg_sq_usage\02_refresh_snapshot_procedure.sql
 
 PROMPT [4/7] D1_MSRMT_RPT_CURR operational procedure

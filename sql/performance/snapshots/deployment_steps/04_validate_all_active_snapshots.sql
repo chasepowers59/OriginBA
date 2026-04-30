@@ -7,10 +7,10 @@ PROMPT [1/7] FT_RPT_CURR validation
 @@..\finance\ft_rpt_curr\11a_fast_before_after_validation.sql
 
 PROMPT [2/7] BSEG_BILLED_USAGE_RPT_CURR validation
-@@..\billed_usage\bseg_billed_usage\04_validation_queries.sql
+@@..\billed_usage\bseg_billed_usage\09_fast_before_after_validation.sql
 
 PROMPT [3/7] BSEG_SQ_USAGE_RPT_CURR validation
-@@..\billed_usage\bseg_sq_usage\04_validation_queries.sql
+@@..\billed_usage\bseg_sq_usage\10_fast_before_after_validation.sql
 
 PROMPT [4/7] D1_MSRMT_RPT_CURR validation
 @@..\meter_ops\d1_msrmt\08_fast_before_after_validation.sql

@@ -16,13 +16,16 @@ Run these scripts in `SQL Developer` or `SQLcl` as **script execution** (`F5` / 
 ## Deployment sequence
 1. `01_create_all_active_snapshot_tables.sql`
 2. `02_deploy_all_initial_full_history_procedures.sql`
-3. `03_run_all_initial_full_history_refreshes.sql`
-4. `04_validate_all_active_snapshots.sql`
-5. `05_deploy_all_rolling_window_updates.sql`
-6. `06_run_all_operational_refreshes.sql`
-7. `04_validate_all_active_snapshots.sql` again
-8. `07_schedule_all_active_snapshots.sql`
-9. `08_capture_latest_active_snapshot_runs.sql`
+3. Choose one baseline load option:
+   - `03_run_all_initial_full_history_refreshes.sql` for a manual foreground run
+   - `03a_schedule_all_initial_full_history_refreshes.sql` for unattended one-time baseline jobs
+4. If using scheduled baseline jobs, run `03b_capture_initial_full_history_job_status.sql` later
+5. `04_validate_all_active_snapshots.sql`
+6. `05_deploy_all_rolling_window_updates.sql`
+7. `06_run_all_operational_refreshes.sql`
+8. `04_validate_all_active_snapshots.sql` again
+9. `07_schedule_all_active_snapshots.sql`
+10. `08_capture_latest_active_snapshot_runs.sql`
 
 ## BSEG promotion flow
 
@@ -75,6 +78,21 @@ For the two BSEG snapshots, the fast validators became the operational QA gate
 - rolling `12-month` monthly parity
 - additive total parity
 - duplicate-key safety
+
+## Unattended first-load option
+
+`03a_schedule_all_initial_full_history_refreshes.sql` creates one-time baseline
+jobs staggered every 30 minutes, starting 30 minutes from the script run time.
+Use this when loading client databases so the first full-history loads can run
+without keeping a local terminal session open.
+
+After the scheduled start window has elapsed, use:
+
+- `03b_capture_initial_full_history_job_status.sql`
+- `04_validate_all_active_snapshots.sql`
+
+Do not deploy the rolling-window procedures or recurring 6-hour jobs until the
+baseline job status and validation output are acceptable.
 
 ## Scheduling guidance
 
