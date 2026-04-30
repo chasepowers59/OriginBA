@@ -82,7 +82,7 @@ For the two BSEG snapshots, the fast validators became the operational QA gate
 ## Unattended first-load option
 
 `03a_schedule_all_initial_full_history_refreshes.sql` creates one-time baseline
-jobs staggered every 30 minutes, starting 30 minutes from the script run time.
+jobs staggered every 15 minutes, starting at the script run time.
 Use this when loading client databases so the first full-history loads can run
 without keeping a local terminal session open.
 

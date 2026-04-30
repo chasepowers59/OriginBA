@@ -11,13 +11,13 @@ PROMPT   3. Run this script.
 PROMPT   4. Come back later and run status capture + validation.
 PROMPT
 PROMPT Start offsets from current database time:
-PROMPT   FT_RPT_CURR                         + 30 minutes
-PROMPT   BSEG_BILLED_USAGE_RPT_CURR          + 60 minutes
-PROMPT   BSEG_SQ_USAGE_RPT_CURR              + 90 minutes
-PROMPT   D1_MSRMT_RPT_CURR                   + 120 minutes
-PROMPT   FT_GL_DISTRIBUTION_RPT_CURR         + 150 minutes
-PROMPT   D1_USAGE_RPT_CURR                   + 180 minutes
-PROMPT   D1_USAGE_SCALAR_DTL_RPT_CURR        + 210 minutes
+PROMPT   FT_RPT_CURR                         now
+PROMPT   BSEG_BILLED_USAGE_RPT_CURR          + 15 minutes
+PROMPT   BSEG_SQ_USAGE_RPT_CURR              + 30 minutes
+PROMPT   D1_MSRMT_RPT_CURR                   + 45 minutes
+PROMPT   FT_GL_DISTRIBUTION_RPT_CURR         + 60 minutes
+PROMPT   D1_USAGE_RPT_CURR                   + 75 minutes
+PROMPT   D1_USAGE_SCALAR_DTL_RPT_CURR        + 90 minutes
 
 DECLARE
     PROCEDURE drop_job_if_exists(p_job_name IN VARCHAR2) IS
@@ -57,49 +57,49 @@ BEGIN
     create_one_time_job(
         p_job_name   => 'CISADM.JOB_BASELINE_FT_RPT_CURR_ONCE',
         p_job_action => 'CISADM.REFRESH_FT_RPT_CURR',
-        p_minutes    => 30,
+        p_minutes    => 0,
         p_comments   => 'One-time initial full-history baseline load for FT_RPT_CURR'
     );
 
     create_one_time_job(
         p_job_name   => 'CISADM.JOB_BASELINE_BSEG_BILLED_USAGE_RPT_CURR_ONCE',
         p_job_action => 'CISADM.REFRESH_BSEG_BILLED_USAGE_RPT_CURR',
-        p_minutes    => 60,
+        p_minutes    => 15,
         p_comments   => 'One-time initial full-history baseline load for BSEG_BILLED_USAGE_RPT_CURR'
     );
 
     create_one_time_job(
         p_job_name   => 'CISADM.JOB_BASELINE_BSEG_SQ_USAGE_RPT_CURR_ONCE',
         p_job_action => 'CISADM.REFRESH_BSEG_SQ_USAGE_RPT_CURR',
-        p_minutes    => 90,
+        p_minutes    => 30,
         p_comments   => 'One-time initial full-history baseline load for BSEG_SQ_USAGE_RPT_CURR'
     );
 
     create_one_time_job(
         p_job_name   => 'CISADM.JOB_BASELINE_D1_MSRMT_RPT_CURR_ONCE',
         p_job_action => 'CISADM.REFRESH_D1_MSRMT_RPT_CURR',
-        p_minutes    => 120,
+        p_minutes    => 45,
         p_comments   => 'One-time initial full-history baseline load for D1_MSRMT_RPT_CURR'
     );
 
     create_one_time_job(
         p_job_name   => 'CISADM.JOB_BASELINE_FT_GL_DISTRIBUTION_RPT_CURR_ONCE',
         p_job_action => 'CISADM.REFRESH_FT_GL_DISTRIBUTION_RPT_CURR',
-        p_minutes    => 150,
+        p_minutes    => 60,
         p_comments   => 'One-time initial full-history baseline load for FT_GL_DISTRIBUTION_RPT_CURR'
     );
 
     create_one_time_job(
         p_job_name   => 'CISADM.JOB_BASELINE_D1_USAGE_RPT_CURR_ONCE',
         p_job_action => 'CISADM.REFRESH_D1_USAGE_RPT_CURR',
-        p_minutes    => 180,
+        p_minutes    => 75,
         p_comments   => 'One-time initial full-history baseline load for D1_USAGE_RPT_CURR'
     );
 
     create_one_time_job(
         p_job_name   => 'CISADM.JOB_BASELINE_D1_USAGE_SCALAR_DTL_RPT_CURR_ONCE',
         p_job_action => 'CISADM.REFRESH_D1_USAGE_SCALAR_DTL_RPT_CURR',
-        p_minutes    => 210,
+        p_minutes    => 90,
         p_comments   => 'One-time initial full-history baseline load for D1_USAGE_SCALAR_DTL_RPT_CURR'
     );
 END;

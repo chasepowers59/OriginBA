@@ -121,8 +121,8 @@ Fresh-client batch form:
 python3 scripts/local/run_snapshot_rollout_step.py --step schedule-baseline --clients fresh
 ```
 
-The one-time baseline jobs start at 30-minute intervals beginning 30 minutes
-after this script is run.
+The one-time baseline jobs start immediately and then continue at 15-minute
+intervals.
 
 5. Capture status after the scheduled windows have had time to run
 
