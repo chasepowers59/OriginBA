@@ -45,10 +45,14 @@ class ProcessingError(Exception):
     """Raised when a target package cannot be produced safely."""
 
 
+PROMOTION_MODES = ("client", "datasource")
+
+
 @dataclass
 class TargetSummary:
     target_org: str
     target_ds: str
+    output_stem: str = ""
     files_edited: int = 0
     text_replacements: int = 0
     path_renames: int = 0
@@ -104,11 +108,94 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--promotion-mode",
+        choices=PROMOTION_MODES,
+        default="client",
+        help=(
+            "client: rewrite org and datasource for SmartCity client promotions; "
+            "datasource: rewrite datasource only and keep the source org paths."
+        ),
+    )
+    parser.add_argument(
+        "--output-stem",
+        help="Output ZIP stem override (for example standard_offering_Origin_DEMO).",
+    )
+    parser.add_argument(
+        "--repository-uri-style",
+        choices=("full", "org_relative"),
+        default="full",
+        help=(
+            "full: keep /organizations/organization_1/organizations/<org>/... URIs; "
+            "org_relative: shorten to /SmartCity/... and /DataSource/... style paths."
+        ),
+    )
+    parser.add_argument(
+        "--map-standard-offering-to-workstreams",
+        action="store_true",
+        help=(
+            "After URI shortening, rewrite /SmartCity/Report/Standard_Offering/ "
+            "to /SmartCity/Report/Workstreams/ in package contents."
+        ),
+    )
+    parser.add_argument(
+        "--index-module-folder-uri",
+        help="Deprecated alias for --import-module-folder-uri.",
+    )
+    parser.add_argument(
+        "--import-module-folder-uri",
+        help=(
+            "Full org-scoped index.xml module folder URI used by Jaspersoft import "
+            "(for example .../Standard_Offering/Field_Operations)."
+        ),
+    )
+    parser.add_argument(
+        "--skip-datasource-import",
+        action="store_true",
+        help=(
+            "Do not bundle DataSource/ in the ZIP or index.xml resource entry. "
+            "Use when the target datasource already exists on the server."
+        ),
+    )
+    parser.add_argument(
+        "--repository-layout",
+        choices=("organizations_tree", "tenant_root"),
+        default="organizations_tree",
+        help=(
+            "organizations_tree: resources/organizations/organization_1/... layout; "
+            "tenant_root: resources/SmartCity/... with index rootTenantId (demo style)."
+        ),
+    )
+    parser.add_argument(
+        "--tenant-id",
+        help="Tenant ID for index.xml rootTenantId when repository-layout is tenant_root.",
+    )
+    parser.add_argument(
+        "--import-into-existing-tenant",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "Omit rootTenantId from index.xml when importing content into a tenant "
+            "you are already inside (avoids import.organization.into.root.not.allowed)."
+        ),
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Validate and report actions without writing output ZIPs.",
     )
     return parser.parse_args()
+
+
+def default_output_stem(target_org: str, target_ds: str, promotion_mode: str) -> str:
+    if promotion_mode == "datasource":
+        if target_ds.endswith("_DS"):
+            return target_ds[:-3]
+        return target_ds
+    return target_org
+
+
+def output_zip_path(outdir: str, output_stem: str) -> str:
+    return os.path.join(outdir, f"{output_stem}_import.zip")
 
 
 def read_mapping(path: str) -> List[Tuple[str, str]]:
@@ -357,8 +444,105 @@ def remove_datasource_directories(root: str) -> Tuple[int, int]:
     return removed_files, removed_dirs
 
 
-def datasource_resource_uri(target_org: str, target_ds: str) -> str:
-    return f"/organizations/organization_1/organizations/{target_org}/DataSource/{target_ds}"
+def org_scoped_uri_prefix(target_org: str) -> str:
+    return f"/organizations/organization_1/organizations/{target_org}/"
+
+
+def datasource_resource_uri(
+    target_org: str,
+    target_ds: str,
+    *,
+    org_relative: bool = False,
+) -> str:
+    if org_relative:
+        return f"/DataSource/{target_ds}"
+    return f"{org_scoped_uri_prefix(target_org)}DataSource/{target_ds}"
+
+
+def should_skip_uri_shortening(path: str) -> bool:
+    """Import manifest and datasource XML are rewritten separately for tenant-root layout."""
+    basename = os.path.basename(path)
+    if basename == "index.xml":
+        return True
+    if f"{os.sep}DataSource{os.sep}" in path and basename.endswith(".xml"):
+        return True
+    return False
+
+
+def shorten_repository_uris(
+    root: str,
+    target_org: str,
+    map_standard_offering_to_workstreams: bool = False,
+) -> Tuple[int, int]:
+    org_prefix = org_scoped_uri_prefix(target_org)
+    replacements: Dict[str, str] = {org_prefix: "/"}
+    if map_standard_offering_to_workstreams:
+        replacements["/SmartCity/Report/Standard_Offering/"] = "/SmartCity/Report/Workstreams/"
+
+    files_edited = 0
+    total_replacements = 0
+    for current_root, _dirs, files in os.walk(root):
+        for filename in files:
+            path = os.path.join(current_root, filename)
+            if should_skip_uri_shortening(path):
+                continue
+            content, _encoding = read_text_file(path)
+            if content is None:
+                continue
+
+            updated = content
+            replacement_count = 0
+            for old, new in sorted(
+                replacements.items(), key=lambda pair: len(pair[0]), reverse=True
+            ):
+                if old == new:
+                    continue
+                replacement_count += updated.count(old)
+                updated = updated.replace(old, new)
+
+            if replacement_count:
+                with open(path, "w", encoding="utf-8", newline="") as handle:
+                    handle.write(updated)
+                files_edited += 1
+                total_replacements += replacement_count
+
+    return files_edited, total_replacements
+
+
+def finalize_import_index(
+    root: str,
+    import_module_folder_uri: str,
+    import_datasource_resource_uri: Optional[str] = None,
+) -> None:
+    index_path = os.path.join(root, "index.xml")
+    if not os.path.isfile(index_path):
+        raise ProcessingError(f"Package index.xml is missing: {index_path}")
+
+    tree = ET.parse(index_path)
+    export_root = tree.getroot()
+    repository_module = None
+    for module in export_root.findall("module"):
+        if module.get("id") == "repositoryResources":
+            repository_module = module
+            break
+
+    if repository_module is None:
+        repository_module = ET.Element("module", {"id": "repositoryResources"})
+        export_root.insert(0, repository_module)
+
+    folder_element = repository_module.find("folder")
+    if folder_element is None:
+        folder_element = ET.SubElement(repository_module, "folder")
+    folder_element.text = import_module_folder_uri
+
+    for resource in list(repository_module.findall("resource")):
+        repository_module.remove(resource)
+
+    if import_datasource_resource_uri:
+        resource_element = ET.SubElement(repository_module, "resource")
+        resource_element.text = import_datasource_resource_uri
+
+    tree.write(index_path, encoding="utf-8", xml_declaration=True)
 
 
 def merge_repository_resource(index_path: str, resource_uri: str) -> None:
@@ -391,6 +575,8 @@ def inject_target_datasource(
     overlay_root: str,
     target_org: str,
     target_ds: str,
+    *,
+    org_relative_uris: bool = False,
 ) -> int:
     source_file = os.path.join(
         overlay_root,
@@ -416,7 +602,7 @@ def inject_target_datasource(
 
     merge_repository_resource(
         os.path.join(work_root, "index.xml"),
-        datasource_resource_uri(target_org, target_ds),
+        datasource_resource_uri(target_org, target_ds, org_relative=org_relative_uris),
     )
     return copied_files
 
@@ -445,6 +631,36 @@ def collect_leftover_matches(root: str, terms: Iterable[str]) -> Tuple[List[str]
                     found_contents.append((path, term))
 
     return found_paths, found_contents
+
+
+def ensure_tenant_root_structure(
+    root: str,
+    import_folder_uri: str,
+    *,
+    require_root_tenant_id: bool = False,
+) -> None:
+    smartcity_root = os.path.join(root, "resources", "SmartCity")
+    if not os.path.isdir(smartcity_root):
+        raise ProcessingError(f"Missing tenant-root SmartCity folder: {smartcity_root}")
+
+    relative_folder = import_folder_uri.removeprefix("/SmartCity/").lstrip("/")
+    import_path = os.path.join(smartcity_root, relative_folder.replace("/", os.sep))
+    if not os.path.isdir(import_path):
+        raise ProcessingError(f"Missing tenant-root import folder path: {import_path}")
+
+    index_path = os.path.join(root, "index.xml")
+    if not os.path.isfile(index_path):
+        raise ProcessingError(f"Package index.xml is missing: {index_path}")
+
+    tree = ET.parse(index_path)
+    export_root = tree.getroot()
+    root_tenant = None
+    for prop in export_root.findall("property"):
+        if prop.get("name") == "rootTenantId":
+            root_tenant = prop.get("value")
+            break
+    if require_root_tenant_id and not root_tenant:
+        raise ProcessingError("index.xml is missing rootTenantId for tenant-root layout.")
 
 
 def ensure_required_structure(root: str, source_org: str, target_org: str) -> None:
@@ -549,7 +765,8 @@ def zip_directory(root: str, output_zip: str) -> None:
 
 
 def summarize_result(summary: TargetSummary) -> None:
-    print(f"\n--- {summary.target_org} ({summary.target_ds}) ---")
+    label = summary.output_stem or summary.target_org
+    print(f"\n--- {label} ({summary.target_org} / {summary.target_ds}) ---")
     print(f"status: {'SUCCESS' if summary.success else 'FAILED'}")
     print(f"files edited: {summary.files_edited}")
     print(f"text replacements: {summary.text_replacements}")
@@ -574,30 +791,50 @@ def process_target(
     target_ds: str,
     datasource_export_dir: Optional[str],
     dry_run: bool,
+    promotion_mode: str = "client",
+    output_stem: Optional[str] = None,
+    repository_uri_style: str = "full",
+    map_standard_offering_to_workstreams: bool = False,
+    index_module_folder_uri: Optional[str] = None,
+    import_module_folder_uri: Optional[str] = None,
+    skip_datasource_import: bool = False,
+    repository_layout: str = "organizations_tree",
+    tenant_id: Optional[str] = None,
+    import_into_existing_tenant: bool = True,
 ) -> TargetSummary:
-    summary = TargetSummary(target_org=target_org, target_ds=target_ds)
-    work_root = make_workspace_dir(os.path.join(outdir, "_tmp"), f"work_{target_org}")
+    resolved_output_stem = output_stem or default_output_stem(
+        target_org, target_ds, promotion_mode
+    )
+    summary = TargetSummary(
+        target_org=target_org,
+        target_ds=target_ds,
+        output_stem=resolved_output_stem,
+    )
+    work_label = resolved_output_stem.replace(os.sep, "_")
+    work_root = make_workspace_dir(os.path.join(outdir, "_tmp"), f"work_{work_label}")
     overlay_root: Optional[str] = None
+    rewrite_org = source_org != target_org
+    org_relative_uris = repository_uri_style == "org_relative"
 
     try:
         shutil.copytree(source_root, work_root, dirs_exist_ok=True)
 
-        replacements = {
-            source_org: target_org,
-            source_ds: target_ds,
-        }
+        replacements = {source_ds: target_ds}
+        if rewrite_org:
+            replacements[source_org] = target_org
         files_edited, text_replacements = replace_content_references(work_root, replacements)
         summary.files_edited = files_edited
         summary.text_replacements = text_replacements
 
         summary.path_renames += rename_paths(work_root, source_ds, target_ds)
-        summary.path_renames += rename_paths(work_root, source_org, target_org)
+        if rewrite_org:
+            summary.path_renames += rename_paths(work_root, source_org, target_org)
 
         removed_files, removed_dirs = remove_datasource_directories(work_root)
         summary.datasource_files_removed = removed_files
         summary.datasource_dirs_removed = removed_dirs
 
-        if datasource_export_dir:
+        if datasource_export_dir and not skip_datasource_import:
             datasource_input = find_named_input(datasource_export_dir, target_org, target_ds)
             overlay_root = make_workspace_dir(os.path.join(outdir, "_tmp"), f"datasource_{target_org}")
             prepare_overlay_tree(datasource_input, overlay_root)
@@ -616,21 +853,80 @@ def process_target(
                 overlay_root,
                 target_org,
                 target_ds,
+                org_relative_uris=False,
             )
 
-        ensure_required_structure(work_root, source_org, target_org)
-        if datasource_export_dir:
-            ensure_target_datasource_file_present(work_root, target_org, target_ds)
-            ensure_index_has_resource(work_root, datasource_resource_uri(target_org, target_ds))
+        import_folder_uri = import_module_folder_uri or index_module_folder_uri
+        import_datasource_uri = datasource_resource_uri(target_org, target_ds, org_relative=False)
+
+        if org_relative_uris:
+            uri_files_edited, uri_replacements = shorten_repository_uris(
+                work_root,
+                target_org,
+                map_standard_offering_to_workstreams=map_standard_offering_to_workstreams,
+            )
+            summary.files_edited += uri_files_edited
+            summary.text_replacements += uri_replacements
+
+        if repository_layout == "tenant_root":
+            if not tenant_id:
+                raise ProcessingError("tenant_root layout requires tenant_id.")
+            if not import_folder_uri:
+                raise ProcessingError("tenant_root layout requires import_module_folder_uri.")
+            from tenant_root_layout import repackage_to_tenant_root
+
+            repackage_to_tenant_root(
+                work_root,
+                tenant_id,
+                import_folder_uri,
+                target_ds,
+                skip_datasource_import=skip_datasource_import,
+                use_workstreams_report_root=map_standard_offering_to_workstreams,
+                import_into_existing_tenant=import_into_existing_tenant,
+                target_org=target_org,
+            )
+            summary.files_edited += 1
+        elif import_folder_uri:
+            index_datasource_uri = None if skip_datasource_import else import_datasource_uri
+            finalize_import_index(work_root, import_folder_uri, index_datasource_uri)
+            summary.files_edited += 1
+
+        if repository_layout == "tenant_root":
+            ensure_tenant_root_structure(
+                work_root,
+                import_folder_uri or "",
+                require_root_tenant_id=not import_into_existing_tenant,
+            )
+            if datasource_export_dir and not skip_datasource_import:
+                tenant_datasource_file = os.path.join(
+                    work_root, "resources", "DataSource", f"{target_ds}.xml"
+                )
+                if not os.path.isfile(tenant_datasource_file):
+                    raise ProcessingError(
+                        f"Expected tenant-root datasource XML is missing: {tenant_datasource_file}"
+                    )
+                if import_folder_uri:
+                    index_datasource_uri = None if skip_datasource_import else f"/DataSource/{target_ds}"
+                    if index_datasource_uri:
+                        ensure_index_has_resource(work_root, index_datasource_uri)
+            elif skip_datasource_import:
+                ensure_datasource_removed(work_root)
         else:
-            ensure_datasource_removed(work_root)
+            ensure_required_structure(work_root, source_org, target_org)
+            if datasource_export_dir and not skip_datasource_import:
+                ensure_target_datasource_file_present(work_root, target_org, target_ds)
+                ensure_index_has_resource(work_root, import_datasource_uri)
+            else:
+                ensure_datasource_removed(work_root)
         ensure_target_datasource_present(work_root, target_ds)
 
         validation_terms: List[str] = []
-        if source_org != target_org:
+        if rewrite_org:
             validation_terms.append(source_org)
         if source_ds != target_ds:
             validation_terms.append(source_ds)
+        if org_relative_uris and not import_folder_uri:
+            validation_terms.append(org_scoped_uri_prefix(target_org))
 
         leftover_paths, leftover_contents = collect_leftover_matches(work_root, validation_terms)
         summary.leftover_path_matches = leftover_paths
@@ -650,7 +946,7 @@ def process_target(
             raise ProcessingError("; ".join(problems))
 
         if not dry_run:
-            output_zip = os.path.join(outdir, f"{target_org}_import.zip")
+            output_zip = output_zip_path(outdir, resolved_output_stem)
             if os.path.exists(output_zip):
                 os.remove(output_zip)
             zip_directory(work_root, output_zip)
@@ -703,6 +999,18 @@ def main() -> int:
                     else None
                 ),
                 dry_run=args.dry_run,
+                promotion_mode=args.promotion_mode,
+                output_stem=args.output_stem,
+                repository_uri_style=args.repository_uri_style,
+                map_standard_offering_to_workstreams=args.map_standard_offering_to_workstreams,
+                index_module_folder_uri=args.index_module_folder_uri,
+                import_module_folder_uri=(
+                    args.import_module_folder_uri or args.index_module_folder_uri
+                ),
+                skip_datasource_import=args.skip_datasource_import,
+                repository_layout=args.repository_layout,
+                tenant_id=args.tenant_id,
+                import_into_existing_tenant=args.import_into_existing_tenant,
             )
             summarize_result(summary)
             summaries.append(summary)

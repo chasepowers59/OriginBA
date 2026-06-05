@@ -1,0 +1,93 @@
+section,domain_name,Account_Alert___Domain
+section,workstream,Customer Operations
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_ACCT,CI_ACCT
+CI_ACCT_PER,CI_ACCT_PER
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_BILL_CYC_L,CI_BILL_CYC_L
+CI_CIS_DIVISION_L,CI_CIS_DIVISION_L
+CI_COLL_CL_L,CI_COLL_CL_L
+CI_CUST_CL_L,CI_CUST_CL_L
+CI_BUD_PLAN_L,CI_BUD_PLAN_L
+SC_USER,SC_USER
+CI_ACCT_ALERT,CI_ACCT_ALERT
+CI_ALERT_TYPE_L,CI_ALERT_TYPE_L
+CI_PER_NAME,CI_PER_NAME
+CI_SA,CI_SA
+CI_BSEG,CI_BSEG
+CI_BSEG_CALC,CI_BSEG_CALC
+C1_PER_CONTDET,C1_PER_CONTDET
+JoinTree_1,CI_ACCT
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_ACCT,CI_ACCT_ALERT,CI_ACCT.ACCT_ID == CI_ACCT_ALERT.ACCT_ID
+JoinTree_1,2,inner,CI_ACCT,CI_ACCT_PER,CI_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_1,3,inner,CI_ACCT_ALERT,CI_ALERT_TYPE_L,CI_ACCT_ALERT.ALERT_TYPE_CD == CI_ALERT_TYPE_L.ALERT_TYPE_CD and CI_ALERT_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,4,leftOuter,CI_ACCT,CI_BILL_CYC_L,CI_ACCT.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,5,leftOuter,CI_ACCT,CI_CIS_DIVISION_L,CI_ACCT.CIS_DIVISION == CI_CIS_DIVISION_L.CIS_DIVISION and CI_CIS_DIVISION_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,6,inner,CI_ACCT,CI_COLL_CL_L,CI_ACCT.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,7,inner,CI_ACCT,CI_CUST_CL_L,CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,8,leftOuter,CI_ACCT,CI_BUD_PLAN_L,CI_ACCT.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,9,leftOuter,CI_ACCT,SC_USER,CI_ACCT.BILL_PRT_INTERCEPT == SC_USER.USER_ID
+JoinTree_1,10,inner,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM' and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_1,11,leftOuter,CI_ACCT,CI_SA,CI_ACCT.ACCT_ID == CI_SA.ACCT_ID
+JoinTree_1,12,leftOuter,CI_SA,CI_BSEG,CI_SA.SA_ID == CI_BSEG.SA_ID
+JoinTree_1,13,inner,CI_BSEG,CI_BSEG_CALC,CI_BSEG.BSEG_ID == CI_BSEG_CALC.BSEG_ID
+JoinTree_1,14,leftOuter,CI_BSEG,FT_GL_SUMMARY,CI_BSEG.BSEG_ID == FT_GL_SUMMARY.SIBLING_ID
+JoinTree_1,15,leftOuter,CI_ACCT_PER,C1_PER_CONTDET,CI_ACCT_PER.PER_ID == C1_PER_CONTDET.PER_ID
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Account,Access Group,JoinTree_1.CI_ACCT,ACCESS_GRP_CD,,
+1.) Account,Account ID,JoinTree_1.CI_ACCT,ACCT_ID,,
+1.) Account,Account Management Group,JoinTree_1.CI_ACCT,ACCT_MGMT_GRP_CD,,
+1.) Account,Alert Information,JoinTree_1.CI_ACCT,ALERT_INFO,,
+1.) Account,Bill After                    ,JoinTree_1.CI_ACCT,BILL_AFTER_DT,,
+1.) Account,Bill Cycle,JoinTree_1.CI_ACCT,BILL_CYC_CD,,
+1.) Account,Bill Print Intercept,JoinTree_1.CI_ACCT,BILL_PRT_INTERCEPT,,
+1.) Account,Budget Plan,JoinTree_1.CI_ACCT,BUD_PLAN_CD,,
+1.) Account,Collection Class,JoinTree_1.CI_ACCT,COLL_CL_CD,,
+1.) Account,Last Credit Review Date,JoinTree_1.CI_ACCT,CR_REVIEW_DT,,
+1.) Account,Currency Code,JoinTree_1.CI_ACCT,CURRENCY_CD,,
+1.) Account,Customer Class,JoinTree_1.CI_ACCT,CUST_CL_CD,,
+1.) Account,Internal Credit Review,JoinTree_1.CI_ACCT,INT_CR_REVIEW_SW,,
+1.) Account,Mailing Premise ID,JoinTree_1.CI_ACCT,MAILING_PREM_ID,,
+1.) Account,No Deposit Review Switch,JoinTree_1.CI_ACCT,NO_DEP_RVW_SW,,
+1.) Account,Postpone Credit Review Until,JoinTree_1.CI_ACCT,POSTPONE_CR_RVW_DT,,
+1.) Account,Protect Bill Cycle,JoinTree_1.CI_ACCT,PROTECT_CYC_SW,,
+1.) Account,Protect Division,JoinTree_1.CI_ACCT,PROTECT_DIV_SW,,
+1.) Account,Protect Mailing Premise,JoinTree_1.CI_ACCT,PROTECT_PREM_SW,,
+1.) Account,Set Up Date,JoinTree_1.CI_ACCT,SETUP_DT,,
+1.) Account Alert,Account ID,JoinTree_1.CI_ACCT_ALERT,ACCT_ID,,
+1.) Account Alert,Alert Type,JoinTree_1.CI_ACCT_ALERT,ALERT_TYPE_CD,,
+1.) Account Alert,End Date,JoinTree_1.CI_ACCT_ALERT,END_DT,,
+1.) Account Alert,Start Date,JoinTree_1.CI_ACCT_ALERT,START_DT,,
+1.) Descriptions,Alert Type Description,JoinTree_1.CI_ALERT_TYPE_L,DESCR80,,
+1.) Descriptions,Bill Cycle Description,JoinTree_1.CI_BILL_CYC_L,DESCR,,
+1.) Descriptions,Budget Plan Description,JoinTree_1.CI_BUD_PLAN_L,DESCR,,
+1.) Descriptions,CIS Division Description,JoinTree_1.CI_CIS_DIVISION_L,DESCR,,
+1.) Descriptions,Collection Class Description,JoinTree_1.CI_COLL_CL_L,DESCR,,
+1.) Descriptions,Customer Class Description,JoinTree_1.CI_CUST_CL_L,DESCR,,
+1.) Formulas,Bill Print Intercept (Name),JoinTree_1,BILL_PRT_INTERCEPT_NAME,,
+1.) Formulas,Distinct Account ID,JoinTree_1,ACCT_ID_DISTINCT,,
+1.) Formulas,Distinct Account Alert,JoinTree_1,ACCT_ALERT_DISTINCT,,
+1.) Formulas,Effective,JoinTree_1,IS_EFFECTIVE,,
+1.) Formulas,Name,JoinTree_1.CI_PER_NAME,ENTITY_NAME_UPR,,
+2.) Billing vs GL Recon,Bill Segment ID,JoinTree_1.CI_BSEG,BSEG_ID,,
+2.) Billing vs GL Recon,SA Status,JoinTree_1.CI_SA,SA_STATUS_FLG,,
+2.) Billing vs GL Recon,Bill Route Type,JoinTree_1.CI_ACCT_PER,BILL_RTE_TYPE_CD,,
+2.) Billing vs GL Recon,Bill Segment Start Date,JoinTree_1.CI_BSEG,START_DT,,
+2.) Billing vs GL Recon,Description on Bill,JoinTree_1.CI_BSEG_CALC,DESCR_ON_BILL,,
+2.) Billing vs GL Recon,Calculated Amount,JoinTree_1.CI_BSEG_CALC,CALC_AMT,,
+2.) Billing vs GL Recon,GL Amount (Sum),JoinTree_1,GL_AMOUNT_SUM,,
+2.) Billing vs GL Recon,GL Distribution Code,JoinTree_1.FT_GL_SUMMARY,DST_ID,,
+2.) Billing vs GL Recon,GL Account,JoinTree_1.FT_GL_SUMMARY,GL_ACCT,,
+2.) Billing vs GL Recon,Accounting Date,JoinTree_1.FT_GL_SUMMARY,ACCOUNTING_DT,,
+2.) Billing vs GL Recon,Contact Value,JoinTree_1.C1_PER_CONTDET,CONTACT_VALUE,,
+2.) Billing vs GL Recon,Communication Type,JoinTree_1.C1_PER_CONTDET,COMM_RTE_TYPE_CD,,
+2.) Billing vs GL Recon,Contact Active/Inactive,JoinTree_1.C1_PER_CONTDET,CND_ACTINACT_FLG,,
+2.) Financial Formulas,GL Amount (Sum),JoinTree_1,GL_AMOUNT_SUM,,
+2.) Financial Formulas,GL Variance,JoinTree_1,GL_VARIANCE,,

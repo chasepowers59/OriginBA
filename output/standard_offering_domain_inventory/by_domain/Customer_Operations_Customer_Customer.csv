@@ -1,0 +1,80 @@
+section,domain_name,Customer___Domain
+section,workstream,Customer Operations
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_PER,CI_PER
+CMS_CI_PER_ID_VW,CMS_CI_PER_ID_VW
+CMS_CI_PER_NAME_VW,CMS_CI_PER_NAME_VW
+CMS_CI_PER_CHAR_VW,CMS_CI_PER_CHAR_VW
+CMS_CI_PER_PER_VW,CMS_CI_PER_PER_VW
+CMS_CI_PER_CONTDET_VW,CMS_CI_PER_CONTDET_VW
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_2,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_3,CI_LOOKUP_VAL_L
+CI_TIME_ZONE_L,CI_TIME_ZONE_L
+CI_PER_PER,CI_PER_PER
+CI_PER_REL_TYPE_L,CI_PER_REL_TYPE_L
+JoinTree_1,CI_PER
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_PER,CMS_CI_PER_ID_VW,CI_PER.PER_ID == CMS_CI_PER_ID_VW.PER_ID
+JoinTree_1,2,leftOuter,CI_PER,CMS_CI_PER_CHAR_VW,CI_PER.PER_ID == CMS_CI_PER_CHAR_VW.PER_ID
+JoinTree_1,3,leftOuter,CI_PER,CMS_CI_PER_PER_VW,CI_PER.PER_ID == CMS_CI_PER_PER_VW.PER_ID1
+JoinTree_1,4,inner,CI_PER,CMS_CI_PER_NAME_VW,CI_PER.PER_ID == CMS_CI_PER_NAME_VW.PER_ID
+JoinTree_1,5,leftOuter,CI_PER,CMS_CI_PER_CONTDET_VW,CI_PER.PER_ID == CMS_CI_PER_CONTDET_VW.PER_ID
+JoinTree_1,6,inner,CI_PER,CI_LOOKUP_VAL_L,CI_PER.PER_OR_BUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'PER_OR_BUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,7,inner,CI_PER,CI_LOOKUP_VAL_L_1,CI_PER.LS_SL_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'LS_SL_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,8,leftOuter,CI_PER,CI_LOOKUP_VAL_L_2,CI_PER.RECV_MKTG_INFO_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'RECV_MKTG_INFO_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,9,leftOuter,CI_PER,CI_LOOKUP_VAL_L_3,CI_PER.WEB_PWD_HINT_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'WEB_PWD_HINT_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_1,10,leftOuter,CI_PER,CI_TIME_ZONE_L,CI_PER.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Person,Address,JoinTree_1.CI_PER,ADDRESS1,,
+1.) Person,Address 2,JoinTree_1.CI_PER,ADDRESS2,,
+1.) Person,Address 3,JoinTree_1.CI_PER,ADDRESS3,,
+1.) Person,Address 4,JoinTree_1.CI_PER,ADDRESS4,,
+1.) Person,City,JoinTree_1.CI_PER,CITY,,
+1.) Person,Country,JoinTree_1.CI_PER,COUNTRY,,
+1.) Person,County,JoinTree_1.CI_PER,COUNTY,,
+1.) Person,Email Address,JoinTree_1.CI_PER,EMAILID,,
+1.) Person,Geographical Code,JoinTree_1.CI_PER,GEO_CODE,,
+1.) Person,House Type,JoinTree_1.CI_PER,HOUSE_TYPE,,
+1.) Person,In City Limit,JoinTree_1.CI_PER,IN_CITY_LIMIT,,
+1.) Person,Language,JoinTree_1.CI_PER,LANGUAGE_CD,,
+1.) Person,Life Support / Sensitive Load Details,JoinTree_1.CI_PER,LS_SL_DESCR,,
+1.) Person,Life Support / Sensitive Load,JoinTree_1.CI_PER,LS_SL_FLG,,
+1.) Person,Number 1,JoinTree_1.CI_PER,NUM1,,
+1.) Person,Number 2,JoinTree_1.CI_PER,NUM2,,
+1.) Person,Name 1,JoinTree_1.CI_PER,OVRD_MAIL_NAME1,,
+1.) Person,Name 2,JoinTree_1.CI_PER,OVRD_MAIL_NAME2,,
+1.) Person,Name 3,JoinTree_1.CI_PER,OVRD_MAIL_NAME3,,
+1.) Person,Person ID,JoinTree_1.CI_PER,PER_ID,,
+1.) Person,Person/Business,JoinTree_1.CI_PER,PER_OR_BUS_FLG,,
+1.) Person,Postal,JoinTree_1.CI_PER,POSTAL,,
+1.) Person,Web Self Service Marketing Info,JoinTree_1.CI_PER,RECV_MKTG_INFO_FLG,,
+1.) Person,State,JoinTree_1.CI_PER,STATE,,
+1.) Person,Time Zone,JoinTree_1.CI_PER,TIME_ZONE_CD,,
+1.) Person Name,Doing Business As,JoinTree_1.CMS_CI_PER_NAME_VW,DBA,,
+1.) Person Name,Name (Primary),JoinTree_1.CMS_CI_PER_NAME_VW,PRIM,,
+1.) Person Identifier,Drivers license,JoinTree_1.CMS_CI_PER_ID_VW,DL,,
+1.) Person Identifier,Social security number,JoinTree_1.CMS_CI_PER_ID_VW,SSN,,
+1.) Person Identifier,Tax Exemption ID,JoinTree_1.CMS_CI_PER_ID_VW,TAXEXMPT,,
+1.) Person Identifier,Tax ID,JoinTree_1.CMS_CI_PER_ID_VW,TAXID,,
+1.) Person Characteristics,Birth Date,JoinTree_1.CMS_CI_PER_CHAR_VW,C2MBTHDT,,
+1.) Person Contact,Cell Phone,JoinTree_1.CMS_CI_PER_CONTDET_VW,CELLPHONE,,
+1.) Person Contact,	Home Phone,JoinTree_1.CMS_CI_PER_CONTDET_VW,HOMEPHONE,,
+1.) Person Contact,Primary Email,JoinTree_1.CMS_CI_PER_CONTDET_VW,PRIMARYEMAIL,,
+1.) Person Contact,Secondary Email,JoinTree_1.CMS_CI_PER_CONTDET_VW,SECONDARYEMAIL,,
+1.) Person Contact,Business/Work Phone,JoinTree_1.CMS_CI_PER_CONTDET_VW,WORKPHONE,,
+1.) Person to Person,Authorized Person,JoinTree_1.CMS_CI_PER_PER_VW,AUTH_PER,,
+1.) Person to Person,Spouse,JoinTree_1.CMS_CI_PER_PER_VW,SPOUSE,,
+1.) Descriptions,Life Support / Sensitive Load Description,JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,Person/Business Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Time Zone Description,JoinTree_1.CI_TIME_ZONE_L,DESCR,,
+1.) Descriptions,Web Self Service Marketing Info Description,JoinTree_1.CI_LOOKUP_VAL_L_2,DESCR,,
+1.) Formulas,Distinct Person ID,JoinTree_1,PER_ID_DISTINCT,,
+1.) Formulas,Postal (5 Digits),JoinTree_1,POSTAL_5,,

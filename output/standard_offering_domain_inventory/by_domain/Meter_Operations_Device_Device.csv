@@ -1,0 +1,360 @@
+section,domain_name,Device___Domain
+section,workstream,Meter Operations
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+D1_DVC,D1_DVC
+D1_DVC_1,D1_DVC
+D1_DVC_2,D1_DVC
+D1_DVC_CFG,D1_DVC_CFG
+D1_INSTALL_EVT,D1_INSTALL_EVT
+D1_DVC_TYPE_L,D1_DVC_TYPE_L
+D1_DVC_TYPE_L_1,D1_DVC_TYPE_L
+D1_DVC_TYPE_L_2,D1_DVC_TYPE_L
+F1_BUS_OBJ_L,F1_BUS_OBJ_L
+F1_BUS_OBJ_L_1,F1_BUS_OBJ_L
+F1_BUS_OBJ_L_2,F1_BUS_OBJ_L
+F1_BUS_OBJ_L_3,F1_BUS_OBJ_L
+F1_BUS_OBJ_L_4,F1_BUS_OBJ_L
+F1_BUS_OBJ_L_5,F1_BUS_OBJ_L
+D1_MANUFACTURER_L,D1_MANUFACTURER_L
+D1_MANUFACTURER_L_1,D1_MANUFACTURER_L
+D1_MANUFACTURER_L_2,D1_MANUFACTURER_L
+D1_MODEL_L,D1_MODEL_L
+D1_MODEL_L_1,D1_MODEL_L
+D1_MODEL_L_3,D1_MODEL_L
+D1_SPR_L,D1_SPR_L
+D1_SPR_L_1,D1_SPR_L
+D1_SPR_L_2,D1_SPR_L
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_2,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_3,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_4,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_5,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_6,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_7,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_8,CI_LOOKUP_VAL_L
+F1_BUS_OBJ_STATUS_L,F1_BUS_OBJ_STATUS_L
+F1_BUS_OBJ_STATUS_L_1,F1_BUS_OBJ_STATUS_L
+F1_BUS_OBJ_STATUS_L_2,F1_BUS_OBJ_STATUS_L
+F1_BUS_OBJ_STATUS_L_3,F1_BUS_OBJ_STATUS_L
+F1_BUS_OBJ_STATUS_L_4,F1_BUS_OBJ_STATUS_L
+F1_BUS_OBJ_STATUS_L_5,F1_BUS_OBJ_STATUS_L
+F1_BUS_OBJ_STATUS_L_6,F1_BUS_OBJ_STATUS_L
+F1_BUS_OBJ_STATUS_RSN_L,F1_BUS_OBJ_STATUS_RSN_L
+F1_BUS_OBJ_STATUS_RSN_L_1,F1_BUS_OBJ_STATUS_RSN_L
+F1_BUS_OBJ_STATUS_RSN_L_2,F1_BUS_OBJ_STATUS_RSN_L
+F1_BUS_OBJ_STATUS_RSN_L_3,F1_BUS_OBJ_STATUS_RSN_L
+F1_BUS_OBJ_STATUS_RSN_L_4,F1_BUS_OBJ_STATUS_RSN_L
+D1_COMMAND_SET_L,D1_COMMAND_SET_L
+D1_COMMAND_SET_L_1,D1_COMMAND_SET_L
+CI_ACC_GRP_L,CI_ACC_GRP_L
+CI_ACC_GRP_L_1,CI_ACC_GRP_L
+D1_DVC_CFG_TYPE_L,D1_DVC_CFG_TYPE_L
+CI_TIME_ZONE_L,CI_TIME_ZONE_L
+CI_TIME_ZONE_L_1,CI_TIME_ZONE_L
+CI_ACCT_PER,CI_ACCT_PER
+CI_PER_NAME,CI_PER_NAME
+CMS_D1_DVC_CHAR_VW,CMS_D1_DVC_CHAR_VW
+CMS_D1_DVC_IDENTIFIER_VW,CMS_D1_DVC_IDENTIFIER_VW
+CMS_D1_DVC_IDENTIFIER_VW_1,CMS_D1_DVC_IDENTIFIER_VW
+CI_CHAR_VAL_L,CI_CHAR_VAL_L
+CI_PREM,CI_PREM
+CI_SP,CI_SP
+CI_PREM_TYPE_L,CI_PREM_TYPE_L
+CI_MR_INSTR_L,CI_MR_INSTR_L
+CI_MR_WARN_L,CI_MR_WARN_L
+CI_TREND_AREA_L,CI_TREND_AREA_L
+CI_STATE_L,CI_STATE_L
+CMS_D1_DVC_BODA_VW,CMS_D1_DVC_BODA_VW
+CMS_D1_DVC_BODA_VW_1,CMS_D1_DVC_BODA_VW
+D1_DVC_EVT,D1_DVC_EVT
+D1_DVC_EVT_TYPE_L,D1_DVC_EVT_TYPE_L
+D1_SP_EQPMNT,D1_SP_EQPMNT
+JoinTree_1,D1_DVC
+JoinTree_2,D1_DVC
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,leftOuter,D1_DVC,D1_DVC_CFG,D1_DVC.D1_DEVICE_ID == D1_DVC_CFG.D1_DEVICE_ID
+JoinTree_1,2,leftOuter,D1_DVC_CFG,D1_INSTALL_EVT,D1_DVC_CFG.DEVICE_CONFIG_ID == D1_INSTALL_EVT.DEVICE_CONFIG_ID
+JoinTree_1,3,leftOuter,D1_DVC,CMS_DVC_ACCT,D1_DVC.D1_DEVICE_ID == CMS_DVC_ACCT.D1_DEVICE_ID
+JoinTree_1,4,leftOuter,CMS_DVC_ACCT,CI_ACCT_PER,CMS_DVC_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_1,5,leftOuter,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
+JoinTree_1,6,leftOuter,D1_DVC,CMS_D1_DVC_CHAR_VW,D1_DVC.D1_DEVICE_ID == CMS_D1_DVC_CHAR_VW.D1_DEVICE_ID
+JoinTree_1,7,leftOuter,D1_DVC,CMS_D1_DVC_IDENTIFIER_VW,D1_DVC.D1_DEVICE_ID == CMS_D1_DVC_IDENTIFIER_VW.D1_DEVICE_ID
+JoinTree_1,8,leftOuter,CMS_DVC_ACCT,CI_SP,CMS_DVC_ACCT.SP_ID == CI_SP.SP_ID
+JoinTree_1,9,leftOuter,CI_SP,CI_PREM,CI_SP.PREM_ID == CI_PREM.PREM_ID
+JoinTree_1,10,leftOuter,D1_DVC,CMS_D1_DVC_BODA_VW,D1_DVC.D1_DEVICE_ID == CMS_D1_DVC_BODA_VW.D1_DEVICE_ID
+JoinTree_1,11,leftOuter,D1_DVC,CMS_DVC_CFG_EFFECTIVE,D1_DVC.D1_DEVICE_ID == CMS_DVC_CFG_EFFECTIVE.D1_DEVICE_ID
+JoinTree_1,12,leftOuter,D1_DVC_CFG,CMS_IEVT_LATEST,D1_DVC_CFG.DEVICE_CONFIG_ID == CMS_IEVT_LATEST.DEVICE_CONFIG_ID
+JoinTree_1,13,leftOuter,D1_INSTALL_EVT,D1_SP_EQPMNT,D1_INSTALL_EVT.D1_SP_ID == D1_SP_EQPMNT.D1_SP_ID
+JoinTree_1,14,leftOuter,D1_SP_EQPMNT,D1_DVC_2,D1_SP_EQPMNT.D1_DEVICE_ID == D1_DVC_2.D1_DEVICE_ID
+JoinTree_1,15,inner,D1_DVC,F1_BUS_OBJ_L,D1_DVC.BUS_OBJ_CD == F1_BUS_OBJ_L.BUS_OBJ_CD and F1_BUS_OBJ_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,16,leftOuter,D1_DVC,D1_MANUFACTURER_L,D1_DVC.MANUFACTURER_CD == D1_MANUFACTURER_L.MANUFACTURER_CD and D1_MANUFACTURER_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,17,leftOuter,D1_DVC,D1_MODEL_L,D1_DVC.MANUFACTURER_CD == D1_MODEL_L.MANUFACTURER_CD and D1_DVC.D1_MODEL_CD == D1_MODEL_L.D1_MODEL_CD and D1_MODEL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,18,leftOuter,D1_DVC,D1_SPR_L,D1_DVC.D1_SPR_CD == D1_SPR_L.D1_SPR_CD and D1_SPR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,19,leftOuter,D1_DVC,CI_LOOKUP_VAL_L,D1_DVC.IN_DATA_SHIFT_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'IN_DATA_SHIFT_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,20,inner,D1_DVC,F1_BUS_OBJ_STATUS_L,D1_DVC.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L.BUS_OBJ_CD and D1_DVC.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,21,leftOuter,D1_DVC,F1_BUS_OBJ_STATUS_RSN_L,D1_DVC.BO_STATUS_REASON_CD == F1_BUS_OBJ_STATUS_RSN_L.BO_STATUS_REASON_CD and F1_BUS_OBJ_STATUS_RSN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,22,leftOuter,D1_DVC,CI_LOOKUP_VAL_L_1,D1_DVC.ARMING_REQ_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'ARMING_REQ_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,23,leftOuter,D1_DVC,CI_LOOKUP_VAL_L_2,D1_DVC.HEAD_END_REGISTR_STATUS_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'HEAD_END_REGISTR_STATUS_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,24,leftOuter,D1_DVC,D1_COMMAND_SET_L,D1_DVC.D1_CMD_SET_CD == D1_COMMAND_SET_L.D1_CMD_SET_CD and D1_COMMAND_SET_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,25,leftOuter,D1_DVC,CI_ACC_GRP_L,D1_DVC.ACCESS_GRP_CD == CI_ACC_GRP_L.ACCESS_GRP_CD and CI_ACC_GRP_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,26,inner,D1_DVC,D1_DVC_TYPE_L,D1_DVC.DEVICE_TYPE_CD == D1_DVC_TYPE_L.DEVICE_TYPE_CD and D1_DVC_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,27,leftOuter,D1_DVC_CFG,D1_DVC_CFG_TYPE_L,D1_DVC_CFG.DEVICE_CONFIG_TYPE_CD == D1_DVC_CFG_TYPE_L.DEVICE_CONFIG_TYPE_CD and D1_DVC_CFG_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,28,leftOuter,D1_DVC_CFG,F1_BUS_OBJ_STATUS_L_1,D1_DVC_CFG.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_1.BUS_OBJ_CD and F1_BUS_OBJ_STATUS_L_1.LANGUAGE_CD == 'ENG' and D1_DVC_CFG.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L_1.BO_STATUS_CD
+JoinTree_1,29,leftOuter,D1_DVC_CFG,CI_TIME_ZONE_L,D1_DVC_CFG.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,30,leftOuter,D1_DVC_CFG,F1_BUS_OBJ_L_1,D1_DVC_CFG.BUS_OBJ_CD == F1_BUS_OBJ_L_1.BUS_OBJ_CD and F1_BUS_OBJ_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,31,leftOuter,D1_DVC_CFG,F1_BUS_OBJ_STATUS_RSN_L_1,D1_DVC_CFG.BO_STATUS_REASON_CD == F1_BUS_OBJ_STATUS_RSN_L_1.BO_STATUS_REASON_CD and F1_BUS_OBJ_STATUS_RSN_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,32,leftOuter,D1_INSTALL_EVT,F1_BUS_OBJ_L_2,D1_INSTALL_EVT.BUS_OBJ_CD == F1_BUS_OBJ_L_2.BUS_OBJ_CD and F1_BUS_OBJ_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,33,leftOuter,D1_INSTALL_EVT,F1_BUS_OBJ_STATUS_L_2,D1_INSTALL_EVT.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_2.BUS_OBJ_CD and D1_INSTALL_EVT.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L_2.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,34,leftOuter,D1_INSTALL_EVT,F1_BUS_OBJ_STATUS_RSN_L_2,D1_INSTALL_EVT.BO_STATUS_REASON_CD == F1_BUS_OBJ_STATUS_RSN_L_2.BO_STATUS_REASON_CD and F1_BUS_OBJ_STATUS_RSN_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,35,leftOuter,D1_INSTALL_EVT,CI_LOOKUP_VAL_L_3,D1_INSTALL_EVT.ARM_STAT_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'ARM_STAT_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_1,36,leftOuter,CMS_D1_DVC_CHAR_VW,CI_CHAR_VAL_L,CMS_D1_DVC_CHAR_VW.MXU_TYPE == CI_CHAR_VAL_L.CHAR_VAL and CI_CHAR_VAL_L.CHAR_TYPE_CD == 'CMCMXUTY' and CI_CHAR_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,37,leftOuter,CI_PREM,CI_PREM_TYPE_L,CI_PREM.PREM_TYPE_CD == CI_PREM_TYPE_L.PREM_TYPE_CD and CI_PREM_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,38,leftOuter,CI_PREM,CI_MR_INSTR_L,CI_PREM.MR_INSTR_CD == CI_MR_INSTR_L.MR_INSTR_CD and CI_MR_INSTR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,39,leftOuter,CI_PREM,CI_MR_WARN_L,CI_PREM.MR_WARN_CD == CI_MR_WARN_L.MR_WARN_CD and CI_MR_WARN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,40,leftOuter,CI_PREM,CI_TREND_AREA_L,CI_PREM.TREND_AREA_CD == CI_TREND_AREA_L.TREND_AREA_CD and CI_TREND_AREA_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,41,leftOuter,CI_PREM,CI_STATE_L,CI_PREM.COUNTRY == CI_STATE_L.COUNTRY and CI_PREM.STATE == CI_STATE_L.STATE and CI_STATE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,42,leftOuter,CI_PREM,CI_TIME_ZONE_L_1,CI_PREM.TIME_ZONE_CD == CI_TIME_ZONE_L_1.TIME_ZONE_CD and CI_TIME_ZONE_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,43,leftOuter,CMS_D1_DVC_BODA_VW,F1_BUS_OBJ_STATUS_L_3,CMS_D1_DVC_BODA_VW.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_3.BUS_OBJ_CD and CMS_D1_DVC_BODA_VW.STATUS == F1_BUS_OBJ_STATUS_L_3.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_1,44,leftOuter,CMS_DVC_ACCT,CI_LOOKUP_VAL_L_8,CMS_DVC_ACCT.SA_STATUS_FLG == CI_LOOKUP_VAL_L_8.FIELD_VALUE and CI_LOOKUP_VAL_L_8.FIELD_NAME == 'SA_STATUS_FLG' and CI_LOOKUP_VAL_L_8.LANGUAGE_CD == 'ENG'
+JoinTree_1,45,leftOuter,D1_DVC_2,D1_DVC_TYPE_L_2,D1_DVC_2.DEVICE_TYPE_CD == D1_DVC_TYPE_L_2.DEVICE_TYPE_CD and D1_DVC_TYPE_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,46,leftOuter,D1_DVC_2,F1_BUS_OBJ_L_5,D1_DVC_2.BUS_OBJ_CD == F1_BUS_OBJ_L_5.BUS_OBJ_CD and F1_BUS_OBJ_L_5.LANGUAGE_CD == 'ENG'
+JoinTree_1,47,leftOuter,D1_DVC_2,F1_BUS_OBJ_STATUS_L_6,D1_DVC_2.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_6.BUS_OBJ_CD and D1_DVC_2.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L_6.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L_6.LANGUAGE_CD == 'ENG'
+JoinTree_1,48,leftOuter,D1_DVC_2,D1_MANUFACTURER_L_2,D1_DVC_2.MANUFACTURER_CD == D1_MANUFACTURER_L_2.MANUFACTURER_CD and D1_MANUFACTURER_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,49,leftOuter,D1_DVC_2,D1_MODEL_L_3,D1_DVC_2.MANUFACTURER_CD == D1_MODEL_L_3.MANUFACTURER_CD and D1_DVC_2.D1_MODEL_CD == D1_MODEL_L_3.D1_MODEL_CD and D1_MODEL_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_2,50,leftOuter,D1_DVC_1,D1_DVC_EVT,D1_DVC_1.D1_DEVICE_ID == D1_DVC_EVT.D1_DEVICE_ID
+JoinTree_2,51,leftOuter,D1_DVC_1,CMS_D1_DVC_BODA_VW_1,D1_DVC_1.D1_DEVICE_ID == CMS_D1_DVC_BODA_VW_1.D1_DEVICE_ID
+JoinTree_2,52,leftOuter,D1_DVC_1,CMS_D1_DVC_IDENTIFIER_VW_1,D1_DVC_1.D1_DEVICE_ID == CMS_D1_DVC_IDENTIFIER_VW_1.D1_DEVICE_ID
+JoinTree_2,53,leftOuter,D1_DVC_1,CMS_DVC_EVT_LATEST,D1_DVC_1.D1_DEVICE_ID == CMS_DVC_EVT_LATEST.D1_DEVICE_ID
+JoinTree_2,54,inner,D1_DVC_1,F1_BUS_OBJ_L_3,D1_DVC_1.BUS_OBJ_CD == F1_BUS_OBJ_L_3.BUS_OBJ_CD and F1_BUS_OBJ_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_2,55,leftOuter,D1_DVC_1,D1_MANUFACTURER_L_1,D1_DVC_1.MANUFACTURER_CD == D1_MANUFACTURER_L_1.MANUFACTURER_CD and D1_MANUFACTURER_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_2,56,leftOuter,D1_DVC_1,D1_MODEL_L_1,D1_DVC_1.MANUFACTURER_CD == D1_MODEL_L_1.MANUFACTURER_CD and D1_DVC_1.D1_MODEL_CD == D1_MODEL_L_1.D1_MODEL_CD and D1_MODEL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_2,57,leftOuter,D1_DVC_1,D1_SPR_L_1,D1_DVC_1.D1_SPR_CD == D1_SPR_L_1.D1_SPR_CD and D1_SPR_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_2,58,leftOuter,D1_DVC_1,CI_LOOKUP_VAL_L_4,D1_DVC_1.IN_DATA_SHIFT_FLG == CI_LOOKUP_VAL_L_4.FIELD_VALUE and CI_LOOKUP_VAL_L_4.FIELD_NAME == 'IN_DATA_SHIFT_FLG' and CI_LOOKUP_VAL_L_4.LANGUAGE_CD == 'ENG'
+JoinTree_2,59,inner,D1_DVC_1,F1_BUS_OBJ_STATUS_L_4,D1_DVC_1.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_4.BUS_OBJ_CD and D1_DVC_1.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L_4.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L_4.LANGUAGE_CD == 'ENG'
+JoinTree_2,60,leftOuter,D1_DVC_1,F1_BUS_OBJ_STATUS_RSN_L_3,D1_DVC_1.BO_STATUS_REASON_CD == F1_BUS_OBJ_STATUS_RSN_L_3.BO_STATUS_REASON_CD and F1_BUS_OBJ_STATUS_RSN_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_2,61,leftOuter,D1_DVC_1,CI_LOOKUP_VAL_L_5,D1_DVC_1.ARMING_REQ_FLG == CI_LOOKUP_VAL_L_5.FIELD_VALUE and CI_LOOKUP_VAL_L_5.FIELD_NAME == 'ARMING_REQ_FLG' and CI_LOOKUP_VAL_L_5.LANGUAGE_CD == 'ENG'
+JoinTree_2,62,leftOuter,D1_DVC_1,CI_LOOKUP_VAL_L_6,D1_DVC_1.HEAD_END_REGISTR_STATUS_FLG == CI_LOOKUP_VAL_L_6.FIELD_VALUE and CI_LOOKUP_VAL_L_6.FIELD_NAME == 'HEAD_END_REGISTR_STATUS_FLG' and CI_LOOKUP_VAL_L_6.LANGUAGE_CD == 'ENG'
+JoinTree_2,63,leftOuter,D1_DVC_1,D1_COMMAND_SET_L_1,D1_DVC_1.D1_CMD_SET_CD == D1_COMMAND_SET_L_1.D1_CMD_SET_CD and D1_COMMAND_SET_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_2,64,leftOuter,D1_DVC_1,CI_ACC_GRP_L_1,D1_DVC_1.ACCESS_GRP_CD == CI_ACC_GRP_L_1.ACCESS_GRP_CD and CI_ACC_GRP_L_1.DESCR == 'ENG'
+JoinTree_2,65,inner,D1_DVC_1,D1_DVC_TYPE_L_1,D1_DVC_1.DEVICE_TYPE_CD == D1_DVC_TYPE_L_1.DEVICE_TYPE_CD and D1_DVC_TYPE_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_2,66,leftOuter,D1_DVC_EVT,D1_DVC_EVT_TYPE_L,D1_DVC_EVT.DVC_EVT_TYPE_CD == D1_DVC_EVT_TYPE_L.DVC_EVT_TYPE_CD and D1_DVC_EVT_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_2,67,leftOuter,D1_DVC_EVT,F1_BUS_OBJ_L_4,D1_DVC_EVT.BUS_OBJ_CD == F1_BUS_OBJ_L_4.BUS_OBJ_CD and F1_BUS_OBJ_L_4.LANGUAGE_CD == 'ENG'
+JoinTree_2,68,leftOuter,D1_DVC_EVT,CI_LOOKUP_VAL_L_7,D1_DVC_EVT.EXT_EVT_NAME_FLG == CI_LOOKUP_VAL_L_7.FIELD_VALUE and CI_LOOKUP_VAL_L_7.FIELD_NAME == 'EXT_EVT_NAME_FLG' and CI_LOOKUP_VAL_L_7.LANGUAGE_CD == 'ENG'
+JoinTree_2,69,leftOuter,D1_DVC_EVT,D1_SPR_L_2,D1_DVC_EVT.D1_SPR_CD == D1_SPR_L_2.D1_SPR_CD and D1_SPR_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_2,70,leftOuter,D1_DVC_EVT,F1_BUS_OBJ_STATUS_L_5,D1_DVC_EVT.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L_5.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L_5.LANGUAGE_CD == 'ENG' and D1_DVC_EVT.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_5.BUS_OBJ_CD
+JoinTree_2,71,leftOuter,D1_DVC_EVT,F1_BUS_OBJ_STATUS_RSN_L_4,D1_DVC_EVT.BO_STATUS_REASON_CD == F1_BUS_OBJ_STATUS_RSN_L_4.BO_STATUS_REASON_CD and F1_BUS_OBJ_STATUS_RSN_L_4.LANGUAGE_CD == 'ENG'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Device,Access Group,JoinTree_1.D1_DVC,ACCESS_GRP_CD,,
+1.) Device,Arming Required,JoinTree_1.D1_DVC,ARMING_REQ_FLG,,
+1.) Device,Status (Device),JoinTree_1.D1_DVC,BO_STATUS_CD,,
+1.) Device,Status Reason (Device),JoinTree_1.D1_DVC,BO_STATUS_REASON_CD,,
+1.) Device,Business Object (Device),JoinTree_1.D1_DVC,BUS_OBJ_CD,,
+1.) Device,Create Date/Time (Device),JoinTree_1.D1_DVC,CRE_DTTM,,
+1.) Device,Command Set,JoinTree_1.D1_DVC,D1_CMD_SET_CD,,
+1.) Device,Device ID (Device),JoinTree_1.D1_DVC,D1_DEVICE_ID,,
+1.) Device,Model (Device),JoinTree_1.D1_DVC,D1_MODEL_CD,,
+1.) Device,Service Provider (Device),JoinTree_1.D1_DVC,D1_SPR_CD,,
+1.) Device,Device Type (Device),JoinTree_1.D1_DVC,DEVICE_TYPE_CD,,
+1.) Device,Head-End Registration Status,JoinTree_1.D1_DVC,HEAD_END_REGISTR_STATUS_FLG,,
+1.) Device,Incoming Data Shift,JoinTree_1.D1_DVC,IN_DATA_SHIFT_FLG,,
+1.) Device,Manufacturer (Device),JoinTree_1.D1_DVC,MANUFACTURER_CD,,
+1.) Device,Status Date/Time (Device),JoinTree_1.D1_DVC,STATUS_UPD_DTTM,,
+1.) Device Details,Asset ID,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,ASSET_ID,,
+1.) Device Details,Badge Number,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,BADGE_NUMBER,,
+1.) Device Details,Configuration,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,CONFIGURATION,,
+1.) Device Details,External ID,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,EXTERNAL_ID,,
+1.) Device Details,Internal Meter Number,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,INTERNAL_METER_NUMBER,,
+1.) Device Details,Latest Device Status,JoinTree_1.CMS_D1_DVC_BODA_VW,STATUS,,
+1.) Device Details,MDM External ID,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,MDM_EXTERNAL_ID,,
+1.) Device Details,Name (Device),JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,NAME,,
+1.) Device Details,Neuron ID,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,NEURON_ID,,
+1.) Device Details,NIC ID,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,NIC_ID,,
+1.) Device Details,NIC Serial Number,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,NIC_SERIAL_NUMBER,,
+1.) Device Details,Pallet Number,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,PALLET_NUMBER,,
+1.) Device Details,Retirement Date/Time,JoinTree_1.CMS_D1_DVC_BODA_VW,RETIREMENT_DTTM,,
+1.) Device Details,Serial Number,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,SERIAL_NUMBER,,
+1.) Device Details,Specification,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,SPECIFICATION,,
+1.) Device Details,Utility Device ID,JoinTree_1.CMS_D1_DVC_IDENTIFIER_VW,UTILITY_DEVICE_ID,,
+1.) Device Details,MXU Type,JoinTree_1.CMS_D1_DVC_CHAR_VW,MXU_TYPE,,
+1.) Device Configuration,Status (Device Config),JoinTree_1.D1_DVC_CFG,BO_STATUS_CD,,
+1.) Device Configuration,Status Reason (Device Config),JoinTree_1.D1_DVC_CFG,BO_STATUS_REASON_CD,,
+1.) Device Configuration,Business Object (Device Config),JoinTree_1.D1_DVC_CFG,BUS_OBJ_CD,,
+1.) Device Configuration,Create Date/Time (Device Config),JoinTree_1.D1_DVC_CFG,CRE_DTTM,,
+1.) Device Configuration,Device ID (Device Config),JoinTree_1.D1_DVC_CFG,D1_DEVICE_ID,,
+1.) Device Configuration,Device Configuration,JoinTree_1.D1_DVC_CFG,DEVICE_CONFIG_ID,,
+1.) Device Configuration,Device Configuration Type,JoinTree_1.D1_DVC_CFG,DEVICE_CONFIG_TYPE_CD,,
+1.) Device Configuration,Effective Date/Time,JoinTree_1.D1_DVC_CFG,EFF_DTTM,,
+1.) Device Configuration,Status Date/Time (Device Config),JoinTree_1.D1_DVC_CFG,STATUS_UPD_DTTM,,
+1.) Device Configuration,Time Zone (Device Config),JoinTree_1.D1_DVC_CFG,TIME_ZONE_CD,,
+1.) Install Event,Arming Status,JoinTree_1.D1_INSTALL_EVT,ARM_STAT_FLG,,
+1.) Install Event,Status (Install Event),JoinTree_1.D1_INSTALL_EVT,BO_STATUS_CD,,
+1.) Install Event,Status Reason (Install Event),JoinTree_1.D1_INSTALL_EVT,BO_STATUS_REASON_CD,,
+1.) Install Event,Business Object (Install Event),JoinTree_1.D1_INSTALL_EVT,BUS_OBJ_CD,,
+1.) Install Event,Create Date/Time (Install Event),JoinTree_1.D1_INSTALL_EVT,CRE_DTTM,,
+1.) Install Event,Installation Date/Time (Install Event),JoinTree_1.D1_INSTALL_EVT,D1_INSTALL_DTTM,,
+1.) Install Event,Removal Date/Time (Install Event),JoinTree_1.D1_INSTALL_EVT,D1_REMOVAL_DTTM,,
+1.) Install Event,Service Point ID (Install Event),JoinTree_1.D1_INSTALL_EVT,D1_SP_ID,,
+1.) Install Event,Device Configuration (Install Event),JoinTree_1.D1_INSTALL_EVT,DEVICE_CONFIG_ID,,
+1.) Install Event,Install Event ID,JoinTree_1.D1_INSTALL_EVT,INSTALL_EVT_ID,,
+1.) Install Event,Installation Constant (Install Event),JoinTree_1.D1_INSTALL_EVT,INSTALLATION_CONST,,
+1.) Install Event,Status Date/Time (Install Event),JoinTree_1.D1_INSTALL_EVT,STATUS_UPD_DTTM,,
+1.) Service Point Equipment,Comments,JoinTree_1.D1_SP_EQPMNT,COMMENTS,,
+1.) Service Point Equipment,Device ID,JoinTree_1.D1_SP_EQPMNT,D1_DEVICE_ID,,
+1.) Service Point Equipment,Installation Date/Time (SP Equipment),JoinTree_1.D1_SP_EQPMNT,D1_INSTALL_DTTM,,
+1.) Service Point Equipment,Removal Date/Time (SP Equipment),JoinTree_1.D1_SP_EQPMNT,D1_REMOVAL_DTTM,,
+1.) Service Point Equipment,Service Point ID (SP Equipment),JoinTree_1.D1_SP_EQPMNT,D1_SP_ID,,
+1.) Service Point Equipment,Equipment Count (SP Equipment),JoinTree_1.D1_SP_EQPMNT,EQPMNT_CNT,,
+1.) Equipment,Status (Equipment),JoinTree_1.D1_DVC_2,BO_STATUS_CD,,
+1.) Equipment,Business Object (Equipment),JoinTree_1.D1_DVC_2,BUS_OBJ_CD,,
+1.) Equipment,Create Date/Time (Equipment),JoinTree_1.D1_DVC_2,CRE_DTTM,,
+1.) Equipment,Device ID (Equipment),JoinTree_1.D1_DVC_2,D1_DEVICE_ID,,
+1.) Equipment,Model (Equipment),JoinTree_1.D1_DVC_2,D1_MODEL_CD,,
+1.) Equipment,Device Type (Equipment),JoinTree_1.D1_DVC_2,DEVICE_TYPE_CD,,
+1.) Equipment,Manufacturer (Equpiment),JoinTree_1.D1_DVC_2,MANUFACTURER_CD,,
+1.) Equipment,Status Date/Time (Equipment),JoinTree_1.D1_DVC_2,STATUS_UPD_DTTM,,
+1.) Premise,Address,JoinTree_1.CI_PREM,ADDRESS1,,
+1.) Premise,Address Uppercase,JoinTree_1.CI_PREM,ADDRESS1_UPR,,
+1.) Premise,Address 2,JoinTree_1.CI_PREM,ADDRESS2,,
+1.) Premise,Address 3,JoinTree_1.CI_PREM,ADDRESS3,,
+1.) Premise,Address 4,JoinTree_1.CI_PREM,ADDRESS4,,
+1.) Premise,CIS Division,JoinTree_1.CI_PREM,CIS_DIVISION,,
+1.) Premise,City,JoinTree_1.CI_PREM,CITY,,
+1.) Premise,City Uppercase,JoinTree_1.CI_PREM,CITY_UPR,,
+1.) Premise,Country,JoinTree_1.CI_PREM,COUNTRY,,
+1.) Premise,County,JoinTree_1.CI_PREM,COUNTY,,
+1.) Premise,Geographical Code,JoinTree_1.CI_PREM,GEO_CODE,,
+1.) Premise,House Type,JoinTree_1.CI_PREM,HOUSE_TYPE,,
+1.) Premise,In City Limit,JoinTree_1.CI_PREM,IN_CITY_LIMIT,,
+1.) Premise,Key ID,JoinTree_1.CI_PREM,KEY_ID,,
+1.) Premise,Key,JoinTree_1.CI_PREM,KEY_SW,,
+1.) Premise,Landlord Agreement ID,JoinTree_1.CI_PREM,LL_ID,,
+1.) Premise,Life Support / Sensitive Load Details,JoinTree_1.CI_PREM,LS_SL_DESCR,,
+1.) Premise,Life Support / Sensitive Load,JoinTree_1.CI_PREM,LS_SL_FLG,,
+1.) Premise,Mailing Address,JoinTree_1.CI_PREM,MAIL_ADDR_SW,,
+1.) Premise,Meter Read Instruction,JoinTree_1.CI_PREM,MR_INSTR_CD,,
+1.) Premise,Instruction Details,JoinTree_1.CI_PREM,MR_INSTR_DETAILS,,
+1.) Premise,Meter Read Warning,JoinTree_1.CI_PREM,MR_WARN_CD,,
+1.) Premise,Number 1,JoinTree_1.CI_PREM,NUM1,,
+1.) Premise,Number 2,JoinTree_1.CI_PREM,NUM2,,
+1.) Premise,OK to Enter,JoinTree_1.CI_PREM,OK_TO_ENTER_SW,,
+1.) Premise,Postal,JoinTree_1.CI_PREM,POSTAL,,
+1.) Premise,Premise ID,JoinTree_1.CI_PREM,PREM_ID,,
+1.) Premise,Premise Type,JoinTree_1.CI_PREM,PREM_TYPE_CD,,
+1.) Premise,Parent Premise ID,JoinTree_1.CI_PREM,PRNT_PREM_ID,,
+1.) Premise,State,JoinTree_1.CI_PREM,STATE,,
+1.) Premise,Time Zone (Premise),JoinTree_1.CI_PREM,TIME_ZONE_CD,,
+1.) Premise,Trend Area,JoinTree_1.CI_PREM,TREND_AREA_CD,,
+1.) Descriptions,Access Group Description,JoinTree_1.CI_ACC_GRP_L,DESCR,,
+1.) Descriptions,Arming Required Description,JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,Arming Status Description,JoinTree_1.CI_LOOKUP_VAL_L_3,DESCR,,
+1.) Descriptions,Business Object Description (Device),JoinTree_1.F1_BUS_OBJ_L,DESCR,,
+1.) Descriptions,Business Object Description (Device Config),JoinTree_1.F1_BUS_OBJ_L_1,DESCR,,
+1.) Descriptions,Business Object Description (Equipment),JoinTree_1.F1_BUS_OBJ_L_5,DESCR,,
+1.) Descriptions,Business Object Description  (Install Event),JoinTree_1.F1_BUS_OBJ_L_2,DESCR,,
+1.) Descriptions,Command Set Description,JoinTree_1.D1_COMMAND_SET_L,DESCR100,,
+1.) Descriptions,Device Configuration Type Description,JoinTree_1.D1_DVC_CFG_TYPE_L,DESCR100,,
+1.) Descriptions,Device Type Description (Device),JoinTree_1.D1_DVC_TYPE_L,DESCR100,,
+1.) Descriptions,Device Type Description (Equipment),JoinTree_1.D1_DVC_TYPE_L_2,DESCR100,,
+1.) Descriptions,Head-End Registration Status Description,JoinTree_1.CI_LOOKUP_VAL_L_2,DESCR,,
+1.) Descriptions,Incoming Data Shift Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Manufacturer Description (Device),JoinTree_1.D1_MANUFACTURER_L,DESCR100,,
+1.) Descriptions,Manufacturer Description (Equipment),JoinTree_1.D1_MANUFACTURER_L_2,DESCR100,,
+1.) Descriptions,Meter Read Instruction Description,JoinTree_1.CI_MR_INSTR_L,DESCR,,
+1.) Descriptions,Meter Read Warning,JoinTree_1.CI_MR_WARN_L,DESCR,,
+1.) Descriptions,Model Description (Device),JoinTree_1.D1_MODEL_L,DESCR100,,
+1.) Descriptions,Model Description (Equipment),JoinTree_1.D1_MODEL_L_3,DESCR100,,
+1.) Descriptions,MXU Type Description,JoinTree_1.CI_CHAR_VAL_L,DESCR,,
+1.) Descriptions,Premise Type Description,JoinTree_1.CI_PREM_TYPE_L,DESCR,,
+1.) Descriptions,SA Status Description,JoinTree_1.CI_LOOKUP_VAL_L_8,DESCR,,
+1.) Descriptions,Service Provider Description,JoinTree_1.D1_SPR_L,DESCR100,,
+1.) Descriptions,State Description,JoinTree_1.CI_STATE_L,DESCR,,
+1.) Descriptions,Status Description (Device),JoinTree_1.F1_BUS_OBJ_STATUS_L,DESCR,,
+1.) Descriptions,Status Description (Device Config),JoinTree_1.F1_BUS_OBJ_STATUS_L_1,DESCR,,
+1.) Descriptions,Status Description (Equipment),JoinTree_1.F1_BUS_OBJ_STATUS_L_6,DESCR,,
+1.) Descriptions,Status Description (Install Event),JoinTree_1.F1_BUS_OBJ_STATUS_L_2,DESCR,,
+1.) Descriptions,Status Reason Description (Device),JoinTree_1.F1_BUS_OBJ_STATUS_RSN_L,DESCR,,
+1.) Descriptions,Status Reason Description (Device Config),JoinTree_1.F1_BUS_OBJ_STATUS_RSN_L_1,DESCR,,
+1.) Descriptions,Status Reason Description (Install Event),JoinTree_1.F1_BUS_OBJ_STATUS_RSN_L_2,DESCR,,
+1.) Descriptions,Time Zone Description (Device Config),JoinTree_1.CI_TIME_ZONE_L,DESCR,,
+1.) Descriptions,Time Zone Description (Premise),JoinTree_1.CI_TIME_ZONE_L_1,DESCR,,
+1.) Descriptions,Trend Area Description,JoinTree_1.CI_TREND_AREA_L,DESCR,,
+1.) Formulas,Account ID,JoinTree_1.CMS_DVC_ACCT,ACCT_ID,,
+1.) Formulas,Distinct Device Configuration,JoinTree_1,DEVICE_CONFIG_ID_DISTINCT,,
+1.) Formulas,Distinct Device ID,JoinTree_1,DEVICE_ID_DISTINCT,,
+1.) Formulas,Distinct Install Event ID,JoinTree_1,INSTALL_EVT_ID_DISTINCT,,
+1.) Formulas,Is Effective (Device Config),JoinTree_1,DVC_CFG_EFFECTIVE,,
+1.) Formulas,Is Latest (Install Event),JoinTree_1,IEVT_LATEST,,
+1.) Formulas,Name,JoinTree_1.CI_PER_NAME,ENTITY_NAME_UPR,,
+2.) Device,Access Group,JoinTree_2.D1_DVC_1,ACCESS_GRP_CD,,
+2.) Device,Arming Required,JoinTree_2.D1_DVC_1,ARMING_REQ_FLG,,
+2.) Device,Status (Device),JoinTree_2.D1_DVC_1,BO_STATUS_CD,,
+2.) Device,Status Reason (Device),JoinTree_2.D1_DVC_1,BO_STATUS_REASON_CD,,
+2.) Device,Business Object (Device),JoinTree_2.D1_DVC_1,BUS_OBJ_CD,,
+2.) Device,Create Date/Time (Device),JoinTree_2.D1_DVC_1,CRE_DTTM,,
+2.) Device,Command Set,JoinTree_2.D1_DVC_1,D1_CMD_SET_CD,,
+2.) Device,Device ID,JoinTree_2.D1_DVC_1,D1_DEVICE_ID,,
+2.) Device,Device Type,JoinTree_2.D1_DVC_1,DEVICE_TYPE_CD,,
+2.) Device,Manufacturer,JoinTree_2.D1_DVC_1,MANUFACTURER_CD,,
+2.) Device,Model,JoinTree_2.D1_DVC_1,D1_MODEL_CD,,
+2.) Device,Head-End Registration Status,JoinTree_2.D1_DVC_1,HEAD_END_REGISTR_STATUS_FLG,,
+2.) Device,Incoming Data Shift,JoinTree_2.D1_DVC_1,IN_DATA_SHIFT_FLG,,
+2.) Device,Service Provider (Device),JoinTree_2.D1_DVC_1,D1_SPR_CD,,
+2.) Device,Status Date/Time,JoinTree_2.D1_DVC_1,STATUS_UPD_DTTM,,
+2.) Device Details,Asset ID,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,ASSET_ID,,
+2.) Device Details,Badge Number,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,BADGE_NUMBER,,
+2.) Device Details,Configuration,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,CONFIGURATION,,
+2.) Device Details,External ID,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,EXTERNAL_ID,,
+2.) Device Details,Internal Meter Number,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,INTERNAL_METER_NUMBER,,
+2.) Device Details,Latest Status,JoinTree_2.CMS_D1_DVC_BODA_VW_1,STATUS,,
+2.) Device Details,MDM External ID,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,MDM_EXTERNAL_ID,,
+2.) Device Details,Name (Device),JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,NAME,,
+2.) Device Details,Neuron ID,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,NEURON_ID,,
+2.) Device Details,NIC ID,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,NIC_ID,,
+2.) Device Details,NIC Serial Number,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,NIC_SERIAL_NUMBER,,
+2.) Device Details,Pallet Number,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,PALLET_NUMBER,,
+2.) Device Details,Retirement Date/Time,JoinTree_2.CMS_D1_DVC_BODA_VW_1,RETIREMENT_DTTM,,
+2.) Device Details,Serial Number,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,SERIAL_NUMBER,,
+2.) Device Details,Specification,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,SPECIFICATION,,
+2.) Device Details,Utility Device ID,JoinTree_2.CMS_D1_DVC_IDENTIFIER_VW_1,UTILITY_DEVICE_ID,,
+2.) Device Event,Status (Device Event),JoinTree_2.D1_DVC_EVT,BO_STATUS_CD,,
+2.) Device Event,Status Reason (Device Event),JoinTree_2.D1_DVC_EVT,BO_STATUS_REASON_CD,,
+2.) Device Event,Business Object (Device Event),JoinTree_2.D1_DVC_EVT,BUS_OBJ_CD,,
+2.) Device Event,Create Date/Time (Device Event),JoinTree_2.D1_DVC_EVT,CRE_DTTM,,
+2.) Device Event,Device ID,JoinTree_2.D1_DVC_EVT,D1_DEVICE_ID,,
+2.) Device Event,Service Provider (Device Event),JoinTree_2.D1_DVC_EVT,D1_SPR_CD,,
+2.) Device Event,Device Event Date/Time,JoinTree_2.D1_DVC_EVT,DVC_EVT_DTTM,,
+2.) Device Event,Device Event End Date/Time,JoinTree_2.D1_DVC_EVT,DVC_EVT_END_DTTM,,
+2.) Device Event,Device Event ID,JoinTree_2.D1_DVC_EVT,DVC_EVT_ID,,
+2.) Device Event,Device Event Type,JoinTree_2.D1_DVC_EVT,DVC_EVT_TYPE_CD,,
+2.) Device Event,External Event Name,JoinTree_2.D1_DVC_EVT,EXT_EVT_NAME_FLG,,
+2.) Device Event,Retention Period,JoinTree_2.D1_DVC_EVT,RETENTION_PERIOD,,
+2.) Device Event,Status Date/Time,JoinTree_2.D1_DVC_EVT,STATUS_UPD_DTTM,,
+2.) Descriptions,Access Group Description,JoinTree_2.CI_ACC_GRP_L_1,DESCR,,
+2.) Descriptions,Arming Required Description,JoinTree_2.CI_LOOKUP_VAL_L_5,DESCR,,
+2.) Descriptions,Business Object Description (Device),JoinTree_2.F1_BUS_OBJ_L_3,DESCR,,
+2.) Descriptions,Business Object Description (Device Event),JoinTree_2.F1_BUS_OBJ_L_4,DESCR,,
+2.) Descriptions,Command Set Description,JoinTree_2.D1_COMMAND_SET_L_1,DESCR100,,
+2.) Descriptions,Device Event Type Description,JoinTree_2.D1_DVC_EVT_TYPE_L,DESCR100,,
+2.) Descriptions,Device Type Description,JoinTree_2.D1_DVC_TYPE_L_1,DESCR100,,
+2.) Descriptions,External Event Name Description,JoinTree_2.CI_LOOKUP_VAL_L_7,DESCR,,
+2.) Descriptions,Head-End Registration Status Description,JoinTree_2.CI_LOOKUP_VAL_L_6,DESCR,,
+2.) Descriptions,Incoming Data Shift Description,JoinTree_2.CI_LOOKUP_VAL_L_4,DESCR,,
+2.) Descriptions,Manufacturer Description,JoinTree_2.D1_MANUFACTURER_L_1,DESCR100,,
+2.) Descriptions,Model Description,JoinTree_2.D1_MODEL_L_1,DESCR100,,
+2.) Descriptions,Service Provider Description (Device),JoinTree_2.D1_SPR_L_1,DESCR100,,
+2.) Descriptions,Service Provider Description (Device Event),JoinTree_2.D1_SPR_L_2,DESCR100,,
+2.) Descriptions,Status Description (Device),JoinTree_2.F1_BUS_OBJ_STATUS_L_4,DESCR,,
+2.) Descriptions,Status Description (Device Event),JoinTree_2.F1_BUS_OBJ_STATUS_L_5,DESCR,,
+2.) Descriptions,Status Reason Description (Device),JoinTree_2.F1_BUS_OBJ_STATUS_RSN_L_3,DESCR,,
+2.) Descriptions,Status Reason Description (Device Event),JoinTree_2.F1_BUS_OBJ_STATUS_RSN_L_4,DESCR,,
+2.) Formulas,Distinct Device ID,JoinTree_2,D1_DEVICE_ID_DISTINCT,,
+2.) Formulas,Distinct Device Event ID,JoinTree_2,DVC_EVT_ID_DISTINCT,,
+2.) Formulas,Latest Device Event Date/Time,JoinTree_2.CMS_DVC_EVT_LATEST,LATEST_DEVT_DTTM,,
+2.) Formulas,Is Latest (Device Event),JoinTree_2,DVC_EVT_LATEST,,

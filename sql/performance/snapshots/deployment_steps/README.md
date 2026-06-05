@@ -89,10 +89,45 @@ without keeping a local terminal session open.
 After the scheduled start window has elapsed, use:
 
 - `03b_capture_initial_full_history_job_status.sql`
-- `04_validate_all_active_snapshots.sql`
+- `baseline-and-validate` compound step (recommended)
+
+```bash
+python3 scripts/local/run_snapshot_rollout_step.py --step baseline-and-validate --clients newark
+```
+
+This chains baseline status capture, baseline job gate, full validation, and install
+sanity gate. It exits non-zero and writes a failure marker under
+`deploy/snapshot_rollout_logs/` when anything fails.
 
 Do not deploy the rolling-window procedures or recurring 6-hour jobs until the
-baseline job status and validation output are acceptable.
+baseline job gate and validation output are acceptable.
+
+## Install validation compound steps
+
+Use these for first-time client install QA. They run the full validation pack and
+fail fast when baseline jobs or snapshot sanity checks do not pass.
+
+| Step | When to use |
+| --- | --- |
+| `baseline-and-validate` | After baseline one-time jobs finish |
+| `operational-and-validate` | After manual operational refresh during cutover |
+| `cutover-and-validate` | Deploy rolling procs, run operational refresh, validate |
+
+Examples:
+
+```bash
+python3 scripts/local/run_snapshot_rollout_step.py --step baseline-and-validate --clients newark
+python3 scripts/local/run_snapshot_rollout_step.py --step cutover-and-validate --clients newark
+```
+
+Gate scripts:
+
+- `03d_baseline_jobs_ready_gate.sql` — fails when any baseline one-time job is not `SUCCEEDED`
+- `04b_snapshot_install_validation_gate.sql` — fails on empty tables or duplicate grain keys
+
+Logs for compound steps:
+
+- `deploy/snapshot_rollout_logs/<client>/<compound_step>/`
 
 ## Scheduling guidance
 

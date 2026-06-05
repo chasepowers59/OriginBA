@@ -1,0 +1,213 @@
+section,domain_name,Bill_Segment___Domain
+section,workstream,Billing and Rates
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_BILL,CI_BILL
+CI_ACCT,CI_ACCT
+CI_ACCT_PER,CI_ACCT_PER
+CI_PER_NAME,CI_PER_NAME
+CI_BILL_CYC_L,CI_BILL_CYC_L
+CI_BILL_CYC_L_1,CI_BILL_CYC_L
+CI_BILL_CYC_L_2,CI_BILL_CYC_L
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_2,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_3,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_4,CI_LOOKUP_VAL_L
+SC_USER,SC_USER
+CI_ACCT_MGMT_GR_L,CI_ACCT_MGMT_GR_L
+CI_COLL_CL_L,CI_COLL_CL_L
+CI_CUST_CL_L,CI_CUST_CL_L
+CI_BUD_PLAN_L,CI_BUD_PLAN_L
+CI_BSEG,CI_BSEG
+CI_BSEG_CALC,CI_BSEG_CALC
+CI_BSEG_READ,CI_BSEG_READ
+CI_BSEG_SQ,CI_BSEG_SQ
+CI_BILL_CAN_RSN_L,CI_BILL_CAN_RSN_L
+CI_RS_L,CI_RS_L
+CI_UOM_L,CI_UOM_L
+CI_UOM_L_1,CI_UOM_L
+CI_UOM_L_2,CI_UOM_L
+CI_TOU_L,CI_TOU_L
+CI_TOU_L_1,CI_TOU_L
+CI_TOU_L_2,CI_TOU_L
+CI_SQI_L,CI_SQI_L
+CI_SQI_L_1,CI_SQI_L
+CI_SQI_L_2,CI_SQI_L
+JoinTree_1,CI_BILL
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_BILL,CI_BSEG,CI_BILL.BILL_ID == CI_BSEG.BILL_ID
+JoinTree_1,2,inner,CI_BSEG,CI_BSEG_READ,CI_BSEG.BSEG_ID == CI_BSEG_READ.BSEG_ID
+JoinTree_1,3,inner,CI_BSEG,CI_BSEG_SQ,CI_BSEG.BSEG_ID == CI_BSEG_SQ.BSEG_ID
+JoinTree_1,4,inner,CI_BSEG,CI_BSEG_CALC,CI_BSEG.BSEG_ID == CI_BSEG_CALC.BSEG_ID
+JoinTree_1,5,inner,CI_BILL,CI_ACCT,CI_BILL.ACCT_ID == CI_ACCT.ACCT_ID
+JoinTree_1,6,inner,CI_ACCT,CI_ACCT_PER,CI_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_1,7,inner,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
+JoinTree_1,8,leftOuter,CI_BILL,CI_BILL_CYC_L,CI_BILL.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,9,inner,CI_BILL,CI_LOOKUP_VAL_L,CI_BILL.BILL_STAT_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'BILL_STAT_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,10,leftOuter,CI_BILL,SC_USER,CI_BILL.APAY_STOP_USER_ID == SC_USER.USER_ID
+JoinTree_1,11,leftOuter,CI_BILL,CI_LOOKUP_VAL_L_1,CI_BILL.DOC_TYPE_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'DOC_TYPE_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,12,leftOuter,CI_ACCT,CI_BILL_CYC_L_1,CI_ACCT.BILL_CYC_CD == CI_BILL_CYC_L_1.BILL_CYC_CD and CI_BILL_CYC_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,13,leftOuter,CI_ACCT,CI_ACCT_MGMT_GR_L,CI_ACCT.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,14,inner,CI_ACCT,CI_COLL_CL_L,CI_ACCT.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,15,inner,CI_ACCT,CI_CUST_CL_L,CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,16,leftOuter,CI_ACCT,CI_BUD_PLAN_L,CI_ACCT.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,17,leftOuter,CI_BSEG,CI_BILL_CYC_L_2,CI_BSEG.BILL_CYC_CD == CI_BILL_CYC_L_2.BILL_CYC_CD and CI_BILL_CYC_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,18,leftOuter,CI_BSEG,CI_BILL_CAN_RSN_L,CI_BSEG.CAN_RSN_CD == CI_BILL_CAN_RSN_L.CAN_RSN_CD and CI_BILL_CAN_RSN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,19,inner,CI_BSEG,CI_LOOKUP_VAL_L_2,CI_BSEG.BSEG_STAT_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'BSEG_STAT_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,20,leftOuter,CI_BSEG_CALC,CI_RS_L,CI_BSEG_CALC.RS_CD == CI_RS_L.RS_CD and CI_RS_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,21,inner,CI_BSEG_READ,CI_LOOKUP_VAL_L_3,CI_BSEG_READ.USAGE_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'USAGE_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_1,22,leftOuter,CI_BSEG_READ,CI_LOOKUP_VAL_L_4,CI_BSEG_READ.HOW_TO_USE_FLG == CI_LOOKUP_VAL_L_4.FIELD_VALUE and CI_LOOKUP_VAL_L_4.FIELD_NAME == 'HOW_TO_USE_FLG' and CI_LOOKUP_VAL_L_4.LANGUAGE_CD == 'ENG'
+JoinTree_1,23,leftOuter,CI_BSEG_READ,CI_UOM_L,CI_BSEG_READ.UOM_CD == CI_UOM_L.UOM_CD and CI_UOM_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,24,leftOuter,CI_BSEG_READ,CI_UOM_L_1,CI_BSEG_READ.FINAL_UOM_CD == CI_UOM_L_1.UOM_CD and CI_UOM_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,25,leftOuter,CI_BSEG_READ,CI_TOU_L,CI_BSEG_READ.TOU_CD == CI_TOU_L.TOU_CD and CI_TOU_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,26,leftOuter,CI_BSEG_READ,CI_TOU_L_1,CI_BSEG_READ.FINAL_TOU_CD == CI_TOU_L_1.TOU_CD and CI_TOU_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,27,leftOuter,CI_BSEG_READ,CI_SQI_L,CI_BSEG_READ.SQI_CD == CI_SQI_L.SQI_CD and CI_SQI_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,28,leftOuter,CI_BSEG_READ,CI_SQI_L_1,CI_BSEG_READ.FINAL_SQI_CD == CI_SQI_L_1.SQI_CD and CI_SQI_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,29,leftOuter,CI_BSEG_SQ,CI_UOM_L_2,CI_BSEG_SQ.UOM_CD == CI_UOM_L_2.UOM_CD and CI_UOM_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,30,leftOuter,CI_BSEG_SQ,CI_TOU_L_2,CI_BSEG_SQ.TOU_CD == CI_TOU_L_2.TOU_CD and CI_TOU_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,31,leftOuter,CI_BSEG_SQ,CI_SQI_L_2,CI_BSEG_SQ.SQI_CD == CI_SQI_L_2.SQI_CD and CI_SQI_L_2.LANGUAGE_CD == 'ENG'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Bill,Account ID,JoinTree_1.CI_BILL,ACCT_ID,,
+1.) Bill,Allow Reopen,JoinTree_1.CI_BILL,ALLOW_REOPEN_SW,,
+1.) Bill,Seq Bill Number,JoinTree_1.CI_BILL,ALT_BILL_ID,,CountAll
+1.) Bill,Auto Pay Amount,JoinTree_1.CI_BILL,APAY_AMT,,
+1.) Bill,Auto Pay Creation Date,JoinTree_1.CI_BILL,APAY_CRE_DT,,
+1.) Bill,Auto Pay Stop Amount,JoinTree_1.CI_BILL,APAY_STOP_AMT,,
+1.) Bill,Auto Pay Stop Creation Date,JoinTree_1.CI_BILL,APAY_STOP_CRE_DT,,
+1.) Bill,Auto Pay Stop Date/Time,JoinTree_1.CI_BILL,APAY_STOP_DTTM,,
+1.) Bill,Auto Pay Stop User Id,JoinTree_1.CI_BILL,APAY_STOP_USER_ID,,
+1.) Bill,Archived,JoinTree_1.CI_BILL,ARCHIVE_SW,,
+1.) Bill,Bill Cycle (Bill),JoinTree_1.CI_BILL,BILL_CYC_CD,,
+1.) Bill,Bill Date,JoinTree_1.CI_BILL,BILL_DT,,
+1.) Bill,Bill ID                       ,JoinTree_1.CI_BILL,BILL_ID,,
+1.) Bill,Digitial Bill Signature,JoinTree_1.CI_BILL,BILL_SIGN,,
+1.) Bill,Bill Status,JoinTree_1.CI_BILL,BILL_STAT_FLG,,
+1.) Bill,Completion Date/Time,JoinTree_1.CI_BILL,COMPLETE_DTTM,,
+1.) Bill,CR Note from Bill ID,JoinTree_1.CI_BILL,CR_NOTE_FR_BILL_ID,,
+1.) Bill,Create Date/Time,JoinTree_1.CI_BILL,CRE_DTTM,,
+1.) Bill,Document Number,JoinTree_1.CI_BILL,DOC_ID,,
+1.) Bill,Document Type,JoinTree_1.CI_BILL,DOC_TYPE_FLG,,
+1.) Bill,Due Date,JoinTree_1.CI_BILL,DUE_DT,,
+1.) Bill,Late Payment Charge Date,JoinTree_1.CI_BILL,LATE_PAY_CHARGE_DT,,
+1.) Bill,Late Payment Charge,JoinTree_1.CI_BILL,LATE_PAY_CHARGE_SW,,
+1.) Bill,Next Credit Review Date,JoinTree_1.CI_BILL,NEXT_CR_RVW_DT,,
+1.) Bill,Off Cycle Bill Generator ID,JoinTree_1.CI_BILL,OFFCYC_BGEN_ID,,
+1.) Bill,Window Start Date,JoinTree_1.CI_BILL,WIN_START_DT,,
+1.) Bill Segment,Bill Cycle (Bill Segment),JoinTree_1.CI_BSEG,BILL_CYC_CD,,
+1.) Bill Segment,Bill ID                       ,JoinTree_1.CI_BSEG,BILL_ID,,
+1.) Bill Segment,Bill Scenario ID,JoinTree_1.CI_BSEG,BILL_SCNR_ID,,
+1.) Bill Segment,Bill Segment ID,JoinTree_1.CI_BSEG,BSEG_ID,,
+1.) Bill Segment,Bill Segment Status,JoinTree_1.CI_BSEG,BSEG_STAT_FLG,,
+1.) Bill Segment,Cancel Bill Segment ID,JoinTree_1.CI_BSEG,CAN_BSEG_ID,,
+1.) Bill Segment,Cancel Reason,JoinTree_1.CI_BSEG,CAN_RSN_CD,,
+1.) Bill Segment,Closing Bill Segment,JoinTree_1.CI_BSEG,CLOSING_BSEG_SW,,
+1.) Bill Segment,Create Date/Time,JoinTree_1.CI_BSEG,CRE_DTTM,,
+1.) Bill Segment,End Date,JoinTree_1.CI_BSEG,END_DT,,
+1.) Bill Segment,Estimate,JoinTree_1.CI_BSEG,EST_SW,,
+1.) Bill Segment,Item Override,JoinTree_1.CI_BSEG,ITEM_OVERRIDE_SW,,
+1.) Bill Segment,Master Bill Segment Id,JoinTree_1.CI_BSEG,MASTER_BSEG_ID,,
+1.) Bill Segment,MDM End Date/Time,JoinTree_1.CI_BSEG,MDM_END_DTTM,,
+1.) Bill Segment,MDM Start Date/Time,JoinTree_1.CI_BSEG,MDM_START_DTTM,,
+1.) Bill Segment,Premise ID,JoinTree_1.CI_BSEG,PREM_ID,,
+1.) Bill Segment,Quote Detail ID,JoinTree_1.CI_BSEG,QUOTE_DTL_ID,,
+1.) Bill Segment,Rebill Segment ID,JoinTree_1.CI_BSEG,REBILL_SEG_ID,,
+1.) Bill Segment,Service Agreement,JoinTree_1.CI_BSEG,SA_ID,,
+1.) Bill Segment,SQ Override,JoinTree_1.CI_BSEG,SQ_OVERRIDE_SW,,
+1.) Bill Segment,Start Date,JoinTree_1.CI_BSEG,START_DT,,
+1.) Bill Segment,Status Change Date/Time,JoinTree_1.CI_BSEG,STAT_CHG_DTTM,,
+1.) Bill Segment,Window Start Date,JoinTree_1.CI_BSEG,WIN_START_DT,,
+1.1) Bill Segment Calc Header (Mutually Exclusive),Billable Charge ID,JoinTree_1.CI_BSEG_CALC,BILLABLE_CHG_ID,,
+1.1) Bill Segment Calc Header (Mutually Exclusive),Bill Segment ID,JoinTree_1.CI_BSEG_CALC,BSEG_ID,,
+1.1) Bill Segment Calc Header (Mutually Exclusive),Calculated Amount,JoinTree_1.CI_BSEG_CALC,CALC_AMT,,
+1.1) Bill Segment Calc Header (Mutually Exclusive),Currency Code,JoinTree_1.CI_BSEG_CALC,CURRENCY_CD,,
+1.1) Bill Segment Calc Header (Mutually Exclusive),Description on Bill,JoinTree_1.CI_BSEG_CALC,DESCR_ON_BILL,,
+1.1) Bill Segment Calc Header (Mutually Exclusive),Effective Date,JoinTree_1.CI_BSEG_CALC,EFFDT,,
+1.1) Bill Segment Calc Header (Mutually Exclusive),End Date,JoinTree_1.CI_BSEG_CALC,END_DT,,
+1.1) Bill Segment Calc Header (Mutually Exclusive),Header Sequence,JoinTree_1.CI_BSEG_CALC,HEADER_SEQ,Dimension,CountAll
+1.1) Bill Segment Calc Header (Mutually Exclusive),Rate Schedule,JoinTree_1.CI_BSEG_CALC,RS_CD,,
+1.1) Bill Segment Calc Header (Mutually Exclusive),Start Date,JoinTree_1.CI_BSEG_CALC,START_DT,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Bill Segment ID,JoinTree_1.CI_BSEG_READ,BSEG_ID,,
+1.2) Bill Segment Register Read (Mutually Exclusive),End Read Date/Time,JoinTree_1.CI_BSEG_READ,END_READ_DTTM,,
+1.2) Bill Segment Register Read (Mutually Exclusive),End Register Reading ID,JoinTree_1.CI_BSEG_READ,END_REG_READ_ID,,
+1.2) Bill Segment Register Read (Mutually Exclusive),End Register Reading,JoinTree_1.CI_BSEG_READ,END_REG_READING,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Register Quantity,JoinTree_1.CI_BSEG_READ,FINAL_REG_QTY,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Final Service Quantity ID,JoinTree_1.CI_BSEG_READ,FINAL_SQI_CD,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Final Time of Use (BSEG Read),JoinTree_1.CI_BSEG_READ,FINAL_TOU_CD,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Final Unit of Measure (BSEG Read),JoinTree_1.CI_BSEG_READ,FINAL_UOM_CD,,
+1.2) Bill Segment Register Read (Mutually Exclusive),How To Use                    ,JoinTree_1.CI_BSEG_READ,HOW_TO_USE_FLG,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Measures Peak Qty,JoinTree_1.CI_BSEG_READ,MSR_PEAK_QTY_SW,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Measured Quantity,JoinTree_1.CI_BSEG_READ,MSR_QTY,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Register Constant,JoinTree_1.CI_BSEG_READ,REG_CONST,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Sequence,JoinTree_1.CI_BSEG_READ,SEQNO,Dimension,CountAll
+1.2) Bill Segment Register Read (Mutually Exclusive),Service Point ID,JoinTree_1.CI_BSEG_READ,SP_ID,,
+1.2) Bill Segment Register Read (Mutually Exclusive),SQI (BSEG Read),JoinTree_1.CI_BSEG_READ,SQI_CD,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Start Read Date/Time,JoinTree_1.CI_BSEG_READ,START_READ_DTTM,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Start Reg Read ID     ,JoinTree_1.CI_BSEG_READ,START_REG_READ_ID,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Start Register Reading,JoinTree_1.CI_BSEG_READ,START_REG_READING,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Time of Use (BSEG Read),JoinTree_1.CI_BSEG_READ,TOU_CD,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Unit of Measure (BSEG Read),JoinTree_1.CI_BSEG_READ,UOM_CD,,
+1.2) Bill Segment Register Read (Mutually Exclusive),How To Use (SP)               ,JoinTree_1.CI_BSEG_READ,USAGE_FLG,,
+1.2) Bill Segment Register Read (Mutually Exclusive),Use Percent,JoinTree_1.CI_BSEG_READ,USE_PCT,,
+1.3) Bill Segment Service Quantity (Mutually Exclusive),Billable Service Quantity,JoinTree_1.CI_BSEG_SQ,BILL_SQ,,
+1.3) Bill Segment Service Quantity (Mutually Exclusive),Bill Segment ID,JoinTree_1.CI_BSEG_SQ,BSEG_ID,,
+1.3) Bill Segment Service Quantity (Mutually Exclusive),Initial Service Quantity,JoinTree_1.CI_BSEG_SQ,INIT_SQ,,
+1.3) Bill Segment Service Quantity (Mutually Exclusive),SQI (BSEG SQ),JoinTree_1.CI_BSEG_SQ,SQI_CD,,
+1.3) Bill Segment Service Quantity (Mutually Exclusive),Time of Use (BSEG SQ),JoinTree_1.CI_BSEG_SQ,TOU_CD,,
+1.3) Bill Segment Service Quantity (Mutually Exclusive),Unit of Measure (BSEG SQ),JoinTree_1.CI_BSEG_SQ,UOM_CD,,
+1.) Account,Access Group,JoinTree_1.CI_ACCT,ACCESS_GRP_CD,,
+1.) Account,Account ID,JoinTree_1.CI_ACCT,ACCT_ID,,
+1.) Account,Account Management Group,JoinTree_1.CI_ACCT,ACCT_MGMT_GRP_CD,,
+1.) Account,Alert Information,JoinTree_1.CI_ACCT,ALERT_INFO,,
+1.) Account,Bill After                    ,JoinTree_1.CI_ACCT,BILL_AFTER_DT,,
+1.) Account,Bill Cycle (Account),JoinTree_1.CI_ACCT,BILL_CYC_CD,,
+1.) Account,Bill Print Intercept,JoinTree_1.CI_ACCT,BILL_PRT_INTERCEPT,,
+1.) Account,Budget Plan,JoinTree_1.CI_ACCT,BUD_PLAN_CD,,
+1.) Account,CIS Division,JoinTree_1.CI_ACCT,CIS_DIVISION,,
+1.) Account,Collection Class,JoinTree_1.CI_ACCT,COLL_CL_CD,,
+1.) Account,Last Credit Review Date,JoinTree_1.CI_ACCT,CR_REVIEW_DT,,
+1.) Account,Currency Code,JoinTree_1.CI_ACCT,CURRENCY_CD,,
+1.) Account,Customer Class,JoinTree_1.CI_ACCT,CUST_CL_CD,,
+1.) Account,Internal Credit Review,JoinTree_1.CI_ACCT,INT_CR_REVIEW_SW,,
+1.) Account,Mailing Premise ID,JoinTree_1.CI_ACCT,MAILING_PREM_ID,,
+1.) Account,No Deposit Review Switch,JoinTree_1.CI_ACCT,NO_DEP_RVW_SW,,
+1.) Account,Postpone Credit Review Until,JoinTree_1.CI_ACCT,POSTPONE_CR_RVW_DT,,
+1.) Account,Protect Bill Cycle,JoinTree_1.CI_ACCT,PROTECT_CYC_SW,,
+1.) Account,Protect Division,JoinTree_1.CI_ACCT,PROTECT_DIV_SW,,
+1.) Account,Protect Mailing Premise,JoinTree_1.CI_ACCT,PROTECT_PREM_SW,,
+1.) Account,Set Up Date,JoinTree_1.CI_ACCT,SETUP_DT,,
+1.) Descriptions,Account Management Group Description,JoinTree_1.CI_ACCT_MGMT_GR_L,DESCR,,
+1.) Descriptions,Bill Cycle Description (Account),JoinTree_1.CI_BILL_CYC_L_1,DESCR,,
+1.) Descriptions,Bill Cycle Description (Bill),JoinTree_1.CI_BILL_CYC_L,DESCR,,
+1.) Descriptions,Bill Cycle Description (Bill Segment),JoinTree_1.CI_BILL_CYC_L_2,DESCR,,
+1.) Descriptions,Bill Segment Status Description,JoinTree_1.CI_LOOKUP_VAL_L_2,DESCR,,
+1.) Descriptions,Bill Status Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Budget Plan Description,JoinTree_1.CI_BUD_PLAN_L,DESCR,,
+1.) Descriptions,Cancel Reason Description,JoinTree_1.CI_BILL_CAN_RSN_L,DESCR,,
+1.) Descriptions,Collection Class Description,JoinTree_1.CI_COLL_CL_L,DESCR,,
+1.) Descriptions,Customer Class Description,JoinTree_1.CI_CUST_CL_L,DESCR,,
+1.) Descriptions,Document Type Description,JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,Final Service Quantity ID Description (BSEG Read),JoinTree_1.CI_SQI_L_1,DESCR,,
+1.) Descriptions,Final Time of Use Description (BSEG Read),JoinTree_1.CI_TOU_L_1,DESCR,,
+1.) Descriptions,Final Unit of Measure Description (BSEG Read),JoinTree_1.CI_UOM_L_1,DESCR,,
+1.) Descriptions,How To Use Description,JoinTree_1.CI_LOOKUP_VAL_L_4,DESCR,,
+1.) Descriptions,How To Use Description (SP)       ,JoinTree_1.CI_LOOKUP_VAL_L_3,DESCR,,
+1.) Descriptions,SQI Description (BSEG Read),JoinTree_1.CI_SQI_L,DESCR,,
+1.) Descriptions,SQI Description (BSEG SQ),JoinTree_1.CI_SQI_L_2,DESCR,,
+1.) Descriptions,Rate Schedule Description,JoinTree_1.CI_RS_L,DESCR,,
+1.) Descriptions,Time of Use Description (BSEG Read),JoinTree_1.CI_TOU_L,DESCR,,
+1.) Descriptions,Time of Use Description (BSEG SQ),JoinTree_1.CI_TOU_L_2,DESCR,,
+1.) Descriptions,Unit of Measure Description (BSEG Read),JoinTree_1.CI_UOM_L,DESCR,,
+1.) Descriptions,Unit of Measure Description (BSEG SQ),JoinTree_1.CI_UOM_L_2,DESCR,,
+1.) Formulas,Auto Pay Stop User Name,JoinTree_1,APAY_STOP_USER_NAME,,
+1.) Formulas,Distinct Bill ID,JoinTree_1,BILL_ID_DIST,,
+1.) Formulas,Distinct Bill Segment ID,JoinTree_1,BSEG_ID_DIST,,
+1.) Formulas,Distinct Bill Segment Calculation Header,JoinTree_1,BSEG_CALC_HEADER_DIST,,
+1.) Formulas,Distinct Bill Segment Read,JoinTree_1,BSEG_READ_DIST,,
+1.) Formulas,Distinct Bill Segment SQ,JoinTree_1,BSEG_SQ_DIST,,
+1.) Formulas,Name (Person),JoinTree_1.CI_PER_NAME,ENTITY_NAME_UPR,,

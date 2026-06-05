@@ -1,0 +1,49 @@
+section,domain_name,Payment_Header___Domain
+section,workstream,Cashiering
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_PAY_EVENT,CI_PAY_EVENT
+CI_PAY,CI_PAY
+CI_PAY_CAN_RSN_L,CI_PAY_CAN_RSN_L
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_ACCT_PER,CI_ACCT_PER
+CI_MATCH_TYPE_L,CI_MATCH_TYPE_L
+CI_PER_NAME,CI_PER_NAME
+JoinTree_1,CI_PAY
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_PAY,CI_PAY_EVENT,CI_PAY.PAY_EVENT_ID == CI_PAY_EVENT.PAY_EVENT_ID
+JoinTree_1,2,leftOuter,CI_PAY,CI_PAY_CAN_RSN_L,CI_PAY.CAN_RSN_CD == CI_PAY_CAN_RSN_L.CAN_RSN_CD and CI_PAY_CAN_RSN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,3,leftOuter,CI_PAY,CI_MATCH_TYPE_L,CI_PAY.MATCH_TYPE_CD == CI_MATCH_TYPE_L.MATCH_TYPE_CD and CI_MATCH_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,4,inner,CI_PAY,CI_LOOKUP_VAL_L,CI_PAY.PAY_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'PAY_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,5,inner,CI_PAY,CI_ACCT_PER,CI_PAY.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_1,6,inner,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM' and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Payment Header,Account ID,JoinTree_1.CI_PAY,ACCT_ID,,
+1.) Payment Header,Cancel Reason,JoinTree_1.CI_PAY,CAN_RSN_CD,,
+1.) Payment Header,Currency Code,JoinTree_1.CI_PAY,CURRENCY_CD,,
+1.) Payment Header,Match Type,JoinTree_1.CI_PAY,MATCH_TYPE_CD,,
+1.) Payment Header,Match Value,JoinTree_1.CI_PAY,MATCH_VAL,,
+1.) Payment Header,Non CIS Comments,JoinTree_1.CI_PAY,NON_CIS_COMMENT,,
+1.) Payment Header,Non CIS Name,JoinTree_1.CI_PAY,NON_CIS_NAME,,
+1.) Payment Header,Reference Number,JoinTree_1.CI_PAY,NON_CIS_REF_NBR,,
+1.) Payment Header,Payment Amount,JoinTree_1.CI_PAY,PAY_AMT,,
+1.) Payment Header,Payment Event ID,JoinTree_1.CI_PAY,PAY_EVENT_ID,,
+1.) Payment Header,Payment ID,JoinTree_1.CI_PAY,PAY_ID,,
+1.) Payment Header,Payment Status,JoinTree_1.CI_PAY,PAY_STATUS_FLG,,
+1.) Payment Event,Create Date/Time,JoinTree_1.CI_PAY_EVENT,CRE_DTTM,,
+1.) Payment Event,Document Number,JoinTree_1.CI_PAY_EVENT,DOC_ID,,
+1.) Payment Event,Payment Date,JoinTree_1.CI_PAY_EVENT,PAY_DT,,
+1.) Payment Event,Payment Event ID,JoinTree_1.CI_PAY_EVENT,PAY_EVENT_ID,,
+1.) Descriptions,Cancel Reason Description,JoinTree_1.CI_PAY_CAN_RSN_L,DESCR,,
+1.) Descriptions,Match Type Description,JoinTree_1.CI_MATCH_TYPE_L,DESCR,,
+1.) Descriptions,Payment Status Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Formulas,Distinct  Account ID,JoinTree_1,ACCT_ID_DISTINCT,,
+1.) Formulas,Distinct Payment Event ID,JoinTree_1,PAY_EVENT_ID_DISTINCT,,
+1.) Formulas,Distinct Payment ID,JoinTree_1,PAY_ID_DISTINCT,,
+1.) Formulas,Days Old,JoinTree_1,DAYS_OLD,,
+1.) Formulas,Name,JoinTree_1.CI_PER_NAME,ENTITY_NAME_UPR,,

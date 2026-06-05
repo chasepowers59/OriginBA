@@ -1,0 +1,128 @@
+section,domain_name,To_Do___Domain
+section,workstream,Common
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_TD_ENTRY,CI_TD_ENTRY
+CI_TD_TYPE_L,CI_TD_TYPE_L
+CI_ROLE_L,CI_ROLE_L
+SC_USER,SC_USER
+SC_USER_1,SC_USER
+SC_USER_2,SC_USER
+CI_PREM,CI_PREM
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_MSG_L,CI_MSG_L
+CI_PER_NAME,CI_PER_NAME
+CI_PREM_TYPE_L,CI_PREM_TYPE_L
+CI_MR_INSTR_L,CI_MR_INSTR_L
+CI_MR_WARN_L,CI_MR_WARN_L
+CI_TREND_AREA_L,CI_TREND_AREA_L
+CI_STATE_L,CI_STATE_L
+CI_TIME_ZONE_L,CI_TIME_ZONE_L
+JoinTree_1,CI_TD_ENTRY
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_TD_ENTRY,CI_TD_TYPE_L,CI_TD_ENTRY.TD_TYPE_CD == CI_TD_TYPE_L.TD_TYPE_CD and CI_TD_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,2,inner,CI_TD_ENTRY,CMS_TD_ENTRY_FKREF,CI_TD_ENTRY.TD_ENTRY_ID == CMS_TD_ENTRY_FKREF.TD_ENTRY_ID
+JoinTree_1,3,leftOuter,CMS_TD_ENTRY_FKREF,CI_PER_NAME,CMS_TD_ENTRY_FKREF.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
+JoinTree_1,4,leftOuter,CMS_TD_ENTRY_FKREF,CI_PREM,CMS_TD_ENTRY_FKREF.PREM_ID == CI_PREM.PREM_ID
+JoinTree_1,5,leftOuter,CI_TD_ENTRY,CMS_TD_ENTRY_TIMES,CI_TD_ENTRY.TD_ENTRY_ID == CMS_TD_ENTRY_TIMES.TD_ENTRY_ID
+JoinTree_1,6,leftOuter,CI_TD_ENTRY,SC_USER,CI_TD_ENTRY.ASSIGNED_TO == SC_USER.USER_ID
+JoinTree_1,7,leftOuter,CI_TD_ENTRY,SC_USER_1,CI_TD_ENTRY.ASSIGNED_USER_ID == SC_USER_1.USER_ID
+JoinTree_1,8,leftOuter,CI_TD_ENTRY,SC_USER_2,CI_TD_ENTRY.COMPLETE_USER_ID == SC_USER_2.USER_ID
+JoinTree_1,9,inner,CI_TD_ENTRY,CI_LOOKUP_VAL_L,CI_TD_ENTRY.ENTRY_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'ENTRY_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,10,inner,CI_TD_ENTRY,CI_ROLE_L,CI_TD_ENTRY.ROLE_ID == CI_ROLE_L.ROLE_ID and CI_ROLE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,11,inner,CI_TD_ENTRY,CI_MSG_L,CI_TD_ENTRY.MESSAGE_CAT_NBR == CI_MSG_L.MESSAGE_CAT_NBR and CI_TD_ENTRY.MESSAGE_NBR == CI_MSG_L.MESSAGE_NBR and CI_MSG_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,12,leftOuter,CI_PREM,CI_PREM_TYPE_L,CI_PREM.PREM_TYPE_CD == CI_PREM_TYPE_L.PREM_TYPE_CD and CI_PREM_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,13,leftOuter,CI_PREM,CI_MR_WARN_L,CI_PREM.MR_WARN_CD == CI_MR_WARN_L.MR_WARN_CD and CI_MR_WARN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,14,leftOuter,CI_PREM,CI_MR_INSTR_L,CI_PREM.MR_INSTR_CD == CI_MR_INSTR_L.MR_INSTR_CD and CI_MR_INSTR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,15,leftOuter,CI_PREM,CI_TREND_AREA_L,CI_PREM.TREND_AREA_CD == CI_TREND_AREA_L.TREND_AREA_CD and CI_TREND_AREA_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,16,leftOuter,CI_PREM,CI_STATE_L,CI_PREM.COUNTRY == CI_STATE_L.COUNTRY and CI_PREM.STATE == CI_STATE_L.STATE and CI_STATE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,17,leftOuter,CI_PREM,CI_TIME_ZONE_L,CI_PREM.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) To Do Entry,Assigned Date/Time,JoinTree_1.CI_TD_ENTRY,ASSIGNED_DTTM,,
+1.) To Do Entry,Assign to User,JoinTree_1.CI_TD_ENTRY,ASSIGNED_TO,,
+1.) To Do Entry,Assigned By User,JoinTree_1.CI_TD_ENTRY,ASSIGNED_USER_ID,,
+1.) To Do Entry,Batch Control,JoinTree_1.CI_TD_ENTRY,BATCH_CD,,
+1.) To Do Entry,Batch Number,JoinTree_1.CI_TD_ENTRY,BATCH_NBR,Dimension,CountAll
+1.) To Do Entry,Comments,JoinTree_1.CI_TD_ENTRY,COMMENTS,,
+1.) To Do Entry,Completion Date/Time,JoinTree_1.CI_TD_ENTRY,COMPLETE_DTTM,,
+1.) To Do Entry,Completed By,JoinTree_1.CI_TD_ENTRY,COMPLETE_USER_ID,,
+1.) To Do Entry,Create Date/Time,JoinTree_1.CI_TD_ENTRY,CRE_DTTM,,
+1.) To Do Entry,Status,JoinTree_1.CI_TD_ENTRY,ENTRY_STATUS_FLG,,
+1.) To Do Entry,Message Category,JoinTree_1.CI_TD_ENTRY,MESSAGE_CAT_NBR,Dimension,CountAll
+1.) To Do Entry,Message Number,JoinTree_1.CI_TD_ENTRY,MESSAGE_NBR,Dimension,CountAll
+1.) To Do Entry,To Do Role,JoinTree_1.CI_TD_ENTRY,ROLE_ID,,
+1.) To Do Entry,To Do ID,JoinTree_1.CI_TD_ENTRY,TD_ENTRY_ID,,
+1.) To Do Entry,Priority,JoinTree_1.CI_TD_ENTRY,TD_PRIORITY_FLG,,
+1.) To Do Entry,To Do Type,JoinTree_1.CI_TD_ENTRY,TD_TYPE_CD,,
+1.) To Do Entry FK Reference,Account ID,JoinTree_1.CMS_TD_ENTRY_FKREF,ACCT_ID,,
+1.) To Do Entry FK Reference,Asset,JoinTree_1.CMS_TD_ENTRY_FKREF,ASSET_ID,,
+1.) To Do Entry FK Reference,Contact ID,JoinTree_1.CMS_TD_ENTRY_FKREF,CONTACT_ID,,
+1.) To Do Entry FK Reference,Device ID,JoinTree_1.CMS_TD_ENTRY_FKREF,D1_DEVICE_ID,,
+1.) To Do Entry FK Reference,Measuring Component ID,JoinTree_1.CMS_TD_ENTRY_FKREF,MEASR_COMP_ID,,
+1.) To Do Entry FK Reference,Person ID,JoinTree_1.CMS_TD_ENTRY_FKREF,PER_ID,,
+1.) To Do Entry FK Reference,Premise ID,JoinTree_1.CMS_TD_ENTRY_FKREF,PREM_ID,,
+1.) To Do Entry FK Reference,Service Agreement,JoinTree_1.CMS_TD_ENTRY_FKREF,SA_ID,,
+1.) To Do Entry FK Reference,Service Point ID,JoinTree_1.CMS_TD_ENTRY_FKREF,D1_SP_ID,,
+1.) To Do Entry FK Reference,To Do ID,JoinTree_1.CMS_TD_ENTRY_FKREF,TD_ENTRY_ID,,
+1.) To Do Entry FK Reference,Usage Subscription,JoinTree_1.CMS_TD_ENTRY_FKREF,US_ID,,
+1.) Premise,Address,JoinTree_1.CI_PREM,ADDRESS1,,
+1.) Premise,Address Uppercase,JoinTree_1.CI_PREM,ADDRESS1_UPR,,
+1.) Premise,Address 2,JoinTree_1.CI_PREM,ADDRESS2,,
+1.) Premise,Address 3,JoinTree_1.CI_PREM,ADDRESS3,,
+1.) Premise,Address 4,JoinTree_1.CI_PREM,ADDRESS4,,
+1.) Premise,CIS Division,JoinTree_1.CI_PREM,CIS_DIVISION,,
+1.) Premise,City,JoinTree_1.CI_PREM,CITY,,
+1.) Premise,City Uppercase,JoinTree_1.CI_PREM,CITY_UPR,,
+1.) Premise,Country,JoinTree_1.CI_PREM,COUNTRY,,
+1.) Premise,County,JoinTree_1.CI_PREM,COUNTY,,
+1.) Premise,Geographical Code,JoinTree_1.CI_PREM,GEO_CODE,,
+1.) Premise,House Type,JoinTree_1.CI_PREM,HOUSE_TYPE,,
+1.) Premise,In City Limit,JoinTree_1.CI_PREM,IN_CITY_LIMIT,,
+1.) Premise,Key ID,JoinTree_1.CI_PREM,KEY_ID,,
+1.) Premise,Key,JoinTree_1.CI_PREM,KEY_SW,,
+1.) Premise,Landlord Agreement ID,JoinTree_1.CI_PREM,LL_ID,,
+1.) Premise,Life Support / Sensitive Load Details,JoinTree_1.CI_PREM,LS_SL_DESCR,,
+1.) Premise,Life Support / Sensitive Load,JoinTree_1.CI_PREM,LS_SL_FLG,,
+1.) Premise,Mailing Address,JoinTree_1.CI_PREM,MAIL_ADDR_SW,,
+1.) Premise,Meter Read Instruction,JoinTree_1.CI_PREM,MR_INSTR_CD,,
+1.) Premise,Instruction Details,JoinTree_1.CI_PREM,MR_INSTR_DETAILS,,
+1.) Premise,Meter Read Warning,JoinTree_1.CI_PREM,MR_WARN_CD,,
+1.) Premise,Number 1,JoinTree_1.CI_PREM,NUM1,,
+1.) Premise,Number 2,JoinTree_1.CI_PREM,NUM2,,
+1.) Premise,OK to Enter,JoinTree_1.CI_PREM,OK_TO_ENTER_SW,,
+1.) Premise,Postal,JoinTree_1.CI_PREM,POSTAL,,
+1.) Premise,Premise ID,JoinTree_1.CI_PREM,PREM_ID,,
+1.) Premise,Premise Type,JoinTree_1.CI_PREM,PREM_TYPE_CD,,
+1.) Premise,Parent Premise ID,JoinTree_1.CI_PREM,PRNT_PREM_ID,,
+1.) Premise,State,JoinTree_1.CI_PREM,STATE,,
+1.) Premise,Time Zone,JoinTree_1.CI_PREM,TIME_ZONE_CD,,
+1.) Premise,Trend Area,JoinTree_1.CI_PREM,TREND_AREA_CD,,
+1.) Formulas,Assigned Duration (in days),JoinTree_1.CMS_TD_ENTRY_TIMES,ASSIGNED_TM_DAYS,,
+1.) Formulas,Assigned Duration (in minutes),JoinTree_1.CMS_TD_ENTRY_TIMES,ASSIGNED_TM_MINS,,
+1.) Formulas,Assigned By User (Name),JoinTree_1,ASSIGNED_USER_ID_NAME,,
+1.) Formulas,Assign to User (Name),JoinTree_1,ASSIGNED_TO_NAME,,
+1.) Formulas,Completed By (Name),JoinTree_1,COMPLETE_USER_ID_NAME,,
+1.) Formulas,Completion Duration (in days),JoinTree_1.CMS_TD_ENTRY_TIMES,COMPLETE_TM_DAYS,,
+1.) Formulas,Completion Duration (in minutes),JoinTree_1.CMS_TD_ENTRY_TIMES,COMPLETE_TM_MINS,,
+1.) Formulas,Days Old,JoinTree_1,DAYS_OLD,,
+1.) Formulas,Distinct To Do ID,JoinTree_1,TD_ENTRY_ID_DISTINCT,,
+1.) Formulas,Message Text,JoinTree_1.CI_MSG_L,MESSAGE_TEXT,,
+1.) Formulas,Name,JoinTree_1.CI_PER_NAME,ENTITY_NAME_UPR,,
+1.) Formulas,Postal (First Five),JoinTree_1,POSTAL_5,,
+1.) Formulas,Unassigned Duration (in days),JoinTree_1.CMS_TD_ENTRY_TIMES,UNASSIGNED_TM_DAYS,,
+1.) Formulas,Unassigned Duration (in minutes),JoinTree_1.CMS_TD_ENTRY_TIMES,UNASSIGNED_TM_MINS,,
+1.) Descriptions,Meter Read Instruction Description,JoinTree_1.CI_MR_INSTR_L,DESCR,,
+1.) Descriptions,Meter Read Warning Description,JoinTree_1.CI_MR_WARN_L,DESCR,,
+1.) Descriptions,Premise Type Description,JoinTree_1.CI_PREM_TYPE_L,DESCR,,
+1.) Descriptions,State Description,JoinTree_1.CI_STATE_L,DESCR,,
+1.) Descriptions,Status Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Time Zone Description,JoinTree_1.CI_TIME_ZONE_L,DESCR,,
+1.) Descriptions,To Do Type Description,JoinTree_1.CI_TD_TYPE_L,DESCR,,
+1.) Descriptions,To Do Role Description,JoinTree_1.CI_ROLE_L,DESCR,,
+1.) Descriptions,Trend Area Description,JoinTree_1.CI_TREND_AREA_L,DESCR,,

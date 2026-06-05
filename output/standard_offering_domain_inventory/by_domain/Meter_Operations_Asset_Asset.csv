@@ -1,0 +1,272 @@
+section,domain_name,Asset___Domain
+section,workstream,Meter Operations
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+W1_ASSET,W1_ASSET
+W1_ASSET_CHAR,W1_ASSET_CHAR
+W1_ASSET_IDENTIFIER,W1_ASSET_IDENTIFIER
+W1_ASSET_NODE,W1_ASSET_NODE
+W1_NODE,W1_NODE
+W1_NODE_1,W1_NODE
+W1_ASSET_TYPE_L,W1_ASSET_TYPE_L
+F1_BUS_OBJ_L,F1_BUS_OBJ_L
+F1_BUS_OBJ_L_1,F1_BUS_OBJ_L
+F1_BUS_OBJ_STATUS_L,F1_BUS_OBJ_STATUS_L
+F1_BUS_OBJ_STATUS_RSN_L,F1_BUS_OBJ_STATUS_RSN_L
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_2,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_3,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_4,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_5,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_6,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_7,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_8,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_9,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_10,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_11,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_12,CI_LOOKUP_VAL_L
+W1_SPECIFICATION_L,W1_SPECIFICATION_L
+W1_SPECIFICATION_L_1,W1_SPECIFICATION_L
+CI_ACC_GRP_L,CI_ACC_GRP_L
+CI_ACC_GRP_L_1,CI_ACC_GRP_L
+CI_STATE_L,CI_STATE_L
+CI_TIME_ZONE_L,CI_TIME_ZONE_L
+W1_SERVICE_AREA_L,W1_SERVICE_AREA_L
+W1_APPROVAL_PROF_L,W1_APPROVAL_PROF_L
+W1_COST_CENTER_L,W1_COST_CENTER_L
+W1_COST_CENTER_L_1,W1_COST_CENTER_L
+W1_COST_CENTER_L_2,W1_COST_CENTER_L
+W1_COST_CENTER_L_3,W1_COST_CENTER_L
+W1_COST_CENTER_L_4,W1_COST_CENTER_L
+W1_COST_CENTER_L_5,W1_COST_CENTER_L
+W1_EXPENSE_CD_L,W1_EXPENSE_CD_L
+W1_EXPENSE_CD_L_1,W1_EXPENSE_CD_L
+W1_EXPENSE_CD_L_2,W1_EXPENSE_CD_L
+W1_EXPENSE_CD_L_3,W1_EXPENSE_CD_L
+W1_BUYER_L,W1_BUYER_L
+W1_PLANNER_L,W1_PLANNER_L
+W1_MAINTMGR_L,W1_MAINTMGR_L
+CMS_W1_ASSET_IDENTIFIER_VW,CMS_W1_ASSET_IDENTIFIER_VW
+F1_EXT_LOOKUP_VAL_L,F1_EXT_LOOKUP_VAL_L
+F1_EXT_LOOKUP_VAL_L_1,F1_EXT_LOOKUP_VAL_L
+W1_NODE_TYPE_L,W1_NODE_TYPE_L
+W1_BOM_PART,W1_BOM_PART
+W1_VENDOR_LOC,W1_VENDOR_LOC
+W1_PROPERTY_UNIT_L,W1_PROPERTY_UNIT_L
+JoinTree_1,W1_ASSET
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,W1_ASSET,W1_ASSET_NODE,W1_ASSET.ASSET_ID == W1_ASSET_NODE.ASSET_ID
+JoinTree_1,2,inner,W1_ASSET,CMS_W1_ASSET_IDENTIFIER_VW,W1_ASSET.ASSET_ID == CMS_W1_ASSET_IDENTIFIER_VW.ASSET_ID
+JoinTree_1,3,inner,W1_ASSET_NODE,W1_NODE,W1_ASSET_NODE.NODE_ID == W1_NODE.NODE_ID
+JoinTree_1,4,inner,W1_ASSET,W1_ASSET_TYPE_L,W1_ASSET.ASSET_TYPE_CD == W1_ASSET_TYPE_L.ASSET_TYPE_CD and W1_ASSET_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,5,inner,W1_ASSET,F1_BUS_OBJ_L,W1_ASSET.BUS_OBJ_CD == F1_BUS_OBJ_L.BUS_OBJ_CD and F1_BUS_OBJ_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,6,leftOuter,W1_ASSET,F1_BUS_OBJ_STATUS_RSN_L,W1_ASSET.BO_STATUS_REASON_CD == F1_BUS_OBJ_STATUS_RSN_L.BO_STATUS_REASON_CD and F1_BUS_OBJ_STATUS_RSN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,7,leftOuter,W1_ASSET,CI_LOOKUP_VAL_L,W1_ASSET.ASSET_COND_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'ASSET_COND_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,8,leftOuter,W1_ASSET,W1_SPECIFICATION_L,W1_ASSET.SPECIFICATION_CD == W1_SPECIFICATION_L.SPECIFICATION_CD and W1_SPECIFICATION_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,9,leftOuter,W1_ASSET,CI_ACC_GRP_L,W1_ASSET.OWNING_ACCESS_GRP_CD == CI_ACC_GRP_L.ACCESS_GRP_CD and CI_ACC_GRP_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,10,leftOuter,W1_ASSET,W1_SPECIFICATION_L_1,W1_ASSET.MAINT_SPEC_CD == W1_SPECIFICATION_L_1.SPECIFICATION_CD and W1_SPECIFICATION_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,11,leftOuter,W1_ASSET,CI_LOOKUP_VAL_L_1,W1_ASSET.ASSET_OWNERSHIP_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'ASSET_OWNERSHIP_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,12,leftOuter,W1_ASSET,CI_LOOKUP_VAL_L_2,W1_ASSET.CONTRIBUTED_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'CONTRIBUTED_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,13,leftOuter,W1_ASSET_NODE,CI_LOOKUP_VAL_L_4,W1_ASSET_NODE.FAILURE_FLG == CI_LOOKUP_VAL_L_4.FIELD_VALUE and CI_LOOKUP_VAL_L_4.FIELD_NAME == 'FAILURE_FLG' and CI_LOOKUP_VAL_L_4.LANGUAGE_CD == 'ENG'
+JoinTree_1,14,inner,W1_ASSET_NODE,F1_EXT_LOOKUP_VAL_L,W1_ASSET_NODE.ASSET_DPOS_FLG == F1_EXT_LOOKUP_VAL_L.F1_EXT_LOOKUP_VALUE and F1_EXT_LOOKUP_VAL_L.BUS_OBJ_CD == 'W1-AssetDisposition' and F1_EXT_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,15,inner,W1_NODE,W1_NODE_TYPE_L,W1_NODE.NODE_TYPE_CD == W1_NODE_TYPE_L.NODE_TYPE_CD and W1_NODE_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,16,inner,W1_NODE,F1_BUS_OBJ_L_1,W1_NODE.BUS_OBJ_CD == F1_BUS_OBJ_L_1.BUS_OBJ_CD and F1_BUS_OBJ_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,17,inner,W1_NODE,CI_LOOKUP_VAL_L_3,W1_NODE.NODE_DPOS_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'NODE_DPOS_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_1,18,leftOuter,W1_NODE,CI_LOOKUP_VAL_L_5,W1_NODE.W1_OPERATION_FLG == CI_LOOKUP_VAL_L_5.FIELD_VALUE and CI_LOOKUP_VAL_L_5.FIELD_NAME == 'W1_OPERATION_FLG' and CI_LOOKUP_VAL_L_5.LANGUAGE_CD == 'ENG'
+JoinTree_1,19,leftOuter,W1_NODE,CI_LOOKUP_VAL_L_6,W1_NODE.CRITICALITY_FLG == CI_LOOKUP_VAL_L_6.FIELD_VALUE and CI_LOOKUP_VAL_L_6.FIELD_NAME == 'CRITICALITY_FLG' and CI_LOOKUP_VAL_L_6.LANGUAGE_CD == 'ENG'
+JoinTree_1,20,leftOuter,W1_NODE,CI_LOOKUP_VAL_L_7,W1_NODE.LOCATION_CLASS_FLG == CI_LOOKUP_VAL_L_7.FIELD_VALUE and CI_LOOKUP_VAL_L_7.FIELD_NAME == 'LOCATION_CLASS_FLG' and CI_LOOKUP_VAL_L_7.LANGUAGE_CD == 'ENG'
+JoinTree_1,21,leftOuter,W1_NODE,CI_STATE_L,W1_NODE.STATE == CI_STATE_L.STATE and W1_NODE.COUNTRY == CI_STATE_L.COUNTRY and CI_STATE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,22,inner,W1_NODE,CI_TIME_ZONE_L,W1_NODE.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,23,leftOuter,W1_NODE,CI_ACC_GRP_L_1,W1_NODE.OWNING_ACCESS_GRP_CD == CI_ACC_GRP_L_1.ACCESS_GRP_CD and CI_ACC_GRP_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,24,leftOuter,W1_NODE,W1_SERVICE_AREA_L,W1_NODE.SERVICE_AREA_CD == W1_SERVICE_AREA_L.SERVICE_AREA_CD and W1_SERVICE_AREA_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,25,leftOuter,W1_NODE,W1_APPROVAL_PROF_L,W1_NODE.WORK_REQ_APPROVAL_PROF_CD == W1_APPROVAL_PROF_L.APPROVAL_PROF_CD and W1_APPROVAL_PROF_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,26,leftOuter,W1_NODE,CI_LOOKUP_VAL_L_8,W1_NODE.RCM_SYSTEM_FLG == CI_LOOKUP_VAL_L_8.FIELD_VALUE and CI_LOOKUP_VAL_L_8.FIELD_NAME == 'RCM_SYSTEM_FLG' and CI_LOOKUP_VAL_L_8.LANGUAGE_CD == 'ENG'
+JoinTree_1,27,inner,W1_NODE,CI_LOOKUP_VAL_L_9,W1_NODE.RUN_TO_FAILURE_FLG == CI_LOOKUP_VAL_L_9.FIELD_VALUE and CI_LOOKUP_VAL_L_9.FIELD_NAME == 'RUN_TO_FAILURE_FLG' and CI_LOOKUP_VAL_L_9.LANGUAGE_CD == 'ENG'
+JoinTree_1,28,leftOuter,W1_NODE,W1_COST_CENTER_L,W1_NODE.INV_COST_CENTER_CD == W1_COST_CENTER_L.COST_CENTER_CD and W1_COST_CENTER_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,29,leftOuter,W1_NODE,W1_COST_CENTER_L_1,W1_NODE.INV_ADJTMT_COST_CENTER_CD == W1_COST_CENTER_L_1.COST_CENTER_CD and W1_COST_CENTER_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,30,leftOuter,W1_NODE,W1_COST_CENTER_L_2,W1_NODE.MARK_UP_COST_CENTER_CD == W1_COST_CENTER_L_2.COST_CENTER_CD and W1_COST_CENTER_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,31,leftOuter,W1_NODE,W1_COST_CENTER_L_3,W1_NODE.STOCK_TRANSFER_COST_CENTER_CD == W1_COST_CENTER_L_3.COST_CENTER_CD and W1_COST_CENTER_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_1,32,leftOuter,W1_NODE,W1_EXPENSE_CD_L,W1_NODE.INV_EXPENSE_CD == W1_EXPENSE_CD_L.EXPENSE_CD and W1_EXPENSE_CD_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,33,leftOuter,W1_NODE,W1_BUYER_L,W1_NODE.BUYER_CD == W1_BUYER_L.BUYER_CD and W1_BUYER_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,34,leftOuter,W1_NODE,W1_EXPENSE_CD_L_1,W1_NODE.MARK_UP_EXPENSE_CD == W1_EXPENSE_CD_L_1.EXPENSE_CD
+JoinTree_1,35,leftOuter,W1_NODE,CI_LOOKUP_VAL_L_10,W1_NODE.RR_APP_REQ_FLG == CI_LOOKUP_VAL_L_10.FIELD_VALUE and CI_LOOKUP_VAL_L_10.FIELD_NAME == 'RR_APP_REQ_FLG' and CI_LOOKUP_VAL_L_10.LANGUAGE_CD == 'ENG'
+JoinTree_1,36,leftOuter,W1_NODE,CI_LOOKUP_VAL_L_11,W1_NODE.PUR_DOC_ACTION_FLG == CI_LOOKUP_VAL_L_11.FIELD_VALUE and CI_LOOKUP_VAL_L_11.FIELD_NAME == 'PUR_DOC_ACTION_FLG' and CI_LOOKUP_VAL_L_11.LANGUAGE_CD == 'ENG'
+JoinTree_1,37,leftOuter,W1_NODE,W1_PLANNER_L,W1_NODE.PLANNER_CD == W1_PLANNER_L.PLANNER_CD and W1_PLANNER_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,38,leftOuter,W1_NODE,CI_LOOKUP_VAL_L_12,W1_NODE.BACK_LOG_GRP_FLG == CI_LOOKUP_VAL_L_12.FIELD_VALUE and CI_LOOKUP_VAL_L_12.FIELD_NAME == 'BACK_LOG_GRP_FLG' and CI_LOOKUP_VAL_L_12.LANGUAGE_CD == 'ENG'
+JoinTree_1,39,leftOuter,W1_NODE,W1_MAINTMGR_L,W1_NODE.MAINTMGR_CD == W1_MAINTMGR_L.MAINTMGR_CD and W1_MAINTMGR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,40,leftOuter,W1_NODE,W1_COST_CENTER_L_4,W1_NODE.TAX_COST_CENTER_CD == W1_COST_CENTER_L_4.COST_CENTER_CD and W1_COST_CENTER_L_4.LANGUAGE_CD == 'ENG'
+JoinTree_1,41,leftOuter,W1_NODE,W1_COST_CENTER_L_5,W1_NODE.INVOICE_WRITEOFF_COST_CTR_CD == W1_COST_CENTER_L_5.COST_CENTER_CD and W1_COST_CENTER_L_5.LANGUAGE_CD == 'ENG'
+JoinTree_1,42,leftOuter,W1_NODE,W1_EXPENSE_CD_L_2,W1_NODE.TAX_EXPENSE_CD == W1_EXPENSE_CD_L_2.EXPENSE_CD and W1_EXPENSE_CD_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,43,leftOuter,W1_NODE,W1_EXPENSE_CD_L_3,W1_NODE.INVOICE_WRITEOFF_EXPENSE_CD == W1_EXPENSE_CD_L_3.EXPENSE_CD and W1_EXPENSE_CD_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_1,44,leftOuter,W1_NODE,F1_EXT_LOOKUP_VAL_L_1,W1_NODE.SERVICE_COND_FLG == F1_EXT_LOOKUP_VAL_L_1.F1_EXT_LOOKUP_VALUE and F1_EXT_LOOKUP_VAL_L_1.BUS_OBJ_CD == 'W1-ServiceCondition' and F1_EXT_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,45,leftOuter,W1_ASSET,W1_BOM_PART,W1_ASSET.BOM_PART_ID == W1_BOM_PART.BOM_PART_ID
+JoinTree_1,46,leftOuter,W1_ASSET,W1_VENDOR_LOC,W1_ASSET.VENDOR_LOC_ID == W1_VENDOR_LOC.VENDOR_LOC_ID
+JoinTree_1,47,leftOuter,W1_ASSET,W1_PROPERTY_UNIT_L,W1_ASSET.PROPERTY_UNIT_CD == W1_PROPERTY_UNIT_L.PROPERTY_UNIT_CD and W1_PROPERTY_UNIT_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,48,leftOuter,W1_NODE,W1_NODE_1,W1_NODE.PARENT_NODE_ID == W1_NODE_1.NODE_ID
+JoinTree_1,49,inner,W1_ASSET,F1_BUS_OBJ_STATUS_L,W1_ASSET.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L.BUS_OBJ_CD and W1_ASSET.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L.LANGUAGE_CD == 'ENG'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Asset,Acquisition Cost,JoinTree_1.W1_ASSET,ACQUISITION_COST,,
+1.) Asset,Acquisition Date,JoinTree_1.W1_ASSET,ACQUISITION_DT,,
+1.) Asset,Activity,JoinTree_1.W1_ASSET,ACT_ID,,
+1.) Asset,Asset Condition,JoinTree_1.W1_ASSET,ASSET_COND_FLG,,
+1.) Asset,Asset,JoinTree_1.W1_ASSET,ASSET_ID,,
+1.) Asset,Asset Ownership,JoinTree_1.W1_ASSET,ASSET_OWNERSHIP_FLG,,
+1.) Asset,Asset Type,JoinTree_1.W1_ASSET,ASSET_TYPE_CD,,
+1.) Asset,Average Outage Repair Cost,JoinTree_1.W1_ASSET,AVG_OUT_REPR_COST,,
+1.) Asset,Status (Asset),JoinTree_1.W1_ASSET,BO_STATUS_CD,,
+1.) Asset,Status Reason (Asset),JoinTree_1.W1_ASSET,BO_STATUS_REASON_CD,,
+1.) Asset,BOM Part,JoinTree_1.W1_ASSET,BOM_PART_ID,,
+1.) Asset,Book Value,JoinTree_1.W1_ASSET,BOOK_VALUE,,
+1.) Asset,Business Object (Asset),JoinTree_1.W1_ASSET,BUS_OBJ_CD,,
+1.) Asset,Calendar PM Reset Date,JoinTree_1.W1_ASSET,CALENDAR_PM_RESET_DT,,
+1.) Asset,Condition Rating,JoinTree_1.W1_ASSET,CONDITION_RATING,,
+1.) Asset,Confidence Rating,JoinTree_1.W1_ASSET,CONFIDENCE_RATING,,
+1.) Asset,Contributed,JoinTree_1.W1_ASSET,CONTRIBUTED_FLG,,
+1.) Asset,Core Charge,JoinTree_1.W1_ASSET,CORE_CHARGE,,
+1.) Asset,Core Charge Expiration Date,JoinTree_1.W1_ASSET,CORE_CHRG_EXP_DT,,
+1.) Asset,Create Date/Time,JoinTree_1.W1_ASSET,CRE_DTTM,,
+1.) Asset,Detailed Description,JoinTree_1.W1_ASSET,DESCRLONG,,
+1.) Asset,Disposal Cost,JoinTree_1.W1_ASSET,DISPOSAL_COST,,
+1.) Asset,Economic Life (Years),JoinTree_1.W1_ASSET,ECO_LIFE,,
+1.) Asset,Final Date/Time,JoinTree_1.W1_ASSET,FINAL_DTTM,,
+1.) Asset,Hourly Outage Cost,JoinTree_1.W1_ASSET,HOURLY_OUT_COST,,
+1.) Asset,In Service Date,JoinTree_1.W1_ASSET,IN_SERVICE_DT,,
+1.) Asset,Maintenance Specification,JoinTree_1.W1_ASSET,MAINT_SPEC_CD,,
+1.) Asset,Owning Organization (Asset),JoinTree_1.W1_ASSET,OWNING_ACCESS_GRP_CD,,
+1.) Asset,Predicted Wear Out Date,JoinTree_1.W1_ASSET,PREDCTD_WEAR_OUT_DT,,
+1.) Asset,Property Unit,JoinTree_1.W1_ASSET,PROPERTY_UNIT_CD,,
+1.) Asset,Replacement Cost,JoinTree_1.W1_ASSET,REPLACEMENT_COST,,
+1.) Asset,Salvage Cost,JoinTree_1.W1_ASSET,SALVAGE_COST,,
+1.) Asset,Specification,JoinTree_1.W1_ASSET,SPECIFICATION_CD,,
+1.) Asset,Status Date/Time,JoinTree_1.W1_ASSET,STATUS_UPD_DTTM,,
+1.) Asset,Unit Price,JoinTree_1.W1_ASSET,UNIT_PRICE,,
+1.) Asset,Useful Life (Years),JoinTree_1.W1_ASSET,USEFUL_LIFE,,
+1.) Asset,Vendor Location,JoinTree_1.W1_ASSET,VENDOR_LOC_ID,,
+1.) Asset Identifier,Asset,JoinTree_1.CMS_W1_ASSET_IDENTIFIER_VW,ASSET_ID,,
+1.) Asset Identifier,Badge Number,JoinTree_1.CMS_W1_ASSET_IDENTIFIER_VW,BADGE_NUMBER,,
+1.) Asset Identifier,External ID,JoinTree_1.CMS_W1_ASSET_IDENTIFIER_VW,EXTERNAL_ID,,
+1.) Asset Identifier,Metrology Firmware Version,JoinTree_1.CMS_W1_ASSET_IDENTIFIER_VW,METROLOGY_FIRMWARE_VERSION,,
+1.) Asset Identifier,NIC Firmware Version,JoinTree_1.CMS_W1_ASSET_IDENTIFIER_VW,NIC_FIRMWARE_VERSION,,
+1.) Asset Identifier,Pallet Number,JoinTree_1.CMS_W1_ASSET_IDENTIFIER_VW,PALLET_NUMBER,,
+1.) Asset Identifier,Purchase Order,JoinTree_1.CMS_W1_ASSET_IDENTIFIER_VW,PURCHASE_ORDER,,
+1.) Asset Identifier,Serial Number,JoinTree_1.CMS_W1_ASSET_IDENTIFIER_VW,SERIAL_NUMBER,,
+1.) Asset Location,Activity,JoinTree_1.W1_ASSET_NODE,ACT_ID,,
+1.) Asset Location,Asset Disposition,JoinTree_1.W1_ASSET_NODE,ASSET_DPOS_FLG,,
+1.) Asset Location,Asset,JoinTree_1.W1_ASSET_NODE,ASSET_ID,,
+1.) Asset Location,Attached to Asset ID,JoinTree_1.W1_ASSET_NODE,ATTCH_TO_ASSET_ID,,
+1.) Asset Location,Current Asset ID,JoinTree_1.W1_ASSET_NODE,CURR_ASSET_ID,,
+1.) Asset Location,Current Attached to Asset ID,JoinTree_1.W1_ASSET_NODE,CURR_ATTCH_TO_ASSET_ID,,
+1.) Asset Location,Current Location/Organization ID,JoinTree_1.W1_ASSET_NODE,CURR_NODE_ID,,
+1.) Asset Location,Effective Date/Time,JoinTree_1.W1_ASSET_NODE,EFF_DTTM,,
+1.) Asset Location,Failure,JoinTree_1.W1_ASSET_NODE,FAILURE_FLG,,
+1.) Asset Location,Location/Organization,JoinTree_1.W1_ASSET_NODE,NODE_ID,,
+1.) Location/Organization,Address,JoinTree_1.W1_NODE,ADDRESS1,,
+1.) Location/Organization,Address 2,JoinTree_1.W1_NODE,ADDRESS2,,
+1.) Location/Organization,Address 3,JoinTree_1.W1_NODE,ADDRESS3,,
+1.) Location/Organization,Address 4,JoinTree_1.W1_NODE,ADDRESS4,,
+1.) Location/Organization,Backlog Group,JoinTree_1.W1_NODE,BACK_LOG_GRP_FLG,,
+1.) Location/Organization,Building,JoinTree_1.W1_NODE,BUILDING,,
+1.) Location/Organization,Business Object (Location),JoinTree_1.W1_NODE,BUS_OBJ_CD,,
+1.) Location/Organization,Buyer,JoinTree_1.W1_NODE,BUYER_CD,,
+1.) Location/Organization,City,JoinTree_1.W1_NODE,CITY,,
+1.) Location/Organization,Country,JoinTree_1.W1_NODE,COUNTRY,,
+1.) Location/Organization,County,JoinTree_1.W1_NODE,COUNTY,,
+1.) Location/Organization,Criticality,JoinTree_1.W1_NODE,CRITICALITY_FLG,,
+1.) Location/Organization,Description,JoinTree_1.W1_NODE,DESCR100,,
+1.) Location/Organization,Geographical Code,JoinTree_1.W1_NODE,GEO_CODE,,
+1.) Location/Organization,House Type,JoinTree_1.W1_NODE,HOUSE_TYPE,,
+1.) Location/Organization,In City Limit,JoinTree_1.W1_NODE,IN_CITY_LIMIT,,
+1.) Location/Organization,Inventory Adjustment Cost Center,JoinTree_1.W1_NODE,INV_ADJTMT_COST_CENTER_CD,,
+1.) Location/Organization,Inventory Cost Center,JoinTree_1.W1_NODE,INV_COST_CENTER_CD,,
+1.) Location/Organization,Inventory Expense Code,JoinTree_1.W1_NODE,INV_EXPENSE_CD,,
+1.) Location/Organization,Invoice Write-Off Cost Center Code,JoinTree_1.W1_NODE,INVOICE_WRITEOFF_COST_CTR_CD,,
+1.) Location/Organization,Invoice Write-Off Expense Code,JoinTree_1.W1_NODE,INVOICE_WRITEOFF_EXPENSE_CD,,
+1.) Location/Organization,Location Class,JoinTree_1.W1_NODE,LOCATION_CLASS_FLG,,
+1.) Location/Organization,Maintenance Manager,JoinTree_1.W1_NODE,MAINTMGR_CD,,
+1.) Location/Organization,Markup Cost Center,JoinTree_1.W1_NODE,MARK_UP_COST_CENTER_CD,,
+1.) Location/Organization,Markup Expense Code,JoinTree_1.W1_NODE,MARK_UP_EXPENSE_CD,,
+1.) Location/Organization,Location/Organization Disposition,JoinTree_1.W1_NODE,NODE_DPOS_FLG,,
+1.) Location/Organization,Location/Organization,JoinTree_1.W1_NODE,NODE_ID,,
+1.) Location/Organization,Location/Organization Type,JoinTree_1.W1_NODE,NODE_TYPE_CD,,
+1.) Location/Organization,Number 1,JoinTree_1.W1_NODE,NUM1,,
+1.) Location/Organization,Number 2,JoinTree_1.W1_NODE,NUM2,,
+1.) Location/Organization,Owning Organization (Location),JoinTree_1.W1_NODE,OWNING_ACCESS_GRP_CD,,
+1.) Location/Organization,Parent Location/Organization,JoinTree_1.W1_NODE,PARENT_NODE_ID,,
+1.) Location/Organization,Planner,JoinTree_1.W1_NODE,PLANNER_CD,,
+1.) Location/Organization,Position,JoinTree_1.W1_NODE,POSITION,,
+1.) Location/Organization,Postal,JoinTree_1.W1_NODE,POSTAL,,
+1.) Location/Organization,Purchasing Document Action,JoinTree_1.W1_NODE,PUR_DOC_ACTION_FLG,,
+1.) Location/Organization,RCM System,JoinTree_1.W1_NODE,RCM_SYSTEM_FLG,,
+1.) Location/Organization,Room,JoinTree_1.W1_NODE,ROOM,,
+1.) Location/Organization,Reorder Review Approval Required,JoinTree_1.W1_NODE,RR_APP_REQ_FLG,,
+1.) Location/Organization,Run To Failure,JoinTree_1.W1_NODE,RUN_TO_FAILURE_FLG,,
+1.) Location/Organization,Service Area,JoinTree_1.W1_NODE,SERVICE_AREA_CD,,
+1.) Location/Organization,Service Condition,JoinTree_1.W1_NODE,SERVICE_COND_FLG,,
+1.) Location/Organization,State,JoinTree_1.W1_NODE,STATE,,
+1.) Location/Organization,Stock Transfer Cost Center,JoinTree_1.W1_NODE,STOCK_TRANSFER_COST_CENTER_CD,,
+1.) Location/Organization,Tax Cost Center,JoinTree_1.W1_NODE,TAX_COST_CENTER_CD,,
+1.) Location/Organization,Tax Expense Code,JoinTree_1.W1_NODE,TAX_EXPENSE_CD,,
+1.) Location/Organization,Time Zone,JoinTree_1.W1_NODE,TIME_ZONE_CD,,
+1.) Location/Organization,Address Uppercase,JoinTree_1.W1_NODE,W1_ADDRESS1_UPR,,
+1.) Location/Organization,City Uppercase,JoinTree_1.W1_NODE,W1_CITY_UPR,,
+1.) Location/Organization,Cross Street,JoinTree_1.W1_NODE,W1_CROSS_STREET,,
+1.) Location/Organization,Description Upper,JoinTree_1.W1_NODE,W1_DESCR100_UPR,,
+1.) Location/Organization,Latitude,JoinTree_1.W1_NODE,W1_GEO_LAT,Dimension,CountAll
+1.) Location/Organization,Longitude,JoinTree_1.W1_NODE,W1_GEO_LONG,Dimension,CountAll
+1.) Location/Organization,Operation,JoinTree_1.W1_NODE,W1_OPERATION_FLG,,
+1.) Location/Organization,Suburb,JoinTree_1.W1_NODE,W1_SUBURB,,
+1.) Location/Organization,Work Request Approval Profile,JoinTree_1.W1_NODE,WORK_REQ_APPROVAL_PROF_CD,,
+1.) Descriptions,Asset Condition Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Asset Disposition Description,JoinTree_1.F1_EXT_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Asset Ownership Description,JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,Asset Type Description,JoinTree_1.W1_ASSET_TYPE_L,DESCR100,,
+1.) Descriptions,Backlog Group Description,JoinTree_1.CI_LOOKUP_VAL_L_12,DESCR,,
+1.) Descriptions,BOM Part Description,JoinTree_1.W1_BOM_PART,BOM_PART_DESCR,,
+1.) Descriptions,Business Object Description (Asset),JoinTree_1.F1_BUS_OBJ_L,DESCR,,
+1.) Descriptions,Business Object Description (Location),JoinTree_1.F1_BUS_OBJ_L_1,DESCR,,
+1.) Descriptions,Buyer Description,JoinTree_1.W1_BUYER_L,DESCR100,,
+1.) Descriptions,Contributed Description,JoinTree_1.CI_LOOKUP_VAL_L_2,DESCR,,
+1.) Descriptions,Criticality Description,JoinTree_1.CI_LOOKUP_VAL_L_6,DESCR,,
+1.) Descriptions,Failure Description,JoinTree_1.CI_LOOKUP_VAL_L_4,DESCR,,
+1.) Descriptions,Inventory Adjustment Cost Center Description,JoinTree_1.W1_COST_CENTER_L_1,DESCR100,,
+1.) Descriptions,Inventory Cost Center Description,JoinTree_1.W1_COST_CENTER_L,DESCR100,,
+1.) Descriptions,Inventory Expense Code Description,JoinTree_1.W1_EXPENSE_CD_L,DESCR100,,
+1.) Descriptions,Invoice Write-Off Cost Center Code Description,JoinTree_1.W1_COST_CENTER_L_5,DESCR100,,
+1.) Descriptions,Invoice Write-Off Expense Code Description,JoinTree_1.W1_EXPENSE_CD_L_3,DESCR100,,
+1.) Descriptions,Maintenance Manager Description,JoinTree_1.W1_MAINTMGR_L,DESCR100,,
+1.) Descriptions,Maintenance Specification Description,JoinTree_1.W1_SPECIFICATION_L_1,DESCR100,,
+1.) Descriptions,Markup Cost Center Description,JoinTree_1.W1_COST_CENTER_L_2,DESCR100,,
+1.) Descriptions,Markup Expense Code Description,JoinTree_1.W1_EXPENSE_CD_L_1,DESCR100,,
+1.) Descriptions,Location Class Description,JoinTree_1.CI_LOOKUP_VAL_L_7,DESCR,,
+1.) Descriptions,Location/Organization Disposition Description,JoinTree_1.CI_LOOKUP_VAL_L_3,DESCR,,
+1.) Descriptions,Location/Organization Type Description,JoinTree_1.W1_NODE_TYPE_L,DESCR100,,
+1.) Descriptions,Operation Description,JoinTree_1.CI_LOOKUP_VAL_L_5,DESCR,,
+1.) Descriptions,Owning Organization Description (Asset),JoinTree_1.CI_ACC_GRP_L,DESCR,,
+1.) Descriptions,Owning Organization Description (Location),JoinTree_1.CI_ACC_GRP_L_1,DESCR,,
+1.) Descriptions,Planner Description,JoinTree_1.W1_PLANNER_L,DESCR100,,
+1.) Descriptions,Property Unit Description,JoinTree_1.W1_PROPERTY_UNIT_L,DESCR100,,
+1.) Descriptions,Purchasing Document Action Description,JoinTree_1.CI_LOOKUP_VAL_L_11,DESCR,,
+1.) Descriptions,Reorder Review Approval Required Description,JoinTree_1.CI_LOOKUP_VAL_L_10,DESCR,,
+1.) Descriptions,RCM System Description,JoinTree_1.CI_LOOKUP_VAL_L_8,DESCR,,
+1.) Descriptions,Run to Failure Description,JoinTree_1.CI_LOOKUP_VAL_L_9,DESCR,,
+1.) Descriptions,Service Area Description,JoinTree_1.W1_SERVICE_AREA_L,DESCR100,,
+1.) Descriptions,Service Condition Description,JoinTree_1.F1_EXT_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,Specification Description,JoinTree_1.W1_SPECIFICATION_L,DESCR100,,
+1.) Descriptions,State Description,JoinTree_1.CI_STATE_L,DESCR,,
+1.) Descriptions,Status Description (Asset),JoinTree_1.F1_BUS_OBJ_STATUS_L,DESCR,,
+1.) Descriptions,Status Reason Description (Asset),JoinTree_1.F1_BUS_OBJ_STATUS_RSN_L,DESCR,,
+1.) Descriptions,Stock Transfer Cost Center Description,JoinTree_1.W1_COST_CENTER_L_3,DESCR100,,
+1.) Descriptions,Tax Cost Center Description,JoinTree_1.W1_COST_CENTER_L_4,DESCR100,,
+1.) Descriptions,Tax Expense Code Description,JoinTree_1.W1_EXPENSE_CD_L_2,DESCR100,,
+1.) Descriptions,Time Zone Description,JoinTree_1.CI_TIME_ZONE_L,DESCR,,
+1.) Descriptions,Work Request Approval Profile Description,JoinTree_1.W1_APPROVAL_PROF_L,DESCR100,,
+1.) Formulas,Distinct Location/Organization,JoinTree_1,NODE_ID_DISTINCT,,
+1.) Formulas,Distinct Asset ID,JoinTree_1,ASSET_ID_DISTINCT,,
+1.) Formulas,Location Name,JoinTree_1.W1_VENDOR_LOC,LOC_NAME_UPR,,
+1.) Formulas,Address Uppercase (Parent Location/Organization),JoinTree_1.W1_NODE_1,W1_ADDRESS1_UPR,,

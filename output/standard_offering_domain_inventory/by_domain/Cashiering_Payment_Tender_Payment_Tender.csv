@@ -1,0 +1,88 @@
+section,domain_name,Payment_Tender___Domain
+section,workstream,Cashiering
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_PAY_EVENT,CI_PAY_EVENT
+CI_PAY_TNDR,CI_PAY_TNDR
+CI_PAY_TND_VW,CI_PAY_TND_VW
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_ACCT_PER,CI_ACCT_PER
+CI_TENDER_TYPE_L,CI_TENDER_TYPE_L
+CI_PAY_CAN_RSN_L,CI_PAY_CAN_RSN_L
+CI_TNDR_CTL,CI_TNDR_CTL
+CI_TNDR_SRCE_L,CI_TNDR_SRCE_L
+SC_USER,SC_USER
+SC_USER_1,SC_USER
+CI_PER_NAME,CI_PER_NAME
+JoinTree_1,CI_PAY_TNDR
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_PAY_TNDR,CI_PAY_EVENT,CI_PAY_TNDR.PAY_EVENT_ID == CI_PAY_EVENT.PAY_EVENT_ID
+JoinTree_1,2,inner,CI_PAY_TNDR,CI_TENDER_TYPE_L,CI_PAY_TNDR.TENDER_TYPE_CD == CI_TENDER_TYPE_L.TENDER_TYPE_CD and CI_TENDER_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,3,inner,CI_PAY_TNDR,CI_ACCT_PER,CI_PAY_TNDR.PAYOR_ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_1,4,inner,CI_PAY_TNDR,CI_LOOKUP_VAL_L,CI_PAY_TNDR.TNDR_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'TNDR_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,5,leftOuter,CI_PAY_TNDR,CI_PAY_CAN_RSN_L,CI_PAY_TNDR.CAN_RSN_CD == CI_PAY_CAN_RSN_L.CAN_RSN_CD and CI_PAY_CAN_RSN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,6,inner,CI_PAY_TNDR,CI_TNDR_CTL,CI_PAY_TNDR.TNDR_CTL_ID == CI_TNDR_CTL.TNDR_CTL_ID
+JoinTree_1,7,inner,CI_TNDR_CTL,CI_TNDR_SRCE_L,CI_TNDR_CTL.TNDR_SOURCE_CD == CI_TNDR_SRCE_L.TNDR_SOURCE_CD and CI_TNDR_SRCE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,8,inner,CI_TNDR_CTL,CI_LOOKUP_VAL_L_1,CI_TNDR_CTL.TNDR_CTL_ST_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'TNDR_CTL_ST_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,9,leftOuter,CI_TNDR_CTL,SC_USER_1,CI_TNDR_CTL.USER_ID == SC_USER_1.USER_ID
+JoinTree_1,10,leftOuter,CI_TNDR_CTL,SC_USER,CI_TNDR_CTL.BALANCED_USER_ID == SC_USER.USER_ID
+JoinTree_1,11,inner,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM' and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Payment Event,Create Date/Time,JoinTree_1.CI_PAY_EVENT,CRE_DTTM,,
+1.) Payment Event,Document Number,JoinTree_1.CI_PAY_EVENT,DOC_ID,,
+1.) Payment Event,Payment Date,JoinTree_1.CI_PAY_EVENT,PAY_DT,,
+1.) Payment Event,Payment Event ID,JoinTree_1.CI_PAY_EVENT,PAY_EVENT_ID,,
+1.) Payment Tender,Adjustment ID,JoinTree_1.CI_PAY_TNDR,ADJ_ID,,
+1.) Payment Tender,Alternate Currency Code,JoinTree_1.CI_PAY_TNDR,ALT_CURRENCY_CD,,
+1.) Payment Tender,Alternate Amount,JoinTree_1.CI_PAY_TNDR,ALT_TENDER_AMT,,
+1.) Payment Tender,Cancel Reason,JoinTree_1.CI_PAY_TNDR,CAN_RSN_CD,,
+1.) Payment Tender,Check Number,JoinTree_1.CI_PAY_TNDR,CHECK_NBR,,
+1.) Payment Tender,Currency Code,JoinTree_1.CI_PAY_TNDR,CURRENCY_CD,,
+1.) Payment Tender,Customer ID,JoinTree_1.CI_PAY_TNDR,CUST_ID,,
+1.) Payment Tender,Encrypted Micr ID,JoinTree_1.CI_PAY_TNDR,ENCR_MICR_ID,,
+1.) Payment Tender,Hash MICR ID,JoinTree_1.CI_PAY_TNDR,HASH_MICR_ID,,
+1.) Payment Tender,Included in Tender Ctl Balance,JoinTree_1.CI_PAY_TNDR,IN_TNDR_CTL_BAL_SW,,
+1.) Payment Tender,MICR ID,JoinTree_1.CI_PAY_TNDR,MICR_ID,,
+1.) Payment Tender,Name,JoinTree_1.CI_PAY_TNDR,NAME1,,
+1.) Payment Tender,Payment Event ID,JoinTree_1.CI_PAY_TNDR,PAY_EVENT_ID,,
+1.) Payment Tender,Pay Tender ID,JoinTree_1.CI_PAY_TNDR,PAY_TENDER_ID,,
+1.) Payment Tender,Payor Account ID,JoinTree_1.CI_PAY_TNDR,PAYOR_ACCT_ID,,
+1.) Payment Tender,Tender Amount,JoinTree_1.CI_PAY_TNDR,TENDER_AMT,,
+1.) Payment Tender,Tender Type,JoinTree_1.CI_PAY_TNDR,TENDER_TYPE_CD,,
+1.) Payment Tender,Tender Control ID,JoinTree_1.CI_PAY_TNDR,TNDR_CTL_ID,,
+1.) Payment Tender,Tender Status,JoinTree_1.CI_PAY_TNDR,TNDR_STATUS_FLG,,
+1.) Tender Control,All Users                     ,JoinTree_1.CI_TNDR_CTL,ALL_OPERATORS_SW,,
+1.) Tender Control,Archived,JoinTree_1.CI_TNDR_CTL,ARCHIVE_SW,,
+1.) Tender Control,Balanced Date/Time,JoinTree_1.CI_TNDR_CTL,BALANCED_DTTM,,
+1.) Tender Control,Balanced User ID,JoinTree_1.CI_TNDR_CTL,BALANCED_USER_ID,,
+1.) Tender Control,Batch Control,JoinTree_1.CI_TNDR_CTL,BATCH_CD,,
+1.) Tender Control,Batch Number,JoinTree_1.CI_TNDR_CTL,BATCH_NBR,Dimension,None
+1.) Tender Control,Comments,JoinTree_1.CI_TNDR_CTL,COMMENTS,,
+1.) Tender Control,Create Date/Time,JoinTree_1.CI_TNDR_CTL,CRE_DTTM,,
+1.) Tender Control,Currency Code,JoinTree_1.CI_TNDR_CTL,CURRENCY_CD,,
+1.) Tender Control,Deposit Control ID,JoinTree_1.CI_TNDR_CTL,DEP_CTL_ID,,
+1.) Tender Control,Ending Balance,JoinTree_1.CI_TNDR_CTL,END_BALANCE,,
+1.) Tender Control,External Transmission ID,JoinTree_1.CI_TNDR_CTL,EXT_TRANSMIT_ID,,
+1.) Tender Control,Starting Balance,JoinTree_1.CI_TNDR_CTL,START_BALANCE,,
+1.) Tender Control,Tender Control ID,JoinTree_1.CI_TNDR_CTL,TNDR_CTL_ID,,
+1.) Tender Control,Status         ,JoinTree_1.CI_TNDR_CTL,TNDR_CTL_ST_FLG,,
+1.) Tender Control,Tender Source,JoinTree_1.CI_TNDR_CTL,TNDR_SOURCE_CD,,
+1.) Tender Control,User,JoinTree_1.CI_TNDR_CTL,USER_ID,,
+1.) Description,Cancel Reason Description,JoinTree_1.CI_PAY_CAN_RSN_L,DESCR,,
+1.) Description,Tender Control Balanced By (Name),JoinTree_1,TNDR_CTL_BAL_USER_NAME,,
+1.) Description,Tender Control Status Description,JoinTree_1.CI_LOOKUP_VAL_L_1,FIELD_VALUE,,
+1.) Description,Tender Control User (Name),JoinTree_1,TNDR_CTL_USER_NAME,,
+1.) Description,Tender Status Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Description,Tender Type Description,JoinTree_1.CI_TENDER_TYPE_L,DESCR,,
+1.) Description,Tender Source Description,JoinTree_1.CI_TNDR_SRCE_L,DESCR,,
+1.) Formulas,Days Old,JoinTree_1,DAYS_OLD,,
+1.) Formulas,Distinct Payment Event ID,JoinTree_1,PAY_EVENT_ID_DISTINCT,,
+1.) Formulas,Distinct Pay Tender ID,JoinTree_1,PAY_TENDER_ID_DISTINCT,,
+1.) Formulas,Distnct Payor Account ID,JoinTree_1,ACCT_ID_DISTINCT,,
+1.) Formulas,Payor (Name),JoinTree_1.CI_PER_NAME,ENTITY_NAME_UPR,,

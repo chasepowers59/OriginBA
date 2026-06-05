@@ -1,0 +1,201 @@
+section,domain_name,Severance_Process___Domain
+section,workstream,Debt Management
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_2,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_3,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_4,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_5,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_6,CI_LOOKUP_VAL_L
+CI_SA,CI_SA
+CI_SEV_PROC,CI_SEV_PROC
+CI_SEV_EVT,CI_SEV_EVT
+CI_SEV_EVT_TYPE_L,CI_SEV_EVT_TYPE_L
+CI_SEV_PROC_TMP_L,CI_SEV_PROC_TMP_L
+CI_PREM,CI_PREM
+CI_PER_NAME,CI_PER_NAME
+CI_ACCT,CI_ACCT
+CI_ACCT_PER,CI_ACCT_PER
+CI_SA_TYPE_L,CI_SA_TYPE_L
+CI_ACCT_MGMT_GR_L,CI_ACCT_MGMT_GR_L
+CI_BILL_CYC_L,CI_BILL_CYC_L
+CI_CUST_CL_L,CI_CUST_CL_L
+CI_COLL_CL_L,CI_COLL_CL_L
+CI_BUD_PLAN_L,CI_BUD_PLAN_L
+CI_PREM_TYPE_L,CI_PREM_TYPE_L
+CI_MR_WARN_L,CI_MR_WARN_L
+CI_MR_INSTR_L,CI_MR_INSTR_L
+CI_TIME_ZONE_L,CI_TIME_ZONE_L
+JoinTree_1,CI_SEV_PROC
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_SEV_PROC,CI_SA,CI_SEV_PROC.SA_ID == CI_SA.SA_ID
+JoinTree_1,2,inner,CI_SEV_PROC,CI_SEV_EVT,CI_SEV_PROC.SEV_PROC_ID == CI_SEV_EVT.SEV_PROC_ID
+JoinTree_1,3,inner,CI_SA,CI_ACCT,CI_SA.ACCT_ID == CI_ACCT.ACCT_ID
+JoinTree_1,4,inner,CI_ACCT,CI_ACCT_PER,CI_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_1,5,inner,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
+JoinTree_1,6,leftOuter,CI_SEV_EVT,CMS_IS_NEXT_SEV_EVT,CI_SEV_EVT.SEV_PROC_ID == CMS_IS_NEXT_SEV_EVT.SEV_PROC_ID and CI_SEV_EVT.EVT_SEQ == CMS_IS_NEXT_SEV_EVT.EVT_SEQ
+JoinTree_1,7,inner,CI_SEV_PROC,CI_LOOKUP_VAL_L,CI_SEV_PROC.SEV_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'SEV_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,8,inner,CI_SEV_PROC,CI_LOOKUP_VAL_L_1,CI_SEV_PROC.SEV_STAT_RSN_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'SEV_STAT_RSN_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,9,leftOuter,CI_SEV_PROC,CI_LOOKUP_VAL_L_2,CI_SEV_PROC.CRIT_PRIO_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'CRIT_PRIO_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,10,inner,CI_SEV_PROC,CI_SEV_PROC_TMP_L,CI_SEV_PROC.SEV_PROC_TMPL_CD == CI_SEV_PROC_TMP_L.SEV_PROC_TMPL_CD and CI_SEV_PROC_TMP_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,11,inner,CI_SEV_EVT,CI_LOOKUP_VAL_L_3,CI_SEV_EVT.SEV_EVT_STAT_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'SEV_EVT_STAT_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_1,12,inner,CI_SEV_EVT,CI_SEV_EVT_TYPE_L,CI_SEV_EVT.SEV_EVT_TYPE_CD == CI_SEV_EVT_TYPE_L.SEV_EVT_TYPE_CD and CI_SEV_EVT_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,13,inner,CI_SA,CI_LOOKUP_VAL_L_4,CI_SA.SA_STATUS_FLG == CI_LOOKUP_VAL_L_4.FIELD_VALUE and CI_LOOKUP_VAL_L_4.FIELD_NAME == 'SA_STATUS_FLG' and CI_LOOKUP_VAL_L_4.LANGUAGE_CD == 'ENG'
+JoinTree_1,14,inner,CI_SA,CI_SA_TYPE_L,CI_SA.CIS_DIVISION == CI_SA_TYPE_L.CIS_DIVISION and CI_SA.SA_TYPE_CD == CI_SA_TYPE_L.SA_TYPE_CD
+JoinTree_1,15,leftOuter,CI_ACCT,CI_BILL_CYC_L,CI_ACCT.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,16,leftOuter,CI_ACCT,CI_ACCT_MGMT_GR_L,CI_ACCT.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,17,inner,CI_ACCT,CI_CUST_CL_L,CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,18,inner,CI_ACCT,CI_COLL_CL_L,CI_ACCT.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,19,leftOuter,CI_ACCT,CI_BUD_PLAN_L,CI_ACCT.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,20,leftOuter,CI_SA,CI_PREM,CI_SA.CHAR_PREM_ID == CI_PREM.PREM_ID
+JoinTree_1,21,leftOuter,CI_PREM,CI_PREM_TYPE_L,CI_PREM.PREM_TYPE_CD == CI_PREM_TYPE_L.PREM_TYPE_CD and CI_PREM_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,22,leftOuter,CI_PREM,CI_MR_WARN_L,CI_PREM.MR_WARN_CD == CI_MR_WARN_L.MR_WARN_CD and CI_MR_WARN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,23,leftOuter,CI_PREM,CI_MR_INSTR_L,CI_PREM.MR_INSTR_CD == CI_MR_INSTR_L.MR_INSTR_CD and CI_MR_INSTR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,24,leftOuter,CI_PREM,CI_TIME_ZONE_L,CI_PREM.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Severance Process,Arrears Amount,JoinTree_1.CI_SEV_PROC,ARS_AMT,,
+1.) Severance Process,Collection Process ID,JoinTree_1.CI_SEV_PROC,COLL_PROC_ID,,
+1.) Severance Process,Comments,JoinTree_1.CI_SEV_PROC,COMMENTS,,
+1.) Severance Process,Create Date/Time,JoinTree_1.CI_SEV_PROC,CRE_DTTM,,
+1.) Severance Process,Priority,JoinTree_1.CI_SEV_PROC,CRIT_PRIO_FLG,,
+1.) Severance Process,Currency Code,JoinTree_1.CI_SEV_PROC,CURRENCY_CD,,
+1.) Severance Process,Event Sequence,JoinTree_1.CI_SEV_PROC,EVT_SEQ,Dimension,CountAll
+1.) Severance Process,Message Category,JoinTree_1.CI_SEV_PROC,MESSAGE_CAT_NBR,Dimension,CountAll
+1.) Severance Process,Message Number,JoinTree_1.CI_SEV_PROC,MESSAGE_NBR,Dimension,CountAll
+1.) Severance Process,Service Agreement,JoinTree_1.CI_SEV_PROC,SA_ID,,
+1.) Severance Process,Arrears Date,JoinTree_1.CI_SEV_PROC,SEV_ARS_DT,,
+1.) Severance Process,Severance Process ID,JoinTree_1.CI_SEV_PROC,SEV_PROC_ID,,CountAll
+1.) Severance Process,Severance Process Template,JoinTree_1.CI_SEV_PROC,SEV_PROC_TMPL_CD,,
+1.) Severance Process,Severance Status Reason,JoinTree_1.CI_SEV_PROC,SEV_STAT_RSN_FLG,,
+1.) Severance Process,Severance Status,JoinTree_1.CI_SEV_PROC,SEV_STATUS_FLG,,
+1.) Severance Process,Trigger Business Process,JoinTree_1.CI_SEV_PROC,TRIGGER_BP_SW,,
+1.) Severance Event,Completion Date,JoinTree_1.CI_SEV_EVT,COMPLETION_DT,,
+1.) Severance Event,Days After Prev Response,JoinTree_1.CI_SEV_EVT,DAYS_AFT_PREV_EVT,,
+1.) Severance Event,Dep on Other Events,JoinTree_1.CI_SEV_EVT,DEP_EVT_SW,,
+1.) Severance Event,Event Sequence,JoinTree_1.CI_SEV_EVT,EVT_SEQ,Dimension,CountAll
+1.) Severance Event,Severance Event Status,JoinTree_1.CI_SEV_EVT,SEV_EVT_STAT_FLG,,
+1.) Severance Event,Severance Event Type,JoinTree_1.CI_SEV_EVT,SEV_EVT_TYPE_CD,,
+1.) Severance Event,Severance Process ID,JoinTree_1.CI_SEV_EVT,SEV_PROC_ID,,
+1.) Severance Event,Trigger Business Process,JoinTree_1.CI_SEV_EVT,TRIGGER_BP_SW,,
+1.) Severance Event,Trigger Date,JoinTree_1.CI_SEV_EVT,TRIGGER_DT,,
+1.) Service Agreement,Account ID,JoinTree_1.CI_SA,ACCT_ID,,
+1.) Service Agreement,Allow Estimates,JoinTree_1.CI_SA,ALLOW_EST_SW,,
+1.) Service Agreement,Business Activity,JoinTree_1.CI_SA,BUS_ACTIVITY_DESC,,
+1.) Service Agreement,Premise ID,JoinTree_1.CI_SA,CHAR_PREM_ID,,
+1.) Service Agreement,CIAC Review Date,JoinTree_1.CI_SA,CIAC_REVIEW_DT,,
+1.) Service Agreement,CIS Division,JoinTree_1.CI_SA,CIS_DIVISION,,
+1.) Service Agreement,Currency Code,JoinTree_1.CI_SA,CURRENCY_CD,,
+1.) Service Agreement,Customer Read,JoinTree_1.CI_SA,CUST_READ_FLG,,
+1.) Service Agreement,End Date,JoinTree_1.CI_SA,END_DT,,
+1.) Service Agreement,Order ID,JoinTree_1.CI_SA,ENRL_ID,,
+1.) Service Agreement,Expire Date,JoinTree_1.CI_SA,EXPIRE_DT,,
+1.) Service Agreement,Maximum Bill Threshold,JoinTree_1.CI_SA,HIGH_BILL_AMT,,
+1.) Service Agreement,Start Day Option,JoinTree_1.CI_SA,IB_BASE_TM_DAY_FLG,,
+1.) Service Agreement,IB SA Cutoff Time,JoinTree_1.CI_SA,IB_SA_CUTOFF_TM,,
+1.) Service Agreement,Deposit Interest Calculated,JoinTree_1.CI_SA,INT_CALC_DT,,
+1.) Service Agreement,NBB Auto Pay,JoinTree_1.CI_SA,NB_APAY_FLG,,
+1.) Service Agreement,Recommendation Rule,JoinTree_1.CI_SA,NB_RULE_CD,,
+1.) Service Agreement,Number of Payment Periods,JoinTree_1.CI_SA,NBR_PYMNT_PERIODS,,
+1.) Service Agreement,Old Account ID,JoinTree_1.CI_SA,OLD_ACCT_ID,,
+1.) Service Agreement,Decline Reason,JoinTree_1.CI_SA,PROP_DCL_RSN_CD,,
+1.) Service Agreement,Proposal SA ID,JoinTree_1.CI_SA,PROP_SA_ID,,
+1.) Service Agreement,Proposal SA Status,JoinTree_1.CI_SA,PROP_SA_STAT_FLG,,
+1.) Service Agreement,Renewal Date,JoinTree_1.CI_SA,RENEWAL_DT,,
+1.) Service Agreement,Service Agreement,JoinTree_1.CI_SA,SA_ID,,
+1.) Service Agreement,SA Relationship ID,JoinTree_1.CI_SA,SA_REL_ID,,
+1.) Service Agreement,SA Status,JoinTree_1.CI_SA,SA_STATUS_FLG,,
+1.) Service Agreement,SA Type,JoinTree_1.CI_SA,SA_TYPE_CD,,
+1.) Service Agreement,SIC,JoinTree_1.CI_SA,SIC_CD,,
+1.) Service Agreement,Special Usage,JoinTree_1.CI_SA,SPECIAL_USAGE_FLG,,
+1.) Service Agreement,Start Date,JoinTree_1.CI_SA,START_DT,,
+1.) Service Agreement,Start Option,JoinTree_1.CI_SA,START_OPT_CD,,
+1.) Service Agreement,Stop Requested By,JoinTree_1.CI_SA,STOP_REQED_BY,,
+1.) Service Agreement,Stop Reason,JoinTree_1.CI_SA,STOP_RSN_FLG,,
+1.) Service Agreement,Start Requested By,JoinTree_1.CI_SA,STRT_REQED_BY,,
+1.) Service Agreement,Start Reason,JoinTree_1.CI_SA,STRT_RSN_FLG,,
+1.) Service Agreement,Total Amount to Bill,JoinTree_1.CI_SA,TOT_TO_BILL_AMT,,
+1.) Account,Access Group,JoinTree_1.CI_ACCT,ACCESS_GRP_CD,,
+1.) Account,Account ID,JoinTree_1.CI_ACCT,ACCT_ID,,
+1.) Account,Account Management Group,JoinTree_1.CI_ACCT,ACCT_MGMT_GRP_CD,,
+1.) Account,Alert Information,JoinTree_1.CI_ACCT,ALERT_INFO,,
+1.) Account,Bill After                    ,JoinTree_1.CI_ACCT,BILL_AFTER_DT,,
+1.) Account,Bill Cycle,JoinTree_1.CI_ACCT,BILL_CYC_CD,,
+1.) Account,Bill Print Intercept,JoinTree_1.CI_ACCT,BILL_PRT_INTERCEPT,,
+1.) Account,Budget Plan,JoinTree_1.CI_ACCT,BUD_PLAN_CD,,
+1.) Account,CIS Division,JoinTree_1.CI_ACCT,CIS_DIVISION,,
+1.) Account,Collection Class,JoinTree_1.CI_ACCT,COLL_CL_CD,,
+1.) Account,Last Credit Review Date,JoinTree_1.CI_ACCT,CR_REVIEW_DT,,
+1.) Account,Currency Code,JoinTree_1.CI_ACCT,CURRENCY_CD,,
+1.) Account,Customer Class,JoinTree_1.CI_ACCT,CUST_CL_CD,,
+1.) Account,Internal Credit Review,JoinTree_1.CI_ACCT,INT_CR_REVIEW_SW,,
+1.) Account,Mailing Premise ID,JoinTree_1.CI_ACCT,MAILING_PREM_ID,,
+1.) Account,No Deposit Review Switch,JoinTree_1.CI_ACCT,NO_DEP_RVW_SW,,
+1.) Account,Postpone Credit Review Until,JoinTree_1.CI_ACCT,POSTPONE_CR_RVW_DT,,
+1.) Account,Protect Bill Cycle,JoinTree_1.CI_ACCT,PROTECT_CYC_SW,,
+1.) Account,Protect Division,JoinTree_1.CI_ACCT,PROTECT_DIV_SW,,
+1.) Account,Protect Mailing Premise,JoinTree_1.CI_ACCT,PROTECT_PREM_SW,,
+1.) Account,Set Up Date,JoinTree_1.CI_ACCT,SETUP_DT,,
+1.) Premise,Address,JoinTree_1.CI_PREM,ADDRESS1,,
+1.) Premise,Address Uppercase,JoinTree_1.CI_PREM,ADDRESS1_UPR,,
+1.) Premise,Address 2,JoinTree_1.CI_PREM,ADDRESS2,,
+1.) Premise,Address 3,JoinTree_1.CI_PREM,ADDRESS3,,
+1.) Premise,Address 4,JoinTree_1.CI_PREM,ADDRESS4,,
+1.) Premise,CIS Division,JoinTree_1.CI_PREM,CIS_DIVISION,,
+1.) Premise,City,JoinTree_1.CI_PREM,CITY,,
+1.) Premise,City Uppercase,JoinTree_1.CI_PREM,CITY_UPR,,
+1.) Premise,Country,JoinTree_1.CI_PREM,COUNTRY,,
+1.) Premise,County,JoinTree_1.CI_PREM,COUNTY,,
+1.) Premise,Geographical Code,JoinTree_1.CI_PREM,GEO_CODE,,
+1.) Premise,House Type,JoinTree_1.CI_PREM,HOUSE_TYPE,,
+1.) Premise,In City Limit,JoinTree_1.CI_PREM,IN_CITY_LIMIT,,
+1.) Premise,Key ID,JoinTree_1.CI_PREM,KEY_ID,,
+1.) Premise,Key,JoinTree_1.CI_PREM,KEY_SW,,
+1.) Premise,Landlord Agreement ID,JoinTree_1.CI_PREM,LL_ID,,
+1.) Premise,Life Support / Sensitive Load Details,JoinTree_1.CI_PREM,LS_SL_DESCR,,
+1.) Premise,Life Support / Sensitive Load,JoinTree_1.CI_PREM,LS_SL_FLG,,
+1.) Premise,Mailing Address,JoinTree_1.CI_PREM,MAIL_ADDR_SW,,
+1.) Premise,Meter Read Instruction,JoinTree_1.CI_PREM,MR_INSTR_CD,,
+1.) Premise,Instruction Details,JoinTree_1.CI_PREM,MR_INSTR_DETAILS,,
+1.) Premise,Meter Read Warning,JoinTree_1.CI_PREM,MR_WARN_CD,,
+1.) Premise,Number 1,JoinTree_1.CI_PREM,NUM1,,
+1.) Premise,Number 2,JoinTree_1.CI_PREM,NUM2,,
+1.) Premise,OK to Enter,JoinTree_1.CI_PREM,OK_TO_ENTER_SW,,
+1.) Premise,Postal,JoinTree_1.CI_PREM,POSTAL,,
+1.) Premise,Premise ID,JoinTree_1.CI_PREM,PREM_ID,,
+1.) Premise,Premise Type,JoinTree_1.CI_PREM,PREM_TYPE_CD,,
+1.) Premise,Parent Premise ID,JoinTree_1.CI_PREM,PRNT_PREM_ID,,
+1.) Premise,State,JoinTree_1.CI_PREM,STATE,,
+1.) Premise,Time Zone,JoinTree_1.CI_PREM,TIME_ZONE_CD,,
+1.) Premise,Trend Area,JoinTree_1.CI_PREM,TREND_AREA_CD,,
+1.) Descriptions,Account Management Group Description,JoinTree_1.CI_ACCT_MGMT_GR_L,DESCR,,
+1.) Descriptions,Bill Cycle Description,JoinTree_1.CI_BILL_CYC_L,DESCR,,
+1.) Descriptions,Budget Plan Description,JoinTree_1.CI_BUD_PLAN_L,DESCR,,
+1.) Descriptions,Collection Class Description,JoinTree_1.CI_COLL_CL_L,DESCR,,
+1.) Descriptions,Customer Class Description,JoinTree_1.CI_CUST_CL_L,DESCR,,
+1.) Descriptions,Meter Read Instruction Description,JoinTree_1.CI_MR_INSTR_L,DESCR,,
+1.) Descriptions,Meter Read Warning Description,JoinTree_1.CI_MR_WARN_L,DESCR,,
+1.) Descriptions,Premise Type Description,JoinTree_1.CI_PREM_TYPE_L,DESCR,,
+1.) Descriptions,Priority Description,JoinTree_1.CI_LOOKUP_VAL_L_2,DESCR,,
+1.) Descriptions,SA Status Description,JoinTree_1.CI_LOOKUP_VAL_L_4,DESCR,,
+1.) Descriptions,SA Type Description,JoinTree_1.CI_SA_TYPE_L,DESCR,,
+1.) Descriptions,Severance Event Status Description,JoinTree_1.CI_LOOKUP_VAL_L_3,DESCR,,
+1.) Descriptions,Severance Event Type Description,JoinTree_1.CI_SEV_EVT_TYPE_L,DESCR,,
+1.) Descriptions,Severance Process Template Description,JoinTree_1.CI_SEV_PROC_TMP_L,DESCR,,
+1.) Descriptions,Severance Status Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Severance Status Reason Description,JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,Time Zone Description,JoinTree_1.CI_TIME_ZONE_L,DESCR,,
+1.) Formulas,Days Old,JoinTree_1,DAYS_OLD,,
+1.) Formulas,Distinct Account ID,JoinTree_1,ACCT_ID_DISTINCT,,
+1.) Formulas,Distinct Severance Event,JoinTree_1,SEV_EVT_DISTINCT,,
+1.) Formulas,Distinct Severance Process,JoinTree_1,SEV_PROC_ID_DISTINCT,,Sum
+1.) Formulas,Distinct Service Agreement,JoinTree_1,SA_ID_DISTINCT,,
+1.) Formulas,Days Old,JoinTree_1,DAYS_OLD,,
+1.) Formulas,Is Next Severance Event,JoinTree_1,IS_NEXT_SEV_EVT,,
+1.) Formulas,Name,JoinTree_1.CI_PER_NAME,ENTITY_NAME_UPR,,

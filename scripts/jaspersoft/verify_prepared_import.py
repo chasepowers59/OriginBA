@@ -40,6 +40,16 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Require the package to contain DataSource/<target_ds>.xml and an index.xml repository resource entry.",
     )
+    parser.add_argument(
+        "--repository-uri-style",
+        choices=("full", "org_relative"),
+        default="full",
+        help="Match full org-scoped URIs or org-relative /SmartCity and /DataSource paths.",
+    )
+    parser.add_argument(
+        "--import-module-folder-uri",
+        help="Expected full org-scoped index.xml module folder URI for import wrapper validation.",
+    )
     return parser.parse_args()
 
 
@@ -86,6 +96,8 @@ def verify_zip(
     source_org: str | None,
     source_ds: str | None,
     expect_datasource_overlay: bool,
+    repository_uri_style: str = "full",
+    import_module_folder_uri: str | None = None,
 ) -> VerificationResult:
     messages: List[str] = []
     ok = True
@@ -101,6 +113,7 @@ def verify_zip(
         datasource_xml = (
             f"{ORG_ROOT_PREFIX}{target_org}/DataSource/{target_ds}.xml"
         )
+        org_relative_uris = repository_uri_style == "org_relative"
         datasource_resource = (
             f"/organizations/organization_1/organizations/{target_org}/DataSource/{target_ds}"
         )
@@ -130,6 +143,24 @@ def verify_zip(
             else:
                 ok = False
                 messages.append(f"index.xml missing repository resource: {datasource_resource}")
+
+            if import_module_folder_uri:
+                index_root = ET.fromstring(index_text)
+                index_folder = None
+                for module in index_root.findall("module"):
+                    if module.get("id") == "repositoryResources":
+                        folder_element = module.find("folder")
+                        if folder_element is not None:
+                            index_folder = (folder_element.text or "").strip()
+                        break
+                if index_folder == import_module_folder_uri:
+                    messages.append(f"index.xml import folder matches: {import_module_folder_uri}")
+                else:
+                    ok = False
+                    messages.append(
+                        "index.xml import folder mismatch: "
+                        f"expected {import_module_folder_uri}, found {index_folder!r}"
+                    )
         else:
             if any("/DataSource/" in name and name.endswith(".xml") for name in names):
                 ok = False
@@ -139,7 +170,11 @@ def verify_zip(
 
         referenced_uris: List[str] = []
         referenced_target_ds = False
+        referenced_smartcity_uri = False
+        referenced_datasource_uri = False
         leftover_hits: List[Tuple[str, str]] = []
+        leftover_org_uri_hits: List[str] = []
+        org_prefix = f"/organizations/organization_1/organizations/{target_org}/"
         check_terms: Sequence[Tuple[str, str | None]] = (
             ("source org", source_org),
             ("source datasource", source_ds),
@@ -155,6 +190,19 @@ def verify_zip(
             if target_ds in text:
                 referenced_target_ds = True
             referenced_uris.extend(collect_repository_uris(text))
+            if "/SmartCity/" in text:
+                referenced_smartcity_uri = True
+            if "/DataSource/" in text:
+                referenced_datasource_uri = True
+
+            if (
+                org_relative_uris
+                and org_prefix in text
+                and name != "index.xml"
+                and not name.endswith("/.folder.xml")
+                and "/DataSource/" not in name
+            ):
+                leftover_org_uri_hits.append(name)
 
             for label, term in check_terms:
                 if term and term in text:
@@ -166,13 +214,28 @@ def verify_zip(
             ok = False
             messages.append(f"target datasource string not found in package contents: {target_ds}")
 
-        target_uri_prefix = f"/organizations/organization_1/organizations/{target_org}/"
         uri_sample = sorted(set(referenced_uris))
-        if any(uri.startswith(target_uri_prefix) for uri in uri_sample):
-            messages.append(f"target repository URIs found: {target_uri_prefix}")
+        if org_relative_uris:
+            if referenced_smartcity_uri and referenced_datasource_uri:
+                messages.append("org-relative repository URIs found: /SmartCity/ and /DataSource/")
+            else:
+                ok = False
+                messages.append(
+                    "org-relative repository URIs missing expected /SmartCity/ and /DataSource/ prefixes"
+                )
+            if leftover_org_uri_hits:
+                ok = False
+                messages.append(
+                    "leftover org-scoped repository URI found in contents: "
+                    f"{leftover_org_uri_hits[0]}"
+                )
         else:
-            ok = False
-            messages.append(f"target repository URIs not found: {target_uri_prefix}")
+            target_uri_prefix = f"/organizations/organization_1/organizations/{target_org}/"
+            if any(uri.startswith(target_uri_prefix) for uri in uri_sample):
+                messages.append(f"target repository URIs found: {target_uri_prefix}")
+            else:
+                ok = False
+                messages.append(f"target repository URIs not found: {target_uri_prefix}")
 
         if source_org and any_name_contains(names, source_org):
             ok = False
@@ -207,6 +270,8 @@ def main() -> int:
         source_org=args.source_org,
         source_ds=args.source_ds,
         expect_datasource_overlay=args.expect_datasource_overlay,
+        repository_uri_style=args.repository_uri_style,
+        import_module_folder_uri=args.import_module_folder_uri,
     )
 
     print(f"ZIP: {zip_path}")

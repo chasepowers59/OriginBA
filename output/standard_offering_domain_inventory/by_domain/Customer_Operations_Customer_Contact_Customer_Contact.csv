@@ -1,0 +1,144 @@
+section,domain_name,Customer_Contact___Domain
+section,workstream,Customer Operations
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_CC,CI_CC
+CI_CC_TYPE_L,CI_CC_TYPE_L
+CI_CC_CL_L,CI_CC_CL_L
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_2,CI_LOOKUP_VAL_L
+CI_LETTER_TMPL_L,CI_LETTER_TMPL_L
+CI_PREM,CI_PREM
+SC_USER,SC_USER
+CI_PER_NAME,CI_PER_NAME
+CI_ACCT,CI_ACCT
+CI_BILL_CYC_L,CI_BILL_CYC_L
+CI_COLL_CL_L,CI_COLL_CL_L
+CI_BUD_PLAN_L,CI_BUD_PLAN_L
+CI_ACCT_MGMT_GR_L,CI_ACCT_MGMT_GR_L
+CI_PREM_TYPE_L,CI_PREM_TYPE_L
+CI_MR_INSTR_L,CI_MR_INSTR_L
+CI_TIME_ZONE_L,CI_TIME_ZONE_L
+CI_CUST_CL_L,CI_CUST_CL_L
+CI_MR_WARN_L,CI_MR_WARN_L
+JoinTree_1,CI_CC
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_CC,CI_PER_NAME,CI_CC.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
+JoinTree_1,2,leftOuter,CI_CC,CI_ACCT,CI_CC.ACCT_ID == CI_ACCT.ACCT_ID
+JoinTree_1,3,leftOuter,CI_CC,CI_PREM,CI_CC.PREM_ID == CI_PREM.PREM_ID
+JoinTree_1,4,inner,CI_CC,SC_USER,CI_CC.USER_ID == SC_USER.USER_ID
+JoinTree_1,5,inner,CI_CC,CI_CC_CL_L,CI_CC.CC_CL_CD == CI_CC_CL_L.CC_CL_CD and CI_CC_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,6,inner,CI_CC,CI_CC_TYPE_L,CI_CC.CC_CL_CD == CI_CC_TYPE_L.CC_CL_CD and CI_CC.CC_TYPE_CD == CI_CC_TYPE_L.CC_TYPE_CD and CI_CC_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,7,leftOuter,CI_CC,CI_LOOKUP_VAL_L,CI_CC.CC_ENTITY_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'CC_ENTITY_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,8,leftOuter,CI_CC,CI_LETTER_TMPL_L,CI_CC.LTR_TMPL_CD == CI_LETTER_TMPL_L.LTR_TMPL_CD and CI_LETTER_TMPL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,9,leftOuter,CI_CC,CI_LOOKUP_VAL_L_1,CI_CC.CC_STATUS_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'CC_STATUS_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,10,leftOuter,CI_CC,CI_LOOKUP_VAL_L_2,CI_CC.CONTACT_METH_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'CONTACT_METH_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,11,leftOuter,CI_ACCT,CI_BILL_CYC_L,CI_ACCT.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,12,leftOuter,CI_ACCT,CI_CUST_CL_L,CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,13,leftOuter,CI_ACCT,CI_COLL_CL_L,CI_ACCT.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,14,leftOuter,CI_ACCT,CI_ACCT_MGMT_GR_L,CI_ACCT.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,15,leftOuter,CI_ACCT,CI_BUD_PLAN_L,CI_ACCT.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,16,leftOuter,CI_PREM,CI_PREM_TYPE_L,CI_PREM.PREM_TYPE_CD == CI_PREM_TYPE_L.PREM_TYPE_CD and CI_PREM_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,17,leftOuter,CI_PREM,CI_MR_WARN_L,CI_PREM.MR_WARN_CD == CI_MR_WARN_L.MR_WARN_CD
+JoinTree_1,18,leftOuter,CI_PREM,CI_MR_INSTR_L,CI_PREM.MR_INSTR_CD == CI_MR_INSTR_L.MR_INSTR_CD and CI_MR_INSTR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,19,leftOuter,CI_PREM,CI_TIME_ZONE_L,CI_PREM.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Customer Contact,Account ID,JoinTree_1.CI_CC,ACCT_ID,,
+1.) Customer Contact,Batch Control,JoinTree_1.CI_CC,BATCH_CD,,
+1.) Customer Contact,Batch Number,JoinTree_1.CI_CC,BATCH_NBR,Dimension,CountAll
+1.) Customer Contact,Person Contact,JoinTree_1.CI_CC,C1_CONTACT_ID,,
+1.) Customer Contact,Contact Class,JoinTree_1.CI_CC,CC_CL_CD,,
+1.) Customer Contact,Contact Date/Time,JoinTree_1.CI_CC,CC_DTTM,,
+1.) Customer Contact,Customer Contact Entity,JoinTree_1.CI_CC,CC_ENTITY_FLG,,
+1.) Customer Contact,Customer Contact ID,JoinTree_1.CI_CC,CC_ID,,
+1.) Customer Contact,Contact Status,JoinTree_1.CI_CC,CC_STATUS_FLG,,
+1.) Customer Contact,Contact Type,JoinTree_1.CI_CC,CC_TYPE_CD,,
+1.) Customer Contact,Preferred Contact Method,JoinTree_1.CI_CC,CONTACT_METH_FLG,,
+1.) Customer Contact,Detailed Description,JoinTree_1.CI_CC,DESCRLONG,,
+1.) Customer Contact,Letter Print Date/Time,JoinTree_1.CI_CC,LETTER_PRINT_DTTM,,
+1.) Customer Contact,Letter Template,JoinTree_1.CI_CC,LTR_TMPL_CD,,
+1.) Customer Contact,Person ID,JoinTree_1.CI_CC,PER_ID,,
+1.) Customer Contact,Premise ID,JoinTree_1.CI_CC,PREM_ID,,
+1.) Customer Contact,Print Letter,JoinTree_1.CI_CC,PRINT_LETTER_SW,,
+1.) Customer Contact,User,JoinTree_1.CI_CC,USER_ID,,
+1.) Account,Access Group,JoinTree_1.CI_ACCT,ACCESS_GRP_CD,,
+1.) Account,Account ID,JoinTree_1.CI_ACCT,ACCT_ID,,
+1.) Account,Account Management Group,JoinTree_1.CI_ACCT,ACCT_MGMT_GRP_CD,,
+1.) Account,Alert Information,JoinTree_1.CI_ACCT,ALERT_INFO,,
+1.) Account,Bill After                    ,JoinTree_1.CI_ACCT,BILL_AFTER_DT,,
+1.) Account,Bill Cycle,JoinTree_1.CI_ACCT,BILL_CYC_CD,,
+1.) Account,Bill Print Intercept,JoinTree_1.CI_ACCT,BILL_PRT_INTERCEPT,,
+1.) Account,Budget Plan,JoinTree_1.CI_ACCT,BUD_PLAN_CD,,
+1.) Account,CIS Division,JoinTree_1.CI_ACCT,CIS_DIVISION,,
+1.) Account,Collection Class,JoinTree_1.CI_ACCT,COLL_CL_CD,,
+1.) Account,Last Credit Review Date,JoinTree_1.CI_ACCT,CR_REVIEW_DT,,
+1.) Account,Currency Code,JoinTree_1.CI_ACCT,CURRENCY_CD,,
+1.) Account,Customer Class,JoinTree_1.CI_ACCT,CUST_CL_CD,,
+1.) Account,Internal Credit Review,JoinTree_1.CI_ACCT,INT_CR_REVIEW_SW,,
+1.) Account,Mailing Premise ID,JoinTree_1.CI_ACCT,MAILING_PREM_ID,,
+1.) Account,No Deposit Review Switch,JoinTree_1.CI_ACCT,NO_DEP_RVW_SW,,
+1.) Account,Postpone Credit Review Until,JoinTree_1.CI_ACCT,POSTPONE_CR_RVW_DT,,
+1.) Account,Protect Bill Cycle,JoinTree_1.CI_ACCT,PROTECT_CYC_SW,,
+1.) Account,Protect Division,JoinTree_1.CI_ACCT,PROTECT_DIV_SW,,
+1.) Account,Protect Mailing Premise,JoinTree_1.CI_ACCT,PROTECT_PREM_SW,,
+1.) Account,Set Up Date,JoinTree_1.CI_ACCT,SETUP_DT,,
+1.) Premise,Address,JoinTree_1.CI_PREM,ADDRESS1,,
+1.) Premise,Address Uppercase,JoinTree_1.CI_PREM,ADDRESS1_UPR,,
+1.) Premise,Address 2,JoinTree_1.CI_PREM,ADDRESS2,,
+1.) Premise,Address 3,JoinTree_1.CI_PREM,ADDRESS3,,
+1.) Premise,Address 4,JoinTree_1.CI_PREM,ADDRESS4,,
+1.) Premise,CIS Division,JoinTree_1.CI_PREM,CIS_DIVISION,,
+1.) Premise,City,JoinTree_1.CI_PREM,CITY,,
+1.) Premise,City Uppercase,JoinTree_1.CI_PREM,CITY_UPR,,
+1.) Premise,Country,JoinTree_1.CI_PREM,COUNTRY,,
+1.) Premise,County,JoinTree_1.CI_PREM,COUNTY,,
+1.) Premise,Geographical Code,JoinTree_1.CI_PREM,GEO_CODE,,
+1.) Premise,House Type,JoinTree_1.CI_PREM,HOUSE_TYPE,,
+1.) Premise,In City Limit,JoinTree_1.CI_PREM,IN_CITY_LIMIT,,
+1.) Premise,Key ID,JoinTree_1.CI_PREM,KEY_ID,,
+1.) Premise,Key,JoinTree_1.CI_PREM,KEY_SW,,
+1.) Premise,Landlord Agreement ID,JoinTree_1.CI_PREM,LL_ID,,
+1.) Premise,Life Support / Sensitive Load Details,JoinTree_1.CI_PREM,LS_SL_DESCR,,
+1.) Premise,Life Support / Sensitive Load,JoinTree_1.CI_PREM,LS_SL_FLG,,
+1.) Premise,Mailing Address,JoinTree_1.CI_PREM,MAIL_ADDR_SW,,
+1.) Premise,Meter Read Instruction,JoinTree_1.CI_PREM,MR_INSTR_CD,,
+1.) Premise,Instruction Details,JoinTree_1.CI_PREM,MR_INSTR_DETAILS,,
+1.) Premise,Meter Read Warning,JoinTree_1.CI_PREM,MR_WARN_CD,,
+1.) Premise,Number 1,JoinTree_1.CI_PREM,NUM1,,
+1.) Premise,Number 2,JoinTree_1.CI_PREM,NUM2,,
+1.) Premise,OK to Enter,JoinTree_1.CI_PREM,OK_TO_ENTER_SW,,
+1.) Premise,Postal,JoinTree_1.CI_PREM,POSTAL,,
+1.) Premise,Premise ID,JoinTree_1.CI_PREM,PREM_ID,,
+1.) Premise,Premise Type,JoinTree_1.CI_PREM,PREM_TYPE_CD,,
+1.) Premise,Parent Premise ID,JoinTree_1.CI_PREM,PRNT_PREM_ID,,
+1.) Premise,State,JoinTree_1.CI_PREM,STATE,,
+1.) Premise,Time Zone,JoinTree_1.CI_PREM,TIME_ZONE_CD,,
+1.) Premise,Trend Area,JoinTree_1.CI_PREM,TREND_AREA_CD,,
+1.) Descriptions,Account Management Group Description,JoinTree_1.CI_ACCT_MGMT_GR_L,DESCR,,
+1.) Descriptions,Bill Cycle Description,JoinTree_1.CI_BILL_CYC_L,DESCR,,
+1.) Descriptions,Budget Plan Description,JoinTree_1.CI_BUD_PLAN_L,DESCR,,
+1.) Descriptions,Collection Class Description,JoinTree_1.CI_COLL_CL_L,DESCR,,
+1.) Descriptions,Contact Class Description,JoinTree_1.CI_CC_CL_L,DESCR,,
+1.) Descriptions,Contact Status Description,JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,Contact Type Description,JoinTree_1.CI_CC_TYPE_L,DESCR,,
+1.) Descriptions,Customer Class Description,JoinTree_1.CI_CUST_CL_L,DESCR,,
+1.) Descriptions,Customer Contact Entity Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Letter Template Description,JoinTree_1.CI_LETTER_TMPL_L,DESCR,,
+1.) Descriptions,Meter Read Instruction Description,JoinTree_1.CI_MR_INSTR_L,DESCR,,
+1.) Descriptions,Meter Read Warning Description,JoinTree_1.CI_MR_WARN_L,DESCR,,
+1.) Descriptions,Preferred Contact Method Description,JoinTree_1.CI_LOOKUP_VAL_L_2,DESCR,,
+1.) Descriptions,Premise Type Description,JoinTree_1.CI_PREM_TYPE_L,DESCR,,
+1.) Descriptions,Time Zone Description,JoinTree_1.CI_TIME_ZONE_L,DESCR,,
+1.) Formulas,Days Old,JoinTree_1,DAYS_OLD,,
+1.) Formulas,Distinct Account ID,JoinTree_1,ACCT_ID_DISTINCT,,
+1.) Formulas,Distinct Customer Contact,JoinTree_1,CC_ID_DIST,,
+1.) Formulas,Distinct Person ID,JoinTree_1,PER_ID_DISTINCT,,
+1.) Formulas,Distinct Premise ID,JoinTree_1,PREM_ID_DISTINCT,,
+1.) Formulas,Name,JoinTree_1.CI_PER_NAME,ENTITY_NAME_UPR,,
+1.) Formulas,User (Name),JoinTree_1,USER_ID_NAME,,

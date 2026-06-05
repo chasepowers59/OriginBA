@@ -1,0 +1,111 @@
+section,domain_name,Write_Off_Process___Domain
+section,workstream,Debt Management
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_2,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_3,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_4,CI_LOOKUP_VAL_L
+CI_WO_CNTL_L,CI_WO_CNTL_L
+CI_WO_PROC_TMPL_L,CI_WO_PROC_TMPL_L
+CI_WO_EVT,CI_WO_EVT
+CI_WO_EVT_TYP_L,CI_WO_EVT_TYP_L
+CI_WO_PROC,CI_WO_PROC
+CI_WO_PROC_SA,CI_WO_PROC_SA
+CI_WO_DEBT_CL_L,CI_WO_DEBT_CL_L
+CI_ACCT,CI_ACCT
+CI_ACCT_PER,CI_ACCT_PER
+CI_PER_NAME,CI_PER_NAME
+CI_BILL_CYC_L,CI_BILL_CYC_L
+CI_COLL_CL_L,CI_COLL_CL_L
+CI_CUST_CL_L,CI_CUST_CL_L
+CI_ACCT_MGMT_GR_L,CI_ACCT_MGMT_GR_L
+CI_BUD_PLAN_L,CI_BUD_PLAN_L
+JoinTree_1,CI_WO_PROC
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_WO_PROC,CI_WO_EVT,CI_WO_PROC.WO_PROC_ID == CI_WO_EVT.WO_PROC_ID
+JoinTree_1,2,inner,CI_WO_PROC,CI_ACCT,CI_WO_PROC.ACCT_ID == CI_ACCT.ACCT_ID
+JoinTree_1,3,inner,CI_ACCT,CI_ACCT_PER,CI_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_1,4,inner,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
+JoinTree_1,5,inner,CI_WO_PROC,CI_WO_PROC_TMPL_L,CI_WO_PROC.WO_PROC_TMPL_CD == CI_WO_PROC_TMPL_L.WO_PROC_TMPL_CD and CI_WO_PROC_TMPL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,6,inner,CI_WO_PROC,CI_LOOKUP_VAL_L,CI_WO_PROC.WO_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'WO_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,7,inner,CI_WO_PROC,CI_WO_CNTL_L,CI_WO_PROC.WO_CNTL_CD == CI_WO_CNTL_L.WO_CNTL_CD and CI_WO_CNTL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,8,inner,CI_WO_PROC,CI_LOOKUP_VAL_L_1,CI_WO_PROC.WO_STAT_RSN_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'WO_STAT_RSN_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,9,leftOuter,CI_WO_PROC,CI_LOOKUP_VAL_L_2,CI_WO_PROC.CRIT_PRIO_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'CRIT_PRIO_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,10,inner,CI_WO_EVT,CI_LOOKUP_VAL_L_3,CI_WO_EVT.WO_EVT_STAT_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'WO_EVT_STAT_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_1,11,inner,CI_WO_EVT,CI_WO_EVT_TYP_L,CI_WO_EVT.WO_EVT_TYP_CD == CI_WO_EVT_TYP_L.WO_EVT_TYP_CD and CI_WO_EVT_TYP_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,12,leftOuter,CI_WO_EVT,CMS_IS_NEXT_WO_EVT,CI_WO_EVT.WO_PROC_ID == CMS_IS_NEXT_WO_EVT.WO_PROC_ID and CI_WO_EVT.EVT_SEQ == CMS_IS_NEXT_WO_EVT.EVT_SEQ
+JoinTree_1,13,leftOuter,CI_ACCT,CI_BILL_CYC_L,CI_ACCT.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,14,leftOuter,CI_ACCT,CI_ACCT_MGMT_GR_L,CI_ACCT.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,15,inner,CI_ACCT,CI_CUST_CL_L,CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,16,inner,CI_ACCT,CI_COLL_CL_L,CI_ACCT.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,17,leftOuter,CI_ACCT,CI_BUD_PLAN_L,CI_ACCT.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,18,leftOuter,CI_WO_PROC,CMS_WO_PROC_SA_ACTIVE,CI_WO_PROC.WO_PROC_ID == CMS_WO_PROC_SA_ACTIVE.WO_PROC_ID
+JoinTree_1,19,leftOuter,CI_WO_PROC,CMS_WO_PROC_SA_INACTIVE,CI_WO_PROC.WO_PROC_ID == CMS_WO_PROC_SA_INACTIVE.WO_PROC_ID
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Write Off Process,Account ID,JoinTree_1.CI_WO_PROC,ACCT_ID,,
+1.) Write Off Process,Comments,JoinTree_1.CI_WO_PROC,COMMENTS,,
+1.) Write Off Process,Create Date/Time,JoinTree_1.CI_WO_PROC,CRE_DTTM,,
+1.) Write Off Process,Priority,JoinTree_1.CI_WO_PROC,CRIT_PRIO_FLG,,
+1.) Write Off Process,Message Category,JoinTree_1.CI_WO_PROC,MESSAGE_CAT_NBR,Dimension,CountAll
+1.) Write Off Process,Message Number,JoinTree_1.CI_WO_PROC,MESSAGE_NBR,Dimension,CountAll
+1.) Write Off Process,Trigger Business Process,JoinTree_1.CI_WO_PROC,TRIGGER_BP_SW,,
+1.) Write Off Process,Write Off Control,JoinTree_1.CI_WO_PROC,WO_CNTL_CD,,
+1.) Write Off Process,Write Off Process ID,JoinTree_1.CI_WO_PROC,WO_PROC_ID,,
+1.) Write Off Process,Write Off Process Template,JoinTree_1.CI_WO_PROC,WO_PROC_TMPL_CD,,
+1.) Write Off Process,Write Off Status Reason,JoinTree_1.CI_WO_PROC,WO_STAT_RSN_FLG,,
+1.) Write Off Process,Write Off Status,JoinTree_1.CI_WO_PROC,WO_STATUS_FLG,,
+1.) Write Off Event,Completion Date,JoinTree_1.CI_WO_EVT,COMPLETION_DT,,
+1.) Write Off Event,Event Sequence,JoinTree_1.CI_WO_EVT,EVT_SEQ,Dimension,CountAll
+1.) Write Off Event,Trigger Business Process,JoinTree_1.CI_WO_EVT,TRIGGER_BP_SW,,
+1.) Write Off Event,Trigger Date,JoinTree_1.CI_WO_EVT,TRIGGER_DT,,
+1.) Write Off Event,Write Off Event Status,JoinTree_1.CI_WO_EVT,WO_EVT_STAT_FLG,,
+1.) Write Off Event,Write Off Event Type,JoinTree_1.CI_WO_EVT,WO_EVT_TYP_CD,,
+1.) Write Off Event,Write Off Process ID,JoinTree_1.CI_WO_EVT,WO_PROC_ID,,
+1.) Account,Access Group,JoinTree_1.CI_ACCT,ACCESS_GRP_CD,,
+1.) Account,Account ID,JoinTree_1.CI_ACCT,ACCT_ID,,
+1.) Account,Account Management Group,JoinTree_1.CI_ACCT,ACCT_MGMT_GRP_CD,,
+1.) Account,Alert Information,JoinTree_1.CI_ACCT,ALERT_INFO,,
+1.) Account,Bill After                    ,JoinTree_1.CI_ACCT,BILL_AFTER_DT,,
+1.) Account,Bill Cycle,JoinTree_1.CI_ACCT,BILL_CYC_CD,,
+1.) Account,Bill Print Intercept,JoinTree_1.CI_ACCT,BILL_PRT_INTERCEPT,,
+1.) Account,Budget Plan,JoinTree_1.CI_ACCT,BUD_PLAN_CD,,
+1.) Account,CIS Division,JoinTree_1.CI_ACCT,CIS_DIVISION,,
+1.) Account,Collection Class,JoinTree_1.CI_ACCT,COLL_CL_CD,,
+1.) Account,Last Credit Review Date,JoinTree_1.CI_ACCT,CR_REVIEW_DT,,
+1.) Account,Currency Code,JoinTree_1.CI_ACCT,CURRENCY_CD,,
+1.) Account,Customer Class,JoinTree_1.CI_ACCT,CUST_CL_CD,,
+1.) Account,Internal Credit Review,JoinTree_1.CI_ACCT,INT_CR_REVIEW_SW,,
+1.) Account,Mailing Premise ID,JoinTree_1.CI_ACCT,MAILING_PREM_ID,,
+1.) Account,No Deposit Review Switch,JoinTree_1.CI_ACCT,NO_DEP_RVW_SW,,
+1.) Account,Postpone Credit Review Until,JoinTree_1.CI_ACCT,POSTPONE_CR_RVW_DT,,
+1.) Account,Protect Bill Cycle,JoinTree_1.CI_ACCT,PROTECT_CYC_SW,,
+1.) Account,Protect Division,JoinTree_1.CI_ACCT,PROTECT_DIV_SW,,
+1.) Account,Protect Mailing Premise,JoinTree_1.CI_ACCT,PROTECT_PREM_SW,,
+1.) Account,Set Up Date,JoinTree_1.CI_ACCT,SETUP_DT,,
+1.) Descriptions,Account Management Group Description,JoinTree_1.CI_ACCT_MGMT_GR_L,DESCR,,
+1.) Descriptions,Bill Cycle Description,JoinTree_1.CI_BILL_CYC_L,DESCR,,
+1.) Descriptions,Budget Plan Description,JoinTree_1.CI_BUD_PLAN_L,DESCR,,
+1.) Descriptions,Collection Class Description,JoinTree_1.CI_COLL_CL_L,DESCR,,
+1.) Descriptions,Customer Class Description,JoinTree_1.CI_CUST_CL_L,DESCR,,
+1.) Descriptions,Priority Description,JoinTree_1.CI_LOOKUP_VAL_L_2,DESCR,,
+1.) Descriptions,Write Off Control Description,JoinTree_1.CI_WO_CNTL_L,DESCR,,
+1.) Descriptions,Write Off Event Status Description,JoinTree_1.CI_LOOKUP_VAL_L_3,DESCR,,
+1.) Descriptions,Write Off Event Type Description,JoinTree_1.CI_WO_EVT_TYP_L,DESCR,,
+1.) Descriptions,Write Off Process Template Description,JoinTree_1.CI_WO_PROC_TMPL_L,DESCR,,
+1.) Descriptions,Write Off Status Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Write Off Status Reason Description,JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Formulas,Distinct Account ID,JoinTree_1,ACCT_ID_DISTINCT,,
+1.) Formulas,Distinct Write Off Process,JoinTree_1,WO_PROC_ID_DIST,,
+1.) Formulas,Distinct Write Off Event,JoinTree_1,WO_EVT_DIST,,
+1.) Formulas,Days Old,JoinTree_1,DAYS_OLD,,
+1.) Formulas,Is Next Write Off Event,JoinTree_1,IS_NEXT_WO_EVT,,
+1.) Formulas,Name,JoinTree_1.CI_PER_NAME,ENTITY_NAME_UPR,,
+1.) Formulas,Write Off Amount (Active WO SA),JoinTree_1,WO_SA_ARS_AMT_ACTIVE,,
+1.) Formulas,Write Off Amount (Inactive WO SA),JoinTree_1,WO_SA_ARS_AMT_INACTIVE,,

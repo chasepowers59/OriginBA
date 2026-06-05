@@ -1,0 +1,172 @@
+section,domain_name,VEE_Exception___Domain
+section,workstream,Common
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+D1_VEE_EXCP,D1_VEE_EXCP
+CI_TD_DRLKEY,CI_TD_DRLKEY
+CI_TD_DRLKEY_TY,CI_TD_DRLKEY_TY
+CI_TD_ENTRY,CI_TD_ENTRY
+D1_INIT_MSRMT_DATA,D1_INIT_MSRMT_DATA
+D1_MEASR_COMP,D1_MEASR_COMP
+D1_DVC_CFG,D1_DVC_CFG
+D1_INSTALL_EVT,D1_INSTALL_EVT
+D1_SP,D1_SP
+F1_BUS_OBJ_L,F1_BUS_OBJ_L
+F1_BUS_OBJ_L_1,F1_BUS_OBJ_L
+F1_BUS_OBJ_STATUS_L,F1_BUS_OBJ_STATUS_L
+F1_BUS_OBJ_STATUS_L_1,F1_BUS_OBJ_STATUS_L
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_2,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_3,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_4,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_5,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_6,CI_LOOKUP_VAL_L
+D1_EXCP_TYPE_L,D1_EXCP_TYPE_L
+D1_VEE_GRP_L,D1_VEE_GRP_L
+D1_VEE_RULE_L,D1_VEE_RULE_L
+D1_DIVISION_L,D1_DIVISION_L
+D1_MKT_L,D1_MKT_L
+D1_MSRMT_CYC_L,D1_MSRMT_CYC_L
+D1_MSRMT_CYC_RTE_L,D1_MSRMT_CYC_RTE_L
+CI_TIME_ZONE_L,CI_TIME_ZONE_L
+SC_USER,SC_USER
+SC_USER_1,SC_USER
+SC_USER_2,SC_USER
+SC_USER_3,SC_USER
+SC_USER_4,SC_USER
+CI_ROLE_L,CI_ROLE_L
+CI_TD_TYPE_L,CI_TD_TYPE_L
+CI_SP_TYPE_L,CI_SP_TYPE_L
+D1_SP_TYPE_L,D1_SP_TYPE_L
+JoinTree_1,D1_VEE_EXCP
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,D1_VEE_EXCP,D1_INIT_MSRMT_DATA,D1_VEE_EXCP.INIT_MSRMT_DATA_ID == D1_INIT_MSRMT_DATA.INIT_MSRMT_DATA_ID
+JoinTree_1,2,inner,D1_INIT_MSRMT_DATA,CI_TD_DRLKEY,D1_INIT_MSRMT_DATA.INIT_MSRMT_DATA_ID == CI_TD_DRLKEY.KEY_VALUE
+JoinTree_1,3,inner,CI_TD_DRLKEY,CI_TD_DRLKEY_TY,CI_TD_DRLKEY.SEQ_NUM == CI_TD_DRLKEY_TY.SEQ_NUM
+JoinTree_1,4,inner,CI_TD_DRLKEY_TY,CI_TD_ENTRY,CI_TD_DRLKEY_TY.TD_TYPE_CD == CI_TD_ENTRY.TD_TYPE_CD and CI_TD_DRLKEY_TY.TBL_NAME == 'D1_INIT_MSRMT_DATA' and CI_TD_DRLKEY_TY.FLD_NAME == 'INIT_MSRMT_DATA_ID'
+JoinTree_1,5,inner,CI_TD_DRLKEY,CI_TD_ENTRY,CI_TD_DRLKEY.TD_ENTRY_ID == CI_TD_ENTRY.TD_ENTRY_ID
+JoinTree_1,6,inner,D1_INIT_MSRMT_DATA,CMS_PER_NAME,D1_INIT_MSRMT_DATA.INIT_MSRMT_DATA_ID == CMS_PER_NAME.INIT_MSRMT_DATA_ID
+JoinTree_1,7,inner,D1_INIT_MSRMT_DATA,D1_MEASR_COMP,D1_INIT_MSRMT_DATA.MEASR_COMP_ID == D1_MEASR_COMP.MEASR_COMP_ID
+JoinTree_1,8,inner,D1_MEASR_COMP,D1_DVC_CFG,D1_MEASR_COMP.DEVICE_CONFIG_ID == D1_DVC_CFG.DEVICE_CONFIG_ID
+JoinTree_1,9,inner,D1_DVC_CFG,D1_INSTALL_EVT,D1_DVC_CFG.DEVICE_CONFIG_ID == D1_INSTALL_EVT.DEVICE_CONFIG_ID
+JoinTree_1,10,inner,D1_INSTALL_EVT,D1_SP,D1_INSTALL_EVT.D1_SP_ID == D1_SP.D1_SP_ID
+JoinTree_1,11,leftOuter,D1_VEE_EXCP,F1_BUS_OBJ_STATUS_L,D1_VEE_EXCP.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L.BO_STATUS_CD and D1_VEE_EXCP.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L.BUS_OBJ_CD and F1_BUS_OBJ_STATUS_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,12,inner,D1_VEE_EXCP,F1_BUS_OBJ_L,D1_VEE_EXCP.BUS_OBJ_CD == F1_BUS_OBJ_L.BUS_OBJ_CD and F1_BUS_OBJ_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,13,inner,D1_VEE_EXCP,CI_LOOKUP_VAL_L,D1_VEE_EXCP.EXCP_SEVERITY_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'EXCP_SEVERITY_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,14,inner,D1_VEE_EXCP,D1_EXCP_TYPE_L,D1_VEE_EXCP.EXCP_TYPE_CD == D1_EXCP_TYPE_L.EXCP_TYPE_CD and D1_EXCP_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,15,inner,D1_VEE_EXCP,CI_LOOKUP_VAL_L_1,D1_VEE_EXCP.OPEN_CLOSE_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'OPEN_CLOSE_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,16,inner,D1_VEE_EXCP,D1_VEE_GRP_L,D1_VEE_EXCP.VEE_GRP_CD == D1_VEE_GRP_L.VEE_GRP_CD and D1_VEE_GRP_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,17,inner,D1_VEE_EXCP,D1_VEE_RULE_L,D1_VEE_EXCP.VEE_RULE_CD == D1_VEE_RULE_L.VEE_RULE_CD and D1_VEE_EXCP.VEE_GRP_CD == D1_VEE_RULE_L.VEE_GRP_CD and D1_VEE_RULE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,18,inner,D1_SP,F1_BUS_OBJ_L_1,D1_SP.BUS_OBJ_CD == F1_BUS_OBJ_L_1.BUS_OBJ_CD and F1_BUS_OBJ_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,19,inner,D1_SP,F1_BUS_OBJ_STATUS_L_1,D1_SP.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L_1.BO_STATUS_CD and D1_SP.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_1.BUS_OBJ_CD and F1_BUS_OBJ_STATUS_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,20,leftOuter,D1_SP,CI_LOOKUP_VAL_L_3,D1_SP.DISCONN_LOC_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'DISCONN_LOC_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_1,21,leftOuter,D1_SP,D1_MKT_L,D1_SP.MKT_CD == D1_MKT_L.MKT_CD and D1_MKT_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,22,leftOuter,D1_SP,D1_MSRMT_CYC_L,D1_SP.MSRMT_CYC_CD == D1_MSRMT_CYC_L.MSRMT_CYC_CD and D1_MSRMT_CYC_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,23,leftOuter,D1_SP,D1_MSRMT_CYC_RTE_L,D1_SP.MSRMT_CYC_RTE_CD == D1_MSRMT_CYC_RTE_L.MSRMT_CYC_RTE_CD and D1_MSRMT_CYC_RTE_L.MSRMT_CYC_CD == D1_SP.MSRMT_CYC_CD and D1_MSRMT_CYC_RTE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,24,inner,D1_SP,CI_TIME_ZONE_L,D1_SP.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,25,inner,D1_SP,CI_LOOKUP_VAL_L_4,D1_SP.SP_SRC_STAT_FLG == CI_LOOKUP_VAL_L_4.FIELD_VALUE and CI_LOOKUP_VAL_L_4.FIELD_NAME == 'SP_SRC_STAT_FLG' and CI_LOOKUP_VAL_L_4.LANGUAGE_CD == 'ENG'
+JoinTree_1,26,leftOuter,CI_TD_ENTRY,SC_USER,CI_TD_ENTRY.ASSIGNED_TO == SC_USER.USER_ID
+JoinTree_1,27,leftOuter,CI_TD_ENTRY,SC_USER_1,CI_TD_ENTRY.ASSIGNED_USER_ID == SC_USER_1.USER_ID
+JoinTree_1,28,leftOuter,CI_TD_ENTRY,SC_USER_2,CI_TD_ENTRY.COMPLETE_USER_ID == SC_USER_2.USER_ID
+JoinTree_1,29,inner,CI_TD_ENTRY,CI_ROLE_L,CI_TD_ENTRY.ROLE_ID == CI_ROLE_L.ROLE_ID and CI_ROLE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,30,inner,CI_TD_ENTRY,CI_LOOKUP_VAL_L_5,CI_TD_ENTRY.TD_PRIORITY_FLG == CI_LOOKUP_VAL_L_5.FIELD_VALUE and CI_LOOKUP_VAL_L_5.FIELD_NAME == 'TD_PRIORITY_FLG' and CI_LOOKUP_VAL_L_5.LANGUAGE_CD == 'ENG'
+JoinTree_1,31,inner,CI_TD_ENTRY,CI_TD_TYPE_L,CI_TD_ENTRY.TD_TYPE_CD == CI_TD_TYPE_L.TD_TYPE_CD and CI_TD_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,32,inner,D1_SP,D1_SP_TYPE_L,D1_SP.D1_SP_TYPE_CD == D1_SP_TYPE_L.D1_SP_TYPE_CD and D1_SP_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,33,inner,CI_TD_ENTRY,CI_LOOKUP_VAL_L_6,CI_TD_ENTRY.ENTRY_STATUS_FLG == CI_LOOKUP_VAL_L_6.FIELD_VALUE and CI_LOOKUP_VAL_L_6.FIELD_NAME == 'ENTRY_STATUS_FLG' and CI_LOOKUP_VAL_L_6.LANGUAGE_CD == 'ENG'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) VEE Exception,Status (VEE Exception),JoinTree_1.D1_VEE_EXCP,BO_STATUS_CD,,
+1.) VEE Exception,Status Reason,JoinTree_1.D1_VEE_EXCP,BO_STATUS_REASON_CD,,
+1.) VEE Exception,Business Object (VEE Exception),JoinTree_1.D1_VEE_EXCP,BUS_OBJ_CD,,
+1.) VEE Exception,Create Date/Time (VEE Exception),JoinTree_1.D1_VEE_EXCP,CRE_DTTM,,
+1.) VEE Exception,Exception Severity,JoinTree_1.D1_VEE_EXCP,EXCP_SEVERITY_FLG,,
+1.) VEE Exception,Exception Type,JoinTree_1.D1_VEE_EXCP,EXCP_TYPE_CD,,
+1.) VEE Exception,Initial Measurement Data ID,JoinTree_1.D1_VEE_EXCP,INIT_MSRMT_DATA_ID,,
+1.) VEE Exception,Exception Status,JoinTree_1.D1_VEE_EXCP,OPEN_CLOSE_FLG,,
+1.) VEE Exception,Status Date/Time (VEE Exception),JoinTree_1.D1_VEE_EXCP,STATUS_UPD_DTTM,,
+1.) VEE Exception,VEE Exception ID,JoinTree_1.D1_VEE_EXCP,VEE_EXCP_ID,,
+1.) VEE Exception,VEE Group,JoinTree_1.D1_VEE_EXCP,VEE_GRP_CD,,
+1.) VEE Exception,VEE Rule,JoinTree_1.D1_VEE_EXCP,VEE_RULE_CD,,
+1.) To Do Entry,Assigned Date/Time,JoinTree_1.CI_TD_ENTRY,ASSIGNED_DTTM,,
+1.) To Do Entry,Assign to User,JoinTree_1.CI_TD_ENTRY,ASSIGNED_TO,,
+1.) To Do Entry,Assigned By User,JoinTree_1.CI_TD_ENTRY,ASSIGNED_USER_ID,,
+1.) To Do Entry,Batch Control,JoinTree_1.CI_TD_ENTRY,BATCH_CD,,
+1.) To Do Entry,Batch Number,JoinTree_1.CI_TD_ENTRY,BATCH_NBR,Dimension,CountAll
+1.) To Do Entry,Comments,JoinTree_1.CI_TD_ENTRY,COMMENTS,,
+1.) To Do Entry,Completion Date/Time,JoinTree_1.CI_TD_ENTRY,COMPLETE_DTTM,,
+1.) To Do Entry,Completed By,JoinTree_1.CI_TD_ENTRY,COMPLETE_USER_ID,,
+1.) To Do Entry,Create Date/Time (To Do Entry),JoinTree_1.CI_TD_ENTRY,CRE_DTTM,,
+1.) To Do Entry,Status (To Do Entry),JoinTree_1.CI_TD_ENTRY,ENTRY_STATUS_FLG,,
+1.) To Do Entry,Message Category,JoinTree_1.CI_TD_ENTRY,MESSAGE_CAT_NBR,Dimension,CountAll
+1.) To Do Entry,Message Number,JoinTree_1.CI_TD_ENTRY,MESSAGE_NBR,Dimension,CountAll
+1.) To Do Entry,To Do Role,JoinTree_1.CI_TD_ENTRY,ROLE_ID,,
+1.) To Do Entry,To Do ID,JoinTree_1.CI_TD_ENTRY,TD_ENTRY_ID,,
+1.) To Do Entry,Priority,JoinTree_1.CI_TD_ENTRY,TD_PRIORITY_FLG,,
+1.) To Do Entry,To Do Type,JoinTree_1.CI_TD_ENTRY,TD_TYPE_CD,,
+1.) Service Point - MDM,Access Group,JoinTree_1.D1_SP,ACCESS_GRP_CD,,
+1.) Service Point - MDM,Address,JoinTree_1.D1_SP,ADDRESS1,,
+1.) Service Point - MDM,Address Line 1 Upper Case,JoinTree_1.D1_SP,ADDRESS1_UPPER,,
+1.) Service Point - MDM,Address 2,JoinTree_1.D1_SP,ADDRESS2,,
+1.) Service Point - MDM,Address 3,JoinTree_1.D1_SP,ADDRESS3,,
+1.) Service Point - MDM,Address 4,JoinTree_1.D1_SP,ADDRESS4,,
+1.) Service Point - MDM,Status (Service Point - MDM),JoinTree_1.D1_SP,BO_STATUS_CD,,
+1.) Service Point - MDM,Status Reason,JoinTree_1.D1_SP,BO_STATUS_REASON_CD,,
+1.) Service Point - MDM,Business Object  (Service Point - MDM),JoinTree_1.D1_SP,BUS_OBJ_CD,,
+1.) Service Point - MDM,City,JoinTree_1.D1_SP,CITY,,
+1.) Service Point - MDM,City Upper Case,JoinTree_1.D1_SP,CITY_UPPER,,
+1.) Service Point - MDM,Country,JoinTree_1.D1_SP,COUNTRY,,
+1.) Service Point - MDM,County,JoinTree_1.D1_SP,COUNTY,,
+1.) Service Point - MDM,Create Date/Time (Service Point - MDM),JoinTree_1.D1_SP,CRE_DTTM,,
+1.) Service Point - MDM,Geographic Latitude,JoinTree_1.D1_SP,D1_GEO_LAT,Dimension,CountAll
+1.) Service Point - MDM,Geographic Longitude,JoinTree_1.D1_SP,D1_GEO_LONG,Dimension,CountAll
+1.) Service Point - MDM,Life Support / Sensitive Load Details,JoinTree_1.D1_SP,D1_LS_SL_DESCR,,
+1.) Service Point - MDM,Life Support / Sensitive Load,JoinTree_1.D1_SP,D1_LS_SL_FLG,,
+1.) Service Point - MDM,Service Point ID,JoinTree_1.D1_SP,D1_SP_ID,,
+1.) Service Point - MDM,Service Point Type,JoinTree_1.D1_SP,D1_SP_TYPE_CD,,
+1.) Service Point - MDM,Disconnect Location,JoinTree_1.D1_SP,DISCONN_LOC_FLG,,
+1.) Service Point - MDM,Division,JoinTree_1.D1_SP,DIVISION_CD,,
+1.) Service Point - MDM,Geographical Code,JoinTree_1.D1_SP,GEO_CODE,,
+1.) Service Point - MDM,House Type,JoinTree_1.D1_SP,HOUSE_TYPE,,
+1.) Service Point - MDM,In City Limit,JoinTree_1.D1_SP,IN_CITY_LIMIT,,
+1.) Service Point - MDM,Market,JoinTree_1.D1_SP,MKT_CD,,
+1.) Service Point - MDM,Measurement Cycle,JoinTree_1.D1_SP,MSRMT_CYC_CD,,
+1.) Service Point - MDM,Route,JoinTree_1.D1_SP,MSRMT_CYC_RTE_CD,,
+1.) Service Point - MDM,Sequence,JoinTree_1.D1_SP,MSRMT_CYC_RTE_SEQ,Dimension,CountAll
+1.) Service Point - MDM,Number 1,JoinTree_1.D1_SP,NUM1,,
+1.) Service Point - MDM,Number 2,JoinTree_1.D1_SP,NUM2,,
+1.) Service Point - MDM,Postal,JoinTree_1.D1_SP,POSTAL,,
+1.) Service Point - MDM,Source Status,JoinTree_1.D1_SP,SP_SRC_STAT_FLG,,
+1.) Service Point - MDM,State,JoinTree_1.D1_SP,STATE,,
+1.) Service Point - MDM,Status Date/Time (Service Point - MDM),JoinTree_1.D1_SP,STATUS_UPD_DTTM,,
+1.) Service Point - MDM,Time Zone,JoinTree_1.D1_SP,TIME_ZONE_CD,,
+1.) Descriptions,Business Object Description (Service Point - MDM),JoinTree_1.F1_BUS_OBJ_L_1,DESCR,,
+1.) Descriptions,Business Object Description (VEE Exception),JoinTree_1.F1_BUS_OBJ_L,DESCR,,
+1.) Descriptions,Disconnect Location Description,JoinTree_1.CI_LOOKUP_VAL_L_3,DESCR,,
+1.) Descriptions,Exception Status Description,JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,Exception Severity Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Exception Type Description,JoinTree_1.D1_EXCP_TYPE_L,DESCR100,,
+1.) Descriptions,Market Description,JoinTree_1.D1_MKT_L,DESCR100,,
+1.) Descriptions,Measurement Cycle Description,JoinTree_1.D1_MSRMT_CYC_L,DESCR100,,
+1.) Descriptions,Priority Description,JoinTree_1.CI_LOOKUP_VAL_L_5,DESCR,,
+1.) Descriptions,Route Description,JoinTree_1.D1_MSRMT_CYC_RTE_L,DESCR100,,
+1.) Descriptions,Service Point Type Description,JoinTree_1.D1_SP_TYPE_L,DESCR100,,
+1.) Descriptions,Source Status Description,JoinTree_1.CI_LOOKUP_VAL_L_4,DESCR,,
+1.) Descriptions,Status Description (Service Point - MDM),JoinTree_1.F1_BUS_OBJ_STATUS_L_1,DESCR,,
+1.) Descriptions,Status Description (To Do Entry),JoinTree_1.CI_LOOKUP_VAL_L_6,DESCR,,
+1.) Descriptions,Status Description (VEE Exception),JoinTree_1.F1_BUS_OBJ_STATUS_L,DESCR,,
+1.) Descriptions,Time Zone Description,JoinTree_1.CI_TIME_ZONE_L,DESCR,,
+1.) Descriptions,To Do Role Description,JoinTree_1.CI_ROLE_L,DESCR,,
+1.) Descriptions,To Do Type Description,JoinTree_1.CI_TD_TYPE_L,DESCR,,
+1.) Descriptions,VEE Group Description,JoinTree_1.D1_VEE_GRP_L,DESCR100,,
+1.) Descriptions,VEE Rule Exception,JoinTree_1.D1_VEE_RULE_L,DESCR100,,
+1.) Formulas,Assign to User (Name),JoinTree_1,ASSIGNED_TO_NAME,,
+1.) Formulas,Assigned By User (Name),JoinTree_1,ASSIGNED_USER_ID_NAME,,
+1.) Formulas,Completed By (Name),JoinTree_1,COMPLETED_USER_ID_NAME,,
+1.) Formulas,Distinct To Do ID,JoinTree_1,TD_ENTRY_ID_DISTINCT,,
+1.) Formulas,Name,JoinTree_1.CMS_PER_NAME,ENTITY_NAME_UPR,,
+1.) Formulas,Distinct VEE Exception ID ,JoinTree_1,VEE_EXCP_ID_DISTINCT,,

@@ -1,0 +1,90 @@
+section,domain_name,Write_Offs___Domain
+section,workstream,Debt Management
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+C1_BI_WOPROC_VW,C1_BI_WOPROC_VW
+CI_PER_NAME,CI_PER_NAME
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_2,CI_LOOKUP_VAL_L
+CI_WO_CNTL_L,CI_WO_CNTL_L
+CI_WO_PROC_TMPL_L,CI_WO_PROC_TMPL_L
+CI_WO_EVT_TYP_L,CI_WO_EVT_TYP_L
+CI_WO_EVT_TYP_L_1,CI_WO_EVT_TYP_L
+JoinTree_1,C1_BI_WOPROC_VW
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,leftOuter,C1_BI_WOPROC_VW,CI_PER_NAME,C1_BI_WOPROC_VW.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
+JoinTree_1,2,leftOuter,C1_BI_WOPROC_VW,CI_LOOKUP_VAL_L,C1_BI_WOPROC_VW.WO_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'WO_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,3,leftOuter,C1_BI_WOPROC_VW,CI_LOOKUP_VAL_L_1,C1_BI_WOPROC_VW.UNCOLL_PROC_STAT_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'UNCOLL_PROC_STAT_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,4,leftOuter,C1_BI_WOPROC_VW,CI_LOOKUP_VAL_L_2,C1_BI_WOPROC_VW.WO_STAT_RSN_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'WO_STAT_RSN_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,5,leftOuter,C1_BI_WOPROC_VW,CI_WO_CNTL_L,C1_BI_WOPROC_VW.WO_CNTL_CD == CI_WO_CNTL_L.WO_CNTL_CD and CI_WO_CNTL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,6,leftOuter,C1_BI_WOPROC_VW,CI_WO_PROC_TMPL_L,C1_BI_WOPROC_VW.WO_PROC_TMPL_CD == CI_WO_PROC_TMPL_L.WO_PROC_TMPL_CD and CI_WO_PROC_TMPL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,7,leftOuter,C1_BI_WOPROC_VW,CI_WO_EVT_TYP_L,C1_BI_WOPROC_VW.EFF_WO_EVT_TYP_CD == CI_WO_EVT_TYP_L.WO_EVT_TYP_CD and CI_WO_EVT_TYP_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,8,leftOuter,C1_BI_WOPROC_VW,CI_WO_EVT_TYP_L_1,C1_BI_WOPROC_VW.NEXT_WO_EVT_TYP_CD == CI_WO_EVT_TYP_L_1.WO_EVT_TYP_CD and CI_WO_EVT_TYP_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,9,leftOuter,C1_BI_WOPROC_VW,WO_PAY_AGG,C1_BI_WOPROC_VW.UNCOLL_PROC_ID == WO_PAY_AGG.UNCOLL_PROC_ID
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+Process Core,Write Off Process ID,JoinTree_1.C1_BI_WOPROC_VW,UNCOLL_PROC_ID,,
+Process Core,Account ID,JoinTree_1.C1_BI_WOPROC_VW,ACCT_ID,,
+Process Core,Person ID,JoinTree_1.C1_BI_WOPROC_VW,PER_ID,,
+Process Core,Person Name,JoinTree_1.CI_PER_NAME,ENTITY_NAME,,
+Process Core,Currency Code,JoinTree_1.C1_BI_WOPROC_VW,CURRENCY_CD,,
+Process Core,Process Start DTTM,JoinTree_1.C1_BI_WOPROC_VW,CRE_DTTM,,
+Process Core,Process Complete Date,JoinTree_1.C1_BI_WOPROC_VW,WO_PROC_COMPL_DT,,
+Process Core,Process Duration (Days),JoinTree_1.C1_BI_WOPROC_VW,UNCOLL_PROC_DUR,,
+Process Core,Write Off Status Code,JoinTree_1.C1_BI_WOPROC_VW,WO_STATUS_FLG,,
+Process Core,Write Off Status Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+Process Core,Uncoll Process Status Code,JoinTree_1.C1_BI_WOPROC_VW,UNCOLL_PROC_STAT_FLG,,
+Process Core,Uncoll Process Status Description,JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+Process Core,Write Off Status Reason Code,JoinTree_1.C1_BI_WOPROC_VW,WO_STAT_RSN_FLG,,
+Process Core,Write Off Status Reason Description,JoinTree_1.CI_LOOKUP_VAL_L_2,DESCR,,
+Process Core,Comments,JoinTree_1.C1_BI_WOPROC_VW,COMMENTS,,
+Process Configuration,Write Off Control Code,JoinTree_1.C1_BI_WOPROC_VW,WO_CNTL_CD,,
+Process Configuration,Write Off Control Description,JoinTree_1.CI_WO_CNTL_L,DESCR,,
+Process Configuration,Write Off Template Code,JoinTree_1.C1_BI_WOPROC_VW,WO_PROC_TMPL_CD,,
+Process Configuration,Write Off Template Description,JoinTree_1.CI_WO_PROC_TMPL_L,DESCR,,
+Process Configuration,Effective Event Type Code,JoinTree_1.C1_BI_WOPROC_VW,EFF_WO_EVT_TYP_CD,,
+Process Configuration,Effective Event Type Description,JoinTree_1.CI_WO_EVT_TYP_L,DESCR,,
+Process Configuration,Next Event Type Code,JoinTree_1.C1_BI_WOPROC_VW,NEXT_WO_EVT_TYP_CD,,
+Process Configuration,Next Event Type Description,JoinTree_1.CI_WO_EVT_TYP_L_1,DESCR,,
+Process Configuration,Next Event Trigger Date,JoinTree_1.C1_BI_WOPROC_VW,NEXT_WO_EVT_TRIGGER_DT,,
+Debt And Recovery,Initial Outstanding Amount,JoinTree_1.C1_BI_WOPROC_VW,ARS_AT_START,,
+Debt And Recovery,End Outstanding Amount,JoinTree_1.C1_BI_WOPROC_VW,ARS_AT_END,,
+Debt And Recovery,Outstanding Difference Amount,JoinTree_1.C1_BI_WOPROC_VW,ARS_DIFF,,
+Debt And Recovery,Recovery Amount Est (Row),JoinTree_1,RECOVERY_AMT_EST_ROW,,
+Debt And Recovery,Payment Amount In Process Window (Row),JoinTree_1,PAY_SEG_AMT_IN_WINDOW_ROW,,
+Debt And Recovery,Estimated Recovery Rate (Row),JoinTree_1,RECOVERY_RATE_EST_ROW,,
+Process Counters,Active Process Count (Row),JoinTree_1.C1_BI_WOPROC_VW,ACTIVE_WO_PROC_CNT,,
+Process Counters,Inactive Process Count (Row),JoinTree_1.C1_BI_WOPROC_VW,INACTIVE_WO_PROC_CNT,,
+Process Counters,Completed Process Count (Row),JoinTree_1.C1_BI_WOPROC_VW,COMPL_WO_PROC_CNT,,
+Process Counters,Cancelled by System Count (Row),JoinTree_1.C1_BI_WOPROC_VW,CANCL_SYS_WO_PROC_CNT,,
+Process Counters,Cancelled by User Count (Row),JoinTree_1.C1_BI_WOPROC_VW,CANCL_USER_WO_PROC_CNT,,
+Process Counters,Effective Process Count (Row),JoinTree_1.C1_BI_WOPROC_VW,EFF_WO_PROC_CNT,,
+Process Counters,Ineffective Process Count (Row),JoinTree_1.C1_BI_WOPROC_VW,INEFF_WO_PROC_CNT,,
+Process Counters,Total SA Count (Row),JoinTree_1.C1_BI_WOPROC_VW,WO_PROC_TOT_SA_CNT,,
+Process Counters,Active SA Count (Row),JoinTree_1.C1_BI_WOPROC_VW,WO_PROC_ACT_SA_CNT,,
+Process Counters,Inactive SA Count (Row),JoinTree_1.C1_BI_WOPROC_VW,WO_PROC_INACT_SA_CNT,,
+Payment Aggregates,Payment Segment Count (Row),JoinTree_1.WO_PAY_AGG,PAY_SEGMENT_COUNT,,
+Payment Aggregates,Payment Event Count (Row),JoinTree_1.WO_PAY_AGG,PAYMENT_EVENT_COUNT,,
+Payment Aggregates,Payment Segment Amount Total (Row),JoinTree_1.WO_PAY_AGG,PAY_SEG_AMT_TOTAL,,
+Payment Aggregates,First Payment Date,JoinTree_1.WO_PAY_AGG,FIRST_PAY_DT,,
+Payment Aggregates,Last Payment Date,JoinTree_1.WO_PAY_AGG,LAST_PAY_DT,,
+Measures,Write Off Process Count,JoinTree_1.C1_BI_WOPROC_VW,UNCOLL_PROC_ID,Measure,CountDistinct
+Measures,Account Count,JoinTree_1.C1_BI_WOPROC_VW,ACCT_ID,Measure,CountDistinct
+Measures,Initial Outstanding Amount Total,JoinTree_1.C1_BI_WOPROC_VW,ARS_AT_START,Measure,Sum
+Measures,End Outstanding Amount Total,JoinTree_1.C1_BI_WOPROC_VW,ARS_AT_END,Measure,Sum
+Measures,Outstanding Difference Amount Total,JoinTree_1.C1_BI_WOPROC_VW,ARS_DIFF,Measure,Sum
+Measures,Recovery Amount Est Total,JoinTree_1,RECOVERY_AMT_EST_ROW,Measure,Sum
+Measures,Payment Amount In Process Window Total,JoinTree_1,PAY_SEG_AMT_IN_WINDOW_ROW,Measure,Sum
+Measures,Average Estimated Recovery Rate,JoinTree_1,RECOVERY_RATE_EST_ROW,Measure,Average
+Measures,Average Process Duration (Days),JoinTree_1.C1_BI_WOPROC_VW,UNCOLL_PROC_DUR,Measure,Average
+Measures,Payment Segment Count (Agg Sum),JoinTree_1.WO_PAY_AGG,PAY_SEGMENT_COUNT,Measure,Sum
+Measures,Payment Event Count (Agg Sum),JoinTree_1.WO_PAY_AGG,PAYMENT_EVENT_COUNT,Measure,Sum
+Measures,Payment Segment Amount Total,JoinTree_1.WO_PAY_AGG,PAY_SEG_AMT_TOTAL,Measure,Sum
+Measures,Total SA Count Total,JoinTree_1.C1_BI_WOPROC_VW,WO_PROC_TOT_SA_CNT,Measure,Sum
+Measures,Active SA Count Total,JoinTree_1.C1_BI_WOPROC_VW,WO_PROC_ACT_SA_CNT,Measure,Sum
+Measures,Inactive SA Count Total,JoinTree_1.C1_BI_WOPROC_VW,WO_PROC_INACT_SA_CNT,Measure,Sum

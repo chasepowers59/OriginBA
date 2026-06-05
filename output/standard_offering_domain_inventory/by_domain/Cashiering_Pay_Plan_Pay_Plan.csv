@@ -1,0 +1,64 @@
+section,domain_name,Pay_Plan___Domain
+section,workstream,Cashiering
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_PP,CI_PP
+CI_PP_SCHED_PAY,CI_PP_SCHED_PAY
+CI_PP_TYPE_L,CI_PP_TYPE_L
+CI_PP_ACCT_HST_VW,CI_PP_ACCT_HST_VW
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_ACCT_PER,CI_ACCT_PER
+CI_ACCT_PER_1,CI_ACCT_PER
+CI_PAY_METH_L,CI_PAY_METH_L
+CI_THRD_PTY_L,CI_THRD_PTY_L
+SC_USER,SC_USER
+SC_USER_1,SC_USER
+CI_PER_NAME,CI_PER_NAME
+CI_PER_NAME_1,CI_PER_NAME
+JoinTree_1,CI_PP
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_PP,CI_PAY_METH_L,CI_PP.PAY_METH_CD == CI_PAY_METH_L.PAY_METH_CD and CI_PAY_METH_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,2,leftOuter,CI_PP,CI_LOOKUP_VAL_L,CI_PP.PP_CAN_RSN_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'PP_CAN_RSN_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,3,inner,CI_PP,CI_LOOKUP_VAL_L_1,CI_PP.PP_STAT_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'PP_STAT_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,4,inner,CI_PP,CI_PP_TYPE_L,CI_PP.PP_TYPE_CD == CI_PP_TYPE_L.PP_TYPE_CD and CI_PP_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,5,inner,CI_PP,SC_USER,CI_PP.USER_ID == SC_USER.USER_ID
+JoinTree_1,6,inner,CI_PP,CI_ACCT_PER,CI_PP.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_1,7,inner,CI_PP,CI_ACCT_PER_1,CI_PP.PAYOR_ACCT_ID == CI_ACCT_PER_1.ACCT_ID and CI_ACCT_PER_1.MAIN_CUST_SW == 'Y'
+JoinTree_1,8,leftOuter,CI_PP,SC_USER_1,CI_PP.LAST_STAT_USER_ID == SC_USER_1.USER_ID
+JoinTree_1,9,leftOuter,CI_PP,CI_THRD_PTY_L,CI_PP.THRD_PTY_PAYOR_CD == CI_THRD_PTY_L.THRD_PTY_PAYOR_CD and CI_THRD_PTY_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,10,inner,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM' and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_1,11,inner,CI_ACCT_PER_1,CI_PER_NAME_1,CI_ACCT_PER_1.PER_ID == CI_PER_NAME_1.PER_ID and CI_PER_NAME_1.NAME_TYPE_FLG == 'PRIM' and CI_ACCT_PER_1.MAIN_CUST_SW == 'Y'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Pay Plan,Account ID,JoinTree_1.CI_PP,ACCT_ID,,
+1.) Pay Plan,Comments,JoinTree_1.CI_PP,COMMENTS,,
+1.) Pay Plan,Create Date/Time,JoinTree_1.CI_PP,CRE_DTTM,,
+1.) Pay Plan,Last Status Date/Time,JoinTree_1.CI_PP,LAST_STAT_DTTM,,
+1.) Pay Plan,Last Updated by,JoinTree_1.CI_PP,LAST_STAT_USER_ID,,
+1.) Pay Plan,Pay Method,JoinTree_1.CI_PP,PAY_METH_CD,,
+1.) Pay Plan,Payor Account ID,JoinTree_1.CI_PP,PAYOR_ACCT_ID,,
+1.) Pay Plan,Cancel Reason,JoinTree_1.CI_PP,PP_CAN_RSN_FLG,,
+1.) Pay Plan,Pay Plan ID,JoinTree_1.CI_PP,PP_ID,,
+1.) Pay Plan,Pay Plan Status,JoinTree_1.CI_PP,PP_STAT_FLG,,
+1.) Pay Plan,Pay Plan Type,JoinTree_1.CI_PP,PP_TYPE_CD,,
+1.) Pay Plan,Start Date,JoinTree_1.CI_PP,START_DT,,
+1.) Pay Plan,Third Party Payor,JoinTree_1.CI_PP,THRD_PTY_PAYOR_CD,,
+1.) Pay Plan,Third Party Guarantor,JoinTree_1.CI_PP,THRD_PTY_SW,,
+1.) Pay Plan,User,JoinTree_1.CI_PP,USER_ID,,
+1.) Descriptions,Cancel Reason Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Pay Method Description,JoinTree_1.CI_PAY_METH_L,DESCR,,
+1.) Descriptions,Pay Plan Status Description,JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,Pay Plan Type Description,JoinTree_1.CI_PP_TYPE_L,DESCR,,
+1.) Descriptions,Third Party Payor Description,JoinTree_1.CI_THRD_PTY_L,DESCR,,
+1.) Formulas,Days Old,JoinTree_1,DAYS_OLD,,
+1.) Formulas,Distinct Account ID,JoinTree_1,ACCT_ID_DISTINCT,,
+1.) Formulas,Distinct Pay Plan ID,JoinTree_1,PP_ID_DISTINCT,,
+1.) Formulas,Name,JoinTree_1.CI_PER_NAME,ENTITY_NAME_UPR,,
+1.) Formulas,Last Updated by (Name),JoinTree_1,LAST_STAT_USER_ID_NAME,,
+1.) Formulas,Payor Account (Name),JoinTree_1.CI_PER_NAME_1,ENTITY_NAME_UPR,,
+1.) Formulas,User (Name),JoinTree_1,USER_ID_NAME,,

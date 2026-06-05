@@ -1,0 +1,79 @@
+section,domain_name,Landlord_Agreement___Domain
+section,workstream,Customer Operations
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_ACCT,CI_ACCT
+CI_ACCT_PER,CI_ACCT_PER
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_CIS_DIVISION_L,CI_CIS_DIVISION_L
+CI_PREM,CI_PREM
+CI_LL_DETAIL,CI_LL_DETAIL
+CI_LANDLORD,CI_LANDLORD
+CI_PREM_TYPE_L,CI_PREM_TYPE_L
+CI_TIME_ZONE_L,CI_TIME_ZONE_L
+CI_STATE_L,CI_STATE_L
+CI_PER_NAME,CI_PER_NAME
+JoinTree_1,CI_LANDLORD
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_LANDLORD,CI_PREM,CI_LANDLORD.LL_ID == CI_PREM.LL_ID
+JoinTree_1,2,inner,CI_LANDLORD,CI_ACCT,CI_LANDLORD.ACCT_ID == CI_ACCT.ACCT_ID
+JoinTree_1,3,inner,CI_LANDLORD,CI_ACCT_PER,CI_LANDLORD.ACCT_ID == CI_ACCT_PER.ACCT_ID
+JoinTree_1,4,inner,CI_PREM,CI_PREM_TYPE_L,CI_PREM.PREM_TYPE_CD == CI_PREM_TYPE_L.PREM_TYPE_CD and CI_PREM_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,5,leftOuter,CI_PREM,CI_CIS_DIVISION_L,CI_PREM.CIS_DIVISION == CI_CIS_DIVISION_L.CIS_DIVISION and CI_CIS_DIVISION_L.CIS_DIVISION == 'ENG'
+JoinTree_1,6,inner,CI_PREM,CI_STATE_L,CI_PREM.COUNTRY == CI_STATE_L.COUNTRY and CI_PREM.STATE == CI_STATE_L.STATE and CI_STATE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,7,leftOuter,CI_PREM,CI_TIME_ZONE_L,CI_PREM.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,8,inner,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y' and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
+JoinTree_1,9,leftOuter,CI_LANDLORD,CMS_LL_COVERAGE,CI_LANDLORD.LL_ID == CMS_LL_COVERAGE.LL_ID
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Landlord Agreement,Account ID,JoinTree_1.CI_LANDLORD,ACCT_ID,,
+1.) Landlord Agreement,Description,JoinTree_1.CI_LANDLORD,DESCR_UPR,,
+1.) Landlord Agreement,Landlord Agreement ID,JoinTree_1.CI_LANDLORD,LL_ID,,
+1.) Premise,Address,JoinTree_1.CI_PREM,ADDRESS1,,
+1.) Premise,Address Uppercase,JoinTree_1.CI_PREM,ADDRESS1_UPR,,
+1.) Premise,Address 2,JoinTree_1.CI_PREM,ADDRESS2,,
+1.) Premise,Address 3,JoinTree_1.CI_PREM,ADDRESS3,,
+1.) Premise,Address 4,JoinTree_1.CI_PREM,ADDRESS4,,
+1.) Premise,CIS Division,JoinTree_1.CI_PREM,CIS_DIVISION,,
+1.) Premise,City,JoinTree_1.CI_PREM,CITY,,
+1.) Premise,City Uppercase,JoinTree_1.CI_PREM,CITY_UPR,,
+1.) Premise,Country,JoinTree_1.CI_PREM,COUNTRY,,
+1.) Premise,County,JoinTree_1.CI_PREM,COUNTY,,
+1.) Premise,Geographical Code,JoinTree_1.CI_PREM,GEO_CODE,,
+1.) Premise,House Type,JoinTree_1.CI_PREM,HOUSE_TYPE,,
+1.) Premise,In City Limit,JoinTree_1.CI_PREM,IN_CITY_LIMIT,,
+1.) Premise,Key ID,JoinTree_1.CI_PREM,KEY_ID,,
+1.) Premise,Key,JoinTree_1.CI_PREM,KEY_SW,,
+1.) Premise,Landlord Agreement ID,JoinTree_1.CI_PREM,LL_ID,,
+1.) Premise,Life Support / Sensitive Load Description,JoinTree_1.CI_PREM,LS_SL_DESCR,,
+1.) Premise,Life Support / Sensitive Load,JoinTree_1.CI_PREM,LS_SL_FLG,,
+1.) Premise,Mailing Address,JoinTree_1.CI_PREM,MAIL_ADDR_SW,,
+1.) Premise,Meter Read Instruction,JoinTree_1.CI_PREM,MR_INSTR_CD,,
+1.) Premise,Instruction Details,JoinTree_1.CI_PREM,MR_INSTR_DETAILS,,
+1.) Premise,Meter Read Warning,JoinTree_1.CI_PREM,MR_WARN_CD,,
+1.) Premise,Number 1,JoinTree_1.CI_PREM,NUM1,,
+1.) Premise,Number 2,JoinTree_1.CI_PREM,NUM2,,
+1.) Premise,OK to Enter,JoinTree_1.CI_PREM,OK_TO_ENTER_SW,,
+1.) Premise,Postal,JoinTree_1.CI_PREM,POSTAL,,
+1.) Premise,Premise ID,JoinTree_1.CI_PREM,PREM_ID,,
+1.) Premise,Premise Type,JoinTree_1.CI_PREM,PREM_TYPE_CD,,
+1.) Premise,Parent Premise ID,JoinTree_1.CI_PREM,PRNT_PREM_ID,,
+1.) Premise,State,JoinTree_1.CI_PREM,STATE,,
+1.) Premise,Time Zone,JoinTree_1.CI_PREM,TIME_ZONE_CD,,
+1.) Premise,Trend Area,JoinTree_1.CI_PREM,TREND_AREA_CD,,
+1.) Descriptions,CIS Division Description,JoinTree_1.CI_CIS_DIVISION_L,DESCR,,
+1.) Descriptions,Premise Type Description,JoinTree_1.CI_PREM_TYPE_L,DESCR,,
+1.) Descriptions,State Description,JoinTree_1.CI_STATE_L,DESCR,,
+1.) Descriptions,Timezone Description,JoinTree_1.CI_TIME_ZONE_L,DESCR,,
+1.) Formulas,Distinct Account ID,JoinTree_1,ACCT_ID_DISTINCT,,
+1.) Formulas,Distinct Landlord Agreement ID,JoinTree_1,LL_ID_DISTINCT,,
+1.) Formulas,Distinct Premise ID,JoinTree_1,PREM_ID_DISTINCT,,
+1.) Formulas,Electric Covered,JoinTree_1.CMS_LL_COVERAGE,IS_ELECTRIC_COVERED,,
+1.) Formulas,Gas Covered,JoinTree_1.CMS_LL_COVERAGE,IS_GAS_COVERED,,
+1.) Formulas,Sewer Covered,JoinTree_1.CMS_LL_COVERAGE,IS_SEWER_COVERED,,
+1.) Formulas,Water Covered,JoinTree_1.CMS_LL_COVERAGE,IS_WATER_COVERED,,
+1.) Formulas,Landlord Name,JoinTree_1.CI_PER_NAME,ENTITY_NAME_UPR,,

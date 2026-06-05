@@ -12,6 +12,7 @@ import argparse
 import json
 import os
 import re
+import sys
 from pathlib import Path
 
 import oracledb
@@ -24,6 +25,7 @@ CLIENTS = {
     "collegestation": "COLLEGESTATION",
     "ellensburg": "ELLENSBURG",
     "citycorp": "CITYCORP",
+    "demo": "DEMO",
 }
 
 
@@ -35,6 +37,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--format", choices=["table", "json"], default="table")
     parser.add_argument("--max-rows", type=int, default=5000)
     parser.add_argument("--dry-run", action="store_true", help="Resolve includes and print statement count only.")
+    parser.add_argument(
+        "--fail-if-any-rows",
+        action="store_true",
+        help="Exit with code 1 when any SELECT returns one or more rows (for install gate scripts).",
+    )
+    parser.add_argument(
+        "--log-file",
+        help="Append full stdout to this file in addition to printing.",
+    )
     return parser.parse_args()
 
 
@@ -134,6 +145,19 @@ def split_sql_script(text: str) -> list[str]:
     return statements
 
 
+class _Tee:
+    def __init__(self, *streams):
+        self.streams = streams
+
+    def write(self, data: str) -> None:
+        for stream in self.streams:
+            stream.write(data)
+
+    def flush(self) -> None:
+        for stream in self.streams:
+            stream.flush()
+
+
 def print_table(columns: list[str], rows: list[tuple]) -> None:
     widths = [len(col) for col in columns]
     string_rows = []
@@ -167,6 +191,10 @@ def client_connection(config: dict[str, str], client: str) -> tuple[str, str, st
     return user, password, dsn
 
 
+def emit(message: str = "", *, end: str = "\n") -> None:
+    print(message, end=end, flush=True)
+
+
 def main() -> int:
     args = parse_args()
     repo_root = Path(__file__).resolve().parents[2]
@@ -181,35 +209,68 @@ def main() -> int:
         raise RuntimeError("Provide --file or --sql.")
 
     statements = split_sql_script(sql_text)
-    print(f"Client: {args.client}")
-    print(f"Statements: {len(statements)}")
+    emit(f"Client: {args.client}")
+    emit(f"Statements: {len(statements)}")
 
     if args.dry_run:
         return 0
 
-    user, password, dsn = client_connection(config, args.client)
-    call_timeout_ms = int(config.get("DB_CALL_TIMEOUT_MS") or "900000")
-    fetch_array_size = int(config.get("DB_FETCH_ARRAY_SIZE") or "200")
+    log_handle = None
+    original_stdout = sys.stdout
+    if args.log_file:
+        log_path = Path(args.log_file).expanduser().resolve()
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_handle = log_path.open("a", encoding="utf-8")
+        sys.stdout = _Tee(original_stdout, log_handle)
 
-    with oracledb.connect(user=user, password=password, dsn=dsn) as conn:
-        conn.call_timeout = call_timeout_ms
-        with conn.cursor() as cursor:
-            cursor.arraysize = fetch_array_size
-            for index, sql in enumerate(statements, start=1):
-                print(f"\n=== Statement {index}/{len(statements)} ===")
-                cursor.execute(sql)
-                if cursor.description is None:
-                    print("Statement executed successfully.")
-                    continue
+    exit_code = 0
+    failure_rows: list[tuple[int, int, list[tuple]]] = []
 
-                columns = [col[0] for col in cursor.description]
-                rows = cursor.fetchmany(args.max_rows)
-                if args.format == "json":
-                    print(json.dumps([dict(zip(columns, row)) for row in rows], default=str, indent=2))
-                else:
-                    print_table(columns, rows)
+    try:
+        user, password, dsn = client_connection(config, args.client)
+        call_timeout_ms = int(
+            os.environ.get("DB_CALL_TIMEOUT_MS")
+            or config.get("DB_CALL_TIMEOUT_MS")
+            or "900000"
+        )
+        fetch_array_size = int(config.get("DB_FETCH_ARRAY_SIZE") or "200")
 
-    return 0
+        with oracledb.connect(user=user, password=password, dsn=dsn) as conn:
+            conn.call_timeout = call_timeout_ms
+            with conn.cursor() as cursor:
+                cursor.arraysize = fetch_array_size
+                for index, sql in enumerate(statements, start=1):
+                    emit(f"\n=== Statement {index}/{len(statements)} ===")
+                    cursor.execute(sql)
+                    if cursor.description is None:
+                        emit("Statement executed successfully.")
+                        continue
+
+                    columns = [col[0] for col in cursor.description]
+                    rows = cursor.fetchmany(args.max_rows)
+                    if args.format == "json":
+                        emit(json.dumps([dict(zip(columns, row)) for row in rows], default=str, indent=2))
+                    else:
+                        print_table(columns, rows)
+                    if args.fail_if_any_rows and rows:
+                        failure_rows.append((index, len(rows), rows))
+    finally:
+        if log_handle is not None:
+            sys.stdout = original_stdout
+            log_handle.close()
+
+    if failure_rows:
+        emit("\nVALIDATION GATE FAILED")
+        for index, row_count, rows in failure_rows:
+            emit(f"- Statement {index}: {row_count} failure row(s)")
+            for row in rows[:10]:
+                emit(f"  {row}")
+        return 1
+
+    if args.fail_if_any_rows:
+        emit("\nVALIDATION GATE PASSED")
+
+    return exit_code
 
 
 if __name__ == "__main__":

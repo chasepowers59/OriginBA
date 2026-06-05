@@ -1,0 +1,171 @@
+section,domain_name,Field_Activity___Domain
+section,workstream,Field Operations
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+D1_ACTIVITY,D1_ACTIVITY
+CMS_D1_ACTIVITY_D1FA_BODA_VW,CMS_D1_ACTIVITY_D1FA_BODA_VW
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_2,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_3,CI_LOOKUP_VAL_L
+D1_ACTIVITY_TYPE_L,D1_ACTIVITY_TYPE_L
+F1_BUS_OBJ_STATUS_L,F1_BUS_OBJ_STATUS_L
+F1_BUS_OBJ_STATUS_L_1,F1_BUS_OBJ_STATUS_L
+F1_BUS_OBJ_STATUS_RSN_L,F1_BUS_OBJ_STATUS_RSN_L
+F1_BUS_OBJ_STATUS_RSN_L_1,F1_BUS_OBJ_STATUS_RSN_L
+F1_BUS_OBJ_L,F1_BUS_OBJ_L
+F1_BUS_OBJ_L_1,F1_BUS_OBJ_L
+F1_EXT_LOOKUP_VAL_L,F1_EXT_LOOKUP_VAL_L
+F1_EXT_LOOKUP_VAL_L_1,F1_EXT_LOOKUP_VAL_L
+F1_EXT_LOOKUP_VAL_L_2,F1_EXT_LOOKUP_VAL_L
+D1_ACTIVITY_TYPE,D1_ACTIVITY_TYPE
+D1_ACTIVITY_REL,D1_ACTIVITY_REL
+D1_ACTIVITY_REL_OBJ,D1_ACTIVITY_REL_OBJ
+D1_SP,D1_SP
+CI_ACC_GRP_L,CI_ACC_GRP_L
+D1_SP_TYPE_L,D1_SP_TYPE_L
+D1_MKT_L,D1_MKT_L
+D1_MSRMT_CYC_L,D1_MSRMT_CYC_L
+D1_MSRMT_CYC_RTE_L,D1_MSRMT_CYC_RTE_L
+CI_STATE_L,CI_STATE_L
+CI_TIME_ZONE_L,CI_TIME_ZONE_L
+C1_REPRESENTATIVE_L,C1_REPRESENTATIVE_L
+SC_USER,SC_USER
+JoinTree_1,D1_ACTIVITY
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,D1_ACTIVITY,D1_ACTIVITY_TYPE,D1_ACTIVITY.ACTIVITY_TYPE_CD == D1_ACTIVITY_TYPE.ACTIVITY_TYPE_CD and D1_ACTIVITY_TYPE.ACTIVITY_TYPE_CAT_FLG == 'D1FA'
+JoinTree_1,2,leftOuter,D1_ACTIVITY,D1_ACTIVITY_REL,D1_ACTIVITY.D1_ACTIVITY_ID == D1_ACTIVITY_REL.D1_ACTIVITY_ID and D1_ACTIVITY_REL.ACTIVITY_REL_TYPE_FLG == 'D1PR'
+JoinTree_1,3,leftOuter,D1_ACTIVITY,D1_ACTIVITY_REL_OBJ,D1_ACTIVITY.D1_ACTIVITY_ID == D1_ACTIVITY_REL_OBJ.D1_ACTIVITY_ID and D1_ACTIVITY_REL_OBJ.ACTIVITY_REL_OBJ_TYPE_FLG == 'D1RO' and D1_ACTIVITY_REL_OBJ.MAINT_OBJ_CD == 'D1-SP'
+JoinTree_1,4,inner,D1_ACTIVITY,CMS_D1_ACTIVITY_D1FA_BODA_VW,D1_ACTIVITY.D1_ACTIVITY_ID == CMS_D1_ACTIVITY_D1FA_BODA_VW.D1_ACTIVITY_ID
+JoinTree_1,5,leftOuter,D1_ACTIVITY_REL_OBJ,D1_SP,D1_ACTIVITY_REL_OBJ.PK_VALUE1 == D1_SP.D1_SP_ID
+JoinTree_1,6,inner,D1_ACTIVITY,F1_BUS_OBJ_STATUS_L,D1_ACTIVITY.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L.LANGUAGE_CD == 'ENG' and D1_ACTIVITY.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L.BUS_OBJ_CD
+JoinTree_1,7,leftOuter,D1_ACTIVITY,F1_BUS_OBJ_STATUS_RSN_L,D1_ACTIVITY.BO_STATUS_REASON_CD == F1_BUS_OBJ_STATUS_RSN_L.BO_STATUS_REASON_CD and F1_BUS_OBJ_STATUS_RSN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,8,inner,D1_ACTIVITY,F1_BUS_OBJ_L,D1_ACTIVITY.BUS_OBJ_CD == F1_BUS_OBJ_L.BUS_OBJ_CD and F1_BUS_OBJ_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,9,leftOuter,D1_ACTIVITY,F1_EXT_LOOKUP_VAL_L,D1_ACTIVITY.CANCEL_REASON == F1_EXT_LOOKUP_VAL_L.F1_EXT_LOOKUP_VALUE and F1_EXT_LOOKUP_VAL_L.BUS_OBJ_CD == 'D1-CancelReasonLookup' and F1_EXT_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,10,leftOuter,D1_ACTIVITY,F1_EXT_LOOKUP_VAL_L_1,D1_ACTIVITY.FIELD_TASK_TYPE == F1_EXT_LOOKUP_VAL_L_1.F1_EXT_LOOKUP_VALUE and F1_EXT_LOOKUP_VAL_L_1.BUS_OBJ_CD == 'D1-FieldTaskTypeLookup' and F1_EXT_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,11,leftOuter,D1_ACTIVITY,F1_EXT_LOOKUP_VAL_L_2,D1_ACTIVITY.RESCHEDULE_REASON == F1_EXT_LOOKUP_VAL_L_2.F1_EXT_LOOKUP_VALUE and F1_EXT_LOOKUP_VAL_L_2.BUS_OBJ_CD == 'D1-RescheduleReasonLookup' and F1_EXT_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,12,inner,D1_ACTIVITY_TYPE,D1_ACTIVITY_TYPE_L,D1_ACTIVITY_TYPE.ACTIVITY_TYPE_CD == D1_ACTIVITY_TYPE_L.ACTIVITY_TYPE_CD and D1_ACTIVITY_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,13,leftOuter,D1_ACTIVITY,CMS_ACTIVITY_ML,D1_ACTIVITY.D1_ACTIVITY_ID == CMS_ACTIVITY_ML.D1_ACTIVITY_ID
+JoinTree_1,14,leftOuter,D1_SP,CI_ACC_GRP_L,D1_SP.ACCESS_GRP_CD == CI_ACC_GRP_L.ACCESS_GRP_CD and CI_ACC_GRP_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,15,leftOuter,D1_SP,F1_BUS_OBJ_STATUS_L_1,D1_SP.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L_1.BO_STATUS_CD and D1_SP.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_1.BUS_OBJ_CD and F1_BUS_OBJ_STATUS_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,16,leftOuter,D1_SP,F1_BUS_OBJ_STATUS_RSN_L_1,D1_SP.BO_STATUS_REASON_CD == F1_BUS_OBJ_STATUS_RSN_L_1.BO_STATUS_REASON_CD and F1_BUS_OBJ_STATUS_RSN_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,17,leftOuter,D1_SP,F1_BUS_OBJ_L_1,D1_SP.BUS_OBJ_CD == F1_BUS_OBJ_L_1.BUS_OBJ_CD and F1_BUS_OBJ_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,18,leftOuter,D1_SP,D1_SP_TYPE_L,D1_SP.D1_SP_TYPE_CD == D1_SP_TYPE_L.D1_SP_TYPE_CD and D1_SP_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,19,leftOuter,D1_SP,CI_LOOKUP_VAL_L_1,D1_SP.DISCONN_LOC_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'DISCONN_LOC_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,20,leftOuter,D1_SP,D1_MKT_L,D1_SP.MKT_CD == D1_MKT_L.MKT_CD and D1_MKT_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,21,leftOuter,D1_SP,D1_MSRMT_CYC_L,D1_SP.MSRMT_CYC_CD == D1_MSRMT_CYC_L.MSRMT_CYC_CD and D1_MSRMT_CYC_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,22,leftOuter,D1_SP,D1_MSRMT_CYC_RTE_L,D1_SP.MSRMT_CYC_RTE_CD == D1_MSRMT_CYC_RTE_L.MSRMT_CYC_RTE_CD and D1_SP.MSRMT_CYC_CD == D1_MSRMT_CYC_RTE_L.MSRMT_CYC_CD and D1_MSRMT_CYC_RTE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,23,leftOuter,D1_SP,CI_LOOKUP_VAL_L_2,D1_SP.SP_SRC_STAT_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'SP_SRC_STAT_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,24,leftOuter,D1_SP,CI_TIME_ZONE_L,D1_SP.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,25,leftOuter,D1_SP,CI_STATE_L,D1_SP.STATE == CI_STATE_L.STATE and D1_SP.COUNTRY == CI_STATE_L.COUNTRY and CI_STATE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,26,leftOuter,CMS_ACTIVITY_ML,CI_LOOKUP_VAL_L_3,CMS_ACTIVITY_ML.FA_INT_STATUS_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'FA_INT_STATUS_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_1,27,leftOuter,CMS_ACTIVITY_ML,C1_REPRESENTATIVE_L,CMS_ACTIVITY_ML.THRD_PTY_REP_CD == C1_REPRESENTATIVE_L.C1_REPRESENTATIVE_CD and C1_REPRESENTATIVE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,28,leftOuter,CMS_D1_ACTIVITY_D1FA_BODA_VW,SC_USER,CMS_D1_ACTIVITY_D1FA_BODA_VW.CR_REQUESTER_USER == SC_USER.USER_ID
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Activity,Activity Type,JoinTree_1.D1_ACTIVITY,ACTIVITY_TYPE_CD,,
+1.) Activity,Status (Activity),JoinTree_1.D1_ACTIVITY,BO_STATUS_CD,,
+1.) Activity,Status Reason (Activity),JoinTree_1.D1_ACTIVITY,BO_STATUS_REASON_CD,,
+1.) Activity,Business Object (Activity),JoinTree_1.D1_ACTIVITY,BUS_OBJ_CD,,
+1.) Activity,Cancel Reason (Activity),JoinTree_1.D1_ACTIVITY,CANCEL_REASON,,
+1.) Activity,Create Date/Time (Activity),JoinTree_1.D1_ACTIVITY,CRE_DTTM,,
+1.) Activity,Activity ID (Activity),JoinTree_1.D1_ACTIVITY,D1_ACTIVITY_ID,,
+1.) Activity,Effective Date/Time (Activity),JoinTree_1.D1_ACTIVITY,EFF_DTTM,,
+1.) Activity,End Date/Time (Activity),JoinTree_1.D1_ACTIVITY,END_DTTM,,
+1.) Activity,Field Task Type (Activity),JoinTree_1.D1_ACTIVITY,FIELD_TASK_TYPE,,
+1.) Activity,Reschedule Reason,JoinTree_1.D1_ACTIVITY,RESCHEDULE_REASON,,
+1.) Activity,Retention Period,JoinTree_1.D1_ACTIVITY,RETENTION_PERIOD,Dimension,CountAll
+1.) Activity,Start Date/Time (Activity),JoinTree_1.D1_ACTIVITY,START_DTTM,,
+1.) Activity,Status Date/Time (Activity),JoinTree_1.D1_ACTIVITY,STATUS_UPD_DTTM,,
+1.) Activity Details,Appointment Comments,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,APPOINTMENT_COMMENTS,,
+1.) Activity Details,Appointment Necessary,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,APPOINTMENT_FLG,,
+1.) Activity Details,Appointment Taken By,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,APPOINTMENT_TAKEN_BY,,
+1.) Activity Details,Appointment Taken Date,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,APPOINTMENT_TAKEN_DATE,,
+1.) Activity Details,Appointment End Date Time,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,APPOINTMENT_WINDOW_END_DTTM,,
+1.) Activity Details,Appointment Window Date Time,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,APPOINTMENT_WINDOW_START_DTTM,,
+1.) Activity Details,Pickup Order,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,CM_ML_IS_PICKUP_FLG,,
+1.) Activity Details,Comments,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,COMMENTS,,
+1.) Activity Details,Requester User,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,CR_REQUESTER_USER,,
+1.) Activity Details,Cell Phone,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,D1_CELLPHONE,,
+1.) Activity Details,Contact External ID,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,D1_CONT_EXTERNAL_ID,,
+1.) Activity Details,Contact Name,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,D1_CONTACTNAME,,
+1.) Activity Details,Customer Name,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,D1_CUSTOMERNAME,,
+1.) Activity Details,Instructions,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,D1_INSTRUCTIONS,,
+1.) Activity Details,Main Phone,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,D1_MAINPHONE,,
+1.) Activity Details,Email,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,EMAIL_VALUE,,
+1.) Activity Details,Expiration Date/Time,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,EXPIRATION_DTTM,,
+1.) Activity Details,External Reference ID,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,EXT_REFERENCE_ID,,
+1.) Activity Details,External Account ID,JoinTree_1.CMS_D1_ACTIVITY_D1FA_BODA_VW,EXTERNAL_ACCT_ID,,
+1.) Activity Details (for MobileLite),Intermediate Status,JoinTree_1.CMS_ACTIVITY_ML,FA_INT_STATUS_FLG,,
+1.) Activity Details (for MobileLite),Field Activity Priority,JoinTree_1.CMS_ACTIVITY_ML,FA_PRIORITY_FLG,,
+1.) Activity Details (for MobileLite),Representative,JoinTree_1.CMS_ACTIVITY_ML,THRD_PTY_REP_CD,,
+1.) Service Point - MDM,Access Group,JoinTree_1.D1_SP,ACCESS_GRP_CD,,
+1.) Service Point - MDM,Address,JoinTree_1.D1_SP,ADDRESS1,,
+1.) Service Point - MDM,Address,JoinTree_1.D1_SP,ADDRESS1_UPPER,,
+1.) Service Point - MDM,Address 2,JoinTree_1.D1_SP,ADDRESS2,,
+1.) Service Point - MDM,Address 3,JoinTree_1.D1_SP,ADDRESS3,,
+1.) Service Point - MDM,Address 4,JoinTree_1.D1_SP,ADDRESS4,,
+1.) Service Point - MDM,Status (Service Point),JoinTree_1.D1_SP,BO_STATUS_CD,,
+1.) Service Point - MDM,Status Reason (Service Point),JoinTree_1.D1_SP,BO_STATUS_REASON_CD,,
+1.) Service Point - MDM,Business Object (Service Point),JoinTree_1.D1_SP,BUS_OBJ_CD,,
+1.) Service Point - MDM,City,JoinTree_1.D1_SP,CITY,,
+1.) Service Point - MDM,City Upper Case,JoinTree_1.D1_SP,CITY_UPPER,,
+1.) Service Point - MDM,Country,JoinTree_1.D1_SP,COUNTRY,,
+1.) Service Point - MDM,County,JoinTree_1.D1_SP,COUNTY,,
+1.) Service Point - MDM,Create Date/Time,JoinTree_1.D1_SP,CRE_DTTM,,
+1.) Service Point - MDM,Geographic Latitude,JoinTree_1.D1_SP,D1_GEO_LAT,Dimension,CountAll
+1.) Service Point - MDM,Geographic Longitude,JoinTree_1.D1_SP,D1_GEO_LONG,Dimension,CountAll
+1.) Service Point - MDM,Life Support / Sensitive Load Description,JoinTree_1.D1_SP,D1_LS_SL_DESCR,,
+1.) Service Point - MDM,Life Support / Sensitive Load,JoinTree_1.D1_SP,D1_LS_SL_FLG,,
+1.) Service Point - MDM,Service Point ID,JoinTree_1.D1_SP,D1_SP_ID,,
+1.) Service Point - MDM,Service Point Type,JoinTree_1.D1_SP,D1_SP_TYPE_CD,,
+1.) Service Point - MDM,Disconnect Location,JoinTree_1.D1_SP,DISCONN_LOC_FLG,,
+1.) Service Point - MDM,Division,JoinTree_1.D1_SP,DIVISION_CD,,
+1.) Service Point - MDM,Geographical Code,JoinTree_1.D1_SP,GEO_CODE,,
+1.) Service Point - MDM,House Type,JoinTree_1.D1_SP,HOUSE_TYPE,,
+1.) Service Point - MDM,In City Limit,JoinTree_1.D1_SP,IN_CITY_LIMIT,,
+1.) Service Point - MDM,Market,JoinTree_1.D1_SP,MKT_CD,,
+1.) Service Point - MDM,Measurement Cycle,JoinTree_1.D1_SP,MSRMT_CYC_CD,,
+1.) Service Point - MDM,Route,JoinTree_1.D1_SP,MSRMT_CYC_RTE_CD,,
+1.) Service Point - MDM,Sequence,JoinTree_1.D1_SP,MSRMT_CYC_RTE_SEQ,Dimension,CountAll
+1.) Service Point - MDM,Number 1,JoinTree_1.D1_SP,NUM1,,
+1.) Service Point - MDM,Number 2,JoinTree_1.D1_SP,NUM2,,
+1.) Service Point - MDM,Postal,JoinTree_1.D1_SP,POSTAL,,
+1.) Service Point - MDM,Source Status,JoinTree_1.D1_SP,SP_SRC_STAT_FLG,,
+1.) Service Point - MDM,State,JoinTree_1.D1_SP,STATE,,
+1.) Service Point - MDM,Status Date/Time (Service Point),JoinTree_1.D1_SP,STATUS_UPD_DTTM,,
+1.) Service Point - MDM,Time Zone,JoinTree_1.D1_SP,TIME_ZONE_CD,,
+1.) Descriptions,Access Group Description,JoinTree_1.CI_ACC_GRP_L,DESCR,,
+1.) Descriptions,Activity Type Description,JoinTree_1.D1_ACTIVITY_TYPE_L,DESCR100,,
+1.) Descriptions,Business Object Description (Activity),JoinTree_1.F1_BUS_OBJ_L,DESCR,,
+1.) Descriptions,Business Object Description (Service Point),JoinTree_1.F1_BUS_OBJ_L_1,DESCR,,
+1.) Descriptions,Cancel Reason Description (Activity),JoinTree_1.F1_EXT_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Disconnect Location Description,JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,Field Task Type Description,JoinTree_1.F1_EXT_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,Intermediate Status Description,JoinTree_1.CI_LOOKUP_VAL_L_3,DESCR,,
+1.) Descriptions,Market Description,JoinTree_1.D1_MKT_L,DESCR100,,
+1.) Descriptions,Measurement Cycle Description,JoinTree_1.D1_MSRMT_CYC_L,DESCR100,,
+1.) Descriptions,Representative Description,JoinTree_1.C1_REPRESENTATIVE_L,DESCR100,,
+1.) Descriptions,Reschedule Reason Description,JoinTree_1.F1_EXT_LOOKUP_VAL_L_2,DESCR,,
+1.) Descriptions,Route Description,JoinTree_1.D1_MSRMT_CYC_RTE_L,DESCR100,,
+1.) Descriptions,Service Point Type Description,JoinTree_1.D1_SP_TYPE_L,DESCR100,,
+1.) Descriptions,Source Status Description,JoinTree_1.CI_LOOKUP_VAL_L_2,DESCR,,
+1.) Descriptions,State Description,JoinTree_1.CI_STATE_L,DESCR,,
+1.) Descriptions,Status Description (Activity),JoinTree_1.F1_BUS_OBJ_STATUS_L,DESCR,,
+1.) Descriptions,Status Description (Service Point),JoinTree_1.F1_BUS_OBJ_STATUS_L_1,DESCR,,
+1.) Descriptions,Status Reason Description (Activity),JoinTree_1.F1_BUS_OBJ_STATUS_RSN_L,DESCR,,
+1.) Descriptions,Status Reason Description (Service Point),JoinTree_1.F1_BUS_OBJ_STATUS_RSN_L_1,DESCR,,
+1.) Descriptions,Time Zone Description,JoinTree_1.CI_TIME_ZONE_L,DESCR,,
+1.) Formulas,Completed Activities,JoinTree_1,DISTINCT_COMPLETED_ACTIVITY_ID,,
+1.) Formulas,Days Old,JoinTree_1,DAYS_OLD,,
+1.) Formulas,Days Completion,JoinTree_1,DAYS_COMPLETED,,
+1.) Formulas,Days Started Since Creation,JoinTree_1,DAYS_STARTED_SINCE_CREATE,,
+1.) Formulas,Total # of Activities,JoinTree_1,ACTIVITY_ID_DISTINCT,,
+1.) Formulas,Distinct Service Point ID,JoinTree_1,D1_SP_ID_DISTINCT,,
+1.) Formulas,Parent Activity ID,JoinTree_1.D1_ACTIVITY_REL,REL_ACTIVITY_ID,,
+1.) Formulas,Postal (First Five),JoinTree_1,POSTAL_5,,
+1.) Formulas,Requester User (Name),JoinTree_1,REQUESTER_USER_NAME,,

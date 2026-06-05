@@ -1,0 +1,114 @@
+section,domain_name,Deposit_Control___Domain
+section,workstream,Cashiering
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_DEP_CTL,CI_DEP_CTL
+CI_DEP_CTL_1,CI_DEP_CTL
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_2,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_3,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_4,CI_LOOKUP_VAL_L
+CI_TNDR_CTL,CI_TNDR_CTL
+CI_TNDR_DEP,CI_TNDR_DEP
+CI_TNDR_SRCE_L,CI_TNDR_SRCE_L
+CI_TNDR_END_BAL,CI_TNDR_END_BAL
+SC_USER,SC_USER
+SC_USER_1,SC_USER
+SC_USER_2,SC_USER
+SC_USER_3,SC_USER
+SC_USER_4,SC_USER
+SC_USER_5,SC_USER
+CI_BATCH_CTRL_L,CI_BATCH_CTRL_L
+CI_TENDER_TYPE_L,CI_TENDER_TYPE_L
+CI_BANK_L,CI_BANK_L
+CI_BANK_ACCOUNT_L,CI_BANK_ACCOUNT_L
+JoinTree_1,CI_TNDR_CTL
+JoinTree_2,CI_DEP_CTL
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_TNDR_CTL,CI_DEP_CTL,CI_TNDR_CTL.DEP_CTL_ID == CI_DEP_CTL.DEP_CTL_ID
+JoinTree_1,2,inner,CI_TNDR_CTL,CI_TNDR_SRCE_L,CI_TNDR_CTL.TNDR_SOURCE_CD == CI_TNDR_SRCE_L.TNDR_SOURCE_CD and CI_TNDR_SRCE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,3,inner,CI_TNDR_CTL,CI_LOOKUP_VAL_L,CI_TNDR_CTL.TNDR_CTL_ST_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'TNDR_CTL_ST_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,4,leftOuter,CI_TNDR_CTL,SC_USER,CI_TNDR_CTL.USER_ID == SC_USER.USER_ID
+JoinTree_1,5,leftOuter,CI_TNDR_CTL,SC_USER_1,CI_TNDR_CTL.BALANCED_USER_ID == SC_USER_1.USER_ID
+JoinTree_1,6,leftOuter,CI_TNDR_CTL,CI_BATCH_CTRL_L,CI_TNDR_CTL.BATCH_CD == CI_BATCH_CTRL_L.BATCH_CD and CI_BATCH_CTRL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,7,leftOuter,CI_DEP_CTL,SC_USER_2,CI_DEP_CTL.USER_ID == SC_USER_2.USER_ID
+JoinTree_1,8,leftOuter,CI_DEP_CTL,SC_USER_3,CI_DEP_CTL.BALANCED_USER_ID == SC_USER_3.USER_ID
+JoinTree_1,9,inner,CI_DEP_CTL,CI_LOOKUP_VAL_L_1,CI_DEP_CTL.TNDR_SRCE_TYPE_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'TNDR_SRCE_TYPE_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,10,inner,CI_DEP_CTL,CI_LOOKUP_VAL_L_2,CI_DEP_CTL.DEP_CTL_STATUS_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'DEP_CTL_STATUS_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_2,11,leftOuter,CI_DEP_CTL_1,CI_TNDR_DEP,CI_DEP_CTL_1.DEP_CTL_ID == CI_TNDR_DEP.DEP_CTL_ID
+JoinTree_2,12,leftOuter,CI_TNDR_DEP,CI_BANK_L,CI_TNDR_DEP.BANK_CD == CI_BANK_L.BANK_CD and CI_BANK_L.LANGUAGE_CD == 'ENG'
+JoinTree_2,13,inner,CI_DEP_CTL_1,CI_LOOKUP_VAL_L_3,CI_DEP_CTL_1.DEP_CTL_STATUS_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'DEP_CTL_STATUS_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_2,14,inner,CI_DEP_CTL_1,CI_LOOKUP_VAL_L_4,CI_DEP_CTL_1.TNDR_SRCE_TYPE_FLG == CI_LOOKUP_VAL_L_4.FIELD_VALUE and CI_LOOKUP_VAL_L_4.FIELD_NAME == 'TNDR_SRCE_TYPE_FLG' and CI_LOOKUP_VAL_L_4.LANGUAGE_CD == 'ENG'
+JoinTree_2,15,leftOuter,CI_TNDR_DEP,CI_BANK_ACCOUNT_L,CI_TNDR_DEP.BANK_CD == CI_BANK_ACCOUNT_L.BANK_CD and CI_TNDR_DEP.BANK_ACCT_KEY == CI_BANK_ACCOUNT_L.BANK_ACCT_KEY and CI_BANK_ACCOUNT_L.LANGUAGE_CD == 'ENG'
+JoinTree_2,16,leftOuter,CI_DEP_CTL_1,SC_USER_4,CI_DEP_CTL_1.USER_ID == SC_USER_4.USER_ID
+JoinTree_2,17,leftOuter,CI_DEP_CTL_1,SC_USER_5,CI_DEP_CTL_1.BALANCED_USER_ID == SC_USER_5.USER_ID
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Deposit Control,Balanced Date/Time,JoinTree_1.CI_DEP_CTL,BALANCED_DTTM,,
+1.) Deposit Control,Balanced User ID,JoinTree_1.CI_DEP_CTL,BALANCED_USER_ID,,
+1.) Deposit Control,Comments,JoinTree_1.CI_DEP_CTL,COMMENTS,,
+1.) Deposit Control,Create Date/Time,JoinTree_1.CI_DEP_CTL,CRE_DTTM,,
+1.) Deposit Control,Currency Code,JoinTree_1.CI_DEP_CTL,CURRENCY_CD,,
+1.) Deposit Control,Deposit Control ID,JoinTree_1.CI_DEP_CTL,DEP_CTL_ID,,
+1.) Deposit Control,Deposit Control Status,JoinTree_1.CI_DEP_CTL,DEP_CTL_STATUS_FLG,,
+1.) Deposit Control,Deposit Control Ending Balance,JoinTree_1.CI_DEP_CTL,END_BALANCE,,
+1.) Deposit Control,Tender Source Type,JoinTree_1.CI_DEP_CTL,TNDR_SRCE_TYPE_FLG,,
+1.) Deposit Control,User,JoinTree_1.CI_DEP_CTL,USER_ID,,
+1.) Tender Control,All Users                     ,JoinTree_1.CI_TNDR_CTL,ALL_OPERATORS_SW,,
+1.) Tender Control,Archived,JoinTree_1.CI_TNDR_CTL,ARCHIVE_SW,,
+1.) Tender Control,Balanced Date/Time,JoinTree_1.CI_TNDR_CTL,BALANCED_DTTM,,
+1.) Tender Control,Balanced User ID,JoinTree_1.CI_TNDR_CTL,BALANCED_USER_ID,,
+1.) Tender Control,Batch Control,JoinTree_1.CI_TNDR_CTL,BATCH_CD,,
+1.) Tender Control,Batch Number,JoinTree_1.CI_TNDR_CTL,BATCH_NBR,Dimension,CountAll
+1.) Tender Control,Comments,JoinTree_1.CI_TNDR_CTL,COMMENTS,,
+1.) Tender Control,Create Date/Time,JoinTree_1.CI_TNDR_CTL,CRE_DTTM,,
+1.) Tender Control,Currency Code,JoinTree_1.CI_TNDR_CTL,CURRENCY_CD,,
+1.) Tender Control,Deposit Control ID,JoinTree_1.CI_TNDR_CTL,DEP_CTL_ID,,
+1.) Tender Control,Tender Control Ending Balance,JoinTree_1.CI_TNDR_CTL,END_BALANCE,,
+1.) Tender Control,External Transmission ID,JoinTree_1.CI_TNDR_CTL,EXT_TRANSMIT_ID,,
+1.) Tender Control,Tender Control Starting Balance,JoinTree_1.CI_TNDR_CTL,START_BALANCE,,
+1.) Tender Control,Tender Control ID,JoinTree_1.CI_TNDR_CTL,TNDR_CTL_ID,,
+1.) Tender Control,Tender Control Status,JoinTree_1.CI_TNDR_CTL,TNDR_CTL_ST_FLG,,
+1.) Tender Control,Tender Source,JoinTree_1.CI_TNDR_CTL,TNDR_SOURCE_CD,,
+1.) Tender Control,User,JoinTree_1.CI_TNDR_CTL,USER_ID,,
+1.) Descriptions,Batch Control Description,JoinTree_1.CI_BATCH_CTRL_L,DESCR,,
+1.) Descriptions,Deposit Control Status Description,JoinTree_1.CI_LOOKUP_VAL_L_2,DESCR,,
+1.) Descriptions,Tender Control Status Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Tender Source Description,JoinTree_1.CI_TNDR_SRCE_L,DESCR,,
+1.) Descriptions,Tender Source Type Description,JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Formulas,Deposit Control Balanced By (Name),JoinTree_1,DEP_CTL_BAL_USER_NAME,,
+1.) Formulas,Deposit Control User (Name),JoinTree_1,DEP_CTL_USER_NAME,,
+1.) Formulas,Distinct Deposit Control ID,JoinTree_1,DEP_CTL_ID_DISTINCT,Measure,Sum
+1.) Formulas,Distinct Tender Control ID,JoinTree_1,TNDR_CTL_ID_DISTINCT,Measure,Sum
+1.) Formulas,Tender Control Balanced By (Name),JoinTree_1,TNDR_CTL_BAL_USER_NAME,,
+1.) Formulas,Tender Control User (Name),JoinTree_1,TNDR_CTL_USER_NAME,,
+2.) Tender Deposit,Bank Account,JoinTree_2.CI_TNDR_DEP,BANK_ACCT_KEY,,
+2.) Tender Deposit,Bank,JoinTree_2.CI_TNDR_DEP,BANK_CD,,
+2.) Tender Deposit,Currency Code,JoinTree_2.CI_TNDR_DEP,CURRENCY_CD,,
+2.) Tender Deposit,Deposit Control ID,JoinTree_2.CI_TNDR_DEP,DEP_CTL_ID,,
+2.) Tender Deposit,Deposit Amount,JoinTree_2.CI_TNDR_DEP,DEPOSIT_AMT,,
+2.) Tender Deposit,Reference ID,JoinTree_2.CI_TNDR_DEP,REFERENCE_ID,,
+2.) Tender Deposit,Tender Deposit ID,JoinTree_2.CI_TNDR_DEP,TNDR_DEP_ID,,
+2.) Deposit Control,Balanced Date/Time,JoinTree_2.CI_DEP_CTL_1,BALANCED_DTTM,,
+2.) Deposit Control,Balanced User ID,JoinTree_2.CI_DEP_CTL_1,BALANCED_USER_ID,,
+2.) Deposit Control,Comments,JoinTree_2.CI_DEP_CTL_1,COMMENTS,,
+2.) Deposit Control,Create Date/Time,JoinTree_2.CI_DEP_CTL_1,CRE_DTTM,,
+2.) Deposit Control,Currency Code,JoinTree_2.CI_DEP_CTL_1,CURRENCY_CD,,
+2.) Deposit Control,Deposit Control ID,JoinTree_2.CI_DEP_CTL_1,DEP_CTL_ID,,
+2.) Deposit Control,Deposit Control Status,JoinTree_2.CI_DEP_CTL_1,DEP_CTL_STATUS_FLG,,
+2.) Deposit Control,Ending Balance,JoinTree_2.CI_DEP_CTL_1,END_BALANCE,,
+2.) Deposit Control,Tender Source Type,JoinTree_2.CI_DEP_CTL_1,TNDR_SRCE_TYPE_FLG,,
+2.) Deposit Control,User,JoinTree_2.CI_DEP_CTL_1,USER_ID,,
+2.) Descriptions,Bank Account Description,JoinTree_2.CI_BANK_ACCOUNT_L,DESCR,,
+2.) Descriptions,Bank Description,JoinTree_2.CI_BANK_L,DESCR,,
+2.) Descriptions,Deposit Control Status Description,JoinTree_2.CI_LOOKUP_VAL_L_3,DESCR,,
+2.) Descriptions,Tender Source Type Description,JoinTree_2.CI_LOOKUP_VAL_L_4,DESCR,,
+2.) Formulas,Balanced By User (Name),JoinTree_2,DEP_CTL_BAL_USER_NAME,,
+2.) Formulas,Distinct Deposit Control ID,JoinTree_2,DEP_CTL_ID_DISTINCT,,
+2.) Formulas,Distinct Tender Deposit ID,JoinTree_2,TNDR_DEP_ID_DISTINCT,,
+2.) Formulas,User (Name),JoinTree_2,DEP_CTL_USER_NAME,,

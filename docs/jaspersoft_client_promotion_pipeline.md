@@ -31,6 +31,13 @@ It also does not depend on:
 - local SQL runners
 - the active 7-snapshot performance workstream
 
+## Related: environment-only promotions
+
+For non-client targets that keep `Origin_DEV` org paths and only swap datasource
+aliases (for example `Origin_DEMO_DS`), use:
+
+- [jaspersoft_environment_promotion_pipeline.md](jaspersoft_environment_promotion_pipeline.md)
+
 ## Repo Locations
 
 Scripts:

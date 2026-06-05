@@ -1,0 +1,167 @@
+section,domain_name,Bill_Segment_Exception___Domain
+section,workstream,Common
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_BSEG_EXCP,CI_BSEG_EXCP
+CI_SA,CI_SA
+CI_ACCT_PER,CI_ACCT_PER
+CI_PER_NAME,CI_PER_NAME
+CI_TD_DRLKEY,CI_TD_DRLKEY
+CI_TD_ENTRY,CI_TD_ENTRY
+SC_USER,SC_USER
+SC_USER_1,SC_USER
+SC_USER_2,SC_USER
+SC_USER_3,SC_USER
+SC_USER_4,SC_USER
+CI_TD_TYPE_L,CI_TD_TYPE_L
+CI_ROLE_L,CI_ROLE_L
+CI_TD_DRLKEY_TY,CI_TD_DRLKEY_TY
+CI_BSEG,CI_BSEG
+CI_LOOKUP_VAL_L,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_2,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_3,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_4,CI_LOOKUP_VAL_L
+CI_BILL_CYC_L,CI_BILL_CYC_L
+CI_COLL_CL_L,CI_COLL_CL_L
+CI_ACCT_MGMT_GR_L,CI_ACCT_MGMT_GR_L
+CI_ACCT,CI_ACCT
+CI_CUST_CL_L,CI_CUST_CL_L
+CI_BUD_PLAN_L,CI_BUD_PLAN_L
+CI_SA_TYPE_L,CI_SA_TYPE_L
+JoinTree_1,CI_BSEG_EXCP
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,inner,CI_BSEG_EXCP,CI_TD_DRLKEY,CI_BSEG_EXCP.BSEG_ID == CI_TD_DRLKEY.KEY_VALUE
+JoinTree_1,2,inner,CI_TD_DRLKEY,CI_TD_DRLKEY_TY,CI_TD_DRLKEY.SEQ_NUM == CI_TD_DRLKEY_TY.SEQ_NUM
+JoinTree_1,3,inner,CI_TD_DRLKEY_TY,CI_TD_ENTRY,CI_TD_DRLKEY_TY.TD_TYPE_CD == CI_TD_ENTRY.TD_TYPE_CD and CI_TD_DRLKEY_TY.TBL_NAME == 'CI_BSEG' and CI_TD_DRLKEY_TY.FLD_NAME == 'BSEG_ID'
+JoinTree_1,4,inner,CI_TD_DRLKEY,CI_TD_ENTRY,CI_TD_DRLKEY.TD_ENTRY_ID == CI_TD_ENTRY.TD_ENTRY_ID
+JoinTree_1,5,inner,CI_BSEG_EXCP,CI_BSEG,CI_BSEG_EXCP.BSEG_ID == CI_BSEG.BSEG_ID
+JoinTree_1,6,inner,CI_BSEG,CI_SA,CI_BSEG.SA_ID == CI_SA.SA_ID
+JoinTree_1,7,inner,CI_SA,CI_ACCT_PER,CI_SA.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_1,8,inner,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
+JoinTree_1,9,inner,CI_BSEG_EXCP,CI_LOOKUP_VAL_L,CI_BSEG_EXCP.BSEG_EXCP_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'BSEG_EXCP_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,10,inner,CI_BSEG_EXCP,SC_USER,CI_BSEG_EXCP.USER_ID == SC_USER.USER_ID
+JoinTree_1,11,leftOuter,CI_BSEG_EXCP,SC_USER_1,CI_BSEG_EXCP.REVIEW_USER_ID == SC_USER_1.USER_ID
+JoinTree_1,12,leftOuter,CI_TD_ENTRY,SC_USER_2,CI_TD_ENTRY.ASSIGNED_USER_ID == SC_USER_2.USER_ID
+JoinTree_1,13,inner,CI_TD_ENTRY,CI_TD_TYPE_L,CI_TD_ENTRY.TD_TYPE_CD == CI_TD_TYPE_L.TD_TYPE_CD and CI_TD_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,14,inner,CI_TD_ENTRY,CI_ROLE_L,CI_TD_ENTRY.ROLE_ID == CI_ROLE_L.ROLE_ID
+JoinTree_1,15,inner,CI_TD_ENTRY,CI_LOOKUP_VAL_L_1,CI_TD_ENTRY.ENTRY_STATUS_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'ENTRY_STATUS_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_1,16,leftOuter,CI_TD_ENTRY,SC_USER_3,CI_TD_ENTRY.COMPLETE_USER_ID == SC_USER_3.USER_ID
+JoinTree_1,17,inner,CI_TD_ENTRY,CI_LOOKUP_VAL_L_2,CI_TD_ENTRY.TD_PRIORITY_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'TD_PRIORITY_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'
+JoinTree_1,18,leftOuter,CI_TD_ENTRY,SC_USER_4,CI_TD_ENTRY.ASSIGNED_TO == SC_USER_4.USER_ID
+JoinTree_1,19,inner,CI_SA,CI_ACCT,CI_SA.ACCT_ID == CI_ACCT.ACCT_ID
+JoinTree_1,20,leftOuter,CI_ACCT,CI_BILL_CYC_L,CI_ACCT.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,21,leftOuter,CI_ACCT,CI_ACCT_MGMT_GR_L,CI_ACCT.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,22,inner,CI_ACCT,CI_COLL_CL_L,CI_ACCT.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,23,inner,CI_ACCT,CI_CUST_CL_L,CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,24,leftOuter,CI_ACCT,CI_BUD_PLAN_L,CI_ACCT.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,25,inner,CI_SA,CI_SA_TYPE_L,CI_SA.SA_TYPE_CD == CI_SA_TYPE_L.SA_TYPE_CD and CI_SA.CIS_DIVISION == CI_SA_TYPE_L.CIS_DIVISION and CI_SA_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,26,inner,CI_SA,CI_LOOKUP_VAL_L_3,CI_SA.SA_STATUS_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'SA_STATUS_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Bill Segment Exception,Bill Segment Exception Type,JoinTree_1.CI_BSEG_EXCP,BSEG_EXCP_FLG,,
+1.) Bill Segment Exception,Bill Segment ID,JoinTree_1.CI_BSEG_EXCP,BSEG_ID,,
+1.) Bill Segment Exception,Comments (Bill Segment Exception),JoinTree_1.CI_BSEG_EXCP,COMMENTS,,
+1.) Bill Segment Exception,Create Date/Time (Bill Segment Exception),JoinTree_1.CI_BSEG_EXCP,CRE_DTTM,,
+1.) Bill Segment Exception,Message,JoinTree_1.CI_BSEG_EXCP,EXP_MSG,,
+1.) Bill Segment Exception,Reviewed,JoinTree_1.CI_BSEG_EXCP,REVIEW_COMP,,
+1.) Bill Segment Exception,Review Date,JoinTree_1.CI_BSEG_EXCP,REVIEW_DT,,
+1.) Bill Segment Exception,Review User,JoinTree_1.CI_BSEG_EXCP,REVIEW_USER_ID,,
+1.) Bill Segment Exception,User,JoinTree_1.CI_BSEG_EXCP,USER_ID,,
+1.) To Do Entry,Assigned Date/Time,JoinTree_1.CI_TD_ENTRY,ASSIGNED_DTTM,,
+1.) To Do Entry,Assign to User,JoinTree_1.CI_TD_ENTRY,ASSIGNED_TO,,
+1.) To Do Entry,Assigned By User,JoinTree_1.CI_TD_ENTRY,ASSIGNED_USER_ID,,
+1.) To Do Entry,Batch Control,JoinTree_1.CI_TD_ENTRY,BATCH_CD,,
+1.) To Do Entry,Batch Number,JoinTree_1.CI_TD_ENTRY,BATCH_NBR,Dimension,CountAll
+1.) To Do Entry,Comments (To Do Entry),JoinTree_1.CI_TD_ENTRY,COMMENTS,,
+1.) To Do Entry,Completion Date/Time,JoinTree_1.CI_TD_ENTRY,COMPLETE_DTTM,,
+1.) To Do Entry,Completed By,JoinTree_1.CI_TD_ENTRY,COMPLETE_USER_ID,,
+1.) To Do Entry,Create Date/Time (To Do Entry),JoinTree_1.CI_TD_ENTRY,CRE_DTTM,,
+1.) To Do Entry,Status (To Do Entry),JoinTree_1.CI_TD_ENTRY,ENTRY_STATUS_FLG,,
+1.) To Do Entry,Message Category,JoinTree_1.CI_TD_ENTRY,MESSAGE_CAT_NBR,Dimension,CountAll
+1.) To Do Entry,Message Number,JoinTree_1.CI_TD_ENTRY,MESSAGE_NBR,Dimension,CountAll
+1.) To Do Entry,To Do Role,JoinTree_1.CI_TD_ENTRY,ROLE_ID,,
+1.) To Do Entry,To Do ID,JoinTree_1.CI_TD_ENTRY,TD_ENTRY_ID,,
+1.) To Do Entry,Priority,JoinTree_1.CI_TD_ENTRY,TD_PRIORITY_FLG,,
+1.) To Do Entry,To Do Type,JoinTree_1.CI_TD_ENTRY,TD_TYPE_CD,,
+1.) Account,Access Group,JoinTree_1.CI_ACCT,ACCESS_GRP_CD,,
+1.) Account,Account ID,JoinTree_1.CI_ACCT,ACCT_ID,,
+1.) Account,Account Management Group,JoinTree_1.CI_ACCT,ACCT_MGMT_GRP_CD,,
+1.) Account,Alert Information,JoinTree_1.CI_ACCT,ALERT_INFO,,
+1.) Account,Bill After                    ,JoinTree_1.CI_ACCT,BILL_AFTER_DT,,
+1.) Account,Bill Cycle,JoinTree_1.CI_ACCT,BILL_CYC_CD,,
+1.) Account,Bill Print Intercept,JoinTree_1.CI_ACCT,BILL_PRT_INTERCEPT,,
+1.) Account,Budget Plan,JoinTree_1.CI_ACCT,BUD_PLAN_CD,,
+1.) Account,CIS Division,JoinTree_1.CI_ACCT,CIS_DIVISION,,
+1.) Account,Collection Class,JoinTree_1.CI_ACCT,COLL_CL_CD,,
+1.) Account,Last Credit Review Date,JoinTree_1.CI_ACCT,CR_REVIEW_DT,,
+1.) Account,Currency Code,JoinTree_1.CI_ACCT,CURRENCY_CD,,
+1.) Account,Customer Class,JoinTree_1.CI_ACCT,CUST_CL_CD,,
+1.) Account,Internal Credit Review,JoinTree_1.CI_ACCT,INT_CR_REVIEW_SW,,
+1.) Account,Mailing Premise ID,JoinTree_1.CI_ACCT,MAILING_PREM_ID,,
+1.) Account,No Deposit Review Switch,JoinTree_1.CI_ACCT,NO_DEP_RVW_SW,,
+1.) Account,Postpone Credit Review Until,JoinTree_1.CI_ACCT,POSTPONE_CR_RVW_DT,,
+1.) Account,Protect Bill Cycle,JoinTree_1.CI_ACCT,PROTECT_CYC_SW,,
+1.) Account,Protect Division,JoinTree_1.CI_ACCT,PROTECT_DIV_SW,,
+1.) Account,Protect Mailing Premise,JoinTree_1.CI_ACCT,PROTECT_PREM_SW,,
+1.) Account,Set Up Date,JoinTree_1.CI_ACCT,SETUP_DT,,
+1.) SA (Service Agreement),Account ID,JoinTree_1.CI_SA,ACCT_ID,,
+1.) SA (Service Agreement),Allow Estimates,JoinTree_1.CI_SA,ALLOW_EST_SW,,
+1.) SA (Service Agreement),Business Activity,JoinTree_1.CI_SA,BUS_ACTIVITY_DESC,,
+1.) SA (Service Agreement),Premise ID,JoinTree_1.CI_SA,CHAR_PREM_ID,,
+1.) SA (Service Agreement),CIAC Review Date,JoinTree_1.CI_SA,CIAC_REVIEW_DT,,
+1.) SA (Service Agreement),CIS Division,JoinTree_1.CI_SA,CIS_DIVISION,,
+1.) SA (Service Agreement),Currency Code,JoinTree_1.CI_SA,CURRENCY_CD,,
+1.) SA (Service Agreement),Customer Read,JoinTree_1.CI_SA,CUST_READ_FLG,,
+1.) SA (Service Agreement),End Date,JoinTree_1.CI_SA,END_DT,,
+1.) SA (Service Agreement),Order ID,JoinTree_1.CI_SA,ENRL_ID,,
+1.) SA (Service Agreement),Expire Date,JoinTree_1.CI_SA,EXPIRE_DT,,
+1.) SA (Service Agreement),Maximum Bill Threshold,JoinTree_1.CI_SA,HIGH_BILL_AMT,,CountAll
+1.) SA (Service Agreement),Start Day Option,JoinTree_1.CI_SA,IB_BASE_TM_DAY_FLG,,
+1.) SA (Service Agreement),IB SA Cutoff Time,JoinTree_1.CI_SA,IB_SA_CUTOFF_TM,,
+1.) SA (Service Agreement),Deposit Interest Calculated,JoinTree_1.CI_SA,INT_CALC_DT,,
+1.) SA (Service Agreement),NBB Auto Pay,JoinTree_1.CI_SA,NB_APAY_FLG,,
+1.) SA (Service Agreement),Recommendation Rule,JoinTree_1.CI_SA,NB_RULE_CD,,
+1.) SA (Service Agreement),Number of Payment Periods,JoinTree_1.CI_SA,NBR_PYMNT_PERIODS,Dimension,CountAll
+1.) SA (Service Agreement),Old Account ID,JoinTree_1.CI_SA,OLD_ACCT_ID,,
+1.) SA (Service Agreement),Decline Reason,JoinTree_1.CI_SA,PROP_DCL_RSN_CD,,
+1.) SA (Service Agreement),Proposal SA ID,JoinTree_1.CI_SA,PROP_SA_ID,,
+1.) SA (Service Agreement),Proposal SA Status,JoinTree_1.CI_SA,PROP_SA_STAT_FLG,,
+1.) SA (Service Agreement),Renewal Date,JoinTree_1.CI_SA,RENEWAL_DT,,
+1.) SA (Service Agreement),Service Agreement,JoinTree_1.CI_SA,SA_ID,,
+1.) SA (Service Agreement),SA Relationship ID,JoinTree_1.CI_SA,SA_REL_ID,,
+1.) SA (Service Agreement),SA Status,JoinTree_1.CI_SA,SA_STATUS_FLG,,
+1.) SA (Service Agreement),SA Type,JoinTree_1.CI_SA,SA_TYPE_CD,,
+1.) SA (Service Agreement),SIC,JoinTree_1.CI_SA,SIC_CD,,
+1.) SA (Service Agreement),Special Usage,JoinTree_1.CI_SA,SPECIAL_USAGE_FLG,,
+1.) SA (Service Agreement),Start Date,JoinTree_1.CI_SA,START_DT,,
+1.) SA (Service Agreement),Start Option,JoinTree_1.CI_SA,START_OPT_CD,,
+1.) SA (Service Agreement),Stop Requested By,JoinTree_1.CI_SA,STOP_REQED_BY,,
+1.) SA (Service Agreement),Stop Reason,JoinTree_1.CI_SA,STOP_RSN_FLG,,
+1.) SA (Service Agreement),Start Requested By,JoinTree_1.CI_SA,STRT_REQED_BY,,
+1.) SA (Service Agreement),Start Reason,JoinTree_1.CI_SA,STRT_RSN_FLG,,
+1.) SA (Service Agreement),Total Amount to Bill,JoinTree_1.CI_SA,TOT_TO_BILL_AMT,,CountAll
+1.) Descriptions,Account Management Group Description,JoinTree_1.CI_ACCT_MGMT_GR_L,DESCR,,
+1.) Descriptions,Bill Cycle Description,JoinTree_1.CI_BILL_CYC_L,DESCR,,
+1.) Descriptions,Bill Segment Exception Type Description,JoinTree_1.CI_LOOKUP_VAL_L,DESCR,,
+1.) Descriptions,Budget Plan Description,JoinTree_1.CI_BUD_PLAN_L,DESCR,,
+1.) Descriptions,Collection Class Description,JoinTree_1.CI_COLL_CL_L,DESCR,,
+1.) Descriptions,Customer Class Description,JoinTree_1.CI_CUST_CL_L,DESCR,,
+1.) Descriptions,Priority Description,JoinTree_1.CI_LOOKUP_VAL_L_2,DESCR,,
+1.) Descriptions,SA Status Description,JoinTree_1.CI_LOOKUP_VAL_L_3,DESCR,,
+1.) Descriptions,SA Type Description,JoinTree_1.CI_SA_TYPE_L,DESCR,,
+1.) Descriptions,Status Description (To Do Entry),JoinTree_1.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,To Do Role Description,JoinTree_1.CI_ROLE_L,DESCR,,
+1.) Descriptions,To Do Type Description,JoinTree_1.CI_TD_TYPE_L,DESCR,,
+1.) Formulas,Assign to User (Name),JoinTree_1,ASSIGNED_TO_NAME,,
+1.) Formulas,Assigned By User (Name),JoinTree_1,ASSIGNED_USER_ID_NAME,,
+1.) Formulas,Completed By (Name),JoinTree_1,COMPLETE_USER_ID_NAME,,
+1.) Formulas,Distinct Bill Segment ID,JoinTree_1,BSEG_ID_DIST,,
+1.) Formulas,Distinct To Do ID,JoinTree_1,TD_ENTRY_ID_DIST,,
+1.) Formulas,Name,JoinTree_1.CI_PER_NAME,ENTITY_NAME_UPR,,
+1.) Formulas,Review User (Name),JoinTree_1,REVIEW_USER_ID_NAME,,
+1.) Formulas,User (Name),JoinTree_1,USER_ID_NAME,,

@@ -43,12 +43,12 @@ PROMPT 16d. Table privileges granted directly to the current user
 PROMPT ============================================================================
 
 SELECT
-    owner,
+    table_schema AS owner,
     table_name,
     privilege
 FROM all_tab_privs
 WHERE grantee = SYS_CONTEXT('USERENV', 'SESSION_USER')
-ORDER BY owner, table_name, privilege;
+ORDER BY table_schema, table_name, privilege;
 
 PROMPT
 PROMPT ============================================================================
@@ -81,12 +81,12 @@ PROMPT 16f. Snapshot-table object privileges visible to the current user
 PROMPT ============================================================================
 
 SELECT
-    owner,
+    table_schema AS owner,
     table_name,
     privilege
 FROM all_tab_privs
 WHERE grantee = SYS_CONTEXT('USERENV', 'SESSION_USER')
-  AND owner = 'CISADM'
+  AND table_schema = 'CISADM'
   AND table_name IN (
       'FT_RPT_CURR',
       'BSEG_BILLED_USAGE_RPT_CURR',

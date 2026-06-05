@@ -13,6 +13,15 @@ test databases:
 - `D1_USAGE_RPT_CURR`
 - `D1_USAGE_SCALAR_DTL_RPT_CURR`
 
+## Rollout Status Ledger
+
+Current client-by-client rollout status and QA results are documented in:
+
+- [smartcity_client_snapshot_rollout_status_2026-04-30.md](smartcity_client_snapshot_rollout_status_2026-04-30.md)
+
+Recurring 6-hour schedules should not be created for a client until the status
+ledger shows that all 7 baseline jobs completed and high-level QA has passed.
+
 ## Client Aliases
 
 Use the client-aware runner:
@@ -146,7 +155,13 @@ python3 scripts/local/run_client_oracle_sql.py \
   --file sql/performance/snapshots/deployment_steps/04_validate_all_active_snapshots.sql
 ```
 
-Fresh-client batch form:
+Fresh-client batch form — recommended install gate:
+
+```bash
+python3 scripts/local/run_snapshot_rollout_step.py --step baseline-and-validate --clients fresh
+```
+
+Legacy single-step form:
 
 ```bash
 python3 scripts/local/run_snapshot_rollout_step.py --step validate --clients fresh
@@ -174,10 +189,16 @@ python3 scripts/local/run_client_oracle_sql.py \
   --file sql/performance/snapshots/deployment_steps/06_run_all_operational_refreshes.sql
 ```
 
-Fresh-client batch form:
+Fresh-client batch form — recommended cutover gate:
 
 ```bash
-python3 scripts/local/run_snapshot_rollout_step.py --step run-operational --clients fresh
+python3 scripts/local/run_snapshot_rollout_step.py --step cutover-and-validate --clients fresh
+```
+
+Or operational refresh + validate only:
+
+```bash
+python3 scripts/local/run_snapshot_rollout_step.py --step operational-and-validate --clients fresh
 ```
 
 9. Validate again after rolling procedure cutover
@@ -256,6 +277,51 @@ After rolling procedure cutover:
 - validation wrapper should pass again
 - older baseline history should remain present
 - recurring jobs should be scheduled on the 6-hour stagger
+
+## Demo database (Int Demo 2.9)
+
+**Jaspersoft imports:** use the environment promotion pipeline only — see
+[jaspersoft_environment_promotion_pipeline.md](jaspersoft_environment_promotion_pipeline.md).
+Every `origin_demo` ZIP automatically bundles the public dashboard template and
+Development snapshot Domains (same fixes that made the full Standard Offering import succeed).
+
+**Oracle snapshots:** fresh-database rollout (create tables, full-history baseline, then
+6-month rolling schedules) is in
+[smartcity_demo_snapshot_rollout_runbook.md](smartcity_demo_snapshot_rollout_runbook.md)
+with live tracking in
+[smartcity_demo_snapshot_rollout_status.md](smartcity_demo_snapshot_rollout_status.md).
+
+Use client alias `demo` and store connection settings in local `.env` as `DEMO_*`.
+
+## CityCorp 6-Month Rolling Cutover
+
+CityCorp uses a **6-month** rolling maintenance window for all 7 active snapshots
+instead of the default 12-month window used on the other fresh rollout clients.
+
+Deploy the CityCorp-specific 6-month procedures, run one operational refresh,
+then create the recurring 6-hour schedules:
+
+```bash
+python3 scripts/local/run_snapshot_rollout_step.py \
+  --step citycorp-deploy-6month-rolling \
+  --clients citycorp
+
+python3 scripts/local/run_snapshot_rollout_step.py \
+  --step citycorp-run-operational \
+  --clients citycorp
+
+python3 scripts/local/run_client_oracle_sql.py \
+  --client citycorp \
+  --file sql/performance/snapshots/deployment_steps/04_validate_all_active_snapshots.sql
+
+python3 scripts/local/run_snapshot_rollout_step.py \
+  --step citycorp-schedule-operational \
+  --clients citycorp
+```
+
+6-month procedure sources live beside the standard operational scripts as
+`*_6month.sql` files and are wired through
+`sql/performance/snapshots/deployment_steps/clients/citycorp/`.
 
 ## Assumptions
 
