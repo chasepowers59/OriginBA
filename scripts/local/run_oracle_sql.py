@@ -1,10 +1,17 @@
 import argparse
 import json
 import os
+import sys
 from pathlib import Path
 
 import oracledb
-from dotenv import load_dotenv
+
+ROOT = Path(__file__).resolve().parents[2]
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from oracle_client import ensure_oracle_client, load_env_file, normalize_oracle_dsn
 
 
 def build_connect_string() -> str:
@@ -29,15 +36,7 @@ def build_connect_string() -> str:
 
 
 def init_oracle_client() -> None:
-    thick_mode = os.getenv("DB_THICK_MODE", "").strip().lower() in {"1", "true", "yes", "y"}
-    lib_dir = os.getenv("ORACLE_CLIENT_LIB_DIR", "").strip()
-
-    if thick_mode and lib_dir:
-        try:
-            oracledb.init_oracle_client(lib_dir=lib_dir)
-        except oracledb.ProgrammingError:
-            # Already initialized in this process.
-            pass
+    ensure_oracle_client(load_env_file(ROOT / ".env"))
 
 
 def split_sql_script(text: str) -> list[str]:
@@ -135,23 +134,25 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    repo_root = Path(__file__).resolve().parents[2]
-    load_dotenv(repo_root / ".env")
-
+    config = load_env_file(ROOT / ".env")
     init_oracle_client()
 
-    user = os.getenv("DB_USER") or os.getenv("ORACLE_USER")
-    password = os.getenv("DB_PASSWORD") or os.getenv("ORACLE_PASSWORD")
-    dsn = build_connect_string()
-    call_timeout_ms = int(os.getenv("DB_CALL_TIMEOUT_MS", "120000"))
-    fetch_array_size = int(os.getenv("DB_FETCH_ARRAY_SIZE", "200"))
+    user = config.get("DB_USER") or config.get("ORACLE_USER")
+    password = config.get("DB_PASSWORD") or config.get("ORACLE_PASSWORD")
+    dsn = normalize_oracle_dsn(
+        config.get("DB_CONNECT_STRING")
+        or config.get("ORACLE_DSN")
+        or build_connect_string()
+    )
+    call_timeout_ms = int(config.get("DB_CALL_TIMEOUT_MS") or "120000")
+    fetch_array_size = int(config.get("DB_FETCH_ARRAY_SIZE") or "200")
 
     if not user or not password:
         raise RuntimeError("DB_USER/DB_PASSWORD or ORACLE_USER/ORACLE_PASSWORD must be set in .env.")
 
     statements = load_sql_statements(args)
 
-    with oracledb.connect(user=user, password=password, dsn=dsn) as conn:
+    with oracledb.connect(user=user, password=password, dsn=normalize_oracle_dsn(dsn)) as conn:
         conn.call_timeout = call_timeout_ms
         with conn.cursor() as cursor:
             cursor.arraysize = fetch_array_size

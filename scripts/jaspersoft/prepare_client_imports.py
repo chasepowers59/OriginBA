@@ -179,6 +179,22 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--light-touch-tenant-root",
+        action="store_true",
+        help=(
+            "For already tenant-root source exports, patch index/datasource only and "
+            "preserve the source ZIP entry order."
+        ),
+    )
+    parser.add_argument(
+        "--use-canonical-index-encryption",
+        action="store_true",
+        help=(
+            "Use keyalias/encrypted from the canonical datasource export index for the "
+            "target environment (required for internal Origin_STAGE/Origin_DEV servers)."
+        ),
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Validate and report actions without writing output ZIPs.",
@@ -248,16 +264,34 @@ def discover_datasource_export_identity(root: str) -> Tuple[str, str]:
                 continue
             datasource_name = os.path.splitext(filename)[0]
             path_parts = current_root.split(os.sep)
-            if len(path_parts) < len(ORG_ROOT_PARTS) + 2:
-                continue
-            if tuple(path_parts[-(len(ORG_ROOT_PARTS) + 2):-2]) != ORG_ROOT_PARTS:
-                continue
-            org_name = path_parts[-2]
-            return org_name, datasource_name
+            if len(path_parts) >= len(ORG_ROOT_PARTS) + 2:
+                if tuple(path_parts[-(len(ORG_ROOT_PARTS) + 2):-2]) == ORG_ROOT_PARTS:
+                    org_name = path_parts[-2]
+                    return org_name, datasource_name
+            # Tenant-root export: resources/DataSource/<name>.xml
+            if len(path_parts) >= 2 and path_parts[-2] == "resources":
+                return "", datasource_name
 
     raise ProcessingError(
         "Datasource export does not contain a recognizable DataSource/<name>.xml resource: "
         f"{root}"
+    )
+
+
+def resolve_datasource_overlay_dir(
+    overlay_root: str,
+    target_org: str,
+    target_ds: str,
+) -> str:
+    org_tree_dir = os.path.join(overlay_root, *ORG_ROOT_PARTS, target_org, "DataSource")
+    if os.path.isfile(os.path.join(org_tree_dir, f"{target_ds}.xml")):
+        return org_tree_dir
+    tenant_root_dir = os.path.join(overlay_root, "resources", "DataSource")
+    if os.path.isfile(os.path.join(tenant_root_dir, f"{target_ds}.xml")):
+        return tenant_root_dir
+    raise ProcessingError(
+        "Target datasource export does not contain the expected datasource XML under "
+        f"either org-tree or tenant-root layout: {overlay_root}"
     )
 
 
@@ -577,23 +611,14 @@ def inject_target_datasource(
     target_ds: str,
     *,
     org_relative_uris: bool = False,
+    tenant_root_layout: bool = False,
 ) -> int:
-    source_file = os.path.join(
-        overlay_root,
-        *ORG_ROOT_PARTS,
-        target_org,
-        "DataSource",
-        f"{target_ds}.xml",
-    )
-    if not os.path.isfile(source_file):
-        raise ProcessingError(
-            "Target datasource export does not contain the expected datasource XML: "
-            f"{source_file}"
-        )
-
-    source_dir = os.path.dirname(source_file)
-    dest_dir = os.path.join(work_root, *ORG_ROOT_PARTS, target_org, "DataSource")
-    os.makedirs(os.path.dirname(dest_dir), exist_ok=True)
+    source_dir = resolve_datasource_overlay_dir(overlay_root, target_org, target_ds)
+    if tenant_root_layout:
+        dest_dir = os.path.join(work_root, "resources", "DataSource")
+    else:
+        dest_dir = os.path.join(work_root, *ORG_ROOT_PARTS, target_org, "DataSource")
+    os.makedirs(dest_dir, exist_ok=True)
     shutil.copytree(source_dir, dest_dir, dirs_exist_ok=True)
 
     copied_files = 0
@@ -753,15 +778,59 @@ def ensure_target_datasource_present(root: str, target_ds: str) -> None:
     )
 
 
-def zip_directory(root: str, output_zip: str) -> None:
+def zip_jaspersoft_export(root: str, output_zip: str) -> None:
+    """Write a ZIP using the directory-entry and index.xml ordering JRS expects."""
+    resource_entries: list[tuple[str, Optional[str]]] = []
+    favorites_entries: list[tuple[str, Optional[str]]] = []
+    index_entry: Optional[tuple[str, str]] = None
+
+    for current_root, dirs, files in os.walk(root):
+        dirs.sort()
+        files.sort()
+        relative_root = os.path.relpath(current_root, root)
+        bucket = favorites_entries if relative_root == "favorites" else resource_entries
+
+        for dirname in dirs:
+            relative_dir = (
+                dirname
+                if relative_root == "."
+                else f"{relative_root.replace(os.sep, '/')}/{dirname}"
+            )
+            if relative_dir == "favorites":
+                continue
+            bucket.append((f"{relative_dir}/", None))
+
+        for filename in files:
+            if filename == "index.xml" and relative_root == ".":
+                index_entry = ("index.xml", os.path.join(current_root, filename))
+                continue
+            relative_path = (
+                filename
+                if relative_root == "."
+                else f"{relative_root.replace(os.sep, '/')}/{filename}"
+            )
+            bucket.append((relative_path, os.path.join(current_root, filename)))
+
+    favorites_dir = os.path.join(root, "favorites")
+    if os.path.isdir(favorites_dir):
+        favorites_entries = [("favorites/", None)]
+
+    entries = resource_entries + favorites_entries
+    if index_entry is not None:
+        entries.append(index_entry)
+
     with zipfile.ZipFile(output_zip, "w", zipfile.ZIP_DEFLATED) as archive:
-        for current_root, dirs, files in os.walk(root):
-            dirs.sort()
-            files.sort()
-            for filename in files:
-                full_path = os.path.join(current_root, filename)
-                relative_path = os.path.relpath(full_path, root)
-                archive.write(full_path, relative_path)
+        for arcname, full_path in entries:
+            if full_path is None:
+                zip_info = zipfile.ZipInfo(arcname)
+                zip_info.compress_type = zipfile.ZIP_DEFLATED
+                archive.writestr(zip_info, b"")
+            else:
+                archive.write(full_path, arcname)
+
+
+def zip_directory(root: str, output_zip: str) -> None:
+    zip_jaspersoft_export(root, output_zip)
 
 
 def summarize_result(summary: TargetSummary) -> None:
@@ -801,6 +870,9 @@ def process_target(
     repository_layout: str = "organizations_tree",
     tenant_id: Optional[str] = None,
     import_into_existing_tenant: bool = True,
+    source_zip: Optional[str] = None,
+    light_touch_tenant_root: bool = False,
+    use_canonical_index_encryption: bool = False,
 ) -> TargetSummary:
     resolved_output_stem = output_stem or default_output_stem(
         target_org, target_ds, promotion_mode
@@ -813,6 +885,7 @@ def process_target(
     work_label = resolved_output_stem.replace(os.sep, "_")
     work_root = make_workspace_dir(os.path.join(outdir, "_tmp"), f"work_{work_label}")
     overlay_root: Optional[str] = None
+    datasource_export_index_path: Optional[str] = None
     rewrite_org = source_org != target_org
     org_relative_uris = repository_uri_style == "org_relative"
 
@@ -836,24 +909,26 @@ def process_target(
 
         if datasource_export_dir and not skip_datasource_import:
             datasource_input = find_named_input(datasource_export_dir, target_org, target_ds)
+            candidate_index = os.path.join(datasource_input, "index.xml")
+            if os.path.isfile(candidate_index):
+                datasource_export_index_path = candidate_index
             overlay_root = make_workspace_dir(os.path.join(outdir, "_tmp"), f"datasource_{target_org}")
             prepare_overlay_tree(datasource_input, overlay_root)
             overlay_org, overlay_ds = discover_datasource_export_identity(overlay_root)
-            replace_content_references(
-                overlay_root,
-                {
-                    overlay_org: target_org,
-                    overlay_ds: target_ds,
-                },
-            )
+            overlay_replacements = {overlay_ds: target_ds}
+            if overlay_org:
+                overlay_replacements[overlay_org] = target_org
+            replace_content_references(overlay_root, overlay_replacements)
             rename_paths(overlay_root, overlay_ds, target_ds)
-            rename_paths(overlay_root, overlay_org, target_org)
+            if overlay_org:
+                rename_paths(overlay_root, overlay_org, target_org)
             summary.datasource_files_added = inject_target_datasource(
                 work_root,
                 overlay_root,
                 target_org,
                 target_ds,
-                org_relative_uris=False,
+                org_relative_uris=org_relative_uris,
+                tenant_root_layout=repository_layout == "tenant_root",
             )
 
         import_folder_uri = import_module_folder_uri or index_module_folder_uri
@@ -873,18 +948,36 @@ def process_target(
                 raise ProcessingError("tenant_root layout requires tenant_id.")
             if not import_folder_uri:
                 raise ProcessingError("tenant_root layout requires import_module_folder_uri.")
-            from tenant_root_layout import repackage_to_tenant_root
-
-            repackage_to_tenant_root(
-                work_root,
-                tenant_id,
-                import_folder_uri,
-                target_ds,
-                skip_datasource_import=skip_datasource_import,
-                use_workstreams_report_root=map_standard_offering_to_workstreams,
-                import_into_existing_tenant=import_into_existing_tenant,
-                target_org=target_org,
+            from tenant_root_layout import (
+                is_tenant_root_export,
+                promote_tenant_root_export_light_touch,
+                repackage_to_tenant_root,
+                zip_from_source_order,
             )
+
+            use_light_touch = light_touch_tenant_root and is_tenant_root_export(work_root)
+            if use_light_touch:
+                promote_tenant_root_export_light_touch(
+                    work_root,
+                    import_folder_uri,
+                    target_ds,
+                    skip_datasource_import=skip_datasource_import,
+                    import_into_existing_tenant=import_into_existing_tenant,
+                    datasource_export_index_path=datasource_export_index_path,
+                    use_canonical_index_encryption=use_canonical_index_encryption,
+                )
+            else:
+                repackage_to_tenant_root(
+                    work_root,
+                    tenant_id,
+                    import_folder_uri,
+                    target_ds,
+                    skip_datasource_import=skip_datasource_import,
+                    use_workstreams_report_root=map_standard_offering_to_workstreams,
+                    import_into_existing_tenant=import_into_existing_tenant,
+                    target_org=target_org,
+                    datasource_export_index_path=datasource_export_index_path,
+                )
             summary.files_edited += 1
         elif import_folder_uri:
             index_datasource_uri = None if skip_datasource_import else import_datasource_uri
@@ -949,7 +1042,21 @@ def process_target(
             output_zip = output_zip_path(outdir, resolved_output_stem)
             if os.path.exists(output_zip):
                 os.remove(output_zip)
-            zip_directory(work_root, output_zip)
+            if (
+                repository_layout == "tenant_root"
+                and light_touch_tenant_root
+                and source_zip
+                and os.path.isfile(source_zip)
+            ):
+                zip_from_source_order(
+                    source_zip,
+                    work_root,
+                    output_zip,
+                    source_ds=source_ds,
+                    target_ds=target_ds,
+                )
+            else:
+                zip_directory(work_root, output_zip)
             summary.output_zip = output_zip
 
         summary.success = True
@@ -984,8 +1091,21 @@ def main() -> int:
             print(f"ERROR: {exc}")
             return 2
 
+        source_zip = os.path.abspath(args.source_zip) if args.source_zip else None
         print("Will produce packages for:", ", ".join(target_org for target_org, _ in mapping))
         for target_org, target_ds in mapping:
+            if args.output_stem:
+                resolved_output_stem = args.output_stem
+            elif (
+                args.promotion_mode == "client"
+                and (args.import_module_folder_uri or args.index_module_folder_uri or "")
+                .endswith("Standard_Offering")
+            ):
+                resolved_output_stem = f"{target_org}_Standard_Offering"
+            else:
+                resolved_output_stem = default_output_stem(
+                    target_org, target_ds, args.promotion_mode
+                )
             summary = process_target(
                 source_root=source_root,
                 outdir=outdir,
@@ -1000,7 +1120,7 @@ def main() -> int:
                 ),
                 dry_run=args.dry_run,
                 promotion_mode=args.promotion_mode,
-                output_stem=args.output_stem,
+                output_stem=resolved_output_stem,
                 repository_uri_style=args.repository_uri_style,
                 map_standard_offering_to_workstreams=args.map_standard_offering_to_workstreams,
                 index_module_folder_uri=args.index_module_folder_uri,
@@ -1009,8 +1129,11 @@ def main() -> int:
                 ),
                 skip_datasource_import=args.skip_datasource_import,
                 repository_layout=args.repository_layout,
-                tenant_id=args.tenant_id,
+                tenant_id=args.tenant_id or target_org,
                 import_into_existing_tenant=args.import_into_existing_tenant,
+                source_zip=source_zip,
+                light_touch_tenant_root=args.light_touch_tenant_root,
+                use_canonical_index_encryption=args.use_canonical_index_encryption,
             )
             summarize_result(summary)
             summaries.append(summary)

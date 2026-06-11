@@ -16,6 +16,9 @@ This catalog covers the current snapshot workspaces under `sql/performance/snaps
 
 It does not replace the deeper per-snapshot docs. Instead, it tells you which artifact to use first and where to go next.
 
+For client-facing use cases, example Standard Offering reports, population/status scope, and workstream chooser guidance, see:
+- `sql/performance/snapshots/docs/snapshot_client_reporting_guide.md`
+
 For the repeatable process of converting an older manual Domain into one of these governed snapshots, see:
 - `sql/performance/snapshots/docs/legacy_domain_to_snapshot_modernization_playbook.md`
 - `sql/performance/snapshots/docs/snapshot_modernization_checklist.md`

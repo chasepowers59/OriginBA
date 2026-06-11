@@ -5,6 +5,8 @@ This folder defines how report work should be executed in this repo.
 ## Files
 - `domain_report_workflow.md`: end-to-end process for domain-based report delivery.
 - `jrxml_schema_guardrails.md`: element-order and syntax rules to avoid Studio/JRS failures.
+- `jrxml_expression_patterns.md`: reusable Jasper expression idioms from live reports.
+- `cisadm_sql_prompt_guide.md`: structured prompt template for context-aware CISADM SQL generation.
 - `deployment_compliance_checklist.md`: strict deployment steps and validations.
 - `request_templates.md`: copy/paste prompts to request new reports or fixes.
 - `skill_authoring_guide.md`: how to write high-quality reusable assistant skills.

@@ -26,6 +26,28 @@ JRXML element order/schema violation.
 2. Move `filterExpression` before `group`.
 3. Move `pageFooter` before `summary`.
 4. Remove invalid chart elements.
+5. Run `python3 scripts/validate_jrxml_schema.py reports/<name>.jrxml`.
+
+## AI-Assisted JRXML Debug Template
+Paste this into Cursor with the failing snippet:
+
+```text
+Fix JRXML compile/runtime error.
+Report: reports/<name>.jrxml
+Error/stack trace:
+<paste full error>
+
+Failing XML snippet:
+<paste smallest relevant XML block>
+
+Follow:
+- skills/jrxml_report_builder/SKILL.md
+- docs/assistant_skills/jrxml_schema_guardrails.md
+- docs/assistant_skills/past_mistakes_and_prevention.md
+
+After fix run:
+python3 scripts/validate_jrxml_schema.py reports/<name>.jrxml
+```
 
 ## Error: `Resource not found at subreports/...`
 ### Cause

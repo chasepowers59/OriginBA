@@ -37,6 +37,7 @@ Supported clients:
 - `collegestation`
 - `ellensburg`
 - `citycorp`
+- `odessa`
 
 ## Environment Status
 
@@ -59,6 +60,7 @@ Fresh rollout targets:
 - `fonddulac`
 - `collegestation`
 - `citycorp`
+- `odessa`
 
 ## Deployment Flow
 
@@ -73,6 +75,7 @@ The keyword `fresh` means:
 - `fonddulac`
 - `collegestation`
 - `citycorp`
+- `odessa`
 
 1. Access and environment preflight
 
@@ -277,6 +280,32 @@ After rolling procedure cutover:
 - validation wrapper should pass again
 - older baseline history should remain present
 - recurring jobs should be scheduled on the 6-hour stagger
+
+## Consolidation snapshots (phase 2)
+
+After the active 7 snapshots are baseline-complete on a client, deploy the **12
+workstream consolidation snapshots** using the same full-history → 6-month rolling
+→ 6-hour schedule pattern.
+
+Full runbook: [smartcity_consolidation_snapshot_rollout_runbook.md](smartcity_consolidation_snapshot_rollout_runbook.md)
+
+Quick start:
+
+```bash
+python3 scripts/local/run_snapshot_rollout_step.py \
+  --step consolidation-create-tables --clients newark
+python3 scripts/local/run_snapshot_rollout_step.py \
+  --step consolidation-deploy-baseline-procs --clients newark
+python3 scripts/local/run_snapshot_rollout_step.py \
+  --step consolidation-schedule-baseline --clients newark
+# wait ~3 hours, then:
+python3 scripts/local/run_snapshot_rollout_step.py \
+  --step consolidation-baseline-and-validate --clients newark
+python3 scripts/local/run_snapshot_rollout_step.py \
+  --step consolidation-cutover-and-validate --clients newark
+python3 scripts/local/run_snapshot_rollout_step.py \
+  --step consolidation-schedule-operational --clients newark
+```
 
 ## Demo database (Int Demo 2.9)
 

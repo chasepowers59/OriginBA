@@ -26,37 +26,92 @@ Staging and profiles:
 - [deploy/jaspersoft_environment_promotion](/Users/chase/OriginBA-3/deploy/jaspersoft_environment_promotion)
 - [environment_profiles.json](/Users/chase/OriginBA-3/deploy/jaspersoft_environment_promotion/environment_profiles.json)
 
-## Two import models (do not mix them)
+## Standard promotion contract (all environments)
 
-### A. Import inside a tenant (demo — `Origin_DEMO`)
+**Validated on Origin_STAGE and Origin_DEV (2026-06).** Use this for every
+promotion going forward — internal and client.
 
-Use when you are already **inside** the org in JRS and demo is a **single** tenant.
+### Import location
 
-You typically change only:
+Always import **from inside the client’s tenant** (logged into that org →
+**Repository** → Import). This is the client’s repository root: paths like
+`/SmartCity/Report/Standard_Offering/...` and `/DataSource/<alias>`.
 
-- Datasource alias/endpoints: `Origin_DEV_DS` → `Origin_DEMO_DS` (and JDBC URL/user/password in the datasource XML)
-- Report root folder family: `Standard_Offering` (demo default) or `Workstreams` when `map_standard_offering_to_workstreams` is true
+Do **not** import Standard Offering tenant-root ZIPs from server root
+(Manage → Organizations). That path expects a different package shape
+(`organizations` tree + `rootTenantId=organizations`) and causes
+`not valid export file` or `import of an organization to the root is not allowed`.
 
-You do **not** need per-report org segments like `/organizations/organization_1/organizations/Ellensburg/...` in domain or ad hoc XML. Paths stay tenant-root style:
+### Package build flags (environment profile)
 
-- `/SmartCity/Report/Standard_Offering/...` (demo)
-- `/DataSource/Origin_DEMO_DS`
+Every tenant-root promotion profile must set:
 
-Pipeline flags: `repository_layout: tenant_root`, `import_into_existing_tenant: true`, import from **inside** `Origin_DEMO`.
+| Setting | Value | Why |
+| --- | --- | --- |
+| `repository_layout` | `tenant_root` | Matches export/import path style |
+| `repository_uri_style` | `org_relative` | `/SmartCity/...`, `/DataSource/...` |
+| `import_into_existing_tenant` | `true` | Omits `rootTenantId` from `index.xml` |
+| `light_touch_tenant_root` | `true` | Preserves source ZIP entry order and export envelope |
+| `use_canonical_index_encryption` | `true` (internal servers) | `keyalias`/`encrypted` from target JRS server |
 
-### B. Import from server root (test — six clients)
+### What the pipeline does (light-touch)
 
-Use the **client promotion** pipeline when importing from the **server root** into separate client orgs (`Ellensburg`, `CityCorp`, etc.).
+1. Rewrites datasource references in package XML (`Origin_DEV_DS` → target alias)
+2. Injects canonical datasource XML from `deploy/jaspersoft_datasources/canonical/`
+3. Patches `index.xml` in place (adds datasource + public template resources)
+4. Repackages using **source ZIP entry order** (not a full folder-metadata rebuild)
+5. Bundles `/public/templates/actual_size.820.jrxml` when dashboards are included
 
-That flow **does** rewrite org names in repository paths and `index.xml` (`rootTenantId` = `organizations`), and swaps each client’s datasource (`Ellensburg_DS`, `CityCorp_DS`, …).
+### Datasource policy
 
-See [jaspersoft_client_promotion_pipeline.md](jaspersoft_client_promotion_pipeline.md).
+- **Do not override** an existing tenant datasource when adding snapshot-backed
+  content. Add a **new alias** (for example `Training_DB` on `Origin_STAGE`) and
+  point the import package at that alias only. Keep `Origin_STAGE_DS` on pstgdb.
+- Store canonical exports per alias under `deploy/jaspersoft_datasources/canonical/`.
+
+### Rebuild command (internal)
+
+```bash
+python3 scripts/jaspersoft/run_internal_standard_offering_pipeline.py \
+  --source-zip "/path/to/standard offering.zip"
+```
+
+Single environment:
+
+```bash
+python3 scripts/jaspersoft/run_environment_import_pipeline.py \
+  --environment origin_stage \
+  --source-zip "/path/to/standard offering.zip" \
+  --datasource-export-dir deploy/jaspersoft_datasources/canonical \
+  --skip-archive
+```
+
+### Legacy: server-root / organizations tree
+
+The old 102-report `organizations/organization_1/...` packages and server-root
+client imports remain documented in
+[jaspersoft_client_promotion_pipeline.md](jaspersoft_client_promotion_pipeline.md)
+for reference only. **New promotions use the tenant-root contract above.**
 
 ## Current environments
 
-| Environment ID | Target datasource | Output ZIP | Org paths |
+| Environment ID | Target datasource | Output ZIP | Import inside tenant |
 | --- | --- | --- | --- |
-| `origin_demo` | `Origin_DEMO_DS` | `standard_offering_Origin_DEMO_import.zip` | Tenant-root `Standard_Offering` export |
+| `origin_demo` | `Origin_DEMO_DS` | `standard_offering_Origin_DEMO_import.zip` | `Origin_DEMO` |
+| `origin_stage` | `Training_DB` (ptrndb snapshots) | `standard_offering_Origin_STAGE_import.zip` | `Origin_STAGE` |
+| `origin_dev` | `Origin_DEV_DS` | `standard_offering_Origin_DEV_import.zip` | `Origin_DEV` |
+
+`Origin_STAGE_DS` (pstgdb) is **not** replaced by Stage Standard Offering imports.
+
+Canonical JDBC exports: `deploy/jaspersoft_datasources/canonical/`. Always inject
+the target alias from canonical — never reuse `Origin_DEV_DS` JDBC from the source export.
+
+Build both internal Standard Offering import ZIPs:
+
+```bash
+python3 scripts/jaspersoft/run_internal_standard_offering_pipeline.py \
+  --source-zip "/path/to/Workstream folder.zip"
+```
 
 `origin_demo` uses **tenant-root** packaging for imports done **inside** `Origin_DEMO`:
 

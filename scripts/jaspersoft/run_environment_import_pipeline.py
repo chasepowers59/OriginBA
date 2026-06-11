@@ -74,6 +74,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Validate and plan without writing output ZIPs or archiving.",
     )
+    parser.add_argument(
+        "--skip-archive",
+        action="store_true",
+        help="Do not move the source ZIP to archive after a successful rewrite.",
+    )
     return parser.parse_args()
 
 
@@ -145,6 +150,10 @@ def build_rewrite_command(
             command.extend(["--tenant-id", profile.tenant_id])
     if not profile.import_into_existing_tenant:
         command.append("--no-import-into-existing-tenant")
+    if profile.light_touch_tenant_root:
+        command.append("--light-touch-tenant-root")
+    if profile.use_canonical_index_encryption:
+        command.append("--use-canonical-index-encryption")
     if args.dry_run:
         command.append("--dry-run")
     return command
@@ -217,11 +226,14 @@ def main() -> int:
         print("Source ZIP was not archived.")
         return 1
 
-    print("Step 3/3: archive original export")
-    archive_code = run_command(build_archive_command(args))
-    if archive_code != 0:
-        print("\nPipeline completed rewrite, but archive step failed.")
-        return archive_code
+    if args.skip_archive:
+        print("Step 3/3: skip archive (source ZIP retained)")
+    else:
+        print("Step 3/3: archive original export")
+        archive_code = run_command(build_archive_command(args))
+        if archive_code != 0:
+            print("\nPipeline completed rewrite, but archive step failed.")
+            return archive_code
 
     if args.dry_run:
         print("\nDry-run complete. No import ZIP or archive changes were written.")

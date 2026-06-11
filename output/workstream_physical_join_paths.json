@@ -1,0 +1,4504 @@
+{
+  "version": "1.0",
+  "sql_rules": {
+    "driving_population": "Choose the table that matches business grain; do not filter exploratory populations in SQL when building ad hoc snapshots.",
+    "enrichment": "LEFT JOIN lookup (_L), char, and optional child detail tables.",
+    "language_cd": "Lookup labels: LANGUAGE_CD = 'ENG'",
+    "blank_strings": "Use NULLIF(TRIM(col),'') for C2M blank-string codes."
+  },
+  "workstreams": {
+    "billing": {
+      "label": "billing",
+      "canonical_chains": [
+        {
+          "name": "billing_fact_chain",
+          "grain": "bill_segment",
+          "driver_table": "CI_BSEG",
+          "tables": [
+            "CI_ACCT",
+            "CI_SA",
+            "CI_BSEG",
+            "CI_BILL"
+          ],
+          "join_sql": [
+            "CI_ACCT.ACCT_ID = CI_SA.ACCT_ID",
+            "CI_SA.SA_ID = CI_BSEG.SA_ID",
+            "CI_BSEG.BILL_ID = CI_BILL.BILL_ID"
+          ]
+        },
+        {
+          "name": "billing_detail_enrichment",
+          "grain": "bill_segment",
+          "driver_table": "CI_BSEG",
+          "tables": [
+            "CI_BSEG_SQ",
+            "CI_BSEG_READ",
+            "CI_BSEG_CALC",
+            "CI_BSEG_CALC_LN",
+            "CI_BSEG_ITEM",
+            "CI_BSEG_EXCP"
+          ],
+          "join_sql": [
+            "CI_BSEG.BSEG_ID = <child>.BSEG_ID"
+          ],
+          "enrichment": true
+        }
+      ],
+      "tables": [
+        "BSEG_BILLED_USAGE_RPT_CURR",
+        "BSEG_SQ_USAGE_RPT_CURR",
+        "CI_ACCT",
+        "CI_ACCT_MGMT_GR_L",
+        "CI_ACCT_PER",
+        "CI_BILL",
+        "CI_BILL_CAN_RSN_L",
+        "CI_BILL_CYC_L",
+        "CI_BSEG",
+        "CI_BSEG_CALC",
+        "CI_BSEG_CALC_LN",
+        "CI_BSEG_EXCP",
+        "CI_BSEG_ITEM",
+        "CI_BSEG_READ",
+        "CI_BSEG_SQ",
+        "CI_BUD_PLAN_L",
+        "CI_COLL_CL_L",
+        "CI_CUST_CL_L",
+        "CI_LOOKUP_VAL_L",
+        "CI_PER_NAME",
+        "CI_RS_L",
+        "CI_SA",
+        "CI_SQI_L",
+        "CI_TOU_L",
+        "CI_UOM_L",
+        "SC_USER"
+      ]
+    },
+    "cashiering": {
+      "label": "cashiering",
+      "canonical_chains": [
+        {
+          "name": "payment_event_chain",
+          "grain": "payment_event",
+          "driver_table": "CI_PAY_EVENT",
+          "tables": [
+            "CI_ACCT",
+            "CI_PAY",
+            "CI_PAY_EVENT",
+            "CI_PAY_TNDR",
+            "CI_PAY_SEG",
+            "CI_DEP_CTL"
+          ],
+          "join_sql": [
+            "CI_PAY_EVENT.PAY_EVENT_ID = CI_PAY.PAY_EVENT_ID",
+            "CI_PAY.ACCT_ID = CI_ACCT.ACCT_ID"
+          ],
+          "enrichment": true
+        }
+      ],
+      "tables": [
+        "CI_ACCT",
+        "CI_ACCT_PER",
+        "CI_BANK_ACCOUNT_L",
+        "CI_BANK_L",
+        "CI_BATCH_CTRL_L",
+        "CI_DEP_CTL",
+        "CI_LOOKUP_VAL_L",
+        "CI_MATCH_TYPE_L",
+        "CI_PAY",
+        "CI_PAY_CAN_RSN_L",
+        "CI_PAY_EVENT",
+        "CI_PAY_METH_L",
+        "CI_PAY_SEG",
+        "CI_PAY_TNDR",
+        "CI_PER_NAME",
+        "CI_PP",
+        "CI_PP_SCHED_PAY",
+        "CI_PP_TYPE_L",
+        "CI_TENDER_TYPE_L",
+        "CI_THRD_PTY_L",
+        "CI_TNDR_CTL",
+        "CI_TNDR_DEP",
+        "CI_TNDR_END_BAL",
+        "CI_TNDR_SRCE_L",
+        "SC_USER"
+      ]
+    },
+    "common": {
+      "label": "common",
+      "canonical_chains": [
+        {
+          "name": "workflow_queue_chain",
+          "grain": "todo_entry",
+          "driver_table": "CI_TD_ENTRY",
+          "tables": [
+            "CI_TD_ENTRY",
+            "CI_BATCH_INST",
+            "CI_PREM",
+            "CI_ACCT"
+          ],
+          "join_sql": [],
+          "enrichment": true
+        },
+        {
+          "name": "premise_chain",
+          "grain": "premise",
+          "driver_table": "CI_PREM",
+          "tables": [
+            "CI_PREM",
+            "CI_PREM_CHAR",
+            "CI_PREM_GEO",
+            "CI_SP"
+          ],
+          "join_sql": [
+            "CI_SP.PREM_ID = CI_PREM.PREM_ID"
+          ],
+          "enrichment": true
+        }
+      ],
+      "tables": [
+        "CI_ACCT",
+        "CI_ACCT_MGMT_GR_L",
+        "CI_ACCT_PER",
+        "CI_ACC_GRP_L",
+        "CI_BATCH_CTRL",
+        "CI_BATCH_CTRL_L",
+        "CI_BATCH_INST",
+        "CI_BATCH_RUN",
+        "CI_BATCH_THD",
+        "CI_BILL_CYC_L",
+        "CI_BSEG",
+        "CI_BSEG_EXCP",
+        "CI_BUD_PLAN_L",
+        "CI_COLL_CL_L",
+        "CI_CUST_CL_L",
+        "CI_LOOKUP_VAL_L",
+        "CI_MR_INSTR_L",
+        "CI_MR_WARN_L",
+        "CI_MSG_L",
+        "CI_PER_NAME",
+        "CI_PREM",
+        "CI_PREM_CHAR",
+        "CI_PREM_GEO",
+        "CI_PREM_TYPE_L",
+        "CI_ROLE_L",
+        "CI_SA",
+        "CI_SA_TYPE_L",
+        "CI_SP",
+        "CI_SP_TYPE_L",
+        "CI_STATE_L",
+        "CI_TD_DRLKEY",
+        "CI_TD_DRLKEY_TY",
+        "CI_TD_ENTRY",
+        "CI_TD_TYPE_L",
+        "CI_TIME_ZONE_L",
+        "CI_TREND_AREA_L",
+        "D1_CONTACT_IDENTIFIER",
+        "D1_DIVISION_L",
+        "D1_DVC_CFG",
+        "D1_EXCP_TYPE_L",
+        "D1_INIT_MSRMT_DATA",
+        "D1_INSTALL_EVT",
+        "D1_MEASR_COMP",
+        "D1_MKT_L",
+        "D1_MSRMT_CYC_L",
+        "D1_MSRMT_CYC_RTE_L",
+        "D1_SP",
+        "D1_SP_TYPE_L",
+        "D1_USAGE",
+        "D1_USAGE_EXCP",
+        "D1_USAGE_EXCP_TYPE_L",
+        "D1_USG_GRP_L",
+        "D1_USG_RULE_L",
+        "D1_US_CONTACT",
+        "D1_US_SP",
+        "D1_VEE_EXCP",
+        "D1_VEE_GRP_L",
+        "D1_VEE_RULE_L",
+        "F1_BUS_OBJ_L",
+        "F1_BUS_OBJ_STATUS_L",
+        "SC_USER"
+      ]
+    },
+    "customer_ops": {
+      "label": "customer_ops",
+      "canonical_chains": [
+        {
+          "name": "account_customer_chain",
+          "grain": "account",
+          "driver_table": "CI_ACCT",
+          "tables": [
+            "CI_ACCT",
+            "CI_ACCT_PER",
+            "CI_PER",
+            "CI_PER_NAME",
+            "CI_PREM"
+          ],
+          "join_sql": [
+            "CI_ACCT.ACCT_ID = CI_ACCT_PER.ACCT_ID AND CI_ACCT_PER.MAIN_CUST_SW = 'Y'",
+            "CI_ACCT_PER.PER_ID = CI_PER.PER_ID",
+            "CI_ACCT_PER.PER_ID = CI_PER_NAME.PER_ID AND CI_PER_NAME.NAME_TYPE_FLG = 'PRIM'"
+          ]
+        },
+        {
+          "name": "case_chain",
+          "grain": "case",
+          "driver_table": "CI_CASE",
+          "tables": [
+            "CI_CASE",
+            "CI_CC",
+            "CI_ACCT",
+            "CI_PREM",
+            "CI_PER"
+          ],
+          "join_sql": [
+            "CI_CASE.ACCT_ID = CI_ACCT.ACCT_ID",
+            "CI_CASE.PREM_ID = CI_PREM.PREM_ID"
+          ],
+          "enrichment": true
+        }
+      ],
+      "tables": [
+        "C1_PER_CONTDET",
+        "CI_ACCT",
+        "CI_ACCT_ALERT",
+        "CI_ACCT_MGMT_GR_L",
+        "CI_ACCT_PER",
+        "CI_ACC_GRP_L",
+        "CI_ALERT_TYPE_L",
+        "CI_BILL_CYC_L",
+        "CI_BSEG",
+        "CI_BSEG_CALC",
+        "CI_BUD_PLAN_L",
+        "CI_CASE",
+        "CI_CASE_STATUS_L",
+        "CI_CASE_TYPE_L",
+        "CI_CC",
+        "CI_CC_CL_L",
+        "CI_CC_TYPE_L",
+        "CI_CIS_DIVISION_L",
+        "CI_COLL_CL_L",
+        "CI_CUST_CL_L",
+        "CI_DEBT_CL_L",
+        "CI_DEP_CL_L",
+        "CI_GEO_TYPE_L",
+        "CI_LANDLORD",
+        "CI_LETTER_TMPL_L",
+        "CI_LL_DETAIL",
+        "CI_LOOKUP_VAL_L",
+        "CI_MR_INSTR_L",
+        "CI_MR_WARN_L",
+        "CI_NB_RULE_L",
+        "CI_PER",
+        "CI_PER_NAME",
+        "CI_PER_PER",
+        "CI_PER_REL_TYPE_L",
+        "CI_PHONE_TYPE_L",
+        "CI_PREM",
+        "CI_PREM_CHAR",
+        "CI_PREM_TYPE_L",
+        "CI_PROP_DCL_RSN_L",
+        "CI_REV_CL_L",
+        "CI_SA",
+        "CI_SA_TYPE",
+        "CI_SA_TYPE_L",
+        "CI_SIC_L",
+        "CI_SS_OPT_L",
+        "CI_STATE_L",
+        "CI_SVC_TYPE_L",
+        "CI_TIME_ZONE_L",
+        "CI_TREND_AREA_L",
+        "CI_WO_DEBT_CL_L",
+        "SC_USER"
+      ]
+    },
+    "debt_mgmt": {
+      "label": "debt_mgmt",
+      "canonical_chains": [
+        {
+          "name": "debt_chain",
+          "grain": "sa",
+          "driver_table": "CI_FT",
+          "tables": [
+            "CI_ACCT",
+            "CI_SA",
+            "CI_FT",
+            "CI_COLL_PROC",
+            "C1_PA_RQST",
+            "C1_PA_RQST_REL_OBJ"
+          ],
+          "join_sql": [
+            "CI_ACCT.ACCT_ID = CI_SA.ACCT_ID",
+            "CI_SA.SA_ID = CI_FT.SA_ID"
+          ]
+        }
+      ],
+      "tables": [
+        "C1_PA_RQST",
+        "C1_PA_RQST_REL_OBJ",
+        "CI_ACCT",
+        "CI_ACCT_MGMT_GR_L",
+        "CI_ACCT_PER",
+        "CI_BILL_CYC_L",
+        "CI_BUD_PLAN_L",
+        "CI_COLL_CL_L",
+        "CI_COLL_PROC",
+        "CI_CUST_CL_L",
+        "CI_FT",
+        "CI_LOOKUP_VAL_L",
+        "CI_MR_INSTR_L",
+        "CI_MR_WARN_L",
+        "CI_PER_NAME",
+        "CI_PREM",
+        "CI_PREM_TYPE_L",
+        "CI_SA",
+        "CI_SA_TYPE_L",
+        "CI_SEV_EVT",
+        "CI_SEV_EVT_TYPE_L",
+        "CI_SEV_PROC",
+        "CI_SEV_PROC_TMP_L",
+        "CI_STATE_L",
+        "CI_TIME_ZONE_L",
+        "CI_TREND_AREA_L",
+        "CI_WO_CNTL_L",
+        "CI_WO_DEBT_CL_L",
+        "CI_WO_EVT",
+        "CI_WO_EVT_TYP_L",
+        "CI_WO_PROC",
+        "CI_WO_PROC_SA",
+        "CI_WO_PROC_TMPL_L"
+      ]
+    },
+    "field_ops": {
+      "label": "field_ops",
+      "canonical_chains": [
+        {
+          "name": "field_activity_chain",
+          "grain": "activity",
+          "driver_table": "D1_ACTIVITY",
+          "tables": [
+            "CI_SP",
+            "D1_ACTIVITY",
+            "D1_ACTIVITY_TYPE",
+            "D1_ACTIVITY_CHAR",
+            "D1_ACTIVITY_REL",
+            "D1_ACTIVITY_REL_OBJ",
+            "C1_REPRESENTATIVE",
+            "F1_TSK",
+            "F1_TSK_LOG"
+          ],
+          "join_sql": [
+            "D1_ACTIVITY.D1_ACTIVITY_ID = D1_ACTIVITY_CHAR.D1_ACTIVITY_ID",
+            "D1_ACTIVITY.ACTIVITY_TYPE_CD = D1_ACTIVITY_TYPE.ACTIVITY_TYPE_CD"
+          ],
+          "enrichment": true
+        }
+      ],
+      "tables": [
+        "C1_REPRESENTATIVE",
+        "C1_REPRESENTATIVE_L",
+        "CI_ACC_GRP_L",
+        "CI_LOOKUP_VAL_L",
+        "CI_NT_XID_L",
+        "CI_SP",
+        "CI_STATE_L",
+        "CI_TIME_ZONE_L",
+        "D1_ACTIVITY",
+        "D1_ACTIVITY_CHAR",
+        "D1_ACTIVITY_REL",
+        "D1_ACTIVITY_REL_OBJ",
+        "D1_ACTIVITY_TYPE",
+        "D1_ACTIVITY_TYPE_L",
+        "D1_MKT_L",
+        "D1_MSRMT_CYC_L",
+        "D1_MSRMT_CYC_RTE_L",
+        "D1_SP",
+        "D1_SP_TYPE_L",
+        "F1_BUS_OBJ_L",
+        "F1_BUS_OBJ_STATUS_L",
+        "F1_BUS_OBJ_STATUS_RSN_L",
+        "F1_EXT_LOOKUP_VAL_L",
+        "F1_TSK",
+        "F1_TSK_LOG",
+        "SC_USER"
+      ]
+    },
+    "finance": {
+      "label": "finance",
+      "canonical_chains": [
+        {
+          "name": "financial_transaction_chain",
+          "grain": "ft",
+          "driver_table": "CI_FT",
+          "tables": [
+            "CI_ACCT",
+            "CI_SA",
+            "CI_FT",
+            "CI_FT_GL",
+            "CI_FT_PROC"
+          ],
+          "join_sql": [
+            "CI_ACCT.ACCT_ID = CI_SA.ACCT_ID",
+            "CI_SA.SA_ID = CI_FT.SA_ID",
+            "CI_FT.FT_ID = CI_FT_GL.FT_ID"
+          ]
+        }
+      ],
+      "tables": [
+        "CI_ACCT",
+        "CI_ACCT_MGMT_GR_L",
+        "CI_ACCT_PER",
+        "CI_ADJ",
+        "CI_ADJ_CAN_RSN_L",
+        "CI_ADJ_TYPE_L",
+        "CI_BAL_CTL_GRP",
+        "CI_BILL_CAN_RSN_L",
+        "CI_BILL_CHG",
+        "CI_BILL_CYC_L",
+        "CI_BSEG",
+        "CI_BUD_PLAN_L",
+        "CI_B_CHG_LINE",
+        "CI_CIS_DIVISION_L",
+        "CI_COLL_CL_L",
+        "CI_CUST_CL_L",
+        "CI_FT",
+        "CI_FT_GL",
+        "CI_FT_PROC",
+        "CI_GL_DIVISION_L",
+        "CI_LOOKUP_VAL_L",
+        "CI_MR_INSTR_L",
+        "CI_MR_WARN_L",
+        "CI_NB_RULE_L",
+        "CI_PAY_SEG",
+        "CI_PER_NAME",
+        "CI_PREM",
+        "CI_PREM_TYPE_L",
+        "CI_PROP_DCL_RSN_L",
+        "CI_SA",
+        "CI_SA_TYPE",
+        "CI_SA_TYPE_L",
+        "CI_SIC_L",
+        "CI_SS_OPT_L",
+        "CI_STATE_L",
+        "CI_TIME_ZONE_L",
+        "CI_TREND_AREA_L",
+        "FT_GL_DISTRIBUTION_RPT_CURR",
+        "FT_RPT_CURR",
+        "SC_USER"
+      ]
+    },
+    "meter_ops": {
+      "label": "meter_ops",
+      "canonical_chains": [
+        {
+          "name": "usage_chain",
+          "grain": "usage",
+          "driver_table": "D1_USAGE",
+          "tables": [
+            "CI_ACCT",
+            "CI_SA",
+            "C1_USAGE",
+            "D1_USAGE",
+            "D1_USAGE_SCALAR_DTL",
+            "D1_USAGE_PERIOD_SQ"
+          ],
+          "join_sql": [
+            "CI_SA.SA_ID = C1_USAGE.SA_ID",
+            "C1_USAGE.USAGE_ID = D1_USAGE.USG_EXT_ID",
+            "D1_USAGE.D1_USAGE_ID = D1_USAGE_SCALAR_DTL.D1_USAGE_ID"
+          ]
+        },
+        {
+          "name": "device_install_chain",
+          "grain": "install_event",
+          "driver_table": "D1_INSTALL_EVT",
+          "tables": [
+            "CI_SP",
+            "D1_INSTALL_EVT",
+            "D1_DVC_CFG",
+            "D1_DVC",
+            "D1_MEASR_COMP"
+          ],
+          "join_sql": [
+            "D1_INSTALL_EVT.D1_DEVICE_ID = D1_DVC.D1_DEVICE_ID"
+          ],
+          "enrichment": true
+        }
+      ],
+      "tables": [
+        "C1_USAGE",
+        "CI_ACCT",
+        "CI_ACCT_PER",
+        "CI_ACC_GRP_L",
+        "CI_CHAR_VAL_L",
+        "CI_LOOKUP_VAL_L",
+        "CI_MR_INSTR_L",
+        "CI_MR_WARN_L",
+        "CI_PER_NAME",
+        "CI_PREM",
+        "CI_PREM_TYPE_L",
+        "CI_SA",
+        "CI_SP",
+        "CI_STATE_L",
+        "CI_TIME_ZONE_L",
+        "CI_TREND_AREA_L",
+        "D1_COMMAND_SET_L",
+        "D1_DVC",
+        "D1_DVC_CFG",
+        "D1_DVC_CFG_TYPE_L",
+        "D1_DVC_EVT",
+        "D1_DVC_EVT_TYPE_L",
+        "D1_DVC_TYPE_L",
+        "D1_INSTALL_EVT",
+        "D1_MANUFACTURER_L",
+        "D1_MEASR_COMP",
+        "D1_MODEL_L",
+        "D1_MSRMT_RPT_CURR",
+        "D1_SPR_L",
+        "D1_SP_EQPMNT",
+        "D1_USAGE",
+        "D1_USAGE_PERIOD_SQ",
+        "D1_USAGE_RPT_CURR",
+        "D1_USAGE_SCALAR_DTL",
+        "D1_USAGE_SCALAR_DTL_RPT_CURR",
+        "F1_BUS_OBJ_L",
+        "F1_BUS_OBJ_STATUS_L",
+        "F1_BUS_OBJ_STATUS_RSN_L",
+        "F1_EXT_LOOKUP_VAL_L",
+        "W1_APPROVAL_PROF_L",
+        "W1_ASSET",
+        "W1_ASSET_CHAR",
+        "W1_ASSET_IDENTIFIER",
+        "W1_ASSET_NODE",
+        "W1_ASSET_TYPE_L",
+        "W1_BOM_PART",
+        "W1_BUYER_L",
+        "W1_COST_CENTER_L",
+        "W1_EXPENSE_CD_L",
+        "W1_MAINTMGR_L",
+        "W1_NODE",
+        "W1_NODE_TYPE_L",
+        "W1_PLANNER_L",
+        "W1_PROPERTY_UNIT_L",
+        "W1_SERVICE_AREA_L",
+        "W1_SPECIFICATION_L",
+        "W1_VENDOR_LOC"
+      ]
+    },
+    "new_services": {
+      "label": "new_services",
+      "canonical_chains": [
+        {
+          "name": "service_agreement_chain",
+          "grain": "sa",
+          "driver_table": "CI_SA",
+          "tables": [
+            "CI_ACCT",
+            "CI_SA",
+            "CI_SA_SP",
+            "CI_SP",
+            "CI_SA_TYPE",
+            "CI_ENRL"
+          ],
+          "join_sql": [
+            "CI_ACCT.ACCT_ID = CI_SA.ACCT_ID",
+            "CI_SA.SA_ID = CI_SA_SP.SA_ID",
+            "CI_SA_SP.SP_ID = CI_SP.SP_ID"
+          ]
+        }
+      ],
+      "tables": [
+        "CI_ACCT",
+        "CI_ACCT_PER",
+        "CI_BILL_CYC_L",
+        "CI_BUD_PLAN_L",
+        "CI_CIS_DIVISION_L",
+        "CI_COLL_CL_L",
+        "CI_CUST_CL_L",
+        "CI_ENRL",
+        "CI_LOOKUP_VAL_L",
+        "CI_MR_INSTR_L",
+        "CI_MR_WARN_L",
+        "CI_NB_RULE_L",
+        "CI_PER_NAME",
+        "CI_PREM",
+        "CI_PREM_TYPE_L",
+        "CI_PROP_DCL_RSN_L",
+        "CI_SA",
+        "CI_SA_SP",
+        "CI_SA_TYPE",
+        "CI_SA_TYPE_L",
+        "CI_SIC_L",
+        "CI_SP",
+        "CI_SS_OPT_L",
+        "CI_STATE_L",
+        "CI_SVC_TYPE_L",
+        "CI_TIME_ZONE_L",
+        "CI_TREND_AREA_L",
+        "SC_USER"
+      ]
+    }
+  },
+  "domain_inferred_joins": [
+    {
+      "child_table": "CI_BILL",
+      "child_column": "BILL_ID",
+      "parent_table": "CI_BSEG",
+      "parent_column": "BILL_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG",
+      "child_column": "BSEG_ID",
+      "parent_table": "CI_BSEG_READ",
+      "parent_column": "BSEG_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG",
+      "child_column": "BSEG_ID",
+      "parent_table": "CI_BSEG_SQ",
+      "parent_column": "BSEG_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG",
+      "child_column": "BSEG_ID",
+      "parent_table": "CI_BSEG_CALC",
+      "parent_column": "BSEG_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BILL",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_ACCT",
+      "parent_column": "ACCT_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_ACCT_PER",
+      "parent_column": "ACCT_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT_PER",
+      "child_column": "PER_ID",
+      "parent_table": "CI_PER_NAME",
+      "parent_column": "PER_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BILL",
+      "child_column": "BILL_CYC_CD",
+      "parent_table": "CI_BILL_CYC_L",
+      "parent_column": "BILL_CYC_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BILL",
+      "child_column": "BILL_STAT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BILL",
+      "child_column": "APAY_STOP_USER_ID",
+      "parent_table": "SC_USER",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BILL",
+      "child_column": "DOC_TYPE_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT",
+      "child_column": "BILL_CYC_CD",
+      "parent_table": "CI_BILL_CYC_L_1",
+      "parent_column": "BILL_CYC_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT",
+      "child_column": "ACCT_MGMT_GRP_CD",
+      "parent_table": "CI_ACCT_MGMT_GR_L",
+      "parent_column": "ACCT_MGMT_GRP_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT",
+      "child_column": "COLL_CL_CD",
+      "parent_table": "CI_COLL_CL_L",
+      "parent_column": "COLL_CL_CD",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT",
+      "child_column": "CUST_CL_CD",
+      "parent_table": "CI_CUST_CL_L",
+      "parent_column": "CUST_CL_CD",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT",
+      "child_column": "BUD_PLAN_CD",
+      "parent_table": "CI_BUD_PLAN_L",
+      "parent_column": "BUD_PLAN_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG",
+      "child_column": "BILL_CYC_CD",
+      "parent_table": "CI_BILL_CYC_L_2",
+      "parent_column": "BILL_CYC_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG",
+      "child_column": "CAN_RSN_CD",
+      "parent_table": "CI_BILL_CAN_RSN_L",
+      "parent_column": "CAN_RSN_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG",
+      "child_column": "BSEG_STAT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_CALC",
+      "child_column": "RS_CD",
+      "parent_table": "CI_RS_L",
+      "parent_column": "RS_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_READ",
+      "child_column": "USAGE_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_3",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_READ",
+      "child_column": "HOW_TO_USE_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_4",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_READ",
+      "child_column": "UOM_CD",
+      "parent_table": "CI_UOM_L",
+      "parent_column": "UOM_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_READ",
+      "child_column": "FINAL_UOM_CD",
+      "parent_table": "CI_UOM_L_1",
+      "parent_column": "UOM_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_READ",
+      "child_column": "TOU_CD",
+      "parent_table": "CI_TOU_L",
+      "parent_column": "TOU_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_READ",
+      "child_column": "FINAL_TOU_CD",
+      "parent_table": "CI_TOU_L_1",
+      "parent_column": "TOU_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_READ",
+      "child_column": "SQI_CD",
+      "parent_table": "CI_SQI_L",
+      "parent_column": "SQI_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_READ",
+      "child_column": "FINAL_SQI_CD",
+      "parent_table": "CI_SQI_L_1",
+      "parent_column": "SQI_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_SQ",
+      "child_column": "UOM_CD",
+      "parent_table": "CI_UOM_L_2",
+      "parent_column": "UOM_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_SQ",
+      "child_column": "TOU_CD",
+      "parent_table": "CI_TOU_L_2",
+      "parent_column": "TOU_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_SQ",
+      "child_column": "SQI_CD",
+      "parent_table": "CI_SQI_L_2",
+      "parent_column": "SQI_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment___Domain",
+      "workstream": "Billing and Rates",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TNDR_CTL",
+      "child_column": "DEP_CTL_ID",
+      "parent_table": "CI_DEP_CTL",
+      "parent_column": "DEP_CTL_ID",
+      "join_type": "inner",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TNDR_CTL",
+      "child_column": "TNDR_SOURCE_CD",
+      "parent_table": "CI_TNDR_SRCE_L",
+      "parent_column": "TNDR_SOURCE_CD",
+      "join_type": "inner",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TNDR_CTL",
+      "child_column": "TNDR_CTL_ST_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TNDR_CTL",
+      "child_column": "USER_ID",
+      "parent_table": "SC_USER",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TNDR_CTL",
+      "child_column": "BALANCED_USER_ID",
+      "parent_table": "SC_USER_1",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TNDR_CTL",
+      "child_column": "BATCH_CD",
+      "parent_table": "CI_BATCH_CTRL_L",
+      "parent_column": "BATCH_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_DEP_CTL",
+      "child_column": "USER_ID",
+      "parent_table": "SC_USER_2",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_DEP_CTL",
+      "child_column": "BALANCED_USER_ID",
+      "parent_table": "SC_USER_3",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_DEP_CTL",
+      "child_column": "TNDR_SRCE_TYPE_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_DEP_CTL",
+      "child_column": "DEP_CTL_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_DEP_CTL_1",
+      "child_column": "DEP_CTL_ID",
+      "parent_table": "CI_TNDR_DEP",
+      "parent_column": "DEP_CTL_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TNDR_DEP",
+      "child_column": "BANK_CD",
+      "parent_table": "CI_BANK_L",
+      "parent_column": "BANK_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TNDR_DEP",
+      "child_column": "BANK_CD",
+      "parent_table": "CI_BANK_ACCOUNT_L",
+      "parent_column": "BANK_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TNDR_DEP",
+      "child_column": "BANK_ACCT_KEY",
+      "parent_table": "CI_BANK_ACCOUNT_L",
+      "parent_column": "BANK_ACCT_KEY",
+      "join_type": "leftOuter",
+      "domain_name": "Deposit_Control___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PP",
+      "child_column": "PAY_METH_CD",
+      "parent_table": "CI_PAY_METH_L",
+      "parent_column": "PAY_METH_CD",
+      "join_type": "inner",
+      "domain_name": "Pay_Plan___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PP",
+      "child_column": "PP_CAN_RSN_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Pay_Plan___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PP",
+      "child_column": "PP_STAT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Pay_Plan___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PP",
+      "child_column": "PP_TYPE_CD",
+      "parent_table": "CI_PP_TYPE_L",
+      "parent_column": "PP_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Pay_Plan___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PP",
+      "child_column": "USER_ID",
+      "parent_table": "SC_USER",
+      "parent_column": "USER_ID",
+      "join_type": "inner",
+      "domain_name": "Pay_Plan___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PP",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_ACCT_PER",
+      "parent_column": "ACCT_ID",
+      "join_type": "inner",
+      "domain_name": "Pay_Plan___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PP",
+      "child_column": "PAYOR_ACCT_ID",
+      "parent_table": "CI_ACCT_PER_1",
+      "parent_column": "ACCT_ID",
+      "join_type": "inner",
+      "domain_name": "Pay_Plan___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PP",
+      "child_column": "LAST_STAT_USER_ID",
+      "parent_table": "SC_USER_1",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Pay_Plan___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PP",
+      "child_column": "THRD_PTY_PAYOR_CD",
+      "parent_table": "CI_THRD_PTY_L",
+      "parent_column": "THRD_PTY_PAYOR_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Pay_Plan___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PAY",
+      "child_column": "PAY_EVENT_ID",
+      "parent_table": "CI_PAY_EVENT",
+      "parent_column": "PAY_EVENT_ID",
+      "join_type": "inner",
+      "domain_name": "Payment_Header___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PAY",
+      "child_column": "CAN_RSN_CD",
+      "parent_table": "CI_PAY_CAN_RSN_L",
+      "parent_column": "CAN_RSN_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Payment_Header___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PAY",
+      "child_column": "MATCH_TYPE_CD",
+      "parent_table": "CI_MATCH_TYPE_L",
+      "parent_column": "MATCH_TYPE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Payment_Header___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PAY",
+      "child_column": "PAY_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Payment_Header___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PAY",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_ACCT_PER",
+      "parent_column": "ACCT_ID",
+      "join_type": "inner",
+      "domain_name": "Payment_Header___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PAY_TNDR",
+      "child_column": "PAY_EVENT_ID",
+      "parent_table": "CI_PAY_EVENT",
+      "parent_column": "PAY_EVENT_ID",
+      "join_type": "inner",
+      "domain_name": "Payment_Tender___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PAY_TNDR",
+      "child_column": "TENDER_TYPE_CD",
+      "parent_table": "CI_TENDER_TYPE_L",
+      "parent_column": "TENDER_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Payment_Tender___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PAY_TNDR",
+      "child_column": "PAYOR_ACCT_ID",
+      "parent_table": "CI_ACCT_PER",
+      "parent_column": "ACCT_ID",
+      "join_type": "inner",
+      "domain_name": "Payment_Tender___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PAY_TNDR",
+      "child_column": "TNDR_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Payment_Tender___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PAY_TNDR",
+      "child_column": "CAN_RSN_CD",
+      "parent_table": "CI_PAY_CAN_RSN_L",
+      "parent_column": "CAN_RSN_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Payment_Tender___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PAY_TNDR",
+      "child_column": "TNDR_CTL_ID",
+      "parent_table": "CI_TNDR_CTL",
+      "parent_column": "TNDR_CTL_ID",
+      "join_type": "inner",
+      "domain_name": "Payment_Tender___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TNDR_CTL",
+      "child_column": "TNDR_CTL_ST_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Payment_Tender___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TNDR_CTL",
+      "child_column": "USER_ID",
+      "parent_table": "SC_USER_1",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Payment_Tender___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TNDR_CTL",
+      "child_column": "BALANCED_USER_ID",
+      "parent_table": "SC_USER",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Payment_Tender___Domain",
+      "workstream": "Cashiering",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BATCH_INST",
+      "child_column": "BATCH_CD",
+      "parent_table": "CI_BATCH_RUN",
+      "parent_column": "BATCH_CD",
+      "join_type": "inner",
+      "domain_name": "Batch_Process___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BATCH_INST",
+      "child_column": "BATCH_NBR",
+      "parent_table": "CI_BATCH_RUN",
+      "parent_column": "BATCH_NBR",
+      "join_type": "inner",
+      "domain_name": "Batch_Process___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BATCH_INST",
+      "child_column": "BATCH_RERUN_NBR",
+      "parent_table": "CI_BATCH_RUN",
+      "parent_column": "BATCH_RERUN_NBR",
+      "join_type": "inner",
+      "domain_name": "Batch_Process___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BATCH_INST",
+      "child_column": "BATCH_CD",
+      "parent_table": "CI_BATCH_CTRL",
+      "parent_column": "BATCH_CD",
+      "join_type": "inner",
+      "domain_name": "Batch_Process___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BATCH_INST",
+      "child_column": "BATCH_CD",
+      "parent_table": "CI_BATCH_CTRL_L",
+      "parent_column": "BATCH_CD",
+      "join_type": "inner",
+      "domain_name": "Batch_Process___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BATCH_INST",
+      "child_column": "BATCH_CD",
+      "parent_table": "CI_BATCH_THD",
+      "parent_column": "BATCH_CD",
+      "join_type": "inner",
+      "domain_name": "Batch_Process___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BATCH_INST",
+      "child_column": "BATCH_NBR",
+      "parent_table": "CI_BATCH_THD",
+      "parent_column": "BATCH_NBR",
+      "join_type": "inner",
+      "domain_name": "Batch_Process___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BATCH_INST",
+      "child_column": "BATCH_RERUN_NBR",
+      "parent_table": "CI_BATCH_THD",
+      "parent_column": "BATCH_RERUN_NBR",
+      "join_type": "inner",
+      "domain_name": "Batch_Process___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BATCH_RUN",
+      "child_column": "RUN_STATUS",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Batch_Process___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BATCH_THD",
+      "child_column": "THREAD_STATUS",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Batch_Process___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_EXCP",
+      "child_column": "BSEG_ID",
+      "parent_table": "CI_TD_DRLKEY",
+      "parent_column": "KEY_VALUE",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_DRLKEY",
+      "child_column": "SEQ_NUM",
+      "parent_table": "CI_TD_DRLKEY_TY",
+      "parent_column": "SEQ_NUM",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_DRLKEY_TY",
+      "child_column": "TD_TYPE_CD",
+      "parent_table": "CI_TD_ENTRY",
+      "parent_column": "TD_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_DRLKEY",
+      "child_column": "TD_ENTRY_ID",
+      "parent_table": "CI_TD_ENTRY",
+      "parent_column": "TD_ENTRY_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_EXCP",
+      "child_column": "BSEG_ID",
+      "parent_table": "CI_BSEG",
+      "parent_column": "BSEG_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG",
+      "child_column": "SA_ID",
+      "parent_table": "CI_SA",
+      "parent_column": "SA_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_ACCT_PER",
+      "parent_column": "ACCT_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_EXCP",
+      "child_column": "BSEG_EXCP_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_EXCP",
+      "child_column": "USER_ID",
+      "parent_table": "SC_USER",
+      "parent_column": "USER_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG_EXCP",
+      "child_column": "REVIEW_USER_ID",
+      "parent_table": "SC_USER_1",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "ASSIGNED_USER_ID",
+      "parent_table": "SC_USER_2",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "TD_TYPE_CD",
+      "parent_table": "CI_TD_TYPE_L",
+      "parent_column": "TD_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "ROLE_ID",
+      "parent_table": "CI_ROLE_L",
+      "parent_column": "ROLE_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "ENTRY_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "COMPLETE_USER_ID",
+      "parent_table": "SC_USER_3",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "TD_PRIORITY_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "ASSIGNED_TO",
+      "parent_table": "SC_USER_4",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_ACCT",
+      "parent_column": "ACCT_ID",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT",
+      "child_column": "BILL_CYC_CD",
+      "parent_table": "CI_BILL_CYC_L",
+      "parent_column": "BILL_CYC_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "SA_TYPE_CD",
+      "parent_table": "CI_SA_TYPE_L",
+      "parent_column": "SA_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "CIS_DIVISION",
+      "parent_table": "CI_SA_TYPE_L",
+      "parent_column": "CIS_DIVISION",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "SA_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_3",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Bill_Segment_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "ASSIGNED_TO",
+      "parent_table": "SC_USER",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "ASSIGNED_USER_ID",
+      "parent_table": "SC_USER_1",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "COMPLETE_USER_ID",
+      "parent_table": "SC_USER_2",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "ENTRY_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "MESSAGE_CAT_NBR",
+      "parent_table": "CI_MSG_L",
+      "parent_column": "MESSAGE_CAT_NBR",
+      "join_type": "inner",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "MESSAGE_NBR",
+      "parent_table": "CI_MSG_L",
+      "parent_column": "MESSAGE_NBR",
+      "join_type": "inner",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PREM",
+      "child_column": "PREM_TYPE_CD",
+      "parent_table": "CI_PREM_TYPE_L",
+      "parent_column": "PREM_TYPE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PREM",
+      "child_column": "MR_WARN_CD",
+      "parent_table": "CI_MR_WARN_L",
+      "parent_column": "MR_WARN_CD",
+      "join_type": "leftOuter",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PREM",
+      "child_column": "MR_INSTR_CD",
+      "parent_table": "CI_MR_INSTR_L",
+      "parent_column": "MR_INSTR_CD",
+      "join_type": "leftOuter",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PREM",
+      "child_column": "TREND_AREA_CD",
+      "parent_table": "CI_TREND_AREA_L",
+      "parent_column": "TREND_AREA_CD",
+      "join_type": "leftOuter",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PREM",
+      "child_column": "COUNTRY",
+      "parent_table": "CI_STATE_L",
+      "parent_column": "COUNTRY",
+      "join_type": "leftOuter",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PREM",
+      "child_column": "STATE",
+      "parent_table": "CI_STATE_L",
+      "parent_column": "STATE",
+      "join_type": "leftOuter",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PREM",
+      "child_column": "TIME_ZONE_CD",
+      "parent_table": "CI_TIME_ZONE_L",
+      "parent_column": "TIME_ZONE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "To_Do___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_USAGE_EXCP",
+      "child_column": "D1_USAGE_ID",
+      "parent_table": "CI_TD_DRLKEY",
+      "parent_column": "KEY_VALUE",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_USAGE_EXCP",
+      "child_column": "D1_USAGE_ID",
+      "parent_table": "D1_USAGE",
+      "parent_column": "D1_USAGE_ID",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_USAGE",
+      "child_column": "US_ID",
+      "parent_table": "D1_US_CONTACT",
+      "parent_column": "US_ID",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_US_CONTACT",
+      "child_column": "CONTACT_ID",
+      "parent_table": "D1_CONTACT_IDENTIFIER",
+      "parent_column": "CONTACT_ID",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_CONTACT_IDENTIFIER",
+      "child_column": "ID_VALUE",
+      "parent_table": "CI_PER_NAME",
+      "parent_column": "PER_ID",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_USAGE_EXCP",
+      "child_column": "EXCP_SEVERITY_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "ENTRY_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "TD_PRIORITY_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_3",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_USAGE_EXCP",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_L",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_USAGE_EXCP",
+      "child_column": "USAGE_EXCP_TYPE_CD",
+      "parent_table": "D1_USAGE_EXCP_TYPE_L",
+      "parent_column": "USAGE_EXCP_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_USAGE_EXCP",
+      "child_column": "USG_GRP_CD",
+      "parent_table": "D1_USG_GRP_L",
+      "parent_column": "USG_GRP_CD",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_USAGE_EXCP",
+      "child_column": "USG_RULE_CD",
+      "parent_table": "D1_USG_RULE_L",
+      "parent_column": "USG_RULE_CD",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_USAGE_EXCP",
+      "child_column": "USG_GRP_CD",
+      "parent_table": "D1_USG_RULE_L",
+      "parent_column": "USG_GRP_CD",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_USAGE_EXCP",
+      "child_column": "OPEN_CLOSE_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_USAGE",
+      "child_column": "US_ID",
+      "parent_table": "D1_US_SP",
+      "parent_column": "US_ID",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_US_SP",
+      "child_column": "D1_SP_ID",
+      "parent_table": "D1_SP",
+      "parent_column": "D1_SP_ID",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "ACCESS_GRP_CD",
+      "parent_table": "CI_ACC_GRP_L",
+      "parent_column": "ACCESS_GRP_CD",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_L_1",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "BO_STATUS_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L",
+      "parent_column": "BO_STATUS_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "D1_SP_TYPE_CD",
+      "parent_table": "D1_SP_TYPE_L",
+      "parent_column": "D1_SP_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "DIVISION_CD",
+      "parent_table": "D1_DIVISION_L",
+      "parent_column": "DIVISION_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "MKT_CD",
+      "parent_table": "D1_MKT_L",
+      "parent_column": "MKT_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "MSRMT_CYC_CD",
+      "parent_table": "D1_MSRMT_CYC_L",
+      "parent_column": "MSRMT_CYC_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "MSRMT_CYC_CD",
+      "parent_table": "D1_MSRMT_CYC_RTE_L",
+      "parent_column": "MSRMT_CYC_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "MSRMT_CYC_RTE_CD",
+      "parent_table": "D1_MSRMT_CYC_RTE_L",
+      "parent_column": "MSRMT_CYC_RTE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "TIME_ZONE_CD",
+      "parent_table": "CI_TIME_ZONE_L",
+      "parent_column": "TIME_ZONE_CD",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "DISCONN_LOC_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_4",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "SP_SRC_STAT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_5",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Usage_Transaction_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_VEE_EXCP",
+      "child_column": "INIT_MSRMT_DATA_ID",
+      "parent_table": "D1_INIT_MSRMT_DATA",
+      "parent_column": "INIT_MSRMT_DATA_ID",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_INIT_MSRMT_DATA",
+      "child_column": "INIT_MSRMT_DATA_ID",
+      "parent_table": "CI_TD_DRLKEY",
+      "parent_column": "KEY_VALUE",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_INIT_MSRMT_DATA",
+      "child_column": "MEASR_COMP_ID",
+      "parent_table": "D1_MEASR_COMP",
+      "parent_column": "MEASR_COMP_ID",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_MEASR_COMP",
+      "child_column": "DEVICE_CONFIG_ID",
+      "parent_table": "D1_DVC_CFG",
+      "parent_column": "DEVICE_CONFIG_ID",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_CFG",
+      "child_column": "DEVICE_CONFIG_ID",
+      "parent_table": "D1_INSTALL_EVT",
+      "parent_column": "DEVICE_CONFIG_ID",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_INSTALL_EVT",
+      "child_column": "D1_SP_ID",
+      "parent_table": "D1_SP",
+      "parent_column": "D1_SP_ID",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_VEE_EXCP",
+      "child_column": "BO_STATUS_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L",
+      "parent_column": "BO_STATUS_CD",
+      "join_type": "leftOuter",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_VEE_EXCP",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "leftOuter",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_VEE_EXCP",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_L",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_VEE_EXCP",
+      "child_column": "EXCP_SEVERITY_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_VEE_EXCP",
+      "child_column": "EXCP_TYPE_CD",
+      "parent_table": "D1_EXCP_TYPE_L",
+      "parent_column": "EXCP_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_VEE_EXCP",
+      "child_column": "OPEN_CLOSE_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_VEE_EXCP",
+      "child_column": "VEE_GRP_CD",
+      "parent_table": "D1_VEE_GRP_L",
+      "parent_column": "VEE_GRP_CD",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_VEE_EXCP",
+      "child_column": "VEE_RULE_CD",
+      "parent_table": "D1_VEE_RULE_L",
+      "parent_column": "VEE_RULE_CD",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_VEE_EXCP",
+      "child_column": "VEE_GRP_CD",
+      "parent_table": "D1_VEE_RULE_L",
+      "parent_column": "VEE_GRP_CD",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "BO_STATUS_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L_1",
+      "parent_column": "BO_STATUS_CD",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L_1",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "DISCONN_LOC_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_3",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_MSRMT_CYC_RTE_L",
+      "child_column": "MSRMT_CYC_CD",
+      "parent_table": "D1_SP",
+      "parent_column": "MSRMT_CYC_CD",
+      "join_type": "leftOuter",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "SP_SRC_STAT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_4",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "TD_PRIORITY_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_5",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_TD_ENTRY",
+      "child_column": "ENTRY_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_6",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "VEE_Exception___Domain",
+      "workstream": "Common",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_ACCT_ALERT",
+      "parent_column": "ACCT_ID",
+      "join_type": "inner",
+      "domain_name": "Account_Alert___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT_ALERT",
+      "child_column": "ALERT_TYPE_CD",
+      "parent_table": "CI_ALERT_TYPE_L",
+      "parent_column": "ALERT_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Account_Alert___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT",
+      "child_column": "CIS_DIVISION",
+      "parent_table": "CI_CIS_DIVISION_L",
+      "parent_column": "CIS_DIVISION",
+      "join_type": "leftOuter",
+      "domain_name": "Account_Alert___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT",
+      "child_column": "BILL_PRT_INTERCEPT",
+      "parent_table": "SC_USER",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Account_Alert___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_SA",
+      "parent_column": "ACCT_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Account_Alert___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "SA_ID",
+      "parent_table": "CI_BSEG",
+      "parent_column": "SA_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Account_Alert___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG",
+      "child_column": "BSEG_ID",
+      "parent_table": "FT_GL_SUMMARY",
+      "parent_column": "SIBLING_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Account_Alert___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT_PER",
+      "child_column": "PER_ID",
+      "parent_table": "C1_PER_CONTDET",
+      "parent_column": "PER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Account_Alert___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "CIS_DIVISION",
+      "parent_table": "CI_SA_TYPE",
+      "parent_column": "CIS_DIVISION",
+      "join_type": "inner",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "SA_TYPE_CD",
+      "parent_table": "CI_SA_TYPE",
+      "parent_column": "SA_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA_TYPE",
+      "child_column": "CIS_DIVISION",
+      "parent_table": "CI_SA_TYPE_L",
+      "parent_column": "CIS_DIVISION",
+      "join_type": "inner",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA_TYPE",
+      "child_column": "SA_TYPE_CD",
+      "parent_table": "CI_SA_TYPE_L",
+      "parent_column": "SA_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "CIS_DIVISION",
+      "parent_table": "CI_CIS_DIVISION_L",
+      "parent_column": "CIS_DIVISION",
+      "join_type": "inner",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "NB_RULE_CD",
+      "parent_table": "CI_NB_RULE_L",
+      "parent_column": "NB_RULE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "PROP_DCL_RSN_CD",
+      "parent_table": "CI_PROP_DCL_RSN_L",
+      "parent_column": "PROP_DCL_RSN_CD",
+      "join_type": "leftOuter",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "PROP_SA_STAT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "SA_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "SIC_CD",
+      "parent_table": "CI_SIC_L",
+      "parent_column": "SIC_CD",
+      "join_type": "leftOuter",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "SPECIAL_USAGE_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "START_OPT_CD",
+      "parent_table": "CI_SS_OPT_L",
+      "parent_column": "START_OPT_CD",
+      "join_type": "leftOuter",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "STRT_RSN_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_3",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "STOP_RSN_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_4",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA_TYPE",
+      "child_column": "DEBT_CL_CD",
+      "parent_table": "CI_DEBT_CL_L",
+      "parent_column": "DEBT_CL_CD",
+      "join_type": "inner",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA_TYPE",
+      "child_column": "DEP_CL_CD",
+      "parent_table": "CI_DEP_CL_L",
+      "parent_column": "DEP_CL_CD",
+      "join_type": "leftOuter",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA_TYPE",
+      "child_column": "REV_CL_CD",
+      "parent_table": "CI_REV_CL_L",
+      "parent_column": "REV_CL_CD",
+      "join_type": "inner",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA_TYPE",
+      "child_column": "SPECIAL_ROLE_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_5",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA_TYPE",
+      "child_column": "SVC_TYPE_CD",
+      "parent_table": "CI_SVC_TYPE_L",
+      "parent_column": "SVC_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA_TYPE",
+      "child_column": "WO_DEBT_CL_CD",
+      "parent_table": "CI_WO_DEBT_CL_L",
+      "parent_column": "WO_DEBT_CL_CD",
+      "join_type": "inner",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "SA_ID",
+      "parent_table": "CM_FT_BAL",
+      "parent_column": "SA_ID",
+      "join_type": "leftOuter",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT_PER",
+      "child_column": "PER_ID",
+      "parent_table": "CI_PER",
+      "parent_column": "PER_ID",
+      "join_type": "inner",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PER",
+      "child_column": "PER_OR_BUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_6",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "C_Side___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CASE",
+      "child_column": "PREM_ID",
+      "parent_table": "CI_PREM",
+      "parent_column": "PREM_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Case___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CASE",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_ACCT",
+      "parent_column": "ACCT_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Case___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CASE",
+      "child_column": "PER_ID",
+      "parent_table": "CI_PER_NAME",
+      "parent_column": "PER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Case___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CASE",
+      "child_column": "CASE_TYPE_CD",
+      "parent_table": "CI_CASE_TYPE_L",
+      "parent_column": "CASE_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Case___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CASE",
+      "child_column": "CASE_TYPE_CD",
+      "parent_table": "CI_CASE_STATUS_L",
+      "parent_column": "CASE_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Case___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CASE",
+      "child_column": "CASE_STATUS_CD",
+      "parent_table": "CI_CASE_STATUS_L",
+      "parent_column": "CASE_STATUS_CD",
+      "join_type": "inner",
+      "domain_name": "Case___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CASE",
+      "child_column": "CASE_COND_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Case___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CASE",
+      "child_column": "USER_ID",
+      "parent_table": "SC_USER",
+      "parent_column": "USER_ID",
+      "join_type": "inner",
+      "domain_name": "Case___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CASE",
+      "child_column": "PHONE_TYPE_CD",
+      "parent_table": "CI_PHONE_TYPE_L",
+      "parent_column": "PHONE_TYPE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Case___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CC",
+      "child_column": "PER_ID",
+      "parent_table": "CI_PER_NAME",
+      "parent_column": "PER_ID",
+      "join_type": "inner",
+      "domain_name": "Customer_Contact___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CC",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_ACCT",
+      "parent_column": "ACCT_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Customer_Contact___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CC",
+      "child_column": "PREM_ID",
+      "parent_table": "CI_PREM",
+      "parent_column": "PREM_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Customer_Contact___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CC",
+      "child_column": "USER_ID",
+      "parent_table": "SC_USER",
+      "parent_column": "USER_ID",
+      "join_type": "inner",
+      "domain_name": "Customer_Contact___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CC",
+      "child_column": "CC_CL_CD",
+      "parent_table": "CI_CC_CL_L",
+      "parent_column": "CC_CL_CD",
+      "join_type": "inner",
+      "domain_name": "Customer_Contact___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CC",
+      "child_column": "CC_CL_CD",
+      "parent_table": "CI_CC_TYPE_L",
+      "parent_column": "CC_CL_CD",
+      "join_type": "inner",
+      "domain_name": "Customer_Contact___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CC",
+      "child_column": "CC_TYPE_CD",
+      "parent_table": "CI_CC_TYPE_L",
+      "parent_column": "CC_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Customer_Contact___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CC",
+      "child_column": "CC_ENTITY_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Customer_Contact___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CC",
+      "child_column": "LTR_TMPL_CD",
+      "parent_table": "CI_LETTER_TMPL_L",
+      "parent_column": "LTR_TMPL_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Customer_Contact___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CC",
+      "child_column": "CC_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Customer_Contact___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_CC",
+      "child_column": "CONTACT_METH_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Customer_Contact___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PER",
+      "child_column": "PER_OR_BUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Customer___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PER",
+      "child_column": "LS_SL_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Customer___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PER",
+      "child_column": "RECV_MKTG_INFO_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Customer___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PER",
+      "child_column": "WEB_PWD_HINT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_3",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Customer___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PER",
+      "child_column": "TIME_ZONE_CD",
+      "parent_table": "CI_TIME_ZONE_L",
+      "parent_column": "TIME_ZONE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Customer___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_LANDLORD",
+      "child_column": "LL_ID",
+      "parent_table": "CI_PREM",
+      "parent_column": "LL_ID",
+      "join_type": "inner",
+      "domain_name": "Landlord_Agreement___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_LANDLORD",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_ACCT",
+      "parent_column": "ACCT_ID",
+      "join_type": "inner",
+      "domain_name": "Landlord_Agreement___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_LANDLORD",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_ACCT_PER",
+      "parent_column": "ACCT_ID",
+      "join_type": "inner",
+      "domain_name": "Landlord_Agreement___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PREM",
+      "child_column": "CIS_DIVISION",
+      "parent_table": "CI_CIS_DIVISION_L",
+      "parent_column": "CIS_DIVISION",
+      "join_type": "leftOuter",
+      "domain_name": "Landlord_Agreement___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PREM",
+      "child_column": "PREM_ID",
+      "parent_table": "CI_SA",
+      "parent_column": "CHAR_PREM_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Premise___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "SA_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Premise___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ACCT",
+      "child_column": "ACCESS_GRP_CD",
+      "parent_table": "CI_ACC_GRP_L",
+      "parent_column": "ACCESS_GRP_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Premise___Domain",
+      "workstream": "Customer Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "CHAR_PREM_ID",
+      "parent_table": "CI_PREM",
+      "parent_column": "PREM_ID",
+      "join_type": "leftOuter",
+      "domain_name": "SA_Snapshot___Aged_Balance___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SEV_PROC",
+      "child_column": "SA_ID",
+      "parent_table": "CI_SA",
+      "parent_column": "SA_ID",
+      "join_type": "inner",
+      "domain_name": "Severance_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SEV_PROC",
+      "child_column": "SEV_PROC_ID",
+      "parent_table": "CI_SEV_EVT",
+      "parent_column": "SEV_PROC_ID",
+      "join_type": "inner",
+      "domain_name": "Severance_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SEV_PROC",
+      "child_column": "SEV_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Severance_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SEV_PROC",
+      "child_column": "SEV_STAT_RSN_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Severance_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SEV_PROC",
+      "child_column": "CRIT_PRIO_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Severance_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SEV_PROC",
+      "child_column": "SEV_PROC_TMPL_CD",
+      "parent_table": "CI_SEV_PROC_TMP_L",
+      "parent_column": "SEV_PROC_TMPL_CD",
+      "join_type": "inner",
+      "domain_name": "Severance_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SEV_EVT",
+      "child_column": "SEV_EVT_STAT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_3",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Severance_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SEV_EVT",
+      "child_column": "SEV_EVT_TYPE_CD",
+      "parent_table": "CI_SEV_EVT_TYPE_L",
+      "parent_column": "SEV_EVT_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Severance_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "SA_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_4",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Severance_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_WO_PROC",
+      "child_column": "WO_PROC_ID",
+      "parent_table": "CI_WO_EVT",
+      "parent_column": "WO_PROC_ID",
+      "join_type": "inner",
+      "domain_name": "Write_Off_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_WO_PROC",
+      "child_column": "ACCT_ID",
+      "parent_table": "CI_ACCT",
+      "parent_column": "ACCT_ID",
+      "join_type": "inner",
+      "domain_name": "Write_Off_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_WO_PROC",
+      "child_column": "WO_PROC_TMPL_CD",
+      "parent_table": "CI_WO_PROC_TMPL_L",
+      "parent_column": "WO_PROC_TMPL_CD",
+      "join_type": "inner",
+      "domain_name": "Write_Off_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_WO_PROC",
+      "child_column": "WO_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Write_Off_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_WO_PROC",
+      "child_column": "WO_CNTL_CD",
+      "parent_table": "CI_WO_CNTL_L",
+      "parent_column": "WO_CNTL_CD",
+      "join_type": "inner",
+      "domain_name": "Write_Off_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_WO_PROC",
+      "child_column": "WO_STAT_RSN_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Write_Off_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_WO_PROC",
+      "child_column": "CRIT_PRIO_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Write_Off_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_WO_EVT",
+      "child_column": "WO_EVT_STAT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_3",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Write_Off_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_WO_EVT",
+      "child_column": "WO_EVT_TYP_CD",
+      "parent_table": "CI_WO_EVT_TYP_L",
+      "parent_column": "WO_EVT_TYP_CD",
+      "join_type": "inner",
+      "domain_name": "Write_Off_Process___Domain",
+      "workstream": "Debt Management",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "C1_REPRESENTATIVE",
+      "child_column": "C1_REPRESENTATIVE_CD",
+      "parent_table": "D1_ACTIVITY_CHAR",
+      "parent_column": "SRCH_CHAR_VAL",
+      "join_type": "leftOuter",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY_CHAR",
+      "child_column": "D1_ACTIVITY_ID",
+      "parent_table": "D1_ACTIVITY",
+      "parent_column": "D1_ACTIVITY_ID",
+      "join_type": "inner",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "ACTIVITY_TYPE_CD",
+      "parent_table": "D1_ACTIVITY_TYPE",
+      "parent_column": "ACTIVITY_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "C1_REPRESENTATIVE",
+      "child_column": "C1_REPRESENTATIVE_CD",
+      "parent_table": "C1_REPRESENTATIVE_L",
+      "parent_column": "C1_REPRESENTATIVE_CD",
+      "join_type": "inner",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "C1_REPRESENTATIVE",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_L",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "C1_REPRESENTATIVE",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "C1_REPRESENTATIVE",
+      "child_column": "BO_STATUS_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L",
+      "parent_column": "BO_STATUS_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "C1_REPRESENTATIVE",
+      "child_column": "BO_STATUS_REASON_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_RSN_L",
+      "parent_column": "BO_STATUS_REASON_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "C1_REPRESENTATIVE",
+      "child_column": "C1_REPRESENTATIVE_TYPE_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "C1_REPRESENTATIVE",
+      "child_column": "USER_ID",
+      "parent_table": "SC_USER",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "C1_REPRESENTATIVE",
+      "child_column": "NT_XID_CD",
+      "parent_table": "CI_NT_XID_L",
+      "parent_column": "NT_XID_CD",
+      "join_type": "inner",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_L_1",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L_1",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "BO_STATUS_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L_1",
+      "parent_column": "BO_STATUS_CD",
+      "join_type": "inner",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "BO_STATUS_REASON_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_RSN_L_1",
+      "parent_column": "BO_STATUS_REASON_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "CANCEL_REASON",
+      "parent_table": "F1_EXT_LOOKUP_VAL_L",
+      "parent_column": "F1_EXT_LOOKUP_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "FIELD_TASK_TYPE",
+      "parent_table": "F1_EXT_LOOKUP_VAL_L_1",
+      "parent_column": "F1_EXT_LOOKUP_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "RESCHEDULE_REASON",
+      "parent_table": "F1_EXT_LOOKUP_VAL_L_2",
+      "parent_column": "F1_EXT_LOOKUP_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "ACTIVITY_TYPE_CD",
+      "parent_table": "D1_ACTIVITY_TYPE_L",
+      "parent_column": "ACTIVITY_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Crew___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "D1_ACTIVITY_ID",
+      "parent_table": "D1_ACTIVITY_REL",
+      "parent_column": "D1_ACTIVITY_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "D1_ACTIVITY_ID",
+      "parent_table": "D1_ACTIVITY_REL_OBJ",
+      "parent_column": "D1_ACTIVITY_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY_REL_OBJ",
+      "child_column": "PK_VALUE1",
+      "parent_table": "D1_SP",
+      "parent_column": "D1_SP_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "BO_STATUS_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L",
+      "parent_column": "BO_STATUS_CD",
+      "join_type": "inner",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "BO_STATUS_REASON_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_RSN_L",
+      "parent_column": "BO_STATUS_REASON_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_L",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_ACTIVITY_TYPE",
+      "child_column": "ACTIVITY_TYPE_CD",
+      "parent_table": "D1_ACTIVITY_TYPE_L",
+      "parent_column": "ACTIVITY_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "BO_STATUS_REASON_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_RSN_L_1",
+      "parent_column": "BO_STATUS_REASON_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "DISCONN_LOC_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "SP_SRC_STAT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "STATE",
+      "parent_table": "CI_STATE_L",
+      "parent_column": "STATE",
+      "join_type": "leftOuter",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP",
+      "child_column": "COUNTRY",
+      "parent_table": "CI_STATE_L",
+      "parent_column": "COUNTRY",
+      "join_type": "leftOuter",
+      "domain_name": "Field_Activity___Domain",
+      "workstream": "Field Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "SA_ID",
+      "parent_table": "CI_BILL_CHG",
+      "parent_column": "SA_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Billable_Charge___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BILL_CHG",
+      "child_column": "BILLABLE_CHG_ID",
+      "parent_table": "CI_B_CHG_LINE",
+      "parent_column": "BILLABLE_CHG_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Billable_Charge___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_FT",
+      "child_column": "SIBLING_ID",
+      "parent_table": "CI_BSEG",
+      "parent_column": "BSEG_ID",
+      "join_type": "inner",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_FT",
+      "child_column": "BILL_ID",
+      "parent_table": "CI_BSEG",
+      "parent_column": "BILL_ID",
+      "join_type": "inner",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_FT",
+      "child_column": "SIBLING_ID",
+      "parent_table": "CI_PAY_SEG",
+      "parent_column": "PAY_SEG_ID",
+      "join_type": "inner",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_FT",
+      "child_column": "PARENT_ID",
+      "parent_table": "CI_PAY_SEG",
+      "parent_column": "PAY_ID",
+      "join_type": "inner",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_FT",
+      "child_column": "SIBLING_ID",
+      "parent_table": "CI_ADJ",
+      "parent_column": "ADJ_ID",
+      "join_type": "inner",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_FT",
+      "child_column": "PARENT_ID",
+      "parent_table": "CI_ADJ",
+      "parent_column": "ADJ_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_FT",
+      "child_column": "SA_ID",
+      "parent_table": "CI_SA",
+      "parent_column": "SA_ID",
+      "join_type": "inner",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_FT",
+      "child_column": "GL_DIVISION",
+      "parent_table": "CI_GL_DIVISION_L",
+      "parent_column": "GL_DIVISION",
+      "join_type": "inner",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_FT",
+      "child_column": "FREEZE_USER_ID",
+      "parent_table": "SC_USER",
+      "parent_column": "USER_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SA",
+      "child_column": "SA_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PREM",
+      "child_column": "TREND_AREA_CD",
+      "parent_table": "CI_TREND_AREA_L",
+      "parent_column": "DESCR",
+      "join_type": "leftOuter",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG",
+      "child_column": "BILL_CYC_CD",
+      "parent_table": "CI_BILL_CYC_L_1",
+      "parent_column": "BILL_CYC_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BSEG",
+      "child_column": "BSEG_STAT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_3",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ADJ",
+      "child_column": "ADJ_TYPE_CD",
+      "parent_table": "CI_ADJ_TYPE_L",
+      "parent_column": "ADJ_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ADJ",
+      "child_column": "ADJ_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_4",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_ADJ",
+      "child_column": "CAN_RSN_CD",
+      "parent_table": "CI_ADJ_CAN_RSN_L",
+      "parent_column": "CAN_RSN_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_FT",
+      "child_column": "BAL_CTL_GRP_ID",
+      "parent_table": "CI_BAL_CTL_GRP",
+      "parent_column": "BAL_CTL_GRP_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_BAL_CTL_GRP",
+      "child_column": "BALANCING_STAT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_5",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Financial_Transaction___Domain",
+      "workstream": "Finance",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "ASSET_ID",
+      "parent_table": "W1_ASSET_NODE",
+      "parent_column": "ASSET_ID",
+      "join_type": "inner",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET_NODE",
+      "child_column": "NODE_ID",
+      "parent_table": "W1_NODE",
+      "parent_column": "NODE_ID",
+      "join_type": "inner",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "ASSET_TYPE_CD",
+      "parent_table": "W1_ASSET_TYPE_L",
+      "parent_column": "ASSET_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_L",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "BO_STATUS_REASON_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_RSN_L",
+      "parent_column": "BO_STATUS_REASON_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "ASSET_COND_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "SPECIFICATION_CD",
+      "parent_table": "W1_SPECIFICATION_L",
+      "parent_column": "SPECIFICATION_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "OWNING_ACCESS_GRP_CD",
+      "parent_table": "CI_ACC_GRP_L",
+      "parent_column": "ACCESS_GRP_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "MAINT_SPEC_CD",
+      "parent_table": "W1_SPECIFICATION_L_1",
+      "parent_column": "SPECIFICATION_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "ASSET_OWNERSHIP_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "CONTRIBUTED_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET_NODE",
+      "child_column": "FAILURE_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_4",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET_NODE",
+      "child_column": "ASSET_DPOS_FLG",
+      "parent_table": "F1_EXT_LOOKUP_VAL_L",
+      "parent_column": "F1_EXT_LOOKUP_VALUE",
+      "join_type": "inner",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "NODE_TYPE_CD",
+      "parent_table": "W1_NODE_TYPE_L",
+      "parent_column": "NODE_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_L_1",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "NODE_DPOS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_3",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "W1_OPERATION_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_5",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "CRITICALITY_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_6",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "LOCATION_CLASS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_7",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "STATE",
+      "parent_table": "CI_STATE_L",
+      "parent_column": "STATE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "COUNTRY",
+      "parent_table": "CI_STATE_L",
+      "parent_column": "COUNTRY",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "TIME_ZONE_CD",
+      "parent_table": "CI_TIME_ZONE_L",
+      "parent_column": "TIME_ZONE_CD",
+      "join_type": "inner",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "OWNING_ACCESS_GRP_CD",
+      "parent_table": "CI_ACC_GRP_L_1",
+      "parent_column": "ACCESS_GRP_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "SERVICE_AREA_CD",
+      "parent_table": "W1_SERVICE_AREA_L",
+      "parent_column": "SERVICE_AREA_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "WORK_REQ_APPROVAL_PROF_CD",
+      "parent_table": "W1_APPROVAL_PROF_L",
+      "parent_column": "APPROVAL_PROF_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "RCM_SYSTEM_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_8",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "RUN_TO_FAILURE_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_9",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "inner",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "INV_COST_CENTER_CD",
+      "parent_table": "W1_COST_CENTER_L",
+      "parent_column": "COST_CENTER_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "INV_ADJTMT_COST_CENTER_CD",
+      "parent_table": "W1_COST_CENTER_L_1",
+      "parent_column": "COST_CENTER_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "MARK_UP_COST_CENTER_CD",
+      "parent_table": "W1_COST_CENTER_L_2",
+      "parent_column": "COST_CENTER_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "STOCK_TRANSFER_COST_CENTER_CD",
+      "parent_table": "W1_COST_CENTER_L_3",
+      "parent_column": "COST_CENTER_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "INV_EXPENSE_CD",
+      "parent_table": "W1_EXPENSE_CD_L",
+      "parent_column": "EXPENSE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "BUYER_CD",
+      "parent_table": "W1_BUYER_L",
+      "parent_column": "BUYER_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "MARK_UP_EXPENSE_CD",
+      "parent_table": "W1_EXPENSE_CD_L_1",
+      "parent_column": "EXPENSE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "RR_APP_REQ_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_10",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "PUR_DOC_ACTION_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_11",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "PLANNER_CD",
+      "parent_table": "W1_PLANNER_L",
+      "parent_column": "PLANNER_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "BACK_LOG_GRP_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_12",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "MAINTMGR_CD",
+      "parent_table": "W1_MAINTMGR_L",
+      "parent_column": "MAINTMGR_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "TAX_COST_CENTER_CD",
+      "parent_table": "W1_COST_CENTER_L_4",
+      "parent_column": "COST_CENTER_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "INVOICE_WRITEOFF_COST_CTR_CD",
+      "parent_table": "W1_COST_CENTER_L_5",
+      "parent_column": "COST_CENTER_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "TAX_EXPENSE_CD",
+      "parent_table": "W1_EXPENSE_CD_L_2",
+      "parent_column": "EXPENSE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "INVOICE_WRITEOFF_EXPENSE_CD",
+      "parent_table": "W1_EXPENSE_CD_L_3",
+      "parent_column": "EXPENSE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "SERVICE_COND_FLG",
+      "parent_table": "F1_EXT_LOOKUP_VAL_L_1",
+      "parent_column": "F1_EXT_LOOKUP_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "BOM_PART_ID",
+      "parent_table": "W1_BOM_PART",
+      "parent_column": "BOM_PART_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "VENDOR_LOC_ID",
+      "parent_table": "W1_VENDOR_LOC",
+      "parent_column": "VENDOR_LOC_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "PROPERTY_UNIT_CD",
+      "parent_table": "W1_PROPERTY_UNIT_L",
+      "parent_column": "PROPERTY_UNIT_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_NODE",
+      "child_column": "PARENT_NODE_ID",
+      "parent_table": "W1_NODE_1",
+      "parent_column": "NODE_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "W1_ASSET",
+      "child_column": "BO_STATUS_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L",
+      "parent_column": "BO_STATUS_CD",
+      "join_type": "inner",
+      "domain_name": "Asset___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "D1_DEVICE_ID",
+      "parent_table": "D1_DVC_CFG",
+      "parent_column": "D1_DEVICE_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_SP",
+      "child_column": "PREM_ID",
+      "parent_table": "CI_PREM",
+      "parent_column": "PREM_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_INSTALL_EVT",
+      "child_column": "D1_SP_ID",
+      "parent_table": "D1_SP_EQPMNT",
+      "parent_column": "D1_SP_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_SP_EQPMNT",
+      "child_column": "D1_DEVICE_ID",
+      "parent_table": "D1_DVC_2",
+      "parent_column": "D1_DEVICE_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_L",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "MANUFACTURER_CD",
+      "parent_table": "D1_MANUFACTURER_L",
+      "parent_column": "MANUFACTURER_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "MANUFACTURER_CD",
+      "parent_table": "D1_MODEL_L",
+      "parent_column": "MANUFACTURER_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "D1_MODEL_CD",
+      "parent_table": "D1_MODEL_L",
+      "parent_column": "D1_MODEL_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "D1_SPR_CD",
+      "parent_table": "D1_SPR_L",
+      "parent_column": "D1_SPR_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "IN_DATA_SHIFT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "inner",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "BO_STATUS_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L",
+      "parent_column": "BO_STATUS_CD",
+      "join_type": "inner",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "BO_STATUS_REASON_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_RSN_L",
+      "parent_column": "BO_STATUS_REASON_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "ARMING_REQ_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_1",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "HEAD_END_REGISTR_STATUS_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_2",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "D1_CMD_SET_CD",
+      "parent_table": "D1_COMMAND_SET_L",
+      "parent_column": "D1_CMD_SET_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "ACCESS_GRP_CD",
+      "parent_table": "CI_ACC_GRP_L",
+      "parent_column": "ACCESS_GRP_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC",
+      "child_column": "DEVICE_TYPE_CD",
+      "parent_table": "D1_DVC_TYPE_L",
+      "parent_column": "DEVICE_TYPE_CD",
+      "join_type": "inner",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_CFG",
+      "child_column": "DEVICE_CONFIG_TYPE_CD",
+      "parent_table": "D1_DVC_CFG_TYPE_L",
+      "parent_column": "DEVICE_CONFIG_TYPE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_CFG",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L_1",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_CFG",
+      "child_column": "BO_STATUS_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L_1",
+      "parent_column": "BO_STATUS_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_CFG",
+      "child_column": "TIME_ZONE_CD",
+      "parent_table": "CI_TIME_ZONE_L",
+      "parent_column": "TIME_ZONE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_CFG",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_L_1",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_CFG",
+      "child_column": "BO_STATUS_REASON_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_RSN_L_1",
+      "parent_column": "BO_STATUS_REASON_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_INSTALL_EVT",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_L_2",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_INSTALL_EVT",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L_2",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_INSTALL_EVT",
+      "child_column": "BO_STATUS_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L_2",
+      "parent_column": "BO_STATUS_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_INSTALL_EVT",
+      "child_column": "BO_STATUS_REASON_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_RSN_L_2",
+      "parent_column": "BO_STATUS_REASON_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_INSTALL_EVT",
+      "child_column": "ARM_STAT_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_3",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "CI_PREM",
+      "child_column": "TIME_ZONE_CD",
+      "parent_table": "CI_TIME_ZONE_L_1",
+      "parent_column": "TIME_ZONE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_1",
+      "child_column": "D1_DEVICE_ID",
+      "parent_table": "D1_DVC_EVT",
+      "parent_column": "D1_DEVICE_ID",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_EVT",
+      "child_column": "DVC_EVT_TYPE_CD",
+      "parent_table": "D1_DVC_EVT_TYPE_L",
+      "parent_column": "DVC_EVT_TYPE_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_EVT",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_L_4",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_EVT",
+      "child_column": "EXT_EVT_NAME_FLG",
+      "parent_table": "CI_LOOKUP_VAL_L_7",
+      "parent_column": "FIELD_VALUE",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_EVT",
+      "child_column": "D1_SPR_CD",
+      "parent_table": "D1_SPR_L_2",
+      "parent_column": "D1_SPR_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_EVT",
+      "child_column": "BO_STATUS_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L_5",
+      "parent_column": "BO_STATUS_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_EVT",
+      "child_column": "BUS_OBJ_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_L_5",
+      "parent_column": "BUS_OBJ_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    },
+    {
+      "child_table": "D1_DVC_EVT",
+      "child_column": "BO_STATUS_REASON_CD",
+      "parent_table": "F1_BUS_OBJ_STATUS_RSN_L_4",
+      "parent_column": "BO_STATUS_REASON_CD",
+      "join_type": "leftOuter",
+      "domain_name": "Device___Domain",
+      "workstream": "Meter Operations",
+      "source": "domain_join_inventory"
+    }
+  ],
+  "domain_inferred_join_count": 386
+}

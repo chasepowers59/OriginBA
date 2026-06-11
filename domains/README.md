@@ -50,6 +50,18 @@ Keep production-safe artifacts in `exports/`; use `working/` for temporary edits
 - `exports/manual_imports/PAY_TNDR_CASH_RPT_CURR_End_User_Friendly.xml`
 - `exports/manual_imports/FT_RPT_CURR_End_User_Friendly.xml`
 - `exports/manual_imports/FT_GL_DISTRIBUTION_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/ACCT_CUSTOMER_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/CASE_PREM_CONTACT_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/NEW_SERVICE_PIPELINE_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/FIELD_ACTIVITY_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/CREW_OPS_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/DEVICE_SP_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/PAY_EVENT_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/BILLABLE_CHARGE_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/SA_AGED_BAL_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/WO_PROC_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/OPS_EXCEPTION_RPT_CURR_End_User_Friendly.xml`
+- `exports/manual_imports/WORKFLOW_QUEUE_RPT_CURR_End_User_Friendly.xml`
 
 Archived patch and backup variants are in:
 - `../archive/2026-03-10/root_zip_cleanup/domain_variants/`

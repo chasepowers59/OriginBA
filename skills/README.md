@@ -5,11 +5,27 @@ Reusable execution playbooks for SQL and Jaspersoft work in this repo.
 
 ## Skills
 - `skills/sql_report_builder/SKILL.md`
+- `skills/jrxml_report_builder/SKILL.md`
 - `skills/jaspersoft_derived_table_builder/SKILL.md`
 - `skills/sql_validation_guard/SKILL.md`
 - `skills/c2m_usage_performance_validation/SKILL.md`
 - `skills/cisadm_domain_modeling/SKILL.md`
 - `skills/cisadm_reporting_gap_analysis/SKILL.md`
+
+## AI Context Bundle
+Regenerate before SQL/JRXML work when dictionaries or client health change:
+```bash
+python3 scripts/performance/build_cisadm_dictionary_coverage.py
+python3 scripts/build_domain_field_index.py
+python3 scripts/build_ai_cisadm_context.py
+python3 scripts/local/run_workstream_table_health.sh demo   # optional client merge
+python3 scripts/build_ai_cisadm_context.py --client demo
+```
+
+Key outputs:
+- `output/ai_cisadm_context.json`
+- `output/domain_field_index.json`
+- `deploy/snapshot_rollout_logs/<client>/table_health.json`
 
 ## Workflow
 1. Use `cisadm_domain_modeling` first to choose report vs Domain vs Topic vs Ad Hoc vs dashboard and to decide whether raw tables or a derived table are row-safe.
@@ -18,8 +34,10 @@ Reusable execution playbooks for SQL and Jaspersoft work in this repo.
 4. Use `sql_validation_guard` to validate parity, preserved rows, cache-sensitive behavior, and reconciliation.
 5. Use `c2m_usage_performance_validation` to execute zero-diff performance validation for billed-usage optimization work.
 6. Use `cisadm_reporting_gap_analysis` when the goal is to inventory client-specific configuration, identify missing governed layers, and document workstream reporting gaps before building artifacts.
-7. All skill workflows are read-only for DB validation unless explicitly approved otherwise.
-8. Use `scripts/performance/run_sql_quality_workflow.ps1` for deterministic static gates and optional read-only DB checks.
+7. Use `jrxml_report_builder` for domain-first JRXML creation/fixes and paired input controls.
+8. All skill workflows are read-only for DB validation unless explicitly approved otherwise.
+9. Use `scripts/performance/run_sql_quality_workflow.ps1` for deterministic static gates and optional read-only DB checks.
+10. Use `scripts/validate_jrxml_schema.py` before shipping JRXML changes.
 
 ## Knowledge Base Dependency
 All skills reference:

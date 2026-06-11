@@ -17,8 +17,9 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Iterable, List, Set
+from typing import Dict, Iterable, List, Optional, Set
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -46,6 +47,49 @@ def _read_csv_rows(path: Path) -> List[Dict[str, str]]:
         raise FileNotFoundError(f"Required CSV file not found: {path}")
     with path.open("r", encoding="utf-8-sig", newline="") as fh:
         return list(csv.DictReader(fh))
+
+
+def _load_table_stats(dictionary_dir: Path) -> Dict[str, Dict[str, Optional[int]]]:
+    tables_csv = dictionary_dir / "tables.csv"
+    if not tables_csv.exists():
+        return {}
+    stats: Dict[str, Dict[str, Optional[int]]] = {}
+    rows = _read_csv_rows(tables_csv)
+    for row in rows:
+        name = _row_get_case_insensitive(row, "TABLE_NAME").upper()
+        if not name:
+            continue
+        num_rows_raw = _row_get_case_insensitive(row, "NUM_ROWS")
+        try:
+            num_rows = int(num_rows_raw) if num_rows_raw else None
+        except ValueError:
+            num_rows = None
+        stats[name] = {
+            "num_rows": num_rows,
+            "last_analyzed": _row_get_case_insensitive(row, "LAST_ANALYZED") or None,
+        }
+    return stats
+
+
+def _stats_population_status(num_rows: Optional[int]) -> str:
+    if num_rows is None:
+        return "unknown"
+    if num_rows == 0:
+        return "empty"
+    return "populated"
+
+
+def _stats_stale(last_analyzed: Optional[str], stale_days: int = 30) -> str:
+    if not last_analyzed:
+        return "unknown"
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d"):
+        try:
+            analyzed = datetime.strptime(last_analyzed[:19], fmt)
+            cutoff = datetime.now() - timedelta(days=stale_days)
+            return "stale" if analyzed < cutoff else "fresh"
+        except ValueError:
+            continue
+    return "unknown"
 
 
 def _load_discovered_tables(dictionary_dir: Path) -> Set[str]:
@@ -178,13 +222,26 @@ def main() -> int:
     dictionary_dir.mkdir(parents=True, exist_ok=True)
 
     discovered = _load_discovered_tables(dictionary_dir)
+    table_stats = _load_table_stats(dictionary_dir)
     workstream_map = _load_workstream_tables(workstream_dict)
     domain_tables = _load_domain_tables(domain_meta)
 
     all_tables = sorted(discovered | set(workstream_map.keys()) | domain_tables)
     rows: List[Dict[str, str]] = []
+    empty_workstream = 0
+    stale_workstream = 0
     for table in all_tables:
         ws = sorted(workstream_map.get(table, set()))
+        stat = table_stats.get(table, {})
+        num_rows = stat.get("num_rows")
+        last_analyzed = stat.get("last_analyzed")
+        population_status = _stats_population_status(num_rows if isinstance(num_rows, int) else None)
+        stats_freshness = _stats_stale(last_analyzed if isinstance(last_analyzed, str) else None)
+        if table in workstream_map:
+            if population_status == "empty":
+                empty_workstream += 1
+            if stats_freshness == "stale":
+                stale_workstream += 1
         rows.append(
             {
                 "table_name": table,
@@ -192,6 +249,10 @@ def main() -> int:
                 "in_workstream_dictionary": "Y" if table in workstream_map else "N",
                 "workstreams": "|".join(ws),
                 "in_domain_metadata": "Y" if table in domain_tables else "N",
+                "num_rows": "" if num_rows is None else str(num_rows),
+                "last_analyzed": last_analyzed or "",
+                "stats_population_status": population_status,
+                "stats_freshness": stats_freshness,
             }
         )
 
@@ -204,9 +265,15 @@ def main() -> int:
             "in_workstream_dictionary",
             "workstreams",
             "in_domain_metadata",
+            "num_rows",
+            "last_analyzed",
+            "stats_population_status",
+            "stats_freshness",
         ],
     )
     _write_summary_md(out_md, discovered, workstream_map, domain_tables)
+    print(f"[INFO] Workstream tables with NUM_ROWS=0: {empty_workstream}")
+    print(f"[INFO] Workstream tables with stale stats: {stale_workstream}")
 
     print(f"[PASS] Coverage CSV written: {out_csv}")
     print(f"[PASS] Coverage summary written: {out_md}")

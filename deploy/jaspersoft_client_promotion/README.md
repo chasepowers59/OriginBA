@@ -1,32 +1,50 @@
 # Jaspersoft Client Promotion Staging
 
-Use this folder to stage DEV export ZIPs and target datasource exports before
-running the client promotion pipeline in `scripts/jaspersoft/`.
+Prepare Standard Offering import ZIPs for all six SmartCity test clients.
 
-This staging area is for Jaspersoft repository package movement only.
+## Canonical client datasources (committed)
 
-It is not part of:
+Full JDBC exports live in:
 
-- DB procedure deployment
-- SQL validation
-- snapshot refresh operations
-- Domain build engineering
+`deploy/jaspersoft_datasources/clients/`
 
-Tracked contents here are templates and folder scaffolding only.
+Each client gets its own `{Client}_DS.xml` injected into the import package —
+not a rename of `Origin_DEV_DS`.
 
-Do not commit:
+## Build all client packages
 
-- raw client export ZIPs
-- target datasource export ZIPs
-- prepared import ZIPs
-- temporary working folders
+```bash
+python3 scripts/jaspersoft/run_client_standard_offering_pipeline.py \
+  --source-zip "/path/to/standard offering.zip" \
+  --skip-archive
+```
 
-Use:
+One client only:
 
-- `incoming_exports/` for untouched source export ZIPs from Jaspersoft Server
-- `incoming_datasources/` for one target datasource export ZIP or extracted
-  folder per client org
-- `prepared_imports/` for final rewritten import ZIPs
-- `prepared_imports/_tmp/` for transient script workspaces
-- `archive/` for original DEV export ZIPs after successful preparation
-- `client_org_mapping.csv` for target org to datasource mapping
+```bash
+python3 scripts/jaspersoft/run_client_standard_offering_pipeline.py \
+  --source-zip "/path/to/standard offering.zip" \
+  --clients Ellensburg \
+  --skip-archive
+```
+
+Outputs:
+
+`prepared_imports/<Client>_Standard_Offering_import.zip`
+
+## Import
+
+Log into each **client tenant** → **Repository** → Import the matching ZIP.
+Do not import from server root (same rule as Origin_STAGE / Origin_DEV).
+
+## Mapping
+
+`client_org_mapping.csv` — org resource ID → datasource alias.
+
+## Folder layout
+
+- `incoming_datasources/` — optional drop zone for refreshed ZIP exports (gitignored)
+- `prepared_imports/` — generated import ZIPs (gitignored)
+- `archive/` — source exports after successful batch (gitignored)
+
+See [jaspersoft_client_promotion_pipeline.md](/Users/chase/OriginBA-3/docs/jaspersoft_client_promotion_pipeline.md).

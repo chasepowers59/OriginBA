@@ -19,6 +19,7 @@ FROM (
     GROUP BY ft_id
     HAVING COUNT(*) > 1
 )
+HAVING COUNT(*) > 0
 
 UNION ALL
 
@@ -39,6 +40,7 @@ FROM (
     GROUP BY bseg_id
     HAVING COUNT(*) > 1
 )
+HAVING COUNT(*) > 0
 
 UNION ALL
 
@@ -59,6 +61,7 @@ FROM (
     GROUP BY bseg_id, uom_cd, tou_cd, sqi_cd
     HAVING COUNT(*) > 1
 )
+HAVING COUNT(*) > 0
 
 UNION ALL
 
@@ -79,6 +82,7 @@ FROM (
     GROUP BY measr_comp_id, msrmt_dttm
     HAVING COUNT(*) > 1
 )
+HAVING COUNT(*) > 0
 
 UNION ALL
 
@@ -99,6 +103,7 @@ FROM (
     GROUP BY ft_id, gl_seq_nbr
     HAVING COUNT(*) > 1
 )
+HAVING COUNT(*) > 0
 
 UNION ALL
 
@@ -119,6 +124,7 @@ FROM (
     GROUP BY d1_usage_id
     HAVING COUNT(*) > 1
 )
+HAVING COUNT(*) > 0
 
 UNION ALL
 
@@ -139,3 +145,4 @@ FROM (
     GROUP BY d1_usage_id, seq_num
     HAVING COUNT(*) > 1
 )
+HAVING COUNT(*) > 0

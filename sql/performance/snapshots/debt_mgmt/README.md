@@ -38,12 +38,19 @@ This is the best high-level debt fact because debt aging is financial truth, whi
   - arrangement pipeline and eligibility/result monitoring
 
 ### 4. Write-off snapshot
-- Proposed table: `CISADM.WO_PROC_RPT_CURR`
+- Table: `CISADM.WO_PROC_RPT_CURR`
 - Grain: one row per `WO_PROC_ID`
 - Purpose:
   - write-off process status, timing, exposure, and recovery tracking
 
 Prefer `C1_BI_WOPROC_VW` when it is populated and tenant-valid because it is already a write-off-focused BI shape.
+
+### 6. SA aged balance snapshot
+- Table: `CISADM.SA_AGED_BAL_RPT_CURR`
+- Grain: one row per `SA_ID`
+- Purpose:
+  - current SA-level aged debt exposure from governed `CI_FT` arrears logic
+  - replacement for current-state `CMS_SA_SNAPSHOT` aged-balance Ad Hoc views
 
 ### 5. Severance / agency child snapshots
 - Build only if the tenant actually uses them and the tables are populated.
@@ -90,3 +97,17 @@ Reason:
 - `coll_proc/03_schedule_snapshot_job.sql`
 - `coll_proc/04_validation_queries.sql`
 - `coll_proc/COLL_PROC_RPT_CURR_End_User_Friendly.xml`
+
+## Implemented SA aged-balance snapshot
+
+- `sa_aged_bal/01_create_snapshot_table.sql`
+- `sa_aged_bal/02a_full_history_refresh_procedure.sql`
+- `sa_aged_bal/02_refresh_snapshot_procedure.sql`
+- `sa_aged_bal/04_validation_queries.sql`
+
+## Implemented write-off snapshot
+
+- `wo_proc/01_create_snapshot_table.sql`
+- `wo_proc/02a_full_history_refresh_procedure.sql`
+- `wo_proc/02_refresh_snapshot_procedure.sql`
+- `wo_proc/04_validation_queries.sql`

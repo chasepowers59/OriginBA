@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="WORKFLOW_QUEUE_RPT_CURR" label="Workflow Queue Snapshot" resourceId="WORKFLOW_QUEUE_RPT_CURR" />
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string />
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="WORKFLOW_QUEUE_RPT_CURR_AUDIT" label="Snapshot Audit" resourceId="WORKFLOW_QUEUE_RPT_CURR">
+      <items>
+        <item id="LOAD_DTTM" label="Snapshot Load Date Time" resourceId="WORKFLOW_QUEUE_RPT_CURR.LOAD_DTTM" />
+      </items>
+    </itemGroup>
+    <itemGroup id="WORKFLOW_QUEUE_RPT_CURR_QUEUE" label="Queue Keys" resourceId="WORKFLOW_QUEUE_RPT_CURR">
+      <items>
+        <item id="QUEUE_SOURCE" label="Queue Source" resourceId="WORKFLOW_QUEUE_RPT_CURR.QUEUE_SOURCE" />
+        <item id="QUEUE_NATURAL_KEY" label="Queue Natural Key" resourceId="WORKFLOW_QUEUE_RPT_CURR.QUEUE_NATURAL_KEY" />
+        <item id="QUEUE_ANCHOR_DTTM" label="Queue Anchor Date Time" resourceId="WORKFLOW_QUEUE_RPT_CURR.QUEUE_ANCHOR_DTTM" />
+      </items>
+    </itemGroup>
+    <itemGroup id="WORKFLOW_QUEUE_RPT_CURR_TODO" label="To-Do Entry" resourceId="WORKFLOW_QUEUE_RPT_CURR">
+      <items>
+        <item id="TD_ENTRY_ID" label="To-Do Entry ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.TD_ENTRY_ID" />
+        <item id="TD_TYPE_CD" label="To-Do Type Code" resourceId="WORKFLOW_QUEUE_RPT_CURR.TD_TYPE_CD" />
+        <item id="TD_TYPE_DESC" label="To-Do Type Description" resourceId="WORKFLOW_QUEUE_RPT_CURR.TD_TYPE_DESC" />
+        <item id="ENTRY_STATUS_FLG" label="Entry Status Code" resourceId="WORKFLOW_QUEUE_RPT_CURR.ENTRY_STATUS_FLG" />
+        <item id="ENTRY_STATUS_DESC" label="Entry Status Description" resourceId="WORKFLOW_QUEUE_RPT_CURR.ENTRY_STATUS_DESC" />
+        <item id="TD_PRIORITY_FLG" label="To-Do Priority Code" resourceId="WORKFLOW_QUEUE_RPT_CURR.TD_PRIORITY_FLG" />
+        <item id="TD_PRIORITY_DESC" label="To-Do Priority Description" resourceId="WORKFLOW_QUEUE_RPT_CURR.TD_PRIORITY_DESC" />
+        <item id="ROLE_ID" label="Role ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.ROLE_ID" />
+        <item id="ROLE_DESC" label="Role Description" resourceId="WORKFLOW_QUEUE_RPT_CURR.ROLE_DESC" />
+        <item id="ASSIGNED_TO" label="Assigned To" resourceId="WORKFLOW_QUEUE_RPT_CURR.ASSIGNED_TO" />
+        <item id="ASSIGNED_TO_NAME" label="Assigned To Name" resourceId="WORKFLOW_QUEUE_RPT_CURR.ASSIGNED_TO_NAME" />
+        <item id="ASSIGNED_USER_ID" label="Assigned User ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.ASSIGNED_USER_ID" />
+        <item id="ASSIGNED_USER_NAME" label="Assigned User Name" resourceId="WORKFLOW_QUEUE_RPT_CURR.ASSIGNED_USER_NAME" />
+        <item id="COMPLETE_USER_ID" label="Complete User ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.COMPLETE_USER_ID" />
+        <item id="COMPLETE_USER_NAME" label="Complete User Name" resourceId="WORKFLOW_QUEUE_RPT_CURR.COMPLETE_USER_NAME" />
+        <item id="TD_CRE_DTTM" label="To-Do Create Date Time" resourceId="WORKFLOW_QUEUE_RPT_CURR.TD_CRE_DTTM" />
+        <item id="ASSIGNED_DTTM" label="Assigned Date Time" resourceId="WORKFLOW_QUEUE_RPT_CURR.ASSIGNED_DTTM" />
+        <item id="COMPLETE_DTTM" label="Complete Date Time" resourceId="WORKFLOW_QUEUE_RPT_CURR.COMPLETE_DTTM" />
+        <item id="TD_BATCH_CD" label="To-Do Batch Code" resourceId="WORKFLOW_QUEUE_RPT_CURR.TD_BATCH_CD" />
+        <item id="TD_BATCH_NBR" label="To-Do Batch Number" resourceId="WORKFLOW_QUEUE_RPT_CURR.TD_BATCH_NBR" />
+        <item id="MESSAGE_CAT_NBR" label="Message Cat Number" resourceId="WORKFLOW_QUEUE_RPT_CURR.MESSAGE_CAT_NBR" />
+        <item id="MESSAGE_NBR" label="Message Number" resourceId="WORKFLOW_QUEUE_RPT_CURR.MESSAGE_NBR" />
+        <item id="MESSAGE_TEXT" label="Message Text" resourceId="WORKFLOW_QUEUE_RPT_CURR.MESSAGE_TEXT" />
+        <item id="TD_COMMENTS" label="To-Do Comments" resourceId="WORKFLOW_QUEUE_RPT_CURR.TD_COMMENTS" />
+        <item id="DAYS_OLD" label="Days Old" resourceId="WORKFLOW_QUEUE_RPT_CURR.DAYS_OLD" />
+        <item id="ASSIGNED_TM_DAYS" label="Assigned Time Days" resourceId="WORKFLOW_QUEUE_RPT_CURR.ASSIGNED_TM_DAYS" />
+        <item id="ASSIGNED_TM_MINS" label="Assigned Time Minutes" resourceId="WORKFLOW_QUEUE_RPT_CURR.ASSIGNED_TM_MINS" />
+        <item id="COMPLETE_TM_DAYS" label="Complete Time Days" resourceId="WORKFLOW_QUEUE_RPT_CURR.COMPLETE_TM_DAYS" />
+        <item id="COMPLETE_TM_MINS" label="Complete Time Minutes" resourceId="WORKFLOW_QUEUE_RPT_CURR.COMPLETE_TM_MINS" />
+        <item id="UNASSIGNED_TM_DAYS" label="Unassigned Time Days" resourceId="WORKFLOW_QUEUE_RPT_CURR.UNASSIGNED_TM_DAYS" />
+        <item id="UNASSIGNED_TM_MINS" label="Unassigned Time Minutes" resourceId="WORKFLOW_QUEUE_RPT_CURR.UNASSIGNED_TM_MINS" />
+      </items>
+    </itemGroup>
+    <itemGroup id="WORKFLOW_QUEUE_RPT_CURR_FK_OVERLAY" label="Foreign Key Overlay" resourceId="WORKFLOW_QUEUE_RPT_CURR">
+      <items>
+        <item id="FK_ACCT_ID" label="Foreign Key Account ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.FK_ACCT_ID" />
+        <item id="FK_SA_ID" label="Foreign Key Service Agreement ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.FK_SA_ID" />
+        <item id="FK_PREM_ID" label="Foreign Key Premise ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.FK_PREM_ID" />
+        <item id="FK_PER_ID" label="Foreign Key Person ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.FK_PER_ID" />
+        <item id="FK_D1_SP_ID" label="Foreign Key D1 Service Point ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.FK_D1_SP_ID" />
+        <item id="FK_US_ID" label="Foreign Key Usage Subscription ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.FK_US_ID" />
+        <item id="FK_ASSET_ID" label="Foreign Key Asset ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.FK_ASSET_ID" />
+        <item id="FK_D1_DEVICE_ID" label="Foreign Key D1 Device ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.FK_D1_DEVICE_ID" />
+        <item id="FK_MEASR_COMP_ID" label="Foreign Key Measr Comp ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.FK_MEASR_COMP_ID" />
+        <item id="FK_CONTACT_ID" label="Foreign Key Contact ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.FK_CONTACT_ID" />
+      </items>
+    </itemGroup>
+    <itemGroup id="WORKFLOW_QUEUE_RPT_CURR_PERSON_PREMISE" label="Person And Premise" resourceId="WORKFLOW_QUEUE_RPT_CURR">
+      <items>
+        <item id="PERSON_NAME_UPR" label="Person Name Uppercase" resourceId="WORKFLOW_QUEUE_RPT_CURR.PERSON_NAME_UPR" />
+        <item id="PREM_ADDRESS1" label="Premise Address1" resourceId="WORKFLOW_QUEUE_RPT_CURR.PREM_ADDRESS1" />
+        <item id="PREM_ADDRESS1_UPR" label="Premise Address1 Uppercase" resourceId="WORKFLOW_QUEUE_RPT_CURR.PREM_ADDRESS1_UPR" />
+        <item id="PREM_CITY" label="Premise City" resourceId="WORKFLOW_QUEUE_RPT_CURR.PREM_CITY" />
+        <item id="PREM_STATE" label="Premise State" resourceId="WORKFLOW_QUEUE_RPT_CURR.PREM_STATE" />
+        <item id="PREM_POSTAL" label="Premise Postal" resourceId="WORKFLOW_QUEUE_RPT_CURR.PREM_POSTAL" />
+        <item id="PREM_TYPE_CD" label="Premise Type Code" resourceId="WORKFLOW_QUEUE_RPT_CURR.PREM_TYPE_CD" />
+        <item id="PREM_TYPE_DESC" label="Premise Type Description" resourceId="WORKFLOW_QUEUE_RPT_CURR.PREM_TYPE_DESC" />
+      </items>
+    </itemGroup>
+    <itemGroup id="WORKFLOW_QUEUE_RPT_CURR_PREMISE_ATTR" label="Premise Attributes" resourceId="WORKFLOW_QUEUE_RPT_CURR">
+      <items>
+        <item id="TREND_AREA_CD" label="Trend Area Code" resourceId="WORKFLOW_QUEUE_RPT_CURR.TREND_AREA_CD" />
+        <item id="TREND_AREA_DESC" label="Trend Area Description" resourceId="WORKFLOW_QUEUE_RPT_CURR.TREND_AREA_DESC" />
+        <item id="TIME_ZONE_CD" label="Time Zone Code" resourceId="WORKFLOW_QUEUE_RPT_CURR.TIME_ZONE_CD" />
+        <item id="TIME_ZONE_DESC" label="Time Zone Description" resourceId="WORKFLOW_QUEUE_RPT_CURR.TIME_ZONE_DESC" />
+        <item id="POSTAL_5" label="Postal 5" resourceId="WORKFLOW_QUEUE_RPT_CURR.POSTAL_5" />
+      </items>
+    </itemGroup>
+    <itemGroup id="WORKFLOW_QUEUE_RPT_CURR_BATCH" label="Batch Process" resourceId="WORKFLOW_QUEUE_RPT_CURR">
+      <items>
+        <item id="SCHEDULER_ID" label="Scheduler ID" resourceId="WORKFLOW_QUEUE_RPT_CURR.SCHEDULER_ID" />
+        <item id="BATCH_CD" label="Batch Code" resourceId="WORKFLOW_QUEUE_RPT_CURR.BATCH_CD" />
+        <item id="BATCH_CD_DESC" label="Batch Code Description" resourceId="WORKFLOW_QUEUE_RPT_CURR.BATCH_CD_DESC" />
+        <item id="BATCH_NBR" label="Batch Number" resourceId="WORKFLOW_QUEUE_RPT_CURR.BATCH_NBR" />
+        <item id="BATCH_RERUN_NBR" label="Batch Rerun Number" resourceId="WORKFLOW_QUEUE_RPT_CURR.BATCH_RERUN_NBR" />
+        <item id="BATCH_THREAD_NBR" label="Batch Thread Number" resourceId="WORKFLOW_QUEUE_RPT_CURR.BATCH_THREAD_NBR" />
+        <item id="BATCH_BUS_DT" label="Batch Business Date" resourceId="WORKFLOW_QUEUE_RPT_CURR.BATCH_BUS_DT" />
+        <item id="BATCH_START_DTTM" label="Batch Start Date Time" resourceId="WORKFLOW_QUEUE_RPT_CURR.BATCH_START_DTTM" />
+        <item id="BATCH_END_DTTM" label="Batch End Date Time" resourceId="WORKFLOW_QUEUE_RPT_CURR.BATCH_END_DTTM" />
+        <item id="BATCH_RUN_STATUS" label="Batch Run Status" resourceId="WORKFLOW_QUEUE_RPT_CURR.BATCH_RUN_STATUS" />
+        <item id="BATCH_RUN_STATUS_DESC" label="Batch Run Status Description" resourceId="WORKFLOW_QUEUE_RPT_CURR.BATCH_RUN_STATUS_DESC" />
+        <item id="BATCH_DO_NOT_RESTART_SW" label="Batch Do Not Restart Switch" resourceId="WORKFLOW_QUEUE_RPT_CURR.BATCH_DO_NOT_RESTART_SW" />
+        <item id="THREAD_STATUS" label="Thread Status" resourceId="WORKFLOW_QUEUE_RPT_CURR.THREAD_STATUS" />
+        <item id="THREAD_STATUS_DESC" label="Thread Status Description" resourceId="WORKFLOW_QUEUE_RPT_CURR.THREAD_STATUS_DESC" />
+        <item id="THREAD_LOG_FILE_NAME" label="Thread Log File Name" resourceId="WORKFLOW_QUEUE_RPT_CURR.THREAD_LOG_FILE_NAME" />
+        <item id="THREAD_RETRY_CNT" label="Thread Retry Count" resourceId="WORKFLOW_QUEUE_RPT_CURR.THREAD_RETRY_CNT" />
+        <item id="REC_PROC_CNT" label="Record Process Count" resourceId="WORKFLOW_QUEUE_RPT_CURR.REC_PROC_CNT" />
+        <item id="REC_ERR_CNT" label="Record Error Count" resourceId="WORKFLOW_QUEUE_RPT_CURR.REC_ERR_CNT" />
+        <item id="INST_START_DTTM" label="Instance Start Date Time" resourceId="WORKFLOW_QUEUE_RPT_CURR.INST_START_DTTM" />
+        <item id="INST_END_DTTM" label="Instance End Date Time" resourceId="WORKFLOW_QUEUE_RPT_CURR.INST_END_DTTM" />
+        <item id="INST_FILE_DETAILS" label="Instance File Details" resourceId="WORKFLOW_QUEUE_RPT_CURR.INST_FILE_DETAILS" />
+        <item id="DURATION_HOURS" label="Duration Hours" resourceId="WORKFLOW_QUEUE_RPT_CURR.DURATION_HOURS" />
+        <item id="DURATION_MINS" label="Duration Minutes" resourceId="WORKFLOW_QUEUE_RPT_CURR.DURATION_MINS" />
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="WORKFLOW_QUEUE_RPT_CURR" datasourceId="Origin_DEV_DS" datasourceTableName="WORKFLOW_QUEUE_RPT_CURR" schemaAlias="CISADM">
+      <fieldList>
+        <field id="QUEUE_SOURCE" type="java.lang.String" />
+        <field id="QUEUE_NATURAL_KEY" type="java.lang.String" />
+        <field id="QUEUE_ANCHOR_DTTM" type="java.sql.Timestamp" />
+        <field id="TD_ENTRY_ID" type="java.lang.String" />
+        <field id="TD_TYPE_CD" type="java.lang.String" />
+        <field id="TD_TYPE_DESC" type="java.lang.String" />
+        <field id="ENTRY_STATUS_FLG" type="java.lang.String" />
+        <field id="ENTRY_STATUS_DESC" type="java.lang.String" />
+        <field id="TD_PRIORITY_FLG" type="java.lang.String" />
+        <field id="TD_PRIORITY_DESC" type="java.lang.String" />
+        <field id="ROLE_ID" type="java.lang.String" />
+        <field id="ROLE_DESC" type="java.lang.String" />
+        <field id="ASSIGNED_TO" type="java.lang.String" />
+        <field id="ASSIGNED_TO_NAME" type="java.lang.String" />
+        <field id="ASSIGNED_USER_ID" type="java.lang.String" />
+        <field id="ASSIGNED_USER_NAME" type="java.lang.String" />
+        <field id="COMPLETE_USER_ID" type="java.lang.String" />
+        <field id="COMPLETE_USER_NAME" type="java.lang.String" />
+        <field id="TD_CRE_DTTM" type="java.sql.Timestamp" />
+        <field id="ASSIGNED_DTTM" type="java.sql.Timestamp" />
+        <field id="COMPLETE_DTTM" type="java.sql.Timestamp" />
+        <field id="TD_BATCH_CD" type="java.lang.String" />
+        <field id="TD_BATCH_NBR" type="java.math.BigDecimal" />
+        <field id="MESSAGE_CAT_NBR" type="java.math.BigDecimal" />
+        <field id="MESSAGE_NBR" type="java.math.BigDecimal" />
+        <field id="MESSAGE_TEXT" type="java.lang.String" />
+        <field id="TD_COMMENTS" type="java.lang.String" />
+        <field id="DAYS_OLD" type="java.math.BigDecimal" />
+        <field id="ASSIGNED_TM_DAYS" type="java.math.BigDecimal" />
+        <field id="ASSIGNED_TM_MINS" type="java.math.BigDecimal" />
+        <field id="COMPLETE_TM_DAYS" type="java.math.BigDecimal" />
+        <field id="COMPLETE_TM_MINS" type="java.math.BigDecimal" />
+        <field id="UNASSIGNED_TM_DAYS" type="java.math.BigDecimal" />
+        <field id="UNASSIGNED_TM_MINS" type="java.math.BigDecimal" />
+        <field id="FK_ACCT_ID" type="java.lang.String" />
+        <field id="FK_SA_ID" type="java.lang.String" />
+        <field id="FK_PREM_ID" type="java.lang.String" />
+        <field id="FK_PER_ID" type="java.lang.String" />
+        <field id="FK_D1_SP_ID" type="java.lang.String" />
+        <field id="FK_US_ID" type="java.lang.String" />
+        <field id="FK_ASSET_ID" type="java.lang.String" />
+        <field id="FK_D1_DEVICE_ID" type="java.lang.String" />
+        <field id="FK_MEASR_COMP_ID" type="java.lang.String" />
+        <field id="FK_CONTACT_ID" type="java.lang.String" />
+        <field id="PERSON_NAME_UPR" type="java.lang.String" />
+        <field id="PREM_ADDRESS1" type="java.lang.String" />
+        <field id="PREM_ADDRESS1_UPR" type="java.lang.String" />
+        <field id="PREM_CITY" type="java.lang.String" />
+        <field id="PREM_STATE" type="java.lang.String" />
+        <field id="PREM_POSTAL" type="java.lang.String" />
+        <field id="PREM_TYPE_CD" type="java.lang.String" />
+        <field id="PREM_TYPE_DESC" type="java.lang.String" />
+        <field id="TREND_AREA_CD" type="java.lang.String" />
+        <field id="TREND_AREA_DESC" type="java.lang.String" />
+        <field id="TIME_ZONE_CD" type="java.lang.String" />
+        <field id="TIME_ZONE_DESC" type="java.lang.String" />
+        <field id="POSTAL_5" type="java.lang.String" />
+        <field id="SCHEDULER_ID" type="java.math.BigDecimal" />
+        <field id="BATCH_CD" type="java.lang.String" />
+        <field id="BATCH_CD_DESC" type="java.lang.String" />
+        <field id="BATCH_NBR" type="java.math.BigDecimal" />
+        <field id="BATCH_RERUN_NBR" type="java.math.BigDecimal" />
+        <field id="BATCH_THREAD_NBR" type="java.math.BigDecimal" />
+        <field id="BATCH_BUS_DT" type="java.sql.Timestamp" />
+        <field id="BATCH_START_DTTM" type="java.sql.Timestamp" />
+        <field id="BATCH_END_DTTM" type="java.sql.Timestamp" />
+        <field id="BATCH_RUN_STATUS" type="java.lang.String" />
+        <field id="BATCH_RUN_STATUS_DESC" type="java.lang.String" />
+        <field id="BATCH_DO_NOT_RESTART_SW" type="java.lang.String" />
+        <field id="THREAD_STATUS" type="java.lang.String" />
+        <field id="THREAD_STATUS_DESC" type="java.lang.String" />
+        <field id="THREAD_LOG_FILE_NAME" type="java.lang.String" />
+        <field id="THREAD_RETRY_CNT" type="java.math.BigDecimal" />
+        <field id="REC_PROC_CNT" type="java.math.BigDecimal" />
+        <field id="REC_ERR_CNT" type="java.math.BigDecimal" />
+        <field id="INST_START_DTTM" type="java.sql.Timestamp" />
+        <field id="INST_END_DTTM" type="java.sql.Timestamp" />
+        <field id="INST_FILE_DETAILS" type="java.lang.String" />
+        <field id="DURATION_HOURS" type="java.math.BigDecimal" />
+        <field id="DURATION_MINS" type="java.math.BigDecimal" />
+        <field id="LOAD_DTTM" type="java.sql.Timestamp" />
+      </fieldList>
+    </jdbcTable>
+  </resources>
+</schema>

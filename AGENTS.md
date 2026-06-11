@@ -15,8 +15,9 @@ Build and maintain Oracle C2M + Jaspersoft Studio/Server reports using **Domain-
 
 ## Source of Truth
 1. `output/workstream_reporting_dictionary.json`
-2. `Domain Designs.xlsx`
-3. Exported Domain schema files (when provided)
+2. `output/ai_cisadm_context.json`
+3. `Domain Designs.xlsx`
+4. Exported Domain schema files (when provided)
 
 ## Operating References
 1. `docs/c2m_jaspersoft_delivery_playbook.md`

@@ -11,10 +11,22 @@ Build Oracle SQL datasets for C2M reporting without losing required rows, changi
 - Known validation slice for parity testing.
 
 ## Required References
+- `output/ai_cisadm_context.json`
+- `docs/assistant_skills/cisadm_sql_prompt_guide.md`
 - `docs/c2m_jaspersoft_delivery_playbook.md`
 - `knowledge_base/jaspersoft_artifact_model_and_performance.md`
 - `knowledge_base/oracle_c2m_query_patterns.md`
+- `knowledge_base/c2m_cisadm/cisadm_core_model.md`
 - `knowledge_base/billing_cycle_reporting_semantics.md`
+
+## Pre-Steps (mandatory)
+1. Identify the workstream from the business question.
+2. Load `output/ai_cisadm_context.json` for candidate tables, join hints, and population status.
+3. If client-specific accuracy matters, confirm live table health:
+   - `python3 scripts/local/run_workstream_table_health.sh <client>`
+   - or inspect `deploy/snapshot_rollout_logs/<client>/table_health.json`
+4. Do not use tables marked `population_status: empty` or `missing` as the driving population without documenting the gap or choosing a snapshot/alternate source.
+5. State driving population, output grain, and validation slice before writing joins.
 
 ## Steps
 1. Define the driving population, output grain, event scope, and validation slice before writing joins.

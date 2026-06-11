@@ -18,6 +18,9 @@ from typing import Iterable, List, Sequence, Tuple
 ORG_ROOT_PREFIX = "resources/organizations/organization_1/organizations/"
 FAVORITES_ROOT_PREFIX = "favorites/organizations/organization_1/organizations/"
 URI_PATTERN = re.compile(r"/organizations/organization_1/organizations/[A-Za-z0-9_./-]+")
+PUBLIC_DASHBOARD_TEMPLATE_URI = "/public/templates/actual_size.820.jrxml"
+PUBLIC_DASHBOARD_TEMPLATE_XML = "resources/public/templates/actual_size.820.jrxml.xml"
+PUBLIC_DASHBOARD_TEMPLATE_DATA = "resources/public/templates/actual_size.820.jrxml.data"
 
 
 @dataclass
@@ -47,8 +50,18 @@ def parse_args() -> argparse.Namespace:
         help="Match full org-scoped URIs or org-relative /SmartCity and /DataSource paths.",
     )
     parser.add_argument(
+        "--repository-layout",
+        choices=("organizations_tree", "tenant_root"),
+        default="organizations_tree",
+        help="organizations_tree: org-scoped paths; tenant_root: resources/SmartCity + resources/DataSource.",
+    )
+    parser.add_argument(
+        "--tenant-id",
+        help="Expected index.xml rootTenantId for tenant_root packages (omit when importing into existing tenant).",
+    )
+    parser.add_argument(
         "--import-module-folder-uri",
-        help="Expected full org-scoped index.xml module folder URI for import wrapper validation.",
+        help="Expected index.xml module folder URI (/SmartCity/... for tenant_root).",
     )
     return parser.parse_args()
 
@@ -89,6 +102,17 @@ def verify_index_resource(index_text: str, expected_resource: str) -> bool:
     return False
 
 
+def verify_root_tenant_id(index_text: str, expected_tenant_id: str | None) -> bool:
+    root = ET.fromstring(index_text)
+    for prop in root.findall("property"):
+        if prop.get("name") == "rootTenantId":
+            actual = (prop.get("value") or "").strip()
+            if expected_tenant_id is None:
+                return not actual
+            return actual == expected_tenant_id
+    return expected_tenant_id is None
+
+
 def verify_zip(
     zip_path: str,
     target_org: str,
@@ -97,6 +121,8 @@ def verify_zip(
     source_ds: str | None,
     expect_datasource_overlay: bool,
     repository_uri_style: str = "full",
+    repository_layout: str = "organizations_tree",
+    tenant_id: str | None = None,
     import_module_folder_uri: str | None = None,
 ) -> VerificationResult:
     messages: List[str] = []
@@ -108,28 +134,52 @@ def verify_zip(
         if index_text is None:
             return VerificationResult(False, ["missing index.xml at ZIP root"])
 
+        tenant_root_layout = repository_layout == "tenant_root"
         org_root = f"{ORG_ROOT_PREFIX}{target_org}/"
         favorites_root = f"{FAVORITES_ROOT_PREFIX}{target_org}/"
         datasource_xml = (
-            f"{ORG_ROOT_PREFIX}{target_org}/DataSource/{target_ds}.xml"
+            f"resources/DataSource/{target_ds}.xml"
+            if tenant_root_layout
+            else f"{ORG_ROOT_PREFIX}{target_org}/DataSource/{target_ds}.xml"
         )
-        org_relative_uris = repository_uri_style == "org_relative"
+        org_relative_uris = repository_uri_style == "org_relative" or tenant_root_layout
         datasource_resource = (
-            f"/organizations/organization_1/organizations/{target_org}/DataSource/{target_ds}"
+            f"/DataSource/{target_ds}"
+            if tenant_root_layout
+            else f"/organizations/organization_1/organizations/{target_org}/DataSource/{target_ds}"
         )
 
-        if any_name_contains(names, org_root):
-            messages.append(f"org root present: {org_root}")
-        else:
-            ok = False
-            messages.append(f"missing org root: {org_root}")
-
-        if any_name_contains(names, FAVORITES_ROOT_PREFIX):
-            if any_name_contains(names, favorites_root):
-                messages.append(f"favorites root present: {favorites_root}")
+        if tenant_root_layout:
+            smartcity_root = "resources/SmartCity/"
+            if any_name_contains(names, smartcity_root):
+                messages.append(f"tenant-root SmartCity folder present: {smartcity_root}")
             else:
                 ok = False
-                messages.append(f"favorites exist but target org root is missing: {favorites_root}")
+                messages.append(f"missing tenant-root SmartCity folder: {smartcity_root}")
+
+            if verify_root_tenant_id(index_text, tenant_id):
+                if tenant_id:
+                    messages.append(f"index.xml rootTenantId matches: {tenant_id}")
+                else:
+                    messages.append("index.xml has no rootTenantId (existing-tenant import)")
+            else:
+                ok = False
+                messages.append(
+                    f"index.xml rootTenantId mismatch: expected {tenant_id!r}"
+                )
+        else:
+            if any_name_contains(names, org_root):
+                messages.append(f"org root present: {org_root}")
+            else:
+                ok = False
+                messages.append(f"missing org root: {org_root}")
+
+            if any_name_contains(names, FAVORITES_ROOT_PREFIX):
+                if any_name_contains(names, favorites_root):
+                    messages.append(f"favorites root present: {favorites_root}")
+                else:
+                    ok = False
+                    messages.append(f"favorites exist but target org root is missing: {favorites_root}")
 
         if expect_datasource_overlay:
             if datasource_xml in names:
@@ -143,6 +193,19 @@ def verify_zip(
             else:
                 ok = False
                 messages.append(f"index.xml missing repository resource: {datasource_resource}")
+
+            if tenant_root_layout and verify_index_resource(
+                index_text, PUBLIC_DASHBOARD_TEMPLATE_URI
+            ):
+                for template_path in (
+                    PUBLIC_DASHBOARD_TEMPLATE_XML,
+                    PUBLIC_DASHBOARD_TEMPLATE_DATA,
+                ):
+                    if template_path in names:
+                        messages.append(f"public dashboard template present: {template_path}")
+                    else:
+                        ok = False
+                        messages.append(f"missing public dashboard template file: {template_path}")
 
             if import_module_folder_uri:
                 index_root = ET.fromstring(index_text)
@@ -175,9 +238,10 @@ def verify_zip(
         leftover_hits: List[Tuple[str, str]] = []
         leftover_org_uri_hits: List[str] = []
         org_prefix = f"/organizations/organization_1/organizations/{target_org}/"
+        effective_source_ds = source_ds if source_ds and source_ds != target_ds else None
         check_terms: Sequence[Tuple[str, str | None]] = (
             ("source org", source_org),
-            ("source datasource", source_ds),
+            ("source datasource", effective_source_ds),
         )
 
         for name in names:
@@ -240,9 +304,11 @@ def verify_zip(
         if source_org and any_name_contains(names, source_org):
             ok = False
             messages.append(f"leftover source org path found in ZIP names: {source_org}")
-        if source_ds and any_name_contains(names, source_ds):
+        if effective_source_ds and any_name_contains(names, effective_source_ds):
             ok = False
-            messages.append(f"leftover source datasource path found in ZIP names: {source_ds}")
+            messages.append(
+                f"leftover source datasource path found in ZIP names: {effective_source_ds}"
+            )
 
         if leftover_hits:
             ok = False
@@ -271,6 +337,8 @@ def main() -> int:
         source_ds=args.source_ds,
         expect_datasource_overlay=args.expect_datasource_overlay,
         repository_uri_style=args.repository_uri_style,
+        repository_layout=args.repository_layout,
+        tenant_id=args.tenant_id,
         import_module_folder_uri=args.import_module_folder_uri,
     )
 

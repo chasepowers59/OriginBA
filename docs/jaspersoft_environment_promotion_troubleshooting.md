@@ -13,6 +13,68 @@ Environment packages must use `repository_layout: tenant_root` in
 `environment_profiles.json`. The pipeline repackages DEV exports into this layout
 before import.
 
+## Error: Provided zip file is not valid JasperReports Server export file
+
+Jaspersoft rejects the ZIP before import when the export manifest does not match a
+real server export.
+
+Required contract:
+
+1. `index.xml` element order:
+   - `property keyalias`
+   - `module repositoryResources`
+   - `module favorites`
+   - `property pathProcessorId`
+   - `property jsVersion`
+   - `property encrypted`
+   - omit `rootTenantId` when importing inside an existing tenant
+2. Empty `favorites/` directory at ZIP root (ZIP entry must use `ZIP_DEFLATED`, not `ZIP_STORED`)
+3. `index.xml` must be the **last** ZIP entry
+4. `index.xml` must use compact JRS formatting (`<module id="favorites"/>`, not spaced self-closing tags)
+5. Internal servers (`Origin_STAGE`, `Origin_DEV`) use a different export encryption key
+   than demo/test exports. For those environments, set `use_canonical_index_encryption:
+   true` and `light_touch_tenant_root: true` in the profile so the package keeps the
+   source ZIP entry order and uses the target server's `keyalias`/`encrypted` metadata
+6. Demo/external promotions can keep the source export `keyalias`/`encrypted` values when
+   importing onto the same server family that produced the export
+
+Pipeline mistakes to avoid:
+
+- Setting `rootTenantId=Origin_STAGE` on a tenant-root content ZIP and importing from
+  server root → `Import of an organization to the root is not allowed`
+- Replacing source-export `keyalias`/`encrypted` with canonical datasource index metadata
+  on a large content ZIP
+
+## Error: Import of an organization to the root is not allowed (Origin_STAGE)
+
+### Meaning
+
+The ZIP includes `rootTenantId=Origin_STAGE` in `index.xml`. JRS interprets that as
+“import the `Origin_STAGE` organization into server root,” which is blocked.
+
+Tenant-root Standard Offering packages are **content imports** (folders under
+`/SmartCity/Report/Standard_Offering`), not organization imports.
+
+### Fix
+
+1. Rebuild with `import_into_existing_tenant: true` for `origin_stage` (omits
+   `rootTenantId` from `index.xml`).
+2. Import **while scoped to the `Origin_STAGE` tenant**:
+   - Log in as a user with access to `Origin_STAGE`
+   - Open **Repository** inside that tenant (not server-root Manage → Organizations)
+   - **Import** `standard_offering_Origin_STAGE_import.zip`
+
+Do not use server-root organization import for this package shape. The legacy 102-report
+package worked from root because it used `rootTenantId=organizations` and the full
+`organizations/organization_1/...` tree — a different import contract.
+
+Rebuild after fixing:
+
+```bash
+python3 scripts/jaspersoft/run_internal_standard_offering_pipeline.py \
+  --source-zip "/path/to/standard offering.zip"
+```
+
 ## Warning: Reference resource /public/templates/actual_size.820.jrxml not found (dashboards)
 
 Dashboards reference a shared JRXML layout template at `/public/templates/actual_size.820.jrxml`.
@@ -20,8 +82,8 @@ That path is **not** part of the SmartCity export tree. Even if the template alr
 the repository UI under Public, the import batch only resolves references that are **included in
 the same ZIP** (listed in `index.xml`).
 
-The `origin_demo` pipeline now bundles the template from
-`deploy/jaspersoft_environment_promotion/bundled/public_dashboard_template/` and adds:
+The environment pipelines bundle the template from
+`deploy/jaspersoft_environment_promotion/bundled/public_dashboard_template/` and add:
 
 ```xml
 <resource>/public/templates/actual_size.820.jrxml</resource>

@@ -49,6 +49,8 @@ class EnvironmentProfile:
     repository_layout: str = "organizations_tree"
     tenant_id: str | None = None
     import_into_existing_tenant: bool = True
+    light_touch_tenant_root: bool = False
+    use_canonical_index_encryption: bool = False
 
     @property
     def output_zip_name(self) -> str:
@@ -162,6 +164,10 @@ def _parse_profile(environment_id: str, payload: Any) -> EnvironmentProfile:
         tenant_id=tenant_id,
         import_into_existing_tenant=bool(
             payload.get("import_into_existing_tenant", True)
+        ),
+        light_touch_tenant_root=bool(payload.get("light_touch_tenant_root", False)),
+        use_canonical_index_encryption=bool(
+            payload.get("use_canonical_index_encryption", False)
         ),
         datasource=DatasourceProfile(
             label=str(datasource_payload.get("label") or target_ds),

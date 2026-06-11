@@ -25,6 +25,25 @@ Constraints:
 - No subreports unless requested
 - Studio/Server 9.x schema safe
 Also update matching input controls if parameters changed.
+Follow:
+- skills/jrxml_report_builder/SKILL.md
+- docs/assistant_skills/jrxml_schema_guardrails.md
+- docs/assistant_skills/jrxml_expression_patterns.md
+Run: python3 scripts/validate_jrxml_schema.py reports/<name>.jrxml
+```
+
+## Context-Aware CISADM SQL
+```text
+Workstream: <workstream>
+Client: demo|qa|prod
+Business question: <question>
+Expected grain: <grain>
+Validation slice: <counts or date range>
+Follow:
+- output/ai_cisadm_context.json
+- skills/sql_report_builder/SKILL.md
+- docs/assistant_skills/cisadm_sql_prompt_guide.md
+Constraints: read-only SELECT, LEFT JOIN enrichment, no credentials
 ```
 
 ## Cleanup Pass

@@ -36,6 +36,25 @@ The current snapshot XML inventory is also summarized in:
 | `D1_MSRMT_RPT_CURR` | `meter_ops` | `sql/performance/snapshots/meter_ops/d1_msrmt/D1_MSRMT_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/D1_MSRMT_RPT_CURR_End_User_Friendly.xml` |
 | `PAY_TNDR_CASH_RPT_CURR` | `payments_cashiering` | `sql/performance/snapshots/payments_cashiering/pay_tndr_cashier/PAY_TNDR_CASH_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/PAY_TNDR_CASH_RPT_CURR_End_User_Friendly.xml` |
 
+## Consolidation snapshot XML (12 tables)
+
+| Snapshot | Workstream | Snapshot-folder XML copy | Importable XML file |
+| --- | --- | --- | --- |
+| `ACCT_CUSTOMER_RPT_CURR` | `customer_ops` | `sql/performance/snapshots/customer_ops/acct_customer/ACCT_CUSTOMER_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/ACCT_CUSTOMER_RPT_CURR_End_User_Friendly.xml` |
+| `CASE_PREM_CONTACT_RPT_CURR` | `customer_ops` | `sql/performance/snapshots/customer_ops/case_prem_contact/CASE_PREM_CONTACT_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/CASE_PREM_CONTACT_RPT_CURR_End_User_Friendly.xml` |
+| `NEW_SERVICE_PIPELINE_RPT_CURR` | `new_services` | `sql/performance/snapshots/new_services/pipeline/NEW_SERVICE_PIPELINE_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/NEW_SERVICE_PIPELINE_RPT_CURR_End_User_Friendly.xml` |
+| `FIELD_ACTIVITY_RPT_CURR` | `field_ops` | `sql/performance/snapshots/field_ops/field_activity/FIELD_ACTIVITY_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/FIELD_ACTIVITY_RPT_CURR_End_User_Friendly.xml` |
+| `CREW_OPS_RPT_CURR` | `field_ops` | `sql/performance/snapshots/field_ops/crew_ops/CREW_OPS_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/CREW_OPS_RPT_CURR_End_User_Friendly.xml` |
+| `DEVICE_SP_RPT_CURR` | `meter_ops` | `sql/performance/snapshots/meter_ops/device_sp/DEVICE_SP_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/DEVICE_SP_RPT_CURR_End_User_Friendly.xml` |
+| `PAY_EVENT_RPT_CURR` | `cashiering` | `sql/performance/snapshots/payments_cashiering/pay_event/PAY_EVENT_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/PAY_EVENT_RPT_CURR_End_User_Friendly.xml` |
+| `BILLABLE_CHARGE_RPT_CURR` | `finance` | `sql/performance/snapshots/finance/billable_charge/BILLABLE_CHARGE_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/BILLABLE_CHARGE_RPT_CURR_End_User_Friendly.xml` |
+| `SA_AGED_BAL_RPT_CURR` | `debt_mgmt` | `sql/performance/snapshots/debt_mgmt/sa_aged_bal/SA_AGED_BAL_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/SA_AGED_BAL_RPT_CURR_End_User_Friendly.xml` |
+| `WO_PROC_RPT_CURR` | `debt_mgmt` | `sql/performance/snapshots/debt_mgmt/wo_proc/WO_PROC_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/WO_PROC_RPT_CURR_End_User_Friendly.xml` |
+| `OPS_EXCEPTION_RPT_CURR` | `common` | `sql/performance/snapshots/common/ops_exception/OPS_EXCEPTION_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/OPS_EXCEPTION_RPT_CURR_End_User_Friendly.xml` |
+| `WORKFLOW_QUEUE_RPT_CURR` | `common` | `sql/performance/snapshots/common/workflow_queue/WORKFLOW_QUEUE_RPT_CURR_End_User_Friendly.xml` | `domains/exports/manual_imports/WORKFLOW_QUEUE_RPT_CURR_End_User_Friendly.xml` |
+
+Regenerate with: `python3 scripts/build_consolidation_domain_xml.py`
+
 ## How to use these files
 - Use the SQL workspace under `sql/performance/snapshots/` for table, procedure, scheduler, and validation logic.
 - Use the colocated XML copy in the snapshot folder when you are building, reviewing, or debugging that snapshot end to end.

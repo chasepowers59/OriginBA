@@ -1,0 +1,41 @@
+CREATE TABLE cisadm.crew_ops_rpt_curr (
+    -- Crew / representative keys
+    crew_id                              VARCHAR2(40)    NOT NULL,
+    crew_name                            VARCHAR2(240),
+    crew_type_flg                        VARCHAR2(8),
+    crew_type_desc                       VARCHAR2(240),
+    -- Representative status / lifecycle
+    bo_status_cd                         VARCHAR2(48),
+    bo_status_desc                       VARCHAR2(240),
+    bo_status_reason_cd                  VARCHAR2(48),
+    bo_status_reason_desc                VARCHAR2(240),
+    bus_obj_cd                           VARCHAR2(48),
+    bus_obj_desc                         VARCHAR2(240),
+    rep_cre_dttm                         TIMESTAMP,
+    status_upd_dttm                      TIMESTAMP,
+    nt_xid_cd                            VARCHAR2(40),
+    nt_xid_desc                          VARCHAR2(240),
+    per_id                               VARCHAR2(40),
+    user_id                              VARCHAR2(40),
+    user_name                            VARCHAR2(200),
+    -- Crew operational profile (BODA)
+    svc_area                             VARCHAR2(120),
+    worker_capability                    VARCHAR2(120),
+    -- Field-activity rollups (linked via D1_ACTIVITY_CHAR CMFAREP)
+    fa_activity_count                    NUMBER(18,0),
+    completed_fa_count                   NUMBER(18,0),
+    open_fa_count                        NUMBER(18,0),
+    distinct_fa_type_count               NUMBER(18,0),
+    latest_fa_id                         VARCHAR2(40),
+    latest_fa_cre_dttm                   TIMESTAMP,
+    latest_fa_start_dttm                 TIMESTAMP,
+    latest_fa_end_dttm                   TIMESTAMP,
+    latest_fa_status_cd                  VARCHAR2(48),
+    latest_fa_status_desc                VARCHAR2(240),
+    latest_fa_type_cd                    VARCHAR2(48),
+    latest_fa_type_desc                  VARCHAR2(240),
+    latest_appointment_flg               VARCHAR2(4),
+    oldest_open_fa_days                  NUMBER(18,0),
+    avg_days_to_complete                 NUMBER(18,4),
+    load_dttm                            TIMESTAMP DEFAULT SYSTIMESTAMP
+);

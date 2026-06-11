@@ -19,6 +19,30 @@ pwsh -File scripts/performance/run_cisadm_dictionary_discovery.ps1 `
   -SchemaOwner CISADM
 ```
 
+Or export pending outputs from a named client:
+
+```bash
+python3 scripts/local/export_cisadm_dictionary_outputs.py --client demo
+```
+
+## Workstream Table Health (Live Population)
+```bash
+python3 scripts/local/run_workstream_table_health.sh demo
+python3 scripts/build_ai_cisadm_context.py --client demo
+```
+
+Outputs:
+- `deploy/snapshot_rollout_logs/<client>/table_health.json`
+- `sql/diagnostics/cisadm_workstream_table_health.sql` (generated)
+
+## AI Context Bundle
+```bash
+python3 scripts/build_ai_cisadm_context.py
+python3 scripts/build_domain_field_index.py
+```
+
+Primary output: `output/ai_cisadm_context.json`
+
 This produces:
 - `output/cisadm_dictionary/tables.csv`
 - `output/cisadm_dictionary/columns.csv`

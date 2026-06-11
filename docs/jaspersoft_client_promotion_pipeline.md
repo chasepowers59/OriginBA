@@ -15,6 +15,21 @@ This capability is intentionally separate from:
 Its scope is limited to Jaspersoft repository package preparation and
 verification.
 
+## Import location (standard as of 2026-06)
+
+**Import every prepared ZIP from inside the client’s tenant** (logged into that
+org → Repository → Import). This matches the validated Origin_STAGE / Origin_DEV
+flow (light-touch tenant-root packages, no `rootTenantId` in `index.xml`).
+
+Server-root import (`Manage` → `Organizations`) is legacy only for old
+`organizations/organization_1/...` packages.
+
+Package builds for new client promotions should use the same tenant-root +
+light-touch flags documented in
+[jaspersoft_environment_promotion_pipeline.md](jaspersoft_environment_promotion_pipeline.md)
+(**Standard promotion contract**), with per-client datasource aliases from
+`client_org_mapping.csv`.
+
 It is designed for SmartCity client promotions where:
 
 - the source export comes from the `Origin_DEV` organization
@@ -64,7 +79,7 @@ Current client org-to-datasource template:
 
 - `Ellensburg -> Ellensburg_DS`
 - `CityCorp -> CityCorp_DS`
-- `College_Station -> College_Station_DS`
+- `College_Station -> CollegeStation_DS`
 - `Fond_Du_Lac -> FondDuLac_DS`
 - `Newark1 -> Newark1_DS`
 - `Odessa -> Odessa_DS`
@@ -129,9 +144,46 @@ For current snapshot artifacts, use the repository truth in:
 
 - [current_snapshot_repository_path_truth.md](/Users/chase/OriginBA-3/docs/current_snapshot_repository_path_truth.md)
 
-## Recommended Commands
+## Recommended commands
 
-### 1. Full pipeline without datasource overlay
+### Standard Offering — all six clients
+
+Canonical JDBC exports: `deploy/jaspersoft_datasources/clients/`
+
+```bash
+python3 scripts/jaspersoft/run_client_standard_offering_pipeline.py \
+  --source-zip "/path/to/standard offering.zip" \
+  --skip-archive
+```
+
+One client:
+
+```bash
+python3 scripts/jaspersoft/run_client_standard_offering_pipeline.py \
+  --source-zip "/path/to/standard offering.zip" \
+  --clients Ellensburg \
+  --skip-archive
+```
+
+Outputs: `prepared_imports/<Client>_Standard_Offering_import.zip`
+
+Import **inside each client tenant** (Repository → Import).
+
+Each package injects the full `{Client}_DS.xml` (JDBC URL, user, encrypted password)
+and rewrites all Domains/Ad Hocs to `/DataSource/{Client}_DS`.
+
+### Lower-level client pipeline
+
+```bash
+python3 scripts/jaspersoft/run_client_import_pipeline.py \
+  --source-zip deploy/jaspersoft_client_promotion/incoming_exports/example.zip \
+  --mapping deploy/jaspersoft_client_promotion/client_org_mapping.csv \
+  --skip-archive
+```
+
+Defaults: tenant-root light-touch, datasource overlay from `deploy/jaspersoft_datasources/clients/`.
+
+### 1. Full pipeline without datasource overlay (legacy — not recommended)
 
 ```bash
 python3 scripts/jaspersoft/run_client_import_pipeline.py \

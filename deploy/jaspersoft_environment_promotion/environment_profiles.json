@@ -21,5 +21,55 @@
       "connectionUser": "JRS2C2M",
       "connectionPassword": "ENC&lt;4A5253495600000010BC2C455433080F629B21D978462EF0DF165CAAA86C4B0F2D29901425E3BB9131&gt;"
     }
+  },
+  "origin_stage": {
+    "label": "Origin Stage (Int Train)",
+    "src_org": "Origin_DEV",
+    "src_ds": "Origin_DEV_DS",
+    "target_org": "Origin_DEV",
+    "target_ds": "Training_DB",
+    "tenant_id": "Origin_STAGE",
+    "import_into_existing_tenant": true,
+    "light_touch_tenant_root": true,
+    "use_canonical_index_encryption": true,
+    "repository_layout": "tenant_root",
+    "repository_uri_style": "org_relative",
+    "map_standard_offering_to_workstreams": false,
+    "import_module_folder_uri": "/SmartCity/Report/Standard_Offering",
+    "output_zip_stem": "standard_offering_Origin_STAGE",
+    "skip_datasource_import": false,
+    "datasource": {
+      "label": "Training_DB",
+      "description": "Int Train ptrndb for snapshot-backed Standard Offering on Origin_STAGE (Origin_STAGE_DS unchanged)",
+      "driver": "oracle.jdbc.OracleDriver",
+      "connectionUrl": "jdbc:oracle:thin:@smartcity-db-demo.originsmartops.com:1521/ptrndb_demo.demoprivatesn2.origindemovcn.oraclevcn.com",
+      "connectionUser": "JRS2C2M",
+      "connectionPassword": "ENC&lt;4A5253495600000010BC2C455433080F629B21D978462EF0DF165CAAA86C4B0F2D29901425E3BB9131&gt;"
+    }
+  },
+  "origin_dev": {
+    "label": "Origin Dev 25.4 (Int Dev)",
+    "src_org": "Origin_DEV",
+    "src_ds": "Origin_DEV_DS",
+    "target_org": "Origin_DEV",
+    "target_ds": "Origin_DEV_DS",
+    "tenant_id": "Origin_DEV",
+    "import_into_existing_tenant": true,
+    "light_touch_tenant_root": true,
+    "use_canonical_index_encryption": true,
+    "repository_layout": "tenant_root",
+    "repository_uri_style": "org_relative",
+    "map_standard_offering_to_workstreams": false,
+    "import_module_folder_uri": "/SmartCity/Report/Standard_Offering",
+    "output_zip_stem": "standard_offering_Origin_DEV",
+    "skip_datasource_import": false,
+    "datasource": {
+      "label": "Origin_DEV_DS (C2M 25.4)",
+      "description": "Data Source for Origin DEV",
+      "driver": "oracle.jdbc.OracleDriver",
+      "connectionUrl": "jdbc:oracle:thin:@10.16.0.89:1521/pdevdb_demo.devprivatesn.devvcn.oraclevcn.com",
+      "connectionUser": "JRS2C2M_DEV",
+      "connectionPassword": "ENC&lt;4A52534956000000105CB536530A0353364E41CB521E4CCAD285015E788864D7C6E88EFED7FE34F7B1&gt;"
+    }
   }
 }

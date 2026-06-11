@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
+import zipfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Optional, Tuple
@@ -33,6 +35,12 @@ ORGANIZATIONS_ROOT_PARTS = (
 PUBLIC_DASHBOARD_TEMPLATE_URI = "/public/templates/actual_size.820.jrxml"
 
 # Development/Snapshots duplicate domains -> canonical workstream domain URIs.
+STANDARD_OFFERING_URI_CORRECTIONS: dict[str, str] = {
+    "/SmartCity/Report/Standard_Offering/Cashiering/Payment_Tender/Cashiering_Dashboard": (
+        "/SmartCity/Report/Standard_Offering/Cashiering/Payment_Header/Cashiering_Dashboard"
+    ),
+}
+
 DEVELOPMENT_SNAPSHOT_TO_WORKSTREAM: dict[str, str] = {
     "Development/Snapshots/Billed_Usage/Amount_Billed/Billed_Usage_Snapshot___Domain": (
         "Billing_and_Rates/Billed_Amount/Billed_Usage_Snapshot___Domain"
@@ -111,6 +119,143 @@ def merge_field_operations_into_workstreams(smartcity_root: str) -> None:
         shutil.rmtree(standard_offering)
 
 
+RESOURCE_ROOT_TAGS = {
+    "adhocDataView",
+    "reportUnit",
+    "dashboardModelResource",
+    "semanticLayerDataSource",
+    "contentResource",
+    "fileResource",
+}
+
+
+def resource_label(path: str) -> Optional[str]:
+    content, _encoding = read_text_file(path)
+    if content is None:
+        return None
+    try:
+        root = ET.fromstring(content)
+    except ET.ParseError:
+        return None
+    if root.tag.split("}")[-1] not in RESOURCE_ROOT_TAGS:
+        return None
+    return (root.findtext("label") or root.findtext("name") or "").strip() or None
+
+
+def resource_name_from_label(label: str) -> str:
+    candidate = label.replace(" - ", "___")
+    candidate = re.sub(r"[^\w]+", "_", candidate)
+    candidate = re.sub(r"_+", "_", candidate).strip("_")
+    return candidate or "Resource"
+
+
+def copy_resource_tree(source_xml_path: str, dest_xml_path: str) -> None:
+    os.makedirs(os.path.dirname(dest_xml_path), exist_ok=True)
+    shutil.copy2(source_xml_path, dest_xml_path)
+    source_files = source_xml_path[:-4] + "_files"
+    dest_files = dest_xml_path[:-4] + "_files"
+    if os.path.isdir(source_files):
+        if os.path.exists(dest_files):
+            shutil.rmtree(dest_files)
+        shutil.copytree(source_files, dest_files)
+
+
+def rename_resource_identity(xml_path: str, old_name: str, new_name: str) -> None:
+    """Align copied resource XML and sidecar folders with a unique repository name."""
+    if old_name == new_name:
+        return
+    content, _encoding = read_text_file(xml_path)
+    if content is None:
+        return
+    updated = content.replace(old_name, new_name)
+    with open(xml_path, "w", encoding="utf-8", newline="") as handle:
+        handle.write(updated)
+
+    sidecar_root = xml_path[:-4] + "_files"
+    if os.path.isdir(sidecar_root):
+        for current_root, _dirs, files in os.walk(sidecar_root):
+            for filename in files:
+                path = os.path.join(current_root, filename)
+                payload, enc = read_text_file(path)
+                if payload is None or old_name not in payload:
+                    continue
+                rewritten = payload.replace(old_name, new_name)
+                with open(path, "w", encoding=enc or "utf-8", newline="") as handle:
+                    handle.write(rewritten)
+
+
+def reconcile_workstreams_resource_collisions(smartcity_root: str) -> dict[str, str]:
+    """Preserve Workstreams resources that share a filename with a different Standard_Offering object."""
+    uri_remap: dict[str, str] = {}
+    workstreams_root = os.path.join(smartcity_root, "Report", "Workstreams")
+    standard_root = os.path.join(smartcity_root, "Report", "Standard_Offering")
+    if not os.path.isdir(workstreams_root) or not os.path.isdir(standard_root):
+        return uri_remap
+
+    for current_root, _dirs, files in os.walk(workstreams_root):
+        for filename in files:
+            if not filename.endswith(".xml") or filename == ".folder.xml":
+                continue
+            workstreams_xml = os.path.join(current_root, filename)
+            workstreams_label = resource_label(workstreams_xml)
+            if not workstreams_label:
+                continue
+            relative = os.path.relpath(workstreams_xml, workstreams_root)
+            standard_xml = os.path.join(standard_root, relative)
+            if not os.path.isfile(standard_xml):
+                continue
+            standard_label = resource_label(standard_xml)
+            if not standard_label or standard_label == workstreams_label:
+                continue
+
+            relative_dir = os.path.dirname(relative)
+            unique_name = resource_name_from_label(workstreams_label)
+            if unique_name == os.path.splitext(filename)[0]:
+                unique_name = f"{unique_name}__Workstreams"
+            dest_xml = os.path.join(standard_root, relative_dir, f"{unique_name}.xml")
+            if os.path.exists(dest_xml):
+                continue
+
+            old_name = os.path.splitext(filename)[0]
+            copy_resource_tree(workstreams_xml, dest_xml)
+            rename_resource_identity(dest_xml, old_name, unique_name)
+            workstreams_uri = folder_uri_from_dir(
+                smartcity_root,
+                os.path.join(workstreams_root, relative_dir),
+            ) + f"/{os.path.splitext(filename)[0]}"
+            standard_uri = folder_uri_from_dir(
+                smartcity_root,
+                os.path.join(standard_root, relative_dir),
+            ) + f"/{unique_name}"
+            uri_remap[workstreams_uri] = standard_uri
+
+    return uri_remap
+
+
+def apply_uri_replacements(root: str, replacements: dict[str, str]) -> int:
+    if not replacements:
+        return 0
+    changed_files = 0
+    for current_root, _dirs, files in os.walk(root):
+        for filename in files:
+            if not filename.endswith((".xml", ".data", ".jrxml", "layout")):
+                continue
+            path = os.path.join(current_root, filename)
+            if filename == "index.xml":
+                continue
+            content, _encoding = read_text_file(path)
+            if content is None:
+                continue
+            updated = content
+            for old, new in replacements.items():
+                updated = updated.replace(old, new)
+            if updated != content:
+                with open(path, "w", encoding="utf-8", newline="") as handle:
+                    handle.write(updated)
+                changed_files += 1
+    return changed_files
+
+
 def merge_workstreams_extensions_into_standard_offering(smartcity_root: str) -> None:
     """Preserve Workstreams-only paths still referenced from Standard_Offering artifacts."""
     workstreams_root = os.path.join(smartcity_root, "Report", "Workstreams")
@@ -124,22 +269,22 @@ def merge_workstreams_extensions_into_standard_offering(smartcity_root: str) -> 
         )
 
 
-def prefer_standard_offering_tree(smartcity_root: str) -> None:
+def prefer_standard_offering_tree(smartcity_root: str) -> dict[str, str]:
     merge_workstreams_extensions_into_standard_offering(smartcity_root)
+    uri_remap = reconcile_workstreams_resource_collisions(smartcity_root)
 
-    standard_field_ops = os.path.join(
-        smartcity_root, "Report", "Standard_Offering", "Field_Operations"
-    )
-    workstreams_field_ops = os.path.join(
-        smartcity_root, "Report", "Workstreams", "Field_Operations"
-    )
-    if os.path.isdir(workstreams_field_ops):
-        os.makedirs(standard_field_ops, exist_ok=True)
-        merge_tree(workstreams_field_ops, standard_field_ops)
+    standard_root = os.path.join(smartcity_root, "Report", "Standard_Offering")
+    workstreams = os.path.join(smartcity_root, "Report", "Workstreams")
+    if os.path.isdir(workstreams):
+        os.makedirs(standard_root, exist_ok=True)
+        # Preserve Workstreams-only dependencies after URI normalization rewrites
+        # /Workstreams/... references to /Standard_Offering/...
+        copy_tree_missing(workstreams, standard_root)
 
     workstreams = os.path.join(smartcity_root, "Report", "Workstreams")
     if os.path.isdir(workstreams):
         shutil.rmtree(workstreams)
+    return uri_remap
 
 
 def move_tree(source: str, destination: str) -> None:
@@ -165,6 +310,21 @@ def merge_tree(source: str, destination: str) -> None:
             if os.path.exists(dest_path):
                 os.remove(dest_path)
             shutil.move(src_path, dest_path)
+
+
+def copy_tree_missing(source: str, destination: str) -> None:
+    """Copy files from source into destination without overwriting existing targets."""
+    if not os.path.isdir(source):
+        return
+    os.makedirs(destination, exist_ok=True)
+    for entry in os.listdir(source):
+        src_path = os.path.join(source, entry)
+        dest_path = os.path.join(destination, entry)
+        if os.path.isdir(src_path):
+            copy_tree_missing(src_path, dest_path)
+        elif not os.path.exists(dest_path):
+            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+            shutil.copy2(src_path, dest_path)
 
 
 def remove_organizations_tree(work_root: str) -> None:
@@ -297,6 +457,24 @@ def rewrite_development_snapshot_domain_uris(root: str, report_root: str = "Stan
     return changed_files
 
 
+def apply_standard_offering_uri_corrections(root: str) -> int:
+    return apply_uri_replacements(root, STANDARD_OFFERING_URI_CORRECTIONS)
+
+
+def remove_superseded_development_snapshot_tree(work_root: str) -> None:
+    """Drop Development/Snapshots copies after URIs point at workstream domains."""
+    development_root = os.path.join(
+        work_root,
+        "resources",
+        "SmartCity",
+        "Report",
+        "Standard_Offering",
+        "Development",
+    )
+    if os.path.isdir(development_root):
+        shutil.rmtree(development_root)
+
+
 def normalize_report_root_uris(root: str, report_root: str) -> None:
     if report_root == "Standard_Offering":
         replacements = {"/SmartCity/Report/Workstreams/": "/SmartCity/Report/Standard_Offering/"}
@@ -369,18 +547,36 @@ def validate_tenant_root_package(work_root: str, report_root: str) -> None:
                     )
 
 
+def bundled_public_dashboard_template_files(
+    bundle_root: Optional[str] = None,
+) -> tuple[Path, Path]:
+    bundle = Path(bundle_root or DEFAULT_PUBLIC_TEMPLATE_BUNDLE)
+    template_dir = bundle / "resources" / "public" / "templates"
+    template_xml = template_dir / "actual_size.820.jrxml.xml"
+    template_data = template_dir / "actual_size.820.jrxml.data"
+    return template_xml, template_data
+
+
 def merge_bundled_public_dashboard_template(
     work_root: str,
     bundle_root: Optional[str] = None,
 ) -> bool:
     """Bundle shared dashboard JRXML template required by Standard Offering dashboards."""
-    bundle = Path(bundle_root or DEFAULT_PUBLIC_TEMPLATE_BUNDLE)
-    public_src = bundle / "resources" / "public"
-    if not public_src.is_dir():
-        return False
+    template_xml, template_data = bundled_public_dashboard_template_files(bundle_root)
+    if not template_xml.is_file() or not template_data.is_file():
+        raise ProcessingError(
+            "Bundled public dashboard template is missing required files: "
+            f"{template_xml} and {template_data}. "
+            "Restore them under deploy/jaspersoft_environment_promotion/bundled/"
+            "public_dashboard_template/ before building tenant-root import ZIPs."
+        )
 
     public_dest = Path(work_root) / "resources" / "public"
-    merge_tree(str(public_src), str(public_dest))
+    templates_dest = public_dest / "templates"
+    templates_dest.mkdir(parents=True, exist_ok=True)
+    # Copy from the canonical bundle; merge_tree moves files and would drain the repo store.
+    shutil.copy2(template_xml, templates_dest / template_xml.name)
+    shutil.copy2(template_data, templates_dest / template_data.name)
     write_folder_xml(
         str(public_dest / ".folder.xml"),
         "/",
@@ -389,13 +585,257 @@ def merge_bundled_public_dashboard_template(
         child_folders=["templates"],
     )
     write_folder_xml(
-        str(public_dest / "templates" / ".folder.xml"),
+        str(templates_dest / ".folder.xml"),
         "/public",
         "templates",
         "templates",
         child_resources=["actual_size.820.jrxml"],
     )
+    dest_xml = templates_dest / template_xml.name
+    dest_data = templates_dest / template_data.name
+    if not dest_xml.is_file() or not dest_data.is_file():
+        raise ProcessingError(
+            "Public dashboard template bundle did not copy into the package: "
+            f"{dest_xml} and {dest_data}"
+        )
     return True
+
+
+def read_export_index_metadata(index_path: str) -> tuple[Optional[str], Optional[str], Optional[str]]:
+    """Return keyalias, encrypted, and jsVersion from a Jaspersoft export index.xml."""
+    if not os.path.isfile(index_path):
+        return None, None, None
+    tree = ET.parse(index_path)
+    export_root = tree.getroot()
+    values: dict[str, Optional[str]] = {
+        "keyalias": None,
+        "encrypted": None,
+        "jsVersion": None,
+    }
+    for prop in export_root.findall("property"):
+        name = prop.get("name")
+        if name in values:
+            values[name] = prop.get("value")
+    return values["keyalias"], values["encrypted"], values["jsVersion"]
+
+
+def ensure_favorites_directory(root: str) -> None:
+    favorites_dir = os.path.join(root, "favorites")
+    os.makedirs(favorites_dir, exist_ok=True)
+
+
+def is_tenant_root_export(work_root: str) -> bool:
+    return os.path.isdir(os.path.join(work_root, "resources", "SmartCity"))
+
+
+def patch_source_export_index(
+    index_path: str,
+    *,
+    import_folder_uri: str,
+    import_datasource_resource_uri: Optional[str] = None,
+    import_repository_resources: Optional[list[str]] = None,
+    import_into_existing_tenant: bool = True,
+    keyalias: Optional[str] = None,
+    encrypted: Optional[str] = None,
+) -> None:
+    """Patch a server export index.xml in place instead of rebuilding it from scratch."""
+    original = read_text_file(index_path)[0]
+    if original is None:
+        raise ProcessingError(f"Package index.xml is unreadable: {index_path}")
+
+    declaration = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    if original.startswith("<?xml"):
+        declaration = original[: original.index(">") + 2]
+
+    root = ET.fromstring(original)
+    for prop in list(root.findall("property")):
+        name = prop.get("name")
+        if name == "rootTenantId" and import_into_existing_tenant:
+            root.remove(prop)
+        elif name == "keyalias" and keyalias:
+            prop.set("value", keyalias)
+        elif name == "encrypted" and encrypted:
+            prop.set("value", encrypted)
+
+    repo_module = next(
+        (module for module in root.findall("module") if module.get("id") == "repositoryResources"),
+        None,
+    )
+    if repo_module is None:
+        repo_module = ET.SubElement(root, "module", {"id": "repositoryResources"})
+
+    existing_resources = {(node.text or "").strip() for node in repo_module.findall("resource")}
+    resource_uris: list[str] = []
+    if import_datasource_resource_uri:
+        resource_uris.append(import_datasource_resource_uri)
+    resource_uris.extend(import_repository_resources or [])
+    insert_at = 0
+    for uri in resource_uris:
+        if uri in existing_resources:
+            continue
+        resource_element = ET.Element("resource")
+        resource_element.text = uri
+        repo_module.insert(insert_at, resource_element)
+        insert_at += 1
+        existing_resources.add(uri)
+
+    folder_uris = {(node.text or "").strip() for node in repo_module.findall("folder")}
+    if import_folder_uri not in folder_uris:
+        folder_element = ET.SubElement(repo_module, "folder")
+        folder_element.text = import_folder_uri
+
+    if not any(module.get("id") == "favorites" for module in root.findall("module")):
+        ET.SubElement(root, "module", {"id": "favorites"})
+
+    with open(index_path, "w", encoding="utf-8", newline="") as handle:
+        handle.write(declaration + ET.tostring(root, encoding="unicode"))
+
+
+def zip_from_source_order(
+    source_zip: str,
+    work_root: str,
+    output_zip: str,
+    *,
+    source_ds: str,
+    target_ds: str,
+) -> None:
+    """Write a ZIP using the source export entry order to stay JRS-compatible."""
+    work_path = os.path.abspath(work_root)
+    source_ds_entry = f"resources/DataSource/{source_ds}.xml"
+    target_ds_entry = f"resources/DataSource/{target_ds}.xml"
+    written: set[str] = set()
+
+    with zipfile.ZipFile(source_zip, "r") as source_archive, zipfile.ZipFile(
+        output_zip, "w", zipfile.ZIP_DEFLATED
+    ) as output_archive:
+        for entry_name in source_archive.namelist():
+            if entry_name == "index.xml":
+                continue
+            if entry_name == source_ds_entry:
+                mapped_name = target_ds_entry
+                local_path = os.path.join(work_path, mapped_name)
+                if os.path.isfile(local_path):
+                    output_archive.write(local_path, mapped_name)
+                    written.add(mapped_name)
+                continue
+
+            local_path = os.path.join(work_path, entry_name)
+            if os.path.isfile(local_path):
+                output_archive.write(local_path, entry_name)
+                written.add(entry_name)
+                continue
+
+            if entry_name.endswith("/"):
+                directory_path = os.path.join(work_path, entry_name.rstrip("/"))
+                if os.path.isdir(directory_path):
+                    zip_info = zipfile.ZipInfo(entry_name)
+                    zip_info.compress_type = zipfile.ZIP_DEFLATED
+                    output_archive.writestr(zip_info, b"")
+                    written.add(entry_name)
+
+        extras: list[str] = []
+        for current_root, _dirs, files in os.walk(work_path):
+            for filename in files:
+                full_path = os.path.join(current_root, filename)
+                relative_path = os.path.relpath(full_path, work_path).replace(os.sep, "/")
+                if relative_path not in written and relative_path != "index.xml":
+                    extras.append(relative_path)
+        for relative_path in sorted(extras):
+            output_archive.write(os.path.join(work_path, relative_path), relative_path)
+            written.add(relative_path)
+
+        index_path = os.path.join(work_path, "index.xml")
+        if os.path.isfile(index_path):
+            output_archive.write(index_path, "index.xml")
+
+
+def promote_tenant_root_export_light_touch(
+    work_root: str,
+    import_folder_uri: str,
+    target_ds: str,
+    *,
+    skip_datasource_import: bool = False,
+    import_into_existing_tenant: bool = True,
+    datasource_export_index_path: Optional[str] = None,
+    use_canonical_index_encryption: bool = False,
+) -> None:
+    """Minimally promote an already tenant-root export without rebuilding folder metadata."""
+    if not is_tenant_root_export(work_root):
+        raise ProcessingError("Light-touch promotion requires an existing tenant-root SmartCity tree.")
+
+    if not skip_datasource_import:
+        rewrite_datasource_for_tenant_root(work_root, target_ds)
+
+    template_xml = os.path.join(
+        work_root, "resources", "public", "templates", "actual_size.820.jrxml.xml"
+    )
+    include_public_template = os.path.isfile(template_xml)
+    if not include_public_template:
+        include_public_template = merge_bundled_public_dashboard_template(work_root)
+
+    keyalias = None
+    encrypted = None
+    if use_canonical_index_encryption and datasource_export_index_path:
+        keyalias, encrypted, _js_version = read_export_index_metadata(datasource_export_index_path)
+        if not keyalias or not encrypted:
+            raise ProcessingError(
+                "Canonical datasource export index is missing keyalias/encrypted metadata."
+            )
+
+    datasource_uri = None if skip_datasource_import else f"/DataSource/{target_ds}"
+    extra_resources = [PUBLIC_DASHBOARD_TEMPLATE_URI] if include_public_template else []
+    patch_source_export_index(
+        os.path.join(work_root, "index.xml"),
+        import_folder_uri=import_folder_uri,
+        import_datasource_resource_uri=datasource_uri,
+        import_repository_resources=extra_resources,
+        import_into_existing_tenant=import_into_existing_tenant,
+        keyalias=keyalias,
+        encrypted=encrypted,
+    )
+    ensure_favorites_directory(work_root)
+
+
+def render_jrs_export_index_xml(
+    *,
+    keyalias: str,
+    encrypted: str,
+    js_version: str,
+    import_folder_uri: str,
+    import_datasource_resource_uri: Optional[str] = None,
+    import_repository_resources: Optional[list[str]] = None,
+    tenant_id: Optional[str] = None,
+    import_into_existing_tenant: bool = False,
+) -> str:
+    """Render index.xml in the compact format emitted by JasperReports Server exports."""
+    parts = [
+        '<?xml version="1.0" encoding="UTF-8"?>\n',
+        "<export>",
+        f'<property name="keyalias" value="{keyalias}"/>',
+        '<module id="repositoryResources">',
+    ]
+    if import_datasource_resource_uri:
+        parts.append(f"<resource>{import_datasource_resource_uri}</resource>")
+    for resource_uri in import_repository_resources or []:
+        parts.append(f"<resource>{resource_uri}</resource>")
+    parts.append(f"<folder>{import_folder_uri}</folder>")
+    parts.extend(
+        [
+            "</module>",
+            '<module id="favorites"/>',
+            '<property name="pathProcessorId" value="zip"/>',
+        ]
+    )
+    if tenant_id and not import_into_existing_tenant:
+        parts.append(f'<property name="rootTenantId" value="{tenant_id}"/>')
+    parts.extend(
+        [
+            f'<property name="jsVersion" value="{js_version}"/>',
+            f'<property name="encrypted" value="{encrypted}"/>',
+            "</export>",
+        ]
+    )
+    return "".join(parts)
 
 
 def finalize_tenant_import_index(
@@ -406,6 +846,7 @@ def finalize_tenant_import_index(
     import_repository_resources: Optional[list[str]] = None,
     encrypted: Optional[str] = None,
     keyalias: Optional[str] = None,
+    js_version: Optional[str] = None,
     *,
     import_into_existing_tenant: bool = False,
 ) -> None:
@@ -413,53 +854,29 @@ def finalize_tenant_import_index(
     if not os.path.isfile(index_path):
         raise ProcessingError(f"Package index.xml is missing: {index_path}")
 
-    tree = ET.parse(index_path)
-    export_root = tree.getroot()
+    existing_keyalias, existing_encrypted, existing_js_version = read_export_index_metadata(index_path)
+    resolved_keyalias = keyalias or existing_keyalias
+    resolved_encrypted = encrypted or existing_encrypted
+    resolved_js_version = js_version or existing_js_version or "8.1.0 PRO"
+    if not resolved_keyalias or not resolved_encrypted:
+        raise ProcessingError(
+            "Package index.xml is missing required export metadata (keyalias and encrypted). "
+            "Use the canonical datasource export index for the target environment."
+        )
 
-    for module in list(export_root.findall("module")):
-        export_root.remove(module)
-
-    repository_module = ET.Element("module", {"id": "repositoryResources"})
-    if import_datasource_resource_uri:
-        resource_element = ET.SubElement(repository_module, "resource")
-        resource_element.text = import_datasource_resource_uri
-    for resource_uri in import_repository_resources or []:
-        resource_element = ET.SubElement(repository_module, "resource")
-        resource_element.text = resource_uri
-    folder_element = ET.SubElement(repository_module, "folder")
-    folder_element.text = import_folder_uri
-    export_root.insert(0, repository_module)
-
-    favorites_module = ET.Element("module", {"id": "favorites"})
-    export_root.append(favorites_module)
-
-    properties = {child.get("name"): child for child in export_root.findall("property")}
-    if "pathProcessorId" not in properties:
-        ET.SubElement(export_root, "property", {"name": "pathProcessorId", "value": "zip"})
-    else:
-        properties["pathProcessorId"].set("value", "zip")
-
-    # When importing from inside an existing tenant (for example Origin_DEMO),
-    # rootTenantId must not name that tenant or JRS treats it as an org import
-    # into root and fails with import.organization.into.root.not.allowed.
-    if import_into_existing_tenant:
-        if "rootTenantId" in properties:
-            export_root.remove(properties["rootTenantId"])
-    else:
-        if "rootTenantId" in properties:
-            properties["rootTenantId"].set("value", tenant_id)
-        else:
-            ET.SubElement(export_root, "property", {"name": "rootTenantId", "value": tenant_id})
-
-    if "jsVersion" not in properties:
-        ET.SubElement(export_root, "property", {"name": "jsVersion", "value": "8.1.0 PRO"})
-
-    if encrypted and "encrypted" in properties:
-        properties["encrypted"].set("value", encrypted)
-    if keyalias and "keyalias" in properties:
-        properties["keyalias"].set("value", keyalias)
-
-    tree.write(index_path, encoding="utf-8", xml_declaration=True)
+    index_xml = render_jrs_export_index_xml(
+        keyalias=resolved_keyalias,
+        encrypted=resolved_encrypted,
+        js_version=resolved_js_version,
+        import_folder_uri=import_folder_uri,
+        import_datasource_resource_uri=import_datasource_resource_uri,
+        import_repository_resources=import_repository_resources,
+        tenant_id=tenant_id,
+        import_into_existing_tenant=import_into_existing_tenant,
+    )
+    with open(index_path, "w", encoding="utf-8", newline="") as handle:
+        handle.write(index_xml)
+    ensure_favorites_directory(root)
 
 
 def repackage_to_tenant_root(
@@ -472,18 +889,23 @@ def repackage_to_tenant_root(
     use_workstreams_report_root: bool = False,
     import_into_existing_tenant: bool = True,
     target_org: str = "Origin_DEV",
+    datasource_export_index_path: Optional[str] = None,
 ) -> None:
     org_name, smartcity_src, smartcity_dest, already_tenant_root = resolve_smartcity_for_repackage(
         work_root
     )
     report_root = "Workstreams" if use_workstreams_report_root else "Standard_Offering"
+    collision_uri_remap: dict[str, str] = {}
     if use_workstreams_report_root:
         merge_field_operations_into_workstreams(smartcity_src)
     else:
-        prefer_standard_offering_tree(smartcity_src)
+        collision_uri_remap = prefer_standard_offering_tree(smartcity_src)
 
     if not already_tenant_root:
         merge_tree(smartcity_src, smartcity_dest)
+
+    if collision_uri_remap:
+        apply_uri_replacements(work_root, collision_uri_remap)
 
     if not skip_datasource_import:
         if org_name:
@@ -501,22 +923,25 @@ def repackage_to_tenant_root(
 
     remove_organizations_tree(work_root)
     normalize_report_root_uris(work_root, report_root)
+    if collision_uri_remap:
+        normalized_remap = {
+            old.replace("/SmartCity/Report/Workstreams/", "/SmartCity/Report/Standard_Offering/"): new
+            for old, new in collision_uri_remap.items()
+        }
+        apply_uri_replacements(work_root, normalized_remap)
+    apply_standard_offering_uri_corrections(work_root)
     rewrite_development_snapshot_domain_uris(work_root, report_root)
+    remove_superseded_development_snapshot_tree(work_root)
     regenerate_tenant_folder_metadata(smartcity_dest)
     include_public_template = merge_bundled_public_dashboard_template(work_root)
 
-    encrypted = None
-    keyalias = None
-    index_path = os.path.join(work_root, "index.xml")
-    if os.path.isfile(index_path):
-        tree = ET.parse(index_path)
-        export_root = tree.getroot()
-        for prop in export_root.findall("property"):
-            name = prop.get("name")
-            if name == "encrypted":
-                encrypted = prop.get("value")
-            if name == "keyalias":
-                keyalias = prop.get("value")
+    # Preserve the source export's encryption envelope for content packages. Swapping in
+    # the canonical datasource index keyalias/encrypted invalidates the catalog seal and
+    # JRS rejects the ZIP before import ("not valid JasperReports Server export file").
+    keyalias, encrypted, js_version = read_export_index_metadata(os.path.join(work_root, "index.xml"))
+    if not keyalias or not encrypted:
+        if datasource_export_index_path and os.path.isfile(datasource_export_index_path):
+            keyalias, encrypted, js_version = read_export_index_metadata(datasource_export_index_path)
 
     datasource_uri = None if skip_datasource_import else f"/DataSource/{target_ds}"
     extra_resources = (
@@ -530,6 +955,7 @@ def repackage_to_tenant_root(
         import_repository_resources=extra_resources,
         encrypted=encrypted,
         keyalias=keyalias,
+        js_version=js_version,
         import_into_existing_tenant=import_into_existing_tenant,
     )
     validate_tenant_root_package(work_root, report_root)

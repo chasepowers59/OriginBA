@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="PAY_EVENT_RPT_CURR" label="Payment Event Snapshot" resourceId="PAY_EVENT_RPT_CURR" />
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string />
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="PAY_EVENT_RPT_CURR_AUDIT" label="Snapshot Audit" resourceId="PAY_EVENT_RPT_CURR">
+      <items>
+        <item id="LOAD_DTTM" label="Snapshot Load Date Time" resourceId="PAY_EVENT_RPT_CURR.LOAD_DTTM" />
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_EVENT_RPT_CURR_PAYMENT" label="Payment" resourceId="PAY_EVENT_RPT_CURR">
+      <items>
+        <item id="PAY_ID" label="Payment ID" resourceId="PAY_EVENT_RPT_CURR.PAY_ID" />
+        <item id="PAY_EVENT_ID" label="Payment Event ID" resourceId="PAY_EVENT_RPT_CURR.PAY_EVENT_ID" />
+        <item id="PAY_DT" label="Payment Date" resourceId="PAY_EVENT_RPT_CURR.PAY_DT" />
+        <item id="PAY_EVENT_CRE_DTTM" label="Payment Event Create Date Time" resourceId="PAY_EVENT_RPT_CURR.PAY_EVENT_CRE_DTTM" />
+        <item id="DOC_ID" label="Document ID" resourceId="PAY_EVENT_RPT_CURR.DOC_ID" />
+        <item id="PAY_AMT" label="Payment Amount" resourceId="PAY_EVENT_RPT_CURR.PAY_AMT" />
+        <item id="PAY_STATUS_FLG" label="Payment Status Code" resourceId="PAY_EVENT_RPT_CURR.PAY_STATUS_FLG" />
+        <item id="PAY_STATUS_DESC" label="Payment Status Description" resourceId="PAY_EVENT_RPT_CURR.PAY_STATUS_DESC" />
+        <item id="DAYS_OLD" label="Days Old" resourceId="PAY_EVENT_RPT_CURR.DAYS_OLD" />
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_EVENT_RPT_CURR_ACCOUNT" label="Account And Customer" resourceId="PAY_EVENT_RPT_CURR">
+      <items>
+        <item id="ACCT_ID" label="Account ID" resourceId="PAY_EVENT_RPT_CURR.ACCT_ID" />
+        <item id="PER_ID" label="Person ID" resourceId="PAY_EVENT_RPT_CURR.PER_ID" />
+        <item id="CUSTOMER_NAME" label="Customer Name" resourceId="PAY_EVENT_RPT_CURR.CUSTOMER_NAME" />
+        <item id="ACCT_PP_COUNT" label="Account Pay Plan Count" resourceId="PAY_EVENT_RPT_CURR.ACCT_PP_COUNT" />
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_EVENT_RPT_CURR_TENDER" label="Tender Summary" resourceId="PAY_EVENT_RPT_CURR">
+      <items>
+        <item id="EVENT_TENDER_COUNT" label="Event Tender Count" resourceId="PAY_EVENT_RPT_CURR.EVENT_TENDER_COUNT" />
+        <item id="EVENT_TENDER_AMT" label="Event Tender Amount" resourceId="PAY_EVENT_RPT_CURR.EVENT_TENDER_AMT" />
+        <item id="DISTINCT_TENDER_TYPE_COUNT" label="Distinct Tender Type Count" resourceId="PAY_EVENT_RPT_CURR.DISTINCT_TENDER_TYPE_COUNT" />
+        <item id="SOLE_TENDER_TYPE_CD" label="Sole Tender Type Code" resourceId="PAY_EVENT_RPT_CURR.SOLE_TENDER_TYPE_CD" />
+        <item id="SOLE_TENDER_TYPE_DESC" label="Sole Tender Type Description" resourceId="PAY_EVENT_RPT_CURR.SOLE_TENDER_TYPE_DESC" />
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_EVENT_RPT_CURR_TENDER_CONTROL" label="Tender Control" resourceId="PAY_EVENT_RPT_CURR">
+      <items>
+        <item id="EVENT_TNDR_CTL_COUNT" label="Event Tender Control Count" resourceId="PAY_EVENT_RPT_CURR.EVENT_TNDR_CTL_COUNT" />
+        <item id="PRIMARY_TNDR_CTL_ID" label="Primary Tender Control ID" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_TNDR_CTL_ID" />
+        <item id="PRIMARY_TNDR_SOURCE_CD" label="Primary Tender Source Code" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_TNDR_SOURCE_CD" />
+        <item id="PRIMARY_TNDR_SOURCE_DESC" label="Primary Tender Source Description" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_TNDR_SOURCE_DESC" />
+        <item id="PRIMARY_TNDR_CTL_STATUS_FLG" label="Primary Tender Control Status Code" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_TNDR_CTL_STATUS_FLG" />
+        <item id="PRIMARY_TNDR_CTL_STATUS_DESC" label="Primary Tender Control Status Description" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_TNDR_CTL_STATUS_DESC" />
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_EVENT_RPT_CURR_DEPOSIT" label="Deposit Control" resourceId="PAY_EVENT_RPT_CURR">
+      <items>
+        <item id="EVENT_DEP_CTL_COUNT" label="Event Deposit Control Count" resourceId="PAY_EVENT_RPT_CURR.EVENT_DEP_CTL_COUNT" />
+        <item id="PRIMARY_DEP_CTL_ID" label="Primary Deposit Control ID" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_DEP_CTL_ID" />
+        <item id="PRIMARY_DEP_CTL_STATUS_FLG" label="Primary Deposit Control Status Code" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_DEP_CTL_STATUS_FLG" />
+        <item id="PRIMARY_DEP_CTL_STATUS_DESC" label="Primary Deposit Control Status Description" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_DEP_CTL_STATUS_DESC" />
+        <item id="PRIMARY_DEP_CTL_END_BALANCE" label="Primary Deposit Control End Balance" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_DEP_CTL_END_BALANCE" />
+        <item id="EVENT_DEP_AMT" label="Event Deposit Amount" resourceId="PAY_EVENT_RPT_CURR.EVENT_DEP_AMT" />
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_EVENT_RPT_CURR_PAY_PLAN" label="Pay Plan" resourceId="PAY_EVENT_RPT_CURR">
+      <items>
+        <item id="ACTIVE_PP_COUNT" label="Active Pay Plan Count" resourceId="PAY_EVENT_RPT_CURR.ACTIVE_PP_COUNT" />
+        <item id="PRIMARY_PP_ID" label="Primary Pay Plan ID" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_PP_ID" />
+        <item id="PRIMARY_PP_STAT_FLG" label="Primary Pay Plan Status Code" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_PP_STAT_FLG" />
+        <item id="PRIMARY_PP_STAT_DESC" label="Primary Pay Plan Status Description" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_PP_STAT_DESC" />
+        <item id="PRIMARY_PP_TYPE_CD" label="Primary Pay Plan Type Code" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_PP_TYPE_CD" />
+        <item id="PRIMARY_PP_TYPE_DESC" label="Primary Pay Plan Type Description" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_PP_TYPE_DESC" />
+        <item id="PRIMARY_PP_START_DT" label="Primary Pay Plan Start Date" resourceId="PAY_EVENT_RPT_CURR.PRIMARY_PP_START_DT" />
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_EVENT_RPT_CURR_GENERAL" label="Additional Fields" resourceId="PAY_EVENT_RPT_CURR">
+      <items>
+        <item id="CURRENCY_CD" label="Currency Code" resourceId="PAY_EVENT_RPT_CURR.CURRENCY_CD" />
+        <item id="CAN_RSN_CD" label="Cancel Reason Code" resourceId="PAY_EVENT_RPT_CURR.CAN_RSN_CD" />
+        <item id="CAN_RSN_DESC" label="Cancel Reason Description" resourceId="PAY_EVENT_RPT_CURR.CAN_RSN_DESC" />
+        <item id="MATCH_TYPE_CD" label="Match Type Code" resourceId="PAY_EVENT_RPT_CURR.MATCH_TYPE_CD" />
+        <item id="MATCH_TYPE_DESC" label="Match Type Description" resourceId="PAY_EVENT_RPT_CURR.MATCH_TYPE_DESC" />
+        <item id="MATCH_VAL" label="Match Value" resourceId="PAY_EVENT_RPT_CURR.MATCH_VAL" />
+        <item id="NON_CIS_NAME" label="Non CIS Name" resourceId="PAY_EVENT_RPT_CURR.NON_CIS_NAME" />
+        <item id="NON_CIS_REF_NBR" label="Non CIS Reference Number" resourceId="PAY_EVENT_RPT_CURR.NON_CIS_REF_NBR" />
+        <item id="NON_CIS_COMMENT" label="Non CIS Comment" resourceId="PAY_EVENT_RPT_CURR.NON_CIS_COMMENT" />
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="PAY_EVENT_RPT_CURR" datasourceId="Origin_DEV_DS" datasourceTableName="PAY_EVENT_RPT_CURR" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PAY_ID" type="java.lang.String" />
+        <field id="PAY_EVENT_ID" type="java.lang.String" />
+        <field id="PAY_DT" type="java.sql.Timestamp" />
+        <field id="PAY_EVENT_CRE_DTTM" type="java.sql.Timestamp" />
+        <field id="DOC_ID" type="java.lang.String" />
+        <field id="ACCT_ID" type="java.lang.String" />
+        <field id="PER_ID" type="java.lang.String" />
+        <field id="CUSTOMER_NAME" type="java.lang.String" />
+        <field id="PAY_AMT" type="java.math.BigDecimal" />
+        <field id="CURRENCY_CD" type="java.lang.String" />
+        <field id="PAY_STATUS_FLG" type="java.lang.String" />
+        <field id="PAY_STATUS_DESC" type="java.lang.String" />
+        <field id="CAN_RSN_CD" type="java.lang.String" />
+        <field id="CAN_RSN_DESC" type="java.lang.String" />
+        <field id="MATCH_TYPE_CD" type="java.lang.String" />
+        <field id="MATCH_TYPE_DESC" type="java.lang.String" />
+        <field id="MATCH_VAL" type="java.lang.String" />
+        <field id="NON_CIS_NAME" type="java.lang.String" />
+        <field id="NON_CIS_REF_NBR" type="java.lang.String" />
+        <field id="NON_CIS_COMMENT" type="java.lang.String" />
+        <field id="DAYS_OLD" type="java.math.BigDecimal" />
+        <field id="EVENT_TENDER_COUNT" type="java.math.BigDecimal" />
+        <field id="EVENT_TENDER_AMT" type="java.math.BigDecimal" />
+        <field id="DISTINCT_TENDER_TYPE_COUNT" type="java.math.BigDecimal" />
+        <field id="SOLE_TENDER_TYPE_CD" type="java.lang.String" />
+        <field id="SOLE_TENDER_TYPE_DESC" type="java.lang.String" />
+        <field id="EVENT_TNDR_CTL_COUNT" type="java.math.BigDecimal" />
+        <field id="PRIMARY_TNDR_CTL_ID" type="java.lang.String" />
+        <field id="PRIMARY_TNDR_SOURCE_CD" type="java.lang.String" />
+        <field id="PRIMARY_TNDR_SOURCE_DESC" type="java.lang.String" />
+        <field id="PRIMARY_TNDR_CTL_STATUS_FLG" type="java.lang.String" />
+        <field id="PRIMARY_TNDR_CTL_STATUS_DESC" type="java.lang.String" />
+        <field id="EVENT_DEP_CTL_COUNT" type="java.math.BigDecimal" />
+        <field id="PRIMARY_DEP_CTL_ID" type="java.lang.String" />
+        <field id="PRIMARY_DEP_CTL_STATUS_FLG" type="java.lang.String" />
+        <field id="PRIMARY_DEP_CTL_STATUS_DESC" type="java.lang.String" />
+        <field id="PRIMARY_DEP_CTL_END_BALANCE" type="java.math.BigDecimal" />
+        <field id="EVENT_DEP_AMT" type="java.math.BigDecimal" />
+        <field id="ACCT_PP_COUNT" type="java.math.BigDecimal" />
+        <field id="ACTIVE_PP_COUNT" type="java.math.BigDecimal" />
+        <field id="PRIMARY_PP_ID" type="java.lang.String" />
+        <field id="PRIMARY_PP_STAT_FLG" type="java.lang.String" />
+        <field id="PRIMARY_PP_STAT_DESC" type="java.lang.String" />
+        <field id="PRIMARY_PP_TYPE_CD" type="java.lang.String" />
+        <field id="PRIMARY_PP_TYPE_DESC" type="java.lang.String" />
+        <field id="PRIMARY_PP_START_DT" type="java.sql.Timestamp" />
+        <field id="LOAD_DTTM" type="java.sql.Timestamp" />
+      </fieldList>
+    </jdbcTable>
+  </resources>
+</schema>

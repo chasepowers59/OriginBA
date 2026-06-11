@@ -16,7 +16,15 @@ import sys
 from pathlib import Path
 
 import oracledb
-from dotenv import dotenv_values
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from oracle_client import ensure_oracle_client, load_env_file, normalize_oracle_dsn
+
+# Back-compat for scripts that import init_oracle_client from this module.
+init_oracle_client = ensure_oracle_client
 
 
 CLIENTS = {
@@ -25,7 +33,11 @@ CLIENTS = {
     "collegestation": "COLLEGESTATION",
     "ellensburg": "ELLENSBURG",
     "citycorp": "CITYCORP",
+    "odessa": "ODESSA",
     "demo": "DEMO",
+    # Internal SmartCity environments (demo credentials; separate service names).
+    "int_train": "INT_TRAIN",
+    "int_dev": "INT_DEV",
 }
 
 
@@ -47,16 +59,6 @@ def parse_args() -> argparse.Namespace:
         help="Append full stdout to this file in addition to printing.",
     )
     return parser.parse_args()
-
-
-def init_oracle_client(config: dict[str, str]) -> None:
-    thick_mode = (config.get("DB_THICK_MODE") or "").strip().lower() in {"1", "true", "yes", "y"}
-    lib_dir = (config.get("ORACLE_CLIENT_LIB_DIR") or "").strip()
-    if thick_mode and lib_dir:
-        try:
-            oracledb.init_oracle_client(lib_dir=lib_dir)
-        except oracledb.ProgrammingError:
-            pass
 
 
 def resolve_include(include_path: str, current_file: Path) -> Path:
@@ -177,14 +179,16 @@ def print_table(columns: list[str], rows: list[tuple]) -> None:
 
 
 def load_config(repo_root: Path) -> dict[str, str]:
-    values = dotenv_values(repo_root / ".env")
-    return {key: value for key, value in values.items() if value is not None}
+    return load_env_file(repo_root / ".env")
 
 
 def client_connection(config: dict[str, str], client: str) -> tuple[str, str, str]:
     prefix = CLIENTS[client]
-    user = config.get(f"{prefix}_DB_USER") or config.get("DB_USER") or config.get("ORACLE_USER")
-    password = config.get(f"{prefix}_DB_PASSWORD") or config.get("DB_PASSWORD") or config.get("ORACLE_PASSWORD")
+    # Internal DBs default to DEMO credentials when user/password are not set explicitly.
+    demo_user = config.get("DEMO_DB_USER") or config.get("DB_USER") or config.get("ORACLE_USER")
+    demo_password = config.get("DEMO_DB_PASSWORD") or config.get("DB_PASSWORD") or config.get("ORACLE_PASSWORD")
+    user = config.get(f"{prefix}_DB_USER") or demo_user
+    password = config.get(f"{prefix}_DB_PASSWORD") or demo_password
     dsn = config.get(f"{prefix}_ORACLE_DSN") or config.get(f"{prefix}_DB_CONNECT_STRING")
     if not user or not password or not dsn:
         raise RuntimeError(f"Missing connection config for client {client}")
@@ -199,7 +203,7 @@ def main() -> int:
     args = parse_args()
     repo_root = Path(__file__).resolve().parents[2]
     config = load_config(repo_root)
-    init_oracle_client(config)
+    ensure_oracle_client(config)
 
     if args.file:
         sql_text = expand_includes(Path(args.file).expanduser().resolve())
@@ -235,7 +239,7 @@ def main() -> int:
         )
         fetch_array_size = int(config.get("DB_FETCH_ARRAY_SIZE") or "200")
 
-        with oracledb.connect(user=user, password=password, dsn=dsn) as conn:
+        with oracledb.connect(user=user, password=password, dsn=normalize_oracle_dsn(dsn)) as conn:
             conn.call_timeout = call_timeout_ms
             with conn.cursor() as cursor:
                 cursor.arraysize = fetch_array_size

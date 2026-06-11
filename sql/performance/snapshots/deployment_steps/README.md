@@ -2,6 +2,8 @@
 
 Use this folder as the centralized deployment reference for the active 7 governed snapshots.
 
+Client reporting guide (use cases, example reports, population scope): [../docs/snapshot_client_reporting_guide.md](../docs/snapshot_client_reporting_guide.md)
+
 Run these scripts in `SQL Developer` or `SQLcl` as **script execution** (`F5` / `@file.sql`), not as single-statement execution, because they rely on `@@` includes and PL/SQL blocks.
 
 ## Active 7 snapshots
@@ -136,7 +138,36 @@ Logs for compound steps:
 - then applies the current approved staggered 6-hour cadence from:
   - [apply_6hour_staggered_schedule_1am_base.sql](/C:/Users/cvpow/OneDrive/Desktop/OriginBA/sql/performance/snapshots/apply_6hour_staggered_schedule_1am_base.sql)
 
+## Consolidation snapshots (12 tables)
+
+Workstream consolidation phase uses scripts **21–28** with the same baseline → rolling → schedule model (6-month rolling window).
+
+Runbook: [smartcity_consolidation_snapshot_rollout_runbook.md](../../../docs/smartcity_consolidation_snapshot_rollout_runbook.md)
+
+| Step | Script |
+| --- | --- |
+| Create tables | `21_create_all_consolidation_snapshot_tables.sql` |
+| Deploy baseline (`02a`) | `22_deploy_all_consolidation_baseline_procedures.sql` |
+| Schedule baseline jobs | `23a_schedule_all_consolidation_baseline_refreshes.sql` |
+| Baseline status / gate | `23b_…`, `23d_consolidation_baseline_jobs_ready_gate.sql` |
+| Validate | `24_validate_all_consolidation_snapshots.sql` |
+| Deploy rolling (`02`) | `25_deploy_all_consolidation_rolling_procedures.sql` |
+| Run operational once | `26_run_all_consolidation_operational_refreshes.sql` |
+| Schedule 6-hour jobs | `27_schedule_all_consolidation_snapshots.sql` |
+
+Batch wrapper examples:
+
+```bash
+python3 scripts/local/run_snapshot_rollout_step.py --step consolidation-create-tables --clients newark
+python3 scripts/local/run_snapshot_rollout_step.py --step consolidation-baseline-and-validate --clients newark
+python3 scripts/local/run_snapshot_rollout_step.py --step consolidation-cutover-and-validate --clients newark
+python3 scripts/local/run_snapshot_rollout_step.py --step consolidation-schedule-operational --clients newark
+```
+
+Manifest: [00_consolidation_snapshot_deployment_manifest.md](00_consolidation_snapshot_deployment_manifest.md)
+
 ## Manifest
 
 For the exact source files each wrapper script targets, use:
-- [00_active_snapshot_deployment_manifest.md](/C:/Users/cvpow/OneDrive/Desktop/OriginBA/sql/performance/snapshots/deployment_steps/00_active_snapshot_deployment_manifest.md)
+- Active 7: [00_active_snapshot_deployment_manifest.md](00_active_snapshot_deployment_manifest.md)
+- Consolidation 12: [00_consolidation_snapshot_deployment_manifest.md](00_consolidation_snapshot_deployment_manifest.md)
