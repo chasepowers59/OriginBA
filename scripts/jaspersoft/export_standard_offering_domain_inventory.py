@@ -27,7 +27,6 @@ WORKSTREAM_LABELS = {
     "Common": "Common",
     "Customer_Operations": "Customer Operations",
     "Debt_Management": "Debt Management",
-    "Development": "Development",
     "Field_Operations": "Field Operations",
     "Finance": "Finance",
     "Meter_Operations": "Meter Operations",
@@ -72,6 +71,15 @@ def _text(element: ET.Element | None, tag: str) -> str:
     return (child.text or "").strip() if child is not None else ""
 
 
+def is_domain_xml_path(name: str) -> bool:
+    if "/_files/" in name or not name.endswith(".xml"):
+        return False
+    basename = name.rsplit("/", 1)[-1]
+    if basename == ".folder.xml":
+        return False
+    return basename.endswith("___Domain.xml") or basename.endswith("_Domain.xml")
+
+
 def parse_domain_xml(xml_text: str, repo_rel: str) -> dict[str, str]:
     root = ET.fromstring(xml_text)
     folder = _text(root, "folder")
@@ -84,20 +92,40 @@ def parse_domain_xml(xml_text: str, repo_rel: str) -> dict[str, str]:
             workstream_folder = parts[idx + 1]
         if idx + 2 < len(parts):
             subfolder = "/".join(parts[idx + 2:])
+    elif "Workstreams" in parts:
+        idx = parts.index("Workstreams")
+        if idx + 1 < len(parts):
+            workstream_folder = parts[idx + 1]
+        if idx + 2 < len(parts):
+            subfolder = "/".join(parts[idx + 2:])
     elif repo_rel.startswith("resources/SmartCity/Report/Standard_Offering/"):
         rel = repo_rel.split("Standard_Offering/")[-1]
         rel_parts = rel.split("/")
         if len(rel_parts) >= 2:
             workstream_folder = rel_parts[0]
             subfolder = "/".join(rel_parts[1:-1]) if len(rel_parts) > 2 else rel_parts[0]
+    elif repo_rel.startswith("resources/SmartCity/Report/Workstreams/"):
+        rel = repo_rel.split("Workstreams/")[-1]
+        rel_parts = rel.split("/")
+        if rel_parts:
+            workstream_folder = rel_parts[0]
+            subfolder = "/".join(rel_parts[1:-1]) if len(rel_parts) > 1 else ""
 
     if not workstream_folder and repo_rel:
         m = re.search(r"Standard_Offering/([^/]+)/", repo_rel)
         if m:
             workstream_folder = m.group(1)
-        m2 = re.search(r"Standard_Offering/([^/]+/.*?)/[^/]+___Domain", repo_rel)
+        m2 = re.search(r"Standard_Offering/([^/]+/.*?)/[^/]+(?:___|_)Domain", repo_rel)
         if m2:
             subfolder = m2.group(1).split("/", 1)[-1] if "/" in m2.group(1) else ""
+        if not workstream_folder:
+            m3 = re.search(r"Workstreams/([^/]+)/", repo_rel)
+            if m3:
+                workstream_folder = m3.group(1)
+        if not subfolder:
+            m4 = re.search(r"Workstreams/[^/]+/(.*?)/[^/]+(?:___|_)Domain", repo_rel)
+            if m4:
+                subfolder = m4.group(1)
 
     return {
         "domain_name": _text(root, "name"),
@@ -200,14 +228,14 @@ def parse_schema(schema_text: str) -> tuple[list[dict[str, str]], list[dict[str,
 def load_domains_from_zip(zip_path: Path) -> list[DomainRecord]:
     domains: list[DomainRecord] = []
     with zipfile.ZipFile(zip_path) as archive:
-        domain_xml_paths = sorted(
-            name
-            for name in archive.namelist()
-            if "Standard_Offering/" in name
-            and name.endswith("___Domain.xml")
-            and "/_files/" not in name
-        )
+        domain_xml_paths = sorted(name for name in archive.namelist() if is_domain_xml_path(name))
         for domain_xml_path in domain_xml_paths:
+            if "/Development/" in domain_xml_path or domain_xml_path.endswith("/Development"):
+                continue
+            if not domain_xml_path.startswith("resources/SmartCity/Report/Standard_Offering/"):
+                continue
+            repo_root = "Standard_Offering"
+
             schema_path = domain_xml_path.replace(".xml", "_files/schema.data")
             if schema_path not in archive.namelist():
                 continue
@@ -215,10 +243,20 @@ def load_domains_from_zip(zip_path: Path) -> list[DomainRecord]:
                 archive.read(domain_xml_path).decode("utf-8", errors="replace"),
                 domain_xml_path,
             )
-            rel_path = domain_xml_path.split("Standard_Offering/")[-1]
+            rel_path = domain_xml_path.split(f"{repo_root}/")[-1]
             if not meta["subfolder"]:
                 parts = rel_path.split("/")
                 meta["subfolder"] = "/".join(parts[:-1]) if len(parts) > 1 else ""
+            meta["subfolder"] = (
+                meta["subfolder"]
+                .replace("___Domain.xml", "")
+                .replace("_Domain.xml", "")
+                .replace(".xml", "")
+            )
+            meta["workstream_label"] = WORKSTREAM_LABELS.get(
+                meta["workstream_folder"],
+                meta["workstream_folder"].replace("_", " "),
+            )
 
             tables, joins, fields = parse_schema(
                 archive.read(schema_path).decode("utf-8", errors="replace")
@@ -228,7 +266,7 @@ def load_domains_from_zip(zip_path: Path) -> list[DomainRecord]:
                     domain_name=meta["domain_name"],
                     domain_label=meta["domain_label"],
                     description=meta["description"],
-                    repository_path=f"/SmartCity/Report/Standard_Offering/{rel_path.replace('.xml', '')}",
+                    repository_path=f"/SmartCity/Report/{repo_root}/{rel_path.replace('.xml', '')}",
                     workstream_folder=meta["workstream_folder"],
                     workstream_label=meta["workstream_label"],
                     subfolder=meta["subfolder"],

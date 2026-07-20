@@ -22,6 +22,7 @@ PREPARED_DIR = CLIENT_PROMOTION / "prepared_imports"
 MAPPING = CLIENT_PROMOTION / "client_org_mapping.csv"
 CLIENT_PIPELINE = SCRIPT_DIR / "run_client_import_pipeline.py"
 VERIFY_PREPARED = SCRIPT_DIR / "verify_prepared_import.py"
+VERIFY_TENANT_SO = SCRIPT_DIR / "verify_standard_offering_tenant_import.py"
 
 DEFAULT_SOURCE_ZIP = Path("/Users/chase/Downloads/standard offering.zip")
 IMPORT_FOLDER = "/SmartCity/Report/Standard_Offering"
@@ -57,6 +58,25 @@ def parse_args() -> argparse.Namespace:
 def run(cmd: list[str], label: str) -> None:
     print(f"\n[{label}] {' '.join(cmd)}")
     subprocess.run(cmd, check=True)
+
+
+def read_datasource_index_metadata(target_ds: str) -> tuple[str | None, str | None]:
+    ds_index = CLIENT_DS_DIR / target_ds / "index.xml"
+    if not ds_index.is_file():
+        return None, None
+    import xml.etree.ElementTree as ET
+
+    root = ET.fromstring(ds_index.read_text(encoding="utf-8"))
+    keyalias = None
+    encrypted = None
+    for prop in root.findall("property"):
+        name = prop.get("name")
+        value = (prop.get("value") or "").strip() or None
+        if name == "keyalias":
+            keyalias = value
+        elif name == "encrypted":
+            encrypted = value
+    return keyalias, encrypted
 
 
 def read_mapping(path: Path) -> list[tuple[str, str]]:
@@ -167,6 +187,27 @@ def main() -> int:
             ],
             f"verify-{target_org}",
         )
+
+        verify_tenant_cmd = [
+            sys.executable,
+            str(VERIFY_TENANT_SO),
+            "--zip",
+            str(output_zip),
+            "--source-zip",
+            str(source_zip),
+            "--target-ds",
+            target_ds,
+            "--forbid-source-ds",
+            "Origin_DEV_DS",
+            "--output-json",
+            str(PREPARED_DIR / f"{target_org}_Standard_Offering_verification.json"),
+        ]
+        expected_keyalias, expected_encrypted = read_datasource_index_metadata(target_ds)
+        if expected_keyalias:
+            verify_tenant_cmd.extend(["--expected-keyalias", expected_keyalias])
+        if expected_encrypted:
+            verify_tenant_cmd.extend(["--expected-encrypted", expected_encrypted])
+        run(verify_tenant_cmd, f"verify-so-{target_org}")
 
     print("\nClient Standard Offering pipeline complete.")
     for target_org, _target_ds in mapping:

@@ -82,6 +82,10 @@ def parse_args() -> argparse.Namespace:
         "--expected-keyalias",
         help="Expected index.xml keyalias when target server encryption differs from source export.",
     )
+    parser.add_argument(
+        "--expected-encrypted",
+        help="Expected index.xml encrypted value for the target JasperReports Server.",
+    )
     return parser.parse_args()
 
 
@@ -149,6 +153,7 @@ def verify_index(
     expected_tenant_id: str | None = None,
     source_index_root: ET.Element | None = None,
     expected_keyalias: str | None = None,
+    expected_encrypted: str | None = None,
 ) -> None:
     verify_zip_structure(archive, report)
     if "index.xml" not in archive.namelist():
@@ -157,6 +162,10 @@ def verify_index(
     if index_text is None:
         report.fail("unreadable index.xml")
         return
+    if "<?xml version='1.0'" in index_text or ' />' in index_text:
+        report.fail("index.xml must use compact Jaspersoft export formatting")
+    if '<module id="favorites"></module>' in index_text or '<module id="favorites">' in index_text:
+        report.fail("index.xml favorites module must be self-closing and empty")
     root = ET.fromstring(index_text)
     children = list(root)
     if not children or children[0].tag != "property" or children[0].get("name") != "keyalias":
@@ -203,6 +212,13 @@ def verify_index(
                 f"index.xml keyalias mismatch: expected {expected_keyalias!r}, "
                 f"found {actual_keyalias!r}"
             )
+        if expected_encrypted:
+            actual_encrypted = read_index_property(root, "encrypted")
+            if actual_encrypted != expected_encrypted:
+                report.fail(
+                    f"index.xml encrypted mismatch: expected target-server value, "
+                    f"found {actual_encrypted!r}"
+                )
     elif source_index_root is not None:
         for property_name in ("keyalias", "encrypted"):
             expected = read_index_property(source_index_root, property_name)
@@ -387,6 +403,7 @@ def verify_zip(
     expected_dashboard_labels: list[str] | None,
     tenant_id: str | None = None,
     expected_keyalias: str | None = None,
+    expected_encrypted: str | None = None,
 ) -> VerificationReport:
     report = VerificationReport()
     prepared = inventory_zip(zip_path)
@@ -425,6 +442,7 @@ def verify_zip(
             expected_tenant_id=tenant_id,
             source_index_root=source_index_root,
             expected_keyalias=expected_keyalias,
+            expected_encrypted=expected_encrypted,
         )
         verify_datasource(archive, target_ds, report)
         verify_resource_placement(archive, report)
@@ -471,6 +489,7 @@ def main() -> int:
         expected_dashboard_labels=args.expected_dashboard_labels,
         tenant_id=args.tenant_id,
         expected_keyalias=args.expected_keyalias,
+        expected_encrypted=args.expected_encrypted,
     )
 
     print(f"ZIP: {zip_path}")

@@ -146,6 +146,7 @@ def build_rewrite_command(args: argparse.Namespace) -> List[str]:
         args.import_module_folder_uri,
         "--light-touch-tenant-root",
         "--import-into-existing-tenant",
+        "--use-canonical-index-encryption",
     ]
     if args.datasource_export_dir:
         command.extend(["--datasource-export-dir", args.datasource_export_dir])

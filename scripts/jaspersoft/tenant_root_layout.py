@@ -257,16 +257,8 @@ def apply_uri_replacements(root: str, replacements: dict[str, str]) -> int:
 
 
 def merge_workstreams_extensions_into_standard_offering(smartcity_root: str) -> None:
-    """Preserve Workstreams-only paths still referenced from Standard_Offering artifacts."""
-    workstreams_root = os.path.join(smartcity_root, "Report", "Workstreams")
-    standard_root = os.path.join(smartcity_root, "Report", "Standard_Offering")
-    workstreams_development = os.path.join(workstreams_root, "Development")
-    if os.path.isdir(workstreams_development):
-        os.makedirs(standard_root, exist_ok=True)
-        merge_tree(
-            workstreams_development,
-            os.path.join(standard_root, "Development"),
-        )
+    """No-op: Development/Snapshots domains are never promoted into Standard_Offering."""
+    return
 
 
 def prefer_standard_offering_tree(smartcity_root: str) -> dict[str, str]:
@@ -463,16 +455,17 @@ def apply_standard_offering_uri_corrections(root: str) -> int:
 
 def remove_superseded_development_snapshot_tree(work_root: str) -> None:
     """Drop Development/Snapshots copies after URIs point at workstream domains."""
-    development_root = os.path.join(
-        work_root,
-        "resources",
-        "SmartCity",
-        "Report",
-        "Standard_Offering",
-        "Development",
-    )
-    if os.path.isdir(development_root):
-        shutil.rmtree(development_root)
+    for report_root in ("Standard_Offering", "Workstreams"):
+        development_root = os.path.join(
+            work_root,
+            "resources",
+            "SmartCity",
+            "Report",
+            report_root,
+            "Development",
+        )
+        if os.path.isdir(development_root):
+            shutil.rmtree(development_root)
 
 
 def normalize_report_root_uris(root: str, report_root: str) -> None:
@@ -744,6 +737,16 @@ def zip_from_source_order(
             output_archive.write(os.path.join(work_path, relative_path), relative_path)
             written.add(relative_path)
 
+        for dir_entry in ("resources/", "favorites/"):
+            if dir_entry in written:
+                continue
+            directory_path = os.path.join(work_path, dir_entry.rstrip("/"))
+            if os.path.isdir(directory_path):
+                zip_info = zipfile.ZipInfo(dir_entry)
+                zip_info.compress_type = zipfile.ZIP_DEFLATED
+                output_archive.writestr(zip_info, b"")
+                written.add(dir_entry)
+
         index_path = os.path.join(work_path, "index.xml")
         if os.path.isfile(index_path):
             output_archive.write(index_path, "index.xml")
@@ -763,6 +766,20 @@ def promote_tenant_root_export_light_touch(
     if not is_tenant_root_export(work_root):
         raise ProcessingError("Light-touch promotion requires an existing tenant-root SmartCity tree.")
 
+    smartcity_root = os.path.join(work_root, "resources", "SmartCity")
+    if os.path.isdir(smartcity_root):
+        workstreams_root = os.path.join(smartcity_root, "Report", "Workstreams")
+        if os.path.isdir(workstreams_root):
+            collision_uri_remap = prefer_standard_offering_tree(smartcity_root)
+            if collision_uri_remap:
+                normalized_remap = {
+                    old.replace("/SmartCity/Report/Workstreams/", "/SmartCity/Report/Standard_Offering/"): new
+                    for old, new in collision_uri_remap.items()
+                }
+                apply_uri_replacements(work_root, normalized_remap)
+        normalize_report_root_uris(work_root, "Standard_Offering")
+        apply_standard_offering_uri_corrections(work_root)
+
     if not skip_datasource_import:
         rewrite_datasource_for_tenant_root(work_root, target_ds)
 
@@ -773,26 +790,36 @@ def promote_tenant_root_export_light_touch(
     if not include_public_template:
         include_public_template = merge_bundled_public_dashboard_template(work_root)
 
-    keyalias = None
-    encrypted = None
+    datasource_uri = None if skip_datasource_import else f"/DataSource/{target_ds}"
+    extra_resources = [PUBLIC_DASHBOARD_TEMPLATE_URI] if include_public_template else []
     if use_canonical_index_encryption and datasource_export_index_path:
-        keyalias, encrypted, _js_version = read_export_index_metadata(datasource_export_index_path)
-        if not keyalias or not encrypted:
+        ds_keyalias, ds_encrypted, ds_js_version = read_export_index_metadata(
+            datasource_export_index_path
+        )
+        if not ds_keyalias or not ds_encrypted:
             raise ProcessingError(
                 "Canonical datasource export index is missing keyalias/encrypted metadata."
             )
-
-    datasource_uri = None if skip_datasource_import else f"/DataSource/{target_ds}"
-    extra_resources = [PUBLIC_DASHBOARD_TEMPLATE_URI] if include_public_template else []
-    patch_source_export_index(
-        os.path.join(work_root, "index.xml"),
-        import_folder_uri=import_folder_uri,
-        import_datasource_resource_uri=datasource_uri,
-        import_repository_resources=extra_resources,
-        import_into_existing_tenant=import_into_existing_tenant,
-        keyalias=keyalias,
-        encrypted=encrypted,
-    )
+        finalize_tenant_import_index(
+            work_root,
+            tenant_id="",
+            import_folder_uri=import_folder_uri,
+            import_datasource_resource_uri=datasource_uri,
+            import_repository_resources=extra_resources,
+            keyalias=ds_keyalias,
+            encrypted=ds_encrypted,
+            js_version=ds_js_version,
+            import_into_existing_tenant=import_into_existing_tenant,
+        )
+    else:
+        finalize_tenant_import_index(
+            work_root,
+            tenant_id="",
+            import_folder_uri=import_folder_uri,
+            import_datasource_resource_uri=datasource_uri,
+            import_repository_resources=extra_resources,
+            import_into_existing_tenant=import_into_existing_tenant,
+        )
     ensure_favorites_directory(work_root)
 
 

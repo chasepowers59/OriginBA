@@ -78,7 +78,6 @@ WORKSTREAM_ORDER = [
     "Common",
     "Customer_Operations",
     "Debt_Management",
-    "Development",
     "Field_Operations",
     "Finance",
     "Meter_Operations",
