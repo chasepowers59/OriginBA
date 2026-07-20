@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CIS FT_GL open AR controls as-of ACCOUNTING_DT (bridge to BC Trial Balance).
+  Filter GL_ACCT suffix 142000 / 142050 / 142060 (+ optional 235000 deposits).
+  Import as Report Unit; bind JDBC datasource ORIGIN_DEV_DS. Not an aging report.
+  SQL avoids WITH/CTE and REGEXP_* (JRS validateSQL / error 6632).
+-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="ar_gl_control_bridge_asof"
+    pageWidth="842"
+    pageHeight="595"
+    orientation="Landscape"
+    columnWidth="802"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="b2c3d4e5-f6a7-4890-b123-456789abcdef">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+    <property name="net.sf.jasperreports.query.timeout" value="900"/>
+
+    <style name="Base" fontName="SansSerif" fontSize="9"/>
+    <style name="TitleBlue" style="Base" fontSize="16" isBold="true" forecolor="#0A4A8A"/>
+    <style name="MetaBlue" style="Base" fontSize="10" forecolor="#0A4A8A"/>
+    <style name="HeaderBlue" style="Base" fontSize="9" isBold="true" forecolor="#FFFFFF" backcolor="#0A4A8A"/>
+    <style name="DetailText" style="Base" fontSize="9"/>
+    <style name="SummaryBlue" style="Base" fontSize="9" isBold="true" backcolor="#EAF3FF"/>
+
+    <parameter name="AS_OF_DT" class="java.sql.Timestamp">
+        <defaultValueExpression><![CDATA[new java.sql.Timestamp(java.sql.Date.valueOf("2026-06-30").getTime())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Origin DEV"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="INCLUDE_DEPOSITS" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Y"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="SQL"><![CDATA[
+SELECT
+    CASE
+        WHEN g.gl_acct LIKE '%-142000' THEN '142000'
+        WHEN g.gl_acct LIKE '%-142050' THEN '142050'
+        WHEN g.gl_acct LIKE '%-142060' THEN '142060'
+        WHEN g.gl_acct LIKE '%-235000' THEN '235000'
+        ELSE 'OTHER'
+    END AS GL_ACCT_NUM,
+    TRIM(g.dst_id) AS DISTRIBUTION_CODE,
+    NVL(TRIM(dl.descr), TRIM(g.dst_id)) AS DISTRIBUTION_DESCR,
+    COUNT(*) AS GL_LINE_COUNT,
+    ROUND(SUM(g.amount), 2) AS GL_AMOUNT
+FROM cisadm.ci_ft_gl g
+JOIN cisadm.ci_ft ft
+  ON ft.ft_id = g.ft_id
+LEFT JOIN cisadm.ci_dst_code_l dl
+  ON dl.dst_id = g.dst_id
+ AND dl.language_cd = 'ENG'
+WHERE ft.freeze_sw = 'Y'
+  AND NVL(g.tot_amt_sw, 'Y') = 'Y'
+  AND ft.accounting_dt <= TRUNC($P{AS_OF_DT})
+  AND (
+        g.gl_acct LIKE '%-142000'
+     OR g.gl_acct LIKE '%-142050'
+     OR g.gl_acct LIKE '%-142060'
+     OR (
+            UPPER(NVL($P{INCLUDE_DEPOSITS}, 'Y')) = 'Y'
+        AND g.gl_acct LIKE '%-235000'
+        )
+  )
+GROUP BY
+    CASE
+        WHEN g.gl_acct LIKE '%-142000' THEN '142000'
+        WHEN g.gl_acct LIKE '%-142050' THEN '142050'
+        WHEN g.gl_acct LIKE '%-142060' THEN '142060'
+        WHEN g.gl_acct LIKE '%-235000' THEN '235000'
+        ELSE 'OTHER'
+    END,
+    TRIM(g.dst_id),
+    NVL(TRIM(dl.descr), TRIM(g.dst_id))
+ORDER BY GL_ACCT_NUM, DISTRIBUTION_CODE
+    ]]></queryString>
+
+    <field name="GL_ACCT_NUM" class="java.lang.String"/>
+    <field name="DISTRIBUTION_CODE" class="java.lang.String"/>
+    <field name="DISTRIBUTION_DESCR" class="java.lang.String"/>
+    <field name="GL_LINE_COUNT" class="java.lang.Long"/>
+    <field name="GL_AMOUNT" class="java.math.BigDecimal"/>
+
+    <variable name="SUM_GL_AMOUNT" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{GL_AMOUNT}]]></variableExpression>
+    </variable>
+
+    <group name="GL_ACCT">
+        <groupExpression><![CDATA[$F{GL_ACCT_NUM}]]></groupExpression>
+        <groupHeader>
+            <band height="20">
+                <textField>
+                    <reportElement style="SummaryBlue" mode="Opaque" x="0" y="0" width="802" height="20" uuid="66666666-6666-4666-a666-666666666601"/>
+                    <textElement verticalAlignment="Middle"/>
+                    <textFieldExpression><![CDATA["GL Account " + $F{GL_ACCT_NUM}]]></textFieldExpression>
+                </textField>
+            </band>
+        </groupHeader>
+        <groupFooter>
+            <band height="18">
+                <staticText>
+                    <reportElement style="DetailText" x="0" y="0" width="400" height="18" uuid="66666666-6666-4666-a666-666666666602"/>
+                    <textElement verticalAlignment="Middle"><font isBold="true"/></textElement>
+                    <text><![CDATA[Group subtotal (see export / Ad Hoc for per-GL sum)]]></text>
+                </staticText>
+            </band>
+        </groupFooter>
+    </group>
+
+    <title>
+        <band height="52">
+            <staticText>
+                <reportElement style="TitleBlue" x="0" y="4" width="802" height="22" uuid="77777777-7777-4777-a777-777777777701"/>
+                <text><![CDATA[AR GL Control Bridge (As-Of Accounting Date)]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="MetaBlue" x="0" y="28" width="802" height="14" uuid="77777777-7777-4777-a777-777777777702"/>
+                <textFieldExpression><![CDATA[$P{CLIENT_NAME} + "  |  As-of (ACCOUNTING_DT): " + $P{AS_OF_DT} + "  |  Compare GL_AMOUNT to BC TB 142000 / 142050 / 142060"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="MetaBlue" x="0" y="42" width="802" height="10" uuid="77777777-7777-4777-a777-777777777703"/>
+                <textFieldExpression><![CDATA["Not SA aging. Frozen FT_GL lines with TOT_AMT_SW=Y. Deposits (235000) optional."]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="22">
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="0" y="0" width="80" height="22" uuid="88888888-8888-4888-a888-888888888801"/>
+                <textElement verticalAlignment="Middle"/><text><![CDATA[GL Acct]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="80" y="0" width="120" height="22" uuid="88888888-8888-4888-a888-888888888802"/>
+                <textElement verticalAlignment="Middle"/><text><![CDATA[Dist Code]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="200" y="0" width="320" height="22" uuid="88888888-8888-4888-a888-888888888803"/>
+                <textElement verticalAlignment="Middle"/><text><![CDATA[Description]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="520" y="0" width="100" height="22" uuid="88888888-8888-4888-a888-888888888804"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/><text><![CDATA[GL Lines]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="620" y="0" width="182" height="22" uuid="88888888-8888-4888-a888-888888888805"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/><text><![CDATA[GL Amount]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="16">
+            <textField>
+                <reportElement style="DetailText" x="0" y="0" width="80" height="16" uuid="99999999-9999-4999-a999-999999999901"/>
+                <textFieldExpression><![CDATA[$F{GL_ACCT_NUM}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="DetailText" x="80" y="0" width="120" height="16" uuid="99999999-9999-4999-a999-999999999902"/>
+                <textFieldExpression><![CDATA[$F{DISTRIBUTION_CODE}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="DetailText" x="200" y="0" width="320" height="16" uuid="99999999-9999-4999-a999-999999999903"/>
+                <textFieldExpression><![CDATA[$F{DISTRIBUTION_DESCR}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="DetailText" x="520" y="0" width="100" height="16" uuid="99999999-9999-4999-a999-999999999904"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{GL_LINE_COUNT}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement style="DetailText" x="620" y="0" width="182" height="16" uuid="99999999-9999-4999-a999-999999999905"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{GL_AMOUNT}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="2" width="802" height="14" uuid="aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaa1"/>
+                <textElement textAlignment="Center"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Origin Utility — Proprietary & Confidential — " + $P{CLIENT_NAME} + " — Page " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <summary>
+        <band height="22">
+            <staticText>
+                <reportElement style="SummaryBlue" mode="Opaque" x="0" y="0" width="620" height="22" uuid="bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbb1"/>
+                <textElement verticalAlignment="Middle"/><text><![CDATA[Grand total GL Amount (all selected controls)]]></text>
+            </staticText>
+            <textField pattern="#,##0.00">
+                <reportElement style="SummaryBlue" mode="Opaque" x="620" y="0" width="182" height="22" uuid="bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbb2"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{SUM_GL_AMOUNT}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+</jasperReport>

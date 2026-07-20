@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CityCorp / SmartCity — AR Aging by Distribution Code (as-of cutoff).
+  SQL JRXML: frozen ARS FTs with ARS_DT <= AS_OF_DT; FIFO buckets as of AS_OF_DT
+  (same rules as CISADM.REFRESH_CMS_SA_SNAPSHOT, parameterized for EOY).
+    Import as Report Unit; bind JDBC datasource ORIGIN_DEV_DS.
+-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="ar_aging_by_dist_code_asof"
+    pageWidth="842"
+    pageHeight="595"
+    orientation="Landscape"
+    columnWidth="802"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="a1b2c3d4-e5f6-4789-a012-3456789abcde">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+    <property name="net.sf.jasperreports.query.timeout" value="900"/>
+
+    <style name="Base" fontName="SansSerif" fontSize="9"/>
+    <style name="TitleBlue" style="Base" fontSize="16" isBold="true" forecolor="#0A4A8A"/>
+    <style name="MetaBlue" style="Base" fontSize="10" forecolor="#0A4A8A"/>
+    <style name="HeaderBlue" style="Base" fontSize="9" isBold="true" forecolor="#FFFFFF" backcolor="#0A4A8A"/>
+    <style name="DetailText" style="Base" fontSize="9"/>
+    <style name="SummaryBlue" style="Base" fontSize="9" isBold="true" backcolor="#EAF3FF"/>
+
+    <parameter name="AS_OF_DT" class="java.sql.Timestamp">
+        <defaultValueExpression><![CDATA[new java.sql.Timestamp(java.sql.Date.valueOf("2026-06-30").getTime())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Origin DEV"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="INCLUDE_ZERO_BAL" class="java.lang.String">
+        <defaultValueExpression><![CDATA["N"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="SQL"><![CDATA[
+WITH
+asof AS (
+    SELECT TRUNC($P{AS_OF_DT}) AS d FROM dual
+),
+base_ft AS (
+    SELECT
+        ft.sa_id,
+        TRUNC(ft.ars_dt) AS ars_dt,
+        ft.ft_id,
+        NVL(ft.cur_amt, 0) AS cur_amt,
+        CASE WHEN NVL(ft.cur_amt, 0) > 0 THEN NVL(ft.cur_amt, 0) ELSE 0 END AS debt_amt,
+        CASE WHEN NVL(ft.cur_amt, 0) < 0 THEN -NVL(ft.cur_amt, 0) ELSE 0 END AS credit_amt
+    FROM cisadm.ci_ft ft
+    CROSS JOIN asof a
+    WHERE ft.freeze_sw = 'Y'
+      AND ft.not_in_ars_sw = 'N'
+      AND ft.ars_dt IS NOT NULL
+      AND TRUNC(ft.ars_dt) <= a.d
+),
+sa_tot AS (
+    SELECT
+        sa_id,
+        SUM(cur_amt) AS cur_bal,
+        SUM(debt_amt) AS total_debt,
+        SUM(credit_amt) AS total_credit
+    FROM base_ft
+    GROUP BY sa_id
+),
+debt_rows AS (
+    SELECT
+        b.sa_id,
+        b.ars_dt,
+        b.ft_id,
+        b.debt_amt,
+        SUM(b.debt_amt) OVER (
+            PARTITION BY b.sa_id
+            ORDER BY b.ars_dt, b.ft_id
+            ROWS UNBOUNDED PRECEDING
+        ) AS cum_debt
+    FROM base_ft b
+    WHERE b.debt_amt > 0
+),
+unpaid_debt AS (
+    SELECT
+        d.sa_id,
+        d.ars_dt,
+        GREATEST(0, d.cum_debt - t.total_credit)
+            - GREATEST(0, (d.cum_debt - d.debt_amt) - t.total_credit) AS unpaid_amt
+    FROM debt_rows d
+    INNER JOIN sa_tot t ON t.sa_id = d.sa_id
+),
+aged_debt AS (
+    SELECT
+        u.sa_id,
+        NVL(SUM(CASE WHEN a.d - u.ars_dt BETWEEN 0 AND 30 THEN u.unpaid_amt ELSE 0 END), 0) AS ars_amt1,
+        NVL(SUM(CASE WHEN a.d - u.ars_dt BETWEEN 31 AND 60 THEN u.unpaid_amt ELSE 0 END), 0) AS ars_amt2,
+        NVL(SUM(CASE WHEN a.d - u.ars_dt BETWEEN 61 AND 90 THEN u.unpaid_amt ELSE 0 END), 0) AS ars_amt3,
+        NVL(SUM(CASE WHEN a.d - u.ars_dt BETWEEN 91 AND 120 THEN u.unpaid_amt ELSE 0 END), 0) AS ars_amt4,
+        NVL(SUM(CASE WHEN a.d - u.ars_dt > 120 THEN u.unpaid_amt ELSE 0 END), 0) AS ars_amt5
+    FROM unpaid_debt u
+    CROSS JOIN asof a
+    GROUP BY u.sa_id
+),
+sa_aged AS (
+    SELECT
+        t.sa_id,
+        t.cur_bal,
+        NVL(ad.ars_amt1, 0) - GREATEST(0, t.total_credit - t.total_debt) AS ars_amt1,
+        NVL(ad.ars_amt2, 0) AS ars_amt2,
+        NVL(ad.ars_amt3, 0) AS ars_amt3,
+        NVL(ad.ars_amt4, 0) AS ars_amt4,
+        NVL(ad.ars_amt5, 0) AS ars_amt5
+    FROM sa_tot t
+    LEFT JOIN aged_debt ad ON ad.sa_id = t.sa_id
+),
+sa_dst AS (
+    SELECT
+        sa.sa_id,
+        TRIM(st.dst_id) AS dist_code,
+        NVL(TRIM(dl.descr), TRIM(st.dst_id)) AS dist_descr
+    FROM cisadm.ci_sa sa
+    JOIN cisadm.ci_sa_type st
+      ON st.sa_type_cd = sa.sa_type_cd
+     AND st.cis_division = sa.cis_division
+    LEFT JOIN cisadm.ci_dst_code_l dl
+      ON dl.dst_id = st.dst_id
+     AND dl.language_cd = 'ENG'
+)
+SELECT
+    d.dist_code AS DISTRIBUTION_CODE,
+    d.dist_descr AS DISTRIBUTION_DESCR,
+    CASE
+        WHEN d.dist_code IN ('A/R-WATER', 'A/R-SEWER', 'A/R-PA', 'A/P-OVPY')
+            THEN '142000 Customer AR'
+        WHEN d.dist_code = 'A/R-SOLWST'
+            THEN '142050 Solid Waste AR'
+        WHEN d.dist_code = 'A/R-CARDS'
+            THEN '142060 Cards AR'
+        WHEN d.dist_code = 'A/P-DEPOS'
+            THEN '235000 Customer Deposits'
+        WHEN d.dist_code LIKE 'E-WO%'
+            THEN 'Write-Off DST (not AR control)'
+        ELSE 'Other'
+    END AS GL_CONTROL_SECTION,
+    COUNT(*) AS SA_COUNT,
+    ROUND(SUM(s.cur_bal), 2) AS CURRENT_BAL,
+    ROUND(SUM(s.ars_amt1), 2) AS AMT_0_30,
+    ROUND(SUM(s.ars_amt2), 2) AS AMT_31_60,
+    ROUND(SUM(s.ars_amt3), 2) AS AMT_61_90,
+    ROUND(SUM(s.ars_amt4), 2) AS AMT_91_120,
+    ROUND(SUM(s.ars_amt5), 2) AS AMT_121_PLUS
+FROM sa_aged s
+JOIN sa_dst d ON d.sa_id = s.sa_id
+WHERE (UPPER(NVL($P{INCLUDE_ZERO_BAL}, 'N')) = 'Y' OR ABS(s.cur_bal) > 0.005)
+GROUP BY
+    d.dist_code,
+    d.dist_descr,
+    CASE
+        WHEN d.dist_code IN ('A/R-WATER', 'A/R-SEWER', 'A/R-PA', 'A/P-OVPY')
+            THEN '142000 Customer AR'
+        WHEN d.dist_code = 'A/R-SOLWST'
+            THEN '142050 Solid Waste AR'
+        WHEN d.dist_code = 'A/R-CARDS'
+            THEN '142060 Cards AR'
+        WHEN d.dist_code = 'A/P-DEPOS'
+            THEN '235000 Customer Deposits'
+        WHEN d.dist_code LIKE 'E-WO%'
+            THEN 'Write-Off DST (not AR control)'
+        ELSE 'Other'
+    END
+ORDER BY GL_CONTROL_SECTION, DISTRIBUTION_CODE
+    ]]></queryString>
+
+    <field name="DISTRIBUTION_CODE" class="java.lang.String"/>
+    <field name="DISTRIBUTION_DESCR" class="java.lang.String"/>
+    <field name="GL_CONTROL_SECTION" class="java.lang.String"/>
+    <field name="SA_COUNT" class="java.lang.Long"/>
+    <field name="CURRENT_BAL" class="java.math.BigDecimal"/>
+    <field name="AMT_0_30" class="java.math.BigDecimal"/>
+    <field name="AMT_31_60" class="java.math.BigDecimal"/>
+    <field name="AMT_61_90" class="java.math.BigDecimal"/>
+    <field name="AMT_91_120" class="java.math.BigDecimal"/>
+    <field name="AMT_121_PLUS" class="java.math.BigDecimal"/>
+
+    <variable name="SUM_CURRENT" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{CURRENT_BAL}]]></variableExpression>
+    </variable>
+    <variable name="SUM_0_30" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{AMT_0_30}]]></variableExpression>
+    </variable>
+    <variable name="SUM_31_60" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{AMT_31_60}]]></variableExpression>
+    </variable>
+    <variable name="SUM_61_90" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{AMT_61_90}]]></variableExpression>
+    </variable>
+    <variable name="SUM_91_120" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{AMT_91_120}]]></variableExpression>
+    </variable>
+    <variable name="SUM_121" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{AMT_121_PLUS}]]></variableExpression>
+    </variable>
+
+    <title>
+        <band height="56">
+            <staticText>
+                <reportElement style="TitleBlue" x="0" y="4" width="802" height="22" uuid="11111111-1111-4111-a111-111111111101"/>
+                <text><![CDATA[AR Aging Balance by Distribution Code (As-Of)]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="MetaBlue" x="0" y="28" width="802" height="14" uuid="11111111-1111-4111-a111-111111111102"/>
+                <textFieldExpression><![CDATA[$P{CLIENT_NAME} + "  |  As-of (ARS_DT cutoff): " + $P{AS_OF_DT} + "  |  FIFO aging; payments/credits included; future ARS excluded"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="MetaBlue" x="0" y="42" width="802" height="12" uuid="11111111-1111-4111-a111-111111111103"/>
+                <textFieldExpression><![CDATA["Current = SA CUR_BAL as of cutoff. Buckets ARS_AMT1-5 sum to Current. Use GL Control Section when comparing to BC TB 142000/050/060."]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="28">
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="0" y="0" width="90" height="28" uuid="22222222-2222-4222-a222-222222222201"/>
+                <textElement verticalAlignment="Middle"/><text><![CDATA[Dist Code]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="90" y="0" width="130" height="28" uuid="22222222-2222-4222-a222-222222222202"/>
+                <textElement verticalAlignment="Middle"/><text><![CDATA[GL Control Section]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="220" y="0" width="50" height="28" uuid="22222222-2222-4222-a222-222222222203"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/><text><![CDATA[SA #]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="270" y="0" width="88" height="28" uuid="22222222-2222-4222-a222-222222222204"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/><text><![CDATA[Current]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="358" y="0" width="88" height="28" uuid="22222222-2222-4222-a222-222222222205"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/><text><![CDATA[0-30]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="446" y="0" width="88" height="28" uuid="22222222-2222-4222-a222-222222222206"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/><text><![CDATA[31-60]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="534" y="0" width="88" height="28" uuid="22222222-2222-4222-a222-222222222207"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/><text><![CDATA[61-90]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="622" y="0" width="88" height="28" uuid="22222222-2222-4222-a222-222222222208"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/><text><![CDATA[91-120]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="HeaderBlue" mode="Opaque" x="710" y="0" width="92" height="28" uuid="22222222-2222-4222-a222-222222222209"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/><text><![CDATA[121+]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="18">
+            <textField>
+                <reportElement style="DetailText" x="0" y="0" width="90" height="18" uuid="33333333-3333-4333-a333-333333333301"/>
+                <textFieldExpression><![CDATA[$F{DISTRIBUTION_CODE}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="DetailText" x="90" y="0" width="130" height="18" uuid="33333333-3333-4333-a333-333333333302"/>
+                <textFieldExpression><![CDATA[$F{GL_CONTROL_SECTION}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="DetailText" x="220" y="0" width="50" height="18" uuid="33333333-3333-4333-a333-333333333303"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{SA_COUNT}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement style="DetailText" x="270" y="0" width="88" height="18" uuid="33333333-3333-4333-a333-333333333304"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{CURRENT_BAL}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement style="DetailText" x="358" y="0" width="88" height="18" uuid="33333333-3333-4333-a333-333333333305"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{AMT_0_30}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement style="DetailText" x="446" y="0" width="88" height="18" uuid="33333333-3333-4333-a333-333333333306"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{AMT_31_60}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement style="DetailText" x="534" y="0" width="88" height="18" uuid="33333333-3333-4333-a333-333333333307"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{AMT_61_90}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement style="DetailText" x="622" y="0" width="88" height="18" uuid="33333333-3333-4333-a333-333333333308"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{AMT_91_120}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement style="DetailText" x="710" y="0" width="92" height="18" uuid="33333333-3333-4333-a333-333333333309"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{AMT_121_PLUS}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="2" width="802" height="14" uuid="55555555-5555-4555-a555-555555555501"/>
+                <textElement textAlignment="Center"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Origin Utility — Proprietary & Confidential — " + $P{CLIENT_NAME} + " — Page " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <summary>
+        <band height="22">
+            <staticText>
+                <reportElement style="SummaryBlue" mode="Opaque" x="0" y="0" width="220" height="22" uuid="44444444-4444-4444-a444-444444444401"/>
+                <textElement verticalAlignment="Middle"/><text><![CDATA[Totals]]></text>
+            </staticText>
+            <textField pattern="#,##0.00">
+                <reportElement style="SummaryBlue" mode="Opaque" x="270" y="0" width="88" height="22" uuid="44444444-4444-4444-a444-444444444402"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{SUM_CURRENT}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement style="SummaryBlue" mode="Opaque" x="358" y="0" width="88" height="22" uuid="44444444-4444-4444-a444-444444444403"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{SUM_0_30}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement style="SummaryBlue" mode="Opaque" x="446" y="0" width="88" height="22" uuid="44444444-4444-4444-a444-444444444404"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{SUM_31_60}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement style="SummaryBlue" mode="Opaque" x="534" y="0" width="88" height="22" uuid="44444444-4444-4444-a444-444444444405"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{SUM_61_90}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement style="SummaryBlue" mode="Opaque" x="622" y="0" width="88" height="22" uuid="44444444-4444-4444-a444-444444444406"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{SUM_91_120}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement style="SummaryBlue" mode="Opaque" x="710" y="0" width="92" height="22" uuid="44444444-4444-4444-a444-444444444407"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{SUM_121}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+</jasperReport>

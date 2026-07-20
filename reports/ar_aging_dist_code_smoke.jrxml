@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Minimal smoke: proves JDBC datasource can SELECT from CISADM.
+  Bind Report Unit datasource to ORIGIN_DEV_DS (not a Domain).
+-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="ar_aging_dist_code_smoke"
+    pageWidth="595"
+    pageHeight="842"
+    columnWidth="555"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="c3d4e5f6-a7b8-4901-c234-567890abcdef">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+    <property name="net.sf.jasperreports.query.timeout" value="60"/>
+
+    <parameter name="AS_OF_DT" class="java.sql.Timestamp">
+        <defaultValueExpression><![CDATA[new java.sql.Timestamp(java.sql.Date.valueOf("2026-06-30").getTime())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Origin DEV"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="SQL"><![CDATA[
+SELECT
+    'OK' AS STATUS,
+    USER AS DB_USER,
+    SYS_CONTEXT('USERENV', 'DB_NAME') AS DB_NAME,
+    SYSDATE AS DB_NOW,
+    TRUNC($P{AS_OF_DT}) AS AS_OF_USED
+FROM dual
+    ]]></queryString>
+
+    <field name="STATUS" class="java.lang.String"/>
+    <field name="DB_USER" class="java.lang.String"/>
+    <field name="DB_NAME" class="java.lang.String"/>
+    <field name="DB_NOW" class="java.sql.Timestamp"/>
+    <field name="AS_OF_USED" class="java.sql.Timestamp"/>
+
+    <title>
+        <band height="36">
+            <staticText>
+                <reportElement x="0" y="8" width="555" height="20" uuid="d4e5f6a7-b8c9-4012-d345-678901abcdef"/>
+                <textElement><font size="14" isBold="true"/></textElement>
+                <text><![CDATA[AR Aging — Datasource Smoke Test]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="18">
+            <staticText>
+                <reportElement x="0" y="0" width="80" height="18" uuid="e5f6a7b8-c9d0-4123-e456-789012abcdef"/>
+                <text><![CDATA[Status]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="80" y="0" width="120" height="18" uuid="e5f6a7b8-c9d0-4123-e456-789012abcde0"/>
+                <text><![CDATA[DB User]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="200" y="0" width="150" height="18" uuid="e5f6a7b8-c9d0-4123-e456-789012abcde1"/>
+                <text><![CDATA[DB Name]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="350" y="0" width="100" height="18" uuid="e5f6a7b8-c9d0-4123-e456-789012abcde2"/>
+                <text><![CDATA[As-Of]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="80" height="18" uuid="f6a7b8c9-d0e1-4234-f567-890123abcdef"/>
+                <textFieldExpression><![CDATA[$F{STATUS}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="80" y="0" width="120" height="18" uuid="f6a7b8c9-d0e1-4234-f567-890123abcde0"/>
+                <textFieldExpression><![CDATA[$F{DB_USER}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="200" y="0" width="150" height="18" uuid="f6a7b8c9-d0e1-4234-f567-890123abcde1"/>
+                <textFieldExpression><![CDATA[$F{DB_NAME}]]></textFieldExpression>
+            </textField>
+            <textField pattern="yyyy-MM-dd">
+                <reportElement x="350" y="0" width="100" height="18" uuid="f6a7b8c9-d0e1-4234-f567-890123abcde2"/>
+                <textFieldExpression><![CDATA[$F{AS_OF_USED}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="16">
+            <textField>
+                <reportElement x="0" y="0" width="555" height="14" uuid="a7b8c9d0-e1f2-4345-a678-901234abcdef"/>
+                <textFieldExpression><![CDATA[$P{CLIENT_NAME}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>
