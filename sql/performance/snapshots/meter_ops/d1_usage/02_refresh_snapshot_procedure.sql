@@ -304,8 +304,8 @@ BEGIN
             bridge.c1_sa_id,
             bridge.c1_sp_id,
             bridge.c1_bseg_id,
-            bridge.c1_bill_cyc_cd,
-            c1_bill_cyc.descr,
+            COALESCE(NULLIF(TRIM(bridge.c1_bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), '')) AS c1_bill_cyc_cd,
+            c1_bill_cyc.descr AS c1_bill_cyc_desc,
             bridge.c1_bo_status_cd,
             c1_status.descr,
             bridge.c1_start_dttm,
@@ -318,8 +318,8 @@ BEGIN
             bseg.start_dt,
             bseg.end_dt,
             bseg.est_sw,
-            bseg.bill_cyc_cd,
-            bseg_bill_cyc.descr,
+            COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(bridge.c1_bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), '')) AS bseg_bill_cyc_cd,
+            bseg_bill_cyc.descr AS bseg_bill_cyc_desc,
             COALESCE(bridge.c1_sa_id, bseg.sa_id) AS sa_id,
             sa.acct_id,
             acct.cust_cl_cd,
@@ -408,14 +408,14 @@ BEGIN
            AND c1_status.bo_status_cd = bridge.c1_bo_status_cd
            AND c1_status.language_cd = 'ENG'
         LEFT JOIN cisadm.ci_bill_cyc_l c1_bill_cyc
-            ON c1_bill_cyc.bill_cyc_cd = bridge.c1_bill_cyc_cd
+            ON c1_bill_cyc.bill_cyc_cd = COALESCE(NULLIF(TRIM(bridge.c1_bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
            AND c1_bill_cyc.language_cd = 'ENG'
         LEFT JOIN cisadm.ci_lookup_val_l bseg_status
             ON TRIM(bseg_status.field_name) = 'BSEG_STAT_FLG'
            AND TRIM(bseg_status.field_value) = TRIM(bseg.bseg_stat_flg)
            AND bseg_status.language_cd = 'ENG'
         LEFT JOIN cisadm.ci_bill_cyc_l bseg_bill_cyc
-            ON bseg_bill_cyc.bill_cyc_cd = bseg.bill_cyc_cd
+            ON bseg_bill_cyc.bill_cyc_cd = COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(bridge.c1_bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
            AND bseg_bill_cyc.language_cd = 'ENG'
         LEFT JOIN cisadm.ci_sa_type_l sa_type
             ON sa_type.cis_division = sa.cis_division

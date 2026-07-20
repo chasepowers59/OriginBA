@@ -84,10 +84,10 @@ BEGIN
         bseg.start_dt,
         bseg.end_dt,
         bseg.win_start_dt,
-        bseg.bill_cyc_cd,
-        bseg_bill_cyc_l.descr,
-        bill.bill_cyc_cd,
-        bill_bill_cyc_l.descr,
+        COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), '')) AS bseg_bill_cyc_cd,
+        bseg_bill_cyc_l.descr AS bseg_bill_cyc_desc,
+        COALESCE(NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), '')) AS bill_bill_cyc_cd,
+        bill_bill_cyc_l.descr AS bill_bill_cyc_desc,
         acct.cust_cl_cd,
         cust_cl_l.descr,
         acct.coll_cl_cd,
@@ -186,10 +186,10 @@ BEGIN
        AND bseg_status_l.field_value = bseg.bseg_stat_flg
        AND bseg_status_l.language_cd = 'ENG'
     LEFT JOIN cisadm.ci_bill_cyc_l bill_bill_cyc_l
-        ON bill_bill_cyc_l.bill_cyc_cd = bill.bill_cyc_cd
+        ON bill_bill_cyc_l.bill_cyc_cd = COALESCE(NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
        AND bill_bill_cyc_l.language_cd = 'ENG'
     LEFT JOIN cisadm.ci_bill_cyc_l bseg_bill_cyc_l
-        ON bseg_bill_cyc_l.bill_cyc_cd = bseg.bill_cyc_cd
+        ON bseg_bill_cyc_l.bill_cyc_cd = COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
        AND bseg_bill_cyc_l.language_cd = 'ENG'
     LEFT JOIN cisadm.ci_cust_cl_l cust_cl_l
         ON cust_cl_l.cust_cl_cd = acct.cust_cl_cd

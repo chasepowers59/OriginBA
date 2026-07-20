@@ -335,8 +335,8 @@ BEGIN
             bridge.c1_sa_id,
             bridge.c1_sp_id,
             bridge.c1_bseg_id,
-            bridge.c1_bill_cyc_cd,
-            c1_bill_cyc.descr,
+            COALESCE(NULLIF(TRIM(bridge.c1_bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), '')) AS c1_bill_cyc_cd,
+            c1_bill_cyc.descr AS c1_bill_cyc_desc,
             bridge.c1_bo_status_cd,
             c1_status.descr,
             bseg.bill_id,
@@ -468,7 +468,7 @@ BEGIN
            AND c1_status.bo_status_cd = bridge.c1_bo_status_cd
            AND c1_status.language_cd = 'ENG'
         LEFT JOIN cisadm.ci_bill_cyc_l c1_bill_cyc
-            ON c1_bill_cyc.bill_cyc_cd = bridge.c1_bill_cyc_cd
+            ON c1_bill_cyc.bill_cyc_cd = COALESCE(NULLIF(TRIM(bridge.c1_bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
            AND c1_bill_cyc.language_cd = 'ENG'
         LEFT JOIN cisadm.ci_lookup_val_l bseg_status
             ON TRIM(bseg_status.field_name) = 'BSEG_STAT_FLG'
