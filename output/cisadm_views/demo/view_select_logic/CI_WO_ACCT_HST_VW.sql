@@ -1,0 +1,18 @@
+-- SELECT logic for CISADM.CI_WO_ACCT_HST_VW
+SELECT
+       WO.ACCT_ID
+      ,LU.LANGUAGE_CD
+      ,WO.WO_PROC_ID
+      ,'          '
+      ,WO.CRE_DTTM
+      ,LU.FIELD_VALUE
+      ,LU.DESCR
+      ,TO_CHAR(WO.CRE_DTTM,'YYYY-MM-DD-HH24.MI.SS') ||'.000000'
+  FROM CI_WO_PROC     WO
+      ,CI_LOOKUP       LU
+   WHERE
+       LU.FIELD_NAME = 'ACT_TYPE_FLG'
+   AND LU.FIELD_VALUE = 'WO'
+   AND WO.WO_STATUS_FLG = '20'
+WITH READ ONLY
+ 

@@ -25,29 +25,33 @@ CI_ACCT_MGMT_GR_L,CI_ACCT_MGMT_GR_L
 CI_COLL_CL_L,CI_COLL_CL_L
 CI_CUST_CL_L,CI_CUST_CL_L
 CI_BUD_PLAN_L,CI_BUD_PLAN_L
+CI_SA_SP,CI_SA_SP
 CMS_CI_PREM_GEO_GEOTYPE_VW,CMS_CI_PREM_GEO_GEOTYPE_VW
 CI_ACC_GRP_L,CI_ACC_GRP_L
+CI_SP,CI_SP
 JoinTree_1,CI_PREM
 
 JOIN_TREE
 join_tree,join_sequence,join_type,left_table,right_table,join_expression
 JoinTree_1,1,leftOuter,CI_PREM,CMS_CI_PREM_GEO_GEOTYPE_VW,CI_PREM.PREM_ID == CMS_CI_PREM_GEO_GEOTYPE_VW.PREM_ID
-JoinTree_1,2,leftOuter,CI_PREM,CI_SA,CI_PREM.PREM_ID == CI_SA.CHAR_PREM_ID
-JoinTree_1,3,leftOuter,CI_SA,CI_ACCT,CI_SA.ACCT_ID == CI_ACCT.ACCT_ID
-JoinTree_1,4,leftOuter,CI_ACCT,CI_ACCT_PER,CI_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
-JoinTree_1,5,leftOuter,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
-JoinTree_1,6,inner,CI_PREM,CI_PREM_TYPE_L,CI_PREM.PREM_TYPE_CD == CI_PREM_TYPE_L.PREM_TYPE_CD and CI_PREM_TYPE_L.LANGUAGE_CD == 'ENG'
-JoinTree_1,7,leftOuter,CI_PREM,CI_MR_INSTR_L,CI_PREM.MR_INSTR_CD == CI_MR_INSTR_L.MR_INSTR_CD and CI_MR_INSTR_L.LANGUAGE_CD == 'ENG'
-JoinTree_1,8,leftOuter,CI_PREM,CI_MR_WARN_L,CI_PREM.MR_WARN_CD == CI_MR_WARN_L.MR_WARN_CD and CI_MR_WARN_L.LANGUAGE_CD == 'ENG'
-JoinTree_1,9,leftOuter,CI_PREM,CI_TIME_ZONE_L,CI_PREM.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
-JoinTree_1,10,leftOuter,CI_SA,CI_SA_TYPE_L,CI_SA.SA_TYPE_CD == CI_SA_TYPE_L.SA_TYPE_CD and CI_SA_TYPE_L.LANGUAGE_CD == 'ENG'
-JoinTree_1,11,leftOuter,CI_SA,CI_LOOKUP_VAL_L,CI_SA.SA_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'SA_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
-JoinTree_1,12,leftOuter,CI_ACCT,CI_BILL_CYC_L,CI_ACCT.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
-JoinTree_1,13,leftOuter,CI_ACCT,CI_ACCT_MGMT_GR_L,CI_ACCT.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'
-JoinTree_1,14,leftOuter,CI_ACCT,CI_COLL_CL_L,CI_ACCT.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'
-JoinTree_1,15,leftOuter,CI_ACCT,CI_CUST_CL_L,CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
-JoinTree_1,16,leftOuter,CI_ACCT,CI_BUD_PLAN_L,CI_ACCT.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'
-JoinTree_1,17,leftOuter,CI_ACCT,CI_ACC_GRP_L,CI_ACCT.ACCESS_GRP_CD == CI_ACC_GRP_L.ACCESS_GRP_CD and CI_ACC_GRP_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,2,leftOuter,CI_SP,CI_SA_SP,CI_SP.SP_ID == CI_SA_SP.SP_ID
+JoinTree_1,3,leftOuter,CI_SA_SP,CI_SA,CI_SA_SP.SA_ID == CI_SA.SA_ID
+JoinTree_1,4,leftOuter,CI_SA,CI_ACCT,CI_SA.ACCT_ID == CI_ACCT.ACCT_ID
+JoinTree_1,5,leftOuter,CI_ACCT,CI_ACCT_PER,CI_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_1,6,leftOuter,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
+JoinTree_1,7,inner,CI_PREM,CI_PREM_TYPE_L,CI_PREM.PREM_TYPE_CD == CI_PREM_TYPE_L.PREM_TYPE_CD and CI_PREM_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,8,leftOuter,CI_PREM,CI_MR_INSTR_L,CI_PREM.MR_INSTR_CD == CI_MR_INSTR_L.MR_INSTR_CD and CI_MR_INSTR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,9,leftOuter,CI_PREM,CI_MR_WARN_L,CI_PREM.MR_WARN_CD == CI_MR_WARN_L.MR_WARN_CD and CI_MR_WARN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,10,leftOuter,CI_PREM,CI_TIME_ZONE_L,CI_PREM.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,11,leftOuter,CI_SA,CI_SA_TYPE_L,CI_SA.SA_TYPE_CD == CI_SA_TYPE_L.SA_TYPE_CD and CI_SA_TYPE_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,12,leftOuter,CI_SA,CI_LOOKUP_VAL_L,CI_SA.SA_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'SA_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,13,leftOuter,CI_ACCT,CI_BILL_CYC_L,CI_ACCT.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,14,leftOuter,CI_ACCT,CI_ACCT_MGMT_GR_L,CI_ACCT.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,15,leftOuter,CI_ACCT,CI_COLL_CL_L,CI_ACCT.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,16,leftOuter,CI_ACCT,CI_CUST_CL_L,CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,17,leftOuter,CI_ACCT,CI_BUD_PLAN_L,CI_ACCT.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,18,leftOuter,CI_ACCT,CI_ACC_GRP_L,CI_ACCT.ACCESS_GRP_CD == CI_ACC_GRP_L.ACCESS_GRP_CD and CI_ACC_GRP_L.LANGUAGE_CD == 'ENG'
+JoinTree_1,19,leftOuter,CI_PREM,CI_SP,CI_PREM.PREM_ID == CI_SP.PREM_ID
 
 EXPOSED_FIELDS
 item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
@@ -83,6 +87,42 @@ item_group_label,field_label,source_table,source_column,dimension_or_measure,def
 1.) Premise,State,JoinTree_1.CI_PREM,STATE,,
 1.) Premise,Time Zone,JoinTree_1.CI_PREM,TIME_ZONE_CD,,
 1.) Premise,Trend Area,JoinTree_1.CI_PREM,TREND_AREA_CD,,
+Service Point,Abolish Date,JoinTree_1.CI_SP,ABOLISH_DT,,
+Service Point,Description,JoinTree_1.CI_SP,DESCRLONG,,
+Service Point,Disconnect Location Code,JoinTree_1.CI_SP,DISCON_LOC_CD,,
+Service Point,Facility Level 1 Code,JoinTree_1.CI_SP,FAC_LVL_1_CD,,
+Service Point,Facility Level 2 Code,JoinTree_1.CI_SP,FAC_LVL_2_CD,,
+Service Point,Facility Level 3 Code,JoinTree_1.CI_SP,FAC_LVL_3_CD,,
+Service Point,Install Date,JoinTree_1.CI_SP,INSTALL_DT,,
+Service Point,Key ID,JoinTree_1.CI_SP,KEY_ID,,
+Service Point,Key,JoinTree_1.CI_SP,KEY_SW,,
+Service Point,Meter Read Cycle,JoinTree_1.CI_SP,MR_CYC_CD,,
+Service Point,Meter Read Cycle Route Sequence,JoinTree_1.CI_SP,MR_CYC_RTE_SEQ,,
+Service Point,Meter Read Instruction Code,JoinTree_1.CI_SP,MR_INSTR_CD,,
+Service Point,Meter Read Instruction Details,JoinTree_1.CI_SP,MR_INSTR_DETAILS,,
+Service Point,Meter Read Route Code,JoinTree_1.CI_SP,MR_RTE_CD,,
+Service Point,Meter Read Warning Code,JoinTree_1.CI_SP,MR_WARN_CD,,
+Service Point,Meter Location Code,JoinTree_1.CI_SP,MTR_LOC_CD,,
+Service Point,Meter Location Details,JoinTree_1.CI_SP,MTR_LOC_DETAILS,,
+Service Point,OK to Enter,JoinTree_1.CI_SP,OK_TO_ENTER_SW,,
+Service Point,Override Premise Field Info,JoinTree_1.CI_SP,OVRD_PREM_FLD_INFO_FLG,,
+Service Point,Premise ID,JoinTree_1.CI_SP,PREM_ID,,
+Service Point,Service Point Data Area,JoinTree_1.CI_SP,SP_DATA_AREA,,
+Service Point,Service Point ID,JoinTree_1.CI_SP,SP_ID,,
+Service Point,Service Point Source Status Flag,JoinTree_1.CI_SP,SP_SRC_STATUS_FLG,,
+Service Point,Service Point Status Flag,JoinTree_1.CI_SP,SP_STATUS_FLG,,
+Service Point,Service Point Type,JoinTree_1.CI_SP,SP_TYPE_CD,,
+Service Point,VERSION,JoinTree_1.CI_SP,VERSION,,
+1.) SA-SP Link,SA_ID,JoinTree_1.CI_SA_SP,SA_ID,,
+1.) SA-SP Link,SA_SP_ID,JoinTree_1.CI_SA_SP,SA_SP_ID,,
+1.) SA-SP Link,SP_ID,JoinTree_1.CI_SA_SP,SP_ID,,
+1.) SA-SP Link,START_DTTM,JoinTree_1.CI_SA_SP,START_DTTM,,
+1.) SA-SP Link,START_MR_ID,JoinTree_1.CI_SA_SP,START_MR_ID,,
+1.) SA-SP Link,STOP_DTTM,JoinTree_1.CI_SA_SP,STOP_DTTM,,
+1.) SA-SP Link,STOP_MR_ID,JoinTree_1.CI_SA_SP,STOP_MR_ID,,
+1.) SA-SP Link,USAGE_FLG,JoinTree_1.CI_SA_SP,USAGE_FLG,,
+1.) SA-SP Link,USE_PCT,JoinTree_1.CI_SA_SP,USE_PCT,,
+1.) SA-SP Link,VERSION,JoinTree_1.CI_SA_SP,VERSION,,
 1.) Premise Geo Location,Latitude/Longitude,JoinTree_1.CMS_CI_PREM_GEO_GEOTYPE_VW,LATLONG,,
 1.) Premise Geo Location,Latitude,JoinTree_1.CMS_CI_PREM_GEO_GEOTYPE_VW,LATITUDE,,
 1.) Premise Geo Location,Longitude,JoinTree_1.CMS_CI_PREM_GEO_GEOTYPE_VW,LONGITUDE,,

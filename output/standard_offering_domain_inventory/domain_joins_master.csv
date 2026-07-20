@@ -32,6 +32,9 @@ Bill_Segment___Domain,Billing and Rates,JoinTree_1,30,leftOuter,CI_BSEG_SQ,CI_TO
 Bill_Segment___Domain,Billing and Rates,JoinTree_1,31,leftOuter,CI_BSEG_SQ,CI_SQI_L_2,CI_BSEG_SQ.SQI_CD == CI_SQI_L_2.SQI_CD and CI_SQI_L_2.LANGUAGE_CD == 'ENG'
 Billed_Usage_SQ_Snapshot___Domain,Billing and Rates,BSEG_SQ_USAGE_RPT_CURR,1,single_table,BSEG_SQ_USAGE_RPT_CURR,,Single-table domain on BSEG_SQ_USAGE_RPT_CURR
 Billed_Usage_Snapshot___Domain,Billing and Rates,BSEG_BILLED_USAGE_RPT_CURR,1,single_table,BSEG_BILLED_USAGE_RPT_CURR,,Single-table domain on BSEG_BILLED_USAGE_RPT_CURR
+SC_Unbilled_Billing_Domain,Billing and Rates,JoinTree_1,1,leftOuter,SC_CUS_CONTACT,SC_BILLS_IN_ERROR,SC_CUS_CONTACT.ACCT_ID == SC_BILLS_IN_ERROR.ACCT_ID
+SC_Unbilled_Billing_Domain,Billing and Rates,JoinTree_1,2,inner,SC_BILLS_IN_ERROR,CI_BSEG,SC_BILLS_IN_ERROR.BILL_ID == CI_BSEG.BILL_ID
+SC_Unbilled_Billing_Domain,Billing and Rates,JoinTree_1,3,leftOuter,CI_BSEG,CI_BSEG_EXCP,CI_BSEG.BSEG_ID == CI_BSEG_EXCP.BSEG_ID
 Deposit_Control___Domain,Cashiering,JoinTree_1,1,inner,CI_TNDR_CTL,CI_DEP_CTL,CI_TNDR_CTL.DEP_CTL_ID == CI_DEP_CTL.DEP_CTL_ID
 Deposit_Control___Domain,Cashiering,JoinTree_1,2,inner,CI_TNDR_CTL,CI_TNDR_SRCE_L,CI_TNDR_CTL.TNDR_SOURCE_CD == CI_TNDR_SRCE_L.TNDR_SOURCE_CD and CI_TNDR_SRCE_L.LANGUAGE_CD == 'ENG'
 Deposit_Control___Domain,Cashiering,JoinTree_1,3,inner,CI_TNDR_CTL,CI_LOOKUP_VAL_L,CI_TNDR_CTL.TNDR_CTL_ST_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'TNDR_CTL_ST_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
@@ -208,6 +211,10 @@ Account_Alert___Domain,Customer Operations,JoinTree_1,12,leftOuter,CI_SA,CI_BSEG
 Account_Alert___Domain,Customer Operations,JoinTree_1,13,inner,CI_BSEG,CI_BSEG_CALC,CI_BSEG.BSEG_ID == CI_BSEG_CALC.BSEG_ID
 Account_Alert___Domain,Customer Operations,JoinTree_1,14,leftOuter,CI_BSEG,FT_GL_SUMMARY,CI_BSEG.BSEG_ID == FT_GL_SUMMARY.SIBLING_ID
 Account_Alert___Domain,Customer Operations,JoinTree_1,15,leftOuter,CI_ACCT_PER,C1_PER_CONTDET,CI_ACCT_PER.PER_ID == C1_PER_CONTDET.PER_ID
+Account_Characteristics___Domain,Customer Operations,JoinTree_2,1,leftOuter,CI_ACCT,CI_ACCT_CHAR,CI_ACCT.ACCT_ID == CI_ACCT_CHAR.ACCT_ID
+Account_Characteristics___Domain,Customer Operations,JoinTree_2,2,leftOuter,CI_ACCT_PER,CI_ACCT,CI_ACCT_PER.ACCT_ID == CI_ACCT.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+Account_Characteristics___Domain,Customer Operations,JoinTree_2,3,leftOuter,CI_PER,CI_ACCT_PER,CI_PER.PER_ID == CI_ACCT_PER.PER_ID
+Account_Characteristics___Domain,Customer Operations,JoinTree_2,4,leftOuter,CI_CHAR_TYPE_L,CI_ACCT_CHAR,CI_CHAR_TYPE_L.CHAR_TYPE_CD == CI_ACCT_CHAR.CHAR_TYPE_CD and CI_CHAR_TYPE_L.LANGUAGE_CD == 'ENG'
 C_Side___Domain,Customer Operations,JoinTree_1,1,inner,CI_SA,CI_SA_TYPE,CI_SA.CIS_DIVISION == CI_SA_TYPE.CIS_DIVISION and CI_SA.SA_TYPE_CD == CI_SA_TYPE.SA_TYPE_CD
 C_Side___Domain,Customer Operations,JoinTree_1,2,inner,CI_SA_TYPE,CI_SA_TYPE_L,CI_SA_TYPE.CIS_DIVISION == CI_SA_TYPE_L.CIS_DIVISION and CI_SA_TYPE.SA_TYPE_CD == CI_SA_TYPE_L.SA_TYPE_CD and CI_SA_TYPE_L.LANGUAGE_CD == 'ENG'
 C_Side___Domain,Customer Operations,JoinTree_1,3,inner,CI_SA,CI_ACCT,CI_SA.ACCT_ID == CI_ACCT.ACCT_ID
@@ -301,22 +308,61 @@ Landlord_Agreement___Domain,Customer Operations,JoinTree_1,7,leftOuter,CI_PREM,C
 Landlord_Agreement___Domain,Customer Operations,JoinTree_1,8,inner,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y' and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
 Landlord_Agreement___Domain,Customer Operations,JoinTree_1,9,leftOuter,CI_LANDLORD,CMS_LL_COVERAGE,CI_LANDLORD.LL_ID == CMS_LL_COVERAGE.LL_ID
 Premise___Domain,Customer Operations,JoinTree_1,1,leftOuter,CI_PREM,CMS_CI_PREM_GEO_GEOTYPE_VW,CI_PREM.PREM_ID == CMS_CI_PREM_GEO_GEOTYPE_VW.PREM_ID
-Premise___Domain,Customer Operations,JoinTree_1,2,leftOuter,CI_PREM,CI_SA,CI_PREM.PREM_ID == CI_SA.CHAR_PREM_ID
-Premise___Domain,Customer Operations,JoinTree_1,3,leftOuter,CI_SA,CI_ACCT,CI_SA.ACCT_ID == CI_ACCT.ACCT_ID
-Premise___Domain,Customer Operations,JoinTree_1,4,leftOuter,CI_ACCT,CI_ACCT_PER,CI_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
-Premise___Domain,Customer Operations,JoinTree_1,5,leftOuter,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
-Premise___Domain,Customer Operations,JoinTree_1,6,inner,CI_PREM,CI_PREM_TYPE_L,CI_PREM.PREM_TYPE_CD == CI_PREM_TYPE_L.PREM_TYPE_CD and CI_PREM_TYPE_L.LANGUAGE_CD == 'ENG'
-Premise___Domain,Customer Operations,JoinTree_1,7,leftOuter,CI_PREM,CI_MR_INSTR_L,CI_PREM.MR_INSTR_CD == CI_MR_INSTR_L.MR_INSTR_CD and CI_MR_INSTR_L.LANGUAGE_CD == 'ENG'
-Premise___Domain,Customer Operations,JoinTree_1,8,leftOuter,CI_PREM,CI_MR_WARN_L,CI_PREM.MR_WARN_CD == CI_MR_WARN_L.MR_WARN_CD and CI_MR_WARN_L.LANGUAGE_CD == 'ENG'
-Premise___Domain,Customer Operations,JoinTree_1,9,leftOuter,CI_PREM,CI_TIME_ZONE_L,CI_PREM.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
-Premise___Domain,Customer Operations,JoinTree_1,10,leftOuter,CI_SA,CI_SA_TYPE_L,CI_SA.SA_TYPE_CD == CI_SA_TYPE_L.SA_TYPE_CD and CI_SA_TYPE_L.LANGUAGE_CD == 'ENG'
-Premise___Domain,Customer Operations,JoinTree_1,11,leftOuter,CI_SA,CI_LOOKUP_VAL_L,CI_SA.SA_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'SA_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
-Premise___Domain,Customer Operations,JoinTree_1,12,leftOuter,CI_ACCT,CI_BILL_CYC_L,CI_ACCT.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
-Premise___Domain,Customer Operations,JoinTree_1,13,leftOuter,CI_ACCT,CI_ACCT_MGMT_GR_L,CI_ACCT.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'
-Premise___Domain,Customer Operations,JoinTree_1,14,leftOuter,CI_ACCT,CI_COLL_CL_L,CI_ACCT.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'
-Premise___Domain,Customer Operations,JoinTree_1,15,leftOuter,CI_ACCT,CI_CUST_CL_L,CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
-Premise___Domain,Customer Operations,JoinTree_1,16,leftOuter,CI_ACCT,CI_BUD_PLAN_L,CI_ACCT.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'
-Premise___Domain,Customer Operations,JoinTree_1,17,leftOuter,CI_ACCT,CI_ACC_GRP_L,CI_ACCT.ACCESS_GRP_CD == CI_ACC_GRP_L.ACCESS_GRP_CD and CI_ACC_GRP_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,2,leftOuter,CI_SP,CI_SA_SP,CI_SP.SP_ID == CI_SA_SP.SP_ID
+Premise___Domain,Customer Operations,JoinTree_1,3,leftOuter,CI_SA_SP,CI_SA,CI_SA_SP.SA_ID == CI_SA.SA_ID
+Premise___Domain,Customer Operations,JoinTree_1,4,leftOuter,CI_SA,CI_ACCT,CI_SA.ACCT_ID == CI_ACCT.ACCT_ID
+Premise___Domain,Customer Operations,JoinTree_1,5,leftOuter,CI_ACCT,CI_ACCT_PER,CI_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+Premise___Domain,Customer Operations,JoinTree_1,6,leftOuter,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
+Premise___Domain,Customer Operations,JoinTree_1,7,inner,CI_PREM,CI_PREM_TYPE_L,CI_PREM.PREM_TYPE_CD == CI_PREM_TYPE_L.PREM_TYPE_CD and CI_PREM_TYPE_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,8,leftOuter,CI_PREM,CI_MR_INSTR_L,CI_PREM.MR_INSTR_CD == CI_MR_INSTR_L.MR_INSTR_CD and CI_MR_INSTR_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,9,leftOuter,CI_PREM,CI_MR_WARN_L,CI_PREM.MR_WARN_CD == CI_MR_WARN_L.MR_WARN_CD and CI_MR_WARN_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,10,leftOuter,CI_PREM,CI_TIME_ZONE_L,CI_PREM.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,11,leftOuter,CI_SA,CI_SA_TYPE_L,CI_SA.SA_TYPE_CD == CI_SA_TYPE_L.SA_TYPE_CD and CI_SA_TYPE_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,12,leftOuter,CI_SA,CI_LOOKUP_VAL_L,CI_SA.SA_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'SA_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,13,leftOuter,CI_ACCT,CI_BILL_CYC_L,CI_ACCT.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,14,leftOuter,CI_ACCT,CI_ACCT_MGMT_GR_L,CI_ACCT.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,15,leftOuter,CI_ACCT,CI_COLL_CL_L,CI_ACCT.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,16,leftOuter,CI_ACCT,CI_CUST_CL_L,CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,17,leftOuter,CI_ACCT,CI_BUD_PLAN_L,CI_ACCT.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,18,leftOuter,CI_ACCT,CI_ACC_GRP_L,CI_ACCT.ACCESS_GRP_CD == CI_ACC_GRP_L.ACCESS_GRP_CD and CI_ACC_GRP_L.LANGUAGE_CD == 'ENG'
+Premise___Domain,Customer Operations,JoinTree_1,19,leftOuter,CI_PREM,CI_SP,CI_PREM.PREM_ID == CI_SP.PREM_ID
+Service_Agreement___Domain,Customer Operations,JoinTree_1,1,leftOuter,CI_SA_CONTERM,CI_SA,CI_SA_CONTERM.SA_ID == CI_SA.SA_ID
+Service_Agreement___Domain,Customer Operations,JoinTree_1,2,leftOuter,CI_SA_CONTERM,CI_TOU_CONT_VAL,CI_SA_CONTERM.SA_ID == CI_TOU_CONT_VAL.SA_ID and CI_SA_CONTERM.CONTERM_TYPE_FLG == CI_TOU_CONT_VAL.CONTERM_TYPE_FLG and CI_SA_CONTERM.START_DT == CI_TOU_CONT_VAL.START_DT and CI_SA_CONTERM.BF_CD == CI_TOU_CONT_VAL.BF_CD and CI_SA_CONTERM.TOU_GRP_CD == CI_TOU_CONT_VAL.TOU_GRP_CD
+Service_Agreement___Domain,Customer Operations,JoinTree_1,3,leftOuter,CI_SA,CI_ACCT,CI_SA.ACCT_ID == CI_ACCT.ACCT_ID
+Service_Agreement___Domain,Customer Operations,JoinTree_1,4,leftOuter,CI_ACCT,CI_ACCT_PER,CI_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,5,leftOuter,CI_ACCT_PER,CI_PER_NAME,CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,6,leftOuter,CI_SA,CI_PREM,CI_SA.CHAR_PREM_ID == CI_PREM.PREM_ID
+Service_Agreement___Domain,Customer Operations,JoinTree_1,7,leftOuter,CI_SA,CI_SA_TYPE,CI_SA.CIS_DIVISION == CI_SA_TYPE.CIS_DIVISION and CI_SA.SA_TYPE_CD == CI_SA_TYPE.SA_TYPE_CD
+Service_Agreement___Domain,Customer Operations,JoinTree_1,8,leftOuter,CI_SA_CONTERM,CI_LOOKUP_VAL_L,CI_SA_CONTERM.CONTERM_TYPE_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'CONTERM_TYPE_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,9,leftOuter,CI_SA_CONTERM,CI_BF_L,CI_SA_CONTERM.BF_CD == CI_BF_L.BF_CD and CI_BF_L.LANGUAGE_CD == 'ENG'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,10,leftOuter,CI_SA_CONTERM,CI_TAX_EX_TYPE_L,CI_SA_CONTERM.TAX_EX_TYPE_CD == CI_TAX_EX_TYPE_L.TAX_EX_TYPE_CD and CI_TAX_EX_TYPE_L.LANGUAGE_CD == 'ENG'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,11,leftOuter,CI_SA_CONTERM,CI_TOU_GRP_L,CI_SA_CONTERM.TOU_GRP_CD == CI_TOU_GRP_L.TOU_GRP_CD and CI_TOU_GRP_L.LANGUAGE_CD == 'ENG'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,12,leftOuter,CI_TOU_CONT_VAL,CI_TOU_L,CI_TOU_CONT_VAL.TOU_CD == CI_TOU_L.TOU_CD and CI_TOU_L.LANGUAGE_CD == 'ENG'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,13,leftOuter,CI_SA,CI_LOOKUP_VAL_L_1,CI_SA.SA_STATUS_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'SA_STATUS_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,14,leftOuter,CI_SA_TYPE,CI_SA_TYPE_L,CI_SA_TYPE.CIS_DIVISION == CI_SA_TYPE_L.CIS_DIVISION and CI_SA_TYPE.SA_TYPE_CD == CI_SA_TYPE_L.SA_TYPE_CD and CI_SA_TYPE_L.LANGUAGE_CD == 'ENG'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,15,leftOuter,CI_ACCT,CI_BILL_CYC_L,CI_ACCT.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,16,leftOuter,CI_ACCT,CI_CUST_CL_L,CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,17,leftOuter,CI_ACCT,CI_COLL_CL_L,CI_ACCT.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,18,leftOuter,CI_ACCT,CI_CIS_DIVISION_L,CI_ACCT.CIS_DIVISION == CI_CIS_DIVISION_L.CIS_DIVISION and CI_CIS_DIVISION_L.LANGUAGE_CD == 'ENG'
+Service_Agreement___Domain,Customer Operations,JoinTree_1,19,leftOuter,CI_PREM,CI_PREM_TYPE_L,CI_PREM.PREM_TYPE_CD == CI_PREM_TYPE_L.PREM_TYPE_CD and CI_PREM_TYPE_L.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,1,inner,CI_COLL_PROC,CI_COLL_EVT,CI_COLL_PROC.COLL_PROC_ID == CI_COLL_EVT.COLL_PROC_ID
+Collection_Process_Domain,Debt Management,JoinTree_3,2,inner,CI_COLL_PROC,CI_ACCT_1,CI_COLL_PROC.ACCT_ID == CI_ACCT_1.ACCT_ID
+Collection_Process_Domain,Debt Management,JoinTree_3,3,inner,CI_COLL_PROC,CI_COLL_PROC_TM_L,CI_COLL_PROC.COLL_PROC_TMPL_CD == CI_COLL_PROC_TM_L.COLL_PROC_TMPL_CD and CI_COLL_PROC_TM_L.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,4,inner,CI_COLL_PROC,CI_LOOKUP_VAL_L_1,CI_COLL_PROC.COLL_STATUS_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'COLL_STATUS_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,5,inner,CI_COLL_PROC,CI_LOOKUP_VAL_L_3,CI_COLL_PROC.COLL_STAT_RSN_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'COLL_STAT_RSN_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,6,inner,CI_COLL_EVT,CI_COLL_EVT_TYP_L,CI_COLL_EVT.COLL_EVT_TYP_CD == CI_COLL_EVT_TYP_L.COLL_EVT_TYP_CD and CI_COLL_EVT_TYP_L.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,7,inner,CI_COLL_PROC,CI_ACCT_PER_1,CI_COLL_PROC.ACCT_ID == CI_ACCT_PER_1.ACCT_ID and CI_ACCT_PER_1.MAIN_CUST_SW == 'Y'
+Collection_Process_Domain,Debt Management,JoinTree_3,8,inner,CI_ACCT_PER_1,CI_PER_NAME_1,CI_ACCT_PER_1.PER_ID == CI_PER_NAME_1.PER_ID and CI_PER_NAME_1.NAME_TYPE_FLG == 'PRIM'
+Collection_Process_Domain,Debt Management,JoinTree_3,9,inner,CI_COLL_PROC,CI_COLL_CL_CNTL_L,CI_COLL_PROC.COLL_CL_CNTL_CD == CI_COLL_CL_CNTL_L.COLL_CL_CNTL_CD and CI_COLL_CL_CNTL_L.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,10,leftOuter,CI_COLL_PROC,CI_LOOKUP_VAL_L_4,CI_COLL_PROC.COLL_CAT_PRIO_FLG == CI_LOOKUP_VAL_L_4.FIELD_VALUE and CI_LOOKUP_VAL_L_4.FIELD_NAME == 'COLL_CAT_PRIO_FLG' and CI_LOOKUP_VAL_L_4.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,11,leftOuter,CI_COLL_PROC,CI_LOOKUP_VAL_L_5,CI_COLL_PROC.CRIT_PRIO_FLG == CI_LOOKUP_VAL_L_5.FIELD_VALUE and CI_LOOKUP_VAL_L_5.FIELD_NAME == 'CRIT_PRIO_FLG' and CI_LOOKUP_VAL_L_5.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,12,inner,CI_COLL_EVT,CI_LOOKUP_VAL_L_6,CI_COLL_EVT.COLL_EVT_STAT_FLG == CI_LOOKUP_VAL_L_6.FIELD_VALUE and CI_LOOKUP_VAL_L_6.FIELD_NAME == 'COLL_EVT_STAT_FLG' and CI_LOOKUP_VAL_L_6.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,13,leftOuter,CI_COLL_EVT,CMS_IS_NEXT_COLL_EVT,CI_COLL_EVT.COLL_PROC_ID == CMS_IS_NEXT_COLL_EVT.COLL_PROC_ID and CI_COLL_EVT.EVT_SEQ == CMS_IS_NEXT_COLL_EVT.EVT_SEQ
+Collection_Process_Domain,Debt Management,JoinTree_3,14,leftOuter,CI_ACCT_1,CI_BILL_CYC_L,CI_ACCT_1.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,15,leftOuter,CI_ACCT_1,CI_ACCT_MGMT_GR_L,CI_ACCT_1.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,16,inner,CI_ACCT_1,CI_CUST_CL_L,CI_ACCT_1.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,17,inner,CI_ACCT_1,CI_COLL_CL_L_1,CI_ACCT_1.COLL_CL_CD == CI_COLL_CL_L_1.COLL_CL_CD and CI_COLL_CL_L_1.LANGUAGE_CD == 'ENG'
+Collection_Process_Domain,Debt Management,JoinTree_3,18,leftOuter,CI_ACCT_1,CI_BUD_PLAN_L,CI_ACCT_1.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'
 SA_Snapshot___Aged_Balance___Domain,Debt Management,JoinTree_1,1,inner,CMS_SA_SNAPSHOT,CI_SA,CMS_SA_SNAPSHOT.SA_ID == CI_SA.SA_ID
 SA_Snapshot___Aged_Balance___Domain,Debt Management,JoinTree_1,2,inner,CI_SA,CI_ACCT,CI_SA.ACCT_ID == CI_ACCT.ACCT_ID
 SA_Snapshot___Aged_Balance___Domain,Debt Management,JoinTree_1,3,inner,CMS_SA_SNAPSHOT,CI_PER_NAME,CMS_SA_SNAPSHOT.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'
@@ -395,8 +441,6 @@ Write_Offs___Domain,Debt Management,JoinTree_1,6,leftOuter,C1_BI_WOPROC_VW,CI_WO
 Write_Offs___Domain,Debt Management,JoinTree_1,7,leftOuter,C1_BI_WOPROC_VW,CI_WO_EVT_TYP_L,C1_BI_WOPROC_VW.EFF_WO_EVT_TYP_CD == CI_WO_EVT_TYP_L.WO_EVT_TYP_CD and CI_WO_EVT_TYP_L.LANGUAGE_CD == 'ENG'
 Write_Offs___Domain,Debt Management,JoinTree_1,8,leftOuter,C1_BI_WOPROC_VW,CI_WO_EVT_TYP_L_1,C1_BI_WOPROC_VW.NEXT_WO_EVT_TYP_CD == CI_WO_EVT_TYP_L_1.WO_EVT_TYP_CD and CI_WO_EVT_TYP_L_1.LANGUAGE_CD == 'ENG'
 Write_Offs___Domain,Debt Management,JoinTree_1,9,leftOuter,C1_BI_WOPROC_VW,WO_PAY_AGG,C1_BI_WOPROC_VW.UNCOLL_PROC_ID == WO_PAY_AGG.UNCOLL_PROC_ID
-FT_and_GL_Snapshot___Domain,Development,FT_GL_DISTRIBUTION_RPT_CURR,1,single_table,FT_GL_DISTRIBUTION_RPT_CURR,,Single-table domain on FT_GL_DISTRIBUTION_RPT_CURR
-Measurement_Snapshot___Domain,Development,D1_MSRMT_RPT_CURR,1,single_table,D1_MSRMT_RPT_CURR,,Single-table domain on D1_MSRMT_RPT_CURR
 Crew___Domain,Field Operations,JoinTree_1,1,leftOuter,C1_REPRESENTATIVE,D1_ACTIVITY_CHAR,C1_REPRESENTATIVE.C1_REPRESENTATIVE_CD == D1_ACTIVITY_CHAR.SRCH_CHAR_VAL and D1_ACTIVITY_CHAR.CHAR_TYPE_CD == 'CMFAREP'
 Crew___Domain,Field Operations,JoinTree_1,2,inner,D1_ACTIVITY_CHAR,D1_ACTIVITY,D1_ACTIVITY_CHAR.D1_ACTIVITY_ID == D1_ACTIVITY.D1_ACTIVITY_ID
 Crew___Domain,Field Operations,JoinTree_1,3,inner,D1_ACTIVITY,D1_ACTIVITY_TYPE,D1_ACTIVITY.ACTIVITY_TYPE_CD == D1_ACTIVITY_TYPE.ACTIVITY_TYPE_CD and D1_ACTIVITY_TYPE.ACTIVITY_TYPE_CAT_FLG == 'D1FA'
@@ -625,6 +669,7 @@ Device___Domain,Meter Operations,JoinTree_2,69,leftOuter,D1_DVC_EVT,D1_SPR_L_2,D
 Device___Domain,Meter Operations,JoinTree_2,70,leftOuter,D1_DVC_EVT,F1_BUS_OBJ_STATUS_L_5,D1_DVC_EVT.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L_5.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L_5.LANGUAGE_CD == 'ENG' and D1_DVC_EVT.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_5.BUS_OBJ_CD
 Device___Domain,Meter Operations,JoinTree_2,71,leftOuter,D1_DVC_EVT,F1_BUS_OBJ_STATUS_RSN_L_4,D1_DVC_EVT.BO_STATUS_REASON_CD == F1_BUS_OBJ_STATUS_RSN_L_4.BO_STATUS_REASON_CD and F1_BUS_OBJ_STATUS_RSN_L_4.LANGUAGE_CD == 'ENG'
 Measurement_Snapshot___Domain,Meter Operations,D1_MSRMT_RPT_CURR,1,single_table,D1_MSRMT_RPT_CURR,,Single-table domain on D1_MSRMT_RPT_CURR
+Un_Billed_Usage___Domain,Meter Operations,JoinTree_1,1,leftOuter,MASTER_SOURCE,DeviceInfo,MASTER_SOURCE.SP_ID == DeviceInfo.SP_ID
 Usage_Scalar_Snapshot___Domain,Meter Operations,D1_USAGE_SCALAR_DTL_RPT_CURR,1,single_table,D1_USAGE_SCALAR_DTL_RPT_CURR,,Single-table domain on D1_USAGE_SCALAR_DTL_RPT_CURR
 Usage_Transactions_Snapshot___Domain,Meter Operations,D1_USAGE_RPT_CURR,1,single_table,D1_USAGE_RPT_CURR,,Single-table domain on D1_USAGE_RPT_CURR
 New_Services___Domain,New Services and Planning,JoinTree_1,1,inner,CI_SA,CI_SA_TYPE,CI_SA.CIS_DIVISION == CI_SA_TYPE.CIS_DIVISION and CI_SA.SA_TYPE_CD == CI_SA_TYPE.SA_TYPE_CD

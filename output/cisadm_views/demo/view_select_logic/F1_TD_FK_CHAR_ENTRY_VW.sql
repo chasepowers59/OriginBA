@@ -1,0 +1,19 @@
+-- SELECT logic for CISADM.F1_TD_FK_CHAR_ENTRY_VW
+SELECT 
+      C.TD_ENTRY_ID,
+      CT.CHAR_TYPE_CD,
+      C.CHAR_VAL_FK1,
+      C.CHAR_VAL_FK2,
+      C.CHAR_VAL_FK3,
+      C.CHAR_VAL_FK4,
+      C.CHAR_VAL_FK5
+FROM
+      CI_TD_ENTRY_CHA C,
+      CI_CHAR_TYPE CT
+WHERE
+          C.CHAR_TYPE_CD = CT.CHAR_TYPE_CD
+      AND CT.CHAR_TYPE_FLG = 'FKV'
+ 
+ 
+ 
+ 

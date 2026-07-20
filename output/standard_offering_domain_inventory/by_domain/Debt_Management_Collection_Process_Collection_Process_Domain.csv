@@ -1,0 +1,109 @@
+section,domain_name,Collection_Process_Domain
+section,workstream,Debt Management
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_COLL_PROC,CI_COLL_PROC
+CI_COLL_EVT,CI_COLL_EVT
+CI_ACCT_1,CI_ACCT
+CI_COLL_PROC_TM_L,CI_COLL_PROC_TM_L
+CI_LOOKUP_VAL_L_1,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_3,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_4,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_5,CI_LOOKUP_VAL_L
+CI_LOOKUP_VAL_L_6,CI_LOOKUP_VAL_L
+CI_COLL_CL_L_1,CI_COLL_CL_L
+CI_COLL_EVT_TYP_L,CI_COLL_EVT_TYP_L
+CI_ACCT_PER_1,CI_ACCT_PER
+CI_PER_NAME_1,CI_PER_NAME
+CI_COLL_CL_CNTL_L,CI_COLL_CL_CNTL_L
+CI_BILL_CYC_L,CI_BILL_CYC_L
+CI_ACCT_MGMT_GR_L,CI_ACCT_MGMT_GR_L
+CI_CUST_CL_L,CI_CUST_CL_L
+CI_BUD_PLAN_L,CI_BUD_PLAN_L
+JoinTree_3,CI_COLL_PROC
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_3,1,inner,CI_COLL_PROC,CI_COLL_EVT,CI_COLL_PROC.COLL_PROC_ID == CI_COLL_EVT.COLL_PROC_ID
+JoinTree_3,2,inner,CI_COLL_PROC,CI_ACCT_1,CI_COLL_PROC.ACCT_ID == CI_ACCT_1.ACCT_ID
+JoinTree_3,3,inner,CI_COLL_PROC,CI_COLL_PROC_TM_L,CI_COLL_PROC.COLL_PROC_TMPL_CD == CI_COLL_PROC_TM_L.COLL_PROC_TMPL_CD and CI_COLL_PROC_TM_L.LANGUAGE_CD == 'ENG'
+JoinTree_3,4,inner,CI_COLL_PROC,CI_LOOKUP_VAL_L_1,CI_COLL_PROC.COLL_STATUS_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'COLL_STATUS_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_3,5,inner,CI_COLL_PROC,CI_LOOKUP_VAL_L_3,CI_COLL_PROC.COLL_STAT_RSN_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'COLL_STAT_RSN_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'
+JoinTree_3,6,inner,CI_COLL_EVT,CI_COLL_EVT_TYP_L,CI_COLL_EVT.COLL_EVT_TYP_CD == CI_COLL_EVT_TYP_L.COLL_EVT_TYP_CD and CI_COLL_EVT_TYP_L.LANGUAGE_CD == 'ENG'
+JoinTree_3,7,inner,CI_COLL_PROC,CI_ACCT_PER_1,CI_COLL_PROC.ACCT_ID == CI_ACCT_PER_1.ACCT_ID and CI_ACCT_PER_1.MAIN_CUST_SW == 'Y'
+JoinTree_3,8,inner,CI_ACCT_PER_1,CI_PER_NAME_1,CI_ACCT_PER_1.PER_ID == CI_PER_NAME_1.PER_ID and CI_PER_NAME_1.NAME_TYPE_FLG == 'PRIM'
+JoinTree_3,9,inner,CI_COLL_PROC,CI_COLL_CL_CNTL_L,CI_COLL_PROC.COLL_CL_CNTL_CD == CI_COLL_CL_CNTL_L.COLL_CL_CNTL_CD and CI_COLL_CL_CNTL_L.LANGUAGE_CD == 'ENG'
+JoinTree_3,10,leftOuter,CI_COLL_PROC,CI_LOOKUP_VAL_L_4,CI_COLL_PROC.COLL_CAT_PRIO_FLG == CI_LOOKUP_VAL_L_4.FIELD_VALUE and CI_LOOKUP_VAL_L_4.FIELD_NAME == 'COLL_CAT_PRIO_FLG' and CI_LOOKUP_VAL_L_4.LANGUAGE_CD == 'ENG'
+JoinTree_3,11,leftOuter,CI_COLL_PROC,CI_LOOKUP_VAL_L_5,CI_COLL_PROC.CRIT_PRIO_FLG == CI_LOOKUP_VAL_L_5.FIELD_VALUE and CI_LOOKUP_VAL_L_5.FIELD_NAME == 'CRIT_PRIO_FLG' and CI_LOOKUP_VAL_L_5.LANGUAGE_CD == 'ENG'
+JoinTree_3,12,inner,CI_COLL_EVT,CI_LOOKUP_VAL_L_6,CI_COLL_EVT.COLL_EVT_STAT_FLG == CI_LOOKUP_VAL_L_6.FIELD_VALUE and CI_LOOKUP_VAL_L_6.FIELD_NAME == 'COLL_EVT_STAT_FLG' and CI_LOOKUP_VAL_L_6.LANGUAGE_CD == 'ENG'
+JoinTree_3,13,leftOuter,CI_COLL_EVT,CMS_IS_NEXT_COLL_EVT,CI_COLL_EVT.COLL_PROC_ID == CMS_IS_NEXT_COLL_EVT.COLL_PROC_ID and CI_COLL_EVT.EVT_SEQ == CMS_IS_NEXT_COLL_EVT.EVT_SEQ
+JoinTree_3,14,leftOuter,CI_ACCT_1,CI_BILL_CYC_L,CI_ACCT_1.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'
+JoinTree_3,15,leftOuter,CI_ACCT_1,CI_ACCT_MGMT_GR_L,CI_ACCT_1.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'
+JoinTree_3,16,inner,CI_ACCT_1,CI_CUST_CL_L,CI_ACCT_1.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'
+JoinTree_3,17,inner,CI_ACCT_1,CI_COLL_CL_L_1,CI_ACCT_1.COLL_CL_CD == CI_COLL_CL_L_1.COLL_CL_CD and CI_COLL_CL_L_1.LANGUAGE_CD == 'ENG'
+JoinTree_3,18,leftOuter,CI_ACCT_1,CI_BUD_PLAN_L,CI_ACCT_1.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+1.) Collection Process,Account ID,JoinTree_3.CI_COLL_PROC,ACCT_ID,,
+1.) Collection Process,Arrears Amount,JoinTree_3.CI_COLL_PROC,ARS_AMT,,
+1.) Collection Process,Arrears Date,JoinTree_3.CI_COLL_PROC,COLL_ARS_DT,,
+1.) Collection Process,Collection Condition Priority,JoinTree_3.CI_COLL_PROC,COLL_CAT_PRIO_FLG,,
+1.) Collection Process,Collection Class Control,JoinTree_3.CI_COLL_PROC,COLL_CL_CNTL_CD,,
+1.) Collection Process,Collection Process ID,JoinTree_3.CI_COLL_PROC,COLL_PROC_ID,,
+1.) Collection Process,Collection Process Template,JoinTree_3.CI_COLL_PROC,COLL_PROC_TMPL_CD,,
+1.) Collection Process,Collection Status Reason,JoinTree_3.CI_COLL_PROC,COLL_STAT_RSN_FLG,,
+1.) Collection Process,Collection Status,JoinTree_3.CI_COLL_PROC,COLL_STATUS_FLG,,
+1.) Collection Process,Comments,JoinTree_3.CI_COLL_PROC,COMMENTS,,
+1.) Collection Process,Create Date/Time,JoinTree_3.CI_COLL_PROC,CRE_DTTM,,
+1.) Collection Process,Priority,JoinTree_3.CI_COLL_PROC,CRIT_PRIO_FLG,,
+1.) Collection Process,Currency Code,JoinTree_3.CI_COLL_PROC,CURRENCY_CD,,
+1.) Collection Process,Trigger Business Process,JoinTree_3.CI_COLL_PROC,TRIGGER_BP_SW,,
+1.) Collection Event,Collection Event Status,JoinTree_3.CI_COLL_EVT,COLL_EVT_STAT_FLG,,
+1.) Collection Event,Collection Event Type,JoinTree_3.CI_COLL_EVT,COLL_EVT_TYP_CD,,
+1.) Collection Event,Collection Process ID,JoinTree_3.CI_COLL_EVT,COLL_PROC_ID,,
+1.) Collection Event,Completion Date,JoinTree_3.CI_COLL_EVT,COMPLETION_DT,,
+1.) Collection Event,Event Sequence,JoinTree_3.CI_COLL_EVT,EVT_SEQ,Dimension,CountAll
+1.) Collection Event,Trigger Business Process,JoinTree_3.CI_COLL_EVT,TRIGGER_BP_SW,,
+1.) Collection Event,Trigger Date,JoinTree_3.CI_COLL_EVT,TRIGGER_DT,,
+1.) Account,Access Group,JoinTree_3.CI_ACCT_1,ACCESS_GRP_CD,,
+1.) Account,Account ID,JoinTree_3.CI_ACCT_1,ACCT_ID,,
+1.) Account,Account Management Group,JoinTree_3.CI_ACCT_1,ACCT_MGMT_GRP_CD,,
+1.) Account,Alert Information,JoinTree_3.CI_ACCT_1,ALERT_INFO,,
+1.) Account,Bill After,JoinTree_3.CI_ACCT_1,BILL_AFTER_DT,,
+1.) Account,Bill Cycle,JoinTree_3.CI_ACCT_1,BILL_CYC_CD,,
+1.) Account,Bill Print Intercept,JoinTree_3.CI_ACCT_1,BILL_PRT_INTERCEPT,,
+1.) Account,Budget Plan,JoinTree_3.CI_ACCT_1,BUD_PLAN_CD,,
+1.) Account,CIS Division,JoinTree_3.CI_ACCT_1,CIS_DIVISION,,
+1.) Account,Collection Class,JoinTree_3.CI_ACCT_1,COLL_CL_CD,,
+1.) Account,Last Credit Review Date,JoinTree_3.CI_ACCT_1,CR_REVIEW_DT,,
+1.) Account,Currency Code,JoinTree_3.CI_ACCT_1,CURRENCY_CD,,
+1.) Account,Customer Class,JoinTree_3.CI_ACCT_1,CUST_CL_CD,,
+1.) Account,Internal Credit Review,JoinTree_3.CI_ACCT_1,INT_CR_REVIEW_SW,,
+1.) Account,Mailing Premise ID,JoinTree_3.CI_ACCT_1,MAILING_PREM_ID,,
+1.) Account,No Deposit Review Switch,JoinTree_3.CI_ACCT_1,NO_DEP_RVW_SW,,
+1.) Account,Postpone Credit Review Until,JoinTree_3.CI_ACCT_1,POSTPONE_CR_RVW_DT,,
+1.) Account,Protect Bill Cycle,JoinTree_3.CI_ACCT_1,PROTECT_CYC_SW,,
+1.) Account,Protect Division,JoinTree_3.CI_ACCT_1,PROTECT_DIV_SW,,
+1.) Account,Protect Mailing Premise,JoinTree_3.CI_ACCT_1,PROTECT_PREM_SW,,
+1.) Account,Set Up Date,JoinTree_3.CI_ACCT_1,SETUP_DT,,
+1.) Descriptions,Account Management Group Description,JoinTree_3.CI_ACCT_MGMT_GR_L,DESCR,,
+1.) Descriptions,Bill Cycle Description,JoinTree_3.CI_BILL_CYC_L,DESCR,,
+1.) Descriptions,Budget Plan Description,JoinTree_3.CI_BUD_PLAN_L,DESCR,,
+1.) Descriptions,Collection Class Control Description,JoinTree_3.CI_COLL_CL_CNTL_L,DESCR,,
+1.) Descriptions,Collection Class Description,JoinTree_3.CI_COLL_CL_L_1,DESCR,,
+1.) Descriptions,Collection Condition Priority Description,JoinTree_3.CI_LOOKUP_VAL_L_4,DESCR,,
+1.) Descriptions,Collection Event Status Description,JoinTree_3.CI_LOOKUP_VAL_L_6,DESCR,,
+1.) Descriptions,Collection Event Type Description,JoinTree_3.CI_COLL_EVT_TYP_L,DESCR,,
+1.) Descriptions,Collection Process Template Description,JoinTree_3.CI_COLL_PROC_TM_L,DESCR,,
+1.) Descriptions,Collection Status Description,JoinTree_3.CI_LOOKUP_VAL_L_1,DESCR,,
+1.) Descriptions,Collection Status Reason Description,JoinTree_3.CI_LOOKUP_VAL_L_3,DESCR,,
+1.) Descriptions,Customer Class Description,JoinTree_3.CI_CUST_CL_L,DESCR,,
+1.) Descriptions,Priority Description,JoinTree_3.CI_LOOKUP_VAL_L_5,DESCR,,
+1.) Formulas,Days Old,JoinTree_3,DAYS_OLD,,
+1.) Formulas,Distinct Account ID,JoinTree_3,ACCT_ID_DISTINCT,,
+1.) Formulas,Distinct Collection Event,JoinTree_3,COLL_EVENT_DISTINCT,,
+1.) Formulas,Distinct Collection Process,JoinTree_3,COLL_PROC_ID_DISTINCT,,
+1.) Formulas,Is Next Collection Event,JoinTree_3,IS_NEXT_COLL_EVT,,
+1.) Formulas,Name,JoinTree_3.CI_PER_NAME_1,ENTITY_NAME_UPR,,

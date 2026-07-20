@@ -6,17 +6,26 @@ domain_table_alias,physical_table
 
 JOIN_TREE
 join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,leftOuter,MASTER_SOURCE,DeviceInfo,MASTER_SOURCE.SP_ID == DeviceInfo.SP_ID
 
 EXPOSED_FIELDS
 item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
-C2M Data Explorer,Service Point ID,MASTER_SOURCE,SP_ID,,
-C2M Data Explorer,Address,MASTER_SOURCE,ADDRESS1,,
-C2M Data Explorer,City,MASTER_SOURCE,CITY,,
-C2M Data Explorer,SP Status (Desc),MASTER_SOURCE,SP_STATUS,,
-C2M Data Explorer,Service Type (Desc),MASTER_SOURCE,SVC_TYPE,,
-C2M Data Explorer,Latest SA ID,MASTER_SOURCE,SA_ID,,
-C2M Data Explorer,Latest SA Status (Desc),MASTER_SOURCE,SA_STATUS,,
-C2M Data Explorer,SA Status Code,MASTER_SOURCE,SA_STATUS_FLG,,
-C2M Data Explorer,Latest SA Stop Date,MASTER_SOURCE,SA_STOP_DATE,,
-C2M Data Explorer,Read Date/Time,MASTER_SOURCE,MSRMT_DTTM,,
-C2M Data Explorer,Consumption Value,MASTER_SOURCE,MSRMT_VAL,,
+Device Info,Asset ID,JoinTree_1.DeviceInfo,ASSET_ID,,
+Device Info,Badge Number,JoinTree_1.DeviceInfo,BADGE_NUMBER,,
+Device Info,Meter Install Date,JoinTree_1.DeviceInfo,D1_INSTALL_DTTM,,
+Device Info,Device Specification,JoinTree_1.DeviceInfo,DEVICE_SPECIFICATION,,
+Device Info,Device Type,JoinTree_1.DeviceInfo,DEVICE_TYPE_CD,,
+Device Info,Manufacturer,JoinTree_1.DeviceInfo,MANUFACTURER_CD,,
+Device Info,Serial Number,JoinTree_1.DeviceInfo,SERIAL_NUMBER,,
+Device Info,Service Point ID,JoinTree_1.DeviceInfo,SP_ID,,
+UnBilled Info,Address,JoinTree_1.MASTER_SOURCE,ADDRESS1,,
+UnBilled Info,City,JoinTree_1.MASTER_SOURCE,CITY,,
+UnBilled Info,Measurement Date Time,JoinTree_1.MASTER_SOURCE,MSRMT_DTTM,,
+UnBilled Info,Measurement Value,JoinTree_1.MASTER_SOURCE,MSRMT_VAL,,
+UnBilled Info,Service Agreement ID,JoinTree_1.MASTER_SOURCE,SA_ID,,
+UnBilled Info,Service Agreement Status,JoinTree_1.MASTER_SOURCE,SA_STATUS,,
+UnBilled Info,Service Agreement Status Code,JoinTree_1.MASTER_SOURCE,SA_STATUS_FLG,,
+UnBilled Info,Service Stop Date,JoinTree_1.MASTER_SOURCE,SA_STOP_DATE,,
+UnBilled Info,Service Point ID,JoinTree_1.MASTER_SOURCE,SP_ID,,
+UnBilled Info,Service Point Status,JoinTree_1.MASTER_SOURCE,SP_STATUS,,
+UnBilled Info,Service Type,JoinTree_1.MASTER_SOURCE,SVC_TYPE,,

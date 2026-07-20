@@ -34,7 +34,14 @@ CLIENTS = {
     "ellensburg": "ELLENSBURG",
     "citycorp": "CITYCORP",
     "odessa": "ODESSA",
+    "odessa_dev": "ODESSA_DEV",
     "demo": "DEMO",
+    # Production SmartCity clients (read-only; see SMARTCITY_PROD_* in .env).
+    "newark_prod": "NEWARK_PROD",
+    "fonddulac_prod": "FONDDULAC_PROD",
+    "collegestation_prod": "COLLEGESTATION_PROD",
+    "ellensburg_prod": "ELLENSBURG_PROD",
+    "citycorp_prod": "CITYCORP_PROD",
     # Internal SmartCity environments (demo credentials; separate service names).
     "int_train": "INT_TRAIN",
     "int_dev": "INT_DEV",
@@ -53,6 +60,11 @@ def parse_args() -> argparse.Namespace:
         "--fail-if-any-rows",
         action="store_true",
         help="Exit with code 1 when any SELECT returns one or more rows (for install gate scripts).",
+    )
+    parser.add_argument(
+        "--fail-last-select-only",
+        action="store_true",
+        help="With --fail-if-any-rows, only the final SELECT can fail the gate (earlier SELECTs are summaries).",
     )
     parser.add_argument(
         "--log-file",
@@ -189,6 +201,13 @@ def client_connection(config: dict[str, str], client: str) -> tuple[str, str, st
     demo_password = config.get("DEMO_DB_PASSWORD") or config.get("DB_PASSWORD") or config.get("ORACLE_PASSWORD")
     user = config.get(f"{prefix}_DB_USER") or demo_user
     password = config.get(f"{prefix}_DB_PASSWORD") or demo_password
+    if prefix.endswith("_PROD"):
+        user = config.get(f"{prefix}_DB_USER") or config.get("SMARTCITY_PROD_DB_USER") or user
+        password = (
+            config.get(f"{prefix}_DB_PASSWORD")
+            or config.get("SMARTCITY_PROD_DB_PASSWORD")
+            or password
+        )
     dsn = config.get(f"{prefix}_ORACLE_DSN") or config.get(f"{prefix}_DB_CONNECT_STRING")
     if not user or not password or not dsn:
         raise RuntimeError(f"Missing connection config for client {client}")
@@ -243,6 +262,13 @@ def main() -> int:
             conn.call_timeout = call_timeout_ms
             with conn.cursor() as cursor:
                 cursor.arraysize = fetch_array_size
+                select_indexes = [
+                    index
+                    for index, sql in enumerate(statements, start=1)
+                    if sql.lstrip().upper().startswith("SELECT")
+                ]
+                last_select_index = select_indexes[-1] if select_indexes else None
+
                 for index, sql in enumerate(statements, start=1):
                     emit(f"\n=== Statement {index}/{len(statements)} ===")
                     cursor.execute(sql)
@@ -256,7 +282,11 @@ def main() -> int:
                         emit(json.dumps([dict(zip(columns, row)) for row in rows], default=str, indent=2))
                     else:
                         print_table(columns, rows)
-                    if args.fail_if_any_rows and rows:
+
+                    should_fail = args.fail_if_any_rows and rows
+                    if args.fail_last_select_only:
+                        should_fail = should_fail and index == last_select_index
+                    if should_fail:
                         failure_rows.append((index, len(rows), rows))
     finally:
         if log_handle is not None:

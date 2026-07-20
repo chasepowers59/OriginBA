@@ -1,0 +1,21 @@
+-- SELECT logic for CISADM.CI_CA_ACCT_HIS_VW
+SELECT
+       CA.ACCT_ID
+      ,LU.LANGUAGE_CD
+      ,CA.CASE_ID
+      ,'          '
+      ,CL.LOG_DTTM
+      ,LU.FIELD_VALUE
+      ,LU.DESCR
+      ,TO_CHAR(CL.LOG_DTTM,'YYYY-MM-DD-HH24.MI.SS') ||'.000000'
+  FROM CI_CASE         CA
+      ,CI_CASE_LOG     CL
+      ,CI_LOOKUP       LU
+   WHERE
+       LU.FIELD_NAME = 'ACT_TYPE_FLG'
+   AND LU.FIELD_VALUE = 'CA'
+   AND CA.ACCT_ID <> ' '
+   AND CL.CASE_ID = CA.CASE_ID
+   AND CL.CASE_LOG_TYPE_FLG = 'CASC'
+WITH READ ONLY
+ 

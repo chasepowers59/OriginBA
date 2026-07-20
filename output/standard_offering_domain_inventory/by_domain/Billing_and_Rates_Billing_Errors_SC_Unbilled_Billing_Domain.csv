@@ -1,0 +1,65 @@
+section,domain_name,SC_Unbilled_Billing_Domain
+section,workstream,Billing and Rates
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_BSEG_EXCP,CI_BSEG_EXCP
+CI_BSEG,CI_BSEG
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_1,1,leftOuter,SC_CUS_CONTACT,SC_BILLS_IN_ERROR,SC_CUS_CONTACT.ACCT_ID == SC_BILLS_IN_ERROR.ACCT_ID
+JoinTree_1,2,inner,SC_BILLS_IN_ERROR,CI_BSEG,SC_BILLS_IN_ERROR.BILL_ID == CI_BSEG.BILL_ID
+JoinTree_1,3,leftOuter,CI_BSEG,CI_BSEG_EXCP,CI_BSEG.BSEG_ID == CI_BSEG_EXCP.BSEG_ID
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+Bill Segment,Bill Scenario Id,JoinTree_1.CI_BSEG,BILL_SCNR_ID,,
+Bill Segment,Bill Segment Id,JoinTree_1.CI_BSEG,BSEG_ID,,
+Bill Segment,Bill Segment Status,JoinTree_1.CI_BSEG,BSEG_STAT_FLG,,
+Bill Segment,Cancel Bill Segment Id,JoinTree_1.CI_BSEG,CAN_BSEG_ID,,
+Bill Segment,Cancel Reason,JoinTree_1.CI_BSEG,CAN_RSN_CD,,
+Bill Segment,Closing Bill Segment,JoinTree_1.CI_BSEG,CLOSING_BSEG_SW,,
+Bill Segment,Create Date/Time,JoinTree_1.CI_BSEG,CRE_DTTM,,
+Bill Segment,End Date,JoinTree_1.CI_BSEG,END_DT,,
+Bill Segment,Estimate,JoinTree_1.CI_BSEG,EST_SW,,
+Bill Segment,Item Override,JoinTree_1.CI_BSEG,ITEM_OVERRIDE_SW,,
+Bill Segment,Master Bill Segment Id,JoinTree_1.CI_BSEG,MASTER_BSEG_ID,,
+Bill Segment,MDM End Date/Time,JoinTree_1.CI_BSEG,MDM_END_DTTM,,
+Bill Segment,MDM Start Date/Time,JoinTree_1.CI_BSEG,MDM_START_DTTM,,
+Bill Segment,Premise Id,JoinTree_1.CI_BSEG,PREM_ID,,
+Bill Segment,Quote Detail Id,JoinTree_1.CI_BSEG,QUOTE_DTL_ID,,
+Bill Segment,Rebill Segment Id,JoinTree_1.CI_BSEG,REBILL_SEG_ID,,
+Bill Segment,SA Id,JoinTree_1.CI_BSEG,SA_ID,,
+Bill Segment,SQ Override,JoinTree_1.CI_BSEG,SQ_OVERRIDE_SW,,
+Bill Segment,Start Date,JoinTree_1.CI_BSEG,START_DT,,
+Bill Segment,Status Change Date/Time,JoinTree_1.CI_BSEG,STAT_CHG_DTTM,,
+Bill Segment,Window Start Date,JoinTree_1.CI_BSEG,WIN_START_DT,,
+Bill Segment Exception,Bill Segment Exception Type,JoinTree_1.CI_BSEG_EXCP,BSEG_EXCP_FLG,,
+Bill Segment Exception,Calling Program Sequence,JoinTree_1.CI_BSEG_EXCP,CALL_SEQ,,
+Bill Segment Exception,Comments,JoinTree_1.CI_BSEG_EXCP,COMMENTS,,
+Bill Segment Exception,Create Date/Time,JoinTree_1.CI_BSEG_EXCP,CRE_DTTM,,
+Bill Segment Exception,Message,JoinTree_1.CI_BSEG_EXCP,EXP_MSG,,
+Bill Segment Exception,Message Cat Number,JoinTree_1.CI_BSEG_EXCP,MESSAGE_CAT_NBR,,
+Bill Segment Exception,Message Number,JoinTree_1.CI_BSEG_EXCP,MESSAGE_NBR,,
+Bill Segment Exception,Message Parm 1,JoinTree_1.CI_BSEG_EXCP,MESSAGE_PARM1,,
+Bill Segment Exception,Message Parm 2,JoinTree_1.CI_BSEG_EXCP,MESSAGE_PARM2,,
+Bill Segment Exception,Message Parm 3,JoinTree_1.CI_BSEG_EXCP,MESSAGE_PARM3,,
+Bill Segment Exception,Message Parm 4,JoinTree_1.CI_BSEG_EXCP,MESSAGE_PARM4,,
+Bill Segment Exception,Message Parm 5,JoinTree_1.CI_BSEG_EXCP,MESSAGE_PARM5,,
+Bill Segment Exception,Message Parm 6,JoinTree_1.CI_BSEG_EXCP,MESSAGE_PARM6,,
+Bill Segment Exception,Message Parm 7,JoinTree_1.CI_BSEG_EXCP,MESSAGE_PARM7,,
+Bill Segment Exception,Message Parm 8,JoinTree_1.CI_BSEG_EXCP,MESSAGE_PARM8,,
+Bill Segment Exception,Message Parm 9,JoinTree_1.CI_BSEG_EXCP,MESSAGE_PARM9,,
+Bill Segment Exception,Reviewed,JoinTree_1.CI_BSEG_EXCP,REVIEW_COMP,,
+Bill Segment Exception,Review Date,JoinTree_1.CI_BSEG_EXCP,REVIEW_DT,,
+Bill Segment Exception,Review User Id,JoinTree_1.CI_BSEG_EXCP,REVIEW_USER_ID,,
+Bill Segment Exception,User Id,JoinTree_1.CI_BSEG_EXCP,USER_ID,,
+Un-Billed Bills,Account Id,JoinTree_1.SC_BILLS_IN_ERROR,ACCT_ID,,
+Un-Billed Bills,Bill Cycle Code,JoinTree_1.SC_BILLS_IN_ERROR,BILL_CYC_CD,,
+Un-Billed Bills,Bill Id,JoinTree_1.SC_BILLS_IN_ERROR,BILL_ID,,
+Un-Billed Bills,Home Phone,JoinTree_1.SC_CUS_CONTACT,HOMEPHONE,,
+Un-Billed Bills,Cell Phone,JoinTree_1.SC_CUS_CONTACT,CELLPHONE,,
+Un-Billed Bills,Entity Name,JoinTree_1.SC_CUS_CONTACT,ENTITY_NAME,,
+Un-Billed Bills,Customer Class,JoinTree_1.SC_BILLS_IN_ERROR,CUST_CL_CD,,
+Un-Billed Bills,Email,JoinTree_1.SC_CUS_CONTACT,PRIMARYEMAIL,,

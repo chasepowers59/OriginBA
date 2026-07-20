@@ -1,0 +1,109 @@
+section,domain_name,Account_Characteristics___Domain
+section,workstream,Customer Operations
+
+PHYSICAL_TABLES
+domain_table_alias,physical_table
+CI_ACCT,CI_ACCT
+CI_ACCT_CHAR,CI_ACCT_CHAR
+CI_CHAR_TYPE_L,CI_CHAR_TYPE_L
+CI_PER,CI_PER
+CI_ACCT_PER,CI_ACCT_PER
+JoinTree_2,CI_ACCT
+
+JOIN_TREE
+join_tree,join_sequence,join_type,left_table,right_table,join_expression
+JoinTree_2,1,leftOuter,CI_ACCT,CI_ACCT_CHAR,CI_ACCT.ACCT_ID == CI_ACCT_CHAR.ACCT_ID
+JoinTree_2,2,leftOuter,CI_ACCT_PER,CI_ACCT,CI_ACCT_PER.ACCT_ID == CI_ACCT.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'
+JoinTree_2,3,leftOuter,CI_PER,CI_ACCT_PER,CI_PER.PER_ID == CI_ACCT_PER.PER_ID
+JoinTree_2,4,leftOuter,CI_CHAR_TYPE_L,CI_ACCT_CHAR,CI_CHAR_TYPE_L.CHAR_TYPE_CD == CI_ACCT_CHAR.CHAR_TYPE_CD and CI_CHAR_TYPE_L.LANGUAGE_CD == 'ENG'
+
+EXPOSED_FIELDS
+item_group_label,field_label,source_table,source_column,dimension_or_measure,default_aggregation
+Account - Person Relationship,Account Number,JoinTree_2.CI_ACCT_PER,ACCT_ID,,
+Account - Person Relationship,Relationship Type Code,JoinTree_2.CI_ACCT_PER,ACCT_REL_TYPE_CD,,
+Account - Person Relationship,Allow Preferences Flag,JoinTree_2.CI_ACCT_PER,ALW_PREF_FLG,,
+Account - Person Relationship,Billing Address Source Flag,JoinTree_2.CI_ACCT_PER,BILL_ADDR_SRCE_FLG,,
+Account - Person Relationship,Bill Format Flag,JoinTree_2.CI_ACCT_PER,BILL_FORMAT_FLG,,
+Account - Person Relationship,Bill Route Type Code,JoinTree_2.CI_ACCT_PER,BILL_RTE_TYPE_CD,,
+Account - Person Relationship,CSS Access Role Flag,JoinTree_2.CI_ACCT_PER,CSS_ACCESS_ROLE_FLG,,
+Account - Person Relationship,Customer PO ID,JoinTree_2.CI_ACCT_PER,CUST_PO_ID,,
+Account - Person Relationship,Financially Responsible,JoinTree_2.CI_ACCT_PER,FIN_RESP_SW,,
+Account - Person Relationship,Primary Customer,JoinTree_2.CI_ACCT_PER,MAIN_CUST_SW,,
+Account - Person Relationship,Name Prefix/Suffix,JoinTree_2.CI_ACCT_PER,NAME_PFX_SFX,,
+Account - Person Relationship,Number of Bill Copies,JoinTree_2.CI_ACCT_PER,NBR_BILL_COPIES,,
+Account - Person Relationship,Notification Flag,JoinTree_2.CI_ACCT_PER,NOTIFY_SW,,
+Account - Person Relationship,Person ID,JoinTree_2.CI_ACCT_PER,PER_ID,,
+Account - Person Relationship,Prefix/Suffix Flag,JoinTree_2.CI_ACCT_PER,PFX_SFX_FLG,,
+Account - Person Relationship,Quote Route Type Code,JoinTree_2.CI_ACCT_PER,QTE_RTE_TYPE_CD,,
+Account - Person Relationship,Receive Copy Flag,JoinTree_2.CI_ACCT_PER,RECEIVE_COPY_SW,,
+Account - Person Relationship,Receive Quote Flag,JoinTree_2.CI_ACCT_PER,RECV_QTE_SW,,
+Account - Person Relationship,Third Party Flag,JoinTree_2.CI_ACCT_PER,THRD_PTY_SW,,
+Account - Person Relationship,Version,JoinTree_2.CI_ACCT_PER,VERSION,,
+Account - Person Relationship,Web Access Flag,JoinTree_2.CI_ACCT_PER,WEB_ACCESS_FLG,,
+Characteristic Type Lookup,Characteristic Code,JoinTree_2.CI_CHAR_TYPE_L,CHAR_TYPE_CD,,
+Characteristic Type Lookup,Description,JoinTree_2.CI_CHAR_TYPE_L,DESCR,,
+Characteristic Type Lookup,Language Code,JoinTree_2.CI_CHAR_TYPE_L,LANGUAGE_CD,,
+Characteristic Type Lookup,Owner Flag,JoinTree_2.CI_CHAR_TYPE_L,OWNER_FLG,,
+Characteristic Type Lookup,Version,JoinTree_2.CI_CHAR_TYPE_L,VERSION,,Max
+Account Characteristics,Account Number,JoinTree_2.CI_ACCT_CHAR,ACCT_ID,,
+Account Characteristics,Ad Hoc Characteristic Value,JoinTree_2.CI_ACCT_CHAR,ADHOC_CHAR_VAL,,
+Account Characteristics,Characteristic Code,JoinTree_2.CI_ACCT_CHAR,CHAR_TYPE_CD,,
+Account Characteristics,Characteristic Value,JoinTree_2.CI_ACCT_CHAR,CHAR_VAL,,
+Account Characteristics,Characteristic Value FK 1,JoinTree_2.CI_ACCT_CHAR,CHAR_VAL_FK1,,
+Account Characteristics,Characteristic Value FK 2,JoinTree_2.CI_ACCT_CHAR,CHAR_VAL_FK2,,
+Account Characteristics,Characteristic Value FK 3,JoinTree_2.CI_ACCT_CHAR,CHAR_VAL_FK3,,
+Account Characteristics,Characteristic Value FK 4,JoinTree_2.CI_ACCT_CHAR,CHAR_VAL_FK4,,
+Account Characteristics,Characteristic Value FK 5,JoinTree_2.CI_ACCT_CHAR,CHAR_VAL_FK5,,
+Account Characteristics,Effective Date,JoinTree_2.CI_ACCT_CHAR,EFFDT,,
+Account Characteristics,Search Characteristic Value,JoinTree_2.CI_ACCT_CHAR,SRCH_CHAR_VAL,,
+Account Characteristics,Version,JoinTree_2.CI_ACCT_CHAR,VERSION,,
+Account Details,Access Group Code,JoinTree_2.CI_ACCT,ACCESS_GRP_CD,,
+Account Details,Account Data Area,JoinTree_2.CI_ACCT,ACCT_DATA_AREA,,
+Account Details,Account Number,JoinTree_2.CI_ACCT,ACCT_ID,,
+Account Details,Account Management Group Code,JoinTree_2.CI_ACCT,ACCT_MGMT_GRP_CD,,
+Account Details,Alert Information,JoinTree_2.CI_ACCT,ALERT_INFO,,
+Account Details,Bill After Date,JoinTree_2.CI_ACCT,BILL_AFTER_DT,,
+Account Details,Billing Cycle Code,JoinTree_2.CI_ACCT,BILL_CYC_CD,,
+Account Details,Bill Print Intercept,JoinTree_2.CI_ACCT,BILL_PRT_INTERCEPT,,
+Account Details,Budget Plan Code,JoinTree_2.CI_ACCT,BUD_PLAN_CD,,
+Account Details,CIS Division,JoinTree_2.CI_ACCT,CIS_DIVISION,,
+Account Details,Collection Class Code,JoinTree_2.CI_ACCT,COLL_CL_CD,,
+Account Details,Credit Review Date,JoinTree_2.CI_ACCT,CR_REVIEW_DT,,
+Account Details,Currency Code,JoinTree_2.CI_ACCT,CURRENCY_CD,,
+Account Details,Customer Class Code,JoinTree_2.CI_ACCT,CUST_CL_CD,,
+Account Details,Internal Credit Review Flag,JoinTree_2.CI_ACCT,INT_CR_REVIEW_SW,,
+Account Details,Mailing Premise ID,JoinTree_2.CI_ACCT,MAILING_PREM_ID,,
+Account Details,No Deposit Review Flag,JoinTree_2.CI_ACCT,NO_DEP_RVW_SW,,
+Account Details,Postpone Credit Review Date,JoinTree_2.CI_ACCT,POSTPONE_CR_RVW_DT,,
+Account Details,Protect Cycle Flag,JoinTree_2.CI_ACCT,PROTECT_CYC_SW,,
+Account Details,Protect Division Flag,JoinTree_2.CI_ACCT,PROTECT_DIV_SW,,
+Account Details,Protect Premise Flag,JoinTree_2.CI_ACCT,PROTECT_PREM_SW,,
+Account Details,Setup Date,JoinTree_2.CI_ACCT,SETUP_DT,,
+Account Details,Version,JoinTree_2.CI_ACCT,VERSION,,
+Customer Details,Address Line 1,JoinTree_2.CI_PER,ADDRESS1,,
+Customer Details,Address Line 2,JoinTree_2.CI_PER,ADDRESS2,,
+Customer Details,Address Line 3,JoinTree_2.CI_PER,ADDRESS3,,
+Customer Details,Address Line 4,JoinTree_2.CI_PER,ADDRESS4,,
+Customer Details,City,JoinTree_2.CI_PER,CITY,,
+Customer Details,Country,JoinTree_2.CI_PER,COUNTRY,,
+Customer Details,County,JoinTree_2.CI_PER,COUNTY,,
+Customer Details,Email Address,JoinTree_2.CI_PER,EMAILID,,
+Customer Details,Geographic Code,JoinTree_2.CI_PER,GEO_CODE,,
+Customer Details,House Type,JoinTree_2.CI_PER,HOUSE_TYPE,,
+Customer Details,In City Limits,JoinTree_2.CI_PER,IN_CITY_LIMIT,,
+Customer Details,Language Code,JoinTree_2.CI_PER,LANGUAGE_CD,,
+Customer Details,LS/SL Description,JoinTree_2.CI_PER,LS_SL_DESCR,,
+Customer Details,LS/SL Flag,JoinTree_2.CI_PER,LS_SL_FLG,,
+Customer Details,Additional Number 1,JoinTree_2.CI_PER,NUM1,,
+Customer Details,Additional Number 2,JoinTree_2.CI_PER,NUM2,,
+Customer Details,Override Mailing Name Line 1,JoinTree_2.CI_PER,OVRD_MAIL_NAME1,,
+Customer Details,Override Mailing Name Line 2,JoinTree_2.CI_PER,OVRD_MAIL_NAME2,,
+Customer Details,Override Mailing Name Line 3,JoinTree_2.CI_PER,OVRD_MAIL_NAME3,,
+Customer Details,Person Data Area,JoinTree_2.CI_PER,PER_DATA_AREA,,
+Customer Details,Person ID,JoinTree_2.CI_PER,PER_ID,,
+Customer Details,Person or Business Flag,JoinTree_2.CI_PER,PER_OR_BUS_FLG,,
+Customer Details,Postal Code,JoinTree_2.CI_PER,POSTAL,,
+Customer Details,Receive Marketing Info Flag,JoinTree_2.CI_PER,RECV_MKTG_INFO_FLG,,
+Customer Details,State,JoinTree_2.CI_PER,STATE,,
+Customer Details,Time Zone Code,JoinTree_2.CI_PER,TIME_ZONE_CD,,
+Customer Details,Version,JoinTree_2.CI_PER,VERSION,,
