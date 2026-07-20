@@ -50,7 +50,8 @@ Prefer `C1_BI_WOPROC_VW` when it is populated and tenant-valid because it is alr
 - Grain: one row per `SA_ID`
 - Purpose:
   - current SA-level aged debt exposure from governed `CI_FT` arrears logic
-  - replacement for current-state `CMS_SA_SNAPSHOT` aged-balance Ad Hoc views
+  - replacement for current-state `CMS_SA_SNAPSHOT` aged-balance Ad Hoc views  
+    (`CMS_SA_SNAPSHOT` LDAY refresh now nets payments so balances match CIS current unpaid)
 
 ### 5. Severance / agency child snapshots
 - Build only if the tenant actually uses them and the tables are populated.
