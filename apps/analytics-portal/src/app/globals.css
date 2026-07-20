@@ -1,0 +1,417 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Semantic tokens (light default) ── */
+:root {
+  color-scheme: light;
+  --background: #f1f5f9;
+  --foreground: #0f172a;
+  --foreground-muted: #64748b;
+  --foreground-subtle: #94a3b8;
+  --heading: #0f172a;
+  --surface: rgba(255, 255, 255, 0.92);
+  --surface-subtle: rgba(255, 255, 255, 0.72);
+  --surface-solid: #ffffff;
+  --surface-input: #ffffff;
+  --header-bg: rgba(255, 255, 255, 0.88);
+  --border: rgba(15, 23, 42, 0.1);
+  --border-subtle: rgba(15, 23, 42, 0.06);
+  --chip-bg: rgba(15, 23, 42, 0.04);
+  --chip-text: #475569;
+  --chip-border: rgba(15, 23, 42, 0.08);
+  --chip-active-bg: rgba(14, 165, 233, 0.12);
+  --chip-active-text: #0369a1;
+  --chip-active-border: rgba(14, 165, 233, 0.35);
+  --btn-ghost-bg: rgba(15, 23, 42, 0.03);
+  --btn-ghost-hover: rgba(15, 23, 42, 0.06);
+  --btn-ghost-text: #334155;
+  --shadow-color: rgba(15, 23, 42, 0.08);
+  --accent: #0ea5e9;
+  --accent-2: #6366f1;
+  --accent-muted: #0284c7;
+  --mesh-glow-1: rgba(56, 189, 248, 0.1);
+  --mesh-glow-2: rgba(99, 102, 241, 0.08);
+  --mesh-glow-3: rgba(14, 165, 233, 0.06);
+  --tooltip-bg: #ffffff;
+  --tooltip-border: rgba(15, 23, 42, 0.12);
+  --tooltip-text: #0f172a;
+  --tooltip-muted: #64748b;
+  --originba-navy: #0b1f3a;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #070b14;
+  --foreground: #e2e8f0;
+  --foreground-muted: #94a3b8;
+  --foreground-subtle: #64748b;
+  --heading: #f8fafc;
+  --surface: rgba(15, 23, 42, 0.72);
+  --surface-subtle: rgba(15, 23, 42, 0.45);
+  --surface-solid: #0f172a;
+  --surface-input: rgba(2, 6, 23, 0.55);
+  --header-bg: rgba(2, 6, 23, 0.78);
+  --border: rgba(148, 163, 184, 0.14);
+  --border-subtle: rgba(148, 163, 184, 0.08);
+  --chip-bg: rgba(255, 255, 255, 0.05);
+  --chip-text: #cbd5e1;
+  --chip-border: rgba(255, 255, 255, 0.1);
+  --chip-active-bg: rgba(56, 189, 248, 0.15);
+  --chip-active-text: #bae6fd;
+  --chip-active-border: rgba(56, 189, 248, 0.4);
+  --btn-ghost-bg: rgba(255, 255, 255, 0.05);
+  --btn-ghost-hover: rgba(255, 255, 255, 0.1);
+  --btn-ghost-text: #e2e8f0;
+  --shadow-color: rgba(0, 0, 0, 0.25);
+  --tooltip-bg: #020617;
+  --tooltip-border: rgba(255, 255, 255, 0.15);
+  --tooltip-text: #f8fafc;
+  --tooltip-muted: #94a3b8;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--foreground-muted) 35%, transparent) transparent;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+.mesh-bg {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(at 0% 0%, var(--mesh-glow-1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, var(--mesh-glow-2) 0, transparent 45%),
+    radial-gradient(at 50% 100%, var(--mesh-glow-3) 0, transparent 50%);
+}
+
+@layer components {
+  .glass-panel {
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 20px 25px -5px var(--shadow-color);
+    backdrop-filter: blur(20px);
+  }
+
+  .glass-panel-subtle {
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-subtle);
+    backdrop-filter: blur(12px);
+  }
+
+  .input-modern {
+    @apply w-full rounded-xl px-3 py-2.5 text-sm outline-none transition;
+    border: 1px solid var(--border);
+    background: var(--surface-input);
+    color: var(--foreground);
+  }
+
+  .input-modern::placeholder {
+    color: var(--foreground-subtle);
+  }
+
+  .input-modern:focus {
+    border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition disabled:cursor-not-allowed disabled:opacity-50;
+    background: linear-gradient(to right, var(--accent), var(--accent-2));
+    box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.08);
+  }
+
+  .brand-logo {
+    background: linear-gradient(to bottom right, var(--accent), var(--accent-2));
+    box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm transition;
+    border: 1px solid var(--border);
+    background: var(--btn-ghost-bg);
+    color: var(--btn-ghost-text);
+  }
+
+  .btn-ghost:hover {
+    background: var(--btn-ghost-hover);
+  }
+
+  .chip {
+    @apply rounded-full px-3 py-1 text-xs font-medium;
+    border: 1px solid var(--chip-border);
+    background: var(--chip-bg);
+    color: var(--chip-text);
+  }
+
+  .chip-active {
+    border-color: var(--chip-active-border);
+    background: var(--chip-active-bg);
+    color: var(--chip-active-text);
+  }
+
+  .portal-header {
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--header-bg);
+    backdrop-filter: blur(20px);
+  }
+
+  .portal-heading {
+    color: var(--heading);
+  }
+
+  .portal-text-muted {
+    color: var(--foreground-muted);
+  }
+
+  .portal-text-subtle {
+    color: var(--foreground-subtle);
+  }
+
+  .portal-footer {
+    border-top: 1px solid var(--border-subtle);
+    color: var(--foreground-subtle);
+  }
+
+  .chart-tooltip {
+    border: 1px solid var(--tooltip-border);
+    background: var(--tooltip-bg);
+    color: var(--tooltip-text);
+    box-shadow: 0 20px 25px -5px var(--shadow-color);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.35s ease-out both;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out both;
+  }
+}
+
+/* Legacy utility compatibility inside the app shell */
+.mesh-bg .text-white {
+  color: var(--heading);
+}
+
+.dark .mesh-bg .text-white {
+  color: #fff;
+}
+
+.mesh-bg .text-slate-100 {
+  color: color-mix(in srgb, var(--heading) 92%, var(--foreground-muted));
+}
+
+.dark .mesh-bg .text-slate-100 {
+  color: rgb(241 245 249);
+}
+
+.mesh-bg .text-slate-200 {
+  color: color-mix(in srgb, var(--heading) 80%, var(--foreground-muted));
+}
+
+.dark .mesh-bg .text-slate-200 {
+  color: rgb(226 232 240);
+}
+
+.mesh-bg .text-slate-300 {
+  color: color-mix(in srgb, var(--foreground) 70%, var(--foreground-muted));
+}
+
+.dark .mesh-bg .text-slate-300 {
+  color: rgb(203 213 225);
+}
+
+.mesh-bg .text-slate-400,
+.mesh-bg .text-slate-500,
+.mesh-bg .text-slate-600 {
+  color: var(--foreground-muted);
+}
+
+.mesh-bg .border-white\/5,
+.mesh-bg .border-white\/10,
+.mesh-bg .border-white\/15,
+.mesh-bg .border-white\/20 {
+  border-color: var(--border-subtle);
+}
+
+.mesh-bg .bg-white\/5,
+.mesh-bg .bg-white\/10 {
+  background: var(--chip-bg);
+}
+
+.mesh-bg .bg-slate-950\/30,
+.mesh-bg .bg-slate-950\/40,
+.mesh-bg .bg-slate-950\/50,
+.mesh-bg .bg-slate-900\/40,
+.mesh-bg .bg-slate-900\/60 {
+  background: var(--surface-subtle);
+}
+
+.mesh-bg .ring-white\/10 {
+  --tw-ring-color: var(--border-subtle);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--foreground) 4%, transparent) 25%,
+    color-mix(in srgb, var(--foreground) 10%, transparent) 50%,
+    color-mix(in srgb, var(--foreground) 4%, transparent) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@media print {
+  @page {
+    margin: 0.75in;
+    size: letter;
+  }
+
+  body {
+    background: white !important;
+    color: #0f172a !important;
+  }
+
+  .no-print,
+  .mesh-bg > header,
+  .mesh-bg > footer,
+  .mesh-bg > div > aside {
+    display: none !important;
+  }
+
+  .mesh-bg {
+    background: white !important;
+  }
+
+  .council-pack {
+    color: #0f172a !important;
+  }
+
+  .council-pack .glass-panel,
+  .council-pack .glass-panel-subtle {
+    background: white !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .council-pack .text-white,
+  .council-pack .text-slate-200,
+  .council-pack .text-slate-300 {
+    color: #0f172a !important;
+  }
+
+  .council-pack .text-slate-400,
+  .council-pack .text-slate-500 {
+    color: #475569 !important;
+  }
+
+  .council-pack-header {
+    display: block !important;
+  }
+
+  #dashboard-export-root.printing-dashboard .glass-panel {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .lineage-pack {
+    color: #0f172a !important;
+  }
+
+  .lineage-pack .glass-panel,
+  .lineage-pack .glass-panel-subtle {
+    background: white !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .lineage-pack .text-white,
+  .lineage-pack .text-slate-200,
+  .lineage-pack .text-sky-200,
+  .lineage-pack .text-sky-300,
+  .lineage-pack .text-emerald-300,
+  .lineage-pack .text-amber-300,
+  .lineage-pack .text-violet-300,
+  .lineage-pack .text-indigo-200 {
+    color: #0f172a !important;
+  }
+
+  .lineage-pack .text-slate-400,
+  .lineage-pack .text-slate-500,
+  .lineage-pack .text-slate-600 {
+    color: #475569 !important;
+  }
+
+  .lineage-pack-header {
+    display: block !important;
+  }
+
+  #lineage-pack-export.printing-lineage .no-print {
+    display: none !important;
+  }
+
+  #lineage-pack-export.printing-lineage section,
+  #lineage-pack-export.printing-lineage .relative {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+html.presentation-mode .no-print {
+  display: none !important;
+}
+
+html.presentation-mode .mesh-bg > div {
+  grid-template-columns: 1fr !important;
+  max-width: 100% !important;
+  padding: 1.5rem !important;
+}
+
+html.presentation-mode #dashboard-export-root {
+  max-width: 1400px;
+  margin: 0 auto;
+}

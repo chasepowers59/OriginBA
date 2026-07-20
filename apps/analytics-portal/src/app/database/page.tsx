@@ -1,0 +1,38 @@
+import { fetchSnapshots } from "@/lib/api";
+import { AppShell } from "@/components/AppShell";
+import { DatabaseWorkspace } from "@/components/DatabaseWorkspace";
+
+export default async function DatabasePage() {
+  let index;
+  try {
+    index = await fetchSnapshots();
+  } catch {
+    index = {
+      client: "demo",
+      poc_enabled: [],
+      db_configured: false,
+      workstreams: [],
+      snapshots: [],
+    };
+  }
+
+  return (
+    <AppShell
+      snapshots={index.snapshots}
+      workstreams={index.workstreams ?? []}
+      dbConfigured={index.db_configured}
+      activeNav="database"
+    >
+      <div className="space-y-4">
+        <div>
+          <h1 className="portal-heading text-2xl font-bold tracking-tight">Database</h1>
+          <p className="portal-text-muted mt-1 max-w-2xl text-sm">
+            Run SQL against your Oracle reporting database. Start with a premade business question,
+            fetch results in 50-row pages, and optionally chart grouped results.
+          </p>
+        </div>
+        <DatabaseWorkspace dbConfigured={index.db_configured} />
+      </div>
+    </AppShell>
+  );
+}
