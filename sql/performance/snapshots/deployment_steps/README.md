@@ -17,17 +17,25 @@ Run these scripts in `SQL Developer` or `SQLcl` as **script execution** (`F5` / 
 
 ## Deployment sequence
 1. `01_create_all_active_snapshot_tables.sql`
-2. `02_deploy_all_initial_full_history_procedures.sql`
-3. Choose one baseline load option:
+2. `01b_create_all_domain_support_objects.sql` — CMS views + `CMS_SA_SNAPSHOT`
+3. `02_deploy_all_initial_full_history_procedures.sql`
+4. `02b_deploy_domain_support_procedures.sql` — `REFRESH_CMS_SA_SNAPSHOT`
+5. Choose one baseline load option:
    - `03_run_all_initial_full_history_refreshes.sql` for a manual foreground run
    - `03a_schedule_all_initial_full_history_refreshes.sql` for unattended one-time baseline jobs
-4. If using scheduled baseline jobs, run `03b_capture_initial_full_history_job_status.sql` later
-5. `04_validate_all_active_snapshots.sql`
-6. `05_deploy_all_rolling_window_updates.sql`
-7. `06_run_all_operational_refreshes.sql`
-8. `04_validate_all_active_snapshots.sql` again
-9. `07_schedule_all_active_snapshots.sql`
-10. `08_capture_latest_active_snapshot_runs.sql`
+6. `03e_run_domain_support_refreshes.sql` — refresh CMS SA snapshot (can run in parallel with baseline)
+7. If using scheduled baseline jobs, run `03b_capture_initial_full_history_job_status.sql` later
+8. `04_validate_all_active_snapshots.sql`
+9. `04c_validate_all_domain_support_objects.sql`
+10. `04b_snapshot_install_validation_gate.sql`
+11. `04d_domain_support_install_validation_gate.sql`
+12. `05_deploy_all_rolling_window_updates.sql`
+13. `06_run_all_operational_refreshes.sql` (includes CMS SA refresh)
+14. `04_validate_all_active_snapshots.sql` again
+15. `04c_validate_all_domain_support_objects.sql` again
+16. `04b_snapshot_install_validation_gate.sql` and `04d_domain_support_install_validation_gate.sql` again
+17. `07_schedule_all_active_snapshots.sql`
+18. `08_capture_latest_active_snapshot_runs.sql`
 
 ## BSEG promotion flow
 
@@ -112,6 +120,7 @@ fail fast when baseline jobs or snapshot sanity checks do not pass.
 | Step | When to use |
 | --- | --- |
 | `baseline-and-validate` | After baseline one-time jobs finish |
+| `domain-support-deploy-and-validate` | Create/deploy/refresh CMS layer + gate |
 | `operational-and-validate` | After manual operational refresh during cutover |
 | `cutover-and-validate` | Deploy rolling procs, run operational refresh, validate |
 
@@ -119,13 +128,15 @@ Examples:
 
 ```bash
 python3 scripts/local/run_snapshot_rollout_step.py --step baseline-and-validate --clients newark
+python3 scripts/local/run_snapshot_rollout_step.py --step domain-support-deploy-and-validate --clients newark
 python3 scripts/local/run_snapshot_rollout_step.py --step cutover-and-validate --clients newark
 ```
 
 Gate scripts:
 
 - `03d_baseline_jobs_ready_gate.sql` — fails when any baseline one-time job is not `SUCCEEDED`
-- `04b_snapshot_install_validation_gate.sql` — fails on empty tables or duplicate grain keys
+- `04b_snapshot_install_validation_gate.sql` — fails on empty tables or duplicate grain keys (active 7)
+- `04d_domain_support_install_validation_gate.sql` — fails on invalid CMS views, bucket gaps, or FT parity on `CMS_SA_SNAPSHOT`
 
 Logs for compound steps:
 
@@ -170,4 +181,5 @@ Manifest: [00_consolidation_snapshot_deployment_manifest.md](00_consolidation_sn
 
 For the exact source files each wrapper script targets, use:
 - Active 7: [00_active_snapshot_deployment_manifest.md](00_active_snapshot_deployment_manifest.md)
+- Domain support (CMS views + `CMS_SA_SNAPSHOT`): [00_domain_support_deployment_manifest.md](00_domain_support_deployment_manifest.md)
 - Consolidation 12: [00_consolidation_snapshot_deployment_manifest.md](00_consolidation_snapshot_deployment_manifest.md)

@@ -13,6 +13,24 @@ test databases:
 - `D1_USAGE_RPT_CURR`
 - `D1_USAGE_SCALAR_DTL_RPT_CURR`
 
+## Domain support objects (deploy with active 7)
+
+Standard Offering Domains also require CMS views and the updated `CMS_SA_SNAPSHOT` table. Deploy and validate these in the same client rollout:
+
+- `CMS_SA_SNAPSHOT` + `REFRESH_CMS_SA_SNAPSHOT` (FIFO aging, excludes future `ARS_DT`)
+- `CMS_D1_DVC_IDENTIFIER_VW`, `CMS_D1_DVC_BODA_VW`, `CMS_W1_ASSET_IDENTIFIER_VW`
+- `CMS_C1_REPRESENTATIVE_BODA_VW`, `CMS_D1_ACTIVITY_CHAR_VW`, `CMS_D1_ACTIVITY_D1FA_BODA_VW`
+
+Manifest: [00_domain_support_deployment_manifest.md](../sql/performance/snapshots/deployment_steps/00_domain_support_deployment_manifest.md)
+
+Compound step:
+
+```bash
+python3 scripts/local/run_snapshot_rollout_step.py --step domain-support-deploy-and-validate --clients fresh
+```
+
+`baseline-and-validate`, `operational-and-validate`, and `cutover-and-validate` now include domain-support validation gates at the end.
+
 ## Rollout Status Ledger
 
 Current client-by-client rollout status and QA results are documented in:
@@ -103,6 +121,15 @@ Fresh-client batch form:
 
 ```bash
 python3 scripts/local/run_snapshot_rollout_step.py --step create-tables --clients fresh
+python3 scripts/local/run_snapshot_rollout_step.py --step create-domain-support --clients fresh
+```
+
+2b. Create domain support objects (CMS views + CMS SA snapshot table)
+
+```bash
+python3 scripts/local/run_client_oracle_sql.py \
+  --client ellensburg \
+  --file sql/performance/snapshots/deployment_steps/01b_create_all_domain_support_objects.sql
 ```
 
 3. Deploy initial full-history procedures
@@ -117,6 +144,20 @@ Fresh-client batch form:
 
 ```bash
 python3 scripts/local/run_snapshot_rollout_step.py --step deploy-baseline-procs --clients fresh
+python3 scripts/local/run_snapshot_rollout_step.py --step deploy-domain-support-procs --clients fresh
+python3 scripts/local/run_snapshot_rollout_step.py --step domain-support-deploy-and-validate --clients fresh
+```
+
+3b. Deploy CMS SA refresh procedure and initial refresh
+
+```bash
+python3 scripts/local/run_client_oracle_sql.py \
+  --client ellensburg \
+  --file sql/performance/snapshots/deployment_steps/02b_deploy_domain_support_procedures.sql
+
+python3 scripts/local/run_client_oracle_sql.py \
+  --client ellensburg \
+  --file sql/performance/snapshots/deployment_steps/03e_run_domain_support_refreshes.sql
 ```
 
 4. Schedule unattended one-time full-history baseline jobs

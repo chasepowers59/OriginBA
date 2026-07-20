@@ -29,13 +29,28 @@ SIX_MONTH_SCHEDULE = (
 STEPS = {
     "preflight": "sql/performance/snapshots/impact/16_snapshot_access_verification.sql",
     "create-tables": "sql/performance/snapshots/deployment_steps/01_create_all_active_snapshot_tables.sql",
+    "create-domain-support": (
+        "sql/performance/snapshots/deployment_steps/01b_create_all_domain_support_objects.sql"
+    ),
     "deploy-baseline-procs": "sql/performance/snapshots/deployment_steps/02_deploy_all_initial_full_history_procedures.sql",
+    "deploy-domain-support-procs": (
+        "sql/performance/snapshots/deployment_steps/02b_deploy_domain_support_procedures.sql"
+    ),
     "schedule-baseline": "sql/performance/snapshots/deployment_steps/03a_schedule_all_initial_full_history_refreshes.sql",
     "baseline-status": "sql/performance/snapshots/deployment_steps/03b_capture_initial_full_history_job_status.sql",
     "baseline-jobs-gate": "sql/performance/snapshots/deployment_steps/03d_baseline_jobs_ready_gate.sql",
     "retry-bseg-billed-baseline": "sql/performance/snapshots/deployment_steps/03c_schedule_bseg_billed_baseline_retry.sql",
     "validate": "sql/performance/snapshots/deployment_steps/04_validate_all_active_snapshots.sql",
+    "validate-domain-support": (
+        "sql/performance/snapshots/deployment_steps/04c_validate_all_domain_support_objects.sql"
+    ),
     "install-validation-gate": "sql/performance/snapshots/deployment_steps/04b_snapshot_install_validation_gate.sql",
+    "domain-support-install-gate": (
+        "sql/performance/snapshots/deployment_steps/04d_domain_support_install_validation_gate.sql"
+    ),
+    "run-domain-support-refresh": (
+        "sql/performance/snapshots/deployment_steps/03e_run_domain_support_refreshes.sql"
+    ),
     "deploy-rolling-procs": "sql/performance/snapshots/deployment_steps/05_deploy_all_rolling_window_updates.sql",
     "run-operational": "sql/performance/snapshots/deployment_steps/06_run_all_operational_refreshes.sql",
     "schedule-operational": "sql/performance/snapshots/deployment_steps/07_schedule_all_active_snapshots.sql",
@@ -109,17 +124,30 @@ COMPOUND_STEPS: dict[str, list[StepAction]] = {
         StepAction("baseline-jobs-gate", fail_if_any_rows=True),
         StepAction("validate", log_label="full_validate"),
         StepAction("install-validation-gate", fail_if_any_rows=True),
+        StepAction("validate-domain-support", log_label="domain_support_validate"),
+        StepAction("domain-support-install-gate", fail_if_any_rows=True),
     ],
     "operational-and-validate": [
         StepAction("run-operational"),
         StepAction("validate", log_label="full_validate"),
         StepAction("install-validation-gate", fail_if_any_rows=True),
+        StepAction("validate-domain-support", log_label="domain_support_validate"),
+        StepAction("domain-support-install-gate", fail_if_any_rows=True),
     ],
     "cutover-and-validate": [
         StepAction("deploy-rolling-procs"),
         StepAction("run-operational"),
         StepAction("validate", log_label="full_validate"),
         StepAction("install-validation-gate", fail_if_any_rows=True),
+        StepAction("validate-domain-support", log_label="domain_support_validate"),
+        StepAction("domain-support-install-gate", fail_if_any_rows=True),
+    ],
+    "domain-support-deploy-and-validate": [
+        StepAction("create-domain-support"),
+        StepAction("deploy-domain-support-procs"),
+        StepAction("run-domain-support-refresh"),
+        StepAction("validate-domain-support", log_label="domain_support_validate"),
+        StepAction("domain-support-install-gate", fail_if_any_rows=True),
     ],
     "consolidation-baseline-and-validate": [
         StepAction("consolidation-baseline-status", log_label="baseline_status"),
@@ -140,16 +168,23 @@ COMPOUND_STEPS: dict[str, list[StepAction]] = {
     ],
     "internal-7-baseline-and-validate": [
         StepAction("create-tables"),
+        StepAction("create-domain-support"),
         StepAction("deploy-baseline-procs"),
+        StepAction("deploy-domain-support-procs"),
         StepAction("run-baseline"),
+        StepAction("run-domain-support-refresh"),
         StepAction("validate", log_label="post_baseline_validate"),
         StepAction("install-validation-gate", fail_if_any_rows=True),
+        StepAction("validate-domain-support", log_label="domain_support_validate"),
+        StepAction("domain-support-install-gate", fail_if_any_rows=True),
     ],
     "internal-7-cutover-6month-and-validate": [
         StepAction("deploy-6month-rolling"),
         StepAction("citycorp-run-operational"),
         StepAction("validate", log_label="post_cutover_validate"),
         StepAction("install-validation-gate", fail_if_any_rows=True),
+        StepAction("validate-domain-support", log_label="domain_support_validate"),
+        StepAction("domain-support-install-gate", fail_if_any_rows=True),
     ],
 }
 

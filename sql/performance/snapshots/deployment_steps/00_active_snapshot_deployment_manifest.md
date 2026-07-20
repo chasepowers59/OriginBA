@@ -14,6 +14,7 @@ This manifest is the source-of-truth map for the centralized deployment scripts 
 
 ## Notes
 - `BSEG_BILLED_USAGE_RPT_CURR` and `BSEG_SQ_USAGE_RPT_CURR` were promoted to active rolling-window maintenance on `2026-04-24` after diagnostics, manual refresh, and AFTER QA validation.
+- Domain support objects (CMS views + `CMS_SA_SNAPSHOT`) deploy alongside the active 7; see [00_domain_support_deployment_manifest.md](00_domain_support_deployment_manifest.md).
 - `FT_GL_DISTRIBUTION_RPT_CURR` was narrowed from rolling `12` months to rolling `6` months on `2026-04-24` after source diagnostics, manual refresh, and AFTER QA validation reduced the observed manual refresh runtime to `5.89` minutes.
 - `FT_GL_DISTRIBUTION_RPT_CURR` uses the ultra-fast validator here because the heavier monthly parity validator is slow enough to block deployment flow.
 - If a package-level file changes later, update this manifest and the wrapper script in this folder in the same change.
