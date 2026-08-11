@@ -47,14 +47,16 @@ DEFAULT_MAX_ROWS = 500
 HARD_MAX_ROWS = 5000
 DEFAULT_TIMEOUT_MS = 120_000
 
+# Note: do NOT ban REPLACE — Oracle SQL REPLACE() string function is valid in SELECT.
+# CREATE OR REPLACE remains blocked via CREATE.
 _FORBIDDEN = re.compile(
     r"(?is)\b("
-    r"INSERT|UPDATE|DELETE|MERGE|UPSERT|REPLACE|"
+    r"INSERT|UPDATE|DELETE|MERGE|UPSERT|"
     r"CREATE|ALTER|DROP|TRUNCATE|RENAME|GRANT|REVOKE|"
     r"EXECUTE|EXEC|CALL|BEGIN|DECLARE|ANONYMOUS|"
     r"COMMIT|ROLLBACK|SAVEPOINT|"
     r"LOCK|ANALYZE|AUDIT|COMMENT|FLASHBACK|PURGE|"
-    r"DBMS_|UTL_|SYS\."
+    r"DBMS_|UTL_"
     r")\b"
 )
 _FOR_UPDATE = re.compile(r"(?is)\bFOR\s+UPDATE\b")
@@ -271,6 +273,7 @@ def _self_test_guards() -> None:
         ("SELECT 1 FROM dual", True),
         ("WITH x AS (SELECT 1 a FROM dual) SELECT * FROM x", True),
         ("SELECT created_dt, update_dttm FROM cisadm.ci_ft WHERE ROWNUM=1", True),
+        ("SELECT REPLACE(descr,'-',' ') AS d FROM cisadm.ci_sa_type_l WHERE ROWNUM=1", True),
         ("DELETE FROM cisadm.ci_ft", False),
         ("DROP TABLE x", False),
         ("SELECT 1 FROM dual; SELECT 2 FROM dual", False),

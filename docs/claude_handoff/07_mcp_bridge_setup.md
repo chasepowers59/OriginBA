@@ -34,7 +34,13 @@ python3 scripts/local/originba_oracle_mcp.py --self-test
 
 ## Claude Desktop / Co-work config
 
-Add to MCP settings (absolute paths). Example also in `mcp/claude_desktop_config.example.json`:
+**Important:** register in Claude Desktop, not Cursor.
+
+Mac path:
+
+`~/Library/Application Support/Claude/claude_desktop_config.json`
+
+Merge an `mcpServers.originba-oracle` block (absolute paths). Example also in `mcp/claude_desktop_config.example.json`:
 
 ```json
 {
