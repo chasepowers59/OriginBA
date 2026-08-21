@@ -47,7 +47,9 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
             ? [{ field: meta.required_date_field, grain: tile.time_grain }]
             : [];
         const filters: import("@/lib/types").FilterDef[] = [
-          { field: meta.required_date_field, op: "between", value: [start, end] },
+          ...(meta.required_date_field
+            ? [{ field: meta.required_date_field, op: "between" as const, value: [start, end] }]
+            : []),
           ...(report?.filters ?? []),
         ];
         if (filter) {

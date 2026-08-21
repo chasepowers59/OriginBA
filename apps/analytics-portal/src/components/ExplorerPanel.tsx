@@ -163,12 +163,20 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
 
   const buildFilters = useCallback(
     (extra: PremadeReport["filters"] = []) => {
+      // A snapshot need not HAVE a required date field. The dbt canvases do not: they
+      // are contract-governed and row-capped, so a mandatory transaction window is both
+      // unnecessary and meaningless on a dimension table like the price list. Building
+      // the filter unconditionally sent {field: null} and the API rejected the whole
+      // query -- "Input should be a valid string" -- so the explorer showed a validation
+      // error instead of a chart.
       const filters: PremadeReport["filters"] = [
-        {
-          field: metadata.required_date_field,
-          op: "between",
-          value: [dateStart, dateEnd],
-        },
+        ...(metadata.required_date_field
+          ? [{
+              field: metadata.required_date_field,
+              op: "between" as const,
+              value: [dateStart, dateEnd],
+            }]
+          : []),
         ...extra,
       ];
       if (scopeField && scopeValue) {
@@ -217,9 +225,10 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       dimensions: timeGrain ? [] : dims,
       measures,
       filters: buildFilters(extraFilters),
-      time_dimensions: timeGrain
-        ? [{ field: metadata.required_date_field, grain: timeGrain }]
-        : [],
+      time_dimensions:
+        timeGrain && metadata.required_date_field
+          ? [{ field: metadata.required_date_field, grain: timeGrain }]
+          : [],
       limit: 500,
     }),
     [timeGrain, metadata.required_date_field, buildFilters],

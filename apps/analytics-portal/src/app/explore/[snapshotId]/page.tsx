@@ -59,6 +59,7 @@ export default async function ExplorePage({ params }: PageProps) {
             />
           ) : (
             <SampleRowsPanel
+              schemaName={metadata.schema}
               snapshotId={metadata.id}
               tableName={metadata.table_name}
               grainDescription={metadata.grain_description}

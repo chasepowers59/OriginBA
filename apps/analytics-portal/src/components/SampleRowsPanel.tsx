@@ -9,11 +9,15 @@ import type { SampleRowsResponse } from "@/lib/types";
 export function SampleRowsPanel({
   snapshotId,
   tableName,
+  schemaName = "CISADM",
   grainDescription,
   skipSampleRows,
 }: {
   snapshotId: string;
   tableName: string;
+  /** The snapshot's own schema. A dbt canvas lives in `reporting`; only the legacy
+   *  snapshots live in CISADM, and hardcoding it labelled every canvas wrongly. */
+  schemaName?: string;
   grainDescription?: string;
   skipSampleRows?: boolean;
 }) {
@@ -48,7 +52,7 @@ export function SampleRowsPanel({
           <h3 className="mt-1 text-lg font-semibold text-white">What one row looks like</h3>
           <p className="mt-1 text-sm text-slate-500">
             {grainDescription ?? "Sample rows from the governed snapshot table"} ·{" "}
-            <code className="text-xs text-slate-400">CISADM.{tableName}</code>
+            <code className="text-xs text-slate-400">{schemaName}.{tableName}</code>
           </p>
         </div>
         <span className="text-slate-500">{expanded ? "▾" : "▸"}</span>

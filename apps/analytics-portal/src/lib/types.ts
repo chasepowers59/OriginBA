@@ -146,6 +146,7 @@ export type ScopeOptionsResponse = {
 };
 
 export type SnapshotMetadata = {
+  schema: string;
   id: string;
   client: string;
   table_name: string;
