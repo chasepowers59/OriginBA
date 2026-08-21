@@ -405,7 +405,11 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
 
   const columnLabels = useMemo(() => {
     if (!result) return {};
-    return buildColumnLabels(metadata, dimensions, measureField, measureAgg, result.columns);
+    // The SERVER's labels first. It knows every alias it assigned; the client builder
+    // only names the last measure column, so a two-measure report left the other as
+    // "m0". Kept as the fallback for anything the server did not label.
+    const local = buildColumnLabels(metadata, dimensions, measureField, measureAgg, result.columns);
+    return { ...local, ...(result.column_labels ?? {}) };
   }, [result, metadata, dimensions, measureField, measureAgg]);
 
   const totalMeasure = useMemo(() => {

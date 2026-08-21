@@ -332,6 +332,41 @@ def snapshot_sample_rows(
     }
 
 
+
+# Aggregate aliases are m0, m1, TD0 -- deliberately opaque, so a measure name can never be
+# interpolated into SQL. That safety property is worth keeping, but it means the RESPONSE
+# has to carry the translation back or the reader sees "m0" where a number's name should
+# be. The builder assigns the aliases in request order, so they can be reconstructed here
+# without loosening anything.
+_AGG_WORD = {"sum": "Total", "count": "Count of", "count_distinct": "Distinct",
+             "min": "Lowest", "max": "Highest", "avg": "Average"}
+
+
+def _result_labels(snapshot: dict, columns: list[str], dimensions: list[str],
+                   measures: list[dict], time_dimensions: list[dict]) -> dict[str, str]:
+    field_labels = {f["id"]: f.get("label", f["id"]) for f in snapshot.get("fields", [])}
+
+    def label_of(field_id: str) -> str:
+        return field_labels.get(field_id, field_labels.get(field_id.upper(), field_id))
+
+    labels: dict[str, str] = {}
+    for idx, td in enumerate(time_dimensions or []):
+        grain = str(td.get("grain", "month")).lower()
+        labels[f"TD{idx}"] = f"{label_of(str(td.get('field', '')))} ({grain})"
+    for dim in dimensions or []:
+        labels[dim] = label_of(dim)
+    for idx, m in enumerate(measures or []):
+        field = str(m.get("field", "*"))
+        agg = str(m.get("agg", "count")).lower()
+        if field == "*":
+            labels[f"m{idx}"] = "Number of records"
+        else:
+            labels[f"m{idx}"] = f"{_AGG_WORD.get(agg, agg.title())} {label_of(field)}"
+    # Anything the query returned that was not requested keeps its own name rather than
+    # disappearing from the map.
+    return {c: labels.get(c, field_labels.get(c, c)) for c in columns}
+
+
 @router.post("/{snapshot_id}/raw-sql")
 def snapshot_raw_sql(
     snapshot_id: str,
@@ -433,6 +468,10 @@ def snapshot_query(
         # returning RPT_BILL_SEGMENT for rpt_bill_segment breaks the caller's own lookups.
         "snapshot_id": snapshot_id,
         "columns": columns,
+        "column_labels": _result_labels(
+            snapshot, columns, body.dimensions,
+            [m.model_dump() for m in body.measures],
+            [t.model_dump() for t in body.time_dimensions]),
         "rows": serialized_rows,
         "row_count": len(serialized_rows),
         "sql": sql,

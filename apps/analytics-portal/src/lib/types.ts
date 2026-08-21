@@ -191,6 +191,10 @@ export type QueryRequest = {
 };
 
 export type QueryResponse = {
+  /** Server-side labels for EVERY column, aggregate aliases included. The client-side
+   *  builder only ever named the last measure, so a report with two measures showed one
+   *  of them as "m0". */
+  column_labels?: Record<string, string>;
   client: string;
   snapshot_id: string;
   columns: string[];
