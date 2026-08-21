@@ -113,7 +113,7 @@ def snapshots_index(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, A
     org_id = ctx.effective_organization_id()
     catalog = load_catalog(organization_id=org_id)
     workstreams = filter_workstreams_for_auth(list_workstreams(org_id), ctx)
-    snapshots = filter_snapshots_for_auth(list_snapshots(), ctx)
+    snapshots = filter_snapshots_for_auth(list_snapshots(organization_id=org_id), ctx)
     return {
         "client": org_id or catalog.get("client", "demo"),
         "organization_id": org_id,

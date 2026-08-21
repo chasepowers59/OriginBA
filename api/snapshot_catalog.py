@@ -119,7 +119,9 @@ def list_workstreams(organization_id: str | None = None) -> list[dict[str, Any]]
     processes_by_ws: dict[str, list[dict[str, Any]]] = {ws: [] for ws in order}
     for process in processes:
         processes_by_ws.setdefault(process["workstream"], []).append(process)
-    snapshots = list_snapshots()
+    # SAME catalog as the workstreams above. Defaulting here served the dbt
+    # canvases to an Oracle tenant whose workstreams came from CISADM.
+    snapshots = list_snapshots(organization_id=organization_id)
     grouped: dict[str, list[dict[str, Any]]] = {ws: [] for ws in order}
     for snap in snapshots:
         grouped.setdefault(snap["workstream"], []).append(snap)

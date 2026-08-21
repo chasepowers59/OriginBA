@@ -116,7 +116,8 @@ def report_library(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, An
     ctx.require_permission("report_library:read")
     from api.report_library import get_report_library
 
-    return filter_report_library_for_auth(get_report_library(), ctx)
+    return filter_report_library_for_auth(
+        get_report_library(ctx.effective_organization_id()), ctx)
 
 
 @router.get("/saved-views")

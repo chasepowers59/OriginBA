@@ -66,8 +66,8 @@ def build_report_library(organization_id: str | None = None) -> dict[str, Any]:
     }
 
 
-def get_report_library() -> dict[str, Any]:
+def get_report_library(organization_id: str | None = None) -> dict[str, Any]:
     try:
-        return build_report_library()
+        return build_report_library(organization_id)
     except CatalogError as exc:
         return {"client": "demo", "pack_count": 0, "report_count": 0, "packs": [], "error": str(exc)}
