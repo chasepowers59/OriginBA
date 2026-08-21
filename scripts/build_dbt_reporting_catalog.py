@@ -286,8 +286,11 @@ def attach_reports(snapshots: dict[str, Any]) -> list[dict[str, Any]]:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dbt-project", type=Path, default=DEFAULT_DBT)
-    ap.add_argument("--out", type=Path,
-                    default=ROOT / "output" / "snapshot_explorer_catalog.json")
+    # catalog_dbt.json, NOT snapshot_explorer_catalog.json. The catalogs were split per
+    # engine when tenants started choosing between them; leaving the old default here
+    # meant every regeneration wrote a file nothing reads, and the API went on serving a
+    # stale catalog with no sign that the build had done nothing.
+    ap.add_argument("--out", type=Path, default=ROOT / "output" / "catalog_dbt.json")
     ap.add_argument("--client", default="originba")
     args = ap.parse_args()
 
@@ -333,10 +336,26 @@ def main() -> int:
             "grain_description": f"One row per {grain}" if grain else "",
             "summary": summary,
             "use_case": use_case,
-            "required_date_label": dates[0]["label"] if dates else None,
+            # NO MANDATORY DATE WINDOW on a dbt canvas, and this is a design decision
+            # rather than an omission. The portal REQUIRES a filter on
+            # required_date_field and injects a default preset when the caller sends
+            # none. That guard exists for the raw CISADM snapshots, which are millions of
+            # rows and must never be scanned whole.
+            #
+            # A canvas is not that. It is contract-governed, grain-asserted and row-capped
+            # already. Auto-picking its first date column and forcing a window on it
+            # silently emptied results: rpt_aged_debt got "Oldest Charge Date in Band",
+            # a per-band derived date, and every query came back with zero rows and no
+            # error to say why. Worse, half the canvases -- rate configuration, asset
+            # locations, the price list -- are dimension tables where a transaction window
+            # means nothing at all.
+            #
+            # Date fields stay in date_fields for OPTIONAL filtering. The portal's own
+            # row cap is what protects the database.
+            "required_date_label": None,
             "trusted_measures": [m["id"] for m in meas[1:]
                                  if not NOT_SUMMABLE.search(m["id"])],
-            "required_date_field": dates[0]["id"] if dates else None,
+            "required_date_field": None,
             "fields": fields,
             "dimensions": dims,
             "measures": meas,
