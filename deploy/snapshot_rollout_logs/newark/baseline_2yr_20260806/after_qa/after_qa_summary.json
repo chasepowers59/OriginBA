@@ -1,0 +1,145 @@
+{
+  "finished": "2026-08-06T14:45:38.194426",
+  "mode": "fast_after_qa",
+  "retention": [
+    {
+      "src": "BSEG_BILLED",
+      "total_rows": 2804202,
+      "mn": "2024-08-01",
+      "mx": "2026-07-29",
+      "older_than_2yr": 0,
+      "retention_ok": true
+    },
+    {
+      "src": "BSEG_SQ",
+      "total_rows": 12223039,
+      "mn": "2024-08-01",
+      "mx": "2026-07-29",
+      "older_than_2yr": 0,
+      "retention_ok": true
+    },
+    {
+      "src": "FT_RPT",
+      "total_rows": 6388303,
+      "mn": "2024-08-01",
+      "mx": "2026-08-06",
+      "older_than_2yr": 0,
+      "retention_ok": true
+    },
+    {
+      "src": "FT_GL",
+      "total_rows": 12764147,
+      "mn": "2024-08-01",
+      "mx": "2026-08-06",
+      "older_than_2yr": 0,
+      "retention_ok": true
+    },
+    {
+      "src": "D1_MSRMT",
+      "total_rows": 1032100,
+      "mn": "2024-08-01",
+      "mx": "2026-12-29",
+      "older_than_2yr": 0,
+      "retention_ok": true
+    },
+    {
+      "src": "D1_USAGE",
+      "total_rows": 2741183,
+      "mn": "2024-08-05",
+      "mx": "3025-05-31",
+      "older_than_2yr": 0,
+      "retention_ok": true
+    },
+    {
+      "src": "D1_USAGE_SCALAR",
+      "total_rows": 2887336,
+      "mn": "2024-08-05",
+      "mx": "2026-12-29",
+      "older_than_2yr": 0,
+      "retention_ok": true
+    }
+  ],
+  "parity": [
+    {
+      "check": "parity_bseg_billed",
+      "raw_rows": 2804202,
+      "snap_rows": 2804202,
+      "diff": 0,
+      "status": "PASS",
+      "note": "full_24mo"
+    },
+    {
+      "check": "parity_bseg_sq",
+      "raw_rows": 12223039,
+      "snap_rows": 12223039,
+      "diff": 0,
+      "status": "PASS",
+      "note": "full_24mo"
+    },
+    {
+      "check": "parity_ft_rpt",
+      "raw_rows": 6393911,
+      "snap_rows": 6388303,
+      "diff": -5608,
+      "status": "NEAR",
+      "note": "full_24mo"
+    },
+    {
+      "check": "parity_ft_gl",
+      "raw_rows": 12788456,
+      "snap_rows": 12764147,
+      "diff": -24309,
+      "status": "NEAR",
+      "note": "full_24mo"
+    },
+    {
+      "check": "parity_d1_msrmt",
+      "raw_rows": 1032692,
+      "snap_rows": 1032100,
+      "diff": -592,
+      "status": "NEAR",
+      "note": "full_24mo"
+    },
+    {
+      "check": "parity_d1_usage_recent_3mo",
+      "raw_rows": 34472,
+      "snap_rows": 34472,
+      "diff": 0,
+      "status": "PASS",
+      "note": "recent_3mo_slice"
+    },
+    {
+      "check": "parity_d1_usage_scalar_recent_3mo",
+      "raw_rows": 34595,
+      "snap_rows": 34592,
+      "diff": -3,
+      "status": "NEAR",
+      "note": "recent_3mo_slice"
+    }
+  ],
+  "recent_3mo_bseg": [
+    {
+      "YM": "2026-05",
+      "RAW_ROWS": 119540,
+      "SNAP_ROWS": 119540,
+      "ROW_DIFF": 0
+    },
+    {
+      "YM": "2026-06",
+      "RAW_ROWS": 119318,
+      "SNAP_ROWS": 119318,
+      "ROW_DIFF": 0
+    },
+    {
+      "YM": "2026-07",
+      "RAW_ROWS": 114,
+      "SNAP_ROWS": 114,
+      "ROW_DIFF": 0
+    }
+  ],
+  "scheduling": "HELD \u2014 test env; rolling JOB_REFRESH_* left disabled",
+  "notes": [
+    "D1_USAGE / SCALAR use recent 3-month source parity only (full 24mo source scan too slow).",
+    "Retention fingerprint still validates all 7 tables have 0 older-than-2yr rows."
+  ]
+}

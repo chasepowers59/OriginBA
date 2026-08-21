@@ -6,6 +6,7 @@ from datetime import date, timedelta
 from typing import Any
 
 from api.demo_db import execute_query
+from api.snapshot_catalog import is_warehouse
 from api.query_builder import QueryValidationError, build_query
 from api.snapshot_catalog import allowed_fields, get_snapshot
 
@@ -41,19 +42,22 @@ def run_kpi_query(
     sql, binds = build_query(
         table_name=snapshot["table_name"],
         allowed_fields=allowed_fields(snapshot),
-        trusted_measures={m.upper() for m in snapshot.get("trusted_measures", [])},
+        trusted_measures=(set(snapshot.get("trusted_measures", []))
+                          if is_warehouse(snapshot)
+                          else {m.upper() for m in snapshot.get("trusted_measures", [])}),
         required_date_field=snapshot.get("required_date_field"),
         dimensions=query_spec.get("dimensions") or [],
         measures=query_spec.get("measures") or [{"field": "*", "agg": "count"}],
         filters=filters,
         limit=int(query_spec.get("limit") or 500),
+        dialect="postgres" if is_warehouse(snapshot) else "oracle",
+        schema=snapshot.get("schema", "CISADM"),
     )
-    return execute_query(
-        sql,
-        binds,
-        organization_id=organization_id,
-        max_rows=int(query_spec.get("limit") or 500),
-    )
+    row_cap = int(query_spec.get("limit") or 500)
+    if is_warehouse(snapshot):
+        from api.warehouse_db import execute_query as run_warehouse
+        return run_warehouse(sql, binds, organization_id=organization_id, max_rows=row_cap)
+    return execute_query(sql, binds, organization_id=organization_id, max_rows=row_cap)
 
 
 def scalar_measure_value(columns: list[str], rows: list[list[Any]]) -> float | None:

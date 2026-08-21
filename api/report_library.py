@@ -7,8 +7,8 @@ from typing import Any
 from api.snapshot_catalog import CatalogError, load_catalog
 
 
-def build_report_library() -> dict[str, Any]:
-    catalog = load_catalog()
+def build_report_library(organization_id: str | None = None) -> dict[str, Any]:
+    catalog = load_catalog(organization_id=organization_id)
     packs_cfg = catalog.get("report_library_packs") or []
     labels = catalog.get("workstream_labels", {})
     snapshots = catalog.get("snapshots", {})
@@ -17,7 +17,12 @@ def build_report_library() -> dict[str, Any]:
     for pack in packs_cfg:
         entries: list[dict[str, Any]] = []
         for ref in pack.get("reports") or []:
-            snap_id = str(ref.get("snapshot_id", "")).upper()
+            # Do NOT force case. Uppercasing was safe while every snapshot was an
+            # Oracle table (CISADM names are uppercase); the dbt canvases are lowercase
+            # rpt_* and every lookup missed, so the library came back empty with no
+            # error. Try the id as written, then upper for the legacy names.
+            raw_id = str(ref.get("snapshot_id", ""))
+            snap_id = raw_id if raw_id in snapshots else raw_id.upper()
             report_id = ref.get("report_id")
             snap = snapshots.get(snap_id)
             if not snap or not report_id:

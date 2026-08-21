@@ -13,6 +13,10 @@ test databases:
 - `D1_USAGE_RPT_CURR`
 - `D1_USAGE_SCALAR_DTL_RPT_CURR`
 
+`CMS_SA_SNAPSHOT` is the scheduled domain-support snapshot used by the Standard
+Offering SA Snapshot / aged-balance Domains. Treat it as the 8th scheduled
+object for rollout and QA, while the CMS views remain live domain-support views.
+
 ## Domain support objects (deploy with active 7)
 
 Standard Offering Domains also require CMS views and the updated `CMS_SA_SNAPSHOT` table. Deploy and validate these in the same client rollout:
@@ -60,7 +64,11 @@ Supported clients:
 ## Environment Status
 
 `ellensburg` is the reference environment where the active 7 snapshot objects
-were already built, tested, optimized, and scheduled during earlier work.
+and CMS domain-support objects were built, tested, optimized, and scheduled
+during earlier work.
+
+All snapshot rollout and QA SQL should validate through `CISADM` only. Do not
+use `CISREAD` synonyms or legacy schemas for standard snapshot integrity checks.
 
 For the next client rollout, use Ellensburg for:
 
@@ -260,6 +268,8 @@ python3 scripts/local/run_client_oracle_sql.py \
   --client ellensburg \
   --file sql/performance/snapshots/deployment_steps/07_schedule_all_active_snapshots.sql
 ```
+
+This schedules the active 7 governed snapshots plus `CMS_SA_SNAPSHOT`.
 
 Fresh-client batch form:
 

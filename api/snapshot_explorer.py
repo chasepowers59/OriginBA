@@ -20,7 +20,7 @@ from api.query_builder import QueryValidationError, build_query
 from api.raw_sql_validator import RawSqlValidationError, apply_row_cap, validate_raw_sql
 from api.executive_dashboard import build_executive_summary
 from api.workstream_dashboard import build_workstream_summary
-from api.snapshot_catalog import CatalogError, allowed_fields, get_snapshot, list_snapshots, list_workstreams, load_catalog
+from api.snapshot_catalog import CatalogError, allowed_fields, get_snapshot, list_snapshots, list_workstreams, load_catalog, is_warehouse
 
 
 router = APIRouter(prefix="/snapshots", tags=["snapshots"])
@@ -55,6 +55,21 @@ class RawSqlRequest(BaseModel):
     limit: int = 100
 
 
+
+def _run(snapshot: dict, sql: str, binds=None, *, organization_id: str, max_rows: int):
+    """Execute against whichever database this snapshot lives in."""
+    if is_warehouse(snapshot):
+        from api.warehouse_db import execute_query as run_warehouse
+        return run_warehouse(sql, binds, organization_id=organization_id, max_rows=max_rows)
+    return execute_query(sql, binds, organization_id=organization_id, max_rows=max_rows)
+
+
+def _qualified(snapshot: dict) -> str:
+    """schema.table, quoted for Postgres because a canvas name is lowercase."""
+    table, schema = snapshot["table_name"], snapshot.get("schema", "CISADM")
+    return f'{schema}."{table}"' if is_warehouse(snapshot) else f"{schema}.{table.upper()}"
+
+
 def _default_date_filter(snapshot: dict[str, Any]) -> FilterRequest | None:
     field = snapshot.get("required_date_field")
     if not field:
@@ -76,13 +91,16 @@ def _cross_filter(cross_field: str | None, cross_value: str | None) -> list[dict
     return []
 
 
-def _workstream_for_snapshot(snapshot_id: str) -> str:
-    return get_snapshot(snapshot_id)["workstream"]
+def _workstream_for_snapshot(snapshot_id: str, organization_id: str | None = None) -> str:
+    return get_snapshot(snapshot_id, organization_id)["workstream"]
 
 
 def _require_snapshot_access(ctx: AuthContext, snapshot_id: str) -> dict[str, Any]:
+    # The caller's own organization decides WHICH catalog this id is looked up in, so a
+    # Postgres tenant and an Oracle tenant can hold different snapshots under the same
+    # route without either seeing the other's.
     try:
-        snapshot = get_snapshot(snapshot_id)
+        snapshot = get_snapshot(snapshot_id, getattr(ctx, "organization_id", None))
     except CatalogError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     assert_workstream_access(ctx, snapshot["workstream"])
@@ -93,8 +111,8 @@ def _require_snapshot_access(ctx: AuthContext, snapshot_id: str) -> dict[str, An
 def snapshots_index(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     ctx.require_permission("snapshots:read")
     org_id = ctx.effective_organization_id()
-    catalog = load_catalog()
-    workstreams = filter_workstreams_for_auth(list_workstreams(), ctx)
+    catalog = load_catalog(organization_id=org_id)
+    workstreams = filter_workstreams_for_auth(list_workstreams(org_id), ctx)
     snapshots = filter_snapshots_for_auth(list_snapshots(), ctx)
     return {
         "client": org_id or catalog.get("client", "demo"),
@@ -181,17 +199,24 @@ def snapshot_stats(
     ctx.require_permission("snapshots:read")
     org_id = require_org_for_data(ctx)
     snapshot = _require_snapshot_access(ctx, snapshot_id)
-    table = snapshot["table_name"].upper()
-    sql = f"SELECT COUNT(*) AS ROW_COUNT, MAX(LOAD_DTTM) AS LATEST_LOAD_DTTM FROM CISADM.{table}"
+    # LOAD_DTTM is the CDC watermark on a CISADM snapshot; a dbt canvas has no such
+    # column, so the warehouse form reports the row count alone rather than inventing one.
+    if is_warehouse(snapshot):
+        sql = f"SELECT COUNT(*) AS row_count, NULL AS latest_load_dttm FROM {_qualified(snapshot)}"
+    else:
+        sql = (f"SELECT COUNT(*) AS ROW_COUNT, MAX(LOAD_DTTM) AS LATEST_LOAD_DTTM "
+               f"FROM {_qualified(snapshot)}")
     try:
-        columns, rows = execute_query(sql, organization_id=org_id, max_rows=1)
+        columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=1)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Demo stats failed: {exc}") from exc
     row = rows[0] if rows else [0, None]
     return {
         "client": org_id,
         "organization_id": org_id,
-        "snapshot_id": snapshot_id.upper(),
+        # As written. Upper-casing was an Oracle habit and a dbt canvas id is lowercase;
+        # returning RPT_BILL_SEGMENT for rpt_bill_segment breaks the caller's own lookups.
+        "snapshot_id": snapshot_id,
         "row_count": int(row[0] or 0),
         "latest_load_dttm": _serialize_value(row[1]) if len(row) > 1 else None,
     }
@@ -216,15 +241,20 @@ def snapshot_scope_options(
     if field not in allowed_fields(snapshot):
         raise HTTPException(status_code=400, detail=f"Unknown field: {field_id}")
 
-    table = snapshot["table_name"].upper()
-    sql = (
-        f"SELECT * FROM ("
-        f"SELECT DISTINCT {field} AS VAL FROM CISADM.{table} "
-        f"WHERE {field} IS NOT NULL ORDER BY 1"
-        f") WHERE ROWNUM <= 100"
-    )
+
+    if is_warehouse(snapshot):
+        col = f'"{field}"'
+        sql = (f"SELECT DISTINCT {col} AS val FROM {_qualified(snapshot)} "
+               f"WHERE {col} IS NOT NULL ORDER BY 1 FETCH FIRST 100 ROWS ONLY")
+    else:
+        sql = (
+            f"SELECT * FROM ("
+            f"SELECT DISTINCT {field} AS VAL FROM {_qualified(snapshot)} "
+            f"WHERE {field} IS NOT NULL ORDER BY 1"
+            f") WHERE ROWNUM <= 100"
+        )
     try:
-        columns, rows = execute_query(sql, organization_id=org_id, max_rows=100)
+        columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=100)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Scope options failed: {exc}") from exc
 
@@ -232,7 +262,9 @@ def snapshot_scope_options(
     return {
         "client": org_id,
         "organization_id": org_id,
-        "snapshot_id": snapshot_id.upper(),
+        # As written. Upper-casing was an Oracle habit and a dbt canvas id is lowercase;
+        # returning RPT_BILL_SEGMENT for rpt_bill_segment breaks the caller's own lookups.
+        "snapshot_id": snapshot_id,
         "field": field,
         "label": allowed_scope[field].get("label", field),
         "values": values,
@@ -252,7 +284,12 @@ def snapshot_sample_rows(
     row_cap = max(1, min(limit, 10))
     table = snapshot["table_name"].upper()
     date_field = snapshot.get("required_date_field")
-    if date_field:
+    if is_warehouse(snapshot):
+        # No recency window on the warehouse form. The canvases are already scoped to a
+        # client's own data and a sample of ten rows is cheap; ordering by a date on an
+        # unindexed canvas is not, and this is only ever a preview.
+        sql = f"SELECT * FROM {_qualified(snapshot)} FETCH FIRST {row_cap} ROWS ONLY"
+    elif date_field:
         # Restrict to recent rows so sample preview stays fast on large snapshots.
         sql = (
             f"SELECT * FROM ("
@@ -264,7 +301,7 @@ def snapshot_sample_rows(
     else:
         sql = f"SELECT * FROM CISADM.{table} WHERE ROWNUM <= {row_cap}"
     try:
-        columns, rows = execute_query(sql, organization_id=org_id, max_rows=row_cap)
+        columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=row_cap)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Sample rows failed: {exc}") from exc
 
@@ -278,7 +315,9 @@ def snapshot_sample_rows(
     return {
         "client": org_id,
         "organization_id": org_id,
-        "snapshot_id": snapshot_id.upper(),
+        # As written. Upper-casing was an Oracle habit and a dbt canvas id is lowercase;
+        # returning RPT_BILL_SEGMENT for rpt_bill_segment breaks the caller's own lookups.
+        "snapshot_id": snapshot_id,
         "grain_description": snapshot.get("grain_description"),
         "columns": columns,
         "column_labels": {col: field_labels.get(col.upper(), col) for col in columns},
@@ -316,7 +355,9 @@ def snapshot_raw_sql(
     return {
         "client": org_id,
         "organization_id": org_id,
-        "snapshot_id": snapshot_id.upper(),
+        # As written. Upper-casing was an Oracle habit and a dbt canvas id is lowercase;
+        # returning RPT_BILL_SEGMENT for rpt_bill_segment breaks the caller's own lookups.
+        "snapshot_id": snapshot_id,
         "columns": columns,
         "rows": serialized_rows,
         "row_count": len(serialized_rows),
@@ -341,24 +382,40 @@ def snapshot_query(
             filters = [default_filter.model_dump()]
 
     try:
+        # WHICH WORLD THIS SNAPSHOT LIVES IN decides the dialect and the backend. The
+        # dbt canvases are Postgres with quoted Title Case columns; the legacy
+        # *_RPT_CURR snapshots are Oracle CISADM. The snapshot says which, so the two
+        # coexist while the migration finishes and nothing needs configuring twice.
+        warehouse = is_warehouse(snapshot)
+        dialect = "postgres" if warehouse else "oracle"
+        trusted = set(snapshot.get("trusted_measures", []))
         sql, binds = build_query(
             table_name=snapshot["table_name"],
             allowed_fields=allowed_fields(snapshot),
-            trusted_measures={m.upper() for m in snapshot.get("trusted_measures", [])},
+            trusted_measures=trusted if warehouse else {m.upper() for m in trusted},
             required_date_field=snapshot.get("required_date_field"),
             dimensions=body.dimensions,
             measures=[m.model_dump() for m in body.measures],
             filters=filters,
             limit=min(body.limit, snapshot.get("max_rows", 500)),
             time_dimensions=[t.model_dump() for t in body.time_dimensions],
+            dialect=dialect,
+            schema=snapshot.get("schema", "CISADM"),
         )
     except QueryValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     try:
-        columns, rows = execute_query(sql, binds, organization_id=org_id, max_rows=body.limit)
+        if warehouse:
+            from api.warehouse_db import execute_query as run_warehouse
+            columns, rows = run_warehouse(sql, binds, organization_id=org_id,
+                                          max_rows=body.limit)
+        else:
+            columns, rows = execute_query(sql, binds, organization_id=org_id,
+                                          max_rows=body.limit)
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Demo query failed: {exc}") from exc
+        where = "Warehouse" if warehouse else "Demo"
+        raise HTTPException(status_code=502, detail=f"{where} query failed: {exc}") from exc
 
     serialized_rows = [
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}
@@ -367,7 +424,9 @@ def snapshot_query(
     return {
         "client": org_id,
         "organization_id": org_id,
-        "snapshot_id": snapshot_id.upper(),
+        # As written. Upper-casing was an Oracle habit and a dbt canvas id is lowercase;
+        # returning RPT_BILL_SEGMENT for rpt_bill_segment breaks the caller's own lookups.
+        "snapshot_id": snapshot_id,
         "columns": columns,
         "rows": serialized_rows,
         "row_count": len(serialized_rows),

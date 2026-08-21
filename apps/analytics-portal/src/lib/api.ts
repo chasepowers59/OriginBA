@@ -20,7 +20,7 @@ import type {
   SnapshotsIndex,
   WorkstreamSummary,
 } from "./types";
-import { authHeaders } from "./auth";
+import { authHeaders, activeOrganizationHeader } from "./auth";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -28,6 +28,7 @@ async function resolveRequestHeaders(init?: RequestInit): Promise<HeadersInit> {
   const merged: Record<string, string> = {
     "Content-Type": "application/json",
     ...authHeaders(),
+    ...activeOrganizationHeader(),
   };
   if (typeof window === "undefined") {
     try {

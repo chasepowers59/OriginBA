@@ -3,13 +3,17 @@
 Read-only access for validation and reporting parity work. Credentials live in
 local `.env` only (`SMARTCITY_PROD_*` and per-client `*_PROD_ORACLE_DSN`).
 
-## Shared host
+## Hosts
+
+Most legacy PROD clients still use the shared host below. CityCorp 25.4 PROD
+uses the newer `v1-2` host/service.
 
 | Field | Value |
 | --- | --- |
-| Host | `smartcity-db-prod.originsmartops.com` |
+| Shared host (legacy) | `smartcity-db-prod.originsmartops.com` |
+| CityCorp 25.4 PROD host | `smartcity-db-prod-v1-2.originsmartops.com` |
 | Port | `1521` |
-| User | `CPOWERS` (from Bitwarden internal send) |
+| User | `CPOWERS` (from Bitwarden / ops send; per-client password may differ) |
 
 ## Service names
 
@@ -19,7 +23,7 @@ local `.env` only (`SMARTCITY_PROD_*` and per-client `*_PROD_ORACLE_DSN`).
 | Fond du Lac | `pproddb_fonddulac.prodprivatesn.originprodvcn.oraclevcn.com` |
 | College Station | `pproddb_collegestation.prodprivatesn.originprodvcn.oraclevcn.com` |
 | Ellensburg | `pproddb_ellensburg.prodprivatesn.originprodvcn.oraclevcn.com` |
-| CityCorp | `pproddb_citycorp.prodprivatesn.originprodvcn.oraclevcn.com` |
+| CityCorp 25.4 PROD | `PPRODDB_CITYCORP.prodprivatesn.prodvcn.oraclevcn.com` |
 
 ## Runner aliases
 

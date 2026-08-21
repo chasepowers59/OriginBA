@@ -289,9 +289,9 @@ BEGIN
                  OR (
                         NVL(ie2.d1_install_dttm, TIMESTAMP '1900-01-01 00:00:00') = NVL(ie.d1_install_dttm, TIMESTAMP '1900-01-01 00:00:00')
                     AND ie2.install_evt_id > ie.install_evt_id
-                    )
-                  )
-        )
+                 )
+              )
+       )
     LEFT JOIN cisadm.d1_sp sp
         ON sp.d1_sp_id = ie.d1_sp_id
     LEFT JOIN cisadm.f1_bus_obj_l msrmt_bo
@@ -387,7 +387,8 @@ BEGIN
        AND sp_disconn.language_cd = 'ENG'
     LEFT JOIN cisadm.ci_acc_grp_l sp_acc_grp
         ON sp_acc_grp.access_grp_cd = sp.access_grp_cd
-       AND sp_acc_grp.language_cd = 'ENG';
+       AND sp_acc_grp.language_cd = 'ENG'
+    WHERE msrmt.msrmt_dttm >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24);
 
     COMMIT;
 END;

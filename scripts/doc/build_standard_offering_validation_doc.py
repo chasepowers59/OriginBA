@@ -88,6 +88,8 @@ class GenerationConfig:
     template_mode: bool = False
     output_path: Path = DEFAULT_OUTPUT
     document_date: str | None = None
+    # TEST or PROD — drives cover title wording only; layout stays identical.
+    deployment_tier: str = "TEST"
 
     @property
     def is_fillable_template(self) -> bool:
@@ -99,10 +101,15 @@ class GenerationConfig:
 
     @property
     def cover_title_lines(self) -> tuple[str, str, str]:
+        tier = (self.deployment_tier or "TEST").strip().upper()
+        if tier not in {"TEST", "PROD", "PRODUCTION"}:
+            tier = "TEST"
+        if tier == "PRODUCTION":
+            tier = "PROD"
         return (
             "STANDARD OFFERING REPORT",
             "LIBRARY VALIDATION –",
-            f"{self.client_name} CIS TEST {self.test_version}",
+            f"{self.client_name} CIS {tier} {self.test_version}",
         )
 
     @property
@@ -116,7 +123,14 @@ class GenerationConfig:
     def version_notes(self) -> str:
         if self.is_fillable_template:
             return "Initial validation evidence for CLIENT_NAME Standard Offering report library."
-        return f"Initial validation evidence for {self.client_name} Standard Offering report library."
+        tier = (self.deployment_tier or "TEST").strip().upper()
+        if tier == "PRODUCTION":
+            tier = "PROD"
+        env = "production" if tier == "PROD" else "test"
+        return (
+            f"Initial validation evidence for {self.client_name} Standard Offering "
+            f"report library ({env} deployment)."
+        )
 
     @property
     def summary_result(self) -> str:
@@ -788,7 +802,13 @@ def parse_args() -> GenerationConfig:
         help="Generate the reusable fillable template with CLIENT_NAME placeholders.",
     )
     parser.add_argument("--client", default="CityCorp", help="Client short name, for example CityCorp.")
-    parser.add_argument("--test-version", default="25.4", help="CIS test version, for example 25.4.")
+    parser.add_argument("--test-version", default="25.4", help="CIS version label, for example 25.4.")
+    parser.add_argument(
+        "--deployment-tier",
+        default="TEST",
+        choices=("TEST", "PROD", "PRODUCTION"),
+        help="Cover title tier: TEST or PROD (PRODUCTION accepted as PROD).",
+    )
     parser.add_argument(
         "--datasource",
         default=None,
@@ -818,17 +838,24 @@ def parse_args() -> GenerationConfig:
             notes_text=TEMPLATE_NOTES,
             template_mode=True,
             output_path=output_path,
+            deployment_tier="TEST",
         )
 
     client_name = args.client
     datasource = args.datasource or f"{client_name}_DS"
+    tier = args.deployment_tier
     if args.output:
         output_path = Path(args.output)
     else:
-        if client_name == "CityCorp":
+        slug = re.sub(r"[^A-Za-z0-9]+", "_", client_name).strip("_")
+        if tier in {"PROD", "PRODUCTION"}:
+            output_path = (
+                REPO_ROOT
+                / f"output/doc/{slug}_PROD_Standard_Offering_Report_Library_Validation.docx"
+            )
+        elif client_name == "CityCorp":
             output_path = DEFAULT_OUTPUT
         else:
-            slug = re.sub(r"[^A-Za-z0-9]+", "_", client_name).strip("_")
             output_path = REPO_ROOT / f"output/doc/{slug}_Standard_Offering_Report_Library_Validation.docx"
 
     return GenerationConfig(
@@ -840,6 +867,7 @@ def parse_args() -> GenerationConfig:
         notes_text=PLACEHOLDER_NOTES,
         template_mode=False,
         output_path=output_path,
+        deployment_tier=tier,
     )
 
 

@@ -1,0 +1,29 @@
+---
+description: Domain-first JRXML and Jaspersoft expression generation with schema validation
+globs:
+  - "reports/**/*.jrxml"
+  - "server/input_controls/**/*.json"
+  - "domains/**/*.xml"
+alwaysApply: false
+---
+
+# JRXML Report Builder Rule
+
+Before creating or editing JRXML or input controls:
+
+1. Read `skills/jrxml_report_builder/SKILL.md`.
+2. Map Domain item IDs using `output/domain_field_index.json`; do not invent query field IDs.
+3. Follow `docs/assistant_skills/jrxml_schema_guardrails.md` element order:
+   - `filterExpression` before `group`
+   - `pageFooter` before `summary`
+4. Use expression patterns from `docs/assistant_skills/jrxml_expression_patterns.md`.
+5. Prefer `language="domain"` unless raw SQL was explicitly requested.
+6. Update both input control files when parameters change:
+   - `server/input_controls/<report>_input_controls.json`
+   - `server/input_controls/<report>_input_controls_rest.json`
+7. Run before done:
+   ```bash
+   python3 scripts/validate_jrxml_schema.py reports/<report>.jrxml
+   ```
+
+For compile/runtime errors, use the debug template in `docs/assistant_skills/troubleshooting_runbook.md`.

@@ -1,8 +1,9 @@
 import { exportRowsCsv } from "./format";
+import { brandTitle } from "./brand";
 
 export function printDashboardPack(title: string, targetId = "dashboard-export-root"): void {
   const previous = document.title;
-  document.title = `${title} | Utility Insights Dashboard`;
+  document.title = brandTitle(title);
   const el = document.getElementById(targetId);
   if (el) el.classList.add("printing-dashboard");
   window.print();

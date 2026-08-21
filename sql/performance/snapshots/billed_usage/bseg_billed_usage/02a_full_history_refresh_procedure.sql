@@ -5,14 +5,18 @@ CREATE OR REPLACE PROCEDURE cisadm.refresh_bseg_billed_usage_rpt_curr AS
 BEGIN
     EXECUTE IMMEDIATE 'TRUNCATE TABLE cisadm.bseg_billed_usage_rpt_curr';
 
-    SELECT TRUNC(MIN(bill.bill_dt), 'MM'),
+    SELECT GREATEST(
+               TRUNC(MIN(bill.bill_dt), 'MM'),
+               ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24)
+           ),
            TRUNC(MAX(bill.bill_dt), 'MM')
     INTO v_batch_start,
          v_max_month
     FROM cisadm.ci_bseg bseg
     INNER JOIN cisadm.ci_bill bill
         ON bill.bill_id = bseg.bill_id
-       AND bill.bill_stat_flg = 'C ';
+       AND bill.bill_stat_flg = 'C '
+    WHERE bill.bill_dt >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24);
 
     WHILE v_batch_start IS NOT NULL
       AND v_batch_start <= v_max_month
@@ -279,10 +283,10 @@ BEGIN
            AND bseg_status_l.field_value = bseg.bseg_stat_flg
            AND bseg_status_l.language_cd = 'ENG'
         LEFT JOIN cisadm.ci_bill_cyc_l bill_bill_cyc_l
-            ON bill_bill_cyc_l.bill_cyc_cd = COALESCE(NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
+            ON TRIM(bill_bill_cyc_l.bill_cyc_cd) = COALESCE(NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
            AND bill_bill_cyc_l.language_cd = 'ENG'
         LEFT JOIN cisadm.ci_bill_cyc_l bseg_bill_cyc_l
-            ON bseg_bill_cyc_l.bill_cyc_cd = COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
+            ON TRIM(bseg_bill_cyc_l.bill_cyc_cd) = COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
            AND bseg_bill_cyc_l.language_cd = 'ENG'
         LEFT JOIN cisadm.ci_cust_cl_l cust_cl_l
             ON cust_cl_l.cust_cl_cd = acct.cust_cl_cd

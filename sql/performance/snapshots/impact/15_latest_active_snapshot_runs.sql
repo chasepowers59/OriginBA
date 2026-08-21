@@ -1,6 +1,6 @@
 -- Purpose:
---   Return the most recent observed scheduler run for the 7 currently active
---   staggered snapshot jobs.
+--   Return the most recent observed scheduler run for the active 7 governed
+--   snapshot jobs plus CMS_SA_SNAPSHOT domain support.
 --
 -- Use this when:
 --   - capturing current refresh durations for operational tracking
@@ -14,7 +14,8 @@ WITH job_map AS (
     SELECT 4, 'meter_ops', 'D1_MSRMT_RPT_CURR', 'JOB_REFRESH_D1_MSRMT_RPT_CURR' FROM dual UNION ALL
     SELECT 5, 'finance', 'FT_GL_DISTRIBUTION_RPT_CURR', 'JOB_REFRESH_FT_GL_DISTRIBUTION_RPT_CURR' FROM dual UNION ALL
     SELECT 6, 'meter_ops', 'D1_USAGE_RPT_CURR', 'JOB_REFRESH_D1_USAGE_RPT_CURR' FROM dual UNION ALL
-    SELECT 7, 'meter_ops', 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'JOB_REFRESH_D1_USAGE_SCALAR_DTL_RPT_CURR' FROM dual
+    SELECT 7, 'meter_ops', 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'JOB_REFRESH_D1_USAGE_SCALAR_DTL_RPT_CURR' FROM dual UNION ALL
+    SELECT 8, 'debt_mgmt', 'CMS_SA_SNAPSHOT', 'JOB_REFRESH_CMS_SA_SNAPSHOT' FROM dual
 ),
 run_hist AS (
     SELECT

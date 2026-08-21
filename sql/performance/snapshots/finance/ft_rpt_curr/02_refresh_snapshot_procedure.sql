@@ -1,6 +1,10 @@
 CREATE OR REPLACE PROCEDURE cisadm.refresh_ft_rpt_curr AS
-    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12);
+    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -3);
+    v_retain_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24);
 BEGIN
+    DELETE FROM cisadm.ft_rpt_curr
+    WHERE accounting_dt < v_retain_start;
+
     DELETE FROM cisadm.ft_rpt_curr
     WHERE accounting_dt >= v_window_start;
 

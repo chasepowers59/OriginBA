@@ -88,3 +88,27 @@ export function roleLabel(role: PortalRole): string {
   };
   return labels[role] ?? role;
 }
+
+/** The tenant an admin is currently viewing.
+ *
+ * Stored per browser session, not per user record: it is a VIEW, not an assignment, and
+ * it must not survive a sign-out. The API ignores this header for anyone who is not an
+ * admin, so a stale value can never widen what a non-admin sees.
+ */
+const ACTIVE_ORG_KEY = "portal_active_organization";
+
+export function getActiveOrganization(): string | null {
+  if (typeof window === "undefined") return null;
+  return window.sessionStorage.getItem(ACTIVE_ORG_KEY);
+}
+
+export function setActiveOrganization(orgId: string | null): void {
+  if (typeof window === "undefined") return;
+  if (orgId) window.sessionStorage.setItem(ACTIVE_ORG_KEY, orgId);
+  else window.sessionStorage.removeItem(ACTIVE_ORG_KEY);
+}
+
+export function activeOrganizationHeader(): Record<string, string> {
+  const org = getActiveOrganization();
+  return org ? { "X-Organization-Id": org } : {};
+}

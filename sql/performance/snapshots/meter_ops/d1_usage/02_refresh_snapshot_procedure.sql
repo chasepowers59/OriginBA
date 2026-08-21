@@ -1,12 +1,19 @@
 CREATE OR REPLACE PROCEDURE cisadm.refresh_d1_usage_rpt_curr AS
-    c_window_months      CONSTANT PLS_INTEGER := 12;
+    c_window_months      CONSTANT PLS_INTEGER := 3;
+    c_retain_months      CONSTANT PLS_INTEGER := 24;
     c_batch_months       CONSTANT PLS_INTEGER := 3;
     v_window_start       TIMESTAMP;
+    v_retain_start       TIMESTAMP;
     v_batch_start       TIMESTAMP;
     v_batch_end         TIMESTAMP;
     v_batch_upper_bound TIMESTAMP;
 BEGIN
     v_window_start := CAST(ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -c_window_months) AS TIMESTAMP);
+    v_retain_start := CAST(ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -c_retain_months) AS TIMESTAMP);
+
+    DELETE FROM cisadm.d1_usage_rpt_curr
+    WHERE NVL(end_dttm, start_dttm) < v_retain_start;
+    COMMIT;
 
     DELETE FROM cisadm.d1_usage_rpt_curr t
     WHERE EXISTS (

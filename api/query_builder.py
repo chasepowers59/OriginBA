@@ -12,6 +12,12 @@ from typing import Any
 
 
 IDENT_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
+# A dbt canvas column is quoted Title Case and may hold spaces, brackets, a slash or a
+# percent -- "Billed Usage less Read Quantity", "Duration (min)", "% of Arrears Collected".
+# The ALLOW-LIST is what makes a query safe: nothing reaches the SQL that is not already
+# a declared field of the snapshot. This pattern is the second line, rejecting anything
+# that could not be a column name at all, and a double quote most of all.
+WAREHOUSE_IDENT_RE = re.compile(r"^[A-Za-z][A-Za-z0-9 _()/%.,+-]*$")
 ALLOWED_AGGS = {"count", "count_distinct", "sum", "min", "max"}
 ALLOWED_OPS = {"eq", "neq", "in", "between", "gte", "lte"}
 ALLOWED_TIME_GRAINS = {"month", "quarter", "year"}
@@ -35,7 +41,13 @@ class FilterSpec:
     value: Any
 
 
-def _validate_ident(name: str, allowed: set[str], kind: str) -> str:
+def _validate_ident(name: str, allowed: set[str], kind: str, dialect: str = "oracle") -> str:
+    if dialect == "postgres":
+        if name == "*":
+            return name
+        if name not in allowed or not WAREHOUSE_IDENT_RE.match(name) or '"' in name:
+            raise QueryValidationError(f"Invalid {kind}: {name}")
+        return name
     upper = name.upper()
     if upper == "*":
         return upper
@@ -44,10 +56,22 @@ def _validate_ident(name: str, allowed: set[str], kind: str) -> str:
     return upper
 
 
-def _time_bucket_expr(field: str, grain: str) -> str:
+def _quote(name: str, dialect: str) -> str:
+    """Render a validated identifier for the dialect."""
+    return f'"{name}"' if dialect == "postgres" else name
+
+
+def _bind(name: str, dialect: str) -> str:
+    """psycopg takes %(name)s; oracledb takes :name."""
+    return f"%({name})s" if dialect == "postgres" else f":{name}"
+
+
+def _time_bucket_expr(field: str, grain: str, dialect: str = "oracle") -> str:
     grain = grain.lower()
     if grain not in ALLOWED_TIME_GRAINS:
         raise QueryValidationError(f"Invalid time grain: {grain}")
+    if dialect == "postgres":
+        return f"date_trunc('{grain}', {field})"
     if grain == "month":
         return f"TRUNC({field}, 'MM')"
     if grain == "quarter":
@@ -66,16 +90,20 @@ def build_query(
     filters: list[dict[str, Any]],
     limit: int,
     time_dimensions: list[dict[str, Any]] | None = None,
+    dialect: str = "oracle",
+    schema: str = "CISADM",
 ) -> tuple[str, dict[str, Any]]:
     if limit < 1 or limit > 5000:
         raise QueryValidationError("limit must be between 1 and 5000")
     if not measures:
         raise QueryValidationError("At least one measure is required")
 
-    dims = [_validate_ident(d, allowed_fields, "dimension") for d in dimensions]
+    pg = dialect == "postgres"
+    dims = [_validate_ident(d, allowed_fields, "dimension", dialect) for d in dimensions]
     measure_specs: list[MeasureSpec] = []
     for idx, measure in enumerate(measures):
-        field = str(measure.get("field", "*")).upper()
+        raw_field = str(measure.get("field", "*"))
+        field = raw_field if pg else raw_field.upper()
         agg = str(measure.get("agg", "count")).lower()
         if agg not in ALLOWED_AGGS:
             raise QueryValidationError(f"Invalid aggregation: {agg}")
@@ -92,7 +120,7 @@ def build_query(
     binds: dict[str, Any] = {}
     has_date_window = False
     for idx, raw in enumerate(filters):
-        field = _validate_ident(str(raw.get("field", "")), allowed_fields, "filter field")
+        field = _validate_ident(str(raw.get("field", "")), allowed_fields, "filter field", dialect)
         op = str(raw.get("op", "eq")).lower()
         if op not in ALLOWED_OPS:
             raise QueryValidationError(f"Invalid filter op: {op}")
@@ -100,12 +128,13 @@ def build_query(
         if op == "between":
             if not isinstance(value, (list, tuple)) or len(value) != 2:
                 raise QueryValidationError("between filter requires [start, end]")
-            if field == (required_date_field or "").upper():
+            required_cmp = required_date_field or ""
+            if field == (required_cmp if pg else required_cmp.upper()):
                 has_date_window = True
         filter_specs.append(FilterSpec(field=field, op=op, value=value))
 
     if required_date_field:
-        req = required_date_field.upper()
+        req = required_date_field if pg else required_date_field.upper()
         if req not in allowed_fields:
             raise QueryValidationError(f"Required date field missing from snapshot: {req}")
         if not has_date_window:
@@ -113,8 +142,9 @@ def build_query(
                 f"A date filter on {req} is required (use op=between with start and end dates)"
             )
 
-    table = table_name.upper()
-    if not IDENT_RE.match(table):
+    table = table_name if pg else table_name.upper()
+    ident_ok = WAREHOUSE_IDENT_RE if pg else IDENT_RE
+    if not ident_ok.match(table) or '"' in table:
         raise QueryValidationError(f"Invalid table name: {table_name}")
 
     select_parts: list[str] = []
@@ -122,38 +152,38 @@ def build_query(
     for idx, raw in enumerate(time_dimensions or []):
         field = _validate_ident(str(raw.get("field", "")), allowed_fields, "time dimension field")
         grain = str(raw.get("grain", "month")).lower()
-        expr = _time_bucket_expr(field, grain)
+        expr = _time_bucket_expr(_quote(field, dialect), grain, dialect)
         alias = f"TD{idx}"
         select_parts.append(f"{expr} AS {alias}")
         group_parts.append(expr)
     for dim in dims:
-        select_parts.append(dim)
-        group_parts.append(dim)
+        select_parts.append(_quote(dim, dialect))
+        group_parts.append(_quote(dim, dialect))
     for spec in measure_specs:
         if spec.agg == "count" and spec.field == "*":
             select_parts.append(f"COUNT(*) AS {spec.alias}")
         elif spec.agg == "count":
-            select_parts.append(f"COUNT({spec.field}) AS {spec.alias}")
+            select_parts.append(f"COUNT({_quote(spec.field, dialect)}) AS {spec.alias}")
         elif spec.agg == "count_distinct":
-            select_parts.append(f"COUNT(DISTINCT {spec.field}) AS {spec.alias}")
+            select_parts.append(f"COUNT(DISTINCT {_quote(spec.field, dialect)}) AS {spec.alias}")
         elif spec.agg == "sum":
-            select_parts.append(f"SUM({spec.field}) AS {spec.alias}")
+            select_parts.append(f"SUM({_quote(spec.field, dialect)}) AS {spec.alias}")
         elif spec.agg == "min":
-            select_parts.append(f"MIN({spec.field}) AS {spec.alias}")
+            select_parts.append(f"MIN({_quote(spec.field, dialect)}) AS {spec.alias}")
         elif spec.agg == "max":
-            select_parts.append(f"MAX({spec.field}) AS {spec.alias}")
+            select_parts.append(f"MAX({_quote(spec.field, dialect)}) AS {spec.alias}")
 
     where_parts: list[str] = []
     for idx, spec in enumerate(filter_specs):
-        col = spec.field
+        col = _quote(spec.field, dialect)
         if spec.op == "eq":
             bind = f"b{idx}"
             binds[bind] = spec.value
-            where_parts.append(f"{col} = :{bind}")
+            where_parts.append(f"{col} = {_bind(bind, dialect)}")
         elif spec.op == "neq":
             bind = f"b{idx}"
             binds[bind] = spec.value
-            where_parts.append(f"{col} <> :{bind}")
+            where_parts.append(f"{col} <> {_bind(bind, dialect)}")
         elif spec.op == "in":
             if not isinstance(spec.value, list) or not spec.value:
                 raise QueryValidationError("in filter requires non-empty list")
@@ -161,31 +191,42 @@ def build_query(
             for j, item in enumerate(spec.value):
                 bind = f"b{idx}_{j}"
                 binds[bind] = item
-                placeholders.append(f":{bind}")
+                placeholders.append(_bind(bind, dialect))
             where_parts.append(f"{col} IN ({', '.join(placeholders)})")
         elif spec.op == "gte":
             bind = f"b{idx}"
             binds[bind] = spec.value
-            where_parts.append(f"{col} >= :{bind}")
+            where_parts.append(f"{col} >= {_bind(bind, dialect)}")
         elif spec.op == "lte":
             bind = f"b{idx}"
             binds[bind] = spec.value
-            where_parts.append(f"{col} <= :{bind}")
+            where_parts.append(f"{col} <= {_bind(bind, dialect)}")
         elif spec.op == "between":
             bind_start = f"b{idx}_start"
             bind_end = f"b{idx}_end"
             binds[bind_start] = spec.value[0]
             binds[bind_end] = spec.value[1]
-            # TO_DATE works for DATE and TIMESTAMP snapshot columns in Oracle.
-            where_parts.append(
-                f"{col} >= TO_DATE(:{bind_start}, 'YYYY-MM-DD') "
-                f"AND {col} < TO_DATE(:{bind_end}, 'YYYY-MM-DD') + 1"
-            )
+            if pg:
+                # The end of the window is EXCLUSIVE and one day on, so a timestamp
+                # anywhere inside the closing day is still inside the window -- the same
+                # semantics the Oracle branch gets from "+ 1".
+                where_parts.append(
+                    f"{col} >= {_bind(bind_start, dialect)}::date "
+                    f"AND {col} < {_bind(bind_end, dialect)}::date + 1"
+                )
+            else:
+                # TO_DATE works for DATE and TIMESTAMP snapshot columns in Oracle.
+                where_parts.append(
+                    f"{col} >= TO_DATE(:{bind_start}, 'YYYY-MM-DD') "
+                    f"AND {col} < TO_DATE(:{bind_end}, 'YYYY-MM-DD') + 1"
+                )
 
-    sql = f"SELECT {', '.join(select_parts)} FROM CISADM.{table}"
+    qualified = f'{schema}."{table}"' if pg else f"{schema}.{table}"
+    sql = f"SELECT {', '.join(select_parts)} FROM {qualified}"
     if where_parts:
         sql += " WHERE " + " AND ".join(where_parts)
     if group_parts:
         sql += " GROUP BY " + ", ".join(group_parts)
+    # FETCH FIRST is standard SQL and valid in both, so the tail needs no branch.
     sql += f" FETCH FIRST {int(limit)} ROWS ONLY"
     return sql, binds

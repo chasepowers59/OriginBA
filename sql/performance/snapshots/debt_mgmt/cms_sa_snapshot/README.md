@@ -24,6 +24,7 @@ Domain Designer deletes / breaks when it cannot resolve:
 2. `02_refresh_cms_sa_snapshot_procedure.sql` — create `CISADM.REFRESH_CMS_SA_SNAPSHOT`
 3. `03_run_and_validate.sql` — run refresh + basic validation queries
 4. `04_validate_cms_sa_snapshot.sql` — bucket identity, FT parity, CISREAD smoke (no refresh)
+5. `05_schedule_cms_sa_snapshot_job.sql` — recurring 6-hour scheduler job
 
 Centralized rollout wrappers: [deployment_steps/00_domain_support_deployment_manifest.md](../../deployment_steps/00_domain_support_deployment_manifest.md)
 
@@ -54,3 +55,4 @@ python3 scripts/local/run_client_oracle_sql.py --client citycorp \
   - `ARS_AMT5` 121+
 - CIS "Future" (ARS_DT after today) is intentionally excluded from this snapshot; report it separately if needed
 - Longer-term replacement object is `SA_AGED_BAL_RPT_CURR`; this CMS table keeps existing SO domains working.
+- Recurring schedule: `JOB_REFRESH_CMS_SA_SNAPSHOT`, every 6 hours at 04:30, 10:30, 16:30, and 22:30 GMT.

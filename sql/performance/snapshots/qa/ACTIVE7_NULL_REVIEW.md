@@ -1,6 +1,16 @@
-# Active 7 Snapshot Null Review
+# Active 8 Snapshot Null Review
 
-Read-only audit run on CityCorp (reference) and Odessa DEV (target).
+Historical read-only audit originally run on CityCorp (reference) and Odessa DEV
+(target).
+
+Current rule moving forward:
+
+- Use Ellensburg as the development/reference database.
+- Validate only `CISADM` source and snapshot objects.
+- Treat the active QA set as the original 7 governed snapshots plus
+  `CISADM.CMS_SA_SNAPSHOT`.
+- Do not use `CISREAD` synonyms or legacy schemas for standard snapshot
+  integrity checks.
 
 ## Rule used
 

@@ -1,0 +1,24 @@
+Client: newark
+Statements: 1
+
+=== Statement 1/1 ===
+
+Traceback (most recent call last):
+  File "/Users/chase/OriginBA-3/scripts/local/run_client_oracle_sql.py", line 311, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/Users/chase/OriginBA-3/scripts/local/run_client_oracle_sql.py", line 274, in main
+    cursor.execute(sql)
+    ~~~~~~~~~~~~~~^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/oracledb/cursor.py", line 844, in execute
+    impl.execute(self)
+    ~~~~~~~~~~~~^^^^^^
+  File "src/oracledb/impl/thick/cursor.pyx", line 320, in oracledb.thick_impl.ThickCursorImpl.execute
+  File "src/oracledb/impl/thick/utils.pyx", line 484, in oracledb.thick_impl._raise_from_odpi
+  File "src/oracledb/impl/thick/utils.pyx", line 474, in oracledb.thick_impl._raise_from_info
+oracledb.exceptions.DatabaseError: DPY-4011: the database or network closed the connection
+DPI-1080: connection was closed by ORA-03113
+ORA-03113: end-of-file on communication channel
+Process ID: 19580
+Session ID: 635 Serial number: 18523
+Help: https://docs.oracle.com/error-help/db/ora-03113/

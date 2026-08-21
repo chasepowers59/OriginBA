@@ -1,6 +1,6 @@
 # Active Snapshot Deployment Steps
 
-Use this folder as the centralized deployment reference for the active 7 governed snapshots.
+Use this folder as the centralized deployment reference for the active 7 governed snapshots plus CMS domain-support objects.
 
 Client reporting guide (use cases, example reports, population scope): [../docs/snapshot_client_reporting_guide.md](../docs/snapshot_client_reporting_guide.md)
 
@@ -15,6 +15,13 @@ Run these scripts in `SQL Developer` or `SQLcl` as **script execution** (`F5` / 
 - `D1_USAGE_RPT_CURR`
 - `D1_USAGE_SCALAR_DTL_RPT_CURR`
 
+## Scheduled domain-support snapshot
+- `CMS_SA_SNAPSHOT`
+
+`CMS_SA_SNAPSHOT` is refreshed and scheduled with the active 7 because active
+Standard Offering debt-management Domains depend on it. The CMS views remain
+live view objects and are validated through the domain-support gates.
+
 ## Deployment sequence
 1. `01_create_all_active_snapshot_tables.sql`
 2. `01b_create_all_domain_support_objects.sql` — CMS views + `CMS_SA_SNAPSHOT`
@@ -23,19 +30,21 @@ Run these scripts in `SQL Developer` or `SQLcl` as **script execution** (`F5` / 
 5. Choose one baseline load option:
    - `03_run_all_initial_full_history_refreshes.sql` for a manual foreground run
    - `03a_schedule_all_initial_full_history_refreshes.sql` for unattended one-time baseline jobs
+   - On limited-privilege hosts, prefer 2–3 concurrent baselines (not all 8) to reduce I/O contention
 6. `03e_run_domain_support_refreshes.sql` — refresh CMS SA snapshot (can run in parallel with baseline)
 7. If using scheduled baseline jobs, run `03b_capture_initial_full_history_job_status.sql` later
-8. `04_validate_all_active_snapshots.sql`
-9. `04c_validate_all_domain_support_objects.sql`
-10. `04b_snapshot_install_validation_gate.sql`
-11. `04d_domain_support_install_validation_gate.sql`
-12. `05_deploy_all_rolling_window_updates.sql`
-13. `06_run_all_operational_refreshes.sql` (includes CMS SA refresh)
-14. `04_validate_all_active_snapshots.sql` again
-15. `04c_validate_all_domain_support_objects.sql` again
-16. `04b_snapshot_install_validation_gate.sql` and `04d_domain_support_install_validation_gate.sql` again
-17. `07_schedule_all_active_snapshots.sql`
-18. `08_capture_latest_active_snapshot_runs.sql`
+8. **Post-load indexes (limited-priv / Ad Hoc performance):** `clients/post_load_snapshot_indexes_limited_priv.sql` via `ORIGINBA_DDL_HELPER2` — run after baselines succeed so indexes build on loaded data
+9. `04_validate_all_active_snapshots.sql`
+10. `04c_validate_all_domain_support_objects.sql`
+11. `04b_snapshot_install_validation_gate.sql`
+12. `04d_domain_support_install_validation_gate.sql`
+13. `05_deploy_all_rolling_window_updates.sql` (or CityCorp `clients/citycorp/05_deploy_6month_rolling_window_updates.sql` for 6-month)
+14. `06_run_all_operational_refreshes.sql` (includes CMS SA refresh) — optional; schedule-only cutover is acceptable
+15. `04_validate_all_active_snapshots.sql` again
+16. `04c_validate_all_domain_support_objects.sql` again
+17. `04b_snapshot_install_validation_gate.sql` and `04d_domain_support_install_validation_gate.sql` again
+18. `07_schedule_all_active_snapshots.sql` — schedules the active 7 plus `CMS_SA_SNAPSHOT`
+19. `08_capture_latest_active_snapshot_runs.sql`
 
 ## BSEG promotion flow
 
@@ -145,7 +154,7 @@ Logs for compound steps:
 ## Scheduling guidance
 
 `07_schedule_all_active_snapshots.sql`:
-- creates the scheduler jobs from the package-level job scripts
+- creates the scheduler jobs from the package-level job scripts for the active 7 plus `CMS_SA_SNAPSHOT`
 - then applies the current approved staggered 6-hour cadence from:
   - [apply_6hour_staggered_schedule_1am_base.sql](/C:/Users/cvpow/OneDrive/Desktop/OriginBA/sql/performance/snapshots/apply_6hour_staggered_schedule_1am_base.sql)
 

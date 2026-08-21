@@ -8,12 +8,13 @@ a full server export (org-tree layout) used by the promotion pipeline to inject
 | --- | --- | --- |
 | `Ellensburg_DS/` | Ellensburg | `ptestdb_ellensburg...` |
 | `CityCorp_DS/` | CityCorp | `ptestdb_citycorp...` |
+| `CityCorp_PROD_DS/` | CityCorp (PROD) | `PPRODDB_CITYCORP...` (tenant-root layout, DS name `CityCorp_DS`) |
 | `CollegeStation_DS/` | College_Station | `ptestdb_collegestation...` |
 | `FondDuLac_DS/` | Fond_Du_Lac | `ptestdb_fonddulac...` |
-| `Newark1_DS/` | Newark1 | `ptestdb_newark...` |
+| `Newark1_DS/` | Newark1 | `PTESTDB_NEWARK...` (tenant-root `/DataSource`, host `smartcity-db-test-v1-2`) |
 | `Odessa_DS/` | Odessa | `pdevdb_odessa...` |
 
-Original ZIP backups (same content): `deploy/EllensburgDS.zip`, `deploy/CityCorpDS.zip`, etc.
+Original ZIP backups (same content): `deploy/EllensburgDS.zip`, `deploy/CityCorpDS.zip`, `deploy/CityCorpPRODDS.zip`, etc.
 
 Refresh from Jaspersoft: export `/DataSource/<Client>_DS` inside the client tenant and replace the matching folder here (or run `store_canonical_datasource_export.py` after adding the alias to allowed list).
 

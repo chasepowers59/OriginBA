@@ -1,4 +1,5 @@
 "use client";
+import { brandLine } from "../lib/brand";
 
 import { useEffect, useState } from "react";
 import { fetchSnapshots } from "@/lib/api";
@@ -32,7 +33,7 @@ export function HomeDashboard() {
         <div className="pointer-events-none absolute -bottom-16 left-1/3 h-48 w-48 rounded-full bg-indigo-500/10 blur-3xl" />
         <div className="relative">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400">
-            {brand.name} · {brand.product}
+            {brandLine(brand)}
           </p>
           <h1 className="mt-2 max-w-2xl text-4xl font-bold tracking-tight text-white md:text-5xl">
             Governed analytics across{" "}

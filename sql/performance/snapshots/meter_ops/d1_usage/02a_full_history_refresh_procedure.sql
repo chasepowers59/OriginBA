@@ -7,13 +7,16 @@ BEGIN
     COMMIT;
 
     SELECT
-        CAST(TRUNC(MIN(NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm))), 'MM') AS TIMESTAMP),
+        CAST(GREATEST(
+            TRUNC(MIN(NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm))), 'MM'),
+            ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24)
+        ) AS TIMESTAMP),
         CAST(ADD_MONTHS(TRUNC(MAX(NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm))), 'MM'), 1) AS TIMESTAMP)
     INTO
         v_batch_start,
         v_batch_upper_bound
     FROM cisadm.d1_usage u
-    WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) IS NOT NULL;
+    WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24);
 
     WHILE v_batch_start < v_batch_upper_bound LOOP
         v_batch_end := ADD_MONTHS(v_batch_start, 1);

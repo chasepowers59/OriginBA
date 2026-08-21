@@ -1,0 +1,115 @@
+CI_BSEG_CALC_LN — Cross-Client Pattern Note (read-only)
+=======================================================
+As of 2026-08-03. Frozen bill segments, roughly last 3–6 months.
+Clients checked live: CityCorp (deep), Ellensburg, Odessa DEV,
+College Station, Fond du Lac. Newark failed mid-query (ORA-03135
+connection lost).
+
+What is the same everywhere
+---------------------------
+- Grain is always one row per calc line under a calc header
+  (BSEG_ID + HEADER_SEQ + SEQNO).
+- Amounts live on CALC_AMT; billable determinant on BILL_SQ.
+- UOM / SQI / TOU may be blank on some lines depending on rate design.
+- PRT_SW and APP_IN_SUMM_SW control bill-print vs summary behavior.
+- Mixing Calc Line with BSEG_SQ or BSEG_READ in Ad Hoc still fans out
+  on every client — that domain rule does not change by client.
+
+
+What is different (and why CityCorp looks “weird”)
+--------------------------------------------------
+CityCorp is NOT averaging usage into tiny pieces.
+
+It is a water / sewer / sanitation rate design that writes MANY
+bill-presentation lines per segment: meter charges, tier usage,
+“Total …” rollups, franchise fees, and tax lines. Most of those lines
+have no UOM and no SQI. Only the real consumption lines carry
+Thousand Gallons + T1/T2/T3 Multiplier.
+
+Example CityCorp residential water segment (10 lines):
+
+  1  Meter Charge - 5/8                         $14.15   print Y  (no UOM/SQI)
+  2  Water - 1 TGAL at $2.60                    $2.60    print Y  Thousand Gallons / T1 Multiplier
+  3  Total Water Consumption Charge             $2.60    print Y  (no UOM/SQI)  <-- rollup
+  4  Fed Safe Drinking Water Act                $0.40    print Y  (no UOM/SQI)
+  5  Sanitation Charges subject to tax          $3.47    print N  (no UOM/SQI)
+  6  Franchise Fee                              $0.75    print Y  (no UOM/SQI)
+  7  City Sales Tax                             $0.31    print N  app_in_summ Y
+  8  County Sales Tax                           $0.21    print N  app_in_summ Y
+  9  State Sales Tax                            $1.36    print N  app_in_summ Y
+ 10  Total Taxes                                $1.88    print Y  (no UOM/SQI)  <-- rollup
+
+So the “tiny amounts” are mostly fees/taxes/cents, not fractional gallons.
+The “ton of calc lines” is print/summary structure, not one line per gallon.
+
+
+CityCorp snapshot (last ~6 months, Frozen)
+------------------------------------------
+Lines per bseg:
+  01-03 lines:   ~3,600 bsegs
+  04-10 lines: ~160,500 bsegs   (majority; avg ~5.8)
+  11-25 lines:  ~23,900 bsegs   (avg ~11.4, max observed 13)
+
+Top calc-line patterns:
+  (no UOM)/(no SQI)              ~873k lines   avg ~$8.79   (fees, taxes, totals)
+  Thousand Gallons / T1 Mult     ~95k lines    avg ~$10.35
+  Extra Recycle Cans             ~72k lines    ~$0
+  Extra Trash Cans               ~72k lines    tiny avg
+  Thousand Gallons / T2 Mult     ~72k lines
+  Thousand Gallons / T3 Mult     ~12k lines
+
+Main SA / rate schedules:
+  W-RES  / RESWTIER   ~10.5 lines/bseg avg
+  SW-RES / RESSTIER   ~5.9
+  SN-PROV / SANCARDS  ~4.3
+  SN-C-SVC / SANCASUB ~4.1
+  W-COM  / COMWTIER   ~8.0
+
+Print switches (last ~3 months):
+  Print Y / summ N : majority of dollars (bill-facing lines)
+  Print N / summ Y : tax components rolled into “Total Taxes”
+  Print N / summ N : working / non-print lines (discounts, sanitation detail)
+
+
+Cross-client summary (Frozen, ~3 months)
+----------------------------------------
+Client            Avg/max lines   % no UOM+SQI   % print Y   Notes
+----------------  --------------  -------------  ----------  -------------------------
+CityCorp          6.4 / 13        71.7%          50%         Fee/tax/total lines;
+                                                             usage = TGAL + tiers
+Ellensburg        3.6 / 13         1.0%          98.5%       SQI-heavy; few blank
+                                                             determinant lines
+Odessa DEV        1.0 / 1          0%            0%          Sparse conversion;
+                                                             100% UOM, all app_summ
+College Station   4.9 / 10        65.5%          41.6%       Similar “presentation
+                                                             line” style to CityCorp
+Fond du Lac       1.7 / 4         59.8%          98.1%       Simpler; mostly print Y
+Newark            —               —              —           Query failed (network)
+
+
+Reporting guidance
+------------------
+Same rules for all clients:
+1. Stay in Calc Line folder for charge-line analysis.
+2. Do not mix BSEG_SQ / BSEG_READ into the same Ad Hoc.
+3. Filter by client-specific UOM/SQI patterns — they are not portable.
+
+Client-specific:
+- CityCorp water usage: filter Calc Line UOM = Thousand Gallons
+  and/or SQI like T1/T2/T3 Multiplier.
+  For bill-facing dollars: prefer PRT_SW = Y, and be careful summing
+  both detail and “Total …” rollup lines (double count risk).
+- CityCorp taxes: often Print N + App In Summary Y, then a Print Y
+  “Total Taxes” rollup.
+- Ellensburg water: calc lines usually have no UOM; use SQI
+  (Days, Tier Multiplier). Gallons live in Service Quantity (BSEG_SQ).
+- Do not assume “one calc line = one commodity unit” on any client.
+
+
+Open follow-ups
+---------------
+- Re-run Newark summary metrics after DB connectivity is stable.
+- Optional: catalog which descr_on_bill values are rollups vs detail
+  per client (to support safe SUM rules in Ad Hoc).
+- Optional: map PRT_SW / APP_IN_SUMM_SW patterns for Ellensburg electric/gas
+  the same way as CityCorp.

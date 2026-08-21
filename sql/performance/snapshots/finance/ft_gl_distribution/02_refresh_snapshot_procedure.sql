@@ -1,6 +1,10 @@
 CREATE OR REPLACE PROCEDURE cisadm.refresh_ft_gl_distribution_rpt_curr AS
-    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -6);
+    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -3);
+    v_retain_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24);
 BEGIN
+    DELETE FROM cisadm.ft_gl_distribution_rpt_curr
+    WHERE accounting_dt < v_retain_start;
+
     DELETE FROM cisadm.ft_gl_distribution_rpt_curr
     WHERE accounting_dt >= v_window_start;
 
@@ -305,7 +309,7 @@ BEGIN
        AND bseg_status_l.language_cd = 'ENG'
        AND ft.ft_type_flg IN ('BS', 'BX')
     LEFT JOIN cisadm.ci_bill_cyc_l bseg_bill_cyc_l
-        ON bseg_bill_cyc_l.bill_cyc_cd = COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
+        ON TRIM(bseg_bill_cyc_l.bill_cyc_cd) = COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
        AND bseg_bill_cyc_l.language_cd = 'ENG'
        AND ft.ft_type_flg IN ('BS', 'BX')
     LEFT JOIN cisadm.ci_bill_can_rsn_l bseg_can_rsn_l

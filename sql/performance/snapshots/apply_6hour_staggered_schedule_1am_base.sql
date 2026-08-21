@@ -85,6 +85,17 @@ BEGIN
         attribute => 'comments',
         value     => 'Refresh D1 usage scalar-detail reporting snapshot every 6 hours at 04:00, 10:00, 16:00, and 22:00 GMT'
     );
+
+    DBMS_SCHEDULER.SET_ATTRIBUTE(
+        name      => 'CISADM.JOB_REFRESH_CMS_SA_SNAPSHOT',
+        attribute => 'repeat_interval',
+        value     => 'FREQ=DAILY;BYHOUR=4,10,16,22;BYMINUTE=30;BYSECOND=0'
+    );
+    DBMS_SCHEDULER.SET_ATTRIBUTE(
+        name      => 'CISADM.JOB_REFRESH_CMS_SA_SNAPSHOT',
+        attribute => 'comments',
+        value     => 'Refresh CMS SA aged-balance snapshot every 6 hours at 04:30, 10:30, 16:30, and 22:30 GMT'
+    );
 END;
 /
 
@@ -103,6 +114,7 @@ WHERE owner = 'CISADM'
         'JOB_REFRESH_D1_MSRMT_RPT_CURR',
         'JOB_REFRESH_FT_GL_DISTRIBUTION_RPT_CURR',
         'JOB_REFRESH_D1_USAGE_RPT_CURR',
-        'JOB_REFRESH_D1_USAGE_SCALAR_DTL_RPT_CURR'
+        'JOB_REFRESH_D1_USAGE_SCALAR_DTL_RPT_CURR',
+        'JOB_REFRESH_CMS_SA_SNAPSHOT'
       )
 ORDER BY next_run_date, job_name;

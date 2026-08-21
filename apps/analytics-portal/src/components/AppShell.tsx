@@ -6,6 +6,7 @@ import { BrandMark } from "@/components/BrandMark";
 import { useAuth } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { roleLabel } from "@/lib/auth";
+import OrgSwitcher from "@/components/OrgSwitcher";
 import { WorkstreamSidebar, WorkstreamSidebarNav } from "@/components/WorkstreamExplorer";
 import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
@@ -54,6 +55,9 @@ export function AppShell({
               <p className="portal-text-muted text-sm">{portal.organization_name}</p>
             </div>
           </Link>
+          <div className="flex items-center gap-4">
+            <OrgSwitcher role={user?.role ?? ""} homeOrganizationId={user?.organization_id ?? null} />
+          </div>
           <nav className="hidden items-center gap-1 md:flex">
             {NAV.filter((item) => item.id !== "settings" || can("settings:manage")).map((item) => {
               const active = activeNav === item.id || (!activeNav && item.id === "home");

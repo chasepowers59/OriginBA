@@ -155,7 +155,8 @@ BEGIN
     LEFT JOIN cisadm.ci_adj_type_l adj_type
         ON adj_type.adj_type_cd  = adj.adj_type_cd
        AND adj_type.language_cd  = 'ENG'
-    WHERE ft.redundant_sw = 'N';
+    WHERE ft.redundant_sw = 'N'
+      AND ft.accounting_dt >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24);
 
     COMMIT;
 END;

@@ -1,0 +1,30 @@
+---
+description: Context-aware Oracle C2M CISADM SQL generation using repo dictionaries and table health gates
+globs:
+  - "sql/**/*.sql"
+  - "scripts/**/*.py"
+  - "output/**/*.json"
+alwaysApply: false
+---
+
+# CISADM SQL Context Rule
+
+Before writing or changing Oracle C2M SQL:
+
+1. Read `skills/sql_report_builder/SKILL.md` and follow its pre-steps.
+2. Load `output/ai_cisadm_context.json` and `output/workstream_physical_catalog.json` for table semantics, join hints, and population status.
+3. Use `knowledge_base/c2m_cisadm/workstream_physical_join_paths.md` for canonical physical join chains (no custom views).
+4. Do not reference `CMS_*` or `*_VW` objects in generated SQL.
+4. Do not use tables marked `population_status: empty` or `missing` in `client_health` as the driving population without documenting the gap.
+5. Preserve driving population; use LEFT JOIN for optional enrichment lookups and BODA views.
+6. Never embed credentials; use datasource aliases only when SQL is for Jaspersoft (`ORIGIN_DEV_DS`, `C2M_QA_DS`, `C2M_PROD_DS`).
+7. For client-specific validation, reference or run:
+   - `python3 scripts/local/run_workstream_table_health.sh <client>`
+   - `deploy/snapshot_rollout_logs/<client>/table_health.json`
+
+Prompt template: `docs/assistant_skills/cisadm_sql_prompt_guide.md`
+
+Regenerate context when dictionaries change:
+```bash
+python3 scripts/build_ai_cisadm_context.py --client demo
+```

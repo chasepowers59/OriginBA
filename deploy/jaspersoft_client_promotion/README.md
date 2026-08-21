@@ -11,6 +11,22 @@ Full JDBC exports live in:
 Each client gets its own `{Client}_DS.xml` injected into the import package —
 not a rename of `Origin_DEV_DS`.
 
+## Patch VEE Exception To Do joins first
+
+The shipped VEE Exception domain inner-joins the To Do chain
+(`CI_TD_DRLKEY` / `CI_TD_DRLKEY_TY` / `CI_TD_ENTRY` and its lookups) onto
+`D1_INIT_MSRMT_DATA`. Clients without IMD To Do entries lose the whole
+exception population as soon as an Ad Hoc view selects a To Do field
+(Newark TEST: 475,842 exceptions to 0 rows). Relax them before building:
+
+```bash
+python3 scripts/jaspersoft/patch_vee_exception_todo_joins.py \
+  --source "/path/to/standard offering.zip" \
+  --output "/path/to/standard offering_vee_todo_leftouter.zip"
+```
+
+Then use the patched ZIP as `--source-zip` below.
+
 ## Build all client packages
 
 ```bash

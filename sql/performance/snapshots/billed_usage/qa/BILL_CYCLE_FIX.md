@@ -11,7 +11,13 @@ On converted clients (especially Odessa DEV), `CI_BILL.BILL_CYC_CD` and `CI_BSEG
 | `bill_bill_cyc_cd` | `COALESCE(NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))` |
 | `bseg_bill_cyc_cd` | `COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))` |
 
-Lookup joins (`CI_BILL_CYC_L`) use the same COALESCE keys.
+Lookup joins (`CI_BILL_CYC_L`) use the same COALESCE keys, with `TRIM()` on the lookup side:
+
+```sql
+ON TRIM(bill_bill_cyc_l.bill_cyc_cd) = COALESCE(...)
+```
+
+Oracle blank-pads only for CHAR/literal compares. `TRIM(...)` returns `VARCHAR2`, so `CHAR = TRIM(...)` never matches (`'45  ' != '45'`), which leaves `*_bill_cyc_desc` null even when codes are populated from account.
 
 **Files updated:** all `02_refresh_*`, `02a_full_history_*`, `10_rolling_*`, and `11_rolling_*` under `bseg_billed_usage/` and `bseg_sq_usage/`.
 
@@ -21,28 +27,23 @@ Lookup joins (`CI_BILL_CYC_L`) use the same COALESCE keys.
 
 | Client | Role |
 |--------|------|
-| **CityCorp** | Read-only reference — run `qa/bill_cycle_source_audit.sql` |
-| **Odessa DEV** | Only DB we deploy procedures to and run full refresh |
+| **Ellensburg** | Development/reference DB — run read-only source and snapshot audits here first |
+| **Target client** | Run the same read-only audit before and after promotion |
 
 ```bash
-# Read-only QA (CityCorp or Odessa)
-python3 scripts/local/run_client_oracle_sql.py --client citycorp \
+# Read-only QA (Ellensburg first, then target client)
+python3 scripts/local/run_client_oracle_sql.py --client ellensburg \
   --file sql/performance/snapshots/billed_usage/qa/bill_cycle_source_audit.sql
-
-# Deploy + refresh (Odessa DEV ONLY)
-python3 scripts/local/run_client_oracle_sql.py --client odessa_dev \
-  --file sql/performance/snapshots/billed_usage/bseg_billed_usage/02a_full_history_refresh_procedure.sql
-# then compile/run procedure via SQL*Plus or run_client_oracle_sql with BEGIN/END block
 ```
 
-## Before full refresh on Odessa
+## Before full refresh on a target client
 
-1. Run audit on CityCorp — confirm COALESCE simulation matches expectations
-2. Run audit on Odessa — confirm current snapshots are 0% populated
-3. Deploy updated procedures to **Odessa DEV only**
+1. Run audit on Ellensburg — confirm COALESCE simulation still matches expectations
+2. Run audit on target client — record current snapshot coverage
+3. Deploy updated procedures only after review
 4. Run `02a_full_history_refresh_procedure.sql` (full history)
 5. Re-run audit — expect bill-cycle coverage to match source rows where trimmed fallback resolves
-6. Switch scheduled job to `02_refresh_snapshot_procedure_6month.sql` for rolling maintenance
+6. Switch scheduled job to the rolling refresh procedure for ongoing maintenance
 
 ## Odessa DEV validation result
 

@@ -121,7 +121,7 @@ BEGIN
     batch_usage AS (
         SELECT u.*
         FROM cisadm.d1_usage u
-        WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) IS NOT NULL
+        WHERE NVL(u.start_dttm, NVL(u.cre_dttm, u.status_upd_dttm)) >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24)
     ),
     c1_usage_bridge AS (
         SELECT

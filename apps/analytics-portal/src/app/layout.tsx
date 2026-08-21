@@ -2,13 +2,13 @@ import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 import { AuthProvider } from "@/components/AuthProvider";
 import { PortalThemeProvider } from "@/components/PortalThemeProvider";
-import { DEFAULT_BRAND } from "@/lib/brand";
+import { DEFAULT_BRAND, brandLine } from "@/lib/brand";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: `${DEFAULT_BRAND.name} | ${DEFAULT_BRAND.product}`,
+  title: brandLine(DEFAULT_BRAND),
   description: DEFAULT_BRAND.tagline,
   icons: {
     icon: DEFAULT_BRAND.logo_src ?? "/brand-icon.svg",

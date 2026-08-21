@@ -302,7 +302,7 @@ BEGIN
        AND bseg_status_l.language_cd = 'ENG'
        AND ft.ft_type_flg IN ('BS', 'BX')
     LEFT JOIN cisadm.ci_bill_cyc_l bseg_bill_cyc_l
-        ON bseg_bill_cyc_l.bill_cyc_cd = COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
+        ON TRIM(bseg_bill_cyc_l.bill_cyc_cd) = COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
        AND bseg_bill_cyc_l.language_cd = 'ENG'
        AND ft.ft_type_flg IN ('BS', 'BX')
     LEFT JOIN cisadm.ci_bill_can_rsn_l bseg_can_rsn_l
@@ -324,7 +324,8 @@ BEGIN
        AND ft.ft_type_flg IN ('AD', 'AX')
     LEFT JOIN cisadm.ci_dst_code_l dst_l
         ON dst_l.dst_id = ft_gl.dst_id
-       AND dst_l.language_cd = 'ENG';
+       AND dst_l.language_cd = 'ENG'
+    WHERE ft.accounting_dt >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24);
 
     COMMIT;
 END;

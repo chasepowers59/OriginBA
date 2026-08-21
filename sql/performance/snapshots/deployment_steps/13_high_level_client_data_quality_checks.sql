@@ -2,7 +2,7 @@ PROMPT ============================================================
 PROMPT High-level client snapshot data quality checks
 PROMPT ============================================================
 PROMPT Coverage:
-PROMPT   1) Row counts and load freshness for active 7 snapshots
+PROMPT   1) Row counts and load freshness for active 7 snapshots plus CMS_SA_SNAPSHOT
 PROMPT   2) Required field-name presence check
 PROMPT   3) Null-rate checks for critical columns
 
@@ -48,7 +48,13 @@ SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR',
        COUNT(*),
        MIN(load_dttm),
        MAX(load_dttm)
-FROM cisadm.d1_usage_scalar_dtl_rpt_curr;
+FROM cisadm.d1_usage_scalar_dtl_rpt_curr
+UNION ALL
+SELECT 'CMS_SA_SNAPSHOT',
+       COUNT(*),
+       CAST(MIN(c1_snapshot_dt) AS TIMESTAMP),
+       CAST(MAX(c1_snapshot_dt) AS TIMESTAMP)
+FROM cisadm.cms_sa_snapshot;
 
 PROMPT
 PROMPT 2) Required field-name presence summary
@@ -90,7 +96,18 @@ WITH expected AS (
     SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'USAGE_STATUS_UPD_DTTM' FROM dual UNION ALL
     SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'LOAD_DTTM' FROM dual UNION ALL
     SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'QUANTITY' FROM dual UNION ALL
-    SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'FINAL_QUANTITY' FROM dual
+    SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'FINAL_QUANTITY' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'SA_ID' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'C1_SNAPSHOT_DT' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'CM_SNAPSHOT_TYPE_FLG' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'ACCT_ID' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'CUR_BAL' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'TOT_BAL' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'ARS_AMT1' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'ARS_AMT2' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'ARS_AMT3' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'ARS_AMT4' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'ARS_AMT5' FROM dual
 )
 SELECT e.table_name,
        COUNT(*) AS expected_columns,
@@ -144,7 +161,18 @@ WITH expected AS (
     SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'USAGE_STATUS_UPD_DTTM' FROM dual UNION ALL
     SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'LOAD_DTTM' FROM dual UNION ALL
     SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'QUANTITY' FROM dual UNION ALL
-    SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'FINAL_QUANTITY' FROM dual
+    SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'FINAL_QUANTITY' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'SA_ID' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'C1_SNAPSHOT_DT' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'CM_SNAPSHOT_TYPE_FLG' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'ACCT_ID' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'CUR_BAL' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'TOT_BAL' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'ARS_AMT1' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'ARS_AMT2' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'ARS_AMT3' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'ARS_AMT4' FROM dual UNION ALL
+    SELECT 'CMS_SA_SNAPSHOT', 'ARS_AMT5' FROM dual
 )
 SELECT e.table_name, e.column_name
 FROM expected e
@@ -241,4 +269,19 @@ SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'DRIVER_ALL_NULL', COUNT(*),
        SUM(CASE WHEN usage_start_dttm IS NULL AND usage_cre_dttm IS NULL AND usage_status_upd_dttm IS NULL THEN 1 ELSE 0 END),
        ROUND(SUM(CASE WHEN usage_start_dttm IS NULL AND usage_cre_dttm IS NULL AND usage_status_upd_dttm IS NULL THEN 1 ELSE 0 END) * 100 / NULLIF(COUNT(*), 0), 4)
 FROM cisadm.d1_usage_scalar_dtl_rpt_curr
+UNION ALL
+SELECT 'CMS_SA_SNAPSHOT', 'SA_ID', COUNT(*),
+       SUM(CASE WHEN sa_id IS NULL THEN 1 ELSE 0 END),
+       ROUND(SUM(CASE WHEN sa_id IS NULL THEN 1 ELSE 0 END) * 100 / NULLIF(COUNT(*), 0), 4)
+FROM cisadm.cms_sa_snapshot
+UNION ALL
+SELECT 'CMS_SA_SNAPSHOT', 'ACCT_ID', COUNT(*),
+       SUM(CASE WHEN acct_id IS NULL THEN 1 ELSE 0 END),
+       ROUND(SUM(CASE WHEN acct_id IS NULL THEN 1 ELSE 0 END) * 100 / NULLIF(COUNT(*), 0), 4)
+FROM cisadm.cms_sa_snapshot
+UNION ALL
+SELECT 'CMS_SA_SNAPSHOT', 'CM_SNAPSHOT_TYPE_FLG', COUNT(*),
+       SUM(CASE WHEN cm_snapshot_type_flg IS NULL THEN 1 ELSE 0 END),
+       ROUND(SUM(CASE WHEN cm_snapshot_type_flg IS NULL THEN 1 ELSE 0 END) * 100 / NULLIF(COUNT(*), 0), 4)
+FROM cisadm.cms_sa_snapshot
 ;

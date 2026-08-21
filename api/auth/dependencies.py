@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Annotated, Callable
 
 import jwt
@@ -29,6 +29,9 @@ class AuthContext:
     workstreams: list[str]
     disabled: bool = False
     must_change_password: bool = False
+    # Set ONLY for an admin who has switched tenant in the header control. It is the
+    # tenant they are currently looking at, never the tenant they belong to.
+    active_organization_id: str | None = None
 
     def has_permission(self, permission: str) -> bool:
         return permission in self.permissions
@@ -41,6 +44,11 @@ class AuthContext:
         return workstreams_allowed(self.workstreams, workstream_id)
 
     def effective_organization_id(self) -> str | None:
+        # An admin's in-session tenant choice wins. It is validated against the registry
+        # and against the admin role before it ever reaches this field, so by the time it
+        # is set it is already known to be legitimate.
+        if self.active_organization_id:
+            return self.active_organization_id
         if self.organization_id:
             return self.organization_id
         if self.disabled:
@@ -89,13 +97,43 @@ def _dev_context() -> AuthContext:
     )
 
 
+def _resolve_active_organization(role: str, requested: str | None) -> str | None:
+    """The tenant an admin has switched to, or None.
+
+    THREE THINGS HAVE TO BE TRUE and all three are checked here rather than at the call
+    sites, because a tenant override that leaks is a data-separation failure, not a bug:
+
+      the caller is an ADMIN -- for anyone else the header is IGNORED, not rejected.
+      Ignoring is the fail-safe: a non-admin who sends it gets their own tenant's data,
+      which is the correct answer to their request, instead of an error that confirms
+      the header does something.
+
+      the value NAMES A REGISTERED ORGANIZATION. Anything else is discarded, so the
+      header can never reach a connection string or a catalog path.
+
+      the value is used only to CHOOSE among configured tenants. It is never a
+      connection detail itself.
+    """
+    if not requested or role != "admin":
+        return None
+    from api.organizations import is_valid_org_id
+    return requested if is_valid_org_id(requested) else None
+
+
 def _resolve_auth_context(
     authorization: str | None,
     *,
     allow_password_change_pending: bool,
+    active_organization: str | None = None,
 ) -> AuthContext:
     if auth_disabled():
-        return _dev_context()
+        # AuthContext is frozen on purpose -- a request's identity must not be editable
+        # once resolved -- so the dev context is REPLACED rather than mutated.
+        ctx = _dev_context()
+        return replace(
+            ctx,
+            active_organization_id=_resolve_active_organization(ctx.role, active_organization),
+        )
 
     if not authorization or not authorization.lower().startswith("bearer "):
         raise HTTPException(status_code=401, detail="Authentication required")
@@ -127,11 +165,20 @@ def _resolve_auth_context(
         permissions=set(public["permissions"]),
         workstreams=public["workstreams"],
         must_change_password=public["must_change_password"],
+        active_organization_id=_resolve_active_organization(
+            public["role"], active_organization),
     )
 
 
-def get_auth_context(authorization: str | None = Header(None)) -> AuthContext:
-    return _resolve_auth_context(authorization, allow_password_change_pending=False)
+def get_auth_context(
+    authorization: str | None = Header(None),
+    x_organization_id: str | None = Header(None),
+) -> AuthContext:
+    return _resolve_auth_context(
+        authorization,
+        allow_password_change_pending=False,
+        active_organization=x_organization_id,
+    )
 
 
 def get_session_auth_context(authorization: str | None = Header(None)) -> AuthContext:

@@ -1,6 +1,10 @@
 CREATE OR REPLACE PROCEDURE cisadm.refresh_d1_msrmt_rpt_curr AS
-    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12);
+    v_window_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -3);
+    v_retain_start DATE := ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24);
 BEGIN
+    DELETE FROM cisadm.d1_msrmt_rpt_curr
+    WHERE msrmt_dttm < v_retain_start;
+
     DELETE FROM cisadm.d1_msrmt_rpt_curr
     WHERE msrmt_dttm >= v_window_start;
 

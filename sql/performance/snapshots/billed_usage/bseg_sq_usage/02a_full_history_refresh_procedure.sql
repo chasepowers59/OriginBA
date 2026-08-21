@@ -120,6 +120,7 @@ BEGIN
         INNER JOIN cisadm.ci_bill bill
             ON bill.bill_id = bseg.bill_id
            AND bill.bill_stat_flg = 'C '
+           AND bill.bill_dt >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24)
         GROUP BY
             sq.bseg_id,
             sq.uom_cd,
@@ -131,6 +132,7 @@ BEGIN
     INNER JOIN cisadm.ci_bill bill
         ON bill.bill_id = bseg.bill_id
        AND bill.bill_stat_flg = 'C '
+       AND bill.bill_dt >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -24)
     LEFT JOIN cisadm.ci_sa sa
         ON sa.sa_id = bseg.sa_id
     LEFT JOIN (
@@ -186,10 +188,10 @@ BEGIN
        AND bseg_status_l.field_value = bseg.bseg_stat_flg
        AND bseg_status_l.language_cd = 'ENG'
     LEFT JOIN cisadm.ci_bill_cyc_l bill_bill_cyc_l
-        ON bill_bill_cyc_l.bill_cyc_cd = COALESCE(NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
+        ON TRIM(bill_bill_cyc_l.bill_cyc_cd) = COALESCE(NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
        AND bill_bill_cyc_l.language_cd = 'ENG'
     LEFT JOIN cisadm.ci_bill_cyc_l bseg_bill_cyc_l
-        ON bseg_bill_cyc_l.bill_cyc_cd = COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
+        ON TRIM(bseg_bill_cyc_l.bill_cyc_cd) = COALESCE(NULLIF(TRIM(bseg.bill_cyc_cd), ''), NULLIF(TRIM(bill.bill_cyc_cd), ''), NULLIF(TRIM(acct.bill_cyc_cd), ''))
        AND bseg_bill_cyc_l.language_cd = 'ENG'
     LEFT JOIN cisadm.ci_cust_cl_l cust_cl_l
         ON cust_cl_l.cust_cl_cd = acct.cust_cl_cd
