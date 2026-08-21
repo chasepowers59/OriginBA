@@ -96,11 +96,13 @@ def _workstream_for_snapshot(snapshot_id: str, organization_id: str | None = Non
 
 
 def _require_snapshot_access(ctx: AuthContext, snapshot_id: str) -> dict[str, Any]:
-    # The caller's own organization decides WHICH catalog this id is looked up in, so a
-    # Postgres tenant and an Oracle tenant can hold different snapshots under the same
-    # route without either seeing the other's.
+    # The caller's EFFECTIVE organization decides which catalog this id is looked up in --
+    # effective, not home. Using ctx.organization_id here meant an admin who switched
+    # tenant still had every snapshot resolved against the tenant they belong to, so the
+    # switcher changed the lists and not the lookups: "Unknown snapshot: rpt_aged_debt"
+    # against a catalog the sidebar was displaying at that moment.
     try:
-        snapshot = get_snapshot(snapshot_id, getattr(ctx, "organization_id", None))
+        snapshot = get_snapshot(snapshot_id, ctx.effective_organization_id())
     except CatalogError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     assert_workstream_access(ctx, snapshot["workstream"])
@@ -183,7 +185,7 @@ def snapshot_metadata(
     snapshot = _require_snapshot_access(ctx, snapshot_id)
     default_filter = _default_date_filter(snapshot)
     return {
-        "id": snapshot_id.upper(),
+        "id": snapshot_id,
         "client": org_id,
         "organization_id": org_id,
         **snapshot,
@@ -233,9 +235,9 @@ def snapshot_scope_options(
     snapshot = _require_snapshot_access(ctx, snapshot_id)
 
     allowed_scope = {
-        f["field"].upper(): f for f in snapshot.get("scope_filters", [])
+        f["field"]: f for f in snapshot.get("scope_filters", [])
     }
-    field = field_id.upper()
+    field = field_id if field_id in allowed_fields(snapshot) else field_id.upper()
     if field not in allowed_scope:
         raise HTTPException(status_code=400, detail=f"Scope filter not allowed: {field_id}")
     if field not in allowed_fields(snapshot):
@@ -305,8 +307,10 @@ def snapshot_sample_rows(
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Sample rows failed: {exc}") from exc
 
+    # Label lookup keyed BOTH ways: an Oracle snapshot's columns come back uppercase from
+    # the driver, a canvas's come back exactly as declared.
     field_labels = {
-        f["id"].upper(): f.get("label", f["id"]) for f in snapshot.get("fields", [])
+        f["id"]: f.get("label", f["id"]) for f in snapshot.get("fields", [])
     }
     serialized_rows = [
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}
@@ -320,7 +324,8 @@ def snapshot_sample_rows(
         "snapshot_id": snapshot_id,
         "grain_description": snapshot.get("grain_description"),
         "columns": columns,
-        "column_labels": {col: field_labels.get(col.upper(), col) for col in columns},
+        "column_labels": {col: field_labels.get(col, field_labels.get(col.upper(), col))
+                          for col in columns},
         "rows": serialized_rows,
         "row_count": len(serialized_rows),
         "sql": sql,

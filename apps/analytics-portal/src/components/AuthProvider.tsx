@@ -73,7 +73,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const status = await fetchAuthStatus();
     setEnabled(status.enabled);
     if (!status.enabled) {
-      setUser(null);
+      // Open-access mode still HAS a user -- the API answers /auth/me with its dev
+      // context, an admin. Setting null here made the two modes diverge exactly where it
+      // matters: anything keyed off a role silently disappeared, so the admin tenant
+      // switcher was invisible in the only mode you can browse without signing in, and
+      // looked like it had never been built.
+      try {
+        setUser(await fetchCurrentUser());
+      } catch {
+        setUser(null);
+      }
       setLoading(false);
       return;
     }

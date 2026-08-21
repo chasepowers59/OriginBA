@@ -34,7 +34,8 @@ def run_kpi_query(
     *,
     organization_id: str,
 ) -> tuple[list[str], list[list[Any]]]:
-    snapshot = get_snapshot(snapshot_id)
+    # organization_id is already a parameter here; the catalog must follow it.
+    snapshot = get_snapshot(snapshot_id, organization_id)
     filters = list(query_spec.get("filters") or [])
     if extra_filters:
         filters.extend(extra_filters)
@@ -104,7 +105,7 @@ def execute_kpi_definition(
         "explore_report_id": kpi.get("explore_report_id"),
     }
     try:
-        snapshot = get_snapshot(snapshot_id)
+        snapshot = get_snapshot(snapshot_id, organization_id)
         date_field = snapshot.get("required_date_field")
         if not date_field:
             raise ValueError("Snapshot has no required date field")

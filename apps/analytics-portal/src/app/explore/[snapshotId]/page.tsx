@@ -12,7 +12,10 @@ type PageProps = {
 
 export default async function ExplorePage({ params }: PageProps) {
   const { snapshotId } = await params;
-  const id = snapshotId.toUpperCase();
+  // AS WRITTEN. Upper-casing was safe while a snapshot was always an Oracle table;
+  // a dbt canvas is lowercase rpt_*, and this turned every explore link into
+  // "Unknown snapshot: RPT_AGED_DEBT" against a catalog holding rpt_aged_debt.
+  const id = snapshotId;
 
   let index;
   let metadata;

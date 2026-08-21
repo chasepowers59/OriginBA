@@ -91,21 +91,31 @@ export function roleLabel(role: PortalRole): string {
 
 /** The tenant an admin is currently viewing.
  *
- * Stored per browser session, not per user record: it is a VIEW, not an assignment, and
- * it must not survive a sign-out. The API ignores this header for anyone who is not an
- * admin, so a stale value can never widen what a non-admin sees.
+ * A COOKIE, not sessionStorage. This app server-renders its pages, and a server render
+ * cannot see sessionStorage -- so the first paint used the admin's HOME tenant while
+ * every client-side fetch used the switched one. The header said DEV and the page below
+ * it was still listing CityCorp's processes, with no error anywhere to explain it.
+ *
+ * A session cookie is visible to both halves and still disappears when the browser
+ * closes, which is the property that matters: this is a VIEW, not an assignment, and it
+ * must not outlive the session. The API ignores the header for anyone who is not an
+ * admin, so a stale cookie can never widen what a non-admin sees.
  */
 const ACTIVE_ORG_KEY = "portal_active_organization";
 
 export function getActiveOrganization(): string | null {
-  if (typeof window === "undefined") return null;
-  return window.sessionStorage.getItem(ACTIVE_ORG_KEY);
+  if (typeof document === "undefined") return null;
+  const hit = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${ACTIVE_ORG_KEY}=`));
+  return hit ? decodeURIComponent(hit.split("=")[1]) : null;
 }
 
 export function setActiveOrganization(orgId: string | null): void {
-  if (typeof window === "undefined") return;
-  if (orgId) window.sessionStorage.setItem(ACTIVE_ORG_KEY, orgId);
-  else window.sessionStorage.removeItem(ACTIVE_ORG_KEY);
+  if (typeof document === "undefined") return;
+  document.cookie = orgId
+    ? `${ACTIVE_ORG_KEY}=${encodeURIComponent(orgId)}; path=/; SameSite=Lax`
+    : `${ACTIVE_ORG_KEY}=; path=/; Max-Age=0; SameSite=Lax`;
 }
 
 export function activeOrganizationHeader(): Record<string, string> {

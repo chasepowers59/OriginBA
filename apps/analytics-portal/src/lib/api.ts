@@ -38,6 +38,12 @@ async function resolveRequestHeaders(init?: RequestInit): Promise<HeadersInit> {
       if (token) {
         merged.Authorization = `Bearer ${decodeURIComponent(token)}`;
       }
+      // The admin's tenant choice, forwarded on the SERVER side as well. Without this
+      // the first paint of every page renders against the admin's home tenant.
+      const org = jar.get("portal_active_organization")?.value;
+      if (org) {
+        merged["X-Organization-Id"] = decodeURIComponent(org);
+      }
     } catch {
       /* ignore — not in a server context */
     }
