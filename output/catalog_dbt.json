@@ -272,6 +272,10 @@
    "id": "financials",
    "reports": [
     {
+     "report_id": "billed_not_revenue",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
      "report_id": "financial_position",
      "snapshot_id": "rpt_financial_txn"
     },
@@ -785,7 +789,7 @@
   },
   "rpt_aged_debt": {
    "data_model": {
-    "columns_traced_to_cisadm": 9,
+    "columns_traced_to_cisadm": 11,
     "domain_table": "rpt_aged_debt",
     "driving_table": "CI_BILL_CYC_L",
     "field_groups": [
@@ -801,6 +805,9 @@
        "Debt Class Code",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "SA Status",
        "Utility Type",
        "Revenue Class",
@@ -866,6 +873,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "SA Status",
@@ -980,6 +999,30 @@
      "label": "SA Type Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "debt",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "debt",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "debt",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "",
@@ -2203,7 +2246,7 @@
   },
   "rpt_bill_segment": {
    "data_model": {
-    "columns_traced_to_cisadm": 30,
+    "columns_traced_to_cisadm": 32,
     "domain_table": "rpt_bill_segment",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -2297,6 +2340,9 @@
        "Service Agreement ID",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "SA Status",
        "Utility Type",
        "Revenue Class",
@@ -2617,6 +2663,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "SA Status",
@@ -3381,6 +3439,30 @@
      "type": "text"
     },
     {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "billing",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "billing",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "billing",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
      "description": "",
      "group": "billing",
      "id": "SA Status",
@@ -3828,11 +3910,27 @@
    "premade_reports": [
     {
      "chart_type": "bar",
-     "description": "Billed revenue is FROZEN segments only. Unfrozen segments are still in flight and cancelled ones were reversed; counting either inflates the total.",
+     "description": "Billed revenue is FROZEN segments only. Unfrozen segments are still in flight and cancelled ones were reversed; counting either inflates the total. Not every billed line is revenue either: a payment arrangement is billed but only reschedules debt, so it is split out here rather than silently dropped.",
      "dimensions": [
       "SA Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      },
+      {
+       "field": "Is Revenue Bearing",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "billed_revenue_by_type",
      "measures": [
       {
@@ -3840,8 +3938,41 @@
        "field": "Billed Amount"
       }
      ],
-     "title": "What was billed, by service agreement type?",
+     "title": "What revenue was billed, by service agreement type?",
      "workstream_label": "Billing"
+    },
+    {
+     "chart_type": "bar",
+     "description": "Payment arrangements, cash deposits, write-offs, loans and non-billed budgets all put money on a bill without earning any. A payment arrangement reschedules debt that was already billed on another agreement, so counting it as revenue books the same money twice; a deposit is the customer's own money, held as security and refundable. This is the amount a revenue report has to exclude, and the reason it excludes it.",
+     "dimensions": [
+      "SA Special Role"
+     ],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      },
+      {
+       "field": "Is Revenue Bearing",
+       "op": "eq",
+       "value": false
+      }
+     ],
+     "id": "billed_not_revenue",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Billed Amount"
+      }
+     ],
+     "title": "How much of what we bill is not revenue?",
+     "workstream_label": "Revenue"
     },
     {
      "chart_type": "pie",
@@ -4078,7 +4209,7 @@
   },
   "rpt_bill_segment_read": {
    "data_model": {
-    "columns_traced_to_cisadm": 30,
+    "columns_traced_to_cisadm": 32,
     "domain_table": "rpt_bill_segment_read",
     "driving_table": "CI_BSEG",
     "field_groups": [
@@ -4119,6 +4250,9 @@
        "Service Period End",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "Utility Type",
        "Account ID",
        "Main Customer Name",
@@ -4144,8 +4278,10 @@
      "CI_BSEG",
      "CI_BSEG_READ",
      "CI_CUST_CL_L",
+     "CI_LOOKUP_VAL_L",
      "CI_PREM",
      "CI_SA",
+     "CI_SA_TYPE",
      "CI_SA_TYPE_L",
      "CI_SP",
      "CI_SQI_L",
@@ -4270,6 +4406,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "Utility Type",
@@ -4590,6 +4738,30 @@
      "type": "text"
     },
     {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "billing",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "billing",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "billing",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
      "description": "",
      "group": "billing",
      "id": "Utility Type",
@@ -4805,7 +4977,7 @@
   },
   "rpt_billable_charge": {
    "data_model": {
-    "columns_traced_to_cisadm": 36,
+    "columns_traced_to_cisadm": 38,
     "domain_table": "rpt_billable_charge",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -4836,6 +5008,9 @@
        "Service Agreement ID",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "SA Status",
        "SA Status Code",
        "Utility Type",
@@ -4976,6 +5151,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "SA Status",
@@ -5252,6 +5439,30 @@
      "type": "text"
     },
     {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "billing",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "billing",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "billing",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
      "description": "English description of \"SA Status Code\". Group and report on this; filter on the code.",
      "group": "billing",
      "id": "SA Status",
@@ -5492,7 +5703,7 @@
   },
   "rpt_billed_charge": {
    "data_model": {
-    "columns_traced_to_cisadm": 50,
+    "columns_traced_to_cisadm": 52,
     "domain_table": "rpt_billed_charge",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -5518,6 +5729,9 @@
        "Service Agreement ID",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "SA Status",
        "SA Status Code",
        "Utility Type",
@@ -5699,6 +5913,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "SA Status",
@@ -6017,6 +6243,30 @@
      "label": "SA Type Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "billing",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "billing",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "billing",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "English description of \"SA Status Code\". Group and report on this; filter on the code.",
@@ -6512,7 +6762,7 @@
   },
   "rpt_billed_usage": {
    "data_model": {
-    "columns_traced_to_cisadm": 28,
+    "columns_traced_to_cisadm": 30,
     "domain_table": "rpt_billed_usage",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -6553,6 +6803,9 @@
        "Service Agreement ID",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "SA Status",
        "Utility Type",
        "Revenue Class",
@@ -6747,6 +7000,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "SA Status",
@@ -7093,6 +7358,30 @@
      "label": "SA Type Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "billing",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "billing",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "billing",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "",
@@ -10586,7 +10875,7 @@
   },
   "rpt_debt_process": {
    "data_model": {
-    "columns_traced_to_cisadm": 12,
+    "columns_traced_to_cisadm": 14,
     "domain_table": "rpt_debt_process",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -10634,6 +10923,9 @@
        "Collection Class Code",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "SA Status",
        "Utility Type",
        "Revenue Class",
@@ -10807,6 +11099,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "SA Status",
@@ -11161,6 +11465,30 @@
      "label": "SA Type Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "debt",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "debt",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "debt",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "",
@@ -14448,7 +14776,7 @@
   },
   "rpt_financial_txn": {
    "data_model": {
-    "columns_traced_to_cisadm": 44,
+    "columns_traced_to_cisadm": 46,
     "domain_table": "rpt_financial_txn",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -14504,6 +14832,9 @@
        "Service Agreement ID",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "SA Status",
        "Utility Type",
        "Revenue Class",
@@ -14761,6 +15092,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "SA Status",
@@ -15249,6 +15592,30 @@
      "type": "text"
     },
     {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "finance",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "finance",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "finance",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
      "description": "",
      "group": "finance",
      "id": "SA Status",
@@ -15544,11 +15911,27 @@
     },
     {
      "chart_type": "bar",
-     "description": "Revenue class is how a utility reports itself to a regulator. Anything unclassified here is revenue that cannot be reported.",
+     "description": "Revenue class is how a utility reports itself to a regulator. Anything unclassified here is revenue that cannot be reported. Non-revenue service agreements are excluded \u2014 see \"How much of what we bill is not revenue?\" for what came out and why.",
      "dimensions": [
       "Revenue Class"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Bill Segment",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Revenue Bearing",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "revenue_by_class",
      "measures": [
       {
@@ -15582,7 +15965,7 @@
   },
   "rpt_gl": {
    "data_model": {
-    "columns_traced_to_cisadm": 26,
+    "columns_traced_to_cisadm": 28,
     "domain_table": "rpt_gl",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -15616,6 +15999,9 @@
        "Service Agreement ID",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "SA Status",
        "Utility Type",
        "Revenue Class",
@@ -15752,6 +16138,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "SA Status",
@@ -16018,6 +16416,30 @@
      "label": "SA Type Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "finance",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "finance",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "finance",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "",
@@ -17603,7 +18025,7 @@
   },
   "rpt_payment": {
    "data_model": {
-    "columns_traced_to_cisadm": 29,
+    "columns_traced_to_cisadm": 31,
     "domain_table": "rpt_payment",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -17640,6 +18062,9 @@
        "Service Agreement ID",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "SA Status",
        "Utility Type",
        "Revenue Class",
@@ -17791,6 +18216,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "SA Status",
@@ -18057,6 +18494,30 @@
      "label": "SA Type Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "cashiering",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "cashiering",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "cashiering",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "",
@@ -20235,7 +20696,7 @@
   },
   "rpt_rate_schedule_history": {
    "data_model": {
-    "columns_traced_to_cisadm": 10,
+    "columns_traced_to_cisadm": 12,
     "domain_table": "rpt_rate_schedule_history",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -20252,6 +20713,9 @@
        "Is Rate Change",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "SA Status",
        "Utility Type",
        "Account ID",
@@ -20278,6 +20742,7 @@
      "CI_LOOKUP_VAL_L",
      "CI_SA",
      "CI_SA_RS_HIST",
+     "CI_SA_TYPE",
      "CI_SA_TYPE_L"
     ],
     "trusted_measures": []
@@ -20330,6 +20795,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "SA Status",
@@ -20448,6 +20925,30 @@
      "label": "SA Type Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "billing",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "billing",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "billing",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "",
@@ -20769,7 +21270,7 @@
   },
   "rpt_sa_aged_balance": {
    "data_model": {
-    "columns_traced_to_cisadm": 10,
+    "columns_traced_to_cisadm": 12,
     "domain_table": "rpt_sa_aged_balance",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -20790,6 +21291,9 @@
        "Oldest Debt Band",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "SA Status",
        "Utility Type",
        "Revenue Class",
@@ -20866,6 +21370,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "SA Status",
@@ -21028,6 +21544,30 @@
      "label": "SA Type Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "debt",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "debt",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "debt",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "",
@@ -21250,7 +21790,7 @@
   },
   "rpt_service_agreement": {
    "data_model": {
-    "columns_traced_to_cisadm": 24,
+    "columns_traced_to_cisadm": 26,
     "domain_table": "rpt_service_agreement",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -21259,6 +21799,9 @@
        "Service Agreement ID",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "SA Status",
        "SA Status Code",
        "Utility Type",
@@ -21397,6 +21940,18 @@
      "label": "SA Type Code"
     },
     {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
+    },
+    {
      "id": "SA Status",
      "label": "SA Status"
     },
@@ -21529,6 +22084,30 @@
      "label": "SA Type Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "billing",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "billing",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "billing",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "English description of \"SA Status Code\". Group and report on this; filter on the code.",
@@ -22831,7 +23410,7 @@
   },
   "rpt_unbilled_revenue": {
    "data_model": {
-    "columns_traced_to_cisadm": 13,
+    "columns_traced_to_cisadm": 15,
     "domain_table": "rpt_unbilled_revenue",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -22857,6 +23436,9 @@
        "Has Usage After Stop",
        "SA Type",
        "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
        "Utility Type",
        "Revenue Class",
        "Revenue Class Code",
@@ -22959,6 +23541,18 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
     },
     {
      "id": "Utility Type",
@@ -23153,6 +23747,30 @@
      "label": "SA Type Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "billing",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "billing",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "billing",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "",

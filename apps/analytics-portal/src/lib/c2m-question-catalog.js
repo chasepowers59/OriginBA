@@ -209,18 +209,45 @@ export const QUESTIONS = [
     id: "billed-revenue-by-type",
     process: "usage", workstream: "Billing",
     kind: "total",
-    title: "What was billed, by service agreement type?",
-    why: "Billed revenue is FROZEN segments only. Unfrozen segments are still in flight and cancelled ones were reversed; counting either inflates the total.",
+    // Declared for the portal, which builds its own governed query and never runs the
+    // SQL below. Without these the tile showed the unrestricted total under a caption
+    // promising frozen revenue only, and ranked Payment Arrangement first.
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true},
+              {"field": "Is Cancelled", "op": "eq", "value": false},
+              {"field": "Is Revenue Bearing", "op": "eq", "value": true}],
+    title: "What revenue was billed, by service agreement type?",
+    why: "Billed revenue is FROZEN segments only. Unfrozen segments are still in flight and cancelled ones were reversed; counting either inflates the total. Not every billed line is revenue either: a payment arrangement is billed but only reschedules debt, so it is split out here rather than silently dropped.",
     canvas: "rpt_bill_segment",
     axis: "SA Type", value: "Billed Amount",
     sql: `select coalesce("SA Type", "SA Type Code") as "SA Type",
                  coalesce("Utility Type", '(unset)') as "Utility Type",
+                 case when "Is Revenue Bearing" then 'Revenue'
+                      else coalesce("SA Special Role", 'Not revenue') end as "Revenue Or Not",
                  count(*)::bigint as "Segments",
                  round(sum("Billed Amount")::numeric, 2) as "Billed Amount",
                  round(avg("Billed Amount")::numeric, 2) as "Average Segment",
                  round(sum("Billed Usage")::numeric, 2) as "Billed Usage"
           from reporting.rpt_bill_segment
           where "Is Frozen" and not "Is Cancelled"
+          group by 1, 2, 3 order by 5 desc nulls last`,
+  }),
+  q({
+    id: "billed-not-revenue",
+    process: "financial", workstream: "Revenue",
+    kind: "total", unit: "money",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true},
+              {"field": "Is Cancelled", "op": "eq", "value": false},
+              {"field": "Is Revenue Bearing", "op": "eq", "value": false}],
+    title: "How much of what we bill is not revenue?",
+    why: "Payment arrangements, cash deposits, write-offs, loans and non-billed budgets all put money on a bill without earning any. A payment arrangement reschedules debt that was already billed on another agreement, so counting it as revenue books the same money twice; a deposit is the customer's own money, held as security and refundable. This is the amount a revenue report has to exclude, and the reason it excludes it.",
+    canvas: "rpt_bill_segment",
+    axis: "SA Special Role", value: "Billed Amount",
+    sql: `select coalesce("SA Special Role", '(no special role)') as "SA Special Role",
+                 coalesce("SA Type", "SA Type Code") as "SA Type",
+                 count(*)::bigint as "Segments",
+                 round(sum("Billed Amount")::numeric, 2) as "Billed Amount"
+          from reporting.rpt_bill_segment
+          where "Is Frozen" and not "Is Cancelled" and not "Is Revenue Bearing"
           group by 1, 2 order by 4 desc nulls last`,
   }),
   q({
@@ -1208,8 +1235,11 @@ export const QUESTIONS = [
     id: "revenue-by-class",
     process: "financial", workstream: "Revenue",
     kind: "total", unit: "money",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true},
+              {"field": "Is Bill Segment", "op": "eq", "value": true},
+              {"field": "Is Revenue Bearing", "op": "eq", "value": true}],
     title: "Where does revenue come from, by revenue class?",
-    why: "Revenue class is how a utility reports itself to a regulator. Anything unclassified here is revenue that cannot be reported.",
+    why: "Revenue class is how a utility reports itself to a regulator. Anything unclassified here is revenue that cannot be reported. Non-revenue service agreements are excluded — see \"How much of what we bill is not revenue?\" for what came out and why.",
     canvas: "rpt_financial_txn",
     axis: "Revenue Class", value: "Current Amount",
     sql: `select coalesce("Revenue Class", "Revenue Class Code", '(unclassified)') as "Revenue Class",
@@ -1217,7 +1247,7 @@ export const QUESTIONS = [
                  count(*)::bigint as "Transactions",
                  round(sum("Current Amount")::numeric, 2) as "Current Amount"
           from reporting.rpt_financial_txn
-          where "Is Frozen" and "Is Bill Segment"
+          where "Is Frozen" and "Is Bill Segment" and "Is Revenue Bearing"
           group by 1, 2 order by 4 desc nulls last`,
   }),
 

@@ -209,6 +209,20 @@ def parse_questions() -> list[dict[str, str]]:
     portal builds its own query from dimensions and measures. Taking the SQL would
     bypass the governed query builder and its row caps, which is the one thing a
     client-facing app must not do.
+
+    WHICH IS WHY A QUESTION MUST DECLARE ITS FILTERS SEPARATELY. Reading only the axis
+    and the measure meant every WHERE clause in that file was dropped on the floor, and
+    the tile the client saw was the unrestricted aggregate under the question's own
+    words. "What was billed" says in its description that it counts frozen segments
+    only; the chart counted cancelled and in-flight ones too. Worse, a revenue chart
+    ranked "Payment Arrangement" top -- money that reschedules debt already billed
+    elsewhere -- because the exclusion lived in SQL nobody here read. A caption that
+    promises a restriction the query does not apply is the most expensive kind of wrong:
+    it looks answered.
+
+    Declared as metadata rather than parsed out of the SQL, because the query builder
+    validates every field and operator it is handed, and a regex over a WHERE clause
+    would be a second, weaker parser feeding the same governed path.
     """
     if not QUESTION_CATALOG.exists():
         return []
@@ -218,11 +232,26 @@ def parse_questions() -> list[dict[str, str]]:
         def field(name):
             m = re.search(name + r':\s*"((?:[^"\\]|\\.)*)"', block)
             return m.group(1).replace('\\"', '"') if m else ""
+
+        def filters():
+            m = re.search(r"filters:\s*(\[.*?\])\s*,\s*\n", block, re.S)
+            if not m:
+                return []
+            try:
+                # Written with quoted keys in the catalogue so it is JSON as well as JS.
+                # A malformed literal returns no filters rather than raising: attach()
+                # then drops the report, which is the same honest signal as a bad column.
+                got = json.loads(m.group(1))
+            except json.JSONDecodeError:
+                return [{"field": "!malformed", "op": "eq", "value": None}]
+            return got if isinstance(got, list) else []
+
         out.append({
             "id": field("id"), "title": field("title"), "why": field("why"),
             "canvas": field("canvas"), "axis": field("axis"), "value": field("value"),
             "kind": field("kind"), "process": field("process"),
             "workstream": field("workstream"), "target": field("target"),
+            "filters": filters(),
         })
     return [q for q in out if q["id"] and q["canvas"]]
 
@@ -255,13 +284,25 @@ def attach_reports(snapshots: dict[str, Any]) -> list[dict[str, Any]]:
             measure = {"field": q["value"], "agg": "max" if q["kind"] == "outlier" else "sum"}
         else:
             measure = {"field": "*", "agg": "count"}
+        # A filter is held to the same standard as the axis: it must name a real field on
+        # this canvas, or the question is about an older model and the whole report is
+        # dropped. Filters may reference a boolean the canvas exposes as a dimension, or
+        # any other selectable field, so both sets count as valid.
+        selectable = dims | meas
+        bad_filter = any(
+            not isinstance(f, dict) or f.get("field") not in selectable
+            for f in q["filters"]
+        )
+        if bad_filter:
+            dropped += 1
+            continue
         report = {
             "id": q["id"].replace("-", "_"),
             "title": q["title"],
             "description": q["why"],
             "dimensions": [q["axis"]],
             "measures": [measure],
-            "filters": [],
+            "filters": q["filters"],
             "chart_type": CHART.get(q["kind"], "bar"),
             "workstream_label": q["workstream"],
         }
