@@ -2309,6 +2309,7 @@
        "Window Start Date",
        "Due Date",
        "Billed Amount",
+       "Itemized Charge Amount",
        "Consumption Charge Amount",
        "Demand Charge Amount",
        "Service Quantity Charge Amount",
@@ -2420,6 +2421,7 @@
     ],
     "trusted_measures": [
      "Billed Amount",
+     "Itemized Charge Amount",
      "Consumption Charge Amount",
      "Demand Charge Amount",
      "Service Quantity Charge Amount",
@@ -3005,10 +3007,18 @@
      "type": "timestamp"
     },
     {
-     "description": "Currency measure, additive at this canvas's grain.",
+     "description": "What the segment billed: the sum of its calculation HEADERS (CI_BSEG_CALC.CALC_AMT). Not the calc lines: lines are itemisation and some clients itemise selectively (Newark: most headers carry no lines), so a line sum undercounts there. See \"Itemized Charge Amount\" for what the lines cover.",
      "group": "billing",
      "id": "Billed Amount",
      "label": "Billed Amount",
+     "role": "measure",
+     "type": "numeric"
+    },
+    {
+     "description": "The part of \"Billed Amount\" the calc LINES itemise. Equals \"Billed Amount\" at a fully-itemising client (Ellensburg); partial where itemisation is selective (Newark). The charge-basis split columns partition THIS figure, to the cent.",
+     "group": "billing",
+     "id": "Itemized Charge Amount",
+     "label": "Itemized Charge Amount",
      "role": "measure",
      "type": "numeric"
     },
@@ -3675,6 +3685,16 @@
       "min",
       "max"
      ],
+     "id": "Itemized Charge Amount",
+     "label": "Itemized Charge Amount"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
      "id": "Consumption Charge Amount",
      "label": "Consumption Charge Amount"
     },
@@ -4228,6 +4248,7 @@
    "table_name": "rpt_bill_segment",
    "trusted_measures": [
     "Billed Amount",
+    "Itemized Charge Amount",
     "Consumption Charge Amount",
     "Demand Charge Amount",
     "Service Quantity Charge Amount",
@@ -6692,7 +6713,7 @@
      "type": "text"
     },
     {
-     "description": "Currency measure, additive at this canvas's grain.",
+     "description": "What the segment billed: the sum of its calculation HEADERS (CI_BSEG_CALC.CALC_AMT). Not the calc lines: lines are itemisation and some clients itemise selectively (Newark: most headers carry no lines), so a line sum undercounts there. See \"Itemized Charge Amount\" for what the lines cover.",
      "group": "billing",
      "id": "Billed Amount",
      "label": "Billed Amount",
