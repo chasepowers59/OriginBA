@@ -58,7 +58,8 @@ def load_catalog(*, force: bool = False, organization_id: str | None = None) -> 
         alt = next((p for p in CATALOGS.values() if p.exists()), None)
         if alt is None:
             raise CatalogError(
-                f"Missing {path}. Run: python3 scripts/build_dbt_reporting_catalog.py")
+                f"Missing {path}. The generator lives with the contracts it derives from: "
+                f"run `.venv/bin/python scripts/build_portal_catalog.py` in originba_dbt.")
         path = alt
     mtime = path.stat().st_mtime
     cached = _caches.get(name)
