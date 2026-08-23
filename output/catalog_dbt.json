@@ -1709,7 +1709,7 @@
   },
   "rpt_batch": {
    "data_model": {
-    "columns_traced_to_cisadm": 9,
+    "columns_traced_to_cisadm": 10,
     "domain_table": "rpt_batch",
     "driving_table": "CI_BATCH_CTRL",
     "field_groups": [
@@ -1718,6 +1718,7 @@
        "Batch Code",
        "Program",
        "Run Number",
+       "Rerun Number",
        "Run Status",
        "Run Status Code",
        "Batch Category Code",
@@ -1744,6 +1745,7 @@
     ],
     "trusted_measures": [
      "Run Number",
+     "Rerun Number",
      "Duration (min)"
     ]
    },
@@ -1807,6 +1809,14 @@
      "group": "common",
      "id": "Run Number",
      "label": "Run Number",
+     "role": "measure",
+     "type": "numeric(10,0)"
+    },
+    {
+     "description": "",
+     "group": "common",
+     "id": "Rerun Number",
+     "label": "Rerun Number",
      "role": "measure",
      "type": "numeric(10,0)"
     },
@@ -1897,6 +1907,16 @@
       "min",
       "max"
      ],
+     "id": "Rerun Number",
+     "label": "Rerun Number"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
      "id": "Duration (min)",
      "label": "Duration (min)"
     }
@@ -1949,6 +1969,7 @@
    "table_name": "rpt_batch",
    "trusted_measures": [
     "Run Number",
+    "Rerun Number",
     "Duration (min)"
    ],
    "usage_guidance": null,
@@ -4284,7 +4305,7 @@
   },
   "rpt_bill_segment_read": {
    "data_model": {
-    "columns_traced_to_cisadm": 34,
+    "columns_traced_to_cisadm": 32,
     "domain_table": "rpt_bill_segment_read",
     "driving_table": "CI_BSEG",
     "field_groups": [
@@ -4311,8 +4332,6 @@
        "Measured less Raw x Constant",
        "Unit of Measure",
        "Unit of Measure Code",
-       "Final Unit of Measure",
-       "Final Unit of Measure Code",
        "Service Quantity Identifier",
        "Service Quantity Identifier Code",
        "Time of Use",
@@ -4440,14 +4459,6 @@
     {
      "id": "Unit of Measure Code",
      "label": "Unit of Measure Code"
-    },
-    {
-     "id": "Final Unit of Measure",
-     "label": "Final Unit of Measure"
-    },
-    {
-     "id": "Final Unit of Measure Code",
-     "label": "Final Unit of Measure Code"
     },
     {
      "id": "Service Quantity Identifier",
@@ -4708,22 +4719,6 @@
      "group": "billing",
      "id": "Unit of Measure Code",
      "label": "Unit of Measure Code",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
-     "description": "English description of \"Final Unit of Measure Code\". Group and report on this; filter on the code.",
-     "group": "billing",
-     "id": "Final Unit of Measure",
-     "label": "Final Unit of Measure",
-     "role": "dimension",
-     "type": "varchar(60)"
-    },
-    {
-     "description": "Code configured by this utility; the values differ between clients. Paired with \"Final Unit of Measure\" for the description: report on the description, filter on the code.",
-     "group": "billing",
-     "id": "Final Unit of Measure Code",
-     "label": "Final Unit of Measure Code",
      "role": "dimension",
      "type": "text"
     },
@@ -15041,12 +15036,9 @@
        "Scheduled Distribution Date",
        "Transferred to GL Date",
        "Owning Bill ID",
-       "Parent Adjustment Type Code",
-       "Parent Payment ID",
        "Bill ID",
        "Processed on Different Bill",
        "Sibling ID",
-       "Segment Bill ID",
        "Segment Period Start",
        "Segment Period End",
        "Segment Status",
@@ -15247,14 +15239,6 @@
      "label": "Owning Bill ID"
     },
     {
-     "id": "Parent Adjustment Type Code",
-     "label": "Parent Adjustment Type Code"
-    },
-    {
-     "id": "Parent Payment ID",
-     "label": "Parent Payment ID"
-    },
-    {
      "id": "Bill ID",
      "label": "Bill ID"
     },
@@ -15265,10 +15249,6 @@
     {
      "id": "Sibling ID",
      "label": "Sibling ID"
-    },
-    {
-     "id": "Segment Bill ID",
-     "label": "Segment Bill ID"
     },
     {
      "id": "Segment Status",
@@ -15609,22 +15589,6 @@
      "type": "text"
     },
     {
-     "description": "PARENT_ID on adjustment transactions (AD/AX): the adjustment TYPE code, not an id. Verified on all 580 populated rows.",
-     "group": "finance",
-     "id": "Parent Adjustment Type Code",
-     "label": "Parent Adjustment Type Code",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
-     "description": "PARENT_ID on payment transactions (PS/PX): the payment this segment belongs to. Verified on all 1,284 populated rows.",
-     "group": "finance",
-     "id": "Parent Payment ID",
-     "label": "Parent Payment ID",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
      "description": "The bill this row was processed on. For revenue attribution on cancellations use \"Owning Bill ID\" where the canvas offers it.",
      "group": "finance",
      "id": "Bill ID",
@@ -15645,14 +15609,6 @@
      "group": "finance",
      "id": "Sibling ID",
      "label": "Sibling ID",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
-     "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "finance",
-     "id": "Segment Bill ID",
-     "label": "Segment Bill ID",
      "role": "dimension",
      "type": "text"
     },
@@ -24389,7 +24345,7 @@
   },
   "rpt_usage_txn": {
    "data_model": {
-    "columns_traced_to_cisadm": 30,
+    "columns_traced_to_cisadm": 28,
     "domain_table": "rpt_usage_txn",
     "driving_table": "CI_PREM",
     "field_groups": [
@@ -24406,8 +24362,6 @@
        "End DtTm",
        "Unit of Measure",
        "Unit of Measure Code",
-       "Final Unit of Measure",
-       "Final Unit of Measure Code",
        "Time of Use",
        "Time of Use Code",
        "Service Quantity Identifier",
@@ -24490,14 +24444,6 @@
     {
      "id": "Unit of Measure Code",
      "label": "Unit of Measure Code"
-    },
-    {
-     "id": "Final Unit of Measure",
-     "label": "Final Unit of Measure"
-    },
-    {
-     "id": "Final Unit of Measure Code",
-     "label": "Final Unit of Measure Code"
     },
     {
      "id": "Time of Use",
@@ -24662,22 +24608,6 @@
      "group": "meter_ops",
      "id": "Unit of Measure Code",
      "label": "Unit of Measure Code",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
-     "description": "English description of \"Final Unit of Measure Code\". Group and report on this; filter on the code.",
-     "group": "meter_ops",
-     "id": "Final Unit of Measure",
-     "label": "Final Unit of Measure",
-     "role": "dimension",
-     "type": "varchar(60)"
-    },
-    {
-     "description": "Code configured by this utility; the values differ between clients. Paired with \"Final Unit of Measure\" for the description: report on the description, filter on the code.",
-     "group": "meter_ops",
-     "id": "Final Unit of Measure Code",
-     "label": "Final Unit of Measure Code",
      "role": "dimension",
      "type": "text"
     },
