@@ -2322,7 +2322,7 @@
        "Is Rebilled",
        "Is Cancelling Another Segment",
        "Closing Segment",
-       "SQ Override",
+       "Service Quantity Override",
        "Item Override",
        "Rebill Segment ID",
        "Canceled Segment ID",
@@ -2348,10 +2348,10 @@
        "Calc Line Count",
        "Calc Header Count",
        "Rate Schedule Count",
-       "SQ Line Count",
-       "Measured SQ Line Count",
-       "Breakdown SQ Line Count",
-       "Derived SQ Line Count",
+       "Service Quantity Line Count",
+       "Measured Service Quantity Lines",
+       "Breakdown Service Quantity Lines",
+       "Derived Service Quantity Lines",
        "Consumption UOM Count",
        "Unclassified UOM Count",
        "Average Price Per Unit",
@@ -2455,10 +2455,10 @@
      "Billed Demand",
      "Calc Line Count",
      "Calc Header Count",
-     "SQ Line Count",
-     "Measured SQ Line Count",
-     "Breakdown SQ Line Count",
-     "Derived SQ Line Count",
+     "Service Quantity Line Count",
+     "Measured Service Quantity Lines",
+     "Breakdown Service Quantity Lines",
+     "Derived Service Quantity Lines",
      "Consumption UOM Count",
      "Unclassified UOM Count",
      "Distinct UOM Count",
@@ -2590,8 +2590,8 @@
      "label": "Closing Segment"
     },
     {
-     "id": "SQ Override",
-     "label": "SQ Override"
+     "id": "Service Quantity Override",
+     "label": "Service Quantity Override"
     },
     {
      "id": "Item Override",
@@ -2974,8 +2974,8 @@
     {
      "description": "",
      "group": "billing",
-     "id": "SQ Override",
-     "label": "SQ Override",
+     "id": "Service Quantity Override",
+     "label": "Service Quantity Override",
      "role": "dimension",
      "type": "boolean"
     },
@@ -3182,32 +3182,32 @@
     {
      "description": "Pre-aggregated count, additive at this canvas's grain.",
      "group": "billing",
-     "id": "SQ Line Count",
-     "label": "SQ Line Count",
+     "id": "Service Quantity Line Count",
+     "label": "Service Quantity Line Count",
      "role": "measure",
      "type": "bigint"
     },
     {
      "description": "Service quantity rows that are a measured quantity in a unit.",
      "group": "billing",
-     "id": "Measured SQ Line Count",
-     "label": "Measured SQ Line Count",
+     "id": "Measured Service Quantity Lines",
+     "label": "Measured Service Quantity Lines",
      "role": "measure",
      "type": "bigint"
     },
     {
      "description": "Service quantity rows that subdivide a measured quantity in the SAME unit, such as water tiers. Never add these to the measured row.",
      "group": "billing",
-     "id": "Breakdown SQ Line Count",
-     "label": "Breakdown SQ Line Count",
+     "id": "Breakdown Service Quantity Lines",
+     "label": "Breakdown Service Quantity Lines",
      "role": "measure",
      "type": "bigint"
     },
     {
      "description": "Service quantity rows that are not a quantity in any unit: days, equivalent residential units, living units, rate multipliers, tax totals.",
      "group": "billing",
-     "id": "Derived SQ Line Count",
-     "label": "Derived SQ Line Count",
+     "id": "Derived Service Quantity Lines",
+     "label": "Derived Service Quantity Lines",
      "role": "measure",
      "type": "bigint"
     },
@@ -3846,8 +3846,8 @@
       "min",
       "max"
      ],
-     "id": "SQ Line Count",
-     "label": "SQ Line Count"
+     "id": "Service Quantity Line Count",
+     "label": "Service Quantity Line Count"
     },
     {
      "aggs": [
@@ -3856,8 +3856,8 @@
       "min",
       "max"
      ],
-     "id": "Measured SQ Line Count",
-     "label": "Measured SQ Line Count"
+     "id": "Measured Service Quantity Lines",
+     "label": "Measured Service Quantity Lines"
     },
     {
      "aggs": [
@@ -3866,8 +3866,8 @@
       "min",
       "max"
      ],
-     "id": "Breakdown SQ Line Count",
-     "label": "Breakdown SQ Line Count"
+     "id": "Breakdown Service Quantity Lines",
+     "label": "Breakdown Service Quantity Lines"
     },
     {
      "aggs": [
@@ -3876,8 +3876,8 @@
       "min",
       "max"
      ],
-     "id": "Derived SQ Line Count",
-     "label": "Derived SQ Line Count"
+     "id": "Derived Service Quantity Lines",
+     "label": "Derived Service Quantity Lines"
     },
     {
      "aggs": [
@@ -4282,10 +4282,10 @@
     "Billed Demand",
     "Calc Line Count",
     "Calc Header Count",
-    "SQ Line Count",
-    "Measured SQ Line Count",
-    "Breakdown SQ Line Count",
-    "Derived SQ Line Count",
+    "Service Quantity Line Count",
+    "Measured Service Quantity Lines",
+    "Breakdown Service Quantity Lines",
+    "Derived Service Quantity Lines",
     "Consumption UOM Count",
     "Unclassified UOM Count",
     "Distinct UOM Count",
@@ -4320,8 +4320,8 @@
        "Use Percent",
        "Read Row Kind",
        "UOM Class",
-       "Start Read DtTm",
-       "End Read DtTm",
+       "Start Read Date/Time",
+       "End Read Date/Time",
        "Start Register Reading",
        "End Register Reading",
        "Register Constant (Multiplier)",
@@ -4401,12 +4401,12 @@
    },
    "date_fields": [
     {
-     "id": "Start Read DtTm",
-     "label": "Start Read DtTm"
+     "id": "Start Read Date/Time",
+     "label": "Start Read Date/Time"
     },
     {
-     "id": "End Read DtTm",
-     "label": "End Read DtTm"
+     "id": "End Read Date/Time",
+     "label": "End Read Date/Time"
     },
     {
      "id": "Bill Date",
@@ -4421,7 +4421,7 @@
      "label": "Service Period End"
     }
    ],
-   "default_date_field": "Start Read DtTm",
+   "default_date_field": "Start Read Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -4629,16 +4629,16 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "billing",
-     "id": "Start Read DtTm",
-     "label": "Start Read DtTm",
+     "id": "Start Read Date/Time",
+     "label": "Start Read Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "billing",
-     "id": "End Read DtTm",
-     "label": "End Read DtTm",
+     "id": "End Read Date/Time",
+     "label": "End Read Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -6943,7 +6943,7 @@
        "Is Frozen",
        "Is Cancelled",
        "Estimated Segment",
-       "SQ Override",
+       "Service Quantity Override",
        "Account ID",
        "Main Customer Name",
        "Customer Class",
@@ -7112,8 +7112,8 @@
      "label": "Estimated Segment"
     },
     {
-     "id": "SQ Override",
-     "label": "SQ Override"
+     "id": "Service Quantity Override",
+     "label": "Service Quantity Override"
     },
     {
      "id": "Account ID",
@@ -7436,8 +7436,8 @@
     {
      "description": "",
      "group": "billing",
-     "id": "SQ Override",
-     "label": "SQ Override",
+     "id": "Service Quantity Override",
+     "label": "Service Quantity Override",
      "role": "dimension",
      "type": "boolean"
     },
@@ -7808,9 +7808,9 @@
        "Status Condition Code",
        "Is Final Status",
        "Is Closed",
-       "Created DtTm",
-       "Closed DtTm",
-       "Last Status DtTm",
+       "Created Date/Time",
+       "Closed Date/Time",
+       "Last Status Date/Time",
        "Case Duration Minutes",
        "Case Duration Hours",
        "Log Entry Count",
@@ -7854,19 +7854,19 @@
    },
    "date_fields": [
     {
-     "id": "Created DtTm",
-     "label": "Created DtTm"
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
     },
     {
-     "id": "Closed DtTm",
-     "label": "Closed DtTm"
+     "id": "Closed Date/Time",
+     "label": "Closed Date/Time"
     },
     {
-     "id": "Last Status DtTm",
-     "label": "Last Status DtTm"
+     "id": "Last Status Date/Time",
+     "label": "Last Status Date/Time"
     }
    ],
-   "default_date_field": "Created DtTm",
+   "default_date_field": "Created Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -8046,24 +8046,24 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "customer_ops",
-     "id": "Created DtTm",
-     "label": "Created DtTm",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "customer_ops",
-     "id": "Closed DtTm",
-     "label": "Closed DtTm",
+     "id": "Closed Date/Time",
+     "label": "Closed Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "customer_ops",
-     "id": "Last Status DtTm",
-     "label": "Last Status DtTm",
+     "id": "Last Status Date/Time",
+     "label": "Last Status Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -8890,10 +8890,10 @@
        "Latest Payment Date",
        "Total Paid",
        "Customer Contact Count",
-       "Latest Customer Contact DtTm",
+       "Latest Customer Contact Date/Time",
        "Case Count",
        "Open Case Count",
-       "Latest Case Created DtTm",
+       "Latest Case Created Date/Time",
        "Credit Review Date",
        "Postpone Credit Review Date",
        "Collection Process Count",
@@ -8980,12 +8980,12 @@
      "label": "Latest Payment Date"
     },
     {
-     "id": "Latest Customer Contact DtTm",
-     "label": "Latest Customer Contact DtTm"
+     "id": "Latest Customer Contact Date/Time",
+     "label": "Latest Customer Contact Date/Time"
     },
     {
-     "id": "Latest Case Created DtTm",
-     "label": "Latest Case Created DtTm"
+     "id": "Latest Case Created Date/Time",
+     "label": "Latest Case Created Date/Time"
     },
     {
      "id": "Credit Review Date",
@@ -9540,8 +9540,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "customer_ops",
-     "id": "Latest Customer Contact DtTm",
-     "label": "Latest Customer Contact DtTm",
+     "id": "Latest Customer Contact Date/Time",
+     "label": "Latest Customer Contact Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -9564,8 +9564,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "customer_ops",
-     "id": "Latest Case Created DtTm",
-     "label": "Latest Case Created DtTm",
+     "id": "Latest Case Created Date/Time",
+     "label": "Latest Case Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -10094,7 +10094,7 @@
      {
       "fields": [
        "Customer Contact ID",
-       "Contact DtTm",
+       "Contact Date/Time",
        "Contact Type",
        "Contact Type Code",
        "Contact Class",
@@ -10112,7 +10112,7 @@
        "Contact Value",
        "External Contact ID",
        "Prints Letter",
-       "Letter Printed DtTm",
+       "Letter Printed Date/Time",
        "Letter Template Code",
        "Account ID",
        "Main Customer Name",
@@ -10148,15 +10148,15 @@
    },
    "date_fields": [
     {
-     "id": "Contact DtTm",
-     "label": "Contact DtTm"
+     "id": "Contact Date/Time",
+     "label": "Contact Date/Time"
     },
     {
-     "id": "Letter Printed DtTm",
-     "label": "Letter Printed DtTm"
+     "id": "Letter Printed Date/Time",
+     "label": "Letter Printed Date/Time"
     }
    ],
-   "default_date_field": "Contact DtTm",
+   "default_date_field": "Contact Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -10284,8 +10284,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "customer_ops",
-     "id": "Contact DtTm",
-     "label": "Contact DtTm",
+     "id": "Contact Date/Time",
+     "label": "Contact Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -10428,8 +10428,8 @@
     {
      "description": "When the generated letter was printed.",
      "group": "customer_ops",
-     "id": "Letter Printed DtTm",
-     "label": "Letter Printed DtTm",
+     "id": "Letter Printed Date/Time",
+     "label": "Letter Printed Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -10601,9 +10601,9 @@
        "Is Cancelled",
        "Is Outstanding",
        "Days Outstanding",
-       "Created DtTm",
-       "Status Updated DtTm",
-       "Effective DtTm",
+       "Created Date/Time",
+       "Status Updated Date/Time",
+       "Effective Date/Time",
        "Related Objects",
        "Bill ID",
        "Payment ID",
@@ -10642,19 +10642,19 @@
    },
    "date_fields": [
     {
-     "id": "Created DtTm",
-     "label": "Created DtTm"
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
     },
     {
-     "id": "Status Updated DtTm",
-     "label": "Status Updated DtTm"
+     "id": "Status Updated Date/Time",
+     "label": "Status Updated Date/Time"
     },
     {
-     "id": "Effective DtTm",
-     "label": "Effective DtTm"
+     "id": "Effective Date/Time",
+     "label": "Effective Date/Time"
     }
    ],
-   "default_date_field": "Created DtTm",
+   "default_date_field": "Created Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -10846,24 +10846,24 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "customer_ops",
-     "id": "Created DtTm",
-     "label": "Created DtTm",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "customer_ops",
-     "id": "Status Updated DtTm",
-     "label": "Status Updated DtTm",
+     "id": "Status Updated Date/Time",
+     "label": "Status Updated Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "customer_ops",
-     "id": "Effective DtTm",
-     "label": "Effective DtTm",
+     "id": "Effective Date/Time",
+     "label": "Effective Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -11085,8 +11085,8 @@
        "% of Arrears Collected",
        "Duration (Days)",
        "Is Process Complete",
-       "Process Started DtTm",
-       "Process Ended DtTm",
+       "Process Started Date/Time",
+       "Process Ended Date/Time",
        "Event Type",
        "Event Type Code",
        "Event Status",
@@ -11154,12 +11154,12 @@
      "label": "Arrears Date"
     },
     {
-     "id": "Process Started DtTm",
-     "label": "Process Started DtTm"
+     "id": "Process Started Date/Time",
+     "label": "Process Started Date/Time"
     },
     {
-     "id": "Process Ended DtTm",
-     "label": "Process Ended DtTm"
+     "id": "Process Ended Date/Time",
+     "label": "Process Ended Date/Time"
     },
     {
      "id": "Trigger Date",
@@ -11530,16 +11530,16 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "debt",
-     "id": "Process Started DtTm",
-     "label": "Process Started DtTm",
+     "id": "Process Started Date/Time",
+     "label": "Process Started Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "debt",
-     "id": "Process Ended DtTm",
-     "label": "Process Ended DtTm",
+     "id": "Process Ended Date/Time",
+     "label": "Process Ended Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -11920,7 +11920,7 @@
        "Device Model Code",
        "Device Status Code",
        "Business Object Status",
-       "Retirement DtTm",
+       "Retirement Date/Time",
        "Is Retired",
        "Install Event ID",
        "Install Status Code",
@@ -11932,13 +11932,13 @@
        "Device Config ID",
        "Service Point ID",
        "MDM Service Point ID",
-       "Install DtTm",
-       "Removal DtTm",
+       "Install Date/Time",
+       "Removal Date/Time",
        "Is Installed",
        "Attachment Path",
        "Is Attached To Service Point",
-       "Equipment Attached DtTm",
-       "Equipment Removed DtTm",
+       "Equipment Attached Date/Time",
+       "Equipment Removed Date/Time",
        "Equipment Is Current",
        "Service Point Type Code",
        "Service Point Status",
@@ -11961,7 +11961,7 @@
        "Purchase Order",
        "Metrology Firmware Version",
        "NIC Firmware Version",
-       "Asset Created DtTm",
+       "Asset Created Date/Time",
        "Asset Acquisition Date",
        "Asset In Service Date",
        "Asset Condition Code",
@@ -11969,7 +11969,7 @@
        "Fixed Asset Number",
        "Asset Disposition Code",
        "Asset Is In Service",
-       "Asset Placement Effective DtTm",
+       "Asset Placement Effective Date/Time",
        "Asset Location Node ID",
        "Asset Location",
        "Asset Location Description",
@@ -12015,28 +12015,28 @@
    },
    "date_fields": [
     {
-     "id": "Retirement DtTm",
-     "label": "Retirement DtTm"
+     "id": "Retirement Date/Time",
+     "label": "Retirement Date/Time"
     },
     {
-     "id": "Install DtTm",
-     "label": "Install DtTm"
+     "id": "Install Date/Time",
+     "label": "Install Date/Time"
     },
     {
-     "id": "Removal DtTm",
-     "label": "Removal DtTm"
+     "id": "Removal Date/Time",
+     "label": "Removal Date/Time"
     },
     {
-     "id": "Equipment Attached DtTm",
-     "label": "Equipment Attached DtTm"
+     "id": "Equipment Attached Date/Time",
+     "label": "Equipment Attached Date/Time"
     },
     {
-     "id": "Equipment Removed DtTm",
-     "label": "Equipment Removed DtTm"
+     "id": "Equipment Removed Date/Time",
+     "label": "Equipment Removed Date/Time"
     },
     {
-     "id": "Asset Created DtTm",
-     "label": "Asset Created DtTm"
+     "id": "Asset Created Date/Time",
+     "label": "Asset Created Date/Time"
     },
     {
      "id": "Asset Acquisition Date",
@@ -12047,11 +12047,11 @@
      "label": "Asset In Service Date"
     },
     {
-     "id": "Asset Placement Effective DtTm",
-     "label": "Asset Placement Effective DtTm"
+     "id": "Asset Placement Effective Date/Time",
+     "label": "Asset Placement Effective Date/Time"
     }
    ],
-   "default_date_field": "Retirement DtTm",
+   "default_date_field": "Retirement Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -12483,8 +12483,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Retirement DtTm",
-     "label": "Retirement DtTm",
+     "id": "Retirement Date/Time",
+     "label": "Retirement Date/Time",
      "role": "date",
      "type": "timestamptz"
     },
@@ -12579,16 +12579,16 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Install DtTm",
-     "label": "Install DtTm",
+     "id": "Install Date/Time",
+     "label": "Install Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Removal DtTm",
-     "label": "Removal DtTm",
+     "id": "Removal Date/Time",
+     "label": "Removal Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -12619,16 +12619,16 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Equipment Attached DtTm",
-     "label": "Equipment Attached DtTm",
+     "id": "Equipment Attached Date/Time",
+     "label": "Equipment Attached Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Equipment Removed DtTm",
-     "label": "Equipment Removed DtTm",
+     "id": "Equipment Removed Date/Time",
+     "label": "Equipment Removed Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -12811,8 +12811,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Asset Created DtTm",
-     "label": "Asset Created DtTm",
+     "id": "Asset Created Date/Time",
+     "label": "Asset Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -12875,8 +12875,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Asset Placement Effective DtTm",
-     "label": "Asset Placement Effective DtTm",
+     "id": "Asset Placement Effective Date/Time",
+     "label": "Asset Placement Effective Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -13135,9 +13135,9 @@
        "Event Status Code",
        "Event Status Reason Code",
        "Service Provider Code",
-       "Event DtTm",
-       "Event End DtTm",
-       "Created DtTm",
+       "Event Date/Time",
+       "Event End Date/Time",
+       "Created Date/Time",
        "Is Event Closed",
        "Event Duration Minutes",
        "Device ID",
@@ -13182,19 +13182,19 @@
    },
    "date_fields": [
     {
-     "id": "Event DtTm",
-     "label": "Event DtTm"
+     "id": "Event Date/Time",
+     "label": "Event Date/Time"
     },
     {
-     "id": "Event End DtTm",
-     "label": "Event End DtTm"
+     "id": "Event End Date/Time",
+     "label": "Event End Date/Time"
     },
     {
-     "id": "Created DtTm",
-     "label": "Created DtTm"
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
     }
    ],
-   "default_date_field": "Event DtTm",
+   "default_date_field": "Event Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -13350,24 +13350,24 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Event DtTm",
-     "label": "Event DtTm",
+     "id": "Event Date/Time",
+     "label": "Event Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Event End DtTm",
-     "label": "Event End DtTm",
+     "id": "Event End Date/Time",
+     "label": "Event End Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Created DtTm",
-     "label": "Created DtTm",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -13616,7 +13616,7 @@
        "Service Point ID",
        "Message Number",
        "Review Complete",
-       "Created DtTm",
+       "Created Date/Time",
        "Related ID",
        "IMD ID",
        "Exception Bill Segment ID",
@@ -13663,11 +13663,11 @@
    },
    "date_fields": [
     {
-     "id": "Created DtTm",
-     "label": "Created DtTm"
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
     }
    ],
-   "default_date_field": "Created DtTm",
+   "default_date_field": "Created Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -13999,8 +13999,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "field_ops",
-     "id": "Created DtTm",
-     "label": "Created DtTm",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -14250,7 +14250,7 @@
   },
   "rpt_field_activity": {
    "data_model": {
-    "columns_traced_to_cisadm": 36,
+    "columns_traced_to_cisadm": 14,
     "domain_table": "rpt_field_activity",
     "driving_table": "CI_LOOKUP_VAL_L",
     "field_groups": [
@@ -14268,19 +14268,19 @@
        "Field Task Type",
        "Cancel Reason",
        "Reschedule Reason",
-       "Event DtTm",
-       "Start Event DtTm",
-       "Stop Event DtTm",
-       "Retry DtTm",
-       "Scheduled Selection DtTm",
-       "Measurement Reference DtTm",
-       "Created DtTm",
-       "Status Updated DtTm",
+       "Event Date/Time",
+       "Start Event Date/Time",
+       "Stop Event Date/Time",
+       "Retry Date/Time",
+       "Scheduled Selection Date/Time",
+       "Measurement Reference Date/Time",
+       "Created Date/Time",
+       "Status Updated Date/Time",
        "Number of Retries",
        "Appointment Required",
        "Appointment Window Start",
        "Appointment Window End",
-       "Appointment Taken DtTm",
+       "Appointment Taken Date/Time",
        "Appointment Taken By",
        "Appointment Comments",
        "Activity Comments",
@@ -14329,36 +14329,36 @@
    },
    "date_fields": [
     {
-     "id": "Event DtTm",
-     "label": "Event DtTm"
+     "id": "Event Date/Time",
+     "label": "Event Date/Time"
     },
     {
-     "id": "Start Event DtTm",
-     "label": "Start Event DtTm"
+     "id": "Start Event Date/Time",
+     "label": "Start Event Date/Time"
     },
     {
-     "id": "Stop Event DtTm",
-     "label": "Stop Event DtTm"
+     "id": "Stop Event Date/Time",
+     "label": "Stop Event Date/Time"
     },
     {
-     "id": "Retry DtTm",
-     "label": "Retry DtTm"
+     "id": "Retry Date/Time",
+     "label": "Retry Date/Time"
     },
     {
-     "id": "Scheduled Selection DtTm",
-     "label": "Scheduled Selection DtTm"
+     "id": "Scheduled Selection Date/Time",
+     "label": "Scheduled Selection Date/Time"
     },
     {
-     "id": "Measurement Reference DtTm",
-     "label": "Measurement Reference DtTm"
+     "id": "Measurement Reference Date/Time",
+     "label": "Measurement Reference Date/Time"
     },
     {
-     "id": "Created DtTm",
-     "label": "Created DtTm"
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
     },
     {
-     "id": "Status Updated DtTm",
-     "label": "Status Updated DtTm"
+     "id": "Status Updated Date/Time",
+     "label": "Status Updated Date/Time"
     },
     {
      "id": "Appointment Window Start",
@@ -14369,11 +14369,11 @@
      "label": "Appointment Window End"
     },
     {
-     "id": "Appointment Taken DtTm",
-     "label": "Appointment Taken DtTm"
+     "id": "Appointment Taken Date/Time",
+     "label": "Appointment Taken Date/Time"
     }
    ],
-   "default_date_field": "Event DtTm",
+   "default_date_field": "Event Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -14629,64 +14629,64 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "field_ops",
-     "id": "Event DtTm",
-     "label": "Event DtTm",
+     "id": "Event Date/Time",
+     "label": "Event Date/Time",
      "role": "date",
      "type": "timestamptz"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "field_ops",
-     "id": "Start Event DtTm",
-     "label": "Start Event DtTm",
+     "id": "Start Event Date/Time",
+     "label": "Start Event Date/Time",
      "role": "date",
      "type": "timestamptz"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "field_ops",
-     "id": "Stop Event DtTm",
-     "label": "Stop Event DtTm",
+     "id": "Stop Event Date/Time",
+     "label": "Stop Event Date/Time",
      "role": "date",
      "type": "timestamptz"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "field_ops",
-     "id": "Retry DtTm",
-     "label": "Retry DtTm",
+     "id": "Retry Date/Time",
+     "label": "Retry Date/Time",
      "role": "date",
      "type": "timestamptz"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "field_ops",
-     "id": "Scheduled Selection DtTm",
-     "label": "Scheduled Selection DtTm",
+     "id": "Scheduled Selection Date/Time",
+     "label": "Scheduled Selection Date/Time",
      "role": "date",
      "type": "timestamptz"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "field_ops",
-     "id": "Measurement Reference DtTm",
-     "label": "Measurement Reference DtTm",
+     "id": "Measurement Reference Date/Time",
+     "label": "Measurement Reference Date/Time",
      "role": "date",
      "type": "timestamptz"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "field_ops",
-     "id": "Created DtTm",
-     "label": "Created DtTm",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "field_ops",
-     "id": "Status Updated DtTm",
-     "label": "Status Updated DtTm",
+     "id": "Status Updated Date/Time",
+     "label": "Status Updated Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -14725,8 +14725,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "field_ops",
-     "id": "Appointment Taken DtTm",
-     "label": "Appointment Taken DtTm",
+     "id": "Appointment Taken Date/Time",
+     "label": "Appointment Taken Date/Time",
      "role": "date",
      "type": "timestamptz"
     },
@@ -15031,8 +15031,8 @@
        "Currency Code",
        "Accounting Date",
        "Arrears Date",
-       "Freeze DtTm",
-       "Created DtTm",
+       "Freeze Date/Time",
+       "Created Date/Time",
        "Scheduled Distribution Date",
        "Transferred to GL Date",
        "Owning Bill ID",
@@ -15090,7 +15090,7 @@
        "Is Shown on Bill",
        "Is Excluded from Arrears",
        "Freeze User ID",
-       "Load DtTm"
+       "Load Date/Time"
       ],
       "id": "finance",
       "label": "Finance"
@@ -15139,12 +15139,12 @@
      "label": "Arrears Date"
     },
     {
-     "id": "Freeze DtTm",
-     "label": "Freeze DtTm"
+     "id": "Freeze Date/Time",
+     "label": "Freeze Date/Time"
     },
     {
-     "id": "Created DtTm",
-     "label": "Created DtTm"
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
     },
     {
      "id": "Scheduled Distribution Date",
@@ -15179,8 +15179,8 @@
      "label": "SA End Date"
     },
     {
-     "id": "Load DtTm",
-     "label": "Load DtTm"
+     "id": "Load Date/Time",
+     "label": "Load Date/Time"
     }
    ],
    "default_date_field": "Accounting Date",
@@ -15551,16 +15551,16 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "finance",
-     "id": "Freeze DtTm",
-     "label": "Freeze DtTm",
+     "id": "Freeze Date/Time",
+     "label": "Freeze Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "finance",
-     "id": "Created DtTm",
-     "label": "Created DtTm",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -16023,8 +16023,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "finance",
-     "id": "Load DtTm",
-     "label": "Load DtTm",
+     "id": "Load Date/Time",
+     "label": "Load Date/Time",
      "role": "date",
      "type": "timestamp"
     }
@@ -16206,8 +16206,8 @@
        "FT Total Amount (Payoff)",
        "Currency Code",
        "Accounting Date",
-       "Created DtTm",
-       "Freeze DtTm",
+       "Created Date/Time",
+       "Freeze Date/Time",
        "Transferred to GL Date",
        "GL Extract Run Number",
        "Is Extracted to GL",
@@ -16276,12 +16276,12 @@
      "label": "Accounting Date"
     },
     {
-     "id": "Created DtTm",
-     "label": "Created DtTm"
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
     },
     {
-     "id": "Freeze DtTm",
-     "label": "Freeze DtTm"
+     "id": "Freeze Date/Time",
+     "label": "Freeze Date/Time"
     },
     {
      "id": "Transferred to GL Date",
@@ -16540,16 +16540,16 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "finance",
-     "id": "Created DtTm",
-     "label": "Created DtTm",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "finance",
-     "id": "Freeze DtTm",
-     "label": "Freeze DtTm",
+     "id": "Freeze Date/Time",
+     "label": "Freeze Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -16912,7 +16912,7 @@
      {
       "fields": [
        "Measuring Component ID",
-       "Measurement DtTm",
+       "Measurement Date/Time",
        "Measurement Value",
        "Register Reading",
        "Measurement Status Code",
@@ -16924,7 +16924,7 @@
        "Measuring Component Type Code",
        "Multiplier",
        "Read Sequence",
-       "Latest Measurement DtTm",
+       "Latest Measurement Date/Time",
        "Device Config ID",
        "Device ID",
        "Meter Badge Number",
@@ -16964,15 +16964,15 @@
    },
    "date_fields": [
     {
-     "id": "Measurement DtTm",
-     "label": "Measurement DtTm"
+     "id": "Measurement Date/Time",
+     "label": "Measurement Date/Time"
     },
     {
-     "id": "Latest Measurement DtTm",
-     "label": "Latest Measurement DtTm"
+     "id": "Latest Measurement Date/Time",
+     "label": "Latest Measurement Date/Time"
     }
    ],
-   "default_date_field": "Measurement DtTm",
+   "default_date_field": "Measurement Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -17064,8 +17064,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Measurement DtTm",
-     "label": "Measurement DtTm",
+     "id": "Measurement Date/Time",
+     "label": "Measurement Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -17160,8 +17160,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Latest Measurement DtTm",
-     "label": "Latest Measurement DtTm",
+     "id": "Latest Measurement Date/Time",
+     "label": "Latest Measurement Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -17358,7 +17358,7 @@
       "fields": [
        "Install Event ID",
        "Event Sequence",
-       "Event DtTm",
+       "Event Date/Time",
        "On/Off Event",
        "On/Off Event Code",
        "Hours Since Previous Event",
@@ -17366,7 +17366,7 @@
        "Device ID",
        "Meter Badge Number",
        "Device Is Retired",
-       "Device Retirement DtTm",
+       "Device Retirement Date/Time",
        "MDM Service Point ID",
        "Service Point ID",
        "Premise ID",
@@ -17400,15 +17400,15 @@
    },
    "date_fields": [
     {
-     "id": "Event DtTm",
-     "label": "Event DtTm"
+     "id": "Event Date/Time",
+     "label": "Event Date/Time"
     },
     {
-     "id": "Device Retirement DtTm",
-     "label": "Device Retirement DtTm"
+     "id": "Device Retirement Date/Time",
+     "label": "Device Retirement Date/Time"
     }
    ],
-   "default_date_field": "Event DtTm",
+   "default_date_field": "Event Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -17484,8 +17484,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Event DtTm",
-     "label": "Event DtTm",
+     "id": "Event Date/Time",
+     "label": "Event Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -17548,8 +17548,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Device Retirement DtTm",
-     "label": "Device Retirement DtTm",
+     "id": "Device Retirement Date/Time",
+     "label": "Device Retirement Date/Time",
      "role": "date",
      "type": "timestamptz"
     },
@@ -17695,8 +17695,8 @@
        "Is Cancelled",
        "Cancel Reason Code",
        "Start Date",
-       "Created DtTm",
-       "Last Status DtTm",
+       "Created Date/Time",
+       "Last Status Date/Time",
        "Scheduled Payment Count",
        "Scheduled Total Amount",
        "Next Scheduled Payment Date",
@@ -17752,12 +17752,12 @@
      "label": "Start Date"
     },
     {
-     "id": "Created DtTm",
-     "label": "Created DtTm"
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
     },
     {
-     "id": "Last Status DtTm",
-     "label": "Last Status DtTm"
+     "id": "Last Status Date/Time",
+     "label": "Last Status Date/Time"
     },
     {
      "id": "Next Scheduled Payment Date",
@@ -17972,16 +17972,16 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "debt",
-     "id": "Created DtTm",
-     "label": "Created DtTm",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "debt",
-     "id": "Last Status DtTm",
-     "label": "Last Status DtTm",
+     "id": "Last Status Date/Time",
+     "label": "Last Status Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -18286,7 +18286,7 @@
        "Event Payment Total",
        "Event Is Balanced",
        "Payment Date",
-       "Created DtTm",
+       "Created Date/Time",
        "Pay Segment Amount",
        "Payment Amount (Header)",
        "Payment Status",
@@ -18361,8 +18361,8 @@
      "label": "Payment Date"
     },
     {
-     "id": "Created DtTm",
-     "label": "Created DtTm"
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
     }
    ],
    "default_date_field": "Payment Date",
@@ -18565,8 +18565,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "cashiering",
-     "id": "Created DtTm",
-     "label": "Created DtTm",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -18949,7 +18949,7 @@
        "Payment Tender ID",
        "Pay Event ID",
        "Payment Date",
-       "Created DtTm",
+       "Created Date/Time",
        "Tender Amount",
        "Tender Type",
        "Tender Type Code",
@@ -18971,12 +18971,12 @@
        "Batch Code",
        "Batch Number",
        "Tender Control User ID",
-       "Tender Control Balanced DtTm",
+       "Tender Control Balanced Date/Time",
        "Deposit Control ID",
        "Deposit Status",
        "Deposit Status Code",
-       "Deposit Created DtTm",
-       "Deposit Balanced DtTm",
+       "Deposit Created Date/Time",
+       "Deposit Balanced Date/Time",
        "Deposit End Balance",
        "Tender Source Type",
        "Payor Account ID",
@@ -19021,20 +19021,20 @@
      "label": "Payment Date"
     },
     {
-     "id": "Created DtTm",
-     "label": "Created DtTm"
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
     },
     {
-     "id": "Tender Control Balanced DtTm",
-     "label": "Tender Control Balanced DtTm"
+     "id": "Tender Control Balanced Date/Time",
+     "label": "Tender Control Balanced Date/Time"
     },
     {
-     "id": "Deposit Created DtTm",
-     "label": "Deposit Created DtTm"
+     "id": "Deposit Created Date/Time",
+     "label": "Deposit Created Date/Time"
     },
     {
-     "id": "Deposit Balanced DtTm",
-     "label": "Deposit Balanced DtTm"
+     "id": "Deposit Balanced Date/Time",
+     "label": "Deposit Balanced Date/Time"
     }
    ],
    "default_date_field": "Payment Date",
@@ -19177,8 +19177,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "cashiering",
-     "id": "Created DtTm",
-     "label": "Created DtTm",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -19353,8 +19353,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "cashiering",
-     "id": "Tender Control Balanced DtTm",
-     "label": "Tender Control Balanced DtTm",
+     "id": "Tender Control Balanced Date/Time",
+     "label": "Tender Control Balanced Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -19385,16 +19385,16 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "cashiering",
-     "id": "Deposit Created DtTm",
-     "label": "Deposit Created DtTm",
+     "id": "Deposit Created Date/Time",
+     "label": "Deposit Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "cashiering",
-     "id": "Deposit Balanced DtTm",
-     "label": "Deposit Balanced DtTm",
+     "id": "Deposit Balanced Date/Time",
+     "label": "Deposit Balanced Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -19606,8 +19606,8 @@
        "Device Model Code",
        "Manufacturer",
        "Manufacturer Code",
-       "Device Install DtTm",
-       "Device Removal DtTm",
+       "Device Install Date/Time",
+       "Device Removal Date/Time",
        "Has Installed Device",
        "Install Status Code",
        "Service Is On",
@@ -19657,12 +19657,12 @@
      "label": "SP Abolish Date"
     },
     {
-     "id": "Device Install DtTm",
-     "label": "Device Install DtTm"
+     "id": "Device Install Date/Time",
+     "label": "Device Install Date/Time"
     },
     {
-     "id": "Device Removal DtTm",
-     "label": "Device Removal DtTm"
+     "id": "Device Removal Date/Time",
+     "label": "Device Removal Date/Time"
     },
     {
      "id": "Latest Unbilled Usage Through",
@@ -20225,16 +20225,16 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Device Install DtTm",
-     "label": "Device Install DtTm",
+     "id": "Device Install Date/Time",
+     "label": "Device Install Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Device Removal DtTm",
-     "label": "Device Removal DtTm",
+     "id": "Device Removal Date/Time",
+     "label": "Device Removal Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -22168,7 +22168,7 @@
        "Pay Plan Count",
        "Active Pay Plan Count",
        "Is On Active Pay Plan",
-       "Latest Pay Plan Created DtTm",
+       "Latest Pay Plan Created Date/Time",
        "Current Rate Schedule Code",
        "Current Rate Schedule",
        "Rate Schedule Effective From",
@@ -22248,8 +22248,8 @@
      "label": "Last Bill Segment End"
     },
     {
-     "id": "Latest Pay Plan Created DtTm",
-     "label": "Latest Pay Plan Created DtTm"
+     "id": "Latest Pay Plan Created Date/Time",
+     "label": "Latest Pay Plan Created Date/Time"
     },
     {
      "id": "Rate Schedule Effective From",
@@ -22748,8 +22748,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "billing",
-     "id": "Latest Pay Plan Created DtTm",
-     "label": "Latest Pay Plan Created DtTm",
+     "id": "Latest Pay Plan Created Date/Time",
+     "label": "Latest Pay Plan Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -23034,7 +23034,7 @@
      {
       "fields": [
        "Tender Control ID",
-       "Created DtTm",
+       "Created Date/Time",
        "Tender Control Status",
        "Tender Control Status Code",
        "Tender Source",
@@ -23044,7 +23044,7 @@
        "Start Balance",
        "End Balance",
        "Balanced By User ID",
-       "Balanced DtTm",
+       "Balanced Date/Time",
        "Is Balanced",
        "Days Unbalanced",
        "Tender Control Comments",
@@ -23056,7 +23056,7 @@
        "Deposit Control Status Code",
        "Deposit End Balance",
        "Deposit Balanced By User ID",
-       "Deposit Balanced DtTm"
+       "Deposit Balanced Date/Time"
       ],
       "id": "cashiering",
       "label": "Cashiering & Payments"
@@ -23085,19 +23085,19 @@
    },
    "date_fields": [
     {
-     "id": "Created DtTm",
-     "label": "Created DtTm"
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
     },
     {
-     "id": "Balanced DtTm",
-     "label": "Balanced DtTm"
+     "id": "Balanced Date/Time",
+     "label": "Balanced Date/Time"
     },
     {
-     "id": "Deposit Balanced DtTm",
-     "label": "Deposit Balanced DtTm"
+     "id": "Deposit Balanced Date/Time",
+     "label": "Deposit Balanced Date/Time"
     }
    ],
-   "default_date_field": "Created DtTm",
+   "default_date_field": "Created Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -23177,8 +23177,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "cashiering",
-     "id": "Created DtTm",
-     "label": "Created DtTm",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -23257,8 +23257,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "cashiering",
-     "id": "Balanced DtTm",
-     "label": "Balanced DtTm",
+     "id": "Balanced Date/Time",
+     "label": "Balanced Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -23353,8 +23353,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "cashiering",
-     "id": "Deposit Balanced DtTm",
-     "label": "Deposit Balanced DtTm",
+     "id": "Deposit Balanced Date/Time",
+     "label": "Deposit Balanced Date/Time",
      "role": "date",
      "type": "timestamp"
     }
@@ -23479,8 +23479,8 @@
        "Entry Status Code",
        "Priority Code",
        "Role ID",
-       "Created DtTm",
-       "Completed DtTm",
+       "Created Date/Time",
+       "Completed Date/Time",
        "Is Complete",
        "Hours Open",
        "Assigned User",
@@ -23509,15 +23509,15 @@
    },
    "date_fields": [
     {
-     "id": "Created DtTm",
-     "label": "Created DtTm"
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
     },
     {
-     "id": "Completed DtTm",
-     "label": "Completed DtTm"
+     "id": "Completed Date/Time",
+     "label": "Completed Date/Time"
     }
    ],
-   "default_date_field": "Created DtTm",
+   "default_date_field": "Created Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -23621,16 +23621,16 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "common",
-     "id": "Created DtTm",
-     "label": "Created DtTm",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "common",
-     "id": "Completed DtTm",
-     "label": "Completed DtTm",
+     "id": "Completed Date/Time",
+     "label": "Completed Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -24358,8 +24358,8 @@
        "Final Quantity",
        "Start Measurement",
        "End Measurement",
-       "Start DtTm",
-       "End DtTm",
+       "Start Date/Time",
+       "End Date/Time",
        "Unit of Measure",
        "Unit of Measure Code",
        "Time of Use",
@@ -24377,7 +24377,7 @@
        "Usage Group Code",
        "Measurement Cycle Code",
        "Measurement Cycle Route Code",
-       "Usage Created DtTm",
+       "Usage Created Date/Time",
        "Service Point ID",
        "Premise ID",
        "Premise Address",
@@ -24414,19 +24414,19 @@
    },
    "date_fields": [
     {
-     "id": "Start DtTm",
-     "label": "Start DtTm"
+     "id": "Start Date/Time",
+     "label": "Start Date/Time"
     },
     {
-     "id": "End DtTm",
-     "label": "End DtTm"
+     "id": "End Date/Time",
+     "label": "End Date/Time"
     },
     {
-     "id": "Usage Created DtTm",
-     "label": "Usage Created DtTm"
+     "id": "Usage Created Date/Time",
+     "label": "Usage Created Date/Time"
     }
    ],
-   "default_date_field": "Start DtTm",
+   "default_date_field": "Start Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -24582,16 +24582,16 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Start DtTm",
-     "label": "Start DtTm",
+     "id": "Start Date/Time",
+     "label": "Start Date/Time",
      "role": "date",
      "type": "timestamp"
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "End DtTm",
-     "label": "End DtTm",
+     "id": "End Date/Time",
+     "label": "End Date/Time",
      "role": "date",
      "type": "timestamp"
     },
@@ -24734,8 +24734,8 @@
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
      "group": "meter_ops",
-     "id": "Usage Created DtTm",
-     "label": "Usage Created DtTm",
+     "id": "Usage Created Date/Time",
+     "label": "Usage Created Date/Time",
      "role": "date",
      "type": "timestamp"
     },

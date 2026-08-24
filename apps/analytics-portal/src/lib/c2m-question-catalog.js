@@ -431,7 +431,7 @@ export const QUESTIONS = [
     axis: "Tender Source", value: "Days Unbalanced",
     sql: `select "Tender Control ID", coalesce("Tender Source", "Tender Source Code") as "Tender Source",
                  "Tender Control Status", "Days Unbalanced",
-                 "Start Balance", "End Balance", "Operator User ID", "Created DtTm"
+                 "Start Balance", "End Balance", "Operator User ID", "Created Date/Time"
           from reporting.rpt_tender_control
           where not "Is Balanced"
           order by "Days Unbalanced" desc nulls last
@@ -969,7 +969,7 @@ export const QUESTIONS = [
                  count(*)::bigint as "Events",
                  count(*) filter (where "On/Off Event Code" = 'ON')::bigint as "Turn On",
                  count(*) filter (where "On/Off Event Code" = 'OFF')::bigint as "Turn Off",
-                 max("Event DtTm") as "Latest Event"
+                 max("Event Date/Time") as "Latest Event"
           from reporting.rpt_on_off_history
           group by 1, 2, 3
           having count(*) > 1
@@ -1039,7 +1039,7 @@ export const QUESTIONS = [
     sql: `select "Bill Segment ID", "Bill Date",
                  "Billed Usage", "Read Quantity",
                  "Billed Usage less Read Quantity",
-                 "SQ Override", "Estimated Segment",
+                 "Service Quantity Override", "Estimated Segment",
                  "Account ID", "Main Customer Name", "Premise Address"
           from reporting.rpt_bill_segment
           where "Billed Usage less Read Quantity" is not null
@@ -1366,7 +1366,7 @@ export const QUESTIONS = [
     axis: "To Do Type", value: "Hours Open",
     sql: `select "To Do Entry ID", coalesce("To Do Type", "To Do Type Code") as "To Do Type",
                  "Entry Status", "Priority Code", round("Hours Open"::numeric, 1) as "Hours Open",
-                 "Assigned User", "Created DtTm"
+                 "Assigned User", "Created Date/Time"
           from reporting.rpt_todo
           where not "Is Complete"
           order by "Hours Open" desc nulls last
@@ -1383,7 +1383,7 @@ export const QUESTIONS = [
     sql: `select coalesce("Activity Type", "Activity Type Code") as "Activity Type",
                  count(*)::bigint as "Activities",
                  count(*) filter (where trim("Appointment Required") = 'Y')::bigint as "Appointment Required",
-                 count(*) filter (where "Appointment Taken DtTm" is not null)::bigint as "Appointment Booked",
+                 count(*) filter (where "Appointment Taken Date/Time" is not null)::bigint as "Appointment Booked",
                  count(distinct "Work By Crew")::bigint as "Crews"
           from reporting.rpt_field_activity
           group by 1 order by 2 desc`,
