@@ -4305,7 +4305,7 @@
   },
   "rpt_bill_segment_read": {
    "data_model": {
-    "columns_traced_to_cisadm": 32,
+    "columns_traced_to_cisadm": 27,
     "domain_table": "rpt_bill_segment_read",
     "driving_table": "CI_BSEG",
     "field_groups": [
@@ -4648,7 +4648,7 @@
      "id": "Start Register Reading",
      "label": "Start Register Reading",
      "role": "measure",
-     "type": "numeric(15,6)"
+     "type": "numeric"
     },
     {
      "description": "",
@@ -4656,7 +4656,7 @@
      "id": "End Register Reading",
      "label": "End Register Reading",
      "role": "measure",
-     "type": "numeric(15,6)"
+     "type": "numeric"
     },
     {
      "description": "The register multiplier applied to dial movement to get usage. Null is treated as 1 in the derived columns.",
@@ -4664,7 +4664,7 @@
      "id": "Register Constant (Multiplier)",
      "label": "Register Constant (Multiplier)",
      "role": "measure",
-     "type": "numeric(12,6)"
+     "type": "numeric"
     },
     {
      "description": "DERIVED: End Register Reading - Start Register Reading. Before the register constant is applied, so it is dial movement, not usage.",
@@ -4688,7 +4688,7 @@
      "id": "Measured Quantity",
      "label": "Measured Quantity",
      "role": "measure",
-     "type": "numeric(18,6)"
+     "type": "numeric"
     },
     {
      "description": "The converted register quantity on the same segment-level copy as \"Read Quantity\".",
@@ -4696,7 +4696,7 @@
      "id": "Final Register Quantity",
      "label": "Final Register Quantity",
      "role": "measure",
-     "type": "numeric(18,6)"
+     "type": "numeric"
     },
     {
      "description": "DERIVED read-quality check: Measured Quantity - Raw x Constant. Zero means the register arithmetic ties. Non-zero means the billed quantity did not come from the register alone -- estimation, proration or a register rollover. Filter on it to find reads worth investigating.",
@@ -5827,7 +5827,7 @@
   },
   "rpt_billed_charge": {
    "data_model": {
-    "columns_traced_to_cisadm": 54,
+    "columns_traced_to_cisadm": 53,
     "domain_table": "rpt_billed_charge",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -6737,7 +6737,7 @@
      "id": "Billed Quantity (Per Rate Component)",
      "label": "Billed Quantity (Per Rate Component)",
      "role": "measure",
-     "type": "numeric(18,6)"
+     "type": "numeric"
     },
     {
      "description": "On rpt_bill_segment: Consumption Charge Amount / Billed Usage -- the unit price of METERED CONSUMPTION only, because dividing the full billed amount by usage overstates the price by the daily, service-quantity and flat charges (60% of ellensburg revenue). On rpt_billed_charge: this line's amount over this line's quantity. Null unless the quantity is a single unit of measure.",
@@ -6913,7 +6913,7 @@
   },
   "rpt_billed_usage": {
    "data_model": {
-    "columns_traced_to_cisadm": 32,
+    "columns_traced_to_cisadm": 30,
     "domain_table": "rpt_billed_usage",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -7327,7 +7327,7 @@
      "id": "Billed Quantity",
      "label": "Billed Quantity",
      "role": "measure",
-     "type": "numeric(18,6)"
+     "type": "numeric"
     },
     {
      "description": "Quantity measure, additive at this canvas's grain.",
@@ -7335,7 +7335,7 @@
      "id": "Initial Quantity",
      "label": "Initial Quantity",
      "role": "measure",
-     "type": "numeric(18,6)"
+     "type": "numeric"
     },
     {
      "description": "Quantity measure, additive at this canvas's grain.",
@@ -17083,7 +17083,7 @@
      "id": "Register Reading",
      "label": "Register Reading",
      "role": "measure",
-     "type": "numeric(16,6)"
+     "type": "numeric"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -19609,6 +19609,10 @@
        "Device Install Date/Time",
        "Device Removal Date/Time",
        "Has Installed Device",
+       "Last Measurement Date/Time",
+       "Last Actual Measurement Date/Time",
+       "Days Since Actual Measurement",
+       "Usage After Vacancy",
        "Install Status Code",
        "Service Is On",
        "Installed But Switched Off",
@@ -19643,6 +19647,7 @@
      "Service Point Count (Premise)",
      "SA Count (Premise)",
      "Billed Segment Count (Premise)",
+     "Days Since Actual Measurement",
      "Active SA Count",
      "Unbilled Usage Transaction Count (Point)"
     ]
@@ -19663,6 +19668,14 @@
     {
      "id": "Device Removal Date/Time",
      "label": "Device Removal Date/Time"
+    },
+    {
+     "id": "Last Measurement Date/Time",
+     "label": "Last Measurement Date/Time"
+    },
+    {
+     "id": "Last Actual Measurement Date/Time",
+     "label": "Last Actual Measurement Date/Time"
     },
     {
      "id": "Latest Unbilled Usage Through",
@@ -19835,6 +19848,10 @@
     {
      "id": "Has Installed Device",
      "label": "Has Installed Device"
+    },
+    {
+     "id": "Usage After Vacancy",
+     "label": "Usage After Vacancy"
     },
     {
      "id": "Install Status Code",
@@ -20231,7 +20248,7 @@
      "type": "timestamp"
     },
     {
-     "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
+     "description": "When this service point lost its LAST meter -- populated exactly when \"Has Installed Device\" is false, null while a device is installed. Vacancy aging: filter to it not-null for points whose meter was pulled, sort for the oldest vacancies. The removed device itself is on rpt_device_asset; the full event history on rpt_on_off_history.",
      "group": "meter_ops",
      "id": "Device Removal Date/Time",
      "label": "Device Removal Date/Time",
@@ -20243,6 +20260,38 @@
      "group": "meter_ops",
      "id": "Has Installed Device",
      "label": "Has Installed Device",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
+     "group": "meter_ops",
+     "id": "Last Measurement Date/Time",
+     "label": "Last Measurement Date/Time",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "The newest REGULAR (non-estimated, non-missing) measurement through any device ever at this point -- C2M condition 500000+. Pair with \"Days Since Actual Measurement\" for read-coverage aging.",
+     "group": "meter_ops",
+     "id": "Last Actual Measurement Date/Time",
+     "label": "Last Actual Measurement Date/Time",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Age of the newest regular measurement, in days as of the build's as-of date. The read-coverage worklist: sort descending.",
+     "group": "meter_ops",
+     "id": "Days Since Actual Measurement",
+     "label": "Days Since Actual Measurement",
+     "role": "measure",
+     "type": "integer"
+    },
+    {
+     "description": "A VACANT service point whose (removed) device has measurements NEWER than the vacancy date -- theft, a leak, or a records error, and worth eyes in every case. Requires \"Has Installed Device\" false by construction.",
+     "group": "meter_ops",
+     "id": "Usage After Vacancy",
+     "label": "Usage After Vacancy",
      "role": "dimension",
      "type": "boolean"
     },
@@ -20363,6 +20412,16 @@
       "min",
       "max"
      ],
+     "id": "Days Since Actual Measurement",
+     "label": "Days Since Actual Measurement"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
      "id": "Active SA Count",
      "label": "Active SA Count"
     },
@@ -20445,6 +20504,7 @@
     "Service Point Count (Premise)",
     "SA Count (Premise)",
     "Billed Segment Count (Premise)",
+    "Days Since Actual Measurement",
     "Active SA Count",
     "Unbilled Usage Transaction Count (Point)"
    ],
@@ -22128,6 +22188,8 @@
        "Service Agreement ID",
        "SA Type",
        "SA Type Code",
+       "Consecutive Estimated Bills",
+       "Zero Usage On Latest Bill",
        "SA Special Role",
        "SA Special Role Code",
        "Is Revenue Bearing",
@@ -22207,6 +22269,7 @@
      "CI_SVC_TYPE_L"
     ],
     "trusted_measures": [
+     "Consecutive Estimated Bills",
      "Days Pending",
      "Current Balance",
      "Total Balance",
@@ -22270,6 +22333,10 @@
     {
      "id": "SA Type Code",
      "label": "SA Type Code"
+    },
+    {
+     "id": "Zero Usage On Latest Bill",
+     "label": "Zero Usage On Latest Bill"
     },
     {
      "id": "SA Special Role",
@@ -22424,6 +22491,22 @@
      "label": "SA Type Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "How many frozen bill segments IN A ROW, newest first, were estimated. 0 = the latest bill used a real read. 3+ is the complaint and regulatory zone -- sort descending and work the top. Resets the moment a real read bills.",
+     "group": "billing",
+     "id": "Consecutive Estimated Bills",
+     "label": "Consecutive Estimated Bills",
+     "role": "measure",
+     "type": "bigint"
+    },
+    {
+     "description": "The newest frozen segment billed ZERO consumption on a service agreement that HAS billed real usage before -- a dead meter, a stopped register, or vacant-but-billing. Flat services (solid waste, drainage) are honestly false here: they never bill usage, so zero is their normal.",
+     "group": "billing",
+     "id": "Zero Usage On Latest Bill",
+     "label": "Zero Usage On Latest Bill",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
@@ -22870,6 +22953,16 @@
       "min",
       "max"
      ],
+     "id": "Consecutive Estimated Bills",
+     "label": "Consecutive Estimated Bills"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
      "id": "Days Pending",
      "label": "Days Pending"
     },
@@ -23006,6 +23099,7 @@
    "summary": "service agreement: lifecycle, balance, arrears, pay plan",
    "table_name": "rpt_service_agreement",
    "trusted_measures": [
+    "Consecutive Estimated Bills",
     "Days Pending",
     "Current Balance",
     "Total Balance",
@@ -24345,7 +24439,7 @@
   },
   "rpt_usage_txn": {
    "data_model": {
-    "columns_traced_to_cisadm": 28,
+    "columns_traced_to_cisadm": 26,
     "domain_table": "rpt_usage_txn",
     "driving_table": "CI_PREM",
     "field_groups": [
@@ -24553,7 +24647,7 @@
      "id": "Quantity",
      "label": "Quantity",
      "role": "measure",
-     "type": "numeric(16,6)"
+     "type": "numeric"
     },
     {
      "description": "Quantity measure, additive at this canvas's grain.",
@@ -24561,7 +24655,7 @@
      "id": "Final Quantity",
      "label": "Final Quantity",
      "role": "measure",
-     "type": "numeric(16,6)"
+     "type": "numeric"
     },
     {
      "description": "",
