@@ -6,6 +6,7 @@
   "rpt_aged_debt",
   "rpt_asset_location",
   "rpt_batch",
+  "rpt_bill",
   "rpt_bill_factor_price",
   "rpt_bill_segment",
   "rpt_bill_segment_read",
@@ -46,6 +47,7 @@
   "rpt_aged_debt",
   "rpt_asset_location",
   "rpt_batch",
+  "rpt_bill",
   "rpt_bill_factor_price",
   "rpt_bill_segment",
   "rpt_bill_segment_read",
@@ -1974,6 +1976,535 @@
    ],
    "usage_guidance": null,
    "use_case": "",
+   "workstream": "common",
+   "workstream_label": "Operations & Shared Services"
+  },
+  "rpt_bill": {
+   "data_model": {
+    "columns_traced_to_cisadm": 20,
+    "domain_table": "rpt_bill",
+    "driving_table": "CI_ACCT",
+    "field_groups": [
+     {
+      "fields": [
+       "Bill ID",
+       "Alternate Bill ID",
+       "Bill Status",
+       "Bill Status Code",
+       "Is Completed",
+       "Window Start Date",
+       "Bill Date",
+       "Due Date",
+       "Created Date/Time",
+       "Completed Date/Time",
+       "Days To Complete",
+       "Days Bill Open",
+       "Bill Cycle",
+       "Bill Cycle Code",
+       "Is Off-Cycle",
+       "Late Payment Charge Applied",
+       "Late Payment Charge Date",
+       "Allows Reopen",
+       "Credit Note From Bill ID",
+       "Autopay Extract Date",
+       "Autopay Amount",
+       "Autopay Stopped Date/Time",
+       "Bill Segment Count",
+       "Frozen Bill Segment Count",
+       "Cancelled Bill Segment Count",
+       "SA Count (Bill)",
+       "Account ID",
+       "Main Customer Name",
+       "Customer Class",
+       "Customer Class Code",
+       "CIS Division"
+      ],
+      "id": "common",
+      "label": "Operations & Shared Services"
+     }
+    ],
+    "grain": "rpt_bill",
+    "grain_description": "",
+    "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
+    "join_paths": [],
+    "population_filter": null,
+    "refresh_sql": "models/marts/reporting/rpt_bill.sql",
+    "snapshot_table": "reporting.rpt_bill",
+    "source_tables": [
+     "CI_ACCT",
+     "CI_BILL",
+     "CI_BILL_CYC_L",
+     "CI_CUST_CL_L",
+     "CI_LOOKUP_VAL_L"
+    ],
+    "trusted_measures": [
+     "Days To Complete",
+     "Days Bill Open",
+     "Autopay Amount",
+     "Bill Segment Count",
+     "Frozen Bill Segment Count",
+     "Cancelled Bill Segment Count",
+     "SA Count (Bill)"
+    ]
+   },
+   "date_fields": [
+    {
+     "id": "Window Start Date",
+     "label": "Window Start Date"
+    },
+    {
+     "id": "Bill Date",
+     "label": "Bill Date"
+    },
+    {
+     "id": "Due Date",
+     "label": "Due Date"
+    },
+    {
+     "id": "Created Date/Time",
+     "label": "Created Date/Time"
+    },
+    {
+     "id": "Completed Date/Time",
+     "label": "Completed Date/Time"
+    },
+    {
+     "id": "Late Payment Charge Date",
+     "label": "Late Payment Charge Date"
+    },
+    {
+     "id": "Autopay Extract Date",
+     "label": "Autopay Extract Date"
+    },
+    {
+     "id": "Autopay Stopped Date/Time",
+     "label": "Autopay Stopped Date/Time"
+    }
+   ],
+   "default_date_field": "Window Start Date",
+   "default_date_preset": "last_12_months",
+   "dimensions": [
+    {
+     "id": "Bill ID",
+     "label": "Bill ID"
+    },
+    {
+     "id": "Alternate Bill ID",
+     "label": "Alternate Bill ID"
+    },
+    {
+     "id": "Bill Status",
+     "label": "Bill Status"
+    },
+    {
+     "id": "Bill Status Code",
+     "label": "Bill Status Code"
+    },
+    {
+     "id": "Is Completed",
+     "label": "Is Completed"
+    },
+    {
+     "id": "Bill Cycle",
+     "label": "Bill Cycle"
+    },
+    {
+     "id": "Bill Cycle Code",
+     "label": "Bill Cycle Code"
+    },
+    {
+     "id": "Is Off-Cycle",
+     "label": "Is Off-Cycle"
+    },
+    {
+     "id": "Late Payment Charge Applied",
+     "label": "Late Payment Charge Applied"
+    },
+    {
+     "id": "Allows Reopen",
+     "label": "Allows Reopen"
+    },
+    {
+     "id": "Credit Note From Bill ID",
+     "label": "Credit Note From Bill ID"
+    },
+    {
+     "id": "Account ID",
+     "label": "Account ID"
+    },
+    {
+     "id": "Main Customer Name",
+     "label": "Main Customer Name"
+    },
+    {
+     "id": "Customer Class",
+     "label": "Customer Class"
+    },
+    {
+     "id": "Customer Class Code",
+     "label": "Customer Class Code"
+    },
+    {
+     "id": "CIS Division",
+     "label": "CIS Division"
+    }
+   ],
+   "fields": [
+    {
+     "description": "The bill this row was processed on. For revenue attribution on cancellations use \"Owning Bill ID\" where the canvas offers it.",
+     "group": "common",
+     "id": "Bill ID",
+     "label": "Bill ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "common",
+     "id": "Alternate Bill ID",
+     "label": "Alternate Bill ID",
+     "role": "dimension",
+     "type": "numeric(14,0)"
+    },
+    {
+     "description": "English description of \"Bill Status Code\". Group and report on this; filter on the code.",
+     "group": "common",
+     "id": "Bill Status",
+     "label": "Bill Status",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code, fixed by Oracle and the same at every utility. Paired with \"Bill Status\" for the description: report on the description, filter on the code.",
+     "group": "common",
+     "id": "Bill Status Code",
+     "label": "Bill Status Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Flag. Filter on it; do not sum it.",
+     "group": "common",
+     "id": "Is Completed",
+     "label": "Is Completed",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
+     "group": "common",
+     "id": "Window Start Date",
+     "label": "Window Start Date",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
+     "group": "common",
+     "id": "Bill Date",
+     "label": "Bill Date",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
+     "group": "common",
+     "id": "Due Date",
+     "label": "Due Date",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
+     "group": "common",
+     "id": "Created Date/Time",
+     "label": "Created Date/Time",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
+     "group": "common",
+     "id": "Completed Date/Time",
+     "label": "Completed Date/Time",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Window start to completion, whole days -- a CYCLED-bill metric by construction: off-cycle bills have no window at all (measured: the two populations partition 360,376 / 359,785 with zero crossovers at the reference client; \"Is Off-Cycle\" is the split). The billing engine's speedometer: measured norm p50 3.8 / p90 7.8 / p99 24.2, 2 bills over 30 days in a year. Never negative (asserted).",
+     "group": "common",
+     "id": "Days To Complete",
+     "label": "Days To Complete",
+     "role": "measure",
+     "type": "integer"
+    },
+    {
+     "description": "The same clock still running: days since window start on bills NOT yet complete, as of the build's as-of date. The stuck-bill worklist -- sort descending.",
+     "group": "common",
+     "id": "Days Bill Open",
+     "label": "Days Bill Open",
+     "role": "measure",
+     "type": "integer"
+    },
+    {
+     "description": "English description of \"Bill Cycle Code\". Group and report on this; filter on the code.",
+     "group": "common",
+     "id": "Bill Cycle",
+     "label": "Bill Cycle",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Bill Cycle\" for the description: report on the description, filter on the code.",
+     "group": "common",
+     "id": "Bill Cycle Code",
+     "label": "Bill Cycle Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Flag. Filter on it; do not sum it.",
+     "group": "common",
+     "id": "Is Off-Cycle",
+     "label": "Is Off-Cycle",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "",
+     "group": "common",
+     "id": "Late Payment Charge Applied",
+     "label": "Late Payment Charge Applied",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
+     "group": "common",
+     "id": "Late Payment Charge Date",
+     "label": "Late Payment Charge Date",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "",
+     "group": "common",
+     "id": "Allows Reopen",
+     "label": "Allows Reopen",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "common",
+     "id": "Credit Note From Bill ID",
+     "label": "Credit Note From Bill ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
+     "group": "common",
+     "id": "Autopay Extract Date",
+     "label": "Autopay Extract Date",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Currency measure, additive at this canvas's grain.",
+     "group": "common",
+     "id": "Autopay Amount",
+     "label": "Autopay Amount",
+     "role": "measure",
+     "type": "numeric(15,2)"
+    },
+    {
+     "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
+     "group": "common",
+     "id": "Autopay Stopped Date/Time",
+     "label": "Autopay Stopped Date/Time",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Pre-aggregated count, additive at this canvas's grain.",
+     "group": "common",
+     "id": "Bill Segment Count",
+     "label": "Bill Segment Count",
+     "role": "measure",
+     "type": "bigint"
+    },
+    {
+     "description": "Pre-aggregated count, additive at this canvas's grain.",
+     "group": "common",
+     "id": "Frozen Bill Segment Count",
+     "label": "Frozen Bill Segment Count",
+     "role": "measure",
+     "type": "bigint"
+    },
+    {
+     "description": "Pre-aggregated count, additive at this canvas's grain.",
+     "group": "common",
+     "id": "Cancelled Bill Segment Count",
+     "label": "Cancelled Bill Segment Count",
+     "role": "measure",
+     "type": "bigint"
+    },
+    {
+     "description": "",
+     "group": "common",
+     "id": "SA Count (Bill)",
+     "label": "SA Count (Bill)",
+     "role": "measure",
+     "type": "bigint"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "common",
+     "id": "Account ID",
+     "label": "Account ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Descriptive label.",
+     "group": "common",
+     "id": "Main Customer Name",
+     "label": "Main Customer Name",
+     "role": "dimension",
+     "type": "varchar(254)"
+    },
+    {
+     "description": "English description of \"Customer Class Code\". Group and report on this; filter on the code.",
+     "group": "common",
+     "id": "Customer Class",
+     "label": "Customer Class",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Customer Class\" for the description: report on the description, filter on the code.",
+     "group": "common",
+     "id": "Customer Class Code",
+     "label": "Customer Class Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "",
+     "group": "common",
+     "id": "CIS Division",
+     "label": "CIS Division",
+     "role": "dimension",
+     "type": "text"
+    }
+   ],
+   "grain": "rpt_bill",
+   "grain_description": "",
+   "label": "Bill",
+   "large_domain": false,
+   "max_rows": 500,
+   "measures": [
+    {
+     "aggs": [
+      "count"
+     ],
+     "id": "*",
+     "label": "Number of records"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Days To Complete",
+     "label": "Days To Complete"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Days Bill Open",
+     "label": "Days Bill Open"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Autopay Amount",
+     "label": "Autopay Amount"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Bill Segment Count",
+     "label": "Bill Segment Count"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Frozen Bill Segment Count",
+     "label": "Frozen Bill Segment Count"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Cancelled Bill Segment Count",
+     "label": "Cancelled Bill Segment Count"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "SA Count (Bill)",
+     "label": "SA Count (Bill)"
+    }
+   ],
+   "poc_enabled": true,
+   "portal_enabled": true,
+   "premade_reports": [],
+   "related_snapshot": null,
+   "required_date_field": null,
+   "required_date_label": null,
+   "schema": "reporting",
+   "scope_filters": [],
+   "skip_sample_rows": false,
+   "summary": "bills as C2M sees them. Grain: Bill ID",
+   "table_name": "rpt_bill",
+   "trusted_measures": [
+    "Days To Complete",
+    "Days Bill Open",
+    "Autopay Amount",
+    "Bill Segment Count",
+    "Frozen Bill Segment Count",
+    "Cancelled Bill Segment Count",
+    "SA Count (Bill)"
+   ],
+   "usage_guidance": null,
+   "use_case": "through their segments, which answers per-service questions but not the billing",
    "workstream": "common",
    "workstream_label": "Operations & Shared Services"
   },
@@ -8830,7 +9361,7 @@
   },
   "rpt_customer_account": {
    "data_model": {
-    "columns_traced_to_cisadm": 19,
+    "columns_traced_to_cisadm": 20,
     "domain_table": "rpt_customer_account",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -8899,7 +9430,15 @@
        "Collection Process Count",
        "Pay Plan Count",
        "Active Pay Plan Count",
-       "Is On Active Pay Plan"
+       "Is On Active Pay Plan",
+       "Autopay Enrolled",
+       "Autopay Source",
+       "Autopay Source Code",
+       "Autopay Method",
+       "Autopay Method Code",
+       "Autopay Start Date",
+       "Autopay End Date",
+       "Autopay Maximum Withdrawal Amount"
       ],
       "id": "customer_ops",
       "label": "Customer Operations"
@@ -8918,6 +9457,7 @@
      "CI_BUD_PLAN_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_LOOKUP_VAL_L",
      "CI_PER"
     ],
     "trusted_measures": [
@@ -8947,7 +9487,8 @@
      "Open Case Count",
      "Collection Process Count",
      "Pay Plan Count",
-     "Active Pay Plan Count"
+     "Active Pay Plan Count",
+     "Autopay Maximum Withdrawal Amount"
     ]
    },
    "date_fields": [
@@ -8994,6 +9535,14 @@
     {
      "id": "Postpone Credit Review Date",
      "label": "Postpone Credit Review Date"
+    },
+    {
+     "id": "Autopay Start Date",
+     "label": "Autopay Start Date"
+    },
+    {
+     "id": "Autopay End Date",
+     "label": "Autopay End Date"
     }
    ],
    "default_date_field": "Bill After Date",
@@ -9102,6 +9651,26 @@
     {
      "id": "Is On Active Pay Plan",
      "label": "Is On Active Pay Plan"
+    },
+    {
+     "id": "Autopay Enrolled",
+     "label": "Autopay Enrolled"
+    },
+    {
+     "id": "Autopay Source",
+     "label": "Autopay Source"
+    },
+    {
+     "id": "Autopay Source Code",
+     "label": "Autopay Source Code"
+    },
+    {
+     "id": "Autopay Method",
+     "label": "Autopay Method"
+    },
+    {
+     "id": "Autopay Method Code",
+     "label": "Autopay Method Code"
     }
    ],
    "fields": [
@@ -9616,6 +10185,70 @@
      "label": "Is On Active Pay Plan",
      "role": "dimension",
      "type": "boolean"
+    },
+    {
+     "description": "THREE-STATE by design. True/false where this client administers autopay in CIS (base-product enrollment table); NULL where that table is empty because autopay lives at the payment vendor or the client convention is undecided -- false there would be wrong for every enrolled customer the CIS cannot see. Enforced both directions by assert_autopay_null_vs_false.",
+     "group": "customer_ops",
+     "id": "Autopay Enrolled",
+     "label": "Autopay Enrolled",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "The configured payment source of the current enrollment -- at the client using this, the bank and tender kind. The customer's own account number NEVER leaves landing (same rule as MICR).",
+     "group": "customer_ops",
+     "id": "Autopay Source",
+     "label": "Autopay Source",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Autopay Source\" for the description: report on the description, filter on the code.",
+     "group": "customer_ops",
+     "id": "Autopay Source Code",
+     "label": "Autopay Source Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Autopay Method Code\". Group and report on this; filter on the code.",
+     "group": "customer_ops",
+     "id": "Autopay Method",
+     "label": "Autopay Method",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Autopay Method\" for the description: report on the description, filter on the code.",
+     "group": "customer_ops",
+     "id": "Autopay Method Code",
+     "label": "Autopay Method Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
+     "group": "customer_ops",
+     "id": "Autopay Start Date",
+     "label": "Autopay Start Date",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
+     "group": "customer_ops",
+     "id": "Autopay End Date",
+     "label": "Autopay End Date",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Currency measure, additive at this canvas's grain.",
+     "group": "customer_ops",
+     "id": "Autopay Maximum Withdrawal Amount",
+     "label": "Autopay Maximum Withdrawal Amount",
+     "role": "measure",
+     "type": "numeric(15,2)"
     }
    ],
    "grain": "account",
@@ -9900,6 +10533,16 @@
      ],
      "id": "Active Pay Plan Count",
      "label": "Active Pay Plan Count"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Autopay Maximum Withdrawal Amount",
+     "label": "Autopay Maximum Withdrawal Amount"
     }
    ],
    "poc_enabled": true,
@@ -10078,7 +10721,8 @@
     "Open Case Count",
     "Collection Process Count",
     "Pay Plan Count",
-    "Active Pay Plan Count"
+    "Active Pay Plan Count",
+    "Autopay Maximum Withdrawal Amount"
    ],
    "usage_guidance": null,
    "use_case": "financial position, preferences, flags and activity history. This is the canvas a",
@@ -11895,7 +12539,7 @@
   },
   "rpt_device_asset": {
    "data_model": {
-    "columns_traced_to_cisadm": 37,
+    "columns_traced_to_cisadm": 38,
     "domain_table": "rpt_device_asset",
     "driving_table": "CI_LOOKUP_VAL_L",
     "field_groups": [
@@ -11912,7 +12556,9 @@
        "Pallet Number",
        "Utility Device ID",
        "Device Type",
+       "Head-End Registration Status",
        "Head-End Registration Status Code",
+       "Never Registered At Head-End",
        "Device Type Code",
        "Manufacturer",
        "Manufacturer Code",
@@ -11928,6 +12574,9 @@
        "Installed But Switched Off",
        "Install Ended (Meter Removed)",
        "Install Status Reason Code",
+       "Switched Off Since Date/Time",
+       "Days Switched Off",
+       "Switch-Off Field Task Type",
        "Installation Constant",
        "Device Config ID",
        "Service Point ID",
@@ -12008,6 +12657,7 @@
      "W1_NODE"
     ],
     "trusted_measures": [
+     "Days Switched Off",
      "Installation Constant",
      "Replacement Cost",
      "Useful Life Years"
@@ -12017,6 +12667,10 @@
     {
      "id": "Retirement Date/Time",
      "label": "Retirement Date/Time"
+    },
+    {
+     "id": "Switched Off Since Date/Time",
+     "label": "Switched Off Since Date/Time"
     },
     {
      "id": "Install Date/Time",
@@ -12099,8 +12753,16 @@
      "label": "Device Type"
     },
     {
+     "id": "Head-End Registration Status",
+     "label": "Head-End Registration Status"
+    },
+    {
      "id": "Head-End Registration Status Code",
      "label": "Head-End Registration Status Code"
+    },
+    {
+     "id": "Never Registered At Head-End",
+     "label": "Never Registered At Head-End"
     },
     {
      "id": "Device Type Code",
@@ -12157,6 +12819,10 @@
     {
      "id": "Install Status Reason Code",
      "label": "Install Status Reason Code"
+    },
+    {
+     "id": "Switch-Off Field Task Type",
+     "label": "Switch-Off Field Task Type"
     },
     {
      "id": "Device Config ID",
@@ -12417,12 +13083,28 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Head-End Registration Status Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Head-End Registration Status",
+     "label": "Head-End Registration Status",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Head-End Registration Status\" for the description: report on the description, filter on the code.",
      "group": "meter_ops",
      "id": "Head-End Registration Status Code",
      "label": "Head-End Registration Status Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The head-end system has never seen this meter (status D1NR) -- an installed AMI device measuring nothing over the network. The rollout worklist: filter true and \"Is Attached To Service Point\" true. Honestly FALSE at a manual-read client whose estate carries no head-end status at all.",
+     "group": "meter_ops",
+     "id": "Never Registered At Head-End",
+     "label": "Never Registered At Head-End",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"Device Type\" for the description: report on the description, filter on the code.",
@@ -12541,6 +13223,30 @@
      "group": "meter_ops",
      "id": "Install Status Reason Code",
      "label": "Install Status Reason Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "When this device went dark: the latest on/off history event, present only while the install status is OFF (present but disconnected). The install status and the history agree exactly on live states -- measured, then asserted per build.",
+     "group": "meter_ops",
+     "id": "Switched Off Since Date/Time",
+     "label": "Switched Off Since Date/Time",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Age of the current disconnection, in days as of the build's as-of date. The reconnect-after-payment clock regulators ask about: sort descending over \"Switch-Off Field Task Type\" = the credit-cut task to find customers dark the longest.",
+     "group": "meter_ops",
+     "id": "Days Switched Off",
+     "label": "Days Switched Off",
+     "role": "measure",
+     "type": "integer"
+    },
+    {
+     "description": "The field task that performed the current switch-off (DNP = credit disconnect, DISCONNECT-SEASONAL = seasonal). Null = office-initiated or pre-MDM legacy -- left null, never guessed. Task vocabulary is CLIENT configuration; read values per client before filtering.",
+     "group": "meter_ops",
+     "id": "Switch-Off Field Task Type",
+     "label": "Switch-Off Field Task Type",
      "role": "dimension",
      "type": "text"
     },
@@ -12989,6 +13695,16 @@
       "min",
       "max"
      ],
+     "id": "Days Switched Off",
+     "label": "Days Switched Off"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
      "id": "Installation Constant",
      "label": "Installation Constant"
     },
@@ -13111,6 +13827,7 @@
    "summary": "devices with their asset record and current install",
    "table_name": "rpt_device_asset",
    "trusted_measures": [
+    "Days Switched Off",
     "Installation Constant",
     "Replacement Cost",
     "Useful Life Years"
@@ -17350,7 +18067,7 @@
   },
   "rpt_on_off_history": {
    "data_model": {
-    "columns_traced_to_cisadm": 12,
+    "columns_traced_to_cisadm": 13,
     "domain_table": "rpt_on_off_history",
     "driving_table": "CI_LOOKUP_VAL_L",
     "field_groups": [
@@ -17363,6 +18080,7 @@
        "On/Off Event Code",
        "Hours Since Previous Event",
        "MDM Activity ID",
+       "Field Task Type",
        "Device ID",
        "Meter Badge Number",
        "Device Is Retired",
@@ -17389,6 +18107,7 @@
      "CI_LOOKUP_VAL_L",
      "CI_PREM",
      "CI_SP",
+     "D1_ACTIVITY",
      "D1_DVC",
      "D1_DVC_CFG",
      "D1_ON_OFF_HIST"
@@ -17426,6 +18145,10 @@
     {
      "id": "MDM Activity ID",
      "label": "MDM Activity ID"
+    },
+    {
+     "id": "Field Task Type",
+     "label": "Field Task Type"
     },
     {
      "id": "Device ID",
@@ -17518,6 +18241,14 @@
      "group": "meter_ops",
      "id": "MDM Activity ID",
      "label": "MDM Activity ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "",
+     "group": "meter_ops",
+     "id": "Field Task Type",
+     "label": "Field Task Type",
      "role": "dimension",
      "type": "text"
     },
@@ -24987,6 +25718,7 @@
   ],
   "common": [
    "rpt_batch",
+   "rpt_bill",
    "rpt_characteristics",
    "rpt_todo"
   ],
