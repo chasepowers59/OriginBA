@@ -223,6 +223,7 @@ def build_workstream_summary(
     days: int = 30,
     *,
     compare: bool = False,
+    compare_mode: str = "prior_period",
     extra_filters: list[dict[str, Any]] | None = None,
     organization_id: str | None = None,
 ) -> dict[str, Any]:
@@ -231,8 +232,8 @@ def build_workstream_summary(
     ws = workstream_id.lower()
     kpis_def = WORKSTREAM_KPIS.get(ws, [])
 
-    (date_start, date_end), (prior_start, prior_end) = date_windows(days)
-    period_label = f"Last {days} days"
+    (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode)
+    period_label = f"Last {days} days" if compare_mode != "mom" else "Month to date"
     client_id = organization_id or catalog.get("client", "demo")
 
     if ws not in WORKSTREAM_KPIS:
@@ -246,6 +247,8 @@ def build_workstream_summary(
             "client": client_id,
             "db_configured": False,
             "compare_enabled": compare,
+            "compare_mode": compare_mode,
+            "compare_label": compare_label,
             "workstream": ws,
             "workstream_label": labels.get(ws, ws),
             "period": {"start": date_start, "end": date_end, "label": period_label, "days": days},
@@ -274,6 +277,7 @@ def build_workstream_summary(
             kpi,
             days=days,
             compare=compare,
+            compare_mode=compare_mode,
             extra_filters=extra_filters,
             organization_id=organization_id,
         )
@@ -283,6 +287,8 @@ def build_workstream_summary(
         "client": client_id,
         "db_configured": True,
         "compare_enabled": compare,
+        "compare_mode": compare_mode,
+        "compare_label": compare_label,
         "workstream": ws,
         "workstream_label": labels.get(ws, ws),
         "period": {"start": date_start, "end": date_end, "label": period_label, "days": days},

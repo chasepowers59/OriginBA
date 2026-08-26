@@ -165,16 +165,46 @@ def _kpis_for_workstreams(allowed_workstreams: list[str] | None) -> list[dict[st
     return [kpi for kpi in EXECUTIVE_KPIS if kpi.get("workstream") in allowed]
 
 
+
+
+def _refresh_insight(organization_id: str) -> dict[str, Any] | None:
+    """Change since last refresh, from the landing watermarks -- every row carries
+    its CDC load_dttm, so the latest batch IS the change log. Best-effort: a legacy
+    org (no warehouse) or a warehouse without the landing schema returns None."""
+    try:
+        from api.warehouse_db import execute_query as run_warehouse
+
+        # one watermark query per table, kept simple and cheap
+        rows_out = []
+        last = None
+        for name, tbl in [("financial transactions", "ci_ft"), ("bill segments", "ci_bseg"),
+                          ("payment tenders", "ci_pay_tndr"), ("measurements", "d1_msrmt")]:
+            _, rows = run_warehouse(
+                f"select max(load_dttm), count(*) filter (where load_dttm = "
+                f"(select max(load_dttm) from cisadm.{tbl})), count(*) from cisadm.{tbl}",
+                organization_id=organization_id, max_rows=1)
+            if rows and rows[0][0] is not None:
+                ts, batch, total = rows[0]
+                last = max(last, ts) if last else ts
+                rows_out.append({"table": name, "batch_rows": int(batch), "total_rows": int(total)})
+        if not rows_out:
+            return None
+        return {"last_refresh": last.isoformat() if last else None, "tables": rows_out}
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def build_executive_summary(
     days: int = 30,
     *,
     compare: bool = False,
+    compare_mode: str = "prior_period",
     extra_filters: list[dict[str, Any]] | None = None,
     allowed_workstreams: list[str] | None = None,
     organization_id: str | None = None,
 ) -> dict[str, Any]:
-    (date_start, date_end), (prior_start, prior_end) = date_windows(days)
-    period_label = f"Last {days} days"
+    (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode)
+    period_label = f"Last {days} days" if compare_mode != "mom" else "Month to date"
     client_id = organization_id or "demo"
     kpi_defs = _kpis_for_workstreams(allowed_workstreams)
 
@@ -187,6 +217,8 @@ def build_executive_summary(
             "client": client_id,
             "db_configured": False,
             "compare_enabled": compare,
+        "compare_mode": compare_mode,
+        "compare_label": compare_label,
             "period": {
                 "start": date_start,
                 "end": date_end,
@@ -228,6 +260,7 @@ def build_executive_summary(
             kpi,
             days=days,
             compare=compare,
+            compare_mode=compare_mode,
             extra_filters=extra_filters,
             organization_id=organization_id,
         )
@@ -237,6 +270,9 @@ def build_executive_summary(
         "client": client_id,
         "db_configured": True,
         "compare_enabled": compare,
+        "compare_mode": compare_mode,
+        "compare_label": compare_label,
+        "refresh": _refresh_insight(organization_id),
         "period": {
             "start": date_start,
             "end": date_end,

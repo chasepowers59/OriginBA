@@ -51,7 +51,7 @@ export function DashboardWidget({
         </p>
         {showCompare ? (
           <div className="mt-2">
-            <KpiCompareBadge changePct={kpi.change_pct} />
+            <KpiCompareBadge changePct={kpi.change_pct} priorLabel={kpi.compare_label ?? undefined} />
           </div>
         ) : null}
         {kpi.error ? (

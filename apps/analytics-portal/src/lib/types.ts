@@ -284,6 +284,8 @@ export type ExecutiveKpi = {
   value: number | null;
   prior_value?: number | null;
   change_pct?: number | null;
+  /** "vs July" / "vs 2025" / "vs prior 30d" — set by the API per compare mode. */
+  compare_label?: string | null;
   trend: ExecutiveTrendPoint[];
   trend_dimension?: string | null;
   error?: string | null;
@@ -296,7 +298,13 @@ export type PeriodInfo = {
   days: number;
 };
 
+export type RefreshInsight = {
+  last_refresh: string | null;
+  tables: { table: string; batch_rows: number; total_rows: number }[];
+};
+
 export type ExecutiveSummary = {
+  refresh?: RefreshInsight | null;
   client: string;
   db_configured: boolean;
   compare_enabled?: boolean;

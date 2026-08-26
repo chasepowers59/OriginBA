@@ -142,10 +142,12 @@ export function fetchExecutiveSummary(
   days = 30,
   compare = false,
   crossFilter?: { field: string; value: string },
+  compareMode: "prior_period" | "mom" | "yoy" = "prior_period",
 ): Promise<ExecutiveSummary> {
   const params = new URLSearchParams({
     days: String(days),
     compare: compare ? "true" : "false",
+    compare_mode: compareMode,
   });
   if (crossFilter) {
     params.set("cross_field", crossFilter.field);
@@ -159,10 +161,12 @@ export function fetchWorkstreamSummary(
   days = 30,
   compare = false,
   crossFilter?: { field: string; value: string },
+  compareMode: "prior_period" | "mom" | "yoy" = "prior_period",
 ): Promise<WorkstreamSummary> {
   const params = new URLSearchParams({
     days: String(days),
     compare: compare ? "true" : "false",
+    compare_mode: compareMode,
   });
   if (crossFilter) {
     params.set("cross_field", crossFilter.field);

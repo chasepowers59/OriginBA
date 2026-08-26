@@ -9,7 +9,7 @@ import {
 } from "@/lib/businessLabels";
 import type { WorkstreamSummary } from "@/lib/types";
 import { DashboardWidget } from "./DashboardWidget";
-import { DashboardControls } from "./DashboardControls";
+import { DashboardControls, type CompareMode } from "./DashboardControls";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { PresentationToolbar } from "./PresentationToolbar";
 import { WorkstreamHeroLinks } from "./WorkstreamHeroLinks";
@@ -27,6 +27,7 @@ function WorkstreamDashboardInner({
   const { filter, toggleFilter, clearFilter } = useCrossFilter();
   const [days, setDays] = useState(30);
   const [compare, setCompare] = useState(false);
+  const [compareMode, setCompareMode] = useState<CompareMode>("prior_period");
   const [summary, setSummary] = useState<WorkstreamSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -37,11 +38,12 @@ function WorkstreamDashboardInner({
       days,
       compare,
       filter ? { field: filter.field, value: filter.value } : undefined,
+      compareMode,
     )
       .then(setSummary)
       .catch(() => setSummary(null))
       .finally(() => setLoading(false));
-  }, [workstreamId, days, compare, filter]);
+  }, [workstreamId, days, compare, compareMode, filter]);
 
   const label = summary?.workstream_label ?? workstreamDisplayName(workstreamId);
 
@@ -85,8 +87,10 @@ function WorkstreamDashboardInner({
       <DashboardControls
         days={days}
         compare={compare}
+        compareMode={compareMode}
         onDaysChange={setDays}
         onCompareChange={setCompare}
+        onCompareModeChange={setCompareMode}
       />
 
       <WorkstreamHeroLinks workstreamId={workstreamId} workstreams={workstreams} />

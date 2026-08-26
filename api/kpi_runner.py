@@ -11,17 +11,50 @@ from api.query_builder import QueryValidationError, build_query
 from api.snapshot_catalog import allowed_fields, get_snapshot
 
 
-def date_windows(days: int) -> tuple[tuple[str, str], tuple[str, str]]:
-    """Return (current_start, current_end), (prior_start, prior_end) as ISO date strings."""
+COMPARE_MODES = ("prior_period", "mom", "yoy")
+
+
+def date_windows(
+    days: int, compare_mode: str = "prior_period"
+) -> tuple[tuple[str, str], tuple[str, str], str]:
+    """(current_start, current_end), (prior_start, prior_end), compare_label.
+
+    prior_period -- rolling: last N days vs the N days before them.
+    mom -- calendar: month-to-date vs the same day-span of the previous month
+           (a July bill compared to June is weather; the label says which month).
+    yoy -- seasonal: the same window one year earlier (July vs LAST July is signal).
+    """
     capped = max(1, min(days, 365))
-    current_end = date.today()
-    current_start = current_end - timedelta(days=capped)
-    prior_end = current_start - timedelta(days=1)
+    today = date.today()
+
+    if compare_mode == "mom":
+        cur_start = today.replace(day=1)
+        prev_last = cur_start - timedelta(days=1)
+        prior_start = prev_last.replace(day=1)
+        # same day-span, clamped to the previous month's length
+        prior_end = prior_start + timedelta(
+            days=min((today - cur_start).days, (prev_last - prior_start).days))
+        return ((cur_start.isoformat(), today.isoformat()),
+                (prior_start.isoformat(), prior_end.isoformat()),
+                f"vs {prior_start.strftime('%B')}")
+
+    cur_start = today - timedelta(days=capped)
+    if compare_mode == "yoy":
+        try:
+            prior_start = cur_start.replace(year=cur_start.year - 1)
+            prior_end = today.replace(year=today.year - 1)
+        except ValueError:  # Feb 29
+            prior_start = cur_start - timedelta(days=365)
+            prior_end = today - timedelta(days=365)
+        return ((cur_start.isoformat(), today.isoformat()),
+                (prior_start.isoformat(), prior_end.isoformat()),
+                f"vs {today.year - 1}")
+
+    prior_end = cur_start - timedelta(days=1)
     prior_start = prior_end - timedelta(days=capped)
-    return (
-        (current_start.isoformat(), current_end.isoformat()),
-        (prior_start.isoformat(), prior_end.isoformat()),
-    )
+    return ((cur_start.isoformat(), today.isoformat()),
+            (prior_start.isoformat(), prior_end.isoformat()),
+            f"vs prior {capped}d")
 
 
 def run_kpi_query(
@@ -94,6 +127,7 @@ def execute_kpi_definition(
     *,
     days: int,
     compare: bool = False,
+    compare_mode: str = "prior_period",
     extra_filters: list[dict[str, Any]] | None = None,
     organization_id: str,
 ) -> dict[str, Any]:
@@ -120,7 +154,7 @@ def execute_kpi_definition(
         if not date_field and not windowless:
             raise ValueError("Snapshot has no date field and KPI is not windowless")
 
-        (cur_start, cur_end), (pri_start, pri_end) = date_windows(days)
+        (cur_start, cur_end), (pri_start, pri_end), compare_label = date_windows(days, compare_mode)
 
         value_cols, value_rows = run_kpi_query(
             snapshot_id, kpi["value"], date_field, cur_start, cur_end, extra_filters, organization_id=organization_id
@@ -160,6 +194,7 @@ def execute_kpi_definition(
             "value": value,
             "prior_value": prior_value if compare else None,
             "change_pct": change_pct,
+            "compare_label": compare_label if compare and not windowless else None,
             "trend": trend,
             "trend_dimension": trend_dimension,
             "error": None,

@@ -6,7 +6,7 @@ import { fetchExecutiveSummary } from "@/lib/api";
 import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { ExecutiveSummary } from "@/lib/types";
 import { DashboardWidget } from "./DashboardWidget";
-import { DashboardControls } from "./DashboardControls";
+import { DashboardControls, type CompareMode } from "./DashboardControls";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { PresentationToolbar } from "./PresentationToolbar";
 
@@ -21,6 +21,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
   const { filter, toggleFilter, clearFilter } = useCrossFilter();
   const [days, setDays] = useState(initialDays);
   const [compare, setCompare] = useState(false);
+  const [compareMode, setCompareMode] = useState<CompareMode>("prior_period");
   const [summary, setSummary] = useState<ExecutiveSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -30,11 +31,12 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       days,
       compare,
       filter ? { field: filter.field, value: filter.value } : undefined,
+      compareMode,
     )
       .then(setSummary)
       .catch(() => setSummary(null))
       .finally(() => setLoading(false));
-  }, [days, compare, filter]);
+  }, [days, compare, compareMode, filter]);
 
   const isHome = variant === "home";
 
@@ -69,6 +71,13 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
           </h2>
           <p className="mt-1 text-sm text-slate-500">
             {summary?.period.label ?? `Last ${days} days`}
+            {summary?.refresh?.last_refresh ? (
+              <span className="ml-2 text-xs text-slate-600">
+                · data refreshed {new Date(summary.refresh.last_refresh).toLocaleString()} (
+                {summary.refresh.tables.reduce((a, t) => a + t.batch_rows, 0).toLocaleString()}{" "}
+                rows in latest batch)
+              </span>
+            ) : null}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -77,8 +86,10 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
               <DashboardControls
                 days={days}
                 compare={compare}
+                compareMode={compareMode}
                 onDaysChange={setDays}
                 onCompareChange={setCompare}
+                onCompareModeChange={setCompareMode}
               />
               <PresentationToolbar
                 title={`${portal.organization_name} Executive Dashboard`}

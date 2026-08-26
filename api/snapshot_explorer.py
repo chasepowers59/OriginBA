@@ -20,6 +20,7 @@ from api.org_db import require_org_for_data
 from api.query_builder import QueryValidationError, build_query
 from api.raw_sql_validator import RawSqlValidationError, apply_row_cap, validate_raw_sql
 from api.executive_dashboard import build_executive_summary
+from api.kpi_runner import COMPARE_MODES
 from api.workstream_dashboard import build_workstream_summary
 from api.snapshot_catalog import CatalogError, allowed_fields, get_snapshot, list_snapshots, list_workstreams, load_catalog, is_warehouse
 
@@ -139,6 +140,7 @@ def snapshots_index(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, A
 def executive_summary(
     days: int = 30,
     compare: bool = False,
+    compare_mode: str = "prior_period",
     cross_field: str | None = None,
     cross_value: str | None = None,
     ctx: AuthContext = Depends(get_auth_context),
@@ -146,9 +148,12 @@ def executive_summary(
     ctx.require_permission("snapshots:read")
     org_id = require_org_for_data(ctx)
     extra = _cross_filter(cross_field, cross_value)
+    if compare_mode not in COMPARE_MODES:
+        raise HTTPException(status_code=400, detail=f"compare_mode must be one of {COMPARE_MODES}")
     return build_executive_summary(
         days,
         compare=compare,
+        compare_mode=compare_mode,
         extra_filters=extra,
         allowed_workstreams=ctx.workstreams,
         organization_id=org_id,
@@ -160,6 +165,7 @@ def workstream_summary(
     workstream_id: str,
     days: int = 30,
     compare: bool = False,
+    compare_mode: str = "prior_period",
     cross_field: str | None = None,
     cross_value: str | None = None,
     ctx: AuthContext = Depends(get_auth_context),
@@ -168,10 +174,13 @@ def workstream_summary(
     assert_workstream_access(ctx, workstream_id)
     org_id = require_org_for_data(ctx)
     extra = _cross_filter(cross_field, cross_value)
+    if compare_mode not in COMPARE_MODES:
+        raise HTTPException(status_code=400, detail=f"compare_mode must be one of {COMPARE_MODES}")
     result = build_workstream_summary(
         workstream_id,
         days,
         compare=compare,
+        compare_mode=compare_mode,
         extra_filters=extra,
         organization_id=org_id,
     )
