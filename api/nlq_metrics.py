@@ -1,4 +1,15 @@
-"""Governed everyday metric questions mapped to snapshot queries."""
+"""Governed everyday metric questions mapped to reporting-canvas queries.
+
+REBOUND onto the dbt canvases 2026-08-26: every metric queries a governed
+reporting canvas (rpt_*) through the same routed KPI runner the dashboards use.
+Every field name was verified against output/catalog_dbt.json or lifted from a
+live-verified dashboard KPI spec before it was written here -- never guess a
+canvas column, the allow-list holds queries to the real names.
+
+The legacy *_RPT_CURR metric set this replaces lives in git history; a
+cisadm-catalog org simply gets no NLQ metrics (snapshot_analytics_nlq filters
+the catalog per org), which is honest until that org migrates.
+"""
 
 from __future__ import annotations
 
@@ -8,7 +19,7 @@ from datetime import date, timedelta
 from typing import Any, Callable
 
 from api.kpi_runner import run_kpi_query, trend_from_rows
-from api.snapshot_catalog import get_snapshot
+from api.snapshot_catalog import allowed_fields, get_snapshot
 
 
 @dataclass
@@ -32,18 +43,22 @@ def _window(days: int) -> tuple[str, str]:
     return start.isoformat(), end.isoformat()
 
 
-def _extra(params: dict[str, Any]) -> list[dict[str, Any]]:
+# Optional question parameters -> conformed canvas columns. Applied only when the
+# target canvas actually carries the column (the conformed blocks make that true
+# almost everywhere); a param the canvas cannot express is simply not applied.
+_PARAM_FIELDS = {
+    "customer_class": "Customer Class",
+    "payment_type": "Tender Type",
+    "uom": "Unit of Measure",
+    "bill_cycle": "Bill Cycle",
+}
+
+
+def _extra(params: dict[str, Any], allowed: set[str]) -> list[dict[str, Any]]:
     filters: list[dict[str, Any]] = []
-    if params.get("bill_cycle"):
-        filters.append({"field": "BILL_CYC_DESC", "op": "eq", "value": params["bill_cycle"]})
-    if params.get("customer_class"):
-        filters.append({"field": "CUST_CL_DESC", "op": "eq", "value": params["customer_class"]})
-    if params.get("payment_type"):
-        filters.append({"field": "SOLE_TENDER_TYPE_DESC", "op": "eq", "value": params["payment_type"]})
-    if params.get("rate_code"):
-        filters.append({"field": "SOLE_RS_DESC", "op": "eq", "value": params["rate_code"]})
-    if params.get("uom"):
-        filters.append({"field": "UOM_DESC", "op": "eq", "value": params["uom"]})
+    for key, field_name in _PARAM_FIELDS.items():
+        if params.get(key) and field_name in allowed:
+            filters.append({"field": field_name, "op": "eq", "value": params[key]})
     return filters
 
 
@@ -54,18 +69,19 @@ def _scalar(
     *,
     organization_id: str,
     date_field: str | None = None,
+    windowless: bool = False,
 ) -> tuple[float, list[dict[str, Any]]]:
-    # The catalog is per-org; resolving without it looks up legacy ids in the dbt
+    # The catalog is per-org; resolving without it looks up ids in the wrong
     # catalog and misses (this had NLQ erroring for every tenant).
     snap = get_snapshot(snapshot_id, organization_id)
-    field_name = date_field or snap.get("required_date_field")
-    if not field_name:
+    field_name = None if windowless else (
+        date_field or snap.get("required_date_field") or snap.get("default_date_field"))
+    if not field_name and not windowless:
         raise ValueError(f"No date field for {snapshot_id}")
     days = int(params.get("days") or 90)
     start, end = _window(days)
-    extra = _extra(params)
     filters = list(query.get("filters") or [])
-    filters.extend(extra)
+    filters.extend(_extra(params, allowed_fields(snap)))
     payload = {**query, "filters": filters}
     cols, rows = run_kpi_query(
         snapshot_id, payload, field_name, start, end, organization_id=organization_id
@@ -82,16 +98,15 @@ def _trend(
     *,
     organization_id: str,
     date_field: str | None = None,
+    windowless: bool = False,
 ) -> list[dict[str, Any]]:
-    # The catalog is per-org; resolving without it looks up legacy ids in the dbt
-    # catalog and misses (this had NLQ erroring for every tenant).
     snap = get_snapshot(snapshot_id, organization_id)
-    field_name = date_field or snap.get("required_date_field")
+    field_name = None if windowless else (
+        date_field or snap.get("required_date_field") or snap.get("default_date_field"))
     days = int(params.get("days") or 90)
     start, end = _window(days)
-    extra = _extra(params)
     filters = list(query.get("filters") or [])
-    filters.extend(extra)
+    filters.extend(_extra(params, allowed_fields(snap)))
     payload = {**query, "filters": filters}
     cols, rows = run_kpi_query(
         snapshot_id, payload, field_name, start, end, organization_id=organization_id
@@ -142,6 +157,10 @@ def _pin_from_spec(spec: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _source_label(snapshot_id: str) -> str:
+    return snapshot_id.removeprefix("rpt_").replace("_", " ").title()
+
+
 def _result(
     metric: NlqMetric,
     params: dict[str, Any],
@@ -152,9 +171,10 @@ def _result(
     spec: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     days = int(params.get("days") or metric.default_days)
+    window_txt = "as of now" if (spec or {}).get("windowless") else f"last {days} days"
     narrative = (
         f"{metric.label}: {_fmt(value, metric.format)} "
-        f"(last {days} days on {metric.snapshot_id.replace('_RPT_CURR', '').replace('_', ' ').title()})."
+        f"({window_txt} on {_source_label(metric.snapshot_id)})."
     )
     if narrative_extra:
         narrative += " " + narrative_extra
@@ -194,893 +214,388 @@ def _run_metric(metric: NlqMetric, params: dict[str, Any], *, organization_id: s
         raise ValueError(f"Metric {metric.id} has no builder")
     spec = metric.build(params)
     kind = spec.get("kind", "scalar")
-    if kind == "bucket_table":
-        rows: list[dict[str, Any]] = []
-        total = 0.0
-        for bucket in spec.get("buckets") or []:
-            label = str(bucket.get("label", "Bucket"))
-            query = bucket["query"]
-            value, _ = _scalar(
-                metric.snapshot_id,
-                query,
-                params,
-                organization_id=organization_id,
-                date_field=spec.get("date_field"),
-            )
-            rows.append({"label": label, "value": value})
-            total += value
-        return _result(
-            metric, params, total, rows, narrative_extra=spec.get("note", ""), spec=spec
-        )
+    kwargs = {
+        "organization_id": organization_id,
+        "date_field": spec.get("date_field"),
+        "windowless": bool(spec.get("windowless")),
+    }
     if kind == "trend":
-        table = _trend(metric.snapshot_id, spec["query"], params, organization_id=organization_id)
+        table = _trend(metric.snapshot_id, spec["query"], params, **kwargs)
         total = sum(float(r["value"]) for r in table)
         return _result(
             metric, params, total, table, narrative_extra=spec.get("note", ""), spec=spec
         )
-    value, table = _scalar(metric.snapshot_id, spec["query"], params, organization_id=organization_id)
+    value, table = _scalar(metric.snapshot_id, spec["query"], params, **kwargs)
     return _result(
         metric, params, value, table or None, narrative_extra=spec.get("note", ""), spec=spec
     )
 
 
+def _count(filters: list[dict[str, Any]] | None = None,
+           dims: list[str] | None = None) -> dict[str, Any]:
+    return {"dimensions": dims or [], "measures": [{"field": "*", "agg": "count"}],
+            "filters": filters or []}
+
+
+def _sum(field_name: str, filters: list[dict[str, Any]] | None = None,
+         dims: list[str] | None = None) -> dict[str, Any]:
+    return {"dimensions": dims or [], "measures": [{"field": field_name, "agg": "sum"}],
+            "filters": filters or []}
+
+
 METRICS: list[NlqMetric] = [
+    # ------------------------------------------------------------- Customers
     NlqMetric(
-        id="total_premises",
-        label="Total premises (distinct)",
-        category="Premises & accounts",
-        patterns=[r"total\s+#?\s*(?:of\s+)?premises?", r"how many premises"],
-        snapshot_id="CASE_PREM_CONTACT_RPT_CURR",
-        default_days=365,
-        param_keys=["days", "bill_cycle", "customer_class"],
-        example="Total premises by customer class",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["CUST_CL_DESC"],
-                "measures": [{"field": "PREM_ID", "agg": "count_distinct"}],
-                "filters": [],
-                "limit": 20,
-            },
-        },
+        id="total_customers",
+        label="Total customer accounts",
+        category="Customers",
+        patterns=[r"how\s+many\s+customers", r"total\s+customers", r"customer\s+count",
+                  r"number\s+of\s+(customers|accounts)"],
+        snapshot_id="rpt_customer_account",
+        example="How many customers do we have?",
+        build=lambda _p: {"kind": "scalar", "windowless": True, "query": _count()},
     ),
     NlqMetric(
-        id="total_accounts",
-        label="Total accounts",
-        category="Premises & accounts",
-        patterns=[r"total\s+#?\s*(?:of\s+)?accounts?(?!\s+billed)", r"how many accounts"],
-        snapshot_id="ACCT_CUSTOMER_RPT_CURR",
-        default_days=365,
-        param_keys=["days", "bill_cycle", "customer_class"],
-        example="Total accounts by bill cycle",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["BILL_CYC_DESC"],
-                "measures": [{"field": "ACCT_ID", "agg": "count_distinct"}],
-                "filters": [],
-                "limit": 24,
-            },
-        },
+        id="new_service_agreements",
+        label="New service agreements",
+        category="Customers",
+        patterns=[r"new\s+service\s+agreements?", r"new\s+sas?\b", r"service\s+starts",
+                  r"new\s+services\b"],
+        snapshot_id="rpt_service_agreement",
+        example="New service agreements last 90 days",
+        build=lambda _p: {"kind": "scalar", "date_field": "SA Start Date",
+                          "query": _count(dims=["SA Type"])},
     ),
     NlqMetric(
-        id="active_service_agreements",
-        label="Active service agreements",
-        category="Premises & accounts",
-        patterns=[r"active\s+service", r"premises?\s+with\s+active\s+service"],
-        snapshot_id="NEW_SERVICE_PIPELINE_RPT_CURR",
-        default_days=365,
-        param_keys=["days", "customer_class"],
-        example="Premises with active service",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "SA_ID", "agg": "count_distinct"}],
-                "filters": [{"field": "SA_STATUS_DESC", "op": "eq", "value": "Active"}],
-            },
-            "note": "Active SA status (20) on new service pipeline snapshot.",
-        },
+        id="customer_contacts",
+        label="Customer contacts logged",
+        category="Customers",
+        patterns=[r"customer\s+contacts?", r"contact\s+volume", r"calls\s+logged"],
+        snapshot_id="rpt_customer_contact",
+        example="Customer contacts this week",
+        build=lambda _p: {"kind": "scalar", "date_field": "Contact Date/Time",
+                          "query": _count(dims=["Contact Type"])},
     ),
     NlqMetric(
-        id="billed_revenue_total",
-        label="Total dollars billed",
+        id="estimate_streaks",
+        label="SAs with 3+ consecutive estimated bills",
+        category="Customers",
+        patterns=[r"estimat(e|ed)\s+streaks?", r"consecutive\s+estimated"],
+        snapshot_id="rpt_service_agreement",
+        example="How many estimate streaks do we have?",
+        build=lambda _p: {"kind": "scalar", "windowless": True, "query": _count(
+            [{"field": "Consecutive Estimated Bills", "op": "gte", "value": 3}])},
+    ),
+    # --------------------------------------------------------------- Billing
+    NlqMetric(
+        id="billed_revenue",
+        label="Billed revenue",
         category="Billing",
-        patterns=[
-            r"total\s+\$?\s*(?:of\s+)?accounts?\s+billed",
-            r"billed\s+revenue",
-            r"billing\s+total",
-        ],
-        snapshot_id="BSEG_BILLED_USAGE_RPT_CURR",
-        default_days=180,
+        patterns=[r"billed\s+revenue", r"total\s+billed", r"billed\s+(amount|dollars)",
+                  r"revenue\s+billed", r"how\s+much\s+did\s+we\s+bill"],
+        snapshot_id="rpt_bill_segment",
         format="currency",
-        param_keys=["days", "bill_cycle", "customer_class"],
-        example="Total billed revenue last 6 months",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "TOTAL_CALC_AMT", "agg": "sum"}],
-                "filters": [],
-            },
-        },
+        param_keys=["days", "customer_class", "bill_cycle"],
+        example="Total billed revenue last 90 days",
+        build=lambda _p: {"kind": "scalar", "query": _sum("Billed Amount")},
     ),
     NlqMetric(
-        id="accounts_billed_count",
-        label="Accounts billed (distinct)",
-        category="Billing",
-        patterns=[r"total\s+#?\s*(?:of\s+)?accounts?\s+billed", r"how many accounts billed"],
-        snapshot_id="BSEG_BILLED_USAGE_RPT_CURR",
-        default_days=180,
-        param_keys=["days", "bill_cycle", "customer_class"],
-        example="Total accounts billed",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "ACCT_ID", "agg": "count_distinct"}],
-                "filters": [],
-            },
-        },
-    ),
-    NlqMetric(
-        id="billed_by_customer_class",
+        id="billed_by_class",
         label="Billed revenue by customer class",
         category="Billing",
-        patterns=[r"billed.*customer\s+class", r"revenue\s+by\s+class"],
-        snapshot_id="BSEG_BILLED_USAGE_RPT_CURR",
-        default_days=180,
+        patterns=[r"(billed|revenue)\s+by\s+(customer\s+)?class"],
+        snapshot_id="rpt_bill_segment",
         format="currency",
-        param_keys=["days", "customer_class"],
         example="Billed revenue by customer class",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["CUST_CL_DESC"],
-                "measures": [{"field": "TOTAL_CALC_AMT", "agg": "sum"}],
-                "filters": [],
-                "limit": 12,
-            },
-        },
+        build=lambda _p: {"kind": "trend",
+                          "query": _sum("Billed Amount", dims=["Customer Class"])},
     ),
     NlqMetric(
-        id="billed_by_bill_cycle",
+        id="billed_by_cycle",
         label="Billed revenue by bill cycle",
         category="Billing",
-        patterns=[r"by\s+bill\s+cycle", r"billed.*bill\s+cycle"],
-        snapshot_id="BSEG_BILLED_USAGE_RPT_CURR",
-        default_days=180,
+        patterns=[r"(billed|revenue)\s+by\s+(bill\s+)?cycle"],
+        snapshot_id="rpt_bill_segment",
         format="currency",
-        param_keys=["days", "bill_cycle"],
-        example="Billed amount by bill cycle",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["BILL_CYC_DESC"],
-                "measures": [{"field": "TOTAL_CALC_AMT", "agg": "sum"}],
-                "filters": [],
-                "limit": 24,
-            },
-        },
+        example="Billed revenue by bill cycle",
+        build=lambda _p: {"kind": "trend",
+                          "query": _sum("Billed Amount", dims=["Bill Cycle"])},
     ),
     NlqMetric(
-        id="kwh_billed",
-        label="Total kWh billed",
+        id="bills_completed",
+        label="Bills completed",
         category="Billing",
-        patterns=[r"total\s+kwh", r"kilowatt", r"kwh\s+billed"],
-        snapshot_id="BSEG_SQ_USAGE_RPT_CURR",
-        default_days=180,
-        param_keys=["days", "customer_class"],
-        example="Total kWh billed",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "TOTAL_BILL_SQ", "agg": "sum"}],
-                "filters": [{"field": "UOM_DESC", "op": "eq", "value": "KWH"}],
-            },
-            "note": "Filtered to KWH unit of measure on billed determinant snapshot.",
-        },
+        patterns=[r"bills\s+completed", r"completed\s+bills", r"how\s+many\s+bills"],
+        snapshot_id="rpt_bill",
+        example="How many bills completed last 30 days?",
+        default_days=30,
+        build=lambda _p: {"kind": "scalar", "date_field": "Window Start Date",
+                          "query": _count(
+                              [{"field": "Is Completed", "op": "eq", "value": True}])},
     ),
     NlqMetric(
-        id="billing_todos",
-        label="Billing to-do items",
+        id="stuck_bills",
+        label="Bills stuck open over 30 days",
         category="Billing",
-        patterns=[r"billing\s+todo", r"todo.*billing"],
-        snapshot_id="WORKFLOW_QUEUE_RPT_CURR",
-        default_days=30,
-        param_keys=["days"],
-        example="Billing todos generated",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [{"field": "QUEUE_SOURCE", "op": "eq", "value": "TODO"}],
-            },
-        },
+        patterns=[r"stuck\s+bills", r"bills\s+stuck", r"bills?\s+open\s+(over|more)"],
+        snapshot_id="rpt_bill",
+        example="How many bills are stuck open?",
+        build=lambda _p: {"kind": "scalar", "windowless": True, "query": _count(
+            [{"field": "Days Bill Open", "op": "gte", "value": 31}])},
     ),
     NlqMetric(
-        id="open_exceptions",
-        label="Open exceptions",
-        category="Operations",
-        patterns=[r"open\s+exceptions?", r"exception\s+backlog", r"total\s+#?\s*(?:of\s+)?exceptions?"],
-        snapshot_id="OPS_EXCEPTION_RPT_CURR",
-        default_days=30,
-        param_keys=["days"],
-        example="Open exceptions this month",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["EXCP_SEVERITY_DESC"],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [{"field": "OPEN_CLOSE_FLG", "op": "eq", "value": "O"}],
-                "limit": 8,
-            },
-        },
+        id="billed_usage_by_uom",
+        label="Billed usage by unit of measure",
+        category="Billing",
+        patterns=[r"(billed\s+)?usage\s+by\s+(uom|unit)", r"quantity\s+by\s+(uom|unit)",
+                  r"gallons\s+billed", r"kwh\s+billed"],
+        snapshot_id="rpt_billed_usage",
+        param_keys=["days", "uom", "customer_class"],
+        example="Billed usage by unit of measure",
+        # Usage is only additive WITHIN a unit of measure -- always grouped, never
+        # a bare total (the cisadm-sql never-sum-across-UOMs rule).
+        build=lambda _p: {"kind": "trend",
+                          "query": _sum("Billed Quantity", dims=["Unit of Measure"])},
     ),
+    # -------------------------------------------------------------- Payments
     NlqMetric(
-        id="workflow_todos",
-        label="Open workflow to-dos",
-        category="Operations",
-        patterns=[r"workflow\s+todo", r"work\s+queue", r"staff\s+todo"],
-        snapshot_id="WORKFLOW_QUEUE_RPT_CURR",
-        default_days=30,
-        param_keys=["days"],
-        example="Open to-do workload",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["ENTRY_STATUS_DESC"],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [{"field": "QUEUE_SOURCE", "op": "eq", "value": "TODO"}],
-                "limit": 10,
-            },
-        },
-    ),
-    NlqMetric(
-        id="payments_count",
-        label="Payments processed",
+        id="payments_collected",
+        label="Payments collected",
         category="Payments",
-        patterns=[r"total\s+#?\s*(?:of\s+)?payments?\s+processed", r"how many payments"],
-        snapshot_id="PAY_EVENT_RPT_CURR",
-        default_days=90,
-        param_keys=["days", "payment_type"],
-        example="Payments processed last quarter",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [],
-            },
-        },
-    ),
-    NlqMetric(
-        id="payments_dollars",
-        label="Payment dollars processed",
-        category="Payments",
-        patterns=[
-            r"total\s+\$?\s*(?:of\s+)?payments?\s+processed",
-            r"payment\s+dollars",
-            r"payments?\s+amount",
-        ],
-        snapshot_id="PAY_EVENT_RPT_CURR",
-        default_days=90,
+        patterns=[r"payments?\s+collected", r"how\s+much\s+(was\s+)?(collected|paid)",
+                  r"total\s+payments", r"cash\s+collected"],
+        snapshot_id="rpt_payment_tender",
         format="currency",
-        param_keys=["days", "payment_type"],
-        example="Total payment dollars",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "PAY_AMT", "agg": "sum"}],
-                "filters": [],
-            },
-        },
+        param_keys=["days", "payment_type", "customer_class"],
+        example="Payments collected last 30 days",
+        default_days=30,
+        build=lambda _p: {"kind": "scalar", "date_field": "Payment Date",
+                          "query": _sum("Tender Amount")},
     ),
     NlqMetric(
         id="payments_by_type",
         label="Payments by tender type",
         category="Payments",
-        patterns=[r"payment\s+type", r"payments?\s+by\s+(?:payment\s+)?type", r"ebpp|kiosk|usps"],
-        snapshot_id="PAY_EVENT_RPT_CURR",
-        default_days=90,
+        patterns=[r"payments?\s+by\s+(tender\s+)?type", r"tender\s+mix"],
+        snapshot_id="rpt_payment_tender",
         format="currency",
-        param_keys=["days", "payment_type"],
-        example="Payments by payment type",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["SOLE_TENDER_TYPE_DESC"],
-                "measures": [{"field": "PAY_AMT", "agg": "sum"}],
-                "filters": [],
-                "limit": 12,
-            },
-        },
+        example="Payments by tender type",
+        build=lambda _p: {"kind": "trend", "date_field": "Payment Date",
+                          "query": _sum("Tender Amount", dims=["Tender Type"])},
     ),
     NlqMetric(
-        id="field_activities_created",
-        label="Field activities created",
-        category="Field operations",
-        patterns=[r"field\s+activit(?:y|ies)\s+created", r"total\s+#?\s*(?:of\s+)?field\s+activit"],
-        snapshot_id="FIELD_ACTIVITY_RPT_CURR",
-        default_days=90,
-        param_keys=["days"],
-        example="Field activities created",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [],
-            },
-        },
+        id="cancelled_tenders",
+        label="Cancelled tenders",
+        category="Payments",
+        patterns=[r"cancell?ed\s+(tenders?|payments?)", r"payment\s+reversals"],
+        snapshot_id="rpt_payment_tender",
+        example="Cancelled tenders last 30 days",
+        default_days=30,
+        build=lambda _p: {"kind": "scalar", "date_field": "Payment Date",
+                          "query": _count(
+                              [{"field": "Is Cancelled", "op": "eq", "value": True}])},
     ),
+    # ----------------------------------------------------------- Collections
     NlqMetric(
-        id="field_activities_pending",
-        label="Pending field activities",
-        category="Field operations",
-        patterns=[r"field\s+activit.*pending", r"pending\s+field"],
-        snapshot_id="FIELD_ACTIVITY_RPT_CURR",
-        default_days=90,
-        param_keys=["days"],
-        example="Field activities pending",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [{"field": "BO_STATUS_DESC", "op": "neq", "value": "Complete"}],
-            },
-        },
-    ),
-    NlqMetric(
-        id="debt_total",
-        label="Total SA debt",
+        id="accounts_receivable",
+        label="Accounts receivable",
         category="Collections",
-        patterns=[r"total\s+debt", r"accounts?\s+by\s+debt", r"top\s+accounts?\s+by\s+debt"],
-        snapshot_id="SA_AGED_BAL_RPT_CURR",
-        default_days=730,
+        patterns=[r"accounts?\s+receivable", r"\bar\b", r"total\s+(debt|balance)\b",
+                  r"outstanding\s+balance"],
+        snapshot_id="rpt_sa_aged_balance",
         format="currency",
-        param_keys=["days", "customer_class"],
-        example="Top accounts by debt",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["ACCT_ID"],
-                "measures": [{"field": "TOTAL_DEBT", "agg": "sum"}],
-                "filters": [{"field": "TOTAL_DEBT", "op": "gte", "value": 0.01}],
-                "limit": 10,
-            },
-        },
+        example="What is our accounts receivable?",
+        build=lambda _p: {"kind": "scalar", "windowless": True,
+                          "query": _sum("Total Balance")},
+    ),
+    NlqMetric(
+        id="past_due",
+        label="Past-due balance",
+        category="Collections",
+        patterns=[r"past\s+due", r"overdue\s+(balance|amount|dollars)", r"arrears\s+total"],
+        snapshot_id="rpt_sa_aged_balance",
+        format="currency",
+        example="How much is past due?",
+        build=lambda _p: {"kind": "scalar", "windowless": True, "query": _sum(
+            "Total Balance", [{"field": "Is Past Due", "op": "eq", "value": True}])},
     ),
     NlqMetric(
         id="debt_by_age",
-        label="Debt by aging bucket",
+        label="Debt by age band",
         category="Collections",
-        patterns=[r"accounts?\s+by\s+age", r"debt\s+by\s+age", r"aging"],
-        snapshot_id="SA_AGED_BAL_RPT_CURR",
-        default_days=730,
+        patterns=[r"debt\s+by\s+age", r"aged?\s+(debt|balance|receivables)",
+                  r"aging\s+buckets?"],
+        snapshot_id="rpt_sa_aged_balance",
         format="currency",
-        param_keys=["days"],
-        example="Total debt by age bucket",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["CUST_CL_DESC"],
-                "measures": [{"field": "TOTAL_DEBT", "agg": "sum"}],
-                "filters": [],
-                "limit": 12,
-            },
-            "note": "Grouped by customer class; use explorer for 0-30/31-60 bucket fields.",
-        },
+        example="Debt dollars by age bucket",
+        build=lambda _p: {"kind": "trend", "windowless": True,
+                          "query": _sum("Total Balance", dims=["Oldest Debt Band"])},
     ),
     NlqMetric(
-        id="new_connections",
-        label="New service connections",
-        category="New connections",
-        patterns=[r"total\s+#?\s*(?:of\s+)?connects?", r"new\s+connections?", r"new\s+service"],
-        snapshot_id="NEW_SERVICE_PIPELINE_RPT_CURR",
-        default_days=180,
-        param_keys=["days"],
-        example="New connects in pipeline",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "SA_ID", "agg": "count_distinct"}],
-                "filters": [],
-            },
-        },
-    ),
-    NlqMetric(
-        id="meter_reads_in_cycle",
-        label="Measurements in period",
-        category="Meter operations",
-        patterns=[r"meters?\s+.*reads?", r"meter\s+reading", r"measurements?\s+in"],
-        snapshot_id="D1_MSRMT_RPT_CURR",
-        default_days=30,
-        param_keys=["days"],
-        example="Meter reads last 30 days",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [],
-            },
-            "note": "Large domain — uses 30-day window by default.",
-        },
-    ),
-    NlqMetric(
-        id="premises_by_bill_cycle",
-        label="Premises by bill cycle",
-        category="Premises & accounts",
-        patterns=[r"premises?\s+by\s+bill\s+cycle"],
-        snapshot_id="SA_AGED_BAL_RPT_CURR",
-        default_days=365,
-        param_keys=["days", "bill_cycle"],
-        example="Total premises by bill cycle",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["BILL_CYC_DESC"],
-                "measures": [{"field": "PREM_ID", "agg": "count_distinct"}],
-                "filters": [],
-                "limit": 24,
-            },
-        },
-    ),
-    NlqMetric(
-        id="premises_by_customer_class",
-        label="Premises by customer class",
-        category="Premises & accounts",
-        patterns=[r"premises?\s+by\s+customer\s+class"],
-        snapshot_id="SA_AGED_BAL_RPT_CURR",
-        default_days=365,
-        param_keys=["days", "customer_class"],
-        example="Premises by customer class",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["CUST_CL_DESC"],
-                "measures": [{"field": "PREM_ID", "agg": "count_distinct"}],
-                "filters": [],
-                "limit": 12,
-            },
-        },
-    ),
-    NlqMetric(
-        id="accounts_by_customer_class",
-        label="Accounts by customer class",
-        category="Premises & accounts",
-        patterns=[r"accounts?\s+by\s+customer\s+class"],
-        snapshot_id="ACCT_CUSTOMER_RPT_CURR",
-        default_days=365,
-        param_keys=["days", "customer_class"],
-        example="Accounts by customer class",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["CUST_CL_DESC"],
-                "measures": [{"field": "ACCT_ID", "agg": "count_distinct"}],
-                "filters": [],
-                "limit": 12,
-            },
-        },
-    ),
-    NlqMetric(
-        id="premises_active_service",
-        label="Premises with active service",
-        category="Premises & accounts",
-        patterns=[r"premises?\s+with\s+active\s+service", r"active\s+service\s+premises?"],
-        snapshot_id="NEW_SERVICE_PIPELINE_RPT_CURR",
-        default_days=365,
-        param_keys=["days", "customer_class", "bill_cycle"],
-        example="Premises with active service",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "PREM_ID", "agg": "count_distinct"}],
-                "filters": [{"field": "SA_STATUS_DESC", "op": "eq", "value": "Active"}],
-            },
-        },
-    ),
-    NlqMetric(
-        id="premises_no_active_service",
-        label="Premises with no active service",
-        category="Premises & accounts",
-        patterns=[r"no\s+active\s+service", r"premises?\s+without\s+active"],
-        snapshot_id="ACCT_CUSTOMER_RPT_CURR",
-        default_days=365,
-        param_keys=["days", "customer_class"],
-        example="Accounts with no active service agreements",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "ACCT_ID", "agg": "count_distinct"}],
-                "filters": [{"field": "ACTIVE_SA_COUNT", "op": "lte", "value": 0}],
-            },
-            "note": "Account grain — ACTIVE_SA_COUNT = 0.",
-        },
-    ),
-    NlqMetric(
-        id="premises_disconnected",
-        label="Premises with disconnected service",
-        category="Premises & accounts",
-        patterns=[r"disconnected\s+service", r"service\s+disconnected"],
-        snapshot_id="NEW_SERVICE_PIPELINE_RPT_CURR",
-        default_days=365,
-        param_keys=["days"],
-        example="Service agreements in stopped status",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "PREM_ID", "agg": "count_distinct"}],
-                "filters": [{"field": "SA_STATUS_DESC", "op": "eq", "value": "Stopped"}],
-            },
-            "note": "Distinct premises on stopped service agreements.",
-        },
-    ),
-    NlqMetric(
-        id="accounts_billed_by_rate",
-        label="Accounts billed by rate schedule",
-        category="Billing",
-        patterns=[r"accounts?\s+billed\s+by\s+rate", r"billed\s+accounts?\s+by\s+rate"],
-        snapshot_id="BSEG_BILLED_USAGE_RPT_CURR",
-        default_days=180,
-        param_keys=["days", "rate_code"],
-        example="Accounts billed by rate code",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["SOLE_RS_DESC"],
-                "measures": [{"field": "ACCT_ID", "agg": "count_distinct"}],
-                "filters": [],
-                "limit": 15,
-            },
-        },
-    ),
-    NlqMetric(
-        id="billed_dollars_by_rate",
-        label="Billed dollars by rate schedule",
-        category="Billing",
-        patterns=[r"\$\s*.*billed\s+by\s+rate", r"revenue\s+by\s+rate\s+code"],
-        snapshot_id="BSEG_BILLED_USAGE_RPT_CURR",
-        default_days=180,
-        format="currency",
-        param_keys=["days", "rate_code"],
-        example="Total dollars billed by rate code",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["SOLE_RS_DESC"],
-                "measures": [{"field": "TOTAL_CALC_AMT", "agg": "sum"}],
-                "filters": [],
-                "limit": 15,
-            },
-        },
-    ),
-    NlqMetric(
-        id="estimated_bills",
-        label="Estimated bills",
-        category="Billing",
-        patterns=[r"estimated\s+bills?", r"total\s+#?\s*(?:of\s+)?estimated"],
-        snapshot_id="BSEG_BILLED_USAGE_RPT_CURR",
-        default_days=180,
-        param_keys=["days", "bill_cycle"],
-        example="Estimated bill segments",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "BSEG_ID", "agg": "count_distinct"}],
-                "filters": [{"field": "EST_SW", "op": "eq", "value": "Y"}],
-            },
-        },
-    ),
-    NlqMetric(
-        id="closing_cycle_segments",
-        label="Closing-cycle bill segments",
-        category="Billing",
-        patterns=[r"closing\s+cycle", r"eligible.*closing"],
-        snapshot_id="BSEG_BILLED_USAGE_RPT_CURR",
-        default_days=90,
-        param_keys=["days", "bill_cycle"],
-        example="Accounts eligible on closing cycle",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "ACCT_ID", "agg": "count_distinct"}],
-                "filters": [{"field": "CLOSING_BSEG_SW", "op": "eq", "value": "Y"}],
-            },
-            "note": "Distinct accounts on closing bill segments.",
-        },
-    ),
-    NlqMetric(
-        id="opening_cycle_segments",
-        label="Opening-cycle bill segments",
-        category="Billing",
-        patterns=[r"opening\s+cycle", r"eligible.*opening"],
-        snapshot_id="BSEG_BILLED_USAGE_RPT_CURR",
-        default_days=90,
-        param_keys=["days", "bill_cycle"],
-        example="Accounts on opening cycle segments",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "ACCT_ID", "agg": "count_distinct"}],
-                "filters": [{"field": "CLOSING_BSEG_SW", "op": "neq", "value": "Y"}],
-            },
-            "note": "Distinct accounts on non-closing bill segments.",
-        },
-    ),
-    NlqMetric(
-        id="accounts_on_hold",
-        label="Accounts with bill print intercept",
-        category="Billing",
-        patterns=[r"accounts?\s+on\s+hold", r"bill\s+hold", r"intercept"],
-        snapshot_id="NEW_SERVICE_PIPELINE_RPT_CURR",
-        default_days=365,
-        param_keys=["days"],
-        example="Accounts on billing hold (print intercept)",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "ACCT_ID", "agg": "count_distinct"}],
-                "filters": [{"field": "BILL_PRT_INTERCEPT", "op": "neq", "value": " "}],
-            },
-            "note": "Accounts with a non-blank bill print intercept flag.",
-        },
-    ),
-    NlqMetric(
-        id="meter_read_todos",
-        label="Meter reading to-do items",
-        category="Meter operations",
-        patterns=[r"meter\s+reading\s+todo", r"mr\s+todo"],
-        snapshot_id="WORKFLOW_QUEUE_RPT_CURR",
-        default_days=30,
-        param_keys=["days"],
-        example="Meter reading todos in workflow queue",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [
-                    {"field": "QUEUE_SOURCE", "op": "eq", "value": "TODO"},
-                    {"field": "TD_TYPE_DESC", "op": "in", "value": ["Meter Read", "Meter Reading"]},
-                ],
-            },
-            "note": "Open to-dos whose type description matches meter reading.",
-        },
-    ),
-    NlqMetric(
-        id="meters_with_reads",
-        label="Bill segments with meter reads",
-        category="Meter operations",
-        patterns=[r"meters?\s+.*with\s+reads?", r"segments?\s+with\s+reads?"],
-        snapshot_id="BSEG_BILLED_USAGE_RPT_CURR",
-        default_days=90,
-        param_keys=["days", "bill_cycle"],
-        example="Bill segments with read lines",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "BSEG_ID", "agg": "count_distinct"}],
-                "filters": [{"field": "READ_LINE_COUNT", "op": "gte", "value": 1}],
-            },
-        },
-    ),
-    NlqMetric(
-        id="meters_without_reads",
-        label="Bill segments with no reads",
-        category="Meter operations",
-        patterns=[r"meters?\s+.*no\s+reads?", r"without\s+reads?", r"no\s+read\s+lines?"],
-        snapshot_id="BSEG_BILLED_USAGE_RPT_CURR",
-        default_days=90,
-        param_keys=["days", "bill_cycle"],
-        example="Bill segments missing read lines",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "BSEG_ID", "agg": "count_distinct"}],
-                "filters": [{"field": "READ_LINE_COUNT", "op": "lte", "value": 0}],
-            },
-        },
-    ),
-    NlqMetric(
-        id="field_activities_scheduled",
-        label="Scheduled field activities",
-        category="Field operations",
-        patterns=[r"field\s+activit.*scheduled", r"scheduled\s+for\s+(?:7|9)\s*am"],
-        snapshot_id="FIELD_ACTIVITY_RPT_CURR",
-        default_days=30,
-        param_keys=["days"],
-        example="Field activities with appointment windows",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [{"field": "APPOINTMENT_FLG", "op": "eq", "value": "Y"}],
-            },
-            "note": "Use explorer on START_DTTM for 7am/9am slot drill-down.",
-        },
-    ),
-    NlqMetric(
-        id="disconnects",
-        label="Disconnect field activities",
-        category="Field operations",
-        patterns=[r"total\s+#?\s*(?:of\s+)?disconnects?", r"\bdisconnects?\b"],
-        snapshot_id="FIELD_ACTIVITY_RPT_CURR",
-        default_days=90,
-        param_keys=["days"],
-        example="Disconnect field activities",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [{"field": "ACTIVITY_TYPE_DESC", "op": "eq", "value": "Disconnect"}],
-            },
-        },
-    ),
-    NlqMetric(
-        id="reconnects",
-        label="Reconnect field activities",
-        category="Field operations",
-        patterns=[r"total\s+#?\s*(?:of\s+)?reconnects?", r"\breconnects?\b"],
-        snapshot_id="FIELD_ACTIVITY_RPT_CURR",
-        default_days=90,
-        param_keys=["days"],
-        example="Reconnect field activities",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [{"field": "ACTIVITY_TYPE_DESC", "op": "eq", "value": "Reconnect"}],
-            },
-        },
-    ),
-    NlqMetric(
-        id="connects",
-        label="Connect field activities",
-        category="Field operations",
-        patterns=[r"total\s+#?\s*(?:of\s+)?connects?(?!\s+ion)", r"\bconnects?\b"],
-        snapshot_id="FIELD_ACTIVITY_RPT_CURR",
-        default_days=90,
-        param_keys=["days"],
-        example="Connect field activities",
-        build=lambda _p: {
-            "query": {
-                "dimensions": [],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [{"field": "ACTIVITY_TYPE_DESC", "op": "eq", "value": "Connect"}],
-            },
-        },
-    ),
-    NlqMetric(
-        id="work_requests_manual",
-        label="Open to-dos needing attention",
-        category="Operations",
-        patterns=[r"work\s+request.*manual", r"manual\s+intervention", r"waiting\s+for\s+staff"],
-        snapshot_id="WORKFLOW_QUEUE_RPT_CURR",
-        default_days=30,
-        param_keys=["days"],
-        example="Open workflow to-dos not complete",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["TD_TYPE_DESC"],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [
-                    {"field": "QUEUE_SOURCE", "op": "eq", "value": "TODO"},
-                    {"field": "TD_ENTRY_STATUS_DESC", "op": "neq", "value": "Complete"},
-                ],
-                "limit": 12,
-            },
-        },
-    ),
-    NlqMetric(
-        id="payments_count_by_type",
-        label="Payment count by tender type",
-        category="Payments",
-        patterns=[r"payments?\s+processed\s+by\s+(?:payment\s+)?type", r"#\s*payments?\s+by\s+type"],
-        snapshot_id="PAY_EVENT_RPT_CURR",
-        default_days=90,
-        param_keys=["days", "payment_type"],
-        example="Number of payments by payment type",
-        build=lambda _p: {
-            "kind": "trend",
-            "query": {
-                "dimensions": ["SOLE_TENDER_TYPE_DESC"],
-                "measures": [{"field": "*", "agg": "count"}],
-                "filters": [],
-                "limit": 12,
-            },
-        },
-    ),
-    NlqMetric(
-        id="accounts_by_age",
-        label="Accounts with debt by aging bucket",
+        id="collection_processes",
+        label="Collection processes started",
         category="Collections",
-        patterns=[r"accounts?\s+by\s+age", r"#\s*accounts?\s+by\s+age"],
-        snapshot_id="SA_AGED_BAL_RPT_CURR",
-        default_days=730,
-        param_keys=["days"],
-        example="Accounts with debt by age bucket",
-        build=lambda _p: {
-            "kind": "bucket_table",
-            "buckets": [
-                {
-                    "label": "0-30 days",
-                    "query": {
-                        "dimensions": [],
-                        "measures": [{"field": "ACCT_ID", "agg": "count_distinct"}],
-                        "filters": [{"field": "DEBT_0_30", "op": "gte", "value": 0.01}],
-                    },
-                },
-                {
-                    "label": "31-60 days",
-                    "query": {
-                        "dimensions": [],
-                        "measures": [{"field": "ACCT_ID", "agg": "count_distinct"}],
-                        "filters": [{"field": "DEBT_31_60", "op": "gte", "value": 0.01}],
-                    },
-                },
-                {
-                    "label": "61-90 days",
-                    "query": {
-                        "dimensions": [],
-                        "measures": [{"field": "ACCT_ID", "agg": "count_distinct"}],
-                        "filters": [{"field": "DEBT_61_90", "op": "gte", "value": 0.01}],
-                    },
-                },
-                {
-                    "label": "Over 90 days",
-                    "query": {
-                        "dimensions": [],
-                        "measures": [{"field": "ACCT_ID", "agg": "count_distinct"}],
-                        "filters": [{"field": "DEBT_OVER_90", "op": "gte", "value": 0.01}],
-                    },
-                },
-            ],
-        },
+        patterns=[r"collection\s+process", r"collections?\s+started", r"dunning"],
+        snapshot_id="rpt_debt_process",
+        example="Collection processes last 90 days",
+        build=lambda _p: {"kind": "scalar", "date_field": "Process Created",
+                          "query": _count(dims=["Process Type"])},
     ),
     NlqMetric(
-        id="debt_dollars_by_age",
-        label="Debt dollars by aging bucket",
+        id="active_pay_plans",
+        label="Active pay plans",
         category="Collections",
-        patterns=[r"\$\s*.*accounts?\s+by\s+age", r"debt\s+dollars\s+by\s+age"],
-        snapshot_id="SA_AGED_BAL_RPT_CURR",
-        default_days=730,
+        patterns=[r"active\s+pay(ment)?\s+plans?", r"how\s+many\s+pay(ment)?\s+plans"],
+        snapshot_id="rpt_pay_plan",
+        example="How many active pay plans?",
+        build=lambda _p: {"kind": "scalar", "windowless": True, "query": _count(
+            [{"field": "Is Active", "op": "eq", "value": True}])},
+    ),
+    NlqMetric(
+        id="broken_pay_plans",
+        label="Broken pay plans",
+        category="Collections",
+        patterns=[r"broken\s+pay(ment)?\s+plans?", r"defaulted\s+plans?"],
+        snapshot_id="rpt_pay_plan",
+        example="How many broken pay plans?",
+        build=lambda _p: {"kind": "scalar", "windowless": True, "query": _count(
+            [{"field": "Is Broken", "op": "eq", "value": True}])},
+    ),
+    # ------------------------------------------------------------- Meter ops
+    NlqMetric(
+        id="measurements",
+        label="Measurements recorded",
+        category="Meter ops",
+        patterns=[r"measurements?\s+(recorded|taken|count)", r"meter\s+read(s|ings)"],
+        snapshot_id="rpt_measurement",
+        example="Meter readings last 30 days",
+        default_days=30,
+        build=lambda _p: {"kind": "scalar", "date_field": "Measurement Date/Time",
+                          "query": _count()},
+    ),
+    NlqMetric(
+        id="estimated_measurements",
+        label="Estimated measurements",
+        category="Meter ops",
+        patterns=[r"estimated\s+(measurements?|read(s|ings))", r"estimation\s+(rate|share)"],
+        snapshot_id="rpt_measurement",
+        example="Estimated reads last 30 days",
+        default_days=30,
+        build=lambda _p: {"kind": "scalar", "date_field": "Measurement Date/Time",
+                          "query": _count([{"field": "Is Estimated Measurement",
+                                            "op": "eq", "value": True}])},
+    ),
+    NlqMetric(
+        id="devices_dark",
+        label="Devices switched off 60+ days",
+        category="Meter ops",
+        patterns=[r"devices?\s+(dark|switched\s+off)", r"meters?\s+off\b"],
+        snapshot_id="rpt_device_asset",
+        example="How many devices are switched off over 60 days?",
+        build=lambda _p: {"kind": "scalar", "windowless": True, "query": _count(
+            [{"field": "Days Switched Off", "op": "gte", "value": 60}])},
+    ),
+    NlqMetric(
+        id="never_registered_devices",
+        label="Installed devices never registered at head-end",
+        category="Meter ops",
+        patterns=[r"never\s+registered", r"head[- ]end\s+registration"],
+        snapshot_id="rpt_device_asset",
+        example="Devices never registered at the head-end",
+        build=lambda _p: {"kind": "scalar", "windowless": True, "query": _count(
+            [{"field": "Never Registered At Head-End", "op": "eq", "value": True},
+             {"field": "Is Attached To Service Point", "op": "eq", "value": True}])},
+    ),
+    NlqMetric(
+        id="meterless_service_points",
+        label="In-service points with no installed meter",
+        category="Meter ops",
+        patterns=[r"(service\s+points?|sps?)\s+with(out|\s+no)\s+(a\s+)?meter",
+                  r"no\s+meter\s+installed", r"meterless"],
+        snapshot_id="rpt_premise_sp",
+        example="Active service points with no meter installed right now",
+        build=lambda _p: {"kind": "scalar", "windowless": True, "query": _count(
+            [{"field": "Has Installed Device", "op": "eq", "value": False}])},
+    ),
+    NlqMetric(
+        id="usage_transactions",
+        label="Usage transactions processed",
+        category="Meter ops",
+        patterns=[r"usage\s+transactions?", r"usage\s+processed"],
+        snapshot_id="rpt_usage_txn",
+        example="Usage transactions last 30 days",
+        default_days=30,
+        build=lambda _p: {"kind": "scalar", "date_field": "Start Date/Time",
+                          "query": _count()},
+    ),
+    # ------------------------------------------------------------- Field ops
+    NlqMetric(
+        id="field_activities",
+        label="Field activities",
+        category="Field ops",
+        patterns=[r"field\s+(activities|activity|work|orders?)", r"truck\s+rolls?"],
+        snapshot_id="rpt_field_activity",
+        example="Field activities last 30 days",
+        default_days=30,
+        build=lambda _p: {"kind": "scalar", "date_field": "Event Date/Time",
+                          "query": _count(dims=["Activity Type"])},
+    ),
+    NlqMetric(
+        id="open_todos",
+        label="Open To Do entries",
+        category="Field ops",
+        patterns=[r"open\s+to[- ]?dos?", r"to[- ]?do\s+backlog", r"work\s+queue"],
+        snapshot_id="rpt_todo",
+        example="How many open To Dos?",
+        build=lambda _p: {"kind": "scalar", "windowless": True, "query": _count(
+            [{"field": "Is Complete", "op": "eq", "value": False}])},
+    ),
+    NlqMetric(
+        id="open_cases",
+        label="Open cases",
+        category="Field ops",
+        patterns=[r"open\s+cases?", r"case\s+backlog"],
+        snapshot_id="rpt_case",
+        example="How many open cases?",
+        build=lambda _p: {"kind": "scalar", "windowless": True, "query": _count(
+            [{"field": "Is Closed", "op": "eq", "value": False}])},
+    ),
+    # --------------------------------------------------------------- Finance
+    NlqMetric(
+        id="frozen_ft_dollars",
+        label="Frozen financial transaction dollars",
+        category="Finance",
+        patterns=[r"(frozen\s+)?ft\s+dollars", r"financial\s+transactions?\s+(total|dollars)",
+                  r"posted\s+dollars"],
+        snapshot_id="rpt_financial_txn",
         format="currency",
-        param_keys=["days"],
-        example="Total debt dollars by age bucket",
-        build=lambda _p: {
-            "kind": "bucket_table",
-            "buckets": [
-                {
-                    "label": "0-30 days",
-                    "query": {
-                        "dimensions": [],
-                        "measures": [{"field": "DEBT_0_30", "agg": "sum"}],
-                        "filters": [],
-                    },
-                },
-                {
-                    "label": "31-60 days",
-                    "query": {
-                        "dimensions": [],
-                        "measures": [{"field": "DEBT_31_60", "agg": "sum"}],
-                        "filters": [],
-                    },
-                },
-                {
-                    "label": "61-90 days",
-                    "query": {
-                        "dimensions": [],
-                        "measures": [{"field": "DEBT_61_90", "agg": "sum"}],
-                        "filters": [],
-                    },
-                },
-                {
-                    "label": "Over 90 days",
-                    "query": {
-                        "dimensions": [],
-                        "measures": [{"field": "DEBT_OVER_90", "agg": "sum"}],
-                        "filters": [],
-                    },
-                },
-            ],
-        },
+        example="Frozen FT dollars last 90 days",
+        build=lambda _p: {"kind": "scalar", "date_field": "Accounting Date",
+                          "query": _sum("Current Amount",
+                                        [{"field": "Is Frozen", "op": "eq", "value": True}])},
+    ),
+    NlqMetric(
+        id="adjustments",
+        label="Adjustment dollars",
+        category="Finance",
+        patterns=[r"adjustments?\s+(total|dollars|amount)?", r"write[- ]?offs?\b"],
+        snapshot_id="rpt_financial_txn",
+        format="currency",
+        example="Adjustment dollars last 90 days",
+        build=lambda _p: {"kind": "scalar", "date_field": "Accounting Date",
+                          "query": _sum("Current Amount",
+                                        [{"field": "Is Adjustment", "op": "eq", "value": True}])},
+    ),
+    NlqMetric(
+        id="gl_by_account",
+        label="GL dollars by account",
+        category="Finance",
+        patterns=[r"gl\s+(distribution|dollars|by\s+account)", r"general\s+ledger"],
+        snapshot_id="rpt_gl",
+        format="currency",
+        example="GL dollars by account last 90 days",
+        build=lambda _p: {"kind": "trend", "date_field": "Accounting Date",
+                          "query": _sum("GL Amount", dims=["GL Account"])},
     ),
 ]
 
