@@ -20,6 +20,9 @@ type DqRule = {
   columns: string[];
   rows: (string | null)[][];
   acked_rows?: (string | null)[][];
+  /** Server-computed ack key per row (rule's declared entity, not blindly col 0). */
+  row_keys?: string[];
+  acked_row_keys?: string[];
   count: number;
   capped?: boolean;
   error?: string;
@@ -60,8 +63,8 @@ export function DataQualityBoard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const mark = async (ruleId: string, entity: string | null, done: boolean) => {
-    await apiPost(done ? "/dq/ack" : "/dq/unack", { key: `${ruleId}|${entity}` });
+  const mark = async (key: string, done: boolean) => {
+    await apiPost(done ? "/dq/ack" : "/dq/unack", { key });
     await reload();
   };
 
@@ -186,7 +189,7 @@ export function DataQualityBoard() {
                         <tr key={i} className="border-b border-slate-100">
                           <td className="px-2 py-1">
                             <button
-                              onClick={() => mark(r.id, row[0], true)}
+                              onClick={() => mark(r.row_keys?.[i] ?? `${r.id}|${row[0]}`, true)}
                               title="Mark done until the next data refresh"
                               className="rounded border border-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-50"
                             >
@@ -217,7 +220,7 @@ export function DataQualityBoard() {
                     {r.acked_rows!.map((row, i) => (
                       <li key={i} className="flex items-center gap-2">
                         <button
-                          onClick={() => mark(r.id, row[0], false)}
+                          onClick={() => mark(r.acked_row_keys?.[i] ?? `${r.id}|${row[0]}`, false)}
                           className="rounded border border-slate-300 px-1.5 py-0.5 text-[10px] hover:bg-slate-50"
                         >
                           Undo

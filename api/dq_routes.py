@@ -82,7 +82,7 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
         cur = conn.cursor()
         for r in rules:
             entry: dict[str, Any] = {k: r.get(k) for k in
-                                     ("id", "object", "severity", "title", "action")}
+                                     ("id", "object", "severity", "title", "action", "key_column")}
             try:
                 cur.execute(r["sql"])
                 cols = [d[0] for d in cur.description]
@@ -110,11 +110,22 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
         if not e.get("rows"):
             e["acked_rows"] = []
             continue
-        keep, acked = [], []
+        # The ack ENTITY is the rule's declared key_column, not blindly column 0:
+        # sp_no_installed_device leads with Premise ID, which several service points
+        # share -- keying on it made one ack hide every SP at that premise (found
+        # during the 2026-08-26 triage: 85 rows produced 64 distinct keys).
+        cols = e.get("columns") or []
+        key_col = e.get("key_column")
+        ki = cols.index(key_col) if key_col in cols else 0
+        keep, acked, keep_keys, acked_keys = [], [], [], []
         for row in e["rows"]:
-            key = f"{e['id']}|{row[0]}"
-            (acked if key in live_acks else keep).append(row)
+            key = f"{e['id']}|{row[ki]}"
+            if key in live_acks:
+                acked.append(row); acked_keys.append(key)
+            else:
+                keep.append(row); keep_keys.append(key)
         e["rows"], e["acked_rows"] = keep, acked
+        e["row_keys"], e["acked_row_keys"] = keep_keys, acked_keys
         e["count"] = len(keep)
 
     sev_rank = {"action": 0, "review": 1, "info": 2}
