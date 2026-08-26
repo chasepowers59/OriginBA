@@ -76,7 +76,7 @@ export const QUESTIONS = [
     title: "How many accounts have no email address on file?",
     why: "An account with no email cannot be sent a bill-ready notification, so every one of them is a paper bill and a phone call waiting to happen.",
     canvas: "rpt_customer_account",
-    axis: "Reachability", value: "Accounts",
+    axis: "Has Email On File", value: "Accounts",
     sql: `select case when "Main Customer Email" is not null then 'Has email'
                      when "Main Customer Phone" is not null then 'Phone only'
                      else 'No email or phone' end as "Reachability",
@@ -176,7 +176,7 @@ export const QUESTIONS = [
     title: "How many premises have a meter installed but service switched off?",
     why: "Present but disconnected. A meter can be asset-INSTALLED and install-OFF at the same time, and only one of those two statuses says whether anyone is being served.",
     canvas: "rpt_premise_sp",
-    axis: "Service State", value: "Service Points",
+    axis: "Installed But Switched Off", value: "Service Points",
     sql: `select case when "Service Is On" then 'On'
                      when "Installed But Switched Off" then 'Installed, switched off'
                      when "Has Installed Device" then 'Installed, other status'
@@ -783,7 +783,7 @@ export const QUESTIONS = [
     title: "How many customers take more than one utility service?",
     why: "A multi-service customer is worth more and is harder to lose. It also means one billing failure affects several services at once.",
     canvas: "rpt_customer_account",
-    axis: "Services Taken", value: "Accounts",
+    axis: "Takes Multiple Utility Services", value: "Accounts",
     sql: `select "Utility Type Count"::text as "Services Taken",
                  count(*)::bigint as "Accounts",
                  round(avg("Total Balance")::numeric, 2) as "Avg Balance",

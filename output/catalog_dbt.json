@@ -96,6 +96,10 @@
      "snapshot_id": "rpt_customer_account"
     },
     {
+     "report_id": "accounts_no_email",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
      "report_id": "notification_outcomes",
      "snapshot_id": "rpt_customer_notification"
     },
@@ -106,6 +110,10 @@
     {
      "report_id": "kpi_call_deflection",
      "snapshot_id": "rpt_customer_contact"
+    },
+    {
+     "report_id": "accounts_multi_utility",
+     "snapshot_id": "rpt_customer_account"
     },
     {
      "report_id": "accounts_on_alerts",
@@ -146,6 +154,10 @@
     {
      "report_id": "meters_not_registered",
      "snapshot_id": "rpt_device_asset"
+    },
+    {
+     "report_id": "service_off_but_installed",
+     "snapshot_id": "rpt_premise_sp"
     },
     {
      "report_id": "usage_no_active_sa",
@@ -8929,6 +8941,7 @@
        "Main Customer Name",
        "Main Customer Person ID",
        "Main Customer Email",
+       "Has Email On File",
        "Main Customer Phone",
        "Linked Person Count",
        "Financially Responsible Person Count",
@@ -8970,6 +8983,7 @@
        "Active SA Count",
        "Pending Stop SA Count",
        "Utility Type Count",
+       "Takes Multiple Utility Services",
        "Third Party Person Count",
        "Account Setup Date",
        "Earliest SA Start Date",
@@ -9126,6 +9140,10 @@
      "label": "Main Customer Email"
     },
     {
+     "id": "Has Email On File",
+     "label": "Has Email On File"
+    },
+    {
      "id": "Main Customer Phone",
      "label": "Main Customer Phone"
     },
@@ -9214,6 +9232,10 @@
      "label": "Has Alert"
     },
     {
+     "id": "Takes Multiple Utility Services",
+     "label": "Takes Multiple Utility Services"
+    },
+    {
      "id": "Is On Active Pay Plan",
      "label": "Is On Active Pay Plan"
     },
@@ -9270,6 +9292,14 @@
      "label": "Main Customer Email",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "Flag. Filter on it; do not sum it.",
+     "group": "customer_ops",
+     "id": "Has Email On File",
+     "label": "Has Email On File",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "Contact detail as captured in C2M.",
@@ -9598,6 +9628,14 @@
      "label": "Utility Type Count",
      "role": "measure",
      "type": "bigint"
+    },
+    {
+     "description": "",
+     "group": "customer_ops",
+     "id": "Takes Multiple Utility Services",
+     "label": "Takes Multiple Utility Services",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "Pre-aggregated count, additive at this canvas's grain.",
@@ -10175,6 +10213,23 @@
     },
     {
      "chart_type": "bar",
+     "description": "An account with no email cannot be sent a bill-ready notification, so every one of them is a paper bill and a phone call waiting to happen.",
+     "dimensions": [
+      "Has Email On File"
+     ],
+     "filters": [],
+     "id": "accounts_no_email",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "How many accounts have no email address on file?",
+     "workstream_label": "Customer Contact"
+    },
+    {
+     "chart_type": "bar",
      "description": "Collections effort follows the money. The top of this list is worth a phone call before it is worth a process.",
      "dimensions": [
       "Main Customer Name"
@@ -10207,6 +10262,23 @@
      ],
      "title": "Write-off exposure \u2014 how much debt is past the point of collection?",
      "workstream_label": "Credit Risk"
+    },
+    {
+     "chart_type": "pie",
+     "description": "A multi-service customer is worth more and is harder to lose. It also means one billing failure affects several services at once.",
+     "dimensions": [
+      "Takes Multiple Utility Services"
+     ],
+     "filters": [],
+     "id": "accounts_multi_utility",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "How many customers take more than one utility service?",
+     "workstream_label": "Customer Information"
     },
     {
      "chart_type": "bar",
@@ -20762,6 +20834,23 @@
    "poc_enabled": true,
    "portal_enabled": true,
    "premade_reports": [
+    {
+     "chart_type": "bar",
+     "description": "Present but disconnected. A meter can be asset-INSTALLED and install-OFF at the same time, and only one of those two statuses says whether anyone is being served.",
+     "dimensions": [
+      "Installed But Switched Off"
+     ],
+     "filters": [],
+     "id": "service_off_but_installed",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "How many premises have a meter installed but service switched off?",
+     "workstream_label": "Service Point"
+    },
     {
      "chart_type": "bar",
      "description": "Consumption nobody is being billed for. Either service started without an agreement or one was stopped while the meter kept running.",
