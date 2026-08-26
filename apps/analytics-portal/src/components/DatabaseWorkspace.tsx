@@ -8,10 +8,11 @@ import {
 } from "@/lib/api";
 import { suggestChart } from "@/lib/databaseChartUtils";
 import {
-  DATABASE_QUERY_TEMPLATES,
-  DATABASE_TEMPLATE_CATEGORIES,
-  DATABASE_TIPS,
+  categoriesForEngine,
+  templatesForEngine,
+  tipsForEngine,
   type DatabaseQueryTemplate,
+  type WorkspaceEngine,
 } from "@/lib/databaseQueryTemplates";
 import { exportRowsCsv, formatCurrency, formatNumber } from "@/lib/format";
 import { prettifyFieldName } from "@/lib/businessLabels";
@@ -77,7 +78,14 @@ export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("starters");
   const [templateCategory, setTemplateCategory] = useState("All");
   const [resultView, setResultView] = useState<ResultView>("table");
+  // The warehouse is where the fleet is going; the first /database/tables response
+  // corrects this for a legacy Oracle tenant.
+  const [engine, setEngine] = useState<WorkspaceEngine>("postgres");
   const editorRef = useRef<HTMLTextAreaElement>(null);
+
+  const queryTemplates = useMemo(() => templatesForEngine(engine), [engine]);
+  const templateCategories = useMemo(() => categoriesForEngine(engine), [engine]);
+  const workspaceTips = useMemo(() => tipsForEngine(engine), [engine]);
 
   const columns = result?.columns ?? (accumulatedRows[0] ? Object.keys(accumulatedRows[0]) : []);
   const hasMore = result?.has_more ?? false;
@@ -97,19 +105,20 @@ export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
   const filteredTemplates = useMemo(
     () =>
       templateCategory === "All"
-        ? DATABASE_QUERY_TEMPLATES
-        : DATABASE_QUERY_TEMPLATES.filter((t) => t.category === templateCategory),
-    [templateCategory],
+        ? queryTemplates
+        : queryTemplates.filter((t) => t.category === templateCategory),
+    [templateCategory, queryTemplates],
   );
 
   const loadTables = useCallback(async (search: string) => {
     if (!dbConfigured) return;
     setTablesLoading(true);
     try {
-      const response = await fetchDatabaseTables("CISADM", search, {
+      const response = await fetchDatabaseTables("", search, {
         snapshotsOnly: !search.trim(),
         includeStats: Boolean(search.trim()),
       });
+      if (response.engine) setEngine(response.engine);
       setTables(response.tables);
     } catch {
       setTables([]);
@@ -117,6 +126,12 @@ export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
       setTablesLoading(false);
     }
   }, [dbConfigured]);
+
+  // Learn the engine on mount so the starter queries and tips match the database
+  // this org actually queries, before the user ever opens the Tables tab.
+  useEffect(() => {
+    void loadTables("");
+  }, [loadTables]);
 
   useEffect(() => {
     if (sidebarTab === "tables") void loadTables(tableSearch);
@@ -239,7 +254,10 @@ export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
   };
 
   const insertTable = (tableName: string) => {
-    const snippet = `SELECT *\nFROM CISADM.${tableName}\nWHERE ROWNUM <= ${pageSize}`;
+    const snippet =
+      engine === "postgres"
+        ? `SELECT *\nFROM reporting.${tableName}\nLIMIT ${pageSize}`
+        : `SELECT *\nFROM CISADM.${tableName}\nWHERE ROWNUM <= ${pageSize}`;
     setSql(snippet);
     setActiveTemplate(null);
     editorRef.current?.focus();
@@ -404,7 +422,7 @@ export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
                     onChange={(e) => setTemplateCategory(e.target.value)}
                     className="input-modern w-full py-1.5 text-xs"
                   >
-                    {DATABASE_TEMPLATE_CATEGORIES.map((cat) => (
+                    {templateCategories.map((cat) => (
                       <option key={cat} value={cat}>
                         {cat}
                       </option>
@@ -441,7 +459,7 @@ export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
                     type="search"
                     value={tableSearch}
                     onChange={(e) => setTableSearch(e.target.value)}
-                    placeholder="Search CISADM tables…"
+                    placeholder={engine === "postgres" ? "Search reporting canvases…" : "Search CISADM tables…"}
                     className="input-modern w-full py-1.5 text-xs"
                   />
                   {tablesLoading ? (
@@ -466,7 +484,7 @@ export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
 
               {sidebarTab === "tips" ? (
                 <ul className="space-y-3 text-xs leading-relaxed text-slate-400">
-                  {DATABASE_TIPS.map((tip) => (
+                  {workspaceTips.map((tip) => (
                     <li key={tip} className="flex gap-2">
                       <span className="text-sky-400">•</span>
                       <span>{tip}</span>
@@ -538,7 +556,7 @@ export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
                       Results appear in pages of {pageSize} rows.
                     </p>
                     <div className="mt-6 flex flex-wrap justify-center gap-2">
-                      {DATABASE_QUERY_TEMPLATES.slice(0, 3).map((t) => (
+                      {queryTemplates.slice(0, 3).map((t) => (
                         <button
                           key={t.id}
                           type="button"

@@ -6,6 +6,17 @@ from typing import Any
 
 from api.demo_db import demo_configured
 from api.nlq_metrics import list_metric_catalog, match_metric, run_metric_nlq
+from api.warehouse_db import warehouse_configured
+
+
+def _org_snapshot_ids(organization_id: str | None) -> set[str]:
+    """The snapshot ids this org's catalog can actually resolve."""
+    from api.snapshot_catalog import load_catalog
+
+    try:
+        return set(load_catalog(organization_id=organization_id)["snapshots"].keys())
+    except Exception:  # noqa: BLE001
+        return set()
 
 
 def run_snapshot_analytics_nlq(
@@ -15,10 +26,17 @@ def run_snapshot_analytics_nlq(
     params: dict[str, Any] | None = None,
     organization_id: str,
 ) -> dict[str, Any] | None:
-    if not demo_configured(organization_id):
+    # Either backend counts — the metric's snapshot routes to whichever database
+    # serves it, exactly like the dashboards.
+    if not (demo_configured(organization_id) or warehouse_configured(organization_id)):
         return None
     q = (question or "").strip()
     if not q and not metric_id:
+        return None
+    # Never run a metric this org's catalog cannot resolve: a dbt-catalog org has no
+    # legacy *_RPT_CURR snapshots, and offering the metric anyway just errors on click.
+    metric = match_metric(q, metric_id)
+    if metric and metric.snapshot_id not in _org_snapshot_ids(organization_id):
         return None
     try:
         result = run_metric_nlq(q, metric_id=metric_id, params=params, organization_id=organization_id)
@@ -33,8 +51,13 @@ def run_snapshot_analytics_nlq(
     return None
 
 
-def get_nlq_metric_catalog() -> list[dict[str, Any]]:
-    return list_metric_catalog()
+def get_nlq_metric_catalog(organization_id: str | None = None) -> list[dict[str, Any]]:
+    """The metric catalog, restricted to snapshots this org's catalog contains."""
+    metrics = list_metric_catalog()
+    if organization_id is None:
+        return metrics
+    available = _org_snapshot_ids(organization_id)
+    return [m for m in metrics if m.get("snapshot_id") in available]
 
 
 def match_nlq_metric(question: str, metric_id: str | None = None) -> dict[str, Any] | None:

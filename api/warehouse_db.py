@@ -99,14 +99,22 @@ def execute_query(
     *,
     organization_id: str | None = None,
     max_rows: int = 5000,
+    search_path: str | None = None,
 ) -> tuple[list[str], list[list[Any]]]:
-    binds = binds or {}
+    # None, not {}: psycopg2 attempts %-interpolation whenever vars is not None, so an
+    # unparameterised statement containing a literal % (LIKE '%tax%') would crash.
+    binds = binds or None
     with warehouse_connection(organization_id) as conn:
         with conn.cursor() as cur:
             # A hard server-side ceiling as well as the LIMIT the builder writes: a
             # governed portal must not be able to hold a client warehouse open on one
             # badly-shaped request.
             cur.execute("SET LOCAL statement_timeout = '30s'")
+            if search_path:
+                # Scopes UNQUALIFIED names for callers like the SQL workspace, whose
+                # contract is "the reporting layer only". SET LOCAL dies with the
+                # rolled-back transaction, so it never leaks to the next borrower.
+                cur.execute("SET LOCAL search_path = %s", (search_path,))
             cur.execute(sql, binds)
             if cur.description is None:
                 return [], []

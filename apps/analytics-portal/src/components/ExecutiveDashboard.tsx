@@ -90,7 +90,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
             </>
           ) : null}
           {isHome ? (
-            <Link href="/dashboard" className="btn-primary">
+            <Link href="/" className="btn-primary">
               Open full dashboard
             </Link>
           ) : null}

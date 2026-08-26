@@ -1,4 +1,11 @@
-"""Database workspace API — ad-hoc read-only SQL with paginated results."""
+"""Database workspace API — ad-hoc read-only SQL with paginated results.
+
+ENGINE ROUTING: the workspace queries whatever database serves this org's catalog —
+the same decision the explorer and dashboards make. A dbt-catalog org reads the
+Postgres reporting warehouse and sees ONLY the governed reporting canvases (search_path
+pinned to `reporting`, other schemas rejected by the validator); a legacy cisadm-catalog
+org still reads the Oracle *_RPT_CURR snapshots until it is migrated.
+"""
 
 from __future__ import annotations
 
@@ -9,14 +16,19 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from api.auth.dependencies import AuthContext, require_permission
-from api.demo_db import demo_configured, execute_query
+from api.demo_db import demo_configured
+from api.demo_db import execute_query as execute_demo_query
 from api.org_db import require_org_for_data
+from api.snapshot_catalog import catalog_name_for_org
 from api.sql_workspace_validator import (
     SqlWorkspaceValidationError,
+    validate_reporting_scope,
     validate_workspace_sql,
     wrap_count_sql,
     wrap_paginated_sql,
 )
+from api.warehouse_db import execute_query as execute_warehouse_query
+from api.warehouse_db import warehouse_configured
 
 
 router = APIRouter(prefix="/database", tags=["database"])
@@ -25,6 +37,8 @@ MAX_PAGE_SIZE = 500
 DEFAULT_PAGE_SIZE = 50
 MAX_TOTAL_ROWS = 50_000
 
+# The legacy Oracle workspace's curated list. The warehouse needs no equivalent:
+# every rpt_* canvas in the reporting schema is governed by construction.
 ACTIVE_SNAPSHOT_TABLES = (
     "FT_RPT_CURR",
     "BSEG_BILLED_USAGE_RPT_CURR",
@@ -71,26 +85,86 @@ def _rows_to_dicts(columns: list[str], rows: list[list[Any]]) -> list[dict[str, 
     ]
 
 
-def _require_db(org_id: str) -> None:
-    if not demo_configured(org_id):
+def _engine(org_id: str) -> str:
+    """Which database this org's workspace queries — routed like the whole portal."""
+    return "postgres" if catalog_name_for_org(org_id) == "dbt" else "oracle"
+
+
+def _require_db(org_id: str) -> str:
+    engine = _engine(org_id)
+    ok = warehouse_configured(org_id) if engine == "postgres" else demo_configured(org_id)
+    if not ok:
         raise HTTPException(
             status_code=503,
             detail="Database is not configured for this organization.",
         )
+    return engine
+
+
+def _validate(engine: str, sql: str) -> str:
+    validated = validate_workspace_sql(sql)
+    if engine == "postgres":
+        validate_reporting_scope(validated)
+    return validated
+
+
+def _run(engine: str, sql: str, org_id: str, max_rows: int) -> tuple[list[str], list[list[Any]]]:
+    if engine == "postgres":
+        # search_path pins unqualified names to the reporting layer; the validator
+        # already rejected explicit references to any other schema.
+        return execute_warehouse_query(
+            sql, organization_id=org_id, max_rows=max_rows, search_path="reporting")
+    return execute_demo_query(sql, organization_id=org_id, max_rows=max_rows)
+
+
+def _list_warehouse_tables(org_id: str, needle: str) -> list[dict[str, Any]]:
+    """The reporting canvases, with live row estimates — one governed layer, no
+    curated subset needed."""
+    sql = """
+        select c.relname as table_name,
+               s.n_live_tup as num_rows,
+               greatest(s.last_analyze, s.last_autoanalyze) as last_analyzed
+        from pg_stat_user_tables s
+        join pg_class c on c.oid = s.relid
+        where s.schemaname = 'reporting'
+          and (%(pattern)s = '' or c.relname ilike '%%' || %(pattern)s || '%%')
+        order by c.relname
+        limit 200
+    """
+    columns, rows = execute_warehouse_query(
+        sql, {"pattern": needle}, organization_id=org_id, max_rows=200)
+    return [
+        {columns[i].lower(): _serialize_cell(row[i]) for i in range(len(columns))}
+        for row in rows
+    ]
 
 
 @router.get("/tables")
 def list_tables(
     ctx: AuthContext = Depends(require_permission("database:sql")),
-    schema: str = Query(default="CISADM", min_length=1, max_length=128),
+    schema: str = Query(default="", min_length=0, max_length=128),
     search: str = Query(default="", max_length=128),
     snapshots_only: bool = Query(default=True),
     include_stats: bool = Query(default=False),
 ) -> dict[str, Any]:
     org_id = require_org_for_data(ctx)
-    _require_db(org_id)
+    engine = _require_db(org_id)
 
-    schema_upper = schema.strip().upper()
+    if engine == "postgres":
+        try:
+            tables = _list_warehouse_tables(org_id, search.strip().lower())
+        except Exception as exc:
+            raise HTTPException(status_code=502, detail=f"Failed to list tables: {exc}") from exc
+        return {
+            "organization_id": org_id,
+            "engine": engine,
+            "schema": "reporting",
+            "tables": tables,
+            "table_count": len(tables),
+            "source": "database",
+        }
+
+    schema_upper = (schema.strip() or "CISADM").upper()
     needle = search.strip().upper()
 
     if snapshots_only and not needle and not include_stats:
@@ -100,6 +174,7 @@ def list_tables(
         ]
         return {
             "organization_id": org_id,
+            "engine": engine,
             "schema": schema_upper,
             "tables": tables,
             "table_count": len(tables),
@@ -131,17 +206,19 @@ def list_tables(
             FETCH FIRST 200 ROWS ONLY
         """
     try:
-        columns, rows = execute_query(sql, binds, organization_id=org_id, max_rows=200)
+        columns, rows = execute_demo_query(sql, binds, organization_id=org_id, max_rows=200)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Failed to list tables: {exc}") from exc
 
     items = []
     for row in rows:
-        rec = {columns[i]: _serialize_cell(row[i]) for i in range(len(columns))}
+        # Lowercase the keys: Oracle reports TABLE_NAME and the UI reads table_name.
+        rec = {columns[i].lower(): _serialize_cell(row[i]) for i in range(len(columns))}
         items.append(rec)
 
     return {
         "organization_id": org_id,
+        "engine": engine,
         "schema": schema_upper,
         "tables": items,
         "table_count": len(items),
@@ -155,7 +232,7 @@ def execute_sql(
     ctx: AuthContext = Depends(require_permission("database:sql")),
 ) -> dict[str, Any]:
     org_id = require_org_for_data(ctx)
-    _require_db(org_id)
+    engine = _require_db(org_id)
 
     if body.offset >= MAX_TOTAL_ROWS:
         raise HTTPException(
@@ -164,7 +241,7 @@ def execute_sql(
         )
 
     try:
-        validated = validate_workspace_sql(body.sql)
+        validated = _validate(engine, body.sql)
     except SqlWorkspaceValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -175,11 +252,9 @@ def execute_sql(
     paged_sql = wrap_paginated_sql(validated, offset=body.offset, limit=page_size, probe_extra=1)
     started = time.perf_counter()
     try:
-        columns, raw_rows = execute_query(
-            paged_sql,
-            organization_id=org_id,
-            max_rows=page_size + 1,
-        )
+        columns, raw_rows = _run(engine, paged_sql, org_id, page_size + 1)
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Query failed: {exc}") from exc
     elapsed_ms = int((time.perf_counter() - started) * 1000)
@@ -192,7 +267,7 @@ def execute_sql(
     if body.include_total_count:
         try:
             count_sql = wrap_count_sql(validated)
-            _, count_rows = execute_query(count_sql, organization_id=org_id, max_rows=1)
+            _, count_rows = _run(engine, count_sql, org_id, 1)
             if count_rows:
                 total_count = int(count_rows[0][0])
         except Exception:
@@ -202,6 +277,7 @@ def execute_sql(
 
     return {
         "organization_id": org_id,
+        "engine": engine,
         "columns": columns,
         "rows": serialized,
         "row_count": len(serialized),
@@ -221,23 +297,24 @@ def count_sql(
     ctx: AuthContext = Depends(require_permission("database:sql")),
 ) -> dict[str, Any]:
     org_id = require_org_for_data(ctx)
-    _require_db(org_id)
+    engine = _require_db(org_id)
 
     try:
-        validated = validate_workspace_sql(body.sql)
+        validated = _validate(engine, body.sql)
     except SqlWorkspaceValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     started = time.perf_counter()
     try:
         count_sql_text = wrap_count_sql(validated)
-        _, count_rows = execute_query(count_sql_text, organization_id=org_id, max_rows=1)
+        _, count_rows = _run(engine, count_sql_text, org_id, 1)
         total = int(count_rows[0][0]) if count_rows else 0
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Count failed: {exc}") from exc
 
     return {
         "organization_id": org_id,
+        "engine": engine,
         "total_count": total,
         "execution_ms": int((time.perf_counter() - started) * 1000),
         "sql": validated,

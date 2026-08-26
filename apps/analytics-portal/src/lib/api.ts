@@ -318,11 +318,13 @@ export function defaultDateRangeLastMonth(): [string, string] {
 }
 
 export function fetchDatabaseTables(
-  schema = "CISADM",
+  // Empty = let the API pick the engine's own schema (reporting for the warehouse,
+  // CISADM for a legacy Oracle tenant).
+  schema = "",
   search = "",
   opts?: { snapshotsOnly?: boolean; includeStats?: boolean },
 ): Promise<DatabaseTablesResponse> {
-  const params = new URLSearchParams({ schema });
+  const params = new URLSearchParams(schema ? { schema } : {});
   if (search.trim()) params.set("search", search.trim());
   if (opts?.snapshotsOnly === false) params.set("snapshots_only", "false");
   if (opts?.includeStats) params.set("include_stats", "true");

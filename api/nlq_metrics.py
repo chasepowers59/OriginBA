@@ -55,7 +55,9 @@ def _scalar(
     organization_id: str,
     date_field: str | None = None,
 ) -> tuple[float, list[dict[str, Any]]]:
-    snap = get_snapshot(snapshot_id)
+    # The catalog is per-org; resolving without it looks up legacy ids in the dbt
+    # catalog and misses (this had NLQ erroring for every tenant).
+    snap = get_snapshot(snapshot_id, organization_id)
     field_name = date_field or snap.get("required_date_field")
     if not field_name:
         raise ValueError(f"No date field for {snapshot_id}")
@@ -81,7 +83,9 @@ def _trend(
     organization_id: str,
     date_field: str | None = None,
 ) -> list[dict[str, Any]]:
-    snap = get_snapshot(snapshot_id)
+    # The catalog is per-org; resolving without it looks up legacy ids in the dbt
+    # catalog and misses (this had NLQ erroring for every tenant).
+    snap = get_snapshot(snapshot_id, organization_id)
     field_name = date_field or snap.get("required_date_field")
     days = int(params.get("days") or 90)
     start, end = _window(days)

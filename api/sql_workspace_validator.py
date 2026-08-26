@@ -53,6 +53,27 @@ def validate_workspace_sql(sql: str) -> str:
     return cleaned
 
 
+# Schemas a WAREHOUSE workspace query may not name. The portal's contract is that end
+# users read only the governed reporting canvases -- staging/core are implementation
+# layers and cisadm/landing are raw source. Unqualified names are handled separately by
+# pinning search_path to reporting, so this only has to catch explicit qualification.
+_NON_REPORTING_SCHEMA = re.compile(
+    r"\b(cisadm|landing|staging|core|public|pg_catalog|information_schema)\s*\.",
+    re.IGNORECASE,
+)
+
+
+def validate_reporting_scope(sql: str) -> None:
+    """Reject warehouse SQL that reaches outside the reporting layer."""
+    match = _NON_REPORTING_SCHEMA.search(sql)
+    if match:
+        raise SqlWorkspaceValidationError(
+            f"The workspace is scoped to the reporting layer -- "
+            f"'{match.group(1)}.' is not queryable here. "
+            f"Query the reporting.rpt_* canvases instead."
+        )
+
+
 def wrap_paginated_sql(sql: str, *, offset: int, limit: int, probe_extra: int = 0) -> str:
     """Wrap user SQL with OFFSET/FETCH for SQL-Developer-style paging."""
     off = max(0, offset)

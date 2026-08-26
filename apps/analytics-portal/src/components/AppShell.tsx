@@ -11,10 +11,12 @@ import { WorkstreamSidebar, WorkstreamSidebarNav } from "@/components/Workstream
 import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 
+// One entry per surface: "/" IS the executive overview (the old /dashboard entry
+// duplicated it), workstream sections live in the sidebar, and everything reads
+// the governed reporting layer.
 const NAV = [
-  { href: "/", label: "Home", id: "home" as const },
+  { href: "/", label: "Overview", id: "home" as const },
   { href: "/reports", label: "Reports", id: "reports" as const },
-  { href: "/dashboard", label: "Dashboard", id: "dashboard" as const },
   { href: "/dashboard/custom", label: "My dashboards", id: "custom" as const },
   { href: "/database", label: "Database", id: "database" as const },
   { href: "/data-quality", label: "Data Quality", id: "dq" as const },

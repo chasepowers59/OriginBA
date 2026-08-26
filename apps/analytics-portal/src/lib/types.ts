@@ -212,6 +212,8 @@ export type DatabaseTableInfo = {
 
 export type DatabaseTablesResponse = {
   organization_id: string;
+  /** "postgres" = the dbt reporting warehouse; "oracle" = legacy CISADM snapshots. */
+  engine?: "postgres" | "oracle";
   schema: string;
   tables: DatabaseTableInfo[];
   table_count: number;

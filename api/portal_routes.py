@@ -239,7 +239,10 @@ def analytics_nlq_metrics(ctx: AuthContext = Depends(get_auth_context)) -> dict[
     ctx.require_permission("nlq:read")
     from api.snapshot_analytics_nlq import get_nlq_metric_catalog
 
-    return {"metrics": filter_nlq_metrics_for_auth(get_nlq_metric_catalog(), ctx)}
+    # Per-org: only metrics whose snapshot exists in this org's catalog are offered —
+    # a dbt-catalog org has no legacy *_RPT_CURR snapshots to run them against.
+    org_id = ctx.effective_organization_id()
+    return {"metrics": filter_nlq_metrics_for_auth(get_nlq_metric_catalog(org_id), ctx)}
 
 
 @router.post("/analytics-nlq")
@@ -250,10 +253,11 @@ def analytics_nlq(
     ctx.require_permission("nlq:read")
     from api.demo_db import demo_configured
     from api.snapshot_analytics_nlq import run_snapshot_analytics_nlq
+    from api.warehouse_db import warehouse_configured
 
     org_id = require_org_for_data(ctx)
-    if not demo_configured(org_id):
-        raise HTTPException(status_code=503, detail="Demo database not configured")
+    if not (demo_configured(org_id) or warehouse_configured(org_id)):
+        raise HTTPException(status_code=503, detail="Database not configured")
     params = body.model_dump(exclude={"query", "metric_id"}, exclude_none=True)
     from api.snapshot_analytics_nlq import match_nlq_metric
 

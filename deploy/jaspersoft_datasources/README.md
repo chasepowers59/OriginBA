@@ -10,7 +10,8 @@ under `clients/`.
 | --- | --- | --- | --- |
 | `Origin_STAGE_DS` | `Origin_STAGE` | pstgdb (primary Stage DB) | `canonical/Origin_STAGE_DS/` |
 | `Training_DB` | `Origin_STAGE` | ptrndb Int Train (snapshots) | `canonical/Training_DB/` |
-| `Origin_DEV_DS` | `Origin_DEV` | Int Dev 25.4 | `canonical/Origin_DEV_DS/` |
+| `Origin_DEV_DS` | `Origin_DEV` | Org primary DEV alias (repo copy = INT_DEV; server may differ) | `canonical/Origin_DEV_DS/` |
+| `Origin_INT_DEV_DS` | `Origin_DEV` | INT_DEV / pdevdb 25.4 (dbt warehouse) — safe beside Ellensburg `Origin_DEV_DS` | `canonical/Origin_INT_DEV_DS/` |
 
 **Origin_STAGE_DS pstgdb backup:** `archive/Origin_STAGE_DS_pstgdb_20260608/`
 
@@ -22,7 +23,9 @@ Each folder contains the exact Jaspersoft export:
 - `resources/DataSource/.folder.xml`
 - `index.xml`
 
-Original ZIP backups: `Origin_STAGE_DS_export.zip`, `Origin_DEV_DS_export.zip`.
+Original ZIP backups: `Origin_STAGE_DS_export.zip`, `Origin_DEV_DS_export.zip`, `Origin_INT_DEV_DS_export.zip`.
+
+If server `Origin_DEV_DS` already points at a client TEST DB (e.g. Ellensburg), import **`Origin_INT_DEV_DS`** for pdevdb warehouse work so you do not overwrite that alias.
 
 ## Refresh from Jaspersoft Server
 

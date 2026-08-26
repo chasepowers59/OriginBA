@@ -238,3 +238,204 @@ export const DATABASE_TEMPLATE_CATEGORIES = [
   "All",
   ...Array.from(new Set(DATABASE_QUERY_TEMPLATES.map((t) => t.category))),
 ];
+
+// ---------------------------------------------------------------------------
+// WAREHOUSE templates — the dbt reporting canvases (Postgres). Column names are
+// the governed Title-Case contract, verified against output/catalog_dbt.json;
+// never guess a name here, the validator holds queries to the real ones.
+// ---------------------------------------------------------------------------
+
+export const WAREHOUSE_TIPS = [
+  "You are querying the governed reporting canvases (reporting.rpt_*) — the same tables every dashboard reads.",
+  "Column names are business names in double quotes: \"Billed Amount\", \"Main Customer Name\".",
+  "Flags are real booleans — filter with WHERE \"Is Completed\" or WHERE NOT \"Has Installed Device\".",
+  "Results load 50 rows at a time. Use Fetch next when you need more rows without waiting for the full result set.",
+  "Add a date filter (last 6 months) to keep queries fast on the big canvases like rpt_financial_txn.",
+  "Press Ctrl+Enter (⌘+Enter on Mac) to run the statement.",
+  "Toggle Chart view when your result has categories and numbers — great for monthly trends or class breakdowns.",
+];
+
+export const WAREHOUSE_QUERY_TEMPLATES: DatabaseQueryTemplate[] = [
+  {
+    id: "wh_canvas_freshness",
+    category: "Operations",
+    title: "Canvas freshness check",
+    description: "Row counts for the core reporting canvases, plus the warehouse's refresh watermark.",
+    tip: "\"Load Date/Time\" on rpt_financial_txn is the CDC watermark — the same marker the Data Quality page keys its acks to.",
+    sql: `SELECT 'rpt_financial_txn' AS canvas, COUNT(*) AS row_count, MAX("Load Date/Time") AS last_refresh
+FROM rpt_financial_txn
+UNION ALL
+SELECT 'rpt_bill_segment', COUNT(*), NULL FROM rpt_bill_segment
+UNION ALL
+SELECT 'rpt_payment_tender', COUNT(*), NULL FROM rpt_payment_tender
+UNION ALL
+SELECT 'rpt_measurement', COUNT(*), NULL FROM rpt_measurement
+UNION ALL
+SELECT 'rpt_gl', COUNT(*), NULL FROM rpt_gl`,
+  },
+  {
+    id: "wh_ft_monthly",
+    category: "Finance",
+    title: "FT dollars by month (last 6 months)",
+    description: "Monthly financial transaction count and current amount totals.",
+    tip: "Frozen FTs only — the canvas flag states the lifecycle basis.",
+    sql: `SELECT date_trunc('month', "Accounting Date") AS month,
+       COUNT(*) AS ft_count,
+       SUM("Current Amount") AS total_current_amount
+FROM rpt_financial_txn
+WHERE "Accounting Date" >= date_trunc('month', current_date) - interval '6 months'
+  AND "Is Frozen"
+GROUP BY 1
+ORDER BY 1`,
+    chartDimension: "month",
+    chartMeasure: "total_current_amount",
+    chartType: "line",
+    isCurrency: true,
+    sortTimeSeries: true,
+  },
+  {
+    id: "wh_ft_by_type",
+    category: "Finance",
+    title: "FT volume and dollars by transaction type",
+    description: "Which FT types drive activity and dollars in the last 90 days.",
+    tip: "Add \"GL Distribution Status\" to the SELECT for a posting-health view.",
+    sql: `SELECT "FT Type" AS ft_type,
+       COUNT(*) AS ft_count,
+       SUM("Current Amount") AS total_current_amount
+FROM rpt_financial_txn
+WHERE "Accounting Date" >= current_date - 90
+GROUP BY "FT Type"
+ORDER BY total_current_amount DESC`,
+    chartDimension: "ft_type",
+    chartMeasure: "total_current_amount",
+    chartType: "horizontal",
+    isCurrency: true,
+  },
+  {
+    id: "wh_billed_by_class",
+    category: "Billing",
+    title: "Billed revenue by customer class",
+    description: "Total billed dollars by customer class — last 6 months.",
+    tip: "Segment grain — one row per bill segment. \"Billed Amount\" is the calc-line total, the correct billed figure.",
+    sql: `SELECT "Customer Class" AS customer_class,
+       COUNT(*) AS bill_segments,
+       SUM("Billed Amount") AS billed_amount
+FROM rpt_bill_segment
+WHERE "Bill Date" >= current_date - interval '6 months'
+GROUP BY "Customer Class"
+ORDER BY billed_amount DESC`,
+    chartDimension: "customer_class",
+    chartMeasure: "billed_amount",
+    chartType: "horizontal",
+    isCurrency: true,
+  },
+  {
+    id: "wh_billed_by_cycle",
+    category: "Billing",
+    title: "Billed revenue by bill cycle",
+    description: "Billed dollars grouped by bill cycle for recent billing periods.",
+    tip: "Useful for cycle-level billing health and revenue comparisons.",
+    sql: `SELECT "Bill Cycle" AS bill_cycle,
+       COUNT(*) AS bill_segments,
+       SUM("Billed Amount") AS billed_amount
+FROM rpt_bill_segment
+WHERE "Bill Date" >= current_date - interval '6 months'
+GROUP BY "Bill Cycle"
+ORDER BY billed_amount DESC`,
+    chartDimension: "bill_cycle",
+    chartMeasure: "billed_amount",
+    chartType: "bar",
+    isCurrency: true,
+  },
+  {
+    id: "wh_charges_by_description",
+    category: "Billing",
+    title: "Billed dollars by charge description",
+    description: "Which charge lines carry the revenue — calc-line grain.",
+    tip: "The line-level detail behind every bill segment; filter with ILIKE '%tax%' to profile tax lines.",
+    sql: `SELECT "Charge Description" AS charge,
+       COUNT(*) AS line_count,
+       SUM("Billed Amount") AS billed_amount
+FROM rpt_billed_charge
+GROUP BY "Charge Description"
+ORDER BY billed_amount DESC
+LIMIT 25`,
+    chartDimension: "charge",
+    chartMeasure: "billed_amount",
+    chartType: "horizontal",
+    isCurrency: true,
+  },
+  {
+    id: "wh_measurements_monthly",
+    category: "Meter ops",
+    title: "Measurements by month",
+    description: "Monthly measurement counts, with the estimated share.",
+    tip: "\"Is Estimated Measurement\" is a real boolean — a rising estimated share is the complaint zone.",
+    sql: `SELECT date_trunc('month', "Measurement Date/Time") AS month,
+       COUNT(*) AS measurement_count,
+       COUNT(*) FILTER (WHERE "Is Estimated Measurement") AS estimated_count
+FROM rpt_measurement
+WHERE "Measurement Date/Time" >= current_date - interval '6 months'
+GROUP BY 1
+ORDER BY 1`,
+    chartDimension: "month",
+    chartMeasure: "measurement_count",
+    chartType: "line",
+    sortTimeSeries: true,
+  },
+  {
+    id: "wh_gl_by_account",
+    category: "Finance",
+    title: "GL distribution by account (last 6 months)",
+    description: "Top GL accounts by distribution amount from the GL canvas.",
+    tip: "Use rpt_gl for GL line detail — not the FT header totals.",
+    sql: `SELECT "GL Account" AS gl_account,
+       COUNT(*) AS distribution_lines,
+       SUM("GL Amount") AS total_gl_amount
+FROM rpt_gl
+WHERE "Accounting Date" >= current_date - interval '6 months'
+GROUP BY "GL Account"
+ORDER BY total_gl_amount DESC`,
+    chartDimension: "gl_account",
+    chartMeasure: "total_gl_amount",
+    chartType: "horizontal",
+    isCurrency: true,
+  },
+  {
+    id: "wh_stuck_bills",
+    category: "Operations",
+    title: "Bills stuck open over 30 days",
+    description: "The billing engine's stuck-bill worklist, straight off rpt_bill.",
+    tip: "Measured norm is p50 3.8 / p99 24.2 days open — 30+ is genuinely stuck.",
+    sql: `SELECT "Bill ID", "Main Customer Name", "Bill Date", "Days Bill Open"
+FROM rpt_bill
+WHERE "Days Bill Open" > 30
+ORDER BY "Days Bill Open" DESC`,
+  },
+  {
+    id: "wh_peek_ft",
+    category: "Quick look",
+    title: "Preview financial transactions",
+    description: "Recent financial transaction rows — good for exploring columns.",
+    tip: "Fast starter query. Edit the WHERE clause to narrow by date or account.",
+    sql: `SELECT "FT ID", "Accounting Date", "FT Type", "Current Amount",
+       "GL Distribution Status", "Main Customer Name"
+FROM rpt_financial_txn
+WHERE "Accounting Date" >= current_date - interval '1 month'
+ORDER BY "Accounting Date" DESC`,
+  },
+];
+
+export type WorkspaceEngine = "postgres" | "oracle";
+
+export function templatesForEngine(engine: WorkspaceEngine): DatabaseQueryTemplate[] {
+  return engine === "postgres" ? WAREHOUSE_QUERY_TEMPLATES : DATABASE_QUERY_TEMPLATES;
+}
+
+export function tipsForEngine(engine: WorkspaceEngine): string[] {
+  return engine === "postgres" ? WAREHOUSE_TIPS : DATABASE_TIPS;
+}
+
+export function categoriesForEngine(engine: WorkspaceEngine): string[] {
+  return ["All", ...Array.from(new Set(templatesForEngine(engine).map((t) => t.category)))];
+}

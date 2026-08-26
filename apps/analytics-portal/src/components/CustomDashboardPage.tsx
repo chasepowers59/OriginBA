@@ -10,20 +10,22 @@ import {
   updateDashboard,
 } from "@/lib/api";
 import type { DashboardTileDef, SavedDashboard, SnapshotSummary } from "@/lib/types";
-import { DASHBOARD_TEMPLATES, type DashboardTemplate } from "@/lib/dashboardTemplates";
+import { templatesForSnapshots, type DashboardTemplate } from "@/lib/dashboardTemplates";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { DashboardTile } from "./DashboardTile";
 import { PresentationToolbar } from "./PresentationToolbar";
 
 const SLOTS = [0, 1, 2, 3];
 
-function emptyTile(slot: number): DashboardTileDef {
+function emptyTile(slot: number, snapshotId = "rpt_financial_txn"): DashboardTileDef {
+  // Default to the dbt canvas; callers with the org's catalog loaded pass its first
+  // snapshot instead, so a legacy Oracle tenant still gets a valid starting point.
   return {
     id: crypto.randomUUID(),
     slot,
     title: "New tile",
     visual: "chart",
-    snapshot_id: "FT_RPT_CURR",
+    snapshot_id: snapshotId,
     chart_type: "bar",
   };
 }
@@ -127,6 +129,13 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     }
   };
 
+  // Only templates every one of whose tiles this org's catalog can run — a
+  // dbt-catalog org never sees the legacy *_RPT_CURR boards, and vice versa.
+  const availableTemplates = useMemo(
+    () => templatesForSnapshots(new Set(snapshots.map((s) => s.id))),
+    [snapshots],
+  );
+
   const updateTile = (slot: number, patch: Partial<DashboardTileDef>) => {
     setTiles((prev) => {
       const existing = prev.find((t) => t.slot === slot);
@@ -165,8 +174,8 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href="/dashboard" className="text-xs text-sky-400 hover:text-sky-300">
-            ← Dashboards
+          <Link href="/dashboard/custom" className="text-xs text-sky-400 hover:text-sky-300">
+            ← My dashboards
           </Link>
           <input
             value={title}
@@ -194,7 +203,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
             Load a 2×2 workstream dashboard, then drag tiles or edit to customize.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {DASHBOARD_TEMPLATES.map((template) => (
+            {availableTemplates.map((template) => (
               <button
                 key={template.id}
                 type="button"

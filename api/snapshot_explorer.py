@@ -15,6 +15,7 @@ from api.auth.workstream_access import (
     filter_workstreams_for_auth,
 )
 from api.demo_db import demo_configured, execute_query
+from api.warehouse_db import warehouse_configured
 from api.org_db import require_org_for_data
 from api.query_builder import QueryValidationError, build_query
 from api.raw_sql_validator import RawSqlValidationError, apply_row_cap, validate_raw_sql
@@ -124,7 +125,11 @@ def snapshots_index(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, A
         "workstream_labels": catalog.get("workstream_labels", {}),
         "portal_snapshots": catalog.get("portal_snapshots", []),
         "poc_enabled": catalog.get("poc_enabled", []),
-        "db_configured": demo_configured(org_id) if org_id else False,
+        # Either backend counts: dbt-catalog orgs read the Postgres warehouse, legacy
+        # orgs the Oracle demo. Demo-only here showed warehouse tenants "Connect
+        # database" with a live warehouse behind them.
+        "db_configured": (demo_configured(org_id) or warehouse_configured(org_id))
+        if org_id else False,
         "workstreams": workstreams,
         "snapshots": snapshots,
     }

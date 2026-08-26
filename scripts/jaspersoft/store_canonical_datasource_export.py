@@ -11,7 +11,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CANONICAL_ROOT = REPO_ROOT / "deploy" / "jaspersoft_datasources" / "canonical"
-ALLOWED_ALIASES = {"Origin_STAGE_DS", "Origin_DEV_DS", "Training_DB"}
+ALLOWED_ALIASES = {"Origin_STAGE_DS", "Origin_DEV_DS", "Training_DB", "Origin_INT_DEV_DS"}
 
 
 def parse_args() -> argparse.Namespace:

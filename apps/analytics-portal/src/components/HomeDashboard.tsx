@@ -10,7 +10,6 @@ import { FavoritesPanel } from "@/components/FavoritesPanel";
 import { ExecutiveDashboard } from "@/components/ExecutiveDashboard";
 import { NlqSearchPanel } from "@/components/NlqSearchPanel";
 import { useBrand } from "@/components/PortalThemeProvider";
-import { WorkstreamExplorer } from "@/components/WorkstreamExplorer";
 
 export function HomeDashboard() {
   const brand = useBrand();
@@ -49,8 +48,8 @@ export function HomeDashboard() {
             <Link href="/reports" className="btn-primary">
               Open report library
             </Link>
-            <Link href="/dashboard" className="btn-ghost">
-              Executive dashboard
+            <Link href="/data-quality" className="btn-ghost">
+              Data quality board
             </Link>
           </div>
           <p className="mt-4 text-xs text-slate-500">
@@ -60,11 +59,13 @@ export function HomeDashboard() {
       </section>
 
       <section>
-        <ExecutiveDashboard variant="home" initialDays={30} />
+        {/* The one executive overview: "/" is the Executive Overview page —
+            /dashboard redirects here so the KPIs and search live in one place. */}
+        <ExecutiveDashboard variant="full" initialDays={30} />
       </section>
 
       <section>
-        <NlqSearchPanel compact />
+        <NlqSearchPanel />
       </section>
 
       <section>
@@ -106,10 +107,3 @@ export function SnapshotCard({ snap }: { snap: SnapshotSummary }) {
   );
 }
 
-export function SnapshotCatalog({
-  workstreams,
-}: {
-  workstreams: import("@/lib/types").WorkstreamGroup[];
-}) {
-  return <WorkstreamExplorer workstreams={workstreams} />;
-}
