@@ -10,12 +10,13 @@ per-tenant warehouse pool every canvas query uses.
 """
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 from typing import Any
 
 import yaml
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Body, Depends
 
 from api.auth import AuthContext, get_auth_context
 from api.warehouse_db import warehouse_configured, warehouse_connection
@@ -27,6 +28,39 @@ DEFAULT_RULES = ROOT.parent / "originba_dbt" / "dq_rules" / "rules.yml"
 router = APIRouter(prefix="/dq", tags=["data-quality"])
 
 ROW_CAP = 100
+ACK_DIR = ROOT / "data" / "dq_acks"
+
+
+def _ack_path(org: str | None) -> Path:
+    return ACK_DIR / f"{org or 'default'}.json"
+
+
+def _load_acks(org: str | None) -> dict[str, Any]:
+    try:
+        return json.loads(_ack_path(org).read_text())
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def _save_acks(org: str | None, acks: dict[str, Any]) -> None:
+    ACK_DIR.mkdir(parents=True, exist_ok=True)
+    _ack_path(org).write_text(json.dumps(acks, indent=1))
+
+
+def _refresh_marker(cur) -> str:
+    """A value that changes when the warehouse is reloaded/rebuilt.
+
+    load_dttm is the CDC/build watermark every staging view carries; its max moves
+    on every refresh, which is EXACTLY the acknowledged-until-next-refresh contract:
+    mark a finding done and it stays hidden until new data arrives, then the rule
+    re-evaluates it fresh.
+    """
+    try:
+        cur.execute("select max(load_dttm)::text from staging.stg_financial_txn")
+        row = cur.fetchone()
+        return str(row[0]) if row and row[0] else "none"
+    except Exception:  # noqa: BLE001
+        return "none"
 
 
 def _rules_path() -> Path:
@@ -63,11 +97,60 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
                 entry["error"] = str(e).splitlines()[0][:200]
                 entry["columns"], entry["rows"], entry["count"] = [], [], 0
             out.append(entry)
+    # ---- acknowledgements: hidden until the warehouse refreshes -------------
+    with warehouse_connection(org) as conn:
+        marker = _refresh_marker(conn.cursor())
+    acks = _load_acks(org)
+    # a marker change means new data arrived: every ack expires and findings
+    # re-surface for the next quality pass
+    live_acks = {k: v for k, v in acks.items() if v.get("marker") == marker}
+    if live_acks != acks:
+        _save_acks(org, live_acks)
+    for e in out:
+        if not e.get("rows"):
+            e["acked_rows"] = []
+            continue
+        keep, acked = [], []
+        for row in e["rows"]:
+            key = f"{e['id']}|{row[0]}"
+            (acked if key in live_acks else keep).append(row)
+        e["rows"], e["acked_rows"] = keep, acked
+        e["count"] = len(keep)
+
     sev_rank = {"action": 0, "review": 1, "info": 2}
     out.sort(key=lambda e: (sev_rank.get(e.get("severity"), 9), -e.get("count", 0)))
     return {
         "configured": True,
+        "refresh_marker": marker,
         "act_now": sum(e["count"] for e in out if e.get("severity") == "action"),
         "review": sum(e["count"] for e in out if e.get("severity") == "review"),
+        "acknowledged": sum(len(e.get("acked_rows") or []) for e in out),
         "rules": out,
     }
+
+
+@router.post("/ack")
+def dq_ack(payload: dict[str, Any] = Body(...),
+           ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
+    """Mark one finding done until the next warehouse refresh."""
+    org = ctx.organization_id
+    key = str(payload.get("key") or "")
+    if not key:
+        return {"ok": False, "error": "key required"}
+    with warehouse_connection(org) as conn:
+        marker = _refresh_marker(conn.cursor())
+    acks = _load_acks(org)
+    acks[key] = {"marker": marker, "by": getattr(ctx, "email", None) or "user"}
+    _save_acks(org, acks)
+    return {"ok": True}
+
+
+@router.post("/unack")
+def dq_unack(payload: dict[str, Any] = Body(...),
+             ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
+    org = ctx.organization_id
+    key = str(payload.get("key") or "")
+    acks = _load_acks(org)
+    acks.pop(key, None)
+    _save_acks(org, acks)
+    return {"ok": True}

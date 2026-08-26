@@ -9,7 +9,7 @@
  * the page reads as "what needs attention", not "what we checked".
  */
 import { useEffect, useMemo, useState } from "react";
-import { apiGet } from "@/lib/api";
+import { apiGet, apiPost } from "@/lib/api";
 
 type DqRule = {
   id: string;
@@ -19,6 +19,7 @@ type DqRule = {
   action: string;
   columns: string[];
   rows: (string | null)[][];
+  acked_rows?: (string | null)[][];
   count: number;
   capped?: boolean;
   error?: string;
@@ -28,6 +29,8 @@ type DqResponse = {
   configured: boolean;
   act_now?: number;
   review?: number;
+  acknowledged?: number;
+  refresh_marker?: string;
   rules: DqRule[];
   error?: string;
 };
@@ -48,11 +51,19 @@ export function DataQualityBoard() {
   const [err, setErr] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
 
-  useEffect(() => {
+  const reload = () =>
     apiGet<DqResponse>("/dq/findings")
       .then(setData)
       .catch((e) => setErr(String(e)));
+  useEffect(() => {
+    reload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const mark = async (ruleId: string, entity: string | null, done: boolean) => {
+    await apiPost(done ? "/dq/ack" : "/dq/unack", { key: `${ruleId}|${entity}` });
+    await reload();
+  };
 
   const rules = useMemo(() => {
     if (!data?.rules) return [];
@@ -115,8 +126,8 @@ export function DataQualityBoard() {
         <SummaryCard label="Review findings" value={data.review ?? 0} tone="amber" />
         <SummaryCard label="Rules run" value={data.rules.length} tone="slate" />
         <SummaryCard
-          label="Clean rules"
-          value={data.rules.filter((r) => !r.count && !r.error).length}
+          label="Marked done (until refresh)"
+          value={data.acknowledged ?? 0}
           tone="green"
         />
       </div>
@@ -159,6 +170,7 @@ export function DataQualityBoard() {
                   <table className="min-w-full text-xs">
                     <thead>
                       <tr>
+                        <th className="border-b border-slate-200 bg-slate-50 px-2 py-1.5" />
                         {r.columns.map((c) => (
                           <th
                             key={c}
@@ -172,6 +184,15 @@ export function DataQualityBoard() {
                     <tbody>
                       {r.rows.map((row, i) => (
                         <tr key={i} className="border-b border-slate-100">
+                          <td className="px-2 py-1">
+                            <button
+                              onClick={() => mark(r.id, row[0], true)}
+                              title="Mark done until the next data refresh"
+                              className="rounded border border-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-50"
+                            >
+                              Done
+                            </button>
+                          </td>
                           {row.map((v, j) => (
                             <td key={j} className="whitespace-nowrap px-2 py-1 text-slate-700">
                               {v ?? ""}
@@ -185,6 +206,27 @@ export function DataQualityBoard() {
                     <p className="mt-1 text-xs text-slate-400">showing first 100</p>
                   )}
                 </div>
+              )}
+              {(r.acked_rows?.length ?? 0) > 0 && (
+                <details className="mt-2">
+                  <summary className="cursor-pointer text-xs text-slate-400">
+                    {r.acked_rows!.length} marked done (hidden until the next data
+                    refresh)
+                  </summary>
+                  <ul className="mt-1 space-y-0.5 text-xs text-slate-500">
+                    {r.acked_rows!.map((row, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <button
+                          onClick={() => mark(r.id, row[0], false)}
+                          className="rounded border border-slate-300 px-1.5 py-0.5 text-[10px] hover:bg-slate-50"
+                        >
+                          Undo
+                        </button>
+                        <span className="line-through">{row.filter(Boolean).slice(0, 4).join(" · ")}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
               )}
             </div>
           </details>

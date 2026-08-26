@@ -81,9 +81,13 @@ export function storeSettingsToken(token: string): void {
   else sessionStorage.removeItem(SETTINGS_TOKEN_KEY);
 }
 
-// Generic authenticated GET for feature routes (data quality etc.)
+// Generic authenticated GET/POST for feature routes (data quality etc.)
 export async function apiGet<T>(path: string): Promise<T> {
   return fetchJson<T>(path);
+}
+
+export async function apiPost<T>(path: string, body: unknown): Promise<T> {
+  return fetchJson<T>(path, { method: "POST", body: JSON.stringify(body) });
 }
 
 function settingsHeaders(token?: string): Record<string, string> {
