@@ -3,7 +3,6 @@
  "client": "originba",
  "poc_enabled": [
   "rpt_account_person",
-  "rpt_aged_debt",
   "rpt_asset_location",
   "rpt_batch",
   "rpt_bill",
@@ -44,7 +43,6 @@
  ],
  "portal_snapshots": [
   "rpt_account_person",
-  "rpt_aged_debt",
   "rpt_asset_location",
   "rpt_batch",
   "rpt_bill",
@@ -331,11 +329,11 @@
    "reports": [
     {
      "report_id": "arrears_by_band",
-     "snapshot_id": "rpt_aged_debt"
+     "snapshot_id": "rpt_sa_aged_balance"
     },
     {
      "report_id": "arrears_by_class",
-     "snapshot_id": "rpt_aged_debt"
+     "snapshot_id": "rpt_sa_aged_balance"
     },
     {
      "report_id": "largest_debtors",
@@ -788,446 +786,6 @@
    "use_case": "Its own canvas rather than folded into rpt_customer_account because an account can",
    "workstream": "customer_ops",
    "workstream_label": "Customer Operations"
-  },
-  "rpt_aged_debt": {
-   "data_model": {
-    "columns_traced_to_cisadm": 13,
-    "domain_table": "rpt_aged_debt",
-    "driving_table": "CI_BILL_CYC_L",
-    "field_groups": [
-     {
-      "fields": [
-       "Service Agreement ID",
-       "Band Sequence",
-       "Aging Band",
-       "Banded Unpaid Amount",
-       "Charge Count in Band",
-       "Oldest Charge Date in Band",
-       "SA Net Balance",
-       "Debt Class Code",
-       "SA Type",
-       "SA Type Code",
-       "SA Special Role",
-       "SA Special Role Code",
-       "Is Revenue Bearing",
-       "SA Status",
-       "Utility Type",
-       "Service Type",
-       "Service Type Code",
-       "Revenue Class",
-       "Account ID",
-       "Main Customer Name",
-       "Customer Class",
-       "Collection Class",
-       "Bill Cycle"
-      ],
-      "id": "debt",
-      "label": "Collections & Debt"
-     }
-    ],
-    "grain": "service agreement + aging band",
-    "grain_description": "One row per service agreement + aging band",
-    "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
-    "population_filter": null,
-    "refresh_sql": "models/marts/reporting/rpt_aged_debt.sql",
-    "snapshot_table": "reporting.rpt_aged_debt",
-    "source_tables": [
-     "CI_BILL_CYC_L",
-     "CI_COLL_CL_L",
-     "CI_CUST_CL_L",
-     "CI_LOOKUP_VAL_L",
-     "CI_REV_CL_L",
-     "CI_SA",
-     "CI_SA_TYPE",
-     "CI_SA_TYPE_L",
-     "CI_SVC_TYPE_L"
-    ],
-    "trusted_measures": [
-     "Band Sequence",
-     "Banded Unpaid Amount",
-     "Charge Count in Band",
-     "SA Net Balance"
-    ]
-   },
-   "date_fields": [
-    {
-     "id": "Oldest Charge Date in Band",
-     "label": "Oldest Charge Date in Band"
-    }
-   ],
-   "default_date_field": "Oldest Charge Date in Band",
-   "default_date_preset": "last_12_months",
-   "dimensions": [
-    {
-     "id": "Service Agreement ID",
-     "label": "Service Agreement ID"
-    },
-    {
-     "id": "Aging Band",
-     "label": "Aging Band"
-    },
-    {
-     "id": "Debt Class Code",
-     "label": "Debt Class Code"
-    },
-    {
-     "id": "SA Type",
-     "label": "SA Type"
-    },
-    {
-     "id": "SA Type Code",
-     "label": "SA Type Code"
-    },
-    {
-     "id": "SA Special Role",
-     "label": "SA Special Role"
-    },
-    {
-     "id": "SA Special Role Code",
-     "label": "SA Special Role Code"
-    },
-    {
-     "id": "Is Revenue Bearing",
-     "label": "Is Revenue Bearing"
-    },
-    {
-     "id": "SA Status",
-     "label": "SA Status"
-    },
-    {
-     "id": "Utility Type",
-     "label": "Utility Type"
-    },
-    {
-     "id": "Service Type",
-     "label": "Service Type"
-    },
-    {
-     "id": "Service Type Code",
-     "label": "Service Type Code"
-    },
-    {
-     "id": "Revenue Class",
-     "label": "Revenue Class"
-    },
-    {
-     "id": "Account ID",
-     "label": "Account ID"
-    },
-    {
-     "id": "Main Customer Name",
-     "label": "Main Customer Name"
-    },
-    {
-     "id": "Customer Class",
-     "label": "Customer Class"
-    },
-    {
-     "id": "Collection Class",
-     "label": "Collection Class"
-    },
-    {
-     "id": "Bill Cycle",
-     "label": "Bill Cycle"
-    }
-   ],
-   "fields": [
-    {
-     "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "debt",
-     "id": "Service Agreement ID",
-     "label": "Service Agreement ID",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
-     "description": "Ordering sequence within its parent. Part of the grain, not a measure.",
-     "group": "debt",
-     "id": "Band Sequence",
-     "label": "Band Sequence",
-     "role": "measure",
-     "type": "integer"
-    },
-    {
-     "description": "The client-configured aging bucket (seeds/arrears_bands.csv, selected by the arrears_band_set var) plus the structural 'New / Unbilled' band for debt with no arrears date. One row per SA per band -- pivot in Ad Hoc.",
-     "group": "debt",
-     "id": "Aging Band",
-     "label": "Aging Band",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
-     "description": "The FIFO-allocated unpaid debt in this band: credits retire the OLDEST charges first, so residual debt sits on the newest. Additive across an SA's bands up to its net balance.",
-     "group": "debt",
-     "id": "Banded Unpaid Amount",
-     "label": "Banded Unpaid Amount",
-     "role": "measure",
-     "type": "numeric"
-    },
-    {
-     "description": "",
-     "group": "debt",
-     "id": "Charge Count in Band",
-     "label": "Charge Count in Band",
-     "role": "measure",
-     "type": "bigint"
-    },
-    {
-     "description": "",
-     "group": "debt",
-     "id": "Oldest Charge Date in Band",
-     "label": "Oldest Charge Date in Band",
-     "role": "date",
-     "type": "timestamp"
-    },
-    {
-     "description": "The SA's full net balance -- REPEATS on every band row of the SA; never sum across bands. The banded amounts partition it.",
-     "group": "debt",
-     "id": "SA Net Balance",
-     "label": "SA Net Balance",
-     "role": "measure",
-     "type": "numeric"
-    },
-    {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "debt",
-     "id": "Debt Class Code",
-     "label": "Debt Class Code",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
-     "description": "English description of \"SA Type Code\". Group and report on this; filter on the code.",
-     "group": "debt",
-     "id": "SA Type",
-     "label": "SA Type",
-     "role": "dimension",
-     "type": "varchar(60)"
-    },
-    {
-     "description": "Code configured by this utility; the values differ between clients. Paired with \"SA Type\" for the description: report on the description, filter on the code.",
-     "group": "debt",
-     "id": "SA Type Code",
-     "label": "SA Type Code",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
-     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
-     "group": "debt",
-     "id": "SA Special Role",
-     "label": "SA Special Role",
-     "role": "dimension",
-     "type": "varchar(60)"
-    },
-    {
-     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
-     "group": "debt",
-     "id": "SA Special Role Code",
-     "label": "SA Special Role Code",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
-     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
-     "group": "debt",
-     "id": "Is Revenue Bearing",
-     "label": "Is Revenue Bearing",
-     "role": "dimension",
-     "type": "boolean"
-    },
-    {
-     "description": "",
-     "group": "debt",
-     "id": "SA Status",
-     "label": "SA Status",
-     "role": "dimension",
-     "type": "varchar(60)"
-    },
-    {
-     "description": "Which utility this service agreement is for, from C2M's own service type (CI_SA_TYPE.SVC_TYPE_CD). Payment arrangements, deposits, fees and write-offs are service type M and group under Other / Non-Utility. Was previously inferred from the SA type's English description, which read correctly at one client and misfiled sewer and stormwater at the others.",
-     "group": "debt",
-     "id": "Utility Type",
-     "label": "Utility Type",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
-     "description": "The client's label for the C2M service type -- Water, Waste Water, Storm Water, Electric, Gas, Telecom, Miscellaneous. Same information as \"Utility Type\", in the client's own wording rather than this project's rollup.",
-     "group": "debt",
-     "id": "Service Type",
-     "label": "Service Type",
-     "role": "dimension",
-     "type": "varchar(60)"
-    },
-    {
-     "description": "Base-product service type (W, WW, ST, E, G, T, M). The domain is fixed by C2M and identical at every client, unlike \"SA Type Code\", so a filter written on this one ports between clients.",
-     "group": "debt",
-     "id": "Service Type Code",
-     "label": "Service Type Code",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
-     "description": "",
-     "group": "debt",
-     "id": "Revenue Class",
-     "label": "Revenue Class",
-     "role": "dimension",
-     "type": "varchar(60)"
-    },
-    {
-     "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "debt",
-     "id": "Account ID",
-     "label": "Account ID",
-     "role": "dimension",
-     "type": "text"
-    },
-    {
-     "description": "Descriptive label.",
-     "group": "debt",
-     "id": "Main Customer Name",
-     "label": "Main Customer Name",
-     "role": "dimension",
-     "type": "varchar(254)"
-    },
-    {
-     "description": "",
-     "group": "debt",
-     "id": "Customer Class",
-     "label": "Customer Class",
-     "role": "dimension",
-     "type": "varchar(60)"
-    },
-    {
-     "description": "",
-     "group": "debt",
-     "id": "Collection Class",
-     "label": "Collection Class",
-     "role": "dimension",
-     "type": "varchar(60)"
-    },
-    {
-     "description": "",
-     "group": "debt",
-     "id": "Bill Cycle",
-     "label": "Bill Cycle",
-     "role": "dimension",
-     "type": "varchar(60)"
-    }
-   ],
-   "grain": "service agreement + aging band",
-   "grain_description": "One row per service agreement + aging band",
-   "label": "Aged Debt",
-   "large_domain": false,
-   "max_rows": 500,
-   "measures": [
-    {
-     "aggs": [
-      "count"
-     ],
-     "id": "*",
-     "label": "Number of records"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Band Sequence",
-     "label": "Band Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Banded Unpaid Amount",
-     "label": "Banded Unpaid Amount"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Charge Count in Band",
-     "label": "Charge Count in Band"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "SA Net Balance",
-     "label": "SA Net Balance"
-    }
-   ],
-   "poc_enabled": true,
-   "portal_enabled": true,
-   "premade_reports": [
-    {
-     "chart_type": "bar",
-     "description": "Aged debt is the collections work queue and the bad-debt provision at the same time. The oldest band is the one that stops being collectable.",
-     "dimensions": [
-      "Aging Band"
-     ],
-     "filters": [],
-     "id": "arrears_by_band",
-     "measures": [
-      {
-       "agg": "sum",
-       "field": "Banded Unpaid Amount"
-      }
-     ],
-     "title": "What is owed, and how old is it?",
-     "workstream_label": "Collections"
-    },
-    {
-     "chart_type": "pie",
-     "description": "Total arrears is one number; who owes it decides which collection approach applies. Commercial debt and residential debt are not worked the same way.",
-     "dimensions": [
-      "Customer Class"
-     ],
-     "filters": [],
-     "id": "arrears_by_class",
-     "measures": [
-      {
-       "agg": "sum",
-       "field": "Banded Unpaid Amount"
-      }
-     ],
-     "title": "Which customer classes carry the arrears?",
-     "workstream_label": "Collections"
-    }
-   ],
-   "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
-   "schema": "reporting",
-   "scope_filters": [],
-   "skip_sample_rows": false,
-   "summary": "the governed aging model. Grain: Service Agreement ID + Band",
-   "table_name": "rpt_aged_debt",
-   "trusted_measures": [
-    "Band Sequence",
-    "Banded Unpaid Amount",
-    "Charge Count in Band",
-    "SA Net Balance"
-   ],
-   "usage_guidance": null,
-   "use_case": "variants the SmartCity backlog flags. Bands come from seeds/arrears_bands.csv,",
-   "workstream": "debt",
-   "workstream_label": "Collections & Debt"
   },
   "rpt_asset_location": {
    "data_model": {
@@ -9392,6 +8950,8 @@
        "Self-Service Enabled",
        "Self-Service Person Count",
        "Active Alerts",
+       "Account Characteristics",
+       "Account Characteristic Count",
        "Active Alert Count",
        "Any Person Receives Notifications",
        "Any Person Receives Bill Copy",
@@ -9464,6 +9024,7 @@
      "Linked Person Count",
      "Financially Responsible Person Count",
      "Self-Service Person Count",
+     "Account Characteristic Count",
      "Active Alert Count",
      "Current Balance",
      "Total Balance",
@@ -9631,6 +9192,10 @@
     {
      "id": "Active Alerts",
      "label": "Active Alerts"
+    },
+    {
+     "id": "Account Characteristics",
+     "label": "Account Characteristics"
     },
     {
      "id": "Any Person Receives Notifications",
@@ -9873,6 +9438,22 @@
      "label": "Active Alerts",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The account's characteristics flattened to one line -- 'Type: Value' pairs separated by '; ', LATEST effective row per characteristic type (a re-dated characteristic is a replacement, not an addition). Text rollup, not additive; filter with contains. Full detail at its own grain in rpt_characteristics, joined on Account ID with Entity Type = 'Account'.",
+     "group": "customer_ops",
+     "id": "Account Characteristics",
+     "label": "Account Characteristics",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "How many distinct characteristic types are attached to the account (latest effective per type). 0 = none attached.",
+     "group": "customer_ops",
+     "id": "Account Characteristic Count",
+     "label": "Account Characteristic Count",
+     "role": "measure",
+     "type": "bigint"
     },
     {
      "description": "How many typed alerts are active (no end date or a future one) on the account.",
@@ -10301,6 +9882,16 @@
       "min",
       "max"
      ],
+     "id": "Account Characteristic Count",
+     "label": "Account Characteristic Count"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
      "id": "Active Alert Count",
      "label": "Active Alert Count"
     },
@@ -10698,6 +10289,7 @@
     "Linked Person Count",
     "Financially Responsible Person Count",
     "Self-Service Person Count",
+    "Account Characteristic Count",
     "Active Alert Count",
     "Current Balance",
     "Total Balance",
@@ -22363,7 +21955,7 @@
   },
   "rpt_sa_aged_balance": {
    "data_model": {
-    "columns_traced_to_cisadm": 14,
+    "columns_traced_to_cisadm": 15,
     "domain_table": "rpt_sa_aged_balance",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -22393,6 +21985,7 @@
        "Service Type Code",
        "Revenue Class",
        "Revenue Class Code",
+       "Debt Class Code",
        "Account ID",
        "Main Customer Name",
        "Customer Class",
@@ -22502,6 +22095,10 @@
     {
      "id": "Revenue Class Code",
      "label": "Revenue Class Code"
+    },
+    {
+     "id": "Debt Class Code",
+     "label": "Debt Class Code"
     },
     {
      "id": "Account ID",
@@ -22722,6 +22319,14 @@
      "type": "text"
     },
     {
+     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "group": "debt",
+     "id": "Debt Class Code",
+     "label": "Debt Class Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
      "group": "debt",
      "id": "Account ID",
@@ -22867,6 +22472,40 @@
    "poc_enabled": true,
    "portal_enabled": true,
    "premade_reports": [
+    {
+     "chart_type": "bar",
+     "description": "Aged debt is the collections work queue and the bad-debt provision at the same time. The oldest band is the one that stops being collectable.",
+     "dimensions": [
+      "Oldest Debt Band"
+     ],
+     "filters": [],
+     "id": "arrears_by_band",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Total Balance"
+      }
+     ],
+     "title": "What is owed, and how old is it?",
+     "workstream_label": "Collections"
+    },
+    {
+     "chart_type": "pie",
+     "description": "Total arrears is one number; who owes it decides which collection approach applies. Commercial debt and residential debt are not worked the same way.",
+     "dimensions": [
+      "Customer Class"
+     ],
+     "filters": [],
+     "id": "arrears_by_class",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Past Due Amount"
+      }
+     ],
+     "title": "Which customer classes carry the arrears?",
+     "workstream_label": "Collections"
+    },
     {
      "chart_type": "bar",
      "description": "Account-level arrears can hide a single agreement in deep debt behind others in credit. The agreement is where collections actually acts.",
@@ -25729,10 +25368,10 @@
    "rpt_customer_contact"
   ],
   "debt": [
-   "rpt_aged_debt",
    "rpt_credit_rating_history",
    "rpt_debt_process",
-   "rpt_pay_plan"
+   "rpt_pay_plan",
+   "rpt_sa_aged_balance"
   ],
   "field_ops": [
    "rpt_exception",

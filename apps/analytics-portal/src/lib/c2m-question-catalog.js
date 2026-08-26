@@ -480,15 +480,22 @@ export const QUESTIONS = [
     kind: "total",
     title: "What is owed, and how old is it?",
     why: "Aged debt is the collections work queue and the bad-debt provision at the same time. The oldest band is the one that stops being collectable.",
-    canvas: "rpt_aged_debt",
-    axis: "Aging Band", value: "Banded Unpaid Amount",
-    sql: `select "Aging Band", min("Band Sequence") as seq,
-                 count(distinct "Service Agreement ID")::bigint as "Agreements",
-                 count(distinct "Account ID")::bigint as "Accounts",
-                 round(sum("Banded Unpaid Amount")::numeric, 2) as "Banded Unpaid Amount",
-                 sum("Charge Count in Band")::bigint as "Charges"
-          from reporting.rpt_aged_debt
-          group by 1 order by seq`,
+    canvas: "rpt_sa_aged_balance",
+    axis: "Oldest Debt Band", value: "Total Balance",
+    // the wide canvas IS the debt table (one row per SA, a column per bucket --
+    // the CMS_SA_SNAPSHOT shape); band rows here are unpivoted from its columns
+    sql: `select b."Aging Band",
+                 count(distinct s."Service Agreement ID") filter (where b.amt > 0)::bigint as "Agreements",
+                 count(distinct s."Account ID") filter (where b.amt > 0)::bigint as "Accounts",
+                 round(sum(b.amt)::numeric, 2) as "Unpaid Amount"
+          from reporting.rpt_sa_aged_balance s
+          cross join lateral (values
+            ('1) 0-30',   s."Arrears 0-30 Days"),
+            ('2) 31-60',  s."Arrears 31-60 Days"),
+            ('3) 61-90',  s."Arrears 61-90 Days"),
+            ('4) 91-120', s."Arrears 91-120 Days"),
+            ('5) 121+',   s."Arrears 121+ Days")) as b("Aging Band", amt)
+          group by 1 order by 1`,
   }),
   q({
     id: "arrears-by-class",
@@ -496,14 +503,14 @@ export const QUESTIONS = [
     kind: "distribution",
     title: "Which customer classes carry the arrears?",
     why: "Total arrears is one number; who owes it decides which collection approach applies. Commercial debt and residential debt are not worked the same way.",
-    canvas: "rpt_aged_debt",
-    axis: "Customer Class", value: "Banded Unpaid Amount",
+    canvas: "rpt_sa_aged_balance",
+    axis: "Customer Class", value: "Past Due Amount",
     sql: `select coalesce("Customer Class", '(unset)') as "Customer Class",
                  coalesce("Collection Class", '(unset)') as "Collection Class",
                  count(distinct "Account ID")::bigint as "Accounts",
-                 round(sum("Banded Unpaid Amount")::numeric, 2) as "Banded Unpaid Amount",
-                 round(avg("SA Net Balance")::numeric, 2) as "Average SA Balance"
-          from reporting.rpt_aged_debt
+                 round(sum("Past Due Amount")::numeric, 2) as "Past Due Amount",
+                 round(avg("Total Balance")::numeric, 2) as "Average SA Balance"
+          from reporting.rpt_sa_aged_balance
           group by 1, 2 order by 4 desc nulls last`,
   }),
   q({
