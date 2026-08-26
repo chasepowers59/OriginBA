@@ -39,7 +39,10 @@ def run_kpi_query(
     filters = list(query_spec.get("filters") or [])
     if extra_filters:
         filters.extend(extra_filters)
-    filters.append({"field": date_field, "op": "between", "value": [date_start, date_end]})
+    # STOCK metrics (a balance, a population) have no date window -- date_field is
+    # None for a windowless KPI and no range filter is added.
+    if date_field:
+        filters.append({"field": date_field, "op": "between", "value": [date_start, date_end]})
     sql, binds = build_query(
         table_name=snapshot["table_name"],
         allowed_fields=allowed_fields(snapshot),
@@ -106,9 +109,16 @@ def execute_kpi_definition(
     }
     try:
         snapshot = get_snapshot(snapshot_id, organization_id)
-        date_field = snapshot.get("required_date_field")
-        if not date_field:
-            raise ValueError("Snapshot has no required date field")
+        # KPI may name its own date field (dbt canvases carry default_date_field, not
+        # required_date_field); a WINDOWLESS KPI (stock metric: total customers, AR
+        # balance) skips the window and the period comparison entirely.
+        windowless = bool(kpi.get("windowless"))
+        date_field = None if windowless else (
+            kpi.get("date_field")
+            or snapshot.get("required_date_field")
+            or snapshot.get("default_date_field"))
+        if not date_field and not windowless:
+            raise ValueError("Snapshot has no date field and KPI is not windowless")
 
         (cur_start, cur_end), (pri_start, pri_end) = date_windows(days)
 
@@ -118,7 +128,7 @@ def execute_kpi_definition(
         value = scalar_measure_value(value_cols, value_rows)
 
         prior_value: float | None = None
-        if compare:
+        if compare and not windowless:
             prior_cols, prior_rows = run_kpi_query(
                 snapshot_id,
                 kpi["value"],

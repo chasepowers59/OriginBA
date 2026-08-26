@@ -17,6 +17,7 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard", id: "dashboard" as const },
   { href: "/dashboard/custom", label: "My dashboards", id: "custom" as const },
   { href: "/database", label: "Database", id: "database" as const },
+  { href: "/data-quality", label: "Data Quality", id: "dq" as const },
   { href: "/settings", label: "Settings", id: "settings" as const },
 ];
 
@@ -32,7 +33,7 @@ export function AppShell({
   snapshots: SnapshotSummary[];
   workstreams: WorkstreamGroup[];
   activeId?: string;
-  activeNav?: "home" | "reports" | "dashboard" | "custom" | "database" | "settings";
+  activeNav?: "home" | "reports" | "dashboard" | "custom" | "database" | "dq" | "settings";
   dbConfigured: boolean;
 }) {
   const brand = useBrand();

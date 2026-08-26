@@ -73,6 +73,8 @@ app.include_router(snapshot_router)
 app.include_router(portal_router)
 app.include_router(data_source_router)
 app.include_router(database_router)
+from api.dq_routes import router as dq_router
+app.include_router(dq_router)
 
 
 def _require_nlq_access(

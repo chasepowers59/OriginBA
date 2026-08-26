@@ -81,6 +81,11 @@ export function storeSettingsToken(token: string): void {
   else sessionStorage.removeItem(SETTINGS_TOKEN_KEY);
 }
 
+// Generic authenticated GET for feature routes (data quality etc.)
+export async function apiGet<T>(path: string): Promise<T> {
+  return fetchJson<T>(path);
+}
+
 function settingsHeaders(token?: string): Record<string, string> {
   const t = token ?? getStoredSettingsToken();
   return t ? { "X-Portal-Settings-Token": t } : {};
