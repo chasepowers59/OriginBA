@@ -21,7 +21,7 @@ from api.query_builder import QueryValidationError, build_query
 from api.raw_sql_validator import RawSqlValidationError, apply_row_cap, validate_raw_sql
 from api.executive_dashboard import build_executive_summary
 from api.kpi_runner import COMPARE_MODES
-from api.workstream_dashboard import build_workstream_summary
+from api.workstream_dashboard import build_workstream_about, build_workstream_summary
 from api.snapshot_catalog import CatalogError, allowed_fields, get_snapshot, list_snapshots, list_workstreams, load_catalog, is_warehouse
 
 
@@ -187,6 +187,18 @@ def workstream_summary(
     if result.get("error"):
         raise HTTPException(status_code=404, detail=result["error"])
     return result
+
+
+@router.get("/workstream-about/{workstream_id}")
+def workstream_about(
+    workstream_id: str,
+    ctx: AuthContext = Depends(get_auth_context),
+) -> dict[str, Any]:
+    """What this workstream includes, deliberately excludes, and links to."""
+    ctx.require_permission("snapshots:read")
+    assert_workstream_access(ctx, workstream_id)
+    return build_workstream_about(
+        workstream_id, organization_id=ctx.effective_organization_id())
 
 
 @router.get("/{snapshot_id}/metadata")

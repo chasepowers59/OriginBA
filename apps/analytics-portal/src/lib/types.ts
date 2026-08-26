@@ -298,6 +298,16 @@ export type PeriodInfo = {
   days: number;
 };
 
+export type WorkstreamAbout = {
+  workstream: string;
+  label: string;
+  summary: string;
+  canvases: { id: string; label: string; grain: string | null }[];
+  kpis: { id: string; label: string; subtitle: string }[];
+  not_included: string[];
+  related: { workstream: string; label: string; via: string }[];
+};
+
 export type RefreshInsight = {
   last_refresh: string | null;
   tables: { table: string; batch_rows: number; total_rows: number }[];

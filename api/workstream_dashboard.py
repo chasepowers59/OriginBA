@@ -300,3 +300,164 @@ def build_workstream_summary(
         },
         "kpis": kpis,
     }
+
+
+# ---------------------------------------------------------------------------
+# "About this workstream" -- what a section INCLUDES, what it deliberately does
+# NOT, and how it cross-links to its neighbors. Included canvases and KPIs are
+# GENERATED (catalog + WORKSTREAM_KPIS, so they cannot drift); the summaries,
+# exclusions, and id-chain links are authored BASE-PRODUCT semantics -- the same
+# at every client, which is why they live here and not in per-tenant config.
+# The exclusions are the point: they are what analysts guess wrong.
+# ---------------------------------------------------------------------------
+
+WORKSTREAM_ABOUT: dict[str, dict[str, Any]] = {
+    "billing": {
+        "summary": "Bill production: segments, calc-line itemization, billed usage "
+                   "per unit of measure, and rate/bill-factor pricing -- each at its "
+                   "own grain, lifecycle stated on every amount (frozen vs cancelled).",
+        "not_included": [
+            "Payments and tenders -- Cashiering & Payments (money received is not money billed)",
+            "The accounting view of the same dollars (FTs, GL) -- Finance",
+            "Raw/unbilled usage and measurements -- Meter Operations (usage joins billing only once a segment bills it)",
+            "Aged balances and arrears -- Collections & Debt",
+        ],
+        "related": [
+            {"workstream": "finance", "via": "Bill Segment ID -> frozen bill-segment FTs (the revenue tie the reconciliation canvas asserts)"},
+            {"workstream": "cashiering", "via": "Account ID / Bill ID -> payments applied against billed balances"},
+            {"workstream": "meter_ops", "via": "Bill Segment ID -> the usage and service-quantity lines behind each segment"},
+            {"workstream": "customer_ops", "via": "SA ID -> the agreement and customer context on every segment"},
+        ],
+    },
+    "cashiering": {
+        "summary": "Money received: payments, tenders, and tender-control balancing "
+                   "-- the cash-drawer view, with cancellation and NSF lifecycle flags.",
+        "not_included": [
+            "Pay plans and collection activity -- Collections & Debt",
+            "The ledger effect of a payment (PS/PX FTs) -- Finance",
+            "What was billed -- Billing & Rates",
+        ],
+        "related": [
+            {"workstream": "finance", "via": "Payment ID -> payment FTs posting to the ledger"},
+            {"workstream": "debt", "via": "Account ID -> payments that cure arrears and feed pay-plan compliance"},
+            {"workstream": "customer_ops", "via": "Account ID -> who paid"},
+        ],
+    },
+    "debt": {
+        "summary": "What is owed and what is being done about it: aged balances "
+                   "(rederived from raw FTs and verified 100% against the client's own "
+                   "snapshot), collection/severance processes, pay plans, credit rating.",
+        "not_included": [
+            "Current bill production -- Billing & Rates",
+            "The cash drawer itself -- Cashiering & Payments",
+            "Write-off accounting detail (GL) -- Finance",
+        ],
+        "related": [
+            {"workstream": "field_ops", "via": "severance -> the cut/reconnect field activities it dispatches"},
+            {"workstream": "cashiering", "via": "Account ID -> payments reducing the aged position"},
+            {"workstream": "customer_ops", "via": "SA ID / Account ID -> whose debt it is"},
+        ],
+    },
+    "customer_ops": {
+        "summary": "Who the utility serves: accounts, linked persons, contacts, "
+                   "notifications, and cases -- the customer master with flattened "
+                   "contact points, alerts, autopay, and characteristics on the row.",
+        "not_included": [
+            "Balances and arrears detail -- Collections & Debt",
+            "Bills and segments -- Billing & Rates",
+            "Premises/service points/devices -- Meter Operations (the service side of the same customers)",
+        ],
+        "related": [
+            {"workstream": "billing", "via": "Account ID / SA ID -> everything billed to the customer"},
+            {"workstream": "debt", "via": "Account ID -> the aged position behind the account"},
+            {"workstream": "field_ops", "via": "Case ID / Account ID -> field work the customer generated"},
+        ],
+    },
+    "meter_ops": {
+        "summary": "The metering estate and what it measures: devices, service "
+                   "points, install/on-off history, measurements (with estimation "
+                   "flags), processed usage, and asset locations.",
+        "not_included": [
+            "Billed usage -- Billing & Rates (same quantities, but only once a bill segment claims them)",
+            "Field visit workflow -- Field Operations (the activity that touches the meter lives there)",
+            "Customer identity -- Customer Operations",
+        ],
+        "related": [
+            {"workstream": "billing", "via": "usage transactions -> the bill segments that bill them"},
+            {"workstream": "field_ops", "via": "Service Point ID -> activities executed at the point"},
+            {"workstream": "customer_ops", "via": "Premise ID / SP ID -> the customer at the point"},
+        ],
+    },
+    "field_ops": {
+        "summary": "Work in the field: activities with their event lifecycle, and "
+                   "operational exceptions -- the dispatch-and-outcome view.",
+        "not_included": [
+            "The device/meter master -- Meter Operations",
+            "To Do queues -- Operations & Shared Services (back-office work, not truck rolls)",
+            "Cases -- Customer Operations",
+        ],
+        "related": [
+            {"workstream": "meter_ops", "via": "Service Point ID / Device ID -> what the activity touched"},
+            {"workstream": "debt", "via": "severance cut/reconnect activities dispatched by collections"},
+        ],
+    },
+    "finance": {
+        "summary": "The ledger view: every financial transaction (bill segments, "
+                   "payments, adjustments) net of cancellation, GL distribution "
+                   "lines, and the revenue reconciliation control canvas.",
+        "not_included": [
+            "Tender-level cash detail -- Cashiering & Payments",
+            "Calc-line pricing itemization -- Billing & Rates",
+            "Aged debt bands -- Collections & Debt (same FTs, aged rather than posted)",
+        ],
+        "related": [
+            {"workstream": "billing", "via": "Bill Segment ID -> BS/BX FTs (calc lines must tie, asserted per bill)"},
+            {"workstream": "cashiering", "via": "Payment ID -> PS/PX FTs"},
+            {"workstream": "debt", "via": "the same FTs aged into arrears bands"},
+        ],
+    },
+    "common": {
+        "summary": "Shared infrastructure every workstream reads: the bill "
+                   "lifecycle header, batch runs, To Do queues, and characteristics "
+                   "for every entity type.",
+        "not_included": [
+            "Domain detail -- each canvas here cross-links into its owning workstream by id",
+        ],
+        "related": [
+            {"workstream": "billing", "via": "Bill ID -> the segments inside each bill"},
+            {"workstream": "field_ops", "via": "To Do drill keys -> the work the queues point at"},
+        ],
+    },
+}
+
+
+def build_workstream_about(
+    workstream_id: str, *, organization_id: str | None = None
+) -> dict[str, Any]:
+    from api.snapshot_catalog import list_snapshots
+
+    catalog = load_catalog(organization_id=organization_id)
+    labels = catalog.get("workstream_labels", {})
+    ws = workstream_id.lower()
+    about = WORKSTREAM_ABOUT.get(ws, {})
+    canvases = [
+        {"id": s["id"], "label": s["label"], "grain": s.get("grain_description") or s.get("grain")}
+        for s in list_snapshots(organization_id=organization_id)
+        if s["workstream"] == ws
+    ]
+    kpis = [
+        {"id": k["id"], "label": k["label"], "subtitle": k.get("subtitle", "")}
+        for k in WORKSTREAM_KPIS.get(ws, [])
+    ]
+    return {
+        "workstream": ws,
+        "label": labels.get(ws, ws),
+        "summary": about.get("summary", ""),
+        "canvases": canvases,
+        "kpis": kpis,
+        "not_included": about.get("not_included", []),
+        "related": [
+            {**r, "label": labels.get(r["workstream"], r["workstream"])}
+            for r in about.get("related", [])
+        ],
+    }

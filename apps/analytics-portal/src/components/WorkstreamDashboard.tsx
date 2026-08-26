@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { fetchWorkstreamSummary } from "@/lib/api";
+import { fetchWorkstreamAbout, fetchWorkstreamSummary } from "@/lib/api";
 import {
   WORKSTREAM_DESCRIPTIONS,
   workstreamDisplayName,
 } from "@/lib/businessLabels";
-import type { WorkstreamSummary } from "@/lib/types";
+import type { WorkstreamAbout, WorkstreamSummary } from "@/lib/types";
 import { DashboardWidget } from "./DashboardWidget";
 import { DashboardControls, type CompareMode } from "./DashboardControls";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
@@ -29,6 +29,7 @@ function WorkstreamDashboardInner({
   const [compare, setCompare] = useState(false);
   const [compareMode, setCompareMode] = useState<CompareMode>("prior_period");
   const [summary, setSummary] = useState<WorkstreamSummary | null>(null);
+  const [about, setAbout] = useState<WorkstreamAbout | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,6 +45,10 @@ function WorkstreamDashboardInner({
       .catch(() => setSummary(null))
       .finally(() => setLoading(false));
   }, [workstreamId, days, compare, compareMode, filter]);
+
+  useEffect(() => {
+    fetchWorkstreamAbout(workstreamId).then(setAbout).catch(() => setAbout(null));
+  }, [workstreamId]);
 
   const label = summary?.workstream_label ?? workstreamDisplayName(workstreamId);
 
@@ -83,6 +88,64 @@ function WorkstreamDashboardInner({
           <PresentationToolbar title={`${label} Dashboard`} exportSections={exportSections} />
         </div>
       </div>
+
+      {about ? (
+        <details className="glass-panel-subtle px-5 py-4">
+          <summary className="cursor-pointer text-sm font-semibold text-slate-200">
+            About this workstream
+            <span className="ml-2 text-xs font-normal text-slate-500">
+              what it includes, what it deliberately does not, and where it connects
+            </span>
+          </summary>
+          <div className="mt-4 grid gap-6 md:grid-cols-3">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-400/80">
+                Included ({about.canvases.length} canvases · {about.kpis.length} KPIs)
+              </p>
+              {about.summary ? (
+                <p className="mt-2 text-xs leading-relaxed text-slate-400">{about.summary}</p>
+              ) : null}
+              <ul className="mt-2 space-y-1">
+                {about.canvases.map((c) => (
+                  <li key={c.id}>
+                    <Link href={`/explore/${c.id}`} className="text-xs text-sky-300/90 hover:text-sky-200">
+                      {c.label}
+                    </Link>
+                    {c.grain ? <span className="ml-1 text-[10px] text-slate-600">— {c.grain}</span> : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-400/80">
+                Deliberately not included
+              </p>
+              <ul className="mt-2 space-y-2">
+                {about.not_included.map((n) => (
+                  <li key={n} className="text-xs leading-relaxed text-slate-400">
+                    {n}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-400/80">
+                Connects to
+              </p>
+              <ul className="mt-2 space-y-2">
+                {about.related.map((r) => (
+                  <li key={r.workstream} className="text-xs leading-relaxed text-slate-400">
+                    <Link href={`/workstream/${r.workstream}`} className="font-medium text-emerald-300/90 hover:text-emerald-200">
+                      {r.label}
+                    </Link>{" "}
+                    — {r.via}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </details>
+      ) : null}
 
       <DashboardControls
         days={days}

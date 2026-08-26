@@ -175,6 +175,12 @@ export function fetchWorkstreamSummary(
   return fetchJson<WorkstreamSummary>(`/snapshots/workstream-summary/${workstreamId}?${params}`);
 }
 
+export function fetchWorkstreamAbout(
+  workstreamId: string,
+): Promise<import("@/lib/types").WorkstreamAbout> {
+  return fetchJson(`/snapshots/workstream-about/${workstreamId}`);
+}
+
 export function fetchSavedViews(): Promise<{ client_id: string; views: SavedView[] }> {
   return fetchJson("/portal/saved-views");
 }
