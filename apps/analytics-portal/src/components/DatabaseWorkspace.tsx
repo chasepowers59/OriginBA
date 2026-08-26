@@ -14,7 +14,7 @@ import {
   type DatabaseQueryTemplate,
   type WorkspaceEngine,
 } from "@/lib/databaseQueryTemplates";
-import { exportRowsCsv, formatCurrency, formatNumber } from "@/lib/format";
+import { exportRowsCsv, formatCurrency, formatNumber, isIdentifierColumn } from "@/lib/format";
 import { prettifyFieldName } from "@/lib/businessLabels";
 import { DatabaseResultChart } from "@/components/DatabaseResultChart";
 import type { DatabaseSqlResponse, DatabaseTableInfo } from "@/lib/types";
@@ -23,8 +23,10 @@ const PAGE_SIZES = [50, 100, 200, 500] as const;
 type SidebarTab = "starters" | "tables" | "tips";
 type ResultView = "table" | "chart" | "both";
 
-function formatCell(value: unknown, isNumericCol = false): string {
+function formatCell(value: unknown, isNumericCol = false, columnId?: string): string {
   if (value === null || value === undefined) return "—";
+  // an identifier is a STRING that happens to be digits -- never comma-format it
+  if (isIdentifierColumn(columnId)) return String(value);
   if (typeof value === "number") return formatNumber(value);
   if (isNumericCol && value !== "" && !Number.isNaN(Number(value))) {
     return formatNumber(Number(value));
@@ -599,11 +601,11 @@ export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
                             {idx + 1}
                           </td>
                           {columns.map((col) => {
-                            const isNum = numericColumns.has(col);
+                            const isNum = numericColumns.has(col) && !isIdentifierColumn(col);
                             const raw = row[col];
                             const display = isNum && raw != null && CURRENCY_LIKE.test(col)
                               ? formatCurrency(Number(raw))
-                              : formatCell(raw, isNum);
+                              : formatCell(raw, isNum, col);
                             return (
                               <td
                                 key={col}
