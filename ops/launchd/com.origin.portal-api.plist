@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.origin.portal-api</string>
+  <key>WorkingDirectory</key><string>/Users/chase/OriginBA-3</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Library/Frameworks/Python.framework/Versions/3.13/bin/uvicorn</string>
+    <string>api.app:app</string>
+    <string>--host</string><string>127.0.0.1</string>
+    <string>--port</string><string>8000</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>WAREHOUSE_DATABASE_URL</key><string>postgres://chase@localhost:5432/originba_v2_int_dev_full</string>
+    <key>WAREHOUSE_DATABASE_URL_DEV</key><string>postgres://chase@localhost:5432/originba_v2_int_dev_full</string>
+  </dict>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>/tmp/portal-api.log</string>
+  <key>StandardErrorPath</key><string>/tmp/portal-api.err</string>
+</dict>
+</plist>
