@@ -15,6 +15,18 @@ and the Database workspace all ask "which catalog does this org read?" and route
 There is no per-surface configuration and there must never be: a surface that
 hard-wires a backend is a bug (that class was swept out on 2026-08-25).
 
+## Alignment with the production estate (confirmed by TA, 2026-08-28)
+
+The org's existing doctrine, per the platform team: every CIS/SmartCity client has
+its OWN dedicated Oracle database (isolation at the database level, no shared data
+layer), and all clients share one OKE cluster with one namespace per client. The
+warehouse model in this runbook — per-client databases, portal routing by
+connection, CDC and dbt runners on shared OKE — mirrors that doctrine exactly
+rather than introducing a new pattern. Open with the platform architect: whether
+database-level isolation within a shared Postgres cluster satisfies the same
+standard as the Oracle side's dedicated databases, or whether prod requires
+per-client instances (the cost difference is roughly 2x).
+
 ## Why one warehouse per client, not one warehouse with a tenant column
 
 dbt builds a **separate database per client** (the deploy pipeline in `originba_dbt`
