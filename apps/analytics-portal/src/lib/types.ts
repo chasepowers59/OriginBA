@@ -400,6 +400,8 @@ export type SavedView = {
   dimensions?: string[] | null;
   measure_field?: string | null;
   measure_agg?: string | null;
+  /** Multi-measure builder views; singular fields above hold the first measure. */
+  measures?: BuilderMeasure[] | null;
   chart_type?: string | null;
   date_preset?: string | null;
   date_start?: string | null;

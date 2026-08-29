@@ -54,7 +54,7 @@ def create_saved_view(payload: dict[str, Any], *, organization_id: str) -> dict[
         "id": str(uuid.uuid4()),
         "organization_id": organization_id,
         "client_id": organization_id,
-        "snapshot_id": str(payload["snapshot_id"]).upper(),
+        "snapshot_id": str(payload["snapshot_id"]),
         "snapshot_label": payload["snapshot_label"],
         "title": payload["title"],
         "kind": payload["kind"],
@@ -62,6 +62,10 @@ def create_saved_view(payload: dict[str, Any], *, organization_id: str) -> dict[
         "dimensions": payload.get("dimensions"),
         "measure_field": payload.get("measure_field"),
         "measure_agg": payload.get("measure_agg"),
+        # Multi-measure builder views carry the full list; the singular fields
+        # above stay populated with the first measure for backward compatibility
+        # with tiles/readers that predate the array.
+        "measures": payload.get("measures"),
         "chart_type": payload.get("chart_type"),
         "date_preset": payload.get("date_preset"),
         "date_start": payload.get("date_start"),

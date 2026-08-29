@@ -14,6 +14,7 @@ import {
   fetchSnapshotMetadata,
   fetchSnapshots,
   runSnapshotQuery,
+  createSavedView,
 } from "@/lib/api";
 import {
   aggregationLabel,
@@ -56,6 +57,7 @@ export function VisualBuilder() {
   const [error, setError] = useState<string | null>(null);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [questions, setQuestions] = useState<BuilderQuestion[]>([]);
+  const [saved, setSaved] = useState<string | null>(null);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -222,6 +224,31 @@ export function VisualBuilder() {
     [loadCanvas],
   );
 
+  const saveView = useCallback(async () => {
+    if (!meta) return;
+    const measures = vals.length ? vals.map((v) => ({ field: v.field, agg: v.agg })) : [{ field: "*", agg: "count" }];
+    const first = measures[0];
+    const title = `${cols.map((c) => c.label).join(", ") || meta.label} by ${series[0]?.label ?? "count"}`.slice(0, 80);
+    try {
+      await createSavedView({
+        snapshot_id: snapshotId,
+        snapshot_label: meta.label,
+        title,
+        kind: "custom",
+        dimensions: cols.map((c) => c.field),
+        measure_field: first.field,
+        measure_agg: first.agg,
+        measures,
+        chart_type: visual,
+      });
+      setSaved("Saved to your views");
+      setTimeout(() => setSaved(null), 2500);
+    } catch (err) {
+      setSaved(err instanceof Error ? err.message : "Save failed");
+      setTimeout(() => setSaved(null), 3500);
+    }
+  }, [meta, snapshotId, cols, vals, visual, series]);
+
   const grouped = useMemo(() => {
     const g = new Map<string, SnapshotSummary[]>();
     for (const s of index) {
@@ -340,11 +367,19 @@ export function VisualBuilder() {
               <div className="glass-panel space-y-3 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <VisualPicker value={visual} onChange={setVisual} />
-                  {result ? (
-                    <span className="text-xs" style={{ color: "var(--foreground-subtle)" }}>
-                      {result.row_count} rows
-                    </span>
-                  ) : null}
+                  <div className="flex items-center gap-3">
+                    {saved ? (
+                      <span className="text-xs" style={{ color: "var(--chart-1)" }}>{saved}</span>
+                    ) : null}
+                    {result ? (
+                      <span className="text-xs" style={{ color: "var(--foreground-subtle)" }}>
+                        {result.row_count} rows
+                      </span>
+                    ) : null}
+                    <button type="button" onClick={saveView} className="btn-ghost text-xs" disabled={!result}>
+                      Save view
+                    </button>
+                  </div>
                 </div>
                 {error ? (
                   <p className="rounded-lg px-3 py-2 text-sm" style={{ background: "color-mix(in srgb, var(--chart-5) 12%, transparent)", color: "var(--chart-5)" }}>
