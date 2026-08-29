@@ -51,7 +51,7 @@ export function SampleRowsPanel({
           </p>
           <h3 className="mt-1 text-lg font-semibold text-white">What one row looks like</h3>
           <p className="mt-1 text-sm text-slate-500">
-            {grainDescription ?? "Sample rows from the governed snapshot table"} ·{" "}
+            {grainDescription ?? "Sample rows from the governed canvas"} ·{" "}
             <code className="text-xs text-slate-400">{schemaName}.{tableName}</code>
           </p>
         </div>

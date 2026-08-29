@@ -53,7 +53,7 @@ export function HomeDashboard() {
             </Link>
           </div>
           <p className="mt-4 text-xs text-slate-500">
-            {workstreamCount} workstreams · {snapshotCount || 19} snapshot domains
+            {workstreamCount} workstreams · {snapshotCount || 19} reporting canvases
           </p>
         </div>
       </section>
@@ -101,7 +101,7 @@ export function SnapshotCard({ snap }: { snap: SnapshotSummary }) {
         {snap.label}
       </h3>
       <p className="mt-2 line-clamp-3 text-sm text-slate-500">
-        {summary || snap.grain_description || "Explore this governed snapshot domain."}
+        {summary || snap.grain_description || "Explore this governed reporting canvas."}
       </p>
     </Link>
   );

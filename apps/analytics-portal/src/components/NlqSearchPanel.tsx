@@ -80,7 +80,7 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
           Everyday utility metrics
         </h2>
         <p className="mt-1 text-sm text-slate-500">
-          Governed snapshot answers for billing, payments, field work, debt, and operations — adjust
+          Governed canvas answers for billing, payments, field work, debt, and operations — adjust
           parameters and re-run.
         </p>
       </div>

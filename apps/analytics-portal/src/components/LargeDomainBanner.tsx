@@ -23,7 +23,7 @@ export function LargeDomainBanner({
           </p>
           <h3 className="mt-1 text-lg font-semibold text-white">{snapshotLabel}</h3>
           <p className="mt-2 text-sm text-amber-100/90">
-            This snapshot has{" "}
+            This canvas has{" "}
             {rowCount != null ? (
               <strong>{formatNumber(rowCount)}</strong>
             ) : (

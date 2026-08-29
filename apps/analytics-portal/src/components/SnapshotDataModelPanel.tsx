@@ -152,7 +152,7 @@ function OverviewTab({
       <section className="glass-panel space-y-4 p-5">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
-            Governed snapshot
+            Governed canvas
           </p>
           <p className="mt-2 font-mono text-sm text-sky-200">{model.snapshot_table}</p>
           <p className="mt-1 text-xs text-slate-500">
@@ -249,7 +249,7 @@ function TablesTab({ model }: { model: SnapshotDataModel }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-slate-400">
-        These Oracle tables are combined during the snapshot refresh. Analysts query the flattened{" "}
+        These Oracle tables are combined during the canvas refresh. Analysts query the flattened{" "}
         <span className="font-mono text-sky-200">{model.snapshot_table}</span> table in the portal.
       </p>
       {grouped.map(({ role, tables }) => (
@@ -281,7 +281,7 @@ function JoinsTab({ model, onPrint }: { model: SnapshotDataModel; onPrint?: () =
   if (!model.join_paths.length) {
     return (
       <div className="glass-panel p-8 text-center text-sm text-slate-500">
-        No join paths were parsed for this snapshot (may use UNION or a custom refresh pattern).
+        No join paths were parsed for this canvas (may use UNION or a custom refresh pattern).
       </div>
     );
   }

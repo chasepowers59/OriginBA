@@ -82,7 +82,7 @@ function WorkstreamDashboardInner({
               {WORKSTREAM_DESCRIPTIONS[workstreamId] ?? "Governed analytics for this business area."}
             </p>
             {snapshotCount != null ? (
-              <p className="mt-2 text-xs text-slate-500">{snapshotCount} snapshot domains</p>
+              <p className="mt-2 text-xs text-slate-500">{snapshotCount} reporting canvases</p>
             ) : null}
           </div>
           <PresentationToolbar title={`${label} Dashboard`} exportSections={exportSections} />
