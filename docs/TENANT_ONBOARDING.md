@@ -2,12 +2,21 @@
 
 The portal scales by **routing, not code**. Every tenant is one entry in
 `config/portal_organizations.json` plus one database; nothing else in the application
-is per-client. There are exactly two paths, chosen by the org's `catalog` field:
+is per-client. There are three shapes, chosen by the org's `engine` + `catalog`:
 
-| `catalog` | engine | what the org reads | state |
+| `engine` | `catalog` | what the org reads | state |
 | --- | --- | --- | --- |
-| `dbt` | postgres | the governed reporting canvases (`reporting.rpt_*`) in that client's own dbt warehouse | the destination for every client |
-| `cisadm` | oracle | the legacy `*_RPT_CURR` snapshots in the client's Oracle CISADM | legacy, until migrated |
+| `postgres` | `dbt` | the governed canvases (`reporting.rpt_*`) in that client's own Postgres dbt warehouse | deployment shape A (separate warehouse) |
+| `oracle` | `dbt` | the same governed canvases in `ORIGINBA_REPORTING`, built INSIDE the client's own Oracle instance beside CISADM (no CDC, refreshed every 6h) | the IN-DATABASE shape (2026-08-28); the direction |
+| `oracle` | `cisadm` | the legacy `*_RPT_CURR` snapshots in the client's Oracle CISADM | legacy, until migrated |
+
+The backend is resolved by `api.snapshot_catalog.org_backend(org)` and
+`snapshot_backend(snapshot, org)` -- `engine` is now authoritative, not inferred
+from the schema. The workspace, KPI runner, and explorer all route through it, so
+a surface that hard-wires a backend is still a bug. The in-database shape uses the
+`oracle_dbt` SQL dialect (quoted Title-Case columns, Oracle binds/dates) and pins
+`CURRENT_SCHEMA = ORIGINBA_REPORTING` as the scope fence. Ellensburg runs this
+shape (its `ELLENSBURG_*` Oracle env keys point at the 25.4 TEST instance).
 
 Every surface follows the same routing decision automatically — catalog, explorer,
 executive overview, workstream sections, KPI runner, NLQ, My-dashboards templates,
