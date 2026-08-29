@@ -13,6 +13,9 @@ ROOT = Path(__file__).resolve().parent.parent
 VIEWS_PATH = ROOT / "data" / "analytics_portal" / "saved_views.json"
 MAX_VIEWS = 24
 
+from api import portal_state_store as _pss  # noqa: E402
+_COLLECTION = "saved_views"
+
 
 class SavedViewError(ValueError):
     pass
@@ -39,6 +42,8 @@ def _matches_scope(view: dict[str, Any], organization_id: str) -> bool:
 
 
 def list_saved_views(organization_id: str) -> list[dict[str, Any]]:
+    if _pss.enabled():
+        return _pss.list_records(_COLLECTION, organization_id)
     store = _load_store()
     views = [v for v in store.get("views", []) if _matches_scope(v, organization_id)]
     return sorted(views, key=lambda v: v.get("saved_at", ""), reverse=True)
@@ -75,6 +80,16 @@ def create_saved_view(payload: dict[str, Any], *, organization_id: str) -> dict[
         "saved_at": datetime.now(timezone.utc).isoformat(),
     }
 
+    if _pss.enabled():
+        # de-dupe on (snapshot_id, title), then cap to MAX_VIEWS newest-first
+        for v in _pss.list_records(_COLLECTION, organization_id):
+            if v.get("snapshot_id") == entry["snapshot_id"] and v.get("title") == entry["title"]:
+                _pss.delete(_COLLECTION, v["id"], organization_id)
+        _pss.upsert(_COLLECTION, entry["id"], organization_id, entry)
+        for stale in _pss.list_records(_COLLECTION, organization_id)[MAX_VIEWS:]:
+            _pss.delete(_COLLECTION, stale["id"], organization_id)
+        return entry
+
     store = _load_store()
     views = [v for v in store.get("views", []) if _matches_scope(v, organization_id)]
     views = [v for v in views if not (v["snapshot_id"] == entry["snapshot_id"] and v["title"] == entry["title"])]
@@ -87,6 +102,8 @@ def create_saved_view(payload: dict[str, Any], *, organization_id: str) -> dict[
 
 
 def delete_saved_view(view_id: str, *, organization_id: str) -> bool:
+    if _pss.enabled():
+        return _pss.delete(_COLLECTION, view_id, organization_id)
     store = _load_store()
     before = len(store.get("views", []))
     store["views"] = [

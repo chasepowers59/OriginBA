@@ -14,12 +14,21 @@ and, for Oracle orgs, needs Instant Client — neither fits Vercel serverless);
 
 ## One-time setup
 
-### 1. Supabase (login + user-state DB)
-- Create a Supabase project (dashboard). Copy the connection string
-  (`postgresql://…pooler.supabase.com:6543/postgres`, the pooled port for apps).
-- Apply the state schema: `psql "$SUPABASE_DB_URL" -f deploy/supabase/001_init.sql`.
-- The **auth tables create themselves** on first API boot (SQLAlchemy) when
-  `PORTAL_AUTH_DATABASE_URL` points at Supabase — no migration needed.
+### 1. Supabase (login + user-state DB) — PROVISIONED
+- Project `hvnfyulgwpjpeeowzuni` (region us-east-2) is live and the state schema
+  `portal_state.records` is **already applied** (deploy/supabase/001_init.sql).
+- The API reads/writes it through `PORTAL_AUTH_DATABASE_URL` (or a separate
+  `PORTAL_STATE_DATABASE_URL`). Copy the project's **pooled** connection string
+  (Dashboard → Connect → port 6543) into the API host env — this is the one secret
+  only the owner can supply.
+- The **auth tables create themselves** on first API boot (SQLAlchemy) against the
+  same URL — no migration needed.
+- **RLS advisory:** `portal_state.records` has row-level security disabled. That is
+  safe as built — the API reaches it over a direct Postgres connection (which
+  bypasses RLS) and the schema is NOT in Supabase's PostgREST-exposed set, so the
+  browser/anon key cannot touch it. If you ever expose it to Supabase client
+  libraries, enable RLS first: `ALTER TABLE portal_state.records ENABLE ROW LEVEL
+  SECURITY;` plus an org-scoped policy.
 
 ### 2. API container (Fly.io / Render / Railway / OKE)
 - Build `deploy/Dockerfile.api` (Postgres-serving base). For Oracle orgs, rebuild
@@ -53,5 +62,6 @@ and, for Oracle orgs, needs Instant Client — neither fits Vercel serverless);
 
 ## Current blockers (need the account owner)
 - Push the builder branch to GitHub (this agent cannot `git push`).
-- Provision the Supabase project + connection string (account creation + secrets).
+- Supabase project is provisioned + schema applied; supply its pooled connection
+  string to the API host (the password is the remaining secret).
 - Pick + provision the API container host.

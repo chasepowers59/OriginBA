@@ -14,6 +14,9 @@ STORE_PATH = ROOT / "data" / "analytics_portal" / "saved_dashboards.json"
 MAX_DASHBOARDS = 12
 MAX_TILES = 4
 
+from api import portal_state_store as _pss  # noqa: E402
+_COLLECTION = "saved_dashboards"
+
 
 class DashboardError(ValueError):
     pass
@@ -69,6 +72,8 @@ def _validate_tiles(tiles: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def list_dashboards(organization_id: str) -> list[dict[str, Any]]:
+    if _pss.enabled():
+        return _pss.list_records(_COLLECTION, organization_id)
     store = _load_store()
     boards = [d for d in store.get("dashboards", []) if _matches_scope(d, organization_id)]
     return sorted(boards, key=lambda d: d.get("updated_at", ""), reverse=True)
@@ -98,6 +103,11 @@ def create_dashboard(payload: dict[str, Any], *, organization_id: str) -> dict[s
         "created_at": now,
         "updated_at": now,
     }
+    if _pss.enabled():
+        _pss.upsert(_COLLECTION, entry["id"], organization_id, entry)
+        for stale in _pss.list_records(_COLLECTION, organization_id)[MAX_DASHBOARDS:]:
+            _pss.delete(_COLLECTION, stale["id"], organization_id)
+        return entry
     store = _load_store()
     boards = [d for d in store.get("dashboards", []) if _matches_scope(d, organization_id)]
     boards = [entry, *boards][:MAX_DASHBOARDS]
@@ -107,15 +117,7 @@ def create_dashboard(payload: dict[str, Any], *, organization_id: str) -> dict[s
     return entry
 
 
-def update_dashboard(dashboard_id: str, payload: dict[str, Any], *, organization_id: str) -> dict[str, Any]:
-    store = _load_store()
-    found: dict[str, Any] | None = None
-    for board in store.get("dashboards", []):
-        if board.get("id") == dashboard_id and _matches_scope(board, organization_id):
-            found = board
-            break
-    if not found:
-        raise DashboardError("Dashboard not found")
+def _apply_update(found: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any]:
     if payload.get("title"):
         found["title"] = str(payload["title"]).strip()
     if "description" in payload:
@@ -125,11 +127,33 @@ def update_dashboard(dashboard_id: str, payload: dict[str, Any], *, organization
     if "tiles" in payload:
         found["tiles"] = _validate_tiles(list(payload["tiles"] or []))
     found["updated_at"] = datetime.now(timezone.utc).isoformat()
+    return found
+
+
+def update_dashboard(dashboard_id: str, payload: dict[str, Any], *, organization_id: str) -> dict[str, Any]:
+    if _pss.enabled():
+        found = get_dashboard(dashboard_id, organization_id=organization_id)
+        if not found:
+            raise DashboardError("Dashboard not found")
+        found = _apply_update(found, payload)
+        _pss.upsert(_COLLECTION, dashboard_id, organization_id, found)
+        return found
+    store = _load_store()
+    found: dict[str, Any] | None = None
+    for board in store.get("dashboards", []):
+        if board.get("id") == dashboard_id and _matches_scope(board, organization_id):
+            found = board
+            break
+    if not found:
+        raise DashboardError("Dashboard not found")
+    _apply_update(found, payload)
     _save_store(store)
     return found
 
 
 def delete_dashboard(dashboard_id: str, *, organization_id: str) -> bool:
+    if _pss.enabled():
+        return _pss.delete(_COLLECTION, dashboard_id, organization_id)
     store = _load_store()
     before = len(store.get("dashboards", []))
     store["dashboards"] = [
