@@ -1,0 +1,87 @@
+Client: collegestation
+Statements: 8
+
+=== Statement 1/8 ===
+SRC             | TOTAL_ROWS | MN         | MX         | OLDER_THAN_2YR
+----------------+------------+------------+------------+---------------
+BSEG_BILLED     | 6146301    | 2024-08-01 | 2026-08-26 | 0             
+BSEG_SQ         | 12840458   | 2024-08-01 | 2026-08-26 | 0             
+FT_RPT          | 14040693   | 2024-08-01 | 2026-08-27 | 0             
+FT_GL           | 33232685   | 2024-08-01 | 2026-08-27 | 0             
+D1_MSRMT        | 3309191    | 2024-08-01 | 2026-08-24 | 0             
+D1_USAGE        | 2569730    | 2024-08-01 | 2026-08-27 | 0             
+D1_USAGE_SCALAR | 3816781    | 2024-08-01 | 2026-08-24 | 0             
+
+=== Statement 2/8 ===
+CHK         | RAW_ROWS | SNAP_ROWS
+------------+----------+----------
+BSEG_BILLED | 6146302  | 6146301  
+BSEG_SQ     | 12840460 | 12840458 
+FT_RPT      | 14040698 | 14040693 
+FT_GL       | 33237468 | 33232685 
+D1_MSRMT    | 3309201  | 3309191  
+
+=== Statement 3/8 ===
+CHK                    | RAW_ROWS | SNAP_ROWS
+-----------------------+----------+----------
+D1_USAGE_3MO           | 299250   | 299249   
+D1_SCALAR_BY_START_3MO | 309559   | 309557   
+D1_SCALAR_BY_USAGE_3MO | 443277   | 443273   
+
+=== Statement 4/8 ===
+CHK               | RAW_DUP_GROUPS | SNAP_DUP_GROUPS
+------------------+----------------+----------------
+SCALAR_DUP_GROUPS | 508            | 508            
+
+=== Statement 5/8 ===
+TYP  | ROWS_N  | SA_N    | SUM_CUR    
+-----+---------+---------+------------
+LDAY | 1005409 | 1005409 | 24938281.04
+
+=== Statement 6/8 ===
+OBJECT_NAME                          | OBJECT_TYPE | STATUS
+-------------------------------------+-------------+-------
+CMS_SA_SNAPSHOT                      | TABLE       | VALID 
+REFRESH_BSEG_BILLED_USAGE_RPT_CURR   | PROCEDURE   | VALID 
+REFRESH_BSEG_SQ_USAGE_RPT_CURR       | PROCEDURE   | VALID 
+REFRESH_CMS_SA_SNAPSHOT              | PROCEDURE   | VALID 
+REFRESH_D1_MSRMT_RPT_CURR            | PROCEDURE   | VALID 
+REFRESH_D1_USAGE_RPT_CURR            | PROCEDURE   | VALID 
+REFRESH_D1_USAGE_SCALAR_DTL_RPT_CURR | PROCEDURE   | VALID 
+REFRESH_FT_GL_DISTRIBUTION_RPT_CURR  | PROCEDURE   | VALID 
+REFRESH_FT_RPT_CURR                  | PROCEDURE   | VALID 
+
+=== Statement 7/8 ===
+JOB_NAME                                 | ENABLED | STATE     | LAST_START       | NEXT_RUN        
+-----------------------------------------+---------+-----------+------------------+-----------------
+JOB_REFRESH_BSEG_BILLED_USAGE_RPT_CURR   | TRUE    | SCHEDULED | 2026-08-27 07:30 | 2026-08-27 13:30
+JOB_REFRESH_CMS_SA_SNAPSHOT              | TRUE    | SCHEDULED | 2026-08-27 10:30 | 2026-08-27 16:30
+JOB_REFRESH_D1_MSRMT_RPT_CURR            | TRUE    | SCHEDULED | 2026-08-27 08:30 | 2026-08-27 14:30
+JOB_REFRESH_D1_USAGE_RPT_CURR            | TRUE    | SCHEDULED | 2026-08-27 09:30 | 2026-08-27 15:30
+JOB_REFRESH_D1_USAGE_SCALAR_DTL_RPT_CURR | TRUE    | SCHEDULED | 2026-08-27 10:00 | 2026-08-27 16:00
+JOB_REFRESH_FT_GL_DISTRIBUTION_RPT_CURR  | TRUE    | SCHEDULED |                  | 2026-08-27 15:00
+JOB_REFRESH_FT_RPT_CURR                  | TRUE    | SCHEDULED | 2026-08-27 07:00 | 2026-08-27 13:00
+REFRESH_BSEG_SQ_USAGE_RPT_CURR_JOB       | TRUE    | SCHEDULED | 2026-08-27 08:00 | 2026-08-27 14:00
+
+=== Statement 8/8 ===
+CHK                    | RAW_ROWS | SNAP_ROWS | DIFF  | FAILURE_CODE  
+-----------------------+----------+-----------+-------+---------------
+BSEG_BILLED            | 6146307  | 6146301   | -6    | COUNT_MISMATCH
+BSEG_SQ                | 12840469 | 12840458  | -11   | COUNT_MISMATCH
+FT_RPT                 | 14040708 | 14040693  | -15   | COUNT_MISMATCH
+FT_GL                  | 33237487 | 33232685  | -4802 | COUNT_MISMATCH
+D1_MSRMT               | 3309201  | 3309191   | -10   | COUNT_MISMATCH
+D1_USAGE_3MO           | 299251   | 299249    | -2    | COUNT_MISMATCH
+D1_SCALAR_BY_START_3MO | 309559   | 309557    | -2    | COUNT_MISMATCH
+D1_SCALAR_BY_USAGE_3MO | 443277   | 443273    | -4    | COUNT_MISMATCH
+
+VALIDATION GATE FAILED
+- Statement 8: 8 failure row(s)
+  ('BSEG_BILLED', 6146307, 6146301, -6, 'COUNT_MISMATCH')
+  ('BSEG_SQ', 12840469, 12840458, -11, 'COUNT_MISMATCH')
+  ('FT_RPT', 14040708, 14040693, -15, 'COUNT_MISMATCH')
+  ('FT_GL', 33237487, 33232685, -4802, 'COUNT_MISMATCH')
+  ('D1_MSRMT', 3309201, 3309191, -10, 'COUNT_MISMATCH')
+  ('D1_USAGE_3MO', 299251, 299249, -2, 'COUNT_MISMATCH')
+  ('D1_SCALAR_BY_START_3MO', 309559, 309557, -2, 'COUNT_MISMATCH')
+  ('D1_SCALAR_BY_USAGE_3MO', 443277, 443273, -4, 'COUNT_MISMATCH')

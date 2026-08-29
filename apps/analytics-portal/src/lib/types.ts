@@ -85,6 +85,7 @@ export type FieldDef = {
   type: string;
   role: string;
   group?: string;
+  description?: string;
 };
 
 export type SourceTableDef = {
@@ -175,6 +176,33 @@ export type SnapshotMetadata = {
   default_date_preset?: DatePresetConfig;
   trusted_measures?: string[];
   process_guides?: Record<string, ProcessFieldGuide>;
+};
+
+export type BuilderMeasure = { field: string; agg: string };
+
+/** A cross-canvas "common business question" (flattened premade reports) served by
+ *  GET /snapshots/questions; picking one prefills the visual builder. */
+export type BuilderQuestion = {
+  id: string;
+  report_id: string;
+  snapshot_id: string;
+  snapshot_label: string;
+  workstream: string;
+  workstream_label: string;
+  title: string;
+  description: string;
+  dimensions: string[];
+  measures: BuilderMeasure[];
+  filters: FilterDef[];
+  chart_type: string;
+};
+
+export type BuilderQuestionsResponse = {
+  organization_id: string | null;
+  workstream_order: string[];
+  workstream_labels: Record<string, string>;
+  count: number;
+  questions: BuilderQuestion[];
 };
 
 export type FilterDef = {

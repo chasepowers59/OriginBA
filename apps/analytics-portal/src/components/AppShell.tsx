@@ -17,6 +17,7 @@ import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 const NAV = [
   { href: "/", label: "Overview", id: "home" as const },
   { href: "/reports", label: "Reports", id: "reports" as const },
+  { href: "/build", label: "Build", id: "build" as const },
   { href: "/dashboard/custom", label: "My dashboards", id: "custom" as const },
   { href: "/database", label: "Database", id: "database" as const },
   { href: "/data-quality", label: "Data Quality", id: "dq" as const },
@@ -35,7 +36,7 @@ export function AppShell({
   snapshots: SnapshotSummary[];
   workstreams: WorkstreamGroup[];
   activeId?: string;
-  activeNav?: "home" | "reports" | "dashboard" | "custom" | "database" | "dq" | "settings";
+  activeNav?: "home" | "reports" | "build" | "dashboard" | "custom" | "database" | "dq" | "settings";
   dbConfigured: boolean;
 }) {
   const brand = useBrand();

@@ -264,6 +264,10 @@ export function deleteDashboard(id: string): Promise<void> {
   return fetchJson(`/portal/dashboards/${id}`, { method: "DELETE" });
 }
 
+export function fetchBuilderQuestions(): Promise<import("@/lib/types").BuilderQuestionsResponse> {
+  return apiGet("/snapshots/questions");
+}
+
 export function fetchSnapshotMetadata(snapshotId: string): Promise<SnapshotMetadata> {
   return fetchJson<SnapshotMetadata>(`/snapshots/${snapshotId}/metadata`);
 }

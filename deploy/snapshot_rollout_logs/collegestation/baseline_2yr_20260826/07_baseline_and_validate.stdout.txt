@@ -1,0 +1,115 @@
+Client: collegestation
+Statements: 3
+
+=== Statement 1/3 ===
+OWNER  | JOB_NAME                                       | ENABLED | STATE    | JOB_ACTION                                  | START_DATE | NEXT_RUN_DATE | FAILURE_COUNT | RUN_COUNT | COMMENTS                                         
+-------+------------------------------------------------+---------+----------+---------------------------------------------+------------+---------------+---------------+-----------+--------------------------------------------------
+CISADM | JOB_BASELINE_BSEG_BILLED_USAGE_RPT_CURR_ONCE   | FALSE   | DISABLED | CISADM.REFRESH_BSEG_BILLED_USAGE_RPT_CURR   |            |               | 0             | 1         | College Station TEST 2yr truncate+reload baseline
+CISADM | JOB_BASELINE_BSEG_SQ_USAGE_RPT_CURR_ONCE       | FALSE   | DISABLED | CISADM.REFRESH_BSEG_SQ_USAGE_RPT_CURR       |            |               | 0             | 1         | College Station TEST 2yr truncate+reload baseline
+CISADM | JOB_BASELINE_D1_MSRMT_RPT_CURR_ONCE            | FALSE   | DISABLED | CISADM.REFRESH_D1_MSRMT_RPT_CURR            |            |               | 0             | 1         | College Station TEST 2yr truncate+reload baseline
+CISADM | JOB_BASELINE_D1_USAGE_RPT_CURR_ONCE            | FALSE   | DISABLED | CISADM.REFRESH_D1_USAGE_RPT_CURR            |            |               | 0             | 1         | College Station TEST 2yr truncate+reload baseline
+CISADM | JOB_BASELINE_D1_USAGE_SCALAR_DTL_RPT_CURR_ONCE | FALSE   | DISABLED | CISADM.REFRESH_D1_USAGE_SCALAR_DTL_RPT_CURR |            |               | 0             | 1         | College Station TEST 2yr truncate+reload baseline
+CISADM | JOB_BASELINE_FT_GL_DISTRIBUTION_RPT_CURR_ONCE  | FALSE   | DISABLED | CISADM.REFRESH_FT_GL_DISTRIBUTION_RPT_CURR  |            |               | 0             | 1         | College Station TEST 2yr truncate+reload baseline
+CISADM | JOB_BASELINE_FT_RPT_CURR_ONCE                  | FALSE   | DISABLED | CISADM.REFRESH_FT_RPT_CURR                  |            |               | 0             | 1         | College Station TEST 2yr truncate+reload baseline
+
+=== Statement 2/3 ===
+OWNER  | JOB_NAME                                       | STATUS    | ACTUAL_START_DATE          | RUN_DURATION | ADDITIONAL_INFO
+-------+------------------------------------------------+-----------+----------------------------+--------------+----------------
+CISADM | JOB_BASELINE_D1_USAGE_SCALAR_DTL_RPT_CURR_ONCE | SUCCEEDED | 2026-08-26 14:24:56.946743 | 0:11:11      |                
+CISADM | JOB_BASELINE_D1_USAGE_RPT_CURR_ONCE            | SUCCEEDED | 2026-08-26 14:24:56.929061 | 0:09:27      |                
+CISADM | JOB_BASELINE_D1_MSRMT_RPT_CURR_ONCE            | SUCCEEDED | 2026-08-26 14:24:56.817241 | 0:43:37      |                
+CISADM | JOB_BASELINE_FT_RPT_CURR_ONCE                  | SUCCEEDED | 2026-08-26 14:24:56.806155 | 0:18:04      |                
+CISADM | JOB_BASELINE_BSEG_SQ_USAGE_RPT_CURR_ONCE       | SUCCEEDED | 2026-08-26 14:24:56.796823 | 0:10:06      |                
+CISADM | JOB_BASELINE_BSEG_BILLED_USAGE_RPT_CURR_ONCE   | SUCCEEDED | 2026-08-26 14:24:56.785444 | 0:19:36      |                
+CISADM | JOB_BASELINE_FT_GL_DISTRIBUTION_RPT_CURR_ONCE  | SUCCEEDED | 2026-08-26 14:24:56.785214 | 0:54:50      |                
+
+=== Statement 3/3 ===
+WORKSTREAM | TABLE_NAME                   | LIVE_ROW_COUNT | MIN_LOAD_DTTM              | MAX_LOAD_DTTM             
+-----------+------------------------------+----------------+----------------------------+---------------------------
+billing    | BSEG_BILLED_USAGE_RPT_CURR   | 6146301        | 2026-08-26 14:27:23.576632 | 2026-08-26 14:44:13.645892
+billing    | BSEG_SQ_USAGE_RPT_CURR       | 12840458       | 2026-08-26 14:24:57.317976 | 2026-08-26 14:24:57.317976
+finance    | FT_RPT_CURR                  | 14030545       | 2026-08-26 14:24:57.021851 | 2026-08-26 14:24:57.021851
+finance    | FT_GL_DISTRIBUTION_RPT_CURR  | 33212389       | 2026-08-26 14:24:57.514113 | 2026-08-26 14:24:57.514113
+meter_ops  | D1_USAGE_RPT_CURR            | 2569730        | 2026-08-26 14:25:40.113107 | 2026-08-26 14:34:20.024790
+meter_ops  | D1_USAGE_SCALAR_DTL_RPT_CURR | 3816781        | 2026-08-26 14:24:58.864717 | 2026-08-26 14:24:58.864717
+meter_ops  | D1_MSRMT_RPT_CURR            | 3309191        | 2026-08-26 14:24:57.299229 | 2026-08-26 14:24:57.299229
+Client: collegestation
+Statements: 1
+
+=== Statement 1/1 ===
+JOB_NAME | FAILURE_CODE | DETAIL
+---------+--------------+-------
+
+VALIDATION GATE PASSED
+Client: collegestation
+Statements: 31
+
+=== Statement 1/31 ===
+SNAPSHOT_ROWS | MIN_ACCOUNTING_DT   | MAX_ACCOUNTING_DT   | MIN_LOAD_DTTM              | MAX_LOAD_DTTM              | TOTAL_CUR_AMT | TOTAL_TOT_AMT
+--------------+---------------------+---------------------+----------------------------+----------------------------+---------------+--------------
+14030545      | 2024-08-01 00:00:00 | 2026-08-26 00:00:00 | 2026-08-26 14:24:57.021851 | 2026-08-26 14:24:57.021851 | 3141886.77    | 726858.44    
+
+=== Statement 2/31 ===
+ACCOUNTING_MONTH    | RAW_ROWS | SNAPSHOT_ROWS | SNAPSHOT_MINUS_RAW_ROWS | RAW_CUR_AMT | SNAPSHOT_CUR_AMT | SNAPSHOT_MINUS_RAW_CUR_AMT | RAW_TOT_AMT | SNAPSHOT_TOT_AMT | SNAPSHOT_MINUS_RAW_TOT_AMT
+--------------------+----------+---------------+-------------------------+-------------+------------------+----------------------------+-------------+------------------+---------------------------
+2025-08-01 00:00:00 | 538114   | 538114        | 0                       | 1816839.31  | 1816839.31       | 0                          | 1731025.19  | 1731025.19       | 0                         
+2025-09-01 00:00:00 | 561438   | 561438        | 0                       | -2419641.75 | -2419641.75      | 0                          | -2939952.83 | -2939952.83      | 0                         
+2025-10-01 00:00:00 | 615958   | 615958        | 0                       | 1705230.24  | 1705230.24       | 0                          | 1552903.55  | 1552903.55       | 0                         
+2025-11-01 00:00:00 | 494396   | 494396        | 0                       | -1510181.12 | -1510181.12      | 0                          | -1625716.62 | -1625716.62      | 0                         
+2025-12-01 00:00:00 | 588734   | 588734        | 0                       | -3415983.38 | -3415983.38      | 0                          | -3588163.84 | -3588163.84      | 0                         
+2026-01-01 00:00:00 | 588245   | 588245        | 0                       | 2171386.94  | 2171386.94       | 0                          | 2087717.56  | 2087717.56       | 0                         
+2026-02-01 00:00:00 | 615023   | 615023        | 0                       | 13400.83    | 13400.83         | 0                          | -157756.16  | -157756.16       | 0                         
+2026-03-01 00:00:00 | 607259   | 607259        | 0                       | -1313149.74 | -1313149.74      | 0                          | -1607129.58 | -1607129.58      | 0                         
+2026-04-01 00:00:00 | 585183   | 585183        | 0                       | 1501342.46  | 1501342.46       | 0                          | 969863.7    | 969863.7         | 0                         
+2026-05-01 00:00:00 | 568333   | 568333        | 0                       | 1325228.16  | 1325228.16       | 0                          | 1285449.28  | 1285449.28       | 0                         
+2026-06-01 00:00:00 | 597878   | 597878        | 0                       | -1080589.92 | -1080589.92      | 0                          | -863900.84  | -863900.84       | 0                         
+2026-07-01 00:00:00 | 654664   | 654664        | 0                       | 3273609.98  | 3273609.98       | 0                          | 3692947.17  | 3692947.17       | 0                         
+2026-08-01 00:00:00 | 454891   | 454891        | 0                       | 1433817.51  | 1433817.51       | 0                          | 1400038.11  | 1400038.11       | 0                         
+
+=== Statement 3/31 ===
+FT_ID | ROW_COUNT
+------+----------
+
+=== Statement 4/31 ===
+SOURCE_ROWS | SNAPSHOT_ROWS | SOURCE_CUR_AMT | SNAPSHOT_CUR_AMT | SOURCE_TOT_AMT | SNAPSHOT_TOT_AMT
+------------+---------------+----------------+------------------+----------------+-----------------
+15770051    | 14030545      | 27006457.3     | 3141886.77       | 19391952.99    | 726858.44       
+
+=== Statement 5/31 ===
+SNAPSHOT_ROWS | MIN_BILL_DT         | MAX_BILL_DT         | MIN_LOAD_DTTM              | MAX_LOAD_DTTM              | TOTAL_BILL_SQ    | TOTAL_CALC_AMT
+--------------+---------------------+---------------------+----------------------------+----------------------------+------------------+---------------
+6146301       | 2024-08-01 00:00:00 | 2026-08-26 00:00:00 | 2026-08-26 14:27:23.576632 | 2026-08-26 14:44:13.645892 | 7632495967.86202 | 437348618.33  
+
+=== Statement 6/31 ===
+Traceback (most recent call last):
+  File "/Users/chase/OriginBA-3/scripts/local/run_client_oracle_sql.py", line 311, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/Users/chase/OriginBA-3/scripts/local/run_client_oracle_sql.py", line 274, in main
+    cursor.execute(sql)
+    ~~~~~~~~~~~~~~^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/oracledb/cursor.py", line 844, in execute
+    impl.execute(self)
+    ~~~~~~~~~~~~^^^^^^
+  File "src/oracledb/impl/thick/cursor.pyx", line 320, in oracledb.thick_impl.ThickCursorImpl.execute
+  File "src/oracledb/impl/thick/utils.pyx", line 484, in oracledb.thick_impl._raise_from_odpi
+  File "src/oracledb/impl/thick/utils.pyx", line 474, in oracledb.thick_impl._raise_from_info
+oracledb.exceptions.DatabaseError: DPY-4011: the database or network closed the connection
+DPI-1080: connection was closed by ORA-03135
+ORA-03135: connection lost contact
+Process ID: 37511
+Session ID: 641 Serial number: 41639
+Help: https://docs.oracle.com/error-help/db/ora-03135/
+
+========================================================================
+collegestation: baseline-and-validate (6 chained actions)
+Logs: /Users/chase/OriginBA-3/deploy/snapshot_rollout_logs/collegestation/baseline_2yr_20260826/collegestation/baseline-and-validate
+========================================================================
+
+=== collegestation: baseline-status ===
+
+=== collegestation: baseline-jobs-gate ===
+
+=== collegestation: validate ===
+
+FAILED: collegestation baseline-and-validate stopped at step validate

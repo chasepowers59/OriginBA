@@ -144,6 +144,55 @@ def snapshots_index(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, A
     }
 
 
+@router.get("/questions")
+def snapshot_questions(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
+    """Every canvas's premade reports, flattened into ONE cross-canvas gallery of
+    common business questions. Powers the visual builder's "Start from a question"
+    panel: each entry is already the /query request shape, so picking one prefills
+    the shelves. Cheap -- the catalog is already resident (load_catalog), no DB hit.
+    Workstream access is honoured: a user sees only questions on canvases in their
+    granted workstreams."""
+    ctx.require_permission("snapshots:read")
+    org_id = ctx.effective_organization_id()
+    catalog = load_catalog(organization_id=org_id)
+    order = catalog.get("workstream_order", [])
+    labels = catalog.get("workstream_labels", {})
+    order_index = {ws: i for i, ws in enumerate(order)}
+
+    questions: list[dict[str, Any]] = []
+    for snapshot_id, meta in catalog.get("snapshots", {}).items():
+        if not meta.get("portal_enabled", True):
+            continue
+        workstream = meta.get("workstream", "")
+        if not ctx.can_access_workstream(workstream):
+            continue
+        for report in meta.get("premade_reports", []) or []:
+            questions.append({
+                "id": f"{snapshot_id}:{report.get('id')}",
+                "report_id": report.get("id"),
+                "snapshot_id": snapshot_id,
+                "snapshot_label": meta.get("label", snapshot_id),
+                "workstream": workstream,
+                "workstream_label": labels.get(workstream, workstream),
+                "title": report.get("title", report.get("id")),
+                "description": report.get("description", ""),
+                "dimensions": report.get("dimensions", []),
+                "measures": report.get("measures", []),
+                "filters": report.get("filters", []),
+                "chart_type": report.get("chart_type", "bar"),
+            })
+
+    questions.sort(key=lambda q: (order_index.get(q["workstream"], 99),
+                                  q["snapshot_label"], q["title"]))
+    return {
+        "organization_id": org_id,
+        "workstream_order": order,
+        "workstream_labels": labels,
+        "count": len(questions),
+        "questions": questions,
+    }
+
+
 @router.get("/executive-summary")
 def executive_summary(
     days: int = 30,
