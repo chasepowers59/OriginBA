@@ -12,7 +12,12 @@ import {
 import type { ExecutiveTrendPoint } from "@/lib/types";
 import { ChartTooltipContent, chartTooltipWrapperStyle } from "./ChartTooltip";
 
-const COLORS = ["#38bdf8", "#818cf8", "#22d3ee", "#34d399", "#a78bfa", "#fbbf24"];
+// Single-accent treatment (Power BI / Tableau convention): one hue carries the
+// series, the leading value is emphasized and the rest recede, so the eye lands
+// on what matters instead of decoding a rainbow. Selection overrides to amber.
+const ACCENT = "#38bdf8";
+const ACCENT_MUTED = "rgba(56, 189, 248, 0.32)";
+const SELECTED = "#fbbf24";
 
 type MiniSparkChartProps = {
   points: ExecutiveTrendPoint[];
@@ -29,11 +34,17 @@ export function MiniSparkChart({
   selectedLabel,
   onBarClick,
 }: MiniSparkChartProps) {
-  const data = points.map((p, i) => ({
+  const maxValue = points.reduce((m, p) => Math.max(m, p.value), 0);
+  const data = points.map((p) => ({
     name: p.label.slice(0, 14),
     fullName: p.label,
     value: p.value,
-    fill: selectedLabel === p.label ? "#fbbf24" : COLORS[i % COLORS.length],
+    fill:
+      selectedLabel === p.label
+        ? SELECTED
+        : p.value >= maxValue && maxValue > 0
+          ? ACCENT
+          : ACCENT_MUTED,
   }));
 
   if (!data.length) {
@@ -49,7 +60,7 @@ export function MiniSparkChart({
 
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} barCategoryGap="12%">
+      <BarChart data={data} barCategoryGap="18%" margin={{ top: 4, right: 2, left: 2, bottom: 0 }}>
         <XAxis
           dataKey="name"
           tick={{ fontSize: 9, fill: "#64748b" }}
@@ -57,18 +68,21 @@ export function MiniSparkChart({
           angle={-25}
           textAnchor="end"
           height={42}
+          tickLine={false}
+          axisLine={false}
         />
         <YAxis hide domain={[0, "auto"]} />
         <Tooltip
           content={<ChartTooltipContent measureLabel="Value" isCurrency={format === "currency"} />}
           wrapperStyle={chartTooltipWrapperStyle}
-          cursor={{ fill: "rgba(255,255,255,0.06)" }}
+          cursor={{ fill: "rgba(255,255,255,0.05)" }}
         />
         <Bar
           dataKey="value"
-          radius={[4, 4, 0, 0]}
+          radius={[3, 3, 0, 0]}
           onClick={(payload) => onBarClick?.(String((payload as { fullName?: string }).fullName ?? ""))}
           style={{ cursor: onBarClick ? "pointer" : "default" }}
+          isAnimationActive={false}
         >
           {data.map((entry, index) => (
             <Cell key={index} fill={entry.fill} />

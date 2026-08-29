@@ -46,7 +46,7 @@ export function DashboardWidget({
           </div>
           <span className="shrink-0 text-slate-600 transition group-hover:text-sky-400">→</span>
         </div>
-        <p className={`mt-3 font-bold tracking-tight text-white ${compact ? "text-2xl" : "text-3xl"}`}>
+        <p className={`mt-3 font-bold tracking-tight tabular-nums text-white ${compact ? "text-2xl" : "text-3xl"}`}>
           {formatted}
         </p>
         {showCompare ? (

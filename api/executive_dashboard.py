@@ -255,8 +255,15 @@ def build_executive_summary(
             ],
         }
 
-    kpis = [
-        execute_kpi_definition(
+    # KPIs are independent and I/O-bound (each is one or more Oracle/Postgres
+    # round-trips), so run them CONCURRENTLY rather than in a ~20s sequential
+    # loop over the VPN. Workers are capped at the connection-pool size; order is
+    # preserved so the dashboard grid stays stable. execute_kpi_definition never
+    # raises (it returns an error field), so no future needs a try/except here.
+    from concurrent.futures import ThreadPoolExecutor
+
+    def _run(kpi: dict[str, Any]) -> dict[str, Any]:
+        return execute_kpi_definition(
             kpi,
             days=days,
             compare=compare,
@@ -264,8 +271,12 @@ def build_executive_summary(
             extra_filters=extra_filters,
             organization_id=organization_id,
         )
-        for kpi in kpi_defs
-    ]
+
+    if kpi_defs:
+        with ThreadPoolExecutor(max_workers=min(8, len(kpi_defs))) as pool:
+            kpis = list(pool.map(_run, kpi_defs))
+    else:
+        kpis = []
     return {
         "client": client_id,
         "db_configured": True,

@@ -124,15 +124,56 @@ def test_oracle_connection(config: Any) -> dict[str, Any]:
         conn.close()
 
 
-@contextmanager
-def demo_connection(organization_id: str) -> Iterator[Any]:
+# One Oracle session pool per tenant, built on first use and kept -- the same
+# reason warehouse_db pools Postgres. Without it every query opened a brand-new
+# connection, and the executive summary's ~18 sequential queries each paid a full
+# connection + TLS handshake over the VPN, so the KPI grid took 30-40s to fill
+# (measured 2026-08-28). A pool reuses warm sessions and drops that to seconds.
+# Keyed by (user, dsn); a credential rotation is picked up by clearing the cache
+# (demo_reset_pools) or a process restart.
+_pools: dict[tuple[str, str], Any] = {}
+
+
+def _oracle_pool(organization_id: str):
     user, password, dsn, lib_dir, thick_mode = active_connection_config(organization_id)
     _ensure_thick_mode(lib_dir=lib_dir, thick_mode=thick_mode)
-    conn = oracledb.connect(user=user, password=password, dsn=normalize_oracle_dsn(dsn))
+    ndsn = normalize_oracle_dsn(dsn)
+    key = (user, ndsn)
+    pool = _pools.get(key)
+    if pool is None:
+        pool = oracledb.create_pool(
+            user=user, password=password, dsn=ndsn,
+            min=1, max=8, increment=1, getmode=oracledb.POOL_GETMODE_WAIT,
+        )
+        _pools[key] = pool
+    return pool
+
+
+def demo_reset_pools() -> None:
+    """Close and forget every pool (use after a credential rotation)."""
+    for pool in _pools.values():
+        try:
+            pool.close(force=True)
+        except Exception:  # noqa: BLE001
+            pass
+    _pools.clear()
+
+
+@contextmanager
+def demo_connection(organization_id: str) -> Iterator[Any]:
+    pool = _oracle_pool(organization_id)
+    conn = pool.acquire()
     try:
         yield conn
     finally:
-        conn.close()
+        # Return the session to the pool rather than closing it. Roll back any
+        # open transaction first so a borrowed session never leaks state (these
+        # are read-only SELECTs, but the discipline matches warehouse_db).
+        try:
+            conn.rollback()
+        except Exception:  # noqa: BLE001
+            pass
+        pool.release(conn)
 
 
 # Oracle statement ceiling, matching the Postgres side's 30s statement_timeout.

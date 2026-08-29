@@ -2,6 +2,11 @@
 
 import { formatPercent } from "@/lib/format";
 
+/**
+ * The period-over-period delta chip. A color-tinted pill (Power BI / Tableau
+ * convention) reads faster than plain text: green up, rose down, slate flat,
+ * with a directional arrow and the prior-period basis stated beside it.
+ */
 export function KpiCompareBadge({
   changePct,
   priorLabel = "vs prior period",
@@ -14,14 +19,22 @@ export function KpiCompareBadge({
   }
   const up = changePct > 0;
   const flat = Math.abs(changePct) < 0.05;
-  const color = flat ? "text-slate-400" : up ? "text-emerald-400" : "text-rose-400";
-  const arrow = flat ? "→" : up ? "↑" : "↓";
+  const tone = flat
+    ? "bg-slate-500/10 text-slate-300 ring-slate-400/20"
+    : up
+      ? "bg-emerald-500/12 text-emerald-300 ring-emerald-400/25"
+      : "bg-rose-500/12 text-rose-300 ring-rose-400/25";
+  const arrow = flat ? "→" : up ? "▲" : "▼";
 
   return (
-    <span className={`inline-flex items-center gap-1 text-xs font-medium ${color}`}>
-      <span>{arrow}</span>
-      <span>{formatPercent(Math.abs(changePct))}</span>
-      <span className="text-slate-500">{priorLabel}</span>
+    <span className="inline-flex items-center gap-2">
+      <span
+        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ring-1 ring-inset ${tone}`}
+      >
+        <span className="text-[10px] leading-none">{arrow}</span>
+        {formatPercent(Math.abs(changePct))}
+      </span>
+      <span className="text-xs text-slate-500">{priorLabel}</span>
     </span>
   );
 }

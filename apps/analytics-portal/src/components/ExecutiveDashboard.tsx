@@ -20,6 +20,11 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
   const portal = usePortalConfig();
   const { filter, toggleFilter, clearFilter } = useCrossFilter();
   const [days, setDays] = useState(initialDays);
+  // Deltas are one toggle away, not on by default: the in-database Oracle path
+  // runs a prior-period query per KPI, and doubling ~9 KPIs' queries over the VPN
+  // left the grid blank for 20s+ (measured 2026-08-28). The KPIs load fast without
+  // it; the polished delta chips render the moment Compare is on. The Postgres
+  // shape could default this on -- revisit per-engine if it becomes worthwhile.
   const [compare, setCompare] = useState(false);
   const [compareMode, setCompareMode] = useState<CompareMode>("prior_period");
   const [summary, setSummary] = useState<ExecutiveSummary | null>(null);

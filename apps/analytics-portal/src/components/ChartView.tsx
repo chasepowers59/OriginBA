@@ -19,7 +19,14 @@ import {
 import { formatCurrency, formatNumber } from "@/lib/format";
 import { ChartTooltipContent, chartTooltipWrapperStyle } from "./ChartTooltip";
 
-const COLORS = ["#38bdf8", "#818cf8", "#22d3ee", "#34d399", "#a78bfa", "#fbbf24"];
+// A single measure across categories is one series, so bars use ONE accent hue
+// with the leading value emphasized (dataviz: color should encode meaning, and
+// here it does not vary by category). Pie slices are genuinely categorical, so
+// they keep a harmonious multi-hue palette.
+const ACCENT = "#38bdf8";
+const ACCENT_MUTED = "rgba(56, 189, 248, 0.34)";
+const SELECTED = "#fbbf24";
+const PIE_COLORS = ["#38bdf8", "#6366f1", "#22d3ee", "#34d399", "#a78bfa", "#f59e0b", "#f472b6", "#2dd4bf"];
 
 type ChartViewProps = {
   chartType: "bar" | "line" | "pie" | "horizontal";
@@ -60,15 +67,17 @@ export function ChartView({
     return mapped;
   }, [rows, dimensionKey, measureKey, sortTimeSeries]);
 
+  const maxValue = useMemo(() => data.reduce((m, d) => Math.max(m, d.value), 0), [data]);
+
   const handleClick = (payload: { fullName?: string }) => {
     if (onCategoryClick && payload.fullName) {
       onCategoryClick(payload.fullName);
     }
   };
 
-  const barFill = (fullName: string, index: number) => {
-    if (selectedCategory && fullName === selectedCategory) return "#fbbf24";
-    return COLORS[index % COLORS.length];
+  const barFill = (fullName: string, value: number) => {
+    if (selectedCategory && fullName === selectedCategory) return SELECTED;
+    return value >= maxValue && maxValue > 0 ? ACCENT : ACCENT_MUTED;
   };
 
   if (!data.length) {
@@ -101,8 +110,8 @@ export function ChartView({
             {data.map((entry, index) => (
               <Cell
                 key={index}
-                fill={barFill(entry.fullName, index)}
-                stroke={selectedCategory === entry.fullName ? "#fbbf24" : "transparent"}
+                fill={selectedCategory === entry.fullName ? SELECTED : PIE_COLORS[index % PIE_COLORS.length]}
+                stroke={selectedCategory === entry.fullName ? SELECTED : "transparent"}
                 strokeWidth={2}
               />
             ))}
@@ -138,7 +147,7 @@ export function ChartView({
             style={{ cursor: onCategoryClick ? "pointer" : "default" }}
           >
             {data.map((entry, index) => (
-              <Cell key={index} fill={barFill(entry.fullName, index)} />
+              <Cell key={index} fill={barFill(entry.fullName, entry.value)} />
             ))}
           </Bar>
         </BarChart>
@@ -202,7 +211,7 @@ export function ChartView({
           style={{ cursor: onCategoryClick ? "pointer" : "default" }}
         >
           {data.map((entry, index) => (
-            <Cell key={index} fill={barFill(entry.fullName, index)} />
+            <Cell key={index} fill={barFill(entry.fullName, entry.value)} />
           ))}
         </Bar>
       </BarChart>
