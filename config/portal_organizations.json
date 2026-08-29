@@ -48,11 +48,11 @@
       "id": "ellensburg",
       "display_name": "Ellensburg",
       "env_prefix": "ELLENSBURG",
-      "default_dsn": "smartcity-db-test.originsmartops.com:1521/ptestdb_ellensburg.testprivatesn.origintestvcn.oraclevcn.com",
-      "engine": "postgres",
+      "default_dsn": "smartcity-db-test-v1-2.originsmartops.com:1521/ptestdb_ellensburg.testprivatesn.origintestvcn.oraclevcn.com",
+      "engine": "oracle",
       "catalog": "dbt",
       "warehouse_url_env": "WAREHOUSE_DATABASE_URL_ELLENSBURG",
-      "notes": "MIGRATED to the dbt warehouse 2026-08-26 (first client through the onboarding runbook; deployment shape A). Warehouse: the validated Ellensburg slice DB (8/10 reconciliation checks exact). Rollback: flip catalog back to cisadm -- nothing else changes."
+      "notes": "IN-DATABASE shape since 2026-08-28: the dbt canvases live in ORIGINBA_REPORTING inside the Ellensburg 25.4 TEST instance, rebuilt every 6 hours with 120 source-parity checks behind them (originba_dbt nightly). Connection: ELLENSBURG_* env keys. Rollback: engine back to postgres (the validated slice DB) or catalog back to cisadm -- nothing else changes."
     },
     {
       "id": "college_station",

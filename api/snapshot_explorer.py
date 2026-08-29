@@ -22,7 +22,9 @@ from api.raw_sql_validator import RawSqlValidationError, apply_row_cap, validate
 from api.executive_dashboard import build_executive_summary
 from api.kpi_runner import COMPARE_MODES
 from api.workstream_dashboard import build_workstream_about, build_workstream_summary
-from api.snapshot_catalog import CatalogError, allowed_fields, get_snapshot, list_snapshots, list_workstreams, load_catalog, is_warehouse
+from api.snapshot_catalog import (CatalogError, allowed_fields, get_snapshot,
+                                  is_warehouse, list_snapshots, list_workstreams,
+                                  load_catalog, snapshot_backend)
 
 
 router = APIRouter(prefix="/snapshots", tags=["snapshots"])
@@ -59,17 +61,23 @@ class RawSqlRequest(BaseModel):
 
 
 def _run(snapshot: dict, sql: str, binds=None, *, organization_id: str, max_rows: int):
-    """Execute against whichever database this snapshot lives in."""
-    if is_warehouse(snapshot):
+    """Execute against whichever database serves this snapshot FOR THIS ORG."""
+    backend, _, _ = snapshot_backend(snapshot, organization_id)
+    if backend == "postgres":
         from api.warehouse_db import execute_query as run_warehouse
         return run_warehouse(sql, binds, organization_id=organization_id, max_rows=max_rows)
     return execute_query(sql, binds, organization_id=organization_id, max_rows=max_rows)
 
 
-def _qualified(snapshot: dict) -> str:
-    """schema.table, quoted for Postgres because a canvas name is lowercase."""
-    table, schema = snapshot["table_name"], snapshot.get("schema", "CISADM")
-    return f'{schema}."{table}"' if is_warehouse(snapshot) else f"{schema}.{table.upper()}"
+def _qualified(snapshot: dict, organization_id: str | None = None) -> str:
+    """schema.table for this org's engine. Quoted lowercase for Postgres; UNQUOTED
+    for both Oracle shapes (an in-database canvas was created unquoted, so Oracle
+    case-folds the reference -- quoting the lowercase name would miss it)."""
+    backend, dialect, schema = snapshot_backend(snapshot, organization_id)
+    table = snapshot["table_name"]
+    if dialect == "postgres":
+        return f'{schema}."{table}"'
+    return f"{schema}.{table.upper()}"
 
 
 def _default_date_filter(snapshot: dict[str, Any]) -> FilterRequest | None:
@@ -230,7 +238,7 @@ def snapshot_stats(
     # LOAD_DTTM is the CDC watermark on a CISADM snapshot; a dbt canvas has no such
     # column, so the warehouse form reports the row count alone rather than inventing one.
     if is_warehouse(snapshot):
-        sql = f"SELECT COUNT(*) AS row_count, NULL AS latest_load_dttm FROM {_qualified(snapshot)}"
+        sql = f"SELECT COUNT(*) AS row_count, NULL AS latest_load_dttm FROM {_qualified(snapshot, org_id)}"
     else:
         sql = (f"SELECT COUNT(*) AS ROW_COUNT, MAX(LOAD_DTTM) AS LATEST_LOAD_DTTM "
                f"FROM {_qualified(snapshot)}")
@@ -272,7 +280,7 @@ def snapshot_scope_options(
 
     if is_warehouse(snapshot):
         col = f'"{field}"'
-        sql = (f"SELECT DISTINCT {col} AS val FROM {_qualified(snapshot)} "
+        sql = (f"SELECT DISTINCT {col} AS val FROM {_qualified(snapshot, org_id)} "
                f"WHERE {col} IS NOT NULL ORDER BY 1 FETCH FIRST 100 ROWS ONLY")
     else:
         sql = (
@@ -316,7 +324,7 @@ def snapshot_sample_rows(
         # No recency window on the warehouse form. The canvases are already scoped to a
         # client's own data and a sample of ten rows is cheap; ordering by a date on an
         # unindexed canvas is not, and this is only ever a preview.
-        sql = f"SELECT * FROM {_qualified(snapshot)} FETCH FIRST {row_cap} ROWS ONLY"
+        sql = f"SELECT * FROM {_qualified(snapshot, org_id)} FETCH FIRST {row_cap} ROWS ONLY"
     elif date_field:
         # Restrict to recent rows so sample preview stays fast on large snapshots.
         sql = (
@@ -452,13 +460,13 @@ def snapshot_query(
         # dbt canvases are Postgres with quoted Title Case columns; the legacy
         # *_RPT_CURR snapshots are Oracle CISADM. The snapshot says which, so the two
         # coexist while the migration finishes and nothing needs configuring twice.
-        warehouse = is_warehouse(snapshot)
-        dialect = "postgres" if warehouse else "oracle"
+        backend, dialect, schema = snapshot_backend(snapshot, org_id)
+        warehouse = backend == "postgres"
         trusted = set(snapshot.get("trusted_measures", []))
         sql, binds = build_query(
             table_name=snapshot["table_name"],
             allowed_fields=allowed_fields(snapshot),
-            trusted_measures=trusted if warehouse else {m.upper() for m in trusted},
+            trusted_measures=trusted if dialect != "oracle" else {m.upper() for m in trusted},
             required_date_field=snapshot.get("required_date_field"),
             dimensions=body.dimensions,
             measures=[m.model_dump() for m in body.measures],
@@ -466,7 +474,7 @@ def snapshot_query(
             limit=min(body.limit, snapshot.get("max_rows", 500)),
             time_dimensions=[t.model_dump() for t in body.time_dimensions],
             dialect=dialect,
-            schema=snapshot.get("schema", "CISADM"),
+            schema=schema,
         )
     except QueryValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

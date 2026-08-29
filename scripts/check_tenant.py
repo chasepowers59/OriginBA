@@ -63,6 +63,11 @@ def check_org(org_id: str) -> bool:
         print()
         return bool(ok)
 
+    if engine == "oracle":
+        # In-database shape (oracle + dbt): the canvases live in ORIGINBA_REPORTING
+        # inside the client's own Oracle instance. Same gates, Oracle introspection.
+        return _check_oracle_dbt(org_id, ok, snaps)
+
     # 2. The warehouse itself.
     from api.warehouse_db import execute_query, warehouse_configured, warehouse_url
 
@@ -133,6 +138,88 @@ def check_org(org_id: str) -> bool:
         _, rows = _run(eng, sql, org_id, 1)
         ok &= _p(PASS, "database workspace",
                  f"{len(tables)} canvases listed, rpt_financial_txn count={rows[0][0]}")
+    except Exception as exc:  # noqa: BLE001
+        ok &= _p(FAIL, "database workspace", str(exc)[:120])
+
+    print()
+    return bool(ok)
+
+
+def _check_oracle_dbt(org_id: str, ok: bool, snaps: dict) -> bool:
+    """Gates 2-6 for the in-database deployment shape (2026-08-28)."""
+    from api.demo_db import demo_configured, execute_query
+
+    # 2. The in-instance reporting schema.
+    if not demo_configured(org_id):
+        return _p(FAIL, "oracle backend", "connection not configured (env keys)") and False
+    try:
+        _, rows = execute_query(
+            "select count(case when nvl(num_rows, 0) > 0 then 1 end), count(*) "
+            "from all_tables where owner = 'ORIGINBA_REPORTING' "
+            "and table_name like 'RPT%'",
+            organization_id=org_id)
+        populated, total = int(rows[0][0]), int(rows[0][1])
+        ok &= _p(PASS, "warehouse (in-database)",
+                 f"ORIGINBA_REPORTING — {populated}/{total} canvases with rows (stats-based)")
+        if total == 0:
+            ok &= _p(FAIL, "reporting schema",
+                     "no canvases — did build_oracle_warehouse.sh run here?")
+        elif populated < total:
+            _, empty = execute_query(
+                "select listagg(lower(table_name), ', ') within group (order by table_name) "
+                "from all_tables where owner = 'ORIGINBA_REPORTING' "
+                "and table_name like 'RPT%' and nvl(num_rows, 0) = 0",
+                organization_id=org_id)
+            ok &= _p(WARN, "empty canvases (per stats)", str(empty[0][0])[:160])
+    except Exception as exc:  # noqa: BLE001
+        return _p(FAIL, "warehouse (in-database)", str(exc)[:160]) and False
+
+    # 3. Catalog vs warehouse drift.
+    try:
+        _, rows = execute_query(
+            "select lower(table_name) from all_tables "
+            "where owner = 'ORIGINBA_REPORTING' and table_name like 'RPT%'",
+            organization_id=org_id, max_rows=500)
+        live = {r[0] for r in rows}
+        missing = sorted(set(snaps.keys()) - live)
+        ok &= _p(FAIL if missing else PASS, "catalog↔warehouse",
+                 f"missing: {missing[:5]}" if missing else "every cataloged canvas exists")
+    except Exception as exc:  # noqa: BLE001
+        ok &= _p(FAIL, "catalog↔warehouse", str(exc)[:120])
+
+    # 4 + 5. Executive and workstream KPIs — identical calls; the runner routes.
+    from api.executive_dashboard import build_executive_summary
+
+    try:
+        summary = build_executive_summary(days=365, compare=False, organization_id=org_id)
+        errs = [k["id"] for k in summary.get("kpis", []) if k.get("error")]
+        ok &= _p(FAIL if errs else PASS, "executive summary",
+                 f"KPI errors: {errs}" if errs else f"{len(summary.get('kpis', []))} KPIs execute")
+    except Exception as exc:  # noqa: BLE001
+        ok &= _p(FAIL, "executive summary", str(exc)[:120])
+
+    from api.workstream_dashboard import WORKSTREAM_KPIS, build_workstream_summary
+
+    for ws in WORKSTREAM_KPIS:
+        try:
+            r = build_workstream_summary(ws, days=365, compare=False, organization_id=org_id)
+            errs = [k["id"] for k in r.get("kpis", []) if k.get("error")]
+            ok &= _p(FAIL if errs else PASS, f"workstream:{ws}",
+                     f"KPI errors: {errs}" if errs else f"{len(r.get('kpis', []))} KPIs")
+        except Exception as exc:  # noqa: BLE001
+            ok &= _p(FAIL, f"workstream:{ws}", str(exc)[:120])
+
+    # 6. Database workspace through the real path.
+    from api.database_routes import _engine, _list_oracle_reporting_tables, _run, _validate
+
+    try:
+        eng = _engine(org_id)
+        tables = _list_oracle_reporting_tables(org_id, "")
+        sql = _validate(eng, "select count(*) from rpt_financial_txn")
+        _, rows = _run(eng, sql, org_id, 1)
+        ok &= _p(PASS, "database workspace",
+                 f"engine={eng}, {len(tables)} canvases listed, "
+                 f"rpt_financial_txn count={rows[0][0]}")
     except Exception as exc:  # noqa: BLE001
         ok &= _p(FAIL, "database workspace", str(exc)[:120])
 

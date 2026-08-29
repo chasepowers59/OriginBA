@@ -426,13 +426,81 @@ ORDER BY "Accounting Date" DESC`,
   },
 ];
 
-export type WorkspaceEngine = "postgres" | "oracle";
+export type WorkspaceEngine = "postgres" | "oracle" | "oracle_dbt";
+
+// The in-database shape (2026-08-28): the same governed rpt_* canvases, living in
+// ORIGINBA_REPORTING inside the client's own Oracle instance. Columns keep their
+// quoted Title-Case names; dates and row limits use Oracle idioms.
+const ORACLE_DBT_QUERY_TEMPLATES: DatabaseQueryTemplate[] = [
+  {
+    id: "odbt_recent_fts",
+    category: "Finance",
+    title: "Recent financial transactions",
+    description: "Frozen financial activity for the last month, newest first.",
+    tip: "Edit the WHERE clause to narrow by date or account.",
+    sql: `SELECT "FT ID", "Accounting Date", "FT Type", "Current Amount",
+       "GL Distribution Status", "Main Customer Name"
+FROM rpt_financial_txn
+WHERE "Accounting Date" >= ADD_MONTHS(TRUNC(SYSDATE), -1)
+ORDER BY "Accounting Date" DESC
+FETCH FIRST 100 ROWS ONLY`,
+  },
+  {
+    id: "odbt_billing_by_month",
+    category: "Billing",
+    title: "Billed amount by month",
+    description: "Twelve months of billed segment revenue.",
+    tip: "TRUNC(date, 'MM') is the Oracle month bucket.",
+    sql: `SELECT TRUNC("Bill Date", 'MM') AS billing_month,
+       COUNT(*) AS segments,
+       SUM("Billed Amount") AS billed_amount
+FROM rpt_bill_segment
+WHERE "Bill Date" >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12)
+GROUP BY TRUNC("Bill Date", 'MM')
+ORDER BY billing_month`,
+  },
+  {
+    id: "odbt_aged_debt",
+    category: "Collections",
+    title: "Aged receivables by bucket",
+    description: "The arrears position straight off the aged balance canvas.",
+    tip: "Buckets age by days past due, matching the CIS arrears zone.",
+    sql: `SELECT COUNT(*) AS service_agreements,
+       SUM("Current Balance") AS current_balance,
+       SUM("Arrears 0-30 Days") AS bucket_0_30,
+       SUM("Arrears 31-60 Days") AS bucket_31_60,
+       SUM("Arrears 61-90 Days") AS bucket_61_90,
+       SUM("Arrears 121+ Days") AS bucket_121_plus
+FROM rpt_sa_aged_balance`,
+  },
+  {
+    id: "odbt_payments",
+    category: "Payments",
+    title: "Payments by tender type",
+    description: "Last 30 days of tenders, grouped by how customers paid.",
+    tip: "Unqualified rpt_* names resolve to the governed reporting layer.",
+    sql: `SELECT "Tender Type", COUNT(*) AS tenders, SUM("Tender Amount") AS amount
+FROM rpt_payment_tender
+WHERE "Payment Date" >= TRUNC(SYSDATE) - 30
+GROUP BY "Tender Type"
+ORDER BY amount DESC`,
+  },
+];
+
+const ORACLE_DBT_TIPS: string[] = [
+  "You are reading the governed reporting canvases inside this client's own Oracle instance -- the same tables the dashboards use, refreshed every 6 hours.",
+  "Column names are quoted and Title Case: \"Account ID\", \"Accounting Date\".",
+  "Use FETCH FIRST n ROWS ONLY (not LIMIT) and TRUNC/ADD_MONTHS for dates.",
+  "Only the reporting layer is queryable; staging, core, and CISADM are fenced off.",
+];
 
 export function templatesForEngine(engine: WorkspaceEngine): DatabaseQueryTemplate[] {
+  if (engine === "oracle_dbt") return ORACLE_DBT_QUERY_TEMPLATES;
   return engine === "postgres" ? WAREHOUSE_QUERY_TEMPLATES : DATABASE_QUERY_TEMPLATES;
 }
 
 export function tipsForEngine(engine: WorkspaceEngine): string[] {
+  if (engine === "oracle_dbt") return ORACLE_DBT_TIPS;
   return engine === "postgres" ? WAREHOUSE_TIPS : DATABASE_TIPS;
 }
 

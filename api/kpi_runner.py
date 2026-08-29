@@ -6,9 +6,8 @@ from datetime import date, timedelta
 from typing import Any
 
 from api.demo_db import execute_query
-from api.snapshot_catalog import is_warehouse
 from api.query_builder import QueryValidationError, build_query
-from api.snapshot_catalog import allowed_fields, get_snapshot
+from api.snapshot_catalog import allowed_fields, get_snapshot, snapshot_backend
 
 
 COMPARE_MODES = ("prior_period", "mom", "yoy")
@@ -76,22 +75,25 @@ def run_kpi_query(
     # None for a windowless KPI and no range filter is added.
     if date_field:
         filters.append({"field": date_field, "op": "between", "value": [date_start, date_end]})
+    # (backend, dialect, schema) resolve from the ORG as well as the snapshot: the
+    # same dbt canvas runs in Postgres for shape-A tenants and in the client's own
+    # Oracle instance (ORIGINBA_REPORTING) for in-database tenants.
+    backend, dialect, schema = snapshot_backend(snapshot, organization_id)
+    trusted = set(snapshot.get("trusted_measures", []))
     sql, binds = build_query(
         table_name=snapshot["table_name"],
         allowed_fields=allowed_fields(snapshot),
-        trusted_measures=(set(snapshot.get("trusted_measures", []))
-                          if is_warehouse(snapshot)
-                          else {m.upper() for m in snapshot.get("trusted_measures", [])}),
+        trusted_measures=trusted if dialect != "oracle" else {m.upper() for m in trusted},
         required_date_field=snapshot.get("required_date_field"),
         dimensions=query_spec.get("dimensions") or [],
         measures=query_spec.get("measures") or [{"field": "*", "agg": "count"}],
         filters=filters,
         limit=int(query_spec.get("limit") or 500),
-        dialect="postgres" if is_warehouse(snapshot) else "oracle",
-        schema=snapshot.get("schema", "CISADM"),
+        dialect=dialect,
+        schema=schema,
     )
     row_cap = int(query_spec.get("limit") or 500)
-    if is_warehouse(snapshot):
+    if backend == "postgres":
         from api.warehouse_db import execute_query as run_warehouse
         return run_warehouse(sql, binds, organization_id=organization_id, max_rows=row_cap)
     return execute_query(sql, binds, organization_id=organization_id, max_rows=row_cap)

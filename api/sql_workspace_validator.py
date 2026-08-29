@@ -74,6 +74,46 @@ def validate_reporting_scope(sql: str) -> None:
         )
 
 
+# The in-database workspace's fence (oracle_dbt shape). The session's
+# CURRENT_SCHEMA is pinned to ORIGINBA_REPORTING so unqualified names resolve to
+# the governed canvases; this catches explicit qualification elsewhere AND the
+# Oracle-specific escape hatches a Postgres deny-list never had to think about:
+# dictionary views (all_/dba_/user_/v$/cdb_), PL/SQL package surface (dbms_/utl_),
+# XML/network functions, and database links (@).
+_ORACLE_NON_REPORTING = re.compile(
+    r"\b(cisadm|originba_staging|originba_core|originba_src|sys|system)\s*\.",
+    re.IGNORECASE,
+)
+_ORACLE_DICTIONARY = re.compile(
+    r"\b(all_|dba_|user_|cdb_|v\$|gv\$)\w*",
+    re.IGNORECASE,
+)
+_ORACLE_PACKAGES = re.compile(
+    r"\b(dbms_|utl_|owa_|htp\.|httpuritype|xmltype|extractvalue|ctxsys)\w*",
+    re.IGNORECASE,
+)
+_ORACLE_DBLINK = re.compile(r"@\w+", re.IGNORECASE)
+
+
+def validate_oracle_reporting_scope(sql: str) -> None:
+    """Reject in-database workspace SQL that reaches outside ORIGINBA_REPORTING."""
+    match = _ORACLE_NON_REPORTING.search(sql)
+    if match:
+        raise SqlWorkspaceValidationError(
+            f"The workspace is scoped to the reporting layer -- "
+            f"'{match.group(1)}.' is not queryable here. "
+            f"Query the rpt_* canvases (unqualified or ORIGINBA_REPORTING.rpt_*)."
+        )
+    for pattern, what in ((_ORACLE_DICTIONARY, "data dictionary views"),
+                          (_ORACLE_PACKAGES, "PL/SQL packages and network functions"),
+                          (_ORACLE_DBLINK, "database links")):
+        m = pattern.search(sql)
+        if m:
+            raise SqlWorkspaceValidationError(
+                f"{what.capitalize()} are not queryable from the workspace ('{m.group(0)}')."
+            )
+
+
 def wrap_paginated_sql(sql: str, *, offset: int, limit: int, probe_extra: int = 0) -> str:
     """Wrap user SQL with OFFSET/FETCH for SQL-Developer-style paging."""
     off = max(0, offset)

@@ -41,8 +41,14 @@ class FilterSpec:
     value: Any
 
 
+# Dialects that carry the dbt canvases' quoted Title-Case identifiers as written.
+# oracle_dbt (2026-08-28) is the in-database warehouse: same identifiers as the
+# Postgres form (double-quoting is identical SQL in Oracle), Oracle everything else.
+_TITLECASE_DIALECTS = ("postgres", "oracle_dbt")
+
+
 def _validate_ident(name: str, allowed: set[str], kind: str, dialect: str = "oracle") -> str:
-    if dialect == "postgres":
+    if dialect in _TITLECASE_DIALECTS:
         if name == "*":
             return name
         if name not in allowed or not WAREHOUSE_IDENT_RE.match(name) or '"' in name:
@@ -58,7 +64,7 @@ def _validate_ident(name: str, allowed: set[str], kind: str, dialect: str = "ora
 
 def _quote(name: str, dialect: str) -> str:
     """Render a validated identifier for the dialect."""
-    return f'"{name}"' if dialect == "postgres" else name
+    return f'"{name}"' if dialect in _TITLECASE_DIALECTS else name
 
 
 def _bind(name: str, dialect: str) -> str:
@@ -99,11 +105,12 @@ def build_query(
         raise QueryValidationError("At least one measure is required")
 
     pg = dialect == "postgres"
+    titlecase = dialect in _TITLECASE_DIALECTS
     dims = [_validate_ident(d, allowed_fields, "dimension", dialect) for d in dimensions]
     measure_specs: list[MeasureSpec] = []
     for idx, measure in enumerate(measures):
         raw_field = str(measure.get("field", "*"))
-        field = raw_field if pg else raw_field.upper()
+        field = raw_field if titlecase else raw_field.upper()
         agg = str(measure.get("agg", "count")).lower()
         if agg not in ALLOWED_AGGS:
             raise QueryValidationError(f"Invalid aggregation: {agg}")
@@ -129,12 +136,12 @@ def build_query(
             if not isinstance(value, (list, tuple)) or len(value) != 2:
                 raise QueryValidationError("between filter requires [start, end]")
             required_cmp = required_date_field or ""
-            if field == (required_cmp if pg else required_cmp.upper()):
+            if field == (required_cmp if titlecase else required_cmp.upper()):
                 has_date_window = True
         filter_specs.append(FilterSpec(field=field, op=op, value=value))
 
     if required_date_field:
-        req = required_date_field if pg else required_date_field.upper()
+        req = required_date_field if titlecase else required_date_field.upper()
         if req not in allowed_fields:
             raise QueryValidationError(f"Required date field missing from snapshot: {req}")
         if not has_date_window:
@@ -143,6 +150,8 @@ def build_query(
             )
 
     table = table_name if pg else table_name.upper()
+    # A table name is interpolated (never bound), so it is validated strictly:
+    # word characters only for anything that lands in Oracle UNQUOTED.
     ident_ok = WAREHOUSE_IDENT_RE if pg else IDENT_RE
     if not ident_ok.match(table) or '"' in table:
         raise QueryValidationError(f"Invalid table name: {table_name}")
@@ -150,7 +159,7 @@ def build_query(
     select_parts: list[str] = []
     group_parts: list[str] = []
     for idx, raw in enumerate(time_dimensions or []):
-        field = _validate_ident(str(raw.get("field", "")), allowed_fields, "time dimension field")
+        field = _validate_ident(str(raw.get("field", "")), allowed_fields, "time dimension field", dialect)
         grain = str(raw.get("grain", "month")).lower()
         expr = _time_bucket_expr(_quote(field, dialect), grain, dialect)
         alias = f"TD{idx}"
@@ -221,6 +230,9 @@ def build_query(
                     f"AND {col} < TO_DATE(:{bind_end}, 'YYYY-MM-DD') + 1"
                 )
 
+    # oracle_dbt: the canvas name arrives lowercase (rpt_financial_txn) and the
+    # table was created unquoted, so Oracle case-folds an UNQUOTED reference to
+    # match -- quoting the lowercase name here would miss the uppercase object.
     qualified = f'{schema}."{table}"' if pg else f"{schema}.{table}"
     sql = f"SELECT {', '.join(select_parts)} FROM {qualified}"
     if where_parts:

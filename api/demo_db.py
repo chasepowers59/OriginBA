@@ -6,6 +6,8 @@ Priority per organization: portal encrypted vault → org-specific .env → DEMO
 
 from __future__ import annotations
 
+import os
+import re
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator
@@ -133,16 +135,35 @@ def demo_connection(organization_id: str) -> Iterator[Any]:
         conn.close()
 
 
+# Oracle statement ceiling, matching the Postgres side's 30s statement_timeout.
+# call_timeout is per round-trip in python-oracledb; a runaway query is cancelled
+# server-side instead of holding the API worker.
+_CALL_TIMEOUT_MS = int(os.getenv("PORTAL_ORACLE_CALL_TIMEOUT_MS", "60000"))
+_SCHEMA_IDENT = re.compile(r"^[A-Za-z][A-Za-z0-9_$#]*$")
+
+
 def execute_query(
     sql: str,
     binds: dict[str, Any] | None = None,
     *,
     organization_id: str,
     max_rows: int = 5000,
+    current_schema: str | None = None,
 ) -> tuple[list[str], list[list[Any]]]:
+    """current_schema pins unqualified names for the in-database workspace (the
+    Oracle analogue of the Postgres side's search_path). Identifier-validated
+    because it is interpolated into ALTER SESSION."""
     binds = binds or {}
     with demo_connection(organization_id) as conn:
+        try:
+            conn.call_timeout = _CALL_TIMEOUT_MS
+        except Exception:  # noqa: BLE001 -- older thick-mode handles lack it
+            pass
         with conn.cursor() as cur:
+            if current_schema:
+                if not _SCHEMA_IDENT.match(current_schema):
+                    raise ValueError(f"Invalid schema name: {current_schema}")
+                cur.execute(f"ALTER SESSION SET CURRENT_SCHEMA = {current_schema}")
             cur.execute(sql, binds)
             if cur.description is None:
                 return [], []

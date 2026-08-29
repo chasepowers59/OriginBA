@@ -19,9 +19,10 @@ from api.auth.dependencies import AuthContext, require_permission
 from api.demo_db import demo_configured
 from api.demo_db import execute_query as execute_demo_query
 from api.org_db import require_org_for_data
-from api.snapshot_catalog import catalog_name_for_org
+from api.snapshot_catalog import org_backend
 from api.sql_workspace_validator import (
     SqlWorkspaceValidationError,
+    validate_oracle_reporting_scope,
     validate_reporting_scope,
     validate_workspace_sql,
     wrap_count_sql,
@@ -86,8 +87,15 @@ def _rows_to_dicts(columns: list[str], rows: list[list[Any]]) -> list[dict[str, 
 
 
 def _engine(org_id: str) -> str:
-    """Which database this org's workspace queries — routed like the whole portal."""
-    return "postgres" if catalog_name_for_org(org_id) == "dbt" else "oracle"
+    """Workspace engine for this org -- the portal-wide routing decision.
+
+    Three shapes since 2026-08-28: 'postgres' (dbt warehouse, shape A), 'oracle'
+    (legacy CISADM snapshots), 'oracle_dbt' (the dbt canvases inside the client's
+    own Oracle instance -- ORIGINBA_REPORTING, no CDC)."""
+    engine, catalog = org_backend(org_id)
+    if catalog == "dbt":
+        return "postgres" if engine == "postgres" else "oracle_dbt"
+    return "oracle"
 
 
 def _require_db(org_id: str) -> str:
@@ -105,6 +113,8 @@ def _validate(engine: str, sql: str) -> str:
     validated = validate_workspace_sql(sql)
     if engine == "postgres":
         validate_reporting_scope(validated)
+    elif engine == "oracle_dbt":
+        validate_oracle_reporting_scope(validated)
     return validated
 
 
@@ -114,7 +124,35 @@ def _run(engine: str, sql: str, org_id: str, max_rows: int) -> tuple[list[str], 
         # already rejected explicit references to any other schema.
         return execute_warehouse_query(
             sql, organization_id=org_id, max_rows=max_rows, search_path="reporting")
+    if engine == "oracle_dbt":
+        # CURRENT_SCHEMA is the Oracle analogue of search_path: unqualified rpt_*
+        # resolves to the governed canvases, the validator rejected everything else.
+        return execute_demo_query(
+            sql, organization_id=org_id, max_rows=max_rows,
+            current_schema="ORIGINBA_REPORTING")
     return execute_demo_query(sql, organization_id=org_id, max_rows=max_rows)
+
+
+def _list_oracle_reporting_tables(org_id: str, needle: str) -> list[dict[str, Any]]:
+    """The in-database canvases with optimizer stats -- names lowercased so the
+    UI and the dbt catalog agree on rpt_* identity."""
+    binds: dict[str, Any] = {}
+    where = "WHERE owner = 'ORIGINBA_REPORTING' AND table_name LIKE 'RPT%'"
+    if needle:
+        binds["pattern"] = f"%{needle.upper()}%"
+        where += " AND table_name LIKE :pattern"
+    sql = f"""
+        SELECT LOWER(table_name) AS table_name, num_rows, last_analyzed
+        FROM all_tables
+        {where}
+        ORDER BY table_name
+        FETCH FIRST 200 ROWS ONLY
+    """
+    columns, rows = execute_demo_query(sql, binds, organization_id=org_id, max_rows=200)
+    return [
+        {columns[i].lower(): _serialize_cell(row[i]) for i in range(len(columns))}
+        for row in rows
+    ]
 
 
 def _list_warehouse_tables(org_id: str, needle: str) -> list[dict[str, Any]]:
@@ -159,6 +197,20 @@ def list_tables(
             "organization_id": org_id,
             "engine": engine,
             "schema": "reporting",
+            "tables": tables,
+            "table_count": len(tables),
+            "source": "database",
+        }
+
+    if engine == "oracle_dbt":
+        try:
+            tables = _list_oracle_reporting_tables(org_id, search.strip())
+        except Exception as exc:
+            raise HTTPException(status_code=502, detail=f"Failed to list tables: {exc}") from exc
+        return {
+            "organization_id": org_id,
+            "engine": engine,
+            "schema": "ORIGINBA_REPORTING",
             "tables": tables,
             "table_count": len(tables),
             "source": "database",

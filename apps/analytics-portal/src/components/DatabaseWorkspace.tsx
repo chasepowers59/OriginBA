@@ -259,7 +259,9 @@ export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
     const snippet =
       engine === "postgres"
         ? `SELECT *\nFROM reporting.${tableName}\nLIMIT ${pageSize}`
-        : `SELECT *\nFROM CISADM.${tableName}\nWHERE ROWNUM <= ${pageSize}`;
+        : engine === "oracle_dbt"
+          ? `SELECT *\nFROM ${tableName}\nFETCH FIRST ${pageSize} ROWS ONLY`
+          : `SELECT *\nFROM CISADM.${tableName}\nWHERE ROWNUM <= ${pageSize}`;
     setSql(snippet);
     setActiveTemplate(null);
     editorRef.current?.focus();
@@ -461,7 +463,7 @@ export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
                     type="search"
                     value={tableSearch}
                     onChange={(e) => setTableSearch(e.target.value)}
-                    placeholder={engine === "postgres" ? "Search reporting canvases…" : "Search CISADM tables…"}
+                    placeholder={engine === "oracle" ? "Search CISADM tables…" : "Search reporting canvases…"}
                     className="input-modern w-full py-1.5 text-xs"
                   />
                   {tablesLoading ? (

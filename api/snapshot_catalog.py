@@ -164,3 +164,49 @@ def allowed_fields(snapshot: dict[str, Any]) -> set[str]:
 def is_warehouse(snapshot: dict[str, Any]) -> bool:
     """True when this snapshot lives in the dbt warehouse rather than Oracle CISADM."""
     return str(snapshot.get("schema", "")).lower() != "cisadm"
+
+
+def org_backend(organization_id: str | None) -> tuple[str, str]:
+    """(engine, catalog) for an org.
+
+    THREE shapes exist since 2026-08-28, so the schema-implies-engine shortcut
+    (is_warehouse == Postgres) is no longer safe on its own:
+
+        postgres + dbt     the client's Postgres dbt warehouse (deployment shape A)
+        oracle   + cisadm  the legacy *_RPT_CURR snapshots (pre-migration)
+        oracle   + dbt     the dbt canvases built INSIDE the client's own Oracle
+                           instance (ORIGINBA_REPORTING beside CISADM -- the
+                           in-database deployment shape, no CDC)
+    """
+    catalog = catalog_name_for_org(organization_id)
+    engine = "postgres" if catalog == "dbt" else "oracle"
+    if organization_id:
+        try:
+            from api.organizations import get_organization
+            org = get_organization(organization_id) or {}
+            declared = str(org.get("engine") or "").lower()
+            if declared in ("postgres", "oracle"):
+                engine = declared
+        except Exception:  # noqa: BLE001
+            pass
+    return engine, catalog
+
+
+def snapshot_backend(snapshot: dict[str, Any],
+                     organization_id: str | None) -> tuple[str, str, str]:
+    """(backend, dialect, schema) for running THIS snapshot for THIS org.
+
+    backend  which driver executes: 'postgres' (warehouse pool) or 'oracle'
+    dialect  what build_query emits: 'postgres' | 'oracle_dbt' | 'oracle'
+    schema   the qualification the SQL uses
+
+    The oracle_dbt dialect exists because the in-database canvases keep their
+    quoted Title-Case columns ("Account ID" is identical SQL in both engines)
+    while binds, date functions and table casing follow Oracle rules.
+    """
+    if not is_warehouse(snapshot):
+        return "oracle", "oracle", str(snapshot.get("schema", "CISADM"))
+    engine, _catalog = org_backend(organization_id)
+    if engine == "oracle":
+        return "oracle", "oracle_dbt", "ORIGINBA_REPORTING"
+    return "postgres", "postgres", str(snapshot.get("schema", "reporting"))
