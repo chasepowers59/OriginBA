@@ -53,10 +53,91 @@ def validate_workspace_sql(sql: str) -> str:
     return cleaned
 
 
-# Schemas a WAREHOUSE workspace query may not name. The portal's contract is that end
-# users read only the governed reporting canvases -- staging/core are implementation
-# layers and cisadm/landing are raw source. Unqualified names are handled separately by
-# pinning search_path to reporting, so this only has to catch explicit qualification.
+# ---------------------------------------------------------------------------
+# Scope fencing for the ad-hoc workspace.
+#
+# The workspace pins the session default schema (Postgres search_path / Oracle
+# CURRENT_SCHEMA) to the reporting layer, so an UNQUALIFIED name resolves to a
+# governed canvas. These validators exist to stop an EXPLICIT qualifier reaching
+# another schema. A regex deny-list alone is not enough (2026-08-28 security
+# review): `"CISADM"."CI_ACCT"` and `CISADM/**/.CI_ACCT` both slip past a naive
+# `\bcisadm\s*\.` because a quote or a comment sits between the name and the dot.
+# The model here is defense in depth:
+#   A. strip comments and string literals first (a literal or comment can hide
+#      a qualifier, and its contents must never be scanned as code);
+#   B. a POSITIVE allow-list on FROM/JOIN-position qualifiers -- the only schema
+#      a table may be qualified with is the reporting schema, so an UNKNOWN
+#      other schema is rejected too, not only the enumerated ones;
+#   C. reject any quoted identifier used as a schema qualifier outright
+#      (a reporting query never needs "SCHEMA".table -- tables are unquoted
+#      rpt_*), which closes the quoted-qualifier class wholesale;
+#   D. the original deny-list, on the cleaned text, as a backstop for comma-join
+#      position and the Oracle-specific escape hatches.
+# The primary boundary remains the DATABASE GRANT: the workspace connection
+# should hold SELECT only on the reporting schema (see oracle-native-rollout).
+# ---------------------------------------------------------------------------
+
+_BLOCK_COMMENT = re.compile(r"/\*.*?\*/", re.DOTALL)
+_LINE_COMMENT = re.compile(r"--[^\n]*")
+_STRING_LITERAL = re.compile(r"'(?:[^']|'')*'")
+# A quoted identifier ("...") immediately before a dot == a quoted schema
+# qualifier. A quoted COLUMN sits AFTER a dot (t."Col") or standalone, so this
+# does not touch legitimate quoted column names.
+_QUOTED_QUALIFIER = re.compile(r'"[^"]*"\s*\.')
+# schema.table in FROM/JOIN position, qualifier captured (quoted or bare).
+_FROM_JOIN_QUALIFIER = re.compile(
+    r'\b(?:FROM|JOIN)\s+("?[A-Za-z_$#][\w$#]*"?)\s*\.',
+    re.IGNORECASE,
+)
+
+
+def _strip_sql_noise(sql: str) -> str:
+    """Remove comments and string literals so the scope scan sees only code."""
+    cleaned = _BLOCK_COMMENT.sub(" ", sql)
+    cleaned = _LINE_COMMENT.sub(" ", cleaned)
+    cleaned = _STRING_LITERAL.sub("''", cleaned)
+    return cleaned
+
+
+def _enforce_scope(sql: str, allowed_schema: str, deny: re.Pattern,
+                   extra: tuple[tuple[re.Pattern, str], ...] = ()) -> None:
+    cleaned = _strip_sql_noise(sql)
+
+    # C. No quoted schema qualifier at all.
+    if _QUOTED_QUALIFIER.search(cleaned):
+        raise SqlWorkspaceValidationError(
+            "Quoted schema qualifiers are not allowed. Query the reporting "
+            "canvases unqualified (they resolve automatically) or with the "
+            f"{allowed_schema} schema, unquoted."
+        )
+
+    # B. Positive allow-list: any FROM/JOIN-qualified table must name the
+    #    reporting schema and nothing else -- unknown schemas rejected too.
+    for m in _FROM_JOIN_QUALIFIER.finditer(cleaned):
+        qualifier = m.group(1).strip('"').lower()
+        if qualifier != allowed_schema.lower():
+            raise SqlWorkspaceValidationError(
+                f"The workspace is scoped to the {allowed_schema} layer -- "
+                f"'{m.group(1)}.' is not queryable here. Query the rpt_* "
+                f"canvases instead."
+            )
+
+    # D. Deny-list backstop (comma-join position, Oracle escape hatches).
+    match = deny.search(cleaned)
+    if match:
+        raise SqlWorkspaceValidationError(
+            f"The workspace is scoped to the {allowed_schema} layer -- "
+            f"'{match.group(1)}.' is not queryable here."
+        )
+    for pattern, what in extra:
+        m = pattern.search(cleaned)
+        if m:
+            raise SqlWorkspaceValidationError(
+                f"{what.capitalize()} are not queryable from the workspace "
+                f"('{m.group(0)}')."
+            )
+
+
 _NON_REPORTING_SCHEMA = re.compile(
     r"\b(cisadm|landing|staging|core|public|pg_catalog|information_schema)\s*\.",
     re.IGNORECASE,
@@ -64,22 +145,14 @@ _NON_REPORTING_SCHEMA = re.compile(
 
 
 def validate_reporting_scope(sql: str) -> None:
-    """Reject warehouse SQL that reaches outside the reporting layer."""
-    match = _NON_REPORTING_SCHEMA.search(sql)
-    if match:
-        raise SqlWorkspaceValidationError(
-            f"The workspace is scoped to the reporting layer -- "
-            f"'{match.group(1)}.' is not queryable here. "
-            f"Query the reporting.rpt_* canvases instead."
-        )
+    """Reject Postgres warehouse SQL that reaches outside the reporting layer."""
+    _enforce_scope(sql, "reporting", _NON_REPORTING_SCHEMA)
 
 
-# The in-database workspace's fence (oracle_dbt shape). The session's
-# CURRENT_SCHEMA is pinned to ORIGINBA_REPORTING so unqualified names resolve to
-# the governed canvases; this catches explicit qualification elsewhere AND the
-# Oracle-specific escape hatches a Postgres deny-list never had to think about:
-# dictionary views (all_/dba_/user_/v$/cdb_), PL/SQL package surface (dbms_/utl_),
-# XML/network functions, and database links (@).
+# The in-database (oracle_dbt) fence adds the Oracle-specific escape hatches a
+# Postgres deny-list never had to think about: dictionary views
+# (all_/dba_/user_/v$/cdb_), PL/SQL package surface (dbms_/utl_), XML/network
+# functions, and database links (@).
 _ORACLE_NON_REPORTING = re.compile(
     r"\b(cisadm|originba_staging|originba_core|originba_src|sys|system)\s*\.",
     re.IGNORECASE,
@@ -97,21 +170,12 @@ _ORACLE_DBLINK = re.compile(r"@\w+", re.IGNORECASE)
 
 def validate_oracle_reporting_scope(sql: str) -> None:
     """Reject in-database workspace SQL that reaches outside ORIGINBA_REPORTING."""
-    match = _ORACLE_NON_REPORTING.search(sql)
-    if match:
-        raise SqlWorkspaceValidationError(
-            f"The workspace is scoped to the reporting layer -- "
-            f"'{match.group(1)}.' is not queryable here. "
-            f"Query the rpt_* canvases (unqualified or ORIGINBA_REPORTING.rpt_*)."
-        )
-    for pattern, what in ((_ORACLE_DICTIONARY, "data dictionary views"),
-                          (_ORACLE_PACKAGES, "PL/SQL packages and network functions"),
-                          (_ORACLE_DBLINK, "database links")):
-        m = pattern.search(sql)
-        if m:
-            raise SqlWorkspaceValidationError(
-                f"{what.capitalize()} are not queryable from the workspace ('{m.group(0)}')."
-            )
+    _enforce_scope(
+        sql, "ORIGINBA_REPORTING", _ORACLE_NON_REPORTING,
+        extra=((_ORACLE_DICTIONARY, "data dictionary views"),
+               (_ORACLE_PACKAGES, "PL/SQL packages and network functions"),
+               (_ORACLE_DBLINK, "database links")),
+    )
 
 
 def wrap_paginated_sql(sql: str, *, offset: int, limit: int, probe_extra: int = 0) -> str:
