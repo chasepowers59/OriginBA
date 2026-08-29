@@ -12,9 +12,17 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator
 
-import oracledb
+try:  # optional -- see api/oracle_client for why
+    import oracledb
+except ImportError:  # pragma: no cover
+    oracledb = None  # type: ignore
 
-from api.oracle_client import ensure_oracle_client, load_env_file, normalize_oracle_dsn
+from api.oracle_client import (
+    ensure_oracle_client,
+    load_env_file,
+    normalize_oracle_dsn,
+    _require_oracledb,
+)
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -141,6 +149,7 @@ def _oracle_pool(organization_id: str):
     key = (user, ndsn)
     pool = _pools.get(key)
     if pool is None:
+        _require_oracledb()
         pool = oracledb.create_pool(
             user=user, password=password, dsn=ndsn,
             min=1, max=8, increment=1, getmode=oracledb.POOL_GETMODE_WAIT,

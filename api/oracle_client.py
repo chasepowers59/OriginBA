@@ -5,8 +5,22 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-import oracledb
+try:  # oracledb is optional: a Postgres-only deployment (e.g. a container serving
+    # the dbt/warehouse orgs) has no Oracle Instant Client. Import lazily so the API
+    # boots without it and only errors if an Oracle-backed org is actually queried.
+    import oracledb
+except ImportError:  # pragma: no cover
+    oracledb = None  # type: ignore
 from dotenv import dotenv_values
+
+
+def _require_oracledb():
+    if oracledb is None:
+        raise RuntimeError(
+            "python-oracledb is not installed in this deployment; Oracle-backed "
+            "organizations are unavailable here. Install oracledb (and Instant "
+            "Client for thick mode) to enable them.")
+    return oracledb
 
 _thick_initialized = False
 _thick_lib_dir: str | None = None
@@ -45,6 +59,7 @@ def ensure_oracle_client(
 
     if not thick_mode and not lib_dir:
         return
+    _require_oracledb()
 
     if lib_dir and not Path(lib_dir).is_dir():
         if thick_mode:
