@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { QueryResponse } from "@/lib/types";
 import {
   exportRowsCsv,
+  formatBoolean,
   formatCellValue,
   formatCurrency,
   formatNumber,
@@ -32,6 +33,7 @@ type ResultsPanelProps = {
   snapshotLabel?: string;
   reportTitle?: string | null;
   columnLabels?: Record<string, string>;
+  booleanColumns?: Set<string>;
   measureField?: string;
   measureAgg?: string;
   periodLabel?: string;
@@ -61,6 +63,7 @@ export function ResultsPanel({
   snapshotLabel,
   reportTitle,
   columnLabels = {},
+  booleanColumns,
   measureField = "*",
   measureAgg = "count",
   periodLabel,
@@ -161,7 +164,9 @@ export function ResultsPanel({
     const labeledRows = result.rows.map((row) => {
       const out: Record<string, unknown> = {};
       result.columns.forEach((col, i) => {
-        out[friendlyHeaders[i]] = row[col];
+        const v = row[col];
+        out[friendlyHeaders[i]] =
+          booleanColumns?.has(col) || typeof v === "boolean" ? formatBoolean(v) : v;
       });
       return out;
     });
@@ -303,6 +308,7 @@ export function ResultsPanel({
                         columnId: col,
                         isMeasure: col === measureKey,
                         asCurrency: col === measureKey && isCurrency,
+                        isBoolean: booleanColumns?.has(col),
                       })}
                     </td>
                   ))}

@@ -421,6 +421,13 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     return { ...local, ...(result.column_labels ?? {}) };
   }, [result, metadata, dimensions, measureField, measureAgg]);
 
+  // Flag columns keyed by declared type, so the detail table renders True/False rather
+  // than a raw 1/0 (Oracle NUMBER(1)) or bare boolean.
+  const booleanColumns = useMemo(
+    () => new Set((metadata.fields ?? []).filter((f) => f.type === "boolean").map((f) => f.id)),
+    [metadata.fields],
+  );
+
   const totalMeasure = useMemo(() => {
     if (!result || !measureKey) return null;
     return result.rows.reduce((sum, row) => sum + Number(row[measureKey] ?? 0), 0);
@@ -762,6 +769,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             snapshotLabel={metadata.label}
             reportTitle={activeReportTitle}
             columnLabels={columnLabels}
+            booleanColumns={booleanColumns}
             measureField={measureField}
             measureAgg={measureAgg}
             periodLabel={activePreset}

@@ -36,12 +36,33 @@ export function isIdentifierColumn(columnId?: string): boolean {
   );
 }
 
+/**
+ * Render a flag column as a state, never a raw 1/0 or bare true/false.
+ *
+ * A flag reaches the UI in several encodings depending on the backend: a genuine
+ * boolean on the Postgres/Supabase path, a NUMBER(1) 1/0 on the Oracle path, or a
+ * Y/N/T/F string. All of them mean the same thing on a BI surface, so normalise to
+ * one readable pair. Undecidable values fall through to their string form.
+ */
+export function formatBoolean(value: unknown): string {
+  if (value == null || value === "") return "—";
+  if (typeof value === "boolean") return value ? "True" : "False";
+  const s = String(value).trim().toLowerCase();
+  if (["1", "t", "true", "y", "yes"].includes(s)) return "True";
+  if (["0", "f", "false", "n", "no"].includes(s)) return "False";
+  return String(value);
+}
+
 /** Table / preview cells — compact only for measure columns. */
 export function formatCellValue(
   value: unknown,
-  options?: { columnId?: string; isMeasure?: boolean; asCurrency?: boolean },
+  options?: { columnId?: string; isMeasure?: boolean; asCurrency?: boolean; isBoolean?: boolean },
 ): string {
   if (value == null || value === "") return "—";
+  // Flags render as a state. A native JS boolean is always a flag (Postgres path);
+  // a NUMBER(1) 1/0 flag is indistinguishable from an integer by value alone, so the
+  // caller declares it via isBoolean from the column's declared type (Oracle path).
+  if (options?.isBoolean || typeof value === "boolean") return formatBoolean(value);
   if (typeof value === "string" && value.match(/^\d{4}-\d{2}-\d{2}/)) {
     return formatDateTime(value);
   }

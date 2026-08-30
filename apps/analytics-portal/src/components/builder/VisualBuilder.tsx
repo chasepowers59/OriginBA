@@ -23,7 +23,7 @@ import {
   measureDisplaysAsCurrency,
   workstreamDisplayName,
 } from "@/lib/businessLabels";
-import { formatNumber } from "@/lib/format";
+import { formatNumber, formatCellValue } from "@/lib/format";
 import type {
   BuilderQuestion,
   FieldDef,
@@ -75,6 +75,12 @@ export function VisualBuilder() {
   }, []);
 
   const trusted = useMemo(() => new Set(meta?.trusted_measures ?? []), [meta]);
+  // Flag columns keyed by their declared type, so a NUMBER(1) 1/0 (Oracle path) or a
+  // native boolean (Postgres path) both render as True/False in the result table.
+  const booleanCols = useMemo(
+    () => new Set((meta?.fields ?? []).filter((f) => f.type === "boolean").map((f) => f.id)),
+    [meta],
+  );
 
   const addField = useCallback(
     (shelf: string, field: FieldDef) => {
@@ -386,7 +392,7 @@ export function VisualBuilder() {
                     {error}
                   </p>
                 ) : visual === "table" ? (
-                  <ResultTable result={result} />
+                  <ResultTable result={result} booleanCols={booleanCols} />
                 ) : (
                   <BuilderChart rows={result?.rows ?? []} xKey={xKey} xLabel={xLabel} series={series} visual={visual} />
                 )}
@@ -403,13 +409,16 @@ export function VisualBuilder() {
   );
 }
 
-function ResultTable({ result }: { result: QueryResponse | null }) {
+function ResultTable({ result, booleanCols }: { result: QueryResponse | null; booleanCols?: Set<string> }) {
   if (!result?.rows.length) {
     return <p className="py-8 text-center text-sm" style={{ color: "var(--foreground-subtle)" }}>No rows.</p>;
   }
   const cols = result.columns;
   const label = (c: string) => result.column_labels?.[c] ?? c;
-  const fmt = (v: unknown) => (typeof v === "number" ? formatNumber(v) : String(v ?? ""));
+  const fmt = (v: unknown, c: string) => {
+    if (booleanCols?.has(c) || typeof v === "boolean") return formatCellValue(v, { isBoolean: true });
+    return typeof v === "number" ? formatNumber(v) : String(v ?? "");
+  };
   return (
     <div className="max-h-[360px] overflow-auto">
       <table className="min-w-full text-left text-xs">
@@ -427,7 +436,7 @@ function ResultTable({ result }: { result: QueryResponse | null }) {
             <tr key={i} style={{ borderTop: "1px solid var(--border-subtle)" }}>
               {cols.map((c) => (
                 <td key={c} className="px-3 py-1.5 tabular-nums" style={{ color: "var(--foreground)" }}>
-                  {fmt(row[c])}
+                  {fmt(row[c], c)}
                 </td>
               ))}
             </tr>
