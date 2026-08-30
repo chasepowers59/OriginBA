@@ -82,6 +82,15 @@ cold-start after idle; use the Starter plan or Fly for always-on. The API comes 
 - Set env `NEXT_PUBLIC_API_URL` = the API container URL, then redeploy.
 - CORS: the API must allow the Vercel origin (`FRONTEND_ORIGINS` / CORS config).
 
+### 4. Warehouse data (what the `dev` org reads)
+- Quick start / fabricated demo: `deploy/load_test_data.sh` dumps the local fixture
+  `reporting.*` into Supabase (no VPN, no real data).
+- **Real INT_DEV 25.4 data** (real C2M shape, no client PII): `deploy/load_intdev_to_supabase.sh`
+  — one command that extracts INT_DEV, builds the dbt reporting layer, and loads it into
+  Supabase. Needs **VPN** (Oracle reachable) and `TARGET_DB_URL` (Supabase Session pooler,
+  never committed). It preflights both and refuses if a MICR column ever reached the layer.
+  Do NOT load a real *client* slice (Ellensburg, etc.) into cloud Supabase — data residency.
+
 ## Deploy / update
 1. `git push origin main` (or merge the feature branch) — Vercel auto-builds the frontend.
 2. Rebuild + roll the API container.
