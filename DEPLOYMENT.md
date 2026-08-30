@@ -44,6 +44,27 @@ and, for Oracle orgs, needs Instant Client — neither fits Vercel serverless);
   replica (schema in 001_init.sql; the store code is the one remaining backend task —
   auth already uses the shared DB).
 
+### 2a. API on Fly.io (concrete, ready to run)
+`fly.toml` (repo root) + `deploy/Dockerfile.api` are written. From the repo root:
+
+```bash
+fly apps create originba-api            # once; name matches fly.toml
+# secrets (never in fly.toml): the Supabase POOLED url backs BOTH auth + state
+fly secrets set \
+  PORTAL_AUTH_DATABASE_URL="postgresql://postgres.<ref>:<pw>@aws-0-us-east-2.pooler.supabase.com:6543/postgres?sslmode=require" \
+  PORTAL_AUTH_SECRET="$(openssl rand -hex 24)" \
+  PORTAL_BOOTSTRAP_ADMIN_EMAIL="admin@origin.local" \
+  PORTAL_BOOTSTRAP_ADMIN_PASSWORD="<strong password>" \
+  WAREHOUSE_DATABASE_URL="postgresql://<dbt warehouse>" \
+  PORTAL_CORS_ORIGINS="https://originba-portal.vercel.app,https://originba-portal-chase-powers-projects.vercel.app"
+fly deploy                              # builds deploy/Dockerfile.api, boots uvicorn
+```
+The API comes up at `https://originba-api.fly.dev`; `GET /health` is the Fly check.
+`min_machines_running = 1` keeps one machine warm so the connection pools stay hot.
+For an Oracle-serving build, swap the Dockerfile base to an Instant Client image,
+uncomment `oracledb` in `deploy/requirements-api.txt`, and add the `<ORG>_DB_*`
+secrets — the Postgres orgs need none of that.
+
 ### 3. Vercel (frontend)
 - Project is linked to `chasepowers59/OriginBA`, root `apps/analytics-portal`
   (team `chase-powers-projects`). It builds the repo's production branch.

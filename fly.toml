@@ -1,0 +1,32 @@
+# OriginBA portal API — Fly.io. `fly deploy` from the repo root uses this file.
+# Region iad (us-east) sits next to the Supabase us-east-2 project, so the
+# control-plane round-trips stay short.
+app = "originba-api"
+primary_region = "iad"
+
+[build]
+  dockerfile = "deploy/Dockerfile.api"
+
+# Non-secret env only. Real values go in `fly secrets set` (see DEPLOYMENT.md):
+# PORTAL_AUTH_DATABASE_URL, PORTAL_AUTH_SECRET, PORTAL_BOOTSTRAP_ADMIN_*,
+# WAREHOUSE_DATABASE_URL[_<ORG>], PORTAL_CORS_ORIGINS.
+[env]
+  PORT = "8000"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 1          # keep one warm so the DB pools stay hot
+
+  [[http_service.checks]]
+    method = "GET"
+    path = "/health"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

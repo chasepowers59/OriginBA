@@ -1,19 +1,21 @@
-# OriginBA portal API — container image for a real host (Fly.io / Render / Railway /
-# the OKE cluster). NOT Vercel serverless: the API holds DB connection pools and,
-# for Oracle orgs, needs Instant Client — neither fits a serverless function.
-# This base image serves the Postgres/dbt orgs (dev, and any Postgres warehouse).
-# For Oracle-backed orgs, start FROM an Instant Client base and set DB_THICK_MODE.
+# OriginBA portal API — container for Fly.io / Render / Railway / OKE.
+# NOT Vercel serverless: the API holds DB connection pools and, for Oracle orgs,
+# needs Instant Client. This Postgres base serves the dbt/warehouse orgs; the
+# oracledb import is optional (guarded in api/oracle_client.py), so no Oracle libs
+# are needed here. For Oracle orgs, switch to an Instant Client base + uncomment
+# oracledb in requirements-api.txt.
+#
+# BUILD CONTEXT = repo root (fly.toml lives at the repo root and points here).
 FROM python:3.12-slim
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends libpq5 \
     && rm -rf /var/lib/apt/lists/*
-COPY requirements-api.txt .
+COPY deploy/requirements-api.txt ./requirements-api.txt
 RUN pip install --no-cache-dir -r requirements-api.txt
 COPY api ./api
 COPY output ./output
 COPY config ./config
 ENV PORT=8000
-# Uvicorn workers stay low; the DB pools (psycopg2 ThreadedConnectionPool, oracledb
-# session pool) provide the concurrency. Scale by running more replicas behind the
-# load balancer, not more workers per pod.
+# Concurrency comes from the DB pools, not many workers per machine. Scale out
+# with more Fly machines behind the anycast address, not more workers per pod.
 CMD ["sh", "-c", "uvicorn api.app:app --host 0.0.0.0 --port ${PORT} --workers 2"]
