@@ -6,9 +6,10 @@
 #   TARGET_DB_URL='postgresql://postgres:<pw>@db.<ref>.supabase.co:5432/postgres' \
 #     ./deploy/load_test_data.sh
 #
-# Get the URL from Supabase → Connect → "Direct connection" (port 5432); use the
-# direct connection (not the 6543 pooler) for a bulk load. The app itself uses the
-# pooled URL at runtime.
+# Get the URL from Supabase → Connect → "Session pooler" (IPv4, port 5432). The
+# "Direct connection" host (db.<ref>.supabase.co) is IPv6-only and will not resolve
+# on an IPv4 network. Session pooler supports the full protocol a bulk load needs;
+# the app itself uses the Transaction pooler (6543) at runtime.
 set -euo pipefail
 
 # local fixtures warehouse (the docker container on 5433)
