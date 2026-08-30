@@ -1,8 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import {
+  DndContext,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
 import {
   createDashboard,
   fetchDashboard,
@@ -11,6 +20,7 @@ import {
 } from "@/lib/api";
 import type { DashboardTileDef, SavedDashboard, SnapshotSummary } from "@/lib/types";
 import { templatesForSnapshots, type DashboardTemplate } from "@/lib/dashboardTemplates";
+import { swapTileSlots } from "@/lib/dashboardSlots";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { DashboardTile } from "./DashboardTile";
 import { PresentationToolbar } from "./PresentationToolbar";
@@ -45,7 +55,8 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     { name: string; headers: string[]; rows: Record<string, unknown>[] }[]
   >([]);
   const [saving, setSaving] = useState(false);
-  const [dragSlot, setDragSlot] = useState<number | null>(null);
+  // Drag distance so a click on a tile's Edit/handle isn't read as a drag.
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   useEffect(() => {
     fetchSnapshots().then((i) => setSnapshots(i.snapshots));
@@ -146,18 +157,10 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     });
   };
 
-  const onDrop = (targetSlot: number) => {
-    if (dragSlot == null || dragSlot === targetSlot) return;
-    setTiles((prev) => {
-      const a = prev.find((t) => t.slot === dragSlot);
-      const b = prev.find((t) => t.slot === targetSlot);
-      if (!a) return prev;
-      const next = prev.filter((t) => t.slot !== dragSlot && t.slot !== targetSlot);
-      next.push({ ...a, slot: targetSlot });
-      if (b) next.push({ ...b, slot: dragSlot });
-      return next.sort((x, y) => x.slot - y.slot);
-    });
-    setDragSlot(null);
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setTiles((prev) => swapTileSlots(prev, Number(active.id), Number(over.id)));
   };
 
   const registerExport = useCallback(
@@ -231,19 +234,11 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
         <p className="text-xs text-slate-500">Click a chart value to cross-filter all tiles.</p>
       )}
 
-      <div id="dashboard-export-root" className="grid gap-4 md:grid-cols-2">
-        {SLOTS.map((slot) => {
-          const tile = tileBySlot.get(slot);
-          return (
-            <div
-              key={slot}
-              draggable={Boolean(tile)}
-              onDragStart={() => setDragSlot(slot)}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={() => onDrop(slot)}
-              className="min-h-[260px] rounded-2xl border border-dashed border-white/10 p-1 transition hover:border-sky-400/30"
-            >
-              {tile ? (
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <div id="dashboard-export-root" className="grid gap-4 md:grid-cols-2">
+          {SLOTS.map((slot) => (
+            <SlotCell key={slot} slot={slot} hasTile={Boolean(tileBySlot.get(slot))}>
+              {tileBySlot.get(slot) ? (
                 <div className="relative h-full">
                   <div className="absolute right-2 top-2 z-10 flex gap-1">
                     <button
@@ -255,12 +250,10 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
                     </button>
                   </div>
                   <DashboardTile
-                    tile={tile}
+                    tile={tileBySlot.get(slot)!}
                     days={days}
                     onData={registerExport}
-                    onCrossSelect={(field, value) =>
-                      toggleFilter(field, value, value)
-                    }
+                    onCrossSelect={(field, value) => toggleFilter(field, value, value)}
                   />
                 </div>
               ) : (
@@ -275,10 +268,10 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
                   + Add tile
                 </button>
               )}
-            </div>
-          );
-        })}
-      </div>
+            </SlotCell>
+          ))}
+        </div>
+      </DndContext>
 
       {editSlot != null ? (
         <TileEditor
@@ -295,6 +288,47 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
           }}
         />
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * One pinboard slot: a @dnd-kit droppable cell with a drag-handle grip (only when it
+ * holds a tile). The grip carries the drag listeners so clicking the chart still
+ * cross-filters and the Edit button still opens the editor.
+ */
+function SlotCell({
+  slot,
+  hasTile,
+  children,
+}: {
+  slot: number;
+  hasTile: boolean;
+  children: ReactNode;
+}) {
+  const { setNodeRef: setDropRef, isOver } = useDroppable({ id: slot });
+  const { setNodeRef: setDragRef, attributes, listeners, isDragging } = useDraggable({ id: slot });
+  return (
+    <div
+      ref={setDropRef}
+      className={`relative min-h-[260px] rounded-2xl border border-dashed p-1 transition ${
+        isOver ? "border-sky-400/60 bg-sky-400/5" : "border-white/10 hover:border-sky-400/30"
+      } ${isDragging ? "opacity-50" : ""}`}
+    >
+      {hasTile ? (
+        <button
+          type="button"
+          ref={setDragRef}
+          {...attributes}
+          {...listeners}
+          aria-label="Drag tile to another slot"
+          title="Drag to reorder"
+          className="absolute left-2 top-2 z-10 cursor-grab rounded px-1.5 py-0.5 text-xs leading-none text-slate-400 hover:text-sky-300 active:cursor-grabbing"
+        >
+          ⠿
+        </button>
+      ) : null}
+      {children}
     </div>
   );
 }
