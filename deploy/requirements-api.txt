@@ -1,11 +1,16 @@
-fastapi
-uvicorn[standard]
-psycopg2-binary
-sqlalchemy
-pyjwt
-python-dotenv
-pydantic
-# oracledb is OPTIONAL — add it (and an Instant Client base image) only for a
-# build that must serve Oracle-backed orgs. The API boots and serves the Postgres
-# orgs without it (import is guarded in api/oracle_client.py).
-# oracledb
+# API container deps. Kept lean: only what api/ imports at import-time (verified by
+# grepping top-level imports). pandas/openai/google-genai are lazy (NLQ only) and
+# not needed to boot the dashboard/builder, so they're omitted to keep the image
+# small; add them if you enable the NLQ features.
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+psycopg2-binary>=2.9.9
+sqlalchemy>=2.0.0
+PyJWT>=2.8.0
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+cryptography>=42.0.0
+PyYAML>=6.0
+# oracledb is OPTIONAL — add it (and an Instant Client base image) only for a build
+# that must serve Oracle-backed orgs. The API boots without it (guarded import).
+# oracledb>=2.0.0
