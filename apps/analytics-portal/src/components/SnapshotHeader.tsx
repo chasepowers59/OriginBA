@@ -42,11 +42,11 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
             <span className="chip chip-active">{workstream}</span>
             <span className="chip">Trusted data domain</span>
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-white">{metadata.label}</h2>
-          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+          <h2 className="text-3xl font-bold tracking-tight text-heading">{metadata.label}</h2>
+          <p className="mt-2 text-sm leading-relaxed text-fg">
             {summary || snapshotSubtitle(metadata)}
           </p>
-          <p className="mt-2 text-xs text-slate-500">{snapshotDetailLine(metadata)}</p>
+          <p className="mt-2 text-xs text-fg-muted">{snapshotDetailLine(metadata)}</p>
           {model ? (
             <div className="mt-3 flex flex-wrap gap-2">
               <Link
@@ -58,15 +58,15 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
               </Link>
               <Link
                 href={`/explore/${metadata.id}?tab=model&modelTab=joins`}
-                className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-slate-950/40 px-3 py-2 text-xs text-slate-300 transition hover:border-white/20 hover:text-white"
+                className="inline-flex items-center gap-2 rounded-lg border border-edge-subtle bg-surface-subtle px-3 py-2 text-xs text-fg transition hover:border-edge-subtle hover:text-heading"
               >
                 Join path diagram
               </Link>
             </div>
           ) : null}
           {metadata.use_case ? (
-            <p className="mt-3 rounded-lg border border-white/5 bg-slate-950/40 px-3 py-2 text-xs text-slate-400">
-              <span className="font-medium text-slate-300">Best for: </span>
+            <p className="mt-3 rounded-lg border border-edge-subtle bg-surface-subtle px-3 py-2 text-xs text-fg-muted">
+              <span className="font-medium text-fg">Best for: </span>
               {metadata.use_case}
             </p>
           ) : null}
@@ -120,12 +120,12 @@ function StatPill({
       className={`min-w-[140px] rounded-xl border px-4 py-3 ${
         accent
           ? "border-emerald-400/20 bg-emerald-500/10"
-          : "border-white/10 bg-slate-950/40"
+          : "border-edge-subtle bg-surface-subtle"
       }`}
     >
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{label}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-fg-muted">{label}</p>
       <p
-        className={`mt-1 font-semibold ${accent ? "text-emerald-300" : "text-white"} ${
+        className={`mt-1 font-semibold ${accent ? "text-emerald-300" : "text-heading"} ${
           small ? "text-sm" : "text-lg"
         }`}
         title={value}
