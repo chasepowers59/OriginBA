@@ -61,7 +61,13 @@ function isNumericColumn(rows: Record<string, unknown>[], col: string): boolean 
   return numeric >= Math.ceil(sample.length * 0.7);
 }
 
-export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
+export function DatabaseWorkspace({
+  dbConfigured,
+  initialTable,
+}: {
+  dbConfigured: boolean;
+  initialTable?: string;
+}) {
   const [sql, setSql] = useState("");
   const [activeTemplate, setActiveTemplate] = useState<DatabaseQueryTemplate | null>(null);
   const [pageSize, setPageSize] = useState<number>(50);
@@ -266,6 +272,16 @@ export function DatabaseWorkspace({ dbConfigured }: { dbConfigured: boolean }) {
     setActiveTemplate(null);
     editorRef.current?.focus();
   };
+
+  // Deep-link entry from a Canvas Overview: /database?table=<name> seeds a browse query.
+  const seededTable = useRef(false);
+  useEffect(() => {
+    if (initialTable && !seededTable.current) {
+      seededTable.current = true;
+      insertTable(initialTable);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialTable]);
 
   const statusText = useMemo(() => {
     if (loading) return "Executing…";

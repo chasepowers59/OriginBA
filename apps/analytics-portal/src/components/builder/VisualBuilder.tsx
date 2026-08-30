@@ -43,7 +43,13 @@ type FilItem = { field: string; label: string; op: string; value: unknown; role:
 
 const GRAINS = ["month", "quarter", "year"];
 
-export function VisualBuilder() {
+export function VisualBuilder({
+  initialCanvas,
+  initialReport,
+}: {
+  initialCanvas?: string;
+  initialReport?: string;
+} = {}) {
   const [index, setIndex] = useState<SnapshotSummary[]>([]);
   const [snapshotId, setSnapshotId] = useState("");
   const [meta, setMeta] = useState<SnapshotMetadata | null>(null);
@@ -58,6 +64,7 @@ export function VisualBuilder() {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [questions, setQuestions] = useState<BuilderQuestion[]>([]);
   const [saved, setSaved] = useState<string | null>(null);
+  const initialApplied = useRef(false);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -229,6 +236,25 @@ export function VisualBuilder() {
     },
     [loadCanvas],
   );
+
+  // Deep-link entry from a Canvas Overview: /build?canvas=<id> preselects the canvas;
+  // &report=<id> also prefills that governed report. Apply once, after the catalog loads.
+  useEffect(() => {
+    if (initialApplied.current || !index.length) return;
+    if (initialReport) {
+      const q = questions.find((x) => x.id === initialReport);
+      if (q) {
+        initialApplied.current = true;
+        void applyQuestion(q);
+        return;
+      }
+      if (!questions.length) return; // questions still loading; wait
+    }
+    if (initialCanvas) {
+      initialApplied.current = true;
+      void loadCanvas(initialCanvas);
+    }
+  }, [index, questions, initialCanvas, initialReport, applyQuestion, loadCanvas]);
 
   const saveView = useCallback(async () => {
     if (!meta) return;

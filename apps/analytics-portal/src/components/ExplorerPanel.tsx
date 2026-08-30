@@ -27,7 +27,6 @@ import { pinReportUrl } from "@/lib/pinReport";
 import { useAuth } from "@/components/AuthProvider";
 import { FavoritesPanel } from "./FavoritesPanel";
 import { GlobalFilterBar } from "./GlobalFilterBar";
-import { RawSqlPanel } from "./RawSqlPanel";
 import { ResultsPanel } from "./ResultsPanel";
 import { ScopeFilterSelect } from "./ScopeFilterSelect";
 import { SnapshotDataModelPanel } from "./SnapshotDataModelPanel";
@@ -65,12 +64,13 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const builderMeasures = scoped.guidedMeasures;
   const processGuide = scoped.processGuide;
   const { can } = useAuth();
+  // SQL now lives at the single /database surface (see the CTA + the ?tab=sql redirect
+  // below); it is no longer a tab here.
   const tabOptions = (
     [
       ["reports", "Reports", true],
       ["builder", "Ad Hoc Builder", can("explorer:builder")],
       ["model", "Data model", can("portal:read")],
-      ["sql", "SQL", can("snapshots:raw_sql")],
     ] as const
   ).filter(([, , allowed]) => allowed);
 
@@ -103,7 +103,14 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [favoriteApplied, setFavoriteApplied] = useState(false);
 
-  const allowedTabs = new Set(tabOptions.map(([key]) => key));
+  const allowedTabs = new Set<Tab>(tabOptions.map(([key]) => key));
+
+  // A ?tab=sql deep link (e.g. an old bookmark) now routes to the single SQL surface.
+  useEffect(() => {
+    if (tabFromUrl === "sql") {
+      router.replace(`/database?table=${encodeURIComponent(metadata.table_name)}`);
+    }
+  }, [tabFromUrl, router, metadata.table_name]);
 
   useEffect(() => {
     const next =
@@ -489,22 +496,40 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           onClearScope={() => setScopeValue("")}
         />
       ) : null}
-      <div className="no-print glass-panel p-2">
-        <div className="grid grid-cols-2 gap-1 sm:grid-cols-4">
-          {tabOptions.map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => selectTab(key)}
-              className={`rounded-xl px-2 py-2.5 text-xs font-medium transition sm:text-sm ${
-                tab === key
-                  ? "bg-gradient-to-r from-sky-500/20 to-indigo-500/20 text-white ring-1 ring-sky-400/30"
-                  : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
-              }`}
+      <div className="no-print flex flex-wrap items-center justify-between gap-2">
+        <div className="glass-panel flex-1 p-2">
+          <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
+            {tabOptions.map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => selectTab(key)}
+                className={`rounded-xl px-2 py-2.5 text-xs font-medium transition sm:text-sm ${
+                  tab === key
+                    ? "bg-gradient-to-r from-sky-500/20 to-indigo-500/20 text-white ring-1 ring-sky-400/30"
+                    : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* Route to the single full-featured surfaces for deeper work. */}
+        <div className="flex gap-2">
+          {can("explorer:builder") ? (
+            <Link href={`/build?canvas=${encodeURIComponent(metadata.id)}`} className="btn-ghost whitespace-nowrap text-xs">
+              Build a custom view →
+            </Link>
+          ) : null}
+          {can("snapshots:raw_sql") ? (
+            <Link
+              href={`/database?table=${encodeURIComponent(metadata.table_name)}`}
+              className="btn-ghost whitespace-nowrap text-xs"
             >
-              {label}
-            </button>
-          ))}
+              Open in SQL →
+            </Link>
+          ) : null}
         </div>
       </div>
 
@@ -520,8 +545,6 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
               : undefined
           }
         />
-      ) : tab === "sql" ? (
-        <RawSqlPanel snapshotId={metadata.id} tableName={metadata.table_name} />
       ) : (
         <div className="grid gap-6 xl:grid-cols-[340px_1fr]">
       <aside className="no-print space-y-4">

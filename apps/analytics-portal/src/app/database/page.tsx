@@ -2,7 +2,12 @@ import { fetchSnapshots } from "@/lib/api";
 import { AppShell } from "@/components/AppShell";
 import { DatabaseWorkspace } from "@/components/DatabaseWorkspace";
 
-export default async function DatabasePage() {
+export default async function DatabasePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ table?: string }>;
+}) {
+  const { table } = await searchParams;
   let index;
   try {
     index = await fetchSnapshots();
@@ -31,7 +36,7 @@ export default async function DatabasePage() {
             fetch results in 50-row pages, and optionally chart grouped results.
           </p>
         </div>
-        <DatabaseWorkspace dbConfigured={index.db_configured} />
+        <DatabaseWorkspace dbConfigured={index.db_configured} initialTable={table} />
       </div>
     </AppShell>
   );

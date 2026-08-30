@@ -2,7 +2,12 @@ import { fetchSnapshots } from "@/lib/api";
 import { AppShell } from "@/components/AppShell";
 import { VisualBuilder } from "@/components/builder/VisualBuilder";
 
-export default async function BuildPage() {
+export default async function BuildPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ canvas?: string; report?: string }>;
+}) {
+  const { canvas, report } = await searchParams;
   let index;
   try {
     index = await fetchSnapshots();
@@ -27,7 +32,7 @@ export default async function BuildPage() {
             visualization — or start from a governed business question.
           </p>
         </div>
-        <VisualBuilder />
+        <VisualBuilder initialCanvas={canvas} initialReport={report} />
       </section>
     </AppShell>
   );
