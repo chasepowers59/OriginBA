@@ -11,10 +11,8 @@ import {
 } from "@/lib/api";
 import type { PremadeReport, QueryResponse, SnapshotMetadata } from "@/lib/types";
 import {
-  aggregationLabel,
   allowedAggsForMeasure,
   buildColumnLabels,
-  chartTypeLabel,
   defaultMeasureSelection,
   prettifyFieldName,
   requiredDateLabel,
@@ -44,7 +42,7 @@ const DATE_PRESETS: DatePreset[] = [
   { kind: "days", label: "Last 12 months", days: 365 },
 ];
 
-type Tab = "reports" | "builder" | "model" | "sql";
+type Tab = "reports" | "model";
 
 type ExplorerPanelProps = {
   metadata: SnapshotMetadata;
@@ -60,28 +58,20 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   );
   const scopeFilters = scoped.guidedScopeFilters;
   const premadeReports = scoped.guidedPremadeReports;
-  const builderDimensions = scoped.guidedDimensions;
-  const builderMeasures = scoped.guidedMeasures;
+  const measures = scoped.guidedMeasures;
   const processGuide = scoped.processGuide;
   const { can } = useAuth();
-  // SQL now lives at the single /database surface (see the CTA + the ?tab=sql redirect
-  // below); it is no longer a tab here.
+  // Ad-hoc building and SQL now live at the single /build and /database surfaces (see the
+  // CTAs + the ?tab redirects below); the canvas page keeps only Reports + Data model.
   const tabOptions = (
     [
       ["reports", "Reports", true],
-      ["builder", "Ad Hoc Builder", can("explorer:builder")],
       ["model", "Data model", can("portal:read")],
     ] as const
   ).filter(([, , allowed]) => allowed);
 
   const tabFromUrl = searchParams.get("tab");
-  const initialTab: Tab =
-    tabFromUrl === "model" ||
-    tabFromUrl === "sql" ||
-    tabFromUrl === "builder" ||
-    tabFromUrl === "reports"
-      ? tabFromUrl
-      : "reports";
+  const initialTab: Tab = tabFromUrl === "model" ? "model" : "reports";
 
   const [tab, setTab] = useState<Tab>(initialTab);
   const [activeReportId, setActiveReportId] = useState<string | null>(null);
@@ -95,7 +85,6 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const [scopeField, setScopeField] = useState(scopeFilters[0]?.field ?? "");
   const [scopeValue, setScopeValue] = useState("");
   const [chartType, setChartType] = useState<"bar" | "line" | "pie" | "horizontal" | "table">("bar");
-  const [timeGrain, setTimeGrain] = useState<"" | "month" | "quarter" | "year">("");
   const [drillFilter, setDrillFilter] = useState<{ field: string; value: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -105,21 +94,17 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
 
   const allowedTabs = new Set<Tab>(tabOptions.map(([key]) => key));
 
-  // A ?tab=sql deep link (e.g. an old bookmark) now routes to the single SQL surface.
+  // Old deep links route to the single surfaces: ?tab=sql -> /database, ?tab=builder -> /build.
   useEffect(() => {
     if (tabFromUrl === "sql") {
       router.replace(`/database?table=${encodeURIComponent(metadata.table_name)}`);
+    } else if (tabFromUrl === "builder") {
+      router.replace(`/build?canvas=${encodeURIComponent(metadata.id)}`);
     }
-  }, [tabFromUrl, router, metadata.table_name]);
+  }, [tabFromUrl, router, metadata.table_name, metadata.id]);
 
   useEffect(() => {
-    const next =
-      tabFromUrl === "model" ||
-      tabFromUrl === "sql" ||
-      tabFromUrl === "builder" ||
-      tabFromUrl === "reports"
-        ? tabFromUrl
-        : null;
+    const next = tabFromUrl === "model" ? "model" : tabFromUrl === "reports" ? "reports" : null;
     if (next && allowedTabs.has(next)) setTab(next);
   }, [tabFromUrl, allowedTabs]);
 
@@ -227,47 +212,10 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     [metadata.id, buildFilters],
   );
 
-  const queryPayload = useCallback(
-    (dims: string[], measures: { field: string; agg: string }[], extraFilters: PremadeReport["filters"] = []) => ({
-      dimensions: timeGrain ? [] : dims,
-      measures,
-      filters: buildFilters(extraFilters),
-      time_dimensions:
-        timeGrain && metadata.required_date_field
-          ? [{ field: metadata.required_date_field, grain: timeGrain }]
-          : [],
-      limit: 500,
-    }),
-    [timeGrain, metadata.required_date_field, buildFilters],
-  );
-
-  const runBuilder = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setActiveReportId(null);
-    setActiveReportTitle("Custom analysis");
-    setTab("builder");
-    try {
-      const response = await runSnapshotQuery(
-        metadata.id,
-        queryPayload(
-          dimensions,
-          [{ field: measureField, agg: measureAgg }],
-        ),
-      );
-      setResult(response);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to run this analysis");
-      setResult(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [metadata.id, dimensions, measureField, measureAgg, queryPayload]);
-
   useEffect(() => {
     const { range, label } = applyDatePresetConfig(metadata.default_date_preset);
     const defaultMeasure = defaultMeasureSelection({
-      measures: builderMeasures,
+      measures,
       trusted_measures: metadata.trusted_measures,
     });
     setDateStart(range[0]);
@@ -288,11 +236,11 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     scopeFilters,
     metadata.default_date_preset,
     metadata.trusted_measures,
-    builderMeasures,
+    measures,
   ]);
 
   useEffect(() => {
-    const aggs = allowedAggsForMeasure({ measures: builderMeasures }, measureField);
+    const aggs = allowedAggsForMeasure({ measures }, measureField);
     if (!aggs.includes(measureAgg)) {
       setMeasureAgg(aggs[0] ?? "count");
     }
@@ -345,38 +293,29 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         }
       }
       if (fav.dimensions?.length) {
-        setDimensions(fav.dimensions);
-        setMeasureField(fav.measureField ?? "*");
-        setMeasureAgg(fav.measureAgg ?? "count");
-        setActiveReportTitle(fav.title);
-        setTab("builder");
+        // A custom (dimensions-based) saved view now opens in the single builder surface.
+        router.replace(`/build?canvas=${encodeURIComponent(metadata.id)}`);
       }
     }
-  }, [searchParams, metadata, favoriteApplied, runPremade, dateStart, dateEnd]);
+  }, [searchParams, metadata, favoriteApplied, runPremade, dateStart, dateEnd, router]);
 
   useEffect(() => {
     if (!dateStart || !dateEnd) return;
     if (searchParams.get("favorite") && !favoriteApplied) return;
-    if (tab === "model" || tab === "sql") return;
-
-    if (tab === "builder" && dimensions.length) {
-      void runBuilder();
-      return;
-    }
+    if (tab === "model") return;
 
     const report =
       premadeReports.find((r) => r.id === activeReportId) ?? premadeReports[0];
     if (!report) return;
     runPremade(report);
-  }, [dateStart, dateEnd, scopeField, scopeValue, drillFilter, metadata.id, tab, dimensions.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [dateStart, dateEnd, scopeField, scopeValue, drillFilter, metadata.id, tab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeReport = premadeReports.find((r) => r.id === activeReportId) ?? null;
 
-  const drillDimension = timeGrain
-    ? null
-    : dimensions[0] ??
-      activeReport?.dimensions[0] ??
-      (result && result.columns.length > 1 ? result.columns[0] : "");
+  const drillDimension =
+    dimensions[0] ??
+    activeReport?.dimensions[0] ??
+    (result && result.columns.length > 1 ? result.columns[0] : "");
 
   const handleDrill = useCallback(
     (category: string) => {
@@ -405,15 +344,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     setActivePreset(wider.label);
   };
 
-  const trustedMeasures = metadata.trusted_measures ?? [];
-  const showUntrustedSumWarning =
-    measureAgg === "sum" &&
-    measureField !== "*" &&
-    !trustedMeasures.includes(measureField);
-
-  const dimensionKey = timeGrain
-    ? (result?.columns[0] ?? "")
-    : drillDimension || dimensions[0] || "";
+  const dimensionKey = drillDimension || dimensions[0] || "";
   const measureKey = useMemo(() => {
     if (!result?.columns.length) return "";
     return result.columns[result.columns.length - 1];
@@ -486,7 +417,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           </p>
         </div>
       ) : null}
-      {tab !== "model" && tab !== "sql" ? (
+      {tab !== "model" ? (
         <GlobalFilterBar
           periodLabel={activePreset}
           dateRange={[dateStart, dateEnd]}
@@ -606,139 +537,29 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           />
         ) : null}
 
-        {tab === "reports" ? (
-          <div className="glass-panel p-4">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
-              Ready-to-run reports
-            </p>
-            <div className="space-y-2">
-              {premadeReports.map((report) => (
-                <button
-                  key={report.id}
-                  type="button"
-                  onClick={() => runPremade(report)}
-                  disabled={loading}
-                  className={`w-full rounded-xl border px-4 py-3 text-left transition disabled:opacity-60 ${
-                    activeReportId === report.id
-                      ? "border-sky-400/40 bg-sky-500/10 ring-1 ring-sky-400/20"
-                      : "border-edge-subtle bg-surface-subtle hover:border-edge-subtle hover:bg-chip"
-                  }`}
-                >
-                  <div className="font-medium text-heading">{report.title}</div>
-                  <div className="mt-1 text-xs text-fg-muted">{report.description}</div>
-                </button>
-              ))}
-            </div>
+        <div className="glass-panel p-4">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
+            Ready-to-run reports
+          </p>
+          <div className="space-y-2">
+            {premadeReports.map((report) => (
+              <button
+                key={report.id}
+                type="button"
+                onClick={() => runPremade(report)}
+                disabled={loading}
+                className={`w-full rounded-xl border px-4 py-3 text-left transition disabled:opacity-60 ${
+                  activeReportId === report.id
+                    ? "border-sky-400/40 bg-sky-500/10 ring-1 ring-sky-400/20"
+                    : "border-edge-subtle bg-surface-subtle hover:border-edge-subtle hover:bg-chip"
+                }`}
+              >
+                <div className="font-medium text-heading">{report.title}</div>
+                <div className="mt-1 text-xs text-fg-muted">{report.description}</div>
+              </button>
+            ))}
           </div>
-        ) : (
-          <div className="glass-panel space-y-3 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
-              Build your view
-            </p>
-            <label className="block text-xs text-fg-muted">
-              Time trend (optional)
-              <select
-                value={timeGrain}
-                onChange={(e) => {
-                  const v = e.target.value as "" | "month" | "quarter" | "year";
-                  setTimeGrain(v);
-                  if (v && chartType !== "table") setChartType("line");
-                }}
-                className="input-modern mt-1"
-              >
-                <option value="">Group by field</option>
-                <option value="month">Trend by month</option>
-                <option value="quarter">Trend by quarter</option>
-                <option value="year">Trend by year</option>
-              </select>
-            </label>
-            <label className="block text-xs text-fg-muted">
-              Field
-              <select
-                value={dimensions[0] ?? ""}
-                onChange={(e) => setDimensions(e.target.value ? [e.target.value] : [])}
-                disabled={Boolean(timeGrain)}
-                className="input-modern mt-1 disabled:opacity-50"
-              >
-                <option value="">Choose a field…</option>
-                {builderDimensions.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block text-xs text-fg-muted">
-              Metric
-              <select
-                value={measureField}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  setMeasureField(next);
-                  const aggs = allowedAggsForMeasure({ measures: builderMeasures }, next);
-                  setMeasureAgg(aggs[0] ?? "count");
-                }}
-                className="input-modern mt-1"
-              >
-                {builderMeasures.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.label}
-                    {trustedMeasures.includes(m.id) ? " · trusted" : ""}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block text-xs text-fg-muted">
-              Calculation
-              <select
-                value={measureAgg}
-                onChange={(e) => setMeasureAgg(e.target.value)}
-                className="input-modern mt-1"
-              >
-                {allowedAggsForMeasure({ measures: builderMeasures }, measureField).map(
-                  (agg) => (
-                    <option key={agg} value={agg}>
-                      {aggregationLabel(agg)}
-                    </option>
-                  ),
-                )}
-              </select>
-            </label>
-            <label className="block text-xs text-fg-muted">
-              Chart style
-              <div className="mt-2 flex flex-wrap gap-2">
-                {(["bar", "horizontal", "line", "pie", "table"] as const).map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => {
-                      setChartType(t);
-                      if (t === "table") setTimeGrain("");
-                    }}
-                    className={`chip ${chartType === t ? "chip-active" : ""}`}
-                  >
-                    {chartTypeLabel(t)}
-                  </button>
-                ))}
-              </div>
-            </label>
-            <button
-              type="button"
-              onClick={runBuilder}
-              disabled={loading || (!dimensions.length && !timeGrain)}
-              className="btn-primary w-full"
-            >
-              {loading ? "Running analysis…" : "Run analysis"}
-            </button>
-            {showUntrustedSumWarning ? (
-              <p className="rounded-lg border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-                <strong className="text-amber-200">Not a trusted measure.</strong> Summing{" "}
-                {measureField} may double-count at this grain. Prefer{" "}
-                {trustedMeasures.join(", ") || "governed measures"} for dollar totals.
-              </p>
-            ) : null}
-          </div>
-        )}
+        </div>
 
         {result ? (
           <div className="space-y-2">
@@ -785,7 +606,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             result={result}
             dimensionKey={dimensionKey}
             measureKey={measureKey}
-            chartType={timeGrain && chartType !== "table" ? "line" : chartType}
+            chartType={chartType}
             totalMeasure={totalMeasure}
             loading={loading}
             snapshotId={metadata.id}
@@ -799,9 +620,9 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             scopeLabel={scopeLabel ? `${scopeLabel}: ${scopeValue}` : undefined}
             dateRange={[dateStart, dateEnd]}
             drillFilter={drillFilter}
-            onDrillSelect={drillDimension && !timeGrain ? handleDrill : undefined}
+            onDrillSelect={drillDimension ? handleDrill : undefined}
             onClearDrill={clearDrill}
-            sortTimeSeries={Boolean(timeGrain)}
+            sortTimeSeries={false}
             emptyContext={{
               periodLabel: activePreset,
               dateRange: [dateStart, dateEnd],
