@@ -15,7 +15,7 @@ and, for Oracle orgs, needs Instant Client — neither fits Vercel serverless);
 ## One-time setup
 
 ### 1. Supabase (login + user-state DB) — PROVISIONED
-- Project `hvnfyulgwpjpeeowzuni` (region us-east-2) is live and the state schema
+- Project `psnkxsjpuxgvvjvyenfj` (region us-east-2) is live and the state schema
   `portal_state.records` is **already applied** (deploy/supabase/001_init.sql).
 - The API reads/writes it through `PORTAL_AUTH_DATABASE_URL` (or a separate
   `PORTAL_STATE_DATABASE_URL`). Copy the project's **pooled** connection string
