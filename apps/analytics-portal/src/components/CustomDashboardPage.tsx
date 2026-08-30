@@ -183,9 +183,9 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-2 block w-full max-w-lg bg-transparent text-2xl font-bold text-white outline-none border-b border-white/10 focus:border-sky-400/50"
+            className="mt-2 block w-full max-w-lg bg-transparent text-2xl font-bold text-heading outline-none border-b border-edge-subtle focus:border-sky-400/50"
           />
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-fg-muted">
             Drag tiles between slots · up to 4 visuals · saved to server
           </p>
         </div>
@@ -199,10 +199,10 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
 
       {!dashboardId ? (
         <div className="glass-panel p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
             Starter templates
           </p>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-fg-muted">
             Load a 2×2 workstream dashboard, then drag tiles or edit to customize.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -213,8 +213,8 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
                 onClick={() => applyTemplate(template)}
                 className="chip text-left"
               >
-                <span className="block font-medium text-slate-200">{template.title}</span>
-                <span className="block text-[10px] text-slate-500">{template.description}</span>
+                <span className="block font-medium text-heading">{template.title}</span>
+                <span className="block text-[10px] text-fg-muted">{template.description}</span>
               </button>
             ))}
           </div>
@@ -231,7 +231,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
           </button>
         </div>
       ) : (
-        <p className="text-xs text-slate-500">Click a chart value to cross-filter all tiles.</p>
+        <p className="text-xs text-fg-muted">Click a chart value to cross-filter all tiles.</p>
       )}
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
@@ -263,7 +263,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
                     updateTile(slot, emptyTile(slot));
                     setEditSlot(slot);
                   }}
-                  className="flex h-full w-full items-center justify-center text-sm text-slate-500 hover:text-sky-300"
+                  className="flex h-full w-full items-center justify-center text-sm text-fg-muted hover:text-sky-300"
                 >
                   + Add tile
                 </button>
@@ -312,7 +312,7 @@ function SlotCell({
     <div
       ref={setDropRef}
       className={`relative min-h-[260px] rounded-2xl border border-dashed p-1 transition ${
-        isOver ? "border-sky-400/60 bg-sky-400/5" : "border-white/10 hover:border-sky-400/30"
+        isOver ? "border-sky-400/60 bg-sky-400/5" : "border-edge-subtle hover:border-sky-400/30"
       } ${isDragging ? "opacity-50" : ""}`}
     >
       {hasTile ? (
@@ -323,7 +323,7 @@ function SlotCell({
           {...listeners}
           aria-label="Drag tile to another slot"
           title="Drag to reorder"
-          className="absolute left-2 top-2 z-10 cursor-grab rounded px-1.5 py-0.5 text-xs leading-none text-slate-400 hover:text-sky-300 active:cursor-grabbing"
+          className="absolute left-2 top-2 z-10 cursor-grab rounded px-1.5 py-0.5 text-xs leading-none text-fg-muted hover:text-sky-300 active:cursor-grabbing"
         >
           ⠿
         </button>
@@ -349,9 +349,9 @@ function TileEditor({
   const [draft, setDraft] = useState(tile);
   return (
     <div className="glass-panel fixed inset-x-4 bottom-4 z-50 mx-auto max-w-xl p-4 shadow-2xl md:inset-x-auto md:right-8 md:top-24 md:bottom-auto">
-      <p className="mb-3 font-semibold text-white">Configure tile</p>
+      <p className="mb-3 font-semibold text-heading">Configure tile</p>
       <div className="grid gap-3 sm:grid-cols-2">
-        <label className="text-xs text-slate-500 sm:col-span-2">
+        <label className="text-xs text-fg-muted sm:col-span-2">
           Title
           <input
             className="input-modern mt-1"
@@ -359,7 +359,7 @@ function TileEditor({
             onChange={(e) => setDraft({ ...draft, title: e.target.value })}
           />
         </label>
-        <label className="text-xs text-slate-500 sm:col-span-2">
+        <label className="text-xs text-fg-muted sm:col-span-2">
           Snapshot
           <select
             className="input-modern mt-1"
@@ -373,7 +373,7 @@ function TileEditor({
             ))}
           </select>
         </label>
-        <label className="text-xs text-slate-500">
+        <label className="text-xs text-fg-muted">
           Visual
           <select
             className="input-modern mt-1"
@@ -387,7 +387,7 @@ function TileEditor({
             <option value="table">Table</option>
           </select>
         </label>
-        <label className="text-xs text-slate-500">
+        <label className="text-xs text-fg-muted">
           Chart type
           <select
             className="input-modern mt-1"
@@ -400,7 +400,7 @@ function TileEditor({
             <option value="pie">Pie</option>
           </select>
         </label>
-        <label className="text-xs text-slate-500 sm:col-span-2">
+        <label className="text-xs text-fg-muted sm:col-span-2">
           Time trend (optional)
           <select
             className="input-modern mt-1"

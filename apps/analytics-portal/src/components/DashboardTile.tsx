@@ -121,8 +121,8 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
     const formatted = isCurrency ? formatCurrency(total) : formatNumber(total);
     return (
       <div className="glass-panel flex h-full flex-col justify-center p-6">
-        <p className="text-xs uppercase tracking-wide text-slate-500">{tile.title}</p>
-        <p className="mt-2 text-4xl font-bold text-white">{formatted ?? "—"}</p>
+        <p className="text-xs uppercase tracking-wide text-fg-muted">{tile.title}</p>
+        <p className="mt-2 text-4xl font-bold text-heading">{formatted ?? "—"}</p>
       </div>
     );
   }
@@ -130,13 +130,13 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
   if (tile.visual === "table") {
     return (
       <div className="glass-panel flex h-full flex-col overflow-hidden">
-        <p className="border-b border-white/10 px-4 py-2 text-sm font-medium text-white">{tile.title}</p>
+        <p className="border-b border-edge-subtle px-4 py-2 text-sm font-medium text-heading">{tile.title}</p>
         <div className="max-h-64 overflow-auto">
           <table className="min-w-full text-left text-xs">
             <thead>
               <tr>
                 {result.columns.map((c) => (
-                  <th key={c} className="px-3 py-2 text-slate-500">
+                  <th key={c} className="px-3 py-2 text-fg-muted">
                     {c}
                   </th>
                 ))}
@@ -144,9 +144,9 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
             </thead>
             <tbody>
               {result.rows.slice(0, 12).map((row, i) => (
-                <tr key={i} className="border-t border-white/5">
+                <tr key={i} className="border-t border-edge-subtle">
                   {result.columns.map((c) => (
-                    <td key={c} className="px-3 py-1.5 text-slate-200">
+                    <td key={c} className="px-3 py-1.5 text-heading">
                       {String(row[c] ?? "")}
                     </td>
                   ))}
@@ -161,7 +161,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
 
   return (
     <div className="glass-panel flex h-full flex-col p-4">
-      <p className="mb-2 text-sm font-medium text-white">{tile.title}</p>
+      <p className="mb-2 text-sm font-medium text-heading">{tile.title}</p>
       <div className="flex-1">
         <BuilderChart
           visual={effectiveChart}

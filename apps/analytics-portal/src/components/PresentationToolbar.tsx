@@ -42,7 +42,7 @@ export function PresentationToolbar({
           Export Excel pack
         </button>
       ) : null}
-      <button type="button" onClick={exitPresentation} className="btn-ghost text-xs text-slate-500">
+      <button type="button" onClick={exitPresentation} className="btn-ghost text-xs text-fg-muted">
         Exit present
       </button>
     </div>

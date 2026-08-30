@@ -71,13 +71,13 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400">
             Executive overview
           </p>
-          <h2 className="mt-1 text-xl font-bold text-white md:text-2xl">
+          <h2 className="mt-1 text-xl font-bold text-heading md:text-2xl">
             {isHome ? "Key metrics at a glance" : `${portal.organization_name} performance`}
           </h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-fg-muted">
             {summary?.period.label ?? `Last ${days} days`}
             {summary?.refresh?.last_refresh ? (
-              <span className="ml-2 text-xs text-slate-600">
+              <span className="ml-2 text-xs text-fg-muted">
                 · data refreshed {new Date(summary.refresh.last_refresh).toLocaleString()} (
                 {summary.refresh.tables.reduce((a, t) => a + t.batch_rows, 0).toLocaleString()}{" "}
                 rows in latest batch)
@@ -157,7 +157,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
             ))}
           </div>
         ) : (
-          <div className="glass-panel px-4 py-8 text-center text-sm text-slate-500">
+          <div className="glass-panel px-4 py-8 text-center text-sm text-fg-muted">
             Unable to load executive metrics.
           </div>
         )}

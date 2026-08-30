@@ -20,7 +20,7 @@ export function KpiCompareBadge({
   const up = changePct > 0;
   const flat = Math.abs(changePct) < 0.05;
   const tone = flat
-    ? "bg-slate-500/10 text-slate-300 ring-slate-400/20"
+    ? "bg-slate-500/10 text-fg ring-slate-400/20"
     : up
       ? "bg-emerald-500/12 text-emerald-300 ring-emerald-400/25"
       : "bg-rose-500/12 text-rose-300 ring-rose-400/25";
@@ -34,7 +34,7 @@ export function KpiCompareBadge({
         <span className="text-[10px] leading-none">{arrow}</span>
         {formatPercent(Math.abs(changePct))}
       </span>
-      <span className="text-xs text-slate-500">{priorLabel}</span>
+      <span className="text-xs text-fg-muted">{priorLabel}</span>
     </span>
   );
 }

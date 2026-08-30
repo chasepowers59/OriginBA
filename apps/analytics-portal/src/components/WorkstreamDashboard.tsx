@@ -77,12 +77,12 @@ function WorkstreamDashboardInner({
             <Link href="/" className="text-xs text-sky-400 hover:text-sky-300">
               ← All workstreams
             </Link>
-            <h1 className="mt-2 text-3xl font-bold text-white">{label}</h1>
-            <p className="mt-2 max-w-2xl text-slate-400">
+            <h1 className="mt-2 text-3xl font-bold text-heading">{label}</h1>
+            <p className="mt-2 max-w-2xl text-fg-muted">
               {WORKSTREAM_DESCRIPTIONS[workstreamId] ?? "Governed analytics for this business area."}
             </p>
             {snapshotCount != null ? (
-              <p className="mt-2 text-xs text-slate-500">{snapshotCount} reporting canvases</p>
+              <p className="mt-2 text-xs text-fg-muted">{snapshotCount} reporting canvases</p>
             ) : null}
           </div>
           <PresentationToolbar title={`${label} Dashboard`} exportSections={exportSections} />
@@ -91,9 +91,9 @@ function WorkstreamDashboardInner({
 
       {about ? (
         <details className="glass-panel-subtle px-5 py-4">
-          <summary className="cursor-pointer text-sm font-semibold text-slate-200">
+          <summary className="cursor-pointer text-sm font-semibold text-heading">
             About this workstream
-            <span className="ml-2 text-xs font-normal text-slate-500">
+            <span className="ml-2 text-xs font-normal text-fg-muted">
               what it includes, what it deliberately does not, and where it connects
             </span>
           </summary>
@@ -103,7 +103,7 @@ function WorkstreamDashboardInner({
                 Included ({about.canvases.length} canvases · {about.kpis.length} KPIs)
               </p>
               {about.summary ? (
-                <p className="mt-2 text-xs leading-relaxed text-slate-400">{about.summary}</p>
+                <p className="mt-2 text-xs leading-relaxed text-fg-muted">{about.summary}</p>
               ) : null}
               <ul className="mt-2 space-y-1">
                 {about.canvases.map((c) => (
@@ -111,7 +111,7 @@ function WorkstreamDashboardInner({
                     <Link href={`/explore/${c.id}`} className="text-xs text-sky-300/90 hover:text-sky-200">
                       {c.label}
                     </Link>
-                    {c.grain ? <span className="ml-1 text-[10px] text-slate-600">— {c.grain}</span> : null}
+                    {c.grain ? <span className="ml-1 text-[10px] text-fg-muted">— {c.grain}</span> : null}
                   </li>
                 ))}
               </ul>
@@ -122,7 +122,7 @@ function WorkstreamDashboardInner({
               </p>
               <ul className="mt-2 space-y-2">
                 {about.not_included.map((n) => (
-                  <li key={n} className="text-xs leading-relaxed text-slate-400">
+                  <li key={n} className="text-xs leading-relaxed text-fg-muted">
                     {n}
                   </li>
                 ))}
@@ -134,7 +134,7 @@ function WorkstreamDashboardInner({
               </p>
               <ul className="mt-2 space-y-2">
                 {about.related.map((r) => (
-                  <li key={r.workstream} className="text-xs leading-relaxed text-slate-400">
+                  <li key={r.workstream} className="text-xs leading-relaxed text-fg-muted">
                     <Link href={`/workstream/${r.workstream}`} className="font-medium text-emerald-300/90 hover:text-emerald-200">
                       {r.label}
                     </Link>{" "}
@@ -168,7 +168,7 @@ function WorkstreamDashboardInner({
           </button>
         </div>
       ) : (
-        <p className="text-xs text-slate-500">Click spark chart bars to cross-filter all tiles.</p>
+        <p className="text-xs text-fg-muted">Click spark chart bars to cross-filter all tiles.</p>
       )}
 
       <div id="dashboard-export-root">

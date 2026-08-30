@@ -32,10 +32,10 @@ export function WorkstreamHeroLinks({
           return (
             <div
               key={item.snapshot_id}
-              className="rounded-xl border border-white/10 bg-slate-950/40 p-4"
+              className="rounded-xl border border-edge-subtle bg-surface-subtle p-4"
             >
-              <p className="font-medium text-white">{label}</p>
-              <p className="mt-1 text-xs text-slate-500">{snap?.grain_description ?? snap?.summary}</p>
+              <p className="font-medium text-heading">{label}</p>
+              <p className="mt-1 text-xs text-fg-muted">{snap?.grain_description ?? snap?.summary}</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Link
                   href={`/explore/${item.snapshot_id}${reportQs}`}
@@ -45,7 +45,7 @@ export function WorkstreamHeroLinks({
                 </Link>
                 <Link
                   href={`/explore/${item.snapshot_id}?tab=model`}
-                  className="text-xs text-slate-400 hover:text-slate-200"
+                  className="text-xs text-fg-muted hover:text-heading"
                 >
                   Data model
                 </Link>

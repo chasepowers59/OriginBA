@@ -177,7 +177,7 @@ export function AdminAccessPanel() {
         <div className="mt-4 overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10 text-left portal-text-subtle">
+              <tr className="border-b border-edge-subtle text-left portal-text-subtle">
                 <th className="px-3 py-2">Name</th>
                 <th className="px-3 py-2">Email</th>
                 <th className="px-3 py-2">Organization</th>
@@ -189,7 +189,7 @@ export function AdminAccessPanel() {
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id} className="border-b border-white/5">
+                <tr key={user.id} className="border-b border-edge-subtle">
                   <td className="px-3 py-2 portal-heading">{user.display_name}</td>
                   <td className="px-3 py-2 portal-text-muted">{user.email}</td>
                   <td className="px-3 py-2">
@@ -352,7 +352,7 @@ export function AdminAccessPanel() {
         </p>
         <ul className="mt-4 space-y-3">
           {groups.map((group) => (
-            <li key={group.id} className="rounded-xl border border-white/10 p-4">
+            <li key={group.id} className="rounded-xl border border-edge-subtle p-4">
               {editingGroupId === group.id ? (
                 <div className="grid gap-3 md:grid-cols-2">
                   <input
@@ -472,7 +472,7 @@ export function AdminAccessPanel() {
         <ul className="mt-4 max-h-64 space-y-2 overflow-y-auto text-sm">
           {auditEvents.length ? (
             auditEvents.map((event) => (
-              <li key={event.id} className="rounded-lg border border-white/10 px-3 py-2">
+              <li key={event.id} className="rounded-lg border border-edge-subtle px-3 py-2">
                 <p className="portal-heading">
                   {event.action}
                   {event.detail ? ` — ${event.detail}` : ""}

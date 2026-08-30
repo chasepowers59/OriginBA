@@ -18,10 +18,10 @@ export function DatabaseResultChart({
     <div className="border-b border-[var(--border-subtle)] bg-[var(--surface-subtle)] p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-fg-muted">
             Chart view
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-fg-muted">
             {prettifyFieldName(suggestion.dimensionKey)} vs{" "}
             {prettifyFieldName(suggestion.measureKey)}
             {chartRows.length < rows.length

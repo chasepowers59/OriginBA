@@ -67,7 +67,7 @@ export default function OrgSwitcher({
         className={`rounded-md border px-2 py-1 text-sm ${
           viewingOther
             ? "border-amber-500/60 bg-amber-500/10 text-amber-700 dark:text-amber-300"
-            : "border-white/10 bg-white/5"
+            : "border-edge-subtle bg-chip"
         }`}
       >
         {orgs.map((o) => (

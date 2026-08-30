@@ -76,10 +76,10 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400">
           Ask a question
         </p>
-        <h2 className={`mt-1 font-bold text-white ${compact ? "text-lg" : "text-xl"}`}>
+        <h2 className={`mt-1 font-bold text-heading ${compact ? "text-lg" : "text-xl"}`}>
           Everyday utility metrics
         </h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-fg-muted">
           Governed canvas answers for billing, payments, field work, debt, and operations — adjust
           parameters and re-run.
         </p>
@@ -95,7 +95,7 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
           disabled={loading}
         />
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-          <label className="block text-xs text-slate-500">
+          <label className="block text-xs text-fg-muted">
             Period (days)
             <input
               type="number"
@@ -106,7 +106,7 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
               className="input-modern mt-1"
             />
           </label>
-          <label className="block text-xs text-slate-500">
+          <label className="block text-xs text-fg-muted">
             Bill cycle (optional)
             <input
               type="text"
@@ -116,7 +116,7 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
               placeholder="Cycle description"
             />
           </label>
-          <label className="block text-xs text-slate-500">
+          <label className="block text-xs text-fg-muted">
             Customer class (optional)
             <input
               type="text"
@@ -126,7 +126,7 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
               placeholder="Residential, C&I…"
             />
           </label>
-          <label className="block text-xs text-slate-500">
+          <label className="block text-xs text-fg-muted">
             Payment type (optional)
             <input
               type="text"
@@ -136,7 +136,7 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
               placeholder="Tender type"
             />
           </label>
-          <label className="block text-xs text-slate-500">
+          <label className="block text-xs text-fg-muted">
             Rate schedule (optional)
             <input
               type="text"
@@ -156,7 +156,7 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
         <div className="mt-4 max-h-64 space-y-3 overflow-y-auto">
           {grouped.map(([category, items]) => (
             <div key={category}>
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-fg-muted">
                 {category}
               </p>
               <div className="mt-1 flex flex-wrap gap-2">

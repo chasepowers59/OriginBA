@@ -35,18 +35,18 @@ export function DashboardWidget({
 
   const inner = (
     <>
-      <div className="border-b border-white/5 px-4 py-3">
+      <div className="border-b border-edge-subtle px-4 py-3">
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-wider text-sky-400/80">
               {workstreamDisplayName(kpi.workstream)}
             </p>
-            <h3 className="mt-0.5 font-semibold text-white group-hover:text-sky-100">{kpi.label}</h3>
-            <p className="mt-0.5 text-xs text-slate-500">{kpi.subtitle}</p>
+            <h3 className="mt-0.5 font-semibold text-heading group-hover:text-sky-100">{kpi.label}</h3>
+            <p className="mt-0.5 text-xs text-fg-muted">{kpi.subtitle}</p>
           </div>
-          <span className="shrink-0 text-slate-600 transition group-hover:text-sky-400">→</span>
+          <span className="shrink-0 text-fg-muted transition group-hover:text-sky-400">→</span>
         </div>
-        <p className={`mt-3 font-bold tracking-tight tabular-nums text-white ${compact ? "text-2xl" : "text-3xl"}`}>
+        <p className={`mt-3 font-bold tracking-tight tabular-nums text-heading ${compact ? "text-2xl" : "text-3xl"}`}>
           {formatted}
         </p>
         {showCompare ? (
@@ -80,7 +80,7 @@ export function DashboardWidget({
     return (
       <div className="group glass-panel block overflow-hidden transition hover:border-sky-400/30">
         {inner}
-        <Link href={exploreHref} className="block border-t border-white/5 px-4 py-2 text-xs text-sky-400">
+        <Link href={exploreHref} className="block border-t border-edge-subtle px-4 py-2 text-xs text-sky-400">
           Open full report →
         </Link>
       </div>

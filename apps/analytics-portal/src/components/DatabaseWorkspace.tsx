@@ -374,7 +374,7 @@ export function DatabaseWorkspace({
               className={`rounded-md px-2.5 py-1 text-xs capitalize transition ${
                 resultView === mode
                   ? "bg-sky-500/20 text-sky-300"
-                  : "portal-text-muted hover:bg-white/5 disabled:opacity-40"
+                  : "portal-text-muted hover:bg-chip disabled:opacity-40"
               }`}
               title={
                 mode !== "table" && !chartSuggestion
@@ -429,7 +429,7 @@ export function DatabaseWorkspace({
                   className={`flex-1 px-2 py-2 text-[11px] font-medium ${
                     sidebarTab === id
                       ? "border-b-2 border-sky-400 text-sky-300"
-                      : "portal-text-muted hover:text-slate-300"
+                      : "portal-text-muted hover:text-fg"
                   }`}
                 >
                   {label}
@@ -468,7 +468,7 @@ export function DatabaseWorkspace({
                       <p className="mt-0.5 text-sm font-medium text-[var(--heading)]">
                         {template.title}
                       </p>
-                      <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
+                      <p className="mt-1 text-[11px] leading-relaxed text-fg-muted">
                         {template.description}
                       </p>
                     </button>
@@ -486,7 +486,7 @@ export function DatabaseWorkspace({
                     className="input-modern w-full py-1.5 text-xs"
                   />
                   {tablesLoading ? (
-                    <p className="px-1 py-2 text-xs text-slate-500">Loading…</p>
+                    <p className="px-1 py-2 text-xs text-fg-muted">Loading…</p>
                   ) : (
                     <ul className="space-y-0.5">
                       {tables.map((t) => (
@@ -494,7 +494,7 @@ export function DatabaseWorkspace({
                           <button
                             type="button"
                             onClick={() => insertTable(t.table_name)}
-                            className="w-full rounded-lg px-2 py-1.5 text-left text-xs hover:bg-white/10"
+                            className="w-full rounded-lg px-2 py-1.5 text-left text-xs hover:bg-chip"
                           >
                             <span className="font-mono text-sky-300/90">{t.table_name}</span>
                           </button>
@@ -506,7 +506,7 @@ export function DatabaseWorkspace({
               ) : null}
 
               {sidebarTab === "tips" ? (
-                <ul className="space-y-3 text-xs leading-relaxed text-slate-400">
+                <ul className="space-y-3 text-xs leading-relaxed text-fg-muted">
                   {workspaceTips.map((tip) => (
                     <li key={tip} className="flex gap-2">
                       <span className="text-sky-400">•</span>
@@ -530,10 +530,10 @@ export function DatabaseWorkspace({
 
           <div className="border-b border-[var(--border)]">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--chip-bg)] px-3 py-1">
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-fg-muted">
                 SQL worksheet
               </span>
-              <span className="text-[10px] text-slate-500">Ctrl+Enter to run · read-only SELECT</span>
+              <span className="text-[10px] text-fg-muted">Ctrl+Enter to run · read-only SELECT</span>
             </div>
             <textarea
               ref={editorRef}
@@ -559,10 +559,10 @@ export function DatabaseWorkspace({
 
           <div className="flex min-h-0 flex-1 flex-col">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--chip-bg)] px-3 py-1">
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-fg-muted">
                 Results
               </span>
-              <span className="font-mono text-[10px] text-slate-500">{statusText}</span>
+              <span className="font-mono text-[10px] text-fg-muted">{statusText}</span>
             </div>
 
             {showChart && chartSuggestion ? (
@@ -595,13 +595,13 @@ export function DatabaseWorkspace({
                   <table className="min-w-full border-collapse text-left text-xs">
                     <thead className="sticky top-0 z-10 bg-slate-950/95 backdrop-blur">
                       <tr>
-                        <th className="border-b border-white/10 px-2 py-2 text-center font-normal text-slate-500">
+                        <th className="border-b border-edge-subtle px-2 py-2 text-center font-normal text-fg-muted">
                           #
                         </th>
                         {columns.map((col) => (
                           <th
                             key={col}
-                            className={`whitespace-nowrap border-b border-white/10 px-3 py-2 font-medium text-slate-400 ${
+                            className={`whitespace-nowrap border-b border-edge-subtle px-3 py-2 font-medium text-fg-muted ${
                               numericColumns.has(col) ? "text-right" : "text-left"
                             }`}
                           >
@@ -614,11 +614,11 @@ export function DatabaseWorkspace({
                       {accumulatedRows.map((row, idx) => (
                         <tr
                           key={idx}
-                          className={`border-t border-white/5 hover:bg-white/[0.04] ${
+                          className={`border-t border-edge-subtle hover:bg-white/[0.04] ${
                             idx % 2 === 0 ? "" : "bg-white/[0.02]"
                           }`}
                         >
-                          <td className="px-2 py-1.5 text-center font-mono text-[10px] text-slate-600">
+                          <td className="px-2 py-1.5 text-center font-mono text-[10px] text-fg-muted">
                             {idx + 1}
                           </td>
                           {columns.map((col) => {
@@ -631,8 +631,8 @@ export function DatabaseWorkspace({
                               <td
                                 key={col}
                                 className={`max-w-xs truncate whitespace-nowrap px-3 py-1.5 font-mono ${
-                                  isNum ? "text-right text-emerald-200/90" : "text-slate-200"
-                                } ${raw == null ? "text-slate-600" : ""}`}
+                                  isNum ? "text-right text-emerald-200/90" : "text-heading"
+                                } ${raw == null ? "text-fg-muted" : ""}`}
                                 title={raw != null ? String(raw) : undefined}
                               >
                                 {display}
@@ -650,7 +650,7 @@ export function DatabaseWorkspace({
         </div>
       </div>
 
-      <div className="flex items-center justify-between border-t border-[var(--border)] bg-[var(--surface-subtle)] px-3 py-1.5 font-mono text-[10px] text-slate-500">
+      <div className="flex items-center justify-between border-t border-[var(--border)] bg-[var(--surface-subtle)] px-3 py-1.5 font-mono text-[10px] text-fg-muted">
         <span>{statusText}</span>
         <span>
           {chartSuggestion ? "Chart available · " : ""}
