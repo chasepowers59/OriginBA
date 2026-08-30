@@ -31,15 +31,15 @@ export function NlqAnswerCard({ result, days, onPinToDashboard }: NlqAnswerCardP
           {result.metric_label}
         </p>
       ) : null}
-      {display ? <p className="mt-2 text-3xl font-bold text-white">{display}</p> : null}
-      <p className="mt-2 text-sm leading-relaxed text-slate-200">{result.narrative}</p>
+      {display ? <p className="mt-2 text-3xl font-bold text-heading">{display}</p> : null}
+      <p className="mt-2 text-sm leading-relaxed text-heading">{result.narrative}</p>
       {value === 0 ? (
         <p className="mt-2 text-xs text-amber-200/90">
           No rows in this period — try widening to 180 or 365 days for billing and finance metrics.
         </p>
       ) : null}
       {result.resolved_from ? (
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2 text-xs text-fg-muted">
           Source:{" "}
           <Link
             href={`/explore/${result.resolved_from}?tab=model`}
@@ -66,12 +66,12 @@ export function NlqAnswerCard({ result, days, onPinToDashboard }: NlqAnswerCardP
         ) : null}
       </div>
       {result.table?.rows?.length ? (
-        <div className="mt-3 overflow-auto rounded-lg border border-white/5">
+        <div className="mt-3 overflow-auto rounded-lg border border-edge-subtle">
           <table className="min-w-full text-left text-xs">
             <thead>
               <tr>
                 {result.table.columns.map((c) => (
-                  <th key={c} className="px-3 py-2 text-slate-500">
+                  <th key={c} className="px-3 py-2 text-fg-muted">
                     {c}
                   </th>
                 ))}
@@ -79,9 +79,9 @@ export function NlqAnswerCard({ result, days, onPinToDashboard }: NlqAnswerCardP
             </thead>
             <tbody>
               {result.table.rows.slice(0, 8).map((row, i) => (
-                <tr key={i} className="border-t border-white/5">
-                  <td className="px-3 py-1.5 text-slate-200">{row.label}</td>
-                  <td className="px-3 py-1.5 text-slate-200">{row.value}</td>
+                <tr key={i} className="border-t border-edge-subtle">
+                  <td className="px-3 py-1.5 text-heading">{row.label}</td>
+                  <td className="px-3 py-1.5 text-heading">{row.value}</td>
                 </tr>
               ))}
             </tbody>

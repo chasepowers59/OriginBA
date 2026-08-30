@@ -506,8 +506,8 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 onClick={() => selectTab(key)}
                 className={`rounded-xl px-2 py-2.5 text-xs font-medium transition sm:text-sm ${
                   tab === key
-                    ? "bg-gradient-to-r from-sky-500/20 to-indigo-500/20 text-white ring-1 ring-sky-400/30"
-                    : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                    ? "bg-gradient-to-r from-sky-500/20 to-indigo-500/20 text-heading ring-1 ring-sky-400/30"
+                    : "text-fg-muted hover:bg-chip hover:text-heading"
                 }`}
               >
                 {label}
@@ -551,10 +551,10 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         <FavoritesPanel compact />
 
         <div className="glass-panel p-4">
-          <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+          <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
             Reporting period
           </p>
-          <p className="mb-3 text-xs text-slate-600">Filtered by {dateFieldLabel.toLowerCase()}</p>
+          <p className="mb-3 text-xs text-fg-muted">Filtered by {dateFieldLabel.toLowerCase()}</p>
           <div className="mb-3 flex flex-wrap gap-2">
             {DATE_PRESETS.map((p) => (
               <button
@@ -568,7 +568,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             ))}
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <label className="block text-xs text-slate-500">
+            <label className="block text-xs text-fg-muted">
               Start date
               <input
                 type="date"
@@ -580,7 +580,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 className="input-modern mt-1"
               />
             </label>
-            <label className="block text-xs text-slate-500">
+            <label className="block text-xs text-fg-muted">
               End date
               <input
                 type="date"
@@ -608,7 +608,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
 
         {tab === "reports" ? (
           <div className="glass-panel p-4">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
               Ready-to-run reports
             </p>
             <div className="space-y-2">
@@ -621,21 +621,21 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                   className={`w-full rounded-xl border px-4 py-3 text-left transition disabled:opacity-60 ${
                     activeReportId === report.id
                       ? "border-sky-400/40 bg-sky-500/10 ring-1 ring-sky-400/20"
-                      : "border-white/5 bg-slate-950/30 hover:border-white/15 hover:bg-white/5"
+                      : "border-edge-subtle bg-surface-subtle hover:border-edge-subtle hover:bg-chip"
                   }`}
                 >
-                  <div className="font-medium text-white">{report.title}</div>
-                  <div className="mt-1 text-xs text-slate-500">{report.description}</div>
+                  <div className="font-medium text-heading">{report.title}</div>
+                  <div className="mt-1 text-xs text-fg-muted">{report.description}</div>
                 </button>
               ))}
             </div>
           </div>
         ) : (
           <div className="glass-panel space-y-3 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
               Build your view
             </p>
-            <label className="block text-xs text-slate-500">
+            <label className="block text-xs text-fg-muted">
               Time trend (optional)
               <select
                 value={timeGrain}
@@ -652,7 +652,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 <option value="year">Trend by year</option>
               </select>
             </label>
-            <label className="block text-xs text-slate-500">
+            <label className="block text-xs text-fg-muted">
               Field
               <select
                 value={dimensions[0] ?? ""}
@@ -668,7 +668,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 ))}
               </select>
             </label>
-            <label className="block text-xs text-slate-500">
+            <label className="block text-xs text-fg-muted">
               Metric
               <select
                 value={measureField}
@@ -688,7 +688,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 ))}
               </select>
             </label>
-            <label className="block text-xs text-slate-500">
+            <label className="block text-xs text-fg-muted">
               Calculation
               <select
                 value={measureAgg}
@@ -704,7 +704,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 )}
               </select>
             </label>
-            <label className="block text-xs text-slate-500">
+            <label className="block text-xs text-fg-muted">
               Chart style
               <div className="mt-2 flex flex-wrap gap-2">
                 {(["bar", "horizontal", "line", "pie", "table"] as const).map((t) => (

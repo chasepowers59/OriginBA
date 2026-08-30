@@ -21,7 +21,7 @@ export function LargeDomainBanner({
           <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-300">
             Large governed domain
           </p>
-          <h3 className="mt-1 text-lg font-semibold text-white">{snapshotLabel}</h3>
+          <h3 className="mt-1 text-lg font-semibold text-heading">{snapshotLabel}</h3>
           <p className="mt-2 text-sm text-amber-100/90">
             This canvas has{" "}
             {rowCount != null ? (

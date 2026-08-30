@@ -34,13 +34,13 @@ export function HomeDashboard() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400">
             {brandLine(brand)}
           </p>
-          <h1 className="mt-2 max-w-2xl text-4xl font-bold tracking-tight text-white md:text-5xl">
+          <h1 className="mt-2 max-w-2xl text-4xl font-bold tracking-tight text-heading md:text-5xl">
             Governed analytics across{" "}
             <span className="bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">
               every utility workstream
             </span>
           </h1>
-          <p className="mt-4 max-w-2xl text-lg text-slate-400">
+          <p className="mt-4 max-w-2xl text-lg text-fg-muted">
             {brand.tagline}. Start with governed report packs for billing close, payments,
             operations, and collections — or ask a question in plain language.
           </p>
@@ -52,7 +52,7 @@ export function HomeDashboard() {
               Data quality board
             </Link>
           </div>
-          <p className="mt-4 text-xs text-slate-500">
+          <p className="mt-4 text-xs text-fg-muted">
             {workstreamCount} workstreams · {snapshotCount || 19} reporting canvases
           </p>
         </div>
@@ -70,7 +70,7 @@ export function HomeDashboard() {
 
       <section>
         <div className="mb-3 flex items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold text-white">Saved views</h2>
+          <h2 className="text-lg font-semibold text-heading">Saved views</h2>
           <Link href="/reports" className="text-xs text-sky-400 hover:text-sky-300">
             Browse all reports →
           </Link>
@@ -87,7 +87,7 @@ export function SnapshotCard({ snap }: { snap: SnapshotSummary }) {
   return (
     <Link
       href={`/explore/${snap.id}`}
-      className="group glass-panel-subtle block p-5 transition hover:border-sky-400/30 hover:bg-slate-900/60 hover:shadow-lg hover:shadow-sky-500/5"
+      className="group glass-panel-subtle block p-5 transition hover:border-sky-400/30 hover:bg-surface-subtle hover:shadow-lg hover:shadow-sky-500/5"
     >
       <div className="flex items-start justify-between gap-3">
         {snap.poc_enabled ? (
@@ -95,12 +95,12 @@ export function SnapshotCard({ snap }: { snap: SnapshotSummary }) {
         ) : (
           <span className="chip text-[10px]">Browse & SQL</span>
         )}
-        <span className="text-slate-600 transition group-hover:text-sky-400">View →</span>
+        <span className="text-fg-muted transition group-hover:text-sky-400">View →</span>
       </div>
-      <h3 className="mt-3 text-lg font-semibold text-white group-hover:text-sky-100">
+      <h3 className="mt-3 text-lg font-semibold text-heading group-hover:text-sky-100">
         {snap.label}
       </h3>
-      <p className="mt-2 line-clamp-3 text-sm text-slate-500">
+      <p className="mt-2 line-clamp-3 text-sm text-fg-muted">
         {summary || snap.grain_description || "Explore this governed reporting canvas."}
       </p>
     </Link>

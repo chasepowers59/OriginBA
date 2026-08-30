@@ -40,7 +40,7 @@ export function WorkstreamExplorer({
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
                       href={`/workstream/${ws.id}`}
-                      className="text-lg font-semibold text-white hover:text-sky-200"
+                      className="text-lg font-semibold text-heading hover:text-sky-200"
                     >
                       {ws.label ?? workstreamDisplayName(ws.id)}
                     </Link>
@@ -49,15 +49,15 @@ export function WorkstreamExplorer({
                       Dashboard →
                     </Link>
                   </div>
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="mt-1 text-sm text-fg-muted">
                     {WORKSTREAM_DESCRIPTIONS[ws.id] ?? "Governed report domains"}
                   </p>
                 </div>
               </div>
-              <span className="shrink-0 text-slate-500">{isOpen ? "▾" : "▸"}</span>
+              <span className="shrink-0 text-fg-muted">{isOpen ? "▾" : "▸"}</span>
             </button>
             {isOpen ? (
-              <div className="border-t border-white/10 px-5 pb-5 pt-4">
+              <div className="border-t border-edge-subtle px-5 pb-5 pt-4">
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                   {ws.snapshots.map((snap) => (
                     <SnapshotCard key={snap.id} snap={snap} />
@@ -136,10 +136,10 @@ export function WorkstreamSidebar({
 
   return (
     <div>
-      <div className="mb-4 space-y-1 border-b border-white/10 pb-4">
+      <div className="mb-4 space-y-1 border-b border-edge-subtle pb-4">
         <Link
           href="/dashboards"
-          className="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white"
+          className="block rounded-xl px-3 py-2 text-sm font-medium text-fg transition hover:bg-chip hover:text-heading"
         >
           Custom dashboards
         </Link>
@@ -160,7 +160,7 @@ export function WorkstreamSidebar({
             <button
               type="button"
               onClick={() => setExpandedWs((p) => ({ ...p, [ws.id]: !wsOpen }))}
-              className="mb-1 flex w-full items-center gap-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500"
+              className="mb-1 flex w-full items-center gap-2 text-left text-[11px] font-semibold uppercase tracking-wide text-fg-muted"
             >
               <span className="text-sky-400">{workstreamIcon(ws.id)}</span>
               <Link
@@ -170,7 +170,7 @@ export function WorkstreamSidebar({
               >
                 {ws.label ?? workstreamDisplayName(ws.id)}
               </Link>
-              <span className="text-slate-600">{wsOpen ? "▾" : "▸"}</span>
+              <span className="text-fg-muted">{wsOpen ? "▾" : "▸"}</span>
             </button>
             {wsOpen ? (
               <ul className="space-y-2 pl-1">
@@ -184,13 +184,13 @@ export function WorkstreamSidebar({
                         onClick={() =>
                           setExpandedProcess((p) => ({ ...p, [procKey]: !procOpen }))
                         }
-                        className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-medium text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                        className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-medium text-fg-muted hover:bg-chip hover:text-heading"
                       >
                         <span className="flex-1">{process.label}</span>
-                        <span className="text-slate-600">{procOpen ? "▾" : "▸"}</span>
+                        <span className="text-fg-muted">{procOpen ? "▾" : "▸"}</span>
                       </button>
                       {procOpen ? (
-                        <ul className="mt-1 space-y-0.5 border-l border-white/10 pl-3">
+                        <ul className="mt-1 space-y-0.5 border-l border-edge-subtle pl-3">
                           {process.reports.map((report) => {
                             const active =
                               activeId === report.snapshot_id &&
@@ -205,8 +205,8 @@ export function WorkstreamSidebar({
                                   })}
                                   className={`block rounded-lg px-2 py-1.5 text-sm transition ${
                                     active
-                                      ? "bg-gradient-to-r from-sky-500/20 to-indigo-500/20 text-white ring-1 ring-sky-400/30"
-                                      : "text-slate-400 hover:bg-white/5 hover:text-slate-100"
+                                      ? "bg-gradient-to-r from-sky-500/20 to-indigo-500/20 text-heading ring-1 ring-sky-400/30"
+                                      : "text-fg-muted hover:bg-chip hover:text-heading"
                                   }`}
                                 >
                                   <span className="font-medium">{report.title}</span>
@@ -225,7 +225,7 @@ export function WorkstreamSidebar({
         );
       })}
         {filteredWorkstreams.length === 0 ? (
-          <p className="text-xs text-slate-500">No processes match your search.</p>
+          <p className="text-xs text-fg-muted">No processes match your search.</p>
         ) : null}
       </div>
     </div>

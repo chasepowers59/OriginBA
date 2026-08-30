@@ -51,7 +51,7 @@ export function AppShell({
             <div>
               <div className="flex flex-wrap items-baseline gap-2">
                 <span className="portal-heading text-xl font-bold tracking-tight">{brand.name}</span>
-                <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs font-medium text-sky-600 ring-1 ring-white/10 dark:text-sky-300">
+                <span className="rounded-full bg-chip px-2 py-0.5 text-xs font-medium text-sky-600 ring-1 ring-edge-subtle dark:text-sky-300">
                   {brand.product}
                 </span>
               </div>
@@ -70,8 +70,8 @@ export function AppShell({
                   href={item.href}
                   className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
                     active
-                      ? "bg-white/10 portal-heading ring-1 ring-white/10"
-                      : "portal-text-muted hover:bg-white/5 hover:text-slate-700 dark:hover:text-slate-200"
+                      ? "bg-chip portal-heading ring-1 ring-edge-subtle"
+                      : "portal-text-muted hover:bg-chip hover:text-slate-700 dark:hover:text-heading"
                   }`}
                 >
                   {item.label}
