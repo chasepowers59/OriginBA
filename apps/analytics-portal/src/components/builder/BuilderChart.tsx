@@ -24,6 +24,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { formatCurrency, formatNumber } from "@/lib/format";
+import { barEmphasisRoles, type BarEmphasis } from "@/lib/chartEmphasis";
 
 export type BuilderVisual =
   | "bar"
@@ -43,6 +44,13 @@ type BuilderChartProps = {
   series: ChartSeries[];
   visual: BuilderVisual;
   height?: number;
+  // Cross-filter: highlight one category and report clicks (single-measure surfaces).
+  selectedCategory?: string | null;
+  onCategorySelect?: (category: string) => void;
+  // Single-series bar/horizontal: emphasize the max bar, mute the rest (ported ChartView).
+  emphasizeMax?: boolean;
+  emptyMessage?: string;
+  sortTimeSeries?: boolean;
 };
 
 // Series colors come from the theme's --chart-1..5 (light + dark aware, defined in
@@ -55,6 +63,12 @@ const SERIES_VARS = [
   "var(--chart-5)",
 ];
 
+const ROLE_FILL: Record<BarEmphasis, string> = {
+  selected: "var(--chart-selected)",
+  emphasis: "var(--chart-1)",
+  base: "color-mix(in srgb, var(--chart-1) 32%, transparent)",
+};
+
 export function BuilderChart({
   rows,
   xKey,
@@ -62,6 +76,11 @@ export function BuilderChart({
   series,
   visual,
   height = 340,
+  selectedCategory = null,
+  onCategorySelect,
+  emphasizeMax = false,
+  emptyMessage = "Drop a dimension and a measure to see a chart",
+  sortTimeSeries = false,
 }: BuilderChartProps) {
   const config = useMemo<ChartConfig>(() => {
     const c: ChartConfig = {};
@@ -71,20 +90,42 @@ export function BuilderChart({
     return c;
   }, [series]);
 
-  const data = useMemo(
-    () =>
-      rows.map((r) => {
-        const row: Record<string, unknown> = {
-          [xKey]: String(r[xKey] ?? "—"),
-        };
-        for (const s of series) row[s.key] = Number(r[s.key] ?? 0);
-        return row;
-      }),
-    [rows, xKey, series],
-  );
+  const data = useMemo(() => {
+    const mapped = rows.map((r) => {
+      const row: Record<string, unknown> = { [xKey]: String(r[xKey] ?? "—") };
+      for (const s of series) row[s.key] = Number(r[s.key] ?? 0);
+      return row;
+    });
+    if (sortTimeSeries) {
+      return [...mapped].sort((a, b) => String(a[xKey]).localeCompare(String(b[xKey])));
+    }
+    return mapped;
+  }, [rows, xKey, series, sortTimeSeries]);
 
   const anyCurrency = series.some((s) => s.currency);
   const fmt = (v: number) => (anyCurrency ? formatCurrency(v) : formatNumber(v));
+
+  // Single-measure emphasis / selection colouring for bar + horizontal. When neither
+  // emphasis nor a selection applies, bars keep their flat themed series colour.
+  const singleSeries = series.length === 1;
+  const useEmphasis = singleSeries && (emphasizeMax || Boolean(selectedCategory));
+  const barRoles = useMemo<BarEmphasis[] | null>(() => {
+    if (!useEmphasis) return null;
+    const key = series[0].key;
+    return barEmphasisRoles(
+      data.map((d) => String(d[xKey])),
+      data.map((d) => Number(d[key] ?? 0)),
+      selectedCategory,
+    );
+  }, [useEmphasis, data, xKey, series, selectedCategory]);
+
+  const cellFill = (i: number, fallback: string) =>
+    barRoles ? ROLE_FILL[barRoles[i]] : fallback;
+
+  const handleSelect = (category: unknown) => {
+    if (onCategorySelect && category != null) onCategorySelect(String(category));
+  };
+  const clickCursor = onCategorySelect ? "pointer" : "default";
 
   if (!data.length || !series.length) {
     return (
@@ -92,7 +133,7 @@ export function BuilderChart({
         className="flex items-center justify-center rounded-xl border border-dashed"
         style={{ height, borderColor: "var(--border)", color: "var(--foreground-subtle)" }}
       >
-        Drop a dimension and a measure to see a chart
+        {emptyMessage}
       </div>
     );
   }
@@ -118,10 +159,27 @@ export function BuilderChart({
       <ChartContainer config={config} style={{ height }} className="w-full">
         <PieChart>
           {tip}
-          <Pie data={data} dataKey={key} nameKey={xKey} innerRadius={64} outerRadius={120} paddingAngle={2}>
-            {data.map((_, i) => (
-              <Cell key={i} fill={SERIES_VARS[i % SERIES_VARS.length]} />
-            ))}
+          <Pie
+            data={data}
+            dataKey={key}
+            nameKey={xKey}
+            innerRadius={64}
+            outerRadius={120}
+            paddingAngle={2}
+            onClick={(d: Record<string, unknown>) => handleSelect(d?.[xKey] ?? (d?.payload as Record<string, unknown>)?.[xKey])}
+            style={{ cursor: clickCursor }}
+          >
+            {data.map((d, i) => {
+              const isSelected = selectedCategory != null && String(d[xKey]) === selectedCategory;
+              return (
+                <Cell
+                  key={i}
+                  fill={isSelected ? "var(--chart-selected)" : SERIES_VARS[i % SERIES_VARS.length]}
+                  stroke={isSelected ? "var(--chart-selected)" : "transparent"}
+                  strokeWidth={2}
+                />
+              );
+            })}
           </Pie>
           <ChartLegend content={<ChartLegendContent nameKey={xKey} />} />
         </PieChart>
@@ -138,9 +196,22 @@ export function BuilderChart({
           <YAxis type="category" dataKey={xKey} width={130} tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} axisLine={false} tickLine={false} />
           {tip}
           {legend}
-          {series.map((s) => (
-            <Bar key={s.key} dataKey={s.key} fill={`var(--color-${s.key})`} radius={[0, 4, 4, 0]} />
-          ))}
+          {singleSeries ? (
+            <Bar
+              dataKey={series[0].key}
+              radius={[0, 4, 4, 0]}
+              onClick={(d: Record<string, unknown>) => handleSelect(d?.[xKey])}
+              style={{ cursor: clickCursor }}
+            >
+              {data.map((_, i) => (
+                <Cell key={i} fill={cellFill(i, `var(--color-${series[0].key})`)} />
+              ))}
+            </Bar>
+          ) : (
+            series.map((s) => (
+              <Bar key={s.key} dataKey={s.key} fill={`var(--color-${s.key})`} radius={[0, 4, 4, 0]} />
+            ))
+          )}
         </BarChart>
       </ChartContainer>
     );
@@ -207,9 +278,23 @@ export function BuilderChart({
         <YAxis tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} tickFormatter={fmt} axisLine={false} tickLine={false} width={56} />
         {tip}
         {legend}
-        {series.map((s) => (
-          <Bar key={s.key} dataKey={s.key} fill={`var(--color-${s.key})`} radius={stackId ? 0 : [4, 4, 0, 0]} stackId={stackId} />
-        ))}
+        {singleSeries ? (
+          <Bar
+            dataKey={series[0].key}
+            radius={stackId ? 0 : [4, 4, 0, 0]}
+            stackId={stackId}
+            onClick={(d: Record<string, unknown>) => handleSelect(d?.[xKey])}
+            style={{ cursor: clickCursor }}
+          >
+            {data.map((_, i) => (
+              <Cell key={i} fill={cellFill(i, `var(--color-${series[0].key})`)} />
+            ))}
+          </Bar>
+        ) : (
+          series.map((s) => (
+            <Bar key={s.key} dataKey={s.key} fill={`var(--color-${s.key})`} radius={stackId ? 0 : [4, 4, 0, 0]} stackId={stackId} />
+          ))
+        )}
       </BarChart>
     </ChartContainer>
   );

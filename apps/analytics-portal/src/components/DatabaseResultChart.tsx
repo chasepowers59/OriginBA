@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { ChartView } from "@/components/ChartView";
+import { BuilderChart } from "@/components/builder/BuilderChart";
 import type { ChartSuggestion } from "@/lib/databaseChartUtils";
 import { prettifyFieldName } from "@/lib/businessLabels";
 
@@ -30,15 +30,23 @@ export function DatabaseResultChart({
           </p>
         </div>
       </div>
-      <div className="h-72 rounded-xl border border-[var(--border)] bg-[var(--surface-solid)] p-2">
-        <ChartView
-          chartType={suggestion.chartType === "horizontal" ? "horizontal" : suggestion.chartType}
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-solid)] p-2">
+        <BuilderChart
+          visual={suggestion.chartType}
           rows={chartRows}
-          dimensionKey={suggestion.dimensionKey}
-          measureKey={suggestion.measureKey}
-          measureLabel={prettifyFieldName(suggestion.measureKey)}
-          isCurrency={suggestion.isCurrency}
+          xKey={suggestion.dimensionKey}
+          xLabel={prettifyFieldName(suggestion.dimensionKey)}
+          series={[
+            {
+              key: suggestion.measureKey,
+              label: prettifyFieldName(suggestion.measureKey),
+              currency: suggestion.isCurrency,
+            },
+          ]}
+          emphasizeMax
           sortTimeSeries={suggestion.sortTimeSeries}
+          height={272}
+          emptyMessage="No chart data for this result"
         />
       </div>
     </div>

@@ -9,7 +9,7 @@ import {
 import { formatCurrency, formatNumber } from "@/lib/format";
 import { measureDisplaysAsCurrency } from "@/lib/businessLabels";
 import type { DashboardTileDef, QueryResponse } from "@/lib/types";
-import { ChartView } from "./ChartView";
+import { BuilderChart } from "./builder/BuilderChart";
 import { useCrossFilter } from "./CrossFilterContext";
 
 type DashboardTileProps = {
@@ -163,14 +163,24 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
     <div className="glass-panel flex h-full flex-col p-4">
       <p className="mb-2 text-sm font-medium text-white">{tile.title}</p>
       <div className="flex-1">
-        <ChartView
-          chartType={effectiveChart}
+        <BuilderChart
+          visual={effectiveChart}
           rows={result.rows}
-          dimensionKey={dimensionKey}
-          measureKey={measureKey}
-          isCurrency={isCurrency}
+          xKey={dimensionKey}
+          xLabel={dimensionKey}
+          series={[
+            {
+              key: measureKey,
+              label: queryMeasureField === "*" ? "Count" : queryMeasureField,
+              currency: isCurrency,
+            },
+          ]}
+          emphasizeMax
           sortTimeSeries={isTimeSeries}
-          onCategoryClick={dimensionKey.startsWith("TD") ? undefined : handleClick}
+          selectedCategory={filter && filter.field === dimensionKey ? filter.value : null}
+          onCategorySelect={dimensionKey.startsWith("TD") ? undefined : handleClick}
+          height={240}
+          emptyMessage="No chart data for this tile"
         />
       </div>
     </div>

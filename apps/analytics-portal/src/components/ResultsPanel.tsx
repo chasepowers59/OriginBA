@@ -16,7 +16,7 @@ import {
   measureDisplaysAsCurrency,
   prettifyFieldName,
 } from "@/lib/businessLabels";
-import { ChartView } from "./ChartView";
+import { BuilderChart } from "./builder/BuilderChart";
 import { printCouncilPack } from "@/lib/councilPack";
 import { useBrand } from "@/components/PortalThemeProvider";
 
@@ -256,16 +256,23 @@ export function ResultsPanel({
 
       {dimensionKey && measureKey && chartType !== "table" ? (
         <div className="glass-panel p-5">
-          <ChartView
-            chartType={chartType}
+          <BuilderChart
+            visual={chartType as "bar" | "line" | "pie" | "horizontal"}
             rows={sortedRows}
-            dimensionKey={dimensionKey}
-            measureKey={measureKey}
-            measureLabel={columnLabels[measureKey] ?? "Value"}
-            isCurrency={isCurrency}
+            xKey={dimensionKey}
+            xLabel={columnLabels[dimensionKey] ?? dimensionKey}
+            series={[
+              {
+                key: measureKey,
+                label: columnLabels[measureKey] ?? "Value",
+                currency: isCurrency,
+              },
+            ]}
+            emphasizeMax
             selectedCategory={drillFilter?.value ?? null}
-            onCategoryClick={onDrillSelect}
+            onCategorySelect={onDrillSelect}
             sortTimeSeries={sortTimeSeries}
+            emptyMessage="No chart data for this selection"
           />
         </div>
       ) : null}
