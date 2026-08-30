@@ -1,0 +1,31 @@
+# OriginBA portal API on Render — deploys from GitHub, no card required (free tier).
+# Render reads this blueprint at the repo root. In the dashboard: New +  → Blueprint,
+# pick this repo. Free web services cold-start after ~15 min idle (~50s first hit) —
+# fine for a demo; move to the Starter plan (or Fly, fly.toml is ready) for always-on.
+services:
+  - type: web
+    name: originba-api
+    runtime: docker
+    dockerfilePath: ./deploy/Dockerfile.api
+    dockerContext: .
+    region: ohio                 # us-east, next to the Supabase us-east-2 project
+    plan: free
+    branch: main                 # the code must be on main; merge feature/bi-builder
+                                 # first, or change this to feature/bi-builder
+    autoDeploy: true             # redeploys on every push to the branch
+    healthCheckPath: /health
+    envVars:
+      # secrets — set in the Render dashboard (Environment), not in git
+      - key: PORTAL_AUTH_DATABASE_URL     # Supabase POOLED url (port 6543, ?sslmode=require)
+        sync: false
+      - key: PORTAL_AUTH_SECRET           # Render generates a strong value
+        generateValue: true
+      - key: PORTAL_BOOTSTRAP_ADMIN_EMAIL
+        sync: false
+      - key: PORTAL_BOOTSTRAP_ADMIN_PASSWORD
+        sync: false
+      - key: WAREHOUSE_DATABASE_URL        # a warehouse Render can reach (not localhost)
+        sync: false
+      # non-secret: the Vercel origins allowed through CORS
+      - key: PORTAL_CORS_ORIGINS
+        value: https://originba-portal.vercel.app,https://originba-portal-chase-powers-projects.vercel.app

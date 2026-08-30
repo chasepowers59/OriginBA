@@ -65,6 +65,17 @@ For an Oracle-serving build, swap the Dockerfile base to an Instant Client image
 uncomment `oracledb` in `deploy/requirements-api.txt`, and add the `<ORG>_DB_*`
 secrets — the Postgres orgs need none of that.
 
+### 2b. API on Render (no credit card — alternative to Fly)
+`render.yaml` (repo root) is a Blueprint. In Render: **New + → Blueprint → pick the
+`chasepowers59/OriginBA` repo**. It builds `deploy/Dockerfile.api`, health-checks
+`/health`, and **auto-deploys on every push**. Set the four `sync:false` secrets in
+the dashboard (the Supabase pooled URL, the two bootstrap-admin values, the warehouse
+URL); Render generates `PORTAL_AUTH_SECRET` and the CORS origins are baked in.
+The code must be on the blueprint's `branch` (default `main` — merge
+`feature/bi-builder` first, or set `branch: feature/bi-builder`). Free web services
+cold-start after idle; use the Starter plan or Fly for always-on. The API comes up at
+`https://originba-api.onrender.com`.
+
 ### 3. Vercel (frontend)
 - Project is linked to `chasepowers59/OriginBA`, root `apps/analytics-portal`
   (team `chase-powers-projects`). It builds the repo's production branch.
