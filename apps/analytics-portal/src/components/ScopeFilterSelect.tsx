@@ -42,11 +42,11 @@ export function ScopeFilterSelect({
 
   return (
     <div className="glass-panel space-y-3 p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
         Organization filter
       </p>
-      <p className="text-xs text-slate-600">Optional — narrow results by division or business unit</p>
-      <label className="block text-xs text-slate-500">
+      <p className="text-xs text-fg-muted">Optional — narrow results by division or business unit</p>
+      <label className="block text-xs text-fg-muted">
         Filter type
         <select
           value={field}
@@ -63,7 +63,7 @@ export function ScopeFilterSelect({
           ))}
         </select>
       </label>
-      <label className="block text-xs text-slate-500">
+      <label className="block text-xs text-fg-muted">
         Value
         <select
           value={selectedValue}

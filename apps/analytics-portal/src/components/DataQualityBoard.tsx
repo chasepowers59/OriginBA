@@ -39,9 +39,9 @@ type DqResponse = {
 };
 
 const SEV_STYLE: Record<string, string> = {
-  action: "bg-red-800 text-white",
-  review: "bg-amber-600 text-white",
-  info: "bg-slate-500 text-white",
+  action: "bg-red-800 text-heading",
+  review: "bg-amber-600 text-heading",
+  info: "bg-slate-500 text-heading",
 };
 const SEV_LABEL: Record<string, string> = {
   action: "ACT NOW",
@@ -98,7 +98,7 @@ export function DataQualityBoard() {
   }
   if (!data.configured) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+      <div className="rounded-lg border border-slate-200 bg-white p-8 text-center text-sm text-fg-muted">
         No reporting warehouse is configured for this organization, so the
         data-quality rules have nothing to run against.
       </div>
@@ -110,7 +110,7 @@ export function DataQualityBoard() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-slate-900">Data Quality</h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-fg-muted">
             Rules run against the governed reporting canvases; every finding says
             exactly where to act in CIS.
           </p>
@@ -149,7 +149,7 @@ export function DataQualityBoard() {
                 {SEV_LABEL[r.severity]}
               </span>
               <span className="font-medium text-slate-900">{r.title}</span>
-              <span className="ml-auto text-sm text-slate-500">
+              <span className="ml-auto text-sm text-fg-muted">
                 {r.error
                   ? "rule error"
                   : r.count
@@ -167,7 +167,7 @@ export function DataQualityBoard() {
               {r.error ? (
                 <p className="text-sm text-red-700">rule error: {r.error}</p>
               ) : r.count === 0 ? (
-                <p className="text-sm text-slate-400">No findings — clean.</p>
+                <p className="text-sm text-fg-muted">No findings — clean.</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-xs">
@@ -177,7 +177,7 @@ export function DataQualityBoard() {
                         {r.columns.map((c) => (
                           <th
                             key={c}
-                            className="whitespace-nowrap border-b border-slate-200 bg-slate-50 px-2 py-1.5 text-left font-semibold text-slate-600"
+                            className="whitespace-nowrap border-b border-slate-200 bg-slate-50 px-2 py-1.5 text-left font-semibold text-fg-muted"
                           >
                             {c}
                           </th>
@@ -206,17 +206,17 @@ export function DataQualityBoard() {
                     </tbody>
                   </table>
                   {r.capped && (
-                    <p className="mt-1 text-xs text-slate-400">showing first 100</p>
+                    <p className="mt-1 text-xs text-fg-muted">showing first 100</p>
                   )}
                 </div>
               )}
               {(r.acked_rows?.length ?? 0) > 0 && (
                 <details className="mt-2">
-                  <summary className="cursor-pointer text-xs text-slate-400">
+                  <summary className="cursor-pointer text-xs text-fg-muted">
                     {r.acked_rows!.length} marked done (hidden until the next data
                     refresh)
                   </summary>
-                  <ul className="mt-1 space-y-0.5 text-xs text-slate-500">
+                  <ul className="mt-1 space-y-0.5 text-xs text-fg-muted">
                     {r.acked_rows!.map((row, i) => (
                       <li key={i} className="flex items-center gap-2">
                         <button
@@ -257,7 +257,7 @@ function SummaryCard({
   return (
     <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
       <div className={`text-2xl font-semibold ${tones[tone]}`}>{value}</div>
-      <div className="text-xs text-slate-500">{label}</div>
+      <div className="text-xs text-fg-muted">{label}</div>
     </div>
   );
 }

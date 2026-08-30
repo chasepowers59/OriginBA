@@ -90,10 +90,10 @@ export function DataSourceSettings() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400">
           Data connection
         </p>
-        <h1 className="mt-1 text-2xl font-bold text-white">Settings</h1>
-        <p className="mt-2 max-w-2xl text-sm text-slate-400">
+        <h1 className="mt-1 text-2xl font-bold text-heading">Settings</h1>
+        <p className="mt-2 max-w-2xl text-sm text-fg-muted">
           Connect the analytics portal to your Oracle C2M database for{" "}
-          <span className="text-slate-200">{authUser?.organization_name ?? "your assigned client"}</span>.
+          <span className="text-heading">{authUser?.organization_name ?? "your assigned client"}</span>.
           Credentials are sent over HTTPS to the API only, encrypted at rest on the server, and never
           written to browser storage or git.
         </p>
@@ -101,30 +101,30 @@ export function DataSourceSettings() {
 
       {status ? (
         <div className="glass-panel p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
             Current connection
           </p>
           <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
             <div>
-              <dt className="text-slate-500">Source</dt>
-              <dd className="text-slate-200">{SOURCE_LABELS[status.source]}</dd>
+              <dt className="text-fg-muted">Source</dt>
+              <dd className="text-heading">{SOURCE_LABELS[status.source]}</dd>
             </div>
             <div>
-              <dt className="text-slate-500">Status</dt>
+              <dt className="text-fg-muted">Status</dt>
               <dd className={status.configured ? "text-emerald-300" : "text-amber-300"}>
                 {status.configured ? "Configured" : "Not connected"}
               </dd>
             </div>
             {status.user_masked ? (
               <div>
-                <dt className="text-slate-500">User</dt>
-                <dd className="font-mono text-slate-200">{status.user_masked}</dd>
+                <dt className="text-fg-muted">User</dt>
+                <dd className="font-mono text-heading">{status.user_masked}</dd>
               </div>
             ) : null}
             {status.dsn_masked ? (
               <div>
-                <dt className="text-slate-500">DSN</dt>
-                <dd className="font-mono text-slate-200">{status.dsn_masked}</dd>
+                <dt className="text-fg-muted">DSN</dt>
+                <dd className="font-mono text-heading">{status.dsn_masked}</dd>
               </div>
             ) : null}
           </dl>
@@ -138,10 +138,10 @@ export function DataSourceSettings() {
           void run("save");
         }}
       >
-        <p className="text-sm font-medium text-white">Oracle connection</p>
+        <p className="text-sm font-medium text-heading">Oracle connection</p>
 
         {status?.settings_token_required ? (
-          <label className="block text-xs text-slate-500">
+          <label className="block text-xs text-fg-muted">
             Admin settings token
             <input
               type="password"
@@ -151,13 +151,13 @@ export function DataSourceSettings() {
               placeholder="PORTAL_SETTINGS_TOKEN from server .env"
               autoComplete="off"
             />
-            <span className="mt-1 block text-[10px] text-slate-600">
+            <span className="mt-1 block text-[10px] text-fg-muted">
               Required to test or save. Stored in session storage only for this browser tab session.
             </span>
           </label>
         ) : null}
 
-        <label className="block text-xs text-slate-500">
+        <label className="block text-xs text-fg-muted">
           Database user
           <input
             type="text"
@@ -169,7 +169,7 @@ export function DataSourceSettings() {
           />
         </label>
 
-        <label className="block text-xs text-slate-500">
+        <label className="block text-xs text-fg-muted">
           Password
           <input
             type="password"
@@ -181,7 +181,7 @@ export function DataSourceSettings() {
           />
         </label>
 
-        <label className="block text-xs text-slate-500">
+        <label className="block text-xs text-fg-muted">
           Connect string (DSN)
           <input
             type="text"
@@ -193,7 +193,7 @@ export function DataSourceSettings() {
           />
         </label>
 
-        <label className="block text-xs text-slate-500">
+        <label className="block text-xs text-fg-muted">
           Oracle Instant Client path (optional)
           <input
             type="text"
@@ -205,12 +205,12 @@ export function DataSourceSettings() {
           />
         </label>
 
-        <label className="flex items-center gap-2 text-sm text-slate-400">
+        <label className="flex items-center gap-2 text-sm text-fg-muted">
           <input
             type="checkbox"
             checked={thickMode}
             onChange={(e) => setThickMode(e.target.checked)}
-            className="rounded border-white/20"
+            className="rounded border-edge-subtle"
           />
           Use thick mode (required for some VPN / encryption setups)
         </label>
@@ -251,12 +251,12 @@ export function DataSourceSettings() {
         ) : null}
       </form>
 
-      <div className="glass-panel p-4 text-xs text-slate-500">
-        <p className="font-medium text-slate-400">Security notes</p>
+      <div className="glass-panel p-4 text-xs text-fg-muted">
+        <p className="font-medium text-fg-muted">Security notes</p>
         <ul className="mt-2 list-inside list-disc space-y-1">
           <li>Passwords are never returned by the API after save.</li>
           <li>Portal vault file is gitignored and encrypted with Fernet on the API server.</li>
-          <li>Set <code className="text-slate-400">PORTAL_SETTINGS_TOKEN</code> in production to gate changes.</li>
+          <li>Set <code className="text-fg-muted">PORTAL_SETTINGS_TOKEN</code> in production to gate changes.</li>
           <li>Prefer a read-only database account for analytics exploration.</li>
         </ul>
       </div>

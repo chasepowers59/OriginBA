@@ -23,8 +23,8 @@ export function GlobalFilterBar({
   if (!periodLabel && !hasFilters) return null;
 
   return (
-    <div className="no-print flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2 text-xs">
-      <span className="font-medium uppercase tracking-wide text-slate-500">Active filters</span>
+    <div className="no-print flex flex-wrap items-center gap-2 rounded-xl border border-edge-subtle bg-surface-subtle px-3 py-2 text-xs">
+      <span className="font-medium uppercase tracking-wide text-fg-muted">Active filters</span>
       {periodLabel ? (
         <span className="chip chip-active">
           {periodLabel}
@@ -38,7 +38,7 @@ export function GlobalFilterBar({
             <button
               type="button"
               onClick={onClearScope}
-              className="ml-1 text-slate-400 hover:text-white"
+              className="ml-1 text-fg-muted hover:text-heading"
               aria-label="Clear scope filter"
             >
               ×
@@ -53,7 +53,7 @@ export function GlobalFilterBar({
             <button
               type="button"
               onClick={onClearDrill}
-              className="ml-1 text-amber-200/80 hover:text-white"
+              className="ml-1 text-amber-200/80 hover:text-heading"
               aria-label="Clear cross-filter"
             >
               ×

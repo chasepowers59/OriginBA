@@ -49,17 +49,17 @@ export function SampleRowsPanel({
           <p className="text-[11px] font-semibold uppercase tracking-widest text-sky-400/80">
             Row preview
           </p>
-          <h3 className="mt-1 text-lg font-semibold text-white">What one row looks like</h3>
-          <p className="mt-1 text-sm text-slate-500">
+          <h3 className="mt-1 text-lg font-semibold text-heading">What one row looks like</h3>
+          <p className="mt-1 text-sm text-fg-muted">
             {grainDescription ?? "Sample rows from the governed canvas"} ·{" "}
-            <code className="text-xs text-slate-400">{schemaName}.{tableName}</code>
+            <code className="text-xs text-fg-muted">{schemaName}.{tableName}</code>
           </p>
         </div>
-        <span className="text-slate-500">{expanded ? "▾" : "▸"}</span>
+        <span className="text-fg-muted">{expanded ? "▾" : "▸"}</span>
       </button>
 
       {expanded ? (
-        <div className="border-t border-white/10 px-5 pb-5">
+        <div className="border-t border-edge-subtle px-5 pb-5">
           {error ? (
             <p className="mt-4 rounded-lg border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
               {error.includes("503") || error.toLowerCase().includes("configured")
@@ -75,16 +75,16 @@ export function SampleRowsPanel({
               {data.rows.map((row, idx) => (
                 <div
                   key={idx}
-                  className="rounded-xl border border-white/10 bg-slate-950/40 p-4"
+                  className="rounded-xl border border-edge-subtle bg-surface-subtle p-4"
                 >
                   <p className="mb-3 text-xs font-medium text-sky-300">Sample row {idx + 1}</p>
                   <dl className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                     {data.columns.map((col) => (
                       <div key={col} className="min-w-0">
-                        <dt className="truncate text-[10px] uppercase tracking-wide text-slate-500">
+                        <dt className="truncate text-[10px] uppercase tracking-wide text-fg-muted">
                           {data.column_labels[col] ?? prettifyFieldName(col)}
                         </dt>
-                        <dd className="truncate text-sm text-slate-200" title={String(row[col] ?? "")}>
+                        <dd className="truncate text-sm text-heading" title={String(row[col] ?? "")}>
                           {formatCellValue(row[col], { columnId: col })}
                         </dd>
                       </div>
@@ -95,7 +95,7 @@ export function SampleRowsPanel({
             </div>
           ) : null}
           {data && !data.rows.length && !error ? (
-            <p className="mt-4 text-sm text-slate-500">No sample rows returned for this domain.</p>
+            <p className="mt-4 text-sm text-fg-muted">No sample rows returned for this domain.</p>
           ) : null}
         </div>
       ) : null}
