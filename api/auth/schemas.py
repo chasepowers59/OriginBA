@@ -8,6 +8,10 @@ from pydantic import BaseModel, Field, field_validator
 class LoginRequest(BaseModel):
     email: str = Field(min_length=3, max_length=320)
     password: str = Field(min_length=8, max_length=128)
+    # Multi-tenant: the organization the user is signing in to. Supplied as the org
+    # id/slug from a /<slug> tenant URL, or typed by name at the root login. Optional
+    # for backward compatibility — when omitted, the user's home organization is used.
+    organization: str | None = Field(default=None, max_length=120)
 
     @field_validator("email")
     @classmethod
@@ -16,6 +20,14 @@ class LoginRequest(BaseModel):
         if "@" not in email:
             raise ValueError("Invalid email")
         return email
+
+    @field_validator("organization")
+    @classmethod
+    def normalize_org(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        trimmed = value.strip()
+        return trimmed or None
 
 
 class PortalOrganizationPublic(BaseModel):
@@ -49,6 +61,10 @@ class LoginResponse(BaseModel):
     token_type: str = "bearer"
     expires_in_minutes: int
     user: AuthUserPublic
+    # The organization the session should view. Equals the user's home org for a normal
+    # login; for an admin entering a specific tenant it is that tenant, and the client
+    # sets it as the active-org so the admin lands in the right context.
+    active_organization_id: str | None = None
 
 
 class AuthStatusResponse(BaseModel):

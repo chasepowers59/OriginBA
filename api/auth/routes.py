@@ -40,7 +40,7 @@ from api.auth.service import (
     update_user,
     user_to_public,
 )
-from api.organizations import list_organizations_public
+from api.organizations import list_organizations_public, resolve_organization
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -89,6 +89,26 @@ def login(
         raise HTTPException(status_code=401, detail=str(exc)) from exc
     clear_login_attempts(rate_key)
     public = user_to_public(user)
+
+    # Multi-tenant binding. When the login names an organization (a /<slug> tenant URL
+    # or a typed org at root), resolve and authorize it: a non-admin may only enter the
+    # organization their account belongs to; an admin may enter any registered tenant.
+    home_org = public.get("organization_id")
+    active_org = home_org
+    if body.organization:
+        target = resolve_organization(body.organization)
+        if not target:
+            raise HTTPException(
+                status_code=400, detail=f"Unknown organization '{body.organization}'."
+            )
+        target_id = str(target["id"])
+        if public["role"] != "admin" and home_org != target_id:
+            raise HTTPException(
+                status_code=403,
+                detail=f"This account is not part of {target['display_name']}.",
+            )
+        active_org = target_id
+
     token = create_access_token(
         user_id=public["id"],
         email=public["email"],
@@ -101,6 +121,7 @@ def login(
         access_token=token,
         expires_in_minutes=access_token_minutes(),
         user=AuthUserPublic(**public),
+        active_organization_id=active_org,
     )
 
 
@@ -155,6 +176,20 @@ def list_organizations(
     _: AuthContext = Depends(require_permission("users:manage")),
 ) -> list[PortalOrganizationPublic]:
     return [PortalOrganizationPublic(**row) for row in list_organizations_public()]
+
+
+@router.get("/tenants/{slug}", response_model=PortalOrganizationPublic)
+def resolve_tenant(slug: str) -> PortalOrganizationPublic:
+    """Public, unauthenticated single-tenant lookup for the login page.
+
+    A /<slug> tenant URL uses this to show the tenant's real display name and to
+    reject an unknown slug. It returns only {id, display_name} for one org — never the
+    full tenant list — so the client roster is not enumerable from here.
+    """
+    org = resolve_organization(slug)
+    if not org:
+        raise HTTPException(status_code=404, detail="Unknown organization")
+    return PortalOrganizationPublic(id=str(org["id"]), display_name=str(org["display_name"]))
 
 
 @router.get("/users", response_model=list[AuthUserPublic])

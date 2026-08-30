@@ -1,8 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { login } from "@/lib/authApi";
+import { login, resolveTenant } from "@/lib/authApi";
 import { useAuth } from "@/components/AuthProvider";
 import { DEFAULT_BRAND } from "@/lib/brand";
 
@@ -17,16 +17,43 @@ export default function LoginPage() {
   const { refresh } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [organization, setOrganization] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Multi-tenant: a /<slug> URL redirects here with ?tenant=<slug>. When present the org
+  // is fixed by the URL (no org field); at the root the user types the organization.
+  const tenantSlug = searchParams.get("tenant");
+  const [tenantName, setTenantName] = useState<string | null>(null);
+  useEffect(() => {
+    if (!tenantSlug) {
+      setTenantName(null);
+      return;
+    }
+    let active = true;
+    resolveTenant(tenantSlug)
+      .then((org) => {
+        if (active) setTenantName(org.display_name);
+      })
+      .catch(() => {
+        // Unknown slug: fall back to the root experience (show the org field).
+        if (active) setTenantName(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, [tenantSlug]);
+
+  const boundToTenant = Boolean(tenantSlug && tenantName);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setSubmitting(true);
     setError(null);
     try {
-      const signedIn = await login(email, password);
+      const org = boundToTenant ? tenantSlug : organization.trim() || undefined;
+      const signedIn = await login(email, password, org);
       await refresh();
       if (signedIn.must_change_password) {
         router.replace("/change-password");
@@ -92,9 +119,40 @@ export default function LoginPage() {
           </div>
           <h1 className="portal-heading text-2xl font-bold">Welcome back</h1>
           <p className="portal-text-muted mt-1 text-sm">
-            Sign in to {DEFAULT_BRAND.product}
+            {boundToTenant ? (
+              <>
+                Sign in to{" "}
+                <span className="portal-heading font-semibold">{tenantName}</span>
+              </>
+            ) : (
+              <>Sign in to {DEFAULT_BRAND.product}</>
+            )}
           </p>
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
+            {boundToTenant ? (
+              <div
+                className="flex items-center gap-2 rounded-lg border border-sky-400/30 bg-sky-500/10 px-3 py-2 text-sm text-sky-700 dark:text-sky-300"
+                aria-label={`Organization: ${tenantName}`}
+              >
+                <span aria-hidden>🏢</span>
+                <span>
+                  Organization: <strong>{tenantName}</strong>
+                </span>
+              </div>
+            ) : (
+              <label className="portal-text-muted block text-sm" htmlFor="login-org">
+                Organization
+                <input
+                  id="login-org"
+                  type="text"
+                  autoComplete="organization"
+                  value={organization}
+                  onChange={(e) => setOrganization(e.target.value)}
+                  className="input-modern mt-1"
+                  placeholder="Your organization (optional)"
+                />
+              </label>
+            )}
             <label className="portal-text-muted block text-sm" htmlFor="login-email">
               Email
               <input

@@ -1,5 +1,5 @@
 import type { AccessGroup, AuthStatus, AuthUser, PortalOrganization } from "@/lib/auth";
-import { authHeaders, clearAccessToken, storeAccessToken } from "@/lib/auth";
+import { authHeaders, clearAccessToken, setActiveOrganization, storeAccessToken } from "@/lib/auth";
 import { parseApiError } from "@/lib/apiErrors";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -30,17 +30,30 @@ export function fetchCurrentUser(): Promise<AuthUser> {
   return authFetch<AuthUser>("/auth/me");
 }
 
-export async function login(email: string, password: string): Promise<AuthUser> {
+export async function login(
+  email: string,
+  password: string,
+  organization?: string | null,
+): Promise<AuthUser> {
   const res = await authFetch<{
     access_token: string;
     expires_in_minutes: number;
     user: AuthUser;
+    active_organization_id?: string | null;
   }>("/auth/login", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, ...(organization ? { organization } : {}) }),
   });
   storeAccessToken(res.access_token, res.expires_in_minutes * 60);
+  // Bind the session to the org the server authorized (the tenant for an admin entering
+  // a client, otherwise the user's home org).
+  if (res.active_organization_id) setActiveOrganization(res.active_organization_id);
   return res.user;
+}
+
+/** Public single-tenant lookup for the /<slug> login page. Throws if the slug is unknown. */
+export function resolveTenant(slug: string): Promise<PortalOrganization> {
+  return authFetch<PortalOrganization>(`/auth/tenants/${encodeURIComponent(slug)}`);
 }
 
 export function logout(): void {

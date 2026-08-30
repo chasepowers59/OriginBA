@@ -59,6 +59,27 @@ def organization_display_name(org_id: str | None) -> str | None:
     return str(org["display_name"]) if org else None
 
 
+def resolve_organization(name_or_id: str | None) -> dict[str, Any] | None:
+    """Resolve a user-supplied organization token to a registered org.
+
+    Accepts the org id/slug (as used in a /<slug> tenant URL) OR the human display
+    name, both case-insensitively, so a login form can take either "ellensburg" or
+    "Ellensburg". Returns None when nothing matches.
+    """
+    if not name_or_id:
+        return None
+    token = name_or_id.strip().lower()
+    if not token:
+        return None
+    for org in load_organizations():
+        if str(org["id"]).lower() == token:
+            return org
+    for org in load_organizations():
+        if str(org["display_name"]).lower() == token:
+            return org
+    return None
+
+
 def _env_value(env: dict[str, str], *keys: str) -> str | None:
     for key in keys:
         value = (env.get(key) or os.getenv(key) or "").strip()

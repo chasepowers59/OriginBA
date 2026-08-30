@@ -19,7 +19,12 @@ from api.auth.permissions import permissions_for_role, role_at_least  # noqa: E4
 from api.auth.security import hash_password, verify_password  # noqa: E402
 from api.auth.service import AuthError, create_group, create_user, get_user, update_user, user_to_public  # noqa: E402
 from api.executive_dashboard import build_executive_summary  # noqa: E402
-from api.organizations import is_valid_org_id, list_organizations_public  # noqa: E402
+from api.organizations import (  # noqa: E402
+    is_valid_org_id,
+    list_organizations_public,
+    organization_display_name,
+    resolve_organization,
+)
 
 
 class PortalAuthTests(unittest.TestCase):
@@ -50,9 +55,25 @@ class PortalAuthTests(unittest.TestCase):
 
     def test_organization_registry(self) -> None:
         orgs = list_organizations_public()
-        self.assertEqual(len(orgs), 6)
+        # Assert the known tenants are present rather than a brittle exact count that
+        # drifts every time a client is onboarded.
+        ids = {o["id"] for o in orgs}
+        self.assertGreaterEqual(len(orgs), 6)
+        self.assertIn("ellensburg", ids)
+        self.assertIn("dev", ids)
         self.assertTrue(is_valid_org_id("ellensburg"))
         self.assertFalse(is_valid_org_id("unknown-client"))
+
+    def test_resolve_organization_by_id_and_name(self) -> None:
+        # Multi-tenant login accepts the slug (from a /<slug> URL) or the typed display
+        # name, both case-insensitively; unknown/blank tokens resolve to None.
+        self.assertEqual(resolve_organization("ellensburg")["id"], "ellensburg")
+        self.assertEqual(resolve_organization("ELLENSBURG")["id"], "ellensburg")
+        by_name = resolve_organization(organization_display_name("dev"))
+        self.assertEqual(by_name["id"], "dev")
+        self.assertIsNone(resolve_organization("unknown-client"))
+        self.assertIsNone(resolve_organization(None))
+        self.assertIsNone(resolve_organization("   "))
 
     def test_user_requires_organization_for_non_admin(self) -> None:
         init_auth_database()
