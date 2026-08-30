@@ -1,0 +1,34 @@
+import { fetchSnapshots } from "@/lib/api";
+import { AppShell } from "@/components/AppShell";
+import { VisualBuilder } from "@/components/builder/VisualBuilder";
+
+export default async function BuildPage() {
+  let index;
+  try {
+    index = await fetchSnapshots();
+  } catch {
+    index = { client: "demo", poc_enabled: [], db_configured: false, workstreams: [], snapshots: [] };
+  }
+  return (
+    <AppShell
+      snapshots={index.snapshots}
+      workstreams={index.workstreams ?? []}
+      dbConfigured={index.db_configured}
+      activeNav="build"
+    >
+      <section className="space-y-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--chart-1)" }}>
+            Visual builder
+          </p>
+          <h1 className="portal-heading mt-1 text-2xl font-bold">Build a view</h1>
+          <p className="mt-1 text-sm" style={{ color: "var(--foreground-muted)" }}>
+            Pick a reporting canvas, drag columns onto the shelves, and choose a
+            visualization — or start from a governed business question.
+          </p>
+        </div>
+        <VisualBuilder />
+      </section>
+    </AppShell>
+  );
+}
