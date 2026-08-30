@@ -109,8 +109,8 @@ export function ResultsPanel({
     return (
       <div className="glass-panel flex min-h-[320px] flex-col items-center justify-center p-12 text-center">
         <EmptyStateIcon variant="chart" />
-        <p className="text-lg font-medium text-slate-300">Choose a standard report to get started</p>
-        <p className="mt-2 max-w-sm text-sm text-slate-500">
+        <p className="text-lg font-medium text-fg">Choose a standard report to get started</p>
+        <p className="mt-2 max-w-sm text-sm text-fg-muted">
           Your chart, key metrics, and exportable detail table will appear here.
         </p>
       </div>
@@ -124,11 +124,11 @@ export function ResultsPanel({
     return (
       <div className="glass-panel flex min-h-[320px] flex-col items-center justify-center p-10 text-center">
         <EmptyStateIcon variant="search" />
-        <h3 className="text-lg font-semibold text-white">No data for this view</h3>
-        <p className="mt-3 max-w-md text-sm text-slate-400">
+        <h3 className="text-lg font-semibold text-heading">No data for this view</h3>
+        <p className="mt-3 max-w-md text-sm text-fg-muted">
           {ctx?.periodLabel ? (
             <>
-              Nothing matched <strong className="text-slate-200">{ctx.periodLabel}</strong>
+              Nothing matched <strong className="text-heading">{ctx.periodLabel}</strong>
               {ctx.dateRange ? ` (${ctx.dateRange[0]} to ${ctx.dateRange[1]})` : ""}.
             </>
           ) : (
@@ -139,7 +139,7 @@ export function ResultsPanel({
             <> Cross-filter: {ctx.drillFilter.value}.</>
           ) : null}
         </p>
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2 text-xs text-fg-muted">
           Try widening the reporting period, clearing scope or cross-filters, or pick a different
           field.
         </p>
@@ -184,15 +184,15 @@ export function ResultsPanel({
   return (
     <div id="council-pack-export" className="council-pack space-y-4 animate-slide-up">
       <div className="council-pack-header hidden print:block">
-        <p className="text-xs uppercase tracking-widest text-slate-600">{brand.name}</p>
+        <p className="text-xs uppercase tracking-widest text-fg-muted">{brand.name}</p>
         <h1 className="text-2xl font-bold text-slate-900">{reportTitle ?? snapshotLabel}</h1>
-        <p className="mt-1 text-sm text-slate-600">{snapshotLabel}</p>
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-1 text-sm text-fg-muted">{snapshotLabel}</p>
+        <p className="mt-2 text-xs text-fg-muted">
           {periodLabel ?? "Reporting period"}
           {dateRange ? ` · ${dateRange[0]} to ${dateRange[1]}` : ""}
           {scopeLabel ? ` · ${scopeLabel}` : ""}
         </p>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="mt-1 text-xs text-fg-muted">
           Generated {new Date().toLocaleString()} · {brand.connection_label}
         </p>
         <hr className="my-4 border-slate-300" />
@@ -200,10 +200,10 @@ export function ResultsPanel({
 
       <div className="no-print flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-white">
+          <h3 className="text-lg font-semibold text-heading">
             {reportTitle ?? "Analysis results"}
           </h3>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-fg-muted">
             {periodLabel ? `${periodLabel} · ` : ""}
             {result.row_count} field values
             {loading ? " · updating…" : ""}
@@ -231,14 +231,14 @@ export function ResultsPanel({
       </div>
 
       {onDrillSelect && !drillFilter ? (
-        <p className="no-print text-xs text-slate-500">
+        <p className="no-print text-xs text-fg-muted">
           Click a chart bar or table row to cross-filter this view.
         </p>
       ) : null}
 
       {insight ? (
-        <div className="rounded-xl border border-sky-400/20 bg-gradient-to-r from-sky-500/10 to-indigo-500/10 px-4 py-3 text-sm text-slate-200">
-          <span className="font-medium text-white">{insight.label}</span> leads this view at{" "}
+        <div className="rounded-xl border border-sky-400/20 bg-gradient-to-r from-sky-500/10 to-indigo-500/10 px-4 py-3 text-sm text-heading">
+          <span className="font-medium text-heading">{insight.label}</span> leads this view at{" "}
           <span className="font-semibold text-sky-300">{formatPercent(insight.share)}</span> of the
           total ({formatMeasure(insight.topValue)}).
         </div>
@@ -278,17 +278,17 @@ export function ResultsPanel({
       ) : null}
 
       <div className="glass-panel overflow-hidden">
-        <div className="border-b border-white/10 px-4 py-2 text-xs text-slate-500">
+        <div className="border-b border-edge-subtle px-4 py-2 text-xs text-fg-muted">
           {chartType === "table"
             ? "Results table — click a row to cross-filter"
             : "Detail table — click a row to cross-filter"}
         </div>
         <div className={chartType === "table" ? "max-h-[560px] overflow-auto" : "max-h-[420px] overflow-auto"}>
           <table className="min-w-full text-left text-sm">
-            <thead className="sticky top-0 border-b border-white/10 bg-slate-950/90 backdrop-blur">
+            <thead className="sticky top-0 border-b border-edge-subtle bg-surface-solid backdrop-blur">
               <tr>
                 {result.columns.map((col) => (
-                  <th key={col} className="px-4 py-3 font-medium text-slate-400">
+                  <th key={col} className="px-4 py-3 font-medium text-fg-muted">
                     {columnLabels[col] ?? prettifyFieldName(col)}
                   </th>
                 ))}
@@ -301,7 +301,7 @@ export function ResultsPanel({
                   onClick={() =>
                     onDrillSelect?.(String(row[dimensionKey] ?? ""))
                   }
-                  className={`border-b border-white/5 transition hover:bg-white/[0.03] ${
+                  className={`border-b border-edge-subtle transition hover:bg-white/[0.03] ${
                     onDrillSelect ? "cursor-pointer" : ""
                   } ${
                     drillFilter?.value === String(row[dimensionKey])
@@ -310,7 +310,7 @@ export function ResultsPanel({
                   }`}
                 >
                   {result.columns.map((col) => (
-                    <td key={col} className="px-4 py-2.5 text-slate-200">
+                    <td key={col} className="px-4 py-2.5 text-heading">
                       {formatCellValue(row[col], {
                         columnId: col,
                         isMeasure: col === measureKey,
@@ -326,11 +326,11 @@ export function ResultsPanel({
         </div>
       </div>
 
-      <details className="no-print glass-panel-subtle group p-4 text-xs text-slate-500">
-        <summary className="cursor-pointer font-medium text-slate-400 group-open:text-sky-400">
+      <details className="no-print glass-panel-subtle group p-4 text-xs text-fg-muted">
+        <summary className="cursor-pointer font-medium text-fg-muted group-open:text-sky-400">
           Technical query details (for IT review)
         </summary>
-        <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-lg bg-black/30 p-3 text-slate-400">
+        <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-lg bg-black/30 p-3 text-fg-muted">
           {result.sql}
         </pre>
       </details>
@@ -354,12 +354,12 @@ function KpiCard({
       className={`rounded-xl border px-4 py-3 ${
         highlight
           ? "border-sky-400/20 bg-gradient-to-br from-sky-500/10 to-indigo-500/10"
-          : "border-white/10 bg-slate-950/40"
+          : "border-edge-subtle bg-surface-subtle"
       }`}
     >
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{label}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-fg-muted">{label}</p>
       <p
-        className={`mt-1 font-semibold text-white ${small ? "truncate text-sm" : "text-xl"}`}
+        className={`mt-1 font-semibold text-heading ${small ? "truncate text-sm" : "text-xl"}`}
         title={value}
       >
         {value}

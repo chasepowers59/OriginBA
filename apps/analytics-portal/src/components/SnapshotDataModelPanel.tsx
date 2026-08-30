@@ -61,7 +61,7 @@ export function SnapshotDataModelPanel({
 
   if (!model) {
     return (
-      <div className="glass-panel p-8 text-center text-sm text-slate-500">
+      <div className="glass-panel p-8 text-center text-sm text-fg-muted">
         Data model documentation is not available for this domain yet.
       </div>
     );
@@ -70,19 +70,19 @@ export function SnapshotDataModelPanel({
   return (
     <div id="lineage-pack-export" className="lineage-pack space-y-4">
       <div className="lineage-pack-header hidden print:block">
-        <p className="text-xs uppercase tracking-widest text-slate-600">{brand.name}</p>
+        <p className="text-xs uppercase tracking-widest text-fg-muted">{brand.name}</p>
         <h1 className="text-2xl font-bold text-slate-900">{metadata.label} — Data Model</h1>
         <p className="mt-1 font-mono text-sm text-slate-700">
           {model.snapshot_table} · grain: {model.grain}
         </p>
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2 text-xs text-fg-muted">
           Generated {new Date().toLocaleString()} · {brand.name}
         </p>
         <hr className="my-4 border-slate-300" />
       </div>
 
       <div className="no-print flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-fg-muted">
           Governed lineage for client transparency — source tables, join logic, and field catalog.
         </p>
         <button
@@ -110,8 +110,8 @@ export function SnapshotDataModelPanel({
               onClick={() => setTab(key)}
               className={`rounded-xl px-2 py-2.5 text-xs font-medium transition sm:text-sm ${
                 tab === key
-                  ? "bg-gradient-to-r from-sky-500/20 to-indigo-500/20 text-white ring-1 ring-sky-400/30"
-                  : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                  ? "bg-gradient-to-r from-sky-500/20 to-indigo-500/20 text-heading ring-1 ring-sky-400/30"
+                  : "text-fg-muted hover:bg-chip hover:text-heading"
               }`}
             >
               {label}
@@ -151,27 +151,27 @@ function OverviewTab({
     <div className="grid gap-4 lg:grid-cols-2">
       <section className="glass-panel space-y-4 p-5">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
             Governed canvas
           </p>
           <p className="mt-2 font-mono text-sm text-sky-200">{model.snapshot_table}</p>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-fg-muted">
             End-user Domain points at this table — not live C2M joins at report runtime.
           </p>
         </div>
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
             Row grain
           </p>
-          <p className="mt-2 text-sm text-white">{model.grain}</p>
-          <p className="mt-1 text-xs text-slate-400">{model.grain_description}</p>
+          <p className="mt-2 text-sm text-heading">{model.grain}</p>
+          <p className="mt-1 text-xs text-fg-muted">{model.grain_description}</p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-xs text-slate-300">
+        <div className="rounded-xl border border-edge-subtle bg-surface-subtle px-4 py-3 text-xs text-fg">
           {model.grain_preservation}
         </div>
         {model.trusted_measures.length ? (
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
               Trusted additive measures
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
@@ -186,7 +186,7 @@ function OverviewTab({
             </div>
           </div>
         ) : (
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-fg-muted">
             This domain is primarily for counts and workflow monitoring — no single trusted dollar
             measure is published.
           </p>
@@ -195,22 +195,22 @@ function OverviewTab({
 
       <section className="glass-panel space-y-4 p-5">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
             Driving C2M table
           </p>
-          <p className="mt-2 font-mono text-sm text-white">
+          <p className="mt-2 font-mono text-sm text-heading">
             CISADM.{model.driving_table ?? "—"}
           </p>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-fg-muted">
             Population and grain are anchored here during the nightly refresh.
           </p>
         </div>
         {model.population_filter ? (
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
               Population filter
             </p>
-            <pre className="mt-2 overflow-x-auto rounded-lg bg-black/30 p-3 text-xs text-slate-300">
+            <pre className="mt-2 overflow-x-auto rounded-lg bg-black/30 p-3 text-xs text-fg">
               {model.population_filter}
             </pre>
           </div>
@@ -222,9 +222,9 @@ function OverviewTab({
           <StatCard label="Field groups" value={String(model.field_groups.length)} />
         </div>
         {model.refresh_sql ? (
-          <p className="text-[10px] text-slate-600">
+          <p className="text-[10px] text-fg-muted">
             Lineage parsed from{" "}
-            <span className="font-mono text-slate-500">{model.refresh_sql}</span>
+            <span className="font-mono text-fg-muted">{model.refresh_sql}</span>
           </p>
         ) : null}
       </section>
@@ -248,7 +248,7 @@ function TablesTab({ model }: { model: SnapshotDataModel }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-fg-muted">
         These Oracle tables are combined during the canvas refresh. Analysts query the flattened{" "}
         <span className="font-mono text-sky-200">{model.snapshot_table}</span> table in the portal.
       </p>
@@ -256,17 +256,17 @@ function TablesTab({ model }: { model: SnapshotDataModel }) {
         <section key={role} className="glass-panel p-5">
           <div className="mb-4 flex items-center gap-2">
             <span className={`chip ${ROLE_COLORS[role] ?? ""}`}>{ROLE_LABELS[role] ?? role}</span>
-            <span className="text-xs text-slate-500">{tables.length} tables</span>
+            <span className="text-xs text-fg-muted">{tables.length} tables</span>
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
             {tables.map((table) => (
               <div
                 key={table.table}
-                className="rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3"
+                className="rounded-xl border border-edge-subtle bg-surface-subtle px-4 py-3"
               >
-                <p className="font-mono text-sm text-white">CISADM.{table.table}</p>
+                <p className="font-mono text-sm text-heading">CISADM.{table.table}</p>
                 {table.alias ? (
-                  <p className="mt-1 text-xs text-slate-500">SQL alias: {table.alias}</p>
+                  <p className="mt-1 text-xs text-fg-muted">SQL alias: {table.alias}</p>
                 ) : null}
               </div>
             ))}
@@ -280,7 +280,7 @@ function TablesTab({ model }: { model: SnapshotDataModel }) {
 function JoinsTab({ model, onPrint }: { model: SnapshotDataModel; onPrint?: () => void }) {
   if (!model.join_paths.length) {
     return (
-      <div className="glass-panel p-8 text-center text-sm text-slate-500">
+      <div className="glass-panel p-8 text-center text-sm text-fg-muted">
         No join paths were parsed for this canvas (may use UNION or a custom refresh pattern).
       </div>
     );
@@ -289,7 +289,7 @@ function JoinsTab({ model, onPrint }: { model: SnapshotDataModel; onPrint?: () =
   return (
     <div className="space-y-3">
       <div className="no-print flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-fg-muted">
           Join logic applied when building{" "}
           <span className="font-mono text-sky-200">{model.snapshot_table}</span>. LEFT joins preserve
           the driving population; optional-child joins only populate when FT/type rules match.
@@ -309,7 +309,7 @@ function JoinsTab({ model, onPrint }: { model: SnapshotDataModel; onPrint?: () =
               <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
                 Start · driving table
               </p>
-              <p className="mt-1 font-mono text-sm text-white">CISADM.{model.driving_table}</p>
+              <p className="mt-1 font-mono text-sm text-heading">CISADM.{model.driving_table}</p>
             </div>
           </div>
         ) : null}
@@ -318,18 +318,18 @@ function JoinsTab({ model, onPrint }: { model: SnapshotDataModel; onPrint?: () =
             <span className="absolute left-3 top-5 h-4 w-4 rounded-full bg-sky-400/80 ring-4 ring-sky-400/20" />
             <div className="glass-panel p-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <span className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
                   Step {index + 1}
                 </span>
                 <span className={`chip text-[10px] ${ROLE_COLORS[join.role] ?? ""}`}>
                   {join.join_type} · {ROLE_LABELS[join.role] ?? join.role}
                 </span>
               </div>
-              <p className="mt-2 font-mono text-sm text-white">
+              <p className="mt-2 font-mono text-sm text-heading">
                 CISADM.{join.table}
                 {join.alias ? ` AS ${join.alias}` : ""}
               </p>
-              <pre className="mt-3 overflow-x-auto rounded-lg bg-black/30 p-3 text-xs leading-relaxed text-slate-300">
+              <pre className="mt-3 overflow-x-auto rounded-lg bg-black/30 p-3 text-xs leading-relaxed text-fg">
                 ON {join.on}
               </pre>
             </div>
@@ -362,7 +362,7 @@ function FieldsTab({
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-fg-muted">
           {fields.length} of {totalCount} fields available for filters, group-by, and metrics in
           this Domain.
         </p>
@@ -390,20 +390,20 @@ function FieldsTab({
       <div className="glass-panel overflow-hidden">
         <div className="max-h-[560px] overflow-auto">
           <table className="min-w-full text-left text-sm">
-            <thead className="sticky top-0 border-b border-white/10 bg-slate-950/95 backdrop-blur">
+            <thead className="sticky top-0 border-b border-edge-subtle bg-surface-solid backdrop-blur">
               <tr>
-                <th className="px-4 py-3 font-medium text-slate-400">Field</th>
-                <th className="px-4 py-3 font-medium text-slate-400">Business label</th>
-                <th className="px-4 py-3 font-medium text-slate-400">Role</th>
-                <th className="hidden px-4 py-3 font-medium text-slate-400 md:table-cell">Group</th>
-                <th className="hidden px-4 py-3 font-medium text-slate-400 lg:table-cell">Type</th>
+                <th className="px-4 py-3 font-medium text-fg-muted">Field</th>
+                <th className="px-4 py-3 font-medium text-fg-muted">Business label</th>
+                <th className="px-4 py-3 font-medium text-fg-muted">Role</th>
+                <th className="hidden px-4 py-3 font-medium text-fg-muted md:table-cell">Group</th>
+                <th className="hidden px-4 py-3 font-medium text-fg-muted lg:table-cell">Type</th>
               </tr>
             </thead>
             <tbody>
               {fields.map((field) => (
-                <tr key={field.id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                <tr key={field.id} className="border-b border-edge-subtle hover:bg-white/[0.02]">
                   <td className="px-4 py-2.5 font-mono text-xs text-sky-200">{field.id}</td>
-                  <td className="px-4 py-2.5 text-slate-200">
+                  <td className="px-4 py-2.5 text-heading">
                     {field.label}
                     {trusted.has(field.id) ? (
                       <span className="ml-2 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-300">
@@ -414,16 +414,16 @@ function FieldsTab({
                   <td className="px-4 py-2.5">
                     <span
                       className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase ${
-                        FIELD_ROLE_COLORS[field.role] ?? "text-slate-400 bg-white/5"
+                        FIELD_ROLE_COLORS[field.role] ?? "text-fg-muted bg-chip"
                       }`}
                     >
                       {fieldRoleLabel(field.role)}
                     </span>
                   </td>
-                  <td className="hidden px-4 py-2.5 text-xs text-slate-500 md:table-cell">
+                  <td className="hidden px-4 py-2.5 text-xs text-fg-muted md:table-cell">
                     {field.group ?? "—"}
                   </td>
-                  <td className="hidden px-4 py-2.5 text-xs text-slate-600 lg:table-cell">
+                  <td className="hidden px-4 py-2.5 text-xs text-fg-muted lg:table-cell">
                     {field.type.replace("java.lang.", "").replace("java.sql.", "").replace("java.math.", "")}
                   </td>
                 </tr>
@@ -438,9 +438,9 @@ function FieldsTab({
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-3">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-white">{value}</p>
+    <div className="rounded-xl border border-edge-subtle bg-surface-subtle px-3 py-3">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-fg-muted">{label}</p>
+      <p className="mt-1 text-lg font-semibold text-heading">{value}</p>
     </div>
   );
 }
