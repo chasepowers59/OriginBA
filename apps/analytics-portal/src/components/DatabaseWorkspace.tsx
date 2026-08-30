@@ -14,7 +14,7 @@ import {
   type DatabaseQueryTemplate,
   type WorkspaceEngine,
 } from "@/lib/databaseQueryTemplates";
-import { exportRowsCsv, formatCurrency, formatNumber, isIdentifierColumn } from "@/lib/format";
+import { exportRowsCsv, formatBoolean, formatCurrency, formatNumber, isIdentifierColumn } from "@/lib/format";
 import { prettifyFieldName } from "@/lib/businessLabels";
 import { DatabaseResultChart } from "@/components/DatabaseResultChart";
 import type { DatabaseSqlResponse, DatabaseTableInfo } from "@/lib/types";
@@ -25,6 +25,9 @@ type ResultView = "table" | "chart" | "both";
 
 function formatCell(value: unknown, isNumericCol = false, columnId?: string): string {
   if (value === null || value === undefined) return "—";
+  // A flag renders as a state, not a number: Number(true) is a finite 1, so without this
+  // a boolean column would be mis-detected as numeric and print "1"/"0".
+  if (typeof value === "boolean") return formatBoolean(value);
   // an identifier is a STRING that happens to be digits -- never comma-format it
   if (isIdentifierColumn(columnId)) return String(value);
   if (typeof value === "number") return formatNumber(value);

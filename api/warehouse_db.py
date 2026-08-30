@@ -63,6 +63,23 @@ def warehouse_configured(organization_id: str | None = None) -> bool:
     return bool(warehouse_url(organization_id))
 
 
+def _pool_max() -> int:
+    """Max warehouse connections per tenant pool.
+
+    The executive dashboard fans out up to 8 KPI queries at once, and the home page
+    issues other warehouse reads (metrics, trends) alongside them; a ceiling of 8 left
+    no headroom, so concurrent borrowers hit "connection pool exhausted". Default 16
+    gives room above the dashboard fan-out; tune per deployment (a shared transaction
+    pooler may want it lower) via WAREHOUSE_POOL_MAX.
+    """
+    raw = os.environ.get("WAREHOUSE_POOL_MAX") or (_env("WAREHOUSE_POOL_MAX") or "")
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        value = 16
+    return max(4, value)
+
+
 def _pool(organization_id: str | None):
     """One pool per tenant, built on first use and kept.
 
@@ -73,7 +90,7 @@ def _pool(organization_id: str | None):
 
     url = warehouse_url(organization_id)
     if url not in _pools:
-        _pools[url] = ThreadedConnectionPool(1, 8, dsn=url)
+        _pools[url] = ThreadedConnectionPool(1, _pool_max(), dsn=url)
     return _pools[url]
 
 
