@@ -100,7 +100,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
                 title={`${portal.organization_name} Executive Dashboard`}
                 exportSections={exportSections}
               />
-              <Link href="/dashboard/custom" className="btn-ghost">
+              <Link href="/dashboards" className="btn-ghost">
                 Custom dashboards
               </Link>
             </>

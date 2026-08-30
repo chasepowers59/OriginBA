@@ -1,25 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { BrandMark } from "@/components/BrandMark";
 import { useAuth } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { roleLabel } from "@/lib/auth";
 import OrgSwitcher from "@/components/OrgSwitcher";
-import { WorkstreamSidebar, WorkstreamSidebarNav } from "@/components/WorkstreamExplorer";
 import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 
-// One entry per surface: "/" IS the executive overview (the old /dashboard entry
-// duplicated it), workstream sections live in the sidebar, and everything reads
-// the governed reporting layer.
+// One clean top nav, one job per destination. "/" is the executive Home; Explore is the
+// single self-serve builder; Library is the one report catalog (and hosts the workstream
+// browse tree); SQL is the one query surface. The ids are stable so each page's activeNav
+// prop is unchanged even though labels/routes were rationalised.
 const NAV = [
-  { href: "/", label: "Overview", id: "home" as const },
-  { href: "/reports", label: "Reports", id: "reports" as const },
-  { href: "/build", label: "Build", id: "build" as const },
-  { href: "/dashboard/custom", label: "My dashboards", id: "custom" as const },
-  { href: "/database", label: "Database", id: "database" as const },
+  { href: "/", label: "Home", id: "home" as const },
+  { href: "/build", label: "Explore", id: "build" as const },
+  { href: "/dashboards", label: "Dashboards", id: "custom" as const },
+  { href: "/reports", label: "Library", id: "reports" as const },
+  { href: "/database", label: "SQL", id: "database" as const },
   { href: "/data-quality", label: "Data Quality", id: "dq" as const },
   { href: "/settings", label: "Settings", id: "settings" as const },
 ];
@@ -28,7 +28,6 @@ export function AppShell({
   children,
   snapshots,
   workstreams,
-  activeId,
   activeNav,
   dbConfigured,
 }: {
@@ -116,21 +115,7 @@ export function AppShell({
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-[1400px] gap-6 px-6 py-8 lg:grid-cols-[280px_1fr]">
-        <aside className="no-print lg:sticky lg:top-24 lg:self-start">
-          <div className="glass-panel p-4">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-sky-400/80">
-              Workstreams
-            </p>
-            <Suspense
-              fallback={
-                <WorkstreamSidebar workstreams={workstreams} activeId={activeId} />
-              }
-            >
-              <WorkstreamSidebarNav workstreams={workstreams} activeId={activeId} />
-            </Suspense>
-          </div>
-        </aside>
+      <div className="mx-auto max-w-[1400px] px-6 py-8">
         <main className="min-w-0 animate-fade-in">{children}</main>
       </div>
 

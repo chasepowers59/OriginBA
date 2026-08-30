@@ -138,7 +138,7 @@ export function WorkstreamSidebar({
     <div>
       <div className="mb-4 space-y-1 border-b border-white/10 pb-4">
         <Link
-          href="/dashboard/custom"
+          href="/dashboards"
           className="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white"
         >
           Custom dashboards

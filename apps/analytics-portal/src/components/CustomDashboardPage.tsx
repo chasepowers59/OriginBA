@@ -93,7 +93,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
         dimensions: pinDims ? pinDims.split(",").filter(Boolean) : undefined,
       },
     ]);
-    router.replace("/dashboard/custom", { scroll: false });
+    router.replace("/dashboards", { scroll: false });
   }, [dashboardId, router, searchParams]);
 
   const tileBySlot = useMemo(() => {
@@ -122,7 +122,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       } else {
         const created = await createDashboard({ title, days, tiles });
         setBoard(created);
-        window.history.replaceState(null, "", `/dashboard/custom/${created.id}`);
+        window.history.replaceState(null, "", `/dashboards/${created.id}`);
       }
     } finally {
       setSaving(false);
@@ -174,7 +174,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href="/dashboard/custom" className="text-xs text-sky-400 hover:text-sky-300">
+          <Link href="/dashboards" className="text-xs text-sky-400 hover:text-sky-300">
             ← My dashboards
           </Link>
           <input

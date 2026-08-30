@@ -1,31 +1,17 @@
-import { Suspense } from "react";
-import { fetchSnapshots } from "@/lib/api";
-import { AppShell } from "@/components/AppShell";
-import { CustomDashboardPage } from "@/components/CustomDashboardPage";
+import { redirect } from "next/navigation";
 
-export default async function NewCustomDashboardPage() {
-  let index;
-  try {
-    index = await fetchSnapshots();
-  } catch {
-    index = { client: "demo", poc_enabled: [], db_configured: false, workstreams: [], snapshots: [] };
+/** Renamed to /dashboards. Preserve old bookmarks and pinned-report links. */
+export default async function LegacyCustomDashboardRedirect({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const qs = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (typeof v === "string") qs.set(k, v);
+    else if (Array.isArray(v) && v[0]) qs.set(k, v[0]);
   }
-  return (
-    <AppShell
-      snapshots={index.snapshots}
-      workstreams={index.workstreams ?? []}
-      dbConfigured={index.db_configured}
-      activeNav="custom"
-    >
-      <Suspense
-        fallback={
-          <div className="glass-panel p-8">
-            <div className="loading-shimmer h-64 rounded-xl" />
-          </div>
-        }
-      >
-        <CustomDashboardPage />
-      </Suspense>
-    </AppShell>
-  );
+  const query = qs.toString();
+  redirect(query ? `/dashboards?${query}` : "/dashboards");
 }
