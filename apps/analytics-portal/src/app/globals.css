@@ -213,68 +213,11 @@ body {
   }
 }
 
-/* Legacy utility compatibility inside the app shell */
-.mesh-bg .text-white {
-  color: var(--heading);
-}
-
-.dark .mesh-bg .text-white {
-  color: #fff;
-}
-
-.mesh-bg .text-slate-100 {
-  color: color-mix(in srgb, var(--heading) 92%, var(--foreground-muted));
-}
-
-.dark .mesh-bg .text-slate-100 {
-  color: rgb(241 245 249);
-}
-
-.mesh-bg .text-slate-200 {
-  color: color-mix(in srgb, var(--heading) 80%, var(--foreground-muted));
-}
-
-.dark .mesh-bg .text-slate-200 {
-  color: rgb(226 232 240);
-}
-
-.mesh-bg .text-slate-300 {
-  color: color-mix(in srgb, var(--foreground) 70%, var(--foreground-muted));
-}
-
-.dark .mesh-bg .text-slate-300 {
-  color: rgb(203 213 225);
-}
-
-.mesh-bg .text-slate-400,
-.mesh-bg .text-slate-500,
-.mesh-bg .text-slate-600 {
-  color: var(--foreground-muted);
-}
-
-.mesh-bg .border-white\/5,
-.mesh-bg .border-white\/10,
-.mesh-bg .border-white\/15,
-.mesh-bg .border-white\/20 {
-  border-color: var(--border-subtle);
-}
-
-.mesh-bg .bg-white\/5,
-.mesh-bg .bg-white\/10 {
-  background: var(--chip-bg);
-}
-
-.mesh-bg .bg-slate-950\/30,
-.mesh-bg .bg-slate-950\/40,
-.mesh-bg .bg-slate-950\/50,
-.mesh-bg .bg-slate-900\/40,
-.mesh-bg .bg-slate-900\/60 {
-  background: var(--surface-subtle);
-}
-
-.mesh-bg .ring-white\/10 {
-  --tw-ring-color: var(--border-subtle);
-}
+/* The legacy utility-compatibility shim was removed once every in-shell component moved
+   onto semantic-token classes (text-fg-muted, border-edge-subtle, bg-surface-subtle, …).
+   The only hardcoded text-white / text-slate that remain are on intentionally fixed
+   backgrounds (the accent brand logo, the login value panel), where the real Tailwind
+   value is correct. */
 
 @keyframes fadeIn {
   from {

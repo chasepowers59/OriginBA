@@ -75,7 +75,7 @@ export function MiniSparkChart({
   if (!data.length) {
     return (
       <div
-        className="flex items-center justify-center rounded-lg border border-dashed border-white/10 text-xs text-slate-500"
+        className="flex items-center justify-center rounded-lg border border-dashed border-edge-subtle text-xs text-fg-muted"
         style={{ height }}
       >
         No trend data
