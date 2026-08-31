@@ -120,32 +120,40 @@ def _validate(engine: str, sql: str) -> str:
 
 def _run(engine: str, sql: str, org_id: str, max_rows: int) -> tuple[list[str], list[list[Any]]]:
     if engine == "postgres":
-        # search_path pins unqualified names to the reporting layer; the validator
-        # already rejected explicit references to any other schema.
+        # search_path resolves unqualified names against CISADM first (the schema
+        # analysts actually know), then the reporting layer; the validator already
+        # rejected explicit references to any other schema and guards secrets.
         return execute_warehouse_query(
-            sql, organization_id=org_id, max_rows=max_rows, search_path="reporting")
+            sql, organization_id=org_id, max_rows=max_rows, search_path="cisadm, reporting")
     if engine == "oracle_dbt":
-        # CURRENT_SCHEMA is the Oracle analogue of search_path: unqualified rpt_*
-        # resolves to the governed canvases, the validator rejected everything else.
+        # CURRENT_SCHEMA is the Oracle analogue: unqualified names resolve to
+        # CISADM (rpt_* stays reachable as ORIGINBA_REPORTING.rpt_*); the
+        # validator fenced everything else and guards secrets.
         return execute_demo_query(
             sql, organization_id=org_id, max_rows=max_rows,
-            current_schema="ORIGINBA_REPORTING")
+            current_schema="CISADM")
     return execute_demo_query(sql, organization_id=org_id, max_rows=max_rows)
 
 
 def _list_oracle_reporting_tables(org_id: str, needle: str) -> list[dict[str, Any]]:
-    """The in-database canvases with optimizer stats -- names lowercased so the
-    UI and the dbt catalog agree on rpt_* identity."""
+    """CISADM tables (the schema analysts know) with optimizer stats, uppercase
+    per Oracle convention. Empty tables are skipped — a full CISADM install has
+    thousands of never-used tables that would bury the ones with data."""
     binds: dict[str, Any] = {}
-    where = "WHERE owner = 'ORIGINBA_REPORTING' AND table_name LIKE 'RPT%'"
+    # Log tables (D1_USAGE_LOG, *_LOG_PARM, ...) carry no business value and their
+    # row counts bury the tables that do -- excluded outright.
+    where = ("WHERE owner = 'CISADM' AND num_rows > 0"
+             " AND table_name NOT LIKE '%\\_LOG' ESCAPE '\\'"
+             " AND table_name NOT LIKE '%\\_LOG\\_%' ESCAPE '\\'"
+             " AND table_name NOT LIKE '%LOGPARM'")
     if needle:
         binds["pattern"] = f"%{needle.upper()}%"
         where += " AND table_name LIKE :pattern"
     sql = f"""
-        SELECT LOWER(table_name) AS table_name, num_rows, last_analyzed
+        SELECT table_name, num_rows, last_analyzed
         FROM all_tables
         {where}
-        ORDER BY table_name
+        ORDER BY num_rows DESC
         FETCH FIRST 200 ROWS ONLY
     """
     columns, rows = execute_demo_query(sql, binds, organization_id=org_id, max_rows=200)
@@ -156,17 +164,22 @@ def _list_oracle_reporting_tables(org_id: str, needle: str) -> list[dict[str, An
 
 
 def _list_warehouse_tables(org_id: str, needle: str) -> list[dict[str, Any]]:
-    """The reporting canvases, with live row estimates — one governed layer, no
-    curated subset needed."""
+    """CISADM landing tables with live row estimates, busiest first — the
+    schema analysts know. Empty tables are skipped so the ones with data lead."""
     sql = """
         select c.relname as table_name,
                s.n_live_tup as num_rows,
                greatest(s.last_analyze, s.last_autoanalyze) as last_analyzed
         from pg_stat_user_tables s
         join pg_class c on c.oid = s.relid
-        where s.schemaname = 'reporting'
+        where s.schemaname = 'cisadm'
+          and s.n_live_tup > 0
+          -- log tables carry no business value; keep them out of the browser
+          and c.relname not like '%%\\_log' escape '\\'
+          and c.relname not like '%%\\_log\\_%%' escape '\\'
+          and c.relname not like '%%logparm'
           and (%(pattern)s = '' or c.relname ilike '%%' || %(pattern)s || '%%')
-        order by c.relname
+        order by s.n_live_tup desc
         limit 200
     """
     columns, rows = execute_warehouse_query(
@@ -196,7 +209,7 @@ def list_tables(
         return {
             "organization_id": org_id,
             "engine": engine,
-            "schema": "reporting",
+            "schema": "cisadm",
             "tables": tables,
             "table_count": len(tables),
             "source": "database",
@@ -210,7 +223,7 @@ def list_tables(
         return {
             "organization_id": org_id,
             "engine": engine,
-            "schema": "ORIGINBA_REPORTING",
+            "schema": "CISADM",
             "tables": tables,
             "table_count": len(tables),
             "source": "database",

@@ -16,6 +16,7 @@ import {
 } from "@/lib/databaseQueryTemplates";
 import { exportRowsCsv, formatBoolean, formatCurrency, formatNumber, isIdentifierColumn } from "@/lib/format";
 import { prettifyFieldName } from "@/lib/businessLabels";
+import { cisadmTableGuide } from "@/lib/cisadmTableGuide";
 import { DatabaseResultChart } from "@/components/DatabaseResultChart";
 import type { DatabaseSqlResponse, DatabaseTableInfo } from "@/lib/types";
 
@@ -265,12 +266,16 @@ export function DatabaseWorkspace({
   };
 
   const insertTable = (tableName: string) => {
+    // CISADM browse snippets. ci_pay_tndr carries protected columns, so its snippet
+    // lists safe columns explicitly — the fence rejects SELECT * there.
+    const isTender = tableName.toLowerCase() === "ci_pay_tndr";
+    const cols = isTender ? "pay_event_id, tender_type_cd, tender_amt, tender_ctl_id" : "*";
     const snippet =
       engine === "postgres"
-        ? `SELECT *\nFROM reporting.${tableName}\nLIMIT ${pageSize}`
+        ? `SELECT ${cols}\nFROM cisadm.${tableName}\nLIMIT ${pageSize}`
         : engine === "oracle_dbt"
-          ? `SELECT *\nFROM ${tableName}\nFETCH FIRST ${pageSize} ROWS ONLY`
-          : `SELECT *\nFROM CISADM.${tableName}\nWHERE ROWNUM <= ${pageSize}`;
+          ? `SELECT ${cols}\nFROM ${tableName}\nFETCH FIRST ${pageSize} ROWS ONLY`
+          : `SELECT ${cols}\nFROM CISADM.${tableName}\nWHERE ROWNUM <= ${pageSize}`;
     setSql(snippet);
     setActiveTemplate(null);
     editorRef.current?.focus();
@@ -489,17 +494,33 @@ export function DatabaseWorkspace({
                     <p className="px-1 py-2 text-xs text-fg-muted">Loading…</p>
                   ) : (
                     <ul className="space-y-0.5">
-                      {tables.map((t) => (
-                        <li key={t.table_name}>
-                          <button
-                            type="button"
-                            onClick={() => insertTable(t.table_name)}
-                            className="w-full rounded-lg px-2 py-1.5 text-left text-xs hover:bg-chip"
-                          >
-                            <span className="font-mono text-sky-300/90">{t.table_name}</span>
-                          </button>
-                        </li>
-                      ))}
+                      {tables.map((t) => {
+                        const guide = cisadmTableGuide(t.table_name);
+                        return (
+                          <li key={t.table_name}>
+                            <button
+                              type="button"
+                              onClick={() => insertTable(t.table_name)}
+                              className="w-full rounded-lg px-2 py-1.5 text-left text-xs hover:bg-chip"
+                              title={guide ?? undefined}
+                            >
+                              <span className="flex items-baseline justify-between gap-2">
+                                <span className="font-mono text-sky-300/90">{t.table_name}</span>
+                                {t.num_rows != null ? (
+                                  <span className="shrink-0 tabular-nums text-fg-subtle">
+                                    {Number(t.num_rows).toLocaleString()}
+                                  </span>
+                                ) : null}
+                              </span>
+                              {guide ? (
+                                <span className="mt-0.5 block text-[11px] leading-snug text-fg-muted">
+                                  {guide}
+                                </span>
+                              ) : null}
+                            </button>
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </div>

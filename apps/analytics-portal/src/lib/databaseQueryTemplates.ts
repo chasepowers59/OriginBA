@@ -246,45 +246,44 @@ export const DATABASE_TEMPLATE_CATEGORIES = [
 // ---------------------------------------------------------------------------
 
 export const WAREHOUSE_TIPS = [
-  "You are querying the governed reporting canvases (reporting.rpt_*) — the same tables every dashboard reads.",
-  "Column names are business names in double quotes: \"Billed Amount\", \"Main Customer Name\".",
-  "Flags are real booleans — filter with WHERE \"Is Completed\" or WHERE NOT \"Has Installed Device\".",
-  "Results load 50 rows at a time. Use Fetch next when you need more rows without waiting for the full result set.",
-  "Add a date filter (last 6 months) to keep queries fast on the big canvases like rpt_financial_txn.",
-  "Press Ctrl+Enter (⌘+Enter on Mac) to run the statement.",
-  "Toggle Chart view when your result has categories and numbers — great for monthly trends or class breakdowns.",
+  "You are querying the CISADM schema — the same tables you know from CIS. Unqualified names resolve there.",
+  "Protected columns (MICR_ID, WEB_PASSWD, ALERT_INFO) are blocked, and SELECT * on CI_PAY_TNDR needs an explicit column list.",
+  "Lowercase table names here (cisadm.ci_acct); dates use date_trunc('month', dt) and current_date - interval '6 months'.",
+  "The Tables tab lists CISADM tables busiest-first, with a guide line for the core ones.",
+  "Press Ctrl+Enter (⌘+Enter on Mac) to run the statement; results load 50 rows at a time.",
 ];
 
 export const WAREHOUSE_QUERY_TEMPLATES: DatabaseQueryTemplate[] = [
   {
-    id: "wh_canvas_freshness",
-    category: "Operations",
-    title: "Canvas freshness check",
-    description: "Row counts for the core reporting canvases, plus the warehouse's refresh watermark.",
-    tip: "\"Load Date/Time\" on rpt_financial_txn is the CDC watermark — the same marker the Data Quality page keys its acks to.",
-    sql: `SELECT 'rpt_financial_txn' AS canvas, COUNT(*) AS row_count, MAX("Load Date/Time") AS last_refresh
-FROM rpt_financial_txn
-UNION ALL
-SELECT 'rpt_bill_segment', COUNT(*), NULL FROM rpt_bill_segment
-UNION ALL
-SELECT 'rpt_payment_tender', COUNT(*), NULL FROM rpt_payment_tender
-UNION ALL
-SELECT 'rpt_measurement', COUNT(*), NULL FROM rpt_measurement
-UNION ALL
-SELECT 'rpt_gl', COUNT(*), NULL FROM rpt_gl`,
+    id: "wh_accts_by_class",
+    category: "Customers",
+    title: "Accounts by customer class",
+    description: "How the account base splits across customer classes.",
+    tip: "cust_cl_cd is client-configured — join ci_cust_cl_l for the English description.",
+    sql: `SELECT a.cust_cl_cd,
+       l.descr AS customer_class,
+       COUNT(*) AS accounts
+FROM cisadm.ci_acct a
+LEFT JOIN cisadm.ci_cust_cl_l l
+  ON l.cust_cl_cd = a.cust_cl_cd AND l.language_cd = 'ENG'
+GROUP BY a.cust_cl_cd, l.descr
+ORDER BY accounts DESC`,
+    chartDimension: "customer_class",
+    chartMeasure: "accounts",
+    chartType: "horizontal",
   },
   {
     id: "wh_ft_monthly",
     category: "Finance",
-    title: "FT dollars by month (last 6 months)",
-    description: "Monthly financial transaction count and current amount totals.",
-    tip: "Frozen FTs only — the canvas flag states the lifecycle basis.",
-    sql: `SELECT date_trunc('month', "Accounting Date") AS month,
+    title: "Frozen FT dollars by month (last 6 months)",
+    description: "Monthly financial-transaction count and current amount, frozen FTs only.",
+    tip: "freeze_sw = 'Y' is the frozen lifecycle basis — unfrozen FTs are still in flight.",
+    sql: `SELECT date_trunc('month', accounting_dt) AS month,
        COUNT(*) AS ft_count,
-       SUM("Current Amount") AS total_current_amount
-FROM rpt_financial_txn
-WHERE "Accounting Date" >= date_trunc('month', current_date) - interval '6 months'
-  AND "Is Frozen"
+       SUM(cur_amt) AS total_current_amount
+FROM cisadm.ci_ft
+WHERE freeze_sw = 'Y'
+  AND accounting_dt >= date_trunc('month', current_date) - interval '6 months'
 GROUP BY 1
 ORDER BY 1`,
     chartDimension: "month",
@@ -296,133 +295,98 @@ ORDER BY 1`,
   {
     id: "wh_ft_by_type",
     category: "Finance",
-    title: "FT volume and dollars by transaction type",
-    description: "Which FT types drive activity and dollars in the last 90 days.",
-    tip: "Add \"GL Distribution Status\" to the SELECT for a posting-health view.",
-    sql: `SELECT "FT Type" AS ft_type,
+    title: "FT volume and dollars by type",
+    description: "Which FT types (BS, PS, AD…) drive activity in the last 90 days.",
+    tip: "BS/BX net against each other on a rebill; they do not disappear.",
+    sql: `SELECT ft_type_flg,
        COUNT(*) AS ft_count,
-       SUM("Current Amount") AS total_current_amount
-FROM rpt_financial_txn
-WHERE "Accounting Date" >= current_date - 90
-GROUP BY "FT Type"
+       SUM(cur_amt) AS total_current_amount
+FROM cisadm.ci_ft
+WHERE freeze_sw = 'Y'
+  AND accounting_dt >= current_date - 90
+GROUP BY ft_type_flg
 ORDER BY total_current_amount DESC`,
-    chartDimension: "ft_type",
+    chartDimension: "ft_type_flg",
     chartMeasure: "total_current_amount",
     chartType: "horizontal",
     isCurrency: true,
   },
   {
-    id: "wh_billed_by_class",
+    id: "wh_bills_by_month",
     category: "Billing",
-    title: "Billed revenue by customer class",
-    description: "Total billed dollars by customer class — last 6 months.",
-    tip: "Segment grain — one row per bill segment. \"Billed Amount\" is the calc-line total, the correct billed figure.",
-    sql: `SELECT "Customer Class" AS customer_class,
-       COUNT(*) AS bill_segments,
-       SUM("Billed Amount") AS billed_amount
-FROM rpt_bill_segment
-WHERE "Bill Date" >= current_date - interval '6 months'
-GROUP BY "Customer Class"
-ORDER BY billed_amount DESC`,
-    chartDimension: "customer_class",
-    chartMeasure: "billed_amount",
-    chartType: "horizontal",
-    isCurrency: true,
-  },
-  {
-    id: "wh_billed_by_cycle",
-    category: "Billing",
-    title: "Billed revenue by bill cycle",
-    description: "Billed dollars grouped by bill cycle for recent billing periods.",
-    tip: "Useful for cycle-level billing health and revenue comparisons.",
-    sql: `SELECT "Bill Cycle" AS bill_cycle,
-       COUNT(*) AS bill_segments,
-       SUM("Billed Amount") AS billed_amount
-FROM rpt_bill_segment
-WHERE "Bill Date" >= current_date - interval '6 months'
-GROUP BY "Bill Cycle"
-ORDER BY billed_amount DESC`,
-    chartDimension: "bill_cycle",
-    chartMeasure: "billed_amount",
-    chartType: "bar",
-    isCurrency: true,
-  },
-  {
-    id: "wh_charges_by_description",
-    category: "Billing",
-    title: "Billed dollars by charge description",
-    description: "Which charge lines carry the revenue — calc-line grain.",
-    tip: "The line-level detail behind every bill segment; filter with ILIKE '%tax%' to profile tax lines.",
-    sql: `SELECT "Charge Description" AS charge,
-       COUNT(*) AS line_count,
-       SUM("Billed Amount") AS billed_amount
-FROM rpt_billed_charge
-GROUP BY "Charge Description"
-ORDER BY billed_amount DESC
-LIMIT 25`,
-    chartDimension: "charge",
-    chartMeasure: "billed_amount",
-    chartType: "horizontal",
-    isCurrency: true,
-  },
-  {
-    id: "wh_measurements_monthly",
-    category: "Meter ops",
-    title: "Measurements by month",
-    description: "Monthly measurement counts, with the estimated share.",
-    tip: "\"Is Estimated Measurement\" is a real boolean — a rising estimated share is the complaint zone.",
-    sql: `SELECT date_trunc('month', "Measurement Date/Time") AS month,
-       COUNT(*) AS measurement_count,
-       COUNT(*) FILTER (WHERE "Is Estimated Measurement") AS estimated_count
-FROM rpt_measurement
-WHERE "Measurement Date/Time" >= current_date - interval '6 months'
+    title: "Bills completed by month",
+    description: "Twelve months of completed-bill throughput.",
+    tip: "bill_stat_flg = 'C' is Complete; 'P' bills are still pending.",
+    sql: `SELECT date_trunc('month', bill_dt) AS month,
+       COUNT(*) AS bills_completed
+FROM cisadm.ci_bill
+WHERE bill_stat_flg = 'C'
+  AND bill_dt >= date_trunc('month', current_date) - interval '12 months'
 GROUP BY 1
 ORDER BY 1`,
     chartDimension: "month",
-    chartMeasure: "measurement_count",
+    chartMeasure: "bills_completed",
     chartType: "line",
     sortTimeSeries: true,
   },
   {
-    id: "wh_gl_by_account",
-    category: "Finance",
-    title: "GL distribution by account (last 6 months)",
-    description: "Top GL accounts by distribution amount from the GL canvas.",
-    tip: "Use rpt_gl for GL line detail — not the FT header totals.",
-    sql: `SELECT "GL Account" AS gl_account,
-       COUNT(*) AS distribution_lines,
-       SUM("GL Amount") AS total_gl_amount
-FROM rpt_gl
-WHERE "Accounting Date" >= current_date - interval '6 months'
-GROUP BY "GL Account"
-ORDER BY total_gl_amount DESC`,
-    chartDimension: "gl_account",
-    chartMeasure: "total_gl_amount",
+    id: "wh_frozen_bsegs",
+    category: "Billing",
+    title: "Bill segments by status",
+    description: "The segment lifecycle at a glance — frozen, pending, cancelled.",
+    tip: "bseg_stat_flg 50 = Frozen, 60 = Cancelled; pending states sit below 50.",
+    sql: `SELECT bseg_stat_flg,
+       COUNT(*) AS segments
+FROM cisadm.ci_bseg
+GROUP BY bseg_stat_flg
+ORDER BY segments DESC`,
+    chartDimension: "bseg_stat_flg",
+    chartMeasure: "segments",
+    chartType: "bar",
+  },
+  {
+    id: "wh_payments_by_tender",
+    category: "Payments",
+    title: "Payments by tender type (last 30 days)",
+    description: "How customers paid — cash, check, card — with dollar totals.",
+    tip: "Columns are listed explicitly: SELECT * is blocked on ci_pay_tndr (protected columns).",
+    sql: `SELECT t.tender_type_cd,
+       COUNT(*) AS tenders,
+       SUM(t.tender_amt) AS amount
+FROM cisadm.ci_pay_tndr t
+GROUP BY t.tender_type_cd
+ORDER BY amount DESC`,
+    chartDimension: "tender_type_cd",
+    chartMeasure: "amount",
     chartType: "horizontal",
     isCurrency: true,
   },
   {
-    id: "wh_stuck_bills",
-    category: "Operations",
-    title: "Bills stuck open over 30 days",
-    description: "The billing engine's stuck-bill worklist, straight off rpt_bill.",
-    tip: "Measured norm is p50 3.8 / p99 24.2 days open — 30+ is genuinely stuck.",
-    sql: `SELECT "Bill ID", "Main Customer Name", "Bill Date", "Days Bill Open"
-FROM rpt_bill
-WHERE "Days Bill Open" > 30
-ORDER BY "Days Bill Open" DESC`,
+    id: "wh_sa_by_status",
+    category: "Customers",
+    title: "Service agreements by status",
+    description: "The SA portfolio: active, stopped, closed.",
+    tip: "sa_status_flg 20 = Active, 40 = Stopped, 60 = Closed, 70 = Reactivated.",
+    sql: `SELECT s.sa_status_flg,
+       COUNT(*) AS service_agreements
+FROM cisadm.ci_sa s
+GROUP BY s.sa_status_flg
+ORDER BY service_agreements DESC`,
+    chartDimension: "sa_status_flg",
+    chartMeasure: "service_agreements",
+    chartType: "bar",
   },
   {
-    id: "wh_peek_ft",
-    category: "Quick look",
-    title: "Preview financial transactions",
-    description: "Recent financial transaction rows — good for exploring columns.",
-    tip: "Fast starter query. Edit the WHERE clause to narrow by date or account.",
-    sql: `SELECT "FT ID", "Accounting Date", "FT Type", "Current Amount",
-       "GL Distribution Status", "Main Customer Name"
-FROM rpt_financial_txn
-WHERE "Accounting Date" >= current_date - interval '1 month'
-ORDER BY "Accounting Date" DESC`,
+    id: "wh_recent_fts",
+    category: "Finance",
+    title: "Recent financial transactions",
+    description: "The latest frozen FTs, newest first.",
+    tip: "Fast starter — edit the WHERE clause to narrow by account or SA.",
+    sql: `SELECT ft_id, ft_type_flg, accounting_dt, cur_amt, tot_amt, sa_id
+FROM cisadm.ci_ft
+WHERE freeze_sw = 'Y'
+ORDER BY accounting_dt DESC
+LIMIT 100`,
   },
 ];
 
@@ -433,65 +397,97 @@ export type WorkspaceEngine = "postgres" | "oracle" | "oracle_dbt";
 // quoted Title-Case names; dates and row limits use Oracle idioms.
 const ORACLE_DBT_QUERY_TEMPLATES: DatabaseQueryTemplate[] = [
   {
+    id: "odbt_accts_by_class",
+    category: "Customers",
+    title: "Accounts by customer class",
+    description: "How the account base splits across customer classes.",
+    tip: "cust_cl_cd is client-configured — join CI_CUST_CL_L for the English description.",
+    sql: `SELECT a.cust_cl_cd,
+       l.descr AS customer_class,
+       COUNT(*) AS accounts
+FROM CI_ACCT a
+LEFT JOIN CI_CUST_CL_L l
+  ON l.cust_cl_cd = a.cust_cl_cd AND l.language_cd = 'ENG'
+GROUP BY a.cust_cl_cd, l.descr
+ORDER BY accounts DESC`,
+    chartDimension: "customer_class",
+    chartMeasure: "accounts",
+    chartType: "horizontal",
+  },
+  {
+    id: "odbt_ft_monthly",
+    category: "Finance",
+    title: "Frozen FT dollars by month (last 6 months)",
+    description: "Monthly financial-transaction count and current amount, frozen FTs only.",
+    tip: "freeze_sw = 'Y' is the frozen lifecycle basis.",
+    sql: `SELECT TRUNC(accounting_dt, 'MM') AS month,
+       COUNT(*) AS ft_count,
+       SUM(cur_amt) AS total_current_amount
+FROM CI_FT
+WHERE freeze_sw = 'Y'
+  AND accounting_dt >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -6)
+GROUP BY TRUNC(accounting_dt, 'MM')
+ORDER BY month`,
+    chartDimension: "month",
+    chartMeasure: "total_current_amount",
+    chartType: "line",
+    isCurrency: true,
+    sortTimeSeries: true,
+  },
+  {
+    id: "odbt_bills_by_month",
+    category: "Billing",
+    title: "Bills completed by month",
+    description: "Twelve months of completed-bill throughput.",
+    tip: "bill_stat_flg = 'C' is Complete.",
+    sql: `SELECT TRUNC(bill_dt, 'MM') AS month,
+       COUNT(*) AS bills_completed
+FROM CI_BILL
+WHERE bill_stat_flg = 'C'
+  AND bill_dt >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12)
+GROUP BY TRUNC(bill_dt, 'MM')
+ORDER BY month`,
+    chartDimension: "month",
+    chartMeasure: "bills_completed",
+    chartType: "line",
+    sortTimeSeries: true,
+  },
+  {
+    id: "odbt_payments_by_tender",
+    category: "Payments",
+    title: "Payments by tender type",
+    description: "How customers paid, with dollar totals.",
+    tip: "Columns are listed explicitly: SELECT * is blocked on CI_PAY_TNDR (protected columns).",
+    sql: `SELECT t.tender_type_cd,
+       COUNT(*) AS tenders,
+       SUM(t.tender_amt) AS amount
+FROM CI_PAY_TNDR t
+GROUP BY t.tender_type_cd
+ORDER BY amount DESC`,
+    chartDimension: "tender_type_cd",
+    chartMeasure: "amount",
+    chartType: "horizontal",
+    isCurrency: true,
+  },
+  {
     id: "odbt_recent_fts",
     category: "Finance",
     title: "Recent financial transactions",
-    description: "Frozen financial activity for the last month, newest first.",
-    tip: "Edit the WHERE clause to narrow by date or account.",
-    sql: `SELECT "FT ID", "Accounting Date", "FT Type", "Current Amount",
-       "GL Distribution Status", "Main Customer Name"
-FROM rpt_financial_txn
-WHERE "Accounting Date" >= ADD_MONTHS(TRUNC(SYSDATE), -1)
-ORDER BY "Accounting Date" DESC
+    description: "The latest frozen FTs, newest first.",
+    tip: "Unqualified names resolve to CISADM here.",
+    sql: `SELECT ft_id, ft_type_flg, accounting_dt, cur_amt, tot_amt, sa_id
+FROM CI_FT
+WHERE freeze_sw = 'Y'
+ORDER BY accounting_dt DESC
 FETCH FIRST 100 ROWS ONLY`,
-  },
-  {
-    id: "odbt_billing_by_month",
-    category: "Billing",
-    title: "Billed amount by month",
-    description: "Twelve months of billed segment revenue.",
-    tip: "TRUNC(date, 'MM') is the Oracle month bucket.",
-    sql: `SELECT TRUNC("Bill Date", 'MM') AS billing_month,
-       COUNT(*) AS segments,
-       SUM("Billed Amount") AS billed_amount
-FROM rpt_bill_segment
-WHERE "Bill Date" >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12)
-GROUP BY TRUNC("Bill Date", 'MM')
-ORDER BY billing_month`,
-  },
-  {
-    id: "odbt_aged_debt",
-    category: "Collections",
-    title: "Aged receivables by bucket",
-    description: "The arrears position straight off the aged balance canvas.",
-    tip: "Buckets age by days past due, matching the CIS arrears zone.",
-    sql: `SELECT COUNT(*) AS service_agreements,
-       SUM("Current Balance") AS current_balance,
-       SUM("Arrears 0-30 Days") AS bucket_0_30,
-       SUM("Arrears 31-60 Days") AS bucket_31_60,
-       SUM("Arrears 61-90 Days") AS bucket_61_90,
-       SUM("Arrears 121+ Days") AS bucket_121_plus
-FROM rpt_sa_aged_balance`,
-  },
-  {
-    id: "odbt_payments",
-    category: "Payments",
-    title: "Payments by tender type",
-    description: "Last 30 days of tenders, grouped by how customers paid.",
-    tip: "Unqualified rpt_* names resolve to the governed reporting layer.",
-    sql: `SELECT "Tender Type", COUNT(*) AS tenders, SUM("Tender Amount") AS amount
-FROM rpt_payment_tender
-WHERE "Payment Date" >= TRUNC(SYSDATE) - 30
-GROUP BY "Tender Type"
-ORDER BY amount DESC`,
   },
 ];
 
 const ORACLE_DBT_TIPS: string[] = [
-  "You are reading the governed reporting canvases inside this client's own Oracle instance -- the same tables the dashboards use, refreshed every 6 hours.",
-  "Column names are quoted and Title Case: \"Account ID\", \"Accounting Date\".",
+  "You are querying CISADM in this client's own Oracle instance — the schema you know from CIS. Unqualified names resolve there.",
+  "Protected columns (MICR_ID, WEB_PASSWD, ALERT_INFO) are blocked, and SELECT * on CI_PAY_TNDR needs an explicit column list.",
   "Use FETCH FIRST n ROWS ONLY (not LIMIT) and TRUNC/ADD_MONTHS for dates.",
-  "Only the reporting layer is queryable; staging, core, and CISADM are fenced off.",
+  "Oracle treats '' as NULL — test empty codes with IS NULL, never = ''.",
 ];
 
 export function templatesForEngine(engine: WorkspaceEngine): DatabaseQueryTemplate[] {

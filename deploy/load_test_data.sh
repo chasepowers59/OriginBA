@@ -28,10 +28,33 @@ for d in /opt/homebrew/opt/postgresql@16/bin /opt/homebrew/opt/postgresql@17/bin
 done
 command -v pg_dump >/dev/null || { echo "pg_dump not found (brew install postgresql@16)"; exit 1; }
 
-echo "Dumping reporting.* from ${SRC_DB} and loading into the target…"
+# The SQL workspace queries the CISADM schema (what analysts know), so ship it
+# alongside the reporting canvases. Secrets stay out of the cloud: MICR_ID,
+# WEB_PASSWD% and ALERT_INFO are nulled post-load (the app's SQL fence blocks
+# them too — this is defense in depth for the cloud copy).
+echo "Dumping cisadm.* + reporting.* from ${SRC_DB} and loading into the target…"
 pg_dump -h "$SRC_HOST" -p "$SRC_PORT" -U "$SRC_USER" -d "$SRC_DB" \
-  -n reporting --no-owner --no-privileges \
+  -n cisadm -n reporting --no-owner --no-privileges \
   | psql "$TARGET_DB_URL" -v ON_ERROR_STOP=1 -q
+
+echo "Nulling protected columns in the cloud copy…"
+psql "$TARGET_DB_URL" -v ON_ERROR_STOP=1 -q <<'SQL'
+DO $$
+DECLARE r record;
+BEGIN
+  FOR r IN
+    SELECT table_name, column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'cisadm'
+      AND (lower(column_name) = 'micr_id'
+           OR lower(column_name) LIKE 'web_passwd%'
+           OR lower(column_name) = 'alert_info')
+  LOOP
+    EXECUTE format('UPDATE cisadm.%I SET %I = NULL WHERE %I IS NOT NULL',
+                   r.table_name, r.column_name, r.column_name);
+  END LOOP;
+END $$;
+SQL
 
 echo "Done. Verifying a couple of canvases:"
 psql "$TARGET_DB_URL" -tAc \

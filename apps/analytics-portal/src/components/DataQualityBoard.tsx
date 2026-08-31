@@ -3,10 +3,11 @@
 /**
  * Data Quality board — the rules engine's findings as a CIS worklist.
  *
- * Every card is one rule run against this tenant's governed reporting canvases:
- * severity, plain-English title, the exact action to take in CIS, and the finding
- * rows. Act-now findings open expanded; clean rules collapse to a single line so
- * the page reads as "what needs attention", not "what we checked".
+ * Organised the way an analyst triages: an at-a-glance summary strip, then findings
+ * GROUPED BY SEVERITY — "Act now" first and expanded, "Review" next, and the clean
+ * checks collapsed into a quiet strip at the bottom, so the page reads as "what needs
+ * attention", never "what we checked". Every finding card carries the exact action to
+ * take in CIS. Theme-token styled (light + dark), reference-dashboard panel language.
  */
 import { useEffect, useMemo, useState } from "react";
 import { apiGet, apiPost } from "@/lib/api";
@@ -38,16 +39,11 @@ type DqResponse = {
   error?: string;
 };
 
-const SEV_STYLE: Record<string, string> = {
-  action: "bg-red-800 text-heading",
-  review: "bg-amber-600 text-heading",
-  info: "bg-slate-500 text-heading",
-};
-const SEV_LABEL: Record<string, string> = {
-  action: "ACT NOW",
-  review: "REVIEW",
-  info: "INFO",
-};
+const SEV = {
+  action: { label: "ACT NOW", pill: "bg-red-500/15 text-red-600 ring-1 ring-red-500/30 dark:text-red-300" },
+  review: { label: "REVIEW", pill: "bg-amber-500/15 text-amber-700 ring-1 ring-amber-500/30 dark:text-amber-300" },
+  info: { label: "INFO", pill: "bg-chip text-fg-muted ring-1 ring-edge-subtle" },
+} as const;
 
 export function DataQualityBoard() {
   const [data, setData] = useState<DqResponse | null>(null);
@@ -80,9 +76,22 @@ export function DataQualityBoard() {
     );
   }, [data, filter]);
 
+  // Triage grouping: anything with findings (or a rule error) surfaces under its
+  // severity; clean rules collapse to the quiet strip at the bottom.
+  const groups = useMemo(() => {
+    const open = (sev: DqRule["severity"]) =>
+      rules.filter((r) => r.severity === sev && (r.count > 0 || r.error));
+    return {
+      action: open("action"),
+      review: open("review"),
+      info: rules.filter((r) => r.severity === "info" && (r.count > 0 || r.error)),
+      clean: rules.filter((r) => r.count === 0 && !r.error),
+    };
+  }, [rules]);
+
   if (err) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-sm text-red-800">
+      <div className="glass-panel border-red-400/30 bg-red-500/10 p-6 text-sm text-red-600 dark:text-red-300">
         Could not load data-quality findings: {err}
       </div>
     );
@@ -91,14 +100,14 @@ export function DataQualityBoard() {
     return (
       <div className="animate-pulse space-y-3 p-2">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-16 rounded-lg bg-slate-100" />
+          <div key={i} className="loading-shimmer h-16 rounded-xl" />
         ))}
       </div>
     );
   }
   if (!data.configured) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white p-8 text-center text-sm text-fg-muted">
+      <div className="glass-panel p-8 text-center text-sm text-fg-muted">
         No reporting warehouse is configured for this organization, so the
         data-quality rules have nothing to run against.
       </div>
@@ -106,13 +115,19 @@ export function DataQualityBoard() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900">Data Quality</h1>
-          <p className="text-sm text-fg-muted">
-            Rules run against the governed reporting canvases; every finding says
-            exactly where to act in CIS.
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">
+            Data quality
+          </p>
+          <h1 className="portal-heading mt-1 text-2xl font-bold">Worklist</h1>
+          <p className="mt-1 text-sm text-fg-muted">
+            Rules run against this tenant&apos;s data; every finding says exactly where
+            to act in CIS.
+            {data.refresh_marker ? (
+              <span className="text-fg-subtle"> · data as of {data.refresh_marker}</span>
+            ) : null}
           </p>
         </div>
         <input
@@ -120,122 +135,200 @@ export function DataQualityBoard() {
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Filter rules…"
           aria-label="Filter rules"
-          className="w-56 rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+          className="input-modern w-56"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <SummaryCard label="Act-now findings" value={data.act_now ?? 0} tone="red" />
-        <SummaryCard label="Review findings" value={data.review ?? 0} tone="amber" />
-        <SummaryCard label="Rules run" value={data.rules.length} tone="slate" />
-        <SummaryCard
-          label="Marked done (until refresh)"
-          value={data.acknowledged ?? 0}
-          tone="green"
-        />
+        <SummaryCard label="Act now" value={data.act_now ?? 0} tone="red" glyph="!" />
+        <SummaryCard label="Review" value={data.review ?? 0} tone="amber" glyph="?" />
+        <SummaryCard label="Rules run" value={data.rules.length} tone="blue" glyph="✓" />
+        <SummaryCard label="Marked done" value={data.acknowledged ?? 0} tone="green" glyph="✔" />
       </div>
 
-      <div className="space-y-2">
+      <Section
+        title="Act now"
+        subtitle="Findings that block or corrupt downstream work — fix these in CIS first."
+        rules={groups.action}
+        defaultOpen
+        onMark={mark}
+        emptyNote="Nothing needs immediate action."
+      />
+      <Section
+        title="Review"
+        subtitle="Worth a look — likely configuration drift or unusual data."
+        rules={groups.review}
+        onMark={mark}
+        emptyNote="Nothing waiting for review."
+      />
+      {groups.info.length ? (
+        <Section title="Informational" rules={groups.info} onMark={mark} />
+      ) : null}
+
+      {groups.clean.length ? (
+        <details className="glass-panel px-4 py-3">
+          <summary className="cursor-pointer text-sm text-fg-muted">
+            <span className="font-medium text-emerald-600 dark:text-emerald-400">
+              {groups.clean.length} checks clean
+            </span>{" "}
+            — everything these rules watch is in order
+          </summary>
+          <ul className="mt-3 grid gap-1 text-xs text-fg-muted sm:grid-cols-2">
+            {groups.clean.map((r) => (
+              <li key={r.id} className="flex items-center gap-2">
+                <span aria-hidden className="text-emerald-500">✓</span>
+                <span>{r.title}</span>
+                <span className="text-fg-subtle">· {r.object}</span>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
+    </div>
+  );
+}
+
+function Section({
+  title,
+  subtitle,
+  rules,
+  defaultOpen = false,
+  onMark,
+  emptyNote,
+}: {
+  title: string;
+  subtitle?: string;
+  rules: DqRule[];
+  defaultOpen?: boolean;
+  onMark: (key: string, done: boolean) => Promise<void>;
+  emptyNote?: string;
+}) {
+  if (!rules.length) {
+    return emptyNote ? (
+      <div>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-fg-subtle">{title}</h2>
+        <p className="mt-1 text-sm text-fg-muted">
+          <span aria-hidden className="mr-1 text-emerald-500">✓</span>
+          {emptyNote}
+        </p>
+      </div>
+    ) : null;
+  }
+  return (
+    <section>
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-fg-subtle">{title}</h2>
+      {subtitle ? <p className="mt-0.5 text-xs text-fg-muted">{subtitle}</p> : null}
+      <div className="mt-3 space-y-3">
         {rules.map((r) => (
-          <details
-            key={r.id}
-            open={r.severity === "action" && r.count > 0}
-            className="rounded-lg border border-slate-200 bg-white shadow-sm"
-          >
-            <summary className="flex cursor-pointer items-center gap-3 px-4 py-3">
-              <span
-                className={`rounded px-2 py-0.5 text-[10px] font-bold tracking-wide ${SEV_STYLE[r.severity]}`}
-              >
-                {SEV_LABEL[r.severity]}
-              </span>
-              <span className="font-medium text-slate-900">{r.title}</span>
-              <span className="ml-auto text-sm text-fg-muted">
-                {r.error
-                  ? "rule error"
-                  : r.count
-                    ? `${r.count}${r.capped ? "+" : ""} finding${r.count === 1 ? "" : "s"}`
-                    : "clean"}
-                {" · "}
-                {r.object}
-              </span>
-            </summary>
-            <div className="border-t border-slate-100 px-4 py-3">
-              <p className="mb-3 rounded-md border-l-2 border-teal-700 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-                <span className="font-semibold">What to do: </span>
-                {r.action}
-              </p>
-              {r.error ? (
-                <p className="text-sm text-red-700">rule error: {r.error}</p>
-              ) : r.count === 0 ? (
-                <p className="text-sm text-fg-muted">No findings — clean.</p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-xs">
-                    <thead>
-                      <tr>
-                        <th className="border-b border-slate-200 bg-slate-50 px-2 py-1.5" />
-                        {r.columns.map((c) => (
-                          <th
-                            key={c}
-                            className="whitespace-nowrap border-b border-slate-200 bg-slate-50 px-2 py-1.5 text-left font-semibold text-fg-muted"
-                          >
-                            {c}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {r.rows.map((row, i) => (
-                        <tr key={i} className="border-b border-slate-100">
-                          <td className="px-2 py-1">
-                            <button
-                              onClick={() => mark(r.row_keys?.[i] ?? `${r.id}|${row[0]}`, true)}
-                              title="Mark done until the next data refresh"
-                              className="rounded border border-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-50"
-                            >
-                              Done
-                            </button>
-                          </td>
-                          {row.map((v, j) => (
-                            <td key={j} className="whitespace-nowrap px-2 py-1 text-slate-700">
-                              {v ?? ""}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {r.capped && (
-                    <p className="mt-1 text-xs text-fg-muted">showing first 100</p>
-                  )}
-                </div>
-              )}
-              {(r.acked_rows?.length ?? 0) > 0 && (
-                <details className="mt-2">
-                  <summary className="cursor-pointer text-xs text-fg-muted">
-                    {r.acked_rows!.length} marked done (hidden until the next data
-                    refresh)
-                  </summary>
-                  <ul className="mt-1 space-y-0.5 text-xs text-fg-muted">
-                    {r.acked_rows!.map((row, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <button
-                          onClick={() => mark(r.acked_row_keys?.[i] ?? `${r.id}|${row[0]}`, false)}
-                          className="rounded border border-slate-300 px-1.5 py-0.5 text-[10px] hover:bg-slate-50"
-                        >
-                          Undo
-                        </button>
-                        <span className="line-through">{row.filter(Boolean).slice(0, 4).join(" · ")}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              )}
-            </div>
-          </details>
+          <RuleCard key={r.id} rule={r} defaultOpen={defaultOpen} onMark={onMark} />
         ))}
       </div>
-    </div>
+    </section>
+  );
+}
+
+function RuleCard({
+  rule: r,
+  defaultOpen,
+  onMark,
+}: {
+  rule: DqRule;
+  defaultOpen: boolean;
+  onMark: (key: string, done: boolean) => Promise<void>;
+}) {
+  const sev = SEV[r.severity];
+  return (
+    <details open={defaultOpen && r.count > 0} className="glass-panel overflow-hidden">
+      <summary className="flex cursor-pointer flex-wrap items-center gap-3 px-4 py-3">
+        <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wide ${sev.pill}`}>
+          {sev.label}
+        </span>
+        <span className="font-medium text-heading">{r.title}</span>
+        <span className="ml-auto flex items-center gap-2 text-sm">
+          {r.error ? (
+            <span className="text-red-500">rule error</span>
+          ) : (
+            <span className="rounded-full bg-chip px-2 py-0.5 text-xs font-semibold tabular-nums text-fg">
+              {r.count}
+              {r.capped ? "+" : ""}
+            </span>
+          )}
+          <span className="font-mono text-xs text-fg-subtle">{r.object}</span>
+        </span>
+      </summary>
+      <div className="border-t border-edge-subtle px-4 py-3">
+        <p className="mb-3 rounded-lg border-l-2 border-brand bg-surface-subtle px-3 py-2 text-sm text-fg">
+          <span className="font-semibold text-heading">What to do: </span>
+          {r.action}
+        </p>
+        {r.error ? (
+          <p className="text-sm text-red-500">rule error: {r.error}</p>
+        ) : r.count === 0 ? (
+          <p className="text-sm text-fg-muted">No findings — clean.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-xs">
+              <thead>
+                <tr>
+                  <th className="border-b border-edge-subtle px-2 py-1.5" />
+                  {r.columns.map((c) => (
+                    <th
+                      key={c}
+                      className="whitespace-nowrap border-b border-edge-subtle px-2 py-1.5 text-left font-semibold text-fg-muted"
+                    >
+                      {c}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {r.rows.map((row, i) => (
+                  <tr key={i} className="border-b border-edge-subtle/60 hover:bg-chip">
+                    <td className="px-2 py-1">
+                      <button
+                        onClick={() => onMark(r.row_keys?.[i] ?? `${r.id}|${row[0]}`, true)}
+                        title="Mark done until the next data refresh"
+                        className="rounded border border-emerald-500/50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 hover:bg-emerald-500/10 dark:text-emerald-400"
+                      >
+                        Done
+                      </button>
+                    </td>
+                    {row.map((v, j) => (
+                      <td key={j} className="whitespace-nowrap px-2 py-1 text-fg">
+                        {v ?? ""}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {r.capped && <p className="mt-1 text-xs text-fg-subtle">showing first 100</p>}
+          </div>
+        )}
+        {(r.acked_rows?.length ?? 0) > 0 && (
+          <details className="mt-2">
+            <summary className="cursor-pointer text-xs text-fg-muted">
+              {r.acked_rows!.length} marked done (hidden until the next data refresh)
+            </summary>
+            <ul className="mt-1 space-y-0.5 text-xs text-fg-muted">
+              {r.acked_rows!.map((row, i) => (
+                <li key={i} className="flex items-center gap-2">
+                  <button
+                    onClick={() => onMark(r.acked_row_keys?.[i] ?? `${r.id}|${row[0]}`, false)}
+                    className="rounded border border-edge px-1.5 py-0.5 text-[10px] hover:bg-chip"
+                  >
+                    Undo
+                  </button>
+                  <span className="line-through">
+                    {row.filter(Boolean).slice(0, 4).join(" · ")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
+      </div>
+    </details>
   );
 }
 
@@ -243,21 +336,32 @@ function SummaryCard({
   label,
   value,
   tone,
+  glyph,
 }: {
   label: string;
   value: number;
-  tone: "red" | "amber" | "green" | "slate";
+  tone: "red" | "amber" | "green" | "blue";
+  glyph: string;
 }) {
-  const tones: Record<string, string> = {
-    red: "text-red-800",
-    amber: "text-amber-700",
-    green: "text-emerald-700",
-    slate: "text-slate-800",
+  const tones: Record<string, { text: string; chip: string }> = {
+    red: { text: "text-red-600 dark:text-red-400", chip: "bg-red-500" },
+    amber: { text: "text-amber-600 dark:text-amber-400", chip: "bg-amber-500" },
+    green: { text: "text-emerald-600 dark:text-emerald-400", chip: "bg-emerald-500" },
+    blue: { text: "text-brand", chip: "bg-brand" },
   };
+  const t = tones[tone];
   return (
-    <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
-      <div className={`text-2xl font-semibold ${tones[tone]}`}>{value}</div>
-      <div className="text-xs text-fg-muted">{label}</div>
+    <div className="glass-panel flex items-center gap-3 px-4 py-3">
+      <span
+        aria-hidden
+        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white ${t.chip}`}
+      >
+        {glyph}
+      </span>
+      <div>
+        <div className={`text-2xl font-bold tabular-nums leading-none ${t.text}`}>{value}</div>
+        <div className="mt-1 text-xs text-fg-muted">{label}</div>
+      </div>
     </div>
   );
 }

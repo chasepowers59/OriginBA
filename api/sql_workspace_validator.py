@@ -99,34 +99,64 @@ def _strip_sql_noise(sql: str) -> str:
     return cleaned
 
 
-def _enforce_scope(sql: str, allowed_schema: str, deny: re.Pattern,
+# ---------------------------------------------------------------------------
+# Secrets guard (2026-08-31): CISADM is queryable — utility analysts know the
+# CIS schema, and it is what the workspace is FOR — but the columns that hold
+# secrets never are. MICR_ID is bank routing, WEB_PASSWD* are credentials,
+# ALERT_INFO is free-text operational notes. Two layers:
+#   1. any mention of a secret column name is rejected outright;
+#   2. SELECT * against CI_PAY_TNDR (the table that carries MICR_ID) is
+#      rejected — an explicit column list is required there instead.
+# ---------------------------------------------------------------------------
+_SECRET_COLUMNS = re.compile(r"\b(micr_id|web_passwd\w*|alert_info)\b", re.IGNORECASE)
+_STAR_ON_TENDER = re.compile(
+    r"\bSELECT\b[^;]*?(?:^|[\s,(])(?:[\w$#]+\s*\.\s*)?\*.*?\bFROM\b[^;]*?\bci_pay_tndr\b",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def _enforce_secrets(cleaned: str) -> None:
+    m = _SECRET_COLUMNS.search(cleaned)
+    if m:
+        raise SqlWorkspaceValidationError(
+            f"'{m.group(1)}' is a protected column (secrets never leave the "
+            "database). Select the columns you need explicitly, without it."
+        )
+    if _STAR_ON_TENDER.search(cleaned):
+        raise SqlWorkspaceValidationError(
+            "SELECT * is not allowed on CI_PAY_TNDR (it carries protected "
+            "columns). List the columns you need explicitly."
+        )
+
+
+def _enforce_scope(sql: str, allowed_schemas: tuple[str, ...], deny: re.Pattern,
                    extra: tuple[tuple[re.Pattern, str], ...] = ()) -> None:
     cleaned = _strip_sql_noise(sql)
+    primary = allowed_schemas[0]
+    allowed = {s.lower() for s in allowed_schemas}
 
     # C. No quoted schema qualifier at all.
     if _QUOTED_QUALIFIER.search(cleaned):
         raise SqlWorkspaceValidationError(
-            "Quoted schema qualifiers are not allowed. Query the reporting "
-            "canvases unqualified (they resolve automatically) or with the "
-            f"{allowed_schema} schema, unquoted."
+            "Quoted schema qualifiers are not allowed. Query tables "
+            f"unqualified or with the {primary} schema, unquoted."
         )
 
-    # B. Positive allow-list: any FROM/JOIN-qualified table must name the
-    #    reporting schema and nothing else -- unknown schemas rejected too.
+    # B. Positive allow-list: any FROM/JOIN-qualified table must name an
+    #    allowed schema and nothing else -- unknown schemas rejected too.
     for m in _FROM_JOIN_QUALIFIER.finditer(cleaned):
         qualifier = m.group(1).strip('"').lower()
-        if qualifier != allowed_schema.lower():
+        if qualifier not in allowed:
             raise SqlWorkspaceValidationError(
-                f"The workspace is scoped to the {allowed_schema} layer -- "
-                f"'{m.group(1)}.' is not queryable here. Query the rpt_* "
-                f"canvases instead."
+                f"The workspace is scoped to {', '.join(allowed_schemas)} -- "
+                f"'{m.group(1)}.' is not queryable here."
             )
 
     # D. Deny-list backstop (comma-join position, Oracle escape hatches).
     match = deny.search(cleaned)
     if match:
         raise SqlWorkspaceValidationError(
-            f"The workspace is scoped to the {allowed_schema} layer -- "
+            f"The workspace is scoped to {', '.join(allowed_schemas)} -- "
             f"'{match.group(1)}.' is not queryable here."
         )
     for pattern, what in extra:
@@ -137,16 +167,23 @@ def _enforce_scope(sql: str, allowed_schema: str, deny: re.Pattern,
                 f"('{m.group(0)}')."
             )
 
+    _enforce_secrets(cleaned)
+
 
 _NON_REPORTING_SCHEMA = re.compile(
-    r"\b(cisadm|landing|staging|core|public|pg_catalog|information_schema)\s*\.",
+    r"\b(landing|staging|core|public|pg_catalog|information_schema)\s*\.",
     re.IGNORECASE,
 )
 
 
 def validate_reporting_scope(sql: str) -> None:
-    """Reject Postgres warehouse SQL that reaches outside the reporting layer."""
-    _enforce_scope(sql, "reporting", _NON_REPORTING_SCHEMA)
+    """Reject Postgres warehouse SQL that reaches outside cisadm + reporting.
+
+    CISADM is the workspace's primary surface (analysts know the CIS schema);
+    the reporting layer stays queryable for governed canvases. Secrets are
+    guarded separately (see _enforce_secrets).
+    """
+    _enforce_scope(sql, ("cisadm", "reporting"), _NON_REPORTING_SCHEMA)
 
 
 # The in-database (oracle_dbt) fence adds the Oracle-specific escape hatches a
@@ -154,7 +191,7 @@ def validate_reporting_scope(sql: str) -> None:
 # (all_/dba_/user_/v$/cdb_), PL/SQL package surface (dbms_/utl_), XML/network
 # functions, and database links (@).
 _ORACLE_NON_REPORTING = re.compile(
-    r"\b(cisadm|originba_staging|originba_core|originba_src|sys|system)\s*\.",
+    r"\b(originba_staging|originba_core|originba_src|sys|system)\s*\.",
     re.IGNORECASE,
 )
 _ORACLE_DICTIONARY = re.compile(
@@ -169,9 +206,14 @@ _ORACLE_DBLINK = re.compile(r"@\w+", re.IGNORECASE)
 
 
 def validate_oracle_reporting_scope(sql: str) -> None:
-    """Reject in-database workspace SQL that reaches outside ORIGINBA_REPORTING."""
+    """Reject in-database workspace SQL outside CISADM + ORIGINBA_REPORTING.
+
+    CISADM is queryable (it is the schema utility analysts actually know); the
+    Oracle escape hatches (dictionary views, PL/SQL, dblinks) and the internal
+    build schemas stay fenced, and secrets are guarded (see _enforce_secrets).
+    """
     _enforce_scope(
-        sql, "ORIGINBA_REPORTING", _ORACLE_NON_REPORTING,
+        sql, ("CISADM", "ORIGINBA_REPORTING"), _ORACLE_NON_REPORTING,
         extra=((_ORACLE_DICTIONARY, "data dictionary views"),
                (_ORACLE_PACKAGES, "PL/SQL packages and network functions"),
                (_ORACLE_DBLINK, "database links")),

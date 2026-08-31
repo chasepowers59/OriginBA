@@ -30,10 +30,10 @@ export default async function DatabasePage({
     >
       <div className="space-y-4">
         <div>
-          <h1 className="portal-heading text-2xl font-bold tracking-tight">Database</h1>
+          <h1 className="portal-heading text-2xl font-bold tracking-tight">SQL</h1>
           <p className="portal-text-muted mt-1 max-w-2xl text-sm">
-            Run SQL against your Oracle reporting database. Start with a premade business question,
-            fetch results in 50-row pages, and optionally chart grouped results.
+            Query the CISADM schema you know from CIS. Start with a premade business question or
+            browse the table guide, fetch results in 50-row pages, and chart grouped results.
           </p>
         </div>
         <DatabaseWorkspace dbConfigured={index.db_configured} initialTable={table} />
