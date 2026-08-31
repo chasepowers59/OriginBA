@@ -23,7 +23,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { formatCurrency, formatNumber } from "@/lib/format";
+import { formatCurrency, formatNumber, formatTooltipNumber } from "@/lib/format";
 import { valueRampColors } from "@/lib/chartEmphasis";
 
 export type BuilderVisual =
@@ -94,7 +94,12 @@ export function BuilderChart({
   }, [rows, xKey, series, sortTimeSeries]);
 
   const anyCurrency = series.some((s) => s.currency);
-  const fmt = (v: number) => (anyCurrency ? formatCurrency(v) : formatNumber(v));
+  // Axis ticks COMPACT ($12.3M) so they fit the axis width; tooltips show the full
+  // value. formatCurrency never compacts, which clipped revenue axes at width 56.
+  const fmt = (v: number) => (anyCurrency ? `$${formatNumber(v)}` : formatNumber(v));
+  const tipFormatter = anyCurrency
+    ? (value: unknown) => formatCurrency(Number(value))
+    : (value: unknown) => formatTooltipNumber(Number(value));
 
   // Single-measure bars use the app-wide value ramp: blue = highest, shifting toward
   // red as values drop. A cross-filter selection overrides its bar to the selection hue.
@@ -129,7 +134,7 @@ export function BuilderChart({
   }
 
   const grid = <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />;
-  const tip = <ChartTooltip content={<ChartTooltipContent />} />;
+  const tip = <ChartTooltip content={<ChartTooltipContent valueFormatter={tipFormatter} />} />;
   const legend = series.length > 1 ? <ChartLegend content={<ChartLegendContent />} /> : null;
   const xAxis = (
     <XAxis
@@ -145,21 +150,49 @@ export function BuilderChart({
 
   if (visual === "pie") {
     const key = series[0].key;
+    // A readable pie: positive slices only (negative arcs are broken by definition —
+    // adjustments/refunds go negative routinely), capped at 7 + an "Other" bucket, and
+    // a legend config keyed by CATEGORY so names actually render.
+    const positive = data.filter((d) => Number(d[key]) > 0);
+    if (!positive.length) {
+      return (
+        <div
+          className="flex items-center justify-center rounded-xl border border-dashed px-6 text-center text-sm"
+          style={{ height, borderColor: "var(--border)", color: "var(--foreground-subtle)" }}
+        >
+          A pie needs positive values — switch to a bar for this result.
+        </div>
+      );
+    }
+    const sorted = [...positive].sort((a, b) => Number(b[key]) - Number(a[key]));
+    const MAX_SLICES = 7;
+    const head = sorted.slice(0, MAX_SLICES);
+    const tail = sorted.slice(MAX_SLICES);
+    const pieData = tail.length
+      ? [...head, { [xKey]: `Other (${tail.length})`, [key]: tail.reduce((a, d) => a + Number(d[key]), 0) }]
+      : head;
+    const pieConfig: ChartConfig = { ...config };
+    pieData.forEach((d, i) => {
+      pieConfig[String(d[xKey])] = {
+        label: String(d[xKey]),
+        color: SERIES_VARS[i % SERIES_VARS.length],
+      };
+    });
     return (
-      <ChartContainer config={config} style={{ height }} className="w-full">
+      <ChartContainer config={pieConfig} style={{ height }} className="w-full">
         <PieChart>
           {tip}
           <Pie
-            data={data}
+            data={pieData}
             dataKey={key}
             nameKey={xKey}
-            innerRadius={64}
-            outerRadius={120}
+            innerRadius="45%"
+            outerRadius="78%"
             paddingAngle={2}
             onClick={(d: Record<string, unknown>) => handleSelect(d?.[xKey] ?? (d?.payload as Record<string, unknown>)?.[xKey])}
             style={{ cursor: clickCursor }}
           >
-            {data.map((d, i) => {
+            {pieData.map((d, i) => {
               const isSelected = selectedCategory != null && String(d[xKey]) === selectedCategory;
               return (
                 <Cell
@@ -178,12 +211,16 @@ export function BuilderChart({
   }
 
   if (visual === "horizontal") {
+    // Rows drive the chart's own height, but the VIEWPORT is capped and scrolls: a
+    // 200-row result no longer produces a 7,000px page (or blows out a dashboard tile).
+    const chartHeight = Math.max(height, data.length * 34);
     return (
-      <ChartContainer config={config} style={{ height: Math.max(height, data.length * 34) }} className="w-full">
-        <BarChart data={data} layout="vertical" margin={{ left: 8 }}>
+      <div style={{ maxHeight: Math.max(height, 560), overflowY: chartHeight > Math.max(height, 560) ? "auto" : "visible" }}>
+      <ChartContainer config={config} style={{ height: chartHeight }} className="w-full">
+        <BarChart data={data} layout="vertical" margin={{ left: 8 }} maxBarSize={40}>
           <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />
           <XAxis type="number" tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} tickFormatter={fmt} axisLine={false} tickLine={false} />
-          <YAxis type="category" dataKey={xKey} width={130} tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} axisLine={false} tickLine={false} />
+          <YAxis type="category" dataKey={xKey} width={130} tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} tickFormatter={(v: string) => (v.length > 18 ? v.slice(0, 17) + "…" : v)} axisLine={false} tickLine={false} />
           {tip}
           {legend}
           {singleSeries ? (
@@ -204,6 +241,7 @@ export function BuilderChart({
           )}
         </BarChart>
       </ChartContainer>
+      </div>
     );
   }
 
@@ -217,7 +255,7 @@ export function BuilderChart({
           {tip}
           {legend}
           {series.map((s) => (
-            <Line key={s.key} type="monotone" dataKey={s.key} stroke={`var(--color-${s.key})`} strokeWidth={2} dot={false} />
+            <Line key={s.key} type="monotone" dataKey={s.key} stroke={`var(--color-${s.key})`} strokeWidth={2} dot={data.length < 3} />
           ))}
         </LineChart>
       </ChartContainer>

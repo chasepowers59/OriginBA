@@ -87,11 +87,11 @@ export function MiniSparkChart({
           tickLine={false}
           axisLine={false}
         />
-        <YAxis hide domain={[0, "auto"]} />
+        <YAxis hide domain={["auto", "auto"]} />
         <Tooltip
           content={<SparkTooltip isCurrency={format === "currency"} />}
           wrapperStyle={{ zIndex: 50, outline: "none" }}
-          cursor={{ fill: "rgba(255,255,255,0.05)" }}
+          cursor={{ fill: "var(--chip-bg)" }}
         />
         <Bar
           dataKey="value"
