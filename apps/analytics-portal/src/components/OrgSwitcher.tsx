@@ -59,15 +59,23 @@ export default function OrgSwitcher({
   const viewingOther = Boolean(active) && active !== (homeOrganizationId ?? "");
 
   return (
-    <label className="hidden items-center gap-2 lg:flex" title="Admin: view another client">
-      <span className="portal-text-muted text-xs uppercase tracking-wider">Client</span>
+    <label
+      className="hidden items-center gap-1.5 lg:flex"
+      title={viewingOther ? "Admin: viewing another client's tenant" : "Admin: view another client"}
+    >
+      {/* Viewing someone else's tenant should never look like the default state:
+          the select itself turns amber, plus a dot for colour-blind redundancy. */}
+      {viewingOther && (
+        <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-amber-500" />
+      )}
       <select
         value={active}
         onChange={(e) => choose(e.target.value)}
-        className={`rounded-md border px-2 py-1 text-sm ${
+        aria-label="Client organization"
+        className={`max-w-[180px] truncate rounded-lg border px-2 py-1.5 text-sm ${
           viewingOther
-            ? "border-amber-500/60 bg-amber-500/10 text-amber-700 dark:text-amber-300"
-            : "border-edge-subtle bg-chip"
+            ? "border-amber-500/60 bg-amber-500/10 font-medium text-amber-700 dark:text-amber-300"
+            : "border-edge-subtle bg-chip text-fg"
         }`}
       >
         {orgs.map((o) => (
@@ -76,12 +84,6 @@ export default function OrgSwitcher({
           </option>
         ))}
       </select>
-      {/* Viewing someone else's tenant should never look like the default state. */}
-      {viewingOther && (
-        <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300">
-          viewing as admin
-        </span>
-      )}
     </label>
   );
 }
