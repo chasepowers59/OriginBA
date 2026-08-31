@@ -12,6 +12,8 @@ module.exports = {
           slate: "#64748b",
         },
         brand: {
+          DEFAULT: "var(--brand)",
+          navy: "var(--brand-navy)",
           50: "#eff6ff",
           600: "#1d4ed8",
           700: "#1e40af",

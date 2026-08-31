@@ -2,13 +2,13 @@ import type { PortalBrandConfig } from "./types";
 
 /** Default brand tokens — overridden at runtime by portal client config. */
 export const DEFAULT_BRAND: PortalBrandConfig = {
-  name: "OriginBA",
-  product: "OriginBA",
+  name: "Origin",
+  product: "Analytics",
   tagline: "Governed analytics for water, electric and gas utilities",
-  logo_initials: "BA",
-  logo_src: "/brand-icon.svg",
+  logo_initials: "O",
+  logo_src: "/origin-mark.png",
   connection_label: "Connected",
-  footer: "Built on the OriginBA reporting layer · contracted models · traceable to the source column",
+  footer: "Built on the Origin reporting layer · contracted models · traceable to the source column",
 };
 
 /** Runtime brand (set by PortalThemeProvider). Falls back to defaults. */

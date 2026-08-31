@@ -46,16 +46,13 @@ export function AppShell({
     <div className="mesh-bg min-h-screen">
       <header className="portal-header no-print sticky top-0 z-50">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-4">
-          <Link href="/" className="group flex items-center gap-4">
-            <BrandMark />
-            <div>
-              <div className="flex flex-wrap items-baseline gap-2">
-                <span className="portal-heading text-xl font-bold tracking-tight">{brand.name}</span>
-                <span className="rounded-full bg-chip px-2 py-0.5 text-xs font-medium text-sky-600 ring-1 ring-edge-subtle dark:text-sky-300">
-                  {brand.product}
-                </span>
-              </div>
-              <p className="portal-text-muted text-sm">{portal.organization_name}</p>
+          <Link href="/" className="group flex items-center gap-3">
+            <BrandMark className="h-8 w-auto" />
+            <div className="hidden border-l border-edge-subtle pl-3 sm:block">
+              <span className="rounded-full bg-chip px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-brand ring-1 ring-edge-subtle">
+                {brand.product}
+              </span>
+              <p className="portal-text-muted mt-1 text-xs">{portal.organization_name}</p>
             </div>
           </Link>
           <div className="flex items-center gap-4">

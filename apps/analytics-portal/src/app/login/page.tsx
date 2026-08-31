@@ -76,11 +76,10 @@ export default function LoginPage() {
     <div className="mesh-bg flex min-h-screen items-center justify-center px-4 py-8">
       <div className="glass-panel grid w-full max-w-4xl overflow-hidden md:grid-cols-2">
         {/* value panel */}
-        <div className="hidden flex-col justify-between bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 p-10 text-white md:flex">
+        <div className="hidden flex-col justify-between bg-gradient-to-br from-[#16283c] via-[#1b3959] to-[#0e1c2c] p-10 text-white md:flex">
           <div>
-            <div className="brand-logo mb-6 flex h-12 w-12 items-center justify-center rounded-xl text-base font-bold">
-              BA
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/origin-logo-white.png" alt="Origin" className="mb-8 h-8 w-auto" />
             <h2 className="text-2xl font-semibold leading-snug text-[#f8fafc]">
               Utility intelligence on governed data
             </h2>
@@ -98,7 +97,7 @@ export default function LoginPage() {
               "Ad hoc exploration over every governed canvas",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2">
-                <span aria-hidden className="mt-0.5 text-teal-300">
+                <span aria-hidden className="mt-0.5 text-[#6aa9dd]">
                   ✓
                 </span>
                 {item}
@@ -106,16 +105,17 @@ export default function LoginPage() {
             ))}
           </ul>
           <p className="text-xs text-[#94a3b8]">
-            {DEFAULT_BRAND.product} · SmartCity reporting platform
+            {DEFAULT_BRAND.name} {DEFAULT_BRAND.product} · SmartCity reporting platform
           </p>
         </div>
 
         {/* sign-in panel */}
         <div className="p-8 md:p-10">
           <div className="mb-6 md:hidden">
-            <div className="brand-logo mb-3 flex h-12 w-12 items-center justify-center rounded-xl text-base font-bold text-white">
-              BA
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/origin-logo.png" alt="Origin" className="h-8 w-auto dark:hidden" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/origin-logo-white.png" alt="Origin" className="hidden h-8 w-auto dark:block" />
           </div>
           <h1 className="portal-heading text-2xl font-bold">Welcome back</h1>
           <p className="portal-text-muted mt-1 text-sm">
@@ -125,7 +125,7 @@ export default function LoginPage() {
                 <span className="portal-heading font-semibold">{tenantName}</span>
               </>
             ) : (
-              <>Sign in to {DEFAULT_BRAND.product}</>
+              <>Sign in to {DEFAULT_BRAND.name} {DEFAULT_BRAND.product}</>
             )}
           </p>
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
