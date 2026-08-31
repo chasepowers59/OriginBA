@@ -52,16 +52,18 @@
 
 .dark {
   color-scheme: dark;
-  --background: #070b14;
+  /* Near-black ground with slightly lifted panel surfaces — the reference dashboard's
+     look: #0b0d12 page, #14171f cards, hairline borders. */
+  --background: #0b0d12;
   --foreground: #e2e8f0;
   --foreground-muted: #94a3b8;
   --foreground-subtle: #64748b;
   --heading: #f8fafc;
-  --surface: rgba(15, 23, 42, 0.72);
-  --surface-subtle: rgba(15, 23, 42, 0.45);
-  --surface-solid: #0f172a;
-  --surface-input: rgba(2, 6, 23, 0.55);
-  --header-bg: rgba(2, 6, 23, 0.78);
+  --surface: rgba(20, 23, 31, 0.88);
+  --surface-subtle: rgba(20, 23, 31, 0.55);
+  --surface-solid: #14171f;
+  --surface-input: rgba(9, 11, 16, 0.7);
+  --header-bg: rgba(9, 11, 16, 0.82);
   --border: rgba(148, 163, 184, 0.14);
   --border-subtle: rgba(148, 163, 184, 0.08);
   --chip-bg: rgba(255, 255, 255, 0.05);
@@ -76,6 +78,10 @@
   --shadow-color: rgba(0, 0, 0, 0.25);
   --brand: #5b9bd8;
   --brand-navy: #16283c;
+  /* Quieter glows on the near-black ground (reference is essentially flat dark). */
+  --mesh-glow-1: rgba(56, 189, 248, 0.05);
+  --mesh-glow-2: rgba(99, 102, 241, 0.04);
+  --mesh-glow-3: rgba(14, 165, 233, 0.03);
   --tooltip-bg: #020617;
   --tooltip-border: rgba(255, 255, 255, 0.15);
   --tooltip-text: #f8fafc;
@@ -138,6 +144,24 @@ body {
   .input-modern:focus {
     border-color: color-mix(in srgb, var(--accent) 50%, transparent);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+
+  /* Login-page input: the sign-in page is deliberately light regardless of app theme
+     (reference design), so these are fixed light values, brand-blue focus. */
+  .login-input {
+    @apply w-full rounded-xl px-4 py-3 text-sm outline-none transition;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #0f172a;
+  }
+
+  .login-input::placeholder {
+    color: #94a3b8;
+  }
+
+  .login-input:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent);
   }
 
   .btn-primary {

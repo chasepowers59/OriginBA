@@ -86,13 +86,15 @@ export function MiniSparkChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data} barCategoryGap="18%" margin={{ top: 4, right: 2, left: 2, bottom: 0 }}>
+        {/* Axis labels stay FLAT (design standard): truncate + skip ticks rather than
+            rotate — angled text is harder to scan. */}
         <XAxis
           dataKey="name"
-          tick={{ fontSize: 9, fill: "#64748b" }}
-          interval={0}
-          angle={-25}
-          textAnchor="end"
-          height={42}
+          tick={{ fontSize: 9, fill: "var(--foreground-subtle)" }}
+          tickFormatter={(v: string) => (v.length > 9 ? v.slice(0, 8) + "…" : v)}
+          interval="preserveStartEnd"
+          minTickGap={8}
+          height={20}
           tickLine={false}
           axisLine={false}
         />

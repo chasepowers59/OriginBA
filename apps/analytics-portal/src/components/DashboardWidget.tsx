@@ -33,16 +33,34 @@ export function DashboardWidget({
     ? `/explore/${kpi.snapshot_id}?report=${kpi.explore_report_id}`
     : `/explore/${kpi.snapshot_id}`;
 
+  const workstreamName = workstreamDisplayName(kpi.workstream);
+  // Reference-dashboard panel headers lead with a small rounded icon chip, coloured per
+  // category. Chip hue cycles through the chart palette keyed by the workstream name.
+  const CHIP_VARS = ["--chart-1", "--chart-2", "--chart-3", "--chart-4", "--chart-5"];
+  const chipVar =
+    CHIP_VARS[
+      Math.abs([...kpi.workstream].reduce((h, c) => h * 31 + c.charCodeAt(0), 7)) % CHIP_VARS.length
+    ];
+
   const inner = (
     <>
       <div className="border-b border-edge-subtle px-4 py-3">
         <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-sky-400/80">
-              {workstreamDisplayName(kpi.workstream)}
-            </p>
-            <h3 className="mt-0.5 font-semibold text-heading group-hover:text-sky-100">{kpi.label}</h3>
-            <p className="mt-0.5 text-xs text-fg-muted">{kpi.subtitle}</p>
+          <div className="flex items-start gap-2.5">
+            <span
+              aria-hidden
+              className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[11px] font-bold text-white"
+              style={{ background: `var(${chipVar})` }}
+            >
+              {workstreamName.charAt(0)}
+            </span>
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-fg-subtle">
+                {workstreamName}
+              </p>
+              <h3 className="mt-0.5 font-semibold text-heading group-hover:text-sky-100">{kpi.label}</h3>
+              <p className="mt-0.5 text-xs text-fg-muted">{kpi.subtitle}</p>
+            </div>
           </div>
           <span className="shrink-0 text-fg-muted transition group-hover:text-sky-400">→</span>
         </div>

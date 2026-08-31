@@ -73,74 +73,35 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mesh-bg flex min-h-screen items-center justify-center px-4 py-8">
-      <div className="glass-panel grid w-full max-w-4xl overflow-hidden md:grid-cols-2">
-        {/* value panel */}
-        <div className="hidden flex-col justify-between bg-gradient-to-br from-[#16283c] via-[#1b3959] to-[#0e1c2c] p-10 text-white md:flex">
-          <div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/origin-logo-white.png" alt="Origin" className="mb-8 h-8 w-auto" />
-            <h2 className="text-2xl font-semibold leading-snug text-[#f8fafc]">
-              Utility intelligence on governed data
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-slate-200/90">
-              Reporting canvases transformed from Oracle C2M and validated against
-              your own live system — the numbers tie back to CIS because they are
-              proven to, per key.
-            </p>
-          </div>
-          <ul className="space-y-3 text-sm text-[#e2e8f0]">
-            {[
-              "Executive KPIs with period comparison",
-              "Billing, payments, collections, and usage analytics",
-              "Data-quality worklists with exact CIS actions",
-              "Ad hoc exploration over every governed canvas",
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-2">
-                <span aria-hidden className="mt-0.5 text-[#6aa9dd]">
-                  ✓
-                </span>
-                {item}
-              </li>
-            ))}
-          </ul>
-          <p className="text-xs text-[#94a3b8]">
-            {DEFAULT_BRAND.name} {DEFAULT_BRAND.product} · SmartCity reporting platform
-          </p>
-        </div>
+    <div className="grid min-h-screen bg-white text-slate-900 lg:grid-cols-[1fr_1.1fr]">
+      {/* form column — clean, light, logo pinned top-left (reference layout) */}
+      <div className="relative flex flex-col px-8 py-8 sm:px-14">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/origin-logo.png" alt="Origin" className="h-8 w-auto self-start" />
 
-        {/* sign-in panel */}
-        <div className="p-8 md:p-10">
-          <div className="mb-6 md:hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/origin-logo.png" alt="Origin" className="h-8 w-auto dark:hidden" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/origin-logo-white.png" alt="Origin" className="hidden h-8 w-auto dark:block" />
-          </div>
-          <h1 className="portal-heading text-2xl font-bold">Welcome back</h1>
-          <p className="portal-text-muted mt-1 text-sm">
-            {boundToTenant ? (
-              <>
-                Sign in to{" "}
-                <span className="portal-heading font-semibold">{tenantName}</span>
-              </>
-            ) : (
-              <>Sign in to {DEFAULT_BRAND.name} {DEFAULT_BRAND.product}</>
-            )}
+        <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            {boundToTenant ? `Sign in to ${tenantName}` : "Welcome back"}
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">
+            {boundToTenant
+              ? `${DEFAULT_BRAND.name} ${DEFAULT_BRAND.product} for ${tenantName}`
+              : `Sign in to ${DEFAULT_BRAND.name} ${DEFAULT_BRAND.product}`}
           </p>
-          <form onSubmit={onSubmit} className="mt-6 space-y-4">
+          <form onSubmit={onSubmit} className="mt-8 space-y-5">
             {boundToTenant ? (
               <div
-                className="flex items-center gap-2 rounded-lg border border-sky-400/30 bg-sky-500/10 px-3 py-2 text-sm text-sky-700 dark:text-sky-300"
+                className="flex items-center gap-2 rounded-xl border border-[#2f74b8]/30 bg-[#2f74b8]/[0.07] px-4 py-3 text-sm text-[#1b3959]"
                 aria-label={`Organization: ${tenantName}`}
               >
-                <span aria-hidden>🏢</span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/origin-mark.png" alt="" className="h-4 w-auto" aria-hidden />
                 <span>
                   Organization: <strong>{tenantName}</strong>
                 </span>
               </div>
             ) : (
-              <label className="portal-text-muted block text-sm" htmlFor="login-org">
+              <label className="block text-sm font-medium text-slate-700" htmlFor="login-org">
                 Organization
                 <input
                   id="login-org"
@@ -148,12 +109,12 @@ export default function LoginPage() {
                   autoComplete="organization"
                   value={organization}
                   onChange={(e) => setOrganization(e.target.value)}
-                  className="input-modern mt-1"
+                  className="login-input mt-1.5"
                   placeholder="Your organization (optional)"
                 />
               </label>
             )}
-            <label className="portal-text-muted block text-sm" htmlFor="login-email">
+            <label className="block text-sm font-medium text-slate-700" htmlFor="login-email">
               Email
               <input
                 id="login-email"
@@ -161,32 +122,29 @@ export default function LoginPage() {
                 autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-modern mt-1"
+                className="login-input mt-1.5"
                 placeholder="you@utility.gov"
                 required
                 autoFocus
               />
             </label>
-            <label
-              className="portal-text-muted block text-sm"
-              htmlFor="login-password"
-            >
+            <label className="block text-sm font-medium text-slate-700" htmlFor="login-password">
               Password
-              <div className="relative mt-1">
+              <div className="relative mt-1.5">
                 <input
                   id="login-password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input-modern pr-16"
+                  className="login-input pr-16"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="portal-text-muted absolute inset-y-0 right-2 my-auto h-7 rounded px-2 text-xs hover:underline"
+                  className="absolute inset-y-0 right-2 my-auto h-7 rounded px-2 text-xs text-slate-500 hover:underline"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -195,7 +153,7 @@ export default function LoginPage() {
             {error ? (
               <p
                 role="alert"
-                className="rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-300"
+                className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700"
               >
                 {error}
               </p>
@@ -203,15 +161,50 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="btn-primary w-full disabled:opacity-60"
+              className="w-full rounded-xl bg-[#2f74b8] py-3 text-sm font-semibold text-white shadow-lg shadow-[#2f74b8]/25 transition hover:bg-[#28649f] disabled:opacity-60"
             >
               {submitting ? "Signing in…" : "Sign in"}
             </button>
-            <p className="portal-text-muted text-xs">
-              Trouble signing in? Contact your portal administrator — accounts are
-              provisioned per organization.
-            </p>
           </form>
+        </div>
+
+        <p className="text-xs text-slate-400">
+          Trouble signing in? Contact your portal administrator — accounts are provisioned
+          per organization.
+        </p>
+      </div>
+
+      {/* brand panel — full-bleed Origin navy with a bold tagline (reference layout) */}
+      <div className="relative hidden overflow-hidden bg-[#16283c] lg:block">
+        {/* subtle brand-mark pattern, like the reference's code-glyph texture */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage: "url(/origin-mark.png)",
+            backgroundSize: "140px auto",
+            backgroundRepeat: "space",
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-[#0c1826]"
+        />
+        <div className="relative flex h-full flex-col items-center justify-center px-14 text-center">
+          <h2 className="text-4xl font-bold leading-tight text-white xl:text-5xl">
+            Utility intelligence,
+            <br />
+            <span className="text-[#6aa9dd]">governed end to end</span>
+          </h2>
+          <p className="mt-5 max-w-md text-sm leading-relaxed text-slate-300">
+            Reporting canvases transformed from Oracle C2M and validated against your own
+            live system — the numbers tie back to CIS because they are proven to, per key.
+          </p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/origin-logo-white.png" alt="" aria-hidden className="mt-14 h-10 w-auto opacity-90" />
+          <p className="mt-4 text-xs text-slate-400">
+            {DEFAULT_BRAND.name} {DEFAULT_BRAND.product} · SmartCity reporting platform
+          </p>
         </div>
       </div>
     </div>
