@@ -321,10 +321,15 @@ def snapshot_scope_options(
         f["field"]: f for f in snapshot.get("scope_filters", [])
     }
     field = field_id if field_id in allowed_fields(snapshot) else field_id.upper()
-    if field not in allowed_scope:
-        raise HTTPException(status_code=400, detail=f"Scope filter not allowed: {field_id}")
     if field not in allowed_fields(snapshot):
         raise HTTPException(status_code=400, detail=f"Unknown field: {field_id}")
+    # Any DIMENSION is a valid value source (the builder's filter shelf offers a value
+    # picker for every dimension) — declared scope_filters remain valid too. Measures
+    # are refused: a distinct over a numeric fact is meaningless and expensive.
+    if field not in allowed_scope:
+        roles = {f["id"]: f.get("role") for f in snapshot.get("fields", [])}
+        if roles.get(field) != "dimension":
+            raise HTTPException(status_code=400, detail=f"Scope filter not allowed: {field_id}")
 
 
     if is_warehouse(snapshot):
@@ -351,7 +356,7 @@ def snapshot_scope_options(
         # returning RPT_BILL_SEGMENT for rpt_bill_segment breaks the caller's own lookups.
         "snapshot_id": snapshot_id,
         "field": field,
-        "label": allowed_scope[field].get("label", field),
+        "label": allowed_scope.get(field, {}).get("label", field),
         "values": values,
     }
 

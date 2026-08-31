@@ -11,6 +11,7 @@ import {
 import {
   defaultDateRange,
   fetchBuilderQuestions,
+  fetchScopeOptions,
   fetchSnapshotMetadata,
   fetchSnapshots,
   runSnapshotQuery,
@@ -143,7 +144,11 @@ export function VisualBuilder({
       ? vals.map((v) => ({ field: v.field, agg: v.agg }))
       : [{ field: "*", agg: "count" }];
 
-    const filters = fils.map((f) => ({ field: f.field, op: f.op, value: f.value }));
+    // A filter whose value hasn't been chosen yet is inert — sending it as `= ''`
+    // would silently return zero rows.
+    const filters = fils
+      .filter((f) => f.role === "date" || String(f.value ?? "") !== "")
+      .map((f) => ({ field: f.field, op: f.op, value: f.value }));
     // Governance mirror: a canvas with a required date field must carry a between
     // filter on it, or the server rejects the query. Auto-add if the user hasn't.
     const req = meta.required_date_field;
@@ -294,42 +299,31 @@ export function VisualBuilder({
   return (
     <DndContext sensors={sensors} onDragEnd={onDragEnd}>
       <div className="space-y-4">
-        {/* canvas selector + question gallery trigger */}
         <div className="flex flex-wrap items-center gap-3">
-          <select
-            value={snapshotId}
-            onChange={(e) => loadCanvas(e.target.value)}
-            className="input-modern min-w-[260px] text-sm"
-          >
-            <option value="">Select a reporting canvas…</option>
-            {grouped.map(([ws, snaps]) => (
-              <optgroup key={ws} label={workstreamDisplayName(ws)}>
-                {snaps.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.label}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
           <button type="button" className="btn-ghost text-sm" onClick={() => setGalleryOpen(true)}>
             ✨ Start from a question
           </button>
           {running ? <span className="text-xs" style={{ color: "var(--foreground-subtle)" }}>Running…</span> : null}
         </div>
 
-        {!meta ? (
-          <div className="glass-panel px-6 py-16 text-center text-sm" style={{ color: "var(--foreground-subtle)" }}>
-            Pick a reporting canvas to start, or open “Start from a question” for a ready-made view.
+        {/* Table-first layout: the data pane (tables -> columns) is always visible —
+            picking the table IS the entry point, columns expand beneath it. */}
+        <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
+          <div className="glass-panel h-[560px] p-3">
+            <FieldPalette
+              grouped={grouped}
+              activeId={snapshotId}
+              meta={meta}
+              onSelect={(id) => void loadCanvas(id)}
+            />
           </div>
-        ) : (
-          <div className="grid gap-4 lg:grid-cols-[240px_1fr]">
-            {/* data pane */}
-            <div className="glass-panel h-[560px] p-3">
-              <FieldPalette meta={meta} />
-            </div>
 
-            {/* shelves + visual */}
+          {!meta ? (
+            <div className="glass-panel flex items-center justify-center px-6 py-16 text-center text-sm" style={{ color: "var(--foreground-subtle)" }}>
+              Pick a table on the left to see its columns, or open “Start from a question”
+              for a ready-made view.
+            </div>
+          ) : (
             <div className="space-y-4">
               <div className="glass-panel grid gap-3 p-3 md:grid-cols-3">
                 <Shelf id="columns" label="Columns / Group" hint="dimensions + dates" accent="var(--chart-2)" empty={!cols.length}>
@@ -382,12 +376,11 @@ export function VisualBuilder({
                       {f.role === "date" ? (
                         <span className="text-[10px]" style={{ color: "var(--foreground-subtle)" }}>last 90d</span>
                       ) : (
-                        <input
+                        <FilterValuePicker
+                          snapshotId={snapshotId}
+                          field={f.field}
                           value={String(f.value ?? "")}
-                          onChange={(e) => setFils((ff) => ff.map((x) => (x.field === f.field ? { ...x, value: e.target.value } : x)))}
-                          placeholder="= value"
-                          className="w-20 rounded bg-transparent text-[10px]"
-                          style={{ color: "var(--chart-4)" }}
+                          onChange={(v) => setFils((ff) => ff.map((x) => (x.field === f.field ? { ...x, value: v } : x)))}
                         />
                       )}
                       <button type="button" onClick={() => setFils((ff) => ff.filter((x) => x.field !== f.field))} aria-label="remove">×</button>
@@ -424,14 +417,84 @@ export function VisualBuilder({
                 )}
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {galleryOpen ? (
         <QuestionGallery questions={questions} onPick={applyQuestion} onClose={() => setGalleryOpen(false)} />
       ) : null}
     </DndContext>
+  );
+}
+
+/**
+ * Value picker for a filter pill: fetches the field's distinct values (governed, capped
+ * at 100) so users pick from what actually exists instead of typing blind. Falls back
+ * to a free-text input when the list is unavailable or the value set is capped-out.
+ */
+function FilterValuePicker({
+  snapshotId,
+  field,
+  value,
+  onChange,
+}: {
+  snapshotId: string;
+  field: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [values, setValues] = useState<string[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    setValues(null);
+    setFailed(false);
+    fetchScopeOptions(snapshotId, field)
+      .then((r) => {
+        if (active) setValues(r.values ?? []);
+      })
+      .catch(() => {
+        if (active) setFailed(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [snapshotId, field]);
+
+  if (failed || (values && values.length === 0)) {
+    return (
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="= value"
+        className="w-24 rounded bg-transparent text-[10px]"
+        style={{ color: "var(--chart-4)" }}
+      />
+    );
+  }
+  if (values === null) {
+    return (
+      <span className="text-[10px]" style={{ color: "var(--foreground-subtle)" }}>
+        loading…
+      </span>
+    );
+  }
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="max-w-[150px] truncate rounded border-none bg-transparent text-[10px] outline-none"
+      style={{ color: "var(--chart-4)" }}
+    >
+      <option value="">choose value…</option>
+      {values.map((v) => (
+        <option key={v} value={v}>
+          {v}
+        </option>
+      ))}
+    </select>
   );
 }
 
