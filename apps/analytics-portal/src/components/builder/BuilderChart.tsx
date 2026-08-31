@@ -24,7 +24,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { formatCurrency, formatNumber } from "@/lib/format";
-import { barEmphasisRoles, type BarEmphasis } from "@/lib/chartEmphasis";
+import { valueRampColors } from "@/lib/chartEmphasis";
 
 export type BuilderVisual =
   | "bar"
@@ -47,8 +47,6 @@ type BuilderChartProps = {
   // Cross-filter: highlight one category and report clicks (single-measure surfaces).
   selectedCategory?: string | null;
   onCategorySelect?: (category: string) => void;
-  // Single-series bar/horizontal: emphasize the max bar, mute the rest (ported ChartView).
-  emphasizeMax?: boolean;
   emptyMessage?: string;
   sortTimeSeries?: boolean;
 };
@@ -63,12 +61,6 @@ const SERIES_VARS = [
   "var(--chart-5)",
 ];
 
-const ROLE_FILL: Record<BarEmphasis, string> = {
-  selected: "var(--chart-selected)",
-  emphasis: "var(--chart-1)",
-  base: "color-mix(in srgb, var(--chart-1) 32%, transparent)",
-};
-
 export function BuilderChart({
   rows,
   xKey,
@@ -78,7 +70,6 @@ export function BuilderChart({
   height = 340,
   selectedCategory = null,
   onCategorySelect,
-  emphasizeMax = false,
   emptyMessage = "Drop a dimension and a measure to see a chart",
   sortTimeSeries = false,
 }: BuilderChartProps) {
@@ -105,22 +96,21 @@ export function BuilderChart({
   const anyCurrency = series.some((s) => s.currency);
   const fmt = (v: number) => (anyCurrency ? formatCurrency(v) : formatNumber(v));
 
-  // Single-measure emphasis / selection colouring for bar + horizontal. When neither
-  // emphasis nor a selection applies, bars keep their flat themed series colour.
+  // Single-measure bars use the app-wide value ramp: blue = highest, shifting toward
+  // red as values drop. A cross-filter selection overrides its bar to the selection hue.
   const singleSeries = series.length === 1;
-  const useEmphasis = singleSeries && (emphasizeMax || Boolean(selectedCategory));
-  const barRoles = useMemo<BarEmphasis[] | null>(() => {
-    if (!useEmphasis) return null;
+  const rampFills = useMemo<string[] | null>(() => {
+    if (!singleSeries) return null;
     const key = series[0].key;
-    return barEmphasisRoles(
-      data.map((d) => String(d[xKey])),
-      data.map((d) => Number(d[key] ?? 0)),
-      selectedCategory,
-    );
-  }, [useEmphasis, data, xKey, series, selectedCategory]);
+    return valueRampColors(data.map((d) => Number(d[key] ?? 0)));
+  }, [singleSeries, data, series]);
 
-  const cellFill = (i: number, fallback: string) =>
-    barRoles ? ROLE_FILL[barRoles[i]] : fallback;
+  const cellFill = (i: number, fallback: string) => {
+    if (selectedCategory != null && String(data[i]?.[xKey]) === selectedCategory) {
+      return "var(--chart-selected)";
+    }
+    return rampFills ? rampFills[i] : fallback;
+  };
 
   const handleSelect = (category: unknown) => {
     if (onCategorySelect && category != null) onCategorySelect(String(category));

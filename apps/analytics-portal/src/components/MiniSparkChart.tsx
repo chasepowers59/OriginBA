@@ -11,17 +11,8 @@ import {
   YAxis,
 } from "recharts";
 import type { ExecutiveTrendPoint } from "@/lib/types";
-import { barEmphasisRoles, type BarEmphasis } from "@/lib/chartEmphasis";
+import { valueRampColors } from "@/lib/chartEmphasis";
 import { formatTooltipCurrency, formatTooltipNumber } from "@/lib/format";
-
-// Single-accent treatment (Power BI / Tableau convention): one hue carries the series,
-// the leading value is emphasized and the rest recede, so the eye lands on what matters.
-// Selection overrides to the shared cross-filter highlight. Colours are theme tokens.
-const ROLE_FILL: Record<BarEmphasis, string> = {
-  selected: "var(--chart-selected)",
-  emphasis: "var(--chart-1)",
-  base: "color-mix(in srgb, var(--chart-1) 32%, transparent)",
-};
 
 type MiniSparkChartProps = {
   points: ExecutiveTrendPoint[];
@@ -60,16 +51,14 @@ export function MiniSparkChart({
   selectedLabel,
   onBarClick,
 }: MiniSparkChartProps) {
-  const roles = barEmphasisRoles(
-    points.map((p) => p.label),
-    points.map((p) => p.value),
-    selectedLabel,
-  );
+  // App-wide value ramp: blue = highest, shifting toward red as values drop; the
+  // cross-filter selection overrides its bar to the selection hue.
+  const fills = valueRampColors(points.map((p) => p.value));
   const data = points.map((p, i) => ({
     name: p.label.slice(0, 14),
     fullName: p.label,
     value: p.value,
-    fill: ROLE_FILL[roles[i]],
+    fill: selectedLabel === p.label ? "var(--chart-selected)" : fills[i],
   }));
 
   if (!data.length) {

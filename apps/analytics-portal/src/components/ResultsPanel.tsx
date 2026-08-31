@@ -268,7 +268,6 @@ export function ResultsPanel({
                 currency: isCurrency,
               },
             ]}
-            emphasizeMax
             selectedCategory={drillFilter?.value ?? null}
             onCategorySelect={onDrillSelect}
             sortTimeSeries={sortTimeSeries}

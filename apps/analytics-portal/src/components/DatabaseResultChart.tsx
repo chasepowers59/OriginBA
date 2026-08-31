@@ -43,7 +43,6 @@ export function DatabaseResultChart({
               currency: suggestion.isCurrency,
             },
           ]}
-          emphasizeMax
           sortTimeSeries={suggestion.sortTimeSeries}
           height={272}
           emptyMessage="No chart data for this result"

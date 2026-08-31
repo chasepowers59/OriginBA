@@ -175,7 +175,6 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
               currency: isCurrency,
             },
           ]}
-          emphasizeMax
           sortTimeSeries={isTimeSeries}
           selectedCategory={filter && filter.field === dimensionKey ? filter.value : null}
           onCategorySelect={dimensionKey.startsWith("TD") ? undefined : handleClick}
