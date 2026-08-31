@@ -58,11 +58,11 @@ export function DashboardWidget({
               <p className="text-[10px] font-semibold uppercase tracking-wider text-fg-subtle">
                 {workstreamName}
               </p>
-              <h3 className="mt-0.5 font-semibold text-heading group-hover:text-sky-100">{kpi.label}</h3>
+              <h3 className="mt-0.5 font-semibold text-heading group-hover:text-sky-700 dark:group-hover:text-sky-100">{kpi.label}</h3>
               <p className="mt-0.5 text-xs text-fg-muted">{kpi.subtitle}</p>
             </div>
           </div>
-          <span className="shrink-0 text-fg-muted transition group-hover:text-sky-400">→</span>
+          <span className="shrink-0 text-fg-muted transition group-hover:text-sky-600 dark:group-hover:text-sky-400">→</span>
         </div>
         <p className={`mt-3 font-bold tracking-tight tabular-nums text-heading ${compact ? "text-2xl" : "text-3xl"}`}>
           {formatted}
@@ -98,7 +98,7 @@ export function DashboardWidget({
     return (
       <div className="group glass-panel block overflow-hidden transition hover:border-sky-400/30">
         {inner}
-        <Link href={exploreHref} className="block border-t border-edge-subtle px-4 py-2 text-xs text-sky-400">
+        <Link href={exploreHref} className="block border-t border-edge-subtle px-4 py-2 text-xs text-sky-600 dark:text-sky-400">
           Open full report →
         </Link>
       </div>

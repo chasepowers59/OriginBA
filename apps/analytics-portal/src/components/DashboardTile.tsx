@@ -109,7 +109,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
 
   if (error) {
     return (
-      <div className="glass-panel h-full p-4 text-sm text-amber-300">{error}</div>
+      <div className="glass-panel h-full p-4 text-sm text-amber-700 dark:text-amber-300">{error}</div>
     );
   }
 

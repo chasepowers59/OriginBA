@@ -33,19 +33,19 @@ export function WorkstreamExplorer({
               className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-white/[0.02]"
             >
               <div className="flex items-start gap-4">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-lg text-sky-300 ring-1 ring-sky-400/20">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-lg text-sky-600 dark:text-sky-300 ring-1 ring-sky-400/20">
                   {workstreamIcon(ws.id)}
                 </span>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
                       href={`/workstream/${ws.id}`}
-                      className="text-lg font-semibold text-heading hover:text-sky-200"
+                      className="text-lg font-semibold text-heading hover:text-sky-700 dark:hover:text-sky-200"
                     >
                       {ws.label ?? workstreamDisplayName(ws.id)}
                     </Link>
                     <span className="chip">{ws.snapshot_count} snapshots</span>
-                    <Link href={`/workstream/${ws.id}`} className="text-xs text-sky-400 hover:text-sky-300">
+                    <Link href={`/workstream/${ws.id}`} className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300">
                       Dashboard →
                     </Link>
                   </div>
@@ -162,11 +162,11 @@ export function WorkstreamSidebar({
               onClick={() => setExpandedWs((p) => ({ ...p, [ws.id]: !wsOpen }))}
               className="mb-1 flex w-full items-center gap-2 text-left text-[11px] font-semibold uppercase tracking-wide text-fg-muted"
             >
-              <span className="text-sky-400">{workstreamIcon(ws.id)}</span>
+              <span className="text-sky-600 dark:text-sky-400">{workstreamIcon(ws.id)}</span>
               <Link
                 href={`/workstream/${ws.id}`}
                 onClick={(e) => e.stopPropagation()}
-                className="flex-1 hover:text-sky-300"
+                className="flex-1 hover:text-sky-600 dark:hover:text-sky-300"
               >
                 {ws.label ?? workstreamDisplayName(ws.id)}
               </Link>

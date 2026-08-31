@@ -239,7 +239,7 @@ export function ResultsPanel({
       {insight ? (
         <div className="rounded-xl border border-sky-400/20 bg-gradient-to-r from-sky-500/10 to-indigo-500/10 px-4 py-3 text-sm text-heading">
           <span className="font-medium text-heading">{insight.label}</span> leads this view at{" "}
-          <span className="font-semibold text-sky-300">{formatPercent(insight.share)}</span> of the
+          <span className="font-semibold text-sky-600 dark:text-sky-300">{formatPercent(insight.share)}</span> of the
           total ({formatMeasure(insight.topValue)}).
         </div>
       ) : null}

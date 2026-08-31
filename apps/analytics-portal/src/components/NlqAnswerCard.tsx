@@ -27,14 +27,14 @@ export function NlqAnswerCard({ result, days, onPinToDashboard }: NlqAnswerCardP
   return (
     <div className="rounded-xl border border-sky-400/20 bg-gradient-to-br from-sky-500/10 to-indigo-500/10 p-4">
       {result.metric_label ? (
-        <p className="text-xs font-semibold uppercase tracking-wide text-sky-300">
+        <p className="text-xs font-semibold uppercase tracking-wide text-sky-600 dark:text-sky-300">
           {result.metric_label}
         </p>
       ) : null}
       {display ? <p className="mt-2 text-3xl font-bold text-heading">{display}</p> : null}
       <p className="mt-2 text-sm leading-relaxed text-heading">{result.narrative}</p>
       {value === 0 ? (
-        <p className="mt-2 text-xs text-amber-200/90">
+        <p className="mt-2 text-xs text-amber-700 dark:text-amber-200/90">
           No rows in this period — try widening to 180 or 365 days for billing and finance metrics.
         </p>
       ) : null}
@@ -43,7 +43,7 @@ export function NlqAnswerCard({ result, days, onPinToDashboard }: NlqAnswerCardP
           Source:{" "}
           <Link
             href={`/explore/${result.resolved_from}?tab=model`}
-            className="text-sky-400 hover:text-sky-300"
+            className="text-sky-600 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300"
           >
             {result.resolved_from.replace(/_RPT_CURR$/, "").replace(/_/g, " ")}
           </Link>

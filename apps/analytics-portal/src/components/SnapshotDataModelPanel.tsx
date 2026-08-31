@@ -16,16 +16,16 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const ROLE_COLORS: Record<string, string> = {
-  driving: "text-emerald-300 ring-emerald-400/30 bg-emerald-500/10",
-  context: "text-sky-300 ring-sky-400/30 bg-sky-500/10",
-  optional_child: "text-amber-300 ring-amber-400/30 bg-amber-500/10",
-  lookup: "text-violet-300 ring-violet-400/30 bg-violet-500/10",
+  driving: "text-emerald-600 dark:text-emerald-300 ring-emerald-400/30 bg-emerald-500/10",
+  context: "text-sky-600 dark:text-sky-300 ring-sky-400/30 bg-sky-500/10",
+  optional_child: "text-amber-700 dark:text-amber-300 ring-amber-400/30 bg-amber-500/10",
+  lookup: "text-violet-600 dark:text-violet-300 ring-violet-400/30 bg-violet-500/10",
 };
 
 const FIELD_ROLE_COLORS: Record<string, string> = {
-  dimension: "text-sky-300 bg-sky-500/10",
-  measure: "text-emerald-300 bg-emerald-500/10",
-  date: "text-amber-300 bg-amber-500/10",
+  dimension: "text-sky-600 dark:text-sky-300 bg-sky-500/10",
+  measure: "text-emerald-600 dark:text-emerald-300 bg-emerald-500/10",
+  date: "text-amber-700 dark:text-amber-300 bg-amber-500/10",
 };
 
 export function SnapshotDataModelPanel({
@@ -154,7 +154,7 @@ function OverviewTab({
           <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
             Governed canvas
           </p>
-          <p className="mt-2 font-mono text-sm text-sky-200">{model.snapshot_table}</p>
+          <p className="mt-2 font-mono text-sm text-sky-700 dark:text-sky-200">{model.snapshot_table}</p>
           <p className="mt-1 text-xs text-fg-muted">
             End-user Domain points at this table — not live C2M joins at report runtime.
           </p>
@@ -178,7 +178,7 @@ function OverviewTab({
               {model.trusted_measures.map((measure) => (
                 <span
                   key={measure}
-                  className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300 ring-1 ring-emerald-400/20"
+                  className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-300 ring-1 ring-emerald-400/20"
                 >
                   {measure}
                 </span>
@@ -250,7 +250,7 @@ function TablesTab({ model }: { model: SnapshotDataModel }) {
     <div className="space-y-4">
       <p className="text-sm text-fg-muted">
         These Oracle tables are combined during the canvas refresh. Analysts query the flattened{" "}
-        <span className="font-mono text-sky-200">{model.snapshot_table}</span> table in the portal.
+        <span className="font-mono text-sky-700 dark:text-sky-200">{model.snapshot_table}</span> table in the portal.
       </p>
       {grouped.map(({ role, tables }) => (
         <section key={role} className="glass-panel p-5">
@@ -291,7 +291,7 @@ function JoinsTab({ model, onPrint }: { model: SnapshotDataModel; onPrint?: () =
       <div className="no-print flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-fg-muted">
           Join logic applied when building{" "}
-          <span className="font-mono text-sky-200">{model.snapshot_table}</span>. LEFT joins preserve
+          <span className="font-mono text-sky-700 dark:text-sky-200">{model.snapshot_table}</span>. LEFT joins preserve
           the driving population; optional-child joins only populate when FT/type rules match.
         </p>
         {onPrint ? (
@@ -306,7 +306,7 @@ function JoinsTab({ model, onPrint }: { model: SnapshotDataModel; onPrint?: () =
           <div className="relative pl-12">
             <span className="absolute left-3 top-4 h-4 w-4 rounded-full bg-emerald-400 ring-4 ring-emerald-400/20" />
             <div className="glass-panel p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                 Start · driving table
               </p>
               <p className="mt-1 font-mono text-sm text-heading">CISADM.{model.driving_table}</p>
@@ -402,11 +402,11 @@ function FieldsTab({
             <tbody>
               {fields.map((field) => (
                 <tr key={field.id} className="border-b border-edge-subtle hover:bg-white/[0.02]">
-                  <td className="px-4 py-2.5 font-mono text-xs text-sky-200">{field.id}</td>
+                  <td className="px-4 py-2.5 font-mono text-xs text-sky-700 dark:text-sky-200">{field.id}</td>
                   <td className="px-4 py-2.5 text-heading">
                     {field.label}
                     {trusted.has(field.id) ? (
-                      <span className="ml-2 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-300">
+                      <span className="ml-2 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-600 dark:text-emerald-300">
                         trusted
                       </span>
                     ) : null}

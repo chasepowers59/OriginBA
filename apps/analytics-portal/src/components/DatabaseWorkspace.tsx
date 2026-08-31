@@ -378,7 +378,7 @@ export function DatabaseWorkspace({
               disabled={mode !== "table" && !chartSuggestion}
               className={`rounded-md px-2.5 py-1 text-xs capitalize transition ${
                 resultView === mode
-                  ? "bg-sky-500/20 text-sky-300"
+                  ? "bg-sky-500/20 text-sky-600 dark:text-sky-300"
                   : "portal-text-muted hover:bg-chip disabled:opacity-40"
               }`}
               title={
@@ -433,7 +433,7 @@ export function DatabaseWorkspace({
                   onClick={() => setSidebarTab(id)}
                   className={`flex-1 px-2 py-2 text-[11px] font-medium ${
                     sidebarTab === id
-                      ? "border-b-2 border-sky-400 text-sky-300"
+                      ? "border-b-2 border-sky-400 text-sky-600 dark:text-sky-300"
                       : "portal-text-muted hover:text-fg"
                   }`}
                 >
@@ -467,7 +467,7 @@ export function DatabaseWorkspace({
                           : "border-[var(--border)] bg-[var(--surface-solid)] hover:border-sky-400/30"
                       }`}
                     >
-                      <span className="text-[10px] font-medium uppercase tracking-wide text-sky-400/80">
+                      <span className="text-[10px] font-medium uppercase tracking-wide text-sky-600 dark:text-sky-400/80">
                         {template.category}
                       </span>
                       <p className="mt-0.5 text-sm font-medium text-[var(--heading)]">
@@ -505,7 +505,7 @@ export function DatabaseWorkspace({
                               title={guide ?? undefined}
                             >
                               <span className="flex items-baseline justify-between gap-2">
-                                <span className="font-mono text-sky-300/90">{t.table_name}</span>
+                                <span className="font-mono text-sky-600 dark:text-sky-300/90">{t.table_name}</span>
                                 {t.num_rows != null ? (
                                   <span className="shrink-0 tabular-nums text-fg-subtle">
                                     {Number(t.num_rows).toLocaleString()}
@@ -530,7 +530,7 @@ export function DatabaseWorkspace({
                 <ul className="space-y-3 text-xs leading-relaxed text-fg-muted">
                   {workspaceTips.map((tip) => (
                     <li key={tip} className="flex gap-2">
-                      <span className="text-sky-400">•</span>
+                      <span className="text-sky-600 dark:text-sky-400">•</span>
                       <span>{tip}</span>
                     </li>
                   ))}
@@ -542,9 +542,9 @@ export function DatabaseWorkspace({
 
         <div className="flex min-w-0 flex-1 flex-col">
           {activeTemplate ? (
-            <div className="border-b border-sky-400/20 bg-sky-500/5 px-3 py-2 text-xs text-sky-200/90">
+            <div className="border-b border-sky-400/20 bg-sky-500/5 px-3 py-2 text-xs text-sky-700 dark:text-sky-200/90">
               <span className="font-medium">{activeTemplate.title}</span>
-              <span className="mx-2 text-sky-400/50">·</span>
+              <span className="mx-2 text-sky-600 dark:text-sky-400/50">·</span>
               {activeTemplate.tip}
             </div>
           ) : null}
@@ -573,7 +573,7 @@ export function DatabaseWorkspace({
           </div>
 
           {error ? (
-            <div className="border-b border-red-400/20 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+            <div className="border-b border-red-400/20 bg-red-500/10 px-3 py-2 text-xs text-red-700 dark:text-red-200">
               {error}
             </div>
           ) : null}

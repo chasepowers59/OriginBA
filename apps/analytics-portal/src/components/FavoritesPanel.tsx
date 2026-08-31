@@ -49,7 +49,7 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
           >
             <Link
               href={`/explore/${fav.snapshotId}?favorite=${fav.id}`}
-              className="min-w-0 flex-1 text-sm text-heading hover:text-sky-300"
+              className="min-w-0 flex-1 text-sm text-heading hover:text-sky-600 dark:hover:text-sky-300"
             >
               <span className="block truncate font-medium">{fav.title}</span>
               <span className="block truncate text-xs text-fg-muted">{fav.snapshotLabel}</span>
@@ -60,7 +60,7 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
                 await removeViewRemote(fav.id);
                 refresh();
               }}
-              className="shrink-0 text-xs text-fg-muted hover:text-red-300"
+              className="shrink-0 text-xs text-fg-muted hover:text-red-600 dark:hover:text-red-300"
               title="Remove saved view"
             >
               Remove

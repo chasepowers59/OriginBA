@@ -31,7 +31,7 @@ export function HomeDashboard() {
         <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-sky-500/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-16 left-1/3 h-48 w-48 rounded-full bg-indigo-500/10 blur-3xl" />
         <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
             {brandLine(brand)}
           </p>
           <h1 className="mt-2 max-w-2xl text-4xl font-bold tracking-tight text-heading md:text-5xl">
@@ -71,7 +71,7 @@ export function HomeDashboard() {
       <section>
         <div className="mb-3 flex items-center justify-between gap-2">
           <h2 className="text-lg font-semibold text-heading">Saved views</h2>
-          <Link href="/reports" className="text-xs text-sky-400 hover:text-sky-300">
+          <Link href="/reports" className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300">
             Browse all reports →
           </Link>
         </div>
@@ -95,9 +95,9 @@ export function SnapshotCard({ snap }: { snap: SnapshotSummary }) {
         ) : (
           <span className="chip text-[10px]">Browse & SQL</span>
         )}
-        <span className="text-fg-muted transition group-hover:text-sky-400">View →</span>
+        <span className="text-fg-muted transition group-hover:text-sky-600 dark:group-hover:text-sky-400">View →</span>
       </div>
-      <h3 className="mt-3 text-lg font-semibold text-heading group-hover:text-sky-100">
+      <h3 className="mt-3 text-lg font-semibold text-heading group-hover:text-sky-700 dark:group-hover:text-sky-100">
         {snap.label}
       </h3>
       <p className="mt-2 line-clamp-3 text-sm text-fg-muted">

@@ -586,13 +586,13 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           </div>
         ) : null}
         {savedMsg ? (
-          <p className="text-center text-xs text-emerald-400">{savedMsg}</p>
+          <p className="text-center text-xs text-emerald-600 dark:text-emerald-400">{savedMsg}</p>
         ) : null}
       </aside>
 
       <main className="space-y-4">
         {error ? (
-          <div className="glass-panel border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          <div className="glass-panel border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-200">
             {error}
           </div>
         ) : null}

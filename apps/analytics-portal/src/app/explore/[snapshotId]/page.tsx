@@ -45,7 +45,7 @@ export default async function ExplorePage({ params }: PageProps) {
       dbConfigured={index.db_configured}
     >
       {error || !metadata ? (
-        <div className="glass-panel border-red-400/20 bg-red-500/10 px-4 py-3 text-red-200">
+        <div className="glass-panel border-red-400/20 bg-red-500/10 px-4 py-3 text-red-700 dark:text-red-200">
           {error ?? "Snapshot not found"}
         </div>
       ) : (

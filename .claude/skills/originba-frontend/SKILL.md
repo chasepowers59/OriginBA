@@ -33,6 +33,11 @@ during the 2026-08 overhaul; breaking one usually reintroduces a bug we already 
   login navy panel).
 - Dark mode is near-black by design (#0b0d12 ground, #14171f cards) per the reference
   dashboard. Every change is verified in BOTH themes before commit.
+- **Accent text must be a dual-theme pair.** A light Tailwind shade (sky-300,
+  amber-200, red-300…) is a DARK-surface colour; alone it washes out on white. Always
+  write `text-sky-600 dark:text-sky-300` style pairs (light gets 600/700-shade, dark
+  keeps the light shade). Contrast audit trick: computed text luminance > 0.7 in light
+  mode outside btn-primary = a bug.
 - Print (council/lineage packs): the `@media print` block forces tokens to fixed light
   values inside `.council-pack` / `.lineage-pack` / `#dashboard-export-root`. Token
   classes print correctly; do not add print-only hardcoded colours.

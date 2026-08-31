@@ -177,7 +177,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href="/dashboards" className="text-xs text-sky-400 hover:text-sky-300">
+          <Link href="/dashboards" className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300">
             ← My dashboards
           </Link>
           <input
@@ -222,7 +222,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       ) : null}
 
       {filter ? (
-        <div className="flex items-center justify-between rounded-xl border border-amber-400/25 bg-amber-500/10 px-4 py-2 text-sm text-amber-100">
+        <div className="flex items-center justify-between rounded-xl border border-amber-400/25 bg-amber-500/10 px-4 py-2 text-sm text-amber-800 dark:text-amber-100">
           <span>
             Cross-filter: <strong>{filter.label ?? filter.field}</strong> = {filter.value}
           </span>
@@ -263,7 +263,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
                     updateTile(slot, emptyTile(slot));
                     setEditSlot(slot);
                   }}
-                  className="flex h-full w-full items-center justify-center text-sm text-fg-muted hover:text-sky-300"
+                  className="flex h-full w-full items-center justify-center text-sm text-fg-muted hover:text-sky-600 dark:hover:text-sky-300"
                 >
                   + Add tile
                 </button>
@@ -323,7 +323,7 @@ function SlotCell({
           {...listeners}
           aria-label="Drag tile to another slot"
           title="Drag to reorder"
-          className="absolute left-2 top-2 z-10 cursor-grab rounded px-1.5 py-0.5 text-xs leading-none text-fg-muted hover:text-sky-300 active:cursor-grabbing"
+          className="absolute left-2 top-2 z-10 cursor-grab rounded px-1.5 py-0.5 text-xs leading-none text-fg-muted hover:text-sky-600 dark:hover:text-sky-300 active:cursor-grabbing"
         >
           ⠿
         </button>
@@ -417,7 +417,7 @@ function TileEditor({
         </label>
       </div>
       <div className="mt-4 flex justify-between gap-2">
-        <button type="button" onClick={onRemove} className="text-xs text-red-400">
+        <button type="button" onClick={onRemove} className="text-xs text-red-600 dark:text-red-400">
           Remove tile
         </button>
         <div className="flex gap-2">

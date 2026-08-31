@@ -51,9 +51,9 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
             <div className="mt-3 flex flex-wrap gap-2">
               <Link
                 href={`/explore/${metadata.id}?tab=model`}
-                className="inline-flex items-center gap-2 rounded-lg border border-indigo-400/25 bg-indigo-500/10 px-3 py-2 text-xs text-indigo-100 transition hover:border-indigo-400/45"
+                className="inline-flex items-center gap-2 rounded-lg border border-indigo-400/25 bg-indigo-500/10 px-3 py-2 text-xs text-indigo-700 dark:text-indigo-100 transition hover:border-indigo-400/45"
               >
-                <span className="font-medium text-indigo-200">View data model →</span>
+                <span className="font-medium text-indigo-700 dark:text-indigo-200">View data model →</span>
                 {model.source_tables.length} source tables · {metadata.fields?.length ?? 0} fields
               </Link>
               <Link
@@ -71,19 +71,19 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
             </p>
           ) : null}
           {metadata.usage_guidance ? (
-            <p className="mt-3 rounded-lg border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-xs text-amber-100/90">
-              <span className="font-medium text-amber-200">Data guidance: </span>
+            <p className="mt-3 rounded-lg border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-xs text-amber-800 dark:text-amber-100/90">
+              <span className="font-medium text-amber-700 dark:text-amber-200">Data guidance: </span>
               {metadata.usage_guidance}
             </p>
           ) : null}
           {metadata.related_snapshot ? (
             <Link
               href={`/explore/${metadata.related_snapshot.id}`}
-              className="mt-3 inline-flex items-center gap-2 rounded-lg border border-sky-400/20 bg-sky-500/10 px-3 py-2 text-xs text-sky-100 transition hover:border-sky-400/40"
+              className="mt-3 inline-flex items-center gap-2 rounded-lg border border-sky-400/20 bg-sky-500/10 px-3 py-2 text-xs text-sky-700 dark:text-sky-100 transition hover:border-sky-400/40"
             >
-              <span className="font-medium text-sky-200">Related domain →</span>
+              <span className="font-medium text-sky-700 dark:text-sky-200">Related domain →</span>
               {metadata.related_snapshot.label}
-              <span className="text-sky-300/70">· {metadata.related_snapshot.hint}</span>
+              <span className="text-sky-600 dark:text-sky-300/70">· {metadata.related_snapshot.hint}</span>
             </Link>
           ) : null}
         </div>
@@ -125,7 +125,7 @@ function StatPill({
     >
       <p className="text-[10px] font-semibold uppercase tracking-wider text-fg-muted">{label}</p>
       <p
-        className={`mt-1 font-semibold ${accent ? "text-emerald-300" : "text-heading"} ${
+        className={`mt-1 font-semibold ${accent ? "text-emerald-600 dark:text-emerald-300" : "text-heading"} ${
           small ? "text-sm" : "text-lg"
         }`}
         title={value}

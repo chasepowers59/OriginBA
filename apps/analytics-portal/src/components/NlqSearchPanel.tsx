@@ -73,7 +73,7 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
   return (
     <section className={`glass-panel ${compact ? "p-4" : "p-6"}`}>
       <div className="mb-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
           Ask a question
         </p>
         <h2 className={`mt-1 font-bold text-heading ${compact ? "text-lg" : "text-xl"}`}>
@@ -182,7 +182,7 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
       ) : null}
 
       {error ? (
-        <div className="mt-4 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <div className="mt-4 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-200">
           {error}
         </div>
       ) : null}
