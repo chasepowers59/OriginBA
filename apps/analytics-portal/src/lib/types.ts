@@ -346,6 +346,8 @@ export type ExecutiveSummary = {
   client: string;
   db_configured: boolean;
   compare_enabled?: boolean;
+  /** Set when the org's catalog has none of the governed canvases the KPIs read. */
+  catalog_note?: string | null;
   period: PeriodInfo;
   prior_period?: PeriodInfo;
   kpis: ExecutiveKpi[];

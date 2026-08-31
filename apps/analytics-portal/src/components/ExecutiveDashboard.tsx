@@ -156,6 +156,15 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
               />
             ))}
           </div>
+        ) : summary?.catalog_note ? (
+          // A legacy-catalog org has none of the governed canvases the KPIs read — one
+          // clear explanation instead of a grid of per-KPI errors.
+          <div className="glass-panel px-6 py-8 text-center">
+            <p className="text-sm font-medium text-heading">
+              Executive KPIs aren&apos;t available for this organization
+            </p>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-fg-muted">{summary.catalog_note}</p>
+          </div>
         ) : (
           <div className="glass-panel px-4 py-8 text-center text-sm text-fg-muted">
             Unable to load executive metrics.

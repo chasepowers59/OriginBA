@@ -165,6 +165,35 @@ def _kpis_for_workstreams(allowed_workstreams: list[str] | None) -> list[dict[st
     return [kpi for kpi in EXECUTIVE_KPIS if kpi.get("workstream") in allowed]
 
 
+def available_kpis(
+    kpi_defs: list[dict[str, Any]], organization_id: str | None,
+) -> tuple[list[dict[str, Any]], str | None]:
+    """Filter the KPI set to snapshots that exist in this org's catalog.
+
+    The executive KPIs read the governed dbt canvases (rpt_*). A legacy-catalog org
+    (demo: the CISADM *_RPT_CURR snapshots) has none of them, so running the set there
+    produced a grid of 'Unknown snapshot' error cards. Skip the missing ones instead;
+    when nothing is left, return a single human note for the dashboard to show.
+    """
+    from api.snapshot_catalog import CatalogError, get_snapshot
+
+    def _in_catalog(snapshot_id: str) -> bool:
+        try:
+            get_snapshot(snapshot_id, organization_id)
+            return True
+        except CatalogError:
+            return False
+
+    avail = [k for k in kpi_defs if _in_catalog(str(k.get("snapshot_id")))]
+    if avail or not kpi_defs:
+        return avail, None
+    return [], (
+        "Executive KPIs read the governed reporting canvases, which are not part of "
+        "this organization's catalog. Its reports are available under Library and "
+        "the canvas pages."
+    )
+
+
 
 
 def _refresh_insight(organization_id: str) -> dict[str, Any] | None:
@@ -206,7 +235,8 @@ def build_executive_summary(
     (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode)
     period_label = f"Last {days} days" if compare_mode != "mom" else "Month to date"
     client_id = organization_id or "demo"
-    kpi_defs = _kpis_for_workstreams(allowed_workstreams)
+    kpi_defs, catalog_note = available_kpis(
+        _kpis_for_workstreams(allowed_workstreams), organization_id)
 
     # the KPI set runs on the dbt WAREHOUSE canvases; the Oracle demo DB is only
     # needed for any legacy-snapshot KPI. Either backend being configured is enough --
@@ -283,7 +313,10 @@ def build_executive_summary(
         "compare_enabled": compare,
         "compare_mode": compare_mode,
         "compare_label": compare_label,
-        "refresh": _refresh_insight(organization_id),
+        "catalog_note": catalog_note,
+        # The freshness marker reads the warehouse landing; on a legacy-catalog org
+        # (no canvas KPIs ran) it would advertise ANOTHER org's data — suppress it.
+        "refresh": _refresh_insight(organization_id) if kpi_defs else None,
         "period": {
             "start": date_start,
             "end": date_end,

@@ -163,3 +163,22 @@ class PortalAuthTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ExecutiveCatalogAvailabilityTests(unittest.TestCase):
+    """A legacy-catalog org (demo: cisadm snapshots) has none of the dbt canvases the
+    executive KPIs read, so the dashboard must SKIP them with one clear note — never
+    render a grid of 'Unknown snapshot' errors."""
+
+    def test_dbt_org_has_all_kpis(self) -> None:
+        from api.executive_dashboard import EXECUTIVE_KPIS, available_kpis
+        avail, note = available_kpis(EXECUTIVE_KPIS, "dev")
+        self.assertEqual(len(avail), len(EXECUTIVE_KPIS))
+        self.assertIsNone(note)
+
+    def test_legacy_catalog_org_skips_all_with_note(self) -> None:
+        from api.executive_dashboard import EXECUTIVE_KPIS, available_kpis
+        avail, note = available_kpis(EXECUTIVE_KPIS, "demo")
+        self.assertEqual(avail, [])
+        self.assertIsNotNone(note)
+        self.assertIn("canvas", note.lower())
