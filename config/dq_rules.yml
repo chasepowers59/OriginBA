@@ -228,13 +228,13 @@
   sql: >
     select bs."SA Type",
            count(distinct bs."Bill Segment ID")            as usage_segments,
-           count(cl.uom_cd)                                as calc_lines_with_uom,
+           count(cl."Unit of Measure Code")                as calc_lines_with_uom,
            count(*)                                        as calc_lines_total
     from reporting.rpt_bill_segment bs
-    join core.fct_billed_charge cl on cl.bseg_id = bs."Bill Segment ID"
+    join reporting.rpt_billed_charge cl on cl."Bill Segment ID" = bs."Bill Segment ID"
     where bs."Billed Usage" is not null
     group by bs."SA Type"
-    having count(cl.uom_cd) = 0
+    having count(cl."Unit of Measure Code") = 0
 
 - id: config_tax_in_calc_lines
   object: Rate configuration
