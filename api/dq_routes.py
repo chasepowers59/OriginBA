@@ -22,8 +22,12 @@ from api.auth import AuthContext, get_auth_context
 from api.warehouse_db import warehouse_configured, warehouse_connection
 
 ROOT = Path(__file__).resolve().parent.parent
-# sibling-checkout default, same convention as the comparison suite's env file
+# Rules resolution order: the sibling originba_dbt checkout is the SOURCE (dev machines),
+# and config/dq_rules.yml is the DEPLOY COPY bundled into the container (Render has no
+# sibling repo). Refresh the bundled copy whenever dq_rules/rules.yml changes:
+#   cp ../originba_dbt/dq_rules/rules.yml config/dq_rules.yml
 DEFAULT_RULES = ROOT.parent / "originba_dbt" / "dq_rules" / "rules.yml"
+BUNDLED_RULES = ROOT / "config" / "dq_rules.yml"
 
 router = APIRouter(prefix="/dq", tags=["data-quality"])
 
@@ -64,7 +68,12 @@ def _refresh_marker(cur) -> str:
 
 
 def _rules_path() -> Path:
-    return Path(os.environ.get("DQ_RULES_PATH") or DEFAULT_RULES)
+    override = os.environ.get("DQ_RULES_PATH")
+    if override:
+        return Path(override)
+    if DEFAULT_RULES.exists():
+        return DEFAULT_RULES
+    return BUNDLED_RULES
 
 
 @router.get("/findings")

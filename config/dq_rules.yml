@@ -1,0 +1,352 @@
+# Data-quality rules v1 — each rule: one SQL against the VALIDATED reporting
+# canvases + the metadata that turns rows into a CIS worklist. Canvases are the rule
+# substrate on purpose: the contract is fleet-identical, so one rule runs at every
+# client unchanged (docs/DATA_GOVERNANCE_ROADMAP.md).
+#
+# severity: action (work it now) | review (judgment call) | info (awareness)
+# Every threshold is MEASURED, never guessed (the wave-2 discipline); the measurement
+# is cited in the comment above the rule.
+
+- id: never_registered_head_end
+  object: Device
+  severity: action
+  title: AMI device never registered at head-end
+  action: >
+    The head-end has never seen this installed meter -- it measures nothing over the
+    network. In CIS: Main Menu > Device > search the Device ID; verify commissioning
+    and the head-end registration; re-commission or replace.
+  # measured: 1,646 at college_station (real AMI); honestly empty at manual clients.
+  # GUARDED (measured 2026-08-26): a per-device worklist only means something when the
+  # client demonstrably HAS a head-end feed. On full INT_DEV, 794 of 797 attached
+  # devices flagged (0.38% registered) -- that is one absent integration, not 794
+  # device defects, and it drowned every other finding. The guard: at least 1% of
+  # attached devices must be registered for the per-device list to fire; below that,
+  # head_end_integration_absent (next rule) reports the systemic fact as ONE row.
+  sql: >
+    select "Device ID", "Meter Badge Number", "Device Type", "Premise Address",
+           "Install Date/Time"
+    from reporting.rpt_device_asset
+    where "Never Registered At Head-End" and "Is Attached To Service Point"
+      and (select count(*) filter (where not "Never Registered At Head-End")
+           from reporting.rpt_device_asset where "Is Attached To Service Point")
+          >= 0.01 * (select count(*) from reporting.rpt_device_asset
+                     where "Is Attached To Service Point")
+
+- id: head_end_integration_absent
+  object: Head-end integration
+  severity: action
+  title: Head-end feed effectively absent (fleet-wide)
+  action: >
+    Under 1% of attached devices have ever registered at the head-end: the problem is
+    the INTEGRATION (feed not configured, broken, or this environment has no AMI),
+    not the individual meters. Fix or confirm the feed; the per-device worklist stays
+    suppressed until registrations appear. If this environment is genuinely manual,
+    acknowledge this one finding rather than 794.
+  # the systemic half of the guard above -- one row instead of a flooded worklist
+  sql: >
+    select count(*) filter (where "Never Registered At Head-End") as unregistered,
+           count(*)                                               as attached_devices,
+           round(100.0 * count(*) filter (where not "Never Registered At Head-End")
+                 / greatest(count(*), 1), 2)                      as pct_registered
+    from reporting.rpt_device_asset
+    where "Is Attached To Service Point"
+    having count(*) > 0
+       and count(*) filter (where not "Never Registered At Head-End")
+           < 0.01 * count(*)
+
+- id: switched_off_over_60d
+  object: Device
+  severity: review
+  title: Device switched off over 60 days
+  action: >
+    Present but disconnected for 60+ days. If the cause column shows DNP this is
+    credit-cut aging (regulated reconnect clocks); null cause = office/legacy --
+    verify the premise is genuinely inactive. CIS: Device > Install Event history.
+  # measured: reconnect gaps p50 1.9d / p90 155d -- past 60d it is seasonal-or-stuck
+  sql: >
+    select "Device ID", "Meter Badge Number", "Premise Address",
+           "Switched Off Since Date/Time", "Days Switched Off",
+           "Switch-Off Field Task Type"
+    from reporting.rpt_device_asset
+    where "Days Switched Off" >= 60
+
+- id: usage_after_vacancy
+  key_column: "Service Point ID"
+  object: Service Point
+  severity: action
+  title: Usage recorded after the point went vacant
+  action: >
+    A departed meter is still measuring consumption -- theft, leak, or a records
+    error. CIS: Premise > Service Point > install history; reconcile the removal
+    date against the measuring component's latest reads.
+  sql: >
+    select "Premise ID", "Service Point ID", "Premise Address",
+           "Last Measurement Date/Time"
+    from reporting.rpt_premise_sp
+    where "Usage After Vacancy"
+
+- id: estimate_streak
+  object: Service Agreement
+  severity: action
+  title: Three or more consecutive estimated bills
+  action: >
+    The complaint and regulatory zone. CIS: Service Agreement > billing history;
+    check the meter read chain (route skips, access issues, dead register) and
+    schedule an actual read.
+  # measured: streak sample verified exact vs live; 3+ = complaint zone
+  sql: >
+    select "Service Agreement ID", "Main Customer Name", "SA Type",
+           "Consecutive Estimated Bills"
+    from reporting.rpt_service_agreement
+    where "Consecutive Estimated Bills" >= 3
+    order by "Consecutive Estimated Bills" desc
+
+- id: zero_usage_latest_bill
+  object: Service Agreement
+  severity: review
+  title: Latest bill billed zero usage on a service that has billed usage before
+  action: >
+    Dying meter, stopped register, or vacant-but-billing (the live sample was a real
+    meter dying 3 -> 1 -> 0). CIS: SA > bill segments > read history for the newest
+    segment.
+  sql: >
+    select "Service Agreement ID", "Main Customer Name", "SA Type"
+    from reporting.rpt_service_agreement
+    where "Zero Usage On Latest Bill"
+
+- id: bill_open_over_30d
+  object: Bill
+  severity: action
+  title: Bill window open over 30 days
+  action: >
+    The billing engine's stuck-bill worklist -- measured norm is p50 3.8 / p99 24.2
+    days, so 30+ is genuinely stuck. CIS: Billing > Bill > check segment errors and
+    the window; complete or delete.
+  sql: >
+    select "Bill ID", "Account ID", "Main Customer Name", "Window Start Date",
+           "Days Bill Open"
+    from reporting.rpt_bill
+    where "Days Bill Open" > 30
+    order by "Days Bill Open" desc
+
+- id: cycled_bill_no_window
+  object: Bill
+  severity: review
+  title: Cycled bill with no window start
+  action: >
+    Window-start and cycle partition EXACTLY in healthy data (360,376/359,785, zero
+    crossovers measured) -- a cycled bill without a window is an anomaly worth a
+    look. CIS: Billing > Bill.
+  sql: >
+    select "Bill ID", "Account ID", "Bill Cycle Code", "Created Date/Time"
+    from reporting.rpt_bill
+    where "Bill Cycle Code" is not null and "Window Start Date" is null
+
+- id: completed_bill_no_frozen_segments
+  object: Bill
+  severity: review
+  title: Completed bill with zero frozen segments
+  action: >
+    A completed bill should carry frozen segments; zero is the hand-cranked/broken
+    billing shape (the INT_DEV class). CIS: Billing > Bill > segments.
+  sql: >
+    select "Bill ID", "Account ID", "Completed Date/Time",
+           "Bill Segment Count", "Frozen Bill Segment Count"
+    from reporting.rpt_bill
+    where "Is Completed" and coalesce("Frozen Bill Segment Count", 0) = 0
+
+- id: sp_no_installed_device
+  key_column: "Service Point ID"
+  object: Service Point
+  severity: review
+  title: Service point with no installed device
+  action: >
+    The classic ask: "active service points with no meter installed". If the point
+    should be vacant, set its status in CIS (Premise > Service Point) so field and
+    billing stop expecting a meter; if it should have a meter, dispatch.
+  sql: >
+    select "Premise ID", "Service Point ID", "Premise Address",
+           "Service Point Status", "Device Removal Date/Time"
+    from reporting.rpt_premise_sp
+    where not "Has Installed Device"
+
+- id: stale_actual_measurement
+  key_column: "Service Point ID"
+  object: Service Point
+  severity: review
+  title: No actual (non-estimated) measurement in 90+ days on a metered point
+  action: >
+    The register may be unreadable or the route skipping it. CIS: Service Point >
+    measuring component > measurement history.
+  sql: >
+    select "Premise ID", "Service Point ID", "Premise Address",
+           "Last Actual Measurement Date/Time", "Days Since Actual Measurement"
+    from reporting.rpt_premise_sp
+    where "Has Installed Device" and "Days Since Actual Measurement" > 90
+    order by "Days Since Actual Measurement" desc
+
+- id: duplicate_meter_badge
+  object: Device
+  severity: action
+  title: Two devices sharing one meter badge number
+  action: >
+    Badge numbers are the field's identity for a meter -- a duplicate breaks
+    exchanges and reads. CIS: Device > identifiers; correct the data entry.
+  sql: >
+    select "Meter Badge Number", count(*) as devices,
+           string_agg("Device ID", ', ') as device_ids
+    from reporting.rpt_device_asset
+    where "Meter Badge Number" is not null
+    group by "Meter Badge Number" having count(*) > 1
+
+- id: future_dated_bills
+  object: Bill
+  severity: action
+  title: Bill dated in the future
+  action: >
+    Entry/clock error -- a bill date beyond tomorrow. CIS: Billing > Bill; verify
+    the bill date and the batch business date.
+  sql: >
+    select "Bill ID", "Account ID", "Bill Date", "Created Date/Time"
+    from reporting.rpt_bill
+    where "Bill Date" > current_date + 1
+
+# ---- CONFIG-QUALITY family (info severity): per-client convention profiles.
+# These read CORE where the configuration detail lives (calc-line UOMs are not a
+# reporting column); the roadmap's second family, same engine.
+
+- id: config_calc_lines_no_uom_on_usage
+  object: Rate configuration
+  severity: info
+  title: "Config profile: usage-billing segments whose calc lines carry no UOM"
+  action: >
+    The Ellensburg pattern: the SQ line carries gallons while the calc line carries
+    no UOM -- unit-of-measure reporting from calc lines silently loses those
+    volumes. Per SA Type below: segments that billed usage vs how many of their calc
+    lines carry a UOM. Review the rate component configuration in CIS (Rate Schedule
+    > components) for the SA types where uom_lines is zero.
+  sql: >
+    select bs."SA Type",
+           count(distinct bs."Bill Segment ID")            as usage_segments,
+           count(cl.uom_cd)                                as calc_lines_with_uom,
+           count(*)                                        as calc_lines_total
+    from reporting.rpt_bill_segment bs
+    join core.fct_billed_charge cl on cl.bseg_id = bs."Bill Segment ID"
+    where bs."Billed Usage" is not null
+    group by bs."SA Type"
+    having count(cl.uom_cd) = 0
+
+- id: config_tax_in_calc_lines
+  object: Rate configuration
+  severity: info
+  title: "Config profile: tax carried as calc lines"
+  action: >
+    Convention detector (citycorp does this; others may not): charge lines whose
+    description reads as tax. Knowing WHERE each client carries tax is what keeps
+    revenue-by-component reports comparable across the fleet. No CIS action unless
+    a client's convention changed unexpectedly.
+  sql: >
+    select "Charge Description", count(*) as line_count,
+           sum("Billed Amount") as total_amount
+    from reporting.rpt_billed_charge
+    where "Charge Description" ~* 'tax'
+    group by "Charge Description"
+    order by line_count desc
+
+# ---- ETL PIPELINE INTEGRITY (action severity): the source-side family.
+# Chase's point (2026-08-26): rules on the canvases assume the ETL was faithful.
+# These rules CHECK that assumption -- each compares a canvas against its landing
+# source on rows AND dollars, and returns a row only on mismatch, so a join that
+# silently drops rows or a filter that silently widens becomes an act-now finding
+# instead of a quietly wrong dashboard. The orphan rules are true SOURCE integrity:
+# broken references in the landing itself (CDC or source-system defects).
+
+- id: pipeline_ft_parity
+  object: ETL pipeline
+  severity: action
+  title: Financial transactions differ between landing and reporting
+  action: >
+    rpt_financial_txn is one row per CI_FT with no population filter -- counts and
+    summed current amounts must match EXACTLY. A mismatch means the dbt chain
+    dropped or duplicated rows: diff staging.stg_financial_txn against the landing
+    before trusting any financial number.
+  sql: >
+    select 'financial transactions' as chain,
+           l.n as landing_rows, c.n as canvas_rows,
+           l.amt as landing_amount, c.amt as canvas_amount
+    from (select count(*) n, round(sum(cur_amt)::numeric,2) amt from cisadm.ci_ft) l,
+         (select count(*) n, round(sum("Current Amount")::numeric,2) amt
+          from reporting.rpt_financial_txn) c
+    where l.n <> c.n or l.amt is distinct from c.amt
+
+- id: pipeline_bill_parity
+  object: ETL pipeline
+  severity: action
+  title: Bills differ between landing and reporting
+  action: One row per CI_BILL, no filter -- investigate the dbt chain on mismatch.
+  sql: >
+    select 'bills' as chain, l.n as landing_rows, c.n as canvas_rows
+    from (select count(*) n from cisadm.ci_bill) l,
+         (select count(*) n from reporting.rpt_bill) c
+    where l.n <> c.n
+
+- id: pipeline_bseg_parity
+  object: ETL pipeline
+  severity: action
+  title: Bill segments differ between landing and reporting
+  action: One row per CI_BSEG, no filter -- investigate the dbt chain on mismatch.
+  sql: >
+    select 'bill segments' as chain, l.n as landing_rows, c.n as canvas_rows
+    from (select count(*) n from cisadm.ci_bseg) l,
+         (select count(*) n from reporting.rpt_bill_segment) c
+    where l.n <> c.n
+
+- id: pipeline_tender_parity
+  object: ETL pipeline
+  severity: action
+  title: Payment tenders differ between landing and reporting (rows or dollars)
+  action: One row per CI_PAY_TNDR -- counts and tender dollars must tie exactly.
+  sql: >
+    select 'payment tenders' as chain,
+           l.n as landing_rows, c.n as canvas_rows,
+           l.amt as landing_amount, c.amt as canvas_amount
+    from (select count(*) n, round(sum(tender_amt)::numeric,2) amt from cisadm.ci_pay_tndr) l,
+         (select count(*) n, round(sum("Tender Amount")::numeric,2) amt
+          from reporting.rpt_payment_tender) c
+    where l.n <> c.n or l.amt is distinct from c.amt
+
+- id: pipeline_msrmt_parity
+  object: ETL pipeline
+  severity: action
+  title: Measurements differ between landing and reporting
+  action: One row per D1_MSRMT -- investigate the dbt chain on mismatch.
+  sql: >
+    select 'measurements' as chain, l.n as landing_rows, c.n as canvas_rows
+    from (select count(*) n from cisadm.d1_msrmt) l,
+         (select count(*) n from reporting.rpt_measurement) c
+    where l.n <> c.n
+
+- id: source_orphan_bseg_without_bill
+  object: Source integrity
+  severity: action
+  title: Bill segments referencing a bill that is not in the landing
+  action: >
+    A broken reference IN THE SOURCE COPY: either the CDC feed missed the bill or
+    the source system carries an orphan. Check the extract/CDC completeness for the
+    bill ids listed before suspecting any model.
+  sql: >
+    select s.bseg_id, s.bill_id
+    from cisadm.ci_bseg s
+    where nullif(trim(s.bill_id),'') is not null
+      and not exists (select 1 from cisadm.ci_bill b where b.bill_id = s.bill_id)
+
+- id: source_orphan_ft_without_sa
+  object: Source integrity
+  severity: action
+  title: Financial transactions referencing a service agreement not in the landing
+  action: Same class -- CDC completeness or source orphan; check the SA ids listed.
+  sql: >
+    select f.ft_id, f.sa_id
+    from cisadm.ci_ft f
+    where nullif(trim(f.sa_id),'') is not null
+      and not exists (select 1 from cisadm.ci_sa s where s.sa_id = f.sa_id)
