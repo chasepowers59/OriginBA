@@ -134,6 +134,18 @@
     {
      "report_id": "notification_error_detail",
      "snapshot_id": "rpt_customer_notification"
+    },
+    {
+     "report_id": "sas_by_type",
+     "snapshot_id": "rpt_service_agreement"
+    },
+    {
+     "report_id": "links_by_relationship",
+     "snapshot_id": "rpt_account_person"
+    },
+    {
+     "report_id": "financially_responsible_split",
+     "snapshot_id": "rpt_account_person"
     }
    ],
    "title": "Customer Operations"
@@ -190,6 +202,14 @@
     {
      "report_id": "life_support_premises",
      "snapshot_id": "rpt_premise_sp"
+    },
+    {
+     "report_id": "locations_by_type",
+     "snapshot_id": "rpt_asset_location"
+    },
+    {
+     "report_id": "deepest_location_trees",
+     "snapshot_id": "rpt_asset_location"
     }
    ],
    "title": "Metering & Assets"
@@ -274,6 +294,30 @@
     {
      "report_id": "billable_charges",
      "snapshot_id": "rpt_billable_charge"
+    },
+    {
+     "report_id": "bills_by_status",
+     "snapshot_id": "rpt_bill"
+    },
+    {
+     "report_id": "bills_longest_open",
+     "snapshot_id": "rpt_bill"
+    },
+    {
+     "report_id": "billed_by_class_calc_lines",
+     "snapshot_id": "rpt_billed_charge"
+    },
+    {
+     "report_id": "billed_by_budget_plan",
+     "snapshot_id": "rpt_billed_charge"
+    },
+    {
+     "report_id": "measured_by_uom",
+     "snapshot_id": "rpt_bill_segment_read"
+    },
+    {
+     "report_id": "reads_by_row_kind",
+     "snapshot_id": "rpt_bill_segment_read"
     }
    ],
    "title": "Usage & Billing"
@@ -382,6 +426,10 @@
     {
      "report_id": "sa_aged_balance",
      "snapshot_id": "rpt_sa_aged_balance"
+    },
+    {
+     "report_id": "sa_balance_by_type",
+     "snapshot_id": "rpt_service_agreement"
     }
    ],
    "title": "Credit & Collections"
@@ -438,6 +486,14 @@
     {
      "report_id": "usage_transactions",
      "snapshot_id": "rpt_usage_txn"
+    },
+    {
+     "report_id": "characteristics_by_entity",
+     "snapshot_id": "rpt_characteristics"
+    },
+    {
+     "report_id": "top_characteristic_types",
+     "snapshot_id": "rpt_characteristics"
     }
    ],
    "title": "Field & Operations"
@@ -827,7 +883,42 @@
    ],
    "poc_enabled": true,
    "portal_enabled": true,
-   "premade_reports": [],
+   "premade_reports": [
+    {
+     "chart_type": "bar",
+     "description": "Account-person links drive who gets billed and who gets told; an unexpected relationship mix is a data-entry pattern worth seeing.",
+     "dimensions": [
+      "Account Relationship"
+     ],
+     "filters": [],
+     "id": "links_by_relationship",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "How are people linked to accounts, by relationship?",
+     "workstream_label": "Customer Information"
+    },
+    {
+     "chart_type": "pie",
+     "description": "Responsibility drives collections contact; third-party-only accounts behave differently in arrears.",
+     "dimensions": [
+      "Financially Responsible"
+     ],
+     "filters": [],
+     "id": "financially_responsible_split",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "Who on the account is financially responsible?",
+     "workstream_label": "Customer Information"
+    }
+   ],
    "related_snapshot": null,
    "required_date_field": null,
    "required_date_label": null,
@@ -1318,7 +1409,42 @@
    ],
    "poc_enabled": true,
    "portal_enabled": true,
-   "premade_reports": [],
+   "premade_reports": [
+    {
+     "chart_type": "horizontal",
+     "description": "The shape of the location estate \u2014 and types with one node are usually setup artifacts.",
+     "dimensions": [
+      "Location Type"
+     ],
+     "filters": [],
+     "id": "locations_by_type",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "How many asset locations, by type?",
+     "workstream_label": "Assets"
+    },
+    {
+     "chart_type": "horizontal",
+     "description": "Very deep hierarchies slow navigation and usually mean an import created nesting nobody designed.",
+     "dimensions": [
+      "Location"
+     ],
+     "filters": [],
+     "id": "deepest_location_trees",
+     "measures": [
+      {
+       "agg": "max",
+       "field": "Hierarchy Depth"
+      }
+     ],
+     "title": "Which location trees run deepest?",
+     "workstream_label": "Assets"
+    }
+   ],
    "related_snapshot": null,
    "required_date_field": null,
    "required_date_label": null,
@@ -1563,7 +1689,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "Batch is what makes bills exist. A failed billing batch is tomorrow's missed bill run, and a slow one is the reason the window is closing.",
      "dimensions": [
       "Batch Code"
@@ -2150,7 +2276,42 @@
    ],
    "poc_enabled": true,
    "portal_enabled": true,
-   "premade_reports": [],
+   "premade_reports": [
+    {
+     "chart_type": "bar",
+     "description": "Pending bills past their window are billing throughput problems; completed is the denominator for close.",
+     "dimensions": [
+      "Bill Status"
+     ],
+     "filters": [],
+     "id": "bills_by_status",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "How many bills, by status?",
+     "workstream_label": "Billing"
+    },
+    {
+     "chart_type": "horizontal",
+     "description": "A cycle whose bills sit open for weeks is where billing close is actually stuck.",
+     "dimensions": [
+      "Bill Cycle"
+     ],
+     "filters": [],
+     "id": "bills_longest_open",
+     "measures": [
+      {
+       "agg": "max",
+       "field": "Days Bill Open"
+      }
+     ],
+     "title": "Which bill cycles have the longest-open bills?",
+     "workstream_label": "Billing"
+    }
+   ],
    "related_snapshot": null,
    "required_date_field": null,
    "required_date_label": null,
@@ -4480,7 +4641,7 @@
      "workstream_label": "Billing"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "The top of the distribution is where billing errors surface first, and where a high-bill complaint is about to come from.",
      "dimensions": [
       "Main Customer Name"
@@ -4497,7 +4658,7 @@
      "workstream_label": "Billing"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "A segment priced far from every other segment on the same rate is either a proration, a rate change mid-period, or a mistake. All three are worth seeing.",
      "dimensions": [
       "Sole Rate Schedule Code"
@@ -4567,7 +4728,7 @@
      "workstream_label": "Billing"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "Billed usage should be derivable from the reads. A gap means a correction, an override or an estimate \u2014 and the customer will notice before the utility does.",
      "dimensions": [
       "Main Customer Name"
@@ -4584,7 +4745,7 @@
      "workstream_label": "Usage"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "A zero bill is usually a missing read; a negative one is a credit the customer will ring about. Neither should appear without a reason attached.",
      "dimensions": [
       "Main Customer Name"
@@ -4601,7 +4762,7 @@
      "workstream_label": "Billing"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "High consumption is a leak, a theft, a faulty meter or a genuinely large customer. Comparing within a rate schedule is what separates the fourth from the first three.",
      "dimensions": [
       "Premise Address"
@@ -5477,7 +5638,42 @@
    ],
    "poc_enabled": true,
    "portal_enabled": true,
-   "premade_reports": [],
+   "premade_reports": [
+    {
+     "chart_type": "horizontal",
+     "description": "Per-UOM totals are the safe way to look at quantity \u2014 never sum across units.",
+     "dimensions": [
+      "Unit of Measure"
+     ],
+     "filters": [],
+     "id": "measured_by_uom",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Measured Quantity"
+      }
+     ],
+     "title": "What was measured on bills, by unit of measure?",
+     "workstream_label": "Usage"
+    },
+    {
+     "chart_type": "pie",
+     "description": "Register reads vs derived rows tells you how much of billing rests on actual measurement.",
+     "dimensions": [
+      "Read Row Kind"
+     ],
+     "filters": [],
+     "id": "reads_by_row_kind",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "Where do billed reads come from?",
+     "workstream_label": "Usage"
+    }
+   ],
    "related_snapshot": null,
    "required_date_field": null,
    "required_date_label": null,
@@ -7462,7 +7658,42 @@
    ],
    "poc_enabled": true,
    "portal_enabled": true,
-   "premade_reports": [],
+   "premade_reports": [
+    {
+     "chart_type": "horizontal",
+     "description": "The charge-line view of billed dollars \u2014 the level rate analysts reconcile at.",
+     "dimensions": [
+      "Customer Class"
+     ],
+     "filters": [],
+     "id": "billed_by_class_calc_lines",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Billed Amount"
+      }
+     ],
+     "title": "What was billed, by customer class (charge lines)?",
+     "workstream_label": "Billing"
+    },
+    {
+     "chart_type": "bar",
+     "description": "Budget billing shifts cash timing; the split shows how much revenue rides on it.",
+     "dimensions": [
+      "Budget Plan"
+     ],
+     "filters": [],
+     "id": "billed_by_budget_plan",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Billed Amount"
+      }
+     ],
+     "title": "How much was billed under each budget plan?",
+     "workstream_label": "Billing"
+    }
+   ],
    "related_snapshot": null,
    "required_date_field": null,
    "required_date_label": null,
@@ -9169,7 +9400,42 @@
    ],
    "poc_enabled": true,
    "portal_enabled": true,
-   "premade_reports": [],
+   "premade_reports": [
+    {
+     "chart_type": "bar",
+     "description": "Characteristics are the free-form extension surface; where they pile up is where configuration lives.",
+     "dimensions": [
+      "Entity Type"
+     ],
+     "filters": [],
+     "id": "characteristics_by_entity",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "Which entities carry characteristics?",
+     "workstream_label": "Operations"
+    },
+    {
+     "chart_type": "horizontal",
+     "description": "The top of this list is this client's real extension model \u2014 worth knowing before any report asks for 'that extra field'.",
+     "dimensions": [
+      "Characteristic"
+     ],
+     "filters": [],
+     "id": "top_characteristic_types",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "Which characteristic types are most used?",
+     "workstream_label": "Operations"
+    }
+   ],
    "related_snapshot": null,
    "required_date_field": null,
    "required_date_label": null,
@@ -10957,7 +11223,7 @@
      "workstream_label": "Customer Contact"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "Collections effort follows the money. The top of this list is worth a phone call before it is worth a process.",
      "dimensions": [
       "Main Customer Name"
@@ -11060,7 +11326,7 @@
      "workstream_label": "Payments"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "Debt nobody is chasing. Every account here is either an oversight or an exclusion somebody applied and never reviewed.",
      "dimensions": [
       "Main Customer Name"
@@ -12116,7 +12382,7 @@
      "workstream_label": "Customer Notification"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "A task pending for weeks is not pending, it is stuck. These are the ones a person has to look at.",
      "dimensions": [
       "Task Type"
@@ -12133,7 +12399,7 @@
      "workstream_label": "Customer Notification"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "An errored notification is a customer who was never told. Ranking by error rate rather than error count stops the highest-volume type hiding a worse one.",
      "dimensions": [
       "Task Type"
@@ -14471,7 +14737,7 @@
      "workstream_label": "Asset Management"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "An installed meter the network has never heard from is an AMI rollout failure. It bills on estimates until someone visits it.",
      "dimensions": [
       "Device Type"
@@ -14488,7 +14754,7 @@
      "workstream_label": "Device Management"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "A meter past its useful life drifts, and a drifting meter under-reads. This is the replacement programme's work queue and its capital case at once.",
      "dimensions": [
       "Device Type"
@@ -15038,7 +15304,7 @@
      "workstream_label": "Device Events"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "Events per device normalises for fleet size, which is what turns a device-event count into a reliability comparison between models.",
      "dimensions": [
       "Device Model"
@@ -15763,7 +16029,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "A VEE or usage exception blocks a read from becoming a bill. Days open is how long that revenue has been stuck.",
      "dimensions": [
       "Exception Type"
@@ -19481,7 +19747,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "Repeated on/off at one point is either a rental property turning over or a disconnection cycle. Both are expensive and both look the same in this list until you open one.",
      "dimensions": [
       "Premise Address"
@@ -20110,7 +20376,7 @@
      "workstream_label": "Pay Plans"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "The variance between what was scheduled and what was paid is the early warning that a plan is about to break, while there is still time to renegotiate it.",
      "dimensions": [
       "Main Customer Name"
@@ -20791,7 +21057,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "A cancelled payment is usually a returned item, and a returned item is money the utility counted and then lost. The reason code is where the pattern is.",
      "dimensions": [
       "Cancel Reason"
@@ -20808,7 +21074,7 @@
      "workstream_label": "Payments"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "The tenders taken and the payments applied should equal each other. Where they do not, cash has been recorded that was never applied to an account.",
      "dimensions": [
       "Main Customer Name"
@@ -22512,7 +22778,7 @@
      "workstream_label": "Service Point"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "Consumption nobody is being billed for. Either service started without an agreement or one was stopped while the meter kept running.",
      "dimensions": [
       "Premise Address"
@@ -23737,7 +24003,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "The calc lines say what the rate produced; the financial transactions say what was posted. They should agree to the cent, and where they do not there is a real variance.",
      "dimensions": [
       "Bill ID"
@@ -25352,7 +25618,42 @@
    ],
    "poc_enabled": true,
    "portal_enabled": true,
-   "premade_reports": [],
+   "premade_reports": [
+    {
+     "chart_type": "horizontal",
+     "description": "The service portfolio at a glance \u2014 and a type with a handful of SAs is usually leftover configuration.",
+     "dimensions": [
+      "SA Type"
+     ],
+     "filters": [],
+     "id": "sas_by_type",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "How many service agreements, by SA type?",
+     "workstream_label": "Customer Information"
+    },
+    {
+     "chart_type": "horizontal",
+     "description": "Receivables concentrated in one service type changes who you call and how.",
+     "dimensions": [
+      "SA Type"
+     ],
+     "filters": [],
+     "id": "sa_balance_by_type",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Current Balance"
+      }
+     ],
+     "title": "Where do balances sit, by SA type?",
+     "workstream_label": "Credit & Collections"
+    }
+   ],
    "related_snapshot": null,
    "required_date_field": null,
    "required_date_label": null,
@@ -25813,7 +26114,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "An unbalanced tender control is cash the utility cannot yet account for. Days unbalanced is the aging on that.",
      "dimensions": [
       "Tender Source"
@@ -26131,7 +26432,7 @@
      "workstream_label": "Work Queues"
     },
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "A to-do is work the system could not finish alone. The oldest ones are the exceptions nobody has been made responsible for.",
      "dimensions": [
       "To Do Type"
@@ -26746,7 +27047,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "Revenue earned and not invoiced. A stopped agreement awaiting a final bill is the expensive kind \u2014 the customer has gone.",
      "dimensions": [
       "SA Type"
@@ -26764,7 +27065,7 @@
     },
     {
      "benchmark": "billing cycle under 30 days",
-     "chart_type": "bar",
+     "chart_type": "horizontal",
      "description": "The benchmark is a billing cycle under 30 days. Every day past that is revenue earned and not invoiced, and the tail is where the real money sits.",
      "dimensions": [
       "SA Type"

@@ -1427,6 +1427,195 @@ export const QUESTIONS = [
           from reporting.rpt_usage_txn
           group by 1, 2 order by 3 desc`,
   }),
+
+  // ------------------------------------------------- coverage: every canvas answers
+  // (2026-08-31: seven canvases had no ready-to-run reports; each now carries at
+  // least two, so the library and the builder's question gallery cover the whole
+  // reporting layer.)
+  q({
+    id: "bills-by-status",
+    process: "usage", workstream: "Billing",
+    kind: "count",
+    title: "How many bills, by status?",
+    why: "Pending bills past their window are billing throughput problems; completed is the denominator for close.",
+    canvas: "rpt_bill",
+    axis: "Bill Status", value: "Bills",
+    sql: `select coalesce("Bill Status", '(unset)') as "Bill Status",
+                 count(*)::bigint as "Bills"
+          from reporting.rpt_bill
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "bills-longest-open",
+    process: "usage", workstream: "Billing",
+    kind: "outlier", chart: "horizontal",
+    title: "Which bill cycles have the longest-open bills?",
+    why: "A cycle whose bills sit open for weeks is where billing close is actually stuck.",
+    canvas: "rpt_bill",
+    axis: "Bill Cycle", value: "Days Bill Open",
+    sql: `select coalesce("Bill Cycle", '(none)') as "Bill Cycle",
+                 max("Days Bill Open")::bigint as "Days Bill Open"
+          from reporting.rpt_bill
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "sas-by-type",
+    process: "customer", workstream: "Customer Information",
+    kind: "ranking", chart: "horizontal",
+    title: "How many service agreements, by SA type?",
+    why: "The service portfolio at a glance — and a type with a handful of SAs is usually leftover configuration.",
+    canvas: "rpt_service_agreement",
+    axis: "SA Type", value: "Service Agreements",
+    sql: `select coalesce("SA Type", "SA Type Code", '(unset)') as "SA Type",
+                 count(*)::bigint as "Service Agreements"
+          from reporting.rpt_service_agreement
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "sa-balance-by-type",
+    process: "credit", workstream: "Credit & Collections",
+    kind: "total", chart: "horizontal",
+    title: "Where do balances sit, by SA type?",
+    why: "Receivables concentrated in one service type changes who you call and how.",
+    canvas: "rpt_service_agreement",
+    axis: "SA Type", value: "Current Balance",
+    sql: `select coalesce("SA Type", "SA Type Code", '(unset)') as "SA Type",
+                 sum("Current Balance")::numeric(18,2) as "Current Balance"
+          from reporting.rpt_service_agreement
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "links-by-relationship",
+    process: "customer", workstream: "Customer Information",
+    kind: "count",
+    title: "How are people linked to accounts, by relationship?",
+    why: "Account-person links drive who gets billed and who gets told; an unexpected relationship mix is a data-entry pattern worth seeing.",
+    canvas: "rpt_account_person",
+    axis: "Account Relationship", value: "Links",
+    sql: `select coalesce("Account Relationship", "Account Relationship Code", '(unset)') as "Account Relationship",
+                 count(*)::bigint as "Links"
+          from reporting.rpt_account_person
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "financially-responsible-split",
+    process: "customer", workstream: "Customer Information",
+    kind: "distribution",
+    title: "Who on the account is financially responsible?",
+    why: "Responsibility drives collections contact; third-party-only accounts behave differently in arrears.",
+    canvas: "rpt_account_person",
+    axis: "Financially Responsible", value: "People",
+    sql: `select "Financially Responsible",
+                 count(*)::bigint as "People"
+          from reporting.rpt_account_person
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "billed-by-class-calc-lines",
+    process: "usage", workstream: "Billing",
+    kind: "total", chart: "horizontal",
+    title: "What was billed, by customer class (charge lines)?",
+    why: "The charge-line view of billed dollars — the level rate analysts reconcile at.",
+    canvas: "rpt_billed_charge",
+    axis: "Customer Class", value: "Billed Amount",
+    sql: `select coalesce("Customer Class", "Customer Class Code", '(unset)') as "Customer Class",
+                 sum("Billed Amount")::numeric(18,2) as "Billed Amount"
+          from reporting.rpt_billed_charge
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "billed-by-budget-plan",
+    process: "usage", workstream: "Billing",
+    kind: "total",
+    title: "How much was billed under each budget plan?",
+    why: "Budget billing shifts cash timing; the split shows how much revenue rides on it.",
+    canvas: "rpt_billed_charge",
+    axis: "Budget Plan", value: "Billed Amount",
+    sql: `select coalesce("Budget Plan", '(none)') as "Budget Plan",
+                 sum("Billed Amount")::numeric(18,2) as "Billed Amount"
+          from reporting.rpt_billed_charge
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "measured-by-uom",
+    process: "usage", workstream: "Usage",
+    kind: "total", chart: "horizontal",
+    title: "What was measured on bills, by unit of measure?",
+    why: "Per-UOM totals are the safe way to look at quantity — never sum across units.",
+    canvas: "rpt_bill_segment_read",
+    axis: "Unit of Measure", value: "Measured Quantity",
+    sql: `select coalesce("Unit of Measure", "Unit of Measure Code", '(unset)') as "Unit of Measure",
+                 sum("Measured Quantity")::numeric(18,2) as "Measured Quantity"
+          from reporting.rpt_bill_segment_read
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "reads-by-row-kind",
+    process: "usage", workstream: "Usage",
+    kind: "distribution",
+    title: "Where do billed reads come from?",
+    why: "Register reads vs derived rows tells you how much of billing rests on actual measurement.",
+    canvas: "rpt_bill_segment_read",
+    axis: "Read Row Kind", value: "Read Rows",
+    sql: `select coalesce("Read Row Kind", '(unset)') as "Read Row Kind",
+                 count(*)::bigint as "Read Rows"
+          from reporting.rpt_bill_segment_read
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "locations-by-type",
+    process: "meter", workstream: "Assets",
+    kind: "ranking", chart: "horizontal",
+    title: "How many asset locations, by type?",
+    why: "The shape of the location estate — and types with one node are usually setup artifacts.",
+    canvas: "rpt_asset_location",
+    axis: "Location Type", value: "Locations",
+    sql: `select coalesce("Location Type", "Location Type Code", '(unset)') as "Location Type",
+                 count(*)::bigint as "Locations"
+          from reporting.rpt_asset_location
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "deepest-location-trees",
+    process: "meter", workstream: "Assets",
+    kind: "outlier", chart: "horizontal",
+    title: "Which location trees run deepest?",
+    why: "Very deep hierarchies slow navigation and usually mean an import created nesting nobody designed.",
+    canvas: "rpt_asset_location",
+    axis: "Location", value: "Hierarchy Depth",
+    sql: `select "Location",
+                 max("Hierarchy Depth")::bigint as "Hierarchy Depth"
+          from reporting.rpt_asset_location
+          group by 1 order by 2 desc
+          limit 25`,
+  }),
+  q({
+    id: "characteristics-by-entity",
+    process: "field", workstream: "Operations",
+    kind: "count",
+    title: "Which entities carry characteristics?",
+    why: "Characteristics are the free-form extension surface; where they pile up is where configuration lives.",
+    canvas: "rpt_characteristics",
+    axis: "Entity Type", value: "Characteristics",
+    sql: `select coalesce("Entity Type", '(unset)') as "Entity Type",
+                 count(*)::bigint as "Characteristics"
+          from reporting.rpt_characteristics
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "top-characteristic-types",
+    process: "field", workstream: "Operations",
+    kind: "ranking", chart: "horizontal",
+    title: "Which characteristic types are most used?",
+    why: "The top of this list is this client's real extension model — worth knowing before any report asks for 'that extra field'.",
+    canvas: "rpt_characteristics",
+    axis: "Characteristic", value: "Rows",
+    sql: `select coalesce("Characteristic", "Characteristic Code", '(unset)') as "Characteristic",
+                 count(*)::bigint as "Rows"
+          from reporting.rpt_characteristics
+          group by 1 order by 2 desc
+          limit 25`,
+  }),
 ];
 
 export function byId(id) {

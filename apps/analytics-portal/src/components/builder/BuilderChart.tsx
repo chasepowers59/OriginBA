@@ -262,7 +262,7 @@ export function BuilderChart({
   const stackId = visual === "stacked-bar" ? "a" : undefined;
   return (
     <ChartContainer config={config} style={{ height }} className="w-full">
-      <BarChart data={data} margin={{ left: 4, right: 8 }}>
+      <BarChart data={data} margin={{ left: 4, right: 8 }} maxBarSize={64}>
         {grid}
         {xAxis}
         <YAxis tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} tickFormatter={fmt} axisLine={false} tickLine={false} width={56} />
