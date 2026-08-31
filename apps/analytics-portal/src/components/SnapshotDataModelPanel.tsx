@@ -5,6 +5,7 @@ import { useBrand } from "@/components/PortalThemeProvider";
 import { printLineagePack } from "@/lib/lineagePack";
 import { fieldRoleLabel } from "@/lib/businessLabels";
 import type { FieldDef, SnapshotDataModel, SnapshotMetadata } from "@/lib/types";
+import { cisadmTableGuide } from "@/lib/cisadmTableGuide";
 
 type ModelTab = "overview" | "tables" | "joins" | "fields";
 
@@ -234,9 +235,15 @@ function OverviewTab({
 
 function TablesTab({ model }: { model: SnapshotDataModel }) {
   const grouped = useMemo(() => {
-    const order = ["driving", "context", "optional_child", "lookup"];
-    const map = new Map<string, typeof model.source_tables>();
-    for (const table of model.source_tables) {
+    // Two catalog shapes: the legacy Oracle build emits {table, role, alias} objects;
+    // the dbt build emits plain CISADM table names (lineage-derived — no per-table role,
+    // so they all group under "source"). Normalise so both render.
+    const normalized = model.source_tables.map((t) =>
+      typeof t === "string" ? { table: t, role: "source", alias: undefined } : t,
+    );
+    const order = ["driving", "context", "optional_child", "lookup", "source"];
+    const map = new Map<string, typeof normalized>();
+    for (const table of normalized) {
       const list = map.get(table.role) ?? [];
       list.push(table);
       map.set(table.role, list);
@@ -259,17 +266,21 @@ function TablesTab({ model }: { model: SnapshotDataModel }) {
             <span className="text-xs text-fg-muted">{tables.length} tables</span>
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
-            {tables.map((table) => (
-              <div
-                key={table.table}
-                className="rounded-xl border border-edge-subtle bg-surface-subtle px-4 py-3"
-              >
-                <p className="font-mono text-sm text-heading">CISADM.{table.table}</p>
-                {table.alias ? (
-                  <p className="mt-1 text-xs text-fg-muted">SQL alias: {table.alias}</p>
-                ) : null}
-              </div>
-            ))}
+            {tables.map((table) => {
+              const guide = cisadmTableGuide(table.table);
+              return (
+                <div
+                  key={table.table}
+                  className="rounded-xl border border-edge-subtle bg-surface-subtle px-4 py-3"
+                >
+                  <p className="font-mono text-sm text-heading">CISADM.{table.table}</p>
+                  {guide ? <p className="mt-1 text-xs text-fg-muted">{guide}</p> : null}
+                  {table.alias ? (
+                    <p className="mt-1 text-xs text-fg-subtle">SQL alias: {table.alias}</p>
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
         </section>
       ))}

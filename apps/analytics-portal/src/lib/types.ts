@@ -117,7 +117,8 @@ export type SnapshotDataModel = {
   grain_preservation: string;
   trusted_measures: string[];
   driving_table: string | null;
-  source_tables: SourceTableDef[];
+  /** Legacy Oracle catalog: objects; dbt catalog: plain CISADM table names. */
+  source_tables: (SourceTableDef | string)[];
   join_paths: JoinPathDef[];
   population_filter: string | null;
   refresh_sql?: string;

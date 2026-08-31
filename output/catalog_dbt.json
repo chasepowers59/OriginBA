@@ -482,7 +482,50 @@
     "grain": "account + person",
     "grain_description": "One row per account + person",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "dp",
+      "join_type": "left join",
+      "on": "dp.per_id = ap.per_id",
+      "role": "model",
+      "table": "dim_person"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = ap.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "art",
+      "join_type": "left join",
+      "on": "art.acct_rel_type_cd = ap.acct_rel_type_cd",
+      "role": "model",
+      "table": "stg_acct_rel_type_label"
+     },
+     {
+      "alias": "brt",
+      "join_type": "left join",
+      "on": "brt.bill_rte_type_cd = ap.bill_route_type_cd",
+      "role": "model",
+      "table": "stg_bill_route_type_label"
+     },
+     {
+      "alias": "pc",
+      "join_type": "left join",
+      "on": "pc.per_id = ap.per_id",
+      "role": "model",
+      "table": "stg_person_contact"
+     },
+     {
+      "alias": "rt",
+      "join_type": "join",
+      "on": "",
+      "role": "model",
+      "table": "stg_comm_route_type"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_account_person.sql",
     "snapshot_table": "reporting.rpt_account_person",
@@ -845,7 +888,22 @@
     "grain": "asset location node",
     "grain_description": "One row per asset location node",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "h",
+      "join_type": "left join",
+      "on": "h.node_id = l.node_id",
+      "role": "model",
+      "table": "int_asset_location_hierarchy"
+     },
+     {
+      "alias": "nt",
+      "join_type": "left join",
+      "on": "nt.node_type_cd = l.node_type_cd",
+      "role": "model",
+      "table": "stg_asset_location_type_label"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_asset_location.sql",
     "snapshot_table": "reporting.rpt_asset_location",
@@ -1306,7 +1364,15 @@
     "grain": "batch run",
     "grain_description": "One row per batch run",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "rs",
+      "join_type": "left join",
+      "on": "rs.field_name='RUN_STATUS' and rs.field_value = f.run_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_batch.sql",
     "snapshot_table": "reporting.rpt_batch",
@@ -1596,7 +1662,36 @@
     "grain": "rpt_bill",
     "grain_description": "",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "s",
+      "join_type": "left join",
+      "on": "s.bill_id = b.bill_id",
+      "role": "step",
+      "table": "segments"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = b.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "bc",
+      "join_type": "left join",
+      "on": "bc.bill_cyc_cd = b.bill_cyc_cd",
+      "role": "model",
+      "table": "stg_bill_cycle_label"
+     },
+     {
+      "alias": "lvbs",
+      "join_type": "left join",
+      "on": "lvbs.field_name = 'BILL_STAT_FLG' and lvbs.field_value = b.bill_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_bill.sql",
     "snapshot_table": "reporting.rpt_bill",
@@ -2110,7 +2205,29 @@
     "grain": "rpt_bill_factor_price",
     "grain_description": "",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "g",
+      "join_type": "join",
+      "on": "g.calc_grp_cd = r.calc_grp_cd",
+      "role": "model",
+      "table": "stg_rate_calc_group"
+     },
+     {
+      "alias": "bf",
+      "join_type": "left join",
+      "on": "bf.bill_factor_cd = v.bill_factor_cd",
+      "role": "model",
+      "table": "stg_bill_factor"
+     },
+     {
+      "alias": "u",
+      "join_type": "left join",
+      "on": "u.bill_factor_cd = v.bill_factor_cd",
+      "role": "step",
+      "table": "usage_of"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_bill_factor_price.sql",
     "snapshot_table": "reporting.rpt_bill_factor_price",
@@ -2519,7 +2636,148 @@
     "grain": "bill segment",
     "grain_description": "One row per bill segment",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "u",
+      "join_type": "left join",
+      "on": "u.uom_cd = c.uom_cd",
+      "role": "model",
+      "table": "uom_class"
+     },
+     {
+      "alias": "du",
+      "join_type": "left join",
+      "on": "du.usg_ext_id = cu.usage_id",
+      "role": "model",
+      "table": "stg_d1_usage"
+     },
+     {
+      "alias": "h",
+      "join_type": "left join",
+      "on": "h.bseg_id = b.bseg_id",
+      "role": "step",
+      "table": "headers"
+     },
+     {
+      "alias": "c",
+      "join_type": "left join",
+      "on": "c.bseg_id = b.bseg_id",
+      "role": "step",
+      "table": "charges"
+     },
+     {
+      "alias": "u",
+      "join_type": "left join",
+      "on": "u.bseg_id = b.bseg_id",
+      "role": "step",
+      "table": "usage"
+     },
+     {
+      "alias": "r",
+      "join_type": "left join",
+      "on": "r.bseg_id = b.bseg_id",
+      "role": "step",
+      "table": "reads"
+     },
+     {
+      "alias": "ub",
+      "join_type": "left join",
+      "on": "ub.bseg_id = b.bseg_id",
+      "role": "step",
+      "table": "usage_bridge"
+     },
+     {
+      "alias": "rs",
+      "join_type": "left join",
+      "on": "rs.rate_schedule_cd = c.sole_rate_schedule_cd",
+      "role": "model",
+      "table": "dim_rate_schedule"
+     },
+     {
+      "alias": "uu",
+      "join_type": "left join",
+      "on": "uu.uom_cd = u.billed_usage_uom_cd",
+      "role": "model",
+      "table": "stg_uom_label"
+     },
+     {
+      "alias": "du",
+      "join_type": "left join",
+      "on": "du.uom_cd = u.billed_demand_uom_cd",
+      "role": "model",
+      "table": "stg_uom_label"
+     },
+     {
+      "alias": "ru",
+      "join_type": "left join",
+      "on": "ru.uom_cd = r.read_quantity_uom_cd",
+      "role": "model",
+      "table": "stg_uom_label"
+     },
+     {
+      "alias": "su",
+      "join_type": "left join",
+      "on": "su.uom_cd = u.sole_uom_cd",
+      "role": "model",
+      "table": "stg_uom_label"
+     },
+     {
+      "alias": "stou",
+      "join_type": "left join",
+      "on": "stou.tou_cd = u.sole_tou_cd",
+      "role": "model",
+      "table": "stg_tou_label"
+     },
+     {
+      "alias": "ssqi",
+      "join_type": "left join",
+      "on": "ssqi.sqi_cd = u.sole_sqi_cd",
+      "role": "model",
+      "table": "stg_sqi_label"
+     },
+     {
+      "alias": "bl",
+      "join_type": "left join",
+      "on": "bl.bill_id = b.bill_id",
+      "role": "model",
+      "table": "dim_bill"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = bl.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = b.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "dp",
+      "join_type": "left join",
+      "on": "dp.prem_id = b.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     },
+     {
+      "alias": "bs",
+      "join_type": "left join",
+      "on": "bs.field_name='BILL_STAT_FLG' and bs.field_value = bl.bill_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "sg",
+      "join_type": "left join",
+      "on": "sg.field_name='BSEG_STAT_FLG' and sg.field_value = b.bseg_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_bill_segment.sql",
     "snapshot_table": "reporting.rpt_bill_segment",
@@ -4467,7 +4725,78 @@
     "grain": "bill segment + service point + read sequence",
     "grain_description": "One row per bill segment + service point + read sequence",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "b",
+      "join_type": "left join",
+      "on": "b.bseg_id = r.bseg_id",
+      "role": "model",
+      "table": "dim_bill_segment"
+     },
+     {
+      "alias": "bl",
+      "join_type": "left join",
+      "on": "bl.bill_id = b.bill_id",
+      "role": "model",
+      "table": "dim_bill"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = r.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = sa.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "sp",
+      "join_type": "left join",
+      "on": "sp.sp_id = r.sp_id",
+      "role": "model",
+      "table": "stg_service_point"
+     },
+     {
+      "alias": "pr",
+      "join_type": "left join",
+      "on": "pr.prem_id = sp.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     },
+     {
+      "alias": "dev",
+      "join_type": "left join",
+      "on": "dev.sp_id = r.sp_id",
+      "role": "model",
+      "table": "int_sp_device"
+     },
+     {
+      "alias": "uom",
+      "join_type": "left join",
+      "on": "uom.uom_cd = r.uom_cd",
+      "role": "model",
+      "table": "stg_uom_label"
+     },
+     {
+      "alias": "sqi",
+      "join_type": "left join",
+      "on": "sqi.sqi_cd = r.sqi_cd",
+      "role": "model",
+      "table": "stg_sqi_label"
+     },
+     {
+      "alias": "tou",
+      "join_type": "left join",
+      "on": "tou.tou_cd = r.tou_cd",
+      "role": "model",
+      "table": "stg_tou_label"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_bill_segment_read.sql",
     "snapshot_table": "reporting.rpt_bill_segment_read",
@@ -5237,7 +5566,57 @@
     "grain": "rpt_billable_charge",
     "grain_description": "",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = f.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = sa.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "b",
+      "join_type": "left join",
+      "on": "b.bseg_id = f.bseg_id",
+      "role": "model",
+      "table": "dim_bill_segment"
+     },
+     {
+      "alias": "bl",
+      "join_type": "left join",
+      "on": "bl.bill_id = b.bill_id",
+      "role": "model",
+      "table": "dim_bill"
+     },
+     {
+      "alias": "dp",
+      "join_type": "left join",
+      "on": "dp.prem_id = b.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     },
+     {
+      "alias": "bcs",
+      "join_type": "left join",
+      "on": "bcs.field_name='BILLABLE_CHG_STAT' and bcs.field_value = f.billable_chg_stat",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "bst",
+      "join_type": "left join",
+      "on": "bst.field_name='BILL_STAT_FLG' and bst.field_value = bl.bill_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_billable_charge.sql",
     "snapshot_table": "reporting.rpt_billable_charge",
@@ -6015,7 +6394,99 @@
     "grain": "bill segment + calculation header sequence + calculation line sequence",
     "grain_description": "One row per bill segment + calculation header sequence + calculation line sequence",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "bl",
+      "join_type": "left join",
+      "on": "bl.bill_id = f.bill_id",
+      "role": "model",
+      "table": "dim_bill"
+     },
+     {
+      "alias": "bseg",
+      "join_type": "left join",
+      "on": "bseg.bseg_id = f.bseg_id",
+      "role": "model",
+      "table": "dim_bill_segment"
+     },
+     {
+      "alias": "dsp",
+      "join_type": "left join",
+      "on": "dsp.sp_id = f.sp_id",
+      "role": "model",
+      "table": "dim_service_point"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = f.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = f.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "dp",
+      "join_type": "left join",
+      "on": "dp.prem_id = f.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     },
+     {
+      "alias": "rs",
+      "join_type": "left join",
+      "on": "rs.rate_schedule_cd = f.rate_schedule_cd",
+      "role": "model",
+      "table": "dim_rate_schedule"
+     },
+     {
+      "alias": "uom",
+      "join_type": "left join",
+      "on": "uom.uom_cd = f.uom_cd",
+      "role": "model",
+      "table": "stg_uom_label"
+     },
+     {
+      "alias": "ucl",
+      "join_type": "left join",
+      "on": "ucl.uom_cd = f.uom_cd",
+      "role": "model",
+      "table": "uom_class"
+     },
+     {
+      "alias": "sqi",
+      "join_type": "left join",
+      "on": "sqi.sqi_cd = f.sqi_cd",
+      "role": "model",
+      "table": "stg_sqi_label"
+     },
+     {
+      "alias": "tou",
+      "join_type": "left join",
+      "on": "tou.tou_cd = f.tou_cd",
+      "role": "model",
+      "table": "stg_tou_label"
+     },
+     {
+      "alias": "bs",
+      "join_type": "left join",
+      "on": "bs.field_name='BILL_STAT_FLG' and bs.field_value = f.bill_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "sg",
+      "join_type": "left join",
+      "on": "sg.field_name='BSEG_STAT_FLG' and sg.field_value = f.bseg_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_billed_charge.sql",
     "snapshot_table": "reporting.rpt_billed_charge",
@@ -7086,7 +7557,78 @@
     "grain": "bill segment + unit of measure + time of use + service quantity identifier",
     "grain_description": "One row per bill segment + unit of measure + time of use + service quantity identifier",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "b",
+      "join_type": "left join",
+      "on": "b.bseg_id = f.bseg_id",
+      "role": "model",
+      "table": "dim_bill_segment"
+     },
+     {
+      "alias": "bl",
+      "join_type": "left join",
+      "on": "bl.bill_id = b.bill_id",
+      "role": "model",
+      "table": "dim_bill"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = bl.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = b.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "dp",
+      "join_type": "left join",
+      "on": "dp.prem_id = b.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     },
+     {
+      "alias": "uom",
+      "join_type": "left join",
+      "on": "uom.uom_cd = f.uom_cd",
+      "role": "model",
+      "table": "stg_uom_label"
+     },
+     {
+      "alias": "tou",
+      "join_type": "left join",
+      "on": "tou.tou_cd = f.tou_cd",
+      "role": "model",
+      "table": "stg_tou_label"
+     },
+     {
+      "alias": "sqi",
+      "join_type": "left join",
+      "on": "sqi.sqi_cd = f.sqi_cd",
+      "role": "model",
+      "table": "stg_sqi_label"
+     },
+     {
+      "alias": "bs",
+      "join_type": "left join",
+      "on": "bs.field_name='BILL_STAT_FLG' and bs.field_value = bl.bill_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "sg",
+      "join_type": "left join",
+      "on": "sg.field_name='BSEG_STAT_FLG' and sg.field_value = b.bseg_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_billed_usage.sql",
     "snapshot_table": "reporting.rpt_billed_usage",
@@ -7933,7 +8475,64 @@
     "grain": "case",
     "grain_description": "One row per case",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "t",
+      "join_type": "left join",
+      "on": "t.case_id = c.case_id",
+      "role": "model",
+      "table": "int_case_timeline"
+     },
+     {
+      "alias": "st",
+      "join_type": "left join",
+      "on": "st.case_type_cd = c.case_type_cd and st.case_status_cd = c.case_status_cd",
+      "role": "model",
+      "table": "stg_case_status"
+     },
+     {
+      "alias": "ct",
+      "join_type": "left join",
+      "on": "ct.case_type_cd = c.case_type_cd",
+      "role": "model",
+      "table": "stg_case_type_label"
+     },
+     {
+      "alias": "cs",
+      "join_type": "left join",
+      "on": "cs.case_type_cd = c.case_type_cd and cs.case_status_cd = c.case_status_cd",
+      "role": "model",
+      "table": "stg_case_status_label"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = c.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "pr",
+      "join_type": "left join",
+      "on": "pr.prem_id = c.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     },
+     {
+      "alias": "lvcc",
+      "join_type": "left join",
+      "on": "lvcc.field_name='CASE_COND_FLG' and lvcc.field_value = c.case_cond_flg",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "lvsc",
+      "join_type": "left join",
+      "on": "lvsc.field_name='STATUS_COND_FLG' and lvsc.field_value = st.status_condition_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_case.sql",
     "snapshot_table": "reporting.rpt_case",
@@ -8384,7 +8983,15 @@
     "grain": "entity + characteristic type + effective date + sequence",
     "grain_description": "One row per entity + characteristic type + effective date + sequence",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "lvvs",
+      "join_type": "left join",
+      "on": "lvvs.field_name='CHAR_TYPE_FLG' and lvvs.field_value = c.char_type_flg",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_characteristics.sql",
     "snapshot_table": "reporting.rpt_characteristics",
@@ -8612,7 +9219,22 @@
     "grain": "rpt_credit_rating_history",
     "grain_description": "",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = c.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "cb",
+      "join_type": "left join",
+      "on": "cb.field_name = 'CR_RAT_CRE_BY_FLG' and cb.field_value = c.created_by_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_credit_rating_history.sql",
     "snapshot_table": "reporting.rpt_credit_rating_history",
@@ -9021,7 +9643,113 @@
     "grain": "account",
     "grain_description": "One row per account",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "sa",
+      "join_type": "join",
+      "on": "sa.sa_id = a.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "atl",
+      "join_type": "left join",
+      "on": "atl.alert_type_cd = a.alert_type_cd",
+      "role": "model",
+      "table": "stg_alert_type_label"
+     },
+     {
+      "alias": "ag",
+      "join_type": "left join",
+      "on": "ag.acct_id  = da.acct_id",
+      "role": "step",
+      "table": "agreements"
+     },
+     {
+      "alias": "f",
+      "join_type": "left join",
+      "on": "f.acct_id   = da.acct_id",
+      "role": "step",
+      "table": "financials"
+     },
+     {
+      "alias": "p",
+      "join_type": "left join",
+      "on": "p.acct_id   = da.acct_id",
+      "role": "step",
+      "table": "persons"
+     },
+     {
+      "alias": "ct",
+      "join_type": "left join",
+      "on": "ct.acct_id  = da.acct_id",
+      "role": "step",
+      "table": "contacts"
+     },
+     {
+      "alias": "cs",
+      "join_type": "left join",
+      "on": "cs.acct_id  = da.acct_id",
+      "role": "step",
+      "table": "cases"
+     },
+     {
+      "alias": "b",
+      "join_type": "left join",
+      "on": "b.acct_id   = da.acct_id",
+      "role": "step",
+      "table": "billing"
+     },
+     {
+      "alias": "pay",
+      "join_type": "left join",
+      "on": "pay.acct_id = da.acct_id",
+      "role": "step",
+      "table": "payments"
+     },
+     {
+      "alias": "dbt",
+      "join_type": "left join",
+      "on": "dbt.acct_id = da.acct_id",
+      "role": "step",
+      "table": "debt"
+     },
+     {
+      "alias": "pl",
+      "join_type": "left join",
+      "on": "pl.acct_id  = da.acct_id",
+      "role": "step",
+      "table": "plans"
+     },
+     {
+      "alias": "al",
+      "join_type": "left join",
+      "on": "al.acct_id  = da.acct_id",
+      "role": "step",
+      "table": "alerts"
+     },
+     {
+      "alias": "ch",
+      "join_type": "left join",
+      "on": "ch.acct_id = da.acct_id",
+      "role": "step",
+      "table": "characteristics"
+     },
+     {
+      "alias": "ap",
+      "join_type": "left join",
+      "on": "ap.acct_id = da.acct_id",
+      "role": "model",
+      "table": "int_account_autopay"
+     },
+     {
+      "alias": "pc",
+      "join_type": "left join",
+      "on": "pc.per_id = da.main_customer_per_id",
+      "role": "model",
+      "table": "stg_person_contact"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_customer_account.sql",
     "snapshot_table": "reporting.rpt_customer_account",
@@ -9550,7 +10278,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt 0-30 DAYS PAST DUE as of the run date (bill due date for billed debt; billed-not-yet-due sits here too). Can be negative: excess credit nets against the newest band. The five bands sum exactly to \"Current Balance\".",
      "group": "customer_ops",
      "id": "Arrears 0-30 Days",
      "label": "Arrears 0-30 Days",
@@ -9558,7 +10286,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt 31-60 days past due as of the run date.",
      "group": "customer_ops",
      "id": "Arrears 31-60 Days",
      "label": "Arrears 31-60 Days",
@@ -9566,7 +10294,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt 61-90 days past due as of the run date.",
      "group": "customer_ops",
      "id": "Arrears 61-90 Days",
      "label": "Arrears 61-90 Days",
@@ -9574,7 +10302,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt 91-120 days past due as of the run date.",
      "group": "customer_ops",
      "id": "Arrears 91-120 Days",
      "label": "Arrears 91-120 Days",
@@ -10439,7 +11167,57 @@
     "grain": "customer contact",
     "grain_description": "One row per customer contact",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = c.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "dp",
+      "join_type": "left join",
+      "on": "dp.per_id = c.per_id",
+      "role": "model",
+      "table": "dim_person"
+     },
+     {
+      "alias": "cct",
+      "join_type": "left join",
+      "on": "cct.cc_class_cd = c.cc_class_cd and cct.cc_type_cd  = c.cc_type_cd",
+      "role": "model",
+      "table": "stg_cc_type_label"
+     },
+     {
+      "alias": "ccc",
+      "join_type": "left join",
+      "on": "ccc.cc_class_cd = c.cc_class_cd",
+      "role": "model",
+      "table": "stg_cc_class_label"
+     },
+     {
+      "alias": "cst",
+      "join_type": "left join",
+      "on": "cst.field_name='CC_STATUS_FLG' and cst.field_value = c.cc_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "src",
+      "join_type": "left join",
+      "on": "src.field_name='CC_SRC_FLG' and src.field_value = c.cc_src_flg",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "mth",
+      "join_type": "left join",
+      "on": "mth.field_name='CONTACT_METH_FLG' and mth.field_value = c.contact_meth_flg",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_customer_contact.sql",
     "snapshot_table": "reporting.rpt_customer_contact",
@@ -10931,7 +11709,36 @@
     "grain": "service task",
     "grain_description": "One row per service task",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "r",
+      "join_type": "left join",
+      "on": "r.service_task_id = t.service_task_id",
+      "role": "step",
+      "table": "rel"
+     },
+     {
+      "alias": "tt",
+      "join_type": "left join",
+      "on": "tt.task_type_cd = t.task_type_cd",
+      "role": "model",
+      "table": "stg_service_task_type_label"
+     },
+     {
+      "alias": "ty",
+      "join_type": "left join",
+      "on": "ty.task_type_cd = t.task_type_cd",
+      "role": "model",
+      "table": "stg_service_task_type"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = r.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_customer_notification.sql",
     "snapshot_table": "reporting.rpt_customer_notification",
@@ -11426,7 +12233,99 @@
     "grain": "process type + process + service agreement + event sequence",
     "grain_description": "One row per process type + process + service agreement + event sequence",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "e",
+      "join_type": "left join",
+      "on": "e.coll_proc_id = s.coll_proc_id",
+      "role": "model",
+      "table": "fct_collection_event"
+     },
+     {
+      "alias": "cet",
+      "join_type": "left join",
+      "on": "cet.coll_evt_type_cd = e.coll_evt_type_cd",
+      "role": "model",
+      "table": "stg_collection_event_type_label"
+     },
+     {
+      "alias": "e",
+      "join_type": "left join",
+      "on": "e.sev_proc_id = p.sev_proc_id",
+      "role": "model",
+      "table": "fct_severance_event"
+     },
+     {
+      "alias": "set_",
+      "join_type": "left join",
+      "on": "set_.sev_evt_type_cd = e.sev_evt_type_cd",
+      "role": "model",
+      "table": "stg_severance_event_type_label"
+     },
+     {
+      "alias": "e",
+      "join_type": "left join",
+      "on": "e.wo_proc_id = s.wo_proc_id",
+      "role": "model",
+      "table": "fct_writeoff_event"
+     },
+     {
+      "alias": "wet",
+      "join_type": "left join",
+      "on": "wet.wo_evt_type_cd = e.wo_evt_type_cd",
+      "role": "model",
+      "table": "stg_writeoff_event_type_label"
+     },
+     {
+      "alias": "pa",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "int_debt_process_arrears"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = c.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = coalesce(c.acct_id, sa.acct_id)",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "pst",
+      "join_type": "left join",
+      "on": "pst.field_name='COLL_STATUS_FLG' and pst.field_value = c.process_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "sds",
+      "join_type": "left join",
+      "on": "sds.field_name='COLL_SA_STATUS_FLG' and sds.field_value = c.sa_debt_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "est",
+      "join_type": "left join",
+      "on": "est.field_name='COLL_EVT_STATUS_FLG' and est.field_value = c.event_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "srn",
+      "join_type": "left join",
+      "on": "srn.field_name = c.reason_family and srn.field_value = c.status_reason_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_debt_process.sql",
     "snapshot_table": "reporting.rpt_debt_process",
@@ -12302,7 +13201,148 @@
     "grain": "device",
     "grain_description": "One row per device",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "di",
+      "join_type": "left join",
+      "on": "di.d1_device_id = d.d1_device_id",
+      "role": "model",
+      "table": "stg_d1_device_identifier"
+     },
+     {
+      "alias": "dt",
+      "join_type": "left join",
+      "on": "dt.device_type_cd = d.device_type_cd",
+      "role": "model",
+      "table": "stg_d1_device_type_label"
+     },
+     {
+      "alias": "mfr",
+      "join_type": "left join",
+      "on": "mfr.manufacturer_cd = d.manufacturer_cd",
+      "role": "model",
+      "table": "stg_d1_manufacturer_label"
+     },
+     {
+      "alias": "mdl",
+      "join_type": "left join",
+      "on": "mdl.manufacturer_cd = d.manufacturer_cd and mdl.model_cd = d.model_cd",
+      "role": "model",
+      "table": "stg_d1_model_label"
+     },
+     {
+      "alias": "boda",
+      "join_type": "left join",
+      "on": "boda.d1_device_id = d.d1_device_id",
+      "role": "model",
+      "table": "stg_d1_device_boda"
+     },
+     {
+      "alias": "dd",
+      "join_type": "left join",
+      "on": "dd.d1_device_id = d.d1_device_id",
+      "role": "model",
+      "table": "dim_device"
+     },
+     {
+      "alias": "inst",
+      "join_type": "left join",
+      "on": "inst.device_id = d.d1_device_id",
+      "role": "model",
+      "table": "int_sp_device"
+     },
+     {
+      "alias": "ie",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "int_latest_install_event"
+     },
+     {
+      "alias": "lo",
+      "join_type": "left join",
+      "on": "lo.install_evt_id = ie.install_evt_id",
+      "role": "model",
+      "table": "int_install_event_last_onoff"
+     },
+     {
+      "alias": "eq",
+      "join_type": "left join",
+      "on": "eq.d1_device_id = d.d1_device_id",
+      "role": "model",
+      "table": "int_device_equipment"
+     },
+     {
+      "alias": "sp",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_service_point"
+     },
+     {
+      "alias": "pr",
+      "join_type": "left join",
+      "on": "pr.prem_id = sp.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     },
+     {
+      "alias": "a",
+      "join_type": "left join",
+      "on": "a.asset_id = di.asset_id",
+      "role": "model",
+      "table": "stg_asset"
+     },
+     {
+      "alias": "ai",
+      "join_type": "left join",
+      "on": "ai.asset_id = a.asset_id",
+      "role": "model",
+      "table": "stg_asset_identifier"
+     },
+     {
+      "alias": "at_",
+      "join_type": "left join",
+      "on": "at_.asset_type_cd = a.asset_type_cd",
+      "role": "model",
+      "table": "stg_asset_type_label"
+     },
+     {
+      "alias": "aty",
+      "join_type": "left join",
+      "on": "aty.asset_type_cd = a.asset_type_cd",
+      "role": "model",
+      "table": "stg_asset_type"
+     },
+     {
+      "alias": "pl",
+      "join_type": "left join",
+      "on": "pl.asset_id = a.asset_id",
+      "role": "model",
+      "table": "int_asset_placement"
+     },
+     {
+      "alias": "nd",
+      "join_type": "left join",
+      "on": "nd.node_id = pl.node_id",
+      "role": "model",
+      "table": "stg_asset_location"
+     },
+     {
+      "alias": "lvsps",
+      "join_type": "left join",
+      "on": "lvsps.field_name='SP_STATUS_FLG' and lvsps.field_value = sp.sp_status_flg",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "lvhe",
+      "join_type": "left join",
+      "on": "lvhe.field_name='HEAD_END_REGISTR_STATUS_FLG' and lvhe.field_value = d.head_end_registr_status_flg",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_device_asset.sql",
     "snapshot_table": "reporting.rpt_device_asset",
@@ -13544,7 +14584,71 @@
     "grain": "device event",
     "grain_description": "One row per device event",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "d",
+      "join_type": "left join",
+      "on": "d.d1_device_id = e.d1_device_id",
+      "role": "model",
+      "table": "stg_d1_device"
+     },
+     {
+      "alias": "di",
+      "join_type": "left join",
+      "on": "di.d1_device_id = e.d1_device_id",
+      "role": "model",
+      "table": "stg_d1_device_identifier"
+     },
+     {
+      "alias": "dt",
+      "join_type": "left join",
+      "on": "dt.device_type_cd = d.device_type_cd",
+      "role": "model",
+      "table": "stg_d1_device_type_label"
+     },
+     {
+      "alias": "mfr",
+      "join_type": "left join",
+      "on": "mfr.manufacturer_cd = d.manufacturer_cd",
+      "role": "model",
+      "table": "stg_d1_manufacturer_label"
+     },
+     {
+      "alias": "mdl",
+      "join_type": "left join",
+      "on": "mdl.manufacturer_cd = d.manufacturer_cd and mdl.model_cd = d.model_cd",
+      "role": "model",
+      "table": "stg_d1_model_label"
+     },
+     {
+      "alias": "et",
+      "join_type": "left join",
+      "on": "et.dvc_evt_type_cd = e.dvc_evt_type_cd",
+      "role": "model",
+      "table": "stg_d1_device_event_type_label"
+     },
+     {
+      "alias": "inst",
+      "join_type": "left join",
+      "on": "inst.device_id = e.d1_device_id",
+      "role": "model",
+      "table": "int_sp_device"
+     },
+     {
+      "alias": "sp",
+      "join_type": "left join",
+      "on": "sp.sp_id = inst.sp_id",
+      "role": "model",
+      "table": "stg_service_point"
+     },
+     {
+      "alias": "pr",
+      "join_type": "left join",
+      "on": "pr.prem_id = sp.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_device_event.sql",
     "snapshot_table": "reporting.rpt_device_event",
@@ -14023,7 +15127,106 @@
     "grain": "exception domain + exception id",
     "grain_description": "One row per exception domain + exception id",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "b",
+      "join_type": "left join",
+      "on": "b.bseg_id = c.related_id and c.exception_domain = 'Billing'",
+      "role": "model",
+      "table": "dim_bill_segment"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = b.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = sa.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "u",
+      "join_type": "left join",
+      "on": "u.d1_usage_id = c.usage_id",
+      "role": "model",
+      "table": "stg_d1_usage"
+     },
+     {
+      "alias": "uet",
+      "join_type": "left join",
+      "on": "uet.excp_type_cd = c.exception_type_cd",
+      "role": "model",
+      "table": "stg_usage_excp_type_label"
+     },
+     {
+      "alias": "det",
+      "join_type": "left join",
+      "on": "det.excp_type_cd = c.exception_type_cd",
+      "role": "model",
+      "table": "stg_excp_type_label"
+     },
+     {
+      "alias": "sev",
+      "join_type": "left join",
+      "on": "sev.field_name='EXCP_SEVERITY_FLG' and sev.field_value = c.severity_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "vr",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_vee_rule_label"
+     },
+     {
+      "alias": "lvoc",
+      "join_type": "left join",
+      "on": "lvoc.field_name='OPEN_CLOSE_FLG' and lvoc.field_value = c.open_close_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "mc",
+      "join_type": "left join",
+      "on": "mc.measr_comp_id = c.measr_comp_id",
+      "role": "model",
+      "table": "stg_d1_measuring_component"
+     },
+     {
+      "alias": "cfg",
+      "join_type": "left join",
+      "on": "cfg.device_config_id = mc.device_config_id",
+      "role": "model",
+      "table": "stg_d1_device_config"
+     },
+     {
+      "alias": "di",
+      "join_type": "left join",
+      "on": "di.d1_device_id = cfg.d1_device_id",
+      "role": "model",
+      "table": "stg_d1_device_identifier"
+     },
+     {
+      "alias": "inst",
+      "join_type": "left join",
+      "on": "inst.device_config_id = mc.device_config_id",
+      "role": "model",
+      "table": "int_sp_device"
+     },
+     {
+      "alias": "spdev",
+      "join_type": "left join",
+      "on": "spdev.d1_sp_id = c.d1_sp_id",
+      "role": "model",
+      "table": "int_sp_device"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_exception.sql",
     "snapshot_table": "reporting.rpt_exception",
@@ -14694,7 +15897,29 @@
     "grain": "field activity",
     "grain_description": "One row per field activity",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "fadev",
+      "join_type": "left join",
+      "on": "fadev.sp_id = f.sp_id",
+      "role": "model",
+      "table": "int_sp_device"
+     },
+     {
+      "alias": "at_",
+      "join_type": "left join",
+      "on": "at_.activity_type_cd = f.activity_type_cd",
+      "role": "model",
+      "table": "stg_d1_activity_type_label"
+     },
+     {
+      "alias": "lvpr",
+      "join_type": "left join",
+      "on": "lvpr.field_name='FA_PRIORITY_FLG' and lvpr.field_value = f.fa_priority_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_field_activity.sql",
     "snapshot_table": "reporting.rpt_field_activity",
@@ -15480,7 +16705,85 @@
     "grain": "financial transaction",
     "grain_description": "One row per financial transaction",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "bseg",
+      "join_type": "left join",
+      "on": "bseg.bseg_id = f.sibling_id and f.ft_type_cd in ('BS','BX')",
+      "role": "model",
+      "table": "dim_bill_segment"
+     },
+     {
+      "alias": "adj",
+      "join_type": "left join",
+      "on": "adj.adj_id = f.sibling_id and f.ft_type_cd in ('AD','AX')",
+      "role": "model",
+      "table": "fct_adjustment"
+     },
+     {
+      "alias": "pay",
+      "join_type": "left join",
+      "on": "pay.pay_seg_id = f.sibling_id and f.ft_type_cd in ('PS','PX')",
+      "role": "model",
+      "table": "fct_payment"
+     },
+     {
+      "alias": "adjt",
+      "join_type": "left join",
+      "on": "adjt.adj_type_cd = adj.adj_type_cd",
+      "role": "model",
+      "table": "stg_adjustment_type_label"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = f.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = sa.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "ftt",
+      "join_type": "left join",
+      "on": "ftt.field_name='FT_TYPE_FLG' and ftt.field_value = f.ft_type_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "gd",
+      "join_type": "left join",
+      "on": "gd.field_name='GL_DISTRIB_STATUS' and gd.field_value = f.gl_distrib_status",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "lvads",
+      "join_type": "left join",
+      "on": "lvads.field_name='ADJ_STATUS_FLG' and lvads.field_value = adj.adj_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "lvpys",
+      "join_type": "left join",
+      "on": "lvpys.field_name='PAY_STATUS_FLG' and lvpys.field_value = pay.pay_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "lvbss",
+      "join_type": "left join",
+      "on": "lvbss.field_name='BSEG_STAT_FLG' and lvbss.field_value = bseg.bseg_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_financial_txn.sql",
     "snapshot_table": "reporting.rpt_financial_txn",
@@ -16624,7 +17927,43 @@
     "grain": "financial transaction + GL sequence number",
     "grain_description": "One row per financial transaction + GL sequence number",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "f",
+      "join_type": "left join",
+      "on": "f.ft_id = g.ft_id",
+      "role": "model",
+      "table": "fct_financial_txn"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = f.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = sa.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "ftt",
+      "join_type": "left join",
+      "on": "ftt.field_name='FT_TYPE_FLG' and ftt.field_value = f.ft_type_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "gd",
+      "join_type": "left join",
+      "on": "gd.field_name='GL_DISTRIB_STATUS' and gd.field_value = f.gl_distrib_status",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_gl.sql",
     "snapshot_table": "reporting.rpt_gl",
@@ -17325,7 +18664,64 @@
     "grain": "measuring component + measurement date/time",
     "grain_description": "One row per measuring component + measurement date/time",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "mc",
+      "join_type": "left join",
+      "on": "mc.measr_comp_id = m.measr_comp_id",
+      "role": "model",
+      "table": "stg_d1_measuring_component"
+     },
+     {
+      "alias": "cfg",
+      "join_type": "left join",
+      "on": "cfg.device_config_id = mc.device_config_id",
+      "role": "model",
+      "table": "stg_d1_device_config"
+     },
+     {
+      "alias": "d",
+      "join_type": "left join",
+      "on": "d.d1_device_id = cfg.d1_device_id",
+      "role": "model",
+      "table": "stg_d1_device"
+     },
+     {
+      "alias": "di",
+      "join_type": "left join",
+      "on": "di.d1_device_id = cfg.d1_device_id",
+      "role": "model",
+      "table": "stg_d1_device_identifier"
+     },
+     {
+      "alias": "dt",
+      "join_type": "left join",
+      "on": "dt.device_type_cd = d.device_type_cd",
+      "role": "model",
+      "table": "stg_d1_device_type_label"
+     },
+     {
+      "alias": "inst",
+      "join_type": "left join",
+      "on": "inst.device_id = cfg.d1_device_id",
+      "role": "model",
+      "table": "int_sp_device"
+     },
+     {
+      "alias": "sp",
+      "join_type": "left join",
+      "on": "sp.sp_id = inst.sp_id",
+      "role": "model",
+      "table": "stg_service_point"
+     },
+     {
+      "alias": "pr",
+      "join_type": "left join",
+      "on": "pr.prem_id = sp.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_measurement.sql",
     "snapshot_table": "reporting.rpt_measurement",
@@ -17763,7 +19159,57 @@
     "grain": "rpt_on_off_history",
     "grain_description": "",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "act",
+      "join_type": "left join",
+      "on": "act.d1_activity_id = h.d1_activity_id",
+      "role": "model",
+      "table": "stg_d1_activity"
+     },
+     {
+      "alias": "ie",
+      "join_type": "left join",
+      "on": "ie.install_evt_id = h.install_evt_id",
+      "role": "model",
+      "table": "stg_d1_install_event"
+     },
+     {
+      "alias": "dev",
+      "join_type": "left join",
+      "on": "dev.d1_sp_id = ie.d1_sp_id",
+      "role": "model",
+      "table": "int_sp_device"
+     },
+     {
+      "alias": "sp",
+      "join_type": "left join",
+      "on": "sp.sp_id = dev.sp_id",
+      "role": "model",
+      "table": "stg_service_point"
+     },
+     {
+      "alias": "pr",
+      "join_type": "left join",
+      "on": "pr.prem_id = sp.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     },
+     {
+      "alias": "bod",
+      "join_type": "left join",
+      "on": "bod.d1_device_id = dev.device_id",
+      "role": "model",
+      "table": "stg_d1_device_boda"
+     },
+     {
+      "alias": "oo",
+      "join_type": "left join",
+      "on": "oo.field_name = 'ONOFF_HIST_FLG' and oo.field_value = h.on_off_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_on_off_history.sql",
     "snapshot_table": "reporting.rpt_on_off_history",
@@ -18119,7 +19565,43 @@
     "grain": "pay plan",
     "grain_description": "One row per pay plan",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "s",
+      "join_type": "left join",
+      "on": "s.pp_id = f.pp_id",
+      "role": "step",
+      "table": "schedule"
+     },
+     {
+      "alias": "a",
+      "join_type": "join",
+      "on": "a.acct_id = pp.acct_id and a.pay_dt >= pp.start_dt",
+      "role": "step",
+      "table": "actual_payments"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = f.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "ppt",
+      "join_type": "left join",
+      "on": "ppt.pp_type_cd = f.pp_type_cd",
+      "role": "model",
+      "table": "stg_pp_type_label"
+     },
+     {
+      "alias": "pps",
+      "join_type": "left join",
+      "on": "pps.field_name='PP_STAT_FLG' and pps.field_value = f.pp_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_pay_plan.sql",
     "snapshot_table": "reporting.rpt_pay_plan",
@@ -18722,7 +20204,36 @@
     "grain": "pay segment",
     "grain_description": "One row per pay segment",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = f.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = f.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "ps",
+      "join_type": "left join",
+      "on": "ps.field_name='PAY_STATUS_FLG' and ps.field_value = f.pay_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "pcr",
+      "join_type": "left join",
+      "on": "pcr.cancel_reason_cd = f.cancel_reason_cd",
+      "role": "model",
+      "table": "stg_pay_cancel_reason_label"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_payment.sql",
     "snapshot_table": "reporting.rpt_payment",
@@ -19386,7 +20897,71 @@
     "grain": "tender",
     "grain_description": "One row per tender",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = f.payor_acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "tt",
+      "join_type": "left join",
+      "on": "tt.tender_type_cd = f.tender_type_cd",
+      "role": "model",
+      "table": "stg_tender_type_label"
+     },
+     {
+      "alias": "tc",
+      "join_type": "left join",
+      "on": "tc.tndr_ctl_id = f.tndr_ctl_id",
+      "role": "model",
+      "table": "stg_tender_control"
+     },
+     {
+      "alias": "tsl",
+      "join_type": "left join",
+      "on": "tsl.tndr_source_cd = tc.tndr_source_cd",
+      "role": "model",
+      "table": "stg_tender_source_label"
+     },
+     {
+      "alias": "dc",
+      "join_type": "left join",
+      "on": "dc.dep_ctl_id = tc.dep_ctl_id",
+      "role": "model",
+      "table": "stg_deposit_control"
+     },
+     {
+      "alias": "ts",
+      "join_type": "left join",
+      "on": "ts.field_name='TNDR_STATUS_FLG'  and ts.field_value = f.tndr_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "tcs",
+      "join_type": "left join",
+      "on": "tcs.field_name='TNDR_CTL_ST_FLG' and tcs.field_value = tc.tndr_ctl_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "dcs",
+      "join_type": "left join",
+      "on": "dcs.field_name='DEP_CTL_STATUS_FLG' and dcs.field_value = dc.dep_ctl_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "pcr",
+      "join_type": "left join",
+      "on": "pcr.cancel_reason_cd = f.cancel_reason_cd",
+      "role": "model",
+      "table": "stg_pay_cancel_reason_label"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_payment_tender.sql",
     "snapshot_table": "reporting.rpt_payment_tender",
@@ -20023,7 +21598,92 @@
     "grain": "service point",
     "grain_description": "One row per service point",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "u",
+      "join_type": "join",
+      "on": "u.d1_usage_id = sr.d1_usage_id",
+      "role": "model",
+      "table": "stg_d1_usage"
+     },
+     {
+      "alias": "pr",
+      "join_type": "left join",
+      "on": "pr.prem_id = sp.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     },
+     {
+      "alias": "prc",
+      "join_type": "left join",
+      "on": "prc.prem_id = sp.prem_id",
+      "role": "step",
+      "table": "premise_rollup"
+     },
+     {
+      "alias": "sap",
+      "join_type": "left join",
+      "on": "sap.prem_id = sp.prem_id",
+      "role": "step",
+      "table": "sa_by_premise"
+     },
+     {
+      "alias": "bsp",
+      "join_type": "left join",
+      "on": "bsp.prem_id = sp.prem_id",
+      "role": "step",
+      "table": "bseg_by_premise"
+     },
+     {
+      "alias": "dev",
+      "join_type": "left join",
+      "on": "dev.sp_id = sp.sp_id",
+      "role": "model",
+      "table": "int_sp_device"
+     },
+     {
+      "alias": "rec",
+      "join_type": "left join",
+      "on": "rec.d1_sp_id = dev.d1_sp_id",
+      "role": "model",
+      "table": "int_sp_measurement_recency"
+     },
+     {
+      "alias": "asp",
+      "join_type": "left join",
+      "on": "asp.sp_id = sp.sp_id",
+      "role": "step",
+      "table": "active_sa_on_sp"
+     },
+     {
+      "alias": "spu",
+      "join_type": "left join",
+      "on": "spu.sp_id = sp.sp_id",
+      "role": "step",
+      "table": "sp_unbilled_usage"
+     },
+     {
+      "alias": "dmod",
+      "join_type": "left join",
+      "on": "dmod.manufacturer_cd = dev.manufacturer_cd and dmod.model_cd = dev.device_model_cd",
+      "role": "model",
+      "table": "stg_d1_model_label"
+     },
+     {
+      "alias": "dman",
+      "join_type": "left join",
+      "on": "dman.manufacturer_cd = dev.manufacturer_cd",
+      "role": "model",
+      "table": "stg_d1_manufacturer_label"
+     },
+     {
+      "alias": "lvsps",
+      "join_type": "left join",
+      "on": "lvsps.field_name='SP_STATUS_FLG' and lvsps.field_value = sp.sp_status_flg",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_premise_sp.sql",
     "snapshot_table": "reporting.rpt_premise_sp",
@@ -20972,7 +22632,50 @@
     "grain": "rpt_rate_configuration",
     "grain_description": "",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "g",
+      "join_type": "join",
+      "on": "g.rs_cd = rs.rs_cd",
+      "role": "model",
+      "table": "stg_rate_calc_group"
+     },
+     {
+      "alias": "r",
+      "join_type": "left join",
+      "on": "r.calc_grp_cd = g.calc_grp_cd",
+      "role": "model",
+      "table": "stg_calc_rule"
+     },
+     {
+      "alias": "rsl",
+      "join_type": "left join",
+      "on": "rsl.rate_schedule_cd = rs.rs_cd",
+      "role": "model",
+      "table": "stg_rate_schedule_label"
+     },
+     {
+      "alias": "gl",
+      "join_type": "left join",
+      "on": "gl.calc_grp_cd = g.calc_grp_cd",
+      "role": "model",
+      "table": "stg_calc_group_label"
+     },
+     {
+      "alias": "rl",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_calc_rule_label"
+     },
+     {
+      "alias": "bf",
+      "join_type": "left join",
+      "on": "bf.bill_factor_cd = r.bill_factor_cd",
+      "role": "model",
+      "table": "stg_bill_factor"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_rate_configuration.sql",
     "snapshot_table": "reporting.rpt_rate_configuration",
@@ -21480,7 +23183,36 @@
     "grain": "rpt_rate_schedule_history",
     "grain_description": "",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "rs",
+      "join_type": "left join",
+      "on": "rs.rate_schedule_cd = h.rate_schedule_cd",
+      "role": "model",
+      "table": "dim_rate_schedule"
+     },
+     {
+      "alias": "prs",
+      "join_type": "left join",
+      "on": "prs.rate_schedule_cd = h.previous_rate_cd",
+      "role": "model",
+      "table": "dim_rate_schedule"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = h.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = sa.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_rate_schedule_history.sql",
     "snapshot_table": "reporting.rpt_rate_schedule_history",
@@ -22089,7 +23821,22 @@
     "grain": "rpt_sa_aged_balance",
     "grain_description": "",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = f.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = f.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_sa_aged_balance.sql",
     "snapshot_table": "reporting.rpt_sa_aged_balance",
@@ -22248,7 +23995,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt 0-30 DAYS PAST DUE as of the run date (bill due date for billed debt; billed-not-yet-due sits here too). Can be negative: excess credit nets against the newest band. The five bands sum exactly to \"Current Balance\".",
      "group": "debt",
      "id": "Arrears 0-30 Days",
      "label": "Arrears 0-30 Days",
@@ -22256,7 +24003,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt 31-60 days past due as of the run date.",
      "group": "debt",
      "id": "Arrears 31-60 Days",
      "label": "Arrears 31-60 Days",
@@ -22264,7 +24011,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt 61-90 days past due as of the run date.",
      "group": "debt",
      "id": "Arrears 61-90 Days",
      "label": "Arrears 61-90 Days",
@@ -22272,7 +24019,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt 91-120 days past due as of the run date.",
      "group": "debt",
      "id": "Arrears 91-120 Days",
      "label": "Arrears 91-120 Days",
@@ -22280,7 +24027,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt more than 120 days past due as of the run date.",
      "group": "debt",
      "id": "Arrears 121+ Days",
      "label": "Arrears 121+ Days",
@@ -22710,7 +24457,64 @@
     "grain": "service agreement",
     "grain_description": "One row per service agreement",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "sig",
+      "join_type": "left join",
+      "on": "sig.sa_id = sa.sa_id",
+      "role": "model",
+      "table": "int_sa_billing_signals"
+     },
+     {
+      "alias": "f",
+      "join_type": "left join",
+      "on": "f.sa_id = sa.sa_id",
+      "role": "model",
+      "table": "stg_service_agreement"
+     },
+     {
+      "alias": "ars",
+      "join_type": "left join",
+      "on": "ars.sa_id = sa.sa_id",
+      "role": "model",
+      "table": "int_sa_arrears"
+     },
+     {
+      "alias": "ub",
+      "join_type": "left join",
+      "on": "ub.sa_id = sa.sa_id",
+      "role": "model",
+      "table": "int_unbilled_sa"
+     },
+     {
+      "alias": "pp",
+      "join_type": "left join",
+      "on": "pp.acct_id = sa.acct_id",
+      "role": "step",
+      "table": "pay_plan_by_account"
+     },
+     {
+      "alias": "rsh",
+      "join_type": "left join",
+      "on": "rsh.sa_id = sa.sa_id and rsh.is_current",
+      "role": "model",
+      "table": "int_sa_rate_schedule_scd"
+     },
+     {
+      "alias": "rs",
+      "join_type": "left join",
+      "on": "rs.rate_schedule_cd = rsh.rate_schedule_cd",
+      "role": "model",
+      "table": "dim_rate_schedule"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = sa.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_service_agreement.sql",
     "snapshot_table": "reporting.rpt_service_agreement",
@@ -23192,7 +24996,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt 0-30 DAYS PAST DUE as of the run date (bill due date for billed debt; billed-not-yet-due sits here too). Can be negative: excess credit nets against the newest band. The five bands sum exactly to \"Current Balance\".",
      "group": "billing",
      "id": "Arrears 0-30 Days",
      "label": "Arrears 0-30 Days",
@@ -23200,7 +25004,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt 31-60 days past due as of the run date.",
      "group": "billing",
      "id": "Arrears 31-60 Days",
      "label": "Arrears 31-60 Days",
@@ -23208,7 +25012,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt 61-90 days past due as of the run date.",
      "group": "billing",
      "id": "Arrears 61-90 Days",
      "label": "Arrears 61-90 Days",
@@ -23216,7 +25020,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt 91-120 days past due as of the run date.",
      "group": "billing",
      "id": "Arrears 91-120 Days",
      "label": "Arrears 91-120 Days",
@@ -23618,7 +25422,36 @@
     "grain": "rpt_tender_control",
     "grain_description": "",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "d",
+      "join_type": "left join",
+      "on": "d.dep_ctl_id = t.dep_ctl_id",
+      "role": "model",
+      "table": "stg_deposit_control"
+     },
+     {
+      "alias": "ts",
+      "join_type": "left join",
+      "on": "ts.field_name = 'TNDR_CTL_ST_FLG' and ts.field_value = t.tndr_ctl_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "ds",
+      "join_type": "left join",
+      "on": "ds.field_name = 'DEP_CTL_STATUS_FLG' and ds.field_value = d.dep_ctl_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "src",
+      "join_type": "left join",
+      "on": "src.tndr_source_cd = t.tndr_source_cd",
+      "role": "model",
+      "table": "stg_tender_source_label"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_tender_control.sql",
     "snapshot_table": "reporting.rpt_tender_control",
@@ -24047,7 +25880,22 @@
     "grain": "to-do entry",
     "grain_description": "One row per to-do entry",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "tt",
+      "join_type": "left join",
+      "on": "tt.td_type_cd = t.td_type_cd",
+      "role": "model",
+      "table": "stg_td_type_label"
+     },
+     {
+      "alias": "ts",
+      "join_type": "left join",
+      "on": "ts.field_name='ENTRY_STATUS_FLG' and ts.field_value = t.entry_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_todo.sql",
     "snapshot_table": "reporting.rpt_todo",
@@ -24366,7 +26214,64 @@
     "grain": "rpt_unbilled_revenue",
     "grain_description": "",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "dev",
+      "join_type": "join",
+      "on": "dev.sp_id = l.sp_id",
+      "role": "model",
+      "table": "int_sp_device"
+     },
+     {
+      "alias": "u",
+      "join_type": "join",
+      "on": "u.d1_usage_id = sr.d1_usage_id",
+      "role": "model",
+      "table": "stg_d1_usage"
+     },
+     {
+      "alias": "o",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_sa_service_point"
+     },
+     {
+      "alias": "lb",
+      "join_type": "left join",
+      "on": "lb.sa_id = sa.sa_id",
+      "role": "step",
+      "table": "last_bseg"
+     },
+     {
+      "alias": "su",
+      "join_type": "left join",
+      "on": "su.sa_id = sa.sa_id",
+      "role": "step",
+      "table": "sa_usage"
+     },
+     {
+      "alias": "sh",
+      "join_type": "left join",
+      "on": "sh.sa_id = sa.sa_id",
+      "role": "step",
+      "table": "sp_share"
+     },
+     {
+      "alias": "sas",
+      "join_type": "left join",
+      "on": "sas.sa_id = sa.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = sas.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_unbilled_revenue.sql",
     "snapshot_table": "reporting.rpt_unbilled_revenue",
@@ -24943,7 +26848,78 @@
     "grain": "usage transaction + MDM service point + sequence",
     "grain_description": "One row per usage transaction + MDM service point + sequence",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
-    "join_paths": [],
+    "join_paths": [
+     {
+      "alias": "u",
+      "join_type": "left join",
+      "on": "u.d1_usage_id = r.d1_usage_id",
+      "role": "model",
+      "table": "stg_d1_usage"
+     },
+     {
+      "alias": "mc",
+      "join_type": "left join",
+      "on": "mc.measr_comp_id = r.measr_comp_id",
+      "role": "model",
+      "table": "stg_d1_measuring_component"
+     },
+     {
+      "alias": "cfg",
+      "join_type": "left join",
+      "on": "cfg.device_config_id = mc.device_config_id",
+      "role": "model",
+      "table": "stg_d1_device_config"
+     },
+     {
+      "alias": "di",
+      "join_type": "left join",
+      "on": "di.d1_device_id = cfg.d1_device_id",
+      "role": "model",
+      "table": "stg_d1_device_identifier"
+     },
+     {
+      "alias": "inst",
+      "join_type": "left join",
+      "on": "inst.d1_sp_id = r.d1_sp_id",
+      "role": "model",
+      "table": "int_sp_device"
+     },
+     {
+      "alias": "sp",
+      "join_type": "left join",
+      "on": "sp.sp_id = inst.sp_id",
+      "role": "model",
+      "table": "stg_service_point"
+     },
+     {
+      "alias": "pr",
+      "join_type": "left join",
+      "on": "pr.prem_id = sp.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     },
+     {
+      "alias": "uom",
+      "join_type": "left join",
+      "on": "uom.uom_cd = r.uom_cd",
+      "role": "model",
+      "table": "stg_uom_label"
+     },
+     {
+      "alias": "tou",
+      "join_type": "left join",
+      "on": "tou.tou_cd = r.tou_cd",
+      "role": "model",
+      "table": "stg_tou_label"
+     },
+     {
+      "alias": "sqi",
+      "join_type": "left join",
+      "on": "sqi.sqi_cd = r.sqi_cd",
+      "role": "model",
+      "table": "stg_sqi_label"
+     }
+    ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_usage_txn.sql",
     "snapshot_table": "reporting.rpt_usage_txn",
