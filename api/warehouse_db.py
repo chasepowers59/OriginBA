@@ -128,10 +128,14 @@ def execute_query(
             # badly-shaped request.
             cur.execute("SET LOCAL statement_timeout = '30s'")
             if search_path:
-                # Scopes UNQUALIFIED names for callers like the SQL workspace, whose
-                # contract is "the reporting layer only". SET LOCAL dies with the
-                # rolled-back transaction, so it never leaks to the next borrower.
-                cur.execute("SET LOCAL search_path = %s", (search_path,))
+                # Scopes UNQUALIFIED names for callers like the SQL workspace. SET LOCAL
+                # dies with the rolled-back transaction, so it never leaks to the next
+                # borrower. A comma-separated value ('cisadm, reporting') must be passed
+                # as SEPARATE parameters — a single %s binds one quoted name and
+                # 'cisadm, reporting' resolves to nothing.
+                schemas = [s.strip() for s in search_path.split(",") if s.strip()]
+                placeholders = ", ".join(["%s"] * len(schemas))
+                cur.execute(f"SET LOCAL search_path = {placeholders}", schemas)
             cur.execute(sql, binds)
             if cur.description is None:
                 return [], []
