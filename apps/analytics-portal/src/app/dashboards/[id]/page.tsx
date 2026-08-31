@@ -27,7 +27,7 @@ export default async function EditCustomDashboardPage({ params }: PageProps) {
           </div>
         }
       >
-        <CustomDashboardPage dashboardId={id} />
+        <CustomDashboardPage dashboardId={id === "new" ? undefined : id} />
       </Suspense>
     </AppShell>
   );

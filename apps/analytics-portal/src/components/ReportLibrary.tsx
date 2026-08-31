@@ -9,6 +9,7 @@ export function ReportLibrary() {
   const [packs, setPacks] = useState<ReportLibraryPack[]>([]);
   const [activePack, setActivePack] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchReportLibrary()
@@ -16,6 +17,7 @@ export function ReportLibrary() {
         setPacks(data.packs);
         setActivePack(data.packs[0]?.id ?? null);
       })
+      .catch(() => setError("Couldn't load the report library."))
       .finally(() => setLoading(false));
   }, []);
 
@@ -36,6 +38,13 @@ export function ReportLibrary() {
 
       {loading ? (
         <div className="loading-shimmer h-48 rounded-2xl" />
+      ) : error || !packs.length ? (
+        <div className="glass-panel p-8 text-center text-sm text-fg-muted">
+          {error ?? "No report packs are available for this organization yet."}{" "}
+          <button type="button" onClick={() => location.reload()} className="text-sky-600 hover:underline dark:text-sky-400">
+            Retry
+          </button>
+        </div>
       ) : (
         <>
           <div className="flex flex-wrap gap-2">

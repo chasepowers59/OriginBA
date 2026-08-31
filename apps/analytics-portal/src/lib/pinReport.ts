@@ -21,5 +21,5 @@ export function pinReportUrl(opts: {
   if (opts.measureAgg) params.set("pin_agg", opts.measureAgg);
   if (opts.dimensions?.length) params.set("pin_dims", opts.dimensions.join(","));
   if (opts.days) params.set("pin_days", String(opts.days));
-  return `/dashboards?${params.toString()}`;
+  return `/dashboards/new?${params.toString()}`;
 }

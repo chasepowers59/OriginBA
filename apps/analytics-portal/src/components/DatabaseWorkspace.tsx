@@ -614,7 +614,7 @@ export function DatabaseWorkspace({
                   </div>
                 ) : (
                   <table className="min-w-full border-collapse text-left text-xs">
-                    <thead className="sticky top-0 z-10 bg-slate-950/95 backdrop-blur">
+                    <thead className="sticky top-0 z-10 bg-surface-solid backdrop-blur">
                       <tr>
                         <th className="border-b border-edge-subtle px-2 py-2 text-center font-normal text-fg-muted">
                           #
@@ -635,8 +635,8 @@ export function DatabaseWorkspace({
                       {accumulatedRows.map((row, idx) => (
                         <tr
                           key={idx}
-                          className={`border-t border-edge-subtle hover:bg-white/[0.04] ${
-                            idx % 2 === 0 ? "" : "bg-white/[0.02]"
+                          className={`border-t border-edge-subtle hover:bg-chip ${
+                            idx % 2 === 0 ? "" : "bg-surface-subtle"
                           }`}
                         >
                           <td className="px-2 py-1.5 text-center font-mono text-[10px] text-fg-muted">
@@ -652,7 +652,7 @@ export function DatabaseWorkspace({
                               <td
                                 key={col}
                                 className={`max-w-xs truncate whitespace-nowrap px-3 py-1.5 font-mono ${
-                                  isNum ? "text-right text-emerald-200/90" : "text-heading"
+                                  isNum ? "text-right text-emerald-700 dark:text-emerald-300/90" : "text-heading"
                                 } ${raw == null ? "text-fg-muted" : ""}`}
                                 title={raw != null ? String(raw) : undefined}
                               >

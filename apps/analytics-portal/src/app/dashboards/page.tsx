@@ -1,7 +1,6 @@
-import { Suspense } from "react";
 import { fetchSnapshots } from "@/lib/api";
 import { AppShell } from "@/components/AppShell";
-import { CustomDashboardPage } from "@/components/CustomDashboardPage";
+import { DashboardListPage } from "@/components/DashboardListPage";
 
 export default async function NewCustomDashboardPage() {
   let index;
@@ -17,15 +16,7 @@ export default async function NewCustomDashboardPage() {
       dbConfigured={index.db_configured}
       activeNav="custom"
     >
-      <Suspense
-        fallback={
-          <div className="glass-panel p-8">
-            <div className="loading-shimmer h-64 rounded-xl" />
-          </div>
-        }
-      >
-        <CustomDashboardPage />
-      </Suspense>
+      <DashboardListPage />
     </AppShell>
   );
 }

@@ -43,6 +43,7 @@ export default async function ExplorePage({ params }: PageProps) {
       workstreams={index.workstreams ?? []}
       activeId={id}
       dbConfigured={index.db_configured}
+      activeNav="reports"
     >
       {error || !metadata ? (
         <div className="glass-panel border-red-400/20 bg-red-500/10 px-4 py-3 text-red-700 dark:text-red-200">

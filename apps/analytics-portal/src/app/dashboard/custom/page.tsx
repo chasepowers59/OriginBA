@@ -13,5 +13,5 @@ export default async function LegacyCustomDashboardRedirect({
     else if (Array.isArray(v) && v[0]) qs.set(k, v[0]);
   }
   const query = qs.toString();
-  redirect(query ? `/dashboards?${query}` : "/dashboards");
+  redirect(query ? `/dashboards/new?${query}` : "/dashboards");
 }

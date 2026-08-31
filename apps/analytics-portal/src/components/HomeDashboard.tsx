@@ -14,7 +14,7 @@ import { useBrand } from "@/components/PortalThemeProvider";
 export function HomeDashboard() {
   const brand = useBrand();
   const [snapshotCount, setSnapshotCount] = useState(0);
-  const [workstreamCount, setWorkstreamCount] = useState(9);
+  const [workstreamCount, setWorkstreamCount] = useState(0);
 
   useEffect(() => {
     fetchSnapshots()
@@ -53,7 +53,8 @@ export function HomeDashboard() {
             </Link>
           </div>
           <p className="mt-4 text-xs text-fg-muted">
-            {workstreamCount} workstreams · {snapshotCount || 19} reporting canvases
+            {/* Real counts only — fabricated placeholders confidently lied when the API was down. */}
+            {workstreamCount ? `${workstreamCount} workstreams · ${snapshotCount} reporting tables` : "\u00a0"}
           </p>
         </div>
       </section>

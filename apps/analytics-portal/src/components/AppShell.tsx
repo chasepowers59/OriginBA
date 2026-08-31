@@ -82,6 +82,31 @@ export function AppShell({
           </nav>
 
           <div className="ml-auto flex shrink-0 items-center gap-2">
+            {/* Mobile nav: below md the top nav is hidden, so this menu is the ONLY
+                route to the app's surfaces on a phone. */}
+            <details className="relative md:hidden">
+              <summary
+                className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-lg text-lg transition hover:bg-chip [&::-webkit-details-marker]:hidden"
+                aria-label="Open navigation menu"
+              >
+                ☰
+              </summary>
+              <div className="glass-panel absolute right-0 top-full z-50 mt-2 w-56 p-2 shadow-xl">
+                {NAV.filter((item) => item.id !== "settings" || can("settings:manage")).map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`block rounded-lg px-3 py-2 text-sm font-medium ${
+                      activeNav === item.id
+                        ? "bg-chip text-heading"
+                        : "text-fg-muted hover:bg-chip hover:text-heading"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </details>
             {can("data_source:manage") ? (
               <Link
                 href="/settings"
@@ -120,7 +145,7 @@ export function AppShell({
                     {user.organization_name ? ` · ${user.organization_name}` : ""}
                   </p>
                   <p className="portal-text-subtle mt-2 border-t border-edge-subtle pt-2 text-xs">
-                    {workstreams.length} workstreams · {snapshots.length} reporting canvases
+                    {workstreams.length} workstreams · {snapshots.length} reporting tables
                   </p>
                   <button type="button" onClick={logout} className="btn-ghost mt-3 w-full text-xs">
                     Sign out

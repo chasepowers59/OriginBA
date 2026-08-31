@@ -14,6 +14,7 @@ import {
   fetchScopeOptions,
   fetchSnapshotMetadata,
   fetchSnapshots,
+  fetchSavedViews,
   runSnapshotQuery,
   createSavedView,
 } from "@/lib/api";
@@ -47,9 +48,12 @@ const GRAINS = ["month", "quarter", "year"];
 export function VisualBuilder({
   initialCanvas,
   initialReport,
+  initialView,
 }: {
   initialCanvas?: string;
   initialReport?: string;
+  /** A saved custom view's id — reopens it with shelves and visual restored. */
+  initialView?: string;
 } = {}) {
   const [index, setIndex] = useState<SnapshotSummary[]>([]);
   const [snapshotId, setSnapshotId] = useState("");
@@ -242,18 +246,64 @@ export function VisualBuilder({
     [loadCanvas],
   );
 
+  // Reopen a saved custom view: restore canvas, shelves and visual from the stored
+  // definition. Without this, a saved view opened an EMPTY builder (the user's work
+  // never came back).
+  useEffect(() => {
+    if (!initialView || initialApplied.current) return;
+    initialApplied.current = true;
+    (async () => {
+      try {
+        const { views } = await fetchSavedViews();
+        const v = views.find((x) => x.id === initialView);
+        if (!v) return;
+        const m = await loadCanvas(v.snapshot_id, true);
+        const findField = (id: string) => m.fields?.find((x) => x.id === id);
+        setCols(
+          (v.dimensions ?? []).map((d) => {
+            const f = findField(d);
+            const kind = f?.role === "date" ? ("time" as const) : ("dim" as const);
+            return { field: d, label: f?.label ?? d, kind, grain: kind === "time" ? "month" : undefined };
+          }),
+        );
+        const ms = v.measures?.length
+          ? v.measures
+          : v.measure_field && v.measure_field !== "*"
+            ? [{ field: v.measure_field, agg: v.measure_agg ?? "sum" }]
+            : [];
+        setVals(
+          ms.map((mm) => ({
+            field: mm.field,
+            label: findField(mm.field)?.label ?? mm.field,
+            agg: mm.agg,
+            trusted: (m.trusted_measures ?? []).includes(mm.field),
+          })),
+        );
+        const ct = v.chart_type;
+        setVisual(
+          (ct === "line" || ct === "pie" || ct === "horizontal" || ct === "area" ||
+           ct === "stacked-bar" || ct === "stacked-area" || ct === "table"
+            ? ct
+            : "bar") as VisualChoice,
+        );
+      } catch {
+        /* view missing or fetch failed — the builder still opens usable */
+      }
+    })();
+  }, [initialView, loadCanvas]);
+
   // Deep-link entry from a Canvas Overview: /build?canvas=<id> preselects the canvas;
   // &report=<id> also prefills that governed report. Apply once, after the catalog loads.
   useEffect(() => {
     if (initialApplied.current || !index.length) return;
-    if (initialReport) {
+    if (initialReport && questions.length) {
       const q = questions.find((x) => x.id === initialReport);
       if (q) {
         initialApplied.current = true;
         void applyQuestion(q);
         return;
       }
-      if (!questions.length) return; // questions still loading; wait
+      // report id unknown in the loaded set -> fall through to the canvas
     }
     if (initialCanvas) {
       initialApplied.current = true;

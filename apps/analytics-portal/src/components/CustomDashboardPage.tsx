@@ -104,7 +104,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
         dimensions: pinDims ? pinDims.split(",").filter(Boolean) : undefined,
       },
     ]);
-    router.replace("/dashboards", { scroll: false });
+    router.replace("/dashboards/new", { scroll: false });
   }, [dashboardId, router, searchParams]);
 
   const tileBySlot = useMemo(() => {

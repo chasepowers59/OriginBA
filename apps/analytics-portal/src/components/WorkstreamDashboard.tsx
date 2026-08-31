@@ -74,7 +74,7 @@ function WorkstreamDashboardInner({
       <div className="glass-panel relative overflow-hidden p-6 md:p-8">
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div>
-            <Link href="/" className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300">
+            <Link href="/reports" className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300">
               ← All workstreams
             </Link>
             <h1 className="mt-2 text-3xl font-bold text-heading">{label}</h1>

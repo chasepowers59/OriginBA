@@ -40,6 +40,7 @@ export default async function WorkstreamPage({ params }: PageProps) {
       snapshots={index.snapshots}
       workstreams={index.workstreams ?? []}
       dbConfigured={index.db_configured}
+      activeNav="reports"
     >
       <WorkstreamDashboard
         workstreamId={id}

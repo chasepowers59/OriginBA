@@ -3,7 +3,7 @@ import { AppShell } from "@/components/AppShell";
 import { HomeDashboard } from "@/components/HomeDashboard";
 
 // "/" is the Executive Overview — the app's single dashboard surface. Workstream
-// browsing lives in the shell's sidebar, so this page doesn't repeat it below.
+// browsing lives in the Library's filter rail (/reports).
 export default async function HomePage() {
   let index;
   let error: string | null = null;
@@ -27,12 +27,12 @@ export default async function HomePage() {
       dbConfigured={index.db_configured}
       activeNav="home"
     >
-      <HomeDashboard />
       {error ? (
         <p className="mb-6 rounded-xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-200">
           Connection unavailable — start the analytics API to load the full catalog.
         </p>
       ) : null}
+      <HomeDashboard />
     </AppShell>
   );
 }

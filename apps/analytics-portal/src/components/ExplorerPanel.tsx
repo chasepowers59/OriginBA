@@ -293,8 +293,9 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         }
       }
       if (fav.dimensions?.length) {
-        // A custom (dimensions-based) saved view now opens in the single builder surface.
-        router.replace(`/build?canvas=${encodeURIComponent(metadata.id)}`);
+        // A custom (dimensions-based) saved view opens in the single builder surface,
+        // WITH its saved definition (the view id hydrates the shelves there).
+        router.replace(`/build?view=${encodeURIComponent(fav.id)}`);
       }
     }
   }, [searchParams, metadata, favoriteApplied, runPremade, dateStart, dateEnd, router]);
