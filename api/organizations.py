@@ -80,6 +80,11 @@ def resolve_organization(name_or_id: str | None) -> dict[str, Any] | None:
     return None
 
 
+# Orgs allowed to use the unprefixed/DEMO_* credentials. Everything else names its
+# own keys or is unconfigured.
+SHARED_CREDENTIAL_ORGS = frozenset({"demo"})
+
+
 def _env_value(env: dict[str, str], *keys: str) -> str | None:
     for key in keys:
         value = (env.get(key) or os.getenv(key) or "").strip()
@@ -101,7 +106,11 @@ def org_env_connection_config(org_id: str) -> tuple[str, str, str, str, bool] | 
     password = _env_value(env, f"{prefix}_DB_PASSWORD", f"{prefix}_ORACLE_PASSWORD")
     dsn = _env_value(env, f"{prefix}_ORACLE_DSN", f"{prefix}_DB_CONNECT_STRING")
 
-    if not user or not password:
+    # Only the orgs that are MEANT to share credentials may fall back to the global
+    # keys. A client whose own keys are missing must fail, not inherit the demo
+    # connection — that is how one tenant ends up querying another's database
+    # (audit H2).
+    if (not user or not password) and org_id.lower() in SHARED_CREDENTIAL_ORGS:
         user = _env_value(env, "DEMO_DB_USER", "DB_USER", "ORACLE_USER")
         password = _env_value(env, "DEMO_DB_PASSWORD", "DB_PASSWORD", "ORACLE_PASSWORD")
 

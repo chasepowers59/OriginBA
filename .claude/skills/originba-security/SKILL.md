@@ -28,9 +28,11 @@ header is ignored, never rejected, and never used as a connection detail.
 2. **Every store read AND delete filters on `organization_id`.** `list_all()` exists
    only for the cron runner; a route calling it is a cross-tenant leak.
 3. **A missing per-org connection is an ERROR, not a fallback.** Falling back to a
-   shared warehouse or a `_legacy` credential silently serves tenant A's data to
-   tenant B. Enforced for the warehouse (C2 fixed); H2's `_legacy` credential
-   fallback is still open.
+   shared warehouse or a shared credential silently serves tenant A's data to tenant
+   B. Enforced in all four places (C2, H2): the warehouse URL, the vault's `_legacy`
+   entry, the env credential lookup and the Oracle driver. Sharing is EXPLICIT —
+   `SHARED_WAREHOUSE_ORGS`, `SHARED_CREDENTIAL_ORGS`,
+   `PORTAL_LEGACY_VAULT_ORGANIZATION` — and defaults to nobody.
 4. **Every SQL path gets a fence.** Both engines, every route. A branch that
    validates syntax but skips the scope/secrets fence is an open door. Enforced:
    `_SCOPE_FENCES` in `database_routes` is a TOTAL mapping and an unknown engine is
@@ -75,17 +77,22 @@ Oracle: `ALL_TABLES`/`DBA_*`/`V$*`/`SYS.*`, other schemas, `@dblink`, `UTL_HTTP`
 - **C4** the secrets guard is per TABLE — `SELECT *` and whole-row projection are
   both blocked on every table carrying a protected column.
 
-**HIGH — H1 and H4 also FIXED:**
+**HIGH — H1, H2, H4 and H5 also FIXED:**
 - **H1** `data_source:manage` is required unconditionally; the settings token is a
   second factor, never an alternative. The connection test returns a generic failure
   so it cannot be used to probe the internal network.
+- **H2** no credential inherits across tenants: the vault's `_legacy` entry belongs to
+  one org named by `PORTAL_LEGACY_VAULT_ORGANIZATION` (unset = nobody), the global
+  DEMO_*/DB_USER keys serve only `SHARED_CREDENTIAL_ORGS` (`{demo}`), and the driver
+  raises for a client with no keys of its own.
 - **H4** `is_protected_column()` drops secrets at `allowed_fields()`, so the governed
   query API refuses them whatever a catalog says; the catalog and its generator are
   clean too.
+- **H5** `sample-rows` and `raw-sql` audit what they actually ran (they used to 500
+  after the query and skip the audit write).
 
-**STILL OPEN — HIGH:** H2 `_legacy` credential fallback; H3 `raw_sql_validator`
-scopes by substring presence; H5 two routes 500 after querying and skip their audit
-write; H6 the JWT is in a non-HttpOnly cookie for 8 hours.
+**STILL OPEN — HIGH:** H3 `raw_sql_validator` scopes by substring presence (admin-only);
+H6 the JWT is in a non-HttpOnly cookie for 8 hours.
 **MEDIUM/LOW:** see the audit document.
 
 Full evidence: `docs/SECURITY_AUDIT_2026-09-01.md`.

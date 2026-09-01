@@ -55,6 +55,10 @@ class DqWarehouseScopingTests(unittest.TestCase):
     def setUp(self):
         os.environ["PORTAL_AUTH_DISABLED"] = "true"
         os.environ["PORTAL_DEV_ORGANIZATION"] = "dev"
+        # The org HAS a data source (so require_org_for_data admits it) but no
+        # Postgres warehouse — exactly the shape of an Oracle-backed client, which
+        # is the case that used to be served another tenant's findings.
+        os.environ["WAREHOUSE_DATABASE_URL"] = "postgresql://test@localhost/test"
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
 

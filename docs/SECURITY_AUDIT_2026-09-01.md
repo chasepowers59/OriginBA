@@ -103,15 +103,20 @@ with column-level SELECT that excludes those columns.
 
 ---
 
-## HIGH — H1 and H4 FIXED 2026-09-01
+## HIGH — H1, H2, H4 and H5 FIXED 2026-09-01
 
 | # | Fix | Test |
 | --- | --- | --- |
 | H1 | `_require_data_source_manage` now requires `data_source:manage` UNCONDITIONALLY; the settings token is a second factor layered on top, never an alternative. The connection test no longer returns the driver error (it distinguished "no listener" from "wrong password" from "no route" — a network probe); the detail goes to the server log. Dead `_require_settings_token` helper deleted. | `tests/test_data_source_authz.py` (6) |
 | H4 | `snapshot_catalog.is_protected_column` drops MICR/WEB_PASSWD/ALERT_INFO/EXT_ACCT_ID from `allowed_fields()`, so the governed query API refuses them whatever a catalog declares; the two `*ALERT_INFO` fields were removed from `output/catalog_cisadm.json`; and the catalog generator skips them so regeneration cannot reintroduce them. Legitimate alert columns (ALERT_COUNT, OPEN_ALERT_COUNT, LATEST_ALERT_*) are untouched. | `tests/test_catalog_secrets.py` (5) |
 
+| H2 | The three credential fallbacks are gone. The vault's `_legacy` entry now belongs to exactly one org named by `PORTAL_LEGACY_VAULT_ORGANIZATION` (unset = nobody); the global DEMO_*/DB_USER keys serve only `SHARED_CREDENTIAL_ORGS` (`{demo}`); and `demo_db.env_connection_config` raises for a client whose own keys are missing instead of reaching for the shared ones. | `tests/test_credential_isolation.py` (8) |
+| H5 | Both routes now audit what they actually ran: `sample-rows` records a preview, `raw-sql` records `raw_sql_run` with the statement. (This one was self-inflicted — the access-audit sweep pasted the query route's detail block into two routes that have no `body`.) | `tests/test_access_audit.py` (8) |
+
 Verified: `build_query(dimensions=['ALERT_INFO'])` on the real cisadm snapshot →
 `Invalid dimension: ALERT_INFO`, with the five legitimate alert columns still allowed.
+Every real client org still resolves its OWN credentials (checked across all eight);
+an unknown org resolves none. `sample-rows` returns 200 and writes its audit row.
 
 ### Still open
 

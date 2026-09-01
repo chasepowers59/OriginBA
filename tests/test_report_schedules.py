@@ -244,7 +244,11 @@ class RouteTests(unittest.TestCase):
         # another module may have flipped auth on at import time; pin it per-class
         # (auth_disabled() reads the env per request)
         cls._env = mock.patch.dict(os.environ, {
-            "PORTAL_AUTH_DISABLED": "true", "PORTAL_DEV_ORGANIZATION": "dev"})
+            "PORTAL_AUTH_DISABLED": "true", "PORTAL_DEV_ORGANIZATION": "dev",
+            # dev needs a data source: require_org_for_data no longer accepts
+            # the global credential fallback (audit H2).
+            "WAREHOUSE_DATABASE_URL": "postgresql://test@localhost/test",
+        })
         cls._env.start()
         app = FastAPI()
         app.include_router(router)

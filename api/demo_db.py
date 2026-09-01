@@ -49,6 +49,18 @@ def env_connection_config(organization_id: str | None = None) -> tuple[str, str,
         if org_cfg:
             return org_cfg
 
+    from api.organizations import SHARED_CREDENTIAL_ORGS
+
+    if organization_id and organization_id.lower() not in SHARED_CREDENTIAL_ORGS:
+        # Its per-org config was already tried above and did not resolve; the shared
+        # DEMO_* keys are not a substitute for a client's own (audit H2).
+        raise RuntimeError(
+            f"No database credentials are configured for organization "
+            f"'{organization_id}'. Set {organization_id.upper()}_DB_USER, "
+            f"{organization_id.upper()}_DB_PASSWORD and "
+            f"{organization_id.upper()}_ORACLE_DSN."
+        )
+
     config = load_env()
     user = config.get("DEMO_DB_USER") or config.get("DB_USER") or config.get("ORACLE_USER")
     password = config.get("DEMO_DB_PASSWORD") or config.get("DB_PASSWORD") or config.get("ORACLE_PASSWORD")

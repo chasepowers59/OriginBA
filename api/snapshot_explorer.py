@@ -408,9 +408,7 @@ def snapshot_sample_rows(
     record_access_event(
         actor_email=ctx.email, actor_id=ctx.id, action="report_run",
         target_type="snapshot", target_id=snapshot_id,
-        detail=(f"dims={','.join(body.dimensions) or '-'}; "
-                f"measures={','.join(m.agg + '(' + m.field + ')' for m in body.measures)}; "
-                f"rows={len(serialized_rows)}"))
+        detail=f"sample rows; rows={len(serialized_rows)}")
     return {
         "client": org_id,
         "organization_id": org_id,
@@ -489,11 +487,9 @@ def snapshot_raw_sql(
     ]
     from api.access_audit import record_access_event
     record_access_event(
-        actor_email=ctx.email, actor_id=ctx.id, action="report_run",
+        actor_email=ctx.email, actor_id=ctx.id, action="raw_sql_run",
         target_type="snapshot", target_id=snapshot_id,
-        detail=(f"dims={','.join(body.dimensions) or '-'}; "
-                f"measures={','.join(m.agg + '(' + m.field + ')' for m in body.measures)}; "
-                f"rows={len(serialized_rows)}"))
+        detail=f"rows={len(serialized_rows)}; sql: {body.sql[:300]}")
     return {
         "client": org_id,
         "organization_id": org_id,

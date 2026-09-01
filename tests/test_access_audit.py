@@ -109,6 +109,31 @@ class RouteWiringTests(unittest.TestCase):
         self.assertEqual(rows[0].target_id, "rpt_bill_segment")
         self.assertEqual(rows[0].actor_email, "dev@origin.local")
 
+    def test_sample_rows_succeeds_and_is_audited(self):
+        """H5: the route referenced a `body` it never took, so it 500'd AFTER the
+        query ran and its audit write was never reached."""
+        with mock.patch("api.warehouse_db.execute_query",
+                        return_value=(["Bill Cycle"], [["CYCLE1"]])), \
+             mock.patch("api.warehouse_db.warehouse_configured", return_value=True):
+            r = self.client.get("/snapshots/rpt_bill_segment/sample-rows?limit=3")
+        self.assertEqual(r.status_code, 200, r.text)
+        rows = _events("report_run")
+        self.assertTrue(rows)
+        self.assertEqual(rows[0].target_id, "rpt_bill_segment")
+        self.assertIn("sample", rows[0].detail.lower())
+
+    def test_raw_sql_succeeds_and_is_audited(self):
+        # this route goes through the Oracle executor, whatever the snapshot
+        with mock.patch("api.snapshot_explorer.execute_query",
+                        return_value=(["n"], [[1]])):
+            r = self.client.post(
+                "/snapshots/rpt_bill_segment/raw-sql",
+                json={"sql": "SELECT 1 AS n FROM CISADM.RPT_BILL_SEGMENT", "limit": 5})
+        self.assertEqual(r.status_code, 200, r.text)
+        rows = _events("raw_sql_run")
+        self.assertTrue(rows)
+        self.assertEqual(rows[0].target_id, "rpt_bill_segment")
+
     def test_sql_refused_is_recorded(self):
         r = self.client.post(
             "/database/sql/execute",

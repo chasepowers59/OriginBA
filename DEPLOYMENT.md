@@ -43,6 +43,11 @@ and, for Oracle orgs, needs Instant Client — neither fits Vercel serverless);
     an org with no key of its own reports "not configured" rather than reading another
     tenant's database. Oracle-backed orgs use `<ORG>_DB_*` and need no warehouse URL.
   - Oracle orgs only: `<ORG>_DB_*` / `<ORG>_ORACLE_DSN`, `DB_THICK_MODE`, `ORACLE_CLIENT_LIB_DIR`
+    — **per client, required.** Since the 2026-09-01 isolation fix a client never
+    inherits the global `DEMO_DB_*` / `DB_USER` keys; those serve the `demo` org only,
+    and an org with no keys of its own reports "not configured". If you are migrating a
+    pre-multi-org credential vault, name its owner with
+    `PORTAL_LEGACY_VAULT_ORGANIZATION=<org>`; unset means no org inherits it.
   - OIDC SSO (optional, Azure AD / Entra): set all four of `OIDC_ISSUER`
     (`https://login.microsoftonline.com/<tenant-id>/v2.0`), `OIDC_CLIENT_ID`,
     `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URI` (`https://<api-host>/auth/oidc/callback`,
