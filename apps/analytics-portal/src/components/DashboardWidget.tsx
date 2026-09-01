@@ -73,7 +73,7 @@ export function DashboardWidget({
           </div>
         ) : null}
         {kpi.error ? (
-          <p className="mt-1 text-xs text-amber-400/90">{kpi.error}</p>
+          <p className="mt-1 text-xs text-amber-700 dark:text-amber-400/90">{kpi.error}</p>
         ) : null}
       </div>
       {!compact ? (

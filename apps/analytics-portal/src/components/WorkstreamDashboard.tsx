@@ -117,7 +117,7 @@ function WorkstreamDashboardInner({
               </ul>
             </div>
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-400/80">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400/80">
                 Deliberately not included
               </p>
               <ul className="mt-2 space-y-2">
