@@ -272,7 +272,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       {filter ? (
         <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
           <span>
-            Cross-filter: <strong>{filter.label ?? filter.field}</strong> = {filter.value}
+            Cross-filter: <strong>{filter.field}</strong> = {filter.value}
           </span>
           <button type="button" onClick={clearFilter} className="btn-ghost text-xs">
             Clear
@@ -301,7 +301,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
                     tile={tileBySlot.get(slot)!}
                     days={days}
                     onData={registerExport}
-                    onCrossSelect={(field, value) => toggleFilter(field, value, value)}
+                    onCrossSelect={(field, value) => toggleFilter(field, value)}
                   />
                 </div>
               ) : (

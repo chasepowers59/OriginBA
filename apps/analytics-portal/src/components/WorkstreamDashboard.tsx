@@ -64,7 +64,7 @@ function WorkstreamDashboardInner({
 
   const handleTrendClick = useCallback(
     (kpi: { trend_dimension?: string | null }, trendLabel: string) => {
-      if (kpi.trend_dimension) toggleFilter(kpi.trend_dimension, trendLabel, trendLabel);
+      if (kpi.trend_dimension) toggleFilter(kpi.trend_dimension, trendLabel);
     },
     [toggleFilter],
   );
@@ -161,7 +161,7 @@ function WorkstreamDashboardInner({
       {filter ? (
         <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
           <span>
-            Cross-filter: <strong>{filter.label ?? filter.field}</strong> = {filter.value}
+            Cross-filter: <strong>{filter.field}</strong> = {filter.value}
           </span>
           <button type="button" onClick={clearFilter} className="btn-ghost text-xs">
             Clear

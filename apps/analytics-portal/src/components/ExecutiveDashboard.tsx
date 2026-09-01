@@ -61,7 +61,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
   const handleTrendClick = useCallback(
     (kpi: { trend_dimension?: string | null }, label: string) => {
       if (kpi.trend_dimension) {
-        toggleFilter(kpi.trend_dimension, label, label);
+        toggleFilter(kpi.trend_dimension, label);
       }
     },
     [toggleFilter],
@@ -123,7 +123,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       {filter && !isHome ? (
         <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
           <span>
-            Cross-filter active: <strong>{filter.label ?? filter.field}</strong> = {filter.value}
+            Cross-filter active: <strong>{filter.field}</strong> = {filter.value}
           </span>
           <button type="button" onClick={clearFilter} className="btn-ghost text-xs">
             Clear
