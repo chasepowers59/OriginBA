@@ -102,6 +102,13 @@ cold-start after idle; use the Starter plan or Fly for always-on. The API comes 
   never committed). It preflights both and refuses if a MICR column ever reached the layer.
   Do NOT load a real *client* slice (Ellensburg, etc.) into cloud Supabase — data residency.
 
+## Backups
+`deploy/backup_portal_state.sh [outdir]` dumps the control-plane data users create
+by hand — auth tables + the whole `portal_state` schema (saved views, dashboards,
+schedules, alerts) — into a timestamped `.sql.gz`. Run it daily from the same cron
+that runs the report-schedule runner; it needs only `PORTAL_AUTH_DATABASE_URL`.
+The warehouse is NOT backed up here (dbt rebuilds it).
+
 ## Deploy / update
 1. `git push origin main` (or merge the feature branch) — Vercel auto-builds the frontend.
 2. Rebuild + roll the API container.
