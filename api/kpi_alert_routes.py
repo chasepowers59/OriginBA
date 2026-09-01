@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from api.auth.dependencies import AuthContext, get_auth_context
+from api.notifications import smtp_configured
 from api.org_db import require_org_for_data
 from api import kpi_alerts as ka
 
@@ -31,7 +32,7 @@ def get_alerts(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     org_id = require_org_for_data(ctx)
     return {"alerts": ka.list_alerts(org_id),
             "available_kpis": ka.watchable_kpis(),
-            "smtp_configured": ka.smtp_configured()}
+            "smtp_configured": smtp_configured()}
 
 
 @router.post("")

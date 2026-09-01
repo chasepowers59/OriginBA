@@ -21,7 +21,8 @@ def main() -> int:
                         help="render due schedules but do not send or mark them run")
     args = parser.parse_args()
 
-    from api.report_schedules import run_due_schedules, smtp_configured
+    from api.notifications import smtp_configured
+    from api.report_schedules import run_due_schedules
 
     if not args.dry_run and not smtp_configured():
         print("SMTP_HOST is not configured; refusing a live run (use --dry-run).")

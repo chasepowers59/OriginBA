@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import secrets
 from typing import Any
+from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from api.auth.config import access_token_minutes, auth_disabled
@@ -25,7 +28,8 @@ from api.auth.schemas import (
     UserCreate,
     UserUpdate,
 )
-from api.auth.security import create_access_token
+from api.auth.models import User
+from api.auth.security import create_access_token, hash_password
 from api.auth.service import (
     AuthError,
     authenticate_user,
@@ -201,9 +205,6 @@ def oidc_login():
     if not cfg:
         raise HTTPException(status_code=404, detail="SSO is not configured")
     disc = oidc.fetch_discovery(cfg["OIDC_ISSUER"])
-    from urllib.parse import urlencode
-
-    from fastapi.responses import RedirectResponse
     params = urlencode({
         "client_id": cfg["OIDC_CLIENT_ID"],
         "response_type": "code",
@@ -243,17 +244,13 @@ def oidc_callback(
     if not email:
         raise HTTPException(status_code=400, detail="Identity token carried no email address")
 
-    from api.auth.models import User
-    from api.auth.security import hash_password
-    import secrets as _secrets
-
     user = session.query(User).filter(User.email == email).one_or_none()
     if user is None:
         user = User(
             email=email,
             display_name=str(claims.get("name") or email.split("@")[0]),
             # unusable password: SSO users authenticate at the IdP only
-            password_hash=hash_password(_secrets.token_urlsafe(24)),
+            password_hash=hash_password(secrets.token_urlsafe(24)),
             role="user",
             organization_id=cfg.get("OIDC_DEFAULT_ORGANIZATION") or None,
             is_active=True,
@@ -273,7 +270,6 @@ def oidc_callback(
         client_id=public["client_id"], organization_id=public.get("organization_id"),
         workstreams=public["workstreams"])
 
-    from fastapi.responses import RedirectResponse
     dest = cfg.get("OIDC_POST_LOGIN_URL") or "/login"
     return RedirectResponse(f"{dest}#sso_token={token}")
 

@@ -55,7 +55,6 @@ def _payload(**over):
         "cadence": "daily",
         "hour_utc": 13,
         "window_days": 30,
-        "format": "csv",
     }
     base.update(over)
     return base
@@ -167,7 +166,7 @@ class RunnerTests(unittest.TestCase):
         self._views = mock.patch.object(rs, "_find_view", side_effect=lambda vid, org: (
             VIEW if vid == "view-1" else None))
         self._views.start()
-        self.sched = rs.create_schedule(_payload(), organization_id="dev", created_by="a@b.gov")
+        rs.create_schedule(_payload(), organization_id="dev", created_by="a@b.gov")
 
     def tearDown(self):
         self._views.stop()
@@ -210,7 +209,7 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(live[0]["status"], "sent")
 
     def test_render_failure_recorded_not_fatal(self):
-        second = rs.create_schedule(_payload(), organization_id="dev", created_by="b@b.gov")
+        rs.create_schedule(_payload(), organization_id="dev", created_by="b@b.gov")
         now = datetime(2026, 9, 1, 13, 5, tzinfo=UTC)
         calls = {"n": 0}
 
@@ -226,7 +225,6 @@ class RunnerTests(unittest.TestCase):
         statuses = sorted(r["status"].split(":")[0] for r in results)
         self.assertEqual(statuses, ["error", "sent"])
         self.assertEqual(len(sent), 1)
-        _ = second
 
 
 class RouteTests(unittest.TestCase):

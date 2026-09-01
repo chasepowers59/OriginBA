@@ -1,54 +1,34 @@
 """Report annotations — the "why" pinned next to the number.
 
 A short note on a saved view, a dashboard, or one dashboard tile: who wrote it,
-when, and what they saw ("spike is the CYCLE3 rebill batch"). Notes live with the
-org's portal state; the author or an admin can remove them.
-
-Storage follows saved_views.py: portal_state when configured, local JSON otherwise.
+when, and what they saw ("spike is the CYCLE3 rebill batch"). The author or an
+admin can remove one.
 """
 from __future__ import annotations
 
-import json
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from api import portal_state_store as _pss
+from api.org_store import OrgRecordStore
 
 ROOT = Path(__file__).resolve().parent.parent
 ANNOTATIONS_PATH = ROOT / "data" / "analytics_portal" / "annotations.json"
-_COLLECTION = "annotations"
 TARGET_TYPES = ("saved_view", "dashboard", "dashboard_tile")
 MAX_TEXT = 2000
 MAX_PER_TARGET = 50
+
+_store = OrgRecordStore("annotations", lambda: ANNOTATIONS_PATH, "annotations")
 
 
 class AnnotationError(ValueError):
     pass
 
 
-def _load_store() -> dict[str, Any]:
-    if ANNOTATIONS_PATH.exists():
-        return json.loads(ANNOTATIONS_PATH.read_text(encoding="utf-8"))
-    return {"annotations": []}
-
-
-def _save_store(data: dict[str, Any]) -> None:
-    ANNOTATIONS_PATH.parent.mkdir(parents=True, exist_ok=True)
-    ANNOTATIONS_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
-
-
-def _org_annotations(organization_id: str) -> list[dict[str, Any]]:
-    if _pss.enabled():
-        return _pss.list_records(_COLLECTION, organization_id)
-    return [a for a in _load_store().get("annotations", [])
-            if a.get("organization_id") == organization_id]
-
-
 def list_annotations(organization_id: str, *, target_type: str,
                      target_id: str) -> list[dict[str, Any]]:
-    notes = [a for a in _org_annotations(organization_id)
+    notes = [a for a in _store.list(organization_id)
              if a.get("target_type") == target_type and a.get("target_id") == target_id]
     return sorted(notes, key=lambda a: a.get("created_at", ""), reverse=True)
 
@@ -70,7 +50,7 @@ def create_annotation(payload: dict[str, Any], *, organization_id: str,
                             target_id=target_id)) >= MAX_PER_TARGET:
         raise AnnotationError(f"This item already has {MAX_PER_TARGET} notes")
 
-    entry = {
+    return _store.add({
         "id": str(uuid.uuid4()),
         "organization_id": organization_id,
         "target_type": target_type,
@@ -78,29 +58,16 @@ def create_annotation(payload: dict[str, Any], *, organization_id: str,
         "text": text,
         "author_email": author_email.strip().lower(),
         "created_at": datetime.now(timezone.utc).isoformat(),
-    }
-    if _pss.enabled():
-        _pss.upsert(_COLLECTION, entry["id"], organization_id, entry)
-    else:
-        store = _load_store()
-        store.setdefault("annotations", []).append(entry)
-        _save_store(store)
-    return entry
+    })
 
 
 def delete_annotation(annotation_id: str, *, organization_id: str,
                       requester_email: str, is_admin: bool) -> bool:
     """The author or an admin removes a note; anyone else is refused."""
-    note = next((a for a in _org_annotations(organization_id)
+    note = next((a for a in _store.list(organization_id)
                  if a.get("id") == annotation_id), None)
     if note is None:
         return False
     if not is_admin and note.get("author_email") != requester_email.strip().lower():
         return False
-    if _pss.enabled():
-        return _pss.delete(_COLLECTION, annotation_id, organization_id)
-    store = _load_store()
-    store["annotations"] = [a for a in store.get("annotations", [])
-                            if a.get("id") != annotation_id]
-    _save_store(store)
-    return True
+    return _store.delete(annotation_id, organization_id)

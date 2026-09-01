@@ -10,10 +10,12 @@ from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from api.auth.dependencies import AuthContext, get_auth_context
+from api.notifications import send_message, smtp_configured
 from api.org_db import require_org_for_data
+from api.saved_views import list_saved_views
 from api import report_schedules as rs
 
 router = APIRouter(prefix="/report-schedules", tags=["report-schedules"])
@@ -26,7 +28,6 @@ class ScheduleCreateRequest(BaseModel):
     weekday: int = 0
     hour_utc: int = 13
     window_days: int = 30
-    format: str = "csv"
 
 
 @router.get("")
@@ -34,7 +35,7 @@ def get_schedules(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any
     ctx.require_permission("portal:read")
     org_id = require_org_for_data(ctx)
     return {"schedules": rs.list_schedules(org_id),
-            "smtp_configured": rs.smtp_configured()}
+            "smtp_configured": smtp_configured()}
 
 
 @router.post("")
@@ -74,15 +75,14 @@ def run_now(
     schedule = next((s for s in rs.list_schedules(org_id) if s["id"] == schedule_id), None)
     if schedule is None:
         raise HTTPException(status_code=404, detail="Unknown schedule")
-    if not rs.smtp_configured():
+    if not smtp_configured():
         raise HTTPException(status_code=503, detail="SMTP is not configured on the API")
-    view = rs._find_view(schedule["saved_view_id"], org_id)
+    view = next((v for v in list_saved_views(org_id)
+                 if v.get("id") == schedule["saved_view_id"]), None)
     if view is None:
         raise HTTPException(status_code=400, detail="Saved view no longer exists")
-    now = datetime.now(timezone.utc)
     try:
-        columns, labels, rows = rs.render_schedule(schedule, view)
-        rs._smtp_send(rs._build_message(schedule, rs.rows_to_csv(columns, labels, rows), now))
+        count = rs.deliver(schedule, view, datetime.now(timezone.utc), send_message)
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=502, detail=f"Delivery failed: {exc}") from exc
-    return {"status": "sent", "row_count": len(rows), "recipients": schedule["recipients"]}
+    return {"status": "sent", "row_count": count, "recipients": schedule["recipients"]}

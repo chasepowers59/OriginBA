@@ -3,7 +3,7 @@
  * for the current data shape, null when it can. Unknown shape (count 0 — data
  * not run yet) never blocks: the picker should not fight an empty canvas.
  */
-export const PIE_MAX_CATEGORIES = 30;
+const PIE_MAX_CATEGORIES = 30;
 
 export function visualGuardrail(
   visual: string,

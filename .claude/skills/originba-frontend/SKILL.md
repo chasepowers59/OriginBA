@@ -85,6 +85,12 @@ builder/SQL tabs redirect out). Never add a second builder/SQL/chart surface.
   fences. Vitest (`npm run test`) frontend, unittest backend.
 - **Propagate everywhere**: a change in one place updates its siblings (both brand
   sources, fence + its tests + templates + loader, etc.) in the same commit.
+- **Lean pass before the commit.** Writing the code is not the last step: read it
+  back as a reviewer and DELETE what doesn't earn its place — duplicated logic
+  (factor it to one place), temporary scaffolding and dead branches, and comments
+  that narrate the code or the change instead of stating a constraint. The bar is
+  absolute: tests stay green and behaviour is unchanged. The tests written first
+  are what make the deletion safe.
 - Never run `next build` while `next dev` is live (corrupts `.next`).
 - Verify against real data: local INT_DEV Postgres VPN-free; Ellensburg 25.4 Oracle
   (the authentic C2M validation target) when VPN is on.
