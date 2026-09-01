@@ -16,8 +16,13 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
   const model = metadata.data_model;
   const [rowCount, setRowCount] = useState<number | null>(null);
   const [loadDttm, setLoadDttm] = useState<string | null>(null);
+  // "…" means still fetching. Without this it also meant "there is no such value",
+  // and a dbt canvas has no CDC watermark to report -- so the refresh pill sat at an
+  // ellipsis forever, reading as a load that never finished.
+  const [statsLoaded, setStatsLoaded] = useState(false);
 
   useEffect(() => {
+    setStatsLoaded(false);
     fetchSnapshotStats(metadata.id)
       .then((s) => {
         setRowCount(s.row_count);
@@ -26,7 +31,8 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
       .catch(() => {
         setRowCount(null);
         setLoadDttm(null);
-      });
+      })
+      .finally(() => setStatsLoaded(true));
   }, [metadata.id]);
 
   const workstream =
@@ -90,13 +96,17 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
         <div className="flex flex-wrap gap-3">
           <StatPill
             label="Records in domain"
-            value={rowCount != null ? formatNumber(rowCount) : "…"}
+            value={rowCount != null ? formatNumber(rowCount) : statsLoaded ? "—" : "…"}
           />
-          <StatPill
-            label="Data refreshed"
-            value={loadDttm ? formatDateTime(loadDttm) : "…"}
-            accent
-          />
+          {/* Dropped entirely when the canvas has no watermark: a pill reading
+              "Data refreshed —" is noise, and one reading "…" is a lie. */}
+          {loadDttm || !statsLoaded ? (
+            <StatPill
+              label="Data refreshed"
+              value={loadDttm ? formatDateTime(loadDttm) : "…"}
+              accent
+            />
+          ) : null}
           <StatPill label="Date filter" value={requiredDateLabel(metadata)} small />
         </div>
       </div>
