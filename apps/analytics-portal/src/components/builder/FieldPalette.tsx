@@ -16,11 +16,13 @@ export function FieldPalette({
   activeId,
   meta,
   onSelect,
+  onAddField,
 }: {
   grouped: [string, SnapshotSummary[]][];
   activeId: string;
   meta: SnapshotMetadata | null;
   onSelect: (id: string) => void;
+  onAddField?: (field: import("@/lib/types").FieldDef) => void;
 }) {
   const [q, setQ] = useState("");
   const needle = q.trim().toLowerCase();
@@ -123,7 +125,7 @@ export function FieldPalette({
                               </p>
                               <div className="space-y-1.5">
                                 {g.items.map((f) => (
-                                  <FieldPill key={f.id} field={f} trusted={trusted.has(f.id)} dragId={`palette:${f.id}`} />
+                                  <FieldPill key={f.id} field={f} trusted={trusted.has(f.id)} dragId={`palette:${f.id}`} onActivate={onAddField} />
                                 ))}
                               </div>
                             </div>

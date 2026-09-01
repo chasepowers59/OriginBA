@@ -38,7 +38,7 @@ export function GlobalFilterBar({
             <button
               type="button"
               onClick={onClearScope}
-              className="ml-1 text-fg-muted hover:text-heading"
+              className="-my-2 ml-0.5 -mr-1 rounded p-2 leading-none text-fg-muted hover:text-heading"
               aria-label="Clear scope filter"
             >
               ×
@@ -53,7 +53,7 @@ export function GlobalFilterBar({
             <button
               type="button"
               onClick={onClearDrill}
-              className="ml-1 text-amber-700 dark:text-amber-200/80 hover:text-heading"
+              className="-my-2 ml-0.5 -mr-1 rounded p-2 leading-none text-amber-700 dark:text-amber-200/80 hover:text-heading"
               aria-label="Clear cross-filter"
             >
               ×

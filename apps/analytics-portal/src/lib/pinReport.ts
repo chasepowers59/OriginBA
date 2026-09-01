@@ -9,6 +9,8 @@ export function pinReportUrl(opts: {
   measureAgg?: string;
   dimensions?: string[];
   days?: number;
+  /** Append to this existing dashboard instead of starting a new one. */
+  dashboardId?: string;
 }): string {
   const params = new URLSearchParams({
     pin_snapshot: opts.snapshotId,
@@ -21,5 +23,6 @@ export function pinReportUrl(opts: {
   if (opts.measureAgg) params.set("pin_agg", opts.measureAgg);
   if (opts.dimensions?.length) params.set("pin_dims", opts.dimensions.join(","));
   if (opts.days) params.set("pin_days", String(opts.days));
-  return `/dashboards/new?${params.toString()}`;
+  const base = opts.dashboardId ? `/dashboards/${opts.dashboardId}` : "/dashboards/new";
+  return `${base}?${params.toString()}`;
 }

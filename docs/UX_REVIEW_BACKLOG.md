@@ -1,36 +1,28 @@
-# UX / chart review backlog — 2026-08-31
+# UX / chart review backlog — 2026-08-31 (mediums closed 2026-09-01)
 
 Two review passes (charts, UX/layout) ran over `apps/analytics-portal`. All HIGH
-findings and the quick MEDIUMs were fixed the same day (see commits "Chart review
-fixes…" and "UX review fixes…"). What remains, ranked, so nothing silently drops:
+findings and the quick MEDIUMs were fixed the same day; the remaining ten mediums
+were burned down on 2026-09-01 (tests-first where the logic was pure):
 
-## Medium
+## Medium — ALL FIXED 2026-09-01
 
-- **Tile measure mismatch** — `DashboardTile.tsx` charts the LAST result column but
-  takes label + currency from `measures[0]`; a 2-measure premade report labels one
-  measure with the other's name. Derive label/currency from the charted column.
-- **suggestChart can pick an ID column as measure** — `lib/databaseChartUtils.ts`
-  takes the first ≥60%-numeric column; `ACCT_ID` qualifies (bars of summed account
-  ids). Consult `isIdentifierColumn`, and sample >1 row when picking the dimension.
-- **VisualPicker guardrails** — pie with 200 categories / stacked-* with one series
-  are selectable; disable or warn based on row/series count.
-- **Tile KPI total sums regardless of agg** — a tile aggregated by avg/min/max shows
-  the SUM of group values as its headline. Only total sum/count aggs.
-- **User + mobile menus don't close on outside click** — native `<details>` behaviour;
-  close on blur/outside click/navigation.
-- **Pin can't target an existing dashboard** — pinning always starts a fresh board and
-  a second pin replaces the first (unless saved between). Append to the first free
-  slot; offer "add to existing" now the dashboards list exists.
-- **FieldPill is drag-only** — no click-to-add fallback, no keyboard sensor, no grip
-  affordance. Add onClick → role-appropriate shelf + a ⠿ grip (SlotCell has the
-  pattern); wire dnd-kit's KeyboardSensor.
-- **Tiny × hit-targets** — shelf chips and GlobalFilterBar remove buttons are bare
-  text `×` (well under 24px) beside selects; add padding (`p-1 -m-1`).
-- **Builder data pane** — fixed `h-[560px]` stacks awkwardly below `lg` and can't
-  shrink on short laptops; use max-h + sticky. Save-view confirmation doesn't say
-  where views live, and save ERRORS render in the success-styled slot.
-- **Dashboard save/load has no error surfacing** — `save()` try/finally without
-  catch; `fetchDashboard`/`fetchSnapshots` in the editor likewise. Surface a toast.
+- Tile measure mismatch → `lib/dashboardTileMath.chartedMeasureColumn` (tested):
+  the tile charts the FIRST measure's column, matching its label/currency.
+- suggestChart ID-column measure → consults `isIdentifierColumn`, samples 20 rows
+  for both roles, prefers non-identifier dimensions (`databaseChartUtils.test.ts`).
+- VisualPicker guardrails → `lib/visualGuardrails` (tested): pie >30 slices and
+  single-series stacked visuals disable with a reason tooltip.
+- Tile KPI agg → `kpiHeadline` (tested): sums only sum/count; single ungrouped row
+  passes through; grouped avg/min/max shows — instead of a wrong number.
+- Menus close on outside click + navigation (AppShell pointerdown listener).
+- Pin targets an existing dashboard → PinMenu ("+ New dashboard" / "Add to
+  existing"); pins APPEND to the first free slot and never replace; full board
+  surfaces an error.
+- FieldPill click-to-add (role-routed shelf) + ⠿ grip; Enter works natively.
+- × hit-targets padded to ~24px (negative margins keep the chip size).
+- Builder data pane: max-h + sticky on lg, 320px cap stacked; save confirmation
+  names where views live; save errors render in error styling with role=alert.
+- Dashboard save errors surface in an alert banner (catch added).
 
 ## Low
 

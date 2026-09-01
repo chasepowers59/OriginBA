@@ -1,4 +1,5 @@
 import type { DatabaseQueryTemplate } from "./databaseQueryTemplates";
+import { isIdentifierColumn } from "./format";
 
 export type ChartSuggestion = {
   dimensionKey: string;
@@ -51,24 +52,25 @@ export function suggestChart(
     }
   }
 
-  let dimensionKey: string | null = null;
-  let measureKey: string | null = null;
+  // Identifier columns (ACCT_ID, BSEG_ID…) are never measures — a bar of summed
+  // account ids is nonsense — and only dimension-of-last-resort. Sample several
+  // rows: the first row alone misclassifies a column whose first value is null.
+  const sampleRows = rows.slice(0, 20);
+  const isMostlyNumeric = (col: string) => {
+    const numericCount = sampleRows.filter((r) => isNumericValue(r[col])).length;
+    return numericCount >= Math.max(2, Math.floor(sampleRows.length * 0.6));
+  };
+  const hasCategoryValues = (col: string) =>
+    sampleRows.some((r) => r[col] != null && r[col] !== "" && !isNumericValue(r[col]));
 
-  for (const col of columns) {
-    const sample = rows[0]?.[col];
-    if (!dimensionKey && !isNumericValue(sample)) {
-      dimensionKey = col;
-    }
-  }
+  const categoricalCols = columns.filter(hasCategoryValues);
+  const dimensionKey =
+    categoricalCols.find((c) => !isIdentifierColumn(c)) ?? categoricalCols[0] ?? null;
 
-  for (const col of columns) {
-    if (col === dimensionKey) continue;
-    const numericCount = rows.slice(0, 20).filter((r) => isNumericValue(r[col])).length;
-    if (numericCount >= Math.max(2, Math.floor(rows.slice(0, 20).length * 0.6))) {
-      measureKey = col;
-      break;
-    }
-  }
+  const measureKey =
+    columns.find(
+      (col) => col !== dimensionKey && !isIdentifierColumn(col) && isMostlyNumeric(col),
+    ) ?? null;
 
   if (!dimensionKey || !measureKey) return null;
 

@@ -21,7 +21,7 @@ import { getFavorite } from "@/lib/favorites";
 import { getViewRemote, saveViewRemote } from "@/lib/savedViews";
 import { applyDatePresetConfig, estimatePeriodDays, widenDateRange } from "@/lib/datePresets";
 import { applyProcessGuide } from "@/lib/processGuide";
-import { pinReportUrl } from "@/lib/pinReport";
+import { PinMenu } from "@/components/PinMenu";
 import { useAuth } from "@/components/AuthProvider";
 import { FavoritesPanel } from "./FavoritesPanel";
 import { GlobalFilterBar } from "./GlobalFilterBar";
@@ -571,18 +571,15 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
               Save a copy
             </button>
             {activeReportId ? (
-              <Link
-                href={pinReportUrl({
+              <PinMenu
+                target={{
                   snapshotId: metadata.id,
                   reportId: activeReportId,
                   title: activeReportTitle ?? metadata.label,
                   chartType,
                   days: estimatePeriodDays(dateStart, dateEnd),
-                })}
-                className="btn-ghost block w-full text-center text-xs"
-              >
-                Pin to dashboard
-              </Link>
+                }}
+              />
             ) : null}
           </div>
         ) : null}

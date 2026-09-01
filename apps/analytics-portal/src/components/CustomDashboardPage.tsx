@@ -57,6 +57,8 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     { name: string; headers: string[]; rows: Record<string, unknown>[] }[]
   >([]);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [boardLoaded, setBoardLoaded] = useState(false);
   // Drag distance so a click on a tile's Edit/handle isn't read as a drag.
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
@@ -74,11 +76,15 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       setTitle(d.title);
       setDays(d.days);
       setTiles(d.tiles.length ? d.tiles : [emptyTile(0)]);
+      setBoardLoaded(true);
     });
   }, [dashboardId]);
 
   useEffect(() => {
-    if (dashboardId || pinApplied.current) return;
+    // Pins APPEND to the first free slot — on a fresh board or an existing one
+    // (?pin_* on /dashboards/{id}); a second pin never replaces the first.
+    if (pinApplied.current) return;
+    if (dashboardId && !boardLoaded) return;
     const snapshotId = searchParams.get("pin_snapshot");
     if (!snapshotId) return;
     pinApplied.current = true;
@@ -90,24 +96,34 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     const measureAgg = searchParams.get("pin_agg");
     const pinDims = searchParams.get("pin_dims");
     const pinDays = searchParams.get("pin_days");
-    if (pinDays) setDays(Math.max(1, Number(pinDays) || 30));
-    const slot = SLOTS.find((s) => s === 0) ?? 0;
-    setTiles([
-      {
-        id: crypto.randomUUID(),
-        slot,
-        title: pinTitle,
-        visual,
-        snapshot_id: snapshotId,
-        report_id: reportId,
-        chart_type: chartType,
-        measure_field: measureField,
-        measure_agg: measureAgg,
-        dimensions: pinDims ? pinDims.split(",").filter(Boolean) : undefined,
-      },
-    ]);
-    router.replace("/dashboards/new", { scroll: false });
-  }, [dashboardId, router, searchParams]);
+    if (pinDays && !dashboardId) setDays(Math.max(1, Number(pinDays) || 30));
+    const pinnedTile = (slot: number): DashboardTileDef => ({
+      id: crypto.randomUUID(),
+      slot,
+      title: pinTitle,
+      visual,
+      snapshot_id: snapshotId,
+      report_id: reportId,
+      chart_type: chartType,
+      measure_field: measureField,
+      measure_agg: measureAgg,
+      dimensions: pinDims ? pinDims.split(",").filter(Boolean) : undefined,
+    });
+    setTiles((current) => {
+      // ignore the placeholder empty tile a fresh board starts with
+      // a fresh board starts with one "New tile" placeholder — strip it there,
+      // but never touch a saved board's tiles, whatever they're named
+      const real = dashboardId ? current : current.filter((t) => t.title !== "New tile");
+      const used = new Set(real.map((t) => t.slot));
+      const free = SLOTS.find((sl) => !used.has(sl));
+      if (free === undefined) {
+        setSaveError("This dashboard is full (4 tiles) — remove one before pinning.");
+        return current;
+      }
+      return [...real, pinnedTile(free)];
+    });
+    router.replace(dashboardId ? `/dashboards/${dashboardId}` : "/dashboards/new", { scroll: false });
+  }, [dashboardId, boardLoaded, router, searchParams]);
 
   const tileBySlot = useMemo(() => {
     const map = new Map<number, DashboardTileDef>();
@@ -128,6 +144,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
 
   const save = async () => {
     setSaving(true);
+    setSaveError(null);
     try {
       if (board?.id) {
         const updated = await updateDashboard(board.id, { title, days, tiles });
@@ -137,6 +154,12 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
         setBoard(created);
         window.history.replaceState(null, "", `/dashboards/${created.id}`);
       }
+    } catch (err) {
+      setSaveError(
+        err instanceof Error && err.message
+          ? err.message
+          : "The dashboard could not be saved — check your connection and try again.",
+      );
     } finally {
       setSaving(false);
     }
@@ -203,6 +226,15 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
           </button>
         </div>
       </div>
+
+      {saveError ? (
+        <p
+          role="alert"
+          className="rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-2 text-sm text-red-700 dark:text-red-300"
+        >
+          {saveError}
+        </p>
+      ) : null}
 
       {showNotes && dashboardId ? (
         <NotesDialog
