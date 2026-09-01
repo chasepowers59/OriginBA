@@ -4,6 +4,13 @@ module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
+      // Tailwind's bare `border` utility falls back to gray-200, which is a LIGHT
+      // halo in dark mode. ui/chart.tsx asks for `border-border/50`, and an opacity
+      // modifier cannot be applied to a raw var(), so that class does not generate
+      // and the bare `border` was all that survived -- the tooltip wore a pale
+      // outline against the dark theme. Defaulting the utility to the token means
+      // every bare `border` in the app is theme-aware.
+      borderColor: { DEFAULT: "var(--border)" },
       colors: {
         // Soul Palette V2.1 uses the shadcn token NAMES, and our vendored shadcn
         // components (ui/chart.tsx) style themselves with bg-background,

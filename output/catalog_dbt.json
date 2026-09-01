@@ -18136,7 +18136,7 @@
   },
   "rpt_gl": {
    "data_model": {
-    "columns_traced_to_cisadm": 30,
+    "columns_traced_to_cisadm": 31,
     "domain_table": "rpt_gl",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -18159,6 +18159,7 @@
        "Created Date/Time",
        "Freeze Date/Time",
        "Transferred to GL Date",
+       "GL Extract Batch Code",
        "GL Extract Run Number",
        "Is Extracted to GL",
        "GL Distribution Status",
@@ -18308,6 +18309,10 @@
     {
      "id": "Currency Code",
      "label": "Currency Code"
+    },
+    {
+     "id": "GL Extract Batch Code",
+     "label": "GL Extract Batch Code"
     },
     {
      "id": "Is Extracted to GL",
@@ -18548,7 +18553,15 @@
      "type": "timestamp"
     },
     {
-     "description": "Which run of the GL extract shipped this transaction to the financial system. This is the value a GL file reconciles against. Null until the transaction has been extracted, which is the same population as a null Transferred to GL Date.",
+     "description": "Which configured GL extract shipped this transaction (C1-GLFCX, GL Extract for Oracle Financial Cloud, at the reference client). Run numbers are issued PER BATCH CODE, so this column QUALIFIES the Run Number beside it: reconcile a GL file on the pair, never on the run number alone. Most clients configure a single extract and this reads as a constant; demo25 runs two (C1-GLFCX and GLDL), which is why the column is on the canvas at all.",
+     "group": "finance",
+     "id": "GL Extract Batch Code",
+     "label": "GL Extract Batch Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Which run of the GL extract shipped this transaction to the financial system, numbered WITHIN its GL Extract Batch Code -- read the two together, because run 5 of one extract is a different file from run 5 of another. Null until the transaction has been extracted, which is the same population as a null Transferred to GL Date.",
      "group": "finance",
      "id": "GL Extract Run Number",
      "label": "GL Extract Run Number",
@@ -18758,7 +18771,7 @@
    ],
    "grain": "financial transaction + GL sequence number",
    "grain_description": "One row per financial transaction + GL sequence number",
-   "label": "Gl",
+   "label": "GL",
    "large_domain": false,
    "max_rows": 500,
    "measures": [
@@ -22675,7 +22688,7 @@
    ],
    "grain": "service point",
    "grain_description": "One row per service point",
-   "label": "Premise Sp",
+   "label": "Premise SP",
    "large_domain": false,
    "max_rows": 500,
    "measures": [
@@ -24479,7 +24492,7 @@
    ],
    "grain": "rpt_sa_aged_balance",
    "grain_description": "",
-   "label": "Sa Aged Balance",
+   "label": "SA Aged Balance",
    "large_domain": false,
    "max_rows": 500,
    "measures": [
@@ -26379,7 +26392,7 @@
    ],
    "grain": "to-do entry",
    "grain_description": "One row per to-do entry",
-   "label": "Todo",
+   "label": "To Do",
    "large_domain": false,
    "max_rows": 500,
    "measures": [
