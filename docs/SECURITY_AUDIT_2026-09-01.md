@@ -8,7 +8,22 @@ Standing rules and the isolation model: `.claude/skills/originba-security/SKILL.
 
 ---
 
-## CRITICAL
+## CRITICAL — all four FIXED 2026-09-01
+
+Fixed the same day, each with the failing test written first. Evidence below is
+kept as written so the regression tests can be traced back to the attack.
+
+| # | Fix | Test |
+| --- | --- | --- |
+| C1 | `_SCOPE_FENCES` is now a TOTAL mapping engine→fence in `database_routes`; an unknown engine is refused, not waved through. The legacy path gets `validate_oracle_cisadm_scope` (CISADM only, same Oracle escape-hatch and secrets guards). | `LegacyOracleEngineFenceTests` — every engine fences, the eight audited bypasses blocked, legacy `*_RPT_CURR` still served |
+| C2 | `warehouse_url()` returns **None** for an Oracle-backed org, an unknown org, and any client without its own key; `SHARED_WAREHOUSE_ORGS` is `{dev}`; `DEFAULT_URL` deleted; `_pool` raises rather than letting psycopg2 fall back to libpq defaults. | `tests/test_warehouse_isolation.py` (7) |
+| C3 | All three `/dq/*` routes now `require_permission("portal:read")` and scope with `require_org_for_data`; the shared `default.json` ack bucket is gone. | `tests/test_dq_route_scoping.py` (4) |
+| C4 | The secrets guard is per TABLE, not per name: `SELECT *` blocked on `ci_pay_tndr`, `ci_per`, `ci_acct`, `ci_acct_apay`, and whole-row projection (`row_to_json(t)`, `to_jsonb(t)`, `t::text`, `CAST(t AS text)`) blocked when the alias resolves to one of them. | `SecretsProjectionTests` (4) |
+
+Verified live against the running API after the fix:
+`SELECT micr_id FROM cisadm.ci_pay_tndr` → 400 · `SELECT row_to_json(t) FROM
+cisadm.ci_pay_tndr t` → 400 · `SELECT * FROM cisadm.ci_per` → 400 ·
+`SELECT 1 AS n FROM cisadm.ci_acct` → 200.
 
 ### C1 — The SQL workspace has no fence on the legacy Oracle engine
 `api/database_routes.py:112-118`. `_validate()` runs the syntax check, then applies a

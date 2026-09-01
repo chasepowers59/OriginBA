@@ -105,14 +105,59 @@ def _strip_sql_noise(sql: str) -> str:
 # secrets never are. MICR_ID is bank routing, WEB_PASSWD* are credentials,
 # ALERT_INFO is free-text operational notes. Two layers:
 #   1. any mention of a secret column name is rejected outright;
-#   2. SELECT * against CI_PAY_TNDR (the table that carries MICR_ID) is
-#      rejected — an explicit column list is required there instead.
+#   2. SELECT * against any table that carries one is rejected — an explicit
+#      column list is required there instead;
+#   3. whole-row projection of such a table (row_to_json(t), t::text) is
+#      rejected, because it returns the value without naming the column.
 # ---------------------------------------------------------------------------
 _SECRET_COLUMNS = re.compile(r"\b(micr_id|web_passwd\w*|alert_info)\b", re.IGNORECASE)
-_STAR_ON_TENDER = re.compile(
-    r"\bSELECT\b[^;]*?(?:^|[\s,(])(?:[\w$#]+\s*\.\s*)?\*.*?\bFROM\b[^;]*?\bci_pay_tndr\b",
+
+# Every CISADM table that carries one of those columns. Naming the column is not
+# the only way to read it: `SELECT *` and whole-row projection both return it
+# without ever mentioning it (audit C4), so the guard is per TABLE, not per name.
+_SECRET_TABLES = ("ci_pay_tndr", "ci_per", "ci_acct", "ci_acct_apay")
+_TABLE_ALT = "|".join(_SECRET_TABLES)
+
+_STAR_ON_SECRET_TABLE = re.compile(
+    r"\bSELECT\b[^;]*?(?:^|[\s,(])(?:[\w$#]+\s*\.\s*)?\*.*?\bFROM\b[^;]*?"
+    rf"\b(?:{_TABLE_ALT})\b",
     re.IGNORECASE | re.DOTALL,
 )
+
+# A bare alias fed to a row-composite function or cast returns the WHOLE row as a
+# value: row_to_json(t), to_jsonb(t), t::text, CAST(t AS text). Matched against
+# the alias the statement actually binds to a secret-bearing table, so the same
+# expression over a harmless table stays allowed.
+_ROW_COMPOSITE = re.compile(
+    r"(?:\b(?:row_to_json|to_jsonb|to_json|row|hstore)\s*\(\s*(?P<fn>[\w$#]+)\s*\)"
+    r"|\b(?P<cast>[\w$#]+)\s*::\s*(?:text|varchar|json|jsonb)\b"
+    r"|\bCAST\s*\(\s*(?P<cast2>[\w$#]+)\s+AS\s+(?:text|varchar|json|jsonb)\s*\))",
+    re.IGNORECASE,
+)
+# FROM/JOIN cisadm.ci_per p  ->  {"p": "ci_per", "ci_per": "ci_per"}
+_TABLE_ALIAS = re.compile(
+    rf"\b(?:FROM|JOIN)\s+(?:[\w$#]+\s*\.\s*)?(?P<table>[\w$#]+)"
+    r"(?:\s+(?:AS\s+)?(?P<alias>[A-Za-z_$#][\w$#]*))?",
+    re.IGNORECASE,
+)
+_ALIAS_STOPWORDS = {"where", "group", "order", "having", "join", "on", "limit",
+                    "fetch", "offset", "union", "left", "right", "inner", "outer",
+                    "cross", "full", "using", "and", "or", "as", "start", "connect"}
+
+
+def _secret_bearing_names(cleaned: str) -> set[str]:
+    """Aliases (and bare table names) in this statement that resolve to a table
+    carrying a protected column."""
+    names: set[str] = set()
+    for m in _TABLE_ALIAS.finditer(cleaned):
+        table = m.group("table").lower()
+        if table not in _SECRET_TABLES:
+            continue
+        names.add(table)
+        alias = (m.group("alias") or "").lower()
+        if alias and alias not in _ALIAS_STOPWORDS:
+            names.add(alias)
+    return names
 
 
 def _enforce_secrets(cleaned: str) -> None:
@@ -122,11 +167,22 @@ def _enforce_secrets(cleaned: str) -> None:
             f"'{m.group(1)}' is a protected column (secrets never leave the "
             "database). Select the columns you need explicitly, without it."
         )
-    if _STAR_ON_TENDER.search(cleaned):
+    if _STAR_ON_SECRET_TABLE.search(cleaned):
         raise SqlWorkspaceValidationError(
-            "SELECT * is not allowed on CI_PAY_TNDR (it carries protected "
-            "columns). List the columns you need explicitly."
+            "SELECT * is not allowed on tables that carry protected columns "
+            f"({', '.join(t.upper() for t in _SECRET_TABLES)}). List the columns "
+            "you need explicitly."
         )
+    secret_names = _secret_bearing_names(cleaned)
+    if secret_names:
+        for m in _ROW_COMPOSITE.finditer(cleaned):
+            target = (m.group("fn") or m.group("cast") or m.group("cast2") or "").lower()
+            if target in secret_names:
+                raise SqlWorkspaceValidationError(
+                    "Projecting a whole row from a table with protected columns "
+                    f"('{m.group(0).strip()}') is not allowed — it returns the "
+                    "protected values without naming them. Select columns explicitly."
+                )
 
 
 def _enforce_scope(sql: str, allowed_schemas: tuple[str, ...], deny: re.Pattern,
@@ -205,6 +261,13 @@ _ORACLE_PACKAGES = re.compile(
 _ORACLE_DBLINK = re.compile(r"@\w+", re.IGNORECASE)
 
 
+_ORACLE_EXTRA = (
+    (_ORACLE_DICTIONARY, "data dictionary views"),
+    (_ORACLE_PACKAGES, "PL/SQL packages and network functions"),
+    (_ORACLE_DBLINK, "database links"),
+)
+
+
 def validate_oracle_reporting_scope(sql: str) -> None:
     """Reject in-database workspace SQL outside CISADM + ORIGINBA_REPORTING.
 
@@ -212,12 +275,21 @@ def validate_oracle_reporting_scope(sql: str) -> None:
     Oracle escape hatches (dictionary views, PL/SQL, dblinks) and the internal
     build schemas stay fenced, and secrets are guarded (see _enforce_secrets).
     """
-    _enforce_scope(
-        sql, ("CISADM", "ORIGINBA_REPORTING"), _ORACLE_NON_REPORTING,
-        extra=((_ORACLE_DICTIONARY, "data dictionary views"),
-               (_ORACLE_PACKAGES, "PL/SQL packages and network functions"),
-               (_ORACLE_DBLINK, "database links")),
-    )
+    _enforce_scope(sql, ("CISADM", "ORIGINBA_REPORTING"), _ORACLE_NON_REPORTING,
+                   extra=_ORACLE_EXTRA)
+
+
+def validate_oracle_cisadm_scope(sql: str) -> None:
+    """Reject legacy-workspace SQL outside CISADM.
+
+    The legacy orgs read their *_RPT_CURR snapshots straight out of CISADM and
+    have no ORIGINBA_REPORTING schema, so CISADM is the whole surface. Same
+    Oracle escape hatches, same secrets guard.
+
+    This path had NO fence at all until 2026-09-01 (audit C1) — six of eight
+    orgs, with `database:sql` held by the lowest role.
+    """
+    _enforce_scope(sql, ("CISADM",), _ORACLE_NON_REPORTING, extra=_ORACLE_EXTRA)
 
 
 def wrap_paginated_sql(sql: str, *, offset: int, limit: int, probe_extra: int = 0) -> str:

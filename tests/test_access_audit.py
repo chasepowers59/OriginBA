@@ -79,8 +79,11 @@ class RouteWiringTests(unittest.TestCase):
         from api.database_routes import router as database_router
 
         # another module may flip auth on at import time; pin it per-class
+        # The SQL routes now refuse an org with no warehouse (audit C2), so the
+        # dev org needs one configured before the audit wiring can be exercised.
         cls._env = mock.patch.dict(os.environ, {
-            "PORTAL_AUTH_DISABLED": "true", "PORTAL_DEV_ORGANIZATION": "dev"})
+            "PORTAL_AUTH_DISABLED": "true", "PORTAL_DEV_ORGANIZATION": "dev",
+            "WAREHOUSE_DATABASE_URL": "postgresql://test@localhost/test"})
         cls._env.start()
         init_auth_database()
         app = FastAPI()

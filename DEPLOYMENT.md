@@ -37,7 +37,11 @@ and, for Oracle orgs, needs Instant Client — neither fits Vercel serverless);
   - `PORTAL_AUTH_DATABASE_URL` = the Supabase connection string
   - `PORTAL_AUTH_SECRET` = a 32+ char random secret (JWT signing)
   - `PORTAL_BOOTSTRAP_ADMIN_EMAIL` / `PORTAL_BOOTSTRAP_ADMIN_PASSWORD`
-  - `WAREHOUSE_DATABASE_URL` (shared) and/or `WAREHOUSE_DATABASE_URL_<ORG>` per client
+  - `WAREHOUSE_DATABASE_URL_<ORG>` **per Postgres-backed client** — required. Since
+    the 2026-09-01 isolation fix a client org NEVER inherits the unsuffixed
+    `WAREHOUSE_DATABASE_URL`; that shared key serves the internal `dev` org only, and
+    an org with no key of its own reports "not configured" rather than reading another
+    tenant's database. Oracle-backed orgs use `<ORG>_DB_*` and need no warehouse URL.
   - Oracle orgs only: `<ORG>_DB_*` / `<ORG>_ORACLE_DSN`, `DB_THICK_MODE`, `ORACLE_CLIENT_LIB_DIR`
   - OIDC SSO (optional, Azure AD / Entra): set all four of `OIDC_ISSUER`
     (`https://login.microsoftonline.com/<tenant-id>/v2.0`), `OIDC_CLIENT_ID`,

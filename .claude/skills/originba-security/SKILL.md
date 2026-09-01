@@ -7,7 +7,8 @@ description: The OriginBA client-isolation and data-protection model — how one
 
 Every client's data lives in a different place and must never meet. This file states
 the model, the rules that keep it true, and the audited gaps — so a refactor cannot
-quietly undo a control. Audited 2026-09-01; findings marked OPEN are live.
+quietly undo a control. Audited 2026-09-01: the four CRITICAL findings are fixed
+and regression-tested; the HIGH findings below are still live.
 
 ## The isolation model in one paragraph
 
@@ -28,16 +29,20 @@ header is ignored, never rejected, and never used as a connection detail.
    only for the cron runner; a route calling it is a cross-tenant leak.
 3. **A missing per-org connection is an ERROR, not a fallback.** Falling back to a
    shared warehouse or a `_legacy` credential silently serves tenant A's data to
-   tenant B. (OPEN: C2/H2 below.)
+   tenant B. Enforced for the warehouse (C2 fixed); H2's `_legacy` credential
+   fallback is still open.
 4. **Every SQL path gets a fence.** Both engines, every route. A branch that
-   validates syntax but skips the scope/secrets fence is an open door. (OPEN: C1.)
+   validates syntax but skips the scope/secrets fence is an open door. Enforced:
+   `_SCOPE_FENCES` in `database_routes` is a TOTAL mapping and an unknown engine is
+   refused (C1 fixed) — keep it total when you add an engine.
 5. **Secrets never leave the source.** `MICR_ID`, `WEB_PASSWD*`, `ALERT_INFO`,
    `EXT_ACCT_ID` are dropped or collapsed in dbt staging, must not appear in any
    reporting canvas or portal catalog, and must be unselectable in the workspace —
-   including via `SELECT *` and whole-row projections. (OPEN: C4/H4.)
+   including via `SELECT *` and whole-row projections (C4 fixed). H4 is still open:
+   `ALERT_INFO` remains a queryable dimension in the cisadm catalog.
 6. **Permissions gate every data route.** `ctx.require_permission(...)` or
    `Depends(require_permission(...))`. A route with only `get_auth_context` is
-   unprotected. (OPEN: C3.)
+   unprotected. (C3 fixed for `/dq/*`.)
 7. **A token is an extra factor, never an alternative to a permission.** (OPEN: H1.)
 8. **Real client data never enters git.** Slice files and `docs/screenshots/` are
    gitignored; no hook enforces it, so `git add -f` is the standing risk.
@@ -51,31 +56,31 @@ CTEs that hide the real target, and whole-row projection (`row_to_json(t)`,
 `to_jsonb(t)`, `t::text`) of any table carrying a secret.
 
 Oracle: `ALL_TABLES`/`DBA_*`/`V$*`/`SYS.*`, other schemas, `@dblink`, `UTL_HTTP`,
-`XMLTYPE(t)`, `JSON_OBJECT(*)`. The `oracle_dbt` fence blocks all of these today —
-the legacy `oracle` path does not (C1).
+`XMLTYPE(t)`, `JSON_OBJECT(*)`. Both Oracle fences block all of these:
+`validate_oracle_reporting_scope` (in-database, CISADM + ORIGINBA_REPORTING) and
+`validate_oracle_cisadm_scope` (legacy, CISADM only).
 
-## Audited findings still OPEN (2026-09-01)
+## Audited findings (2026-09-01)
 
-CRITICAL
-- **C1** `database_routes._validate` applies a fence only for `postgres` and
-  `oracle_dbt`; engine `oracle` (6 of 8 orgs, permission held by role `user`) gets
-  none — MICR, `DBA_USERS`, `V$SESSION`, dblink and `UTL_HTTP` are all reachable.
-- **C2** `warehouse_db.warehouse_url()` falls back to a global URL and a hardcoded
-  default, so `warehouse_configured()` is always True and every org resolves to one
-  shared database. `render.yaml` sets only the global key.
-- **C3** `/dq/*` has no permission check, uses the home org instead of the effective
-  one, and reaches that shared warehouse.
-- **C4** The secrets guard blocks column NAMES but not whole-row projection, and its
-  `SELECT *` rule names only `ci_pay_tndr` (not `ci_per`, `ci_acct`).
+**CRITICAL — all four FIXED the same day**, each test-first:
+- **C1** every engine now maps to a fence (`_SCOPE_FENCES` is total; unknown engine
+  is refused). The legacy `oracle` path uses `validate_oracle_cisadm_scope`.
+- **C2** `warehouse_url()` returns None for Oracle orgs, unknown orgs and clients
+  with no key of their own; only `dev` may use the shared URL; no hardcoded default;
+  `_pool` raises rather than letting psycopg2 guess.
+- **C3** `/dq/*` requires `portal:read` and scopes with `require_org_for_data`; no
+  shared ack bucket.
+- **C4** the secrets guard is per TABLE — `SELECT *` and whole-row projection are
+  both blocked on every table carrying a protected column.
 
-HIGH — H1 settings-token bypass on data-source management (also a blind internal
-port scanner); H2 `_legacy` credential fallback; H3 `raw_sql_validator` scopes by
-substring presence; H4 `ALERT_INFO` is a queryable dimension in the cisadm catalog;
-H5 two routes 500 after querying and skip their audit write; H6 the JWT is in a
-non-HttpOnly cookie for 8 hours.
+**STILL OPEN — HIGH:** H1 settings-token bypass on data-source management (also a
+blind internal port scanner); H2 `_legacy` credential fallback; H3
+`raw_sql_validator` scopes by substring presence; H4 `ALERT_INFO` is a queryable
+dimension in the cisadm catalog; H5 two routes 500 after querying and skip their
+audit write; H6 the JWT is in a non-HttpOnly cookie for 8 hours.
+**MEDIUM/LOW:** see the audit document.
 
-Full evidence, MEDIUM/LOW findings and the "already solid" list:
-`docs/SECURITY_AUDIT_2026-09-01.md`.
+Full evidence: `docs/SECURITY_AUDIT_2026-09-01.md`.
 
 ## What genuinely holds (do not re-fix)
 
@@ -94,8 +99,8 @@ sensitive has ever been committed.
   tests. No test anywhere sends `X-Organization-Id`.
 - No HTTP-layer cross-org test exists for any resource; the `*_org_scoped` tests
   prove the store filters, not that the route passes the caller's real org.
-- The fence tests miss every bypass that actually works (C1, C4, unqualified
-  `pg_catalog`, `dblink`).
+- The fence tests now cover C1 and C4, and assert the engine→fence routing. Still
+  uncovered: unqualified `pg_catalog` names (M1) and `dblink`/`pg_read_file` (M2).
 - `api-ci.yml` path filters exclude `scripts/`, `output/` and `apps/`, so a catalog
   regeneration that reintroduces a secret column runs no security test.
 - No pre-commit hook or git hook exists in either repo.

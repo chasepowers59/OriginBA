@@ -25,8 +25,15 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator
 
+from api.snapshot_catalog import org_backend
+
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_URL = "postgres://originba:originba@localhost:5433/originba_training"
+
+# The ONLY org allowed to use the unsuffixed WAREHOUSE_DATABASE_URL. Everything
+# else must name its own key. A shared default is a cross-client data leak: with
+# only the global key set (the shipped render.yaml), every org resolved the same
+# database and warehouse_configured() could never say no (audit C2).
+SHARED_WAREHOUSE_ORGS = frozenset({"dev"})
 
 _pools: dict[str, Any] = {}
 
@@ -47,12 +54,23 @@ def _env(name: str) -> str | None:
     return None
 
 
-def warehouse_url(organization_id: str | None = None) -> str:
+def warehouse_url(organization_id: str | None = None) -> str | None:
+    """This org's Postgres warehouse, or None when it has none.
+
+    None is the honest answer for an Oracle-backed org (demo_db serves those), for
+    an unknown org, and for a client whose own key is unset — never another
+    tenant's database.
+    """
     if organization_id:
+        engine, _ = org_backend(organization_id)
+        if engine != "postgres":
+            return None
         per_tenant = _env(f"WAREHOUSE_DATABASE_URL_{organization_id.upper()}")
         if per_tenant:
             return per_tenant
-    return _env("WAREHOUSE_DATABASE_URL") or DEFAULT_URL
+        if organization_id.lower() not in SHARED_WAREHOUSE_ORGS:
+            return None
+    return _env("WAREHOUSE_DATABASE_URL")
 
 
 def warehouse_configured(organization_id: str | None = None) -> bool:
@@ -89,6 +107,13 @@ def _pool(organization_id: str | None):
     from psycopg2.pool import ThreadedConnectionPool
 
     url = warehouse_url(organization_id)
+    if not url:
+        # psycopg2 with dsn=None falls back to libpq defaults — another way to land
+        # on the wrong database. An org with no warehouse gets an error, not a guess.
+        raise RuntimeError(
+            f"No warehouse is configured for organization '{organization_id}'. "
+            f"Set WAREHOUSE_DATABASE_URL_{(organization_id or '').upper()}."
+        )
     if url not in _pools:
         _pools[url] = ThreadedConnectionPool(1, _pool_max(), dsn=url)
     return _pools[url]

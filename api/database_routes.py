@@ -22,6 +22,7 @@ from api.org_db import require_org_for_data
 from api.snapshot_catalog import org_backend
 from api.sql_workspace_validator import (
     SqlWorkspaceValidationError,
+    validate_oracle_cisadm_scope,
     validate_oracle_reporting_scope,
     validate_reporting_scope,
     validate_workspace_sql,
@@ -109,12 +110,24 @@ def _require_db(org_id: str) -> str:
     return engine
 
 
+# Every engine the router knows MUST map to a fence. A missing branch is not a
+# lenient default, it is an open database (audit C1) — so this is a total mapping
+# and an unknown engine is refused rather than waved through.
+_SCOPE_FENCES = {
+    "postgres": validate_reporting_scope,
+    "oracle_dbt": validate_oracle_reporting_scope,
+    "oracle": validate_oracle_cisadm_scope,
+}
+
+
 def _validate(engine: str, sql: str) -> str:
     validated = validate_workspace_sql(sql)
-    if engine == "postgres":
-        validate_reporting_scope(validated)
-    elif engine == "oracle_dbt":
-        validate_oracle_reporting_scope(validated)
+    fence = _SCOPE_FENCES.get(engine)
+    if fence is None:
+        raise SqlWorkspaceValidationError(
+            f"No scope fence is defined for the '{engine}' engine."
+        )
+    fence(validated)
     return validated
 
 
