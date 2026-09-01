@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "@/components/AuthProvider";
+import { usePortalConfig } from "@/components/PortalThemeProvider";
 import {
   clearDataSourceConnection,
   fetchDataSourceStatus,
@@ -20,7 +20,7 @@ const SOURCE_LABELS: Record<DataSourceStatus["source"], string> = {
 };
 
 export function DataSourceSettings() {
-  const { user: authUser } = useAuth();
+  const portal = usePortalConfig();
   const [status, setStatus] = useState<DataSourceStatus | null>(null);
   const [dbUser, setDbUser] = useState("");
   const [password, setPassword] = useState("");
@@ -92,8 +92,13 @@ export function DataSourceSettings() {
         </p>
         <h1 className="mt-1 text-2xl font-bold text-heading">Settings</h1>
         <p className="mt-2 max-w-2xl text-sm text-fg-muted">
+          {/* The EFFECTIVE organization -- the one this page reads and writes. It used
+              to name the signed-in user's HOME org, so an admin who had switched tenant
+              was told they were configuring one client while every save went to another. */}
           Connect the analytics portal to your Oracle C2M database for{" "}
-          <span className="text-heading">{authUser?.organization_name ?? "your assigned client"}</span>.
+          <span className="text-heading">
+            {portal.organization_name ?? "your assigned client"}
+          </span>.
           Credentials are sent over HTTPS to the API only, encrypted at rest on the server, and never
           written to browser storage or git.
         </p>
