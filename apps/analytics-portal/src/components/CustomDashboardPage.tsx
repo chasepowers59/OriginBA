@@ -24,6 +24,7 @@ import { swapTileSlots } from "@/lib/dashboardSlots";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { DashboardTile } from "./DashboardTile";
 import { PresentationToolbar } from "./PresentationToolbar";
+import { NotesDialog } from "./NotesDialog";
 
 const SLOTS = [0, 1, 2, 3];
 
@@ -41,6 +42,7 @@ function emptyTile(slot: number, snapshotId = "rpt_financial_txn"): DashboardTil
 }
 
 function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
+  const [showNotes, setShowNotes] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pinApplied = useRef(false);
@@ -190,12 +192,26 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {dashboardId ? (
+            <button type="button" onClick={() => setShowNotes(true)} className="btn-ghost">
+              Notes
+            </button>
+          ) : null}
           <PresentationToolbar title={title} exportSections={exportSections} />
           <button type="button" onClick={() => void save()} disabled={saving} className="btn-primary">
             {saving ? "Saving…" : "Save dashboard"}
           </button>
         </div>
       </div>
+
+      {showNotes && dashboardId ? (
+        <NotesDialog
+          targetType="dashboard"
+          targetId={dashboardId}
+          title={title}
+          onClose={() => setShowNotes(false)}
+        />
+      ) : null}
 
       {!dashboardId ? (
         <div className="glass-panel p-4">

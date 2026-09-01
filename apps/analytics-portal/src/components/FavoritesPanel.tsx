@@ -5,11 +5,13 @@ import Link from "next/link";
 import { loadSavedViews, removeViewRemote } from "@/lib/savedViews";
 import type { SavedFavorite } from "@/lib/favorites";
 import { ScheduleDialog } from "@/components/ScheduleDialog";
+import { NotesDialog } from "@/components/NotesDialog";
 
 export function FavoritesPanel({ compact }: { compact?: boolean }) {
   const [favorites, setFavorites] = useState<SavedFavorite[]>([]);
   const [loading, setLoading] = useState(true);
   const [scheduling, setScheduling] = useState<SavedFavorite | null>(null);
+  const [noting, setNoting] = useState<SavedFavorite | null>(null);
 
   const refresh = () => {
     loadSavedViews()
@@ -58,6 +60,14 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
             </Link>
             <button
               type="button"
+              onClick={() => setNoting(fav)}
+              className="shrink-0 text-xs text-fg-muted hover:text-sky-600 dark:hover:text-sky-300"
+              title="Notes on this view"
+            >
+              Notes
+            </button>
+            <button
+              type="button"
               onClick={() => setScheduling(fav)}
               className="shrink-0 text-xs text-fg-muted hover:text-sky-600 dark:hover:text-sky-300"
               title="Email this view on a schedule"
@@ -83,6 +93,14 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
           savedViewId={scheduling.id}
           viewTitle={scheduling.title}
           onClose={() => setScheduling(null)}
+        />
+      ) : null}
+      {noting ? (
+        <NotesDialog
+          targetType="saved_view"
+          targetId={noting.id}
+          title={noting.title}
+          onClose={() => setNoting(null)}
         />
       ) : null}
     </div>

@@ -271,6 +271,35 @@ export function deleteKpiAlert(alertId: string): Promise<void> {
   return fetchJson(`/kpi-alerts/${alertId}`, { method: "DELETE" });
 }
 
+export type Annotation = {
+  id: string;
+  target_type: string;
+  target_id: string;
+  text: string;
+  author_email: string;
+  created_at: string;
+};
+
+export function fetchAnnotations(
+  targetType: string,
+  targetId: string,
+): Promise<{ annotations: Annotation[] }> {
+  const q = new URLSearchParams({ target_type: targetType, target_id: targetId });
+  return fetchJson(`/annotations?${q}`);
+}
+
+export function createAnnotation(body: {
+  target_type: string;
+  target_id: string;
+  text: string;
+}): Promise<Annotation> {
+  return fetchJson("/annotations", { method: "POST", body: JSON.stringify(body) });
+}
+
+export function deleteAnnotation(annotationId: string): Promise<void> {
+  return fetchJson(`/annotations/${annotationId}`, { method: "DELETE" });
+}
+
 export function importSavedViews(
   views: Omit<SavedView, "id" | "client_id" | "saved_at">[],
 ): Promise<{ imported: number; views: SavedView[] }> {
