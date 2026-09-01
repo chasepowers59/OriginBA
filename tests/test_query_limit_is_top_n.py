@@ -49,6 +49,8 @@ def _sql(dialect: str = "postgres", *, time_dim: bool = False, measures=None) ->
         limit=6,
         time_dimensions=[{"field": date_field, "grain": "month"}] if time_dim else None,
         dialect=dialect,
+        # legacy oracle reads CISADM; the canvas dialects read the reporting schema
+        schema="CISADM" if dialect == "oracle" else "reporting",
     )
     return sql
 
@@ -97,6 +99,7 @@ class LimitIsTopNTests(unittest.TestCase):
                 filters=[],
                 limit=6,
                 dialect="postgres",
+                schema="reporting",
             )
 
 

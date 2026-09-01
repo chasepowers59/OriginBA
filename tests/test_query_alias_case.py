@@ -48,6 +48,8 @@ def _sql(dialect: str) -> str:
         limit=100,
         time_dimensions=[{"field": date_field, "grain": "month"}],
         dialect=dialect,
+        # legacy oracle reads CISADM; the canvas dialects read the reporting schema
+        schema="CISADM" if dialect == "oracle" else "reporting",
     )
     return sql
 

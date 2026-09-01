@@ -217,6 +217,55 @@ ORDER BY 1`,
     sortTimeSeries: true,
   },
   {
+    id: "batch_run_status",
+    category: "Operations",
+    title: "Batch runs by status (last 7 days)",
+    description:
+      "Did last night's jobs land? Every batch run in the last week, by outcome, worst first.",
+    tip:
+      "RUN_STATUS is DECODED from CI_LOOKUP_VAL_L, never hand-written: 30 is Error and 40 is Complete, and a CASE that guessed otherwise once reported a failed batch as still running. Both sides are TRIMmed because these are CHAR columns.",
+    sql: `SELECT TRIM(b.run_status)                       AS run_status_cd,
+       NVL(TRIM(l.descr), '(unmapped status)')      AS run_status,
+       COUNT(*)                                     AS runs,
+       COUNT(DISTINCT TRIM(b.batch_cd))             AS distinct_jobs,
+       MAX(b.end_dttm)                              AS latest_end
+FROM CISADM.CI_BATCH_RUN b
+LEFT JOIN CISADM.CI_LOOKUP_VAL_L l
+       ON TRIM(l.field_name) = 'RUN_STATUS'
+      AND TRIM(l.field_value) = TRIM(b.run_status)
+WHERE b.batch_bus_dt >= TRUNC(SYSDATE) - 7
+GROUP BY TRIM(b.run_status), TRIM(l.descr)
+ORDER BY runs DESC`,
+    chartDimension: "RUN_STATUS",
+    chartMeasure: "RUNS",
+    chartType: "bar",
+  },
+  {
+    id: "vee_open_exceptions",
+    category: "Meter ops",
+    title: "Open VEE exceptions by rule",
+    description:
+      "Measurements that failed validation or estimation and are still open — the MDM worklist.",
+    tip:
+      "Severity and open/closed are decoded from CI_LOOKUP_VAL_L (D1IF Information, D1IS Issues, D1TM Terminate). Closed exceptions are history; the open ones are the work.",
+    sql: `SELECT TRIM(e.vee_rule_cd)                       AS vee_rule,
+       NVL(TRIM(s.descr), TRIM(e.excp_severity_flg)) AS severity,
+       COUNT(*)                                      AS open_exceptions
+FROM CISADM.D1_VEE_EXCP e
+LEFT JOIN CISADM.CI_LOOKUP_VAL_L o
+       ON TRIM(o.field_name) = 'OPEN_CLOSE_FLG'
+      AND TRIM(o.field_value) = TRIM(e.open_close_flg)
+LEFT JOIN CISADM.CI_LOOKUP_VAL_L s
+       ON TRIM(s.field_name) = 'EXCP_SEVERITY_FLG'
+      AND TRIM(s.field_value) = TRIM(e.excp_severity_flg)
+WHERE TRIM(o.descr) = 'Open'
+GROUP BY TRIM(e.vee_rule_cd), TRIM(s.descr), TRIM(e.excp_severity_flg)
+ORDER BY open_exceptions DESC`,
+    chartDimension: "VEE_RULE",
+    chartMeasure: "OPEN_EXCEPTIONS",
+    chartType: "horizontal",
+  },
+  {
     id: "peek_ft",
     category: "Quick look",
     title: "Preview FT rows",

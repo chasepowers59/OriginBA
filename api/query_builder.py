@@ -96,8 +96,12 @@ def build_query(
     filters: list[dict[str, Any]],
     limit: int,
     time_dimensions: list[dict[str, Any]] | None = None,
-    dialect: str = "oracle",
-    schema: str = "CISADM",
+    # No defaults: which world a query belongs to is a property of the ORG and the
+    # snapshot (snapshot_backend resolves it), not something to fall back on. Defaulting
+    # to oracle/CISADM meant a caller who forgot got the legacy path silently, in Oracle
+    # syntax, against the wrong schema.
+    dialect: str,
+    schema: str,
 ) -> tuple[str, dict[str, Any]]:
     if limit < 1 or limit > 5000:
         raise QueryValidationError("limit must be between 1 and 5000")
