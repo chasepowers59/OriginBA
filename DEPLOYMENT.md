@@ -47,6 +47,9 @@ and, for Oracle orgs, needs Instant Client — neither fits Vercel serverless);
     `OIDC_POST_LOGIN_URL` (the portal login page, which receives `#sso_token=`).
     The login page shows "Sign in with Microsoft" automatically once `/auth/status`
     reports `oidc_enabled`.
+  - Scheduled report delivery (optional): `SMTP_HOST`/`SMTP_PORT`/`SMTP_USERNAME`/
+    `SMTP_PASSWORD`/`SMTP_FROM`/`SMTP_STARTTLS`, then add an hourly cron job running
+    `python -m api.report_schedule_runner` with the same env (`--dry-run` to verify).
 - Expose HTTPS; note the URL (e.g. `https://originba-api.fly.dev`).
 - Move saved views/dashboards off local JSON to Supabase before scaling past one
   replica (schema in 001_init.sql; the store code is the one remaining backend task —

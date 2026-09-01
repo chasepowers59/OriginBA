@@ -53,6 +53,8 @@ FAKE_DISCOVERY = {
 class OidcSsoTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        # OIDC callbacks need real auth semantics; another module may have disabled it
+        os.environ.pop("PORTAL_AUTH_DISABLED", None)
         init_auth_database()
         app = FastAPI()
         app.include_router(auth_router)

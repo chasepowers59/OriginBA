@@ -198,6 +198,42 @@ export function deleteSavedView(viewId: string): Promise<void> {
   return fetchJson(`/portal/saved-views/${viewId}`, { method: "DELETE" });
 }
 
+export type ReportSchedule = {
+  id: string;
+  saved_view_id: string;
+  view_title?: string | null;
+  recipients: string[];
+  cadence: "daily" | "weekly" | "monthly";
+  weekday: number;
+  hour_utc: number;
+  window_days: number;
+  enabled: boolean;
+  last_run_at?: string | null;
+  last_status?: string | null;
+};
+
+export function fetchReportSchedules(): Promise<{
+  schedules: ReportSchedule[];
+  smtp_configured: boolean;
+}> {
+  return fetchJson("/report-schedules");
+}
+
+export function createReportSchedule(body: {
+  saved_view_id: string;
+  recipients: string[];
+  cadence: string;
+  weekday?: number;
+  hour_utc?: number;
+  window_days?: number;
+}): Promise<ReportSchedule> {
+  return fetchJson("/report-schedules", { method: "POST", body: JSON.stringify(body) });
+}
+
+export function deleteReportSchedule(scheduleId: string): Promise<void> {
+  return fetchJson(`/report-schedules/${scheduleId}`, { method: "DELETE" });
+}
+
 export function importSavedViews(
   views: Omit<SavedView, "id" | "client_id" | "saved_at">[],
 ): Promise<{ imported: number; views: SavedView[] }> {

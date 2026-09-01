@@ -75,6 +75,8 @@ app.include_router(data_source_router)
 app.include_router(database_router)
 from api.dq_routes import router as dq_router
 app.include_router(dq_router)
+from api.report_schedule_routes import router as report_schedule_router
+app.include_router(report_schedule_router)
 
 
 def _require_nlq_access(

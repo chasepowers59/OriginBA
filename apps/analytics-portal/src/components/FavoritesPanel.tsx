@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { loadSavedViews, removeViewRemote } from "@/lib/savedViews";
 import type { SavedFavorite } from "@/lib/favorites";
+import { ScheduleDialog } from "@/components/ScheduleDialog";
 
 export function FavoritesPanel({ compact }: { compact?: boolean }) {
   const [favorites, setFavorites] = useState<SavedFavorite[]>([]);
   const [loading, setLoading] = useState(true);
+  const [scheduling, setScheduling] = useState<SavedFavorite | null>(null);
 
   const refresh = () => {
     loadSavedViews()
@@ -56,6 +58,14 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
             </Link>
             <button
               type="button"
+              onClick={() => setScheduling(fav)}
+              className="shrink-0 text-xs text-fg-muted hover:text-sky-600 dark:hover:text-sky-300"
+              title="Email this view on a schedule"
+            >
+              Schedule
+            </button>
+            <button
+              type="button"
               onClick={async () => {
                 await removeViewRemote(fav.id);
                 refresh();
@@ -68,6 +78,13 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
           </li>
         ))}
       </ul>
+      {scheduling ? (
+        <ScheduleDialog
+          savedViewId={scheduling.id}
+          viewTitle={scheduling.title}
+          onClose={() => setScheduling(null)}
+        />
+      ) : null}
     </div>
   );
 }
