@@ -111,6 +111,21 @@ cold-start after idle; use the Starter plan or Fly for always-on. The API comes 
   never committed). It preflights both and refuses if a MICR column ever reached the layer.
   Do NOT load a real *client* slice (Ellensburg, etc.) into cloud Supabase — data residency.
 
+## Supabase pooler hosts
+
+The pooler host's instance number is **per project, not per region**. Both portal
+projects live in us-east-2 yet resolve differently:
+
+| Project | Pooler host |
+| --- | --- |
+| `psnkxsjpuxgvvjvyenfj` (INT_DEV warehouse, auth + portal_state) | `aws-0-us-east-2.pooler.supabase.com` |
+| `hvnfyulgwpjpeeowzuni` (Demo 25.4 warehouse) | `aws-1-us-east-2.pooler.supabase.com` |
+
+The wrong host fails with `FATAL: (ENOTFOUND) tenant/user postgres.<ref> not found`,
+which reads like a credential error and is not one. To identify the right host without
+the password, connect with a deliberately wrong one: "tenant/user not found" means the
+host is wrong, "password authentication failed" means the host is right.
+
 ## Backups
 `deploy/backup_portal_state.sh [outdir]` dumps the control-plane data users create
 by hand — auth tables + the whole `portal_state` schema (saved views, dashboards,

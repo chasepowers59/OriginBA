@@ -7,7 +7,19 @@
 #     ./deploy/load_demo25_to_supabase.sh
 #
 # Get it from Supabase → Connect → "Session pooler" (IPv4, port 5432) on the
-# DEMO 25.4 PROJECT, not the INT_DEV one. Two reasons this gets its own project:
+# DEMO 25.4 PROJECT, not the INT_DEV one.
+#
+# The pooler host's instance number differs PER PROJECT, not per region: both of
+# these projects are us-east-2, yet INT_DEV is aws-0-us-east-2 and Demo 25.4 is
+# aws-1-us-east-2. Using the wrong one fails with
+#   FATAL: (ENOTFOUND) tenant/user postgres.<ref> not found
+# which reads like a credential problem and is not one. To find the right host
+# without knowing the password, connect with a deliberately wrong one and see
+# which error comes back -- "tenant/user not found" means wrong HOST, "password
+# authentication failed" means right host:
+#   for h in aws-0-us-east-2 aws-1-us-east-2; do
+#     psql "postgresql://postgres.<ref>:wrong@$h.pooler.supabase.com:5432/postgres" -c "select 1"
+#   done Two reasons this gets its own project:
 #   - the two instances share ID space (an ACCT_ID already collides), so blending
 #     them into one set of tables would corrupt both;
 #   - each free project has its own 500 MB, and per-org warehouse URLs are how the
