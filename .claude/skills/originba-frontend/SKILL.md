@@ -82,7 +82,11 @@ builder/SQL tabs redirect out). Never add a second builder/SQL/chart surface.
 ## Working discipline
 
 - **Tests first** (red → green) for any pure logic: formatters, ramps, swap logic,
-  fences. Vitest (`npm run test`) frontend, unittest backend.
+  fences. Frontend `npm run test` (vitest); backend `pytest tests/ -q` from the
+  repo root — pytest collects BOTH the unittest.TestCase modules and the
+  pytest-style ones, so a bare `python -m unittest` silently errors on two files.
+  Install with `pip install -r deploy/requirements-dev.txt`. Both suites gate CI
+  (portal-ci, api-ci).
 - **Propagate everywhere**: a change in one place updates its siblings (both brand
   sources, fence + its tests + templates + loader, etc.) in the same commit.
 - **Lean pass before the commit.** Writing the code is not the last step: read it
