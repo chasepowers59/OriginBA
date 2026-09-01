@@ -28,10 +28,10 @@ source of truth.
 | Cross-filter / drill interactions | ✅ | click-to-filter across tiles |
 | Export: CSV | ✅ | tables + SQL results |
 | Export: PDF | 🟡 | council/lineage print packs; no per-chart PDF |
-| Export: true Excel (.xlsx) | ❌ | "Export Excel pack" writes CSV — misleading label |
-| **Scheduled report delivery (email/subscriptions)** | ❌ | the #1 asked-for feature in utility reporting shops |
-| Alerting on thresholds (KPI breach → notify) | ❌ | DQ alerts exist for the *pipeline* (qa_alert), not for business KPIs |
-| Annotations / commentary on reports | ❌ | analysts explain variances; nowhere to write it down |
+| Export: true Excel (.xlsx) | ✅ | SheetJS workbook: typed numbers, True/False booleans, one sheet per dashboard section |
+| **Scheduled report delivery (email/subscriptions)** | ✅ | saved view → CSV email on a cadence; hourly cron runner (`api.report_schedule_runner`), SMTP env |
+| Alerting on thresholds (KPI breach → notify) | ✅ | KPI alerts (value/pct-change thresholds), notify once per breach; same runner |
+| Annotations / commentary on reports | ✅ | notes on saved views + dashboards; author-or-admin delete |
 | Report versioning / history | ❌ | saved views overwrite silently |
 
 ## C. Enterprise / IT requirements
@@ -40,11 +40,11 @@ source of truth.
 |---|---|---|
 | RBAC (roles, workstream scoping) | ✅ | user/editor/admin + workstream groups |
 | Audit log of admin actions | 🟡 | auth events logged; report/query access is not |
-| **SSO (SAML/OIDC — Azure AD is the utility default)** | ❌ | password-only today; enterprise blocker for real rollouts |
-| MFA | ❌ | comes largely free with SSO |
+| **SSO (SAML/OIDC — Azure AD is the utility default)** | ✅ | OIDC auth-code flow (`/auth/oidc/*`), JIT provisioning as role user, Microsoft button on login |
+| MFA | 🟡 | inherited via the IdP when SSO is on; no native MFA for password logins |
 | Session/password policy controls | 🟡 | expiry + forced change exist; no lockout/policy UI |
 | Deployment shapes (cloud demo / on-prem / in-database) | ✅ | Vercel+Render+Supabase and OKE/VPN paths |
-| Backup/restore & environment promotion | 🟡 | dbt rebuilds are reproducible; portal state (views/boards) needs a backup story |
+| Backup/restore & environment promotion | ✅ | `deploy/backup_portal_state.sh` dumps auth tables + portal_state nightly; dbt rebuilds the warehouse |
 | Accessibility (WCAG) | 🟡 | contrast now audited; keyboard DnD + screen-reader pass not done |
 | Mobile usability | 🟡 | nav now works on phones; dashboards usable, builder is desktop-first (fine) |
 
@@ -61,21 +61,14 @@ source of truth.
 
 ## Ranked gaps (the actual roadmap)
 
-1. **SSO/OIDC (Azure AD)** — the enterprise gate. No utility IT department approves a
-   password-only analytics tool at rollout. MFA rides along.
-2. **Scheduled report delivery** — saved view/dashboard → PDF/CSV on a cron → email.
-   The single most-used feature of legacy utility reporting stacks; also what lets the
-   portal replace emailed spreadsheets.
-3. **True .xlsx export** (and fix the "Excel pack" label until then) — utility finance
-   lives in Excel; CSV loses types and formatting.
-4. **KPI threshold alerts** — reuse the DQ engine's shape: rule + threshold + notify;
-   the exec KPIs are already computed on a schedule.
-5. **Brand font decision** — get the font name from Origin's brand guide, load via
-   next/font with licensed files, swap the Inter default.
-6. **Query/report access audit** — extend the existing audit log to report runs and
-   SQL statements (compliance ask in regulated utilities).
-7. **Report annotations** — a comments field on saved views/dashboard tiles.
+Shipped 2026-09 (all tests-first): 1 SSO/OIDC (JIT provisioning, Microsoft button),
+2 scheduled report delivery (CSV email on a cadence, hourly runner), 3 true .xlsx
+export, 4 KPI threshold alerts (notify once per breach), 5 Aptos brand font,
+6 query/report access audit (report runs + SQL executes + fence refusals),
+7 report annotations (saved views + dashboards), 10 portal-state backup script.
+
+Remaining:
+
 8. **UX backlog burn-down** — docs/UX_REVIEW_BACKLOG.md mediums.
 9. **Accessibility pass** — keyboard field-add in the builder (also in the backlog),
    focus states, aria labels on charts.
-10. **Portal-state backup** — pg_dump of portal_state/auth schemas on a schedule.
