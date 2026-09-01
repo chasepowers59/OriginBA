@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { fetchReportLibrary } from "@/lib/api";
 import { reportShape } from "@/lib/reportShape";
 import type { ReportLibraryPack, ReportLibraryEntry } from "@/lib/types";
@@ -22,6 +23,11 @@ export function ReportLibrary() {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // The workstream rail beside this list is a filter, not a second navigation: picking
+  // "Collections & Debt" should narrow what is on screen, which is what a reader expects
+  // of a tree sitting next to a list. It rides in the URL so it survives a reload and a
+  // shared link, and composes with the search box rather than fighting it.
+  const workstreamFilter = useSearchParams().get("workstream");
 
   useEffect(() => {
     fetchReportLibrary()
@@ -45,6 +51,7 @@ export function ReportLibrary() {
       .map((pack) => ({
         pack,
         reports: pack.reports.filter((r) => {
+          if (workstreamFilter && r.workstream !== workstreamFilter) return false;
           if (!needle) return true;
           const haystack = [
             r.title,
@@ -59,7 +66,7 @@ export function ReportLibrary() {
         }),
       }))
       .filter((group) => group.reports.length > 0);
-  }, [packs, activePack, query]);
+  }, [packs, activePack, query, workstreamFilter]);
 
   const shown = results.reduce((n, g) => n + g.reports.length, 0);
 
@@ -101,7 +108,7 @@ export function ReportLibrary() {
               className="input-modern w-full sm:max-w-sm"
             />
             <p className="text-xs text-fg-muted" aria-live="polite">
-              {query.trim()
+              {query.trim() || workstreamFilter
                 ? `${shown} of ${totalReports} reports match`
                 : `${totalReports} reports across ${packs.length} packs`}
             </p>
@@ -131,7 +138,11 @@ export function ReportLibrary() {
 
           {results.length === 0 ? (
             <div className="glass-panel p-8 text-center">
-              <p className="text-sm text-heading">No report matches “{query.trim()}”.</p>
+              <p className="text-sm text-heading">
+                {query.trim()
+                  ? `No report matches “${query.trim()}”${workstreamFilter ? " in this workstream" : ""}.`
+                  : "No reports in this workstream."}
+              </p>
               <p className="mt-1 text-xs text-fg-muted">
                 Try a broader word, or build the question yourself in Explore.
               </p>

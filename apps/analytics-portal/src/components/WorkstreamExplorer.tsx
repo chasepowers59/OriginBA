@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { WORKSTREAM_DESCRIPTIONS, workstreamDisplayName } from "@/lib/businessLabels";
 import { exploreUrl } from "@/lib/processGuide";
 import { workstreamIcon } from "@/lib/workstreamIcons";
+import { groupByDomain } from "@/lib/workstreamDomains";
 import type { BusinessProcess, SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 import { SnapshotCard } from "./HomeDashboard";
 
@@ -75,15 +76,19 @@ export function WorkstreamExplorer({
 export function WorkstreamSidebarNav({
   workstreams,
   activeId,
+  filterMode,
 }: {
   workstreams: WorkstreamGroup[];
   activeId?: string;
+  /** On Library the rail FILTERS the page instead of navigating away from it. */
+  filterMode?: boolean;
 }) {
   const searchParams = useSearchParams();
   return (
     <WorkstreamSidebar
       workstreams={workstreams}
-      activeId={activeId}
+      activeId={activeId ?? (filterMode ? searchParams.get("workstream") ?? undefined : undefined)}
+      filterMode={filterMode}
       activeProcessId={searchParams.get("process") ?? undefined}
       activeReportId={searchParams.get("report") ?? undefined}
     />
@@ -111,11 +116,13 @@ export function WorkstreamSidebar({
   activeId,
   activeProcessId,
   activeReportId,
+  filterMode,
 }: {
   workstreams: WorkstreamGroup[];
   activeId?: string;
   activeProcessId?: string;
   activeReportId?: string;
+  filterMode?: boolean;
 }) {
   const [expandedWs, setExpandedWs] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(workstreams.map((ws) => [ws.id, true])),
@@ -151,8 +158,28 @@ export function WorkstreamSidebar({
         onChange={(e) => setQuery(e.target.value)}
         className="input-modern mb-3 text-xs"
       />
-      <div className="max-h-[calc(100vh-320px)] space-y-3 overflow-y-auto pr-1">
-        {filteredWorkstreams.map((ws) => {
+      {filterMode && activeId ? (
+        <Link
+          href="/reports"
+          className="mb-3 flex items-center justify-between rounded-lg bg-chip px-3 py-2 text-xs text-heading"
+        >
+          <span>Filtered to one workstream</span>
+          <span className="text-fg-muted">Clear ×</span>
+        </Link>
+      ) : null}
+      <div className="max-h-[calc(100vh-320px)] space-y-4 overflow-y-auto pr-1">
+        {groupByDomain(filteredWorkstreams).map((domain) => (
+        <div key={domain.id}>
+          {/* C side / M side / shared -- the shape of C2M, which a flat list of nine
+              workstreams hid from anyone who did not already know it. */}
+          <p
+            className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-fg-subtle"
+            title={domain.hint}
+          >
+            {domain.label}
+          </p>
+          <div className="space-y-3">
+        {domain.workstreams.map((ws) => {
         const wsOpen = expandedWs[ws.id] ?? true;
         const processes = ws.processes ?? [];
         return (
@@ -164,11 +191,17 @@ export function WorkstreamSidebar({
             >
               <span className="text-primary">{workstreamIcon(ws.id)}</span>
               <Link
-                href={`/workstream/${ws.id}`}
+                href={filterMode ? `/reports?workstream=${ws.id}` : `/workstream/${ws.id}`}
                 onClick={(e) => e.stopPropagation()}
-                className="flex-1 hover:text-primary"
+                aria-current={activeId === ws.id ? "true" : undefined}
+                className={`flex-1 hover:text-primary ${
+ activeId === ws.id ? "text-primary" : ""
+ }`}
               >
                 {ws.label ?? workstreamDisplayName(ws.id)}
+                {typeof ws.snapshot_count === "number" ? (
+                  <span className="ml-1 font-normal opacity-60">({ws.snapshot_count})</span>
+                ) : null}
               </Link>
               <span className="text-fg-muted">{wsOpen ? "▾" : "▸"}</span>
             </button>
@@ -224,6 +257,9 @@ export function WorkstreamSidebar({
           </div>
         );
       })}
+          </div>
+        </div>
+        ))}
         {filteredWorkstreams.length === 0 ? (
           <p className="text-xs text-fg-muted">No processes match your search.</p>
         ) : null}

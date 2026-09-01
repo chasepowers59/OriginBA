@@ -37,7 +37,7 @@ export default async function ReportsPage() {
               Workstreams
             </p>
             <Suspense fallback={<WorkstreamSidebar workstreams={workstreams} />}>
-              <WorkstreamSidebarNav workstreams={workstreams} />
+              <WorkstreamSidebarNav workstreams={workstreams} filterMode />
             </Suspense>
           </div>
         </aside>
