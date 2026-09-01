@@ -20,9 +20,12 @@ import type { PortalOrganization } from "../lib/auth";
 export default function OrgSwitcher({
   role,
   homeOrganizationId,
+  className = "hidden min-w-0 shrink-0 items-center gap-1.5 xl:flex",
 }: {
   role: string;
   homeOrganizationId?: string | null;
+  /** The app bar has room for this only at xl; below that it rides in the user menu. */
+  className?: string;
 }) {
   const [orgs, setOrgs] = useState<PortalOrganization[]>([]);
   const [active, setActive] = useState<string>("");
@@ -60,7 +63,7 @@ export default function OrgSwitcher({
 
   return (
     <label
-      className="hidden items-center gap-1.5 lg:flex"
+      className={className}
       title={viewingOther ? "Admin: viewing another client's tenant" : "Admin: view another client"}
     >
       {/* Viewing someone else's tenant should never look like the default state:
@@ -72,7 +75,10 @@ export default function OrgSwitcher({
         value={active}
         onChange={(e) => choose(e.target.value)}
         aria-label="Client organization"
-        className={`max-w-[180px] truncate rounded-lg border px-2 py-1.5 text-sm ${
+        // min-w-0 is load-bearing: a select defaults to min-width:auto, so it refuses to
+        // shrink below its longest option and overflows the header's flex box instead of
+        // truncating -- it sat on top of the Home and Explore nav links between lg and 2xl.
+        className={`w-full min-w-[7.5rem] max-w-[180px] truncate rounded-lg border px-2 py-1.5 text-sm ${
  viewingOther
  ? "border-warn bg-warn-bg font-medium text-warn"
  : "border-edge-subtle bg-chip text-fg"

@@ -5,6 +5,7 @@ import { MiniSparkChart } from "./MiniSparkChart";
 import { KpiCompareBadge } from "./KpiCompareBadge";
 import { formatCurrency, formatNumber } from "@/lib/format";
 import { workstreamDisplayName } from "@/lib/businessLabels";
+import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
 import type { ExecutiveKpi } from "@/lib/types";
 
 type DashboardWidgetProps = {
@@ -79,7 +80,12 @@ export function DashboardWidget({
       {!compact ? (
         <div className="px-2 pb-2 pt-1">
           <MiniSparkChart
-            points={kpi.trend}
+            points={orderChartRows(
+              kpi.trend,
+              "label",
+              ["value"],
+              isOrderedAxis(kpi.trend_dimension),
+            )}
             format={kpi.format}
             height={130}
             selectedLabel={selectedTrendLabel}

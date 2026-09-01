@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/chart";
 import { formatCurrency, formatNumber, formatTooltipNumber } from "@/lib/format";
 import { valueRampColors } from "@/lib/chartEmphasis";
+import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
 import { useColorMode } from "@/components/PortalThemeProvider";
 
 export type BuilderVisual =
@@ -90,11 +91,13 @@ export function BuilderChart({
       for (const s of series) row[s.key] = Number(r[s.key] ?? 0);
       return row;
     });
-    if (sortTimeSeries) {
-      return [...mapped].sort((a, b) => String(a[xKey]).localeCompare(String(b[xKey])));
-    }
-    return mapped;
-  }, [rows, xKey, series, sortTimeSeries]);
+    return orderChartRows(
+      mapped,
+      xKey,
+      series.map((s) => s.key),
+      sortTimeSeries || isOrderedAxis(xLabel),
+    );
+  }, [rows, xKey, xLabel, series, sortTimeSeries]);
 
   const anyCurrency = series.some((s) => s.currency);
   // Axis ticks COMPACT ($12.3M) so they fit the axis width; tooltips show the full

@@ -475,7 +475,16 @@ export function VisualBuilder({
                 ) : visual === "table" ? (
                   <ResultTable result={result} booleanCols={booleanCols} />
                 ) : (
-                  <BuilderChart rows={result?.rows ?? []} xKey={xKey} xLabel={xLabel} series={series} visual={visual} />
+                  <BuilderChart
+                    rows={result?.rows ?? []}
+                    xKey={xKey}
+                    xLabel={xLabel}
+                    series={series}
+                    visual={visual}
+                    // xKey is the time dimension whenever the shelf holds one, and a date
+                    // axis has to read chronologically rather than ranked by size.
+                    sortTimeSeries={cols.some((c) => c.kind === "time")}
+                  />
                 )}
               </div>
             </div>

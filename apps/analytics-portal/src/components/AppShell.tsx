@@ -167,6 +167,13 @@ export function AppShell({
                     {roleLabel(user.role)}
                     {user.organization_name ? ` · ${user.organization_name}` : ""}
                   </p>
+                  {/* The bar only has room for the switcher at xl; without this an admin
+                      on a narrower screen has no way to change tenant at all. */}
+                  <OrgSwitcher
+                    role={user.role}
+                    homeOrganizationId={user.organization_id ?? null}
+                    className="mt-2 flex min-w-0 items-center gap-1.5 xl:hidden"
+                  />
                   <p className="portal-text-subtle mt-2 border-t border-edge-subtle pt-2 text-xs">
                     {workstreams.length} workstreams · {snapshots.length} reporting tables
                   </p>
