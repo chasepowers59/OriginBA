@@ -56,12 +56,30 @@ for d in /opt/homebrew/opt/postgresql@16/bin /opt/homebrew/opt/postgresql@17/bin
 done
 command -v pg_dump >/dev/null || { echo "pg_dump not found (brew install postgresql@16)"; exit 1; }
 
+# Supabase enforces a statement_timeout, and a bulk COPY runs well past it:
+#   ERROR: canceling statement due to statement timeout
+#   CONTEXT: COPY d1_init_msrmt_data, line 7740
+# Lift it for THIS session only (server-side, set at connect) so every load step
+# below inherits it. Nothing persists on the database.
+export PGOPTIONS="${PGOPTIONS:-} -c statement_timeout=0 -c idle_in_transaction_session_timeout=0"
+
 SRC=(-h "$SRC_HOST" -p "$SRC_PORT" -U "$SRC_USER" -d "$SRC_DB")
 # The same two facts are giant on BOTH sides: the landing tables and the canvases
 # built from them. Capping only the cisadm pair would still ship a 3.5M-row
 # rpt_measurement.
 BIG=(cisadm.d1_msrmt cisadm.ci_batch_run cisadm.d1_init_msrmt_data
      reporting.rpt_measurement reporting.rpt_batch)
+
+# A failed run leaves a half-loaded target, and this script is not incremental, so
+# it starts from a known-empty state every time. This DROPS cisadm and reporting on
+# the TARGET only -- safe here because Demo 25.4 owns its project, and the reason it
+# owns one. Set KEEP_TARGET=1 to skip (then the load must be into an empty database).
+if [ "${KEEP_TARGET:-0}" != "1" ]; then
+  echo "0/4  Resetting target schemas (cisadm, reporting)…"
+  psql "$TARGET_DB_URL" -v ON_ERROR_STOP=1 -q \
+    -c "drop schema if exists cisadm cascade" \
+    -c "drop schema if exists reporting cascade"
+fi
 
 echo "1/4  Structure (cisadm + reporting)…"
 pg_dump "${SRC[@]}" -n cisadm -n reporting --schema-only --no-owner --no-privileges \
@@ -75,8 +93,11 @@ pg_dump "${SRC[@]}" -n cisadm -n reporting --data-only --no-owner --no-privilege
 
 echo "3/4  Capped tables (newest ${MSRMT_CAP} measurements, ${BATCH_CAP} batch runs)…"
 copy_capped() {  # <source select> <target table>
+  # SET as well as PGOPTIONS: this is the step that actually hit the timeout, and a
+  # session-level SET holds for the \copy that follows it in the same psql session.
   psql "${SRC[@]}" -v ON_ERROR_STOP=1 -qAt -c "\\copy ($1) TO STDOUT" \
-    | psql "$TARGET_DB_URL" -v ON_ERROR_STOP=1 -q -c "\\copy $2 FROM STDIN"
+    | psql "$TARGET_DB_URL" -v ON_ERROR_STOP=1 -q \
+        -c "SET statement_timeout = 0" -c "\\copy $2 FROM STDIN"
 }
 copy_capped "SELECT * FROM cisadm.d1_msrmt ORDER BY msrmt_dttm DESC LIMIT ${MSRMT_CAP}" cisadm.d1_msrmt
 copy_capped "SELECT * FROM cisadm.ci_batch_run ORDER BY batch_bus_dt DESC LIMIT ${BATCH_CAP}" cisadm.ci_batch_run
