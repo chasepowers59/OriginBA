@@ -102,7 +102,12 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  /* Brand typography: Aptos (Origin's face, the M365 default) when installed
+     locally — every Microsoft-shop user has it — falling back to the bundled Inter.
+     To ship Aptos as a webfont later, drop licensed .woff2 files into src/app/fonts
+     and switch to next/font/local; the stack order stays the same. */
+  font-family: "Aptos", "Aptos Display", var(--font-inter), ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", sans-serif;
   min-height: 100vh;
 }
 
