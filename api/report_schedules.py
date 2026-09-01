@@ -123,12 +123,15 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
     backend, dialect, schema = snapshot_backend(snapshot, org_id)
 
     filters: list[dict[str, Any]] = []
-    date_field = snapshot.get("required_date_field")
+    date_field = schedule_date_field(snapshot)
+    end = datetime.now(timezone.utc).date()
+    window_days = int(schedule.get("window_days") or 30)
     if date_field:
-        end = datetime.now(timezone.utc).date()
-        start = end - timedelta(days=int(schedule.get("window_days") or 30))
+        start = end - timedelta(days=window_days)
         filters.append({"field": date_field, "op": "between",
                         "value": [start.isoformat(), end.isoformat()]})
+    # The email quotes THIS, written where the filter is decided, so the two cannot drift.
+    schedule["window_note"] = window_sentence(date_field, window_days, end.isoformat())
     if view.get("scope_field") and view.get("scope_value") is not None:
         filters.append({"field": view["scope_field"], "op": "eq",
                         "value": view["scope_value"]})
@@ -178,13 +181,36 @@ def rows_to_csv(columns: list[str], labels: dict[str, str],
     return buf.getvalue()
 
 
+def schedule_date_field(snapshot: dict[str, Any]) -> str | None:
+    """The date a scheduled report should window on.
+
+    `required_date_field` alone was a CISADM-era read: no dbt canvas sets one, so the
+    window was never applied on a canvas-backed org and the subscriber got the whole
+    table while the email said "trailing 30 days". Every canvas declares
+    `default_date_field`; the KPI runner and NLQ metrics already fall back to it.
+    """
+    return snapshot.get("required_date_field") or snapshot.get("default_date_field") or None
+
+
+def window_sentence(date_field: str | None, window_days: int, as_of: str) -> str:
+    """Describe the window that was ACTUALLY applied.
+
+    Names the field as well as the span: "trailing 30 days" is ambiguous on a canvas
+    carrying eight date columns, and a reader who cannot tell which one was windowed
+    cannot check the number.
+    """
+    if not date_field:
+        return "Data window: all rows — this canvas carries no date to window on."
+    return f"Data window: trailing {window_days} days on {date_field}, as of {as_of}."
+
+
 def _message(schedule: dict[str, Any], csv_text: str, now: datetime):
     title = schedule.get("view_title") or schedule.get("snapshot_id") or "Report"
     msg = build_message(
         f"{title} — {now.date().isoformat()}",
         schedule.get("recipients", []),
         f"Scheduled report: {title}\n"
-        f"Data window: trailing {schedule.get('window_days', 30)} days as of {now.date()}.\n\n"
+        f"{schedule.get('window_note') or ''}\n\n"
         "The data is attached as CSV. Open the portal for the interactive view.\n")
     safe = re.sub(r"[^A-Za-z0-9_-]+", "_", str(title))[:60] or "report"
     msg.add_attachment(csv_text.encode("utf-8"), maintype="text", subtype="csv",
