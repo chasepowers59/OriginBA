@@ -6,11 +6,8 @@ import { fetchSnapshotStats } from "@/lib/api";
 import { formatDateTime, formatNumber } from "@/lib/format";
 import type { SnapshotMetadata } from "@/lib/types";
 import { snapshotDetailLine, snapshotSubtitle } from "@/lib/snapshot";
-import {
-  requiredDateLabel,
-  snapshotSummary,
-  workstreamDisplayName,
-} from "@/lib/businessLabels";
+import { snapshotSummary, workstreamDisplayName } from "@/lib/businessLabels";
+import { dateScope } from "@/lib/dateScope";
 
 export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
   const model = metadata.data_model;
@@ -38,6 +35,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
   const workstream =
     metadata.workstream_label ?? workstreamDisplayName(metadata.workstream);
   const summary = snapshotSummary(metadata);
+  const scope = dateScope(metadata);
 
   return (
     <div className="no-print glass-panel relative animate-slide-up overflow-hidden p-6">
@@ -107,7 +105,9 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
               accent
             />
           ) : null}
-          <StatPill label="Date filter" value={requiredDateLabel(metadata)} small />
+          {/* Only claim a date filter when the canvas really has one; otherwise name
+              the date it works in by default, which is something the reader can use. */}
+          {scope ? <StatPill label={scope.label} value={scope.value} small /> : null}
         </div>
       </div>
     </div>

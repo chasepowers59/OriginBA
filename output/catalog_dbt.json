@@ -925,11 +925,11 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "persons linked to accounts, with their billing preferences",
+   "summary": "persons linked to accounts, with their billing preferences.",
    "table_name": "rpt_account_person",
    "trusted_measures": [],
    "usage_guidance": null,
-   "use_case": "Its own canvas rather than folded into rpt_customer_account because an account can",
+   "use_case": "Its own canvas rather than folded into rpt_customer_account because an account can hold several persons (main customer, spouse, landlord, third-party payor) and each carries its own bill routing and notification preferences.",
    "workstream": "customer_ops",
    "workstream_label": "Customer Operations"
   },
@@ -1451,7 +1451,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "asset locations with their hierarchy",
+   "summary": "asset locations with their hierarchy.",
    "table_name": "rpt_asset_location",
    "trusted_measures": [
     "Hierarchy Depth",
@@ -1459,7 +1459,7 @@
     "Geo Longitude"
    ],
    "usage_guidance": null,
-   "use_case": "Oracle's WAM asset analyses slice by \"Location parent hierarchy levels 1-10\", so the",
+   "use_case": "Oracle's WAM asset analyses slice by \"Location parent hierarchy levels 1-10\", so the ancestry is flattened into columns here rather than left as a parent pointer: a report cannot group by level 3 if reaching level 3 needs a recursive walk\u2026",
    "workstream": "assets",
    "workstream_label": "Asset Operations"
   },
@@ -1729,7 +1729,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "Common / Operations \u2014 Batch run monitoring. Grain: batch code + run number.",
+   "summary": "Batch run monitoring.",
    "table_name": "rpt_batch",
    "trusted_measures": [
     "Run Number",
@@ -2318,7 +2318,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "bills as C2M sees them. Grain: Bill ID",
+   "summary": "bills as C2M sees them.",
    "table_name": "rpt_bill",
    "trusted_measures": [
     "Days To Complete",
@@ -2330,7 +2330,7 @@
     "SA Count (Bill)"
    ],
    "usage_guidance": null,
-   "use_case": "through their segments, which answers per-service questions but not the billing",
+   "use_case": "The first bill-grain canvas (wave 2, 2026-08-25). Bills previously surfaced only through their segments, which answers per-service questions but not the billing manager's operational one: is the billing engine keeping up?",
    "workstream": "common",
    "workstream_label": "Operations & Shared Services"
   },
@@ -2660,14 +2660,14 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "the prices behind the rules",
+   "summary": "the prices behind the rules.",
    "table_name": "rpt_bill_factor_price",
    "trusted_measures": [
     "Value",
     "Calculation Rule Count"
    ],
    "usage_guidance": null,
-   "use_case": "rpt_rate_configuration says a rule multiplies by bill factor X; this says what X is",
+   "use_case": "rpt_rate_configuration says a rule multiplies by bill factor X; this says what X is worth, and when.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -4785,7 +4785,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "bill segment summary: AMOUNT and USAGE together",
+   "summary": "bill segment summary: AMOUNT and USAGE together.",
    "table_name": "rpt_bill_segment",
    "trusted_measures": [
     "Billed Amount",
@@ -4819,7 +4819,7 @@
     "Usage Request Count"
    ],
    "usage_guidance": null,
-   "use_case": "THE COMBINED VIEW, and it is only correct because each measure is aggregated from its",
+   "use_case": "THE COMBINED VIEW, and it is only correct because each measure is aggregated from its OWN authoritative source: Billed Amount <- sum of calc lines (fct_billed_charge) Billed Usage <- sum of MEASURED consumption quantities (fct_bseg_sq)",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -5680,7 +5680,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "the meter reads a bill segment was calculated from",
+   "summary": "the meter reads a bill segment was calculated from.",
    "table_name": "rpt_bill_segment_read",
    "trusted_measures": [
     "Sequence Number",
@@ -5694,7 +5694,7 @@
     "Measured less Raw x Constant"
    ],
    "usage_guidance": null,
-   "use_case": "(the real CI_BSEG_READ primary key)",
+   "use_case": "A BILLING artifact, not an MDM measurement. CI_BSEG_READ records the register readings frozen onto a bill segment; D1_MSRMT is the meter-data measurement stream.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -6488,7 +6488,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "charges that do not come from a rate",
+   "summary": "charges that do not come from a rate.",
    "table_name": "rpt_billable_charge",
    "trusted_measures": [
     "Line Sequence",
@@ -6497,7 +6497,7 @@
     "Billed Calculation Amount"
    ],
    "usage_guidance": null,
-   "use_case": "Connection fees, deposits, service calls, miscellaneous billing. Real money on",
+   "use_case": "Connection fees, deposits, service calls, miscellaneous billing. Real money on customer bills that no other canvas showed: 18,110 of them at one client, and until now the fact was built in core and surfaced nowhere.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -7700,7 +7700,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "billed charges at calc-line grain",
+   "summary": "billed charges at calc-line grain.",
    "table_name": "rpt_billed_charge",
    "trusted_measures": [
     "Calc Header Seq",
@@ -7710,7 +7710,7 @@
     "Exempt Amount"
    ],
    "usage_guidance": null,
-   "use_case": "CI_BSEG_CALC_LN primary key)",
+   "use_case": "AUTHORITATIVE FOR **AMOUNT**, NOT FOR USAGE.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -8651,7 +8651,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "billed consumption at determinant grain",
+   "summary": "billed consumption at determinant grain.",
    "table_name": "rpt_billed_usage",
    "trusted_measures": [
     "Billed Quantity",
@@ -8659,7 +8659,7 @@
     "Billed less Initial Quantity"
    ],
    "usage_guidance": null,
-   "use_case": "AUTHORITATIVE FOR **USAGE**, but only when \"Is Usage\" is filtered on first",
+   "use_case": "AUTHORITATIVE FOR **USAGE**, but only when \"Is Usage\" is filtered on first.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -9174,7 +9174,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "cases with their timing and current state",
+   "summary": "cases with their timing and current state.",
    "table_name": "rpt_case",
    "trusted_measures": [
     "Case Duration Minutes",
@@ -9182,7 +9182,7 @@
     "Log Entry Count"
    ],
    "usage_guidance": null,
-   "use_case": "Its OWN canvas, not an account roll-up. Cases were originally folded into",
+   "use_case": "Its OWN canvas, not an account roll-up. Cases were originally folded into rpt_customer_account as a count, which destroyed every case attribute -- type, status, condition, comment, timing. A case is its own grain.",
    "workstream": "customer_ops",
    "workstream_label": "Customer Operations"
   },
@@ -9442,11 +9442,11 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "characteristics for every business area, in one canvas",
+   "summary": "characteristics for every business area, in one canvas.",
    "table_name": "rpt_characteristics",
    "trusted_measures": [],
    "usage_guidance": null,
-   "use_case": "STANDALONE BY DESIGN. Characteristics are TALL (one row per characteristic per",
+   "use_case": "STANDALONE BY DESIGN. Characteristics are TALL (one row per characteristic per entity), so joining them into the subject canvases would fan those facts out -- an account with 6 characteristics would sextuple its rows and every amount on\u2026",
    "workstream": "common",
    "workstream_label": "Operations & Shared Services"
   },
@@ -9806,14 +9806,14 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "credit rating history. Grain: Account ID + Credit Rating History ID",
+   "summary": "credit rating history.",
    "table_name": "rpt_credit_rating_history",
    "trusted_measures": [
     "Credit Rating Points",
     "Cash-Only Points"
    ],
    "usage_guidance": null,
-   "use_case": "account's credit rating, and every event that moved the rating -- a collection",
+   "use_case": "WHY an account entered collections. C2M decides collection eligibility from the account's credit rating, and every event that moved the rating -- a collection process, a severance, a broken pay plan, a write-off -- leaves a row here with\u2026",
    "workstream": "debt",
    "workstream_label": "Collections & Debt"
   },
@@ -11349,7 +11349,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "the account 360. Grain: Account ID",
+   "summary": "the account 360.",
    "table_name": "rpt_customer_account",
    "trusted_measures": [
     "Linked Person Count",
@@ -11383,7 +11383,7 @@
     "Autopay Maximum Withdrawal Amount"
    ],
    "usage_guidance": null,
-   "use_case": "financial position, preferences, flags and activity history. This is the canvas a",
+   "use_case": "One row per account carrying identification, classification, billing setup, financial position, preferences, flags and activity history. This is the canvas a CSR or analyst starts from: \"everything about this account\" without joining.",
    "workstream": "customer_ops",
    "workstream_label": "Customer Operations"
   },
@@ -11925,11 +11925,11 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "customer contacts. Grain: Customer Contact ID",
+   "summary": "customer contacts.",
    "table_name": "rpt_customer_contact",
    "trusted_measures": [],
    "usage_guidance": null,
-   "use_case": "only be counted on rpt_customer_account, never joined. This is where the detail",
+   "use_case": "Its own canvas because contacts are high-volume per account (hundreds), so they can only be counted on rpt_customer_account, never joined. This is where the detail lives: who was contacted, about what, through which channel, by whom.",
    "workstream": "customer_ops",
    "workstream_label": "Customer Operations"
   },
@@ -12422,13 +12422,13 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "customer notifications and self-service requests",
+   "summary": "customer notifications and self-service requests.",
    "table_name": "rpt_customer_notification",
    "trusted_measures": [
     "Days Outstanding"
    ],
    "usage_guidance": null,
-   "use_case": "The question no canvas could answer before: DID THE CUSTOMER ACTUALLY GET TOLD?",
+   "use_case": "The question no canvas could answer before: DID THE CUSTOMER ACTUALLY GET TOLD? Bills, payments, arrears and cases were all reportable; the notification that was supposed to reach the customer about them was not, because it lives in the\u2026",
    "workstream": "customer_ops",
    "workstream_label": "Customer Operations"
   },
@@ -13349,7 +13349,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "collection, severance and write-off processes with their events",
+   "summary": "collection, severance and write-off processes with their events.",
    "table_name": "rpt_debt_process",
    "trusted_measures": [
     "Event Sequence",
@@ -13362,7 +13362,7 @@
     "Duration (Days)"
    ],
    "usage_guidance": null,
-   "use_case": "C2M runs three debt processes with the same shape -- a process header, the service",
+   "use_case": "C2M runs three debt processes with the same shape -- a process header, the service agreements it covers, and a sequence of timed events.",
    "workstream": "debt",
    "workstream_label": "Collections & Debt"
   },
@@ -14794,7 +14794,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "devices with their asset record and current install",
+   "summary": "devices with their asset record and current install.",
    "table_name": "rpt_device_asset",
    "trusted_measures": [
     "Days Switched Off",
@@ -14803,7 +14803,7 @@
     "Useful Life Years"
    ],
    "usage_guidance": null,
-   "use_case": "Absorbs rpt_devices, rpt_assets and rpt_device_install. A device and its W1 asset",
+   "use_case": "Absorbs rpt_devices, rpt_assets and rpt_device_install. A device and its W1 asset record are one physical meter seen by two C2M modules (MDM and Work & Asset), and the install is its current placement -- all one row per device.",
    "workstream": "assets",
    "workstream_label": "Asset Operations"
   },
@@ -15327,13 +15327,13 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "device events reported by the head end",
+   "summary": "device events reported by the head end.",
    "table_name": "rpt_device_event",
    "trusted_measures": [
     "Event Duration Minutes"
    ],
    "usage_guidance": null,
-   "use_case": "Outages, tampers, restorations, communication failures. Oracle's MDM Device Events",
+   "use_case": "Outages, tampers, restorations, communication failures. Oracle's MDM Device Events dashboard is built entirely on this fact; we had no coverage of it at all until the OUAW parity audit surfaced it.",
    "workstream": "meter_ops",
    "workstream_label": "Meter Operations"
   },
@@ -16087,14 +16087,14 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "every exception, from all three C2M exception engines, in one canvas",
+   "summary": "every exception, from all three C2M exception engines, in one canvas.",
    "table_name": "rpt_exception",
    "trusted_measures": [
     "Days Open",
     "Message Number"
    ],
    "usage_guidance": null,
-   "use_case": "Replaces four legacy canvases (bill_segment_exceptions, usage_exceptions,",
+   "use_case": "Replaces four legacy canvases (bill_segment_exceptions, usage_exceptions, vee_exceptions, exception_summary).",
    "workstream": "field_ops",
    "workstream_label": "Field Operations"
   },
@@ -16871,11 +16871,11 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "MDM field activity. Grain: Activity ID",
+   "summary": "MDM field activity.",
    "table_name": "rpt_field_activity",
    "trusted_measures": [],
    "usage_guidance": null,
-   "use_case": "(client configuration, never a hardcoded type list)",
+   "use_case": "Scoped to field activities via D1_ACTIVITY_TYPE.activity_type_cat_flg = 'D1FA' (client configuration, never a hardcoded type list).",
    "workstream": "field_ops",
    "workstream_label": "Field Operations"
   },
@@ -18120,7 +18120,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "every financial transaction. Grain: FT ID",
+   "summary": "every financial transaction.",
    "table_name": "rpt_financial_txn",
    "trusted_measures": [
     "Current Amount",
@@ -18130,7 +18130,7 @@
     "Pay Segment Amount"
    ],
    "usage_guidance": null,
-   "use_case": "adjustments, deposits, write-offs, refunds). They were never different grains --",
+   "use_case": "Consolidates what were six separate canvases (financials, financial summary, adjustments, deposits, write-offs, refunds). They were never different grains -- all six were CI_FT filtered by transaction type.",
    "workstream": "finance",
    "workstream_label": "Finance"
   },
@@ -18887,7 +18887,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "general ledger distribution. Grain: FT ID + GL Sequence Number",
+   "summary": "general ledger distribution.",
    "table_name": "rpt_gl",
    "trusted_measures": [
     "GL Sequence Number",
@@ -18898,7 +18898,7 @@
     "GL Extract Run Number"
    ],
    "usage_guidance": null,
-   "use_case": "One financial transaction posts MULTIPLE GL lines -- the double-entry debits and",
+   "use_case": "One financial transaction posts MULTIPLE GL lines -- the double-entry debits and credits. Their amounts therefore sum to zero per FT by construction, which is why a GL canvas must never be used to measure revenue: use rpt_financial_txn for\u2026",
    "workstream": "finance",
    "workstream_label": "Finance"
   },
@@ -19391,7 +19391,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "interval and register measurements",
+   "summary": "interval and register measurements.",
    "table_name": "rpt_measurement",
    "trusted_measures": [
     "Measurement Value",
@@ -19400,7 +19400,7 @@
     "Read Sequence"
    ],
    "usage_guidance": null,
-   "use_case": "The measuring component is the hinge between a measurement and a device:",
+   "use_case": "The measuring component is the hinge between a measurement and a device: D1_DVC -> D1_DVC_CFG -> D1_MEASR_COMP -> D1_MSRMT Reaching measurements through the usage detail instead captures under 1% of rows (169 of 29,047 on ellensburg)\u2026",
    "workstream": "meter_ops",
    "workstream_label": "Meter Operations"
   },
@@ -19783,14 +19783,14 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "connect and disconnect history. Grain: Install Event ID + Sequence",
+   "summary": "connect and disconnect history.",
    "table_name": "rpt_on_off_history",
    "trusted_measures": [
     "Event Sequence",
     "Hours Since Previous Event"
    ],
    "usage_guidance": null,
-   "use_case": "device was commanded on or off, when, and through which MDM activity. Landed and",
+   "use_case": "The physical end of the credit journey and the start of restoration: every time a device was commanded on or off, when, and through which MDM activity.",
    "workstream": "meter_ops",
    "workstream_label": "Meter Operations"
   },
@@ -20412,7 +20412,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "pay plans / payment arrangements. Grain: Pay Plan ID",
+   "summary": "pay plans / payment arrangements.",
    "table_name": "rpt_pay_plan",
    "trusted_measures": [
     "Scheduled Payment Count",
@@ -20423,7 +20423,7 @@
     "Paid vs Elapsed Schedule Variance"
    ],
    "usage_guidance": null,
-   "use_case": "one account can hold several plans. Folding it into rpt_service_agreement would",
+   "use_case": "Its own canvas because a pay plan is at ACCOUNT grain, not service-agreement grain: one account can hold several plans.",
    "workstream": "debt",
    "workstream_label": "Collections & Debt"
   },
@@ -21110,7 +21110,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "payments at pay-segment grain. Grain: Pay Segment ID",
+   "summary": "payments at pay-segment grain.",
    "table_name": "rpt_payment",
    "trusted_measures": [
     "Event Tender Total",
@@ -21119,7 +21119,7 @@
     "Payment Amount (Header)"
    ],
    "usage_guidance": null,
-   "use_case": "segments (CI_PAY_SEG). The segment is the finest grain and the only one at which",
+   "use_case": "A payment (CI_PAY) is distributed across one or more SERVICE AGREEMENTS as pay segments (CI_PAY_SEG). The segment is the finest grain and the only one at which \"Pay Segment Amount\" is additive.",
    "workstream": "cashiering",
    "workstream_label": "Cashiering & Payments"
   },
@@ -21787,7 +21787,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "tenders: how money physically arrived. Grain: Payment Tender ID",
+   "summary": "tenders: how money physically arrived.",
    "table_name": "rpt_payment_tender",
    "trusted_measures": [
     "Tender Amount",
@@ -21797,7 +21797,7 @@
     "Deposit End Balance"
    ],
    "usage_guidance": null,
-   "use_case": "the payment: one tender can settle several payments, and one payment event can be",
+   "use_case": "A tender is the instrument (cash, cheque, card, EFT). It is a DIFFERENT grain from the payment: one tender can settle several payments, and one payment event can be met by several tenders.",
    "workstream": "cashiering",
    "workstream_label": "Cashiering & Payments"
   },
@@ -22848,7 +22848,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "service point with its premise and installed device",
+   "summary": "service point with its premise and installed device.",
    "table_name": "rpt_premise_sp",
    "trusted_measures": [
     "Meter Read Route Sequence",
@@ -22860,7 +22860,7 @@
     "Unbilled Usage Transaction Count (Point)"
    ],
    "usage_guidance": null,
-   "use_case": "Service point rather than premise, because a premise holds several service points",
+   "use_case": "Service point rather than premise, because a premise holds several service points (one per commodity) and the device, meter and usage chains all hang off the SERVICE POINT.",
    "workstream": "meter_ops",
    "workstream_label": "Meter Operations"
   },
@@ -23411,7 +23411,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "how each rate schedule actually calculates",
+   "summary": "how each rate schedule actually calculates.",
    "table_name": "rpt_rate_configuration",
    "trusted_measures": [
     "Role Sequence",
@@ -23419,7 +23419,7 @@
     "Eligibility Criteria Count"
    ],
    "usage_guidance": null,
-   "use_case": "Rate configuration was reportable nowhere: an analyst could see the RESULT of a",
+   "use_case": "Rate configuration was reportable nowhere: an analyst could see the RESULT of a calculation on rpt_billed_charge (the calc lines a bill produced) but not the RULES that produced it.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -23833,11 +23833,11 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "rate schedule history. Grain: Service Agreement ID + Effective Date",
+   "summary": "rate schedule history.",
    "table_name": "rpt_rate_schedule_history",
    "trusted_measures": [],
    "usage_guidance": null,
-   "use_case": "reporting: a rate change lands here before its first bill lands anywhere else, so",
+   "use_case": "Who is on which rate since when, and what they were on before. This is rate migration reporting: a rate change lands here before its first bill lands anywhere else, so \"how many customers have moved to the new rate\" is answerable during\u2026",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -24039,7 +24039,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "CONTROL / QA CANVAS (not an end-user analytics canvas).",
+   "summary": "CONTROL / QA CANVAS (not an end-user analytics canvas). Reconciles billed revenue from calc lines vs CI_FT (Bill Segment) per bill.",
    "table_name": "rpt_revenue_reconciliation",
    "trusted_measures": [
     "Calc Line Revenue",
@@ -24645,7 +24645,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "the aged trial balance. Grain: Service Agreement ID + Snapshot Date",
+   "summary": "the aged trial balance.",
    "table_name": "rpt_sa_aged_balance",
    "trusted_measures": [
     "Current Balance",
@@ -24658,7 +24658,7 @@
     "Past Due Amount"
    ],
    "usage_guidance": null,
-   "use_case": "30/60/90/120 bands, as of the snapshot date. This is the canvas the Jaspersoft",
+   "use_case": "The collections workhorse: every service agreement's balance aged into the standard 30/60/90/120 bands, as of the snapshot date.",
    "workstream": "debt",
    "workstream_label": "Collections & Debt"
   },
@@ -25673,7 +25673,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "service agreement: lifecycle, balance, arrears, pay plan",
+   "summary": "service agreement: lifecycle, balance, arrears, pay plan.",
    "table_name": "rpt_service_agreement",
    "trusted_measures": [
     "Consecutive Estimated Bills",
@@ -25692,7 +25692,7 @@
     "Active Pay Plan Count"
    ],
    "usage_guidance": null,
-   "use_case": "Absorbs four legacy canvases (sa_aged_balance, unbilled_sas, pay_plans,",
+   "use_case": "Absorbs four legacy canvases (sa_aged_balance, unbilled_sas, pay_plans, pay_plan_summary). All four were the same grain -- one row per SA -- differing only in which attributes they carried, so \"which SAs are in arrears AND on a pay plan\u2026",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -26150,7 +26150,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "drawer balancing. Grain: Tender Control ID",
+   "summary": "drawer balancing.",
    "table_name": "rpt_tender_control",
    "trusted_measures": [
     "Start Balance",
@@ -26160,7 +26160,7 @@
     "Deposit End Balance"
    ],
    "usage_guidance": null,
-   "use_case": "batch), its start and end balance, whether it has been balanced, by whom, and which",
+   "use_case": "The cashiering day: one row per tender control (a teller's drawer, or an all-operators batch), its start and end balance, whether it has been balanced, by whom, and which deposit control it rolled into.",
    "workstream": "cashiering",
    "workstream_label": "Cashiering & Payments"
   },
@@ -26468,14 +26468,14 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "to-do entries: the work queue C2M raises for staff",
+   "summary": "to-do entries: the work queue C2M raises for staff.",
    "table_name": "rpt_todo",
    "trusted_measures": [
     "Hours Open",
     "Drill Key Count"
    ],
    "usage_guidance": null,
-   "use_case": "Kept separate from rpt_exception on purpose. An exception is a data-quality failure",
+   "use_case": "Kept separate from rpt_exception on purpose. An exception is a data-quality failure detected by an engine; a to-do is assignable WORK with an owner and a completion time.",
    "workstream": "common",
    "workstream_label": "Operations & Shared Services"
   },
@@ -27101,7 +27101,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "unbilled revenue drivers. Grain: Service Agreement ID",
+   "summary": "unbilled revenue drivers.",
    "table_name": "rpt_unbilled_revenue",
    "trusted_measures": [
     "Days Since Last Billed",
@@ -27111,7 +27111,7 @@
     "Active Service Point Count"
    ],
    "usage_guidance": null,
-   "use_case": "\"UNBILLED\" IS SEVERAL DIFFERENT PROBLEMS, owned by different people, so this canvas",
+   "use_case": "\"UNBILLED\" IS SEVERAL DIFFERENT PROBLEMS, owned by different people, so this canvas exposes them as typed flags on one SA-grain row rather than one blended number",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -27706,7 +27706,7 @@
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "usage transactions at scalar-detail grain",
+   "summary": "usage transactions at scalar-detail grain.",
    "table_name": "rpt_usage_txn",
    "trusted_measures": [
     "Sequence Number",
@@ -27716,7 +27716,7 @@
     "End Measurement"
    ],
    "usage_guidance": null,
-   "use_case": "(the real D1_USAGE_SCALAR_DTL key)",
+   "use_case": "A usage transaction is the MDM calculation that feeds billing. The scalar detail is the finest grain -- one row per measuring component per usage -- and is where the quantities live, so the header is denormalised onto it rather than kept\u2026",
    "workstream": "meter_ops",
    "workstream_label": "Meter Operations"
   }
