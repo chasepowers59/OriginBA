@@ -23,35 +23,46 @@ during the 2026-08 overhaul; breaking one usually reintroduces a bug we already 
 
 ## Theme tokens — never hardcode a colour
 
-- All colour comes from tokens in `globals.css` (`:root` light, `.dark` overrides),
-  registered as Tailwind classes: `text-fg`, `text-fg-muted`, `text-fg-subtle`,
-  `text-heading`, `bg-surface(-subtle/-solid/-input)`, `border-edge(-subtle)`,
-  `bg-chip`, `text-brand`, `chart.1-5`, `chart-selected`.
-- NO `text-white` / `text-slate-*` / `bg-white/10` in app components — the compat shim
-  that used to remap them is DELETED; a hardcoded class now renders literally. The only
-  legitimate `text-white` sits on intentionally fixed backgrounds (brand logo tile,
-  login navy panel).
-- Dark mode is near-black by design (#0b0d12 ground, #14171f cards) per the reference
-  dashboard. Every change is verified in BOTH themes before commit.
-- **Accent text must be a dual-theme pair.** A light Tailwind shade (sky-300,
-  amber-200, red-300…) is a DARK-surface colour; alone it washes out on white. Always
-  write `text-sky-600 dark:text-sky-300` style pairs (light gets 600/700-shade, dark
-  keeps the light shade). Contrast audit trick: computed text luminance > 0.7 in light
-  mode outside btn-primary = a bug.
+The palette is **Soul Palette V2.1** (Reed, approved 2026-08-29), adopted VERBATIM and
+merged 2026-09-01. Contract + spec: `docs/design/soul-palette-v2.1-origin.css` and
+`docs/design/merged-palette-and-components.html`. The conversion app and the portal
+share these token names and values — changing a V2.1 value is a cross-app decision.
+
+- **Surfaces/ink:** `--background --card --muted --band --border --input --foreground
+  --muted-foreground --primary --primary-foreground --ring`. Light is white-grounded;
+  dark is the V2.1 navy (`#0B1723` page, `#14202D` card) — NOT the old near-black.
+- **Status is a PAIR, and the pair flips with the theme by itself:** `ok/ok-bg`,
+  `over/over-bg`, `warn/warn-bg` (Tailwind: `text-ok bg-ok-bg`, `text-over bg-over-bg`,
+  `text-warn bg-warn-bg`). Never write emerald/red/amber classes again, and never add a
+  `dark:` variant to a status token — the token already carries both columns.
+- **Headings:** `--heading` is ink for page titles; `--heading-accent` is the V2.1 teal
+  and belongs on the small uppercase eyebrow above them (`text-heading-accent`).
+- **Ramps:** `--neutral-0..6`, `--brand-blue-1..3`, `--brand-teal-1..3`.
+- Everything else (`--surface*`, `--chip*`, `--btn-ghost*`, `--tooltip*`, `--mesh-glow*`,
+  `--foreground-muted`, `--accent`) is DERIVED from those in globals.css — change the
+  base token, not the derivation.
+- NO Tailwind palette classes in app components. `audit-brand.mjs` fails the build on
+  any `text|bg|border|ring|from|via|to-{sky,emerald,red,amber,indigo,violet,cyan,rose,
+  green,orange,purple,fuchsia,pink}-NNN`. Allowlisted: the login page (deliberately
+  fixed-light with the navy panel) and the print-pack headers (fixed-light for paper).
 - Print (council/lineage packs): the `@media print` block forces tokens to fixed light
-  values inside `.council-pack` / `.lineage-pack` / `#dashboard-export-root`. Token
-  classes print correctly; do not add print-only hardcoded colours.
+  values inside `.council-pack` / `.lineage-pack` / `#dashboard-export-root`.
 
 ## Charts — one renderer, one colour rule
 
 - `builder/BuilderChart` (+ `ui/chart.tsx` primitives) is THE chart renderer.
   `MiniSparkChart` is the only other (KPI sparklines). Never add a third; never
   reintroduce raw Recharts with hex colours (the deleted ChartView anti-pattern).
-- **Value ramp rule (app-wide):** single-series bars are coloured by value —
-  BLUE (hue 207) = highest, shifting toward RED (368≡8) as values drop, interpolated
-  the WARM way round the wheel so the ramp never passes green (green falsely reads
-  "good"). Implementation: `lib/chartEmphasis.ts` `valueRampColors` — unit-tested;
-  change the tests first.
+- **Categorical series come from `--chart-1..6`** — blue and teal only. Teal is NEVER
+  paired with blue as a category; two-series charts use chart-1 with chart-3.
+- **Value ramp rule (app-wide):** single-series bars are coloured by MAGNITUDE —
+  `--primary` at the top of the range shifting to the palette's own `over` red at the
+  bottom, so the suite has exactly one red. Interpolated in **Oklab**, not HSL: a hue
+  sweep between those endpoints takes the short way round the wheel and renders
+  mid-range values as vivid magenta/violet (the 2026-09-01 bug — bars that looked like
+  a third category). `lib/chartEmphasis.ts` `valueRampColors(values, {dark})` — the
+  anchors differ per theme, so callers pass `colorMode`. Unit-tested including the
+  magenta guard; change the tests first.
 - Cross-filter selection overrides a bar/slice to `var(--chart-selected)` (amber).
 - **Axis text is FLAT — never rotated.** Long labels truncate (`slice + …`) with
   `interval="preserveStartEnd"` / `minTickGap`; grids/axes colour from
@@ -82,10 +93,57 @@ builder/SQL tabs redirect out). Never add a second builder/SQL/chart surface.
 ## Working discipline
 
 - **Tests first** (red → green) for any pure logic: formatters, ramps, swap logic,
-  fences. Vitest (`npm run test`) frontend, unittest backend.
+  fences. Frontend `npm run test` (vitest); backend `pytest tests/ -q` from the
+  repo root — pytest collects BOTH the unittest.TestCase modules and the
+  pytest-style ones, so a bare `python -m unittest` silently errors on two files.
+  Install with `pip install -r deploy/requirements-dev.txt`. Both suites gate CI
+  (portal-ci, api-ci).
 - **Propagate everywhere**: a change in one place updates its siblings (both brand
   sources, fence + its tests + templates + loader, etc.) in the same commit.
+- **Lean pass before the commit.** Writing the code is not the last step: read it
+  back as a reviewer and DELETE what doesn't earn its place — duplicated logic
+  (factor it to one place), temporary scaffolding and dead branches, and comments
+  that narrate the code or the change instead of stating a constraint. The bar is
+  absolute: tests stay green and behaviour is unchanged. The tests written first
+  are what make the deletion safe.
 - Never run `next build` while `next dev` is live (corrupts `.next`).
 - Verify against real data: local INT_DEV Postgres VPN-free; Ellensburg 25.4 Oracle
   (the authentic C2M validation target) when VPN is on.
 - Reporting column names are a Jaspersoft contract — presentation changes only.
+
+## Enterprise features (shipped 2026-09-01, all tests-first)
+
+- **SSO/OIDC** (`api/auth/oidc.py` + `/auth/oidc/*`): Azure AD auth-code flow, signed
+  HS256 state, RS256 id_token via JWKS. JIT-provisions role `user` in
+  OIDC_DEFAULT_ORGANIZATION — SSO NEVER mints admins. SPA gets our JWT via the login
+  page's `#sso_token=` fragment (fragments stay out of server logs). Routes call
+  helpers through the `oidc.` namespace so tests can patch them.
+- **Scheduled delivery + KPI alerts** ride ONE hourly cron: `python -m
+  api.report_schedule_runner` (`--dry-run` renders only). Schedules mail a saved view
+  as CSV (business labels, True/False); alerts watch exec KPIs via the SAME
+  execute_kpi_definition the dashboard uses and notify ONLY on the transition into
+  breach. Both org-scoped in portal_state (local JSON fallback), both capped, SMTP_*
+  env. UI: ScheduleDialog (saved views), KpiAlertsDialog (exec toolbar).
+- **Access audit** (`api/access_audit.py`): report runs, SQL executes AND fence
+  refusals land in portal_audit_log; the writer swallows failures by design — an
+  audit outage must never 500 a query. `/auth/audit-log?action=` filters.
+- **Annotations** (`api/annotations.py`, NotesDialog): notes on saved_view/dashboard/
+  dashboard_tile; author-or-admin delete.
+- **Backup**: `deploy/backup_portal_state.sh` (auth tables + portal_state schema).
+- **Dialogs**: `components/Modal.tsx` is THE shell (overlay, click-outside AND
+  Escape to close, `role="dialog"`, header + close button), with `SmtpNotice` and
+  `FormError` beside it. Schedule/Alerts/Notes all use it; never hand-roll a fourth
+  modal, and use the app's `.btn-primary` rather than a new button style.
+- **Guardrails live in libs, tested**: `visualGuardrails` (pie >30 slices, 1-series
+  stacked → disabled with reason), `dashboardTileMath` (tile charts the FIRST
+  measure's column; KPI headline sums only sum/count), `databaseChartUtils`
+  (identifier columns never chart as measures), `axisLabels.tickLabels` (truncate
+  ONCE; head…tail when two labels would collide), `recipients.parseRecipients`.
+- **Errors**: `fetchJson` runs `parseApiError` once, so `err.message` is already a
+  human message everywhere — never re-parse JSON at a call site.
+- **Pinning**: PinMenu targets a NEW or EXISTING dashboard; pins APPEND to the first
+  free slot, never replace.
+- **A11y baseline**: global `:focus-visible` ring, `role="img"` + descriptive
+  aria-label on every chart, click/Enter adds fields (drag is optional).
+- Route-test hygiene: modules share one interpreter — pin `PORTAL_AUTH_DISABLED` etc.
+  per test class with `mock.patch.dict(os.environ, ...)`, never rely on import-time env.

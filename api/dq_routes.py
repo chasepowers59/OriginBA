@@ -19,6 +19,7 @@ import yaml
 from fastapi import APIRouter, Body, Depends
 
 from api.auth import AuthContext, get_auth_context
+from api.org_db import require_org_for_data
 from api.warehouse_db import warehouse_configured, warehouse_connection
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -35,18 +36,22 @@ ROW_CAP = 100
 ACK_DIR = ROOT / "data" / "dq_acks"
 
 
-def _ack_path(org: str | None) -> Path:
-    return ACK_DIR / f"{org or 'default'}.json"
+def _ack_path(org: str) -> Path:
+    """One ack file per organization. There is no shared bucket: an orgless caller
+    is refused upstream by require_org_for_data (audit C3)."""
+    if not org:
+        raise ValueError("An organization is required to read or write DQ acks")
+    return ACK_DIR / f"{org}.json"
 
 
-def _load_acks(org: str | None) -> dict[str, Any]:
+def _load_acks(org: str) -> dict[str, Any]:
     try:
         return json.loads(_ack_path(org).read_text())
     except Exception:  # noqa: BLE001
         return {}
 
 
-def _save_acks(org: str | None, acks: dict[str, Any]) -> None:
+def _save_acks(org: str, acks: dict[str, Any]) -> None:
     ACK_DIR.mkdir(parents=True, exist_ok=True)
     _ack_path(org).write_text(json.dumps(acks, indent=1))
 
@@ -78,7 +83,8 @@ def _rules_path() -> Path:
 
 @router.get("/findings")
 def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
-    org = ctx.organization_id
+    ctx.require_permission("portal:read")
+    org = require_org_for_data(ctx)
     if not warehouse_configured(org):
         return {"configured": False, "rules": []}
     path = _rules_path()
@@ -153,7 +159,8 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
 def dq_ack(payload: dict[str, Any] = Body(...),
            ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     """Mark one finding done until the next warehouse refresh."""
-    org = ctx.organization_id
+    ctx.require_permission("portal:read")
+    org = require_org_for_data(ctx)
     key = str(payload.get("key") or "")
     if not key:
         return {"ok": False, "error": "key required"}
@@ -168,7 +175,8 @@ def dq_ack(payload: dict[str, Any] = Body(...),
 @router.post("/unack")
 def dq_unack(payload: dict[str, Any] = Body(...),
              ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
-    org = ctx.organization_id
+    ctx.require_permission("portal:read")
+    org = require_org_for_data(ctx)
     key = str(payload.get("key") or "")
     acks = _load_acks(org)
     acks.pop(key, None)

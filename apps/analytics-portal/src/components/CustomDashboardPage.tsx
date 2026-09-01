@@ -24,6 +24,7 @@ import { swapTileSlots } from "@/lib/dashboardSlots";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { DashboardTile } from "./DashboardTile";
 import { PresentationToolbar } from "./PresentationToolbar";
+import { NotesDialog } from "./NotesDialog";
 
 const SLOTS = [0, 1, 2, 3];
 
@@ -41,6 +42,7 @@ function emptyTile(slot: number, snapshotId = "rpt_financial_txn"): DashboardTil
 }
 
 function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
+  const [showNotes, setShowNotes] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pinApplied = useRef(false);
@@ -55,6 +57,8 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     { name: string; headers: string[]; rows: Record<string, unknown>[] }[]
   >([]);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [boardLoaded, setBoardLoaded] = useState(false);
   // Drag distance so a click on a tile's Edit/handle isn't read as a drag.
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
@@ -72,11 +76,15 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       setTitle(d.title);
       setDays(d.days);
       setTiles(d.tiles.length ? d.tiles : [emptyTile(0)]);
+      setBoardLoaded(true);
     });
   }, [dashboardId]);
 
   useEffect(() => {
-    if (dashboardId || pinApplied.current) return;
+    // Pins APPEND to the first free slot — on a fresh board or an existing one
+    // (?pin_* on /dashboards/{id}); a second pin never replaces the first.
+    if (pinApplied.current) return;
+    if (dashboardId && !boardLoaded) return;
     const snapshotId = searchParams.get("pin_snapshot");
     if (!snapshotId) return;
     pinApplied.current = true;
@@ -88,24 +96,34 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     const measureAgg = searchParams.get("pin_agg");
     const pinDims = searchParams.get("pin_dims");
     const pinDays = searchParams.get("pin_days");
-    if (pinDays) setDays(Math.max(1, Number(pinDays) || 30));
-    const slot = SLOTS.find((s) => s === 0) ?? 0;
-    setTiles([
-      {
-        id: crypto.randomUUID(),
-        slot,
-        title: pinTitle,
-        visual,
-        snapshot_id: snapshotId,
-        report_id: reportId,
-        chart_type: chartType,
-        measure_field: measureField,
-        measure_agg: measureAgg,
-        dimensions: pinDims ? pinDims.split(",").filter(Boolean) : undefined,
-      },
-    ]);
-    router.replace("/dashboards/new", { scroll: false });
-  }, [dashboardId, router, searchParams]);
+    if (pinDays && !dashboardId) setDays(Math.max(1, Number(pinDays) || 30));
+    const pinnedTile = (slot: number): DashboardTileDef => ({
+      id: crypto.randomUUID(),
+      slot,
+      title: pinTitle,
+      visual,
+      snapshot_id: snapshotId,
+      report_id: reportId,
+      chart_type: chartType,
+      measure_field: measureField,
+      measure_agg: measureAgg,
+      dimensions: pinDims ? pinDims.split(",").filter(Boolean) : undefined,
+    });
+    setTiles((current) => {
+      // ignore the placeholder empty tile a fresh board starts with
+      // a fresh board starts with one "New tile" placeholder — strip it there,
+      // but never touch a saved board's tiles, whatever they're named
+      const real = dashboardId ? current : current.filter((t) => t.title !== "New tile");
+      const used = new Set(real.map((t) => t.slot));
+      const free = SLOTS.find((sl) => !used.has(sl));
+      if (free === undefined) {
+        setSaveError("This dashboard is full (4 tiles) — remove one before pinning.");
+        return current;
+      }
+      return [...real, pinnedTile(free)];
+    });
+    router.replace(dashboardId ? `/dashboards/${dashboardId}` : "/dashboards/new", { scroll: false });
+  }, [dashboardId, boardLoaded, router, searchParams]);
 
   const tileBySlot = useMemo(() => {
     const map = new Map<number, DashboardTileDef>();
@@ -126,6 +144,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
 
   const save = async () => {
     setSaving(true);
+    setSaveError(null);
     try {
       if (board?.id) {
         const updated = await updateDashboard(board.id, { title, days, tiles });
@@ -135,6 +154,12 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
         setBoard(created);
         window.history.replaceState(null, "", `/dashboards/${created.id}`);
       }
+    } catch (err) {
+      setSaveError(
+        err instanceof Error && err.message
+          ? err.message
+          : "The dashboard could not be saved — check your connection and try again.",
+      );
     } finally {
       setSaving(false);
     }
@@ -177,25 +202,48 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href="/dashboards" className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300">
+          <Link href="/dashboards" className="text-xs text-primary hover:text-primary">
             ← My dashboards
           </Link>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-2 block w-full max-w-lg bg-transparent text-2xl font-bold text-heading outline-none border-b border-edge-subtle focus:border-sky-400/50"
+            className="mt-2 block w-full max-w-lg bg-transparent text-2xl font-bold text-heading outline-none border-b border-edge-subtle focus:border-edge"
           />
           <p className="mt-1 text-sm text-fg-muted">
             Drag tiles between slots · up to 4 visuals · saved to server
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {dashboardId ? (
+            <button type="button" onClick={() => setShowNotes(true)} className="btn-ghost">
+              Notes
+            </button>
+          ) : null}
           <PresentationToolbar title={title} exportSections={exportSections} />
           <button type="button" onClick={() => void save()} disabled={saving} className="btn-primary">
             {saving ? "Saving…" : "Save dashboard"}
           </button>
         </div>
       </div>
+
+      {saveError ? (
+        <p
+          role="alert"
+          className="rounded-xl border border-over bg-over-bg px-4 py-2 text-sm text-over"
+        >
+          {saveError}
+        </p>
+      ) : null}
+
+      {showNotes && dashboardId ? (
+        <NotesDialog
+          targetType="dashboard"
+          targetId={dashboardId}
+          title={title}
+          onClose={() => setShowNotes(false)}
+        />
+      ) : null}
 
       {!dashboardId ? (
         <div className="glass-panel p-4">
@@ -222,7 +270,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       ) : null}
 
       {filter ? (
-        <div className="flex items-center justify-between rounded-xl border border-amber-400/25 bg-amber-500/10 px-4 py-2 text-sm text-amber-800 dark:text-amber-100">
+        <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
           <span>
             Cross-filter: <strong>{filter.label ?? filter.field}</strong> = {filter.value}
           </span>
@@ -263,7 +311,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
                     updateTile(slot, emptyTile(slot));
                     setEditSlot(slot);
                   }}
-                  className="flex h-full w-full items-center justify-center text-sm text-fg-muted hover:text-sky-600 dark:hover:text-sky-300"
+                  className="flex h-full w-full items-center justify-center text-sm text-fg-muted hover:text-primary"
                 >
                   + Add tile
                 </button>
@@ -312,8 +360,8 @@ function SlotCell({
     <div
       ref={setDropRef}
       className={`relative min-h-[260px] rounded-2xl border border-dashed p-1 transition ${
-        isOver ? "border-sky-400/60 bg-sky-400/5" : "border-edge-subtle hover:border-sky-400/30"
-      } ${isDragging ? "opacity-50" : ""}`}
+ isOver ? "border-edge bg-band" : "border-edge-subtle hover:border-edge"
+ } ${isDragging ? "opacity-50" : ""}`}
     >
       {hasTile ? (
         <button
@@ -323,7 +371,7 @@ function SlotCell({
           {...listeners}
           aria-label="Drag tile to another slot"
           title="Drag to reorder"
-          className="absolute left-2 top-2 z-10 cursor-grab rounded px-1.5 py-0.5 text-xs leading-none text-fg-muted hover:text-sky-600 dark:hover:text-sky-300 active:cursor-grabbing"
+          className="absolute left-2 top-2 z-10 cursor-grab rounded px-1.5 py-0.5 text-xs leading-none text-fg-muted hover:text-primary active:cursor-grabbing"
         >
           ⠿
         </button>
@@ -417,7 +465,7 @@ function TileEditor({
         </label>
       </div>
       <div className="mt-4 flex justify-between gap-2">
-        <button type="button" onClick={onRemove} className="text-xs text-red-600 dark:text-red-400">
+        <button type="button" onClick={onRemove} className="text-xs text-over">
           Remove tile
         </button>
         <div className="flex gap-2">

@@ -1,0 +1,25 @@
+# Portal CI — the enforcement layer for the front-end rules.
+# Every push/PR touching the app runs: types, unit tests, the BRAND AUDIT (tokens only,
+# paired accents, flat axes), and a production build. A brand violation fails CI the
+# same way a type error does — alignment is checked, not hoped for.
+name: portal-ci
+on:
+  push:
+    branches: [main]
+    paths: ["apps/analytics-portal/**", ".github/workflows/portal-ci.yml"]
+  pull_request:
+    paths: ["apps/analytics-portal/**"]
+jobs:
+  portal:
+    runs-on: ubuntu-latest
+    defaults:
+      run: { working-directory: apps/analytics-portal }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: apps/analytics-portal/package-lock.json }
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run test
+      - run: npm run audit:brand
+      - run: npm run build

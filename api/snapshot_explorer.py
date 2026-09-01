@@ -404,6 +404,11 @@ def snapshot_sample_rows(
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}
         for row in rows
     ]
+    from api.access_audit import record_access_event
+    record_access_event(
+        actor_email=ctx.email, actor_id=ctx.id, action="report_run",
+        target_type="snapshot", target_id=snapshot_id,
+        detail=f"sample rows; rows={len(serialized_rows)}")
     return {
         "client": org_id,
         "organization_id": org_id,
@@ -480,6 +485,11 @@ def snapshot_raw_sql(
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}
         for row in rows
     ]
+    from api.access_audit import record_access_event
+    record_access_event(
+        actor_email=ctx.email, actor_id=ctx.id, action="raw_sql_run",
+        target_type="snapshot", target_id=snapshot_id,
+        detail=f"rows={len(serialized_rows)}; sql: {body.sql[:300]}")
     return {
         "client": org_id,
         "organization_id": org_id,
@@ -549,6 +559,13 @@ def snapshot_query(
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}
         for row in rows
     ]
+    from api.access_audit import record_access_event
+    record_access_event(
+        actor_email=ctx.email, actor_id=ctx.id, action="report_run",
+        target_type="snapshot", target_id=snapshot_id,
+        detail=(f"dims={','.join(body.dimensions) or '-'}; "
+                f"measures={','.join(m.agg + '(' + m.field + ')' for m in body.measures)}; "
+                f"rows={len(serialized_rows)}"))
     return {
         "client": org_id,
         "organization_id": org_id,

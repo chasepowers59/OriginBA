@@ -21,6 +21,7 @@ import type {
   WorkstreamSummary,
 } from "./types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
+import { parseApiError } from "@/lib/apiErrors";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -58,8 +59,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
     cache: "no-store",
   });
   if (!res.ok) {
-    const detail = await res.text();
-    throw new Error(detail || res.statusText);
+    throw new Error(parseApiError(await res.text(), res.statusText));
   }
   return res.json() as Promise<T>;
 }
@@ -196,6 +196,108 @@ export function createSavedView(
 
 export function deleteSavedView(viewId: string): Promise<void> {
   return fetchJson(`/portal/saved-views/${viewId}`, { method: "DELETE" });
+}
+
+export type ReportSchedule = {
+  id: string;
+  saved_view_id: string;
+  view_title?: string | null;
+  recipients: string[];
+  cadence: "daily" | "weekly" | "monthly";
+  weekday: number;
+  hour_utc: number;
+  window_days: number;
+  enabled: boolean;
+  last_run_at?: string | null;
+  last_status?: string | null;
+};
+
+export function fetchReportSchedules(): Promise<{
+  schedules: ReportSchedule[];
+  smtp_configured: boolean;
+}> {
+  return fetchJson("/report-schedules");
+}
+
+export function createReportSchedule(body: {
+  saved_view_id: string;
+  recipients: string[];
+  cadence: string;
+  weekday?: number;
+  hour_utc?: number;
+  window_days?: number;
+}): Promise<ReportSchedule> {
+  return fetchJson("/report-schedules", { method: "POST", body: JSON.stringify(body) });
+}
+
+export function deleteReportSchedule(scheduleId: string): Promise<void> {
+  return fetchJson(`/report-schedules/${scheduleId}`, { method: "DELETE" });
+}
+
+export type KpiAlert = {
+  id: string;
+  kpi_id: string;
+  kpi_label: string;
+  condition: "above" | "below" | "pct_change_above" | "pct_change_below";
+  threshold: number;
+  window_days: number;
+  recipients: string[];
+  enabled: boolean;
+  last_state: "ok" | "breached";
+  last_status?: string | null;
+};
+
+export type WatchableKpi = { id: string; label: string; subtitle: string; format: string };
+
+export function fetchKpiAlerts(): Promise<{
+  alerts: KpiAlert[];
+  available_kpis: WatchableKpi[];
+  smtp_configured: boolean;
+}> {
+  return fetchJson("/kpi-alerts");
+}
+
+export function createKpiAlert(body: {
+  kpi_id: string;
+  condition: string;
+  threshold: number;
+  window_days?: number;
+  recipients: string[];
+}): Promise<KpiAlert> {
+  return fetchJson("/kpi-alerts", { method: "POST", body: JSON.stringify(body) });
+}
+
+export function deleteKpiAlert(alertId: string): Promise<void> {
+  return fetchJson(`/kpi-alerts/${alertId}`, { method: "DELETE" });
+}
+
+export type Annotation = {
+  id: string;
+  target_type: string;
+  target_id: string;
+  text: string;
+  author_email: string;
+  created_at: string;
+};
+
+export function fetchAnnotations(
+  targetType: string,
+  targetId: string,
+): Promise<{ annotations: Annotation[] }> {
+  const q = new URLSearchParams({ target_type: targetType, target_id: targetId });
+  return fetchJson(`/annotations?${q}`);
+}
+
+export function createAnnotation(body: {
+  target_type: string;
+  target_id: string;
+  text: string;
+}): Promise<Annotation> {
+  return fetchJson("/annotations", { method: "POST", body: JSON.stringify(body) });
+}
+
+export function deleteAnnotation(annotationId: string): Promise<void> {
+  return fetchJson(`/annotations/${annotationId}`, { method: "DELETE" });
 }
 
 export function importSavedViews(

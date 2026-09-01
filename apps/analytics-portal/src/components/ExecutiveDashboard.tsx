@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { fetchExecutiveSummary } from "@/lib/api";
+import { KpiAlertsDialog } from "@/components/KpiAlertsDialog";
 import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { ExecutiveSummary } from "@/lib/types";
 import { DashboardWidget } from "./DashboardWidget";
@@ -28,6 +29,8 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
   const [compare, setCompare] = useState(false);
   const [compareMode, setCompareMode] = useState<CompareMode>("prior_period");
   const [summary, setSummary] = useState<ExecutiveSummary | null>(null);
+  const [showAlerts, setShowAlerts] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,7 +44,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       .then(setSummary)
       .catch(() => setSummary(null))
       .finally(() => setLoading(false));
-  }, [days, compare, compareMode, filter]);
+  }, [days, compare, compareMode, filter, reloadKey]);
 
   const isHome = variant === "home";
 
@@ -66,9 +69,10 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
 
   return (
     <section className="space-y-4">
+      {showAlerts ? <KpiAlertsDialog onClose={() => setShowAlerts(false)} /> : null}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
             Executive overview
           </p>
           <h2 className="mt-1 text-xl font-bold text-heading md:text-2xl">
@@ -100,6 +104,9 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
                 title={`${portal.organization_name} Executive Dashboard`}
                 exportSections={exportSections}
               />
+              <button type="button" onClick={() => setShowAlerts(true)} className="btn-ghost">
+                Alerts
+              </button>
               <Link href="/dashboards" className="btn-ghost">
                 Custom dashboards
               </Link>
@@ -114,7 +121,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       </div>
 
       {filter && !isHome ? (
-        <div className="flex items-center justify-between rounded-xl border border-amber-400/25 bg-amber-500/10 px-4 py-2 text-sm text-amber-800 dark:text-amber-100">
+        <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
           <span>
             Cross-filter active: <strong>{filter.label ?? filter.field}</strong> = {filter.value}
           </span>
@@ -125,7 +132,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       ) : null}
 
       {!summary?.db_configured && !loading ? (
-        <div className="glass-panel border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-800 dark:text-amber-100">
+        <div className="glass-panel border-warn bg-warn-bg px-4 py-3 text-sm text-warn">
           Connect your database in Settings to load live KPIs and trend charts.
         </div>
       ) : null}
@@ -140,8 +147,8 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
         ) : summary?.kpis.length ? (
           <div
             className={`grid gap-4 ${
-              isHome ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2 xl:grid-cols-3"
-            }`}
+ isHome ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2 xl:grid-cols-3"
+ }`}
           >
             {(isHome ? summary.kpis.slice(0, 3) : summary.kpis).map((kpi) => (
               <DashboardWidget
@@ -167,7 +174,10 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
           </div>
         ) : (
           <div className="glass-panel px-4 py-8 text-center text-sm text-fg-muted">
-            Unable to load executive metrics.
+            <p>Unable to load executive metrics.</p>
+            <button type="button" onClick={() => setReloadKey((k) => k + 1)} className="btn-ghost mt-3">
+              Try again
+            </button>
           </div>
         )}
       </div>

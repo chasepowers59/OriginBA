@@ -1,0 +1,6 @@
+# Test-only deps, never shipped in the API image.
+# httpx backs fastapi's TestClient; pytest collects both the pytest-style modules
+# and the unittest.TestCase ones, so it is the single runner for tests/.
+-r requirements-api.txt
+pytest>=8.0.0
+httpx>=0.27.0

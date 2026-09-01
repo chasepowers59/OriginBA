@@ -44,6 +44,9 @@ from snapshot_portal_config import (
     WORKSTREAM_FEATURED,
 )
 
+sys.path.insert(0, str(ROOT))
+from api.snapshot_catalog import is_protected_column  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DOMAIN_DIR = ROOT / "domains" / "exports" / "manual_imports"
@@ -120,6 +123,8 @@ def parse_domain_xml(path: Path) -> tuple[dict[str, dict[str, str]], list[dict[s
             upper = item_id.upper()
             if label:
                 labels[upper] = label
+            if is_protected_column(upper):
+                continue
             group_fields.append({"id": upper, "label": label or upper.replace("_", " ").title()})
         if group_fields:
             field_groups.append({"id": group_id, "label": group_label, "fields": group_fields})
@@ -316,6 +321,12 @@ def build_snapshot_entry(spec: SnapshotSpec) -> dict[str, Any]:
     measures = []
     dates = []
     for field_id, meta in sorted(parsed.items()):
+        # A protected column must never enter the catalog: the governed query API
+        # allow-lists whatever the catalog declares, so declaring one re-opens the
+        # door the SQL fence closes (audit H4). api.snapshot_catalog drops them at
+        # the allow-list too — this keeps them out of the artifact in the first place.
+        if is_protected_column(field_id):
+            continue
         role = classify_field(field_id, meta["type"], spec.trusted_measures)
         entry = {
             "id": field_id,

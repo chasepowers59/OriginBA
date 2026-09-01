@@ -328,10 +328,10 @@ export function VisualBuilder({
         measures,
         chart_type: visual,
       });
-      setSaved("Saved to your views");
-      setTimeout(() => setSaved(null), 2500);
+      setSaved("Saved — find it under Saved views on Home");
+      setTimeout(() => setSaved(null), 3500);
     } catch (err) {
-      setSaved(err instanceof Error ? err.message : "Save failed");
+      setSaved(`Save failed: ${err instanceof Error && err.message ? err.message : "try again"}`);
       setTimeout(() => setSaved(null), 3500);
     }
   }, [meta, snapshotId, cols, vals, visual, series]);
@@ -359,12 +359,15 @@ export function VisualBuilder({
         {/* Table-first layout: the data pane (tables -> columns) is always visible —
             picking the table IS the entry point, columns expand beneath it. */}
         <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
-          <div className="glass-panel h-[560px] p-3">
+          <div className="glass-panel max-h-[320px] overflow-y-auto p-3 lg:sticky lg:top-20 lg:max-h-[calc(100vh-7rem)] lg:self-start">
             <FieldPalette
               grouped={grouped}
               activeId={snapshotId}
               meta={meta}
               onSelect={(id) => void loadCanvas(id)}
+              onAddField={(field) =>
+                addField(field.role === "measure" ? "values" : "columns", field)
+              }
             />
           </div>
 
@@ -392,7 +395,7 @@ export function VisualBuilder({
                           ))}
                         </select>
                       ) : null}
-                      <button type="button" onClick={() => setCols((cc) => cc.filter((x) => x.field !== c.field))} aria-label="remove">×</button>
+                      <button type="button" onClick={() => setCols((cc) => cc.filter((x) => x.field !== c.field))} aria-label="remove" className="-my-2 -mr-1 rounded p-2 leading-none hover:text-heading">×</button>
                     </span>
                   ))}
                 </Shelf>
@@ -414,7 +417,7 @@ export function VisualBuilder({
                           ))}
                         </select>
                         {v.label}
-                        <button type="button" onClick={() => setVals((vv) => vv.filter((x) => x.field !== v.field))} aria-label="remove">×</button>
+                        <button type="button" onClick={() => setVals((vv) => vv.filter((x) => x.field !== v.field))} aria-label="remove" className="-my-2 -mr-1 rounded p-2 leading-none hover:text-heading">×</button>
                       </span>
                     );
                   })}
@@ -433,7 +436,7 @@ export function VisualBuilder({
                           onChange={(v) => setFils((ff) => ff.map((x) => (x.field === f.field ? { ...x, value: v } : x)))}
                         />
                       )}
-                      <button type="button" onClick={() => setFils((ff) => ff.filter((x) => x.field !== f.field))} aria-label="remove">×</button>
+                      <button type="button" onClick={() => setFils((ff) => ff.filter((x) => x.field !== f.field))} aria-label="remove" className="-my-2 -mr-1 rounded p-2 leading-none hover:text-heading">×</button>
                     </span>
                   ))}
                 </Shelf>
@@ -441,10 +444,19 @@ export function VisualBuilder({
 
               <div className="glass-panel space-y-3 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <VisualPicker value={visual} onChange={setVisual} />
+                  <VisualPicker
+                    value={visual}
+                    onChange={setVisual}
+                    categoryCount={result?.rows.length ?? 0}
+                    seriesCount={series.length}
+                  />
                   <div className="flex items-center gap-3">
                     {saved ? (
-                      <span className="text-xs" style={{ color: "var(--chart-1)" }}>{saved}</span>
+                      <span
+                        role={saved.startsWith("Saved") ? undefined : "alert"}
+                        className={`text-xs ${saved.startsWith("Saved") ? "" : "text-over"}`}
+                        style={saved.startsWith("Saved") ? { color: "var(--chart-1)" } : undefined}
+                      >{saved}</span>
                     ) : null}
                     {result ? (
                       <span className="text-xs" style={{ color: "var(--foreground-subtle)" }}>

@@ -33,7 +33,7 @@ export default async function ReportsPage() {
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <aside className="no-print lg:sticky lg:top-24 lg:self-start">
           <div className="glass-panel p-4">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-sky-600 dark:text-sky-400/80">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-heading-accent">
               Workstreams
             </p>
             <Suspense fallback={<WorkstreamSidebar workstreams={workstreams} />}>

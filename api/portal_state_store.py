@@ -76,6 +76,18 @@ def list_records(collection: str, organization_id: str) -> list[dict[str, Any]]:
         return [row[0] for row in cur.fetchall()]
 
 
+def list_all_records(collection: str) -> list[dict[str, Any]]:
+    """Every org's records in a collection — for cross-org sweeps like the
+    report-schedule runner. Route handlers must use list_records (org-scoped)."""
+    with _conn() as c, c.cursor() as cur:
+        cur.execute(
+            "select data from portal_state.records "
+            "where collection = %s order by updated_at desc",
+            (collection,),
+        )
+        return [row[0] for row in cur.fetchall()]
+
+
 def upsert(collection: str, record_id: str, organization_id: str, data: dict[str, Any]) -> None:
     import json
 

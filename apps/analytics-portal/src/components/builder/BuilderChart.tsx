@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/chart";
 import { formatCurrency, formatNumber, formatTooltipNumber } from "@/lib/format";
 import { valueRampColors } from "@/lib/chartEmphasis";
+import { useColorMode } from "@/components/PortalThemeProvider";
 
 export type BuilderVisual =
   | "bar"
@@ -73,6 +74,8 @@ export function BuilderChart({
   emptyMessage = "Drop a dimension and a measure to see a chart",
   sortTimeSeries = false,
 }: BuilderChartProps) {
+  const { colorMode } = useColorMode();
+
   const config = useMemo<ChartConfig>(() => {
     const c: ChartConfig = {};
     series.forEach((s, i) => {
@@ -107,8 +110,8 @@ export function BuilderChart({
   const rampFills = useMemo<string[] | null>(() => {
     if (!singleSeries) return null;
     const key = series[0].key;
-    return valueRampColors(data.map((d) => Number(d[key] ?? 0)));
-  }, [singleSeries, data, series]);
+    return valueRampColors(data.map((d) => Number(d[key] ?? 0)), { dark: colorMode === "dark" });
+  }, [singleSeries, data, series, colorMode]);
 
   const cellFill = (i: number, fallback: string) => {
     if (selectedCategory != null && String(data[i]?.[xKey]) === selectedCategory) {
@@ -116,6 +119,10 @@ export function BuilderChart({
     }
     return rampFills ? rampFills[i] : fallback;
   };
+
+  // Screen readers get a description of what the chart encodes; the data itself
+  // is available through the result table, so a summary is the right depth here.
+  const a11yLabel = `${visual} chart: ${series.map((s) => s.label).join(", ")} by ${xLabel ?? xKey}, ${data.length} categories`;
 
   const handleSelect = (category: unknown) => {
     if (onCategorySelect && category != null) onCategorySelect(String(category));
@@ -179,7 +186,7 @@ export function BuilderChart({
       };
     });
     return (
-      <ChartContainer config={pieConfig} style={{ height }} className="w-full">
+      <ChartContainer config={pieConfig} style={{ height }} className="w-full" role="img" aria-label={a11yLabel}>
         <PieChart>
           {tip}
           <Pie
@@ -216,7 +223,7 @@ export function BuilderChart({
     const chartHeight = Math.max(height, data.length * 34);
     return (
       <div style={{ maxHeight: Math.max(height, 560), overflowY: chartHeight > Math.max(height, 560) ? "auto" : "visible" }}>
-      <ChartContainer config={config} style={{ height: chartHeight }} className="w-full">
+      <ChartContainer config={config} style={{ height: chartHeight }} className="w-full" role="img" aria-label={a11yLabel}>
         <BarChart data={data} layout="vertical" margin={{ left: 8 }} maxBarSize={40}>
           <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />
           <XAxis type="number" tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} tickFormatter={fmt} axisLine={false} tickLine={false} />
@@ -247,7 +254,7 @@ export function BuilderChart({
 
   if (visual === "line") {
     return (
-      <ChartContainer config={config} style={{ height }} className="w-full">
+      <ChartContainer config={config} style={{ height }} className="w-full" role="img" aria-label={a11yLabel}>
         <LineChart data={data} margin={{ left: 4, right: 8 }}>
           {grid}
           {xAxis}
@@ -265,7 +272,7 @@ export function BuilderChart({
   if (visual === "area" || visual === "stacked-area") {
     const stackId = visual === "stacked-area" ? "a" : undefined;
     return (
-      <ChartContainer config={config} style={{ height }} className="w-full">
+      <ChartContainer config={config} style={{ height }} className="w-full" role="img" aria-label={a11yLabel}>
         <AreaChart data={data} margin={{ left: 4, right: 8 }}>
           <defs>
             {series.map((s) => (
@@ -299,7 +306,7 @@ export function BuilderChart({
   // bar / stacked-bar
   const stackId = visual === "stacked-bar" ? "a" : undefined;
   return (
-    <ChartContainer config={config} style={{ height }} className="w-full">
+    <ChartContainer config={config} style={{ height }} className="w-full" role="img" aria-label={a11yLabel}>
       <BarChart data={data} margin={{ left: 4, right: 8 }} maxBarSize={64}>
         {grid}
         {xAxis}

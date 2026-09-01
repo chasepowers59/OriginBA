@@ -40,19 +40,13 @@ function formatCell(value: unknown, isNumericCol = false, columnId?: string): st
   return text;
 }
 
-function parseApiError(err: unknown): string {
+function queryError(err: unknown): string {
   if (!(err instanceof Error)) return "Query failed";
-  const raw = err.message;
-  try {
-    const parsed = JSON.parse(raw) as { detail?: string };
-    if (typeof parsed.detail === "string") return parsed.detail;
-  } catch {
-    /* plain text */
-  }
-  if (raw.includes("503") || raw.toLowerCase().includes("configured")) {
+  const message = err.message;
+  if (message.includes("503") || message.toLowerCase().includes("configured")) {
     return "Database unavailable — configure the connection in Settings.";
   }
-  return raw || "Query failed";
+  return message || "Query failed";
 }
 
 function isNumericColumn(rows: Record<string, unknown>[], col: string): boolean {
@@ -196,7 +190,7 @@ export function DatabaseWorkspace({
       });
       applyPage(response, append);
     } catch (err) {
-      setError(parseApiError(err));
+      setError(queryError(err));
       if (!append) resetResults();
     } finally {
       setLoading(false);
@@ -240,7 +234,7 @@ export function DatabaseWorkspace({
         setError("Stopped at 50,000 rows (safety limit). Narrow your query to fetch more.");
       }
     } catch (err) {
-      setError(parseApiError(err));
+      setError(queryError(err));
     } finally {
       setFetchingAll(false);
     }
@@ -259,7 +253,7 @@ export function DatabaseWorkspace({
       const response = await countDatabaseSql(sql);
       setTotalCount(response.total_count);
     } catch (err) {
-      setError(parseApiError(err));
+      setError(queryError(err));
     } finally {
       setCountLoading(false);
     }
@@ -377,10 +371,10 @@ export function DatabaseWorkspace({
               onClick={() => setResultView(mode)}
               disabled={mode !== "table" && !chartSuggestion}
               className={`rounded-md px-2.5 py-1 text-xs capitalize transition ${
-                resultView === mode
-                  ? "bg-sky-500/20 text-sky-600 dark:text-sky-300"
-                  : "portal-text-muted hover:bg-chip disabled:opacity-40"
-              }`}
+ resultView === mode
+ ? "bg-band text-primary"
+ : "portal-text-muted hover:bg-chip disabled:opacity-40"
+ }`}
               title={
                 mode !== "table" && !chartSuggestion
                   ? "Run a grouped query to enable charts"
@@ -432,10 +426,10 @@ export function DatabaseWorkspace({
                   type="button"
                   onClick={() => setSidebarTab(id)}
                   className={`flex-1 px-2 py-2 text-[11px] font-medium ${
-                    sidebarTab === id
-                      ? "border-b-2 border-sky-400 text-sky-600 dark:text-sky-300"
-                      : "portal-text-muted hover:text-fg"
-                  }`}
+ sidebarTab === id
+ ? "border-b-2 border-edge text-primary"
+ : "portal-text-muted hover:text-fg"
+ }`}
                 >
                   {label}
                 </button>
@@ -462,12 +456,12 @@ export function DatabaseWorkspace({
                       type="button"
                       onClick={() => applyTemplate(template)}
                       className={`w-full rounded-xl border px-3 py-2.5 text-left transition ${
-                        activeTemplate?.id === template.id
-                          ? "border-sky-400/40 bg-sky-500/10"
-                          : "border-[var(--border)] bg-[var(--surface-solid)] hover:border-sky-400/30"
-                      }`}
+ activeTemplate?.id === template.id
+ ? "border-edge bg-band"
+ : "border-[var(--border)] bg-[var(--surface-solid)] hover:border-edge"
+ }`}
                     >
-                      <span className="text-[10px] font-medium uppercase tracking-wide text-sky-600 dark:text-sky-400/80">
+                      <span className="text-[10px] font-medium uppercase tracking-wide text-primary">
                         {template.category}
                       </span>
                       <p className="mt-0.5 text-sm font-medium text-[var(--heading)]">
@@ -487,11 +481,17 @@ export function DatabaseWorkspace({
                     type="search"
                     value={tableSearch}
                     onChange={(e) => setTableSearch(e.target.value)}
-                    placeholder={engine === "oracle" ? "Search CISADM tables…" : "Search reporting canvases…"}
+                    placeholder="Search tables…"
                     className="input-modern w-full py-1.5 text-xs"
                   />
                   {tablesLoading ? (
                     <p className="px-1 py-2 text-xs text-fg-muted">Loading…</p>
+                  ) : !tables.length ? (
+                    <p className="px-1 py-2 text-xs text-fg-muted">
+                      {tableSearch.trim()
+                        ? `No table matches “${tableSearch.trim()}”.`
+                        : "No tables available for this connection."}
+                    </p>
                   ) : (
                     <ul className="space-y-0.5">
                       {tables.map((t) => {
@@ -505,7 +505,7 @@ export function DatabaseWorkspace({
                               title={guide ?? undefined}
                             >
                               <span className="flex items-baseline justify-between gap-2">
-                                <span className="font-mono text-sky-600 dark:text-sky-300/90">{t.table_name}</span>
+                                <span className="font-mono text-primary">{t.table_name}</span>
                                 {t.num_rows != null ? (
                                   <span className="shrink-0 tabular-nums text-fg-subtle">
                                     {Number(t.num_rows).toLocaleString()}
@@ -530,7 +530,7 @@ export function DatabaseWorkspace({
                 <ul className="space-y-3 text-xs leading-relaxed text-fg-muted">
                   {workspaceTips.map((tip) => (
                     <li key={tip} className="flex gap-2">
-                      <span className="text-sky-600 dark:text-sky-400">•</span>
+                      <span className="text-primary">•</span>
                       <span>{tip}</span>
                     </li>
                   ))}
@@ -542,9 +542,9 @@ export function DatabaseWorkspace({
 
         <div className="flex min-w-0 flex-1 flex-col">
           {activeTemplate ? (
-            <div className="border-b border-sky-400/20 bg-sky-500/5 px-3 py-2 text-xs text-sky-700 dark:text-sky-200/90">
+            <div className="border-b border-edge bg-band px-3 py-2 text-xs text-primary">
               <span className="font-medium">{activeTemplate.title}</span>
-              <span className="mx-2 text-sky-600 dark:text-sky-400/50">·</span>
+              <span className="mx-2 text-primary">·</span>
               {activeTemplate.tip}
             </div>
           ) : null}
@@ -573,7 +573,7 @@ export function DatabaseWorkspace({
           </div>
 
           {error ? (
-            <div className="border-b border-red-400/20 bg-red-500/10 px-3 py-2 text-xs text-red-700 dark:text-red-200">
+            <div className="border-b border-over bg-over-bg px-3 py-2 text-xs text-over">
               {error}
             </div>
           ) : null}
@@ -623,8 +623,8 @@ export function DatabaseWorkspace({
                           <th
                             key={col}
                             className={`whitespace-nowrap border-b border-edge-subtle px-3 py-2 font-medium text-fg-muted ${
-                              numericColumns.has(col) ? "text-right" : "text-left"
-                            }`}
+ numericColumns.has(col) ? "text-right" : "text-left"
+ }`}
                           >
                             {prettifyFieldName(col)}
                           </th>
@@ -636,8 +636,8 @@ export function DatabaseWorkspace({
                         <tr
                           key={idx}
                           className={`border-t border-edge-subtle hover:bg-chip ${
-                            idx % 2 === 0 ? "" : "bg-surface-subtle"
-                          }`}
+ idx % 2 === 0 ? "" : "bg-surface-subtle"
+ }`}
                         >
                           <td className="px-2 py-1.5 text-center font-mono text-[10px] text-fg-muted">
                             {idx + 1}
@@ -652,8 +652,8 @@ export function DatabaseWorkspace({
                               <td
                                 key={col}
                                 className={`max-w-xs truncate whitespace-nowrap px-3 py-1.5 font-mono ${
-                                  isNum ? "text-right text-emerald-700 dark:text-emerald-300/90" : "text-heading"
-                                } ${raw == null ? "text-fg-muted" : ""}`}
+ isNum ? "text-right text-ok" : "text-heading"
+ } ${raw == null ? "text-fg-muted" : ""}`}
                                 title={raw != null ? String(raw) : undefined}
                               >
                                 {display}
@@ -675,7 +675,7 @@ export function DatabaseWorkspace({
         <span>{statusText}</span>
         <span>
           {chartSuggestion ? "Chart available · " : ""}
-          Read-only SELECT · 50-row paging
+          Read-only SELECT · {pageSize}-row paging
         </span>
       </div>
     </div>

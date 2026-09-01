@@ -9,6 +9,14 @@
       "notes": "dbt reporting layer built from the INT_DEV (internal Origin dev 25.4) CISADM extract -- real C2M-shaped data, no client PII. The fabricated fixtures live in the local 5433 target and ORIGINBA_FIXTURES, not here."
     },
     {
+      "id": "demo25",
+      "display_name": "Demo 25.4",
+      "engine": "postgres",
+      "catalog": "dbt",
+      "warehouse_url_env": "WAREHOUSE_DATABASE_URL_DEMO25",
+      "notes": "dbt reporting layer built from the Demo 25.4 (PDEMODB_DEMO 23ai) full census -- 4.79M landing rows, the largest C2M-shaped dataset we serve. Its own Supabase project: the two instances share ID space (an ACCT_ID collides) so it cannot share INT_DEV's tables. Cloud copy is capped on three tables (measurements, batch runs, init measurement data) and has MICR_ID, WEB_PASSWD*, ALERT_INFO and EXT_ACCT_ID nulled."
+    },
+    {
       "id": "demo",
       "display_name": "Demo (all snapshots)",
       "env_prefix": "DEMO",

@@ -1,10 +1,24 @@
 """
 Validate demo-only read-only SQL against a single governed snapshot table.
+
+Scope is checked by PARSING the FROM/JOIN targets, not by looking for the table's
+name somewhere in the text. The old substring test was satisfied by a comment, so a
+statement could read any table it liked as long as it mentioned the allowed one
+(audit H3); it also applied no secrets guard and none of the Oracle escape-hatch
+rules the SQL workspace enforces. Both now come from sql_workspace_validator, so
+"protected column" and "escape hatch" have one definition across the two paths.
 """
 
 from __future__ import annotations
 
 import re
+
+from api.sql_workspace_validator import (
+    SqlWorkspaceValidationError,
+    enforce_oracle_hatches,
+    enforce_secrets,
+    strip_sql_noise,
+)
 
 
 class RawSqlValidationError(ValueError):
@@ -13,6 +27,13 @@ class RawSqlValidationError(ValueError):
 
 _FORBIDDEN = re.compile(
     r"\b(INSERT|UPDATE|DELETE|MERGE|DROP|TRUNCATE|ALTER|CREATE|GRANT|REVOKE|EXEC|EXECUTE|CALL)\b",
+    re.IGNORECASE,
+)
+
+# Every table the statement reads: FROM/JOIN, optionally schema-qualified. Run over
+# the cleaned text so a comment or string literal cannot hide one.
+_READ_TARGETS = re.compile(
+    r'\b(?:FROM|JOIN)\s+("?[\w$#]+"?)(?:\s*\.\s*("?[\w$#]+"?))?',
     re.IGNORECASE,
 )
 
@@ -32,8 +53,28 @@ def validate_raw_sql(sql: str, allowed_table: str) -> str:
         raise RawSqlValidationError("Multiple statements are not allowed")
 
     table = allowed_table.upper()
-    if f"CISADM.{table}" not in cleaned.upper() and f"cisadm.{table.lower()}" not in cleaned.lower():
-        raise RawSqlValidationError(f"Query must reference CISADM.{table}")
+    scanned = strip_sql_noise(cleaned)
+
+    try:
+        enforce_oracle_hatches(scanned)
+        enforce_secrets(scanned)
+    except SqlWorkspaceValidationError as exc:
+        raise RawSqlValidationError(str(exc)) from exc
+
+    targets = []
+    for qualifier, name in _READ_TARGETS.findall(scanned):
+        schema = qualifier.strip('"').upper() if name else ""
+        targets.append((schema, (name or qualifier).strip('"').upper()))
+
+    if not targets:
+        raise RawSqlValidationError(f"Query must read CISADM.{table}")
+
+    for schema, target in targets:
+        if target != table or schema not in ("", "CISADM"):
+            named = f"{schema}.{target}" if schema else target
+            raise RawSqlValidationError(
+                f"This query is scoped to CISADM.{table} -- '{named}' is not readable here."
+            )
 
     return cleaned
 

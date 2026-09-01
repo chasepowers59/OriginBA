@@ -180,12 +180,20 @@ def load_config(organization_id: str | None = None) -> DataSourceConfig | None:
                 return DataSourceConfig.from_dict(data)
             except (KeyError, ValueError):
                 pass
-    legacy = organizations.get("_legacy")
-    if legacy:
-        try:
-            return DataSourceConfig.from_dict(legacy)
-        except (KeyError, ValueError):
-            pass
+    # The `_legacy` entry is a pre-multi-org vault (one connection, no org key).
+    # Serving it to whichever org happens to ask hands tenant A's credentials to
+    # tenant B (audit H2), so it now belongs to exactly one org, named explicitly:
+    #   PORTAL_LEGACY_VAULT_ORGANIZATION=<org>
+    # Unset means nobody inherits it; saving a connection for an org writes a
+    # proper per-org entry and retires it.
+    legacy_owner = (os.getenv("PORTAL_LEGACY_VAULT_ORGANIZATION") or "").strip()
+    if legacy_owner and organization_id and organization_id.strip() == legacy_owner:
+        legacy = organizations.get("_legacy")
+        if legacy:
+            try:
+                return DataSourceConfig.from_dict(legacy)
+            except (KeyError, ValueError):
+                pass
     return None
 
 

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { BrandMark } from "@/components/BrandMark";
 import { useAuth } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -42,12 +43,34 @@ export function AppShell({
   const portal = usePortalConfig();
   const { user, logout, can } = useAuth();
 
+  // Native <details> menus stay open until their summary is re-clicked; close
+  // them on outside click and on navigation so they behave like real dropdowns.
+  const headerRef = useRef<HTMLElement>(null);
+  const pathname = usePathname();
+  const closeMenus = () => {
+    headerRef.current
+      ?.querySelectorAll<HTMLDetailsElement>("details[open]")
+      .forEach((d) => d.removeAttribute("open"));
+  };
+  useEffect(() => {
+    const onPointerDown = (e: PointerEvent) => {
+      headerRef.current
+        ?.querySelectorAll<HTMLDetailsElement>("details[open]")
+        .forEach((d) => {
+          if (!d.contains(e.target as Node)) d.removeAttribute("open");
+        });
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, []);
+  useEffect(closeMenus, [pathname]);
+
   return (
     <div className="mesh-bg min-h-screen">
       {/* Three-zone app bar: brand + org context | nav | compact controls. The meta
           that used to crowd the bar (workstream counts, role, org, sign out) lives in
           the user menu, so the bar itself stays one clean row at every width. */}
-      <header className="portal-header no-print sticky top-0 z-50">
+      <header ref={headerRef} className="portal-header no-print sticky top-0 z-50">
         <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-4 px-6">
           <div className="flex min-w-0 items-center gap-3">
             <Link href="/" className="group flex shrink-0 items-center">
@@ -70,10 +93,10 @@ export function AppShell({
                   key={item.href}
                   href={item.href}
                   className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition ${
-                    active
-                      ? "bg-chip portal-heading ring-1 ring-edge-subtle"
-                      : "portal-text-muted hover:bg-chip hover:text-heading"
-                  }`}
+ active
+ ? "bg-chip portal-heading ring-1 ring-edge-subtle"
+ : "portal-text-muted hover:bg-chip hover:text-heading"
+ }`}
                 >
                   {item.label}
                 </Link>
@@ -97,10 +120,10 @@ export function AppShell({
                     key={item.href}
                     href={item.href}
                     className={`block rounded-lg px-3 py-2 text-sm font-medium ${
-                      activeNav === item.id
-                        ? "bg-chip text-heading"
-                        : "text-fg-muted hover:bg-chip hover:text-heading"
-                    }`}
+ activeNav === item.id
+ ? "bg-chip text-heading"
+ : "text-fg-muted hover:bg-chip hover:text-heading"
+ }`}
                   >
                     {item.label}
                   </Link>
@@ -114,7 +137,7 @@ export function AppShell({
                 title={dbConfigured ? `${brand.connection_label} — database connection settings` : "Connect database"}
               >
                 <span
-                  className={`h-2 w-2 rounded-full ${dbConfigured ? "bg-emerald-500 dark:bg-emerald-400" : "animate-pulse bg-amber-500 dark:bg-amber-400"}`}
+                  className={`h-2 w-2 rounded-full ${dbConfigured ? "bg-ok dark:bg-ok" : "animate-pulse bg-warn dark:bg-warn"}`}
                 />
                 <span className="hidden xl:inline">
                   {dbConfigured ? brand.connection_label : "Connect"}

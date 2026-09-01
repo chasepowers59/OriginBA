@@ -5,7 +5,9 @@ import { PortalThemeProvider } from "@/components/PortalThemeProvider";
 import { DEFAULT_BRAND, brandLine } from "@/lib/brand";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], display: "swap" });
+// Inter is the bundled FALLBACK; the body stack prefers locally-installed Aptos
+// (Origin's brand face, shipped with M365) — see globals.css and brandFont.test.ts.
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: brandLine(DEFAULT_BRAND),
@@ -33,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: colorModeScript }} />
       </head>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.variable} antialiased`}>
         <AuthProvider>
           <PortalThemeProvider>{children}</PortalThemeProvider>
         </AuthProvider>

@@ -1,0 +1,43 @@
+name: api-ci
+
+# The API test suite was never gated: the SQL fence, secrets guard, tenant-login
+# authorization and SSO tests all ran only when someone remembered to run them
+# locally. This runs the whole suite on every change to the API or its tests.
+
+on:
+  pull_request:
+    paths:
+      - "api/**"
+      - "tests/**"
+      - "config/**"
+      - "deploy/requirements-api.txt"
+      - "deploy/requirements-dev.txt"
+      - ".github/workflows/api-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "api/**"
+      - "tests/**"
+      - "config/**"
+      - "deploy/requirements-api.txt"
+      - "deploy/requirements-dev.txt"
+      - ".github/workflows/api-ci.yml"
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: pip install -r deploy/requirements-dev.txt
+
+      - name: Test
+        # No database is required: the suite uses SQLite for auth and mocks the
+        # warehouse. Anything that needs a real Postgres/Oracle skips itself.
+        run: pytest tests/ -q

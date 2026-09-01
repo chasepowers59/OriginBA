@@ -7,6 +7,7 @@ import {
   runSnapshotQuery,
 } from "@/lib/api";
 import { formatCurrency, formatNumber } from "@/lib/format";
+import { chartedMeasureColumn, kpiHeadline } from "@/lib/dashboardTileMath";
 import { measureDisplaysAsCurrency } from "@/lib/businessLabels";
 import type { DashboardTileDef, QueryResponse } from "@/lib/types";
 import { BuilderChart } from "./builder/BuilderChart";
@@ -67,7 +68,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
         setDimensionKey(
           timeDimensions.length ? response.columns[0] ?? "" : dimensions[0] ?? response.columns[0] ?? "",
         );
-        setMeasureKey(response.columns[response.columns.length - 1] ?? "");
+        setMeasureKey(chartedMeasureColumn(response.columns, measures.length));
         setQueryMeasureField(primaryMeasure.field ?? "*");
         setQueryMeasureAgg(primaryMeasure.agg ?? "count");
         setError(null);
@@ -84,9 +85,9 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
   }, [tile, days, filter]);
 
   const total = useMemo(() => {
-    if (!result || !measureKey) return null;
-    return result.rows.reduce((s, r) => s + Number(r[measureKey] ?? 0), 0);
-  }, [result, measureKey]);
+    if (!result) return null;
+    return kpiHeadline(result.rows, measureKey, queryMeasureAgg);
+  }, [result, measureKey, queryMeasureAgg]);
 
   useEffect(() => {
     if (!result || !onData) return;
@@ -109,7 +110,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
 
   if (error) {
     return (
-      <div className="glass-panel h-full p-4 text-sm text-amber-700 dark:text-amber-300">{error}</div>
+      <div className="glass-panel h-full p-4 text-sm text-warn">{error}</div>
     );
   }
 
@@ -118,7 +119,8 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
   }
 
   if (tile.visual === "kpi") {
-    const formatted = isCurrency ? formatCurrency(total) : formatNumber(total);
+    const formatted =
+      total === null ? null : isCurrency ? formatCurrency(total) : formatNumber(total);
     return (
       <div className="glass-panel flex h-full flex-col justify-center p-6">
         <p className="text-xs uppercase tracking-wide text-fg-muted">{tile.title}</p>

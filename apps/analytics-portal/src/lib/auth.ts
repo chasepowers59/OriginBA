@@ -24,6 +24,8 @@ export type PortalOrganization = {
 export type AuthStatus = {
   enabled: boolean;
   authenticated: boolean;
+  /** True when the API is configured for OIDC single sign-on (Azure AD / Entra). */
+  oidc_enabled?: boolean;
 };
 
 export type AccessGroup = {
@@ -56,18 +58,40 @@ function cookieFlags(maxAgeSeconds: number): string {
   return `; path=/; max-age=${maxAgeSeconds}; SameSite=Lax${secure}`;
 }
 
-export function storeAccessToken(token: string, maxAgeSeconds = 48 * 3600): void {
+/**
+ * The token lives in sessionStorage for this tab's own fetches, and a copy is
+ * handed to a same-origin route that stores it HttpOnly for server-side rendering
+ * (app/api/session). It is deliberately NOT written with document.cookie any more:
+ * a scriptable cookie handed any XSS a token good for its full life (audit H6).
+ * `portal_session` stays a plain cookie — it is a flag, not a credential, and the
+ * middleware reads it to gate routes.
+ */
+export async function storeAccessToken(token: string, maxAgeSeconds = 8 * 3600): Promise<void> {
   if (typeof window === "undefined") return;
   sessionStorage.setItem(TOKEN_KEY, token);
   document.cookie = `${SESSION_COOKIE}=1${cookieFlags(maxAgeSeconds)}`;
-  document.cookie = `${TOKEN_COOKIE}=${encodeURIComponent(token)}${cookieFlags(maxAgeSeconds)}`;
+  try {
+    await fetch("/api/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, maxAge: maxAgeSeconds }),
+    });
+  } catch {
+    // SSR will fall back to the client-side fetch path; not fatal.
+  }
 }
 
-export function clearAccessToken(): void {
+export async function clearAccessToken(): Promise<void> {
   if (typeof window === "undefined") return;
   sessionStorage.removeItem(TOKEN_KEY);
   document.cookie = `${SESSION_COOKIE}=; path=/; max-age=0; SameSite=Lax`;
+  // clear any cookie left by a pre-H6 session, then drop the HttpOnly one
   document.cookie = `${TOKEN_COOKIE}=; path=/; max-age=0; SameSite=Lax`;
+  try {
+    await fetch("/api/session", { method: "DELETE" });
+  } catch {
+    /* best effort */
+  }
 }
 
 export function authHeaders(): Record<string, string> {

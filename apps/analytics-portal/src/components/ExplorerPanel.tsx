@@ -14,14 +14,13 @@ import {
   allowedAggsForMeasure,
   buildColumnLabels,
   defaultMeasureSelection,
-  prettifyFieldName,
   requiredDateLabel,
 } from "@/lib/businessLabels";
 import { getFavorite } from "@/lib/favorites";
 import { getViewRemote, saveViewRemote } from "@/lib/savedViews";
 import { applyDatePresetConfig, estimatePeriodDays, widenDateRange } from "@/lib/datePresets";
 import { applyProcessGuide } from "@/lib/processGuide";
-import { pinReportUrl } from "@/lib/pinReport";
+import { PinMenu } from "@/components/PinMenu";
 import { useAuth } from "@/components/AuthProvider";
 import { FavoritesPanel } from "./FavoritesPanel";
 import { GlobalFilterBar } from "./GlobalFilterBar";
@@ -410,7 +409,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   return (
     <div className="space-y-6">
       {processGuide ? (
-        <div className="glass-panel-subtle border-sky-400/20 px-4 py-3">
+        <div className="glass-panel-subtle border-edge px-4 py-3">
           <p className="text-sm font-semibold portal-heading">{processGuide.label}</p>
           <p className="mt-1 text-sm portal-text-muted">{processGuide.description}</p>
           <p className="mt-2 text-xs portal-text-subtle">
@@ -437,10 +436,10 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 type="button"
                 onClick={() => selectTab(key)}
                 className={`rounded-xl px-2 py-2.5 text-xs font-medium transition sm:text-sm ${
-                  tab === key
-                    ? "bg-gradient-to-r from-sky-500/20 to-indigo-500/20 text-heading ring-1 ring-sky-400/30"
-                    : "text-fg-muted hover:bg-chip hover:text-heading"
-                }`}
+ tab === key
+ ? "bg-gradient-to-r from-primary to-accent-2 text-heading ring-1 ring-edge"
+ : "text-fg-muted hover:bg-chip hover:text-heading"
+ }`}
               >
                 {label}
               </button>
@@ -550,10 +549,10 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 onClick={() => runPremade(report)}
                 disabled={loading}
                 className={`w-full rounded-xl border px-4 py-3 text-left transition disabled:opacity-60 ${
-                  activeReportId === report.id
-                    ? "border-sky-400/40 bg-sky-500/10 ring-1 ring-sky-400/20"
-                    : "border-edge-subtle bg-surface-subtle hover:border-edge-subtle hover:bg-chip"
-                }`}
+ activeReportId === report.id
+ ? "border-edge bg-band ring-1 ring-edge"
+ : "border-edge-subtle bg-surface-subtle hover:border-edge-subtle hover:bg-chip"
+ }`}
               >
                 <div className="font-medium text-heading">{report.title}</div>
                 <div className="mt-1 text-xs text-fg-muted">{report.description}</div>
@@ -565,35 +564,32 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         {result ? (
           <div className="space-y-2">
             <button type="button" onClick={() => void handleSaveFavorite()} className="btn-ghost w-full">
-              Save to workspace
+              Save view
             </button>
             <button type="button" onClick={() => void handleSaveCopy()} className="btn-ghost w-full text-xs">
               Save a copy
             </button>
             {activeReportId ? (
-              <Link
-                href={pinReportUrl({
+              <PinMenu
+                target={{
                   snapshotId: metadata.id,
                   reportId: activeReportId,
                   title: activeReportTitle ?? metadata.label,
                   chartType,
                   days: estimatePeriodDays(dateStart, dateEnd),
-                })}
-                className="btn-ghost block w-full text-center text-xs"
-              >
-                Pin to dashboard
-              </Link>
+                }}
+              />
             ) : null}
           </div>
         ) : null}
         {savedMsg ? (
-          <p className="text-center text-xs text-emerald-600 dark:text-emerald-400">{savedMsg}</p>
+          <p className="text-center text-xs text-ok">{savedMsg}</p>
         ) : null}
       </aside>
 
       <main className="space-y-4">
         {error ? (
-          <div className="glass-panel border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-200">
+          <div className="glass-panel border-over bg-over-bg px-4 py-3 text-sm text-over">
             {error}
           </div>
         ) : null}

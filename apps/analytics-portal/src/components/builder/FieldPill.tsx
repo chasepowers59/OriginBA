@@ -16,10 +16,14 @@ export function FieldPill({
   field,
   trusted,
   dragId,
+  onActivate,
 }: {
   field: FieldDef;
   trusted?: boolean;
   dragId: string;
+  /** Click / Enter fallback: adds the field to its role-appropriate shelf, so the
+   *  palette works without drag-and-drop (and for keyboard users). */
+  onActivate?: (field: FieldDef) => void;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: dragId,
@@ -31,6 +35,7 @@ export function FieldPill({
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      onClick={onActivate ? () => onActivate(field) : undefined}
       type="button"
       className="group flex w-full items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left text-xs transition"
       style={{
@@ -40,8 +45,11 @@ export function FieldPill({
         background: "var(--surface-subtle)",
         color: "var(--foreground)",
       }}
-      title={field.description || field.label}
+      title={`${field.description || field.label} — click to add, or drag to a shelf`}
     >
+      <span aria-hidden className="shrink-0 text-[10px] leading-none" style={{ color: "var(--foreground-subtle)" }}>
+        ⠿
+      </span>
       <span
         className="grid h-4 w-5 shrink-0 place-items-center rounded text-[9px] font-bold"
         style={{ background: `color-mix(in srgb, ${tone} 20%, transparent)`, color: tone }}

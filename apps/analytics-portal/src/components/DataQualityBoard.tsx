@@ -40,8 +40,8 @@ type DqResponse = {
 };
 
 const SEV = {
-  action: { label: "ACT NOW", pill: "bg-red-500/15 text-red-600 ring-1 ring-red-500/30 dark:text-red-300" },
-  review: { label: "REVIEW", pill: "bg-amber-500/15 text-amber-700 ring-1 ring-amber-500/30 dark:text-amber-300" },
+  action: { label: "ACT NOW", pill: "bg-over-bg text-over ring-1 ring-over dark:text-over" },
+  review: { label: "REVIEW", pill: "bg-warn-bg text-warn ring-1 ring-warn dark:text-warn" },
   info: { label: "INFO", pill: "bg-chip text-fg-muted ring-1 ring-edge-subtle" },
 } as const;
 
@@ -91,7 +91,7 @@ export function DataQualityBoard() {
 
   if (err) {
     return (
-      <div className="glass-panel border-red-400/30 bg-red-500/10 p-6 text-sm text-red-600 dark:text-red-300">
+      <div className="glass-panel border-over bg-over-bg p-6 text-sm text-over">
         Could not load data-quality findings: {err}
       </div>
     );
@@ -118,7 +118,7 @@ export function DataQualityBoard() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
             Data quality
           </p>
           <h1 className="portal-heading mt-1 text-2xl font-bold">Worklist</h1>
@@ -168,7 +168,7 @@ export function DataQualityBoard() {
       {groups.clean.length ? (
         <details className="glass-panel px-4 py-3">
           <summary className="cursor-pointer text-sm text-fg-muted">
-            <span className="font-medium text-emerald-600 dark:text-emerald-400">
+            <span className="font-medium text-ok">
               {groups.clean.length} checks clean
             </span>{" "}
             — everything these rules watch is in order
@@ -176,7 +176,7 @@ export function DataQualityBoard() {
           <ul className="mt-3 grid gap-1 text-xs text-fg-muted sm:grid-cols-2">
             {groups.clean.map((r) => (
               <li key={r.id} className="flex items-center gap-2">
-                <span aria-hidden className="text-emerald-500">✓</span>
+                <span aria-hidden className="text-ok">✓</span>
                 <span>{r.title}</span>
                 <span className="text-fg-subtle">· {r.object}</span>
               </li>
@@ -208,7 +208,7 @@ function Section({
       <div>
         <h2 className="text-sm font-semibold uppercase tracking-wider text-fg-subtle">{title}</h2>
         <p className="mt-1 text-sm text-fg-muted">
-          <span aria-hidden className="mr-1 text-emerald-500">✓</span>
+          <span aria-hidden className="mr-1 text-ok">✓</span>
           {emptyNote}
         </p>
       </div>
@@ -246,7 +246,7 @@ function RuleCard({
         <span className="font-medium text-heading">{r.title}</span>
         <span className="ml-auto flex items-center gap-2 text-sm">
           {r.error ? (
-            <span className="text-red-500">rule error</span>
+            <span className="text-over">rule error</span>
           ) : (
             <span className="rounded-full bg-chip px-2 py-0.5 text-xs font-semibold tabular-nums text-fg">
               {r.count}
@@ -262,7 +262,7 @@ function RuleCard({
           {r.action}
         </p>
         {r.error ? (
-          <p className="text-sm text-red-500">rule error: {r.error}</p>
+          <p className="text-sm text-over">rule error: {r.error}</p>
         ) : r.count === 0 ? (
           <p className="text-sm text-fg-muted">No findings — clean.</p>
         ) : (
@@ -288,7 +288,7 @@ function RuleCard({
                       <button
                         onClick={() => onMark(r.row_keys?.[i] ?? `${r.id}|${row[0]}`, true)}
                         title="Mark done until the next data refresh"
-                        className="rounded border border-emerald-500/50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 hover:bg-emerald-500/10 dark:text-emerald-400"
+                        className="rounded border border-ok px-1.5 py-0.5 text-[10px] font-semibold text-ok hover:bg-ok-bg dark:text-ok"
                       >
                         Done
                       </button>
@@ -344,9 +344,9 @@ function SummaryCard({
   glyph: string;
 }) {
   const tones: Record<string, { text: string; chip: string }> = {
-    red: { text: "text-red-600 dark:text-red-400", chip: "bg-red-500" },
-    amber: { text: "text-amber-600 dark:text-amber-400", chip: "bg-amber-500" },
-    green: { text: "text-emerald-600 dark:text-emerald-400", chip: "bg-emerald-500" },
+    red: { text: "text-over", chip: "bg-over" },
+    amber: { text: "text-warn", chip: "bg-warn" },
+    green: { text: "text-ok", chip: "bg-ok" },
     blue: { text: "text-brand", chip: "bg-brand" },
   };
   const t = tones[tone];

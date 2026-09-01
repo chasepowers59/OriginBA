@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -150,15 +151,40 @@ def get_snapshot(snapshot_id: str, organization_id: str | None = None) -> dict[s
     raise CatalogError(f"Unknown snapshot: {snapshot_id}")
 
 
+# Columns that may never be queryable, whatever a catalog says. The SQL workspace
+# fences these; the governed query API allow-lists whatever the catalog declares, so
+# a catalog carrying one re-opened the same door the fence closes (audit H4). This
+# denylist is applied at the ALLOW-LIST, so a regenerated or hand-edited catalog
+# cannot re-expose them.
+#
+# Matched as whole words against the field id, upper-cased and with separators
+# normalised, so it catches ALERT_INFO, ACCT_ALERT_INFO, "Alert Info" and
+# "Bank Routing Number (MICR ID)" alike -- while leaving columns that merely
+# CONTAIN a word ("Open Alert Count", "Has Alert") alone.
+PROTECTED_COLUMNS = ("MICR ID", "MICR", "WEB PASSWD", "ALERT INFO", "EXT ACCT ID")
+_PROTECTED_RE = re.compile(
+    r"(?<![A-Z0-9])(?:" + "|".join(c.replace(" ", r"\s+") for c in PROTECTED_COLUMNS)
+    + r")(?![A-Z0-9])"
+)
+
+
+def is_protected_column(field_id: str) -> bool:
+    """True when this field id names a protected column in any of our spellings."""
+    normalised = re.sub(r"[_\-]+", " ", str(field_id)).upper()
+    normalised = re.sub(r"[^A-Z0-9 ]+", " ", normalised)
+    return bool(_PROTECTED_RE.search(normalised))
+
+
 def allowed_fields(snapshot: dict[str, Any]) -> set[str]:
-    """The field ids a query may name, AS WRITTEN.
+    """The field ids a query may name, AS WRITTEN, minus the protected columns.
 
     Uppercasing was safe while every field was an Oracle column. The dbt canvases use
     quoted Title Case -- "Billed Amount" -- and upper-casing those produced a set nothing
     could match, so every query failed validation before it reached the database. The
     allow-list is what keeps a query safe, so it has to hold the real names.
     """
-    return {field["id"] for field in snapshot.get("fields", [])}
+    return {field["id"] for field in snapshot.get("fields", [])
+            if not is_protected_column(field.get("id", ""))}
 
 
 def is_warehouse(snapshot: dict[str, Any]) -> bool:

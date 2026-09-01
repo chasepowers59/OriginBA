@@ -22,6 +22,7 @@ from api.org_db import require_org_for_data
 from api.snapshot_catalog import org_backend
 from api.sql_workspace_validator import (
     SqlWorkspaceValidationError,
+    validate_oracle_cisadm_scope,
     validate_oracle_reporting_scope,
     validate_reporting_scope,
     validate_workspace_sql,
@@ -109,12 +110,24 @@ def _require_db(org_id: str) -> str:
     return engine
 
 
+# Every engine the router knows MUST map to a fence. A missing branch is not a
+# lenient default, it is an open database (audit C1) — so this is a total mapping
+# and an unknown engine is refused rather than waved through.
+_SCOPE_FENCES = {
+    "postgres": validate_reporting_scope,
+    "oracle_dbt": validate_oracle_reporting_scope,
+    "oracle": validate_oracle_cisadm_scope,
+}
+
+
 def _validate(engine: str, sql: str) -> str:
     validated = validate_workspace_sql(sql)
-    if engine == "postgres":
-        validate_reporting_scope(validated)
-    elif engine == "oracle_dbt":
-        validate_oracle_reporting_scope(validated)
+    fence = _SCOPE_FENCES.get(engine)
+    if fence is None:
+        raise SqlWorkspaceValidationError(
+            f"No scope fence is defined for the '{engine}' engine."
+        )
+    fence(validated)
     return validated
 
 
@@ -308,6 +321,11 @@ def execute_sql(
     try:
         validated = _validate(engine, body.sql)
     except SqlWorkspaceValidationError as exc:
+        from api.access_audit import record_access_event
+        record_access_event(
+            actor_email=ctx.email, actor_id=ctx.id, action="sql_refused",
+            target_type="sql", target_id=org_id,
+            detail=f"{exc} | sql: {body.sql[:300]}")
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     page_size = max(1, min(body.page_size, MAX_PAGE_SIZE))
@@ -339,6 +357,12 @@ def execute_sql(
             total_count = None
 
     fetched_total = body.offset + len(page_rows)
+
+    from api.access_audit import record_access_event
+    record_access_event(
+        actor_email=ctx.email, actor_id=ctx.id, action="sql_execute",
+        target_type="sql", target_id=org_id,
+        detail=f"rows={len(serialized)}; ms={elapsed_ms}; sql: {validated[:300]}")
 
     return {
         "organization_id": org_id,

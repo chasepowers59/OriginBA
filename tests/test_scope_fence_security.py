@@ -111,5 +111,167 @@ class PostgresScopeFenceTests(unittest.TestCase):
         self.assertFalse(self._blocked('SELECT "Account ID" FROM rpt_bill t WHERE t."Bill ID" > 0'))
 
 
+class SecretsProjectionTests(unittest.TestCase):
+    """C4 (2026-09-01): the secrets guard blocked column NAMES, not whole rows.
+
+    Blocking `micr_id` does nothing if the row itself can be projected as a value,
+    and the `SELECT *` rule named only the tender table while `ci_per` carries
+    web_passwd and `ci_acct` carries alert_info.
+    """
+
+    def _blocked(self, sql: str) -> bool:
+        try:
+            validate_reporting_scope(sql)
+            return False
+        except SqlWorkspaceValidationError:
+            return True
+
+    def test_blocks_whole_row_projection_of_a_secret_table(self):
+        for sql in (
+            "SELECT row_to_json(t) FROM cisadm.ci_pay_tndr t",
+            "SELECT to_jsonb(t) FROM cisadm.ci_pay_tndr t",
+            "SELECT t::text FROM cisadm.ci_pay_tndr t",
+            "SELECT CAST(t AS text) FROM cisadm.ci_pay_tndr t",
+            "SELECT row_to_json(p) FROM cisadm.ci_per p",
+            "SELECT to_jsonb(a) FROM cisadm.ci_acct a",
+        ):
+            with self.subTest(sql=sql):
+                self.assertTrue(self._blocked(sql), sql)
+
+    def test_blocks_select_star_on_every_secret_bearing_table(self):
+        for table in ("ci_pay_tndr", "ci_per", "ci_acct", "ci_acct_apay"):
+            with self.subTest(table=table):
+                self.assertTrue(self._blocked(f"SELECT * FROM cisadm.{table}"))
+                self.assertTrue(self._blocked(f"SELECT t.* FROM cisadm.{table} t"))
+
+    def test_still_allows_explicit_columns_on_those_tables(self):
+        self.assertFalse(self._blocked(
+            "SELECT pay_event_id, tender_amt FROM cisadm.ci_pay_tndr"))
+        self.assertFalse(self._blocked("SELECT per_id, per_or_bus_flg FROM cisadm.ci_per"))
+        self.assertFalse(self._blocked("SELECT acct_id, cis_division FROM cisadm.ci_acct"))
+
+    def test_row_projection_of_a_harmless_table_is_fine(self):
+        # The rule is about tables that carry secrets, not about the functions.
+        self.assertFalse(self._blocked("SELECT row_to_json(b) FROM cisadm.ci_bseg b"))
+        self.assertFalse(self._blocked("SELECT * FROM cisadm.ci_bseg"))
+
+
+class PostgresCatalogAndFunctionTests(unittest.TestCase):
+    """M1/M2 (2026-09-01): the Postgres fence had no unqualified-catalog rule and
+    no function deny-list, where the Oracle fence has both.
+
+    Qualified `pg_catalog.` was blocked, so the deny-list was bypassed simply by
+    dropping the qualifier: `pg_database` enumerates other clients' database names,
+    and `dblink`/`pg_read_file`/`pg_sleep` reach outside the database entirely.
+    """
+
+    def _blocked(self, sql: str) -> bool:
+        try:
+            validate_reporting_scope(sql)
+            return False
+        except SqlWorkspaceValidationError:
+            return True
+
+    def test_blocks_unqualified_catalog_tables(self):
+        for sql in (
+            "SELECT relname FROM pg_class",
+            "SELECT datname FROM pg_database",
+            "SELECT * FROM pg_stat_activity",
+            "SELECT usename FROM pg_user",
+            "SELECT rolname FROM pg_roles",
+            "SELECT name, setting FROM pg_settings",
+            "SELECT * FROM pg_shadow",
+            "SELECT table_name FROM information_schema.tables",
+        ):
+            with self.subTest(sql=sql):
+                self.assertTrue(self._blocked(sql), sql)
+
+    def test_blocks_dangerous_functions(self):
+        for sql in (
+            "SELECT dblink('host=evil', 'SELECT 1')",
+            "SELECT dblink_connect('host=evil')",
+            "SELECT pg_read_file('/etc/passwd')",
+            "SELECT pg_read_binary_file('/etc/passwd')",
+            "SELECT lo_import('/etc/passwd')",
+            "SELECT pg_sleep(10)",
+            "SELECT pg_ls_dir('/')",
+            "SELECT * FROM reporting.rpt_bill WHERE pg_sleep(5) IS NULL",
+        ):
+            with self.subTest(sql=sql):
+                self.assertTrue(self._blocked(sql), sql)
+
+    def test_ordinary_reporting_queries_are_untouched(self):
+        for sql in (
+            "SELECT * FROM reporting.rpt_financial_txn",
+            'SELECT "Account ID", "Billed Amount" FROM rpt_bill_segment',
+            "SELECT count(*) FROM cisadm.ci_bseg WHERE freeze_sw = 'Y'",
+            # a column whose name merely starts with the same letters
+            'SELECT "Page Count" FROM reporting.rpt_bill',
+        ):
+            with self.subTest(sql=sql):
+                self.assertFalse(self._blocked(sql), sql)
+
+
+class LegacyOracleEngineFenceTests(unittest.TestCase):
+    """C1 (2026-09-01): the legacy `oracle` engine had NO fence.
+
+    `database_routes._validate` fenced only 'postgres' and 'oracle_dbt', so six of
+    eight orgs — every org whose catalog is not 'dbt', with `database:sql` held by
+    the lowest role — reached MICR_ID, the data dictionary, other schemas, dblinks
+    and UTL_HTTP. These tests pin the ROUTING, not just the validator, because the
+    routing is where the hole was.
+    """
+
+    def _validate(self, engine: str, sql: str):
+        from api.database_routes import _validate
+
+        return _validate(engine, sql)
+
+    def _blocked(self, engine: str, sql: str) -> bool:
+        try:
+            self._validate(engine, sql)
+            return False
+        except SqlWorkspaceValidationError:
+            return True
+
+    def test_every_engine_applies_a_fence(self):
+        # A fenced statement must be refused on EVERY engine the router knows.
+        for engine in ("postgres", "oracle", "oracle_dbt"):
+            with self.subTest(engine=engine):
+                self.assertTrue(
+                    self._blocked(engine, "SELECT micr_id FROM cisadm.ci_pay_tndr"))
+
+    def test_legacy_oracle_blocks_the_audited_bypasses(self):
+        for sql in (
+            "SELECT micr_id FROM cisadm.ci_pay_tndr",
+            "SELECT username FROM dba_users",
+            "SELECT sid FROM v$session",
+            "SELECT * FROM sys.user$",
+            "SELECT * FROM cisadm.ci_acct@remote",
+            "SELECT utl_http.request('http://x') FROM dual",
+            "SELECT * FROM scott.emp",
+            'SELECT * FROM "CISADM"."CI_ACCT"',
+        ):
+            with self.subTest(sql=sql):
+                self.assertTrue(self._blocked("oracle", sql), sql)
+
+    def test_legacy_oracle_still_serves_its_own_snapshots(self):
+        # The legacy orgs read *_RPT_CURR in CISADM — that must keep working.
+        for sql in (
+            "SELECT ACCT_ID, CUR_AMT FROM CISADM.FT_RPT_CURR WHERE ROWNUM < 50",
+            "SELECT COUNT(*) FROM FT_RPT_CURR",
+            "SELECT a.ACCT_ID FROM CISADM.ACCT_CUSTOMER_RPT_CURR a "
+            "JOIN CISADM.FT_RPT_CURR f ON f.ACCT_ID = a.ACCT_ID",
+        ):
+            with self.subTest(sql=sql):
+                self.assertEqual(self._validate("oracle", sql), sql.strip())
+
+    def test_legacy_oracle_refuses_a_reporting_schema_it_does_not_have(self):
+        # A legacy CISADM org has no ORIGINBA_REPORTING; naming it is a mistake,
+        # and allowing it would widen the fence for no reason.
+        self.assertTrue(
+            self._blocked("oracle", "SELECT * FROM ORIGINBA_REPORTING.RPT_BILL_SEGMENT"))
+
+
 if __name__ == "__main__":
     unittest.main()

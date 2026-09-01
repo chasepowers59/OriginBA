@@ -37,8 +37,28 @@ and, for Oracle orgs, needs Instant Client — neither fits Vercel serverless);
   - `PORTAL_AUTH_DATABASE_URL` = the Supabase connection string
   - `PORTAL_AUTH_SECRET` = a 32+ char random secret (JWT signing)
   - `PORTAL_BOOTSTRAP_ADMIN_EMAIL` / `PORTAL_BOOTSTRAP_ADMIN_PASSWORD`
-  - `WAREHOUSE_DATABASE_URL` (shared) and/or `WAREHOUSE_DATABASE_URL_<ORG>` per client
+  - `WAREHOUSE_DATABASE_URL_<ORG>` **per Postgres-backed client** — required. Since
+    the 2026-09-01 isolation fix a client org NEVER inherits the unsuffixed
+    `WAREHOUSE_DATABASE_URL`; that shared key serves the internal `dev` org only, and
+    an org with no key of its own reports "not configured" rather than reading another
+    tenant's database. Oracle-backed orgs use `<ORG>_DB_*` and need no warehouse URL.
   - Oracle orgs only: `<ORG>_DB_*` / `<ORG>_ORACLE_DSN`, `DB_THICK_MODE`, `ORACLE_CLIENT_LIB_DIR`
+    — **per client, required.** Since the 2026-09-01 isolation fix a client never
+    inherits the global `DEMO_DB_*` / `DB_USER` keys; those serve the `demo` org only,
+    and an org with no keys of its own reports "not configured". If you are migrating a
+    pre-multi-org credential vault, name its owner with
+    `PORTAL_LEGACY_VAULT_ORGANIZATION=<org>`; unset means no org inherits it.
+  - OIDC SSO (optional, Azure AD / Entra): set all four of `OIDC_ISSUER`
+    (`https://login.microsoftonline.com/<tenant-id>/v2.0`), `OIDC_CLIENT_ID`,
+    `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URI` (`https://<api-host>/auth/oidc/callback`,
+    registered at the IdP) to enable; plus `OIDC_DEFAULT_ORGANIZATION` (org for
+    just-in-time provisioned users — always role `user`; SSO never mints admins) and
+    `OIDC_POST_LOGIN_URL` (the portal login page, which receives `#sso_token=`).
+    The login page shows "Sign in with Microsoft" automatically once `/auth/status`
+    reports `oidc_enabled`.
+  - Scheduled report delivery (optional): `SMTP_HOST`/`SMTP_PORT`/`SMTP_USERNAME`/
+    `SMTP_PASSWORD`/`SMTP_FROM`/`SMTP_STARTTLS`, then add an hourly cron job running
+    `python -m api.report_schedule_runner` with the same env (`--dry-run` to verify).
 - Expose HTTPS; note the URL (e.g. `https://originba-api.fly.dev`).
 - Move saved views/dashboards off local JSON to Supabase before scaling past one
   replica (schema in 001_init.sql; the store code is the one remaining backend task —
@@ -90,6 +110,28 @@ cold-start after idle; use the Starter plan or Fly for always-on. The API comes 
   Supabase. Needs **VPN** (Oracle reachable) and `TARGET_DB_URL` (Supabase Session pooler,
   never committed). It preflights both and refuses if a MICR column ever reached the layer.
   Do NOT load a real *client* slice (Ellensburg, etc.) into cloud Supabase — data residency.
+
+## Supabase pooler hosts
+
+The pooler host's instance number is **per project, not per region**. Both portal
+projects live in us-east-2 yet resolve differently:
+
+| Project | Pooler host |
+| --- | --- |
+| `psnkxsjpuxgvvjvyenfj` (INT_DEV warehouse, auth + portal_state) | `aws-0-us-east-2.pooler.supabase.com` |
+| `hvnfyulgwpjpeeowzuni` (Demo 25.4 warehouse) | `aws-1-us-east-2.pooler.supabase.com` |
+
+The wrong host fails with `FATAL: (ENOTFOUND) tenant/user postgres.<ref> not found`,
+which reads like a credential error and is not one. To identify the right host without
+the password, connect with a deliberately wrong one: "tenant/user not found" means the
+host is wrong, "password authentication failed" means the host is right.
+
+## Backups
+`deploy/backup_portal_state.sh [outdir]` dumps the control-plane data users create
+by hand — auth tables + the whole `portal_state` schema (saved views, dashboards,
+schedules, alerts) — into a timestamped `.sql.gz`. Run it daily from the same cron
+that runs the report-schedule runner; it needs only `PORTAL_AUTH_DATABASE_URL`.
+The warehouse is NOT backed up here (dbt rebuilds it).
 
 ## Deploy / update
 1. `git push origin main` (or merge the feature branch) — Vercel auto-builds the frontend.

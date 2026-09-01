@@ -1,0 +1,831 @@
+<title>Soul Palette V2.1 Merge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --page: #FFFFFF; --page-2: #F2F5F8; --ink: #1B2530; --ink-dim: #56636E;
+  --rule: #D9E1E8; --teal: #1C7884; --blue: #006FAC; --card-bg: #FFFFFF;
+  --tag-add-bg: #E4F1E8; --tag-add-fg: #0B5A2E;
+  --tag-v1-bg: #EFF5FB; --tag-v1-fg: #004B86;
+  --shadow: 0 1px 2px rgba(27,37,48,.06), 0 8px 24px -16px rgba(27,37,48,.28);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #0B1723; --page-2: #14202D; --ink: #E6ECF2; --ink-dim: #A4ACB4;
+    --rule: #343E4A; --teal: #8ACAD4; --blue: #6BB2EA; --card-bg: #14202D;
+    --tag-add-bg: #003A15; --tag-add-fg: #96D6A7;
+    --tag-v1-bg: #1B2835; --tag-v1-fg: #A2E6FF;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"] {
+  --page: #0B1723; --page-2: #14202D; --ink: #E6ECF2; --ink-dim: #A4ACB4;
+  --rule: #343E4A; --teal: #8ACAD4; --blue: #6BB2EA; --card-bg: #14202D;
+  --tag-add-bg: #003A15; --tag-add-fg: #96D6A7;
+  --tag-v1-bg: #1B2835; --tag-v1-fg: #A2E6FF;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page); color: var(--ink);
+  font-family: "Aptos","Aptos Display",Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased;
+}
+.mono, .sw-hex, code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 56px 24px 96px; }
+h1 { font-size: clamp(2rem, 4vw, 2.7rem); line-height: 1.08; letter-spacing: -.022em; margin: 0 0 12px; text-wrap: balance; }
+h2 { font-size: 1.35rem; letter-spacing: -.012em; margin: 0 0 6px; }
+h3 { font-size: 1.02rem; margin: 0 0 10px; }
+.eyebrow { display:block; font-size: 11px; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--teal); }
+.lede { font-size: 1.06rem; color: var(--ink-dim); max-width: 68ch; margin: 0 0 8px; }
+.dim { color: var(--ink-dim); }
+.small { font-size: 12.5px; }
+section { margin-top: 56px; }
+section > header { margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+a { color: var(--blue); }
+
+.meta { display:flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 18px; font-size: 13px; color: var(--ink-dim); }
+.meta b { color: var(--ink); font-weight: 600; }
+
+.cards { display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); }
+.card { background: var(--card-bg); border: 1px solid var(--rule); border-radius: 12px;
+  padding: 18px 18px 20px; box-shadow: var(--shadow); }
+.card .big { font-size: 2.1rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.card p { margin: 6px 0 0; font-size: 13.5px; color: var(--ink-dim); }
+
+.tag { display:inline-block; margin-left: 6px; padding: 1px 5px; border-radius: 4px;
+  font-size: 9.5px; font-weight: 700; letter-spacing: .06em; vertical-align: middle;
+  font-family: "JetBrains Mono", monospace; }
+.tag-v1 { background: var(--tag-v1-bg); color: var(--tag-v1-fg); }
+.tag-add { background: var(--tag-add-bg); color: var(--tag-add-fg); }
+
+/* palette */
+.pal-group { margin-bottom: 26px; }
+.pal-group-title { font-size: 12px; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--ink-dim); margin: 0 0 8px; font-weight: 600; }
+.pal-cols { display:grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 720px) { .pal-cols { grid-template-columns: 1fr; } }
+.pal-col { border: 1px solid var(--border); border-radius: 12px; padding: 12px;
+  background: var(--background); }
+.sw { display:flex; align-items:center; gap: 10px; padding: 4px 2px; }
+.chip-color { width: 26px; height: 26px; border-radius: 6px; flex: none;
+  border: 1px solid rgba(127,127,127,.35); }
+.sw-name { flex: 1; font-size: 12.5px; color: var(--foreground);
+  font-family: "JetBrains Mono", monospace; }
+.sw-hex { font-size: 11.5px; color: var(--muted-foreground); }
+.col-tag { display:flex; justify-content: space-between; font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-dim); margin-bottom: 6px; }
+
+/* contrast table */
+table.spec { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+table.spec th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .09em;
+  color: var(--ink-dim); border-bottom: 1px solid var(--rule); padding: 8px 10px; font-weight: 600; }
+table.spec td { padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+table.spec td.num, table.spec th.num { text-align: right; font-variant-numeric: tabular-nums;
+  font-family: "JetBrains Mono", monospace; }
+td.pass { color: var(--tag-add-fg); font-weight: 600; font-size: 11.5px; text-align: right; }
+.scroll { overflow-x: auto; }
+
+/* ramp */
+.ramp { display:flex; border-radius: 8px; overflow: hidden; height: 42px; border: 1px solid var(--rule); }
+.ramp-cell { flex: 1; }
+.ramp-axis { display:flex; justify-content: space-between; font-size: 11.5px;
+  color: var(--ink-dim); margin-top: 5px; }
+.ramp-compare { display:grid; gap: 20px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 720px) { .ramp-compare { grid-template-columns: 1fr; } }
+
+/* ---------- specimen scopes ---------- */
+.pal.light { 
+  --background:#FFFFFF; --card:#FFFFFF; --muted:#F2F5F8; --band:#EFF5FB;
+  --border:#D9E1E8; --input:#7A8FA0; --foreground:#1B2530; --muted-foreground:#56636E;
+  --heading:#1C7884; --primary:#006FAC; --primary-foreground:#FFFFFF; --ring:#006FAC;
+  --ok:#0B5A2E; --ok-bg:#E4F1E8; --over:#8B1515; --over-bg:#FBEAEA;
+  --warn-fg:#3D2E00; --warn-bg:#F3E5AB; --neutral-3:#A4B8C8; --neutral-4:#7A8FA0;
+  --chart-1:#006FAC; --chart-2:#1C7884; --chart-3:#28A0EE; --chart-4:#00535F;
+  --chart-5:#004B86; --chart-6:#7A8FA0; --chart-selected:#A85E00;
+  --chart-selected-foreground:#FFFFFF; --title:#1B2530; --accent-2:#004B86;
+ color-scheme: light; }
+.pal.dark  { 
+  --background:#0B1723; --card:#14202D; --muted:#212C39; --band:#1B2835;
+  --border:#343E4A; --input:#606A76; --foreground:#E6ECF2; --muted-foreground:#A4ACB4;
+  --heading:#8ACAD4; --primary:#6BB2EA; --primary-foreground:#07121E; --ring:#6BB2EA;
+  --ok:#96D6A7; --ok-bg:#003A15; --over:#FF998D; --over-bg:#610000;
+  --warn-fg:#F2E5B1; --warn-bg:#403103; --neutral-3:#5A6470; --neutral-4:#838D98;
+  --chart-1:#6BB2EA; --chart-2:#8ACAD4; --chart-3:#A2E6FF; --chart-4:#388E9A;
+  --chart-5:#1A7BB9; --chart-6:#838D98; --chart-selected:#F0B429;
+  --chart-selected-foreground:#07121E; --title:#E6ECF2; --accent-2:#1A7BB9;
+ color-scheme: dark; }
+.specimen { background: var(--background); color: var(--foreground);
+  border: 1px solid var(--border); border-radius: 14px; padding: 16px; display:grid; gap: 14px; }
+.spec-cols { display:grid; gap: 18px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 900px) { .spec-cols { grid-template-columns: 1fr; } }
+
+.appbar { display:flex; align-items:center; gap: 12px; background: var(--card);
+  border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px; }
+.wordmark { font-weight: 700; letter-spacing: -.02em; color: var(--primary); }
+.nav { display:flex; gap: 2px; flex: 1; flex-wrap: wrap; }
+.nav-item { font-size: 12px; padding: 4px 8px; border-radius: 6px; color: var(--muted-foreground); }
+.nav-item.active { background: var(--muted); color: var(--foreground); }
+.org-chip { font-size: 11px; padding: 3px 8px; border-radius: 999px;
+  background: var(--band); color: var(--primary); border: 1px solid var(--border); }
+
+.tiles { display:grid; gap: 10px; grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 560px) { .tiles { grid-template-columns: 1fr; } }
+.tile { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.tile-label { display:block; font-size: 12.5px; color: var(--muted-foreground); margin-top: 4px; }
+.tile-value { display:block; font-size: 1.7rem; font-weight: 700; color: var(--title);
+  letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.tile-sub { display:block; font-size: 11px; color: var(--muted-foreground); }
+
+.row { display:flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+.pill { font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+.pill-ok { background: var(--ok-bg); color: var(--ok); }
+.pill-over { background: var(--over-bg); color: var(--over); }
+.pill-warn { background: var(--warn-bg); color: var(--warn-fg); }
+.btn { font: inherit; font-size: 12.5px; font-weight: 600; border-radius: 8px;
+  padding: 7px 14px; border: 1px solid transparent; cursor: default; }
+.btn-primary { background: linear-gradient(90deg, var(--primary), var(--accent-2));
+  color: var(--primary-foreground); }
+.btn-primary[disabled] { opacity: .5; }
+.btn-ghost { background: var(--muted); color: var(--foreground); border-color: var(--border); }
+.btn.full { width: 100%; }
+.field { display:block; }
+.field-label { display:block; font-size: 11px; color: var(--muted-foreground); margin-bottom: 3px; }
+.input { font: inherit; font-size: 12.5px; padding: 7px 10px; border-radius: 8px;
+  border: 1px solid var(--input); background: var(--card); color: var(--foreground); width: 200px; }
+.input.focused { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 30%, transparent); }
+
+.banner { font-size: 12px; padding: 8px 11px; border-radius: 8px; }
+.banner-warn { background: var(--warn-bg); color: var(--warn-fg); }
+.banner-over { background: var(--over-bg); color: var(--over); }
+
+.panel { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.panel-title { font-size: 13px; margin: 2px 0 10px; color: var(--title); font-weight: 600; }
+.chart-pair { display:grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 560px) { .chart-pair { grid-template-columns: 1fr; } }
+.chart { display:flex; align-items: flex-end; gap: 8px; height: 110px; }
+.bar-col { flex: 1; display:flex; flex-direction: column; justify-content: flex-end;
+  align-items: center; height: 100%; gap: 4px; }
+.bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 3px; }
+.bar-label { font-size: 9.5px; color: var(--muted-foreground); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+table.data { width: 100%; border-collapse: collapse; font-size: 12px; }
+table.data th { background: var(--primary); color: var(--primary-foreground);
+  text-align: left; padding: 6px 9px; font-size: 10.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .05em; }
+table.data th:first-child { border-radius: 6px 0 0 0; }
+table.data th:last-child { border-radius: 0 6px 0 0; }
+table.data td { padding: 6px 9px; color: var(--foreground); border-bottom: 1px solid var(--border); }
+table.data tr.band td { background: var(--band); }
+table.data .num { text-align: right; font-variant-numeric: tabular-nums;
+  font-family: "JetBrains Mono", monospace; }
+table.data td.mono { font-family: "JetBrains Mono", monospace; color: var(--muted-foreground); }
+
+.dialog { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px; display:grid; gap: 10px; box-shadow: 0 18px 40px -20px rgba(0,0,0,.5); }
+.dialog-head { display:flex; justify-content: space-between; align-items: flex-start; }
+
+pre.css { background: var(--page-2); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 16px; overflow-x: auto; font-size: 12px; line-height: 1.6; margin: 0; }
+ol.decisions { padding-left: 20px; }
+ol.decisions li { margin-bottom: 12px; max-width: 76ch; }
+ol.decisions b { color: var(--ink); }
+.footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--rule);
+  font-size: 12.5px; color: var(--ink-dim); }
+.pal.light{--ramp-l1:#823235;--ramp-l2:#76434E;--ramp-l4:#575C7D;--ramp-l5:#3F6694;--ramp-high:#006FAC;--ramp-mid:#695166;--ramp-low:#8B1515;}.pal.dark{--ramp-l1:#EBA09E;--ramp-l2:#D6A5AF;--ramp-l4:#A7AECD;--ramp-l5:#8CB0DC;--ramp-high:#6BB2EA;--ramp-mid:#BFAABE;--ramp-low:#FF998D;}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Soul Palette V2.1 · merge proposal</span>
+    <h1>One palette for the conversion app and the analytics portal</h1>
+    <p class="lede">
+      V2.1 is adopted <b>verbatim</b> — all fifteen V1 anchors, the neutral ramp, both brand
+      ramps and the six chart aliases keep their approved values. The OriginBA portal adds
+      seven tokens for roles the conversion app does not have, and asks for no changes to
+      any V2.1 value.
+    </p>
+    <div class="meta">
+      <span><b>Base:</b> V2.1 Soul Palette, approved by Reed 2026-08-29</span>
+      <span><b>Merged:</b> OriginBA analytics portal, 2026-09-01</span>
+      <span><b>Contrast:</b> 14 pairs, all AA in both columns</span>
+    </div>
+  </header>
+
+  <section>
+    <header><span class="eyebrow">Summary</span><h2>What the merge does</h2></header>
+    <div class="cards">
+      <div class="card">
+        <span class="big">37</span>
+        <p><b>tokens adopted verbatim.</b> Surfaces, text, status pairs, neutral ramp, brand
+        ramps and the chart aliases — value for value, both columns.</p>
+      </div>
+      <div class="card">
+        <span class="big">7</span>
+        <p><b>tokens added by the portal.</b> Page title ink, cross-filter selection, the
+        three value-ramp anchors and the button gradient end.</p>
+      </div>
+      <div class="card">
+        <span class="big">0</span>
+        <p><b>changes requested to V2.1.</b> Nothing in the approved set is redefined,
+        renamed or overridden.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <header>
+      <span class="eyebrow">Tokens</span>
+      <h2>The merged palette</h2>
+      <p class="dim small">Left is light, right is dark; both painted from the same token
+      names. <span class="tag tag-v1">V1</span> marks a V2.1 anchor,
+      <span class="tag tag-add">+BA</span> a portal addition.</p>
+    </header>
+    
+      <div class="pal-group">
+        <h4 class="pal-group-title">Surfaces</h4>
+        <div class="pal-cols">
+          <div class="pal-col pal light"><div class="sw"><span class="chip-color" style="background:#FFFFFF"></span><span class="sw-name">background<span class="tag tag-v1">V1</span></span><span class="sw-hex">#FFFFFF</span></div>
+<div class="sw"><span class="chip-color" style="background:#FFFFFF"></span><span class="sw-name">card<span class="tag tag-v1">V1</span></span><span class="sw-hex">#FFFFFF</span></div>
+<div class="sw"><span class="chip-color" style="background:#F2F5F8"></span><span class="sw-name">muted<span class="tag tag-v1">V1</span></span><span class="sw-hex">#F2F5F8</span></div>
+<div class="sw"><span class="chip-color" style="background:#EFF5FB"></span><span class="sw-name">band<span class="tag tag-v1">V1</span></span><span class="sw-hex">#EFF5FB</span></div>
+<div class="sw"><span class="chip-color" style="background:#D9E1E8"></span><span class="sw-name">border<span class="tag tag-v1">V1</span></span><span class="sw-hex">#D9E1E8</span></div>
+<div class="sw"><span class="chip-color" style="background:#7A8FA0"></span><span class="sw-name">input<span class="tag tag-v1">V1</span></span><span class="sw-hex">#7A8FA0</span></div></div>
+          <div class="pal-col pal dark"><div class="sw"><span class="chip-color" style="background:#0B1723"></span><span class="sw-name">background<span class="tag tag-v1">V1</span></span><span class="sw-hex">#0B1723</span></div>
+<div class="sw"><span class="chip-color" style="background:#14202D"></span><span class="sw-name">card<span class="tag tag-v1">V1</span></span><span class="sw-hex">#14202D</span></div>
+<div class="sw"><span class="chip-color" style="background:#212C39"></span><span class="sw-name">muted<span class="tag tag-v1">V1</span></span><span class="sw-hex">#212C39</span></div>
+<div class="sw"><span class="chip-color" style="background:#1B2835"></span><span class="sw-name">band<span class="tag tag-v1">V1</span></span><span class="sw-hex">#1B2835</span></div>
+<div class="sw"><span class="chip-color" style="background:#343E4A"></span><span class="sw-name">border<span class="tag tag-v1">V1</span></span><span class="sw-hex">#343E4A</span></div>
+<div class="sw"><span class="chip-color" style="background:#606A76"></span><span class="sw-name">input<span class="tag tag-v1">V1</span></span><span class="sw-hex">#606A76</span></div></div>
+        </div>
+      </div>
+
+      <div class="pal-group">
+        <h4 class="pal-group-title">Text and brand</h4>
+        <div class="pal-cols">
+          <div class="pal-col pal light"><div class="sw"><span class="chip-color" style="background:#1B2530"></span><span class="sw-name">foreground<span class="tag tag-v1">V1</span></span><span class="sw-hex">#1B2530</span></div>
+<div class="sw"><span class="chip-color" style="background:#56636E"></span><span class="sw-name">muted-foreground<span class="tag tag-v1">V1</span></span><span class="sw-hex">#56636E</span></div>
+<div class="sw"><span class="chip-color" style="background:#1C7884"></span><span class="sw-name">heading<span class="tag tag-v1">V1</span></span><span class="sw-hex">#1C7884</span></div>
+<div class="sw"><span class="chip-color" style="background:#006FAC"></span><span class="sw-name">primary<span class="tag tag-v1">V1</span></span><span class="sw-hex">#006FAC</span></div>
+<div class="sw"><span class="chip-color" style="background:#FFFFFF"></span><span class="sw-name">primary-foreground<span class="tag tag-v1">V1</span></span><span class="sw-hex">#FFFFFF</span></div>
+<div class="sw"><span class="chip-color" style="background:#006FAC"></span><span class="sw-name">ring<span class="tag tag-v1">V1</span></span><span class="sw-hex">#006FAC</span></div>
+<div class="sw"><span class="chip-color" style="background:#1B2530"></span><span class="sw-name">title<span class="tag tag-add">+BA</span></span><span class="sw-hex">#1B2530</span></div></div>
+          <div class="pal-col pal dark"><div class="sw"><span class="chip-color" style="background:#E6ECF2"></span><span class="sw-name">foreground<span class="tag tag-v1">V1</span></span><span class="sw-hex">#E6ECF2</span></div>
+<div class="sw"><span class="chip-color" style="background:#A4ACB4"></span><span class="sw-name">muted-foreground<span class="tag tag-v1">V1</span></span><span class="sw-hex">#A4ACB4</span></div>
+<div class="sw"><span class="chip-color" style="background:#8ACAD4"></span><span class="sw-name">heading<span class="tag tag-v1">V1</span></span><span class="sw-hex">#8ACAD4</span></div>
+<div class="sw"><span class="chip-color" style="background:#6BB2EA"></span><span class="sw-name">primary<span class="tag tag-v1">V1</span></span><span class="sw-hex">#6BB2EA</span></div>
+<div class="sw"><span class="chip-color" style="background:#07121E"></span><span class="sw-name">primary-foreground<span class="tag tag-v1">V1</span></span><span class="sw-hex">#07121E</span></div>
+<div class="sw"><span class="chip-color" style="background:#6BB2EA"></span><span class="sw-name">ring<span class="tag tag-v1">V1</span></span><span class="sw-hex">#6BB2EA</span></div>
+<div class="sw"><span class="chip-color" style="background:#E6ECF2"></span><span class="sw-name">title<span class="tag tag-add">+BA</span></span><span class="sw-hex">#E6ECF2</span></div></div>
+        </div>
+      </div>
+
+      <div class="pal-group">
+        <h4 class="pal-group-title">Status pairs</h4>
+        <div class="pal-cols">
+          <div class="pal-col pal light"><div class="sw"><span class="chip-color" style="background:#0B5A2E"></span><span class="sw-name">ok<span class="tag tag-v1">V1</span></span><span class="sw-hex">#0B5A2E</span></div>
+<div class="sw"><span class="chip-color" style="background:#E4F1E8"></span><span class="sw-name">ok-bg<span class="tag tag-v1">V1</span></span><span class="sw-hex">#E4F1E8</span></div>
+<div class="sw"><span class="chip-color" style="background:#8B1515"></span><span class="sw-name">over<span class="tag tag-v1">V1</span></span><span class="sw-hex">#8B1515</span></div>
+<div class="sw"><span class="chip-color" style="background:#FBEAEA"></span><span class="sw-name">over-bg<span class="tag tag-v1">V1</span></span><span class="sw-hex">#FBEAEA</span></div>
+<div class="sw"><span class="chip-color" style="background:#3D2E00"></span><span class="sw-name">warn-fg<span class="tag tag-v1">V1</span></span><span class="sw-hex">#3D2E00</span></div>
+<div class="sw"><span class="chip-color" style="background:#F3E5AB"></span><span class="sw-name">warn-bg<span class="tag tag-v1">V1</span></span><span class="sw-hex">#F3E5AB</span></div></div>
+          <div class="pal-col pal dark"><div class="sw"><span class="chip-color" style="background:#96D6A7"></span><span class="sw-name">ok<span class="tag tag-v1">V1</span></span><span class="sw-hex">#96D6A7</span></div>
+<div class="sw"><span class="chip-color" style="background:#003A15"></span><span class="sw-name">ok-bg<span class="tag tag-v1">V1</span></span><span class="sw-hex">#003A15</span></div>
+<div class="sw"><span class="chip-color" style="background:#FF998D"></span><span class="sw-name">over<span class="tag tag-v1">V1</span></span><span class="sw-hex">#FF998D</span></div>
+<div class="sw"><span class="chip-color" style="background:#610000"></span><span class="sw-name">over-bg<span class="tag tag-v1">V1</span></span><span class="sw-hex">#610000</span></div>
+<div class="sw"><span class="chip-color" style="background:#F2E5B1"></span><span class="sw-name">warn-fg<span class="tag tag-v1">V1</span></span><span class="sw-hex">#F2E5B1</span></div>
+<div class="sw"><span class="chip-color" style="background:#403103"></span><span class="sw-name">warn-bg<span class="tag tag-v1">V1</span></span><span class="sw-hex">#403103</span></div></div>
+        </div>
+      </div>
+
+      <div class="pal-group">
+        <h4 class="pal-group-title">Neutral ramp</h4>
+        <div class="pal-cols">
+          <div class="pal-col pal light"><div class="sw"><span class="chip-color" style="background:#FFFFFF"></span><span class="sw-name">neutral-0</span><span class="sw-hex">#FFFFFF</span></div>
+<div class="sw"><span class="chip-color" style="background:#F2F5F8"></span><span class="sw-name">neutral-1</span><span class="sw-hex">#F2F5F8</span></div>
+<div class="sw"><span class="chip-color" style="background:#D9E1E8"></span><span class="sw-name">neutral-2</span><span class="sw-hex">#D9E1E8</span></div>
+<div class="sw"><span class="chip-color" style="background:#A4B8C8"></span><span class="sw-name">neutral-3</span><span class="sw-hex">#A4B8C8</span></div>
+<div class="sw"><span class="chip-color" style="background:#7A8FA0"></span><span class="sw-name">neutral-4</span><span class="sw-hex">#7A8FA0</span></div>
+<div class="sw"><span class="chip-color" style="background:#56636E"></span><span class="sw-name">neutral-5</span><span class="sw-hex">#56636E</span></div>
+<div class="sw"><span class="chip-color" style="background:#1B2530"></span><span class="sw-name">neutral-6</span><span class="sw-hex">#1B2530</span></div></div>
+          <div class="pal-col pal dark"><div class="sw"><span class="chip-color" style="background:#0B1723"></span><span class="sw-name">neutral-0</span><span class="sw-hex">#0B1723</span></div>
+<div class="sw"><span class="chip-color" style="background:#14202D"></span><span class="sw-name">neutral-1</span><span class="sw-hex">#14202D</span></div>
+<div class="sw"><span class="chip-color" style="background:#343E4A"></span><span class="sw-name">neutral-2</span><span class="sw-hex">#343E4A</span></div>
+<div class="sw"><span class="chip-color" style="background:#5A6470"></span><span class="sw-name">neutral-3</span><span class="sw-hex">#5A6470</span></div>
+<div class="sw"><span class="chip-color" style="background:#838D98"></span><span class="sw-name">neutral-4</span><span class="sw-hex">#838D98</span></div>
+<div class="sw"><span class="chip-color" style="background:#B1B8C1"></span><span class="sw-name">neutral-5</span><span class="sw-hex">#B1B8C1</span></div>
+<div class="sw"><span class="chip-color" style="background:#E6ECF2"></span><span class="sw-name">neutral-6</span><span class="sw-hex">#E6ECF2</span></div></div>
+        </div>
+      </div>
+
+      <div class="pal-group">
+        <h4 class="pal-group-title">Brand ramps</h4>
+        <div class="pal-cols">
+          <div class="pal-col pal light"><div class="sw"><span class="chip-color" style="background:#28A0EE"></span><span class="sw-name">brand-blue-1</span><span class="sw-hex">#28A0EE</span></div>
+<div class="sw"><span class="chip-color" style="background:#006FAC"></span><span class="sw-name">brand-blue-2</span><span class="sw-hex">#006FAC</span></div>
+<div class="sw"><span class="chip-color" style="background:#004B86"></span><span class="sw-name">brand-blue-3</span><span class="sw-hex">#004B86</span></div>
+<div class="sw"><span class="chip-color" style="background:#5DA5B0"></span><span class="sw-name">brand-teal-1</span><span class="sw-hex">#5DA5B0</span></div>
+<div class="sw"><span class="chip-color" style="background:#1C7884"></span><span class="sw-name">brand-teal-2</span><span class="sw-hex">#1C7884</span></div>
+<div class="sw"><span class="chip-color" style="background:#00535F"></span><span class="sw-name">brand-teal-3</span><span class="sw-hex">#00535F</span></div></div>
+          <div class="pal-col pal dark"><div class="sw"><span class="chip-color" style="background:#A2E6FF"></span><span class="sw-name">brand-blue-1</span><span class="sw-hex">#A2E6FF</span></div>
+<div class="sw"><span class="chip-color" style="background:#6BB2EA"></span><span class="sw-name">brand-blue-2</span><span class="sw-hex">#6BB2EA</span></div>
+<div class="sw"><span class="chip-color" style="background:#1A7BB9"></span><span class="sw-name">brand-blue-3</span><span class="sw-hex">#1A7BB9</span></div>
+<div class="sw"><span class="chip-color" style="background:#BCE7EE"></span><span class="sw-name">brand-teal-1</span><span class="sw-hex">#BCE7EE</span></div>
+<div class="sw"><span class="chip-color" style="background:#8ACAD4"></span><span class="sw-name">brand-teal-2</span><span class="sw-hex">#8ACAD4</span></div>
+<div class="sw"><span class="chip-color" style="background:#388E9A"></span><span class="sw-name">brand-teal-3</span><span class="sw-hex">#388E9A</span></div></div>
+        </div>
+      </div>
+
+      <div class="pal-group">
+        <h4 class="pal-group-title">Chart palette</h4>
+        <div class="pal-cols">
+          <div class="pal-col pal light"><div class="sw"><span class="chip-color" style="background:#006FAC"></span><span class="sw-name">chart-1</span><span class="sw-hex">#006FAC</span></div>
+<div class="sw"><span class="chip-color" style="background:#1C7884"></span><span class="sw-name">chart-2</span><span class="sw-hex">#1C7884</span></div>
+<div class="sw"><span class="chip-color" style="background:#28A0EE"></span><span class="sw-name">chart-3</span><span class="sw-hex">#28A0EE</span></div>
+<div class="sw"><span class="chip-color" style="background:#00535F"></span><span class="sw-name">chart-4</span><span class="sw-hex">#00535F</span></div>
+<div class="sw"><span class="chip-color" style="background:#004B86"></span><span class="sw-name">chart-5</span><span class="sw-hex">#004B86</span></div>
+<div class="sw"><span class="chip-color" style="background:#7A8FA0"></span><span class="sw-name">chart-6</span><span class="sw-hex">#7A8FA0</span></div>
+<div class="sw"><span class="chip-color" style="background:#A85E00"></span><span class="sw-name">chart-selected<span class="tag tag-add">+BA</span></span><span class="sw-hex">#A85E00</span></div></div>
+          <div class="pal-col pal dark"><div class="sw"><span class="chip-color" style="background:#6BB2EA"></span><span class="sw-name">chart-1</span><span class="sw-hex">#6BB2EA</span></div>
+<div class="sw"><span class="chip-color" style="background:#8ACAD4"></span><span class="sw-name">chart-2</span><span class="sw-hex">#8ACAD4</span></div>
+<div class="sw"><span class="chip-color" style="background:#A2E6FF"></span><span class="sw-name">chart-3</span><span class="sw-hex">#A2E6FF</span></div>
+<div class="sw"><span class="chip-color" style="background:#388E9A"></span><span class="sw-name">chart-4</span><span class="sw-hex">#388E9A</span></div>
+<div class="sw"><span class="chip-color" style="background:#1A7BB9"></span><span class="sw-name">chart-5</span><span class="sw-hex">#1A7BB9</span></div>
+<div class="sw"><span class="chip-color" style="background:#838D98"></span><span class="sw-name">chart-6</span><span class="sw-hex">#838D98</span></div>
+<div class="sw"><span class="chip-color" style="background:#F0B429"></span><span class="sw-name">chart-selected<span class="tag tag-add">+BA</span></span><span class="sw-hex">#F0B429</span></div></div>
+        </div>
+      </div>
+
+      <div class="pal-group">
+        <h4 class="pal-group-title">Value ramp</h4>
+        <div class="pal-cols">
+          <div class="pal-col pal light"><div class="sw"><span class="chip-color" style="background:#006FAC"></span><span class="sw-name">ramp-high<span class="tag tag-add">+BA</span></span><span class="sw-hex">#006FAC</span></div>
+<div class="sw"><span class="chip-color" style="background:#695166"></span><span class="sw-name">ramp-mid<span class="tag tag-add">+BA</span></span><span class="sw-hex">#695166</span></div>
+<div class="sw"><span class="chip-color" style="background:#8B1515"></span><span class="sw-name">ramp-low<span class="tag tag-add">+BA</span></span><span class="sw-hex">#8B1515</span></div></div>
+          <div class="pal-col pal dark"><div class="sw"><span class="chip-color" style="background:#6BB2EA"></span><span class="sw-name">ramp-high<span class="tag tag-add">+BA</span></span><span class="sw-hex">#6BB2EA</span></div>
+<div class="sw"><span class="chip-color" style="background:#BFAABE"></span><span class="sw-name">ramp-mid<span class="tag tag-add">+BA</span></span><span class="sw-hex">#BFAABE</span></div>
+<div class="sw"><span class="chip-color" style="background:#FF998D"></span><span class="sw-name">ramp-low<span class="tag tag-add">+BA</span></span><span class="sw-hex">#FF998D</span></div></div>
+        </div>
+      </div>
+  </section>
+
+  <section>
+    <header>
+      <span class="eyebrow">Components</span>
+      <h2>The portal, painted from these tokens</h2>
+      <p class="dim small">Real surfaces from the analytics portal — app bar, KPI tiles,
+      status pills, buttons, inputs, banners, both chart modes, a data table with its zebra
+      band, and a dialog. Nothing here uses a colour that is not a token above.</p>
+    </header>
+    <div class="spec-cols">
+      <div>
+        <div class="col-tag"><span>Light</span></div>
+        
+    <div class="pal light specimen">
+      <!-- app bar -->
+      <div class="appbar">
+        <span class="wordmark">Origin</span>
+        <nav class="nav">
+          <span class="nav-item active">Home</span><span class="nav-item">Explore</span>
+          <span class="nav-item">Dashboards</span><span class="nav-item">Library</span>
+          <span class="nav-item">SQL</span><span class="nav-item">Data Quality</span>
+        </nav>
+        <span class="org-chip">Ellensburg</span>
+      </div>
+
+      <!-- KPI tiles -->
+      <div class="tiles">
+        <div class="tile">
+          <span class="eyebrow">Billing &amp; rates</span>
+          <span class="tile-label">Billed revenue</span>
+          <span class="tile-value">$1.73M</span>
+          <span class="tile-sub">Frozen bill-segment FTs · last 30 days</span>
+        </div>
+        <div class="tile">
+          <span class="eyebrow">Customer</span>
+          <span class="tile-label">Frozen bill segments</span>
+          <span class="tile-value">19,727</span>
+          <span class="tile-sub">bseg_stat_flg = 50</span>
+        </div>
+        <div class="tile">
+          <span class="eyebrow">Finance</span>
+          <span class="tile-label">Financial transactions</span>
+          <span class="tile-value">55,425</span>
+          <span class="tile-sub">every dollar movement</span>
+        </div>
+      </div>
+
+      <!-- status + buttons + input -->
+      <div class="row">
+        <span class="pill pill-ok">Meets target</span>
+        <span class="pill pill-over">Above target</span>
+        <span class="pill pill-warn">Unexplained</span>
+        <button class="btn btn-primary">Run query</button>
+        <button class="btn btn-ghost">Export</button>
+        <button class="btn btn-primary" disabled>Saving…</button>
+      </div>
+      <div class="row">
+        <label class="field">
+          <span class="field-label">Recipients</span>
+          <input class="input" value="exec@utility.gov" readonly />
+        </label>
+        <label class="field">
+          <span class="field-label">Focused (ring)</span>
+          <input class="input focused" value="billing@utility.gov" readonly />
+        </label>
+      </div>
+
+      <!-- banners -->
+      <div class="banner banner-warn">Email delivery is not configured on the server yet — schedules save, but nothing sends.</div>
+      <div class="banner banner-over">Query failed: relation &ldquo;cisadm.ci_bsegg&rdquo; does not exist.</div>
+
+      <!-- charts -->
+      <div class="chart-pair">
+        <div class="panel">
+          <span class="eyebrow">Categorical · chart-1 / chart-2 / chart-3</span>
+          <h5 class="panel-title">Billed revenue by service type</h5>
+          <div class="chart"><div class="bar-col"><div class="bar" style="height:100%;background:var(--chart-1)"></div><span class="bar-label">Water</span></div><div class="bar-col"><div class="bar" style="height:85%;background:var(--chart-2)"></div><span class="bar-label">Electric</span></div><div class="bar-col"><div class="bar" style="height:45%;background:var(--chart-3)"></div><span class="bar-label">Waste</span></div><div class="bar-col"><div class="bar" style="height:28%;background:var(--chart-1)"></div><span class="bar-label">Storm</span></div><div class="bar-col"><div class="bar" style="height:20%;background:var(--chart-2)"></div><span class="bar-label">Sewer</span></div></div>
+        </div>
+        <div class="panel">
+          <span class="eyebrow">Magnitude · value ramp + selection</span>
+          <h5 class="panel-title">Accounts by customer class</h5>
+          <div class="chart"><div class="bar-col"><div class="bar" style="height:100%;background:var(--ramp-high)"></div><span class="bar-label">Residential</span></div><div class="bar-col"><div class="bar" style="height:39%;background:var(--ramp-l4)"></div><span class="bar-label">Commercial</span></div><div class="bar-col"><div class="bar" style="height:15%;background:var(--chart-selected)"></div><span class="bar-label">Industrial</span></div><div class="bar-col"><div class="bar" style="height:8%;background:var(--ramp-l2)"></div><span class="bar-label">Prepay</span></div><div class="bar-col"><div class="bar" style="height:3%;background:var(--ramp-low)"></div><span class="bar-label">Other</span></div></div>
+        </div>
+      </div>
+
+      <!-- table -->
+      <div class="panel">
+        <h5 class="panel-title">Bill Segment</h5>
+        <table class="data">
+          <thead><tr><th>Bill Segment ID</th><th>Customer Class</th><th>Is Frozen</th><th class="num">Billed Amount</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">1358301387</td><td>Residential</td><td>True</td><td class="num">1,727.38</td></tr>
+            <tr class="band"><td class="mono">1358301402</td><td>Commercial</td><td>True</td><td class="num">12,482.10</td></tr>
+            <tr><td class="mono">1358301419</td><td>Residential</td><td>False</td><td class="num">-248.32</td></tr>
+            <tr class="band"><td class="mono">1358301433</td><td>Industrial</td><td>True</td><td class="num">88,301.75</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- dialog -->
+      <div class="dialog">
+        <div class="dialog-head">
+          <div><h5 class="panel-title">Email schedule</h5>
+          <span class="dim small">Frozen segments by bill cycle</span></div>
+          <span class="dim">✕</span>
+        </div>
+        <div class="banner banner-warn small">SMTP is not configured — schedules save, nothing sends.</div>
+        <button class="btn btn-primary full">Create schedule</button>
+      </div>
+    </div>
+      </div>
+      <div>
+        <div class="col-tag"><span>Dark</span></div>
+        
+    <div class="pal dark specimen">
+      <!-- app bar -->
+      <div class="appbar">
+        <span class="wordmark">Origin</span>
+        <nav class="nav">
+          <span class="nav-item active">Home</span><span class="nav-item">Explore</span>
+          <span class="nav-item">Dashboards</span><span class="nav-item">Library</span>
+          <span class="nav-item">SQL</span><span class="nav-item">Data Quality</span>
+        </nav>
+        <span class="org-chip">Ellensburg</span>
+      </div>
+
+      <!-- KPI tiles -->
+      <div class="tiles">
+        <div class="tile">
+          <span class="eyebrow">Billing &amp; rates</span>
+          <span class="tile-label">Billed revenue</span>
+          <span class="tile-value">$1.73M</span>
+          <span class="tile-sub">Frozen bill-segment FTs · last 30 days</span>
+        </div>
+        <div class="tile">
+          <span class="eyebrow">Customer</span>
+          <span class="tile-label">Frozen bill segments</span>
+          <span class="tile-value">19,727</span>
+          <span class="tile-sub">bseg_stat_flg = 50</span>
+        </div>
+        <div class="tile">
+          <span class="eyebrow">Finance</span>
+          <span class="tile-label">Financial transactions</span>
+          <span class="tile-value">55,425</span>
+          <span class="tile-sub">every dollar movement</span>
+        </div>
+      </div>
+
+      <!-- status + buttons + input -->
+      <div class="row">
+        <span class="pill pill-ok">Meets target</span>
+        <span class="pill pill-over">Above target</span>
+        <span class="pill pill-warn">Unexplained</span>
+        <button class="btn btn-primary">Run query</button>
+        <button class="btn btn-ghost">Export</button>
+        <button class="btn btn-primary" disabled>Saving…</button>
+      </div>
+      <div class="row">
+        <label class="field">
+          <span class="field-label">Recipients</span>
+          <input class="input" value="exec@utility.gov" readonly />
+        </label>
+        <label class="field">
+          <span class="field-label">Focused (ring)</span>
+          <input class="input focused" value="billing@utility.gov" readonly />
+        </label>
+      </div>
+
+      <!-- banners -->
+      <div class="banner banner-warn">Email delivery is not configured on the server yet — schedules save, but nothing sends.</div>
+      <div class="banner banner-over">Query failed: relation &ldquo;cisadm.ci_bsegg&rdquo; does not exist.</div>
+
+      <!-- charts -->
+      <div class="chart-pair">
+        <div class="panel">
+          <span class="eyebrow">Categorical · chart-1 / chart-2 / chart-3</span>
+          <h5 class="panel-title">Billed revenue by service type</h5>
+          <div class="chart"><div class="bar-col"><div class="bar" style="height:100%;background:var(--chart-1)"></div><span class="bar-label">Water</span></div><div class="bar-col"><div class="bar" style="height:85%;background:var(--chart-2)"></div><span class="bar-label">Electric</span></div><div class="bar-col"><div class="bar" style="height:45%;background:var(--chart-3)"></div><span class="bar-label">Waste</span></div><div class="bar-col"><div class="bar" style="height:28%;background:var(--chart-1)"></div><span class="bar-label">Storm</span></div><div class="bar-col"><div class="bar" style="height:20%;background:var(--chart-2)"></div><span class="bar-label">Sewer</span></div></div>
+        </div>
+        <div class="panel">
+          <span class="eyebrow">Magnitude · value ramp + selection</span>
+          <h5 class="panel-title">Accounts by customer class</h5>
+          <div class="chart"><div class="bar-col"><div class="bar" style="height:100%;background:var(--ramp-high)"></div><span class="bar-label">Residential</span></div><div class="bar-col"><div class="bar" style="height:39%;background:var(--ramp-l4)"></div><span class="bar-label">Commercial</span></div><div class="bar-col"><div class="bar" style="height:15%;background:var(--chart-selected)"></div><span class="bar-label">Industrial</span></div><div class="bar-col"><div class="bar" style="height:8%;background:var(--ramp-l2)"></div><span class="bar-label">Prepay</span></div><div class="bar-col"><div class="bar" style="height:3%;background:var(--ramp-low)"></div><span class="bar-label">Other</span></div></div>
+        </div>
+      </div>
+
+      <!-- table -->
+      <div class="panel">
+        <h5 class="panel-title">Bill Segment</h5>
+        <table class="data">
+          <thead><tr><th>Bill Segment ID</th><th>Customer Class</th><th>Is Frozen</th><th class="num">Billed Amount</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">1358301387</td><td>Residential</td><td>True</td><td class="num">1,727.38</td></tr>
+            <tr class="band"><td class="mono">1358301402</td><td>Commercial</td><td>True</td><td class="num">12,482.10</td></tr>
+            <tr><td class="mono">1358301419</td><td>Residential</td><td>False</td><td class="num">-248.32</td></tr>
+            <tr class="band"><td class="mono">1358301433</td><td>Industrial</td><td>True</td><td class="num">88,301.75</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- dialog -->
+      <div class="dialog">
+        <div class="dialog-head">
+          <div><h5 class="panel-title">Email schedule</h5>
+          <span class="dim small">Frozen segments by bill cycle</span></div>
+          <span class="dim">✕</span>
+        </div>
+        <div class="banner banner-warn small">SMTP is not configured — schedules save, nothing sends.</div>
+        <button class="btn btn-primary full">Create schedule</button>
+      </div>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <header>
+      <span class="eyebrow">Addition · the one that needed fixing</span>
+      <h2>Value ramp</h2>
+      <p class="lede small">Portal bar charts encode magnitude by colour: the tallest bar is
+      brand blue and the shortest is red. The portal's current ramp sweeps hue in HSL, which
+      takes the short way round the wheel and lands mid-range values in vivid magenta and
+      violet — colours that exist nowhere in V2.1. Re-interpolating the same two endpoints in
+      Oklab keeps the middle low-chroma and inside the palette, and anchors the bottom to
+      V2.1's own <code>over</code> red so one red means one thing across both apps.</p>
+    </header>
+    <div class="ramp-compare">
+      <div>
+        <h3>Current portal ramp <span class="tag tag-v1">HSL sweep</span></h3>
+        <div class="ramp"><span class="ramp-cell" style="background:#CF4934"></span><span class="ramp-cell" style="background:#CF3473"></span><span class="ramp-cell" style="background:#CF34C6"></span><span class="ramp-cell" style="background:#AF34CF"></span><span class="ramp-cell" style="background:#8534CF"></span><span class="ramp-cell" style="background:#3436CF"></span><span class="ramp-cell" style="background:#3489CF"></span></div><div class="ramp-axis"><span>lowest value</span><span>highest value</span></div>
+        <p class="dim small">Mid-range renders <code>#CF34C6</code> magenta and
+        <code>#8534CF</code> violet — off-brand, and easily read as a third category rather
+        than a middling value.</p>
+      </div>
+      <div>
+        <h3>Proposed ramp <span class="tag tag-add">Oklab</span></h3>
+        <div class="ramp"><span class="ramp-cell" style="background:#8B1515"></span><span class="ramp-cell" style="background:#823235"></span><span class="ramp-cell" style="background:#76434E"></span><span class="ramp-cell" style="background:#695166"></span><span class="ramp-cell" style="background:#575C7D"></span><span class="ramp-cell" style="background:#3F6694"></span><span class="ramp-cell" style="background:#006FAC"></span></div><div class="ramp-axis"><span>lowest value</span><span>highest value</span></div>
+        <p class="dim small">Light column: <code>over</code> #8B1515 → <code>primary</code>
+        #006FAC. Every step sits in the palette's own hue family.</p>
+        <div style="margin-top:12px"><div class="ramp"><span class="ramp-cell" style="background:#FF998D"></span><span class="ramp-cell" style="background:#EBA09E"></span><span class="ramp-cell" style="background:#D6A5AF"></span><span class="ramp-cell" style="background:#BFAABE"></span><span class="ramp-cell" style="background:#A7AECD"></span><span class="ramp-cell" style="background:#8CB0DC"></span><span class="ramp-cell" style="background:#6BB2EA"></span></div></div>
+        <p class="dim small">Dark column: #FF998D → #6BB2EA.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <header>
+      <span class="eyebrow">Verification</span>
+      <h2>Contrast, recomputed at merge time</h2>
+      <p class="dim small">Every V2.1 pair was recomputed from the published hex values and
+      matches the V2.1 sheet exactly. The two added pairs are listed with them. AA needs 4.5:1.</p>
+    </header>
+    <div class="scroll">
+      <table class="spec">
+        <thead><tr><th>Text on background</th><th>Where it appears</th>
+        <th class="num">Light</th><th class="num">Dark</th><th class="num">Result</th></tr></thead>
+        <tbody><tr>
+          <td class="mono">foreground on background</td>
+          <td class="dim">body text</td>
+          <td class="num">15.51</td>
+          <td class="num">15.20</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">muted-foreground on background</td>
+          <td class="dim">captions, legend</td>
+          <td class="num">6.17</td>
+          <td class="num">7.87</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">heading on background</td>
+          <td class="dim">section headings</td>
+          <td class="num">5.16</td>
+          <td class="num">9.89</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">primary on background</td>
+          <td class="dim">active nav, links</td>
+          <td class="num">5.43</td>
+          <td class="num">7.91</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">primary-foreground on primary</td>
+          <td class="dim">table header, buttons</td>
+          <td class="num">5.43</td>
+          <td class="num">8.24</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">foreground on band</td>
+          <td class="dim">zebra rows</td>
+          <td class="num">14.13</td>
+          <td class="num">12.59</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">foreground on muted</td>
+          <td class="dim">tile, chips</td>
+          <td class="num">14.18</td>
+          <td class="num">11.89</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">muted-foreground on card</td>
+          <td class="dim">chart text</td>
+          <td class="num">6.17</td>
+          <td class="num">7.17</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">ok on ok-bg</td>
+          <td class="dim">Meets target chip</td>
+          <td class="num">7.17</td>
+          <td class="num">7.72</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">over on over-bg</td>
+          <td class="dim">Above target chip</td>
+          <td class="num">8.15</td>
+          <td class="num">6.76</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">warn-fg on warn-bg</td>
+          <td class="dim">banner, Unexplained</td>
+          <td class="num">10.45</td>
+          <td class="num">10.02</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">foreground on input</td>
+          <td class="dim">text on input border</td>
+          <td class="num">4.63</td>
+          <td class="num">4.62</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">title on card<span class="tag tag-add">+BA</span></td>
+          <td class="dim">page titles</td>
+          <td class="num">15.51</td>
+          <td class="num">13.85</td>
+          <td class="pass">AA</td>
+        </tr>
+<tr>
+          <td class="mono">selected-fg on chart-selected<span class="tag tag-add">+BA</span></td>
+          <td class="dim">cross-filter bar label</td>
+          <td class="num">4.92</td>
+          <td class="num">10.11</td>
+          <td class="pass">AA</td>
+        </tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <header><span class="eyebrow">Rationale</span><h2>Decisions inside the additions</h2></header>
+    <ol class="decisions">
+      <li><b>--title, not a redefined --heading.</b> V2.1 puts teal on h1/h2 at 5.16:1, which
+      is right for a status dashboard's short headings. Portal page titles run long and
+      analytic ("Frozen bill segments by bill cycle, trailing 90 days"), so they take ink at
+      15.51:1 while teal stays on the eyebrow above them. Both tokens keep their V2.1
+      meaning; the portal simply uses one more.</li>
+
+      <li><b>--chart-selected is amber because the categorical set is blue and teal.</b>
+      Clicking a bar cross-filters the dashboard, and the selected bar has to leave the
+      series palette entirely or the selection is invisible. Amber at #A85E00 / #F0B429
+      carries its own value label (4.92:1 light, 10.11:1 dark) and is the only warm hue in
+      the chart layer, so it never competes with a category.</li>
+
+      <li><b>The value ramp shares V2.1's red.</b> Anchoring the low end to
+      <code>over</code> rather than a new red means the suite has exactly one red: in the
+      conversion app it marks a file above its error target, in the portal it marks the
+      bottom of a measured range. Same hue, same alarm weight, one palette.</li>
+
+      <li><b>The button gradient ends inside the blue ramp.</b> The portal's primary button
+      is a gradient; its second stop is now <code>brand-blue-3</code> instead of the indigo
+      it used to carry, so the button is Origin blue at both ends.</li>
+
+      <li><b>Teal is never a category colour.</b> Adopted from V2.1 as written — teal stays
+      on headings, target lines and single-series accents. The two-series pairing remains
+      chart-1 with chart-3.</li>
+    </ol>
+  </section>
+
+  <section>
+    <header><span class="eyebrow">Adoption</span><h2>What changes in the portal</h2></header>
+    <p class="lede">The portal is on a Tailwind sky/indigo/slate palette today: neutrals and
+    primary already sit within 2–11° of V2.1's hues, so the surfaces barely move. Three things
+    do change visibly.</p>
+    <ol class="decisions">
+      <li><b>Chart series lose their rainbow.</b> Indigo, violet and amber categories become
+      the blue/teal aliases. The largest single shift in the app.</li>
+      <li><b>Dark mode gains its navy back.</b> The portal currently runs a near-black ground
+      (#0B0D12); V2.1's #0B1723 is the suite value and stays unmistakably dark.</li>
+      <li><b>Status colours become tokens.</b> Roughly 205 hardcoded Tailwind
+      emerald/red/amber classes across 39 files collapse onto the six status tokens — the
+      same mechanical sweep the portal already ran for its dual-theme accent pairs, and the
+      brand-audit script gains a rule so they cannot come back.</li>
+    </ol>
+  </section>
+
+  <section>
+    <header><span class="eyebrow">Handover</span><h2>CSS, ready to paste</h2></header>
+    <pre class="css"><code>:root {
+  /* V2.1, verbatim */
+  --background:#FFFFFF; --card:#FFFFFF; --muted:#F2F5F8; --band:#EFF5FB;
+  --border:#D9E1E8; --input:#7A8FA0;
+  --foreground:#1B2530; --muted-foreground:#56636E; --heading:#1C7884;
+  --primary:#006FAC; --primary-foreground:#FFFFFF; --ring:#006FAC;
+  --ok:#0B5A2E; --ok-bg:#E4F1E8; --over:#8B1515; --over-bg:#FBEAEA;
+  --warn-fg:#3D2E00; --warn-bg:#F3E5AB;
+  --neutral-0:#FFFFFF; --neutral-1:#F2F5F8; --neutral-2:#D9E1E8; --neutral-3:#A4B8C8;
+  --neutral-4:#7A8FA0; --neutral-5:#56636E; --neutral-6:#1B2530;
+  --brand-blue-1:#28A0EE; --brand-blue-2:#006FAC; --brand-blue-3:#004B86;
+  --brand-teal-1:#5DA5B0; --brand-teal-2:#1C7884; --brand-teal-3:#00535F;
+  --chart-1:var(--brand-blue-2); --chart-2:var(--brand-teal-2); --chart-3:var(--brand-blue-1);
+  --chart-4:var(--brand-teal-3); --chart-5:var(--brand-blue-3); --chart-6:var(--neutral-4);
+
+  /* OriginBA additions */
+  --title:var(--neutral-6);
+  --chart-selected:#A85E00; --chart-selected-foreground:#FFFFFF;
+  --ramp-high:var(--brand-blue-2); --ramp-mid:#695166; --ramp-low:var(--over);
+  --accent:var(--primary); --accent-2:var(--brand-blue-3);
+}
+
+.dark {
+  /* V2.1, verbatim */
+  --background:#0B1723; --card:#14202D; --muted:#212C39; --band:#1B2835;
+  --border:#343E4A; --input:#606A76;
+  --foreground:#E6ECF2; --muted-foreground:#A4ACB4; --heading:#8ACAD4;
+  --primary:#6BB2EA; --primary-foreground:#07121E; --ring:#6BB2EA;
+  --ok:#96D6A7; --ok-bg:#003A15; --over:#FF998D; --over-bg:#610000;
+  --warn-fg:#F2E5B1; --warn-bg:#403103;
+  --neutral-0:#0B1723; --neutral-1:#14202D; --neutral-2:#343E4A; --neutral-3:#5A6470;
+  --neutral-4:#838D98; --neutral-5:#B1B8C1; --neutral-6:#E6ECF2;
+  --brand-blue-1:#A2E6FF; --brand-blue-2:#6BB2EA; --brand-blue-3:#1A7BB9;
+  --brand-teal-1:#BCE7EE; --brand-teal-2:#8ACAD4; --brand-teal-3:#388E9A;
+
+  /* OriginBA additions */
+  --title:var(--neutral-6);
+  --chart-selected:#F0B429; --chart-selected-foreground:#07121E;
+  --ramp-high:var(--brand-blue-2); --ramp-mid:#BFAABE; --ramp-low:var(--over);
+  --accent:var(--primary); --accent-2:var(--brand-blue-3);
+}</code></pre>
+  </section>
+
+  <p class="footer">
+    To approve the merge, reply <b>"merge approved"</b>. To change one addition, name the
+    token and the direction ("selection warmer", "ramp middle lighter"). No V2.1 value is in
+    question — this document only proposes what sits beside it.
+  </p>
+</div>

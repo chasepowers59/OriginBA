@@ -70,6 +70,7 @@ class LoginResponse(BaseModel):
 class AuthStatusResponse(BaseModel):
     enabled: bool
     authenticated: bool = False
+    oidc_enabled: bool = False
 
 
 class AccessGroupPublic(BaseModel):
