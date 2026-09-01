@@ -6,6 +6,7 @@ import { printLineagePack } from "@/lib/lineagePack";
 import { fieldRoleLabel } from "@/lib/businessLabels";
 import type { FieldDef, SnapshotDataModel, SnapshotMetadata } from "@/lib/types";
 import { cisadmTableGuide } from "@/lib/cisadmTableGuide";
+import { trustedMeasureSet } from "@/lib/trustedMeasures";
 
 type ModelTab = "overview" | "tables" | "joins" | "fields";
 
@@ -368,7 +369,7 @@ function FieldsTab({
   onRoleFilterChange: (value: string) => void;
   trustedMeasures: string[];
 }) {
-  const trusted = new Set(trustedMeasures.map((m) => m.toUpperCase()));
+  const trusted = trustedMeasureSet(trustedMeasures);
 
   return (
     <div className="space-y-4">

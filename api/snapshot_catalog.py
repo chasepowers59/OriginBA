@@ -145,7 +145,9 @@ def get_snapshot(snapshot_id: str, organization_id: str | None = None) -> dict[s
     # Try the id AS WRITTEN before upper-casing it. Upper was right while every snapshot
     # was an Oracle table; a dbt canvas is lowercase rpt_*, and forcing case made every
     # lookup miss with "Unknown snapshot" on a catalog that plainly contained it.
-    for key in (snapshot_id, snapshot_id.upper()):
+    # lower() is here for the dashboards saved while _validate_tiles upper-cased the id:
+    # user state has no migration, so the reader forgives what the writer broke.
+    for key in (snapshot_id, snapshot_id.upper(), snapshot_id.lower()):
         if key in catalog["snapshots"]:
             return catalog["snapshots"][key]
     raise CatalogError(f"Unknown snapshot: {snapshot_id}")
