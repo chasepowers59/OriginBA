@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date, timedelta
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from api.auth.dependencies import AuthContext, get_auth_context, require_permission
@@ -193,6 +193,21 @@ def snapshot_questions(ctx: AuthContext = Depends(get_auth_context)) -> dict[str
     }
 
 
+def _lens_selection(pairs: list[str]) -> dict[str, str]:
+    """`?lens=total_customers:inactive` repeated per card.
+
+    The client names a lens; the predicate behind it stays server-side, so this can
+    only ever pick from what the KPI already declared. An unparseable pair is dropped
+    rather than raising -- a stale bookmark should render the default, not a 400.
+    """
+    out: dict[str, str] = {}
+    for pair in pairs:
+        kpi_id, sep, lens_id = pair.partition(":")
+        if sep and kpi_id.strip() and lens_id.strip():
+            out[kpi_id.strip()] = lens_id.strip()
+    return out
+
+
 @router.get("/executive-summary")
 def executive_summary(
     days: int = 30,
@@ -200,6 +215,7 @@ def executive_summary(
     compare_mode: str = "prior_period",
     cross_field: str | None = None,
     cross_value: str | None = None,
+    lens: list[str] = Query(default=[]),
     ctx: AuthContext = Depends(get_auth_context),
 ) -> dict[str, Any]:
     ctx.require_permission("snapshots:read")
@@ -213,6 +229,7 @@ def executive_summary(
         compare_mode=compare_mode,
         extra_filters=extra,
         allowed_workstreams=ctx.workstreams,
+        lenses=_lens_selection(lens),
         organization_id=org_id,
     )
 

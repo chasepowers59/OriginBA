@@ -13,6 +13,41 @@ from api.snapshot_catalog import allowed_fields, get_snapshot, snapshot_backend
 COMPARE_MODES = ("prior_period", "mom", "yoy")
 
 
+# ── Lenses ────────────────────────────────────────────────────────────────────
+# A card can offer several readings of the same question. "Total customers" counted
+# EVERY account while a reader hears "customers we bill" -- both are legitimate, so the
+# card names which one it is showing and lets the reader switch. The lens carries its
+# own subtitle, because the subtitle is what makes the number honest.
+#
+# Filters stay SERVER-SIDE: the client names a lens by id and never sends a predicate,
+# so a lens can never widen what an org is allowed to read.
+
+
+def select_lens(kpi: dict[str, Any], lens_id: str | None) -> dict[str, Any] | None:
+    """The chosen lens, or the first as default. An unknown id falls back rather than
+    erroring -- a stale bookmark must not blank the dashboard."""
+    lenses = kpi.get("lenses") or []
+    if not lenses:
+        return None
+    for lens in lenses:
+        if lens.get("id") == lens_id:
+            return lens
+    return lenses[0]
+
+
+def lens_filters(kpi: dict[str, Any], lens_id: str | None) -> list[dict[str, Any]]:
+    lens = select_lens(kpi, lens_id)
+    return [dict(f) for f in (lens or {}).get("filters", [])]
+
+
+def public_lenses(kpi: dict[str, Any]) -> list[dict[str, Any]]:
+    """What the client is told: names only, never the predicates behind them."""
+    return [
+        {"id": lens["id"], "label": lens["label"], "subtitle": lens.get("subtitle", "")}
+        for lens in kpi.get("lenses") or []
+    ]
+
+
 def date_windows(
     days: int, compare_mode: str = "prior_period"
 ) -> tuple[tuple[str, str], tuple[str, str], str]:
@@ -131,13 +166,21 @@ def execute_kpi_definition(
     compare: bool = False,
     compare_mode: str = "prior_period",
     extra_filters: list[dict[str, Any]] | None = None,
+    lens_id: str | None = None,
     organization_id: str,
 ) -> dict[str, Any]:
     snapshot_id = kpi["snapshot_id"]
+    # The lens narrows BOTH the headline and its trend, so the bars always break down
+    # the number above them. Its subtitle replaces the card's, because that line is
+    # what tells the reader which population they are looking at.
+    lens = select_lens(kpi, lens_id)
+    extra_filters = list(extra_filters or []) + lens_filters(kpi, lens_id)
     base = {
         "id": kpi["id"],
         "label": kpi["label"],
-        "subtitle": kpi.get("subtitle", ""),
+        "subtitle": (lens or {}).get("subtitle") or kpi.get("subtitle", ""),
+        "lenses": public_lenses(kpi),
+        "lens": (lens or {}).get("id"),
         "snapshot_id": snapshot_id,
         "format": kpi.get("format", "number"),
         "workstream": kpi.get("workstream"),

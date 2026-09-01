@@ -32,6 +32,9 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
   const [showAlerts, setShowAlerts] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
   const [loading, setLoading] = useState(true);
+  // Which lens each card is showing, by kpi id. Empty means every card keeps its
+  // default, so the URL stays clean until the reader actually switches one.
+  const [lenses, setLenses] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setLoading(true);
@@ -40,11 +43,16 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       compare,
       filter ? { field: filter.field, value: filter.value } : undefined,
       compareMode,
+      lenses,
     )
       .then(setSummary)
       .catch(() => setSummary(null))
       .finally(() => setLoading(false));
-  }, [days, compare, compareMode, filter, reloadKey]);
+  }, [days, compare, compareMode, filter, reloadKey, lenses]);
+
+  const handleLensChange = useCallback((kpiId: string, lensId: string) => {
+    setLenses((prev) => (prev[kpiId] === lensId ? prev : { ...prev, [kpiId]: lensId }));
+  }, []);
 
   const isHome = variant === "home";
 
@@ -160,6 +168,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
                   filter && filter.field === kpi.trend_dimension ? filter.value : null
                 }
                 onTrendClick={isHome ? undefined : handleTrendClick}
+                onLensChange={handleLensChange}
               />
             ))}
           </div>

@@ -14,6 +14,7 @@ type DashboardWidgetProps = {
   showCompare?: boolean;
   selectedTrendLabel?: string | null;
   onTrendClick?: (kpi: ExecutiveKpi, label: string) => void;
+  onLensChange?: (kpiId: string, lensId: string) => void;
 };
 
 export function DashboardWidget({
@@ -22,6 +23,7 @@ export function DashboardWidget({
   showCompare,
   selectedTrendLabel,
   onTrendClick,
+  onLensChange,
 }: DashboardWidgetProps) {
   const formatted =
     kpi.value == null
@@ -35,6 +37,7 @@ export function DashboardWidget({
     : `/explore/${kpi.snapshot_id}`;
 
   const workstreamName = workstreamDisplayName(kpi.workstream);
+  const lenses = kpi.lenses ?? [];
   // Reference-dashboard panel headers lead with a small rounded icon chip, coloured per
   // category. Chip hue cycles through the chart palette keyed by the workstream name.
   const CHIP_VARS = ["--chart-1", "--chart-2", "--chart-3", "--chart-4", "--chart-5"];
@@ -73,6 +76,40 @@ export function DashboardWidget({
         <p className={`mt-3 font-bold tracking-tight tabular-nums text-heading ${compact ? "text-2xl" : "text-3xl"}`}>
           {formatted}
         </p>
+        {/* The lens picker sits UNDER the number it changes, so the reader sees which
+            population produced it. The subtitle above re-states the choice in words. */}
+        {lenses.length > 1 && onLensChange ? (
+          <div
+            role="group"
+            aria-label={`${kpi.label}: which population to count`}
+            className="mt-2 inline-flex flex-wrap gap-0.5 rounded-lg bg-chip p-0.5"
+          >
+            {lenses.map((lens) => {
+              const active = lens.id === kpi.lens;
+              return (
+                <button
+                  key={lens.id}
+                  type="button"
+                  aria-pressed={active}
+                  title={lens.subtitle}
+                  onClick={(e) => {
+                    // the whole card is a link to the canvas
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onLensChange(kpi.id, lens.id);
+                  }}
+                  className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition ${
+ active
+ ? "bg-surface text-heading shadow-sm"
+ : "text-fg-muted hover:text-heading"
+ }`}
+                >
+                  {lens.label}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
         {showCompare ? (
           <div className="mt-2">
             <KpiCompareBadge changePct={kpi.change_pct} priorLabel={kpi.compare_label ?? undefined} />

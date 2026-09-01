@@ -143,6 +143,7 @@ export function fetchExecutiveSummary(
   compare = false,
   crossFilter?: { field: string; value: string },
   compareMode: "prior_period" | "mom" | "yoy" = "prior_period",
+  lenses?: Record<string, string>,
 ): Promise<ExecutiveSummary> {
   const params = new URLSearchParams({
     days: String(days),
@@ -152,6 +153,10 @@ export function fetchExecutiveSummary(
   if (crossFilter) {
     params.set("cross_field", crossFilter.field);
     params.set("cross_value", crossFilter.value);
+  }
+  // one `lens=<kpi>:<lens>` per card the reader has switched; the rest keep their default
+  for (const [kpiId, lensId] of Object.entries(lenses ?? {})) {
+    params.append("lens", `${kpiId}:${lensId}`);
   }
   return fetchJson<ExecutiveSummary>(`/snapshots/executive-summary?${params}`);
 }

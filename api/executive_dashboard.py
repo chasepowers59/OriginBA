@@ -6,7 +6,7 @@ from typing import Any
 
 from api.demo_db import demo_configured
 from api.warehouse_db import warehouse_configured
-from api.kpi_runner import date_windows, execute_kpi_definition
+from api.kpi_runner import date_windows, execute_kpi_definition, public_lenses, select_lens
 
 
 EXECUTIVE_KPIS: list[dict[str, Any]] = [
@@ -17,7 +17,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     # own date field.
     {
         "id": "total_customers",
-        "label": "Total customers",
+        "label": "Billing accounts",
         "subtitle": "Accounts in CIS",
         "snapshot_id": "rpt_customer_account",
         "format": "number",
@@ -27,24 +27,50 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
         "trend": {"dimensions": ["Customer Class"],
                   "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
+        # "Total customers / Accounts in CIS" counted EVERY account -- 562 on Demo 25.4
+        # -- where a reader hears "customers we bill" (496). Both are legitimate, so the
+        # card names which one it is showing. "Active SA Count" is a coalesced count, so
+        # <= 0 reaches the accounts with no service agreement at all; while it was NULL
+        # that comparison silently excluded 27 of the 66.
+        "lenses": [
+            {"id": "active", "label": "Active", "subtitle": "At least one active service agreement",
+             "filters": [{"field": "Active SA Count", "op": "gte", "value": 1}]},
+            {"id": "all", "label": "All", "subtitle": "Every account in CIS", "filters": []},
+            {"id": "inactive", "label": "Inactive", "subtitle": "No active service agreement",
+             "filters": [{"field": "Active SA Count", "op": "lte", "value": 0}]},
+        ],
     },
     {
         "id": "active_service_agreements",
-        "label": "Active service agreements",
+        "label": "Service agreements",
         "subtitle": "Status Active or Reactivated",
         "snapshot_id": "rpt_service_agreement",
         "format": "number",
         "workstream": "customer",
         "explore_report_id": None,
         "windowless": True,
-        # 20 Active / 50 Reactivated are base-product constants (never client config)
-        "value": {"dimensions": [],
-                  "measures": [{"field": "*", "agg": "count"}],
-                  "filters": [{"field": "SA Status Code", "op": "in", "value": ["20", "50"]}]},
+        # The lens supplies the status filter; `value`/`trend` carry none of their own,
+        # so "All" really is every SA rather than the active ones re-counted.
+        "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
         "trend": {"dimensions": ["SA Type"],
-                  "measures": [{"field": "*", "agg": "count"}],
-                  "filters": [{"field": "SA Status Code", "op": "in", "value": ["20", "50"]}],
-                  "limit": 6},
+                  "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
+        # SA_STATUS_FLG is a base-product lookup, not client config, so testing its codes
+        # is safe (the same licence the Active/Reactivated pair already relied on).
+        # Verified against Demo 25.4, which carries all seven: 20 Active 1485,
+        # 70 Canceled 45, 60 Closed 38, 10 Pending Start 33, 30 Pending Stop 15,
+        # 40 Stopped 14, 50 Reactivated 1. Active+Reactivated = 1,486 = the old headline.
+        "lenses": [
+            {"id": "active", "label": "Active", "subtitle": "Status Active or Reactivated",
+             "filters": [{"field": "SA Status Code", "op": "in", "value": ["20", "50"]}]},
+            {"id": "pending", "label": "Pending", "subtitle": "Pending start or pending stop",
+             "filters": [{"field": "SA Status Code", "op": "in", "value": ["10", "30"]}]},
+            {"id": "stopped", "label": "Stopped", "subtitle": "Stopped or closed",
+             "filters": [{"field": "SA Status Code", "op": "in", "value": ["40", "60"]}]},
+            {"id": "canceled", "label": "Canceled", "subtitle": "Cancelled service agreements",
+             "filters": [{"field": "SA Status Code", "op": "in", "value": ["70"]}]},
+            {"id": "all", "label": "All", "subtitle": "Every service agreement, any status",
+             "filters": []},
+        ],
     },
     {
         "id": "billed_revenue",
@@ -230,6 +256,7 @@ def build_executive_summary(
     compare_mode: str = "prior_period",
     extra_filters: list[dict[str, Any]] | None = None,
     allowed_workstreams: list[str] | None = None,
+    lenses: dict[str, str] | None = None,
     organization_id: str | None = None,
 ) -> dict[str, Any]:
     (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode)
@@ -275,6 +302,8 @@ def build_executive_summary(
                             "explore_report_id",
                         )
                     },
+                    "lenses": public_lenses(kpi),
+                    "lens": (select_lens(kpi, (lenses or {}).get(str(kpi.get("id")))) or {}).get("id"),
                     "value": None,
                     "prior_value": None,
                     "change_pct": None,
@@ -299,6 +328,7 @@ def build_executive_summary(
             compare=compare,
             compare_mode=compare_mode,
             extra_filters=extra_filters,
+            lens_id=(lenses or {}).get(str(kpi.get("id"))),
             organization_id=organization_id,
         )
 

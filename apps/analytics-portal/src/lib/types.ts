@@ -317,8 +317,14 @@ export type ExecutiveKpi = {
   compare_label?: string | null;
   trend: ExecutiveTrendPoint[];
   trend_dimension?: string | null;
+  /** Alternative readings of the same card — "Active | All | Inactive". The client
+   *  names one by id; the predicate behind it never leaves the server. */
+  lenses?: ExecutiveKpiLens[];
+  lens?: string | null;
   error?: string | null;
 };
+
+export type ExecutiveKpiLens = { id: string; label: string; subtitle: string };
 
 export type PeriodInfo = {
   start: string;
