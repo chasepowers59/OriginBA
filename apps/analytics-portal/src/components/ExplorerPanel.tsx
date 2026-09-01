@@ -14,7 +14,6 @@ import {
   allowedAggsForMeasure,
   buildColumnLabels,
   defaultMeasureSelection,
-  prettifyFieldName,
   requiredDateLabel,
 } from "@/lib/businessLabels";
 import { getFavorite } from "@/lib/favorites";
@@ -565,7 +564,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         {result ? (
           <div className="space-y-2">
             <button type="button" onClick={() => void handleSaveFavorite()} className="btn-ghost w-full">
-              Save to workspace
+              Save view
             </button>
             <button type="button" onClick={() => void handleSaveCopy()} className="btn-ghost w-full text-xs">
               Save a copy

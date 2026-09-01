@@ -91,9 +91,9 @@ export function ResultsPanel({
     if (!top) return null;
     const topValue = Number(top[measureKey] ?? 0);
     const total = sorted.reduce((s, r) => s + Number(r[measureKey] ?? 0), 0);
-    const share = total > 0 ? (topValue / total) * 100 : 0;
+    if (total <= 0) return null; // "leads at 0.0% of total" is noise, not an insight
     const label = String(top[dimensionKey] ?? "Top value");
-    return { label, share, topValue };
+    return { label, share: (topValue / total) * 100, topValue };
   }, [result, measureKey, dimensionKey]);
 
   const sortedRows = useMemo(() => {

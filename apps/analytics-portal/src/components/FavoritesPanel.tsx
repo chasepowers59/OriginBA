@@ -33,7 +33,11 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
     if (compact) return null;
     return (
       <div className="glass-panel-subtle p-4 text-sm text-fg-muted">
-        Save reports you run often — they sync to your client workspace for one-click access.
+        Save reports you run often — they sync to your client workspace for one-click
+        access.{" "}
+        <Link href="/build" className="text-sky-600 hover:underline dark:text-sky-300">
+          Build your first view →
+        </Link>
       </div>
     );
   }

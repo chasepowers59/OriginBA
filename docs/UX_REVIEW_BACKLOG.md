@@ -24,22 +24,26 @@ were burned down on 2026-09-01 (tests-first where the logic was pure):
   names where views live; save errors render in error styling with role=alert.
 - Dashboard save errors surface in an alert banner (catch added).
 
-## Low
+## Low  — ALL FIXED 2026-09-01
 
-- Heading pattern drift (eyebrow+h1 vs plain h1 vs none on Settings); DQ eyebrow uses
-  `text-brand`, others `text-sky-600 dark:…`, build page uses an inline style.
-- Copy: "canvases"/"snapshot" jargon in user-facing text (AppShell footer text,
-  SQL search placeholder, tile editor label); raw `err.message` in builder/explorer
-  (adopt DatabaseWorkspace's `parseApiError`); "Export to Excel" produces CSV;
-  naming drift Save view / Save to workspace / Saved views / favorites.
-- Home hero: two CTAs both go to /reports; neither promotes Explore.
-- SQL: no shimmer while executing; Tables tab silent when empty; footer always says
-  "50-row paging" regardless of page size.
-- MiniSparkChart double truncation (14-char data cut + 8-char tick cut) can make two
-  categories indistinguishable on the axis.
-- Time-series sort is `localeCompare` on the bucket label — verify the TD0 bucket
-  format is ISO-sortable everywhere.
-- ExecutiveDashboard terminal failure state has no retry; FavoritesPanel empty state
-  doesn't link anywhere.
-- `ResultsPanel` insight banner reads "leads at 0.0% of total" when total ≤ 0 —
-  suppress instead.
+- Heading eyebrows: one class string app-wide (`text-sky-600 dark:text-sky-400`);
+  the DQ board's `text-brand` and the build page's inline style are gone.
+- Copy: "reporting canvases" no longer appears in user-facing text (the SQL search
+  says "Search tables…"); save actions all say "view" ("Save view", "Saved views");
+  `fetchJson` now runs `parseApiError` ONCE so every screen shows the message, not
+  raw JSON (the SQL workspace's private copy of that parser was deleted).
+- Home hero: the primary CTA is Explore (the self-serve spine), the report library
+  is secondary; the copy names all three ways in.
+- SQL: the Tables tab says what it found ("No table matches …") instead of
+  rendering nothing; the paging footer and page intro report the ACTUAL page size
+  instead of a hardcoded 50.
+- MiniSparkChart: one truncation (`lib/axisLabels.tickLabels`, 4 tests) that falls
+  back to head…tail when two labels would render identically.
+- Time-series sort verified: both dialects bucket with date_trunc/TRUNC and the API
+  serializes via isoformat(), so the bucket labels ARE lexicographically sortable —
+  no change needed.
+- ExecutiveDashboard failure state has a "Try again" button; the FavoritesPanel
+  empty state links to the builder.
+- ResultsPanel insight banner is suppressed when the total is <= 0 rather than
+  claiming "leads at 0.0% of total".
+- "Export to Excel" writes real .xlsx as of the export work — item resolved.

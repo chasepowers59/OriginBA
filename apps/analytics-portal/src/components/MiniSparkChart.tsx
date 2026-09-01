@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import type { ExecutiveTrendPoint } from "@/lib/types";
 import { valueRampColors } from "@/lib/chartEmphasis";
+import { tickLabels } from "@/lib/axisLabels";
 import { formatTooltipCurrency, formatTooltipNumber } from "@/lib/format";
 
 type MiniSparkChartProps = {
@@ -54,8 +55,9 @@ export function MiniSparkChart({
   // App-wide value ramp: blue = highest, shifting toward red as values drop; the
   // cross-filter selection overrides its bar to the selection hue.
   const fills = valueRampColors(points.map((p) => p.value));
+  const ticks = tickLabels(points.map((p) => p.label), 9);
   const data = points.map((p, i) => ({
-    name: p.label.slice(0, 14),
+    name: ticks[i],
     fullName: p.label,
     value: p.value,
     fill: selectedLabel === p.label ? "var(--chart-selected)" : fills[i],
@@ -80,7 +82,6 @@ export function MiniSparkChart({
         <XAxis
           dataKey="name"
           tick={{ fontSize: 9, fill: "var(--foreground-subtle)" }}
-          tickFormatter={(v: string) => (v.length > 9 ? v.slice(0, 8) + "…" : v)}
           interval="preserveStartEnd"
           minTickGap={8}
           height={20}

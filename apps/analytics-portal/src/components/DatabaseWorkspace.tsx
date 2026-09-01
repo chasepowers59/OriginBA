@@ -40,19 +40,13 @@ function formatCell(value: unknown, isNumericCol = false, columnId?: string): st
   return text;
 }
 
-function parseApiError(err: unknown): string {
+function queryError(err: unknown): string {
   if (!(err instanceof Error)) return "Query failed";
-  const raw = err.message;
-  try {
-    const parsed = JSON.parse(raw) as { detail?: string };
-    if (typeof parsed.detail === "string") return parsed.detail;
-  } catch {
-    /* plain text */
-  }
-  if (raw.includes("503") || raw.toLowerCase().includes("configured")) {
+  const message = err.message;
+  if (message.includes("503") || message.toLowerCase().includes("configured")) {
     return "Database unavailable — configure the connection in Settings.";
   }
-  return raw || "Query failed";
+  return message || "Query failed";
 }
 
 function isNumericColumn(rows: Record<string, unknown>[], col: string): boolean {
@@ -196,7 +190,7 @@ export function DatabaseWorkspace({
       });
       applyPage(response, append);
     } catch (err) {
-      setError(parseApiError(err));
+      setError(queryError(err));
       if (!append) resetResults();
     } finally {
       setLoading(false);
@@ -240,7 +234,7 @@ export function DatabaseWorkspace({
         setError("Stopped at 50,000 rows (safety limit). Narrow your query to fetch more.");
       }
     } catch (err) {
-      setError(parseApiError(err));
+      setError(queryError(err));
     } finally {
       setFetchingAll(false);
     }
@@ -259,7 +253,7 @@ export function DatabaseWorkspace({
       const response = await countDatabaseSql(sql);
       setTotalCount(response.total_count);
     } catch (err) {
-      setError(parseApiError(err));
+      setError(queryError(err));
     } finally {
       setCountLoading(false);
     }
@@ -487,11 +481,17 @@ export function DatabaseWorkspace({
                     type="search"
                     value={tableSearch}
                     onChange={(e) => setTableSearch(e.target.value)}
-                    placeholder={engine === "oracle" ? "Search CISADM tables…" : "Search reporting canvases…"}
+                    placeholder="Search tables…"
                     className="input-modern w-full py-1.5 text-xs"
                   />
                   {tablesLoading ? (
                     <p className="px-1 py-2 text-xs text-fg-muted">Loading…</p>
+                  ) : !tables.length ? (
+                    <p className="px-1 py-2 text-xs text-fg-muted">
+                      {tableSearch.trim()
+                        ? `No table matches “${tableSearch.trim()}”.`
+                        : "No tables available for this connection."}
+                    </p>
                   ) : (
                     <ul className="space-y-0.5">
                       {tables.map((t) => {
@@ -675,7 +675,7 @@ export function DatabaseWorkspace({
         <span>{statusText}</span>
         <span>
           {chartSuggestion ? "Chart available · " : ""}
-          Read-only SELECT · 50-row paging
+          Read-only SELECT · {pageSize}-row paging
         </span>
       </div>
     </div>

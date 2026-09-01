@@ -21,6 +21,7 @@ import type {
   WorkstreamSummary,
 } from "./types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
+import { parseApiError } from "@/lib/apiErrors";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -58,8 +59,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
     cache: "no-store",
   });
   if (!res.ok) {
-    const detail = await res.text();
-    throw new Error(detail || res.statusText);
+    throw new Error(parseApiError(await res.text(), res.statusText));
   }
   return res.json() as Promise<T>;
 }

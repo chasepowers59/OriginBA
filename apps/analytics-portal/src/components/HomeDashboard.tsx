@@ -3,7 +3,6 @@ import { brandLine } from "../lib/brand";
 
 import { useEffect, useState } from "react";
 import { fetchSnapshots } from "@/lib/api";
-import { formatNumber } from "@/lib/format";
 import Link from "next/link";
 import type { SnapshotSummary } from "@/lib/types";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
@@ -41,15 +40,16 @@ export function HomeDashboard() {
             </span>
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-fg-muted">
-            {brand.tagline}. Start with governed report packs for billing close, payments,
-            operations, and collections — or ask a question in plain language.
+            {brand.tagline}. Explore any reporting table yourself, start from a governed
+            report pack for billing close, payments, operations and collections, or ask a
+            question in plain language.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/reports" className="btn-primary">
-              Open report library
+            <Link href="/build" className="btn-primary">
+              Explore your data
             </Link>
-            <Link href="/data-quality" className="btn-ghost">
-              Data quality board
+            <Link href="/reports" className="btn-ghost">
+              Open report library
             </Link>
           </div>
           <p className="mt-4 text-xs text-fg-muted">

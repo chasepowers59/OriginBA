@@ -30,6 +30,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
   const [compareMode, setCompareMode] = useState<CompareMode>("prior_period");
   const [summary, setSummary] = useState<ExecutiveSummary | null>(null);
   const [showAlerts, setShowAlerts] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,7 +44,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       .then(setSummary)
       .catch(() => setSummary(null))
       .finally(() => setLoading(false));
-  }, [days, compare, compareMode, filter]);
+  }, [days, compare, compareMode, filter, reloadKey]);
 
   const isHome = variant === "home";
 
@@ -173,7 +174,10 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
           </div>
         ) : (
           <div className="glass-panel px-4 py-8 text-center text-sm text-fg-muted">
-            Unable to load executive metrics.
+            <p>Unable to load executive metrics.</p>
+            <button type="button" onClick={() => setReloadKey((k) => k + 1)} className="btn-ghost mt-3">
+              Try again
+            </button>
           </div>
         )}
       </div>
