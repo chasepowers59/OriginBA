@@ -308,6 +308,11 @@ def execute_sql(
     try:
         validated = _validate(engine, body.sql)
     except SqlWorkspaceValidationError as exc:
+        from api.access_audit import record_access_event
+        record_access_event(
+            actor_email=ctx.email, actor_id=ctx.id, action="sql_refused",
+            target_type="sql", target_id=org_id,
+            detail=f"{exc} | sql: {body.sql[:300]}")
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     page_size = max(1, min(body.page_size, MAX_PAGE_SIZE))
@@ -339,6 +344,12 @@ def execute_sql(
             total_count = None
 
     fetched_total = body.offset + len(page_rows)
+
+    from api.access_audit import record_access_event
+    record_access_event(
+        actor_email=ctx.email, actor_id=ctx.id, action="sql_execute",
+        target_type="sql", target_id=org_id,
+        detail=f"rows={len(serialized)}; ms={elapsed_ms}; sql: {validated[:300]}")
 
     return {
         "organization_id": org_id,

@@ -406,7 +406,8 @@ def admin_delete_group(
 @router.get("/audit-log")
 def admin_audit_log(
     limit: int = 100,
+    action: str | None = None,
     _: AuthContext = Depends(require_permission("users:manage")),
     session: Session = Depends(_db_session),
 ) -> list[dict[str, Any]]:
-    return list_audit_events(session, limit=limit)
+    return list_audit_events(session, limit=limit, action=action)

@@ -46,12 +46,13 @@ def log_audit(
     )
 
 
-def list_audit_events(session: Session, limit: int = 100) -> list[dict[str, Any]]:
+def list_audit_events(session: Session, limit: int = 100,
+                      action: str | None = None) -> list[dict[str, Any]]:
+    stmt = select(AuditLog).where(AuditLog.client_id == _client_id())
+    if action:
+        stmt = stmt.where(AuditLog.action == action)
     rows = session.scalars(
-        select(AuditLog)
-        .where(AuditLog.client_id == _client_id())
-        .order_by(AuditLog.created_at.desc())
-        .limit(max(1, min(limit, 500)))
+        stmt.order_by(AuditLog.created_at.desc()).limit(max(1, min(limit, 500)))
     ).all()
     return [
         {
