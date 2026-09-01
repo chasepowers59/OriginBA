@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import type { QueryResponse } from "@/lib/types";
 import {
-  exportRowsCsv,
   formatBoolean,
   formatCellValue,
   formatCurrency,
@@ -17,6 +16,7 @@ import {
   prettifyFieldName,
 } from "@/lib/businessLabels";
 import { BuilderChart } from "./builder/BuilderChart";
+import { downloadWorkbook } from "@/lib/exportXlsx";
 import { printCouncilPack } from "@/lib/councilPack";
 import { useBrand } from "@/components/PortalThemeProvider";
 
@@ -160,6 +160,7 @@ export function ResultsPanel({
   }
 
   const handleExport = () => {
+    // A REAL .xlsx (typed numbers survive) — this button said Excel while writing CSV.
     const friendlyHeaders = result.columns.map((c) => columnLabels[c] ?? prettifyFieldName(c));
     const labeledRows = result.rows.map((row) => {
       const out: Record<string, unknown> = {};
@@ -170,7 +171,10 @@ export function ResultsPanel({
       });
       return out;
     });
-    exportRowsCsv(friendlyHeaders, labeledRows, `${snapshotId}_analysis.csv`);
+    downloadWorkbook(
+      [{ name: reportTitle ?? snapshotLabel ?? snapshotId, columns: friendlyHeaders, rows: labeledRows }],
+      `${snapshotId}_analysis.xlsx`,
+    );
   };
 
   const formatMeasure = (value: unknown) =>

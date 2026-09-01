@@ -1,6 +1,6 @@
 "use client";
 
-import { exportDashboardCsv, printDashboardPack } from "@/lib/exportDashboard";
+import { exportDashboardXlsx, printDashboardPack } from "@/lib/exportDashboard";
 
 type PresentationToolbarProps = {
   title: string;
@@ -36,7 +36,7 @@ export function PresentationToolbar({
       {exportSections.length ? (
         <button
           type="button"
-          onClick={() => exportDashboardCsv(title, exportSections)}
+          onClick={() => exportDashboardXlsx(title, exportSections)}
           className="btn-ghost"
         >
           Export Excel pack
