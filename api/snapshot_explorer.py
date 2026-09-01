@@ -96,8 +96,16 @@ def _serialize_value(value: Any) -> Any:
 
 
 def _cross_filter(cross_field: str | None, cross_value: str | None) -> list[dict[str, Any]]:
+    """The field name goes through UNTOUCHED.
+
+    This used to upper-case it, which was right when every column was CISADM's
+    UPPER_SNAKE and wrong the moment the canvases arrived with Title Case business
+    names: "Customer Class" became "CUSTOMER CLASS" and every card in the grid returned
+    `Invalid filter field`. Casing per dialect is the query builder's job -- it
+    upper-cases for legacy Oracle and leaves the Title Case dialects alone.
+    """
     if cross_field and cross_value is not None and str(cross_value).strip():
-        return [{"field": cross_field.upper(), "op": "eq", "value": cross_value}]
+        return [{"field": cross_field, "op": "eq", "value": cross_value}]
     return []
 
 

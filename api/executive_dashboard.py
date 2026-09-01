@@ -135,6 +135,29 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "trend": {"dimensions": ["Oldest Debt Band"],
                   "measures": [{"field": "Total Balance", "agg": "sum"}],
                   "filters": [], "limit": 6},
+        # The card summed every row and reported the NET: -$6,333.30 on Demo 25.4, which
+        # is arithmetically right and reads as broken. "Accounts receivable" means what
+        # customers owe -- 130 SAs at +$23,854.69 -- and netting 66 credit balances of
+        # -$30,187.99 against it turns a receivable into a liability nobody asked for.
+        # Gross receivable is the default; credits are their own line, as in any ledger.
+        #
+        # rpt_sa_aged_balance anticipated exactly this. Its header says credit balances
+        # are deliberately kept as rows because "who do we owe" is a real finance
+        # question, and that the choice "belongs to the Ad Hoc user, which is why
+        # 'Is In Arrears' and 'Has Credit Balance' exist as flags instead". The card
+        # simply never made the choice; these lenses are it, using that same flag.
+        # The flag reads Current Balance while the measure sums Total Balance, so the
+        # subtitles name the flag rather than implying a clean sign split.
+        "lenses": [
+            {"id": "owing", "label": "Owing",
+             "subtitle": "Service agreements not in credit",
+             "filters": [{"field": "Has Credit Balance", "op": "eq", "value": False}]},
+            {"id": "credit", "label": "In credit",
+             "subtitle": "Credit balances — what the utility owes",
+             "filters": [{"field": "Has Credit Balance", "op": "eq", "value": True}]},
+            {"id": "net", "label": "Net", "subtitle": "Every balance, credits netted off",
+             "filters": []},
+        ],
     },
     {
         "id": "past_due_balance",
@@ -192,7 +215,12 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "format": "number",
         "workstream": "operations",
         "explore_report_id": None,
-        "date_field": "Event Date/Time",
+        # NOT "Event Date/Time": an activity only gets one once it has actually been
+        # executed in the field, so it is 17% populated on Demo 25.4 (57 of 330), 54% on
+        # Ellensburg and 56% on INT_DEV -- the card silently dropped the rest while
+        # calling itself "activity volume". "Created Date/Time" is 100% at all three and
+        # is the date every activity has, whatever became of it.
+        "date_field": "Created Date/Time",
         "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
         "trend": {"dimensions": ["Activity Type"],
                   "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
@@ -216,8 +244,22 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "explore_report_id": None,
         "date_field": "Contact Date/Time",
         "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
-        "trend": {"dimensions": ["Contact Class"],
+        # Broken down by TYPE, lensed by CLASS -- pick a category, see what it is made of.
+        # Lensing on the trend's own axis would leave a one-bar chart; this way "Credit
+        # and collection contacts" resolves to NSF letter 12, auto-dialer call 8, debt
+        # reminder 8, which is the shape of the question someone actually asks.
+        "trend": {"dimensions": ["Contact Type"],
                   "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
+        # Contact class is CI_CC_CL -- client configuration, so DISCOVERED. Demo 25.4
+        # carries nine ("General contacts", "Credit and collection contacts",
+        # "Record of Digital Notifications" ...), and the next client's will be its own.
+        #
+        # Status was the obvious axis and is unusable: "Contact Status" is NULL on all
+        # 170 rows here and at Ellensburg and INT_DEV too. "Contact Source" is likewise
+        # empty and "Contact Method" reaches only 6 of 170, so class is the one
+        # well-populated axis a lens can stand on.
+        "lens_field": {"field": "Contact Class", "noun": "Contact class",
+                       "all_subtitle": "Every contact, all classes", "limit": 8},
     },
 ]
 

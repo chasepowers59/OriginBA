@@ -4,6 +4,7 @@ import Link from "next/link";
 import { MiniSparkChart } from "./MiniSparkChart";
 import { KpiCompareBadge } from "./KpiCompareBadge";
 import { formatCurrency, formatNumber } from "@/lib/format";
+import { formatTimeBucket } from "@/lib/timeBucketLabel";
 import { workstreamDisplayName } from "@/lib/businessLabels";
 import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
 import type { ExecutiveKpi } from "@/lib/types";
@@ -38,6 +39,10 @@ export function DashboardWidget({
 
   const workstreamName = workstreamDisplayName(kpi.workstream);
   const lenses = kpi.lenses ?? [];
+  // Segmented control up to a handful of short labels; a select past that. 5 lenses of
+  // 6 characters read fine in a row, 9 of "Program management contacts" do not.
+  const asDropdown =
+    lenses.length > 5 || lenses.reduce((n, l) => n + l.label.length, 0) > 48;
   // Reference-dashboard panel headers lead with a small rounded icon chip, coloured per
   // category. Chip hue cycles through the chart palette keyed by the workstream name.
   const CHIP_VARS = ["--chart-1", "--chart-2", "--chart-3", "--chart-4", "--chart-5"];
@@ -79,36 +84,69 @@ export function DashboardWidget({
         {/* The lens picker sits UNDER the number it changes, so the reader sees which
             population produced it. The subtitle above re-states the choice in words. */}
         {lenses.length > 1 && onLensChange ? (
-          <div
-            role="group"
-            aria-label={`${kpi.label}: which population to count`}
-            className="mt-2 inline-flex flex-wrap gap-0.5 rounded-lg bg-chip p-0.5"
-          >
-            {lenses.map((lens) => {
-              const active = lens.id === kpi.lens;
-              return (
-                <button
-                  key={lens.id}
-                  type="button"
-                  aria-pressed={active}
-                  title={lens.subtitle}
-                  onClick={(e) => {
-                    // the whole card is a link to the canvas
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onLensChange(kpi.id, lens.id);
-                  }}
-                  className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition ${
+          asDropdown ? (
+            // Many lenses, or long ones: a segmented control would wrap to three lines
+            // of chips and swamp the number it belongs to. Discovered lenses carry the
+            // client's own wording ("Credit and collection contacts"), so the width is
+            // not ours to control -- past a handful, a select is the honest shape.
+            <label className="mt-2 block">
+              <span className="sr-only">{kpi.label}: which population to count</span>
+              <select
+                value={kpi.lens ?? ""}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onLensChange(kpi.id, e.target.value);
+                }}
+                className="w-full min-w-0 max-w-full truncate rounded-lg border border-edge-subtle bg-chip px-2 py-1 text-[11px] font-medium text-fg"
+              >
+                {lenses.map((lens) => (
+                  <option key={lens.id} value={lens.id}>
+                    {lens.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <div
+              role="group"
+              aria-label={`${kpi.label}: which population to count`}
+              className="mt-2 inline-flex flex-wrap gap-0.5 rounded-lg bg-chip p-0.5"
+            >
+              {lenses.map((lens) => {
+                const active = lens.id === kpi.lens;
+                return (
+                  <button
+                    key={lens.id}
+                    type="button"
+                    aria-pressed={active}
+                    title={lens.subtitle}
+                    onClick={(e) => {
+                      // the whole card is a link to the canvas
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onLensChange(kpi.id, lens.id);
+                    }}
+                    className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition ${
  active
  ? "bg-surface text-heading shadow-sm"
  : "text-fg-muted hover:text-heading"
  }`}
-                >
-                  {lens.label}
-                </button>
-              );
-            })}
-          </div>
+                  >
+                    {lens.label}
+                  </button>
+                );
+              })}
+            </div>
+          )
+        ) : null}
+        {/* A bare 0 cannot say whether nothing happened or the window missed the data.
+            When the canvas has rows but none in range, say so and name the last date. */}
+        {kpi.empty_window ? (
+          <p className="mt-1 text-xs text-warn">
+            No data in this window — latest {formatTimeBucket(kpi.empty_window.latest, "day")}
+          </p>
         ) : null}
         {showCompare ? (
           <div className="mt-2">

@@ -321,6 +321,9 @@ export type ExecutiveKpi = {
    *  names one by id; the predicate behind it never leaves the server. */
   lenses?: ExecutiveKpiLens[];
   lens?: string | null;
+  /** Set when a WINDOWED metric came back empty: the newest date the canvas holds,
+   *  so the card can say "no data in this window" instead of a bare 0. */
+  empty_window?: { latest: string } | null;
   error?: string | null;
 };
 

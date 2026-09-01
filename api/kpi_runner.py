@@ -125,6 +125,60 @@ def resolve_lenses(kpi: dict[str, Any], *, organization_id: str) -> dict[str, An
     return {**kpi, "lenses": lenses}
 
 
+def applicable_filters(
+    filters: list[dict[str, Any]] | None, fields: set[str]
+) -> list[dict[str, Any]]:
+    """Keep only the filters this canvas has a column for.
+
+    A cross-filter is raised on one card and applied to all of them, but "Customer
+    Class" exists on the account canvas and not on the payment or aged-balance ones.
+    Erroring those out emptied the whole grid; every BI tool instead leaves an unrelated
+    visual alone. Matched case-insensitively so either dialect's spelling resolves.
+    """
+    if not filters:
+        return []
+    known = {f.casefold() for f in fields}
+    return [f for f in filters if str(f.get("field", "")).casefold() in known]
+
+
+def _latest_date(snapshot_id: str, date_field: str, organization_id: str) -> str | None:
+    """The newest value the canvas holds for this date, ignoring any window."""
+    _, rows = run_kpi_query(
+        snapshot_id,
+        {"dimensions": [], "measures": [{"field": date_field, "agg": "max"}],
+         "filters": [], "limit": 1},
+        None,
+        "",
+        "",
+        organization_id=organization_id,
+    )
+    value = rows[0][0] if rows and rows[0] else None
+    return str(value)[:10] if value else None
+
+
+def empty_window_note(
+    *, value: Any, windowless: bool, snapshot_id: str,
+    date_field: str | None, organization_id: str,
+) -> dict[str, str] | None:
+    """Distinguish "none happened" from "none in the window you chose".
+
+    A bare 0 sent three separate investigations down the wrong road -- the number was
+    right every time, and useless, because nothing on the card said whether the window
+    had missed the data. When a WINDOWED metric comes back empty, the card is told the
+    newest date its canvas actually holds so it can say so.
+
+    Only pays for the extra query when the answer is already empty; a canvas with no
+    rows at all gets no note, because then the zero is the whole truth.
+    """
+    if windowless or not date_field or value not in (None, 0):
+        return None
+    try:
+        latest = _latest_date(snapshot_id, date_field, organization_id)
+    except Exception:  # noqa: BLE001 - an explanation is not worth failing a KPI over
+        return None
+    return {"latest": latest} if latest else None
+
+
 def date_windows(
     days: int, compare_mode: str = "prior_period"
 ) -> tuple[tuple[str, str], tuple[str, str], str]:
@@ -266,6 +320,9 @@ def execute_kpi_definition(
     }
     try:
         snapshot = get_snapshot(snapshot_id, organization_id)
+        # A cross-filter is raised on one card and sent to all of them; the ones whose
+        # canvas has no such column are left unfiltered rather than failed.
+        extra_filters = applicable_filters(extra_filters, allowed_fields(snapshot))
         # KPI may name its own date field (dbt canvases carry default_date_field, not
         # required_date_field); a WINDOWLESS KPI (stock metric: total customers, AR
         # balance) skips the window and the period comparison entirely.
@@ -320,6 +377,9 @@ def execute_kpi_definition(
             "compare_label": compare_label if compare and not windowless else None,
             "trend": trend,
             "trend_dimension": trend_dimension,
+            "empty_window": empty_window_note(
+                value=value, windowless=windowless, snapshot_id=snapshot_id,
+                date_field=date_field, organization_id=organization_id),
             "error": None,
         }
     except (QueryValidationError, ValueError) as exc:
