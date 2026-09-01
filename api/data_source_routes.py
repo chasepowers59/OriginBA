@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
@@ -22,6 +24,8 @@ from api.demo_db import env_configured, test_oracle_connection
 from api.organizations import is_valid_org_id
 
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/portal/data-source", tags=["portal-data-source"])
 
 
@@ -33,23 +37,25 @@ class DataSourceBody(BaseModel):
     thick_mode: bool = False
 
 
-def _require_settings_token(x_portal_settings_token: str | None = Header(None)) -> None:
-    if not verify_settings_token(x_portal_settings_token):
-        raise HTTPException(
-            status_code=401,
-            detail="Missing or invalid X-Portal-Settings-Token header.",
-        )
-
-
 def _require_data_source_manage(
     ctx: AuthContext = Depends(get_auth_context),
     x_portal_settings_token: str | None = Header(None),
 ) -> AuthContext:
-    if ctx.has_permission("data_source:manage"):
-        return ctx
-    if verify_settings_token(x_portal_settings_token):
-        return ctx
-    raise HTTPException(status_code=403, detail="Admin access required for data source settings")
+    """Managing a connection needs the permission, ALWAYS.
+
+    The settings token used to be accepted *instead* of the permission, and
+    verify_settings_token() returns True when PORTAL_SETTINGS_TOKEN is unset — the
+    default — so any authenticated user could repoint their org's database and use
+    the connection test as an internal network probe (audit H1). The token is a
+    second factor layered on top, never an alternative.
+    """
+    if not ctx.has_permission("data_source:manage"):
+        raise HTTPException(
+            status_code=403, detail="Admin access required for data source settings")
+    if not verify_settings_token(x_portal_settings_token):
+        raise HTTPException(
+            status_code=401, detail="Missing or invalid X-Portal-Settings-Token header.")
+    return ctx
 
 
 def _target_organization_id(
@@ -121,7 +127,17 @@ def test_data_source(
         result = test_oracle_connection(config)
         return {"ok": True, "organization_id": org_id, **result}
     except Exception as exc:
-        return {"ok": False, "organization_id": org_id, "error": str(exc)}
+        # The driver error distinguishes "no listener" from "wrong password" from
+        # "no route", which turns this endpoint into a network probe run from the
+        # API host (audit H1). The operator gets the detail in the server log; the
+        # response says only that it failed.
+        logger.warning("Data source test failed for %s: %s", org_id, exc)
+        return {
+            "ok": False,
+            "organization_id": org_id,
+            "error": "Could not connect with those settings. Check the host, "
+                     "service name and credentials, then try again.",
+        }
 
 
 @router.put("")

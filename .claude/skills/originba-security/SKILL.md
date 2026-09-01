@@ -38,12 +38,14 @@ header is ignored, never rejected, and never used as a connection detail.
 5. **Secrets never leave the source.** `MICR_ID`, `WEB_PASSWD*`, `ALERT_INFO`,
    `EXT_ACCT_ID` are dropped or collapsed in dbt staging, must not appear in any
    reporting canvas or portal catalog, and must be unselectable in the workspace —
-   including via `SELECT *` and whole-row projections (C4 fixed). H4 is still open:
-   `ALERT_INFO` remains a queryable dimension in the cisadm catalog.
+   including via `SELECT *` and whole-row projections (C4 fixed). The same rule is
+   enforced in the CATALOG: `is_protected_column()` drops them from
+   `allowed_fields()`, so the governed query API and the SQL fence agree (H4 fixed).
 6. **Permissions gate every data route.** `ctx.require_permission(...)` or
    `Depends(require_permission(...))`. A route with only `get_auth_context` is
    unprotected. (C3 fixed for `/dq/*`.)
-7. **A token is an extra factor, never an alternative to a permission.** (OPEN: H1.)
+7. **A token is an extra factor, never an alternative to a permission.** (H1 fixed;
+   the same shape would be a bug anywhere else it appears.)
 8. **Real client data never enters git.** Slice files and `docs/screenshots/` are
    gitignored; no hook enforces it, so `git add -f` is the standing risk.
 
@@ -73,11 +75,17 @@ Oracle: `ALL_TABLES`/`DBA_*`/`V$*`/`SYS.*`, other schemas, `@dblink`, `UTL_HTTP`
 - **C4** the secrets guard is per TABLE — `SELECT *` and whole-row projection are
   both blocked on every table carrying a protected column.
 
-**STILL OPEN — HIGH:** H1 settings-token bypass on data-source management (also a
-blind internal port scanner); H2 `_legacy` credential fallback; H3
-`raw_sql_validator` scopes by substring presence; H4 `ALERT_INFO` is a queryable
-dimension in the cisadm catalog; H5 two routes 500 after querying and skip their
-audit write; H6 the JWT is in a non-HttpOnly cookie for 8 hours.
+**HIGH — H1 and H4 also FIXED:**
+- **H1** `data_source:manage` is required unconditionally; the settings token is a
+  second factor, never an alternative. The connection test returns a generic failure
+  so it cannot be used to probe the internal network.
+- **H4** `is_protected_column()` drops secrets at `allowed_fields()`, so the governed
+  query API refuses them whatever a catalog says; the catalog and its generator are
+  clean too.
+
+**STILL OPEN — HIGH:** H2 `_legacy` credential fallback; H3 `raw_sql_validator`
+scopes by substring presence; H5 two routes 500 after querying and skip their audit
+write; H6 the JWT is in a non-HttpOnly cookie for 8 hours.
 **MEDIUM/LOW:** see the audit document.
 
 Full evidence: `docs/SECURITY_AUDIT_2026-09-01.md`.

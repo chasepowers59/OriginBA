@@ -103,7 +103,17 @@ with column-level SELECT that excludes those columns.
 
 ---
 
-## HIGH
+## HIGH — H1 and H4 FIXED 2026-09-01
+
+| # | Fix | Test |
+| --- | --- | --- |
+| H1 | `_require_data_source_manage` now requires `data_source:manage` UNCONDITIONALLY; the settings token is a second factor layered on top, never an alternative. The connection test no longer returns the driver error (it distinguished "no listener" from "wrong password" from "no route" — a network probe); the detail goes to the server log. Dead `_require_settings_token` helper deleted. | `tests/test_data_source_authz.py` (6) |
+| H4 | `snapshot_catalog.is_protected_column` drops MICR/WEB_PASSWD/ALERT_INFO/EXT_ACCT_ID from `allowed_fields()`, so the governed query API refuses them whatever a catalog declares; the two `*ALERT_INFO` fields were removed from `output/catalog_cisadm.json`; and the catalog generator skips them so regeneration cannot reintroduce them. Legitimate alert columns (ALERT_COUNT, OPEN_ALERT_COUNT, LATEST_ALERT_*) are untouched. | `tests/test_catalog_secrets.py` (5) |
+
+Verified: `build_query(dimensions=['ALERT_INFO'])` on the real cisadm snapshot →
+`Invalid dimension: ALERT_INFO`, with the five legitimate alert columns still allowed.
+
+### Still open
 
 | # | Finding | Evidence |
 | --- | --- | --- |
