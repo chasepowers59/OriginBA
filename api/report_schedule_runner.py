@@ -27,11 +27,9 @@ def main() -> int:
         print("SMTP_HOST is not configured; refusing a live run (use --dry-run).")
         return 1
 
-    results = run_due_schedules(dry_run=args.dry_run)
-    if not results:
-        print("Nothing due.")
-        return 0
     failed = 0
+
+    results = run_due_schedules(dry_run=args.dry_run)
     for r in results:
         line = f"[{r['status']}] {r.get('view')} -> {', '.join(r.get('recipients', []))}"
         if "row_count" in r:
@@ -39,6 +37,19 @@ def main() -> int:
         print(line)
         if str(r["status"]).startswith("error"):
             failed += 1
+
+    # KPI threshold alerts ride the same hourly heartbeat (skipped on dry-run:
+    # evaluating a KPI hits the warehouse, and dry-run promises no side effects
+    # on alert state).
+    if not args.dry_run:
+        from api.kpi_alerts import run_kpi_alerts
+        for r in run_kpi_alerts():
+            print(f"[alert {r['status']}] {r.get('kpi')} -> {', '.join(r.get('recipients', []))}")
+            if str(r["status"]).startswith("error"):
+                failed += 1
+
+    if not results:
+        print("No schedules due.")
     return 1 if failed else 0
 
 

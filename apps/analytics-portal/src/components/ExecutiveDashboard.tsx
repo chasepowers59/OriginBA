@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { fetchExecutiveSummary } from "@/lib/api";
+import { KpiAlertsDialog } from "@/components/KpiAlertsDialog";
 import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { ExecutiveSummary } from "@/lib/types";
 import { DashboardWidget } from "./DashboardWidget";
@@ -28,6 +29,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
   const [compare, setCompare] = useState(false);
   const [compareMode, setCompareMode] = useState<CompareMode>("prior_period");
   const [summary, setSummary] = useState<ExecutiveSummary | null>(null);
+  const [showAlerts, setShowAlerts] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -66,6 +68,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
 
   return (
     <section className="space-y-4">
+      {showAlerts ? <KpiAlertsDialog onClose={() => setShowAlerts(false)} /> : null}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
@@ -100,6 +103,9 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
                 title={`${portal.organization_name} Executive Dashboard`}
                 exportSections={exportSections}
               />
+              <button type="button" onClick={() => setShowAlerts(true)} className="btn-ghost">
+                Alerts
+              </button>
               <Link href="/dashboards" className="btn-ghost">
                 Custom dashboards
               </Link>

@@ -234,6 +234,43 @@ export function deleteReportSchedule(scheduleId: string): Promise<void> {
   return fetchJson(`/report-schedules/${scheduleId}`, { method: "DELETE" });
 }
 
+export type KpiAlert = {
+  id: string;
+  kpi_id: string;
+  kpi_label: string;
+  condition: "above" | "below" | "pct_change_above" | "pct_change_below";
+  threshold: number;
+  window_days: number;
+  recipients: string[];
+  enabled: boolean;
+  last_state: "ok" | "breached";
+  last_status?: string | null;
+};
+
+export type WatchableKpi = { id: string; label: string; subtitle: string; format: string };
+
+export function fetchKpiAlerts(): Promise<{
+  alerts: KpiAlert[];
+  available_kpis: WatchableKpi[];
+  smtp_configured: boolean;
+}> {
+  return fetchJson("/kpi-alerts");
+}
+
+export function createKpiAlert(body: {
+  kpi_id: string;
+  condition: string;
+  threshold: number;
+  window_days?: number;
+  recipients: string[];
+}): Promise<KpiAlert> {
+  return fetchJson("/kpi-alerts", { method: "POST", body: JSON.stringify(body) });
+}
+
+export function deleteKpiAlert(alertId: string): Promise<void> {
+  return fetchJson(`/kpi-alerts/${alertId}`, { method: "DELETE" });
+}
+
 export function importSavedViews(
   views: Omit<SavedView, "id" | "client_id" | "saved_at">[],
 ): Promise<{ imported: number; views: SavedView[] }> {
