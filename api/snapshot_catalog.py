@@ -140,16 +140,30 @@ def list_workstreams(organization_id: str | None = None) -> list[dict[str, Any]]
     ]
 
 
+def resolve_snapshot_key(snapshots: Any, snapshot_id: str) -> str:
+    """The key `snapshot_id` actually names, whatever case it arrived in.
+
+    Try it AS WRITTEN first. Upper was right while every snapshot was an Oracle table; a
+    dbt canvas is lowercase rpt_*, and forcing case made every lookup miss with "Unknown
+    snapshot" on a catalog that plainly contained it. Lower is here for the dashboards
+    saved while _validate_tiles upper-cased the id -- user state has no migration, so the
+    reader forgives what the writer broke.
+
+    One function because there were two of these with DIFFERENT tolerance (the library
+    tried two cases, this tried three), which is how the next silent miss gets in.
+    Returns the id unchanged when nothing matches, so callers keep their own error.
+    """
+    for key in (snapshot_id, snapshot_id.upper(), snapshot_id.lower()):
+        if key in snapshots:
+            return key
+    return snapshot_id
+
+
 def get_snapshot(snapshot_id: str, organization_id: str | None = None) -> dict[str, Any]:
     catalog = load_catalog(organization_id=organization_id)
-    # Try the id AS WRITTEN before upper-casing it. Upper was right while every snapshot
-    # was an Oracle table; a dbt canvas is lowercase rpt_*, and forcing case made every
-    # lookup miss with "Unknown snapshot" on a catalog that plainly contained it.
-    # lower() is here for the dashboards saved while _validate_tiles upper-cased the id:
-    # user state has no migration, so the reader forgives what the writer broke.
-    for key in (snapshot_id, snapshot_id.upper(), snapshot_id.lower()):
-        if key in catalog["snapshots"]:
-            return catalog["snapshots"][key]
+    key = resolve_snapshot_key(catalog["snapshots"], snapshot_id)
+    if key in catalog["snapshots"]:
+        return catalog["snapshots"][key]
     raise CatalogError(f"Unknown snapshot: {snapshot_id}")
 
 

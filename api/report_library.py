@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from api.snapshot_catalog import CatalogError, load_catalog
+from api.snapshot_catalog import CatalogError, load_catalog, resolve_snapshot_key
 
 
 def build_report_library(organization_id: str | None = None) -> dict[str, Any]:
@@ -22,7 +22,7 @@ def build_report_library(organization_id: str | None = None) -> dict[str, Any]:
             # rpt_* and every lookup missed, so the library came back empty with no
             # error. Try the id as written, then upper for the legacy names.
             raw_id = str(ref.get("snapshot_id", ""))
-            snap_id = raw_id if raw_id in snapshots else raw_id.upper()
+            snap_id = resolve_snapshot_key(snapshots, raw_id)
             report_id = ref.get("report_id")
             snap = snapshots.get(snap_id)
             if not snap or not report_id:
@@ -43,6 +43,12 @@ def build_report_library(organization_id: str | None = None) -> dict[str, Any]:
                     "title": premade.get("title", report_id),
                     "description": premade.get("description", ""),
                     "chart_type": premade.get("chart_type", "bar"),
+                    # The catalog knows the SHAPE of each report; the library used to drop
+                    # it, so a card said why a question matters and never what it returns.
+                    "dimensions": premade.get("dimensions") or [],
+                    "measures": premade.get("measures") or [],
+                    "filters": premade.get("filters") or [],
+                    "grain_description": snap.get("grain_description", ""),
                     "explore_url": f"/explore/{snap_id}?report={report_id}",
                 }
             )

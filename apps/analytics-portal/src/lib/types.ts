@@ -492,6 +492,11 @@ export type ReportLibraryEntry = {
   title: string;
   description: string;
   chart_type: string;
+  /** The report's SHAPE, so a card can say what it returns before you open it. */
+  dimensions?: string[];
+  measures?: { field?: string; agg?: string }[];
+  filters?: { field?: string }[];
+  grain_description?: string;
   explore_url: string;
 };
 
