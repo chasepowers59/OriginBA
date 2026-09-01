@@ -36,6 +36,7 @@ import type {
 import { FieldPalette } from "./FieldPalette";
 import { Shelf } from "./Shelf";
 import { VisualPicker, type VisualChoice } from "./VisualPicker";
+import { shelfDimensions } from "@/lib/builderShelves";
 import { BuilderChart, type ChartSeries } from "./BuilderChart";
 import { QuestionGallery } from "./QuestionGallery";
 
@@ -140,10 +141,7 @@ export function VisualBuilder({
   // --- query assembly ---------------------------------------------------------
   const buildRequest = useCallback(() => {
     if (!meta) return null;
-    const dims = cols.filter((c) => c.kind === "dim").map((c) => c.field);
-    const timeDims = cols
-      .filter((c) => c.kind === "time")
-      .map((c) => ({ field: c.field, grain: c.grain ?? "month" }));
+    const { dimensions: dims, timeDimensions: timeDims } = shelfDimensions(cols);
     const measures = vals.length
       ? vals.map((v) => ({ field: v.field, agg: v.agg }))
       : [{ field: "*", agg: "count" }];
@@ -160,7 +158,9 @@ export function VisualBuilder({
       filters.push({ field: req, op: "between", value: defaultDateRange(90) });
     }
     return {
-      dimensions: timeDims.length ? [] : dims,
+      // Both, always. A date used to blank the dimension list, which silently
+      // dropped every other column the user had put on the shelf.
+      dimensions: dims,
       measures,
       filters,
       time_dimensions: timeDims.length ? timeDims : undefined,
@@ -358,7 +358,7 @@ export function VisualBuilder({
 
         {/* Table-first layout: the data pane (tables -> columns) is always visible —
             picking the table IS the entry point, columns expand beneath it. */}
-        <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
+        <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
           <div className="glass-panel max-h-[320px] overflow-y-auto p-3 lg:sticky lg:top-20 lg:max-h-[calc(100vh-7rem)] lg:self-start">
             <FieldPalette
               grouped={grouped}
@@ -571,7 +571,7 @@ function ResultTable({ result, booleanCols }: { result: QueryResponse | null; bo
     return typeof v === "number" ? formatNumber(v) : String(v ?? "");
   };
   return (
-    <div className="max-h-[360px] overflow-auto">
+    <div className="max-h-[min(70vh,900px)] overflow-auto">
       <table className="min-w-full text-left text-xs">
         <thead>
           <tr>

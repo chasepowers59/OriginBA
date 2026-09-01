@@ -71,7 +71,7 @@ export function AppShell({
           that used to crowd the bar (workstream counts, role, org, sign out) lives in
           the user menu, so the bar itself stays one clean row at every width. */}
       <header ref={headerRef} className="portal-header no-print sticky top-0 z-50">
-        <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-4 px-6">
+        <div className="mx-auto flex h-16 max-w-[1700px] items-center gap-4 px-6 2xl:px-10">
           <div className="flex min-w-0 items-center gap-3">
             <Link href="/" className="group flex shrink-0 items-center">
               <BrandMark className="h-7 w-auto" />
@@ -180,7 +180,7 @@ export function AppShell({
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1400px] px-6 py-8">
+      <div className="mx-auto max-w-[1700px] px-6 py-8 2xl:px-10">
         <main className="min-w-0 animate-fade-in">{children}</main>
       </div>
 

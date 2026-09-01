@@ -68,7 +68,7 @@ export function BuilderChart({
   xLabel,
   series,
   visual,
-  height = 340,
+  height = 460,
   selectedCategory = null,
   onCategorySelect,
   emptyMessage = "Drop a dimension and a measure to see a chart",

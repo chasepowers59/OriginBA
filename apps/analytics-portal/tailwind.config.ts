@@ -5,6 +5,21 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Soul Palette V2.1 uses the shadcn token NAMES, and our vendored shadcn
+        // components (ui/chart.tsx) style themselves with bg-background,
+        // fill-muted, text-muted-foreground, border-border. Those classes were
+        // never registered, so they silently did nothing and recharts fell back to
+        // its own light-grey defaults -- a near-white tooltip and hover cursor that
+        // was unreadable on the dark theme. Registering them makes the vendored
+        // components theme-aware for free.
+        background: "var(--background)",
+        foreground: "var(--foreground)",
+        card: { DEFAULT: "var(--card)", foreground: "var(--foreground)" },
+        popover: { DEFAULT: "var(--card)", foreground: "var(--foreground)" },
+        muted: { DEFAULT: "var(--muted)", foreground: "var(--muted-foreground)" },
+        border: "var(--border)",
+        input: "var(--input)",
+        ring: "var(--ring)",
         brand: {
           DEFAULT: "var(--brand)",
           navy: "var(--brand-navy)",
