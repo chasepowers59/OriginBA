@@ -1,6 +1,7 @@
 import { exportRowsCsv } from "./format";
 import { downloadWorkbook } from "./exportXlsx";
 import { brandTitle } from "./brand";
+import { exportFilename } from "./exportFilename";
 
 export function printDashboardPack(title: string, targetId = "dashboard-export-root"): void {
   const previous = document.title;
@@ -30,7 +31,7 @@ export function exportDashboardCsv(
     }
     rows.push({ Section: "" });
   }
-  exportRowsCsv(allHeaders, rows, `${title.replace(/\s+/g, "_")}_dashboard.csv`);
+  exportRowsCsv(allHeaders, rows, exportFilename(title, "dashboard", "csv"));
 }
 
 /** The Excel pack is a REAL workbook: one sheet per dashboard section, typed values. */
@@ -40,6 +41,6 @@ export function exportDashboardXlsx(
 ): void {
   downloadWorkbook(
     sections.map((s) => ({ name: s.name, columns: s.headers, rows: s.rows })),
-    `${title.replace(/\s+/g, "_")}_dashboard.xlsx`,
+    exportFilename(title, "dashboard", "xlsx"),
   );
 }
