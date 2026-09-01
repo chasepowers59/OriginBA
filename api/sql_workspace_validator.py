@@ -118,9 +118,14 @@ _SECRET_COLUMNS = re.compile(r"\b(micr_id|web_passwd\w*|alert_info)\b", re.IGNOR
 _SECRET_TABLES = ("ci_pay_tndr", "ci_per", "ci_acct", "ci_acct_apay")
 _TABLE_ALT = "|".join(_SECRET_TABLES)
 
+# The star has to be a PROJECTION to return a row, which means it is followed by a
+# comma or by FROM. As a function argument it is followed by `)` and reveals nothing:
+# the earlier pattern allowed an opening paren before the star, so COUNT(*) read as a
+# whole-row projection and the shipped "Accounts by customer class" starter -- a pure
+# aggregate returning a code, a label and a count -- was refused.
 _STAR_ON_SECRET_TABLE = re.compile(
-    r"\bSELECT\b[^;]*?(?:^|[\s,(])(?:[\w$#]+\s*\.\s*)?\*.*?\bFROM\b[^;]*?"
-    rf"\b(?:{_TABLE_ALT})\b",
+    r"\bSELECT\b[^;]*?(?:^|[\s,])(?:[\w$#]+\s*\.\s*)?\*\s*(?:,|(?=\bFROM\b))"
+    rf".*?\bFROM\b[^;]*?\b(?:{_TABLE_ALT})\b",
     re.IGNORECASE | re.DOTALL,
 )
 
