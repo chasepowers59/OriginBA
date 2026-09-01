@@ -55,7 +55,7 @@ class QueryBuilderTests(unittest.TestCase):
             ],
             limit=100,
         )
-        self.assertIn("COUNT(*) AS m0", sql)
+        self.assertIn('COUNT(*) AS "m0"', sql)
         self.assertIn("ENTRY_STATUS_DESC", sql)
         self.assertIn("QUEUE_SOURCE = :b1", sql)
         self.assertEqual(binds["b1"], "TODO")
@@ -86,7 +86,7 @@ class QueryBuilderTests(unittest.TestCase):
             filters=[{"field": "ACCOUNTING_DT", "op": "between", "value": ["2025-01-01", "2025-06-01"]}],
             limit=50,
         )
-        self.assertIn("SUM(CUR_AMT) AS m0", sql)
+        self.assertIn('SUM(CUR_AMT) AS "m0"', sql)
 
     def test_rejects_unknown_field(self) -> None:
         snap, fields = self._snapshot("FT_RPT_CURR")

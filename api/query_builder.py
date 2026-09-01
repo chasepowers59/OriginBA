@@ -162,25 +162,29 @@ def build_query(
         field = _validate_ident(str(raw.get("field", "")), allowed_fields, "time dimension field", dialect)
         grain = str(raw.get("grain", "month")).lower()
         expr = _time_bucket_expr(_quote(field, dialect), grain, dialect)
-        alias = f"TD{idx}"
-        select_parts.append(f"{expr} AS {alias}")
+        # Aliases are quoted so they reach the client with the case it asked for. Bare,
+        # an identifier folds to lower case in Postgres and UPPER in Oracle, so the same
+        # request answered by two engines returned two different column names -- and the
+        # client, which looks for "TD0", found neither.
+        select_parts.append(f'{expr} AS "TD{idx}"')
         group_parts.append(expr)
     for dim in dims:
         select_parts.append(_quote(dim, dialect))
         group_parts.append(_quote(dim, dialect))
     for spec in measure_specs:
+        alias = f'"{spec.alias}"'
         if spec.agg == "count" and spec.field == "*":
-            select_parts.append(f"COUNT(*) AS {spec.alias}")
+            select_parts.append(f"COUNT(*) AS {alias}")
         elif spec.agg == "count":
-            select_parts.append(f"COUNT({_quote(spec.field, dialect)}) AS {spec.alias}")
+            select_parts.append(f"COUNT({_quote(spec.field, dialect)}) AS {alias}")
         elif spec.agg == "count_distinct":
-            select_parts.append(f"COUNT(DISTINCT {_quote(spec.field, dialect)}) AS {spec.alias}")
+            select_parts.append(f"COUNT(DISTINCT {_quote(spec.field, dialect)}) AS {alias}")
         elif spec.agg == "sum":
-            select_parts.append(f"SUM({_quote(spec.field, dialect)}) AS {spec.alias}")
+            select_parts.append(f"SUM({_quote(spec.field, dialect)}) AS {alias}")
         elif spec.agg == "min":
-            select_parts.append(f"MIN({_quote(spec.field, dialect)}) AS {spec.alias}")
+            select_parts.append(f"MIN({_quote(spec.field, dialect)}) AS {alias}")
         elif spec.agg == "max":
-            select_parts.append(f"MAX({_quote(spec.field, dialect)}) AS {spec.alias}")
+            select_parts.append(f"MAX({_quote(spec.field, dialect)}) AS {alias}")
 
     where_parts: list[str] = []
     for idx, spec in enumerate(filter_specs):
@@ -239,6 +243,17 @@ def build_query(
         sql += " WHERE " + " AND ".join(where_parts)
     if group_parts:
         sql += " GROUP BY " + ", ".join(group_parts)
+    # Without this the row limit keeps an ARBITRARY slice: every KPI trend asks for six
+    # groups, and the six that survived were whatever the planner produced first. The
+    # "Active service agreements" card drew the 13th and 14th largest SA Types and none
+    # of the top four, while looking like a breakdown of its own headline number.
+    # A time bucket ranks by recency instead -- the newest months are the interesting
+    # ones, and the client re-sorts them chronologically to draw.
+    # measure_specs is never empty -- a query with no measure is rejected above.
+    if time_dimensions:
+        sql += ' ORDER BY "TD0" DESC'
+    else:
+        sql += f' ORDER BY "{measure_specs[0].alias}" DESC'
     # FETCH FIRST is standard SQL and valid in both, so the tail needs no branch.
     sql += f" FETCH FIRST {int(limit)} ROWS ONLY"
     return sql, binds

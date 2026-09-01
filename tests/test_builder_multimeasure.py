@@ -45,8 +45,8 @@ class MultiMeasureBuilderTests(unittest.TestCase):
         )
         self.assertIn('"FT Type"', sql)
         self.assertIn('"CIS Division"', sql)
-        self.assertIn("COUNT(*) AS m0", sql)
-        self.assertIn('SUM("Current Amount") AS m1', sql)
+        self.assertIn('COUNT(*) AS "m0"', sql)
+        self.assertIn('SUM("Current Amount") AS "m1"', sql)
         self.assertIn("GROUP BY", sql)
         self.assertIn('reporting."rpt_financial_txn"', sql)
 
