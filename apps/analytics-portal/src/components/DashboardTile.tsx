@@ -8,6 +8,7 @@ import {
 } from "@/lib/api";
 import { formatCurrency, formatNumber } from "@/lib/format";
 import { chartedMeasureColumn, kpiHeadline } from "@/lib/dashboardTileMath";
+import { resolveTileDateField } from "@/lib/tileDateField";
 import { measureDisplaysAsCurrency } from "@/lib/businessLabels";
 import type { DashboardTileDef, QueryResponse } from "@/lib/types";
 import { BuilderChart } from "./builder/BuilderChart";
@@ -25,6 +26,11 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
   const [result, setResult] = useState<QueryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dimensionKey, setDimensionKey] = useState("");
+  // Whether the query ACTUALLY grouped by a time bucket. Deriving "is this a time
+  // series" from the tile's requested grain alone let the two disagree: when no date
+  // could be resolved the tile still drew itself as a trend, with the measure on the
+  // x axis, so "Billed revenue by month" plotted one dot labelled 1072398.6.
+  const [grouped, setGrouped] = useState(false);
   const [measureKey, setMeasureKey] = useState("");
   const [queryMeasureField, setQueryMeasureField] = useState("*");
   const [queryMeasureAgg, setQueryMeasureAgg] = useState("count");
@@ -43,10 +49,9 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
           { field: tile.measure_field ?? "*", agg: tile.measure_agg ?? "count" },
         ];
         const primaryMeasure = measures[0] ?? { field: "*", agg: "count" };
+        const groupDate = resolveTileDateField(meta);
         const timeDimensions =
-          tile.time_grain && meta.required_date_field
-            ? [{ field: meta.required_date_field, grain: tile.time_grain }]
-            : [];
+          tile.time_grain && groupDate ? [{ field: groupDate, grain: tile.time_grain }] : [];
         const filters: import("@/lib/types").FilterDef[] = [
           ...(meta.required_date_field
             ? [{ field: meta.required_date_field, op: "between" as const, value: [start, end] }]
@@ -65,6 +70,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
         });
         if (cancelled) return;
         setResult(response);
+        setGrouped(timeDimensions.length > 0);
         setDimensionKey(
           timeDimensions.length ? response.columns[0] ?? "" : dimensions[0] ?? response.columns[0] ?? "",
         );
@@ -99,7 +105,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
   }, [result, tile.title, onData]);
 
   const chartType = (tile.chart_type as "bar" | "line" | "pie" | "horizontal") ?? "bar";
-  const isTimeSeries = Boolean(tile.time_grain);
+  const isTimeSeries = Boolean(tile.time_grain) && grouped;
   const effectiveChart = isTimeSeries ? "line" : chartType;
   const isCurrency = measureDisplaysAsCurrency(queryMeasureField, queryMeasureAgg);
 
@@ -178,6 +184,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
             },
           ]}
           sortTimeSeries={isTimeSeries}
+          xGrain={tile.time_grain ?? null}
           selectedCategory={filter && filter.field === dimensionKey ? filter.value : null}
           onCategorySelect={dimensionKey.startsWith("TD") ? undefined : handleClick}
           height={240}

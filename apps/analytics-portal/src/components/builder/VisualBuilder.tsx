@@ -484,6 +484,7 @@ export function VisualBuilder({
                     // xKey is the time dimension whenever the shelf holds one, and a date
                     // axis has to read chronologically rather than ranked by size.
                     sortTimeSeries={cols.some((c) => c.kind === "time")}
+                    xGrain={cols.find((c) => c.kind === "time")?.grain ?? null}
                   />
                 )}
               </div>
