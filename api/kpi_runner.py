@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import date, timedelta
 from typing import Any
 
@@ -46,6 +47,82 @@ def public_lenses(kpi: dict[str, Any]) -> list[dict[str, Any]]:
         {"id": lens["id"], "label": lens["label"], "subtitle": lens.get("subtitle", "")}
         for lens in kpi.get("lenses") or []
     ]
+
+
+def _lens_id(value: str) -> str:
+    """A URL-safe id for a discovered value. Collisions are broken by the caller."""
+    slug = re.sub(r"[^a-z0-9]+", "-", str(value).lower()).strip("-")
+    return slug or "value"
+
+
+def _discover_lens_values(
+    kpi: dict[str, Any], spec: dict[str, Any], organization_id: str
+) -> list[str]:
+    """The tenant's own status values for this field, most common first.
+
+    Runs through the SAME governed builder as everything else, so the field is
+    validated against the catalog and the org's scope applies.
+    """
+    columns, rows = run_kpi_query(
+        kpi["snapshot_id"],
+        {
+            "dimensions": [spec["field"]],
+            "measures": [{"field": "*", "agg": "count"}],
+            "filters": [],
+            "limit": int(spec.get("limit", 8)),
+        },
+        None,
+        "",
+        "",
+        organization_id=organization_id,
+    )
+    idx = columns.index(spec["field"]) if spec["field"] in columns else 0
+    return [str(r[idx]) for r in rows if r[idx] is not None and str(r[idx]) != ""]
+
+
+def resolve_lenses(kpi: dict[str, Any], *, organization_id: str) -> dict[str, Any]:
+    """Give a KPI concrete lenses, discovering them when the vocabulary is the client's.
+
+    A status held in a base-product `_FLG` lookup (bill, payment, SA) is named in the
+    spec, because the set is fixed and can be grouped into something a reader
+    recognises. A business-object lifecycle state is not: a client extends it, so the
+    lenses are read from that tenant's data instead of guessed. Demo 25.4 alone carries
+    seven activity statuses, and a hardcoded list would be wrong at the next client.
+
+    Never mutates the shared spec, and a discovery failure costs the card its switcher,
+    never its number.
+    """
+    spec = kpi.get("lens_field")
+    if not spec:
+        return kpi
+    try:
+        values = _discover_lens_values(kpi, spec, organization_id)
+    except Exception:  # noqa: BLE001 - a switcher is not worth failing a KPI over
+        return {**kpi, "lenses": []}
+    if not values:
+        return {**kpi, "lenses": []}
+
+    noun = spec.get("noun", "Status")
+    lenses = [{
+        "id": "all",
+        "label": "All",
+        "subtitle": spec.get("all_subtitle", "Every status"),
+        "filters": [],
+    }]
+    seen = {"all"}
+    for value in values:
+        base = _lens_id(value)
+        lens_id, n = base, 2
+        while lens_id in seen:
+            lens_id, n = f"{base}-{n}", n + 1
+        seen.add(lens_id)
+        lenses.append({
+            "id": lens_id,
+            "label": str(value),
+            "subtitle": f"{noun} {value}",
+            "filters": [{"field": spec["field"], "op": "eq", "value": value}],
+        })
+    return {**kpi, "lenses": lenses}
 
 
 def date_windows(
@@ -173,6 +250,7 @@ def execute_kpi_definition(
     # The lens narrows BOTH the headline and its trend, so the bars always break down
     # the number above them. Its subtitle replaces the card's, because that line is
     # what tells the reader which population they are looking at.
+    kpi = resolve_lenses(kpi, organization_id=organization_id)
     lens = select_lens(kpi, lens_id)
     extra_filters = list(extra_filters or []) + lens_filters(kpi, lens_id)
     base = {

@@ -106,3 +106,73 @@ class LensSelectionParsingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DiscoveredLensTests(unittest.TestCase):
+    """Some statuses are CLIENT-CONFIGURED and cannot be written down in advance.
+
+    SA/bill/payment statuses are base-product `_FLG` lookups, so their lenses are named
+    in the spec. A field activity's status is a business-object lifecycle state that a
+    client can extend -- Demo 25.4 alone carries COMPLETED, DISCARDED, WAITEFFTDT,
+    COMINPROG, VALERROR, COMERROR and WAITAPPT -- so hardcoding them would be exactly
+    the "never hardcode a client-configured code" mistake. Those lenses are DISCOVERED
+    from the tenant's own data, ranked by volume, through the same governed query path.
+    """
+
+    def setUp(self):
+        from api import kpi_runner
+        self.kpi_runner = kpi_runner
+        self.kpi = {
+            "id": "field_activities",
+            "snapshot_id": "rpt_field_activity",
+            "lens_field": {"field": "Activity Status Code", "noun": "Activity status"},
+        }
+
+    def _resolve(self, values):
+        from unittest import mock
+        with mock.patch.object(self.kpi_runner, "_discover_lens_values", return_value=values):
+            return self.kpi_runner.resolve_lenses(self.kpi, organization_id="dev")
+
+    def test_all_comes_first_so_it_is_the_default(self):
+        out = self._resolve(["COMPLETED", "DISCARDED"])
+        self.assertEqual(out["lenses"][0]["id"], "all")
+        self.assertEqual(out["lenses"][0]["filters"], [])
+
+    def test_one_lens_per_discovered_value_in_the_order_given(self):
+        out = self._resolve(["COMPLETED", "DISCARDED", "WAITEFFTDT"])
+        self.assertEqual(
+            [l["label"] for l in out["lenses"]], ["All", "COMPLETED", "DISCARDED", "WAITEFFTDT"]
+        )
+
+    def test_each_lens_filters_on_the_declared_field_by_equality(self):
+        out = self._resolve(["COMPLETED"])
+        self.assertEqual(
+            out["lenses"][1]["filters"],
+            [{"field": "Activity Status Code", "op": "eq", "value": "COMPLETED"}],
+        )
+
+    def test_ids_are_url_safe_and_distinct(self):
+        out = self._resolve(["WAIT APPT", "wait/appt", "COMPLETED"])
+        ids = [l["id"] for l in out["lenses"]]
+        self.assertEqual(len(ids), len(set(ids)), ids)
+        for lens_id in ids:
+            self.assertRegex(lens_id, r"^[a-z0-9-]+$")
+
+    def test_a_value_that_slugs_to_nothing_still_gets_an_id(self):
+        out = self._resolve(["///", "COMPLETED"])
+        self.assertTrue(all(l["id"] for l in out["lenses"]))
+
+    def test_a_spec_with_static_lenses_is_returned_untouched(self):
+        static = {"id": "x", "lenses": [{"id": "a", "label": "A", "filters": []}]}
+        self.assertEqual(
+            self.kpi_runner.resolve_lenses(static, organization_id="dev")["lenses"],
+            static["lenses"],
+        )
+
+    def test_discovery_failure_degrades_to_no_lenses_rather_than_breaking_the_card(self):
+        from unittest import mock
+        with mock.patch.object(
+            self.kpi_runner, "_discover_lens_values", side_effect=RuntimeError("db down")
+        ):
+            out = self.kpi_runner.resolve_lenses(self.kpi, organization_id="dev")
+        self.assertEqual(out.get("lenses", []), [])

@@ -93,7 +93,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     },
     {
         "id": "payments_collected",
-        "label": "Payments collected",
+        "label": "Payments",
         "subtitle": "Frozen pay segments",
         "snapshot_id": "rpt_payment",
         "format": "currency",
@@ -105,6 +105,21 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "trend": {"dimensions": ["Payment Status"],
                   "measures": [{"field": "Pay Segment Amount", "agg": "sum"}],
                   "filters": [], "limit": 6},
+        # This card SAID "Frozen pay segments" and filtered on nothing, so it summed
+        # cancelled payments into collections: $1,010,508.27 against a true frozen
+        # $1,003,883.05 on Demo 25.4 -- $6,570.22 of it cancelled. The Frozen lens is
+        # first, so the default now matches the claim the subtitle was already making.
+        # PAY_STATUS_FLG is a base-product lookup (30 Freezable, 50 Frozen, 60 Cancelled).
+        "lenses": [
+            {"id": "frozen", "label": "Frozen", "subtitle": "Frozen pay segments — collected",
+             "filters": [{"field": "Payment Status Code", "op": "eq", "value": "50"}]},
+            {"id": "canceled", "label": "Canceled", "subtitle": "Cancelled payments",
+             "filters": [{"field": "Payment Status Code", "op": "eq", "value": "60"}]},
+            {"id": "freezable", "label": "Freezable", "subtitle": "Not yet frozen",
+             "filters": [{"field": "Payment Status Code", "op": "eq", "value": "30"}]},
+            {"id": "all", "label": "All", "subtitle": "Every pay segment, any status",
+             "filters": []},
+        ],
     },
     {
         "id": "accounts_receivable",
@@ -140,20 +155,34 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     },
     {
         "id": "bills_completed",
-        "label": "Bills completed",
+        "label": "Bills",
         "subtitle": "Cycled billing throughput",
         "snapshot_id": "rpt_bill",
         "format": "number",
         "workstream": "billing",
         "explore_report_id": None,
-        "date_field": "Window Start Date",
-        "value": {"dimensions": [],
-                  "measures": [{"field": "*", "agg": "count"}],
-                  "filters": [{"field": "Is Completed", "op": "eq", "value": True}]},
+        # NOT "Window Start Date": that column is empty at two of the three client
+        # databases on this machine (0 of 1,978 on Demo 25.4, 0 of 87 on INT_DEV) and
+        # only 53% populated on Ellensburg, so the card read 0 whatever the window.
+        # "Created Date/Time" is 100% populated at all three, and it is the only date a
+        # PENDING bill has -- a bill that is not yet billed has no bill date, so windowing
+        # on Bill Date would make the Pending lens permanently empty.
+        "date_field": "Created Date/Time",
+        # The lens supplies the status; the base query carries none, so "All" is really
+        # every bill rather than the completed ones re-counted.
+        "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
         "trend": {"dimensions": ["Bill Cycle"],
-                  "measures": [{"field": "*", "agg": "count"}],
-                  "filters": [{"field": "Is Completed", "op": "eq", "value": True}],
-                  "limit": 6},
+                  "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
+        # Phrased against the canvas's derived BOOLEAN rather than BILL_STAT_FLG's
+        # 'C'/'P', so no code is written down at all -- the model already owns that
+        # mapping and is tested on it. Demo 25.4: 1,963 complete, 15 pending.
+        "lenses": [
+            {"id": "complete", "label": "Complete", "subtitle": "Completed bills",
+             "filters": [{"field": "Is Completed", "op": "eq", "value": True}]},
+            {"id": "pending", "label": "Pending", "subtitle": "Bills not yet completed",
+             "filters": [{"field": "Is Completed", "op": "eq", "value": False}]},
+            {"id": "all", "label": "All", "subtitle": "Every bill, any status", "filters": []},
+        ],
     },
     {
         "id": "field_activities",
@@ -167,6 +196,15 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
         "trend": {"dimensions": ["Activity Type"],
                   "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
+        # DISCOVERED, not declared. An activity's status is a business-object lifecycle
+        # state a client can extend, unlike the base-product _FLG lookups above -- Demo
+        # 25.4 alone carries COMPLETED, DISCARDED, WAITEFFTDT, COMINPROG, VALERROR,
+        # COMERROR and WAITAPPT. Writing those down would be wrong at the next client,
+        # so the lenses are read from the tenant's own data, most common first.
+        # The canvas carries the code without a description (no ENG label table for BO
+        # states), so the code IS the label -- which is also what the analyst sees in CIS.
+        "lens_field": {"field": "Activity Status Code", "noun": "Activity status",
+                       "all_subtitle": "Every activity, any status", "limit": 8},
     },
     {
         "id": "customer_contacts",
