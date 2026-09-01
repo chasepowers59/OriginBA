@@ -24,6 +24,8 @@ export type PortalOrganization = {
 export type AuthStatus = {
   enabled: boolean;
   authenticated: boolean;
+  /** True when the API is configured for OIDC single sign-on (Azure AD / Entra). */
+  oidc_enabled?: boolean;
 };
 
 export type AccessGroup = {

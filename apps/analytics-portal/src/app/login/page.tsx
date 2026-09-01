@@ -2,7 +2,8 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { login, resolveTenant } from "@/lib/authApi";
+import { fetchAuthStatus, login, resolveTenant } from "@/lib/authApi";
+import { storeAccessToken } from "@/lib/auth";
 import { useAuth } from "@/components/AuthProvider";
 import { DEFAULT_BRAND } from "@/lib/brand";
 
@@ -46,6 +47,24 @@ export default function LoginPage() {
   }, [tenantSlug]);
 
   const boundToTenant = Boolean(tenantSlug && tenantName);
+
+  // SSO: show the button when the API is configured for it, and catch the callback's
+  // #sso_token= fragment (fragments never reach server logs) exactly like a password
+  // login's token.
+  const [ssoEnabled, setSsoEnabled] = useState(false);
+  useEffect(() => {
+    fetchAuthStatus()
+      .then((s) => setSsoEnabled(Boolean(s.oidc_enabled)))
+      .catch(() => setSsoEnabled(false));
+  }, []);
+  useEffect(() => {
+    const m = window.location.hash.match(/[#&]sso_token=([^&]+)/);
+    if (!m) return;
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    storeAccessToken(decodeURIComponent(m[1]), 8 * 60 * 60);
+    refresh().then(() => router.replace(searchParams.get("next") || "/"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -165,6 +184,27 @@ export default function LoginPage() {
             >
               {submitting ? "Signing in…" : "Sign in"}
             </button>
+            {ssoEnabled ? (
+              <>
+                <div className="flex items-center gap-3 text-xs text-slate-400">
+                  <span className="h-px flex-1 bg-slate-200" />
+                  or
+                  <span className="h-px flex-1 bg-slate-200" />
+                </div>
+                <a
+                  href={`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/auth/oidc/login`}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  <span aria-hidden className="grid grid-cols-2 gap-[1px]">
+                    <span className="h-2 w-2 bg-[#f25022]" />
+                    <span className="h-2 w-2 bg-[#7fba00]" />
+                    <span className="h-2 w-2 bg-[#00a4ef]" />
+                    <span className="h-2 w-2 bg-[#ffb900]" />
+                  </span>
+                  Sign in with Microsoft
+                </a>
+              </>
+            ) : null}
           </form>
         </div>
 

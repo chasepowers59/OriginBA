@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from api.auth.config import access_token_minutes, auth_disabled
+from api.auth import oidc
 from api.auth.database import get_session_factory
 from api.auth.dependencies import AuthContext, get_auth_context, get_session_auth_context, require_permission
 from api.auth.rate_limit import check_login_rate_limit, clear_login_attempts, record_login_failure
@@ -60,15 +61,16 @@ def _db_session():
 
 @router.get("/status", response_model=AuthStatusResponse)
 def auth_status(authorization: str | None = Header(None)) -> AuthStatusResponse:
+    sso = oidc.oidc_enabled()
     if auth_disabled():
-        return AuthStatusResponse(enabled=False, authenticated=True)
+        return AuthStatusResponse(enabled=False, authenticated=True, oidc_enabled=sso)
     if not authorization or not authorization.lower().startswith("bearer "):
-        return AuthStatusResponse(enabled=True, authenticated=False)
+        return AuthStatusResponse(enabled=True, authenticated=False, oidc_enabled=sso)
     try:
         get_auth_context(authorization)
-        return AuthStatusResponse(enabled=True, authenticated=True)
+        return AuthStatusResponse(enabled=True, authenticated=True, oidc_enabled=sso)
     except HTTPException:
-        return AuthStatusResponse(enabled=True, authenticated=False)
+        return AuthStatusResponse(enabled=True, authenticated=False, oidc_enabled=sso)
 
 
 @router.post("/login", response_model=LoginResponse)
@@ -190,6 +192,90 @@ def resolve_tenant(slug: str) -> PortalOrganizationPublic:
     if not org:
         raise HTTPException(status_code=404, detail="Unknown organization")
     return PortalOrganizationPublic(id=str(org["id"]), display_name=str(org["display_name"]))
+
+
+@router.get("/oidc/login")
+def oidc_login():
+    """Kick off SSO: redirect to the IdP with our client id and a signed state."""
+    cfg = oidc.oidc_config()
+    if not cfg:
+        raise HTTPException(status_code=404, detail="SSO is not configured")
+    disc = oidc.fetch_discovery(cfg["OIDC_ISSUER"])
+    from urllib.parse import urlencode
+
+    from fastapi.responses import RedirectResponse
+    params = urlencode({
+        "client_id": cfg["OIDC_CLIENT_ID"],
+        "response_type": "code",
+        "scope": "openid email profile",
+        "redirect_uri": cfg["OIDC_REDIRECT_URI"],
+        "response_mode": "query",
+        "state": oidc.make_state(),
+    })
+    return RedirectResponse(f"{disc['authorization_endpoint']}?{params}")
+
+
+@router.get("/oidc/callback")
+def oidc_callback(
+    code: str = "",
+    state: str = "",
+    session: Session = Depends(_db_session),
+):
+    """IdP redirect target: verify state + id_token, JIT-provision, hand the SPA our JWT.
+
+    The token travels in the URL FRAGMENT (#sso_token=...) — fragments never reach
+    server logs — and the login page stores it exactly like a password login's token.
+    Users are provisioned as role `user` in the configured default org; SSO never
+    mints admins.
+    """
+    cfg = oidc.oidc_config()
+    if not cfg:
+        raise HTTPException(status_code=404, detail="SSO is not configured")
+    if not code or not oidc.verify_state(state):
+        raise HTTPException(status_code=400, detail="Invalid SSO state")
+
+    disc = oidc.fetch_discovery(cfg["OIDC_ISSUER"])
+    tokens = oidc.exchange_code(disc["token_endpoint"], code, cfg)
+    claims = oidc.verify_id_token(
+        tokens.get("id_token", ""), disc["jwks_uri"],
+        cfg["OIDC_CLIENT_ID"], disc.get("issuer", cfg["OIDC_ISSUER"]))
+    email = oidc.claims_email(claims)
+    if not email:
+        raise HTTPException(status_code=400, detail="Identity token carried no email address")
+
+    from api.auth.models import User
+    from api.auth.security import hash_password
+    import secrets as _secrets
+
+    user = session.query(User).filter(User.email == email).one_or_none()
+    if user is None:
+        user = User(
+            email=email,
+            display_name=str(claims.get("name") or email.split("@")[0]),
+            # unusable password: SSO users authenticate at the IdP only
+            password_hash=hash_password(_secrets.token_urlsafe(24)),
+            role="user",
+            organization_id=cfg.get("OIDC_DEFAULT_ORGANIZATION") or None,
+            is_active=True,
+        )
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        log_audit(session, actor_id=user.id, actor_email=email, action="sso_jit_provision",
+                  target_type="user", target_id=user.id, detail="OIDC first login")
+        session.commit()
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="This account is deactivated")
+
+    public = user_to_public(user)
+    token = create_access_token(
+        user_id=public["id"], email=public["email"], role=public["role"],
+        client_id=public["client_id"], organization_id=public.get("organization_id"),
+        workstreams=public["workstreams"])
+
+    from fastapi.responses import RedirectResponse
+    dest = cfg.get("OIDC_POST_LOGIN_URL") or "/login"
+    return RedirectResponse(f"{dest}#sso_token={token}")
 
 
 @router.get("/users", response_model=list[AuthUserPublic])

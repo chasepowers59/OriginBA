@@ -39,6 +39,14 @@ and, for Oracle orgs, needs Instant Client — neither fits Vercel serverless);
   - `PORTAL_BOOTSTRAP_ADMIN_EMAIL` / `PORTAL_BOOTSTRAP_ADMIN_PASSWORD`
   - `WAREHOUSE_DATABASE_URL` (shared) and/or `WAREHOUSE_DATABASE_URL_<ORG>` per client
   - Oracle orgs only: `<ORG>_DB_*` / `<ORG>_ORACLE_DSN`, `DB_THICK_MODE`, `ORACLE_CLIENT_LIB_DIR`
+  - OIDC SSO (optional, Azure AD / Entra): set all four of `OIDC_ISSUER`
+    (`https://login.microsoftonline.com/<tenant-id>/v2.0`), `OIDC_CLIENT_ID`,
+    `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URI` (`https://<api-host>/auth/oidc/callback`,
+    registered at the IdP) to enable; plus `OIDC_DEFAULT_ORGANIZATION` (org for
+    just-in-time provisioned users — always role `user`; SSO never mints admins) and
+    `OIDC_POST_LOGIN_URL` (the portal login page, which receives `#sso_token=`).
+    The login page shows "Sign in with Microsoft" automatically once `/auth/status`
+    reports `oidc_enabled`.
 - Expose HTTPS; note the URL (e.g. `https://originba-api.fly.dev`).
 - Move saved views/dashboards off local JSON to Supabase before scaling past one
   replica (schema in 001_init.sql; the store code is the one remaining backend task —
