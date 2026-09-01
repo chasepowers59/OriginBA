@@ -20,7 +20,9 @@ CONNECTION comes from the environment and is never constructed from a request:
 """
 from __future__ import annotations
 
+import logging
 import os
+import re
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator
@@ -36,6 +38,27 @@ ROOT = Path(__file__).resolve().parent.parent
 SHARED_WAREHOUSE_ORGS = frozenset({"dev"})
 
 _pools: dict[str, Any] = {}
+
+logger = logging.getLogger(__name__)
+
+# A whole KEY=value line pasted into a dashboard's value box. psycopg2 then reports
+# `invalid dsn: invalid connection option "WAREHOUSE_DATABASE_URL_DEMO25"`, which
+# names the variable and says nothing about the actual mistake. A DSN can never
+# legitimately start with a bare KEY=, so strip it -- and warn, because the
+# environment is still wrong even though the connection now works.
+_PASTED_KEY_PREFIX = re.compile(r"^\s*[A-Z][A-Z0-9_]*\s*=\s*(?=postgres)")
+
+
+def _clean_url(value: str | None, source: str) -> str | None:
+    if not value:
+        return None
+    cleaned = _PASTED_KEY_PREFIX.sub("", value.strip()).strip().strip('"').strip("'")
+    if cleaned != value.strip():
+        logger.warning(
+            "%s looks like a whole KEY=value line: its value began with the variable "
+            "name. Using the URL after the '='; fix the value to start with "
+            "'postgresql://'.", source)
+    return cleaned or None
 
 
 def _env(name: str) -> str | None:
@@ -65,12 +88,13 @@ def warehouse_url(organization_id: str | None = None) -> str | None:
         engine, _ = org_backend(organization_id)
         if engine != "postgres":
             return None
-        per_tenant = _env(f"WAREHOUSE_DATABASE_URL_{organization_id.upper()}")
+        key = f"WAREHOUSE_DATABASE_URL_{organization_id.upper()}"
+        per_tenant = _clean_url(_env(key), key)
         if per_tenant:
             return per_tenant
         if organization_id.lower() not in SHARED_WAREHOUSE_ORGS:
             return None
-    return _env("WAREHOUSE_DATABASE_URL")
+    return _clean_url(_env("WAREHOUSE_DATABASE_URL"), "WAREHOUSE_DATABASE_URL")
 
 
 def warehouse_configured(organization_id: str | None = None) -> bool:
