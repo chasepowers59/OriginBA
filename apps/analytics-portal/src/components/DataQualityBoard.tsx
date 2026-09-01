@@ -26,6 +26,8 @@ type DqRule = {
   acked_row_keys?: string[];
   count: number;
   capped?: boolean;
+  /** True finding count; `count` is only how many rows fit in the payload. */
+  total?: number;
   error?: string;
 };
 
@@ -249,8 +251,7 @@ function RuleCard({
             <span className="text-over">rule error</span>
           ) : (
             <span className="rounded-full bg-chip px-2 py-0.5 text-xs font-semibold tabular-nums text-fg">
-              {r.count}
-              {r.capped ? "+" : ""}
+              {r.total ?? r.count}
             </span>
           )}
           <span className="font-mono text-xs text-fg-subtle">{r.object}</span>
@@ -302,7 +303,11 @@ function RuleCard({
                 ))}
               </tbody>
             </table>
-            {r.capped && <p className="mt-1 text-xs text-fg-subtle">showing first 100</p>}
+            {r.capped && (
+              <p className="mt-1 text-xs text-fg-subtle">
+                showing the first {r.count} of {r.total ?? r.count}
+              </p>
+            )}
           </div>
         )}
         {(r.acked_rows?.length ?? 0) > 0 && (

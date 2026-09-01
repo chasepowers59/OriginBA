@@ -81,6 +81,30 @@ def _rules_path() -> Path:
     return BUNDLED_RULES
 
 
+TOTAL_COL = "_dq_total"
+
+
+def _finding_total(entry: dict[str, Any]) -> int:
+    """How many findings this rule has, not how many fit in the payload."""
+    if entry.get("error"):
+        return 0
+    total = entry.get("total")
+    return int(total if total is not None else entry.get("count") or 0)
+
+
+def summarise_counts(rules: list[dict[str, Any]]) -> dict[str, int]:
+    """The headline numbers, from the true finding counts.
+
+    These used to sum the CAPPED row counts, so two rules pinned at the 100-row cap
+    reported "200 act now" against a real backlog of 1,455 on Demo 25.4. A worklist that
+    under-reports itself reads as a manageable afternoon.
+    """
+    return {
+        "act_now": sum(_finding_total(e) for e in rules if e.get("severity") == "action"),
+        "review": sum(_finding_total(e) for e in rules if e.get("severity") == "review"),
+    }
+
+
 @router.get("/findings")
 def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     ctx.require_permission("portal:read")
@@ -99,18 +123,27 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
             entry: dict[str, Any] = {k: r.get(k) for k in
                                      ("id", "object", "severity", "title", "action", "key_column")}
             try:
-                cur.execute(r["sql"])
+                # count(*) OVER () rides along with the capped page, so one query
+                # answers both "show me some" and "how many are there". Fetching
+                # ROW_CAP + 1 rows could only ever say "at least 101", and the
+                # headline was summing that: 200 shown for a real backlog of 1,455.
+                cur.execute(f'select t.*, count(*) over () as {TOTAL_COL} '
+                            f'from ({r["sql"].rstrip().rstrip(";")}) t')
                 cols = [d[0] for d in cur.description]
+                total_at = cols.index(TOTAL_COL)
                 rows = cur.fetchmany(ROW_CAP + 1)
-                entry["columns"] = cols
-                entry["rows"] = [[None if v is None else str(v) for v in row]
+                entry["columns"] = [c for i, c in enumerate(cols) if i != total_at]
+                entry["rows"] = [[None if v is None else str(v)
+                                  for i, v in enumerate(row) if i != total_at]
                                  for row in rows[:ROW_CAP]]
                 entry["count"] = len(rows[:ROW_CAP])
-                entry["capped"] = len(rows) > ROW_CAP
+                entry["total"] = int(rows[0][total_at]) if rows else 0
+                entry["capped"] = entry["total"] > ROW_CAP
             except Exception as e:  # noqa: BLE001
                 conn.rollback()
                 entry["error"] = str(e).splitlines()[0][:200]
-                entry["columns"], entry["rows"], entry["count"] = [], [], 0
+                entry["columns"], entry["rows"] = [], []
+                entry["count"] = entry["total"] = 0
             out.append(entry)
     # ---- acknowledgements: hidden until the warehouse refreshes -------------
     with warehouse_connection(org) as conn:
@@ -144,12 +177,12 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
         e["count"] = len(keep)
 
     sev_rank = {"action": 0, "review": 1, "info": 2}
-    out.sort(key=lambda e: (sev_rank.get(e.get("severity"), 9), -e.get("count", 0)))
+    # Ordered by how much work each rule represents, so the biggest queue leads.
+    out.sort(key=lambda e: (sev_rank.get(e.get("severity"), 9), -_finding_total(e)))
     return {
         "configured": True,
         "refresh_marker": marker,
-        "act_now": sum(e["count"] for e in out if e.get("severity") == "action"),
-        "review": sum(e["count"] for e in out if e.get("severity") == "review"),
+        **summarise_counts(out),
         "acknowledged": sum(len(e.get("acked_rows") or []) for e in out),
         "rules": out,
     }
