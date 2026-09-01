@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { WORKSTREAM_DESCRIPTIONS, workstreamDisplayName } from "@/lib/businessLabels";
 import { exploreUrl } from "@/lib/processGuide";
 import { workstreamIcon } from "@/lib/workstreamIcons";
-import { groupByDomain } from "@/lib/workstreamDomains";
+import { groupByDataset } from "@/lib/workstreamDatasets";
 import type { BusinessProcess, SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 import { SnapshotCard } from "./HomeDashboard";
 
@@ -168,18 +168,18 @@ export function WorkstreamSidebar({
         </Link>
       ) : null}
       <div className="max-h-[calc(100vh-320px)] space-y-4 overflow-y-auto pr-1">
-        {groupByDomain(filteredWorkstreams).map((domain) => (
-        <div key={domain.id}>
-          {/* C side / M side / shared -- the shape of C2M, which a flat list of nine
-              workstreams hid from anyone who did not already know it. */}
+        {groupByDataset(filteredWorkstreams).map((dataset) => (
+        <div key={dataset.id}>
+          {/* C side / M side / assets / shared -- the shape of C2M, which a flat list
+              of nine workstreams hid from anyone who did not already know it. */}
           <p
             className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-fg-subtle"
-            title={domain.hint}
+            title={dataset.hint}
           >
-            {domain.label}
+            {dataset.label}
           </p>
           <div className="space-y-3">
-        {domain.workstreams.map((ws) => {
+        {dataset.workstreams.map((ws) => {
         const wsOpen = expandedWs[ws.id] ?? true;
         const processes = ws.processes ?? [];
         return (

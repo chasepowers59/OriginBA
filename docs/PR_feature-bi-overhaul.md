@@ -120,5 +120,30 @@ than changed quietly.
 4. Optional: `OIDC_*` (SSO) and `SMTP_*` (scheduled delivery / alerts) are inert until
    set. `python -m api.report_schedule_runner` wants an hourly cron.
 
+5. **New `assets` workstream — check granular access groups before deploying.**
+   `rpt_device_asset` and `rpt_asset_location` moved from `meter_ops` to a new `assets`
+   workstream (Asset Operations), so the device estate is its own data set rather than
+   buried in metering. Access is granted per workstream, so:
+
+   - a group with `workstreams_csv = '*'` is **unaffected**;
+   - a group that lists workstreams explicitly **and includes `meter_ops`** silently
+     loses those two canvases until `assets` is added.
+
+   In this checkout only `*` and a `finance,billing` smoke group exist, so nothing is
+   affected here — but each client's portal auth DB is its own. Check and remediate with:
+
+   ```sql
+   -- who would lose the asset canvases?
+   SELECT name, workstreams_csv FROM portal_access_groups
+    WHERE workstreams_csv <> '*' AND workstreams_csv LIKE '%meter_ops%';
+
+   -- grant the new workstream to exactly those groups
+   UPDATE portal_access_groups
+      SET workstreams_csv = workstreams_csv || ',assets'
+    WHERE workstreams_csv <> '*'
+      AND workstreams_csv LIKE '%meter_ops%'
+      AND workstreams_csv NOT LIKE '%assets%';
+   ```
+
 **Verification:** 143 backend tests (14 skipped), 47 frontend tests, `tsc` clean,
 brand audit clean across 103 files.

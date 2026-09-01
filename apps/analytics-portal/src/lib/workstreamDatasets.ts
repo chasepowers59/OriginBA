@@ -1,6 +1,10 @@
 import type { WorkstreamGroup } from "./types";
 
 /**
+ * Called DATA SETS deliberately: "domain" already means a Jaspersoft domain in this
+ * product, and two meanings for one word in the same UI is how people end up talking
+ * past each other.
+ *
  * C2M is two systems plus an asset register, and utility people think in exactly those
  * terms: the C side (CCB — who the customer is, what they were billed, what they paid,
  * what they owe), the M side (MDM — meters, the usage they produce, and the field work
@@ -17,14 +21,14 @@ import type { WorkstreamGroup } from "./types";
  * This groups the EXISTING workstream ids and renames nothing. The ids carry per-user
  * access grants, so they are not ours to reshuffle for presentation.
  */
-export type WorkstreamDomain = {
+export type WorkstreamDataset = {
   id: string;
   label: string;
   hint: string;
   workstreamIds: string[];
 };
 
-export const WORKSTREAM_DOMAINS: WorkstreamDomain[] = [
+export const WORKSTREAM_DATASETS: WorkstreamDataset[] = [
   {
     id: "customer",
     label: "Customer & revenue",
@@ -33,14 +37,20 @@ export const WORKSTREAM_DOMAINS: WorkstreamDomain[] = [
   },
   {
     id: "metering",
-    label: "Metering, usage & assets",
-    hint: "The M side — MDM and the device estate that feeds it",
+    label: "Metering & usage",
+    hint: "The M side — MDM: meters read, usage produced, field work that keeps them reading",
     workstreamIds: ["meter_ops", "field_ops"],
+  },
+  {
+    id: "assets",
+    label: "Asset operations",
+    hint: "The device estate itself — W1 asset records and where they sit",
+    workstreamIds: ["assets"],
   },
   {
     id: "shared",
     label: "Shared services",
-    hint: "Batch, exceptions and the plumbing both sides run on",
+    hint: "Batch, exceptions and the plumbing every side runs on",
     workstreamIds: ["common"],
   },
 ];
@@ -51,17 +61,17 @@ export const WORKSTREAM_DOMAINS: WorkstreamDomain[] = [
  * domain rather than disappearing — an unclassified workstream is a missing line here,
  * never a hidden report.
  */
-export function groupByDomain(
+export function groupByDataset(
   workstreams: WorkstreamGroup[],
-): (WorkstreamDomain & { workstreams: WorkstreamGroup[] })[] {
-  const known = new Set(WORKSTREAM_DOMAINS.flatMap((d) => d.workstreamIds));
+): (WorkstreamDataset & { workstreams: WorkstreamGroup[] })[] {
+  const known = new Set(WORKSTREAM_DATASETS.flatMap((d) => d.workstreamIds));
   const unclassified = workstreams.filter((w) => !known.has(w.id));
 
-  return WORKSTREAM_DOMAINS.map((domain, i) => {
+  return WORKSTREAM_DATASETS.map((domain, i) => {
     const mine = domain.workstreamIds
       .map((id) => workstreams.find((w) => w.id === id))
       .filter(Boolean) as WorkstreamGroup[];
-    const isLast = i === WORKSTREAM_DOMAINS.length - 1;
+    const isLast = i === WORKSTREAM_DATASETS.length - 1;
     return { ...domain, workstreams: isLast ? [...mine, ...unclassified] : mine };
   }).filter((domain) => domain.workstreams.length > 0);
 }
