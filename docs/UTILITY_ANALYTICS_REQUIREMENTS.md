@@ -45,7 +45,7 @@ source of truth.
 | Session/password policy controls | 🟡 | expiry + forced change exist; no lockout/policy UI |
 | Deployment shapes (cloud demo / on-prem / in-database) | ✅ | Vercel+Render+Supabase and OKE/VPN paths |
 | Backup/restore & environment promotion | ✅ | `deploy/backup_portal_state.sh` dumps auth tables + portal_state nightly; dbt rebuilds the warehouse |
-| Accessibility (WCAG) | 🟡 | contrast now audited; keyboard DnD + screen-reader pass not done |
+| Accessibility (WCAG) | 🟡→✅ | contrast audited; app-wide :focus-visible ring; charts carry role=img + descriptive aria-labels; builder fields add by click/Enter (no drag required); full screen-reader audit still advisable before a public-sector rollout |
 | Mobile usability | 🟡 | nav now works on phones; dashboards usable, builder is desktop-first (fine) |
 
 ## D. Brand & experience governance (the "how do we ensure" answer)
@@ -67,8 +67,8 @@ export, 4 KPI threshold alerts (notify once per breach), 5 Aptos brand font,
 6 query/report access audit (report runs + SQL executes + fence refusals),
 7 report annotations (saved views + dashboards), 10 portal-state backup script.
 
-Remaining:
-
-8. **UX backlog burn-down** — docs/UX_REVIEW_BACKLOG.md mediums.
-9. **Accessibility pass** — keyboard field-add in the builder (also in the backlog),
-   focus states, aria labels on charts.
+All ten ranked gaps are shipped as of 2026-09-01: the UX backlog mediums are
+closed (see docs/UX_REVIEW_BACKLOG.md) and the accessibility pass added the
+app-wide focus ring, chart aria-labels, and keyboard field-add. Remaining
+lower-priority follow-ups live in the UX backlog's Low section, plus a full
+screen-reader audit before any public-sector rollout.
