@@ -119,13 +119,17 @@ builder/SQL tabs redirect out). Never add a second builder/SQL/chart surface.
 - **Annotations** (`api/annotations.py`, NotesDialog): notes on saved_view/dashboard/
   dashboard_tile; author-or-admin delete.
 - **Backup**: `deploy/backup_portal_state.sh` (auth tables + portal_state schema).
-- **Dialog pattern** (Schedule/Alerts/Notes): fixed inset overlay, click-outside
-  closes, `role="dialog"` + aria-label, brand primary button, amber SMTP-unconfigured
-  notice. Reuse it; don't invent a fourth modal shape.
+- **Dialogs**: `components/Modal.tsx` is THE shell (overlay, click-outside AND
+  Escape to close, `role="dialog"`, header + close button), with `SmtpNotice` and
+  `FormError` beside it. Schedule/Alerts/Notes all use it; never hand-roll a fourth
+  modal, and use the app's `.btn-primary` rather than a new button style.
 - **Guardrails live in libs, tested**: `visualGuardrails` (pie >30 slices, 1-series
   stacked → disabled with reason), `dashboardTileMath` (tile charts the FIRST
   measure's column; KPI headline sums only sum/count), `databaseChartUtils`
-  (identifier columns never chart as measures).
+  (identifier columns never chart as measures), `axisLabels.tickLabels` (truncate
+  ONCE; head…tail when two labels would collide), `recipients.parseRecipients`.
+- **Errors**: `fetchJson` runs `parseApiError` once, so `err.message` is already a
+  human message everywhere — never re-parse JSON at a call site.
 - **Pinning**: PinMenu targets a NEW or EXISTING dashboard; pins APPEND to the first
   free slot, never replace.
 - **A11y baseline**: global `:focus-visible` ring, `role="img"` + descriptive
