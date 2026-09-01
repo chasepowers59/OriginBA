@@ -343,18 +343,22 @@ function SummaryCard({
   tone: "red" | "amber" | "green" | "blue";
   glyph: string;
 }) {
+  // Each chip pairs a semantic colour with its OWN tinted ground instead of putting
+  // white on the colour itself. In dark mode --over/--warn/--ok invert to light tints
+  // meant to sit ON dark, so white glyphs measured 1.26–2.29:1 and the "?" was all but
+  // invisible. bg-*-bg + text-* is the pairing the palette already defines, both ways.
   const tones: Record<string, { text: string; chip: string }> = {
-    red: { text: "text-over", chip: "bg-over" },
-    amber: { text: "text-warn", chip: "bg-warn" },
-    green: { text: "text-ok", chip: "bg-ok" },
-    blue: { text: "text-brand", chip: "bg-brand" },
+    red: { text: "text-over", chip: "bg-over-bg text-over" },
+    amber: { text: "text-warn", chip: "bg-warn-bg text-warn" },
+    green: { text: "text-ok", chip: "bg-ok-bg text-ok" },
+    blue: { text: "text-brand", chip: "bg-chip text-brand" },
   };
   const t = tones[tone];
   return (
     <div className="glass-panel flex items-center gap-3 px-4 py-3">
       <span
         aria-hidden
-        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white ${t.chip}`}
+        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${t.chip}`}
       >
         {glyph}
       </span>

@@ -148,7 +148,10 @@ export function AppShell({
             {user ? (
               <details className="group/menu relative">
                 <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg px-2 py-1.5 transition hover:bg-chip [&::-webkit-details-marker]:hidden">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
+                  {/* primary-fg, not white: in dark mode --brand is a LIGHT blue meant
+                      to sit ON dark, so white initials on it measured 2.29:1. The
+                      palette already pairs each primary with its own foreground. */}
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-xs font-bold text-primary-fg">
                     {user.display_name
                       .split(/\s+/)
                       .map((w) => w.charAt(0))

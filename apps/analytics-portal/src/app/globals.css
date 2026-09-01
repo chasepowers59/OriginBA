@@ -55,7 +55,11 @@
   --brand-navy: #16283c;
 
   /* ── Derived surface/chrome roles the components already speak in ── */
-  --foreground-subtle: var(--neutral-4);
+  /* neutral-4 alone is 3.35:1 on the page ground, and this role carries the 10px
+     uppercase section labels — small text, so AA asks for 4.5. Mixed toward neutral-5
+     rather than snapped to it, which would collapse "subtle" into "muted": 4.76:1,
+     and Reed's ramp is read, never redefined. */
+  --foreground-subtle: color-mix(in srgb, var(--neutral-4) 40%, var(--neutral-5));
   --foreground-muted: var(--muted-foreground);
   --accent-muted: var(--primary);
   --surface: var(--card);
@@ -127,7 +131,10 @@
   --brand-navy: #16283c;
 
   /* ── Derived ── */
-  --foreground-subtle: var(--neutral-3);
+  /* neutral-3 is 3.01:1 on the dark ground — the same small-text failure as the light
+     column. neutral-4 is 5.36:1 and still clearly below muted (#a4acb4), so the third
+     text level survives here without a mix. */
+  --foreground-subtle: var(--neutral-4);
   --foreground-muted: var(--muted-foreground);
   --accent-muted: var(--primary);
   --surface: var(--card);

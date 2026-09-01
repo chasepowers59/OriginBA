@@ -50,8 +50,13 @@ export function DashboardWidget({
           <div className="flex items-start gap-2.5">
             <span
               aria-hidden
-              className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[11px] font-bold text-white"
-              style={{ background: `var(${chipVar})` }}
+              // The hue carries the category in the chip's GROUND; the letter stays
+              // ordinary text. White on the hue measured 1.83:1 once the chart palette
+              // inverted for dark mode, and the hue as text is no better -- chart
+              // colours are chosen to be distinct from EACH OTHER, and two of the five
+              // (--chart-4, --chart-5) are dark enough to fail on a dark card at 3.59:1.
+              className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[11px] font-bold text-fg"
+              style={{ background: `color-mix(in srgb, var(${chipVar}) 22%, transparent)` }}
             >
               {workstreamName.charAt(0)}
             </span>
