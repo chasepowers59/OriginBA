@@ -249,11 +249,15 @@ def build_query(
     # of the top four, while looking like a breakdown of its own headline number.
     # A time bucket ranks by recency instead -- the newest months are the interesting
     # ones, and the client re-sorts them chronologically to draw.
+    # NULLS LAST is not decoration: DESC defaults to NULLS FIRST in Postgres AND Oracle,
+    # so a group whose measure is null would take the top slot and, under a small limit,
+    # evict the real leaders -- the same bug this ordering exists to prevent. Measured on
+    # Demo 25.4, bill-segment status returned Error (null) ahead of Frozen at 868,262.10.
     # measure_specs is never empty -- a query with no measure is rejected above.
     if time_dimensions:
-        sql += ' ORDER BY "TD0" DESC'
+        sql += ' ORDER BY "TD0" DESC NULLS LAST'
     else:
-        sql += f' ORDER BY "{measure_specs[0].alias}" DESC'
+        sql += f' ORDER BY "{measure_specs[0].alias}" DESC NULLS LAST'
     # FETCH FIRST is standard SQL and valid in both, so the tail needs no branch.
     sql += f" FETCH FIRST {int(limit)} ROWS ONLY"
     return sql, binds

@@ -29,17 +29,25 @@ from api.query_builder import QueryValidationError, build_query  # noqa: E402
 FIELDS = {"Bill Date", "SA Type", "Amount"}
 
 
+DIALECT_FIELDS = {
+    "postgres": ("rpt_service_agreement", "Bill Date", "SA Type", "Amount"),
+    "oracle_dbt": ("rpt_service_agreement", "Bill Date", "SA Type", "Amount"),
+    "oracle": ("SA_RPT_CURR", "BILL_DATE", "SA_TYPE_CD", "CUR_AMT"),
+}
+
+
 def _sql(dialect: str = "postgres", *, time_dim: bool = False, measures=None) -> str:
+    table, date_field, dim, measure = DIALECT_FIELDS[dialect]
     sql, _ = build_query(
-        table_name="rpt_service_agreement",
-        allowed_fields=FIELDS,
-        trusted_measures={"Amount"},
+        table_name=table,
+        allowed_fields={date_field, dim, measure},
+        trusted_measures={measure},
         required_date_field=None,
-        dimensions=["SA Type"],
+        dimensions=[dim],
         measures=measures if measures is not None else [{"field": "*", "agg": "count"}],
         filters=[],
         limit=6,
-        time_dimensions=[{"field": "Bill Date", "grain": "month"}] if time_dim else None,
+        time_dimensions=[{"field": date_field, "grain": "month"}] if time_dim else None,
         dialect=dialect,
     )
     return sql
@@ -54,6 +62,19 @@ class LimitIsTopNTests(unittest.TestCase):
     def test_a_time_bucketed_query_takes_the_most_recent(self) -> None:
         # Ranking a date by size would drop the interesting months, not the old ones.
         self.assertIn('ORDER BY "TD0" DESC', _sql(time_dim=True))
+
+    def test_nulls_sort_last_so_they_cannot_take_the_top_slots(self) -> None:
+        """DESC defaults to NULLS FIRST in BOTH Postgres and Oracle.
+
+        Measured on Demo 25.4: `... ORDER BY m0 DESC LIMIT 5` over bill-segment status
+        returns Error (null) first, ahead of Frozen at 868,262.10. Under `limit: 6` a
+        handful of null-measure groups would evict the real leaders -- the very bug this
+        ordering exists to prevent, wearing a different hat.
+        """
+        for dialect in ("postgres", "oracle_dbt", "oracle"):
+            with self.subTest(dialect=dialect):
+                self.assertIn('DESC NULLS LAST', _sql(dialect))
+                self.assertIn('DESC NULLS LAST', _sql(dialect, time_dim=True))
 
     def test_ordering_precedes_the_row_limit(self) -> None:
         sql = _sql()
