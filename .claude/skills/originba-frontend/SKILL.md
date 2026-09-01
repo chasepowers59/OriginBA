@@ -89,3 +89,36 @@ builder/SQL tabs redirect out). Never add a second builder/SQL/chart surface.
 - Verify against real data: local INT_DEV Postgres VPN-free; Ellensburg 25.4 Oracle
   (the authentic C2M validation target) when VPN is on.
 - Reporting column names are a Jaspersoft contract — presentation changes only.
+
+## Enterprise features (shipped 2026-09-01, all tests-first)
+
+- **SSO/OIDC** (`api/auth/oidc.py` + `/auth/oidc/*`): Azure AD auth-code flow, signed
+  HS256 state, RS256 id_token via JWKS. JIT-provisions role `user` in
+  OIDC_DEFAULT_ORGANIZATION — SSO NEVER mints admins. SPA gets our JWT via the login
+  page's `#sso_token=` fragment (fragments stay out of server logs). Routes call
+  helpers through the `oidc.` namespace so tests can patch them.
+- **Scheduled delivery + KPI alerts** ride ONE hourly cron: `python -m
+  api.report_schedule_runner` (`--dry-run` renders only). Schedules mail a saved view
+  as CSV (business labels, True/False); alerts watch exec KPIs via the SAME
+  execute_kpi_definition the dashboard uses and notify ONLY on the transition into
+  breach. Both org-scoped in portal_state (local JSON fallback), both capped, SMTP_*
+  env. UI: ScheduleDialog (saved views), KpiAlertsDialog (exec toolbar).
+- **Access audit** (`api/access_audit.py`): report runs, SQL executes AND fence
+  refusals land in portal_audit_log; the writer swallows failures by design — an
+  audit outage must never 500 a query. `/auth/audit-log?action=` filters.
+- **Annotations** (`api/annotations.py`, NotesDialog): notes on saved_view/dashboard/
+  dashboard_tile; author-or-admin delete.
+- **Backup**: `deploy/backup_portal_state.sh` (auth tables + portal_state schema).
+- **Dialog pattern** (Schedule/Alerts/Notes): fixed inset overlay, click-outside
+  closes, `role="dialog"` + aria-label, brand primary button, amber SMTP-unconfigured
+  notice. Reuse it; don't invent a fourth modal shape.
+- **Guardrails live in libs, tested**: `visualGuardrails` (pie >30 slices, 1-series
+  stacked → disabled with reason), `dashboardTileMath` (tile charts the FIRST
+  measure's column; KPI headline sums only sum/count), `databaseChartUtils`
+  (identifier columns never chart as measures).
+- **Pinning**: PinMenu targets a NEW or EXISTING dashboard; pins APPEND to the first
+  free slot, never replace.
+- **A11y baseline**: global `:focus-visible` ring, `role="img"` + descriptive
+  aria-label on every chart, click/Enter adds fields (drag is optional).
+- Route-test hygiene: modules share one interpreter — pin `PORTAL_AUTH_DISABLED` etc.
+  per test class with `mock.patch.dict(os.environ, ...)`, never rely on import-time env.
