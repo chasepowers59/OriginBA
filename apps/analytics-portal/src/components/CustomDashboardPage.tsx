@@ -202,13 +202,13 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href="/dashboards" className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300">
+          <Link href="/dashboards" className="text-xs text-primary hover:text-primary">
             ← My dashboards
           </Link>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-2 block w-full max-w-lg bg-transparent text-2xl font-bold text-heading outline-none border-b border-edge-subtle focus:border-sky-400/50"
+            className="mt-2 block w-full max-w-lg bg-transparent text-2xl font-bold text-heading outline-none border-b border-edge-subtle focus:border-edge"
           />
           <p className="mt-1 text-sm text-fg-muted">
             Drag tiles between slots · up to 4 visuals · saved to server
@@ -230,7 +230,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       {saveError ? (
         <p
           role="alert"
-          className="rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-2 text-sm text-red-700 dark:text-red-300"
+          className="rounded-xl border border-over bg-over-bg px-4 py-2 text-sm text-over"
         >
           {saveError}
         </p>
@@ -270,7 +270,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       ) : null}
 
       {filter ? (
-        <div className="flex items-center justify-between rounded-xl border border-amber-400/25 bg-amber-500/10 px-4 py-2 text-sm text-amber-800 dark:text-amber-100">
+        <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
           <span>
             Cross-filter: <strong>{filter.label ?? filter.field}</strong> = {filter.value}
           </span>
@@ -311,7 +311,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
                     updateTile(slot, emptyTile(slot));
                     setEditSlot(slot);
                   }}
-                  className="flex h-full w-full items-center justify-center text-sm text-fg-muted hover:text-sky-600 dark:hover:text-sky-300"
+                  className="flex h-full w-full items-center justify-center text-sm text-fg-muted hover:text-primary"
                 >
                   + Add tile
                 </button>
@@ -360,8 +360,8 @@ function SlotCell({
     <div
       ref={setDropRef}
       className={`relative min-h-[260px] rounded-2xl border border-dashed p-1 transition ${
-        isOver ? "border-sky-400/60 bg-sky-400/5" : "border-edge-subtle hover:border-sky-400/30"
-      } ${isDragging ? "opacity-50" : ""}`}
+ isOver ? "border-edge bg-band" : "border-edge-subtle hover:border-edge"
+ } ${isDragging ? "opacity-50" : ""}`}
     >
       {hasTile ? (
         <button
@@ -371,7 +371,7 @@ function SlotCell({
           {...listeners}
           aria-label="Drag tile to another slot"
           title="Drag to reorder"
-          className="absolute left-2 top-2 z-10 cursor-grab rounded px-1.5 py-0.5 text-xs leading-none text-fg-muted hover:text-sky-600 dark:hover:text-sky-300 active:cursor-grabbing"
+          className="absolute left-2 top-2 z-10 cursor-grab rounded px-1.5 py-0.5 text-xs leading-none text-fg-muted hover:text-primary active:cursor-grabbing"
         >
           ⠿
         </button>
@@ -465,7 +465,7 @@ function TileEditor({
         </label>
       </div>
       <div className="mt-4 flex justify-between gap-2">
-        <button type="button" onClick={onRemove} className="text-xs text-red-600 dark:text-red-400">
+        <button type="button" onClick={onRemove} className="text-xs text-over">
           Remove tile
         </button>
         <div className="flex gap-2">

@@ -58,11 +58,11 @@ export function DashboardWidget({
               <p className="text-[10px] font-semibold uppercase tracking-wider text-fg-subtle">
                 {workstreamName}
               </p>
-              <h3 className="mt-0.5 font-semibold text-heading group-hover:text-sky-700 dark:group-hover:text-sky-100">{kpi.label}</h3>
+              <h3 className="mt-0.5 font-semibold text-heading group-hover:text-primary dark:group-hover:text-primary">{kpi.label}</h3>
               <p className="mt-0.5 text-xs text-fg-muted">{kpi.subtitle}</p>
             </div>
           </div>
-          <span className="shrink-0 text-fg-muted transition group-hover:text-sky-600 dark:group-hover:text-sky-400">→</span>
+          <span className="shrink-0 text-fg-muted transition group-hover:text-primary dark:group-hover:text-primary">→</span>
         </div>
         <p className={`mt-3 font-bold tracking-tight tabular-nums text-heading ${compact ? "text-2xl" : "text-3xl"}`}>
           {formatted}
@@ -73,7 +73,7 @@ export function DashboardWidget({
           </div>
         ) : null}
         {kpi.error ? (
-          <p className="mt-1 text-xs text-amber-700 dark:text-amber-400/90">{kpi.error}</p>
+          <p className="mt-1 text-xs text-warn">{kpi.error}</p>
         ) : null}
       </div>
       {!compact ? (
@@ -96,9 +96,9 @@ export function DashboardWidget({
 
   if (onTrendClick) {
     return (
-      <div className="group glass-panel block overflow-hidden transition hover:border-sky-400/30">
+      <div className="group glass-panel block overflow-hidden transition hover:border-edge">
         {inner}
-        <Link href={exploreHref} className="block border-t border-edge-subtle px-4 py-2 text-xs text-sky-600 dark:text-sky-400">
+        <Link href={exploreHref} className="block border-t border-edge-subtle px-4 py-2 text-xs text-primary">
           Open full report →
         </Link>
       </div>
@@ -108,7 +108,7 @@ export function DashboardWidget({
   return (
     <Link
       href={exploreHref}
-      className="group glass-panel block overflow-hidden transition hover:border-sky-400/30 hover:shadow-lg hover:shadow-sky-500/5"
+      className="group glass-panel block overflow-hidden transition hover:border-edge hover:shadow-lg hover:shadow-sky-500/5"
     >
       {inner}
     </Link>

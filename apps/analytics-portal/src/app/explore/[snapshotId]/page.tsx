@@ -46,7 +46,7 @@ export default async function ExplorePage({ params }: PageProps) {
       activeNav="reports"
     >
       {error || !metadata ? (
-        <div className="glass-panel border-red-400/20 bg-red-500/10 px-4 py-3 text-red-700 dark:text-red-200">
+        <div className="glass-panel border-over bg-over-bg px-4 py-3 text-over">
           {error ?? "Snapshot not found"}
         </div>
       ) : (

@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/chart";
 import { formatCurrency, formatNumber, formatTooltipNumber } from "@/lib/format";
 import { valueRampColors } from "@/lib/chartEmphasis";
+import { useColorMode } from "@/components/PortalThemeProvider";
 
 export type BuilderVisual =
   | "bar"
@@ -73,6 +74,8 @@ export function BuilderChart({
   emptyMessage = "Drop a dimension and a measure to see a chart",
   sortTimeSeries = false,
 }: BuilderChartProps) {
+  const { colorMode } = useColorMode();
+
   const config = useMemo<ChartConfig>(() => {
     const c: ChartConfig = {};
     series.forEach((s, i) => {
@@ -107,8 +110,8 @@ export function BuilderChart({
   const rampFills = useMemo<string[] | null>(() => {
     if (!singleSeries) return null;
     const key = series[0].key;
-    return valueRampColors(data.map((d) => Number(d[key] ?? 0)));
-  }, [singleSeries, data, series]);
+    return valueRampColors(data.map((d) => Number(d[key] ?? 0)), { dark: colorMode === "dark" });
+  }, [singleSeries, data, series, colorMode]);
 
   const cellFill = (i: number, fallback: string) => {
     if (selectedCategory != null && String(data[i]?.[xKey]) === selectedCategory) {

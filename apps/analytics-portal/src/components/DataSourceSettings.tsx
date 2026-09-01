@@ -87,7 +87,7 @@ export function DataSourceSettings() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
           Data connection
         </p>
         <h1 className="mt-1 text-2xl font-bold text-heading">Settings</h1>
@@ -111,7 +111,7 @@ export function DataSourceSettings() {
             </div>
             <div>
               <dt className="text-fg-muted">Status</dt>
-              <dd className={status.configured ? "text-emerald-600 dark:text-emerald-300" : "text-amber-700 dark:text-amber-300"}>
+              <dd className={status.configured ? "text-ok" : "text-warn"}>
                 {status.configured ? "Configured" : "Not connected"}
               </dd>
             </div>
@@ -230,7 +230,7 @@ export function DataSourceSettings() {
           {status && (status.source === "portal_vault" || status.source === "portal_memory") ? (
             <button
               type="button"
-              className="btn-ghost text-red-600 dark:text-red-300"
+              className="btn-ghost text-over"
               disabled={loading}
               onClick={() => void run("clear")}
             >
@@ -240,12 +240,12 @@ export function DataSourceSettings() {
         </div>
 
         {message ? (
-          <p className="rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-200">
+          <p className="rounded-lg border border-ok bg-ok-bg px-3 py-2 text-sm text-ok">
             {message}
           </p>
         ) : null}
         {error ? (
-          <p className="rounded-lg border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-200">
+          <p className="rounded-lg border border-over bg-over-bg px-3 py-2 text-sm text-over">
             {error}
           </p>
         ) : null}

@@ -38,8 +38,8 @@ export function Modal({
     >
       <div
         className={`max-h-[85vh] w-full overflow-y-auto rounded-2xl border border-edge-subtle bg-surface p-5 shadow-2xl ${
-          size === "lg" ? "max-w-lg" : "max-w-md"
-        }`}
+ size === "lg" ? "max-w-lg" : "max-w-md"
+ }`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-3">
@@ -69,7 +69,7 @@ export function Modal({
 /** Shown wherever a feature depends on SMTP the server may not have configured. */
 export function SmtpNotice({ what }: { what: string }) {
   return (
-    <p className="mt-3 rounded-lg border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-300">
+    <p className="mt-3 rounded-lg border border-warn bg-warn-bg px-3 py-2 text-xs text-warn">
       Email delivery is not configured on the server yet — {what} save, but
       nothing sends until an administrator sets up SMTP.
     </p>
@@ -81,7 +81,7 @@ export function FormError({ children }: { children: string }) {
   return (
     <p
       role="alert"
-      className="rounded-lg border border-red-400/40 bg-red-500/10 px-3 py-2 text-xs text-red-700 dark:text-red-300"
+      className="rounded-lg border border-over bg-over-bg px-3 py-2 text-xs text-over"
     >
       {children}
     </p>

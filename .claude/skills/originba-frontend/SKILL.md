@@ -23,35 +23,46 @@ during the 2026-08 overhaul; breaking one usually reintroduces a bug we already 
 
 ## Theme tokens — never hardcode a colour
 
-- All colour comes from tokens in `globals.css` (`:root` light, `.dark` overrides),
-  registered as Tailwind classes: `text-fg`, `text-fg-muted`, `text-fg-subtle`,
-  `text-heading`, `bg-surface(-subtle/-solid/-input)`, `border-edge(-subtle)`,
-  `bg-chip`, `text-brand`, `chart.1-5`, `chart-selected`.
-- NO `text-white` / `text-slate-*` / `bg-white/10` in app components — the compat shim
-  that used to remap them is DELETED; a hardcoded class now renders literally. The only
-  legitimate `text-white` sits on intentionally fixed backgrounds (brand logo tile,
-  login navy panel).
-- Dark mode is near-black by design (#0b0d12 ground, #14171f cards) per the reference
-  dashboard. Every change is verified in BOTH themes before commit.
-- **Accent text must be a dual-theme pair.** A light Tailwind shade (sky-300,
-  amber-200, red-300…) is a DARK-surface colour; alone it washes out on white. Always
-  write `text-sky-600 dark:text-sky-300` style pairs (light gets 600/700-shade, dark
-  keeps the light shade). Contrast audit trick: computed text luminance > 0.7 in light
-  mode outside btn-primary = a bug.
+The palette is **Soul Palette V2.1** (Reed, approved 2026-08-29), adopted VERBATIM and
+merged 2026-09-01. Contract + spec: `docs/design/soul-palette-v2.1-origin.css` and
+`docs/design/merged-palette-and-components.html`. The conversion app and the portal
+share these token names and values — changing a V2.1 value is a cross-app decision.
+
+- **Surfaces/ink:** `--background --card --muted --band --border --input --foreground
+  --muted-foreground --primary --primary-foreground --ring`. Light is white-grounded;
+  dark is the V2.1 navy (`#0B1723` page, `#14202D` card) — NOT the old near-black.
+- **Status is a PAIR, and the pair flips with the theme by itself:** `ok/ok-bg`,
+  `over/over-bg`, `warn/warn-bg` (Tailwind: `text-ok bg-ok-bg`, `text-over bg-over-bg`,
+  `text-warn bg-warn-bg`). Never write emerald/red/amber classes again, and never add a
+  `dark:` variant to a status token — the token already carries both columns.
+- **Headings:** `--heading` is ink for page titles; `--heading-accent` is the V2.1 teal
+  and belongs on the small uppercase eyebrow above them (`text-heading-accent`).
+- **Ramps:** `--neutral-0..6`, `--brand-blue-1..3`, `--brand-teal-1..3`.
+- Everything else (`--surface*`, `--chip*`, `--btn-ghost*`, `--tooltip*`, `--mesh-glow*`,
+  `--foreground-muted`, `--accent`) is DERIVED from those in globals.css — change the
+  base token, not the derivation.
+- NO Tailwind palette classes in app components. `audit-brand.mjs` fails the build on
+  any `text|bg|border|ring|from|via|to-{sky,emerald,red,amber,indigo,violet,cyan,rose,
+  green,orange,purple,fuchsia,pink}-NNN`. Allowlisted: the login page (deliberately
+  fixed-light with the navy panel) and the print-pack headers (fixed-light for paper).
 - Print (council/lineage packs): the `@media print` block forces tokens to fixed light
-  values inside `.council-pack` / `.lineage-pack` / `#dashboard-export-root`. Token
-  classes print correctly; do not add print-only hardcoded colours.
+  values inside `.council-pack` / `.lineage-pack` / `#dashboard-export-root`.
 
 ## Charts — one renderer, one colour rule
 
 - `builder/BuilderChart` (+ `ui/chart.tsx` primitives) is THE chart renderer.
   `MiniSparkChart` is the only other (KPI sparklines). Never add a third; never
   reintroduce raw Recharts with hex colours (the deleted ChartView anti-pattern).
-- **Value ramp rule (app-wide):** single-series bars are coloured by value —
-  BLUE (hue 207) = highest, shifting toward RED (368≡8) as values drop, interpolated
-  the WARM way round the wheel so the ramp never passes green (green falsely reads
-  "good"). Implementation: `lib/chartEmphasis.ts` `valueRampColors` — unit-tested;
-  change the tests first.
+- **Categorical series come from `--chart-1..6`** — blue and teal only. Teal is NEVER
+  paired with blue as a category; two-series charts use chart-1 with chart-3.
+- **Value ramp rule (app-wide):** single-series bars are coloured by MAGNITUDE —
+  `--primary` at the top of the range shifting to the palette's own `over` red at the
+  bottom, so the suite has exactly one red. Interpolated in **Oklab**, not HSL: a hue
+  sweep between those endpoints takes the short way round the wheel and renders
+  mid-range values as vivid magenta/violet (the 2026-09-01 bug — bars that looked like
+  a third category). `lib/chartEmphasis.ts` `valueRampColors(values, {dark})` — the
+  anchors differ per theme, so callers pass `colorMode`. Unit-tested including the
+  magenta guard; change the tests first.
 - Cross-filter selection overrides a bar/slice to `var(--chart-selected)` (amber).
 - **Axis text is FLAT — never rotated.** Long labels truncate (`slice + …`) with
   `interval="preserveStartEnd"` / `minTickGap`; grids/axes colour from

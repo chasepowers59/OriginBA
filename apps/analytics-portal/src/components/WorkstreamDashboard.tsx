@@ -74,7 +74,7 @@ function WorkstreamDashboardInner({
       <div className="glass-panel relative overflow-hidden p-6 md:p-8">
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div>
-            <Link href="/reports" className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300">
+            <Link href="/reports" className="text-xs text-primary hover:text-primary">
               ← All workstreams
             </Link>
             <h1 className="mt-2 text-3xl font-bold text-heading">{label}</h1>
@@ -99,7 +99,7 @@ function WorkstreamDashboardInner({
           </summary>
           <div className="mt-4 grid gap-6 md:grid-cols-3">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-600 dark:text-sky-400/80">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
                 Included ({about.canvases.length} canvases · {about.kpis.length} KPIs)
               </p>
               {about.summary ? (
@@ -108,7 +108,7 @@ function WorkstreamDashboardInner({
               <ul className="mt-2 space-y-1">
                 {about.canvases.map((c) => (
                   <li key={c.id}>
-                    <Link href={`/explore/${c.id}`} className="text-xs text-sky-600 dark:text-sky-300/90 hover:text-sky-700 dark:hover:text-sky-200">
+                    <Link href={`/explore/${c.id}`} className="text-xs text-primary hover:text-primary">
                       {c.label}
                     </Link>
                     {c.grain ? <span className="ml-1 text-[10px] text-fg-muted">— {c.grain}</span> : null}
@@ -117,7 +117,7 @@ function WorkstreamDashboardInner({
               </ul>
             </div>
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400/80">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-warn">
                 Deliberately not included
               </p>
               <ul className="mt-2 space-y-2">
@@ -129,13 +129,13 @@ function WorkstreamDashboardInner({
               </ul>
             </div>
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400/80">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-ok">
                 Connects to
               </p>
               <ul className="mt-2 space-y-2">
                 {about.related.map((r) => (
                   <li key={r.workstream} className="text-xs leading-relaxed text-fg-muted">
-                    <Link href={`/workstream/${r.workstream}`} className="font-medium text-emerald-600 dark:text-emerald-300/90 hover:text-emerald-200">
+                    <Link href={`/workstream/${r.workstream}`} className="font-medium text-ok hover:text-ok">
                       {r.label}
                     </Link>{" "}
                     — {r.via}
@@ -159,7 +159,7 @@ function WorkstreamDashboardInner({
       <WorkstreamHeroLinks workstreamId={workstreamId} workstreams={workstreams} />
 
       {filter ? (
-        <div className="flex items-center justify-between rounded-xl border border-amber-400/25 bg-amber-500/10 px-4 py-2 text-sm text-amber-800 dark:text-amber-100">
+        <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
           <span>
             Cross-filter: <strong>{filter.label ?? filter.field}</strong> = {filter.value}
           </span>

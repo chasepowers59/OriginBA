@@ -5,93 +5,154 @@
 /* ── Semantic tokens (light default) ── */
 :root {
   color-scheme: light;
-  --background: #f1f5f9;
-  --foreground: #0f172a;
-  --foreground-muted: #64748b;
-  --foreground-subtle: #94a3b8;
-  --heading: #0f172a;
-  --surface: rgba(255, 255, 255, 0.92);
-  --surface-subtle: rgba(255, 255, 255, 0.72);
-  --surface-solid: #ffffff;
-  --surface-input: #ffffff;
-  --header-bg: rgba(255, 255, 255, 0.88);
-  --border: rgba(15, 23, 42, 0.1);
-  --border-subtle: rgba(15, 23, 42, 0.06);
-  --chip-bg: rgba(15, 23, 42, 0.04);
-  --chip-text: #475569;
-  --chip-border: rgba(15, 23, 42, 0.08);
-  --chip-active-bg: rgba(14, 165, 233, 0.12);
-  --chip-active-text: #0369a1;
-  --chip-active-border: rgba(14, 165, 233, 0.35);
-  --btn-ghost-bg: rgba(15, 23, 42, 0.03);
-  --btn-ghost-hover: rgba(15, 23, 42, 0.06);
-  --btn-ghost-text: #334155;
-  --shadow-color: rgba(15, 23, 42, 0.08);
-  --accent: #0ea5e9;
-  --accent-2: #6366f1;
-  --accent-muted: #0284c7;
-  /* Origin brand blue (the infinity mark / wordmark). */
-  --brand: #2f74b8;
+  /* ── Soul Palette V2.1 (Reed, approved 2026-08-29) — adopted verbatim ── */
+  --background: #ffffff;
+  --card: #ffffff;
+  --muted: #f2f5f8;
+  --band: #eff5fb;
+  --border: #d9e1e8;
+  --input: #7a8fa0;
+  --foreground: #1b2530;
+  --muted-foreground: #56636e;
+  --heading-accent: #1c7884;
+  --primary: #006fac;
+  --primary-foreground: #ffffff;
+  --ring: #006fac;
+  --ok: #0b5a2e;
+  --ok-bg: #e4f1e8;
+  --over: #8b1515;
+  --over-bg: #fbeaea;
+  --warn-fg: #3d2e00;
+  --warn-bg: #f3e5ab;
+  --neutral-0: #ffffff;
+  --neutral-1: #f2f5f8;
+  --neutral-2: #d9e1e8;
+  --neutral-3: #a4b8c8;
+  --neutral-4: #7a8fa0;
+  --neutral-5: #56636e;
+  --neutral-6: #1b2530;
+  --brand-blue-1: #28a0ee;
+  --brand-blue-2: #006fac;
+  --brand-blue-3: #004b86;
+  --brand-teal-1: #5da5b0;
+  --brand-teal-2: #1c7884;
+  --brand-teal-3: #00535f;
+  --chart-1: var(--brand-blue-2);
+  --chart-2: var(--brand-teal-2);
+  --chart-3: var(--brand-blue-1);
+  --chart-4: var(--brand-teal-3);
+  --chart-5: var(--brand-blue-3);
+  --chart-6: var(--neutral-4);
+
+  /* ── OriginBA additions (see docs/design/soul-palette-v2.1-origin.css) ── */
+  /* Page titles take ink; teal stays on the eyebrow above them. */
+  --heading: var(--neutral-6);
+  /* Cross-filter selection must leave the blue/teal series entirely. */
+  --chart-selected: #a85e00;
+  --accent: var(--primary);
+  --accent-2: var(--brand-blue-3);
+  --brand: var(--primary);
   --brand-navy: #16283c;
-  --chart-1: #0284c7;
-  --chart-2: #4f46e5;
-  --chart-3: #0891b2;
-  --chart-4: #7c3aed;
-  --chart-5: #d97706;
-  /* Cross-filter selection highlight for a bar/slice (amber, distinct from the series). */
-  --chart-selected: #f59e0b;
-  --mesh-glow-1: rgba(56, 189, 248, 0.1);
-  --mesh-glow-2: rgba(99, 102, 241, 0.08);
-  --mesh-glow-3: rgba(14, 165, 233, 0.06);
-  --tooltip-bg: #ffffff;
-  --tooltip-border: rgba(15, 23, 42, 0.12);
-  --tooltip-text: #0f172a;
-  --tooltip-muted: #64748b;
-  --originba-navy: #0b1f3a;
+
+  /* ── Derived surface/chrome roles the components already speak in ── */
+  --foreground-subtle: var(--neutral-4);
+  --foreground-muted: var(--muted-foreground);
+  --accent-muted: var(--primary);
+  --surface: var(--card);
+  --surface-subtle: var(--muted);
+  --surface-solid: var(--card);
+  --surface-input: var(--card);
+  --header-bg: rgba(255, 255, 255, 0.9);
+  --border-subtle: color-mix(in srgb, var(--border) 55%, transparent);
+  --chip-bg: var(--muted);
+  --chip-text: var(--muted-foreground);
+  --chip-border: var(--border);
+  --chip-active-bg: var(--band);
+  --chip-active-text: var(--primary);
+  --chip-active-border: color-mix(in srgb, var(--primary) 35%, transparent);
+  --btn-ghost-bg: var(--muted);
+  --btn-ghost-hover: var(--band);
+  --btn-ghost-text: var(--foreground);
+  --shadow-color: rgba(27, 37, 48, 0.08);
+  --mesh-glow-1: color-mix(in srgb, var(--brand-blue-1) 10%, transparent);
+  --mesh-glow-2: color-mix(in srgb, var(--brand-teal-1) 8%, transparent);
+  --mesh-glow-3: color-mix(in srgb, var(--primary) 6%, transparent);
+  --tooltip-bg: var(--card);
+  --tooltip-border: var(--border);
+  --tooltip-text: var(--foreground);
+  --tooltip-muted: var(--muted-foreground);
 }
 
 .dark {
   color-scheme: dark;
-  /* Near-black ground with slightly lifted panel surfaces — the reference dashboard's
-     look: #0b0d12 page, #14171f cards, hairline borders. */
-  --background: #0b0d12;
-  --foreground: #e2e8f0;
-  --foreground-muted: #94a3b8;
-  --foreground-subtle: #64748b;
-  --heading: #f8fafc;
-  --surface: rgba(20, 23, 31, 0.88);
-  --surface-subtle: rgba(20, 23, 31, 0.55);
-  --surface-solid: #14171f;
-  --surface-input: rgba(9, 11, 16, 0.7);
-  --header-bg: rgba(9, 11, 16, 0.82);
-  --border: rgba(148, 163, 184, 0.14);
-  --border-subtle: rgba(148, 163, 184, 0.08);
-  --chip-bg: rgba(255, 255, 255, 0.05);
-  --chip-text: #cbd5e1;
-  --chip-border: rgba(255, 255, 255, 0.1);
-  --chip-active-bg: rgba(56, 189, 248, 0.15);
-  --chip-active-text: #bae6fd;
-  --chip-active-border: rgba(56, 189, 248, 0.4);
-  --btn-ghost-bg: rgba(255, 255, 255, 0.05);
-  --btn-ghost-hover: rgba(255, 255, 255, 0.1);
-  --btn-ghost-text: #e2e8f0;
-  --shadow-color: rgba(0, 0, 0, 0.25);
-  --brand: #5b9bd8;
+  /* ── Soul Palette V2.1 dark column — adopted verbatim ── */
+  --background: #0b1723;
+  --card: #14202d;
+  --muted: #212c39;
+  --band: #1b2835;
+  --border: #343e4a;
+  --input: #606a76;
+  --foreground: #e6ecf2;
+  --muted-foreground: #a4acb4;
+  --heading-accent: #8acad4;
+  --primary: #6bb2ea;
+  --primary-foreground: #07121e;
+  --ring: #6bb2ea;
+  --ok: #96d6a7;
+  --ok-bg: #003a15;
+  --over: #ff998d;
+  --over-bg: #610000;
+  --warn-fg: #f2e5b1;
+  --warn-bg: #403103;
+  --neutral-0: #0b1723;
+  --neutral-1: #14202d;
+  --neutral-2: #343e4a;
+  --neutral-3: #5a6470;
+  --neutral-4: #838d98;
+  --neutral-5: #b1b8c1;
+  --neutral-6: #e6ecf2;
+  --brand-blue-1: #a2e6ff;
+  --brand-blue-2: #6bb2ea;
+  --brand-blue-3: #1a7bb9;
+  --brand-teal-1: #bce7ee;
+  --brand-teal-2: #8acad4;
+  --brand-teal-3: #388e9a;
+
+  /* ── OriginBA additions ── */
+  --heading: var(--neutral-6);
+  --chart-selected: #f0b429;
+  --accent: var(--primary);
+  --accent-2: var(--brand-blue-3);
+  --brand: var(--primary);
   --brand-navy: #16283c;
-  /* Quieter glows on the near-black ground (reference is essentially flat dark). */
-  --mesh-glow-1: rgba(56, 189, 248, 0.05);
-  --mesh-glow-2: rgba(99, 102, 241, 0.04);
-  --mesh-glow-3: rgba(14, 165, 233, 0.03);
-  --tooltip-bg: #020617;
-  --tooltip-border: rgba(255, 255, 255, 0.15);
-  --tooltip-text: #f8fafc;
-  --tooltip-muted: #94a3b8;
-  --chart-1: #38bdf8;
-  --chart-2: #818cf8;
-  --chart-3: #22d3ee;
-  --chart-4: #a78bfa;
-  --chart-5: #fbbf24;
-  --chart-selected: #fbbf24;
+
+  /* ── Derived ── */
+  --foreground-subtle: var(--neutral-3);
+  --foreground-muted: var(--muted-foreground);
+  --accent-muted: var(--primary);
+  --surface: var(--card);
+  --surface-subtle: var(--muted);
+  --surface-solid: var(--card);
+  --surface-input: var(--neutral-0);
+  --header-bg: rgba(11, 23, 35, 0.86);
+  --border-subtle: color-mix(in srgb, var(--border) 65%, transparent);
+  --chip-bg: var(--muted);
+  --chip-text: var(--muted-foreground);
+  --chip-border: var(--border);
+  --chip-active-bg: var(--band);
+  --chip-active-text: var(--primary);
+  --chip-active-border: color-mix(in srgb, var(--primary) 45%, transparent);
+  --btn-ghost-bg: var(--muted);
+  --btn-ghost-hover: var(--band);
+  --btn-ghost-text: var(--foreground);
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --mesh-glow-1: color-mix(in srgb, var(--brand-blue-2) 6%, transparent);
+  --mesh-glow-2: color-mix(in srgb, var(--brand-teal-2) 5%, transparent);
+  --mesh-glow-3: color-mix(in srgb, var(--primary) 4%, transparent);
+  --tooltip-bg: var(--card);
+  --tooltip-border: var(--border);
+  --tooltip-text: var(--foreground);
+  --tooltip-muted: var(--muted-foreground);
 }
 
 * {

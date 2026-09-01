@@ -5,19 +5,19 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        originba: {
-          navy: "#0b1f3a",
-          blue: "#1d4ed8",
-          sky: "#0ea5e9",
-          slate: "#64748b",
-        },
         brand: {
           DEFAULT: "var(--brand)",
           navy: "var(--brand-navy)",
-          50: "#eff6ff",
-          600: "#1d4ed8",
-          700: "#1e40af",
-          900: "#0b1f3a",
+          blue: {
+            1: "var(--brand-blue-1)",
+            2: "var(--brand-blue-2)",
+            3: "var(--brand-blue-3)",
+          },
+          teal: {
+            1: "var(--brand-teal-1)",
+            2: "var(--brand-teal-2)",
+            3: "var(--brand-teal-3)",
+          },
         },
         // Semantic theme tokens (defined in globals.css, light + dark aware). Registering
         // them here lets components use idiomatic Tailwind classes (text-fg-muted,
@@ -28,7 +28,25 @@ module.exports = {
           muted: "var(--foreground-muted)",
           subtle: "var(--foreground-subtle)",
         },
-        heading: "var(--heading)",
+        heading: {
+          DEFAULT: "var(--heading)",
+          accent: "var(--heading-accent)",
+        },
+        // Status pairs from the palette: a foreground and the ground it sits on,
+        // contrast-verified together. Use these instead of emerald/red/amber classes.
+        ok: { DEFAULT: "var(--ok)", bg: "var(--ok-bg)" },
+        over: { DEFAULT: "var(--over)", bg: "var(--over-bg)" },
+        warn: { DEFAULT: "var(--warn-fg)", bg: "var(--warn-bg)" },
+        primary: {
+          DEFAULT: "var(--primary)",
+          fg: "var(--primary-foreground)",
+        },
+        band: "var(--band)",
+        neutral: {
+          0: "var(--neutral-0)", 1: "var(--neutral-1)", 2: "var(--neutral-2)",
+          3: "var(--neutral-3)", 4: "var(--neutral-4)", 5: "var(--neutral-5)",
+          6: "var(--neutral-6)",
+        },
         surface: {
           DEFAULT: "var(--surface)",
           subtle: "var(--surface-subtle)",
@@ -55,6 +73,7 @@ module.exports = {
           3: "var(--chart-3)",
           4: "var(--chart-4)",
           5: "var(--chart-5)",
+          6: "var(--chart-6)",
           selected: "var(--chart-selected)",
         },
       },

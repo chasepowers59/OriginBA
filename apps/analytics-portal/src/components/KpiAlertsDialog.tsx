@@ -97,10 +97,10 @@ export function KpiAlertsDialog({ onClose }: { onClose: () => void }) {
               </span>
               <span
                 className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                  a.last_state === "breached"
-                    ? "bg-red-500/15 text-red-700 dark:text-red-300"
-                    : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                }`}
+ a.last_state === "breached"
+ ? "bg-over-bg text-over"
+ : "bg-ok-bg text-ok"
+ }`}
               >
                 {a.last_state === "breached" ? "Breached" : "OK"}
               </span>
@@ -110,7 +110,7 @@ export function KpiAlertsDialog({ onClose }: { onClose: () => void }) {
                   await deleteKpiAlert(a.id);
                   refresh();
                 }}
-                className="shrink-0 text-fg-muted hover:text-red-600 dark:hover:text-red-300"
+                className="shrink-0 text-fg-muted hover:text-over dark:hover:text-over"
               >
                 Remove
               </button>

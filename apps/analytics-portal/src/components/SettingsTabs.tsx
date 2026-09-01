@@ -28,10 +28,10 @@ export function SettingsTabs() {
                 type="button"
                 onClick={() => setTab(id)}
                 className={`rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                  tab === id
-                    ? "bg-gradient-to-r from-sky-500/20 to-indigo-500/20 portal-heading ring-1 ring-sky-400/30"
-                    : "portal-text-muted hover:bg-chip"
-                }`}
+ tab === id
+ ? "bg-gradient-to-r from-primary to-accent-2 portal-heading ring-1 ring-edge"
+ : "portal-text-muted hover:bg-chip"
+ }`}
               >
                 {label}
               </button>

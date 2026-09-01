@@ -24,7 +24,7 @@ export function DashboardListPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
             Dashboards
           </p>
           <h1 className="portal-heading mt-1 text-2xl font-bold">My dashboards</h1>
@@ -40,7 +40,7 @@ export function DashboardListPage() {
       {error ? (
         <div className="glass-panel p-8 text-center text-sm text-fg-muted">
           {error}{" "}
-          <button type="button" onClick={() => location.reload()} className="text-sky-600 hover:underline dark:text-sky-400">
+          <button type="button" onClick={() => location.reload()} className="text-primary hover:underline dark:text-primary">
             Retry
           </button>
         </div>
@@ -66,9 +66,9 @@ export function DashboardListPage() {
             <Link
               key={b.id}
               href={`/dashboards/${b.id}`}
-              className="glass-panel group block p-5 transition hover:border-sky-400/30"
+              className="glass-panel group block p-5 transition hover:border-edge"
             >
-              <p className="font-semibold text-heading group-hover:text-sky-700 dark:group-hover:text-sky-300">
+              <p className="font-semibold text-heading group-hover:text-primary dark:group-hover:text-primary">
                 {b.title}
               </p>
               <p className="mt-1 text-xs text-fg-muted">

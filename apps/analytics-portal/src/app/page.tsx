@@ -28,7 +28,7 @@ export default async function HomePage() {
       activeNav="home"
     >
       {error ? (
-        <p className="mb-6 rounded-xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-200">
+        <p className="mb-6 rounded-xl border border-warn bg-warn-bg px-4 py-3 text-sm text-warn">
           Connection unavailable — start the analytics API to load the full catalog.
         </p>
       ) : null}

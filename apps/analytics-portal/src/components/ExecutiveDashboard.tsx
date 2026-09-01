@@ -72,7 +72,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       {showAlerts ? <KpiAlertsDialog onClose={() => setShowAlerts(false)} /> : null}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
             Executive overview
           </p>
           <h2 className="mt-1 text-xl font-bold text-heading md:text-2xl">
@@ -121,7 +121,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       </div>
 
       {filter && !isHome ? (
-        <div className="flex items-center justify-between rounded-xl border border-amber-400/25 bg-amber-500/10 px-4 py-2 text-sm text-amber-800 dark:text-amber-100">
+        <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
           <span>
             Cross-filter active: <strong>{filter.label ?? filter.field}</strong> = {filter.value}
           </span>
@@ -132,7 +132,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       ) : null}
 
       {!summary?.db_configured && !loading ? (
-        <div className="glass-panel border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-800 dark:text-amber-100">
+        <div className="glass-panel border-warn bg-warn-bg px-4 py-3 text-sm text-warn">
           Connect your database in Settings to load live KPIs and trend charts.
         </div>
       ) : null}
@@ -147,8 +147,8 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
         ) : summary?.kpis.length ? (
           <div
             className={`grid gap-4 ${
-              isHome ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2 xl:grid-cols-3"
-            }`}
+ isHome ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2 xl:grid-cols-3"
+ }`}
           >
             {(isHome ? summary.kpis.slice(0, 3) : summary.kpis).map((kpi) => (
               <DashboardWidget

@@ -5,8 +5,10 @@
  * Fails (exit 1) on the classes of drift that keep creeping back:
  *   1. Hardcoded slate/white utility classes in app components (the deleted compat
  *      shim's targets) — everything must use the semantic tokens.
- *   2. Un-paired light accent shades: text-sky-300 etc. without a dark: sibling in the
- *      same class string washes out on white. Accent text is always a light/dark pair.
+ *   2. Tailwind palette colours anywhere in app components. Since the Soul Palette V2.1
+ *      merge, colour comes from tokens only: status is ok/over/warn (a verified
+ *      foreground+background pair that flips with the theme on its own), brand is
+ *      primary/chart-N. A sky/emerald/red/amber/indigo/violet class is drift.
  *   3. Rotated axis labels (angle= on recharts axes) — axis text is flat, always.
  *   4. Raw hex colours in TSX outside the allowlist — colour comes from tokens.
  *
@@ -38,8 +40,9 @@ const violations = [];
 const SHIM_TARGETS =
   /(?<![\w:-])(text-white|text-slate-(?:100|200|300|400|500|600)|bg-white\/(?:5|10)|bg-slate-(?:950|900)\/(?:30|40|50|60|90|95)|border-white\/(?:5|10|15|20)|ring-white\/10)(?![\w/])/g;
 
-const LIGHT_ACCENT =
-  /(?<![\w:-])(?:group-hover:|hover:)?text-(sky|teal|amber|red|emerald|indigo|violet|cyan)-(?:100|200|300|400)(?:\/\d+)?(?![\w])/g;
+// Any Tailwind palette colour is now drift: the tokens carry both themes themselves.
+const PALETTE_CLASS =
+  /(?<![\w:-])(?:dark:|group-hover:|hover:|focus:)*(?:text|bg|border|ring|from|via|to)-(sky|teal|amber|red|emerald|indigo|violet|cyan|rose|green|orange|purple|fuchsia|pink)-\d{2,3}(?:\/\d+)?(?![\w])/g;
 
 const HEX_IN_CLASS = /(?:text|bg|border|ring|from|via|to)-\[#[0-9a-fA-F]{3,8}\]/g;
 
@@ -65,7 +68,7 @@ for (const file of files) {
       }
       violations.push(`${where}  hardcoded theme class '${m[1]}' — use a semantic token class`);
     }
-    for (const m of line.matchAll(LIGHT_ACCENT)) {
+    for (const m of line.matchAll(PALETTE_CLASS)) {
       // paired is fine: a dark: sibling of the same hue somewhere on the line
       const hue = m[1];
       if (!line.includes(`dark:`) || !new RegExp(`dark:(?:group-hover:|hover:)?text-${hue}-`).test(line)) {

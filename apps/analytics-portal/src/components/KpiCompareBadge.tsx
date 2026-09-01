@@ -22,8 +22,8 @@ export function KpiCompareBadge({
   const tone = flat
     ? "bg-slate-500/10 text-fg ring-slate-400/20"
     : up
-      ? "bg-emerald-500/12 text-emerald-600 dark:text-emerald-300 ring-emerald-400/25"
-      : "bg-rose-500/12 text-rose-300 ring-rose-400/25";
+      ? "bg-ok-bg text-ok ring-ok"
+      : "bg-over-bg text-over ring-over";
   const arrow = flat ? "→" : up ? "▲" : "▼";
 
   return (

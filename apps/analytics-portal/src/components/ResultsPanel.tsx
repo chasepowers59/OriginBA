@@ -241,9 +241,9 @@ export function ResultsPanel({
       ) : null}
 
       {insight ? (
-        <div className="rounded-xl border border-sky-400/20 bg-gradient-to-r from-sky-500/10 to-indigo-500/10 px-4 py-3 text-sm text-heading">
+        <div className="rounded-xl border border-edge bg-gradient-to-r from-primary to-accent-2 px-4 py-3 text-sm text-heading">
           <span className="font-medium text-heading">{insight.label}</span> leads this view at{" "}
-          <span className="font-semibold text-sky-600 dark:text-sky-300">{formatPercent(insight.share)}</span> of the
+          <span className="font-semibold text-primary">{formatPercent(insight.share)}</span> of the
           total ({formatMeasure(insight.topValue)}).
         </div>
       ) : null}
@@ -305,12 +305,12 @@ export function ResultsPanel({
                     onDrillSelect?.(String(row[dimensionKey] ?? ""))
                   }
                   className={`border-b border-edge-subtle transition hover:bg-white/[0.03] ${
-                    onDrillSelect ? "cursor-pointer" : ""
-                  } ${
-                    drillFilter?.value === String(row[dimensionKey])
-                      ? "bg-amber-500/10"
-                      : ""
-                  }`}
+ onDrillSelect ? "cursor-pointer" : ""
+ } ${
+ drillFilter?.value === String(row[dimensionKey])
+ ? "bg-warn-bg"
+ : ""
+ }`}
                 >
                   {result.columns.map((col) => (
                     <td key={col} className="px-4 py-2.5 text-heading">
@@ -330,7 +330,7 @@ export function ResultsPanel({
       </div>
 
       <details className="no-print glass-panel-subtle group p-4 text-xs text-fg-muted">
-        <summary className="cursor-pointer font-medium text-fg-muted group-open:text-sky-400">
+        <summary className="cursor-pointer font-medium text-fg-muted group-open:text-primary">
           Technical query details (for IT review)
         </summary>
         <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-lg bg-black/30 p-3 text-fg-muted">
@@ -355,10 +355,10 @@ function KpiCard({
   return (
     <div
       className={`rounded-xl border px-4 py-3 ${
-        highlight
-          ? "border-sky-400/20 bg-gradient-to-br from-sky-500/10 to-indigo-500/10"
-          : "border-edge-subtle bg-surface-subtle"
-      }`}
+ highlight
+ ? "border-edge bg-gradient-to-br from-primary to-accent-2"
+ : "border-edge-subtle bg-surface-subtle"
+ }`}
     >
       <p className="text-[10px] font-semibold uppercase tracking-wider text-fg-muted">{label}</p>
       <p

@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import type { ExecutiveTrendPoint } from "@/lib/types";
 import { valueRampColors } from "@/lib/chartEmphasis";
+import { useColorMode } from "@/components/PortalThemeProvider";
 import { tickLabels } from "@/lib/axisLabels";
 import { formatTooltipCurrency, formatTooltipNumber } from "@/lib/format";
 
@@ -54,7 +55,8 @@ export function MiniSparkChart({
 }: MiniSparkChartProps) {
   // App-wide value ramp: blue = highest, shifting toward red as values drop; the
   // cross-filter selection overrides its bar to the selection hue.
-  const fills = valueRampColors(points.map((p) => p.value));
+  const { colorMode } = useColorMode();
+  const fills = valueRampColors(points.map((p) => p.value), { dark: colorMode === "dark" });
   const ticks = tickLabels(points.map((p) => p.label), 9);
   const data = points.map((p, i) => ({
     name: ticks[i],

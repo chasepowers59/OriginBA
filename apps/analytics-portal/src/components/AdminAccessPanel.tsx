@@ -489,8 +489,8 @@ export function AdminAccessPanel() {
         </ul>
       </div>
 
-      {message ? <p className="text-sm text-emerald-600 dark:text-emerald-300">{message}</p> : null}
-      {error ? <p className="text-sm text-red-600 dark:text-red-300">{error}</p> : null}
+      {message ? <p className="text-sm text-ok">{message}</p> : null}
+      {error ? <p className="text-sm text-over">{error}</p> : null}
     </div>
   );
 }

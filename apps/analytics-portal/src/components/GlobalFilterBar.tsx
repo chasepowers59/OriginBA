@@ -47,13 +47,13 @@ export function GlobalFilterBar({
         </span>
       ) : null}
       {drillFilter ? (
-        <span className="chip border-amber-400/30 bg-amber-500/10 text-amber-800 dark:text-amber-100">
+        <span className="chip border-warn bg-warn-bg text-warn">
           {prettifyFieldName(drillFilter.field)} = {drillFilter.value}
           {onClearDrill ? (
             <button
               type="button"
               onClick={onClearDrill}
-              className="-my-2 ml-0.5 -mr-1 rounded p-2 leading-none text-amber-700 dark:text-amber-200/80 hover:text-heading"
+              className="-my-2 ml-0.5 -mr-1 rounded p-2 leading-none text-warn hover:text-heading"
               aria-label="Clear cross-filter"
             >
               ×

@@ -35,7 +35,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
 
   return (
     <div className="no-print glass-panel relative animate-slide-up overflow-hidden p-6">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-sky-500/5 via-transparent to-indigo-500/10" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary via-transparent to-accent-2" />
       <div className="relative flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="max-w-2xl">
           <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -51,9 +51,9 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
             <div className="mt-3 flex flex-wrap gap-2">
               <Link
                 href={`/explore/${metadata.id}?tab=model`}
-                className="inline-flex items-center gap-2 rounded-lg border border-indigo-400/25 bg-indigo-500/10 px-3 py-2 text-xs text-indigo-700 dark:text-indigo-100 transition hover:border-indigo-400/45"
+                className="inline-flex items-center gap-2 rounded-lg border text-chart-2 text-chart-2 px-3 py-2 text-xs text-chart-2 dark:text-chart-2 transition hover:text-chart-2"
               >
-                <span className="font-medium text-indigo-700 dark:text-indigo-200">View data model →</span>
+                <span className="font-medium text-chart-2 dark:text-chart-2">View data model →</span>
                 {model.source_tables.length} source tables · {metadata.fields?.length ?? 0} fields
               </Link>
               <Link
@@ -71,19 +71,19 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
             </p>
           ) : null}
           {metadata.usage_guidance ? (
-            <p className="mt-3 rounded-lg border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-xs text-amber-800 dark:text-amber-100/90">
-              <span className="font-medium text-amber-700 dark:text-amber-200">Data guidance: </span>
+            <p className="mt-3 rounded-lg border border-warn bg-warn-bg px-3 py-2 text-xs text-warn">
+              <span className="font-medium text-warn">Data guidance: </span>
               {metadata.usage_guidance}
             </p>
           ) : null}
           {metadata.related_snapshot ? (
             <Link
               href={`/explore/${metadata.related_snapshot.id}`}
-              className="mt-3 inline-flex items-center gap-2 rounded-lg border border-sky-400/20 bg-sky-500/10 px-3 py-2 text-xs text-sky-700 dark:text-sky-100 transition hover:border-sky-400/40"
+              className="mt-3 inline-flex items-center gap-2 rounded-lg border border-edge bg-band px-3 py-2 text-xs text-primary transition hover:border-edge"
             >
-              <span className="font-medium text-sky-700 dark:text-sky-200">Related domain →</span>
+              <span className="font-medium text-primary">Related domain →</span>
               {metadata.related_snapshot.label}
-              <span className="text-sky-600 dark:text-sky-300/70">· {metadata.related_snapshot.hint}</span>
+              <span className="text-primary">· {metadata.related_snapshot.hint}</span>
             </Link>
           ) : null}
         </div>
@@ -118,16 +118,16 @@ function StatPill({
   return (
     <div
       className={`min-w-[140px] rounded-xl border px-4 py-3 ${
-        accent
-          ? "border-emerald-400/20 bg-emerald-500/10"
-          : "border-edge-subtle bg-surface-subtle"
-      }`}
+ accent
+ ? "border-ok bg-ok-bg"
+ : "border-edge-subtle bg-surface-subtle"
+ }`}
     >
       <p className="text-[10px] font-semibold uppercase tracking-wider text-fg-muted">{label}</p>
       <p
-        className={`mt-1 font-semibold ${accent ? "text-emerald-600 dark:text-emerald-300" : "text-heading"} ${
-          small ? "text-sm" : "text-lg"
-        }`}
+        className={`mt-1 font-semibold ${accent ? "text-ok" : "text-heading"} ${
+ small ? "text-sm" : "text-lg"
+ }`}
         title={value}
       >
         {value}

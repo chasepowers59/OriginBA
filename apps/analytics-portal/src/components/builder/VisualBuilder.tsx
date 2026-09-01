@@ -454,7 +454,7 @@ export function VisualBuilder({
                     {saved ? (
                       <span
                         role={saved.startsWith("Saved") ? undefined : "alert"}
-                        className={`text-xs ${saved.startsWith("Saved") ? "" : "text-red-600 dark:text-red-300"}`}
+                        className={`text-xs ${saved.startsWith("Saved") ? "" : "text-over"}`}
                         style={saved.startsWith("Saved") ? { color: "var(--chart-1)" } : undefined}
                       >{saved}</span>
                     ) : null}

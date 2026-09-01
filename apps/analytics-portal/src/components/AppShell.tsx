@@ -93,10 +93,10 @@ export function AppShell({
                   key={item.href}
                   href={item.href}
                   className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition ${
-                    active
-                      ? "bg-chip portal-heading ring-1 ring-edge-subtle"
-                      : "portal-text-muted hover:bg-chip hover:text-heading"
-                  }`}
+ active
+ ? "bg-chip portal-heading ring-1 ring-edge-subtle"
+ : "portal-text-muted hover:bg-chip hover:text-heading"
+ }`}
                 >
                   {item.label}
                 </Link>
@@ -120,10 +120,10 @@ export function AppShell({
                     key={item.href}
                     href={item.href}
                     className={`block rounded-lg px-3 py-2 text-sm font-medium ${
-                      activeNav === item.id
-                        ? "bg-chip text-heading"
-                        : "text-fg-muted hover:bg-chip hover:text-heading"
-                    }`}
+ activeNav === item.id
+ ? "bg-chip text-heading"
+ : "text-fg-muted hover:bg-chip hover:text-heading"
+ }`}
                   >
                     {item.label}
                   </Link>
@@ -137,7 +137,7 @@ export function AppShell({
                 title={dbConfigured ? `${brand.connection_label} — database connection settings` : "Connect database"}
               >
                 <span
-                  className={`h-2 w-2 rounded-full ${dbConfigured ? "bg-emerald-500 dark:bg-emerald-400" : "animate-pulse bg-amber-500 dark:bg-amber-400"}`}
+                  className={`h-2 w-2 rounded-full ${dbConfigured ? "bg-ok dark:bg-ok" : "animate-pulse bg-warn dark:bg-warn"}`}
                 />
                 <span className="hidden xl:inline">
                   {dbConfigured ? brand.connection_label : "Connect"}

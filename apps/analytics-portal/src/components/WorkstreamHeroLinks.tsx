@@ -21,7 +21,7 @@ export function WorkstreamHeroLinks({
 
   return (
     <div className="glass-panel p-5">
-      <p className="text-[11px] font-semibold uppercase tracking-widest text-sky-600 dark:text-sky-400/80">
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-heading-accent">
         Start here
       </p>
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
@@ -39,7 +39,7 @@ export function WorkstreamHeroLinks({
               <div className="mt-3 flex flex-wrap gap-2">
                 <Link
                   href={`/explore/${item.snapshot_id}${reportQs}`}
-                  className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300"
+                  className="text-xs text-primary hover:text-primary"
                 >
                   Run report →
                 </Link>

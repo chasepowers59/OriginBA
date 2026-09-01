@@ -101,10 +101,10 @@ export function FieldPalette({
                       onClick={() => onSelect(s.id)}
                       aria-expanded={active}
                       className={`flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-xs font-medium transition ${
-                        active
-                          ? "bg-chip text-heading ring-1 ring-edge-subtle"
-                          : "text-fg-muted hover:bg-chip hover:text-heading"
-                      }`}
+ active
+ ? "bg-chip text-heading ring-1 ring-edge-subtle"
+ : "text-fg-muted hover:bg-chip hover:text-heading"
+ }`}
                     >
                       <span aria-hidden className={`text-[9px] transition ${active ? "rotate-90" : ""}`}>
                         ▶

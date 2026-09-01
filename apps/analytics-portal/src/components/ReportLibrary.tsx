@@ -26,7 +26,7 @@ export function ReportLibrary() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
           Utility analytics
         </p>
         <h1 className="mt-1 text-2xl font-bold text-heading">Report library</h1>
@@ -41,7 +41,7 @@ export function ReportLibrary() {
       ) : error || !packs.length ? (
         <div className="glass-panel p-8 text-center text-sm text-fg-muted">
           {error ?? "No report packs are available for this organization yet."}{" "}
-          <button type="button" onClick={() => location.reload()} className="text-sky-600 hover:underline dark:text-sky-400">
+          <button type="button" onClick={() => location.reload()} className="text-primary hover:underline dark:text-primary">
             Retry
           </button>
         </div>
@@ -73,17 +73,17 @@ export function ReportLibrary() {
                   <Link
                     key={`${report.snapshot_id}-${report.report_id}`}
                     href={report.explore_url}
-                    className="group rounded-xl border border-edge-subtle bg-surface-subtle p-4 transition hover:border-sky-400/30 hover:bg-surface-subtle"
+                    className="group rounded-xl border border-edge-subtle bg-surface-subtle p-4 transition hover:border-edge hover:bg-surface-subtle"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <span className="text-[10px] font-medium uppercase tracking-wide text-fg-muted">
                         {report.workstream_label}
                       </span>
-                      <span className="text-fg-muted transition group-hover:text-sky-600 dark:group-hover:text-sky-400">
+                      <span className="text-fg-muted transition group-hover:text-primary dark:group-hover:text-primary">
                         Open →
                       </span>
                     </div>
-                    <h3 className="mt-2 font-medium text-heading group-hover:text-sky-700 dark:group-hover:text-sky-100">
+                    <h3 className="mt-2 font-medium text-heading group-hover:text-primary dark:group-hover:text-primary">
                       {report.title}
                     </h3>
                     <p className="mt-1 line-clamp-2 text-xs text-fg-muted">

@@ -15,14 +15,14 @@ export function LargeDomainBanner({
   grainDescription?: string;
 }) {
   return (
-    <div className="glass-panel border-amber-400/25 bg-gradient-to-r from-amber-500/10 to-orange-500/5 p-5">
+    <div className="glass-panel border-warn bg-gradient-to-r from-band to-band p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-2xl">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-700 dark:text-amber-300">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-warn">
             Large governed domain
           </p>
           <h3 className="mt-1 text-lg font-semibold text-heading">{snapshotLabel}</h3>
-          <p className="mt-2 text-sm text-amber-800 dark:text-amber-100/90">
+          <p className="mt-2 text-sm text-warn">
             This canvas has{" "}
             {rowCount != null ? (
               <strong>{formatNumber(rowCount)}</strong>
@@ -34,7 +34,7 @@ export function LargeDomainBanner({
             instead of loading sample rows.
           </p>
           {grainDescription ? (
-            <p className="mt-2 text-xs text-amber-700 dark:text-amber-200/70">{grainDescription}</p>
+            <p className="mt-2 text-xs text-warn">{grainDescription}</p>
           ) : null}
         </div>
         <Link

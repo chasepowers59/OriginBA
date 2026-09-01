@@ -82,7 +82,7 @@ export function NotesDialog({
                       await deleteAnnotation(n.id);
                       refresh();
                     }}
-                    className="shrink-0 hover:text-red-600 dark:hover:text-red-300"
+                    className="shrink-0 hover:text-over dark:hover:text-over"
                   >
                     Remove
                   </button>

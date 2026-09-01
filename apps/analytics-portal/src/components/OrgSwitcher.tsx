@@ -66,17 +66,17 @@ export default function OrgSwitcher({
       {/* Viewing someone else's tenant should never look like the default state:
           the select itself turns amber, plus a dot for colour-blind redundancy. */}
       {viewingOther && (
-        <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-amber-500" />
+        <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-warn" />
       )}
       <select
         value={active}
         onChange={(e) => choose(e.target.value)}
         aria-label="Client organization"
         className={`max-w-[180px] truncate rounded-lg border px-2 py-1.5 text-sm ${
-          viewingOther
-            ? "border-amber-500/60 bg-amber-500/10 font-medium text-amber-700 dark:text-amber-300"
-            : "border-edge-subtle bg-chip text-fg"
-        }`}
+ viewingOther
+ ? "border-warn bg-warn-bg font-medium text-warn"
+ : "border-edge-subtle bg-chip text-fg"
+ }`}
       >
         {orgs.map((o) => (
           <option key={o.id} value={o.id}>
