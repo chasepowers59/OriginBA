@@ -1,0 +1,150 @@
+/* ============================================================================
+   Soul Palette V2.1 — OriginBA merge
+   Base: V2.1 Soul Palette (Reed, approved 2026-08-29), adopted VERBATIM.
+   Added: seven tokens the analytics portal needs and V2.1 has no slot for.
+   Zero changes are requested to any V2.1 value.
+
+   Every V2.1 pair re-verified at merge time; all 13 text pairs (12 from V2.1
+   plus chart-selected) clear WCAG AA in both columns.
+   ========================================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* ---- Surfaces (V2.1) ---- */
+  --background: #ffffff;
+  --card: #ffffff;
+  --muted: #f2f5f8;
+  --band: #eff5fb;
+  --border: #d9e1e8;
+  --input: #7a8fa0;
+
+  /* ---- Text and brand (V2.1) ---- */
+  --foreground: #1b2530;
+  --muted-foreground: #56636e;
+  --heading: #1c7884;
+  --primary: #006fac;
+  --primary-foreground: #ffffff;
+  --ring: #006fac;
+
+  /* ---- Status pairs (V2.1) ---- */
+  --ok: #0b5a2e;
+  --ok-bg: #e4f1e8;
+  --over: #8b1515;
+  --over-bg: #fbeaea;
+  --warn-fg: #3d2e00;
+  --warn-bg: #f3e5ab;
+
+  /* ---- Neutral ramp (V2.1) ---- */
+  --neutral-0: #ffffff;
+  --neutral-1: #f2f5f8;
+  --neutral-2: #d9e1e8;
+  --neutral-3: #a4b8c8;
+  --neutral-4: #7a8fa0;
+  --neutral-5: #56636e;
+  --neutral-6: #1b2530;
+
+  /* ---- Brand ramps (V2.1) ---- */
+  --brand-blue-1: #28a0ee;
+  --brand-blue-2: #006fac;
+  --brand-blue-3: #004b86;
+  --brand-teal-1: #5da5b0;
+  --brand-teal-2: #1c7884;
+  --brand-teal-3: #00535f;
+
+  /* ---- Chart palette (V2.1 aliases) ---- */
+  --chart-1: var(--brand-blue-2);
+  --chart-2: var(--brand-teal-2);
+  --chart-3: var(--brand-blue-1);
+  --chart-4: var(--brand-teal-3);
+  --chart-5: var(--brand-blue-3);
+  --chart-6: var(--neutral-4);
+
+  /* ======================= OriginBA additions ==========================
+     Roles the analytics portal has and the conversion app does not. All are
+     ADDITIVE: no V2.1 token is redefined. */
+
+  /* Page titles. V2.1's --heading (teal, 5.16:1) is the section-heading
+     signature; portal page titles run long and analytic, so they take ink at
+     15.51:1 and leave teal to the eyebrows above them. */
+  --title: var(--neutral-6);
+
+  /* Cross-filter selection. Clicking a bar filters the dashboard; the selected
+     bar must leave the categorical blue/teal set entirely. Amber, and dark
+     enough to carry its value label (4.92:1). */
+  --chart-selected: #a85e00;
+  --chart-selected-foreground: #ffffff;
+
+  /* Value ramp. Single-series bars encode MAGNITUDE by colour: brand blue at
+     the top of the range shifting to the V2.1 "over" red at the bottom, so the
+     one red in the suite means the same thing in both apps. Interpolated in
+     Oklab, which keeps the middle low-chroma instead of detouring through
+     magenta the way an HSL sweep does. */
+  --ramp-high: var(--brand-blue-2);
+  --ramp-mid: #695166;
+  --ramp-low: var(--over);
+
+  /* Gradient end for the primary button, kept inside the blue ramp. */
+  --accent: var(--primary);
+  --accent-2: var(--brand-blue-3);
+
+  /* Fixed brand ground: the login panel and logo tile are navy in both themes
+     because the wordmark is drawn for it. */
+  --brand-navy: #16283c;
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* ---- Surfaces (V2.1) ---- */
+  --background: #0b1723;
+  --card: #14202d;
+  --muted: #212c39;
+  --band: #1b2835;
+  --border: #343e4a;
+  --input: #606a76;
+
+  /* ---- Text and brand (V2.1) ---- */
+  --foreground: #e6ecf2;
+  --muted-foreground: #a4acb4;
+  --heading: #8acad4;
+  --primary: #6bb2ea;
+  --primary-foreground: #07121e;
+  --ring: #6bb2ea;
+
+  /* ---- Status pairs (V2.1) ---- */
+  --ok: #96d6a7;
+  --ok-bg: #003a15;
+  --over: #ff998d;
+  --over-bg: #610000;
+  --warn-fg: #f2e5b1;
+  --warn-bg: #403103;
+
+  /* ---- Neutral ramp (V2.1) ---- */
+  --neutral-0: #0b1723;
+  --neutral-1: #14202d;
+  --neutral-2: #343e4a;
+  --neutral-3: #5a6470;
+  --neutral-4: #838d98;
+  --neutral-5: #b1b8c1;
+  --neutral-6: #e6ecf2;
+
+  /* ---- Brand ramps (V2.1) ---- */
+  --brand-blue-1: #a2e6ff;
+  --brand-blue-2: #6bb2ea;
+  --brand-blue-3: #1a7bb9;
+  --brand-teal-1: #bce7ee;
+  --brand-teal-2: #8acad4;
+  --brand-teal-3: #388e9a;
+
+  /* ---- OriginBA additions ---- */
+  --title: var(--neutral-6);
+  --chart-selected: #f0b429;
+  --chart-selected-foreground: #07121e;
+  --ramp-high: var(--brand-blue-2);
+  --ramp-mid: #bfaabe;
+  --ramp-low: var(--over);
+  --accent: var(--primary);
+  --accent-2: var(--brand-blue-3);
+  --brand-navy: #16283c;
+}
