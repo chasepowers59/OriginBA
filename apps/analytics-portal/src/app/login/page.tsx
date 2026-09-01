@@ -61,8 +61,9 @@ export default function LoginPage() {
     const m = window.location.hash.match(/[#&]sso_token=([^&]+)/);
     if (!m) return;
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
-    storeAccessToken(decodeURIComponent(m[1]), 8 * 60 * 60);
-    refresh().then(() => router.replace(searchParams.get("next") || "/"));
+    void storeAccessToken(decodeURIComponent(m[1]), 8 * 60 * 60)
+      .then(() => refresh())
+      .then(() => router.replace(searchParams.get("next") || "/"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

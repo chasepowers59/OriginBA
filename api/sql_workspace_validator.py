@@ -91,7 +91,7 @@ _FROM_JOIN_QUALIFIER = re.compile(
 )
 
 
-def _strip_sql_noise(sql: str) -> str:
+def strip_sql_noise(sql: str) -> str:
     """Remove comments and string literals so the scope scan sees only code."""
     cleaned = _BLOCK_COMMENT.sub(" ", sql)
     cleaned = _LINE_COMMENT.sub(" ", cleaned)
@@ -160,7 +160,7 @@ def _secret_bearing_names(cleaned: str) -> set[str]:
     return names
 
 
-def _enforce_secrets(cleaned: str) -> None:
+def enforce_secrets(cleaned: str) -> None:
     m = _SECRET_COLUMNS.search(cleaned)
     if m:
         raise SqlWorkspaceValidationError(
@@ -187,7 +187,7 @@ def _enforce_secrets(cleaned: str) -> None:
 
 def _enforce_scope(sql: str, allowed_schemas: tuple[str, ...], deny: re.Pattern,
                    extra: tuple[tuple[re.Pattern, str], ...] = ()) -> None:
-    cleaned = _strip_sql_noise(sql)
+    cleaned = strip_sql_noise(sql)
     primary = allowed_schemas[0]
     allowed = {s.lower() for s in allowed_schemas}
 
@@ -223,11 +223,35 @@ def _enforce_scope(sql: str, allowed_schemas: tuple[str, ...], deny: re.Pattern,
                 f"('{m.group(0)}')."
             )
 
-    _enforce_secrets(cleaned)
+    enforce_secrets(cleaned)
 
 
 _NON_REPORTING_SCHEMA = re.compile(
     r"\b(landing|staging|core|public|pg_catalog|information_schema)\s*\.",
+    re.IGNORECASE,
+)
+
+
+# The catalog is reachable WITHOUT its qualifier -- `pg_class`, `pg_database` -- so a
+# rule that only matched `pg_catalog.` was bypassed by dropping four characters
+# (audit M1). `pg_database` alone enumerates every other client's database name.
+# Bounded on both sides so one of our own columns ("Page Count") never trips it.
+_PG_CATALOG_OBJECT = re.compile(
+    r"(?<![\w.])(pg_(?:class|database|stat_activity|stat_\w+|user|users|shadow|roles|"
+    r"authid|settings|namespace|tables|attribute|proc|type|index|indexes|locks|"
+    r"available_extensions|extension|catalog|tablespace|largeobject|"
+    r"description|depend|constraint|rewrite|trigger|policy|foreign_\w+)|"
+    r"information_schema)\b",
+    re.IGNORECASE,
+)
+
+# Functions that leave the database or hold the connection open: remote links, file
+# reads, large-object import, sleeps. The Oracle fence has had its equivalent
+# (utl_http, dbms_*) since day one; the Postgres side had none (audit M2).
+_PG_DANGEROUS_FUNCTION = re.compile(
+    r"\b(dblink\w*|postgres_fdw\w*|pg_read_file|pg_read_binary_file|pg_ls_\w+|"
+    r"pg_stat_file|lo_import|lo_export|pg_sleep\w*|pg_terminate_backend|"
+    r"pg_cancel_backend|pg_reload_conf|pg_logical_\w+|pg_execute_\w+)\s*\(",
     re.IGNORECASE,
 )
 
@@ -237,9 +261,13 @@ def validate_reporting_scope(sql: str) -> None:
 
     CISADM is the workspace's primary surface (analysts know the CIS schema);
     the reporting layer stays queryable for governed canvases. Secrets are
-    guarded separately (see _enforce_secrets).
+    guarded separately (see enforce_secrets).
     """
-    _enforce_scope(sql, ("cisadm", "reporting"), _NON_REPORTING_SCHEMA)
+    _enforce_scope(
+        sql, ("cisadm", "reporting"), _NON_REPORTING_SCHEMA,
+        extra=((_PG_CATALOG_OBJECT, "system catalog objects"),
+               (_PG_DANGEROUS_FUNCTION, "system and remote-access functions")),
+    )
 
 
 # The in-database (oracle_dbt) fence adds the Oracle-specific escape hatches a
@@ -266,6 +294,17 @@ _ORACLE_EXTRA = (
     (_ORACLE_PACKAGES, "PL/SQL packages and network functions"),
     (_ORACLE_DBLINK, "database links"),
 )
+
+
+def enforce_oracle_hatches(cleaned: str) -> None:
+    """Dictionary views, PL/SQL packages and database links, on already-cleaned text."""
+    for pattern, what in _ORACLE_EXTRA:
+        m = pattern.search(cleaned)
+        if m:
+            raise SqlWorkspaceValidationError(
+                f"{what.capitalize()} are not queryable from the workspace "
+                f"('{m.group(0)}')."
+            )
 
 
 def validate_oracle_reporting_scope(sql: str) -> None:

@@ -156,6 +156,62 @@ class SecretsProjectionTests(unittest.TestCase):
         self.assertFalse(self._blocked("SELECT * FROM cisadm.ci_bseg"))
 
 
+class PostgresCatalogAndFunctionTests(unittest.TestCase):
+    """M1/M2 (2026-09-01): the Postgres fence had no unqualified-catalog rule and
+    no function deny-list, where the Oracle fence has both.
+
+    Qualified `pg_catalog.` was blocked, so the deny-list was bypassed simply by
+    dropping the qualifier: `pg_database` enumerates other clients' database names,
+    and `dblink`/`pg_read_file`/`pg_sleep` reach outside the database entirely.
+    """
+
+    def _blocked(self, sql: str) -> bool:
+        try:
+            validate_reporting_scope(sql)
+            return False
+        except SqlWorkspaceValidationError:
+            return True
+
+    def test_blocks_unqualified_catalog_tables(self):
+        for sql in (
+            "SELECT relname FROM pg_class",
+            "SELECT datname FROM pg_database",
+            "SELECT * FROM pg_stat_activity",
+            "SELECT usename FROM pg_user",
+            "SELECT rolname FROM pg_roles",
+            "SELECT name, setting FROM pg_settings",
+            "SELECT * FROM pg_shadow",
+            "SELECT table_name FROM information_schema.tables",
+        ):
+            with self.subTest(sql=sql):
+                self.assertTrue(self._blocked(sql), sql)
+
+    def test_blocks_dangerous_functions(self):
+        for sql in (
+            "SELECT dblink('host=evil', 'SELECT 1')",
+            "SELECT dblink_connect('host=evil')",
+            "SELECT pg_read_file('/etc/passwd')",
+            "SELECT pg_read_binary_file('/etc/passwd')",
+            "SELECT lo_import('/etc/passwd')",
+            "SELECT pg_sleep(10)",
+            "SELECT pg_ls_dir('/')",
+            "SELECT * FROM reporting.rpt_bill WHERE pg_sleep(5) IS NULL",
+        ):
+            with self.subTest(sql=sql):
+                self.assertTrue(self._blocked(sql), sql)
+
+    def test_ordinary_reporting_queries_are_untouched(self):
+        for sql in (
+            "SELECT * FROM reporting.rpt_financial_txn",
+            'SELECT "Account ID", "Billed Amount" FROM rpt_bill_segment',
+            "SELECT count(*) FROM cisadm.ci_bseg WHERE freeze_sw = 'Y'",
+            # a column whose name merely starts with the same letters
+            'SELECT "Page Count" FROM reporting.rpt_bill',
+        ):
+            with self.subTest(sql=sql):
+                self.assertFalse(self._blocked(sql), sql)
+
+
 class LegacyOracleEngineFenceTests(unittest.TestCase):
     """C1 (2026-09-01): the legacy `oracle` engine had NO fence.
 

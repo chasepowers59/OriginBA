@@ -44,7 +44,7 @@ export async function login(
     method: "POST",
     body: JSON.stringify({ email, password, ...(organization ? { organization } : {}) }),
   });
-  storeAccessToken(res.access_token, res.expires_in_minutes * 60);
+  await storeAccessToken(res.access_token, res.expires_in_minutes * 60);
   // Bind the session to the org the server authorized (the tenant for an admin entering
   // a client, otherwise the user's home org).
   if (res.active_organization_id) setActiveOrganization(res.active_organization_id);
@@ -56,8 +56,8 @@ export function resolveTenant(slug: string): Promise<PortalOrganization> {
   return authFetch<PortalOrganization>(`/auth/tenants/${encodeURIComponent(slug)}`);
 }
 
-export function logout(): void {
-  clearAccessToken();
+export async function logout(): Promise<void> {
+  await clearAccessToken();
 }
 
 export function changePassword(current_password: string, new_password: string): Promise<AuthUser> {
