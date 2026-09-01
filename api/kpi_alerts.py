@@ -53,6 +53,7 @@ def create_alert(payload: dict[str, Any], *, organization_id: str,
     condition = str(payload.get("condition") or "")
     if condition not in CONDITIONS:
         raise AlertError(f"Condition must be one of {', '.join(CONDITIONS)}")
+    assert_condition_can_fire(str(payload.get("kpi_id") or ""), condition)
     try:
         threshold = float(payload.get("threshold"))
     except (TypeError, ValueError) as exc:
@@ -90,6 +91,30 @@ def delete_alert(alert_id: str, organization_id: str) -> bool:
     return _store.delete(alert_id, organization_id)
 
 
+def assert_condition_can_fire(kpi_id: str, condition: str) -> None:
+    """Refuse a period-over-period condition on a point-in-time KPI.
+
+    Four executive KPIs are WINDOWLESS stock metrics -- a balance or a population has no
+    prior period, so the runner returns change_pct=None every run and
+    evaluate_condition correctly never breaches on None. The alert saved, looked
+    configured, and could not fire in principle. Refusing here puts the answer where
+    there is somebody to read it.
+
+    Threshold conditions stay available on stock metrics: "tell me when past-due balance
+    goes above X" is exactly the question worth asking of a balance.
+    """
+    if not condition.startswith("pct_change"):
+        return
+    kpi = _kpi_by_id(kpi_id)
+    if kpi is None or not kpi.get("windowless"):
+        return
+    label = kpi.get("label", kpi_id)
+    raise AlertError(
+        f"{label} is a point-in-time total, so it has no period to compare against and a "
+        "percent-change alert could never fire. Use an above or below threshold instead."
+    )
+
+
 def evaluate_condition(condition: str, threshold: float, *,
                        value: float | None, pct_change: float | None) -> bool:
     """No data never breaches — an empty warehouse is a data problem, not a KPI one."""
@@ -124,6 +149,15 @@ _CONDITION_TEXT = {
 }
 
 
+def _window_phrase(alert: dict[str, Any]) -> str:
+    """A stock metric is as-of, not trailing; saying "trailing 7 days" of a balance
+    describes a window that was never applied."""
+    kpi = _kpi_by_id(alert.get("kpi_id", ""))
+    if kpi is not None and kpi.get("windowless"):
+        return " (point-in-time total)"
+    return f" (trailing {alert.get('window_days', 7)} days)"
+
+
 def _message(alert: dict[str, Any], result: dict[str, Any], now: datetime):
     label = alert.get("kpi_label") or alert["kpi_id"]
     pct = result.get("pct_change")
@@ -133,7 +167,7 @@ def _message(alert: dict[str, Any], result: dict[str, Any], now: datetime):
         alert.get("recipients", []),
         f"{label} {_CONDITION_TEXT.get(alert['condition'], alert['condition'])} "
         f"{alert['threshold']}{unit}.\n\n"
-        f"Current value (trailing {alert.get('window_days', 7)} days): {result.get('value')}\n"
+        f"Current value{_window_phrase(alert)}: {result.get('value')}\n"
         + (f"Period-over-period change: {pct:.1f}%\n" if pct is not None else "")
         + "\nOpen the portal's executive overview for the full picture.\n")
 
