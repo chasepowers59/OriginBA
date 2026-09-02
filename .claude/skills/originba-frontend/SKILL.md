@@ -219,11 +219,38 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     this Node, so such a test is real rather than vacuous — verify that before trusting
     one. One home each: `api/reporting_dates.py`, `format.ts`'s `localIsoDate`.
 
-**How three of these were found: a widely-used export with no test.** Enumerate
+13. **A missing value silently coerced into a real one.** `Number(null)` and
+    `Number("")` are both `0`, so any formatter opening with `Number(value)` and
+    rejecting only non-finite results turns NULL into a business fact. `formatCurrency`
+    rendered a null amount as **"$0"** on the finance KPIs — while `undefined` rendered
+    "—", and that inconsistency is the tell that neither was considered. Reachable by
+    construction: SQL NULL serializes to JSON null and a SUM over zero matching rows IS
+    null. The backend distinguishes the state deliberately
+    (`kpi_runner.empty_window_note` branches on `value not in (None, 0)` to separate
+    "none happened" from "none in the window you chose"), so the formatter erased the
+    distinction that code exists to preserve. Guard `value == null || value === ""`
+    BEFORE coercing — `formatCellValue` always did, which is how you can tell the
+    convention existed and the others just missed it. Check the **tooltip twin** of any
+    formatter you fix; `formatTooltipCurrency`/`formatTooltipNumber` carried it too.
+
+14. **A string rendered as a number that cannot represent it.** The sibling of 13, same
+    function family. `formatCellValue` numeric-formats anything parsing finite, guarded
+    only by a NAME-based `isIdentifierColumn` (`_ID`, `_NBR`, `" Code"`…). Measured over
+    all 958 text columns in demo25: 430 unmatched by the guard, **8 corrupted**, worst
+    being `rpt_gl."GL Account"` — `'01000123923000000000000'` rendered
+    "1,000,123,923,000,000,000,000", dropping the leading zero, adding separators, and
+    past 2^53 getting the digits themselves wrong. Extending the name list is
+    whack-a-mole ("GL Account", "Value", "Hierarchy Path" share no suffix). The rule
+    that generalizes: **format a string as a number only when that ROUND-TRIPS**
+    (`String(Number(v)) === v.trim()`) — exactly the set where numeric rendering loses
+    nothing, needing no knowledge of naming. The name guard still earns its place, since
+    `'1358301387'` round-trips and only the name keeps an Account ID out of commas.
+
+**How five of these were found: a widely-used export with no test.** Enumerate
 `export function` in `lib/`, count references across the app, and subtract anything
 named in a `.test.ts`. 44 exports had 3+ uses and no test. That list is where
-`prettifyFieldName` (broken for the six legacy orgs it was written for) and the three
-UTC date builders came from — and `businessLabels.test.ts` already EXISTED, covering
+`prettifyFieldName` (broken for the six legacy orgs it was written for), the three UTC
+date builders, and the four coercion bugs in classes 13-14 all came from — and `businessLabels.test.ts` already EXISTED, covering
 only the workstream lists, so "there is a test file" proves nothing about a function.
 
 **The catalog's `default_date_field` can be a measured-empty column.** It is
