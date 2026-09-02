@@ -115,6 +115,7 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
     now — a schedule that mailed a frozen date range weekly would go stale.
     """
     from api.query_builder import build_query
+    from api.reporting_dates import reporting_window
     from api.snapshot_catalog import allowed_fields, get_snapshot, snapshot_backend
     from api.snapshot_explorer import _result_labels, _serialize_value
 
@@ -124,14 +125,18 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
 
     filters: list[dict[str, Any]] = []
     date_field = schedule_date_field(snapshot)
-    end = datetime.now(timezone.utc).date()
     window_days = int(schedule.get("window_days") or 30)
+    # reporting_today(), not a UTC date: this window filters BUSINESS dates, and every
+    # other window builder (kpi_runner, nlq_metrics, snapshot_explorer) ends on the
+    # local calendar date. On a non-UTC server the two disagreed for the offset's worth
+    # of hours each day -- six here -- so a scheduled report's "last 30 days" ended a
+    # day later than the same window on screen and the emailed figure did not tie.
+    start_iso, end_iso = reporting_window(window_days)
     if date_field:
-        start = end - timedelta(days=window_days)
         filters.append({"field": date_field, "op": "between",
-                        "value": [start.isoformat(), end.isoformat()]})
+                        "value": [start_iso, end_iso]})
     # The email quotes THIS, written where the filter is decided, so the two cannot drift.
-    schedule["window_note"] = window_sentence(date_field, window_days, end.isoformat())
+    schedule["window_note"] = window_sentence(date_field, window_days, end_iso)
     if view.get("scope_field") and view.get("scope_value") is not None:
         filters.append({"field": view["scope_field"], "op": "eq",
                         "value": view["scope_value"]})
