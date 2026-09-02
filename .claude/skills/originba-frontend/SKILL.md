@@ -201,6 +201,20 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     situation where the reader had set none — sending them to hunt a filter that was
     not on screen. That is bug class #3 pointing the other way, and it is worth checking
     for directly: **copy that blames the reader's input for something the server did.**
+    **The same root also produces shape-specific HEURISTICS, not just field reads**, and
+    they are quieter because nothing errors. `measureIsCurrency` tested
+    `includes("AMT")` — written for CISADM's `_AMT` suffix, and **"AMOUNT" does not
+    contain "AMT"** — so of 47 money-ish measures in catalog_dbt exactly ONE was
+    detected and canvas money rendered without a dollar sign. `prettifyFieldName` was
+    the mirror image, written for the legacy form and mangling the canvas one. When you
+    find a rule that inspects a column NAME, run it over every field id in BOTH
+    `output/catalog_*.json` and read the diff; the count alone will not tell you.
+    Prefer whole-TOKEN matching (split on non-alphanumerics — `\b` fails on `BILL_AMT`
+    because underscore is a word character) over substrings, which err in both
+    directions: widening the substring list newly matched "Days Unbalanced"
+    (UNBALANCED contains BALANCE), "% of Arrears Collected" and a `_COUNT`. A specific
+    negative set beats a lazy one — "Arrears 0-30 Days" IS currency, so excluding on
+    "Days" would repeat the mistake.
 
 12. **A calendar date derived in UTC.** Found on BOTH sides of the wire, weeks apart,
     which is what makes it a class rather than an incident. Backend:
