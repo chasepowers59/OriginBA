@@ -179,6 +179,23 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     Layout-dependent copy is part of this: "from the left panel" was wrong once the
     panel stacked above.
 
+**Dead-code sweeps need three guards, learned the hard way.** (1) `grep --include=*.ts`
+inside zsh globs the pattern before grep sees it and reports EVERY module as unimported.
+(2) An import-graph scan that ignores `await import("./x")` calls live code dead — that
+nearly took `saveFavorite`/`removeFavorite`. (3) A Python scan over `api/` reported 54
+dead functions, almost all FastAPI route handlers referenced by their DECORATOR, not by
+name; a detector that does not skip decorated defs would delete the API. After all
+three filters: 0 unused modules, 10 dead frontend exports (162 lines), 9 undecorated
+backend candidates.
+
+**An unused function that documents its purpose is a question about the CALLER.**
+`warehouse_db.connection_info` said "Masked, for the settings page" and the settings
+page never called it — because `public_status` only checked the Oracle paths, so a dbt
+org read "Not configured" while `/snapshots` said `db_configured: True` and queries
+returned rows. Same for `filter_kpis_for_auth`: an unused SECURITY filter beside four
+used siblings turned out to mark a rule that half the family re-implemented and
+disagreed on. Follow these before cutting them.
+
 **Shared rules beat mirrored ones.** buildRequest and saveView each decided which
 filters were "live"; only one of them existed, so the saved view was not the view that
 ran. When two code paths must agree about the same thing, give them one function
