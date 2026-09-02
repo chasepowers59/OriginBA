@@ -1,6 +1,13 @@
 import type { SnapshotMetadata } from "./types";
 
-/** Utility industry workstream names and display order (9 workstreams). */
+/**
+ * Fallback names and display order for the workstreams, used when the API has not
+ * supplied a label. It must carry the UNION of both deployment shapes: the dbt catalog
+ * has `assets` and no `new_services`, the legacy CISADM catalog has `new_services` and
+ * no `assets`, so neither id is dead -- each is real in one shape. This list was a copy
+ * of the legacy nine and never gained `assets`, which made /workstream/assets a 404.
+ * businessLabels.test.ts pins it against the catalog files so it cannot drift again.
+ */
 export const WORKSTREAM_ORDER = [
   "finance",
   "billing",
@@ -9,6 +16,7 @@ export const WORKSTREAM_ORDER = [
   "debt",
   "customer_ops",
   "new_services",
+  "assets",
   "field_ops",
   "common",
 ] as const;
@@ -23,16 +31,20 @@ export const WORKSTREAM_LABELS: Record<string, string> = {
   debt: "Collections & Debt",
   cashiering: "Cashiering & Payments",
   new_services: "New Services",
+  assets: "Asset Operations",
 };
 
 export const WORKSTREAM_DESCRIPTIONS: Record<string, string> = {
   billing: "Bill segments, determinant usage, cycles, and rate performance",
   finance: "Transactions, GL distribution, billable charges, and revenue",
-  meter_ops: "Usage, measurements, scalar detail, and device assets",
+  // Device assets moved out to their own workstream when assets became a data set;
+  // leaving them named here sent people to the wrong workstream for them.
+  meter_ops: "Usage, measurements, and scalar detail",
   cashiering: "Payments, tenders, and cashiering activity",
   debt: "Aged balances, collections, and write-off processes",
   customer_ops: "Accounts, customers, cases, and service locations",
   new_services: "New services pipeline and start-service tracking",
+  assets: "Meter and device assets, and the locations they serve",
   field_ops: "Field activities, crews, and BODA field work",
   common: "Workflow queues, batch jobs, and cross-cutting exceptions",
 };

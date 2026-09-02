@@ -7,6 +7,7 @@ export const WORKSTREAM_ICONS: Record<string, string> = {
   debt: "◈",
   customer_ops: "◎",
   new_services: "◊",
+  assets: "▤",
   field_ops: "▣",
   common: "⬡",
 };

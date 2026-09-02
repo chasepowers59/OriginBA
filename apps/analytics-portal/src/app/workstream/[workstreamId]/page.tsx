@@ -8,6 +8,9 @@ type PageProps = {
   params: Promise<{ workstreamId: string }>;
 };
 
+// Prerender hints only. Which workstreams EXIST is decided per organization by the
+// catalog, below -- gating on this list is what made /workstream/assets a 404 while
+// /workstream/new_services rendered, because the list was a copy of the legacy nine.
 export function generateStaticParams() {
   return WORKSTREAM_ORDER.map((id) => ({ workstreamId: id }));
 }
@@ -15,10 +18,6 @@ export function generateStaticParams() {
 export default async function WorkstreamPage({ params }: PageProps) {
   const { workstreamId } = await params;
   const id = workstreamId.toLowerCase();
-
-  if (!WORKSTREAM_ORDER.includes(id as (typeof WORKSTREAM_ORDER)[number])) {
-    notFound();
-  }
 
   let index;
   try {
@@ -34,6 +33,12 @@ export default async function WorkstreamPage({ params }: PageProps) {
   }
 
   const ws = index.workstreams?.find((w) => w.id === id);
+  // The catalog is the authority on what this organization has. Only 404 when it
+  // answered and does not know the id -- an unreachable API must not turn every
+  // workstream into a missing page.
+  if (!ws && (index.workstreams?.length ?? 0) > 0) {
+    notFound();
+  }
 
   return (
     <AppShell

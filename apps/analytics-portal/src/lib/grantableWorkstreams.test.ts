@@ -4,22 +4,28 @@ import { describe, expect, it } from "vitest";
 import { grantableWorkstreams } from "./grantableWorkstreams";
 
 /**
- * The admin access picker carried its own hardcoded copy of the workstream list, and
- * it had drifted from the catalog in BOTH directions. Measured against the live
- * catalog (api.snapshot_catalog.load_catalog) on 2026-09-02:
+ * The admin access picker carried its own hardcoded copy of the workstream list -- a
+ * snapshot of the LEGACY catalog, applied to every organization. Measured 2026-09-02
+ * from the committed catalogs:
  *
- *   workstream_order  billing finance cashiering debt customer_ops meter_ops
- *                     assets field_ops common          <- 9, authoritative
- *   picker offered    ... new_services ...              <- phantom, 0 canvases
- *   picker omitted    assets                            <- 2 canvases, ungrantable
+ *   catalog_dbt.json     ... meter_ops ASSETS field_ops common   assets: 2 canvases,
+ *                                                                no new_services
+ *   catalog_cisadm.json  ... customer_ops NEW_SERVICES field_ops new_services: 1,
+ *                                                                no assets
+ *   picker offered       new_services, always
+ *   picker omitted       assets, always
  *
- * The backend filters by exact workstream id (workstream_access.py), so both halves
- * are silent: a group scoped to "New Services" grants nothing at all, and no group
- * scoped to specific workstreams could ever include Device Asset or Asset Location.
- * That is the access-grant half of making assets its own data set.
+ * So for a dbt org it offered a workstream that grants nothing there and hid one that
+ * grants two canvases; for a legacy org it was right by accident. The backend filters
+ * by exact workstream id (workstream_access.py), so both halves are silent: a group
+ * scoped to "New Services" at a dbt org grants nothing at all, and no scoped group
+ * could ever include Device Asset or Asset Location.
  *
- * workstream_labels is NOT the source of truth -- it still carries a new_services
- * label. Only workstream_order says what exists.
+ * Deriving PER ORGANIZATION is the point -- one hardcoded list cannot be correct for
+ * both deployment shapes at once, however carefully it is maintained.
+ *
+ * workstream_labels is NOT the source of truth: it carries labels for workstreams a
+ * given catalog does not order. Only workstream_order says what exists here.
  */
 const CATALOG_ORDER = [
   "billing",
