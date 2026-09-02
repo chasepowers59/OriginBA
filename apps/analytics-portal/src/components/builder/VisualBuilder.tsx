@@ -525,6 +525,8 @@ function FilterValuePicker({
 }) {
   const [values, setValues] = useState<string[] | null>(null);
   const [failed, setFailed] = useState(false);
+  // Why the list is unavailable, when the API declined rather than errored.
+  const [declined, setDeclined] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -532,7 +534,11 @@ function FilterValuePicker({
     setFailed(false);
     fetchScopeOptions(snapshotId, field)
       .then((r) => {
-        if (active) setValues(r.values ?? []);
+        if (!active) return;
+        // enumerable === false means the canvas is too large to list values from;
+        // absent means an older API, which always enumerated.
+        setDeclined(r.enumerable === false ? r.reason ?? "Too many rows to list values." : null);
+        setValues(r.values ?? []);
       })
       .catch(() => {
         if (active) setFailed(true);
@@ -542,12 +548,17 @@ function FilterValuePicker({
     };
   }, [snapshotId, field]);
 
-  if (failed || (values && values.length === 0)) {
+  // Free text when the list is unavailable — because the fetch failed, because the
+  // column has no values, or because the canvas is too large to list from. The filter
+  // works identically either way; only the convenience of picking is lost. `title`
+  // carries the reason so declining is explained rather than mysterious.
+  if (declined || failed || (values && values.length === 0)) {
     return (
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="= value"
+        title={declined ?? undefined}
         className="w-24 rounded bg-transparent text-[10px]"
         style={{ color: "var(--chart-4)" }}
       />

@@ -80,6 +80,50 @@ def _qualified(snapshot: dict, organization_id: str | None = None) -> str:
     return f"{schema}.{table.upper()}"
 
 
+# Above this, the filter value picker declines to enumerate and the caller falls back
+# to free text. Measured on originba_v2_demo25: SELECT DISTINCT over a canvas costs
+# roughly linearly with rows -- 46,661 -> 42 ms, 748,848 -> 139 ms, 3,565,096 -> 608 ms
+# -- so a 35M-row client fact lands near six seconds for a dropdown. The threshold sits
+# between the last two: dimensions keep their picker, facts do not. This is not an index
+# problem: the catalog declares no scope_filters, so the picker is offered on any of
+# 1,107 dimension columns and there is nothing bounded to index.
+SCOPE_ENUMERATION_MAX_ROWS = 1_000_000
+
+
+def can_enumerate_values(row_estimate: Any) -> bool:
+    """Whether a DISTINCT over this table is cheap enough to sit on the UI path.
+
+    An unknown estimate is ATTEMPTED, not refused: a table nothing has analyzed yet
+    reports none, and refusing would break every picker on a fresh database before the
+    first ANALYZE lands.
+    """
+    try:
+        rows = int(row_estimate)
+    except (TypeError, ValueError):
+        return True
+    return rows <= SCOPE_ENUMERATION_MAX_ROWS if rows > 0 else True
+
+
+def _row_estimate(snapshot: dict, organization_id: str) -> int | None:
+    """The table's row count FROM STATISTICS -- never count(*), which is the scan this
+    exists to avoid. None when the database has no estimate to give."""
+    _, dialect, schema = snapshot_backend(snapshot, organization_id)
+    table = snapshot["table_name"]
+    try:
+        if dialect == "postgres":
+            sql = "SELECT reltuples::bigint FROM pg_class WHERE oid = to_regclass(%(rel)s)"
+            binds = {"rel": f'{schema}."{table}"'}
+        else:
+            sql = "SELECT num_rows FROM all_tables WHERE owner = :owner AND table_name = :tbl"
+            binds = {"owner": schema.upper(), "tbl": table.upper()}
+        _, rows = _run(snapshot, sql, binds, organization_id=organization_id, max_rows=1)
+    except Exception:
+        # An estimate is an optimisation, never a gate: if it cannot be read, the
+        # picker behaves exactly as it did before this existed.
+        return None
+    return rows[0][0] if rows and rows[0] and rows[0][0] is not None else None
+
+
 def _default_date_filter(snapshot: dict[str, Any]) -> FilterRequest | None:
     field = snapshot.get("required_date_field")
     if not field:
@@ -357,6 +401,26 @@ def snapshot_scope_options(
             raise HTTPException(status_code=400, detail=f"Scope filter not allowed: {field_id}")
 
 
+    # Decline BEFORE scanning. A DISTINCT over a fact table costs ~600 ms at 3.5M rows
+    # and ~6 s at a 35M-row client, on the path a user takes to add one filter pill.
+    # Declining is instant and honest; sampling the table would quietly change what the
+    # list means.
+    estimate = _row_estimate(snapshot, org_id)
+    if not can_enumerate_values(estimate):
+        return {
+            "client": org_id,
+            "organization_id": org_id,
+            "snapshot_id": snapshot_id,
+            "field": field,
+            "label": allowed_scope.get(field, {}).get("label", field),
+            "values": [],
+            "enumerable": False,
+            "reason": (
+                f"{int(estimate):,} rows — too many to list values from. "
+                f"Type the value instead."
+            ),
+        }
+
     if is_warehouse(snapshot):
         col = f'"{field}"'
         sql = (f"SELECT DISTINCT {col} AS val FROM {_qualified(snapshot, org_id)} "
@@ -383,6 +447,7 @@ def snapshot_scope_options(
         "field": field,
         "label": allowed_scope.get(field, {}).get("label", field),
         "values": values,
+        "enumerable": True,
     }
 
 

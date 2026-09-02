@@ -145,6 +145,14 @@ export type ScopeOptionsResponse = {
   field: string;
   label: string;
   values: string[];
+  /**
+   * False when the canvas is too large to list values from — a DISTINCT over a fact
+   * table is ~600ms at 3.5M rows and ~6s at 35M, on the path to adding one filter.
+   * The caller shows the free-text input instead. Absent on an older API: treat as
+   * enumerable, which is what it was.
+   */
+  enumerable?: boolean;
+  reason?: string;
 };
 
 export type SnapshotMetadata = {
