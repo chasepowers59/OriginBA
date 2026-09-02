@@ -198,6 +198,22 @@ failure for the SIBLING field: "Auto-picking its first date column and forcing a
 on it silently emptied results". `required_date_field` was fixed by setting it to None;
 `default_date_field` kept the naive pick.
 
+**It is load-bearing in five places, not just the builder's filter shelf.**
+`report_schedules` windows a scheduled EMAIL on it, `tileDateField` gives a dashboard
+tile its time axis, `kpi_runner` and `nlq_metrics` window their metrics, and
+`dateScope` sets the builder's scope. Measured consequence on demo25, a 90-day window:
+
+    rpt_device_asset      old field 0 rows      new field 93 of 1,282
+    rpt_field_activity    old field 0 rows      new field 54 of   330
+
+Zero. Four NLQ metrics (new_service_agreements, never_registered_devices,
+meterless_service_points, open_todos) declare no date_field of their own and are not
+windowless, so they returned 0 unconditionally whatever the data said. The executive
+KPIs escaped only because they carry explicit overrides — `total_customers` is
+`windowless: True`, `bills_completed` and `field_activities` name "Created Date/Time".
+Those overrides were needed BECAUSE the default was wrong: per-KPI patches for a
+catalog-level defect.
+
 Fixing it needs population data the catalog generator does not have. The clean route:
 `build_data_dictionary` already reads the built warehouse and already chooses each
 canvas's date column for the index — have it choose by measured population and write
