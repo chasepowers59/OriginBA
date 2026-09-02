@@ -163,6 +163,22 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
    shows its first — "choose value…" over a live `WHERE` returning 0 rows. Any picker
    backed by a capped list must admit its current value.
 
+10. **A fixed-width child that never yields.** Both responsive failures found were this:
+    `/database`'s 288px `w-72 shrink-0` sidebar left ~55px for the editor at 375px (the
+    placeholder wrapped to one character per line, "Results" clipped to "Resu"), and
+    `/explore`'s grid item defaulted to `min-width:auto` so one wide child sized the
+    column to 860px and scrolled the whole PAGE sideways. Fixes: stack below a
+    breakpoint, and `min-w-0` on every flex/grid child that holds wide content — the
+    codebase already uses `flex min-w-0 flex-1` for exactly this.
+    Related: `flex-1` on a `flex-wrap` row is `flex-basis: 0`, so the child collapses
+    beside its siblings instead of wrapping — use `basis-full sm:basis-0 sm:flex-1`.
+    **Test it by measuring, not looking**: `document.body.scrollWidth > clientWidth`
+    catches the page-level failure, and an element wider than the viewport is only OK
+    if an ancestor's `overflow-x` is auto/scroll AND `scrollWidth > clientWidth` — the
+    DQ tables pass that (946px reachable inside 293px), a clipped panel does not.
+    Layout-dependent copy is part of this: "from the left panel" was wrong once the
+    panel stacked above.
+
 **Shared rules beat mirrored ones.** buildRequest and saveView each decided which
 filters were "live"; only one of them existed, so the saved view was not the view that
 ran. When two code paths must agree about the same thing, give them one function

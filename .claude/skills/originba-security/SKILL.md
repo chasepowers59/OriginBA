@@ -61,6 +61,20 @@ dropdown. Evidence and reasoning: `tests/test_admin_org_isolation.py`.
    the same shape would be a bug anywhere else it appears.)
 8. **Real client data never enters git.** Slice files and `docs/screenshots/` are
    gitignored; no hook enforces it, so `git add -f` is the standing risk.
+9. **A secret with a default is a published secret.** `bootstrap_admin_password()`
+   defaulted to a literal beside a default admin email, and `.env.example` documented
+   that same literal — every deployment that skipped the variable shipped an admin
+   login readable in this repo, and `must_change_password` does not save it (the
+   intruder authenticates, changes the password, locks the operator out). RAISE, as
+   `PORTAL_AUTH_SECRET` does. Fixed 2026-09-02, `tests/test_bootstrap_security.py`.
+10. **Pin algorithms by allowlist, not by default.** `jwt_algorithm()` passed straight
+   into `decode(algorithms=[...])`, so `PORTAL_AUTH_ALGORITHM=none` would have accepted
+   UNSIGNED tokens. Anything outside HS256/384/512 now falls back rather than being
+   trusted because it was configured. This file previously claimed it was pinned.
+11. **An invariant enforced in the service layer is not enforced.** Bootstrap built the
+   `User` model directly, so it created the org-bound admin that
+   `_validate_organization_id` forbids. When you add a rule, grep for every writer that
+   bypasses the function holding it.
 
 ## What the fences must block (test these, not just the happy path)
 
