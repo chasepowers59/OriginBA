@@ -53,6 +53,7 @@ sys.path.insert(0, str(ROOT))
 
 os.environ.setdefault("PORTAL_AUTH_DISABLED", "false")
 os.environ.setdefault("PORTAL_AUTH_DATABASE_URL", "sqlite:///:memory:")
+os.environ.setdefault("PORTAL_BOOTSTRAP_ADMIN_PASSWORD", "test-bootstrap-admin-pw")
 
 from api.auth.bootstrap import init_auth_database  # noqa: E402
 from api.auth.database import get_session_factory  # noqa: E402

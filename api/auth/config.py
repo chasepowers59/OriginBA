@@ -31,12 +31,23 @@ def jwt_secret() -> str:
     return secret
 
 
+# Pinned, not merely defaulted. decode() is called with algorithms=[jwt_algorithm()],
+# so an env value of "none" would have made it accept UNSIGNED tokens. Anything outside
+# this set falls back to HS256 rather than being trusted because it was configured.
+_ALLOWED_JWT_ALGORITHMS = frozenset({"HS256", "HS384", "HS512"})
+
+
 def jwt_algorithm() -> str:
-    return os.getenv("PORTAL_AUTH_ALGORITHM", "HS256")
+    requested = os.getenv("PORTAL_AUTH_ALGORITHM", "HS256").strip()
+    return requested if requested in _ALLOWED_JWT_ALGORITHMS else "HS256"
 
 
 def access_token_minutes() -> int:
     return int(os.getenv("PORTAL_AUTH_ACCESS_MINUTES", "480"))
+
+
+class BootstrapError(RuntimeError):
+    """Refusing to create the first admin with a credential anyone can read."""
 
 
 def bootstrap_admin_email() -> str:
@@ -44,4 +55,19 @@ def bootstrap_admin_email() -> str:
 
 
 def bootstrap_admin_password() -> str:
-    return os.getenv("PORTAL_BOOTSTRAP_ADMIN_PASSWORD", "ChangeMe-Admin-1!")
+    """The first admin's password. There is deliberately NO default.
+
+    A literal here is a published credential: the email defaults to a known value too,
+    so any deployment that skipped this variable had an admin login readable in this
+    repository. must_change_password does not save it — the intruder authenticates,
+    changes the password, and locks the operator out. PORTAL_AUTH_SECRET already
+    establishes the pattern of refusing to start rather than defaulting a secret.
+    """
+    password = os.getenv("PORTAL_BOOTSTRAP_ADMIN_PASSWORD", "")
+    if len(password.strip()) < 12:
+        raise BootstrapError(
+            "PORTAL_BOOTSTRAP_ADMIN_PASSWORD must be set (min 12 chars) to create the "
+            "first admin account. There is no default: one would be a published "
+            "credential. Set PORTAL_AUTH_DISABLED=true for local open access."
+        )
+    return password

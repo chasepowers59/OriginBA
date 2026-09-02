@@ -55,7 +55,12 @@ def init_auth_database() -> None:
             password_hash=hash_password(bootstrap_admin_password()),
             role="admin",
             client_id=client_id,
-            organization_id="demo",
+            # An admin administers every client and carries no organization of its own.
+            # 'demo' here created exactly the account _validate_organization_id refuses,
+            # bypassing that check by building the model directly — so the one account
+            # every deployment starts with was the one shape that is not allowed.
+            # See tests/test_admin_org_isolation.py.
+            organization_id=None,
             is_active=True,
             must_change_password=True,
         )

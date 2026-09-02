@@ -24,6 +24,7 @@ _AUTH_DB.close()
 os.environ["PORTAL_AUTH_DATABASE_URL"] = f"sqlite:///{_AUTH_DB.name}"
 os.environ.pop("PORTAL_AUTH_DISABLED", None)
 os.environ["PORTAL_AUTH_SECRET"] = "test-secret-at-least-thirty-two-characters-long"
+os.environ.setdefault("PORTAL_BOOTSTRAP_ADMIN_PASSWORD", "test-bootstrap-admin-pw")
 
 from fastapi import FastAPI  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402

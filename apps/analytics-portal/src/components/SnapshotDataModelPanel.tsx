@@ -7,6 +7,7 @@ import { fieldRoleLabel } from "@/lib/businessLabels";
 import type { FieldDef, SnapshotDataModel, SnapshotMetadata } from "@/lib/types";
 import { cisadmTableGuide } from "@/lib/cisadmTableGuide";
 import { trustedMeasureSet } from "@/lib/trustedMeasures";
+import { formatDateTime } from "@/lib/format";
 
 type ModelTab = "overview" | "tables" | "joins" | "fields";
 
@@ -78,7 +79,7 @@ export function SnapshotDataModelPanel({
           {model.snapshot_table} · grain: {model.grain}
         </p>
         <p className="mt-2 text-xs text-fg-muted">
-          Generated {new Date().toLocaleString()} · {brand.name}
+          Generated {formatDateTime(new Date())} · {brand.name}
         </p>
         <hr className="my-4 border-slate-300" />
       </div>

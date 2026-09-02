@@ -8,6 +8,7 @@ import {
   formatCurrency,
   formatNumber,
   formatPercent,
+  formatDateTime,
 } from "@/lib/format";
 import { EmptyStateIcon } from "@/components/EmptyStateIcon";
 import {
@@ -197,7 +198,7 @@ export function ResultsPanel({
           {scopeLabel ? ` · ${scopeLabel}` : ""}
         </p>
         <p className="mt-1 text-xs text-fg-muted">
-          Generated {new Date().toLocaleString()} · {brand.connection_label}
+          Generated {formatDateTime(new Date())} · {brand.connection_label}
         </p>
         <hr className="my-4 border-slate-300" />
       </div>

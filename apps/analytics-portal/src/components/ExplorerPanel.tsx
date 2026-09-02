@@ -428,7 +428,10 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         />
       ) : null}
       <div className="no-print flex flex-wrap items-center justify-between gap-2">
-        <div className="glass-panel flex-1 p-2">
+        {/* basis-full until sm: `flex-1` alone means flex-basis:0, so on a narrow screen
+            this collapsed to 43px beside its siblings instead of wrapping onto its own
+            line, and the tab labels rendered 16px wide and unreadable. */}
+        <div className="glass-panel basis-full p-2 sm:basis-0 sm:flex-1">
           <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
             {tabOptions.map(([key, label]) => (
               <button
@@ -478,7 +481,9 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         />
       ) : (
         <div className="grid gap-6 xl:grid-cols-[340px_1fr]">
-      <aside className="no-print space-y-4">
+      {/* min-w-0: a grid item defaults to min-width:auto, so one wide child sized this
+          column to 860px in a 375px viewport and scrolled the whole PAGE sideways. */}
+      <aside className="no-print min-w-0 space-y-4">
         <FavoritesPanel compact />
 
         <div className="glass-panel p-4">
@@ -587,7 +592,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         ) : null}
       </aside>
 
-      <main className="space-y-4">
+      <main className="min-w-0 space-y-4">
         {error ? (
           <div className="glass-panel border-over bg-over-bg px-4 py-3 text-sm text-over">
             {error}

@@ -10,6 +10,7 @@ import { DashboardWidget } from "./DashboardWidget";
 import { DashboardControls, type CompareMode } from "./DashboardControls";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { PresentationToolbar } from "./PresentationToolbar";
+import { formatDateTime } from "@/lib/format";
 
 type ExecutiveDashboardProps = {
   variant?: "home" | "full";
@@ -90,7 +91,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
             {summary?.period.label ?? `Last ${days} days`}
             {summary?.refresh?.last_refresh ? (
               <span className="ml-2 text-xs text-fg-muted">
-                · data refreshed {new Date(summary.refresh.last_refresh).toLocaleString()} (
+                · data refreshed {formatDateTime(summary.refresh.last_refresh)} (
                 {summary.refresh.tables.reduce((a, t) => a + t.batch_rows, 0).toLocaleString()}{" "}
                 rows in latest batch)
               </span>

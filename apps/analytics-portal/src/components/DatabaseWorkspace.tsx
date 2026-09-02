@@ -415,9 +415,14 @@ export function DatabaseWorkspace({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1">
+      {/* Stacked until lg. Side by side, the 288px sidebar left ~55px for the editor on
+          a 375px viewport: the placeholder wrapped to one character per line and
+          "Results" clipped to "Resu", so the page's whole purpose was unreachable on a
+          phone. The sidebar is capped in height when stacked so the editor stays above
+          the fold. */}
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {sidebarOpen ? (
-          <aside className="flex w-72 shrink-0 flex-col border-r border-[var(--border)] bg-[var(--surface-subtle)]">
+          <aside className="flex max-h-64 w-full shrink-0 flex-col border-b border-[var(--border)] bg-[var(--surface-subtle)] lg:max-h-none lg:w-72 lg:border-b-0 lg:border-r">
             <div className="flex border-b border-[var(--border)]">
               {(
                 [
@@ -570,7 +575,8 @@ export function DatabaseWorkspace({
               }}
               onKeyDown={handleKeyDown}
               spellCheck={false}
-              placeholder="Pick a starter query from the left panel, or write your own SELECT…"
+              // Not "the left panel": the panel stacks ABOVE the editor below lg.
+              placeholder="Pick a starter query from the Starters panel, or write your own SELECT…"
               rows={8}
               className="w-full resize-y border-0 bg-[var(--surface-input)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none"
               style={{ minHeight: "120px", maxHeight: "34vh" }}

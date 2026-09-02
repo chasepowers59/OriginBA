@@ -7,6 +7,7 @@ import { grantableWorkstreams, type GrantableWorkstream } from "@/lib/grantableW
 import { organizationForRole, rolePatch } from "@/lib/adminOrgBinding";
 import { auditActionLabel } from "@/lib/auditLabels";
 import { groupDeletionWarning } from "@/lib/groupDeletion";
+import { formatDateTime } from "@/lib/format";
 import type { AccessGroup, AuthUser, PortalOrganization } from "@/lib/auth";
 import {
   createAccessGroup,
@@ -516,7 +517,7 @@ export function AdminAccessPanel() {
                 </p>
                 <p className="text-xs portal-text-subtle">
                   {event.actor_email}
-                  {event.created_at ? ` · ${new Date(event.created_at).toLocaleString()}` : ""}
+                  {event.created_at ? ` · ${formatDateTime(event.created_at)}` : ""}
                 </p>
               </li>
             ))
