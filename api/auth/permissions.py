@@ -57,7 +57,17 @@ def permissions_for_role(role: str) -> set[str]:
 
 
 def role_at_least(role: str, minimum: str) -> bool:
-    return ROLE_RANK.get(role, 0) >= ROLE_RANK.get(minimum, 0)
+    """Whether `role` satisfies a requirement of `minimum`.
+
+    The MINIMUM used to default to rank 0 when unrecognised, so a misspelled
+    requirement ("adminn", "owner") admitted every caller -- while an unrecognised
+    ACTOR role already failed closed. The two directions disagreed, and the open one is
+    the one that matters. An unknown requirement is now unsatisfiable.
+    """
+    required = ROLE_RANK.get(minimum)
+    if required is None:
+        return False
+    return ROLE_RANK.get(role, 0) >= required
 
 
 def can_assign_role(actor_role: str, target_role: str) -> bool:

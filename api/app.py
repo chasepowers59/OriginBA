@@ -27,7 +27,7 @@ from pydantic import BaseModel
 from api.auth import auth_router, init_auth_database
 from api.auth.config import auth_disabled
 from api.auth.dependencies import get_auth_context
-from api.security import is_production
+from api.security import is_development, is_production
 from api.snapshot_explorer import router as snapshot_router
 from api.portal_routes import router as portal_router
 from api.data_source_routes import router as data_source_router
@@ -121,7 +121,9 @@ def _run_nlq(query: str) -> NLQResponse:
 
 @app.get("/health")
 def health() -> dict:
-    if is_production():
+    # Detail requires PROOF of development, not merely the absence of proof of
+    # production: this route takes no auth and the verbose branch names every tenant.
+    if not is_development():
         return {"status": "ok"}
     from api.demo_db import demo_configured
     from api.organizations import dev_organization_id, load_organizations

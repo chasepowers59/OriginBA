@@ -42,8 +42,19 @@ def jwt_algorithm() -> str:
     return requested if requested in _ALLOWED_JWT_ALGORITHMS else "HS256"
 
 
+# Eight hours, and a floor of one minute. A bare int() here raised on any typo INSIDE
+# create_access_token, so a malformed variable 500s every login rather than one; and a
+# 0 or negative lifetime mints tokens that are already expired, which presents to every
+# user at once as "the password is wrong".
+DEFAULT_ACCESS_MINUTES = 480
+
+
 def access_token_minutes() -> int:
-    return int(os.getenv("PORTAL_AUTH_ACCESS_MINUTES", "480"))
+    try:
+        minutes = int(str(os.getenv("PORTAL_AUTH_ACCESS_MINUTES", "")).strip())
+    except (TypeError, ValueError):
+        return DEFAULT_ACCESS_MINUTES
+    return max(1, minutes)
 
 
 class BootstrapError(RuntimeError):

@@ -138,15 +138,26 @@ an unknown org resolves none. `sample-rows` returns 200 and writes its audit row
   blocked. `pg_database` enumerates other clients' database names.
 - **M2** `dblink`, `dblink_connect`, `pg_read_file`, `lo_import`, `pg_sleep` are all
   allowed — the Postgres fence has no function deny-list where the Oracle one does.
-- **M3** `/health` discloses the full client roster unauthenticated, because
-  `ENVIRONMENT` is set in no deployment file so `is_production()` is always False.
+- **M3 FIXED 2026-09-02** `/health` disclosed the full client roster unauthenticated,
+  because `ENVIRONMENT` is set in no deployment file so `is_production()` is always
+  False. The fix is the DIRECTION of the default, not another platform name: detail now
+  requires `is_development()`, affirmative proof, so an unrecognised environment
+  discloses nothing. `tests/test_auth_config_and_catalog.py`.
 - **M4** The audit log has no tenant dimension — rows carry a process-wide
   `client_id`, so an admin's action in one tenant is indistinguishable from another.
-- **M5** Workstream RBAC calls `get_snapshot()` without an org, always hitting the
-  dbt catalog; for a cisadm org every lookup misses and restricted users are denied
-  everything. Fails closed, but is not evaluating the right data.
-- **M6** Scheduled reports and KPI alerts validate recipient *shape* only — a report
-  CSV can be mailed to any external address on a cadence.
+- **M5 FIXED 2026-09-02** Workstream RBAC called `get_snapshot()` without an org,
+  always hitting the dbt catalog; for a cisadm org every lookup missed and restricted
+  users were denied everything, their own grants included. `snapshot_workstream()` now
+  takes the caller's `effective_organization_id()`.
+  `tests/test_snapshot_access_by_shape.py` — note in there: patching
+  `catalog_name_for_org` makes the test pass against the BROKEN code, because it also
+  answers the `organization_id=None` call.
+- **M6 CONTROL ADDED 2026-09-02, still requires configuring** Scheduled reports and
+  KPI alerts validate recipient *shape* only — a report CSV can be mailed to any
+  external address on a cadence. `PORTAL_ALLOWED_RECIPIENT_DOMAINS` now enforces an
+  allow-list (exact domain, so `origin.local` cannot admit
+  `origin.local.attacker.example`) and is INERT until an operator sets it. Setting it
+  per deployment is the remaining work.
 - **M7** `PORTAL_AUTH_DISABLED` yields a full admin with tenant switching and a
   literal dev JWT secret; nothing checks `is_production()` on that path.
 - **M8** The dbt secrets test is name-based (`%micr%`, `%passwd%`…), so a Title-Case
