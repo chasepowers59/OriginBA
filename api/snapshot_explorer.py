@@ -19,6 +19,7 @@ from api.warehouse_db import warehouse_configured
 from api.org_db import require_org_for_data
 from api.query_builder import QueryValidationError, build_query
 from api.raw_sql_validator import RawSqlValidationError, apply_row_cap, validate_raw_sql
+from api.reporting_dates import DEFAULT_WINDOW_DAYS, reporting_today, window_date_field
 from api.executive_dashboard import build_executive_summary
 from api.kpi_runner import COMPARE_MODES
 from api.workstream_dashboard import build_workstream_about, build_workstream_summary
@@ -125,11 +126,23 @@ def _row_estimate(snapshot: dict, organization_id: str) -> int | None:
 
 
 def _default_date_filter(snapshot: dict[str, Any]) -> FilterRequest | None:
-    field = snapshot.get("required_date_field")
+    """The window an unfiltered query falls back to, or None for a canvas with no date.
+
+    This read `required_date_field` alone, which no dbt canvas declares, so the 19
+    legacy snapshots were windowed and the 38 canvases were not. The row cap does not
+    substitute for it: FETCH FIRST applies AFTER GROUP BY, so an unfiltered aggregate
+    reads every row.
+
+    The window bounds the worst case; it is not a speedup on its own. It pays only when
+    selective -- Ellensburg's RPT_GL (6.08M rows, years of history) goes 4,062ms -> 825ms
+    on three months, while demo25's rpt_measurement goes 198ms -> 256ms because its dates
+    are clumped tightly enough that even 7 days holds 35% of the table.
+    """
+    field = window_date_field(snapshot)
     if not field:
         return None
-    end = date.today()
-    start = end - timedelta(days=90)
+    end = reporting_today()
+    start = end - timedelta(days=DEFAULT_WINDOW_DAYS)
     return FilterRequest(field=field, op="between", value=[start.isoformat(), end.isoformat()])
 
 
@@ -604,10 +617,24 @@ def snapshot_query(
     snapshot = _require_snapshot_access(ctx, snapshot_id)
 
     filters = [f.model_dump() for f in body.filters]
-    if not filters and snapshot.get("required_date_field"):
+    # A window the server chose and did not mention is the bug the legacy shape already
+    # had: the caller asked for all time, got a quarter, and only the raw SQL said so.
+    # Applying the same default to 38 more canvases without disclosing it would spread
+    # that rather than fix it, so what we add is reported back and what the CALLER sent
+    # is left alone and never described as ours.
+    applied_window: dict[str, Any] | None = None
+    if not filters:
         default_filter = _default_date_filter(snapshot)
         if default_filter:
             filters = [default_filter.model_dump()]
+            applied_window = {
+                "field": default_filter.field,
+                "days": DEFAULT_WINDOW_DAYS,
+                "start": default_filter.value[0],
+                "end": default_filter.value[1],
+                "note": (f"No filter was set, so this shows the trailing "
+                         f"{DEFAULT_WINDOW_DAYS} days on {default_filter.field}."),
+            }
 
     try:
         # WHICH WORLD THIS SNAPSHOT LIVES IN decides the dialect and the backend. The
@@ -670,4 +697,7 @@ def snapshot_query(
         "rows": serialized_rows,
         "row_count": len(serialized_rows),
         "sql": sql,
+        # None when the caller set their own filters: only a window WE chose is ours to
+        # announce, and labelling the caller's own range as a default would misreport it.
+        "applied_window": applied_window,
     }

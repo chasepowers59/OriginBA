@@ -36,6 +36,7 @@ CLIENTS = {
     "odessa": "ODESSA",
     "odessa_dev": "ODESSA_DEV",
     "demo": "DEMO",
+    "origin_demo": "ORIGIN_DEMO",
     # Production SmartCity clients (read-only; see SMARTCITY_PROD_* in .env).
     "newark_prod": "NEWARK_PROD",
     "fonddulac_prod": "FONDDULAC_PROD",

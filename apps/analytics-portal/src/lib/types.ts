@@ -241,6 +241,18 @@ export type QueryResponse = {
   rows: Record<string, unknown>[];
   row_count: number;
   sql: string;
+  /** Set ONLY when the server chose the window itself, because the request carried no
+   *  filters. An unfiltered aggregate scans the whole canvas — the row cap cannot stop
+   *  it, since FETCH FIRST applies after GROUP BY — so a trailing window is applied.
+   *  Saying so is what keeps it from being a number narrower than the one asked for
+   *  with nothing on screen to explain it. Null whenever the caller filtered. */
+  applied_window?: {
+    field: string;
+    days: number;
+    start: string;
+    end: string;
+    note: string;
+  } | null;
 };
 
 export type DatabaseTableInfo = {

@@ -17,6 +17,7 @@ from typing import Any, Callable
 
 from api.notifications import build_message, clean_recipients, send_message
 from api.org_store import OrgRecordStore
+from api.reporting_dates import window_date_field
 from api.saved_views import list_saved_views
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -186,15 +187,10 @@ def rows_to_csv(columns: list[str], labels: dict[str, str],
     return buf.getvalue()
 
 
-def schedule_date_field(snapshot: dict[str, Any]) -> str | None:
-    """The date a scheduled report should window on.
-
-    `required_date_field` alone was a CISADM-era read: no dbt canvas sets one, so the
-    window was never applied on a canvas-backed org and the subscriber got the whole
-    table while the email said "trailing 30 days". Every canvas declares
-    `default_date_field`; the KPI runner and NLQ metrics already fall back to it.
-    """
-    return snapshot.get("required_date_field") or snapshot.get("default_date_field") or None
+# The rule this module discovered has four callers now -- schedules, the KPI runner, NLQ
+# metrics, and the explorer's default window -- so it lives in reporting_dates beside the
+# window arithmetic. Kept under the name this module's callers already import.
+schedule_date_field = window_date_field
 
 
 def window_sentence(date_field: str | None, window_days: int, as_of: str) -> str:

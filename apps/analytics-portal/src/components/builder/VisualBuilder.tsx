@@ -40,6 +40,7 @@ import { VisualPicker, type VisualChoice } from "./VisualPicker";
 import { shelfDimensions } from "@/lib/builderShelves";
 import { BuilderChart, type ChartSeries } from "./BuilderChart";
 import { QuestionGallery } from "./QuestionGallery";
+import { AppliedWindowNote } from "@/components/AppliedWindowNote";
 
 type ColItem = { field: string; label: string; kind: "dim" | "time"; grain?: string };
 type ValItem = { field: string; label: string; agg: string; trusted: boolean };
@@ -470,6 +471,7 @@ export function VisualBuilder({
                         {result.row_count} rows
                       </span>
                     ) : null}
+                    <AppliedWindowNote result={result} />
                     <button type="button" onClick={saveView} className="btn-ghost text-xs" disabled={!result}>
                       Save view
                     </button>

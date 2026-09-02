@@ -16,10 +16,29 @@ on a UTC server, which is how it survived.
 from __future__ import annotations
 
 from datetime import date, timedelta
+from typing import Any
 
 # Two years. A window is a filter, not an export: a mistyped 99999 should not turn an
 # interactive chart into a whole-warehouse scan.
 MAX_WINDOW_DAYS = 730
+
+# What an unfiltered canvas query falls back to. A quarter is the smallest span that
+# still shows a billing cycle's shape, and it is what the legacy snapshots have always
+# applied -- this is the existing behaviour given one home, not a new policy.
+DEFAULT_WINDOW_DAYS = 90
+
+
+def window_date_field(snapshot: dict[str, Any]) -> str | None:
+    """The date column a window should apply to, or None if the canvas has no date.
+
+    `required_date_field` ALONE is a CISADM-era read: no dbt canvas declares one, so
+    every consumer that checked only that field silently stopped windowing on the 38
+    canvas-backed snapshots while continuing to window the 19 legacy ones. It caused
+    opposite bugs in the two shapes -- a scheduled report emailed the whole table under
+    a "trailing 30 days" heading, and an unfiltered canvas query scanned every row --
+    and it was found and fixed three separate times before this became one function.
+    """
+    return snapshot.get("required_date_field") or snapshot.get("default_date_field") or None
 
 
 def reporting_today() -> date:

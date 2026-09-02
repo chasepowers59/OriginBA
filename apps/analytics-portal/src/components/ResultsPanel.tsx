@@ -20,6 +20,7 @@ import { BuilderChart } from "./builder/BuilderChart";
 import { downloadWorkbook } from "@/lib/exportXlsx";
 import { printCouncilPack } from "@/lib/councilPack";
 import { useBrand } from "@/components/PortalThemeProvider";
+import { AppliedWindowNote } from "@/components/AppliedWindowNote";
 
 type SortDir = "asc" | "desc";
 
@@ -132,6 +133,11 @@ export function ResultsPanel({
               Nothing matched <strong className="text-heading">{ctx.periodLabel}</strong>
               {ctx.dateRange ? ` (${ctx.dateRange[0]} to ${ctx.dateRange[1]})` : ""}.
             </>
+          ) : result.applied_window ? (
+            // "your current filters" is wrong in exactly this case: the reader set
+            // none, and the window is the server's. Blaming filters they never chose
+            // sends them looking for something that is not on screen.
+            <>{result.applied_window.note}</>
           ) : (
             "Nothing matched your current filters."
           )}
@@ -213,6 +219,7 @@ export function ResultsPanel({
             {result.row_count} field values
             {loading ? " · updating…" : ""}
           </p>
+          <AppliedWindowNote result={result} />
         </div>
         <div className="flex gap-2">
           <button
