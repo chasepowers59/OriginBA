@@ -179,6 +179,29 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     Layout-dependent copy is part of this: "from the left panel" was wrong once the
     panel stacked above.
 
+11. **ONE read of a shape-specific field, causing OPPOSITE bugs in the two shapes.**
+    The sharpest form of #1, and the hardest to see, because neither half looks like a
+    bug on its own. `snapshot_explorer` chose its default window from
+    `required_date_field` ALONE — a CISADM-era field no dbt canvas declares. Measured
+    2026-09-02: 19/19 legacy canvases silently applied `BETWEEN today-90 AND today`
+    (asked for all time, got a quarter, and only the returned raw SQL said so), while
+    0/38 dbt canvases applied any window at all (unfiltered aggregate reads every row;
+    the row cap cannot stop it because FETCH FIRST applies AFTER GROUP BY). Reading one
+    file you would conclude the window works; reading the other, that it does not exist.
+    **The fallback had already been written three times** — `kpi_runner`,
+    `nlq_metrics` and `report_schedules` each fall back to `default_date_field`, and
+    `report_schedules`' docstring describes this exact bug — and was never carried to
+    the explorer. When a rule reaches a third caller, move it (`reporting_dates.
+    window_date_field`) instead of fixing the fourth copy later.
+    **A default the server chooses must be RETURNED, not merely applied.** Widening a
+    silent window to 38 more canvases would have spread the legacy bug rather than fix
+    it. The response now carries `applied_window` and one shared `AppliedWindowNote`
+    renders it; a window the CALLER chose is never claimed as ours. The empty state was
+    the strongest case: it said "Nothing matched your current filters" in exactly the
+    situation where the reader had set none — sending them to hunt a filter that was
+    not on screen. That is bug class #3 pointing the other way, and it is worth checking
+    for directly: **copy that blames the reader's input for something the server did.**
+
 **The catalog's `default_date_field` can be a measured-empty column.** It is
 `dates[0]` — the canvas's FIRST date column in field order — and the generator has no
 database access, so it cannot know the column is empty. Measured at Ellensburg
@@ -197,6 +220,15 @@ explaining why — and `build_portal_catalog`'s own comment already describes th
 failure for the SIBLING field: "Auto-picking its first date column and forcing a window
 on it silently emptied results". `required_date_field` was fixed by setting it to None;
 `default_date_field` kept the naive pick.
+
+**FIXED 2026-09-02** in `build_data_dictionary.primary_date_column`: the pick now reads
+`pg_stats.null_frac` and takes the first date column populated on at least 90% of rows,
+falling back to field order when none qualifies. The bar is 90% rather than "more than
+half" so the answer cannot depend on which database the generator ran against —
+RPT_BILL's Window Start Date is 100% null on demo25 and 49.7% null at Ellensburg, so a
+50% bar would accept it at one client and reject it at the other. The same function
+emits the INDEX, so the offered default and the indexed column stay the same column by
+construction. The table above stays: it is the evidence for why the bar exists.
 
 **It is load-bearing in five places, not just the builder's filter shelf.**
 `report_schedules` windows a scheduled EMAIL on it, `tileDateField` gives a dashboard
