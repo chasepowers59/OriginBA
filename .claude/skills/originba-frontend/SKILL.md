@@ -179,6 +179,33 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     Layout-dependent copy is part of this: "from the left panel" was wrong once the
     panel stacked above.
 
+**The catalog's `default_date_field` can be a measured-empty column.** It is
+`dates[0]` — the canvas's FIRST date column in field order — and the generator has no
+database access, so it cannot know the column is empty. Measured at Ellensburg
+2026-09-02:
+
+| canvas               | default_date_field    | rows with a value      |
+| -------------------- | --------------------- | ---------------------- |
+| RPT_CUSTOMER_ACCOUNT | Bill After Date       | 7 of 92,824 (0.008%)   |
+| RPT_DEVICE_ASSET     | Retirement Date/Time  | 184 of 55,082 (0.3%)   |
+| RPT_BILL             | Window Start Date     | 364,382 of 724,762 (50%) — while Bill Date is 99.4% |
+
+Most defaults ARE fine (RPT_PREMISE_SP, RPT_PAY_PLAN, RPT_SERVICE_AGREEMENT,
+RPT_CREDIT_RATING_HISTORY all 100%), so this is a per-canvas defect, not systemic. But a
+user who drags the offered default onto Filters gets a near-empty chart with nothing
+explaining why — and `build_portal_catalog`'s own comment already describes this exact
+failure for the SIBLING field: "Auto-picking its first date column and forcing a window
+on it silently emptied results". `required_date_field` was fixed by setting it to None;
+`default_date_field` kept the naive pick.
+
+Fixing it needs population data the catalog generator does not have. The clean route:
+`build_data_dictionary` already reads the built warehouse and already chooses each
+canvas's date column for the index — have it choose by measured population and write
+that into `_reporting.yml`, which the catalog then reads. That keeps the index column
+and the UI default the same column by construction, which is the property the index
+derivation already depends on. PRODUCT-VISIBLE (it changes which date the UI offers
+first, and which column gets indexed), so decide before doing.
+
 **Dead-code sweeps need three guards, learned the hard way.** (1) `grep --include=*.ts`
 inside zsh globs the pattern before grep sees it and reports EVERY module as unimported.
 (2) An import-graph scan that ignores `await import("./x")` calls live code dead — that
