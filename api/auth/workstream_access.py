@@ -1,4 +1,15 @@
-"""Filter catalog navigation by user workstream access groups."""
+"""Filter catalog navigation by user workstream access groups.
+
+ONE rule decides access and it lives in service.workstreams_allowed: an empty grant or
+"*" means every workstream, anything else is a membership test. Every filter here
+delegates to it rather than re-deciding, because the half that re-decided disagreed on
+the empty case and would have returned an empty portal to a user the permission check
+had just approved (tests/test_workstream_filter_agreement.py).
+
+The `if "*" in ctx.workstreams: return ...` lines are a fast path, not a second rule --
+the fall-through delegates and handles empty correctly. Do not "fix" them into
+membership tests.
+"""
 
 from __future__ import annotations
 

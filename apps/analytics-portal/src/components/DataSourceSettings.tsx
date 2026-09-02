@@ -16,6 +16,7 @@ const SOURCE_LABELS: Record<DataSourceStatus["source"], string> = {
   portal_vault: "Portal vault (encrypted on server)",
   portal_memory: "Portal session (in-memory until API restart)",
   environment: "Server environment (.env)",
+  warehouse: "dbt warehouse (WAREHOUSE_DATABASE_URL)",
   none: "Not configured",
 };
 

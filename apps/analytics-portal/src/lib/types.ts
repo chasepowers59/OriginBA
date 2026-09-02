@@ -1,6 +1,8 @@
 export type DataSourceStatus = {
   configured: boolean;
-  source: "portal_vault" | "portal_memory" | "environment" | "none";
+  /** "warehouse" = a dbt org reading WAREHOUSE_DATABASE_URL; no Oracle connection
+   *  to manage, so the page offers none. */
+  source: "portal_vault" | "portal_memory" | "environment" | "warehouse" | "none";
   organization_id?: string;
   user_masked: string | null;
   dsn_masked: string | null;
