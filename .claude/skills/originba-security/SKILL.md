@@ -89,6 +89,35 @@ Oracle: `ALL_TABLES`/`DBA_*`/`V$*`/`SYS.*`, other schemas, `@dblink`, `UTL_HTTP`
 `validate_oracle_reporting_scope` (in-database, CISADM + ORIGINBA_REPORTING) and
 `validate_oracle_cisadm_scope` (legacy, CISADM only).
 
+## An authorization check that resolved against the WRONG CATALOG (2026-09-02)
+
+Fixed, and worth carrying as a shape rather than an incident, because the isolation
+model has two catalogs behind it and only one is the development default.
+
+`snapshot_workstream()` called `get_snapshot()` with **no organization_id**, and
+`catalog_name_for_org(None)` returns `"dbt"`. So every workstream authorization lookup
+resolved against the dbt catalog whichever org the caller was in. The two shapes share
+no snapshot ids (`rpt_financial_txn` against `FT_RPT_CURR`), so on the **six legacy
+orgs** the lookup missed, returned `""`, and `workstreams_allowed(["finance"], "")` is
+False. A user granted `finance` was refused `FT_RPT_CURR` — which declares
+`workstream: finance` — and through `filter_nlq_metrics_for_auth` /
+`filter_dashboard_for_auth` their metrics and tiles filtered to **empty in silence**,
+reading as a broken portal rather than a denial.
+
+It failed CLOSED — a lockout, not a leak. What kept it invisible is the part to
+remember: the dev org is a dbt org, and **`"*"` and an empty grant both mean full
+access and never reach the workstream comparison at all**, so the two configurations
+we develop against cannot see it. When auditing an authz path here, exercise it with a
+RESTRICTED grant on a LEGACY org; a full-grant pass proves nothing.
+
+**The obvious mock hides it.** My first test patched `catalog_name_for_org` and PASSED
+against the broken code, because that patch answers `"cisadm"` for the
+`organization_id=None` call too — silently supplying the argument whose absence is the
+entire defect. Patch the org REGISTRY (`api.organizations.get_organization`) instead,
+so `catalog_name_for_org(None)` still answers `"dbt"` as in production. See
+`tests/test_snapshot_access_by_shape.py`; neither `assert_snapshot_access` nor
+`assert_workstream_access` was named in ANY test before it.
+
 ## Audited findings (2026-09-01)
 
 **CRITICAL — all four FIXED the same day**, each test-first:
