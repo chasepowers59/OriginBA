@@ -39,7 +39,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
 
   return (
     <div className="no-print glass-panel relative animate-slide-up overflow-hidden p-6">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary via-transparent to-accent-2" />
+      <div className="pointer-events-none absolute inset-0 tint-header" />
       <div className="relative flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="max-w-2xl">
           <div className="mb-2 flex flex-wrap items-center gap-2">

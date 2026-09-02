@@ -112,7 +112,7 @@ export function SnapshotDataModelPanel({
               onClick={() => setTab(key)}
               className={`rounded-xl px-2 py-2.5 text-xs font-medium transition sm:text-sm ${
  tab === key
- ? "bg-gradient-to-r from-primary to-accent-2 text-heading ring-1 ring-edge"
+ ? "tint-active text-heading ring-1 ring-edge"
  : "text-fg-muted hover:bg-chip hover:text-heading"
  }`}
             >
@@ -313,7 +313,7 @@ function JoinsTab({ model, onPrint }: { model: SnapshotDataModel; onPrint?: () =
         ) : null}
       </div>
       <div className="relative space-y-3">
-        <div className="absolute bottom-4 left-5 top-4 w-px bg-gradient-to-b from-primary to-accent-2" />
+        <div className="absolute bottom-4 left-5 top-4 w-px tint-rule" />
         {model.driving_table ? (
           <div className="relative pl-12">
             <span className="absolute left-3 top-4 h-4 w-4 rounded-full bg-ok ring-4 ring-ok" />

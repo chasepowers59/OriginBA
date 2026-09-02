@@ -241,7 +241,7 @@ export function ResultsPanel({
       ) : null}
 
       {insight ? (
-        <div className="rounded-xl border border-edge bg-gradient-to-r from-primary to-accent-2 px-4 py-3 text-sm text-heading">
+        <div className="rounded-xl border border-edge tint-panel px-4 py-3 text-sm text-heading">
           <span className="font-medium text-heading">{insight.label}</span> leads this view at{" "}
           <span className="font-semibold text-primary">{formatPercent(insight.share)}</span> of the
           total ({formatMeasure(insight.topValue)}).
@@ -356,7 +356,7 @@ function KpiCard({
     <div
       className={`rounded-xl border px-4 py-3 ${
  highlight
- ? "border-edge bg-gradient-to-br from-primary to-accent-2"
+ ? "border-edge tint-panel-br"
  : "border-edge-subtle bg-surface-subtle"
  }`}
     >

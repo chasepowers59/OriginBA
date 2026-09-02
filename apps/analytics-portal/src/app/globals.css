@@ -51,6 +51,15 @@
   --chart-selected: #a85e00;
   --accent: var(--primary);
   --accent-2: var(--brand-blue-3);
+  /* The accent gradient carries button text, and the client brand config can set any
+     accent, so PortalThemeProvider overwrites these three with a pair constrained to
+     AA against --on-accent (see lib/accentContrast.ts). These static values are the
+     first-paint / config-failure fallback: white on #006fac is 5.43:1, on #004b86
+     8.93:1, so this column needs no constraining. --accent itself stays the true brand
+     colour for decoration -- glows, shadows, focus rings -- which carries no text. */
+  --accent-readable: var(--primary);
+  --accent-readable-2: var(--brand-blue-3);
+  --on-accent: #ffffff;
   --brand: var(--primary);
   --brand-navy: #16283c;
 
@@ -127,14 +136,28 @@
   --chart-selected: #f0b429;
   --accent: var(--primary);
   --accent-2: var(--brand-blue-3);
+  /* Dark's own accents are the bright end of the ramp, so white fails here where it
+     passed in light: 2.29:1 on #6bb2ea, 4.59:1 on #1a7bb9. The readable pair flips to
+     ink and lifts the darker stop to #5c8fc1 -- 6.78:1 and 4.55:1 -- which is the
+     conventional dark-theme treatment anyway: dark label on a bright accent. */
+  --accent-readable: var(--primary);
+  --accent-readable-2: #5c8fc1;
+  /* The literal ink, NOT var(--neutral-6): the dark ramp is inverted (--neutral-0 is
+     #0b1723), so neutral-6 here is the near-white end and would put light text on a
+     light button. This matches INK in lib/accentContrast.ts. */
+  --on-accent: #1b2530;
   --brand: var(--primary);
   --brand-navy: #16283c;
 
   /* ── Derived ── */
   /* neutral-3 is 3.01:1 on the dark ground — the same small-text failure as the light
-     column. neutral-4 is 5.36:1 and still clearly below muted (#a4acb4), so the third
-     text level survives here without a mix. */
-  --foreground-subtle: var(--neutral-4);
+     column. neutral-4 clears the ground at 5.36:1, but the ground is not the only
+     surface this role lands on: on --muted (#212c39) it is 4.20:1, which is what the
+     10px grain lines under every report card on /reports were rendering at. Lifted to
+     the value that clears AA on the LIGHTEST surface it sits on — 4.52:1 on --muted,
+     5.27:1 on --card, 5.78:1 on the ground — while staying well below muted (#a4acb4,
+     luminance .407 vs .286), so the third text level survives. */
+  --foreground-subtle: #88939e;
   --foreground-muted: var(--muted-foreground);
   --accent-muted: var(--primary);
   --surface: var(--card);
@@ -246,18 +269,64 @@ body {
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition disabled:cursor-not-allowed disabled:opacity-50;
-    background: linear-gradient(to right, var(--accent), var(--accent-2));
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold shadow-lg transition disabled:cursor-not-allowed disabled:opacity-50;
+    background: linear-gradient(to right, var(--accent-readable), var(--accent-readable-2));
+    color: var(--on-accent);
     box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--accent) 25%, transparent);
   }
 
   .btn-primary:hover {
-    filter: brightness(1.08);
+    /* Brightening lifts the light stop back over the contrast limit the readable pair
+       was chosen to sit under, so hover changes elevation, not luminance. */
+    box-shadow: 0 14px 30px -6px color-mix(in srgb, var(--accent) 38%, transparent);
   }
 
   .brand-logo {
-    background: linear-gradient(to bottom right, var(--accent), var(--accent-2));
+    background: linear-gradient(to bottom right, var(--accent-readable), var(--accent-readable-2));
+    color: var(--on-accent);
     box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+
+  /* Accent WASHES, not accent fills. Soul Palette V2.1 rewrote the reference app's
+     translucent tints (from-sky-500/10, /20, /40) onto token colours, and Tailwind
+     silently drops an opacity modifier it cannot apply to a raw var() -- so every one
+     of them became fully opaque and buried its own text: text-primary sat on the
+     from-primary stop at 1.00:1. color-mix keeps the weight the design asked for, and
+     these compose over whatever surface they sit on, exactly as the /10 versions did. */
+  .tint-panel,
+  .tint-panel-br,
+  .tint-active {
+    background-image: linear-gradient(
+      var(--tint-angle, to right),
+      color-mix(in srgb, var(--accent) var(--tint-weight, 10%), transparent),
+      color-mix(in srgb, var(--accent-2) var(--tint-weight, 10%), transparent)
+    );
+  }
+
+  .tint-panel-br {
+    --tint-angle: to bottom right;
+  }
+
+  .tint-active {
+    --tint-weight: 20%;
+  }
+
+  /* Decorative only -- the header wash sits behind the title, and the rule is 1px. */
+  .tint-header {
+    background-image: linear-gradient(
+      to bottom right,
+      color-mix(in srgb, var(--accent) 5%, transparent),
+      transparent,
+      color-mix(in srgb, var(--accent-2) 10%, transparent)
+    );
+  }
+
+  .tint-rule {
+    background-image: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--accent) 40%, transparent),
+      color-mix(in srgb, var(--accent-2) 20%, transparent)
+    );
   }
 
   .btn-ghost {

@@ -25,7 +25,7 @@ export function NlqAnswerCard({ result, days, onPinToDashboard }: NlqAnswerCardP
         : null;
 
   return (
-    <div className="rounded-xl border border-edge bg-gradient-to-br from-primary to-accent-2 p-4">
+    <div className="rounded-xl border border-edge tint-panel-br p-4">
       {result.metric_label ? (
         <p className="text-xs font-semibold uppercase tracking-wide text-primary">
           {result.metric_label}

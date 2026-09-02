@@ -238,7 +238,7 @@ export function WorkstreamSidebar({
                                   })}
                                   className={`block rounded-lg px-2 py-1.5 text-sm transition ${
  active
- ? "bg-gradient-to-r from-primary to-accent-2 text-heading ring-1 ring-edge"
+ ? "tint-active text-heading ring-1 ring-edge"
  : "text-fg-muted hover:bg-chip hover:text-heading"
  }`}
                                 >

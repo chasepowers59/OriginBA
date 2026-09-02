@@ -437,7 +437,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 onClick={() => selectTab(key)}
                 className={`rounded-xl px-2 py-2.5 text-xs font-medium transition sm:text-sm ${
  tab === key
- ? "bg-gradient-to-r from-primary to-accent-2 text-heading ring-1 ring-edge"
+ ? "tint-active text-heading ring-1 ring-edge"
  : "text-fg-muted hover:bg-chip hover:text-heading"
  }`}
               >
