@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { fetchSnapshots } from "@/lib/api";
 import { grantableWorkstreams, type GrantableWorkstream } from "@/lib/grantableWorkstreams";
+import { organizationForRole, rolePatch } from "@/lib/adminOrgBinding";
 import { auditActionLabel } from "@/lib/auditLabels";
 import { groupDeletionWarning } from "@/lib/groupDeletion";
 import type { AccessGroup, AuthUser, PortalOrganization } from "@/lib/auth";
@@ -93,7 +94,7 @@ export function AdminAccessPanel() {
     try {
       await createPortalUser({
         ...newUser,
-        organization_id: newUser.role === "admin" && !newUser.organization_id ? null : newUser.organization_id,
+        organization_id: organizationForRole(newUser.role, newUser.organization_id),
         is_active: true,
       });
       setNewUser({
@@ -182,8 +183,10 @@ export function AdminAccessPanel() {
       <div className="glass-panel p-5">
         <h2 className="text-lg font-semibold portal-heading">Users & roles</h2>
         <p className="mt-1 text-sm portal-text-muted">
-          User = view and run reports. Editor = save views and dashboards. Admin = users, groups, and
-          connection settings. Assign each user to one client environment (CityCorp, Odessa, etc.).
+          User = view and run reports. Editor = save views and dashboards. Assign each of them to
+          one client environment (CityCorp, Odessa, etc.). Admin = users, groups and connection
+          settings across <strong>every</strong> client — an admin is not scoped to one, so use
+          editor for client-scoped access.
         </p>
         <div className="mt-4 overflow-x-auto">
           <table className="min-w-full text-sm">
@@ -206,6 +209,15 @@ export function AdminAccessPanel() {
                   <td className="px-3 py-2">
                     <select
                       value={user.organization_id ?? ""}
+                      // An admin has no client of their own, so there is nothing to
+                      // choose here; offering the list would only compose a request the
+                      // API refuses. Change the role first to bind someone to a client.
+                      disabled={user.role === "admin"}
+                      title={
+                        user.role === "admin"
+                          ? "Admins administer every client. Change the role to bind this account to one."
+                          : undefined
+                      }
                       onChange={(e) =>
                         void runUserUpdate(user.id, {
                           organization_id: e.target.value || null,
@@ -213,7 +225,7 @@ export function AdminAccessPanel() {
                       }
                       className="input-modern min-w-[9rem] py-1 text-xs"
                     >
-                      <option value="">Platform admin</option>
+                      <option value="">{user.role === "admin" ? "All clients" : "Unassigned"}</option>
                       {organizations.map((org) => (
                         <option key={org.id} value={org.id}>
                           {org.display_name}
@@ -225,7 +237,7 @@ export function AdminAccessPanel() {
                     <select
                       value={user.role}
                       disabled={user.id === currentUser?.id}
-                      onChange={(e) => void runUserUpdate(user.id, { role: e.target.value })}
+                      onChange={(e) => void runUserUpdate(user.id, rolePatch(e.target.value))}
                       className="input-modern py-1 text-xs"
                       title={user.id === currentUser?.id ? "You cannot change your own role" : undefined}
                     >
@@ -322,11 +334,14 @@ export function AdminAccessPanel() {
           </select>
           <select
             className="input-modern"
-            value={newUser.organization_id}
+            value={newUser.role === "admin" ? "" : newUser.organization_id}
             onChange={(e) => setNewUser((s) => ({ ...s, organization_id: e.target.value }))}
             required={newUser.role !== "admin"}
+            disabled={newUser.role === "admin"}
           >
-            <option value="">{newUser.role === "admin" ? "Platform admin (all clients)" : "Select organization"}</option>
+            <option value="">
+              {newUser.role === "admin" ? "All clients (admins are not client-scoped)" : "Select organization"}
+            </option>
             {organizations.map((org) => (
               <option key={org.id} value={org.id}>
                 {org.display_name}

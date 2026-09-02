@@ -19,6 +19,17 @@ The caller's organization decides which database answers the query. Admins — a
 only admins — may switch tenants with `X-Organization-Id`; for everyone else the
 header is ignored, never rejected, and never used as a connection detail.
 
+**An admin is a PLATFORM admin and has no organization of their own** (settled and
+enforced 2026-09-02). There is no per-client admin tier: users, access groups and the
+audit log are all filtered by `client_id`, which is ONE value for the whole deployment
+(`load_portal_config()["client_id"]`), so an admin bound to a client would have been a
+deployment-wide superuser wearing that client's name. `_validate_organization_id` now
+refuses the combination on both the create and the promote paths — the promote path
+mattered, because the panel's role dropdown sent `{role}` alone and the old client
+survived. Adding a real client-admin tier means giving `portal_access_groups` and
+`portal_audit_log` an organization first; it is a feature with a schema cost, not a
+dropdown. Evidence and reasoning: `tests/test_admin_org_isolation.py`.
+
 ## The rules
 
 1. **The org comes from the auth context, never the request.** `require_org_for_data(ctx)`
@@ -110,8 +121,10 @@ sensitive has ever been committed.
 
 ## Enforcement gaps to close when you touch this area
 
-- `_resolve_active_organization` — the most isolation-critical function — has ZERO
-  tests. No test anywhere sends `X-Organization-Id`.
+- ~~`_resolve_active_organization` has ZERO tests~~ — CLOSED 2026-09-02 in
+  `tests/test_admin_org_isolation.py`. The control itself was already correct: a
+  non-admin's header is ignored rather than rejected, an unregistered value is
+  discarded, and an unknown role cannot switch. It had no coverage, not a defect.
 - No HTTP-layer cross-org test exists for any resource; the `*_org_scoped` tests
   prove the store filters, not that the route passes the caller's real org.
 - The fence tests now cover C1 and C4, and assert the engine→fence routing. Still
