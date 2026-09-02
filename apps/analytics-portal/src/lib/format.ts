@@ -116,11 +116,6 @@ export function formatDateTime(value: unknown): string {
   });
 }
 
-export function workstreamLabel(key: string): string {
-  // Re-export path kept for compatibility; prefer businessLabels.workstreamDisplayName
-  return key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 export function defaultDateRangeYtd(): [string, string] {
   const end = new Date();
   const start = new Date(end.getFullYear(), 0, 1);

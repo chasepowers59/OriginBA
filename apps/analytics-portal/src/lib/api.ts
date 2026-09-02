@@ -407,17 +407,6 @@ export function fetchSnapshotSampleRows(
   return fetchJson<SampleRowsResponse>(`/snapshots/${snapshotId}/sample-rows?limit=${limit}`);
 }
 
-export function runSnapshotRawSql(
-  snapshotId: string,
-  sql: string,
-  limit = 100,
-): Promise<QueryResponse> {
-  return fetchJson<QueryResponse>(`/snapshots/${snapshotId}/raw-sql`, {
-    method: "POST",
-    body: JSON.stringify({ sql, limit }),
-  });
-}
-
 export function defaultDateRange(days = 90): [string, string] {
   const end = new Date();
   const start = new Date();

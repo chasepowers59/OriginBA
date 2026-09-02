@@ -283,17 +283,6 @@ ORDER BY accounting_dt DESC`,
   },
 ];
 
-export const DATABASE_TEMPLATE_CATEGORIES = [
-  "All",
-  ...Array.from(new Set(DATABASE_QUERY_TEMPLATES.map((t) => t.category))),
-];
-
-// ---------------------------------------------------------------------------
-// WAREHOUSE templates — the dbt reporting canvases (Postgres). Column names are
-// the governed Title-Case contract, verified against output/catalog_dbt.json;
-// never guess a name here, the validator holds queries to the real ones.
-// ---------------------------------------------------------------------------
-
 export const WAREHOUSE_TIPS = [
   "You are querying the CISADM schema — the same tables you know from CIS. Unqualified names resolve there.",
   "Protected columns (MICR_ID, WEB_PASSWD, ALERT_INFO) are blocked, and SELECT * on CI_PAY_TNDR needs an explicit column list.",

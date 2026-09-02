@@ -15,26 +15,6 @@ export function printDashboardPack(title: string, targetId = "dashboard-export-r
   }, 500);
 }
 
-export function exportDashboardCsv(
-  title: string,
-  sections: { name: string; headers: string[]; rows: Record<string, unknown>[] }[],
-): void {
-  const allHeaders = ["Section", ...sections[0]?.headers ?? ["Value"]];
-  const rows: Record<string, unknown>[] = [];
-  for (const section of sections) {
-    for (const row of section.rows) {
-      const out: Record<string, unknown> = { Section: section.name };
-      section.headers.forEach((h) => {
-        out[h] = row[h] ?? row[Object.keys(row).find((k) => k === h) ?? ""] ?? "";
-      });
-      rows.push(out);
-    }
-    rows.push({ Section: "" });
-  }
-  exportRowsCsv(allHeaders, rows, exportFilename(title, "dashboard", "csv"));
-}
-
-/** The Excel pack is a REAL workbook: one sheet per dashboard section, typed values. */
 export function exportDashboardXlsx(
   title: string,
   sections: { name: string; headers: string[]; rows: Record<string, unknown>[] }[],

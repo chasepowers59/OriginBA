@@ -67,23 +67,6 @@ export const AGGREGATION_LABELS: Record<string, string> = {
   max: "Maximum",
 };
 
-/** Chart style labels for end users */
-export const CHART_TYPE_LABELS: Record<string, string> = {
-  bar: "Comparison bars",
-  line: "Trend over time",
-  pie: "Share breakdown",
-  horizontal: "Ranked bars",
-  table: "Data table",
-};
-
-export const DATE_PRESET_LABELS: Record<number, string> = {
-  30: "Last 30 days",
-  90: "Last quarter",
-  180: "Last 6 months",
-  365: "Last 12 months",
-};
-
-/** Snapshot-level business copy (fallback when catalog omits fields) */
 export const SNAPSHOT_BUSINESS: Record<
   string,
   { headline?: string; summary: string; grainDescription: string; dateLabel: string }
@@ -126,10 +109,6 @@ export function workstreamDisplayName(key: string): string {
 
 export function aggregationLabel(agg: string): string {
   return AGGREGATION_LABELS[agg.toLowerCase()] ?? agg;
-}
-
-export function chartTypeLabel(type: string): string {
-  return CHART_TYPE_LABELS[type] ?? type;
 }
 
 export function snapshotSummary(meta: Pick<SnapshotMetadata, "id" | "summary">): string {

@@ -203,16 +203,6 @@ export const DASHBOARD_TEMPLATES: DashboardTemplate[] = [
   },
 ];
 
-export function templatesForWorkstream(workstream: string): DashboardTemplate[] {
-  return DASHBOARD_TEMPLATES.filter((t) => t.workstream === workstream);
-}
-
-// ---------------------------------------------------------------------------
-// WAREHOUSE templates — tiles on the dbt reporting canvases. Every dimension,
-// measure, and date field verified against output/catalog_dbt.json; the page
-// offers a template only when the org's catalog carries all of its snapshots.
-// ---------------------------------------------------------------------------
-
 export const WAREHOUSE_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
   {
     id: "wh_billing_ops",
