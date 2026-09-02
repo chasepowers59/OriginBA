@@ -14,6 +14,7 @@ import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { PresentationToolbar } from "./PresentationToolbar";
 import { WorkstreamHeroLinks } from "./WorkstreamHeroLinks";
 import type { WorkstreamGroup } from "@/lib/types";
+import { CrossFilterBanner } from "@/components/CrossFilterBanner";
 
 function WorkstreamDashboardInner({
   workstreamId,
@@ -159,14 +160,7 @@ function WorkstreamDashboardInner({
       <WorkstreamHeroLinks workstreamId={workstreamId} workstreams={workstreams} />
 
       {filter ? (
-        <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
-          <span>
-            Cross-filter: <strong>{filter.field}</strong> = {filter.value}
-          </span>
-          <button type="button" onClick={clearFilter} className="btn-ghost text-xs">
-            Clear
-          </button>
-        </div>
+        <CrossFilterBanner field={filter.field} value={filter.value} onClear={clearFilter} />
       ) : (
         <p className="text-xs text-fg-muted">Click spark chart bars to cross-filter all tiles.</p>
       )}

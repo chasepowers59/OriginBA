@@ -6,6 +6,7 @@ import {
   WORKSTREAM_LABELS,
   WORKSTREAM_DESCRIPTIONS,
   workstreamDisplayName,
+  prettifyFieldName,
 } from "./businessLabels";
 import { WORKSTREAM_ICONS } from "./workstreamIcons";
 
@@ -84,5 +85,38 @@ describe("workstream label coverage", () => {
 
   it("still prettifies an id it has never seen", () => {
     expect(workstreamDisplayName("brand_new_area")).toBe("Brand New Area");
+  });
+});
+
+describe("prettifyFieldName across BOTH deployment shapes", () => {
+  /**
+   * A field id reaches user-facing copy in two very different forms, because the two
+   * catalogs name columns differently: a dbt canvas field is already a business name
+   * ("Bill Date"), a legacy snapshot's is a database column ("ACCOUNTING_DT"). Copy
+   * that interpolates the id raw therefore looks correct on the dev org and shows a
+   * database column to the six legacy orgs — which is how three cross-filter banners
+   * shipped with `{filter.field}` in them.
+   *
+   * The helper has to be safe in BOTH directions to be usable everywhere: it must
+   * humanise the legacy form AND leave an already-human name untouched.
+   */
+  it("humanises a CISADM column, suffix and all", () => {
+    expect(prettifyFieldName("ACCOUNTING_DT")).toBe("Accounting Date");
+    expect(prettifyFieldName("CUSTOMER_CLASS_CD")).toBe("Customer Class");
+    expect(prettifyFieldName("BILL_AMT")).toBe("Bill Amount");
+    expect(prettifyFieldName("PREM_NBR")).toBe("Prem Number");
+    expect(prettifyFieldName("FREEZE_DTTM")).toBe("Freeze Date/Time");
+  });
+
+  it("leaves an already-human canvas name alone", () => {
+    for (const name of ["Bill Date", "Customer Class", "Service Agreement ID"]) {
+      expect(prettifyFieldName(name)).toBe(name);
+    }
+  });
+
+  it("is idempotent, so passing a prettified name back through is harmless", () => {
+    for (const id of ["ACCOUNTING_DT", "CUSTOMER_CLASS_CD", "Bill Date"]) {
+      expect(prettifyFieldName(prettifyFieldName(id))).toBe(prettifyFieldName(id));
+    }
   });
 });

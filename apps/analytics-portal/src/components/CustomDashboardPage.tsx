@@ -25,6 +25,7 @@ import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { DashboardTile } from "./DashboardTile";
 import { PresentationToolbar } from "./PresentationToolbar";
 import { NotesDialog } from "./NotesDialog";
+import { CrossFilterBanner } from "@/components/CrossFilterBanner";
 
 const SLOTS = [0, 1, 2, 3];
 
@@ -270,14 +271,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       ) : null}
 
       {filter ? (
-        <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
-          <span>
-            Cross-filter: <strong>{filter.field}</strong> = {filter.value}
-          </span>
-          <button type="button" onClick={clearFilter} className="btn-ghost text-xs">
-            Clear
-          </button>
-        </div>
+        <CrossFilterBanner field={filter.field} value={filter.value} onClear={clearFilter} />
       ) : (
         <p className="text-xs text-fg-muted">Click a chart value to cross-filter all tiles.</p>
       )}

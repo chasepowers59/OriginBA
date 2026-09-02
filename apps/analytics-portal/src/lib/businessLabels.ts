@@ -157,19 +157,55 @@ export function buildColumnLabels(
   return labels;
 }
 
+/** Kept upper when a word is one of these; everything else gets Title Case. */
+const ACRONYMS = new Set([
+  "ID", "SA", "SP", "GL", "FT", "BS", "BX", "MC", "SQ", "UOM", "TOU", "AMI", "CIS",
+  "PO", "AR", "QA", "US",
+]);
+
+function capitalize(word: string): string {
+  // Split on "/" so a suffix expansion like "date/time" reads "Date/Time".
+  return word
+    .split("/")
+    .map((part) =>
+      ACRONYMS.has(part.toUpperCase())
+        ? part.toUpperCase()
+        : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
+    )
+    .join("/");
+}
+
+/**
+ * A column identifier as a human would write it.
+ *
+ * This must be safe on BOTH deployment shapes, because it is called on ids from either:
+ * a dbt canvas field is already a business name ("Bill Date"), a legacy snapshot's is a
+ * database column ("ACCOUNTING_DT"), and the SQL workspace passes raw Postgres columns
+ * ("bill_id"). The previous version only upper-cased each word's FIRST letter and never
+ * lowered the rest, so the all-caps legacy form — the one it was written for — came out
+ * shouting: "ACCOUNTING Date", "CUSTOMER CLASS". That is six of the nine orgs, on every
+ * surface that calls this.
+ *
+ * A name that already contains a SPACE was authored for people and is returned
+ * untouched. That is what protects "Service Agreement ID" from being lowered to
+ * "Service Agreement Id" — the reason a blanket toLowerCase is wrong here.
+ */
 export function prettifyFieldName(fieldId: string): string {
+  if (/\s/.test(fieldId)) return fieldId;
   return fieldId
-    .replace(/^FK_/, "")
-    .replace(/_DESC$/, "")
-    .replace(/_FLG$/, " status")
-    .replace(/_CD$/, "")
-    .replace(/_DTTM$/, " date/time")
-    .replace(/_DT$/, " date")
-    .replace(/_AMT$/, " amount")
-    .replace(/_NBR$/, " number")
-    .replace(/_ID$/, "")
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .replace(/^FK_/i, "")
+    .replace(/_DESC$/i, "")
+    .replace(/_FLG$/i, "_status")
+    .replace(/_CD$/i, "")
+    .replace(/_DTTM$/i, "_date/time")
+    .replace(/_DT$/i, "_date")
+    .replace(/_AMT$/i, "_amount")
+    .replace(/_NBR$/i, "_number")
+    .replace(/_ID$/i, "")
+    .split("_")
+    .filter(Boolean)
+    .map(capitalize)
+    .join(" ")
     .trim();
 }
 

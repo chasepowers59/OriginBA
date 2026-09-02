@@ -11,6 +11,7 @@ import { DashboardControls, type CompareMode } from "./DashboardControls";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { PresentationToolbar } from "./PresentationToolbar";
 import { formatDateTime } from "@/lib/format";
+import { CrossFilterBanner } from "@/components/CrossFilterBanner";
 
 type ExecutiveDashboardProps = {
   variant?: "home" | "full";
@@ -130,14 +131,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       </div>
 
       {filter && !isHome ? (
-        <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
-          <span>
-            Cross-filter active: <strong>{filter.field}</strong> = {filter.value}
-          </span>
-          <button type="button" onClick={clearFilter} className="btn-ghost text-xs">
-            Clear
-          </button>
-        </div>
+        <CrossFilterBanner field={filter.field} value={filter.value} onClear={clearFilter} />
       ) : null}
 
       {!summary?.db_configured && !loading ? (
