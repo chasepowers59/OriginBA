@@ -414,6 +414,12 @@ export type SavedView = {
   measure_agg?: string | null;
   /** Multi-measure builder views; singular fields above hold the first measure. */
   measures?: BuilderMeasure[] | null;
+  /**
+   * The scoping the view was saved with. `scope_field`/`scope_value` below hold only
+   * ONE pair and predate the builder's filters shelf; without this array a scoped view
+   * reopened over the whole canvas.
+   */
+  filters?: { field: string; op: string; value: unknown }[] | null;
   chart_type?: string | null;
   date_preset?: string | null;
   date_start?: string | null;

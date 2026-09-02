@@ -47,6 +47,14 @@ class SavedViewCreate(BaseModel):
     dimensions: list[str] | None = None
     measure_field: str | None = None
     measure_agg: str | None = None
+    # The store has always handled `measures`, and the builder has always sent it —
+    # but this schema did not declare it, and Pydantic drops what it does not declare,
+    # so model_dump() handed the store a payload without it. A multi-measure view
+    # reopened with one measure. `filters` was missing end to end, so a scoped view
+    # reopened showing every row. The store-level test could not see either, because
+    # it calls create_saved_view() directly and never crosses this schema.
+    measures: list[dict[str, Any]] | None = None
+    filters: list[dict[str, Any]] | None = None
     chart_type: str | None = None
     date_preset: str | None = None
     date_start: str | None = None

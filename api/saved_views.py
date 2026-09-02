@@ -71,6 +71,10 @@ def create_saved_view(payload: dict[str, Any], *, organization_id: str) -> dict[
         # above stay populated with the first measure for backward compatibility
         # with tiles/readers that predate the array.
         "measures": payload.get("measures"),
+        # The scoping the user applied when they saved. Without it the view reopens
+        # over the whole canvas: different numbers, no warning. scope_field/value
+        # below hold only ONE pair and predate the builder's filters shelf.
+        "filters": payload.get("filters"),
         "chart_type": payload.get("chart_type"),
         "date_preset": payload.get("date_preset"),
         "date_start": payload.get("date_start"),

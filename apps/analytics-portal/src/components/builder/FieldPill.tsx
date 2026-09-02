@@ -3,11 +3,21 @@
 import { useDraggable } from "@dnd-kit/core";
 import type { FieldDef } from "@/lib/types";
 
-const ROLE_GLYPH: Record<string, string> = { dimension: "Abc", measure: "#", date: "📅" };
+// Text glyphs, not emoji. A colour emoji renders in its own palette and ignores the
+// badge colour, so 📅 sat beside "Abc" and "#" in a different hue and stayed illegible
+// at 9px — and the app's marker convention is typographic/geometric throughout.
+const ROLE_GLYPH: Record<string, string> = { dimension: "Abc", measure: "#", date: "YMD" };
+/**
+ * One readable tone, not three series colours. The glyph already says the role
+ * unambiguously, and the palette has no third hue that is BOTH legible as 9px text and
+ * distinct from the other two: chart-3 was 2.86:1 on the light ground, and darkening it
+ * to 4.5 lands 1.2:1 from chart-1 — readable but indistinguishable from the measure
+ * badge. Colour that fails contrast and cannot stay distinct is doing no work.
+ */
 const ROLE_TONE: Record<string, string> = {
-  dimension: "var(--chart-2)",
-  measure: "var(--chart-1)",
-  date: "var(--chart-3)",
+  dimension: "var(--foreground-muted)",
+  measure: "var(--foreground-muted)",
+  date: "var(--foreground-muted)",
 };
 
 /** A draggable column from the data pane. `origin` distinguishes a palette source

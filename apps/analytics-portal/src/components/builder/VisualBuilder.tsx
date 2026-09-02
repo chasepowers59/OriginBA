@@ -25,6 +25,7 @@ import {
   measureDisplaysAsCurrency,
   workstreamDisplayName,
 } from "@/lib/businessLabels";
+import { activeFilters, optionsWithCurrent, restoreFilters } from "@/lib/builderFilters";
 import { formatNumber, formatCellValue } from "@/lib/format";
 import type {
   BuilderQuestion,
@@ -146,11 +147,8 @@ export function VisualBuilder({
       ? vals.map((v) => ({ field: v.field, agg: v.agg }))
       : [{ field: "*", agg: "count" }];
 
-    // A filter whose value hasn't been chosen yet is inert — sending it as `= ''`
-    // would silently return zero rows.
-    const filters = fils
-      .filter((f) => f.role === "date" || String(f.value ?? "") !== "")
-      .map((f) => ({ field: f.field, op: f.op, value: f.value }));
+    // Shared with saveView, so the view that reopens is the view that ran.
+    const filters = activeFilters(fils);
     // Governance mirror: a canvas with a required date field must carry a between
     // filter on it, or the server rejects the query. Auto-add if the user hasn't.
     const req = meta.required_date_field;
@@ -279,6 +277,9 @@ export function VisualBuilder({
             trusted: (m.trusted_measures ?? []).includes(mm.field),
           })),
         );
+        // Restore the scope too. Without this the view reopened over the whole canvas
+        // while its title still described the scoped question.
+        setFils(restoreFilters(v.filters ?? null, m.fields));
         const ct = v.chart_type;
         setVisual(
           (ct === "line" || ct === "pie" || ct === "horizontal" || ct === "area" ||
@@ -326,6 +327,9 @@ export function VisualBuilder({
         measure_field: first.field,
         measure_agg: first.agg,
         measures,
+        // The scoping is part of the view. Saving without it meant reopening over the
+        // whole canvas: different numbers, and nothing said why.
+        filters: activeFilters(fils),
         chart_type: visual,
       });
       setSaved("Saved — find it under Saved views on Home");
@@ -334,7 +338,7 @@ export function VisualBuilder({
       setSaved(`Save failed: ${err instanceof Error && err.message ? err.message : "try again"}`);
       setTimeout(() => setSaved(null), 3500);
     }
-  }, [meta, snapshotId, cols, vals, visual, series]);
+  }, [meta, snapshotId, cols, vals, fils, visual, series]);
 
   const grouped = useMemo(() => {
     const g = new Map<string, SnapshotSummary[]>();
@@ -388,7 +392,10 @@ export function VisualBuilder({
                           value={c.grain}
                           onChange={(e) => setCols((cc) => cc.map((x) => (x.field === c.field ? { ...x, grain: e.target.value } : x)))}
                           className="rounded bg-transparent text-[10px]"
-                          style={{ color: "var(--chart-3)" }}
+                          // The Columns shelf accent, not chart-3: this select lives in
+                          // a Columns pill, and chart-3 is a series fill that reads at
+                          // 2.86:1 as 10px text on the light ground.
+                          style={{ color: "var(--chart-2)" }}
                         >
                           {GRAINS.map((g) => (
                             <option key={g} value={g}>{g}</option>
@@ -553,6 +560,10 @@ function FilterValuePicker({
       </span>
     );
   }
+  // The list is capped at 100, so a restored filter's value is often not in it. A
+  // select whose value matches no option shows "choose value…" while the filter is
+  // still applied — an empty chart with nothing to explain it.
+  const options = optionsWithCurrent(values, value) ?? [];
   return (
     <select
       value={value}
@@ -561,7 +572,7 @@ function FilterValuePicker({
       style={{ color: "var(--chart-4)" }}
     >
       <option value="">choose value…</option>
-      {values.map((v) => (
+      {options.map((v) => (
         <option key={v} value={v}>
           {v}
         </option>
