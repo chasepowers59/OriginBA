@@ -202,6 +202,30 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     not on screen. That is bug class #3 pointing the other way, and it is worth checking
     for directly: **copy that blames the reader's input for something the server did.**
 
+12. **A calendar date derived in UTC.** Found on BOTH sides of the wire, weeks apart,
+    which is what makes it a class rather than an incident. Backend:
+    `report_schedules` ended its window on `datetime.now(timezone.utc).date()` while
+    the other three builders used `date.today()`. Frontend: all three
+    `defaultDateRange*` helpers ended `toISOString().slice(0, 10)` — `new Date()` is
+    local but `toISOString()` converts. Measured under TZ=America/Denver: the end date
+    read 2026-09-03 on 2026-09-02, and **"Prior month" ended 2026-09-01**, including a
+    day of the one month it exists to exclude.
+    These strings filter BUSINESS dates (Bill Date, Accounting Date) — calendar dates
+    in the utility's own timezone, never UTC instants — so local is not merely
+    consistent, it is the correct basis. **Invisible on a UTC machine**, which is how
+    both survived; test with `TZ=America/Denver`, and for the constructed-midnight half
+    (`new Date(y, 0, 1)` converts BACK a day east of UTC, so YTD starts in the prior
+    year) with `TZ=Australia/Sydney`. `process.env.TZ` does take effect mid-process in
+    this Node, so such a test is real rather than vacuous — verify that before trusting
+    one. One home each: `api/reporting_dates.py`, `format.ts`'s `localIsoDate`.
+
+**How three of these were found: a widely-used export with no test.** Enumerate
+`export function` in `lib/`, count references across the app, and subtract anything
+named in a `.test.ts`. 44 exports had 3+ uses and no test. That list is where
+`prettifyFieldName` (broken for the six legacy orgs it was written for) and the three
+UTC date builders came from — and `businessLabels.test.ts` already EXISTED, covering
+only the workstream lists, so "there is a test file" proves nothing about a function.
+
 **The catalog's `default_date_field` can be a measured-empty column.** It is
 `dates[0]` — the canvas's FIRST date column in field order — and the generator has no
 database access, so it cannot know the column is empty. Measured at Ellensburg
