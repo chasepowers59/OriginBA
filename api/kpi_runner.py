@@ -8,6 +8,7 @@ from typing import Any
 
 from api.demo_db import execute_query
 from api.query_builder import QueryValidationError, build_query
+from api.reporting_dates import window_date_field
 from api.snapshot_catalog import allowed_fields, get_snapshot, snapshot_backend
 
 
@@ -327,10 +328,11 @@ def execute_kpi_definition(
         # required_date_field); a WINDOWLESS KPI (stock metric: total customers, AR
         # balance) skips the window and the period comparison entirely.
         windowless = bool(kpi.get("windowless"))
+        # The KPI's own override first, then the ONE shared rule. That
+        # required-or-default chain was written out here as a fourth copy, and the
+        # copies are what caused the explorer to window 19 canvases and none of the 38.
         date_field = None if windowless else (
-            kpi.get("date_field")
-            or snapshot.get("required_date_field")
-            or snapshot.get("default_date_field"))
+            kpi.get("date_field") or window_date_field(snapshot))
         if not date_field and not windowless:
             raise ValueError("Snapshot has no date field and KPI is not windowless")
 
