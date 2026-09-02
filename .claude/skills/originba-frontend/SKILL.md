@@ -222,6 +222,25 @@ and the UI default the same column by construction, which is the property the in
 derivation already depends on. PRODUCT-VISIBLE (it changes which date the UI offers
 first, and which column gets indexed), so decide before doing.
 
+**The business-process layer is dark on dbt orgs.** `build_portal_catalog` emits
+`"business_processes": []` hardcoded, with no comment — and every other deliberate
+emptiness in that file carries one, which is the tell for a placeholder rather than a
+decision. Measured from the committed catalogs:
+
+    catalog_cisadm   21 business_processes, 19 of 19 canvases with process_guides
+    catalog_dbt       0 business_processes,  0 of 38 canvases with process_guides
+
+The UI is wired for it end to end, so it fails quietly on the three dbt orgs —
+including Ellensburg, the strategic target. Two consequences:
+`ExplorerPanel`'s process-guide panel never renders (benign omission), and
+`WorkstreamExplorer`'s search box — placeholder "Search processes…" — can only ever
+match workstream NAMES, because `.filter(ws => ws.processes?.length > 0 || label
+matches)` has nothing to search. Empty query shows everything; typing anything
+collapses it to label hits.
+
+Porting it is CONTENT work (process definitions and field guides for 38 canvases), not
+just code, so it is a product decision rather than a fix to slip in.
+
 **Dead-code sweeps need three guards, learned the hard way.** (1) `grep --include=*.ts`
 inside zsh globs the pattern before grep sees it and reports EVERY module as unimported.
 (2) An import-graph scan that ignores `await import("./x")` calls live code dead — that
