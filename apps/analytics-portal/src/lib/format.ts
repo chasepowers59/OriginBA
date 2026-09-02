@@ -116,17 +116,24 @@ export function formatDateTime(value: unknown): string {
   });
 }
 
-export function defaultDateRangeYtd(): [string, string] {
-  const end = new Date();
-  const start = new Date(end.getFullYear(), 0, 1);
-  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
-}
-
-export function defaultDateRangeLastMonth(): [string, string] {
-  const end = new Date();
-  end.setDate(0); // last day of previous month
-  const start = new Date(end.getFullYear(), end.getMonth(), 1);
-  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+/**
+ * A Date as YYYY-MM-DD in the VIEWER'S calendar.
+ *
+ * `toISOString().slice(0, 10)` is the trap this replaces: `new Date()` is local but
+ * `toISOString()` converts to UTC, so the two disagree for the offset's worth of hours
+ * every day. These strings filter BUSINESS dates -- Bill Date, Accounting Date -- which
+ * are calendar dates in the utility's own timezone, never UTC instants. The same defect
+ * was fixed on the backend in api/reporting_dates.py; fixing it there and leaving it
+ * here would only have moved the disagreement to the client.
+ *
+ * Two copies of defaultDateRangeYtd/LastMonth lived here, byte-identical to the ones in
+ * api.ts and imported by nobody -- every consumer takes them from @/lib/api. They are
+ * deleted rather than fixed twice; this helper is what api.ts now builds them from.
+ */
+export function localIsoDate(d: Date): string {
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${month}-${day}`;
 }
 
 export function exportRowsCsv(columns: string[], rows: Record<string, unknown>[], filename: string) {

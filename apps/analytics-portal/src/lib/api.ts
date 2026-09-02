@@ -21,6 +21,7 @@ import type {
   WorkstreamSummary,
 } from "./types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
+import { localIsoDate } from "@/lib/format";
 import { parseApiError } from "@/lib/apiErrors";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -407,24 +408,30 @@ export function fetchSnapshotSampleRows(
   return fetchJson<SampleRowsResponse>(`/snapshots/${snapshotId}/sample-rows?limit=${limit}`);
 }
 
+// Every boundary below is formatted with localIsoDate, never toISOString(). See that
+// helper: these ranges filter BUSINESS dates, so they belong in the viewer's calendar.
+// Two failures were live before this, both invisible on a UTC machine -- west of UTC
+// (every US utility here) the END rolled to TOMORROW for the last hours of each
+// evening, and "Prior month" ENDED on the 1st of the CURRENT month, including a day of
+// the very month it exists to exclude.
 export function defaultDateRange(days = 90): [string, string] {
   const end = new Date();
   const start = new Date();
   start.setDate(end.getDate() - days);
-  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+  return [localIsoDate(start), localIsoDate(end)];
 }
 
 export function defaultDateRangeYtd(): [string, string] {
   const end = new Date();
   const start = new Date(end.getFullYear(), 0, 1);
-  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+  return [localIsoDate(start), localIsoDate(end)];
 }
 
 export function defaultDateRangeLastMonth(): [string, string] {
   const end = new Date();
-  end.setDate(0);
+  end.setDate(0); // day 0 of this month == the last day of the previous one
   const start = new Date(end.getFullYear(), end.getMonth(), 1);
-  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+  return [localIsoDate(start), localIsoDate(end)];
 }
 
 export function fetchDatabaseTables(
