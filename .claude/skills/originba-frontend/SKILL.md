@@ -150,6 +150,24 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
 7. **The UI implies an authorization boundary the backend does not implement.** See
    originba-security on admin scope. If a field looks like it scopes someone, confirm a
    query actually filters on it.
+8. **A store-level test cannot see what the request schema already dropped.** The saved
+   view store had handled `measures` for months, with a comment; `SavedViewCreate` never
+   declared the field, and Pydantic discards what it does not declare, so every
+   multi-measure view reopened with one measure. `filters` was missing end to end, so a
+   scoped view reopened over the whole canvas ($21,355.94 wrong on the probe). The
+   existing test called `create_saved_view()` DIRECTLY and passed throughout. Round-trip
+   persistence through the ROUTE (`tests/test_saved_view_route_fidelity.py`), and when
+   you add a field to a store, grep for the Pydantic model in front of it.
+9. **A control that shows a different scope than it applies.** The filter value picker
+   caps distinct values at 100 and a `<select>` whose value matches no option silently
+   shows its first — "choose value…" over a live `WHERE` returning 0 rows. Any picker
+   backed by a capped list must admit its current value.
+
+**Shared rules beat mirrored ones.** buildRequest and saveView each decided which
+filters were "live"; only one of them existed, so the saved view was not the view that
+ran. When two code paths must agree about the same thing, give them one function
+(`lib/builderFilters.activeFilters`) rather than two implementations to keep in step —
+the same reasoning as deriving workstreams from the catalog instead of copying them.
 
 **Your own QA tooling lies too — verify before reporting.** All of these produced
 convincing false positives here: `backgroundColor` cannot see a gradient, so
@@ -159,8 +177,15 @@ radial gradients at the element's own position; recharts leaves `fill="#ccc"` as
 ATTRIBUTE while CSS overrides it, so read `getComputedStyle`; `read_console_messages`
 replays a stale buffer including mid-edit HMR errors and pre-restart CORS failures;
 `npx tsc --noEmit | tail -5 && echo clean` prints "clean" unconditionally because the
-exit code is `tail`'s. A ratio of exactly 1.00, or a suspiciously uniform cluster, is
-the tool and not the app until proven otherwise.
+exit code is `tail`'s; and auditing in the SAME call that toggles the theme measures a
+half-applied state (50 "failures" including nav links that pass — set the mode, reload,
+then measure). A ratio of exactly 1.00, or a suspiciously uniform cluster, is the tool
+and not the app until proven otherwise.
+
+**A colour emoji ignores `color` entirely**, so it can MASK a contrast failure in the
+element it sits in: replacing 📅 with a text glyph in the field palette immediately
+exposed a 2.86:1 badge that had been failing all along. When a design mixes emoji and
+text glyphs, audit the text ones separately.
 
 ## Enterprise features (shipped 2026-09-01, all tests-first)
 
