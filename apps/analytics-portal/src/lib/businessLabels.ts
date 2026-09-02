@@ -212,9 +212,39 @@ export function prettifyFieldName(fieldId: string): string {
     .trim();
 }
 
+/** Whole words that mean money. Matched as TOKENS, never as substrings — see below. */
+const CURRENCY_WORDS = new Set([
+  "AMT", "AMOUNT", "AMOUNTS", "BALANCE", "REVENUE", "DEBT", "ARREARS",
+  "PRICE", "COST", "FEE", "FEES",
+]);
+
+/** Words that mean this is a tally or a ratio, whatever money word sits beside it. */
+const NOT_CURRENCY_WORDS = new Set(["COUNT", "COUNTS", "PERCENT", "PCT", "RATE", "RATIO"]);
+
+/**
+ * Whether a measure holds money, in EITHER naming world.
+ *
+ * This was `includes("AMT") || includes("DEBT") || includes("REVENUE")` -- written for
+ * CISADM's `_AMT` suffix, and "AMOUNT" does not contain "AMT" (A-M-O-U-N-T). Measured:
+ * of 47 money-ish measures in catalog_dbt, exactly ONE was detected, so nearly every
+ * money column on the 38 canvases rendered as a bare number. The legacy shape missed
+ * GL_AMOUNT and STATISTIC_AMOUNT for the same reason.
+ *
+ * Matching TOKENS rather than substrings is the actual fix; widening the substring list
+ * just reproduces the bug pointing the other way. Three false positives that a wider
+ * substring rule would have introduced, each found by reading what it newly matched:
+ * "Days Unbalanced" (UNBALANCED contains BALANCE, and it counts days), "% of Arrears
+ * Collected", and GOVERNED_ARREARS_FT_COUNT. Splitting on non-alphanumerics is what
+ * makes BILL_AMT work where a \b regex would not -- underscore is a word character.
+ *
+ * The negative set is specific on purpose: "Arrears 0-30 Days" IS currency, so
+ * excluding on "Days" would have been the lazy version of the same mistake.
+ */
 export function measureIsCurrency(fieldId: string): boolean {
-  const upper = fieldId.toUpperCase();
-  return upper.includes("AMT") || upper.includes("DEBT") || upper.includes("REVENUE");
+  if (fieldId.includes("%")) return false;
+  const words = fieldId.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
+  if (words.some((w) => NOT_CURRENCY_WORDS.has(w))) return false;
+  return words.some((w) => CURRENCY_WORDS.has(w));
 }
 
 /** Dollar formatting only for sum/min/max on amount-like fields — never for counts. */
