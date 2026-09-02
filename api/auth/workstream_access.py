@@ -27,10 +27,12 @@ def filter_workstreams_for_auth(workstreams: list[dict[str, Any]], ctx: AuthCont
 
 
 def filter_snapshots_for_auth(snapshots: list[dict[str, Any]], ctx: AuthContext) -> list[dict[str, Any]]:
-    if "*" in ctx.workstreams:
-        return snapshots
-    allowed = set(ctx.workstreams)
-    return [snap for snap in snapshots if snap.get("workstream") in allowed]
+    # Delegates rather than re-testing "*": workstreams_allowed is the authority the
+    # permission check uses, and it also treats an EMPTY grant as full access. Set
+    # membership alone disagreed with it there and would have handed back an empty
+    # portal to a user ctx.can_access_workstream had just approved.
+    return [snap for snap in snapshots
+            if workstreams_allowed(ctx.workstreams, snap.get("workstream", ""))]
 
 
 def assert_workstream_access(ctx: AuthContext, workstream_id: str) -> None:
@@ -40,11 +42,9 @@ def assert_workstream_access(ctx: AuthContext, workstream_id: str) -> None:
         raise HTTPException(status_code=403, detail=f"Access denied for workstream: {workstream_id}")
 
 
-def filter_kpis_for_auth(kpis: list[dict[str, Any]], ctx: AuthContext) -> list[dict[str, Any]]:
-    if "*" in ctx.workstreams:
-        return kpis
-    allowed = set(ctx.workstreams)
-    return [kpi for kpi in kpis if kpi.get("workstream") in allowed]
+# filter_kpis_for_auth used to sit here, unused. executive_dashboard has its own
+# _kpis_for_workstreams and that one already handled an empty grant correctly, so of
+# the two implementations the dead one was the weaker.
 
 
 def filter_nlq_metrics_for_auth(metrics: list[dict[str, Any]], ctx: AuthContext) -> list[dict[str, Any]]:
@@ -83,12 +83,13 @@ def assert_snapshot_access(ctx: AuthContext, snapshot_id: str) -> None:
 
 
 def filter_report_library_for_auth(library: dict[str, Any], ctx: AuthContext) -> dict[str, Any]:
-    if "*" in ctx.workstreams:
+    if not ctx.workstreams or "*" in ctx.workstreams:
         return library
-    allowed = set(ctx.workstreams)
     packs: list[dict[str, Any]] = []
     for pack in library.get("packs") or []:
-        reports = [r for r in pack.get("reports") or [] if r.get("workstream") in allowed]
+        # workstreams_allowed, not set membership — see filter_snapshots_for_auth.
+        reports = [r for r in pack.get("reports") or []
+                   if workstreams_allowed(ctx.workstreams, r.get("workstream", ""))]
         if not reports:
             continue
         packs.append({**pack, "reports": reports, "report_count": len(reports)})
