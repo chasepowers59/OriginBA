@@ -20,15 +20,34 @@ from api.auth.service import workstreams_allowed
 from api.snapshot_catalog import CatalogError, get_snapshot
 
 
-def snapshot_workstream(snapshot_id: str) -> str:
+def snapshot_workstream(snapshot_id: str, organization_id: str | None = None) -> str:
+    """The workstream a snapshot belongs to, IN THE CALLER'S CATALOG.
+
+    organization_id is load-bearing, not decorative. Without it load_catalog falls back
+    to catalog_name_for_org(None), which is "dbt", so every authorization lookup
+    resolved against the dbt catalog whatever org the caller was in. The two shapes
+    share no snapshot ids (rpt_financial_txn against FT_RPT_CURR), so on the six legacy
+    orgs the lookup missed and returned "" -- and an empty workstream fails every
+    restricted grant. A user granted "finance" was refused FT_RPT_CURR, which declares
+    workstream finance; through filter_nlq_metrics_for_auth and
+    filter_dashboard_for_auth their metrics and tiles filtered to empty in silence.
+
+    Invisible in development because the dev org is a dbt org, and because "*" and an
+    empty grant both mean full access and never reach the comparison.
+
+    The id is passed AS WRITTEN: resolve_snapshot_key already tries all three cases, and
+    upper-casing a lowercase dbt canvas id is the habit that broke lookups elsewhere.
+    """
     try:
-        return str(get_snapshot(snapshot_id.upper()).get("workstream", ""))
+        return str(get_snapshot(snapshot_id, organization_id=organization_id)
+                   .get("workstream", ""))
     except CatalogError:
         return ""
 
 
 def can_access_snapshot(ctx: AuthContext, snapshot_id: str) -> bool:
-    return ctx.can_access_workstream(snapshot_workstream(snapshot_id))
+    return ctx.can_access_workstream(
+        snapshot_workstream(snapshot_id, ctx.effective_organization_id()))
 
 
 def filter_workstreams_for_auth(workstreams: list[dict[str, Any]], ctx: AuthContext) -> list[dict[str, Any]]:
