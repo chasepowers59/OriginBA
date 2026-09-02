@@ -1,5 +1,11 @@
 /** Format currency for utility revenue / billing amounts */
 export function formatCurrency(value: unknown): string {
+  // A missing value is NOT zero: Number(null) and Number("") are both 0, so a NULL
+  // amount rendered as a real "$0" while undefined rendered "—". A SUM over zero
+  // matching rows IS null, and the backend distinguishes that state deliberately
+  // (kpi_runner.empty_window_note), so erasing it here turns "no data" into a business
+  // fact the reader will act on. formatCellValue already guarded this way.
+  if (value == null || value === "") return "—";
   const n = Number(value);
   if (!Number.isFinite(n)) return "—";
   return n.toLocaleString(undefined, {
@@ -87,6 +93,7 @@ export function formatCellValue(
 
 /** Format numbers for charts and KPIs */
 export function formatNumber(value: unknown): string {
+  if (value == null || value === "") return "—";
   const n = Number(value);
   if (!Number.isFinite(n)) return "—";
   if (Math.abs(n) >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
@@ -97,6 +104,7 @@ export function formatNumber(value: unknown): string {
 
 /** Full-precision values for chart hover tooltips (no K/M compaction). */
 export function formatTooltipNumber(value: unknown): string {
+  if (value == null || value === "") return "—";
   const n = Number(value);
   if (!Number.isFinite(n)) return "—";
   if (Number.isInteger(n)) return n.toLocaleString();
@@ -104,6 +112,7 @@ export function formatTooltipNumber(value: unknown): string {
 }
 
 export function formatTooltipCurrency(value: unknown): string {
+  if (value == null || value === "") return "—";
   const n = Number(value);
   if (!Number.isFinite(n)) return "—";
   return n.toLocaleString(undefined, {
