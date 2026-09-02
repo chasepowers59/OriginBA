@@ -247,7 +247,12 @@ export type QueryResponse = {
    *  Saying so is what keeps it from being a number narrower than the one asked for
    *  with nothing on screen to explain it. Null whenever the caller filtered. */
   applied_window?: {
+    /** The machine name the filter is applied on. */
     field: string;
+    /** The human name for copy. These DIFFER on the legacy shape — six of nine orgs —
+     *  where `field` is a database column (ACCOUNTING_DT) and this is "Accounting
+     *  date". Render this one; never render `field`. */
+    label: string;
     days: number;
     start: string;
     end: string;

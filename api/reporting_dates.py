@@ -41,6 +41,24 @@ def window_date_field(snapshot: dict[str, Any]) -> str | None:
     return snapshot.get("required_date_field") or snapshot.get("default_date_field") or None
 
 
+def window_date_label(snapshot: dict[str, Any], field: str) -> str:
+    """A date column's HUMAN name, for copy that a reader sees.
+
+    The two shapes name their columns differently and only one of them needs
+    translating: a dbt canvas field is already Title Case ("Bill Date"), while a legacy
+    snapshot's is a database column ("ACCOUNTING_DT") whose label is "Accounting date".
+    Six of nine orgs are legacy, so printing the raw id would be the majority
+    experience. Falls back to the id itself rather than to nothing -- a sentence with a
+    blank where the column should be is worse than an ugly column name.
+    """
+    if snapshot.get("required_date_field") == field and snapshot.get("required_date_label"):
+        return str(snapshot["required_date_label"])
+    for declared in (snapshot.get("date_fields") or []):
+        if declared.get("id") == field and declared.get("label"):
+            return str(declared["label"])
+    return field
+
+
 def reporting_today() -> date:
     """The calendar date the business is in."""
     return date.today()

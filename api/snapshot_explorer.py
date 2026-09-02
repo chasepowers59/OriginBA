@@ -19,7 +19,8 @@ from api.warehouse_db import warehouse_configured
 from api.org_db import require_org_for_data
 from api.query_builder import QueryValidationError, build_query
 from api.raw_sql_validator import RawSqlValidationError, apply_row_cap, validate_raw_sql
-from api.reporting_dates import DEFAULT_WINDOW_DAYS, reporting_today, window_date_field
+from api.reporting_dates import (DEFAULT_WINDOW_DAYS, reporting_today,
+                                 window_date_field, window_date_label)
 from api.executive_dashboard import build_executive_summary
 from api.kpi_runner import COMPARE_MODES
 from api.workstream_dashboard import build_workstream_about, build_workstream_summary
@@ -627,13 +628,18 @@ def snapshot_query(
         default_filter = _default_date_filter(snapshot)
         if default_filter:
             filters = [default_filter.model_dump()]
+            # `field` stays the machine name the caller filters on; only the sentence is
+            # humanised. On the legacy shape those differ (ACCOUNTING_DT vs "Accounting
+            # date"), and that shape is six of the nine orgs.
+            label = window_date_label(snapshot, default_filter.field)
             applied_window = {
                 "field": default_filter.field,
+                "label": label,
                 "days": DEFAULT_WINDOW_DAYS,
                 "start": default_filter.value[0],
                 "end": default_filter.value[1],
                 "note": (f"No filter was set, so this shows the trailing "
-                         f"{DEFAULT_WINDOW_DAYS} days on {default_filter.field}."),
+                         f"{DEFAULT_WINDOW_DAYS} days on {label}."),
             }
 
     try:

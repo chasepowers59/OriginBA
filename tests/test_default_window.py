@@ -82,6 +82,42 @@ class WindowDateFieldTests(unittest.TestCase):
         self.assertIs(schedule_date_field, window_date_field)
 
 
+class WindowDateLabelTests(unittest.TestCase):
+    """The note is user-facing copy, so it must not print a raw column name.
+
+    Found by enumerating every field that differs between the two catalog shapes --
+    the same sweep that found the bug this file exists for. Exactly three diverge:
+    required_date_field, required_date_label and process_guides. The LABEL is the one
+    the legacy canvases carry and the dbt canvases do not, and it exists for precisely
+    this reason: a dbt canvas's field id is already Title Case ("Bill Date"), while a
+    legacy one is a database column ("ACCOUNTING_DT") whose label is "Accounting date".
+    Six of nine orgs are legacy, so the raw name would be the MAJORITY experience.
+    """
+
+    def test_the_legacy_label_is_preferred_over_the_column_name(self):
+        from api.reporting_dates import window_date_label
+        self.assertEqual(
+            window_date_label({"required_date_field": "ACCOUNTING_DT",
+                               "required_date_label": "Accounting date"}, "ACCOUNTING_DT"),
+            "Accounting date")
+
+    def test_a_declared_date_field_label_is_used_when_there_is_no_required_label(self):
+        from api.reporting_dates import window_date_label
+        self.assertEqual(
+            window_date_label({"date_fields": [{"id": "BILL_DT", "label": "Bill date"}]},
+                              "BILL_DT"),
+            "Bill date")
+
+    def test_a_title_case_canvas_field_is_already_its_own_label(self):
+        from api.reporting_dates import window_date_label
+        self.assertEqual(window_date_label({"default_date_field": "Bill Date"}, "Bill Date"),
+                         "Bill Date")
+
+    def test_an_unlabelled_field_falls_back_to_itself_rather_than_vanishing(self):
+        from api.reporting_dates import window_date_label
+        self.assertEqual(window_date_label({}, "SOME_DT"), "SOME_DT")
+
+
 class DefaultFilterTests(unittest.TestCase):
     def test_a_dbt_canvas_now_gets_a_window(self):
         from api.snapshot_explorer import _default_date_filter
@@ -144,6 +180,14 @@ class QueryRouteTests(unittest.TestCase):
         self.assertEqual(applied["field"], "Bill Date")
         self.assertEqual(applied["days"], 90)
         self.assertIn("Bill Date", applied["note"])
+
+    def test_the_note_never_shows_a_raw_column_name(self):
+        """The field stays machine-readable; only the sentence is humanised."""
+        out = self._query(dict(self.BODY))
+        applied = out["applied_window"]
+        self.assertEqual(applied["label"], "Bill Date")
+        self.assertNotRegex(applied["note"], r"\b[A-Z][A-Z0-9]*_[A-Z0-9_]+\b",
+                            "a database column name reached user-facing copy")
 
     def test_a_caller_supplied_filter_is_never_relabelled_as_ours(self):
         """Filtering on a NON-date field: the server must neither claim a window nor
