@@ -111,6 +111,57 @@ builder/SQL tabs redirect out). Never add a second builder/SQL/chart surface.
   (the authentic C2M validation target) when VPN is on.
 - Reporting column names are a Jaspersoft contract — presentation changes only.
 
+## Bug classes this codebase actually produces (QA sweep 2026-08→09)
+
+Each found more than once. Hunt these by pattern; clicking around finds them slowly.
+
+1. **The second list.** A hardcoded copy of catalog/registry data, drifting silently.
+   Three instances: the admin grant picker, `businessLabels`
+   WORKSTREAM_ORDER/LABELS/DESCRIPTIONS, `workstreamIcons`. Consequences were invisible
+   — Asset Operations was ungrantable, and `/workstream/assets` 404'd while
+   `/workstream/new_services` rendered a full dashboard. **THERE ARE TWO DEPLOYMENT
+   SHAPES**, which is why these copies rot: `output/catalog_dbt.json` has `assets` and
+   no `new_services`; `output/catalog_cisadm.json` has `new_services` and no `assets`
+   (six orgs are legacy). No single hardcoded list can be right for every org. Derive
+   per organization from `workstream_order`; where a shape-independent fallback is
+   genuinely needed it must carry the UNION and be pinned by a test that reads
+   `output/catalog_*.json` — both files are committed, so the test can.
+2. **Shape mismatch across the API boundary, masked by a fallback that never runs.**
+   `workstreams[].featured` is id STRINGS; the hero read `.snapshot_id`, so every
+   "Start here" card on every workstream page rendered blank and linked to
+   `/explore/undefined`. The object shape it expected came only from its own fallback
+   branch, which never ran — so the code read as correct and no catalog data could have
+   fixed it. Accept both shapes at the seam, and assert the rendered href, not merely
+   that something rendered.
+3. **The message describes a scope the query did not apply.** Scheduled emails, alert
+   emails, the DQ headline, the "Data refreshed" pill, "Date filter: Reporting period".
+   Wherever copy names a window or filter, check the query actually carried it.
+4. **A migration silently dropped a semantic.** Soul Palette V2.1 rewrote
+   `from-sky-500/10` to `from-primary`; Tailwind cannot apply an opacity modifier to a
+   raw `var()`, so the alpha vanished and nine tint surfaces became opaque blocks over
+   their own unchanged text (1.00:1 — invisible). Grep a migration diff for what the
+   NEW form cannot express.
+5. **A token validated on one surface, used on another.** Dark `--foreground-subtle`
+   was 5.36:1 on the page ground and 4.20:1 on `--muted`, where it also lives. Check a
+   colour role against the lightest/darkest surface it actually lands on.
+6. **A control that widens, worded as if it narrows.** Deleting an access group gives
+   its members FULL access (`workstreams_allowed` treats empty as all). Say the real
+   consequence in the confirm.
+7. **The UI implies an authorization boundary the backend does not implement.** See
+   originba-security on admin scope. If a field looks like it scopes someone, confirm a
+   query actually filters on it.
+
+**Your own QA tooling lies too — verify before reporting.** All of these produced
+convincing false positives here: `backgroundColor` cannot see a gradient, so
+white-on-gradient reads as white-on-white (ratio exactly 1.00); treating the
+translucent mesh page-glow as opaque flags text nowhere near a glow — evaluate the
+radial gradients at the element's own position; recharts leaves `fill="#ccc"` as an
+ATTRIBUTE while CSS overrides it, so read `getComputedStyle`; `read_console_messages`
+replays a stale buffer including mid-edit HMR errors and pre-restart CORS failures;
+`npx tsc --noEmit | tail -5 && echo clean` prints "clean" unconditionally because the
+exit code is `tail`'s. A ratio of exactly 1.00, or a suspiciously uniform cluster, is
+the tool and not the app until proven otherwise.
+
 ## Enterprise features (shipped 2026-09-01, all tests-first)
 
 - **SSO/OIDC** (`api/auth/oidc.py` + `/auth/oidc/*`): Azure AD auth-code flow, signed
