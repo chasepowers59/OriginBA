@@ -114,6 +114,17 @@ describe("prettifyFieldName across BOTH deployment shapes", () => {
     }
   });
 
+  it("expands a status flag once, not twice", () => {
+    // 22 legacy ids end _STATUS_FLG or _STAT_FLG, including the most-used ones
+    // (BILL_STAT_FLG, SA_STATUS_FLG, PAY_STATUS_FLG). Appending "status" to a stem
+    // that already says it produced "Adj Status Status".
+    expect(prettifyFieldName("ADJ_STATUS_FLG")).toBe("Adj Status");
+    expect(prettifyFieldName("BILL_STAT_FLG")).toBe("Bill Status");
+    expect(prettifyFieldName("SA_STATUS_FLG")).toBe("SA Status");
+    // a flag that does NOT already say status still gains the word
+    expect(prettifyFieldName("BUDGET_FLG")).toBe("Budget Status");
+  });
+
   it("is idempotent, so passing a prettified name back through is harmless", () => {
     for (const id of ["ACCOUNTING_DT", "CUSTOMER_CLASS_CD", "Bill Date"]) {
       expect(prettifyFieldName(prettifyFieldName(id))).toBe(prettifyFieldName(id));
