@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Collection
 from datetime import datetime, timezone
 from typing import Any
 
@@ -46,11 +47,36 @@ def log_audit(
     )
 
 
+# Who-can-do-what changed, plus the security events that are not just a query running.
+# The Users & access feed asks for this set BY NAME: it used to ask for everything and
+# take the newest 40, and report_run -- the highest-volume action there is -- filled
+# every slot, so not one permission change was visible. Naming the set here rather than
+# listing action names in the client is what keeps the two from drifting apart.
+ADMIN_AUDIT_ACTIONS: frozenset[str] = frozenset({
+    "user.create",
+    "user.update",
+    "user.password_change",
+    "group.create",
+    "group.update",
+    "group.delete",
+    # No admin acts on these two, which is exactly why they belong in this feed.
+    "sso_jit_provision",
+    "sql_refused",
+})
+
+AUDIT_CATEGORIES: dict[str, frozenset[str]] = {"admin": ADMIN_AUDIT_ACTIONS}
+
+
 def list_audit_events(session: Session, limit: int = 100,
-                      action: str | None = None) -> list[dict[str, Any]]:
+                      action: str | None = None,
+                      actions: Collection[str] | None = None) -> list[dict[str, Any]]:
     stmt = select(AuditLog).where(AuditLog.client_id == _client_id())
     if action:
         stmt = stmt.where(AuditLog.action == action)
+    if actions:
+        # Narrowed in the query, not after it: filtering a page that telemetry already
+        # filled would still come back empty.
+        stmt = stmt.where(AuditLog.action.in_(sorted(actions)))
     rows = session.scalars(
         stmt.order_by(AuditLog.created_at.desc()).limit(max(1, min(limit, 500)))
     ).all()

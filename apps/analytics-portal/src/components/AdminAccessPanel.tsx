@@ -2,6 +2,10 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { fetchSnapshots } from "@/lib/api";
+import { grantableWorkstreams, type GrantableWorkstream } from "@/lib/grantableWorkstreams";
+import { auditActionLabel } from "@/lib/auditLabels";
+import { groupDeletionWarning } from "@/lib/groupDeletion";
 import type { AccessGroup, AuthUser, PortalOrganization } from "@/lib/auth";
 import {
   createAccessGroup,
@@ -16,22 +20,11 @@ import {
   updatePortalUser,
 } from "@/lib/authApi";
 
-const WORKSTREAM_OPTIONS = [
-  { id: "finance", label: "Finance" },
-  { id: "billing", label: "Billing & Rates" },
-  { id: "meter_ops", label: "Meter Operations" },
-  { id: "cashiering", label: "Cashiering & Payments" },
-  { id: "debt", label: "Collections & Debt" },
-  { id: "customer_ops", label: "Customer Operations" },
-  { id: "new_services", label: "New Services" },
-  { id: "field_ops", label: "Field Operations" },
-  { id: "common", label: "Operations & Shared Services" },
-];
-
 export function AdminAccessPanel() {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [groups, setGroups] = useState<AccessGroup[]>([]);
+  const [workstreamOptions, setWorkstreamOptions] = useState<GrantableWorkstream[]>([]);
   const [organizations, setOrganizations] = useState<PortalOrganization[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
@@ -62,16 +55,20 @@ export function AdminAccessPanel() {
   const reload = useCallback(async () => {
     setLoading(true);
     try {
-      const [u, g, audit, orgs] = await Promise.all([
+      const [u, g, audit, orgs, index] = await Promise.all([
         listPortalUsers(),
         listAccessGroups(),
-        listAuditEvents(40),
+        listAuditEvents(40, "admin"),
         listPortalOrganizations(),
+        // The grantable workstreams come from the catalog, per organization, so this
+        // picker cannot drift from what access is actually filtered against.
+        fetchSnapshots(),
       ]);
       setUsers(u);
       setGroups(g);
       setAuditEvents(audit);
       setOrganizations(orgs);
+      setWorkstreamOptions(grantableWorkstreams(index.workstream_order, index.workstream_labels));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load access data");
     } finally {
@@ -145,6 +142,20 @@ export function AdminAccessPanel() {
       await reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Update group failed");
+    }
+  }
+
+  async function handleDeleteGroup(group: AccessGroup) {
+    // Widening, irreversible, and it used to be one unconfirmed click with no catch.
+    if (!window.confirm(groupDeletionWarning(group))) return;
+    setError(null);
+    setMessage(null);
+    try {
+      await deleteAccessGroup(group.id);
+      setMessage(`Access group "${group.name}" deleted`);
+      await reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Delete group failed");
     }
   }
 
@@ -377,12 +388,18 @@ export function AdminAccessPanel() {
                       }));
                     }}
                   >
-                    {WORKSTREAM_OPTIONS.map((ws) => (
+                    {workstreamOptions.map((ws) => (
                       <option key={ws.id} value={ws.id}>
                         {ws.label}
                       </option>
                     ))}
                   </select>
+                  {workstreamOptions.length ? null : (
+                    <p className="md:col-span-2 text-xs text-over">
+                      Workstreams could not be loaded, so this group can only be saved with full
+                      access. Reload before narrowing it.
+                    </p>
+                  )}
                   <div className="flex gap-2 md:col-span-2">
                     <button type="button" className="btn-primary text-xs" onClick={() => void saveGroupEdit(group.id)}>
                       Save
@@ -402,7 +419,7 @@ export function AdminAccessPanel() {
                       {group.workstreams.includes("*")
                         ? "All"
                         : group.workstreams
-                            .map((id) => WORKSTREAM_OPTIONS.find((w) => w.id === id)?.label ?? id)
+                            .map((id) => workstreamOptions.find((w) => w.id === id)?.label ?? id)
                             .join(", ")}
                       {" · "}
                       {group.member_count} members
@@ -415,7 +432,7 @@ export function AdminAccessPanel() {
                     <button
                       type="button"
                       className="btn-ghost text-xs"
-                      onClick={() => void deleteAccessGroup(group.id).then(reload)}
+                      onClick={() => void handleDeleteGroup(group)}
                     >
                       Delete
                     </button>
@@ -451,14 +468,16 @@ export function AdminAccessPanel() {
               }));
             }}
           >
-            {WORKSTREAM_OPTIONS.map((ws) => (
+            {workstreamOptions.map((ws) => (
               <option key={ws.id} value={ws.id}>
                 {ws.label}
               </option>
             ))}
           </select>
           <p className="md:col-span-2 text-xs portal-text-subtle">
-            Leave workstreams unselected for full access. Hold Cmd/Ctrl to select multiple.
+            {workstreamOptions.length
+              ? "Leave workstreams unselected for full access. Hold Cmd/Ctrl to select multiple."
+              : "Workstreams could not be loaded, so a new group will be created with full access."}
           </p>
           <button type="submit" className="btn-primary md:col-span-2">
             Add access group
@@ -468,13 +487,16 @@ export function AdminAccessPanel() {
 
       <div className="glass-panel p-5">
         <h2 className="text-lg font-semibold portal-heading">Recent admin activity</h2>
-        <p className="mt-1 text-sm portal-text-muted">User, group, and password changes.</p>
+        <p className="mt-1 text-sm portal-text-muted">
+          User, group and password changes, SSO account provisioning, and blocked SQL.
+          Report and query activity is not listed here.
+        </p>
         <ul className="mt-4 max-h-64 space-y-2 overflow-y-auto text-sm">
           {auditEvents.length ? (
             auditEvents.map((event) => (
               <li key={event.id} className="rounded-lg border border-edge-subtle px-3 py-2">
                 <p className="portal-heading">
-                  {event.action}
+                  {auditActionLabel(event.action)}
                   {event.detail ? ` — ${event.detail}` : ""}
                 </p>
                 <p className="text-xs portal-text-subtle">
@@ -484,7 +506,7 @@ export function AdminAccessPanel() {
               </li>
             ))
           ) : (
-            <li className="portal-text-muted">No audit events yet.</li>
+            <li className="portal-text-muted">No access changes recorded yet.</li>
           )}
         </ul>
       </div>
