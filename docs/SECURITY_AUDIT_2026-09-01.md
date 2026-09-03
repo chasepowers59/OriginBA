@@ -103,7 +103,9 @@ with column-level SELECT that excludes those columns.
 
 ---
 
-## HIGH — H1, H2, H4 and H5 FIXED 2026-09-01
+## HIGH — ALL SIX FIXED (H1, H2, H4, H5 on 2026-09-01; H3 and H6 verified
+## fixed 2026-09-02 — H3 blocks all six attacks the finding named, H6 stores the
+## token HttpOnly via a same-origin route)
 
 | # | Fix | Test |
 | --- | --- | --- |
@@ -133,11 +135,14 @@ an unknown org resolves none. `sample-rows` returns 200 and writes its audit row
 
 ## MEDIUM
 
-- **M1** Unqualified `pg_catalog` names (`pg_class`, `pg_database`, `pg_stat_activity`,
-  `pg_user`, `pg_roles`, `pg_settings`) are allowed; only the qualified form is
-  blocked. `pg_database` enumerates other clients' database names.
-- **M2** `dblink`, `dblink_connect`, `pg_read_file`, `lo_import`, `pg_sleep` are all
-  allowed — the Postgres fence has no function deny-list where the Oracle one does.
+- **M1 FIXED** Unqualified `pg_catalog` names (`pg_class`, `pg_database`,
+  `pg_stat_activity`, `pg_user`, `pg_roles`, `pg_settings`) were allowed; only the
+  qualified form was blocked. `_PG_CATALOG_OBJECT` now matches the bare names too,
+  bounded on both sides so a column like "Page Count" cannot trip it.
+- **M2 FIXED** `dblink`, `dblink_connect`, `pg_read_file`, `lo_import`, `pg_sleep` were
+  all allowed — the Postgres fence had no function deny-list where the Oracle one does.
+  `_PG_DANGEROUS_FUNCTION` now covers remote links, file reads, large-object import,
+  sleeps and backend control.
 - **M3 FIXED 2026-09-02** `/health` disclosed the full client roster unauthenticated,
   because `ENVIRONMENT` is set in no deployment file so `is_production()` is always
   False. The fix is the DIRECTION of the default, not another platform name: detail now

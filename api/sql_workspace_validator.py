@@ -191,7 +191,8 @@ def enforce_secrets(cleaned: str) -> None:
 
 
 def _enforce_scope(sql: str, allowed_schemas: tuple[str, ...], deny: re.Pattern,
-                   extra: tuple[tuple[re.Pattern, str], ...] = ()) -> None:
+                   extra: tuple[tuple[re.Pattern, str], ...] = (),
+                   table_position_deny: re.Pattern | None = None) -> None:
     cleaned = strip_sql_noise(sql)
     primary = allowed_schemas[0]
     allowed = {s.lower() for s in allowed_schemas}
@@ -227,6 +228,17 @@ def _enforce_scope(sql: str, allowed_schemas: tuple[str, ...], deny: re.Pattern,
                 f"{what.capitalize()} are not queryable from the workspace "
                 f"('{m.group(0)}')."
             )
+
+    # E. Names that are only dangerous in TABLE position (all_/user_ dictionary views,
+    #    which are also ordinary CISADM column names). Checked here rather than in
+    #    enforce_oracle_hatches because the scope validators do not go through that.
+    if table_position_deny is not None:
+        for name in _oracle_table_references(cleaned):
+            if table_position_deny.match(name):
+                raise SqlWorkspaceValidationError(
+                    f"Data dictionary views are not queryable from the workspace "
+                    f"('{name}')."
+                )
 
     enforce_secrets(cleaned)
 
@@ -283,10 +295,44 @@ _ORACLE_NON_REPORTING = re.compile(
     r"\b(originba_staging|originba_core|originba_src|sys|system)\s*\.",
     re.IGNORECASE,
 )
+# Dictionary prefixes that can NEVER be a CISADM column name, so matching them
+# anywhere is free. Measured on Ellensburg CISADM: zero columns begin dba_ or cdb_, and
+# "$" does not occur in a column name at all.
 _ORACLE_DICTIONARY = re.compile(
-    r"\b(all_|dba_|user_|cdb_|v\$|gv\$)\w*",
+    r"\b(dba_|cdb_|v\$|gv\$)\w*",
     re.IGNORECASE,
 )
+
+# all_ and user_ ARE real CISADM column names -- USER_ID alone is on 378 tables, plus
+# USER_EDITED_FLG, USER_WHERE_CLAUSE, ALL_OPERATORS_SW and five more -- so matching them
+# statement-wide rejected ordinary analyst SQL ("SELECT USER_ID FROM CISADM.CI_TD_ENTRY")
+# with "data dictionary views are not queryable". A dictionary view can only be READ
+# through a table reference, so these are checked there and nowhere else.
+_ORACLE_DICTIONARY_POSITIONAL = re.compile(r"^(all_|user_)\w*$", re.IGNORECASE)
+
+# Table references: after FROM/JOIN, and after a comma inside a FROM list. The comma
+# arm is why the FROM region is scanned rather than just the token after the keyword --
+# "FROM CI_BILL, ALL_TABLES" is a read. Ends at the next clause keyword so a comma in a
+# SELECT list or a GROUP BY can never be mistaken for one.
+_ORACLE_FROM_REGION = re.compile(
+    r"\b(?:FROM|JOIN)\b(.*?)(?=\b(?:WHERE|GROUP|ORDER|HAVING|CONNECT|START|UNION|"
+    r"INTERSECT|MINUS|FETCH|OFFSET|WITH|MODEL|PIVOT|UNPIVOT)\b|$)",
+    re.IGNORECASE | re.DOTALL,
+)
+_ORACLE_TABLE_TOKEN = re.compile(r"[A-Za-z_$#][\w$#]*")
+
+
+def _oracle_table_references(cleaned: str) -> list[str]:
+    """Every identifier sitting in a table position, for the positional check.
+
+    Deliberately over-collects: aliases and ON-clause identifiers come along too. That
+    is safe here because the only thing asked of them is whether they name a dictionary
+    view, and an alias called USER_TABLES would be indistinguishable from reading one.
+    """
+    names: list[str] = []
+    for region in _ORACLE_FROM_REGION.findall(cleaned):
+        names.extend(_ORACLE_TABLE_TOKEN.findall(region))
+    return names
 _ORACLE_PACKAGES = re.compile(
     r"\b(dbms_|utl_|owa_|htp\.|httpuritype|xmltype|extractvalue|ctxsys)\w*",
     re.IGNORECASE,
@@ -310,6 +356,12 @@ def enforce_oracle_hatches(cleaned: str) -> None:
                 f"{what.capitalize()} are not queryable from the workspace "
                 f"('{m.group(0)}')."
             )
+    # all_/user_ only where a view could actually be READ. See the pattern above.
+    for name in _oracle_table_references(cleaned):
+        if _ORACLE_DICTIONARY_POSITIONAL.match(name):
+            raise SqlWorkspaceValidationError(
+                f"Data dictionary views are not queryable from the workspace ('{name}')."
+            )
 
 
 def validate_oracle_reporting_scope(sql: str) -> None:
@@ -320,7 +372,8 @@ def validate_oracle_reporting_scope(sql: str) -> None:
     build schemas stay fenced, and secrets are guarded (see _enforce_secrets).
     """
     _enforce_scope(sql, ("CISADM", "ORIGINBA_REPORTING"), _ORACLE_NON_REPORTING,
-                   extra=_ORACLE_EXTRA)
+                   extra=_ORACLE_EXTRA,
+                   table_position_deny=_ORACLE_DICTIONARY_POSITIONAL)
 
 
 def validate_oracle_cisadm_scope(sql: str) -> None:
@@ -333,7 +386,8 @@ def validate_oracle_cisadm_scope(sql: str) -> None:
     This path had NO fence at all until 2026-09-01 (audit C1) — six of eight
     orgs, with `database:sql` held by the lowest role.
     """
-    _enforce_scope(sql, ("CISADM",), _ORACLE_NON_REPORTING, extra=_ORACLE_EXTRA)
+    _enforce_scope(sql, ("CISADM",), _ORACLE_NON_REPORTING, extra=_ORACLE_EXTRA,
+                   table_position_deny=_ORACLE_DICTIONARY_POSITIONAL)
 
 
 def wrap_paginated_sql(sql: str, *, offset: int, limit: int, probe_extra: int = 0) -> str:

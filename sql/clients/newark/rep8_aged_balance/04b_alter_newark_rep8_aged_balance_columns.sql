@@ -37,7 +37,16 @@ BEGIN
 
     -- credit balance flag + comments
     add_col('ALTER TABLE cisadm.newark_rep8_aged_balance ADD (has_credit_balance CHAR(1))');
-    add_col('ALTER TABLE cisadm.newark_rep8_aged_balance ADD (comments VARCHAR2(2000))');
+    add_col('ALTER TABLE cisadm.newark_rep8_aged_balance ADD (comments VARCHAR2(4000))');
+    -- widen comments if older 2000 definition exists
+    BEGIN
+        cisadm.originba_ddl_helper2(
+            'ALTER TABLE cisadm.newark_rep8_aged_balance MODIFY (comments VARCHAR2(4000))'
+        );
+    EXCEPTION
+        WHEN OTHERS THEN
+            NULL;
+    END;
 
     -- widen legacy STATUS for customer-status descriptions
     BEGIN
