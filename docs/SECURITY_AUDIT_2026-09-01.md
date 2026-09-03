@@ -163,13 +163,19 @@ an unknown org resolves none. `sample-rows` returns 200 and writes its audit row
   allow-list (exact domain, so `origin.local` cannot admit
   `origin.local.attacker.example`) and is INERT until an operator sets it. Setting it
   per deployment is the remaining work.
-- **M7** `PORTAL_AUTH_DISABLED` yields a full admin with tenant switching and a
-  literal dev JWT secret; nothing checks `is_production()` on that path.
+- **M7 FIXED 2026-09-02** `PORTAL_AUTH_DISABLED` yielded a full admin with tenant
+  switching and a literal dev JWT secret, and nothing checked where it was running.
+  `auth_disabled()` now requires `is_development()` — affirmative proof, not the
+  absence of proof of production, because `is_production()` is False for an
+  unrecognised environment and Render sets none of the markers. `ENVIRONMENT` is
+  documented in `deploy/api.env.example`; `tests/conftest.py` declares the suite.
 - **M8** The dbt secrets test is name-based (`%micr%`, `%passwd%`…), so a Title-Case
   rename would pass it; its `depends_on` omits `stg_account` and `stg_person_contact`.
   Today's catalogs are clean.
-- **M9** CORS uses `allow_credentials=True` with an env-extensible origin list;
-  `PORTAL_CORS_ORIGINS=*` would echo any origin with credentials.
+- **M9 FIXED 2026-09-02** CORS uses `allow_credentials=True` with an env-extensible
+  origin list, and `PORTAL_CORS_ORIGINS=*` would echo any origin with credentials.
+  A wildcard is now DROPPED rather than honoured, and entries must look like an origin
+  (`scheme://host[:port]`). `tests/test_open_access_and_cors.py`.
 
 ## LOW
 

@@ -171,15 +171,6 @@ phone AS (
     JOIN cisadm.ci_per_phone pp
       ON pp.per_id = mp.per_id
     GROUP BY mp.acct_id
-),
-latest_coll_comment AS (
-    SELECT
-        a.acct_id,
-        TRIM(SUBSTR(a.alert_info, 1, 4000)) AS comments
-    FROM cisadm.ci_acct a
-    JOIN acct_with_rc rc
-      ON rc.acct_id = a.acct_id
-    WHERE TRIM(a.alert_info) IS NOT NULL
 )
 SELECT
     am.acct_id AS account,
@@ -225,7 +216,7 @@ SELECT
     ph.billing_phone,
     pc.ward,
     TRIM(p.address1) AS street_name,
-    lcc.comments
+    CAST(NULL AS VARCHAR2(4000)) AS comments
 FROM acct_mail am
 LEFT JOIN acct_prem ap
   ON ap.acct_id = am.acct_id
@@ -254,6 +245,4 @@ LEFT JOIN cisadm.ci_char_val_l cust_sta_l
 LEFT JOIN cisadm.ci_char_val_l prpty_l
   ON prpty_l.char_type_cd = 'PRPRTYTY'
  AND TRIM(prpty_l.char_val) = TRIM(pc.property_type_cd)
- AND prpty_l.language_cd = 'ENG'
-LEFT JOIN latest_coll_comment lcc
-  ON lcc.acct_id = am.acct_id;
+ AND prpty_l.language_cd = 'ENG';

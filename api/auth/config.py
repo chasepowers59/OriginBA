@@ -12,7 +12,24 @@ DEFAULT_SQLITE_URL = f"sqlite:///{ROOT / 'data' / 'analytics_portal' / 'portal_a
 
 
 def auth_disabled() -> bool:
-    return os.getenv("PORTAL_AUTH_DISABLED", "").strip().lower() in {"1", "true", "yes"}
+    """Open access, and ONLY on a deployment that declares itself a development one.
+
+    Audit M7: this flag yields `_dev_context()` -- a full ADMIN with users:manage,
+    data_source:manage, settings:manage and tenant switching, on a literal dev JWT
+    secret -- and nothing checked where it was running. One env var set by mistake on a
+    real deployment is a total compromise, and it is a variable used every day in local
+    work, so it is not the kind of thing that stands out in a diff.
+
+    Guarded the same direction as /health (audit M3): AFFIRMATIVE proof of development,
+    never merely the absence of proof of production. `is_production()` returns False for
+    an unrecognised environment, so "refuse when is_production()" would have defended
+    nothing on Render, which sets none of the three markers.
+    """
+    if os.getenv("PORTAL_AUTH_DISABLED", "").strip().lower() not in {"1", "true", "yes"}:
+        return False
+    from api.security import is_development
+
+    return is_development()
 
 
 def database_url() -> str:

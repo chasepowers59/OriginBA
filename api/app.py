@@ -8,6 +8,7 @@ Run from repo root:
 from __future__ import annotations
 
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -46,17 +47,31 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# scheme://host[:port] -- http and https only, and never a bare "*".
+_ORIGIN_RE = re.compile(r"^https?://[A-Za-z0-9.\-]+(?::\d+)?$")
+
+
 def _cors_origins() -> list[str]:
     origins = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "https://originba-analytics-portal.vercel.app",
     ]
+    # Audit M9: this list is used with allow_credentials=True. Starlette treats a "*"
+    # entry as allow-all, and WITH credentials it echoes the caller's origin instead of
+    # sending "*" -- so any website could make credentialed calls carrying a logged-in
+    # user's cookies. A wildcard and credentials are mutually exclusive by the CORS
+    # spec's own reasoning, so the wildcard is dropped rather than silently honoured.
+    # Entries must also look like an origin (scheme://host): a browser Origin header
+    # never matches anything else, so a bare hostname only adds noise to the list.
     extra = os.getenv("PORTAL_CORS_ORIGINS", "")
     for origin in extra.split(","):
         origin = origin.strip()
-        if origin and origin not in origins:
-            origins.append(origin)
+        if not origin or origin in origins:
+            continue
+        if not _ORIGIN_RE.match(origin):
+            continue
+        origins.append(origin)
     return origins
 
 

@@ -185,9 +185,11 @@ BEGIN
             ELSE 'NONE'
         END,
         CASE WHEN NVL(sa.current_bal, 0) < 0 THEN 'Y' ELSE 'N' END,
-        ab.comments,
+        SUBSTR(TRIM(acct.alert_info), 1, 4000),
         SYSTIMESTAMP
     FROM jrs2c2m.cm_aged_balance ab
+    LEFT JOIN cisadm.ci_acct acct
+      ON acct.acct_id = ab.account
     LEFT JOIN sa_acct sa
       ON sa.acct_id = ab.account
     LEFT JOIN sa_status ss
