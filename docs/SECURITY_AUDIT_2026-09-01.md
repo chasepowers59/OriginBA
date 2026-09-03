@@ -179,7 +179,11 @@ an unknown org resolves none. `sample-rows` returns 200 and writes its audit row
 
 ## LOW
 
-L1 CLAUDE.md claims `git push` is in the settings deny list — it is not.
+L1 **CORRECTED 2026-09-02** CLAUDE.md claimed `git push` was in the settings deny list;
+it is not (the list denies curl/wget/nc/scp/rsync only). The doc now states it as a
+RULE rather than an enforced deny, and names the entry to add if enforcement is
+wanted. The behaviour was already correct — push commands are handed to the user —
+but the file asserted a guard that does not exist.
 L2 Committed local-fixture password literals (no client credentials).
 L3 The real client slice sits untracked on disk with live secrets; gitignored, but no
 pre-commit or git hook exists, so `git add -f` bypasses the only barrier.
