@@ -190,7 +190,11 @@ pre-commit or git hook exists, so `git add -f` bypasses the only barrier.
 L4 `ui/chart.tsx` interpolates chart config colors into CSS via
 `dangerouslySetInnerHTML` (stock shadcn) — safe while configs are constants.
 L5 No CSP, HSTS or `X-Frame-Options`.
-L6 `ci/jrxml-smoke.yml` sits outside `.github/workflows/` and never runs.
+L6 **ANSWERED 2026-09-02** `ci/jrxml-smoke.yml` sits outside `.github/workflows/` and
+never runs — deliberately. It needs ORACLE_DSN and JRS_URL inside a private VCN, which
+a GitHub-hosted runner cannot reach, so activating it would redden CI on every .jrxml
+or .sql push without gaining coverage. The reason and the activation path (a
+self-hosted runner in the VCN) are now documented in the file itself.
 
 ---
 

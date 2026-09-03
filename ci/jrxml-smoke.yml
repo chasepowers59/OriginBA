@@ -1,3 +1,19 @@
+# PARKED, DELIBERATELY -- this file is outside .github/workflows/ so GitHub does not
+# run it. Audit L6 recorded that as a defect; it is a decision, and the reason belongs
+# here rather than in an audit nobody reads next to the file.
+#
+# The job needs ORACLE_DSN and JRS_URL pointing at a client Oracle instance and a
+# Jaspersoft server, both of which sit inside a private VCN. A GitHub-hosted runner
+# cannot reach either, so moving this into .github/workflows/ would not gain coverage --
+# it would fail on every push touching a .jrxml or .sql file and make CI permanently
+# red, which costs more than the check is worth.
+#
+# TO ACTIVATE, one of:
+#   * a self-hosted runner inside the VCN -- then move this file to .github/workflows/
+#     and set runs-on to that runner, and
+#   * the eleven secrets below configured on the repository.
+# Until then it is runnable by hand with `act`, or as the manual workflow_dispatch it
+# already declares, from somewhere with VPN.
 name: jrxml-smoke
 
 on:
