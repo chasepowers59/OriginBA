@@ -1,6 +1,16 @@
-# Newark Account Aged Balance Domain (REP8 replacement)
+# Newark Account Aged Balance Domain (DEPRECATED)
 
-Standalone Newark domain for REP8-style aged balance reporting. **Not** a patch of Standard Offering SA Snapshot — that approach produced invalid schema XML for JRS import.
+**Use the staging-table domain instead:** `domains/manual_imports/newark_rep8_aged_balance_domain/`
+
+```bash
+python3 scripts/jaspersoft/build_newark_rep8_staging_domain_import.py
+```
+
+Import zip: `Newark_REP8_Aged_Balance_Domain_client_import.zip`
+
+---
+
+Legacy notes (live-SQL join tree — import failures on JRS):
 
 ## Root cause of prior import failures
 

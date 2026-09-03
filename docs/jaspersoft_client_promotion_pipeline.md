@@ -24,6 +24,11 @@ flow (light-touch tenant-root packages, no `rootTenantId` in `index.xml`).
 Server-root import (`Manage` → `Organizations`) is legacy only for old
 `organizations/organization_1/...` packages.
 
+For **single-report client updates** (e.g. Newark REP8), use the tenant-relative
+report import contract in
+[jaspersoft_client_tenant_report_import.md](jaspersoft_client_tenant_report_import.md)
+and skill `.claude/skills/jaspersoft-client-tenant-import/SKILL.md`.
+
 Package builds for new client promotions should use the same tenant-root +
 light-touch flags documented in
 [jaspersoft_environment_promotion_pipeline.md](jaspersoft_environment_promotion_pipeline.md)

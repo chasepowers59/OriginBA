@@ -72,3 +72,40 @@ describe("a string is only formatted as a number when that round-trips", () => {
     expect(formatCellValue(0)).toBe("0");
   });
 });
+
+describe("identifier detection covers names whose shape is not a suffix", () => {
+  /**
+   * Found by running REAL Ellensburg values through the live formatter, which is the
+   * only reason these surfaced — they round-trip, so the round-trip rule above cannot
+   * see them, and the suffix rule missed them:
+   *
+   *   RPT_ASSET_LOCATION."Hierarchy Path"  '498295347400' -> "498,295,347,400"
+   *   RPT_TODO."Drill Key Values"          '579558819100' -> "579,558,819,100"
+   *
+   * Matching whole TOKENS also catches "Adjustment ID (Pay Seg)", a plain identifier
+   * the `endsWith(" ID")` rule missed because the name ends in a parenthetical.
+   */
+  it("treats key and path columns as identifiers", () => {
+    for (const col of ["Hierarchy Path", "Drill Key Values", "Foreign Key Value",
+                       "Attachment Path", "Adjustment ID (Pay Seg)"]) {
+      expect(isIdentifierColumn(col), col).toBe(true);
+    }
+    expect(formatCellValue("498295347400", { columnId: "Hierarchy Path" }))
+      .toBe("498295347400");
+    expect(formatCellValue("579558819100", { columnId: "Drill Key Values" }))
+      .toBe("579558819100");
+  });
+
+  it("does not swallow a COUNT or a FLAG that sits next to the word", () => {
+    // "Drill Key Count" is a measure and wants its separators; "Key Required" is a flag.
+    expect(isIdentifierColumn("Drill Key Count")).toBe(false);
+    expect(isIdentifierColumn("Key Required")).toBe(false);
+    expect(formatCellValue("1234", { columnId: "Drill Key Count" })).toBe("1,234");
+  });
+
+  it("leaves ordinary measures alone", () => {
+    for (const col of ["Billed Amount", "Service Quantity", "Bill Segment Count"]) {
+      expect(isIdentifierColumn(col), col).toBe(false);
+    }
+  });
+});

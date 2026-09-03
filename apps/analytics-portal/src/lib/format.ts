@@ -20,10 +20,30 @@ export function formatPercent(value: number, digits = 1): string {
   return `${value.toFixed(digits)}%`;
 }
 
+/** Whole words naming an identifier, matched as TOKENS rather than suffixes. */
+const IDENTIFIER_WORDS = new Set(["ID", "IDS", "KEY", "KEYS", "PATH", "GUID", "UUID"]);
+
+/** Words meaning this is a tally or a state, whatever identifier word sits beside it. */
+const NOT_IDENTIFIER_WORDS = new Set([
+  "COUNT", "COUNTS", "REQUIRED", "FLAG", "TOTAL", "AMOUNT", "PERCENT", "PCT",
+]);
+
 /** IDs and natural keys should stay literal — never compact to 90.47M-style labels. */
 export function isIdentifierColumn(columnId?: string): boolean {
   if (!columnId) return false;
   const upper = columnId.toUpperCase();
+  // Suffixes alone missed names whose shape is not a suffix. Found by running REAL
+  // Ellensburg values through this: "Hierarchy Path" rendered '498295347400' as
+  // "498,295,347,400" and "Drill Key Values" did the same -- both round-trip, so the
+  // round-trip guard in formatCellValue cannot see them either. Token matching also
+  // catches "Adjustment ID (Pay Seg)", which endsWith(" ID") missed over a
+  // parenthetical. The negative set keeps "Drill Key Count" (a measure that wants its
+  // separators) and "Key Required" (a flag) out.
+  const words = upper.split(/[^A-Z0-9]+/).filter(Boolean);
+  if (!words.some((w) => NOT_IDENTIFIER_WORDS.has(w))
+      && words.some((w) => IDENTIFIER_WORDS.has(w))) {
+    return true;
+  }
   // Two naming worlds: legacy Oracle snapshots (ACCT_ID, TENDER_TYPE_CD) and the
   // dbt canvases' Title Case ("Account ID", "Bill Cycle Code", "Meter Badge
   // Number"). An identifier rendered with thousand separators ("1,358,301,387")
@@ -122,10 +142,39 @@ export function formatTooltipCurrency(value: unknown): string {
   });
 }
 
+/** YYYY-MM-DD with nothing after it: a calendar date, not an instant. */
+const DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * A timestamp in the viewer's clock, or a plain date left on its own calendar day.
+ *
+ * `new Date("2026-09-02")` is specified to parse as UTC MIDNIGHT, while
+ * `new Date("2026-09-02T00:00:00")` parses as local midnight. Feeding the first form to
+ * toLocaleString rendered every date-only value as THE PREVIOUS DAY west of UTC, with a
+ * time nobody supplied: "2026-09-02" came out "Sep 1, 2026, 06:00 PM". The API
+ * serializes a Postgres DATE column with `date.isoformat()`, which is exactly that
+ * form, so a bill dated the 1st displayed the 31st on every canvas that has one.
+ *
+ * Found by running real Ellensburg values through this function. Bug class 12 a third
+ * time, after report_schedules and the date-range builders: a business date belongs in
+ * the utility's own calendar, never as a UTC instant. A date with no time is also
+ * rendered WITHOUT one, rather than inventing midnight-shifted-into-evening.
+ */
 export function formatDateTime(value: unknown): string {
   if (!value) return "—";
-  const d = new Date(String(value));
-  if (Number.isNaN(d.getTime())) return String(value);
+  const raw = String(value);
+  if (DATE_ONLY_RE.test(raw)) {
+    const [y, m, d] = raw.split("-").map(Number);
+    const local = new Date(y, m - 1, d);          // local midnight, so the day survives
+    if (Number.isNaN(local.getTime())) return raw;
+    return local.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  }
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return raw;
   return d.toLocaleString(undefined, {
     month: "short",
     day: "numeric",

@@ -63,6 +63,8 @@ def validate_schema(path: Path) -> list[str]:
     resources = resources_parent[0]
     resource_ids: set[str] = set()
     join_tree_ids: set[str] = set()
+    flat_table_ids: set[str] = set()
+    table_fields: dict[str, set[str]] = {}
     for resource in resources:
         rid = resource.get("id")
         if not rid:
@@ -83,6 +85,12 @@ def validate_schema(path: Path) -> list[str]:
                 if name in DERIVED_CHILD_ORDER and idx > DERIVED_CHILD_ORDER.index(name):
                     pass
         elif tag_name(resource) == "jdbcTable":
+            fields = {
+                field.get("id")
+                for field in resource.iter()
+                if tag_name(field) == "field" and field.get("id")
+            }
+            table_fields[rid] = fields
             if any(tag_name(child) == "joinInfo" for child in resource):
                 join_tree_ids.add(rid)
                 for idx, name in enumerate(children):
@@ -94,10 +102,16 @@ def validate_schema(path: Path) -> list[str]:
                     issues.append(
                         f"join tree {rid} child order invalid: got {ordered}, expected {expected}"
                     )
+            else:
+                flat_table_ids.add(rid)
 
-    missing_islands = sorted(island_ids - join_tree_ids)
+    island_targets = join_tree_ids | flat_table_ids
+    missing_islands = sorted(island_ids - island_targets)
     if missing_islands:
-        issues.append(f"dataIsland resourceId(s) missing join tree resource: {', '.join(missing_islands)}")
+        issues.append(
+            "dataIsland resourceId(s) missing table resource: "
+            + ", ".join(missing_islands)
+        )
 
     item_resource_ids: list[str] = []
     for items_parent in [*find_children(root, "itemGroups"), *find_children(root, "items")]:
@@ -113,22 +127,22 @@ def validate_schema(path: Path) -> list[str]:
         rid = resource.get("id")
         if rid not in join_tree_ids:
             continue
-        fields = {
-            field.get("id")
-            for field in resource.iter()
-            if tag_name(field) == "field" and field.get("id")
-        }
-        join_fields[rid] = fields
+        join_fields[rid] = table_fields.get(rid, set())
 
     for item_rid in item_resource_ids:
         if "." not in item_rid:
-            issues.append(f"item resourceId missing join tree prefix: {item_rid}")
+            issues.append(f"item resourceId missing table prefix: {item_rid}")
             continue
-        join_id, remainder = item_rid.split(".", 1)
-        if join_id not in join_tree_ids:
-            issues.append(f"item references unknown join tree {join_id}: {item_rid}")
+        table_id, remainder = item_rid.split(".", 1)
+        if table_id in flat_table_ids:
+            fields = table_fields.get(table_id, set())
+            if remainder not in fields:
+                issues.append(f"item references missing flat-table field: {item_rid}")
             continue
-        fields = join_fields.get(join_id, set())
+        if table_id not in join_tree_ids:
+            issues.append(f"item references unknown table {table_id}: {item_rid}")
+            continue
+        fields = join_fields.get(table_id, set())
         if remainder not in fields:
             issues.append(f"item references missing join-tree field: {item_rid}")
 
