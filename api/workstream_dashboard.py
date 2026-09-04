@@ -219,6 +219,51 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
     ],
 }
 
+# Asset Operations and Operations & Shared Services had no cards: their summary route
+# returned 404 and the page showed a cross-filter hint over nothing (2026-09-04). The
+# device cards are the meter_ops definitions re-homed, not re-written, so the two pages
+# cannot disagree; the copies carry this workstream's id for the card's badge and links.
+
+def _rehomed(workstream, kpi_id, new_workstream):
+    spec = next(k for k in WORKSTREAM_KPIS[workstream] if k["id"] == kpi_id)
+    return {**spec, "workstream": new_workstream}
+
+
+WORKSTREAM_KPIS["assets"] = [
+    {"id": "installed_devices", "label": "Installed devices", "subtitle": "Meters installed today",
+     "snapshot_id": "rpt_device_asset", "format": "number", "workstream": "assets",
+     "explore_report_id": None, "windowless": True,
+     "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}],
+               "filters": [{"field": "Is Installed", "op": "eq", "value": True}]},
+     "trend": {"dimensions": ["Device Type"], "measures": [{"field": "*", "agg": "count"}],
+               "filters": [{"field": "Is Installed", "op": "eq", "value": True}], "limit": 6}},
+    {"id": "devices_switched_off", "label": "Installed but switched off", "subtitle": "Installed, service off",
+     "snapshot_id": "rpt_device_asset", "format": "number", "workstream": "assets",
+     "explore_report_id": None, "windowless": True,
+     "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}],
+               "filters": [{"field": "Installed But Switched Off", "op": "eq", "value": True}]},
+     "trend": {"dimensions": ["Device Type"], "measures": [{"field": "*", "agg": "count"}],
+               "filters": [{"field": "Installed But Switched Off", "op": "eq", "value": True}], "limit": 6}},
+    _rehomed("meter_ops", "never_registered", "assets"),
+    _rehomed("meter_ops", "devices_dark_60d", "assets"),
+]
+
+WORKSTREAM_KPIS["common"] = [
+    {"id": "batch_runs", "label": "Batch runs", "subtitle": "Runs started in the period, by outcome",
+     "snapshot_id": "rpt_batch", "format": "number", "workstream": "common",
+     "explore_report_id": None, "date_field": "Start Time",
+     "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
+     "trend": {"dimensions": ["Run Status"], "measures": [{"field": "*", "agg": "count"}],
+               "filters": [], "limit": 6}},
+    {"id": "todos_created", "label": "To Do entries created", "subtitle": "Created in the period",
+     "snapshot_id": "rpt_todo", "format": "number", "workstream": "common",
+     "explore_report_id": None, "date_field": "Created Date/Time",
+     "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
+     "trend": {"dimensions": ["To Do Type"], "measures": [{"field": "*", "agg": "count"}],
+               "filters": [], "limit": 6}},
+    _rehomed("field_ops", "open_todos", "common"),
+]
+
 def build_workstream_summary(
     workstream_id: str,
     days: int = 30,

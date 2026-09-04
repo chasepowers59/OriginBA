@@ -1775,8 +1775,8 @@
        "Customer Class Code",
        "CIS Division"
       ],
-      "id": "common",
-      "label": "Operations & Shared Services"
+      "id": "billing",
+      "label": "Billing & Rates"
      }
     ],
     "grain": "bill",
@@ -1937,7 +1937,7 @@
    "fields": [
     {
      "description": "The bill this row was processed on. For revenue attribution on cancellations use \"Owning Bill ID\" where the canvas offers it.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill ID",
      "label": "Bill ID",
      "role": "dimension",
@@ -1945,7 +1945,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "common",
+     "group": "billing",
      "id": "Alternate Bill ID",
      "label": "Alternate Bill ID",
      "role": "dimension",
@@ -1953,7 +1953,7 @@
     },
     {
      "description": "English description of \"Bill Status Code\". Group and report on this; filter on the code.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill Status",
      "label": "Bill Status",
      "role": "dimension",
@@ -1961,7 +1961,7 @@
     },
     {
      "description": "Base-product code, fixed by Oracle and the same at every utility. Paired with \"Bill Status\" for the description: report on the description, filter on the code.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill Status Code",
      "label": "Bill Status Code",
      "role": "dimension",
@@ -1969,7 +1969,7 @@
     },
     {
      "description": "Flag. Filter on it; do not sum it.",
-     "group": "common",
+     "group": "billing",
      "id": "Is Completed",
      "label": "Is Completed",
      "role": "dimension",
@@ -1977,7 +1977,7 @@
     },
     {
      "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
-     "group": "common",
+     "group": "billing",
      "id": "Window Start Date",
      "label": "Window Start Date",
      "role": "date",
@@ -1985,7 +1985,7 @@
     },
     {
      "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill Date",
      "label": "Bill Date",
      "role": "date",
@@ -1993,7 +1993,7 @@
     },
     {
      "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
-     "group": "common",
+     "group": "billing",
      "id": "Due Date",
      "label": "Due Date",
      "role": "date",
@@ -2001,7 +2001,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "common",
+     "group": "billing",
      "id": "Created Date/Time",
      "label": "Created Date/Time",
      "role": "date",
@@ -2009,7 +2009,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "common",
+     "group": "billing",
      "id": "Completed Date/Time",
      "label": "Completed Date/Time",
      "role": "date",
@@ -2017,7 +2017,7 @@
     },
     {
      "description": "Window start to completion, whole days -- a CYCLED-bill metric by construction: off-cycle bills have no window at all (measured: the two populations partition 360,376 / 359,785 with zero crossovers at the reference client; \"Is Off-Cycle\" is the split). The billing engine's speedometer: measured norm p50 3.8 / p90 7.8 / p99 24.2, 2 bills over 30 days in a year. Never negative (asserted).",
-     "group": "common",
+     "group": "billing",
      "id": "Days To Complete",
      "label": "Days To Complete",
      "role": "measure",
@@ -2025,7 +2025,7 @@
     },
     {
      "description": "The same clock still running: days since window start on bills NOT yet complete, as of the build's as-of date. The stuck-bill worklist -- sort descending.",
-     "group": "common",
+     "group": "billing",
      "id": "Days Bill Open",
      "label": "Days Bill Open",
      "role": "measure",
@@ -2033,7 +2033,7 @@
     },
     {
      "description": "English description of \"Bill Cycle Code\". Group and report on this; filter on the code.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill Cycle",
      "label": "Bill Cycle",
      "role": "dimension",
@@ -2041,7 +2041,7 @@
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"Bill Cycle\" for the description: report on the description, filter on the code.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill Cycle Code",
      "label": "Bill Cycle Code",
      "role": "dimension",
@@ -2049,7 +2049,7 @@
     },
     {
      "description": "Flag. Filter on it; do not sum it.",
-     "group": "common",
+     "group": "billing",
      "id": "Is Off-Cycle",
      "label": "Is Off-Cycle",
      "role": "dimension",
@@ -2057,7 +2057,7 @@
     },
     {
      "description": "",
-     "group": "common",
+     "group": "billing",
      "id": "Late Payment Charge Applied",
      "label": "Late Payment Charge Applied",
      "role": "dimension",
@@ -2065,7 +2065,7 @@
     },
     {
      "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
-     "group": "common",
+     "group": "billing",
      "id": "Late Payment Charge Date",
      "label": "Late Payment Charge Date",
      "role": "date",
@@ -2073,7 +2073,7 @@
     },
     {
      "description": "",
-     "group": "common",
+     "group": "billing",
      "id": "Allows Reopen",
      "label": "Allows Reopen",
      "role": "dimension",
@@ -2081,7 +2081,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "common",
+     "group": "billing",
      "id": "Credit Note From Bill ID",
      "label": "Credit Note From Bill ID",
      "role": "dimension",
@@ -2089,7 +2089,7 @@
     },
     {
      "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
-     "group": "common",
+     "group": "billing",
      "id": "Autopay Extract Date",
      "label": "Autopay Extract Date",
      "role": "date",
@@ -2097,7 +2097,7 @@
     },
     {
      "description": "Currency measure, additive at this canvas's grain.",
-     "group": "common",
+     "group": "billing",
      "id": "Autopay Amount",
      "label": "Autopay Amount",
      "role": "measure",
@@ -2105,7 +2105,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "common",
+     "group": "billing",
      "id": "Autopay Stopped Date/Time",
      "label": "Autopay Stopped Date/Time",
      "role": "date",
@@ -2113,7 +2113,7 @@
     },
     {
      "description": "Pre-aggregated count, additive at this canvas's grain.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill Segment Count",
      "label": "Bill Segment Count",
      "role": "measure",
@@ -2121,7 +2121,7 @@
     },
     {
      "description": "Pre-aggregated count, additive at this canvas's grain.",
-     "group": "common",
+     "group": "billing",
      "id": "Frozen Bill Segment Count",
      "label": "Frozen Bill Segment Count",
      "role": "measure",
@@ -2129,7 +2129,7 @@
     },
     {
      "description": "Pre-aggregated count, additive at this canvas's grain.",
-     "group": "common",
+     "group": "billing",
      "id": "Cancelled Bill Segment Count",
      "label": "Cancelled Bill Segment Count",
      "role": "measure",
@@ -2137,7 +2137,7 @@
     },
     {
      "description": "",
-     "group": "common",
+     "group": "billing",
      "id": "SA Count (Bill)",
      "label": "SA Count (Bill)",
      "role": "measure",
@@ -2145,7 +2145,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "common",
+     "group": "billing",
      "id": "Account ID",
      "label": "Account ID",
      "role": "dimension",
@@ -2153,7 +2153,7 @@
     },
     {
      "description": "Descriptive label.",
-     "group": "common",
+     "group": "billing",
      "id": "Main Customer Name",
      "label": "Main Customer Name",
      "role": "dimension",
@@ -2161,7 +2161,7 @@
     },
     {
      "description": "English description of \"Customer Class Code\". Group and report on this; filter on the code.",
-     "group": "common",
+     "group": "billing",
      "id": "Customer Class",
      "label": "Customer Class",
      "role": "dimension",
@@ -2169,7 +2169,7 @@
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"Customer Class\" for the description: report on the description, filter on the code.",
-     "group": "common",
+     "group": "billing",
      "id": "Customer Class Code",
      "label": "Customer Class Code",
      "role": "dimension",
@@ -2177,7 +2177,7 @@
     },
     {
      "description": "",
-     "group": "common",
+     "group": "billing",
      "id": "CIS Division",
      "label": "CIS Division",
      "role": "dimension",
@@ -2323,8 +2323,8 @@
    ],
    "usage_guidance": null,
    "use_case": "The first bill-grain canvas (wave 2, 2026-08-25). Bills previously surfaced only through their segments, which answers per-service questions but not the billing manager's operational one: is the billing engine keeping up?",
-   "workstream": "common",
-   "workstream_label": "Operations & Shared Services"
+   "workstream": "billing",
+   "workstream_label": "Billing & Rates"
   },
   "rpt_bill_factor_price": {
    "data_model": {
@@ -27652,10 +27652,10 @@
    "rpt_device_asset"
   ],
   "billing": [
+   "rpt_bill",
    "rpt_bill_factor_price",
    "rpt_bill_segment",
-   "rpt_bill_segment_read",
-   "rpt_billable_charge"
+   "rpt_bill_segment_read"
   ],
   "cashiering": [
    "rpt_payment",
@@ -27664,7 +27664,6 @@
   ],
   "common": [
    "rpt_batch",
-   "rpt_bill",
    "rpt_characteristics",
    "rpt_todo"
   ],
