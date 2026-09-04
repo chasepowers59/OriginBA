@@ -15,8 +15,8 @@ export function SampleRowsPanel({
 }: {
   snapshotId: string;
   tableName: string;
-  /** The snapshot's own schema. A dbt canvas lives in `reporting`; only the legacy
-   *  snapshots live in CISADM, and hardcoding it labelled every canvas wrongly. */
+  /** The snapshot's own schema (`reporting`, or ORIGINBA_REPORTING in-database).
+   *  Hardcoding one labelled every canvas wrongly. */
   schemaName?: string;
   grainDescription?: string;
   skipSampleRows?: boolean;

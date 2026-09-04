@@ -153,7 +153,7 @@ class NoMentionTests(unittest.TestCase):
 
     LEGACY = re.compile(r"_RPT_CURR|catalog_cisadm|cisadm[-_ ]catalog|required_date_field"
                         r"|required_date_label|is_warehouse|validate_oracle_cisadm_scope"
-                        r"|legacy (?:oracle |cisadm )?snapshot|cisadm snapshot|legacy catalog|legacy org|legacy shape|legacy tenant|legacy path|legacy nine",
+                        r"|legacy[- ](?:oracle |cisadm )?snapshot|cisadm snapshot|legacy[- ]catalog|legacy[- ]org|legacy[- ]shape|legacy[- ]tenant|legacy[- ]path|legacy nine",
                         re.IGNORECASE)
 
     def _hits(self, root: Path, exts: tuple[str, ...]) -> list[str]:

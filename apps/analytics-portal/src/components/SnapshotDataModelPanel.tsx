@@ -237,9 +237,9 @@ function OverviewTab({
 
 function TablesTab({ model }: { model: SnapshotDataModel }) {
   const grouped = useMemo(() => {
-    // Two catalog shapes: the legacy Oracle build emits {table, role, alias} objects;
-    // the dbt build emits plain CISADM table names (lineage-derived — no per-table role,
-    // so they all group under "source"). Normalise so both render.
+    // Two payload shapes: older saved payloads carry {table, role, alias} objects; the
+    // catalog emits plain CISADM table names (lineage-derived — no per-table role, so
+    // they all group under "source"). Normalise so both render.
     const normalized = model.source_tables.map((t) =>
       typeof t === "string" ? { table: t, role: "source", alias: undefined } : t,
     );

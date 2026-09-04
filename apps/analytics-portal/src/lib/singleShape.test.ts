@@ -86,7 +86,7 @@ describe("the date a canvas works in comes from its measured default", () => {
 describe("the legacy shape is not mentioned anywhere in the app", () => {
   it("no source file names a retired concept", () => {
     const legacy =
-      /_RPT_CURR|catalog_cisadm|cisadm[-_ ]catalog|required_date_field|required_date_label|new_services|legacy (?:oracle |cisadm )?snapshot|cisadm snapshot|legacy catalog|legacy org|legacy shape|legacy tenant|legacy path|legacy nine/i;
+      /_RPT_CURR|catalog_cisadm|cisadm[-_ ]catalog|required_date_field|required_date_label|new_services|legacy[- ](?:oracle |cisadm )?snapshot|cisadm snapshot|legacy[- ]catalog|legacy[- ]org|legacy[- ]shape|legacy[- ]tenant|legacy[- ]path|legacy nine/i;
     const hits: string[] = [];
     for (const file of walk(SRC)) {
       const lines = readFileSync(file, "utf8").split("\n");

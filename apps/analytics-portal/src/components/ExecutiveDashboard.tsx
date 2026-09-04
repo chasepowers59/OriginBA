@@ -168,8 +168,8 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
             ))}
           </div>
         ) : summary?.catalog_note ? (
-          // A legacy-catalog org has none of the governed canvases the KPIs read — one
-          // clear explanation instead of a grid of per-KPI errors.
+          // An org whose warehouse is not built yet resolves none of the canvases the
+          // KPIs read — one clear explanation instead of a grid of per-KPI errors.
           <div className="glass-panel px-6 py-8 text-center">
             <p className="text-sm font-medium text-heading">
               Executive KPIs aren&apos;t available for this organization

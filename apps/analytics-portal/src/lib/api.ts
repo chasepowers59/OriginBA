@@ -435,8 +435,8 @@ export function defaultDateRangeLastMonth(): [string, string] {
 }
 
 export function fetchDatabaseTables(
-  // Empty = let the API pick the engine's own schema (reporting for the warehouse,
-  // CISADM for a legacy Oracle tenant).
+  // Empty = let the API pick the engine's own schema (reporting for Postgres, CISADM
+  // for an Oracle tenant).
   schema = "",
   search = "",
   opts?: { snapshotsOnly?: boolean; includeStats?: boolean },

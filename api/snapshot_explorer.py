@@ -197,9 +197,9 @@ def snapshots_index(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, A
         "workstream_labels": catalog.get("workstream_labels", {}),
         "portal_snapshots": catalog.get("portal_snapshots", []),
         "poc_enabled": catalog.get("poc_enabled", []),
-        # Either backend counts: dbt-catalog orgs read the Postgres warehouse, legacy
-        # orgs the Oracle demo. Demo-only here showed warehouse tenants "Connect
-        # database" with a live warehouse behind them.
+        # Either backend counts: Postgres orgs read the warehouse, Oracle orgs their
+        # own instance. Checking only one showed warehouse tenants "Connect database"
+        # with a live warehouse behind them.
         "db_configured": (demo_configured(org_id) or warehouse_configured(org_id))
         if org_id else False,
         "workstreams": workstreams,

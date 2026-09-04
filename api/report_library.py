@@ -20,7 +20,7 @@ def build_report_library(organization_id: str | None = None) -> dict[str, Any]:
             # Do NOT force case. Uppercasing was safe while every snapshot was an
             # Oracle table (CISADM names are uppercase); the dbt canvases are lowercase
             # rpt_* and every lookup missed, so the library came back empty with no
-            # error. Try the id as written, then upper for the legacy names.
+            # error. Try the id as written, then upper, for references saved upper-cased.
             raw_id = str(ref.get("snapshot_id", ""))
             snap_id = resolve_snapshot_key(snapshots, raw_id)
             report_id = ref.get("report_id")

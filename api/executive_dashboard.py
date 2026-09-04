@@ -304,8 +304,8 @@ def available_kpis(
 
 def _refresh_insight(organization_id: str) -> dict[str, Any] | None:
     """Change since last refresh, from the landing watermarks -- every row carries
-    its CDC load_dttm, so the latest batch IS the change log. Best-effort: a legacy
-    org (no warehouse) or a warehouse without the landing schema returns None."""
+    its CDC load_dttm, so the latest batch IS the change log. Best-effort: an org with
+    no warehouse yet, or a warehouse without the landing schema, returns None."""
     try:
         from api.warehouse_db import execute_query as run_warehouse
 
@@ -345,9 +345,9 @@ def build_executive_summary(
     kpi_defs, catalog_note = available_kpis(
         _kpis_for_workstreams(allowed_workstreams), organization_id)
 
-    # the KPI set runs on the dbt WAREHOUSE canvases; the Oracle demo DB is only
-    # needed for any legacy-snapshot KPI. Either backend being configured is enough --
-    # the runner routes per snapshot and reports per-KPI errors.
+    # The KPI set runs on the canvases from whichever engine serves this org. Either
+    # backend being configured is enough -- the runner routes per snapshot and reports
+    # per-KPI errors.
     if not organization_id or not (
             demo_configured(organization_id) or warehouse_configured(organization_id)):
         return {
@@ -424,8 +424,8 @@ def build_executive_summary(
         "compare_mode": compare_mode,
         "compare_label": compare_label,
         "catalog_note": catalog_note,
-        # The freshness marker reads the warehouse landing; on a legacy-catalog org
-        # (no canvas KPIs ran) it would advertise ANOTHER org's data — suppress it.
+        # The freshness marker reads the warehouse landing; on an org where no canvas
+        # KPI ran it would advertise ANOTHER org's data — suppress it.
         "refresh": _refresh_insight(organization_id) if kpi_defs else None,
         "period": {
             "start": date_start,

@@ -145,7 +145,7 @@ export function prettifyFieldName(fieldId: string): string {
   return fieldId
     .replace(/^FK_/i, "")
     .replace(/_DESC$/i, "")
-    // Absorb a STATUS/STAT stem into the one expanded word: 22 legacy ids end
+    // Absorb a STATUS/STAT stem into the one expanded word: 22 CISADM column ids end
     // _STATUS_FLG or _STAT_FLG (BILL_STAT_FLG, SA_STATUS_FLG, PAY_STATUS_FLG among
     // them) and appending to those produced "Adj Status Status".
     .replace(/(?:_(?:STATUS|STAT))?_FLG$/i, "_status")

@@ -85,8 +85,8 @@ export function DatabaseWorkspace({
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("starters");
   const [templateCategory, setTemplateCategory] = useState("All");
   const [resultView, setResultView] = useState<ResultView>("table");
-  // The warehouse is where the fleet is going; the first /database/tables response
-  // corrects this for a legacy Oracle tenant.
+  // Postgres is the default guess; the first /database/tables response corrects this
+  // for an Oracle tenant.
   const [engine, setEngine] = useState<WorkspaceEngine>("postgres");
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
