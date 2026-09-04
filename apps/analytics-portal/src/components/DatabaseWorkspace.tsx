@@ -122,7 +122,6 @@ export function DatabaseWorkspace({
     setTablesLoading(true);
     try {
       const response = await fetchDatabaseTables("", search, {
-        snapshotsOnly: !search.trim(),
         includeStats: Boolean(search.trim()),
       });
       if (response.engine) setEngine(response.engine);
