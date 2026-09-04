@@ -67,3 +67,26 @@ describe("a date-only value keeps its calendar day", () => {
     expect(formatDateTime(null)).toBe("—");
   });
 });
+
+describe("a column named '... Date' is a calendar date, whatever the engine stored", () => {
+  /**
+   * CISADM DATE columns land as timestamps, so "Accounting Date" arrived as
+   * "2026-07-21T00:00:00" and rendered "Jul 21, 2026, 12:00 AM" beside "Freeze
+   * Date/Time … 05:52 PM" on every canvas (rpt_financial_txn overview, demo25,
+   * 2026-09-04). The naming sweep made the contract explicit: "X Date" is a date,
+   * "X Date/Time" is an instant. The cell honours the name.
+   */
+  it("drops the midnight from a Date column", () => {
+    expect(formatCellValue("2026-07-21T00:00:00", { columnId: "Accounting Date" })).toBe("Jul 21, 2026");
+    expect(formatCellValue("2026-07-21 00:00:00", { columnId: "Bill Date" })).toBe("Jul 21, 2026");
+  });
+
+  it("keeps the time on a Date/Time column and on an unnamed value", () => {
+    expect(formatCellValue("2026-07-21T17:52:00", { columnId: "Freeze Date/Time" })).toContain("5:52");
+    expect(formatCellValue("2026-07-21T00:00:00")).toContain("12:00");
+  });
+
+  it("does not mistake 'Update' or 'Validate' for a date column", () => {
+    expect(formatCellValue("2026-07-21T17:52:00", { columnId: "Last Update" })).toContain("5:52");
+  });
+});

@@ -91,6 +91,12 @@ export function formatCellValue(
   // caller declares it via isBoolean from the column's declared type (Oracle path).
   if (options?.isBoolean || typeof value === "boolean") return formatBoolean(value);
   if (typeof value === "string" && value.match(/^\d{4}-\d{2}-\d{2}/)) {
+    // "X Date" is a calendar date by the reporting layer's naming contract ("X
+    // Date/Time" is the instant), whatever type the engine stored it as: CISADM DATE
+    // columns land as timestamps and rendered "Jul 21, 2026, 12:00 AM" on every canvas.
+    if (options?.columnId && /\bDate$/.test(options.columnId)) {
+      return formatDateTime(value.slice(0, 10));
+    }
     return formatDateTime(value);
   }
   if (options?.asCurrency) return formatCurrency(value);
