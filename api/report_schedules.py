@@ -253,8 +253,12 @@ def run_due_schedules(*, now: datetime | None = None,
                 schedule["last_status"] = f"sent {count} rows"
                 _store.update(schedule)
         except Exception as exc:  # noqa: BLE001 — the runner must survive any one failure
-            result["status"] = f"error: {exc}"
-            schedule["last_status"] = f"error: {exc}"
+            from api.executive_dashboard import WAREHOUSE_NOT_BUILT_NOTE, is_missing_relation_error
+            # ScheduleDialog renders last_status; an unbuilt warehouse gets the sentence
+            # the dashboards use rather than the driver's ORA-00942.
+            reason = WAREHOUSE_NOT_BUILT_NOTE if is_missing_relation_error(str(exc)) else f"error: {exc}"
+            result["status"] = reason
+            schedule["last_status"] = reason
             _store.update(schedule)
         results.append(result)
     return results
