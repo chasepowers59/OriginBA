@@ -277,7 +277,7 @@ METRICS: list[NlqMetric] = [
     ),
     NlqMetric(
         id="estimate_streaks",
-        label="SAs with 3+ consecutive estimated bills",
+        label="Service agreements with 3+ consecutive estimated bills",
         category="Customers",
         patterns=[r"estimat(e|ed)\s+streaks?", r"consecutive\s+estimated"],
         snapshot_id="rpt_service_agreement",

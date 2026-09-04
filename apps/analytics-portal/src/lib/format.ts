@@ -97,16 +97,24 @@ export function formatCellValue(
   if (isIdentifierColumn(options?.columnId)) return String(value);
   const n = Number(value);
   if (!Number.isFinite(n) || !String(value).match(/^-?\d/)) return String(value);
-  // A STRING is only rendered as a number when doing so ROUND-TRIPS. The name-based
+  // A STRING is only rendered as a number when doing so LOSES NOTHING. The name-based
   // guard above cannot cover this: measured across all 958 text columns in
   // originba_v2_demo25, eight hold leading-zero digit strings under names that share no
   // suffix -- rpt_gl."GL Account", rpt_characteristics."Ad Hoc Value",
   // rpt_asset_location."Hierarchy Path", rpt_todo."Drill Key Values" among them. The
   // worst rendered '01000123923000000000000' as "1,000,123,923,000,000,000,000": the
   // key field of a FINANCE canvas, past 2^53, so the leading zero AND the trailing
-  // digits were wrong. Round-tripping is exactly the set where numeric formatting
-  // loses nothing, and it needs no knowledge of column naming.
-  if (typeof value === "string" && String(n) !== value.trim()) return value;
+  // digits were wrong. Lossless is: a plain decimal, no leading zero, integer part
+  // within 2^53 -- formatted at ITS OWN scale, because the API serializes NUMERIC
+  // columns at the column scale and a strict String(n) round-trip left "-1265.00" raw
+  // beside a formatted "-1,561.11" in the same row.
+  if (typeof value === "string") {
+    const m = value.trim().match(/^-?(0|[1-9]\d*)(?:\.(\d+))?$/);
+    if (!m || !Number.isSafeInteger(Math.trunc(n))) return value;
+    if (options?.isMeasure) return formatNumber(n);
+    const scale = Math.min(m[2]?.length ?? 0, 6);
+    return n.toLocaleString(undefined, { minimumFractionDigits: scale, maximumFractionDigits: scale });
+  }
   if (options?.isMeasure) return formatNumber(n);
   if (Number.isInteger(n)) return n.toLocaleString();
   return n.toLocaleString(undefined, { maximumFractionDigits: 6 });

@@ -48,8 +48,16 @@ describe("splitTickLabel: two lines before any ellipsis", () => {
     expect(splitTickLabel("Frozen", 11)).toEqual(["Frozen"]);
   });
 
-  it("splits a three-word label at the first space and keeps the rest together", () => {
-    expect(splitTickLabel("Non Billed Budget", 14)).toEqual(["Non", "Billed Budget"]);
+  it("picks the space that lets both lines fit, most balanced first", () => {
+    // The first space gave "Waste" / "Water Resi…" -- the ellipsis landed on the
+    // distinguishing word when "Waste Water" / "Residential" fits whole.
+    expect(splitTickLabel("Waste Water Residential", 11)).toEqual(["Waste Water", "Residential"]);
+    expect(splitTickLabel("Non CIS Payments", 11)).toEqual(["Non CIS", "Payments"]);
+    expect(splitTickLabel("Non Billed Budget", 14)).toEqual(["Non Billed", "Budget"]);
+  });
+
+  it("falls back to the first space when no split fits, so the head word stays whole", () => {
+    expect(splitTickLabel("Wastewater Residential Service", 11)).toEqual(["Wastewater", "Residentia…"]);
   });
 
   it("only truncates a line that still does not fit", () => {
