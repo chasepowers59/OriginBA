@@ -3,9 +3,9 @@ import type { QueryResponse } from "@/lib/types";
 /**
  * Says out loud when the SERVER picked the date window, not the reader.
  *
- * A canvas query with no filters used to run unbounded on the 38 dbt canvases and
- * silently windowed on the 19 legacy ones — the same one-line read causing opposite
- * bugs. Both are now windowed, which is the only way an aggregate over 6.08M rows stays
+ * A canvas query with no filters used to run unbounded on some canvases and silently
+ * windowed on others — one read of one field causing opposite bugs. Every canvas with a
+ * date is now windowed, which is the only way an aggregate over 6.08M rows stays
  * interactive (the row cap cannot help: FETCH FIRST applies after GROUP BY).
  *
  * That makes this component load-bearing rather than decorative. A default window that
