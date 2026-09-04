@@ -177,8 +177,8 @@ const NOT_CURRENCY_WORDS = new Set(["COUNT", "COUNTS", "PERCENT", "PCT", "RATE",
  * This was `includes("AMT") || includes("DEBT") || includes("REVENUE")` -- written for
  * CISADM's `_AMT` suffix, and "AMOUNT" does not contain "AMT" (A-M-O-U-N-T). Measured:
  * of 47 money-ish measures in catalog_dbt, exactly ONE was detected, so nearly every
- * money column on the 38 canvases rendered as a bare number. The legacy shape missed
- * GL_AMOUNT and STATISTIC_AMOUNT for the same reason.
+ * money column on the 38 canvases rendered as a bare number. CISADM-style names such as
+ * GL_AMOUNT miss for the same reason.
  *
  * Matching TOKENS rather than substrings is the actual fix; widening the substring list
  * just reproduces the bug pointing the other way. Three false positives that a wider

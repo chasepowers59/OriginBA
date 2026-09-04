@@ -7,10 +7,10 @@ import { prettifyFieldName } from "@/lib/businessLabels";
  *
  * This markup existed three times — ExecutiveDashboard, WorkstreamDashboard and
  * CustomDashboardPage — byte-identical apart from one word ("Cross-filter active:"
- * against "Cross-filter:"). All three interpolated `filter.field` RAW, so on the six
- * legacy orgs the banner read "Cross-filter: ACCOUNTING_DT = ..." while the dev org,
- * whose canvas fields are already Title Case, looked perfectly fine. That is why it
- * survived: the shape we develop against hides it.
+ * against "Cross-filter:"). All three interpolated `filter.field` RAW, so with a raw
+ * CISADM column in the filter the banner read "Cross-filter: ACCOUNTING_DT = ..." while
+ * a canvas field, already Title Case, looked perfectly fine. That is why it survived:
+ * the form we develop against hides it.
  *
  * "active" is dropped because the banner only exists when a filter is active.
  */

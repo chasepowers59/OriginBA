@@ -78,13 +78,10 @@ def _rows_to_dicts(columns: list[str], rows: list[list[Any]]) -> list[dict[str, 
 def _engine(org_id: str) -> str:
     """Workspace engine for this org -- the portal-wide routing decision.
 
-    Three shapes since 2026-08-28: 'postgres' (dbt warehouse, shape A), 'oracle'
-    (legacy CISADM snapshots), 'oracle_dbt' (the dbt canvases inside the client's
-    own Oracle instance -- ORIGINBA_REPORTING, no CDC)."""
-    engine, catalog = org_backend(org_id)
-    if catalog == "dbt":
-        return "postgres" if engine == "postgres" else "oracle_dbt"
-    return "oracle"
+    Two shapes: 'postgres' (a CDC-fed dbt warehouse) and 'oracle_dbt' (the same dbt
+    canvases inside the client's own Oracle instance -- ORIGINBA_REPORTING, no CDC)."""
+    engine, _catalog = org_backend(org_id)
+    return "postgres" if engine == "postgres" else "oracle_dbt"
 
 
 def _require_db(org_id: str) -> str:

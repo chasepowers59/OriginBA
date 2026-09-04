@@ -587,8 +587,8 @@ def snapshot_query(
     snapshot = _require_snapshot_access(ctx, snapshot_id)
 
     filters = [f.model_dump() for f in body.filters]
-    # A window the server chose and did not mention is the bug the legacy shape already
-    # had: the caller asked for all time, got a quarter, and only the raw SQL said so.
+    # A window the server chose and did not mention is a bug this code once had: the
+    # caller asked for all time, got a quarter, and only the raw SQL said so.
     # Applying the same default to 38 more canvases without disclosing it would spread
     # that rather than fix it, so what we add is reported back and what the CALLER sent
     # is left alone and never described as ours.
@@ -598,8 +598,7 @@ def snapshot_query(
         if default_filter:
             filters = [default_filter.model_dump()]
             # `field` stays the machine name the caller filters on; only the sentence is
-            # humanised. On the legacy shape those differ (ACCOUNTING_DT vs "Accounting
-            # date"), and that shape is six of the nine orgs.
+            # humanised, from the canvas's declared date_fields label.
             label = window_date_label(snapshot, default_filter.field)
             applied_window = {
                 "field": default_filter.field,

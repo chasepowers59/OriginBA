@@ -44,10 +44,11 @@ export function isIdentifierColumn(columnId?: string): boolean {
       && words.some((w) => IDENTIFIER_WORDS.has(w))) {
     return true;
   }
-  // Two naming worlds: legacy Oracle snapshots (ACCT_ID, TENDER_TYPE_CD) and the
-  // dbt canvases' Title Case ("Account ID", "Bill Cycle Code", "Meter Badge
-  // Number"). An identifier rendered with thousand separators ("1,358,301,387")
-  // is corrupted for copy/paste and lookups, so this guard must cover both.
+  // Two naming worlds: raw CISADM columns from the SQL workspace (ACCT_ID,
+  // TENDER_TYPE_CD) and the canvases' Title Case ("Account ID", "Bill Cycle Code",
+  // "Meter Badge Number"). An identifier rendered with thousand separators
+  // ("1,358,301,387") is corrupted for copy/paste and lookups, so this guard must
+  // cover both.
   // "Count" columns are measures, not identifiers -- only " NUMBER" matches here.
   return (
     upper.endsWith("_ID") ||

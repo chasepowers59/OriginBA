@@ -10,7 +10,7 @@ import type { QueryResponse } from "@/lib/types";
  *
  * That makes this component load-bearing rather than decorative. A default window that
  * nobody announces is a number narrower than the question asked, with nothing on screen
- * to explain the gap — which is exactly the bug the legacy shape already had. Renders
+ * to explain the gap — which is exactly the bug this window once had. Renders
  * nothing when the reader set their own filters, because then the window is theirs.
  */
 export function AppliedWindowNote({ result }: { result: QueryResponse | null }) {

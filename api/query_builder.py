@@ -96,9 +96,9 @@ def build_query(
     limit: int,
     time_dimensions: list[dict[str, Any]] | None = None,
     # No defaults: which world a query belongs to is a property of the ORG and the
-    # snapshot (snapshot_backend resolves it), not something to fall back on. Defaulting
-    # to oracle/CISADM meant a caller who forgot got the legacy path silently, in Oracle
-    # syntax, against the wrong schema.
+    # snapshot (snapshot_backend resolves it), not something to fall back on. A default
+    # meant a caller who forgot got the retired dialect silently, against the wrong
+    # schema.
     dialect: str,
     schema: str,
 ) -> tuple[str, dict[str, Any]]:
@@ -106,9 +106,9 @@ def build_query(
         raise QueryValidationError("limit must be between 1 and 5000")
     if not measures:
         raise QueryValidationError("At least one measure is required")
-    # Only the two dialects that exist. 'oracle' once meant the legacy path -- unquoted
-    # UPPER_SNAKE identifiers against CISADM -- and an unknown dialect used to fall
-    # through to it in silence. It is refused rather than routed.
+    # Only the two dialects that exist. A retired third one emitted unquoted UPPER_SNAKE
+    # identifiers, and an unknown dialect used to fall through to it in silence. It is
+    # refused rather than routed.
     if dialect not in _TITLECASE_DIALECTS:
         raise QueryValidationError(f"Unknown SQL dialect: {dialect}")
 

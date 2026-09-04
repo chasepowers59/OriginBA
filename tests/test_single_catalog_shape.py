@@ -152,7 +152,8 @@ class NoMentionTests(unittest.TestCase):
     """The requirement is literal: the legacy shape is not MENTIONED in the app."""
 
     LEGACY = re.compile(r"_RPT_CURR|catalog_cisadm|cisadm[-_ ]catalog|required_date_field"
-                        r"|required_date_label|is_warehouse|validate_oracle_cisadm_scope",
+                        r"|required_date_label|is_warehouse|validate_oracle_cisadm_scope"
+                        r"|legacy (?:oracle |cisadm )?snapshot|cisadm snapshot|legacy catalog|legacy org|legacy shape|legacy tenant|legacy path|legacy nine",
                         re.IGNORECASE)
 
     def _hits(self, root: Path, exts: tuple[str, ...]) -> list[str]:

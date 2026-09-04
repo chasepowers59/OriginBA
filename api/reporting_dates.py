@@ -23,8 +23,7 @@ from typing import Any
 MAX_WINDOW_DAYS = 730
 
 # What an unfiltered canvas query falls back to. A quarter is the smallest span that
-# still shows a billing cycle's shape, and it is what the legacy snapshots have always
-# applied -- this is the existing behaviour given one home, not a new policy.
+# still shows a billing cycle's shape.
 DEFAULT_WINDOW_DAYS = 90
 
 

@@ -19,21 +19,11 @@ class CatalogError(RuntimeError):
     pass
 
 
-# ONE CATALOG PER ENGINE, chosen by the organization.
-#
-# A Postgres tenant is served the dbt reporting layer -- 38 governed canvases with
-# enforced contracts. An Oracle tenant is served the legacy CISADM snapshots, because the
-# dbt canvases do not exist in that database and pointing a tenant at a catalog its
-# warehouse cannot satisfy produces a portal full of tiles that error on click.
-#
-# This is what lets a client be migrated ONE AT A TIME: deploy their dbt warehouse, flip
-# engine to postgres in config/portal_organizations.json, and they move. Nothing else
-# changes and no other tenant is affected.
-# ONE catalog. A second one served the legacy CISADM snapshots until 2026-09-02; six
-# of seven client orgs were on it while development happened on this one, and that
-# split produced six shape-specific bugs in a single session. It is retired outright
-# rather than left routable, because a dormant branch is exactly where the next such
-# bug goes to hide.
+# ONE catalog. A second one was retired outright on 2026-09-02 rather than left
+# routable -- six of seven client orgs were on it while development happened on this
+# one, and that split produced six shape-specific bugs in a single session
+# (tests/test_single_catalog_shape.py carries the list). A dormant branch is exactly
+# where the next such bug goes to hide.
 CATALOGS = {
     "dbt": ROOT / "output" / "catalog_dbt.json",
 }
