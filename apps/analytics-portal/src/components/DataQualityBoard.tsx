@@ -1,5 +1,7 @@
 "use client";
 
+import { formatCellValue } from "@/lib/format";
+
 /**
  * Data Quality board — the rules engine's findings as a CIS worklist.
  *
@@ -296,7 +298,9 @@ function RuleCard({
                     </td>
                     {row.map((v, j) => (
                       <td key={j} className="whitespace-nowrap px-2 py-1 text-fg">
-                        {v ?? ""}
+                        {/* The API sends str(value); render it like every other table --
+                            dates as dates, identifiers literal, numbers with separators. */}
+                        {formatCellValue(v, { columnId: r.columns[j] })}
                       </td>
                     ))}
                   </tr>

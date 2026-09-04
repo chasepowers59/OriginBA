@@ -77,7 +77,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     {
         "id": "billed_revenue",
         "label": "Billed revenue",
-        "subtitle": "Charges on frozen bill segments",
+        "subtitle": "Charges on frozen bill segments, by accounting date",
         "snapshot_id": "rpt_financial_txn",
         "format": "currency",
         "workstream": "billing",

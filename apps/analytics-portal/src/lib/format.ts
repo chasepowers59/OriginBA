@@ -151,6 +151,15 @@ export function formatTooltipCurrency(value: unknown): string {
   });
 }
 
+/**
+ * "2026-09-20 00:00:00" -- Python's str() of a timestamp, which the Data Quality
+ * worklist sends -- parses on Chrome and is Invalid Date on Safari; the ISO "T" form
+ * parses everywhere. Anything else passes through untouched.
+ */
+export function isoDateTimeString(raw: string): string {
+  return raw.replace(/^(\d{4}-\d{2}-\d{2}) (\d)/, "$1T$2");
+}
+
 /** YYYY-MM-DD with nothing after it: a calendar date, not an instant. */
 const DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -182,7 +191,7 @@ export function formatDateTime(value: unknown): string {
       year: "numeric",
     });
   }
-  const d = new Date(raw);
+  const d = new Date(isoDateTimeString(raw));
   if (Number.isNaN(d.getTime())) return raw;
   return d.toLocaleString(undefined, {
     month: "short",

@@ -162,7 +162,9 @@ function WorkstreamDashboardInner({
       {filter ? (
         <CrossFilterBanner field={filter.field} value={filter.value} onClear={clearFilter} />
       ) : (
-        <p className="text-xs text-fg-muted">Click spark chart bars to cross-filter all tiles.</p>
+        {summary?.kpis.length ? (
+          <p className="text-xs text-fg-muted">Click spark chart bars to cross-filter all tiles.</p>
+        ) : null}
       )}
 
       <div id="dashboard-export-root">

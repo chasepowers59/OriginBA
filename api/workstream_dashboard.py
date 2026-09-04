@@ -19,7 +19,7 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
     # (field_ops), Customer Operations (customer_ops), Finance (finance). Filters
     # use base-product constants or canvas flags only -- never client config.
     "billing": [
-        {"id": "billed_amount", "label": "Billed amount", "subtitle": "Frozen bill segments",
+        {"id": "billed_amount", "label": "Billed amount", "subtitle": "Frozen bill segments, by bill date",
          "snapshot_id": "rpt_bill_segment", "format": "currency", "workstream": "billing",
          "explore_report_id": None, "date_field": "Bill Date",
          "value": {"dimensions": [], "measures": [{"field": "Billed Amount", "agg": "sum"}],

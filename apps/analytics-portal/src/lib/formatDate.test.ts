@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatCellValue, formatDateTime } from "@/lib/format";
+import { formatCellValue, formatDateTime, isoDateTimeString } from "@/lib/format";
 
 /**
  * A date-only value is a CALENDAR DATE, not an instant at UTC midnight.
@@ -47,6 +47,19 @@ describe("a date-only value keeps its calendar day", () => {
 
   it("reaches the table cell, which is where a reader sees it", () => {
     expect(formatCellValue("2026-09-02")).toBe("Sep 2, 2026");
+  });
+
+  it("reads a space-separated timestamp the way it reads the ISO form", () => {
+    // The Data Quality worklist sends str(value) from Python: "2026-09-20 00:00:00".
+    // `new Date("2026-09-20 00:00:00")` is implementation-defined -- Chrome parses it,
+    // Safari returns Invalid Date -- so it rendered raw on one browser and formatted on
+    // another. Normalised to the ISO form before parsing.
+    // V8 parses the space form too, so the observable fact under test is the
+    // normalisation itself, not the browser's parser.
+    expect(isoDateTimeString("2026-09-20 00:00:00")).toBe("2026-09-20T00:00:00");
+    expect(isoDateTimeString("2026-09-20T13:05:00")).toBe("2026-09-20T13:05:00");
+    expect(isoDateTimeString("not a date")).toBe("not a date");
+    expect(formatDateTime("2026-09-20 00:00:00")).toBe(formatDateTime("2026-09-20T00:00:00"));
   });
 
   it("leaves a non-date string alone", () => {
