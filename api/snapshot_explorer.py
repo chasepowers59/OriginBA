@@ -146,6 +146,18 @@ def _default_date_filter(snapshot: dict[str, Any]) -> FilterRequest | None:
     return FilterRequest(field=field, op="between", value=[start.isoformat(), end.isoformat()])
 
 
+def _query_failure(prefix: str, exc: Exception) -> HTTPException:
+    """A 502 that reads as a sentence when the cause is an unbuilt warehouse.
+
+    Every org reads the dbt catalog, so an org whose in-database warehouse has not been
+    built yet reaches every canvas route and fails each one with ORA-00942. Forwarding
+    the driver's text told the reader nothing they could act on; the note does.
+    """
+    if is_missing_relation_error(str(exc)):
+        return HTTPException(status_code=502, detail=WAREHOUSE_NOT_BUILT_NOTE)
+    return HTTPException(status_code=502, detail=f"{prefix}: {exc}")
+
+
 def _serialize_value(value: Any) -> Any:
     if hasattr(value, "isoformat"):
         return value.isoformat()
@@ -370,7 +382,7 @@ def snapshot_stats(
     try:
         columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=1)
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Demo stats failed: {exc}") from exc
+        raise _query_failure("Stats failed", exc) from exc
     row = rows[0] if rows else [0, None]
     return {
         "client": org_id,
@@ -434,7 +446,7 @@ def snapshot_scope_options(
     try:
         columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=100)
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Scope options failed: {exc}") from exc
+        raise _query_failure("Scope options failed", exc) from exc
 
     values = [str(row[0]) for row in rows if row and row[0] is not None]
     return {
@@ -467,7 +479,7 @@ def snapshot_sample_rows(
     try:
         columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=row_cap)
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Sample rows failed: {exc}") from exc
+        raise _query_failure("Sample rows failed", exc) from exc
 
     # Label lookup keyed BOTH ways: an Oracle snapshot's columns come back uppercase from
     # the driver, a canvas's come back exactly as declared.
@@ -642,10 +654,7 @@ def snapshot_query(
             columns, rows = execute_query(sql, binds, organization_id=org_id,
                                           max_rows=body.limit)
     except Exception as exc:
-        if is_missing_relation_error(str(exc)):
-            raise HTTPException(status_code=502, detail=WAREHOUSE_NOT_BUILT_NOTE) from exc
-        where = "Warehouse" if warehouse else "Demo"
-        raise HTTPException(status_code=502, detail=f"{where} query failed: {exc}") from exc
+        raise _query_failure(f"{'Warehouse' if warehouse else 'Demo'} query failed", exc) from exc
 
     serialized_rows = [
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}

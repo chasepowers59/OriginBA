@@ -126,6 +126,21 @@ class QueryRouteTests(unittest.TestCase):
         self.assertIn("not been built", r.json()["detail"].lower())
         self.assertNotIn("relation", r.json()["detail"])
 
+    def test_the_canvas_overview_routes_say_the_same(self):
+        """Stats, sample rows and the value picker all run on the canvas; on an unbuilt
+        org each of them failed with the driver's text too."""
+        exc = RuntimeError('relation "reporting.rpt_bill_segment" does not exist')
+        for path in ("/snapshots/rpt_bill_segment/stats",
+                     "/snapshots/rpt_bill_segment/sample-rows?limit=3",
+                     "/snapshots/rpt_bill_segment/scope-options/Bill%20Cycle"):
+            with self.subTest(path=path), \
+                 mock.patch("api.warehouse_db.execute_query", side_effect=exc), \
+                 mock.patch("api.warehouse_db.warehouse_configured", return_value=True):
+                r = self.client.get(path)
+            self.assertEqual(r.status_code, 502, path)
+            self.assertIn("not been built", r.json()["detail"].lower(), path)
+            self.assertNotIn("relation", r.json()["detail"], path)
+
     def test_any_other_failure_still_says_what_happened(self):
         r = self._post(RuntimeError("connection refused"))
         self.assertEqual(r.status_code, 502)
