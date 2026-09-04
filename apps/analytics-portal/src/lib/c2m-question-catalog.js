@@ -288,6 +288,8 @@ export const QUESTIONS = [
   }),
   q({
     id: "rebilled-segments",
+    // Declared for the portal's governed query (rebilled segments only: without it every never-cancelled segment drew a null bar; demo25, 2026-09-04).
+    filters: [{"field": "Is Rebilled", "op": "eq", "value": true}],
     process: "usage", workstream: "Billing",
     kind: "count",
     title: "How much is being rebilled, and why?",
@@ -796,6 +798,8 @@ export const QUESTIONS = [
   }),
   q({
     id: "accounts-on-alerts",
+    // Declared for the portal's governed query (accounts carrying an alert: without it the chart was one null bar of every account; demo25, 2026-09-04).
+    filters: [{"field": "Has Alert", "op": "eq", "value": true}],
     process: "customer", workstream: "Customer Information",
     kind: "count",
     title: "Which accounts carry active alerts?",
@@ -1171,6 +1175,8 @@ export const QUESTIONS = [
   }),
   q({
     id: "cancelled-payments",
+    // Declared for the portal's governed query (cancelled payments only: without it the not-cancelled majority drew a null bar; demo25, 2026-09-04).
+    filters: [{"field": "Is Cancelled", "op": "eq", "value": true}],
     process: "financial", workstream: "Payments",
     kind: "outlier", unit: "money",
     title: "Which payments were cancelled, and why?",
@@ -1447,6 +1453,8 @@ export const QUESTIONS = [
   }),
   q({
     id: "bills-longest-open",
+    // Declared for the portal's governed query (pending bills only: a completed bill has no open clock; demo25, 2026-09-04).
+    filters: [{"field": "Is Completed", "op": "eq", "value": false}],
     process: "usage", workstream: "Billing",
     kind: "outlier", chart: "horizontal",
     title: "Which bill cycles have the longest-open bills?",
