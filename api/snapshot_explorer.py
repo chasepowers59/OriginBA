@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from datetime import date, timedelta
 from typing import Any
 
@@ -19,7 +21,7 @@ from api.warehouse_db import warehouse_configured
 from api.org_db import require_org_for_data
 from api.query_builder import QueryValidationError, build_query
 from api.raw_sql_validator import RawSqlValidationError, apply_row_cap, validate_raw_sql
-from api.reporting_dates import (DEFAULT_WINDOW_DAYS, reporting_today,
+from api.reporting_dates import (DEFAULT_WINDOW_DAYS, DEFAULT_WINDOW_MIN_ROWS, reporting_today,
                                  window_date_field, window_date_label)
 from api.executive_dashboard import (WAREHOUSE_NOT_BUILT_NOTE, build_executive_summary,
                                      is_missing_relation_error)
@@ -127,8 +129,51 @@ def _row_estimate(snapshot: dict, organization_id: str) -> int | None:
     return rows[0][0] if rows and rows[0] and rows[0][0] is not None else None
 
 
-def _default_date_filter(snapshot: dict[str, Any]) -> FilterRequest | None:
-    """The window an unfiltered query falls back to, or None for a canvas with no date.
+# (organization_id, table) -> (read_at, rows). Statistics move only when the warehouse
+# is rebuilt, so a ten-minute memory is plenty and costs one catalog read per canvas.
+_ESTIMATES: dict[tuple[str | None, str], tuple[float, int | None]] = {}
+_ESTIMATE_TTL_SECONDS = 600
+
+
+def _row_estimate(snapshot: dict[str, Any], organization_id: str | None) -> int | None:
+    """How many rows the ENGINE thinks the canvas has, from its own statistics: no scan.
+
+    Postgres pg_class.reltuples and Oracle ALL_TABLES.NUM_ROWS are both maintained by
+    the build's ANALYZE / DBMS_STATS post-hook. None when the statistic cannot be read,
+    and the caller treats None as "big" -- the window is a safety bound, and losing it
+    on a 6M-row canvas costs far more than keeping it on a small one.
+    """
+    import time
+    table = str(snapshot.get("table_name") or "")
+    key = (organization_id, table)
+    hit = _ESTIMATES.get(key)
+    if hit and time.monotonic() - hit[0] < _ESTIMATE_TTL_SECONDS:
+        return hit[1]
+    estimate: int | None = None
+    try:
+        _backend, dialect, schema = snapshot_backend(snapshot, organization_id)
+        if not re.fullmatch(r"[A-Za-z0-9_]+", table) or not re.fullmatch(r"[A-Za-z0-9_]+", schema):
+            return None
+        if dialect == "postgres":
+            sql = ("SELECT c.reltuples::bigint AS n FROM pg_class c "
+                   "JOIN pg_namespace n ON n.oid = c.relnamespace "
+                   f"WHERE n.nspname = '{schema}' AND c.relname = '{table}'")
+        else:
+            sql = (f"SELECT NUM_ROWS AS n FROM ALL_TABLES WHERE OWNER = '{schema.upper()}' "
+                   f"AND TABLE_NAME = '{table.upper()}'")
+        _columns, rows = _run(snapshot, sql, organization_id=organization_id, max_rows=1)
+        if rows and rows[0] and rows[0][0] is not None:
+            estimate = int(rows[0][0])
+    except Exception:  # noqa: BLE001 -- an unreadable statistic must not fail the query
+        estimate = None
+    _ESTIMATES[key] = (time.monotonic(), estimate)
+    return estimate
+
+
+def _default_date_filter(snapshot: dict[str, Any],
+                         organization_id: str | None = None) -> FilterRequest | None:
+    """The window an unfiltered query falls back to, or None for a canvas with no date
+    -- or for a canvas too small for a window to buy anything (DEFAULT_WINDOW_MIN_ROWS).
 
     The row cap does not substitute for a window: FETCH FIRST applies AFTER GROUP BY,
     so an unfiltered aggregate reads every row before returning its first.
@@ -141,6 +186,10 @@ def _default_date_filter(snapshot: dict[str, Any]) -> FilterRequest | None:
     field = window_date_field(snapshot)
     if not field:
         return None
+    if organization_id is not None:
+        estimate = _row_estimate(snapshot, organization_id)
+        if estimate is not None and estimate < DEFAULT_WINDOW_MIN_ROWS:
+            return None
     end = reporting_today()
     start = end - timedelta(days=DEFAULT_WINDOW_DAYS)
     return FilterRequest(field=field, op="between", value=[start.isoformat(), end.isoformat()])
@@ -359,7 +408,7 @@ def snapshot_metadata(
     ctx.require_permission("snapshots:read")
     org_id = require_org_for_data(ctx)
     snapshot = _require_snapshot_access(ctx, snapshot_id)
-    default_filter = _default_date_filter(snapshot)
+    default_filter = _default_date_filter(snapshot, org_id)
     return {
         "id": snapshot_id,
         "client": org_id,
@@ -607,7 +656,7 @@ def snapshot_query(
     # is left alone and never described as ours.
     applied_window: dict[str, Any] | None = None
     if not filters:
-        default_filter = _default_date_filter(snapshot)
+        default_filter = _default_date_filter(snapshot, org_id)
         if default_filter:
             filters = [default_filter.model_dump()]
             # `field` stays the machine name the caller filters on; only the sentence is

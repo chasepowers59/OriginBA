@@ -302,7 +302,8 @@ export function VisualBuilder({
   useEffect(() => {
     if (initialApplied.current || !index.length) return;
     if (initialReport && questions.length) {
-      const q = questions.find((x) => x.id === initialReport);
+      // The catalog id is composite (canvas:report); the Library's own report_id also resolves.
+      const q = questions.find((x) => x.id === initialReport || x.report_id === initialReport);
       if (q) {
         initialApplied.current = true;
         void applyQuestion(q);

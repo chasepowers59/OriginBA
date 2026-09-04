@@ -171,3 +171,47 @@ class QueryRouteTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TheWindowIsForBigCanvases(unittest.TestCase):
+    """"How many accounts, by customer class?" rendered ONE bar on demo25: the default
+    90-day window on Account Setup Date kept 56 of 562 accounts, so a stock question was
+    silently answered as a flow question (2026-09-04). The window exists to keep a
+    multi-million-row aggregate interactive -- measured: Ellensburg RPT_GL 6.08M rows
+    4,062ms -> 825ms -- and on 562 rows it buys nothing and changes the answer. So it is
+    applied only when the engine's own row estimate says the canvas is big; an estimate
+    that cannot be read fails TOWARD the window, never toward an unbounded scan.
+    """
+
+    def test_a_small_canvas_gets_no_default_window(self):
+        from api import snapshot_explorer as se
+        with mock.patch.object(se, "_row_estimate", return_value=562):
+            self.assertIsNone(se._default_date_filter({"default_date_field": "Account Setup Date"}, "dev"))
+
+    def test_a_big_canvas_still_gets_the_window(self):
+        from api import snapshot_explorer as se
+        with mock.patch.object(se, "_row_estimate", return_value=6_080_000):
+            f = se._default_date_filter({"default_date_field": "Accounting Date"}, "dev")
+        self.assertEqual(f.field, "Accounting Date")
+
+    def test_an_unreadable_estimate_keeps_the_window(self):
+        from api import snapshot_explorer as se
+        with mock.patch.object(se, "_row_estimate", return_value=None):
+            self.assertIsNotNone(se._default_date_filter({"default_date_field": "Bill Date"}, "dev"))
+
+    def test_the_threshold_is_where_the_measurements_put_it(self):
+        from api.reporting_dates import DEFAULT_WINDOW_MIN_ROWS
+        self.assertEqual(DEFAULT_WINDOW_MIN_ROWS, 100_000)
+
+    def test_the_estimate_reads_the_engine_statistics_not_a_count(self):
+        from api import snapshot_explorer as se
+        seen = {}
+        def fake_run(snapshot, sql, organization_id=None, max_rows=None):
+            seen["sql"] = sql
+            return ["n"], [[562]]
+        with mock.patch.object(se, "_run", side_effect=fake_run), \
+             mock.patch.object(se, "snapshot_backend", return_value=("postgres", "postgres", "reporting")):
+            se._ESTIMATES.clear()
+            self.assertEqual(se._row_estimate({"table_name": "rpt_customer_account"}, "dev"), 562)
+        self.assertIn("pg_class", seen["sql"])
+        self.assertNotIn("count(*)", seen["sql"].lower())

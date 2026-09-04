@@ -26,6 +26,14 @@ MAX_WINDOW_DAYS = 730
 # still shows a billing cycle's shape.
 DEFAULT_WINDOW_DAYS = 90
 
+# The default window is applied only to canvases at least this big. Measured: the window
+# takes Ellensburg RPT_GL (6.08M rows) from 4,062ms to 825ms and makes demo25's
+# rpt_measurement (3.56M, dates clumped) slightly SLOWER; on rpt_customer_account (562
+# rows) it cannot speed anything up and turned "accounts by class" into "accounts set
+# up in the last 90 days" (one bar instead of five). Below this, an unfiltered query
+# reads the whole canvas, which at this size is the cheap and correct thing.
+DEFAULT_WINDOW_MIN_ROWS = 100_000
+
 
 def window_date_field(snapshot: dict[str, Any]) -> str | None:
     """The date column a window applies to, or None if the canvas has no date.
