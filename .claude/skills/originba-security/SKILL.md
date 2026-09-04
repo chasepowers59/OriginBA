@@ -7,8 +7,9 @@ description: The OriginBA client-isolation and data-protection model — how one
 
 Every client's data lives in a different place and must never meet. This file states
 the model, the rules that keep it true, and the audited gaps — so a refactor cannot
-quietly undo a control. Audited 2026-09-01: the four CRITICAL findings are fixed
-and regression-tested; the HIGH findings below are still live.
+quietly undo a control. Audited 2026-09-01; as of 2026-09-02 every CRITICAL and HIGH
+finding is fixed and regression-tested, and of the MEDIUMs only M4 (no migration
+mechanism) remains open. `docs/SECURITY_AUDIT_2026-09-01.md` carries the ledger.
 
 ## The isolation model in one paragraph
 
@@ -85,9 +86,11 @@ CTEs that hide the real target, and whole-row projection (`row_to_json(t)`,
 `to_jsonb(t)`, `t::text`) of any table carrying a secret.
 
 Oracle: `ALL_TABLES`/`DBA_*`/`V$*`/`SYS.*`, other schemas, `@dblink`, `UTL_HTTP`,
-`XMLTYPE(t)`, `JSON_OBJECT(*)`. Both Oracle fences block all of these:
-`validate_oracle_reporting_scope` (in-database, CISADM + ORIGINBA_REPORTING) and
-`validate_oracle_cisadm_scope` (legacy, CISADM only).
+`XMLTYPE(t)`, `JSON_OBJECT(*)`. The one Oracle fence, `validate_oracle_reporting_scope`
+(CISADM + ORIGINBA_REPORTING), blocks all of these -- while letting a column that merely
+STARTS with `all_`/`user_` through, because those are ordinary CISADM column names
+(USER_ID is on 378 tables) and a dictionary view is only readable in table position.
+The CISADM-only fence went with the legacy snapshot catalog on 2026-09-02.
 
 ## An authorization check that resolved against the WRONG CATALOG (2026-09-02)
 
