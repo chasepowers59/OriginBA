@@ -91,8 +91,10 @@ Oracle: `ALL_TABLES`/`DBA_*`/`V$*`/`SYS.*`, other schemas, `@dblink`, `UTL_HTTP`
 
 ## An authorization check that resolved against the WRONG CATALOG (2026-09-02)
 
-Fixed, and worth carrying as a shape rather than an incident, because the isolation
-model has two catalogs behind it and only one is the development default.
+Fixed twice over: the lookup now threads the caller's org, AND the second catalog was
+retired the same day (portal `tests/test_single_catalog_shape.py`), so the condition
+that made this possible no longer exists. Kept because the shape of the mistake --
+an authz lookup that forgets WHICH world it is deciding in -- is general.
 
 `snapshot_workstream()` called `get_snapshot()` with **no organization_id**, and
 `catalog_name_for_org(None)` returns `"dbt"`. So every workstream authorization lookup
@@ -108,7 +110,7 @@ It failed CLOSED — a lockout, not a leak. What kept it invisible is the part t
 remember: the dev org is a dbt org, and **`"*"` and an empty grant both mean full
 access and never reach the workstream comparison at all**, so the two configurations
 we develop against cannot see it. When auditing an authz path here, exercise it with a
-RESTRICTED grant on a LEGACY org; a full-grant pass proves nothing.
+RESTRICTED grant on an org OTHER than dev; a full-grant pass proves nothing.
 
 **The obvious mock hides it.** My first test patched `catalog_name_for_org` and PASSED
 against the broken code, because that patch answers `"cisadm"` for the

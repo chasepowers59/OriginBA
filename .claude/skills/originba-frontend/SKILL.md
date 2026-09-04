@@ -119,13 +119,12 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
    Three instances: the admin grant picker, `businessLabels`
    WORKSTREAM_ORDER/LABELS/DESCRIPTIONS, `workstreamIcons`. Consequences were invisible
    — Asset Operations was ungrantable, and `/workstream/assets` 404'd while
-   `/workstream/new_services` rendered a full dashboard. **THERE ARE TWO DEPLOYMENT
-   SHAPES**, which is why these copies rot: `output/catalog_dbt.json` has `assets` and
-   no `new_services`; `output/catalog_cisadm.json` has `new_services` and no `assets`
-   (six orgs are legacy). No single hardcoded list can be right for every org. Derive
-   per organization from `workstream_order`; where a shape-independent fallback is
-   genuinely needed it must carry the UNION and be pinned by a test that reads
-   `output/catalog_*.json` — both files are committed, so the test can.
+   a workstream the catalog did not carry rendered a full dashboard. The root cause was
+   TWO catalog shapes coexisting — **retired 2026-09-02**: every org now reads
+   `output/catalog_dbt.json`, and the legacy CISADM snapshot catalog is deleted. The
+   lesson outlives the cause: derive from `workstream_order`, and pin any fallback
+   against the committed catalog file with a test, because a hand-kept copy is the
+   thing that drifts.
 2. **Shape mismatch across the API boundary, masked by a fallback that never runs.**
    `workstreams[].featured` is id STRINGS; the hero read `.snapshot_id`, so every
    "Start here" card on every workstream page rendered blank and linked to
@@ -180,6 +179,11 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     panel stacked above.
 
 11. **ONE read of a shape-specific field, causing OPPOSITE bugs in the two shapes.**
+    **CLOSED 2026-09-02 by retiring the second shape** — six instances of this class in
+    one session was the case for it. Kept as the record of what the split cost and why
+    a dormant branch is where the next one would have hidden. The shape-specific
+    HEURISTIC variant (a rule that inspects a column NAME) still applies, because the
+    SQL workspace passes raw CISADM column names while canvases are Title Case.
     The sharpest form of #1, and the hardest to see, because neither half looks like a
     bug on its own. `snapshot_explorer` chose its default window from
     `required_date_field` ALONE — a CISADM-era field no dbt canvas declares. Measured
@@ -324,8 +328,10 @@ first, and which column gets indexed), so decide before doing.
 emptiness in that file carries one, which is the tell for a placeholder rather than a
 decision. Measured from the committed catalogs:
 
-    catalog_cisadm   21 business_processes, 19 of 19 canvases with process_guides
     catalog_dbt       0 business_processes,  0 of 38 canvases with process_guides
+    (the retired legacy catalog carried 21 processes and guides on every canvas -- the
+    content exists in git history and has to be PORTED to the 38 canvases; there is no
+    longer a shape where it works by accident)
 
 The UI is wired for it end to end, so it fails quietly on the three dbt orgs —
 including Ellensburg, the strategic target. Two consequences:
