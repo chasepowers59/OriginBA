@@ -264,6 +264,27 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     nothing, needing no knowledge of naming. The name guard still earns its place, since
     `'1358301387'` round-trips and only the name keeps an Account ID out of commas.
 
+15. **A failed query recorded as a VALUE.** `execute_kpi_definition` never raises; it
+    returns `error` with `value: None`. The alert runner never read `error`, so
+    `evaluate_condition(value=None)` was False (correct: no data never breaches) and the
+    runner then wrote `last_state = "ok"`, `last_status = "ok at None"` — an all-clear
+    for a query that failed, which also RESET a breached alert so the next working run
+    re-notified for a condition that never cleared. Any consumer of a result object
+    must check its error field before trusting its value. The sibling: an org whose
+    warehouse is not built yet fails EVERY canvas query with ORA-00942, and eight
+    surfaces (home, workstream, four explorer routes, NLQ, alerts, schedules) each
+    forwarded the driver's text. One detector (`is_missing_relation_error`) and one
+    sentence (`WAREHOUSE_NOT_BUILT_NOTE`) now serve all of them — when a class has that
+    many surfaces, the fix is a shared helper, not eight edits.
+
+16. **`value or default` swallowing a legitimate zero.** `int(x or 13)` turned
+    `hour_utc = 0` (midnight UTC) into 13:00 on both the due check and at creation, so
+    a midnight schedule silently ran at 1pm. Found by a test fixture with `hour_utc: 0`
+    that was never due at noon. Swept every `or <number>` in api/ (~60): this was the
+    ONLY one where 0 is a real value — the rest default a 0-day window or a 0 limit,
+    which are meaningless anyway. The rule: `or` is fine when 0 is invalid; when 0 is a
+    value, only ABSENCE defaults (`13 if x is None else int(x)`). JS: `??` not `||`.
+
 **How five of these were found: a widely-used export with no test.** Enumerate
 `export function` in `lib/`, count references across the app, and subtract anything
 named in a `.test.ts`. 44 exports had 3+ uses and no test. That list is where
