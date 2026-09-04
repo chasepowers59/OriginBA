@@ -185,6 +185,15 @@ def run_kpi_alerts(*, now: datetime | None = None,
                   "recipients": alert.get("recipients", [])}
         try:
             kpi = _kpi_result(alert)
+            # execute_kpi_definition never raises; a failed query comes back as `error`
+            # with value None. Left unchecked, that read as "ok at None" -- an all-clear
+            # that also RESET a breached alert, so the next working run re-notified for
+            # a condition that never cleared.
+            if kpi.get("error"):
+                from api.executive_dashboard import (WAREHOUSE_NOT_BUILT_NOTE,
+                                                     is_missing_relation_error)
+                err = str(kpi["error"])
+                raise AlertError(WAREHOUSE_NOT_BUILT_NOTE if is_missing_relation_error(err) else err)
             value = kpi.get("value")
             breached = evaluate_condition(
                 alert["condition"], float(alert["threshold"]),
