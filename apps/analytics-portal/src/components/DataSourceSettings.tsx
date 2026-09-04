@@ -96,12 +96,22 @@ export function DataSourceSettings() {
           {/* The EFFECTIVE organization -- the one this page reads and writes. It used
               to name the signed-in user's HOME org, so an admin who had switched tenant
               was told they were configuring one client while every save went to another. */}
-          Connect the analytics portal to your Oracle C2M database for{" "}
-          <span className="text-heading">
-            {portal.organization_name ?? "your assigned client"}
-          </span>.
-          Credentials are sent over HTTPS to the API only, encrypted at rest on the server, and never
-          written to browser storage or git.
+          {status?.source === "warehouse" ? (
+            <>
+              <span className="text-heading">{portal.organization_name ?? "This organization"}</span>{" "}
+              reads the dbt reporting layer through the API&apos;s warehouse connection, set by the
+              operator in the environment. Nothing to enter here.
+            </>
+          ) : (
+            <>
+              Connect the analytics portal to your Oracle C2M database for{" "}
+              <span className="text-heading">
+                {portal.organization_name ?? "your assigned client"}
+              </span>.
+              Credentials are sent over HTTPS to the API only, encrypted at rest on the server, and never
+              written to browser storage or git.
+            </>
+          )}
         </p>
       </div>
 
@@ -137,6 +147,9 @@ export function DataSourceSettings() {
         </div>
       ) : null}
 
+      {/* The Oracle form configures an in-database (Oracle) organization. A warehouse-
+          sourced one showed it anyway, inviting credentials that nothing would read. */}
+      {status?.source === "warehouse" ? null : (
       <form
         className="glass-panel space-y-4 p-6"
         onSubmit={(e) => {
@@ -256,6 +269,7 @@ export function DataSourceSettings() {
           </p>
         ) : null}
       </form>
+      )}
 
       <div className="glass-panel p-4 text-xs text-fg-muted">
         <p className="font-medium text-fg-muted">Security notes</p>
