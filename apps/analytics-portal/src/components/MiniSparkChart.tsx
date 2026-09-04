@@ -13,7 +13,7 @@ import {
 import type { ExecutiveTrendPoint } from "@/lib/types";
 import { valueRampColors } from "@/lib/chartEmphasis";
 import { useColorMode } from "@/components/PortalThemeProvider";
-import { tickLabels } from "@/lib/axisLabels";
+import { splitTickLabel } from "@/lib/axisLabels";
 import { formatTooltipCurrency, formatTooltipNumber } from "@/lib/format";
 
 type MiniSparkChartProps = {
@@ -23,6 +23,20 @@ type MiniSparkChartProps = {
   selectedLabel?: string | null;
   onBarClick?: (label: string) => void;
 };
+
+/** Two whole words on two lines beats "Elec…tial": see splitTickLabel. */
+function SparkTick({ x, y, payload }: { x?: number; y?: number; payload?: { value?: unknown } }) {
+  const lines = splitTickLabel(String(payload?.value ?? ""), 11);
+  return (
+    <text x={x} y={y} textAnchor="middle" fontSize={8.5} fill="var(--foreground-subtle)">
+      {lines.map((line, i) => (
+        <tspan key={i} x={x} dy={i === 0 ? 9 : 9.5}>
+          {line}
+        </tspan>
+      ))}
+    </text>
+  );
+}
 
 function SparkTooltip({
   active,
@@ -57,9 +71,8 @@ export function MiniSparkChart({
   // cross-filter selection overrides its bar to the selection hue.
   const { colorMode } = useColorMode();
   const fills = valueRampColors(points.map((p) => p.value), { dark: colorMode === "dark" });
-  const ticks = tickLabels(points.map((p) => p.label), 9);
   const data = points.map((p, i) => ({
-    name: ticks[i],
+    name: p.label,
     fullName: p.label,
     value: p.value,
     fill: selectedLabel === p.label ? "var(--chart-selected)" : fills[i],
@@ -79,14 +92,14 @@ export function MiniSparkChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data} barCategoryGap="18%" margin={{ top: 4, right: 2, left: 2, bottom: 0 }}>
-        {/* Axis labels stay FLAT (design standard): truncate + skip ticks rather than
-            rotate — angled text is harder to scan. */}
+        {/* Axis labels stay FLAT (design standard): wrap to two lines rather than
+            rotate — angled text is harder to scan. Every bar keeps its label
+            (interval 0): a KPI trend has at most a handful of categories. */}
         <XAxis
           dataKey="name"
-          tick={{ fontSize: 9, fill: "var(--foreground-subtle)" }}
-          interval="preserveStartEnd"
-          minTickGap={8}
-          height={20}
+          tick={<SparkTick />}
+          interval={0}
+          height={26}
           tickLine={false}
           axisLine={false}
         />

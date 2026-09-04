@@ -77,7 +77,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     {
         "id": "billed_revenue",
         "label": "Billed revenue",
-        "subtitle": "Frozen bill-segment FTs",
+        "subtitle": "Charges on frozen bill segments",
         "snapshot_id": "rpt_financial_txn",
         "format": "currency",
         "workstream": "billing",
@@ -96,7 +96,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     {
         "id": "payments_collected",
         "label": "Payments",
-        "subtitle": "Frozen pay segments",
+        "subtitle": "Payments on frozen pay segments",
         "snapshot_id": "rpt_payment",
         "format": "currency",
         "workstream": "finance",
@@ -113,7 +113,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         # first, so the default now matches the claim the subtitle was already making.
         # PAY_STATUS_FLG is a base-product lookup (30 Freezable, 50 Frozen, 60 Cancelled).
         "lenses": [
-            {"id": "frozen", "label": "Frozen", "subtitle": "Frozen pay segments — collected",
+            {"id": "frozen", "label": "Frozen", "subtitle": "Collected on frozen pay segments",
              "filters": [{"field": "Payment Status Code", "op": "eq", "value": "50"}]},
             {"id": "canceled", "label": "Canceled", "subtitle": "Cancelled payments",
              "filters": [{"field": "Payment Status Code", "op": "eq", "value": "60"}]},
@@ -164,7 +164,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     {
         "id": "past_due_balance",
         "label": "Past-due balance",
-        "subtitle": "SAs past due",
+        "subtitle": "Service agreements past due",
         "snapshot_id": "rpt_sa_aged_balance",
         "format": "currency",
         "workstream": "finance",
@@ -181,7 +181,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     {
         "id": "bills_completed",
         "label": "Bills",
-        "subtitle": "Cycled billing throughput",
+        "subtitle": "Bills completed in the period",
         "snapshot_id": "rpt_bill",
         "format": "number",
         "workstream": "billing",
@@ -212,7 +212,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     {
         "id": "field_activities",
         "label": "Field activities",
-        "subtitle": "MDM activity volume",
+        "subtitle": "Field activities created in the period",
         "snapshot_id": "rpt_field_activity",
         "format": "number",
         "workstream": "operations",

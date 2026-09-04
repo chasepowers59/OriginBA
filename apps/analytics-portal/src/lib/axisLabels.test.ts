@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { tickLabels } from "./axisLabels";
+import { splitTickLabel, tickLabels } from "./axisLabels";
 
 /**
  * UX-backlog fix: the sparkline truncated twice (14 chars into the datum, then 8
@@ -29,5 +29,35 @@ describe("tickLabels", () => {
   it("handles empty and single-entry input", () => {
     expect(tickLabels([], 9)).toEqual([]);
     expect(tickLabels(["Residential Water"], 9)).toEqual(["Residenti…"]);
+  });
+});
+
+describe("splitTickLabel: two lines before any ellipsis", () => {
+  /**
+   * Utility category names are two words -- "Electric Residential", "Gas Commercial" --
+   * and a 9-character single line turned them into "Elec…tial" and "Elec…cial", which
+   * a reader cannot tell apart at a glance. Splitting on the first space puts each
+   * word on its own line whole; only a word that STILL does not fit is truncated.
+   */
+  it("puts a two-word label on two whole lines", () => {
+    expect(splitTickLabel("Electric Residential", 11)).toEqual(["Electric", "Residential"]);
+    expect(splitTickLabel("Gas Commercial", 11)).toEqual(["Gas", "Commercial"]);
+  });
+
+  it("keeps a short label on one line", () => {
+    expect(splitTickLabel("Frozen", 11)).toEqual(["Frozen"]);
+  });
+
+  it("splits a three-word label at the first space and keeps the rest together", () => {
+    expect(splitTickLabel("Non Billed Budget", 14)).toEqual(["Non", "Billed Budget"]);
+  });
+
+  it("only truncates a line that still does not fit", () => {
+    expect(splitTickLabel("Wastewater Residential", 8)).toEqual(["Wastewa…", "Residen…"]);
+  });
+
+  it("never emits an empty line", () => {
+    expect(splitTickLabel("  Electric  ", 11)).toEqual(["Electric"]);
+    expect(splitTickLabel("", 11)).toEqual([""]);
   });
 });

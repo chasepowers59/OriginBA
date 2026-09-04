@@ -67,8 +67,22 @@ export function changePassword(current_password: string, new_password: string): 
   });
 }
 
+/**
+ * One request per page load, shared by every caller. OrgSwitcher is mounted twice
+ * (desktop header and mobile drawer) and each mount asked again -- four requests for
+ * one list on a single home-page load. A failed request is not cached, so a retry
+ * gets a fresh attempt.
+ */
+let organizationsRequest: Promise<PortalOrganization[]> | null = null;
+
 export function listPortalOrganizations(): Promise<PortalOrganization[]> {
-  return authFetch<PortalOrganization[]>("/auth/organizations");
+  if (!organizationsRequest) {
+    organizationsRequest = authFetch<PortalOrganization[]>("/auth/organizations").catch((err) => {
+      organizationsRequest = null;
+      throw err;
+    });
+  }
+  return organizationsRequest;
 }
 
 export function listPortalUsers(): Promise<AuthUser[]> {
