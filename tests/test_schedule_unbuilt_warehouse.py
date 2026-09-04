@@ -33,7 +33,7 @@ class _Store:
 def _schedule():
     return {"id": "s1", "saved_view_id": "v1", "organization_id": "newark",
             "view_title": "Aged debt", "recipients": ["ops@origin.local"],
-            "cadence": "daily", "hour_utc": 0, "enabled": True, "last_run_at": None,
+            "cadence": "daily", "hour_utc": 9, "enabled": True, "last_run_at": None,
             "last_status": None, "window_days": 30}
 
 
@@ -59,6 +59,35 @@ class ScheduleOnUnbuiltWarehouseTests(unittest.TestCase):
         results, updates, sent = self._run(RuntimeError("SMTP refused"))
         self.assertEqual(sent, [])
         self.assertIn("SMTP refused", updates[-1]["last_status"])
+
+
+class MidnightScheduleTests(unittest.TestCase):
+    """hour_utc=0 is a real hour. `int(x or 13)` turned it into 13 on both the due check
+    and at creation, so a schedule set for midnight UTC silently ran at 13:00 -- found
+    when a test fixture with hour_utc=0 was never due at noon."""
+
+    def test_a_midnight_schedule_is_due_just_after_midnight(self):
+        from api.report_schedules import is_due
+        s = {**_schedule(), "hour_utc": 0}
+        self.assertTrue(is_due(s, datetime(2026, 9, 2, 0, 30, tzinfo=timezone.utc)))
+
+    def test_and_is_not_still_waiting_for_one_pm(self):
+        from api.report_schedules import is_due
+        s = {**_schedule(), "hour_utc": 0}
+        # at 12:59 it must ALREADY have been due for thirteen hours, not "not yet"
+        self.assertTrue(is_due(s, datetime(2026, 9, 2, 12, 59, tzinfo=timezone.utc)))
+
+    def test_creation_keeps_zero_as_zero(self):
+        import api.report_schedules as rs
+        store = _Store([])
+        with mock.patch.object(rs, "_store", store), \
+             mock.patch.object(rs, "_find_view", return_value={"title": "v", "snapshot_id": "rpt_bill"}), \
+             mock.patch.object(rs, "list_schedules", return_value=[]), \
+             mock.patch.object(store, "add", lambda row: row, create=True):
+            created = rs.create_schedule(
+                {"saved_view_id": "v1", "recipients": ["ops@origin.local"], "cadence": "daily",
+                 "hour_utc": 0}, organization_id="newark", created_by="t")
+        self.assertEqual(created["hour_utc"], 0)
 
 
 if __name__ == "__main__":

@@ -61,7 +61,8 @@ def create_schedule(payload: dict[str, Any], *, organization_id: str,
     weekday = int(payload.get("weekday") or 0)
     if cadence == "weekly" and not 0 <= weekday <= 6:
         raise ScheduleError("Weekday must be 0 (Monday) through 6 (Sunday)")
-    hour_utc = int(payload.get("hour_utc") or 13)
+    # `or 13` would turn a deliberate 0 (midnight UTC) into 13:00; only ABSENCE defaults.
+    hour_utc = 13 if payload.get("hour_utc") is None else int(payload["hour_utc"])
     if not 0 <= hour_utc <= 23:
         raise ScheduleError("hour_utc must be 0-23")
     window_days = int(payload.get("window_days") or 30)
@@ -97,7 +98,8 @@ def is_due(schedule: dict[str, Any], now: datetime) -> bool:
     """Due once per period, at or after the configured UTC hour."""
     if not schedule.get("enabled", True):
         return False
-    if now.hour < int(schedule.get("hour_utc") or 13):
+    hour = schedule.get("hour_utc")
+    if now.hour < (13 if hour is None else int(hour)):
         return False
     cadence = schedule.get("cadence", "daily")
     if cadence == "weekly" and now.weekday() != int(schedule.get("weekday") or 0):
