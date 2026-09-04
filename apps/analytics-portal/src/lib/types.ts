@@ -394,6 +394,9 @@ export type WorkstreamSummary = {
   workstream_label: string;
   period: PeriodInfo;
   prior_period?: PeriodInfo;
+  /** Set when every KPI failed for want of its table — the org's warehouse is not
+   *  built yet. `kpis` is empty then; render this sentence instead of a grid. */
+  note?: string | null;
   kpis: ExecutiveKpi[];
 };
 

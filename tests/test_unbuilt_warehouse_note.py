@@ -93,6 +93,47 @@ class UnbuiltWarehouseTests(unittest.TestCase):
         self.assertIsNone(out.get("catalog_note"))
 
 
+class WorkstreamSummaryTests(unittest.TestCase):
+    """The workstream page had the same nine-cards shape and no note to collapse into."""
+
+    def setUp(self):
+        self._env = mock.patch.dict(os.environ, {"PORTAL_AUTH_DISABLED": "true",
+                                                 "PORTAL_DEV_ORGANIZATION": "dev"})
+        self._env.start()
+
+    def tearDown(self):
+        self._env.stop()
+
+    def _summary(self, runner):
+        from api.workstream_dashboard import build_workstream_summary
+        with mock.patch("api.workstream_dashboard.execute_kpi_definition", side_effect=runner), \
+             mock.patch("api.workstream_dashboard.warehouse_configured", return_value=True), \
+             mock.patch("api.workstream_dashboard.demo_configured", return_value=False):
+            return build_workstream_summary("finance", 30, organization_id="newark")
+
+    def test_an_unbuilt_warehouse_collapses_to_one_note(self):
+        out = self._summary(_errored)
+        self.assertEqual(out["kpis"], [])
+        self.assertIn("not been built", (out.get("note") or "").lower())
+
+    def test_a_working_warehouse_has_no_note(self):
+        out = self._summary(_ok)
+        self.assertGreater(len(out["kpis"]), 0)
+        self.assertIsNone(out.get("note"))
+
+    def test_kpis_run_concurrently_not_one_after_another(self):
+        """At client volume over the VPN a sequential fan-out is ~20s; the executive
+        dashboard already runs its KPIs in a pool, and this page had not caught up."""
+        import threading, time
+        seen = set()
+        def slow(kpi, **_):
+            seen.add(threading.get_ident()); time.sleep(0.05); return _ok(kpi)
+        t = time.time(); out = self._summary(slow); elapsed = time.time() - t
+        self.assertGreater(len(out["kpis"]), 1)
+        self.assertGreater(len(seen), 1, "every KPI ran on the same thread")
+        self.assertLess(elapsed, 0.05 * len(out["kpis"]) * 0.8)
+
+
 class QueryRouteTests(unittest.TestCase):
     """The same class on the builder/explorer path: a human sentence, not the driver."""
 

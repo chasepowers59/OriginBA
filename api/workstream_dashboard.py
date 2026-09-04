@@ -6,6 +6,7 @@ from typing import Any
 
 from api.demo_db import demo_configured
 from api.warehouse_db import warehouse_configured
+from api.executive_dashboard import WAREHOUSE_NOT_BUILT_NOTE, warehouse_not_built
 from api.kpi_runner import date_windows, execute_kpi_definition
 from api.snapshot_catalog import load_catalog
 
@@ -272,8 +273,12 @@ def build_workstream_summary(
             ],
         }
 
-    kpis = [
-        execute_kpi_definition(
+    # Concurrent, like the executive dashboard: each KPI is one or more round-trips
+    # to Oracle over the VPN at client volume, and a sequential loop was ~20s.
+    from concurrent.futures import ThreadPoolExecutor
+
+    def _run(kpi: dict[str, Any]) -> dict[str, Any]:
+        return execute_kpi_definition(
             kpi,
             days=days,
             compare=compare,
@@ -281,9 +286,16 @@ def build_workstream_summary(
             extra_filters=extra_filters,
             organization_id=organization_id,
         )
-        for kpi in kpis_def
-    ]
+
+    with ThreadPoolExecutor(max_workers=min(8, max(1, len(kpis_def)))) as pool:
+        kpis = list(pool.map(_run, kpis_def))
+    # An org whose warehouse is not built yet fails every KPI for want of its table.
+    # One sentence, not a grid of ORA-00942 -- the same collapse the home page does.
+    note = WAREHOUSE_NOT_BUILT_NOTE if warehouse_not_built(kpis) else None
+    if note:
+        kpis = []
     return {
+        "note": note,
         "client": client_id,
         "db_configured": True,
         "compare_enabled": compare,

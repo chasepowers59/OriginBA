@@ -186,6 +186,15 @@ function WorkstreamDashboardInner({
               />
             ))}
           </div>
+        ) : summary?.note ? (
+          // Every KPI failed for want of its table: the warehouse is not built yet.
+          // One sentence, the same panel the home page uses — never a grid of errors.
+          <div className="glass-panel px-6 py-8 text-center">
+            <p className="text-sm font-medium text-heading">
+              This workstream&apos;s numbers aren&apos;t available yet
+            </p>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-fg-muted">{summary.note}</p>
+          </div>
         ) : null}
       </div>
     </section>
