@@ -1,10 +1,10 @@
 """Database workspace API — ad-hoc read-only SQL with paginated results.
 
-ENGINE ROUTING: the workspace queries whatever database serves this org's catalog —
-the same decision the explorer and dashboards make. A dbt-catalog org reads the
-Postgres reporting warehouse and sees ONLY the governed reporting canvases (search_path
-pinned to `reporting`, other schemas rejected by the validator); a legacy cisadm-catalog
-org still reads the Oracle *_RPT_CURR snapshots until it is migrated.
+ENGINE ROUTING: the workspace queries whatever database serves this org — the same
+decision the explorer and dashboards make. A Postgres org reads its reporting warehouse
+with search_path pinned to CISADM then reporting; an Oracle org reads its own instance
+with CURRENT_SCHEMA=CISADM and the reporting canvases reachable as ORIGINBA_REPORTING.
+Either way the validator fences everything else and guards secrets.
 """
 
 from __future__ import annotations
@@ -22,7 +22,6 @@ from api.org_db import require_org_for_data
 from api.snapshot_catalog import org_backend
 from api.sql_workspace_validator import (
     SqlWorkspaceValidationError,
-    validate_oracle_cisadm_scope,
     validate_oracle_reporting_scope,
     validate_reporting_scope,
     validate_workspace_sql,
@@ -39,17 +38,6 @@ MAX_PAGE_SIZE = 500
 DEFAULT_PAGE_SIZE = 50
 MAX_TOTAL_ROWS = 50_000
 
-# The legacy Oracle workspace's curated list. The warehouse needs no equivalent:
-# every rpt_* canvas in the reporting schema is governed by construction.
-ACTIVE_SNAPSHOT_TABLES = (
-    "FT_RPT_CURR",
-    "BSEG_BILLED_USAGE_RPT_CURR",
-    "BSEG_SQ_USAGE_RPT_CURR",
-    "D1_MSRMT_RPT_CURR",
-    "FT_GL_DISTRIBUTION_RPT_CURR",
-    "D1_USAGE_RPT_CURR",
-    "D1_USAGE_SCALAR_DTL_RPT_CURR",
-)
 
 
 class SqlExecuteRequest(BaseModel):
@@ -116,7 +104,6 @@ def _require_db(org_id: str) -> str:
 _SCOPE_FENCES = {
     "postgres": validate_reporting_scope,
     "oracle_dbt": validate_oracle_reporting_scope,
-    "oracle": validate_oracle_cisadm_scope,
 }
 
 
@@ -145,7 +132,7 @@ def _run(engine: str, sql: str, org_id: str, max_rows: int) -> tuple[list[str], 
         return execute_demo_query(
             sql, organization_id=org_id, max_rows=max_rows,
             current_schema="CISADM")
-    return execute_demo_query(sql, organization_id=org_id, max_rows=max_rows)
+    raise SqlWorkspaceValidationError(f"No executor is defined for the '{engine}' engine.")
 
 
 def _list_oracle_reporting_tables(org_id: str, needle: str) -> list[dict[str, Any]]:
@@ -208,7 +195,6 @@ def list_tables(
     ctx: AuthContext = Depends(require_permission("database:sql")),
     schema: str = Query(default="", min_length=0, max_length=128),
     search: str = Query(default="", max_length=128),
-    snapshots_only: bool = Query(default=True),
     include_stats: bool = Query(default=False),
 ) -> dict[str, Any]:
     org_id = require_org_for_data(ctx)
@@ -245,24 +231,9 @@ def list_tables(
     schema_upper = (schema.strip() or "CISADM").upper()
     needle = search.strip().upper()
 
-    if snapshots_only and not needle and not include_stats:
-        tables = [
-            {"table_name": name, "num_rows": None, "last_analyzed": None}
-            for name in ACTIVE_SNAPSHOT_TABLES
-        ]
-        return {
-            "organization_id": org_id,
-            "engine": engine,
-            "schema": schema_upper,
-            "tables": tables,
-            "table_count": len(tables),
-            "source": "catalog",
-        }
 
     binds: dict[str, Any] = {"owner": schema_upper}
     where = "WHERE owner = :owner"
-    if snapshots_only:
-        where += " AND table_name LIKE '%RPT_CURR'"
     if needle:
         binds["pattern"] = f"%{needle}%"
         where += " AND table_name LIKE :pattern"

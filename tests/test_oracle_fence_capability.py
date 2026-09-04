@@ -44,11 +44,12 @@ sys.path.insert(0, str(ROOT))
 
 from api.sql_workspace_validator import (  # noqa: E402
     SqlWorkspaceValidationError,
-    validate_oracle_cisadm_scope,
     validate_oracle_reporting_scope,
 )
 
-FENCES = (validate_oracle_cisadm_scope, validate_oracle_reporting_scope)
+# One Oracle fence now: CISADM + ORIGINBA_REPORTING. The legacy CISADM-only fence served
+# the retired snapshot catalog and went with it.
+FENCES = (validate_oracle_reporting_scope,)
 
 
 def blocked(fence, sql: str) -> str | None:

@@ -194,22 +194,12 @@ class HealthDisclosureTests(unittest.TestCase):
 
 
 class CatalogHelperTests(unittest.TestCase):
-    def test_is_warehouse_means_dbt_canvas_not_postgres(self):
-        """An in-database ORACLE org is a warehouse too — the shortcut org_backend warns
-        about is reading this as "is Postgres"."""
-        from api.snapshot_catalog import is_warehouse
-        self.assertTrue(is_warehouse({"schema": "reporting"}))
-        self.assertTrue(is_warehouse({"schema": "ORIGINBA_REPORTING"}))
-        self.assertFalse(is_warehouse({"schema": "cisadm"}))
-        self.assertFalse(is_warehouse({"schema": "CISADM"}))
-        self.assertTrue(is_warehouse({}), "no schema declared is not CISADM")
-
     def test_resolve_snapshot_key_tries_every_casing(self):
         from api.snapshot_catalog import resolve_snapshot_key
-        snaps = {"rpt_bill": {}, "FT_RPT_CURR": {}}
+        snaps = {"rpt_bill": {}, "RPT_GL": {}}
         self.assertEqual(resolve_snapshot_key(snaps, "rpt_bill"), "rpt_bill")
         self.assertEqual(resolve_snapshot_key(snaps, "RPT_BILL"), "rpt_bill")
-        self.assertEqual(resolve_snapshot_key(snaps, "ft_rpt_curr"), "FT_RPT_CURR")
+        self.assertEqual(resolve_snapshot_key(snaps, "rpt_gl"), "RPT_GL")
 
     def test_an_unknown_key_comes_back_unchanged_so_the_caller_can_error(self):
         from api.snapshot_catalog import resolve_snapshot_key

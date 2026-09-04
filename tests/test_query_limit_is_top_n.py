@@ -32,7 +32,6 @@ FIELDS = {"Bill Date", "SA Type", "Amount"}
 DIALECT_FIELDS = {
     "postgres": ("rpt_service_agreement", "Bill Date", "SA Type", "Amount"),
     "oracle_dbt": ("rpt_service_agreement", "Bill Date", "SA Type", "Amount"),
-    "oracle": ("SA_RPT_CURR", "BILL_DATE", "SA_TYPE_CD", "CUR_AMT"),
 }
 
 
@@ -42,7 +41,6 @@ def _sql(dialect: str = "postgres", *, time_dim: bool = False, measures=None) ->
         table_name=table,
         allowed_fields={date_field, dim, measure},
         trusted_measures={measure},
-        required_date_field=None,
         dimensions=[dim],
         measures=measures if measures is not None else [{"field": "*", "agg": "count"}],
         filters=[],
@@ -73,7 +71,7 @@ class LimitIsTopNTests(unittest.TestCase):
         handful of null-measure groups would evict the real leaders -- the very bug this
         ordering exists to prevent, wearing a different hat.
         """
-        for dialect in ("postgres", "oracle_dbt", "oracle"):
+        for dialect in ("postgres", "oracle_dbt"):
             with self.subTest(dialect=dialect):
                 self.assertIn('DESC NULLS LAST', _sql(dialect))
                 self.assertIn('DESC NULLS LAST', _sql(dialect, time_dim=True))
@@ -93,8 +91,7 @@ class LimitIsTopNTests(unittest.TestCase):
                 table_name="rpt_service_agreement",
                 allowed_fields=FIELDS,
                 trusted_measures=set(),
-                required_date_field=None,
-                dimensions=["SA Type"],
+                    dimensions=["SA Type"],
                 measures=[],
                 filters=[],
                 limit=6,

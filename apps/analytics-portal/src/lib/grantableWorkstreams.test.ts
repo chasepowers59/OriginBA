@@ -4,28 +4,15 @@ import { describe, expect, it } from "vitest";
 import { grantableWorkstreams } from "./grantableWorkstreams";
 
 /**
- * The admin access picker carried its own hardcoded copy of the workstream list -- a
- * snapshot of the LEGACY catalog, applied to every organization. Measured 2026-09-02
- * from the committed catalogs:
+ * The admin access picker carried its own hardcoded copy of the workstream list, and
+ * it drifted: it offered a workstream the catalog did not carry and omitted `assets`,
+ * which it did. The backend filters by exact workstream id (workstream_access.py), so
+ * both halves were silent -- a group scoped to the phantom granted nothing at all, and
+ * no scoped group could ever include Device Asset or Asset Location.
  *
- *   catalog_dbt.json     ... meter_ops ASSETS field_ops common   assets: 2 canvases,
- *                                                                no new_services
- *   catalog_cisadm.json  ... customer_ops NEW_SERVICES field_ops new_services: 1,
- *                                                                no assets
- *   picker offered       new_services, always
- *   picker omitted       assets, always
- *
- * So for a dbt org it offered a workstream that grants nothing there and hid one that
- * grants two canvases; for a legacy org it was right by accident. The backend filters
- * by exact workstream id (workstream_access.py), so both halves are silent: a group
- * scoped to "New Services" at a dbt org grants nothing at all, and no scoped group
- * could ever include Device Asset or Asset Location.
- *
- * Deriving PER ORGANIZATION is the point -- one hardcoded list cannot be correct for
- * both deployment shapes at once, however carefully it is maintained.
- *
- * workstream_labels is NOT the source of truth: it carries labels for workstreams a
- * given catalog does not order. Only workstream_order says what exists here.
+ * Deriving from the catalog is the point. workstream_labels is NOT the source of
+ * truth: it can carry a label for a workstream the catalog no longer orders. Only
+ * workstream_order says what exists.
  */
 const CATALOG_ORDER = [
   "billing",
@@ -49,7 +36,7 @@ const CATALOG_LABELS: Record<string, string> = {
   field_ops: "Field Operations",
   finance: "Finance",
   meter_ops: "Meter Operations",
-  new_services: "New Services",
+  retired_area: "Retired Area",
 };
 
 describe("grantableWorkstreams", () => {
@@ -65,7 +52,7 @@ describe("grantableWorkstreams", () => {
 
   it("drops a labelled workstream the catalog no longer orders", () => {
     const opts = grantableWorkstreams(CATALOG_ORDER, CATALOG_LABELS);
-    expect(opts.some((o) => o.id === "new_services")).toBe(false);
+    expect(opts.some((o) => o.id === "retired_area")).toBe(false);
   });
 
   it("falls back to a readable label rather than printing a raw id", () => {
@@ -92,7 +79,6 @@ describe("AdminAccessPanel", () => {
   const SOURCE = readFileSync(resolve(__dirname, "../components/AdminAccessPanel.tsx"), "utf8");
 
   it("keeps no second hardcoded copy of the workstream list", () => {
-    expect(SOURCE).not.toMatch(/new_services/);
     expect(SOURCE).not.toMatch(/WORKSTREAM_OPTIONS\s*=\s*\[/);
   });
 

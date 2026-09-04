@@ -10,7 +10,7 @@ type PageProps = {
 
 // Prerender hints only. Which workstreams EXIST is decided per organization by the
 // catalog, below -- gating on this list is what made /workstream/assets a 404 while
-// /workstream/new_services rendered, because the list was a copy of the legacy nine.
+// a workstream present in the catalog 404'd, because the list was a hand-kept copy.
 export function generateStaticParams() {
   return WORKSTREAM_ORDER.map((id) => ({ workstreamId: id }));
 }

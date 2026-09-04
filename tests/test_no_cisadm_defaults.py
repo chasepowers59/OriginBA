@@ -43,7 +43,6 @@ def test_omitting_them_is_an_error_rather_than_a_silent_cisadm_query() -> None:
             table_name="rpt_bill",
             allowed_fields={"Bill Date"},
             trusted_measures=set(),
-            required_date_field=None,
             dimensions=[],
             measures=[{"field": "*", "agg": "count"}],
             filters=[],

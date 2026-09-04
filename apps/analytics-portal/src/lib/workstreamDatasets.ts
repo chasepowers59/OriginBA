@@ -33,7 +33,7 @@ export const WORKSTREAM_DATASETS: WorkstreamDataset[] = [
     id: "customer",
     label: "Customer & revenue",
     hint: "The C side — CCB: accounts, billing, money in, money owed",
-    workstreamIds: ["customer_ops", "new_services", "billing", "cashiering", "debt", "finance"],
+    workstreamIds: ["customer_ops", "billing", "cashiering", "debt", "finance"],
   },
   {
     id: "metering",

@@ -1,21 +1,21 @@
 type DateFieldSource = {
-  required_date_field?: string | null;
   default_date_field?: string | null;
   date_fields?: { id: string }[] | null;
 };
 
 /**
- * The date a tile should group by when it asks for a time grain.
+ * The date a canvas works in: the MEASURED default, then the first declared date.
  *
- * `required_date_field` is a CISADM-era notion -- a snapshot too large to scan without
- * a date filter -- and no dbt canvas sets one. Keying the time dimension off it alone
- * meant every "by month" tile on the dbt path quietly lost its grouping and charted a
- * single aggregate against itself. Every canvas carries `default_date_field`, so the
- * answer is only ever null when the canvas really has no date at all.
+ * Every canvas with a date declares `default_date_field`, chosen by
+ * build_data_dictionary from pg_stats.null_frac so it is populated on at least 90% of
+ * rows — the same column the warehouse indexes and the server windows on. So the
+ * answer is only ever null when the canvas genuinely has no date at all.
+ *
+ * This is the ONE resolver. The explorer's date presets, the dashboard's day window
+ * and a tile's time grain all key off it; when two of them keyed off a retired
+ * mandatory-window field instead, "Prior month" changed state and sent no filter.
  */
-export function resolveTileDateField(meta: DateFieldSource | undefined | null): string | null {
+export function resolveDateField(meta: DateFieldSource | undefined | null): string | null {
   if (!meta) return null;
-  return (
-    meta.required_date_field || meta.default_date_field || meta.date_fields?.[0]?.id || null
-  );
+  return meta.default_date_field || meta.date_fields?.[0]?.id || null;
 }

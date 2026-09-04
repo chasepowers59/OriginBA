@@ -2,20 +2,17 @@ import type { SnapshotMetadata } from "./types";
 
 /**
  * Fallback names and display order for the workstreams, used when the API has not
- * supplied a label. It must carry the UNION of both deployment shapes: the dbt catalog
- * has `assets` and no `new_services`, the legacy CISADM catalog has `new_services` and
- * no `assets`, so neither id is dead -- each is real in one shape. This list was a copy
- * of the legacy nine and never gained `assets`, which made /workstream/assets a 404.
- * businessLabels.test.ts pins it against the catalog files so it cannot drift again.
+ * supplied a label. There is ONE catalog and this is its `workstream_order`, verbatim;
+ * businessLabels.test.ts pins the two against each other so a hand-kept copy cannot
+ * drift -- the last drift left /workstream/assets a 404 while the catalog carried it.
  */
 export const WORKSTREAM_ORDER = [
-  "finance",
   "billing",
-  "meter_ops",
+  "finance",
   "cashiering",
   "debt",
   "customer_ops",
-  "new_services",
+  "meter_ops",
   "assets",
   "field_ops",
   "common",
@@ -30,7 +27,6 @@ export const WORKSTREAM_LABELS: Record<string, string> = {
   field_ops: "Field Operations",
   debt: "Collections & Debt",
   cashiering: "Cashiering & Payments",
-  new_services: "New Services",
   assets: "Asset Operations",
 };
 
@@ -43,7 +39,6 @@ export const WORKSTREAM_DESCRIPTIONS: Record<string, string> = {
   cashiering: "Payments, tenders, and cashiering activity",
   debt: "Aged balances, collections, and write-off processes",
   customer_ops: "Accounts, customers, cases, and service locations",
-  new_services: "New services pipeline and start-service tracking",
   assets: "Meter and device assets, and the locations they serve",
   field_ops: "Field activities, crews, and BODA field work",
   common: "Workflow queues, batch jobs, and cross-cutting exceptions",
@@ -67,42 +62,6 @@ export const AGGREGATION_LABELS: Record<string, string> = {
   max: "Maximum",
 };
 
-export const SNAPSHOT_BUSINESS: Record<
-  string,
-  { headline?: string; summary: string; grainDescription: string; dateLabel: string }
-> = {
-  WORKFLOW_QUEUE_RPT_CURR: {
-    summary:
-      "Monitor staff to-dos, assignments, aging, and overnight batch runs from a single operational dashboard.",
-    grainDescription: "One row per to-do item or batch processing thread",
-    dateLabel: "To-do created date",
-  },
-  BSEG_BILLED_USAGE_RPT_CURR: {
-    summary:
-      "Analyze billed charges on completed bills — by customer class, cycle, rate, and service type.",
-    grainDescription: "One row per completed bill segment",
-    dateLabel: "Bill date",
-  },
-  FT_RPT_CURR: {
-    summary:
-      "Track financial transaction volume, revenue mix, adjustments, and GL distribution status.",
-    grainDescription: "One row per financial transaction (non-redundant)",
-    dateLabel: "Accounting date",
-  },
-  CASE_PREM_CONTACT_RPT_CURR: {
-    summary:
-      "Understand customer case workload by type, status, division, and service location.",
-    grainDescription: "One row per customer case",
-    dateLabel: "Case opened date",
-  },
-  OPS_EXCEPTION_RPT_CURR: {
-    summary:
-      "Prioritize billing, usage, and validation exceptions — open workload by source and severity.",
-    grainDescription: "One row per operational exception",
-    dateLabel: "Exception created date",
-  },
-};
-
 export function workstreamDisplayName(key: string): string {
   return WORKSTREAM_LABELS[key] ?? key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
@@ -111,21 +70,14 @@ export function aggregationLabel(agg: string): string {
   return AGGREGATION_LABELS[agg.toLowerCase()] ?? agg;
 }
 
-export function snapshotSummary(meta: Pick<SnapshotMetadata, "id" | "summary">): string {
-  return meta.summary ?? SNAPSHOT_BUSINESS[meta.id]?.summary ?? "";
+export function snapshotSummary(meta: Pick<SnapshotMetadata, "summary">): string {
+  return meta.summary ?? "";
 }
 
 export function snapshotGrainDescription(
-  meta: Pick<SnapshotMetadata, "id" | "grain_description" | "grain">,
+  meta: Pick<SnapshotMetadata, "grain_description" | "grain">,
 ): string {
-  return meta.grain_description ?? SNAPSHOT_BUSINESS[meta.id]?.grainDescription ?? meta.grain;
-}
-
-export function requiredDateLabel(meta: SnapshotMetadata): string {
-  if (meta.required_date_label) return meta.required_date_label;
-  const field = meta.date_fields.find((d) => d.id === meta.required_date_field);
-  if (field?.label) return field.label;
-  return SNAPSHOT_BUSINESS[meta.id]?.dateLabel ?? "Reporting period";
+  return meta.grain_description ?? meta.grain;
 }
 
 /** Build friendly table/chart column headers from metadata + query shape */
@@ -178,13 +130,11 @@ function capitalize(word: string): string {
 /**
  * A column identifier as a human would write it.
  *
- * This must be safe on BOTH deployment shapes, because it is called on ids from either:
- * a dbt canvas field is already a business name ("Bill Date"), a legacy snapshot's is a
- * database column ("ACCOUNTING_DT"), and the SQL workspace passes raw Postgres columns
- * ("bill_id"). The previous version only upper-cased each word's FIRST letter and never
- * lowered the rest, so the all-caps legacy form — the one it was written for — came out
- * shouting: "ACCOUNTING Date", "CUSTOMER CLASS". That is six of the nine orgs, on every
- * surface that calls this.
+ * This must be safe on BOTH forms an id arrives in: a canvas field is already a
+ * business name ("Bill Date"), while the SQL workspace passes raw CISADM columns
+ * ("ACCOUNTING_DT") and raw Postgres columns ("bill_id"). The previous version only
+ * upper-cased each word's FIRST letter and never lowered the rest, so the all-caps form
+ * — the one it was written for — came out shouting: "ACCOUNTING Date", "CUSTOMER CLASS".
  *
  * A name that already contains a SPACE was authored for people and is returned
  * untouched. That is what protects "Service Agreement ID" from being lowered to

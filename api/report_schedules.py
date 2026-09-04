@@ -149,8 +149,7 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
     sql, binds = build_query(
         table_name=snapshot["table_name"],
         allowed_fields=allowed_fields(snapshot),
-        trusted_measures=trusted if dialect != "oracle" else {m.upper() for m in trusted},
-        required_date_field=date_field,
+        trusted_measures=trusted,
         dimensions=view.get("dimensions") or [],
         measures=measures,
         filters=filters,

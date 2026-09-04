@@ -23,17 +23,14 @@ from api.snapshot_catalog import CatalogError, get_snapshot
 def snapshot_workstream(snapshot_id: str, organization_id: str | None = None) -> str:
     """The workstream a snapshot belongs to, IN THE CALLER'S CATALOG.
 
-    organization_id is load-bearing, not decorative. Without it load_catalog falls back
-    to catalog_name_for_org(None), which is "dbt", so every authorization lookup
-    resolved against the dbt catalog whatever org the caller was in. The two shapes
-    share no snapshot ids (rpt_financial_txn against FT_RPT_CURR), so on the six legacy
-    orgs the lookup missed and returned "" -- and an empty workstream fails every
-    restricted grant. A user granted "finance" was refused FT_RPT_CURR, which declares
-    workstream finance; through filter_nlq_metrics_for_auth and
-    filter_dashboard_for_auth their metrics and tiles filtered to empty in silence.
-
-    Invisible in development because the dev org is a dbt org, and because "*" and an
-    empty grant both mean full access and never reach the comparison.
+    organization_id is load-bearing, not decorative. When a second catalog existed,
+    calling get_snapshot() without the org resolved every authorization lookup against
+    the default one; the shapes shared no snapshot ids, so on the orgs using the other
+    catalog the lookup missed, returned "", and an empty workstream fails every
+    restricted grant -- a user granted "finance" was refused their own finance
+    snapshots, and their metrics and tiles filtered to empty in silence. Invisible in
+    development because "*" and an empty grant never reach the comparison. There is one
+    catalog now; the org is still threaded because that is what the lookup means.
 
     The id is passed AS WRITTEN: resolve_snapshot_key already tries all three cases, and
     upper-casing a lowercase dbt canvas id is the habit that broke lookups elsewhere.

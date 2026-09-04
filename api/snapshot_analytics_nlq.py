@@ -33,8 +33,8 @@ def run_snapshot_analytics_nlq(
     q = (question or "").strip()
     if not q and not metric_id:
         return None
-    # Never run a metric this org's catalog cannot resolve: a dbt-catalog org has no
-    # legacy *_RPT_CURR snapshots, and offering the metric anyway just errors on click.
+    # Never run a metric this org's catalog cannot resolve; offering it anyway just
+    # errors on click.
     metric = match_metric(q, metric_id)
     if metric and metric.snapshot_id not in _org_snapshot_ids(organization_id):
         return None

@@ -55,21 +55,11 @@ from api.auth.bootstrap import init_auth_database  # noqa: E402
 
 
 class WindowDateFieldTests(unittest.TestCase):
-    """One rule, one home: the fallback the other three consumers already use."""
+    """One rule, one home, one source: the measured default."""
 
-    def test_a_required_field_still_wins(self):
+    def test_a_canvas_windows_on_its_measured_default(self):
         from api.reporting_dates import window_date_field
-        self.assertEqual(
-            window_date_field({"required_date_field": "ACCOUNTING_DT",
-                               "default_date_field": "Bill Date"}),
-            "ACCOUNTING_DT")
-
-    def test_a_canvas_falls_back_to_its_measured_default(self):
-        from api.reporting_dates import window_date_field
-        self.assertEqual(
-            window_date_field({"required_date_field": None,
-                               "default_date_field": "Bill Date"}),
-            "Bill Date")
+        self.assertEqual(window_date_field({"default_date_field": "Bill Date"}), "Bill Date")
 
     def test_a_canvas_with_no_date_windows_on_nothing(self):
         from api.reporting_dates import window_date_field
@@ -83,35 +73,13 @@ class WindowDateFieldTests(unittest.TestCase):
 
 
 class WindowDateLabelTests(unittest.TestCase):
-    """The note is user-facing copy, so it must not print a raw column name.
+    """The note is user-facing copy, so it must never print a raw column name."""
 
-    Found by enumerating every field that differs between the two catalog shapes --
-    the same sweep that found the bug this file exists for. Exactly three diverge:
-    required_date_field, required_date_label and process_guides. The LABEL is the one
-    the legacy canvases carry and the dbt canvases do not, and it exists for precisely
-    this reason: a dbt canvas's field id is already Title Case ("Bill Date"), while a
-    legacy one is a database column ("ACCOUNTING_DT") whose label is "Accounting date".
-    Six of nine orgs are legacy, so the raw name would be the MAJORITY experience.
-    """
-
-    def test_the_legacy_label_is_preferred_over_the_column_name(self):
+    def test_a_declared_date_field_label_is_used(self):
         from api.reporting_dates import window_date_label
         self.assertEqual(
-            window_date_label({"required_date_field": "ACCOUNTING_DT",
-                               "required_date_label": "Accounting date"}, "ACCOUNTING_DT"),
-            "Accounting date")
-
-    def test_a_declared_date_field_label_is_used_when_there_is_no_required_label(self):
-        from api.reporting_dates import window_date_label
-        self.assertEqual(
-            window_date_label({"date_fields": [{"id": "BILL_DT", "label": "Bill date"}]},
-                              "BILL_DT"),
-            "Bill date")
-
-    def test_a_title_case_canvas_field_is_already_its_own_label(self):
-        from api.reporting_dates import window_date_label
-        self.assertEqual(window_date_label({"default_date_field": "Bill Date"}, "Bill Date"),
-                         "Bill Date")
+            window_date_label({"date_fields": [{"id": "Bill Date", "label": "Bill Date"}]},
+                              "Bill Date"), "Bill Date")
 
     def test_an_unlabelled_field_falls_back_to_itself_rather_than_vanishing(self):
         from api.reporting_dates import window_date_label
@@ -121,8 +89,7 @@ class WindowDateLabelTests(unittest.TestCase):
 class DefaultFilterTests(unittest.TestCase):
     def test_a_dbt_canvas_now_gets_a_window(self):
         from api.snapshot_explorer import _default_date_filter
-        f = _default_date_filter({"required_date_field": None,
-                                  "default_date_field": "Bill Date"})
+        f = _default_date_filter({"default_date_field": "Bill Date"})
         self.assertIsNotNone(f, "a canvas with a measured date must window by default")
         self.assertEqual(f.field, "Bill Date")
         self.assertEqual(f.op, "between")
@@ -133,8 +100,7 @@ class DefaultFilterTests(unittest.TestCase):
         """rpt_account_person, rpt_asset_location and rpt_revenue_reconciliation carry
         no date. Inventing one would filter on a column that does not exist."""
         from api.snapshot_explorer import _default_date_filter
-        self.assertIsNone(_default_date_filter({"required_date_field": None,
-                                                "default_date_field": None}))
+        self.assertIsNone(_default_date_filter({"default_date_field": None}))
 
 
 class QueryRouteTests(unittest.TestCase):

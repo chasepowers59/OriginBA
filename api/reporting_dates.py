@@ -29,30 +29,19 @@ DEFAULT_WINDOW_DAYS = 90
 
 
 def window_date_field(snapshot: dict[str, Any]) -> str | None:
-    """The date column a window should apply to, or None if the canvas has no date.
+    """The date column a window applies to, or None if the canvas has no date.
 
-    `required_date_field` ALONE is a CISADM-era read: no dbt canvas declares one, so
-    every consumer that checked only that field silently stopped windowing on the 38
-    canvas-backed snapshots while continuing to window the 19 legacy ones. It caused
-    opposite bugs in the two shapes -- a scheduled report emailed the whole table under
-    a "trailing 30 days" heading, and an unfiltered canvas query scanned every row --
-    and it was found and fixed three separate times before this became one function.
+    One rule with four callers: the explorer's default window, the KPI runner, NLQ
+    metrics and scheduled reports. It once fell back through a mandatory-window field
+    from the retired snapshot catalog first, and the copies of that fallback are what
+    windowed some canvases and not others. The measured default is the only source now.
     """
-    return snapshot.get("required_date_field") or snapshot.get("default_date_field") or None
+    return snapshot.get("default_date_field") or None
 
 
 def window_date_label(snapshot: dict[str, Any], field: str) -> str:
-    """A date column's HUMAN name, for copy that a reader sees.
-
-    The two shapes name their columns differently and only one of them needs
-    translating: a dbt canvas field is already Title Case ("Bill Date"), while a legacy
-    snapshot's is a database column ("ACCOUNTING_DT") whose label is "Accounting date".
-    Six of nine orgs are legacy, so printing the raw id would be the majority
-    experience. Falls back to the id itself rather than to nothing -- a sentence with a
-    blank where the column should be is worse than an ugly column name.
-    """
-    if snapshot.get("required_date_field") == field and snapshot.get("required_date_label"):
-        return str(snapshot["required_date_label"])
+    """A date column's human name for copy a reader sees, falling back to the id
+    itself: a sentence with a blank where the column should be is worse than an id."""
     for declared in (snapshot.get("date_fields") or []):
         if declared.get("id") == field and declared.get("label"):
             return str(declared["label"])

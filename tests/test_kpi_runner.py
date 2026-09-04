@@ -146,9 +146,7 @@ class KpiDateFieldTests(unittest.TestCase):
     def test_execute_uses_the_shared_window_date_field(self):
         from api.reporting_dates import window_date_field
         self.assertEqual(window_date_field({"default_date_field": "Bill Date"}), "Bill Date")
-        self.assertEqual(
-            window_date_field({"required_date_field": "ACCOUNTING_DT",
-                               "default_date_field": "Bill Date"}), "ACCOUNTING_DT")
+        self.assertIsNone(window_date_field({}))
 
     def test_kpi_runner_no_longer_carries_its_own_copy(self):
         import re

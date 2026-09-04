@@ -25,7 +25,6 @@ def _build(dialect, schema, **kw):
         table_name="rpt_financial_txn",
         allowed_fields=FIELDS,
         trusted_measures=TRUSTED,
-        required_date_field=None,
         dimensions=kw.get("dimensions", []),
         measures=kw.get("measures", [{"field": "*", "agg": "count"}]),
         filters=kw.get("filters", []),

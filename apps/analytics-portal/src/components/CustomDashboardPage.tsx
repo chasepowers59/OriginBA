@@ -30,8 +30,7 @@ import { CrossFilterBanner } from "@/components/CrossFilterBanner";
 const SLOTS = [0, 1, 2, 3];
 
 function emptyTile(slot: number, snapshotId = "rpt_financial_txn"): DashboardTileDef {
-  // Default to the dbt canvas; callers with the org's catalog loaded pass its first
-  // snapshot instead, so a legacy Oracle tenant still gets a valid starting point.
+  // Callers with the org's catalog loaded pass its first snapshot instead.
   return {
     id: crypto.randomUUID(),
     slot,
@@ -166,8 +165,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     }
   };
 
-  // Only templates every one of whose tiles this org's catalog can run — a
-  // dbt-catalog org never sees the legacy *_RPT_CURR boards, and vice versa.
+  // Only templates every one of whose tiles this org's catalog can run.
   const availableTemplates = useMemo(
     () => templatesForSnapshots(new Set(snapshots.map((s) => s.id))),
     [snapshots],

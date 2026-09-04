@@ -150,12 +150,8 @@ export function VisualBuilder({
 
     // Shared with saveView, so the view that reopens is the view that ran.
     const filters = activeFilters(fils);
-    // Governance mirror: a canvas with a required date field must carry a between
-    // filter on it, or the server rejects the query. Auto-add if the user hasn't.
-    const req = meta.required_date_field;
-    if (req && !filters.some((f) => f.field === req && f.op === "between")) {
-      filters.push({ field: req, op: "between", value: defaultDateRange(90) });
-    }
+    // No client-side default window: an unfiltered query gets the server's, and the
+    // server DISCLOSES it (applied_window), which a silent client-side one never did.
     return {
       // Both, always. A date used to blank the dimension list, which silently
       // dropped every other column the user had put on the shelf.

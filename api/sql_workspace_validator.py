@@ -376,20 +376,6 @@ def validate_oracle_reporting_scope(sql: str) -> None:
                    table_position_deny=_ORACLE_DICTIONARY_POSITIONAL)
 
 
-def validate_oracle_cisadm_scope(sql: str) -> None:
-    """Reject legacy-workspace SQL outside CISADM.
-
-    The legacy orgs read their *_RPT_CURR snapshots straight out of CISADM and
-    have no ORIGINBA_REPORTING schema, so CISADM is the whole surface. Same
-    Oracle escape hatches, same secrets guard.
-
-    This path had NO fence at all until 2026-09-01 (audit C1) — six of eight
-    orgs, with `database:sql` held by the lowest role.
-    """
-    _enforce_scope(sql, ("CISADM",), _ORACLE_NON_REPORTING, extra=_ORACLE_EXTRA,
-                   table_position_deny=_ORACLE_DICTIONARY_POSITIONAL)
-
-
 def wrap_paginated_sql(sql: str, *, offset: int, limit: int, probe_extra: int = 0) -> str:
     """Wrap user SQL with OFFSET/FETCH for SQL-Developer-style paging."""
     off = max(0, offset)

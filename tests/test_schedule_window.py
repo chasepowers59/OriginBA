@@ -26,17 +26,12 @@ from api.report_schedules import schedule_date_field, window_sentence  # noqa: E
 
 
 class TestScheduleDateField:
-    def test_prefers_a_required_date_field(self):
-        snap = {"required_date_field": "ACCOUNTING_DT", "default_date_field": "Bill Date"}
-        assert schedule_date_field(snap) == "ACCOUNTING_DT"
-
-    def test_falls_back_to_the_canvas_default(self):
-        """The dbt case: no required field, but every canvas declares a default."""
-        snap = {"required_date_field": None, "default_date_field": "Accounting Date"}
-        assert schedule_date_field(snap) == "Accounting Date"
+    def test_windows_on_the_canvas_default(self):
+        """Every canvas with a date declares a MEASURED default; that is the window."""
+        assert schedule_date_field({"default_date_field": "Accounting Date"}) == "Accounting Date"
 
     def test_returns_none_when_the_canvas_genuinely_has_no_date(self):
-        assert schedule_date_field({"required_date_field": None, "default_date_field": None}) is None
+        assert schedule_date_field({"default_date_field": None}) is None
         assert schedule_date_field({}) is None
 
 

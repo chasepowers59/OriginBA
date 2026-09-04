@@ -2,89 +2,28 @@ import { describe, expect, it } from "vitest";
 import { dateScope } from "./dateScope";
 
 /**
- * The canvas header showed a "Date filter" pill reading "Reporting period" on every dbt
- * canvas — a hardcoded fallback for when `required_date_field` is absent, which it always
- * is: no canvas declares one. So the page asserted a mandatory reporting-period filter
- * that does not exist and cannot be adjusted.
+ * The header names the date a canvas works in, and never claims it is compulsory.
  *
- * A canvas still HAS a date it works in — `default_date_field`, the one the builder and
- * the KPIs window on — and saying which is genuinely useful. Saying "Reporting period"
- * is only reassuring.
+ * It used to print "Date filter: Reporting period" -- a literal fallback for a
+ * mandatory-window field no canvas sets -- so every canvas asserted a required filter
+ * that did not exist and could not be adjusted. "Dates on: Bill Date" is something a
+ * reader can act on; a canvas with no date says nothing.
  */
 describe("dateScope", () => {
-  it("reports a genuine required filter as required", () => {
-    const scope = dateScope({
-      required_date_field: "ACCOUNTING_DT",
-      required_date_label: "Accounting date",
+  it("names the canvas's date by its label", () => {
+    expect(dateScope({
       default_date_field: "Bill Date",
-      date_fields: [],
-    });
-    expect(scope).toEqual({ label: "Date filter", value: "Accounting date", required: true });
+      date_fields: [{ id: "Bill Date", label: "Bill Date" }],
+    })).toEqual({ label: "Dates on", value: "Bill Date", required: false });
   });
 
-  it("falls back to the field's own label when no friendly one is set", () => {
-    const scope = dateScope({
-      required_date_field: "ACCOUNTING_DT",
-      required_date_label: null,
-      default_date_field: null,
-      date_fields: [{ id: "ACCOUNTING_DT", label: "Accounting Date" }],
-    });
-    expect(scope?.value).toBe("Accounting Date");
+  it("falls back to the id when no label is declared", () => {
+    expect(dateScope({ default_date_field: "SA Start Date" }))
+      .toEqual({ label: "Dates on", value: "SA Start Date", required: false });
   });
 
-  it("names the default date a canvas actually works in, and does not call it a filter", () => {
-    const scope = dateScope({
-      required_date_field: null,
-      required_date_label: null,
-      default_date_field: "SA Start Date",
-      date_fields: [{ id: "SA Start Date", label: "SA Start Date" }],
-    });
-    expect(scope).toEqual({ label: "Dates on", value: "SA Start Date", required: false });
-  });
-
-  it("shows nothing rather than inventing a period when there is no date at all", () => {
-    expect(
-      dateScope({
-        required_date_field: null,
-        required_date_label: null,
-        default_date_field: null,
-        date_fields: [],
-      }),
-    ).toBeNull();
-  });
-
-  it("never returns the old invented wording", () => {
-    const scope = dateScope({
-      required_date_field: null,
-      required_date_label: null,
-      default_date_field: "Bill Date",
-      date_fields: [],
-    });
-    expect(scope?.value).not.toBe("Reporting period");
-  });
-});
-
-describe("snapshot detail line", () => {
-  it("names the date the canvas works in", async () => {
-    const { snapshotDetailLine } = await import("./snapshot");
-    const line = snapshotDetailLine({
-      grain_description: "One row per service agreement",
-      required_date_field: null,
-      default_date_field: "SA Start Date",
-      date_fields: [],
-    } as never);
-    expect(line).toBe("One row per service agreement · dates on SA Start Date");
-  });
-
-  it("never says the tautology it used to", async () => {
-    const { snapshotDetailLine } = await import("./snapshot");
-    const line = snapshotDetailLine({
-      grain_description: "One row per account",
-      required_date_field: null,
-      default_date_field: null,
-      date_fields: [],
-    } as never);
-    expect(line).toBe("One row per account");
-    expect(line).not.toContain("reporting period uses");
+  it("says nothing for a canvas with no date", () => {
+    expect(dateScope({ default_date_field: null })).toBeNull();
+    expect(dateScope({})).toBeNull();
   });
 });

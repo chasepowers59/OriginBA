@@ -27,11 +27,10 @@ from api.query_builder import build_query  # noqa: E402
 # Every dialect the portal can be answered by. `oracle_dbt` is the one that matters most
 # in production -- the Oracle-native dbt canvases -- and it is the case-folding opposite
 # of Postgres, so a client that works against one must be given the same column names by
-# the other. Legacy `oracle` reads CISADM, whose identifiers are UPPER_SNAKE.
+# the other.
 DIALECTS = {
     "postgres": ("rpt_bill_segment", "Bill Date", "Bill Segment Status Code", "Amount"),
     "oracle_dbt": ("rpt_bill_segment", "Bill Date", "Bill Segment Status Code", "Amount"),
-    "oracle": ("BILL_SEG_RPT_CURR", "BILL_DATE", "BSEG_STATUS_CD", "AMOUNT"),
 }
 
 
@@ -41,7 +40,6 @@ def _sql(dialect: str) -> str:
         table_name=table,
         allowed_fields={date_field, dim, measure},
         trusted_measures={measure},
-        required_date_field=None,
         dimensions=[dim],
         measures=[{"field": "*", "agg": "count"}, {"field": measure, "agg": "sum"}],
         filters=[],
@@ -49,7 +47,7 @@ def _sql(dialect: str) -> str:
         time_dimensions=[{"field": date_field, "grain": "month"}],
         dialect=dialect,
         # legacy oracle reads CISADM; the canvas dialects read the reporting schema
-        schema="CISADM" if dialect == "oracle" else "reporting",
+        schema="reporting",
     )
     return sql
 

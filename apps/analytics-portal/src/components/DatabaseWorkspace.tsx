@@ -268,9 +268,7 @@ export function DatabaseWorkspace({
     const snippet =
       engine === "postgres"
         ? `SELECT ${cols}\nFROM cisadm.${tableName}\nLIMIT ${pageSize}`
-        : engine === "oracle_dbt"
-          ? `SELECT ${cols}\nFROM ${tableName}\nFETCH FIRST ${pageSize} ROWS ONLY`
-          : `SELECT ${cols}\nFROM CISADM.${tableName}\nWHERE ROWNUM <= ${pageSize}`;
+        : `SELECT ${cols}\nFROM ${tableName}\nFETCH FIRST ${pageSize} ROWS ONLY`;
     setSql(snippet);
     setActiveTemplate(null);
     editorRef.current?.focus();

@@ -2,10 +2,9 @@
 
 WHY THIS SITS BESIDE demo_db.py RATHER THAN REPLACING IT
 --------------------------------------------------------
-The portal reads two different worlds now. The legacy `*_RPT_CURR` snapshots live in
-Oracle CISADM and are reached by demo_db; the dbt canvases live in Postgres and are
-reached here. A snapshot's own `schema` says which, so nothing has to be configured twice
-and the two can coexist while the migration finishes.
+The same dbt canvases are served from two engines: a CDC-fed Postgres warehouse,
+reached here, and a client's own Oracle instance (ORIGINBA_REPORTING beside CISADM),
+reached by demo_db. The ORG's declared engine says which, so nothing is configured twice.
 
 The interface is deliberately the same shape as demo_db.execute_query -- (columns, rows)
 -- so the callers choose a backend and change nothing else.

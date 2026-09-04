@@ -14,12 +14,12 @@ import {
   allowedAggsForMeasure,
   buildColumnLabels,
   defaultMeasureSelection,
-  requiredDateLabel,
 } from "@/lib/businessLabels";
 import { getFavorite } from "@/lib/favorites";
 import { getViewRemote, saveViewRemote } from "@/lib/savedViews";
 import { applyDatePresetConfig, estimatePeriodDays, widenDateRange } from "@/lib/datePresets";
 import { applyProcessGuide } from "@/lib/processGuide";
+import { resolveDateField } from "@/lib/tileDateField";
 import { PinMenu } from "@/components/PinMenu";
 import { useAuth } from "@/components/AuthProvider";
 import { FavoritesPanel } from "./FavoritesPanel";
@@ -154,19 +154,15 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
 
   const buildFilters = useCallback(
     (extra: PremadeReport["filters"] = []) => {
-      // A snapshot need not HAVE a required date field. The dbt canvases do not: they
-      // are contract-governed and row-capped, so a mandatory transaction window is both
-      // unnecessary and meaningless on a dimension table like the price list. Building
-      // the filter unconditionally sent {field: null} and the API rejected the whole
-      // query -- "Input should be a valid string" -- so the explorer showed a validation
-      // error instead of a chart.
+      // The presets window on the canvas's MEASURED date. They used to key off a
+      // mandatory-window field no canvas sets, so "Prior month" changed state and sent
+      // nothing -- the query ran unwindowed and the reader had no way to tell. A canvas
+      // with no date at all (the price list, asset locations) gets no window, which is
+      // correct: a transaction window means nothing on a dimension table.
+      const dateField = resolveDateField(metadata);
       const filters: PremadeReport["filters"] = [
-        ...(metadata.required_date_field
-          ? [{
-              field: metadata.required_date_field,
-              op: "between" as const,
-              value: [dateStart, dateEnd],
-            }]
+        ...(dateField
+          ? [{ field: dateField, op: "between" as const, value: [dateStart, dateEnd] }]
           : []),
         ...extra,
       ];
@@ -178,7 +174,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       }
       return filters;
     },
-    [metadata.required_date_field, dateStart, dateEnd, scopeField, scopeValue, drillFilter],
+    [metadata, dateStart, dateEnd, scopeField, scopeValue, drillFilter],
   );
 
   const runPremade = useCallback(
@@ -404,7 +400,11 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     window.setTimeout(() => setSavedMsg(null), 2500);
   };
 
-  const dateFieldLabel = requiredDateLabel(metadata);
+  const resolvedDateField = resolveDateField(metadata);
+  const dateFieldLabel =
+    metadata.date_fields.find((d) => d.id === resolvedDateField)?.label ??
+    resolvedDateField ??
+    "";
 
   return (
     <div className="space-y-6">
@@ -490,7 +490,11 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
             Reporting period
           </p>
-          <p className="mb-3 text-xs text-fg-muted">Filtered by {dateFieldLabel.toLowerCase()}</p>
+          <p className="mb-3 text-xs text-fg-muted">
+            {resolvedDateField
+              ? `Filtered by ${dateFieldLabel.toLowerCase()}`
+              : "This canvas has no date to filter on."}
+          </p>
           <div className="mb-3 flex flex-wrap gap-2">
             {DATE_PRESETS.map((p) => (
               <button

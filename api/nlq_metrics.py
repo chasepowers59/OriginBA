@@ -6,9 +6,8 @@ Every field name was verified against output/catalog_dbt.json or lifted from a
 live-verified dashboard KPI spec before it was written here -- never guess a
 canvas column, the allow-list holds queries to the real names.
 
-The legacy *_RPT_CURR metric set this replaces lives in git history; a
-cisadm-catalog org simply gets no NLQ metrics (snapshot_analytics_nlq filters
-the catalog per org), which is honest until that org migrates.
+snapshot_analytics_nlq filters the metric set per org to the canvases that org's
+catalog actually carries, so a metric is never offered where it cannot run.
 """
 
 from __future__ import annotations
@@ -75,7 +74,7 @@ def _scalar(
     # catalog and misses (this had NLQ erroring for every tenant).
     snap = get_snapshot(snapshot_id, organization_id)
     field_name = None if windowless else (
-        date_field or snap.get("required_date_field") or snap.get("default_date_field"))
+        date_field or snap.get("default_date_field"))
     if not field_name and not windowless:
         raise ValueError(f"No date field for {snapshot_id}")
     days = int(params.get("days") or 90)
@@ -102,7 +101,7 @@ def _trend(
 ) -> list[dict[str, Any]]:
     snap = get_snapshot(snapshot_id, organization_id)
     field_name = None if windowless else (
-        date_field or snap.get("required_date_field") or snap.get("default_date_field"))
+        date_field or snap.get("default_date_field"))
     days = int(params.get("days") or 90)
     start, end = _window(days)
     filters = list(query.get("filters") or [])

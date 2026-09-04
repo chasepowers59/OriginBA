@@ -250,8 +250,7 @@ def run_kpi_query(
     sql, binds = build_query(
         table_name=snapshot["table_name"],
         allowed_fields=allowed_fields(snapshot),
-        trusted_measures=trusted if dialect != "oracle" else {m.upper() for m in trusted},
-        required_date_field=snapshot.get("required_date_field"),
+        trusted_measures=trusted,
         dimensions=query_spec.get("dimensions") or [],
         measures=query_spec.get("measures") or [{"field": "*", "agg": "count"}],
         filters=filters,
@@ -324,9 +323,8 @@ def execute_kpi_definition(
         # A cross-filter is raised on one card and sent to all of them; the ones whose
         # canvas has no such column are left unfiltered rather than failed.
         extra_filters = applicable_filters(extra_filters, allowed_fields(snapshot))
-        # KPI may name its own date field (dbt canvases carry default_date_field, not
-        # required_date_field); a WINDOWLESS KPI (stock metric: total customers, AR
-        # balance) skips the window and the period comparison entirely.
+        # A KPI may name its own date field; a WINDOWLESS KPI (stock metric: total
+        # customers, AR balance) skips the window and the period comparison entirely.
         windowless = bool(kpi.get("windowless"))
         # The KPI's own override first, then the ONE shared rule. That
         # required-or-default chain was written out here as a fourth copy, and the

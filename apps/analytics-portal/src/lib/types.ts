@@ -30,7 +30,6 @@ export type SnapshotSummary = {
   grain_description?: string;
   summary?: string;
   trusted_measures: string[];
-  required_date_field: string | null;
   portal_enabled?: boolean;
   poc_enabled: boolean;
   large_domain?: boolean;
@@ -119,7 +118,7 @@ export type SnapshotDataModel = {
   grain_preservation: string;
   trusted_measures: string[];
   driving_table: string | null;
-  /** Legacy Oracle catalog: objects; dbt catalog: plain CISADM table names. */
+  /** Plain CISADM table names; the object form is accepted for older saved payloads. */
   source_tables: (SourceTableDef | string)[];
   join_paths: JoinPathDef[];
   population_filter: string | null;
@@ -169,12 +168,10 @@ export type SnapshotMetadata = {
   grain_description?: string;
   summary?: string;
   use_case?: string;
-  required_date_label?: string;
   dimensions: { id: string; label: string }[];
   measures: MeasureDef[];
   date_fields: { id: string; label: string }[];
   default_date_field: string;
-  required_date_field: string;
   premade_reports: PremadeReport[];
   scope_filters?: ScopeFilterDef[];
   usage_guidance?: string;
@@ -249,9 +246,7 @@ export type QueryResponse = {
   applied_window?: {
     /** The machine name the filter is applied on. */
     field: string;
-    /** The human name for copy. These DIFFER on the legacy shape — six of nine orgs —
-     *  where `field` is a database column (ACCOUNTING_DT) and this is "Accounting
-     *  date". Render this one; never render `field`. */
+    /** The human name for copy. Render this one; never render `field`. */
     label: string;
     days: number;
     start: string;
@@ -268,7 +263,8 @@ export type DatabaseTableInfo = {
 
 export type DatabaseTablesResponse = {
   organization_id: string;
-  /** "postgres" = the dbt reporting warehouse; "oracle" = legacy CISADM snapshots. */
+  /** Which engine serves this org's reporting layer: a CDC-fed Postgres warehouse, or
+   *  the client's own Oracle instance with the canvases built in ORIGINBA_REPORTING. */
   engine?: "postgres" | "oracle";
   schema: string;
   tables: DatabaseTableInfo[];

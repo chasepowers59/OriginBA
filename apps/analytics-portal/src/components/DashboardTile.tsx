@@ -8,7 +8,7 @@ import {
 } from "@/lib/api";
 import { formatCurrency, formatNumber } from "@/lib/format";
 import { chartedMeasureColumn, kpiHeadline } from "@/lib/dashboardTileMath";
-import { resolveTileDateField } from "@/lib/tileDateField";
+import { resolveDateField } from "@/lib/tileDateField";
 import { measureDisplaysAsCurrency } from "@/lib/businessLabels";
 import type { DashboardTileDef, QueryResponse } from "@/lib/types";
 import { BuilderChart } from "./builder/BuilderChart";
@@ -49,12 +49,15 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
           { field: tile.measure_field ?? "*", agg: tile.measure_agg ?? "count" },
         ];
         const primaryMeasure = measures[0] ?? { field: "*", agg: "count" };
-        const groupDate = resolveTileDateField(meta);
+        const groupDate = resolveDateField(meta);
         const timeDimensions =
           tile.time_grain && groupDate ? [{ field: groupDate, grain: tile.time_grain }] : [];
         const filters: import("@/lib/types").FilterDef[] = [
-          ...(meta.required_date_field
-            ? [{ field: meta.required_date_field, op: "between" as const, value: [start, end] }]
+          // The dashboard's day window applies on the same date the tile groups by.
+          // It used to key off a mandatory-window field no canvas sets, so the
+          // "last N days" control changed nothing on any tile.
+          ...(groupDate
+            ? [{ field: groupDate, op: "between" as const, value: [start, end] }]
             : []),
           ...(report?.filters ?? []),
         ];

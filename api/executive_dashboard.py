@@ -276,10 +276,10 @@ def available_kpis(
 ) -> tuple[list[dict[str, Any]], str | None]:
     """Filter the KPI set to snapshots that exist in this org's catalog.
 
-    The executive KPIs read the governed dbt canvases (rpt_*). A legacy-catalog org
-    (demo: the CISADM *_RPT_CURR snapshots) has none of them, so running the set there
-    produced a grid of 'Unknown snapshot' error cards. Skip the missing ones instead;
-    when nothing is left, return a single human note for the dashboard to show.
+    The executive KPIs read the governed dbt canvases (rpt_*). An org whose warehouse
+    is not built yet resolves none of them, and running the set there produced a grid of
+    'Unknown snapshot' error cards. Skip the missing ones instead; when nothing is left,
+    return a single human note for the dashboard to show.
     """
     from api.snapshot_catalog import CatalogError, get_snapshot
 

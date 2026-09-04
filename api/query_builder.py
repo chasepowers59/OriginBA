@@ -47,7 +47,7 @@ class FilterSpec:
 _TITLECASE_DIALECTS = ("postgres", "oracle_dbt")
 
 
-def _validate_ident(name: str, allowed: set[str], kind: str, dialect: str = "oracle") -> str:
+def _validate_ident(name: str, allowed: set[str], kind: str, dialect: str) -> str:
     if dialect in _TITLECASE_DIALECTS:
         if name == "*":
             return name
@@ -72,7 +72,7 @@ def _bind(name: str, dialect: str) -> str:
     return f"%({name})s" if dialect == "postgres" else f":{name}"
 
 
-def _time_bucket_expr(field: str, grain: str, dialect: str = "oracle") -> str:
+def _time_bucket_expr(field: str, grain: str, dialect: str) -> str:
     grain = grain.lower()
     if grain not in ALLOWED_TIME_GRAINS:
         raise QueryValidationError(f"Invalid time grain: {grain}")
@@ -90,7 +90,6 @@ def build_query(
     table_name: str,
     allowed_fields: set[str],
     trusted_measures: set[str],
-    required_date_field: str | None,
     dimensions: list[str],
     measures: list[dict[str, Any]],
     filters: list[dict[str, Any]],
@@ -107,6 +106,11 @@ def build_query(
         raise QueryValidationError("limit must be between 1 and 5000")
     if not measures:
         raise QueryValidationError("At least one measure is required")
+    # Only the two dialects that exist. 'oracle' once meant the legacy path -- unquoted
+    # UPPER_SNAKE identifiers against CISADM -- and an unknown dialect used to fall
+    # through to it in silence. It is refused rather than routed.
+    if dialect not in _TITLECASE_DIALECTS:
+        raise QueryValidationError(f"Unknown SQL dialect: {dialect}")
 
     pg = dialect == "postgres"
     titlecase = dialect in _TITLECASE_DIALECTS
@@ -129,7 +133,6 @@ def build_query(
 
     filter_specs: list[FilterSpec] = []
     binds: dict[str, Any] = {}
-    has_date_window = False
     for idx, raw in enumerate(filters):
         field = _validate_ident(str(raw.get("field", "")), allowed_fields, "filter field", dialect)
         op = str(raw.get("op", "eq")).lower()
@@ -139,19 +142,8 @@ def build_query(
         if op == "between":
             if not isinstance(value, (list, tuple)) or len(value) != 2:
                 raise QueryValidationError("between filter requires [start, end]")
-            required_cmp = required_date_field or ""
-            if field == (required_cmp if titlecase else required_cmp.upper()):
-                has_date_window = True
         filter_specs.append(FilterSpec(field=field, op=op, value=value))
 
-    if required_date_field:
-        req = required_date_field if titlecase else required_date_field.upper()
-        if req not in allowed_fields:
-            raise QueryValidationError(f"Required date field missing from snapshot: {req}")
-        if not has_date_window:
-            raise QueryValidationError(
-                f"A date filter on {req} is required (use op=between with start and end dates)"
-            )
 
     table = table_name if pg else table_name.upper()
     # A table name is interpolated (never bound), so it is validated strictly:

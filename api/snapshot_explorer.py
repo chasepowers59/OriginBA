@@ -25,7 +25,7 @@ from api.executive_dashboard import build_executive_summary
 from api.kpi_runner import COMPARE_MODES
 from api.workstream_dashboard import build_workstream_about, build_workstream_summary
 from api.snapshot_catalog import (CatalogError, allowed_fields, get_snapshot,
-                                  is_warehouse, list_snapshots, list_workstreams,
+                                  list_snapshots, list_workstreams,
                                   load_catalog, snapshot_backend)
 
 
@@ -73,8 +73,8 @@ def _run(snapshot: dict, sql: str, binds=None, *, organization_id: str, max_rows
 
 def _qualified(snapshot: dict, organization_id: str | None = None) -> str:
     """schema.table for this org's engine. Quoted lowercase for Postgres; UNQUOTED
-    for both Oracle shapes (an in-database canvas was created unquoted, so Oracle
-    case-folds the reference -- quoting the lowercase name would miss it)."""
+    for Oracle (an in-database canvas was created unquoted, so Oracle case-folds the
+    reference -- quoting the lowercase name would miss it)."""
     backend, dialect, schema = snapshot_backend(snapshot, organization_id)
     table = snapshot["table_name"]
     if dialect == "postgres":
@@ -129,10 +129,8 @@ def _row_estimate(snapshot: dict, organization_id: str) -> int | None:
 def _default_date_filter(snapshot: dict[str, Any]) -> FilterRequest | None:
     """The window an unfiltered query falls back to, or None for a canvas with no date.
 
-    This read `required_date_field` alone, which no dbt canvas declares, so the 19
-    legacy snapshots were windowed and the 38 canvases were not. The row cap does not
-    substitute for it: FETCH FIRST applies AFTER GROUP BY, so an unfiltered aggregate
-    reads every row.
+    The row cap does not substitute for a window: FETCH FIRST applies AFTER GROUP BY,
+    so an unfiltered aggregate reads every row before returning its first.
 
     The window bounds the worst case; it is not a speedup on its own. It pays only when
     selective -- Ellensburg's RPT_GL (6.08M rows, years of history) goes 4,062ms -> 825ms
@@ -159,8 +157,7 @@ def _cross_filter(cross_field: str | None, cross_value: str | None) -> list[dict
     This used to upper-case it, which was right when every column was CISADM's
     UPPER_SNAKE and wrong the moment the canvases arrived with Title Case business
     names: "Customer Class" became "CUSTOMER CLASS" and every card in the grid returned
-    `Invalid filter field`. Casing per dialect is the query builder's job -- it
-    upper-cases for legacy Oracle and leaves the Title Case dialects alone.
+    `Invalid filter field`. Casing is the query builder's job.
     """
     if cross_field and cross_value is not None and str(cross_value).strip():
         return [{"field": cross_field, "op": "eq", "value": cross_value}]
@@ -367,13 +364,8 @@ def snapshot_stats(
     ctx.require_permission("snapshots:read")
     org_id = require_org_for_data(ctx)
     snapshot = _require_snapshot_access(ctx, snapshot_id)
-    # LOAD_DTTM is the CDC watermark on a CISADM snapshot; a dbt canvas has no such
-    # column, so the warehouse form reports the row count alone rather than inventing one.
-    if is_warehouse(snapshot):
-        sql = f"SELECT COUNT(*) AS row_count, NULL AS latest_load_dttm FROM {_qualified(snapshot, org_id)}"
-    else:
-        sql = (f"SELECT COUNT(*) AS ROW_COUNT, MAX(LOAD_DTTM) AS LATEST_LOAD_DTTM "
-               f"FROM {_qualified(snapshot)}")
+    # A canvas carries no load watermark of its own; the row count is the honest figure.
+    sql = f"SELECT COUNT(*) AS row_count, NULL AS latest_load_dttm FROM {_qualified(snapshot, org_id)}"
     try:
         columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=1)
     except Exception as exc:
@@ -435,17 +427,9 @@ def snapshot_scope_options(
             ),
         }
 
-    if is_warehouse(snapshot):
-        col = f'"{field}"'
-        sql = (f"SELECT DISTINCT {col} AS val FROM {_qualified(snapshot, org_id)} "
-               f"WHERE {col} IS NOT NULL ORDER BY 1 FETCH FIRST 100 ROWS ONLY")
-    else:
-        sql = (
-            f"SELECT * FROM ("
-            f"SELECT DISTINCT {field} AS VAL FROM {_qualified(snapshot)} "
-            f"WHERE {field} IS NOT NULL ORDER BY 1"
-            f") WHERE ROWNUM <= 100"
-        )
+    col = f'"{field}"'
+    sql = (f"SELECT DISTINCT {col} AS val FROM {_qualified(snapshot, org_id)} "
+           f"WHERE {col} IS NOT NULL ORDER BY 1 FETCH FIRST 100 ROWS ONLY")
     try:
         columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=100)
     except Exception as exc:
@@ -476,24 +460,9 @@ def snapshot_sample_rows(
     snapshot = _require_snapshot_access(ctx, snapshot_id)
 
     row_cap = max(1, min(limit, 10))
-    table = snapshot["table_name"].upper()
-    date_field = snapshot.get("required_date_field")
-    if is_warehouse(snapshot):
-        # No recency window on the warehouse form. The canvases are already scoped to a
-        # client's own data and a sample of ten rows is cheap; ordering by a date on an
-        # unindexed canvas is not, and this is only ever a preview.
-        sql = f"SELECT * FROM {_qualified(snapshot, org_id)} FETCH FIRST {row_cap} ROWS ONLY"
-    elif date_field:
-        # Restrict to recent rows so sample preview stays fast on large snapshots.
-        sql = (
-            f"SELECT * FROM ("
-            f"SELECT * FROM CISADM.{table} "
-            f"WHERE {date_field} >= ADD_MONTHS(TRUNC(SYSDATE), -3) "
-            f"ORDER BY {date_field} DESC NULLS LAST"
-            f") WHERE ROWNUM <= {row_cap}"
-        )
-    else:
-        sql = f"SELECT * FROM CISADM.{table} WHERE ROWNUM <= {row_cap}"
+    # No recency window: the canvases are already scoped to a client's own data and ten
+    # rows are cheap, while ordering by a date on a large canvas is not. Only a preview.
+    sql = f"SELECT * FROM {_qualified(snapshot, org_id)} FETCH FIRST {row_cap} ROWS ONLY"
     try:
         columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=row_cap)
     except Exception as exc:
@@ -643,18 +612,16 @@ def snapshot_query(
             }
 
     try:
-        # WHICH WORLD THIS SNAPSHOT LIVES IN decides the dialect and the backend. The
-        # dbt canvases are Postgres with quoted Title Case columns; the legacy
-        # *_RPT_CURR snapshots are Oracle CISADM. The snapshot says which, so the two
-        # coexist while the migration finishes and nothing needs configuring twice.
+        # The ORG decides the backend and dialect: the same canvas runs in Postgres for
+        # a CDC-fed tenant and in the client's own Oracle instance for an in-database
+        # one, with quoted Title Case columns identical in both.
         backend, dialect, schema = snapshot_backend(snapshot, org_id)
         warehouse = backend == "postgres"
         trusted = set(snapshot.get("trusted_measures", []))
         sql, binds = build_query(
             table_name=snapshot["table_name"],
             allowed_fields=allowed_fields(snapshot),
-            trusted_measures=trusted if dialect != "oracle" else {m.upper() for m in trusted},
-            required_date_field=snapshot.get("required_date_field"),
+            trusted_measures=trusted,
             dimensions=body.dimensions,
             measures=[m.model_dump() for m in body.measures],
             filters=filters,

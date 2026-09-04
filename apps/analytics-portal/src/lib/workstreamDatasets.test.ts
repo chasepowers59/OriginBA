@@ -72,7 +72,6 @@ describe("workstream data sets", () => {
       "field_ops",
       "finance",
       "meter_ops",
-      "new_services",
       "assets",
     ]) {
       expect(assigned.has(id)).toBe(true);

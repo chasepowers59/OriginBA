@@ -247,8 +247,7 @@ def analytics_nlq_metrics(ctx: AuthContext = Depends(get_auth_context)) -> dict[
     ctx.require_permission("nlq:read")
     from api.snapshot_analytics_nlq import get_nlq_metric_catalog
 
-    # Per-org: only metrics whose snapshot exists in this org's catalog are offered —
-    # a dbt-catalog org has no legacy *_RPT_CURR snapshots to run them against.
+    # Per-org: only metrics whose snapshot exists in this org's catalog are offered.
     org_id = ctx.effective_organization_id()
     return {"metrics": filter_nlq_metrics_for_auth(get_nlq_metric_catalog(org_id), ctx)}
 
