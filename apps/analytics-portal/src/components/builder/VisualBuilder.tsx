@@ -143,6 +143,10 @@ export function VisualBuilder({
   // --- query assembly ---------------------------------------------------------
   const buildRequest = useCallback(() => {
     if (!meta) return null;
+    // Empty shelves are not a query. The count(*) default below is for "how many",
+    // asked by putting a measure on VALUES; with nothing on either shelf it ran anyway
+    // and drew an axis with no bars and "1 rows" under it (demo25, 2026-09-04).
+    if (!cols.length && !vals.length) return null;
     const { dimensions: dims, timeDimensions: timeDims } = shelfDimensions(cols);
     const measures = vals.length
       ? vals.map((v) => ({ field: v.field, agg: v.agg }))
@@ -168,7 +172,10 @@ export function VisualBuilder({
   useEffect(() => {
     if (!meta) return;
     const req = buildRequest();
-    if (!req) return;
+    if (!req) {
+      setResult(null);
+      return;
+    }
     if (runTimer.current) clearTimeout(runTimer.current);
     runTimer.current = setTimeout(async () => {
       setRunning(true);
@@ -464,7 +471,7 @@ export function VisualBuilder({
                     ) : null}
                     {result ? (
                       <span className="text-xs" style={{ color: "var(--foreground-subtle)" }}>
-                        {result.row_count} rows
+                        {result.row_count} {result.row_count === 1 ? "row" : "rows"}
                       </span>
                     ) : null}
                     <AppliedWindowNote result={result} />

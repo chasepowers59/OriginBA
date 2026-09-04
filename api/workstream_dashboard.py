@@ -28,7 +28,7 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
                    "filters": [{"field": "Is Frozen", "op": "eq", "value": True}], "limit": 6}},
         {"id": "bills_completed", "label": "Bills completed", "subtitle": "Completed in the period",
          "snapshot_id": "rpt_bill", "format": "number", "workstream": "billing",
-         "explore_report_id": None, "date_field": "Window Start Date",
+         "explore_report_id": None, "date_field": "Completed Date/Time",
          "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}],
                    "filters": [{"field": "Is Completed", "op": "eq", "value": True}]},
          "trend": {"dimensions": ["Bill Cycle"], "measures": [{"field": "*", "agg": "count"}],
@@ -149,7 +149,7 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
     "field_ops": [
         {"id": "field_activities", "label": "Field activities", "subtitle": "Field activities created in the period",
          "snapshot_id": "rpt_field_activity", "format": "number", "workstream": "field_ops",
-         "explore_report_id": None, "date_field": "Event Date/Time",
+         "explore_report_id": None, "date_field": "Created Date/Time",
          "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
          "trend": {"dimensions": ["Activity Type"], "measures": [{"field": "*", "agg": "count"}],
                    "filters": [], "limit": 6}},
