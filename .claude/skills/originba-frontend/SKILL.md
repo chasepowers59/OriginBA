@@ -301,6 +301,26 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     formatted AT ITS OWN SCALE, which is what it does now. When a guard's rule is a
     proxy for the property you care about, the proxy's false negatives are bugs too.
 
+19. **A performance guard that changes the answer.** The default 90-day window keeps
+    a 6M-row aggregate interactive and turned "accounts by customer class" (562 rows)
+    into "accounts set up in the last 90 days": one bar instead of five, with only the
+    disclosure note to say why. A guard whose cost is correctness must be gated on the
+    condition it exists for -- here the engine's own row estimate (pg_class.reltuples /
+    ALL_TABLES.NUM_ROWS), failing toward the guard when the estimate cannot be read.
+
+20. **A report that names a population and declares no filter for it.** "Cancelled
+    payments by reason" charted every payment; the not-cancelled majority was a null
+    bar. The catalogue's SQL had the WHERE; the portal's governed query never runs
+    that SQL and reads only declared filters. Found by running all 92 report views and
+    flagging null categories -- a sweep worth repeating after any catalogue change.
+
+21. **Two concepts sharing one word on one row.** "Has Alert" (the redacted
+    ALERT_INFO free text) sat beside "Active Alerts" (typed CI_ACCT_ALERT); eight
+    accounts had the flag and none had an alert, and a report filtered on one and
+    charted the other. When a fix touches the canvas name, the rename needs the
+    contract mechanism (CLAUDE.md in the dbt repo: enforce_contracts var, then
+    --accept-contract-changes) and a name the secrets rule does not hide.
+
 **How five of these were found: a widely-used export with no test.** Enumerate
 `export function` in `lib/`, count references across the app, and subtract anything
 named in a `.test.ts`. 44 exports had 3+ uses and no test. That list is where
