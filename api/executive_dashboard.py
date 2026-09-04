@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from typing import Any
 
 from api.demo_db import demo_configured
@@ -271,6 +273,31 @@ def _kpis_for_workstreams(allowed_workstreams: list[str] | None) -> list[dict[st
     return [kpi for kpi in EXECUTIVE_KPIS if kpi.get("workstream") in allowed]
 
 
+# What a query against a warehouse that has not been BUILT yet looks like, per engine:
+# ORA-00942 (table or view does not exist) / ORA-00903 (invalid table name) on Oracle,
+# SQLSTATE 42P01 "relation ... does not exist" on Postgres. Nothing else -- a timeout,
+# a bad column, a permission error -- is this case.
+_MISSING_RELATION = re.compile(r"ORA-00942|ORA-00903|relation .* does not exist|42P01", re.IGNORECASE)
+
+WAREHOUSE_NOT_BUILT_NOTE = (
+    "This organization's reporting warehouse has not been built yet, so its canvases "
+    "hold no data. Nothing is wrong with the request: the in-database build is the "
+    "step that fills them.")
+
+
+def is_missing_relation_error(message: str | None) -> bool:
+    return bool(message) and bool(_MISSING_RELATION.search(str(message)))
+
+
+def warehouse_not_built(kpis: list[dict[str, Any]]) -> bool:
+    """True when EVERY KPI failed for want of its table -- the signature of an org
+    pointed at the dbt catalog before its warehouse exists. Since every org reads the
+    catalog, available_kpis() resolves every KPI everywhere; this is the check against
+    the DATABASE that it cannot make. A partial failure is a real per-KPI problem and
+    is left alone."""
+    return bool(kpis) and all(is_missing_relation_error(k.get("error")) for k in kpis)
+
+
 def available_kpis(
     kpi_defs: list[dict[str, Any]], organization_id: str | None,
 ) -> tuple[list[dict[str, Any]], str | None]:
@@ -417,6 +444,12 @@ def build_executive_summary(
             kpis = list(pool.map(_run, kpi_defs))
     else:
         kpis = []
+    # Nine cards each saying ORA-00942 is worse than empty. Collapse to the one note
+    # the front-end already renders for a catalog that lacks the canvases.
+    if warehouse_not_built(kpis):
+        catalog_note = WAREHOUSE_NOT_BUILT_NOTE
+        kpis = []
+        kpi_defs = []
     return {
         "client": client_id,
         "db_configured": True,

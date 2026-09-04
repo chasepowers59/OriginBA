@@ -21,7 +21,8 @@ from api.query_builder import QueryValidationError, build_query
 from api.raw_sql_validator import RawSqlValidationError, apply_row_cap, validate_raw_sql
 from api.reporting_dates import (DEFAULT_WINDOW_DAYS, reporting_today,
                                  window_date_field, window_date_label)
-from api.executive_dashboard import build_executive_summary
+from api.executive_dashboard import (WAREHOUSE_NOT_BUILT_NOTE, build_executive_summary,
+                                     is_missing_relation_error)
 from api.kpi_runner import COMPARE_MODES
 from api.workstream_dashboard import build_workstream_about, build_workstream_summary
 from api.snapshot_catalog import (CatalogError, allowed_fields, get_snapshot,
@@ -641,6 +642,8 @@ def snapshot_query(
             columns, rows = execute_query(sql, binds, organization_id=org_id,
                                           max_rows=body.limit)
     except Exception as exc:
+        if is_missing_relation_error(str(exc)):
+            raise HTTPException(status_code=502, detail=WAREHOUSE_NOT_BUILT_NOTE) from exc
         where = "Warehouse" if warehouse else "Demo"
         raise HTTPException(status_code=502, detail=f"{where} query failed: {exc}") from exc
 
