@@ -9843,7 +9843,7 @@
        "Any Person Receives Notifications",
        "Any Person Receives Bill Copy",
        "Interim Credit Review",
-       "Has Alert",
+       "Has Alert Text",
        "Current Balance",
        "Total Balance",
        "New Charge Balance",
@@ -10208,8 +10208,8 @@
      "label": "Interim Credit Review"
     },
     {
-     "id": "Has Alert",
-     "label": "Has Alert"
+     "id": "Has Alert Text",
+     "label": "Has Alert Text"
     },
     {
      "id": "Takes Multiple Utility Services",
@@ -10498,10 +10498,10 @@
      "type": "boolean"
     },
     {
-     "description": "Flag. Filter on it; do not sum it.",
+     "description": "CI_ACCT.ALERT_INFO holds text -- on real accounts identity-verification data (PINs, security questions, reference contacts) -- redacted at staging to this flag: 'verification data exists in CIS, look there'. NOT a typed alert: the CI_ACCT_ALERT rollup is Active Alerts / Active Alert Count. Renamed from 'Has Alert' 2026-09-04, when a report filtered on this and charted that.",
      "group": "customer_ops",
-     "id": "Has Alert",
-     "label": "Has Alert",
+     "id": "Has Alert Text",
+     "label": "Has Alert Text",
      "role": "dimension",
      "type": "boolean"
     },
@@ -11268,9 +11268,9 @@
      ],
      "filters": [
       {
-       "field": "Has Alert",
-       "op": "eq",
-       "value": true
+       "field": "Active Alert Count",
+       "op": "gte",
+       "value": 1
       }
      ],
      "id": "accounts_on_alerts",
@@ -11954,7 +11954,7 @@
        "Customer Class Code",
        "Collection Class",
        "Bill Cycle",
-       "Has Alert"
+       "Has Alert Text"
       ],
       "id": "customer_ops",
       "label": "Customer Operations"
@@ -12111,8 +12111,8 @@
      "label": "Bill Cycle"
     },
     {
-     "id": "Has Alert",
-     "label": "Has Alert"
+     "id": "Has Alert Text",
+     "label": "Has Alert Text"
     }
    ],
    "fields": [
@@ -12317,10 +12317,10 @@
      "type": "varchar(60)"
     },
     {
-     "description": "Flag. Filter on it; do not sum it.",
+     "description": "CI_ACCT.ALERT_INFO holds text -- on real accounts identity-verification data (PINs, security questions, reference contacts) -- redacted at staging to this flag: 'verification data exists in CIS, look there'. NOT a typed alert: the CI_ACCT_ALERT rollup is Active Alerts / Active Alert Count. Renamed from 'Has Alert' 2026-09-04, when a report filtered on this and charted that.",
      "group": "customer_ops",
-     "id": "Has Alert",
-     "label": "Has Alert",
+     "id": "Has Alert Text",
+     "label": "Has Alert Text",
      "role": "dimension",
      "type": "boolean"
     }

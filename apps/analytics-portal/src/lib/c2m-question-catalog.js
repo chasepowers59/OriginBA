@@ -798,8 +798,8 @@ export const QUESTIONS = [
   }),
   q({
     id: "accounts-on-alerts",
-    // Declared for the portal's governed query (accounts carrying an alert: without it the chart was one null bar of every account; demo25, 2026-09-04).
-    filters: [{"field": "Has Alert", "op": "eq", "value": true}],
+    // Declared for the portal's governed query (accounts with a typed CI_ACCT_ALERT; "Has Alert Text" is the redacted ALERT_INFO free text, a different thing; demo25, 2026-09-04).
+    filters: [{"field": "Active Alert Count", "op": "gte", "value": 1}],
     process: "customer", workstream: "Customer Information",
     kind: "count",
     title: "Which accounts carry active alerts?",
@@ -811,7 +811,7 @@ export const QUESTIONS = [
                  round(sum("Total Arrears")::numeric, 2) as "Total Arrears",
                  count(*) filter (where "Is On Active Pay Plan")::bigint as "On Pay Plan"
           from reporting.rpt_customer_account
-          where "Has Alert"
+          where "Active Alert Count" >= 1
           group by 1 order by 2 desc`,
   }),
   q({
