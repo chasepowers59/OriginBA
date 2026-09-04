@@ -285,6 +285,22 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     which are meaningless anyway. The rule: `or` is fine when 0 is invalid; when 0 is a
     value, only ABSENCE defaults (`13 if x is None else int(x)`). JS: `??` not `||`.
 
+17. **A truncation that keeps labels UNIQUE but not DISTINGUISHABLE.** KPI trend ticks
+    were cut to nine characters, and utility class names are two words sharing a head:
+    "Electric Residential" / "Electric Commercial" became "Elec…tial" / "Elec…cial" --
+    unique to a Set, useless to a reader (home page screenshot, demo25, 2026-09-04).
+    `splitTickLabel` now wraps to two whole lines at the space that lets both fit, most
+    balanced first ("Waste Water" / "Residential"), and truncates only what still does
+    not fit. Uniqueness is the wrong test for a label; legibility at a glance is the test.
+
+18. **A "lossless" guard that is stricter than lossless.** `formatCellValue` formatted
+    a numeric string only when `String(Number(v))` equalled it, so "-1561.11" rendered
+    "-1,561.11" while "-1265.00" and "0.00" in the SAME row stayed raw (the API
+    serializes NUMERIC at the column scale). The guard exists to protect leading zeros
+    and digits past 2^53; a plain decimal with a safe integer part loses nothing when
+    formatted AT ITS OWN SCALE, which is what it does now. When a guard's rule is a
+    proxy for the property you care about, the proxy's false negatives are bugs too.
+
 **How five of these were found: a widely-used export with no test.** Enumerate
 `export function` in `lib/`, count references across the app, and subtract anything
 named in a `.test.ts`. 44 exports had 3+ uses and no test. That list is where
