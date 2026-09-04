@@ -177,6 +177,21 @@ class SnapshotAnalyticsNlqTests(unittest.TestCase):
                                                          organization_id="dev"))
             runner.assert_not_called()
 
+    def test_an_unbuilt_warehouse_answers_in_a_sentence_not_a_driver_error(self):
+        """Every org reads the dbt catalog; on one whose warehouse is not built yet the
+        answer card would otherwise print ORA-00942 into the conversation."""
+        from api.nlq_metrics import METRICS
+        from api.snapshot_analytics_nlq import run_snapshot_analytics_nlq
+        target = METRICS[0]
+        with mock.patch("api.snapshot_analytics_nlq.demo_configured", return_value=True), \
+             mock.patch("api.snapshot_analytics_nlq._org_snapshot_ids",
+                        return_value={target.snapshot_id}), \
+             mock.patch("api.snapshot_analytics_nlq.run_metric_nlq",
+                        side_effect=RuntimeError("ORA-00942: table or view does not exist")):
+            out = run_snapshot_analytics_nlq("q", metric_id=target.id, organization_id="newark")
+        self.assertIn("not been built", out["narrative"].lower())
+        self.assertNotIn("ORA-", out["narrative"])
+
     def test_a_failure_answers_with_the_reason_rather_than_raising(self):
         """This runs behind /nlq; an exception here would 500 the whole answer."""
         from api.nlq_metrics import METRICS

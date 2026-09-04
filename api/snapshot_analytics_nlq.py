@@ -43,8 +43,13 @@ def run_snapshot_analytics_nlq(
         if result:
             return result
     except Exception as exc:
+        from api.executive_dashboard import WAREHOUSE_NOT_BUILT_NOTE, is_missing_relation_error
+        # An org whose warehouse is not built yet must not print ORA-00942 into the
+        # conversation; it gets the same sentence the dashboards use.
+        reason = WAREHOUSE_NOT_BUILT_NOTE if is_missing_relation_error(str(exc)) else str(exc)
         return {
-            "narrative": f"Could not run snapshot analytics: {exc}",
+            "narrative": (reason if reason is WAREHOUSE_NOT_BUILT_NOTE
+                          else f"Could not run snapshot analytics: {reason}"),
             "source": "snapshot_analytics",
             "resolved_from": metric_id,
         }
