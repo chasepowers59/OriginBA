@@ -606,7 +606,7 @@ function ResultTable({ result, booleanCols }: { result: QueryResponse | null; bo
   const label = (c: string) => result.column_labels?.[c] ?? c;
   const fmt = (v: unknown, c: string) => {
     if (booleanCols?.has(c) || typeof v === "boolean") return formatCellValue(v, { isBoolean: true });
-    return typeof v === "number" ? formatNumber(v) : String(v ?? "");
+    return v == null || v === "" ? "—" : typeof v === "number" ? formatNumber(v) : String(v);
   };
   return (
     <div className="max-h-[min(70vh,900px)] overflow-auto">

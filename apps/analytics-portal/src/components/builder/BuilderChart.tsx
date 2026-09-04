@@ -1,5 +1,6 @@
 "use client";
 
+import { categoryLabel } from "@/lib/chartLabels";
 import { useMemo } from "react";
 import {
   Area,
@@ -91,7 +92,7 @@ export function BuilderChart({
 
   const data = useMemo(() => {
     const mapped = rows.map((r) => {
-      const row: Record<string, unknown> = { [xKey]: String(r[xKey] ?? "—") };
+      const row: Record<string, unknown> = { [xKey]: categoryLabel(r[xKey]) };
       for (const s of series) row[s.key] = Number(r[s.key] ?? 0);
       return row;
     });
