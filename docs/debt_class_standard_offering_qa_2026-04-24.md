@@ -51,7 +51,7 @@ Because of that conflict, the QA approach was:
 The repo consistently describes `ACCT_DEBT_RPT_CURR` as the account-debt truth
 layer for debt segmentation:
 
-- [docs/debt_mgmt_acct_debt_adhoc_recipes.md](/Users/chase/OriginBA-3/docs/debt_mgmt_acct_debt_adhoc_recipes.md)
+- [archive/2026-09-08_reorg/docs/debt_mgmt_acct_debt_adhoc_recipes.md](/Users/chase/OriginBA-3/archive/2026-09-08_reorg/docs/debt_mgmt_acct_debt_adhoc_recipes.md)
 - [sql/performance/snapshots/debt_mgmt/acct_debt/README.md](/Users/chase/OriginBA-3/sql/performance/snapshots/debt_mgmt/acct_debt/README.md)
 - [sql/performance/snapshots/docs/debt_mgmt_acct_debt_snapshot.md](/Users/chase/OriginBA-3/sql/performance/snapshots/docs/debt_mgmt_acct_debt_snapshot.md)
 

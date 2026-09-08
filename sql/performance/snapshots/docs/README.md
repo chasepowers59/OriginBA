@@ -1,5 +1,8 @@
 # Snapshot Documentation
 
+> **Active set as of 2026-09-08:** eight tables -- FT_RPT_CURR, BSEG_BILLED_USAGE_RPT_CURR, BSEG_SQ_USAGE_RPT_CURR, D1_MSRMT_RPT_CURR, FT_GL_DISTRIBUTION_RPT_CURR, D1_USAGE_RPT_CURR, D1_USAGE_SCALAR_DTL_RPT_CURR and CMS_SA_SNAPSHOT -- on the 6-hour stagger in `../deployment_steps/07_schedule_all_active_snapshots.sql`. The twelve consolidation snapshots, ACCT_DEBT, COLL_PROC and PAY_TNDR_CASH are archived under `archive/2026-09-08_reorg/` (index there). Sections below that describe them are history.
+
+
 This folder is the central documentation package for the governed snapshot program.
 
 Keep snapshot-facing resources here so the SQL workspaces and the documentation stay together.

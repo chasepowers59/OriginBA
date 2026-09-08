@@ -48,7 +48,7 @@ If running without reload, call `reload_catalog()` or restart the API process af
 ## Report library (`/reports`)
 
 Curated utility report packs (billing close, payments, operations, etc.) are defined in
-`scripts/snapshot_portal_config.py` (`REPORT_LIBRARY_PACKS`), included in the catalog build, and
+`archive/2026-09-08_reorg/scripts/snapshot_portal_config.py (retired with the snapshot catalog)` (`REPORT_LIBRARY_PACKS`), included in the catalog build, and
 served at `GET /portal/report-library`. Rebuild the catalog after changing packs.
 
 ## Validation

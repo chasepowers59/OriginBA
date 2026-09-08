@@ -20,6 +20,9 @@ ACTIVE_8 = {
 }
 # Named by active-8 tooling as a legacy comparison point or a synonym, not deployed by it.
 RPT_CURR_ALLOWED_MENTIONS = set()
+# Files whose purpose is to FIND and STOP the retired jobs in client databases.
+RPT_CURR_ALLOWED_FILES = {"sql/performance/snapshots/qa/scheduler_jobs_sweep.sql",
+                          "sql/performance/snapshots/qa/scheduler_jobs_disable_retired.sql"}
 
 INDEX_DOCS = ["README.md", "AGENTS.md", "docs/roadmap/repository_structure_standard.md",
               "domains/README.md", "jaspersoft/README.md"]
@@ -131,6 +134,8 @@ def test_d5_no_retired_snapshot_table_outside_the_archive():
     # Code, DDL and domain XML only: prose may name a snapshot that was proposed and never built.
     for f in tracked_files("sql", "domains", "scripts", "deploy/jaspersoft_standard_offering"):
         if f.suffix.lower() not in {".sql", ".xml", ".py", ".sh", ".ps1", ".json", ".csv"}:
+            continue
+        if str(f.relative_to(ROOT)) in RPT_CURR_ALLOWED_FILES:
             continue
         try:
             text = f.read_text(encoding="utf-8", errors="ignore")

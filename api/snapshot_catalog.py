@@ -9,7 +9,6 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parent.parent
-CATALOG_PATH = ROOT / "output" / "snapshot_explorer_catalog.json"
 
 _catalog_cache: dict[str, Any] | None = None
 _catalog_mtime: float | None = None

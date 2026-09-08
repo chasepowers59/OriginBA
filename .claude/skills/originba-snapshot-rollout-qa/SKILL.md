@@ -15,7 +15,7 @@ description: Deploy and QA Oracle snapshot baselines and rolling refreshes on Sm
 
 - `sql/performance/snapshots/deployment_steps/clients/<client>/README.md`
 - `sql/performance/snapshots/docs/snapshot_client_reporting_guide.md`
-- `docs/smartcity_client_snapshot_rollout_status_2026-04-30.md`
+- `sql/performance/snapshots/docs/smartcity_client_snapshot_rollout_status_2026-04-30.md`
 - `scripts/local/run_client_oracle_sql.py`
 - `scripts/local/newark_after_qa_2yr.py` (Newark pattern)
 

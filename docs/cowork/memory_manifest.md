@@ -58,7 +58,7 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 
 - `sql/performance/snapshots/deployment_steps/clients/newark/README.md` (or target client)
 - `sql/performance/snapshots/docs/snapshot_client_reporting_guide.md`
-- `docs/smartcity_client_snapshot_rollout_status_2026-04-30.md`
+- `sql/performance/snapshots/docs/smartcity_client_snapshot_rollout_status_2026-04-30.md`
 
 ## Tier C — do not pin
 

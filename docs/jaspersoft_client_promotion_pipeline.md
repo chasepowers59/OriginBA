@@ -73,7 +73,7 @@ Staging area:
 
 Repository path truth references:
 
-- [current_snapshot_repository_path_truth.md](/Users/chase/OriginBA-3/docs/current_snapshot_repository_path_truth.md)
+- [current_snapshot_repository_path_truth.md](/Users/chase/OriginBA-3/sql/performance/snapshots/docs/current_snapshot_repository_path_truth.md)
 - [jaspersoft_repository_export_structure.md](/Users/chase/OriginBA-3/docs/jaspersoft_repository_export_structure.md)
 - [jaspersoft_repository_import_debugging_runbook.md](/Users/chase/OriginBA-3/docs/jaspersoft_repository_import_debugging_runbook.md)
 - [jaspersoft_promotion_endpoint_dependency_contract.md](/Users/chase/OriginBA-3/docs/jaspersoft_promotion_endpoint_dependency_contract.md)
@@ -147,7 +147,7 @@ That matters because Jaspersoft import behavior is sensitive to:
 
 For current snapshot artifacts, use the repository truth in:
 
-- [current_snapshot_repository_path_truth.md](/Users/chase/OriginBA-3/docs/current_snapshot_repository_path_truth.md)
+- [current_snapshot_repository_path_truth.md](/Users/chase/OriginBA-3/sql/performance/snapshots/docs/current_snapshot_repository_path_truth.md)
 
 ## Recommended commands
 

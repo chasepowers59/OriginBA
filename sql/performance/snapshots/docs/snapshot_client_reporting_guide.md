@@ -341,7 +341,7 @@ To-dos and batch threads                 → WORKFLOW_QUEUE_RPT_CURR
 4. Repoint Live Domain Standard Offering reports to consolidation snapshot Domains where mapped above.
 5. Keep status/date filters in **report input controls** or Ad Hoc filters so one snapshot serves both operational and historical views.
 
-Runbook: [smartcity_consolidation_snapshot_rollout_runbook.md](../../../docs/smartcity_consolidation_snapshot_rollout_runbook.md)
+Runbook: [smartcity_consolidation_snapshot_rollout_runbook.md](../../../archive/2026-09-08_reorg/docs/smartcity_consolidation_snapshot_rollout_runbook.md)
 
 Analytics portal POC (demo-only web explorer): [analytics_portal_poc.md](../../../docs/analytics_portal_poc.md)
 
