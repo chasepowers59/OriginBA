@@ -18,7 +18,7 @@ Constraints:
 References:
 - output/ai_cisadm_context.json
 - knowledge_base/c2m_cisadm/cisadm_core_model.md
-- skills/sql_report_builder/SKILL.md
+- .claude/skills/originba-cisadm-sql-builder/SKILL.md
 ```
 
 ## Example

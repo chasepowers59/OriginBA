@@ -10,7 +10,7 @@ Operational workflow for using local skills and knowledge base to deliver Oracle
 - Use `knowledge_base/jaspersoft_artifact_model_and_performance.md` to decide report vs Domain vs Ad Hoc vs dashboard and to choose raw-table vs derived-table modeling.
 
 2. Build SQL Logic
-- Follow `skills/sql_report_builder/SKILL.md`.
+- Follow `.claude/skills/originba-cisadm-sql-builder/SKILL.md`.
 - Use `knowledge_base/oracle_c2m_query_patterns.md`.
 
 3. Convert for Jaspersoft

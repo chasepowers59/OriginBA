@@ -20,7 +20,7 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 
 ### JRXML / reports
 
-- `skills/jrxml_report_builder/SKILL.md`
+- `.claude/skills/originba-jrxml-report-builder/SKILL.md`
 - `docs/assistant_skills/jrxml_schema_guardrails.md`
 - `docs/assistant_skills/jrxml_expression_patterns.md`
 - `docs/assistant_skills/domain_report_workflow.md`
@@ -29,7 +29,7 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 
 ### SQL / snapshots / debt
 
-- `skills/sql_report_builder/SKILL.md`
+- `.claude/skills/originba-cisadm-sql-builder/SKILL.md`
 - `skills/sql_validation_guard/SKILL.md`
 - `skills/cisadm_domain_modeling/SKILL.md`
 - `docs/assistant_skills/cisadm_sql_prompt_guide.md`
@@ -71,4 +71,4 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 
 Pin the whole folder:
 
-- `docs/cowork/skills/`
+- `.claude/skills/` (the six `originba-*` skills; `docs/cowork/skills/` archived 2026-09-08)

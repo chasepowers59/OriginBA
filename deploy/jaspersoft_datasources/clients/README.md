@@ -14,7 +14,7 @@ a full server export (org-tree layout) used by the promotion pipeline to inject
 | `Newark1_DS/` | Newark1 | `PTESTDB_NEWARK...` (tenant-root `/DataSource`, host `smartcity-db-test-v1-2`) |
 | `Odessa_DS/` | Odessa | `pdevdb_odessa...` |
 
-Original ZIP backups (same content): `deploy/EllensburgDS.zip`, `deploy/CityCorpDS.zip`, `deploy/CityCorpPRODDS.zip`, etc.
+Original ZIP backups (same content) are archived under `archive/2026-09-08_reorg/deploy/` (2026-09-08); the unpacked folders here are the record.
 
 Refresh from Jaspersoft: export `/DataSource/<Client>_DS` inside the client tenant and replace the matching folder here (or run `store_canonical_datasource_export.py` after adding the alias to allowed list).
 

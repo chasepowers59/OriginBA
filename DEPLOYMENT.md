@@ -30,7 +30,9 @@ and, for Oracle orgs, needs Instant Client — neither fits Vercel serverless);
   libraries, enable RLS first: `ALTER TABLE portal_state.records ENABLE ROW LEVEL
   SECURITY;` plus an org-scoped policy.
 
-### 2. API container (Fly.io / Render / Railway / OKE)
+### 2. API container (Fly.io / Render / OKE)
+
+Railway was retired 2026-09-08: its root `Dockerfile`/`railway.toml` are archived; `deploy/Dockerfile.api` is the only API image.
 - Build `deploy/Dockerfile.api` (Postgres-serving base). For Oracle orgs, rebuild
   FROM an Instant Client base and add `oracledb` to `deploy/requirements-api.txt`.
 - Env:

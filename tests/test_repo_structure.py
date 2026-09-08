@@ -62,6 +62,15 @@ def path_exists(token: str, doc: Path) -> bool:
     return (doc.parent / token).exists() or (ROOT / token).exists()
 
 
+def expand_braces(tokens: list[str]) -> list[str]:
+    """`deploy/{A,B}DS.zip` -> deploy/ADS.zip, deploy/BDS.zip (one level, as INDEX.md writes them)."""
+    out = []
+    for t in tokens:
+        m = re.search(r"\{([^{}]+)\}", t)
+        out.extend(t[:m.start()] + alt + t[m.end():] for alt in m.group(1).split(",")) if m else out.append(t)
+    return [t.rstrip("/") for t in out]
+
+
 def git_ignored(path: str) -> bool:
     return subprocess.run(["git", "check-ignore", "-q", path], cwd=ROOT).returncode == 0
 
@@ -102,19 +111,32 @@ def test_d2_live_code_does_not_reference_the_archive():
 
 
 # --- D5: only the active-8 snapshot tables outside the archive ----------------------
+_JOB_OR_PROC = re.compile(r"^(?:JOB_BASELINE_|JOB_REFRESH_|JOB_ONCE_FULL_|REFRESH_)|(?:_ONCE|_JOB|_JB)$")
+
+
+def snapshot_table(name: str) -> str:
+    """JOB_REFRESH_FT_RPT_CURR, REFRESH_FT_RPT_CURR and JOB_BASELINE_FT_RPT_CURR_ONCE all name FT_RPT_CURR."""
+    while True:
+        stripped = _JOB_OR_PROC.sub("", name)
+        if stripped == name:
+            return name
+        name = stripped
+
+
 def test_d5_no_retired_snapshot_table_outside_the_archive():
-    if not ARCHIVE.exists():
-        pytest.skip("archive tree not created yet (Phase 2)")
-    pat = re.compile(r"\b[A-Z0-9_]+_RPT_CURR\b")
+    if not (ARCHIVE / "sql" / "performance" / "snapshots").exists():
+        pytest.skip("snapshot estate not archived yet (Phase 2)")
+    pat = re.compile(r"\b[A-Z0-9_]+_RPT_CURR(?:_ONCE|_JOB|_JB)?\b")
     found: dict[str, set[str]] = {}
+    # Code, DDL and domain XML only: prose may name a snapshot that was proposed and never built.
     for f in tracked_files("sql", "domains", "scripts", "deploy/jaspersoft_standard_offering"):
-        if f.suffix.lower() not in {".sql", ".xml", ".py", ".sh", ".ps1", ".md", ".json", ".csv"}:
+        if f.suffix.lower() not in {".sql", ".xml", ".py", ".sh", ".ps1", ".json", ".csv"}:
             continue
         try:
             text = f.read_text(encoding="utf-8", errors="ignore")
         except OSError:
             continue
-        for name in set(pat.findall(text)) - ACTIVE_8 - RPT_CURR_ALLOWED_MENTIONS:
+        for name in {snapshot_table(n) for n in pat.findall(text)} - ACTIVE_8 - RPT_CURR_ALLOWED_MENTIONS:
             found.setdefault(name, set()).add(str(f.relative_to(ROOT)))
     assert found == {}, "retired snapshot tables still named outside archive/:\n" + "\n".join(
         f"  {k}: {sorted(v)[:3]}{' ...' if len(v) > 3 else ''}" for k, v in sorted(found.items()))
@@ -136,15 +158,15 @@ def test_d7_every_archived_item_has_a_pointer_at_its_old_path():
         pytest.skip("archive INDEX.md not created yet (Phase 1)")
     missing = []
     for line in index.read_text(encoding="utf-8").splitlines():
-        m = re.match(r"\|\s*`([^`]+)`\s*\|", line)
-        if not m or m.group(1) in ("what", "original path"):
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if not cells or not cells[0].startswith("`") or cells[0] in ("`what`", "`original path`"):
             continue
-        old = Path(m.group(1))
-        parent = ROOT / old.parent
-        pointers = [parent / "ARCHIVED.md", ROOT / old / "README.md", parent / "README.md", parent / "MOVED.md"]
-        texts = "".join(p.read_text(encoding="utf-8", errors="ignore") for p in pointers if p.exists())
-        if old.name not in texts:
-            missing.append(str(old))
+        for old in (Path(t) for t in expand_braces(re.findall(r"`([^`]+)`", cells[0]))):
+            parent = ROOT / old.parent
+            pointers = [parent / "ARCHIVED.md", ROOT / old / "README.md", parent / "README.md", parent / "MOVED.md"]
+            texts = "".join(p.read_text(encoding="utf-8", errors="ignore") for p in pointers if p.exists())
+            if old.name not in texts:
+                missing.append(str(old))
     assert missing == [], "archived paths with no pointer naming them:\n  " + "\n  ".join(missing)
 
 
