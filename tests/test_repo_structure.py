@@ -112,6 +112,53 @@ def test_d2_live_code_does_not_reference_the_archive():
     assert hits == [], "live code references the archive:\n  " + "\n  ".join(hits)
 
 
+# --- D4: the client registry and the portal agree ----------------------------------------
+def _registry_entries() -> list[dict]:
+    import json
+    export = ROOT / "config" / "clients.export.json"
+    if not export.exists():
+        pytest.skip("config/clients.export.json not exported yet (Phase 4)")
+    return json.loads(export.read_text(encoding="utf-8"))["entries"]
+
+
+def test_d4_every_portal_org_is_a_registry_entry():
+    import json
+    entries = {e["portal_org_id"]: e for e in _registry_entries() if e.get("portal_org_id")}
+    orgs = json.loads((ROOT / "config" / "portal_organizations.json").read_text(encoding="utf-8"))
+    orgs = orgs["organizations"] if isinstance(orgs, dict) else orgs
+    problems = []
+    for org in orgs:
+        e = entries.get(org["id"])
+        if not e:
+            problems.append(f"{org['id']}: no registry entry claims it"); continue
+        if org.get("warehouse_url_env") != e.get("portal_warehouse_url_env"):
+            problems.append(f"{org['id']}: warehouse_url_env {org.get('warehouse_url_env')} vs registry {e.get('portal_warehouse_url_env')}")
+        if org.get("env_prefix") and org["env_prefix"] != e.get("portal_oracle_prefix"):
+            problems.append(f"{org['id']}: env_prefix {org['env_prefix']} vs registry {e.get('portal_oracle_prefix')}")
+    assert problems == [], "\n  ".join(problems)
+
+
+def test_d4_every_client_alias_the_sql_runner_accepts_is_registered():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("rcos", ROOT / "scripts" / "local" / "run_client_oracle_sql.py")
+    mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+    known = set()
+    for e in _registry_entries():
+        known.add(e["id"]); known.update(e.get("aliases", []))
+    unknown = sorted(set(mod.CLIENTS) - known)
+    assert unknown == [], f"aliases with no registry entry: {unknown}"
+    for legacy in ("fonddulac", "collegestation", "newark_prod", "int_train", "odessa_dev", "origin_demo"):
+        assert legacy in mod.CLIENTS, f"{legacy} used to work and must still resolve"
+
+
+def test_d4_promotion_csv_matches_the_registry():
+    import csv
+    rows = list(csv.reader((ROOT / "deploy" / "jaspersoft_client_promotion" / "client_org_mapping.csv").open(encoding="utf-8")))
+    expected = {(e["jaspersoft"]["tenant_org"], e["jaspersoft"]["ds_name"]) for e in _registry_entries()
+                if e.get("jaspersoft") and e["jaspersoft"].get("tenant_org") and e.get("kind") == "client" and e.get("client_id") == e["id"]}
+    assert {tuple(r) for r in rows if r} == expected
+
+
 # --- D5: only the active-8 snapshot tables outside the archive ----------------------
 _JOB_OR_PROC = re.compile(r"^(?:JOB_BASELINE_|JOB_REFRESH_|JOB_ONCE_FULL_|REFRESH_)|(?:_ONCE|_JOB|_JB)$")
 

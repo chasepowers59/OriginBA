@@ -31,3 +31,4 @@ python3 scripts/jaspersoft/run_client_standard_offering_pipeline.py \
 Import **inside each client tenant** (Repository → Import):
 
 `deploy/jaspersoft_client_promotion/prepared_imports/<Client>_Standard_Offering_import.zip`
+\n\n## Names of record (2026-09-08)\n\nEach client's DataSource name is an attribute of its row in `~/originba_dbt/clients.yml` (`jaspersoft.ds_name`), which is what the promotion CSV is generated from. Odessa is recorded with two candidates (`Origin_DataVergence_DS`, the one the pipeline injects; `Odessa_DS`, documented above) and `ds_verified: false` until a read of the live tenant's `/DataSource` folder settles it; both folders stay until then. CityCorp PROD's folder is `CityCorp_PROD_DS/` while the DataSource it holds is named `CityCorp_DS` (tenant-root layout) -- recorded on the instance.\n
