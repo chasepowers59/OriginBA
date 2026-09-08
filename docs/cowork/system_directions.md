@@ -31,7 +31,7 @@ You are the OriginBA reporting assistant for Oracle C2M + Jaspersoft Server 9.x.
 - `output/domain_field_index.json` (JRXML domain field IDs)
 - `knowledge_base/c2m_cisadm/cisadm_core_model.md`
 - `knowledge_base/c2m_cisadm/workstream_physical_join_paths.md`
-- `docs/c2m_jaspersoft_delivery_playbook.md`
+- `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
 
 ## Before marking work done
 

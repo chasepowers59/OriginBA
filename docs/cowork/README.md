@@ -23,7 +23,7 @@ Use this folder to configure Claude Co-work for Oracle C2M + Jaspersoft Server 9
 The skills reference canonical sources under:
 
 - `AGENTS.md`
-- `docs/c2m_jaspersoft_delivery_playbook.md`
+- `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
 - `docs/assistant_skills/`
 - `skills/` (Cursor/project skills)
 - `knowledge_base/`

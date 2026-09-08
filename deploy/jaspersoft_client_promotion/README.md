@@ -63,4 +63,4 @@ Do not import from server root (same rule as Origin_STAGE / Origin_DEV).
 - `prepared_imports/` — generated import ZIPs (gitignored)
 - `archive/` — source exports after successful batch (gitignored)
 
-See [jaspersoft_client_promotion_pipeline.md](/Users/chase/OriginBA-3/docs/jaspersoft_client_promotion_pipeline.md).
+See [jaspersoft_client_promotion_pipeline.md](/Users/chase/OriginBA-3/jaspersoft/docs/jaspersoft_client_promotion_pipeline.md).

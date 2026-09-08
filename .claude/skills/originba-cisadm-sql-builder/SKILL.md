@@ -59,7 +59,7 @@ Build Oracle SQL datasets for C2M reporting without losing required rows, changi
 ### Required References
 - `output/ai_cisadm_context.json`
 - `docs/assistant_skills/cisadm_sql_prompt_guide.md`
-- `docs/c2m_jaspersoft_delivery_playbook.md`
+- `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
 - `knowledge_base/jaspersoft_artifact_model_and_performance.md`
 - `knowledge_base/oracle_c2m_query_patterns.md`
 - `knowledge_base/c2m_cisadm/cisadm_core_model.md`

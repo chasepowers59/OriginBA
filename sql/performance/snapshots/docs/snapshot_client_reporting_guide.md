@@ -81,7 +81,7 @@ Legend for **Population scope**:
 
 ## Active 7 — production snapshots
 
-These are the first tables deployed on client test databases. They underpin most **Finance**, **Billing and Rates**, and **Meter Operations** snapshot reports in the [Standard Offering library](../../../docs/smartcity_standard_offering_report_library.md).
+These are the first tables deployed on client test databases. They underpin most **Finance**, **Billing and Rates**, and **Meter Operations** snapshot reports in the [Standard Offering library](../../../jaspersoft/docs/smartcity_standard_offering_report_library.md).
 
 ### Finance
 
@@ -351,5 +351,5 @@ Analytics portal POC (demo-only web explorer): [analytics_portal_poc.md](../../.
 
 - [workstream_snapshot_catalog.md](workstream_snapshot_catalog.md) — technical catalog and grain rules
 - [business_question_snapshot_coverage.md](business_question_snapshot_coverage.md) — question-level coverage matrix
-- [smartcity_standard_offering_report_library.md](../../../docs/smartcity_standard_offering_report_library.md) — full 104-report library
+- [smartcity_standard_offering_report_library.md](../../../jaspersoft/docs/smartcity_standard_offering_report_library.md) — full 104-report library
 - Per-snapshot README under `sql/performance/snapshots/<workstream>/<subset>/`

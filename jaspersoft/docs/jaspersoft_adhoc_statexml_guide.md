@@ -295,4 +295,4 @@ To avoid repeat import failures, treat package wrapper integrity as a separate d
 
 Authoritative wrapper contract and checklist:
 
-- `docs/jaspersoft_promotion_endpoint_dependency_contract.md` (see **Add-on import wrapper contract** section)
+- `jaspersoft/jaspersoft/docs/jaspersoft_promotion_endpoint_dependency_contract.md` (see **Add-on import wrapper contract** section)

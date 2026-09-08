@@ -80,17 +80,17 @@ Professional workspace for Oracle Utilities C2M (CISADM schema), Jaspersoft Doma
 - `python -m pipeline.validate_tables` (requires Oracle env vars)
 
 ## Domain Report Standards
-- Build/checklist guide: `docs/jaspersoft_domain_report_build_standards.md`
-- Origin 2025 styling implementation: `docs/jaspersoft_origin_2025_style_implementation.md`
-- Delivery playbook: `docs/c2m_jaspersoft_delivery_playbook.md`
-- Client promotion pipeline: `docs/jaspersoft_client_promotion_pipeline.md`
+- Build/checklist guide: `jaspersoft/docs/jaspersoft_domain_report_build_standards.md`
+- Origin 2025 styling implementation: `jaspersoft/docs/jaspersoft_origin_2025_style_implementation.md`
+- Delivery playbook: `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
+- Client promotion pipeline: `jaspersoft/docs/jaspersoft_client_promotion_pipeline.md`
 
 ## Jaspersoft Repository Promotion
 - Scope: standalone Jaspersoft repository export rewrite and client import preparation
 - Scripts: `scripts/jaspersoft/`
 - Staging area: `deploy/jaspersoft_client_promotion/`
 - Not part of the DB / SQL / snapshot optimization workflow
-- Artifact inventory: `docs/jaspersoft_artifact_inventory.md`
+- Artifact inventory: `jaspersoft/docs/jaspersoft_artifact_inventory.md`
 
 ## SQL + Jaspersoft Skills Workflow
 - Workflow runbook: `docs/sql_jaspersoft_workflow_implementation.md`

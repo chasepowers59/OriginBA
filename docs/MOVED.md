@@ -16,3 +16,7 @@ The active-8 snapshot documentation now lives beside the SQL it describes:
 - `meter_ops_d1_usage_scalar_adhoc_recipes.md` -> `sql/performance/snapshots/docs/recipes/meter_ops_d1_usage_scalar_adhoc_recipes.md`
 
 Jaspersoft docs move to `jaspersoft/docs/` in Phase 3 (see `jaspersoft/README.md`).
+
+## Jaspersoft docs -> jaspersoft/docs/ (2026-09-08)
+
+31 delivery docs (`jaspersoft_*`, `smartcity_standard_offering_*`, `c2m_jaspersoft_delivery_playbook.md`, the template and deployment guides, `live_domain_*`, the dashboard packs) now live in `jaspersoft/docs/`; `jaspersoft/README.md` is the index.

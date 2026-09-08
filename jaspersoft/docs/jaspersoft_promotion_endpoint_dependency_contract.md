@@ -220,5 +220,5 @@ Any promotion-impacting change must be treated as a contract change when it affe
 Required companion updates:
 
 1. update this contract doc
-2. update `docs/jaspersoft_client_promotion_pipeline.md` if process changed
+2. update `jaspersoft/jaspersoft/docs/jaspersoft_client_promotion_pipeline.md` if process changed
 3. update verification logic/scripts if new invariant is introduced

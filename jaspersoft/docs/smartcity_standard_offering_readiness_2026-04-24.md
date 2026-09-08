@@ -65,7 +65,7 @@ Latest row-count and `LOAD_DTTM` evidence shows:
 
 The current structural assessment in:
 
-- `docs/live_domain_fit_assessment.md`
+- `jaspersoft/jaspersoft/docs/live_domain_fit_assessment.md`
 - `docs/cashiering_live_domain_assessment.md`
 
 supports this position.

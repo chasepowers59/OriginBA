@@ -260,7 +260,7 @@ No governed snapshot workspace currently exists.
 ### Existing documentation anchors
 - `docs/cisadm_workstream_vocabulary_guide.md`
 - `reports/customer_contact_print_check.jrxml`
-- `docs/bill_templating_playbook.md`
+- `jaspersoft/docs/bill_templating_playbook.md`
 
 ### Likely future snapshot candidates
 - account-contact readiness snapshot

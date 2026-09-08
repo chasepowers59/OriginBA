@@ -147,5 +147,5 @@ For maintainable OriginBA delivery:
 
 ## Related files
 
-- [jaspersoft_repository_export_structure.md](/C:/Users/cvpow/OneDrive/Desktop/OriginBA/docs/jaspersoft_repository_export_structure.md)
+- [jaspersoft_repository_export_structure.md](/C:/Users/cvpow/OneDrive/Desktop/OriginBA/jaspersoft/jaspersoft/docs/jaspersoft_repository_export_structure.md)
 - [payments_deposit_control_summary.jrxml](/C:/Users/cvpow/OneDrive/Desktop/OriginBA/reports/payments_deposit_control_summary.jrxml)

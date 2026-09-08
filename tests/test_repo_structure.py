@@ -27,8 +27,7 @@ RPT_CURR_ALLOWED_FILES = {"sql/performance/snapshots/qa/scheduler_jobs_sweep.sql
 INDEX_DOCS = ["README.md", "AGENTS.md", "docs/roadmap/repository_structure_standard.md",
               "domains/README.md", "jaspersoft/README.md"]
 # Rewritten in Phase 5 of the reorg; their dangling paths are known and listed there.
-REWRITTEN_IN_PHASE_5 = {"README.md", "domains/README.md", "AGENTS.md",
-                        "docs/roadmap/repository_structure_standard.md"}
+REWRITTEN_IN_PHASE_5 = {"README.md", "AGENTS.md"}
 
 _PATH_TOKEN = re.compile(r"`([^`\s]+)`")
 _PLACEHOLDER = re.compile(r"[<>{}*?$~]|^https?://|^--|^-[a-z]|^\.$|^/")

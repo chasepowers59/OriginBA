@@ -287,7 +287,7 @@ If another analyst needs to pick up the work, they should be able to find everyt
 - the current coverage position in `sql/performance/snapshots/docs/business_question_snapshot_coverage.md`
 
 ## Related Guides
-- `docs/c2m_jaspersoft_delivery_playbook.md`
+- `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
 - `sql/performance/snapshots/docs/workstream_snapshot_catalog.md`
 - `sql/performance/snapshots/docs/snapshot_sqldeveloper_runbook.md`
 - `sql/performance/snapshots/docs/snapshot_xml_inventory.md`

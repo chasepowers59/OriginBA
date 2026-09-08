@@ -13,11 +13,11 @@ description: Prepare Jaspersoft Standard Offering or folder import ZIPs for Smar
 
 ## Required references
 
-- `docs/jaspersoft_client_promotion_pipeline.md`
+- `jaspersoft/docs/jaspersoft_client_promotion_pipeline.md`
 - `deploy/jaspersoft_client_promotion/README.md`
 - `deploy/jaspersoft_client_promotion/client_org_mapping.csv`
 - `deploy/jaspersoft_datasources/clients/README.md`
-- `docs/jaspersoft_environment_promotion_troubleshooting.md`
+- `jaspersoft/docs/jaspersoft_environment_promotion_troubleshooting.md`
 
 ## Steps
 

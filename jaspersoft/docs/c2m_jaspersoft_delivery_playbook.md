@@ -173,10 +173,10 @@ For any delivery that changes logic, presentation, or prompts, produce the appli
 ## Supporting Repository Guides
 - `knowledge_base/jaspersoft_artifact_model_and_performance.md`
 - `knowledge_base/jaspersoft_charts_visuals_jrs9.md`
-- `docs/jaspersoft_domain_report_build_standards.md`
+- `jaspersoft/jaspersoft/docs/jaspersoft_domain_report_build_standards.md`
 - `sql/performance/snapshots/docs/legacy_domain_to_snapshot_modernization_playbook.md`
 - `sql/performance/snapshots/docs/snapshot_modernization_checklist.md`
-- `docs/template_authoring_playbook.md`
+- `jaspersoft/jaspersoft/docs/template_authoring_playbook.md`
 - `docs/sql_jaspersoft_workflow_implementation.md`
 - `knowledge_base/oracle_c2m_query_patterns.md`
 - `knowledge_base/jaspersoft_derived_table_rules.md`

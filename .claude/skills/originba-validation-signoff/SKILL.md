@@ -49,7 +49,7 @@ description: Produce Standard Offering QA documents, manager updates, and struct
 Validate SQL and Jaspersoft changes before signoff so parity, preserved population, and freshness assumptions are explicit.
 
 ### Required References
-- `docs/c2m_jaspersoft_delivery_playbook.md`
+- `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
 - `knowledge_base/jaspersoft_artifact_model_and_performance.md`
 - `knowledge_base/validation_playbook.md`
 - `knowledge_base/billing_cycle_reporting_semantics.md`
@@ -87,7 +87,7 @@ Validate optimized vs original C2M usage-reporting logic with deterministic, rea
 - Read-only DB credentials only.
 
 ### Required References
-- `docs/c2m_jaspersoft_delivery_playbook.md`
+- `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
 - `knowledge_base/jaspersoft_artifact_model_and_performance.md`
 - `knowledge_base/validation_playbook.md`
 
@@ -116,7 +116,7 @@ Validate optimized vs original C2M usage-reporting logic with deterministic, rea
 Audit reporting gaps in a client-specific `CISADM` schema and turn them into concrete, governed Oracle/Jaspersoft actions.
 
 ### Inputs Required
-- `docs/c2m_jaspersoft_delivery_playbook.md`
+- `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
 - `docs/reporting_gap_assessment/README.md`
 - `docs/reporting_gap_assessment/03_workstream_coverage_matrix.md`
 - `docs/reporting_gap_assessment/04_reporting_gap_findings.md`

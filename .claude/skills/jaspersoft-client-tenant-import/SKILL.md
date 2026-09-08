@@ -15,7 +15,7 @@ Import **inside the client tenant**. Package must use **tenant-relative** paths 
 
 ## Workflow
 
-1. **Read** [docs/jaspersoft_client_tenant_report_import.md](../../../docs/jaspersoft_client_tenant_report_import.md) for full contract.
+1. **Read** [jaspersoft/docs/jaspersoft_client_tenant_report_import.md](../../../jaspersoft/docs/jaspersoft_client_tenant_report_import.md) for full contract.
 2. **Build** with `scripts/jaspersoft/build_client_tenant_report_import.py` (or a client wrapper like `build_newark_rep8_report_import.py`).
 3. **Verify** output shows `verify_prepared_import.py` → `status: PASS`.
 4. **Import** while logged into client org → Repository → Import → overwrite.

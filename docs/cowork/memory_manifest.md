@@ -8,7 +8,7 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 |------|-----|
 | `AGENTS.md` | Master contract |
 | `docs/cowork/system_directions.md` | Co-work instructions (this bundle) |
-| `docs/c2m_jaspersoft_delivery_playbook.md` | End-to-end delivery rules |
+| `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md` | End-to-end delivery rules |
 | `docs/assistant_skills/README.md` | Assistant workflow index |
 | `docs/assistant_skills/report_preflight_checklist.md` | Done criteria |
 | `docs/assistant_skills/past_mistakes_and_prevention.md` | Known failure patterns |
@@ -47,9 +47,9 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 
 ### Client promotion / import
 
-- `docs/jaspersoft_client_promotion_pipeline.md`
-- `docs/jaspersoft_environment_promotion_troubleshooting.md`
-- `docs/jaspersoft_repository_import_debugging_runbook.md`
+- `jaspersoft/docs/jaspersoft_client_promotion_pipeline.md`
+- `jaspersoft/docs/jaspersoft_environment_promotion_troubleshooting.md`
+- `jaspersoft/docs/jaspersoft_repository_import_debugging_runbook.md`
 - `deploy/jaspersoft_client_promotion/README.md`
 - `deploy/jaspersoft_client_promotion/client_org_mapping.csv`
 - `deploy/jaspersoft_datasources/clients/README.md`

@@ -20,7 +20,7 @@ Build and maintain Oracle C2M + Jaspersoft Studio/Server reports using **Domain-
 4. Exported Domain schema files (when provided)
 
 ## Operating References
-1. `docs/c2m_jaspersoft_delivery_playbook.md`
+1. `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
 2. `knowledge_base/jaspersoft_artifact_model_and_performance.md`
 3. `knowledge_base/jaspersoft_charts_visuals_jrs9.md`
 4. `knowledge_base/jaspersoft_dynamic_features.md`

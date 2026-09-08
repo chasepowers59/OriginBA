@@ -5,9 +5,9 @@
 The current recommended finance dashboard package is the new snapshot-backed
 native dashboard:
 
-- [Financial_Operations_Dashboard_import.zip](/Users/chase/OriginBA-3/deploy/native_dashboard_pack_v1/Financial_Operations_Dashboard_import.zip)
-- [Financial_Operations_Dashboard_manifest.json](/Users/chase/OriginBA-3/deploy/native_dashboard_pack_v1/Financial_Operations_Dashboard_manifest.json)
-- [Financial_Operations_Dashboard_verification.json](/Users/chase/OriginBA-3/deploy/native_dashboard_pack_v1/Financial_Operations_Dashboard_verification.json)
+- [Financial_Operations_Dashboard_import.zip](/Users/chase/OriginBA-3/jaspersoft/dashboards/native_dashboard_pack_v1/Financial_Operations_Dashboard_import.zip)
+- [Financial_Operations_Dashboard_manifest.json](/Users/chase/OriginBA-3/jaspersoft/dashboards/native_dashboard_pack_v1/Financial_Operations_Dashboard_manifest.json)
+- [Financial_Operations_Dashboard_verification.json](/Users/chase/OriginBA-3/jaspersoft/dashboards/native_dashboard_pack_v1/Financial_Operations_Dashboard_verification.json)
 
 This dashboard is designed to be imported into:
 
@@ -69,12 +69,12 @@ The earlier package below is retained for reference, but it is no longer the
 recommended finance dashboard direction because it was based on the legacy FT
 domain/dashboard pattern:
 
-- [Financial_Transaction_Dashboard_import.zip](/Users/chase/OriginBA-3/deploy/native_dashboard_pack_v1/Financial_Transaction_Dashboard_import.zip)
-- [Financial_Transaction_Dashboard_package_audit.json](/Users/chase/OriginBA-3/deploy/native_dashboard_pack_v1/Financial_Transaction_Dashboard_package_audit.json)
-- [Financial_Transaction_Dashboard_verification.json](/Users/chase/OriginBA-3/deploy/native_dashboard_pack_v1/Financial_Transaction_Dashboard_verification.json)
+- [Financial_Transaction_Dashboard_import.zip](/Users/chase/OriginBA-3/jaspersoft/dashboards/native_dashboard_pack_v1/Financial_Transaction_Dashboard_import.zip)
+- [Financial_Transaction_Dashboard_package_audit.json](/Users/chase/OriginBA-3/jaspersoft/dashboards/native_dashboard_pack_v1/Financial_Transaction_Dashboard_package_audit.json)
+- [Financial_Transaction_Dashboard_verification.json](/Users/chase/OriginBA-3/jaspersoft/dashboards/native_dashboard_pack_v1/Financial_Transaction_Dashboard_verification.json)
 
 ## Additional References
 
-- [native_dashboard_inventory_audit.json](/Users/chase/OriginBA-3/deploy/native_dashboard_pack_v1/native_dashboard_inventory_audit.json)
-- [native_dashboard_pack_manifest.json](/Users/chase/OriginBA-3/deploy/native_dashboard_pack_v1/native_dashboard_pack_manifest.json)
+- [native_dashboard_inventory_audit.json](/Users/chase/OriginBA-3/jaspersoft/dashboards/native_dashboard_pack_v1/native_dashboard_inventory_audit.json)
+- [native_dashboard_pack_manifest.json](/Users/chase/OriginBA-3/jaspersoft/dashboards/native_dashboard_pack_v1/native_dashboard_pack_manifest.json)
 - [snapshot_financial_operations_dashboard_v1.md](/Users/chase/OriginBA-3/docs/snapshot_financial_operations_dashboard_v1.md)

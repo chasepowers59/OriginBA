@@ -168,7 +168,7 @@ That audit tool now exists:
 
 - [audit_native_dashboards.py](/Users/chase/OriginBA-3/scripts/jaspersoft/audit_native_dashboards.py)
 - [native_dashboard_inventory_audit.md](/Users/chase/OriginBA-3/docs/native_dashboard_inventory_audit.md)
-- [native_dashboard_inventory_audit.json](/Users/chase/OriginBA-3/deploy/native_dashboard_pack_v1/native_dashboard_inventory_audit.json)
+- [native_dashboard_inventory_audit.json](/Users/chase/OriginBA-3/jaspersoft/dashboards/native_dashboard_pack_v1/native_dashboard_inventory_audit.json)
 
 ## Recommended Next Implementation
 

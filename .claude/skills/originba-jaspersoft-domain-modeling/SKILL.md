@@ -45,11 +45,11 @@ description: Design Jaspersoft Domains, join trees, Topics, and Ad Hoc performan
 Design production-safe Oracle C2M reporting data models and joins for Jaspersoft domains.
 
 ### Core References
-- `docs/c2m_jaspersoft_delivery_playbook.md`
+- `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
 - `knowledge_base/jaspersoft_artifact_model_and_performance.md`
 - `knowledge_base/c2m_cisadm/cisadm_core_model.md`
 - `knowledge_base/c2m_cisadm/performance_playbook.md`
-- `docs/jaspersoft_domain_report_build_standards.md`
+- `jaspersoft/docs/jaspersoft_domain_report_build_standards.md`
 
 ### Modeling Rules
 1. Choose the artifact intentionally: Domain for shared semantic reuse, Topic for curated self-service, report for pixel-perfect output, dashboard for multi-panel consumption.
@@ -78,7 +78,7 @@ Design production-safe Oracle C2M reporting data models and joins for Jaspersoft
 Prepare SQL for Jaspersoft Domain or Ad Hoc derived-table ingestion only when a derived table is the safest way to preserve grain, simplify the join graph, or expose a controlled semantic layer.
 
 ### Required References
-- `docs/c2m_jaspersoft_delivery_playbook.md`
+- `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
 - `knowledge_base/jaspersoft_artifact_model_and_performance.md`
 - `knowledge_base/jaspersoft_derived_table_rules.md`
 

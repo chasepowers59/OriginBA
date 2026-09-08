@@ -74,9 +74,9 @@ Staging area:
 Repository path truth references:
 
 - [current_snapshot_repository_path_truth.md](/Users/chase/OriginBA-3/sql/performance/snapshots/docs/current_snapshot_repository_path_truth.md)
-- [jaspersoft_repository_export_structure.md](/Users/chase/OriginBA-3/docs/jaspersoft_repository_export_structure.md)
-- [jaspersoft_repository_import_debugging_runbook.md](/Users/chase/OriginBA-3/docs/jaspersoft_repository_import_debugging_runbook.md)
-- [jaspersoft_promotion_endpoint_dependency_contract.md](/Users/chase/OriginBA-3/docs/jaspersoft_promotion_endpoint_dependency_contract.md)
+- [jaspersoft_repository_export_structure.md](/Users/chase/OriginBA-3/jaspersoft/jaspersoft/docs/jaspersoft_repository_export_structure.md)
+- [jaspersoft_repository_import_debugging_runbook.md](/Users/chase/OriginBA-3/jaspersoft/jaspersoft/docs/jaspersoft_repository_import_debugging_runbook.md)
+- [jaspersoft_promotion_endpoint_dependency_contract.md](/Users/chase/OriginBA-3/jaspersoft/jaspersoft/docs/jaspersoft_promotion_endpoint_dependency_contract.md)
 
 ## SmartCity Client Mapping
 
@@ -307,7 +307,7 @@ This tooling does not replace:
 
 Use the deployment runbook for that:
 
-- [deployment-runbook-smartcity-new-packages.md](/Users/chase/OriginBA-3/docs/deployment-runbook-smartcity-new-packages.md)
+- [deployment-runbook-smartcity-new-packages.md](/Users/chase/OriginBA-3/jaspersoft/jaspersoft/docs/deployment-runbook-smartcity-new-packages.md)
 
 ## Why This Was Added To The Repo
 

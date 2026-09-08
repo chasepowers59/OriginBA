@@ -128,4 +128,4 @@ When building a maintained report in this repo:
 5. Use the full Ad Hoc export only when you intentionally want to preserve an Ad Hoc view as-is.
 
 For the specific failure sequence and working repair pattern when imports break after packaging, also use:
-- [jaspersoft_repository_import_debugging_runbook.md](/C:/Users/cvpow/OneDrive/Desktop/OriginBA/docs/jaspersoft_repository_import_debugging_runbook.md)
+- [jaspersoft_repository_import_debugging_runbook.md](/C:/Users/cvpow/OneDrive/Desktop/OriginBA/jaspersoft/jaspersoft/docs/jaspersoft_repository_import_debugging_runbook.md)

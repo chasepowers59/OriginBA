@@ -43,7 +43,7 @@ description: Create or fix Domain-first JRXML reports, input controls, and chart
 - Input control JSON parses
 - No forbidden chart tags for 9.x
 
-> **Style is Origin 2025** (`~/originba_dbt/.claude/skills/origin-doc-style/SKILL.md`: Aptos, Sapphire `#006FAC`); the Blue Theme in `docs/jaspersoft_domain_report_build_standards.md` applies only when matching an EXISTING Standard Offering report family. `language="domain"` stays the query language (jasperQL is the 9.0 recommendation, not adopted).
+> **Style is Origin 2025** (`~/originba_dbt/.claude/skills/origin-doc-style/SKILL.md`: Aptos, Sapphire `#006FAC`); the Blue Theme in `jaspersoft/docs/jaspersoft_domain_report_build_standards.md` applies only when matching an EXISTING Standard Offering report family. `language="domain"` stays the query language (jasperQL is the 9.0 recommendation, not adopted).
 
 ## JRXML report builder (Jaspersoft 9.x)
 
@@ -62,8 +62,8 @@ Create or fix domain-first JRXML reports and paired input controls with Studio/S
 - `AGENTS.md`
 - `output/ai_cisadm_context.json` (when SQL/source-table context is needed upstream)
 - `output/domain_field_index.json`
-- `docs/c2m_jaspersoft_delivery_playbook.md`
-- `docs/jaspersoft_domain_report_build_standards.md`
+- `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
+- `jaspersoft/docs/jaspersoft_domain_report_build_standards.md`
 - `docs/assistant_skills/jrxml_schema_guardrails.md`
 - `docs/assistant_skills/jrxml_expression_patterns.md`
 - `docs/assistant_skills/domain_report_workflow.md`
