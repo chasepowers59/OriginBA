@@ -115,3 +115,4 @@ the current equivalent lives.
 | `deploy/jaspersoft_standard_offering_add_ons` | add-on packages whose only builder is archived; the shipped package is deploy/jaspersoft_standard_offering/ | see `README.md` / `jaspersoft/README.md` |
 | `scripts/snapshot_portal_config.py` | UX config for the retired CISADM snapshot catalog (date presets per `*_RPT_CURR`); nothing imports it since the catalog retirement on 2026-09-04 | `output/catalog_dbt.json` |
 | `sql/performance/snapshots/debt_mgmt/00a_config_discovery_validation.sql` | discovery pack for four snapshots that are all archived | `sql/performance/snapshots/debt_mgmt/cms_sa_snapshot/` |
+| `docs/cowork/system_directions.md` | a Co-work paste-in restatement of AGENTS.md (2026-08-11) | `AGENTS.md` |

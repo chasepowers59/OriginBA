@@ -150,3 +150,7 @@ The warehouse is NOT backed up here (dbt rebuilds it).
 - Supabase project is provisioned + schema applied; supply its pooled connection
   string to the API host (the password is the remaining secret).
 - Pick + provision the API container host.
+
+## Client registry copy
+
+`config/clients.export.json` and `deploy/jaspersoft_client_promotion/client_org_mapping.csv` are generated from `~/originba_dbt/clients.yml` (`scripts/client_registry.py export` there, run by its `regenerate_all.sh`). Refresh them before building the API image; the sibling checkout is read first on a dev machine, the bundled copy in the container.

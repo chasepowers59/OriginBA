@@ -7,7 +7,7 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 | Path | Why |
 |------|-----|
 | `AGENTS.md` | Master contract |
-| `docs/cowork/system_directions.md` | Co-work instructions (this bundle) |
+| `AGENTS.md (AGENTS.md was a paste-in restatement of it; archived 2026-09-08)` | Co-work instructions (this bundle) |
 | `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md` | End-to-end delivery rules |
 | `docs/assistant_skills/README.md` | Assistant workflow index |
 | `docs/assistant_skills/report_preflight_checklist.md` | Done criteria |
