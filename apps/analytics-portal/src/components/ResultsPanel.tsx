@@ -8,6 +8,7 @@ import {
   formatCurrency,
   formatNumber,
   formatPercent,
+  formatDateTime,
 } from "@/lib/format";
 import { EmptyStateIcon } from "@/components/EmptyStateIcon";
 import {
@@ -19,6 +20,7 @@ import { BuilderChart } from "./builder/BuilderChart";
 import { downloadWorkbook } from "@/lib/exportXlsx";
 import { printCouncilPack } from "@/lib/councilPack";
 import { useBrand } from "@/components/PortalThemeProvider";
+import { AppliedWindowNote } from "@/components/AppliedWindowNote";
 
 type SortDir = "asc" | "desc";
 
@@ -131,6 +133,11 @@ export function ResultsPanel({
               Nothing matched <strong className="text-heading">{ctx.periodLabel}</strong>
               {ctx.dateRange ? ` (${ctx.dateRange[0]} to ${ctx.dateRange[1]})` : ""}.
             </>
+          ) : result.applied_window ? (
+            // "your current filters" is wrong in exactly this case: the reader set
+            // none, and the window is the server's. Blaming filters they never chose
+            // sends them looking for something that is not on screen.
+            <>{result.applied_window.note}</>
           ) : (
             "Nothing matched your current filters."
           )}
@@ -197,7 +204,7 @@ export function ResultsPanel({
           {scopeLabel ? ` · ${scopeLabel}` : ""}
         </p>
         <p className="mt-1 text-xs text-fg-muted">
-          Generated {new Date().toLocaleString()} · {brand.connection_label}
+          Generated {formatDateTime(new Date())} · {brand.connection_label}
         </p>
         <hr className="my-4 border-slate-300" />
       </div>
@@ -212,6 +219,7 @@ export function ResultsPanel({
             {result.row_count} field values
             {loading ? " · updating…" : ""}
           </p>
+          <AppliedWindowNote result={result} />
         </div>
         <div className="flex gap-2">
           <button
@@ -241,7 +249,7 @@ export function ResultsPanel({
       ) : null}
 
       {insight ? (
-        <div className="rounded-xl border border-edge bg-gradient-to-r from-primary to-accent-2 px-4 py-3 text-sm text-heading">
+        <div className="rounded-xl border border-edge tint-panel px-4 py-3 text-sm text-heading">
           <span className="font-medium text-heading">{insight.label}</span> leads this view at{" "}
           <span className="font-semibold text-primary">{formatPercent(insight.share)}</span> of the
           total ({formatMeasure(insight.topValue)}).
@@ -356,7 +364,7 @@ function KpiCard({
     <div
       className={`rounded-xl border px-4 py-3 ${
  highlight
- ? "border-edge bg-gradient-to-br from-primary to-accent-2"
+ ? "border-edge tint-panel-br"
  : "border-edge-subtle bg-surface-subtle"
  }`}
     >

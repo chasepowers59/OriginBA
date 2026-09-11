@@ -81,7 +81,7 @@ Legend for **Population scope**:
 
 ## Active 7 — production snapshots
 
-These are the first tables deployed on client test databases. They underpin most **Finance**, **Billing and Rates**, and **Meter Operations** snapshot reports in the [Standard Offering library](../../../docs/smartcity_standard_offering_report_library.md).
+These are the first tables deployed on client test databases. They underpin most **Finance**, **Billing and Rates**, and **Meter Operations** snapshot reports in the [Standard Offering library](../../../jaspersoft/docs/smartcity_standard_offering_report_library.md).
 
 ### Finance
 
@@ -341,7 +341,7 @@ To-dos and batch threads                 → WORKFLOW_QUEUE_RPT_CURR
 4. Repoint Live Domain Standard Offering reports to consolidation snapshot Domains where mapped above.
 5. Keep status/date filters in **report input controls** or Ad Hoc filters so one snapshot serves both operational and historical views.
 
-Runbook: [smartcity_consolidation_snapshot_rollout_runbook.md](../../../docs/smartcity_consolidation_snapshot_rollout_runbook.md)
+Runbook: [smartcity_consolidation_snapshot_rollout_runbook.md](../../../archive/2026-09-08_reorg/docs/smartcity_consolidation_snapshot_rollout_runbook.md)
 
 Analytics portal POC (demo-only web explorer): [analytics_portal_poc.md](../../../docs/analytics_portal_poc.md)
 
@@ -351,5 +351,5 @@ Analytics portal POC (demo-only web explorer): [analytics_portal_poc.md](../../.
 
 - [workstream_snapshot_catalog.md](workstream_snapshot_catalog.md) — technical catalog and grain rules
 - [business_question_snapshot_coverage.md](business_question_snapshot_coverage.md) — question-level coverage matrix
-- [smartcity_standard_offering_report_library.md](../../../docs/smartcity_standard_offering_report_library.md) — full 104-report library
+- [smartcity_standard_offering_report_library.md](../../../jaspersoft/docs/smartcity_standard_offering_report_library.md) — full 104-report library
 - Per-snapshot README under `sql/performance/snapshots/<workstream>/<subset>/`

@@ -11,7 +11,7 @@ This document describes how to move the personalized monthly bill from local dev
 3. Map fields to the report:
    - `narrative` → Summary Band text field
    - `current_amount` / `prior_amount` → use in totals or charts as needed
-4. Attach the adapter to the report **Billing & Rates – Personalized Monthly Statement – Monthly** (see `docs/jasper-template-guide.md`).
+4. Attach the adapter to the report **Billing & Rates – Personalized Monthly Statement – Monthly** (see `jaspersoft/docs/jasper-template-guide.md`).
 5. Run a preview in Studio using sample JSON to confirm layout and field binding.
 
 ## 2. User Acceptance Testing (UAT)

@@ -47,7 +47,10 @@ def _validate_tiles(tiles: list[dict[str, Any]]) -> list[dict[str, Any]]:
         raise DashboardError(f"Maximum {MAX_TILES} tiles allowed")
     cleaned: list[dict[str, Any]] = []
     for raw in tiles:
-        snapshot_id = str(raw.get("snapshot_id", "")).upper()
+        # AS GIVEN. Upper-casing was right while every snapshot was an Oracle table;
+        # a dbt canvas is lowercase rpt_*, so this stored RPT_BILL_SEGMENT and the tile
+        # then 404'd on lookup -- the dashboard saved and could not render.
+        snapshot_id = str(raw.get("snapshot_id", "")).strip()
         if not snapshot_id:
             raise DashboardError("Each tile requires snapshot_id")
         visual = str(raw.get("visual", "chart")).lower()

@@ -14,12 +14,12 @@ import {
   allowedAggsForMeasure,
   buildColumnLabels,
   defaultMeasureSelection,
-  requiredDateLabel,
 } from "@/lib/businessLabels";
 import { getFavorite } from "@/lib/favorites";
 import { getViewRemote, saveViewRemote } from "@/lib/savedViews";
 import { applyDatePresetConfig, estimatePeriodDays, widenDateRange } from "@/lib/datePresets";
 import { applyProcessGuide } from "@/lib/processGuide";
+import { resolveDateField } from "@/lib/tileDateField";
 import { PinMenu } from "@/components/PinMenu";
 import { useAuth } from "@/components/AuthProvider";
 import { FavoritesPanel } from "./FavoritesPanel";
@@ -154,19 +154,15 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
 
   const buildFilters = useCallback(
     (extra: PremadeReport["filters"] = []) => {
-      // A snapshot need not HAVE a required date field. The dbt canvases do not: they
-      // are contract-governed and row-capped, so a mandatory transaction window is both
-      // unnecessary and meaningless on a dimension table like the price list. Building
-      // the filter unconditionally sent {field: null} and the API rejected the whole
-      // query -- "Input should be a valid string" -- so the explorer showed a validation
-      // error instead of a chart.
+      // The presets window on the canvas's MEASURED date. They used to key off a
+      // mandatory-window field no canvas sets, so "Prior month" changed state and sent
+      // nothing -- the query ran unwindowed and the reader had no way to tell. A canvas
+      // with no date at all (the price list, asset locations) gets no window, which is
+      // correct: a transaction window means nothing on a dimension table.
+      const dateField = resolveDateField(metadata);
       const filters: PremadeReport["filters"] = [
-        ...(metadata.required_date_field
-          ? [{
-              field: metadata.required_date_field,
-              op: "between" as const,
-              value: [dateStart, dateEnd],
-            }]
+        ...(dateField
+          ? [{ field: dateField, op: "between" as const, value: [dateStart, dateEnd] }]
           : []),
         ...extra,
       ];
@@ -178,7 +174,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       }
       return filters;
     },
-    [metadata.required_date_field, dateStart, dateEnd, scopeField, scopeValue, drillFilter],
+    [metadata, dateStart, dateEnd, scopeField, scopeValue, drillFilter],
   );
 
   const runPremade = useCallback(
@@ -404,7 +400,11 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     window.setTimeout(() => setSavedMsg(null), 2500);
   };
 
-  const dateFieldLabel = requiredDateLabel(metadata);
+  const resolvedDateField = resolveDateField(metadata);
+  const dateFieldLabel =
+    metadata.date_fields.find((d) => d.id === resolvedDateField)?.label ??
+    resolvedDateField ??
+    "";
 
   return (
     <div className="space-y-6">
@@ -428,7 +428,10 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         />
       ) : null}
       <div className="no-print flex flex-wrap items-center justify-between gap-2">
-        <div className="glass-panel flex-1 p-2">
+        {/* basis-full until sm: `flex-1` alone means flex-basis:0, so on a narrow screen
+            this collapsed to 43px beside its siblings instead of wrapping onto its own
+            line, and the tab labels rendered 16px wide and unreadable. */}
+        <div className="glass-panel basis-full p-2 sm:basis-0 sm:flex-1">
           <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
             {tabOptions.map(([key, label]) => (
               <button
@@ -437,7 +440,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 onClick={() => selectTab(key)}
                 className={`rounded-xl px-2 py-2.5 text-xs font-medium transition sm:text-sm ${
  tab === key
- ? "bg-gradient-to-r from-primary to-accent-2 text-heading ring-1 ring-edge"
+ ? "tint-active text-heading ring-1 ring-edge"
  : "text-fg-muted hover:bg-chip hover:text-heading"
  }`}
               >
@@ -478,14 +481,20 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         />
       ) : (
         <div className="grid gap-6 xl:grid-cols-[340px_1fr]">
-      <aside className="no-print space-y-4">
+      {/* min-w-0: a grid item defaults to min-width:auto, so one wide child sized this
+          column to 860px in a 375px viewport and scrolled the whole PAGE sideways. */}
+      <aside className="no-print min-w-0 space-y-4">
         <FavoritesPanel compact />
 
         <div className="glass-panel p-4">
           <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
             Reporting period
           </p>
-          <p className="mb-3 text-xs text-fg-muted">Filtered by {dateFieldLabel.toLowerCase()}</p>
+          <p className="mb-3 text-xs text-fg-muted">
+            {resolvedDateField
+              ? `Filtered by ${dateFieldLabel.toLowerCase()}`
+              : "This canvas has no date to filter on."}
+          </p>
           <div className="mb-3 flex flex-wrap gap-2">
             {DATE_PRESETS.map((p) => (
               <button
@@ -587,7 +596,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         ) : null}
       </aside>
 
-      <main className="space-y-4">
+      <main className="min-w-0 space-y-4">
         {error ? (
           <div className="glass-panel border-over bg-over-bg px-4 py-3 text-sm text-over">
             {error}

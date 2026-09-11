@@ -25,6 +25,7 @@ import {
   measureDisplaysAsCurrency,
   workstreamDisplayName,
 } from "@/lib/businessLabels";
+import { activeFilters, optionsWithCurrent, restoreFilters } from "@/lib/builderFilters";
 import { formatNumber, formatCellValue } from "@/lib/format";
 import type {
   BuilderQuestion,
@@ -36,8 +37,10 @@ import type {
 import { FieldPalette } from "./FieldPalette";
 import { Shelf } from "./Shelf";
 import { VisualPicker, type VisualChoice } from "./VisualPicker";
+import { shelfDimensions } from "@/lib/builderShelves";
 import { BuilderChart, type ChartSeries } from "./BuilderChart";
 import { QuestionGallery } from "./QuestionGallery";
+import { AppliedWindowNote } from "@/components/AppliedWindowNote";
 
 type ColItem = { field: string; label: string; kind: "dim" | "time"; grain?: string };
 type ValItem = { field: string; label: string; agg: string; trusted: boolean };
@@ -140,27 +143,23 @@ export function VisualBuilder({
   // --- query assembly ---------------------------------------------------------
   const buildRequest = useCallback(() => {
     if (!meta) return null;
-    const dims = cols.filter((c) => c.kind === "dim").map((c) => c.field);
-    const timeDims = cols
-      .filter((c) => c.kind === "time")
-      .map((c) => ({ field: c.field, grain: c.grain ?? "month" }));
+    // Empty shelves are not a query. The count(*) default below is for "how many",
+    // asked by putting a measure on VALUES; with nothing on either shelf it ran anyway
+    // and drew an axis with no bars and "1 rows" under it (demo25, 2026-09-04).
+    if (!cols.length && !vals.length) return null;
+    const { dimensions: dims, timeDimensions: timeDims } = shelfDimensions(cols);
     const measures = vals.length
       ? vals.map((v) => ({ field: v.field, agg: v.agg }))
       : [{ field: "*", agg: "count" }];
 
-    // A filter whose value hasn't been chosen yet is inert — sending it as `= ''`
-    // would silently return zero rows.
-    const filters = fils
-      .filter((f) => f.role === "date" || String(f.value ?? "") !== "")
-      .map((f) => ({ field: f.field, op: f.op, value: f.value }));
-    // Governance mirror: a canvas with a required date field must carry a between
-    // filter on it, or the server rejects the query. Auto-add if the user hasn't.
-    const req = meta.required_date_field;
-    if (req && !filters.some((f) => f.field === req && f.op === "between")) {
-      filters.push({ field: req, op: "between", value: defaultDateRange(90) });
-    }
+    // Shared with saveView, so the view that reopens is the view that ran.
+    const filters = activeFilters(fils);
+    // No client-side default window: an unfiltered query gets the server's, and the
+    // server DISCLOSES it (applied_window), which a silent client-side one never did.
     return {
-      dimensions: timeDims.length ? [] : dims,
+      // Both, always. A date used to blank the dimension list, which silently
+      // dropped every other column the user had put on the shelf.
+      dimensions: dims,
       measures,
       filters,
       time_dimensions: timeDims.length ? timeDims : undefined,
@@ -173,7 +172,10 @@ export function VisualBuilder({
   useEffect(() => {
     if (!meta) return;
     const req = buildRequest();
-    if (!req) return;
+    if (!req) {
+      setResult(null);
+      return;
+    }
     if (runTimer.current) clearTimeout(runTimer.current);
     runTimer.current = setTimeout(async () => {
       setRunning(true);
@@ -279,6 +281,9 @@ export function VisualBuilder({
             trusted: (m.trusted_measures ?? []).includes(mm.field),
           })),
         );
+        // Restore the scope too. Without this the view reopened over the whole canvas
+        // while its title still described the scoped question.
+        setFils(restoreFilters(v.filters ?? null, m.fields));
         const ct = v.chart_type;
         setVisual(
           (ct === "line" || ct === "pie" || ct === "horizontal" || ct === "area" ||
@@ -297,7 +302,8 @@ export function VisualBuilder({
   useEffect(() => {
     if (initialApplied.current || !index.length) return;
     if (initialReport && questions.length) {
-      const q = questions.find((x) => x.id === initialReport);
+      // The catalog id is composite (canvas:report); the Library's own report_id also resolves.
+      const q = questions.find((x) => x.id === initialReport || x.report_id === initialReport);
       if (q) {
         initialApplied.current = true;
         void applyQuestion(q);
@@ -326,6 +332,9 @@ export function VisualBuilder({
         measure_field: first.field,
         measure_agg: first.agg,
         measures,
+        // The scoping is part of the view. Saving without it meant reopening over the
+        // whole canvas: different numbers, and nothing said why.
+        filters: activeFilters(fils),
         chart_type: visual,
       });
       setSaved("Saved — find it under Saved views on Home");
@@ -334,7 +343,7 @@ export function VisualBuilder({
       setSaved(`Save failed: ${err instanceof Error && err.message ? err.message : "try again"}`);
       setTimeout(() => setSaved(null), 3500);
     }
-  }, [meta, snapshotId, cols, vals, visual, series]);
+  }, [meta, snapshotId, cols, vals, fils, visual, series]);
 
   const grouped = useMemo(() => {
     const g = new Map<string, SnapshotSummary[]>();
@@ -358,7 +367,7 @@ export function VisualBuilder({
 
         {/* Table-first layout: the data pane (tables -> columns) is always visible —
             picking the table IS the entry point, columns expand beneath it. */}
-        <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
+        <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
           <div className="glass-panel max-h-[320px] overflow-y-auto p-3 lg:sticky lg:top-20 lg:max-h-[calc(100vh-7rem)] lg:self-start">
             <FieldPalette
               grouped={grouped}
@@ -388,7 +397,10 @@ export function VisualBuilder({
                           value={c.grain}
                           onChange={(e) => setCols((cc) => cc.map((x) => (x.field === c.field ? { ...x, grain: e.target.value } : x)))}
                           className="rounded bg-transparent text-[10px]"
-                          style={{ color: "var(--chart-3)" }}
+                          // The Columns shelf accent, not chart-3: this select lives in
+                          // a Columns pill, and chart-3 is a series fill that reads at
+                          // 2.86:1 as 10px text on the light ground.
+                          style={{ color: "var(--chart-2)" }}
                         >
                           {GRAINS.map((g) => (
                             <option key={g} value={g}>{g}</option>
@@ -460,9 +472,10 @@ export function VisualBuilder({
                     ) : null}
                     {result ? (
                       <span className="text-xs" style={{ color: "var(--foreground-subtle)" }}>
-                        {result.row_count} rows
+                        {result.row_count} {result.row_count === 1 ? "row" : "rows"}
                       </span>
                     ) : null}
+                    <AppliedWindowNote result={result} />
                     <button type="button" onClick={saveView} className="btn-ghost text-xs" disabled={!result}>
                       Save view
                     </button>
@@ -475,7 +488,17 @@ export function VisualBuilder({
                 ) : visual === "table" ? (
                   <ResultTable result={result} booleanCols={booleanCols} />
                 ) : (
-                  <BuilderChart rows={result?.rows ?? []} xKey={xKey} xLabel={xLabel} series={series} visual={visual} />
+                  <BuilderChart
+                    rows={result?.rows ?? []}
+                    xKey={xKey}
+                    xLabel={xLabel}
+                    series={series}
+                    visual={visual}
+                    // xKey is the time dimension whenever the shelf holds one, and a date
+                    // axis has to read chronologically rather than ranked by size.
+                    sortTimeSeries={cols.some((c) => c.kind === "time")}
+                    xGrain={cols.find((c) => c.kind === "time")?.grain ?? null}
+                  />
                 )}
               </div>
             </div>
@@ -508,6 +531,8 @@ function FilterValuePicker({
 }) {
   const [values, setValues] = useState<string[] | null>(null);
   const [failed, setFailed] = useState(false);
+  // Why the list is unavailable, when the API declined rather than errored.
+  const [declined, setDeclined] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -515,7 +540,11 @@ function FilterValuePicker({
     setFailed(false);
     fetchScopeOptions(snapshotId, field)
       .then((r) => {
-        if (active) setValues(r.values ?? []);
+        if (!active) return;
+        // enumerable === false means the canvas is too large to list values from;
+        // absent means an older API, which always enumerated.
+        setDeclined(r.enumerable === false ? r.reason ?? "Too many rows to list values." : null);
+        setValues(r.values ?? []);
       })
       .catch(() => {
         if (active) setFailed(true);
@@ -525,12 +554,17 @@ function FilterValuePicker({
     };
   }, [snapshotId, field]);
 
-  if (failed || (values && values.length === 0)) {
+  // Free text when the list is unavailable — because the fetch failed, because the
+  // column has no values, or because the canvas is too large to list from. The filter
+  // works identically either way; only the convenience of picking is lost. `title`
+  // carries the reason so declining is explained rather than mysterious.
+  if (declined || failed || (values && values.length === 0)) {
     return (
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="= value"
+        title={declined ?? undefined}
         className="w-24 rounded bg-transparent text-[10px]"
         style={{ color: "var(--chart-4)" }}
       />
@@ -543,6 +577,10 @@ function FilterValuePicker({
       </span>
     );
   }
+  // The list is capped at 100, so a restored filter's value is often not in it. A
+  // select whose value matches no option shows "choose value…" while the filter is
+  // still applied — an empty chart with nothing to explain it.
+  const options = optionsWithCurrent(values, value) ?? [];
   return (
     <select
       value={value}
@@ -551,7 +589,7 @@ function FilterValuePicker({
       style={{ color: "var(--chart-4)" }}
     >
       <option value="">choose value…</option>
-      {values.map((v) => (
+      {options.map((v) => (
         <option key={v} value={v}>
           {v}
         </option>
@@ -568,10 +606,10 @@ function ResultTable({ result, booleanCols }: { result: QueryResponse | null; bo
   const label = (c: string) => result.column_labels?.[c] ?? c;
   const fmt = (v: unknown, c: string) => {
     if (booleanCols?.has(c) || typeof v === "boolean") return formatCellValue(v, { isBoolean: true });
-    return typeof v === "number" ? formatNumber(v) : String(v ?? "");
+    return v == null || v === "" ? "—" : typeof v === "number" ? formatNumber(v) : String(v);
   };
   return (
-    <div className="max-h-[360px] overflow-auto">
+    <div className="max-h-[min(70vh,900px)] overflow-auto">
       <table className="min-w-full text-left text-xs">
         <thead>
           <tr>

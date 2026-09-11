@@ -9,6 +9,7 @@ import {
 } from "@/lib/api";
 import { useAuth } from "@/components/AuthProvider";
 import { FormError, Modal } from "@/components/Modal";
+import { formatDateTime } from "@/lib/format";
 
 /**
  * Notes pinned to a report artifact — the "why" next to the number. Anyone in
@@ -73,7 +74,7 @@ export function NotesDialog({
               <p className="whitespace-pre-wrap text-sm text-fg">{n.text}</p>
               <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-fg-muted">
                 <span className="truncate">
-                  {n.author_email} · {new Date(n.created_at).toLocaleString()}
+                  {n.author_email} · {formatDateTime(n.created_at)}
                 </span>
                 {canRemove(n) ? (
                   <button

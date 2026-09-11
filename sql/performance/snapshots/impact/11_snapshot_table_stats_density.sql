@@ -1,3 +1,4 @@
+-- 2026-09-08: ACCT_DEBT, COLL_PROC and PAY_TNDR_CASH removed from the list (archived; not part of the active-8).
 -- Purpose:
 --   Review Oracle table stats for governed snapshots, including estimated data size
 --   from row count and average row length.
@@ -12,12 +13,9 @@ WITH snapshot_tables AS (
     SELECT 'BSEG_SQ_USAGE_RPT_CURR' FROM dual UNION ALL
     SELECT 'FT_RPT_CURR' FROM dual UNION ALL
     SELECT 'FT_GL_DISTRIBUTION_RPT_CURR' FROM dual UNION ALL
-    SELECT 'ACCT_DEBT_RPT_CURR' FROM dual UNION ALL
-    SELECT 'COLL_PROC_RPT_CURR' FROM dual UNION ALL
     SELECT 'D1_USAGE_RPT_CURR' FROM dual UNION ALL
     SELECT 'D1_USAGE_SCALAR_DTL_RPT_CURR' FROM dual UNION ALL
-    SELECT 'D1_MSRMT_RPT_CURR' FROM dual UNION ALL
-    SELECT 'PAY_TNDR_CASH_RPT_CURR' FROM dual
+    SELECT 'D1_MSRMT_RPT_CURR' FROM dual
 )
 SELECT
     t.snapshot_table_name AS table_name,

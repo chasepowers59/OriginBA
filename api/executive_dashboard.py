@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import re
+
 from typing import Any
 
 from api.demo_db import demo_configured
 from api.warehouse_db import warehouse_configured
-from api.kpi_runner import date_windows, execute_kpi_definition
+from api.kpi_runner import date_windows, execute_kpi_definition, public_lenses, select_lens
 
 
 EXECUTIVE_KPIS: list[dict[str, Any]] = [
@@ -17,7 +19,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     # own date field.
     {
         "id": "total_customers",
-        "label": "Total customers",
+        "label": "Billing accounts",
         "subtitle": "Accounts in CIS",
         "snapshot_id": "rpt_customer_account",
         "format": "number",
@@ -27,29 +29,55 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
         "trend": {"dimensions": ["Customer Class"],
                   "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
+        # "Total customers / Accounts in CIS" counted EVERY account -- 562 on Demo 25.4
+        # -- where a reader hears "customers we bill" (496). Both are legitimate, so the
+        # card names which one it is showing. "Active SA Count" is a coalesced count, so
+        # <= 0 reaches the accounts with no service agreement at all; while it was NULL
+        # that comparison silently excluded 27 of the 66.
+        "lenses": [
+            {"id": "active", "label": "Active", "subtitle": "At least one active service agreement",
+             "filters": [{"field": "Active SA Count", "op": "gte", "value": 1}]},
+            {"id": "all", "label": "All", "subtitle": "Every account in CIS", "filters": []},
+            {"id": "inactive", "label": "Inactive", "subtitle": "No active service agreement",
+             "filters": [{"field": "Active SA Count", "op": "lte", "value": 0}]},
+        ],
     },
     {
         "id": "active_service_agreements",
-        "label": "Active service agreements",
+        "label": "Service agreements",
         "subtitle": "Status Active or Reactivated",
         "snapshot_id": "rpt_service_agreement",
         "format": "number",
         "workstream": "customer",
         "explore_report_id": None,
         "windowless": True,
-        # 20 Active / 50 Reactivated are base-product constants (never client config)
-        "value": {"dimensions": [],
-                  "measures": [{"field": "*", "agg": "count"}],
-                  "filters": [{"field": "SA Status Code", "op": "in", "value": ["20", "50"]}]},
+        # The lens supplies the status filter; `value`/`trend` carry none of their own,
+        # so "All" really is every SA rather than the active ones re-counted.
+        "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
         "trend": {"dimensions": ["SA Type"],
-                  "measures": [{"field": "*", "agg": "count"}],
-                  "filters": [{"field": "SA Status Code", "op": "in", "value": ["20", "50"]}],
-                  "limit": 6},
+                  "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
+        # SA_STATUS_FLG is a base-product lookup, not client config, so testing its codes
+        # is safe (the same licence the Active/Reactivated pair already relied on).
+        # Verified against Demo 25.4, which carries all seven: 20 Active 1485,
+        # 70 Canceled 45, 60 Closed 38, 10 Pending Start 33, 30 Pending Stop 15,
+        # 40 Stopped 14, 50 Reactivated 1. Active+Reactivated = 1,486 = the old headline.
+        "lenses": [
+            {"id": "active", "label": "Active", "subtitle": "Status Active or Reactivated",
+             "filters": [{"field": "SA Status Code", "op": "in", "value": ["20", "50"]}]},
+            {"id": "pending", "label": "Pending", "subtitle": "Pending start or pending stop",
+             "filters": [{"field": "SA Status Code", "op": "in", "value": ["10", "30"]}]},
+            {"id": "stopped", "label": "Stopped", "subtitle": "Stopped or closed",
+             "filters": [{"field": "SA Status Code", "op": "in", "value": ["40", "60"]}]},
+            {"id": "canceled", "label": "Canceled", "subtitle": "Cancelled service agreements",
+             "filters": [{"field": "SA Status Code", "op": "in", "value": ["70"]}]},
+            {"id": "all", "label": "All", "subtitle": "Every service agreement, any status",
+             "filters": []},
+        ],
     },
     {
         "id": "billed_revenue",
         "label": "Billed revenue",
-        "subtitle": "Frozen bill-segment FTs",
+        "subtitle": "Charges on frozen bill segments, by accounting date",
         "snapshot_id": "rpt_financial_txn",
         "format": "currency",
         "workstream": "billing",
@@ -67,8 +95,8 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     },
     {
         "id": "payments_collected",
-        "label": "Payments collected",
-        "subtitle": "Frozen pay segments",
+        "label": "Payments",
+        "subtitle": "Payments on frozen pay segments",
         "snapshot_id": "rpt_payment",
         "format": "currency",
         "workstream": "finance",
@@ -79,6 +107,21 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "trend": {"dimensions": ["Payment Status"],
                   "measures": [{"field": "Pay Segment Amount", "agg": "sum"}],
                   "filters": [], "limit": 6},
+        # This card SAID "Frozen pay segments" and filtered on nothing, so it summed
+        # cancelled payments into collections: $1,010,508.27 against a true frozen
+        # $1,003,883.05 on Demo 25.4 -- $6,570.22 of it cancelled. The Frozen lens is
+        # first, so the default now matches the claim the subtitle was already making.
+        # PAY_STATUS_FLG is a base-product lookup (30 Freezable, 50 Frozen, 60 Cancelled).
+        "lenses": [
+            {"id": "frozen", "label": "Frozen", "subtitle": "Collected on frozen pay segments",
+             "filters": [{"field": "Payment Status Code", "op": "eq", "value": "50"}]},
+            {"id": "canceled", "label": "Canceled", "subtitle": "Cancelled payments",
+             "filters": [{"field": "Payment Status Code", "op": "eq", "value": "60"}]},
+            {"id": "freezable", "label": "Freezable", "subtitle": "Not yet frozen",
+             "filters": [{"field": "Payment Status Code", "op": "eq", "value": "30"}]},
+            {"id": "all", "label": "All", "subtitle": "Every pay segment, any status",
+             "filters": []},
+        ],
     },
     {
         "id": "accounts_receivable",
@@ -94,11 +137,34 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "trend": {"dimensions": ["Oldest Debt Band"],
                   "measures": [{"field": "Total Balance", "agg": "sum"}],
                   "filters": [], "limit": 6},
+        # The card summed every row and reported the NET: -$6,333.30 on Demo 25.4, which
+        # is arithmetically right and reads as broken. "Accounts receivable" means what
+        # customers owe -- 130 SAs at +$23,854.69 -- and netting 66 credit balances of
+        # -$30,187.99 against it turns a receivable into a liability nobody asked for.
+        # Gross receivable is the default; credits are their own line, as in any ledger.
+        #
+        # rpt_sa_aged_balance anticipated exactly this. Its header says credit balances
+        # are deliberately kept as rows because "who do we owe" is a real finance
+        # question, and that the choice "belongs to the Ad Hoc user, which is why
+        # 'Is In Arrears' and 'Has Credit Balance' exist as flags instead". The card
+        # simply never made the choice; these lenses are it, using that same flag.
+        # The flag reads Current Balance while the measure sums Total Balance, so the
+        # subtitles name the flag rather than implying a clean sign split.
+        "lenses": [
+            {"id": "owing", "label": "Owing",
+             "subtitle": "Service agreements not in credit",
+             "filters": [{"field": "Has Credit Balance", "op": "eq", "value": False}]},
+            {"id": "credit", "label": "In credit",
+             "subtitle": "Credit balances — what the utility owes",
+             "filters": [{"field": "Has Credit Balance", "op": "eq", "value": True}]},
+            {"id": "net", "label": "Net", "subtitle": "Every balance, credits netted off",
+             "filters": []},
+        ],
     },
     {
         "id": "past_due_balance",
         "label": "Past-due balance",
-        "subtitle": "SAs past due",
+        "subtitle": "Service agreements past due",
         "snapshot_id": "rpt_sa_aged_balance",
         "format": "currency",
         "workstream": "finance",
@@ -114,33 +180,61 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     },
     {
         "id": "bills_completed",
-        "label": "Bills completed",
-        "subtitle": "Cycled billing throughput",
+        "label": "Bills",
+        "subtitle": "Bills completed in the period",
         "snapshot_id": "rpt_bill",
         "format": "number",
         "workstream": "billing",
         "explore_report_id": None,
-        "date_field": "Window Start Date",
-        "value": {"dimensions": [],
-                  "measures": [{"field": "*", "agg": "count"}],
-                  "filters": [{"field": "Is Completed", "op": "eq", "value": True}]},
+        # NOT "Window Start Date": that column is empty at two of the three client
+        # databases on this machine (0 of 1,978 on Demo 25.4, 0 of 87 on INT_DEV) and
+        # only 53% populated on Ellensburg, so the card read 0 whatever the window.
+        # "Created Date/Time" is 100% populated at all three, and it is the only date a
+        # PENDING bill has -- a bill that is not yet billed has no bill date, so windowing
+        # on Bill Date would make the Pending lens permanently empty.
+        "date_field": "Created Date/Time",
+        # The lens supplies the status; the base query carries none, so "All" is really
+        # every bill rather than the completed ones re-counted.
+        "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
         "trend": {"dimensions": ["Bill Cycle"],
-                  "measures": [{"field": "*", "agg": "count"}],
-                  "filters": [{"field": "Is Completed", "op": "eq", "value": True}],
-                  "limit": 6},
+                  "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
+        # Phrased against the canvas's derived BOOLEAN rather than BILL_STAT_FLG's
+        # 'C'/'P', so no code is written down at all -- the model already owns that
+        # mapping and is tested on it. Demo 25.4: 1,963 complete, 15 pending.
+        "lenses": [
+            {"id": "complete", "label": "Complete", "subtitle": "Completed bills",
+             "filters": [{"field": "Is Completed", "op": "eq", "value": True}]},
+            {"id": "pending", "label": "Pending", "subtitle": "Bills not yet completed",
+             "filters": [{"field": "Is Completed", "op": "eq", "value": False}]},
+            {"id": "all", "label": "All", "subtitle": "Every bill, any status", "filters": []},
+        ],
     },
     {
         "id": "field_activities",
         "label": "Field activities",
-        "subtitle": "MDM activity volume",
+        "subtitle": "Field activities created in the period",
         "snapshot_id": "rpt_field_activity",
         "format": "number",
         "workstream": "operations",
         "explore_report_id": None,
-        "date_field": "Event Date/Time",
+        # NOT "Event Date/Time": an activity only gets one once it has actually been
+        # executed in the field, so it is 17% populated on Demo 25.4 (57 of 330), 54% on
+        # Ellensburg and 56% on INT_DEV -- the card silently dropped the rest while
+        # calling itself "activity volume". "Created Date/Time" is 100% at all three and
+        # is the date every activity has, whatever became of it.
+        "date_field": "Created Date/Time",
         "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
         "trend": {"dimensions": ["Activity Type"],
                   "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
+        # DISCOVERED, not declared. An activity's status is a business-object lifecycle
+        # state a client can extend, unlike the base-product _FLG lookups above -- Demo
+        # 25.4 alone carries COMPLETED, DISCARDED, WAITEFFTDT, COMINPROG, VALERROR,
+        # COMERROR and WAITAPPT. Writing those down would be wrong at the next client,
+        # so the lenses are read from the tenant's own data, most common first.
+        # The canvas carries the code without a description (no ENG label table for BO
+        # states), so the code IS the label -- which is also what the analyst sees in CIS.
+        "lens_field": {"field": "Activity Status Code", "noun": "Activity status",
+                       "all_subtitle": "Every activity, any status", "limit": 8},
     },
     {
         "id": "customer_contacts",
@@ -152,8 +246,22 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "explore_report_id": None,
         "date_field": "Contact Date/Time",
         "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
-        "trend": {"dimensions": ["Contact Class"],
+        # Broken down by TYPE, lensed by CLASS -- pick a category, see what it is made of.
+        # Lensing on the trend's own axis would leave a one-bar chart; this way "Credit
+        # and collection contacts" resolves to NSF letter 12, auto-dialer call 8, debt
+        # reminder 8, which is the shape of the question someone actually asks.
+        "trend": {"dimensions": ["Contact Type"],
                   "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
+        # Contact class is CI_CC_CL -- client configuration, so DISCOVERED. Demo 25.4
+        # carries nine ("General contacts", "Credit and collection contacts",
+        # "Record of Digital Notifications" ...), and the next client's will be its own.
+        #
+        # Status was the obvious axis and is unusable: "Contact Status" is NULL on all
+        # 170 rows here and at Ellensburg and INT_DEV too. "Contact Source" is likewise
+        # empty and "Contact Method" reaches only 6 of 170, so class is the one
+        # well-populated axis a lens can stand on.
+        "lens_field": {"field": "Contact Class", "noun": "Contact class",
+                       "all_subtitle": "Every contact, all classes", "limit": 8},
     },
 ]
 
@@ -165,15 +273,40 @@ def _kpis_for_workstreams(allowed_workstreams: list[str] | None) -> list[dict[st
     return [kpi for kpi in EXECUTIVE_KPIS if kpi.get("workstream") in allowed]
 
 
+# What a query against a warehouse that has not been BUILT yet looks like, per engine:
+# ORA-00942 (table or view does not exist) / ORA-00903 (invalid table name) on Oracle,
+# SQLSTATE 42P01 "relation ... does not exist" on Postgres. Nothing else -- a timeout,
+# a bad column, a permission error -- is this case.
+_MISSING_RELATION = re.compile(r"ORA-00942|ORA-00903|relation .* does not exist|42P01", re.IGNORECASE)
+
+WAREHOUSE_NOT_BUILT_NOTE = (
+    "This organization's reporting warehouse has not been built yet, so its canvases "
+    "hold no data. Nothing is wrong with the request: the in-database build is the "
+    "step that fills them.")
+
+
+def is_missing_relation_error(message: str | None) -> bool:
+    return bool(message) and bool(_MISSING_RELATION.search(str(message)))
+
+
+def warehouse_not_built(kpis: list[dict[str, Any]]) -> bool:
+    """True when EVERY KPI failed for want of its table -- the signature of an org
+    pointed at the dbt catalog before its warehouse exists. Since every org reads the
+    catalog, available_kpis() resolves every KPI everywhere; this is the check against
+    the DATABASE that it cannot make. A partial failure is a real per-KPI problem and
+    is left alone."""
+    return bool(kpis) and all(is_missing_relation_error(k.get("error")) for k in kpis)
+
+
 def available_kpis(
     kpi_defs: list[dict[str, Any]], organization_id: str | None,
 ) -> tuple[list[dict[str, Any]], str | None]:
     """Filter the KPI set to snapshots that exist in this org's catalog.
 
-    The executive KPIs read the governed dbt canvases (rpt_*). A legacy-catalog org
-    (demo: the CISADM *_RPT_CURR snapshots) has none of them, so running the set there
-    produced a grid of 'Unknown snapshot' error cards. Skip the missing ones instead;
-    when nothing is left, return a single human note for the dashboard to show.
+    The executive KPIs read the governed dbt canvases (rpt_*). An org whose warehouse
+    is not built yet resolves none of them, and running the set there produced a grid of
+    'Unknown snapshot' error cards. Skip the missing ones instead; when nothing is left,
+    return a single human note for the dashboard to show.
     """
     from api.snapshot_catalog import CatalogError, get_snapshot
 
@@ -198,8 +331,8 @@ def available_kpis(
 
 def _refresh_insight(organization_id: str) -> dict[str, Any] | None:
     """Change since last refresh, from the landing watermarks -- every row carries
-    its CDC load_dttm, so the latest batch IS the change log. Best-effort: a legacy
-    org (no warehouse) or a warehouse without the landing schema returns None."""
+    its CDC load_dttm, so the latest batch IS the change log. Best-effort: an org with
+    no warehouse yet, or a warehouse without the landing schema, returns None."""
     try:
         from api.warehouse_db import execute_query as run_warehouse
 
@@ -230,6 +363,7 @@ def build_executive_summary(
     compare_mode: str = "prior_period",
     extra_filters: list[dict[str, Any]] | None = None,
     allowed_workstreams: list[str] | None = None,
+    lenses: dict[str, str] | None = None,
     organization_id: str | None = None,
 ) -> dict[str, Any]:
     (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode)
@@ -238,9 +372,9 @@ def build_executive_summary(
     kpi_defs, catalog_note = available_kpis(
         _kpis_for_workstreams(allowed_workstreams), organization_id)
 
-    # the KPI set runs on the dbt WAREHOUSE canvases; the Oracle demo DB is only
-    # needed for any legacy-snapshot KPI. Either backend being configured is enough --
-    # the runner routes per snapshot and reports per-KPI errors.
+    # The KPI set runs on the canvases from whichever engine serves this org. Either
+    # backend being configured is enough -- the runner routes per snapshot and reports
+    # per-KPI errors.
     if not organization_id or not (
             demo_configured(organization_id) or warehouse_configured(organization_id)):
         return {
@@ -275,6 +409,8 @@ def build_executive_summary(
                             "explore_report_id",
                         )
                     },
+                    "lenses": public_lenses(kpi),
+                    "lens": (select_lens(kpi, (lenses or {}).get(str(kpi.get("id")))) or {}).get("id"),
                     "value": None,
                     "prior_value": None,
                     "change_pct": None,
@@ -299,6 +435,7 @@ def build_executive_summary(
             compare=compare,
             compare_mode=compare_mode,
             extra_filters=extra_filters,
+            lens_id=(lenses or {}).get(str(kpi.get("id"))),
             organization_id=organization_id,
         )
 
@@ -307,6 +444,12 @@ def build_executive_summary(
             kpis = list(pool.map(_run, kpi_defs))
     else:
         kpis = []
+    # Nine cards each saying ORA-00942 is worse than empty. Collapse to the one note
+    # the front-end already renders for a catalog that lacks the canvases.
+    if warehouse_not_built(kpis):
+        catalog_note = WAREHOUSE_NOT_BUILT_NOTE
+        kpis = []
+        kpi_defs = []
     return {
         "client": client_id,
         "db_configured": True,
@@ -314,8 +457,8 @@ def build_executive_summary(
         "compare_mode": compare_mode,
         "compare_label": compare_label,
         "catalog_note": catalog_note,
-        # The freshness marker reads the warehouse landing; on a legacy-catalog org
-        # (no canvas KPIs ran) it would advertise ANOTHER org's data — suppress it.
+        # The freshness marker reads the warehouse landing; on an org where no canvas
+        # KPI ran it would advertise ANOTHER org's data — suppress it.
         "refresh": _refresh_insight(organization_id) if kpi_defs else None,
         "period": {
             "start": date_start,

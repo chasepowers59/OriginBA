@@ -14,6 +14,7 @@ import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { PresentationToolbar } from "./PresentationToolbar";
 import { WorkstreamHeroLinks } from "./WorkstreamHeroLinks";
 import type { WorkstreamGroup } from "@/lib/types";
+import { CrossFilterBanner } from "@/components/CrossFilterBanner";
 
 function WorkstreamDashboardInner({
   workstreamId,
@@ -64,7 +65,7 @@ function WorkstreamDashboardInner({
 
   const handleTrendClick = useCallback(
     (kpi: { trend_dimension?: string | null }, trendLabel: string) => {
-      if (kpi.trend_dimension) toggleFilter(kpi.trend_dimension, trendLabel, trendLabel);
+      if (kpi.trend_dimension) toggleFilter(kpi.trend_dimension, trendLabel);
     },
     [toggleFilter],
   );
@@ -159,17 +160,10 @@ function WorkstreamDashboardInner({
       <WorkstreamHeroLinks workstreamId={workstreamId} workstreams={workstreams} />
 
       {filter ? (
-        <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
-          <span>
-            Cross-filter: <strong>{filter.label ?? filter.field}</strong> = {filter.value}
-          </span>
-          <button type="button" onClick={clearFilter} className="btn-ghost text-xs">
-            Clear
-          </button>
-        </div>
-      ) : (
+        <CrossFilterBanner field={filter.field} value={filter.value} onClear={clearFilter} />
+      ) : summary?.kpis.length ? (
         <p className="text-xs text-fg-muted">Click spark chart bars to cross-filter all tiles.</p>
-      )}
+      ) : null}
 
       <div id="dashboard-export-root">
         {loading ? (
@@ -191,6 +185,15 @@ function WorkstreamDashboardInner({
                 onTrendClick={handleTrendClick}
               />
             ))}
+          </div>
+        ) : summary?.note ? (
+          // Every KPI failed for want of its table: the warehouse is not built yet.
+          // One sentence, the same panel the home page uses — never a grid of errors.
+          <div className="glass-panel px-6 py-8 text-center">
+            <p className="text-sm font-medium text-heading">
+              This workstream&apos;s numbers aren&apos;t available yet
+            </p>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-fg-muted">{summary.note}</p>
           </div>
         ) : null}
       </div>

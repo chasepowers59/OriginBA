@@ -1,6 +1,8 @@
 export type DataSourceStatus = {
   configured: boolean;
-  source: "portal_vault" | "portal_memory" | "environment" | "none";
+  /** "warehouse" = a dbt org reading WAREHOUSE_DATABASE_URL; no Oracle connection
+   *  to manage, so the page offers none. */
+  source: "portal_vault" | "portal_memory" | "environment" | "warehouse" | "none";
   organization_id?: string;
   user_masked: string | null;
   dsn_masked: string | null;
@@ -28,7 +30,6 @@ export type SnapshotSummary = {
   grain_description?: string;
   summary?: string;
   trusted_measures: string[];
-  required_date_field: string | null;
   portal_enabled?: boolean;
   poc_enabled: boolean;
   large_domain?: boolean;
@@ -117,7 +118,7 @@ export type SnapshotDataModel = {
   grain_preservation: string;
   trusted_measures: string[];
   driving_table: string | null;
-  /** Legacy Oracle catalog: objects; dbt catalog: plain CISADM table names. */
+  /** Plain CISADM table names; the object form is accepted for older saved payloads. */
   source_tables: (SourceTableDef | string)[];
   join_paths: JoinPathDef[];
   population_filter: string | null;
@@ -145,6 +146,14 @@ export type ScopeOptionsResponse = {
   field: string;
   label: string;
   values: string[];
+  /**
+   * False when the canvas is too large to list values from — a DISTINCT over a fact
+   * table is ~600ms at 3.5M rows and ~6s at 35M, on the path to adding one filter.
+   * The caller shows the free-text input instead. Absent on an older API: treat as
+   * enumerable, which is what it was.
+   */
+  enumerable?: boolean;
+  reason?: string;
 };
 
 export type SnapshotMetadata = {
@@ -159,12 +168,10 @@ export type SnapshotMetadata = {
   grain_description?: string;
   summary?: string;
   use_case?: string;
-  required_date_label?: string;
   dimensions: { id: string; label: string }[];
   measures: MeasureDef[];
   date_fields: { id: string; label: string }[];
   default_date_field: string;
-  required_date_field: string;
   premade_reports: PremadeReport[];
   scope_filters?: ScopeFilterDef[];
   usage_guidance?: string;
@@ -231,6 +238,21 @@ export type QueryResponse = {
   rows: Record<string, unknown>[];
   row_count: number;
   sql: string;
+  /** Set ONLY when the server chose the window itself, because the request carried no
+   *  filters. An unfiltered aggregate scans the whole canvas — the row cap cannot stop
+   *  it, since FETCH FIRST applies after GROUP BY — so a trailing window is applied.
+   *  Saying so is what keeps it from being a number narrower than the one asked for
+   *  with nothing on screen to explain it. Null whenever the caller filtered. */
+  applied_window?: {
+    /** The machine name the filter is applied on. */
+    field: string;
+    /** The human name for copy. Render this one; never render `field`. */
+    label: string;
+    days: number;
+    start: string;
+    end: string;
+    note: string;
+  } | null;
 };
 
 export type DatabaseTableInfo = {
@@ -241,7 +263,8 @@ export type DatabaseTableInfo = {
 
 export type DatabaseTablesResponse = {
   organization_id: string;
-  /** "postgres" = the dbt reporting warehouse; "oracle" = legacy CISADM snapshots. */
+  /** Which engine serves this org's reporting layer: a CDC-fed Postgres warehouse, or
+   *  the client's own Oracle instance with the canvases built in ORIGINBA_REPORTING. */
   engine?: "postgres" | "oracle";
   schema: string;
   tables: DatabaseTableInfo[];
@@ -317,8 +340,17 @@ export type ExecutiveKpi = {
   compare_label?: string | null;
   trend: ExecutiveTrendPoint[];
   trend_dimension?: string | null;
+  /** Alternative readings of the same card — "Active | All | Inactive". The client
+   *  names one by id; the predicate behind it never leaves the server. */
+  lenses?: ExecutiveKpiLens[];
+  lens?: string | null;
+  /** Set when a WINDOWED metric came back empty: the newest date the canvas holds,
+   *  so the card can say "no data in this window" instead of a bare 0. */
+  empty_window?: { latest: string } | null;
   error?: string | null;
 };
+
+export type ExecutiveKpiLens = { id: string; label: string; subtitle: string };
 
 export type PeriodInfo = {
   start: string;
@@ -362,6 +394,9 @@ export type WorkstreamSummary = {
   workstream_label: string;
   period: PeriodInfo;
   prior_period?: PeriodInfo;
+  /** Set when every KPI failed for want of its table — the org's warehouse is not
+   *  built yet. `kpis` is empty then; render this sentence instead of a grid. */
+  note?: string | null;
   kpis: ExecutiveKpi[];
 };
 
@@ -405,6 +440,12 @@ export type SavedView = {
   measure_agg?: string | null;
   /** Multi-measure builder views; singular fields above hold the first measure. */
   measures?: BuilderMeasure[] | null;
+  /**
+   * The scoping the view was saved with. `scope_field`/`scope_value` below hold only
+   * ONE pair and predate the builder's filters shelf; without this array a scoped view
+   * reopened over the whole canvas.
+   */
+  filters?: { field: string; op: string; value: unknown }[] | null;
   chart_type?: string | null;
   date_preset?: string | null;
   date_start?: string | null;
@@ -483,6 +524,11 @@ export type ReportLibraryEntry = {
   title: string;
   description: string;
   chart_type: string;
+  /** The report's SHAPE, so a card can say what it returns before you open it. */
+  dimensions?: string[];
+  measures?: { field?: string; agg?: string }[];
+  filters?: { field?: string }[];
+  grain_description?: string;
   explore_url: string;
 };
 

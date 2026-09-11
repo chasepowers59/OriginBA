@@ -9,7 +9,6 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parent.parent
-CATALOG_PATH = ROOT / "output" / "snapshot_explorer_catalog.json"
 
 _catalog_cache: dict[str, Any] | None = None
 _catalog_mtime: float | None = None
@@ -19,34 +18,22 @@ class CatalogError(RuntimeError):
     pass
 
 
-# ONE CATALOG PER ENGINE, chosen by the organization.
-#
-# A Postgres tenant is served the dbt reporting layer -- 38 governed canvases with
-# enforced contracts. An Oracle tenant is served the legacy CISADM snapshots, because the
-# dbt canvases do not exist in that database and pointing a tenant at a catalog its
-# warehouse cannot satisfy produces a portal full of tiles that error on click.
-#
-# This is what lets a client be migrated ONE AT A TIME: deploy their dbt warehouse, flip
-# engine to postgres in config/portal_organizations.json, and they move. Nothing else
-# changes and no other tenant is affected.
+# ONE catalog. A second one was retired outright on 2026-09-02 rather than left
+# routable -- six of seven client orgs were on it while development happened on this
+# one, and that split produced six shape-specific bugs in a single session
+# (tests/test_single_catalog_shape.py carries the list). A dormant branch is exactly
+# where the next such bug goes to hide.
 CATALOGS = {
     "dbt": ROOT / "output" / "catalog_dbt.json",
-    "cisadm": ROOT / "output" / "catalog_cisadm.json",
 }
 _caches: dict[str, tuple[float, dict[str, Any]]] = {}
 
 
 def catalog_name_for_org(organization_id: str | None) -> str:
-    """Which catalog an organization reads. Defaults to the dbt layer."""
-    if not organization_id:
-        return "dbt"
-    try:
-        from api.organizations import get_organization
-        org = get_organization(organization_id) or {}
-    except Exception:  # noqa: BLE001
-        return "dbt"
-    name = str(org.get("catalog") or "").lower()
-    return name if name in CATALOGS else "dbt"
+    """Which catalog an organization reads. There is one; the argument is kept so the
+    call sites that thread an org through keep doing so -- that threading is what
+    fixed the authorization lookup that resolved against the wrong catalog."""
+    return "dbt"
 
 
 def load_catalog(*, force: bool = False, organization_id: str | None = None) -> dict[str, Any]:
@@ -92,7 +79,6 @@ def list_snapshots(*, portal_only: bool = True, organization_id: str | None = No
                 "grain_description": meta.get("grain_description"),
                 "summary": meta.get("summary"),
                 "trusted_measures": meta.get("trusted_measures", []),
-                "required_date_field": meta.get("required_date_field"),
                 "portal_enabled": meta.get("portal_enabled", True),
                 "poc_enabled": meta.get("poc_enabled", False),
                 "large_domain": meta.get("large_domain", False),
@@ -140,14 +126,30 @@ def list_workstreams(organization_id: str | None = None) -> list[dict[str, Any]]
     ]
 
 
+def resolve_snapshot_key(snapshots: Any, snapshot_id: str) -> str:
+    """The key `snapshot_id` actually names, whatever case it arrived in.
+
+    Try it AS WRITTEN first. Upper was right while every snapshot was an Oracle table; a
+    dbt canvas is lowercase rpt_*, and forcing case made every lookup miss with "Unknown
+    snapshot" on a catalog that plainly contained it. Lower is here for the dashboards
+    saved while _validate_tiles upper-cased the id -- user state has no migration, so the
+    reader forgives what the writer broke.
+
+    One function because there were two of these with DIFFERENT tolerance (the library
+    tried two cases, this tried three), which is how the next silent miss gets in.
+    Returns the id unchanged when nothing matches, so callers keep their own error.
+    """
+    for key in (snapshot_id, snapshot_id.upper(), snapshot_id.lower()):
+        if key in snapshots:
+            return key
+    return snapshot_id
+
+
 def get_snapshot(snapshot_id: str, organization_id: str | None = None) -> dict[str, Any]:
     catalog = load_catalog(organization_id=organization_id)
-    # Try the id AS WRITTEN before upper-casing it. Upper was right while every snapshot
-    # was an Oracle table; a dbt canvas is lowercase rpt_*, and forcing case made every
-    # lookup miss with "Unknown snapshot" on a catalog that plainly contained it.
-    for key in (snapshot_id, snapshot_id.upper()):
-        if key in catalog["snapshots"]:
-            return catalog["snapshots"][key]
+    key = resolve_snapshot_key(catalog["snapshots"], snapshot_id)
+    if key in catalog["snapshots"]:
+        return catalog["snapshots"][key]
     raise CatalogError(f"Unknown snapshot: {snapshot_id}")
 
 
@@ -187,22 +189,17 @@ def allowed_fields(snapshot: dict[str, Any]) -> set[str]:
             if not is_protected_column(field.get("id", ""))}
 
 
-def is_warehouse(snapshot: dict[str, Any]) -> bool:
-    """True when this snapshot lives in the dbt warehouse rather than Oracle CISADM."""
-    return str(snapshot.get("schema", "")).lower() != "cisadm"
-
-
 def org_backend(organization_id: str | None) -> tuple[str, str]:
     """(engine, catalog) for an org.
 
-    THREE shapes exist since 2026-08-28, so the schema-implies-engine shortcut
-    (is_warehouse == Postgres) is no longer safe on its own:
+    Two deployment shapes, one catalog:
 
-        postgres + dbt     the client's Postgres dbt warehouse (deployment shape A)
-        oracle   + cisadm  the legacy *_RPT_CURR snapshots (pre-migration)
-        oracle   + dbt     the dbt canvases built INSIDE the client's own Oracle
-                           instance (ORIGINBA_REPORTING beside CISADM -- the
-                           in-database deployment shape, no CDC)
+        postgres + dbt     the client's Postgres dbt warehouse (CDC-fed)
+        oracle   + dbt     the same dbt canvases built INSIDE the client's own Oracle
+                           instance (ORIGINBA_REPORTING beside CISADM, no CDC)
+
+    The engine is the org's declaration; the schema a snapshot names never implies
+    it, because an in-database Oracle org's canvases live in a reporting schema too.
     """
     catalog = catalog_name_for_org(organization_id)
     engine = "postgres" if catalog == "dbt" else "oracle"
@@ -223,15 +220,13 @@ def snapshot_backend(snapshot: dict[str, Any],
     """(backend, dialect, schema) for running THIS snapshot for THIS org.
 
     backend  which driver executes: 'postgres' (warehouse pool) or 'oracle'
-    dialect  what build_query emits: 'postgres' | 'oracle_dbt' | 'oracle'
+    dialect  what build_query emits: 'postgres' | 'oracle_dbt'
     schema   the qualification the SQL uses
 
     The oracle_dbt dialect exists because the in-database canvases keep their
     quoted Title-Case columns ("Account ID" is identical SQL in both engines)
     while binds, date functions and table casing follow Oracle rules.
     """
-    if not is_warehouse(snapshot):
-        return "oracle", "oracle", str(snapshot.get("schema", "CISADM"))
     engine, _catalog = org_backend(organization_id)
     if engine == "oracle":
         return "oracle", "oracle_dbt", "ORIGINBA_REPORTING"

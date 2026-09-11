@@ -1,3 +1,4 @@
+-- 2026-09-08: ACCT_DEBT, COLL_PROC and PAY_TNDR_CASH removed from the list (archived; not part of the active-8).
 -- Purpose:
 --   Review configured scheduler cadence and current scheduler state for each snapshot
 --   refresh job.
@@ -12,12 +13,9 @@ WITH job_map AS (
     SELECT 'billing', 'BSEG_SQ_USAGE_RPT_CURR', 'REFRESH_BSEG_SQ_USAGE_RPT_CURR_JOB' FROM dual UNION ALL
     SELECT 'finance', 'FT_RPT_CURR', 'JOB_REFRESH_FT_RPT_CURR' FROM dual UNION ALL
     SELECT 'finance', 'FT_GL_DISTRIBUTION_RPT_CURR', 'JOB_REFRESH_FT_GL_DISTRIBUTION_RPT_CURR' FROM dual UNION ALL
-    SELECT 'debt_mgmt', 'ACCT_DEBT_RPT_CURR', 'JOB_REFRESH_ACCT_DEBT_RPT_CURR' FROM dual UNION ALL
-    SELECT 'debt_mgmt', 'COLL_PROC_RPT_CURR', 'JOB_REFRESH_COLL_PROC_RPT_CURR' FROM dual UNION ALL
     SELECT 'meter_ops', 'D1_USAGE_RPT_CURR', 'JOB_REFRESH_D1_USAGE_RPT_CURR' FROM dual UNION ALL
     SELECT 'meter_ops', 'D1_USAGE_SCALAR_DTL_RPT_CURR', 'JOB_REFRESH_D1_USAGE_SCALAR_DTL_RPT_CURR' FROM dual UNION ALL
-    SELECT 'meter_ops', 'D1_MSRMT_RPT_CURR', 'JOB_REFRESH_D1_MSRMT_RPT_CURR' FROM dual UNION ALL
-    SELECT 'payments_cashiering', 'PAY_TNDR_CASH_RPT_CURR', 'REFRESH_PAY_TNDR_CASH_RPT_CURR_JB' FROM dual
+    SELECT 'meter_ops', 'D1_MSRMT_RPT_CURR', 'JOB_REFRESH_D1_MSRMT_RPT_CURR' FROM dual
 )
 SELECT
     m.workstream,

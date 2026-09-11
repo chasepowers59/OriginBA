@@ -17,6 +17,7 @@ from typing import Any, Callable
 
 from api.notifications import build_message, clean_recipients, send_message
 from api.org_store import OrgRecordStore
+from api.reporting_dates import window_date_field
 from api.saved_views import list_saved_views
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -60,7 +61,8 @@ def create_schedule(payload: dict[str, Any], *, organization_id: str,
     weekday = int(payload.get("weekday") or 0)
     if cadence == "weekly" and not 0 <= weekday <= 6:
         raise ScheduleError("Weekday must be 0 (Monday) through 6 (Sunday)")
-    hour_utc = int(payload.get("hour_utc") or 13)
+    # `or 13` would turn a deliberate 0 (midnight UTC) into 13:00; only ABSENCE defaults.
+    hour_utc = 13 if payload.get("hour_utc") is None else int(payload["hour_utc"])
     if not 0 <= hour_utc <= 23:
         raise ScheduleError("hour_utc must be 0-23")
     window_days = int(payload.get("window_days") or 30)
@@ -96,7 +98,8 @@ def is_due(schedule: dict[str, Any], now: datetime) -> bool:
     """Due once per period, at or after the configured UTC hour."""
     if not schedule.get("enabled", True):
         return False
-    if now.hour < int(schedule.get("hour_utc") or 13):
+    hour = schedule.get("hour_utc")
+    if now.hour < (13 if hour is None else int(hour)):
         return False
     cadence = schedule.get("cadence", "daily")
     if cadence == "weekly" and now.weekday() != int(schedule.get("weekday") or 0):
@@ -115,6 +118,7 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
     now — a schedule that mailed a frozen date range weekly would go stale.
     """
     from api.query_builder import build_query
+    from api.reporting_dates import reporting_window
     from api.snapshot_catalog import allowed_fields, get_snapshot, snapshot_backend
     from api.snapshot_explorer import _result_labels, _serialize_value
 
@@ -123,12 +127,19 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
     backend, dialect, schema = snapshot_backend(snapshot, org_id)
 
     filters: list[dict[str, Any]] = []
-    date_field = snapshot.get("required_date_field")
+    date_field = schedule_date_field(snapshot)
+    window_days = int(schedule.get("window_days") or 30)
+    # reporting_today(), not a UTC date: this window filters BUSINESS dates, and every
+    # other window builder (kpi_runner, nlq_metrics, snapshot_explorer) ends on the
+    # local calendar date. On a non-UTC server the two disagreed for the offset's worth
+    # of hours each day -- six here -- so a scheduled report's "last 30 days" ended a
+    # day later than the same window on screen and the emailed figure did not tie.
+    start_iso, end_iso = reporting_window(window_days)
     if date_field:
-        end = datetime.now(timezone.utc).date()
-        start = end - timedelta(days=int(schedule.get("window_days") or 30))
         filters.append({"field": date_field, "op": "between",
-                        "value": [start.isoformat(), end.isoformat()]})
+                        "value": [start_iso, end_iso]})
+    # The email quotes THIS, written where the filter is decided, so the two cannot drift.
+    schedule["window_note"] = window_sentence(date_field, window_days, end_iso)
     if view.get("scope_field") and view.get("scope_value") is not None:
         filters.append({"field": view["scope_field"], "op": "eq",
                         "value": view["scope_value"]})
@@ -140,8 +151,7 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
     sql, binds = build_query(
         table_name=snapshot["table_name"],
         allowed_fields=allowed_fields(snapshot),
-        trusted_measures=trusted if dialect != "oracle" else {m.upper() for m in trusted},
-        required_date_field=date_field,
+        trusted_measures=trusted,
         dimensions=view.get("dimensions") or [],
         measures=measures,
         filters=filters,
@@ -178,13 +188,31 @@ def rows_to_csv(columns: list[str], labels: dict[str, str],
     return buf.getvalue()
 
 
+# The rule this module discovered has four callers now -- schedules, the KPI runner, NLQ
+# metrics, and the explorer's default window -- so it lives in reporting_dates beside the
+# window arithmetic. Kept under the name this module's callers already import.
+schedule_date_field = window_date_field
+
+
+def window_sentence(date_field: str | None, window_days: int, as_of: str) -> str:
+    """Describe the window that was ACTUALLY applied.
+
+    Names the field as well as the span: "trailing 30 days" is ambiguous on a canvas
+    carrying eight date columns, and a reader who cannot tell which one was windowed
+    cannot check the number.
+    """
+    if not date_field:
+        return "Data window: all rows — this canvas carries no date to window on."
+    return f"Data window: trailing {window_days} days on {date_field}, as of {as_of}."
+
+
 def _message(schedule: dict[str, Any], csv_text: str, now: datetime):
     title = schedule.get("view_title") or schedule.get("snapshot_id") or "Report"
     msg = build_message(
         f"{title} — {now.date().isoformat()}",
         schedule.get("recipients", []),
         f"Scheduled report: {title}\n"
-        f"Data window: trailing {schedule.get('window_days', 30)} days as of {now.date()}.\n\n"
+        f"{schedule.get('window_note') or ''}\n\n"
         "The data is attached as CSV. Open the portal for the interactive view.\n")
     safe = re.sub(r"[^A-Za-z0-9_-]+", "_", str(title))[:60] or "report"
     msg.add_attachment(csv_text.encode("utf-8"), maintype="text", subtype="csv",
@@ -227,8 +255,12 @@ def run_due_schedules(*, now: datetime | None = None,
                 schedule["last_status"] = f"sent {count} rows"
                 _store.update(schedule)
         except Exception as exc:  # noqa: BLE001 — the runner must survive any one failure
-            result["status"] = f"error: {exc}"
-            schedule["last_status"] = f"error: {exc}"
+            from api.executive_dashboard import WAREHOUSE_NOT_BUILT_NOTE, is_missing_relation_error
+            # ScheduleDialog renders last_status; an unbuilt warehouse gets the sentence
+            # the dashboards use rather than the driver's ORA-00942.
+            reason = WAREHOUSE_NOT_BUILT_NOTE if is_missing_relation_error(str(exc)) else f"error: {exc}"
+            result["status"] = reason
+            schedule["last_status"] = reason
             _store.update(schedule)
         results.append(result)
     return results

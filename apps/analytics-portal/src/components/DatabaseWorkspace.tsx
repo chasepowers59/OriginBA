@@ -7,6 +7,7 @@ import {
   fetchDatabaseTables,
 } from "@/lib/api";
 import { suggestChart } from "@/lib/databaseChartUtils";
+import { workspaceScope } from "@/lib/workspaceScope";
 import {
   categoriesForEngine,
   templatesForEngine,
@@ -84,8 +85,8 @@ export function DatabaseWorkspace({
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("starters");
   const [templateCategory, setTemplateCategory] = useState("All");
   const [resultView, setResultView] = useState<ResultView>("table");
-  // The warehouse is where the fleet is going; the first /database/tables response
-  // corrects this for a legacy Oracle tenant.
+  // Postgres is the default guess; the first /database/tables response corrects this
+  // for an Oracle tenant.
   const [engine, setEngine] = useState<WorkspaceEngine>("postgres");
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
@@ -121,7 +122,6 @@ export function DatabaseWorkspace({
     setTablesLoading(true);
     try {
       const response = await fetchDatabaseTables("", search, {
-        snapshotsOnly: !search.trim(),
         includeStats: Boolean(search.trim()),
       });
       if (response.engine) setEngine(response.engine);
@@ -267,9 +267,7 @@ export function DatabaseWorkspace({
     const snippet =
       engine === "postgres"
         ? `SELECT ${cols}\nFROM cisadm.${tableName}\nLIMIT ${pageSize}`
-        : engine === "oracle_dbt"
-          ? `SELECT ${cols}\nFROM ${tableName}\nFETCH FIRST ${pageSize} ROWS ONLY`
-          : `SELECT ${cols}\nFROM CISADM.${tableName}\nWHERE ROWNUM <= ${pageSize}`;
+        : `SELECT ${cols}\nFROM ${tableName}\nFETCH FIRST ${pageSize} ROWS ONLY`;
     setSql(snippet);
     setActiveTemplate(null);
     editorRef.current?.focus();
@@ -319,6 +317,10 @@ export function DatabaseWorkspace({
   }
 
   return (
+    <>
+      {/* Says what this org's workspace can actually reach; the engine is learned on
+          mount, so until then it promises no schema at all. */}
+      <p className="portal-text-muted -mt-2 mb-3 max-w-3xl text-sm">{workspaceScope(engine)}</p>
     <div className="flex h-[calc(100vh-8.5rem)] min-h-[560px] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-solid)] shadow-lg">
       <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border)] bg-[var(--surface-subtle)] px-3 py-2">
         <button
@@ -410,9 +412,14 @@ export function DatabaseWorkspace({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1">
+      {/* Stacked until lg. Side by side, the 288px sidebar left ~55px for the editor on
+          a 375px viewport: the placeholder wrapped to one character per line and
+          "Results" clipped to "Resu", so the page's whole purpose was unreachable on a
+          phone. The sidebar is capped in height when stacked so the editor stays above
+          the fold. */}
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {sidebarOpen ? (
-          <aside className="flex w-72 shrink-0 flex-col border-r border-[var(--border)] bg-[var(--surface-subtle)]">
+          <aside className="flex max-h-64 w-full shrink-0 flex-col border-b border-[var(--border)] bg-[var(--surface-subtle)] lg:max-h-none lg:w-72 lg:border-b-0 lg:border-r">
             <div className="flex border-b border-[var(--border)]">
               {(
                 [
@@ -565,7 +572,8 @@ export function DatabaseWorkspace({
               }}
               onKeyDown={handleKeyDown}
               spellCheck={false}
-              placeholder="Pick a starter query from the left panel, or write your own SELECT…"
+              // Not "the left panel": the panel stacks ABOVE the editor below lg.
+              placeholder="Pick a starter query from the Starters panel, or write your own SELECT…"
               rows={8}
               className="w-full resize-y border-0 bg-[var(--surface-input)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none"
               style={{ minHeight: "120px", maxHeight: "34vh" }}
@@ -679,6 +687,7 @@ export function DatabaseWorkspace({
         </span>
       </div>
     </div>
+    </>
   );
 }
 

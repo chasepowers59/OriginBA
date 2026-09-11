@@ -7,8 +7,8 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 | Path | Why |
 |------|-----|
 | `AGENTS.md` | Master contract |
-| `docs/cowork/system_directions.md` | Co-work instructions (this bundle) |
-| `docs/c2m_jaspersoft_delivery_playbook.md` | End-to-end delivery rules |
+| `AGENTS.md (AGENTS.md was a paste-in restatement of it; archived 2026-09-08)` | Co-work instructions (this bundle) |
+| `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md` | End-to-end delivery rules |
 | `docs/assistant_skills/README.md` | Assistant workflow index |
 | `docs/assistant_skills/report_preflight_checklist.md` | Done criteria |
 | `docs/assistant_skills/past_mistakes_and_prevention.md` | Known failure patterns |
@@ -20,7 +20,7 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 
 ### JRXML / reports
 
-- `skills/jrxml_report_builder/SKILL.md`
+- `.claude/skills/originba-jrxml-report-builder/SKILL.md`
 - `docs/assistant_skills/jrxml_schema_guardrails.md`
 - `docs/assistant_skills/jrxml_expression_patterns.md`
 - `docs/assistant_skills/domain_report_workflow.md`
@@ -29,7 +29,7 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 
 ### SQL / snapshots / debt
 
-- `skills/sql_report_builder/SKILL.md`
+- `.claude/skills/originba-cisadm-sql-builder/SKILL.md`
 - `skills/sql_validation_guard/SKILL.md`
 - `skills/cisadm_domain_modeling/SKILL.md`
 - `docs/assistant_skills/cisadm_sql_prompt_guide.md`
@@ -47,9 +47,9 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 
 ### Client promotion / import
 
-- `docs/jaspersoft_client_promotion_pipeline.md`
-- `docs/jaspersoft_environment_promotion_troubleshooting.md`
-- `docs/jaspersoft_repository_import_debugging_runbook.md`
+- `jaspersoft/docs/jaspersoft_client_promotion_pipeline.md`
+- `jaspersoft/docs/jaspersoft_environment_promotion_troubleshooting.md`
+- `jaspersoft/docs/jaspersoft_repository_import_debugging_runbook.md`
 - `deploy/jaspersoft_client_promotion/README.md`
 - `deploy/jaspersoft_client_promotion/client_org_mapping.csv`
 - `deploy/jaspersoft_datasources/clients/README.md`
@@ -58,7 +58,7 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 
 - `sql/performance/snapshots/deployment_steps/clients/newark/README.md` (or target client)
 - `sql/performance/snapshots/docs/snapshot_client_reporting_guide.md`
-- `docs/smartcity_client_snapshot_rollout_status_2026-04-30.md`
+- `sql/performance/snapshots/docs/smartcity_client_snapshot_rollout_status_2026-04-30.md`
 
 ## Tier C — do not pin
 
@@ -71,4 +71,4 @@ Attach these repo paths to Claude Co-work project memory. Prefer pinning files o
 
 Pin the whole folder:
 
-- `docs/cowork/skills/`
+- `.claude/skills/` (the six `originba-*` skills; `docs/cowork/skills/` archived 2026-09-08)

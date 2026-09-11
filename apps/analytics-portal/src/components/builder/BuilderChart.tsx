@@ -1,5 +1,6 @@
 "use client";
 
+import { categoryLabel } from "@/lib/chartLabels";
 import { useMemo } from "react";
 import {
   Area,
@@ -25,6 +26,8 @@ import {
 } from "@/components/ui/chart";
 import { formatCurrency, formatNumber, formatTooltipNumber } from "@/lib/format";
 import { valueRampColors } from "@/lib/chartEmphasis";
+import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
+import { formatTimeBucket } from "@/lib/timeBucketLabel";
 import { useColorMode } from "@/components/PortalThemeProvider";
 
 export type BuilderVisual =
@@ -50,6 +53,8 @@ type BuilderChartProps = {
   onCategorySelect?: (category: string) => void;
   emptyMessage?: string;
   sortTimeSeries?: boolean;
+  /** Grain of the time bucket on the x axis, so its ticks can name the period. */
+  xGrain?: string | null;
 };
 
 // Series colors come from the theme's --chart-1..5 (light + dark aware, defined in
@@ -68,11 +73,12 @@ export function BuilderChart({
   xLabel,
   series,
   visual,
-  height = 340,
+  height = 460,
   selectedCategory = null,
   onCategorySelect,
   emptyMessage = "Drop a dimension and a measure to see a chart",
   sortTimeSeries = false,
+  xGrain = null,
 }: BuilderChartProps) {
   const { colorMode } = useColorMode();
 
@@ -86,15 +92,17 @@ export function BuilderChart({
 
   const data = useMemo(() => {
     const mapped = rows.map((r) => {
-      const row: Record<string, unknown> = { [xKey]: String(r[xKey] ?? "—") };
+      const row: Record<string, unknown> = { [xKey]: categoryLabel(r[xKey]) };
       for (const s of series) row[s.key] = Number(r[s.key] ?? 0);
       return row;
     });
-    if (sortTimeSeries) {
-      return [...mapped].sort((a, b) => String(a[xKey]).localeCompare(String(b[xKey])));
-    }
-    return mapped;
-  }, [rows, xKey, series, sortTimeSeries]);
+    return orderChartRows(
+      mapped,
+      xKey,
+      series.map((s) => s.key),
+      sortTimeSeries || isOrderedAxis(xLabel),
+    );
+  }, [rows, xKey, xLabel, series, sortTimeSeries]);
 
   const anyCurrency = series.some((s) => s.currency);
   // Axis ticks COMPACT ($12.3M) so they fit the axis width; tooltips show the full
@@ -140,6 +148,12 @@ export function BuilderChart({
     );
   }
 
+  // A time bucket is a timestamp; naming its period beats truncating its first instant.
+  const xTickLabel = (v: string) => {
+    const label = sortTimeSeries ? formatTimeBucket(String(v), xGrain) : String(v);
+    return label.length > 16 ? `${label.slice(0, 15)}…` : label;
+  };
+
   const grid = <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />;
   const tip = <ChartTooltip content={<ChartTooltipContent valueFormatter={tipFormatter} />} />;
   const legend = series.length > 1 ? <ChartLegend content={<ChartLegendContent />} /> : null;
@@ -149,7 +163,7 @@ export function BuilderChart({
       tickLine={false}
       axisLine={false}
       tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }}
-      tickFormatter={(v: string) => (v.length > 16 ? v.slice(0, 15) + "…" : v)}
+      tickFormatter={xTickLabel}
       interval="preserveStartEnd"
       minTickGap={12}
     />

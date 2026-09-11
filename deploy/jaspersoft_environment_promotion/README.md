@@ -9,7 +9,7 @@ Use this folder for **non-client** promotions where repository org paths stay on
 Build packages with **light-touch tenant-root** settings and import **inside the
 target tenant** (Repository → Import). Do not import these ZIPs from server root.
 
-See [jaspersoft_environment_promotion_pipeline.md](/Users/chase/OriginBA-3/docs/jaspersoft_environment_promotion_pipeline.md)
+See [jaspersoft_environment_promotion_pipeline.md](/Users/chase/OriginBA-3/jaspersoft/docs/jaspersoft_environment_promotion_pipeline.md)
 — **Standard promotion contract**.
 
 Tracked contents:
@@ -87,4 +87,4 @@ The `origin_demo` pipeline always:
 - merges `Workstreams/Development` snapshot Domains into `Standard_Offering/Development`
 - regenerates tenant-root `.folder.xml` files and builds a tenant-safe `index.xml`
 
-See [jaspersoft_environment_promotion_pipeline.md](/Users/chase/OriginBA-3/docs/jaspersoft_environment_promotion_pipeline.md).
+See [jaspersoft_environment_promotion_pipeline.md](/Users/chase/OriginBA-3/jaspersoft/docs/jaspersoft_environment_promotion_pipeline.md).

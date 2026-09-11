@@ -20,6 +20,8 @@ from typing import Any
 
 from cryptography.fernet import Fernet, InvalidToken
 
+from api.warehouse_db import warehouse_configured
+
 
 ROOT = Path(__file__).resolve().parent.parent
 VAULT_PATH = ROOT / "output" / ".portal_data_source.vault"
@@ -260,6 +262,28 @@ def public_status(*, organization_id: str, env_configured: bool) -> dict[str, An
             "has_oracle_client_lib_dir": masked.get("has_oracle_client_lib_dir", False),
             "saved_at": None,
             "env_fallback_available": True,
+        }
+    # A dbt organization keeps its warehouse in WAREHOUSE_DATABASE_URL, and nothing
+    # above looks there -- so Settings reported "Not configured" for a database that was
+    # serving the app (measured on `dev`: configured=False here while /snapshots said
+    # db_configured=True and a query returned rows). The snapshots index already counts
+    # either backend; this is the same check in the second place that needed it.
+    #
+    # Its own SOURCE rather than folded into "environment": that value means an Oracle
+    # credential, and claiming it here would put a masked Oracle DSN on a Postgres
+    # tenant's settings page. These orgs have no Oracle connection to manage, and the
+    # page should be able to say so rather than invent one.
+    if warehouse_configured(organization_id):
+        return {
+            "configured": True,
+            "source": "warehouse",
+            "organization_id": organization_id,
+            "user_masked": None,
+            "dsn_masked": None,
+            "thick_mode": False,
+            "has_oracle_client_lib_dir": False,
+            "saved_at": None,
+            "env_fallback_available": False,
         }
     return {
         "configured": False,

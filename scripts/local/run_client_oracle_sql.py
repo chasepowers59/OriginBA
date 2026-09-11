@@ -27,25 +27,46 @@ from oracle_client import ensure_oracle_client, load_env_file, normalize_oracle_
 init_oracle_client = ensure_oracle_client
 
 
-CLIENTS = {
-    "newark": "NEWARK",
-    "fonddulac": "FONDDULAC",
-    "collegestation": "COLLEGESTATION",
-    "ellensburg": "ELLENSBURG",
-    "citycorp": "CITYCORP",
-    "odessa": "ODESSA",
-    "odessa_dev": "ODESSA_DEV",
-    "demo": "DEMO",
-    # Production SmartCity clients (read-only; see SMARTCITY_PROD_* in .env).
-    "newark_prod": "NEWARK_PROD",
-    "fonddulac_prod": "FONDDULAC_PROD",
-    "collegestation_prod": "COLLEGESTATION_PROD",
-    "ellensburg_prod": "ELLENSBURG_PROD",
-    "citycorp_prod": "CITYCORP_PROD",
-    # Internal SmartCity environments (demo credentials; separate service names).
-    "int_train": "INT_TRAIN",
-    "int_dev": "INT_DEV",
-}
+def load_clients() -> dict[str, str]:
+    """alias -> credential prefix (<PREFIX>_ORACLE_DSN / _DB_USER / _DB_PASSWORD).
+
+    The list lives in the data repo's clients.yml (the one registry, 2026-09-08); this
+    script used to carry its own 17-entry copy that disagreed with it. Resolution order is
+    the same as api/dq_routes.py: the sibling checkout is the SOURCE on a dev machine
+    (ORIGINBA_DBT_DIR, default ../originba_dbt), config/clients.export.json is the DEPLOY
+    COPY written by `scripts/client_registry.py export` in that repo.
+    """
+    import json
+    import os
+    repo = Path(__file__).resolve().parents[2]
+    sibling = Path(os.environ.get("ORIGINBA_DBT_DIR") or repo.parent / "originba_dbt") / "clients.yml"
+    entries = None
+    if sibling.exists():
+        try:
+            import yaml  # optional on a deploy image; the bundled JSON is the fallback
+            data = yaml.safe_load(sibling.read_text())
+            entries = []
+            for row in data["clients"]:
+                pfx = (row.get("env_prefixes") or {}).get("portal_oracle") or row["env_prefix"]
+                entries.append({"id": row["id"], "aliases": row.get("aliases", []), "portal_oracle_prefix": pfx})
+                for inst in row.get("instances", []):
+                    entries.append({"id": inst["id"], "aliases": inst.get("aliases", []), "portal_oracle_prefix": inst["env_prefix"]})
+            for env in data.get("oracle_instances", []):
+                entries.append({"id": env["id"], "aliases": env.get("aliases", []),
+                                "portal_oracle_prefix": (env.get("env_prefixes") or {}).get("portal_oracle")})
+        except ImportError:
+            entries = None
+    if entries is None:
+        entries = json.loads((repo / "config" / "clients.export.json").read_text())["entries"]
+    out: dict[str, str] = {}
+    for e in entries:
+        if e.get("portal_oracle_prefix"):
+            for name in [e["id"], *e.get("aliases", [])]:
+                out[name] = e["portal_oracle_prefix"]
+    return out
+
+
+CLIENTS = load_clients()
 
 
 def parse_args() -> argparse.Namespace:

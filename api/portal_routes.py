@@ -47,6 +47,14 @@ class SavedViewCreate(BaseModel):
     dimensions: list[str] | None = None
     measure_field: str | None = None
     measure_agg: str | None = None
+    # The store has always handled `measures`, and the builder has always sent it —
+    # but this schema did not declare it, and Pydantic drops what it does not declare,
+    # so model_dump() handed the store a payload without it. A multi-measure view
+    # reopened with one measure. `filters` was missing end to end, so a scoped view
+    # reopened showing every row. The store-level test could not see either, because
+    # it calls create_saved_view() directly and never crosses this schema.
+    measures: list[dict[str, Any]] | None = None
+    filters: list[dict[str, Any]] | None = None
     chart_type: str | None = None
     date_preset: str | None = None
     date_start: str | None = None
@@ -239,8 +247,7 @@ def analytics_nlq_metrics(ctx: AuthContext = Depends(get_auth_context)) -> dict[
     ctx.require_permission("nlq:read")
     from api.snapshot_analytics_nlq import get_nlq_metric_catalog
 
-    # Per-org: only metrics whose snapshot exists in this org's catalog are offered —
-    # a dbt-catalog org has no legacy *_RPT_CURR snapshots to run them against.
+    # Per-org: only metrics whose snapshot exists in this org's catalog are offered.
     org_id = ctx.effective_organization_id()
     return {"metrics": filter_nlq_metrics_for_auth(get_nlq_metric_catalog(org_id), ctx)}
 

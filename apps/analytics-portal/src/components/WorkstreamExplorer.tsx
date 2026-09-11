@@ -6,84 +6,26 @@ import { useMemo, useState } from "react";
 import { WORKSTREAM_DESCRIPTIONS, workstreamDisplayName } from "@/lib/businessLabels";
 import { exploreUrl } from "@/lib/processGuide";
 import { workstreamIcon } from "@/lib/workstreamIcons";
+import { groupByDataset } from "@/lib/workstreamDatasets";
 import type { BusinessProcess, SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 import { SnapshotCard } from "./HomeDashboard";
-
-export function WorkstreamExplorer({
-  workstreams,
-}: {
-  workstreams: WorkstreamGroup[];
-}) {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(workstreams.map((ws) => [ws.id, true])),
-  );
-
-  const toggle = (id: string) =>
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
-
-  return (
-    <div className="space-y-4">
-      {workstreams.map((ws) => {
-        const isOpen = expanded[ws.id] ?? true;
-        return (
-          <section key={ws.id} className="glass-panel overflow-hidden">
-            <button
-              type="button"
-              onClick={() => toggle(ws.id)}
-              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-white/[0.02]"
-            >
-              <div className="flex items-start gap-4">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-band text-lg text-primary ring-1 ring-edge">
-                  {workstreamIcon(ws.id)}
-                </span>
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Link
-                      href={`/workstream/${ws.id}`}
-                      className="text-lg font-semibold text-heading hover:text-primary"
-                    >
-                      {ws.label ?? workstreamDisplayName(ws.id)}
-                    </Link>
-                    <span className="chip">{ws.snapshot_count} snapshots</span>
-                    <Link href={`/workstream/${ws.id}`} className="text-xs text-primary hover:text-primary">
-                      Dashboard →
-                    </Link>
-                  </div>
-                  <p className="mt-1 text-sm text-fg-muted">
-                    {WORKSTREAM_DESCRIPTIONS[ws.id] ?? "Governed report domains"}
-                  </p>
-                </div>
-              </div>
-              <span className="shrink-0 text-fg-muted">{isOpen ? "▾" : "▸"}</span>
-            </button>
-            {isOpen ? (
-              <div className="border-t border-edge-subtle px-5 pb-5 pt-4">
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {ws.snapshots.map((snap) => (
-                    <SnapshotCard key={snap.id} snap={snap} />
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </section>
-        );
-      })}
-    </div>
-  );
-}
 
 export function WorkstreamSidebarNav({
   workstreams,
   activeId,
+  filterMode,
 }: {
   workstreams: WorkstreamGroup[];
   activeId?: string;
+  /** On Library the rail FILTERS the page instead of navigating away from it. */
+  filterMode?: boolean;
 }) {
   const searchParams = useSearchParams();
   return (
     <WorkstreamSidebar
       workstreams={workstreams}
-      activeId={activeId}
+      activeId={activeId ?? (filterMode ? searchParams.get("workstream") ?? undefined : undefined)}
+      filterMode={filterMode}
       activeProcessId={searchParams.get("process") ?? undefined}
       activeReportId={searchParams.get("report") ?? undefined}
     />
@@ -111,11 +53,13 @@ export function WorkstreamSidebar({
   activeId,
   activeProcessId,
   activeReportId,
+  filterMode,
 }: {
   workstreams: WorkstreamGroup[];
   activeId?: string;
   activeProcessId?: string;
   activeReportId?: string;
+  filterMode?: boolean;
 }) {
   const [expandedWs, setExpandedWs] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(workstreams.map((ws) => [ws.id, true])),
@@ -151,8 +95,28 @@ export function WorkstreamSidebar({
         onChange={(e) => setQuery(e.target.value)}
         className="input-modern mb-3 text-xs"
       />
-      <div className="max-h-[calc(100vh-320px)] space-y-3 overflow-y-auto pr-1">
-        {filteredWorkstreams.map((ws) => {
+      {filterMode && activeId ? (
+        <Link
+          href="/reports"
+          className="mb-3 flex items-center justify-between rounded-lg bg-chip px-3 py-2 text-xs text-heading"
+        >
+          <span>Filtered to one workstream</span>
+          <span className="text-fg-muted">Clear ×</span>
+        </Link>
+      ) : null}
+      <div className="max-h-[calc(100vh-320px)] space-y-4 overflow-y-auto pr-1">
+        {groupByDataset(filteredWorkstreams).map((dataset) => (
+        <div key={dataset.id}>
+          {/* C side / M side / assets / shared -- the shape of C2M, which a flat list
+              of nine workstreams hid from anyone who did not already know it. */}
+          <p
+            className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-fg-subtle"
+            title={dataset.hint}
+          >
+            {dataset.label}
+          </p>
+          <div className="space-y-3">
+        {dataset.workstreams.map((ws) => {
         const wsOpen = expandedWs[ws.id] ?? true;
         const processes = ws.processes ?? [];
         return (
@@ -164,11 +128,17 @@ export function WorkstreamSidebar({
             >
               <span className="text-primary">{workstreamIcon(ws.id)}</span>
               <Link
-                href={`/workstream/${ws.id}`}
+                href={filterMode ? `/reports?workstream=${ws.id}` : `/workstream/${ws.id}`}
                 onClick={(e) => e.stopPropagation()}
-                className="flex-1 hover:text-primary"
+                aria-current={activeId === ws.id ? "true" : undefined}
+                className={`flex-1 hover:text-primary ${
+ activeId === ws.id ? "text-primary" : ""
+ }`}
               >
                 {ws.label ?? workstreamDisplayName(ws.id)}
+                {typeof ws.snapshot_count === "number" ? (
+                  <span className="ml-1 font-normal opacity-60">({ws.snapshot_count})</span>
+                ) : null}
               </Link>
               <span className="text-fg-muted">{wsOpen ? "▾" : "▸"}</span>
             </button>
@@ -205,7 +175,7 @@ export function WorkstreamSidebar({
                                   })}
                                   className={`block rounded-lg px-2 py-1.5 text-sm transition ${
  active
- ? "bg-gradient-to-r from-primary to-accent-2 text-heading ring-1 ring-edge"
+ ? "tint-active text-heading ring-1 ring-edge"
  : "text-fg-muted hover:bg-chip hover:text-heading"
  }`}
                                 >
@@ -224,6 +194,9 @@ export function WorkstreamSidebar({
           </div>
         );
       })}
+          </div>
+        </div>
+        ))}
         {filteredWorkstreams.length === 0 ? (
           <p className="text-xs text-fg-muted">No processes match your search.</p>
         ) : null}
@@ -232,24 +205,3 @@ export function WorkstreamSidebar({
   );
 }
 
-export function groupSnapshotsByWorkstream(
-  snapshots: SnapshotSummary[],
-  workstreamOrder: string[],
-): WorkstreamGroup[] {
-  const labels = new Map<string, string>();
-  for (const snap of snapshots) {
-    if (snap.workstream_label) labels.set(snap.workstream, snap.workstream_label);
-  }
-  const map = new Map<string, SnapshotSummary[]>();
-  for (const snap of snapshots) {
-    map.set(snap.workstream, [...(map.get(snap.workstream) ?? []), snap]);
-  }
-  return workstreamOrder
-    .filter((id) => (map.get(id)?.length ?? 0) > 0)
-    .map((id) => ({
-      id,
-      label: labels.get(id) ?? workstreamDisplayName(id),
-      snapshot_count: map.get(id)?.length ?? 0,
-      snapshots: map.get(id) ?? [],
-    }));
-}

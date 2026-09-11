@@ -7,8 +7,9 @@ description: The OriginBA client-isolation and data-protection model — how one
 
 Every client's data lives in a different place and must never meet. This file states
 the model, the rules that keep it true, and the audited gaps — so a refactor cannot
-quietly undo a control. Audited 2026-09-01: the four CRITICAL findings are fixed
-and regression-tested; the HIGH findings below are still live.
+quietly undo a control. Audited 2026-09-01; as of 2026-09-02 every CRITICAL and HIGH
+finding is fixed and regression-tested, and of the MEDIUMs only M4 (no migration
+mechanism) remains open. `docs/SECURITY_AUDIT_2026-09-01.md` carries the ledger.
 
 ## The isolation model in one paragraph
 
@@ -18,6 +19,17 @@ permissions and `is_active` are re-read from the auth database on every request
 The caller's organization decides which database answers the query. Admins — and
 only admins — may switch tenants with `X-Organization-Id`; for everyone else the
 header is ignored, never rejected, and never used as a connection detail.
+
+**An admin is a PLATFORM admin and has no organization of their own** (settled and
+enforced 2026-09-02). There is no per-client admin tier: users, access groups and the
+audit log are all filtered by `client_id`, which is ONE value for the whole deployment
+(`load_portal_config()["client_id"]`), so an admin bound to a client would have been a
+deployment-wide superuser wearing that client's name. `_validate_organization_id` now
+refuses the combination on both the create and the promote paths — the promote path
+mattered, because the panel's role dropdown sent `{role}` alone and the old client
+survived. Adding a real client-admin tier means giving `portal_access_groups` and
+`portal_audit_log` an organization first; it is a feature with a schema cost, not a
+dropdown. Evidence and reasoning: `tests/test_admin_org_isolation.py`.
 
 ## The rules
 
@@ -50,6 +62,20 @@ header is ignored, never rejected, and never used as a connection detail.
    the same shape would be a bug anywhere else it appears.)
 8. **Real client data never enters git.** Slice files and `docs/screenshots/` are
    gitignored; no hook enforces it, so `git add -f` is the standing risk.
+9. **A secret with a default is a published secret.** `bootstrap_admin_password()`
+   defaulted to a literal beside a default admin email, and `.env.example` documented
+   that same literal — every deployment that skipped the variable shipped an admin
+   login readable in this repo, and `must_change_password` does not save it (the
+   intruder authenticates, changes the password, locks the operator out). RAISE, as
+   `PORTAL_AUTH_SECRET` does. Fixed 2026-09-02, `tests/test_bootstrap_security.py`.
+10. **Pin algorithms by allowlist, not by default.** `jwt_algorithm()` passed straight
+   into `decode(algorithms=[...])`, so `PORTAL_AUTH_ALGORITHM=none` would have accepted
+   UNSIGNED tokens. Anything outside HS256/384/512 now falls back rather than being
+   trusted because it was configured. This file previously claimed it was pinned.
+11. **An invariant enforced in the service layer is not enforced.** Bootstrap built the
+   `User` model directly, so it created the org-bound admin that
+   `_validate_organization_id` forbids. When you add a rule, grep for every writer that
+   bypasses the function holding it.
 
 ## What the fences must block (test these, not just the happy path)
 
@@ -60,9 +86,42 @@ CTEs that hide the real target, and whole-row projection (`row_to_json(t)`,
 `to_jsonb(t)`, `t::text`) of any table carrying a secret.
 
 Oracle: `ALL_TABLES`/`DBA_*`/`V$*`/`SYS.*`, other schemas, `@dblink`, `UTL_HTTP`,
-`XMLTYPE(t)`, `JSON_OBJECT(*)`. Both Oracle fences block all of these:
-`validate_oracle_reporting_scope` (in-database, CISADM + ORIGINBA_REPORTING) and
-`validate_oracle_cisadm_scope` (legacy, CISADM only).
+`XMLTYPE(t)`, `JSON_OBJECT(*)`. The one Oracle fence, `validate_oracle_reporting_scope`
+(CISADM + ORIGINBA_REPORTING), blocks all of these -- while letting a column that merely
+STARTS with `all_`/`user_` through, because those are ordinary CISADM column names
+(USER_ID is on 378 tables) and a dictionary view is only readable in table position.
+The CISADM-only fence went with the legacy snapshot catalog on 2026-09-02.
+
+## An authorization check that resolved against the WRONG CATALOG (2026-09-02)
+
+Fixed twice over: the lookup now threads the caller's org, AND the second catalog was
+retired the same day (portal `tests/test_single_catalog_shape.py`), so the condition
+that made this possible no longer exists. Kept because the shape of the mistake --
+an authz lookup that forgets WHICH world it is deciding in -- is general.
+
+`snapshot_workstream()` called `get_snapshot()` with **no organization_id**, and
+`catalog_name_for_org(None)` returns `"dbt"`. So every workstream authorization lookup
+resolved against the dbt catalog whichever org the caller was in. The two shapes share
+no snapshot ids (`rpt_financial_txn` against `FT_RPT_CURR`), so on the **six legacy
+orgs** the lookup missed, returned `""`, and `workstreams_allowed(["finance"], "")` is
+False. A user granted `finance` was refused `FT_RPT_CURR` — which declares
+`workstream: finance` — and through `filter_nlq_metrics_for_auth` /
+`filter_dashboard_for_auth` their metrics and tiles filtered to **empty in silence**,
+reading as a broken portal rather than a denial.
+
+It failed CLOSED — a lockout, not a leak. What kept it invisible is the part to
+remember: the dev org is a dbt org, and **`"*"` and an empty grant both mean full
+access and never reach the workstream comparison at all**, so the two configurations
+we develop against cannot see it. When auditing an authz path here, exercise it with a
+RESTRICTED grant on an org OTHER than dev; a full-grant pass proves nothing.
+
+**The obvious mock hides it.** My first test patched `catalog_name_for_org` and PASSED
+against the broken code, because that patch answers `"cisadm"` for the
+`organization_id=None` call too — silently supplying the argument whose absence is the
+entire defect. Patch the org REGISTRY (`api.organizations.get_organization`) instead,
+so `catalog_name_for_org(None)` still answers `"dbt"` as in production. See
+`tests/test_snapshot_access_by_shape.py`; neither `assert_snapshot_access` nor
+`assert_workstream_access` was named in ANY test before it.
 
 ## Audited findings (2026-09-01)
 
@@ -110,8 +169,10 @@ sensitive has ever been committed.
 
 ## Enforcement gaps to close when you touch this area
 
-- `_resolve_active_organization` — the most isolation-critical function — has ZERO
-  tests. No test anywhere sends `X-Organization-Id`.
+- ~~`_resolve_active_organization` has ZERO tests~~ — CLOSED 2026-09-02 in
+  `tests/test_admin_org_isolation.py`. The control itself was already correct: a
+  non-admin's header is ignored rather than rejected, an unregistered value is
+  discarded, and an unknown role cannot switch. It had no coverage, not a defect.
 - No HTTP-layer cross-org test exists for any resource; the `*_org_scoped` tests
   prove the store filters, not that the route passes the caller's real org.
 - The fence tests now cover C1 and C4, and assert the engine→fence routing. Still

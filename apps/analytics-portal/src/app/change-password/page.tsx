@@ -38,7 +38,7 @@ export default function ChangePasswordPage() {
     <div className="mesh-bg flex min-h-screen items-center justify-center px-4">
       <div className="glass-panel w-full max-w-md p-8">
         <div className="mb-6 text-center">
-          <div className="brand-logo mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-bold text-white">
+          <div className="brand-logo mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-bold">
             BA
           </div>
           <h1 className="text-2xl font-bold portal-heading">Set a new password</h1>

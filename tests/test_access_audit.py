@@ -189,5 +189,87 @@ class AuditListFilterTests(unittest.TestCase):
         self.assertEqual(actions, {"sql_execute"})
 
 
+class AuditCategoryFilterTests(unittest.TestCase):
+    """The Settings > Users & access feed is headed "User, group, and password
+    changes" but asked for every action and took the newest 40. report_run is by far
+    the highest-volume action, so on a live instance (INT_DEV, 2026-09-02) all forty
+    rows were report_run and not one permission change was visible -- the feed an
+    admin would use to answer "who changed access?" showed only query telemetry.
+
+    A single exact `action` cannot express "the administrative ones", and asking the
+    client to enumerate the action names is how the workstream picker drifted, so the
+    set is named server-side and the client asks for it by name."""
+
+    @classmethod
+    def setUpClass(cls):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from api.auth.routes import router as auth_router
+
+        cls._env = mock.patch.dict(os.environ, {
+            "PORTAL_AUTH_DISABLED": "true", "PORTAL_DEV_ORGANIZATION": "dev"})
+        cls._env.start()
+        init_auth_database()
+        for action in ("report_run", "sql_execute", "raw_sql_run"):
+            access_audit.record_access_event(
+                actor_email="noise@b.gov", action=action,
+                target_type="snapshot", target_id="rpt_x", detail="")
+        for action in ("user.create", "user.update", "user.password_change",
+                       "group.create", "group.update", "group.delete",
+                       "sso_jit_provision", "sql_refused"):
+            access_audit.record_access_event(
+                actor_email="admin@b.gov", action=action,
+                target_type="user", target_id="u1", detail="")
+        app = FastAPI()
+        app.include_router(auth_router)
+        cls.client = TestClient(app)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._env.stop()
+
+    def _actions(self, url: str) -> set[str]:
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200, r.text)
+        return {e["action"] for e in r.json()}
+
+    def test_admin_category_keeps_every_permission_change(self):
+        actions = self._actions("/auth/audit-log?category=admin&limit=200")
+        self.assertEqual(actions, {
+            "user.create", "user.update", "user.password_change",
+            "group.create", "group.update", "group.delete",
+            "sso_jit_provision", "sql_refused"})
+
+    def test_admin_category_drops_query_telemetry(self):
+        actions = self._actions("/auth/audit-log?category=admin&limit=200")
+        self.assertFalse(actions & {"report_run", "sql_execute", "raw_sql_run"})
+
+    def test_admin_category_survives_a_flood_of_telemetry(self):
+        # The real failure: enough report_run rows to fill the window. Filtering has
+        # to happen in the query, not after it.
+        for _ in range(60):
+            access_audit.record_access_event(
+                actor_email="noise@b.gov", action="report_run",
+                target_type="snapshot", target_id="rpt_x", detail="")
+        actions = self._actions("/auth/audit-log?category=admin&limit=40")
+        self.assertIn("group.delete", actions)
+        self.assertNotIn("report_run", actions)
+
+    def test_sso_provisioning_counts_as_an_admin_event(self):
+        # SSO auto-provisioning creates accounts without an admin acting; if it is not
+        # in this feed there is no surface anywhere that shows it happened.
+        self.assertIn("sso_jit_provision",
+                      self._actions("/auth/audit-log?category=admin&limit=200"))
+
+    def test_no_category_is_unchanged(self):
+        actions = self._actions("/auth/audit-log?limit=200")
+        self.assertIn("report_run", actions)
+        self.assertIn("user.create", actions)
+
+    def test_unknown_category_is_rejected_rather_than_silently_showing_all(self):
+        r = self.client.get("/auth/audit-log?category=nonsense")
+        self.assertEqual(r.status_code, 422, r.text)
+
+
 if __name__ == "__main__":
     unittest.main()

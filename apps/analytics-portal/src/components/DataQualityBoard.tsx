@@ -1,5 +1,7 @@
 "use client";
 
+import { formatCellValue } from "@/lib/format";
+
 /**
  * Data Quality board — the rules engine's findings as a CIS worklist.
  *
@@ -26,6 +28,8 @@ type DqRule = {
   acked_row_keys?: string[];
   count: number;
   capped?: boolean;
+  /** True finding count; `count` is only how many rows fit in the payload. */
+  total?: number;
   error?: string;
 };
 
@@ -249,8 +253,7 @@ function RuleCard({
             <span className="text-over">rule error</span>
           ) : (
             <span className="rounded-full bg-chip px-2 py-0.5 text-xs font-semibold tabular-nums text-fg">
-              {r.count}
-              {r.capped ? "+" : ""}
+              {r.total ?? r.count}
             </span>
           )}
           <span className="font-mono text-xs text-fg-subtle">{r.object}</span>
@@ -295,14 +298,20 @@ function RuleCard({
                     </td>
                     {row.map((v, j) => (
                       <td key={j} className="whitespace-nowrap px-2 py-1 text-fg">
-                        {v ?? ""}
+                        {/* The API sends str(value); render it like every other table --
+                            dates as dates, identifiers literal, numbers with separators. */}
+                        {formatCellValue(v, { columnId: r.columns[j] })}
                       </td>
                     ))}
                   </tr>
                 ))}
               </tbody>
             </table>
-            {r.capped && <p className="mt-1 text-xs text-fg-subtle">showing first 100</p>}
+            {r.capped && (
+              <p className="mt-1 text-xs text-fg-subtle">
+                showing the first {r.count} of {r.total ?? r.count}
+              </p>
+            )}
           </div>
         )}
         {(r.acked_rows?.length ?? 0) > 0 && (
@@ -343,18 +352,22 @@ function SummaryCard({
   tone: "red" | "amber" | "green" | "blue";
   glyph: string;
 }) {
+  // Each chip pairs a semantic colour with its OWN tinted ground instead of putting
+  // white on the colour itself. In dark mode --over/--warn/--ok invert to light tints
+  // meant to sit ON dark, so white glyphs measured 1.26–2.29:1 and the "?" was all but
+  // invisible. bg-*-bg + text-* is the pairing the palette already defines, both ways.
   const tones: Record<string, { text: string; chip: string }> = {
-    red: { text: "text-over", chip: "bg-over" },
-    amber: { text: "text-warn", chip: "bg-warn" },
-    green: { text: "text-ok", chip: "bg-ok" },
-    blue: { text: "text-brand", chip: "bg-brand" },
+    red: { text: "text-over", chip: "bg-over-bg text-over" },
+    amber: { text: "text-warn", chip: "bg-warn-bg text-warn" },
+    green: { text: "text-ok", chip: "bg-ok-bg text-ok" },
+    blue: { text: "text-brand", chip: "bg-chip text-brand" },
   };
   const t = tones[tone];
   return (
     <div className="glass-panel flex items-center gap-3 px-4 py-3">
       <span
         aria-hidden
-        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white ${t.chip}`}
+        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${t.chip}`}
       >
         {glyph}
       </span>

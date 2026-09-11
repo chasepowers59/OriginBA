@@ -68,7 +68,7 @@ Trying to force those into one rowset creates the same fan-out and misuse risks 
 
 ## First step
 
-Run `00a_config_discovery_validation.sql` to determine:
+Run `archive/2026-09-08_reorg/sql/performance/snapshots/debt_mgmt/00a_config_discovery_validation.sql` (archived 2026-09-08 with the debt snapshots it planned) to determine:
 - which process tables are populated in this tenant
 - whether `C1_BI_WOPROC_VW` is usable
 - whether collection agency and severance objects are active enough to model now

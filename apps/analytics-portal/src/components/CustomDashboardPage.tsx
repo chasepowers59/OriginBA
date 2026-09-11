@@ -25,12 +25,12 @@ import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { DashboardTile } from "./DashboardTile";
 import { PresentationToolbar } from "./PresentationToolbar";
 import { NotesDialog } from "./NotesDialog";
+import { CrossFilterBanner } from "@/components/CrossFilterBanner";
 
 const SLOTS = [0, 1, 2, 3];
 
 function emptyTile(slot: number, snapshotId = "rpt_financial_txn"): DashboardTileDef {
-  // Default to the dbt canvas; callers with the org's catalog loaded pass its first
-  // snapshot instead, so a legacy Oracle tenant still gets a valid starting point.
+  // Callers with the org's catalog loaded pass its first snapshot instead.
   return {
     id: crypto.randomUUID(),
     slot,
@@ -165,8 +165,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     }
   };
 
-  // Only templates every one of whose tiles this org's catalog can run — a
-  // dbt-catalog org never sees the legacy *_RPT_CURR boards, and vice versa.
+  // Only templates every one of whose tiles this org's catalog can run.
   const availableTemplates = useMemo(
     () => templatesForSnapshots(new Set(snapshots.map((s) => s.id))),
     [snapshots],
@@ -270,14 +269,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       ) : null}
 
       {filter ? (
-        <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
-          <span>
-            Cross-filter: <strong>{filter.label ?? filter.field}</strong> = {filter.value}
-          </span>
-          <button type="button" onClick={clearFilter} className="btn-ghost text-xs">
-            Clear
-          </button>
-        </div>
+        <CrossFilterBanner field={filter.field} value={filter.value} onClear={clearFilter} />
       ) : (
         <p className="text-xs text-fg-muted">Click a chart value to cross-filter all tiles.</p>
       )}
@@ -301,7 +293,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
                     tile={tileBySlot.get(slot)!}
                     days={days}
                     onData={registerExport}
-                    onCrossSelect={(field, value) => toggleFilter(field, value, value)}
+                    onCrossSelect={(field, value) => toggleFilter(field, value)}
                   />
                 </div>
               ) : (

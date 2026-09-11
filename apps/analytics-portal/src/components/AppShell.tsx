@@ -71,7 +71,7 @@ export function AppShell({
           that used to crowd the bar (workstream counts, role, org, sign out) lives in
           the user menu, so the bar itself stays one clean row at every width. */}
       <header ref={headerRef} className="portal-header no-print sticky top-0 z-50">
-        <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-4 px-6">
+        <div className="mx-auto flex h-16 max-w-[1700px] items-center gap-4 px-6 2xl:px-10">
           <div className="flex min-w-0 items-center gap-3">
             <Link href="/" className="group flex shrink-0 items-center">
               <BrandMark className="h-7 w-auto" />
@@ -148,7 +148,10 @@ export function AppShell({
             {user ? (
               <details className="group/menu relative">
                 <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg px-2 py-1.5 transition hover:bg-chip [&::-webkit-details-marker]:hidden">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
+                  {/* primary-fg, not white: in dark mode --brand is a LIGHT blue meant
+                      to sit ON dark, so white initials on it measured 2.29:1. The
+                      palette already pairs each primary with its own foreground. */}
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-xs font-bold text-primary-fg">
                     {user.display_name
                       .split(/\s+/)
                       .map((w) => w.charAt(0))
@@ -167,6 +170,13 @@ export function AppShell({
                     {roleLabel(user.role)}
                     {user.organization_name ? ` · ${user.organization_name}` : ""}
                   </p>
+                  {/* The bar only has room for the switcher at xl; without this an admin
+                      on a narrower screen has no way to change tenant at all. */}
+                  <OrgSwitcher
+                    role={user.role}
+                    homeOrganizationId={user.organization_id ?? null}
+                    className="mt-2 flex min-w-0 items-center gap-1.5 xl:hidden"
+                  />
                   <p className="portal-text-subtle mt-2 border-t border-edge-subtle pt-2 text-xs">
                     {workstreams.length} workstreams · {snapshots.length} reporting tables
                   </p>
@@ -180,7 +190,7 @@ export function AppShell({
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1400px] px-6 py-8">
+      <div className="mx-auto max-w-[1700px] px-6 py-8 2xl:px-10">
         <main className="min-w-0 animate-fade-in">{children}</main>
       </div>
 

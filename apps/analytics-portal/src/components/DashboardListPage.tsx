@@ -7,18 +7,39 @@
  */
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { fetchDashboards } from "@/lib/api";
+import { deleteDashboard, fetchDashboards } from "@/lib/api";
+import { tileSummary } from "@/lib/dashboardCard";
+import { formatTimeBucket } from "@/lib/timeBucketLabel";
 import type { SavedDashboard } from "@/lib/types";
 
 export function DashboardListPage() {
   const [boards, setBoards] = useState<SavedDashboard[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Two-step delete: a board is somebody's saved work, so the first click asks.
+  const [confirming, setConfirming] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = () =>
     fetchDashboards()
       .then((r) => setBoards(r.dashboards))
       .catch(() => setError("Couldn't load your dashboards."));
+
+  useEffect(() => {
+    void load();
   }, []);
+
+  const remove = async (id: string) => {
+    setBusy(id);
+    try {
+      await deleteDashboard(id);
+      await load();
+    } catch {
+      setError("Couldn't delete that dashboard.");
+    } finally {
+      setBusy(null);
+      setConfirming(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -62,20 +83,59 @@ export function DashboardListPage() {
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {boards.map((b) => (
-            <Link
-              key={b.id}
-              href={`/dashboards/${b.id}`}
-              className="glass-panel group block p-5 transition hover:border-edge"
-            >
-              <p className="font-semibold text-heading group-hover:text-primary dark:group-hover:text-primary">
-                {b.title}
-              </p>
-              <p className="mt-1 text-xs text-fg-muted">
-                {b.tiles?.length ?? 0} tile{(b.tiles?.length ?? 0) === 1 ? "" : "s"} · last {b.days} days
-              </p>
-            </Link>
-          ))}
+          {boards.map((b) => {
+            const contents = tileSummary(b.tiles);
+            return (
+              <div key={b.id} className="glass-panel group flex flex-col p-5 transition hover:border-edge">
+                <Link href={`/dashboards/${b.id}`} className="flex-1">
+                  <p className="font-semibold text-heading group-hover:text-primary dark:group-hover:text-primary">
+                    {b.title}
+                  </p>
+                  {/* What is actually on it — the card used to say only "4 tiles", which
+                      tells two boards apart from each other not at all. */}
+                  {contents ? (
+                    <p className="mt-1 line-clamp-2 text-xs text-fg">{contents}</p>
+                  ) : null}
+                  <p className="mt-2 text-[11px] text-fg-subtle">
+                    {b.tiles?.length ?? 0} tile{(b.tiles?.length ?? 0) === 1 ? "" : "s"} · last{" "}
+                    {b.days} days
+                    {b.updated_at ? ` · updated ${formatTimeBucket(b.updated_at, "day")}` : ""}
+                  </p>
+                </Link>
+                <div className="mt-3 flex justify-end border-t border-edge-subtle pt-2">
+                  {confirming === b.id ? (
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-fg-muted">Delete this dashboard?</span>
+                      <button
+                        type="button"
+                        onClick={() => void remove(b.id)}
+                        disabled={busy === b.id}
+                        className="rounded-md bg-over-bg px-2 py-1 font-medium text-over disabled:opacity-60"
+                      >
+                        {busy === b.id ? "Deleting…" : "Delete"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirming(null)}
+                        className="btn-ghost px-2 py-1"
+                      >
+                        Keep
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirming(b.id)}
+                      className="btn-ghost px-2 py-1 text-xs"
+                      aria-label={`Delete ${b.title}`}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

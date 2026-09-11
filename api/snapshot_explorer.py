@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import re
+
 from datetime import date, timedelta
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from api.auth.dependencies import AuthContext, get_auth_context, require_permission
@@ -19,11 +21,14 @@ from api.warehouse_db import warehouse_configured
 from api.org_db import require_org_for_data
 from api.query_builder import QueryValidationError, build_query
 from api.raw_sql_validator import RawSqlValidationError, apply_row_cap, validate_raw_sql
-from api.executive_dashboard import build_executive_summary
+from api.reporting_dates import (DEFAULT_WINDOW_DAYS, DEFAULT_WINDOW_MIN_ROWS, reporting_today,
+                                 window_date_field, window_date_label)
+from api.executive_dashboard import (WAREHOUSE_NOT_BUILT_NOTE, build_executive_summary,
+                                     is_missing_relation_error)
 from api.kpi_runner import COMPARE_MODES
 from api.workstream_dashboard import build_workstream_about, build_workstream_summary
 from api.snapshot_catalog import (CatalogError, allowed_fields, get_snapshot,
-                                  is_warehouse, list_snapshots, list_workstreams,
+                                  list_snapshots, list_workstreams,
                                   load_catalog, snapshot_backend)
 
 
@@ -71,8 +76,8 @@ def _run(snapshot: dict, sql: str, binds=None, *, organization_id: str, max_rows
 
 def _qualified(snapshot: dict, organization_id: str | None = None) -> str:
     """schema.table for this org's engine. Quoted lowercase for Postgres; UNQUOTED
-    for both Oracle shapes (an in-database canvas was created unquoted, so Oracle
-    case-folds the reference -- quoting the lowercase name would miss it)."""
+    for Oracle (an in-database canvas was created unquoted, so Oracle case-folds the
+    reference -- quoting the lowercase name would miss it)."""
     backend, dialect, schema = snapshot_backend(snapshot, organization_id)
     table = snapshot["table_name"]
     if dialect == "postgres":
@@ -80,13 +85,126 @@ def _qualified(snapshot: dict, organization_id: str | None = None) -> str:
     return f"{schema}.{table.upper()}"
 
 
-def _default_date_filter(snapshot: dict[str, Any]) -> FilterRequest | None:
-    field = snapshot.get("required_date_field")
+# Above this, the filter value picker declines to enumerate and the caller falls back
+# to free text. Measured on originba_v2_demo25: SELECT DISTINCT over a canvas costs
+# roughly linearly with rows -- 46,661 -> 42 ms, 748,848 -> 139 ms, 3,565,096 -> 608 ms
+# -- so a 35M-row client fact lands near six seconds for a dropdown. The threshold sits
+# between the last two: dimensions keep their picker, facts do not. This is not an index
+# problem: the catalog declares no scope_filters, so the picker is offered on any of
+# 1,107 dimension columns and there is nothing bounded to index.
+SCOPE_ENUMERATION_MAX_ROWS = 1_000_000
+
+
+def can_enumerate_values(row_estimate: Any) -> bool:
+    """Whether a DISTINCT over this table is cheap enough to sit on the UI path.
+
+    An unknown estimate is ATTEMPTED, not refused: a table nothing has analyzed yet
+    reports none, and refusing would break every picker on a fresh database before the
+    first ANALYZE lands.
+    """
+    try:
+        rows = int(row_estimate)
+    except (TypeError, ValueError):
+        return True
+    return rows <= SCOPE_ENUMERATION_MAX_ROWS if rows > 0 else True
+
+
+def _row_estimate(snapshot: dict, organization_id: str) -> int | None:
+    """The table's row count FROM STATISTICS -- never count(*), which is the scan this
+    exists to avoid. None when the database has no estimate to give."""
+    _, dialect, schema = snapshot_backend(snapshot, organization_id)
+    table = snapshot["table_name"]
+    try:
+        if dialect == "postgres":
+            sql = "SELECT reltuples::bigint FROM pg_class WHERE oid = to_regclass(%(rel)s)"
+            binds = {"rel": f'{schema}."{table}"'}
+        else:
+            sql = "SELECT num_rows FROM all_tables WHERE owner = :owner AND table_name = :tbl"
+            binds = {"owner": schema.upper(), "tbl": table.upper()}
+        _, rows = _run(snapshot, sql, binds, organization_id=organization_id, max_rows=1)
+    except Exception:
+        # An estimate is an optimisation, never a gate: if it cannot be read, the
+        # picker behaves exactly as it did before this existed.
+        return None
+    return rows[0][0] if rows and rows[0] and rows[0][0] is not None else None
+
+
+# (organization_id, table) -> (read_at, rows). Statistics move only when the warehouse
+# is rebuilt, so a ten-minute memory is plenty and costs one catalog read per canvas.
+_ESTIMATES: dict[tuple[str | None, str], tuple[float, int | None]] = {}
+_ESTIMATE_TTL_SECONDS = 600
+
+
+def _row_estimate(snapshot: dict[str, Any], organization_id: str | None) -> int | None:
+    """How many rows the ENGINE thinks the canvas has, from its own statistics: no scan.
+
+    Postgres pg_class.reltuples and Oracle ALL_TABLES.NUM_ROWS are both maintained by
+    the build's ANALYZE / DBMS_STATS post-hook. None when the statistic cannot be read,
+    and the caller treats None as "big" -- the window is a safety bound, and losing it
+    on a 6M-row canvas costs far more than keeping it on a small one.
+    """
+    import time
+    table = str(snapshot.get("table_name") or "")
+    key = (organization_id, table)
+    hit = _ESTIMATES.get(key)
+    if hit and time.monotonic() - hit[0] < _ESTIMATE_TTL_SECONDS:
+        return hit[1]
+    estimate: int | None = None
+    try:
+        _backend, dialect, schema = snapshot_backend(snapshot, organization_id)
+        if not re.fullmatch(r"[A-Za-z0-9_]+", table) or not re.fullmatch(r"[A-Za-z0-9_]+", schema):
+            return None
+        if dialect == "postgres":
+            sql = ("SELECT c.reltuples::bigint AS n FROM pg_class c "
+                   "JOIN pg_namespace n ON n.oid = c.relnamespace "
+                   f"WHERE n.nspname = '{schema}' AND c.relname = '{table}'")
+        else:
+            sql = (f"SELECT NUM_ROWS AS n FROM ALL_TABLES WHERE OWNER = '{schema.upper()}' "
+                   f"AND TABLE_NAME = '{table.upper()}'")
+        _columns, rows = _run(snapshot, sql, organization_id=organization_id, max_rows=1)
+        if rows and rows[0] and rows[0][0] is not None:
+            estimate = int(rows[0][0])
+    except Exception:  # noqa: BLE001 -- an unreadable statistic must not fail the query
+        estimate = None
+    _ESTIMATES[key] = (time.monotonic(), estimate)
+    return estimate
+
+
+def _default_date_filter(snapshot: dict[str, Any],
+                         organization_id: str | None = None) -> FilterRequest | None:
+    """The window an unfiltered query falls back to, or None for a canvas with no date
+    -- or for a canvas too small for a window to buy anything (DEFAULT_WINDOW_MIN_ROWS).
+
+    The row cap does not substitute for a window: FETCH FIRST applies AFTER GROUP BY,
+    so an unfiltered aggregate reads every row before returning its first.
+
+    The window bounds the worst case; it is not a speedup on its own. It pays only when
+    selective -- Ellensburg's RPT_GL (6.08M rows, years of history) goes 4,062ms -> 825ms
+    on three months, while demo25's rpt_measurement goes 198ms -> 256ms because its dates
+    are clumped tightly enough that even 7 days holds 35% of the table.
+    """
+    field = window_date_field(snapshot)
     if not field:
         return None
-    end = date.today()
-    start = end - timedelta(days=90)
+    if organization_id is not None:
+        estimate = _row_estimate(snapshot, organization_id)
+        if estimate is not None and estimate < DEFAULT_WINDOW_MIN_ROWS:
+            return None
+    end = reporting_today()
+    start = end - timedelta(days=DEFAULT_WINDOW_DAYS)
     return FilterRequest(field=field, op="between", value=[start.isoformat(), end.isoformat()])
+
+
+def _query_failure(prefix: str, exc: Exception) -> HTTPException:
+    """A 502 that reads as a sentence when the cause is an unbuilt warehouse.
+
+    Every org reads the dbt catalog, so an org whose in-database warehouse has not been
+    built yet reaches every canvas route and fails each one with ORA-00942. Forwarding
+    the driver's text told the reader nothing they could act on; the note does.
+    """
+    if is_missing_relation_error(str(exc)):
+        return HTTPException(status_code=502, detail=WAREHOUSE_NOT_BUILT_NOTE)
+    return HTTPException(status_code=502, detail=f"{prefix}: {exc}")
 
 
 def _serialize_value(value: Any) -> Any:
@@ -96,8 +214,15 @@ def _serialize_value(value: Any) -> Any:
 
 
 def _cross_filter(cross_field: str | None, cross_value: str | None) -> list[dict[str, Any]]:
+    """The field name goes through UNTOUCHED.
+
+    This used to upper-case it, which was right when every column was CISADM's
+    UPPER_SNAKE and wrong the moment the canvases arrived with Title Case business
+    names: "Customer Class" became "CUSTOMER CLASS" and every card in the grid returned
+    `Invalid filter field`. Casing is the query builder's job.
+    """
     if cross_field and cross_value is not None and str(cross_value).strip():
-        return [{"field": cross_field.upper(), "op": "eq", "value": cross_value}]
+        return [{"field": cross_field, "op": "eq", "value": cross_value}]
     return []
 
 
@@ -134,9 +259,9 @@ def snapshots_index(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, A
         "workstream_labels": catalog.get("workstream_labels", {}),
         "portal_snapshots": catalog.get("portal_snapshots", []),
         "poc_enabled": catalog.get("poc_enabled", []),
-        # Either backend counts: dbt-catalog orgs read the Postgres warehouse, legacy
-        # orgs the Oracle demo. Demo-only here showed warehouse tenants "Connect
-        # database" with a live warehouse behind them.
+        # Either backend counts: Postgres orgs read the warehouse, Oracle orgs their
+        # own instance. Checking only one showed warehouse tenants "Connect database"
+        # with a live warehouse behind them.
         "db_configured": (demo_configured(org_id) or warehouse_configured(org_id))
         if org_id else False,
         "workstreams": workstreams,
@@ -193,6 +318,21 @@ def snapshot_questions(ctx: AuthContext = Depends(get_auth_context)) -> dict[str
     }
 
 
+def _lens_selection(pairs: list[str]) -> dict[str, str]:
+    """`?lens=total_customers:inactive` repeated per card.
+
+    The client names a lens; the predicate behind it stays server-side, so this can
+    only ever pick from what the KPI already declared. An unparseable pair is dropped
+    rather than raising -- a stale bookmark should render the default, not a 400.
+    """
+    out: dict[str, str] = {}
+    for pair in pairs:
+        kpi_id, sep, lens_id = pair.partition(":")
+        if sep and kpi_id.strip() and lens_id.strip():
+            out[kpi_id.strip()] = lens_id.strip()
+    return out
+
+
 @router.get("/executive-summary")
 def executive_summary(
     days: int = 30,
@@ -200,6 +340,7 @@ def executive_summary(
     compare_mode: str = "prior_period",
     cross_field: str | None = None,
     cross_value: str | None = None,
+    lens: list[str] = Query(default=[]),
     ctx: AuthContext = Depends(get_auth_context),
 ) -> dict[str, Any]:
     ctx.require_permission("snapshots:read")
@@ -213,6 +354,7 @@ def executive_summary(
         compare_mode=compare_mode,
         extra_filters=extra,
         allowed_workstreams=ctx.workstreams,
+        lenses=_lens_selection(lens),
         organization_id=org_id,
     )
 
@@ -266,7 +408,7 @@ def snapshot_metadata(
     ctx.require_permission("snapshots:read")
     org_id = require_org_for_data(ctx)
     snapshot = _require_snapshot_access(ctx, snapshot_id)
-    default_filter = _default_date_filter(snapshot)
+    default_filter = _default_date_filter(snapshot, org_id)
     return {
         "id": snapshot_id,
         "client": org_id,
@@ -284,17 +426,12 @@ def snapshot_stats(
     ctx.require_permission("snapshots:read")
     org_id = require_org_for_data(ctx)
     snapshot = _require_snapshot_access(ctx, snapshot_id)
-    # LOAD_DTTM is the CDC watermark on a CISADM snapshot; a dbt canvas has no such
-    # column, so the warehouse form reports the row count alone rather than inventing one.
-    if is_warehouse(snapshot):
-        sql = f"SELECT COUNT(*) AS row_count, NULL AS latest_load_dttm FROM {_qualified(snapshot, org_id)}"
-    else:
-        sql = (f"SELECT COUNT(*) AS ROW_COUNT, MAX(LOAD_DTTM) AS LATEST_LOAD_DTTM "
-               f"FROM {_qualified(snapshot)}")
+    # A canvas carries no load watermark of its own; the row count is the honest figure.
+    sql = f"SELECT COUNT(*) AS row_count, NULL AS latest_load_dttm FROM {_qualified(snapshot, org_id)}"
     try:
         columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=1)
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Demo stats failed: {exc}") from exc
+        raise _query_failure("Stats failed", exc) from exc
     row = rows[0] if rows else [0, None]
     return {
         "client": org_id,
@@ -332,21 +469,33 @@ def snapshot_scope_options(
             raise HTTPException(status_code=400, detail=f"Scope filter not allowed: {field_id}")
 
 
-    if is_warehouse(snapshot):
-        col = f'"{field}"'
-        sql = (f"SELECT DISTINCT {col} AS val FROM {_qualified(snapshot, org_id)} "
-               f"WHERE {col} IS NOT NULL ORDER BY 1 FETCH FIRST 100 ROWS ONLY")
-    else:
-        sql = (
-            f"SELECT * FROM ("
-            f"SELECT DISTINCT {field} AS VAL FROM {_qualified(snapshot)} "
-            f"WHERE {field} IS NOT NULL ORDER BY 1"
-            f") WHERE ROWNUM <= 100"
-        )
+    # Decline BEFORE scanning. A DISTINCT over a fact table costs ~600 ms at 3.5M rows
+    # and ~6 s at a 35M-row client, on the path a user takes to add one filter pill.
+    # Declining is instant and honest; sampling the table would quietly change what the
+    # list means.
+    estimate = _row_estimate(snapshot, org_id)
+    if not can_enumerate_values(estimate):
+        return {
+            "client": org_id,
+            "organization_id": org_id,
+            "snapshot_id": snapshot_id,
+            "field": field,
+            "label": allowed_scope.get(field, {}).get("label", field),
+            "values": [],
+            "enumerable": False,
+            "reason": (
+                f"{int(estimate):,} rows — too many to list values from. "
+                f"Type the value instead."
+            ),
+        }
+
+    col = f'"{field}"'
+    sql = (f"SELECT DISTINCT {col} AS val FROM {_qualified(snapshot, org_id)} "
+           f"WHERE {col} IS NOT NULL ORDER BY 1 FETCH FIRST 100 ROWS ONLY")
     try:
         columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=100)
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Scope options failed: {exc}") from exc
+        raise _query_failure("Scope options failed", exc) from exc
 
     values = [str(row[0]) for row in rows if row and row[0] is not None]
     return {
@@ -358,6 +507,7 @@ def snapshot_scope_options(
         "field": field,
         "label": allowed_scope.get(field, {}).get("label", field),
         "values": values,
+        "enumerable": True,
     }
 
 
@@ -372,28 +522,13 @@ def snapshot_sample_rows(
     snapshot = _require_snapshot_access(ctx, snapshot_id)
 
     row_cap = max(1, min(limit, 10))
-    table = snapshot["table_name"].upper()
-    date_field = snapshot.get("required_date_field")
-    if is_warehouse(snapshot):
-        # No recency window on the warehouse form. The canvases are already scoped to a
-        # client's own data and a sample of ten rows is cheap; ordering by a date on an
-        # unindexed canvas is not, and this is only ever a preview.
-        sql = f"SELECT * FROM {_qualified(snapshot, org_id)} FETCH FIRST {row_cap} ROWS ONLY"
-    elif date_field:
-        # Restrict to recent rows so sample preview stays fast on large snapshots.
-        sql = (
-            f"SELECT * FROM ("
-            f"SELECT * FROM CISADM.{table} "
-            f"WHERE {date_field} >= ADD_MONTHS(TRUNC(SYSDATE), -3) "
-            f"ORDER BY {date_field} DESC NULLS LAST"
-            f") WHERE ROWNUM <= {row_cap}"
-        )
-    else:
-        sql = f"SELECT * FROM CISADM.{table} WHERE ROWNUM <= {row_cap}"
+    # No recency window: the canvases are already scoped to a client's own data and ten
+    # rows are cheap, while ordering by a date on a large canvas is not. Only a preview.
+    sql = f"SELECT * FROM {_qualified(snapshot, org_id)} FETCH FIRST {row_cap} ROWS ONLY"
     try:
         columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=row_cap)
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Sample rows failed: {exc}") from exc
+        raise _query_failure("Sample rows failed", exc) from exc
 
     # Label lookup keyed BOTH ways: an Oracle snapshot's columns come back uppercase from
     # the driver, a canvas's come back exactly as declared.
@@ -514,24 +649,40 @@ def snapshot_query(
     snapshot = _require_snapshot_access(ctx, snapshot_id)
 
     filters = [f.model_dump() for f in body.filters]
-    if not filters and snapshot.get("required_date_field"):
-        default_filter = _default_date_filter(snapshot)
+    # A window the server chose and did not mention is a bug this code once had: the
+    # caller asked for all time, got a quarter, and only the raw SQL said so.
+    # Applying the same default to 38 more canvases without disclosing it would spread
+    # that rather than fix it, so what we add is reported back and what the CALLER sent
+    # is left alone and never described as ours.
+    applied_window: dict[str, Any] | None = None
+    if not filters:
+        default_filter = _default_date_filter(snapshot, org_id)
         if default_filter:
             filters = [default_filter.model_dump()]
+            # `field` stays the machine name the caller filters on; only the sentence is
+            # humanised, from the canvas's declared date_fields label.
+            label = window_date_label(snapshot, default_filter.field)
+            applied_window = {
+                "field": default_filter.field,
+                "label": label,
+                "days": DEFAULT_WINDOW_DAYS,
+                "start": default_filter.value[0],
+                "end": default_filter.value[1],
+                "note": (f"No filter was set, so this shows the trailing "
+                         f"{DEFAULT_WINDOW_DAYS} days on {label}."),
+            }
 
     try:
-        # WHICH WORLD THIS SNAPSHOT LIVES IN decides the dialect and the backend. The
-        # dbt canvases are Postgres with quoted Title Case columns; the legacy
-        # *_RPT_CURR snapshots are Oracle CISADM. The snapshot says which, so the two
-        # coexist while the migration finishes and nothing needs configuring twice.
+        # The ORG decides the backend and dialect: the same canvas runs in Postgres for
+        # a CDC-fed tenant and in the client's own Oracle instance for an in-database
+        # one, with quoted Title Case columns identical in both.
         backend, dialect, schema = snapshot_backend(snapshot, org_id)
         warehouse = backend == "postgres"
         trusted = set(snapshot.get("trusted_measures", []))
         sql, binds = build_query(
             table_name=snapshot["table_name"],
             allowed_fields=allowed_fields(snapshot),
-            trusted_measures=trusted if dialect != "oracle" else {m.upper() for m in trusted},
-            required_date_field=snapshot.get("required_date_field"),
+            trusted_measures=trusted,
             dimensions=body.dimensions,
             measures=[m.model_dump() for m in body.measures],
             filters=filters,
@@ -552,8 +703,7 @@ def snapshot_query(
             columns, rows = execute_query(sql, binds, organization_id=org_id,
                                           max_rows=body.limit)
     except Exception as exc:
-        where = "Warehouse" if warehouse else "Demo"
-        raise HTTPException(status_code=502, detail=f"{where} query failed: {exc}") from exc
+        raise _query_failure(f"{'Warehouse' if warehouse else 'Demo'} query failed", exc) from exc
 
     serialized_rows = [
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}
@@ -580,4 +730,7 @@ def snapshot_query(
         "rows": serialized_rows,
         "row_count": len(serialized_rows),
         "sql": sql,
+        # None when the caller set their own filters: only a window WE chose is ours to
+        # announce, and labelling the caller's own range as a default would misreport it.
+        "applied_window": applied_window,
     }

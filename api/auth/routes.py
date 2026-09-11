@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import secrets
-from typing import Any
+from typing import Any, Literal
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
@@ -31,6 +31,7 @@ from api.auth.schemas import (
 from api.auth.models import User
 from api.auth.security import create_access_token, hash_password
 from api.auth.service import (
+    AUDIT_CATEGORIES,
     AuthError,
     authenticate_user,
     change_password,
@@ -403,7 +404,16 @@ def admin_delete_group(
 def admin_audit_log(
     limit: int = 100,
     action: str | None = None,
+    # A named set, not a list of actions the caller assembles: "admin" is every event
+    # that changes who can do what, and it is defined once in service.py. Literal so an
+    # unknown category is a 422 rather than silently falling through to "everything".
+    category: Literal["admin"] | None = None,
     _: AuthContext = Depends(require_permission("users:manage")),
     session: Session = Depends(_db_session),
 ) -> list[dict[str, Any]]:
-    return list_audit_events(session, limit=limit, action=action)
+    return list_audit_events(
+        session,
+        limit=limit,
+        action=action,
+        actions=AUDIT_CATEGORIES.get(category) if category else None,
+    )

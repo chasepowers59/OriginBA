@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
+import { featuredCanvases } from "@/lib/featuredCanvases";
+import type { WorkstreamGroup } from "@/lib/types";
 
 export function WorkstreamHeroLinks({
   workstreamId,
@@ -11,11 +12,7 @@ export function WorkstreamHeroLinks({
   workstreams: WorkstreamGroup[];
 }) {
   const ws = workstreams.find((w) => w.id === workstreamId);
-  const featured = ws?.featured ?? [];
-  const snapshots = ws?.snapshots ?? [];
-  const top = featured.length
-    ? featured
-    : snapshots.slice(0, 3).map((s) => ({ snapshot_id: s.id, report_id: "" }));
+  const top = featuredCanvases(ws?.featured, ws?.snapshots);
 
   if (!top.length) return null;
 
@@ -26,25 +23,23 @@ export function WorkstreamHeroLinks({
       </p>
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
         {top.map((item) => {
-          const snap = snapshots.find((s) => s.id === item.snapshot_id);
-          const label = snap?.label ?? item.snapshot_id;
-          const reportQs = item.report_id ? `?report=${item.report_id}` : "";
+          const reportQs = item.reportId ? `?report=${item.reportId}` : "";
           return (
             <div
-              key={item.snapshot_id}
+              key={item.snapshotId}
               className="rounded-xl border border-edge-subtle bg-surface-subtle p-4"
             >
-              <p className="font-medium text-heading">{label}</p>
-              <p className="mt-1 text-xs text-fg-muted">{snap?.grain_description ?? snap?.summary}</p>
+              <p className="font-medium text-heading">{item.label}</p>
+              <p className="mt-1 text-xs text-fg-muted">{item.description}</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Link
-                  href={`/explore/${item.snapshot_id}${reportQs}`}
+                  href={`/explore/${item.snapshotId}${reportQs}`}
                   className="text-xs text-primary hover:text-primary"
                 >
                   Run report →
                 </Link>
                 <Link
-                  href={`/explore/${item.snapshot_id}?tab=model`}
+                  href={`/explore/${item.snapshotId}?tab=model`}
                   className="text-xs text-fg-muted hover:text-heading"
                 >
                   Data model

@@ -288,6 +288,8 @@ export const QUESTIONS = [
   }),
   q({
     id: "rebilled-segments",
+    // Declared for the portal's governed query (rebilled segments only: without it every never-cancelled segment drew a null bar; demo25, 2026-09-04).
+    filters: [{"field": "Is Rebilled", "op": "eq", "value": true}],
     process: "usage", workstream: "Billing",
     kind: "count",
     title: "How much is being rebilled, and why?",
@@ -796,6 +798,8 @@ export const QUESTIONS = [
   }),
   q({
     id: "accounts-on-alerts",
+    // Declared for the portal's governed query (accounts with a typed CI_ACCT_ALERT; "Has Alert Text" is the redacted ALERT_INFO free text, a different thing; demo25, 2026-09-04).
+    filters: [{"field": "Active Alert Count", "op": "gte", "value": 1}],
     process: "customer", workstream: "Customer Information",
     kind: "count",
     title: "Which accounts carry active alerts?",
@@ -807,7 +811,7 @@ export const QUESTIONS = [
                  round(sum("Total Arrears")::numeric, 2) as "Total Arrears",
                  count(*) filter (where "Is On Active Pay Plan")::bigint as "On Pay Plan"
           from reporting.rpt_customer_account
-          where "Has Alert"
+          where "Active Alert Count" >= 1
           group by 1 order by 2 desc`,
   }),
   q({
@@ -1171,6 +1175,8 @@ export const QUESTIONS = [
   }),
   q({
     id: "cancelled-payments",
+    // Declared for the portal's governed query (cancelled payments only: without it the not-cancelled majority drew a null bar; demo25, 2026-09-04).
+    filters: [{"field": "Is Cancelled", "op": "eq", "value": true}],
     process: "financial", workstream: "Payments",
     kind: "outlier", unit: "money",
     title: "Which payments were cancelled, and why?",
@@ -1447,6 +1453,8 @@ export const QUESTIONS = [
   }),
   q({
     id: "bills-longest-open",
+    // Declared for the portal's governed query (pending bills only: a completed bill has no open clock; demo25, 2026-09-04).
+    filters: [{"field": "Is Completed", "op": "eq", "value": false}],
     process: "usage", workstream: "Billing",
     kind: "outlier", chart: "horizontal",
     title: "Which bill cycles have the longest-open bills?",

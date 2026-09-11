@@ -166,19 +166,23 @@ if __name__ == "__main__":
 
 
 class ExecutiveCatalogAvailabilityTests(unittest.TestCase):
-    """A legacy-catalog org (demo: cisadm snapshots) has none of the dbt canvases the
-    executive KPIs read, so the dashboard must SKIP them with one clear note — never
-    render a grid of 'Unknown snapshot' errors."""
+    """A KPI whose canvas the catalog does not carry must be SKIPPED with one clear
+    note — never rendered as an 'Unknown snapshot' error card. With one catalog every
+    org resolves every KPI, so the guard is exercised with a KPI that names a canvas
+    which does not exist."""
 
-    def test_dbt_org_has_all_kpis(self) -> None:
+    def test_every_org_has_every_kpi(self) -> None:
         from api.executive_dashboard import EXECUTIVE_KPIS, available_kpis
-        avail, note = available_kpis(EXECUTIVE_KPIS, "dev")
-        self.assertEqual(len(avail), len(EXECUTIVE_KPIS))
-        self.assertIsNone(note)
+        for org in ("dev", "demo", "ellensburg", "newark"):
+            avail, note = available_kpis(EXECUTIVE_KPIS, org)
+            self.assertEqual(len(avail), len(EXECUTIVE_KPIS), org)
+            self.assertIsNone(note, org)
 
-    def test_legacy_catalog_org_skips_all_with_note(self) -> None:
-        from api.executive_dashboard import EXECUTIVE_KPIS, available_kpis
-        avail, note = available_kpis(EXECUTIVE_KPIS, "demo")
+    def test_a_kpi_on_a_missing_canvas_is_skipped_with_a_note(self) -> None:
+        from api.executive_dashboard import available_kpis
+        ghost = [{"id": "ghost", "label": "Ghost", "snapshot_id": "rpt_does_not_exist",
+                  "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}]}}]
+        avail, note = available_kpis(ghost, "dev")
         self.assertEqual(avail, [])
         self.assertIsNotNone(note)
         self.assertIn("canvas", note.lower())

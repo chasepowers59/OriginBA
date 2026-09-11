@@ -67,8 +67,22 @@ export function changePassword(current_password: string, new_password: string): 
   });
 }
 
+/**
+ * One request per page load, shared by every caller. OrgSwitcher is mounted twice
+ * (desktop header and mobile drawer) and each mount asked again -- four requests for
+ * one list on a single home-page load. A failed request is not cached, so a retry
+ * gets a fresh attempt.
+ */
+let organizationsRequest: Promise<PortalOrganization[]> | null = null;
+
 export function listPortalOrganizations(): Promise<PortalOrganization[]> {
-  return authFetch<PortalOrganization[]>("/auth/organizations");
+  if (!organizationsRequest) {
+    organizationsRequest = authFetch<PortalOrganization[]>("/auth/organizations").catch((err) => {
+      organizationsRequest = null;
+      throw err;
+    });
+  }
+  return organizationsRequest;
 }
 
 export function listPortalUsers(): Promise<AuthUser[]> {
@@ -140,6 +154,13 @@ export type AuditEvent = {
   created_at: string | null;
 };
 
-export function listAuditEvents(limit = 50): Promise<AuditEvent[]> {
-  return authFetch<AuditEvent[]>(`/auth/audit-log?limit=${limit}`);
+/**
+ * `category` names a set the API defines (service.py ADMIN_AUDIT_ACTIONS) rather than
+ * a list of action names kept here. Without it the feed returns every action, and
+ * report_run -- the highest-volume one -- fills the whole window.
+ */
+export function listAuditEvents(limit = 50, category?: "admin"): Promise<AuditEvent[]> {
+  const query = new URLSearchParams({ limit: String(limit) });
+  if (category) query.set("category", category);
+  return authFetch<AuditEvent[]>(`/auth/audit-log?${query.toString()}`);
 }

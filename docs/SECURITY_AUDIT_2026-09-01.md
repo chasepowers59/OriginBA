@@ -103,7 +103,9 @@ with column-level SELECT that excludes those columns.
 
 ---
 
-## HIGH — H1, H2, H4 and H5 FIXED 2026-09-01
+## HIGH — ALL SIX FIXED (H1, H2, H4, H5 on 2026-09-01; H3 and H6 verified
+## fixed 2026-09-02 — H3 blocks all six attacks the finding named, H6 stores the
+## token HttpOnly via a same-origin route)
 
 | # | Fix | Test |
 | --- | --- | --- |
@@ -133,38 +135,66 @@ an unknown org resolves none. `sample-rows` returns 200 and writes its audit row
 
 ## MEDIUM
 
-- **M1** Unqualified `pg_catalog` names (`pg_class`, `pg_database`, `pg_stat_activity`,
-  `pg_user`, `pg_roles`, `pg_settings`) are allowed; only the qualified form is
-  blocked. `pg_database` enumerates other clients' database names.
-- **M2** `dblink`, `dblink_connect`, `pg_read_file`, `lo_import`, `pg_sleep` are all
-  allowed — the Postgres fence has no function deny-list where the Oracle one does.
-- **M3** `/health` discloses the full client roster unauthenticated, because
-  `ENVIRONMENT` is set in no deployment file so `is_production()` is always False.
+- **M1 FIXED** Unqualified `pg_catalog` names (`pg_class`, `pg_database`,
+  `pg_stat_activity`, `pg_user`, `pg_roles`, `pg_settings`) were allowed; only the
+  qualified form was blocked. `_PG_CATALOG_OBJECT` now matches the bare names too,
+  bounded on both sides so a column like "Page Count" cannot trip it.
+- **M2 FIXED** `dblink`, `dblink_connect`, `pg_read_file`, `lo_import`, `pg_sleep` were
+  all allowed — the Postgres fence had no function deny-list where the Oracle one does.
+  `_PG_DANGEROUS_FUNCTION` now covers remote links, file reads, large-object import,
+  sleeps and backend control.
+- **M3 FIXED 2026-09-02** `/health` disclosed the full client roster unauthenticated,
+  because `ENVIRONMENT` is set in no deployment file so `is_production()` is always
+  False. The fix is the DIRECTION of the default, not another platform name: detail now
+  requires `is_development()`, affirmative proof, so an unrecognised environment
+  discloses nothing. `tests/test_auth_config_and_catalog.py`.
 - **M4** The audit log has no tenant dimension — rows carry a process-wide
   `client_id`, so an admin's action in one tenant is indistinguishable from another.
-- **M5** Workstream RBAC calls `get_snapshot()` without an org, always hitting the
-  dbt catalog; for a cisadm org every lookup misses and restricted users are denied
-  everything. Fails closed, but is not evaluating the right data.
-- **M6** Scheduled reports and KPI alerts validate recipient *shape* only — a report
-  CSV can be mailed to any external address on a cadence.
-- **M7** `PORTAL_AUTH_DISABLED` yields a full admin with tenant switching and a
-  literal dev JWT secret; nothing checks `is_production()` on that path.
+- **M5 FIXED 2026-09-02** Workstream RBAC called `get_snapshot()` without an org,
+  always hitting the dbt catalog; for a cisadm org every lookup missed and restricted
+  users were denied everything, their own grants included. `snapshot_workstream()` now
+  takes the caller's `effective_organization_id()`.
+  `tests/test_snapshot_access_by_shape.py` — note in there: patching
+  `catalog_name_for_org` makes the test pass against the BROKEN code, because it also
+  answers the `organization_id=None` call.
+- **M6 CONTROL ADDED 2026-09-02, still requires configuring** Scheduled reports and
+  KPI alerts validate recipient *shape* only — a report CSV can be mailed to any
+  external address on a cadence. `PORTAL_ALLOWED_RECIPIENT_DOMAINS` now enforces an
+  allow-list (exact domain, so `origin.local` cannot admit
+  `origin.local.attacker.example`) and is INERT until an operator sets it. Setting it
+  per deployment is the remaining work.
+- **M7 FIXED 2026-09-02** `PORTAL_AUTH_DISABLED` yielded a full admin with tenant
+  switching and a literal dev JWT secret, and nothing checked where it was running.
+  `auth_disabled()` now requires `is_development()` — affirmative proof, not the
+  absence of proof of production, because `is_production()` is False for an
+  unrecognised environment and Render sets none of the markers. `ENVIRONMENT` is
+  documented in `deploy/api.env.example`; `tests/conftest.py` declares the suite.
 - **M8** The dbt secrets test is name-based (`%micr%`, `%passwd%`…), so a Title-Case
   rename would pass it; its `depends_on` omits `stg_account` and `stg_person_contact`.
   Today's catalogs are clean.
-- **M9** CORS uses `allow_credentials=True` with an env-extensible origin list;
-  `PORTAL_CORS_ORIGINS=*` would echo any origin with credentials.
+- **M9 FIXED 2026-09-02** CORS uses `allow_credentials=True` with an env-extensible
+  origin list, and `PORTAL_CORS_ORIGINS=*` would echo any origin with credentials.
+  A wildcard is now DROPPED rather than honoured, and entries must look like an origin
+  (`scheme://host[:port]`). `tests/test_open_access_and_cors.py`.
 
 ## LOW
 
-L1 CLAUDE.md claims `git push` is in the settings deny list — it is not.
+L1 **CORRECTED 2026-09-02** CLAUDE.md claimed `git push` was in the settings deny list;
+it is not (the list denies curl/wget/nc/scp/rsync only). The doc now states it as a
+RULE rather than an enforced deny, and names the entry to add if enforcement is
+wanted. The behaviour was already correct — push commands are handed to the user —
+but the file asserted a guard that does not exist.
 L2 Committed local-fixture password literals (no client credentials).
 L3 The real client slice sits untracked on disk with live secrets; gitignored, but no
 pre-commit or git hook exists, so `git add -f` bypasses the only barrier.
 L4 `ui/chart.tsx` interpolates chart config colors into CSS via
 `dangerouslySetInnerHTML` (stock shadcn) — safe while configs are constants.
 L5 No CSP, HSTS or `X-Frame-Options`.
-L6 `ci/jrxml-smoke.yml` sits outside `.github/workflows/` and never runs.
+L6 **ANSWERED 2026-09-02** `ci/jrxml-smoke.yml` sits outside `.github/workflows/` and
+never runs — deliberately. It needs ORACLE_DSN and JRS_URL inside a private VCN, which
+a GitHub-hosted runner cannot reach, so activating it would redden CI on every .jrxml
+or .sql push without gaining coverage. The reason and the activation path (a
+self-hosted runner in the VCN) are now documented in the file itself.
 
 ---
 

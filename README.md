@@ -1,62 +1,32 @@
 # OriginBA Repository Guide
 
+Rewritten 2026-09-08 with the repository reorganization. `docs/roadmap/repository_structure_standard.md`
+is the structure contract; `scripts/repo/repo_structure_audit.ps1` and `tests/test_repo_structure.py` enforce it.
+
 ## Purpose
-Professional workspace for Oracle Utilities C2M (CISADM schema), Jaspersoft Domain/JRXML engineering, SQL performance tuning, and business analytics delivery.
+The Origin BA analytics portal (FastAPI + Next.js) and the Jaspersoft DELIVERY side for Oracle
+Utilities C2M (CISADM): domains, JRXML reports, client promotion, DataSources, the active snapshot
+operations, and per-client SQL. The data layer -- CISADM -> dbt reporting canvases, and the
+Jaspersoft domains generated from them -- is the sibling repo `~/originba_dbt`.
 
 ## Core Structure
-- `api/` API entry points
-- `ci/` CI pipelines and smoke SQL
-- `db_schema/` staging schema and DDL
-- `deploy/` deployment/build scripts only (generated report-unit artifacts are not tracked)
-- `docs/` runbooks, standards, and implementation guides
-- `docs/roadmap/` professional development and capability plans
-- `domains/exports/` exported Jaspersoft domain packages (`.zip`)
-- `domains/working/` local extracted domain working copies
-- `output/` curated generated metadata used by pipeline/reporting dictionary
-- `pipeline/` Python ETL/NLQ/data validation logic
-- `reports/` JRXML source templates
-- `reports/templates/` base reusable JRXML templates
-- `reports/subreports/` JRXML subreports
-- `reports/subreports/common/` reusable subreport components
-- `sample_data/` small seeds for smoke testing
-- `scripts/` utility validation and metadata scripts
-- `scripts/jaspersoft/` client promotion and repository package verification tools
-- `scripts/performance/` validation runners and perf automation
-- `scripts/repo/` repo hygiene and structure checks
-- `server/input_controls/` JRS input control payloads
-- `sql/` SQL assets
-- `sql/performance/bill_cycle/` bill-cycle performance and parity SQL
-- `sql/performance/billed_usage/validation/` billed-usage optimized-domain validation SQL
-- `sql/reconciliation/billing/` billing reconciliation SQL
-- `sql/diagnostics/` diagnostic SQL
-- `sql/analytics/` analytics/reporting SQL by domain
+- `api/` FastAPI backend (`api.app`); `apps/analytics-portal/` Next.js portal (Vercel root); `config/` runtime config (`portal_organizations.json`, `dq_rules.yml`, the generated `clients.export.json`); `data/` runtime state; `output/catalog_dbt.json` the one canvas catalog (generated in `~/originba_dbt`)
+- `jaspersoft/` the Jaspersoft delivery home: `jaspersoft/README.md` is the index, `jaspersoft/docs/` the standards and runbooks, `jaspersoft/dashboards/` the dashboard packs
+- `reports/`, `reports/templates/`, `reports/subreports/` JRXML; `server/input_controls/` the paired input-control JSON per report
+- `domains/` hand-built domains and client deliverables (`domains/README.md`)
+- `deploy/` the API image (`deploy/Dockerfile.api`), Jaspersoft DataSources, client and environment promotion, the shipped Standard Offering package, snapshot rollout logs
+- `sql/performance/snapshots/` the active-8 snapshot estate (DDL, procedures, schedulers, QA, its `docs/`); `sql/clients/<client>/` per-client deliverables; `sql/performance/bill_cycle/`, `sql/performance/billed_usage/validation/`, `sql/reconciliation/billing/`, `sql/diagnostics/cisadm_dictionary/` the governed packs `.github/workflows/sql-quality.yml` gates; `sql/analytics/` analytics SQL
+- `scripts/` automation: `scripts/jaspersoft/` promotion and domain tooling, `scripts/local/` client SQL runner, MCP, rollout steps, `scripts/performance/` validation runners, `scripts/repo/` hygiene gates, `scripts/doc/` signoff documents
+- `knowledge_base/` and `docs/` the CISADM reference corpus, runbooks and standards (`docs/assistant_skills/` the JRXML and SQL guardrails)
+- `.claude/skills/` the one loadable skill home (`originba-*`, `jaspersoft-client-tenant-import`, `originba-frontend`, `originba-security`)
+- `tests/` pytest (`api-ci.yml`); `ci/jrxml-smoke.yml` parked by design (needs the VCN)
+- `archive/<date>/` superseded files with `INDEX.md` and a pointer at every old path; `pipeline/`, `db_schema/`, `sample_data/` the older ETL/smoke pieces the parked CI file pins
 
 ## Jaspersoft Assets
-- Concrete report: `reports/billing_customer_statement.jrxml`
-- Billing verification flow: `reports/billing_verification_flow.jrxml`
-- Billing verification v2 validation runbook: `docs/billing_verification_v2_validation_runbook.md`
-- Usage/device dashboard: `reports/usage_device_dashboard.jrxml`
-- Base template: `reports/templates/base_customer_bill_template.jrxml`
-- Controls: `server/input_controls/billing_customer_statement_input_controls.json`
-- Billing verification controls: `server/input_controls/billing_verification_flow_input_controls.json`
-- Usage/device controls: `server/input_controls/usage_device_dashboard_input_controls.json`
-- Bundle build:
-  - `deploy/build_report_unit_billing_statement.sh`
-  - `deploy/build_report_unit_billing_statement.ps1`
+Indexed in `jaspersoft/README.md`. Report bundles are built by `deploy/build_report_unit*.sh` from `reports/*.jrxml` and `server/input_controls/*.json`.
 
 ## Domain Packages
-- Current exported packages:
-  - `domains/exports/billed_usage_domain.zip`
-  - `domains/exports/billed_usage_domain_optimized_v1_copy.zip`
-  - `domains/exports/bill_segment_domain_legacy_1.zip`
-- Working billing verification v2 domain package:
-  - `domains/working/billing_requirements_domain_v2/`
-- Manual import bundles retained from prior root-level exports:
-  - `domains/exports/manual_imports/FinalDomain.zip`
-  - `domains/exports/manual_imports/New Bill Cycle Domain.zip`
-  - `domains/exports/manual_imports/New Export Billing.zip`
-- Archived one-off ZIP bundles and patch variants:
-  - `archive/2026-03-10/root_zip_cleanup/`
+Indexed in `domains/README.md`: the seven active-8 domain XMLs and retained bundles under `domains/exports/manual_imports/`, the Newark deliverables under `domains/manual_imports/`, working copies under `domains/working/`. Generated domains live in `~/originba_dbt/jaspersoft/domains/`.
 
 ## Regenerate Deployment Bundles
 - PowerShell: `pwsh -File deploy/build_report_units.ps1`
@@ -80,21 +50,21 @@ Professional workspace for Oracle Utilities C2M (CISADM schema), Jaspersoft Doma
 - `python -m pipeline.validate_tables` (requires Oracle env vars)
 
 ## Domain Report Standards
-- Build/checklist guide: `docs/jaspersoft_domain_report_build_standards.md`
-- Origin 2025 styling implementation: `docs/jaspersoft_origin_2025_style_implementation.md`
-- Delivery playbook: `docs/c2m_jaspersoft_delivery_playbook.md`
-- Client promotion pipeline: `docs/jaspersoft_client_promotion_pipeline.md`
+- Build/checklist guide: `jaspersoft/docs/jaspersoft_domain_report_build_standards.md`
+- Origin 2025 styling implementation: `jaspersoft/docs/jaspersoft_origin_2025_style_implementation.md`
+- Delivery playbook: `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md`
+- Client promotion pipeline: `jaspersoft/docs/jaspersoft_client_promotion_pipeline.md`
 
 ## Jaspersoft Repository Promotion
 - Scope: standalone Jaspersoft repository export rewrite and client import preparation
 - Scripts: `scripts/jaspersoft/`
 - Staging area: `deploy/jaspersoft_client_promotion/`
 - Not part of the DB / SQL / snapshot optimization workflow
-- Artifact inventory: `docs/jaspersoft_artifact_inventory.md`
+- Artifact inventory: `jaspersoft/docs/jaspersoft_artifact_inventory.md`
 
 ## SQL + Jaspersoft Skills Workflow
 - Workflow runbook: `docs/sql_jaspersoft_workflow_implementation.md`
-- Local skills: `skills/README.md`
+- Local skills: `.claude/skills/` (one `SKILL.md` per skill; `skills/` archived 2026-09-08)
 - Knowledge base: `knowledge_base/README.md`
 - CISADM vocabulary guide: `docs/cisadm_workstream_vocabulary_guide.md`
 - CISADM SQL cheat sheet: `docs/cisadm_sql_cheat_sheet.md`

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Collection
 from datetime import datetime, timezone
 from typing import Any
 
@@ -46,11 +47,36 @@ def log_audit(
     )
 
 
+# Who-can-do-what changed, plus the security events that are not just a query running.
+# The Users & access feed asks for this set BY NAME: it used to ask for everything and
+# take the newest 40, and report_run -- the highest-volume action there is -- filled
+# every slot, so not one permission change was visible. Naming the set here rather than
+# listing action names in the client is what keeps the two from drifting apart.
+ADMIN_AUDIT_ACTIONS: frozenset[str] = frozenset({
+    "user.create",
+    "user.update",
+    "user.password_change",
+    "group.create",
+    "group.update",
+    "group.delete",
+    # No admin acts on these two, which is exactly why they belong in this feed.
+    "sso_jit_provision",
+    "sql_refused",
+})
+
+AUDIT_CATEGORIES: dict[str, frozenset[str]] = {"admin": ADMIN_AUDIT_ACTIONS}
+
+
 def list_audit_events(session: Session, limit: int = 100,
-                      action: str | None = None) -> list[dict[str, Any]]:
+                      action: str | None = None,
+                      actions: Collection[str] | None = None) -> list[dict[str, Any]]:
     stmt = select(AuditLog).where(AuditLog.client_id == _client_id())
     if action:
         stmt = stmt.where(AuditLog.action == action)
+    if actions:
+        # Narrowed in the query, not after it: filtering a page that telemetry already
+        # filled would still come back empty.
+        stmt = stmt.where(AuditLog.action.in_(sorted(actions)))
     rows = session.scalars(
         stmt.order_by(AuditLog.created_at.desc()).limit(max(1, min(limit, 500)))
     ).all()
@@ -79,9 +105,25 @@ def _workstreams_for_user(user: User) -> list[str]:
     return sorted(merged) if merged else ["*"]
 
 
+# An admin is a PLATFORM admin: no organization of their own, and therefore every
+# organization. Binding one to a single client used to be accepted and looked like it
+# scoped them, but nothing in the backend reads that field for authorization -- users,
+# groups and the audit log are all filtered by client_id, which is one value for the
+# whole deployment -- so the account was a deployment-wide superuser wearing a client's
+# name. The invariant is enforced here so both the create and update paths inherit it.
+# A real per-client admin tier would need portal_access_groups and portal_audit_log to
+# carry an organization first; see tests/test_admin_org_isolation.py.
+ADMIN_ORG_ERROR = (
+    "An admin administers every client and cannot be bound to one. "
+    "Leave the organization blank, or use the editor role for client-scoped access."
+)
+
+
 def _validate_organization_id(organization_id: str | None, role: str) -> str | None:
     org_id = (organization_id or "").strip() or None
-    if role == "admin" and not org_id:
+    if role == "admin":
+        if org_id:
+            raise AuthError(ADMIN_ORG_ERROR)
         return None
     if not org_id:
         raise AuthError("Organization is required for this role")
@@ -246,6 +288,20 @@ def update_user(
         user.role = role
         if role != "admin" and not (payload.get("organization_id") or user.organization_id):
             raise AuthError("Organization is required for this role")
+        # Promotion carries the old organization unless the caller clears it, and the
+        # panel's role dropdown sends only {role} -- so without this an org-bound editor
+        # promoted to admin kept their client and became the very account the invariant
+        # forbids, never passing through _validate_organization_id at all.
+        # The organization is assigned further down, so read what this request will
+        # LEAVE the user with: an explicit value (including a deliberate null) if the
+        # caller sent one, otherwise the organization they already carry.
+        if role == "admin":
+            resulting_org = (
+                payload["organization_id"] if "organization_id" in payload
+                else user.organization_id
+            )
+            if resulting_org:
+                raise AuthError(ADMIN_ORG_ERROR)
 
     if payload.get("display_name") is not None:
         user.display_name = payload["display_name"].strip()

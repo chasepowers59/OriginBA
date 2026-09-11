@@ -26,36 +26,34 @@ export function HomeDashboard() {
 
   return (
     <div className="space-y-8">
-      <section className="glass-panel relative overflow-hidden p-8 md:p-10">
-        <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-band blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 left-1/3 h-48 w-48 rounded-full text-chart-2 blur-3xl" />
-        <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
-            {brandLine(brand)}
-          </p>
-          <h1 className="mt-2 max-w-2xl text-4xl font-bold tracking-tight text-heading md:text-5xl">
-            Governed analytics across{" "}
-            <span className="bg-gradient-to-r from-primary to-accent-2 bg-clip-text text-transparent">
-              every utility workstream
-            </span>
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-fg-muted">
-            {brand.tagline}. Explore any reporting table yourself, start from a governed
-            report pack for billing close, payments, operations and collections, or ask a
-            question in plain language.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/build" className="btn-primary">
+      {/* A compact bar, not a landing page. Signed in, the reader already knows what the
+          product is; the marketing hero cost roughly half a laptop viewport before a
+          single number appeared, so the executive overview began below the fold on the
+          screen people open every morning. The two entry points and the honest counts
+          stay -- only the pitch goes. */}
+      <section className="glass-panel relative overflow-hidden px-5 py-4">
+        <div className="pointer-events-none absolute -right-20 -top-24 h-48 w-48 rounded-full bg-band blur-3xl" />
+        <div className="relative flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-heading-accent">
+              {brandLine(brand)}
+            </p>
+            <p className="mt-0.5 text-sm text-fg-muted">
+              {/* Real counts only — fabricated placeholders confidently lied when the
+                  API was down. */}
+              {workstreamCount
+                ? `${workstreamCount} workstreams · ${snapshotCount} reporting tables`
+                : "\u00a0"}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/build" className="btn-primary text-sm">
               Explore your data
             </Link>
-            <Link href="/reports" className="btn-ghost">
+            <Link href="/reports" className="btn-ghost text-sm">
               Open report library
             </Link>
           </div>
-          <p className="mt-4 text-xs text-fg-muted">
-            {/* Real counts only — fabricated placeholders confidently lied when the API was down. */}
-            {workstreamCount ? `${workstreamCount} workstreams · ${snapshotCount} reporting tables` : "\u00a0"}
-          </p>
         </div>
       </section>
 

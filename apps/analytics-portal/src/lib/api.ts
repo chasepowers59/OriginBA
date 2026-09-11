@@ -21,6 +21,7 @@ import type {
   WorkstreamSummary,
 } from "./types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
+import { localIsoDate } from "@/lib/format";
 import { parseApiError } from "@/lib/apiErrors";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -143,6 +144,7 @@ export function fetchExecutiveSummary(
   compare = false,
   crossFilter?: { field: string; value: string },
   compareMode: "prior_period" | "mom" | "yoy" = "prior_period",
+  lenses?: Record<string, string>,
 ): Promise<ExecutiveSummary> {
   const params = new URLSearchParams({
     days: String(days),
@@ -152,6 +154,10 @@ export function fetchExecutiveSummary(
   if (crossFilter) {
     params.set("cross_field", crossFilter.field);
     params.set("cross_value", crossFilter.value);
+  }
+  // one `lens=<kpi>:<lens>` per card the reader has switched; the rest keep their default
+  for (const [kpiId, lensId] of Object.entries(lenses ?? {})) {
+    params.append("lens", `${kpiId}:${lensId}`);
   }
   return fetchJson<ExecutiveSummary>(`/snapshots/executive-summary?${params}`);
 }
@@ -402,47 +408,41 @@ export function fetchSnapshotSampleRows(
   return fetchJson<SampleRowsResponse>(`/snapshots/${snapshotId}/sample-rows?limit=${limit}`);
 }
 
-export function runSnapshotRawSql(
-  snapshotId: string,
-  sql: string,
-  limit = 100,
-): Promise<QueryResponse> {
-  return fetchJson<QueryResponse>(`/snapshots/${snapshotId}/raw-sql`, {
-    method: "POST",
-    body: JSON.stringify({ sql, limit }),
-  });
-}
-
+// Every boundary below is formatted with localIsoDate, never toISOString(). See that
+// helper: these ranges filter BUSINESS dates, so they belong in the viewer's calendar.
+// Two failures were live before this, both invisible on a UTC machine -- west of UTC
+// (every US utility here) the END rolled to TOMORROW for the last hours of each
+// evening, and "Prior month" ENDED on the 1st of the CURRENT month, including a day of
+// the very month it exists to exclude.
 export function defaultDateRange(days = 90): [string, string] {
   const end = new Date();
   const start = new Date();
   start.setDate(end.getDate() - days);
-  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+  return [localIsoDate(start), localIsoDate(end)];
 }
 
 export function defaultDateRangeYtd(): [string, string] {
   const end = new Date();
   const start = new Date(end.getFullYear(), 0, 1);
-  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+  return [localIsoDate(start), localIsoDate(end)];
 }
 
 export function defaultDateRangeLastMonth(): [string, string] {
   const end = new Date();
-  end.setDate(0);
+  end.setDate(0); // day 0 of this month == the last day of the previous one
   const start = new Date(end.getFullYear(), end.getMonth(), 1);
-  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+  return [localIsoDate(start), localIsoDate(end)];
 }
 
 export function fetchDatabaseTables(
-  // Empty = let the API pick the engine's own schema (reporting for the warehouse,
-  // CISADM for a legacy Oracle tenant).
+  // Empty = let the API pick the engine's own schema (reporting for Postgres, CISADM
+  // for an Oracle tenant).
   schema = "",
   search = "",
-  opts?: { snapshotsOnly?: boolean; includeStats?: boolean },
+  opts?: { includeStats?: boolean },
 ): Promise<DatabaseTablesResponse> {
   const params = new URLSearchParams(schema ? { schema } : {});
   if (search.trim()) params.set("search", search.trim());
-  if (opts?.snapshotsOnly === false) params.set("snapshots_only", "false");
   if (opts?.includeStats) params.set("include_stats", "true");
   return fetchJson<DatabaseTablesResponse>(`/database/tables?${params}`);
 }
