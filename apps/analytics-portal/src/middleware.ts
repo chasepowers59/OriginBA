@@ -73,5 +73,13 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|brand-icon.svg).*)"],
+  // Anything with a dot in its path is a FILE in public/, and a file must never be routed through
+  // an auth redirect: the browser then gets the login page's HTML where it asked for an image, and
+  // the logo silently disappears with no console error worth the name. This listed the files one by
+  // one and brand-icon.svg was the only one anybody had added, so origin-logo.png, its white
+  // variant and origin-mark.png were all being redirected to /login.
+  //
+  // No app route contains a dot, so the pattern covers every file added to public/ from now on
+  // without anyone having to remember this.
+  matcher: ["/((?!_next/static|_next/image|.*\\..*).*)"],
 };
