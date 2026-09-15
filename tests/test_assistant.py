@@ -142,6 +142,21 @@ class TheLoop(unittest.TestCase):
         self.assertIn("Reference: cisadm-sql", system[1]["text"])
         self.assertEqual(system[1]["cache_control"], {"type": "ephemeral"})
 
+    def test_an_empty_text_block_never_goes_back_to_the_api(self):
+        # the first real Sonnet turn came back as [text(""), tool_use]; echoing that
+        # assistant content verbatim was a 400: "text content blocks must be non-empty"
+        client = FakeClient([
+            _resp([_text(""), _tool("t1", "list_canvases", {})], "tool_use"),
+            _resp([_text("done")], "end_turn"),
+        ])
+        Assistant(org_id="dev", org_name="Dev", actor_email="a@b", actor_id=None,
+                  client_factory=lambda: client).ask("hi")
+        second_call = client.requests[1]["messages"]
+        for m in second_call:
+            for b in (m["content"] if isinstance(m["content"], list) else []):
+                if b.get("type") == "text":
+                    self.assertTrue(b["text"], "an empty text block was sent back")
+
     def test_a_refused_statement_goes_back_to_the_model_as_an_error_and_never_runs(self):
         client = FakeClient([
             # a statement the WORKSPACE would allow (cisadm is in its scope, no secret named):

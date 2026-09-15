@@ -362,7 +362,9 @@ class Assistant:
             if u:
                 usage["input_tokens"] += getattr(u, "input_tokens", 0) or 0
                 usage["output_tokens"] += getattr(u, "output_tokens", 0) or 0
-            content = [_block_dict(b) for b in resp.content]
+            # the API refuses an empty text block on the way back in, and a tool-use turn
+            # often arrives as [text(""), tool_use]
+            content = [d for d in (_block_dict(b) for b in resp.content) if d["type"] != "text" or d["text"]]
             messages.append({"role": "assistant", "content": content})
             text = "\n".join(b["text"] for b in content if b["type"] == "text").strip()
             if text:
