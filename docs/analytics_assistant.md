@@ -30,7 +30,7 @@ sent with prompt caching, so it is paid for once per cache window, not per quest
 | Variable | |
 | --- | --- |
 | `ANTHROPIC_API_KEY` | required; unset means `/portal/assistant/status` reports `configured: false` and `POST` answers 503 |
-| `ASSISTANT_MODEL` | default `claude-sonnet-5` |
+| `ASSISTANT_MODEL` | default `claude-sonnet-5`. `stub` (development only, refused in production) is a scripted stand-in that lists the canvases, picks one by name, runs one aggregate on its default date field, and labels every answer as the stub -- so the whole path can be exercised with no key |
 
 Permission: `nlq:read`. The organization comes from the auth context, never from the request.
 
@@ -54,3 +54,21 @@ The loop stops after 8 tool calls and says so rather than run on.
 `tests/test_assistant.py` runs without a key or a network: a fake model client scripts the tool
 calls, the executor is patched, the catalog is real. It proves the canvases-only fence, the
 validated path, the row cap, the audit, the loop cap, and the routes' answers when unconfigured.
+
+## Measured (Ellensburg 25.4, 2026-09-15)
+
+Driven from the browser as the Ellensburg organization (Oracle, in-database warehouse, over the VPN):
+
+| | |
+| --- | --- |
+| list / describe / prompt build / knowledge search | 0-3 ms each (in-process; catalog and knowledge cached) |
+| system prompt | ~50,000 chars, ~12,500 tokens, sent with prompt caching |
+| bill segments by year (1.3M+ segments, aggregate) | 1,072 ms cold, 51 ms warm (Oracle pool + result cache) |
+| a 300-row detail with ORDER BY over the whole canvas | 5,800 ms -- the prompt now steers away from this shape |
+| request round trip, warm | 103 ms; answer payload 3 KB; `/status` 13 ms |
+| a CISADM read | refused in 0 ms, before any connection |
+
+Statement timeouts already exist below the assistant: 30 s on Postgres (`SET LOCAL statement_timeout`)
+and the Oracle call timeout on the pooled session. A query slower than 8 s comes back to the model
+with a note to narrow it. In development, React StrictMode fetches `/status` twice on mount; that
+is a development-only double effect, not a production cost.
