@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { askAssistant, fetchAssistantStatus, fetchIntegrity } from "@/lib/api";
-import { WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, summarise, threadFor, type Turn } from "@/lib/assistant";
-import type { AssistantQuery, AssistantResponse, AssistantStatus, IntegrityOverview } from "@/lib/types";
+import { askAssistant, fetchAssistantSpend, fetchAssistantStatus, fetchIntegrity } from "@/lib/api";
+import { WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, spendLabel, summarise, threadFor, type Turn } from "@/lib/assistant";
+import type { AssistantQuery, AssistantResponse, AssistantSpend, AssistantStatus, IntegrityOverview } from "@/lib/types";
 
 /**
  * Ask a question about this organization's data in plain language. The answer comes from
@@ -14,6 +14,7 @@ import type { AssistantQuery, AssistantResponse, AssistantStatus, IntegrityOverv
 export function AssistantPanel({ compact }: { compact?: boolean }) {
   const [status, setStatus] = useState<AssistantStatus | null>(null);
   const [integrity, setIntegrity] = useState<IntegrityOverview | null>(null);
+  const [spend, setSpend] = useState<AssistantSpend | null>(null);
   const [question, setQuestion] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [busy, setBusy] = useState(false);
@@ -22,6 +23,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
   useEffect(() => {
     fetchAssistantStatus().then(setStatus).catch(() => setStatus({ configured: false, model: null }));
     fetchIntegrity().then(setIntegrity).catch(() => setIntegrity(null));
+    fetchAssistantSpend().then(setSpend).catch(() => setSpend(null));
   }, []);
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "nearest" });
@@ -36,6 +38,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
     try {
       const response = await askAssistant(q, threadFor(turns));
       setTurns((t) => appendTurns(t, q, response));
+      fetchAssistantSpend().then(setSpend).catch(() => undefined);
     } catch (err) {
       setTurns((t) => [...t, { role: "user", text: q },
         { role: "error", text: err instanceof Error ? err.message : "The assistant could not answer." }]);
@@ -59,6 +62,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
           {integrity ? (
             <p className="mt-1 text-xs text-fg-muted" data-testid="integrity-headline">{integrityHeadline(integrity)}</p>
           ) : null}
+          {spend ? <p className="text-xs text-fg-muted" data-testid="spend-line">{spendLabel(spend)}</p> : null}
         </div>
         {turns.length ? (
           <button type="button" className="btn-ghost text-xs" onClick={() => setTurns([])} disabled={busy}>

@@ -38,6 +38,9 @@ Token cost and the levers that control it: `docs/assistant_token_budget.md`.
 
 Permission: `nlq:read`. The organization comes from the auth context, never from the request.
 
+`GET /portal/assistant/spend` — today's input-equivalent spend for the caller's organization, per
+person, against `ASSISTANT_DAILY_TOKEN_BUDGET` (null when no cap). The panel shows the same line.
+
 ## Request and response
 
 ```json

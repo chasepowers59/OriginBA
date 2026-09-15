@@ -391,6 +391,19 @@ class Routes(unittest.TestCase):
         self.assertIn("minute", second.json()["detail"])
         self.assertGreaterEqual(questions_last_minute("dev@origin.local"), 1)
 
+    def test_spend_is_visible_per_day_and_per_person(self):
+        self._spend("dev", "a@origin.local", input_tokens=1000)
+        self._spend("dev", "b@origin.local", output_tokens=100)   # 500 equivalent
+        r = self.client.get("/portal/assistant/spend")
+        self.assertEqual(r.status_code, 200)
+        body = r.json()
+        self.assertEqual(body["organization"], "dev")
+        self.assertGreaterEqual(body["today"], 1500)
+        by = {p["actor"]: p for p in body["people"]}
+        self.assertGreaterEqual(by["a@origin.local"]["tokens"], 1000)
+        self.assertGreaterEqual(by["b@origin.local"]["questions"], 1)
+        self.assertIn("budget", body)   # null when no cap is set
+
     def test_an_empty_question_is_rejected(self):
         with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-only"}):
             self.assertEqual(self.client.post("/portal/assistant", json={"question": ""}).status_code, 422)

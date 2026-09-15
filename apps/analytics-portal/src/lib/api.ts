@@ -20,7 +20,7 @@ import type {
   SnapshotsIndex,
   WorkstreamSummary,
 } from "./types";
-import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview } from "@/lib/types";
+import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview, AssistantSpend } from "@/lib/types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
 import { localIsoDate } from "@/lib/format";
 import { parseApiError } from "@/lib/apiErrors";
@@ -469,6 +469,10 @@ export function countDatabaseSql(sql: string): Promise<DatabaseSqlCountResponse>
 
 export function fetchIntegrity(): Promise<IntegrityOverview> {
   return fetchJson<IntegrityOverview>("/portal/integrity");
+}
+
+export function fetchAssistantSpend(): Promise<AssistantSpend> {
+  return fetchJson<AssistantSpend>("/portal/assistant/spend");
 }
 
 export function fetchAssistantStatus(): Promise<AssistantStatus> {

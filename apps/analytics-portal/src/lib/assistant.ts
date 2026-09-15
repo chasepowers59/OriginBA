@@ -3,7 +3,7 @@
  * and the model-facing thread the API hands back for a follow-up.
  */
 import { formatCellValue, isIdentifierColumn } from "@/lib/format";
-import type { CanvasIntegrity, AssistantMessage, AssistantResponse, IntegrityOverview } from "@/lib/types";
+import type { AssistantSpend, CanvasIntegrity, AssistantMessage, AssistantResponse, IntegrityOverview } from "@/lib/types";
 
 export type Turn =
   | { role: "user"; text: string }
@@ -72,4 +72,11 @@ export function integrityHeadline(o: IntegrityOverview, now: Date = new Date()):
   const proven = o.canvases.filter((c) => c.verdict === "proven").length;
   const built = o.canvas_as_of ? `Canvases built ${ageLabel(o.canvas_as_of, now)}` : "Canvas build time unknown";
   return `${built} · ${proven} of ${o.canvases.length} canvases proven against the source database`;
+}
+
+/** "Today: 44,464 tokens (2 questions) of a 2,000,000 budget" -- what the organization has spent. */
+export function spendLabel(s: AssistantSpend): string {
+  const q = `${s.questions} question${s.questions === 1 ? "" : "s"}`;
+  const base = `Today: ${s.today.toLocaleString()} tokens (${q})`;
+  return s.budget ? `${base} of a ${s.budget.toLocaleString()} budget` : base;
 }

@@ -46,12 +46,19 @@ asks for short answers and `MAX_TOKENS` caps a turn at 2,048.
 | `describe_canvas` as one line per column, meaning = first clause | ON | rpt_bill_segment 22,751 → ~11K chars (≈5.5K → ≈2.7K tokens), and it is re-sent on every later turn |
 | Prompt: do not repeat the SQL/rows in the answer; trailing windows start at midnight (`TRUNC(SYSDATE) - N`) | ON | output is the 5x class; the first answers repeated the SQL the card already shows |
 
-Not done:
+Tried and declined:
 
-1. **Model routing**: Haiku 4.5 for "which canvas / what does X mean" questions, Sonnet for
-   SQL. Only after a quality comparison on the fixed question set below — cheaper and wrong
-   is worse than nothing.
-2. **A spend view for admins** (per org, per person, per day) over the same audit rows.
+1. **Haiku 4.5 instead of Sonnet** (the fixed set, 2026-09-15). Q1 right ($1,740,989);
+   Q2 right; **Q3 wrong twice**: it summed the 61–90 bucket for "over 90 days" and dropped the
+   revenue-bearing filter, then described the snapshot verification as a "+$19.5K" figure that
+   exists nowhere in the tool result. It also spent MORE tokens per question (21.7K / 11.4K /
+   20.5K input-equivalent vs Sonnet's 13K / 7K / 19K): extra `describe_canvas` and
+   `list_canvases` calls, and its follow-up missed the cache. At roughly a third of the
+   per-token price that is still cheaper in dollars, and still wrong on the question that
+   matters. Not until a prompt change makes it pass the set. Re-run: set
+   `ASSISTANT_MODEL=claude-haiku-4-5-20251001` in the eval script's environment.
+2. ~~A spend view~~ — `GET /portal/assistant/spend` (per org, per person, today, vs budget); the
+   panel prints "Today: N tokens" under its headline.
 
 ## Testing protocol (spend as little as possible)
 

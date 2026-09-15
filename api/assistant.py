@@ -87,13 +87,38 @@ def _ask_rows(since: datetime.datetime, **where: str) -> list[str]:
         return []
 
 
+def _midnight_utc() -> datetime.datetime:
+    return datetime.datetime.now(datetime.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+
+
 def spend_today(org_id: str) -> int:
     """This organization's input-equivalent tokens since midnight UTC."""
-    day = datetime.datetime.now(datetime.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
-    total = 0
-    for detail in _ask_rows(day, target_id=org_id):
-        total += input_equivalent({k: int(v) for k, v in _COUNT.findall(detail)})
-    return total
+    return sum(input_equivalent({k: int(v) for k, v in _COUNT.findall(d)})
+               for d in _ask_rows(_midnight_utc(), target_id=org_id))
+
+
+def spend_report(org_id: str) -> dict[str, Any]:
+    """Today's spend for an organization, per person: the admin's view of the same audit rows."""
+    from api.auth.database import get_session_factory
+    from api.auth.models import AuditLog
+    people: dict[str, dict[str, int]] = {}
+    try:
+        with get_session_factory()() as session:
+            rows = session.query(AuditLog.actor_email, AuditLog.detail).filter(
+                AuditLog.action == "assistant_ask", AuditLog.target_id == org_id,
+                AuditLog.created_at >= _midnight_utc()).all()
+    except Exception:  # noqa: BLE001
+        rows = []
+    for actor, detail in rows:
+        p = people.setdefault(actor, {"questions": 0, "tokens": 0})
+        p["questions"] += 1
+        p["tokens"] += input_equivalent({k: int(v) for k, v in _COUNT.findall(detail)})
+    budget = os.getenv("ASSISTANT_DAILY_TOKEN_BUDGET", "").strip()
+    return {"organization": org_id, "day": _midnight_utc().date().isoformat(),
+            "today": sum(p["tokens"] for p in people.values()),
+            "questions": sum(p["questions"] for p in people.values()),
+            "budget": int(budget) if budget else None,
+            "people": sorted(({"actor": a, **p} for a, p in people.items()), key=lambda x: -x["tokens"])}
 
 
 def questions_last_minute(actor_email: str) -> int:

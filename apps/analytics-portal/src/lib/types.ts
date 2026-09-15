@@ -583,6 +583,14 @@ export type AssistantResponse = {
   thread: AssistantMessage[];
 };
 export type AssistantStatus = { configured: boolean; model: string | null };
+export type AssistantSpend = {
+  organization: string;
+  day: string;
+  today: number;
+  questions: number;
+  budget: number | null;
+  people: { actor: string; questions: number; tokens: number }[];
+};
 export type IntegrityOverview = {
   available: boolean;
   client?: string | null;

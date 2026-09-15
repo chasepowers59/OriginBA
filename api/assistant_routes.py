@@ -8,7 +8,8 @@ from pydantic import BaseModel, Field
 
 import os
 
-from api.assistant import Assistant, assistant_configured, model_name, questions_last_minute, spend_today
+from api.assistant import (Assistant, assistant_configured, model_name, questions_last_minute, spend_report,
+                           spend_today)
 from api.auth.dependencies import AuthContext, get_auth_context
 from api.org_db import require_org_for_data
 
@@ -24,6 +25,13 @@ class AskRequest(BaseModel):
 def status(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     ctx.require_permission("nlq:read")
     return {"configured": assistant_configured(), "model": model_name() if assistant_configured() else None}
+
+
+@router.get("/spend")
+def spend(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
+    """Today's token spend for the caller's organization, per person, against the daily budget."""
+    ctx.require_permission("nlq:read")
+    return spend_report(require_org_for_data(ctx))
 
 
 @router.post("")

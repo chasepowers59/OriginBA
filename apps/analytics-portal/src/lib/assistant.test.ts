@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ageLabel, appendTurns, cell, integrityHeadline, integrityLabel, summarise, threadFor, type Turn } from "./assistant";
+import { ageLabel, appendTurns, cell, integrityHeadline, integrityLabel, spendLabel, summarise, threadFor, type Turn } from "./assistant";
 import type { AssistantResponse, CanvasIntegrity, IntegrityOverview } from "./types";
 
 const answer = (thread: unknown[] = []): AssistantResponse => ({
@@ -71,5 +71,14 @@ describe("what a figure can be trusted to", () => {
     };
     expect(integrityHeadline(o, now)).toBe("Canvases built 5 days ago · 1 of 2 canvases proven against the source database");
     expect(integrityHeadline({ available: false, canvases: [] }, now)).toBe("No verification on record for this organization yet.");
+  });
+});
+
+describe("what the organization has spent", () => {
+  it("reads as a sentence, with the budget when there is one", () => {
+    const base = { organization: "o", day: "2026-09-15", today: 44464, questions: 2, people: [] };
+    expect(spendLabel({ ...base, budget: null })).toBe("Today: 44,464 tokens (2 questions)");
+    expect(spendLabel({ ...base, budget: 2000000 })).toBe("Today: 44,464 tokens (2 questions) of a 2,000,000 budget");
+    expect(spendLabel({ ...base, questions: 1, budget: null })).toBe("Today: 44,464 tokens (1 question)");
   });
 });
