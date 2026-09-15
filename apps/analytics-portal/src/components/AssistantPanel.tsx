@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { askAssistant, fetchAssistantStatus } from "@/lib/api";
-import { WORKSPACE_SQL_KEY, appendTurns, cell, summarise, threadFor, type Turn } from "@/lib/assistant";
-import type { AssistantQuery, AssistantResponse, AssistantStatus } from "@/lib/types";
+import { askAssistant, fetchAssistantStatus, fetchIntegrity } from "@/lib/api";
+import { WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, summarise, threadFor, type Turn } from "@/lib/assistant";
+import type { AssistantQuery, AssistantResponse, AssistantStatus, IntegrityOverview } from "@/lib/types";
 
 /**
  * Ask a question about this organization's data in plain language. The answer comes from
@@ -13,6 +13,7 @@ import type { AssistantQuery, AssistantResponse, AssistantStatus } from "@/lib/t
  */
 export function AssistantPanel({ compact }: { compact?: boolean }) {
   const [status, setStatus] = useState<AssistantStatus | null>(null);
+  const [integrity, setIntegrity] = useState<IntegrityOverview | null>(null);
   const [question, setQuestion] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [busy, setBusy] = useState(false);
@@ -20,6 +21,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
 
   useEffect(() => {
     fetchAssistantStatus().then(setStatus).catch(() => setStatus({ configured: false, model: null }));
+    fetchIntegrity().then(setIntegrity).catch(() => setIntegrity(null));
   }, []);
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "nearest" });
@@ -54,6 +56,9 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
             It reads your reporting canvases, writes and runs read-only SQL, and shows you every query
             it ran. It never sees CISADM tables or another organization&rsquo;s data.
           </p>
+          {integrity ? (
+            <p className="mt-1 text-xs text-fg-muted" data-testid="integrity-headline">{integrityHeadline(integrity)}</p>
+          ) : null}
         </div>
         {turns.length ? (
           <button type="button" className="btn-ghost text-xs" onClick={() => setTurns([])} disabled={busy}>
@@ -138,6 +143,13 @@ function QueryResult({ q }: { q: AssistantQuery }) {
           <Link href="/database" className="btn-ghost text-xs" onClick={handoff}>Open in SQL workspace</Link>
         </div>
       </div>
+      {q.integrity?.length ? (
+        <ul className="border-t border-edge-subtle px-3 py-2 text-xs text-fg-muted">
+          {q.integrity.map((i) => (
+            <li key={i.canvas} className={i.verdict === "differences" ? "text-over" : undefined}>{integrityLabel(i)}</li>
+          ))}
+        </ul>
+      ) : null}
       {open ? <pre className="overflow-x-auto border-t border-edge-subtle px-3 py-2 text-xs text-heading">{q.sql}</pre> : null}
       {shown.length ? (
         <div className="overflow-auto border-t border-edge-subtle">

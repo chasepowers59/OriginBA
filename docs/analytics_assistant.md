@@ -12,10 +12,8 @@ by its tools, not by its instructions.
 | `describe_canvas` | every column of one canvas with type, role and meaning, plus date fields |
 | `run_sql` | validated by the SQL workspace's validator (read-only, secrets guard, engine fence), then **fenced to `rpt_*` canvases only**, scoped to the organization, capped at 200 rows, audited as `assistant_sql` / `assistant_sql_refused` with the question's purpose |
 | `search_knowledge` | keyword search over the C2M skills (`api/assistant_knowledge/`) and the canvas column descriptions |
+| `verification_status` | When a canvas was last proven against the client's own database and against what: raw CISADM (`run_source_parity.py`) and the legacy snapshot tables today's reports read (`run_snapshot_parity.py`: `CMS_SA_SNAPSHOT`, `*_RPT_CURR`), plus the canvas build age. The prompt requires it for every canvas a figure comes from. `run_sql` also attaches the same evidence to every query it returns (`integrity[]`), and the panel prints it under the query. Source: `api/integrity.py`, reading the dbt repo's `qa_reports/*_latest.json` (`ORIGINBA_QA_REPORTS`); `GET /portal/integrity[/{canvas}]` serves it to the UI. Nothing on record = "no verification on record", never a guess. |
 
-`run_sql` is the only path to data, and it is the same `_validate` / `_run` pair the SQL
-workspace uses, so the assistant can do nothing a user could not do in the workspace, and
-strictly less: the workspace admits CISADM, the assistant does not (Chase, 2026-09-15).
 
 ## What it knows
 

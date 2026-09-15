@@ -551,6 +551,12 @@ export type ReportLibraryResponse = {
 
 // ---- the analytics assistant (api/assistant.py)
 export type AssistantStep = { tool: string; input: string; ok: boolean };
+export type CanvasIntegrity = {
+  canvas: string;
+  verdict: "proven" | "differences" | "not covered" | "unavailable";
+  canvas_as_of: string | null;
+  summary: string;
+};
 export type AssistantQuery = {
   purpose: string;
   sql: string;
@@ -559,6 +565,7 @@ export type AssistantQuery = {
   row_count: number;
   truncated: boolean;
   ms: number;
+  integrity?: CanvasIntegrity[];
 };
 export type AssistantMessage = { role: "user" | "assistant"; content: unknown };
 export type AssistantResponse = {
@@ -570,3 +577,19 @@ export type AssistantResponse = {
   thread: AssistantMessage[];
 };
 export type AssistantStatus = { configured: boolean; model: string | null };
+export type IntegrityOverview = {
+  available: boolean;
+  client?: string | null;
+  canvas_as_of?: string | null;
+  canvas_age_hours?: number | null;
+  source_run_at?: string | null;
+  snapshot_run_at?: string | null;
+  canvases: {
+    canvas: string;
+    verdict: CanvasIntegrity["verdict"];
+    source_green: number | null;
+    source_checks: number | null;
+    snapshot_against: string | null;
+    snapshot_ok: boolean | null;
+  }[];
+};

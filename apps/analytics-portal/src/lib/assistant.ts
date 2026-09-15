@@ -3,7 +3,7 @@
  * and the model-facing thread the API hands back for a follow-up.
  */
 import { formatCellValue, isIdentifierColumn } from "@/lib/format";
-import type { AssistantMessage, AssistantResponse } from "@/lib/types";
+import type { CanvasIntegrity, AssistantMessage, AssistantResponse, IntegrityOverview } from "@/lib/types";
 
 export type Turn =
   | { role: "user"; text: string }
@@ -45,4 +45,28 @@ export function summarise(r: AssistantResponse): string {
 export function cell(v: unknown, column?: string): string {
   if (column && (isIdentifierColumn(column) || /\byear\b/i.test(column))) return v == null ? "—" : String(v);
   return formatCellValue(v, { columnId: column });
+}
+
+/** One line per canvas a query read: what it was proven against and how old the build is. */
+export function integrityLabel(i: CanvasIntegrity): string {
+  const age = i.canvas_as_of ? ageLabel(i.canvas_as_of) : null;
+  const built = age ? ` · built ${age}` : "";
+  if (i.verdict === "unavailable") return `${i.canvas}: no verification on record`;
+  if (i.verdict === "not covered") return `${i.canvas}: not covered by a parity check${built}`;
+  return `${i.canvas}: ${i.verdict === "proven" ? "proven" : "differences"} (${i.summary})${built}`;
+}
+
+export function ageLabel(iso: string, now: Date = new Date()): string {
+  const h = Math.floor((now.getTime() - new Date(iso).getTime()) / 3_600_000);
+  if (h < 1) return "within the hour";
+  if (h < 48) return `${h} h ago`;
+  return `${Math.floor(h / 24)} days ago`;
+}
+
+/** The panel's standing line: how current the canvases are and how many are proven. */
+export function integrityHeadline(o: IntegrityOverview, now: Date = new Date()): string {
+  if (!o.available) return "No verification on record for this organization yet.";
+  const proven = o.canvases.filter((c) => c.verdict === "proven").length;
+  const built = o.canvas_as_of ? `Canvases built ${ageLabel(o.canvas_as_of, now)}` : "Canvas build time unknown";
+  return `${built} · ${proven} of ${o.canvases.length} canvases proven against the source database`;
 }

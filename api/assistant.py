@@ -28,6 +28,7 @@ import time
 from pathlib import Path
 from typing import Any, Callable
 
+from api.integrity import canvas_summary, for_query
 from api.snapshot_catalog import load_catalog, org_backend
 from api.sql_workspace_validator import SqlWorkspaceValidationError, strip_sql_noise
 
@@ -131,6 +132,14 @@ TOOLS: list[dict[str, Any]] = [
                       "properties": {"sql": {"type": "string"},
                                      "purpose": {"type": "string", "description": "one line: what this query establishes"}},
                       "required": ["sql", "purpose"]}},
+    {"name": "verification_status",
+     "description": "When a canvas was last proven against the client's own database and against "
+                    "what: raw CISADM (counts, money totals) and the legacy snapshot tables today's "
+                    "reports read (CMS_SA_SNAPSHOT, *_RPT_CURR), plus how old the canvas build is. "
+                    "Call it for every canvas whose figures you report, and tell the user.",
+     "input_schema": {"type": "object",
+                      "properties": {"canvas_id": {"type": "string", "description": "e.g. rpt_financial_txn"}},
+                      "required": ["canvas_id"]}},
     {"name": "search_knowledge",
      "description": "Search the C2M reference notes (SQL traps, business processes, what a "
                     "status means, which canvas holds what) and the canvas column "
@@ -176,6 +185,10 @@ def tool_describe_canvas(org_id: str, engine: str, canvas_id: str) -> dict[str, 
     }
 
 
+def tool_verification_status(org_id: str, canvas_id: str) -> dict[str, Any]:
+    return canvas_summary(org_id, canvas_id)
+
+
 def tool_search_knowledge(org_id: str, query: str, limit: int = 8) -> list[dict[str, str]]:
     """Keyword search: paragraphs of the knowledge files and canvas column descriptions,
     scored by how many query words they carry. Small, honest, and no vector store to run."""
@@ -219,7 +232,8 @@ def tool_run_sql(org_id: str, engine: str, sql: str, *, actor_email: str, actor_
                         target_type="sql", target_id=org_id,
                         detail=f"rows={len(rows)}; ms={ms}; purpose: {purpose[:120]}; sql: {validated[:300]}")
     out: dict[str, Any] = {"columns": columns, "rows": [[_cell(v) for v in r] for r in rows],
-                           "row_count": len(rows), "truncated": truncated, "ms": ms, "sql": validated}
+                           "row_count": len(rows), "truncated": truncated, "ms": ms, "sql": validated,
+                           "integrity": for_query(org_id, validated)}
     if ms > SLOW_MS:
         out["note"] = (f"This query took {ms / 1000:.1f}s. Narrow the date window or aggregate "
                        f"further before running another like it.")
@@ -278,6 +292,10 @@ How you work:
 4. Answer in plain language first: the number or the list, what it covers (which canvas, which
    date window, which filters), and any caveat from the reference notes (frozen vs unfrozen,
    final vs initial measurements, units, grain). Then show the SQL you ran.
+5. Say how far the figure can be trusted: call verification_status for each canvas you used and
+   state when it was last proven against the client's database (raw CISADM and the snapshot
+   tables their current reports read) and how old the canvas build is. A canvas older than a
+   day means figures lag the live system; a "differences" verdict means name the difference.
 
 Rules you never break:
 - Reporting canvases (rpt_*) only. Never CISADM tables, never other schemas.
@@ -322,6 +340,8 @@ class Assistant:
             return tool_describe_canvas(self.org_id, self.engine, args.get("canvas_id", ""))
         if name == "search_knowledge":
             return tool_search_knowledge(self.org_id, args.get("query", ""))
+        if name == "verification_status":
+            return tool_verification_status(self.org_id, args.get("canvas_id", ""))
         if name == "run_sql":
             return tool_run_sql(self.org_id, self.engine, args.get("sql", ""), actor_email=self.actor_email,
                                 actor_id=self.actor_id, purpose=args.get("purpose", ""))

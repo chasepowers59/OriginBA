@@ -20,7 +20,7 @@ import type {
   SnapshotsIndex,
   WorkstreamSummary,
 } from "./types";
-import type { AssistantMessage, AssistantResponse, AssistantStatus } from "@/lib/types";
+import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview } from "@/lib/types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
 import { localIsoDate } from "@/lib/format";
 import { parseApiError } from "@/lib/apiErrors";
@@ -465,6 +465,10 @@ export function countDatabaseSql(sql: string): Promise<DatabaseSqlCountResponse>
     method: "POST",
     body: JSON.stringify({ sql, offset: 0, page_size: 50 }),
   });
+}
+
+export function fetchIntegrity(): Promise<IntegrityOverview> {
+  return fetchJson<IntegrityOverview>("/portal/integrity");
 }
 
 export function fetchAssistantStatus(): Promise<AssistantStatus> {
