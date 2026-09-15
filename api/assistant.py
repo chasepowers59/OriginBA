@@ -21,6 +21,7 @@ fallback.
 """
 from __future__ import annotations
 
+import datetime
 import json
 import os
 import re
@@ -57,6 +58,47 @@ def assistant_configured() -> bool:
 
 def model_name() -> str:
     return os.getenv("ASSISTANT_MODEL") or DEFAULT_MODEL
+
+
+# ---------------------------------------------------------------- spend
+# Every question writes an assistant_ask audit row carrying its token counts (see Assistant.ask);
+# budgets and rate limits are read back from that same table -- no second ledger to drift.
+_RATES = {"input_tokens": 1.0, "cache_creation_input_tokens": 1.25, "cache_read_input_tokens": 0.1,
+          "output_tokens": 5.0}   # relative to uncached input (Sonnet: 1 / 1.25 / 0.1 / 5)
+_COUNT = re.compile(r"(input_tokens|output_tokens|cache_read_input_tokens|cache_creation_input_tokens)=(\d+)")
+
+
+def input_equivalent(usage: dict[str, Any]) -> int:
+    """Tokens priced as uncached input -- the one number a budget can be set in."""
+    return int(round(sum(_RATES[k] * (usage.get(k) or 0) for k in _RATES)))
+
+
+def _ask_rows(since: datetime.datetime, **where: str) -> list[str]:
+    from api.auth.database import get_session_factory
+    from api.auth.models import AuditLog
+    try:
+        with get_session_factory()() as session:
+            q = session.query(AuditLog.detail).filter(AuditLog.action == "assistant_ask",
+                                                      AuditLog.created_at >= since)
+            for col, val in where.items():
+                q = q.filter(getattr(AuditLog, col) == val)
+            return [d for (d,) in q.all()]
+    except Exception:  # noqa: BLE001 -- a broken audit DB must not refuse questions
+        return []
+
+
+def spend_today(org_id: str) -> int:
+    """This organization's input-equivalent tokens since midnight UTC."""
+    day = datetime.datetime.now(datetime.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    total = 0
+    for detail in _ask_rows(day, target_id=org_id):
+        total += input_equivalent({k: int(v) for k, v in _COUNT.findall(detail)})
+    return total
+
+
+def questions_last_minute(actor_email: str) -> int:
+    since = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(seconds=60)
+    return len(_ask_rows(since, actor_email=actor_email.strip().lower()))
 
 
 def cache_control() -> dict[str, str]:
@@ -189,10 +231,17 @@ def tool_describe_canvas(org_id: str, engine: str, canvas_id: str) -> dict[str, 
         "summary": entry.get("summary"), "usage_guidance": entry.get("usage_guidance"),
         "date_fields": [d.get("id") if isinstance(d, dict) else d for d in entry.get("date_fields") or []],
         "default_date_field": entry.get("default_date_field"),
-        "columns": [{"name": f.get("id"), "type": f.get("type"), "role": f.get("role"),
-                     "meaning": f.get("description")} for f in entry.get("fields") or []],
+        # one line per column: as JSON objects a 110-column canvas was ~5.5K tokens, re-sent
+        # on every later turn; a meaning is its first clause, the notes hold the rest
+        "columns": "\n".join(f"{f.get('id')} | {f.get('type')} | {f.get('role')} | {_clause(f.get('description'))}"
+                             for f in entry.get("fields") or []),
         "related_canvas": entry.get("related_snapshot"),
     }
+
+
+def _clause(text: str | None, limit: int = 90) -> str:
+    first = (text or "").split(". ")[0].strip()
+    return first if len(first) <= limit else first[:limit - 1].rstrip() + "…"
 
 
 def tool_verification_status(org_id: str, canvas_id: str) -> dict[str, Any]:
@@ -285,6 +334,7 @@ def system_prompt(org_id: str, org_name: str, engine: str) -> list[dict[str, Any
                         for c in canvases)
     quoting = ('reporting.rpt_bill_segment' if engine == "postgres" else 'ORIGINBA_REPORTING.rpt_bill_segment')
     limit = "LIMIT 50" if engine == "postgres" else "FETCH FIRST 50 ROWS ONLY"
+    window = "CURRENT_DATE - 90" if engine == "postgres" else "TRUNC(SYSDATE) - 90"
     head = f"""You are the OriginBA analytics assistant for {org_name}, a utility running Oracle C2M.
 You answer questions about their data by reading their reporting canvases and running SQL.
 
@@ -294,6 +344,8 @@ How you work:
 2. Write a read-only SELECT against the canvas table exactly as describe_canvas names it, e.g.
    SELECT "Account ID", "Billed Amount" FROM {quoting} WHERE "Bill Date" >= DATE '2026-01-01' {limit}
    The engine is {'PostgreSQL' if engine == 'postgres' else 'Oracle'}. Always add a row limit.
+   A trailing window starts at midnight: "last 90 days" is >= {window} (a whole bill-cycle day
+   can sit on the boundary; SYSDATE - 90 moved a 90-day total by $340K).
 3. Run it with run_sql. If it is refused, read the reason, fix the statement, run again.
    Canvases hold years of data (a bill-segment canvas can be millions of rows): aggregate in
    SQL rather than fetching detail, filter on the canvas's default date field to a recent window
@@ -301,7 +353,7 @@ How you work:
    Prefer one well-aimed query to several; three is usually the most a question needs.
 4. Answer in plain language first: the number or the list, what it covers (which canvas, which
    date window, which filters), and any caveat from the reference notes (frozen vs unfrozen,
-   final vs initial measurements, units, grain). Then show the SQL you ran.
+   final vs initial measurements, units, grain).
 5. Say how far the figure can be trusted: call verification_status for each canvas you used and
    state when it was last proven against the client's database (raw CISADM and the snapshot
    tables their current reports read) and how old the canvas build is. A canvas older than a
@@ -315,7 +367,8 @@ Rules you never break:
 - If the question cannot be answered from the canvases, say so and point to the right place:
   the SQL workspace for ad hoc SQL, the report builder for a saved view, or which canvas
   would need extending. Never invent a figure.
-- Keep answers short. A sentence of answer, a sentence of scope, the caveat if any, the SQL.
+- Keep answers short: a sentence of answer, a sentence of scope, the caveat if any.
+  Do not repeat the SQL or the rows in the answer; the reader sees each query and its rows under it.
 
 The organization's canvases:
 {listing}

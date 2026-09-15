@@ -6,7 +6,9 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from api.assistant import Assistant, assistant_configured, model_name
+import os
+
+from api.assistant import Assistant, assistant_configured, model_name, questions_last_minute, spend_today
 from api.auth.dependencies import AuthContext, get_auth_context
 from api.org_db import require_org_for_data
 
@@ -30,6 +32,7 @@ def ask(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> dict[
     org_id = require_org_for_data(ctx)
     if not assistant_configured():
         raise HTTPException(status_code=503, detail="The assistant is not configured: set ANTHROPIC_API_KEY.")
+    _within_limits(org_id, ctx.email)
     assistant = Assistant(org_id=org_id, org_name=ctx.organization_name or org_id,
                           actor_email=ctx.email, actor_id=ctx.id)
     try:
@@ -44,3 +47,20 @@ def ask(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> dict[
             raise HTTPException(status_code=502,
                                 detail=f"The model API failed ({type(exc).__name__}): {said}") from exc
         raise
+
+
+
+def _within_limits(org_id: str, actor_email: str) -> None:
+    """Two caps, both read from the audit rows every question writes (docs/assistant_token_budget.md):
+    ASSISTANT_DAILY_TOKEN_BUDGET  input-equivalent tokens per organization per UTC day
+    ASSISTANT_QUESTIONS_PER_MINUTE  questions per person per minute
+    Unset means no cap. A refusal says which cap, so the person knows whether to wait a minute
+    or until tomorrow."""
+    budget = os.getenv("ASSISTANT_DAILY_TOKEN_BUDGET", "").strip()
+    if budget and spend_today(org_id) >= int(budget):
+        raise HTTPException(status_code=429, detail=f"Today's assistant budget for this organization "
+                                                    f"({int(budget):,} tokens) is used up; it resets at midnight UTC.")
+    per_minute = os.getenv("ASSISTANT_QUESTIONS_PER_MINUTE", "").strip()
+    if per_minute and questions_last_minute(actor_email) >= int(per_minute):
+        raise HTTPException(status_code=429, detail=f"More than {per_minute} question(s) in the last minute; "
+                                                    f"wait a moment and ask again.")

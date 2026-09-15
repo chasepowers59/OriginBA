@@ -87,11 +87,22 @@ class Tools(unittest.TestCase):
                          "ORIGINBA_REPORTING.rpt_bill_segment")
 
     def test_describe_names_every_column_with_its_meaning(self):
+        # one line per column, not one JSON object: rpt_bill_segment (110 columns) was 22.7K
+        # chars / ~5.5K tokens as objects and is re-sent on every later turn of the question
         d = tool_describe_canvas("dev", "postgres", "rpt_bill_segment")
-        names = {c["name"] for c in d["columns"]}
-        self.assertIn("Billed Amount", names)
-        self.assertTrue(all(c["type"] for c in d["columns"]))
+        lines = d["columns"].splitlines()
+        self.assertEqual(len(lines), len([l for l in lines if l.count(" | ") == 3]), "name | type | role | meaning")
+        self.assertTrue(any(l.startswith("Billed Amount | ") for l in lines))
+        self.assertTrue(all(len(l) <= 160 for l in lines), "a meaning is one clause; the notes hold the rest")
+        self.assertLess(len(json.dumps(d)), 13000)
         self.assertIn("error", tool_describe_canvas("dev", "postgres", "rpt_nope"))
+
+    def test_the_prompt_fixes_the_date_window_and_does_not_repeat_sql(self):
+        from api.assistant import system_prompt
+        head = system_prompt("dev", "Dev", "oracle_dbt")[0]["text"]
+        self.assertIn("TRUNC(SYSDATE) - 90", head)
+        self.assertIn("Do not repeat the SQL", head)
+        self.assertIn("CURRENT_DATE - 90", system_prompt("dev", "Dev", "postgres")[0]["text"])
 
     def test_knowledge_search_finds_the_frozen_rule(self):
         hits = tool_search_knowledge("dev", "frozen financial transaction money")
@@ -338,6 +349,47 @@ class Routes(unittest.TestCase):
         self.assertEqual(r.status_code, 502)
         self.assertIn("credit balance is too low", r.json()["detail"])
         self.assertIn("BadRequestError", r.json()["detail"])
+
+    def _spend(self, org, actor, **usage):
+        from api.access_audit import record_access_event
+        u = {"input_tokens": 0, "output_tokens": 0, "cache_read_input_tokens": 0,
+             "cache_creation_input_tokens": 0, "turns": 1} | usage
+        record_access_event(actor_email=actor, actor_id=None, action="assistant_ask", target_type="assistant",
+                            target_id=org, detail="; ".join(f"{k}={v}" for k, v in u.items()) + "; question: q")
+
+    def test_spend_is_read_back_from_the_audit_in_input_equivalents(self):
+        from api.assistant import spend_today, input_equivalent
+        self.assertEqual(input_equivalent({"input_tokens": 100, "cache_creation_input_tokens": 1000,
+                                           "cache_read_input_tokens": 10000, "output_tokens": 200}),
+                         100 + 1250 + 1000 + 1000)
+        before = spend_today("org-spend")
+        self._spend("org-spend", "x@y", input_tokens=10, cache_read_input_tokens=1000, output_tokens=20)
+        self._spend("org-spend", "z@y", cache_creation_input_tokens=800)
+        self._spend("org-other", "x@y", input_tokens=99999)
+        self.assertEqual(spend_today("org-spend") - before, 10 + 100 + 100 + 1000)
+
+    def test_a_daily_budget_answers_429_and_says_so(self):
+        self._spend("dev", "budget@y", input_tokens=5000)
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-only", "ASSISTANT_DAILY_TOKEN_BUDGET": "100"}), \
+             mock.patch("api.assistant_routes.Assistant") as A:
+            r = self.client.post("/portal/assistant", json={"question": "how many?"})
+        self.assertEqual(r.status_code, 429)
+        self.assertIn("budget", r.json()["detail"])
+        A.return_value.ask.assert_not_called()
+
+    def test_a_person_is_rate_limited_per_minute(self):
+        from api.assistant import questions_last_minute
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-only", "ASSISTANT_QUESTIONS_PER_MINUTE": "1",
+                                          "ASSISTANT_DAILY_TOKEN_BUDGET": ""}), \
+             mock.patch("api.assistant_routes.Assistant") as A:
+            A.return_value.ask.side_effect = lambda q, t: (self._spend("dev", "dev@origin.local", input_tokens=1)
+                                                           or {"answer": "42", "steps": [], "queries": [], "thread": []})
+            first = self.client.post("/portal/assistant", json={"question": "one"})
+            second = self.client.post("/portal/assistant", json={"question": "two"})
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 429)
+        self.assertIn("minute", second.json()["detail"])
+        self.assertGreaterEqual(questions_last_minute("dev@origin.local"), 1)
 
     def test_an_empty_question_is_rejected(self):
         with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-only"}):

@@ -16,6 +16,7 @@ read 0.1x, output ~5x. "Equivalent" below = tokens priced as uncached input.
 | "Billed in the last 90 days by bill cycle" — first form (no message caching, notes inlined) | 4 | 19,240 | (not counted) | (not counted) | 1,114 | ≥ 28K |
 | Same, moving cache breakpoint + 50-row model view | 3 | 6 | 10,270 | 76,969 | 1,283 | ≈ 20.5K |
 | Same, reference notes behind `search_knowledge` (default now) | 3 | 6 | 14,172 | 16,734 | 1,295 | ≈ 19.4K, and the next question in the hour reads it all at 0.1x |
+| Same, `describe_canvas` one line per column + prompt no longer repeats SQL | 3 | 6 | 9,405 | 12,078 | 1,125 | ≈ 13K — and the follow-up reads the whole prefix at 0.1x |
 | Follow-up on the thread ("exclude the test cycle") | 2 | 4 | 1,836 | 46,816 | 440 | ≈ 7K |
 | Arrears over 90 days by class + trust (5 tool calls) | 4 | 8 | 7,508 | 99,501 | 2,102 | ≈ 19.3K |
 
@@ -24,8 +25,8 @@ Where a turn's cache read went before the change: the system prompt + tools were
 question's 77K. The notes are now a tool the model calls when it needs them (it called
 `search_knowledge` unprompted on the arrears question); the prefix is ~3.5K.
 
-Rule of thumb after the changes: **a typical question is ~15–20K input-equivalent + ~1.3K
-output; a follow-up ~7K + ~0.5K.** Output is the expensive class per token; the prompt already
+Rule of thumb after the changes: **a typical question is ~13K input-equivalent + ~1.1K
+output (was ≥28K + 1.1K); a follow-up ~5–7K + ~0.5K.** Output is the expensive class per token; the prompt already
 asks for short answers and `MAX_TOKENS` caps a turn at 2,048.
 
 ## The levers, in the order they pay
@@ -40,20 +41,17 @@ asks for short answers and `MAX_TOKENS` caps a turn at 2,048.
 | `MAX_TURNS=8`, `MAX_TOKENS=2048` | ON | a runaway question costs at most ~8 turns |
 | Prompt asks for one well-aimed query, short answers | ON | 3 turns is the norm; the arrears question took 5 tool calls because it verified two canvases |
 
-Not done, in order of likely value once there is real usage to measure against:
+| Per-org daily budget `ASSISTANT_DAILY_TOKEN_BUDGET` (429 past it, resets midnight UTC) | set in production | read from the `assistant_ask` audit rows in input-equivalents; unset = no cap |
+| Per-person `ASSISTANT_QUESTIONS_PER_MINUTE` (429) | set in production | same source |
+| `describe_canvas` as one line per column, meaning = first clause | ON | rpt_bill_segment 22,751 → ~11K chars (≈5.5K → ≈2.7K tokens), and it is re-sent on every later turn |
+| Prompt: do not repeat the SQL/rows in the answer; trailing windows start at midnight (`TRUNC(SYSDATE) - N`) | ON | output is the 5x class; the first answers repeated the SQL the card already shows |
 
-1. **Per-org daily budget** — sum `assistant_ask` rows for the org today, refuse with 429 past
-   `ASSISTANT_DAILY_TOKEN_BUDGET`. Needs the audit query; a two-hour change.
-2. **Per-person rate limit** (questions per minute) in the route.
-3. **`describe_canvas` is the biggest tool result** (a 100-column canvas is ~4–5K tokens).
-   Trim descriptions to one line, or return measures/dimensions/dates first and the rest on
-   request. Measure on `rpt_bill_segment` before and after.
-4. **Model routing**: Haiku 4.5 for "which canvas / what does X mean" questions, Sonnet for
+Not done:
+
+1. **Model routing**: Haiku 4.5 for "which canvas / what does X mean" questions, Sonnet for
    SQL. Only after a quality comparison on the fixed question set below — cheaper and wrong
    is worse than nothing.
-5. **Answer length**: the model repeats the SQL in the answer text although the panel already
-   shows it under the query card. One prompt line ("do not repeat the SQL; the reader sees it")
-   saves ~200–400 output tokens per answer — the expensive class. Try it, then measure.
+2. **A spend view for admins** (per org, per person, per day) over the same audit rows.
 
 ## Testing protocol (spend as little as possible)
 
