@@ -38,7 +38,9 @@ def ask(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> dict[
         if "anthropic" in type(exc).__module__:
             # the API's own message is the actionable part (billing, an invalid model id,
             # a malformed request); the class name alone sent us to the server logs
-            said = str(getattr(exc, "message", "") or exc).split("{", 1)[0].strip(" -")[:300]
+            body = getattr(exc, "body", None)
+            said = (body.get("error", {}).get("message") if isinstance(body, dict) else None) or str(exc)
+            said = said[:300]
             raise HTTPException(status_code=502,
                                 detail=f"The model API failed ({type(exc).__name__}): {said}") from exc
         raise

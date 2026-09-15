@@ -222,7 +222,8 @@ class Routes(unittest.TestCase):
         # exception class name sent us to the server logs to learn that
         class BadRequestError(Exception):
             __module__ = "anthropic"
-            message = "Error code: 400 - Your credit balance is too low to access the Anthropic API."
+            body = {"type": "error", "error": {"type": "invalid_request_error",
+                    "message": "Your credit balance is too low to access the Anthropic API."}}
         with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-only"}), \
              mock.patch("api.assistant_routes.Assistant") as A:
             A.return_value.ask.side_effect = BadRequestError()
