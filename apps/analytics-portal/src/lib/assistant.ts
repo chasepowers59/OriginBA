@@ -2,6 +2,7 @@
  * The assistant conversation as the browser holds it: what the user asked, what came back,
  * and the model-facing thread the API hands back for a follow-up.
  */
+import { formatCellValue, isIdentifierColumn } from "@/lib/format";
 import type { AssistantMessage, AssistantResponse } from "@/lib/types";
 
 export type Turn =
@@ -36,9 +37,12 @@ export function summarise(r: AssistantResponse): string {
   return parts.join(" · ");
 }
 
-/** A cell for the result table: numbers with separators, everything else as text. */
-export function cell(v: unknown): string {
-  if (v == null) return "";
-  if (typeof v === "number") return Number.isInteger(v) ? v.toLocaleString() : v.toLocaleString(undefined, { maximumFractionDigits: 2 });
-  return String(v);
+/**
+ * A cell for the result table, formatted the way every other canvas cell in the portal is:
+ * identifiers and years verbatim, dates as dates, numbers with separators. The first real
+ * result rendered a "Year" column as "2,026" (Ellensburg, 2026-09-15); a year is a label.
+ */
+export function cell(v: unknown, column?: string): string {
+  if (column && (isIdentifierColumn(column) || /\byear\b/i.test(column))) return v == null ? "—" : String(v);
+  return formatCellValue(v, { columnId: column });
 }

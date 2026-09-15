@@ -224,3 +224,52 @@ class Routes(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TheStub(unittest.TestCase):
+    """ASSISTANT_MODEL=stub exercises the whole path with no key -- and only outside production."""
+
+    def test_stub_is_refused_in_production(self):
+        from api import assistant
+        with mock.patch.dict(os.environ, {"ASSISTANT_MODEL": "stub", "ENVIRONMENT": "production", "ANTHROPIC_API_KEY": ""}):
+            self.assertFalse(assistant.stub_enabled())
+            self.assertFalse(assistant.assistant_configured())
+        with mock.patch.dict(os.environ, {"ASSISTANT_MODEL": "stub", "ENVIRONMENT": "development", "ANTHROPIC_API_KEY": ""}):
+            self.assertTrue(assistant.assistant_configured())
+
+    def test_stub_walks_the_real_tools_and_labels_itself(self):
+        from api.assistant import StubModel
+        with mock.patch("api.assistant.org_backend", return_value=("postgres", "dbt")), \
+             mock.patch("api.database_routes._run", return_value=(["Year", "Rows"], [[2026, 5], [2025, 9]])) as run, \
+             mock.patch("api.access_audit.record_access_event"):
+            a = Assistant(org_id="dev", org_name="Dev", actor_email="t@x", actor_id="t", client_factory=StubModel)
+            out = a.ask("how many bill segments were billed by year?")
+        self.assertEqual([s["tool"] for s in out["steps"]], ["list_canvases", "describe_canvas", "run_sql"])
+        self.assertIn("stub model", out["answer"])
+        self.assertIn("rpt_bill_segment", run.call_args.args[1])
+        self.assertEqual(out["queries"][0]["columns"], ["Year", "Rows"])
+
+    def test_a_slow_query_comes_back_with_a_nudge(self):
+        from api import assistant
+        with mock.patch("api.database_routes._run", return_value=(["n"], [[1]])), \
+             mock.patch("api.access_audit.record_access_event"), \
+             mock.patch("api.assistant.time.perf_counter", side_effect=[0.0, 9.5]):
+            out = assistant.tool_run_sql("dev", "postgres", "select 1 as n from reporting.rpt_bill", actor_email="t", actor_id="t", purpose="p")
+        self.assertIn("9.5s", out["note"])
+
+
+class FromInsideFunctions(unittest.TestCase):
+    """FROM inside EXTRACT/SUBSTRING/TRIM is syntax, not a table source; a subquery's FROM is."""
+
+    def test_functions_pass(self):
+        for sql in ('SELECT EXTRACT(YEAR FROM "Bill Date") AS y, COUNT(*) FROM reporting.rpt_bill_segment GROUP BY 1',
+                    'SELECT SUBSTRING("Account ID" FROM 1 FOR 3) FROM rpt_customer_account',
+                    "SELECT TRIM(BOTH ' ' FROM \"Bill Cycle\") FROM ORIGINBA_REPORTING.rpt_bill",
+                    'SELECT EXTRACT(MONTH FROM (SELECT MAX("Bill Date") FROM reporting.rpt_bill)) FROM reporting.rpt_bill_segment'):
+            enforce_canvases_only(sql)
+
+    def test_a_subquery_reading_cisadm_is_still_caught(self):
+        for sql in ('SELECT EXTRACT(YEAR FROM "Bill Date") FROM reporting.rpt_bill WHERE 1 = (SELECT 1 FROM cisadm.ci_bill)',
+                    'SELECT 1 FROM (SELECT * FROM cisadm.ci_acct) x'):
+            with self.assertRaises(SqlWorkspaceValidationError, msg=sql):
+                enforce_canvases_only(sql)

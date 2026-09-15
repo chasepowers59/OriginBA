@@ -28,10 +28,11 @@ describe("the assistant conversation", () => {
     expect(summarise({ ...answer(), steps: [], queries: [], usage: { input_tokens: 0, output_tokens: 0 } })).toBe("0 steps · 0 queries");
   });
 
-  it("formats cells without inventing precision", () => {
-    expect(cell(null)).toBe("");
-    expect(cell(12345)).toBe("12,345");
-    expect(cell(12.3456)).toBe("12.35");
-    expect(cell("CYCLE1")).toBe("CYCLE1");
+  it("formats cells like the rest of the portal, and never a year with a comma", () => {
+    expect(cell(null, "Rows")).toBe("—");
+    expect(cell(12345, "Rows")).toBe("12,345");
+    expect(cell("CYCLE1", "Bill Cycle")).toBe("CYCLE1");
+    expect(cell(2026, "Year")).toBe("2026");
+    expect(cell(3837610416, "Account ID")).toBe("3837610416");
   });
 });

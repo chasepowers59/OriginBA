@@ -37,10 +37,20 @@ MAX_TURNS = 8            # tool calls per question; the loop stops rather than r
 MAX_ROWS = 200           # rows a single run_sql returns to the model and the reader
 MAX_THREAD = 20          # prior messages kept for a follow-up
 MAX_TOKENS = 2048
+SLOW_MS = 8000           # a query slower than this comes back with a nudge to narrow it
+
+
+def stub_enabled() -> bool:
+    """ASSISTANT_MODEL=stub: a scripted stand-in for the model so the whole path -- panel,
+    API, tools, database, rows back to the panel -- can be exercised with no key. It
+    picks a canvas by keyword and runs one honest aggregate, and every answer says what
+    it is. Refused outright in production: a stub answering real users is a lie."""
+    from api.security import is_production
+    return (os.getenv("ASSISTANT_MODEL") or "").strip().lower() == "stub" and not is_production()
 
 
 def assistant_configured() -> bool:
-    return bool(os.getenv("ANTHROPIC_API_KEY"))
+    return bool(os.getenv("ANTHROPIC_API_KEY")) or stub_enabled()
 
 
 def model_name() -> str:
@@ -51,11 +61,36 @@ def model_name() -> str:
 _READ_TARGET = re.compile(
     r'\b(?:FROM|JOIN)\s+("?[\w$#]+"?)(?:\s*\.\s*("?[\w$#]+"?))?', re.IGNORECASE)
 _CANVAS_SCHEMAS = {"reporting", "originba_reporting"}
+# Functions whose syntax contains the word FROM that is NOT a table source:
+# EXTRACT(YEAR FROM x), SUBSTRING(s FROM 2), TRIM(BOTH ' ' FROM s), POSITION(a IN b),
+# OVERLAY(s PLACING t FROM 3). Reading those as tables refused EXTRACT(YEAR FROM "Bill Date")
+# on the first real query (2026-09-15). A subquery's FROM is still a table source.
+_FROM_FUNCTIONS = {"extract", "substring", "trim", "position", "overlay"}
+_TOKEN = re.compile(r'"[^"]*"|[A-Za-z_$#][\w$#]*|\(|\)|\S')
+
+
+def _table_source_sql(cleaned: str) -> str:
+    """The statement with FROM/JOIN inside EXTRACT-style functions blanked, so the read-target
+    scan sees only table sources. Parenthesis depth is tracked with the name of the function
+    that opened each level; a bare "(" (a subquery) keeps its FROM."""
+    out, stack, prev = [], [], ""
+    for tok in _TOKEN.findall(cleaned):
+        low = tok.lower()
+        if tok == "(":
+            stack.append(prev.lower() if prev.lower() in _FROM_FUNCTIONS else "")
+        elif tok == ")":
+            if stack:
+                stack.pop()
+        elif low in ("from", "join") and stack and stack[-1]:
+            tok = "  "        # inside EXTRACT(...) etc.: not a table source
+        out.append(tok)
+        prev = tok
+    return " ".join(out)
 
 
 def enforce_canvases_only(sql: str) -> None:
     """Every table the statement reads must be a reporting canvas (rpt_*)."""
-    cleaned = strip_sql_noise(sql)
+    cleaned = _table_source_sql(strip_sql_noise(sql))
     for schema, table in _READ_TARGET.findall(cleaned):
         if table:
             s, t = schema.strip('"').lower(), table.strip('"').lower()
@@ -148,14 +183,11 @@ def tool_search_knowledge(org_id: str, query: str, limit: int = 8) -> list[dict[
     if not words:
         return []
     hits: list[tuple[int, dict[str, str]]] = []
-    for f in sorted(KNOWLEDGE.glob("*.md")):
-        for para in re.split(r"\n\s*\n", f.read_text()):
-            text = para.strip()
-            if len(text) < 40 or text.startswith("<!--"):
-                continue
-            score = sum(1 for w in words if w in text.lower())
-            if score:
-                hits.append((score, {"source": f.stem, "text": text[:700]}))
+    _knowledge_files()
+    for stem, text in _knowledge_cache["paragraphs"]:
+        score = sum(1 for w in words if w in text.lower())
+        if score:
+            hits.append((score, {"source": stem, "text": text[:700]}))
     for k, v in _canvases(org_id).items():
         for fld in v.get("fields") or []:
             d = fld.get("description") or ""
@@ -186,8 +218,12 @@ def tool_run_sql(org_id: str, engine: str, sql: str, *, actor_email: str, actor_
     record_access_event(actor_email=actor_email, actor_id=actor_id, action="assistant_sql",
                         target_type="sql", target_id=org_id,
                         detail=f"rows={len(rows)}; ms={ms}; purpose: {purpose[:120]}; sql: {validated[:300]}")
-    return {"columns": columns, "rows": [[_cell(v) for v in r] for r in rows],
-            "row_count": len(rows), "truncated": truncated, "ms": ms, "sql": validated}
+    out: dict[str, Any] = {"columns": columns, "rows": [[_cell(v) for v in r] for r in rows],
+                           "row_count": len(rows), "truncated": truncated, "ms": ms, "sql": validated}
+    if ms > SLOW_MS:
+        out["note"] = (f"This query took {ms / 1000:.1f}s. Narrow the date window or aggregate "
+                       f"further before running another like it.")
+    return out
 
 
 def _cell(v: Any) -> Any:
@@ -197,13 +233,26 @@ def _cell(v: Any) -> Any:
 
 
 # ---------------------------------------------------------------- the prompt
+_knowledge_cache: dict[str, Any] = {}
+
+
+def _knowledge_files() -> list[tuple[str, str]]:
+    """(stem, text) for every knowledge file, read once and re-read only when a file changes.
+    The prompt is built on every question; three disk reads per question is waste."""
+    files = sorted(f for f in KNOWLEDGE.glob("*.md") if f.name != "README.md")
+    stamp = tuple((f.name, f.stat().st_mtime_ns) for f in files)
+    if _knowledge_cache.get("stamp") != stamp:
+        _knowledge_cache["stamp"] = stamp
+        _knowledge_cache["files"] = [(f.stem, f.read_text()) for f in files]
+        _knowledge_cache["paragraphs"] = [
+            (stem, p.strip()) for stem, text in _knowledge_cache["files"]
+            for p in re.split(r"\n\s*\n", text)
+            if len(p.strip()) >= 40 and not p.strip().startswith("<!--")]
+    return _knowledge_cache["files"]
+
+
 def _knowledge_text() -> str:
-    parts = []
-    for f in sorted(KNOWLEDGE.glob("*.md")):
-        if f.name == "README.md":
-            continue
-        parts.append(f"\n\n# Reference: {f.stem}\n\n{f.read_text()}")
-    return "".join(parts)
+    return "".join(f"\n\n# Reference: {stem}\n\n{text}" for stem, text in _knowledge_files())
 
 
 def system_prompt(org_id: str, org_name: str, engine: str) -> list[dict[str, Any]]:
@@ -222,6 +271,10 @@ How you work:
    SELECT "Account ID", "Billed Amount" FROM {quoting} WHERE "Bill Date" >= DATE '2026-01-01' {limit}
    The engine is {'PostgreSQL' if engine == 'postgres' else 'Oracle'}. Always add a row limit.
 3. Run it with run_sql. If it is refused, read the reason, fix the statement, run again.
+   Canvases hold years of data (a bill-segment canvas can be millions of rows): aggregate in
+   SQL rather than fetching detail, filter on the canvas's default date field to a recent window
+   unless the question names one, and do not ORDER BY a whole canvas just to show a few rows.
+   Prefer one well-aimed query to several; three is usually the most a question needs.
 4. Answer in plain language first: the number or the list, what it covers (which canvas, which
    date window, which filters), and any caveat from the reference notes (frozen vs unfrozen,
    final vs initial measurements, units, grain). Then show the SQL you ran.
@@ -257,6 +310,8 @@ class Assistant:
 
     @staticmethod
     def _anthropic():
+        if stub_enabled():
+            return StubModel()
         import anthropic
         return anthropic.Anthropic()
 
@@ -333,3 +388,82 @@ def _trim_thread(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
                   if b.get("type") == "tool_result" else b) for b in c]
         out.append({"role": m["role"], "content": c})
     return out
+
+
+# ---------------------------------------------------------------- the dev-only stub model
+class _Block:
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
+
+
+class StubModel:
+    """Speaks the Anthropic response shape so the loop cannot tell it from the model. It does
+    what a careful analyst would do first: list the canvases, pick the one whose name or
+    summary shares the most words with the question, describe it, run one aggregate on the
+    canvas's default date field (or a plain count), and say what it found -- prefixed so
+    nobody mistakes it for an answer from a model."""
+
+    def __init__(self):
+        self.messages = self
+        self._step = 0
+        self._canvas: dict[str, Any] | None = None
+
+    def create(self, **kw):
+        messages = kw["messages"]
+        question = next((m["content"] for m in messages if m["role"] == "user" and isinstance(m["content"], str)), "")
+        last = messages[-1]
+        results = [b for b in last["content"] if isinstance(b, dict) and b.get("type") == "tool_result"] \
+            if isinstance(last["content"], list) else []
+        self._step += 1
+        if self._step == 1:
+            return self._resp([self._tool("s1", "list_canvases", {})], "tool_use")
+        if self._step == 2:
+            canvases = json.loads(results[0]["content"])
+            self._canvas = _best_canvas(question, canvases)
+            return self._resp([self._tool("s2", "describe_canvas", {"canvas_id": self._canvas["id"]})], "tool_use")
+        if self._step == 3:
+            d = json.loads(results[0]["content"])
+            return self._resp([self._tool("s3", "run_sql", {"sql": _stub_sql(d), "purpose": f"a first look at {d['label']}"})], "tool_use")
+        r = json.loads(results[0]["content"]) if results else {}
+        c = self._canvas or {}
+        if "error" in r:
+            text = f"[stub model — no ANTHROPIC_API_KEY configured] I tried {c.get('label')} and the query was refused: {r['error']}"
+        else:
+            text = (f"[stub model — no ANTHROPIC_API_KEY configured] For \"{question}\" I read the "
+                    f"{c.get('label')} canvas ({c.get('table')}) and ran one aggregate: {r.get('row_count')} "
+                    f"rows came back in {r.get('ms')} ms. A real model would now reason over them; the "
+                    f"query and its rows are below.")
+        return self._resp([_Block(type="text", text=text)], "end_turn")
+
+    @staticmethod
+    def _tool(i, name, inp):
+        return _Block(type="tool_use", id=i, name=name, input=inp)
+
+    @staticmethod
+    def _resp(blocks, stop):
+        return _Block(content=blocks, stop_reason=stop, usage=_Block(input_tokens=0, output_tokens=0))
+
+
+def _best_canvas(question: str, canvases: list[dict[str, Any]]) -> dict[str, Any]:
+    """The canvas whose NAME shares the most words with the question; the summary only breaks
+    ties. "bill segments billed by year" must land on Bill Segment, not on Billed Charge."""
+    stem = lambda w: w[:-1] if w.endswith("s") else w                                   # noqa: E731
+    words = {stem(w) for w in re.findall(r"[a-z]+", question.lower()) if len(w) > 3}
+    def score(c):
+        name = {stem(w) for w in re.findall(r"[a-z]+", f"{c['id']} {c.get('label', '')}".lower())}
+        summary = {stem(w) for w in re.findall(r"[a-z]+", f"{c.get('summary', '')} {c.get('workstream', '')}".lower())}
+        return 3 * len(words & name) + len(words & summary)
+    return max(canvases, key=score) if canvases else {"id": "?", "label": "?", "table": "?"}
+
+
+def _stub_sql(described: dict[str, Any]) -> str:
+    """One aggregate a canvas can always answer: rows per value of its default date field's
+    year, or a plain count when it has no date field."""
+    table = described["table"]
+    oracle = table.upper().startswith("ORIGINBA_REPORTING.")
+    date = described.get("default_date_field")
+    if date:
+        year = f'EXTRACT(YEAR FROM "{date}")'
+        limit = "FETCH FIRST 10 ROWS ONLY" if oracle else "LIMIT 10"
+        return f'SELECT {year} AS "Year", COUNT(*) AS "Rows" FROM {table} GROUP BY {year} ORDER BY 1 DESC {limit}'
+    return f'SELECT COUNT(*) AS "Rows" FROM {table}'

@@ -148,7 +148,7 @@ function QueryResult({ q }: { q: AssistantQuery }) {
             <tbody>
               {shown.map((row, i) => (
                 <tr key={i} className="border-t border-edge-subtle">
-                  {row.map((v, j) => <td key={j} className="px-3 py-1.5 text-heading">{cell(v)}</td>)}
+                  {row.map((v, j) => <td key={j} className="px-3 py-1.5 text-heading">{cell(v, q.columns[j])}</td>)}
                 </tr>
               ))}
             </tbody>
