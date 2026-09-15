@@ -96,6 +96,8 @@ from api.kpi_alert_routes import router as kpi_alert_router
 app.include_router(kpi_alert_router)
 from api.annotation_routes import router as annotation_router
 app.include_router(annotation_router)
+from api.assistant_routes import router as assistant_router
+app.include_router(assistant_router)
 
 
 def _require_nlq_access(

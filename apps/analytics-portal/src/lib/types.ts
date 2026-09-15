@@ -548,3 +548,25 @@ export type ReportLibraryResponse = {
   packs: ReportLibraryPack[];
   error?: string;
 };
+
+// ---- the analytics assistant (api/assistant.py)
+export type AssistantStep = { tool: string; input: string; ok: boolean };
+export type AssistantQuery = {
+  purpose: string;
+  sql: string;
+  columns: string[];
+  rows: unknown[][];
+  row_count: number;
+  truncated: boolean;
+  ms: number;
+};
+export type AssistantMessage = { role: "user" | "assistant"; content: unknown };
+export type AssistantResponse = {
+  answer: string;
+  steps: AssistantStep[];
+  queries: AssistantQuery[];
+  model: string;
+  usage: { input_tokens: number; output_tokens: number };
+  thread: AssistantMessage[];
+};
+export type AssistantStatus = { configured: boolean; model: string | null };

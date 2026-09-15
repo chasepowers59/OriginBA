@@ -68,6 +68,17 @@ export function DatabaseWorkspace({
   initialTable?: string;
 }) {
   const [sql, setSql] = useState("");
+  // A query handed over from the assistant ("Open in SQL workspace"): read once, then cleared,
+  // so a reload does not resurrect it.
+  useEffect(() => {
+    try {
+      const handed = sessionStorage.getItem("portal.assistant.sql");
+      if (handed) {
+        setSql(handed);
+        sessionStorage.removeItem("portal.assistant.sql");
+      }
+    } catch { /* storage unavailable */ }
+  }, []);
   const [activeTemplate, setActiveTemplate] = useState<DatabaseQueryTemplate | null>(null);
   const [pageSize, setPageSize] = useState<number>(50);
   const [loading, setLoading] = useState(false);
