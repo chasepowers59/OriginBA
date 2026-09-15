@@ -23,11 +23,15 @@ They are copied from `originba_dbt/.claude/skills` by `scripts/local/sync_assist
 so the API image is self-contained; re-run it when the skills change. The knowledge block is
 sent with prompt caching, so it is paid for once per cache window, not per question.
 
+Token cost and the levers that control it: `docs/assistant_token_budget.md`.
+
 ## Configuration
 
 | Variable | |
 | --- | --- |
 | `ANTHROPIC_API_KEY` | required; unset means `/portal/assistant/status` reports `configured: false` and `POST` answers 503 |
+| `ASSISTANT_CACHE_TTL` | `1h` keeps the cached prompt prefix an hour instead of five minutes: the write costs 2x instead of 1.25x, reads cost the same tenth, so it pays back from the second question when questions arrive more than five minutes apart. Set it in production; leave unset for burst testing. |
+| `ASSISTANT_INLINE_KNOWLEDGE` | `1` inlines the reference notes (~19.5K tokens) into every request. Off by default since 2026-09-15: they were ~85% of what every turn read from cache, and the model reaches them through `search_knowledge` (it did so unprompted). See `docs/assistant_token_budget.md` for the measurements. |
 | `ASSISTANT_MODEL` | default `claude-sonnet-5`. `stub` (development only, refused in production) is a scripted stand-in that lists the canvases, picks one by name, runs one aggregate on its default date field, and labels every answer as the stub -- so the whole path can be exercised with no key |
 
 Permission: `nlq:read`. The organization comes from the auth context, never from the request.

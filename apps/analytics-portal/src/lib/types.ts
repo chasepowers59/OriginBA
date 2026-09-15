@@ -573,7 +573,13 @@ export type AssistantResponse = {
   steps: AssistantStep[];
   queries: AssistantQuery[];
   model: string;
-  usage: { input_tokens: number; output_tokens: number };
+  usage: {
+    input_tokens: number;
+    output_tokens: number;
+    cache_read_input_tokens?: number;
+    cache_creation_input_tokens?: number;
+    turns?: number;
+  };
   thread: AssistantMessage[];
 };
 export type AssistantStatus = { configured: boolean; model: string | null };

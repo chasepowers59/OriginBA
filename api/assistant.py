@@ -35,7 +35,8 @@ from api.sql_workspace_validator import SqlWorkspaceValidationError, strip_sql_n
 KNOWLEDGE = Path(__file__).resolve().parent / "assistant_knowledge"
 DEFAULT_MODEL = "claude-sonnet-5"
 MAX_TURNS = 8            # tool calls per question; the loop stops rather than run away
-MAX_ROWS = 200           # rows a single run_sql returns to the model and the reader
+MAX_ROWS = 200           # rows a single run_sql returns to the reader
+MAX_ROWS_MODEL = 50      # ...of which the model sees this many: it aggregates, the screen lists
 MAX_THREAD = 20          # prior messages kept for a follow-up
 MAX_TOKENS = 2048
 SLOW_MS = 8000           # a query slower than this comes back with a nudge to narrow it
@@ -56,6 +57,15 @@ def assistant_configured() -> bool:
 
 def model_name() -> str:
     return os.getenv("ASSISTANT_MODEL") or DEFAULT_MODEL
+
+
+def cache_control() -> dict[str, str]:
+    """ASSISTANT_CACHE_TTL=1h keeps the cached prefix an hour instead of five minutes. The
+    write costs 2x instead of 1.25x and reads cost the same tenth, so it pays back from the
+    second question when questions arrive more than five minutes apart -- the shape of real
+    use. Testing in bursts leaves it at the default."""
+    ttl = os.getenv("ASSISTANT_CACHE_TTL", "").strip()
+    return {"type": "ephemeral", "ttl": "1h"} if ttl == "1h" else {"type": "ephemeral"}
 
 
 # ---------------------------------------------------------------- the canvases-only fence
@@ -310,10 +320,15 @@ Rules you never break:
 The organization's canvases:
 {listing}
 """
-    return [
-        {"type": "text", "text": head},
-        {"type": "text", "text": _knowledge_text(), "cache_control": {"type": "ephemeral"}},
-    ]
+    # The reference notes are ~19.5K tokens; inlined they are most of what every turn reads
+    # from cache (measured 2026-09-15: 22.7K per turn, ~68K of a 3-turn question's 77K). The
+    # model reaches them through search_knowledge instead, and did so unprompted. Inline
+    # them with ASSISTANT_INLINE_KNOWLEDGE=1 to measure the other side of that trade.
+    blocks = [{"type": "text", "text": head}]
+    if os.getenv("ASSISTANT_INLINE_KNOWLEDGE", "").strip():
+        blocks.append({"type": "text", "text": _knowledge_text()})
+    blocks[-1]["cache_control"] = cache_control()
+    return blocks
 
 
 # ---------------------------------------------------------------- the loop
@@ -353,15 +368,16 @@ class Assistant:
         system = system_prompt(self.org_id, self.org_name, self.engine)
         steps: list[dict[str, Any]] = []
         queries: list[dict[str, Any]] = []
-        usage = {"input_tokens": 0, "output_tokens": 0}
+        usage = {k: 0 for k in _USAGE_KEYS} | {"turns": 0}
         answer = ""
         for _ in range(MAX_TURNS + 1):
+            _mark_prefix(messages)
             resp = client.messages.create(model=model_name(), max_tokens=MAX_TOKENS, system=system,
                                           tools=TOOLS, messages=messages)
+            usage["turns"] += 1
             u = getattr(resp, "usage", None)
-            if u:
-                usage["input_tokens"] += getattr(u, "input_tokens", 0) or 0
-                usage["output_tokens"] += getattr(u, "output_tokens", 0) or 0
+            for k in _USAGE_KEYS:
+                usage[k] += getattr(u, k, 0) or 0
             # the API refuses an empty text block on the way back in, and a tool-use turn
             # often arrives as [text(""), tool_use]
             content = [d for d in (_block_dict(b) for b in resp.content) if d["type"] != "text" or d["text"]]
@@ -379,13 +395,41 @@ class Assistant:
                 steps.append({"tool": call["name"], "input": _brief(call["input"]), "ok": not is_error})
                 if call["name"] == "run_sql" and not is_error:
                     queries.append({"purpose": call["input"].get("purpose", ""), **out})
+                    if len(out["rows"]) > MAX_ROWS_MODEL:
+                        out = {**out, "rows": out["rows"][:MAX_ROWS_MODEL], "rows_shown_to_model": MAX_ROWS_MODEL}
                 results.append({"type": "tool_result", "tool_use_id": call["id"],
                                 "content": json.dumps(out, default=str)[:60000], "is_error": is_error})
             messages.append({"role": "user", "content": results})
         else:
             answer = answer or "I stopped after too many steps without an answer. Try a narrower question."
+        # one audit row per question with its token cost: spend per org and per person is read
+        # from the same table as every other access, no second ledger
+        from api.access_audit import record_access_event
+        record_access_event(actor_email=self.actor_email, actor_id=self.actor_id, action="assistant_ask",
+                            target_type="assistant", target_id=self.org_id,
+                            detail="; ".join(f"{k}={v}" for k, v in usage.items())
+                            + f"; model={model_name()}; steps={len(steps)}; question: {question[:200]}")
         return {"answer": answer, "steps": steps, "queries": queries, "model": model_name(),
                 "usage": usage, "thread": _trim_thread(messages)}
+
+
+_USAGE_KEYS = ("input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")
+
+
+def _mark_prefix(messages: list[dict[str, Any]]) -> None:
+    """One moving cache breakpoint on the latest user turn. Every turn re-sends the whole
+    history, so without it a 5K-token describe_canvas result is paid for on every later turn;
+    with it each turn pays for its own new tokens and reads the rest at a tenth. Stale
+    breakpoints (from earlier turns, or a thread a client sent back) are cleared first: the
+    API allows four, and one per turn would exhaust that on the fifth."""
+    for m in messages:
+        if isinstance(m["content"], list):
+            for b in m["content"]:
+                b.pop("cache_control", None)
+    last = messages[-1]
+    if not isinstance(last["content"], list):
+        last["content"] = [{"type": "text", "text": last["content"]}]
+    last["content"][-1]["cache_control"] = cache_control()
 
 
 def _block_dict(b: Any) -> dict[str, Any]:
@@ -406,10 +450,20 @@ def _trim_thread(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
     for m in messages[-MAX_THREAD:]:
         c = m["content"]
         if isinstance(c, list):
+            c = [{k: v for k, v in b.items() if k != "cache_control"} for b in c]
             c = [({**b, "content": "(result omitted; re-run the tool if needed)"}
                   if b.get("type") == "tool_result" else b) for b in c]
+            if len(c) == 1 and c[0].get("type") == "text":
+                c = c[0]["text"]   # a plain question goes back the way it came
         out.append({"role": m["role"], "content": c})
     return out
+
+
+def _user_text(m: dict[str, Any]) -> str:
+    c = m["content"]
+    if isinstance(c, str):
+        return c
+    return "\n".join(b.get("text", "") for b in c if isinstance(b, dict) and b.get("type") == "text")
 
 
 # ---------------------------------------------------------------- the dev-only stub model
@@ -432,7 +486,7 @@ class StubModel:
 
     def create(self, **kw):
         messages = kw["messages"]
-        question = next((m["content"] for m in messages if m["role"] == "user" and isinstance(m["content"], str)), "")
+        question = next((_user_text(m) for m in messages if m["role"] == "user" and _user_text(m)), "")
         last = messages[-1]
         results = [b for b in last["content"] if isinstance(b, dict) and b.get("type") == "tool_result"] \
             if isinstance(last["content"], list) else []

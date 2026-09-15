@@ -25,6 +25,8 @@ describe("the assistant conversation", () => {
 
   it("summarises an answer in words a reader scans", () => {
     expect(summarise(answer())).toBe("1 step · 1 query · 1,240 tokens");
+    const cached = { ...answer(), usage: { input_tokens: 1000, output_tokens: 240, cache_read_input_tokens: 22000, cache_creation_input_tokens: 0 } };
+    expect(summarise(cached)).toBe("1 step · 1 query · 1,240 tokens (22,000 cached)");
     expect(summarise({ ...answer(), steps: [], queries: [], usage: { input_tokens: 0, output_tokens: 0 } })).toBe("0 steps · 0 queries");
   });
 

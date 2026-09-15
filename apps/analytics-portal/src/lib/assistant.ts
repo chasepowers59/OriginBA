@@ -26,14 +26,17 @@ export function threadFor(turns: Turn[]): AssistantMessage[] {
   return [];
 }
 
-/** "3 steps · 2 queries · 1,240 tokens" -- the footer under an answer. */
+/** "3 steps · 2 queries · 1,240 tokens (22,000 cached)" -- the footer under an answer.
+ *  Cached reads are the bulk of a question's tokens and cost a tenth; they are shown apart
+ *  so the number a reader sees tracks the bill. */
 export function summarise(r: AssistantResponse): string {
   const tokens = (r.usage?.input_tokens ?? 0) + (r.usage?.output_tokens ?? 0);
+  const cached = (r.usage?.cache_read_input_tokens ?? 0) + (r.usage?.cache_creation_input_tokens ?? 0);
   const parts = [
     `${r.steps.length} step${r.steps.length === 1 ? "" : "s"}`,
     `${r.queries.length} ${r.queries.length === 1 ? "query" : "queries"}`,
   ];
-  if (tokens) parts.push(`${tokens.toLocaleString()} tokens`);
+  if (tokens) parts.push(`${tokens.toLocaleString()} tokens${cached ? ` (${cached.toLocaleString()} cached)` : ""}`);
   return parts.join(" · ");
 }
 

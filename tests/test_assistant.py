@@ -132,15 +132,14 @@ class TheLoop(unittest.TestCase):
         self.assertEqual(q["row_count"], MAX_ROWS, "rows are capped")
         self.assertTrue(q["truncated"])
         self.assertEqual(q["columns"], ["Bill Cycle", "Billed Amount"])
-        audit = self.mocks[2]
-        self.assertEqual(audit.call_args.kwargs["action"], "assistant_sql")
-        self.assertIn("billed by cycle", audit.call_args.kwargs["detail"])
-        self.assertEqual(out["usage"], {"input_tokens": 30, "output_tokens": 15})
+        actions = [c.kwargs["action"] for c in self.mocks[2].call_args_list]
+        self.assertEqual(actions, ["assistant_sql", "assistant_ask"], "the query, then the question with its cost")
+        self.assertIn("billed by cycle", self.mocks[2].call_args_list[0].kwargs["detail"])
+        self.assertEqual((out["usage"]["input_tokens"], out["usage"]["output_tokens"]), (30, 15))
         # the system prompt names the org's canvases and carries the knowledge
         system = client.requests[0]["system"]
         self.assertIn("rpt_bill_segment", system[0]["text"])
-        self.assertIn("Reference: cisadm-sql", system[1]["text"])
-        self.assertEqual(system[1]["cache_control"], {"type": "ephemeral"})
+        self.assertEqual(system[-1]["cache_control"], {"type": "ephemeral"})
 
     def test_an_empty_text_block_never_goes_back_to_the_api(self):
         # the first real Sonnet turn came back as [text(""), tool_use]; echoing that
@@ -157,6 +156,97 @@ class TheLoop(unittest.TestCase):
                 if b.get("type") == "text":
                     self.assertTrue(b["text"], "an empty text block was sent back")
 
+    def test_the_cost_of_a_question_is_counted_in_full(self):
+        # cached reads and cache writes are billed too (at 0.1x and 1.25x); counting only
+        # input_tokens under-reported the first real question by roughly 5x
+        def _usage(inp, out, read, write):
+            return SimpleNamespace(input_tokens=inp, output_tokens=out,
+                                   cache_read_input_tokens=read, cache_creation_input_tokens=write)
+        r1 = SimpleNamespace(content=[_tool("t1", "list_canvases", {})], stop_reason="tool_use", usage=_usage(100, 20, 0, 22000))
+        r2 = SimpleNamespace(content=[_text("done")], stop_reason="end_turn", usage=_usage(300, 50, 22000, 0))
+        out = Assistant(org_id="dev", org_name="Dev", actor_email="a@b", actor_id=None,
+                        client_factory=lambda: FakeClient([r1, r2])).ask("hi")
+        self.assertEqual(out["usage"], {"input_tokens": 400, "output_tokens": 70,
+                                        "cache_read_input_tokens": 22000, "cache_creation_input_tokens": 22000,
+                                        "turns": 2})
+
+    def test_the_conversation_prefix_is_cached_turn_by_turn(self):
+        # every turn re-sends the whole message history; a moving cache breakpoint on the
+        # latest user message makes each turn pay for its new tokens only
+        client = FakeClient([
+            _resp([_tool("t1", "list_canvases", {})], "tool_use"),
+            _resp([_text("done")], "end_turn"),
+        ])
+        Assistant(org_id="dev", org_name="Dev", actor_email="a@b", actor_id=None,
+                  client_factory=lambda: client).ask("hi")
+        for req in client.requests:
+            last = req["messages"][-1]["content"]
+            block = last[-1] if isinstance(last, list) else None
+            self.assertIsNotNone(block, "the user turn must be a block list so it can carry cache_control")
+            self.assertEqual(block.get("cache_control"), {"type": "ephemeral"})
+            self.assertEqual(sum(1 for m in req["messages"] for b in (m["content"] if isinstance(m["content"], list) else [])
+                                 if b.get("cache_control")), 1, "one moving breakpoint, never one per turn")
+
+    def test_the_model_sees_fewer_rows_than_the_screen(self):
+        from api.assistant import MAX_ROWS_MODEL
+        self.assertLess(MAX_ROWS_MODEL, MAX_ROWS)
+        big = {"columns": ["n"], "rows": [[i] for i in range(MAX_ROWS)], "row_count": MAX_ROWS,
+               "truncated": False, "ms": 1, "sql": "select 1", "integrity": []}
+        client = FakeClient([
+            _resp([_tool("t1", "run_sql", {"sql": "select 1", "purpose": "p"})], "tool_use"),
+            _resp([_text("done")], "end_turn"),
+        ])
+        with mock.patch("api.assistant.tool_run_sql", return_value=big):
+            out = Assistant(org_id="dev", org_name="Dev", actor_email="a@b", actor_id=None,
+                            client_factory=lambda: client).ask("hi")
+        sent = json.loads(client.requests[1]["messages"][-1]["content"][0]["content"])
+        self.assertEqual(len(sent["rows"]), MAX_ROWS_MODEL)
+        self.assertIn("rows_shown_to_model", sent)
+        self.assertEqual(len(out["queries"][0]["rows"]), MAX_ROWS, "the screen still gets every row")
+
+    def test_the_reference_notes_are_a_tool_not_a_prefix_unless_asked(self):
+        # measured 2026-09-15: the notes are ~19.5K of the ~22.7K tokens every turn reads from
+        # cache; the model reaches them through search_knowledge (it did so unprompted)
+        from api.assistant import system_prompt
+        with mock.patch.dict(os.environ, {"ASSISTANT_INLINE_KNOWLEDGE": ""}):
+            blocks = system_prompt("dev", "Dev", "postgres")
+        self.assertEqual(len(blocks), 1)
+        self.assertLess(len(blocks[0]["text"]), 12000)
+        self.assertEqual(blocks[0].get("cache_control"), {"type": "ephemeral"}, "the prefix is still cached")
+        with mock.patch.dict(os.environ, {"ASSISTANT_INLINE_KNOWLEDGE": "1"}):
+            blocks = system_prompt("dev", "Dev", "postgres")
+        self.assertEqual(len(blocks), 2)
+        self.assertGreater(len(blocks[1]["text"]), 20000)
+
+    def test_the_cache_ttl_is_a_setting(self):
+        # sporadic use (a question every 10-40 min) rewrites a 5-minute cache on every
+        # question; the 1-hour TTL costs 2x on the write and pays back from the second question
+        from api.assistant import cache_control
+        with mock.patch.dict(os.environ, {"ASSISTANT_CACHE_TTL": ""}):
+            self.assertEqual(cache_control(), {"type": "ephemeral"})
+        with mock.patch.dict(os.environ, {"ASSISTANT_CACHE_TTL": "1h"}):
+            self.assertEqual(cache_control(), {"type": "ephemeral", "ttl": "1h"})
+            client = FakeClient([_resp([_text("ok")], "end_turn")])
+            Assistant(org_id="dev", org_name="Dev", actor_email="a@b", actor_id=None,
+                      client_factory=lambda: client).ask("hi")
+            req = client.requests[0]
+            self.assertEqual(req["system"][-1]["cache_control"], {"type": "ephemeral", "ttl": "1h"})
+            self.assertEqual(req["messages"][-1]["content"][-1]["cache_control"], {"type": "ephemeral", "ttl": "1h"})
+
+    def test_every_question_is_audited_with_its_token_cost(self):
+        client = FakeClient([_resp([_text("ok")], "end_turn")])
+        with mock.patch("api.access_audit.record_access_event") as rec:
+            Assistant(org_id="dev", org_name="Dev", actor_email="a@b", actor_id="u1",
+                      client_factory=lambda: client).ask("how many bills?")
+        asks = [c for c in rec.call_args_list if c.kwargs.get("action") == "assistant_ask"]
+        self.assertEqual(len(asks), 1)
+        d = asks[0].kwargs["detail"]
+        self.assertIn("input_tokens=10", d)
+        self.assertIn("output_tokens=5", d)
+        self.assertIn("turns=1", d)
+        self.assertIn("how many bills?", d)
+        self.assertEqual(asks[0].kwargs["target_id"], "dev")
+
     def test_a_refused_statement_goes_back_to_the_model_as_an_error_and_never_runs(self):
         client = FakeClient([
             # a statement the WORKSPACE would allow (cisadm is in its scope, no secret named):
@@ -171,7 +261,7 @@ class TheLoop(unittest.TestCase):
         result = client.requests[1]["messages"][-1]["content"][0]
         self.assertTrue(result["is_error"])
         self.assertIn("not a reporting canvas", result["content"])
-        self.assertEqual(self.mocks[2].call_args.kwargs["action"], "assistant_sql_refused")
+        self.assertIn("assistant_sql_refused", [c.kwargs["action"] for c in self.mocks[2].call_args_list])
 
     def test_the_loop_stops_at_the_turn_cap(self):
         forever = _resp([_tool("c", "list_canvases", {})], "tool_use")
@@ -192,7 +282,9 @@ class TheLoop(unittest.TestCase):
         json.dumps(out["thread"])   # serialisable for the browser
         follow = FakeClient([_resp([_text("again")], "end_turn")])
         self._assistant(follow).ask("and?", out["thread"])
-        self.assertEqual(follow.requests[0]["messages"][-1], {"role": "user", "content": "and?"})
+        sent = follow.requests[0]["messages"]
+        self.assertEqual(sent[-1], {"role": "user", "content": [{"type": "text", "text": "and?", "cache_control": {"type": "ephemeral"}}]})
+        self.assertEqual(sent[:-1], out["thread"], "the thread goes back exactly as it was handed out")
 
 
 class Routes(unittest.TestCase):
