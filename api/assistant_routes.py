@@ -35,7 +35,10 @@ def ask(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> dict[
     try:
         return assistant.ask(body.question, body.thread)
     except Exception as exc:  # noqa: BLE001 -- the model API is an external dependency
-        name = type(exc).__name__
         if "anthropic" in type(exc).__module__:
-            raise HTTPException(status_code=502, detail=f"The model API failed ({name}). Try again.") from exc
+            # the API's own message is the actionable part (billing, an invalid model id,
+            # a malformed request); the class name alone sent us to the server logs
+            said = str(getattr(exc, "message", "") or exc).split("{", 1)[0].strip(" -")[:300]
+            raise HTTPException(status_code=502,
+                                detail=f"The model API failed ({type(exc).__name__}): {said}") from exc
         raise

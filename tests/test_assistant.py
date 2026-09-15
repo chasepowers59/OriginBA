@@ -217,6 +217,20 @@ class Routes(unittest.TestCase):
         self.assertEqual(A.call_args.kwargs["org_id"], "dev")
         A.return_value.ask.assert_called_once_with("how many?", [])
 
+    def test_a_model_api_failure_says_what_the_api_said(self):
+        # the first real call failed with "credit balance is too low"; a bare 502 with the
+        # exception class name sent us to the server logs to learn that
+        class BadRequestError(Exception):
+            __module__ = "anthropic"
+            message = "Error code: 400 - Your credit balance is too low to access the Anthropic API."
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-only"}), \
+             mock.patch("api.assistant_routes.Assistant") as A:
+            A.return_value.ask.side_effect = BadRequestError()
+            r = self.client.post("/portal/assistant", json={"question": "how many?"})
+        self.assertEqual(r.status_code, 502)
+        self.assertIn("credit balance is too low", r.json()["detail"])
+        self.assertIn("BadRequestError", r.json()["detail"])
+
     def test_an_empty_question_is_rejected(self):
         with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-only"}):
             self.assertEqual(self.client.post("/portal/assistant", json={"question": ""}).status_code, 422)
