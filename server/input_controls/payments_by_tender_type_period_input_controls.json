@@ -29,7 +29,7 @@
       "type": "multiSelectQuery",
       "mandatory": false,
       "visible": true,
-      "query": "SELECT TRIM(tender_type_cd) AS CODE, TRIM(tender_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_TENDER_TYPE_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_PAY_TNDR t WHERE t.tender_type_cd = l.tender_type_cd) ORDER BY 1"
+      "query": "SELECT TRIM(tender_type_cd) AS CODE, TRIM(tender_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_TENDER_TYPE_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_PAY_TNDR t JOIN CISADM.CI_PAY_EVENT e ON e.pay_event_id = t.pay_event_id WHERE t.tender_type_cd = l.tender_type_cd AND e.pay_dt >= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1"
     },
     {
       "id": "PAYOR_ACCT_ID_F",

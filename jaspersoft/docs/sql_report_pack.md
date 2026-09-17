@@ -49,8 +49,9 @@ parameter and `$X{IN, TRIM(col), PARAM}` in the SQL, which is true when nothing 
 `CHEC` + `CKMA` returned exactly those two rows and their months.
 
 **Where a pick-list's entries come from.** Each list reads the client's label table
-(`CI_TENDER_TYPE_L`, `CI_BILL_CYC_L`, ...) restricted to **codes with activity** -- an `EXISTS`
-against the fact the report counts (tenders, bills, adjustments, GL lines, accounts, SAs). The
+(`CI_TENDER_TYPE_L`, `CI_BILL_CYC_L`, ...) restricted to **codes with activity in the last 3 years** -- an `EXISTS`
+against the fact the report counts (tenders by payment date, bills by bill date, adjustments
+by creation date, GL lines by accounting date, SAs open or ended within the window). The
 first cut listed every code ever *configured*, and Ellensburg's carried Auto Pay and Invoice
 Cloud tender types no tender has ever used (18 configured, 10 used); Chase asked for activity
 only (2026-09-17). The `EXISTS` compares CHAR to CHAR untrimmed so Oracle keeps its indexes.
