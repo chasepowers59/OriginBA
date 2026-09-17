@@ -138,14 +138,27 @@ class JrsImportZip(unittest.TestCase):
         cls.zf = zipfile.ZipFile(cls.zip_path)
         cls.names = cls.zf.namelist()
 
-    def test_index_is_last_and_names_the_import_roots(self):
+    def test_index_is_last_keyalias_first_and_names_the_datasource_and_roots(self):
+        import xml.etree.ElementTree as ET
+        import zipfile
         self.assertEqual(self.names[-1], "index.xml")
         self.assertEqual(self.names[0], "favorites/")
+        self.assertEqual(self.zf.getinfo("favorites/").compress_type, zipfile.ZIP_DEFLATED)
         idx = self.zf.read("index.xml").decode()
-        for root in sorted({g.FOLDERS[s.name] for s in g.SPECS}):
-            self.assertIn(f"<folder>{root}</folder>", idx)
-        self.assertIn('jsVersion" value="8.1.0 PRO"', idx)
-        self.assertNotIn("rootTenantId", idx, "tenant-relative")
+        root = ET.fromstring(idx)
+        first = list(root)[0]
+        self.assertEqual((first.tag, first.get("name")), ("property", "keyalias"), "a server export starts with keyalias")
+        self.assertTrue(first.get("value"))
+        props = {p.get("name"): p.get("value") for p in root.findall("property")}
+        self.assertTrue(props.get("encrypted"), "encrypted travels with keyalias, copied from a real export")
+        self.assertEqual(props.get("jsVersion"), "8.1.0 PRO")
+        self.assertNotIn("rootTenantId", props, "tenant-relative")
+        self.assertIn("<resource>/DataSource/Origin_DEV_DS</resource>", idx, "the datasource must be in the batch")
+        for r in sorted({g.FOLDERS[s.name] for s in g.SPECS}):
+            self.assertIn(f"<folder>{r}</folder>", idx)
+        self.assertIn("resources/DataSource/Origin_DEV_DS.xml", self.names)
+        self.assertIn("resources/DataSource/.folder.xml", self.names)
+        self.assertNotIn(" />", idx, "compact export formatting")
 
     def test_every_folder_on_the_path_has_a_folder_xml(self):
         import xml.etree.ElementTree as ET

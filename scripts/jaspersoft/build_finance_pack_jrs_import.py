@@ -1,29 +1,31 @@
 #!/usr/bin/env python3
 """Build the JasperReports Server IMPORT ZIP for the finance report pack.
 
-The first bundle (a manifest + loose files) was refused: "provided zip file is not valid
-JasperReports Server export file" (DEV, 2026-09-17). A JRS import is the server's own export
-shape, learned and verified in originba-letterprint (jasperserver/tools/build_import_bundle.py,
-imported on an 8.1.0 PRO tenant) and on Newark REP8:
+Two shapes were refused or ignored on DEV (2026-09-17) before this one: a manifest bundle
+("not a valid JasperReports Server export file") and a content-only export without the
+datasource or keyalias ("imported fine" -- and imported NOTHING: the server skips a package
+it cannot pair with a key and a datasource it can resolve inside the batch). The shape that
+lands is the one Newark REP8 and the Standard Offering pipeline use, and the repo's own
+verifier (scripts/jaspersoft/verify_standard_offering_tenant_import.py) encodes:
 
-    index.xml                                   LAST entry in the zip; lists the import roots
-    favorites/                                  empty directory entry, as a real export carries
-    resources/<each folder>/.folder.xml         one per folder on the path, parent + name
-    resources/<folder>/<unit>.xml               <reportUnit>: mainReport, inputControls (local),
-                                                resources (the subreport, local jrxml), dataSource
-    resources/<folder>/<unit>_files/main_jrxml.data       the main JRXML
-    resources/<folder>/<unit>_files/<sub>.data            the subreport JRXML, resource name <sub>
-                                                          (the main references "repo:<sub>")
+    index.xml           LAST entry; keyalias FIRST, then <module id="repositoryResources"> with the
+                        datasource <resource> and the import <folder>s, <module id="favorites"/>,
+                        pathProcessorId, jsVersion, encrypted -- keyalias/encrypted/jsVersion are
+                        COPIED from a real export of the target tenant, never invented
+    favorites/          empty, deflated directory entry
+    resources/DataSource/.folder.xml + <DS>.xml   the datasource resource itself, verbatim from
+                        that same export (the unit's <dataSource><uri> must resolve in the batch)
+    resources/<folder>/.folder.xml                one per folder on the path
+    resources/<folder>/<unit>.xml                 <reportUnit>: mainReport, dataSource, local
+                                                  inputControls, the subreport as a local jrxml
+                                                  resource named what the main's repo:<name> says
+    resources/<folder>/<unit>_files/main_jrxml.data, <sub>.data
 
-Tenant-relative: no rootTenantId, so the same zip imports into DEV or inside a client org.
-The datasource is BOUND on each unit (--datasource, default /DataSource/Origin_DEV_DS) and
-must already exist on the target; pass the client's (/DataSource/Newark1_DS) for a tenant.
-jsVersion is measured ("8.1.0 PRO" from deploy/jaspersoft_datasources/canonical/Origin_DEV_DS_export.zip),
-never guessed. keyalias/encrypted are omitted: a content-only bundle needs neither
-(letterprint, verified); if a server ever answers "not valid export file" to THIS shape, copy
-both from a real export of that tenant.
+Tenant-relative (no rootTenantId): import from INSIDE the tenant's Repository.
 
-    python3 scripts/jaspersoft/build_finance_pack_jrs_import.py [--datasource /DataSource/X_DS] [--out ZIP]
+    python3 scripts/jaspersoft/build_finance_pack_jrs_import.py                       # DEV (Origin_DEV_DS)
+    python3 scripts/jaspersoft/build_finance_pack_jrs_import.py --datasource Newark1_DS \
+        --datasource-export deploy/jaspersoft_datasources/clients/Newark1_DS
 """
 from __future__ import annotations
 
@@ -39,7 +41,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import generate_sql_report_pack as g  # noqa: E402
 
 STAMP = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-JS_VERSION = "8.1.0 PRO"
+CANONICAL = REPO / "deploy" / "jaspersoft_datasources" / "canonical"
+CLIENTS = REPO / "deploy" / "jaspersoft_datasources" / "clients"
 # JRS input-control dataType.type: 1 text, 2 number, 3 date, 4 datetime; inputControl.type 2 = single value
 DATATYPE = {"singleValueText": 1, "singleValueNumber": 2, "singleValueDate": 3}
 
@@ -135,8 +138,38 @@ def report_unit(spec: g.Spec, folder: str, datasource: str) -> str:
 '''
 
 
-def build(out_zip: Path, datasource: str) -> Path:
+def load_datasource_export(ds: str, export: Path | None) -> tuple[dict[str, bytes], dict[str, str]]:
+    """The DataSource resource files and the index metadata (keyalias, encrypted, jsVersion) of a
+    REAL export of the target tenant. Default: the canonical DEV export for Origin_DEV_DS, the
+    client's folder under deploy/jaspersoft_datasources/clients/ otherwise."""
+    import xml.etree.ElementTree as ET
+    if export is None:
+        export = CANONICAL / f"{ds}_export.zip" if (CANONICAL / f"{ds}_export.zip").exists() else CLIENTS / ds
+    wanted = {"index.xml", "resources/DataSource/.folder.xml", f"resources/DataSource/{ds}.xml"}
     files: dict[str, bytes] = {}
+    if export.is_file():
+        with zipfile.ZipFile(export) as zf:
+            for n in zf.namelist():
+                if n in wanted:
+                    files[n] = zf.read(n)
+    elif export.is_dir():
+        for n in wanted:
+            if (export / n).exists():
+                files[n] = (export / n).read_bytes()
+    missing = wanted - set(files)
+    if missing:
+        raise SystemExit(f"datasource export {export} lacks {sorted(missing)}; export /DataSource/{ds} from the tenant first")
+    meta = {p.get("name"): p.get("value") for p in ET.fromstring(files.pop("index.xml")).findall("property")}
+    for k in ("keyalias", "encrypted", "jsVersion"):
+        if not meta.get(k):
+            raise SystemExit(f"{export}: index.xml carries no {k}; a real server export always does")
+    return files, meta
+
+
+def build(out_zip: Path, datasource: str, export: Path | None = None) -> Path:
+    ds_files, meta = load_datasource_export(datasource, export)
+    ds_uri = f"/DataSource/{datasource}"
+    files: dict[str, bytes] = dict(ds_files)
     folders: set[str] = set()
     for spec in g.SPECS:
         folder = g.FOLDERS[spec.name]
@@ -144,21 +177,27 @@ def build(out_zip: Path, datasource: str) -> Path:
         for i in range(len(parts)):
             folders.add("/" + "/".join(parts[: i + 1]))
         rel = folder.strip("/")
-        files[f"resources/{rel}/{spec.name}.xml"] = report_unit(spec, folder, datasource).encode()
+        files[f"resources/{rel}/{spec.name}.xml"] = report_unit(spec, folder, ds_uri).encode()
         files[f"resources/{rel}/{spec.name}_files/main_jrxml.data"] = (g.REPORTS / f"{spec.name}.jrxml").read_bytes()
         files[f"resources/{rel}/{spec.name}_files/{spec.sub.name}.data"] = (g.SUBS / f"{spec.sub.name}.jrxml").read_bytes()
     for f in sorted(folders):
         parent, name = f.rsplit("/", 1)
         files[f"resources/{f.strip('/')}/.folder.xml"] = folder_xml(parent or "/", name).encode()
     roots = sorted({g.FOLDERS[s.name] for s in g.SPECS})
-    index = ('<?xml version="1.0" encoding="UTF-8"?>\n<export><module id="repositoryResources">'
+    # the exact layout of a server export: keyalias first, resources before folders inside the
+    # module, favorites module, then the remaining properties; compact, no self-closing spaces
+    index = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+             f'<export><property name="keyalias" value="{meta["keyalias"]}"/>'
+             f'<module id="repositoryResources"><resource>{ds_uri}</resource>'
              + "".join(f"<folder>{r}</folder>" for r in roots)
              + '</module><module id="favorites"/><property name="pathProcessorId" value="zip"/>'
-             f'<property name="jsVersion" value="{JS_VERSION}"/></export>\n')
+             f'<property name="jsVersion" value="{meta["jsVersion"]}"/>'
+             f'<property name="encrypted" value="{meta["encrypted"]}"/></export>\n')
     out_zip.parent.mkdir(parents=True, exist_ok=True)
     out_zip.unlink(missing_ok=True)
     with zipfile.ZipFile(out_zip, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr(zipfile.ZipInfo("favorites/"), b"")
+        fav = zipfile.ZipInfo("favorites/"); fav.compress_type = zipfile.ZIP_DEFLATED
+        z.writestr(fav, b"")
         for name in sorted(files):
             z.writestr(name, files[name])
         z.writestr("index.xml", index)   # last: the importer reads the archive in order
@@ -167,14 +206,16 @@ def build(out_zip: Path, datasource: str) -> Path:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--datasource", default="/DataSource/Origin_DEV_DS")
+    ap.add_argument("--datasource", default="Origin_DEV_DS", help="datasource NAME under /DataSource on the target tenant")
+    ap.add_argument("--datasource-export", type=Path, default=None,
+                    help="a real export of that datasource (zip or extracted dir); default: canonical/ or clients/<DS>/")
     ap.add_argument("--out", type=Path, default=None)
     a = ap.parse_args()
-    ds_slug = a.datasource.rsplit("/", 1)[-1]
-    out = a.out or REPO / "deploy" / f"finance_pack_jrs_import_{ds_slug}.zip"
-    z = build(out, a.datasource)
+    ds = a.datasource.rsplit("/", 1)[-1]
+    out = a.out or REPO / "deploy" / f"finance_pack_jrs_import_{ds}.zip"
+    z = build(out, ds, a.datasource_export)
     with zipfile.ZipFile(z) as zf:
-        print(f"{z.relative_to(REPO)}  ({len(zf.namelist())} entries, {z.stat().st_size // 1024} KB, datasource {a.datasource})")
+        print(f"{z.relative_to(REPO)}  ({len(zf.namelist())} entries, {z.stat().st_size // 1024} KB, datasource /DataSource/{ds})")
     return 0
 
 

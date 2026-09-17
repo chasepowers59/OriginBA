@@ -81,13 +81,20 @@ python3 scripts/jaspersoft/build_finance_pack_jrs_import.py                     
 python3 scripts/jaspersoft/build_finance_pack_jrs_import.py --datasource /DataSource/Newark1_DS   # a client org
 ```
 
-`deploy/finance_pack_jrs_import_<DS>.zip` is a JasperReports Server import (the server's
-own export shape: `index.xml` last, `.folder.xml` per folder, one `<reportUnit>` per report
-with its main JRXML, its subreport as a local jrxml resource and its input controls as local
-resources, the datasource bound). Import it from the tenant's repository (Manage > Import,
-or the REST import) -- the folders already exist there and are merged. The first attempt,
-a loose "manifest" bundle, was refused with "not a valid JasperReports Server export file";
-that shape is not an import format.
+`deploy/finance_pack_jrs_import_<DS>.zip` is a JasperReports Server import in the server's
+own export shape: `index.xml` last with `keyalias` first, the datasource resource bundled
+and listed, `.folder.xml` per folder, one `<reportUnit>` per report with its main JRXML, its
+subreport as a local jrxml resource, its input controls as local resources and the datasource
+bound. `keyalias`, `encrypted` and `jsVersion` are copied from a real export of the target
+tenant (`deploy/jaspersoft_datasources/canonical/Origin_DEV_DS_export.zip` for DEV; the
+client's folder under `deploy/jaspersoft_datasources/clients/` otherwise -- pass
+`--datasource <DS> --datasource-export <path>`). Import it from INSIDE the tenant's
+Repository (breadcrumb shows the org); the folders already exist there and are merged.
+
+Two shapes that do NOT work, both tried on DEV 2026-09-17: a loose "manifest" bundle is
+refused ("not a valid JasperReports Server export file"); a content-only export with no
+datasource in the batch and no `keyalias` reports success and imports nothing -- search the
+repository for a unit name after every import, and treat "success with warnings" as failure.
 
 After import: open each unit, run with a one-month window and no filters, then reconcile one
 number per unit against the source before handing it over: billed vs `rpt_bill_segment`,
