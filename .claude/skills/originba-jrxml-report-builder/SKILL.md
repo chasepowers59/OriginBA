@@ -244,7 +244,15 @@ ORDER BY account]]></queryString>
   `$P{X} IS NULL OR ...` selects all). Every client-configured code (cycle, tender type,
   adjustment type, distribution code, division, service type) is a pick-list; ids and
   amounts stay typed. `GET /rest_v2/reports/<uri>/inputControls/<NAME>/values` proves the
-  list populates. Multi-select is `type: 7` + `$X{IN, col, PARAM}` with a Collection parameter.
+  list populates. Multi-select is `type: 7`, the parameter `java.util.Collection`, the SQL
+  `$X{IN, TRIM(col), PARAM}` (true when the collection is null/empty, so blank = all); pass
+  repeated `PARAM=v` query args to run it. A pick-list is the client's CONFIGURATION table --
+  every code ever defined -- not the codes in use; say so when someone compares it with an Ad
+  Hoc view joined through the fact rows (Ellensburg: 18 tender types configured, 10 ever used).
+- **Layout rules that survived the first DEV review**: main row = light band under a sapphire
+  rule; subreport on the SAME column grid (blank placeholder cells), no caption, plain rows,
+  hairline + subtotal; `fontName="SansSerif"` -- the server has no Aptos and falls back to a
+  serif, which reads as a different report.
 - **Only Origin_DEV** on the SmartCity server unless Chase names another org: the rest are live
   client tenants (2026-09-17).
 - `jrs_repository.py search <name>` / `list <folder>` answer "where is it" before any theory.

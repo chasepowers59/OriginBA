@@ -30,7 +30,7 @@ from jrs_repository import _call, _cfg, _ssl_context  # noqa: E402
 DATATYPE = {"singleValueText": "text", "singleValueNumber": "number", "singleValueDate": "date"}
 # JRS input-control types: 2 = single value (typed), 4 = single-select query (a pick-list whose
 # options come from SQL on the report's datasource; the user sees DESCR, the parameter gets CODE)
-SINGLE_VALUE, SINGLE_SELECT_QUERY = 2, 4
+SINGLE_VALUE, SINGLE_SELECT_QUERY, MULTI_SELECT_QUERY = 2, 4, 7
 
 
 def org_root(org: str | None) -> str:
@@ -44,8 +44,9 @@ def descriptor(spec: g.Spec, ds_uri: str) -> dict:
         base = {"label": ic["label"], "mandatory": bool(ic["mandatory"]), "readOnly": False, "visible": True,
                 # the embedded resource takes its NAME (= the report parameter it binds) from this
                 "uri": f"{spec.name}_files/{ic['id']}"}
-        if ic["type"] == "singleSelectQuery":
-            base.update({"type": SINGLE_SELECT_QUERY, "valueColumn": "CODE", "visibleColumns": ["DESCR"],
+        if ic["type"] in ("singleSelectQuery", "multiSelectQuery"):
+            base.update({"type": MULTI_SELECT_QUERY if ic["type"] == "multiSelectQuery" else SINGLE_SELECT_QUERY,
+                         "valueColumn": "CODE", "visibleColumns": ["DESCR"],
                          "query": {"query": {"label": f"{ic['id']}_query", "language": "sql", "value": ic["query"],
                                              "dataSource": {"dataSourceReference": {"uri": ds_uri}}}}})
         else:
@@ -80,7 +81,8 @@ def deploy(org: str | None, ds: str) -> list[str]:
             continue
         code, text = _call(f"/rest_v2/resources{uri}?expanded=true", accept="application/repository.reportUnit+json")
         d = json.loads(text)
-        ctl = [f"{c['inputControl']['uri'].rsplit('/', 1)[-1]}:{'list' if c['inputControl'].get('type') == SINGLE_SELECT_QUERY else 'value'}"
+        kinds = {SINGLE_SELECT_QUERY: "list", MULTI_SELECT_QUERY: "multi"}
+        ctl = [f"{c['inputControl']['uri'].rsplit('/', 1)[-1]}:{kinds.get(c['inputControl'].get('type'), 'value')}"
                for c in d.get("inputControls", []) if "inputControl" in c]
         rs = d.get("resources", {}); rs = rs.get("resource", rs) if isinstance(rs, dict) else rs
         res = [r.get("name") for r in rs]
@@ -90,11 +92,12 @@ def deploy(org: str | None, ds: str) -> list[str]:
     return uris
 
 
-def run(uris: list[str], from_dt: str, to_dt: str, out_dir: Path, extra: dict[str, str] | None = None) -> int:
+def run(uris: list[str], from_dt: str, to_dt: str, out_dir: Path, extra: dict[str, list[str]] | None = None) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     bad = 0
     for uri in uris:
-        q = urllib.parse.urlencode({"FROM_DT": from_dt, "TO_DT": to_dt, **(extra or {})})
+        pairs = [("FROM_DT", from_dt), ("TO_DT", to_dt)] + [(k, v) for k, vs in (extra or {}).items() for v in (vs if isinstance(vs, list) else [vs])]
+        q = urllib.parse.urlencode(pairs)
         url, auth = _cfg()
         req = urllib.request.Request(f"{url}/rest_v2/reports{uri}.pdf?{q}")
         req.add_header("Authorization", auth)
@@ -123,7 +126,9 @@ def main() -> int:
     a = ap.parse_args()
     uris = deploy(a.org, a.datasource)
     if a.run and uris:
-        extra = dict(kv.split("=", 1) for kv in a.param)
+        extra: dict[str, list[str]] = {}
+        for kv in a.param:
+            k, v = kv.split("=", 1); extra.setdefault(k, []).append(v)
         return 1 if run(uris, a.run[0], a.run[1], a.out, extra) else 0
     return 0 if len(uris) == len(g.SPECS) else 1
 

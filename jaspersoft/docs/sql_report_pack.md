@@ -17,6 +17,12 @@ and a JasperReports 6.20.6 compile of all eight files), packaged as a JRS import
 | `adjustments_by_type_period` — Adjustments by Type | `CI_ADJ.CRE_DT` | adjustment type (`CI_ADJ_TYPE_L`): count, net, debits, credits, largest, smallest | the `TOP_N` largest adjustments with SA, account, main customer | frozen (`50`) |
 | `gl_by_distribution_code_period` — GL Activity by Distribution Code | `CI_FT.ACCOUNTING_DT` | distribution code + GL account: lines, FTs, debits, credits, net | by accounting month | GL lines of frozen FTs (`CI_FT_GL.AMOUNT`) |
 
+Layout (reworked 2026-09-17 after the first DEV review): the main row is a light-blue band
+under a sapphire rule; the subreport sits on the SAME column grid as the main report (a blank
+cell holds the position where the subreport has no such column), rows are plain, the subtotal
+sits under a hairline, and there is no per-subreport caption -- the band names the key. Font
+is SansSerif: the server has no Aptos and fell back to a serif.
+
 Parameters on every unit: `FROM_DT`, `TO_DT` (inclusive, `java.sql.Date`; defaults = last
 calendar month), labelled by the column they filter -- *Bill date*, *Payment date*, *Adjustment
 created date*, *Accounting date* -- and printed in the title line. **Nothing runs unbounded**:
@@ -30,16 +36,27 @@ query control on the report's own datasource showing `CODE - description` from t
 
 | Unit | Pick-lists | Typed |
 | --- | --- | --- |
-| Billing by Cycle | bill cycle, service type, CIS division | account ID |
-| Payments by Tender Type | tender type | payor account ID, tender control ID, minimum tender amount |
+| Billing by Cycle | **bill cycles (multi-select)**, service type, CIS division | account ID |
+| Payments by Tender Type | **tender types (multi-select)** | payor account ID, tender control ID, minimum tender amount |
 | Adjustments by Type | adjustment type | account ID, service agreement ID, minimum absolute amount, `TOP_N` |
 | GL Activity by Distribution Code | distribution code, GL division, CIS division, FT type | GL account (exact) |
 
 Measured on Origin_DEV 2026-09-17: the lists populate from the datasource (18 tender types,
 12 bill cycles, 8 service types, 99 adjustment types, 180 distribution codes, 7 FT types);
 picking `CHEC` narrowed Payments to that row and its months; `E` narrowed Billing to the
-Electric subtotals. Multi-select (several cycles at once) is the same control kind with
-`$X{IN, col, PARAM}` in the SQL -- not built until a report needs it.
+Electric subtotals. Bill cycles and tender types are **multi-select** (a `java.util.Collection`
+parameter and `$X{IN, TRIM(col), PARAM}` in the SQL, which is true when nothing is picked);
+`CHEC` + `CKMA` returned exactly those two rows and their months.
+
+**Where a pick-list's entries come from.** A code list is the client's configuration table
+(`CI_TENDER_TYPE_L`, `CI_BILL_CYC_L`, ...): every code the client has ever defined, whether
+or not any row uses it. An Ad Hoc view that joins the label table *through* the tender rows
+shows only codes with tenders. Ellensburg (2026-09-17, all tenders 2020-01..2026-10):
+18 tender types are configured, 10 have ever carried a tender (OPCC 193,162 / CHEC 63,327 /
+CKMA 17,248 / ELBX 19,717 / EFT 5,871 / CKWI 7,442 / OPOC 8,080 / CCHK 4 / MO 2 / OVUN 1);
+`APCK`, `APSV` (Auto Pay), `TPCC`/`TPCK`/`TPSV` (Invoice Cloud), `TCHK` and `CASH` have none in
+this extract -- configured, never (or no longer) used. The list is deliberately the
+configuration, not the usage: a code that starts being used tomorrow is already there.
 
 ## Semantics, so the totals reconcile
 

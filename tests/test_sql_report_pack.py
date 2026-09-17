@@ -76,19 +76,33 @@ class Sql(unittest.TestCase):
             self.assertGreaterEqual(len(s.filters), 3, s.name)
             main, sub = s.main_sql(), s.sub_sql()
             for f in s.filters:
-                self.assertIn(f"$P{{{f.param}}} IS NULL OR", main, f"{s.name}: {f.param} not optional in main")
-                self.assertIn(f"$P{{{f.param}}} IS NULL OR", sub, f"{s.name}: {f.param} not optional in sub")
+                # optional either way: a null single value, or a null/empty collection ($X{IN} is then true)
+                opt = f"$X{{IN, " if f.multi else f"$P{{{f.param}}} IS NULL OR"
+                self.assertIn(opt, main, f"{s.name}: {f.param} not optional in main")
+                self.assertIn(opt, sub, f"{s.name}: {f.param} not optional in sub")
+                if f.multi:
+                    self.assertIn(f", {f.param}}}", main)
+                    self.assertIn(f'<parameter name="{f.param}" class="java.util.Collection">', g.main_jrxml(s))
                 self.assertIn(f'<parameter name="{f.param}"', g.sub_jrxml(s), f"{s.sub.name}: {f.param} undeclared")
             # the filters sit inside the WHERE, before any GROUP BY
             for sql in (main, sub):
                 if "GROUP BY" in sql:
-                    self.assertLess(sql.rfind("IS NULL OR"), sql.find("\nGROUP BY"), s.name)
+                    self.assertLess(max(sql.rfind("IS NULL OR"), sql.rfind("$X{IN")), sql.find("\nGROUP BY"), s.name)
             self.assertNotIn("/*FILTERS*/", main + sub)
 
     def test_columns_fill_the_page(self):
         for s in g.SPECS:
             self.assertEqual(sum(c.width for c in s.columns), g.COL_W, s.name)
             self.assertEqual(sum(c.width for c in s.sub.columns), g.COL_W - 24, s.sub.name)
+            # a subreport shares the main grid: every numeric column sits at a main column's x
+            edges = set(); x = 0
+            for c in s.columns:
+                x += c.width; edges.add(x)
+            x = 24
+            for c in s.sub.columns:
+                x += c.width
+                if c.name and c.align == "Right":
+                    self.assertIn(x, edges, f"{s.sub.name}.{c.name} right edge {x} is off the main grid")
 
 
 def _jr7_classpath() -> str | None:
@@ -152,7 +166,7 @@ class RestDescriptor(unittest.TestCase):
             self.assertEqual(ids, [ic["id"] for ic in g.controls(s)[0]["inputControls"]])
             for c in desc["inputControls"]:
                 ic = c["inputControl"]
-                if ic["type"] == d.SINGLE_SELECT_QUERY:
+                if ic["type"] in (d.SINGLE_SELECT_QUERY, d.MULTI_SELECT_QUERY):
                     q = ic["query"]["query"]
                     self.assertTrue(q["value"].upper().startswith("SELECT ") and " AS CODE" in q["value"] and " AS DESCR" in q["value"])
                     self.assertIn("LANGUAGE_CD = 'ENG'", q["value"].upper())
@@ -168,3 +182,15 @@ class RestDescriptor(unittest.TestCase):
             self.assertTrue(lists, s.name)
             self.assertTrue(all(f.lov_sql for f in s.filters if f.param.endswith(("_CD_F", "DIVISION_F", "DST_ID_F", "FLG_F"))), s.name)
             self.assertIn(s.window_label, g.main_jrxml(s))
+
+
+class MultiSelect(unittest.TestCase):
+    def test_bill_cycles_and_tender_types_take_several_values(self):
+        import jrs_deploy_report_units as d
+        multi = {(s.name, f.param) for s in g.SPECS for f in s.filters if f.multi}
+        self.assertEqual(multi, {("billing_by_cycle_period", "BILL_CYC_CD_F"), ("payments_by_tender_type_period", "TENDER_TYPE_CD_F")})
+        for s in g.SPECS:
+            desc = d.descriptor(s, "/x/DataSource/X_DS")
+            for c in desc["inputControls"]:
+                ic = c["inputControl"]; name = ic["uri"].rsplit("/", 1)[-1]
+                self.assertEqual(ic["type"] == d.MULTI_SELECT_QUERY, (s.name, name) in multi, f"{s.name}.{name}")

@@ -37,22 +37,23 @@ ROW_H, HDR_H = 16, 18
 MONEY = "#,##0.00;(#,##0.00)"
 INT = "#,##0"
 
-STYLES = """    <style name="Base" default="true" fontName="Aptos" fontSize="9"/>
+STYLES = """    <style name="Base" default="true" fontName="SansSerif" fontSize="9"/>
     <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
-    <style name="H3" style="Base" fontSize="10" forecolor="#0F4761"/>
+    <style name="H3" style="Base" fontSize="9" forecolor="#0F4761"/>
     <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
-    <style name="DetailText" style="Base" fontSize="9" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
-    <style name="SubHeader" style="Base" fontSize="8" bold="true" forecolor="#1348AB"/>
+    <style name="RowBand" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="SubHeader" style="Base" fontSize="8" forecolor="#5B6470"/>
     <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
-    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
-    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#000000"/>
+    <style name="SubTotal" style="Base" fontSize="8" bold="true" forecolor="#0F4761"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
 """
 FOOTER = '"@2026, Origin Utility, Inc / Proprietary & Confidential"'
 
 
 @dataclass
 class Col:
-    name: str
+    name: str | None          # None = a blank cell that holds the main report's column position
     label: str
     cls: str = "java.lang.String"
     width: int = 80
@@ -68,8 +69,9 @@ class Sub:
     key_field: str            # main-report field holding the key
     sql: str
     columns: list[Col]
-    intro: str                # text above the subreport table, may use $P{...}
+    intro: str                # (unused since the layout rework: the main row already names the key)
     extra_keys: dict = field(default_factory=dict)   # more param -> main field pairs (a compound key)
+    header: bool = False      # print the subreport's own column header (only when its columns are not the main grid)
 
     def keys(self) -> dict:
         return {self.key_param: self.key_field, **self.extra_keys}
@@ -87,6 +89,7 @@ class Filter:
     cls: str = "java.lang.String"
     control: str = "singleValueText"
     lov_sql: str | None = None   # a pick-list: SELECT <code> AS CODE, <label> AS DESCR ... on the same datasource
+    multi: bool = False          # several values at once: java.util.Collection, $X{IN, col, PARAM} (empty = all)
 
 
 @dataclass
@@ -103,7 +106,7 @@ class Spec:
     window_label: str = "Date"                    # the column the FROM/TO window filters on, as the user knows it
 
     def all_params(self) -> dict:
-        return {**self.params, **{f.param: (f.cls, "null") for f in self.filters}}
+        return {**self.params, **{f.param: ("java.util.Collection" if f.multi else f.cls, "null") for f in self.filters}}
 
     def main_sql(self) -> str:
         return _with_filters(self.sql, [f.main_pred for f in self.filters])
@@ -150,14 +153,19 @@ def _params(extra: dict[str, tuple[str, str]]) -> str:
 
 
 def _fields(cols: list[Col]) -> str:
-    return "\n".join(f'    <field name="{c.name}" class="{c.cls}"/>' for c in cols)
+    return "\n".join(f'    <field name="{c.name}" class="{c.cls}"/>' for c in cols if c.name)
 
 
 def _variables(cols: list[Col]) -> str:
     return "\n".join(
         f'    <variable name="SUM_{c.name}" class="{c.cls}" calculation="Sum">\n'
         f'        <expression><![CDATA[$F{{{c.name}}}]]></expression>\n    </variable>'
-        for c in cols if c.total)
+        for c in cols if c.total and c.name)
+
+
+def _rule(x: int, y: int, w: int, seed: str, width: str = "0.5", color: str = "#B9C6D2") -> str:
+    return (f'            <element kind="line" x="{x}" y="{y}" width="{w}" height="1">'
+            f'<pen lineWidth="{width}" lineColor="{color}"/></element>')
 
 
 def _text(x: int, y: int, w: int, h: int, expr: str, style: str, align: str, seed: str,
@@ -174,33 +182,37 @@ def _static(x: int, y: int, w: int, h: int, text: str, style: str, align: str, s
             f'hTextAlign="{align}" vTextAlign="Middle"><text><![CDATA[{_xml_esc(text)}]]></text></element>')
 
 
-def _header_row(cols: list[Col], style: str, seed: str, h: int = HDR_H) -> str:
+def _header_row(cols: list[Col], style: str, seed: str, h: int = HDR_H, y: int = 0) -> str:
     x, out = 0, []
     for c in cols:
-        out.append(_static(x, 0, c.width, h, c.label, style, "Center" if style == "HeaderSapphire" else c.align, f"{seed}/h/{c.name}"))
+        if style == "HeaderSapphire" or c.name:
+            out.append(_static(x, y, c.width, h, c.label if c.name else "", style, "Center" if style == "HeaderSapphire" else c.align, f"{seed}/h/{c.name}"))
         x += c.width
     return "\n".join(out)
 
 
-def _detail_row(cols: list[Col], style: str, seed: str, h: int = ROW_H) -> str:
+def _detail_row(cols: list[Col], style: str, seed: str, h: int = ROW_H, y: int = 0) -> str:
     x, out = 0, []
     for c in cols:
-        out.append(_text(x, 0, c.width, h, f"$F{{{c.name}}}", style, c.align, f"{seed}/d/{c.name}", c.pattern))
+        if c.name:
+            out.append(_text(x, y, c.width, h, f"$F{{{c.name}}}", style, c.align, f"{seed}/d/{c.name}", c.pattern))
+        elif style == "RowBand":
+            out.append(_static(x, y, c.width, h, "", style, "Left", f"{seed}/d/blank{x}"))
         x += c.width
     return "\n".join(out)
 
 
-def _total_row(cols: list[Col], style: str, seed: str, label: str, h: int = ROW_H) -> str:
+def _total_row(cols: list[Col], style: str, seed: str, label: str, h: int = ROW_H, y: int = 0) -> str:
     x, out = 0, []
     first = True
     for c in cols:
-        if c.total:
-            out.append(_text(x, 0, c.width, h, f"$V{{SUM_{c.name}}}", style, c.align, f"{seed}/t/{c.name}", c.pattern))
+        if c.total and c.name:
+            out.append(_text(x, y, c.width, h, f"$V{{SUM_{c.name}}}", style, c.align, f"{seed}/t/{c.name}", c.pattern))
         elif first:
-            out.append(_static(x, 0, c.width, h, label, style, "Left", f"{seed}/t/label"))
+            out.append(_static(x, y, c.width, h, label, style, "Left", f"{seed}/t/label"))
             first = False
-        else:
-            out.append(_static(x, 0, c.width, h, "", style, "Left", f"{seed}/t/{c.name}"))
+        elif style == "TotalText":
+            out.append(_static(x, y, c.width, h, "", style, "Left", f"{seed}/t/{c.name}"))
         x += c.width
     return "\n".join(out)
 
@@ -223,7 +235,8 @@ def main_jrxml(s: Spec) -> str:
     window = (f'"{s.window_label} " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{{FROM_DT}}) '
               '+ " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT})'
               + (f' + "  |  {s.order_note}"' if s.order_note else "")
-              + "".join(f' + ($P{{{f.param}}} == null ? "" : "  |  {f.label}: " + $P{{{f.param}}})' for f in s.filters))
+              + "".join((f' + ($P{{{f.param}}} == null || $P{{{f.param}}}.isEmpty() ? "" : "  |  {f.label}: " + String.join(", ", $P{{{f.param}}}))'
+                         if f.multi else f' + ($P{{{f.param}}} == null ? "" : "  |  {f.label}: " + $P{{{f.param}}})') for f in s.filters))
     return (_head(s.name, PAGE_W, PAGE_H, MARGIN, COL_W) + STYLES +
             f'    <query language="SQL"><![CDATA[\n{s.main_sql().strip()}\n]]></query>\n'
             + _params(s.all_params()) + "\n"
@@ -234,7 +247,9 @@ def main_jrxml(s: Spec) -> str:
             f'    </title>\n'
             f'    <columnHeader height="{HDR_H}">\n' + _header_row(s.columns, "HeaderSapphire", s.name) + "\n"
             f'    </columnHeader>\n'
-            f'    <detail>\n        <band height="{ROW_H + 4}" splitType="Prevent">\n' + _detail_row(s.columns, "DetailText", s.name) + "\n"
+            f'    <detail>\n        <band height="{ROW_H + 6}" splitType="Prevent">\n'
+            + _rule(0, 2, COL_W, s.name + "/rule", "0.75", "#006FAC") + "\n"
+            + _detail_row(s.columns, "RowBand", s.name, ROW_H + 2, 3) + "\n"
             f'        </band>\n        <band height="20" splitType="Stretch">\n'
             f'            <element kind="subreport" x="24" y="0" width="{COL_W - 24}" height="20" positionType="Float" '
             f'removeLineWhenBlank="true" usingCache="false">\n'
@@ -247,24 +262,27 @@ def main_jrxml(s: Spec) -> str:
             + _text(600, 0, 150, 14, '"Page " + $V{PAGE_NUMBER} + " of"', "FooterConfidential", "Right", s.name + "/page") + "\n"
             + _text(750, 0, 52, 14, '" " + $V{PAGE_NUMBER}', "FooterConfidential", "Left", s.name + "/pages", evaluation="Report") + "\n"
             f'    </pageFooter>\n'
-            f'    <summary height="{ROW_H + 6}">\n' + _total_row(s.columns, "TotalText", s.name, "Total") + "\n"
+            f'    <summary height="{ROW_H + 8}">\n'
+            + _rule(0, 2, COL_W, s.name + "/trule", "1.0", "#006FAC") + "\n"
+            + _total_row(s.columns, "TotalText", s.name, "Total", ROW_H + 2, 4) + "\n"
             f'    </summary>\n</jasperReport>\n')
 
 
 def sub_jrxml(s: Spec) -> str:
     sub, w = s.sub, COL_W - 24
     params = _params({**{k: ("java.lang.String", '""') for k in sub.keys()}, **s.all_params()})
+    header = (f'    <columnHeader height="13">\n' + _header_row(sub.columns, "SubHeader", sub.name, 12) + "\n"
+              + _rule(0, 12, w, sub.name + "/hrule") + "\n    </columnHeader>\n") if sub.header else ""
     return (_head(sub.name, w, PAGE_H, 0, w) + STYLES +
             f'    <query language="SQL"><![CDATA[\n{s.sub_sql().strip()}\n]]></query>\n'
             + params + "\n"
             + _fields(sub.columns) + "\n" + _variables(sub.columns) + "\n"
-            f'    <title height="14">\n' + _text(0, 0, w, 14, sub.intro, "SubHeader", "Left", sub.name + "/intro") + "\n"
-            f'    </title>\n'
-            f'    <columnHeader height="14">\n' + _header_row(sub.columns, "SubHeader", sub.name, 14) + "\n"
-            f'    </columnHeader>\n'
-            f'    <detail>\n        <band height="13">\n' + _detail_row(sub.columns, "SubText", sub.name, 13) + "\n"
+            + header
+            + f'    <detail>\n        <band height="12">\n' + _detail_row(sub.columns, "SubText", sub.name, 12) + "\n"
             f'        </band>\n    </detail>\n'
-            f'    <summary height="16">\n' + _total_row(sub.columns, "SubHeader", sub.name, "Subtotal", 13) + "\n"
+            f'    <summary height="20">\n'
+            + _rule(0, 1, w, sub.name + "/srule") + "\n"
+            + _total_row(sub.columns, "SubTotal", sub.name, "Subtotal", 12, 2) + "\n"
             f'    </summary>\n</jasperReport>\n')
 
 
@@ -277,7 +295,8 @@ def controls(s: Spec) -> tuple[dict, list]:
         ics.append({"id": n, "label": n.replace("_", " ").title(), "type": "singleValueNumber" if "Integer" in cls else "singleValueText",
                     "mandatory": False, "visible": True, "defaultValue": default.strip('"')})
     for f in s.filters:
-        ic = {"id": f.param, "label": f"{f.label} (blank = all)", "type": "singleSelectQuery" if f.lov_sql else f.control,
+        ic = {"id": f.param, "label": f"{f.label} (blank = all)",
+              "type": ("multiSelectQuery" if f.multi else "singleSelectQuery") if f.lov_sql else f.control,
               "mandatory": False, "visible": True}
         if f.lov_sql:
             ic["query"] = f.lov_sql
@@ -349,14 +368,16 @@ WHERE TRIM(b.bill_stat_flg) = 'C' AND {WINDOW.format(col='b.bill_dt')}
   AND COALESCE(NULLIF(TRIM(b.bill_cyc_cd), ''), '(none)') = $P{{BILL_CYC_CD}}
 GROUP BY TRIM(t.svc_type_cd), COALESCE(sl.descr, TRIM(t.svc_type_cd))
 ORDER BY BILLED_AMT DESC""",
-            columns=[Col("SVC_TYPE_CD", "Type", width=60), Col("SVC_TYPE_DESCR", "Service Type", width=328),
-                     Col("SERVICE_AGREEMENTS", "SAs", "java.lang.Long", 90, "Right", INT, True), Col("SEGMENTS", "Segments", "java.lang.Long", 90, "Right", INT, True),
+            header=True,
+            columns=[Col("SVC_TYPE_CD", "Type", width=46), Col("SVC_TYPE_DESCR", "Service Type", width=252),
+                     Col(None, "", width=90), Col("SERVICE_AGREEMENTS", "SAs", "java.lang.Long", 90, "Right", INT, True),
+                     Col("SEGMENTS", "Segments", "java.lang.Long", 90, "Right", INT, True),
                      Col("ESTIMATED_SEGMENTS", "Estimated", "java.lang.Long", 90, "Right", INT, True),
                      Col("BILLED_AMT", "Billed Amount", "java.math.BigDecimal", 120, "Right", MONEY, True)]),
         filters=[
-            Filter("BILL_CYC_CD_F", "Bill cycle",
-                   "($P{BILL_CYC_CD_F} IS NULL OR TRIM(b.bill_cyc_cd) = TRIM($P{BILL_CYC_CD_F}))",
-                   "($P{BILL_CYC_CD_F} IS NULL OR TRIM(b.bill_cyc_cd) = TRIM($P{BILL_CYC_CD_F}))",
+            Filter("BILL_CYC_CD_F", "Bill cycles",
+                   "$X{IN, TRIM(b.bill_cyc_cd), BILL_CYC_CD_F}",
+                   "$X{IN, TRIM(b.bill_cyc_cd), BILL_CYC_CD_F}", multi=True,
                    lov_sql="SELECT TRIM(bill_cyc_cd) AS CODE, TRIM(bill_cyc_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_BILL_CYC_L WHERE language_cd = 'ENG' ORDER BY 1"),
             Filter("SVC_TYPE_CD_F", "Service type",
                    "($P{SVC_TYPE_CD_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa JOIN CISADM.CI_SA_TYPE ft ON ft.sa_type_cd = fsa.sa_type_cd AND ft.cis_division = fsa.cis_division WHERE fsa.sa_id = s.sa_id AND TRIM(ft.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F})))",
@@ -407,13 +428,13 @@ JOIN CISADM.CI_PAY_EVENT e ON e.pay_event_id = t.pay_event_id
 WHERE {WINDOW.format(col='e.pay_dt')} AND TRIM(t.tender_type_cd) = TRIM($P{{TENDER_TYPE_CD}})
 GROUP BY TO_CHAR(e.pay_dt, 'YYYY-MM')
 ORDER BY PAY_MONTH""",
-            columns=[Col("PAY_MONTH", "Month", width=292), Col("TENDERS", "Tenders", "java.lang.Long", 80, "Right", INT, True),
+            columns=[Col("PAY_MONTH", "Month", width=268), Col("TENDERS", "Tenders", "java.lang.Long", 80, "Right", INT, True),
                      Col("TENDER_AMT", "Amount", "java.math.BigDecimal", 120, "Right", MONEY, True), Col("CANCELLED", "Cancelled", "java.lang.Long", 80, "Right", INT, True),
-                     Col("PAYOR_ACCOUNTS", "Payors", "java.lang.Long", 206, "Right", INT, True)]),
+                     Col(None, "", width=120), Col("PAYOR_ACCOUNTS", "Payors", "java.lang.Long", 110, "Right", INT, True)]),
         filters=[
-            Filter("TENDER_TYPE_CD_F", "Tender type",
-                   "($P{TENDER_TYPE_CD_F} IS NULL OR TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD_F}))",
-                   "($P{TENDER_TYPE_CD_F} IS NULL OR TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD_F}))",
+            Filter("TENDER_TYPE_CD_F", "Tender types",
+                   "$X{IN, TRIM(t.tender_type_cd), TENDER_TYPE_CD_F}",
+                   "$X{IN, TRIM(t.tender_type_cd), TENDER_TYPE_CD_F}", multi=True,
                    lov_sql="SELECT TRIM(tender_type_cd) AS CODE, TRIM(tender_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_TENDER_TYPE_L WHERE language_cd = 'ENG' ORDER BY 1"),
             Filter("PAYOR_ACCT_ID_F", "Payor account ID",
                    "($P{PAYOR_ACCT_ID_F} IS NULL OR TRIM(t.payor_acct_id) = TRIM($P{PAYOR_ACCT_ID_F}))",
@@ -464,6 +485,7 @@ SELECT ADJ_ID, CRE_DT, SA_ID, ACCT_ID, CUSTOMER_NAME, ADJ_AMT FROM (
   ORDER BY ABS(a.adj_amt) DESC, a.adj_id
 ) x
 FETCH FIRST $P{{TOP_N}} ROWS ONLY""",
+            header=True,
             columns=[Col("ADJ_ID", "Adjustment", width=90), Col("CRE_DT", "Created", "java.sql.Timestamp", 80, "Left", "yyyy-MM-dd"),
                      Col("SA_ID", "SA", width=90), Col("ACCT_ID", "Account", width=90), Col("CUSTOMER_NAME", "Main Customer", width=308),
                      Col("ADJ_AMT", "Amount", "java.math.BigDecimal", 120, "Right", MONEY, True)]),
@@ -519,8 +541,9 @@ WHERE TRIM(f.freeze_sw) = 'Y' AND {WINDOW.format(col='f.accounting_dt')} AND TRI
 GROUP BY TO_CHAR(f.accounting_dt, 'YYYY-MM')
 ORDER BY ACCT_MONTH""",
             columns=[Col("ACCT_MONTH", "Month", width=328), Col("GL_LINES", "Lines", "java.lang.Long", 70, "Right", INT, True),
-                     Col("DEBIT_AMT", "Debits", "java.math.BigDecimal", 120, "Right", MONEY, True), Col("CREDIT_AMT", "Credits", "java.math.BigDecimal", 120, "Right", MONEY, True),
-                     Col("NET_AMT", "Net", "java.math.BigDecimal", 140, "Right", MONEY, True)]),
+                     Col(None, "", width=70),
+                     Col("DEBIT_AMT", "Debits", "java.math.BigDecimal", 100, "Right", MONEY, True), Col("CREDIT_AMT", "Credits", "java.math.BigDecimal", 100, "Right", MONEY, True),
+                     Col("NET_AMT", "Net", "java.math.BigDecimal", 110, "Right", MONEY, True)]),
         filters=[
             Filter("DST_ID_F", "Distribution code",
                    "($P{DST_ID_F} IS NULL OR TRIM(g.dst_id) = TRIM($P{DST_ID_F}))",

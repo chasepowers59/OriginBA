@@ -4,15 +4,16 @@
     whenNoDataType="AllSectionsNoDetail">
     <property name="net.sf.jasperreports.query.timeout" value="600"/>
     <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
-    <style name="Base" default="true" fontName="Aptos" fontSize="9"/>
+    <style name="Base" default="true" fontName="SansSerif" fontSize="9"/>
     <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
-    <style name="H3" style="Base" fontSize="10" forecolor="#0F4761"/>
+    <style name="H3" style="Base" fontSize="9" forecolor="#0F4761"/>
     <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
-    <style name="DetailText" style="Base" fontSize="9" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
-    <style name="SubHeader" style="Base" fontSize="8" bold="true" forecolor="#1348AB"/>
+    <style name="RowBand" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="SubHeader" style="Base" fontSize="8" forecolor="#5B6470"/>
     <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
-    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
-    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#000000"/>
+    <style name="SubTotal" style="Base" fontSize="8" bold="true" forecolor="#0F4761"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
     <query language="SQL"><![CDATA[
 SELECT ADJ_ID, CRE_DT, SA_ID, ACCT_ID, CUSTOMER_NAME, ADJ_AMT FROM (
   SELECT TRIM(a.adj_id) AS ADJ_ID, a.cre_dt AS CRE_DT, TRIM(a.sa_id) AS SA_ID, TRIM(sa.acct_id) AS ACCT_ID,
@@ -64,33 +65,28 @@ FETCH FIRST $P{TOP_N} ROWS ONLY
     <variable name="SUM_ADJ_AMT" class="java.math.BigDecimal" calculation="Sum">
         <expression><![CDATA[$F{ADJ_AMT}]]></expression>
     </variable>
-    <title height="14">
-            <element kind="textField" x="0" y="0" width="778" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Largest adjustments of type " + $P{ADJ_TYPE_CD}]]></expression></element>
-    </title>
-    <columnHeader height="14">
-            <element kind="staticText" x="0" y="0" width="90" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Adjustment]]></text></element>
-            <element kind="staticText" x="90" y="0" width="80" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Created]]></text></element>
-            <element kind="staticText" x="170" y="0" width="90" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[SA]]></text></element>
-            <element kind="staticText" x="260" y="0" width="90" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Account]]></text></element>
-            <element kind="staticText" x="350" y="0" width="308" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Main Customer]]></text></element>
-            <element kind="staticText" x="658" y="0" width="120" height="14" style="SubHeader" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Amount]]></text></element>
+    <columnHeader height="13">
+            <element kind="staticText" x="0" y="0" width="90" height="12" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Adjustment]]></text></element>
+            <element kind="staticText" x="90" y="0" width="80" height="12" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Created]]></text></element>
+            <element kind="staticText" x="170" y="0" width="90" height="12" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[SA]]></text></element>
+            <element kind="staticText" x="260" y="0" width="90" height="12" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Account]]></text></element>
+            <element kind="staticText" x="350" y="0" width="308" height="12" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Main Customer]]></text></element>
+            <element kind="staticText" x="658" y="0" width="120" height="12" style="SubHeader" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Amount]]></text></element>
+            <element kind="line" x="0" y="12" width="778" height="1"><pen lineWidth="0.5" lineColor="#B9C6D2"/></element>
     </columnHeader>
     <detail>
-        <band height="13">
-            <element kind="textField" x="0" y="0" width="90" height="13" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ADJ_ID}]]></expression></element>
-            <element kind="textField" x="90" y="0" width="80" height="13" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="yyyy-MM-dd"><expression><![CDATA[$F{CRE_DT}]]></expression></element>
-            <element kind="textField" x="170" y="0" width="90" height="13" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{SA_ID}]]></expression></element>
-            <element kind="textField" x="260" y="0" width="90" height="13" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ACCT_ID}]]></expression></element>
-            <element kind="textField" x="350" y="0" width="308" height="13" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{CUSTOMER_NAME}]]></expression></element>
-            <element kind="textField" x="658" y="0" width="120" height="13" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{ADJ_AMT}]]></expression></element>
+        <band height="12">
+            <element kind="textField" x="0" y="0" width="90" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ADJ_ID}]]></expression></element>
+            <element kind="textField" x="90" y="0" width="80" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="yyyy-MM-dd"><expression><![CDATA[$F{CRE_DT}]]></expression></element>
+            <element kind="textField" x="170" y="0" width="90" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{SA_ID}]]></expression></element>
+            <element kind="textField" x="260" y="0" width="90" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ACCT_ID}]]></expression></element>
+            <element kind="textField" x="350" y="0" width="308" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{CUSTOMER_NAME}]]></expression></element>
+            <element kind="textField" x="658" y="0" width="120" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{ADJ_AMT}]]></expression></element>
         </band>
     </detail>
-    <summary height="16">
-            <element kind="staticText" x="0" y="0" width="90" height="13" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Subtotal]]></text></element>
-            <element kind="staticText" x="90" y="0" width="80" height="13" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
-            <element kind="staticText" x="170" y="0" width="90" height="13" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
-            <element kind="staticText" x="260" y="0" width="90" height="13" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
-            <element kind="staticText" x="350" y="0" width="308" height="13" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
-            <element kind="textField" x="658" y="0" width="120" height="13" style="SubHeader" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_ADJ_AMT}]]></expression></element>
+    <summary height="20">
+            <element kind="line" x="0" y="1" width="778" height="1"><pen lineWidth="0.5" lineColor="#B9C6D2"/></element>
+            <element kind="staticText" x="0" y="2" width="90" height="12" style="SubTotal" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Subtotal]]></text></element>
+            <element kind="textField" x="658" y="2" width="120" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_ADJ_AMT}]]></expression></element>
     </summary>
 </jasperReport>
