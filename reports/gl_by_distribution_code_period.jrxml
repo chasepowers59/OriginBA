@@ -1,21 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-    name="gl_by_distribution_code_period" pageWidth="842" pageHeight="595" orientation="Landscape"
+<jasperReport name="gl_by_distribution_code_period" pageWidth="842" pageHeight="595" orientation="Landscape"
     columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
-    whenNoDataType="AllSectionsNoDetail" uuid="5e3b7d40-427c-52c0-9b1c-0d3256323a66">
+    whenNoDataType="AllSectionsNoDetail">
     <property name="net.sf.jasperreports.query.timeout" value="600"/>
     <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
-    <style name="Base" isDefault="true" fontName="Aptos" fontSize="9"/>
-    <style name="TitleSapphire" style="Base" fontSize="18" isBold="true" forecolor="#006FAC"/>
+    <style name="Base" default="true" fontName="Aptos" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
     <style name="H3" style="Base" fontSize="10" forecolor="#0F4761"/>
-    <style name="HeaderSapphire" style="Base" fontSize="9" isBold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
     <style name="DetailText" style="Base" fontSize="9" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
-    <style name="SubHeader" style="Base" fontSize="8" isBold="true" forecolor="#1348AB"/>
+    <style name="SubHeader" style="Base" fontSize="8" bold="true" forecolor="#1348AB"/>
     <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
-    <style name="TotalText" style="Base" fontSize="9" isBold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#000000"/>
+    <query language="SQL"><![CDATA[
+SELECT TRIM(g.dst_id) AS DST_ID, COALESCE(TRIM(g.gl_acct), '(no GL account)') AS GL_ACCT,
+       COUNT(*) AS GL_LINES, COUNT(DISTINCT f.ft_id) AS TRANSACTIONS,
+       COALESCE(SUM(CASE WHEN g.amount > 0 THEN g.amount ELSE 0 END), 0) AS DEBIT_AMT,
+       COALESCE(SUM(CASE WHEN g.amount < 0 THEN -g.amount ELSE 0 END), 0) AS CREDIT_AMT,
+       COALESCE(SUM(g.amount), 0) AS NET_AMT
+FROM CISADM.CI_FT_GL g
+JOIN CISADM.CI_FT f ON f.ft_id = g.ft_id
+WHERE TRIM(f.freeze_sw) = 'Y' AND f.accounting_dt >= $P{FROM_DT} AND f.accounting_dt < $P{TO_DT} + INTERVAL '1' DAY
+  AND ($P{DST_ID_F} IS NULL OR TRIM(g.dst_id) = TRIM($P{DST_ID_F}))
+  AND ($P{GL_ACCT_F} IS NULL OR TRIM(g.gl_acct) = TRIM($P{GL_ACCT_F}))
+  AND ($P{GL_DIVISION_F} IS NULL OR TRIM(f.gl_division) = TRIM($P{GL_DIVISION_F}))
+  AND ($P{CIS_DIVISION_F} IS NULL OR TRIM(f.cis_division) = TRIM($P{CIS_DIVISION_F}))
+  AND ($P{FT_TYPE_FLG_F} IS NULL OR TRIM(f.ft_type_flg) = TRIM($P{FT_TYPE_FLG_F}))
+GROUP BY TRIM(g.dst_id), COALESCE(TRIM(g.gl_acct), '(no GL account)')
+ORDER BY ABS(COALESCE(SUM(g.amount), 0)) DESC
+]]></query>
     <parameter name="FROM_DT" class="java.sql.Date">
         <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())]]></defaultValueExpression>
     </parameter>
@@ -40,23 +54,6 @@
     <parameter name="FT_TYPE_FLG_F" class="java.lang.String">
         <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
     </parameter>
-    <queryString language="SQL"><![CDATA[
-SELECT TRIM(g.dst_id) AS DST_ID, COALESCE(TRIM(g.gl_acct), '(no GL account)') AS GL_ACCT,
-       COUNT(*) AS GL_LINES, COUNT(DISTINCT f.ft_id) AS TRANSACTIONS,
-       COALESCE(SUM(CASE WHEN g.amount > 0 THEN g.amount ELSE 0 END), 0) AS DEBIT_AMT,
-       COALESCE(SUM(CASE WHEN g.amount < 0 THEN -g.amount ELSE 0 END), 0) AS CREDIT_AMT,
-       COALESCE(SUM(g.amount), 0) AS NET_AMT
-FROM CISADM.CI_FT_GL g
-JOIN CISADM.CI_FT f ON f.ft_id = g.ft_id
-WHERE TRIM(f.freeze_sw) = 'Y' AND f.accounting_dt >= $P{FROM_DT} AND f.accounting_dt < $P{TO_DT} + INTERVAL '1' DAY
-  AND ($P{DST_ID_F} IS NULL OR TRIM(g.dst_id) = TRIM($P{DST_ID_F}))
-  AND ($P{GL_ACCT_F} IS NULL OR TRIM(g.gl_acct) = TRIM($P{GL_ACCT_F}))
-  AND ($P{GL_DIVISION_F} IS NULL OR TRIM(f.gl_division) = TRIM($P{GL_DIVISION_F}))
-  AND ($P{CIS_DIVISION_F} IS NULL OR TRIM(f.cis_division) = TRIM($P{CIS_DIVISION_F}))
-  AND ($P{FT_TYPE_FLG_F} IS NULL OR TRIM(f.ft_type_flg) = TRIM($P{FT_TYPE_FLG_F}))
-GROUP BY TRIM(g.dst_id), COALESCE(TRIM(g.gl_acct), '(no GL account)')
-ORDER BY ABS(COALESCE(SUM(g.amount), 0)) DESC
-]]></queryString>
     <field name="DST_ID" class="java.lang.String"/>
     <field name="GL_ACCT" class="java.lang.String"/>
     <field name="GL_LINES" class="java.lang.Long"/>
@@ -65,199 +62,71 @@ ORDER BY ABS(COALESCE(SUM(g.amount), 0)) DESC
     <field name="CREDIT_AMT" class="java.math.BigDecimal"/>
     <field name="NET_AMT" class="java.math.BigDecimal"/>
     <variable name="SUM_GL_LINES" class="java.lang.Long" calculation="Sum">
-        <variableExpression><![CDATA[$F{GL_LINES}]]></variableExpression>
+        <expression><![CDATA[$F{GL_LINES}]]></expression>
     </variable>
     <variable name="SUM_TRANSACTIONS" class="java.lang.Long" calculation="Sum">
-        <variableExpression><![CDATA[$F{TRANSACTIONS}]]></variableExpression>
+        <expression><![CDATA[$F{TRANSACTIONS}]]></expression>
     </variable>
     <variable name="SUM_DEBIT_AMT" class="java.math.BigDecimal" calculation="Sum">
-        <variableExpression><![CDATA[$F{DEBIT_AMT}]]></variableExpression>
+        <expression><![CDATA[$F{DEBIT_AMT}]]></expression>
     </variable>
     <variable name="SUM_CREDIT_AMT" class="java.math.BigDecimal" calculation="Sum">
-        <variableExpression><![CDATA[$F{CREDIT_AMT}]]></variableExpression>
+        <expression><![CDATA[$F{CREDIT_AMT}]]></expression>
     </variable>
     <variable name="SUM_NET_AMT" class="java.math.BigDecimal" calculation="Sum">
-        <variableExpression><![CDATA[$F{NET_AMT}]]></variableExpression>
+        <expression><![CDATA[$F{NET_AMT}]]></expression>
     </variable>
-    <title>
-        <band height="52">
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="TitleSapphire" x="0" y="0" width="802" height="26" uuid="ef067336-24d4-5f4f-841e-e1ab44098f08"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA["GL Activity by Distribution Code"]]></textFieldExpression>
-            </textField>
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="H3" x="0" y="28" width="802" height="16" uuid="bd819aa0-39f2-57b2-aca7-6b3d9956d867"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  frozen FTs by accounting date; net = sum of GL amounts" + ($P{DST_ID_F} == null ? "" : "  |  Distribution code: " + $P{DST_ID_F}) + ($P{GL_ACCT_F} == null ? "" : "  |  GL account (exact): " + $P{GL_ACCT_F}) + ($P{GL_DIVISION_F} == null ? "" : "  |  GL division: " + $P{GL_DIVISION_F}) + ($P{CIS_DIVISION_F} == null ? "" : "  |  CIS division: " + $P{CIS_DIVISION_F}) + ($P{FT_TYPE_FLG_F} == null ? "" : "  |  FT type (BS, BX, AD, AX, PS, PX): " + $P{FT_TYPE_FLG_F})]]></textFieldExpression>
-            </textField>
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="Base" x="0" y="44" width="802" height="8" uuid="04b3a93d-da45-577b-89f7-b5bb604e7044"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[""]]></textFieldExpression>
-            </textField>
-        </band>
+    <title height="52">
+            <element kind="textField" x="0" y="0" width="802" height="26" style="TitleSapphire" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["GL Activity by Distribution Code"]]></expression></element>
+            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  frozen FTs by accounting date; net = sum of GL amounts" + ($P{DST_ID_F} == null ? "" : "  |  Distribution code: " + $P{DST_ID_F}) + ($P{GL_ACCT_F} == null ? "" : "  |  GL account (exact): " + $P{GL_ACCT_F}) + ($P{GL_DIVISION_F} == null ? "" : "  |  GL division: " + $P{GL_DIVISION_F}) + ($P{CIS_DIVISION_F} == null ? "" : "  |  CIS division: " + $P{CIS_DIVISION_F}) + ($P{FT_TYPE_FLG_F} == null ? "" : "  |  FT type (BS, BX, AD, AX, PS, PX): " + $P{FT_TYPE_FLG_F})]]></expression></element>
     </title>
-    <columnHeader>
-        <band height="18">
-            <staticText>
-                <reportElement style="HeaderSapphire" x="0" y="0" width="120" height="18" uuid="122072da-d846-596a-8a1e-e3dac0b99b6a"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Distribution Code]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="HeaderSapphire" x="120" y="0" width="232" height="18" uuid="57f3c5fe-6a87-58da-b1aa-83b16d71b483"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[GL Account]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="HeaderSapphire" x="352" y="0" width="70" height="18" uuid="cca783e1-13a9-5279-966a-d9ee546e4b6f"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Lines]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="HeaderSapphire" x="422" y="0" width="70" height="18" uuid="d886326e-8e15-598d-969f-69411869c90b"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[FTs]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="HeaderSapphire" x="492" y="0" width="100" height="18" uuid="6010f824-f1a2-5f76-a28e-8380821a8da0"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Debits]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="HeaderSapphire" x="592" y="0" width="100" height="18" uuid="82a1c1f1-c0c9-57ac-bfce-e01a52e757f0"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Credits]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="HeaderSapphire" x="692" y="0" width="110" height="18" uuid="5b3dd1be-3b56-5428-9474-06ef97433d40"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Net]]></text>
-            </staticText>
-        </band>
+    <columnHeader height="18">
+            <element kind="staticText" x="0" y="0" width="120" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Distribution Code]]></text></element>
+            <element kind="staticText" x="120" y="0" width="232" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[GL Account]]></text></element>
+            <element kind="staticText" x="352" y="0" width="70" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Lines]]></text></element>
+            <element kind="staticText" x="422" y="0" width="70" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[FTs]]></text></element>
+            <element kind="staticText" x="492" y="0" width="100" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Debits]]></text></element>
+            <element kind="staticText" x="592" y="0" width="100" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Credits]]></text></element>
+            <element kind="staticText" x="692" y="0" width="110" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Net]]></text></element>
     </columnHeader>
     <detail>
         <band height="20" splitType="Prevent">
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="0" y="0" width="120" height="16" uuid="b37911da-42b7-5636-8225-edc51394d076"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{DST_ID}]]></textFieldExpression>
-            </textField>
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="120" y="0" width="232" height="16" uuid="13d13029-f9a9-5bad-8581-cd71be49c14c"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{GL_ACCT}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="352" y="0" width="70" height="16" uuid="4d77d15c-ee72-5a84-9473-3572c9f37536"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{GL_LINES}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="422" y="0" width="70" height="16" uuid="b8c04a27-59c4-5d48-825b-adcd6eac48f8"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{TRANSACTIONS}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="492" y="0" width="100" height="16" uuid="3e65eb20-4501-5a07-8ed6-40154b006ab7"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{DEBIT_AMT}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="592" y="0" width="100" height="16" uuid="15bb504d-f1d7-571e-9af6-ca33a1125e43"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{CREDIT_AMT}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="692" y="0" width="110" height="16" uuid="570b0760-c7d7-5fe8-966e-59c69d731374"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{NET_AMT}]]></textFieldExpression>
-            </textField>
+            <element kind="textField" x="0" y="0" width="120" height="16" style="DetailText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{DST_ID}]]></expression></element>
+            <element kind="textField" x="120" y="0" width="232" height="16" style="DetailText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{GL_ACCT}]]></expression></element>
+            <element kind="textField" x="352" y="0" width="70" height="16" style="DetailText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{GL_LINES}]]></expression></element>
+            <element kind="textField" x="422" y="0" width="70" height="16" style="DetailText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{TRANSACTIONS}]]></expression></element>
+            <element kind="textField" x="492" y="0" width="100" height="16" style="DetailText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{DEBIT_AMT}]]></expression></element>
+            <element kind="textField" x="592" y="0" width="100" height="16" style="DetailText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{CREDIT_AMT}]]></expression></element>
+            <element kind="textField" x="692" y="0" width="110" height="16" style="DetailText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{NET_AMT}]]></expression></element>
         </band>
         <band height="20" splitType="Stretch">
-            <subreport isUsingCache="false">
-                <reportElement positionType="Float" stretchType="RelativeToBandHeight" isRemoveLineWhenBlank="true" x="24" y="0" width="778" height="20" uuid="d12347da-5ce0-5a17-8c81-7b0bec800de0"/>
-                <subreportParameter name="FROM_DT">
-                    <subreportParameterExpression><![CDATA[$P{FROM_DT}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="TO_DT">
-                    <subreportParameterExpression><![CDATA[$P{TO_DT}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="DST_ID_F">
-                    <subreportParameterExpression><![CDATA[$P{DST_ID_F}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="GL_ACCT_F">
-                    <subreportParameterExpression><![CDATA[$P{GL_ACCT_F}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="GL_DIVISION_F">
-                    <subreportParameterExpression><![CDATA[$P{GL_DIVISION_F}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="CIS_DIVISION_F">
-                    <subreportParameterExpression><![CDATA[$P{CIS_DIVISION_F}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="FT_TYPE_FLG_F">
-                    <subreportParameterExpression><![CDATA[$P{FT_TYPE_FLG_F}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="DST_ID">
-                    <subreportParameterExpression><![CDATA[$F{DST_ID}]]></subreportParameterExpression>
-                </subreportParameter>
+            <element kind="subreport" x="24" y="0" width="778" height="20" positionType="Float" removeLineWhenBlank="true" usingCache="false">
+                <parameter name="FROM_DT"><expression><![CDATA[$P{FROM_DT}]]></expression></parameter>
+                <parameter name="TO_DT"><expression><![CDATA[$P{TO_DT}]]></expression></parameter>
+                <parameter name="DST_ID_F"><expression><![CDATA[$P{DST_ID_F}]]></expression></parameter>
+                <parameter name="GL_ACCT_F"><expression><![CDATA[$P{GL_ACCT_F}]]></expression></parameter>
+                <parameter name="GL_DIVISION_F"><expression><![CDATA[$P{GL_DIVISION_F}]]></expression></parameter>
+                <parameter name="CIS_DIVISION_F"><expression><![CDATA[$P{CIS_DIVISION_F}]]></expression></parameter>
+                <parameter name="FT_TYPE_FLG_F"><expression><![CDATA[$P{FT_TYPE_FLG_F}]]></expression></parameter>
+                <parameter name="DST_ID"><expression><![CDATA[$F{DST_ID}]]></expression></parameter>
+                <parameter name="GL_ACCT"><expression><![CDATA[$F{GL_ACCT}]]></expression></parameter>
                 <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-                <subreportExpression><![CDATA["repo:gl_by_distribution_code_month"]]></subreportExpression>
-            </subreport>
+                <expression><![CDATA["repo:gl_by_distribution_code_month"]]></expression>
+            </element>
         </band>
     </detail>
-    <pageFooter>
-        <band height="14">
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="FooterConfidential" x="0" y="0" width="600" height="14" uuid="4c88a32b-f48a-5801-81ae-51d37c45c554"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></textFieldExpression>
-            </textField>
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report">
-                <reportElement style="FooterConfidential" x="600" y="0" width="202" height="14" uuid="20cb5591-fa88-57d0-91e3-60a95f624d59"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER} + " of " + $V{PAGE_NUMBER}]]></textFieldExpression>
-            </textField>
-        </band>
+    <pageFooter height="14">
+            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></expression></element>
+            <element kind="textField" x="600" y="0" width="150" height="14" style="FooterConfidential" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Page " + $V{PAGE_NUMBER} + " of"]]></expression></element>
+            <element kind="textField" x="750" y="0" width="52" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report"><expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression></element>
     </pageFooter>
-    <summary>
-        <band height="22">
-            <staticText>
-                <reportElement style="TotalText" x="0" y="0" width="120" height="16" uuid="8b2fddab-e538-5fb0-b283-484a4d7251b7"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Total]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="TotalText" x="120" y="0" width="232" height="16" uuid="b8dc2ea1-1fa8-516d-a733-d97a2706cf9e"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[]]></text>
-            </staticText>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="TotalText" x="352" y="0" width="70" height="16" uuid="2b31e1eb-a583-5e20-93a9-716baed9c924"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_GL_LINES}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="TotalText" x="422" y="0" width="70" height="16" uuid="d227ec85-22c8-5576-a6f9-ee8fbbf10e47"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_TRANSACTIONS}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="TotalText" x="492" y="0" width="100" height="16" uuid="38a6bd1b-a823-5144-9551-7277eb3d7bc9"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_DEBIT_AMT}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="TotalText" x="592" y="0" width="100" height="16" uuid="1c9e3b62-d702-57ce-a219-f29919688d43"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_CREDIT_AMT}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="TotalText" x="692" y="0" width="110" height="16" uuid="6d9f129c-0019-5d05-9fd9-aa01c858bc26"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_NET_AMT}]]></textFieldExpression>
-            </textField>
-        </band>
+    <summary height="22">
+            <element kind="staticText" x="0" y="0" width="120" height="16" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Total]]></text></element>
+            <element kind="staticText" x="120" y="0" width="232" height="16" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="textField" x="352" y="0" width="70" height="16" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_GL_LINES}]]></expression></element>
+            <element kind="textField" x="422" y="0" width="70" height="16" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_TRANSACTIONS}]]></expression></element>
+            <element kind="textField" x="492" y="0" width="100" height="16" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_DEBIT_AMT}]]></expression></element>
+            <element kind="textField" x="592" y="0" width="100" height="16" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_CREDIT_AMT}]]></expression></element>
+            <element kind="textField" x="692" y="0" width="110" height="16" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_NET_AMT}]]></expression></element>
     </summary>
 </jasperReport>

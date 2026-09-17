@@ -1,21 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-    name="payments_by_tender_type_period" pageWidth="842" pageHeight="595" orientation="Landscape"
+<jasperReport name="payments_by_tender_type_period" pageWidth="842" pageHeight="595" orientation="Landscape"
     columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
-    whenNoDataType="AllSectionsNoDetail" uuid="823f17b3-038b-54c6-b6fa-a0ee59d00b0d">
+    whenNoDataType="AllSectionsNoDetail">
     <property name="net.sf.jasperreports.query.timeout" value="600"/>
     <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
-    <style name="Base" isDefault="true" fontName="Aptos" fontSize="9"/>
-    <style name="TitleSapphire" style="Base" fontSize="18" isBold="true" forecolor="#006FAC"/>
+    <style name="Base" default="true" fontName="Aptos" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
     <style name="H3" style="Base" fontSize="10" forecolor="#0F4761"/>
-    <style name="HeaderSapphire" style="Base" fontSize="9" isBold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
     <style name="DetailText" style="Base" fontSize="9" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
-    <style name="SubHeader" style="Base" fontSize="8" isBold="true" forecolor="#1348AB"/>
+    <style name="SubHeader" style="Base" fontSize="8" bold="true" forecolor="#1348AB"/>
     <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
-    <style name="TotalText" style="Base" fontSize="9" isBold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#000000"/>
+    <query language="SQL"><![CDATA[
+SELECT TRIM(t.tender_type_cd) AS TENDER_TYPE_CD, COALESCE(tl.descr, TRIM(t.tender_type_cd)) AS TENDER_TYPE_DESCR,
+       COUNT(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NULL THEN 1 END) AS TENDERS,
+       COALESCE(SUM(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NULL THEN t.tender_amt ELSE 0 END), 0) AS TENDER_AMT,
+       COUNT(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NOT NULL THEN 1 END) AS CANCELLED,
+       COALESCE(SUM(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NOT NULL THEN t.tender_amt ELSE 0 END), 0) AS CANCELLED_AMT,
+       COUNT(DISTINCT t.payor_acct_id) AS PAYOR_ACCOUNTS
+FROM CISADM.CI_PAY_TNDR t
+JOIN CISADM.CI_PAY_EVENT e ON e.pay_event_id = t.pay_event_id
+LEFT JOIN CISADM.CI_TENDER_TYPE_L tl ON tl.tender_type_cd = t.tender_type_cd AND tl.language_cd = 'ENG'
+WHERE e.pay_dt >= $P{FROM_DT} AND e.pay_dt < $P{TO_DT} + INTERVAL '1' DAY
+  AND ($P{TENDER_TYPE_CD_F} IS NULL OR TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD_F}))
+  AND ($P{PAYOR_ACCT_ID_F} IS NULL OR TRIM(t.payor_acct_id) = TRIM($P{PAYOR_ACCT_ID_F}))
+  AND ($P{TNDR_CTL_ID_F} IS NULL OR TRIM(t.tndr_ctl_id) = TRIM($P{TNDR_CTL_ID_F}))
+  AND ($P{MIN_AMT_F} IS NULL OR t.tender_amt >= $P{MIN_AMT_F})
+GROUP BY TRIM(t.tender_type_cd), COALESCE(tl.descr, TRIM(t.tender_type_cd))
+ORDER BY TENDER_AMT DESC
+]]></query>
     <parameter name="FROM_DT" class="java.sql.Date">
         <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())]]></defaultValueExpression>
     </parameter>
@@ -37,24 +52,6 @@
     <parameter name="MIN_AMT_F" class="java.math.BigDecimal">
         <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
     </parameter>
-    <queryString language="SQL"><![CDATA[
-SELECT TRIM(t.tender_type_cd) AS TENDER_TYPE_CD, COALESCE(tl.descr, TRIM(t.tender_type_cd)) AS TENDER_TYPE_DESCR,
-       COUNT(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NULL THEN 1 END) AS TENDERS,
-       COALESCE(SUM(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NULL THEN t.tender_amt ELSE 0 END), 0) AS TENDER_AMT,
-       COUNT(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NOT NULL THEN 1 END) AS CANCELLED,
-       COALESCE(SUM(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NOT NULL THEN t.tender_amt ELSE 0 END), 0) AS CANCELLED_AMT,
-       COUNT(DISTINCT t.payor_acct_id) AS PAYOR_ACCOUNTS
-FROM CISADM.CI_PAY_TNDR t
-JOIN CISADM.CI_PAY_EVENT e ON e.pay_event_id = t.pay_event_id
-LEFT JOIN CISADM.CI_TENDER_TYPE_L tl ON tl.tender_type_cd = t.tender_type_cd AND tl.language_cd = 'ENG'
-WHERE e.pay_dt >= $P{FROM_DT} AND e.pay_dt < $P{TO_DT} + INTERVAL '1' DAY
-  AND ($P{TENDER_TYPE_CD_F} IS NULL OR TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD_F}))
-  AND ($P{PAYOR_ACCT_ID_F} IS NULL OR TRIM(t.payor_acct_id) = TRIM($P{PAYOR_ACCT_ID_F}))
-  AND ($P{TNDR_CTL_ID_F} IS NULL OR TRIM(t.tndr_ctl_id) = TRIM($P{TNDR_CTL_ID_F}))
-  AND ($P{MIN_AMT_F} IS NULL OR t.tender_amt >= $P{MIN_AMT_F})
-GROUP BY TRIM(t.tender_type_cd), COALESCE(tl.descr, TRIM(t.tender_type_cd))
-ORDER BY TENDER_AMT DESC
-]]></queryString>
     <field name="TENDER_TYPE_CD" class="java.lang.String"/>
     <field name="TENDER_TYPE_DESCR" class="java.lang.String"/>
     <field name="TENDERS" class="java.lang.Long"/>
@@ -63,196 +60,69 @@ ORDER BY TENDER_AMT DESC
     <field name="CANCELLED_AMT" class="java.math.BigDecimal"/>
     <field name="PAYOR_ACCOUNTS" class="java.lang.Long"/>
     <variable name="SUM_TENDERS" class="java.lang.Long" calculation="Sum">
-        <variableExpression><![CDATA[$F{TENDERS}]]></variableExpression>
+        <expression><![CDATA[$F{TENDERS}]]></expression>
     </variable>
     <variable name="SUM_TENDER_AMT" class="java.math.BigDecimal" calculation="Sum">
-        <variableExpression><![CDATA[$F{TENDER_AMT}]]></variableExpression>
+        <expression><![CDATA[$F{TENDER_AMT}]]></expression>
     </variable>
     <variable name="SUM_CANCELLED" class="java.lang.Long" calculation="Sum">
-        <variableExpression><![CDATA[$F{CANCELLED}]]></variableExpression>
+        <expression><![CDATA[$F{CANCELLED}]]></expression>
     </variable>
     <variable name="SUM_CANCELLED_AMT" class="java.math.BigDecimal" calculation="Sum">
-        <variableExpression><![CDATA[$F{CANCELLED_AMT}]]></variableExpression>
+        <expression><![CDATA[$F{CANCELLED_AMT}]]></expression>
     </variable>
     <variable name="SUM_PAYOR_ACCOUNTS" class="java.lang.Long" calculation="Sum">
-        <variableExpression><![CDATA[$F{PAYOR_ACCOUNTS}]]></variableExpression>
+        <expression><![CDATA[$F{PAYOR_ACCOUNTS}]]></expression>
     </variable>
-    <title>
-        <band height="52">
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="TitleSapphire" x="0" y="0" width="802" height="26" uuid="c5ed2b7d-fd60-5788-925a-7af3f6dcfa9a"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA["Payments by Tender Type"]]></textFieldExpression>
-            </textField>
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="H3" x="0" y="28" width="802" height="16" uuid="1669f324-0993-5311-ab3c-1e22e84bfda6"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  cancelled = tender carries a cancel reason" + ($P{TENDER_TYPE_CD_F} == null ? "" : "  |  Tender type: " + $P{TENDER_TYPE_CD_F}) + ($P{PAYOR_ACCT_ID_F} == null ? "" : "  |  Payor account ID: " + $P{PAYOR_ACCT_ID_F}) + ($P{TNDR_CTL_ID_F} == null ? "" : "  |  Tender control ID: " + $P{TNDR_CTL_ID_F}) + ($P{MIN_AMT_F} == null ? "" : "  |  Minimum tender amount: " + $P{MIN_AMT_F})]]></textFieldExpression>
-            </textField>
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="Base" x="0" y="44" width="802" height="8" uuid="ac75e9fd-efc0-58ef-bcbd-52216ed73e4e"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[""]]></textFieldExpression>
-            </textField>
-        </band>
+    <title height="52">
+            <element kind="textField" x="0" y="0" width="802" height="26" style="TitleSapphire" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Payments by Tender Type"]]></expression></element>
+            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  cancelled = tender carries a cancel reason" + ($P{TENDER_TYPE_CD_F} == null ? "" : "  |  Tender type: " + $P{TENDER_TYPE_CD_F}) + ($P{PAYOR_ACCT_ID_F} == null ? "" : "  |  Payor account ID: " + $P{PAYOR_ACCT_ID_F}) + ($P{TNDR_CTL_ID_F} == null ? "" : "  |  Tender control ID: " + $P{TNDR_CTL_ID_F}) + ($P{MIN_AMT_F} == null ? "" : "  |  Minimum tender amount: " + $P{MIN_AMT_F})]]></expression></element>
     </title>
-    <columnHeader>
-        <band height="18">
-            <staticText>
-                <reportElement style="HeaderSapphire" x="0" y="0" width="60" height="18" uuid="ca4d238f-483b-5961-86ea-8965bba8e025"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Type]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="HeaderSapphire" x="60" y="0" width="232" height="18" uuid="7835e969-28bc-5c39-adda-a3240815ba3e"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Tender Type]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="HeaderSapphire" x="292" y="0" width="80" height="18" uuid="ff1cccd0-fdfb-5ae2-95b3-0b4bd78d49d8"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Tenders]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="HeaderSapphire" x="372" y="0" width="120" height="18" uuid="75c6e164-3319-5439-b68b-c53e4910f3e6"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Amount]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="HeaderSapphire" x="492" y="0" width="80" height="18" uuid="ccaf485f-833d-5331-b22e-0d81f90ec2a9"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Cancelled]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="HeaderSapphire" x="572" y="0" width="120" height="18" uuid="7b23a98a-a66b-541f-be0f-0167d8c0e017"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Cancelled Amt]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="HeaderSapphire" x="692" y="0" width="110" height="18" uuid="d946a3bb-eb69-5959-9f7c-c58b7eb482af"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Payors]]></text>
-            </staticText>
-        </band>
+    <columnHeader height="18">
+            <element kind="staticText" x="0" y="0" width="60" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Type]]></text></element>
+            <element kind="staticText" x="60" y="0" width="232" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Tender Type]]></text></element>
+            <element kind="staticText" x="292" y="0" width="80" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Tenders]]></text></element>
+            <element kind="staticText" x="372" y="0" width="120" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Amount]]></text></element>
+            <element kind="staticText" x="492" y="0" width="80" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Cancelled]]></text></element>
+            <element kind="staticText" x="572" y="0" width="120" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Cancelled Amt]]></text></element>
+            <element kind="staticText" x="692" y="0" width="110" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Payors]]></text></element>
     </columnHeader>
     <detail>
         <band height="20" splitType="Prevent">
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="0" y="0" width="60" height="16" uuid="76183a0c-0d89-5cab-af49-eee8f25ff6d7"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{TENDER_TYPE_CD}]]></textFieldExpression>
-            </textField>
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="60" y="0" width="232" height="16" uuid="2a6eb2ee-2e5d-51c8-9f7f-9d13fd49a0f9"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{TENDER_TYPE_DESCR}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="292" y="0" width="80" height="16" uuid="6bcf39cc-a1a5-55f7-b3a6-f3a60d22275c"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{TENDERS}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="372" y="0" width="120" height="16" uuid="8c15ec21-160c-56ff-ac76-0a6eede98cb5"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{TENDER_AMT}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="492" y="0" width="80" height="16" uuid="4fef3112-5083-507c-81ea-f85e32f7a345"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{CANCELLED}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="572" y="0" width="120" height="16" uuid="8cc28c9d-4639-5e2f-8f5d-b0303e900cf7"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{CANCELLED_AMT}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="DetailText" x="692" y="0" width="110" height="16" uuid="9e76d139-4b55-53f2-8eca-64699c89304a"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{PAYOR_ACCOUNTS}]]></textFieldExpression>
-            </textField>
+            <element kind="textField" x="0" y="0" width="60" height="16" style="DetailText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{TENDER_TYPE_CD}]]></expression></element>
+            <element kind="textField" x="60" y="0" width="232" height="16" style="DetailText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{TENDER_TYPE_DESCR}]]></expression></element>
+            <element kind="textField" x="292" y="0" width="80" height="16" style="DetailText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{TENDERS}]]></expression></element>
+            <element kind="textField" x="372" y="0" width="120" height="16" style="DetailText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{TENDER_AMT}]]></expression></element>
+            <element kind="textField" x="492" y="0" width="80" height="16" style="DetailText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{CANCELLED}]]></expression></element>
+            <element kind="textField" x="572" y="0" width="120" height="16" style="DetailText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{CANCELLED_AMT}]]></expression></element>
+            <element kind="textField" x="692" y="0" width="110" height="16" style="DetailText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{PAYOR_ACCOUNTS}]]></expression></element>
         </band>
         <band height="20" splitType="Stretch">
-            <subreport isUsingCache="false">
-                <reportElement positionType="Float" stretchType="RelativeToBandHeight" isRemoveLineWhenBlank="true" x="24" y="0" width="778" height="20" uuid="aa5be2f9-d6f4-50bd-911f-9a4a418c2cdb"/>
-                <subreportParameter name="FROM_DT">
-                    <subreportParameterExpression><![CDATA[$P{FROM_DT}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="TO_DT">
-                    <subreportParameterExpression><![CDATA[$P{TO_DT}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="TENDER_TYPE_CD_F">
-                    <subreportParameterExpression><![CDATA[$P{TENDER_TYPE_CD_F}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="PAYOR_ACCT_ID_F">
-                    <subreportParameterExpression><![CDATA[$P{PAYOR_ACCT_ID_F}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="TNDR_CTL_ID_F">
-                    <subreportParameterExpression><![CDATA[$P{TNDR_CTL_ID_F}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="MIN_AMT_F">
-                    <subreportParameterExpression><![CDATA[$P{MIN_AMT_F}]]></subreportParameterExpression>
-                </subreportParameter>
-                <subreportParameter name="TENDER_TYPE_CD">
-                    <subreportParameterExpression><![CDATA[$F{TENDER_TYPE_CD}]]></subreportParameterExpression>
-                </subreportParameter>
+            <element kind="subreport" x="24" y="0" width="778" height="20" positionType="Float" removeLineWhenBlank="true" usingCache="false">
+                <parameter name="FROM_DT"><expression><![CDATA[$P{FROM_DT}]]></expression></parameter>
+                <parameter name="TO_DT"><expression><![CDATA[$P{TO_DT}]]></expression></parameter>
+                <parameter name="TENDER_TYPE_CD_F"><expression><![CDATA[$P{TENDER_TYPE_CD_F}]]></expression></parameter>
+                <parameter name="PAYOR_ACCT_ID_F"><expression><![CDATA[$P{PAYOR_ACCT_ID_F}]]></expression></parameter>
+                <parameter name="TNDR_CTL_ID_F"><expression><![CDATA[$P{TNDR_CTL_ID_F}]]></expression></parameter>
+                <parameter name="MIN_AMT_F"><expression><![CDATA[$P{MIN_AMT_F}]]></expression></parameter>
+                <parameter name="TENDER_TYPE_CD"><expression><![CDATA[$F{TENDER_TYPE_CD}]]></expression></parameter>
                 <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-                <subreportExpression><![CDATA["repo:payments_by_tender_type_month"]]></subreportExpression>
-            </subreport>
+                <expression><![CDATA["repo:payments_by_tender_type_month"]]></expression>
+            </element>
         </band>
     </detail>
-    <pageFooter>
-        <band height="14">
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="FooterConfidential" x="0" y="0" width="600" height="14" uuid="e7ca50bc-c42c-59d5-b02c-31e04f6d9e00"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></textFieldExpression>
-            </textField>
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report">
-                <reportElement style="FooterConfidential" x="600" y="0" width="202" height="14" uuid="7790f627-72fa-522c-ab40-a5fa3105bd42"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER} + " of " + $V{PAGE_NUMBER}]]></textFieldExpression>
-            </textField>
-        </band>
+    <pageFooter height="14">
+            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></expression></element>
+            <element kind="textField" x="600" y="0" width="150" height="14" style="FooterConfidential" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Page " + $V{PAGE_NUMBER} + " of"]]></expression></element>
+            <element kind="textField" x="750" y="0" width="52" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report"><expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression></element>
     </pageFooter>
-    <summary>
-        <band height="22">
-            <staticText>
-                <reportElement style="TotalText" x="0" y="0" width="60" height="16" uuid="298d56ca-0bd4-5662-89f9-d5f9e6371d24"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Total]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="TotalText" x="60" y="0" width="232" height="16" uuid="18d22add-506f-5533-95ed-199a6dd320ab"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[]]></text>
-            </staticText>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="TotalText" x="292" y="0" width="80" height="16" uuid="06bfe212-b831-5b86-9987-f14501aee92b"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_TENDERS}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="TotalText" x="372" y="0" width="120" height="16" uuid="aa1529ef-c0b5-5c5b-be20-03c4dbef56af"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_TENDER_AMT}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="TotalText" x="492" y="0" width="80" height="16" uuid="a1e02cc5-900e-56c6-8703-b18b3a59ec85"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_CANCELLED}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="TotalText" x="572" y="0" width="120" height="16" uuid="dcc5c912-8765-5496-958e-be593afecd89"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_CANCELLED_AMT}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="TotalText" x="692" y="0" width="110" height="16" uuid="a9d5bbdf-4d9e-564b-9a3c-094a74eafc09"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_PAYOR_ACCOUNTS}]]></textFieldExpression>
-            </textField>
-        </band>
+    <summary height="22">
+            <element kind="staticText" x="0" y="0" width="60" height="16" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Total]]></text></element>
+            <element kind="staticText" x="60" y="0" width="232" height="16" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="textField" x="292" y="0" width="80" height="16" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_TENDERS}]]></expression></element>
+            <element kind="textField" x="372" y="0" width="120" height="16" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_TENDER_AMT}]]></expression></element>
+            <element kind="textField" x="492" y="0" width="80" height="16" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_CANCELLED}]]></expression></element>
+            <element kind="textField" x="572" y="0" width="120" height="16" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_CANCELLED_AMT}]]></expression></element>
+            <element kind="textField" x="692" y="0" width="110" height="16" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_PAYOR_ACCOUNTS}]]></expression></element>
     </summary>
 </jasperReport>

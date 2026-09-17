@@ -60,46 +60,44 @@ and the subreport one row.
 
 ## Where they live, and what they connect to
 
-| Unit | Folder (tenant-relative) |
+| Unit | Folder (inside the tenant) |
 | --- | --- |
 | Billing by Cycle | `/SmartCity/Report/Standard_Offering/Billing_and_Rates` |
 | Payments by Tender Type | `/SmartCity/Report/Standard_Offering/Cashiering` |
 | Adjustments by Type, GL Activity by Distribution Code | `/SmartCity/Report/Standard_Offering/Finance` |
 
 The SQL is plain Oracle SQL, but a JRXML never carries a connection: every report unit is
-bound at import to a JDBC datasource resource on that server -- `/DataSource/Origin_DEV_DS`
-on DEV, `/DataSource/<Client>_DS` inside a client organization (the registry names them;
-`deploy/jaspersoft_datasources/`). Re-binding the datasource is the only per-tenant step; the
-JRXML, subreports and controls are identical everywhere.
+bound to the tenant's JDBC datasource resource (`/DataSource/<Client>_DS`). Re-binding the
+datasource is the only per-tenant step; JRXML, subreports and controls are identical everywhere.
 
-## Import
+## Deploy (REST, verified 2026-09-17)
+
+The SmartCity server is **JasperReports Server 10.0.0** (`/rest_v2/serverInfo`) -- one server,
+every client an organization under `organization_1`. It runs JasperReports 7, so the pack is
+authored as **JRXML 7** (`<element kind=...>`, `<query>`, `bold=`); the 6.x model does not load
+there. Deployment is the REST API, not an import zip (two zip shapes were accepted "successfully"
+and imported nothing):
 
 ```bash
-python3 scripts/jaspersoft/generate_sql_report_pack.py
-python3 -m pytest tests/test_sql_report_pack.py -q
-python3 scripts/jaspersoft/build_finance_pack_jrs_import.py                      # DEV: /DataSource/Origin_DEV_DS
-python3 scripts/jaspersoft/build_finance_pack_jrs_import.py --datasource /DataSource/Newark1_DS   # a client org
+# ~/OriginBA-3/.env: JRS_URL, JRS_USER (a superuser, or user|Org), JRS_PASSWORD, JRS_INSECURE=true (self-signed TEST cert)
+python3 scripts/jaspersoft/generate_sql_report_pack.py && python3 -m pytest tests/test_sql_report_pack.py -q
+python3 scripts/jaspersoft/jrs_deploy_report_units.py --org Ellensburg --datasource Ellensburg_DS --run 2026-06-01 2026-08-31
+python3 scripts/jaspersoft/jrs_deploy_report_units.py --org Origin_DEV  --datasource Origin_DEV_DS
 ```
 
-`deploy/finance_pack_jrs_import_<DS>.zip` is a JasperReports Server import in the server's
-own export shape: `index.xml` last with `keyalias` first, the datasource resource bundled
-and listed, `.folder.xml` per folder, one `<reportUnit>` per report with its main JRXML, its
-subreport as a local jrxml resource, its input controls as local resources and the datasource
-bound. `keyalias`, `encrypted` and `jsVersion` are copied from a real export of the target
-tenant (`deploy/jaspersoft_datasources/canonical/Origin_DEV_DS_export.zip` for DEV; the
-client's folder under `deploy/jaspersoft_datasources/clients/` otherwise -- pass
-`--datasource <DS> --datasource-export <path>`). Import it from INSIDE the tenant's
-Repository (breadcrumb shows the org); the folders already exist there and are merged.
+`jrs_deploy_report_units.py` PUTs each unit (main JRXML embedded, the subreport as an embedded
+jrxml resource named what `repo:<name>` says, input controls embedded, datasource by reference),
+reads it back, and with `--run` executes it as a PDF with the window given. Login scope matters:
+a superuser addresses `/organizations/organization_1/organizations/<Org>/...` (`--org`); an
+org-scoped login (`user|Org`) addresses `/SmartCity/...` directly. `jrs_repository.py search
+<name>` shows where a unit actually is.
 
-Two shapes that do NOT work, both tried on DEV 2026-09-17: a loose "manifest" bundle is
-refused ("not a valid JasperReports Server export file"); a content-only export with no
-datasource in the batch and no `keyalias` reports success and imports nothing -- search the
-repository for a unit name after every import, and treat "success with warnings" as failure.
-
-After import: open each unit, run with a one-month window and no filters, then reconcile one
-number per unit against the source before handing it over: billed vs `rpt_bill_segment`,
-payments vs `rpt_payment_tender`, GL vs `CI_FT_GL` -- the parity specs in
-`originba_dbt/qa_specs/` hold the same sums.
+Proven on the Ellensburg tenant, 2026-06-01..2026-08-31, real Oracle through `Ellensburg_DS`:
+all four units render (3 / 2 / 6 / 26 pages); Cycle 5 6,808 segments = its service-type
+subtotal; OPCC 5,945 tenders = 5,937 + 8 by month; the GL month subreport is keyed by
+distribution code AND GL account so its subtotal equals the row. On Origin_DEV the units
+deploy but `Origin_DEV_DS` (10.16.0.89/pdevdb_demo) answered "error creating connection"
+that day -- a datasource problem, not a report one.
 
 ## Next reports (same pattern, in order of value)
 

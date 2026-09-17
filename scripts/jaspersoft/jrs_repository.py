@@ -2,7 +2,7 @@
 """See what is actually on a JasperReports Server, and import with the answer in hand.
 
 Reads JRS_URL, JRS_USER, JRS_PASSWORD from the environment (only the key names are ever
-printed). In a multi-tenant server the user is org-scoped: JRS_USER='jasperadmin|Origin_DEV'
+printed); JRS_CA_BUNDLE or JRS_INSECURE=true for a self-signed test server. In a multi-tenant server the user is org-scoped: JRS_USER='jasperadmin|Origin_DEV'
 imports INTO Origin_DEV; a bare 'jasperadmin' is organization_1's admin and 'superuser' is
 the server root -- a tenant-relative package lands wherever the login is scoped, which is
 how an import "succeeds" and nothing appears where you are looking.
@@ -22,7 +22,20 @@ import sys
 import time
 import urllib.error
 import urllib.parse
+import ssl
 import urllib.request
+
+
+def _ssl_context() -> ssl.SSLContext | None:
+    """The SmartCity TEST server presents a self-signed chain. JRS_CA_BUNDLE points at its
+    certificate (preferred); JRS_INSECURE=true skips verification for a test server only."""
+    bundle = os.environ.get("JRS_CA_BUNDLE")
+    if bundle:
+        return ssl.create_default_context(cafile=bundle)
+    if os.environ.get("JRS_INSECURE", "").lower() in ("1", "true", "yes"):
+        ctx = ssl.create_default_context(); ctx.check_hostname = False; ctx.verify_mode = ssl.CERT_NONE
+        return ctx
+    return None
 
 
 def _cfg() -> tuple[str, str]:
@@ -42,7 +55,7 @@ def _call(path: str, *, method: str = "GET", body: bytes | None = None, ctype: s
     if ctype:
         req.add_header("Content-Type", ctype)
     try:
-        with urllib.request.urlopen(req, timeout=120) as r:
+        with urllib.request.urlopen(req, timeout=120, context=_ssl_context()) as r:
             return r.status, r.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode("utf-8", "replace")

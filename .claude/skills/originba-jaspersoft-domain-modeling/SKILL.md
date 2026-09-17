@@ -156,7 +156,7 @@ domains and `rpt_service_agreement`. The physical service premise is a different
 | --- | --- | --- |
 | JRS 8.1.0 PRO (Odessa tenant, `jsVersion` measured from its export) | JasperReports 6.20, JRXML 6 model | reads 6.x JRXML only |
 | JRS 9.0.x (Origin DEV; Studio 9.0.x) | 6.x JRXML model | reads 6.x only; JRS 9 Ad Hoc adds date-time calcs, chart options in `knowledge_base/jaspersoft_charts_visuals_jrs9.md` |
-| JRS 10.0 | JasperReports 7, JRXML 7 model | reads 7 only: 6.x files fail "Unable to load report" and vice versa (measured both ways in originba-letterprint) |
+| **JRS 10.0.0 PRO -- the SmartCity server today** (`/rest_v2/serverInfo`, 2026-09-17; one instance, every client an org) | JasperReports 7, JRXML 7 model | reads 7 only: 6.x files fail "Unable to load report" and vice versa (measured both ways in originba-letterprint). The 8.1.0 PRO rows above are what the same server was before its 2026-05 upgrade; old exports still say 8.1.0 |
 
 JRXML 7 vs 6: boolean attributes lose the `is` prefix (`isBold` -> `bold`), `reportElement` /
 `textElement` / `font` attributes flatten onto the element, `hTextAlign`/`vTextAlign` replace

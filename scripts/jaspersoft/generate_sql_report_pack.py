@@ -7,8 +7,8 @@ and label tables -- never a client-configured code.
 
 Why generated: eight JRXML files share one style block, one page geometry, one parameter set
 and one band layout; hand-editing them drifts. Each report is a SPEC below (query, columns,
-subreport); the emitter owns the JRXML 6 model (JRS 8.1 / 9.0 -- see the report-builder
-skill for the 6-vs-7 rule). Proofs: tests/test_sql_report_pack.py (structure, validator, the
+subreport); the emitter owns the JRXML 7 model: the SmartCity server is JasperReports
+Server 10.0 (JasperReports 7), which cannot load 6.x JRXML at all. Proofs: tests/test_sql_report_pack.py (structure, validator, the
 SQL runs on the Ellensburg slice) and the JasperReports 6.20.6 compile in that test when a
 JDK is present.
 
@@ -23,7 +23,6 @@ GL = CI_FT_GL lines of frozen FTs by accounting date.
 from __future__ import annotations
 
 import json
-import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -38,14 +37,14 @@ ROW_H, HDR_H = 16, 18
 MONEY = "#,##0.00;(#,##0.00)"
 INT = "#,##0"
 
-STYLES = """    <style name="Base" isDefault="true" fontName="Aptos" fontSize="9"/>
-    <style name="TitleSapphire" style="Base" fontSize="18" isBold="true" forecolor="#006FAC"/>
+STYLES = """    <style name="Base" default="true" fontName="Aptos" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
     <style name="H3" style="Base" fontSize="10" forecolor="#0F4761"/>
-    <style name="HeaderSapphire" style="Base" fontSize="9" isBold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
     <style name="DetailText" style="Base" fontSize="9" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
-    <style name="SubHeader" style="Base" fontSize="8" isBold="true" forecolor="#1348AB"/>
+    <style name="SubHeader" style="Base" fontSize="8" bold="true" forecolor="#1348AB"/>
     <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
-    <style name="TotalText" style="Base" fontSize="9" isBold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#000000"/>
 """
 FOOTER = '"@2026, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}'
@@ -70,6 +69,10 @@ class Sub:
     sql: str
     columns: list[Col]
     intro: str                # text above the subreport table, may use $P{...}
+    extra_keys: dict = field(default_factory=dict)   # more param -> main field pairs (a compound key)
+
+    def keys(self) -> dict:
+        return {self.key_param: self.key_field, **self.extra_keys}
 
 
 @dataclass
@@ -123,9 +126,11 @@ def _with_filters(sql: str, preds: list[str]) -> str:
     return sql + extra
 
 
-def _uid(seed: str) -> str:
-    return str(uuid.uuid5(uuid.NAMESPACE_URL, "originba/" + seed))
-
+# ------------------------------------------------------------------ JRXML 7 emitter
+# The SmartCity server is JasperReports Server 10.0 (measured: /rest_v2/serverInfo, 2026-09-17),
+# which runs JasperReports 7 and cannot load the 6.x JRXML model at all. JRXML 7 is the flat
+# vocabulary the letterprint templates use: <element kind="textField" ...><expression>, styles
+# with default/bold, <query>, parameters with forPrompting, no xmlns on the root.
 
 def _xml_esc(s: str) -> str:
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
@@ -138,10 +143,9 @@ def _params(extra: dict[str, tuple[str, str]]) -> str:
         "CLIENT_NAME": ("java.lang.String", '"SmartCity Client"'),
     }
     base.update(extra)
-    out = []
-    for n, (cls, default) in base.items():
-        out.append(f'    <parameter name="{n}" class="{cls}">\n        <defaultValueExpression><![CDATA[{default}]]></defaultValueExpression>\n    </parameter>')
-    return "\n".join(out)
+    return "\n".join(
+        f'    <parameter name="{n}" class="{cls}">\n        <defaultValueExpression><![CDATA[{default}]]></defaultValueExpression>\n    </parameter>'
+        for n, (cls, default) in base.items())
 
 
 def _fields(cols: list[Col]) -> str:
@@ -151,26 +155,22 @@ def _fields(cols: list[Col]) -> str:
 def _variables(cols: list[Col]) -> str:
     return "\n".join(
         f'    <variable name="SUM_{c.name}" class="{c.cls}" calculation="Sum">\n'
-        f'        <variableExpression><![CDATA[$F{{{c.name}}}]]></variableExpression>\n    </variable>'
+        f'        <expression><![CDATA[$F{{{c.name}}}]]></expression>\n    </variable>'
         for c in cols if c.total)
 
 
 def _text(x: int, y: int, w: int, h: int, expr: str, style: str, align: str, seed: str,
-          pattern: str | None = None, mode: str | None = None, blank_null: bool = True) -> str:
+          pattern: str | None = None, evaluation: str | None = None) -> str:
     pat = f' pattern="{pattern}"' if pattern else ""
-    bn = ' isBlankWhenNull="true"' if blank_null else ""
-    m = f' mode="{mode}"' if mode else ""
-    return (f'            <textField{pat}{bn} textAdjust="StretchHeight">\n'
-            f'                <reportElement style="{style}" x="{x}" y="{y}" width="{w}" height="{h}"{m} uuid="{_uid(seed)}"/>\n'
-            f'                <textElement textAlignment="{align}" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>\n'
-            f'                <textFieldExpression><![CDATA[{expr}]]></textFieldExpression>\n            </textField>')
+    ev = f' evaluationTime="{evaluation}"' if evaluation else ""
+    return (f'            <element kind="textField" x="{x}" y="{y}" width="{w}" height="{h}" style="{style}" '
+            f'hTextAlign="{align}" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"{pat}{ev}>'
+            f'<expression><![CDATA[{expr}]]></expression></element>')
 
 
 def _static(x: int, y: int, w: int, h: int, text: str, style: str, align: str, seed: str) -> str:
-    return (f'            <staticText>\n'
-            f'                <reportElement style="{style}" x="{x}" y="{y}" width="{w}" height="{h}" uuid="{_uid(seed)}"/>\n'
-            f'                <textElement textAlignment="{align}" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>\n'
-            f'                <text><![CDATA[{_xml_esc(text)}]]></text>\n            </staticText>')
+    return (f'            <element kind="staticText" x="{x}" y="{y}" width="{w}" height="{h}" style="{style}" '
+            f'hTextAlign="{align}" vTextAlign="Middle"><text><![CDATA[{_xml_esc(text)}]]></text></element>')
 
 
 def _header_row(cols: list[Col], style: str, seed: str, h: int = HDR_H) -> str:
@@ -206,69 +206,66 @@ def _total_row(cols: list[Col], style: str, seed: str, label: str, h: int = ROW_
 
 def _head(name: str, page_w: int, page_h: int, margin: int, col_w: int, orientation: str = "Landscape") -> str:
     return (f'<?xml version="1.0" encoding="UTF-8"?>\n'
-            f'<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"\n'
-            f'    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'
-            f'    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"\n'
-            f'    name="{name}" pageWidth="{page_w}" pageHeight="{page_h}" orientation="{orientation}"\n'
+            f'<jasperReport name="{name}" pageWidth="{page_w}" pageHeight="{page_h}" orientation="{orientation}"\n'
             f'    columnWidth="{col_w}" leftMargin="{margin}" rightMargin="{margin}" topMargin="{margin}" bottomMargin="{margin}"\n'
-            f'    whenNoDataType="AllSectionsNoDetail" uuid="{_uid(name)}">\n'
+            f'    whenNoDataType="AllSectionsNoDetail">\n'
             f'    <property name="net.sf.jasperreports.query.timeout" value="600"/>\n'
             f'    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>\n')
 
 
 def main_jrxml(s: Spec) -> str:
     sub_params = "\n".join(
-        f'                <subreportParameter name="{p}">\n'
-        f'                    <subreportParameterExpression><![CDATA[$P{{{p}}}]]></subreportParameterExpression>\n'
-        f'                </subreportParameter>' for p in ("FROM_DT", "TO_DT", *s.all_params()))
-    sub_key = (f'                <subreportParameter name="{s.sub.key_param}">\n'
-               f'                    <subreportParameterExpression><![CDATA[$F{{{s.sub.key_field}}}]]></subreportParameterExpression>\n'
-               f'                </subreportParameter>')
+        f'                <parameter name="{p}"><expression><![CDATA[$P{{{p}}}]]></expression></parameter>'
+        for p in ("FROM_DT", "TO_DT", *s.all_params()))
+    sub_key = "\n".join(f'                <parameter name="{p}"><expression><![CDATA[$F{{{f}}}]]></expression></parameter>'
+                        for p, f in s.sub.keys().items())
     window = ('$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) '
               '+ " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT})'
               + (f' + "  |  {s.order_note}"' if s.order_note else "")
               + "".join(f' + ($P{{{f.param}}} == null ? "" : "  |  {f.label}: " + $P{{{f.param}}})' for f in s.filters))
-    return (_head(s.name, PAGE_W, PAGE_H, MARGIN, COL_W) + STYLES + _params(s.all_params()) + "\n"
-            f'    <queryString language="SQL"><![CDATA[\n{s.main_sql().strip()}\n]]></queryString>\n'
+    return (_head(s.name, PAGE_W, PAGE_H, MARGIN, COL_W) + STYLES +
+            f'    <query language="SQL"><![CDATA[\n{s.main_sql().strip()}\n]]></query>\n'
+            + _params(s.all_params()) + "\n"
             + _fields(s.columns) + "\n" + _variables(s.columns) + "\n"
-            f'    <title>\n        <band height="52">\n'
+            f'    <title height="52">\n'
             + _text(0, 0, COL_W, 26, f'"{s.label}"', "TitleSapphire", "Left", s.name + "/title") + "\n"
             + _text(0, 28, COL_W, 16, window, "H3", "Left", s.name + "/window") + "\n"
-            + _text(0, 44, COL_W, 8, '""', "Base", "Left", s.name + "/gap") + "\n"
-            f'        </band>\n    </title>\n'
-            f'    <columnHeader>\n        <band height="{HDR_H}">\n' + _header_row(s.columns, "HeaderSapphire", s.name) + "\n"
-            f'        </band>\n    </columnHeader>\n'
+            f'    </title>\n'
+            f'    <columnHeader height="{HDR_H}">\n' + _header_row(s.columns, "HeaderSapphire", s.name) + "\n"
+            f'    </columnHeader>\n'
             f'    <detail>\n        <band height="{ROW_H + 4}" splitType="Prevent">\n' + _detail_row(s.columns, "DetailText", s.name) + "\n"
             f'        </band>\n        <band height="20" splitType="Stretch">\n'
-            f'            <subreport isUsingCache="false">\n'
-            f'                <reportElement positionType="Float" stretchType="RelativeToBandHeight" isRemoveLineWhenBlank="true" x="24" y="0" width="{COL_W - 24}" height="20" uuid="{_uid(s.name + "/sub")}"/>\n'
+            f'            <element kind="subreport" x="24" y="0" width="{COL_W - 24}" height="20" positionType="Float" '
+            f'removeLineWhenBlank="true" usingCache="false">\n'
             + sub_params + "\n" + sub_key + "\n"
             f'                <connectionExpression><![CDATA[$P{{REPORT_CONNECTION}}]]></connectionExpression>\n'
-            f'                <subreportExpression><![CDATA["repo:{s.sub.name}"]]></subreportExpression>\n'
-            f'            </subreport>\n        </band>\n    </detail>\n'
-            f'    <pageFooter>\n        <band height="14">\n'
+            f'                <expression><![CDATA["repo:{s.sub.name}"]]></expression>\n'
+            f'            </element>\n        </band>\n    </detail>\n'
+            f'    <pageFooter height="14">\n'
             + _text(0, 0, 600, 14, FOOTER, "FooterConfidential", "Left", s.name + "/foot") + "\n"
-            + _text(600, 0, 202, 14, '"Page " + $V{PAGE_NUMBER} + " of " + $V{PAGE_NUMBER}', "FooterConfidential", "Right", s.name + "/page").replace(
-                '<textField isBlankWhenNull="true" textAdjust="StretchHeight">', '<textField isBlankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report">', 1) + "\n"
-            f'        </band>\n    </pageFooter>\n'
-            f'    <summary>\n        <band height="{ROW_H + 6}">\n' + _total_row(s.columns, "TotalText", s.name, "Total") + "\n"
-            f'        </band>\n    </summary>\n</jasperReport>\n')
+            + _text(600, 0, 150, 14, '"Page " + $V{PAGE_NUMBER} + " of"', "FooterConfidential", "Right", s.name + "/page") + "\n"
+            + _text(750, 0, 52, 14, '" " + $V{PAGE_NUMBER}', "FooterConfidential", "Left", s.name + "/pages", evaluation="Report") + "\n"
+            f'    </pageFooter>\n'
+            f'    <summary height="{ROW_H + 6}">\n' + _total_row(s.columns, "TotalText", s.name, "Total") + "\n"
+            f'    </summary>\n</jasperReport>\n')
 
 
 def sub_jrxml(s: Spec) -> str:
     sub, w = s.sub, COL_W - 24
-    return (_head(sub.name, w, PAGE_H, 0, w) + STYLES
-            + _params({sub.key_param: ("java.lang.String", '""'), **s.all_params()}).replace('<parameter name="CLIENT_NAME"', '<parameter name="CLIENT_NAME" isForPrompting="false"') + "\n"
-            f'    <queryString language="SQL"><![CDATA[\n{s.sub_sql().strip()}\n]]></queryString>\n'
+    params = _params({**{k: ("java.lang.String", '""') for k in sub.keys()}, **s.all_params()}).replace(
+        '<parameter name="CLIENT_NAME" class', '<parameter name="CLIENT_NAME" forPrompting="false" class')
+    return (_head(sub.name, w, PAGE_H, 0, w) + STYLES +
+            f'    <query language="SQL"><![CDATA[\n{s.sub_sql().strip()}\n]]></query>\n'
+            + params + "\n"
             + _fields(sub.columns) + "\n" + _variables(sub.columns) + "\n"
-            f'    <title>\n        <band height="14">\n' + _text(0, 0, w, 14, sub.intro, "SubHeader", "Left", sub.name + "/intro") + "\n"
-            f'        </band>\n    </title>\n'
-            f'    <columnHeader>\n        <band height="14">\n' + _header_row(sub.columns, "SubHeader", sub.name, 14) + "\n"
-            f'        </band>\n    </columnHeader>\n'
+            f'    <title height="14">\n' + _text(0, 0, w, 14, sub.intro, "SubHeader", "Left", sub.name + "/intro") + "\n"
+            f'    </title>\n'
+            f'    <columnHeader height="14">\n' + _header_row(sub.columns, "SubHeader", sub.name, 14) + "\n"
+            f'    </columnHeader>\n'
             f'    <detail>\n        <band height="13">\n' + _detail_row(sub.columns, "SubText", sub.name, 13) + "\n"
             f'        </band>\n    </detail>\n'
-            f'    <summary>\n        <band height="16">\n' + _total_row(sub.columns, "SubHeader", sub.name, "Subtotal", 13) + "\n"
-            f'        </band>\n    </summary>\n</jasperReport>\n')
+            f'    <summary height="16">\n' + _total_row(sub.columns, "SubHeader", sub.name, "Subtotal", 13) + "\n"
+            f'    </summary>\n</jasperReport>\n')
 
 
 def controls(s: Spec) -> tuple[dict, list]:
@@ -496,7 +493,8 @@ ORDER BY ABS(COALESCE(SUM(g.amount), 0)) DESC""",
                  Col("NET_AMT", "Net", "java.math.BigDecimal", 110, "Right", MONEY, True)],
         sub=Sub(
             name="gl_by_distribution_code_month", key_param="DST_ID", key_field="DST_ID",
-            intro='"By accounting month for distribution code " + $P{DST_ID}',
+            extra_keys={"GL_ACCT": "GL_ACCT"},
+            intro='"By accounting month for distribution code " + $P{DST_ID} + ", GL account " + $P{GL_ACCT}',
             sql=f"""
 SELECT TO_CHAR(f.accounting_dt, 'YYYY-MM') AS ACCT_MONTH, COUNT(*) AS GL_LINES,
        COALESCE(SUM(CASE WHEN g.amount > 0 THEN g.amount ELSE 0 END), 0) AS DEBIT_AMT,
@@ -505,6 +503,7 @@ SELECT TO_CHAR(f.accounting_dt, 'YYYY-MM') AS ACCT_MONTH, COUNT(*) AS GL_LINES,
 FROM CISADM.CI_FT_GL g
 JOIN CISADM.CI_FT f ON f.ft_id = g.ft_id
 WHERE TRIM(f.freeze_sw) = 'Y' AND {WINDOW.format(col='f.accounting_dt')} AND TRIM(g.dst_id) = TRIM($P{{DST_ID}})
+  AND COALESCE(TRIM(g.gl_acct), '(no GL account)') = $P{{GL_ACCT}}
 GROUP BY TO_CHAR(f.accounting_dt, 'YYYY-MM')
 ORDER BY ACCT_MONTH""",
             columns=[Col("ACCT_MONTH", "Month", width=328), Col("GL_LINES", "Lines", "java.lang.Long", 70, "Right", INT, True),

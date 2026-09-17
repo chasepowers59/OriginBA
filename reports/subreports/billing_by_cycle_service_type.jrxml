@@ -1,46 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-    name="billing_by_cycle_service_type" pageWidth="778" pageHeight="595" orientation="Landscape"
+<jasperReport name="billing_by_cycle_service_type" pageWidth="778" pageHeight="595" orientation="Landscape"
     columnWidth="778" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0"
-    whenNoDataType="AllSectionsNoDetail" uuid="2fb889fb-f46a-5496-92c1-5a2175360493">
+    whenNoDataType="AllSectionsNoDetail">
     <property name="net.sf.jasperreports.query.timeout" value="600"/>
     <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
-    <style name="Base" isDefault="true" fontName="Aptos" fontSize="9"/>
-    <style name="TitleSapphire" style="Base" fontSize="18" isBold="true" forecolor="#006FAC"/>
+    <style name="Base" default="true" fontName="Aptos" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
     <style name="H3" style="Base" fontSize="10" forecolor="#0F4761"/>
-    <style name="HeaderSapphire" style="Base" fontSize="9" isBold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
     <style name="DetailText" style="Base" fontSize="9" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
-    <style name="SubHeader" style="Base" fontSize="8" isBold="true" forecolor="#1348AB"/>
+    <style name="SubHeader" style="Base" fontSize="8" bold="true" forecolor="#1348AB"/>
     <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
-    <style name="TotalText" style="Base" fontSize="9" isBold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#000000"/>
-    <parameter name="FROM_DT" class="java.sql.Date">
-        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())]]></defaultValueExpression>
-    </parameter>
-    <parameter name="TO_DT" class="java.sql.Date">
-        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())]]></defaultValueExpression>
-    </parameter>
-    <parameter name="CLIENT_NAME" isForPrompting="false" class="java.lang.String">
-        <defaultValueExpression><![CDATA["SmartCity Client"]]></defaultValueExpression>
-    </parameter>
-    <parameter name="BILL_CYC_CD" class="java.lang.String">
-        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
-    </parameter>
-    <parameter name="BILL_CYC_CD_F" class="java.lang.String">
-        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
-    </parameter>
-    <parameter name="SVC_TYPE_CD_F" class="java.lang.String">
-        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
-    </parameter>
-    <parameter name="CIS_DIVISION_F" class="java.lang.String">
-        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
-    </parameter>
-    <parameter name="ACCT_ID_F" class="java.lang.String">
-        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
-    </parameter>
-    <queryString language="SQL"><![CDATA[
+    <query language="SQL"><![CDATA[
 SELECT TRIM(t.svc_type_cd) AS SVC_TYPE_CD, COALESCE(sl.descr, TRIM(t.svc_type_cd)) AS SVC_TYPE_DESCR,
        COUNT(DISTINCT s.sa_id) AS SERVICE_AGREEMENTS,
        COUNT(DISTINCT s.bseg_id) AS SEGMENTS,
@@ -60,7 +33,31 @@ WHERE TRIM(b.bill_stat_flg) = 'C' AND b.bill_dt >= $P{FROM_DT} AND b.bill_dt < $
   AND ($P{ACCT_ID_F} IS NULL OR TRIM(b.acct_id) = TRIM($P{ACCT_ID_F}))
 GROUP BY TRIM(t.svc_type_cd), COALESCE(sl.descr, TRIM(t.svc_type_cd))
 ORDER BY BILLED_AMT DESC
-]]></queryString>
+]]></query>
+    <parameter name="FROM_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TO_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_NAME" forPrompting="false" class="java.lang.String">
+        <defaultValueExpression><![CDATA["SmartCity Client"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="BILL_CYC_CD" class="java.lang.String">
+        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+    </parameter>
+    <parameter name="BILL_CYC_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="SVC_TYPE_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CIS_DIVISION_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ACCT_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
     <field name="SVC_TYPE_CD" class="java.lang.String"/>
     <field name="SVC_TYPE_DESCR" class="java.lang.String"/>
     <field name="SERVICE_AGREEMENTS" class="java.lang.Long"/>
@@ -68,126 +65,44 @@ ORDER BY BILLED_AMT DESC
     <field name="ESTIMATED_SEGMENTS" class="java.lang.Long"/>
     <field name="BILLED_AMT" class="java.math.BigDecimal"/>
     <variable name="SUM_SERVICE_AGREEMENTS" class="java.lang.Long" calculation="Sum">
-        <variableExpression><![CDATA[$F{SERVICE_AGREEMENTS}]]></variableExpression>
+        <expression><![CDATA[$F{SERVICE_AGREEMENTS}]]></expression>
     </variable>
     <variable name="SUM_SEGMENTS" class="java.lang.Long" calculation="Sum">
-        <variableExpression><![CDATA[$F{SEGMENTS}]]></variableExpression>
+        <expression><![CDATA[$F{SEGMENTS}]]></expression>
     </variable>
     <variable name="SUM_ESTIMATED_SEGMENTS" class="java.lang.Long" calculation="Sum">
-        <variableExpression><![CDATA[$F{ESTIMATED_SEGMENTS}]]></variableExpression>
+        <expression><![CDATA[$F{ESTIMATED_SEGMENTS}]]></expression>
     </variable>
     <variable name="SUM_BILLED_AMT" class="java.math.BigDecimal" calculation="Sum">
-        <variableExpression><![CDATA[$F{BILLED_AMT}]]></variableExpression>
+        <expression><![CDATA[$F{BILLED_AMT}]]></expression>
     </variable>
-    <title>
-        <band height="14">
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubHeader" x="0" y="0" width="778" height="14" uuid="fad2074f-876f-5399-973c-763a27608fdc"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA["By service type in cycle " + $P{BILL_CYC_CD}]]></textFieldExpression>
-            </textField>
-        </band>
+    <title height="14">
+            <element kind="textField" x="0" y="0" width="778" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["By service type in cycle " + $P{BILL_CYC_CD}]]></expression></element>
     </title>
-    <columnHeader>
-        <band height="14">
-            <staticText>
-                <reportElement style="SubHeader" x="0" y="0" width="60" height="14" uuid="51097372-43bb-5811-9a35-349e5226bbe4"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Type]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="60" y="0" width="328" height="14" uuid="5ae54b7c-5fe0-5d41-882e-f2482a06c859"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Service Type]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="388" y="0" width="90" height="14" uuid="fef1b2e3-18ad-5f39-947b-70b83d9f4322"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[SAs]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="478" y="0" width="90" height="14" uuid="b2b2bcc1-adec-54e9-9100-3b5e3ec06c76"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Segments]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="568" y="0" width="90" height="14" uuid="1e74cb18-b5d0-5d41-85c0-20b66374b0ce"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Estimated]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="658" y="0" width="120" height="14" uuid="2c942236-601c-5ff8-b31f-cead7e5a0c37"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Billed Amount]]></text>
-            </staticText>
-        </band>
+    <columnHeader height="14">
+            <element kind="staticText" x="0" y="0" width="60" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Type]]></text></element>
+            <element kind="staticText" x="60" y="0" width="328" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Service Type]]></text></element>
+            <element kind="staticText" x="388" y="0" width="90" height="14" style="SubHeader" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[SAs]]></text></element>
+            <element kind="staticText" x="478" y="0" width="90" height="14" style="SubHeader" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Segments]]></text></element>
+            <element kind="staticText" x="568" y="0" width="90" height="14" style="SubHeader" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Estimated]]></text></element>
+            <element kind="staticText" x="658" y="0" width="120" height="14" style="SubHeader" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Billed Amount]]></text></element>
     </columnHeader>
     <detail>
         <band height="13">
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubText" x="0" y="0" width="60" height="13" uuid="6c79d5ab-bf7b-5235-9456-77d5e3c69508"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{SVC_TYPE_CD}]]></textFieldExpression>
-            </textField>
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubText" x="60" y="0" width="328" height="13" uuid="2125b026-74e9-5260-a58c-a38546d44640"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{SVC_TYPE_DESCR}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubText" x="388" y="0" width="90" height="13" uuid="af65603d-56f2-541a-adec-95f81db671c1"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{SERVICE_AGREEMENTS}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubText" x="478" y="0" width="90" height="13" uuid="89a162a2-819a-5869-8a38-3c0f5669d34a"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{SEGMENTS}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubText" x="568" y="0" width="90" height="13" uuid="8387baea-d928-5a11-b4b9-3c6d7ea857cb"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{ESTIMATED_SEGMENTS}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubText" x="658" y="0" width="120" height="13" uuid="21709655-7a1f-52a4-8854-8d09c3c8d05c"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{BILLED_AMT}]]></textFieldExpression>
-            </textField>
+            <element kind="textField" x="0" y="0" width="60" height="13" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{SVC_TYPE_CD}]]></expression></element>
+            <element kind="textField" x="60" y="0" width="328" height="13" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{SVC_TYPE_DESCR}]]></expression></element>
+            <element kind="textField" x="388" y="0" width="90" height="13" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{SERVICE_AGREEMENTS}]]></expression></element>
+            <element kind="textField" x="478" y="0" width="90" height="13" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{SEGMENTS}]]></expression></element>
+            <element kind="textField" x="568" y="0" width="90" height="13" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{ESTIMATED_SEGMENTS}]]></expression></element>
+            <element kind="textField" x="658" y="0" width="120" height="13" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{BILLED_AMT}]]></expression></element>
         </band>
     </detail>
-    <summary>
-        <band height="16">
-            <staticText>
-                <reportElement style="SubHeader" x="0" y="0" width="60" height="13" uuid="a774f51a-1f0e-598f-90ea-dba8b6cf9864"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Subtotal]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="60" y="0" width="328" height="13" uuid="b16b5310-5f06-5bb9-8e34-c546d064a014"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[]]></text>
-            </staticText>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubHeader" x="388" y="0" width="90" height="13" uuid="29fb2625-bd71-5a23-bd48-b9213a9fcd92"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_SERVICE_AGREEMENTS}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubHeader" x="478" y="0" width="90" height="13" uuid="4a823acb-351f-5cb7-971e-c459bc995cd0"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_SEGMENTS}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubHeader" x="568" y="0" width="90" height="13" uuid="4c262523-6f7a-581b-8ea7-0b4c92e40806"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_ESTIMATED_SEGMENTS}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubHeader" x="658" y="0" width="120" height="13" uuid="2ab018e2-7c56-52db-915a-b42eb5a60eba"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_BILLED_AMT}]]></textFieldExpression>
-            </textField>
-        </band>
+    <summary height="16">
+            <element kind="staticText" x="0" y="0" width="60" height="13" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Subtotal]]></text></element>
+            <element kind="staticText" x="60" y="0" width="328" height="13" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="textField" x="388" y="0" width="90" height="13" style="SubHeader" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_SERVICE_AGREEMENTS}]]></expression></element>
+            <element kind="textField" x="478" y="0" width="90" height="13" style="SubHeader" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_SEGMENTS}]]></expression></element>
+            <element kind="textField" x="568" y="0" width="90" height="13" style="SubHeader" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_ESTIMATED_SEGMENTS}]]></expression></element>
+            <element kind="textField" x="658" y="0" width="120" height="13" style="SubHeader" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_BILLED_AMT}]]></expression></element>
     </summary>
 </jasperReport>

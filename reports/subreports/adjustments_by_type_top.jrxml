@@ -1,28 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-    name="adjustments_by_type_top" pageWidth="778" pageHeight="595" orientation="Landscape"
+<jasperReport name="adjustments_by_type_top" pageWidth="778" pageHeight="595" orientation="Landscape"
     columnWidth="778" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0"
-    whenNoDataType="AllSectionsNoDetail" uuid="54bbc142-c60a-5fea-a826-829445136d7d">
+    whenNoDataType="AllSectionsNoDetail">
     <property name="net.sf.jasperreports.query.timeout" value="600"/>
     <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
-    <style name="Base" isDefault="true" fontName="Aptos" fontSize="9"/>
-    <style name="TitleSapphire" style="Base" fontSize="18" isBold="true" forecolor="#006FAC"/>
+    <style name="Base" default="true" fontName="Aptos" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
     <style name="H3" style="Base" fontSize="10" forecolor="#0F4761"/>
-    <style name="HeaderSapphire" style="Base" fontSize="9" isBold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
     <style name="DetailText" style="Base" fontSize="9" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
-    <style name="SubHeader" style="Base" fontSize="8" isBold="true" forecolor="#1348AB"/>
+    <style name="SubHeader" style="Base" fontSize="8" bold="true" forecolor="#1348AB"/>
     <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
-    <style name="TotalText" style="Base" fontSize="9" isBold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#000000"/>
+    <query language="SQL"><![CDATA[
+SELECT ADJ_ID, CRE_DT, SA_ID, ACCT_ID, CUSTOMER_NAME, ADJ_AMT FROM (
+  SELECT TRIM(a.adj_id) AS ADJ_ID, a.cre_dt AS CRE_DT, TRIM(a.sa_id) AS SA_ID, TRIM(sa.acct_id) AS ACCT_ID,
+         pn.entity_name AS CUSTOMER_NAME, a.adj_amt AS ADJ_AMT
+  FROM CISADM.CI_ADJ a
+  JOIN CISADM.CI_SA sa ON sa.sa_id = a.sa_id
+  LEFT JOIN CISADM.CI_ACCT_PER ap ON ap.acct_id = sa.acct_id AND TRIM(ap.main_cust_sw) = 'Y'
+  LEFT JOIN CISADM.CI_PER_NAME pn ON pn.per_id = ap.per_id AND TRIM(pn.name_type_flg) = 'PRIM'
+  WHERE TRIM(a.adj_status_flg) = '50' AND a.cre_dt >= $P{FROM_DT} AND a.cre_dt < $P{TO_DT} + INTERVAL '1' DAY
+    AND TRIM(a.adj_type_cd) = TRIM($P{ADJ_TYPE_CD})
+      AND ($P{ADJ_TYPE_CD_F} IS NULL OR TRIM(a.adj_type_cd) = TRIM($P{ADJ_TYPE_CD_F}))
+  AND ($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))
+  AND ($P{SA_ID_F} IS NULL OR TRIM(a.sa_id) = TRIM($P{SA_ID_F}))
+  AND ($P{MIN_ABS_AMT_F} IS NULL OR ABS(a.adj_amt) >= $P{MIN_ABS_AMT_F})
+  ORDER BY ABS(a.adj_amt) DESC, a.adj_id
+) x
+FETCH FIRST $P{TOP_N} ROWS ONLY
+]]></query>
     <parameter name="FROM_DT" class="java.sql.Date">
         <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())]]></defaultValueExpression>
     </parameter>
     <parameter name="TO_DT" class="java.sql.Date">
         <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())]]></defaultValueExpression>
     </parameter>
-    <parameter name="CLIENT_NAME" isForPrompting="false" class="java.lang.String">
+    <parameter name="CLIENT_NAME" forPrompting="false" class="java.lang.String">
         <defaultValueExpression><![CDATA["SmartCity Client"]]></defaultValueExpression>
     </parameter>
     <parameter name="ADJ_TYPE_CD" class="java.lang.String">
@@ -43,24 +58,6 @@
     <parameter name="MIN_ABS_AMT_F" class="java.math.BigDecimal">
         <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
     </parameter>
-    <queryString language="SQL"><![CDATA[
-SELECT ADJ_ID, CRE_DT, SA_ID, ACCT_ID, CUSTOMER_NAME, ADJ_AMT FROM (
-  SELECT TRIM(a.adj_id) AS ADJ_ID, a.cre_dt AS CRE_DT, TRIM(a.sa_id) AS SA_ID, TRIM(sa.acct_id) AS ACCT_ID,
-         pn.entity_name AS CUSTOMER_NAME, a.adj_amt AS ADJ_AMT
-  FROM CISADM.CI_ADJ a
-  JOIN CISADM.CI_SA sa ON sa.sa_id = a.sa_id
-  LEFT JOIN CISADM.CI_ACCT_PER ap ON ap.acct_id = sa.acct_id AND TRIM(ap.main_cust_sw) = 'Y'
-  LEFT JOIN CISADM.CI_PER_NAME pn ON pn.per_id = ap.per_id AND TRIM(pn.name_type_flg) = 'PRIM'
-  WHERE TRIM(a.adj_status_flg) = '50' AND a.cre_dt >= $P{FROM_DT} AND a.cre_dt < $P{TO_DT} + INTERVAL '1' DAY
-    AND TRIM(a.adj_type_cd) = TRIM($P{ADJ_TYPE_CD})
-      AND ($P{ADJ_TYPE_CD_F} IS NULL OR TRIM(a.adj_type_cd) = TRIM($P{ADJ_TYPE_CD_F}))
-  AND ($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))
-  AND ($P{SA_ID_F} IS NULL OR TRIM(a.sa_id) = TRIM($P{SA_ID_F}))
-  AND ($P{MIN_ABS_AMT_F} IS NULL OR ABS(a.adj_amt) >= $P{MIN_ABS_AMT_F})
-  ORDER BY ABS(a.adj_amt) DESC, a.adj_id
-) x
-FETCH FIRST $P{TOP_N} ROWS ONLY
-]]></queryString>
     <field name="ADJ_ID" class="java.lang.String"/>
     <field name="CRE_DT" class="java.sql.Timestamp"/>
     <field name="SA_ID" class="java.lang.String"/>
@@ -68,117 +65,35 @@ FETCH FIRST $P{TOP_N} ROWS ONLY
     <field name="CUSTOMER_NAME" class="java.lang.String"/>
     <field name="ADJ_AMT" class="java.math.BigDecimal"/>
     <variable name="SUM_ADJ_AMT" class="java.math.BigDecimal" calculation="Sum">
-        <variableExpression><![CDATA[$F{ADJ_AMT}]]></variableExpression>
+        <expression><![CDATA[$F{ADJ_AMT}]]></expression>
     </variable>
-    <title>
-        <band height="14">
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubHeader" x="0" y="0" width="778" height="14" uuid="e6ea067e-015b-5281-809f-42a7bbb10f0e"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA["Largest adjustments of type " + $P{ADJ_TYPE_CD}]]></textFieldExpression>
-            </textField>
-        </band>
+    <title height="14">
+            <element kind="textField" x="0" y="0" width="778" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Largest adjustments of type " + $P{ADJ_TYPE_CD}]]></expression></element>
     </title>
-    <columnHeader>
-        <band height="14">
-            <staticText>
-                <reportElement style="SubHeader" x="0" y="0" width="90" height="14" uuid="881b5b21-d9e8-5043-bde6-ef8e25ef71b6"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Adjustment]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="90" y="0" width="80" height="14" uuid="26b936c6-4d7e-53c1-ab78-688aa225566f"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Created]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="170" y="0" width="90" height="14" uuid="881ca2ef-4f73-5ad2-afad-4cecaf9c4e46"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[SA]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="260" y="0" width="90" height="14" uuid="e43771a8-741d-51e9-8a87-774eb9220dd1"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Account]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="350" y="0" width="308" height="14" uuid="ad8fb4fa-a62c-5d83-981a-f4f8ccf580b7"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Main Customer]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="658" y="0" width="120" height="14" uuid="60ac5be0-da48-5e23-9b5d-e712df9c175e"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Amount]]></text>
-            </staticText>
-        </band>
+    <columnHeader height="14">
+            <element kind="staticText" x="0" y="0" width="90" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Adjustment]]></text></element>
+            <element kind="staticText" x="90" y="0" width="80" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Created]]></text></element>
+            <element kind="staticText" x="170" y="0" width="90" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[SA]]></text></element>
+            <element kind="staticText" x="260" y="0" width="90" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Account]]></text></element>
+            <element kind="staticText" x="350" y="0" width="308" height="14" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Main Customer]]></text></element>
+            <element kind="staticText" x="658" y="0" width="120" height="14" style="SubHeader" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Amount]]></text></element>
     </columnHeader>
     <detail>
         <band height="13">
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubText" x="0" y="0" width="90" height="13" uuid="59b83475-4e6c-53af-ac33-e738a4d99e75"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{ADJ_ID}]]></textFieldExpression>
-            </textField>
-            <textField pattern="yyyy-MM-dd" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubText" x="90" y="0" width="80" height="13" uuid="367c27ca-d36f-5220-9b4f-02f110991360"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{CRE_DT}]]></textFieldExpression>
-            </textField>
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubText" x="170" y="0" width="90" height="13" uuid="801cf5c1-0498-5697-b64c-5a90b96f01d6"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{SA_ID}]]></textFieldExpression>
-            </textField>
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubText" x="260" y="0" width="90" height="13" uuid="d9f1aff5-e64c-5cde-b05c-127986b8416a"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{ACCT_ID}]]></textFieldExpression>
-            </textField>
-            <textField isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubText" x="350" y="0" width="308" height="13" uuid="3dfcaf8c-766c-5345-b0b3-d8ba75cbfdb3"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{CUSTOMER_NAME}]]></textFieldExpression>
-            </textField>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubText" x="658" y="0" width="120" height="13" uuid="2deb4886-43ac-553b-a096-ea07d64f5030"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$F{ADJ_AMT}]]></textFieldExpression>
-            </textField>
+            <element kind="textField" x="0" y="0" width="90" height="13" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ADJ_ID}]]></expression></element>
+            <element kind="textField" x="90" y="0" width="80" height="13" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="yyyy-MM-dd"><expression><![CDATA[$F{CRE_DT}]]></expression></element>
+            <element kind="textField" x="170" y="0" width="90" height="13" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{SA_ID}]]></expression></element>
+            <element kind="textField" x="260" y="0" width="90" height="13" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ACCT_ID}]]></expression></element>
+            <element kind="textField" x="350" y="0" width="308" height="13" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{CUSTOMER_NAME}]]></expression></element>
+            <element kind="textField" x="658" y="0" width="120" height="13" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{ADJ_AMT}]]></expression></element>
         </band>
     </detail>
-    <summary>
-        <band height="16">
-            <staticText>
-                <reportElement style="SubHeader" x="0" y="0" width="90" height="13" uuid="f8456048-e9a4-56fe-a706-d9ab20cb25db"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[Subtotal]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="90" y="0" width="80" height="13" uuid="93e2961e-16cf-5987-9ad9-eb9287a60b3c"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="170" y="0" width="90" height="13" uuid="90cf7e81-e68f-569b-a634-28b13ba8fa44"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="260" y="0" width="90" height="13" uuid="3117a529-fa52-515c-9f04-f0da4296594f"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[]]></text>
-            </staticText>
-            <staticText>
-                <reportElement style="SubHeader" x="350" y="0" width="308" height="13" uuid="41f1b22e-d5ff-5752-a125-14afa9501f1a"/>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <text><![CDATA[]]></text>
-            </staticText>
-            <textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true" textAdjust="StretchHeight">
-                <reportElement style="SubHeader" x="658" y="0" width="120" height="13" uuid="c2a06424-68a2-5a39-a57d-bfc76bbf955d"/>
-                <textElement textAlignment="Right" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$V{SUM_ADJ_AMT}]]></textFieldExpression>
-            </textField>
-        </band>
+    <summary height="16">
+            <element kind="staticText" x="0" y="0" width="90" height="13" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Subtotal]]></text></element>
+            <element kind="staticText" x="90" y="0" width="80" height="13" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="staticText" x="170" y="0" width="90" height="13" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="staticText" x="260" y="0" width="90" height="13" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="staticText" x="350" y="0" width="308" height="13" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="textField" x="658" y="0" width="120" height="13" style="SubHeader" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_ADJ_AMT}]]></expression></element>
     </summary>
 </jasperReport>

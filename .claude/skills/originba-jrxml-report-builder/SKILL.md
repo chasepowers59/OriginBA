@@ -210,36 +210,33 @@ ORDER BY account]]></queryString>
 </componentElement></band></detail>
 ```
 
-### How the server stores it (what an import ZIP must contain)
+### Deploying to the SmartCity server: REST, JRXML 7, org scope (measured 2026-09-17)
 
-**A "manifest + loose files" bundle is not an import.** `deploy/build_report_unit*.sh` produce
-that older shape for a deployer script; uploaded through Manage > Import it fails with
-"provided zip file is not valid JasperReports Server export file" (DEV, 2026-09-17). The importable shape is the server's own export, built by
-`scripts/jaspersoft/build_finance_pack_jrs_import.py`: `index.xml` LAST in the archive and
-starting with `keyalias` (with `encrypted` and `jsVersion` copied from a real export of the
-target tenant), the DATASOURCE RESOURCE bundled and listed as `<resource>` (a unit whose
-`<dataSource><uri>` cannot be resolved inside the batch is dropped), deflated `favorites/`
-entry, `.folder.xml` per folder, `<reportUnit>` with local input controls, the subreport as
-a local `fileResource` of type jrxml named exactly what the main's `repo:<name>` says.
-A content-only package without the datasource and keyalias "imported fine" on DEV and
-imported NOTHING (2026-09-17) -- always search the repository for a unit name afterwards.
-`verify_standard_offering_tenant_import.py --zip X --target-ds DS` checks the contract; for
-a report-unit package only its dashboard-template and SO-root-folder complaints are expected.
-
-```
-resources/SmartCity/Report/Workstreams/Debt_Management/REP8_Aged_Balance.xml        <reportUnit>: folder, name, label,
-                                                                                     <mainReport><localResource dataFile="main_jrxml.data" fileType="jrxml">,
-                                                                                     <dataSource><uri>/DataSource/Newark1_DS</uri>, <inputControl><uri>...</uri>
-resources/SmartCity/Report/Workstreams/Debt_Management/REP8_Aged_Balance_files/main_jrxml.data   the JRXML body, different extension
-resources/SmartCity/Admin/Parameters/Report_Date.xml                                 a repository input control the unit references
-resources/DataSource/Newark1_DS.xml                                                  the datasource (jsVersion measured from a real export)
-index.xml                                                                            tenant-relative: no rootTenantId
-```
-
-Import inside the client organization; a folder path that does not match `index.xml` fails
-the import (REP8 README pitfalls). For repo Domain reports the input controls also live in
-`server/input_controls/<report>_input_controls.json` + `_rest.json`; for client SQL reports
-they are usually repository controls shipped in the ZIP.
+- **The server is JasperReports Server 10.0.0 PRO** (`GET /rest_v2/serverInfo`), one instance
+  hosting every client as a sub-organization of `organization_1` (Ellensburg, Fond_Du_Lac,
+  CityCorp, College_Station, Odessa, Newark1, Origin_DEV, Origin_TEST). It runs JasperReports 7:
+  **author JRXML 7** -- `<jasperReport name=...>` with no namespace, `<query language="SQL">`,
+  `<element kind="textField" ...><expression>`, `bold=`/`blankWhenNull=`/`forPrompting=`,
+  `<title height=...>` bands with elements directly inside (only `<detail>` keeps `<band>`),
+  subreport = `<element kind="subreport"><parameter name><expression/></parameter>
+  <connectionExpression/><expression>"repo:name"</expression></element>`. A 6.x file fails
+  "Unable to load report"; JR 6.20 fails on a 7 file. Compile-check with JR 7.0.7 (classpath
+  from `~/originba-letterprint/service`, JDK 21): `tests/test_sql_report_pack.py` does.
+- **Login scope decides where things land.** `user|Org` scopes to the organization; a bare
+  login is root (superuser) or organization_1. Superuser REST paths are
+  `/organizations/organization_1/organizations/<Org>/SmartCity/...`.
+- **Deploy with REST, not import zips.** `scripts/jaspersoft/jrs_deploy_report_units.py`:
+  `PUT /rest_v2/resources/<uri>?overwrite=true&createFolders=true`,
+  `Content-Type: application/repository.reportUnit+json`, body = `label`, `dataSource:
+  {dataSourceReference: {uri}}`, `jrxml: {jrxmlFile: {type: jrxml, content: base64}}`,
+  `resources: {resource: [{name, file: {fileResource: {type: jrxml, content}}}]}` (the
+  wrapper object, not a bare array -- "Cannot deserialize ClientReportUnitResourceListWrapper"),
+  `inputControls: [{inputControl: {label, mandatory, visible, type: 2, dataType: {dataType:
+  {type: text|number|date}}, uri: "<unit>_files/<NAME>"}}]` (the `uri` names the control =
+  the parameter it binds). Then `GET /rest_v2/reports/<uri>.pdf?PARAM=...` proves execution.
+  Two import-zip shapes (manifest; export-shaped without/with keyalias and datasource)
+  returned "Import succeeded" and created nothing.
+- `jrs_repository.py search <name>` / `list <folder>` answer "where is it" before any theory.
 
 ### Choosing
 
