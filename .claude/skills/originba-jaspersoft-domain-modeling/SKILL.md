@@ -96,3 +96,28 @@ Prepare SQL for Jaspersoft Domain or Ad Hoc derived-table ingestion only when a 
 - Supports report filters via dataset fields.
 - No environment-specific hardcoded values unless intentionally scoped.
 - Preserves the intended grain and row population on the validation slice.
+
+## Characteristics in a CISADM domain (reviewed 2026-09-17, Service Agreement 360 + CI_PREM_CHAR)
+
+- **`CI_SA.CHAR_PREM_ID` is the right anchor for premise characteristics** — it is C2M's
+  designated "characteristic premise" for the SA, the same link five Standard Offering domains
+  and `rpt_service_agreement` use. The physical service premise is a different fact
+  (`CI_SA_SP` → `CI_SP` → `CI_PREM`, many-to-many); do not swap one for the other. It is
+  populated on ~54% of Ellensburg SAs (non-premise SAs — deposits, fees — have none), so
+  ~half the SAs carry no premise characteristics by design.
+- **Characteristic tables are effective-dated** (PK `entity + CHAR_TYPE_CD + EFFDT`). A plain
+  join returns every historical version of every characteristic; Ad Hoc cannot rank. If the
+  report needs "the current value", establish it in Oracle first: a `<jdbcQuery>` derived
+  table with `EFFDT = (SELECT MAX(EFFDT) ... same entity + type)` (precedent:
+  `citycorp_ar_aging_sa_domain/schema.reference.xml`). The dbt canvases do exactly this
+  (`rpt_service_agreement` aggregates the latest row per type BEFORE joining).
+- **One value column is not enough.** `CI_CHAR_TYPE.CHAR_TYPE_FLG` decides where the value
+  lives: `DFV` → `CHAR_VAL` (described by `CI_CHAR_VAL_L`), `ADV` → `ADHOC_CHAR_VAL`,
+  `FKV` → `CHAR_VAL_FK1`. A "Value Description" from `CI_CHAR_VAL_L` alone is null for every
+  ad hoc and foreign-key characteristic (Ellensburg slice: 19 of 50 premise chars are ADV).
+  Expose a calculated field `Coalesce(CI_CHAR_VAL_L_2.DESCR, CI_PREM_CHAR.ADHOC_CHAR_VAL,
+  CI_PREM_CHAR.CHAR_VAL_FK1)` or include `CI_CHAR_TYPE` for the flag.
+- **A patched schema must keep ONE datasource id, and it must be the wrapper's.** The
+  Newark bundle built by `build_service_agreement_360_prem_char_domain.py` had every table on
+  `Origin_DEV_DS` while `Service_Agreement___Domain.xml` referenced `/DataSource/Newark1_DS`;
+  a domain cannot join across datasource ids, and the schema id must match the referenced DS.
