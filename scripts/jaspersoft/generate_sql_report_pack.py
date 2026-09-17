@@ -244,7 +244,7 @@ def main_jrxml(s: Spec) -> str:
             f'                <reportElement positionType="Float" stretchType="RelativeToBandHeight" isRemoveLineWhenBlank="true" x="24" y="0" width="{COL_W - 24}" height="20" uuid="{_uid(s.name + "/sub")}"/>\n'
             + sub_params + "\n" + sub_key + "\n"
             f'                <connectionExpression><![CDATA[$P{{REPORT_CONNECTION}}]]></connectionExpression>\n'
-            f'                <subreportExpression><![CDATA["repo:subreports/{s.sub.name}"]]></subreportExpression>\n'
+            f'                <subreportExpression><![CDATA["repo:{s.sub.name}"]]></subreportExpression>\n'
             f'            </subreport>\n        </band>\n    </detail>\n'
             f'    <pageFooter>\n        <band height="14">\n'
             + _text(0, 0, 600, 14, FOOTER, "FooterConfidential", "Left", s.name + "/foot") + "\n"
@@ -284,7 +284,8 @@ def controls(s: Spec) -> tuple[dict, list]:
         ics.append({"id": f.param, "label": f"{f.label} (blank = all)", "type": f.control, "mandatory": False, "visible": True})
     doc = {"reportUnitUri": f"{FOLDERS[s.name]}/{s.name}", "label": s.label, "description": s.description,
            "dataSources": {"DEV": "ORIGIN_DEV_DS", "QA": "C2M_QA_DS", "PROD": "C2M_PROD_DS"},
-           "subreports": [f"reports/origin/subreports/{s.sub.name}.jrxml"], "inputControls": ics}
+           "subreport": f"reports/subreports/{s.sub.name}.jrxml  (a local jrxml resource of the unit named {s.sub.name}; the main says repo:{s.sub.name})",
+           "inputControls": ics}
     rest = [{"id": ic["id"], "type": ic["type"], "label": ic["label"], "mandatory": ic["mandatory"], "visible": ic["visible"],
              "uri": f"{FOLDERS[s.name]}/{s.name}_files/{ic['id']}"} for ic in ics]
     return doc, rest

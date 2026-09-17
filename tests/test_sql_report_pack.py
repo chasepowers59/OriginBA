@@ -56,7 +56,7 @@ class Sql(unittest.TestCase):
     def test_subreport_wiring(self):
         for s in g.SPECS:
             main = g.main_jrxml(s)
-            self.assertIn(f'"repo:subreports/{s.sub.name}"', main)
+            self.assertIn(f'"repo:{s.sub.name}"', main, "the subreport is a local resource of the unit, named without a path")
             for p in ("FROM_DT", "TO_DT", s.sub.key_param, *s.all_params()):
                 self.assertIn(f'<subreportParameter name="{p}">', main, f"{s.name}: {p}")
             self.assertIn("$P{REPORT_CONNECTION}", main)
@@ -123,3 +123,56 @@ public class CompileCheck { public static void main(String[] a) throws Exception
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class JrsImportZip(unittest.TestCase):
+    """The import zip is the server's own export shape (the manifest bundle was refused on DEV)."""
+
+    @classmethod
+    def setUpClass(cls):
+        import zipfile
+        import build_finance_pack_jrs_import as b
+        cls.b = b
+        cls.zip_path = Path(tempfile.mkdtemp()) / "pack.zip"
+        b.build(cls.zip_path, "/DataSource/Origin_DEV_DS")
+        cls.zf = zipfile.ZipFile(cls.zip_path)
+        cls.names = cls.zf.namelist()
+
+    def test_index_is_last_and_names_the_import_roots(self):
+        self.assertEqual(self.names[-1], "index.xml")
+        self.assertEqual(self.names[0], "favorites/")
+        idx = self.zf.read("index.xml").decode()
+        for root in sorted({g.FOLDERS[s.name] for s in g.SPECS}):
+            self.assertIn(f"<folder>{root}</folder>", idx)
+        self.assertIn('jsVersion" value="8.1.0 PRO"', idx)
+        self.assertNotIn("rootTenantId", idx, "tenant-relative")
+
+    def test_every_folder_on_the_path_has_a_folder_xml(self):
+        import xml.etree.ElementTree as ET
+        for n in self.names:
+            if n.startswith("resources/") and n.count("/") > 1 and not n.endswith("/"):
+                parts = n.split("/")[1:-1]
+                for i in range(len(parts)):
+                    if parts[i].endswith("_files"):
+                        break
+                    self.assertIn("resources/" + "/".join(parts[: i + 1]) + "/.folder.xml", self.names, n)
+        for n in self.names:
+            if n.endswith(".xml") and n != "index.xml":
+                ET.fromstring(self.zf.read(n))
+
+    def test_each_unit_references_files_that_exist_and_its_subreport_by_name(self):
+        import re as _re
+        for s in g.SPECS:
+            rel = g.FOLDERS[s.name].strip("/")
+            unit = self.zf.read(f"resources/{rel}/{s.name}.xml").decode()
+            self.assertIn("<uri>/DataSource/Origin_DEV_DS</uri>", unit)
+            for df in _re.findall(r'dataFile="([^"]+)"', unit):
+                self.assertIn(f"resources/{rel}/{s.name}_files/{df}", self.names, df)
+            main = self.zf.read(f"resources/{rel}/{s.name}_files/main_jrxml.data").decode()
+            for ref in _re.findall(r'"repo:([^"]+)"', main):
+                self.assertIn(f"<name>{ref}</name>", unit, f"{s.name}: repo:{ref} is not a resource of the unit")
+            doc, _ = g.controls(s)
+            self.assertEqual(unit.count('xsi:type="inputControl"'), len(doc["inputControls"]))
+            for ic in doc["inputControls"]:
+                self.assertIn(f"<name>{ic['id']}</name>", unit)
+                self.assertIn(f'<parameter name="{ic["id"]}"', main, f"{s.name}: control {ic['id']} has no parameter")

@@ -212,6 +212,15 @@ ORDER BY account]]></queryString>
 
 ### How the server stores it (what an import ZIP must contain)
 
+**A "manifest + loose files" bundle is not an import.** `deploy/build_report_unit*.sh` produce
+that older shape for a deployer script; uploaded through Manage > Import it fails with
+"provided zip file is not valid JasperReports Server export file" (DEV, 2026-09-17). The
+importable shape is the server's own export, built by
+`scripts/jaspersoft/build_finance_pack_jrs_import.py` (and letterprint's
+`build_import_bundle.py`): `index.xml` LAST in the archive, `favorites/` entry, `.folder.xml`
+per folder, `<reportUnit>` with local input controls, the subreport as a local `fileResource`
+of type jrxml named exactly what the main's `repo:<name>` says, `<dataSource><uri>` bound.
+
 ```
 resources/SmartCity/Report/Workstreams/Debt_Management/REP8_Aged_Balance.xml        <reportUnit>: folder, name, label,
                                                                                      <mainReport><localResource dataFile="main_jrxml.data" fileType="jrxml">,
