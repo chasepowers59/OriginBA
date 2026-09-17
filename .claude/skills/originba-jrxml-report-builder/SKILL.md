@@ -165,6 +165,22 @@ Rules that are not obvious from the schema:
   (REP8 carries them). `strip_jrs8_incompatible_jrxml_uuid.py` is for Ad Hoc TOPIC JRXML
   only (it also rewrites `<query>` -> `<queryString>` and strips `nestedType`).
 
+### Pattern D: a family of reports from one generator (the finance pack, 2026-09-17)
+
+When several SQL reports share a layout (title, window line, header row, detail row,
+subreport under each row, totals, confidential footer), write them as SPECS and emit the
+JRXML: `scripts/jaspersoft/generate_sql_report_pack.py` -> four main reports + four
+subreports + input-control JSON, `tests/test_sql_report_pack.py` proves the committed files
+are what the generator emits, pass the validator, keep the SQL conventions (TRIM on CHAR
+flags, `COALESCE` not `NVL`, `dt < $P{TO_DT} + INTERVAL '1' DAY`, only lifecycle literals),
+wire every subreport parameter, and compile on JasperReports 6.20.6 (the JRS 8.1/9.0
+engine; classpath from the letterprint verifier). Every query also runs unchanged on the
+local Ellensburg Postgres slice, which is how the totals were reconciled before any server
+saw them. Reports and semantics: `jaspersoft/docs/sql_report_pack.md`. Two compile-time
+lessons: a `$P{}` used in a subreport's SQL must be DECLARED in that subreport and PASSED
+from the main ("Query parameter not found: TOP_N"); `isStretchWithOverflow` is deprecated
+on 6.20 -- use `textAdjust="StretchHeight"`.
+
 ### Pattern B, the one to copy for wide tabular reports
 
 ```xml

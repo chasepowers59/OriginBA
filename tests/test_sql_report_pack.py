@@ -1,0 +1,111 @@
+"""The SQL report pack (scripts/jaspersoft/generate_sql_report_pack.py): the committed JRXML is
+what the generator emits, every file passes the schema validator, the SQL keeps the portable
+conventions, the subreport wiring is complete, and -- when a JDK and the JasperReports 6.20
+classpath are at hand -- every file compiles on the engine JRS 8.1 / 9.0 run."""
+from __future__ import annotations
+
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts" / "jaspersoft"))
+import generate_sql_report_pack as g  # noqa: E402
+
+FILES = [p for s in g.SPECS for p in (g.REPORTS / f"{s.name}.jrxml", g.SUBS / f"{s.sub.name}.jrxml")]
+
+
+class Committed(unittest.TestCase):
+    def test_the_committed_files_are_what_the_generator_emits(self):
+        for s in g.SPECS:
+            self.assertEqual((g.REPORTS / f"{s.name}.jrxml").read_text(), g.main_jrxml(s), s.name)
+            self.assertEqual((g.SUBS / f"{s.sub.name}.jrxml").read_text(), g.sub_jrxml(s), s.sub.name)
+
+    def test_every_file_passes_the_schema_validator(self):
+        for f in FILES:
+            r = subprocess.run([sys.executable, str(ROOT / "scripts/validate_jrxml_schema.py"), str(f)], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, f"{f.name}: {r.stdout} {r.stderr}")
+
+    def test_input_controls_exist_for_every_main_report(self):
+        for s in g.SPECS:
+            self.assertTrue((g.CONTROLS / f"{s.name}_input_controls.json").exists(), s.name)
+            self.assertTrue((g.CONTROLS / f"{s.name}_input_controls_rest.json").exists(), s.name)
+
+
+class Sql(unittest.TestCase):
+    def test_portable_conventions_and_no_client_codes(self):
+        for s in g.SPECS:
+            for sql in (s.sql, s.sub.sql):
+                up = sql.upper()
+                for bad in ("NVL(", "SYSDATE", "DECODE(", "ROWNUM", "$P!{"):
+                    self.assertNotIn(bad, up, f"{s.name}: {bad}")
+                if re.search(r"\b\w+_L\b", up):
+                    self.assertIn("LANGUAGE_CD = 'ENG'", up, f"{s.name}: label join without a language")
+                self.assertIn("INTERVAL '1' DAY", sql, f"{s.name}: inclusive TO date")
+                for flag in re.findall(r"\b\w+\.(bseg_stat_flg|bill_stat_flg|adj_status_flg|freeze_sw|est_sw|main_cust_sw|name_type_flg)\b", sql):
+                    self.assertIn(f"TRIM(", sql, flag)
+            # only lifecycle constants are literal: '50' frozen, 'C' completed, 'Y', 'ENG', 'PRIM'
+            literals = set(re.findall(r"= '([^']+)'", s.sql + s.sub.sql))
+            self.assertTrue(literals <= {"50", "C", "Y", "ENG", "PRIM"}, f"{s.name}: {literals}")
+
+    def test_subreport_wiring(self):
+        for s in g.SPECS:
+            main = g.main_jrxml(s)
+            self.assertIn(f'"repo:subreports/{s.sub.name}"', main)
+            for p in ("FROM_DT", "TO_DT", s.sub.key_param, *s.params):
+                self.assertIn(f'<subreportParameter name="{p}">', main, f"{s.name}: {p}")
+            self.assertIn("$P{REPORT_CONNECTION}", main)
+            self.assertIn(f"$P{{{s.sub.key_param}}}", s.sub.sql)
+            self.assertIn(f'name="{s.sub.key_param}"', g.sub_jrxml(s))
+
+    def test_columns_fill_the_page(self):
+        for s in g.SPECS:
+            self.assertEqual(sum(c.width for c in s.columns), g.COL_W, s.name)
+            self.assertEqual(sum(c.width for c in s.sub.columns), g.COL_W - 24, s.sub.name)
+
+
+def _jr_classpath() -> str | None:
+    """The JasperReports 6.20.6 classpath from the letterprint verifier, if that checkout exists."""
+    pom = Path.home() / "originba-letterprint" / "jrsverify"
+    if not (pom / "pom.xml").exists():
+        return None
+    out = Path(tempfile.gettempdir()) / "originba_jr620.cp"
+    if not out.exists():
+        r = subprocess.run([str(pom / "mvnw"), "-q", "dependency:build-classpath", f"-Dmdep.outputFile={out}"],
+                           cwd=pom, capture_output=True, text=True)
+        if r.returncode != 0 or not out.exists():
+            return None
+    return out.read_text().strip()
+
+
+def _javac() -> str | None:
+    for c in ("/opt/homebrew/opt/openjdk@21/bin/javac", "/opt/homebrew/opt/openjdk/bin/javac", shutil.which("javac") or ""):
+        if c and Path(c).exists():
+            return c
+    return None
+
+
+class CompilesOnJasperReports620(unittest.TestCase):
+    def test_every_file_compiles(self):
+        cp, javac = _jr_classpath(), _javac()
+        if not cp or not javac or not shutil.which("java"):
+            self.skipTest("needs the letterprint jrsverify checkout, a JDK and java on PATH")
+        with tempfile.TemporaryDirectory() as d:
+            src = Path(d) / "CompileCheck.java"
+            src.write_text("""import net.sf.jasperreports.engine.JasperCompileManager;
+public class CompileCheck { public static void main(String[] a) throws Exception { int bad = 0;
+  for (String f : a) { try { JasperCompileManager.compileReport(f); System.out.println("OK   " + f); }
+    catch (Exception e) { bad++; System.out.println("FAIL " + f + " : " + e.getMessage().split("\\n")[0]); } }
+  System.exit(bad == 0 ? 0 : 1); } }""")
+            self.assertEqual(subprocess.run([javac, "--release", "8", "-cp", cp, str(src)], capture_output=True, text=True, cwd=d).returncode, 0)
+            r = subprocess.run(["java", "-cp", f"{cp}:{d}", "CompileCheck", *map(str, FILES)], capture_output=True, text=True, cwd=d)
+            self.assertEqual(r.returncode, 0, r.stdout[-2000:])
+
+
+if __name__ == "__main__":
+    unittest.main()
