@@ -11,25 +11,17 @@
   "inputControls": [
     {
       "id": "FROM_DT",
-      "label": "From date (inclusive)",
+      "label": "Adjustment created date from (inclusive)",
       "type": "singleValueDate",
       "mandatory": true,
       "visible": true
     },
     {
       "id": "TO_DT",
-      "label": "To date (inclusive)",
+      "label": "Adjustment created date to (inclusive)",
       "type": "singleValueDate",
       "mandatory": true,
       "visible": true
-    },
-    {
-      "id": "CLIENT_NAME",
-      "label": "Client name (footer)",
-      "type": "singleValueText",
-      "mandatory": false,
-      "visible": true,
-      "defaultValue": "SmartCity Client"
     },
     {
       "id": "TOP_N",
@@ -42,9 +34,10 @@
     {
       "id": "ADJ_TYPE_CD_F",
       "label": "Adjustment type (blank = all)",
-      "type": "singleValueText",
+      "type": "singleSelectQuery",
       "mandatory": false,
-      "visible": true
+      "visible": true,
+      "query": "SELECT TRIM(adj_type_cd) AS CODE, TRIM(adj_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_ADJ_TYPE_L WHERE language_cd = 'ENG' ORDER BY 1"
     },
     {
       "id": "ACCT_ID_F",

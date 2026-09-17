@@ -18,25 +18,28 @@ and a JasperReports 6.20.6 compile of all eight files), packaged as a JRS import
 | `gl_by_distribution_code_period` — GL Activity by Distribution Code | `CI_FT.ACCOUNTING_DT` | distribution code + GL account: lines, FTs, debits, credits, net | by accounting month | GL lines of frozen FTs (`CI_FT_GL.AMOUNT`) |
 
 Parameters on every unit: `FROM_DT`, `TO_DT` (inclusive, `java.sql.Date`; defaults = last
-calendar month), `CLIENT_NAME` (footer). **Nothing runs unbounded**: the date window is in
-every WHERE clause, main and subreport alike, and JasperReports binds it as JDBC parameters.
+calendar month), labelled by the column they filter -- *Bill date*, *Payment date*, *Adjustment
+created date*, *Accounting date* -- and printed in the title line. **Nothing runs unbounded**:
+the window is in every WHERE clause, main and subreport alike, bound as JDBC parameters. There
+is no client-name parameter; the footer is the corporate confidential line.
 
-Optional filters (blank = all; each narrows the main query AND its subreport, and the
-title line names the ones in use):
+Optional filters (blank = all; each narrows the main query AND its subreport, and the title
+line names the ones in use). Codes the client configures are **pick-lists** -- a single-select
+query control on the report's own datasource showing `CODE - description` from the client's
+`_L` label table, so the list is exactly that client's codes; ids and amounts are typed:
 
-| Unit | Filters |
-| --- | --- |
-| Billing by Cycle | bill cycle, service type, CIS division, account ID |
-| Payments by Tender Type | tender type, payor account ID, tender control ID, minimum tender amount |
-| Adjustments by Type | adjustment type, account ID, service agreement ID, minimum absolute amount, `TOP_N` |
-| GL Activity by Distribution Code | distribution code, GL account, GL division, CIS division, FT type |
+| Unit | Pick-lists | Typed |
+| --- | --- | --- |
+| Billing by Cycle | bill cycle, service type, CIS division | account ID |
+| Payments by Tender Type | tender type | payor account ID, tender control ID, minimum tender amount |
+| Adjustments by Type | adjustment type | account ID, service agreement ID, minimum absolute amount, `TOP_N` |
+| GL Activity by Distribution Code | distribution code, GL division, CIS division, FT type | GL account (exact) |
 
-The optional shape is `($P{X} IS NULL OR TRIM(col) = TRIM($P{X}))` -- an empty control binds
-NULL and the predicate is true for every row; the Oracle optimizer short-circuits it. Codes
-are typed as the client uses them (a cycle code, a tender type code); the labels are on the
-report rows, so the user reads the code off a first unfiltered run. Style: Origin 2025 (Aptos, Sapphire headers, warm
-body, confidential footer with the client name). Landscape A4/Letter-safe (842 x 595), Excel
-export keeps rows tight.
+Measured on Origin_DEV 2026-09-17: the lists populate from the datasource (18 tender types,
+12 bill cycles, 8 service types, 99 adjustment types, 180 distribution codes, 7 FT types);
+picking `CHEC` narrowed Payments to that row and its months; `E` narrowed Billing to the
+Electric subtotals. Multi-select (several cycles at once) is the same control kind with
+`$X{IN, col, PARAM}` in the SQL -- not built until a report needs it.
 
 ## Semantics, so the totals reconcile
 

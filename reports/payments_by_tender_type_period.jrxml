@@ -37,9 +37,6 @@ ORDER BY TENDER_AMT DESC
     <parameter name="TO_DT" class="java.sql.Date">
         <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())]]></defaultValueExpression>
     </parameter>
-    <parameter name="CLIENT_NAME" class="java.lang.String">
-        <defaultValueExpression><![CDATA["SmartCity Client"]]></defaultValueExpression>
-    </parameter>
     <parameter name="TENDER_TYPE_CD_F" class="java.lang.String">
         <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
     </parameter>
@@ -76,7 +73,7 @@ ORDER BY TENDER_AMT DESC
     </variable>
     <title height="52">
             <element kind="textField" x="0" y="0" width="802" height="26" style="TitleSapphire" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Payments by Tender Type"]]></expression></element>
-            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  cancelled = tender carries a cancel reason" + ($P{TENDER_TYPE_CD_F} == null ? "" : "  |  Tender type: " + $P{TENDER_TYPE_CD_F}) + ($P{PAYOR_ACCT_ID_F} == null ? "" : "  |  Payor account ID: " + $P{PAYOR_ACCT_ID_F}) + ($P{TNDR_CTL_ID_F} == null ? "" : "  |  Tender control ID: " + $P{TNDR_CTL_ID_F}) + ($P{MIN_AMT_F} == null ? "" : "  |  Minimum tender amount: " + $P{MIN_AMT_F})]]></expression></element>
+            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Payment date " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  cancelled = tender carries a cancel reason" + ($P{TENDER_TYPE_CD_F} == null ? "" : "  |  Tender type: " + $P{TENDER_TYPE_CD_F}) + ($P{PAYOR_ACCT_ID_F} == null ? "" : "  |  Payor account ID: " + $P{PAYOR_ACCT_ID_F}) + ($P{TNDR_CTL_ID_F} == null ? "" : "  |  Tender control ID: " + $P{TNDR_CTL_ID_F}) + ($P{MIN_AMT_F} == null ? "" : "  |  Minimum tender amount: " + $P{MIN_AMT_F})]]></expression></element>
     </title>
     <columnHeader height="18">
             <element kind="staticText" x="0" y="0" width="60" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Type]]></text></element>
@@ -112,7 +109,7 @@ ORDER BY TENDER_AMT DESC
         </band>
     </detail>
     <pageFooter height="14">
-            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></expression></element>
+            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential"]]></expression></element>
             <element kind="textField" x="600" y="0" width="150" height="14" style="FooterConfidential" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Page " + $V{PAGE_NUMBER} + " of"]]></expression></element>
             <element kind="textField" x="750" y="0" width="52" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report"><expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression></element>
     </pageFooter>

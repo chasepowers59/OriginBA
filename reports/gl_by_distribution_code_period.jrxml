@@ -36,9 +36,6 @@ ORDER BY ABS(COALESCE(SUM(g.amount), 0)) DESC
     <parameter name="TO_DT" class="java.sql.Date">
         <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())]]></defaultValueExpression>
     </parameter>
-    <parameter name="CLIENT_NAME" class="java.lang.String">
-        <defaultValueExpression><![CDATA["SmartCity Client"]]></defaultValueExpression>
-    </parameter>
     <parameter name="DST_ID_F" class="java.lang.String">
         <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
     </parameter>
@@ -78,7 +75,7 @@ ORDER BY ABS(COALESCE(SUM(g.amount), 0)) DESC
     </variable>
     <title height="52">
             <element kind="textField" x="0" y="0" width="802" height="26" style="TitleSapphire" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["GL Activity by Distribution Code"]]></expression></element>
-            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  frozen FTs by accounting date; net = sum of GL amounts" + ($P{DST_ID_F} == null ? "" : "  |  Distribution code: " + $P{DST_ID_F}) + ($P{GL_ACCT_F} == null ? "" : "  |  GL account (exact): " + $P{GL_ACCT_F}) + ($P{GL_DIVISION_F} == null ? "" : "  |  GL division: " + $P{GL_DIVISION_F}) + ($P{CIS_DIVISION_F} == null ? "" : "  |  CIS division: " + $P{CIS_DIVISION_F}) + ($P{FT_TYPE_FLG_F} == null ? "" : "  |  FT type (BS, BX, AD, AX, PS, PX): " + $P{FT_TYPE_FLG_F})]]></expression></element>
+            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Accounting date " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  frozen FTs by accounting date; net = sum of GL amounts" + ($P{DST_ID_F} == null ? "" : "  |  Distribution code: " + $P{DST_ID_F}) + ($P{GL_ACCT_F} == null ? "" : "  |  GL account (exact): " + $P{GL_ACCT_F}) + ($P{GL_DIVISION_F} == null ? "" : "  |  GL division: " + $P{GL_DIVISION_F}) + ($P{CIS_DIVISION_F} == null ? "" : "  |  CIS division: " + $P{CIS_DIVISION_F}) + ($P{FT_TYPE_FLG_F} == null ? "" : "  |  FT type (BS, BX, AD, AX, PS, PX): " + $P{FT_TYPE_FLG_F})]]></expression></element>
     </title>
     <columnHeader height="18">
             <element kind="staticText" x="0" y="0" width="120" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Distribution Code]]></text></element>
@@ -116,7 +113,7 @@ ORDER BY ABS(COALESCE(SUM(g.amount), 0)) DESC
         </band>
     </detail>
     <pageFooter height="14">
-            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></expression></element>
+            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential"]]></expression></element>
             <element kind="textField" x="600" y="0" width="150" height="14" style="FooterConfidential" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Page " + $V{PAGE_NUMBER} + " of"]]></expression></element>
             <element kind="textField" x="750" y="0" width="52" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report"><expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression></element>
     </pageFooter>

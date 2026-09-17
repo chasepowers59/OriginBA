@@ -11,46 +11,41 @@
   "inputControls": [
     {
       "id": "FROM_DT",
-      "label": "From date (inclusive)",
+      "label": "Bill date from (inclusive)",
       "type": "singleValueDate",
       "mandatory": true,
       "visible": true
     },
     {
       "id": "TO_DT",
-      "label": "To date (inclusive)",
+      "label": "Bill date to (inclusive)",
       "type": "singleValueDate",
       "mandatory": true,
       "visible": true
     },
     {
-      "id": "CLIENT_NAME",
-      "label": "Client name (footer)",
-      "type": "singleValueText",
-      "mandatory": false,
-      "visible": true,
-      "defaultValue": "SmartCity Client"
-    },
-    {
       "id": "BILL_CYC_CD_F",
       "label": "Bill cycle (blank = all)",
-      "type": "singleValueText",
+      "type": "singleSelectQuery",
       "mandatory": false,
-      "visible": true
+      "visible": true,
+      "query": "SELECT TRIM(bill_cyc_cd) AS CODE, TRIM(bill_cyc_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_BILL_CYC_L WHERE language_cd = 'ENG' ORDER BY 1"
     },
     {
       "id": "SVC_TYPE_CD_F",
       "label": "Service type (blank = all)",
-      "type": "singleValueText",
+      "type": "singleSelectQuery",
       "mandatory": false,
-      "visible": true
+      "visible": true,
+      "query": "SELECT TRIM(svc_type_cd) AS CODE, TRIM(svc_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_SVC_TYPE_L WHERE language_cd = 'ENG' ORDER BY 1"
     },
     {
       "id": "CIS_DIVISION_F",
       "label": "CIS division (blank = all)",
-      "type": "singleValueText",
+      "type": "singleSelectQuery",
       "mandatory": false,
-      "visible": true
+      "visible": true,
+      "query": "SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L WHERE language_cd = 'ENG' ORDER BY 1"
     },
     {
       "id": "ACCT_ID_F",

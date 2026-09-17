@@ -28,6 +28,9 @@ import generate_sql_report_pack as g  # noqa: E402
 from jrs_repository import _call, _cfg, _ssl_context  # noqa: E402
 
 DATATYPE = {"singleValueText": "text", "singleValueNumber": "number", "singleValueDate": "date"}
+# JRS input-control types: 2 = single value (typed), 4 = single-select query (a pick-list whose
+# options come from SQL on the report's datasource; the user sees DESCR, the parameter gets CODE)
+SINGLE_VALUE, SINGLE_SELECT_QUERY = 2, 4
 
 
 def org_root(org: str | None) -> str:
@@ -38,11 +41,17 @@ def descriptor(spec: g.Spec, ds_uri: str) -> dict:
     doc, _ = g.controls(spec)
     controls = []
     for ic in doc["inputControls"]:
-        controls.append({"inputControl": {
-            "label": ic["label"], "mandatory": bool(ic["mandatory"]), "readOnly": False, "visible": True, "type": 2,
-            "dataType": {"dataType": {"label": "myDatatype", "type": DATATYPE[ic["type"]], "strictMin": False, "strictMax": False}},
-            # the embedded resource takes its NAME (= the report parameter it binds) from this
-            "uri": f"{spec.name}_files/{ic['id']}"}})
+        base = {"label": ic["label"], "mandatory": bool(ic["mandatory"]), "readOnly": False, "visible": True,
+                # the embedded resource takes its NAME (= the report parameter it binds) from this
+                "uri": f"{spec.name}_files/{ic['id']}"}
+        if ic["type"] == "singleSelectQuery":
+            base.update({"type": SINGLE_SELECT_QUERY, "valueColumn": "CODE", "visibleColumns": ["DESCR"],
+                         "query": {"query": {"label": f"{ic['id']}_query", "language": "sql", "value": ic["query"],
+                                             "dataSource": {"dataSourceReference": {"uri": ds_uri}}}}})
+        else:
+            base.update({"type": SINGLE_VALUE,
+                         "dataType": {"dataType": {"label": "myDatatype", "type": DATATYPE[ic["type"]], "strictMin": False, "strictMax": False}}})
+        controls.append({"inputControl": base})
     return {
         "label": spec.label, "description": spec.description,
         "alwaysPromptControls": True, "controlsLayout": "popupScreen",
@@ -71,7 +80,8 @@ def deploy(org: str | None, ds: str) -> list[str]:
             continue
         code, text = _call(f"/rest_v2/resources{uri}?expanded=true", accept="application/repository.reportUnit+json")
         d = json.loads(text)
-        ctl = [c.get("inputControl", c.get("inputControlReference", {})).get("uri", "?").rsplit("/", 1)[-1] for c in d.get("inputControls", [])]
+        ctl = [f"{c['inputControl']['uri'].rsplit('/', 1)[-1]}:{'list' if c['inputControl'].get('type') == SINGLE_SELECT_QUERY else 'value'}"
+               for c in d.get("inputControls", []) if "inputControl" in c]
         rs = d.get("resources", {}); rs = rs.get("resource", rs) if isinstance(rs, dict) else rs
         res = [r.get("name") for r in rs]
         dsd = d.get("dataSource", {}); dsd = next(iter(dsd.values())) if dsd else {}
@@ -80,11 +90,11 @@ def deploy(org: str | None, ds: str) -> list[str]:
     return uris
 
 
-def run(uris: list[str], from_dt: str, to_dt: str, out_dir: Path) -> int:
+def run(uris: list[str], from_dt: str, to_dt: str, out_dir: Path, extra: dict[str, str] | None = None) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     bad = 0
     for uri in uris:
-        q = urllib.parse.urlencode({"FROM_DT": from_dt, "TO_DT": to_dt, "CLIENT_NAME": "Origin DEV (Ellensburg 25.4)"})
+        q = urllib.parse.urlencode({"FROM_DT": from_dt, "TO_DT": to_dt, **(extra or {})})
         url, auth = _cfg()
         req = urllib.request.Request(f"{url}/rest_v2/reports{uri}.pdf?{q}")
         req.add_header("Authorization", auth)
@@ -109,10 +119,12 @@ def main() -> int:
     ap.add_argument("--datasource", default="Origin_DEV_DS")
     ap.add_argument("--run", nargs=2, metavar=("FROM", "TO"), help="execute each unit as a PDF with this window")
     ap.add_argument("--out", type=Path, default=Path("/tmp/finance_pack_pdfs"))
+    ap.add_argument("--param", action="append", default=[], metavar="NAME=VALUE", help="a filter to pass on the run (repeatable)")
     a = ap.parse_args()
     uris = deploy(a.org, a.datasource)
     if a.run and uris:
-        return 1 if run(uris, a.run[0], a.run[1], a.out) else 0
+        extra = dict(kv.split("=", 1) for kv in a.param)
+        return 1 if run(uris, a.run[0], a.run[1], a.out, extra) else 0
     return 0 if len(uris) == len(g.SPECS) else 1
 
 

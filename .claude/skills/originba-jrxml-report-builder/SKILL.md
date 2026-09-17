@@ -236,6 +236,17 @@ ORDER BY account]]></queryString>
   the parameter it binds). Then `GET /rest_v2/reports/<uri>.pdf?PARAM=...` proves execution.
   Two import-zip shapes (manifest; export-shaped without/with keyalias and datasource)
   returned "Import succeeded" and created nothing.
+- **Pick-list input controls** (single-select query, `type: 4`): embed
+  `query: {query: {language: sql, value: "SELECT code AS CODE, code || ' - ' || descr AS DESCR
+  FROM CISADM.<X>_L WHERE language_cd = 'ENG' ORDER BY 1", dataSource: {dataSourceReference:
+  {uri}}}}, valueColumn: "CODE", visibleColumns: ["DESCR"], mandatory: false` -- the user picks
+  a description, the parameter receives the code, blank binds NULL (the SQL's
+  `$P{X} IS NULL OR ...` selects all). Every client-configured code (cycle, tender type,
+  adjustment type, distribution code, division, service type) is a pick-list; ids and
+  amounts stay typed. `GET /rest_v2/reports/<uri>/inputControls/<NAME>/values` proves the
+  list populates. Multi-select is `type: 7` + `$X{IN, col, PARAM}` with a Collection parameter.
+- **Only Origin_DEV** on the SmartCity server unless Chase names another org: the rest are live
+  client tenants (2026-09-17).
 - `jrs_repository.py search <name>` / `list <folder>` answer "where is it" before any theory.
 
 ### Choosing

@@ -11,32 +11,25 @@
   "inputControls": [
     {
       "id": "FROM_DT",
-      "label": "From date (inclusive)",
+      "label": "Accounting date from (inclusive)",
       "type": "singleValueDate",
       "mandatory": true,
       "visible": true
     },
     {
       "id": "TO_DT",
-      "label": "To date (inclusive)",
+      "label": "Accounting date to (inclusive)",
       "type": "singleValueDate",
       "mandatory": true,
       "visible": true
     },
     {
-      "id": "CLIENT_NAME",
-      "label": "Client name (footer)",
-      "type": "singleValueText",
-      "mandatory": false,
-      "visible": true,
-      "defaultValue": "SmartCity Client"
-    },
-    {
       "id": "DST_ID_F",
       "label": "Distribution code (blank = all)",
-      "type": "singleValueText",
+      "type": "singleSelectQuery",
       "mandatory": false,
-      "visible": true
+      "visible": true,
+      "query": "SELECT TRIM(dst_id) AS CODE, TRIM(dst_id) || ' - ' || descr AS DESCR FROM CISADM.CI_DST_CODE_L WHERE language_cd = 'ENG' ORDER BY 1"
     },
     {
       "id": "GL_ACCT_F",
@@ -48,23 +41,26 @@
     {
       "id": "GL_DIVISION_F",
       "label": "GL division (blank = all)",
-      "type": "singleValueText",
+      "type": "singleSelectQuery",
       "mandatory": false,
-      "visible": true
+      "visible": true,
+      "query": "SELECT TRIM(gl_division) AS CODE, TRIM(gl_division) || ' - ' || descr AS DESCR FROM CISADM.CI_GL_DIVISION_L WHERE language_cd = 'ENG' ORDER BY 1"
     },
     {
       "id": "CIS_DIVISION_F",
       "label": "CIS division (blank = all)",
-      "type": "singleValueText",
+      "type": "singleSelectQuery",
       "mandatory": false,
-      "visible": true
+      "visible": true,
+      "query": "SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L WHERE language_cd = 'ENG' ORDER BY 1"
     },
     {
       "id": "FT_TYPE_FLG_F",
       "label": "FT type (BS, BX, AD, AX, PS, PX) (blank = all)",
-      "type": "singleValueText",
+      "type": "singleSelectQuery",
       "mandatory": false,
-      "visible": true
+      "visible": true,
+      "query": "SELECT TRIM(field_value) AS CODE, TRIM(field_value) || ' - ' || descr AS DESCR FROM CISADM.CI_LOOKUP_VAL_L WHERE field_name = 'FT_TYPE_FLG' AND language_cd = 'ENG' ORDER BY 1"
     }
   ]
 }

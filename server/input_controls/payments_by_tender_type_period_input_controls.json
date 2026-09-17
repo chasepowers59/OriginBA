@@ -11,32 +11,25 @@
   "inputControls": [
     {
       "id": "FROM_DT",
-      "label": "From date (inclusive)",
+      "label": "Payment date from (inclusive)",
       "type": "singleValueDate",
       "mandatory": true,
       "visible": true
     },
     {
       "id": "TO_DT",
-      "label": "To date (inclusive)",
+      "label": "Payment date to (inclusive)",
       "type": "singleValueDate",
       "mandatory": true,
       "visible": true
     },
     {
-      "id": "CLIENT_NAME",
-      "label": "Client name (footer)",
-      "type": "singleValueText",
-      "mandatory": false,
-      "visible": true,
-      "defaultValue": "SmartCity Client"
-    },
-    {
       "id": "TENDER_TYPE_CD_F",
       "label": "Tender type (blank = all)",
-      "type": "singleValueText",
+      "type": "singleSelectQuery",
       "mandatory": false,
-      "visible": true
+      "visible": true,
+      "query": "SELECT TRIM(tender_type_cd) AS CODE, TRIM(tender_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_TENDER_TYPE_L WHERE language_cd = 'ENG' ORDER BY 1"
     },
     {
       "id": "PAYOR_ACCT_ID_F",

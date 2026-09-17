@@ -47,7 +47,7 @@ STYLES = """    <style name="Base" default="true" fontName="Aptos" fontSize="9"/
     <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#F5F0EB" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#000000"/>
 """
-FOOTER = '"@2026, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}'
+FOOTER = '"@2026, Origin Utility, Inc / Proprietary & Confidential"'
 
 
 @dataclass
@@ -86,6 +86,7 @@ class Filter:
     sub_pred: str
     cls: str = "java.lang.String"
     control: str = "singleValueText"
+    lov_sql: str | None = None   # a pick-list: SELECT <code> AS CODE, <label> AS DESCR ... on the same datasource
 
 
 @dataclass
@@ -99,6 +100,7 @@ class Spec:
     order_note: str = ""
     params: dict = field(default_factory=dict)   # extra parameters name -> (class, default expr)
     filters: list[Filter] = field(default_factory=list)
+    window_label: str = "Date"                    # the column the FROM/TO window filters on, as the user knows it
 
     def all_params(self) -> dict:
         return {**self.params, **{f.param: (f.cls, "null") for f in self.filters}}
@@ -140,7 +142,6 @@ def _params(extra: dict[str, tuple[str, str]]) -> str:
     base = {
         "FROM_DT": ("java.sql.Date", 'java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())'),
         "TO_DT": ("java.sql.Date", 'java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())'),
-        "CLIENT_NAME": ("java.lang.String", '"SmartCity Client"'),
     }
     base.update(extra)
     return "\n".join(
@@ -219,7 +220,7 @@ def main_jrxml(s: Spec) -> str:
         for p in ("FROM_DT", "TO_DT", *s.all_params()))
     sub_key = "\n".join(f'                <parameter name="{p}"><expression><![CDATA[$F{{{f}}}]]></expression></parameter>'
                         for p, f in s.sub.keys().items())
-    window = ('$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) '
+    window = (f'"{s.window_label} " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{{FROM_DT}}) '
               '+ " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT})'
               + (f' + "  |  {s.order_note}"' if s.order_note else "")
               + "".join(f' + ($P{{{f.param}}} == null ? "" : "  |  {f.label}: " + $P{{{f.param}}})' for f in s.filters))
@@ -252,8 +253,7 @@ def main_jrxml(s: Spec) -> str:
 
 def sub_jrxml(s: Spec) -> str:
     sub, w = s.sub, COL_W - 24
-    params = _params({**{k: ("java.lang.String", '""') for k in sub.keys()}, **s.all_params()}).replace(
-        '<parameter name="CLIENT_NAME" class', '<parameter name="CLIENT_NAME" forPrompting="false" class')
+    params = _params({**{k: ("java.lang.String", '""') for k in sub.keys()}, **s.all_params()})
     return (_head(sub.name, w, PAGE_H, 0, w) + STYLES +
             f'    <query language="SQL"><![CDATA[\n{s.sub_sql().strip()}\n]]></query>\n'
             + params + "\n"
@@ -270,15 +270,18 @@ def sub_jrxml(s: Spec) -> str:
 
 def controls(s: Spec) -> tuple[dict, list]:
     ics = [
-        {"id": "FROM_DT", "label": "From date (inclusive)", "type": "singleValueDate", "mandatory": True, "visible": True},
-        {"id": "TO_DT", "label": "To date (inclusive)", "type": "singleValueDate", "mandatory": True, "visible": True},
-        {"id": "CLIENT_NAME", "label": "Client name (footer)", "type": "singleValueText", "mandatory": False, "visible": True, "defaultValue": "SmartCity Client"},
+        {"id": "FROM_DT", "label": f"{s.window_label} from (inclusive)", "type": "singleValueDate", "mandatory": True, "visible": True},
+        {"id": "TO_DT", "label": f"{s.window_label} to (inclusive)", "type": "singleValueDate", "mandatory": True, "visible": True},
     ]
     for n, (cls, default) in s.params.items():
         ics.append({"id": n, "label": n.replace("_", " ").title(), "type": "singleValueNumber" if "Integer" in cls else "singleValueText",
                     "mandatory": False, "visible": True, "defaultValue": default.strip('"')})
     for f in s.filters:
-        ics.append({"id": f.param, "label": f"{f.label} (blank = all)", "type": f.control, "mandatory": False, "visible": True})
+        ic = {"id": f.param, "label": f"{f.label} (blank = all)", "type": "singleSelectQuery" if f.lov_sql else f.control,
+              "mandatory": False, "visible": True}
+        if f.lov_sql:
+            ic["query"] = f.lov_sql
+        ics.append(ic)
     doc = {"reportUnitUri": f"{FOLDERS[s.name]}/{s.name}", "label": s.label, "description": s.description,
            "dataSources": {"DEV": "ORIGIN_DEV_DS", "QA": "C2M_QA_DS", "PROD": "C2M_PROD_DS"},
            "subreport": f"reports/subreports/{s.sub.name}.jrxml  (a local jrxml resource of the unit named {s.sub.name}; the main says repo:{s.sub.name})",
@@ -304,6 +307,7 @@ WINDOW = "{col} >= $P{{FROM_DT}} AND {col} < $P{{TO_DT}} + INTERVAL '1' DAY"
 SPECS: list[Spec] = [
     Spec(
         name="billing_by_cycle_period", label="Billing by Cycle",
+        window_label="Bill date",
         description="Completed bills in a bill-date window: bills, accounts, frozen segments and billed amount per bill cycle, with a service-type breakdown under each cycle.",
         order_note="completed bills, frozen segments; billed = calc headers",
         sql=f"""
@@ -352,13 +356,16 @@ ORDER BY BILLED_AMT DESC""",
         filters=[
             Filter("BILL_CYC_CD_F", "Bill cycle",
                    "($P{BILL_CYC_CD_F} IS NULL OR TRIM(b.bill_cyc_cd) = TRIM($P{BILL_CYC_CD_F}))",
-                   "($P{BILL_CYC_CD_F} IS NULL OR TRIM(b.bill_cyc_cd) = TRIM($P{BILL_CYC_CD_F}))"),
+                   "($P{BILL_CYC_CD_F} IS NULL OR TRIM(b.bill_cyc_cd) = TRIM($P{BILL_CYC_CD_F}))",
+                   lov_sql="SELECT TRIM(bill_cyc_cd) AS CODE, TRIM(bill_cyc_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_BILL_CYC_L WHERE language_cd = 'ENG' ORDER BY 1"),
             Filter("SVC_TYPE_CD_F", "Service type",
                    "($P{SVC_TYPE_CD_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa JOIN CISADM.CI_SA_TYPE ft ON ft.sa_type_cd = fsa.sa_type_cd AND ft.cis_division = fsa.cis_division WHERE fsa.sa_id = s.sa_id AND TRIM(ft.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F})))",
-                   "($P{SVC_TYPE_CD_F} IS NULL OR TRIM(t.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F}))"),
+                   "($P{SVC_TYPE_CD_F} IS NULL OR TRIM(t.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F}))",
+                   lov_sql="SELECT TRIM(svc_type_cd) AS CODE, TRIM(svc_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_SVC_TYPE_L WHERE language_cd = 'ENG' ORDER BY 1"),
             Filter("CIS_DIVISION_F", "CIS division",
                    "($P{CIS_DIVISION_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_ACCT fa WHERE fa.acct_id = b.acct_id AND TRIM(fa.cis_division) = TRIM($P{CIS_DIVISION_F})))",
-                   "($P{CIS_DIVISION_F} IS NULL OR TRIM(sa.cis_division) = TRIM($P{CIS_DIVISION_F}))"),
+                   "($P{CIS_DIVISION_F} IS NULL OR TRIM(sa.cis_division) = TRIM($P{CIS_DIVISION_F}))",
+                   lov_sql="SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L WHERE language_cd = 'ENG' ORDER BY 1"),
             Filter("ACCT_ID_F", "Account ID",
                    "($P{ACCT_ID_F} IS NULL OR TRIM(b.acct_id) = TRIM($P{ACCT_ID_F}))",
                    "($P{ACCT_ID_F} IS NULL OR TRIM(b.acct_id) = TRIM($P{ACCT_ID_F}))"),
@@ -366,6 +373,7 @@ ORDER BY BILLED_AMT DESC""",
 
     Spec(
         name="payments_by_tender_type_period", label="Payments by Tender Type",
+        window_label="Payment date",
         description="Tenders in a payment-date window by tender type: count and amount of live tenders, cancelled tenders shown apart, with a month-by-month breakdown under each type.",
         order_note="cancelled = tender carries a cancel reason",
         sql=f"""
@@ -405,7 +413,8 @@ ORDER BY PAY_MONTH""",
         filters=[
             Filter("TENDER_TYPE_CD_F", "Tender type",
                    "($P{TENDER_TYPE_CD_F} IS NULL OR TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD_F}))",
-                   "($P{TENDER_TYPE_CD_F} IS NULL OR TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD_F}))"),
+                   "($P{TENDER_TYPE_CD_F} IS NULL OR TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD_F}))",
+                   lov_sql="SELECT TRIM(tender_type_cd) AS CODE, TRIM(tender_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_TENDER_TYPE_L WHERE language_cd = 'ENG' ORDER BY 1"),
             Filter("PAYOR_ACCT_ID_F", "Payor account ID",
                    "($P{PAYOR_ACCT_ID_F} IS NULL OR TRIM(t.payor_acct_id) = TRIM($P{PAYOR_ACCT_ID_F}))",
                    "($P{PAYOR_ACCT_ID_F} IS NULL OR TRIM(t.payor_acct_id) = TRIM($P{PAYOR_ACCT_ID_F}))"),
@@ -419,6 +428,7 @@ ORDER BY PAY_MONTH""",
 
     Spec(
         name="adjustments_by_type_period", label="Adjustments by Type",
+        window_label="Adjustment created date",
         description="Frozen adjustments created in a date window by adjustment type: count, net amount, largest and smallest, with the ten largest adjustments (account and customer) under each type.",
         order_note="frozen adjustments by creation date",
         params={"TOP_N": ("java.lang.Integer", "10")},
@@ -460,7 +470,8 @@ FETCH FIRST $P{{TOP_N}} ROWS ONLY""",
         filters=[
             Filter("ADJ_TYPE_CD_F", "Adjustment type",
                    "($P{ADJ_TYPE_CD_F} IS NULL OR TRIM(a.adj_type_cd) = TRIM($P{ADJ_TYPE_CD_F}))",
-                   "($P{ADJ_TYPE_CD_F} IS NULL OR TRIM(a.adj_type_cd) = TRIM($P{ADJ_TYPE_CD_F}))"),
+                   "($P{ADJ_TYPE_CD_F} IS NULL OR TRIM(a.adj_type_cd) = TRIM($P{ADJ_TYPE_CD_F}))",
+                   lov_sql="SELECT TRIM(adj_type_cd) AS CODE, TRIM(adj_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_ADJ_TYPE_L WHERE language_cd = 'ENG' ORDER BY 1"),
             Filter("ACCT_ID_F", "Account ID",
                    "($P{ACCT_ID_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = a.sa_id AND TRIM(fsa.acct_id) = TRIM($P{ACCT_ID_F})))",
                    "($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))"),
@@ -474,6 +485,7 @@ FETCH FIRST $P{{TOP_N}} ROWS ONLY""",
 
     Spec(
         name="gl_by_distribution_code_period", label="GL Activity by Distribution Code",
+        window_label="Accounting date",
         description="GL lines of frozen financial transactions in an accounting-date window by distribution code and GL account: lines, debits, credits and net, with a month-by-month breakdown under each code.",
         order_note="frozen FTs by accounting date; net = sum of GL amounts",
         sql=f"""
@@ -512,19 +524,23 @@ ORDER BY ACCT_MONTH""",
         filters=[
             Filter("DST_ID_F", "Distribution code",
                    "($P{DST_ID_F} IS NULL OR TRIM(g.dst_id) = TRIM($P{DST_ID_F}))",
-                   "($P{DST_ID_F} IS NULL OR TRIM(g.dst_id) = TRIM($P{DST_ID_F}))"),
+                   "($P{DST_ID_F} IS NULL OR TRIM(g.dst_id) = TRIM($P{DST_ID_F}))",
+                   lov_sql="SELECT TRIM(dst_id) AS CODE, TRIM(dst_id) || ' - ' || descr AS DESCR FROM CISADM.CI_DST_CODE_L WHERE language_cd = 'ENG' ORDER BY 1"),
             Filter("GL_ACCT_F", "GL account (exact)",
                    "($P{GL_ACCT_F} IS NULL OR TRIM(g.gl_acct) = TRIM($P{GL_ACCT_F}))",
                    "($P{GL_ACCT_F} IS NULL OR TRIM(g.gl_acct) = TRIM($P{GL_ACCT_F}))"),
             Filter("GL_DIVISION_F", "GL division",
                    "($P{GL_DIVISION_F} IS NULL OR TRIM(f.gl_division) = TRIM($P{GL_DIVISION_F}))",
-                   "($P{GL_DIVISION_F} IS NULL OR TRIM(f.gl_division) = TRIM($P{GL_DIVISION_F}))"),
+                   "($P{GL_DIVISION_F} IS NULL OR TRIM(f.gl_division) = TRIM($P{GL_DIVISION_F}))",
+                   lov_sql="SELECT TRIM(gl_division) AS CODE, TRIM(gl_division) || ' - ' || descr AS DESCR FROM CISADM.CI_GL_DIVISION_L WHERE language_cd = 'ENG' ORDER BY 1"),
             Filter("CIS_DIVISION_F", "CIS division",
                    "($P{CIS_DIVISION_F} IS NULL OR TRIM(f.cis_division) = TRIM($P{CIS_DIVISION_F}))",
-                   "($P{CIS_DIVISION_F} IS NULL OR TRIM(f.cis_division) = TRIM($P{CIS_DIVISION_F}))"),
+                   "($P{CIS_DIVISION_F} IS NULL OR TRIM(f.cis_division) = TRIM($P{CIS_DIVISION_F}))",
+                   lov_sql="SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L WHERE language_cd = 'ENG' ORDER BY 1"),
             Filter("FT_TYPE_FLG_F", "FT type (BS, BX, AD, AX, PS, PX)",
                    "($P{FT_TYPE_FLG_F} IS NULL OR TRIM(f.ft_type_flg) = TRIM($P{FT_TYPE_FLG_F}))",
-                   "($P{FT_TYPE_FLG_F} IS NULL OR TRIM(f.ft_type_flg) = TRIM($P{FT_TYPE_FLG_F}))"),
+                   "($P{FT_TYPE_FLG_F} IS NULL OR TRIM(f.ft_type_flg) = TRIM($P{FT_TYPE_FLG_F}))",
+                   lov_sql="SELECT TRIM(field_value) AS CODE, TRIM(field_value) || ' - ' || descr AS DESCR FROM CISADM.CI_LOOKUP_VAL_L WHERE field_name = 'FT_TYPE_FLG' AND language_cd = 'ENG' ORDER BY 1"),
         ]),
 ]
 

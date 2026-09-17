@@ -151,4 +151,20 @@ class RestDescriptor(unittest.TestCase):
             ids = [c["inputControl"]["uri"].rsplit("/", 1)[-1] for c in desc["inputControls"]]
             self.assertEqual(ids, [ic["id"] for ic in g.controls(s)[0]["inputControls"]])
             for c in desc["inputControls"]:
-                self.assertIn(c["inputControl"]["dataType"]["dataType"]["type"], ("text", "number", "date"))
+                ic = c["inputControl"]
+                if ic["type"] == d.SINGLE_SELECT_QUERY:
+                    q = ic["query"]["query"]
+                    self.assertTrue(q["value"].upper().startswith("SELECT ") and " AS CODE" in q["value"] and " AS DESCR" in q["value"])
+                    self.assertIn("LANGUAGE_CD = 'ENG'", q["value"].upper())
+                    self.assertEqual((ic["valueColumn"], ic["visibleColumns"]), ("CODE", ["DESCR"]))
+                    self.assertEqual(q["dataSource"]["dataSourceReference"]["uri"], "/organizations/organization_1/organizations/X/DataSource/X_DS")
+                else:
+                    self.assertIn(ic["dataType"]["dataType"]["type"], ("text", "number", "date"))
+            self.assertNotIn("CLIENT_NAME", ids)
+
+    def test_pick_lists_where_the_client_configures_the_codes(self):
+        for s in g.SPECS:
+            lists = {f.param for f in s.filters if f.lov_sql}
+            self.assertTrue(lists, s.name)
+            self.assertTrue(all(f.lov_sql for f in s.filters if f.param.endswith(("_CD_F", "DIVISION_F", "DST_ID_F", "FLG_F"))), s.name)
+            self.assertIn(s.window_label, g.main_jrxml(s))

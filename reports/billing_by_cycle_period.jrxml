@@ -40,9 +40,6 @@ ORDER BY BILLED_AMT DESC
     <parameter name="TO_DT" class="java.sql.Date">
         <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())]]></defaultValueExpression>
     </parameter>
-    <parameter name="CLIENT_NAME" class="java.lang.String">
-        <defaultValueExpression><![CDATA["SmartCity Client"]]></defaultValueExpression>
-    </parameter>
     <parameter name="BILL_CYC_CD_F" class="java.lang.String">
         <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
     </parameter>
@@ -79,7 +76,7 @@ ORDER BY BILLED_AMT DESC
     </variable>
     <title height="52">
             <element kind="textField" x="0" y="0" width="802" height="26" style="TitleSapphire" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Billing by Cycle"]]></expression></element>
-            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  completed bills, frozen segments; billed = calc headers" + ($P{BILL_CYC_CD_F} == null ? "" : "  |  Bill cycle: " + $P{BILL_CYC_CD_F}) + ($P{SVC_TYPE_CD_F} == null ? "" : "  |  Service type: " + $P{SVC_TYPE_CD_F}) + ($P{CIS_DIVISION_F} == null ? "" : "  |  CIS division: " + $P{CIS_DIVISION_F}) + ($P{ACCT_ID_F} == null ? "" : "  |  Account ID: " + $P{ACCT_ID_F})]]></expression></element>
+            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Bill date " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  completed bills, frozen segments; billed = calc headers" + ($P{BILL_CYC_CD_F} == null ? "" : "  |  Bill cycle: " + $P{BILL_CYC_CD_F}) + ($P{SVC_TYPE_CD_F} == null ? "" : "  |  Service type: " + $P{SVC_TYPE_CD_F}) + ($P{CIS_DIVISION_F} == null ? "" : "  |  CIS division: " + $P{CIS_DIVISION_F}) + ($P{ACCT_ID_F} == null ? "" : "  |  Account ID: " + $P{ACCT_ID_F})]]></expression></element>
     </title>
     <columnHeader height="18">
             <element kind="staticText" x="0" y="0" width="70" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Cycle]]></text></element>
@@ -115,7 +112,7 @@ ORDER BY BILLED_AMT DESC
         </band>
     </detail>
     <pageFooter height="14">
-            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></expression></element>
+            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential"]]></expression></element>
             <element kind="textField" x="600" y="0" width="150" height="14" style="FooterConfidential" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Page " + $V{PAGE_NUMBER} + " of"]]></expression></element>
             <element kind="textField" x="750" y="0" width="52" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report"><expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression></element>
     </pageFooter>
