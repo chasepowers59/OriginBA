@@ -58,6 +58,20 @@ service-type subtotals (Cycle 5: 314,847.22 = E 183,989.60 + G 105,021.21 + ...)
 service-type filter set to `E`, Cycle 5 returned exactly the Electric subtotal (183,989.60)
 and the subreport one row.
 
+## Where they live, and what they connect to
+
+| Unit | Folder (tenant-relative) |
+| --- | --- |
+| Billing by Cycle | `/SmartCity/Report/Standard_Offering/Billing_and_Rates` |
+| Payments by Tender Type | `/SmartCity/Report/Standard_Offering/Cashiering` |
+| Adjustments by Type, GL Activity by Distribution Code | `/SmartCity/Report/Standard_Offering/Finance` |
+
+The SQL is plain Oracle SQL, but a JRXML never carries a connection: every report unit is
+bound at import to a JDBC datasource resource on that server -- `/DataSource/Origin_DEV_DS`
+on DEV, `/DataSource/<Client>_DS` inside a client organization (the registry names them;
+`deploy/jaspersoft_datasources/`). Re-binding the datasource is the only per-tenant step; the
+JRXML, subreports and controls are identical everywhere.
+
 ## Import
 
 1. `python3 scripts/jaspersoft/generate_sql_report_pack.py && python3 -m pytest tests/test_sql_report_pack.py -q`

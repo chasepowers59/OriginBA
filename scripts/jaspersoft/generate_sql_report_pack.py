@@ -282,13 +282,23 @@ def controls(s: Spec) -> tuple[dict, list]:
                     "mandatory": False, "visible": True, "defaultValue": default.strip('"')})
     for f in s.filters:
         ics.append({"id": f.param, "label": f"{f.label} (blank = all)", "type": f.control, "mandatory": False, "visible": True})
-    doc = {"reportUnitUri": f"/reports/origin/{s.name}", "label": s.label, "description": s.description,
+    doc = {"reportUnitUri": f"{FOLDERS[s.name]}/{s.name}", "label": s.label, "description": s.description,
            "dataSources": {"DEV": "ORIGIN_DEV_DS", "QA": "C2M_QA_DS", "PROD": "C2M_PROD_DS"},
            "subreports": [f"reports/origin/subreports/{s.sub.name}.jrxml"], "inputControls": ics}
     rest = [{"id": ic["id"], "type": ic["type"], "label": ic["label"], "mandatory": ic["mandatory"], "visible": ic["visible"],
-             "uri": f"/reports/origin/{s.name}_files/{ic['id']}"} for ic in ics]
+             "uri": f"{FOLDERS[s.name]}/{s.name}_files/{ic['id']}"} for ic in ics]
     return doc, rest
 
+
+# Where each unit lives on the server: the Standard Offering tree the tenants already carry
+# (tenant-relative -- the import ZIP never names an organization). The datasource is bound
+# on the report unit at import time (/DataSource/<tenant>_DS), never inside the JRXML.
+FOLDERS = {
+    "billing_by_cycle_period": "/SmartCity/Report/Standard_Offering/Billing_and_Rates",
+    "payments_by_tender_type_period": "/SmartCity/Report/Standard_Offering/Cashiering",
+    "adjustments_by_type_period": "/SmartCity/Report/Standard_Offering/Finance",
+    "gl_by_distribution_code_period": "/SmartCity/Report/Standard_Offering/Finance",
+}
 
 # ------------------------------------------------------------------ the specs
 WINDOW = "{col} >= $P{{FROM_DT}} AND {col} < $P{{TO_DT}} + INTERVAL '1' DAY"
