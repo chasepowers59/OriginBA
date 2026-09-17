@@ -90,6 +90,20 @@ class Patched(unittest.TestCase):
             pdc.patch(self.schema)
 
 
+class AnyCharacteristicTable(unittest.TestCase):
+    def test_a_target_spec_names_table_key_and_the_two_label_aliases(self):
+        self.assertEqual(pdc.parse_target("CI_ACCT_CHAR:ACCT_ID:CI_CHAR_TYPE_L_3:CI_CHAR_VAL_L_3"),
+                         ("CI_ACCT_CHAR", {"key": "ACCT_ID", "type_l": "CI_CHAR_TYPE_L_3", "val_l": "CI_CHAR_VAL_L_3"}))
+        with self.assertRaises(SystemExit):
+            pdc.parse_target("CI_ACCT_CHAR:ACCT_ID")
+
+    def test_the_derived_sql_is_generic_over_the_entity_key(self):
+        sql = pdc.derived_sql("CI_ACCT_CHAR", "ACCT_ID")
+        self.assertIn("FROM CISADM.CI_ACCT_CHAR c", sql)
+        self.assertIn("PARTITION BY c.ACCT_ID, c.CHAR_TYPE_CD", sql)
+        self.assertTrue(sql.startswith("SELECT ACCT_ID, CHAR_TYPE_CD"))
+
+
 class DerivedSql(unittest.TestCase):
     def test_value_resolution_covers_all_three_kinds(self):
         sql = pdc.derived_sql("CI_PREM_CHAR", "PREM_ID")

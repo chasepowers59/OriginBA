@@ -97,27 +97,70 @@ Prepare SQL for Jaspersoft Domain or Ad Hoc derived-table ingestion only when a 
 - No environment-specific hardcoded values unless intentionally scoped.
 - Preserves the intended grain and row population on the validation slice.
 
-## Characteristics in a CISADM domain (reviewed 2026-09-17, Service Agreement 360 + CI_PREM_CHAR)
+## Client-configured, effective-dated tables in a domain: the derived-table recipe
 
-- **`CI_SA.CHAR_PREM_ID` is the right anchor for premise characteristics** — it is C2M's
-  designated "characteristic premise" for the SA, the same link five Standard Offering domains
-  and `rpt_service_agreement` use. The physical service premise is a different fact
-  (`CI_SA_SP` → `CI_SP` → `CI_PREM`, many-to-many); do not swap one for the other. It is
-  populated on ~54% of Ellensburg SAs (non-premise SAs — deposits, fees — have none), so
-  ~half the SAs carry no premise characteristics by design.
-- **Characteristic tables are effective-dated** (PK `entity + CHAR_TYPE_CD + EFFDT`). A plain
-  join returns every historical version of every characteristic; Ad Hoc cannot rank. If the
-  report needs "the current value", establish it in Oracle first: a `<jdbcQuery>` derived
-  table with `EFFDT = (SELECT MAX(EFFDT) ... same entity + type)` (precedent:
-  `citycorp_ar_aging_sa_domain/schema.reference.xml`). The dbt canvases do exactly this
-  (`rpt_service_agreement` aggregates the latest row per type BEFORE joining).
-- **One value column is not enough.** `CI_CHAR_TYPE.CHAR_TYPE_FLG` decides where the value
-  lives: `DFV` → `CHAR_VAL` (described by `CI_CHAR_VAL_L`), `ADV` → `ADHOC_CHAR_VAL`,
-  `FKV` → `CHAR_VAL_FK1`. A "Value Description" from `CI_CHAR_VAL_L` alone is null for every
-  ad hoc and foreign-key characteristic (Ellensburg slice: 19 of 50 premise chars are ADV).
-  Expose a calculated field `Coalesce(CI_CHAR_VAL_L_2.DESCR, CI_PREM_CHAR.ADHOC_CHAR_VAL,
-  CI_PREM_CHAR.CHAR_VAL_FK1)` or include `CI_CHAR_TYPE` for the flag.
-- **A patched schema must keep ONE datasource id, and it must be the wrapper's.** The
-  Newark bundle built by `build_service_agreement_360_prem_char_domain.py` had every table on
-  `Origin_DEV_DS` while `Service_Agreement___Domain.xml` referenced `/DataSource/Newark1_DS`;
-  a domain cannot join across datasource ids, and the schema id must match the referenced DS.
+C2M's core tables are the same at every client. What differs client to client lives in the
+EXTENSION tables: characteristics (`CI_*_CHAR`, `D1_*_CHAR` -- type, code and value are the
+client's own configuration, described by `CI_CHAR_TYPE`, `CI_CHAR_TYPE_L`, `CI_CHAR_VAL_L`),
+and the other effective-dated detail tables (`CI_SA_RS_HIST`, `CI_SA_RCHG_HIST`,
+`CI_SA_CONTERM`, `CI_PREM_CHAR` ...). Joined raw into a domain they misbehave in three ways
+that are invisible on a small tenant and wrong on a real one (found on Service Agreement
+360, 2026-09-17; verified imported on DEV, both derived tables preview):
+
+1. **A label table is a table of everything.** Drag *Characteristic Type Code* from
+   `CI_CHAR_TYPE_L` and Ad Hoc offers every type in the system (account, person, SA,
+   premise); select label fields alone and it queries the label table alone. The outer join
+   is not the cause and must stay (the 360 domains exist to pull anything, then filter).
+2. **Effective dating.** PK is `entity + type + EFFDT`; every version is a row and nothing
+   says which is current. Ad Hoc cannot rank.
+3. **One value column is not enough.** `CI_CHAR_TYPE.CHAR_TYPE_FLG` decides where the value
+   lives: `DFV` -> `CHAR_VAL` (label in `CI_CHAR_VAL_L`), `ADV` -> `ADHOC_CHAR_VAL`,
+   `FKV` -> `CHAR_VAL_FK1`. A description from `CI_CHAR_VAL_L` alone is null for every ad hoc
+   and FK characteristic (Ellensburg slice: 19 of 50 premise chars are ADV).
+
+**The recipe** (`scripts/jaspersoft/patch_domain_characteristics.py`, tested by
+`tests/test_domain_characteristics_patch.py`; `--target TABLE:KEY:TYPE_L_ALIAS:VAL_L_ALIAS`
+applies it to any characteristic table in any domain):
+
+- Replace the raw table AND its label joins with ONE `<jdbcQuery>` derived table **under the
+  raw table's id**. Joins, join-tree fields and item `resourceId`s that named the table keep
+  resolving, so saved Ad Hoc views survive; repoint the label items (same item ids) to the
+  folded columns.
+- The derived row carries: the raw columns, `CHAR_TYPE_DESCR`, `CHAR_TYPE_FLG`,
+  `CHAR_VAL_DESCR`, **`CHAR_VALUE`** (resolved by kind), **`IS_CURRENT_SW`** = 'Y' on the
+  latest version whose `EFFDT` is not in the future, per `(entity, type)`. **No row is
+  removed** -- history stays; "current" is a filter the user applies.
+- SQL rules the JRS domain parser enforces: starts with `SELECT`, one outer wrapper, no CTE,
+  no bind, no semicolon; ANSI so the same text runs on Oracle and on the local Postgres
+  slice (`COALESCE`, `CASE`, `MAX() OVER`, `TRIM`, `CURRENT_DATE`; XML-escape `<`).
+- One datasource id per schema, and it must be the one the domain wrapper references
+  (`<uri>/DataSource/X</uri>`); a domain cannot join across datasource ids. The SA 360
+  builder reads the id from the export and refuses a mismatch -- the first Newark bundle
+  had every table on `Origin_DEV_DS` under a `Newark1_DS` wrapper.
+- Prove it before import: derived rows = raw rows, one current row per key with a
+  non-future version, zero unresolved values (`sql/validation/service_agreement_prem_char_grain_check.sql`
+  gates 5-6); the offline test proves every reference resolves.
+
+Same pattern for a rate-schedule history or a contract-term table: derived table under the
+raw id, `IS_CURRENT_SW` over the table's own effective-date key, descriptions folded in.
+
+**Anchors that are right and look wrong:** `CI_SA.CHAR_PREM_ID` is C2M's designated
+"characteristic premise" for the SA (populated on ~54% of Ellensburg SAs; deposits and fees
+have none) -- the correct link for premise characteristics, used by five Standard Offering
+domains and `rpt_service_agreement`. The physical service premise is a different fact
+(`CI_SA_SP -> CI_SP -> CI_PREM`, many-to-many). Never swap one for the other.
+
+## JasperReports versions (measured, not assumed)
+
+| Server | Library / JRXML model | Notes |
+| --- | --- | --- |
+| JRS 8.1.0 PRO (Odessa tenant, `jsVersion` measured from its export) | JasperReports 6.20, JRXML 6 model | reads 6.x JRXML only |
+| JRS 9.0.x (Origin DEV; Studio 9.0.x) | 6.x JRXML model | reads 6.x only; JRS 9 Ad Hoc adds date-time calcs, chart options in `knowledge_base/jaspersoft_charts_visuals_jrs9.md` |
+| JRS 10.0 | JasperReports 7, JRXML 7 model | reads 7 only: 6.x files fail "Unable to load report" and vice versa (measured both ways in originba-letterprint) |
+
+JRXML 7 vs 6: boolean attributes lose the `is` prefix (`isBold` -> `bold`), `reportElement` /
+`textElement` / `font` attributes flatten onto the element, `hTextAlign`/`vTextAlign` replace
+`textAlignment`/`verticalAlignment`, the XSD lives at `/xsd/jasperreport.xsd`. The converter
+that encodes every measured difference is `~/originba-letterprint/jasperserver/tools/jrxml7to6.py`
+(author once in 7, generate the 6.20 twin, render both and assert equal text). `jsVersion` in
+an import bundle is measured from a real export of the target, never typed.

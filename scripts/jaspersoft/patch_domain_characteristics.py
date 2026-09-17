@@ -28,6 +28,9 @@ The datasource id is read from the schema itself and must be unique: a domain ca
 join across datasource ids, and the id must be the one the domain wrapper references.
 
     python3 scripts/jaspersoft/patch_domain_characteristics.py IN.xml OUT.xml
+    python3 scripts/jaspersoft/patch_domain_characteristics.py IN.xml OUT.xml \
+        --target CI_ACCT_CHAR:ACCT_ID:CI_CHAR_TYPE_L:CI_CHAR_VAL_L
+Verified 2026-09-17: imported to the DEV tenant, both derived tables preview in Domain Designer.
 """
 from __future__ import annotations
 
@@ -36,11 +39,21 @@ import sys
 from pathlib import Path
 from xml.sax.saxutils import escape
 
-# entity column, the two label-table aliases the raw shape used, the item-group id
+# table -> entity key column and the two label-table aliases the raw shape joined to it.
+# The Service Agreement 360 pair is the default; any CISADM characteristic table works
+# (CI_ACCT_CHAR:ACCT_ID, CI_PER_CHAR:PER_ID, CI_SP_CHAR:SP_ID, D1_DVC_CHAR:D1_DVC_ID ...):
+#   --target CI_ACCT_CHAR:ACCT_ID:CI_CHAR_TYPE_L_3:CI_CHAR_VAL_L_3
 TARGETS = {
     "CI_SA_CHAR":   {"key": "SA_ID",   "type_l": "CI_CHAR_TYPE_L",   "val_l": "CI_CHAR_VAL_L"},
     "CI_PREM_CHAR": {"key": "PREM_ID", "type_l": "CI_CHAR_TYPE_L_2", "val_l": "CI_CHAR_VAL_L_2"},
 }
+
+
+def parse_target(spec: str) -> tuple[str, dict[str, str]]:
+    parts = spec.split(":")
+    if len(parts) != 4:
+        raise SystemExit(f"--target wants TABLE:KEY:TYPE_LABEL_ALIAS:VALUE_LABEL_ALIAS, got {spec!r}")
+    return parts[0], {"key": parts[1], "type_l": parts[2], "val_l": parts[3]}
 RAW_COLS = ["CHAR_TYPE_CD", "EFFDT", "CHAR_VAL", "ADHOC_CHAR_VAL", "SRCH_CHAR_VAL",
             "CHAR_VAL_FK1", "CHAR_VAL_FK2", "CHAR_VAL_FK3", "CHAR_VAL_FK4", "CHAR_VAL_FK5", "VERSION"]
 NEW_COLS = [  # column, java type, item label
@@ -89,7 +102,8 @@ def _drop_table(schema: str, table_id: str) -> str:
     return out
 
 
-def patch(schema: str) -> str:
+def patch(schema: str, targets: dict[str, dict[str, str]] | None = None) -> str:
+    targets = targets or TARGETS
     ds_ids = re.findall(r'<jdbcDataSource id="([^"]+)"', schema)
     if len(set(ds_ids)) != 1:
         raise SystemExit(f"expected exactly one datasource id, found {ds_ids}")
@@ -97,7 +111,7 @@ def patch(schema: str) -> str:
     if "<jdbcQuery" in schema:
         raise SystemExit("schema already carries derived tables; refusing to patch twice")
 
-    for table, t in TARGETS.items():
+    for table, t in targets.items():
         key, type_l, val_l = t["key"], t["type_l"], t["val_l"]
         # the raw table and its two labels become one derived table under the same id
         for tid in (table, type_l, val_l):
@@ -124,17 +138,24 @@ def patch(schema: str) -> str:
                         for c, _, lbl in NEW_COLS if c not in ("CHAR_TYPE_DESCR", "CHAR_VAL_DESCR"))
         schema = schema[:item_anchor.end()] + extra + schema[item_anchor.end():]
 
-    # a distinct-SA count that counts SAs, not SAs with contract terms
+    # Service Agreement 360 specifics, no-ops elsewhere: a distinct-SA count that counts SAs,
+    # not SAs with contract terms; the premise group's key is the SA's characteristic premise
     schema = schema.replace("CountDistinct(CI_SA_CONTERM.SA_ID, 'Current')", "CountDistinct(CI_SA.SA_ID, 'Current')")
-    # the premise-characteristic group's key is the SA's characteristic premise
     schema = schema.replace('<item id="CI_PREM_CHAR_PREM_ID" label="Premise ID"', '<item id="CI_PREM_CHAR_PREM_ID" label="Characteristic Premise ID"')
     return schema
 
 
 def main() -> int:
-    src, dst = Path(sys.argv[1]), Path(sys.argv[2])
-    dst.write_text(patch(src.read_text(encoding="utf-8")), encoding="utf-8")
-    print(f"wrote {dst}")
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("src", type=Path)
+    ap.add_argument("dst", type=Path)
+    ap.add_argument("--target", action="append", default=[],
+                    help="TABLE:KEY:TYPE_LABEL_ALIAS:VALUE_LABEL_ALIAS (repeatable); default: the SA 360 pair")
+    a = ap.parse_args()
+    targets = dict(parse_target(t) for t in a.target) if a.target else None
+    a.dst.write_text(patch(a.src.read_text(encoding="utf-8"), targets), encoding="utf-8")
+    print(f"wrote {a.dst}")
     return 0
 
 
