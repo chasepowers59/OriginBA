@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """See what is actually on a JasperReports Server, and import with the answer in hand.
 
-Reads JRS_URL, JRS_USER, JRS_PASSWORD from the environment (only the key names are ever
-printed); JRS_CA_BUNDLE or JRS_INSECURE=true for a self-signed test server. In a multi-tenant server the user is org-scoped: JRS_USER='jasperadmin|Origin_DEV'
+Three servers, one tool: --env test|prod|internal (or JRS_ENV) selects JRS_<ENV>_URL /
+JRS_<ENV>_USER / JRS_<ENV>_PASSWORD / JRS_<ENV>_INSECURE from the environment; the test
+server also answers to the original JRS_URL / JRS_USER / JRS_PASSWORD keys. Only key names
+are ever printed. In a multi-tenant server the user is org-scoped: JRS_USER='jasperadmin|Origin_DEV'
 imports INTO Origin_DEV; a bare 'jasperadmin' is organization_1's admin and 'superuser' is
 the server root -- a tenant-relative package lands wherever the login is scoped, which is
 how an import "succeeds" and nothing appears where you are looking.
@@ -29,19 +31,34 @@ import urllib.request
 def _ssl_context() -> ssl.SSLContext | None:
     """The SmartCity TEST server presents a self-signed chain. JRS_CA_BUNDLE points at its
     certificate (preferred); JRS_INSECURE=true skips verification for a test server only."""
-    bundle = os.environ.get("JRS_CA_BUNDLE")
+    bundle = _env_var("CA_BUNDLE")
     if bundle:
         return ssl.create_default_context(cafile=bundle)
-    if os.environ.get("JRS_INSECURE", "").lower() in ("1", "true", "yes"):
+    if _env_var("INSECURE").lower() in ("1", "true", "yes"):
         ctx = ssl.create_default_context(); ctx.check_hostname = False; ctx.verify_mode = ssl.CERT_NONE
         return ctx
     return None
 
 
+ENVS = ("test", "prod", "internal")
+
+
+def env_name() -> str:
+    return os.environ.get("JRS_ENV", "test").lower()
+
+
+def _env_var(key: str, env: str | None = None) -> str:
+    """JRS_<ENV>_<KEY>, falling back to JRS_<KEY> (the test server's original keys)."""
+    e = (env or env_name()).upper()
+    return os.environ.get(f"JRS_{e}_{key}") or (os.environ.get(f"JRS_{key}", "") if e == "TEST" else "")
+
+
 def _cfg() -> tuple[str, str]:
-    url, user, pw = (os.environ.get(k, "") for k in ("JRS_URL", "JRS_USER", "JRS_PASSWORD"))
+    url, user, pw = _env_var("URL"), _env_var("USER"), _env_var("PASSWORD")
     if not (url and user and pw):
-        sys.exit("set JRS_URL (e.g. https://host/jasperserver-pro), JRS_USER (user|Organization) and JRS_PASSWORD")
+        e = env_name().upper()
+        sys.exit(f"set JRS_{e}_URL, JRS_{e}_USER (user|Organization or a superuser) and JRS_{e}_PASSWORD "
+                 f"(JRS_ENV or --env selects test|prod|internal)")
     token = base64.b64encode(f"{user}:{pw}".encode()).decode()
     return url.rstrip("/"), f"Basic {token}"
 
@@ -125,12 +142,15 @@ def do_import(zip_path: str, update: bool) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--env", choices=ENVS, default=None, help="which server: test (default), prod, internal")
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("whoami")
     s = sub.add_parser("search"); s.add_argument("q")
     l = sub.add_parser("list"); l.add_argument("folder")
     i = sub.add_parser("import"); i.add_argument("zip"); i.add_argument("--no-update", action="store_true")
     a = ap.parse_args()
+    if a.env:
+        os.environ["JRS_ENV"] = a.env
     if a.cmd == "whoami":
         return whoami()
     if a.cmd == "search":
