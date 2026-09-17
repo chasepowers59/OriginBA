@@ -167,6 +167,7 @@ def load_datasource_export(ds: str, export: Path | None) -> tuple[dict[str, byte
 
 
 def build(out_zip: Path, datasource: str, export: Path | None = None) -> Path:
+    datasource = datasource.rsplit("/", 1)[-1]          # "Origin_DEV_DS" or "/DataSource/Origin_DEV_DS"
     ds_files, meta = load_datasource_export(datasource, export)
     ds_uri = f"/DataSource/{datasource}"
     files: dict[str, bytes] = dict(ds_files)

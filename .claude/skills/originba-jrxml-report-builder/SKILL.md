@@ -214,12 +214,17 @@ ORDER BY account]]></queryString>
 
 **A "manifest + loose files" bundle is not an import.** `deploy/build_report_unit*.sh` produce
 that older shape for a deployer script; uploaded through Manage > Import it fails with
-"provided zip file is not valid JasperReports Server export file" (DEV, 2026-09-17). The
-importable shape is the server's own export, built by
-`scripts/jaspersoft/build_finance_pack_jrs_import.py` (and letterprint's
-`build_import_bundle.py`): `index.xml` LAST in the archive, `favorites/` entry, `.folder.xml`
-per folder, `<reportUnit>` with local input controls, the subreport as a local `fileResource`
-of type jrxml named exactly what the main's `repo:<name>` says, `<dataSource><uri>` bound.
+"provided zip file is not valid JasperReports Server export file" (DEV, 2026-09-17). The importable shape is the server's own export, built by
+`scripts/jaspersoft/build_finance_pack_jrs_import.py`: `index.xml` LAST in the archive and
+starting with `keyalias` (with `encrypted` and `jsVersion` copied from a real export of the
+target tenant), the DATASOURCE RESOURCE bundled and listed as `<resource>` (a unit whose
+`<dataSource><uri>` cannot be resolved inside the batch is dropped), deflated `favorites/`
+entry, `.folder.xml` per folder, `<reportUnit>` with local input controls, the subreport as
+a local `fileResource` of type jrxml named exactly what the main's `repo:<name>` says.
+A content-only package without the datasource and keyalias "imported fine" on DEV and
+imported NOTHING (2026-09-17) -- always search the repository for a unit name afterwards.
+`verify_standard_offering_tenant_import.py --zip X --target-ds DS` checks the contract; for
+a report-unit package only its dashboard-template and SO-root-folder complaints are expected.
 
 ```
 resources/SmartCity/Report/Workstreams/Debt_Management/REP8_Aged_Balance.xml        <reportUnit>: folder, name, label,
