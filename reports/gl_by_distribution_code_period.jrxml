@@ -25,6 +25,21 @@
     <parameter name="CLIENT_NAME" class="java.lang.String">
         <defaultValueExpression><![CDATA["SmartCity Client"]]></defaultValueExpression>
     </parameter>
+    <parameter name="DST_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="GL_ACCT_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="GL_DIVISION_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CIS_DIVISION_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="FT_TYPE_FLG_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
     <queryString language="SQL"><![CDATA[
 SELECT TRIM(g.dst_id) AS DST_ID, COALESCE(TRIM(g.gl_acct), '(no GL account)') AS GL_ACCT,
        COUNT(*) AS GL_LINES, COUNT(DISTINCT f.ft_id) AS TRANSACTIONS,
@@ -34,6 +49,11 @@ SELECT TRIM(g.dst_id) AS DST_ID, COALESCE(TRIM(g.gl_acct), '(no GL account)') AS
 FROM CISADM.CI_FT_GL g
 JOIN CISADM.CI_FT f ON f.ft_id = g.ft_id
 WHERE TRIM(f.freeze_sw) = 'Y' AND f.accounting_dt >= $P{FROM_DT} AND f.accounting_dt < $P{TO_DT} + INTERVAL '1' DAY
+  AND ($P{DST_ID_F} IS NULL OR TRIM(g.dst_id) = TRIM($P{DST_ID_F}))
+  AND ($P{GL_ACCT_F} IS NULL OR TRIM(g.gl_acct) = TRIM($P{GL_ACCT_F}))
+  AND ($P{GL_DIVISION_F} IS NULL OR TRIM(f.gl_division) = TRIM($P{GL_DIVISION_F}))
+  AND ($P{CIS_DIVISION_F} IS NULL OR TRIM(f.cis_division) = TRIM($P{CIS_DIVISION_F}))
+  AND ($P{FT_TYPE_FLG_F} IS NULL OR TRIM(f.ft_type_flg) = TRIM($P{FT_TYPE_FLG_F}))
 GROUP BY TRIM(g.dst_id), COALESCE(TRIM(g.gl_acct), '(no GL account)')
 ORDER BY ABS(COALESCE(SUM(g.amount), 0)) DESC
 ]]></queryString>
@@ -69,7 +89,7 @@ ORDER BY ABS(COALESCE(SUM(g.amount), 0)) DESC
             <textField isBlankWhenNull="true" textAdjust="StretchHeight">
                 <reportElement style="H3" x="0" y="28" width="802" height="16" uuid="bd819aa0-39f2-57b2-aca7-6b3d9956d867"/>
                 <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  frozen FTs by accounting date; net = sum of GL amounts"]]></textFieldExpression>
+                <textFieldExpression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  frozen FTs by accounting date; net = sum of GL amounts" + ($P{DST_ID_F} == null ? "" : "  |  Distribution code: " + $P{DST_ID_F}) + ($P{GL_ACCT_F} == null ? "" : "  |  GL account (exact): " + $P{GL_ACCT_F}) + ($P{GL_DIVISION_F} == null ? "" : "  |  GL division: " + $P{GL_DIVISION_F}) + ($P{CIS_DIVISION_F} == null ? "" : "  |  CIS division: " + $P{CIS_DIVISION_F}) + ($P{FT_TYPE_FLG_F} == null ? "" : "  |  FT type (BS, BX, AD, AX, PS, PX): " + $P{FT_TYPE_FLG_F})]]></textFieldExpression>
             </textField>
             <textField isBlankWhenNull="true" textAdjust="StretchHeight">
                 <reportElement style="Base" x="0" y="44" width="802" height="8" uuid="04b3a93d-da45-577b-89f7-b5bb604e7044"/>
@@ -163,6 +183,21 @@ ORDER BY ABS(COALESCE(SUM(g.amount), 0)) DESC
                 </subreportParameter>
                 <subreportParameter name="TO_DT">
                     <subreportParameterExpression><![CDATA[$P{TO_DT}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="DST_ID_F">
+                    <subreportParameterExpression><![CDATA[$P{DST_ID_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="GL_ACCT_F">
+                    <subreportParameterExpression><![CDATA[$P{GL_ACCT_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="GL_DIVISION_F">
+                    <subreportParameterExpression><![CDATA[$P{GL_DIVISION_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="CIS_DIVISION_F">
+                    <subreportParameterExpression><![CDATA[$P{CIS_DIVISION_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="FT_TYPE_FLG_F">
+                    <subreportParameterExpression><![CDATA[$P{FT_TYPE_FLG_F}]]></subreportParameterExpression>
                 </subreportParameter>
                 <subreportParameter name="DST_ID">
                     <subreportParameterExpression><![CDATA[$F{DST_ID}]]></subreportParameterExpression>

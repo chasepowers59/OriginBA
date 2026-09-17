@@ -18,7 +18,23 @@ and a JasperReports 6.20.6 compile of all eight files), bundled by
 | `gl_by_distribution_code_period` — GL Activity by Distribution Code | `CI_FT.ACCOUNTING_DT` | distribution code + GL account: lines, FTs, debits, credits, net | by accounting month | GL lines of frozen FTs (`CI_FT_GL.AMOUNT`) |
 
 Parameters on every unit: `FROM_DT`, `TO_DT` (inclusive, `java.sql.Date`; defaults = last
-calendar month), `CLIENT_NAME` (footer). Style: Origin 2025 (Aptos, Sapphire headers, warm
+calendar month), `CLIENT_NAME` (footer). **Nothing runs unbounded**: the date window is in
+every WHERE clause, main and subreport alike, and JasperReports binds it as JDBC parameters.
+
+Optional filters (blank = all; each narrows the main query AND its subreport, and the
+title line names the ones in use):
+
+| Unit | Filters |
+| --- | --- |
+| Billing by Cycle | bill cycle, service type, CIS division, account ID |
+| Payments by Tender Type | tender type, payor account ID, tender control ID, minimum tender amount |
+| Adjustments by Type | adjustment type, account ID, service agreement ID, minimum absolute amount, `TOP_N` |
+| GL Activity by Distribution Code | distribution code, GL account, GL division, CIS division, FT type |
+
+The optional shape is `($P{X} IS NULL OR TRIM(col) = TRIM($P{X}))` -- an empty control binds
+NULL and the predicate is true for every row; the Oracle optimizer short-circuits it. Codes
+are typed as the client uses them (a cycle code, a tender type code); the labels are on the
+report rows, so the user reads the code off a first unfiltered run. Style: Origin 2025 (Aptos, Sapphire headers, warm
 body, confidential footer with the client name). Landscape A4/Letter-safe (842 x 595), Excel
 export keeps rows tight.
 
@@ -38,7 +54,9 @@ export keeps rows tight.
 
 Proven on the Ellensburg slice (2026-09-17): every main and subreport query runs on the local
 Postgres copy with the same text the Oracle server gets; billing by cycle tied to the
-service-type subtotals (Cycle 5: 314,847.22 = E 183,989.60 + G 105,021.21 + ...).
+service-type subtotals (Cycle 5: 314,847.22 = E 183,989.60 + G 105,021.21 + ...); with the
+service-type filter set to `E`, Cycle 5 returned exactly the Electric subtotal (183,989.60)
+and the subreport one row.
 
 ## Import
 

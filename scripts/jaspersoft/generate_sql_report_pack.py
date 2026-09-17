@@ -73,6 +73,19 @@ class Sub:
 
 
 @dataclass
+class Filter:
+    """An OPTIONAL input control: left empty it selects everything (the predicate is
+    `$P{X} IS NULL OR ...`), filled it narrows both the main query and the subreport. The
+    main and the subreport may need different predicates because their aliases differ."""
+    param: str
+    label: str
+    main_pred: str
+    sub_pred: str
+    cls: str = "java.lang.String"
+    control: str = "singleValueText"
+
+
+@dataclass
 class Spec:
     name: str
     label: str
@@ -82,6 +95,32 @@ class Spec:
     sub: Sub
     order_note: str = ""
     params: dict = field(default_factory=dict)   # extra parameters name -> (class, default expr)
+    filters: list[Filter] = field(default_factory=list)
+
+    def all_params(self) -> dict:
+        return {**self.params, **{f.param: (f.cls, "null") for f in self.filters}}
+
+    def main_sql(self) -> str:
+        return _with_filters(self.sql, [f.main_pred for f in self.filters])
+
+    def sub_sql(self) -> str:
+        return _with_filters(self.sub.sql, [f.sub_pred for f in self.filters])
+
+
+def _with_filters(sql: str, preds: list[str]) -> str:
+    """Append the optional predicates to the query's (first) WHERE clause -- before GROUP BY /
+    ORDER BY. Queries here have one WHERE at their driving level; the TOP-N subquery is the
+    exception and is handled by placing the marker comment where the filters belong."""
+    if not preds:
+        return sql
+    extra = "".join(f"\n  AND {p}" for p in preds)
+    if "/*FILTERS*/" in sql:
+        return sql.replace("/*FILTERS*/", extra.lstrip("\n"))
+    for kw in ("\nGROUP BY", "\nORDER BY"):
+        i = sql.find(kw)
+        if i >= 0:
+            return sql[:i] + extra + sql[i:]
+    return sql + extra
 
 
 def _uid(seed: str) -> str:
@@ -181,15 +220,16 @@ def main_jrxml(s: Spec) -> str:
     sub_params = "\n".join(
         f'                <subreportParameter name="{p}">\n'
         f'                    <subreportParameterExpression><![CDATA[$P{{{p}}}]]></subreportParameterExpression>\n'
-        f'                </subreportParameter>' for p in ("FROM_DT", "TO_DT", *s.params))
+        f'                </subreportParameter>' for p in ("FROM_DT", "TO_DT", *s.all_params()))
     sub_key = (f'                <subreportParameter name="{s.sub.key_param}">\n'
                f'                    <subreportParameterExpression><![CDATA[$F{{{s.sub.key_field}}}]]></subreportParameterExpression>\n'
                f'                </subreportParameter>')
     window = ('$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) '
               '+ " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT})'
-              + (f' + "  |  {s.order_note}"' if s.order_note else ""))
-    return (_head(s.name, PAGE_W, PAGE_H, MARGIN, COL_W) + STYLES + _params(s.params) + "\n"
-            f'    <queryString language="SQL"><![CDATA[\n{s.sql.strip()}\n]]></queryString>\n'
+              + (f' + "  |  {s.order_note}"' if s.order_note else "")
+              + "".join(f' + ($P{{{f.param}}} == null ? "" : "  |  {f.label}: " + $P{{{f.param}}})' for f in s.filters))
+    return (_head(s.name, PAGE_W, PAGE_H, MARGIN, COL_W) + STYLES + _params(s.all_params()) + "\n"
+            f'    <queryString language="SQL"><![CDATA[\n{s.main_sql().strip()}\n]]></queryString>\n'
             + _fields(s.columns) + "\n" + _variables(s.columns) + "\n"
             f'    <title>\n        <band height="52">\n'
             + _text(0, 0, COL_W, 26, f'"{s.label}"', "TitleSapphire", "Left", s.name + "/title") + "\n"
@@ -218,8 +258,8 @@ def main_jrxml(s: Spec) -> str:
 def sub_jrxml(s: Spec) -> str:
     sub, w = s.sub, COL_W - 24
     return (_head(sub.name, w, PAGE_H, 0, w) + STYLES
-            + _params({sub.key_param: ("java.lang.String", '""'), **s.params}).replace('<parameter name="CLIENT_NAME"', '<parameter name="CLIENT_NAME" isForPrompting="false"') + "\n"
-            f'    <queryString language="SQL"><![CDATA[\n{sub.sql.strip()}\n]]></queryString>\n'
+            + _params({sub.key_param: ("java.lang.String", '""'), **s.all_params()}).replace('<parameter name="CLIENT_NAME"', '<parameter name="CLIENT_NAME" isForPrompting="false"') + "\n"
+            f'    <queryString language="SQL"><![CDATA[\n{s.sub_sql().strip()}\n]]></queryString>\n'
             + _fields(sub.columns) + "\n" + _variables(sub.columns) + "\n"
             f'    <title>\n        <band height="14">\n' + _text(0, 0, w, 14, sub.intro, "SubHeader", "Left", sub.name + "/intro") + "\n"
             f'        </band>\n    </title>\n'
@@ -240,6 +280,8 @@ def controls(s: Spec) -> tuple[dict, list]:
     for n, (cls, default) in s.params.items():
         ics.append({"id": n, "label": n.replace("_", " ").title(), "type": "singleValueNumber" if "Integer" in cls else "singleValueText",
                     "mandatory": False, "visible": True, "defaultValue": default.strip('"')})
+    for f in s.filters:
+        ics.append({"id": f.param, "label": f"{f.label} (blank = all)", "type": f.control, "mandatory": False, "visible": True})
     doc = {"reportUnitUri": f"/reports/origin/{s.name}", "label": s.label, "description": s.description,
            "dataSources": {"DEV": "ORIGIN_DEV_DS", "QA": "C2M_QA_DS", "PROD": "C2M_PROD_DS"},
            "subreports": [f"reports/origin/subreports/{s.sub.name}.jrxml"], "inputControls": ics}
@@ -298,7 +340,21 @@ ORDER BY BILLED_AMT DESC""",
             columns=[Col("SVC_TYPE_CD", "Type", width=60), Col("SVC_TYPE_DESCR", "Service Type", width=328),
                      Col("SERVICE_AGREEMENTS", "SAs", "java.lang.Long", 90, "Right", INT, True), Col("SEGMENTS", "Segments", "java.lang.Long", 90, "Right", INT, True),
                      Col("ESTIMATED_SEGMENTS", "Estimated", "java.lang.Long", 90, "Right", INT, True),
-                     Col("BILLED_AMT", "Billed Amount", "java.math.BigDecimal", 120, "Right", MONEY, True)])),
+                     Col("BILLED_AMT", "Billed Amount", "java.math.BigDecimal", 120, "Right", MONEY, True)]),
+        filters=[
+            Filter("BILL_CYC_CD_F", "Bill cycle",
+                   "($P{BILL_CYC_CD_F} IS NULL OR TRIM(b.bill_cyc_cd) = TRIM($P{BILL_CYC_CD_F}))",
+                   "($P{BILL_CYC_CD_F} IS NULL OR TRIM(b.bill_cyc_cd) = TRIM($P{BILL_CYC_CD_F}))"),
+            Filter("SVC_TYPE_CD_F", "Service type",
+                   "($P{SVC_TYPE_CD_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa JOIN CISADM.CI_SA_TYPE ft ON ft.sa_type_cd = fsa.sa_type_cd AND ft.cis_division = fsa.cis_division WHERE fsa.sa_id = s.sa_id AND TRIM(ft.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F})))",
+                   "($P{SVC_TYPE_CD_F} IS NULL OR TRIM(t.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F}))"),
+            Filter("CIS_DIVISION_F", "CIS division",
+                   "($P{CIS_DIVISION_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_ACCT fa WHERE fa.acct_id = b.acct_id AND TRIM(fa.cis_division) = TRIM($P{CIS_DIVISION_F})))",
+                   "($P{CIS_DIVISION_F} IS NULL OR TRIM(sa.cis_division) = TRIM($P{CIS_DIVISION_F}))"),
+            Filter("ACCT_ID_F", "Account ID",
+                   "($P{ACCT_ID_F} IS NULL OR TRIM(b.acct_id) = TRIM($P{ACCT_ID_F}))",
+                   "($P{ACCT_ID_F} IS NULL OR TRIM(b.acct_id) = TRIM($P{ACCT_ID_F}))"),
+        ]),
 
     Spec(
         name="payments_by_tender_type_period", label="Payments by Tender Type",
@@ -337,7 +393,21 @@ GROUP BY TO_CHAR(e.pay_dt, 'YYYY-MM')
 ORDER BY PAY_MONTH""",
             columns=[Col("PAY_MONTH", "Month", width=292), Col("TENDERS", "Tenders", "java.lang.Long", 80, "Right", INT, True),
                      Col("TENDER_AMT", "Amount", "java.math.BigDecimal", 120, "Right", MONEY, True), Col("CANCELLED", "Cancelled", "java.lang.Long", 80, "Right", INT, True),
-                     Col("PAYOR_ACCOUNTS", "Payors", "java.lang.Long", 206, "Right", INT, True)])),
+                     Col("PAYOR_ACCOUNTS", "Payors", "java.lang.Long", 206, "Right", INT, True)]),
+        filters=[
+            Filter("TENDER_TYPE_CD_F", "Tender type",
+                   "($P{TENDER_TYPE_CD_F} IS NULL OR TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD_F}))",
+                   "($P{TENDER_TYPE_CD_F} IS NULL OR TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD_F}))"),
+            Filter("PAYOR_ACCT_ID_F", "Payor account ID",
+                   "($P{PAYOR_ACCT_ID_F} IS NULL OR TRIM(t.payor_acct_id) = TRIM($P{PAYOR_ACCT_ID_F}))",
+                   "($P{PAYOR_ACCT_ID_F} IS NULL OR TRIM(t.payor_acct_id) = TRIM($P{PAYOR_ACCT_ID_F}))"),
+            Filter("TNDR_CTL_ID_F", "Tender control ID",
+                   "($P{TNDR_CTL_ID_F} IS NULL OR TRIM(t.tndr_ctl_id) = TRIM($P{TNDR_CTL_ID_F}))",
+                   "($P{TNDR_CTL_ID_F} IS NULL OR TRIM(t.tndr_ctl_id) = TRIM($P{TNDR_CTL_ID_F}))"),
+            Filter("MIN_AMT_F", "Minimum tender amount",
+                   "($P{MIN_AMT_F} IS NULL OR t.tender_amt >= $P{MIN_AMT_F})",
+                   "($P{MIN_AMT_F} IS NULL OR t.tender_amt >= $P{MIN_AMT_F})", "java.math.BigDecimal", "singleValueNumber"),
+        ]),
 
     Spec(
         name="adjustments_by_type_period", label="Adjustments by Type",
@@ -372,12 +442,27 @@ SELECT ADJ_ID, CRE_DT, SA_ID, ACCT_ID, CUSTOMER_NAME, ADJ_AMT FROM (
   LEFT JOIN CISADM.CI_PER_NAME pn ON pn.per_id = ap.per_id AND TRIM(pn.name_type_flg) = 'PRIM'
   WHERE TRIM(a.adj_status_flg) = '50' AND {WINDOW.format(col='a.cre_dt')}
     AND TRIM(a.adj_type_cd) = TRIM($P{{ADJ_TYPE_CD}})
+    /*FILTERS*/
   ORDER BY ABS(a.adj_amt) DESC, a.adj_id
 ) x
 FETCH FIRST $P{{TOP_N}} ROWS ONLY""",
             columns=[Col("ADJ_ID", "Adjustment", width=90), Col("CRE_DT", "Created", "java.sql.Timestamp", 80, "Left", "yyyy-MM-dd"),
                      Col("SA_ID", "SA", width=90), Col("ACCT_ID", "Account", width=90), Col("CUSTOMER_NAME", "Main Customer", width=308),
-                     Col("ADJ_AMT", "Amount", "java.math.BigDecimal", 120, "Right", MONEY, True)])),
+                     Col("ADJ_AMT", "Amount", "java.math.BigDecimal", 120, "Right", MONEY, True)]),
+        filters=[
+            Filter("ADJ_TYPE_CD_F", "Adjustment type",
+                   "($P{ADJ_TYPE_CD_F} IS NULL OR TRIM(a.adj_type_cd) = TRIM($P{ADJ_TYPE_CD_F}))",
+                   "($P{ADJ_TYPE_CD_F} IS NULL OR TRIM(a.adj_type_cd) = TRIM($P{ADJ_TYPE_CD_F}))"),
+            Filter("ACCT_ID_F", "Account ID",
+                   "($P{ACCT_ID_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = a.sa_id AND TRIM(fsa.acct_id) = TRIM($P{ACCT_ID_F})))",
+                   "($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))"),
+            Filter("SA_ID_F", "Service agreement ID",
+                   "($P{SA_ID_F} IS NULL OR TRIM(a.sa_id) = TRIM($P{SA_ID_F}))",
+                   "($P{SA_ID_F} IS NULL OR TRIM(a.sa_id) = TRIM($P{SA_ID_F}))"),
+            Filter("MIN_ABS_AMT_F", "Minimum absolute amount",
+                   "($P{MIN_ABS_AMT_F} IS NULL OR ABS(a.adj_amt) >= $P{MIN_ABS_AMT_F})",
+                   "($P{MIN_ABS_AMT_F} IS NULL OR ABS(a.adj_amt) >= $P{MIN_ABS_AMT_F})", "java.math.BigDecimal", "singleValueNumber"),
+        ]),
 
     Spec(
         name="gl_by_distribution_code_period", label="GL Activity by Distribution Code",
@@ -413,7 +498,24 @@ GROUP BY TO_CHAR(f.accounting_dt, 'YYYY-MM')
 ORDER BY ACCT_MONTH""",
             columns=[Col("ACCT_MONTH", "Month", width=328), Col("GL_LINES", "Lines", "java.lang.Long", 70, "Right", INT, True),
                      Col("DEBIT_AMT", "Debits", "java.math.BigDecimal", 120, "Right", MONEY, True), Col("CREDIT_AMT", "Credits", "java.math.BigDecimal", 120, "Right", MONEY, True),
-                     Col("NET_AMT", "Net", "java.math.BigDecimal", 140, "Right", MONEY, True)])),
+                     Col("NET_AMT", "Net", "java.math.BigDecimal", 140, "Right", MONEY, True)]),
+        filters=[
+            Filter("DST_ID_F", "Distribution code",
+                   "($P{DST_ID_F} IS NULL OR TRIM(g.dst_id) = TRIM($P{DST_ID_F}))",
+                   "($P{DST_ID_F} IS NULL OR TRIM(g.dst_id) = TRIM($P{DST_ID_F}))"),
+            Filter("GL_ACCT_F", "GL account (exact)",
+                   "($P{GL_ACCT_F} IS NULL OR TRIM(g.gl_acct) = TRIM($P{GL_ACCT_F}))",
+                   "($P{GL_ACCT_F} IS NULL OR TRIM(g.gl_acct) = TRIM($P{GL_ACCT_F}))"),
+            Filter("GL_DIVISION_F", "GL division",
+                   "($P{GL_DIVISION_F} IS NULL OR TRIM(f.gl_division) = TRIM($P{GL_DIVISION_F}))",
+                   "($P{GL_DIVISION_F} IS NULL OR TRIM(f.gl_division) = TRIM($P{GL_DIVISION_F}))"),
+            Filter("CIS_DIVISION_F", "CIS division",
+                   "($P{CIS_DIVISION_F} IS NULL OR TRIM(f.cis_division) = TRIM($P{CIS_DIVISION_F}))",
+                   "($P{CIS_DIVISION_F} IS NULL OR TRIM(f.cis_division) = TRIM($P{CIS_DIVISION_F}))"),
+            Filter("FT_TYPE_FLG_F", "FT type (BS, BX, AD, AX, PS, PX)",
+                   "($P{FT_TYPE_FLG_F} IS NULL OR TRIM(f.ft_type_flg) = TRIM($P{FT_TYPE_FLG_F}))",
+                   "($P{FT_TYPE_FLG_F} IS NULL OR TRIM(f.ft_type_flg) = TRIM($P{FT_TYPE_FLG_F}))"),
+        ]),
 ]
 
 

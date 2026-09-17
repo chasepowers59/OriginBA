@@ -25,6 +25,18 @@
     <parameter name="CLIENT_NAME" class="java.lang.String">
         <defaultValueExpression><![CDATA["SmartCity Client"]]></defaultValueExpression>
     </parameter>
+    <parameter name="TENDER_TYPE_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="PAYOR_ACCT_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TNDR_CTL_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="MIN_AMT_F" class="java.math.BigDecimal">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
     <queryString language="SQL"><![CDATA[
 SELECT TRIM(t.tender_type_cd) AS TENDER_TYPE_CD, COALESCE(tl.descr, TRIM(t.tender_type_cd)) AS TENDER_TYPE_DESCR,
        COUNT(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NULL THEN 1 END) AS TENDERS,
@@ -36,6 +48,10 @@ FROM CISADM.CI_PAY_TNDR t
 JOIN CISADM.CI_PAY_EVENT e ON e.pay_event_id = t.pay_event_id
 LEFT JOIN CISADM.CI_TENDER_TYPE_L tl ON tl.tender_type_cd = t.tender_type_cd AND tl.language_cd = 'ENG'
 WHERE e.pay_dt >= $P{FROM_DT} AND e.pay_dt < $P{TO_DT} + INTERVAL '1' DAY
+  AND ($P{TENDER_TYPE_CD_F} IS NULL OR TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD_F}))
+  AND ($P{PAYOR_ACCT_ID_F} IS NULL OR TRIM(t.payor_acct_id) = TRIM($P{PAYOR_ACCT_ID_F}))
+  AND ($P{TNDR_CTL_ID_F} IS NULL OR TRIM(t.tndr_ctl_id) = TRIM($P{TNDR_CTL_ID_F}))
+  AND ($P{MIN_AMT_F} IS NULL OR t.tender_amt >= $P{MIN_AMT_F})
 GROUP BY TRIM(t.tender_type_cd), COALESCE(tl.descr, TRIM(t.tender_type_cd))
 ORDER BY TENDER_AMT DESC
 ]]></queryString>
@@ -71,7 +87,7 @@ ORDER BY TENDER_AMT DESC
             <textField isBlankWhenNull="true" textAdjust="StretchHeight">
                 <reportElement style="H3" x="0" y="28" width="802" height="16" uuid="1669f324-0993-5311-ab3c-1e22e84bfda6"/>
                 <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  cancelled = tender carries a cancel reason"]]></textFieldExpression>
+                <textFieldExpression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  cancelled = tender carries a cancel reason" + ($P{TENDER_TYPE_CD_F} == null ? "" : "  |  Tender type: " + $P{TENDER_TYPE_CD_F}) + ($P{PAYOR_ACCT_ID_F} == null ? "" : "  |  Payor account ID: " + $P{PAYOR_ACCT_ID_F}) + ($P{TNDR_CTL_ID_F} == null ? "" : "  |  Tender control ID: " + $P{TNDR_CTL_ID_F}) + ($P{MIN_AMT_F} == null ? "" : "  |  Minimum tender amount: " + $P{MIN_AMT_F})]]></textFieldExpression>
             </textField>
             <textField isBlankWhenNull="true" textAdjust="StretchHeight">
                 <reportElement style="Base" x="0" y="44" width="802" height="8" uuid="ac75e9fd-efc0-58ef-bcbd-52216ed73e4e"/>
@@ -165,6 +181,18 @@ ORDER BY TENDER_AMT DESC
                 </subreportParameter>
                 <subreportParameter name="TO_DT">
                     <subreportParameterExpression><![CDATA[$P{TO_DT}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="TENDER_TYPE_CD_F">
+                    <subreportParameterExpression><![CDATA[$P{TENDER_TYPE_CD_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="PAYOR_ACCT_ID_F">
+                    <subreportParameterExpression><![CDATA[$P{PAYOR_ACCT_ID_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="TNDR_CTL_ID_F">
+                    <subreportParameterExpression><![CDATA[$P{TNDR_CTL_ID_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="MIN_AMT_F">
+                    <subreportParameterExpression><![CDATA[$P{MIN_AMT_F}]]></subreportParameterExpression>
                 </subreportParameter>
                 <subreportParameter name="TENDER_TYPE_CD">
                     <subreportParameterExpression><![CDATA[$F{TENDER_TYPE_CD}]]></subreportParameterExpression>

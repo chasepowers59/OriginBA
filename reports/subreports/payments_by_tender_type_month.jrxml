@@ -28,6 +28,18 @@
     <parameter name="TENDER_TYPE_CD" class="java.lang.String">
         <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
     </parameter>
+    <parameter name="TENDER_TYPE_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="PAYOR_ACCT_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TNDR_CTL_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="MIN_AMT_F" class="java.math.BigDecimal">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
     <queryString language="SQL"><![CDATA[
 SELECT TO_CHAR(e.pay_dt, 'YYYY-MM') AS PAY_MONTH,
        COUNT(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NULL THEN 1 END) AS TENDERS,
@@ -37,6 +49,10 @@ SELECT TO_CHAR(e.pay_dt, 'YYYY-MM') AS PAY_MONTH,
 FROM CISADM.CI_PAY_TNDR t
 JOIN CISADM.CI_PAY_EVENT e ON e.pay_event_id = t.pay_event_id
 WHERE e.pay_dt >= $P{FROM_DT} AND e.pay_dt < $P{TO_DT} + INTERVAL '1' DAY AND TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD})
+  AND ($P{TENDER_TYPE_CD_F} IS NULL OR TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD_F}))
+  AND ($P{PAYOR_ACCT_ID_F} IS NULL OR TRIM(t.payor_acct_id) = TRIM($P{PAYOR_ACCT_ID_F}))
+  AND ($P{TNDR_CTL_ID_F} IS NULL OR TRIM(t.tndr_ctl_id) = TRIM($P{TNDR_CTL_ID_F}))
+  AND ($P{MIN_AMT_F} IS NULL OR t.tender_amt >= $P{MIN_AMT_F})
 GROUP BY TO_CHAR(e.pay_dt, 'YYYY-MM')
 ORDER BY PAY_MONTH
 ]]></queryString>

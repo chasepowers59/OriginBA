@@ -28,6 +28,18 @@
     <parameter name="BILL_CYC_CD" class="java.lang.String">
         <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
     </parameter>
+    <parameter name="BILL_CYC_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="SVC_TYPE_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CIS_DIVISION_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ACCT_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
     <queryString language="SQL"><![CDATA[
 SELECT TRIM(t.svc_type_cd) AS SVC_TYPE_CD, COALESCE(sl.descr, TRIM(t.svc_type_cd)) AS SVC_TYPE_DESCR,
        COUNT(DISTINCT s.sa_id) AS SERVICE_AGREEMENTS,
@@ -42,6 +54,10 @@ LEFT JOIN CISADM.CI_SVC_TYPE_L sl ON sl.svc_type_cd = t.svc_type_cd AND sl.langu
 LEFT JOIN CISADM.CI_BSEG_CALC h ON h.bseg_id = s.bseg_id
 WHERE TRIM(b.bill_stat_flg) = 'C' AND b.bill_dt >= $P{FROM_DT} AND b.bill_dt < $P{TO_DT} + INTERVAL '1' DAY
   AND COALESCE(NULLIF(TRIM(b.bill_cyc_cd), ''), '(none)') = $P{BILL_CYC_CD}
+  AND ($P{BILL_CYC_CD_F} IS NULL OR TRIM(b.bill_cyc_cd) = TRIM($P{BILL_CYC_CD_F}))
+  AND ($P{SVC_TYPE_CD_F} IS NULL OR TRIM(t.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F}))
+  AND ($P{CIS_DIVISION_F} IS NULL OR TRIM(sa.cis_division) = TRIM($P{CIS_DIVISION_F}))
+  AND ($P{ACCT_ID_F} IS NULL OR TRIM(b.acct_id) = TRIM($P{ACCT_ID_F}))
 GROUP BY TRIM(t.svc_type_cd), COALESCE(sl.descr, TRIM(t.svc_type_cd))
 ORDER BY BILLED_AMT DESC
 ]]></queryString>

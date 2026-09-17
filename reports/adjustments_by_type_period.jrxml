@@ -28,6 +28,18 @@
     <parameter name="TOP_N" class="java.lang.Integer">
         <defaultValueExpression><![CDATA[10]]></defaultValueExpression>
     </parameter>
+    <parameter name="ADJ_TYPE_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ACCT_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="SA_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="MIN_ABS_AMT_F" class="java.math.BigDecimal">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
     <queryString language="SQL"><![CDATA[
 SELECT TRIM(a.adj_type_cd) AS ADJ_TYPE_CD, COALESCE(al.descr, TRIM(a.adj_type_cd)) AS ADJ_TYPE_DESCR,
        COUNT(*) AS ADJUSTMENTS, COALESCE(SUM(a.adj_amt), 0) AS NET_AMT,
@@ -37,6 +49,10 @@ SELECT TRIM(a.adj_type_cd) AS ADJ_TYPE_CD, COALESCE(al.descr, TRIM(a.adj_type_cd
 FROM CISADM.CI_ADJ a
 LEFT JOIN CISADM.CI_ADJ_TYPE_L al ON al.adj_type_cd = a.adj_type_cd AND al.language_cd = 'ENG'
 WHERE TRIM(a.adj_status_flg) = '50' AND a.cre_dt >= $P{FROM_DT} AND a.cre_dt < $P{TO_DT} + INTERVAL '1' DAY
+  AND ($P{ADJ_TYPE_CD_F} IS NULL OR TRIM(a.adj_type_cd) = TRIM($P{ADJ_TYPE_CD_F}))
+  AND ($P{ACCT_ID_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = a.sa_id AND TRIM(fsa.acct_id) = TRIM($P{ACCT_ID_F})))
+  AND ($P{SA_ID_F} IS NULL OR TRIM(a.sa_id) = TRIM($P{SA_ID_F}))
+  AND ($P{MIN_ABS_AMT_F} IS NULL OR ABS(a.adj_amt) >= $P{MIN_ABS_AMT_F})
 GROUP BY TRIM(a.adj_type_cd), COALESCE(al.descr, TRIM(a.adj_type_cd))
 ORDER BY ABS(COALESCE(SUM(a.adj_amt), 0)) DESC
 ]]></queryString>
@@ -70,7 +86,7 @@ ORDER BY ABS(COALESCE(SUM(a.adj_amt), 0)) DESC
             <textField isBlankWhenNull="true" textAdjust="StretchHeight">
                 <reportElement style="H3" x="0" y="28" width="802" height="16" uuid="1031072b-478d-5d35-bfd3-bb0e315af352"/>
                 <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  frozen adjustments by creation date"]]></textFieldExpression>
+                <textFieldExpression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  frozen adjustments by creation date" + ($P{ADJ_TYPE_CD_F} == null ? "" : "  |  Adjustment type: " + $P{ADJ_TYPE_CD_F}) + ($P{ACCT_ID_F} == null ? "" : "  |  Account ID: " + $P{ACCT_ID_F}) + ($P{SA_ID_F} == null ? "" : "  |  Service agreement ID: " + $P{SA_ID_F}) + ($P{MIN_ABS_AMT_F} == null ? "" : "  |  Minimum absolute amount: " + $P{MIN_ABS_AMT_F})]]></textFieldExpression>
             </textField>
             <textField isBlankWhenNull="true" textAdjust="StretchHeight">
                 <reportElement style="Base" x="0" y="44" width="802" height="8" uuid="3080369e-0515-5610-90a7-fe89bf3d0ef0"/>
@@ -177,6 +193,18 @@ ORDER BY ABS(COALESCE(SUM(a.adj_amt), 0)) DESC
                 </subreportParameter>
                 <subreportParameter name="TOP_N">
                     <subreportParameterExpression><![CDATA[$P{TOP_N}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="ADJ_TYPE_CD_F">
+                    <subreportParameterExpression><![CDATA[$P{ADJ_TYPE_CD_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="ACCT_ID_F">
+                    <subreportParameterExpression><![CDATA[$P{ACCT_ID_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="SA_ID_F">
+                    <subreportParameterExpression><![CDATA[$P{SA_ID_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="MIN_ABS_AMT_F">
+                    <subreportParameterExpression><![CDATA[$P{MIN_ABS_AMT_F}]]></subreportParameterExpression>
                 </subreportParameter>
                 <subreportParameter name="ADJ_TYPE_CD">
                     <subreportParameterExpression><![CDATA[$F{ADJ_TYPE_CD}]]></subreportParameterExpression>

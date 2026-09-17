@@ -40,7 +40,7 @@ class Committed(unittest.TestCase):
 class Sql(unittest.TestCase):
     def test_portable_conventions_and_no_client_codes(self):
         for s in g.SPECS:
-            for sql in (s.sql, s.sub.sql):
+            for sql in (s.main_sql(), s.sub_sql()):
                 up = sql.upper()
                 for bad in ("NVL(", "SYSDATE", "DECODE(", "ROWNUM", "$P!{"):
                     self.assertNotIn(bad, up, f"{s.name}: {bad}")
@@ -50,18 +50,32 @@ class Sql(unittest.TestCase):
                 for flag in re.findall(r"\b\w+\.(bseg_stat_flg|bill_stat_flg|adj_status_flg|freeze_sw|est_sw|main_cust_sw|name_type_flg)\b", sql):
                     self.assertIn(f"TRIM(", sql, flag)
             # only lifecycle constants are literal: '50' frozen, 'C' completed, 'Y', 'ENG', 'PRIM'
-            literals = set(re.findall(r"= '([^']+)'", s.sql + s.sub.sql))
+            literals = set(re.findall(r"= '([^']+)'", s.main_sql() + s.sub_sql()))
             self.assertTrue(literals <= {"50", "C", "Y", "ENG", "PRIM"}, f"{s.name}: {literals}")
 
     def test_subreport_wiring(self):
         for s in g.SPECS:
             main = g.main_jrxml(s)
             self.assertIn(f'"repo:subreports/{s.sub.name}"', main)
-            for p in ("FROM_DT", "TO_DT", s.sub.key_param, *s.params):
+            for p in ("FROM_DT", "TO_DT", s.sub.key_param, *s.all_params()):
                 self.assertIn(f'<subreportParameter name="{p}">', main, f"{s.name}: {p}")
             self.assertIn("$P{REPORT_CONNECTION}", main)
             self.assertIn(f"$P{{{s.sub.key_param}}}", s.sub.sql)
             self.assertIn(f'name="{s.sub.key_param}"', g.sub_jrxml(s))
+
+    def test_every_report_has_optional_filters_that_reach_both_queries(self):
+        for s in g.SPECS:
+            self.assertGreaterEqual(len(s.filters), 3, s.name)
+            main, sub = s.main_sql(), s.sub_sql()
+            for f in s.filters:
+                self.assertIn(f"$P{{{f.param}}} IS NULL OR", main, f"{s.name}: {f.param} not optional in main")
+                self.assertIn(f"$P{{{f.param}}} IS NULL OR", sub, f"{s.name}: {f.param} not optional in sub")
+                self.assertIn(f'<parameter name="{f.param}"', g.sub_jrxml(s), f"{s.sub.name}: {f.param} undeclared")
+            # the filters sit inside the WHERE, before any GROUP BY
+            for sql in (main, sub):
+                if "GROUP BY" in sql:
+                    self.assertLess(sql.rfind("IS NULL OR"), sql.find("\nGROUP BY"), s.name)
+            self.assertNotIn("/*FILTERS*/", main + sub)
 
     def test_columns_fill_the_page(self):
         for s in g.SPECS:

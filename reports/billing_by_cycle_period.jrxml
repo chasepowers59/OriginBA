@@ -25,6 +25,18 @@
     <parameter name="CLIENT_NAME" class="java.lang.String">
         <defaultValueExpression><![CDATA["SmartCity Client"]]></defaultValueExpression>
     </parameter>
+    <parameter name="BILL_CYC_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="SVC_TYPE_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CIS_DIVISION_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ACCT_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
     <queryString language="SQL"><![CDATA[
 SELECT COALESCE(NULLIF(TRIM(b.bill_cyc_cd), ''), '(none)') AS BILL_CYC_CD,
        COALESCE(cl.descr, CASE WHEN NULLIF(TRIM(b.bill_cyc_cd), '') IS NULL THEN 'Off-cycle / no bill cycle' ELSE TRIM(b.bill_cyc_cd) END) AS BILL_CYC_DESCR,
@@ -38,6 +50,10 @@ JOIN CISADM.CI_BSEG s ON s.bill_id = b.bill_id AND TRIM(s.bseg_stat_flg) = '50'
 LEFT JOIN CISADM.CI_BSEG_CALC h ON h.bseg_id = s.bseg_id
 LEFT JOIN CISADM.CI_BILL_CYC_L cl ON cl.bill_cyc_cd = b.bill_cyc_cd AND cl.language_cd = 'ENG'
 WHERE TRIM(b.bill_stat_flg) = 'C' AND b.bill_dt >= $P{FROM_DT} AND b.bill_dt < $P{TO_DT} + INTERVAL '1' DAY
+  AND ($P{BILL_CYC_CD_F} IS NULL OR TRIM(b.bill_cyc_cd) = TRIM($P{BILL_CYC_CD_F}))
+  AND ($P{SVC_TYPE_CD_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa JOIN CISADM.CI_SA_TYPE ft ON ft.sa_type_cd = fsa.sa_type_cd AND ft.cis_division = fsa.cis_division WHERE fsa.sa_id = s.sa_id AND TRIM(ft.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F})))
+  AND ($P{CIS_DIVISION_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_ACCT fa WHERE fa.acct_id = b.acct_id AND TRIM(fa.cis_division) = TRIM($P{CIS_DIVISION_F})))
+  AND ($P{ACCT_ID_F} IS NULL OR TRIM(b.acct_id) = TRIM($P{ACCT_ID_F}))
 GROUP BY COALESCE(NULLIF(TRIM(b.bill_cyc_cd), ''), '(none)'),
          COALESCE(cl.descr, CASE WHEN NULLIF(TRIM(b.bill_cyc_cd), '') IS NULL THEN 'Off-cycle / no bill cycle' ELSE TRIM(b.bill_cyc_cd) END)
 ORDER BY BILLED_AMT DESC
@@ -74,7 +90,7 @@ ORDER BY BILLED_AMT DESC
             <textField isBlankWhenNull="true" textAdjust="StretchHeight">
                 <reportElement style="H3" x="0" y="28" width="802" height="16" uuid="748fb9d7-1293-5a04-9abf-7b449efce105"/>
                 <textElement textAlignment="Left" verticalAlignment="Middle"><paragraph leftIndent="2" rightIndent="2"/></textElement>
-                <textFieldExpression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  completed bills, frozen segments; billed = calc headers"]]></textFieldExpression>
+                <textFieldExpression><![CDATA[$P{CLIENT_NAME} + "  |  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  completed bills, frozen segments; billed = calc headers" + ($P{BILL_CYC_CD_F} == null ? "" : "  |  Bill cycle: " + $P{BILL_CYC_CD_F}) + ($P{SVC_TYPE_CD_F} == null ? "" : "  |  Service type: " + $P{SVC_TYPE_CD_F}) + ($P{CIS_DIVISION_F} == null ? "" : "  |  CIS division: " + $P{CIS_DIVISION_F}) + ($P{ACCT_ID_F} == null ? "" : "  |  Account ID: " + $P{ACCT_ID_F})]]></textFieldExpression>
             </textField>
             <textField isBlankWhenNull="true" textAdjust="StretchHeight">
                 <reportElement style="Base" x="0" y="44" width="802" height="8" uuid="b0522944-7cbc-5911-a80a-84332cf32f65"/>
@@ -168,6 +184,18 @@ ORDER BY BILLED_AMT DESC
                 </subreportParameter>
                 <subreportParameter name="TO_DT">
                     <subreportParameterExpression><![CDATA[$P{TO_DT}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="BILL_CYC_CD_F">
+                    <subreportParameterExpression><![CDATA[$P{BILL_CYC_CD_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="SVC_TYPE_CD_F">
+                    <subreportParameterExpression><![CDATA[$P{SVC_TYPE_CD_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="CIS_DIVISION_F">
+                    <subreportParameterExpression><![CDATA[$P{CIS_DIVISION_F}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="ACCT_ID_F">
+                    <subreportParameterExpression><![CDATA[$P{ACCT_ID_F}]]></subreportParameterExpression>
                 </subreportParameter>
                 <subreportParameter name="BILL_CYC_CD">
                     <subreportParameterExpression><![CDATA[$F{BILL_CYC_CD}]]></subreportParameterExpression>
