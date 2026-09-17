@@ -108,3 +108,113 @@ Create or fix domain-first JRXML reports and paired input controls with Studio/S
 - Use table-qualified Domain query field IDs (`D1_SP.D1_SP_ID`).
 - Skip input control updates when parameters change.
 - Ship JRXML without running `scripts/validate_jrxml_schema.py`.
+
+## SQL JRXML: a report from a query, with no Domain and no Ad Hoc view (added 2026-09-17)
+
+The default here is Domain-first (above). A SQL JRXML is the exception for legacy parity,
+fixed layouts, staging views, procedure calls, or a grain a join tree cannot hold safely.
+Reference implementations, all in this repo and verified importable:
+
+| Shape | File |
+| --- | --- |
+| Pattern A: main query is the SQL, groups/variables/summary in JRXML | `reports/ar_aging_by_dist_code_asof.jrxml` (CityCorp AR aging, `$P{AS_OF_DT}` bind, Sum variables) |
+| Pattern A + subreport | `reports/billing_customer_statement.jrxml` + `reports/subreports/line_items.jrxml` |
+| Pattern B: dummy main query + `subDataset` driving a `jr:table` | `domains/manual_imports/newark_rep8_aged_balance_report/REP8_Aged_Balance_staging_publish.jrxml` (Newark REP8) |
+| Pattern C: procedure call (legacy) | REP8's `REP8_STORED_PROC` subDataset: `language="plsql"`, `{call REPORT_8()}` |
+| How JRS stores it and how it is imported | the report-unit shape below; `scripts/jaspersoft/build_newark_rep8_report_import.py`, `jaspersoft/docs/jaspersoft_client_tenant_report_import.md` |
+
+### The anatomy, in schema order (`scripts/validate_jrxml_schema.py` enforces it)
+
+```
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" ... name= pageWidth= ...>
+  property / style / template
+  subDataset            (ALL subdatasets before the first parameter -- Pattern B)
+  parameter             typed: java.lang.String, java.sql.Date/Timestamp, java.math.BigDecimal
+  queryString language="SQL"   (or "plsql" for {call ...})
+  field                 one per SELECT column, name = the column alias the driver returns (Oracle: UPPERCASE)
+  sortField / variable  (Sum/Count variables for totals -- or total in SQL and print $F)
+  filterExpression, group
+  background, title, pageHeader, columnHeader, detail, columnFooter, pageFooter, summary, noData
+```
+
+Rules that are not obvious from the schema:
+
+- **Binds are `$P{NAME}`** inside the SQL; JasperReports sends them as JDBC binds, so a
+  `java.sql.Date` parameter compares to a DATE column directly (`TRUNC(ft.ars_dt) <= TRUNC($P{AS_OF_DT})`).
+  `$P!{NAME}` splices raw text into the SQL -- injection; never with a user-facing control.
+- **Qualify every table** (`CISADM.`, or the client's staging schema such as Newark's
+  `JRS2C2M.`): the datasource's default schema is not guaranteed. Never credentials in JRXML.
+- **The datasource is NOT in the JRXML.** `com.jaspersoft.studio.data.defaultdataadapter` is a
+  Studio-only hint. On the server the report unit binds `<dataSource><uri>/DataSource/<Client>_DS</uri>`;
+  a subreport or `datasetRun` inherits it through `$P{REPORT_CONNECTION}`.
+- **Types:** VARCHAR2 -> `java.lang.String`; NUMBER -> `java.math.BigDecimal` (never Double for money);
+  DATE/TIMESTAMP -> `java.sql.Timestamp` (or `java.sql.Date` when the report never needs time);
+  Y/N flags stay `java.lang.String`.
+- **A dummy main query needs a real field**: REP8 uses `SELECT 1 FROM CISADM.CI_ACCT WHERE ROWNUM=1`
+  with `<field name="1">` -- Oracle names the column `1`. Alias it (`SELECT 1 AS DUMMY`) in new work.
+- **Heavy logic belongs in Oracle.** A JRXML query is a thin `SELECT` over a view or refreshed
+  table; REP8 went from a giant inline query to `SELECT ... FROM JRS2C2M.REP8_AGED_BALANCE`
+  (refreshed by `REFRESH_NEWARK_REP8_AGED_BALANCE`, `sql/clients/newark/rep8_aged_balance/`).
+  Long queries get `<property name="net.sf.jasperreports.query.timeout" value="900"/>`.
+- **Prove the SQL before the layout**: run it read-only (`scripts/local/run_client_oracle_sql.py
+  --client <alias> --file ...`) with the report's own parameters, and reconcile a total to the
+  legacy report or a canvas before a single band is drawn.
+- **Author for the tenant's engine.** JRS 8.1/9.0 read the JRXML 6 model only; JRS 10 reads
+  JRXML 7 only (measured both ways; the version matrix and the 7->6 converter are in the
+  domain-modeling skill). A `uuid` on `jasperReport` and elements is fine for report units
+  (REP8 carries them). `strip_jrs8_incompatible_jrxml_uuid.py` is for Ad Hoc TOPIC JRXML
+  only (it also rewrites `<query>` -> `<queryString>` and strips `nestedType`).
+
+### Pattern B, the one to copy for wide tabular reports
+
+```xml
+<subDataset name="REP8_VW" uuid="...">
+  <parameter name="Report_Date" class="java.sql.Date"/>
+  <queryString language="SQL"><![CDATA[
+SELECT account, ..., current_bal, arrears_total
+FROM JRS2C2M.REP8_AGED_BALANCE
+WHERE rpt_dt = NVL($P{Report_Date}, TRUNC(SYSDATE))
+ORDER BY account]]></queryString>
+  <field name="ACCOUNT" class="java.lang.String"/>
+</subDataset>
+<parameter name="Report_Date" class="java.sql.Date">
+  <defaultValueExpression><![CDATA[new java.sql.Date(System.currentTimeMillis())]]></defaultValueExpression>
+</parameter>
+<queryString language="SQL"><![CDATA[SELECT 1 AS DUMMY FROM DUAL]]></queryString>
+<field name="DUMMY" class="java.math.BigDecimal"/>
+...
+<detail><band height="60"><componentElement><reportElement .../>
+  <jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" ...>
+    <datasetRun subDataset="REP8_VW">
+      <datasetParameter name="Report_Date"><datasetParameterExpression><![CDATA[$P{Report_Date}]]></datasetParameterExpression></datasetParameter>
+      <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+    </datasetRun>
+    <jr:column> ... </jr:column>
+  </jr:table>
+</componentElement></band></detail>
+```
+
+### How the server stores it (what an import ZIP must contain)
+
+```
+resources/SmartCity/Report/Workstreams/Debt_Management/REP8_Aged_Balance.xml        <reportUnit>: folder, name, label,
+                                                                                     <mainReport><localResource dataFile="main_jrxml.data" fileType="jrxml">,
+                                                                                     <dataSource><uri>/DataSource/Newark1_DS</uri>, <inputControl><uri>...</uri>
+resources/SmartCity/Report/Workstreams/Debt_Management/REP8_Aged_Balance_files/main_jrxml.data   the JRXML body, different extension
+resources/SmartCity/Admin/Parameters/Report_Date.xml                                 a repository input control the unit references
+resources/DataSource/Newark1_DS.xml                                                  the datasource (jsVersion measured from a real export)
+index.xml                                                                            tenant-relative: no rootTenantId
+```
+
+Import inside the client organization; a folder path that does not match `index.xml` fails
+the import (REP8 README pitfalls). For repo Domain reports the input controls also live in
+`server/input_controls/<report>_input_controls.json` + `_rest.json`; for client SQL reports
+they are usually repository controls shipped in the ZIP.
+
+### Choosing
+
+| Approach | Use when |
+| --- | --- |
+| Domain + domain JRXML | Standard Offering, governed self-service, shared semantics (preferred) |
+| Ad Hoc view / topic | exploration, crosstabs on a Domain |
+| SQL JRXML | legacy parity, fixed layout, staging view/table, procedure call, or a grain a join tree cannot hold |
