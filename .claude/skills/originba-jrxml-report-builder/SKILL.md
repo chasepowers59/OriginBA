@@ -246,9 +246,10 @@ ORDER BY account]]></queryString>
   amounts stay typed. `GET /rest_v2/reports/<uri>/inputControls/<NAME>/values` proves the
   list populates. Multi-select is `type: 7`, the parameter `java.util.Collection`, the SQL
   `$X{IN, TRIM(col), PARAM}` (true when the collection is null/empty, so blank = all); pass
-  repeated `PARAM=v` query args to run it. A pick-list is the client's CONFIGURATION table --
-  every code ever defined -- not the codes in use; say so when someone compares it with an Ad
-  Hoc view joined through the fact rows (Ellensburg: 18 tender types configured, 10 ever used).
+  repeated `PARAM=v` query args to run it. A pick-list shows codes WITH ACTIVITY: the label
+  table with an `EXISTS` against the fact table (Chase's rule, 2026-09-17, after the configured
+  list showed Auto Pay tender types no tender ever used -- Ellensburg: 18 configured, 10 used).
+  Compare CHAR = CHAR untrimmed in the EXISTS so Oracle keeps its indexes.
 - **Layout rules that survived the first DEV review**: main row = light band under a sapphire
   rule; subreport on the SAME column grid (blank placeholder cells), no caption, plain rows,
   hairline + subtotal; `fontName="SansSerif"` -- the server has no Aptos and falls back to a

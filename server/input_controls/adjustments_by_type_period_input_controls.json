@@ -37,7 +37,7 @@
       "type": "singleSelectQuery",
       "mandatory": false,
       "visible": true,
-      "query": "SELECT TRIM(adj_type_cd) AS CODE, TRIM(adj_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_ADJ_TYPE_L WHERE language_cd = 'ENG' ORDER BY 1"
+      "query": "SELECT TRIM(adj_type_cd) AS CODE, TRIM(adj_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_ADJ_TYPE_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ADJ a WHERE a.adj_type_cd = l.adj_type_cd) ORDER BY 1"
     },
     {
       "id": "ACCT_ID_F",

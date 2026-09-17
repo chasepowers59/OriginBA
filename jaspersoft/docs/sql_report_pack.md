@@ -48,15 +48,12 @@ Electric subtotals. Bill cycles and tender types are **multi-select** (a `java.u
 parameter and `$X{IN, TRIM(col), PARAM}` in the SQL, which is true when nothing is picked);
 `CHEC` + `CKMA` returned exactly those two rows and their months.
 
-**Where a pick-list's entries come from.** A code list is the client's configuration table
-(`CI_TENDER_TYPE_L`, `CI_BILL_CYC_L`, ...): every code the client has ever defined, whether
-or not any row uses it. An Ad Hoc view that joins the label table *through* the tender rows
-shows only codes with tenders. Ellensburg (2026-09-17, all tenders 2020-01..2026-10):
-18 tender types are configured, 10 have ever carried a tender (OPCC 193,162 / CHEC 63,327 /
-CKMA 17,248 / ELBX 19,717 / EFT 5,871 / CKWI 7,442 / OPOC 8,080 / CCHK 4 / MO 2 / OVUN 1);
-`APCK`, `APSV` (Auto Pay), `TPCC`/`TPCK`/`TPSV` (Invoice Cloud), `TCHK` and `CASH` have none in
-this extract -- configured, never (or no longer) used. The list is deliberately the
-configuration, not the usage: a code that starts being used tomorrow is already there.
+**Where a pick-list's entries come from.** Each list reads the client's label table
+(`CI_TENDER_TYPE_L`, `CI_BILL_CYC_L`, ...) restricted to **codes with activity** -- an `EXISTS`
+against the fact the report counts (tenders, bills, adjustments, GL lines, accounts, SAs). The
+first cut listed every code ever *configured*, and Ellensburg's carried Auto Pay and Invoice
+Cloud tender types no tender has ever used (18 configured, 10 used); Chase asked for activity
+only (2026-09-17). The `EXISTS` compares CHAR to CHAR untrimmed so Oracle keeps its indexes.
 
 ## Semantics, so the totals reconcile
 

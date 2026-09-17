@@ -29,7 +29,7 @@
       "type": "multiSelectQuery",
       "mandatory": false,
       "visible": true,
-      "query": "SELECT TRIM(bill_cyc_cd) AS CODE, TRIM(bill_cyc_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_BILL_CYC_L WHERE language_cd = 'ENG' ORDER BY 1"
+      "query": "SELECT TRIM(bill_cyc_cd) AS CODE, TRIM(bill_cyc_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_BILL_CYC_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_BILL b WHERE b.bill_cyc_cd = l.bill_cyc_cd) ORDER BY 1"
     },
     {
       "id": "SVC_TYPE_CD_F",
@@ -37,7 +37,7 @@
       "type": "singleSelectQuery",
       "mandatory": false,
       "visible": true,
-      "query": "SELECT TRIM(svc_type_cd) AS CODE, TRIM(svc_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_SVC_TYPE_L WHERE language_cd = 'ENG' ORDER BY 1"
+      "query": "SELECT TRIM(svc_type_cd) AS CODE, TRIM(svc_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_SVC_TYPE_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_SA_TYPE t JOIN CISADM.CI_SA sa ON sa.sa_type_cd = t.sa_type_cd AND sa.cis_division = t.cis_division WHERE t.svc_type_cd = l.svc_type_cd) ORDER BY 1"
     },
     {
       "id": "CIS_DIVISION_F",
@@ -45,7 +45,7 @@
       "type": "singleSelectQuery",
       "mandatory": false,
       "visible": true,
-      "query": "SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L WHERE language_cd = 'ENG' ORDER BY 1"
+      "query": "SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ACCT a WHERE a.cis_division = l.cis_division) ORDER BY 1"
     },
     {
       "id": "ACCT_ID_F",

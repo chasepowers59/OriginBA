@@ -170,6 +170,7 @@ class RestDescriptor(unittest.TestCase):
                     q = ic["query"]["query"]
                     self.assertTrue(q["value"].upper().startswith("SELECT ") and " AS CODE" in q["value"] and " AS DESCR" in q["value"])
                     self.assertIn("LANGUAGE_CD = 'ENG'", q["value"].upper())
+                    self.assertIn("EXISTS (SELECT 1 FROM CISADM.", q["value"], f"{s.name}.{ic['uri']}: a pick-list shows codes with activity")
                     self.assertEqual((ic["valueColumn"], ic["visibleColumns"]), ("CODE", ["DESCR"]))
                     self.assertEqual(q["dataSource"]["dataSourceReference"]["uri"], "/organizations/organization_1/organizations/X/DataSource/X_DS")
                 else:

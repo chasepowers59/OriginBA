@@ -29,7 +29,7 @@
       "type": "singleSelectQuery",
       "mandatory": false,
       "visible": true,
-      "query": "SELECT TRIM(dst_id) AS CODE, TRIM(dst_id) || ' - ' || descr AS DESCR FROM CISADM.CI_DST_CODE_L WHERE language_cd = 'ENG' ORDER BY 1"
+      "query": "SELECT TRIM(dst_id) AS CODE, TRIM(dst_id) || ' - ' || descr AS DESCR FROM CISADM.CI_DST_CODE_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_FT_GL g WHERE g.dst_id = l.dst_id) ORDER BY 1"
     },
     {
       "id": "GL_ACCT_F",
@@ -44,7 +44,7 @@
       "type": "singleSelectQuery",
       "mandatory": false,
       "visible": true,
-      "query": "SELECT TRIM(gl_division) AS CODE, TRIM(gl_division) || ' - ' || descr AS DESCR FROM CISADM.CI_GL_DIVISION_L WHERE language_cd = 'ENG' ORDER BY 1"
+      "query": "SELECT TRIM(gl_division) AS CODE, TRIM(gl_division) || ' - ' || descr AS DESCR FROM CISADM.CI_GL_DIVISION_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_FT f WHERE f.gl_division = l.gl_division) ORDER BY 1"
     },
     {
       "id": "CIS_DIVISION_F",
@@ -52,7 +52,7 @@
       "type": "singleSelectQuery",
       "mandatory": false,
       "visible": true,
-      "query": "SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L WHERE language_cd = 'ENG' ORDER BY 1"
+      "query": "SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ACCT a WHERE a.cis_division = l.cis_division) ORDER BY 1"
     },
     {
       "id": "FT_TYPE_FLG_F",
@@ -60,7 +60,7 @@
       "type": "singleSelectQuery",
       "mandatory": false,
       "visible": true,
-      "query": "SELECT TRIM(field_value) AS CODE, TRIM(field_value) || ' - ' || descr AS DESCR FROM CISADM.CI_LOOKUP_VAL_L WHERE field_name = 'FT_TYPE_FLG' AND language_cd = 'ENG' ORDER BY 1"
+      "query": "SELECT TRIM(field_value) AS CODE, TRIM(field_value) || ' - ' || descr AS DESCR FROM CISADM.CI_LOOKUP_VAL_L l WHERE l.field_name = 'FT_TYPE_FLG' AND l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_FT f WHERE f.ft_type_flg = l.field_value) ORDER BY 1"
     }
   ]
 }
