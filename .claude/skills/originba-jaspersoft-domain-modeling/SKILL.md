@@ -165,13 +165,14 @@ that encodes every measured difference is `~/originba-letterprint/jasperserver/t
 (author once in 7, generate the 6.20 twin, render both and assert equal text). `jsVersion` in
 an import bundle is measured from a real export of the target, never typed.
 
-## Effective-dated history tables with CURR_ columns: the current row is the one the app marks (2026-09-18)
+## Effective-dated history tables with CURR_ columns: read the plain column, not the pointer (2026-09-18)
 
 OUAF history tables such as `W1_ASSET_NODE` (asset placement, PK ASSET_ID + EFF_DTTM) carry
-`CURR_ASSET_ID` / `CURR_NODE_ID` / `CURR_ATTCH_TO_ASSET_ID`: the application fills them on
-exactly ONE row per asset (measured: 580 of 580 on Ellensburg) and leaves them null on every
-history row; `NODE_ID` is filled on all rows. A derived table that picks "the latest EFF_DTTM"
-and a report that reads `CURR_NODE_ID` go empty whenever a later-dated row is not the row the
-app calls current (Fond du Lac meter 52222349, 2026-09-18). Pick the row by the marker, fall back
-to the latest date: `domains/manual_imports/fonddulac_asset_domain/`. Fix the derived SQL, never
-the item ids or labels, so bound reports survive.
+`CURR_ASSET_ID` / `CURR_NODE_ID` / `CURR_ATTCH_TO_ASSET_ID`: a denormalised "current" pointer the
+application keeps on ONE row per asset. It is NOT reliable: on Fond du Lac two meters re-installed
+minutes after an In Store entry kept the pointer on the In Store row (43,600 assets, 2 stale). The
+current placement is the LATEST EFF_DTTM row (that is what C2M's Disposition History shows), and
+`NODE_ID` is filled on every row. So: select the latest row, and expose
+`NVL(CURR_NODE_ID, NODE_ID) AS CURR_NODE_ID` so bound reports keep their item ids. Selecting BY the
+pointer was tried first and showed those meters as In Store -- do not. Record:
+`domains/manual_imports/fonddulac_asset_domain/`.
