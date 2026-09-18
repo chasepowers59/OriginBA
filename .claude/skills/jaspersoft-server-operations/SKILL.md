@@ -61,6 +61,8 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
 | `scripts/jaspersoft/jrs_repository.py --env X whoami / search / list / import` | who am I, where is a resource, what a folder holds |
 | `scripts/jaspersoft/jrs_inventory.py snapshot [--orgs] [--split] / diff / summary / clients / environments` | backup + inventory + comparison; `jaspersoft/inventory/{README,CLIENTS,ENVIRONMENTS}.md` are generated |
 | `scripts/jaspersoft/jrs_deploy_report_units.py --org X --datasource Y [--run FROM TO]` | create/overwrite report units from the finance-pack specs and execute them |
+| `scripts/jaspersoft/jrs_run_sweep.py --env X --org Y [--folder F] --out jaspersoft/sweeps/<env>_<org>_<date>.json` | RUN everything in a folder and classify it: Ad Hoc views through queryExecutions with the view as datasource (ok / EMPTY / error), report units through the reports service, dashboards through dashboardExecutions. The post-promotion smoke, and the before/after of a server upgrade (diff the two JSON files by uri). On the test server dashboards answer `ERR_CONNECTION_REFUSED` from the server's own headless export engine, not from the dashboard: classified `export-engine`, and the UI opens them fine (Chase, 2026-09-18) |
+| `scripts/jaspersoft/audit_adhoc_saved_filters.py --env X --org Y --client <config id>` | saved Ad Hoc filter values that name the SOURCE client's configuration and the target does not have (the promoted view returns nothing there); reads the explorer's per-client config export |
 | `tests/test_jrs_inventory.py` | the offline half of the inventory tool on a real export |
 
 ## What the REST API can and cannot do here
@@ -70,3 +72,43 @@ schema, Ad Hoc state); create, overwrite, delete, copy and move resources (struc
 export any URIs with dependencies; import into a named org; run reports to PDF/XLSX/CSV;
 read pick-list values; permissions, users, roles, organizations; scheduled jobs.
 Cannot: server configuration, JDBC drivers, font extensions (Aptos), Ad Hoc design editing.
+
+## Lessons that cost time (2026-09-18) -- read before promoting or upgrading
+
+1. **REST import inside an org needs `rootTenantId=<Org>` in index.xml.** The pipeline's UI
+   package (no rootTenantId) fails by REST with `import.root.into.organization.not.allowed` and
+   creates nothing. Add the property after `pathProcessorId`; both verifiers still PASS with
+   `--tenant-id <Org>`. `/public/templates/actual_size.820.jrxml` in the package is fine.
+2. **Poll `/rest_v2/import/<id>/state`, not `/import/<id>`** (10.0 answers the latter with the
+   task's parameters, then 404). `jrs_repository.py import` does this now.
+3. **Never promote with a stored datasource overlay.** Export the target org's `/DataSource/<DS>`
+   fresh (org-scoped login) and use that as the overlay; the stored FondDuLac_DS pointed at the
+   retired pre-25.4 host. The import re-saves the DS with its own bytes (only the version counter
+   moves) -- prove it with a before/after diff of the DS XML.
+4. **The after-diff against the source is never zero.** Expect: the DS name, a
+   `<componentType>default</componentType>` the 10.0 server adds on save, and the pipeline's
+   rewiring of `/SmartCity/Report/Workstreams/...` references to `Standard_Offering/...` (ten
+   Origin_DEV resources still point at the legacy tree). Anything else is a defect.
+5. **A failed import can still change the org:** the server materialised Origin_TEST's
+   `/themes/default` from its parent on the first (failed) attempt. Harmless, but it shows in
+   the after-snapshot; do not chase it.
+6. **Saved Ad Hoc filters travel with the view.** Authored over Ellensburg, they name Ellensburg
+   rate schedules, GL codes, SA types; at another client those views return nothing. Run
+   `audit_adhoc_saved_filters.py` after every promotion and hand the client the review; the
+   replacement value is the client's decision, never a wording match.
+7. **Running Ad Hoc views by REST:** `POST /rest_v2/queryExecutions` with content type
+   `application/execution.<multiLevel|multiAxis>Query+json`, Accept `application/<kind>Data+json`,
+   body `{"dataSource":{"reference":{"uri":<VIEW uri>}},"query":<view query>}`. The VIEW as
+   datasource (not its domain) resolves calculated fields; filter parameters must be inlined
+   (their names "conflict with metadata field"). The reports service refuses view URIs.
+   Dashboards: `POST /rest_v2/dashboardExecutions` `{"uri","format"}` then `/status` and
+   `/outputResource`; on the test server the headless export engine answers
+   `ERR_CONNECTION_REFUSED` (server config, dashboards open in the UI).
+8. **Before an upgrade:** `jrs_run_sweep.py` over `/SmartCity` for EVERY prod org, committed to
+   `jaspersoft/sweeps/`, plus the inventory snapshot. After: the same, then `jrs_run_sweep.py
+   compare before.json after.json` (broke / healed / emptied / slower; row-count drift is the
+   snapshot refresh, not the upgrade) and `jrs_inventory.py diff`. Run both sweeps after the same
+   refresh wave (10:00-13:30 or 16:00-19:30 UTC) so counts line up.
+9. **Slow views are real findings**, not tool faults: Usage_Transaction___Not_Used_on_Bill
+   exceeds 240 s at Fond du Lac; Measurements___No_Reads 100 s. A view over 30 s is a candidate
+   for the snapshot layer.
