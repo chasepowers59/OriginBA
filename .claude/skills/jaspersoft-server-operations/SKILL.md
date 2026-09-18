@@ -118,8 +118,10 @@ Cannot: server configuration, JDBC drivers, font extensions (Aptos), Ad Hoc desi
     the runner's handling of value-less filters (`startsWith(x, '')`, `isAnyValue(...)`) or of
     inlined relative dates. Calibrate first: open Billed_Amount___Billing_Activity and
     Customer___Customers_Accounts_with_Active_Services in the UI at CityCorp; if they show rows,
-    fix the runner (drop value-less filters before executing) and re-sweep before trusting any
-    empty. Until then, read the sweep for BROKE/healed/slower only.
+    run `jrs_view_calibrate.py --env prod --org CityCorp <view uris>` (four execution variants:
+    inline, params, trimmed, stripped) and adopt the variant whose counts match the UI; then
+    re-sweep before trusting any empty. Until then, read the sweep for BROKE/healed/slower only.
+    Chase's theory: trailing whitespace in padded CHAR values ('Y   ', 'ACCTENRL  ').
 11. **Speed:** the sweep is bounded by the slowest views and by dashboards, not by count
     (Fond du Lac 174 resources in 7 min at 3 workers; CityCorp prod 28 min at 2 workers of which
     20 min were five views at the 240 s cap). Load check = 60 s cap, 6 workers, every prod org AT
