@@ -128,7 +128,11 @@ def do_import(zip_path: str, update: bool) -> int:
     task = json.loads(text)
     tid = task.get("id")
     for _ in range(120):
-        code, text = _call(f"/rest_v2/import/{tid}")
+        # JRS 10 answers /import/<id> with the task's PARAMETERS (and 404 once it is gone);
+        # the phase and the failure reason live under /state (learned 2026-09-18, when an
+        # org-scoped import failed import.root.into.organization.not.allowed and the poll
+        # loop reported "still running" for two minutes)
+        code, text = _call(f"/rest_v2/import/{tid}/state")
         state = json.loads(text) if text.startswith("{") else {"phase": text}
         if state.get("phase") in ("finished", "failed"):
             print(json.dumps(state, indent=2))

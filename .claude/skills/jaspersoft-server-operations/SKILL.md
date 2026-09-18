@@ -40,10 +40,17 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
 3. **Diff after**: `jrs_inventory.py diff test:Origin_DEV test:Origin_DEV` against the
    pre-change snapshot (or env:Org vs env:Org for a promotion) and put the result in the
    commit message. A change that cannot be shown as a diff did not happen.
-4. **Deploy with REST, not import zips** (`jrs_deploy_report_units.py`); two zip shapes
-   "succeeded" and created nothing on this server. Promotion of whole folders uses the
-   server's export (`/rest_v2/export`, which is what a snapshot is) re-imported into the
-   named org -- prove it on Origin_DEV first, then Origin_TEST, before any client.
+4. **Report units deploy with REST descriptors** (`jrs_deploy_report_units.py`). **Folder
+   promotion is proven (Origin_DEV -> Origin_TEST, 2026-09-18,
+   `jaspersoft/docs/origin_dev_to_origin_test_promotion_plan.md`):** org-scoped export of the
+   folder, the client pipeline (`run_client_import_pipeline.py`, tenant-root, light touch,
+   datasource overlay), both verifiers PASS, then `jrs_repository.py import` as `user|<Org>`
+   with `rootTenantId=<Org>` added to index.xml (the REST importer refuses the UI's
+   no-rootTenantId shape: `import.root.into.organization.not.allowed`). Before EVERY promotion
+   export the target org's datasource fresh and use that as the overlay -- the stored
+   FondDuLac_DS overlay pointed at a retired host. Snapshot before and after; the after diff
+   against the source must be datasource name, `componentType`, and Workstreams->Standard_Offering
+   rewiring only.
 5. Commit the inventory after every snapshot: the repo is the version history the servers
    do not keep.
 

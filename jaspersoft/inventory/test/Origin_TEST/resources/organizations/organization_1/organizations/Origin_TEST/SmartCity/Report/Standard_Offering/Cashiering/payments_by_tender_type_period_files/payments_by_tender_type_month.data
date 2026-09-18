@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="payments_by_tender_type_month" pageWidth="778" pageHeight="595" orientation="Landscape"
+    columnWidth="778" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0"
+    whenNoDataType="AllSectionsNoDetail">
+    <property name="net.sf.jasperreports.query.timeout" value="600"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+    <style name="Base" default="true" fontName="SansSerif" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
+    <style name="H3" style="Base" fontSize="9" forecolor="#0F4761"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="RowBand" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="SubHeader" style="Base" fontSize="8" forecolor="#5B6470"/>
+    <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
+    <style name="SubTotal" style="Base" fontSize="8" bold="true" forecolor="#0F4761"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
+    <query language="SQL"><![CDATA[
+SELECT TO_CHAR(e.pay_dt, 'YYYY-MM') AS PAY_MONTH,
+       COUNT(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NULL THEN 1 END) AS TENDERS,
+       COALESCE(SUM(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NULL THEN t.tender_amt ELSE 0 END), 0) AS TENDER_AMT,
+       COUNT(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NOT NULL THEN 1 END) AS CANCELLED,
+       COUNT(DISTINCT t.payor_acct_id) AS PAYOR_ACCOUNTS
+FROM CISADM.CI_PAY_TNDR t
+JOIN CISADM.CI_PAY_EVENT e ON e.pay_event_id = t.pay_event_id
+WHERE e.pay_dt >= $P{FROM_DT} AND e.pay_dt < $P{TO_DT} + INTERVAL '1' DAY AND TRIM(t.tender_type_cd) = TRIM($P{TENDER_TYPE_CD})
+  AND $X{IN, TRIM(t.tender_type_cd), TENDER_TYPE_CD_F}
+  AND ($P{PAYOR_ACCT_ID_F} IS NULL OR TRIM(t.payor_acct_id) = TRIM($P{PAYOR_ACCT_ID_F}))
+  AND ($P{TNDR_CTL_ID_F} IS NULL OR TRIM(t.tndr_ctl_id) = TRIM($P{TNDR_CTL_ID_F}))
+  AND ($P{MIN_AMT_F} IS NULL OR t.tender_amt >= $P{MIN_AMT_F})
+GROUP BY TO_CHAR(e.pay_dt, 'YYYY-MM')
+ORDER BY PAY_MONTH
+]]></query>
+    <parameter name="FROM_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TO_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TENDER_TYPE_CD" class="java.lang.String">
+        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TENDER_TYPE_CD_F" class="java.util.Collection">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="PAYOR_ACCT_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TNDR_CTL_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="MIN_AMT_F" class="java.math.BigDecimal">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <field name="PAY_MONTH" class="java.lang.String"/>
+    <field name="TENDERS" class="java.lang.Long"/>
+    <field name="TENDER_AMT" class="java.math.BigDecimal"/>
+    <field name="CANCELLED" class="java.lang.Long"/>
+    <field name="PAYOR_ACCOUNTS" class="java.lang.Long"/>
+    <variable name="SUM_TENDERS" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{TENDERS}]]></expression>
+    </variable>
+    <variable name="SUM_TENDER_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{TENDER_AMT}]]></expression>
+    </variable>
+    <variable name="SUM_CANCELLED" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{CANCELLED}]]></expression>
+    </variable>
+    <variable name="SUM_PAYOR_ACCOUNTS" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{PAYOR_ACCOUNTS}]]></expression>
+    </variable>
+    <detail>
+        <band height="12">
+            <element kind="textField" x="0" y="0" width="268" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{PAY_MONTH}]]></expression></element>
+            <element kind="textField" x="268" y="0" width="80" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{TENDERS}]]></expression></element>
+            <element kind="textField" x="348" y="0" width="120" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{TENDER_AMT}]]></expression></element>
+            <element kind="textField" x="468" y="0" width="80" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{CANCELLED}]]></expression></element>
+            <element kind="textField" x="668" y="0" width="110" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{PAYOR_ACCOUNTS}]]></expression></element>
+        </band>
+    </detail>
+    <summary height="20">
+            <element kind="line" x="0" y="1" width="778" height="1"><pen lineWidth="0.5" lineColor="#B9C6D2"/></element>
+            <element kind="staticText" x="0" y="2" width="268" height="12" style="SubTotal" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Subtotal]]></text></element>
+            <element kind="textField" x="268" y="2" width="80" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_TENDERS}]]></expression></element>
+            <element kind="textField" x="348" y="2" width="120" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_TENDER_AMT}]]></expression></element>
+            <element kind="textField" x="468" y="2" width="80" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_CANCELLED}]]></expression></element>
+            <element kind="textField" x="668" y="2" width="110" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_PAYOR_ACCOUNTS}]]></expression></element>
+    </summary>
+</jasperReport>

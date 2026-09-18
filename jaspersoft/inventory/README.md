@@ -14,8 +14,8 @@ each snapshot is under `backups/jaspersoft/<env>/<stamp>/` (gitignored). Never h
 | Fond_Du_Lac | 20260918-050245 | 55 | 67 | 73 | 0 | 500 | FondDuLac_DS (JRS2C2M @ smartcity-db-test-v1-2.originsmartops.com:1521), FondDuLac_TST (JRS2C2M @ smartcity-db-test.originsmartops.com:1521) |
 | Newark1 | 20260918-050245 | 118 | 126 | 347 | 44 | 500 | Newark1_DS (JRS2C2M @ smartcity-db-test-v1-2.originsmartops.com:1521) |
 | Odessa | 20260918-050245 | 16 | 85 | 292 | 38 | 1205 | Odessa_DS (JRS2C2M @ 10.17.0.193:1521), Origin_DataVergence_DS (JRS2C2M @ 10.16.0.225:1521), Origin_DEV_DS (JRS2C2M @ 10.13.4.91:1521) |
-| Origin_DEV | 20260918-050245 | 103 | 156 | 518 | 67 | 490 | Origin_DEV_DS (JRS2C2M @ 10.13.4.91:1521), Origin_INT_DEV_DS (JRS2C2M_DEV @ 10.16.0.89:1521) |
-| Origin_TEST | 20260918-050245 | 76 | 57 | 207 | 47 | 2 | Origin_DEV_DS (JRS2C2M @ 10.13.4.91:1521), Origin_TEST_DS (JRS2C2M @ smartcity-db-test.originsmartops.com:1521) |
+| Origin_DEV | 20260918-095947 | 103 | 156 | 518 | 67 | 490 | Origin_DEV_DS (JRS2C2M @ 10.13.4.91:1521), Origin_INT_DEV_DS (JRS2C2M_DEV @ 10.16.0.89:1521) |
+| Origin_TEST | 20260918-102329 | 80 | 110 | 363 | 61 | 482 | Origin_DEV_DS (JRS2C2M @ 10.13.4.91:1521), Origin_TEST_DS (JRS2C2M @ smartcity-db-test.originsmartops.com:1521) |
 
 ## prod
 

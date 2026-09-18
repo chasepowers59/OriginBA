@@ -73,3 +73,42 @@ server; its test org is the first real target once this passes).
   yes), or be cleaned after the proof?
 - Origin_TEST also carries a datasource named `Origin_DEV_DS`. Leave it, or remove it so a
   package that leaked the source datasource name would fail loudly there?
+
+## Result (2026-09-18, run end to end)
+
+**Proven.** `/SmartCity/Report/Standard_Offering` from Origin_DEV is in Origin_TEST: 53 domains,
+156 Ad Hoc views, 14 dashboards, 4 report units, nine modules -- the same file set as the source
+(0 only-in either side). Origin_TEST_DS was re-saved with its own export's bytes: URL, user,
+driver and update date unchanged (only the repository version counter moved 30 to 31). The
+adjustment-type pick-list answered 59 codes from the Ellensburg test database through
+Origin_TEST_DS in one second and a report rendered. Baseline and after snapshots are committed.
+
+**What the run taught, and what changed because of it.**
+- The REST import inside an org needs the package to carry `rootTenantId=<Org>` -- the server's
+  own org-export shape. The tenant-root package the pipeline builds (no rootTenantId, for the
+  UI's Repository > Import) fails by REST with `import.root.into.organization.not.allowed`, and
+  nothing is created. So: pipeline package + `rootTenantId` property = the REST package. The
+  `/public` dashboard template in the package was not the cause (tested without it).
+- `jrs_repository.py import` polled `/rest_v2/import/<id>`, which on 10.0 returns the task's
+  parameters, so it reported "still running" on a failed task. It polls `/state` now and prints
+  the failure reason.
+- The verifiers pass either shape (`--tenant-id <Org>` for the REST one).
+- 171 of the 728 files differ after import, all descriptor-level: the server adds
+  `<componentType>default</componentType>` to local resources on save, and 7 dashboards plus
+  3 views that in Origin_DEV still point at `/SmartCity/Report/Workstreams/...` domains (the
+  legacy tree, including the old VEE Exception domain) are rewired by the pipeline to the
+  Standard_Offering copies. That rewiring is correct for every client; it also means those ten
+  Origin_DEV resources read the legacy domains at home.
+- Side effect: the first (failed) import made the server materialise Origin_TEST's
+  `/themes/default` from its parent (five ORIGINBA_V1x note files, created 16:10 UTC, content
+  dated 2026-08-12). Theme inheritance, not content from the package; harmless, recorded.
+- The repo's `deploy/jaspersoft_datasources/clients/FondDuLac_DS` overlay was STALE: it pointed
+  at the pre-25.4 host (`smartcity-db-test`, `origintestvcn`) while the live datasource points at
+  `smartcity-db-test-v1-2`. Importing with it would have moved Fond du Lac's datasource back.
+  The overlay is now the org's own export of 2026-09-18, and the rule is: **export the target
+  org's datasource fresh before every promotion; never promote with a stored overlay.**
+
+Fond du Lac's package is built and verified from the same source export
+(`prepared_imports/Fond_Du_Lac_Standard_Offering_import_rest.zip`, DS byte-identical to the
+live export, no Origin_DEV identifier, PASS on both verifiers). Not imported: a client org waits
+for Chase's word.

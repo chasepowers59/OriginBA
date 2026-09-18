@@ -323,7 +323,7 @@ Snapshot 20260918-050245 · 1205 files, 292 views, 85 domains, 38 dashboards, 16
 
 ## test / Origin_DEV
 
-Snapshot 20260918-050245 · 518 views, 490 files, 156 domains, 103 reports, 67 dashboards, 2 datasources
+Snapshot 20260918-095947 · 518 views, 490 files, 156 domains, 103 reports, 67 dashboards, 2 datasources
 
 | Datasource | User | Connection |
 | --- | --- | --- |
@@ -371,7 +371,7 @@ Snapshot 20260918-050245 · 518 views, 490 files, 156 domains, 103 reports, 67 d
 
 ## test / Origin_TEST
 
-Snapshot 20260918-050245 · 207 views, 76 reports, 57 domains, 47 dashboards, 2 datasources, 2 files
+Snapshot 20260918-102329 · 482 files, 363 views, 110 domains, 80 reports, 61 dashboards, 2 datasources
 
 | Datasource | User | Connection |
 | --- | --- | --- |
@@ -381,9 +381,24 @@ Snapshot 20260918-050245 · 207 views, 76 reports, 57 domains, 47 dashboards, 2 
 | Top-level folder | Contents |
 | --- | --- |
 | /DataSource | 2 datasources |
-| /SmartCity | 207 views, 76 reports, 57 domains, 47 dashboards |
+| /SmartCity | 363 views, 110 domains, 80 reports, 61 dashboards |
 | /public | 1 files |
 | /templates | 1 files |
+| /themes | 480 files |
+
+**/SmartCity/Report/Standard_Offering**
+
+| Folder | Contents |
+| --- | --- |
+| Billing_and_Rates | 20 views, 5 domains, 3 dashboards, 1 reports |
+| Cashiering | 18 views, 5 domains, 1 reports, 1 dashboards |
+| Common | 13 views, 6 domains, 2 dashboards |
+| Customer_Operations | 22 views, 12 domains, 1 dashboards |
+| Debt_Management | 17 views, 6 domains, 1 dashboards |
+| Field_Operations | 7 views, 3 domains, 1 dashboards |
+| Finance | 26 views, 5 domains, 2 dashboards, 2 reports |
+| Meter_Operations | 26 views, 9 domains, 2 dashboards |
+| New_Services___Planning | 7 views, 2 domains, 1 dashboards |
 
 **/SmartCity/Report/Workstreams**
 
