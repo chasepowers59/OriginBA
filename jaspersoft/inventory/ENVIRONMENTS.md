@@ -492,9 +492,9 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 
 ### Fond_Du_Lac
 
-96 same · 36 differ · 86 only in test · 162 only in prod
+96 same · 36 differ · 313 only in test · 162 only in prod
 
-**only in test** — 31 views, 29 domains, 15 files, 9 reports, 1 datasources, 1 controls
+**only in test** — 187 views, 82 domains, 15 files, 14 dashboards, 13 reports, 1 datasources, 1 controls
 
 - views: `/SmartCity/Origin_Tools/DataVergence/Configuration/Admin_Configuration___Ad_Hoc_View___Tabular_1`
 - views: `/SmartCity/Origin_Tools/Routine_Reports/Batch_Process___Ad_Hoc_View___Batch_Run_by_Status`
@@ -511,7 +511,7 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - views: `/SmartCity/Report/FDL_Asset/Metron_Data_Exchange_Replication`
 - views: `/SmartCity/Report/FDL_Latest_Bills/FDL_Latest_Bill_Segment_Ad_Hoc_View`
 - views: `/SmartCity/Report/FDL_Pending_Bills/FDL_Pending_Bills_Ad_Hoc_View`
-- views: … 16 more
+- views: … 172 more
 - domains: `/SmartCity/Origin_Tools/DataVergence/Configuration/Admin_Configuration___Domain`
 - domains: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance___FT_GL_Domain_V02`
 - domains: `/SmartCity/Report/FDL_Accounts_and_Payments/FDL_Account_Premise_Domain`
@@ -527,7 +527,7 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - domains: `/SmartCity/Report/FDL_Pending_Bills/FDL_Billing_Overview_Domain`
 - domains: `/SmartCity/Report/FDL_Pending_Bills/FDL_Pending_Bills_Domain`
 - domains: `/SmartCity/Report/FDL_SA_To_Close/FDL_SA_To_Close_Domain`
-- domains: … 14 more
+- domains: … 67 more
 - files: `/SmartCity/Admin/Image/smartcity_logo_v3_1.png`
 - files: `/SmartCity/Bill/inputXML/FDL_POSTROUT_.xml`
 - files: `/SmartCity/Bill/inputXML/InteceptTransformedSort_withGlobalBillPrintGroup.xml`
@@ -543,6 +543,20 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - files: `/templates/cm_actual_size_v0`
 - files: `/templates/default.820.jrtx`
 - files: `/templates/origin-002dlogo-002dwhite-002d1`
+- dashboards: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Amount___Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Executive_Multi_Utility_KPI_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage___Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Cashiering/Payment_Header/Cashiering_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Common/Batch/Batch_Process_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Common/To_Do/Exception_and_To_Do_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Customer_Operations/Customer_Contact/Customer_Operations_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Debt_Management/SA_Snapshot___Aged_Balance/Collections_Performance_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Field_Operations/Field_Activity/Field_Operations_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Finance/Financial_Transaction/Finance_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Finance/General_Ledger/General_Ledger___Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Meter_Operations/Measurements/Measurements___Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Meter_Operations/Usage/Usage_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/New_Services___Planning/New_Services/New_Services_Dashboard`
 - reports: `/SmartCity/Report/FDL_Latest_Bills/FDL_Latest_Bill_Segment_Report`
 - reports: `/SmartCity/Report/FDL_Pending_Bills/FDL_Pending_Bills_Report`
 - reports: `/SmartCity/Report/FDL_V_Domains/FDL_Right_Side_V___SA_Ad_Hoc_View_Report`
@@ -552,6 +566,10 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - reports: `/SmartCity/Report/SC_Customer_Contacts/SCCustomerContactCOMPLIANCEReport`
 - reports: `/SmartCity/Report/SC_Origin_Tools/SC_Bill_Compare_Report`
 - reports: `/SmartCity/Report/SC_V/SC_Active_SAs_by_Customer_Class_Ad_Hoc_View_Report`
+- reports: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period`
+- reports: `/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period`
+- reports: `/SmartCity/Report/Standard_Offering/Finance/adjustments_by_type_period`
+- reports: `/SmartCity/Report/Standard_Offering/Finance/gl_by_distribution_code_period`
 - datasources: `/DataSource/FondDuLac_TST`
 - controls: `/templates/ADHOC_TITLE`
 

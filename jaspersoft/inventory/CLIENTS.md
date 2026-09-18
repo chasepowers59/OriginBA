@@ -172,7 +172,7 @@ Snapshot 20260918-050245 · 507 files, 340 views, 163 domains, 118 reports, 13 d
 
 ## test / Fond_Du_Lac
 
-Snapshot 20260918-050245 · 500 files, 73 views, 67 domains, 55 reports, 2 datasources, 1 outputs, 1 dataDefinerUnit, 1 controls
+Snapshot 20260918-104538 · 500 files, 229 views, 120 domains, 59 reports, 14 dashboards, 2 datasources, 1 outputs, 1 dataDefinerUnit, 1 controls
 
 | Datasource | User | Connection |
 | --- | --- | --- |
@@ -182,11 +182,25 @@ Snapshot 20260918-050245 · 500 files, 73 views, 67 domains, 55 reports, 2 datas
 | Top-level folder | Contents |
 | --- | --- |
 | /DataSource | 2 datasources |
-| /SmartCity | 73 views, 67 domains, 55 reports, 11 files, 1 outputs |
+| /SmartCity | 229 views, 120 domains, 59 reports, 14 dashboards, 11 files, 1 outputs |
 | /adhoc | 1 dataDefinerUnit |
 | /public | 1 files |
 | /templates | 8 files, 1 controls |
 | /themes | 480 files |
+
+**/SmartCity/Report/Standard_Offering**
+
+| Folder | Contents |
+| --- | --- |
+| Billing_and_Rates | 20 views, 5 domains, 3 dashboards, 1 reports |
+| Cashiering | 18 views, 5 domains, 1 reports, 1 dashboards |
+| Common | 13 views, 6 domains, 2 dashboards |
+| Customer_Operations | 22 views, 12 domains, 1 dashboards |
+| Debt_Management | 17 views, 6 domains, 1 dashboards |
+| Field_Operations | 7 views, 3 domains, 1 dashboards |
+| Finance | 26 views, 5 domains, 2 dashboards, 2 reports |
+| Meter_Operations | 26 views, 9 domains, 2 dashboards |
+| New_Services___Planning | 7 views, 2 domains, 1 dashboards |
 
 **/SmartCity/Report/Workstreams**
 

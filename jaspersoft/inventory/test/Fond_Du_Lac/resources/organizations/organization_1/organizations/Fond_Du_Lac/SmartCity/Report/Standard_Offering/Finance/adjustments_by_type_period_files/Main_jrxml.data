@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="adjustments_by_type_period" pageWidth="842" pageHeight="595" orientation="Landscape"
+    columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+    whenNoDataType="AllSectionsNoDetail">
+    <property name="net.sf.jasperreports.query.timeout" value="600"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+    <style name="Base" default="true" fontName="SansSerif" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
+    <style name="H3" style="Base" fontSize="9" forecolor="#0F4761"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="RowBand" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="SubHeader" style="Base" fontSize="8" forecolor="#5B6470"/>
+    <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
+    <style name="SubTotal" style="Base" fontSize="8" bold="true" forecolor="#0F4761"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
+    <query language="SQL"><![CDATA[
+SELECT TRIM(a.adj_type_cd) AS ADJ_TYPE_CD, COALESCE(al.descr, TRIM(a.adj_type_cd)) AS ADJ_TYPE_DESCR,
+       COUNT(*) AS ADJUSTMENTS, COALESCE(SUM(a.adj_amt), 0) AS NET_AMT,
+       COALESCE(SUM(CASE WHEN a.adj_amt > 0 THEN a.adj_amt ELSE 0 END), 0) AS DEBIT_AMT,
+       COALESCE(SUM(CASE WHEN a.adj_amt < 0 THEN a.adj_amt ELSE 0 END), 0) AS CREDIT_AMT,
+       MAX(a.adj_amt) AS LARGEST, MIN(a.adj_amt) AS SMALLEST
+FROM CISADM.CI_ADJ a
+LEFT JOIN CISADM.CI_ADJ_TYPE_L al ON al.adj_type_cd = a.adj_type_cd AND al.language_cd = 'ENG'
+WHERE TRIM(a.adj_status_flg) = '50' AND a.cre_dt >= $P{FROM_DT} AND a.cre_dt < $P{TO_DT} + INTERVAL '1' DAY
+  AND ($P{ADJ_TYPE_CD_F} IS NULL OR TRIM(a.adj_type_cd) = TRIM($P{ADJ_TYPE_CD_F}))
+  AND ($P{ACCT_ID_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = a.sa_id AND TRIM(fsa.acct_id) = TRIM($P{ACCT_ID_F})))
+  AND ($P{SA_ID_F} IS NULL OR TRIM(a.sa_id) = TRIM($P{SA_ID_F}))
+  AND ($P{MIN_ABS_AMT_F} IS NULL OR ABS(a.adj_amt) >= $P{MIN_ABS_AMT_F})
+GROUP BY TRIM(a.adj_type_cd), COALESCE(al.descr, TRIM(a.adj_type_cd))
+ORDER BY ABS(COALESCE(SUM(a.adj_amt), 0)) DESC
+]]></query>
+    <parameter name="FROM_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TO_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TOP_N" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[10]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ADJ_TYPE_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ACCT_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="SA_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="MIN_ABS_AMT_F" class="java.math.BigDecimal">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <field name="ADJ_TYPE_CD" class="java.lang.String"/>
+    <field name="ADJ_TYPE_DESCR" class="java.lang.String"/>
+    <field name="ADJUSTMENTS" class="java.lang.Long"/>
+    <field name="NET_AMT" class="java.math.BigDecimal"/>
+    <field name="DEBIT_AMT" class="java.math.BigDecimal"/>
+    <field name="CREDIT_AMT" class="java.math.BigDecimal"/>
+    <field name="LARGEST" class="java.math.BigDecimal"/>
+    <field name="SMALLEST" class="java.math.BigDecimal"/>
+    <variable name="SUM_ADJUSTMENTS" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{ADJUSTMENTS}]]></expression>
+    </variable>
+    <variable name="SUM_NET_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{NET_AMT}]]></expression>
+    </variable>
+    <variable name="SUM_DEBIT_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{DEBIT_AMT}]]></expression>
+    </variable>
+    <variable name="SUM_CREDIT_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{CREDIT_AMT}]]></expression>
+    </variable>
+    <title height="52">
+            <element kind="textField" x="0" y="0" width="802" height="26" style="TitleSapphire" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Adjustments by Type"]]></expression></element>
+            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Adjustment created date " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  frozen adjustments by creation date" + ($P{ADJ_TYPE_CD_F} == null ? "" : "  |  Adjustment type: " + $P{ADJ_TYPE_CD_F}) + ($P{ACCT_ID_F} == null ? "" : "  |  Account ID: " + $P{ACCT_ID_F}) + ($P{SA_ID_F} == null ? "" : "  |  Service agreement ID: " + $P{SA_ID_F}) + ($P{MIN_ABS_AMT_F} == null ? "" : "  |  Minimum absolute amount: " + $P{MIN_ABS_AMT_F})]]></expression></element>
+    </title>
+    <columnHeader height="18">
+            <element kind="staticText" x="0" y="0" width="70" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Type]]></text></element>
+            <element kind="staticText" x="70" y="0" width="222" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Adjustment Type]]></text></element>
+            <element kind="staticText" x="292" y="0" width="60" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Count]]></text></element>
+            <element kind="staticText" x="352" y="0" width="110" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Net Amount]]></text></element>
+            <element kind="staticText" x="462" y="0" width="100" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Debits]]></text></element>
+            <element kind="staticText" x="562" y="0" width="100" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Credits]]></text></element>
+            <element kind="staticText" x="662" y="0" width="70" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Largest]]></text></element>
+            <element kind="staticText" x="732" y="0" width="70" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Smallest]]></text></element>
+    </columnHeader>
+    <detail>
+        <band height="22" splitType="Prevent">
+            <element kind="line" x="0" y="2" width="802" height="1"><pen lineWidth="0.75" lineColor="#006FAC"/></element>
+            <element kind="textField" x="0" y="3" width="70" height="18" style="RowBand" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ADJ_TYPE_CD}]]></expression></element>
+            <element kind="textField" x="70" y="3" width="222" height="18" style="RowBand" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ADJ_TYPE_DESCR}]]></expression></element>
+            <element kind="textField" x="292" y="3" width="60" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{ADJUSTMENTS}]]></expression></element>
+            <element kind="textField" x="352" y="3" width="110" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{NET_AMT}]]></expression></element>
+            <element kind="textField" x="462" y="3" width="100" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{DEBIT_AMT}]]></expression></element>
+            <element kind="textField" x="562" y="3" width="100" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{CREDIT_AMT}]]></expression></element>
+            <element kind="textField" x="662" y="3" width="70" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{LARGEST}]]></expression></element>
+            <element kind="textField" x="732" y="3" width="70" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{SMALLEST}]]></expression></element>
+        </band>
+        <band height="20" splitType="Stretch">
+            <element kind="subreport" x="24" y="0" width="778" height="20" positionType="Float" removeLineWhenBlank="true" usingCache="false">
+                <parameter name="FROM_DT"><expression><![CDATA[$P{FROM_DT}]]></expression></parameter>
+                <parameter name="TO_DT"><expression><![CDATA[$P{TO_DT}]]></expression></parameter>
+                <parameter name="TOP_N"><expression><![CDATA[$P{TOP_N}]]></expression></parameter>
+                <parameter name="ADJ_TYPE_CD_F"><expression><![CDATA[$P{ADJ_TYPE_CD_F}]]></expression></parameter>
+                <parameter name="ACCT_ID_F"><expression><![CDATA[$P{ACCT_ID_F}]]></expression></parameter>
+                <parameter name="SA_ID_F"><expression><![CDATA[$P{SA_ID_F}]]></expression></parameter>
+                <parameter name="MIN_ABS_AMT_F"><expression><![CDATA[$P{MIN_ABS_AMT_F}]]></expression></parameter>
+                <parameter name="ADJ_TYPE_CD"><expression><![CDATA[$F{ADJ_TYPE_CD}]]></expression></parameter>
+                <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                <expression><![CDATA["repo:adjustments_by_type_top"]]></expression>
+            </element>
+        </band>
+    </detail>
+    <pageFooter height="14">
+            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential"]]></expression></element>
+            <element kind="textField" x="600" y="0" width="150" height="14" style="FooterConfidential" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Page " + $V{PAGE_NUMBER} + " of"]]></expression></element>
+            <element kind="textField" x="750" y="0" width="52" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report"><expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression></element>
+    </pageFooter>
+    <summary height="24">
+            <element kind="line" x="0" y="2" width="802" height="1"><pen lineWidth="1.0" lineColor="#006FAC"/></element>
+            <element kind="staticText" x="0" y="4" width="70" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Total]]></text></element>
+            <element kind="staticText" x="70" y="4" width="222" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="textField" x="292" y="4" width="60" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_ADJUSTMENTS}]]></expression></element>
+            <element kind="textField" x="352" y="4" width="110" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_NET_AMT}]]></expression></element>
+            <element kind="textField" x="462" y="4" width="100" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_DEBIT_AMT}]]></expression></element>
+            <element kind="textField" x="562" y="4" width="100" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_CREDIT_AMT}]]></expression></element>
+            <element kind="staticText" x="662" y="4" width="70" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="staticText" x="732" y="4" width="70" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+    </summary>
+</jasperReport>

@@ -110,5 +110,7 @@ Origin_TEST_DS in one second and a report rendered. Baseline and after snapshots
 
 Fond du Lac's package is built and verified from the same source export
 (`prepared_imports/Fond_Du_Lac_Standard_Offering_import_rest.zip`, DS byte-identical to the
-live export, no Origin_DEV identifier, PASS on both verifiers). Not imported: a client org waits
-for Chase's word.
+live export, no Origin_DEV identifier, PASS on both verifiers). **Imported into the Fond du Lac test org 2026-09-18 on Chase's word:** 53 domains, 156
+views, 14 dashboards, 4 report units, nine modules; FondDuLac_DS re-saved with its own bytes
+(v1-2 host, update date 2026-08-19 unchanged); the adjustment-type pick-list answered 44 codes
+from the Fond du Lac test database and a report rendered. Before/after snapshots committed.
