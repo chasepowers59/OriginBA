@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="BILLING_SUMMARY" label="BILLING_SUMMARY" resourceId="BILLING_SUMMARY"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account ID" resourceId="BILLING_SUMMARY.ACCT_ID"></item>
+    <item id="BILL_DT" label="Bill Date" resourceId="BILLING_SUMMARY.BILL_DT"></item>
+    <item id="BILL_ID" label="Bill ID" resourceId="BILLING_SUMMARY.BILL_ID"></item>
+    <item id="CALC_AMT" label="Calculated Amount" resourceId="BILLING_SUMMARY.CALC_AMT"></item>
+    <item id="DST_ID" label="Distribution Code" resourceId="BILLING_SUMMARY.DST_ID"></item>
+    <item id="DESCR_ON_BILL" label="Description on Bill" resourceId="BILLING_SUMMARY.DESCR_ON_BILL"></item>
+    <item id="DUE_DT" label="Due Date" resourceId="BILLING_SUMMARY.DUE_DT"></item>
+    <item id="FT_TYPE_FLG" label="Financial Transaction Type" resourceId="BILLING_SUMMARY.FT_TYPE_FLG"></item>
+    <item id="REV_CL_CD" label="Revenue Class" resourceId="BILLING_SUMMARY.REV_CL_CD"></item>
+    <item id="SA_TYPE_CD" label="SA Type" resourceId="BILLING_SUMMARY.SA_TYPE_CD"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="BILLING_SUMMARY" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="BILL_DT" type="java.sql.Timestamp"></field>
+        <field id="DUE_DT" type="java.sql.Timestamp"></field>
+        <field id="DESCR_ON_BILL" type="java.lang.String"></field>
+        <field id="CALC_AMT" type="java.math.BigDecimal"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="REV_CL_CD" type="java.lang.String"></field>
+        <field id="FT_TYPE_FLG" type="java.lang.String"></field>
+        <field id="DST_ID" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT 
+    BSC.DST_ID,
+    SA.SA_TYPE_CD,
+    SAT.REV_CL_CD, 
+    FT.FT_TYPE_FLG,
+    B.BILL_ID,
+    B.BILL_DT,
+    B.DUE_DT,
+    B.ACCT_ID,
+    CASE 
+        WHEN BSC.CALC_GRP_CD IN ('COMWCHG','INDWCHG','MUNWCHG','PAWCHG','WHOWCHG','RESWTIERCHG') 
+            THEN 'Water Consumption' 
+        WHEN BSC.CALC_GRP_CD IN ('WMTRCHG') 
+            THEN CONCAT('Meter - ', BSC.CHAR_VAL)
+        WHEN BSC.CALC_GRP_CD IN ('WSPRCHG') 
+            THEN CONCAT('Sprinkler - ', BSC.CHAR_VAL) 
+        WHEN BSC.CALC_GRP_CD IN ('FRLNMTRSZCHG') 
+            THEN CONCAT('Fire Hydrant - ', BSC.CHAR_VAL) 
+        WHEN BSC.CALC_GRP_CD IN ('REGSTIERCHG','RESSTIERCHG','WHOSTIERCHGCTY','WHOSTIERCHGRU') 
+            THEN 'Sewer'
+        ELSE BSC.DESCR_ON_BILL 
+    END AS DESCR_ON_BILL,
+    BSC.CALC_AMT
+FROM CISADM.CI_BILL B
+INNER JOIN CISADM.CI_FT FT ON FT.BILL_ID = B.BILL_ID AND FT.FT_TYPE_FLG IN ('BS','BX') AND FT.FREEZE_SW = 'Y'
+INNER JOIN CISADM.CI_BSEG BS ON BS.BSEG_ID = FT.SIBLING_ID
+INNER JOIN CISADM.CI_SA SA ON SA.SA_ID = BS.SA_ID AND SA.SA_ID = FT.SA_ID
+INNER JOIN CISADM.CI_SA_TYPE SAT ON SAT.SA_TYPE_CD = SA.SA_TYPE_CD AND SAT.CIS_DIVISION = SA.CIS_DIVISION
+INNER JOIN CISADM.CI_BSEG_CALC_LN BSC ON BSC.BSEG_ID = BS.BSEG_ID AND BSC.DST_ID != ' '
+UNION
+SELECT 
+    ADT.DST_ID,
+    SA.SA_TYPE_CD, 
+    SAT.REV_CL_CD, 
+    FT.FT_TYPE_FLG,
+    B.BILL_ID,
+    B.BILL_DT,
+    B.DUE_DT,
+    B.ACCT_ID,
+    ADTL.DESCR_ON_BILL, 
+    AD.ADJ_AMT AS CALC_AMT
+FROM CISADM.CI_BILL B 
+INNER JOIN CISADM.CI_FT FT ON FT.BILL_ID = B.BILL_ID AND FT.FT_TYPE_FLG IN ('AD','AX')
+INNER JOIN CISADM.CI_ADJ AD ON AD.ADJ_ID = FT.SIBLING_ID
+INNER JOIN CISADM.CI_SA SA ON SA.SA_ID = AD.SA_ID AND SA.SA_ID = FT.SA_ID
+INNER JOIN CISADM.CI_SA_TYPE SAT ON SAT.SA_TYPE_CD = SA.SA_TYPE_CD AND SAT.CIS_DIVISION = SA.CIS_DIVISION
+INNER JOIN CISADM.CI_ADJ_TYPE_L ADTL ON ADTL.ADJ_TYPE_CD = AD.ADJ_TYPE_CD
+INNER JOIN CISADM.CI_ADJ_TYPE ADT ON ADT.ADJ_TYPE_CD = AD.ADJ_TYPE_CD</query>
+    </jdbcQuery>
+  </resources>
+</schema>

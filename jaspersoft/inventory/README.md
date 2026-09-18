@@ -17,6 +17,14 @@ each snapshot is under `backups/jaspersoft/<env>/<stamp>/` (gitignored). Never h
 | Origin_DEV | 20260918-050245 | 103 | 156 | 518 | 67 | 490 | Origin_DEV_DS (JRS2C2M @ 10.13.4.91:1521), Origin_INT_DEV_DS (JRS2C2M_DEV @ 10.16.0.89:1521) |
 | Origin_TEST | 20260918-050245 | 76 | 57 | 207 | 47 | 2 | Origin_DEV_DS (JRS2C2M @ 10.13.4.91:1521), Origin_TEST_DS (JRS2C2M @ smartcity-db-test.originsmartops.com:1521) |
 
+## prod
+
+| Organization | Snapshot | Report units | Domains | Ad Hoc views | Dashboards | Files | Datasources (user @ host) |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
+| CityCorp | 20260918-051522 | 88 | 126 | 301 | 14 | 17 | CityCorp_DS (JRS2C2M @ smartcity-db-prod-v1-2.originsmartops.com:1521), AuditDataSource (? @ jdbc), AuditVirtualDataSource (? @ ?), JasperserverDataSource (? @ jdbc), JSDiagnosticDataSource (? @ ?), ReportMonitoringDataSource (? @ jdbc) |
+| Ellensburg | 20260918-051522 | 151 | 90 | 197 | 2 | 27 | Ellensburg_DS (JRS2C2M @ smartcity-db-prod-v1-2.originsmartops.com:1521), AuditDataSource (? @ jdbc), AuditVirtualDataSource (? @ ?), JasperserverDataSource (? @ jdbc), JSDiagnosticDataSource (? @ ?), ReportMonitoringDataSource (? @ jdbc) |
+| Newark1 | 20260918-051522 | 99 | 60 | 102 | 3 | 32 | Newark1_DS (JRS2C2M @ smartcity-db-prod-v1-2.originsmartops.com:1521), AuditDataSource (? @ jdbc), AuditVirtualDataSource (? @ ?), JasperserverDataSource (? @ jdbc), JSDiagnosticDataSource (? @ ?), ReportMonitoringDataSource (? @ jdbc) |
+
 ## internal
 
 | Organization | Snapshot | Report units | Domains | Ad Hoc views | Dashboards | Files | Datasources (user @ host) |

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="AuditDataSource">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="JASPERSERVER">
+          <string>{attribute('auditDB')}</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="job_id" label="Job ID" resourceId="JoinTree_1.audit_properties_derived_table.JOB_ID"></item>
+    <item id="job_label" label="Job Name" resourceId="JoinTree_1.audit_properties_derived_table.JOB_LABEL"></item>
+    <item id="job_desc" label="Job Description" resourceId="JoinTree_1.audit_properties_derived_table.JOB_DESC"></item>
+    <item id="resource_name" label="Resource" resourceId="JoinTree_1.audit_properties_derived_table.RESOURCE_NAME"></item>
+    <item id="relative_uri" label="URL" resourceId="JoinTree_1.relative_uri"></item>
+    <item id="username" label="User" resourceId="JoinTree_1.JIAUDITEVENT.USERNAME"></item>
+    <item id="organization_id" label="Organization ID" resourceId="JoinTree_1.audit_properties_derived_table.ORGANIZATION_ID"></item>
+    <item id="organization" label="Organization" resourceId="JoinTree_1.audit_properties_derived_table.ORGANIZATION"></item>
+    <item id="start_time" label="Start Time" resourceId="JoinTree_1.audit_properties_derived_table.START_TIME"></item>
+    <item id="completed_time" label="End Time" resourceId="JoinTree_1.audit_properties_derived_table.COMPLETED_TIME"></item>
+    <item id="data_prep_time" label="Data Preparation Time (ms)" resourceId="JoinTree_1.audit_properties_derived_table.DATA_PREP_TIME"></item>
+    <item id="rpt_rendering_time" label="Report Fill Time (ms)" resourceId="JoinTree_1.audit_properties_derived_table.RPT_RENDERING_TIME"></item>
+    <item id="execution_time" label="Run Time (ms)" resourceId="JoinTree_1.audit_properties_derived_table.EXECUTION_TIME"></item>
+    <item id="exception_category" label="Execution Error Category" resourceId="JoinTree_1.audit_properties_derived_table.EXCEPTION_CATEGORY"></item>
+    <item id="exception_stack_trace" label="Execution Stack Trace" resourceId="JoinTree_1.audit_properties_derived_table.EXCEPTION_STACK_TRACE"></item>
+    <item id="exception_message" label="Execution Error Message" resourceId="JoinTree_1.audit_properties_derived_table.EXCEPTION_MESSAGE"></item>
+    <item id="notification_message" label="Notification Error Message" resourceId="JoinTree_1.audit_properties_derived_table.NOTIFICATION_MESSAGE"></item>
+    <item id="notification_stack_trace" label="Notification Stack Trace" resourceId="JoinTree_1.audit_properties_derived_table.NOTIFICATION_STACK_TRACE"></item>
+    <item id="execution_ids" label="Execution ID(s)" resourceId="JoinTree_1.audit_properties_derived_table.EXECUTION_IDS"></item>
+    <item id="schedule_execution_id" label="Schedule ID" resourceId="JoinTree_1.audit_properties_derived_table.SCHEDULE_EXECUTION_ID"></item>
+  </items>
+  <resources>
+    <null id="constant_fields_level" datasourceId="AuditDataSource">
+      <fieldList>
+        <field id="orgpath" dataSetExpression="groovy('(tenant.getTenantFolderUri() == &quot;/&quot;) ? &quot;/&quot; : tenant.getTenantFolderUri() + &quot;/&quot;')" type="java.lang.String"></field>
+        <field id="tenantUri" dataSetExpression="groovy('tenant.getTenantUri()')" type="java.lang.String"></field>
+      </fieldList>
+    </null>
+    <jdbcTable id="JIAUDITEVENT" datasourceId="AuditDataSource" datasourceTableName="JIAUDITEVENT" schemaAlias="JASPERSERVER">
+      <fieldList>
+        <field id="ID" type="java.math.BigDecimal"></field>
+        <field id="USERNAME" type="java.lang.String"></field>
+        <field id="TENANT_ID" type="java.lang.String"></field>
+        <field id="EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="RESOURCE_URI" type="java.lang.String"></field>
+        <field id="RESOURCE_TYPE" type="java.lang.String"></field>
+        <field id="EVENT_TYPE" type="java.lang.String"></field>
+        <field id="REQUEST_TYPE" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>EVENT_TYPE == 'runReport' and REQUEST_TYPE == 'INTERNAL' and RESOURCE_TYPE == 'ReportUnit'</filterString>
+    </jdbcTable>
+    <jdbcQuery id="audit_properties_derived_table" datasourceId="AuditDataSource">
+      <fieldList>
+        <field id="AUDIT_EVENT_ID" type="java.math.BigDecimal"></field>
+        <field id="START_TIME" type="java.sql.Timestamp"></field>
+        <field id="COMPLETED_TIME" type="java.sql.Timestamp"></field>
+        <field id="EXECUTION_TIME" type="java.lang.String"></field>
+        <field id="JOB_ID" type="java.lang.String"></field>
+        <field id="JOB_LABEL" type="java.lang.String"></field>
+        <field id="JOB_DESC" type="java.lang.String"></field>
+        <field id="DATA_PREP_TIME" type="java.lang.String"></field>
+        <field id="RESOURCE_NAME" type="java.lang.String"></field>
+        <field id="ORGANIZATION" type="java.lang.String"></field>
+        <field id="ORGANIZATION_ID" type="java.lang.String"></field>
+        <field id="RPT_RENDERING_TIME" type="java.lang.String"></field>
+        <field id="EXCEPTION_CATEGORY" type="java.lang.String"></field>
+        <field id="EXCEPTION_MESSAGE" type="java.lang.String"></field>
+        <field id="NOTIFICATION_MESSAGE" type="java.lang.String"></field>
+        <field id="EXCEPTION_STACK_TRACE" type="java.lang.String"></field>
+        <field id="NOTIFICATION_STACK_TRACE" type="java.lang.String"></field>
+        <field id="EXECUTION_IDS" type="java.lang.String"></field>
+        <field id="SCHEDULE_EXECUTION_ID" type="java.lang.String"></field>
+        <field id="ORGANIZATION_URI" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>JOB_ID != NULL</filterString>
+      <query>SELECT t.audit_event_id
+        , MAX(CASE WHEN t.property_type = 'scheduleStartTime' THEN cast(cast ( TO_TIMESTAMP_TZ('1970-01-01 00:00:00 UTC', 'YYYY-MM-DD HH24:MI:SS.FF TZR') + NUMTODSINTERVAL(value/1000, 'SECOND') as timestamp with local time zone)AT TIME ZONE TO_CHAR(SYSTIMESTAMP, 'tzr') as TIMESTAMP) END) start_time
+        , MAX(CASE WHEN t.property_type = 'scheduleEndTime' THEN cast(cast ( TO_TIMESTAMP_TZ('1970-01-01 00:00:00 UTC', 'YYYY-MM-DD HH24:MI:SS.FF TZR') + NUMTODSINTERVAL(value/1000, 'SECOND') as timestamp with local time zone)AT TIME ZONE TO_CHAR(SYSTIMESTAMP, 'tzr') as TIMESTAMP) END) completed_time
+        , MAX(CASE WHEN t.property_type = 'executionTime' THEN t.value END) execution_time
+        , MAX(CASE WHEN t.property_type = 'jobID' THEN t.value END) job_id
+        , MAX(CASE WHEN t.property_type = 'jobLabel' THEN t.value END) job_label
+        , MAX(CASE WHEN t.property_type = 'jobDescription' THEN t.value END) job_desc
+        , MAX(CASE WHEN t.property_type = 'executionIDS' THEN t.value END) execution_ids
+        , MAX(CASE WHEN t.property_type = 'reportScheduleExecutionID' THEN t.value END) schedule_execution_id
+        , MAX(CASE WHEN t.property_type = 'dataPrepTime' THEN t.value END) data_prep_time
+        , MAX(CASE WHEN t.property_type = 'resourceName' THEN t.value END) resource_name
+        , MAX(CASE WHEN t.property_type = 'organization' THEN t.value END) organization
+        , MAX(CASE WHEN t.property_type = 'organizationID' THEN t.value END) organization_id
+        , MAX(CASE WHEN t.property_type = 'reportRenderingTime' THEN t.value END) rpt_rendering_time
+        , MAX(CASE WHEN t.property_type = 'exceptionCategory' THEN t.value END) exception_category
+        , MAX(CASE WHEN t.property_type = 'exception' THEN t.value END) exception_message
+        , MAX(CASE WHEN t.property_type = 'notificationException' THEN t.value END) notification_message
+		, MAX(CASE WHEN t.property_type = 'organizationURI' THEN t.value END) organization_uri
+        , MAX(CASE WHEN t.property_type = 'exception' THEN TO_CHAR(SUBSTR(t.CLOB_VALUE ,0,4000)) END) exception_stack_trace
+        , MAX(CASE WHEN t.property_type = 'notificationException' THEN TO_CHAR(SUBSTR(t.CLOB_VALUE ,0,4000)) END) notification_stack_trace
+        FROM jiauditeventproperty t
+        where audit_event_id in (select distinct(p.audit_event_id) from jiauditeventproperty p where
+        p.property_type in ('exception','notificationException'))
+        and audit_event_id in (select distinct(p.audit_event_id) from jiauditeventproperty p where
+        p.property_type in ('reportScheduleExecutionID'))
+        group by t.audit_event_id</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_1" datasourceId="AuditDataSource">
+      <fieldList>
+        <field id="JIAUDITEVENT.ID" type="java.math.BigDecimal"></field>
+        <field id="JIAUDITEVENT.USERNAME" type="java.lang.String"></field>
+        <field id="JIAUDITEVENT.TENANT_ID" type="java.lang.String"></field>
+        <field id="JIAUDITEVENT.EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="JIAUDITEVENT.RESOURCE_URI" type="java.lang.String"></field>
+        <field id="JIAUDITEVENT.RESOURCE_TYPE" type="java.lang.String"></field>
+        <field id="JIAUDITEVENT.EVENT_TYPE" type="java.lang.String"></field>
+        <field id="JIAUDITEVENT.REQUEST_TYPE" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.AUDIT_EVENT_ID" type="java.math.BigDecimal"></field>
+        <field id="audit_properties_derived_table.START_TIME" type="java.sql.Timestamp"></field>
+        <field id="audit_properties_derived_table.COMPLETED_TIME" type="java.sql.Timestamp"></field>
+        <field id="audit_properties_derived_table.EXECUTION_TIME" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.JOB_ID" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.JOB_LABEL" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.JOB_DESC" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.DATA_PREP_TIME" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.RESOURCE_NAME" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.ORGANIZATION" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.ORGANIZATION_ID" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.RPT_RENDERING_TIME" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.EXCEPTION_CATEGORY" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.EXCEPTION_MESSAGE" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.NOTIFICATION_MESSAGE" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.EXCEPTION_STACK_TRACE" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.NOTIFICATION_STACK_TRACE" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.EXECUTION_IDS" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.SCHEDULE_EXECUTION_ID" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.ORGANIZATION_URI" type="java.lang.String"></field>
+        <field id="filter1" dataSetExpression="startsWith(audit_properties_derived_table.ORGANIZATION_URI, constant_fields_level.tenantUri)" type="java.lang.Boolean"></field>
+        <field id="relative_uri" dataSetExpression="if(startsWith(JIAUDITEVENT.RESOURCE_URI, '/public/'), JIAUDITEVENT.RESOURCE_URI, concat('/', substr(JIAUDITEVENT.RESOURCE_URI, length(constant_fields_level.orgpath) + 1)))" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>JIAUDITEVENT.REQUEST_TYPE == 'INTERNAL' and audit_properties_derived_table.JOB_ID != null and filter1 == true and JIAUDITEVENT.RESOURCE_TYPE == 'ReportUnit' and JIAUDITEVENT.EVENT_TYPE == 'runReport'</filterString>
+      <joinInfo alias="audit_properties_derived_table" referenceId="audit_properties_derived_table"></joinInfo>
+      <joinList>
+        <join expr="audit_properties_derived_table.AUDIT_EVENT_ID == JIAUDITEVENT.ID" left="audit_properties_derived_table" right="JIAUDITEVENT" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>SELECT t.audit_event_id
+        , MAX(CASE WHEN t.property_type = 'scheduleStartTime' THEN cast(cast ( TO_TIMESTAMP_TZ('1970-01-01 00:00:00 UTC', 'YYYY-MM-DD HH24:MI:SS.FF TZR') + NUMTODSINTERVAL(value/1000, 'SECOND') as timestamp with local time zone)AT TIME ZONE TO_CHAR(SYSTIMESTAMP, 'tzr') as TIMESTAMP) END) start_time
+        , MAX(CASE WHEN t.property_type = 'scheduleEndTime' THEN cast(cast ( TO_TIMESTAMP_TZ('1970-01-01 00:00:00 UTC', 'YYYY-MM-DD HH24:MI:SS.FF TZR') + NUMTODSINTERVAL(value/1000, 'SECOND') as timestamp with local time zone)AT TIME ZONE TO_CHAR(SYSTIMESTAMP, 'tzr') as TIMESTAMP) END) completed_time
+        , MAX(CASE WHEN t.property_type = 'executionTime' THEN t.value END) execution_time
+        , MAX(CASE WHEN t.property_type = 'jobID' THEN t.value END) job_id
+        , MAX(CASE WHEN t.property_type = 'jobLabel' THEN t.value END) job_label
+        , MAX(CASE WHEN t.property_type = 'jobDescription' THEN t.value END) job_desc
+        , MAX(CASE WHEN t.property_type = 'executionIDS' THEN t.value END) execution_ids
+        , MAX(CASE WHEN t.property_type = 'reportScheduleExecutionID' THEN t.value END) schedule_execution_id
+        , MAX(CASE WHEN t.property_type = 'dataPrepTime' THEN t.value END) data_prep_time
+        , MAX(CASE WHEN t.property_type = 'resourceName' THEN t.value END) resource_name
+        , MAX(CASE WHEN t.property_type = 'organization' THEN t.value END) organization
+        , MAX(CASE WHEN t.property_type = 'organizationID' THEN t.value END) organization_id
+        , MAX(CASE WHEN t.property_type = 'reportRenderingTime' THEN t.value END) rpt_rendering_time
+        , MAX(CASE WHEN t.property_type = 'exceptionCategory' THEN t.value END) exception_category
+        , MAX(CASE WHEN t.property_type = 'exception' THEN t.value END) exception_message
+        , MAX(CASE WHEN t.property_type = 'notificationException' THEN t.value END) notification_message
+		, MAX(CASE WHEN t.property_type = 'organizationURI' THEN t.value END) organization_uri
+        , MAX(CASE WHEN t.property_type = 'exception' THEN TO_CHAR(SUBSTR(t.CLOB_VALUE ,0,4000)) END) exception_stack_trace
+        , MAX(CASE WHEN t.property_type = 'notificationException' THEN TO_CHAR(SUBSTR(t.CLOB_VALUE ,0,4000)) END) notification_stack_trace
+        FROM jiauditeventproperty t
+        where audit_event_id in (select distinct(p.audit_event_id) from jiauditeventproperty p where
+        p.property_type in ('exception','notificationException'))
+        and audit_event_id in (select distinct(p.audit_event_id) from jiauditeventproperty p where
+        p.property_type in ('reportScheduleExecutionID'))
+        group by t.audit_event_id</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="audit_properties_derived_table" tableId="audit_properties_derived_table"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="JIAUDITEVENT" tableId="JIAUDITEVENT"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

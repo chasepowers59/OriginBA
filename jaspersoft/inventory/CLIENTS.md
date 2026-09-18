@@ -399,6 +399,153 @@ Snapshot 20260918-050245 · 207 views, 76 reports, 57 domains, 47 dashboards, 2 
 | Meter_Operations | 37 views, 19 reports, 8 domains, 7 dashboards |
 | New_Services___Planning | 4 views, 1 dashboards, 1 domains, 1 reports |
 
+## prod / CityCorp
+
+Snapshot 20260918-051522 · 301 views, 126 domains, 88 reports, 17 files, 14 dashboards, 3 outputs, 3 jndiJdbcDataSource, 1 datasources, 1 reportOptions, 1 virtualDataSource, 1 customDataSource
+
+| Datasource | User | Connection |
+| --- | --- | --- |
+| CityCorp_DS | JRS2C2M | jdbc:oracle:thin:@smartcity-db-prod-v1-2.originsmartops.com:1521/PPRODDB_CITYCORP.prodprivatesn.prodvcn.oraclevcn.com |
+| AuditDataSource |  | jdbc/jasperserverAudit |
+| AuditVirtualDataSource |  |  |
+| JasperserverDataSource |  | jdbc/jasperserver |
+| JSDiagnosticDataSource |  |  |
+| ReportMonitoringDataSource |  | jdbc/jasperserverAudit |
+
+| Top-level folder | Contents |
+| --- | --- |
+| / | 12 views, 1 reports, 1 outputs |
+| /DataSource | 1 datasources |
+| /SmartCity | 269 views, 119 domains, 63 reports, 14 dashboards, 5 files, 2 outputs, 1 reportOptions |
+| /adhoc | 2 reports |
+| /public | 22 reports, 20 views, 12 files, 7 domains, 3 jndiJdbcDataSource, 1 virtualDataSource, 1 customDataSource |
+
+**/SmartCity/Report/Standard_Offering**
+
+| Folder | Contents |
+| --- | --- |
+| Billing_and_Rates | 19 views, 5 domains, 2 dashboards |
+| Cashiering | 19 views, 5 domains, 1 dashboards |
+| Common | 13 views, 6 domains, 2 dashboards |
+| Customer_Operations | 17 views, 11 domains, 1 dashboards |
+| Debt_Management | 21 views, 8 domains, 1 dashboards |
+| Field_Operations | 7 views, 3 domains, 1 dashboards |
+| Finance | 26 views, 5 domains, 2 dashboards |
+| Meter_Operations | 24 views, 9 domains, 2 dashboards |
+| New_Services___Planning | 7 views, 1 dashboards, 1 domains |
+
+**/SmartCity/Report/Workstreams**
+
+| Folder | Contents |
+| --- | --- |
+| Billing_and_Rates | 2 views, 1 domains |
+| Cashiering | 1 domains |
+| Customer_Operations | 2 domains, 1 views |
+
+**/SmartCity/Letter**
+
+| Folder | Contents |
+| --- | --- |
+| . | 9 reports |
+| inputXML | 3 files |
+
+**/SmartCity/Bill**
+
+| Folder | Contents |
+| --- | --- |
+| . | 2 reports |
+
+## prod / Ellensburg
+
+Snapshot 20260918-051522 · 197 views, 151 reports, 90 domains, 27 files, 8 outputs, 3 jndiJdbcDataSource, 2 dashboards, 1 datasources, 1 reportOptions, 1 dataDefinerUnit, 1 virtualDataSource, 1 customDataSource
+
+| Datasource | User | Connection |
+| --- | --- | --- |
+| Ellensburg_DS | JRS2C2M | jdbc:oracle:thin:@smartcity-db-prod-v1-2.originsmartops.com:1521/PPRODDB_ELLENSBURG.prodprivatesn.prodvcn.oraclevcn.com |
+| AuditDataSource |  | jdbc/jasperserverAudit |
+| AuditVirtualDataSource |  |  |
+| JasperserverDataSource |  | jdbc/jasperserver |
+| JSDiagnosticDataSource |  |  |
+| ReportMonitoringDataSource |  | jdbc/jasperserverAudit |
+
+| Top-level folder | Contents |
+| --- | --- |
+| /DataSource | 1 datasources |
+| /SmartCity | 176 views, 129 reports, 83 domains, 15 files, 8 outputs, 2 dashboards, 1 reportOptions |
+| /adhoc | 1 dataDefinerUnit |
+| /public | 22 reports, 21 views, 12 files, 7 domains, 3 jndiJdbcDataSource, 1 virtualDataSource, 1 customDataSource |
+
+**/SmartCity/Report/Workstreams**
+
+| Folder | Contents |
+| --- | --- |
+| Cashiering | 1 domains |
+| Customer_Operations | 1 domains |
+
+**/SmartCity/Letter**
+
+| Folder | Contents |
+| --- | --- |
+| . | 11 reports |
+| inputXML | 2 files |
+
+**/SmartCity/Bill**
+
+| Folder | Contents |
+| --- | --- |
+| . | 4 reports, 2 files |
+| inputXML | 1 files |
+
+## prod / Newark1
+
+Snapshot 20260918-051522 · 102 views, 99 reports, 60 domains, 38 outputs, 32 files, 6 controls, 3 dashboards, 3 jndiJdbcDataSource, 1 datasources, 1 reportOptions, 1 virtualDataSource, 1 customDataSource
+
+| Datasource | User | Connection |
+| --- | --- | --- |
+| Newark1_DS | JRS2C2M | jdbc:oracle:thin:@smartcity-db-prod-v1-2.originsmartops.com:1521/PPRODDB_NEWARK.prodprivatesn.prodvcn.oraclevcn.com |
+| AuditDataSource |  | jdbc/jasperserverAudit |
+| AuditVirtualDataSource |  |  |
+| JasperserverDataSource |  | jdbc/jasperserver |
+| JSDiagnosticDataSource |  |  |
+| ReportMonitoringDataSource |  | jdbc/jasperserverAudit |
+
+| Top-level folder | Contents |
+| --- | --- |
+| /DataSource | 1 datasources |
+| /SmartCity | 83 views, 77 reports, 52 domains, 38 outputs, 19 files, 6 controls, 3 dashboards, 1 reportOptions |
+| /public | 22 reports, 19 views, 12 files, 7 domains, 3 jndiJdbcDataSource, 1 virtualDataSource, 1 customDataSource |
+| /temp | 1 domains |
+| /templates | 1 files |
+
+**/SmartCity/Report/Standard_Offering**
+
+| Folder | Contents |
+| --- | --- |
+| Debt_Management | 9 views, 2 domains, 1 dashboards |
+
+**/SmartCity/Report/Workstreams**
+
+| Folder | Contents |
+| --- | --- |
+| Billing_and_Rates | 3 views, 3 reports, 1 dashboards, 1 domains |
+| Cashiering | 1 reports, 1 domains |
+| Customer_Operations | 1 domains |
+| Meter_Operations | 1 domains |
+
+**/SmartCity/Letter**
+
+| Folder | Contents |
+| --- | --- |
+| . | 3 reports |
+
+**/SmartCity/Bill**
+
+| Folder | Contents |
+| --- | --- |
+| . | 4 reports |
+| export | 2 reports |
+| inputXML | 4 files |
+
 ## internal / Origin_DEMO
 
 Snapshot 20260918-050247 · 492 files, 383 views, 113 domains, 89 reports, 63 dashboards, 1 datasources, 1 outputs

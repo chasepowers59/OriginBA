@@ -1,0 +1,986 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 8.2.0.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SC Billed Usage List Report" pageWidth="1790" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" isFloatColumnFooter="true" uuid="07f1d5f2-336a-495e-acbb-1adb53af5138">
+	<property name="net.sf.jasperreports.export.xls.collapse.row.span" value="false"/>
+	<property name="net.sf.jasperreports.export.html.border.collapse" value="collapse"/>
+	<property name="net.sf.jasperreports.export.docx.frames.as.nested.tables" value="false"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.actual.size" value="true"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.group.indent" value="0"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.min.group.label.width" value="100"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.detail.band.height" value="25"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.header.band.height" value="25"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.row.header.width" value="125"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.cell.width" value="100"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.cell.height" value="20"/>
+	<property name="com.jaspersoft.ji.adhoc.data.adapter" value="true"/>
+	<property name="com.jaspersoft.ji.adhoc" value="1"/>
+	<property name="com.jaspersoft.ji.adhoc.preferredDataStrategy" value="domainDataStrategy"/>
+	<property name="net.sf.jasperreports.export.pdf.tagged" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.tag.language" value="EN-US"/>
+	<property name="net.sf.jasperreports.export.pdf.metadata.title" value="Ad Hoc Report"/>
+	<property name="net.sf.jasperreports.export.pdf.display.metadata.title" value="true"/>
+	<property name="net.sf.jasperreports.components.table.generate.pdf.tags" value="true"/>
+	<property name="net.sf.jasperreports.text.truncate.suffix" value="..."/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.table.flattened.data.set" value="true"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="asingh|CityCorp"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Report/SC_Billed_Usage/SC_Billed_Usage_List_Report"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Report/SC_Billed_Usage/SC_Billed_Usage_List_Report_files/mainReportJrxml"/>
+	<import value="com.jaspersoft.ji.adhoc.jr.AdhocReportUtils"/>
+	<style name="ReportDefault" isDefault="true" mode="Transparent" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<pen lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableBaseFrameStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableFrameStyle" style="TableBaseFrameStyle">
+		<box padding="0">
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<bottomPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnFooterFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<pen lineWidth="1.0" lineStyle="Solid"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#D9E4F1">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#F2F2F2">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#F2F2F2" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableSummaryFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableSummaryTextNoBorderStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" fontName="DejaVu Sans" isBold="true">
+		<box leftPadding="5" rightPadding="5"/>
+	</style>
+	<style name="TableSummaryTextStyle" style="TableSummaryTextNoBorderStyle">
+		<box>
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableTitleFrameStyle" style="TableFrameStyle">
+		<box topPadding="0" bottomPadding="0">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableTitleTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box bottomPadding="8">
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableDetailFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableDetailTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="false">
+		<box leftPadding="5" rightPadding="5">
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{PAGE_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="ChartReportTitle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box>
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineStyle="Solid"/>
+		</box>
+	</style>
+	<style name="ChartTitle" forecolor="#000000" fontName="DejaVu Sans" fontSize="12" isBold="true"/>
+	<style name="ChartSubtitle" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartLegend" forecolor="#000000" backcolor="#FFFFFF" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartSeriesColor0" backcolor="#87C4FE"/>
+	<style name="ChartSeriesColor1" backcolor="#E96270"/>
+	<style name="ChartSeriesColor2" backcolor="#D1D1D1"/>
+	<style name="ChartSeriesColor3" backcolor="#FFEE99"/>
+	<style name="ChartSeriesColor4" backcolor="#6164FF"/>
+	<style name="ChartSeriesColor5" backcolor="#B0E992"/>
+	<style name="ChartSeriesColor6" backcolor="#AE9CEA"/>
+	<style name="ChartSeriesColor7" backcolor="#F5B05E"/>
+	<style name="ChartSeriesColor8" backcolor="#589EE1"/>
+	<style name="ChartSeriesColor9" backcolor="#AE4E59"/>
+	<style name="ChartSeriesColor10" backcolor="#747474"/>
+	<style name="ChartSeriesColor11" backcolor="#E2DC77"/>
+	<style name="ChartSeriesColor12" backcolor="#4749A5"/>
+	<style name="ChartSeriesColor13" backcolor="#81B963"/>
+	<style name="ChartSeriesColor14" backcolor="#7764B4"/>
+	<style name="ChartSeriesColor15" backcolor="#F27B4C"/>
+	<style name="ChartCategoryAxisLabelFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="ChartCategoryAxisTickFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartValueAxisLabelFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="ChartValueAxisTickFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartContext" backcolor="#D1CA67"/>
+	<style name="CrosstabElementStyle" mode="Transparent" forecolor="#000033" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseCellStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseTextStyle" mode="Opaque" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Top" vImageAlign="Top" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box topPadding="3" leftPadding="5" bottomPadding="3" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabTitleTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" fontSize="18" isBold="false">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabHeaderLabelStyle" style="CrosstabHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabMeasureHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabMeasureHeaderLabelStyle" style="CrosstabMeasureHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabColumnMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" isBold="false"/>
+	<style name="CrosstabRowMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabInnerRowDimensionHeaderTextStyle" style="CrosstabRowDimensionHeaderTextStyle">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabColumnDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#D9E4F1" hTextAlign="Center" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDetailTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Right" hImageAlign="Right" isBold="false">
+		<box>
+			<topPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" hTextAlign="Right" hImageAlign="Right" isBold="true"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDummyHeaderTextStyle" style="CrosstabBaseTextStyle" backcolor="#F2F2F2"/>
+	<subDataset name="tableDataset" whenResourceMissingType="Key" uuid="8814d5b5-e30a-4a49-8338-7e4cdee19774">
+		<property name="net.sf.jasperreports.create.sort.fields.for.groups" value="true"/>
+		<parameter name="_CI_BILL.ACCT_ID_1_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BILL.ACCT_ID_1_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_ACCT.BILL_CYC_CD_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_ACCT.BILL_CYC_CD_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_ACCT.CUST_CL_CD_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_ACCT.CUST_CL_CD_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_ACCT.COLL_CL_CD_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_ACCT.COLL_CL_CD_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BILL.BILL_ID_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BILL.BILL_ID_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BILL.BILL_DT_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BILL.BILL_DT_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.sql.Timestamp", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BSEG.BSEG_ID_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BSEG.BSEG_ID_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_SA.SA_ID_2_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_SA.SA_ID_2_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_SA.SA_TYPE_CD_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_SA.SA_TYPE_CD_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_SA_RS_HIST_1.RS_CD_1_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_SA_RS_HIST_1.RS_CD_1_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BSEG_SQ.BILL_SQ_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.math.BigDecimal", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BSEG_SQ.BILL_SQ_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.math.BigDecimal", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BSEG_SQ.INIT_SQ_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.math.BigDecimal", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BSEG_SQ.INIT_SQ_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.math.BigDecimal", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BILL_SA.CUR_AMT_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.math.BigDecimal", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BILL_SA.CUR_AMT_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.math.BigDecimal", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BILL_SA.TOT_AMT_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.math.BigDecimal", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_CI_BILL_SA.TOT_AMT_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.math.BigDecimal", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<field name="_detail_level__CI_BILL.ACCT_ID_1" class="java.lang.String">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_BILL.ACCT_ID_1"/>
+		</field>
+		<field name="_detail_level__CI_ACCT.BILL_CYC_CD" class="java.lang.String">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_ACCT.BILL_CYC_CD"/>
+		</field>
+		<field name="_detail_level__CI_ACCT.CUST_CL_CD" class="java.lang.String">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_ACCT.CUST_CL_CD"/>
+		</field>
+		<field name="_detail_level__CI_ACCT.COLL_CL_CD" class="java.lang.String">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_ACCT.COLL_CL_CD"/>
+		</field>
+		<field name="_detail_level__CI_BILL.BILL_ID" class="java.lang.String">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_BILL.BILL_ID"/>
+		</field>
+		<field name="_detail_level__CI_BILL.BILL_DT" class="java.sql.Timestamp">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_BILL.BILL_DT"/>
+		</field>
+		<field name="_detail_level__CI_BSEG.BSEG_ID" class="java.lang.String">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_BSEG.BSEG_ID"/>
+		</field>
+		<field name="_detail_level__CI_SA.SA_ID_2" class="java.lang.String">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_SA.SA_ID_2"/>
+		</field>
+		<field name="_detail_level__CI_SA.SA_TYPE_CD" class="java.lang.String">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_SA.SA_TYPE_CD"/>
+		</field>
+		<field name="_detail_level__CI_SA_RS_HIST_1.RS_CD_1" class="java.lang.String">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_SA_RS_HIST_1.RS_CD_1"/>
+		</field>
+		<field name="_detail_level__CI_BSEG_SQ.BILL_SQ" class="java.math.BigDecimal">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_BSEG_SQ.BILL_SQ"/>
+		</field>
+		<field name="_detail_level__CI_BSEG_SQ.INIT_SQ" class="java.math.BigDecimal">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_BSEG_SQ.INIT_SQ"/>
+		</field>
+		<field name="_detail_level__CI_BILL_SA.CUR_AMT" class="java.math.BigDecimal">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_BILL_SA.CUR_AMT"/>
+		</field>
+		<field name="_detail_level__CI_BILL_SA.TOT_AMT" class="java.math.BigDecimal">
+			<property name="fieldType" value="LEVEL_MEASURE"/>
+			<property name="level" value="_detail_level_"/>
+			<property name="measure" value="CI_BILL_SA.TOT_AMT"/>
+		</field>
+	</subDataset>
+	<parameter name="REPORT_TITLE" class="java.lang.String" isForPrompting="false">
+		<property name="net.sf.jasperreports.data.cache.included" value="true"/>
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ReportTitle" class="java.lang.String">
+		<property name="net.sf.jasperreports.data.cache.included" value=""/>
+		<defaultValueExpression><![CDATA["Billed Usage List Report"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LoggedInUsername" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="BILL_DT_1" class="net.sf.jasperreports.types.date.DateRange" isForPrompting="false"/>
+	<parameter name="BILL_DT_2" class="net.sf.jasperreports.types.date.DateRange" isForPrompting="false"/>
+	<parameter name="CUST_CL_CD_1" class="java.util.Collection" isForPrompting="false"/>
+	<parameter name="BILL_CYC_CD_1" class="java.util.Collection" isForPrompting="false"/>
+	<title>
+		<band height="1" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="140">
+			<frame>
+				<reportElement x="0" y="0" width="1750" height="140" uuid="03ffdc30-3907-4333-a114-e17b0103865a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="1750" height="30" uuid="f7567b2e-7830-46ac-9c85-66e89257423c">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{ReportTitle}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="30" width="190" height="20" uuid="422a2d3b-013f-4fdb-a481-f16d9b88069d">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Selection Values"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="170" y="50" width="190" height="20" uuid="195166f1-d8d2-44a5-bc09-58d15e412c6a">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($P{BILL_DT_1}==null?"                        ":($P{BILL_DT_1}.getStart()==null?"                         ":DATEFORMAT($P{BILL_DT_1}.getStart(),"MMM. dd, yyyy")))]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="50" width="160" height="20" uuid="57da3db6-b83b-42b6-83c5-481555bb55d9">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Bill Date (From)"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="155" y="50" width="20" height="20" uuid="55dedfd1-5c3c-4b00-a545-5276de2a84c6">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Center">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+				</textField>
+				<frame>
+					<reportElement x="1470" y="30" width="280" height="60" uuid="c42a45b7-d7eb-41ca-b1f0-ac70f129b280">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textField>
+						<reportElement x="10" y="0" width="110" height="20" uuid="47037f69-131b-4e2a-8281-90ef59eea270">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box leftPadding="15" bottomPadding="0" rightPadding="0"/>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Page"]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="120" y="0" width="15" height="20" uuid="172db169-a7ed-4762-94ef-e1b1717e7b92">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box leftPadding="0" bottomPadding="0" rightPadding="0"/>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="135" y="0" width="40" height="20" uuid="26841bbc-711b-4797-a88f-ed35b7ba306b">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box leftPadding="1" bottomPadding="0" rightPadding="0"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+					</textField>
+					<textField evaluationTime="Report">
+						<reportElement x="175" y="0" width="105" height="20" uuid="cd4bf37d-f0e8-4199-92a7-e2fe6cb6cfad">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box leftPadding="0" bottomPadding="0" rightPadding="5"/>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA[" of "+$V{PAGE_NUMBER}]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="10" y="20" width="110" height="20" uuid="94cc0d61-8fbc-438f-8a2d-f9b066900c46">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="15" rightPadding="0"/>
+						<textElement>
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Run Date/Time"]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="120" y="20" width="160" height="20" uuid="b820c692-d993-4918-b172-05f156f73d3f">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="5"/>
+						<textElement>
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA[": "+DATEFORMAT(new Date(),"MMM. dd, yyyy hh:mm a")]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="10" y="40" width="110" height="20" uuid="df1092b2-be16-45d8-affc-d8f6ad2600f8">
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="15" rightPadding="0"/>
+						<textElement>
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Prepared By"]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="120" y="40" width="160" height="20" uuid="c923d149-0902-4840-ac73-2c2e7a3c4eeb">
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="5"/>
+						<textElement>
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA[": "+$P{LoggedInUsername}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<textField>
+					<reportElement x="0" y="70" width="160" height="20" uuid="f7ee4665-3fa5-4978-9911-03a87126ff9e">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Bill Date (To)"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="155" y="70" width="20" height="20" uuid="89e3e18b-4920-47cc-9492-9ad300eab90d">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Center">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="170" y="70" width="190" height="20" uuid="a155acd0-70fb-49b3-a33f-89741953520f">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($P{BILL_DT_2}==null?"                        ":($P{BILL_DT_2}.getStart()==null?"                        ":DATEFORMAT($P{BILL_DT_2}.getStart(),"MMM. dd, yyyy")))]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="90" width="160" height="20" uuid="1b5c451c-6735-42de-996f-abbb9f061b9c">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Customer Class"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="155" y="90" width="20" height="20" uuid="83453b26-9674-4832-b8de-6844480e0281">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Center">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement stretchType="ContainerBottom" x="170" y="90" width="1580" height="20" uuid="cf61cdd2-486d-4baf-bfa3-bafb806e2c0e">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+						<paragraph leftIndent="0"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($P{CUST_CL_CD_1}.isEmpty()?"All":$P{CUST_CL_CD_1}.toString().replaceAll( "   ,", "," ).replaceAll( "  ,", "," ).replaceAll( "  ", "" ))]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="110" width="160" height="20" uuid="faf817b3-b9d3-46d3-9e52-4d73a634f98f">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Bill Cycle"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="155" y="110" width="20" height="20" uuid="af564764-33f7-41e1-b161-9780cda2f4cf">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Center">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement stretchType="ContainerBottom" x="170" y="110" width="1580" height="20" uuid="b5906b20-3a5a-430c-9800-544182c130df">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+						<paragraph leftIndent="0"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($P{BILL_CYC_CD_1}.isEmpty()?"All":$P{BILL_CYC_CD_1}.toString().replaceAll( "   ,", "," ).replaceAll( " ,", "," ).replaceAll( "  ", "" ))]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageHeader>
+	<summary>
+		<band height="25" splitType="Stretch">
+			<componentElement>
+				<reportElement style="TableFrameStyle" x="0" y="0" width="1750" height="25" uuid="0463d64b-05cc-4f5a-8f6e-fc4ef1b9439b"/>
+				<c:table xmlns:c="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" whenNoDataType="AllSectionsNoDetail">
+					<datasetRun subDataset="tableDataset" uuid="dc3a343f-5b06-4772-ab42-a4be5d7efab2">
+						<dataSourceExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get("com.jaspersoft.ji.adhoc.report.data.source")]]></dataSourceExpression>
+					</datasetRun>
+					<c:columnGroup width="1750" uuid="4f317b0e-72ca-4639-ac3b-85a3e0f40b79">
+						<c:column width="125" uuid="17ecc44a-5e79-4c35-b6a6-df124a915b42">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="b7d65f94-ad0d-4b62-8f63-96a3867d6d29">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA["Account ID"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="ee3527fd-bff5-4f46-8c5a-813aab51e21f"/>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_BILL.ACCT_ID_1}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_CI_BILL.ACCT_ID_1_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="166af7f9-f695-43a7-8da7-4490793c2465">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="e19e9bad-1009-40eb-89bf-52b916911413">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA["Bill Cycle"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="1a72e332-955f-474b-bafb-7d11e22c4881"/>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_ACCT.BILL_CYC_CD}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_CI_ACCT.BILL_CYC_CD_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="15a16811-95d1-48cb-9ff7-aa455464dc8c">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="402803a2-6fae-4767-9457-7d647427e67b">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA["Customer Class"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="6d15a567-9667-404c-8ca5-e52c316525bc"/>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_ACCT.CUST_CL_CD}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_CI_ACCT.CUST_CL_CD_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="dfabbd4f-51c8-4115-8319-70bddb965174">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="d5fe3069-42a0-4c33-b291-52a4a4f2d66c">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA["Collection Class"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="620157f5-adf3-432b-8047-710995e1930c"/>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_ACCT.COLL_CL_CD}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_CI_ACCT.COLL_CL_CD_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="ab8ac524-348c-4d5d-9b4d-05764faf3374">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="cbee0e18-ebbe-40f1-982e-be688a18619d">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA["Bill ID"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="70df4c00-ff28-477b-ab00-78882ab08f59"/>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_BILL.BILL_ID}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_CI_BILL.BILL_ID_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="ca6321da-bd2c-4b58-8a24-8e40046fb0a3">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="081519f7-c101-4284-ab0a-a01b6d3b2d32">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA["Bill Date"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" pattern="medium,hide" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="27799166-be1f-4bdd-8071-c2af0acc410f"/>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_BILL.BILL_DT}]]></textFieldExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="3ec1906c-4fcc-495d-b8f2-9a5c4af4c325">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="ff2ec6b5-35a0-41ba-88e4-6fd579158bcd">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA["Bill Segment ID"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="41d715ac-fb4a-40c3-b16b-5c0e025dbf86"/>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_BSEG.BSEG_ID}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_CI_BSEG.BSEG_ID_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="db8a5f84-2a39-43b8-b272-047f7c9d888b">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="a58d52dc-a009-468a-b32d-87d81e07d5c0">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA["Service Agreement ID"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="9a7fc3ae-2dd3-4040-8696-5f04d62988c6"/>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_SA.SA_ID_2}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_CI_SA.SA_ID_2_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="67eaa902-9a99-4c35-906c-456ee8abe37a">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="6048a687-5bd8-47d1-b891-192cf7770d86">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA["SA Type"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="086ee01b-cbce-4393-aa67-47fa3f0d4962"/>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_SA.SA_TYPE_CD}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_CI_SA.SA_TYPE_CD_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="dc80af6f-a9cc-4d99-ae41-583f74d437b0">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="b525cdf1-d225-4a0a-b46a-1180d2528158">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA["Rate Schedule"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="d425093c-7e75-437f-a29f-bf717dd3f16e"/>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_SA_RS_HIST_1.RS_CD_1}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_CI_SA_RS_HIST_1.RS_CD_1_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="5cef5a87-279c-4b34-bdb5-996ca459e879">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="bc75032e-2568-4842-94b3-5bb7c53b8091">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression><![CDATA["Billable Service Quantity"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="fb9cf79e-df07-4065-9713-4acbb272923a"/>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_BSEG_SQ.BILL_SQ}]]></textFieldExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="91d6e145-58f4-4e6b-a550-0d1b91885547">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="cfb70c0b-034c-42f8-8f02-e2115c34958e">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression><![CDATA["Initial Service Quantity"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="7a559211-da19-403d-934b-b065ded7512e"/>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_BSEG_SQ.INIT_SQ}]]></textFieldExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="fefa361d-763c-4320-9187-99cae59f315b">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="bb0d72a6-2844-401d-9c09-b424237a12b0">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression><![CDATA["Current Amount"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="630aebbd-6b99-4824-a347-3367b2decd28"/>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_BILL_SA.CUR_AMT}]]></textFieldExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="e645d565-e2f5-424f-8aef-561ee440e130">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="0aae2128-db71-4663-844a-dd18df3935ea">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression><![CDATA["Payoff Amount"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="7b62a5e1-6df6-4d00-bfcf-bcdfded97df7"/>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression><![CDATA[$F{_detail_level__CI_BILL_SA.TOT_AMT}]]></textFieldExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+					</c:columnGroup>
+				</c:table>
+			</componentElement>
+		</band>
+	</summary>
+</jasperReport>

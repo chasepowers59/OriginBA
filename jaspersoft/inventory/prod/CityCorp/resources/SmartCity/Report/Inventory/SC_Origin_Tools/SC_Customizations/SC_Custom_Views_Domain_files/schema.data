@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="ALL_VIEWS" label="ALL_VIEWS" resourceId="ALL_VIEWS"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CityCorp_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="SYS">
+          <string>SYS</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="OWNER" label="Owner" resourceId="ALL_VIEWS.OWNER"></item>
+    <item id="VIEW_NAME" label="View Name" resourceId="ALL_VIEWS.VIEW_NAME"></item>
+    <item id="TEXT" label="Text" resourceId="ALL_VIEWS.TEXT"></item>
+  </items>
+  <resources>
+    <jdbcTable id="ALL_VIEWS" datasourceId="CityCorp_DS" datasourceTableName="ALL_VIEWS" schemaAlias="SYS">
+      <fieldList>
+        <field id="OWNER" type="java.lang.String"></field>
+        <field id="VIEW_NAME" type="java.lang.String"></field>
+        <field id="TEXT_LENGTH" type="java.math.BigDecimal"></field>
+        <field id="TEXT" type="java.lang.String"></field>
+        <field id="TEXT_VC" type="java.lang.String"></field>
+        <field id="TYPE_TEXT_LENGTH" type="java.math.BigDecimal"></field>
+        <field id="TYPE_TEXT" type="java.lang.String"></field>
+        <field id="OID_TEXT_LENGTH" type="java.math.BigDecimal"></field>
+        <field id="OID_TEXT" type="java.lang.String"></field>
+        <field id="VIEW_TYPE_OWNER" type="java.lang.String"></field>
+        <field id="VIEW_TYPE" type="java.lang.String"></field>
+        <field id="SUPERVIEW_NAME" type="java.lang.String"></field>
+        <field id="EDITIONING_VIEW" type="java.lang.String"></field>
+        <field id="READ_ONLY" type="java.lang.String"></field>
+        <field id="CONTAINER_DATA" type="java.lang.String"></field>
+        <field id="BEQUEATH" type="java.lang.String"></field>
+        <field id="ORIGIN_CON_ID" type="java.math.BigDecimal"></field>
+        <field id="DEFAULT_COLLATION" type="java.lang.String"></field>
+        <field id="CONTAINERS_DEFAULT" type="java.lang.String"></field>
+        <field id="CONTAINER_MAP" type="java.lang.String"></field>
+        <field id="EXTENDED_DATA_LINK" type="java.lang.String"></field>
+        <field id="EXTENDED_DATA_LINK_MAP" type="java.lang.String"></field>
+        <field id="HAS_SENSITIVE_COLUMN" type="java.lang.String"></field>
+        <field id="ADMIT_NULL" type="java.lang.String"></field>
+        <field id="PDB_LOCAL_ONLY" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>OWNER == 'CISADM' and startsWith(VIEW_NAME, 'CM%')</filterString>
+    </jdbcTable>
+  </resources>
+</schema>
