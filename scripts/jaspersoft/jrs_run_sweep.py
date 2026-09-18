@@ -16,8 +16,10 @@ Two uses: the smoke test after a promotion, and the before/after of a server upg
 on prod today, run it again after the 10.0 upgrade, and diff the two JSON files.
 
     python3 scripts/jaspersoft/jrs_run_sweep.py --env test --org Fond_Du_Lac \\
-        [--folder /SmartCity/Report/Standard_Offering] [--workers 3] [--timeout 240] \\
+        [--folder /SmartCity/Report/Standard_Offering] [--workers 6] [--timeout 60] \\
         [--types view,report,dashboard] --out jaspersoft/sweeps/test_Fond_Du_Lac_<date>.json
+    python3 scripts/jaspersoft/jrs_run_sweep.py --env prod --org CityCorp --org Ellensburg --org Newark1 \\
+        --org College_Station --org Fond_Du_Lac --folder /SmartCity --out jaspersoft/sweeps/   # all at once
     python3 scripts/jaspersoft/jrs_run_sweep.py compare <before.json> <after.json>
 
 For an upgrade, sweep the whole tenant (--folder /SmartCity), every prod org, as close to the
@@ -42,8 +44,20 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import jrs_repository as jrs  # noqa: E402
 
 
+import base64
+import threading
+
+_AUTH = threading.local()   # the org-scoped Authorization header of the sweep running on this thread
+
+
+def _auth_for(org: str) -> str:
+    base = jrs._env_var("USER").split("|")[0]
+    return "Basic " + base64.b64encode(f"{base}|{org}:{jrs._env_var('PASSWORD')}".encode()).decode()
+
+
 def _http(path, method="GET", body=None, ctype=None, accept="application/json", timeout=240):
-    url, auth = jrs._cfg()
+    url, _ = jrs._cfg()
+    auth = getattr(_AUTH, "header", None) or jrs._cfg()[1]
     req = urllib.request.Request(url + path, data=body, method=method)
     req.add_header("Authorization", auth); req.add_header("Accept", accept)
     if ctype:
@@ -149,20 +163,22 @@ def run_dashboard(uri: str, timeout: int) -> dict:
 RUNNERS = {"adhocDataView": ("view", run_view), "reportUnit": ("report", run_report), "dashboard": ("dashboard", run_dashboard)}
 
 
-def sweep(folder: str, types: set[str], workers: int, timeout: int, limit: int | None) -> list[dict]:
-    code, text = jrs._call(f"/rest_v2/resources?folderUri={urllib.parse.quote(folder)}&recursive=true&limit=5000")
+def sweep(org: str, folder: str, types: set[str], workers: int, timeout: int, limit: int | None) -> list[dict]:
+    _AUTH.header = _auth_for(org)
+    code, text, _ = _http(f"/rest_v2/resources?folderUri={urllib.parse.quote(folder)}&recursive=true&limit=5000")
     if code != 200:
-        sys.exit(f"list {folder}: {code} {text[:200]}")
+        sys.exit(f"[{org}] list {folder}: {code} {text[:200]}")
     items = [i for i in json.loads(text).get("resourceLookup", []) if i["resourceType"] in RUNNERS and RUNNERS[i["resourceType"]][0] in types]
     items = items[:limit] if limit else items
-    print(f"{len(items)} resources under {folder}: " + ", ".join(f"{sum(1 for i in items if i['resourceType'] == t)} {n}s" for t, (n, _) in RUNNERS.items()))
+    print(f"[{org}] {len(items)} resources under {folder}: " + ", ".join(f"{sum(1 for i in items if i['resourceType'] == t)} {n}s" for t, (n, _) in RUNNERS.items()), flush=True)
     results = []
 
     def one(i):
+        _AUTH.header = _auth_for(org)
         name, fn = RUNNERS[i["resourceType"]]
         r = fn(i["uri"], timeout); r.update({"uri": i["uri"], "type": name, "label": i.get("label", "")})
         flag = {"ok": " ", "empty": "0", "error": "X", "timeout": "T", "export-engine": "E"}[r["outcome"]]
-        print(f"  [{flag}] {name:9} {r['seconds']:5.0f}s {i['uri'].split('/Standard_Offering/')[-1][:70]}" + (f"  {r.get('detail', '')[:100]}" if r["outcome"] not in ("ok", "empty") else (f"  rows={r['rows']}" if "rows" in r else "")), flush=True)
+        print(f"  [{org}] [{flag}] {name:9} {r['seconds']:5.0f}s {i['uri'].split('/Report/')[-1][:70]}" + (f"  {r.get('detail', '')[:100]}" if r["outcome"] not in ("ok", "empty") else (f"  rows={r['rows']}" if "rows" in r else "")), flush=True)
         return r
     with cf.ThreadPoolExecutor(max_workers=workers) as ex:
         for r in ex.map(one, items):
@@ -199,26 +215,33 @@ def main() -> int:
     if len(sys.argv) > 1 and sys.argv[1] == "compare":
         return compare(sys.argv[2], sys.argv[3])
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--env", default="test"); ap.add_argument("--org", required=True, help="org-scoped login: the JRS user is re-scoped as user|Org")
-    ap.add_argument("--folder", default="/SmartCity/Report/Standard_Offering")
-    ap.add_argument("--types", default="view,report,dashboard"); ap.add_argument("--workers", type=int, default=3)
-    ap.add_argument("--timeout", type=int, default=240); ap.add_argument("--limit", type=int)
-    ap.add_argument("--out", required=True, help="JSON results file (a before/after pair diffs by uri)")
+    ap.add_argument("--env", default="test")
+    ap.add_argument("--org", action="append", dest="orgs", required=True, help="org-scoped login (user|Org); repeat to sweep several orgs AT ONCE -- each client has its own database, so orgs do not contend")
+    ap.add_argument("--folder", default="/SmartCity/Report/Standard_Offering", help="/SmartCity for a whole tenant (the upgrade check)")
+    ap.add_argument("--types", default="view,report,dashboard"); ap.add_argument("--workers", type=int, default=6, help="concurrent executions PER org")
+    ap.add_argument("--timeout", type=int, default=60, help="seconds per execution; a load check wants 60 (slower is a finding), a slow-list rerun 600")
+    ap.add_argument("--limit", type=int)
+    ap.add_argument("--out", required=True, help="JSON results file, or a directory when several orgs are given (one file per org)")
     a = ap.parse_args()
     os.environ["JRS_ENV"] = a.env
-    base = jrs._env_var("USER").split("|")[0]
-    os.environ[f"JRS_{a.env.upper()}_USER"] = f"{base}|{a.org}"
-    t0 = time.time()
-    results = sweep(a.folder, set(a.types.split(",")), a.workers, a.timeout, a.limit)
-    counts = {}
-    for r in results:
-        counts[r["outcome"]] = counts.get(r["outcome"], 0) + 1
-    info = json.loads(jrs._call("/rest_v2/serverInfo")[1])
-    out = {"env": a.env, "org": a.org, "folder": a.folder, "server": f"{info.get('version')} {info.get('edition')}",
-           "taken": time.strftime("%Y-%m-%dT%H:%M:%S"), "seconds": round(time.time() - t0), "counts": counts, "results": sorted(results, key=lambda r: r["uri"])}
-    pathlib.Path(a.out).parent.mkdir(parents=True, exist_ok=True); pathlib.Path(a.out).write_text(json.dumps(out, indent=1))
-    print(f"\n{a.env}/{a.org} {a.folder}: {counts} in {out['seconds']}s -> {a.out}")
-    return 0 if not counts.get("error") and not counts.get("timeout") else 1
+    info = json.loads(jrs._call("/rest_v2/serverInfo")[1]); server = f"{info.get('version')} {info.get('edition')}"
+
+    def run(org):
+        t0 = time.time()
+        results = sweep(org, a.folder, set(a.types.split(",")), a.workers, a.timeout, a.limit)
+        counts = {}
+        for r in results:
+            counts[r["outcome"]] = counts.get(r["outcome"], 0) + 1
+        out = {"env": a.env, "org": org, "folder": a.folder, "server": server, "taken": time.strftime("%Y-%m-%dT%H:%M:%S"),
+               "seconds": round(time.time() - t0), "counts": counts, "results": sorted(results, key=lambda r: r["uri"])}
+        path = pathlib.Path(a.out) / f"{a.env}_{org}_{time.strftime('%Y%m%d')}.json" if len(a.orgs) > 1 else pathlib.Path(a.out)
+        path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(out, indent=1))
+        print(f"\n{a.env}/{org} {a.folder}: {counts} in {out['seconds']}s -> {path}", flush=True)
+        return counts
+    with cf.ThreadPoolExecutor(max_workers=len(a.orgs)) as ex:
+        all_counts = list(ex.map(run, a.orgs))
+    bad = sum(c.get("error", 0) + c.get("timeout", 0) for c in all_counts)
+    return 1 if bad else 0
 
 
 if __name__ == "__main__":

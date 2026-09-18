@@ -112,3 +112,16 @@ Cannot: server configuration, JDBC drivers, font extensions (Aptos), Ad Hoc desi
 9. **Slow views are real findings**, not tool faults: Usage_Transaction___Not_Used_on_Bill
    exceeds 240 s at Fond du Lac; Measurements___No_Reads 100 s. A view over 30 s is a candidate
    for the snapshot layer.
+10. **"Empty" from the sweep is NOT yet a verified signal (2026-09-18, VPN off).** 40 views are
+    empty at BOTH CityCorp prod and Fond du Lac test, including "Customers Accounts with Active
+    Services" (SA status 10/20, primary name) which cannot be empty at a live client. Suspect
+    the runner's handling of value-less filters (`startsWith(x, '')`, `isAnyValue(...)`) or of
+    inlined relative dates. Calibrate first: open Billed_Amount___Billing_Activity and
+    Customer___Customers_Accounts_with_Active_Services in the UI at CityCorp; if they show rows,
+    fix the runner (drop value-less filters before executing) and re-sweep before trusting any
+    empty. Until then, read the sweep for BROKE/healed/slower only.
+11. **Speed:** the sweep is bounded by the slowest views and by dashboards, not by count
+    (Fond du Lac 174 resources in 7 min at 3 workers; CityCorp prod 28 min at 2 workers of which
+    20 min were five views at the 240 s cap). Load check = 60 s cap, 6 workers, every prod org AT
+    ONCE (`--org A --org B ...`, each client is its own database); rerun only timeouts with a
+    600 s cap if the slow list matters. Whole-tenant, five orgs, expect ~30 min wall clock.
