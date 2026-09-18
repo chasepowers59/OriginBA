@@ -455,6 +455,44 @@ Snapshot 20260918-051522 · 301 views, 126 domains, 88 reports, 17 files, 14 das
 | --- | --- |
 | . | 2 reports |
 
+## prod / College_Station
+
+Snapshot 20260918-074641 · 891 outputs, 178 views, 147 reports, 73 domains, 5 reportOptions, 4 dataDefinerUnit, 3 files, 2 datasources, 1 dashboards
+
+| Datasource | User | Connection |
+| --- | --- | --- |
+| CollegeStation_DS | JRS2C2M | jdbc:oracle:thin:@smartcity-db-prod-v1-2.originsmartops.com:1521/PPRODDB_COLLEGESTATION.prodprivatesn.prodvcn.oraclevcn.com |
+| CollegeStation_DS_1 | JRS2C2M | jdbc:tibcosoftware:oracle://10.14.0.8:1521;SERVICENAME=pproddb_collegestation.prodprivatesn.originprodvcn.oraclevcn.com |
+
+| Top-level folder | Contents |
+| --- | --- |
+| / | 2 views |
+| /DataSource | 2 datasources |
+| /SmartCity | 891 outputs, 175 views, 147 reports, 72 domains, 5 reportOptions, 3 dataDefinerUnit, 2 files, 1 dashboards |
+| /adhoc | 1 dataDefinerUnit |
+| /public | 1 files |
+| /temp | 1 domains, 1 views |
+
+**/SmartCity/Report/Workstreams**
+
+| Folder | Contents |
+| --- | --- |
+| Cashiering | 1 domains |
+| Customer_Operations | 1 domains |
+
+**/SmartCity/Letter**
+
+| Folder | Contents |
+| --- | --- |
+| . | 6 reports |
+| inputXML | 1 files |
+
+**/SmartCity/Bill**
+
+| Folder | Contents |
+| --- | --- |
+| . | 2 reports |
+
 ## prod / Ellensburg
 
 Snapshot 20260918-051522 · 197 views, 151 reports, 90 domains, 27 files, 8 outputs, 3 jndiJdbcDataSource, 2 dashboards, 1 datasources, 1 reportOptions, 1 dataDefinerUnit, 1 virtualDataSource, 1 customDataSource
@@ -495,6 +533,41 @@ Snapshot 20260918-051522 · 197 views, 151 reports, 90 domains, 27 files, 8 outp
 | --- | --- |
 | . | 4 reports, 2 files |
 | inputXML | 1 files |
+
+## prod / Fond_Du_Lac
+
+Snapshot 20260918-071832 · 128 views, 63 reports, 47 domains, 41 outputs, 14 files, 1 datasources, 1 dashboards
+
+| Datasource | User | Connection |
+| --- | --- | --- |
+| FondDuLac_DS | JRS2C2M | jdbc:oracle:thin:@10.14.0.19:1521/pproddb_fonddulac.prodprivatesn.originprodvcn.oraclevcn.com |
+
+| Top-level folder | Contents |
+| --- | --- |
+| /DataSource | 1 datasources |
+| /SmartCity | 128 views, 63 reports, 47 domains, 41 outputs, 13 files, 1 dashboards |
+| /public | 1 files |
+
+**/SmartCity/Report/Workstreams**
+
+| Folder | Contents |
+| --- | --- |
+| Cashiering | 1 domains |
+| Customer_Operations | 1 domains |
+
+**/SmartCity/Letter**
+
+| Folder | Contents |
+| --- | --- |
+| . | 10 reports |
+| inputXML | 8 files |
+
+**/SmartCity/Bill**
+
+| Folder | Contents |
+| --- | --- |
+| . | 5 reports |
+| inputXML | 2 files |
 
 ## prod / Newark1
 

@@ -10,6 +10,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts" / "jaspersoft"))
 import jrs_inventory as inv  # noqa: E402
@@ -68,3 +70,60 @@ import unittest.mock  # noqa: E402
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_split_export_walks_only_the_named_folders(monkeypatch):
+    """--split names the folders exported child by child; everything else stays one part."""
+    tree = {
+        "/": [("f", "/SmartCity"), ("f", "/DataSource")],
+        "/SmartCity": [("f", "/SmartCity/Report"), ("f", "/SmartCity/Domain")],
+        "/SmartCity/Report": [("f", "/SmartCity/Report/FDL_Trial_Balance"), ("r", "/SmartCity/Report/Loose")],
+    }
+
+    def fake_call(path, **_):
+        folder = path.split("folderUri=")[1].split("&")[0]
+        import urllib.parse as up
+        kids = tree.get(up.unquote(folder), [])
+        return 200, json.dumps({"resourceLookup": [
+            {"uri": u, "resourceType": "folder" if k == "f" else "reportUnit"} for k, u in kids]})
+
+    monkeypatch.setattr(inv, "_call", fake_call)
+    assert inv._part_uris(["/SmartCity", "/SmartCity/Report"]) == [
+        "/SmartCity/Report/Loose", "/SmartCity/Report/FDL_Trial_Balance", "/SmartCity/Domain", "/DataSource"]
+    assert inv._part_uris([]) == ["/SmartCity", "/DataSource"]
+
+
+def test_export_stuck_is_raised_not_exited(monkeypatch):
+    calls = {"n": 0}
+
+    def fake_call(path, **kw):
+        if path.endswith("/export"):
+            return 200, json.dumps({"id": "t1"})
+        calls["n"] += 1
+        return 200, json.dumps({"phase": "inprogress"})
+
+    monkeypatch.setattr(inv, "_call", fake_call)
+    monkeypatch.setattr(inv.time, "sleep", lambda s: None)
+    monkeypatch.setattr(inv.time, "time", iter(range(0, 10_000)).__next__)
+    with pytest.raises(inv.ExportStuck):
+        inv.export_zip(["/x"], cap_seconds=5)
+
+
+def test_cut_download_reexports_then_gives_up(monkeypatch):
+    """A download cut mid-stream starts a NEW export (the server drops the old one), bounded."""
+    exports = {"n": 0}
+
+    def fake_call(path, **kw):
+        if path.endswith("/export"):
+            exports["n"] += 1
+            return 200, json.dumps({"id": f"t{exports['n']}"})
+        return 200, json.dumps({"phase": "finished"})
+
+    def cut(path):
+        raise inv.DownloadCut("download cut after 12024 KB (IncompleteRead)")
+
+    monkeypatch.setattr(inv, "_call", fake_call)
+    monkeypatch.setattr(inv, "_download", cut)
+    with pytest.raises(inv.ExportStuck):
+        inv.export_zip(["/x"], attempts=3)
+    assert exports["n"] == 3

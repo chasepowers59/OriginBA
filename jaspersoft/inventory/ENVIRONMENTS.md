@@ -7,7 +7,7 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 | Environment | Server | Organizations |
 | --- | --- | --- |
 | test | JRS 10.0.0 PRO (build 20260514_1415) | CityCorp, College_Station, Ellensburg, Fond_Du_Lac, Newark1, Odessa, Origin_DEV, Origin_TEST |
-| prod | JRS 9.0.0 PRO (build 20260514_1241) -- 10.0 upgrade planned | CityCorp, Ellensburg, Newark1 |
+| prod | JRS 9.0.0 PRO (build 20260514_1241) -- 10.0 upgrade planned | CityCorp, College_Station, Ellensburg, Fond_Du_Lac, Newark1 |
 | internal | JRS 10.0.0 PRO | Origin_DEMO, Origin_DEV, Origin_STAGE |
 
 ## test vs prod
@@ -157,6 +157,187 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - reports: `/SmartCity/Report/Inventory/SC_AR_Aging_Balance/SC_AR_Aging_Balance_-002d_90_Day_Interval_-002d_List_Report`
 - reports: `/SmartCity/Report/My_Reports/CC_Payments/CC_Cards_Payments_Report`
 - datasources: `/DataSource/CityCorp_DS`
+
+### College_Station
+
+214 same · 46 differ · 356 only in test · 1040 only in prod
+
+**only in test** — 237 views, 82 domains, 13 dashboards, 11 reports, 10 outputs, 2 datasources, 1 files
+
+- views: `/SmartCity/Origin_Tools/DataVergence/Configuration/Admin_Configuration___Ad_Hoc_View___Tabular_1`
+- views: `/SmartCity/Origin_Tools/Routine_Reports/Batch_Process___Ad_Hoc_View___Batch_Run_by_Status`
+- views: `/SmartCity/Origin_Tools/Routine_Reports/Batch_Process___Ad_Hoc_View___Incomplete_Batch_Runs`
+- views: `/SmartCity/Origin_Tools/Routine_Reports/Batch_Process___Ad_Hoc_View___Incomplete_Batch_Runs_by_Period`
+- views: `/SmartCity/Report/Custom_Reports/CS_Bill_Details/CS_Bill_Details_Ad_Hoc_View_Snapshot_Amounts`
+- views: `/SmartCity/Report/Custom_Reports/CS_Billed_Revenue/CS_Billed_Revenue_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_KW_Usage/SC_KW_Usage_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_SFTP_C2M_Connect_Disconnect_Last2_Next2_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_SFTP_C2M_Person_Dataset_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_Write_Off_Notifications/CS_Collection_Notice_AUTOTEXT_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/Full_C2M_Premise_ID_Listing`
+- views: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/UCS_Daily_Cash_Reciept_Report/CS_UCS_Daily_Cash_Receipt_Ad_Hoc_View`
+- views: `/SmartCity/Report/SC_AR_Aging_Balance/CS_AR_Aging_Balance___90_Day_Interval_Ad_Hoc_View`
+- views: `/SmartCity/Report/SC_AR_Aging_Balance/Deprecated/SC_AR_Aging_Balance___Standard_Ad_Hoc_View`
+- views: … 222 more
+- domains: `/SmartCity/Origin_Tools/DataVergence/Configuration/Admin_Configuration___Domain`
+- domains: `/SmartCity/Report/Custom_Reports/CS_Billed_Revenue/CS_Billed_Revenue`
+- domains: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Domain`
+- domains: `/SmartCity/Report/Custom_Reports/UCS_Daily_Cash_Reciept_Report/CS_UCS_Daily_Cash_Receipt_Domain`
+- domains: `/SmartCity/Report/SC_AR_Aging_Balance/Deprecated/SC_AR_Aging_Balance___Standard_Domain`
+- domains: `/SmartCity/Report/SC_AR_Aging_Balance/Materialized_View/SC_AR_Aging_Balance___90_Day_Interval___Domain`
+- domains: `/SmartCity/Report/SC_AR_Aging_Balance/View_Test/SC_AR_Aging_Balance___90_Day_Interval___Domain`
+- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Usage_Snapshot___Domain`
+- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Bill_Segment___Domain`
+- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage_SQ_Snapshot___Domain`
+- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billing_360___Domain`
+- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billing_Errors/SC_Unbilled_Billing_Domain`
+- domains: `/SmartCity/Report/Standard_Offering/Cashiering/Cashiering_360___Domain`
+- domains: `/SmartCity/Report/Standard_Offering/Cashiering/Deposit_Control/Deposit_Control___Domain`
+- domains: `/SmartCity/Report/Standard_Offering/Cashiering/Pay_Plan/Pay_Plan___Domain`
+- domains: … 67 more
+- dashboards: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Amount___Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage___Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Cashiering/Payment_Header/Cashiering_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Common/Batch/Batch_Process_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Common/To_Do/Exception_and_To_Do_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Customer_Operations/Customer_Contact/Customer_Operations_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Debt_Management/SA_Snapshot___Aged_Balance/Collections_Performance_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Field_Operations/Field_Activity/Field_Operations_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Finance/Financial_Transaction/Finance_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Finance/General_Ledger/General_Ledger___Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Meter_Operations/Measurements/Measurements___Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Meter_Operations/Usage/Usage_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/New_Services___Planning/New_Services/New_Services_Dashboard`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Billed_Revenue/CS_Billed_Revenue_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CS_SFTP_C2M_Connect_Disconnect_Last2_Next2_Ad_Hoc_View_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CS_SFTP_C2M_Person_Dataset_Report`
+- reports: `/SmartCity/Report/Custom_Reports/Full_C2M_Premise_ID_Listing_Report`
+- reports: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Report`
+- reports: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Report_Snapshot`
+- reports: `/SmartCity/Report/SC_AR_Aging_Balance/Deprecated/SC_AR_Aging_Balance_Standard_List_Report`
+- reports: `/SmartCity/Report/SC_AR_Aging_Balance/Materialized_View/SC_AR_Aging_Balance___90_Day_Interval___Ad_Hoc_View_Report_v2`
+- reports: `/SmartCity/Report/SC_AR_Aging_Balance/SC_AR_Aging_Balance_90_Day_Report`
+- reports: `/SmartCity/Report/SC_AR_Aging_Balance/View_Test/SC_AR_Aging_Balance___90_Day_Interval___Ad_Hoc_View_Report_v2`
+- reports: `/SmartCity/Report/Workstreams/Common/Exception/Usage_Transaction_Exception___Report___Tabular_1`
+- outputs: `/SmartCity/Report/Custom_Reports/CS_Financial_Transactions_Full_Report.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Report-002d202407040612.xlsx`
+- outputs: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Report-002d202407040613.xlsx`
+- outputs: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Report-002d202407040614.xlsx`
+- outputs: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Report-002d202407040615.xlsx`
+- outputs: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Report-002d202407040616.xlsx`
+- outputs: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Report-002d202407040617.xlsx`
+- outputs: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Report.xlsx`
+- outputs: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Report_Snapshot.html`
+- outputs: `/SmartCity/Report/Custom_Reports/Test_Folder/Test_Report_Snapshot.pdf`
+- datasources: `/DataSource/College_Station_DS`
+- datasources: `/DataSource/Origin_DEV_DS`
+- files: `/templates/SmartCity_Template_Actual_Size.jrxml`
+
+**only in prod** — 876 outputs, 99 views, 48 reports, 9 domains, 5 reportOptions, 2 dataDefinerUnit, 1 datasources
+
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240430.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240501.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240502.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240503.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240506.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240507.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240508.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240509.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240510.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240513.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240514.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240515.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240516.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240517.pdf`
+- outputs: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Report_Outputs/Daily_Cash_Receipt_Summaries/Daily_Cash_Receipt_Summary_Report-002d20240520.pdf`
+- outputs: … 861 more
+- views: `/CSIT_Premise_Listing_Ad_Hoc_View`
+- views: `/CSIT_Service_Point_Listing_Ad_Hoc_View_Report`
+- views: `/SmartCity/Report/Custom_Reports/Account_Balances_by_SA`
+- views: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/CS_UCS_Daily_Tender_Batch_Review`
+- views: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/Daily_Cash_Receipt_Summary_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/Excess_Credit_SA_Activity`
+- views: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/Financial_Transactions_for_Specific_Account`
+- views: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/GL_Export_Detail`
+- views: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/List_of_GL_Accts`
+- views: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/Unposted_FTs`
+- views: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/Unposted_FTs__grouped_by_Transaction_Type_`
+- views: `/SmartCity/Report/Custom_Reports/CS_Account_Alerts/CS_Account_Alerts_Pending_CO_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_Account_Bill_Report`
+- views: `/SmartCity/Report/Custom_Reports/CS_Bill_Deposits_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_Bill_Details/CS_Bill_Details_Ad_Hoc_Updated`
+- views: … 84 more
+- reports: `/SmartCity/Bill/Bill_Bursted_Trigger`
+- reports: `/SmartCity/Bill/Bill_Consolidated_Trigger`
+- reports: `/SmartCity/Letter/Letter_LTR_BUDUP`
+- reports: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/CS_UCS_Daily_Tender_Batch_Review_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Daily_Cash_Receipt_Summary_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Excess_Credit_SA_Activity_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/GL_Export_Detail_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Unposted_FTs__grouped_by_Transaction_Type__Report`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Billing_Reports/CS_Billed_Revenue_Ad_Hoc_View___Zero_Segment_Balance_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Billing_Reports/Count_of_Billed_Accounts___Solid_Waste_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Billing_Reports/Final_Bills_within_prior_7_days_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Connection_Email/CS_Connection_Email_Report_for_Email`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Customer_Location_Current_Balance_v2_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Customer_Service_Specific_Rate_Class/CS_Customer_Service_Specific_Rate_Class_Snapshot`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Customer_Service_Specific_Rate_Class/CoCS_CURB_Monthly_Report__BVSWMA_`
+- reports: … 33 more
+- domains: `/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Domains/CS_UCS_Daily_Cash_Receipt_Domain`
+- domains: `/SmartCity/Report/Custom_Reports/CS_Billing_Reports/Domains/CS_Billed_Revenue`
+- domains: `/SmartCity/Report/Custom_Reports/CS_KW_Usage/CS_KW_Usage_Domain_1`
+- domains: `/SmartCity/Report/Custom_Reports/CS_SA___Account_Balances`
+- domains: `/SmartCity/Report/Custom_Reports/CS_Trial_Balance/CS_Trial_Balance_Domain_1`
+- domains: `/SmartCity/Report/SC_Batch_Control/Batch_Process___Domain`
+- domains: `/SmartCity/Report/SC_Financial_Transaction_GL/SC_Financial_Transaction_Domain`
+- domains: `/SmartCity/Report/SC_Origin_Tools/SC_Trial_Balance_Pre_GO_Live/SC_Trial_Balance_Pre_GO_Live_Domain`
+- domains: `/SmartCity/Report/SC_Unbilled_Billing/SC_Unbilled_Billing_Domain`
+- reportOptions: `/SmartCity/Report/Custom_Reports/CS_Deposit_Listing/Prior_Day`
+- reportOptions: `/SmartCity/Report/Custom_Reports/CS_Financial_Transaction_Domain/Deposit_SAs`
+- reportOptions: `/SmartCity/Report/Custom_Reports/CS_Work_Orders___Statistics_by_Date/Options`
+- reportOptions: `/SmartCity/Report/Custom_Reports/Options`
+- reportOptions: `/SmartCity/Report/Custom_Reports/Read_Cycle_Options`
+- dataDefinerUnit: `/SmartCity/Report/Custom_Reports/CS_Test_Report`
+- dataDefinerUnit: `/SmartCity/Report/Custom_Reports/Test_Collections_Report`
+- datasources: `/DataSource/CollegeStation_DS_1`
+
+**differ** — 28 views, 10 domains, 7 reports, 1 datasources
+
+- views: `/SmartCity/Origin_Tools/Routine_Reports/OriginPay___Ad_Hoc_View___Monthly_Transactions`
+- views: `/SmartCity/Report/Custom_Reports/CS_Collections_Notifications/CS_Collections_Notifications_AUTOCALL_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_Collections_Notifications/CS_Collections_Notifications_AUTOTEXT_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_Collections_Notifications/CS_Collections_Notifications_AUTOTEXT_Ad_Hoc_View__CSUCS_`
+- views: `/SmartCity/Report/Custom_Reports/CS_Collections_Notifications/CS_Collections_Notifications_AUTOTEXT_Ad_Hoc_View__GCINCO_`
+- views: `/SmartCity/Report/Custom_Reports/CS_Collections_Notifications/OLD/CS_Collections_Notifications/CS_Collections_Notifications_AUTOCALL_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_Collections_Notifications/OLD/CS_Collections_Notifications/CS_Collections_Notifications_AUTOTEXT_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_Collections_Notifications/OLD/CS_Collections_Notifications/CS_Collections_Notifications_AUTOTEXT_Ad_Hoc_View__GCINCO_`
+- views: `/SmartCity/Report/Custom_Reports/CS_Connect/CS_Connect_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_Connection_Email/CS_Connection_Email_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_Customer_Service_Specific_Rate_Class/CS_Customer_Service_Specific_Rate_Class_Ad_Hoc_View__CURB_`
+- views: `/SmartCity/Report/Custom_Reports/CS_Deposit_Listing/CS_Deposit_Listing_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_Disconnect_Email/CS_Disconnect_Email_Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/CS_Financial_Transactions_Full`
+- views: `/SmartCity/Report/Custom_Reports/CS_Pending_Start/CS_Pending_Start_Severance_Ad_Hoc_View`
+- views: … 13 more
+- domains: `/SmartCity/Report/Custom_Reports/CS_AR_Aging_Balance/CS_AR_Aging_Balance___20_Day_Interval_Domain`
+- domains: `/SmartCity/Report/Custom_Reports/CS_Receivebles_Aging/CS_Receivables_Aging_Domain_v2`
+- domains: `/SmartCity/Report/Custom_Reports/CS_Write_Off_Notifications/CS_Collections_Notifications_AUTOCALL_Domain`
+- domains: `/SmartCity/Report/Custom_Reports/CS_Write_Off_Notifications/CS_Collections_Notifications_AUTOTEXT_Domain`
+- domains: `/SmartCity/Report/SC_AR_Aging_Balance/SC_AR_Aging_Balance_30_Day_Snapshot_Domain`
+- domains: `/SmartCity/Report/SC_AR_Aging_Balance/SC_AR_Aging_Balance___90_Day_Interval___Domain`
+- domains: `/SmartCity/Report/SC_Bill_Print_Audit/SC_Bill_Print_Audit_Domain`
+- domains: `/SmartCity/Report/SC_Billed_Revenue/SC_Billed_Revenue_Domain`
+- domains: `/SmartCity/Report/SC_Severance_Process/SC_Severance_Process_Domain`
+- domains: `/SmartCity/Report/Workstreams/Cashiering/Payment_Tender/Payment_Tender___Domain`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Collections_Notifications/CS_Collections_Notifications_AUTOTEXT_Ad_Hoc_View_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Connect/CS_Connect_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Customer_Service_Specific_Rate_Class/CS_Customer_Service_Specific_Rate_Class_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Receivebles_Aging/CS_Receivables_Aging_List_Report`
+- reports: `/SmartCity/Report/Custom_Reports/CS_Revenue/CS_Revenue_Report`
+- reports: `/SmartCity/Report/Custom_Reports/UCS_Daily_Cash_Reciept_Report/CS_UCS_Daily_Cash_Receipt_Report`
+- reports: `/SmartCity/Report/Custom_Reports/UCS_Daily_Cash_Reciept_Report/CS_UCS_Daily_Cash_Receipt_Report_Snapshot`
+- datasources: `/DataSource/CollegeStation_DS`
 
 ### Ellensburg
 
@@ -308,6 +489,177 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - domains: `/SmartCity/Report/My_Reports/SC_Payment_Tender/SC_Payment_Tender_Domain`
 - domains: `/SmartCity/Report/Workstreams/Cashiering/Payment_Tender/Payment_Tender___Domain`
 - datasources: `/DataSource/Ellensburg_DS`
+
+### Fond_Du_Lac
+
+96 same · 36 differ · 86 only in test · 162 only in prod
+
+**only in test** — 31 views, 29 domains, 15 files, 9 reports, 1 datasources, 1 controls
+
+- views: `/SmartCity/Origin_Tools/DataVergence/Configuration/Admin_Configuration___Ad_Hoc_View___Tabular_1`
+- views: `/SmartCity/Origin_Tools/Routine_Reports/Batch_Process___Ad_Hoc_View___Batch_Run_by_Status`
+- views: `/SmartCity/Origin_Tools/Routine_Reports/Batch_Process___Ad_Hoc_View___Incomplete_Batch_Runs`
+- views: `/SmartCity/Origin_Tools/Routine_Reports/Batch_Process___Ad_Hoc_View___Incomplete_Batch_Runs_by_Period`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Ad_Hoc_View_TS`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Ad_Hoc_View_V2`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Current_Payoff_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Accounts_and_Payments/Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Accounts_and_Payments/FDL_Accounts_and_Payments_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Active_Collection_Process/FDL_Stopped_SA_Collections_Ad_Hoc_View_TS`
+- views: `/SmartCity/Report/FDL_Asset/FDLWU_Asset_AdHoc_View_TEST`
+- views: `/SmartCity/Report/FDL_Asset/FDL_SP_with_SP_CHAR___TEST`
+- views: `/SmartCity/Report/FDL_Asset/Metron_Data_Exchange_Replication`
+- views: `/SmartCity/Report/FDL_Latest_Bills/FDL_Latest_Bill_Segment_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Pending_Bills/FDL_Pending_Bills_Ad_Hoc_View`
+- views: … 16 more
+- domains: `/SmartCity/Origin_Tools/DataVergence/Configuration/Admin_Configuration___Domain`
+- domains: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance___FT_GL_Domain_V02`
+- domains: `/SmartCity/Report/FDL_Accounts_and_Payments/FDL_Account_Premise_Domain`
+- domains: `/SmartCity/Report/FDL_Accounts_and_Payments/FDL_Accounts_and_Payments`
+- domains: `/SmartCity/Report/FDL_Active_Collection_Process/FDL_Stopped_SA_Collection_Process_Domain_TS`
+- domains: `/SmartCity/Report/FDL_Active_Collection_Process/FDL_Stopped_SAs_Collection_Process_Domain`
+- domains: `/SmartCity/Report/FDL_Asset/CDC_Test_DOMAIN`
+- domains: `/SmartCity/Report/FDL_Asset/FDLWU_Asset_MeasureCOMP`
+- domains: `/SmartCity/Report/FDL_Asset/FDL_Asset_Domain___CDC_TEST_MEASURE_COMP`
+- domains: `/SmartCity/Report/FDL_Asset/SP_with_SP_Char_Domain`
+- domains: `/SmartCity/Report/FDL_Bill_Print_Audit/FDL_Summary_Billing_DRAFT`
+- domains: `/SmartCity/Report/FDL_Latest_Bills/FDL_Latest_Bill_Segment_Domain`
+- domains: `/SmartCity/Report/FDL_Pending_Bills/FDL_Billing_Overview_Domain`
+- domains: `/SmartCity/Report/FDL_Pending_Bills/FDL_Pending_Bills_Domain`
+- domains: `/SmartCity/Report/FDL_SA_To_Close/FDL_SA_To_Close_Domain`
+- domains: … 14 more
+- files: `/SmartCity/Admin/Image/smartcity_logo_v3_1.png`
+- files: `/SmartCity/Bill/inputXML/FDL_POSTROUT_.xml`
+- files: `/SmartCity/Bill/inputXML/InteceptTransformedSort_withGlobalBillPrintGroup.xml`
+- files: `/SmartCity/Bill/inputXML/POSTROUT_1_JRS_Sample.xml`
+- files: `/SmartCity/Bill/inputXML/POSTROUT_2.xml`
+- files: `/SmartCity/Bill/inputXML/POSTROUT_3BILLS_AfterChange.xml`
+- files: `/SmartCity/Bill/inputXML/ToBurst.xml`
+- files: `/templates/SmartCity_Template_Actual_Size.jrxml`
+- files: `/templates/a4_landscape.620.jrxml`
+- files: `/templates/actual_size.820`
+- files: `/templates/actual_size.820.jrxml`
+- files: `/templates/cm_actual_size`
+- files: `/templates/cm_actual_size_v0`
+- files: `/templates/default.820.jrtx`
+- files: `/templates/origin-002dlogo-002dwhite-002d1`
+- reports: `/SmartCity/Report/FDL_Latest_Bills/FDL_Latest_Bill_Segment_Report`
+- reports: `/SmartCity/Report/FDL_Pending_Bills/FDL_Pending_Bills_Report`
+- reports: `/SmartCity/Report/FDL_V_Domains/FDL_Right_Side_V___SA_Ad_Hoc_View_Report`
+- reports: `/SmartCity/Report/FDL_V_Domains/FDL_Right_Side_V___SA_CDC_TEST_Report`
+- reports: `/SmartCity/Report/FDL_V_Domains/FDL_Right_Side_V___SA_Report_CM_Template_v0`
+- reports: `/SmartCity/Report/FDL_V_Domains/FDL_Right_Side_V___SA_Report_Header_Exercise`
+- reports: `/SmartCity/Report/SC_Customer_Contacts/SCCustomerContactCOMPLIANCEReport`
+- reports: `/SmartCity/Report/SC_Origin_Tools/SC_Bill_Compare_Report`
+- reports: `/SmartCity/Report/SC_V/SC_Active_SAs_by_Customer_Class_Ad_Hoc_View_Report`
+- datasources: `/DataSource/FondDuLac_TST`
+- controls: `/templates/ADHOC_TITLE`
+
+**only in prod** — 86 views, 40 outputs, 17 reports, 9 files, 9 domains, 1 dashboards
+
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Ad_Hoc_View__Temp_`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Tax_Roll_Check_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Tax_Roll_Check__Active_SAs_`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Tax_Roll_Check__Stopped_SAs_`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Tax_Roll_Check___2024_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Tax_Roll_Check___2024__Active_SAs__Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Tax_Roll_Check___2024__Stopped_SAs__Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Balance_on_Specific_Date_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_SA_Arrears_Revenue_Ad_Hoc_View___Only_With_Balances`
+- views: `/SmartCity/Report/FDL_Accounts_and_Balances/FDL_Accounts_and_Balances_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Active_Collection_Process/FDL_V_Reports/FDL_Active_SAs_by_Customer_Class_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Active_Collection_Process/FDL_V_Reports/FDL_Left_Side_V_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Active_Collection_Process/FDL_V_Reports/FDL_Left_Side_V___SA_ID_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Active_Collection_Process/FDL_V_Reports/FDL_Right_Side_V_SP_Premise_Ad_Hoc_View`
+- views: … 71 more
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/FDLWU_Meter_View_C2M_All_TEST_260610.csv.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/FDLWU_Meters_C2M_InSTORE.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/FDLWU_Meters_C2M_Installed.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/FDLWU_Meters_C2M_Retired.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/Metron_Data_Exchange-002d20260213.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/Metron_Data_Exchange-002d20260220.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/Metron_Data_Exchange-002d20260227.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/Metron_Data_Exchange-002d20260306.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/Metron_Data_Exchange-002d20260313.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/Metron_Data_Exchange_All_Zones-002d20260313.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/Metron_Data_Exchange_All_Zones-002d20260320.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/Metron_Data_Exchange_All_Zones-002d20260327.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/Metron_Data_Exchange_All_Zones-002d20260403.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/Metron_Data_Exchange_All_Zones-002d20260410.csv`
+- outputs: `/SmartCity/Report/FDL_Asset/Asset_Report_Output/Metron_Data_Exchange_All_Zones-002d20260417.csv`
+- outputs: … 25 more
+- reports: `/SmartCity/Origin_Tools/Routine_Reports/GC_-002d_Active_SP_with_No_Meter_Installed_Report`
+- reports: `/SmartCity/Report/FDL_Asset/Customer_Type_Report_v2`
+- reports: `/SmartCity/Report/FDL_Asset/FDLWU_Meter_RES_MTRs_RTRMT_TEST_4_REPORT_Report`
+- reports: `/SmartCity/Report/FDL_Asset/FDLWU_Meter_View_Active_MTRs_ALL_Report_240820`
+- reports: `/SmartCity/Report/FDL_Asset/FDLWU_Meter_View_Active_MTRs_Report_1128`
+- reports: `/SmartCity/Report/FDL_Asset/FDLWU_Meter_View_Active_MTRs_Report_v2B`
+- reports: `/SmartCity/Report/FDL_Asset/FDLWU_Meter_View_Active_MTRs_Report_v2B_ENDPOINTS_BILL-002dCYCLE`
+- reports: `/SmartCity/Report/FDL_Asset/FDLWU_Meter_View_C2M_All`
+- reports: `/SmartCity/Report/FDL_Asset/FDLWU_Meter_View_MCO_Report_5`
+- reports: `/SmartCity/Report/FDL_Asset/FDLWU_Meters_Installed_All_v2026_Report`
+- reports: `/SmartCity/Report/FDL_Asset/FDLWU_PREM-002dPIN_Report_v2`
+- reports: `/SmartCity/Report/FDL_Asset/FDLWU_SC_Active_SAs_ALL_View_Report`
+- reports: `/SmartCity/Report/FDL_Asset/FDLWU_SC_Active_SAs_by_Customer_Class_Report_v1`
+- reports: `/SmartCity/Report/FDL_Asset/FDLWU_SC_Active_SAs_by_Customer_Class_Report_v2`
+- reports: `/SmartCity/Report/FDL_Asset/FDL_LSV_SA_Mail_Addr`
+- reports: … 2 more
+- files: `/SmartCity/Bill/inputXML/C2M_EBIL_157_1of1.xml`
+- files: `/SmartCity/Letter/inputXML/Letter_Generic`
+- files: `/SmartCity/Letter/inputXML/Letter_MR_RPLC_FINL`
+- files: `/SmartCity/Letter/inputXML/Letter_MR_RPLC_FINL.xml`
+- files: `/SmartCity/Letter/inputXML/Letter_MR_RPLC_INIT.xml`
+- files: `/SmartCity/Letter/inputXML/Letter_TXRLLLLTR.xml`
+- files: `/SmartCity/Letter/inputXML/Letter_TXRLLTR.xml`
+- files: `/SmartCity/Letter/inputXML/Letter_WRA_START.xml`
+- files: `/SmartCity/Letter/inputXML/Letter_WRA_STOP.xml`
+- domains: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Tax_Roll_Check_Domain`
+- domains: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Tax_Roll_Check___2024_Domain`
+- domains: `/SmartCity/Report/FDL_Accounts_and_Balances/FDL_Accounts_and_Balances_Domain`
+- domains: `/SmartCity/Report/FDL_Active_Collection_Process/FDL_Stopped_SA_Collection_Process_Domain`
+- domains: `/SmartCity/Report/FDL_Asset/Assets_Retired/Active_Service_Points`
+- domains: `/SmartCity/Report/FDL_Asset/Assets_Retired/Asset_Domain_w__Retirement_Date`
+- domains: `/SmartCity/Report/FDL_V_Domains/FDL_Right_Side_V_Domain___SA`
+- domains: `/SmartCity/Report/FDL_V_Domains/SC_Left_Side_V_Domain___SA_Fields_TESSA_TEST`
+- domains: `/SmartCity/Report/SC_Batch_Control/Batch_Process___Domain`
+- dashboards: `/SmartCity/Report/SC_Batch_Control/Batch_Process___Batch_Day_Status___Dasbhoard`
+
+**differ** — 19 views, 8 reports, 8 domains, 1 datasources
+
+- views: `/SmartCity/Origin_Tools/Routine_Reports/OriginPay___Ad_Hoc_View___Monthly_Transactions`
+- views: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Active_Collection_Process/FDL_Active_Collection_Process_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Active_Collection_Process/FDL_Stopped_SA_Collection_Process_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Active_Write_Off_Process/FDL_Active_Write_Off_Process_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Asset/FDLWU_Asset_AdHoc_View`
+- views: `/SmartCity/Report/FDL_Asset/FDLWU_Meter_View_ALL_RES_MTRs`
+- views: `/SmartCity/Report/FDL_Asset/FDL_Asset_Ad_Hoc_View_with_SP_Equipment`
+- views: `/SmartCity/Report/FDL_Asset/SC_Asset_AdHoc_View_Table`
+- views: `/SmartCity/Report/FDL_Bill_Print_Audit/FDL_Billed_Revenue_Ad_Hoc_View___Full_Year__For_PSC_Audit_`
+- views: `/SmartCity/Report/FDL_Compliance_Customer_Contacts/FDL_Compliance_Customer_Contacts_Ad_Hoc_View`
+- views: `/SmartCity/Report/FDL_Tax_Roll_Write_Off/FDL_Tax_Roll_Write_Off_Ad_Hoc_View`
+- views: `/SmartCity/Report/SC_Adjustment/SC_Adjustment_Ad_Hoc_View`
+- views: `/SmartCity/Report/SC_Case/SC_Case_Ad_Hoc_View`
+- views: `/SmartCity/Report/SC_SA_Arrears_Revenue/SC_Service_Agreement_Arrears_Revenue_Ad_Hoc_View`
+- views: … 4 more
+- reports: `/SmartCity/Bill/Bill_Bursted_Intercept_Trigger`
+- reports: `/SmartCity/Bill/Bill_Bursted_Trigger`
+- reports: `/SmartCity/Bill/Bill_Bursted_Trigger_v2`
+- reports: `/SmartCity/Bill/Bill_Consolidated_Trigger`
+- reports: `/SmartCity/Bill/Bill_OneService`
+- reports: `/SmartCity/Letter/Letter_WRA_START`
+- reports: `/SmartCity/Report/FDL_Tax_Roll_Write_Off/FDL_Tax_Roll_Write_Off_Report`
+- reports: `/SmartCity/Report/SC_V/SC_Right_Side_V_List_Report`
+- domains: `/SmartCity/Report/FDL_AR_Aging_Balance/FDL_AR_Aging_Balance_Domain`
+- domains: `/SmartCity/Report/FDL_Active_Write_Off_Process/FDL_Write_Off_Process_Domain`
+- domains: `/SmartCity/Report/FDL_Tax_Roll_Write_Off/FDL_Tax_Roll_Write_Off_Domain`
+- domains: `/SmartCity/Report/FDL_Trial_Balance/FDL_SA_Arrears_Revenue_Domain_2`
+- domains: `/SmartCity/Report/SC_Collection_Process/SC_Collection_Process_Domain`
+- domains: `/SmartCity/Report/SC_Customer_Contacts/SC_Customer_Contacts_Domain`
+- domains: `/SmartCity/Report/SC_SA_Arrears_Revenue/SC_Service_Agreement_Arrears_Revenue_Domain`
+- domains: `/SmartCity/Report/Workstreams/Cashiering/Payment_Tender/Payment_Tender___Domain`
+- datasources: `/DataSource/FondDuLac_DS`
 
 ### Newark1
 

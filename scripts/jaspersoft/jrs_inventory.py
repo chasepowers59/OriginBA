@@ -38,6 +38,8 @@ import re
 import shutil
 import sys
 import time
+import urllib.error
+import urllib.parse
 import zipfile
 from pathlib import Path
 
@@ -64,29 +66,68 @@ def org_uri(org: str) -> str:
     return f"{ORG_ROOT}/{org}"
 
 
-def export_zip(uris: list[str]) -> bytes:
-    """The server's export of these URIs with repository permissions; polls the task to done."""
+class ExportStuck(Exception):
+    pass
+
+
+def export_zip(uris: list[str], cap_seconds: int = 1800, attempts: int = 3) -> bytes:
+    """The server's export of these URIs with repository permissions; polls the task to done.
+    Raises ExportStuck past cap_seconds -- prod's 9.0 exporter never finishes some folders
+    (Fond_Du_Lac 2026-09-18), and a snapshot must not hang on one of them. A download cut
+    mid-stream (VPN; College_Station prod, twice) is retried as a WHOLE new export: the server
+    discards a finished export once its download starts, so a Range retry answers 404."""
+    for attempt in range(1, attempts + 1):
+        tid = _export_task(uris, cap_seconds)
+        try:
+            return _download(f"/rest_v2/export/{tid}/export.zip")
+        except DownloadCut as exc:
+            print(f"{exc}; re-exporting {uris} ({attempt}/{attempts})")
+    raise ExportStuck(f"download of {uris} cut {attempts} times")
+
+
+def _export_task(uris: list[str], cap_seconds: int) -> str:
     body = json.dumps({"uris": uris, "parameters": ["repository-permissions"]}).encode()
     code, text = _call("/rest_v2/export", method="POST", body=body, ctype="application/json")
     if code not in (200, 201):
-        sys.exit(f"export request: {code} {text[:300]}")
+        raise ExportStuck(f"export request: {code} {text[:300]}")
     tid = json.loads(text)["id"]
-    for _ in range(600):
-        code, text = _call(f"/rest_v2/export/{tid}/state")
+    t0 = time.time()
+    while time.time() - t0 < cap_seconds:
+        try:
+            code, text = _call(f"/rest_v2/export/{tid}/state")
+        except (urllib.error.URLError, ConnectionError, TimeoutError) as exc:
+            # a transient TLS EOF on one poll (College_Station prod, 2026-09-18) must not
+            # end a 40-minute snapshot; the export keeps running server-side
+            print(f"state poll failed ({type(exc).__name__}); retrying")
+            time.sleep(5); continue
         st = json.loads(text) if text.startswith("{") else {"phase": text}
         if st.get("phase") == "finished":
-            break
+            return tid
         if st.get("phase") == "failed":
-            sys.exit(f"export failed: {st}")
+            raise ExportStuck(f"export failed: {st}")
         time.sleep(2)
-    else:
-        sys.exit(f"export {tid} did not finish")
-    url_base, auth = __import__("jrs_repository")._cfg()
+    raise ExportStuck(f"export of {uris} still running after {cap_seconds}s")
+
+
+class DownloadCut(Exception):
+    pass
+
+
+def _download(path: str) -> bytes:
+    import http.client
+    import urllib.error
     import urllib.request
-    req = urllib.request.Request(f"{url_base}/rest_v2/export/{tid}/export.zip")
+    url_base, auth = __import__("jrs_repository")._cfg()
+    req = urllib.request.Request(url_base + path)
     req.add_header("Authorization", auth)
-    with urllib.request.urlopen(req, timeout=1800, context=__import__("jrs_repository")._ssl_context()) as r:
-        return r.read()
+    held = bytearray()
+    try:
+        with urllib.request.urlopen(req, timeout=600, context=__import__("jrs_repository")._ssl_context()) as r:
+            while chunk := r.read(1 << 20):
+                held += chunk
+        return bytes(held)
+    except (http.client.IncompleteRead, ConnectionError, TimeoutError, urllib.error.URLError) as exc:
+        raise DownloadCut(f"download cut after {len(held) // 1024} KB ({type(exc).__name__})") from exc
 
 
 # ------------------------------------------------------------------ files
@@ -101,10 +142,10 @@ NOT_COMMITTED = ("topicJRXML.data",)
 NOT_COMMITTED_SUFFIXES = (".pdf", ".xlsx", ".docx", ".pptx")
 
 
-def unpack(zip_bytes: bytes, dest: Path) -> int:
+def unpack(zip_bytes: bytes, dest: Path, fresh: bool = True) -> int:
     """The export tree, committed shape: XML with passwords redacted, .data files verbatim,
-    minus NOT_COMMITTED."""
-    if dest.exists():
+    minus NOT_COMMITTED. fresh=False adds a part to an existing tree."""
+    if fresh and dest.exists():
         shutil.rmtree(dest)
     n = 0
     with zipfile.ZipFile(io.BytesIO(zip_bytes)) as z:
@@ -158,7 +199,49 @@ def summarize(tree: Path) -> dict:
             "datasources": datasources, "report_units": reports}
 
 
-def snapshot(env: str, only_org: str | None, orgs_scoped: list[str] | None = None) -> None:
+def _export_part(uri: str, cap: int, tries: int = 3) -> bytes | None:
+    """One part's zip, or None when the server never finishes it. A dropped connection
+    (RemoteDisconnected on the POST, TLS EOF on a poll) is retried as a fresh export."""
+    import http.client
+    for attempt in range(1, tries + 1):
+        try:
+            return export_zip([uri], cap_seconds=cap)
+        except ExportStuck as exc:
+            print(f"  {uri}: {exc}")
+            return None
+        except (urllib.error.URLError, http.client.HTTPException, ConnectionError, TimeoutError) as exc:
+            print(f"  {uri}: connection dropped ({type(exc).__name__}); retry {attempt}/{tries}")
+            time.sleep(10)
+    return None
+
+
+def _part_uris(parts: list[str], exclude: tuple[str, ...] = ()) -> list[str]:
+    """Top-level folders of the login's root, with the folders named in `parts` replaced by
+    their children (so a slow branch is exported one child at a time); `exclude` are URIs
+    known to hang the exporter, left out without waiting for the cap."""
+    code, text = _call("/rest_v2/resources?folderUri=/&recursive=false&limit=200")
+    tops = [i["uri"] for i in json.loads(text).get("resourceLookup", []) if i["resourceType"] == "folder"] if code == 200 else []
+    out: list[str] = []
+    for u in tops:
+        out += _expand(u, parts)
+    return [u for u in out if u not in exclude]
+
+
+def _expand(uri: str, parts: list[str]) -> list[str]:
+    if uri not in parts:
+        return [uri]
+    code, text = _call(f"/rest_v2/resources?folderUri={urllib.parse.quote(uri)}&recursive=false&limit=500")
+    kids = json.loads(text).get("resourceLookup", []) if code == 200 else []
+    out = [i["uri"] for i in kids if i["resourceType"] != "folder"]
+    for i in kids:
+        if i["resourceType"] == "folder":
+            out += _expand(i["uri"], parts)
+    return out
+
+
+def snapshot(env: str, only_org: str | None, orgs_scoped: list[str] | None = None,
+             parts: list[str] | None = None, part_cap: int = 600, exclude: tuple[str, ...] = (),
+             resume: bool = False) -> None:
     """A superuser exports each org by its /organizations/... URI. An ORG-SCOPED account (prod:
     the login is user|Org, it sees only that org) exports its own root, "/", once per org with
     the login re-scoped -- pass --orgs A B C for that shape."""
@@ -173,15 +256,43 @@ def snapshot(env: str, only_org: str | None, orgs_scoped: list[str] | None = Non
         t0 = time.time()
         if scoped:
             os.environ[f"JRS_{env.upper()}_USER"] = f"{base_user}|{org}"
-        data = export_zip(["/"] if scoped else [org_uri(org)])
+        if resume and parts:
+            # continue the newest stamp: parts whose zip already landed are not asked for again
+            # (the network to prod drops a connection every 10-15 minutes, 2026-09-18)
+            stamps = sorted(d for d in (BACKUPS / env).glob("*") if any(d.glob(f"{org}__*.zip")))
+            if stamps:
+                stamp = stamps[-1].name
         bdir = BACKUPS / env / stamp
         bdir.mkdir(parents=True, exist_ok=True)
-        (bdir / f"{org}.zip").write_bytes(data)
-        n = unpack(data, INVENTORY / env / org)
+        stuck = list(exclude)
+        if parts:
+            # one export per folder (recursing into --split folders), each under its own cap;
+            # a folder the server never finishes is recorded, not waited for
+            tree = INVENTORY / env / org
+            if tree.exists() and not resume:
+                shutil.rmtree(tree)
+            n, size = 0, 0
+            for uri in _part_uris(parts, exclude):
+                zpath = bdir / f"{org}__{uri.strip('/').replace('/', '__') or 'root'}.zip"
+                if resume and zpath.exists():
+                    part = zpath.read_bytes()
+                else:
+                    part = _export_part(uri, part_cap)
+                    if part is None:
+                        print(f"[{env}] {org}: SKIPPED {uri}")
+                        stuck.append(uri); continue
+                    zpath.write_bytes(part)
+                n += unpack(part, tree, fresh=False); size += len(part)
+            data = b""
+        else:
+            data = export_zip(["/"] if scoped else [org_uri(org)])
+            (bdir / f"{org}.zip").write_bytes(data)
+            n, size = unpack(data, INVENTORY / env / org), len(data)
         summary = summarize(INVENTORY / env / org)
-        summary["snapshot"] = {"env": env, "org": org, "taken": stamp, "backup": str((bdir / f"{org}.zip").relative_to(REPO)), "files": n}
+        summary["snapshot"] = {"env": env, "org": org, "taken": stamp, "backup": str((bdir).relative_to(REPO)) + ("/" + org + "__*.zip" if parts else f"/{org}.zip"),
+                               "files": n, "parts": bool(parts), "stuck": stuck}
         (INVENTORY / env / f"{org}.summary.json").write_text(json.dumps(summary, indent=1) + "\n")
-        print(f"[{env}] {org}: {n} files, {len(data) // 1024} KB, {summary['resources_by_type']} ({time.time() - t0:.0f}s)")
+        print(f"[{env}] {org}: {n} files, {size // 1024} KB, {summary['resources_by_type']} ({time.time() - t0:.0f}s)" + (f"; stuck: {stuck}" if stuck else ""))
     write_readme()
 
 
@@ -197,11 +308,17 @@ def write_readme() -> None:
             continue
         lines += [f"## {env}", "", "| Organization | Snapshot | Report units | Domains | Ad Hoc views | Dashboards | Files | Datasources (user @ host) |",
                   "| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |"]
+        partial = []
         for sf in summaries:
             s = json.loads(sf.read_text()); t = s["resources_by_type"]
+            if s["snapshot"].get("stuck"):
+                partial.append(s)
             ds = ", ".join(f"{d['uri'].rsplit('/', 1)[-1]} ({d.get('user') or '?'} @ {(d.get('url') or d.get('jndi') or '?').split('@')[-1].split('/')[0]})" for d in s["datasources"])
             lines.append(f"| {s['snapshot']['org']} | {s['snapshot']['taken']} | {t.get('reportUnit', 0)} | {t.get('semanticLayerDataSource', 0)} | "
                          f"{t.get('adhocDataView', 0)} | {t.get('dashboardModelResource', 0)} | {t.get('fileResource', 0)} | {ds} |")
+        for s in partial:
+            lines.append(f"\nPartial: {s['snapshot']['org']} is missing {', '.join('`' + u + '`' for u in s['snapshot']['stuck'])} "
+                         "(the server's exporter never finishes them; see the operations skill).")
         lines.append("")
     (INVENTORY / "README.md").write_text("\n".join(lines))
 
@@ -396,6 +513,10 @@ def main() -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("snapshot"); s.add_argument("--env", choices=ENVS, required=True); s.add_argument("--org")
     s.add_argument("--orgs", nargs="+", help="org-scoped login shape: snapshot each of these orgs as user|Org")
+    s.add_argument("--split", nargs="*", metavar="FOLDER", help="export folder by folder instead of the root; the named folders are split into their children")
+    s.add_argument("--part-cap", type=int, default=600, help="seconds to wait for one part before recording it as stuck")
+    s.add_argument("--exclude", nargs="*", default=[], metavar="URI", help="parts known to hang the exporter; recorded as stuck, never requested")
+    s.add_argument("--resume", action="store_true", help="with --split: keep the newest backup's parts and the tree, export only the missing parts")
     d = sub.add_parser("diff"); d.add_argument("a", help="env:Org"); d.add_argument("b", help="env:Org"); d.add_argument("--folder")
     sub.add_parser("summary")
     sub.add_parser("clients", help="write jaspersoft/inventory/CLIENTS.md: what each organization contains")
@@ -404,7 +525,7 @@ def main() -> int:
     r.add_argument("--env", choices=ENVS, required=True)
     a = ap.parse_args()
     if a.cmd == "snapshot":
-        snapshot(a.env, a.org, a.orgs); return 0
+        snapshot(a.env, a.org, a.orgs, a.split if a.split is not None else None, a.part_cap, tuple(a.exclude), a.resume); return 0
     if a.cmd == "diff":
         return diff(a.a, a.b, a.folder)
     if a.cmd == "rebuild":

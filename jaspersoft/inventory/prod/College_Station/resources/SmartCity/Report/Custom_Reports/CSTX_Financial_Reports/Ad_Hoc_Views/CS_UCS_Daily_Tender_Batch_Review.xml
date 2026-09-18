@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adhocDataView exportedWithPermissions="true">
+    <folder>/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views</folder>
+    <name>CS_UCS_Daily_Tender_Batch_Review</name>
+    <version>11</version>
+    <label>Daily Cash Receipt Detail</label>
+    <description>Reflects all deposit batches started the prior day and their totals by tender type. Does not include any return activity.</description>
+    <creationDate>2024-01-29T22:52:24.000Z</creationDate>
+    <updateDate>2024-05-06T14:02:14.000Z</updateDate>
+    <dataSource>
+        <uri>/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Domains/CS_UCS_Daily_Cash_Receipt_Domain</uri>
+    </dataSource>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/CS_UCS_Daily_Tender_Batch_Review_files</folder>
+            <name>CRE_DTTM_1_1</name>
+            <version>3</version>
+            <label>Create Date/Time equals</label>
+            <creationDate>2024-02-01T16:22:59.000Z</creationDate>
+            <updateDate>2024-02-01T16:22:59.000Z</updateDate>
+            <type>2</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/CS_UCS_Daily_Tender_Batch_Review_files/CRE_DTTM_1_1_files</folder>
+                    <name>timestamp</name>
+                    <version>0</version>
+                    <label>Timestamp</label>
+                    <creationDate>2024-02-01T16:22:59.000Z</creationDate>
+                    <updateDate>2024-02-01T16:22:59.000Z</updateDate>
+                    <type>4</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/CS_UCS_Daily_Tender_Batch_Review_files</folder>
+            <name>BatchSource_1</name>
+            <version>3</version>
+            <label>Batch Source</label>
+            <creationDate>2024-02-01T16:22:59.000Z</creationDate>
+            <updateDate>2024-02-01T16:22:59.000Z</updateDate>
+            <type>7</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/CS_UCS_Daily_Tender_Batch_Review_files/BatchSource_1_files</folder>
+                    <name>BatchSource_1</name>
+                    <version>1</version>
+                    <label>Batch Source</label>
+                    <creationDate>2024-02-01T16:22:59.000Z</creationDate>
+                    <updateDate>2024-02-01T16:22:59.000Z</updateDate>
+                    <language>domain</language>
+                    <queryString>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema"&gt;
+  &lt;groupList&gt;
+    &lt;group columnName="BatchSource" id="BatchSource"&gt;&lt;/group&gt;
+  &lt;/groupList&gt;
+  &lt;queryFields&gt;
+    &lt;queryField id="CI_TNDR_CTL.TNDR_SOURCE_CD" resourceId="CI_TNDR_CTL.TNDR_SOURCE_CD"&gt;&lt;/queryField&gt;
+    &lt;queryField expression="IF(CI_TNDR_CTL.USER_ID == '        ', CI_TNDR_CTL.TNDR_SOURCE_CD, CI_TNDR_CTL.USER_ID)" id="BatchSource" resourceId="BatchSource"&gt;&lt;/queryField&gt;
+    &lt;queryField id="IF_equals_CI_TNDR_CTL_USER_ID_zzzzzzzz_CI_TNDR_CTL_TNDR_SOURCE_CD_CI_TNDR_CTL_USER_ID" resourceId="IF_equals_CI_TNDR_CTL_USER_ID_zzzzzzzz_CI_TNDR_CTL_TNDR_SOURCE_CD_CI_TNDR_CTL_USER_ID"&gt;&lt;/queryField&gt;
+    &lt;queryField id="CI_TNDR_CTL.USER_ID" resourceId="CI_TNDR_CTL.USER_ID"&gt;&lt;/queryField&gt;
+  &lt;/queryFields&gt;
+  &lt;resources&gt;
+    &lt;memory id="default"&gt;
+      &lt;fieldList&gt;
+        &lt;field id="BatchSource" dataSetExpression="IF_equals_CI_TNDR_CTL_USER_ID_zzzzzzzz_CI_TNDR_CTL_TNDR_SOURCE_CD_CI_TNDR_CTL_USER_ID" type="java.lang.String"&gt;&lt;/field&gt;
+      &lt;/fieldList&gt;
+      &lt;sortList&gt;
+        &lt;sortColumn columnName="BatchSource"&gt;&lt;/sortColumn&gt;
+      &lt;/sortList&gt;
+      &lt;source&gt;
+        &lt;jdbcTable id="CISADM_CI_PAY" datasourceId="CollegeStation_DS" datasourceTableName="CI_PAY" maxRows="200001" schemaAlias="CISADM"&gt;
+          &lt;fieldList&gt;
+            &lt;field id="CI_TNDR_CTL.USER_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_TNDR_CTL.TNDR_SOURCE_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="IF_equals_CI_TNDR_CTL_USER_ID_zzzzzzzz_CI_TNDR_CTL_TNDR_SOURCE_CD_CI_TNDR_CTL_USER_ID" dataSetExpression="IF(CI_TNDR_CTL.USER_ID == '        ', CI_TNDR_CTL.TNDR_SOURCE_CD, CI_TNDR_CTL.USER_ID)" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_PAY.PAY_STATUS_FLG" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_PAY_TNDR.TNDR_STATUS_FLG" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_TENDER_TYPE_L.LANGUAGE_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_PAY.PAY_EVENT_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_PAY_EVENT.PAY_EVENT_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_PAY_TNDR.PAY_EVENT_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_TNDR_CTL.TNDR_CTL_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_PAY_TNDR.TNDR_CTL_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_PAY_TNDR.TENDER_TYPE_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_TENDER_TYPE_L.TENDER_TYPE_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+          &lt;/fieldList&gt;
+          &lt;filterString&gt;CI_PAY.PAY_STATUS_FLG == '50' and CI_PAY_TNDR.TNDR_STATUS_FLG == '25' and CI_TENDER_TYPE_L.LANGUAGE_CD == 'ENG'&lt;/filterString&gt;
+          &lt;groupList&gt;
+            &lt;group columnName="IF_equals_CI_TNDR_CTL_USER_ID_zzzzzzzz_CI_TNDR_CTL_TNDR_SOURCE_CD_CI_TNDR_CTL_USER_ID" id="IF_equals_CI_TNDR_CTL_USER_ID_zzzzzzzz_CI_TNDR_CTL_TNDR_SOURCE_CD_CI_TNDR_CTL_USER_ID"&gt;&lt;/group&gt;
+          &lt;/groupList&gt;
+          &lt;joinInfo alias="CI_PAY" referenceId="CI_PAY"&gt;&lt;/joinInfo&gt;
+          &lt;joinList&gt;
+            &lt;join expr="CI_PAY.PAY_EVENT_ID == CI_PAY_EVENT.PAY_EVENT_ID" left="CI_PAY" right="CI_PAY_EVENT" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="CI_PAY_TNDR.PAY_EVENT_ID == CI_PAY_EVENT.PAY_EVENT_ID" left="CI_PAY_EVENT" right="CI_PAY_TNDR" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="CI_TNDR_CTL.TNDR_CTL_ID == CI_PAY_TNDR.TNDR_CTL_ID" left="CI_PAY_TNDR" right="CI_TNDR_CTL" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="CI_PAY_TNDR.TENDER_TYPE_CD == CI_TENDER_TYPE_L.TENDER_TYPE_CD" left="CI_PAY_TNDR" right="CI_TENDER_TYPE_L" type="inner" weight="1"&gt;&lt;/join&gt;
+          &lt;/joinList&gt;
+          &lt;joinOptions&gt;&lt;/joinOptions&gt;
+          &lt;joinedDataSetList&gt;
+            &lt;jdbcTable id="CISADM_CI_PAY_EVENT" datasourceId="CollegeStation_DS" datasourceTableName="CI_PAY_EVENT" schemaAlias="CISADM"&gt;
+              &lt;joinInfo alias="CI_PAY_EVENT"&gt;
+                &lt;joinExpressionString&gt;CI_PAY.PAY_EVENT_ID == CI_PAY_EVENT.PAY_EVENT_ID&lt;/joinExpressionString&gt;
+              &lt;/joinInfo&gt;
+              &lt;joinOptions&gt;&lt;/joinOptions&gt;
+              &lt;tableRefList&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_EVENT" tableId="CI_PAY_EVENT"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY" tableId="CI_PAY"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_TNDR" tableId="CI_PAY_TNDR"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TNDR_CTL" tableId="CI_TNDR_CTL"&gt;&lt;/tableRef&gt;
+              &lt;/tableRefList&gt;
+            &lt;/jdbcTable&gt;
+            &lt;jdbcTable id="CISADM_CI_PAY_TNDR" datasourceId="CollegeStation_DS" datasourceTableName="CI_PAY_TNDR" schemaAlias="CISADM"&gt;
+              &lt;fieldList&gt;
+                &lt;field id="TNDR_STATUS_FLG" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+              &lt;/fieldList&gt;
+              &lt;filterString&gt;TNDR_STATUS_FLG == '25'&lt;/filterString&gt;
+              &lt;joinInfo alias="CI_PAY_TNDR"&gt;
+                &lt;joinExpressionString&gt;CI_PAY_TNDR.PAY_EVENT_ID == CI_PAY_EVENT.PAY_EVENT_ID&lt;/joinExpressionString&gt;
+              &lt;/joinInfo&gt;
+              &lt;joinOptions&gt;&lt;/joinOptions&gt;
+              &lt;tableRefList&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_EVENT" tableId="CI_PAY_EVENT"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY" tableId="CI_PAY"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_TNDR" tableId="CI_PAY_TNDR"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TNDR_CTL" tableId="CI_TNDR_CTL"&gt;&lt;/tableRef&gt;
+              &lt;/tableRefList&gt;
+            &lt;/jdbcTable&gt;
+            &lt;jdbcTable id="CISADM_CI_TNDR_CTL" datasourceId="CollegeStation_DS" datasourceTableName="CI_TNDR_CTL" schemaAlias="CISADM"&gt;
+              &lt;joinInfo alias="CI_TNDR_CTL"&gt;
+                &lt;joinExpressionString&gt;CI_TNDR_CTL.TNDR_CTL_ID == CI_PAY_TNDR.TNDR_CTL_ID&lt;/joinExpressionString&gt;
+              &lt;/joinInfo&gt;
+              &lt;joinOptions&gt;&lt;/joinOptions&gt;
+              &lt;tableRefList&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_EVENT" tableId="CI_PAY_EVENT"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY" tableId="CI_PAY"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_TNDR" tableId="CI_PAY_TNDR"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TNDR_CTL" tableId="CI_TNDR_CTL"&gt;&lt;/tableRef&gt;
+              &lt;/tableRefList&gt;
+            &lt;/jdbcTable&gt;
+            &lt;jdbcTable id="CISADM_CI_TENDER_TYPE_L" datasourceId="CollegeStation_DS" datasourceTableName="CI_TENDER_TYPE_L" schemaAlias="CISADM"&gt;
+              &lt;fieldList&gt;
+                &lt;field id="LANGUAGE_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+              &lt;/fieldList&gt;
+              &lt;filterString&gt;LANGUAGE_CD == 'ENG'&lt;/filterString&gt;
+              &lt;joinInfo alias="CI_TENDER_TYPE_L"&gt;
+                &lt;joinExpressionString&gt;CI_PAY_TNDR.TENDER_TYPE_CD == CI_TENDER_TYPE_L.TENDER_TYPE_CD&lt;/joinExpressionString&gt;
+              &lt;/joinInfo&gt;
+              &lt;joinOptions&gt;&lt;/joinOptions&gt;
+              &lt;tableRefList&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_EVENT" tableId="CI_PAY_EVENT"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY" tableId="CI_PAY"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_TNDR" tableId="CI_PAY_TNDR"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TNDR_CTL" tableId="CI_TNDR_CTL"&gt;&lt;/tableRef&gt;
+              &lt;/tableRefList&gt;
+            &lt;/jdbcTable&gt;
+          &lt;/joinedDataSetList&gt;
+          &lt;sortList&gt;
+            &lt;sortColumn columnName="IF_equals_CI_TNDR_CTL_USER_ID_zzzzzzzz_CI_TNDR_CTL_TNDR_SOURCE_CD_CI_TNDR_CTL_USER_ID"&gt;&lt;/sortColumn&gt;
+          &lt;/sortList&gt;
+          &lt;tableRefList&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_EVENT" tableId="CI_PAY_EVENT"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY" tableId="CI_PAY"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_TNDR" tableId="CI_PAY_TNDR"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TNDR_CTL" tableId="CI_TNDR_CTL"&gt;&lt;/tableRef&gt;
+          &lt;/tableRefList&gt;
+        &lt;/jdbcTable&gt;
+      &lt;/source&gt;
+    &lt;/memory&gt;
+  &lt;/resources&gt;
+  &lt;sortList&gt;
+    &lt;sortColumn columnName="BatchSource"&gt;&lt;/sortColumn&gt;
+  &lt;/sortList&gt;
+&lt;/query&gt;
+</queryString>
+                    <dataSource>
+                        <uri>/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Domains/CS_UCS_Daily_Cash_Receipt_Domain</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>BatchSource</queryVisibleColumn>
+            <queryValueColumn>BatchSource</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/CS_UCS_Daily_Tender_Batch_Review_files</folder>
+            <name>TNDR_STATUS_FLG_1</name>
+            <version>2</version>
+            <label>Tender Status</label>
+            <creationDate>2024-02-01T16:22:59.000Z</creationDate>
+            <updateDate>2024-02-01T16:22:59.000Z</updateDate>
+            <type>4</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/CS_UCS_Daily_Tender_Batch_Review_files/TNDR_STATUS_FLG_1_files</folder>
+                    <name>TNDR_STATUS_FLG_1</name>
+                    <version>0</version>
+                    <label>Tender Status</label>
+                    <creationDate>2024-02-01T16:22:59.000Z</creationDate>
+                    <updateDate>2024-02-01T16:22:59.000Z</updateDate>
+                    <language>domain</language>
+                    <queryString>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema"&gt;
+  &lt;groupList&gt;
+    &lt;group columnName="CI_PAY_TNDR.TNDR_STATUS_FLG" id="CI_PAY_TNDR.TNDR_STATUS_FLG"&gt;&lt;/group&gt;
+  &lt;/groupList&gt;
+  &lt;queryFields&gt;
+    &lt;queryField id="CI_PAY_TNDR.TNDR_STATUS_FLG"&gt;&lt;/queryField&gt;
+  &lt;/queryFields&gt;
+  &lt;sortList&gt;
+    &lt;sortColumn columnName="CI_PAY_TNDR.TNDR_STATUS_FLG"&gt;&lt;/sortColumn&gt;
+  &lt;/sortList&gt;
+&lt;/query&gt;
+</queryString>
+                    <dataSource>
+                        <uri>/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Domains/CS_UCS_Daily_Cash_Receipt_Domain</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>CI_PAY_TNDR.TNDR_STATUS_FLG</queryVisibleColumn>
+            <queryValueColumn>CI_PAY_TNDR.TNDR_STATUS_FLG</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" dataFile="topicJRXML.data" xsi:type="fileResource">
+            <folder>/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/CS_UCS_Daily_Tender_Batch_Review_files</folder>
+            <name>topicJRXML</name>
+            <version>1</version>
+            <label>topicJRXML</label>
+            <creationDate>2024-02-01T16:22:59.000Z</creationDate>
+            <updateDate>2024-02-01T16:22:59.000Z</updateDate>
+            <fileType>jrxml</fileType>
+        </localResource>
+    </resource>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" dataFile="stateXML.data" xsi:type="fileResource">
+            <folder>/SmartCity/Report/Custom_Reports/CSTX_Financial_Reports/Ad_Hoc_Views/CS_UCS_Daily_Tender_Batch_Review_files</folder>
+            <name>stateXML</name>
+            <version>3</version>
+            <label>stateXML</label>
+            <creationDate>2024-02-01T16:22:59.000Z</creationDate>
+            <updateDate>2024-02-01T16:22:59.000Z</updateDate>
+            <fileType>xml</fileType>
+        </localResource>
+    </resource>
+    <alwaysPromptControls>false</alwaysPromptControls>
+    <controlsLayout>1</controlsLayout>
+</adhocDataView>

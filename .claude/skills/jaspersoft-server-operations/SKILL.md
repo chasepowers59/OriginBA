@@ -10,8 +10,8 @@ description: Operate the three SmartCity JasperReports Server environments (inte
 | env | URL | what it holds |
 | --- | --- | --- |
 | `test` | https://smartcity-jrs-test.originsmartops.com/jasperserver-pro | JRS 10.0.0 PRO; one instance, every client an org under `organization_1`: Ellensburg, Fond_Du_Lac, CityCorp, College_Station, Odessa, Newark1, Origin_DEV, Origin_TEST |
-| `prod` | https://smartcity-jrs.originsmartops.com/jasperserver-pro | all clients' production orgs |
-| `internal` | https://origin-c2m-demo.originsmartops.com:8443/jasperserver-pro | demo, dev, stage orgs (per Chase; inventory to confirm) |
+| `prod` | https://smartcity-jrs.originsmartops.com/jasperserver-pro | **JRS 9.0.0 PRO (JRXML 6 model) until its 10.0 upgrade, due days after 2026-09-18** -- re-snapshot and diff right after. Org-scoped logins only (`user\|Org`): CityCorp, Ellensburg, Newark1, Fond_Du_Lac, College_Station; Odessa 401 with this account |
+| `internal` | https://origin-c2m-demo.originsmartops.com:8443/jasperserver-pro | JRS 10.0.0 PRO; three orgs (see `jaspersoft/inventory/CLIENTS.md`) |
 
 Reachable only over the VPN. Credentials: `JRS_<ENV>_URL / _USER / _PASSWORD / _INSECURE` in
 `~/OriginBA-3/.env` (the test server also answers to `JRS_URL/USER/PASSWORD`); only key names are
@@ -24,6 +24,16 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
    server's own export lands as a re-importable zip under `backups/jaspersoft/` (gitignored)
    and a diffable tree under `jaspersoft/inventory/<env>/<org>/` (committed, passwords
    redacted). That zip is the rollback. No snapshot, no change.
+   - `prod` is org-scoped (the login is `user|Org`, it sees only that org): `--orgs A B C`
+     exports each org's root with the login re-scoped. Works for CityCorp, Ellensburg,
+     Newark1, Fond_Du_Lac, College_Station; Odessa and Origin_* answer 401 there.
+   - **A prod (JRS 9.0) export can hang forever on one folder** (Fond_Du_Lac 2026-09-18:
+     `/SmartCity/Report/FDL_Bill_Processing_Reports__Linda_` and `FDL_Trial_Balance` never
+     finished, even alone). `--split /SmartCity /SmartCity/Report --part-cap 300` exports the
+     tenant folder by folder, splitting the named folders into their children; a part that
+     is not done after the cap is recorded under `snapshot.stuck` in the summary and skipped,
+     the rest of the tenant lands. The backup is then one zip per part (`<Org>__<folder>.zip`).
+   - Never run two prod exports at once; the exporter is the live server's own thread.
 2. **Origin_DEV on `test` is the only place changes happen without a specific instruction.**
    Every other org is a live client tenant; `prod` is read-only until Chase names the org and
    the change. Never edit a datasource anywhere.
@@ -42,7 +52,7 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
 | | |
 | --- | --- |
 | `scripts/jaspersoft/jrs_repository.py --env X whoami / search / list / import` | who am I, where is a resource, what a folder holds |
-| `scripts/jaspersoft/jrs_inventory.py snapshot / diff / summary` | backup + inventory + comparison; `jaspersoft/inventory/README.md` is the generated overview per environment and client |
+| `scripts/jaspersoft/jrs_inventory.py snapshot [--orgs] [--split] / diff / summary / clients / environments` | backup + inventory + comparison; `jaspersoft/inventory/{README,CLIENTS,ENVIRONMENTS}.md` are generated |
 | `scripts/jaspersoft/jrs_deploy_report_units.py --org X --datasource Y [--run FROM TO]` | create/overwrite report units from the finance-pack specs and execute them |
 | `tests/test_jrs_inventory.py` | the offline half of the inventory tool on a real export |
 

@@ -1,0 +1,788 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CS AR Aging Balance - 30 Day Interval Report" pageWidth="612" pageHeight="792" orientation="Landscape" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" isIgnorePagination="true" uuid="07f1d5f2-336a-495e-acbb-1adb53af5138">
+	<property name="net.sf.jasperreports.export.xls.collapse.row.span" value="false"/>
+	<property name="net.sf.jasperreports.export.html.border.collapse" value="collapse"/>
+	<property name="net.sf.jasperreports.export.docx.frames.as.nested.tables" value="false"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.actual.size" value="true"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.group.indent" value="0"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.min.group.label.width" value="100"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.detail.band.height" value="25"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.header.band.height" value="25"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.row.header.width" value="125"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.cell.width" value="100"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.cell.height" value="20"/>
+	<property name="com.jaspersoft.ji.adhoc" value="1"/>
+	<property name="com.jaspersoft.ji.adhoc.preferredDataStrategy" value="domainDataStrategy"/>
+	<property name="net.sf.jasperreports.export.pdf.tagged" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.tag.language" value="EN-US"/>
+	<property name="net.sf.jasperreports.export.pdf.metadata.title" value="Ad Hoc Report"/>
+	<property name="net.sf.jasperreports.export.pdf.display.metadata.title" value="true"/>
+	<property name="net.sf.jasperreports.text.truncate.suffix" value="..."/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.size.page.to.content" value="true"/>
+	<propertyExpression name="com.jaspersoft.jrs.export.report.empty"><![CDATA[$P{com.jaspersoft.jrs.report.data.source.is.empty} == null? null : $P{com.jaspersoft.jrs.report.data.source.is.empty}.toString()]]></propertyExpression>
+	<import value="com.jaspersoft.ji.adhoc.jr.AdhocReportUtils"/>
+	<style name="ReportDefault" isDefault="true" mode="Transparent" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<pen lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableBaseFrameStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableFrameStyle" style="TableBaseFrameStyle">
+		<box padding="0">
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<bottomPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnFooterFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<pen lineWidth="1.0" lineStyle="Solid"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#D9E4F1">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#F2F2F2">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#F2F2F2" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableSummaryFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableSummaryTextNoBorderStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" fontName="DejaVu Sans" isBold="true">
+		<box leftPadding="5" rightPadding="5"/>
+	</style>
+	<style name="TableSummaryTextStyle" style="TableSummaryTextNoBorderStyle">
+		<box>
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableTitleFrameStyle" style="TableFrameStyle">
+		<box topPadding="0" bottomPadding="0">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableTitleTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box bottomPadding="8">
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableDetailFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableDetailTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="false">
+		<box leftPadding="5" rightPadding="5">
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{PAGE_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="ChartReportTitle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box>
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineStyle="Solid"/>
+		</box>
+	</style>
+	<style name="ChartTitle" forecolor="#000000" fontName="DejaVu Sans" fontSize="12" isBold="true"/>
+	<style name="ChartSubtitle" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartLegend" forecolor="#000000" backcolor="#FFFFFF" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartSeriesColor0" backcolor="#87C4FE"/>
+	<style name="ChartSeriesColor1" backcolor="#E96270"/>
+	<style name="ChartSeriesColor2" backcolor="#D1D1D1"/>
+	<style name="ChartSeriesColor3" backcolor="#FFEE99"/>
+	<style name="ChartSeriesColor4" backcolor="#6164FF"/>
+	<style name="ChartSeriesColor5" backcolor="#B0E992"/>
+	<style name="ChartSeriesColor6" backcolor="#AE9CEA"/>
+	<style name="ChartSeriesColor7" backcolor="#F5B05E"/>
+	<style name="ChartSeriesColor8" backcolor="#589EE1"/>
+	<style name="ChartSeriesColor9" backcolor="#AE4E59"/>
+	<style name="ChartSeriesColor10" backcolor="#747474"/>
+	<style name="ChartSeriesColor11" backcolor="#E2DC77"/>
+	<style name="ChartSeriesColor12" backcolor="#4749A5"/>
+	<style name="ChartSeriesColor13" backcolor="#81B963"/>
+	<style name="ChartSeriesColor14" backcolor="#7764B4"/>
+	<style name="ChartSeriesColor15" backcolor="#F27B4C"/>
+	<style name="ChartCategoryAxisLabelFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="ChartCategoryAxisTickFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartValueAxisLabelFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="ChartValueAxisTickFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartContext" backcolor="#D1CA67"/>
+	<style name="CrosstabElementStyle" mode="Transparent" forecolor="#000033" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseCellStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseTextStyle" mode="Opaque" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Top" vImageAlign="Top" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box topPadding="3" leftPadding="5" bottomPadding="3" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabTitleTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" fontSize="18" isBold="false">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabHeaderLabelStyle" style="CrosstabHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabMeasureHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabMeasureHeaderLabelStyle" style="CrosstabMeasureHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabColumnMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" isBold="false"/>
+	<style name="CrosstabRowMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabColumnDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#D9E4F1" hTextAlign="Center" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDetailTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Right" hImageAlign="Right" isBold="false">
+		<box>
+			<topPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" hTextAlign="Right" hImageAlign="Right" isBold="true"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDummyHeaderTextStyle" style="CrosstabBaseTextStyle" backcolor="#F2F2F2"/>
+	<style name="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.ACCT_ID_1" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{CM_CUS_LOC_BAL.ACCT_ID_1}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.BILL_CYC_CD_1" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{CM_CUS_LOC_BAL.BILL_CYC_CD_1}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.ENTITY_NAME_1" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{CM_CUS_LOC_BAL.ENTITY_NAME_1}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.DUT_DT" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{CM_CUS_LOC_BAL.DUT_DT}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.PRIMARYEMAIL" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{CM_CUS_LOC_BAL.PRIMARYEMAIL}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.CELLPHONE" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{CM_CUS_LOC_BAL.CELLPHONE}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.HOMEPHONE" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{CM_CUS_LOC_BAL.HOMEPHONE}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabInnerRowDimensionHeaderTextStyle" style="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.HOMEPHONE">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="com.jaspersoft.jrs.report.data.source.is.empty" class="java.lang.Boolean" isForPrompting="false">
+		<property name="net.sf.jasperreports.data.cache.included" value="true"/>
+	</parameter>
+	<parameter name="REPORT_TITLE" class="java.lang.String" isForPrompting="false">
+		<property name="net.sf.jasperreports.data.cache.included" value="true"/>
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Collator" class="java.text.Collator" isForPrompting="false">
+		<defaultValueExpression><![CDATA[java.text.Collator.getInstance($P{REPORT_LOCALE})]]></defaultValueExpression>
+	</parameter>
+	<field name="Sum_CM_AGED_60_SUM_FT1_TOT_AMT__1" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.ACCT_ID" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CM_AGED_60_SUM_FT1_CUR_AMT__1" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_AGED_CURRENT.SUM_FT1_CUR_AMT__2" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CM_AGED_CURRENT_SUM_FT1_TOT_AMT__2" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CM_AGED_30_SUM_FT1_CUR_AMT_" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.ENTITY_NAME" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CM_AGED_30_SUM_FT1_TOT_AMT_" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.CURRENT_CHARGES" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CM_CUS_LOC_BAL_CURRENT_CHARGES" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_AGED_60.SUM_FT1_CUR_AMT__1" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_AGED_60.SUM_FT1_TOT_AMT__1" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_CUS_DETAILS.CELLPHONE" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CM_CUS_LOC_BAL_PASTDUE" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CM_AGED_CURRENT_SUM_FT1_CUR_AMT__2" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_AGED_30.SUM_FT1_TOT_AMT_" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.DUT_DT" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="CM_AGED_30.SUM_FT1_CUR_AMT_" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.BILL_CYC_CD" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.PASTDUE" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_AGED_CURRENT.SUM_FT1_TOT_AMT__2" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_CUS_DETAILS.PRIMARYEMAIL" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_CUS_DETAILS.HOMEPHONE" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.ACCT_ID_1" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.BILL_CYC_CD_1" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.ENTITY_NAME_1" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.PRIMARYEMAIL" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.CELLPHONE" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.HOMEPHONE" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="Measures" class="java.lang.String">
+		<property name="udds_mapping" value="COLUMN_LEVEL"/>
+	</field>
+	<field name="Measures__IDENTIFIER" class="java.lang.String">
+		<property name="udds_mapping" value="COLUMN_MEASURE_ID"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.CURRENT_CHARGES_m0" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Current Charges"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.PASTDUE_m1" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Past Due"/>
+	</field>
+	<field name="CM_AGED_CURRENT.SUM_FT1_CUR_AMT__2_m2" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Current"/>
+	</field>
+	<field name="CM_AGED_CURRENT.SUM_FT1_TOT_AMT__2_m3" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Payoff"/>
+	</field>
+	<field name="CM_AGED_30.SUM_FT1_CUR_AMT__m4" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Current (0 - 30)"/>
+	</field>
+	<field name="CM_AGED_30.SUM_FT1_TOT_AMT__m5" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Payoff (0 - 30)"/>
+	</field>
+	<field name="CM_AGED_60.SUM_FT1_CUR_AMT__1_m6" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Current (31 - 60)"/>
+	</field>
+	<field name="CM_AGED_60.SUM_FT1_TOT_AMT__1_m7" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Payoff (31 - 60)"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.ACCT_ID_1__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.ACCT_ID_1__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.BILL_CYC_CD_1__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.BILL_CYC_CD_1__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.ENTITY_NAME_1__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.ENTITY_NAME_1__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.DUT_DT__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.DUT_DT__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.PRIMARYEMAIL__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.PRIMARYEMAIL__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.CELLPHONE__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.CELLPHONE__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.HOMEPHONE__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="CM_CUS_LOC_BAL.HOMEPHONE__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="Measures__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="COLUMN_RAW_VALUE"/>
+	</field>
+	<title>
+		<band height="1" splitType="Stretch"/>
+	</title>
+	<summary>
+		<band height="25" splitType="Stretch">
+			<crosstab>
+				<reportElement style="CrosstabElementStyle" x="0" y="0" width="572" height="25" uuid="04bb9a24-341b-4f52-af9d-2b5438932b9e"/>
+				<crosstabParameter name="CrosstabRowGroupsCount" class="java.lang.Integer">
+					<parameterValueExpression><![CDATA[new Integer(7)]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="CrosstabColumnGroupsCount" class="java.lang.Integer">
+					<parameterValueExpression><![CDATA[new Integer(1)]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="CrosstabMeasureIndexes" class="java.util.Map">
+					<parameterValueExpression><![CDATA[org.apache.commons.collections.MapUtils.putAll(new java.util.HashMap(), new String[]{"CM_CUS_LOC_BAL.CURRENT_CHARGES_m0","0","CM_CUS_LOC_BAL.PASTDUE_m1","1","CM_AGED_CURRENT.SUM_FT1_CUR_AMT__2_m2","2","CM_AGED_CURRENT.SUM_FT1_TOT_AMT__2_m3","3","CM_AGED_30.SUM_FT1_CUR_AMT__m4","4","CM_AGED_30.SUM_FT1_TOT_AMT__m5","5","CM_AGED_60.SUM_FT1_CUR_AMT__1_m6","6","CM_AGED_60.SUM_FT1_TOT_AMT__1_m7","7"})]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabDataset isDataPreSorted="true">
+					<dataset resetType="Report"/>
+				</crosstabDataset>
+				<rowGroup name="CM_CUS_LOC_BAL.ACCT_ID_1" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{CM_CUS_LOC_BAL.ACCT_ID_1__RAW}, $F{CM_CUS_LOC_BAL.ACCT_ID_1}, $F{CM_CUS_LOC_BAL.ACCT_ID_1__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.ACCT_ID_1" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="7e6a17da-5169-4c03-ac2a-bb6ddd578386"/>
+								<textFieldExpression><![CDATA[$V{CM_CUS_LOC_BAL.ACCT_ID_1}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{CM_CUS_LOC_BAL.ACCT_ID_1}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="CM_CUS_LOC_BAL.BILL_CYC_CD_1" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{CM_CUS_LOC_BAL.BILL_CYC_CD_1__RAW}, $F{CM_CUS_LOC_BAL.BILL_CYC_CD_1}, $F{CM_CUS_LOC_BAL.BILL_CYC_CD_1__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.BILL_CYC_CD_1" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="aa9a8765-ebf0-44e2-95c7-c4ddc4689950"/>
+								<textFieldExpression><![CDATA[$V{CM_CUS_LOC_BAL.BILL_CYC_CD_1}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{CM_CUS_LOC_BAL.BILL_CYC_CD_1}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="CM_CUS_LOC_BAL.ENTITY_NAME_1" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{CM_CUS_LOC_BAL.ENTITY_NAME_1__RAW}, $F{CM_CUS_LOC_BAL.ENTITY_NAME_1}, $F{CM_CUS_LOC_BAL.ENTITY_NAME_1__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.ENTITY_NAME_1" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="ccad9da7-fce8-42b3-9b25-74160f2776ce"/>
+								<textFieldExpression><![CDATA[$V{CM_CUS_LOC_BAL.ENTITY_NAME_1}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{CM_CUS_LOC_BAL.ENTITY_NAME_1}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="CM_CUS_LOC_BAL.DUT_DT" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{CM_CUS_LOC_BAL.DUT_DT__RAW}, $F{CM_CUS_LOC_BAL.DUT_DT}, $F{CM_CUS_LOC_BAL.DUT_DT__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance()]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" pattern="medium,hide" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.DUT_DT" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="67027758-b993-45bd-b23d-01319475a9cb"/>
+								<textFieldExpression><![CDATA[$V{CM_CUS_LOC_BAL.DUT_DT}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{CM_CUS_LOC_BAL.DUT_DT}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="CM_CUS_LOC_BAL.PRIMARYEMAIL" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{CM_CUS_LOC_BAL.PRIMARYEMAIL__RAW}, $F{CM_CUS_LOC_BAL.PRIMARYEMAIL}, $F{CM_CUS_LOC_BAL.PRIMARYEMAIL__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.PRIMARYEMAIL" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="06f6641d-a03d-4869-ac69-58994620ec1a"/>
+								<textFieldExpression><![CDATA[$V{CM_CUS_LOC_BAL.PRIMARYEMAIL}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{CM_CUS_LOC_BAL.PRIMARYEMAIL}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="CM_CUS_LOC_BAL.CELLPHONE" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{CM_CUS_LOC_BAL.CELLPHONE__RAW}, $F{CM_CUS_LOC_BAL.CELLPHONE}, $F{CM_CUS_LOC_BAL.CELLPHONE__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_CM_CUS_LOC_BAL.CELLPHONE" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="871fce04-bc23-4be1-8077-51bdfc0cd2e2"/>
+								<textFieldExpression><![CDATA[$V{CM_CUS_LOC_BAL.CELLPHONE}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{CM_CUS_LOC_BAL.CELLPHONE}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="CM_CUS_LOC_BAL.HOMEPHONE" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{CM_CUS_LOC_BAL.HOMEPHONE__RAW}, $F{CM_CUS_LOC_BAL.HOMEPHONE}, $F{CM_CUS_LOC_BAL.HOMEPHONE__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabInnerRowDimensionHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="ea6e95ce-0eec-4a3c-b5a0-f07a825693bc"/>
+								<textFieldExpression><![CDATA[$V{CM_CUS_LOC_BAL.HOMEPHONE}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{CM_CUS_LOC_BAL.HOMEPHONE}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="Measures" height="20" headerPosition="Stretch">
+					<bucket class="net.sf.jasperreports.engine.util.DisplayComparableValue">
+						<bucketExpression><![CDATA[new net.sf.jasperreports.engine.util.DisplayComparableValue($F{Measures__IDENTIFIER}, $F{Measures})]]></bucketExpression>
+						<comparatorExpression><![CDATA[new net.sf.jasperreports.engine.util.DisplayValueLabelComparator($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="88ea164b-b42d-4a65-8362-e70b8bad34fd">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="0"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{CM_CUS_LOC_BAL.ACCT_ID_1} != null) ? $R{CM_CUS_LOC_BAL.ACCT_ID_1} : "CM_CUS_LOC_BAL.ACCT_ID_1"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{CM_CUS_LOC_BAL.ACCT_ID_1} != null) ? $R{CM_CUS_LOC_BAL.ACCT_ID_1} : "CM_CUS_LOC_BAL.ACCT_ID_1"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="125" y="0" width="125" height="20" uuid="1a7fc825-fcaf-44b7-9b5d-a6709c884cbb">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="1"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{CM_CUS_LOC_BAL.BILL_CYC_CD_1} != null) ? $R{CM_CUS_LOC_BAL.BILL_CYC_CD_1} : "CM_CUS_LOC_BAL.BILL_CYC_CD_1"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{CM_CUS_LOC_BAL.BILL_CYC_CD_1} != null) ? $R{CM_CUS_LOC_BAL.BILL_CYC_CD_1} : "CM_CUS_LOC_BAL.BILL_CYC_CD_1"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="250" y="0" width="125" height="20" uuid="ca53f866-ec0e-45f2-8dc5-d1847885e1da">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="2"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{CM_CUS_LOC_BAL.ENTITY_NAME_1} != null) ? $R{CM_CUS_LOC_BAL.ENTITY_NAME_1} : "CM_CUS_LOC_BAL.ENTITY_NAME_1"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{CM_CUS_LOC_BAL.ENTITY_NAME_1} != null) ? $R{CM_CUS_LOC_BAL.ENTITY_NAME_1} : "CM_CUS_LOC_BAL.ENTITY_NAME_1"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="375" y="0" width="125" height="20" uuid="46710881-afae-4f81-b5e2-f0c941adb567">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="3"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{CM_CUS_LOC_BAL.DUT_DT} != null) ? $R{CM_CUS_LOC_BAL.DUT_DT} : "CM_CUS_LOC_BAL.DUT_DT"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{CM_CUS_LOC_BAL.DUT_DT} != null) ? $R{CM_CUS_LOC_BAL.DUT_DT} : "CM_CUS_LOC_BAL.DUT_DT"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="500" y="0" width="125" height="20" uuid="69ecfb17-c08a-4132-a40d-5fa55a15f979">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="4"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{CM_CUS_LOC_BAL.PRIMARYEMAIL} != null) ? $R{CM_CUS_LOC_BAL.PRIMARYEMAIL} : "CM_CUS_LOC_BAL.PRIMARYEMAIL"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{CM_CUS_LOC_BAL.PRIMARYEMAIL} != null) ? $R{CM_CUS_LOC_BAL.PRIMARYEMAIL} : "CM_CUS_LOC_BAL.PRIMARYEMAIL"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="625" y="0" width="125" height="20" uuid="7ed6975c-d314-468d-b765-bed9685b64fd">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="5"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{CM_CUS_LOC_BAL.CELLPHONE} != null) ? $R{CM_CUS_LOC_BAL.CELLPHONE} : "CM_CUS_LOC_BAL.CELLPHONE"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{CM_CUS_LOC_BAL.CELLPHONE} != null) ? $R{CM_CUS_LOC_BAL.CELLPHONE} : "CM_CUS_LOC_BAL.CELLPHONE"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="750" y="0" width="125" height="20" uuid="1631c2d7-edfd-4e97-8bfa-368e43d33fcf">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="6"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{CM_CUS_LOC_BAL.HOMEPHONE} != null) ? $R{CM_CUS_LOC_BAL.HOMEPHONE} : "CM_CUS_LOC_BAL.HOMEPHONE"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{CM_CUS_LOC_BAL.HOMEPHONE} != null) ? $R{CM_CUS_LOC_BAL.HOMEPHONE} : "CM_CUS_LOC_BAL.HOMEPHONE"]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabHeader>
+					<crosstabColumnHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabColumnMeasureHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="da69c7dd-82a1-48d9-9aed-52700031bbe3">
+									<propertyExpression name="net.sf.jasperreports.crosstab.column.header.sort.measure.index"><![CDATA[$P{CrosstabMeasureIndexes}.get($V{Measures}.key())]]></propertyExpression>
+								</reportElement>
+								<textFieldExpression><![CDATA[$V{Measures}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{Measures}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="CM_CUS_LOC_BAL.CURRENT_CHARGES_m0" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{CM_CUS_LOC_BAL.CURRENT_CHARGES_m0}]]></measureExpression>
+				</measure>
+				<measure name="CM_CUS_LOC_BAL.PASTDUE_m1" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{CM_CUS_LOC_BAL.PASTDUE_m1}]]></measureExpression>
+				</measure>
+				<measure name="CM_AGED_CURRENT.SUM_FT1_CUR_AMT__2_m2" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{CM_AGED_CURRENT.SUM_FT1_CUR_AMT__2_m2}]]></measureExpression>
+				</measure>
+				<measure name="CM_AGED_CURRENT.SUM_FT1_TOT_AMT__2_m3" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{CM_AGED_CURRENT.SUM_FT1_TOT_AMT__2_m3}]]></measureExpression>
+				</measure>
+				<measure name="CM_AGED_30.SUM_FT1_CUR_AMT__m4" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{CM_AGED_30.SUM_FT1_CUR_AMT__m4}]]></measureExpression>
+				</measure>
+				<measure name="CM_AGED_30.SUM_FT1_TOT_AMT__m5" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{CM_AGED_30.SUM_FT1_TOT_AMT__m5}]]></measureExpression>
+				</measure>
+				<measure name="CM_AGED_60.SUM_FT1_CUR_AMT__1_m6" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{CM_AGED_60.SUM_FT1_CUR_AMT__1_m6}]]></measureExpression>
+				</measure>
+				<measure name="CM_AGED_60.SUM_FT1_TOT_AMT__1_m7" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{CM_AGED_60.SUM_FT1_TOT_AMT__1_m7}]]></measureExpression>
+				</measure>
+				<measure name="CROSSTAB_TOTAL_DISCRIMINATOR" class="java.lang.Boolean" calculation="First">
+					<measureExpression><![CDATA[Boolean.FALSE || $F{CM_CUS_LOC_BAL.ACCT_ID_1__DISCRIMINATOR} || $F{CM_CUS_LOC_BAL.BILL_CYC_CD_1__DISCRIMINATOR} || $F{CM_CUS_LOC_BAL.ENTITY_NAME_1__DISCRIMINATOR} || $F{CM_CUS_LOC_BAL.DUT_DT__DISCRIMINATOR} || $F{CM_CUS_LOC_BAL.PRIMARYEMAIL__DISCRIMINATOR} || $F{CM_CUS_LOC_BAL.CELLPHONE__DISCRIMINATOR} || $F{CM_CUS_LOC_BAL.HOMEPHONE__DISCRIMINATOR}]]></measureExpression>
+				</measure>
+				<crosstabCell width="100" height="20">
+					<cellContents style="CrosstabBaseCellStyle">
+						<box padding="0"/>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="485a0dd1-30bf-46fc-86e7-78ad85f9a93c">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("CM_CUS_LOC_BAL.CURRENT_CHARGES_m0")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{CM_CUS_LOC_BAL.CURRENT_CHARGES_m0}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="585cad06-3432-4aa4-af7e-ff12e973bf6c">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("CM_CUS_LOC_BAL.PASTDUE_m1")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{CM_CUS_LOC_BAL.PASTDUE_m1}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="50ae542c-3145-49c0-9249-a0c33637c65c">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("CM_AGED_CURRENT.SUM_FT1_CUR_AMT__2_m2")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{CM_AGED_CURRENT.SUM_FT1_CUR_AMT__2_m2}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="40a98f8b-75ea-495e-8d3f-05afb141a8d4">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("CM_AGED_CURRENT.SUM_FT1_TOT_AMT__2_m3")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{CM_AGED_CURRENT.SUM_FT1_TOT_AMT__2_m3}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="6d08f4aa-05d0-4a36-b6d0-c4336983ae31">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("CM_AGED_30.SUM_FT1_CUR_AMT__m4")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{CM_AGED_30.SUM_FT1_CUR_AMT__m4}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="8efd7c35-e4bb-4cac-b95a-7ed66be3201d">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("CM_AGED_30.SUM_FT1_TOT_AMT__m5")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{CM_AGED_30.SUM_FT1_TOT_AMT__m5}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="685b1fd0-c43f-4ae0-8341-b95738245542">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("CM_AGED_60.SUM_FT1_CUR_AMT__1_m6")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{CM_AGED_60.SUM_FT1_CUR_AMT__1_m6}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="63367dcf-d747-4b9c-a5f3-aa39ad185779">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("CM_AGED_60.SUM_FT1_TOT_AMT__1_m7")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{CM_AGED_60.SUM_FT1_TOT_AMT__1_m7}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

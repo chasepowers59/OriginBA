@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="slReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="61b39bbb-e947-4066-895c-f8c2212585b4">
+	<property name="base.datasource.version" value="5"/>
+	<property name="has.modified.presentation" value="false"/>
+	<property name="use.datasource.presentation" value="true"/>
+	<parameter name="BILL_CYC_CD_1" class="java.util.Collection">
+		<defaultValueExpression><![CDATA[java.util.Arrays.asList(new Object[]{"4   "})]]></defaultValueExpression>
+	</parameter>
+	<queryString language="domain">
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema">
+  <queryFields>
+    <queryField id="ACCT_ID"></queryField>
+    <queryField id="PREM_ID"></queryField>
+    <queryField id="ADDRESS1_UPR"></queryField>
+    <queryField id="BILL_CYC_CD"></queryField>
+    <queryField id="RS_CD"></queryField>
+    <queryField id="D1_SP_ID"></queryField>
+    <queryField id="MSRMT_VAL"></queryField>
+    <queryField id="PREV_MSRMT_DTTM"></queryField>
+    <queryField id="MSRMT_DTTM"></queryField>
+    <queryField id="READING_VAL"></queryField>
+    <queryField id="ID_VALUE"></queryField>
+  </queryFields>
+  <queryFilterString>BILL_CYC_CD in BILL_CYC_CD_1</queryFilterString>
+</query>
+]]>
+	</queryString>
+	<field name="ACCT_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Account ID"/>
+		<property name="semantic.item.label" value="Account ID"/>
+		<property name="adhoc.tree.uri" value="/ACCT_ID"/>
+		<property name="resourceId" value="CS_KW_USAGE.ACCT_ID"/>
+		<property name="semantic.tree.uri" value="/ACCT_ID"/>
+		<property name="semantic.tree.sort.order">
+			<![CDATA[{"PREM_ID":2,"PREV_MSRMT_DTTM":8,"MSRMT_VAL":7,"RS_CD":5,"ACCT_ID":1,"BILL_CYC_CD":4,"ID_VALUE":11,"ADDRESS1_UPR":3,"MSRMT_DTTM":9,"READING_VAL":10,"D1_SP_ID":6}]]>
+		</property>
+		<property name="adhoc.tree.labels" value="[]"/>
+		<property name="slIsTableAsList" value="false"/>
+	</field>
+	<field name="PREM_ID" class="java.lang.String">
+		<property name="adhoc.display" value="Premise ID"/>
+		<property name="semantic.item.label" value="Premise ID"/>
+		<property name="adhoc.tree.uri" value="/PREM_ID"/>
+		<property name="resourceId" value="CS_KW_USAGE.PREM_ID"/>
+		<property name="semantic.tree.uri" value="/PREM_ID"/>
+		<property name="semantic.tree.sort.order" value="1"/>
+	</field>
+	<field name="ADDRESS1_UPR" class="java.lang.String">
+		<property name="adhoc.display" value="Address 1"/>
+		<property name="semantic.item.label" value="Address 1"/>
+		<property name="adhoc.tree.uri" value="/ADDRESS1_UPR"/>
+		<property name="resourceId" value="CS_KW_USAGE.ADDRESS1_UPR"/>
+		<property name="semantic.tree.uri" value="/ADDRESS1_UPR"/>
+		<property name="semantic.tree.sort.order" value="2"/>
+	</field>
+	<field name="BILL_CYC_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Bill Cycle"/>
+		<property name="semantic.item.label" value="Bill Cycle"/>
+		<property name="adhoc.tree.uri" value="/BILL_CYC_CD"/>
+		<property name="resourceId" value="CS_KW_USAGE.BILL_CYC_CD"/>
+		<property name="semantic.tree.uri" value="/BILL_CYC_CD"/>
+		<property name="semantic.tree.sort.order" value="3"/>
+		<property name="qb.filters">
+			<![CDATA[[{"comparison":"isOneOf","isParameter":true}]]]>
+		</property>
+	</field>
+	<field name="RS_CD" class="java.lang.String">
+		<property name="adhoc.display" value="Rate Code"/>
+		<property name="semantic.item.label" value="Rate Code"/>
+		<property name="adhoc.tree.uri" value="/RS_CD"/>
+		<property name="resourceId" value="CS_KW_USAGE.RS_CD"/>
+		<property name="semantic.tree.uri" value="/RS_CD"/>
+		<property name="semantic.tree.sort.order" value="4"/>
+	</field>
+	<field name="D1_SP_ID" class="java.lang.String">
+		<property name="adhoc.display" value="MDM Service Point ID"/>
+		<property name="semantic.item.label" value="MDM Service Point ID"/>
+		<property name="adhoc.tree.uri" value="/D1_SP_ID"/>
+		<property name="resourceId" value="CS_KW_USAGE.D1_SP_ID"/>
+		<property name="semantic.tree.uri" value="/D1_SP_ID"/>
+		<property name="semantic.tree.sort.order" value="5"/>
+	</field>
+	<field name="MSRMT_VAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Measurement Value"/>
+		<property name="semantic.item.label" value="Measurement Value"/>
+		<property name="adhoc.tree.uri" value="/MSRMT_VAL"/>
+		<property name="resourceId" value="CS_KW_USAGE.MSRMT_VAL"/>
+		<property name="semantic.tree.uri" value="/MSRMT_VAL"/>
+		<property name="semantic.tree.sort.order" value="6"/>
+	</field>
+	<field name="PREV_MSRMT_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Previous Measurement Date / Time"/>
+		<property name="semantic.item.label" value="Previous Measurement Date / Time"/>
+		<property name="adhoc.tree.uri" value="/PREV_MSRMT_DTTM"/>
+		<property name="resourceId" value="CS_KW_USAGE.PREV_MSRMT_DTTM"/>
+		<property name="semantic.tree.uri" value="/PREV_MSRMT_DTTM"/>
+		<property name="semantic.tree.sort.order" value="7"/>
+	</field>
+	<field name="MSRMT_DTTM" class="java.sql.Timestamp">
+		<property name="adhoc.display" value="Measurement Date / Time"/>
+		<property name="semantic.item.label" value="Measurement Date / Time"/>
+		<property name="adhoc.tree.uri" value="/MSRMT_DTTM"/>
+		<property name="resourceId" value="CS_KW_USAGE.MSRMT_DTTM"/>
+		<property name="semantic.tree.uri" value="/MSRMT_DTTM"/>
+		<property name="semantic.tree.sort.order" value="8"/>
+	</field>
+	<field name="READING_VAL" class="java.math.BigDecimal">
+		<property name="adhoc.display" value="Reading Value"/>
+		<property name="semantic.item.label" value="Reading Value"/>
+		<property name="adhoc.tree.uri" value="/READING_VAL"/>
+		<property name="resourceId" value="CS_KW_USAGE.READING_VAL"/>
+		<property name="semantic.tree.uri" value="/READING_VAL"/>
+		<property name="semantic.tree.sort.order" value="9"/>
+	</field>
+	<field name="ID_VALUE" class="java.lang.String">
+		<property name="adhoc.display" value="Badge Number"/>
+		<property name="semantic.item.label" value="Badge Number"/>
+		<property name="adhoc.tree.uri" value="/ID_VALUE"/>
+		<property name="resourceId" value="CS_KW_USAGE.ID_VALUE"/>
+		<property name="semantic.tree.uri" value="/ID_VALUE"/>
+		<property name="semantic.tree.sort.order" value="10"/>
+	</field>
+</jasperReport>
