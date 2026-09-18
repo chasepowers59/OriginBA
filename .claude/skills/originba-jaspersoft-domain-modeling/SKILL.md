@@ -165,14 +165,17 @@ that encodes every measured difference is `~/originba-letterprint/jasperserver/t
 (author once in 7, generate the 6.20 twin, render both and assert equal text). `jsVersion` in
 an import bundle is measured from a real export of the target, never typed.
 
-## Effective-dated history tables with CURR_ columns: read the plain column, not the pointer (2026-09-18)
+## Placement history: join from the CURRENT row, never the raw history (2026-09-18, Fond du Lac)
 
-OUAF history tables such as `W1_ASSET_NODE` (asset placement, PK ASSET_ID + EFF_DTTM) carry
-`CURR_ASSET_ID` / `CURR_NODE_ID` / `CURR_ATTCH_TO_ASSET_ID`: a denormalised "current" pointer the
-application keeps on ONE row per asset. It is NOT reliable: on Fond du Lac two meters re-installed
-minutes after an In Store entry kept the pointer on the In Store row (43,600 assets, 2 stale). The
-current placement is the LATEST EFF_DTTM row (that is what C2M's Disposition History shows), and
-`NODE_ID` is filled on every row. So: select the latest row, and expose
-`NVL(CURR_NODE_ID, NODE_ID) AS CURR_NODE_ID` so bound reports keep their item ids. Selecting BY the
-pointer was tried first and showed those meters as In Store -- do not. Record:
-`domains/manual_imports/fonddulac_asset_domain/`.
+`W1_ASSET_NODE` (asset placement, PK ASSET_ID + EFF_DTTM) carries a "current" pointer
+(`CURR_ASSET_ID`/`CURR_NODE_ID`) that C2M fills on one row per asset -- and leaves stale when a
+meter is re-installed minutes after an In Store entry (2 of 16,672 at Fond du Lac). Three rules,
+each learned the hard way the same day: (1) the current placement is the LATEST EFF_DTTM row,
+what Disposition History shows; expose `NVL(CURR_NODE_ID, NODE_ID) AS CURR_NODE_ID` under the same
+field id; (2) never select the current row BY the pointer (it showed those meters as In Store);
+(3) join service-point/premise tables FROM the derived current-placement table, not from the raw
+history table -- the raw join fanned 16,672 installed meters into 20,541 rows, and the legacy views
+hid it with a filter on the raw pointer that picked the wrong row. Record and packages:
+`domains/manual_imports/fonddulac_asset_domain/` (REST import needs the org's own datasource
+export listed first, `rootTenantId`, folder XML with `<parent>`+`<name>`, descriptions under 250
+characters -- each of those failed once).
