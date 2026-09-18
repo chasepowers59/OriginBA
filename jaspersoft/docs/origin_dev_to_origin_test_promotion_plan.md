@@ -32,7 +32,10 @@ returns real rows.
 3. **Export the source.** The Standard Offering folder from Origin_DEV by REST
    (`/rest_v2/export` of `/SmartCity/Report/Standard_Offering`, org-scoped login), which is the
    tenant-root export shape the pipeline expects. Keep the zip under `backups/` (gitignored).
-4. **Patch and build.** `patch_vee_exception_todo_joins.py` on the export, then
+4. **Patch (guard) and build.** `patch_vee_exception_todo_joins.py` on the export -- a no-op on a
+   current export, since the Origin_DEV VEE Exception domain has carried all eleven To Do joins as
+   left outer since 2026-08-27 (measured in the 2026-09-18 inventory; CityCorp PROD and Odessa
+   test still hold the 2025-09-11 domain with eight inner joins). Then
    `run_client_import_pipeline.py --src-org Origin_DEV --src-ds Origin_DEV_DS --mapping <one-off
    csv> --datasource-export-dir deploy/jaspersoft_datasources/canonical` with the tenant-root,
    org-relative, import-into-existing-tenant, light-touch flags the Standard Offering pipeline
