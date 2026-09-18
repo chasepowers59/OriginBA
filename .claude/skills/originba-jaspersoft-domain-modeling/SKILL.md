@@ -164,3 +164,14 @@ JRXML 7 vs 6: boolean attributes lose the `is` prefix (`isBold` -> `bold`), `rep
 that encodes every measured difference is `~/originba-letterprint/jasperserver/tools/jrxml7to6.py`
 (author once in 7, generate the 6.20 twin, render both and assert equal text). `jsVersion` in
 an import bundle is measured from a real export of the target, never typed.
+
+## Effective-dated history tables with CURR_ columns: the current row is the one the app marks (2026-09-18)
+
+OUAF history tables such as `W1_ASSET_NODE` (asset placement, PK ASSET_ID + EFF_DTTM) carry
+`CURR_ASSET_ID` / `CURR_NODE_ID` / `CURR_ATTCH_TO_ASSET_ID`: the application fills them on
+exactly ONE row per asset (measured: 580 of 580 on Ellensburg) and leaves them null on every
+history row; `NODE_ID` is filled on all rows. A derived table that picks "the latest EFF_DTTM"
+and a report that reads `CURR_NODE_ID` go empty whenever a later-dated row is not the row the
+app calls current (Fond du Lac meter 52222349, 2026-09-18). Pick the row by the marker, fall back
+to the latest date: `domains/manual_imports/fonddulac_asset_domain/`. Fix the derived SQL, never
+the item ids or labels, so bound reports survive.
