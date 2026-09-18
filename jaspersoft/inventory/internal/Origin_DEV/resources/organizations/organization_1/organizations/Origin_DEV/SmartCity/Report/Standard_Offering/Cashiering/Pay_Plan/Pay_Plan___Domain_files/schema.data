@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="CI_PP" label="1.) Pay Plan" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID" label="Account ID" resourceId="JoinTree_1.CI_PP.ACCT_ID"></item>
+        <item id="COMMENTS" label="Comments" resourceId="JoinTree_1.CI_PP.COMMENTS"></item>
+        <item id="CRE_DTTM" label="Create Date/Time" resourceId="JoinTree_1.CI_PP.CRE_DTTM"></item>
+        <item id="LAST_STAT_DTTM" label="Last Status Date/Time" resourceId="JoinTree_1.CI_PP.LAST_STAT_DTTM"></item>
+        <item id="LAST_STAT_USER_ID" label="Last Updated by" resourceId="JoinTree_1.CI_PP.LAST_STAT_USER_ID"></item>
+        <item id="PAY_METH_CD" label="Pay Method" resourceId="JoinTree_1.CI_PP.PAY_METH_CD"></item>
+        <item id="PAYOR_ACCT_ID" label="Payor Account ID" resourceId="JoinTree_1.CI_PP.PAYOR_ACCT_ID"></item>
+        <item id="PP_CAN_RSN_FLG" label="Cancel Reason" resourceId="JoinTree_1.CI_PP.PP_CAN_RSN_FLG"></item>
+        <item id="PP_ID" label="Pay Plan ID" resourceId="JoinTree_1.CI_PP.PP_ID"></item>
+        <item id="PP_STAT_FLG" label="Pay Plan Status" resourceId="JoinTree_1.CI_PP.PP_STAT_FLG"></item>
+        <item id="PP_TYPE_CD" label="Pay Plan Type" resourceId="JoinTree_1.CI_PP.PP_TYPE_CD"></item>
+        <item id="START_DT" label="Start Date" resourceId="JoinTree_1.CI_PP.START_DT"></item>
+        <item id="THRD_PTY_PAYOR_CD" label="Third Party Payor" resourceId="JoinTree_1.CI_PP.THRD_PTY_PAYOR_CD"></item>
+        <item id="THRD_PTY_SW" label="Third Party Guarantor" resourceId="JoinTree_1.CI_PP.THRD_PTY_SW"></item>
+        <item id="USER_ID" label="User" resourceId="JoinTree_1.CI_PP.USER_ID"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet1" label="1.) Descriptions" resourceId="JoinTree_1">
+      <items>
+        <item id="DESCR_2" label="Cancel Reason Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+        <item id="DESCR_1" label="Pay Method Description" resourceId="JoinTree_1.CI_PAY_METH_L.DESCR"></item>
+        <item id="DESCR_3" label="Pay Plan Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_1.DESCR"></item>
+        <item id="DESCR" label="Pay Plan Type Description" resourceId="JoinTree_1.CI_PP_TYPE_L.DESCR"></item>
+        <item id="DESCR_4" label="Third Party Payor Description" resourceId="JoinTree_1.CI_THRD_PTY_L.DESCR"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet2" label="1.) Formulas" resourceId="JoinTree_1">
+      <items>
+        <item id="DAYS_OLD" label="Days Old" resourceId="JoinTree_1.DAYS_OLD"></item>
+        <item id="ACCT_ID_DISTINCT" label="Distinct Account ID" resourceId="JoinTree_1.ACCT_ID_DISTINCT"></item>
+        <item id="PP_ID_DISTINCT" label="Distinct Pay Plan ID" resourceId="JoinTree_1.PP_ID_DISTINCT"></item>
+        <item id="ENTITY_NAME_UPR" label="Name" resourceId="JoinTree_1.CI_PER_NAME.ENTITY_NAME_UPR"></item>
+        <item id="LAST_STAT_USER_ID_NAME" label="Last Updated by (Name)" resourceId="JoinTree_1.LAST_STAT_USER_ID_NAME"></item>
+        <item id="ENTITY_NAME_UPR_1" label="Payor Account (Name)" resourceId="JoinTree_1.CI_PER_NAME_1.ENTITY_NAME_UPR"></item>
+        <item id="USER_ID_NAME" label="User (Name)" resourceId="JoinTree_1.USER_ID_NAME"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="CI_PP" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PP" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PP_ID" type="java.lang.String"></field>
+        <field id="PP_TYPE_CD" type="java.lang.String"></field>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PAYOR_ACCT_ID" type="java.lang.String"></field>
+        <field id="THRD_PTY_SW" type="java.lang.String"></field>
+        <field id="THRD_PTY_PAYOR_CD" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="PAY_METH_CD" type="java.lang.String"></field>
+        <field id="PP_STAT_FLG" type="java.lang.String"></field>
+        <field id="PP_CAN_RSN_FLG" type="java.lang.String"></field>
+        <field id="LAST_STAT_DTTM" type="java.sql.Timestamp"></field>
+        <field id="LAST_STAT_USER_ID" type="java.lang.String"></field>
+        <field id="COMMENTS" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_PP_SCHED_PAY" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PP_SCHED_PAY" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PP_ID" type="java.lang.String"></field>
+        <field id="PP_SCHED_DT" type="java.sql.Timestamp"></field>
+        <field id="PP_SCHED_AMT" type="java.math.BigDecimal"></field>
+        <field id="CURRENCY_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="APAY_CLR_ID" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_PP_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PP_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PP_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG'</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_PP_ACCT_HST_VW" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PP_ACCT_HST_VW" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="ACTIVITY_ID" type="java.lang.String"></field>
+        <field id="ACTIVITY_ID2" type="java.lang.String"></field>
+        <field id="ACTIVITY_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ACT_TYPE_FLG" type="java.lang.String"></field>
+        <field id="ACT_DESCR" type="java.lang.String"></field>
+        <field id="SORT_DTTM" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="DESCR_OVRD" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="DESCR_OVRD" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG' and FIELD_NAME == 'PP_STAT_FLG                   '</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_ACCT_PER" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT_PER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ACCT_REL_TYPE_CD" type="java.lang.String"></field>
+        <field id="BILL_ADDR_SRCE_FLG" type="java.lang.String"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="FIN_RESP_SW" type="java.lang.String"></field>
+        <field id="THRD_PTY_SW" type="java.lang.String"></field>
+        <field id="RECEIVE_COPY_SW" type="java.lang.String"></field>
+        <field id="BILL_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="BILL_FORMAT_FLG" type="java.lang.String"></field>
+        <field id="NBR_BILL_COPIES" type="java.math.BigDecimal"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="CUST_PO_ID" type="java.lang.String"></field>
+        <field id="NOTIFY_SW" type="java.lang.String"></field>
+        <field id="NAME_PFX_SFX" type="java.lang.String"></field>
+        <field id="PFX_SFX_FLG" type="java.lang.String"></field>
+        <field id="QTE_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="RECV_QTE_SW" type="java.lang.String"></field>
+        <field id="WEB_ACCESS_FLG" type="java.lang.String"></field>
+        <field id="ALW_PREF_FLG" type="java.lang.String"></field>
+        <field id="CSS_ACCESS_ROLE_FLG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>MAIN_CUST_SW == 'Y'</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_ACCT_PER_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT_PER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ACCT_REL_TYPE_CD" type="java.lang.String"></field>
+        <field id="BILL_ADDR_SRCE_FLG" type="java.lang.String"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="FIN_RESP_SW" type="java.lang.String"></field>
+        <field id="THRD_PTY_SW" type="java.lang.String"></field>
+        <field id="RECEIVE_COPY_SW" type="java.lang.String"></field>
+        <field id="BILL_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="BILL_FORMAT_FLG" type="java.lang.String"></field>
+        <field id="NBR_BILL_COPIES" type="java.math.BigDecimal"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="CUST_PO_ID" type="java.lang.String"></field>
+        <field id="NOTIFY_SW" type="java.lang.String"></field>
+        <field id="NAME_PFX_SFX" type="java.lang.String"></field>
+        <field id="PFX_SFX_FLG" type="java.lang.String"></field>
+        <field id="QTE_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="RECV_QTE_SW" type="java.lang.String"></field>
+        <field id="WEB_ACCESS_FLG" type="java.lang.String"></field>
+        <field id="ALW_PREF_FLG" type="java.lang.String"></field>
+        <field id="CSS_ACCESS_ROLE_FLG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>MAIN_CUST_SW == 'Y'</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_PAY_METH_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PAY_METH_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PAY_METH_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG'</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_THRD_PTY_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_THRD_PTY_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="THRD_PTY_PAYOR_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="SC_USER" datasourceId="Origin_DEV_DS" datasourceTableName="SC_USER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="FIRST_NAME" type="java.lang.String"></field>
+        <field id="LAST_NAME" type="java.lang.String"></field>
+        <field id="TNDR_SOURCE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DISP_PROF_CD" type="java.lang.String"></field>
+        <field id="TD_ENTRY_AGE_DAYS1" type="java.math.BigDecimal"></field>
+        <field id="TD_ENTRY_AGE_DAYS2" type="java.math.BigDecimal"></field>
+        <field id="ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="EMAILID" type="java.lang.String"></field>
+        <field id="USER_TYPE_FLG" type="java.lang.String"></field>
+        <field id="PORTAL_OVRD_USER" type="java.lang.String"></field>
+        <field id="FAV_OVRD_USER" type="java.lang.String"></field>
+        <field id="DASHBOARD_WIDTH" type="java.lang.String"></field>
+        <field id="HOME_NAV_OPT_CD" type="java.lang.String"></field>
+        <field id="DISP_ALL_PREM_SW" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="EXT_USER_ID" type="java.lang.String"></field>
+        <field id="USER_ENABLE_FLG" type="java.lang.String"></field>
+        <field id="F1_SECURITY_HASH" type="java.lang.String"></field>
+        <field id="DASHBOARD_LOC_FLG" type="java.lang.String"></field>
+        <field id="DASHBOARD_STATE_FLG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG'</filterString>
+    </jdbcTable>
+    <jdbcTable id="SC_USER_1" datasourceId="Origin_DEV_DS" datasourceTableName="SC_USER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="FIRST_NAME" type="java.lang.String"></field>
+        <field id="LAST_NAME" type="java.lang.String"></field>
+        <field id="TNDR_SOURCE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DISP_PROF_CD" type="java.lang.String"></field>
+        <field id="TD_ENTRY_AGE_DAYS1" type="java.math.BigDecimal"></field>
+        <field id="TD_ENTRY_AGE_DAYS2" type="java.math.BigDecimal"></field>
+        <field id="ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="EMAILID" type="java.lang.String"></field>
+        <field id="USER_TYPE_FLG" type="java.lang.String"></field>
+        <field id="PORTAL_OVRD_USER" type="java.lang.String"></field>
+        <field id="FAV_OVRD_USER" type="java.lang.String"></field>
+        <field id="DASHBOARD_WIDTH" type="java.lang.String"></field>
+        <field id="HOME_NAV_OPT_CD" type="java.lang.String"></field>
+        <field id="DISP_ALL_PREM_SW" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="EXT_USER_ID" type="java.lang.String"></field>
+        <field id="USER_ENABLE_FLG" type="java.lang.String"></field>
+        <field id="F1_SECURITY_HASH" type="java.lang.String"></field>
+        <field id="DASHBOARD_LOC_FLG" type="java.lang.String"></field>
+        <field id="DASHBOARD_STATE_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_PER_NAME" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PER_NAME" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="SEQ_NUM" type="java.math.BigDecimal"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="PRIM_NAME_SW" type="java.lang.String"></field>
+        <field id="ENTITY_NAME_UPR" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>NAME_TYPE_FLG == 'PRIM'</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_PER_NAME_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PER_NAME" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="SEQ_NUM" type="java.math.BigDecimal"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="PRIM_NAME_SW" type="java.lang.String"></field>
+        <field id="ENTITY_NAME_UPR" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>NAME_TYPE_FLG == 'PRIM'</filterString>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PP" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CI_THRD_PTY_L.THRD_PTY_PAYOR_CD" type="java.lang.String"></field>
+        <field id="CI_THRD_PTY_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_THRD_PTY_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_THRD_PTY_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_PER_NAME.PER_ID" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.SEQ_NUM" type="java.math.BigDecimal"></field>
+        <field id="CI_PER_NAME.ENTITY_NAME" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_PER_NAME.PRIM_NAME_SW" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.ENTITY_NAME_UPR" type="java.lang.String"></field>
+        <field id="SC_USER.USER_ID" type="java.lang.String"></field>
+        <field id="SC_USER.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="SC_USER.FIRST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER.LAST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER.TNDR_SOURCE_CD" type="java.lang.String"></field>
+        <field id="SC_USER.VERSION" type="java.math.BigDecimal"></field>
+        <field id="SC_USER.DISP_PROF_CD" type="java.lang.String"></field>
+        <field id="SC_USER.TD_ENTRY_AGE_DAYS1" type="java.math.BigDecimal"></field>
+        <field id="SC_USER.TD_ENTRY_AGE_DAYS2" type="java.math.BigDecimal"></field>
+        <field id="SC_USER.ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="SC_USER.EMAILID" type="java.lang.String"></field>
+        <field id="SC_USER.USER_TYPE_FLG" type="java.lang.String"></field>
+        <field id="SC_USER.PORTAL_OVRD_USER" type="java.lang.String"></field>
+        <field id="SC_USER.FAV_OVRD_USER" type="java.lang.String"></field>
+        <field id="SC_USER.DASHBOARD_WIDTH" type="java.lang.String"></field>
+        <field id="SC_USER.HOME_NAV_OPT_CD" type="java.lang.String"></field>
+        <field id="SC_USER.DISP_ALL_PREM_SW" type="java.lang.String"></field>
+        <field id="SC_USER.OWNER_FLG" type="java.lang.String"></field>
+        <field id="SC_USER.TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="SC_USER.EXT_USER_ID" type="java.lang.String"></field>
+        <field id="SC_USER.USER_ENABLE_FLG" type="java.lang.String"></field>
+        <field id="SC_USER.F1_SECURITY_HASH" type="java.lang.String"></field>
+        <field id="SC_USER.DASHBOARD_LOC_FLG" type="java.lang.String"></field>
+        <field id="SC_USER.DASHBOARD_STATE_FLG" type="java.lang.String"></field>
+        <field id="CI_PER_NAME_1.PER_ID" type="java.lang.String"></field>
+        <field id="CI_PER_NAME_1.SEQ_NUM" type="java.math.BigDecimal"></field>
+        <field id="CI_PER_NAME_1.ENTITY_NAME" type="java.lang.String"></field>
+        <field id="CI_PER_NAME_1.NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_PER_NAME_1.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_PER_NAME_1.PRIM_NAME_SW" type="java.lang.String"></field>
+        <field id="CI_PER_NAME_1.ENTITY_NAME_UPR" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.ACCT_REL_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.BILL_ADDR_SRCE_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.PER_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.FIN_RESP_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.THRD_PTY_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.RECEIVE_COPY_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.BILL_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.BILL_FORMAT_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.NBR_BILL_COPIES" type="java.math.BigDecimal"></field>
+        <field id="CI_ACCT_PER.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_ACCT_PER.CUST_PO_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.NOTIFY_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.NAME_PFX_SFX" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.PFX_SFX_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.QTE_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.RECV_QTE_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.WEB_ACCESS_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.ALW_PREF_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.CSS_ACCESS_ROLE_FLG" type="java.lang.String"></field>
+        <field id="SC_USER_1.USER_ID" type="java.lang.String"></field>
+        <field id="SC_USER_1.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="SC_USER_1.FIRST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER_1.LAST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER_1.TNDR_SOURCE_CD" type="java.lang.String"></field>
+        <field id="SC_USER_1.VERSION" type="java.math.BigDecimal"></field>
+        <field id="SC_USER_1.DISP_PROF_CD" type="java.lang.String"></field>
+        <field id="SC_USER_1.TD_ENTRY_AGE_DAYS1" type="java.math.BigDecimal"></field>
+        <field id="SC_USER_1.TD_ENTRY_AGE_DAYS2" type="java.math.BigDecimal"></field>
+        <field id="SC_USER_1.ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="SC_USER_1.EMAILID" type="java.lang.String"></field>
+        <field id="SC_USER_1.USER_TYPE_FLG" type="java.lang.String"></field>
+        <field id="SC_USER_1.PORTAL_OVRD_USER" type="java.lang.String"></field>
+        <field id="SC_USER_1.FAV_OVRD_USER" type="java.lang.String"></field>
+        <field id="SC_USER_1.DASHBOARD_WIDTH" type="java.lang.String"></field>
+        <field id="SC_USER_1.HOME_NAV_OPT_CD" type="java.lang.String"></field>
+        <field id="SC_USER_1.DISP_ALL_PREM_SW" type="java.lang.String"></field>
+        <field id="SC_USER_1.OWNER_FLG" type="java.lang.String"></field>
+        <field id="SC_USER_1.TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="SC_USER_1.EXT_USER_ID" type="java.lang.String"></field>
+        <field id="SC_USER_1.USER_ENABLE_FLG" type="java.lang.String"></field>
+        <field id="SC_USER_1.F1_SECURITY_HASH" type="java.lang.String"></field>
+        <field id="SC_USER_1.DASHBOARD_LOC_FLG" type="java.lang.String"></field>
+        <field id="SC_USER_1.DASHBOARD_STATE_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.ACCT_REL_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.BILL_ADDR_SRCE_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.PER_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.FIN_RESP_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.THRD_PTY_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.RECEIVE_COPY_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.BILL_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.BILL_FORMAT_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.NBR_BILL_COPIES" type="java.math.BigDecimal"></field>
+        <field id="CI_ACCT_PER_1.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_ACCT_PER_1.CUST_PO_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.NOTIFY_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.NAME_PFX_SFX" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.PFX_SFX_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.QTE_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.RECV_QTE_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.WEB_ACCESS_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.ALW_PREF_FLG" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER_1.CSS_ACCESS_ROLE_FLG" type="java.lang.String"></field>
+        <field id="CI_PP.PP_ID" type="java.lang.String"></field>
+        <field id="CI_PP.PP_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_PP.USER_ID" type="java.lang.String"></field>
+        <field id="CI_PP.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_PP.PAYOR_ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_PP.THRD_PTY_SW" type="java.lang.String"></field>
+        <field id="CI_PP.THRD_PTY_PAYOR_CD" type="java.lang.String"></field>
+        <field id="CI_PP.START_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_PP.PAY_METH_CD" type="java.lang.String"></field>
+        <field id="CI_PP.PP_STAT_FLG" type="java.lang.String"></field>
+        <field id="CI_PP.PP_CAN_RSN_FLG" type="java.lang.String"></field>
+        <field id="CI_PP.LAST_STAT_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_PP.LAST_STAT_USER_ID" type="java.lang.String"></field>
+        <field id="CI_PP.COMMENTS" type="java.lang.String"></field>
+        <field id="CI_PP.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_PP.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR_OVRD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCRLONG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_LOOKUP_VAL_L_1.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.DESCR_OVRD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.DESCRLONG" type="java.lang.String"></field>
+        <field id="CI_PP_TYPE_L.PP_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_PP_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_PP_TYPE_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_PP_TYPE_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_PAY_METH_L.PAY_METH_CD" type="java.lang.String"></field>
+        <field id="CI_PAY_METH_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_PAY_METH_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_PAY_METH_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="PP_ID_DISTINCT" dataSetExpression="CountDistinct(CI_PP.PP_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="DAYS_OLD" dataSetExpression="ElapsedDays(Today(0), CI_PP.CRE_DTTM)" type="java.math.BigDecimal"></field>
+        <field id="USER_ID_NAME" dataSetExpression="Concatenate(SC_USER.FIRST_NAME, ' ', SC_USER.LAST_NAME)" type="java.lang.String"></field>
+        <field id="LAST_STAT_USER_ID_NAME" dataSetExpression="Concatenate(SC_USER_1.FIRST_NAME, ' ', SC_USER_1.LAST_NAME)" type="java.lang.String"></field>
+        <field id="ACCT_ID_DISTINCT" dataSetExpression="CountDistinct&#xA;(CI_PP.ACCT_ID, 'Current')&#xA;" type="java.lang.Long"></field>
+      </fieldList>
+      <filterString>CI_PER_NAME_1.NAME_TYPE_FLG == 'PRIM' and CI_ACCT_PER.MAIN_CUST_SW == 'Y' and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'PP_STAT_FLG                   ' and CI_ACCT_PER_1.MAIN_CUST_SW == 'Y' and CI_PP_TYPE_L.LANGUAGE_CD == 'ENG' and SC_USER.LANGUAGE_CD == 'ENG' and CI_PAY_METH_L.LANGUAGE_CD == 'ENG' and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'</filterString>
+      <joinInfo alias="CI_PP" referenceId="CI_PP"></joinInfo>
+      <joinList>
+        <join expr="CI_PP.PAY_METH_CD == CI_PAY_METH_L.PAY_METH_CD and CI_PAY_METH_L.LANGUAGE_CD == 'ENG'" left="CI_PP" right="CI_PAY_METH_L" type="inner" weight="1"></join>
+        <join expr="CI_PP.PP_CAN_RSN_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'PP_CAN_RSN_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="CI_PP" right="CI_LOOKUP_VAL_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_PP.PP_STAT_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'PP_STAT_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'" left="CI_PP" right="CI_LOOKUP_VAL_L_1" type="inner" weight="1"></join>
+        <join expr="CI_PP.PP_TYPE_CD == CI_PP_TYPE_L.PP_TYPE_CD and CI_PP_TYPE_L.LANGUAGE_CD == 'ENG'" left="CI_PP" right="CI_PP_TYPE_L" type="inner" weight="1"></join>
+        <join expr="CI_PP.USER_ID == SC_USER.USER_ID" left="CI_PP" right="SC_USER" type="inner" weight="1"></join>
+        <join expr="CI_PP.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'" left="CI_PP" right="CI_ACCT_PER" type="inner" weight="1"></join>
+        <join expr="CI_PP.PAYOR_ACCT_ID == CI_ACCT_PER_1.ACCT_ID and CI_ACCT_PER_1.MAIN_CUST_SW == 'Y'" left="CI_PP" right="CI_ACCT_PER_1" type="inner" weight="1"></join>
+        <join expr="CI_PP.LAST_STAT_USER_ID == SC_USER_1.USER_ID" left="CI_PP" right="SC_USER_1" type="leftOuter" weight="1"></join>
+        <join expr="CI_PP.THRD_PTY_PAYOR_CD == CI_THRD_PTY_L.THRD_PTY_PAYOR_CD and CI_THRD_PTY_L.LANGUAGE_CD == 'ENG'" left="CI_PP" right="CI_THRD_PTY_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM' and CI_ACCT_PER.MAIN_CUST_SW == 'Y'" left="CI_ACCT_PER" right="CI_PER_NAME" type="inner" weight="1"></join>
+        <join expr="CI_ACCT_PER_1.PER_ID == CI_PER_NAME_1.PER_ID and CI_PER_NAME_1.NAME_TYPE_FLG == 'PRIM' and CI_ACCT_PER_1.MAIN_CUST_SW == 'Y'" left="CI_ACCT_PER_1" right="CI_PER_NAME_1" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME_1" tableId="CI_PER_NAME_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_USER_1" tableId="SC_USER_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER_1" tableId="CI_ACCT_PER_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PP_TYPE_L" tableId="CI_PP_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_USER" tableId="SC_USER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PP" tableId="CI_PP"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_THRD_PTY_L" tableId="CI_THRD_PTY_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_METH_L" tableId="CI_PAY_METH_L"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

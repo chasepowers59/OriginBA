@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_TEST_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="F1_BNDL" label="1.) Bundle" resourceId="JoinTree_1">
+      <items>
+        <item id="BNDL_DETAIL" label="Bundle Detail" resourceId="JoinTree_1.F1_BNDL.BNDL_DETAIL"></item>
+        <item id="BNDL_ID" label="Bundle ID" resourceId="JoinTree_1.F1_BNDL.BNDL_ID"></item>
+        <item id="BNDL_TYPE_FLG" label="Bundle Type" resourceId="JoinTree_1.F1_BNDL.BNDL_TYPE_FLG"></item>
+        <item id="BO_STATUS_CD" label="Status" resourceId="JoinTree_1.F1_BNDL.BO_STATUS_CD"></item>
+        <item id="BUS_OBJ_CD" label="Business Object" resourceId="JoinTree_1.F1_BNDL.BUS_OBJ_CD"></item>
+        <item id="CRE_DTTM" label="Create Date/Time" resourceId="JoinTree_1.F1_BNDL.CRE_DTTM"></item>
+        <item id="DESCRLONG" label="Detailed Description" resourceId="JoinTree_1.F1_BNDL.DESCRLONG"></item>
+        <item id="EXT_REFERENCE_ID" label="External Reference ID" resourceId="JoinTree_1.F1_BNDL.EXT_REFERENCE_ID"></item>
+        <item id="STATUS_UPD_DTTM" label="Status Date/Time" resourceId="JoinTree_1.F1_BNDL.STATUS_UPD_DTTM"></item>
+        <item id="USER_ID" label="User" resourceId="JoinTree_1.F1_BNDL.USER_ID"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="F1_BNDL_ENTITY_2" label="1.) Bundle Entities" resourceId="JoinTree_1">
+      <items>
+        <item id="BNDL_ID_3" label="Bundle ID" resourceId="JoinTree_1.F1_BNDL_ENTITY.BNDL_ID"></item>
+        <item id="MAINT_OBJ_CD_2" label="Maintenance Object" resourceId="JoinTree_1.F1_BNDL_ENTITY.MAINT_OBJ_CD"></item>
+        <item id="PK_VALUE1_2" label="Primary Key 1" resourceId="JoinTree_1.F1_BNDL_ENTITY.PK_VALUE1"></item>
+        <item id="PK_VALUE2_2" label="Primary Key 2" resourceId="JoinTree_1.F1_BNDL_ENTITY.PK_VALUE2"></item>
+        <item id="PK_VALUE3_2" label="Primary Key 3" resourceId="JoinTree_1.F1_BNDL_ENTITY.PK_VALUE3"></item>
+        <item id="PK_VALUE4_2" label="Primary Key 4" resourceId="JoinTree_1.F1_BNDL_ENTITY.PK_VALUE4"></item>
+        <item id="PK_VALUE5_2" label="Primary Key 5" resourceId="JoinTree_1.F1_BNDL_ENTITY.PK_VALUE5"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="PROC_SEQ_2" label="Process Sequence" resourceId="JoinTree_1.F1_BNDL_ENTITY.PROC_SEQ"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="SEQNO_2" label="Sequence" resourceId="JoinTree_1.F1_BNDL_ENTITY.SEQNO"></item>
+        <item id="USER_ID_3" label="User" resourceId="JoinTree_1.F1_BNDL_ENTITY.USER_ID"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet1" label="1.) Descriptions" resourceId="JoinTree_1">
+      <items>
+        <item id="DESCR" label="Bundle Type Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+        <item id="DESCR_1" label="Business Object Description" resourceId="JoinTree_1.F1_BUS_OBJ_L.DESCR"></item>
+        <item id="DESCR_3" label="Maintenance Object Description" resourceId="JoinTree_1.CI_MD_MO_L.DESCR"></item>
+        <item id="DESCR_2" label="Status Description" resourceId="JoinTree_1.F1_BUS_OBJ_STATUS_L.DESCR"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet2" label="1.) Formulas" resourceId="JoinTree_1">
+      <items>
+        <item id="BNDL_ID_SEQNO_DIST" label="Distinct Bundle/Entity" resourceId="JoinTree_1.BNDL_ID_SEQNO_DIST"></item>
+        <item id="BNDL_ID_DIST" label="Distinct Bundle ID" resourceId="JoinTree_1.BNDL_ID_DIST"></item>
+        <item id="PRIMARY_KEYS" label="Primary Key" resourceId="JoinTree_1.PRIMARY_KEYS"></item>
+        <item id="USER_ID_NAME_1" label="User (Name)" resourceId="JoinTree_1.USER_ID_NAME"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="F1_BNDL" datasourceId="Origin_TEST_DS" datasourceTableName="F1_BNDL" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BNDL_ID" type="java.lang.String"></field>
+        <field id="BNDL_TYPE_FLG" type="java.lang.String"></field>
+        <field id="BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="EXT_REFERENCE_ID" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+        <field id="BNDL_DETAIL" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="F1_BNDL_ENTITY" datasourceId="Origin_TEST_DS" datasourceTableName="F1_BNDL_ENTITY" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BNDL_ID" type="java.lang.String"></field>
+        <field id="SEQNO" type="java.math.BigDecimal"></field>
+        <field id="MAINT_OBJ_CD" type="java.lang.String"></field>
+        <field id="PROC_SEQ" type="java.math.BigDecimal"></field>
+        <field id="PK_VALUE1" type="java.lang.String"></field>
+        <field id="PK_VALUE2" type="java.lang.String"></field>
+        <field id="PK_VALUE3" type="java.lang.String"></field>
+        <field id="PK_VALUE4" type="java.lang.String"></field>
+        <field id="PK_VALUE5" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="USER_ID" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="Origin_TEST_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="DESCR_OVRD" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>FIELD_NAME == 'BNDL_TYPE_FLG                 ' and LANGUAGE_CD == 'ENG'</filterString>
+    </jdbcTable>
+    <jdbcTable id="F1_BUS_OBJ_L" datasourceId="Origin_TEST_DS" datasourceTableName="F1_BUS_OBJ_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG'</filterString>
+    </jdbcTable>
+    <jdbcTable id="F1_BUS_OBJ_STATUS_L" datasourceId="Origin_TEST_DS" datasourceTableName="F1_BUS_OBJ_STATUS_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="DESCR254" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG'</filterString>
+    </jdbcTable>
+    <jdbcTable id="SC_USER" datasourceId="Origin_TEST_DS" datasourceTableName="SC_USER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="FIRST_NAME" type="java.lang.String"></field>
+        <field id="LAST_NAME" type="java.lang.String"></field>
+        <field id="TNDR_SOURCE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DISP_PROF_CD" type="java.lang.String"></field>
+        <field id="TD_ENTRY_AGE_DAYS1" type="java.math.BigDecimal"></field>
+        <field id="TD_ENTRY_AGE_DAYS2" type="java.math.BigDecimal"></field>
+        <field id="ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="EMAILID" type="java.lang.String"></field>
+        <field id="USER_TYPE_FLG" type="java.lang.String"></field>
+        <field id="PORTAL_OVRD_USER" type="java.lang.String"></field>
+        <field id="FAV_OVRD_USER" type="java.lang.String"></field>
+        <field id="DASHBOARD_WIDTH" type="java.lang.String"></field>
+        <field id="HOME_NAV_OPT_CD" type="java.lang.String"></field>
+        <field id="DISP_ALL_PREM_SW" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="EXT_USER_ID" type="java.lang.String"></field>
+        <field id="USER_ENABLE_FLG" type="java.lang.String"></field>
+        <field id="F1_SECURITY_HASH" type="java.lang.String"></field>
+        <field id="DASHBOARD_LOC_FLG" type="java.lang.String"></field>
+        <field id="DASHBOARD_STATE_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="SC_USER_1" datasourceId="Origin_TEST_DS" datasourceTableName="SC_USER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="FIRST_NAME" type="java.lang.String"></field>
+        <field id="LAST_NAME" type="java.lang.String"></field>
+        <field id="TNDR_SOURCE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DISP_PROF_CD" type="java.lang.String"></field>
+        <field id="TD_ENTRY_AGE_DAYS1" type="java.math.BigDecimal"></field>
+        <field id="TD_ENTRY_AGE_DAYS2" type="java.math.BigDecimal"></field>
+        <field id="ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="EMAILID" type="java.lang.String"></field>
+        <field id="USER_TYPE_FLG" type="java.lang.String"></field>
+        <field id="PORTAL_OVRD_USER" type="java.lang.String"></field>
+        <field id="FAV_OVRD_USER" type="java.lang.String"></field>
+        <field id="DASHBOARD_WIDTH" type="java.lang.String"></field>
+        <field id="HOME_NAV_OPT_CD" type="java.lang.String"></field>
+        <field id="DISP_ALL_PREM_SW" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="EXT_USER_ID" type="java.lang.String"></field>
+        <field id="USER_ENABLE_FLG" type="java.lang.String"></field>
+        <field id="F1_SECURITY_HASH" type="java.lang.String"></field>
+        <field id="DASHBOARD_LOC_FLG" type="java.lang.String"></field>
+        <field id="DASHBOARD_STATE_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_MD_MO_L" datasourceId="Origin_TEST_DS" datasourceTableName="CI_MD_MO_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="MAINT_OBJ_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG'</filterString>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_TEST_DS" datasourceTableName="F1_BNDL" schemaAlias="CISADM">
+      <fieldList>
+        <field id="F1_BNDL.BNDL_ID" type="java.lang.String"></field>
+        <field id="F1_BNDL.BNDL_TYPE_FLG" type="java.lang.String"></field>
+        <field id="F1_BNDL.BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="F1_BNDL.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="F1_BNDL.STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="F1_BNDL.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="F1_BNDL.USER_ID" type="java.lang.String"></field>
+        <field id="F1_BNDL.EXT_REFERENCE_ID" type="java.lang.String"></field>
+        <field id="F1_BNDL.VERSION" type="java.math.BigDecimal"></field>
+        <field id="F1_BNDL.DESCRLONG" type="java.lang.String"></field>
+        <field id="F1_BNDL.BNDL_DETAIL" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_L.BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="F1_BUS_OBJ_L.DESCR" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_L.DESCRLONG" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="SC_USER.USER_ID" type="java.lang.String"></field>
+        <field id="SC_USER.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="SC_USER.FIRST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER.LAST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER.TNDR_SOURCE_CD" type="java.lang.String"></field>
+        <field id="SC_USER.VERSION" type="java.math.BigDecimal"></field>
+        <field id="SC_USER.DISP_PROF_CD" type="java.lang.String"></field>
+        <field id="SC_USER.TD_ENTRY_AGE_DAYS1" type="java.math.BigDecimal"></field>
+        <field id="SC_USER.TD_ENTRY_AGE_DAYS2" type="java.math.BigDecimal"></field>
+        <field id="SC_USER.ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="SC_USER.EMAILID" type="java.lang.String"></field>
+        <field id="SC_USER.USER_TYPE_FLG" type="java.lang.String"></field>
+        <field id="SC_USER.PORTAL_OVRD_USER" type="java.lang.String"></field>
+        <field id="SC_USER.FAV_OVRD_USER" type="java.lang.String"></field>
+        <field id="SC_USER.DASHBOARD_WIDTH" type="java.lang.String"></field>
+        <field id="SC_USER.HOME_NAV_OPT_CD" type="java.lang.String"></field>
+        <field id="SC_USER.DISP_ALL_PREM_SW" type="java.lang.String"></field>
+        <field id="SC_USER.OWNER_FLG" type="java.lang.String"></field>
+        <field id="SC_USER.TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="SC_USER.EXT_USER_ID" type="java.lang.String"></field>
+        <field id="SC_USER.USER_ENABLE_FLG" type="java.lang.String"></field>
+        <field id="SC_USER.F1_SECURITY_HASH" type="java.lang.String"></field>
+        <field id="SC_USER.DASHBOARD_LOC_FLG" type="java.lang.String"></field>
+        <field id="SC_USER.DASHBOARD_STATE_FLG" type="java.lang.String"></field>
+        <field id="CI_MD_MO_L.MAINT_OBJ_CD" type="java.lang.String"></field>
+        <field id="CI_MD_MO_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_MD_MO_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_MD_MO_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_MD_MO_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="SC_USER_1.USER_ID" type="java.lang.String"></field>
+        <field id="SC_USER_1.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="SC_USER_1.FIRST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER_1.LAST_NAME" type="java.lang.String"></field>
+        <field id="SC_USER_1.TNDR_SOURCE_CD" type="java.lang.String"></field>
+        <field id="SC_USER_1.VERSION" type="java.math.BigDecimal"></field>
+        <field id="SC_USER_1.DISP_PROF_CD" type="java.lang.String"></field>
+        <field id="SC_USER_1.TD_ENTRY_AGE_DAYS1" type="java.math.BigDecimal"></field>
+        <field id="SC_USER_1.TD_ENTRY_AGE_DAYS2" type="java.math.BigDecimal"></field>
+        <field id="SC_USER_1.ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="SC_USER_1.EMAILID" type="java.lang.String"></field>
+        <field id="SC_USER_1.USER_TYPE_FLG" type="java.lang.String"></field>
+        <field id="SC_USER_1.PORTAL_OVRD_USER" type="java.lang.String"></field>
+        <field id="SC_USER_1.FAV_OVRD_USER" type="java.lang.String"></field>
+        <field id="SC_USER_1.DASHBOARD_WIDTH" type="java.lang.String"></field>
+        <field id="SC_USER_1.HOME_NAV_OPT_CD" type="java.lang.String"></field>
+        <field id="SC_USER_1.DISP_ALL_PREM_SW" type="java.lang.String"></field>
+        <field id="SC_USER_1.OWNER_FLG" type="java.lang.String"></field>
+        <field id="SC_USER_1.TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="SC_USER_1.EXT_USER_ID" type="java.lang.String"></field>
+        <field id="SC_USER_1.USER_ENABLE_FLG" type="java.lang.String"></field>
+        <field id="SC_USER_1.F1_SECURITY_HASH" type="java.lang.String"></field>
+        <field id="SC_USER_1.DASHBOARD_LOC_FLG" type="java.lang.String"></field>
+        <field id="SC_USER_1.DASHBOARD_STATE_FLG" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_STATUS_L.BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_STATUS_L.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_STATUS_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_STATUS_L.DESCR" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_STATUS_L.DESCR254" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_STATUS_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="F1_BUS_OBJ_STATUS_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_STATUS_L.DESCRLONG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR_OVRD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCRLONG" type="java.lang.String"></field>
+        <field id="F1_BNDL_ENTITY.BNDL_ID" type="java.lang.String"></field>
+        <field id="F1_BNDL_ENTITY.SEQNO" type="java.math.BigDecimal"></field>
+        <field id="F1_BNDL_ENTITY.MAINT_OBJ_CD" type="java.lang.String"></field>
+        <field id="F1_BNDL_ENTITY.PROC_SEQ" type="java.math.BigDecimal"></field>
+        <field id="F1_BNDL_ENTITY.PK_VALUE1" type="java.lang.String"></field>
+        <field id="F1_BNDL_ENTITY.PK_VALUE2" type="java.lang.String"></field>
+        <field id="F1_BNDL_ENTITY.PK_VALUE3" type="java.lang.String"></field>
+        <field id="F1_BNDL_ENTITY.PK_VALUE4" type="java.lang.String"></field>
+        <field id="F1_BNDL_ENTITY.PK_VALUE5" type="java.lang.String"></field>
+        <field id="F1_BNDL_ENTITY.VERSION" type="java.math.BigDecimal"></field>
+        <field id="F1_BNDL_ENTITY.USER_ID" type="java.lang.String"></field>
+        <field id="USER_ID_NAME" dataSetExpression="Concatenate(SC_USER.FIRST_NAME, ' ', SC_USER.LAST_NAME)" type="java.lang.String"></field>
+        <field id="PRIMARY_KEYS" dataSetExpression="Concatenate(F1_BNDL_ENTITY.PK_VALUE1, ',', F1_BNDL_ENTITY.PK_VALUE2, ',', F1_BNDL_ENTITY.PK_VALUE3, ',', F1_BNDL_ENTITY.PK_VALUE4, ',', F1_BNDL_ENTITY.PK_VALUE5)" type="java.lang.String"></field>
+        <field id="BNDL_ID_DIST" dataSetExpression="CountDistinct(F1_BNDL.BNDL_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="BNDL_ID_SEQNO_DIST" dataSetExpression="CountDistinct(Concatenate(F1_BNDL_ENTITY.BNDL_ID, '_', F1_BNDL_ENTITY.SEQNO), 'Current')" type="java.lang.Long"></field>
+      </fieldList>
+      <filterString>CI_LOOKUP_VAL_L.FIELD_NAME == 'BNDL_TYPE_FLG                 ' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG' and F1_BUS_OBJ_L.LANGUAGE_CD == 'ENG' and CI_MD_MO_L.LANGUAGE_CD == 'ENG' and F1_BUS_OBJ_STATUS_L.LANGUAGE_CD == 'ENG'</filterString>
+      <joinInfo alias="F1_BNDL" referenceId="F1_BNDL"></joinInfo>
+      <joinList>
+        <join expr="F1_BNDL.BNDL_ID == F1_BNDL_ENTITY.BNDL_ID" left="F1_BNDL" right="F1_BNDL_ENTITY" type="leftOuter" weight="1"></join>
+        <join expr="F1_BNDL.BNDL_TYPE_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'BNDL_TYPE_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="F1_BNDL" right="CI_LOOKUP_VAL_L" type="inner" weight="1"></join>
+        <join expr="F1_BNDL.BUS_OBJ_CD == F1_BUS_OBJ_L.BUS_OBJ_CD and F1_BUS_OBJ_L.LANGUAGE_CD == 'ENG'" left="F1_BNDL" right="F1_BUS_OBJ_L" type="inner" weight="1"></join>
+        <join expr="F1_BNDL.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L.BUS_OBJ_CD and F1_BNDL.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L.LANGUAGE_CD == 'ENG'" left="F1_BNDL" right="F1_BUS_OBJ_STATUS_L" type="inner" weight="1"></join>
+        <join expr="F1_BNDL.USER_ID == SC_USER.USER_ID" left="F1_BNDL" right="SC_USER" type="inner" weight="1"></join>
+        <join expr="F1_BNDL_ENTITY.MAINT_OBJ_CD == CI_MD_MO_L.MAINT_OBJ_CD and CI_MD_MO_L.LANGUAGE_CD == 'ENG'" left="F1_BNDL_ENTITY" right="CI_MD_MO_L" type="inner" weight="1"></join>
+        <join expr="F1_BNDL_ENTITY.USER_ID == SC_USER_1.USER_ID" left="F1_BNDL_ENTITY" right="SC_USER_1" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_USER_1" tableId="SC_USER_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="F1_BNDL" tableId="F1_BNDL"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_USER" tableId="SC_USER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="F1_BNDL_ENTITY" tableId="F1_BNDL_ENTITY"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_MD_MO_L" tableId="CI_MD_MO_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L" tableId="F1_BUS_OBJ_STATUS_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L" tableId="F1_BUS_OBJ_L"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

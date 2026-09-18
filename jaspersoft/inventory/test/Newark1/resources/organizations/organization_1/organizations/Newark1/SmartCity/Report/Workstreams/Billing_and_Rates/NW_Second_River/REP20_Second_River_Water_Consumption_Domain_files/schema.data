@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Second_River_Water_Consumption" label="Second_River_Water_Consumption" resourceId="Second_River_Water_Consumption"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="AS400_ACCOUNT_NUMBER" label="AS400_ACCOUNT_NUMBER" resourceId="Second_River_Water_Consumption.AS400_ACCOUNT_NUMBER"></item>
+    <item id="BILLING_NAME" label="BILLING_NAME" resourceId="Second_River_Water_Consumption.BILLING_NAME"></item>
+    <item id="C2M_ACCOUNT_NUMBER" label="C2M_ACCOUNT_NUMBER" resourceId="Second_River_Water_Consumption.C2M_ACCOUNT_NUMBER"></item>
+    <item id="CITY_STATE" label="CITY_STATE" resourceId="Second_River_Water_Consumption.CITY_STATE"></item>
+    <item id="CLOSING_BSEG_SW" label="CLOSING_BSEG_SW" resourceId="Second_River_Water_Consumption.CLOSING_BSEG_SW"></item>
+    <item id="CONSUMPTION" label="CONSUMPTION" resourceId="Second_River_Water_Consumption.CONSUMPTION"></item>
+    <item id="END_DT" label="END_DT" resourceId="Second_River_Water_Consumption.END_DT"></item>
+    <item id="SA_ID" label="SA_ID" resourceId="Second_River_Water_Consumption.SA_ID"></item>
+    <item id="SA_TYPE_CD" label="SA_TYPE_CD" resourceId="Second_River_Water_Consumption.SA_TYPE_CD"></item>
+    <item id="SECOND_RIVER" label="SECOND_RIVER" resourceId="Second_River_Water_Consumption.SECOND_RIVER"></item>
+    <item id="SERVICE_LOCATION" label="SERVICE_LOCATION" resourceId="Second_River_Water_Consumption.SERVICE_LOCATION"></item>
+    <item id="START_DT" label="START_DT" resourceId="Second_River_Water_Consumption.START_DT"></item>
+    <item id="UOM_CD" label="UOM_CD" resourceId="Second_River_Water_Consumption.UOM_CD"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Second_River_Water_Consumption" datasourceId="Newark1_DS">
+      <fieldList>
+        <field id="AS400_ACCOUNT_NUMBER" type="java.lang.String"></field>
+        <field id="C2M_ACCOUNT_NUMBER" type="java.lang.String"></field>
+        <field id="BILLING_NAME" type="java.lang.String"></field>
+        <field id="SERVICE_LOCATION" type="java.lang.String"></field>
+        <field id="CITY_STATE" fieldDBName="CITY/STATE" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="CLOSING_BSEG_SW" type="java.lang.String"></field>
+        <field id="UOM_CD" type="java.lang.String"></field>
+        <field id="CONSUMPTION" type="java.math.BigDecimal"></field>
+        <field id="SECOND_RIVER" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT SA.OLD_ACCT_ID "AS400_ACCOUNT_NUMBER", 
+       CVL.DESCR "SECOND_RIVER",
+       ACCT.ACCT_ID "C2M_ACCOUNT_NUMBER", 
+       PN.ENTITY_NAME "BILLING_NAME", 
+       PRM.ADDRESS1 "SERVICE_LOCATION", 
+       PRM.CITY || ' ' || PRM.STATE || PRM.POSTAL "CITY/STATE", 
+       SA.SA_ID,
+       SA.SA_TYPE_CD,
+       BS.START_DT, 
+       BS.END_DT,
+       BS.CLOSING_BSEG_SW,
+       BSQ.UOM_CD,
+       NVL(BSQ.BILL_SQ,0) "CONSUMPTION"
+FROM CISADM.CI_PREM PRM
+INNER JOIN CISADM.CI_PREM_CHAR PCH ON PCH.PREM_ID = PRM.PREM_ID 
+    AND PCH.CHAR_TYPE_CD = 'SCNDRVR'
+INNER JOIN CISADM.CI_CHAR_VAL_L CVL ON CVL.CHAR_TYPE_CD = PCH.CHAR_TYPE_CD
+    AND CVL.CHAR_VAL = PCH.CHAR_VAL
+    AND CVL.LANGUAGE_CD = 'ENG'
+INNER JOIN CISADM.CI_SA SA ON SA.CHAR_PREM_ID = PCH.PREM_ID
+INNER JOIN CISADM.CI_SA_TYPE SAT ON SAT.SA_TYPE_CD = SA.SA_TYPE_CD
+    AND SAT.CIS_DIVISION = SA.CIS_DIVISION
+    AND SAT.SVC_TYPE_CD = 'W'
+INNER JOIN CISADM.CI_ACCT ACCT ON ACCT.ACCT_ID = SA.ACCT_ID
+INNER JOIN CISADM.CI_ACCT_PER APER ON APER.ACCT_ID = ACCT.ACCT_ID
+    AND APER.MAIN_CUST_SW = 'Y'
+INNER JOIN CISADM.CI_PER_NAME PN ON PN.PER_ID = APER.PER_ID
+    AND PN.PRIM_NAME_SW = 'Y'
+INNER JOIN CISADM.CI_BSEG BS ON BS.SA_ID = SA.SA_ID
+    AND BS.BSEG_STAT_FLG = '50'
+INNER JOIN CISADM.CI_BSEG_SQ BSQ ON BSQ.BSEG_ID = BS.BSEG_ID
+    AND BSQ.UOM_CD !=  ' '
+    AND BSQ.TOU_CD = ' '
+    AND BSQ.SQI_CD = ' '</query>
+    </jdbcQuery>
+  </resources>
+</schema>

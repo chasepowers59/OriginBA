@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="BILLCOMPARE" label="BILLCOMPARE" resourceId="BILLCOMPARE"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account ID" resourceId="BILLCOMPARE.ACCT_ID"></item>
+    <item id="CUST_CL_CD" label="Customer Class" resourceId="BILLCOMPARE.CUST_CL_CD"></item>
+    <item id="ADDRESS1" label="Address" resourceId="BILLCOMPARE.ADDRESS1"></item>
+    <item id="BILL_CYC_CD" label="Bill Cycle" resourceId="BILLCOMPARE.BILL_CYC_CD"></item>
+    <item id="BILL_ID" label="Bill ID" resourceId="BILLCOMPARE.BILL_ID"></item>
+    <item id="BILL_SQ" label="Billable Service Quantity" resourceId="BILLCOMPARE.BILL_SQ"></item>
+    <item id="CALC_AMT" label="Calculated Amount" resourceId="BILLCOMPARE.CALC_AMT"></item>
+    <item id="CHAR_TYPE_CD" label="Characteristic Type" resourceId="BILLCOMPARE.CHAR_TYPE_CD"></item>
+    <item id="CHAR_VAL" label="Characteristic Value" resourceId="BILLCOMPARE.CHAR_VAL"></item>
+    <item id="CIS_DIVISION" label="CIS Division" resourceId="BILLCOMPARE.CIS_DIVISION"></item>
+    <item id="COMPLETE_DT" label="Completion Date" resourceId="BILLCOMPARE.COMPLETE_DT"></item>
+    <item id="DAYS" label="Days" resourceId="BILLCOMPARE.DAYS"></item>
+    <item id="DEVICE_CONFIG_TYPE_CD" label="Device Configuration Type" resourceId="BILLCOMPARE.DEVICE_CONFIG_TYPE_CD"></item>
+    <item id="END_DT" label="End Date" resourceId="BILLCOMPARE.END_DT"></item>
+    <item id="ENTITY_NAME" label="Entity Name" resourceId="BILLCOMPARE.ENTITY_NAME"></item>
+    <item id="EST_SW" label="Estimate" resourceId="BILLCOMPARE.EST_SW"></item>
+    <item id="OLD_ACCT_ID" label="Old Account ID" resourceId="BILLCOMPARE.OLD_ACCT_ID"></item>
+    <item id="RS_CD" label="Rate Schedule" resourceId="BILLCOMPARE.RS_CD"></item>
+    <item id="SA_ID" label="Service Agreement" resourceId="BILLCOMPARE.SA_ID"></item>
+    <item id="SA_TYPE_CD" label="SA Type" resourceId="BILLCOMPARE.SA_TYPE_CD"></item>
+    <item id="SP_ID" label="Service Point ID" resourceId="BILLCOMPARE.SP_ID"></item>
+    <item id="START_DT" label="Start Date" resourceId="BILLCOMPARE.START_DT"></item>
+    <item id="UOM_CD" label="Unit of Measure" resourceId="BILLCOMPARE.UOM_CD"></item>
+    <item id="WIN_START_DT" label="Window Start Date" resourceId="BILLCOMPARE.WIN_START_DT"></item>
+    <item id="BILL_STAT_FLG" label="Bill Status" resourceId="BILLCOMPARE.BILL_STAT_FLG"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="BILLCOMPARE" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="RS_CD" type="java.lang.String"></field>
+        <field id="DEVICE_CONFIG_TYPE_CD" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="OLD_ACCT_ID" type="java.lang.String"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="WIN_START_DT" type="java.sql.Timestamp"></field>
+        <field id="COMPLETE_DT" type="java.sql.Timestamp"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="DAYS" type="java.math.BigDecimal"></field>
+        <field id="EST_SW" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="BILL_SQ" type="java.math.BigDecimal"></field>
+        <field id="UOM_CD" type="java.lang.String"></field>
+        <field id="CALC_AMT" type="java.math.BigDecimal"></field>
+        <field id="SP_ID" type="java.lang.String"></field>
+        <field id="CHAR_VAL" type="java.lang.String"></field>
+        <field id="CHAR_TYPE_CD" type="java.lang.String"></field>
+        <field id="BILL_STAT_FLG" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>UOM_CD in (NULL, 'CCF')</filterString>
+      <query>SELECT A.BILL_CYC_CD,  A.CUST_CL_CD,
+               SA.SA_TYPE_CD, 
+               BC.RS_CD, 
+               DCFG.DEVICE_CONFIG_TYPE_CD,
+               P.ADDRESS1,
+               A.ACCT_ID,
+               SA.SA_ID,  
+               BS.END_DT, 
+               A.CIS_DIVISION, 
+               SA.OLD_ACCT_ID, 
+               B.BILL_ID, 
+               B.BILL_STAT_FLG, 
+               B.WIN_START_DT, 
+               TRUNC(B.COMPLETE_DTTM) COMPLETE_DT, 
+               BS.START_DT, 
+               (BS.END_DT-BS.START_DT) DAYS, 
+               BS.EST_SW,
+               PN.ENTITY_NAME,  
+               CCF.BILL_SQ, 
+               CCF.UOM_CD,
+               BC.CALC_AMT,
+               SP.sp_ID,
+               SPC.CHAR_TYPE_CD,
+               SPC.CHAR_VAL
+FROM CISADM.CI_ACCT A
+
+JOIN CISADM.CI_ACCT_PER AP 
+    ON A.ACCT_ID=AP.ACCT_ID
+    AND MAIN_CUST_SW='Y'
+JOIN CISADM.CI_PER_NAME PN
+    ON AP.PER_ID=PN.PER_ID
+    AND PN.PRIM_NAME_SW='Y'
+JOIN CISADM.CI_BILL B
+    ON A.ACCT_ID=B.ACCT_ID
+    AND B.WIN_START_DT BETWEEN trunc(SYSDATE)-365 and trunc(SYSDATE)+70
+
+
+JOIN CISADM.CI_SA SA
+    ON A.ACCT_ID=SA.ACCT_ID
+    AND SA.SA_TYPE_CD IN (SELECT SA_TYPE_CD 
+                          FROM CISADM.CI_SA_TYPE 
+                          WHERE ALLOW_BILLING_SW='Y' 
+                          AND PREM_REQ_SW='Y')
+
+JOIN CISADM.CI_BSEG BS
+    ON SA.SA_ID=BS.SA_ID
+    AND B.BILL_ID=BS.BILL_ID
+    AND (SA.SA_STATUS_FLG IN ('20','30','40') OR SA.END_DT&gt;=BS.END_DT)
+    AND BS.BSEG_STAT_FLG IN ('30','50')
+JOIN CISADM.CI_PREM P
+    ON BS.PREM_ID=P.PREM_ID
+LEFT JOIN CISADM.CI_SA_SP SASP
+    ON SA.SA_ID=SASP.SA_ID
+    AND SASP.SP_ID = (SELECT MAX(SP_ID) 
+                      FROM CISADM.CI_SA_SP A1 
+                      WHERE A1.SA_ID=SASP.SA_ID 
+                      AND A1.STOP_DTTM IS NULL 
+                      AND A1.START_DTTM=(SELECT MIN(START_DTTM) 
+                                         FROM CISADM.CI_SA_SP 
+                                         WHERE SA_ID=A1.SA_ID 
+                                         AND STOP_DTTM IS NULL 
+                                         GROUP BY SA_ID))
+LEFT JOIN CISADM.CI_SP SP
+    ON SASP.SP_ID=SP.SP_ID
+LEFT JOIN CISADM.CI_SP_CHAR SPC
+    ON SP.SP_ID=SPC.SP_ID
+    AND SPC.CHAR_TYPE_CD IN ( 'C2M-MSZE')
+  AND SPC.EFFDT = (SELECT MAX(SPC2.EFFDT) from CISADM.CI_SP_CHAR SPC2 where SPC2.SP_ID = SPC.SP_ID and SPC2.CHAR_TYPE_CD IN ( 'C2M-MSZE'))
+LEFT JOIN CISADM.D1_SP_IDENTIFIER DSP_ID
+    ON DSP_ID.ID_VALUE = SP.SP_ID
+    AND DSP_ID.SP_ID_TYPE_FLG = 'D1EI'
+LEFT JOIN CISADM.D1_INSTALL_EVT IE
+    ON IE.D1_SP_ID = DSP_ID.D1_SP_ID
+    AND IE.D1_REMOVAL_DTTM IS NULL
+LEFT JOIN CISADM.D1_DVC_CFG DCFG
+    ON DCFG.DEVICE_CONFIG_ID = IE.DEVICE_CONFIG_ID
+LEFT JOIN CISADM.CI_BSEG_SQ CCF
+ON BS.BSEG_ID=CCF.BSEG_ID
+AND (CCF.UOM_CD != ' ' or CCF.UOM_CD = 'CCF')
+
+AND CCF.TOU_CD = ' '
+AND CCF.SQI_CD = ' '
+LEFT JOIN (SELECT BSEG_ID, RS_CD, SUM(CALC_AMT) CALC_AMT, COUNT(*) HDR_CNT FROM CISADM.CI_BSEG_CALC GROUP BY BSEG_ID, RS_CD) BC
+ON BS.BSEG_ID=BC.BSEG_ID
+
+ORDER BY 
+    A.BILL_CYC_CD, 
+    SA.SA_TYPE_CD, 
+    BC.RS_CD,
+    DCFG.DEVICE_CONFIG_TYPE_CD</query>
+    </jdbcQuery>
+  </resources>
+</schema>

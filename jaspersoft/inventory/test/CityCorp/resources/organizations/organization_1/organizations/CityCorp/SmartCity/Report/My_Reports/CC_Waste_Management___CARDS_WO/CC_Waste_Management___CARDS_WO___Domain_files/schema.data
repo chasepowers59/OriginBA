@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="New_Derived_Table" label="New_Derived_Table" resourceId="New_Derived_Table"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="ACCT_ID" resourceId="New_Derived_Table.ACCT_ID"></item>
+    <item id="SA_ID" label="SA_ID" resourceId="New_Derived_Table.SA_ID"></item>
+    <item id="SA_TYPE_CD" label="SA_TYPE_CD" resourceId="New_Derived_Table.SA_TYPE_CD"></item>
+    <item id="SA_BAL" label="SA_BAL" resourceId="New_Derived_Table.SA_BAL"></item>
+    <item id="BILL_ID" label="BILL_ID" resourceId="New_Derived_Table.BILL_ID"></item>
+    <item id="BSEG_ID" label="BSEG_ID" resourceId="New_Derived_Table.BSEG_ID"></item>
+    <item id="BILL_DT" label="BILL_DT" resourceId="New_Derived_Table.BILL_DT"></item>
+    <item id="COMPLETE_DTTM" label="COMPLETE_DTTM" resourceId="New_Derived_Table.COMPLETE_DTTM"></item>
+    <item id="DUE_DT" label="DUE_DT" resourceId="New_Derived_Table.DUE_DT"></item>
+    <item id="NEXT_CR_RVW_DT" label="NEXT_CR_RVW_DT" resourceId="New_Derived_Table.NEXT_CR_RVW_DT"></item>
+    <item id="PROJECTED_WO_DT" label="PROJECTED_WO_DT" resourceId="New_Derived_Table.PROJECTED_WO_DT"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="New_Derived_Table" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="BILL_DT" type="java.sql.Timestamp"></field>
+        <field id="COMPLETE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="DUE_DT" type="java.sql.Timestamp"></field>
+        <field id="NEXT_CR_RVW_DT" type="java.sql.Timestamp"></field>
+        <field id="PROJECTED_WO_DT" type="java.sql.Timestamp"></field>
+        <field id="SA_BAL" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+    SA.ACCT_ID,
+    SA.SA_ID,
+    SA.SA_TYPE_CD,
+    BSEG.BSEG_ID,
+    BILL.BILL_ID,
+    BILL.BILL_DT,
+    BILL.COMPLETE_DTTM,
+    BILL.DUE_DT,
+    BILL.NEXT_CR_RVW_DT,
+    BILL.NEXT_CR_RVW_DT AS PROJECTED_WO_DT,
+    (
+        SELECT
+            SUM(FT.TOT_AMT)
+        FROM
+            CISADM.CI_FT FT
+        WHERE
+            FT.SA_ID = SA.SA_ID
+            AND FT.FREEZE_SW = 'Y'
+    ) AS SA_BAL
+FROM
+    CISADM.CI_SA SA,
+    CISADM.CI_BSEG BSEG,
+    CISADM.CI_BILL BILL
+WHERE
+    SA.SA_STATUS_FLG = '40'
+    AND BSEG.SA_ID = SA.SA_ID
+    AND BSEG.BSEG_STAT_FLG = '50'
+    AND (BSEG.CLOSING_BSEG_SW = 'Y'
+         OR (
+             SELECT
+                 BSEG2.CLOSING_BSEG_SW
+             FROM
+                 CISADM.CI_BSEG BSEG2
+             WHERE
+                 BSEG2.BSEG_ID = BSEG.MASTER_BSEG_ID
+         ) = 'Y'
+    )
+    AND BILL.BILL_ID = BSEG.BILL_ID
+	AND NOT EXISTS (
+        SELECT
+            'X'
+        FROM
+            CISADM.CI_WO_PROC WP,
+            CISADM.CI_WO_PROC_SA WPS
+        WHERE
+            WP.WO_STATUS_FLG = '10'
+			AND WPS.WO_SA_STAT_FLG = '10'
+            AND WP.ACCT_ID = SA.ACCT_ID
+            AND WPS.SA_ID = SA.SA_ID
+            AND WPS.WO_PROC_ID = WP.WO_PROC_ID
+    )
+ORDER BY
+    BILL.NEXT_CR_RVW_DT, SA.ACCT_ID</query>
+    </jdbcQuery>
+  </resources>
+</schema>

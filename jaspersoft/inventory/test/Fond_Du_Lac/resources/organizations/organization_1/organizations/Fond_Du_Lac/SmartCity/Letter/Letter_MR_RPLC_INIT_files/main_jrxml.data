@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.3.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Letter-MR-RPLC-INIT" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4c516a84-2bc8-4fb6-aa9f-74bc4b108917">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Letter-Generic DS"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin|Fond_Du_Lac"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Letter/Letter_MR_RPLC_INIT_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Letter/Letter_MR_RPLC_INIT"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Meter Replacement Initial Notice"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="net.sf.jasperreports.xml.source" class="java.lang.String"/>
+	<parameter name="customerContactId" class="java.lang.String"/>
+	<parameter name="query" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{customerContactId}==null?"/root/C1-LetterPrintRecord/letter":"/root/C1-LetterPrintRecord[./customerContactId='"+$P{customerContactId}+"']/letter"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="XPath">
+		<![CDATA[$P{query}]]>
+	</queryString>
+	<field name="customerContactId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../customerContactId"/>
+		<fieldDescription><![CDATA[../customerContactId]]></fieldDescription>
+	</field>
+	<field name="personId" class="java.lang.Long">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/personId"/>
+		<fieldDescription><![CDATA[customerContactDetails/personId]]></fieldDescription>
+	</field>
+	<field name="contactDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/contactDate"/>
+		<fieldDescription><![CDATA[customerContactDetails/contactDate]]></fieldDescription>
+	</field>
+	<field name="contactTime" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/contactTime"/>
+		<fieldDescription><![CDATA[customerContactDetails/contactTime]]></fieldDescription>
+	</field>
+	<field name="contactClass" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/contactClass"/>
+		<fieldDescription><![CDATA[customerContactDetails/contactClass]]></fieldDescription>
+	</field>
+	<field name="contactType" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/contactType"/>
+		<fieldDescription><![CDATA[customerContactDetails/contactType]]></fieldDescription>
+	</field>
+	<field name="letterTemplate" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/letterTemplate"/>
+		<fieldDescription><![CDATA[customerContactDetails/letterTemplate]]></fieldDescription>
+	</field>
+	<field name="letterDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/letterDate"/>
+		<fieldDescription><![CDATA[customerContactDetails/letterDate]]></fieldDescription>
+	</field>
+	<field name="entityName1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/entityName1"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/entityName1]]></fieldDescription>
+	</field>
+	<field name="entityName2" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/entityName2"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/entityName2]]></fieldDescription>
+	</field>
+	<field name="entityName3" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/entityName3"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/entityName3]]></fieldDescription>
+	</field>
+	<field name="mailingCountry" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingCountry"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingCountry]]></fieldDescription>
+	</field>
+	<field name="mailingAddress1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingAddress1"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingAddress1]]></fieldDescription>
+	</field>
+	<field name="mailingAddress2" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingAddress2"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingAddress2]]></fieldDescription>
+	</field>
+	<field name="mailingAddress3" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingAddress3"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingAddress3]]></fieldDescription>
+	</field>
+	<field name="mailingAddress4" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingAddress4"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingAddress4]]></fieldDescription>
+	</field>
+	<field name="mailingCity" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingCity"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingCity]]></fieldDescription>
+	</field>
+	<field name="mailingState" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingState"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingState]]></fieldDescription>
+	</field>
+	<field name="mailingPostal" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingPostal"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingPostal]]></fieldDescription>
+	</field>
+	<field name="mailingCounty" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingCounty"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingCounty]]></fieldDescription>
+	</field>
+	<field name="accountId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="collectionDetails/accountId"/>
+		<fieldDescription><![CDATA[collectionDetails/accountId]]></fieldDescription>
+	</field>
+	<field name="amountStillOwed" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="collectionDetails/amountStillOwed"/>
+		<fieldDescription><![CDATA[collectionDetails/amountStillOwed]]></fieldDescription>
+	</field>
+	<field name="collectionArrearsDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="collectionDetails/collectionArrearsDate"/>
+		<fieldDescription><![CDATA[collectionDetails/collectionArrearsDate]]></fieldDescription>
+	</field>
+	<field name="collectionProcessId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="collectionDetails/collectionProcessId"/>
+		<fieldDescription><![CDATA[collectionDetails/collectionProcessId]]></fieldDescription>
+	</field>
+	<field name="CMTXDT" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactCharacteristics//CMTXDT"/>
+		<fieldDescription><![CDATA[customerContactCharacteristics/CMTXDT]]></fieldDescription>
+	</field>
+	<field name="premiseId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/premiseId"/>
+		<fieldDescription><![CDATA[premiseDetails/premiseId]]></fieldDescription>
+	</field>
+	<group name="AccountIDGroup" footerPosition="ForceAtBottom">
+		<groupExpression><![CDATA[$F{customerContactId}+"-"+$F{personId}]]></groupExpression>
+		<groupHeader>
+			<band height="100">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement x="0" y="0" width="560" height="100" uuid="98fd0b21-f0c0-4823-b7bc-83d0154cd312"/>
+					<image scaleImage="FillFrame">
+						<reportElement x="0" y="0" width="560" height="100" uuid="2cd4a1c7-d6c8-442f-ad3b-cade7865a93c"/>
+						<imageExpression><![CDATA["repo:letterhead.jpg"]]></imageExpression>
+					</image>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="30">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement x="0" y="0" width="560" height="30" uuid="421680d6-e214-4381-b698-532449f2cb32"/>
+					<textField>
+						<reportElement x="0" y="0" width="560" height="30" forecolor="#0077C8" uuid="e3cbcd53-3250-4c67-809f-6d7d62b661ce">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Cambria" size="7.5"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Fond du Lac City Government’s mission is to provide excellent local government through responsiveness and accountability to the citizen’s of Fond du Lac.\n"+
+"Our values: Excellence in Service, Honesty, Integrity, and Personal Accountability guide everything we do"]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="40" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement x="0" y="0" width="560" height="40" uuid="74b851a6-3e32-4786-90d4-2334cdaa2287"/>
+				<textField textAdjust="StretchHeight" pattern="MMMM dd, yyyy" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="560" height="20" isPrintWhenDetailOverflows="true" uuid="d7579dbe-11a6-40d0-bda2-9699ba8e4977">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="10" rightPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" markup="styled">
+						<font fontName="Calibri" size="10" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{contactDate}]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="20" width="560" height="20" isPrintWhenDetailOverflows="true" uuid="2fbb36c0-3b53-4ad8-98a6-298046086371">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="10" rightPadding="0"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" markup="styled">
+						<font fontName="Calibri" size="10" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($F{entityName1}==null?"":$F{entityName1})+"\n"+
+($F{mailingAddress1}==null?"":$F{mailingAddress1})+"\n"+
+($F{mailingCity}==null?"":$F{mailingCity})+", "+
+($F{mailingState}==null?"":$F{mailingState})+" " + ($F{mailingPostal}==null?"":$F{mailingPostal})]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="25">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="560" height="25" isPrintWhenDetailOverflows="true" uuid="d4b56d38-adda-4075-81a2-4841e6345767">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="10" rightPadding="0"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font fontName="Calibri" size="10" isBold="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA["WATER SERVICE LOCATION: "+($F{mailingAddress1}==null?"":$F{mailingAddress1})+"         METER SITE: "+ ($F{premiseId}==null?"":$F{premiseId})]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="20">
+			<frame>
+				<reportElement x="0" y="0" width="560" height="20" uuid="8a10437a-c354-4570-aff2-f5475af8c83f"/>
+				<textField textAdjust="StretchHeight">
+					<reportElement x="0" y="0" width="560" height="20" uuid="44202d14-8d8f-4877-852b-f41316fc279e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="5" leftPadding="10" bottomPadding="2" rightPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+						<font fontName="Calibri" size="10"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["RE: WATER METER REPLACEMENT <br />"+
+"Dear Customer / Property Owner;<br />"+
+"The property referenced above is scheduled for a routine water meter replacement with a cross connection/clear water inspection being performed while onsite. This maintenance is mandated by State law, as water meter and associated electronic reading devices are owned by the Fond du Lac Water Utility. As such, property owners are required to allow utility staff access to meter locations in order to complete these tasks. Meter locations are typically basements, crawl spaces or utility closets. Residents are encouraged to clear a path to the meter and test the shut-off valves (located before and after the meter) to reduce the time it takes for the meter to be changed."]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="20">
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="0" width="560" height="20" uuid="d2a78ba2-a881-4996-b8fc-b393efb5a762">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="5" leftPadding="10" bottomPadding="2" rightPadding="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+					<font fontName="Calibri" size="10"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Meters will be replaced by a Fond du Lac Water Utility employee who will arrive in a Fond du Lac Water Utility identified vehicle and carry a City of Fond du Lac Identification Card. The installation and inspection will take 20-30 minutes and an Adult needs to be present for the Utility Technician to be granted access into the building."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="20">
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="0" width="560" height="20" uuid="548d4019-175d-4d85-902d-23a0990793b0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="5" leftPadding="10" bottomPadding="2" rightPadding="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+					<font fontName="Calibri" size="10"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Please schedule your appointment online at <span style='color: #0077C8;text-decoration: underline;'>www.fdl.wi.gov/water/schedule</span> appointments are available in 3 hour time blocks, you will be required to be available during that time frame selected or may be charged a missed appointment fee."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="85">
+			<frame>
+				<reportElement x="0" y="0" width="560" height="85" uuid="2714a942-46d4-481e-82bb-aeb6ee2c7523"/>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="560" height="20" isPrintWhenDetailOverflows="true" uuid="60e6403b-f5ae-4950-81a4-ddce6930561e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+						<font fontName="Calibri" size="10" isBold="false" isItalic="false" isUnderline="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<span style='font-style: italic; font-size: 10px; text-decoration: underline;'>Appointments Available:</span>"+
+"<span style='font-size: 7px;'> *a technician can show up anywhere within the 3 hour block window selected.</span>"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="20" width="560" height="65" isPrintWhenDetailOverflows="true" forecolor="#4B43E6" uuid="528994ff-4efa-43b5-a4c0-aaac3330e905">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="10" rightPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
+						<font fontName="Calibri" size="12" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Morning Appointment Block: 7:30 am-10:30 am \n"+
+"Mid-Day Appointment Block: 11:00 am- 2:00 pm \n"+        
+"Afternoon Appointment Block: 2:30 pm- 5:30 pm "]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="20">
+			<frame>
+				<reportElement x="0" y="0" width="562" height="20" uuid="60d18e85-cdae-43bf-ba92-e5e5b08f27ea"/>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="1" y="0" width="560" height="20" isPrintWhenDetailOverflows="true" uuid="31dbb6cd-d665-4e6e-89ec-22f66999e9ad">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box leftPadding="10" rightPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" markup="html">
+						<font fontName="Calibri" size="10" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Appointments must be scheduled within five (5) business days, from the date this letter was generated to ensure a time block is available of your choosing. Failure to accommodate a meter replacement within a reasonable period of time may result in account surcharges or termination of service.  Please contact a utility representative at (920) 322-3680 or <span style='color: #0077C8;text-decoration: underline;'>fdlwater@fdl.wi.gov</span> Monday through Friday 7:00 a.m. to 3:30 p.m. with questions, or if you need assistance with scheduling your appointment due to special accommodations needed."]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="120">
+			<frame>
+				<reportElement x="0" y="0" width="560" height="120" uuid="b694e663-5a78-4188-9f09-1931b37f9db3"/>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="560" height="70" isPrintWhenDetailOverflows="true" uuid="69e7d2b3-ab1d-4d9d-9aed-09711921c48e">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box topPadding="5" leftPadding="10" rightPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" markup="styled">
+						<font fontName="Calibri" size="10" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Regards,\n"+
+"Travis Kloetzke\n"+
+"Utility General Manager\n"+
+"Fond du Lac Water Utility\n"+
+"109 N Macy St"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="70" width="560" height="50" isPrintWhenDetailOverflows="true" uuid="23413372-6905-405a-9f80-6dbf31fc7cff">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="10" rightPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
+						<font fontName="Calibri" size="7" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["NOTE: Charges for missed appointments may be assessed if the Utility Office is not given reasonable notice of the need to cancel or re-schedule (within 1 hour of the scheduled appointment time).   $20.00 charge for a missed appointment during normal business hours;   $35.00 charge for a missed appointment after hours"]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+</jasperReport>

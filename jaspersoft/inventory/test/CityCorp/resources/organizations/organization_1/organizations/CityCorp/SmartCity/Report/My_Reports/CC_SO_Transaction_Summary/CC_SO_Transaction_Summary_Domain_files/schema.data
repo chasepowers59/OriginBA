@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="SO_TRANSACTION_SUMMARY" label="SO_TRANSACTION_SUMMARY" resourceId="SO_TRANSACTION_SUMMARY"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="CRE_DTTM" label="Create Date/Time" resourceId="SO_TRANSACTION_SUMMARY.CRE_DTTM"></item>
+    <item id="CREW" label="Crew" resourceId="SO_TRANSACTION_SUMMARY.CREW"></item>
+    <item id="D1_COMM_ID" label="Communication ID" resourceId="SO_TRANSACTION_SUMMARY.D1_COMM_ID"></item>
+    <item id="DESCR" label="Description" resourceId="SO_TRANSACTION_SUMMARY.DESCR"></item>
+    <item id="TASK_TYPE" label="Task Type" resourceId="SO_TRANSACTION_SUMMARY.TASK_TYPE"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="SO_TRANSACTION_SUMMARY" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="D1_COMM_ID" type="java.lang.String"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="TASK_TYPE" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="CREW" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT 
+    COMIN.D1_COMM_ID,
+    COMIN.CRE_DTTM,
+    COMIN.TASK_TYPE,
+    FTTL.DESCR,
+    COMIN.CREW
+FROM
+    (SELECT D1_COMM_ID, 
+            CRE_DTTM,
+            EXTRACTVALUE(XMLTYPE(CONCAT(CONCAT('&lt;root&gt;', BO_DATA_AREA), '&lt;/root&gt;')), 'root/responseDetail/message/taskType') TASK_TYPE,
+            CASE WHEN EXTRACTVALUE(XMLTYPE(CONCAT(CONCAT('&lt;root&gt;', BO_DATA_AREA), '&lt;/root&gt;')), 'root/responseDetail/message/completedByCrew') IS NULL 
+            THEN EXTRACTVALUE(XMLTYPE(CONCAT(CONCAT('&lt;root&gt;', BO_DATA_AREA), '&lt;/root&gt;')), 'root/completionDetail/messageCompletionInformation/completedByCrew')
+            ELSE EXTRACTVALUE(XMLTYPE(CONCAT(CONCAT('&lt;root&gt;', BO_DATA_AREA), '&lt;/root&gt;')), 'root/responseDetail/message/completedByCrew')
+            END AS CREW
+    FROM CISADM.D1_COMM_IN
+    WHERE BUS_OBJ_CD = 'D1-FieldActivityIBComm'
+    AND COMM_TYPE_CD = 'FA-IBCOMMTYPE'
+    AND BO_STATUS_CD = 'COMPLETED') COMIN,
+    (SELECT *
+    FROM CISADM.F1_EXT_LOOKUP_VAL_L
+    WHERE BUS_OBJ_CD = 'D1-FieldTaskTypeLookup') FTTL
+WHERE FTTL.F1_EXT_LOOKUP_VALUE = COMIN.TASK_TYPE</query>
+    </jdbcQuery>
+  </resources>
+</schema>

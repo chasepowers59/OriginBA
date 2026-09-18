@@ -1,0 +1,1190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="Customer - Join Tree 1" resourceId="JoinTree_1"></itemGroup>
+    <itemGroup id="JoinTree_2" label="Premise - Join Tree 2" resourceId="JoinTree_2"></itemGroup>
+    <itemGroup id="JoinTree_3" label="Meter - Join Tree 3" resourceId="JoinTree_3"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DataVergence_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+        <entry key="DATAVERGENCE">
+          <string>DATAVERGENCE</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="DV_CUSTOMER_STG" label="1.) Customer Staging Data" resourceId="JoinTree_1">
+      <items>
+        <item id="INPUT_GRP_1" label="Input Group (Customer)" resourceId="JoinTree_1.DV_CUSTOMER_STG.INPUT_GRP"></item>
+        <item id="STATUS_CD_1" label="Migration Status (Customer)" resourceId="JoinTree_1.DV_CUSTOMER_STG.STATUS_CD"></item>
+        <item id="CUST_NBR" label="Customer Number (Customer)" resourceId="JoinTree_1.DV_CUSTOMER_STG.CUST_NBR"></item>
+        <item id="CUST_NAME" label="Customer Name" resourceId="JoinTree_1.DV_CUSTOMER_STG.CUST_NAME"></item>
+        <item id="DBA_NAME" label="Doing Business As" resourceId="JoinTree_1.DV_CUSTOMER_STG.DBA_NAME"></item>
+        <item id="PER_OR_BUS_FLG" label="Person/Business" resourceId="JoinTree_1.DV_CUSTOMER_STG.PER_OR_BUS_FLG"></item>
+        <item id="DOB_1" label="Date of Birth" resourceId="JoinTree_1.DOB"></item>
+        <item id="SSN" label="Social Security Number" resourceId="JoinTree_1.DV_CUSTOMER_STG.SSN"></item>
+        <item id="DRV_LCNSE" label="Driver's License" resourceId="JoinTree_1.DV_CUSTOMER_STG.DRV_LCNSE"></item>
+        <item id="TAXID" label="Tax ID" resourceId="JoinTree_1.DV_CUSTOMER_STG.TAXID"></item>
+        <item id="AUTH_PER" label="Authorized Person" resourceId="JoinTree_1.DV_CUSTOMER_STG.AUTH_PER"></item>
+        <item id="SPOUSE" label="Spouse" resourceId="JoinTree_1.DV_CUSTOMER_STG.SPOUSE"></item>
+        <item id="LS_SL_FLG" label="Life Support/Sensitive Load [Y/N]" resourceId="JoinTree_1.DV_CUSTOMER_STG.LS_SL_FLG"></item>
+        <item id="LS_SL_DESCR" label="Life Support/Sensitive Load Details" resourceId="JoinTree_1.DV_CUSTOMER_STG.LS_SL_DESCR"></item>
+        <item id="CELL_PHONE" label="Cellular Phone" resourceId="JoinTree_1.DV_CUSTOMER_STG.CELL_PHONE"></item>
+        <item id="HOME_PHONE" label="Home Phone" resourceId="JoinTree_1.DV_CUSTOMER_STG.HOME_PHONE"></item>
+        <item id="WORK_PHONE" label="Work Phone" resourceId="JoinTree_1.DV_CUSTOMER_STG.WORK_PHONE"></item>
+        <item id="PRIMARY_EMAIL_ID" label="Primary E-mail" resourceId="JoinTree_1.DV_CUSTOMER_STG.PRIMARY_EMAIL_ID"></item>
+        <item id="SECONDARY_EMAIL_ID" label="Secondary E-mail" resourceId="JoinTree_1.DV_CUSTOMER_STG.SECONDARY_EMAIL_ID"></item>
+        <item id="TAX_EXEMPT_ID" label="Tax Exempt ID" resourceId="JoinTree_1.DV_CUSTOMER_STG.TAX_EXEMPT_ID"></item>
+        <item id="DOB" label="Date of Birth (Text)" resourceId="JoinTree_1.DV_CUSTOMER_STG.DOB"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_ACCOUNT_STG" label="1.) Account Staging Data" resourceId="JoinTree_1">
+      <items>
+        <item id="INPUT_GRP" label="Input Group (Account)" resourceId="JoinTree_1.DV_ACCOUNT_STG.INPUT_GRP"></item>
+        <item id="STATUS_CD" label="Migration Status (Account)" resourceId="JoinTree_1.DV_ACCOUNT_STG.STATUS_CD"></item>
+        <item id="ACCT_NBR" label="Account Number (Account)" resourceId="JoinTree_1.DV_ACCOUNT_STG.ACCT_NBR"></item>
+        <item id="PRIMARY_CUST_NBR" label="Primary Customer Number (Account)" resourceId="JoinTree_1.DV_ACCOUNT_STG.PRIMARY_CUST_NBR"></item>
+        <item id="SECONDARY_CUST_NBR" label="Secondary Customer Number (Account)" resourceId="JoinTree_1.DV_ACCOUNT_STG.SECONDARY_CUST_NBR"></item>
+        <item id="ACCT_REL_TYPE_CD" label="Account Relationship Type" resourceId="JoinTree_1.DV_ACCOUNT_STG.ACCT_REL_TYPE_CD"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle" resourceId="JoinTree_1.DV_ACCOUNT_STG.BILL_CYC_CD"></item>
+        <item id="CUST_CL_CD" label="Customer Class" resourceId="JoinTree_1.DV_ACCOUNT_STG.CUST_CL_CD"></item>
+        <item id="COLL_CL_CD" label="Collection Class" resourceId="JoinTree_1.DV_ACCOUNT_STG.COLL_CL_CD"></item>
+        <item id="SETUP_DT_1" label="Setup Date" resourceId="JoinTree_1.SETUP_DT"></item>
+        <item id="MAILING_ADDRESS_IND" label="Mailing Address Source" resourceId="JoinTree_1.DV_ACCOUNT_STG.MAILING_ADDRESS_IND"></item>
+        <item id="PREMISE_NBR" label="Premise Number" resourceId="JoinTree_1.DV_ACCOUNT_STG.PREMISE_NBR"></item>
+        <item id="ADDRESS1" label="Address" resourceId="JoinTree_1.DV_ACCOUNT_STG.ADDRESS1"></item>
+        <item id="ADDRESS2" label="Address 2" resourceId="JoinTree_1.DV_ACCOUNT_STG.ADDRESS2"></item>
+        <item id="ADDRESS3" label="Address 3" resourceId="JoinTree_1.DV_ACCOUNT_STG.ADDRESS3"></item>
+        <item id="ADDRESS4" label="Address 4" resourceId="JoinTree_1.DV_ACCOUNT_STG.ADDRESS4"></item>
+        <item id="CITY" label="City" resourceId="JoinTree_1.DV_ACCOUNT_STG.CITY"></item>
+        <item id="STATE" label="State" resourceId="JoinTree_1.DV_ACCOUNT_STG.STATE"></item>
+        <item id="COUNTY" label="County" resourceId="JoinTree_1.DV_ACCOUNT_STG.COUNTY"></item>
+        <item id="POSTAL" label="Postal" resourceId="JoinTree_1.DV_ACCOUNT_STG.POSTAL"></item>
+        <item id="COUNTRY" label="Country" resourceId="JoinTree_1.DV_ACCOUNT_STG.COUNTRY"></item>
+        <item id="DD_ACCT_NBR" label="Direct Debit Account Number" resourceId="JoinTree_1.DV_ACCOUNT_STG.DD_ACCT_NBR"></item>
+        <item id="DD_BANK_CHK_SVG" label="Checking/Savings" resourceId="JoinTree_1.DV_ACCOUNT_STG.DD_BANK_CHK_SVG"></item>
+        <item id="DD_BANK_ID" label="Bank ID" resourceId="JoinTree_1.DV_ACCOUNT_STG.DD_BANK_ID"></item>
+        <item id="APAY_START_DT_1" label="Autopay Start Date" resourceId="JoinTree_1.APAY_START_DT"></item>
+        <item id="APAY_NAME" label="Autopay Name" resourceId="JoinTree_1.DV_ACCOUNT_STG.APAY_NAME"></item>
+        <item id="BILL_PRT_INTERCEPT" label="Bill Print Intercept" resourceId="JoinTree_1.DV_ACCOUNT_STG.BILL_PRT_INTERCEPT"></item>
+        <item id="ACCT_ELIG_COLL" label="Account Eligible for Collection [Y/N]" resourceId="JoinTree_1.DV_ACCOUNT_STG.ACCT_ELIG_COLL"></item>
+        <item id="BILL_ROUTING" label="Bill Routing" resourceId="JoinTree_1.DV_ACCOUNT_STG.BILL_ROUTING"></item>
+        <item dimensionOrMeasure="Measure" id="CREDIT_RATING" label="Credit Rating" resourceId="JoinTree_1.DV_ACCOUNT_STG.CREDIT_RATING"></item>
+        <item id="SETUP_DT" label="Setup Date (Text)" resourceId="JoinTree_1.DV_ACCOUNT_STG.SETUP_DT"></item>
+        <item id="APAY_START_DT" label="Autopay Start Date (Text)" resourceId="JoinTree_1.DV_ACCOUNT_STG.APAY_START_DT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_SA_STG" label="1.) SA Staging Data" resourceId="JoinTree_1">
+      <items>
+        <item id="INPUT_GRP_2" label="Input Group (SA)" resourceId="JoinTree_1.DV_SA_STG.INPUT_GRP"></item>
+        <item id="STATUS_CD_2" label="Migration Status (SA)" resourceId="JoinTree_1.DV_SA_STG.STATUS_CD"></item>
+        <item id="ACCT_NBR_1" label="Account Number (SA)" resourceId="JoinTree_1.DV_SA_STG.ACCT_NBR"></item>
+        <item id="SA_NBR" label="SA Number (SA)" resourceId="JoinTree_1.DV_SA_STG.SA_NBR"></item>
+        <item id="SA_TYPE" label="SA Type" resourceId="JoinTree_1.DV_SA_STG.SA_TYPE"></item>
+        <item id="SA_START_DT_1" label="SA Start Date" resourceId="JoinTree_1.SA_START_DT"></item>
+        <item id="SA_END_DT_1" label="SA End Date" resourceId="JoinTree_1.SA_END_DT"></item>
+        <item id="STATUS" label="SA Status" resourceId="JoinTree_1.DV_SA_STG.STATUS"></item>
+        <item id="RATE_CD" label="Rate Schedule" resourceId="JoinTree_1.DV_SA_STG.RATE_CD"></item>
+        <item dimensionOrMeasure="Dimension" id="FED_TAX_EXMPT_PCT" label="Federal Tax Exemption Percentage" resourceId="JoinTree_1.DV_SA_STG.FED_TAX_EXMPT_PCT"></item>
+        <item dimensionOrMeasure="Dimension" id="STATE_TAX_EXMPT_PCT" label="State Tax Exemption Percentage" resourceId="JoinTree_1.DV_SA_STG.STATE_TAX_EXMPT_PCT"></item>
+        <item id="SP_NBR_1" label="SP Number (SA)" resourceId="JoinTree_1.DV_SA_STG.SP_NBR"></item>
+        <item id="DEPOSIT_AMOUNT_1" label="Deposit Amount" resourceId="JoinTree_1.DEPOSIT_AMOUNT"></item>
+        <item id="BUDGET_AMOUNT_1" label="Budget Amount" resourceId="JoinTree_1.BUDGET_AMOUNT"></item>
+        <item id="BUDGET_BALANCE_1" label="Budget Balance" resourceId="JoinTree_1.BUDGET_BALANCE"></item>
+        <item id="SA_START_DT" label="SA Start Date (Text)" resourceId="JoinTree_1.DV_SA_STG.SA_START_DT"></item>
+        <item id="SA_END_DT" label="SA End Date (Text)" resourceId="JoinTree_1.DV_SA_STG.SA_END_DT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_BILL_STG" label="1.) Bill Staging Data" resourceId="JoinTree_1">
+      <items>
+        <item id="INPUT_GRP_4" label="Input Group (Bill)" resourceId="JoinTree_1.DV_BILL_STG.INPUT_GRP"></item>
+        <item id="STATUS_CD_4" label="Migration Status (Bill)" resourceId="JoinTree_1.DV_BILL_STG.STATUS_CD"></item>
+        <item id="ACCT_NBR_3" label="Account Number (Bill)" resourceId="JoinTree_1.DV_BILL_STG.ACCT_NBR"></item>
+        <item id="SA_NBR_1" label="SA Number (Bill)" resourceId="JoinTree_1.DV_BILL_STG.SA_NBR"></item>
+        <item id="SA_TYPE_1" label="SA Type" resourceId="JoinTree_1.DV_BILL_STG.SA_TYPE"></item>
+        <item id="INVOICE_NBR" label="Invoice Number (Bill)" resourceId="JoinTree_1.DV_BILL_STG.INVOICE_NBR"></item>
+        <item id="BILL_DT_1" label="Bill Date" resourceId="JoinTree_1.BILL_DT"></item>
+        <item id="BILL_PERIOD_START_DT_1" label="Bill Period Start Date" resourceId="JoinTree_1.BILL_PERIOD_START_DT"></item>
+        <item id="BILL_PERIOD_END_DT_1" label="Bill Period End Date" resourceId="JoinTree_1.BILL_PERIOD_END_DT"></item>
+        <item id="BILL_DUE_DT_1" label="Bill Due Date" resourceId="JoinTree_1.BILL_DUE_DT"></item>
+        <item id="BILL_AMT_1" label="Bill Amount" resourceId="JoinTree_1.BILL_AMT"></item>
+        <item id="BILL_DESC" label="Bill Description" resourceId="JoinTree_1.DV_BILL_STG.BILL_DESC"></item>
+        <item id="BILL_CONSUMPTION_1" label="Bill Consumption" resourceId="JoinTree_1.BILL_CONSUMPTION"></item>
+        <item id="UOM" label="Unit of Measure" resourceId="JoinTree_1.DV_BILL_STG.UOM"></item>
+        <item id="TOU" label="Time of Use" resourceId="JoinTree_1.DV_BILL_STG.TOU"></item>
+        <item id="SQI" label="Service Quantity Identifier" resourceId="JoinTree_1.DV_BILL_STG.SQI"></item>
+        <item id="BILL_FINAL" label="Final Bill [Y/N]" resourceId="JoinTree_1.DV_BILL_STG.BILL_FINAL"></item>
+        <item id="BILL_ESTIMATED" label="Estimated Bill [Y/N]" resourceId="JoinTree_1.DV_BILL_STG.BILL_ESTIMATED"></item>
+        <item id="BILL_DT" label="Bill Date (Text)" resourceId="JoinTree_1.DV_BILL_STG.BILL_DT"></item>
+        <item id="BILL_PERIOD_START_DT" label="Bill Period Start Date (Text)" resourceId="JoinTree_1.DV_BILL_STG.BILL_PERIOD_START_DT"></item>
+        <item id="BILL_PERIOD_END_DT" label="Bill Period End Date (Text)" resourceId="JoinTree_1.DV_BILL_STG.BILL_PERIOD_END_DT"></item>
+        <item id="BILL_DUE_DT" label="Bill Due Date (Text)" resourceId="JoinTree_1.DV_BILL_STG.BILL_DUE_DT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_PAYMENT_STG" label="1.) Payment Staging Data" resourceId="JoinTree_1">
+      <items>
+        <item id="INPUT_GRP_5" label="Input Group (Payment)" resourceId="JoinTree_1.DV_PAYMENT_STG.INPUT_GRP"></item>
+        <item id="STATUS_CD_5" label="Migration Status (Payment)" resourceId="JoinTree_1.DV_PAYMENT_STG.STATUS_CD"></item>
+        <item id="ACCT_NBR_4" label="Account Number (Payment)" resourceId="JoinTree_1.DV_PAYMENT_STG.ACCT_NBR"></item>
+        <item id="SA_NBR_2" label="SA Number (Payment)" resourceId="JoinTree_1.DV_PAYMENT_STG.SA_NBR"></item>
+        <item id="SA_TYPE_2" label="SA Type" resourceId="JoinTree_1.DV_PAYMENT_STG.SA_TYPE"></item>
+        <item id="PAYMENT_DT" label="Payment Date" resourceId="JoinTree_1.PAYMENT_DT"></item>
+        <item id="PAYMENT_AMOUNT_1" label="Payment Amount" resourceId="JoinTree_1.PAYMENT_AMOUNT"></item>
+        <item id="PAYMENT_TENDER_SOURCE" label="Tender Source" resourceId="JoinTree_1.DV_PAYMENT_STG.PAYMENT_TENDER_SOURCE"></item>
+        <item id="PAYMENT_TENDER_TYPE" label="Tender Type" resourceId="JoinTree_1.DV_PAYMENT_STG.PAYMENT_TENDER_TYPE"></item>
+        <item id="INVOICE_NBR_1" label="Invoice Number (Payment)" resourceId="JoinTree_1.DV_PAYMENT_STG.INVOICE_NBR"></item>
+        <item id="PAYMENT_PRINT_ON_BILL" label="Billed [Y/N]" resourceId="JoinTree_1.DV_PAYMENT_STG.PAYMENT_PRINT_ON_BILL"></item>
+        <item id="PAYMENT_DATE" label="Payment Date (Text)" resourceId="JoinTree_1.DV_PAYMENT_STG.PAYMENT_DATE"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_ADJUSTMENT_STG" label="1.) Adjustment Staging Data" resourceId="JoinTree_1">
+      <items>
+        <item id="INPUT_GRP_6" label="Input Group (Adjustment)" resourceId="JoinTree_1.DV_ADJUSTMENT_STG.INPUT_GRP"></item>
+        <item id="STATUS_CD_6" label="Migration Status (Adjustment)" resourceId="JoinTree_1.DV_ADJUSTMENT_STG.STATUS_CD"></item>
+        <item id="ACCT_NBR_5" label="Account Number (Adjustment)" resourceId="JoinTree_1.DV_ADJUSTMENT_STG.ACCT_NBR"></item>
+        <item id="SA_NBR_3" label="SA Number (Adjustment)" resourceId="JoinTree_1.DV_ADJUSTMENT_STG.SA_NBR"></item>
+        <item id="SA_TYPE_3" label="SA Type" resourceId="JoinTree_1.DV_ADJUSTMENT_STG.SA_TYPE"></item>
+        <item id="ADJ_DT_1" label="Adjustment Date" resourceId="JoinTree_1.ADJ_DT"></item>
+        <item id="ADJ_TYPE" label="Adjustment Type" resourceId="JoinTree_1.DV_ADJUSTMENT_STG.ADJ_TYPE"></item>
+        <item id="ADJ_AMT_1" label="Adjustment Amount" resourceId="JoinTree_1.ADJ_AMT"></item>
+        <item id="BILLED_FLAG" label="Billed [Y/N]" resourceId="JoinTree_1.DV_ADJUSTMENT_STG.BILLED_FLAG"></item>
+        <item id="INVOICE_NBR_2" label="Invoice Number (Adjustment)" resourceId="JoinTree_1.DV_ADJUSTMENT_STG.INVOICE_NBR"></item>
+        <item id="ADJ_DT" label="Adjustment Date (Text)" resourceId="JoinTree_1.DV_ADJUSTMENT_STG.ADJ_DT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_ARREARS_STG" label="1.) Arrears Staging Data" resourceId="JoinTree_1">
+      <items>
+        <item id="INPUT_GRP_9" label="Input Group (Arrears)" resourceId="JoinTree_1.DV_ARREARS_STG.INPUT_GRP"></item>
+        <item id="STATUS_CD_9" label="Migration Status (Arrears)" resourceId="JoinTree_1.DV_ARREARS_STG.STATUS_CD"></item>
+        <item id="ACCT_NBR_8" label="Account Number (Arrears)" resourceId="JoinTree_1.DV_ARREARS_STG.ACCT_NBR"></item>
+        <item id="SA_NBR_4" label="SA Number (Arrears)" resourceId="JoinTree_1.DV_ARREARS_STG.SA_NBR"></item>
+        <item id="ARS_AMT_0_30_1" label="Arrears Amount (Day 0 to 30)" resourceId="JoinTree_1.ARS_AMT_0_30"></item>
+        <item id="ARS_AMT_31_60_1" label="Arrears Amount (Day 31 to 60)" resourceId="JoinTree_1.ARS_AMT_31_60"></item>
+        <item id="ARS_AMT_61_90_1" label="Arrears Amount (Day 61 to 90)" resourceId="JoinTree_1.ARS_AMT_61_90"></item>
+        <item id="ARS_AMT_91_PLUS_1" label="Arrears Amount (Day 91+)" resourceId="JoinTree_1.ARS_AMT_91_PLUS"></item>
+        <item id="TOTAL_ARREARS_1" label="Total Arrears Amount" resourceId="JoinTree_1.TOTAL_ARREARS"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_COLL_AGY_REF_STG" label="1.) Collection Agency Referral Staging Data" resourceId="JoinTree_1">
+      <items>
+        <item id="INPUT_GRP_3" label="Input Group (Coll Agy Ref)" resourceId="JoinTree_1.DV_COLL_AGY_REF_STG.INPUT_GRP"></item>
+        <item id="STATUS_CD_3" label="Migration Status (Coll Agy Ref)" resourceId="JoinTree_1.DV_COLL_AGY_REF_STG.STATUS_CD"></item>
+        <item id="ACCT_NBR_2" label="Account Number (Coll Agy Ref)" resourceId="JoinTree_1.DV_COLL_AGY_REF_STG.ACCT_NBR"></item>
+        <item id="COLL_AGY_CD" label="Collection Agency" resourceId="JoinTree_1.DV_COLL_AGY_REF_STG.COLL_AGY_CD"></item>
+        <item id="ACCT_REF_AGY_ID" label="Account - Referral Agency" resourceId="JoinTree_1.DV_COLL_AGY_REF_STG.ACCT_REF_AGY_ID"></item>
+        <item id="SENT_DATE_1" label="Sent Date" resourceId="JoinTree_1.SENT_DATE"></item>
+        <item id="SENT_AMOUNT_1" label="Sent Amount" resourceId="JoinTree_1.SENT_AMOUNT"></item>
+        <item id="COMM_TYPE" label="Communication Type" resourceId="JoinTree_1.DV_COLL_AGY_REF_STG.COMM_TYPE"></item>
+        <item id="SENT_DATE" label="Sent Date (Text)" resourceId="JoinTree_1.DV_COLL_AGY_REF_STG.SENT_DATE"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_NOTES_STG" label="1.) Notes Staging Data (Customer-Based)" resourceId="JoinTree_1">
+      <items>
+        <item id="INPUT_GRP_8" label="Input Group (Notes/Customer)" resourceId="JoinTree_1.DV_NOTES_STG.INPUT_GRP"></item>
+        <item id="STATUS_CD_8" label="Migration Status (Notes/Customer)" resourceId="JoinTree_1.DV_NOTES_STG.STATUS_CD"></item>
+        <item id="ACCT_NBR_7" label="Account Number (Notes/Customer)" resourceId="JoinTree_1.DV_NOTES_STG.ACCT_NBR"></item>
+        <item id="PREM_NBR" label="Premise Number (Notes/Customer)" resourceId="JoinTree_1.DV_NOTES_STG.PREM_NBR"></item>
+        <item id="CUST_NBR_1" label="Customer Number (Notes/Customer)" resourceId="JoinTree_1.DV_NOTES_STG.CUST_NBR"></item>
+        <item id="NOTE_CAT" label="Note Category" resourceId="JoinTree_1.DV_NOTES_STG.NOTE_CAT"></item>
+        <item id="NOTE_SUB_CATEGORY" label="Note Sub-Category" resourceId="JoinTree_1.DV_NOTES_STG.NOTE_SUB_CATEGORY"></item>
+        <item id="NOTE_TEXT" label="Note Text" resourceId="JoinTree_1.DV_NOTES_STG.NOTE_TEXT"></item>
+        <item id="NOTE_DATE_3" label="Note Date" resourceId="JoinTree_1.NOTE_DATE"></item>
+        <item id="NOTE_TIME_3" label="Note Time" resourceId="JoinTree_1.NOTE_TIME"></item>
+        <item id="NOTE_DATE" label="Note Date (Text)" resourceId="JoinTree_1.DV_NOTES_STG.NOTE_DATE"></item>
+        <item id="NOTE_TIME" label="Note Time (Text)" resourceId="JoinTree_1.DV_NOTES_STG.NOTE_TIME"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_NOTES_STG_1" label="1.) Notes Staging Data (Account-Based)" resourceId="JoinTree_1">
+      <items>
+        <item id="INPUT_GRP_7" label="Input Group (Notes/Account)" resourceId="JoinTree_1.DV_NOTES_STG_1.INPUT_GRP"></item>
+        <item id="STATUS_CD_7" label="Migration Status (Notes/Account)" resourceId="JoinTree_1.DV_NOTES_STG_1.STATUS_CD"></item>
+        <item id="ACCT_NBR_6" label="Account Number (Notes/Account)" resourceId="JoinTree_1.DV_NOTES_STG_1.ACCT_NBR"></item>
+        <item id="PREM_NBR_1" label="Premise Number (Notes/Account)" resourceId="JoinTree_1.DV_NOTES_STG_1.PREM_NBR"></item>
+        <item id="CUST_NBR_2" label="Customer Number (Notes/Account)" resourceId="JoinTree_1.DV_NOTES_STG_1.CUST_NBR"></item>
+        <item id="NOTE_CAT_1" label="Note Category" resourceId="JoinTree_1.DV_NOTES_STG_1.NOTE_CAT"></item>
+        <item id="NOTE_SUB_CATEGORY_1" label="Note Sub Category" resourceId="JoinTree_1.DV_NOTES_STG_1.NOTE_SUB_CATEGORY"></item>
+        <item id="NOTE_TEXT_1" label="Note Text" resourceId="JoinTree_1.DV_NOTES_STG_1.NOTE_TEXT"></item>
+        <item id="NOTE_DATE_1_1" label="Note Date" resourceId="JoinTree_1.NOTE_DATE_1"></item>
+        <item id="NOTE_TIME_1_1" label="Note Time" resourceId="JoinTree_1.NOTE_TIME_1"></item>
+        <item id="NOTE_DATE_1" label="Note Date (Text)" resourceId="JoinTree_1.DV_NOTES_STG_1.NOTE_DATE"></item>
+        <item id="NOTE_TIME_1" label="Note Time (Text)" resourceId="JoinTree_1.DV_NOTES_STG_1.NOTE_TIME"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_SP_STG_2" label="1.) SP Staging Data" resourceId="JoinTree_1">
+      <items>
+        <item id="GIS_LOCATION_ID" label="GIS_LOCATION_ID" resourceId="JoinTree_1.DV_SP_STG_2.GIS_LOCATION_ID"></item>
+        <item id="INPUT_GRP_17" label="INPUT_GRP" resourceId="JoinTree_1.DV_SP_STG_2.INPUT_GRP"></item>
+        <item id="INPUT_ID_3" label="INPUT_ID" resourceId="JoinTree_1.DV_SP_STG_2.INPUT_ID"></item>
+        <item id="LATITUDE_1" label="LATITUDE" resourceId="JoinTree_1.DV_SP_STG_2.LATITUDE"></item>
+        <item id="LONGITUDE_1" label="LONGITUDE" resourceId="JoinTree_1.DV_SP_STG_2.LONGITUDE"></item>
+        <item id="MR_LOC_DETAIL_2" label="MR_LOC_DETAIL" resourceId="JoinTree_1.DV_SP_STG_2.MR_LOC_DETAIL"></item>
+        <item id="MR_WARN_CD_2" label="MR_WARN_CD" resourceId="JoinTree_1.DV_SP_STG_2.MR_WARN_CD"></item>
+        <item id="MTR_LOC_CD_2" label="MTR_LOC_CD" resourceId="JoinTree_1.DV_SP_STG_2.MTR_LOC_CD"></item>
+        <item id="MTR_NBR_3" label="MTR_NBR" resourceId="JoinTree_1.DV_SP_STG_2.MTR_NBR"></item>
+        <item id="PIPE_SIZE_2" label="PIPE_SIZE" resourceId="JoinTree_1.DV_SP_STG_2.PIPE_SIZE"></item>
+        <item id="PREMISE_NBR_3" label="PREMISE_NBR" resourceId="JoinTree_1.DV_SP_STG_2.PREMISE_NBR"></item>
+        <item id="PREV_MTR_NBR_2" label="PREV_MTR_NBR" resourceId="JoinTree_1.DV_SP_STG_2.PREV_MTR_NBR"></item>
+        <item id="READ_CYCLE_CD_2" label="READ_CYCLE_CD" resourceId="JoinTree_1.DV_SP_STG_2.READ_CYCLE_CD"></item>
+        <item id="READ_ROUTE_CD_2" label="READ_ROUTE_CD" resourceId="JoinTree_1.DV_SP_STG_2.READ_ROUTE_CD"></item>
+        <item id="READ_ROUTE_SEQ_2" label="READ_ROUTE_SEQ" resourceId="JoinTree_1.DV_SP_STG_2.READ_ROUTE_SEQ"></item>
+        <item id="SERVICE_POINT_TYPE_2" label="SERVICE_POINT_TYPE" resourceId="JoinTree_1.DV_SP_STG_2.SERVICE_POINT_TYPE"></item>
+        <item id="SP_NBR" label="SP_NBR" resourceId="JoinTree_1.DV_SP_STG_2.SP_NBR"></item>
+        <item id="STATUS_CD_17" label="STATUS_CD" resourceId="JoinTree_1.DV_SP_STG_2.STATUS_CD"></item>
+        <item id="STRM_WTR_TIER" label="STRM_WTR_TIER" resourceId="JoinTree_1.DV_SP_STG_2.STRM_WTR_TIER"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet1" label="1.) Descriptions" resourceId="JoinTree_1">
+      <items>
+        <item id="STATUS_CD_ACCT_STG" label="Migration Status (Account)" resourceId="JoinTree_1.STATUS_CD_ACCT_STG"></item>
+        <item id="STATUS_CD_ADJUSTMENT_STG" label="Migration Status (Adjustment)" resourceId="JoinTree_1.STATUS_CD_ADJUSTMENT_STG"></item>
+        <item id="STATUS_CD_ARREARS_STG" label="Migration Status (Arrears)" resourceId="JoinTree_1.STATUS_CD_ARREARS_STG"></item>
+        <item id="STATUS_CD_BILL_STG" label="Migration Status (Bill)" resourceId="JoinTree_1.STATUS_CD_BILL_STG"></item>
+        <item id="STATUS_CD_COLL_AGY_REF_STG" label="Migration Status (Coll Agy Ref)" resourceId="JoinTree_1.STATUS_CD_COLL_AGY_REF_STG"></item>
+        <item id="STATUS_CD_CUSTOMER_STG" label="Migration Status (Customer)" resourceId="JoinTree_1.STATUS_CD_CUSTOMER_STG"></item>
+        <item id="STATUS_CD_NOTES_STG" label="Migration Status (Notes/Customer)" resourceId="JoinTree_1.STATUS_CD_NOTES_STG"></item>
+        <item id="STATUS_CD_NOTES_STG_1" label="Migration Status (Notes/Account)" resourceId="JoinTree_1.STATUS_CD_NOTES_STG_1"></item>
+        <item id="STATUS_CD_PAYMENT_STG" label="Migration Status (Payment)" resourceId="JoinTree_1.STATUS_CD_PAYMENT_STG"></item>
+        <item id="STATUS_CD_SA_STG" label="Migration Status (SA)" resourceId="JoinTree_1.STATUS_CD_SA_STG"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet2" label="1.) Formulas" resourceId="JoinTree_1">
+      <items>
+        <item dimensionOrMeasure="Measure" id="CUST_NBR_DIST" label="Distinct Customer Number" resourceId="JoinTree_1.CUST_NBR_DIST"></item>
+        <item id="ACCT_NBR_DIST" label="Distinct Account Number" resourceId="JoinTree_1.ACCT_NBR_DIST"></item>
+        <item id="SA_NBR_DIST" label="Distinct SA Number" resourceId="JoinTree_1.SA_NBR_DIST"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_PREMISE_STG" label="2.) Premise Staging Data" resourceId="JoinTree_2">
+      <items>
+        <item id="INPUT_GRP_10" label="Input Group (Premise)" resourceId="JoinTree_2.DV_PREMISE_STG.INPUT_GRP"></item>
+        <item id="STATUS_CD_10" label="Migration Status (Premise)" resourceId="JoinTree_2.DV_PREMISE_STG.STATUS_CD"></item>
+        <item id="PREM_NBR_2" label="Premise Number (Premise)" resourceId="JoinTree_2.DV_PREMISE_STG.PREM_NBR"></item>
+        <item id="ADDRESS1_1" label="Address" resourceId="JoinTree_2.DV_PREMISE_STG.ADDRESS1"></item>
+        <item id="ADDRESS2_1" label="Address 2" resourceId="JoinTree_2.DV_PREMISE_STG.ADDRESS2"></item>
+        <item id="CITY_1" label="City" resourceId="JoinTree_2.DV_PREMISE_STG.CITY"></item>
+        <item id="IN_CITY_LIMIT" label="In City Limit [Y/N]" resourceId="JoinTree_2.DV_PREMISE_STG.IN_CITY_LIMIT"></item>
+        <item id="COUNTY_1" label="County" resourceId="JoinTree_2.DV_PREMISE_STG.COUNTY"></item>
+        <item id="STATE_1" label="State" resourceId="JoinTree_2.DV_PREMISE_STG.STATE"></item>
+        <item id="POSTAL_1" label="Postal" resourceId="JoinTree_2.DV_PREMISE_STG.POSTAL"></item>
+        <item id="PREMISE_TYPE" label="Premise Type" resourceId="JoinTree_2.DV_PREMISE_STG.PREMISE_TYPE"></item>
+        <item id="KEY_ID" label="Key ID" resourceId="JoinTree_2.DV_PREMISE_STG.KEY_ID"></item>
+        <item id="KEY_SW" label="Key [Y/N]" resourceId="JoinTree_2.DV_PREMISE_STG.KEY_SW"></item>
+        <item id="OK_TO_ENTER_SW" label="Ok to Enter [Y/N]" resourceId="JoinTree_2.DV_PREMISE_STG.OK_TO_ENTER_SW"></item>
+        <item id="LS_SL_FLG_1" label="Life Support/Sensitive Load [Y/N]" resourceId="JoinTree_2.DV_PREMISE_STG.LS_SL_FLG"></item>
+        <item id="LS_SL_DESCR_1" label="Life Support/Sensitive Load Details" resourceId="JoinTree_2.DV_PREMISE_STG.LS_SL_DESCR"></item>
+        <item id="LATITUDE" label="Latitude" resourceId="JoinTree_2.DV_PREMISE_STG.LATITUDE"></item>
+        <item id="LONGITUDE" label="Longitude" resourceId="JoinTree_2.DV_PREMISE_STG.LONGITUDE"></item>
+        <item id="LANDLORD_AGREEMENT_NBR" label="Landlord Agreement Number" resourceId="JoinTree_2.DV_PREMISE_STG.LANDLORD_AGREEMENT_NBR"></item>
+        <item id="GIS_LOCATION_ID_1" label="GIS Location ID" resourceId="JoinTree_2.DV_PREMISE_STG.GIS_LOCATION_ID"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_SP_STG" label="2.) SP Staging Data" resourceId="JoinTree_2">
+      <items>
+        <item id="INPUT_GRP_11" label="Input Group (SP)" resourceId="JoinTree_2.DV_SP_STG.INPUT_GRP"></item>
+        <item id="STATUS_CD_11" label="Migration Status (SP)" resourceId="JoinTree_2.DV_SP_STG.STATUS_CD"></item>
+        <item id="SP_NBR_2" label="SP Number (SP)" resourceId="JoinTree_2.DV_SP_STG.SP_NBR"></item>
+        <item id="PREMISE_NBR_1" label="Premise Number (SP)" resourceId="JoinTree_2.DV_SP_STG.PREMISE_NBR"></item>
+        <item id="SERVICE_POINT_TYPE" label="SP Type" resourceId="JoinTree_2.DV_SP_STG.SERVICE_POINT_TYPE"></item>
+        <item id="READ_CYCLE_CD" label="Measurement Cycle" resourceId="JoinTree_2.DV_SP_STG.READ_CYCLE_CD"></item>
+        <item id="READ_ROUTE_CD" label="Measurement Route" resourceId="JoinTree_2.DV_SP_STG.READ_ROUTE_CD"></item>
+        <item id="READ_ROUTE_SEQ" label="Measurement Route Sequence" resourceId="JoinTree_2.DV_SP_STG.READ_ROUTE_SEQ"></item>
+        <item id="PIPE_SIZE" label="Water Pipe Size" resourceId="JoinTree_2.DV_SP_STG.PIPE_SIZE"></item>
+        <item id="MR_WARN_CD" label="Meter Read Warning" resourceId="JoinTree_2.DV_SP_STG.MR_WARN_CD"></item>
+        <item id="MTR_LOC_CD" label="Meter Read Location Instructions" resourceId="JoinTree_2.DV_SP_STG.MTR_LOC_CD"></item>
+        <item id="MR_LOC_DETAIL" label="Instruction Details" resourceId="JoinTree_2.DV_SP_STG.MR_LOC_DETAIL"></item>
+        <item id="LATITUDE_2" label="Latitude" resourceId="JoinTree_2.DV_SP_STG.LATITUDE"></item>
+        <item id="LONGITUDE_2" label="Longitude" resourceId="JoinTree_2.DV_SP_STG.LONGITUDE"></item>
+        <item id="MTR_NBR" label="Meter Number (SP)" resourceId="JoinTree_2.DV_SP_STG.MTR_NBR"></item>
+        <item id="PREV_MTR_NBR" label="Previous - Meter Number (SP)" resourceId="JoinTree_2.DV_SP_STG.PREV_MTR_NBR"></item>
+        <item id="GIS_LOCATION_ID_2" label="GIS Location ID" resourceId="JoinTree_2.DV_SP_STG.GIS_LOCATION_ID"></item>
+        <item id="STRM_WTR_TIER_1" label="Storm Water Tier" resourceId="JoinTree_2.DV_SP_STG.STRM_WTR_TIER"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_LANDLORD_STG_1" label="2.) Landlord Staging Data" resourceId="JoinTree_2">
+      <items>
+        <item id="INPUT_GRP_13" label="Input Group (Landlord)" resourceId="JoinTree_2.DV_LANDLORD_STG.INPUT_GRP"></item>
+        <item id="STATUS_CD_13" label="Migration Status (Landlord)" resourceId="JoinTree_2.DV_LANDLORD_STG.STATUS_CD"></item>
+        <item id="LANDLORD_AGRMNT_1" label="Landlord Agreement Number" resourceId="JoinTree_2.DV_LANDLORD_STG.LANDLORD_AGRMNT"></item>
+        <item id="DESCRIPTION_1" label="Description" resourceId="JoinTree_2.DV_LANDLORD_STG.DESCRIPTION"></item>
+        <item id="ACCT_NBR_10" label="Account Numer (Landlord)" resourceId="JoinTree_2.DV_LANDLORD_STG.ACCT_NBR"></item>
+        <item id="IS_WATER_COVERED_1" label="Is Water Covered [Y/N]" resourceId="JoinTree_2.DV_LANDLORD_STG.IS_WATER_COVERED"></item>
+        <item id="IS_SEWER_COVERED_1" label="Is Sewer Covered [Y/N]" resourceId="JoinTree_2.DV_LANDLORD_STG.IS_SEWER_COVERED"></item>
+        <item id="IS_ELECTRIC_COVERED_1" label="Is Electric Covered [Y/N]" resourceId="JoinTree_2.DV_LANDLORD_STG.IS_ELECTRIC_COVERED"></item>
+        <item id="IS_GAS_COVERED_1" label="Is Gas Covered [Y/N]" resourceId="JoinTree_2.DV_LANDLORD_STG.IS_GAS_COVERED"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_NOTES_STG_2" label="2.) Notes Staging Data (Premise-Based)" resourceId="JoinTree_2">
+      <items>
+        <item id="INPUT_GRP_14" label="Input Group (Notes/Premise)" resourceId="JoinTree_2.DV_NOTES_STG_2.INPUT_GRP"></item>
+        <item id="STATUS_CD_14" label="Migration Status (Notes/Premise)" resourceId="JoinTree_2.DV_NOTES_STG_2.STATUS_CD"></item>
+        <item id="ACCT_NBR_11" label="Account Number (Notes/Premise)" resourceId="JoinTree_2.DV_NOTES_STG_2.ACCT_NBR"></item>
+        <item id="PREM_NBR_3" label="Premise Number (Notes/Premise)" resourceId="JoinTree_2.DV_NOTES_STG_2.PREM_NBR"></item>
+        <item id="CUST_NBR_3" label="Customer Number (Notes/Premise)" resourceId="JoinTree_2.DV_NOTES_STG_2.CUST_NBR"></item>
+        <item id="NOTE_CAT_2" label="Note Category" resourceId="JoinTree_2.DV_NOTES_STG_2.NOTE_CAT"></item>
+        <item id="NOTE_SUB_CATEGORY_2" label="Note Sub Category" resourceId="JoinTree_2.DV_NOTES_STG_2.NOTE_SUB_CATEGORY"></item>
+        <item id="NOTE_TEXT_2" label="Note Text" resourceId="JoinTree_2.DV_NOTES_STG_2.NOTE_TEXT"></item>
+        <item id="NOTE_DATE_4" label="Note Date" resourceId="JoinTree_2.NOTE_DATE"></item>
+        <item id="NOTE_TIME_4" label="Note Time" resourceId="JoinTree_2.NOTE_TIME"></item>
+        <item id="NOTE_DATE_2" label="Note Date (Text)" resourceId="JoinTree_2.DV_NOTES_STG_2.NOTE_DATE"></item>
+        <item id="NOTE_TIME_2" label="Note Time (Text)" resourceId="JoinTree_2.DV_NOTES_STG_2.NOTE_TIME"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet3" label="2.) Descriptions" resourceId="JoinTree_2">
+      <items>
+        <item id="STATUS_CD_LANDLORD_STG" label="Migration Status (Landlord)" resourceId="JoinTree_2.STATUS_CD_LANDLORD_STG"></item>
+        <item id="STATUS_CD_NOTES_STG_2" label="Migration Status (Notes/Premise)" resourceId="JoinTree_2.STATUS_CD_NOTES_STG_2"></item>
+        <item id="STATUS_CD_PREMISE_STG" label="Migration Status (Premise)" resourceId="JoinTree_2.STATUS_CD_PREMISE_STG"></item>
+        <item id="STATUS_CD_SP_STG" label="Migration Status (SP)" resourceId="JoinTree_2.STATUS_CD_SP_STG"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet4" label="2.) Formulas" resourceId="JoinTree_2">
+      <items>
+        <item id="PREM_NBR_DIST" label="Distinct Premise ID" resourceId="JoinTree_2.PREM_NBR_DIST"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_METER_ASSET_STG" label="3.) Meter Asset Staging  Data" resourceId="JoinTree_3">
+      <items>
+        <item id="INPUT_GRP_12" label="Input Group (Meter Asset)" resourceId="JoinTree_3.DV_METER_ASSET_STG.INPUT_GRP"></item>
+        <item id="ASSET_NBR" label="Asset Number (Meter Asset)" resourceId="JoinTree_3.DV_METER_ASSET_STG.ASSET_NBR"></item>
+        <item id="BADGE_NBR_1" label="Badge Number" resourceId="JoinTree_3.DV_METER_ASSET_STG.BADGE_NBR"></item>
+        <item id="SERIAL_NBR_1" label="Serial Number" resourceId="JoinTree_3.DV_METER_ASSET_STG.SERIAL_NBR"></item>
+        <item id="ASSET_TEMPLATE" label="Asset Template" resourceId="JoinTree_3.DV_METER_ASSET_STG.ASSET_TEMPLATE"></item>
+        <item id="ASSET_DISPOSITION" label="Asset Disposition" resourceId="JoinTree_3.DV_METER_ASSET_STG.ASSET_DISPOSITION"></item>
+        <item id="INSTALL_DT_1" label="Install Date" resourceId="JoinTree_3.INSTALL_DT"></item>
+        <item id="DISPOSITION_DT_1" label="Disposition Date" resourceId="JoinTree_3.DISPOSITION_DT"></item>
+        <item id="TEMPLATE_DEVICE_CONFIG_ID" label="Template Device Configuration" resourceId="JoinTree_3.DV_METER_ASSET_STG.TEMPLATE_DEVICE_CONFIG_ID"></item>
+        <item id="STATUS_CD_12" label="Migration Status" resourceId="JoinTree_3.DV_METER_ASSET_STG.STATUS_CD"></item>
+        <item id="INPUT_ID" label="Input ID" resourceId="JoinTree_3.DV_METER_ASSET_STG.INPUT_ID"></item>
+        <item id="INSTALL_DT" label="Install Date (Text)" resourceId="JoinTree_3.DV_METER_ASSET_STG.INSTALL_DT"></item>
+        <item id="DISPOSITION_DT" label="Disposition Date (Text)" resourceId="JoinTree_3.DV_METER_ASSET_STG.DISPOSITION_DT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_METER_READ_STG" label="3.) Meter Read Staging Data" resourceId="JoinTree_3">
+      <items>
+        <item id="INPUT_GRP_15" label="Input Group (Meter Read)" resourceId="JoinTree_3.DV_METER_READ_STG.INPUT_GRP"></item>
+        <item id="MTR_NBR_1" label="Meter Number (Meter Read)" resourceId="JoinTree_3.DV_METER_READ_STG.MTR_NBR"></item>
+        <item id="MTR_READ_DT_1" label="Meter Read Date" resourceId="JoinTree_3.MTR_READ_DT"></item>
+        <item id="MTR_READ_COND" label="Meter Condition" resourceId="JoinTree_3.DV_METER_READ_STG.MTR_READ_COND"></item>
+        <item id="MTR_READING_1" label="Meter Reading" resourceId="JoinTree_3.MTR_READING"></item>
+        <item id="STATUS_CD_15" label="Migration Status" resourceId="JoinTree_3.DV_METER_READ_STG.STATUS_CD"></item>
+        <item id="INPUT_ID_1" label="Input ID" resourceId="JoinTree_3.DV_METER_READ_STG.INPUT_ID"></item>
+        <item id="MTR_READ_DT" label="Meter Read Date (Text)" resourceId="JoinTree_3.DV_METER_READ_STG.MTR_READ_DT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DV_SP_STG_1" label="3.) SP Staging Data" resourceId="JoinTree_3">
+      <items>
+        <item id="INPUT_GRP_16" label="Input Group (SP)" resourceId="JoinTree_3.DV_SP_STG_1.INPUT_GRP"></item>
+        <item id="SP_NBR_3" label="SP Number (SP)" resourceId="JoinTree_3.DV_SP_STG_1.SP_NBR"></item>
+        <item id="PREMISE_NBR_2" label="Premise Number (SP)" resourceId="JoinTree_3.DV_SP_STG_1.PREMISE_NBR"></item>
+        <item id="SERVICE_POINT_TYPE_1" label="SP Type" resourceId="JoinTree_3.DV_SP_STG_1.SERVICE_POINT_TYPE"></item>
+        <item id="READ_CYCLE_CD_1" label="Read Cycle" resourceId="JoinTree_3.DV_SP_STG_1.READ_CYCLE_CD"></item>
+        <item id="READ_ROUTE_CD_1" label="Read Route" resourceId="JoinTree_3.DV_SP_STG_1.READ_ROUTE_CD"></item>
+        <item id="READ_ROUTE_SEQ_1" label="Route Sequence" resourceId="JoinTree_3.DV_SP_STG_1.READ_ROUTE_SEQ"></item>
+        <item id="PIPE_SIZE_1" label="Water Pipe Size" resourceId="JoinTree_3.DV_SP_STG_1.PIPE_SIZE"></item>
+        <item id="MR_WARN_CD_1" label="Meter Reader Warning" resourceId="JoinTree_3.DV_SP_STG_1.MR_WARN_CD"></item>
+        <item id="MTR_LOC_CD_1" label="Meter Location" resourceId="JoinTree_3.DV_SP_STG_1.MTR_LOC_CD"></item>
+        <item id="MR_LOC_DETAIL_1" label="Location Details" resourceId="JoinTree_3.DV_SP_STG_1.MR_LOC_DETAIL"></item>
+        <item id="LATITUDE_3" label="Latitude" resourceId="JoinTree_3.DV_SP_STG_1.LATITUDE"></item>
+        <item id="LONGITUDE_3" label="Longitude" resourceId="JoinTree_3.DV_SP_STG_1.LONGITUDE"></item>
+        <item id="MTR_NBR_2" label="Meter Number" resourceId="JoinTree_3.DV_SP_STG_1.MTR_NBR"></item>
+        <item id="PREV_MTR_NBR_1" label="Previous - Meter Number" resourceId="JoinTree_3.DV_SP_STG_1.PREV_MTR_NBR"></item>
+        <item id="GIS_LOCATION_ID_3" label="GIS Location ID" resourceId="JoinTree_3.DV_SP_STG_1.GIS_LOCATION_ID"></item>
+        <item id="STRM_WTR_TIER_2" label="Storm Water Tier" resourceId="JoinTree_3.DV_SP_STG_1.STRM_WTR_TIER"></item>
+        <item id="STATUS_CD_16" label="Migration Status" resourceId="JoinTree_3.DV_SP_STG_1.STATUS_CD"></item>
+        <item id="INPUT_ID_2" label="Input ID" resourceId="JoinTree_3.DV_SP_STG_1.INPUT_ID"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet5" label="3.) Descriptions" resourceId="JoinTree_3">
+      <items>
+        <item id="STATUS_CD_METER_ASSET_STG" label="Migration Status (Meter Asset)" resourceId="JoinTree_3.STATUS_CD_METER_ASSET_STG"></item>
+        <item id="STATUS_CD_METER_READ_STG" label="Migration Status (Meter Read)" resourceId="JoinTree_3.STATUS_CD_METER_READ_STG"></item>
+        <item id="STATUS_CD_SP_STG_1" label="Migration Status (SP)" resourceId="JoinTree_3.STATUS_CD_SP_STG"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet6" label="3.) Formulas" resourceId="JoinTree_3">
+      <items>
+        <item id="ASSET_NBR_DIST" label="Distinct Asset Number" resourceId="JoinTree_3.ASSET_NBR_DIST"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="DV_ACCOUNT_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_ACCOUNT_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="ACCT_NBR" type="java.lang.String"></field>
+        <field id="PRIMARY_CUST_NBR" type="java.lang.String"></field>
+        <field id="SECONDARY_CUST_NBR" type="java.lang.String"></field>
+        <field id="ACCT_REL_TYPE_CD" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="COLL_CL_CD" type="java.lang.String"></field>
+        <field id="SETUP_DT" type="java.lang.String"></field>
+        <field id="MAILING_ADDRESS_IND" type="java.lang.String"></field>
+        <field id="PREMISE_NBR" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="ADDRESS2" type="java.lang.String"></field>
+        <field id="ADDRESS3" type="java.lang.String"></field>
+        <field id="ADDRESS4" type="java.lang.String"></field>
+        <field id="CITY" type="java.lang.String"></field>
+        <field id="STATE" type="java.lang.String"></field>
+        <field id="COUNTY" type="java.lang.String"></field>
+        <field id="POSTAL" type="java.lang.String"></field>
+        <field id="COUNTRY" type="java.lang.String"></field>
+        <field id="DD_ACCT_NBR" type="java.lang.String"></field>
+        <field id="DD_BANK_CHK_SVG" type="java.lang.String"></field>
+        <field id="DD_BANK_ID" type="java.lang.String"></field>
+        <field id="APAY_START_DT" type="java.lang.String"></field>
+        <field id="APAY_NAME" type="java.lang.String"></field>
+        <field id="BILL_PRT_INTERCEPT" type="java.lang.String"></field>
+        <field id="ACCT_ELIG_COLL" type="java.lang.String"></field>
+        <field id="BILL_ROUTING" type="java.lang.String"></field>
+        <field id="CREDIT_RATING" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_ADJUSTMENT_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_ADJUSTMENT_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="ACCT_NBR" type="java.lang.String"></field>
+        <field id="SA_NBR" type="java.lang.String"></field>
+        <field id="SA_TYPE" type="java.lang.String"></field>
+        <field id="ADJ_DT" type="java.lang.String"></field>
+        <field id="ADJ_TYPE" type="java.lang.String"></field>
+        <field id="ADJ_AMT" type="java.lang.String"></field>
+        <field id="BILLED_FLAG" type="java.lang.String"></field>
+        <field id="INVOICE_NBR" type="java.lang.String"></field>
+        <field id="ADJ_ID" type="java.lang.String"></field>
+        <field id="FT_ID" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_ARREARS_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_ARREARS_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="ACCT_NBR" type="java.lang.String"></field>
+        <field id="SA_NBR" type="java.lang.String"></field>
+        <field id="ARS_AMT_0_30" type="java.lang.String"></field>
+        <field id="ARS_AMT_31_60" type="java.lang.String"></field>
+        <field id="ARS_AMT_61_90" type="java.lang.String"></field>
+        <field id="ARS_AMT_91_PLUS" type="java.lang.String"></field>
+        <field id="TOTAL_ARREARS" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_BILL_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_BILL_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="ACCT_NBR" type="java.lang.String"></field>
+        <field id="SA_NBR" type="java.lang.String"></field>
+        <field id="SA_TYPE" type="java.lang.String"></field>
+        <field id="INVOICE_NBR" type="java.lang.String"></field>
+        <field id="BILL_DT" type="java.lang.String"></field>
+        <field id="BILL_PERIOD_START_DT" type="java.lang.String"></field>
+        <field id="BILL_PERIOD_END_DT" type="java.lang.String"></field>
+        <field id="BILL_DUE_DT" type="java.lang.String"></field>
+        <field id="BILL_AMT" type="java.lang.String"></field>
+        <field id="BILL_DESC" type="java.lang.String"></field>
+        <field id="BILL_CONSUMPTION" type="java.lang.String"></field>
+        <field id="UOM" type="java.lang.String"></field>
+        <field id="TOU" type="java.lang.String"></field>
+        <field id="SQI" type="java.lang.String"></field>
+        <field id="BILL_FINAL" type="java.lang.String"></field>
+        <field id="BILL_ESTIMATED" type="java.lang.String"></field>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="FT_ID" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_COLL_AGY_REF_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_COLL_AGY_REF_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="ACCT_NBR" type="java.lang.String"></field>
+        <field id="COLL_AGY_CD" type="java.lang.String"></field>
+        <field id="ACCT_REF_AGY_ID" type="java.lang.String"></field>
+        <field id="SENT_DATE" type="java.lang.String"></field>
+        <field id="SENT_AMOUNT" type="java.lang.String"></field>
+        <field id="COMM_TYPE" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_CUSTOMER_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_CUSTOMER_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="CUST_NBR" type="java.lang.String"></field>
+        <field id="CUST_NAME" type="java.lang.String"></field>
+        <field id="DBA_NAME" type="java.lang.String"></field>
+        <field id="PER_OR_BUS_FLG" type="java.lang.String"></field>
+        <field id="DOB" type="java.lang.String"></field>
+        <field id="SSN" type="java.lang.String"></field>
+        <field id="DRV_LCNSE" type="java.lang.String"></field>
+        <field id="TAXID" type="java.lang.String"></field>
+        <field id="AUTH_PER" type="java.lang.String"></field>
+        <field id="SPOUSE" type="java.lang.String"></field>
+        <field id="LS_SL_FLG" type="java.lang.String"></field>
+        <field id="LS_SL_DESCR" type="java.lang.String"></field>
+        <field id="CELL_PHONE" type="java.lang.String"></field>
+        <field id="HOME_PHONE" type="java.lang.String"></field>
+        <field id="WORK_PHONE" type="java.lang.String"></field>
+        <field id="PRIMARY_EMAIL_ID" type="java.lang.String"></field>
+        <field id="SECONDARY_EMAIL_ID" type="java.lang.String"></field>
+        <field id="TAX_EXEMPT_ID" type="java.lang.String"></field>
+        <field id="SPOUSE_ID" type="java.lang.String"></field>
+        <field id="AUTH_PER_ID" type="java.lang.String"></field>
+        <field id="CELL_PHONE_ID" type="java.lang.String"></field>
+        <field id="HOME_PHONE_ID" type="java.lang.String"></field>
+        <field id="WORK_PHONE_ID" type="java.lang.String"></field>
+        <field id="EMAIL_CONTACT_ID" type="java.lang.String"></field>
+        <field id="SECONDARY_EMAIL_CONTACT_ID" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_LANDLORD_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_LANDLORD_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="LANDLORD_AGRMNT" type="java.lang.String"></field>
+        <field id="DESCRIPTION" type="java.lang.String"></field>
+        <field id="ACCT_NBR" type="java.lang.String"></field>
+        <field id="IS_WATER_COVERED" type="java.lang.String"></field>
+        <field id="IS_SEWER_COVERED" type="java.lang.String"></field>
+        <field id="IS_ELECTRIC_COVERED" type="java.lang.String"></field>
+        <field id="IS_GAS_COVERED" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_METER_ASSET_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_METER_ASSET_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="BADGE_NBR" type="java.lang.String"></field>
+        <field id="SERIAL_NBR" type="java.lang.String"></field>
+        <field id="ASSET_DISPOSITION" type="java.lang.String"></field>
+        <field id="ASSET_NBR" type="java.lang.String"></field>
+        <field id="ASSET_TEMPLATE" type="java.lang.String"></field>
+        <field id="INSTALL_DT" type="java.lang.String"></field>
+        <field id="DISPOSITION_DT" type="java.lang.String"></field>
+        <field id="TEMPLATE_DEVICE_CONFIG_ID" type="java.lang.String"></field>
+        <field id="ATTACHED_ASSET_NBR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_METER_READ_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_METER_READ_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="MTR_NBR" type="java.lang.String"></field>
+        <field id="MTR_READ_DT" type="java.lang.String"></field>
+        <field id="MTR_READ_COND" type="java.lang.String"></field>
+        <field id="MTR_READING" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_NOTES_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_NOTES_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="ACCT_NBR" type="java.lang.String"></field>
+        <field id="PREM_NBR" type="java.lang.String"></field>
+        <field id="CUST_NBR" type="java.lang.String"></field>
+        <field id="NOTE_CAT" type="java.lang.String"></field>
+        <field id="NOTE_SUB_CATEGORY" type="java.lang.String"></field>
+        <field id="NOTE_TEXT" type="java.lang.String"></field>
+        <field id="NOTE_DATE" type="java.lang.String"></field>
+        <field id="NOTE_TIME" type="java.lang.String"></field>
+        <field id="CC_ID" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_NOTES_STG_1" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_NOTES_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="ACCT_NBR" type="java.lang.String"></field>
+        <field id="PREM_NBR" type="java.lang.String"></field>
+        <field id="CUST_NBR" type="java.lang.String"></field>
+        <field id="NOTE_CAT" type="java.lang.String"></field>
+        <field id="NOTE_SUB_CATEGORY" type="java.lang.String"></field>
+        <field id="NOTE_TEXT" type="java.lang.String"></field>
+        <field id="NOTE_DATE" type="java.lang.String"></field>
+        <field id="NOTE_TIME" type="java.lang.String"></field>
+        <field id="CC_ID" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_NOTES_STG_2" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_NOTES_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="ACCT_NBR" type="java.lang.String"></field>
+        <field id="PREM_NBR" type="java.lang.String"></field>
+        <field id="CUST_NBR" type="java.lang.String"></field>
+        <field id="NOTE_CAT" type="java.lang.String"></field>
+        <field id="NOTE_SUB_CATEGORY" type="java.lang.String"></field>
+        <field id="NOTE_TEXT" type="java.lang.String"></field>
+        <field id="NOTE_DATE" type="java.lang.String"></field>
+        <field id="NOTE_TIME" type="java.lang.String"></field>
+        <field id="CC_ID" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_PAYMENT_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_PAYMENT_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="ACCT_NBR" type="java.lang.String"></field>
+        <field id="SA_NBR" type="java.lang.String"></field>
+        <field id="SA_TYPE" type="java.lang.String"></field>
+        <field id="PAYMENT_DATE" type="java.lang.String"></field>
+        <field id="PAYMENT_AMOUNT" type="java.lang.String"></field>
+        <field id="PAYMENT_TENDER_SOURCE" type="java.lang.String"></field>
+        <field id="INVOICE_NBR" type="java.lang.String"></field>
+        <field id="PAYMENT_PRINT_ON_BILL" type="java.lang.String"></field>
+        <field id="PAY_ID" type="java.lang.String"></field>
+        <field id="PAY_SEG_ID" type="java.lang.String"></field>
+        <field id="PAY_TENDER_ID" type="java.lang.String"></field>
+        <field id="FT_ID" type="java.lang.String"></field>
+        <field id="PAYMENT_TENDER_TYPE" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_PREMISE_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_PREMISE_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="PREM_NBR" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="ADDRESS2" type="java.lang.String"></field>
+        <field id="CITY" type="java.lang.String"></field>
+        <field id="IN_CITY_LIMIT" type="java.lang.String"></field>
+        <field id="COUNTY" type="java.lang.String"></field>
+        <field id="STATE" type="java.lang.String"></field>
+        <field id="POSTAL" type="java.lang.String"></field>
+        <field id="PREMISE_TYPE" type="java.lang.String"></field>
+        <field id="KEY_ID" type="java.lang.String"></field>
+        <field id="KEY_SW" type="java.lang.String"></field>
+        <field id="OK_TO_ENTER_SW" type="java.lang.String"></field>
+        <field id="LS_SL_FLG" type="java.lang.String"></field>
+        <field id="LS_SL_DESCR" type="java.lang.String"></field>
+        <field id="LATITUDE" type="java.lang.String"></field>
+        <field id="LONGITUDE" type="java.lang.String"></field>
+        <field id="LANDLORD_AGREEMENT_NBR" type="java.lang.String"></field>
+        <field id="GIS_LOCATION_ID" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_SA_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_SA_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="ACCT_NBR" type="java.lang.String"></field>
+        <field id="SA_NBR" type="java.lang.String"></field>
+        <field id="SA_TYPE" type="java.lang.String"></field>
+        <field id="SA_START_DT" type="java.lang.String"></field>
+        <field id="SA_END_DT" type="java.lang.String"></field>
+        <field id="STATUS" type="java.lang.String"></field>
+        <field id="RATE_CD" type="java.lang.String"></field>
+        <field id="FED_TAX_EXMPT_PCT" type="java.lang.String"></field>
+        <field id="STATE_TAX_EXMPT_PCT" type="java.lang.String"></field>
+        <field id="DEPOSIT_AMOUNT" type="java.lang.String"></field>
+        <field id="BUDGET_AMOUNT" type="java.lang.String"></field>
+        <field id="BUDGET_BALANCE" type="java.lang.String"></field>
+        <field id="SP_NBR" type="java.lang.String"></field>
+        <field id="OLD_ACCOUNT_ID" type="java.lang.String"></field>
+        <field id="CONTRIBUTION_AMOUNT" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_SP_STG" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_SP_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="PREMISE_NBR" type="java.lang.String"></field>
+        <field id="SERVICE_POINT_TYPE" type="java.lang.String"></field>
+        <field id="READ_CYCLE_CD" type="java.lang.String"></field>
+        <field id="READ_ROUTE_CD" type="java.lang.String"></field>
+        <field id="READ_ROUTE_SEQ" type="java.lang.String"></field>
+        <field id="PIPE_SIZE" type="java.lang.String"></field>
+        <field id="MR_WARN_CD" type="java.lang.String"></field>
+        <field id="MTR_LOC_CD" type="java.lang.String"></field>
+        <field id="MR_LOC_DETAIL" type="java.lang.String"></field>
+        <field id="MTR_NBR" type="java.lang.String"></field>
+        <field id="PREV_MTR_NBR" type="java.lang.String"></field>
+        <field id="SP_NBR" type="java.lang.String"></field>
+        <field id="LATITUDE" type="java.lang.String"></field>
+        <field id="LONGITUDE" type="java.lang.String"></field>
+        <field id="GIS_LOCATION_ID" type="java.lang.String"></field>
+        <field id="STRM_WTR_TIER" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_SP_STG_1" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_SP_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="PREMISE_NBR" type="java.lang.String"></field>
+        <field id="SERVICE_POINT_TYPE" type="java.lang.String"></field>
+        <field id="READ_CYCLE_CD" type="java.lang.String"></field>
+        <field id="READ_ROUTE_CD" type="java.lang.String"></field>
+        <field id="READ_ROUTE_SEQ" type="java.lang.String"></field>
+        <field id="PIPE_SIZE" type="java.lang.String"></field>
+        <field id="MR_WARN_CD" type="java.lang.String"></field>
+        <field id="MTR_LOC_CD" type="java.lang.String"></field>
+        <field id="MR_LOC_DETAIL" type="java.lang.String"></field>
+        <field id="MTR_NBR" type="java.lang.String"></field>
+        <field id="PREV_MTR_NBR" type="java.lang.String"></field>
+        <field id="SP_NBR" type="java.lang.String"></field>
+        <field id="LATITUDE" type="java.lang.String"></field>
+        <field id="LONGITUDE" type="java.lang.String"></field>
+        <field id="GIS_LOCATION_ID" type="java.lang.String"></field>
+        <field id="STRM_WTR_TIER" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="DV_SP_STG_2" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_SP_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="STATUS_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+        <field id="INPUT_ID" type="java.lang.String"></field>
+        <field id="PREMISE_NBR" type="java.lang.String"></field>
+        <field id="SERVICE_POINT_TYPE" type="java.lang.String"></field>
+        <field id="READ_CYCLE_CD" type="java.lang.String"></field>
+        <field id="READ_ROUTE_CD" type="java.lang.String"></field>
+        <field id="READ_ROUTE_SEQ" type="java.lang.String"></field>
+        <field id="PIPE_SIZE" type="java.lang.String"></field>
+        <field id="MR_WARN_CD" type="java.lang.String"></field>
+        <field id="MTR_LOC_CD" type="java.lang.String"></field>
+        <field id="MR_LOC_DETAIL" type="java.lang.String"></field>
+        <field id="MTR_NBR" type="java.lang.String"></field>
+        <field id="PREV_MTR_NBR" type="java.lang.String"></field>
+        <field id="SP_NBR" type="java.lang.String"></field>
+        <field id="LATITUDE" type="java.lang.String"></field>
+        <field id="LONGITUDE" type="java.lang.String"></field>
+        <field id="GIS_LOCATION_ID" type="java.lang.String"></field>
+        <field id="STRM_WTR_TIER" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_CUSTOMER_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="DV_BILL_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.ACCT_NBR" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.SA_NBR" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.SA_TYPE" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.INVOICE_NBR" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.BILL_DT" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.BILL_PERIOD_START_DT" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.BILL_PERIOD_END_DT" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.BILL_DUE_DT" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.BILL_AMT" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.BILL_DESC" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.BILL_CONSUMPTION" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.UOM" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.TOU" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.SQI" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.BILL_FINAL" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.BILL_ESTIMATED" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.BSEG_ID" type="java.lang.String"></field>
+        <field id="DV_BILL_STG.FT_ID" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG.ACCT_NBR" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG.PREM_NBR" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG.CUST_NBR" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG.NOTE_CAT" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG.NOTE_SUB_CATEGORY" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG.NOTE_TEXT" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG.NOTE_DATE" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG.NOTE_TIME" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG.CC_ID" type="java.lang.String"></field>
+        <field id="DV_COLL_AGY_REF_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_COLL_AGY_REF_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_COLL_AGY_REF_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_COLL_AGY_REF_STG.ACCT_NBR" type="java.lang.String"></field>
+        <field id="DV_COLL_AGY_REF_STG.COLL_AGY_CD" type="java.lang.String"></field>
+        <field id="DV_COLL_AGY_REF_STG.ACCT_REF_AGY_ID" type="java.lang.String"></field>
+        <field id="DV_COLL_AGY_REF_STG.SENT_DATE" type="java.lang.String"></field>
+        <field id="DV_COLL_AGY_REF_STG.SENT_AMOUNT" type="java.lang.String"></field>
+        <field id="DV_COLL_AGY_REF_STG.COMM_TYPE" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.ACCT_NBR" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.SA_NBR" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.SA_TYPE" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.ADJ_DT" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.ADJ_TYPE" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.ADJ_AMT" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.BILLED_FLAG" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.INVOICE_NBR" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.ADJ_ID" type="java.lang.String"></field>
+        <field id="DV_ADJUSTMENT_STG.FT_ID" type="java.lang.String"></field>
+        <field id="DV_ARREARS_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_ARREARS_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_ARREARS_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_ARREARS_STG.ACCT_NBR" type="java.lang.String"></field>
+        <field id="DV_ARREARS_STG.SA_NBR" type="java.lang.String"></field>
+        <field id="DV_ARREARS_STG.ARS_AMT_0_30" type="java.lang.String"></field>
+        <field id="DV_ARREARS_STG.ARS_AMT_31_60" type="java.lang.String"></field>
+        <field id="DV_ARREARS_STG.ARS_AMT_61_90" type="java.lang.String"></field>
+        <field id="DV_ARREARS_STG.ARS_AMT_91_PLUS" type="java.lang.String"></field>
+        <field id="DV_ARREARS_STG.TOTAL_ARREARS" type="java.lang.String"></field>
+        <field id="DV_SA_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_SA_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_SA_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_SA_STG.ACCT_NBR" type="java.lang.String"></field>
+        <field id="DV_SA_STG.SA_NBR" type="java.lang.String"></field>
+        <field id="DV_SA_STG.SA_TYPE" type="java.lang.String"></field>
+        <field id="DV_SA_STG.SA_START_DT" type="java.lang.String"></field>
+        <field id="DV_SA_STG.SA_END_DT" type="java.lang.String"></field>
+        <field id="DV_SA_STG.STATUS" type="java.lang.String"></field>
+        <field id="DV_SA_STG.RATE_CD" type="java.lang.String"></field>
+        <field id="DV_SA_STG.FED_TAX_EXMPT_PCT" type="java.lang.String"></field>
+        <field id="DV_SA_STG.STATE_TAX_EXMPT_PCT" type="java.lang.String"></field>
+        <field id="DV_SA_STG.DEPOSIT_AMOUNT" type="java.lang.String"></field>
+        <field id="DV_SA_STG.BUDGET_AMOUNT" type="java.lang.String"></field>
+        <field id="DV_SA_STG.BUDGET_BALANCE" type="java.lang.String"></field>
+        <field id="DV_SA_STG.SP_NBR" type="java.lang.String"></field>
+        <field id="DV_SA_STG.OLD_ACCOUNT_ID" type="java.lang.String"></field>
+        <field id="DV_SA_STG.CONTRIBUTION_AMOUNT" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.ACCT_NBR" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.PRIMARY_CUST_NBR" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.SECONDARY_CUST_NBR" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.ACCT_REL_TYPE_CD" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.COLL_CL_CD" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.SETUP_DT" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.MAILING_ADDRESS_IND" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.PREMISE_NBR" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.ADDRESS1" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.ADDRESS2" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.ADDRESS3" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.ADDRESS4" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.CITY" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.STATE" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.COUNTY" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.POSTAL" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.COUNTRY" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.DD_ACCT_NBR" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.DD_BANK_CHK_SVG" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.DD_BANK_ID" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.APAY_START_DT" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.APAY_NAME" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.BILL_PRT_INTERCEPT" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.ACCT_ELIG_COLL" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.BILL_ROUTING" type="java.lang.String"></field>
+        <field id="DV_ACCOUNT_STG.CREDIT_RATING" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_1.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_1.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_1.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_1.ACCT_NBR" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_1.PREM_NBR" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_1.CUST_NBR" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_1.NOTE_CAT" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_1.NOTE_SUB_CATEGORY" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_1.NOTE_TEXT" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_1.NOTE_DATE" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_1.NOTE_TIME" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_1.CC_ID" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.ACCT_NBR" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.SA_NBR" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.SA_TYPE" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.PAYMENT_DATE" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.PAYMENT_AMOUNT" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.PAYMENT_TENDER_SOURCE" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.INVOICE_NBR" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.PAYMENT_PRINT_ON_BILL" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.PAY_ID" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.PAY_SEG_ID" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.PAY_TENDER_ID" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.FT_ID" type="java.lang.String"></field>
+        <field id="DV_PAYMENT_STG.PAYMENT_TENDER_TYPE" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.CUST_NBR" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.CUST_NAME" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.DBA_NAME" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.PER_OR_BUS_FLG" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.DOB" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.SSN" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.DRV_LCNSE" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.TAXID" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.AUTH_PER" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.SPOUSE" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.LS_SL_FLG" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.LS_SL_DESCR" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.CELL_PHONE" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.HOME_PHONE" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.WORK_PHONE" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.PRIMARY_EMAIL_ID" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.SECONDARY_EMAIL_ID" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.TAX_EXEMPT_ID" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.SPOUSE_ID" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.AUTH_PER_ID" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.CELL_PHONE_ID" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.HOME_PHONE_ID" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.WORK_PHONE_ID" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.EMAIL_CONTACT_ID" type="java.lang.String"></field>
+        <field id="DV_CUSTOMER_STG.SECONDARY_EMAIL_CONTACT_ID" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.PREMISE_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.SERVICE_POINT_TYPE" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.READ_CYCLE_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.READ_ROUTE_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.READ_ROUTE_SEQ" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.PIPE_SIZE" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.MR_WARN_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.MTR_LOC_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.MR_LOC_DETAIL" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.MTR_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.PREV_MTR_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.SP_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.LATITUDE" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.LONGITUDE" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.GIS_LOCATION_ID" type="java.lang.String"></field>
+        <field id="DV_SP_STG_2.STRM_WTR_TIER" type="java.lang.String"></field>
+        <field id="CUST_NBR_DIST" dataSetExpression="CountDistinct(DV_CUSTOMER_STG.CUST_NBR, 'Current')" type="java.lang.Long"></field>
+        <field id="ACCT_NBR_DIST" dataSetExpression="CountDistinct(DV_ACCOUNT_STG.ACCT_NBR, 'Current')" type="java.lang.Long"></field>
+        <field id="SA_NBR_DIST" dataSetExpression="CountDistinct(DV_SA_STG.SA_NBR, 'Current')" type="java.lang.Long"></field>
+        <field id="STATUS_CD_ACCT_STG" dataSetExpression="Case(DV_ACCOUNT_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_ADJUSTMENT_STG" dataSetExpression="Case(DV_ADJUSTMENT_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_BILL_STG" dataSetExpression="Case(DV_BILL_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_COLL_AGY_REF_STG" dataSetExpression="Case(DV_COLL_AGY_REF_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_CUSTOMER_STG" dataSetExpression="Case(DV_CUSTOMER_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_NOTES_STG" dataSetExpression="Case(DV_NOTES_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_NOTES_STG_1" dataSetExpression="Case(DV_NOTES_STG_1.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_PAYMENT_STG" dataSetExpression="Case(DV_PAYMENT_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_SA_STG" dataSetExpression="Case(DV_SA_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_ARREARS_STG" dataSetExpression="Case(DV_ARREARS_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="ADJ_AMT" dataSetExpression="Decimal(DV_ADJUSTMENT_STG.ADJ_AMT)" type="java.math.BigDecimal"></field>
+        <field id="ARS_AMT_0_30" dataSetExpression="Decimal(DV_ARREARS_STG.ARS_AMT_0_30)" type="java.math.BigDecimal"></field>
+        <field id="ARS_AMT_31_60" dataSetExpression="Decimal(DV_ARREARS_STG.ARS_AMT_31_60)" type="java.math.BigDecimal"></field>
+        <field id="ARS_AMT_61_90" dataSetExpression="Decimal(DV_ARREARS_STG.ARS_AMT_61_90)" type="java.math.BigDecimal"></field>
+        <field id="ARS_AMT_91_PLUS" dataSetExpression="Decimal(DV_ARREARS_STG.ARS_AMT_91_PLUS)" type="java.math.BigDecimal"></field>
+        <field id="BILL_AMT" dataSetExpression="Decimal(DV_BILL_STG.BILL_AMT)" type="java.math.BigDecimal"></field>
+        <field id="BILL_CONSUMPTION" dataSetExpression="Decimal(DV_BILL_STG.BILL_CONSUMPTION)" type="java.math.BigDecimal"></field>
+        <field id="SENT_AMOUNT" dataSetExpression="Decimal(DV_COLL_AGY_REF_STG.SENT_AMOUNT)" type="java.math.BigDecimal"></field>
+        <field id="PAYMENT_AMOUNT" dataSetExpression="Decimal(DV_PAYMENT_STG.PAYMENT_AMOUNT)" type="java.math.BigDecimal"></field>
+        <field id="DEPOSIT_AMOUNT" dataSetExpression="Decimal(DV_SA_STG.DEPOSIT_AMOUNT)" type="java.math.BigDecimal"></field>
+        <field id="BUDGET_AMOUNT" dataSetExpression="Decimal(DV_SA_STG.BUDGET_AMOUNT)" type="java.math.BigDecimal"></field>
+        <field id="BUDGET_BALANCE" dataSetExpression="Decimal(DV_SA_STG.BUDGET_BALANCE)" type="java.math.BigDecimal"></field>
+        <field id="TOTAL_ARREARS" dataSetExpression="Decimal(DV_ARREARS_STG.TOTAL_ARREARS)" type="java.math.BigDecimal"></field>
+        <field id="SETUP_DT" dataSetExpression="Date(DV_ACCOUNT_STG.SETUP_DT)" type="java.util.Date"></field>
+        <field id="APAY_START_DT" dataSetExpression="Date(DV_ACCOUNT_STG.APAY_START_DT)" type="java.util.Date"></field>
+        <field id="ADJ_DT" dataSetExpression="Date(DV_ADJUSTMENT_STG.ADJ_DT)" type="java.util.Date"></field>
+        <field id="BILL_DT" dataSetExpression="Date(DV_BILL_STG.BILL_DT)" type="java.util.Date"></field>
+        <field id="BILL_PERIOD_START_DT" dataSetExpression="Date(DV_BILL_STG.BILL_PERIOD_START_DT)" type="java.util.Date"></field>
+        <field id="BILL_PERIOD_END_DT" dataSetExpression="Date(DV_BILL_STG.BILL_PERIOD_END_DT)" type="java.util.Date"></field>
+        <field id="BILL_DUE_DT" dataSetExpression="Date(DV_BILL_STG.BILL_DUE_DT)" type="java.util.Date"></field>
+        <field id="SENT_DATE" dataSetExpression="Date(DV_COLL_AGY_REF_STG.SENT_DATE)" type="java.util.Date"></field>
+        <field id="DOB" dataSetExpression="Date(DV_CUSTOMER_STG.DOB)" type="java.util.Date"></field>
+        <field id="NOTE_TIME" dataSetExpression="Time(DV_NOTES_STG.NOTE_TIME)" type="java.sql.Time"></field>
+        <field id="NOTE_DATE" dataSetExpression="Date(DV_NOTES_STG.NOTE_DATE)" type="java.util.Date"></field>
+        <field id="NOTE_DATE_1" dataSetExpression="Date(DV_NOTES_STG_1.NOTE_DATE)" type="java.util.Date"></field>
+        <field id="NOTE_TIME_1" dataSetExpression="Time(DV_NOTES_STG_1.NOTE_TIME)" type="java.sql.Time"></field>
+        <field id="PAYMENT_DT" dataSetExpression="Date(DV_PAYMENT_STG.PAYMENT_DATE)" type="java.util.Date"></field>
+        <field id="SA_START_DT" dataSetExpression="Date(DV_SA_STG.SA_START_DT)" type="java.util.Date"></field>
+        <field id="SA_END_DT" dataSetExpression="Date(DV_SA_STG.SA_START_DT)" type="java.util.Date"></field>
+      </fieldList>
+      <joinInfo alias="DV_CUSTOMER_STG" referenceId="DV_CUSTOMER_STG"></joinInfo>
+      <joinList>
+        <join expr="DV_CUSTOMER_STG.CUST_NBR == DV_ACCOUNT_STG.PRIMARY_CUST_NBR" left="DV_CUSTOMER_STG" right="DV_ACCOUNT_STG" type="fullOuter" weight="1"></join>
+        <join expr="DV_ACCOUNT_STG.ACCT_NBR == DV_SA_STG.ACCT_NBR" left="DV_ACCOUNT_STG" right="DV_SA_STG" type="leftOuter" weight="1"></join>
+        <join expr="DV_ACCOUNT_STG.ACCT_NBR == DV_COLL_AGY_REF_STG.ACCT_NBR" left="DV_ACCOUNT_STG" right="DV_COLL_AGY_REF_STG" type="leftOuter" weight="1"></join>
+        <join expr="DV_SA_STG.ACCT_NBR == DV_BILL_STG.ACCT_NBR and DV_SA_STG.SA_NBR == DV_BILL_STG.SA_NBR" left="DV_SA_STG" right="DV_BILL_STG" type="leftOuter" weight="1"></join>
+        <join expr="DV_SA_STG.ACCT_NBR == DV_PAYMENT_STG.ACCT_NBR and DV_SA_STG.SA_NBR == DV_PAYMENT_STG.SA_NBR" left="DV_SA_STG" right="DV_PAYMENT_STG" type="leftOuter" weight="1"></join>
+        <join expr="DV_SA_STG.ACCT_NBR == DV_ADJUSTMENT_STG.ACCT_NBR and DV_SA_STG.SA_NBR == DV_ADJUSTMENT_STG.SA_NBR" left="DV_SA_STG" right="DV_ADJUSTMENT_STG" type="leftOuter" weight="1"></join>
+        <join expr="DV_CUSTOMER_STG.CUST_NBR == DV_NOTES_STG.CUST_NBR" left="DV_CUSTOMER_STG" right="DV_NOTES_STG" type="leftOuter" weight="1"></join>
+        <join expr="DV_ACCOUNT_STG.ACCT_NBR == DV_NOTES_STG_1.ACCT_NBR" left="DV_ACCOUNT_STG" right="DV_NOTES_STG_1" type="leftOuter" weight="1"></join>
+        <join expr="DV_ACCOUNT_STG.ACCT_NBR == DV_ARREARS_STG.ACCT_NBR" left="DV_ACCOUNT_STG" right="DV_ARREARS_STG" type="leftOuter" weight="1"></join>
+        <join expr="DV_SA_STG.SP_NBR == DV_SP_STG_2.SP_NBR" left="DV_SA_STG" right="DV_SP_STG_2" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_COLL_AGY_REF_STG" tableId="DV_COLL_AGY_REF_STG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_PAYMENT_STG" tableId="DV_PAYMENT_STG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_ADJUSTMENT_STG" tableId="DV_ADJUSTMENT_STG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_CUSTOMER_STG" tableId="DV_CUSTOMER_STG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_ARREARS_STG" tableId="DV_ARREARS_STG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_ACCOUNT_STG" tableId="DV_ACCOUNT_STG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_SA_STG" tableId="DV_SA_STG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_NOTES_STG" tableId="DV_NOTES_STG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_BILL_STG" tableId="DV_BILL_STG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_SP_STG_2" tableId="DV_SP_STG_2"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_NOTES_STG_1" tableId="DV_NOTES_STG_1"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_2" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_PREMISE_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="DV_LANDLORD_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_LANDLORD_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_LANDLORD_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_LANDLORD_STG.LANDLORD_AGRMNT" type="java.lang.String"></field>
+        <field id="DV_LANDLORD_STG.DESCRIPTION" type="java.lang.String"></field>
+        <field id="DV_LANDLORD_STG.ACCT_NBR" type="java.lang.String"></field>
+        <field id="DV_LANDLORD_STG.IS_WATER_COVERED" type="java.lang.String"></field>
+        <field id="DV_LANDLORD_STG.IS_SEWER_COVERED" type="java.lang.String"></field>
+        <field id="DV_LANDLORD_STG.IS_ELECTRIC_COVERED" type="java.lang.String"></field>
+        <field id="DV_LANDLORD_STG.IS_GAS_COVERED" type="java.lang.String"></field>
+        <field id="DV_SP_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_SP_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_SP_STG.PREMISE_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG.SERVICE_POINT_TYPE" type="java.lang.String"></field>
+        <field id="DV_SP_STG.READ_CYCLE_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG.READ_ROUTE_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG.READ_ROUTE_SEQ" type="java.lang.String"></field>
+        <field id="DV_SP_STG.PIPE_SIZE" type="java.lang.String"></field>
+        <field id="DV_SP_STG.MR_WARN_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG.MTR_LOC_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG.MR_LOC_DETAIL" type="java.lang.String"></field>
+        <field id="DV_SP_STG.MTR_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG.PREV_MTR_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG.SP_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG.LATITUDE" type="java.lang.String"></field>
+        <field id="DV_SP_STG.LONGITUDE" type="java.lang.String"></field>
+        <field id="DV_SP_STG.GIS_LOCATION_ID" type="java.lang.String"></field>
+        <field id="DV_SP_STG.STRM_WTR_TIER" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_2.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_2.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_2.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_2.ACCT_NBR" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_2.PREM_NBR" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_2.CUST_NBR" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_2.NOTE_CAT" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_2.NOTE_SUB_CATEGORY" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_2.NOTE_TEXT" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_2.NOTE_DATE" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_2.NOTE_TIME" type="java.lang.String"></field>
+        <field id="DV_NOTES_STG_2.CC_ID" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.PREM_NBR" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.ADDRESS1" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.ADDRESS2" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.CITY" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.IN_CITY_LIMIT" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.COUNTY" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.STATE" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.POSTAL" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.PREMISE_TYPE" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.KEY_ID" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.KEY_SW" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.OK_TO_ENTER_SW" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.LS_SL_FLG" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.LS_SL_DESCR" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.LATITUDE" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.LONGITUDE" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.LANDLORD_AGREEMENT_NBR" type="java.lang.String"></field>
+        <field id="DV_PREMISE_STG.GIS_LOCATION_ID" type="java.lang.String"></field>
+        <field id="STATUS_CD_LANDLORD_STG" dataSetExpression="Case(DV_LANDLORD_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_NOTES_STG_2" dataSetExpression="Case(DV_NOTES_STG_2.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_PREMISE_STG" dataSetExpression="Case(DV_PREMISE_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_SP_STG" dataSetExpression="Case(DV_SP_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="PREM_NBR_DIST" dataSetExpression="CountDistinct(DV_PREMISE_STG.PREM_NBR, 'Current')" type="java.lang.Long"></field>
+        <field id="NOTE_DATE" dataSetExpression="Date(DV_NOTES_STG_2.NOTE_DATE)" type="java.util.Date"></field>
+        <field id="NOTE_TIME" dataSetExpression="Time(DV_NOTES_STG_2.NOTE_TIME)" type="java.sql.Time"></field>
+      </fieldList>
+      <joinInfo alias="DV_PREMISE_STG" referenceId="DV_PREMISE_STG"></joinInfo>
+      <joinList>
+        <join expr="DV_PREMISE_STG.PREM_NBR == DV_SP_STG.PREMISE_NBR" left="DV_PREMISE_STG" right="DV_SP_STG" type="leftOuter" weight="1"></join>
+        <join expr="DV_PREMISE_STG.LANDLORD_AGREEMENT_NBR == DV_LANDLORD_STG.LANDLORD_AGRMNT" left="DV_PREMISE_STG" right="DV_LANDLORD_STG" type="rightOuter" weight="1"></join>
+        <join expr="DV_PREMISE_STG.PREM_NBR == DV_NOTES_STG_2.PREM_NBR" left="DV_PREMISE_STG" right="DV_NOTES_STG_2" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_LANDLORD_STG" tableId="DV_LANDLORD_STG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_SP_STG" tableId="DV_SP_STG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_NOTES_STG_2" tableId="DV_NOTES_STG_2"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_PREMISE_STG" tableId="DV_PREMISE_STG"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_3" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_METER_ASSET_STG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="DV_METER_READ_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_METER_READ_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_METER_READ_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_METER_READ_STG.MTR_NBR" type="java.lang.String"></field>
+        <field id="DV_METER_READ_STG.MTR_READ_DT" type="java.lang.String"></field>
+        <field id="DV_METER_READ_STG.MTR_READ_COND" type="java.lang.String"></field>
+        <field id="DV_METER_READ_STG.MTR_READING" type="java.lang.String"></field>
+        <field id="DV_METER_ASSET_STG.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_METER_ASSET_STG.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_METER_ASSET_STG.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_METER_ASSET_STG.BADGE_NBR" type="java.lang.String"></field>
+        <field id="DV_METER_ASSET_STG.SERIAL_NBR" type="java.lang.String"></field>
+        <field id="DV_METER_ASSET_STG.ASSET_DISPOSITION" type="java.lang.String"></field>
+        <field id="DV_METER_ASSET_STG.ASSET_NBR" type="java.lang.String"></field>
+        <field id="DV_METER_ASSET_STG.ASSET_TEMPLATE" type="java.lang.String"></field>
+        <field id="DV_METER_ASSET_STG.INSTALL_DT" type="java.lang.String"></field>
+        <field id="DV_METER_ASSET_STG.DISPOSITION_DT" type="java.lang.String"></field>
+        <field id="DV_METER_ASSET_STG.TEMPLATE_DEVICE_CONFIG_ID" type="java.lang.String"></field>
+        <field id="DV_METER_ASSET_STG.ATTACHED_ASSET_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.STATUS_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.INPUT_GRP" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.INPUT_ID" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.PREMISE_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.SERVICE_POINT_TYPE" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.READ_CYCLE_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.READ_ROUTE_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.READ_ROUTE_SEQ" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.PIPE_SIZE" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.MR_WARN_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.MTR_LOC_CD" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.MR_LOC_DETAIL" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.MTR_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.PREV_MTR_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.SP_NBR" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.LATITUDE" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.LONGITUDE" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.GIS_LOCATION_ID" type="java.lang.String"></field>
+        <field id="DV_SP_STG_1.STRM_WTR_TIER" type="java.lang.String"></field>
+        <field id="DISPOSITION_DT" dataSetExpression="Date(DV_METER_ASSET_STG.DISPOSITION_DT)" type="java.util.Date"></field>
+        <field id="INSTALL_DT" dataSetExpression="Date(DV_METER_ASSET_STG.INSTALL_DT)" type="java.util.Date"></field>
+        <field id="MTR_READ_DT" dataSetExpression="Date(DV_METER_READ_STG.MTR_READ_DT)" type="java.util.Date"></field>
+        <field id="MTR_READING" dataSetExpression="Decimal(DV_METER_READ_STG.MTR_READING)" type="java.math.BigDecimal"></field>
+        <field id="STATUS_CD_METER_ASSET_STG" dataSetExpression="Case(DV_METER_ASSET_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_METER_READ_STG" dataSetExpression="Case(DV_METER_READ_STG.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="STATUS_CD_SP_STG" dataSetExpression="Case(DV_SP_STG_1.STATUS_CD, 'T', 'Transformed', 'V', 'Validated', 'K', 'Key assigned ', 'L', 'Loaded successfully in C2M', 'E', 'Record in Error')" type="java.lang.String"></field>
+        <field id="ASSET_NBR_DIST" dataSetExpression="CountDistinct(DV_METER_ASSET_STG.ASSET_NBR, 'Current')" type="java.lang.Long"></field>
+      </fieldList>
+      <joinInfo alias="DV_METER_ASSET_STG" referenceId="DV_METER_ASSET_STG"></joinInfo>
+      <joinList>
+        <join expr="DV_METER_ASSET_STG.ASSET_NBR == DV_METER_READ_STG.MTR_NBR" left="DV_METER_ASSET_STG" right="DV_METER_READ_STG" type="leftOuter" weight="1"></join>
+        <join expr="DV_METER_ASSET_STG.ASSET_NBR == DV_SP_STG_1.MTR_NBR" left="DV_METER_ASSET_STG" right="DV_SP_STG_1" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_METER_READ_STG" tableId="DV_METER_READ_STG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_SP_STG_1" tableId="DV_SP_STG_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_METER_ASSET_STG" tableId="DV_METER_ASSET_STG"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

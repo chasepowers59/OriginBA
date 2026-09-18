@@ -33,6 +33,16 @@ class Unpack(unittest.TestCase):
         jrxml = (self.dir / "Newark1/resources/SmartCity/Report/Workstreams/Debt_Management/REP8_Aged_Balance_files/main_jrxml.data").read_bytes()
         self.assertIn(b"<jasperReport", jrxml)
 
+    def test_generated_topic_jrxml_and_rendered_outputs_stay_in_the_backup_only(self):
+        import io, zipfile
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as z:
+            z.writestr("resources/X/v.xml", "<adhocDataView/>"); z.writestr("resources/X/v_files/stateXML.data", "<state/>")
+            z.writestr("resources/X/v_files/topicJRXML.data", "<jasperReport/>"); z.writestr("resources/X/out.pdf", "%PDF")
+        n = inv.unpack(buf.getvalue(), self.dir / "T")
+        got = sorted(p.name for p in (self.dir / "T").rglob("*") if p.is_file())
+        self.assertEqual(got, ["stateXML.data", "v.xml"]); self.assertEqual(n, 2)
+
     def test_summary_counts_types_and_names_datasources(self):
         inv.unpack(REP8.read_bytes(), self.dir / "Newark1")
         s = inv.summarize(self.dir / "Newark1")

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Bursting trigger: ONE PDF PER LETTER, named CC_<customerContactId>.
+
+     JRXML 6.20, for JasperReports Server 8.1.0 PRO. UNLIKE THE LETTERS, this one has no generated
+     7.x twin: the BurstingScriptlet class ships with JasperReports Server rather than with the
+     JasperReports library, so it cannot be compiled or rendered outside the server and a converted
+     copy would be an untested guess. At the 10.0 upgrade, open these two in Jaspersoft Studio 10
+     and let it convert them, then re-point the letter report units at templates/ instead of
+     templates/legacy/.
+
+     One pair of triggers serves EVERY letter template. What varies is passed in:
+       LetterName                       the report unit to run, e.g. Letter_CIR-OD-LATE
+       net.sf.jasperreports.xml.source  the extract, handed straight to each child job
+       ftp.*                            where the finished PDFs are delivered
+
+     Set the ftp.* values on the scheduled job, never in the repository: ftp.password is a
+     credential and a report unit's stored parameter defaults are readable by anyone who can open
+     the report. -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="Letter-Bursted-Trigger" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail"
+              columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<scriptlet name="bursting" class="com.jaspersoft.jasperreports.jrs.bursting.BurstingScriptlet">
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.result.variable" value="BurstedJob"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.output.formats" value="PDF"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.description" value="Letter-Bursted-Trigger"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.type" value="sftp"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.folder.uri" value="/SmartCity/Letter/export"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.sequential.filenames_customSimpleMode" value="false"/>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.enabled"><![CDATA[true]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.label"><![CDATA["Letter-Bursted-Trigger"]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.source.report.uri"><![CDATA["/SmartCity/Letter/"+$P{LetterName}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.source.parameter.net.sf.jasperreports.xml.source"><![CDATA[$P{net.sf.jasperreports.xml.source}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.base.output.filename"><![CDATA["CC_"+$F{customerContactId}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.alert.enabled"><![CDATA[false]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.overwrite.files"><![CDATA[true]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.save.to.repository"><![CDATA[false]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.server.name"><![CDATA[$P{ftp.server.name}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.username"><![CDATA[$P{ftp.username}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.password"><![CDATA[$P{ftp.password}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.port"><![CDATA[$P{ftp.port}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.folder.path"><![CDATA[$P{ftp.folder.path}==null?"//":$P{ftp.folder.path}]]></propertyExpression>
+	</scriptlet>
+	<parameter name="net.sf.jasperreports.xml.source" class="java.lang.String"/>
+	<parameter name="LetterName" class="java.lang.String"/>
+	<parameter name="ftp.server.name" class="java.lang.String"/>
+	<parameter name="ftp.folder.path" class="java.lang.String"/>
+	<parameter name="ftp.password" class="java.lang.String"/>
+	<parameter name="ftp.username" class="java.lang.String"/>
+	<parameter name="ftp.port" class="java.lang.String"/>
+	<queryString language="XPath">
+		<![CDATA[/root/C1-LetterPrintRecord]]>
+	</queryString>
+	<field name="customerContactId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactId"/>
+		<fieldDescription><![CDATA[customerContactId]]></fieldDescription>
+	</field>
+	<field name="batchCode" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/batchCode"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/batchCode]]></fieldDescription>
+	</field>
+	<field name="batchNumber" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/batchNumber"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/batchNumber]]></fieldDescription>
+	</field>
+	<field name="rerunNumber" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/rerunNumber"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/rerunNumber]]></fieldDescription>
+	</field>
+	<field name="letterCount" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/letterCount"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/letterCount]]></fieldDescription>
+	</field>
+	<field name="extractDateTime" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/extractDateTime"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/extractDateTime]]></fieldDescription>
+	</field>
+	<field name="ccIdStart" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/ccIdStart"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/ccIdStart]]></fieldDescription>
+	</field>
+	<field name="ccIdEnd" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/ccIdEnd"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/ccIdEnd]]></fieldDescription>
+	</field>
+	<field name="threadNumber" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/threadNumber"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/threadNumber]]></fieldDescription>
+	</field>
+	<field name="numOfThreads" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/numOfThreads"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/numOfThreads]]></fieldDescription>
+	</field>
+	<variable name="BurstedJob" class="com.jaspersoft.jasperserver.dto.job.ClientReportJob" calculation="System"/>
+	<columnHeader>
+		<band height="150">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="30"/>
+				<textElement><font size="16" isBold="true"/></textElement>
+				<text><![CDATA[Letter print, bursted]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="40" width="200" height="20"/>
+				<textElement><font size="11" isBold="true"/></textElement>
+				<text><![CDATA[Letter template]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="200" y="40" width="355" height="20"/>
+				<textElement><font size="11"/></textElement>
+				<textFieldExpression><![CDATA[$P{LetterName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="65" width="200" height="20"/>
+				<textElement><font size="11" isBold="true"/></textElement>
+				<text><![CDATA[Batch]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="200" y="65" width="355" height="20"/>
+				<textElement><font size="11"/></textElement>
+				<textFieldExpression><![CDATA[$F{batchCode}+" "+$F{batchNumber}+" thread "+$F{threadNumber}+" of "+$F{numOfThreads}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="90" width="200" height="20"/>
+				<textElement><font size="11" isBold="true"/></textElement>
+				<text><![CDATA[Letters in this extract]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="200" y="90" width="355" height="20"/>
+				<textElement><font size="11"/></textElement>
+				<textFieldExpression><![CDATA[$F{letterCount}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="115" width="200" height="20"/>
+				<textElement><font size="11" isBold="true"/></textElement>
+				<text><![CDATA[Extracted]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="200" y="115" width="355" height="20"/>
+				<textElement><font size="11"/></textElement>
+				<textFieldExpression><![CDATA[$F{extractDateTime}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+</jasperReport>

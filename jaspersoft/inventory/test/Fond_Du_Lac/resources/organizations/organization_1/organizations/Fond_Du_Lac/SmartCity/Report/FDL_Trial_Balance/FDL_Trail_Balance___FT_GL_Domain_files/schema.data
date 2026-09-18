@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="FDL_TRIAL_BALANCE_FT_GL" label="FDL_TRIAL_BALANCE_FT_GL" resourceId="FDL_TRIAL_BALANCE_FT_GL"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="A0" label="All Days" resourceId="FDL_TRIAL_BALANCE_FT_GL.A0"></item>
+    <item id="A180" label="91 to 180 Days" resourceId="FDL_TRIAL_BALANCE_FT_GL.A180"></item>
+    <item id="A270" label="181 to 270 Days" resourceId="FDL_TRIAL_BALANCE_FT_GL.A270"></item>
+    <item id="A90" label="0 to 90 Days" resourceId="FDL_TRIAL_BALANCE_FT_GL.A90"></item>
+    <item id="AOLD" label="271 Days and older" resourceId="FDL_TRIAL_BALANCE_FT_GL.AOLD"></item>
+    <item id="DESCR" label="Description" resourceId="FDL_TRIAL_BALANCE_FT_GL.DESCR"></item>
+    <item id="DST_ID" label="Dist Code" resourceId="FDL_TRIAL_BALANCE_FT_GL.DST_ID"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="FDL_TRIAL_BALANCE_FT_GL" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="A0" type="java.math.BigDecimal"></field>
+        <field id="A90" type="java.math.BigDecimal"></field>
+        <field id="A180" type="java.math.BigDecimal"></field>
+        <field id="A270" type="java.math.BigDecimal"></field>
+        <field id="AOLD" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select DCL.DST_ID, DCL.DESCR, FTGL0.a0, FTGL90.a90, FTGL180.a180, FTGL270.a270, FTGLOLD.aold from CISADM.CI_DST_CODE_L DCL 
+LEFT JOIN (SELECT DST_ID ,SUM(AMOUNT) as aold FROM CISADM.CI_FT_GL WHERE FT_ID IN (select FT1.FT_ID from cisadm.CI_FT FT1 where FT1.ARS_DT &lt;= trunc(SYSDATE) - 271) group by DST_ID) FTGLOLD on FTGLOLD.DST_ID = DCL.DST_ID
+LEFT JOIN (SELECT DST_ID ,SUM(AMOUNT) as a270 FROM CISADM.CI_FT_GL WHERE FT_ID IN (select FT1.FT_ID from cisadm.CI_FT FT1 where FT1.ARS_DT between trunc(SYSDATE) -270 and trunc(SYSDATE - 181)) group by DST_ID) FTGL270 on FTGL270.DST_ID = DCL.DST_ID  
+LEFT JOIN (SELECT DST_ID ,SUM(AMOUNT) as a180 FROM CISADM.CI_FT_GL WHERE FT_ID IN (select FT1.FT_ID from cisadm.CI_FT FT1 where FT1.ARS_DT between trunc(SYSDATE) -180 and trunc(SYSDATE - 91)) group by DST_ID) FTGL180 on FTGL180.DST_ID = DCL.DST_ID
+LEFT JOIN (SELECT DST_ID ,SUM(AMOUNT) as a90 FROM CISADM.CI_FT_GL WHERE FT_ID IN (select FT1.FT_ID from cisadm.CI_FT FT1 where FT1.ARS_DT between trunc(SYSDATE) -90 and trunc(SYSDATE)) group by DST_ID) FTGL90 on FTGL90.DST_ID = DCL.DST_ID
+LEFT JOIN (SELECT DST_ID ,SUM(AMOUNT) as a0 FROM CISADM.CI_FT_GL WHERE FT_ID IN (select FT1.FT_ID from cisadm.CI_FT FT1 where FT1.ARS_DT &lt;= trunc(SYSDATE)) group by DST_ID) FTGL0 on FTGL0.DST_ID = DCL.DST_ID</query>
+    </jdbcQuery>
+  </resources>
+</schema>

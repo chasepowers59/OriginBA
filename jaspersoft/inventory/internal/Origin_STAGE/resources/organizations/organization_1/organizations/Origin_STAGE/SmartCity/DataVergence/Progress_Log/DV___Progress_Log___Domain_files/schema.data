@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_STAGE_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="DATAVERGENCE">
+          <string>DATAVERGENCE</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="DV_PROGRESS_LOG" label="DV Process Log" resourceId="JoinTree_1">
+      <items>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="RUN_NBR" label="Run Number" resourceId="JoinTree_1.DV_PROGRESS_LOG.RUN_NBR"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="STAGE_NBR" label="Stage Number" resourceId="JoinTree_1.DV_PROGRESS_LOG.STAGE_NBR"></item>
+        <item id="STAGE_DESCR" label="Stage Description" resourceId="JoinTree_1.DV_PROGRESS_LOG.STAGE_DESCR"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="STEP_NBR" label="Step Number" resourceId="JoinTree_1.DV_PROGRESS_LOG.STEP_NBR"></item>
+        <item id="STEP_DESCR" label="Step Description" resourceId="JoinTree_1.DV_PROGRESS_LOG.STEP_DESCR"></item>
+        <item id="BEGIN_END_FLAG" label="Begin/End" resourceId="JoinTree_1.DV_PROGRESS_LOG.BEGIN_END_FLAG"></item>
+        <item id="BEGIN_DTTM" label="Begin Date/Time" resourceId="JoinTree_1.DV_PROGRESS_LOG.BEGIN_DTTM"></item>
+        <item id="END_DTTM" label="End Date/Time" resourceId="JoinTree_1.DV_PROGRESS_LOG.END_DTTM"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet1" label="Descriptions" resourceId="JoinTree_1">
+      <items>
+        <item id="STAGE" label="Stage" resourceId="JoinTree_1.STAGE"></item>
+        <item id="STEP" label="Step" resourceId="JoinTree_1.STEP"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet2" label="Formulas" resourceId="JoinTree_1">
+      <items>
+        <item id="DURATION_HOURS" label="Duration (in hours)" resourceId="JoinTree_1.DURATION_HOURS"></item>
+        <item id="DURATION_MINUTES" label="Duration (in minutes)" resourceId="JoinTree_1.DURATION_MINUTES"></item>
+        <item id="IS_LATEST_RUN" label="Is Latest Run" resourceId="JoinTree_1.IS_LATEST_RUN"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="DV_PROGRESS_LOG" datasourceId="Origin_STAGE_DS" datasourceTableName="DV_PROGRESS_LOG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="RUN_NBR" type="java.math.BigDecimal"></field>
+        <field id="STEP_NBR" type="java.math.BigDecimal"></field>
+        <field id="STEP_DESCR" type="java.lang.String"></field>
+        <field id="STAGE_NBR" type="java.math.BigDecimal"></field>
+        <field id="STAGE_DESCR" type="java.lang.String"></field>
+        <field id="BEGIN_DTTM" type="java.sql.Timestamp"></field>
+        <field id="END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="BEGIN_END_FLAG" type="java.lang.String"></field>
+        <field id="RUNTIME" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcQuery id="CMS_LATEST_RUN_NBR" datasourceId="Origin_STAGE_DS">
+      <fieldList>
+        <field id="RUN_NBR" type="java.math.BigDecimal"></field>
+        <field id="IS_LATEST" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+  MAX(RUN_NBR) AS RUN_NBR,
+  'Y' AS  IS_LATEST 
+FROM
+  DATAVERGENCE.DV_PROGRESS_LOG</query>
+    </jdbcQuery>
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_STAGE_DS" datasourceTableName="DV_PROGRESS_LOG" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="CMS_LATEST_RUN_NBR.RUN_NBR" type="java.math.BigDecimal"></field>
+        <field id="CMS_LATEST_RUN_NBR.IS_LATEST" type="java.lang.String"></field>
+        <field id="DV_PROGRESS_LOG.RUN_NBR" type="java.math.BigDecimal"></field>
+        <field id="DV_PROGRESS_LOG.STEP_NBR" type="java.math.BigDecimal"></field>
+        <field id="DV_PROGRESS_LOG.STEP_DESCR" type="java.lang.String"></field>
+        <field id="DV_PROGRESS_LOG.STAGE_NBR" type="java.math.BigDecimal"></field>
+        <field id="DV_PROGRESS_LOG.STAGE_DESCR" type="java.lang.String"></field>
+        <field id="DV_PROGRESS_LOG.BEGIN_DTTM" type="java.sql.Timestamp"></field>
+        <field id="DV_PROGRESS_LOG.END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="DV_PROGRESS_LOG.BEGIN_END_FLAG" type="java.lang.String"></field>
+        <field id="DV_PROGRESS_LOG.RUNTIME" type="java.lang.String"></field>
+        <field id="IS_LATEST_RUN" dataSetExpression="CaseWhen(IsNull(&quot;CMS_LATEST_RUN_NBR.IS_LATEST&quot;), 'N', 'Y')" type="java.lang.String"></field>
+        <field id="DURATION_MINUTES" dataSetExpression="ElapsedMinutes(DV_PROGRESS_LOG.END_DTTM, DV_PROGRESS_LOG.BEGIN_DTTM)" type="java.math.BigDecimal"></field>
+        <field id="DURATION_HOURS" dataSetExpression="ElapsedHours(DV_PROGRESS_LOG.END_DTTM, DV_PROGRESS_LOG.BEGIN_DTTM)" type="java.math.BigDecimal"></field>
+        <field id="STAGE" dataSetExpression="Concatenate (DV_PROGRESS_LOG.STAGE_NBR, ' - ',DV_PROGRESS_LOG.STAGE_DESCR)" type="java.lang.String"></field>
+        <field id="STEP" dataSetExpression="Concatenate (DV_PROGRESS_LOG.STEP_NBR, ' - ',DV_PROGRESS_LOG.STEP_DESCR)" type="java.lang.String"></field>
+      </fieldList>
+      <joinInfo alias="DV_PROGRESS_LOG" referenceId="DV_PROGRESS_LOG"></joinInfo>
+      <joinList>
+        <join expr="DV_PROGRESS_LOG.RUN_NBR == CMS_LATEST_RUN_NBR.RUN_NBR" left="DV_PROGRESS_LOG" right="CMS_LATEST_RUN_NBR" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CMS_LATEST_RUN_NBR" tableId="CMS_LATEST_RUN_NBR"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_PROGRESS_LOG" tableId="DV_PROGRESS_LOG"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

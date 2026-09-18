@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="New_Derived_Table" label="SA Balances" resourceId="New_Derived_Table"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="CI_ACCT_ACCT_ID" label="Account Id" resourceId="New_Derived_Table.CI_ACCT_ACCT_ID"></item>
+    <item id="CI_ACCT_BILL_CYC_CD" label="Bill Cycle" resourceId="New_Derived_Table.CI_ACCT_BILL_CYC_CD"></item>
+    <item id="CI_PER_NAME_ENTITY_NAME" label="Entity Name" resourceId="New_Derived_Table.CI_PER_NAME_ENTITY_NAME"></item>
+    <item id="CI_SA_TYPE_L_DESCR" label="SA Type" resourceId="New_Derived_Table.CI_SA_TYPE_L_DESCR"></item>
+    <item id="SUM_SUM_CI_FT_SUM_CUR_AMT" label="Current Amount" resourceId="New_Derived_Table.SUM_SUM_CI_FT_SUM_CUR_AMT"></item>
+    <item id="SUM_SUM_CI_FT_SUM_TOT_AMT" label="Total Amount" resourceId="New_Derived_Table.SUM_SUM_CI_FT_SUM_TOT_AMT"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="New_Derived_Table" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="CI_ACCT_ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_PER_NAME_ENTITY_NAME" type="java.lang.String"></field>
+        <field id="CI_SA_TYPE_L_DESCR" type="java.lang.String"></field>
+        <field id="SUM_SUM_CI_FT_SUM_CUR_AMT" type="java.math.BigDecimal"></field>
+        <field id="SUM_SUM_CI_FT_SUM_TOT_AMT" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select * from ( select "CI_ACCT"."ACCT_ID" as "CI_ACCT_ACCT_ID", 
+"CI_ACCT"."BILL_CYC_CD" as "CI_ACCT_BILL_CYC_CD", 
+"CI_PER_NAME"."ENTITY_NAME" as "CI_PER_NAME_ENTITY_NAME", 
+"CI_SA_TYPE_L"."DESCR" as "CI_SA_TYPE_L_DESCR", 
+Sum("SUM_CI_FT"."SUM_CUR_AMT") as "SUM_SUM_CI_FT_SUM_CUR_AMT", 
+Sum("SUM_CI_FT"."SUM_TOT_AMT") as "SUM_SUM_CI_FT_SUM_TOT_AMT"
+from "CISADM"."CI_ACCT" "CI_ACCT"
+inner join "CISADM"."CI_CUST_CL_L" "CI_CUST_CL_L" on ("CI_ACCT"."CUST_CL_CD" = "CI_CUST_CL_L"."CUST_CL_CD")
+inner join "CISADM"."CI_SA" "CI_SA" on ("CI_ACCT"."ACCT_ID" = "CI_SA"."ACCT_ID")
+inner join "CISADM"."CI_SA_TYPE" "CI_SA_TYPE" on ("CI_SA"."SA_TYPE_CD" = "CI_SA_TYPE"."SA_TYPE_CD" and "CI_SA"."CIS_DIVISION" = "CI_SA_TYPE"."CIS_DIVISION")
+inner join "CISADM"."CI_SA_TYPE_L" "CI_SA_TYPE_L" on ("CI_SA"."SA_TYPE_CD" = "CI_SA_TYPE_L"."SA_TYPE_CD" and "CI_SA"."CIS_DIVISION" = "CI_SA_TYPE_L"."CIS_DIVISION" and "CI_SA_TYPE"."SA_TYPE_CD" = "CI_SA_TYPE_L"."SA_TYPE_CD" and "CI_SA_TYPE"."CIS_DIVISION" = "CI_SA_TYPE_L"."CIS_DIVISION")
+inner join "CISADM"."CI_SVC_TYPE_L" "CI_SVC_TYPE_L" on ("CI_SA_TYPE"."SVC_TYPE_CD" = "CI_SVC_TYPE_L"."SVC_TYPE_CD")
+inner join "CISADM"."CI_ACCT_PER" "CI_ACCT_PER" on ("CI_ACCT"."ACCT_ID" = "CI_ACCT_PER"."ACCT_ID")
+inner join "CISADM"."CI_PER_NAME" "CI_PER_NAME" on ("CI_PER_NAME"."PER_ID" = "CI_ACCT_PER"."PER_ID")
+inner join (SELECT
+    FT.SA_ID,
+    FT.CIS_DIVISION,
+    SUM(CUR_AMT) "SUM_CUR_AMT",
+    SUM(TOT_AMT) "SUM_TOT_AMT"
+FROM
+    CISADM.CI_FT FT
+WHERE
+    TRIM(FREEZE_DTTM) IS NOT NULL
+    AND REDUNDANT_SW &lt;&gt; 'Y'
+    AND NOT_IN_ARS_SW &lt;&gt; 'Y'
+GROUP BY
+    FT.SA_ID,
+    FT.CIS_DIVISION) "SUM_CI_FT" on ("CI_SA"."SA_ID" = "SUM_CI_FT"."SA_ID" and "CI_SA"."CIS_DIVISION" = "SUM_CI_FT"."CIS_DIVISION")
+where (1 = 1 and ("CI_SA"."SA_STATUS_FLG" != '60' or "CI_SA"."SA_STATUS_FLG" is null)  and "CI_ACCT_PER"."MAIN_CUST_SW" = 'Y' and "CI_SA_TYPE_L"."LANGUAGE_CD" = 'ENG' and "CI_SVC_TYPE_L"."LANGUAGE_CD" = 'ENG' and "CI_CUST_CL_L"."LANGUAGE_CD" = 'ENG')
+group by "CI_ACCT"."BILL_CYC_CD", "CI_ACCT"."ACCT_ID", "CI_PER_NAME"."ENTITY_NAME", "CI_SA_TYPE_L"."DESCR"
+order by "CI_ACCT_BILL_CYC_CD" nulls first, "CI_ACCT_ACCT_ID" nulls first, "CI_PER_NAME_ENTITY_NAME" nulls first, "CI_SA_TYPE_L_DESCR" nulls first
+ )</query>
+    </jdbcQuery>
+  </resources>
+</schema>
