@@ -35,6 +35,19 @@ the domain keeps working. On real Ellensburg rows plus one fabricated later-date
 row, the legacy query returned 579 locations for 580 assets and the fixed one 580, one row per
 asset.
 
+## Import the fixed COPY (does not touch the original)
+
+`FDL_Asset_Domain_Fixed_import.zip` (also in `~/Downloads/`) creates a second domain,
+`/SmartCity/Report/FDL_Asset/SC_Asset_Domain_Fixed`, labelled "FDL Asset Domain (Fixed)", on
+`FondDuLac_DS`, with the fixed schema. Same single-resource package shape as the Newark SA 360
+bundle that imported cleanly. Logged into the Fond du Lac org: Repository > Import > the zip.
+Then build a test Ad Hoc view on the copy (or Save As the ticket's view onto it) and check meter
+52222349: disposition dated 10-20-2025, location 600 LUCO RD's service point.
+
+Existing reports keep pointing at the ORIGINAL domain. Once the copy proves out, either replace
+the original's derived-table query in the Domain Designer (same four lines; ids unchanged, so
+nothing rebinds) or repoint the views. The copy is the proof, not the deployment.
+
 ## Apply
 
 1. Run `validate_current_disposition.sql` on the Fond du Lac instance (read only). Query 1 shows
