@@ -85,8 +85,6 @@ def _inline_parameters(query: dict) -> dict:
     reference runs the identical filter without the binding."""
     where = query.get("where") or {}
     params = {p["name"]: p["expression"]["object"] for p in where.get("parameters", []) if "expression" in p}
-    if not params:
-        return query
 
     def walk(node):
         if isinstance(node, dict):
