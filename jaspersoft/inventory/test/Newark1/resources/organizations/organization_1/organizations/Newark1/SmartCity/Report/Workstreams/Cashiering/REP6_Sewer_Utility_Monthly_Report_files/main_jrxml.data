@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="REP6_Sewer Utility Monthly Report" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Newark C2M DEV"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-app-test.originsmartops.com:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin|Newark"/>
+	<property name="ireport.jasperserver.report.resource" value="/Reports/REP6_Sewer_Utility_Monthly_Report_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/Reports/REP6_Sewer_Utility_Monthly_Report"/>
+	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true"/>
+	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#E6DAC3"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="Start_Date" class="java.sql.Date"/>
+	<parameter name="End_Date" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+    ACCT.ACCT_ID AS ACCOUNT_ID,
+    SA.SA_TYPE_CD,
+    'PAYMENTS RECEIVED' AS PAYMENT_TYPE,
+    SUM(FT.CUR_AMT) AS TOTAL
+FROM
+    CISADM.CI_ACCT ACCT,
+    CISADM.CI_SA SA,
+    CISADM.CI_SA_TYPE SAT,
+    CISADM.CI_FT FT
+WHERE 1 = 1 
+    AND SA.ACCT_ID = ACCT.ACCT_ID
+    AND SAT.SA_TYPE_CD = SA.SA_TYPE_CD
+    AND SAT.CIS_DIVISION = SA.CIS_DIVISION
+    AND SAT.SVC_TYPE_CD = 'WW'  
+    AND FT.SA_ID = SA.SA_ID
+    AND FT.FREEZE_SW = 'Y'
+    AND FT.FT_TYPE_FLG = 'PS'
+    AND $X{[BETWEEN], FT.FREEZE_DTTM, Start_Date, End_Date}
+GROUP BY ACCT.ACCT_ID, SA.SA_TYPE_CD
+UNION ALL
+SELECT 
+    ACCT.ACCT_ID AS ACCOUNT_ID,
+    SA.SA_TYPE_CD,
+    'PAYMENTS RETURNED' AS PAYMENT_TYPE,
+    SUM(FT.CUR_AMT) AS TOTAL
+FROM
+    CISADM.CI_ACCT ACCT,
+    CISADM.CI_SA SA,
+    CISADM.CI_SA_TYPE SAT,
+    CISADM.CI_FT FT,
+    CISADM.CI_PAY PAY
+WHERE 1 = 1 
+    AND SA.ACCT_ID = ACCT.ACCT_ID
+    AND SAT.SA_TYPE_CD = SA.SA_TYPE_CD
+    AND SAT.CIS_DIVISION = SA.CIS_DIVISION
+    AND SAT.SVC_TYPE_CD = 'WW'  
+    AND FT.SA_ID = SA.SA_ID
+    AND FT.FREEZE_SW = 'Y'
+    AND FT.FT_TYPE_FLG = 'PX'
+    AND $X{[BETWEEN], FT.FREEZE_DTTM, Start_Date, End_Date}
+    AND PAY.PAY_ID = FT.PARENT_ID
+    AND PAY.PAY_STATUS_FLG = '60'
+    AND PAY.CAN_RSN_CD = 'NSF'
+GROUP BY ACCT.ACCT_ID, SA.SA_TYPE_CD]]>
+	</queryString>
+	<field name="ACCOUNT_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ACCOUNT_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ACCOUNT_ID"/>
+	</field>
+	<field name="SA_TYPE_CD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SA_TYPE_CD"/>
+		<property name="com.jaspersoft.studio.field.label" value="SA_TYPE_CD"/>
+	</field>
+	<field name="PAYMENT_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAYMENT_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAYMENT_TYPE"/>
+	</field>
+	<field name="TOTAL" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="88" splitType="Stretch">
+			<textField>
+				<reportElement style="Title" x="0" y="0" width="801" height="62" uuid="d37a5918-1c42-43e4-9887-3c72fd3b2271"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font size="19"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TOTAL PAYMENTS RECEIVED AND RETURNED PER ACCOUNT FOR SEWER UTILITY FROM " + $P{Start_Date} + " TO " + $P{End_Date}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="85" width="802" height="1" uuid="49c92d58-cc8c-4161-8557-ba9204a52430"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement style="Column header" x="0" y="70" width="200" height="15" forecolor="#736343" uuid="d892fb9d-8ab3-4613-9e6e-8893839a0ce4">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="78acdabc-b7cb-4007-aa1c-94b2a3462aac"/>
+				</reportElement>
+				<text><![CDATA[ACCOUNT_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="70" width="200" height="15" forecolor="#736343" uuid="58bcb8be-46e8-45ea-a3fb-c4d02968142f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ec6ff92f-8bc5-4c89-9e99-fc9062120422"/>
+				</reportElement>
+				<text><![CDATA[SA_TYPE_CD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="400" y="70" width="200" height="15" forecolor="#736343" uuid="d5854030-429f-43d4-8d7d-44df6e6cc848">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="91d6eb4e-2035-4269-9948-f1cbe9a89478"/>
+				</reportElement>
+				<text><![CDATA[PAYMENT_TYPE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="600" y="70" width="200" height="15" forecolor="#736343" uuid="44a1c01f-7ca2-4b37-ad99-e6d3d1b1c6d7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1a3815b8-9ce8-45e5-bd46-cb2afcb0a2a3"/>
+				</reportElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<frame>
+				<reportElement style="Row" mode="Opaque" x="0" y="0" width="802" height="15" uuid="fa7cec56-4ec1-48e6-a26e-7266a995d174"/>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Detail" x="0" y="0" width="200" height="15" uuid="447209bf-e8e3-4d2a-8c2a-ae38cf1ff3e0">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="78acdabc-b7cb-4007-aa1c-94b2a3462aac"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{ACCOUNT_ID}]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Detail" x="200" y="0" width="200" height="15" uuid="7503af20-fb5b-43fe-8cdf-d1ca36a33c8e">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ec6ff92f-8bc5-4c89-9e99-fc9062120422"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{SA_TYPE_CD}]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Detail" x="400" y="0" width="200" height="15" uuid="9462a0db-6710-47f7-99e9-a937360a8f5e">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="91d6eb4e-2035-4269-9948-f1cbe9a89478"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{PAYMENT_TYPE}]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Detail" x="600" y="0" width="200" height="15" uuid="397f8e17-1e49-4e77-ab22-3b5ba522c03f">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1a3815b8-9ce8-45e5-bd46-cb2afcb0a2a3"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{TOTAL}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

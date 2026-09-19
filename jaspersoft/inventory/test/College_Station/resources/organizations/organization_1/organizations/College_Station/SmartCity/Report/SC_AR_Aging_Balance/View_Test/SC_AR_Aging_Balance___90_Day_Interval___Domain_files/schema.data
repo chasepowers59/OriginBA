@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <itemGroups>
+    <itemGroup id="FDL_AGED_OLD" label="271 Days and Older" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_TOT_AMT__4" label="271 Days and Older (Payoff)" resourceId="JoinTree_1.FDL_AGED_OLD.SUM_FT1_TOT_AMT__4"></item>
+        <item id="SUM_FT1_CUR_AMT__4" label="271 Days and Older (Current)" resourceId="JoinTree_1.FDL_AGED_OLD.SUM_FT1_CUR_AMT__4"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="FDL_AGED_270" label="181 to 270 Days" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_CUR_AMT__2" label="181 to 270 Days (Current)" resourceId="JoinTree_1.FDL_AGED_270.SUM_FT1_CUR_AMT__2"></item>
+        <item id="SUM_FT1_TOT_AMT__2" label="181 to 270 Days (Payoff)" resourceId="JoinTree_1.FDL_AGED_270.SUM_FT1_TOT_AMT__2"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="FDL_AGED_180" label="91 to 180 Days" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_TOT_AMT__3" label="91 to 180 Days (Payoff)" resourceId="JoinTree_1.FDL_AGED_180.SUM_FT1_TOT_AMT__3"></item>
+        <item id="SUM_FT1_CUR_AMT__3" label="91 to 180 Days (Current)" resourceId="JoinTree_1.FDL_AGED_180.SUM_FT1_CUR_AMT__3"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="FDL_AGED_90" label="0 to 90 Days" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_TOT_AMT__1" label="0 to 90 Days (Payoff)" resourceId="JoinTree_1.FDL_AGED_90.SUM_FT1_TOT_AMT__1"></item>
+        <item id="SUM_FT1_CUR_AMT__1" label="0 to 90 Days (Current)" resourceId="JoinTree_1.FDL_AGED_90.SUM_FT1_CUR_AMT__1"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="FDL_AGED_CURRENT" label="All Days" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_TOT_AMT_" label="Payoff" resourceId="JoinTree_1.FDL_AGED_CURRENT.SUM_FT1_TOT_AMT_"></item>
+        <item id="SUM_FT1_CUR_AMT_" label="Current" resourceId="JoinTree_1.FDL_AGED_CURRENT.SUM_FT1_CUR_AMT_"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="FDL_AGED_DETAILS_1" label="Account Details" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID_1" label="Account ID" resourceId="JoinTree_1.FDL_AGED_DETAILS.ACCT_ID"></item>
+        <item id="ADDRESS1_1" label="Address" resourceId="JoinTree_1.FDL_AGED_DETAILS.ADDRESS1"></item>
+        <item id="BILL_CYC_CD_1" label="Bill Cycle" resourceId="JoinTree_1.FDL_AGED_DETAILS.BILL_CYC_CD"></item>
+        <item id="DST_ID" label="Distribution Code" resourceId="JoinTree_1.FDL_AGED_DETAILS.DST_ID"></item>
+        <item id="ENTITY_NAME_1" label="Entity Name" resourceId="JoinTree_1.FDL_AGED_DETAILS.ENTITY_NAME"></item>
+        <item id="SA_ID" label="Service Agreement" resourceId="JoinTree_1.FDL_AGED_DETAILS.SA_ID"></item>
+        <item id="SA_TYPE_CD_1" label="SA Type" resourceId="JoinTree_1.FDL_AGED_DETAILS.SA_TYPE_CD"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcQuery id="FDL_AGED_DETAILS" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="DST_ID" type="java.lang.String"></field>
+      </fieldList>
+      <query>select * from CISADM.CM_CUS_DETAILS_VW</query>
+    </jdbcQuery>
+    <jdbcQuery id="FDL_AGED_90" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT__1" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT1_TOT_AMT__1" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT SA_ID,  CUR_AMT as "SUM(FT1.CUR_AMT)", TOT_AMT as "SUM(FT1.TOT_AMT)" FROM CISADM.CM_AGED_90_VW</query>
+    </jdbcQuery>
+    <jdbcQuery id="FDL_AGED_180" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT__3" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT1_TOT_AMT__3" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT SA_ID,  CUR_AMT as "SUM(FT1.CUR_AMT)", TOT_AMT as "SUM(FT1.TOT_AMT)" FROM CISADM.CM_AGED_180_VW</query>
+    </jdbcQuery>
+    <jdbcQuery id="FDL_AGED_270" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT__2" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT1_TOT_AMT__2" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT SA_ID,  CUR_AMT as "SUM(FT1.CUR_AMT)", TOT_AMT as "SUM(FT1.TOT_AMT)" FROM CISADM.CM_AGED_270_VW</query>
+    </jdbcQuery>
+    <jdbcQuery id="FDL_AGED_CURRENT" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT_" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT1_TOT_AMT_" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT SA_ID,  CUR_AMT as "SUM(FT1.CUR_AMT)", TOT_AMT as "SUM(FT1.TOT_AMT)" FROM CISADM.CM_AGED_CURRENT_VW</query>
+    </jdbcQuery>
+    <jdbcQuery id="FDL_AGED_OLD" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT__4" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT1_TOT_AMT__4" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT SA_ID,  CUR_AMT as "SUM(FT1.CUR_AMT)", TOT_AMT as "SUM(FT1.TOT_AMT)" FROM CISADM.CM_AGED_OLD_VW</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_1" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="FDL_AGED_CURRENT.SA_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_CURRENT.SUM_FT1_CUR_AMT_" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_AGED_CURRENT.SUM_FT1_TOT_AMT_" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_AGED_90.SA_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_90.SUM_FT1_CUR_AMT__1" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_AGED_90.SUM_FT1_TOT_AMT__1" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_AGED_DETAILS.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.ADDRESS1" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.ACCT_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.SA_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.ENTITY_NAME" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.DST_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_180.SA_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_180.SUM_FT1_CUR_AMT__3" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_AGED_180.SUM_FT1_TOT_AMT__3" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_AGED_OLD.SA_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_OLD.SUM_FT1_CUR_AMT__4" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_AGED_OLD.SUM_FT1_TOT_AMT__4" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_AGED_270.SA_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_270.SUM_FT1_CUR_AMT__2" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_AGED_270.SUM_FT1_TOT_AMT__2" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <joinInfo alias="FDL_AGED_DETAILS" referenceId="FDL_AGED_DETAILS"></joinInfo>
+      <joinList>
+        <join expr="FDL_AGED_DETAILS.SA_ID == FDL_AGED_90.SA_ID" left="FDL_AGED_DETAILS" right="FDL_AGED_90" type="inner" weight="1"></join>
+        <join expr="FDL_AGED_DETAILS.SA_ID == FDL_AGED_180.SA_ID" left="FDL_AGED_DETAILS" right="FDL_AGED_180" type="inner" weight="1"></join>
+        <join expr="FDL_AGED_DETAILS.SA_ID == FDL_AGED_270.SA_ID" left="FDL_AGED_DETAILS" right="FDL_AGED_270" type="inner" weight="1"></join>
+        <join expr="FDL_AGED_DETAILS.SA_ID == FDL_AGED_CURRENT.SA_ID" left="FDL_AGED_DETAILS" right="FDL_AGED_CURRENT" type="inner" weight="1"></join>
+        <join expr="FDL_AGED_DETAILS.SA_ID == FDL_AGED_OLD.SA_ID" left="FDL_AGED_DETAILS" right="FDL_AGED_OLD" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>select * from CISADM.CM_CUS_DETAILS_VW</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_AGED_180" tableId="FDL_AGED_180"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_AGED_90" tableId="FDL_AGED_90"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_AGED_270" tableId="FDL_AGED_270"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_AGED_CURRENT" tableId="FDL_AGED_CURRENT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_AGED_OLD" tableId="FDL_AGED_OLD"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_AGED_DETAILS" tableId="FDL_AGED_DETAILS"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

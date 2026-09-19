@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CS_LOC_BALANCE" label="CS_LOC_BALANCE" resourceId="CS_LOC_BALANCE"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account Id" resourceId="CS_LOC_BALANCE.ACCT_ID"></item>
+    <item id="ADDRESS1" label="Location" resourceId="CS_LOC_BALANCE.ADDRESS1"></item>
+    <item id="BALANCE" label="Current Balance" resourceId="CS_LOC_BALANCE.BALANCE"></item>
+    <item id="BILL_CYC_CD" label="Bill Cycle" resourceId="CS_LOC_BALANCE.BILL_CYC_CD"></item>
+    <item id="BILL_ID" label="Bill Id" resourceId="CS_LOC_BALANCE.BILL_ID"></item>
+    <item id="BC_CALC_AMT_NVL_SUM_FTZZ_POSTDUE_0_" label="Past Due" resourceId="CS_LOC_BALANCE.BC_CALC_AMT_NVL_SUM_FTZZ_POSTDUE_0_"></item>
+    <item id="CURRENT_CHARGES" label="Current Charges" resourceId="CS_LOC_BALANCE.CURRENT_CHARGES"></item>
+    <item id="DUE_DT" label="Due Date" resourceId="CS_LOC_BALANCE.DUE_DT"></item>
+    <item id="ENTITY_NAME" label="Entity Name" resourceId="CS_LOC_BALANCE.ENTITY_NAME"></item>
+    <item id="PREM_ID" label="Premise Id" resourceId="CS_LOC_BALANCE.PREM_ID"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CS_LOC_BALANCE" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="DUE_DT" type="java.sql.Timestamp"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="BALANCE" type="java.math.BigDecimal"></field>
+        <field id="CURRENT_CHARGES" type="java.math.BigDecimal"></field>
+        <field id="BC_CALC_AMT_NVL_SUM_FTZZ_POSTDUE_0_" fieldDBName="BC.CALC_AMT+NVL(SUM(FTZZ.POSTDUE),0)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <filterString>BALANCE &gt; 0</filterString>
+      <query>SELECT  
+               A.BILL_CYC_CD, 
+               P.PREM_ID,
+               P.ADDRESS1,
+               A.ACCT_ID,
+               B.DUE_DT,
+               b.BILL_ID,
+               PN.ENTITY_NAME,  
+               FTZ.BALANCE,
+               sum(BC.CALC_AMT) CURRENT_CHARGES,
+               --NVL(sum(FTZZ.POSTDUE),0),
+               BC.CALC_AMT + NVL(sum(FTZZ.POSTDUE),0)
+FROM CISADM.CI_ACCT A
+JOIN CISADM.CI_ACCT_PER AP 
+    ON A.ACCT_ID=AP.ACCT_ID
+    AND A.BILL_CYC_CD in ('    ','1   ','2   ','3   ')
+    AND MAIN_CUST_SW='Y'
+JOIN CISADM.CI_PER_NAME PN
+    ON AP.PER_ID=PN.PER_ID
+    AND PN.PRIM_NAME_SW='Y'
+JOIN CISADM.CI_BILL B
+    ON A.ACCT_ID=B.ACCT_ID
+    AND B.BILL_DT = (SELECT /*+ FULL(BA) */ MAX(BA.BILL_DT) from cisadm.CI_BILL BA where BA.ACCT_ID = A.ACCT_ID and BILL_STAT_FLG = 'C')
+JOIN CISADM.CI_SA SA
+    ON A.ACCT_ID=SA.ACCT_ID
+    AND SA.SA_STATUS_FLG IN ('20','30','40') 
+    AND SA.SA_TYPE_CD IN (SELECT SA_TYPE_CD 
+                          FROM CISADM.CI_SA_TYPE 
+                          WHERE ALLOW_BILLING_SW='Y' 
+                          AND PREM_REQ_SW='Y')
+JOIN CISADM.CI_BSEG BS
+    ON SA.SA_ID=BS.SA_ID
+    AND B.BILL_ID=BS.BILL_ID
+    AND BS.BSEG_STAT_FLG IN ('50')
+JOIN CISADM.CI_PREM P
+    ON BS.PREM_ID=P.PREM_ID
+LEFT JOIN (SELECT /*+ FULL(BSC) */ BSC.BSEG_ID, SUM(BSC.CALC_AMT) CALC_AMT FROM CISADM.CI_BSEG_CALC BSC GROUP BY BSC.BSEG_ID) BC
+--LEFT JOIN (SELECT /*+ FULL(BSC) */ BSC.BSEG_ID, RS_CD, SUM(BSC.CALC_AMT) CALC_AMT FROM CISADM.CI_BSEG_CALC BSC GROUP BY BSC.BSEG_ID, BSC.RS_CD) BC
+ON BS.BSEG_ID=BC.BSEG_ID
+LEFT JOIN (SELECT /*+ FULL(FT) PARALLEL(FT, 8)*/ FT.SA_ID, SUM(CUR_AMT) BALANCE from CISADM.CI_FT FT WHERE  FT.not_in_ars_sw = 'N' group by FT.SA_ID) FTZ
+    on FTZ.SA_ID = SA.SA_ID
+LEFT JOIN (SELECT /*+ FULL(FT2) PARALLEL(FT2, 8)*/ FT2.SA_ID, FT2.ARS_DT, FT2.CUR_AMT POSTDUE from CISADM.CI_FT FT2 WHERE  FT2.not_in_ars_sw = 'N') FTZZ
+    on FTZZ.SA_ID = SA.SA_ID    
+    and FTZZ.ARS_DT &gt;B.DUE_DT
+group by       
+               A.BILL_CYC_CD, 
+               P.PREM_ID,
+               P.ADDRESS1,
+               A.ACCT_ID,
+               B.DUE_DT,
+               B.BILL_ID,
+               PN.ENTITY_NAME,  
+               FTZ.BALANCE,    
+               BC.CALC_AMT</query>
+    </jdbcQuery>
+  </resources>
+</schema>

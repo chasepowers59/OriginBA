@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="New_Derived_Table" label="Pending_Start_Balance_Owed" resourceId="Pending_Start_Balance_Owed"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account ID" resourceId="Pending_Start_Balance_Owed.ACCT_ID"></item>
+    <item id="ADDRESS" label="Premise Address" resourceId="Pending_Start_Balance_Owed.ADDRESS"></item>
+    <item id="CUSTOMER_NAME" label="Person Name" resourceId="Pending_Start_Balance_Owed.CUSTOMER_NAME"></item>
+    <item id="PER_ID" label="Person ID" resourceId="Pending_Start_Balance_Owed.PER_ID"></item>
+    <item id="PREM_ID" label="Premise ID" resourceId="Pending_Start_Balance_Owed.PREM_ID"></item>
+    <item id="PRIOR_ACCT_ID" label="Prior Account with Balance &gt; 0" resourceId="Pending_Start_Balance_Owed.PRIOR_ACCT_ID"></item>
+    <item id="PRIOR_END_DT" label="Prior End Date" resourceId="Pending_Start_Balance_Owed.PRIOR_END_DT"></item>
+    <item id="START_DT" label="Start Date" resourceId="Pending_Start_Balance_Owed.START_DT"></item>
+    <item id="PRIOR_BALANCE" label="Prior Balance" resourceId="Pending_Start_Balance_Owed.PRIOR_BALANCE"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Pending_Start_Balance_Owed" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="CUSTOMER_NAME" type="java.lang.String"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="ADDRESS" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="PRIOR_ACCT_ID" type="java.lang.String"></field>
+        <field id="PRIOR_END_DT" type="java.sql.Timestamp"></field>
+        <field id="PRIOR_BALANCE" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+    F.*
+FROM 
+    (
+    SELECT
+        E.ACCT_ID,
+        E.PER_ID,
+        E.ENTITY_NAME CUSTOMER_NAME,
+        E.PREM_ID,
+        E.ADDRESS,
+        E.START_DT,
+        E.PRIOR_ACCT_ID,
+        E.PRIOR_END_DT,
+        (
+            SELECT
+                SUM (FT.TOT_AMT) AS TOT_AMT
+            FROM
+                CISADM.CI_FT FT,
+                CISADM.CI_SA SA3
+            WHERE
+                FT.SA_ID = SA3.SA_ID
+                AND SA3.ACCT_ID = E.PRIOR_ACCT_ID
+                AND SA3.CHAR_PREM_ID = E.PRIOR_PREM_ID
+                AND SA3.SA_STATUS_FLG = '40'
+                AND FT.REDUNDANT_SW = 'N'
+                AND FT.NOT_IN_ARS_SW &lt;&gt; 'Y'
+                AND FT.FREEZE_SW = 'Y'
+        ) PRIOR_BALANCE
+    FROM (
+        SELECT
+            D.*
+        FROM
+            (
+            SELECT
+                C.*,
+                ACTP2.ACCT_ID PRIOR_ACCT_ID,
+                PREM3.PREM_ID PRIOR_PREM_ID,
+                SA2.SA_ID PRIOR_SA_ID,
+                SA2.END_DT PRIOR_END_DT,
+                ROW_NUMBER() OVER (PARTITION BY ACTP2.ACCT_ID, PREM3.PREM_ID ORDER BY SA2.END_DT DESC) RN
+            FROM 
+                (
+                SELECT
+                    B.ACCT_ID,
+                    ACTP.PER_ID,
+                    PNAME.ENTITY_NAME,
+                    PREM2.PREM_ID,
+                    PREM2.ADDRESS1 ||', '|| PREM2.CITY || ', ' 
+                        || DECODE(PREM2.COUNTY, ' ', '', TRIM(PREM2.COUNTY))  
+                        || TRIM(PREM2.STATE) || ', ' || TRIM(PREM2.POSTAL) || ', ' 
+                        || TRIM(PREM2.COUNTRY) AS ADDRESS,
+                    B.START_DT
+                FROM 
+                    (
+                    SELECT
+                        A.*
+                    FROM 
+                        (
+                        SELECT
+                            ACCT.ACCT_ID,
+                            PREM.PREM_ID,
+                            SA.SA_ID,
+                            SA.START_DT,
+                            ROW_NUMBER() OVER (PARTITION BY ACCT.ACCT_ID, PREM.PREM_ID ORDER BY SA.START_DT ASC) RN
+                        FROM
+                            CISADM.CI_ACCT ACCT,
+                            CISADM.CI_SA SA,
+                            CISADM.CI_SA_TYPE SATY,
+                            CISADM.CI_PREM PREM
+                        WHERE
+                            SA.ACCT_ID = ACCT.ACCT_ID
+                            AND SA.SA_STATUS_FLG = '10'
+                            AND SATY.SA_TYPE_CD = SA.SA_TYPE_CD
+                            AND SATY.CIS_DIVISION = SA.CIS_DIVISION
+                            AND SATY.SVC_TYPE_CD IN ('E', 'W', 'WW', 'SW', 'R', 'D')
+                            AND PREM.PREM_ID = SA.CHAR_PREM_ID
+                            AND PREM.LL_ID = ' ' ) A
+                    WHERE
+                        A.RN = 1 ) B,
+                    CISADM.CI_ACCT_PER ACTP,
+                    CISADM.CI_PER_NAME PNAME,
+                    CISADM.CI_PREM PREM2
+                WHERE
+                    ACTP.ACCT_ID = B.ACCT_ID
+                    AND ACTP.MAIN_CUST_SW = 'Y'
+                    AND PNAME.PER_ID = ACTP.PER_ID
+                    AND PNAME.NAME_TYPE_FLG = 'PRIM'
+                    AND PREM2.PREM_ID = B.PREM_ID ) C,
+                CISADM.CI_ACCT_PER ACTP2,
+                CISADM.CI_SA SA2,
+                CISADM.CI_SA_TYPE SATY2,
+                CISADM.CI_PREM PREM3
+            WHERE
+                ACTP2.PER_ID = C.PER_ID
+                AND ACTP2.MAIN_CUST_SW = 'Y'
+                AND ACTP2.ACCT_ID &lt;&gt; C.ACCT_ID
+                AND SA2.ACCT_ID = ACTP2.ACCT_ID
+                AND SA2.SA_STATUS_FLG = '40'
+                AND SATY2.SA_TYPE_CD = SA2.SA_TYPE_CD
+                AND SATY2.CIS_DIVISION = SA2.CIS_DIVISION
+                AND SATY2.SVC_TYPE_CD IN ('E', 'W', 'WW', 'SW', 'R', 'D')
+                AND PREM3.PREM_ID = SA2.CHAR_PREM_ID
+                AND PREM3.PREM_ID &lt;&gt; C.PREM_ID
+                AND PREM3.LL_ID = ' ' ) D 
+        WHERE 
+            D.RN = 1 ) E ) F
+WHERE
+    F.PRIOR_BALANCE &gt; 0
+    AND F.START_DT &gt;= F.PRIOR_END_DT
+ORDER BY
+    F.ACCT_ID</query>
+    </jdbcQuery>
+  </resources>
+</schema>

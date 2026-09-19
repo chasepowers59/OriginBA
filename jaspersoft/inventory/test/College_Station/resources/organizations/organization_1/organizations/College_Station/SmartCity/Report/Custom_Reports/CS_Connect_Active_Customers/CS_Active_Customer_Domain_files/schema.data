@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Active_Customers" label="Active_Customers" resourceId="Active_Customers"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account ID" resourceId="Active_Customers.ACCT_ID"></item>
+    <item id="ADDRESS" label="Premise Address" resourceId="Active_Customers.ADDRESS"></item>
+    <item id="DESCR" label="SA Type Description" resourceId="Active_Customers.DESCR"></item>
+    <item id="END_DT" label="SA Stop Date" resourceId="Active_Customers.END_DT"></item>
+    <item id="ENTITY_NAME_UPR" label="Customer Name" resourceId="Active_Customers.ENTITY_NAME_UPR"></item>
+    <item id="PER_ID" label="Customer ID" resourceId="Active_Customers.PER_ID"></item>
+    <item id="PREM_ID" label="Premise ID" resourceId="Active_Customers.PREM_ID"></item>
+    <item id="SA_ID" label="SA ID" resourceId="Active_Customers.SA_ID"></item>
+    <item id="SA_TYPE_CD" label="SA Type" resourceId="Active_Customers.SA_TYPE_CD"></item>
+    <item id="START_DT" label="SA Start Date" resourceId="Active_Customers.START_DT"></item>
+    <item id="SA_STATUS" label="SA Status" resourceId="Active_Customers.SA_STATUS"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Active_Customers" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME_UPR" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="ADDRESS" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="SA_STATUS" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    PNAME.PER_ID,
+    PNAME.ENTITY_NAME_UPR,
+    ACCT.ACCT_ID,
+    PREM.PREM_ID,
+    PREM.ADDRESS1 ||', '|| PREM.CITY || ', ' 
+        || DECODE(PREM.COUNTY, ' ', '', TRIM(PREM.COUNTY))  
+        || TRIM(PREM.STATE) || ', ' || TRIM(PREM.POSTAL) || ', ' 
+        || TRIM(PREM.COUNTRY) AS ADDRESS,
+    SA.SA_ID,
+    SA.SA_TYPE_CD,
+    SATYL.DESCR,
+    (SELECT
+         LKVL.DESCR
+     FROM
+         CISADM.CI_LOOKUP_VAL_L LKVL
+     WHERE
+         LKVL.FIELD_NAME = 'SA_STATUS_FLG'
+         AND LKVL.FIELD_VALUE = SA.SA_STATUS_FLG) AS SA_STATUS,
+    SA.START_DT,
+    SA.END_DT
+FROM
+    CISADM.CI_ACCT ACCT,
+    CISADM.CI_SA SA,
+    CISADM.CI_SA_TYPE SATY,
+    CISADM.CI_SA_TYPE_L SATYL,
+    CISADM.CI_PREM PREM,
+    CISADM.CI_ACCT_PER ACTP,
+    CISADM.CI_PER_NAME PNAME
+WHERE
+    SA.ACCT_ID = ACCT.ACCT_ID
+    AND SA.SA_STATUS_FLG IN ('10','20','30','40')
+    AND SATY.SA_TYPE_CD = SA.SA_TYPE_CD
+    AND SATY.CIS_DIVISION = SA.CIS_DIVISION
+    AND SATY.SVC_TYPE_CD IN ('E','W','WW','SW','R','D')
+    AND PREM.PREM_ID = SA.CHAR_PREM_ID
+    AND ACTP.ACCT_ID = ACCT.ACCT_ID
+    AND ACTP.MAIN_CUST_SW = 'Y'
+    AND PNAME.PER_ID = ACTP.PER_ID
+    AND PNAME.NAME_TYPE_FLG = 'PRIM'
+    AND SATYL.SA_TYPE_CD = SATY.SA_TYPE_CD
+    AND SATYL.CIS_DIVISION = SATY.CIS_DIVISION</query>
+    </jdbcQuery>
+  </resources>
+</schema>

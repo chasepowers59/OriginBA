@@ -1,0 +1,658 @@
+/*
+ * Copyright (C) 2005 - 2025 Cloud Software Group, Inc. All Rights Reserved. Confidential & Proprietary.
+ * Licensed pursuant to commercial Cloud Software Group, Inc. End User License Agreement.
+ */
+
+/* --------------------------------------
+   TABLE OF CONTENTS
+
+    01. GENERAL CANVAS
+
+    02. PREVIEW MODE & VIEWER
+        02a. dashlet body
+        02b. dashlet toolbar
+
+   --------------------------------------
+    File last modified Aug 28, 2024
+   -------------------------------------- */
+
+/* ---------------------- */
+/*  01. GENERAL CANVAS    */
+/* ---------------------- */
+.dashboardCanvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.dashboardCanvas > .content {
+    width: 100%;
+    height: 100%;
+}
+
+.dashboardCanvas > .content > .body {
+    background-color: #ffffff;
+    height: 100%;
+    overflow: hidden !important;
+    width: 100%;
+}
+
+.dashboardCanvas > .content > .body div[data-componentId] {
+    position: absolute;
+    overflow: hidden;
+}
+
+.dashboardCanvas > .content > .body div[data-componentId].inputControlWrapper {
+    overflow: visible;
+    position: relative;
+}
+
+.dashboardCanvas > .content > .body div[data-componentId].ui-draggable-disabled.ui-state-disabled {
+    opacity: 1;
+}
+
+.dashboardCanvas > .content > .body div.canvasOverlay {
+    height: 100% !important;
+    width: 100% !important;
+    visibility: visible !important;
+    left: 0 !important;
+    top: 0 !important;
+    position: absolute;
+    z-index: 498 !important;
+}
+
+.dashboardCanvas ._jrHyperLink,
+.dashboardCanvas .hyperlink {
+    cursor: pointer;
+}
+
+/* -------------------- */
+/*  01b. Empty Canvas   */
+/* -------------------- */
+.dashboardCanvas .dashlet > .dashletContent > .nothingToDisplay {
+    position: absolute;
+    top: 25%;
+    left: 20%;
+    right: 20%;
+    width: 60%;
+    background: transparent;
+    z-index: 1;
+    border: medium none;
+    margin: 2px 5px 20px 2px;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .nothingToDisplay.hidden {
+    display: none;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .nothingToDisplay > .content {
+    position: relative;
+    top: -3px;
+    left: -1px;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .nothingToDisplay > .content > .body {
+    position: relative;
+    overflow: hidden;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    font-size: 11px;
+    line-height: 13px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .nothingToDisplay > .content > .body > .message {
+    background: #ffffff;
+    color: #666666;
+    font-family: source_sans_proregular, Franklin Gothic, Verdana, Arial, sans-serif;
+    /*font-size: 16px;*/
+    font-size: 1.3vw;
+    font-weight: normal;
+    /*line-height: 1.5;*/
+    line-height: 1.3;
+    margin: 10px 0;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+
+/* ------------------ */
+/*  02. DASHLETS      */
+/* ------------------ */
+/*  02a. dashlet body */
+/* ------------------ */
+.dashboardCanvas .dashlet {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dashboardCanvas .dashlet > .dashletContent {
+    position: relative;
+    border: 1px solid var(--border-grey-13);
+    border-bottom-color: var(--border-grey-20);
+    height: 100%;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .content {
+    clear: both;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background:#FFFFFF;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch; /* show scroll bars */
+}
+.dashboardCanvas .dashlet > .dashletContent > .content.withTitle {
+    /*
+    The next value '32px' is taken from '.dashboardCanvas .dashlet > .dashletContent > .dashletToolbar.toolbar' selector
+    What it does is reduces the size container because it's not only one child in the parent node, and there is a
+    header bar which is 32 pixels height.
+    */
+    height: calc(100% - 32px);
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .paginationControl {
+    height: 30px;
+    overflow: hidden;
+} /* Doesn't appear to be in use. June 2024 */
+
+.dashboardCanvas .dashlet > .dashletContent > .paginationControl > .pagination {
+    min-width: 285px;
+} /* Doesn't appear to be in use because this classpath doesn't exist. June 2024 */
+
+/*.dashboardCanvas .dashlet .paginationControlWrapper {
+    height: 36px;
+    padding-top: 8px;
+    padding-right: 8px;
+    padding-left: 8px;
+} redundant, found in pagination.css */
+
+.dashboardCanvas.maximizedDashlet > .content > .body div[data-componentId] {
+    visibility: hidden;
+    z-index: -100;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .content {
+    clear: both;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background:#FFFFFF;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch; /* show scroll bars */
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .content.withTitle {
+    /*
+    The next value '32px' is taken from '.dashboardCanvas .dashlet > .dashletContent > .dashletToolbar.toolbar' selector
+    What it does is reduces the size container because it's not only one child in the parent node, and there is a
+    header bar which is 32 pixels height.
+    */
+    height: calc(100% - 32px); /* gets overridden by inline styles */
+}
+
+.dashboardCanvas .filterRow {
+    clear: both;
+}
+
+.dashboardCanvas .filterRow.fluid{
+    margin: 0 186px 0 0;
+}
+
+.dashboardCanvas .filterRow.fluid.oneButton {
+    margin: 0 115px 0 0;
+}
+
+/* ----------------------- */
+/*  02b. Dashlet toolbar   */
+/* ----------------------- */
+.dashboardCanvas .dashlet > .dashletContent > .dashletToolbar {
+    overflow: hidden;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .dashletToolbar.toolbar {
+    background-color: #ffffff;
+    border: 0;
+    height: 32px;
+    padding: 0 4px 0 12px;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .dashletToolbar.toolbar .labelWrapper {
+    float: left;
+    height: 32px;
+    line-height: 32px;
+    width: 100%;
+    padding-right: 100px;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .dashletToolbar.toolbar .buttons.hyperlink + .labelWrapper {
+    padding-left: 20px;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .dashletToolbar.toolbar .innerLabel {
+    height: 100%;
+    margin: 0;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .dashletToolbar.toolbar .innerLabel > p {
+    color: #454545;
+    font-family: source_sans_proregular, Franklin Gothic, Verdana, Arial, sans-serif;
+    font-size: 14px;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .dashletToolbar.toolbar .header {
+    border-bottom: none;
+}
+
+.dashboardCanvas .dashletToolbar .buttons {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.dashboardCanvas .dashletToolbar .buttons.hyperlink {
+    left: 0;
+    right: auto;
+}
+
+.dashboardCanvas .dashletToolbar .button {
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    border-radius: 1px;
+    cursor: pointer;
+    float: right;
+    height: 28px;
+    margin: 2px 0 0 2px;
+    overflow: visible;
+    position: relative;
+    padding: 0;
+    text-decoration: none;
+    vertical-align: top;
+    width: 30px;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .dashletToolbar.toolbar .buttons .button[disabled] .icon {
+    opacity: 0.4;
+}
+
+.dashboardCanvas .dashletToolbar .button.text.cancelDashletButton {
+    background-color: var(--jrs-theme-medium);
+    display: inline-block;
+    padding: 0 8px;
+    width: auto;
+}
+
+.dashboardCanvas .dashletToolbar .button.text.cancelDashletButton .wrap {
+    color: #fff;
+    font-size: 12px;
+    line-height: 24px;
+    padding: 0 0 0 22px;
+    text-align: left;
+    text-overflow: ellipsis;
+}
+
+.dashboardCanvas .dashletToolbar .button.text.cancelDashletButton .icon {
+    background-image: none;
+    background-size: 120%;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top-color: white;
+    border-radius: 50%;
+    display: inline-block;
+    height: 16px;
+    margin: 0;
+    top: 4px;
+    width: 16px;
+    -webkit-animation: spin 1s infinite linear;
+    -moz-animation: spin 1s infinite linear;
+    -ms-animation: spin 1s infinite linear;
+    animation: spin 1s infinite linear;
+    z-index: 7000;
+}
+
+.button.over.cancelDashletButton {
+    color: #666666;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .dashletToolbar.toolbar .buttons .removeDashletButton {
+    height: 21px;
+    background-image: none;
+    border: none;
+    margin-top: 4px;
+    width: 26px;
+}
+
+.dashboardCanvas .dashletToolbar .button .wrap {
+    display: block !important;
+    font-family: inherit;
+    font-size: 11px;
+    height: 25px;
+    line-height: 25px;
+    position: relative;
+    white-space: nowrap;
+}
+
+.dashboardCanvas .dashletToolbar .buttons .icon {
+    background-image: url(../images/button_action_icons_sprite@1x.png);
+    background-repeat: no-repeat;
+    background-size: 240px;
+    display: inline-block;
+    width: 30px;
+    height: 25px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    zoom: 1;
+}
+
+/* 2x ACTION BUTTON ICONS */
+@media (-webkit-min-device-pixel-ratio: 2),(min-resolution: 192dpi){
+    .dashboardCanvas .dashletToolbar .button .icon {
+        background-image: url(../images/button_action_icons_sprite@2x.png);
+    }
+}
+
+.dashboardCanvas .dashletToolbar .button.hyperlinkBackbutton .icon {
+    background-position: -116px -538px;
+}
+
+.dashboardCanvas .dashletToolbar .button.maximizeDashletButton .icon {
+    background-position: -55px -387px;
+}
+.dashboardCanvas .dashletToolbar .button.over.maximizeDashletButton .icon,
+.dashboardCanvas .dashletToolbar .button.pressed.maximizeDashletButton .icon{
+    background-position: -85px -387px;
+}
+
+.dashboardCanvas .dashletToolbar .button.maximizeDashletButton.minimizeDashlet .icon {
+    background-position: -55px -417px;
+}
+.dashboardCanvas .dashletToolbar .button.over.maximizeDashletButton.minimizeDashlet .icon,
+.dashboardCanvas .dashletToolbar .button.pressed.maximizeDashletButton.minimizeDashlet .icon {
+    background-position: -85px -417px;
+}
+
+.dashboardCanvas .dashletToolbar .button.refreshDashletButton .icon {
+    background-position: -55px -237px;
+}
+.dashboardCanvas .dashletToolbar .button.over.refreshDashletButton .icon,
+.dashboardCanvas .dashletToolbar .button.pressed.refreshDashletButton .icon {
+    background-position: -85px -237px;
+}
+
+.dashboardCanvas .dashletToolbar .button.exportDashletButton .icon {
+    background-position: 5px -387px;
+}
+.dashboardCanvas .dashletToolbar .button.over.exportDashletButton .icon,
+.dashboardCanvas .dashletToolbar .button.pressed.exportDashletButton .icon {
+    background-position: -25px -387px;
+}
+
+.dashboardCanvas .dashletToolbar .button.printDashletButton .icon {
+    background-position: -175px -357px;
+}
+.dashboardCanvas .dashletToolbar .button.over.printDashletButton .icon,
+.dashboardCanvas .dashletToolbar .button.pressed.printDashletButton .icon {
+    background-position: -205px -357px
+}
+
+/* buttons with drop menus have no background color change when pressed */
+.dashboardCanvas .dashletToolbar .button.exportDashletButton.pressed {
+    background-color: var(--jrs-theme-medium);
+}
+
+/* ----------------------- */
+/*  02c. Filter dashlet    */
+/* ----------------------- */
+.dashboardCanvas .filterRow {
+    clear: both;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    background:#ffffff;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch; /* show scroll bars */
+}
+.dashboardCanvas .dashlet > .dashletContent > .content.withTitle {
+    /*
+    The next value '32px' is taken from '.dashboardCanvas .dashlet > .dashletContent > .dashletToolbar.toolbar' selector
+    What it does is reduces the size container because it's not only one child in the parent node, and there is a
+    header bar which is 32 pixels height.
+    */
+    height: calc(100% - 32px);
+}
+
+.dashboardCanvas .filterRow.fluid {
+    margin: 0 186px 0 0;
+}
+
+.dashboardCanvas .filterRow.fluid.oneButton {
+    margin: 0 115px 0 0;
+    width: auto;
+}
+
+.dashboardCanvas .dashlet .inputControlWrapper {
+    border: 1px solid #ffffff;
+    float: left;
+    margin-top: 4px; /* added to fix bug 43513 */
+    margin-bottom: 4px;  /* added 16px to fix bug 43513, in 2018 changed to 4px to fix js-33638 */
+    overflow: hidden;
+    padding: 5px;
+    position: relative;
+}
+
+.dashboardCanvas .dashlet .inputControlWrapper .inputControls  label > .wrap,
+.dashboardCanvas .dashlet .inputControlWrapper .inputControls fieldset > legend,
+.dashboardCanvas .dashlet .inputControlWrapper .inputControls .select > .wrap
+{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .filterGroupButtons {
+    height: 34px;
+    position: relative;
+    padding: 2px 5px 0 5px;
+    min-width: 170px;
+    background-color: #ffffff;
+    border-top: 1px solid var(--border-grey-16);
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .filterGroupButtons.fixed {
+    display: block;
+    margin-left: -186px;
+    overflow: hidden;
+    height: 100%;
+    padding-left: 25px;
+    float: left;
+    border-left: 1px solid #d6d6d6;
+    border-top: 0;
+    box-sizing: border-box;
+    width: 170px;
+    z-index: 1;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .filterGroupButtons.fixed.oneButton {
+    margin-left: -115px;
+    min-width: 95px;
+    width: 95px;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .filterGroupButtons.fixed button {
+    margin-top: 10px;
+    margin-left: 2px;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .filterGroupButtons.fixed button[data-target='applyButton'] {
+    margin-left: 0;
+}
+
+.dashboardCanvas .list.inputControls {
+    min-width: 50px;
+}
+
+.dashboardCanvas .list.inputControls .control.input.text input,
+.dashboardCanvas .list.inputControls .control.picker input {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* .dashboardCanvas .control.select.single {
+    margin-bottom: 29px;
+} */
+/* eliminates single select control jumping */
+/* This contributes to bug 43513 */
+
+.dashboardCanvas .mSelect {
+    min-width: 50px;
+}
+
+.dashboardCanvas .sSelect .searchLockup {
+    min-width: 50px;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .paginationControl {
+    height: 30px;
+    overflow: hidden;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .paginationControl > .pagination {
+    min-width: 285px;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .nothingToDisplay {
+    position: absolute;
+    top: 25%;
+    left: 20%;
+    right: 20%;
+    width: 60%;
+    background: transparent;
+    z-index: 1;
+    border: medium none;
+    margin: 2px 5px 20px 2px;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .nothingToDisplay.hidden {
+    display: none;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .nothingToDisplay > .content {
+    position: relative;
+    top: -3px;
+    left: -1px;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .nothingToDisplay > .content > .body {
+    position: relative;
+    overflow: hidden;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    font-size: 11px;
+    line-height: 13px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .nothingToDisplay > .content > .body > .message {
+    background: #ffffff;
+    color: #666666;
+    font-family: source_sans_proregular, Franklin Gothic, Verdana, Arial, sans-serif;
+    /*font-size: 16px;*/
+    font-size: 1.3vw;
+    font-weight: normal;
+    line-height: 1.3;
+    margin: 10px 0;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+.dashboardCanvas ._jrHyperLink,
+.dashboardCanvas .hyperlink {
+    cursor: pointer;
+}
+
+.dashlet .inputControlWrapper > .overlay {
+    left: auto;
+}
+
+.dashlet > .dashletContent > .overlay,
+.dashlet .inputControlWrapper > .overlay {
+    background-color: #000000;
+    opacity: 0;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    filter: alpha(opacity=0);
+    width: 100%;
+    height: 100%;
+    top: 0;
+    position: absolute;
+    z-index: 3000;
+}
+
+.filterGroup.dialog .inputControlWrapper {
+    border: 1px transparent solid;
+    margin-top: 4px;
+    margin-bottom: 4px;;
+    padding: 5px;
+    position: relative;
+    width: 100% !important;
+}
+
+.filterGroup.dialog {
+    height: 600px;
+    width: 450px;
+}
+
+.filterGroup.dialog .dashlet > .dashletContent {
+    border: 1px transparent solid;
+}
+
+.filterGroup.dialog  .dashletContent .content {
+    min-height: 500px;
+    max-height: 525px;
+    padding: 10px;
+    overflow: auto;
+}
+
+.filterGroup.dialog .header .button .icon {
+    background-image: url(../images/dashboard_toolbar_buttons_sprite.png);
+    background-repeat: no-repeat;
+    background-position: 3px 3px;
+    clear: both;
+}
+
+.filterGroup.dialog .footer { /* added to correctly position new jr-mButton within old dialog */
+    padding-top: 4px;
+}
+
+/* new styles below fix bug 43513 */
+.dashletContent .control,
+.dashletContent .picker input {
+    margin-bottom: 0;
+}
+
+.dashletContent .list.inputControls {
+    margin-top: 0;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .content.hideVizLauncher .jr-mAdhoc-visualization-launcher.jr {
+    display: none;
+}
+
+.dashboardCanvas .dashlet > .dashletContent > .content.hideVizLauncher .jive_chartSettingsIcon {
+    display: none;
+}

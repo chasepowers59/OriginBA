@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="New_Derived_Table" label="New_Derived_Table" resourceId="New_Derived_Table"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCOUNTING_DT" label="Accounting date" resourceId="New_Derived_Table.ACCOUNTING_DT"></item>
+    <item id="ACCT_ID" label="Account Id" resourceId="New_Derived_Table.ACCT_ID"></item>
+    <item id="DESCR" label="Payment Status L" resourceId="New_Derived_Table.DESCR"></item>
+    <item id="PAY_AMT" label="Payment Amount" resourceId="New_Derived_Table.PAY_AMT"></item>
+    <item id="PAY_DT" label="Payment date" resourceId="New_Derived_Table.PAY_DT"></item>
+    <item id="PAY_EVENT_ID" label="Payment Event Id" resourceId="New_Derived_Table.PAY_EVENT_ID"></item>
+    <item id="PAY_ID" label="Payment Id" resourceId="New_Derived_Table.PAY_ID"></item>
+    <item id="TENDER_TYPE_CD" label="Tender Type" resourceId="New_Derived_Table.TENDER_TYPE_CD"></item>
+    <item id="TENDERDESCR" label="Tender Type Description" resourceId="New_Derived_Table.TENDERDESCR"></item>
+    <item id="FT_TYPE_FLG" label="Financial Transaction Type" resourceId="New_Derived_Table.FT_TYPE_FLG"></item>
+    <item id="PAYSTATUS" label="Payment Status" resourceId="New_Derived_Table.PAYSTATUS"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="New_Derived_Table" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PAY_ID" type="java.lang.String"></field>
+        <field id="PAY_EVENT_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="PAY_AMT" type="java.math.BigDecimal"></field>
+        <field id="PAY_DT" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNTING_DT" type="java.sql.Timestamp"></field>
+        <field id="TENDER_TYPE_CD" type="java.lang.String"></field>
+        <field id="TENDERDESCR" type="java.lang.String"></field>
+        <field id="PAYSTATUS" type="java.lang.String"></field>
+        <field id="FT_TYPE_FLG" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT DISTINCT
+P.ACCT_ID,P.PAY_ID,P.PAY_EVENT_ID,
+    CASE 
+        WHEN ft.ft_type_flg = 'PX' THEN 'Canceled'
+        ELSE 'Frozen'
+    END Paystatus,
+L.DESCR,P.PAY_AMT,PE.PAY_DT,FT.ACCOUNTING_DT,PT.TENDER_TYPE_CD,TTL.DESCR TenderDescr, ft.ft_type_flg
+FROM CISADM.CI_PAY P,
+CISADM.CI_PAY_EVENT PE,
+CISADM.CI_PAY_TNDR PT,
+CISADM.CI_TENDER_TYPE TT,
+CISADM.CI_TENDER_TYPE_L TTL,
+CISADM.CI_LOOKUP L,
+CISADM.CI_FT FT
+WHERE P.PAY_EVENT_ID=PE.PAY_EVENT_ID
+AND P.PAY_EVENT_ID=PT.PAY_EVENT_ID
+AND PT.TENDER_TYPE_CD=TT.TENDER_TYPE_CD
+AND TT.TENDER_TYPE_CD=TTL.TENDER_TYPE_CD
+AND P.PAY_STATUS_FLG=L.FIELD_VALUE
+AND L.FIELD_NAME='PAY_STATUS_FLG'
+AND P.PAY_ID=FT.PARENT_ID
+AND PT.TENDER_TYPE_CD IN ('APCK','APSV')</query>
+    </jdbcQuery>
+  </resources>
+</schema>

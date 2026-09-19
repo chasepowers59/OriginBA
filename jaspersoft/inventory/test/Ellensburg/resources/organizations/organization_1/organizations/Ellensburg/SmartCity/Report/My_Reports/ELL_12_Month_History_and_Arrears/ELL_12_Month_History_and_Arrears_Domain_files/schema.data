@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="ELL_12_MONTH_ARREARS_ACCT_ADDR" label="12 Month Arrears" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account Id" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.ACCT_ID"></item>
+    <item id="ADDRESS1" label="Address" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.ADDRESS1"></item>
+    <item id="BADGE_NUM" label="Badge Number" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.BADGE_NUM"></item>
+    <item id="BILL_AMT" label="Bill Amount" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.BILL_AMT"></item>
+    <item id="BILL_DT" label="Bill Date" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.BILL_DT"></item>
+    <item id="BILL_ID" label="Bill Id" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.BILL_ID"></item>
+    <item id="BSEG_AMT" label="BSEG Amount" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.BSEG_AMT"></item>
+    <item id="BSEG_ID" label="BSEG Id" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.BSEG_ID"></item>
+    <item id="CONSUMPTION" label="Consumption" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.CONSUMPTION"></item>
+    <item id="DAYS" label="Days" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.DAYS"></item>
+    <item id="DOLLAR_PER_DAY" label="Bill($)/Day" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.DOLLAR_PER_DAY"></item>
+    <item id="MR_DATE" label="Meter Read Date" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.MR_DATE"></item>
+    <item id="PER_DAY" label="Consumption/Day" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.PER_DAY"></item>
+    <item id="READ_TYPE" label="Read Type" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.READ_TYPE"></item>
+    <item id="READING" label="Meter Read" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.READING"></item>
+    <item id="SERVICE_TYPE" label="Service Type" resourceId="ELL_12_MONTH_ARREARS_ACCT_ADDR.SERVICE_TYPE"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="ELL_12_MONTH_ARREARS_ACCT_ADDR" datasourceId="Ellensburg_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="SERVICE_TYPE" type="java.lang.String"></field>
+        <field id="MR_DATE" type="java.sql.Timestamp"></field>
+        <field id="BADGE_NUM" type="java.lang.String"></field>
+        <field id="READING" type="java.math.BigDecimal"></field>
+        <field id="READ_TYPE" type="java.lang.String"></field>
+        <field id="DAYS" type="java.math.BigDecimal"></field>
+        <field id="CONSUMPTION" type="java.math.BigDecimal"></field>
+        <field id="PER_DAY" type="java.math.BigDecimal"></field>
+        <field id="BILL_DT" type="java.sql.Timestamp"></field>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="BILL_AMT" type="java.math.BigDecimal"></field>
+        <field id="BSEG_AMT" type="java.math.BigDecimal"></field>
+        <field id="DOLLAR_PER_DAY" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT 
+    BLINF.acct_id,
+    BLINF.address1,
+    BLINF.SERVICE_TYPE,
+    BLINF.MR_DATE,
+    BLINF.BADGE_NUM,
+    BLINF.READING_VAL READING,
+    BLINF.READ_TYPE,
+    BLINF.DAYS,
+    BLINF.MSRMT_VAL CONSUMPTION,
+    BLINF.PER_DAY,
+    BLINF.BILL_DT,
+    BLINF.BSEG_ID,
+    BLINF.BILL_ID,
+    SUM(FT.CUR_AMT) BILL_AMT,
+    BLINF.CALC_AMT BSEG_AMT,
+    BLINF.DOLLAR_PER_DAY
+FROM
+    (SELECT 
+        CASE
+            WHEN SAT.SVC_TYPE_CD = 'E' THEN 'ELECTRIC'
+            WHEN SAT.SVC_TYPE_CD = 'G' THEN 'GAS'
+            WHEN SAT.SVC_TYPE_CD = 'W' THEN 'WATER'
+        END SERVICE_TYPE,
+        TRUNC(MSR.MSRMT_LOCAL_DTTM) MR_DATE,
+        DVCID.ID_VALUE BADGE_NUM,
+        MSR.READING_VAL,
+        DESCR READ_TYPE,
+        COALESCE(TRUNC(MSR.MSRMT_LOCAL_DTTM) - TRUNC(MSR.PREV_MSRMT_DTTM), 0) DAYS,
+        MSR.MSRMT_VAL,
+        CASE
+            WHEN COALESCE(TRUNC(MSR.MSRMT_LOCAL_DTTM) - TRUNC(MSR.PREV_MSRMT_DTTM), 0) = 0 THEN MSR.MSRMT_VAL
+            ELSE (ROUND(MSR.MSRMT_VAL / COALESCE(TRUNC(MSR.MSRMT_LOCAL_DTTM) - TRUNC(MSR.PREV_MSRMT_DTTM), 0), 2))
+        END PER_DAY,
+        BL.BILL_DT,
+        BL.DUE_DT,
+        BS.BSEG_ID,
+        BS.BILL_ID,
+        BSC.CALC_AMT,
+        CASE
+            WHEN COALESCE(TRUNC(MSR.MSRMT_LOCAL_DTTM) - TRUNC(MSR.PREV_MSRMT_DTTM), 0) = 0 THEN BSC.CALC_AMT
+            ELSE (ROUND(BSC.CALC_AMT / COALESCE(TRUNC(MSR.MSRMT_LOCAL_DTTM) - TRUNC(MSR.PREV_MSRMT_DTTM), 0), 2))
+        END DOLLAR_PER_DAY,
+        SA.ACCT_ID,
+		PR.ADDRESS1        
+    FROM
+        CISADM.CI_BILL BL,
+        CISADM.CI_BSEG BS,
+        CISADM.CI_BSEG_CALC BSC,
+        CISADM.CI_SA SA,
+        CISADM.CI_SA_TYPE SAT,
+        CISADM.CI_PREM PR,
+        CISADM.CI_SA_SP SASP,
+        CISADM.D1_SP_IDENTIFIER SPID,
+        CISADM.D1_INSTALL_EVT INS,
+        CISADM.D1_DVC_CFG DVCCF,
+        CISADM.D1_DVC_IDENTIFIER DVCID,
+        CISADM.D1_MEASR_COMP MSRC,
+        CISADM.D1_MSRMT MSR,
+        CISADM.F1_EXT_LOOKUP_VAL_L LK
+    WHERE
+        BS.SA_ID = SA.SA_ID
+        --AND SA.ACCT_ID = :accountId --'9419554588'
+        --AND PR.ADDRESS1 = :address --'2402 WHEATON CT'
+        AND BS.PREM_ID = PR.PREM_ID
+        
+        AND SAT.SA_TYPE_CD = SA.SA_TYPE_CD
+        AND SAT.SVC_TYPE_CD IN ('E', 'G', 'W')
+        
+        AND BS.BSEG_STAT_FLG = '50'
+        AND BS.BSEG_ID = BSC.BSEG_ID
+        AND BS.BILL_ID = BL.BILL_ID
+        AND BL.BILL_STAT_FLG = 'C'
+        
+        AND SASP.SA_ID = SA.SA_ID
+        AND SASP.START_DTTM = ( SELECT
+                                    MAX(SASP2.START_DTTM)
+                                FROM 
+                                    CISADM.CI_SA_SP SASP2
+                                WHERE 
+                                    SASP.SA_SP_ID = SASP2.SA_SP_ID
+                                    AND (STOP_DTTM IS NULL 
+                                        OR STOP_DTTM &gt; SYSDATE))
+        
+        AND SPID.SP_ID_TYPE_FLG = 'D1EI'
+        AND SPID.ID_VALUE = SASP.SP_ID
+        
+        AND INS.D1_SP_ID = SPID.D1_SP_ID
+        AND INS.D1_INSTALL_DTTM = (SELECT
+                                    MAX(INS2.D1_INSTALL_DTTM)
+                                FROM 
+                                    CISADM.D1_INSTALL_EVT INS2
+                                WHERE 
+                                    INS.INSTALL_EVT_ID = INS2.INSTALL_EVT_ID
+                                    AND (D1_REMOVAL_DTTM IS NULL
+                                        OR D1_REMOVAL_DTTM &gt; SYSDATE))
+        
+        AND DVCCF.DEVICE_CONFIG_ID = INS.DEVICE_CONFIG_ID
+        AND DVCID.D1_DEVICE_ID = DVCCF.D1_DEVICE_ID
+        AND DVCID.DVC_ID_TYPE_FLG = 'D1BN'
+        
+        AND MSRC.DEVICE_CONFIG_ID = INS.DEVICE_CONFIG_ID
+        AND MSR.MEASR_COMP_ID = MSRC.MEASR_COMP_ID
+        AND TRUNC(MSR.MSRMT_LOCAL_DTTM) = BS.END_DT
+        AND BS.END_DT &gt; TRUNC(ADD_MONTHS(TO_DATE(SYSDATE), - 12),'MM')
+        
+        AND LK.BUS_OBJ_CD = 'D1-MeasurementConditionLookup'
+        AND LK.F1_EXT_LOOKUP_VALUE = MSR.MSRMT_COND_FLG) BLINF,
+    
+    CISADM.CI_FT FT
+WHERE
+    BLINF.BILL_ID = FT.PARENT_ID
+GROUP BY
+    BLINF.acct_id,
+    BLINF.address1,
+    BLINF.SERVICE_TYPE,
+    BLINF.MR_DATE,
+    BLINF.BADGE_NUM,
+    BLINF.READING_VAL,
+    BLINF.READ_TYPE,
+    BLINF.DAYS,
+    BLINF.MSRMT_VAL,
+    BLINF.PER_DAY,
+    BLINF.BILL_DT,
+    BLINF.BSEG_ID,
+    BLINF.BILL_ID,
+    BLINF.CALC_AMT,
+    BLINF.DOLLAR_PER_DAY
+ORDER BY
+    BLINF.MR_DATE DESC</query>
+    </jdbcQuery>
+  </resources>
+</schema>

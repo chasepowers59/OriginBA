@@ -1,0 +1,2446 @@
+<!-- Created with Jaspersoft Studio version 10.0.0.final using JasperReports Library version 7.0.5-4355b62c664a7760655b513bdd58950cb3365f54  -->
+<jasperReport name="FDL_Main" language="java" pageWidth="612" pageHeight="842" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="10" uuid="b514e032-6953-47f0-95a9-5b94f5dfedc3">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FDL POSTROUT 2 Past Due Intercept"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="gcinco@originutility.com|Fond_Du_Lac"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Bill/Bill_OneService_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Bill/Bill_OneService"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="net.sf.jasperreports.data.cache.persistable" value="false"/>
+	<style name="msgStyle" fontName="Tahoma" fontSize="8.0"/>
+	<dataset name="billMsgList" whenResourceMissingType="Empty" uuid="8131bb8c-b01e-4528-9a2a-65b64f3f92ea">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="v2_orig"/>
+		<parameter name="accountId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="sequence" class="java.lang.String"/>
+		<query language="XPath"><![CDATA[/C1-BillPrintRecords/C1-BillPrintRecord/billPrint/billMsgList/billMsg]]></query>
+		<field name="billMsgType" class="java.lang.String">
+			<description><![CDATA[billMsgType]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="billMsgType"/>
+		</field>
+		<field name="msgOnBill" class="java.lang.String">
+			<description><![CDATA[msgOnBill]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="msgOnBill"/>
+		</field>
+		<field name="msgPriority" class="java.lang.Integer">
+			<description><![CDATA[msgPriority]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="msgPriority"/>
+		</field>
+		<field name="accountId" class="java.lang.String">
+			<description><![CDATA[../../accountId]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../accountId"/>
+		</field>
+		<field name="premiseId" class="java.lang.String">
+			<description><![CDATA[../../premList/premise/premiseId]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../premList/premise/premiseId"/>
+		</field>
+		<field name="billId" class="java.lang.String">
+			<description><![CDATA[../../../billId]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../billId"/>
+		</field>
+		<field name="sequence" class="java.lang.String">
+			<description><![CDATA[../../../sequence]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../sequence"/>
+		</field>
+		<filterExpression><![CDATA[$F{accountId}.equalsIgnoreCase( $P{accountId} )  && $F{premiseId}.equals( $P{premiseId} ) && $F{billId}.equals( $P{billId} ) && $F{sequence}.equals( $P{sequence} )]]></filterExpression>
+	</dataset>
+	<dataset name="PaymentList" whenResourceMissingType="Empty" uuid="ed5977a6-c354-49dc-acf1-dc45610ca7b1">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="v2_orig"/>
+		<parameter name="sequence" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord/billPrint/premList/premise[./premiseId="+$P{premiseId}+"]/payList/payment"]]></defaultValueExpression>
+		</parameter>
+		<query language="xPath"><![CDATA[$P{parameterQuery}]]></query>
+		<field name="currPayAmt" class="java.lang.Integer">
+			<description><![CDATA[currPayAmt]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="currPayAmt"/>
+		</field>
+		<field name="payDate" class="java.sql.Date">
+			<description><![CDATA[payDate]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="payDate"/>
+		</field>
+		<field name="billId" class="java.lang.String">
+			<description><![CDATA[../../../../../billId]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../billId"/>
+		</field>
+		<field name="sequence" class="java.lang.String">
+			<description><![CDATA[../../../../../sequence]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../sequence"/>
+		</field>
+		<filterExpression><![CDATA[$F{billId}.equals( $P{billId} ) && $F{sequence}.equals( $P{sequence} )]]></filterExpression>
+	</dataset>
+	<dataset name="currentActivity" uuid="9ab79dc8-52a3-40be-8dac-a4583255de14">
+		<parameter name="CurrAdjAmt" class="java.math.BigDecimal"/>
+		<parameter name="CurrChgAmt" class="java.math.BigDecimal"/>
+		<parameter name="CurrBal" class="java.math.BigDecimal"/>
+		<parameter name="TotBal" class="java.math.BigDecimal"/>
+		<parameter name="accountId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="sequence" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord/billPrint/premList/premise[./premiseId="+$P{premiseId}+"]/billCalcHdrList/billCalcHdr/billCalcLine"]]></defaultValueExpression>
+		</parameter>
+		<query language="XPath"><![CDATA[$P{parameterQuery}]]></query>
+		<field name="calcLineCalcAmt" class="java.math.BigDecimal">
+			<description><![CDATA[calcLineCalcAmt]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcLineCalcAmt"/>
+		</field>
+		<field name="calcLineDescrOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcLineDescrOnBill"/>
+		</field>
+		<field name="accountId" class="java.lang.String">
+			<description><![CDATA[../../../../accountId]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../accountId"/>
+		</field>
+		<field name="premiseId" class="java.lang.Double">
+			<description><![CDATA[../../../premiseId]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../premiseId"/>
+		</field>
+		<field name="billId" class="java.lang.String">
+			<description><![CDATA[../../../../../../billId]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../../billId"/>
+		</field>
+		<field name="sequence" class="java.lang.String">
+			<description><![CDATA[../../../../../../sequence]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../../sequence"/>
+		</field>
+		<variable name="totalAmount" calculation="Sum" class="java.math.BigDecimal">
+			<expression><![CDATA[$F{calcLineCalcAmt}==null?new BigDecimal(0):$F{calcLineCalcAmt}]]></expression>
+		</variable>
+		<filterExpression><![CDATA[$F{billId}.equals( $P{billId} ) && $F{sequence}.equals( $P{sequence} )]]></filterExpression>
+	</dataset>
+	<dataset name="currentActivityNonPrem" uuid="9ab79dc8-52a3-40be-8dac-a4583255de14">
+		<parameter name="CurrAdjAmt" class="java.math.BigDecimal"/>
+		<parameter name="CurrChgAmt" class="java.math.BigDecimal"/>
+		<parameter name="CurrBal" class="java.math.BigDecimal"/>
+		<parameter name="TotBal" class="java.math.BigDecimal"/>
+		<parameter name="accountId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="sequence" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/nonPremList/nonPremise/billCalcHdrList/billCalcHdr"]]></defaultValueExpression>
+		</parameter>
+		<query language="XPath"><![CDATA[$P{parameterQuery}]]></query>
+		<field name="calcLineCalcAmtNon" class="java.math.BigDecimal">
+			<description><![CDATA[calcHdrCalcAmt]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcHdrCalcAmt"/>
+		</field>
+		<field name="calcHdrDescrOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcHdrDescrOnBill"/>
+		</field>
+	</dataset>
+	<dataset name="bsegReadList" uuid="bc0e5800-b1cc-4171-93e8-d32a4c5f4003">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="v2_orig"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="sequence" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/premList/premise[./premiseId="+$P{premiseId}+"]/bsegReadList/bsegRead"]]></defaultValueExpression>
+		</parameter>
+		<query language="XPath"><![CDATA[$P{parameterQuery}]]></query>
+		<field name="badge" class="java.lang.String">
+			<description><![CDATA[badge]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="badge"/>
+		</field>
+		<field name="saTypeDescr" class="java.lang.String">
+			<description><![CDATA[saTypeDescr]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="saTypeDescr"/>
+		</field>
+		<field name="startReadDttm" class="java.lang.String">
+			<description><![CDATA[startReadDttm]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startReadDttm"/>
+		</field>
+		<field name="endReadDttm" class="java.lang.String">
+			<description><![CDATA[endReadDttm]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endReadDttm"/>
+		</field>
+		<field name="startRegRdg" class="java.math.BigDecimal">
+			<description><![CDATA[startRegRdg]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startRegRdg"/>
+		</field>
+		<field name="endRegRdg" class="java.math.BigDecimal">
+			<description><![CDATA[endRegRdg]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endRegRdg"/>
+		</field>
+		<field name="regConst" class="java.math.BigDecimal">
+			<description><![CDATA[regConst]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="regConst"/>
+		</field>
+		<field name="finalUom" class="java.lang.String">
+			<description><![CDATA[finalUom]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="finalUom"/>
+		</field>
+		<field name="finalRegQty" class="java.math.BigDecimal">
+			<description><![CDATA[finalRegQty]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="finalRegQty"/>
+		</field>
+		<field name="usage" class="java.lang.String">
+			<description><![CDATA[usage]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="usage"/>
+		</field>
+		<field name="days" class="java.lang.Integer"/>
+		<field name="rateSched" class="java.lang.String">
+			<description><![CDATA[rateSched]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="rateSched"/>
+		</field>
+		<field name="billId" class="java.lang.String">
+			<description><![CDATA[../../../../../billId]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../billId"/>
+		</field>
+		<field name="sequence" class="java.lang.String">
+			<description><![CDATA[../../../../../sequence]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../sequence"/>
+		</field>
+		<variable name="startReadDttm" class="java.lang.String">
+			<expression><![CDATA[$F{startReadDttm}!=null?$F{startReadDttm}.length()>=10?$F{startReadDttm}.substring( 0,10 ).replaceAll("-","/"):null:null]]></expression>
+		</variable>
+		<variable name="endReadDttm" class="java.lang.String">
+			<expression><![CDATA[$F{endReadDttm}!=null?$F{endReadDttm}.length()>=10?$F{endReadDttm}.substring( 0,10 ).replaceAll("-","/"):null:null]]></expression>
+		</variable>
+		<variable name="Days" class="java.lang.Integer">
+			<expression><![CDATA[$F{days}==null?"":$F{days}]]></expression>
+		</variable>
+		<filterExpression><![CDATA[$F{sequence}.equals( $P{sequence} )]]></filterExpression>
+	</dataset>
+	<dataset name="ConsptionHistoryGraph" uuid="be3f3432-7cf3-4958-8eb9-1b181b72df5e">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="v2_orig"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="sequence" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/premList/premise[./premiseId='"+$P{premiseId}+"']/consumptionHistoryList/billSqList[./svcType='W']"]]></defaultValueExpression>
+		</parameter>
+		<query language="xPath"><![CDATA[$P{parameterQuery}]]></query>
+		<field name="sqDate" class="java.sql.Date">
+			<description><![CDATA[sqDate]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="sqDate"/>
+		</field>
+		<field name="billSq" class="java.lang.Double">
+			<description><![CDATA[billSq]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="billSq"/>
+		</field>
+		<field name="premiseId" class="java.lang.String">
+			<description><![CDATA[premiseId]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../premiseId"/>
+		</field>
+		<field name="billId" class="java.lang.String">
+			<description><![CDATA[../../../../../billId]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../billId"/>
+		</field>
+		<field name="sequence" class="java.lang.String">
+			<description><![CDATA[../../../../../sequence]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../sequence"/>
+		</field>
+		<filterExpression><![CDATA[$F{sequence}.equals( $P{sequence} )]]></filterExpression>
+	</dataset>
+	<dataset name="consumptionHistoryList_WW" uuid="1304849d-7a68-48da-aec8-a09cfb0373e8">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="v2_orig"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="sequence" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/premList/premise[./premiseId='"+$P{premiseId}+"']/consumptionHistoryList/billSqList[./svcType='WW']"]]></defaultValueExpression>
+		</parameter>
+		<query language="xPath"><![CDATA[$P{parameterQuery}]]></query>
+		<field name="sqDate" class="java.sql.Date">
+			<description><![CDATA[sqDate]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="sqDate"/>
+		</field>
+		<field name="billSq" class="java.lang.Double">
+			<description><![CDATA[billSq]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="billSq"/>
+		</field>
+		<field name="premiseId" class="java.lang.String">
+			<description><![CDATA[premiseId]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../premiseId"/>
+		</field>
+		<field name="billId" class="java.lang.String">
+			<description><![CDATA[../../../../../billId]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../billId"/>
+		</field>
+		<field name="sequence" class="java.lang.String">
+			<description><![CDATA[../../../../../sequence]]></description>
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../sequence"/>
+		</field>
+		<filterExpression><![CDATA[$F{sequence}.equals( $P{sequence} )]]></filterExpression>
+	</dataset>
+	<scriptlet name="Scriptlet_1" class="net.sf.jasperreports.engine.JRDefaultScriptlet"/>
+	<parameter name="net.sf.jasperreports.xml.source" class="java.lang.String"/>
+	<parameter name="billPrtIntercept" class="java.lang.String"/>
+	<parameter name="billId" class="java.lang.String"/>
+	<parameter name="query" forPrompting="false" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{billId}==null && ($P{billPrtIntercept}==null || $P{billPrtIntercept}.equalsIgnoreCase( "all" ))?"/C1-BillPrintRecords/C1-BillPrintRecord/billPrint/premList/premise":
+$P{billId}==null && $P{billPrtIntercept}!=null?"/C1-BillPrintRecords/C1-BillPrintRecord/billPrint[./billPrtIntercept='"+$P{billPrtIntercept}+"']/premList/premise":
+$P{billId}!=null && $P{billPrtIntercept}!=null?"/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint[./billPrtIntercept='"+$P{billPrtIntercept}+"']/premList/premise"
+:"/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/premList/premise"]]></defaultValueExpression>
+	</parameter>
+	<query language="XPath"><![CDATA[$P{query}]]></query>
+	<field name="svcCountry" class="java.lang.String">
+		<description><![CDATA[svcCountry]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="svcCountry"/>
+	</field>
+	<field name="svcAddressLine1" class="java.lang.String">
+		<description><![CDATA[svcAddressLine1]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="svcAddressLine1"/>
+	</field>
+	<field name="svcInCityLimit" class="java.lang.String">
+		<description><![CDATA[svcInCityLimit]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="svcInCityLimit"/>
+	</field>
+	<field name="svcCity" class="java.lang.String">
+		<description><![CDATA[svcCity]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="svcCity"/>
+	</field>
+	<field name="svcState" class="java.lang.String">
+		<description><![CDATA[svcState]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="svcState"/>
+	</field>
+	<field name="svcPostal" class="java.lang.Integer">
+		<description><![CDATA[svcPostal]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="svcPostal"/>
+	</field>
+	<field name="companyAddress" class="java.lang.String">
+		<description><![CDATA[../../../../C1-GlobalInformationRecord/companyAddress]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../C1-GlobalInformationRecord/companyAddress"/>
+	</field>
+	<field name="waysToPay" class="java.lang.String">
+		<description><![CDATA[../../../../C1-GlobalInformationRecord/waysToPay]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../C1-GlobalInformationRecord/waysToPay"/>
+	</field>
+	<field name="summaryBillText" class="java.lang.String">
+		<description><![CDATA[../../../../C1-GlobalInformationRecord/summaryBillText]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../C1-GlobalInformationRecord/summaryBillText"/>
+	</field>
+	<field name="billFormat" class="java.lang.String">
+		<description><![CDATA[../../billFormat]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../billFormat"/>
+	</field>
+	<field name="entityName" class="java.lang.String">
+		<description><![CDATA[../../entityName]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../entityName"/>
+	</field>
+	<field name="accountId" class="java.lang.String">
+		<description><![CDATA[../../accountId]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../accountId"/>
+	</field>
+	<field name="billDate" class="java.sql.Date">
+		<description><![CDATA[../../billDate]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../billDate"/>
+	</field>
+	<field name="totBal" class="java.math.BigDecimal">
+		<description><![CDATA[../../totBal]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../totBal"/>
+	</field>
+	<field name="delinquentAmt" class="java.math.BigDecimal">
+		<description><![CDATA[../../delinquentAmt]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../delinquentAmt"/>
+	</field>
+	<field name="dueDate" class="java.sql.Date">
+		<description><![CDATA[../../dueDate]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../dueDate"/>
+	</field>
+	<field name="currPrevBal" class="java.lang.String">
+		<description><![CDATA[../../currPrevBal]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../currPrevBal"/>
+	</field>
+	<field name="finalBill" class="java.lang.String">
+		<description><![CDATA[../../finalBill]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../finalBill"/>
+	</field>
+	<field name="currPayAmt" class="java.lang.String">
+		<description><![CDATA[../../currPayAmt]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../currPayAmt"/>
+	</field>
+	<field name="currAdjAmt" class="java.math.BigDecimal">
+		<description><![CDATA[../../currAdjAmt]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../currAdjAmt"/>
+	</field>
+	<field name="currBal" class="java.math.BigDecimal">
+		<description><![CDATA[../../currBal]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../currBal"/>
+	</field>
+	<field name="currChgAmt" class="java.math.BigDecimal">
+		<description><![CDATA[../../currChgAmt]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../currChgAmt"/>
+	</field>
+	<field name="currCorrAmt" class="java.math.BigDecimal">
+		<description><![CDATA[../../currCorrAmt]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../currCorrAmt"/>
+	</field>
+	<field name="mailingAddressLine1" class="java.lang.String">
+		<description><![CDATA[../../mailingAddressLine1]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingAddressLine1"/>
+	</field>
+	<field name="mailingCity" class="java.lang.String">
+		<description><![CDATA[../../mailingCity]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingCity"/>
+	</field>
+	<field name="mailingCountry" class="java.lang.String">
+		<description><![CDATA[../../mailingCountry]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingCountry"/>
+	</field>
+	<field name="mailingPostal" class="java.lang.String">
+		<description><![CDATA[../../mailingPostal]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingPostal"/>
+	</field>
+	<field name="mailingState" class="java.lang.String">
+		<description><![CDATA[../../mailingState]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingState"/>
+	</field>
+	<field name="mailingInCityLimit" class="java.lang.String">
+		<description><![CDATA[../../mailingInCityLimit]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingInCityLimit"/>
+	</field>
+	<field name="paymentInstruction" class="java.lang.String">
+		<description><![CDATA[../../../../C1-GlobalInformationRecord/paymentInstruction]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../C1-GlobalInformationRecord/paymentInstruction"/>
+	</field>
+	<field name="moreInfo" class="java.lang.String">
+		<description><![CDATA[../../../../C1-GlobalInformationRecord/moreInfo]]></description>
+	</field>
+	<field name="premiseId" class="java.lang.String">
+		<description><![CDATA[premiseId]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseId"/>
+	</field>
+	<field name="payList" class="java.lang.String">
+		<description><![CDATA[payList]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="payList"/>
+	</field>
+	<field name="billId" class="java.lang.String">
+		<description><![CDATA[../../../billId]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../../billId"/>
+	</field>
+	<field name="mailingAddressLine2" class="java.lang.String">
+		<description><![CDATA[../../mailingAddressLine2]]></description>
+	</field>
+	<field name="entityName1" class="java.lang.String">
+		<description><![CDATA[../../entityName1]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../entityName1"/>
+	</field>
+	<field name="sequence" class="java.lang.String">
+		<description><![CDATA[../../../sequence]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../../sequence"/>
+	</field>
+	<field name="billPrtIntercept" class="java.lang.String">
+		<description><![CDATA[../../../billPrtIntercept]]></description>
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../../billPrtIntercept"/>
+	</field>
+	<sortField name="billPrtIntercept"/>
+	<variable name="companyAddress" incrementType="Group" incrementGroup="accountId" class="java.lang.String">
+		<expression><![CDATA[$F{companyAddress}.replace( "~", "\n" )]]></expression>
+	</variable>
+	<variable name="paymentInstruction" incrementType="Group" incrementGroup="accountId" class="java.lang.String">
+		<expression><![CDATA[$F{paymentInstruction}.replace( "~", "\n" )]]></expression>
+	</variable>
+	<variable name="mailingPostal" class="java.lang.String">
+		<expression><![CDATA[$F{mailingPostal}.length()>5?"00270903360940"+($F{mailingPostal}.substring( 0, 5 ))+"4":
+"00270903360940"+($F{mailingPostal})+"4"]]></expression>
+	</variable>
+	<variable name="billDate" class="java.util.Date"/>
+	<variable name="dueDate" class="java.util.Date"/>
+	<group name="billPrtInterceptGroup">
+		<expression><![CDATA[$F{billPrtIntercept}]]></expression>
+		<groupHeader>
+			<band>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="accountId4_Group" footerPosition="ForceAtBottom" keepTogether="true">
+		<expression><![CDATA[$F{billId}+"-"+$F{premiseId}+"-"+$F{sequence}]]></expression>
+		<groupFooter>
+			<band height="150">
+				<element kind="rectangle" uuid="63f8eac5-d265-4fa1-ade6-19522394b449" positionType="FixRelativeToBottom" x="10" y="2" width="548" height="17" backcolor="#0EC414" radius="5">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<pen lineColor="#0EC414"/>
+				</element>
+				<element kind="staticText" uuid="6ecc4a57-24e7-43d5-b409-3b6d8b039d6d" x="184" y="2" width="205" height="15" forecolor="#FFFFFF" fontName="Tahoma" fontSize="11.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+					<text><![CDATA[Ways to Pay]]></text>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</element>
+				<element kind="frame" uuid="0b1664f8-0a2b-4fc5-a129-af4c240b0353" x="234" y="25" width="104" height="114">
+					<element kind="textField" uuid="91b8e0d8-54f4-474c-81db-b91d0135c7cd" x="0" y="20" width="104" height="94" fontName="Tahoma" fontSize="8.0" hTextAlign="Center">
+						<expression><![CDATA["Pay online using your\n"+
+"checking, savings, or \n" +
+"credit card at: \n"+
+"https://myaccount.fdl.wi.gov/ \n"+
+" \n"+
+"You can also register \n"+
+"for an account to \n"+
+"receive e-bills and view \n"+
+"billing history."]]></expression>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+					<element kind="textField" uuid="23451dfe-8a74-4dde-9c92-843d1f5f342d" x="0" y="0" width="104" height="19" markup="none" fontName="Arial Black" fontSize="12.0" textAdjust="StretchHeight" bold="true" hTextAlign="Center" vTextAlign="Middle">
+						<expression><![CDATA["Online"]]></expression>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+				</element>
+				<element kind="frame" uuid="344a366d-05d4-4c14-b8c2-74ae1e6c3fc2" x="452" y="25" width="104" height="114">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<element kind="textField" uuid="1eb818ab-1837-4de4-a8ab-b5279a431f13" x="0" y="0" width="103" height="19" markup="none" fontName="Arial Black" fontSize="12.0" textAdjust="StretchHeight" bold="true" hTextAlign="Center" vTextAlign="Middle">
+						<expression><![CDATA["In Person"]]></expression>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+					<element kind="textField" uuid="45ffaec9-0fde-4841-b5ab-20c598aaf66a" x="0" y="21" width="102" height="93" fontName="Tahoma" fontSize="8.0" hTextAlign="Center">
+						<expression><![CDATA["Pay in person at:\n"+
+"160 S Macy St \n" +
+"Fond du Lac, WI 54936\n"+
+" \n"+
+"Monday - Thursday \n"+
+"7:45am to 4:30pm \n"+
+"Friday \n"+
+"7:45am to 2:30pm"]]></expression>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+				</element>
+				<element kind="frame" uuid="c5e9f44c-7025-48fe-8bdd-f460f89ba232" x="344" y="25" width="104" height="114">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<element kind="textField" uuid="74cc3bf8-0407-463d-a13b-8e418a51ad51" x="0" y="20" width="104" height="94" fontName="Tahoma" fontSize="8.0" hTextAlign="Center">
+						<expression><![CDATA["Send payment to:\n"+
+"PO Box 830 \n" +
+"Fond du Lac, WI 54936 \n"+
+" \n"+
+"Please allow 5-7 \n"+
+"business days \n"+
+"for delivery. \n"+
+""]]></expression>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+					<element kind="textField" uuid="1015cdef-5dfe-44a1-8f48-71f9c927d14d" x="0" y="0" width="104" height="19" markup="html" fontName="Arial Black" fontSize="12.0" textAdjust="StretchHeight" bold="true" hTextAlign="Center" vTextAlign="Middle">
+						<expression><![CDATA["By Mail"]]></expression>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+				</element>
+				<element kind="frame" uuid="96862a89-6aee-415f-8910-4506aacc2253" x="15" y="25" width="104" height="114">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<element kind="image" uuid="a0df2d66-c886-4b52-9805-febab6554fb8" x="3" y="17" width="99" height="85" onErrorType="Blank" hImageAlign="Center">
+						<expression><![CDATA["repo:FDLQR"]]></expression>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+					<element kind="textField" uuid="c2a9ea83-36a2-426a-b00f-70e61c46f923" x="0" y="0" width="104" height="19" markup="none" fontName="Arial Black" fontSize="12.0" textAdjust="StretchHeight" bold="true" hTextAlign="Center" vTextAlign="Middle">
+						<expression><![CDATA["Scan"]]></expression>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+				</element>
+				<element kind="frame" uuid="9b71e1a6-7904-4c42-9523-835523006a98" x="121" y="25" width="104" height="114">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<element kind="textField" uuid="7b80c898-51e6-41ea-b0e1-5cd6699b51ab" x="0" y="20" width="104" height="94" fontName="Tahoma" fontSize="8.0" hTextAlign="Center">
+						<expression><![CDATA["Have your payment\n"+
+"automatically deducted \n" +
+"from your checking, \n"+
+"savings, or credit card \n"+
+"account each month. \n"+
+"\n"+
+"Sign up online at: \n"+
+"https://myaccount.fdl.wi.gov/ \n"+
+""]]></expression>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+					<element kind="textField" uuid="89deef5a-e7c2-4c1f-be0d-45b2eb81950a" x="0" y="0" width="104" height="19" markup="none" fontName="Arial Black" fontSize="12.0" textAdjust="StretchHeight" bold="true" hTextAlign="Center" vTextAlign="Middle">
+						<expression><![CDATA["Auto Pay"]]></expression>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+				</element>
+				<element kind="frame" uuid="f8550133-7191-4beb-804b-5acf62d3f95d" x="115" y="25" width="4" height="118">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<element kind="rectangle" uuid="5e51847f-4bca-463e-a78b-8cdad760dfcb" positionType="FixRelativeToBottom" x="1" y="2" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="6d0c1b3f-6ed4-4f9e-b8ba-97aecdac193a" positionType="FixRelativeToBottom" x="1" y="20" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="a8cff6ad-df73-4dc9-a6e9-9af804541147" positionType="FixRelativeToBottom" x="1" y="46" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="e411eae7-de40-4c3e-a03a-db9324260daf" positionType="FixRelativeToBottom" x="1" y="28" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="be65e986-8729-4882-9318-c9076b37cf2e" positionType="FixRelativeToBottom" x="1" y="54" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="09e78971-c7d7-4580-b67f-ebd0f44c5479" positionType="FixRelativeToBottom" x="1" y="72" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="a71df8c9-f268-412a-9af2-e30401169862" positionType="FixRelativeToBottom" x="1" y="80" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="06dfeb0b-a4f2-45b0-bc97-4c3c5db3e928" positionType="FixRelativeToBottom" x="1" y="98" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="272d111c-8b40-4055-9c89-02c21a6feda5" positionType="FixRelativeToBottom" x="1" y="106" width="1" height="8" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+				</element>
+				<element kind="frame" uuid="bf23a46a-fd3b-42b0-bfbd-068c4112f228" x="227" y="25" width="4" height="118">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<element kind="rectangle" uuid="a816a603-0609-4b02-9b25-807de96aeebf" positionType="FixRelativeToBottom" x="1" y="2" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="4247e33f-defe-48ec-8345-74743fd9485a" positionType="FixRelativeToBottom" x="1" y="20" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="a6b08c6c-86eb-4b75-9665-a3dbd20aa42c" positionType="FixRelativeToBottom" x="1" y="46" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="90b0e211-b7ac-490d-a69b-84f0a4c9529e" positionType="FixRelativeToBottom" x="1" y="28" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="6ed00c15-c1af-4824-8c04-ecf0d54b5dc8" positionType="FixRelativeToBottom" x="1" y="54" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="fa76528a-476a-4a97-a810-a8fc960229d9" positionType="FixRelativeToBottom" x="1" y="72" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="9d102bb9-0f13-4851-846c-1ef41d642f08" positionType="FixRelativeToBottom" x="1" y="80" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="4d463663-a890-45ed-8394-15b49167ebcd" positionType="FixRelativeToBottom" x="1" y="98" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="832ed16a-9622-49c2-881c-ebfdeec53b7a" positionType="FixRelativeToBottom" x="1" y="106" width="1" height="8" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+				</element>
+				<element kind="frame" uuid="a0851f89-e88f-4cae-8ad6-037b892cd2b7" x="341" y="25" width="4" height="118">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<element kind="rectangle" uuid="bbd451a8-bd1b-4ea0-838b-95872f244bf9" positionType="FixRelativeToBottom" x="1" y="2" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="cecee290-f54d-44b2-a1c5-63ae1acc8946" positionType="FixRelativeToBottom" x="1" y="20" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="24ff8211-52a2-4fc9-b4bf-c4d6828a9ea7" positionType="FixRelativeToBottom" x="1" y="46" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="289f0777-93cc-4393-a4a6-91cabea602a5" positionType="FixRelativeToBottom" x="1" y="28" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="e4d7789d-1faf-4867-ac3f-3aeaeef1a091" positionType="FixRelativeToBottom" x="1" y="54" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="60d036b7-6498-48a9-80c0-9bd4f4642ac4" positionType="FixRelativeToBottom" x="1" y="72" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="7b5416c3-45bd-425b-9f35-642ed0161071" positionType="FixRelativeToBottom" x="1" y="80" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="93777b89-90bf-436d-aaac-e59c4a979f61" positionType="FixRelativeToBottom" x="1" y="98" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="1cd9cecb-cc8a-49b2-b6a3-a06653951433" positionType="FixRelativeToBottom" x="1" y="106" width="1" height="8" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+				</element>
+				<element kind="frame" uuid="60cbaf9f-9fcf-403c-98df-635f4787e6a4" x="449" y="25" width="4" height="118">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<element kind="rectangle" uuid="f513bcff-420b-4ebe-8382-7d298db4db6a" positionType="FixRelativeToBottom" x="1" y="2" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="0cbb5f17-ded8-4d5e-ab59-70b65efa29d9" positionType="FixRelativeToBottom" x="1" y="20" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="627053e0-448d-4579-8516-40b1414ddcfe" positionType="FixRelativeToBottom" x="1" y="46" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="5b862ef6-558d-4d3f-9495-6a71cb2f31bf" positionType="FixRelativeToBottom" x="1" y="28" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="fe579653-e155-4985-9fd0-6b4da63a9f9c" positionType="FixRelativeToBottom" x="1" y="54" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="da822fd0-e147-4d34-8f0a-93a4dddafe39" positionType="FixRelativeToBottom" x="1" y="72" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="0c689153-88e3-400a-9353-eaad89d9441b" positionType="FixRelativeToBottom" x="1" y="80" width="1" height="15" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="ab2ca1af-9c44-41c8-b7f0-1e5f174743f2" positionType="FixRelativeToBottom" x="1" y="98" width="1" height="5" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+					<element kind="rectangle" uuid="d8a022ef-a58f-4b2c-9bb6-d9e2e42f0695" positionType="FixRelativeToBottom" x="1" y="106" width="1" height="8" forecolor="#0EC414" backcolor="#0EC414" radius="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<pen lineColor="rgba(14, 196, 20, 0.0)"/>
+					</element>
+				</element>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="accountId" startNewPage="true">
+		<expression><![CDATA[$F{billId}+"-"+$F{premiseId}+"-"+$F{sequence}]]></expression>
+		<groupHeader>
+			<band height="97">
+				<element kind="image" uuid="351dc9ea-b31d-47a9-bc99-4c26713700fd" x="5" y="5" width="155" height="70" onErrorType="Blank" hImageAlign="Center">
+					<expression><![CDATA["repo:logo2"]]></expression>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</element>
+				<element kind="textField" uuid="87318db8-af7f-49e3-9abc-ca03a2a0b0e2" x="160" y="5" width="145" height="70" fontName="Tahoma" fontSize="9.0" evaluationTime="Group" evaluationGroup="accountId" blankWhenNull="true" vTextAlign="Middle">
+					<paragraph lineSpacing="Single" lineSpacingSize="1.0" spacingAfter="0"/>
+					<expression><![CDATA[$V{companyAddress}]]></expression>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.spacingAfter" value="px"/>
+				</element>
+				<element kind="rectangle" uuid="6b9e5438-7d72-479b-b2ee-62089a2b7eee" x="330" y="5" width="230" height="20" backcolor="#4B43E6" radius="5">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<pen lineColor="#4B43E6"/>
+				</element>
+				<element kind="staticText" uuid="a7aab5e7-5019-45aa-9576-43c054a18272" x="335" y="5" width="220" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="11.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+					<text><![CDATA[Payment Information]]></text>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</element>
+				<element kind="textField" uuid="d64c5b53-18dd-44bc-8830-18694248eabc" x="330" y="26" width="100" height="14" fontName="Tahoma" fontSize="8.5" vTextAlign="Middle">
+					<expression><![CDATA["Account number:"]]></expression>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<box leftPadding="5">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="188a0221-068a-4558-b87f-36230c608169" x="430" y="26" width="130" height="14" fontName="Tahoma" fontSize="8.5" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+					<expression><![CDATA[$F{accountId}]]></expression>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<box leftPadding="0" rightPadding="5">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="a5c39e5d-f485-4b41-b5b0-ac3e71105962" x="330" y="39" width="100" height="14" fontName="Tahoma" fontSize="8.5" vTextAlign="Middle">
+					<expression><![CDATA["Customer:"]]></expression>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<box leftPadding="5">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="ae17497c-b7a8-404b-9b1b-2e8dce02daf4" x="430" y="39" width="130" height="14" fontName="Tahoma" fontSize="8.5" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+					<expression><![CDATA[$F{entityName}]]></expression>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<box leftPadding="0" rightPadding="5">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="84e86d33-bb02-4c47-a66b-022c4d8b5b77" x="330" y="53" width="100" height="14" fontName="Tahoma" fontSize="8.5" vTextAlign="Middle">
+					<expression><![CDATA["Bill date:"]]></expression>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<box leftPadding="5">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="899e12e7-f9fb-495e-b4c4-63c2075af172" x="430" y="53" width="130" height="14" fontName="Tahoma" fontSize="8.5" pattern="MM/dd/yy" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+					<expression><![CDATA[$F{billDate}]]></expression>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<box leftPadding="0" rightPadding="5">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="fb75a10b-08fc-4361-ad80-c00b11d976fc" x="330" y="67" width="100" height="14" fontName="Tahoma" fontSize="8.5" vTextAlign="Middle">
+					<expression><![CDATA["Amount due:"]]></expression>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<box leftPadding="5">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="917c5019-c96d-433a-8be8-ad8c9396e15f" x="430" y="67" width="130" height="14" fontName="Tahoma" fontSize="8.5" pattern="$#,##0.00#;$(-#,##0.00#)" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+					<expression><![CDATA[$F{currBal}]]></expression>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<box leftPadding="0" rightPadding="5">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="2459efc5-a016-42e6-93d9-4bcf78451bb8" x="330" y="81" width="100" height="14" fontName="Tahoma" fontSize="8.5" vTextAlign="Middle">
+					<expression><![CDATA["Due date:"]]></expression>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<box leftPadding="5">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="960496b1-0522-4097-a840-72e06317773c" x="430" y="81" width="130" height="14" fontName="Tahoma" fontSize="8.5" pattern="MM/dd/yy" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+					<expression><![CDATA[$F{dueDate}]]></expression>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<box leftPadding="0" rightPadding="5">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="6239d7c0-073c-46ba-9d0a-d9c4333967a6" x="-8" y="73" width="492" height="23" forecolor="#C7143B" markup="styled" fontName="Tahoma" fontSize="13.0" textAdjust="StretchHeight" blankWhenNull="true" removeLineWhenBlank="true" bold="false" hTextAlign="Left" vTextAlign="Middle">
+					<printWhenExpression><![CDATA[$F{delinquentAmt}.compareTo(new BigDecimal(0) ) == 1]]></printWhenExpression>
+					<paragraph lineSpacing="Single" lineSpacingSize="1.0"/>
+					<expression><![CDATA["<b>PLEASE NOTE: This account is PAST DUE! Your prompt attention is requested. </b>"]]></expression>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<box topPadding="20" leftPadding="10" rightPadding="10"/>
+				</element>
+				<element kind="textField" uuid="c6f875b8-600b-4e96-8444-5b1bd8ab6a9e" x="375" y="74" width="194" height="23" forecolor="#C7143B" markup="styled" fontName="Tahoma" fontSize="13.0" textAdjust="StretchHeight" blankWhenNull="true" removeLineWhenBlank="true" bold="false" hTextAlign="Right" vTextAlign="Middle">
+					<printWhenExpression><![CDATA[$F{finalBill}.equals("true")]]></printWhenExpression>
+					<paragraph lineSpacing="Single" lineSpacingSize="1.0"/>
+					<expression><![CDATA["<b>FINAL BILL.</b>"]]></expression>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<box topPadding="20" leftPadding="10" rightPadding="10"/>
+				</element>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="51">
+				<element kind="break" uuid="4cb3b8e7-24fd-4cfc-820e-fcddab951810" x="0" y="0" width="555" height="1">
+					<printWhenExpression><![CDATA[false]]></printWhenExpression>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</element>
+				<element kind="component" uuid="96ce8436-d37c-4c20-bc77-b40a8e064484" stretchType="ContainerHeight" x="0" y="15" width="572" height="36">
+					<component kind="table" whenNoDataType="AllSectionsNoDetail">
+						<datasetRun uuid="15101e6d-11c2-4854-aade-9746be2924f4" subDataset="bsegReadList">
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							<parameter name="billId">
+								<expression><![CDATA[$F{billId}]]></expression>
+							</parameter>
+							<parameter name="premiseId">
+								<expression><![CDATA[$F{premiseId}]]></expression>
+							</parameter>
+							<parameter name="XML_DATA_DOCUMENT">
+								<expression><![CDATA[$P{XML_DATA_DOCUMENT}]]></expression>
+							</parameter>
+							<parameter name="XML_DATE_PATTERN">
+								<expression><![CDATA[$P{XML_DATE_PATTERN}]]></expression>
+							</parameter>
+							<parameter name="XML_FILE">
+								<expression><![CDATA[$P{XML_FILE}]]></expression>
+							</parameter>
+							<parameter name="XML_INPUT_STREAM">
+								<expression><![CDATA[$P{XML_INPUT_STREAM}]]></expression>
+							</parameter>
+							<parameter name="XML_LOCALE">
+								<expression><![CDATA[$P{XML_LOCALE}]]></expression>
+							</parameter>
+							<parameter name="XML_NUMBER_PATTERN">
+								<expression><![CDATA[$P{XML_NUMBER_PATTERN}]]></expression>
+							</parameter>
+							<parameter name="XML_TIME_ZONE">
+								<expression><![CDATA[$P{XML_TIME_ZONE}]]></expression>
+							</parameter>
+							<parameter name="net.sf.jasperreports.xml.source">
+								<expression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></expression>
+							</parameter>
+							<parameter name="sequence">
+								<expression><![CDATA[$F{sequence}]]></expression>
+							</parameter>
+						</datasetRun>
+						<column kind="single" uuid="5515ea1c-8b6d-4af0-9be2-44f21b69a263" width="65">
+							<columnHeader height="20" rowSpan="1">
+								<element kind="frame" uuid="03c5b76f-e30e-4cf8-97c4-7d6547d662eb" x="0" y="0" width="65" height="20">
+									<element kind="rectangle" uuid="d009a2db-d0b2-4798-840e-e059de4ccf20" x="1" y="0" width="63" height="20" backcolor="#0077C8" radius="5">
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										<pen lineColor="#0077C8"/>
+									</element>
+									<element kind="staticText" uuid="4e037c28-3e52-4c40-bbd2-801e02c37299" x="2" y="0" width="61" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+										<text><![CDATA[Meter #]]></text>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</columnHeader>
+							<detailCell height="16">
+								<element kind="frame" uuid="9b852bcf-c060-4301-a796-f6c056d2867d" x="0" y="0" width="65" height="16">
+									<element kind="textField" uuid="ef4e42fd-0206-4258-a235-d4f4cb6bcfe4" stretchType="ContainerHeight" x="0" y="0" width="65" height="16" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" blankWhenNull="true" hTextAlign="Center" vTextAlign="Top">
+										<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										<expression><![CDATA[$F{badge}]]></expression>
+										<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+										<box topPadding="2"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</detailCell>
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						</column>
+						<column kind="single" uuid="dfccaf4b-b53a-474b-8e3b-32d474d97c9c" width="85">
+							<columnHeader height="20" rowSpan="1">
+								<element kind="frame" uuid="1f1bcb33-9395-4b03-8958-2ad4728c68f8" x="0" y="0" width="85" height="20">
+									<element kind="rectangle" uuid="00cfd8e1-d851-4d97-949a-f6d6357a40b0" x="1" y="0" width="83" height="20" backcolor="#0077C8" radius="5">
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										<pen lineColor="#0077C8"/>
+									</element>
+									<element kind="textField" uuid="72e73e99-8d71-4cda-8d8c-7762d92009e4" x="5" y="0" width="75" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+										<expression><![CDATA["Service\nDescription"]]></expression>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</columnHeader>
+							<detailCell height="16">
+								<element kind="frame" uuid="225c9c9d-c60b-4bb1-8f6b-706e563ba7a1" x="0" y="0" width="85" height="16">
+									<element kind="textField" uuid="abe5557b-25cc-4799-b210-555d008f5a2e" stretchType="ContainerHeight" x="0" y="0" width="85" height="16" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" blankWhenNull="true" hTextAlign="Left" vTextAlign="Top">
+										<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										<expression><![CDATA[$F{saTypeDescr}]]></expression>
+										<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<box topPadding="2"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</detailCell>
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						</column>
+						<column kind="single" uuid="1fcde58b-09eb-4a37-b5d5-7f69ef3d8fe6" width="58">
+							<columnHeader height="20" rowSpan="1">
+								<element kind="frame" uuid="b1cc6284-44cf-4bea-90e2-600baf16b5fe" x="0" y="0" width="58" height="20">
+									<element kind="rectangle" uuid="5fe9096d-2cfa-4403-bdf5-3286c6610b66" x="1" y="0" width="56" height="20" backcolor="#0077C8" radius="5">
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<pen lineColor="#0077C8"/>
+									</element>
+									<element kind="staticText" uuid="6cafbdd2-cf53-4adf-ad4d-9776242f2525" x="2" y="0" width="54" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+										<text><![CDATA[Rate Class]]></text>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</columnHeader>
+							<detailCell height="16">
+								<element kind="frame" uuid="61c65dfa-5eb6-41d8-beaf-97d120d8b126" x="0" y="0" width="58" height="16">
+									<element kind="textField" uuid="a3e8f7e4-0c42-4d91-ba8e-1d9e32ad31b6" stretchType="ContainerHeight" x="0" y="0" width="58" height="16" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" blankWhenNull="true" hTextAlign="Center" vTextAlign="Middle">
+										<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										<expression><![CDATA[$F{rateSched}]]></expression>
+										<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</detailCell>
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						</column>
+						<column kind="single" uuid="1a42fa02-299b-490f-aa30-2b57729ae757" width="50">
+							<columnHeader height="20" rowSpan="1">
+								<element kind="frame" uuid="c68b8c82-bac3-4bba-beb2-19653b162926" x="0" y="0" width="50" height="20">
+									<element kind="rectangle" uuid="cf6ac730-f392-453f-9224-c920ed9fcfca" x="1" y="0" width="48" height="20" backcolor="#0077C8" radius="5">
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<pen lineColor="#0077C8"/>
+									</element>
+									<element kind="staticText" uuid="674071dd-053d-4b7a-966f-4903d0ffd517" x="2" y="0" width="46" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+										<text><![CDATA[Units]]></text>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</columnHeader>
+							<detailCell height="16">
+								<element kind="frame" uuid="0fda5332-3725-4ea4-8d70-111459f445b8" x="0" y="0" width="50" height="16">
+									<element kind="textField" uuid="d064307b-0730-49fe-961a-7b047f72d6b7" stretchType="ContainerHeight" x="0" y="0" width="50" height="16" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" blankWhenNull="true" hTextAlign="Center" vTextAlign="Middle">
+										<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										<expression><![CDATA[$F{finalUom}]]></expression>
+										<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									</element>
+								</element>
+							</detailCell>
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
+						</column>
+						<column kind="single" uuid="e9a53901-7ba5-44ee-9b0e-a67c0a71d0f5" width="100">
+							<columnHeader height="20" rowSpan="1">
+								<element kind="frame" uuid="243388aa-c9c7-406d-8a5f-acea0cad42a1" x="0" y="0" width="100" height="20">
+									<element kind="rectangle" uuid="8ac303cd-629d-4d49-a472-615bb5b45fe9" x="1" y="0" width="98" height="20" backcolor="#0077C8" radius="5">
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<pen lineColor="#0077C8"/>
+									</element>
+									<element kind="staticText" uuid="88fdca3f-e5a5-4c1b-a47b-054d4eaec70c" x="5" y="0" width="89" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+										<text><![CDATA[Read Dates
+From            To]]></text>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									</element>
+								</element>
+							</columnHeader>
+							<detailCell height="16">
+								<element kind="frame" uuid="474f9ead-a94b-4f74-8005-3fed3a58dcec" x="0" y="0" width="100" height="16">
+									<element kind="textField" uuid="e4ba999a-caf9-4522-b6b6-af2d97ed0670" stretchType="ContainerHeight" x="0" y="0" width="50" height="16" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" pattern="MM/dd/yyyy" blankWhenNull="true" hTextAlign="Center" vTextAlign="Middle">
+										<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										<expression><![CDATA[$V{startReadDttm}]]></expression>
+										<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									</element>
+									<element kind="textField" uuid="5e2ffb2b-f176-4448-bca5-490b6795421d" stretchType="ContainerHeight" x="50" y="0" width="50" height="16" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" pattern="MM/dd/yyyy" blankWhenNull="true" hTextAlign="Center" vTextAlign="Middle">
+										<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										<expression><![CDATA[$V{endReadDttm}]]></expression>
+										<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</detailCell>
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
+						</column>
+						<column kind="single" uuid="0ffe3c50-d6a7-4c22-aa2e-1bb3a29015bf" width="35">
+							<columnHeader height="20" rowSpan="1">
+								<element kind="frame" uuid="ed6abdf0-c3d6-4059-a42f-36bec33f6af1" x="0" y="0" width="35" height="20">
+									<element kind="rectangle" uuid="f23a92cb-35ef-45ae-a1c8-03d5764cd719" x="1" y="0" width="32" height="20" backcolor="#0077C8" radius="5">
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<pen lineColor="#0077C8"/>
+									</element>
+									<element kind="staticText" uuid="f8c07f72-dd0b-4762-b79b-25098cb6b05f" x="5" y="0" width="25" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+										<text><![CDATA[Days]]></text>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</columnHeader>
+							<detailCell height="16">
+								<element kind="frame" uuid="dfa53065-f0b7-49b7-8143-de9fcb430820" x="0" y="0" width="35" height="16">
+									<element kind="textField" uuid="edd5909e-ae11-4e64-b854-0f456067684c" stretchType="ContainerHeight" x="0" y="0" width="35" height="16" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" blankWhenNull="true" hTextAlign="Center" vTextAlign="Middle">
+										<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										<expression><![CDATA[$V{Days}]]></expression>
+										<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</detailCell>
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column6"/>
+						</column>
+						<column kind="single" uuid="bcc10ac1-fb67-4ff7-a800-39863bd69fad" width="95">
+							<columnHeader height="20" rowSpan="1">
+								<element kind="frame" uuid="07758814-e8e7-4dd3-a9a7-362b0a9ad91c" x="0" y="0" width="95" height="20">
+									<element kind="rectangle" uuid="e05610e7-634b-4de7-9618-84074a3e8a64" x="0" y="0" width="94" height="20" backcolor="#0077C8" radius="5">
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<pen lineColor="#0077C8"/>
+									</element>
+									<element kind="staticText" uuid="577a7229-607b-4f3d-9c13-0830e2dab42d" x="5" y="0" width="85" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+										<text><![CDATA[Readings
+Previous     Current
+]]></text>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									</element>
+								</element>
+							</columnHeader>
+							<detailCell height="16">
+								<element kind="frame" uuid="8b5e291a-e6a6-4935-a159-97c1b1f3f2f6" x="0" y="0" width="95" height="16">
+									<element kind="textField" uuid="d0b5cccc-bc08-45e3-90f1-85d8dbf4a454" stretchType="ContainerHeight" x="0" y="0" width="47" height="16" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" pattern="#,##0.###;(-#,##0.###)" blankWhenNull="true" hTextAlign="Center" vTextAlign="Middle">
+										<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										<expression><![CDATA[$F{startRegRdg}]]></expression>
+										<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									</element>
+									<element kind="textField" uuid="fab4f0c4-7dda-486c-a42f-935a52ca314c" stretchType="ContainerHeight" x="47" y="0" width="48" height="16" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" pattern="#,##0.###;(-#,##0.###)" blankWhenNull="true" hTextAlign="Center" vTextAlign="Middle">
+										<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										<expression><![CDATA[$F{endRegRdg}]]></expression>
+										<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</detailCell>
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column7"/>
+						</column>
+						<column kind="single" uuid="72fd747f-6710-470a-a32b-236d81b07cce" width="45">
+							<columnHeader height="20" rowSpan="1">
+								<element kind="frame" uuid="1b21bd21-c94b-4baf-8c91-80ba46630e54" x="0" y="0" width="45" height="20">
+									<element kind="rectangle" uuid="d019c0d9-38c5-4e3f-bae0-1ec8cb3c9817" x="1" y="0" width="43" height="20" backcolor="#0077C8" radius="5">
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<pen lineColor="#0077C8"/>
+									</element>
+									<element kind="staticText" uuid="a06c9d8d-37ca-4338-a814-39649e00526c" x="1" y="0" width="42" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+										<text><![CDATA[Multiplier]]></text>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</columnHeader>
+							<detailCell height="16">
+								<element kind="frame" uuid="c5cbd8a5-29ca-412c-bcb0-9b4ecf80cf18" x="0" y="0" width="45" height="16">
+									<element kind="textField" uuid="a14eef17-5004-4e7a-b6cc-102663d979ff" stretchType="ContainerHeight" x="0" y="0" width="45" height="16" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" pattern="##0" blankWhenNull="true" hTextAlign="Center" vTextAlign="Middle">
+										<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										<expression><![CDATA[$F{regConst}]]></expression>
+										<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</detailCell>
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column8"/>
+						</column>
+						<column kind="single" uuid="fb2e08cb-3b4a-4c64-9aa4-6527286dde8b" width="40">
+							<columnHeader height="20" rowSpan="1">
+								<element kind="frame" uuid="fde064d8-51ac-4da3-b0f6-44762d8248a1" x="0" y="0" width="40" height="20">
+									<element kind="rectangle" uuid="41b0a594-2507-49f1-a7ea-14daecfb4bb6" x="1" y="0" width="38" height="20" backcolor="#0077C8" radius="5">
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<pen lineColor="#0077C8"/>
+									</element>
+									<element kind="staticText" uuid="990322b0-c94a-44f4-bd4c-d78ecc832a33" x="2" y="0" width="36" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+										<text><![CDATA[Usage]]></text>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									</element>
+								</element>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</columnHeader>
+							<detailCell height="16">
+								<element kind="frame" uuid="640bf971-1b52-421a-99bc-b3995b906ea6" x="0" y="0" width="40" height="16">
+									<element kind="textField" uuid="4521681f-bc83-4339-be72-3724e3ee6afc" stretchType="ContainerHeight" x="0" y="0" width="40" height="16" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" pattern="#,##0.###;(-#,##0.###)" blankWhenNull="true" hTextAlign="Center" vTextAlign="Middle">
+										<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										<expression><![CDATA[$F{finalRegQty}]]></expression>
+										<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									</element>
+								</element>
+							</detailCell>
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column9"/>
+						</column>
+					</component>
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 1_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 1_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table 1_TD"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</element>
+			</band>
+			<band height="203">
+				<element kind="chart" chartType="bar" uuid="840c69cd-a053-46fa-a34a-f11e53b055e1" stretchType="ContainerHeight" x="0" y="50" width="281" height="148" printWhenGroupChanges="accountId" showLegend="false" evaluationTime="Group" evaluationGroup="accountId" removeLineWhenBlank="true" printWhenDetailOverflows="true">
+					<titleExpression><![CDATA["Water Usage - CCF"]]></titleExpression>
+					<dataset kind="category">
+						<datasetRun uuid="040fe4fc-143f-4b18-8769-e38a8eac1222" subDataset="ConsptionHistoryGraph">
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							<parameter name="billId">
+								<expression><![CDATA[$F{billId}]]></expression>
+							</parameter>
+							<parameter name="premiseId">
+								<expression><![CDATA[$F{premiseId}]]></expression>
+							</parameter>
+							<parameter name="XML_DATA_DOCUMENT">
+								<expression><![CDATA[$P{XML_DATA_DOCUMENT}]]></expression>
+							</parameter>
+							<parameter name="XML_DATE_PATTERN">
+								<expression><![CDATA[$P{XML_DATE_PATTERN}]]></expression>
+							</parameter>
+							<parameter name="XML_FILE">
+								<expression><![CDATA[$P{XML_FILE}]]></expression>
+							</parameter>
+							<parameter name="XML_INPUT_STREAM">
+								<expression><![CDATA[$P{XML_INPUT_STREAM}]]></expression>
+							</parameter>
+							<parameter name="XML_LOCALE">
+								<expression><![CDATA[$P{XML_LOCALE}]]></expression>
+							</parameter>
+							<parameter name="XML_TIME_ZONE">
+								<expression><![CDATA[$P{XML_TIME_ZONE}]]></expression>
+							</parameter>
+							<parameter name="XML_NUMBER_PATTERN">
+								<expression><![CDATA[$P{XML_NUMBER_PATTERN}]]></expression>
+							</parameter>
+							<parameter name="net.sf.jasperreports.xml.source">
+								<expression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></expression>
+							</parameter>
+							<parameter name="sequence">
+								<expression><![CDATA[$F{sequence}]]></expression>
+							</parameter>
+						</datasetRun>
+						<series>
+							<seriesExpression><![CDATA[""]]></seriesExpression>
+							<categoryExpression><![CDATA[new SimpleDateFormat("MMM yyyy").format($F{sqDate})]]></categoryExpression>
+							<valueExpression><![CDATA[$F{billSq}]]></valueExpression>
+							<labelExpression><![CDATA[""]]></labelExpression>
+						</series>
+					</dataset>
+					<plot labelRotation="60.0" categoryAxisLabelColor="#000000" categoryAxisTickLabelColor="#000000" categoryAxisLineColor="#000000" valueAxisLabelColor="#000000" valueAxisTickLabelColor="#000000" valueAxisLineColor="#000000" categoryAxisTickLabelRotation="60.0">
+						<itemLabel/>
+					</plot>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</element>
+				<element kind="chart" chartType="bar" uuid="f5e95188-55ef-422d-8eb2-d9e9a066366a" stretchType="ContainerHeight" x="291" y="50" width="281" height="148" printWhenGroupChanges="accountId" showLegend="false" evaluationTime="Group" evaluationGroup="accountId" removeLineWhenBlank="true" printWhenDetailOverflows="true">
+					<titleExpression><![CDATA["Waste Water Usage - CCF"]]></titleExpression>
+					<dataset kind="category">
+						<datasetRun uuid="4563724d-39d4-4112-a0e7-470374741ce4" subDataset="consumptionHistoryList_WW">
+							<parameter name="premiseId">
+								<expression><![CDATA[$F{premiseId}]]></expression>
+							</parameter>
+							<parameter name="billId">
+								<expression><![CDATA[$F{billId}]]></expression>
+							</parameter>
+							<parameter name="XML_DATA_DOCUMENT">
+								<expression><![CDATA[$P{XML_DATA_DOCUMENT}]]></expression>
+							</parameter>
+							<parameter name="XML_DATE_PATTERN">
+								<expression><![CDATA[$P{XML_DATE_PATTERN}]]></expression>
+							</parameter>
+							<parameter name="XML_INPUT_STREAM">
+								<expression><![CDATA[$P{XML_INPUT_STREAM}]]></expression>
+							</parameter>
+							<parameter name="XML_FILE">
+								<expression><![CDATA[$P{XML_FILE}]]></expression>
+							</parameter>
+							<parameter name="XML_LOCALE">
+								<expression><![CDATA[$P{XML_LOCALE}]]></expression>
+							</parameter>
+							<parameter name="XML_NUMBER_PATTERN">
+								<expression><![CDATA[$P{XML_NUMBER_PATTERN}]]></expression>
+							</parameter>
+							<parameter name="XML_TIME_ZONE">
+								<expression><![CDATA[$P{XML_TIME_ZONE}]]></expression>
+							</parameter>
+							<parameter name="net.sf.jasperreports.xml.source">
+								<expression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></expression>
+							</parameter>
+							<parameter name="sequence">
+								<expression><![CDATA[$F{sequence}]]></expression>
+							</parameter>
+						</datasetRun>
+						<series>
+							<seriesExpression><![CDATA[""]]></seriesExpression>
+							<categoryExpression><![CDATA[new SimpleDateFormat("MMM yyyy").format($F{sqDate})]]></categoryExpression>
+							<valueExpression><![CDATA[$F{billSq}]]></valueExpression>
+							<labelExpression><![CDATA[""]]></labelExpression>
+						</series>
+					</dataset>
+					<plot labelRotation="60.0" categoryAxisLabelColor="#000000" categoryAxisTickLabelColor="#000000" categoryAxisLineColor="#000000" valueAxisLabelColor="#000000" valueAxisTickLabelColor="#000000" valueAxisLineColor="#000000" categoryAxisTickLabelRotation="60.0">
+						<itemLabel/>
+					</plot>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</element>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="account3" footerPosition="ForceAtBottom">
+		<expression><![CDATA[$F{billId}+"-"+$F{premiseId}+"-"+$F{sequence}]]></expression>
+		<groupFooter>
+			<band height="185" splitType="Prevent">
+				<element kind="frame" uuid="dc130e0a-460f-434b-b943-f07f79ff03c9" positionType="FixRelativeToBottom" x="0" y="0" width="555" height="185">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<element kind="line" uuid="d70888cc-d708-4c53-8be8-6d7745c8ece9" x="0" y="0" width="555" height="1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<pen lineWidth="1.0" lineStyle="Dashed" lineColor="#919090"/>
+					</element>
+					<element kind="frame" uuid="5d6a51d5-1c06-4681-984b-8cced2ef0b98" stretchType="ContainerHeight" x="325" y="3" width="230" height="118">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<element kind="rectangle" uuid="c1c46e2c-c41d-4bf1-9598-ce532018b1aa" x="0" y="0" width="230" height="20" backcolor="#4B43E6" radius="5">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<pen lineColor="#4B43E6"/>
+						</element>
+						<element kind="staticText" uuid="3316f16d-82ab-4525-aaac-684036c22c63" x="5" y="0" width="220" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="11.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+							<text><![CDATA[Payment Information]]></text>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</element>
+						<element kind="textField" uuid="c7906cd3-2e5d-496e-8633-83e124d28127" x="0" y="20" width="100" height="14" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+							<expression><![CDATA["Account number:"]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="53742fc7-903c-40ac-927b-12de2a1abae1" x="100" y="20" width="130" height="14" fontName="Tahoma" fontSize="8.0" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+							<expression><![CDATA[$F{accountId}]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="0" rightPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="ba020159-70e2-4281-986a-d68c2d1cd04e" x="0" y="34" width="100" height="14" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+							<expression><![CDATA["Customer:"]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="0df577aa-316c-4b0e-acd2-c6625dad85ce" x="100" y="34" width="130" height="14" fontName="Tahoma" fontSize="8.0" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+							<expression><![CDATA[$F{entityName}]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="0" rightPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="7149ea96-6027-4f5d-bd3e-d76c2dfbeb4b" x="0" y="48" width="100" height="14" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+							<expression><![CDATA["Bill date:"]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="63f52a2d-3c8d-45d8-9071-e133a2dcd8d6" x="100" y="48" width="130" height="14" fontName="Tahoma" fontSize="8.0" pattern="MM/dd/yy" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+							<expression><![CDATA[$F{billDate}]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="0" rightPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="9d066efd-5f93-486a-8ad0-b217d488a76c" x="0" y="62" width="100" height="14" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+							<expression><![CDATA["Amount due:"]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="44cb87e7-a805-48ee-a083-75648e7467f2" x="100" y="62" width="130" height="14" fontName="Tahoma" fontSize="8.0" pattern="$#,##0.00#;$(-#,##0.00#)" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+							<expression><![CDATA[$F{currBal}]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="0" rightPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="6fa0b861-512d-4db9-af57-7ced4b06960e" x="0" y="76" width="100" height="14" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+							<expression><![CDATA["Amount paid:"]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="cd22ea80-22dc-45b5-a09b-4921fc35bb6e" x="100" y="76" width="130" height="14" fontName="Tahoma" fontSize="8.0" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+							<expression><![CDATA[""]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="0" rightPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="8cf7b0c7-c12a-4402-87d4-29d7a470e3fe" x="100" y="90" width="130" height="14" fontName="Tahoma" fontSize="8.0" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+							<expression><![CDATA[""]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="0" rightPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="1024dc2c-e524-465e-b1c8-a4e893efa64c" x="0" y="104" width="100" height="14" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+							<expression><![CDATA["Due date:"]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="752901df-5ce6-4e71-b7f1-fd983a33298d" x="0" y="90" width="100" height="14" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+							<expression><![CDATA["Check number:"]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+						<element kind="textField" uuid="f02756e9-1ad4-48e1-be7b-28b38db89c2e" x="100" y="104" width="130" height="14" fontName="Tahoma" fontSize="8.0" pattern="MM/dd/yy" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+							<expression><![CDATA[$F{dueDate}]]></expression>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box leftPadding="0" rightPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</element>
+					</element>
+					<element kind="textField" uuid="7f6f8d94-bfb6-4a80-a299-e8215556790a" x="325" y="122" width="230" height="40" fontName="Tahoma" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle">
+						<expression><![CDATA[$V{paymentInstruction}]]></expression>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+					<element kind="image" uuid="a8e7054d-7d35-49de-afd0-64556488eb7a" x="0" y="3" width="145" height="53" onErrorType="Blank" hImageAlign="Center">
+						<expression><![CDATA["repo:logo2"]]></expression>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+					<element kind="textField" uuid="06e400fb-2964-4dbb-a3c2-3f22d8fd9c4a" x="155" y="3" width="145" height="70" fontName="Tahoma" fontSize="9.0" vTextAlign="Middle">
+						<paragraph lineSpacing="Single" lineSpacingSize="1.0" spacingAfter="0"/>
+						<expression><![CDATA[$V{companyAddress}]]></expression>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.spacingAfter" value="px"/>
+					</element>
+					<element kind="staticText" uuid="7d73e6aa-675d-4911-915a-8095e537e948" x="0" y="66" width="145" height="18" fontName="Tahoma" fontSize="9.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+						<text><![CDATA[Service address:  ]]></text>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+					<element kind="textField" uuid="1116808a-2e90-430f-942f-34af9a6537ed" x="155" y="66" width="145" height="18" fontName="Tahoma" fontSize="9.0" evaluationTime="Group" evaluationGroup="accountId" blankWhenNull="true" bold="true" hTextAlign="Left" vTextAlign="Middle">
+						<expression><![CDATA[$F{svcAddressLine1}]]></expression>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+					<element kind="staticText" uuid="1353cb73-919d-4ff8-9a93-bbeb0b516260" x="0" y="84" width="145" height="18" fontName="Tahoma" fontSize="9.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+						<text><![CDATA[Account number:]]></text>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+					<element kind="textField" uuid="32b69c63-7270-419d-8f3f-22f10d9ae940" x="155" y="84" width="145" height="18" fontName="Tahoma" fontSize="9.0" evaluationTime="Group" evaluationGroup="accountId" blankWhenNull="true" bold="true" hTextAlign="Left" vTextAlign="Middle">
+						<expression><![CDATA[$F{accountId}]]></expression>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+					<element kind="textField" uuid="9236a259-86f4-4037-ae74-1405a64f14f8" stretchType="ContainerHeight" x="20" y="117" width="305" height="68" fontName="Tahoma" fontSize="9.0" evaluationTime="Group" evaluationGroup="accountId" bold="false" hTextAlign="Left" vTextAlign="Middle">
+						<expression><![CDATA[($F{entityName1}==null?"":$F{entityName1})+"\n"+
+($F{mailingAddressLine1}==null?"":$F{mailingAddressLine1})+"\n"+
+($F{mailingAddressLine2}==null?"":$F{mailingAddressLine2})+"\n"+
+($F{mailingCity}==null?"":$F{mailingCity})+
+($F{mailingState}==null?"":", "+ $F{mailingState})+
+($F{mailingPostal}==null?"":" "+$F{mailingPostal})]]></expression>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<box leftPadding="10"/>
+					</element>
+					<element kind="component" uuid="bc67b2d9-7afe-40fa-b927-ba910891ede1" x="30" y="105" width="280" height="20">
+						<printWhenExpression><![CDATA[$F{mailingPostal}.length()>=5]]></printWhenExpression>
+						<component kind="barcode4j:USPSIntelligentMail" moduleWidth="3.0" textPosition="none" checksumMode="ignore">
+							<codeExpression><![CDATA[$V{mailingPostal}]]></codeExpression>
+						</component>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</element>
+					<element kind="component" uuid="f3dae78f-fa42-49ee-91f4-d13f07ad8ab0" x="380" y="164" width="175" height="21">
+						<component kind="barbecue" type="USPS" drawText="false" checksumRequired="false" barWidth="5" barHeight="85">
+							<codeExpression><![CDATA[$F{accountId}+"\n $"+$F{totBal}]]></codeExpression>
+						</component>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.barWidth" value="px"/>
+						<property name="com.jaspersoft.studio.unit.barHeight" value="px"/>
+					</element>
+				</element>
+				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			</band>
+		</groupFooter>
+	</group>
+	<background splitType="Stretch"/>
+	<detail>
+		<band height="200" splitType="Stretch">
+			<element kind="textField" uuid="9a3e950e-a555-4072-be1a-3974d8fb4b5c" x="0" y="1" width="555" height="16" fontName="Tahoma" fontSize="11.0" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA["Service address: " +  ( $F{svcAddressLine1} == null  ? "" : $F{svcAddressLine1} )]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="e177551a-55b6-40a5-9770-3bb8dce1c756" x="0" y="18" width="325" height="20" backcolor="#4B43E6" radius="5">
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<pen lineColor="#4B43E6"/>
+			</element>
+			<element kind="staticText" uuid="6a147300-3873-47e8-bc72-587593cd0bb5" x="5" y="18" width="324" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="11.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[Account Activity]]></text>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			</element>
+			<element kind="textField" uuid="2bd63b93-7948-4f21-825d-a944fce4e27e" x="249" y="38" width="80" height="12" fontName="Tahoma" fontSize="8.0" pattern="#,##0.00#;(-#,##0.00#)" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{currPrevBal}]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="d4b89244-aed4-4f72-999a-7bfee99b4200" x="0" y="38" width="118" height="12" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+				<expression><![CDATA["Previous Period's Balance"]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="component" uuid="c67563a1-0b50-49db-8c7b-e83ae2123f8e" x="0" y="138" width="329" height="51" forecolor="#FFFFFF">
+				<printWhenExpression><![CDATA[$F{billFormat}.equals( "D" )]]></printWhenExpression>
+				<component kind="table" whenNoDataType="AllSectionsNoDetail">
+					<datasetRun uuid="241ac995-60e1-4411-89a2-518b1c901d67" subDataset="currentActivity">
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						<parameter name="CurrAdjAmt">
+							<expression><![CDATA[$F{currAdjAmt}]]></expression>
+						</parameter>
+						<parameter name="CurrBal">
+							<expression><![CDATA[$F{currBal}]]></expression>
+						</parameter>
+						<parameter name="CurrChgAmt">
+							<expression><![CDATA[$F{currChgAmt}]]></expression>
+						</parameter>
+						<parameter name="TotBal">
+							<expression><![CDATA[$F{totBal}]]></expression>
+						</parameter>
+						<parameter name="accountId">
+							<expression><![CDATA[$F{accountId}]]></expression>
+						</parameter>
+						<parameter name="premiseId">
+							<expression><![CDATA[$F{premiseId}]]></expression>
+						</parameter>
+						<parameter name="XML_DATA_DOCUMENT">
+							<expression><![CDATA[$P{XML_DATA_DOCUMENT}]]></expression>
+						</parameter>
+						<parameter name="XML_DATE_PATTERN">
+							<expression><![CDATA[$P{XML_DATE_PATTERN}]]></expression>
+						</parameter>
+						<parameter name="XML_FILE">
+							<expression><![CDATA[$P{XML_FILE}]]></expression>
+						</parameter>
+						<parameter name="XML_INPUT_STREAM">
+							<expression><![CDATA[$P{XML_INPUT_STREAM}]]></expression>
+						</parameter>
+						<parameter name="XML_LOCALE">
+							<expression><![CDATA[$P{XML_LOCALE}]]></expression>
+						</parameter>
+						<parameter name="XML_NUMBER_PATTERN">
+							<expression><![CDATA[$P{XML_NUMBER_PATTERN}]]></expression>
+						</parameter>
+						<parameter name="XML_TIME_ZONE">
+							<expression><![CDATA[$P{XML_TIME_ZONE}]]></expression>
+						</parameter>
+						<parameter name="net.sf.jasperreports.xml.source">
+							<expression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></expression>
+						</parameter>
+						<parameter name="billId">
+							<expression><![CDATA[$F{billId}]]></expression>
+						</parameter>
+						<parameter name="sequence">
+							<expression><![CDATA[$F{sequence}]]></expression>
+						</parameter>
+					</datasetRun>
+					<column kind="single" uuid="ac0db9a6-1d95-4d9e-bcae-4f128ddedc64" width="329">
+						<tableFooter height="40" rowSpan="1">
+							<element kind="frame" uuid="761820d7-8ed4-476e-a7ce-2fcbfb2f508e" x="0" y="0" width="329" height="40">
+								<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+								<element kind="textField" uuid="8957e59f-2adf-4a65-8f1d-5451b9784706" positionType="Float" stretchType="ElementGroupHeight" x="2" y="1" width="326" height="10" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" blankWhenNull="true" vTextAlign="Middle">
+									<expression><![CDATA["Total Current Billing Charges"]]></expression>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									<box leftPadding="5">
+										<pen lineWidth="0.0"/>
+										<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C4C4C4"/>
+										<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+								</element>
+								<element kind="textField" uuid="dd0199f8-456e-4a38-a843-b489d50ea373" stretchType="ContainerHeight" x="268" y="1" width="10" height="10" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+									<expression><![CDATA["$"]]></expression>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									<box leftPadding="0">
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+								</element>
+								<element kind="textField" uuid="cbeac6bb-cbd3-4606-9eff-02c64d749a96" positionType="Float" stretchType="ElementGroupHeight" x="248" y="0" width="80" height="10" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" pattern="#,##0.00#;#,##0.00#" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+									<expression><![CDATA[$P{CurrChgAmt}]]></expression>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									<box leftPadding="0" rightPadding="5">
+										<pen lineWidth="0.0"/>
+										<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C4C4C4"/>
+										<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+								</element>
+							</element>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</tableFooter>
+						<columnHeader height="2" rowSpan="1"/>
+						<detailCell height="10">
+							<element kind="frame" uuid="5ba1ec56-2f3b-4f00-aab0-1ef2fb24f488" x="0" y="0" width="329" height="10">
+								<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								<element kind="textField" uuid="c4ffeae8-adac-42ce-b143-555768adb942" positionType="Float" stretchType="ElementGroupHeight" x="2" y="0" width="326" height="10" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" blankWhenNull="true" vTextAlign="Middle">
+									<expression><![CDATA[$F{calcLineDescrOnBill}]]></expression>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									<box leftPadding="5">
+										<pen lineWidth="0.0"/>
+										<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C4C4C4"/>
+										<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+								</element>
+								<element kind="textField" uuid="a36632fd-47e7-4d4c-8417-6f404272f867" positionType="Float" stretchType="ElementGroupHeight" x="248" y="0" width="80" height="10" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" pattern="#,##0.00#;#,##0.00#" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+									<expression><![CDATA[$F{calcLineCalcAmt}]]></expression>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									<box leftPadding="0" rightPadding="5">
+										<pen lineWidth="0.0"/>
+										<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C4C4C4"/>
+										<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+								</element>
+								<element kind="textField" uuid="ec4d08dc-f3b9-4c61-85bc-99e261672d08" stretchType="ContainerHeight" x="268" y="0" width="10" height="10" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+									<expression><![CDATA["$"]]></expression>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									<box leftPadding="0">
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+								</element>
+								<box>
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+							</element>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box>
+								<topPen lineWidth="0.0"/>
+								<leftPen lineWidth="0.0"/>
+								<bottomPen lineWidth="0.0"/>
+								<rightPen lineWidth="0.0"/>
+							</box>
+						</detailCell>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+					</column>
+				</component>
+				<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+				<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+				<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+				<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="frame" uuid="1ea8c4b0-e0b1-4007-893e-48497af12bf4" positionType="Float" stretchType="ElementGroupHeight" x="0" y="100" width="291" height="12">
+				<printWhenExpression><![CDATA[$F{payList}!=null]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="frame" uuid="e41f5acf-16d8-445d-b141-a3247435186a" positionType="Float" x="338" y="17" width="231" height="53">
+				<borderSplitType>DrawBorders</borderSplitType>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="ShowOutOfBoundContent" value="true"/>
+				<element kind="rectangle" uuid="53f6838e-e6ed-4587-aff6-0df8b7252a7d" x="7" y="0" width="224" height="21" backcolor="#C7143B" radius="5">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<pen lineColor="#C7143B"/>
+				</element>
+				<element kind="staticText" uuid="42e6f814-c536-4099-9735-e0d7b01d12c7" x="4" y="3" width="227" height="15" forecolor="#FFFFFF" fontName="Tahoma" fontSize="11.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+					<text><![CDATA[Important Notices]]></text>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</element>
+				<element kind="component" uuid="429db5a6-0817-469c-a679-c5616836d2fe" x="9" y="24" width="222" height="20">
+					<component kind="list" printOrder="Vertical">
+						<datasetRun uuid="26320e3a-e6b5-4c75-997e-812e17e6814f" subDataset="billMsgList">
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							<parameter name="accountId">
+								<expression><![CDATA[$F{accountId}]]></expression>
+							</parameter>
+							<parameter name="premiseId">
+								<expression><![CDATA[$F{premiseId}]]></expression>
+							</parameter>
+							<parameter name="XML_DATA_DOCUMENT">
+								<expression><![CDATA[$P{XML_DATA_DOCUMENT}]]></expression>
+							</parameter>
+							<parameter name="XML_DATE_PATTERN">
+								<expression><![CDATA[$P{XML_DATE_PATTERN}]]></expression>
+							</parameter>
+							<parameter name="XML_FILE">
+								<expression><![CDATA[$P{XML_FILE}]]></expression>
+							</parameter>
+							<parameter name="net.sf.jasperreports.xml.source">
+								<expression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></expression>
+							</parameter>
+							<parameter name="XML_INPUT_STREAM">
+								<expression><![CDATA[$P{XML_INPUT_STREAM}]]></expression>
+							</parameter>
+							<parameter name="XML_LOCALE">
+								<expression><![CDATA[$P{XML_LOCALE}]]></expression>
+							</parameter>
+							<parameter name="XML_NUMBER_PATTERN">
+								<expression><![CDATA[$P{XML_NUMBER_PATTERN}]]></expression>
+							</parameter>
+							<parameter name="XML_TIME_ZONE">
+								<expression><![CDATA[$P{XML_TIME_ZONE}]]></expression>
+							</parameter>
+							<parameter name="billId">
+								<expression><![CDATA[$F{billId}]]></expression>
+							</parameter>
+							<parameter name="sequence">
+								<expression><![CDATA[$F{sequence}]]></expression>
+							</parameter>
+						</datasetRun>
+						<contents height="20" width="222">
+							<element kind="frame" uuid="41d9e1f8-a714-4b16-92d2-4bbdae407764" x="0" y="0" width="222" height="20">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<element kind="textField" uuid="8acbf688-14bb-415e-9b37-9bdaa47a8693" stretchType="ElementGroupHeight" x="0" y="3" width="222" height="17" markup="none" fontName="Tahoma" fontSize="10.0" textAdjust="StretchHeight" blankWhenNull="true" hTextAlign="Left" vTextAlign="Top">
+									<paragraph lineSpacingSize="1.0"/>
+									<expression><![CDATA[$F{msgOnBill}]]></expression>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									<box leftPadding="2"/>
+								</element>
+							</element>
+						</contents>
+					</component>
+				</element>
+				<box>
+					<pen lineWidth="0.0"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="d57f2f33-8079-4c44-b0b5-abbe2250af10" x="6" y="48" width="90" height="12" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+				<expression><![CDATA["Total Payments"]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="e1586b61-14dd-4361-a4a5-eedf6ab42372" x="249" y="48" width="80" height="12" fontName="Tahoma" fontSize="8.0" pattern="#,##0.00#;(-#,##0.00#)" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{currPayAmt}]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="f5097896-fee8-403d-b0ba-d0a801f61e43" x="6" y="58" width="90" height="12" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+				<expression><![CDATA["Total Adjustments"]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="4ae8374d-b3f9-4473-8144-3829ce11d470" x="249" y="58" width="80" height="12" fontName="Tahoma" fontSize="8.0" pattern="#,##0.00#;(-#,##0.00#)" blankWhenNull="false" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{currAdjAmt}]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="d7d83b16-3bd9-45d9-ba8d-7cd18ca7129d" x="6" y="68" width="90" height="12" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+				<expression><![CDATA["Total Bill Corrections"]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="5409280e-fe81-4754-99ca-7894fba6fe8b" x="249" y="68" width="80" height="12" fontName="Tahoma" fontSize="8.0" pattern="#,##0.00#;(-#,##0.00#)" blankWhenNull="false" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{currCorrAmt}]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="a779ff95-eff0-4456-92e7-8458ab453aac" x="6" y="78" width="118" height="12" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+				<expression><![CDATA["Total Current Billing Charges"]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="5824d497-311c-4ba0-ba8c-a21789bb6b4c" x="249" y="78" width="80" height="12" fontName="Tahoma" fontSize="8.0" pattern="#,##0.00#;(-#,##0.00#)" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{currChgAmt}]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="f035e2aa-ccdc-42ca-91e0-83703d755fb0" x="0" y="88" width="118" height="12" fontName="Tahoma" fontSize="8.0" vTextAlign="Middle">
+				<expression><![CDATA["Ending Balance This Period"]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="502c34db-8991-4511-8c51-fea699f13457" x="249" y="88" width="80" height="12" fontName="Tahoma" fontSize="8.0" pattern="#,##0.00#;(-#,##0.00#)" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{currBal}]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="a936f595-71c1-4b63-b371-7fda70589d4e" stretchType="ContainerHeight" x="268" y="48" width="10" height="10" fontName="Tahoma" fontSize="8.0">
+				<expression><![CDATA["$"]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box leftPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="5a491b8e-dfc4-47bc-9ed3-abac56a8b8a2" stretchType="ContainerHeight" x="268" y="39" width="10" height="10" fontName="Tahoma" fontSize="8.0">
+				<expression><![CDATA["$"]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box leftPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="a7bb94d6-0c07-4910-8dfd-494ffef70670" stretchType="ContainerHeight" x="268" y="58" width="10" height="10" fontName="Tahoma" fontSize="8.0">
+				<expression><![CDATA["$"]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box leftPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="a89f07ee-cf1b-427e-933c-f3235bcf00ed" stretchType="ContainerHeight" x="268" y="68" width="10" height="10" fontName="Tahoma" fontSize="8.0">
+				<expression><![CDATA["$"]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box leftPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="8c3b85a2-2642-472d-89cf-5e1b4c32dbbc" stretchType="ContainerHeight" x="268" y="78" width="10" height="10" fontName="Tahoma" fontSize="8.0">
+				<expression><![CDATA["$"]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box leftPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="1bd5360e-eb0c-4da4-82b8-f32081790826" stretchType="ContainerHeight" x="268" y="88" width="10" height="10" fontName="Tahoma" fontSize="8.0">
+				<expression><![CDATA["$"]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box leftPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="component" uuid="3fb2973a-05c9-4e75-a8af-5fa4afb5f027" x="0" y="128" width="325" height="11" forecolor="#FFFFFF">
+				<component kind="table" whenNoDataType="Blank">
+					<datasetRun uuid="244a6b91-8c05-4c3f-a82b-32d4d37538e6" subDataset="currentActivityNonPrem">
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						<parameter name="CurrAdjAmt">
+							<expression><![CDATA[$F{currAdjAmt}]]></expression>
+						</parameter>
+						<parameter name="CurrBal">
+							<expression><![CDATA[$F{currBal}]]></expression>
+						</parameter>
+						<parameter name="CurrChgAmt">
+							<expression><![CDATA[$F{currChgAmt}]]></expression>
+						</parameter>
+						<parameter name="TotBal">
+							<expression><![CDATA[$F{totBal}]]></expression>
+						</parameter>
+						<parameter name="accountId">
+							<expression><![CDATA[$F{accountId}]]></expression>
+						</parameter>
+						<parameter name="premiseId">
+							<expression><![CDATA[$F{premiseId}]]></expression>
+						</parameter>
+						<parameter name="XML_DATA_DOCUMENT">
+							<expression><![CDATA[$P{XML_DATA_DOCUMENT}]]></expression>
+						</parameter>
+						<parameter name="XML_DATE_PATTERN">
+							<expression><![CDATA[$P{XML_DATE_PATTERN}]]></expression>
+						</parameter>
+						<parameter name="XML_FILE">
+							<expression><![CDATA[$P{XML_FILE}]]></expression>
+						</parameter>
+						<parameter name="XML_INPUT_STREAM">
+							<expression><![CDATA[$P{XML_INPUT_STREAM}]]></expression>
+						</parameter>
+						<parameter name="XML_LOCALE">
+							<expression><![CDATA[$P{XML_LOCALE}]]></expression>
+						</parameter>
+						<parameter name="XML_NUMBER_PATTERN">
+							<expression><![CDATA[$P{XML_NUMBER_PATTERN}]]></expression>
+						</parameter>
+						<parameter name="XML_TIME_ZONE">
+							<expression><![CDATA[$P{XML_TIME_ZONE}]]></expression>
+						</parameter>
+						<parameter name="net.sf.jasperreports.xml.source">
+							<expression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></expression>
+						</parameter>
+						<parameter name="billId">
+							<expression><![CDATA[$F{billId}]]></expression>
+						</parameter>
+						<parameter name="sequence">
+							<expression><![CDATA[$F{sequence}]]></expression>
+						</parameter>
+					</datasetRun>
+					<column kind="single" uuid="9a97101b-e762-4b01-9c3b-412102b997f8" width="325">
+						<tableFooter height="40" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</tableFooter>
+						<columnHeader height="2"/>
+						<detailCell height="10">
+							<element kind="frame" uuid="b6298942-4a12-4c43-8aea-130e11baf0cb" x="0" y="0" width="325" height="10">
+								<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								<element kind="textField" uuid="099011d1-25cf-433b-825b-537b59d4917c" positionType="Float" stretchType="ElementGroupHeight" x="2" y="0" width="278" height="10" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" blankWhenNull="true">
+									<expression><![CDATA[$F{calcHdrDescrOnBill}]]></expression>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									<box leftPadding="5">
+										<pen lineWidth="0.0"/>
+										<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+								</element>
+								<element kind="textField" uuid="0964bdcd-5463-488c-b9e3-13c2187d4d3c" positionType="Float" stretchType="ElementGroupHeight" x="245" y="0" width="80" height="10" fontName="Tahoma" fontSize="8.0" textAdjust="StretchHeight" pattern="#,##0.00#;(-#,##0.00#)" blankWhenNull="true" hTextAlign="Right">
+									<expression><![CDATA[$F{calcLineCalcAmtNon}]]></expression>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									<box leftPadding="0" rightPadding="5">
+										<pen lineWidth="0.0"/>
+										<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+								</element>
+								<element kind="textField" uuid="0c967dbd-c1b9-4f8f-94a4-13e4f49bc019" stretchType="ContainerHeight" x="268" y="0" width="10" height="10" fontName="Tahoma" fontSize="8.0">
+									<expression><![CDATA["$"]]></expression>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									<box leftPadding="0">
+										<pen lineWidth="0.0"/>
+										<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+								</element>
+								<box>
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+							</element>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box>
+								<topPen lineWidth="0.0"/>
+								<leftPen lineWidth="0.0"/>
+								<bottomPen lineWidth="0.0"/>
+								<rightPen lineWidth="0.0"/>
+							</box>
+						</detailCell>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+					</column>
+				</component>
+				<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+				<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+				<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+				<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="39100745-1788-4b51-96e3-0d38d2cdb178" x="0" y="109" width="325" height="20" backcolor="#0EC414" radius="5">
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<pen lineStyle="Solid" lineColor="#0EC414"/>
+			</element>
+			<element kind="staticText" uuid="74635f09-1f3c-4c7e-9480-b217c10350ee" x="5" y="109" width="320" height="20" forecolor="#FFFFFF" fontName="Tahoma" fontSize="11.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[Current Activity]]></text>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="textField" uuid="a69bcc94-1741-4c23-9da2-4b901f6e3599" stretchType="ContainerHeight" mode="Opaque" x="-1" y="40" width="330" height="99" forecolor="#080707" markup="html" fontName="Tahoma" fontSize="10.0" textAdjust="StretchHeight" blankWhenNull="true" printWhenDetailOverflows="true" bold="false" hTextAlign="Left" vTextAlign="Top">
+				<printWhenExpression><![CDATA[$F{billFormat}.equals( "S" )]]></printWhenExpression>
+				<paragraph lineSpacing="Single"/>
+				<expression><![CDATA[$F{summaryBillText}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box topPadding="5" leftPadding="10" rightPadding="10"/>
+			</element>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</detail>
+</jasperReport>

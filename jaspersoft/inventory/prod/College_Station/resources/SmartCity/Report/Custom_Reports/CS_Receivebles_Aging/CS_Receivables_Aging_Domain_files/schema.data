@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Receivables_Aging" label="Receivables_Aging" resourceId="Receivables_Aging"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CollegeStation_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="ACCT_ID" label="Account ID" resourceId="Receivables_Aging.ACCT_ID"></item>
+    <item id="BKT1" label="Bucket 1" resourceId="Receivables_Aging.BKT1"></item>
+    <item id="BKT2" label="Bucket 2" resourceId="Receivables_Aging.BKT2"></item>
+    <item id="BKT3" label="Bucket 3" resourceId="Receivables_Aging.BKT3"></item>
+    <item id="BKT4" label="Bucket 4" resourceId="Receivables_Aging.BKT4"></item>
+    <item id="CUR_POS_FLG" label="CUR_POS_FLG" resourceId="Receivables_Aging.CUR_POS_FLG"></item>
+    <item id="CUR_SYMBOL" label="Currency" resourceId="Receivables_Aging.CUR_SYMBOL"></item>
+    <item id="CURR_DESC" label="Currency Desription" resourceId="Receivables_Aging.CURR_DESC"></item>
+    <item id="CURRENCY_CD" label="Currency" resourceId="Receivables_Aging.CURRENCY_CD"></item>
+    <item id="CUST_CL" label="CUST_CL" resourceId="Receivables_Aging.CUST_CL"></item>
+    <item id="CUST_CL_CD" label="Customer Class" resourceId="Receivables_Aging.CUST_CL_CD"></item>
+    <item id="CUTOFF_DATE" label="Cutoff Date" resourceId="Receivables_Aging.CUTOFF_DATE"></item>
+    <item id="DECIMAL_POSITIONS" label="Decimal Positions" resourceId="Receivables_Aging.DECIMAL_POSITIONS"></item>
+    <item id="ENTITY_NAME" label="Name" resourceId="Receivables_Aging.ENTITY_NAME"></item>
+    <item id="MESSAGE_TEXT" label="Message Text" resourceId="Receivables_Aging.MESSAGE_TEXT"></item>
+    <item id="PAY" label="Pay" resourceId="Receivables_Aging.PAY"></item>
+    <item id="RETURN_CODE" label="Return Code" resourceId="Receivables_Aging.RETURN_CODE"></item>
+    <item id="SCALE_POSITIONS" label="Scale Positions" resourceId="Receivables_Aging.SCALE_POSITIONS"></item>
+    <item id="TOT_AR" label="Total AR" resourceId="Receivables_Aging.TOT_AR"></item>
+    <item id="UB_AR" label="Unbilled AR" resourceId="Receivables_Aging.UB_AR"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Receivables_Aging" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="RETURN_CODE" type="java.math.BigDecimal"></field>
+        <field id="MESSAGE_TEXT" type="java.lang.String"></field>
+        <field id="CUTOFF_DATE" type="java.sql.Timestamp"></field>
+        <field id="CURRENCY_CD" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CUST_CL" type="java.lang.String"></field>
+        <field id="TOT_AR" type="java.math.BigDecimal"></field>
+        <field id="UB_AR" type="java.math.BigDecimal"></field>
+        <field id="PAY" type="java.math.BigDecimal"></field>
+        <field id="BKT1" type="java.math.BigDecimal"></field>
+        <field id="BKT2" type="java.math.BigDecimal"></field>
+        <field id="BKT3" type="java.math.BigDecimal"></field>
+        <field id="BKT4" type="java.math.BigDecimal"></field>
+        <field id="CUR_SYMBOL" type="java.lang.String"></field>
+        <field id="DECIMAL_POSITIONS" type="java.math.BigDecimal"></field>
+        <field id="SCALE_POSITIONS" type="java.math.BigDecimal"></field>
+        <field id="CUR_POS_FLG" type="java.lang.String"></field>
+        <field id="CURR_DESC" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT 
+       *
+FROM TABLE(CISADM.CIRCVAGAFN(
+    'SYSUSER',
+    SYSDATE,
+    20,
+    30,
+    60
+  ))</query>
+    </jdbcQuery>
+  </resources>
+</schema>

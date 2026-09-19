@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CS_CONNECT" label="CS_CONNECT" resourceId="CS_CONNECT"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CollegeStation_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="CIS_DIVISION" label="CIS Division" resourceId="CS_CONNECT.CIS_DIVISION"></item>
+    <item id="SA_STATUS_DESCR" label="SA Status Description" resourceId="CS_CONNECT.SA_STATUS_DESCR"></item>
+    <item id="SA_STATUS_FLG" label="SA Status" resourceId="CS_CONNECT.SA_STATUS_FLG"></item>
+    <item id="SA_TYPE_CD" label="Service Agreement Type" resourceId="CS_CONNECT.SA_TYPE_CD"></item>
+    <item id="SA_TYPE_DESCR" label="SA Type Description" resourceId="CS_CONNECT.SA_TYPE_DESCR"></item>
+    <item id="APT_NUM" label="Apt #" resourceId="CS_CONNECT.APT_NUM"></item>
+    <item id="CONNECT_DATE" label="Connect Date" resourceId="CS_CONNECT.CONNECT_DATE"></item>
+    <item id="CUS_ID" label="Cus ID" resourceId="CS_CONNECT.CUS_ID"></item>
+    <item id="CUSTOMER_NAME" label="Customer Name" resourceId="CS_CONNECT.CUSTOMER_NAME"></item>
+    <item id="DISCONNECT_DATE" label="Disconnect Date" resourceId="CS_CONNECT.DISCONNECT_DATE"></item>
+    <item id="LOC_ID" label="Loc ID" resourceId="CS_CONNECT.LOC_ID"></item>
+    <item id="STREET_NAME" label="Street Name" resourceId="CS_CONNECT.STREET_NAME"></item>
+    <item id="STREET_NUM" label="Street Number" resourceId="CS_CONNECT.STREET_NUM"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CS_CONNECT" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="LOC_ID" type="java.lang.String"></field>
+        <field id="CUS_ID" type="java.lang.String"></field>
+        <field id="CUSTOMER_NAME" type="java.lang.String"></field>
+        <field id="CONNECT_DATE" type="java.sql.Timestamp"></field>
+        <field id="DISCONNECT_DATE" type="java.sql.Timestamp"></field>
+        <field id="STREET_NUM" type="java.lang.String"></field>
+        <field id="STREET_NAME" type="java.lang.String"></field>
+        <field id="APT_NUM" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="SA_TYPE_DESCR" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="SA_STATUS_DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT DISTINCT 
+    PREM.PREM_ID AS LOC_ID,
+    PN.PER_ID AS CUS_ID,
+    PN.ENTITY_NAME AS CUSTOMER_NAME,
+    SA.START_DT AS CONNECT_DATE,
+    SA.END_DT AS DISCONNECT_DATE,
+    SA.CIS_DIVISION,
+    SA.SA_TYPE_CD,
+    SATL.DESCR AS SA_TYPE_DESCR,
+    SA.SA_STATUS_FLG,
+    LKUPVL.DESCR AS SA_STATUS_DESCR,
+    SUBSTR(PREM.ADDRESS1,1,INSTR(PREM.ADDRESS1,' ')-1) AS STREET_NUM,
+    CASE WHEN REGEXP_LIKE(SUBSTR(PREM.ADDRESS1,INSTR(PREM.ADDRESS1,' ',-1,1)+1), '^\d+$') THEN SUBSTR(ADDRESS1, INSTR(PREM.ADDRESS1,' ',1,1) + 1,INSTR(PREM.ADDRESS1,' ',-1,1)-INSTR(PREM.ADDRESS1,' ',1,1))
+    ELSE SUBSTR(PREM.ADDRESS1,INSTR(PREM.ADDRESS1,' ',1,1)+1)
+    END AS STREET_NAME,
+    CASE WHEN REGEXP_LIKE(SUBSTR(PREM.ADDRESS1,INSTR(PREM.ADDRESS1,' ',-1,1)+1), '^\d+$') THEN SUBSTR(PREM.ADDRESS1,INSTR(PREM.ADDRESS1,' ',-1,1)+1)
+    ELSE ' '
+    END AS APT_NUM
+FROM
+    CISADM.CI_SA SA,
+    CISADM.CI_ACCT_PER AP,
+    CISADM.CI_PER_NAME PN,
+    CISADM.CI_PREM PREM,
+    CISADM.CI_SA_TYPE_L SATL,
+    CISADM.CI_LOOKUP_VAL_L LKUPVL
+WHERE
+    SA.ACCT_ID = AP.ACCT_ID
+    AND PN.PER_ID = AP.PER_ID
+    AND SA.CHAR_PREM_ID = PREM.PREM_ID
+    AND AP.MAIN_CUST_SW = 'Y'
+    AND PN.PRIM_NAME_SW = 'Y'
+    AND SATL.SA_TYPE_CD = SA.SA_TYPE_CD
+    AND SATL.CIS_DIVISION = SA.CIS_DIVISION
+    AND SATL.LANGUAGE_CD = 'ENG'
+    AND LKUPVL.FIELD_NAME = 'SA_STATUS_FLG'
+    AND LKUPVL.FIELD_VALUE = SA.SA_STATUS_FLG
+    AND LKUPVL.LANGUAGE_CD = 'ENG'
+    AND REGEXP_LIKE(SUBSTR(PREM.ADDRESS1, 1, INSTR(PREM.ADDRESS1, ' ') - 1), '^\d+$')
+    AND NOT REGEXP_LIKE(SUBSTR(PREM.ADDRESS1, INSTR(PREM.ADDRESS1, ' ') + 1, INSTR(PREM.ADDRESS1, ' ', 1, 2) - INSTR(PREM.ADDRESS1, ' ')-1), '^\d+$')
+    AND (SA.END_DT IS NULL OR SA.START_DT != SA.END_DT)
+UNION
+SELECT
+    DISTINCT PREM.PREM_ID AS LOC_ID,
+    PN.PER_ID AS CUS_ID,
+    PN.ENTITY_NAME AS CUSTOMER_NAME,
+    SA.START_DT AS CONNECT_DATE,
+    SA.END_DT AS DISCONNECT_DATE,
+    SA.CIS_DIVISION,
+    SA.SA_TYPE_CD,
+    SATL.DESCR AS SA_TYPE_DESCR,
+    SA.SA_STATUS_FLG,
+    LKUPVL.DESCR AS SA_STATUS_DESCR,
+    SUBSTR(ADDRESS1, INSTR(PREM.ADDRESS1,' ',1,1) + 1,INSTR(PREM.ADDRESS1,' ',1,2)-INSTR(PREM.ADDRESS1,' ',1,1)-1) AS STREET_NUM,
+    SUBSTR(ADDRESS1, INSTR(PREM.ADDRESS1,' ',1,2) + 1) AS STREET_NAME,
+    SUBSTR(PREM.ADDRESS1,1,INSTR(PREM.ADDRESS1,' ')-1) AS APT_NUM
+FROM
+    CISADM.CI_SA SA,
+    CISADM.CI_ACCT_PER AP,
+    CISADM.CI_PER_NAME PN,
+    CISADM.CI_PREM PREM,
+    CISADM.CI_SA_TYPE_L SATL,
+    CISADM.CI_LOOKUP_VAL_L LKUPVL
+WHERE
+    SA.ACCT_ID = AP.ACCT_ID
+    AND PN.PER_ID = AP.PER_ID
+    AND SA.CHAR_PREM_ID = PREM.PREM_ID
+    AND AP.MAIN_CUST_SW = 'Y'
+    AND PN.PRIM_NAME_SW = 'Y'
+    AND SATL.SA_TYPE_CD = SA.SA_TYPE_CD
+    AND SATL.CIS_DIVISION = SA.CIS_DIVISION
+    AND SATL.LANGUAGE_CD = 'ENG'
+    AND LKUPVL.FIELD_NAME = 'SA_STATUS_FLG'
+    AND LKUPVL.FIELD_VALUE = SA.SA_STATUS_FLG
+    AND LKUPVL.LANGUAGE_CD = 'ENG'
+    AND (SA.END_DT IS NULL OR SA.START_DT != SA.END_DT)
+    AND REGEXP_LIKE(SUBSTR(PREM.ADDRESS1, 1, INSTR(PREM.ADDRESS1, ' ') - 1), '^\d+$')
+    AND REGEXP_LIKE(SUBSTR(PREM.ADDRESS1, INSTR(PREM.ADDRESS1, ' ') + 1, INSTR(PREM.ADDRESS1, ' ', 1, 2) - INSTR(PREM.ADDRESS1, ' ') - 1), '^\d+$')</query>
+    </jdbcQuery>
+  </resources>
+</schema>

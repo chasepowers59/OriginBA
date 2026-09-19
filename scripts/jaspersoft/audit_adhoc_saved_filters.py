@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+"""Saved Ad Hoc filters that name another client's configuration.
+
+An Ad Hoc view keeps its filters in its stateXML (expressionString), values included. The
+Standard Offering is authored on Origin_DEV over Ellensburg's data, so a promoted view can
+carry 'SA_TYPE_DESCR in ("Electric Commercial", ...)' into a water utility, where it returns
+nothing. This audit reads an org's committed inventory (jaspersoft/inventory/<env>/<org>) and
+checks every literal in every saved filter against the client's own configuration export
+(the explorer's config_pack.json: every code and description per client) and against the
+source client's, so each filter falls into one of:
+
+  fine        the value is configured at the target client (or is a base-product word that
+              neither client configures: 'Frozen', 'Canceled', 'Completed')
+  MISMATCH    the value is the SOURCE client's configuration wording and the target does not
+              have it -- the view returns nothing at the target until it is changed
+
+Values are compared trimmed and case-insensitively; relative dates (MONTH-1), Y/N and ISO
+dates are skipped. Dashboards embed their own copy of a view's state, so a fix to a view must
+be applied to every dashboard that embeds it; the embedded copies are counted separately.
+
+    python3 scripts/jaspersoft/audit_adhoc_saved_filters.py --env test --org Fond_Du_Lac \\
+        --client fonddulac [--source ellensburg] [--markdown jaspersoft/docs/x.md]
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+from collections import defaultdict
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[2]
+CONFIG_PACK = Path(os.environ.get("ORIGINBA_DBT_DIR", os.path.expanduser("~/originba_dbt"))) / "tools/smartcity-config-explorer/app/data/config_pack.json"
+RELATIVE = re.compile(r"^(DAY|WEEK|MONTH|QUARTER|SEMI|YEAR)[+-]?\d*$", re.I)
+DESC_FIELD = re.compile(r"DESC|DESCR|LABEL|NAME$", re.I)
+
+
+def configuration(client: str):
+    rows = [r for r in json.load(open(CONFIG_PACK)) if r["client"] == client]
+    codes, descs, by_table = defaultdict(set), defaultdict(set), defaultdict(dict)
+    for r in rows:
+        key, descr = str(r["key"]).strip(), str(r["key_descr"] or "").strip()
+        codes[key.upper()].add(r["tbl_name"])
+        if descr:
+            descs[descr.upper()].add(r["tbl_name"])
+        by_table[r["tbl_name"]][key] = descr
+    if not rows:
+        raise SystemExit(f"no configuration rows for client {client!r} in {CONFIG_PACK}")
+    return codes, descs, by_table
+
+
+def literals(expr: str):
+    expr = expr.replace("&apos;", "'").replace("&quot;", '"')
+    field = re.match(r"\s*([\w.]+)", expr)
+    out = []
+    for v in (x.strip() for x in re.findall(r"'([^']*)'", expr)):
+        if not re.search(r"[A-Za-z]", v) or RELATIVE.match(v) or v.upper() in ("Y", "N") or re.match(r"\d{4}-\d{2}-\d{2}", v):
+            continue
+        out.append(v)
+    return (field.group(1) if field else "?"), out
+
+
+def audit(env: str, org: str, client: str, source: str):
+    t_codes, t_descs, t_tables = configuration(client)
+    s_codes, s_descs, _ = configuration(source)
+    root = next(d for d in (REPO / "jaspersoft/inventory" / env / org).rglob("Standard_Offering") if d.is_dir())
+    views, embedded = [], 0
+    for state in sorted(root.rglob("stateXML.data")):
+        owner = state.parent.parent / (state.parent.name[:-6] + ".xml")
+        kind = re.match(r"\s*(?:<\?xml[^>]*>\s*)?<(\w+)", owner.read_text(errors="ignore")).group(1) if owner.exists() else "?"
+        if kind != "adhocDataView":
+            embedded += 1
+            continue
+        text = state.read_text(errors="ignore")
+        title = re.search(r"<title>([^<]*)</title>", text)
+        findings = []
+        for m in re.finditer(r"<expressionString>([^<]*)</expressionString>", text):
+            field, values = literals(m.group(1))
+            is_desc = bool(DESC_FIELD.search(field))
+            for v in values:
+                key = v.upper()
+                at_target = key in (t_descs if is_desc else t_codes)
+                at_source = key in (s_descs if is_desc else s_codes)
+                if at_target or not at_source:
+                    continue
+                tables = sorted((s_descs if is_desc else s_codes)[key])
+                findings.append({"field": field.split(".")[-1], "value": v, "table": tables[0],
+                                 "target_has": len(t_tables.get(tables[0], {}))})
+        if findings:
+            views.append({"module": state.relative_to(root).parts[0], "view": state.parent.name[:-6],
+                          "title": title.group(1) if title else "", "findings": findings})
+    return views, embedded, t_tables
+
+
+def markdown(env, org, client, source, views, embedded, t_tables) -> str:
+    n = sum(len(v["findings"]) for v in views)
+    lines = [f"# Saved filters in {org} ({env}) that name {source}'s configuration", "",
+             f"Generated by `scripts/jaspersoft/audit_adhoc_saved_filters.py` from the committed inventory. "
+             f"{n} filter values in {len(views)} Ad Hoc views use {source} configuration wording that {client} does not have; "
+             f"each returns no rows at {client} until changed. {embedded} embedded view copies inside dashboards carry their own state "
+             "and need the same change. For every mismatched value the table names what the client configures instead; the choice is "
+             "the client's, never a guess.", ""]
+    by_table = defaultdict(set)
+    for v in views:
+        for f in v["findings"]:
+            by_table[f["table"]].add(f["value"])
+    lines += ["## By configuration table", "", "| Table | Source values used in filters | Target configures |", "| --- | ---: | ---: |"]
+    for tb, vals in sorted(by_table.items(), key=lambda x: -len(x[1])):
+        lines.append(f"| `{tb}` | {len(vals)} | {len(t_tables.get(tb, {}))} |")
+    lines += ["", "## By view", ""]
+    for v in views:
+        lines += [f"### {v['module']} / {v['view']}" + (f" — {v['title']}" if v["title"] else ""), "",
+                  "| Field | Value (source wording) | Table | What the target configures |", "| --- | --- | --- | --- |"]
+        for f in v["findings"]:
+            cands = ", ".join(sorted(d for d in t_tables.get(f["table"], {}).values() if d)[:10])
+            more = len(t_tables.get(f["table"], {})) - 10
+            lines.append(f"| `{f['field']}` | {f['value']} | `{f['table']}` | {cands}{f' … {more} more' if more > 0 else ''} |")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--env", default="test"); ap.add_argument("--org", required=True)
+    ap.add_argument("--client", required=True, help="config_pack client id, e.g. fonddulac")
+    ap.add_argument("--source", default="ellensburg", help="the client whose data the offering was authored over")
+    ap.add_argument("--markdown", help="write the review here")
+    ap.add_argument("--json", help="write the findings here")
+    a = ap.parse_args()
+    views, embedded, t_tables = audit(a.env, a.org, a.client, a.source)
+    n = sum(len(v["findings"]) for v in views)
+    print(f"[{a.env}] {a.org}: {n} mismatched filter values in {len(views)} views (+{embedded} embedded copies in dashboards)")
+    if a.markdown:
+        Path(a.markdown).write_text(markdown(a.env, a.org, a.client, a.source, views, embedded, t_tables)); print("wrote", a.markdown)
+    if a.json:
+        Path(a.json).write_text(json.dumps(views, indent=1)); print("wrote", a.json)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

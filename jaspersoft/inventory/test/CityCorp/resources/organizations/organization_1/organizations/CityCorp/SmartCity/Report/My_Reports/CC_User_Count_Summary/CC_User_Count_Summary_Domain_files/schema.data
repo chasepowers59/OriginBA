@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CM_MONTHLY_USER_ACTIVITY" label="CM_MONTHLY_USER_ACTIVITY" resourceId="CM_MONTHLY_USER_ACTIVITY"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="BO_STATUS_CD" label="BO_STATUS_CD" resourceId="CM_MONTHLY_USER_ACTIVITY.BO_STATUS_CD"></item>
+    <item id="D1_ACTIVITY_ID" label="D1_ACTIVITY_ID" resourceId="CM_MONTHLY_USER_ACTIVITY.D1_ACTIVITY_ID"></item>
+    <item id="FIELD_TASK_TYPE" label="FIELD_TASK_TYPE" resourceId="CM_MONTHLY_USER_ACTIVITY.FIELD_TASK_TYPE"></item>
+    <item id="SERVICE_ORDER_STATUS" label="SERVICE_ORDER_STATUS" resourceId="CM_MONTHLY_USER_ACTIVITY.SERVICE_ORDER_STATUS"></item>
+    <item id="STATUS_UPD_DTTM" label="STATUS_UPD_DTTM" resourceId="CM_MONTHLY_USER_ACTIVITY.STATUS_UPD_DTTM"></item>
+    <item id="TOTAL_PER_FIELD_TASK_PER_STATUS" label="TOTAL_PER_FIELD_TASK_PER_STATUS" resourceId="CM_MONTHLY_USER_ACTIVITY.TOTAL_PER_FIELD_TASK_PER_STATUS"></item>
+    <item id="USER_ID" label="USER_ID" resourceId="CM_MONTHLY_USER_ACTIVITY.USER_ID"></item>
+    <item id="USER_NAME" label="USER_NAME" resourceId="CM_MONTHLY_USER_ACTIVITY.USER_NAME"></item>
+    <item id="WORK_CENTER" label="WORK_CENTER" resourceId="CM_MONTHLY_USER_ACTIVITY.WORK_CENTER"></item>
+    <item id="WORK_CENTER_DESCR" label="WORK_CENTER_DESCR" resourceId="CM_MONTHLY_USER_ACTIVITY.WORK_CENTER_DESCR"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CM_MONTHLY_USER_ACTIVITY" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="D1_ACTIVITY_ID" type="java.lang.String"></field>
+        <field id="FIELD_TASK_TYPE" type="java.lang.String"></field>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="USER_NAME" type="java.lang.String"></field>
+        <field id="WORK_CENTER" type="java.lang.String"></field>
+        <field id="WORK_CENTER_DESCR" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="SERVICE_ORDER_STATUS" type="java.lang.String"></field>
+        <field id="STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="TOTAL_PER_FIELD_TASK_PER_STATUS" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+    A.*,
+    COUNT(1) OVER (PARTITION BY FIELD_TASK_TYPE, SERVICE_ORDER_STATUS) TOTAL_PER_FIELD_TASK_PER_STATUS
+FROM (
+    SELECT
+        AC.D1_ACTIVITY_ID,
+        AC.FIELD_TASK_TYPE,
+        USR.USER_ID,
+        USR.FIRST_NAME || ' ' || USR.LAST_NAME USER_NAME,
+        USC.CHAR_VAL WORK_CENTER,
+        CVL.DESCR WORK_CENTER_DESCR,
+        AC.BO_STATUS_CD,
+        CASE
+            WHEN AC.BO_STATUS_CD IN ('PENDING','VALERROR','WAITEFFTDT','WAITAPPT') THEN 'ENTERED'
+            WHEN AC.BO_STATUS_CD IN ('COMINPROG','COMERROR','EXECOMEVENTS','COMEVTERROR') THEN 'WORKED'
+            WHEN AC.BO_STATUS_CD IN ('COMPLETED','CANCELED') THEN 'CLOSED'
+        END SERVICE_ORDER_STATUS,
+        AC.STATUS_UPD_DTTM
+    FROM CISADM.D1_ACTIVITY AC 
+    INNER JOIN CISADM.D1_ACTIVITY_LOG ACL ON (AC.D1_ACTIVITY_ID = ACL.D1_ACTIVITY_ID AND ACL.LOG_ENTRY_TYPE_FLG = 'F1CR')
+    INNER JOIN CISADM.SC_USER USR ON (ACL.USER_ID = USR.USER_ID)
+    LEFT OUTER JOIN CISADM.SC_USER_CHAR USC ON (USC.USER_ID = USR.USER_ID AND USC.CHAR_TYPE_CD = 'WRKCNTR')
+    LEFT OUTER JOIN CISADM.CI_CHAR_VAL_L CVL ON (USC.CHAR_TYPE_CD = CVL.CHAR_TYPE_CD AND USC.CHAR_VAL = CVL.CHAR_VAL)
+    WHERE AC.BUS_OBJ_CD = 'D1-FieldActivity'
+    AND AC.FIELD_TASK_TYPE IS NOT NULL
+    AND AC.BO_STATUS_CD in ('PENDING','VALERROR','WAITEFFTDT','WAITAPPT','COMINPROG','COMERROR','EXECOMEVENTS','COMEVTERROR','COMPLETED','CANCELED')
+) A</query>
+    </jdbcQuery>
+  </resources>
+</schema>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="SA_BALANCES" label="SA_BALANCES" resourceId="SA_BALANCES"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="ACCT_ID" resourceId="SA_BALANCES.ACCT_ID"></item>
+    <item id="ARS_DT" label="ARS_DT" resourceId="SA_BALANCES.ARS_DT"></item>
+    <item id="CUR_AMT" label="CUR_AMT" resourceId="SA_BALANCES.CUR_AMT"></item>
+    <item id="DST_ID" label="DST_ID" resourceId="SA_BALANCES.DST_ID"></item>
+    <item id="FT_ID" label="FT_ID" resourceId="SA_BALANCES.FT_ID"></item>
+    <item id="FT_TYPE_FLG" label="FT_TYPE_FLG" resourceId="SA_BALANCES.FT_TYPE_FLG"></item>
+    <item id="OLD_ACCT_ID" label="OLD_ACCT_ID" resourceId="SA_BALANCES.OLD_ACCT_ID"></item>
+    <item id="RS_CD" label="RS_CD" resourceId="SA_BALANCES.RS_CD"></item>
+    <item id="SA_ID" label="SA_ID" resourceId="SA_BALANCES.SA_ID"></item>
+    <item id="SA_TYPE_CD" label="SA_TYPE_CD" resourceId="SA_BALANCES.SA_TYPE_CD"></item>
+    <item id="TOT_AMT" label="TOT_AMT" resourceId="SA_BALANCES.TOT_AMT"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="SA_BALANCES" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="OLD_ACCT_ID" type="java.lang.String"></field>
+        <field id="RS_CD" type="java.lang.String"></field>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="FT_ID" type="java.lang.String"></field>
+        <field id="FT_TYPE_FLG" type="java.lang.String"></field>
+        <field id="ARS_DT" type="java.sql.Timestamp"></field>
+        <field id="CUR_AMT" type="java.math.BigDecimal"></field>
+        <field id="TOT_AMT" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+    sa.acct_id, sa.sa_id, Sa.SA_tYPE_CD, sa.old_acct_id, SArs.RS_CD, sat.dst_id, FT.FT_ID, FT.FT_TYPE_FLG, FT.ARS_DT,
+    ft.cur_amt,
+    ft.tot_amt
+FROM
+    
+    cisadm.ci_sa      sa,
+    cisadm.ci_sa_type sat,
+    cisadm.CI_SA_RS_HIST sars,
+    cisadm.ci_ft      ft
+WHERE
+    --sa.acct_id = '9775709046'
+    --AND  
+    sa.sa_id = ft.sa_id 
+    --AND ft.ars_dt &lt;= ( sysdate )
+    AND sa.sa_type_cd = sat.sa_type_cd
+    and SA.sa_id = sars.sa_id</query>
+    </jdbcQuery>
+  </resources>
+</schema>

@@ -1,0 +1,66 @@
+{
+  "reportUnitUri": "/SmartCity/Report/Standard_Offering/Finance/gl_by_distribution_code_period",
+  "label": "GL Activity by Distribution Code",
+  "description": "GL lines of frozen financial transactions in an accounting-date window by distribution code and GL account: lines, debits, credits and net, with a month-by-month breakdown under each code.",
+  "dataSources": {
+    "DEV": "ORIGIN_DEV_DS",
+    "QA": "C2M_QA_DS",
+    "PROD": "C2M_PROD_DS"
+  },
+  "subreport": "reports/subreports/gl_by_distribution_code_month.jrxml  (a local jrxml resource of the unit named gl_by_distribution_code_month; the main says repo:gl_by_distribution_code_month)",
+  "inputControls": [
+    {
+      "id": "FROM_DT",
+      "label": "Accounting date from (inclusive)",
+      "type": "singleValueDate",
+      "mandatory": true,
+      "visible": true
+    },
+    {
+      "id": "TO_DT",
+      "label": "Accounting date to (inclusive)",
+      "type": "singleValueDate",
+      "mandatory": true,
+      "visible": true
+    },
+    {
+      "id": "DST_ID_F",
+      "label": "Distribution code (blank = all)",
+      "type": "singleSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "query": "SELECT TRIM(dst_id) AS CODE, TRIM(dst_id) || ' - ' || descr AS DESCR FROM CISADM.CI_DST_CODE_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_FT_GL g JOIN CISADM.CI_FT f ON f.ft_id = g.ft_id WHERE g.dst_id = l.dst_id AND f.accounting_dt >= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1"
+    },
+    {
+      "id": "GL_ACCT_F",
+      "label": "GL account (exact) (blank = all)",
+      "type": "singleValueText",
+      "mandatory": false,
+      "visible": true
+    },
+    {
+      "id": "GL_DIVISION_F",
+      "label": "GL division (blank = all)",
+      "type": "singleSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "query": "SELECT TRIM(gl_division) AS CODE, TRIM(gl_division) || ' - ' || descr AS DESCR FROM CISADM.CI_GL_DIVISION_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_FT f WHERE f.gl_division = l.gl_division AND f.accounting_dt >= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1"
+    },
+    {
+      "id": "CIS_DIVISION_F",
+      "label": "CIS division (blank = all)",
+      "type": "singleSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "query": "SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_SA sa WHERE sa.cis_division = l.cis_division AND (sa.end_dt IS NULL OR sa.end_dt >= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1"
+    },
+    {
+      "id": "FT_TYPE_FLG_F",
+      "label": "FT type (BS, BX, AD, AX, PS, PX) (blank = all)",
+      "type": "singleSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "query": "SELECT TRIM(field_value) AS CODE, TRIM(field_value) || ' - ' || descr AS DESCR FROM CISADM.CI_LOOKUP_VAL_L l WHERE l.field_name = 'FT_TYPE_FLG' AND l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_FT f WHERE f.ft_type_flg = l.field_value AND f.accounting_dt >= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1"
+    }
+  ]
+}

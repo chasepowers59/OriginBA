@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="PAY_TNDR_CASH_RPT_CURR" label="Tender Cashiering" resourceId="PAY_TNDR_CASH_RPT_CURR"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="PAY_TNDR_CASH_AUDIT" label="Snapshot Audit" resourceId="PAY_TNDR_CASH_RPT_CURR">
+      <items>
+        <item id="LOAD_DTTM" label="Snapshot Load Date Time" resourceId="PAY_TNDR_CASH_RPT_CURR.LOAD_DTTM"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_TNDR_CASH_ACCOUNT" label="Account And Customer" resourceId="PAY_TNDR_CASH_RPT_CURR">
+      <items>
+        <item id="PAYOR_ACCT_ID" label="Payor Account ID" resourceId="PAY_TNDR_CASH_RPT_CURR.PAYOR_ACCT_ID"></item>
+        <item id="PER_ID" label="Person ID" resourceId="PAY_TNDR_CASH_RPT_CURR.PER_ID"></item>
+        <item id="CUSTOMER_NAME" label="Customer Name" resourceId="PAY_TNDR_CASH_RPT_CURR.CUSTOMER_NAME"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_TNDR_CASH_EVENT" label="Payment Event" resourceId="PAY_TNDR_CASH_RPT_CURR">
+      <items>
+        <item id="PAY_EVENT_ID" label="Payment Event ID" resourceId="PAY_TNDR_CASH_RPT_CURR.PAY_EVENT_ID"></item>
+        <item id="PAY_DT" label="Payment Date" resourceId="PAY_TNDR_CASH_RPT_CURR.PAY_DT"></item>
+        <item id="EVENT_PAY_COUNT" label="Event Pay Count" resourceId="PAY_TNDR_CASH_RPT_CURR.EVENT_PAY_COUNT"></item>
+        <item id="SOLE_PAY_ID" label="Sole Pay ID" resourceId="PAY_TNDR_CASH_RPT_CURR.SOLE_PAY_ID"></item>
+        <item id="EVENT_PAY_STATUS_DESC" label="Event Pay Status" resourceId="PAY_TNDR_CASH_RPT_CURR.EVENT_PAY_STATUS_DESC"></item>
+        <item id="EVENT_PAY_STATUS_FLG" label="Event Pay Status Code" resourceId="PAY_TNDR_CASH_RPT_CURR.EVENT_PAY_STATUS_FLG"></item>
+        <item id="EVENT_PAY_AMT" label="Event Pay Amount" resourceId="PAY_TNDR_CASH_RPT_CURR.EVENT_PAY_AMT"></item>
+        <item id="EVENT_TENDER_COUNT" label="Event Tender Count" resourceId="PAY_TNDR_CASH_RPT_CURR.EVENT_TENDER_COUNT"></item>
+        <item id="EVENT_TENDER_AMT" label="Event Tender Amount" resourceId="PAY_TNDR_CASH_RPT_CURR.EVENT_TENDER_AMT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_TNDR_CASH_TENDER" label="Tender" resourceId="PAY_TNDR_CASH_RPT_CURR">
+      <items>
+        <item id="PAY_TENDER_ID" label="Pay Tender ID" resourceId="PAY_TNDR_CASH_RPT_CURR.PAY_TENDER_ID"></item>
+        <item id="TENDER_TYPE_DESC" label="Tender Type" resourceId="PAY_TNDR_CASH_RPT_CURR.TENDER_TYPE_DESC"></item>
+        <item id="TENDER_TYPE_CD" label="Tender Type Code" resourceId="PAY_TNDR_CASH_RPT_CURR.TENDER_TYPE_CD"></item>
+        <item id="TNDR_STATUS_FLG" label="Tender Status Code" resourceId="PAY_TNDR_CASH_RPT_CURR.TNDR_STATUS_FLG"></item>
+        <item id="TENDER_AMT" label="Tender Amount" resourceId="PAY_TNDR_CASH_RPT_CURR.TENDER_AMT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_TNDR_CASH_CHANNEL" label="Source Family And Tender Control" resourceId="PAY_TNDR_CASH_RPT_CURR">
+      <items>
+        <item id="SOURCE_FAMILY_DESC" label="Source Family" resourceId="PAY_TNDR_CASH_RPT_CURR.SOURCE_FAMILY_DESC"></item>
+        <item id="SOURCE_FAMILY_CD" label="Source Family Code" resourceId="PAY_TNDR_CASH_RPT_CURR.SOURCE_FAMILY_CD"></item>
+        <item id="TNDR_SOURCE_DESC" label="Tender Source" resourceId="PAY_TNDR_CASH_RPT_CURR.TNDR_SOURCE_DESC"></item>
+        <item id="TNDR_SOURCE_CD" label="Tender Source Code" resourceId="PAY_TNDR_CASH_RPT_CURR.TNDR_SOURCE_CD"></item>
+        <item id="TNDR_SRCE_TYPE_FLG" label="Tender Source Type Code" resourceId="PAY_TNDR_CASH_RPT_CURR.TNDR_SRCE_TYPE_FLG"></item>
+        <item id="TNDR_CTL_ID" label="Tender Control ID" resourceId="PAY_TNDR_CASH_RPT_CURR.TNDR_CTL_ID"></item>
+        <item id="TNDR_CTL_CRE_DTTM" label="Tender Control Create Date Time" resourceId="PAY_TNDR_CASH_RPT_CURR.TNDR_CTL_CRE_DTTM"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_TNDR_CASH_DEPOSIT" label="Deposit Control" resourceId="PAY_TNDR_CASH_RPT_CURR">
+      <items>
+        <item id="DEP_CTL_ID" label="Deposit Control ID" resourceId="PAY_TNDR_CASH_RPT_CURR.DEP_CTL_ID"></item>
+        <item id="DEP_CTL_CRE_DTTM" label="Deposit Control Create Date Time" resourceId="PAY_TNDR_CASH_RPT_CURR.DEP_CTL_CRE_DTTM"></item>
+        <item id="DEP_CTL_STATUS_FLG" label="Deposit Control Status Code" resourceId="PAY_TNDR_CASH_RPT_CURR.DEP_CTL_STATUS_FLG"></item>
+        <item id="DEP_CTL_SRCE_TYPE_FLG" label="Deposit Control Source Type Code" resourceId="PAY_TNDR_CASH_RPT_CURR.DEP_CTL_SRCE_TYPE_FLG"></item>
+        <item id="DEP_CTL_START_BALANCE" label="Deposit Control Start Balance" resourceId="PAY_TNDR_CASH_RPT_CURR.DEP_CTL_START_BALANCE"></item>
+        <item id="DEP_CTL_END_BALANCE" label="Deposit Control End Balance" resourceId="PAY_TNDR_CASH_RPT_CURR.DEP_CTL_END_BALANCE"></item>
+        <item id="DEP_CTL_TNDR_DEP_COUNT" label="Deposit Tender Deposit Count" resourceId="PAY_TNDR_CASH_RPT_CURR.DEP_CTL_TNDR_DEP_COUNT"></item>
+        <item id="DEP_CTL_TNDR_DEP_AMT" label="Deposit Tender Deposit Amount" resourceId="PAY_TNDR_CASH_RPT_CURR.DEP_CTL_TNDR_DEP_AMT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_TNDR_CASH_STAGE" label="Staged External Source" resourceId="PAY_TNDR_CASH_RPT_CURR">
+      <items>
+        <item id="STAGED_TENDER_SW" label="Staged Tender Switch" resourceId="PAY_TNDR_CASH_RPT_CURR.STAGED_TENDER_SW"></item>
+        <item id="PAY_TND_STG_ST_FLG" label="Staged Tender Status Code" resourceId="PAY_TNDR_CASH_RPT_CURR.PAY_TND_STG_ST_FLG"></item>
+        <item id="EXT_SOURCE_ID" label="External Source ID" resourceId="PAY_TNDR_CASH_RPT_CURR.EXT_SOURCE_ID"></item>
+        <item id="APAY_SRC_NAME" label="Auto Pay Source Name" resourceId="PAY_TNDR_CASH_RPT_CURR.APAY_SRC_NAME"></item>
+        <item id="APAY_SRC_CD" label="Auto Pay Source Code" resourceId="PAY_TNDR_CASH_RPT_CURR.APAY_SRC_CD"></item>
+        <item id="APAY_RTE_TYPE_CD" label="Auto Pay Route Type Code" resourceId="PAY_TNDR_CASH_RPT_CURR.APAY_RTE_TYPE_CD"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="PAY_TNDR_CASH_APPLICATION" label="Payment Application Overlay" resourceId="PAY_TNDR_CASH_RPT_CURR">
+      <items>
+        <item id="EVENT_PAY_SEG_COUNT" label="Event Pay Segment Count" resourceId="PAY_TNDR_CASH_RPT_CURR.EVENT_PAY_SEG_COUNT"></item>
+        <item id="EVENT_PAY_SEG_AMT" label="Event Pay Segment Amount" resourceId="PAY_TNDR_CASH_RPT_CURR.EVENT_PAY_SEG_AMT"></item>
+        <item id="EVENT_MATCH_EVT_COUNT" label="Event Match Event Count" resourceId="PAY_TNDR_CASH_RPT_CURR.EVENT_MATCH_EVT_COUNT"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="PAY_TNDR_CASH_RPT_CURR" datasourceId="Origin_DEV_DS" datasourceTableName="PAY_TNDR_CASH_RPT_CURR" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PAY_TENDER_ID" type="java.lang.String"></field>
+        <field id="PAY_EVENT_ID" type="java.lang.String"></field>
+        <field id="PAY_DT" type="java.sql.Timestamp"></field>
+        <field id="PAYOR_ACCT_ID" type="java.lang.String"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="CUSTOMER_NAME" type="java.lang.String"></field>
+        <field id="EVENT_PAY_COUNT" type="java.math.BigDecimal"></field>
+        <field id="SOLE_PAY_ID" type="java.lang.String"></field>
+        <field id="EVENT_PAY_STATUS_FLG" type="java.lang.String"></field>
+        <field id="EVENT_PAY_STATUS_DESC" type="java.lang.String"></field>
+        <field id="EVENT_PAY_AMT" type="java.math.BigDecimal"></field>
+        <field id="EVENT_TENDER_COUNT" type="java.math.BigDecimal"></field>
+        <field id="EVENT_TENDER_AMT" type="java.math.BigDecimal"></field>
+        <field id="TENDER_TYPE_CD" type="java.lang.String"></field>
+        <field id="TENDER_TYPE_DESC" type="java.lang.String"></field>
+        <field id="TNDR_STATUS_FLG" type="java.lang.String"></field>
+        <field id="TNDR_CTL_ID" type="java.lang.String"></field>
+        <field id="TNDR_CTL_CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="TNDR_SOURCE_CD" type="java.lang.String"></field>
+        <field id="TNDR_SOURCE_DESC" type="java.lang.String"></field>
+        <field id="TNDR_SRCE_TYPE_FLG" type="java.lang.String"></field>
+        <field id="DEP_CTL_ID" type="java.lang.String"></field>
+        <field id="DEP_CTL_CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="DEP_CTL_STATUS_FLG" type="java.lang.String"></field>
+        <field id="DEP_CTL_SRCE_TYPE_FLG" type="java.lang.String"></field>
+        <field id="DEP_CTL_START_BALANCE" type="java.math.BigDecimal"></field>
+        <field id="DEP_CTL_END_BALANCE" type="java.math.BigDecimal"></field>
+        <field id="TENDER_AMT" type="java.math.BigDecimal"></field>
+        <field id="SOURCE_FAMILY_CD" type="java.lang.String"></field>
+        <field id="SOURCE_FAMILY_DESC" type="java.lang.String"></field>
+        <field id="STAGED_TENDER_SW" type="java.lang.String"></field>
+        <field id="PAY_TND_STG_ST_FLG" type="java.lang.String"></field>
+        <field id="EXT_SOURCE_ID" type="java.lang.String"></field>
+        <field id="APAY_SRC_CD" type="java.lang.String"></field>
+        <field id="APAY_SRC_NAME" type="java.lang.String"></field>
+        <field id="APAY_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="DEP_CTL_TNDR_DEP_COUNT" type="java.math.BigDecimal"></field>
+        <field id="DEP_CTL_TNDR_DEP_AMT" type="java.math.BigDecimal"></field>
+        <field id="EVENT_PAY_SEG_COUNT" type="java.math.BigDecimal"></field>
+        <field id="EVENT_PAY_SEG_AMT" type="java.math.BigDecimal"></field>
+        <field id="EVENT_MATCH_EVT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="LOAD_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+    </jdbcTable>
+  </resources>
+</schema>

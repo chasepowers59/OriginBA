@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reportUnit exportedWithPermissions="true">
+    <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates</folder>
+    <name>billing_by_cycle_period</name>
+    <version>0</version>
+    <label>Billing by Cycle</label>
+    <description>Completed bills in a bill-date window: bills, accounts, frozen segments and billed amount per bill cycle, with a service-type breakdown under each cycle.</description>
+    <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+    <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+    <mainReport>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" dataFile="Main_jrxml.data" xsi:type="fileResource">
+            <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files</folder>
+            <name>Main_jrxml</name>
+            <version>0</version>
+            <label>Main jrxml</label>
+            <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+            <fileType>jrxml</fileType>
+        </localResource>
+    </mainReport>
+    <dataSource>
+        <uri>/organizations/organization_1/organizations/Origin_TEST/DataSource/Origin_TEST_DS</uri>
+    </dataSource>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files</folder>
+            <name>FROM_DT</name>
+            <version>0</version>
+            <label>Bill date from (inclusive)</label>
+            <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+            <type>2</type>
+            <mandatory>true</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files/FROM_DT_files</folder>
+                    <name>myDatatype</name>
+                    <version>0</version>
+                    <label>myDatatype</label>
+                    <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+                    <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+                    <type>3</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+            <componentType>default</componentType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files</folder>
+            <name>TO_DT</name>
+            <version>0</version>
+            <label>Bill date to (inclusive)</label>
+            <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+            <type>2</type>
+            <mandatory>true</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files/TO_DT_files</folder>
+                    <name>myDatatype</name>
+                    <version>0</version>
+                    <label>myDatatype</label>
+                    <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+                    <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+                    <type>3</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+            <componentType>default</componentType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files</folder>
+            <name>BILL_CYC_CD_F</name>
+            <version>0</version>
+            <label>Bill cycles (blank = all)</label>
+            <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+            <type>7</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files/BILL_CYC_CD_F_files</folder>
+                    <name>BILL_CYC_CD_F_query</name>
+                    <version>0</version>
+                    <label>BILL_CYC_CD_F_query</label>
+                    <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+                    <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+                    <language>sql</language>
+                    <queryString>SELECT TRIM(bill_cyc_cd) AS CODE, TRIM(bill_cyc_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_BILL_CYC_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_BILL b WHERE b.bill_cyc_cd = l.bill_cyc_cd AND b.bill_dt &gt;= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1</queryString>
+                    <dataSource>
+                        <uri>/organizations/organization_1/organizations/Origin_TEST/DataSource/Origin_TEST_DS</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>DESCR</queryVisibleColumn>
+            <queryValueColumn>CODE</queryValueColumn>
+            <componentType>default</componentType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files</folder>
+            <name>SVC_TYPE_CD_F</name>
+            <version>0</version>
+            <label>Service type (blank = all)</label>
+            <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+            <type>4</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files/SVC_TYPE_CD_F_files</folder>
+                    <name>SVC_TYPE_CD_F_query</name>
+                    <version>0</version>
+                    <label>SVC_TYPE_CD_F_query</label>
+                    <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+                    <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+                    <language>sql</language>
+                    <queryString>SELECT TRIM(svc_type_cd) AS CODE, TRIM(svc_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_SVC_TYPE_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_SA_TYPE t JOIN CISADM.CI_SA sa ON sa.sa_type_cd = t.sa_type_cd AND sa.cis_division = t.cis_division WHERE t.svc_type_cd = l.svc_type_cd AND (sa.end_dt IS NULL OR sa.end_dt &gt;= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1</queryString>
+                    <dataSource>
+                        <uri>/organizations/organization_1/organizations/Origin_TEST/DataSource/Origin_TEST_DS</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>DESCR</queryVisibleColumn>
+            <queryValueColumn>CODE</queryValueColumn>
+            <componentType>default</componentType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files</folder>
+            <name>CIS_DIVISION_F</name>
+            <version>0</version>
+            <label>CIS division (blank = all)</label>
+            <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+            <type>4</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files/CIS_DIVISION_F_files</folder>
+                    <name>CIS_DIVISION_F_query</name>
+                    <version>0</version>
+                    <label>CIS_DIVISION_F_query</label>
+                    <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+                    <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+                    <language>sql</language>
+                    <queryString>SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_SA sa WHERE sa.cis_division = l.cis_division AND (sa.end_dt IS NULL OR sa.end_dt &gt;= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1</queryString>
+                    <dataSource>
+                        <uri>/organizations/organization_1/organizations/Origin_TEST/DataSource/Origin_TEST_DS</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>DESCR</queryVisibleColumn>
+            <queryValueColumn>CODE</queryValueColumn>
+            <componentType>default</componentType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files</folder>
+            <name>ACCT_ID_F</name>
+            <version>0</version>
+            <label>Account ID (blank = all)</label>
+            <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+            <type>2</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files/ACCT_ID_F_files</folder>
+                    <name>myDatatype</name>
+                    <version>0</version>
+                    <label>myDatatype</label>
+                    <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+                    <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+                    <type>1</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+            <componentType>default</componentType>
+        </localResource>
+    </inputControl>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false"
+            dataFile="billing_by_cycle_service_type.data" xsi:type="fileResource">
+            <folder>/organizations/organization_1/organizations/Origin_TEST/SmartCity/Report/Standard_Offering/Billing_and_Rates/billing_by_cycle_period_files</folder>
+            <name>billing_by_cycle_service_type</name>
+            <version>0</version>
+            <label>billing_by_cycle_service_type</label>
+            <creationDate>2026-09-18T16:21:52.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:54.000Z</updateDate>
+            <fileType>jrxml</fileType>
+        </localResource>
+    </resource>
+    <alwaysPromptControls>true</alwaysPromptControls>
+    <controlsLayout>1</controlsLayout>
+</reportUnit>

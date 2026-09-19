@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Test_Derived_Table" label="Test_Derived_Table" resourceId="Test_Derived_Table"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="CURRENT_DATE" label="CURRENT_DATE" resourceId="Test_Derived_Table.CURRENT_DATE"></item>
+    <item id="CURRENT_TIME" label="CURRENT_TIME" resourceId="Test_Derived_Table.CURRENT_TIME"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Test_Derived_Table" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="CURRENT_DATE" type="java.lang.String"></field>
+        <field id="CURRENT_TIME" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') AS CURRENT_DATE,
+TO_CHAR(SYSTIMESTAMP, 'YYYY-MM-DD HH24:MI:SS TZR TZD') AS CURRENT_TIME
+FROM
+DUAL</query>
+    </jdbcQuery>
+  </resources>
+</schema>

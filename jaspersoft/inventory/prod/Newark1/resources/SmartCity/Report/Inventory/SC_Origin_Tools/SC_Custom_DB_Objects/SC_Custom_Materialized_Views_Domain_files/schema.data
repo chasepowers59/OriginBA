@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="ALL_MVIEWS" label="ALL_MVIEWS" resourceId="ALL_MVIEWS"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Newark1_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="SYS">
+          <string>SYS</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="OWNER" label="Owner" resourceId="ALL_MVIEWS.OWNER"></item>
+    <item id="MVIEW_NAME" label="Materialized View Name" resourceId="ALL_MVIEWS.MVIEW_NAME"></item>
+    <item id="QUERY" label="Query" resourceId="ALL_MVIEWS.QUERY"></item>
+  </items>
+  <resources>
+    <jdbcTable id="ALL_MVIEWS" datasourceId="Newark1_DS" datasourceTableName="ALL_MVIEWS" schemaAlias="SYS">
+      <fieldList>
+        <field id="OWNER" type="java.lang.String"></field>
+        <field id="MVIEW_NAME" type="java.lang.String"></field>
+        <field id="CONTAINER_NAME" type="java.lang.String"></field>
+        <field id="QUERY" type="java.lang.String"></field>
+        <field id="QUERY_LEN" type="java.math.BigDecimal"></field>
+        <field id="UPDATABLE" type="java.lang.String"></field>
+        <field id="UPDATE_LOG" type="java.lang.String"></field>
+        <field id="MASTER_ROLLBACK_SEG" type="java.lang.String"></field>
+        <field id="MASTER_LINK" type="java.lang.String"></field>
+        <field id="REWRITE_ENABLED" type="java.lang.String"></field>
+        <field id="REWRITE_CAPABILITY" type="java.lang.String"></field>
+        <field id="REFRESH_MODE" type="java.lang.String"></field>
+        <field id="REFRESH_METHOD" type="java.lang.String"></field>
+        <field id="BUILD_MODE" type="java.lang.String"></field>
+        <field id="FAST_REFRESHABLE" type="java.lang.String"></field>
+        <field id="LAST_REFRESH_TYPE" type="java.lang.String"></field>
+        <field id="LAST_REFRESH_DATE" type="java.sql.Timestamp"></field>
+        <field id="LAST_REFRESH_END_TIME" type="java.sql.Timestamp"></field>
+        <field id="STALENESS" type="java.lang.String"></field>
+        <field id="AFTER_FAST_REFRESH" type="java.lang.String"></field>
+        <field id="UNKNOWN_PREBUILT" type="java.lang.String"></field>
+        <field id="UNKNOWN_PLSQL_FUNC" type="java.lang.String"></field>
+        <field id="UNKNOWN_EXTERNAL_TABLE" type="java.lang.String"></field>
+        <field id="UNKNOWN_CONSIDER_FRESH" type="java.lang.String"></field>
+        <field id="UNKNOWN_IMPORT" type="java.lang.String"></field>
+        <field id="UNKNOWN_TRUSTED_FD" type="java.lang.String"></field>
+        <field id="COMPILE_STATE" type="java.lang.String"></field>
+        <field id="USE_NO_INDEX" type="java.lang.String"></field>
+        <field id="STALE_SINCE" type="java.sql.Timestamp"></field>
+        <field id="NUM_PCT_TABLES" type="java.math.BigDecimal"></field>
+        <field id="NUM_FRESH_PCT_REGIONS" type="java.math.BigDecimal"></field>
+        <field id="NUM_STALE_PCT_REGIONS" type="java.math.BigDecimal"></field>
+        <field id="SEGMENT_CREATED" type="java.lang.String"></field>
+        <field id="EVALUATION_EDITION" type="java.lang.String"></field>
+        <field id="UNUSABLE_BEFORE" type="java.lang.String"></field>
+        <field id="UNUSABLE_BEGINNING" type="java.lang.String"></field>
+        <field id="DEFAULT_COLLATION" type="java.lang.String"></field>
+        <field id="ON_QUERY_COMPUTATION" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>OWNER == 'CISADM' and startsWith(MVIEW_NAME, 'CM%')</filterString>
+    </jdbcTable>
+  </resources>
+</schema>

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Debtclassnew" label="Debtclassnew" resourceId="Debtclassnew"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="ACCOUNT_STATUS" label="ACCOUNT_STATUS" resourceId="Debtclassnew.ACCOUNT_STATUS"></item>
+    <item id="ACCT_ID" label="ACCT_ID" resourceId="Debtclassnew.ACCT_ID"></item>
+    <item id="ADDRESS1" label="ADDRESS1" resourceId="Debtclassnew.ADDRESS1"></item>
+    <item id="APAY_STATUS" label="APAY_STATUS" resourceId="Debtclassnew.APAY_STATUS"></item>
+    <item id="BILL_00_20" label="BILL_00_20" resourceId="Debtclassnew.BILL_00_20"></item>
+    <item id="BILL_21_30" label="BILL_21_30" resourceId="Debtclassnew.BILL_21_30"></item>
+    <item id="BILL_31_60" label="BILL_31_60" resourceId="Debtclassnew.BILL_31_60"></item>
+    <item id="BILL_AFTER_DT" label="BILL_AFTER_DT" resourceId="Debtclassnew.BILL_AFTER_DT"></item>
+    <item id="BILL_CYC_CD" label="BILL_CYC_CD" resourceId="Debtclassnew.BILL_CYC_CD"></item>
+    <item id="BILL_OVER_60" label="BILL_OVER_60" resourceId="Debtclassnew.BILL_OVER_60"></item>
+    <item id="BILL_WO" label="BILL_WO" resourceId="Debtclassnew.BILL_WO"></item>
+    <item id="COMB_CURR_TOT" label="COMB_CURR_TOT" resourceId="Debtclassnew.COMB_CURR_TOT"></item>
+    <item id="CUST_CL_CD" label="CUST_CL_CD" resourceId="Debtclassnew.CUST_CL_CD"></item>
+    <item id="CUST_CL_DESCR" label="CUST_CL_DESCR" resourceId="Debtclassnew.CUST_CL_DESCR"></item>
+    <item id="DEBT_CL_CD" label="DEBT_CL_CD" resourceId="Debtclassnew.DEBT_CL_CD"></item>
+    <item id="ENTITY_NAME" label="ENTITY_NAME" resourceId="Debtclassnew.ENTITY_NAME"></item>
+    <item id="NB_APAY_FLG" label="NB_APAY_FLG" resourceId="Debtclassnew.NB_APAY_FLG"></item>
+    <item id="NEW_BALANCE" label="NEW_BALANCE" resourceId="Debtclassnew.NEW_BALANCE"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Debtclassnew" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="BILL_AFTER_DT" type="java.sql.Timestamp"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CUST_CL_DESCR" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="DEBT_CL_CD" type="java.lang.String"></field>
+        <field id="NB_APAY_FLG" type="java.lang.String"></field>
+        <field id="APAY_STATUS" type="java.lang.String"></field>
+        <field id="ACCOUNT_STATUS" type="java.lang.String"></field>
+        <field id="COMB_CURR_TOT" type="java.math.BigDecimal"></field>
+        <field id="NEW_BALANCE" type="java.math.BigDecimal"></field>
+        <field id="BILL_00_20" type="java.math.BigDecimal"></field>
+        <field id="BILL_21_30" type="java.math.BigDecimal"></field>
+        <field id="BILL_31_60" type="java.math.BigDecimal"></field>
+        <field id="BILL_OVER_60" type="java.math.BigDecimal"></field>
+        <field id="BILL_WO" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+    ACCNT.ACCT_ID,
+    ACCNT.BILL_CYC_CD,
+    ACCNT.BILL_AFTER_DT,
+    ACCNT.CUST_CL_CD,
+    CUST_CL.DESCR AS CUST_CL_DESCR,
+    CI_PER_NAME.ENTITY_NAME,
+    CI_PREM.ADDRESS1,
+    AG_TABLE.DEBT_CL_CD,
+    
+    -- Account-level auto-pay status (using MAX to collapse multiple SAs)
+    MAX(AG_TABLE.NB_APAY_FLG) AS NB_APAY_FLG,
+    CASE MAX(AG_TABLE.NB_APAY_FLG)
+        WHEN 'Y' THEN 'Auto-Pay Enabled'
+        WHEN 'N' THEN 'Auto-Pay Disabled'
+        ELSE 'Unknown'
+    END AS APAY_STATUS,
+    
+    -- Account-level SA status (showing if ANY SA is active)
+    MAX(CASE WHEN AG_TABLE.SA_STATUS_FLG = '20' THEN 'Active' ELSE 'Inactive' END) AS ACCOUNT_STATUS,
+    
+    SUM(CASE
+        WHEN (AG_TABLE.RUNNING_ARREAR_CUR_BAL &gt;= AG_TABLE.AD_BA_CUR_AMT 
+              OR AG_TABLE.RUNNING_ARREAR_CUR_BAL IS NULL) 
+        THEN AG_TABLE.AD_BA_CUR_AMT
+        WHEN AG_TABLE.RUNNING_ARREAR_CUR_BAL &lt; AG_TABLE.AD_BA_CUR_AMT 
+        THEN AG_TABLE.RUNNING_ARREAR_CUR_BAL
+        ELSE NULL 
+    END) AS COMB_CURR_TOT,
+    
+    SUM(CASE
+        WHEN AGE IS NULL AND AG_TABLE.DEBT_CL_CD &lt;&gt; 'WO' 
+        THEN AG_TABLE.AD_BA_CUR_AMT
+        ELSE NULL 
+    END) AS NEW_BALANCE,
+    
+    SUM(CASE
+        WHEN AGE &gt;= 0 AND AGE &lt; 21 AND AG_TABLE.DEBT_CL_CD &lt;&gt; 'WO'
+        THEN LEAST(AG_TABLE.AD_BA_CUR_AMT, 
+                   COALESCE(AG_TABLE.RUNNING_ARREAR_CUR_BAL, AG_TABLE.AD_BA_CUR_AMT))
+        ELSE NULL 
+    END) AS BILL_00_20,
+    
+    SUM(CASE
+        WHEN AGE &gt;= 21 AND AGE &lt; 31 AND AG_TABLE.DEBT_CL_CD &lt;&gt; 'WO'
+        THEN LEAST(AG_TABLE.AD_BA_CUR_AMT, 
+                   COALESCE(AG_TABLE.RUNNING_ARREAR_CUR_BAL, AG_TABLE.AD_BA_CUR_AMT))
+        ELSE NULL 
+    END) AS BILL_21_30,
+    
+    SUM(CASE
+        WHEN AGE &gt;= 31 AND AGE &lt; 61 AND AG_TABLE.DEBT_CL_CD &lt;&gt; 'WO'
+        THEN LEAST(AG_TABLE.AD_BA_CUR_AMT, 
+                   COALESCE(AG_TABLE.RUNNING_ARREAR_CUR_BAL, AG_TABLE.AD_BA_CUR_AMT))
+        ELSE NULL 
+    END) AS BILL_31_60,
+    
+    SUM(CASE
+        WHEN AGE &gt;= 61 AND AG_TABLE.DEBT_CL_CD &lt;&gt; 'WO'
+        THEN LEAST(AG_TABLE.AD_BA_CUR_AMT, 
+                   COALESCE(AG_TABLE.RUNNING_ARREAR_CUR_BAL, AG_TABLE.AD_BA_CUR_AMT))
+        ELSE NULL 
+    END) AS BILL_OVER_60,
+    
+    SUM(CASE
+        WHEN AG_TABLE.DEBT_CL_CD = 'WO'
+        THEN LEAST(AG_TABLE.AD_BA_CUR_AMT, 
+                   COALESCE(AG_TABLE.RUNNING_ARREAR_CUR_BAL, AG_TABLE.AD_BA_CUR_AMT))
+        ELSE NULL 
+    END) AS BILL_WO
+
+FROM (
+    SELECT
+        CI_SA.ACCT_ID,
+        CI_SA_TYPE.DEBT_CL_CD,
+        CI_SA.SA_STATUS_FLG,
+        CI_SA.NB_APAY_FLG,
+        TOTALS.CUR_TOT AS CUR_TOT,
+        TOTALS.PAY_TOT AS PAY_TOT,
+        COALESCE(TRUNC(SYSDATE) - CI_FT.ARS_DT, -1) AS AGE,
+        SUM(CI_FT.CUR_AMT) AS AD_BA_CUR_AMT,
+        SUM(SUM(CI_FT.CUR_AMT)) OVER (
+            PARTITION BY CI_SA.ACCT_ID, CI_SA_TYPE.DEBT_CL_CD 
+            ORDER BY COALESCE(TRUNC(SYSDATE) - CI_FT.ARS_DT, -1)
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) AS RUNNING_ARREAR_BA_CUR_BAL,
+        TOTALS.CUR_TOT - SUM(SUM(CI_FT.CUR_AMT)) OVER (
+            PARTITION BY CI_SA.ACCT_ID, CI_SA_TYPE.DEBT_CL_CD 
+            ORDER BY COALESCE(TRUNC(SYSDATE) - CI_FT.ARS_DT, -1)
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) AS RUNNING_ARREAR_CUR_BAL
+    
+    FROM CISADM.CI_FT
+    INNER JOIN CISADM.CI_SA ON CI_SA.SA_ID = CI_FT.SA_ID
+    INNER JOIN CISADM.CI_SA_TYPE ON CI_SA.SA_TYPE_CD = CI_SA_TYPE.SA_TYPE_CD
+    LEFT JOIN (
+        SELECT
+            CI_SA.ACCT_ID,
+            CI_SA_TYPE.DEBT_CL_CD,
+            SUM(CI_FT.CUR_AMT) AS CUR_TOT,
+            SUM(CI_FT.TOT_AMT) AS PAY_TOT
+        FROM CISADM.CI_FT
+        INNER JOIN CISADM.CI_SA ON CI_SA.SA_ID = CI_FT.SA_ID
+        INNER JOIN CISADM.CI_SA_TYPE ON CI_SA.SA_TYPE_CD = CI_SA_TYPE.SA_TYPE_CD
+        WHERE 
+            CI_FT.FREEZE_SW = 'Y'
+            AND CI_FT.NOT_IN_ARS_SW = 'N'
+        GROUP BY
+            CI_SA.ACCT_ID, 
+            CI_SA_TYPE.DEBT_CL_CD
+    ) TOTALS ON TOTALS.ACCT_ID = CI_SA.ACCT_ID 
+                AND TOTALS.DEBT_CL_CD = CI_SA_TYPE.DEBT_CL_CD
+    
+    WHERE 
+        CI_FT.FREEZE_SW = 'Y'
+        AND CI_FT.NOT_IN_ARS_SW = 'N'
+        AND CI_FT.FT_TYPE_FLG NOT IN ('PS', 'PX')
+        AND NOT (CI_FT.CUR_AMT &lt; 0 AND CI_FT.FT_TYPE_FLG IN ('AD','AX'))
+    
+    GROUP BY
+        CI_SA.ACCT_ID,
+        CI_SA_TYPE.DEBT_CL_CD,
+        CI_SA.SA_STATUS_FLG,
+        CI_SA.NB_APAY_FLG,
+        TOTALS.CUR_TOT,
+        TOTALS.PAY_TOT,
+        COALESCE(TRUNC(SYSDATE) - CI_FT.ARS_DT, -1)
+) AG_TABLE
+
+LEFT JOIN CISADM.CI_ACCT ACCNT ON AG_TABLE.ACCT_ID = ACCNT.ACCT_ID
+LEFT JOIN CISADM.CI_ACCT_PER MP ON ACCNT.ACCT_ID = MP.ACCT_ID 
+    AND MP.MAIN_CUST_SW = 'Y'
+LEFT JOIN CISADM.CI_PER_NAME ON MP.PER_ID = CI_PER_NAME.PER_ID 
+    AND PRIM_NAME_SW = 'Y'
+LEFT JOIN CISADM.CI_PREM ON ACCNT.MAILING_PREM_ID = CI_PREM.PREM_ID
+LEFT JOIN CISADM.CI_CUST_CL_L CUST_CL ON ACCNT.CUST_CL_CD = CUST_CL.CUST_CL_CD 
+    AND CUST_CL.LANGUAGE_CD = 'ENG'
+
+WHERE
+    (AG_TABLE.RUNNING_ARREAR_CUR_BAL &gt;= 0 OR AG_TABLE.RUNNING_ARREAR_CUR_BAL IS NULL)
+    AND AG_TABLE.CUR_TOT &lt;&gt; 0
+    AND ACCNT.CUST_CL_CD &lt;&gt; 'N/A'
+
+GROUP BY
+    ACCNT.ACCT_ID,
+    ACCNT.BILL_CYC_CD,
+    ACCNT.BILL_AFTER_DT,
+    ACCNT.CUST_CL_CD,
+    CUST_CL.DESCR,
+    CI_PER_NAME.ENTITY_NAME,
+    CI_PREM.ADDRESS1,
+    AG_TABLE.DEBT_CL_CD
+
+ORDER BY 
+    ACCNT.ACCT_ID,
+    AG_TABLE.DEBT_CL_CD</query>
+    </jdbcQuery>
+  </resources>
+</schema>

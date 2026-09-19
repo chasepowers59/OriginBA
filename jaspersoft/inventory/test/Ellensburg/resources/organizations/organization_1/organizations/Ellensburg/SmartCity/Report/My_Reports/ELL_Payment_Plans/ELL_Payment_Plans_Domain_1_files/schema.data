@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CM_PAYMENT_PLAN_DETAILS" label="Payment Plan Details" resourceId="CM_PAYMENT_PLAN_DETAILS"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account ID" resourceId="CM_PAYMENT_PLAN_DETAILS.ACCT_ID"></item>
+    <item id="CANCEL_REASON" label="Cancel Reason" resourceId="CM_PAYMENT_PLAN_DETAILS.CANCEL_REASON"></item>
+    <item id="COMMENTS" label="Comments" resourceId="CM_PAYMENT_PLAN_DETAILS.COMMENTS"></item>
+    <item id="LAST_UPDATED_BY" label="Last Updated By" resourceId="CM_PAYMENT_PLAN_DETAILS.LAST_UPDATED_BY"></item>
+    <item id="PAY_METH_CD" label="Payment Method" resourceId="CM_PAYMENT_PLAN_DETAILS.PAY_METH_CD"></item>
+    <item id="PP_ID" label="Payment Plan ID" resourceId="CM_PAYMENT_PLAN_DETAILS.PP_ID"></item>
+    <item id="PP_TYPE_CD" label="Payment Plan Type" resourceId="CM_PAYMENT_PLAN_DETAILS.PP_TYPE_CD"></item>
+    <item id="SCHEDULED_PAYMENT_AMT" label="Scheduled Payment Amount" resourceId="CM_PAYMENT_PLAN_DETAILS.SCHEDULED_PAYMENT_AMT"></item>
+    <item id="SCHEDULED_PAYMENT_DATE" label="Scheduled Payment Date" resourceId="CM_PAYMENT_PLAN_DETAILS.SCHEDULED_PAYMENT_DATE"></item>
+    <item id="START_DT" label="Start Date" resourceId="CM_PAYMENT_PLAN_DETAILS.START_DT"></item>
+    <item id="USER_ID" label="User ID" resourceId="CM_PAYMENT_PLAN_DETAILS.USER_ID"></item>
+    <item id="DESCR" label="Status" resourceId="CM_PAYMENT_PLAN_DETAILS.DESCR"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CM_PAYMENT_PLAN_DETAILS" datasourceId="Ellensburg_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PP_ID" type="java.lang.String"></field>
+        <field id="PP_TYPE_CD" type="java.lang.String"></field>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="PAY_METH_CD" type="java.lang.String"></field>
+        <field id="CANCEL_REASON" type="java.lang.String"></field>
+        <field id="LAST_UPDATED_BY" type="java.lang.String"></field>
+        <field id="COMMENTS" type="java.lang.String"></field>
+        <field id="SCHEDULED_PAYMENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="SCHEDULED_PAYMENT_AMT" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+ACCT_ID,PP.PP_ID,PP_TYPE_CD,USER_ID,START_DT,PAY_METH_CD,L.DESCR,
+CASE WHEN PP_CAN_RSN_FLG='10' THEN 'SYSTEM CANCELLED'
+     WHEN PP_CAN_RSN_FLG='20' THEN 'USER CANCELLED'
+     END AS CANCEL_REASON,
+LAST_STAT_USER_ID LAST_UPDATED_BY,COMMENTS,
+PP_SCHED_DT SCHEDULED_PAYMENT_DATE,PP_SCHED_AMT SCHEDULED_PAYMENT_AMT
+FROM CISADM.CI_PP PP,CISADM.CI_PP_SCHED_PAY PPS,CISADM.CI_LOOKUP L
+WHERE PP.PP_ID=PPS.PP_ID 
+AND L.FIELD_VALUE=PP.PP_STAT_FLG
+AND L.FIELD_NAME='PP_STAT_FLG'
+ORDER BY ACCT_ID,START_DT,PP_SCHED_DT</query>
+    </jdbcQuery>
+  </resources>
+</schema>

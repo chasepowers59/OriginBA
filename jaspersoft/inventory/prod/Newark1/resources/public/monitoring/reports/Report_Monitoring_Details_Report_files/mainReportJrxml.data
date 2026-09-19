@@ -1,0 +1,928 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Report Monitoring Details Report" pageWidth="612" pageHeight="792" orientation="Landscape" whenNoDataType="NoPages" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" isIgnorePagination="true" uuid="07f1d5f2-336a-495e-acbb-1adb53af5138">
+	<property name="net.sf.jasperreports.export.xls.collapse.row.span" value="false"/>
+	<property name="net.sf.jasperreports.export.html.border.collapse" value="collapse"/>
+	<property name="net.sf.jasperreports.export.docx.frames.as.nested.tables" value="false"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.actual.size" value="true"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.group.indent" value="0"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.min.group.label.width" value="100"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.detail.band.height" value="25"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.header.band.height" value="25"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.row.header.width" value="125"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.cell.width" value="100"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.cell.height" value="20"/>
+	<property name="com.jaspersoft.ji.adhoc" value="1"/>
+	<property name="com.jaspersoft.ji.adhoc.preferredDataStrategy" value="domainDataStrategy"/>
+	<property name="net.sf.jasperreports.export.pdf.tagged" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.tag.language" value="EN-US"/>
+	<property name="net.sf.jasperreports.export.pdf.metadata.title" value="Ad Hoc Report"/>
+	<property name="net.sf.jasperreports.export.pdf.display.metadata.title" value="true"/>
+	<property name="net.sf.jasperreports.text.truncate.suffix" value="..."/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.size.page.to.content" value="true"/>
+	<propertyExpression name="com.jaspersoft.jrs.export.report.empty"><![CDATA[$P{com.jaspersoft.jrs.report.data.source.is.empty} == null? null : $P{com.jaspersoft.jrs.report.data.source.is.empty}.toString()]]></propertyExpression>
+	<import value="com.jaspersoft.ji.adhoc.jr.AdhocReportUtils"/>
+	<import value="com.jaspersoft.ji.adhoc.service.AdhocEngineServiceImpl"/>
+	<style name="ReportDefault" isDefault="true" mode="Transparent" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<pen lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableBaseFrameStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableFrameStyle" style="TableBaseFrameStyle">
+		<box padding="0">
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<bottomPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnFooterFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<pen lineWidth="1.0" lineStyle="Solid"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#D9E4F1">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#F2F2F2">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#F2F2F2" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableSummaryFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableSummaryTextNoBorderStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" fontName="DejaVu Sans" isBold="true">
+		<box leftPadding="5" rightPadding="5"/>
+	</style>
+	<style name="TableSummaryTextStyle" style="TableSummaryTextNoBorderStyle">
+		<box>
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableTitleFrameStyle" style="TableFrameStyle">
+		<box topPadding="0" bottomPadding="0">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableTitleTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box bottomPadding="8">
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableDetailFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableDetailTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="false">
+		<box leftPadding="5" rightPadding="5">
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{PAGE_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="ChartReportTitle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box>
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineStyle="Solid"/>
+		</box>
+	</style>
+	<style name="ChartTitle" forecolor="#000000" fontName="DejaVu Sans" fontSize="12" isBold="true"/>
+	<style name="ChartSubtitle" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartLegend" forecolor="#000000" backcolor="#FFFFFF" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartSeriesColor0" backcolor="#87C4FE"/>
+	<style name="ChartSeriesColor1" backcolor="#E96270"/>
+	<style name="ChartSeriesColor2" backcolor="#D1D1D1"/>
+	<style name="ChartSeriesColor3" backcolor="#FFEE99"/>
+	<style name="ChartSeriesColor4" backcolor="#6164FF"/>
+	<style name="ChartSeriesColor5" backcolor="#B0E992"/>
+	<style name="ChartSeriesColor6" backcolor="#AE9CEA"/>
+	<style name="ChartSeriesColor7" backcolor="#F5B05E"/>
+	<style name="ChartSeriesColor8" backcolor="#589EE1"/>
+	<style name="ChartSeriesColor9" backcolor="#AE4E59"/>
+	<style name="ChartSeriesColor10" backcolor="#747474"/>
+	<style name="ChartSeriesColor11" backcolor="#E2DC77"/>
+	<style name="ChartSeriesColor12" backcolor="#4749A5"/>
+	<style name="ChartSeriesColor13" backcolor="#81B963"/>
+	<style name="ChartSeriesColor14" backcolor="#7764B4"/>
+	<style name="ChartSeriesColor15" backcolor="#F27B4C"/>
+	<style name="ChartCategoryAxisLabelFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="ChartCategoryAxisTickFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartValueAxisLabelFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="ChartValueAxisTickFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartContext" backcolor="#D1CA67"/>
+	<style name="CrosstabElementStyle" mode="Transparent" forecolor="#000033" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseCellStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseTextStyle" mode="Opaque" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Top" vImageAlign="Top" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box topPadding="3" leftPadding="5" bottomPadding="3" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabTitleTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" fontSize="18" isBold="false">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabHeaderLabelStyle" style="CrosstabHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabMeasureHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabMeasureHeaderLabelStyle" style="CrosstabMeasureHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabColumnMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" isBold="false"/>
+	<style name="CrosstabRowMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabColumnDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#D9E4F1" hTextAlign="Center" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDetailTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Right" hImageAlign="Right" isBold="false">
+		<box>
+			<topPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" hTextAlign="Right" hImageAlign="Right" isBold="true"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDummyHeaderTextStyle" style="CrosstabBaseTextStyle" backcolor="#F2F2F2"/>
+	<style name="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.date_year" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{jireportmonitoringfact.date_year}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.date_month" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{jireportmonitoringfact.date_month}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.date_day" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{jireportmonitoringfact.date_day}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.time_hour" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{jireportmonitoringfact.time_hour}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.time_minute" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{jireportmonitoringfact.time_minute}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.event_type" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{jireportmonitoringfact.event_type}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.event_context" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{jireportmonitoringfact.event_context}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.user_organization" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{jireportmonitoringfact.user_organization}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.user_name" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{jireportmonitoringfact.user_name}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.report_uri" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{jireportmonitoringfact.report_uri}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.editing_action" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{jireportmonitoringfact.editing_action}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabInnerRowDimensionHeaderTextStyle" style="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.editing_action">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="com.jaspersoft.jrs.report.data.source.is.empty" class="java.lang.Boolean" isForPrompting="false">
+		<property name="net.sf.jasperreports.data.cache.included" value="true"/>
+	</parameter>
+	<parameter name="REPORT_TITLE" class="java.lang.String" isForPrompting="false">
+		<property name="net.sf.jasperreports.data.cache.included" value="true"/>
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Collator" class="java.text.Collator" isForPrompting="false">
+		<defaultValueExpression><![CDATA[java.text.Collator.getInstance($P{REPORT_LOCALE})]]></defaultValueExpression>
+	</parameter>
+	<field name="date_year" class="java.lang.Short"/>
+	<field name="report_uri" class="java.lang.String"/>
+	<field name="user_organization" class="java.lang.String"/>
+	<field name="user_name" class="java.lang.String"/>
+	<field name="jireportmonitoringfact.date_day" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.date_month" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.time_hour" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="CountAll_query_execution_time" class="java.lang.Long"/>
+	<field name="Sum_total_report_execution_time" class="java.lang.Long"/>
+	<field name="editing_action" class="java.lang.String"/>
+	<field name="event_type" class="java.lang.String"/>
+	<field name="jireportmonitoringfact.editing_action" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.user_organization" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.event_type" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="CountAll_report_rendering_time" class="java.lang.Long"/>
+	<field name="jireportmonitoringfact.date_year" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="date_month" class="java.lang.Short"/>
+	<field name="time_minute" class="java.lang.Short"/>
+	<field name="Sum_query_execution_time" class="java.lang.Long"/>
+	<field name="jireportmonitoringfact.user_name" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="date_day" class="java.lang.Short"/>
+	<field name="event_context" class="java.lang.String"/>
+	<field name="Sum_report_rendering_time" class="java.lang.Long"/>
+	<field name="jireportmonitoringfact.time_minute" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="CountAll_total_report_execution_time" class="java.lang.Long"/>
+	<field name="jireportmonitoringfact.total_report_execution_time" class="java.lang.Integer">
+		<fieldDescription><![CDATA[total_report_execution_time]]></fieldDescription>
+	</field>
+	<field name="jireportmonitoringfact.event_context" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.report_uri" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.report_rendering_time" class="java.lang.Integer">
+		<fieldDescription><![CDATA[report_rendering_time]]></fieldDescription>
+	</field>
+	<field name="time_hour" class="java.lang.Short"/>
+	<field name="jireportmonitoringfact.query_execution_time" class="java.lang.Integer">
+		<fieldDescription><![CDATA[query_execution_time]]></fieldDescription>
+	</field>
+	<field name="Measures" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="COLUMN_LEVEL"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="Measures__IDENTIFIER" class="java.lang.String">
+		<property name="format"/>
+		<property name="udds_mapping" value="COLUMN_MEASURE_ID"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.query_execution_time_m0" class="java.lang.Double">
+		<property name="format"/>
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="adhoc.display" value="Query Execution Time"/>
+	</field>
+	<field name="jireportmonitoringfact.report_rendering_time_m1" class="java.lang.Double">
+		<property name="format"/>
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="adhoc.display" value="Report Rendering Time"/>
+	</field>
+	<field name="jireportmonitoringfact.total_report_execution_time_m2" class="java.lang.Double">
+		<property name="format"/>
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="adhoc.display" value="Total Report Execution Time"/>
+	</field>
+	<field name="jireportmonitoringfact.date_year__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.date_year__RAW" class="java.lang.Comparable">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.date_month__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.date_month__RAW" class="java.lang.Comparable">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.date_day__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.date_day__RAW" class="java.lang.Comparable">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.time_hour__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.time_hour__RAW" class="java.lang.Comparable">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.time_minute__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.time_minute__RAW" class="java.lang.Comparable">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.event_type__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.event_type__RAW" class="java.lang.Comparable">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.event_context__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.event_context__RAW" class="java.lang.Comparable">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.user_organization__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.user_organization__RAW" class="java.lang.Comparable">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.user_name__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.user_name__RAW" class="java.lang.Comparable">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.report_uri__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.report_uri__RAW" class="java.lang.Comparable">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.editing_action__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="jireportmonitoringfact.editing_action__RAW" class="java.lang.Comparable">
+		<property name="format"/>
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+		<property name="adhoc.display"/>
+	</field>
+	<field name="Measures__RAW" class="java.lang.Comparable">
+		<property name="format"/>
+		<property name="udds_mapping" value="COLUMN_RAW_VALUE"/>
+		<property name="adhoc.display"/>
+	</field>
+	<title>
+		<band height="1" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement key="staticText" style="CrosstabTitleTextStyle" x="0" y="0" width="572" height="0" uuid="5f78f0a6-94d5-4510-9070-447cfd6cbda9">
+					<printWhenExpression><![CDATA[$P{REPORT_TITLE} != null && $P{REPORT_TITLE}.length() > 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<summary>
+		<band height="25" splitType="Stretch">
+			<crosstab>
+				<reportElement style="CrosstabElementStyle" x="0" y="0" width="572" height="25" uuid="82e206af-0c93-4145-8fe7-7aa923565a44"/>
+				<crosstabParameter name="CrosstabRowGroupsCount" class="java.lang.Integer">
+					<parameterValueExpression><![CDATA[new Integer(11)]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="CrosstabColumnGroupsCount" class="java.lang.Integer">
+					<parameterValueExpression><![CDATA[new Integer(1)]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="CrosstabMeasureIndexes" class="java.util.Map">
+					<parameterValueExpression><![CDATA[org.apache.commons.collections.MapUtils.putAll(new java.util.HashMap(), new String[]{"jireportmonitoringfact.query_execution_time_m0","0","jireportmonitoringfact.report_rendering_time_m1","1","jireportmonitoringfact.total_report_execution_time_m2","2"})]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabDataset isDataPreSorted="true"/>
+				<rowGroup name="jireportmonitoringfact.date_year" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{jireportmonitoringfact.date_year__RAW}, $F{jireportmonitoringfact.date_year}, $F{jireportmonitoringfact.date_year__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance()]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField isStretchWithOverflow="true" pattern="0" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.date_year" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="be90a823-a486-4864-bf87-cf54952f6ccb"/>
+								<textFieldExpression><![CDATA[$V{jireportmonitoringfact.date_year}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{jireportmonitoringfact.date_year}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="jireportmonitoringfact.date_month" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{jireportmonitoringfact.date_month__RAW}, $F{jireportmonitoringfact.date_month}, $F{jireportmonitoringfact.date_month__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance()]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField isStretchWithOverflow="true" pattern="0" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.date_month" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="48886b6c-d5d8-419d-9951-7b87afa13411"/>
+								<textFieldExpression><![CDATA[$V{jireportmonitoringfact.date_month}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{jireportmonitoringfact.date_month}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="jireportmonitoringfact.date_day" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{jireportmonitoringfact.date_day__RAW}, $F{jireportmonitoringfact.date_day}, $F{jireportmonitoringfact.date_day__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance()]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField isStretchWithOverflow="true" pattern="0" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.date_day" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="4fe51cca-625c-4cb5-b9a9-12fc0b1b695b"/>
+								<textFieldExpression><![CDATA[$V{jireportmonitoringfact.date_day}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{jireportmonitoringfact.date_day}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="jireportmonitoringfact.time_hour" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{jireportmonitoringfact.time_hour__RAW}, $F{jireportmonitoringfact.time_hour}, $F{jireportmonitoringfact.time_hour__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance()]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField isStretchWithOverflow="true" pattern="0" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.time_hour" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="72617d1c-807e-4394-be64-1a25d38289af"/>
+								<textFieldExpression><![CDATA[$V{jireportmonitoringfact.time_hour}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{jireportmonitoringfact.time_hour}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="jireportmonitoringfact.time_minute" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{jireportmonitoringfact.time_minute__RAW}, $F{jireportmonitoringfact.time_minute}, $F{jireportmonitoringfact.time_minute__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance()]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField isStretchWithOverflow="true" pattern="0" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.time_minute" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="abab266d-80a7-4ea4-934c-80d6408107c3"/>
+								<textFieldExpression><![CDATA[$V{jireportmonitoringfact.time_minute}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{jireportmonitoringfact.time_minute}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="jireportmonitoringfact.event_type" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{jireportmonitoringfact.event_type__RAW}, $F{jireportmonitoringfact.event_type}, $F{jireportmonitoringfact.event_type__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.event_type" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="26b9c179-7c58-452b-9e45-10b3ac598d0f"/>
+								<textFieldExpression><![CDATA[$V{jireportmonitoringfact.event_type}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{jireportmonitoringfact.event_type}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="jireportmonitoringfact.event_context" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{jireportmonitoringfact.event_context__RAW}, $F{jireportmonitoringfact.event_context}, $F{jireportmonitoringfact.event_context__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.event_context" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="a00aff79-159e-4fc2-8a65-b0a60fd1a026"/>
+								<textFieldExpression><![CDATA[$V{jireportmonitoringfact.event_context}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{jireportmonitoringfact.event_context}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="jireportmonitoringfact.user_organization" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{jireportmonitoringfact.user_organization__RAW}, $F{jireportmonitoringfact.user_organization}, $F{jireportmonitoringfact.user_organization__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.user_organization" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="7a185cd9-9592-4064-8fc6-10e13b486f06"/>
+								<textFieldExpression><![CDATA[$V{jireportmonitoringfact.user_organization}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{jireportmonitoringfact.user_organization}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="jireportmonitoringfact.user_name" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{jireportmonitoringfact.user_name__RAW}, $F{jireportmonitoringfact.user_name}, $F{jireportmonitoringfact.user_name__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.user_name" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="b2be8adb-61ff-474f-aed9-1f91f6d8e642"/>
+								<textFieldExpression><![CDATA[$V{jireportmonitoringfact.user_name}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{jireportmonitoringfact.user_name}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="jireportmonitoringfact.report_uri" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{jireportmonitoringfact.report_uri__RAW}, $F{jireportmonitoringfact.report_uri}, $F{jireportmonitoringfact.report_uri__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_jireportmonitoringfact.report_uri" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="9d1b82ec-5c53-4bbf-bcfe-efc04d1b563c"/>
+								<textFieldExpression><![CDATA[$V{jireportmonitoringfact.report_uri}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{jireportmonitoringfact.report_uri}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="jireportmonitoringfact.editing_action" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{jireportmonitoringfact.editing_action__RAW}, $F{jireportmonitoringfact.editing_action}, $F{jireportmonitoringfact.editing_action__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="CrosstabInnerRowDimensionHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="ea36da50-692f-4502-a9fc-bc16a3e33491"/>
+								<textFieldExpression><![CDATA[$V{jireportmonitoringfact.editing_action}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{jireportmonitoringfact.editing_action}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="Measures" height="20" headerPosition="Stretch">
+					<bucket class="net.sf.jasperreports.engine.util.DisplayComparableValue">
+						<bucketExpression><![CDATA[new net.sf.jasperreports.engine.util.DisplayComparableValue($F{Measures__IDENTIFIER}, $F{Measures})]]></bucketExpression>
+						<comparatorExpression><![CDATA[new net.sf.jasperreports.engine.util.DisplayValueLabelComparator($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="3960e569-32ad-45f3-9181-96aa2d9e17df">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="0"/>
+								</reportElement>
+								<textFieldExpression><![CDATA["Year"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA["Year"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField isStretchWithOverflow="true">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="125" y="0" width="125" height="20" uuid="2158b1c2-0a12-44e5-be1b-606144875250">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="1"/>
+								</reportElement>
+								<textFieldExpression><![CDATA["Month"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA["Month"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField isStretchWithOverflow="true">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="250" y="0" width="125" height="20" uuid="5f745004-7e6d-4200-a49f-972985e6ef36">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="2"/>
+								</reportElement>
+								<textFieldExpression><![CDATA["Day"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA["Day"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField isStretchWithOverflow="true">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="375" y="0" width="125" height="20" uuid="0d4df18b-d4d6-4eaa-b99e-2fa3de95ebd0">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="3"/>
+								</reportElement>
+								<textFieldExpression><![CDATA["Hour"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA["Hour"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField isStretchWithOverflow="true">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="500" y="0" width="125" height="20" uuid="6b2674ed-2550-4b9f-9cbc-bc954d92d756">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="4"/>
+								</reportElement>
+								<textFieldExpression><![CDATA["Minute"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA["Minute"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField isStretchWithOverflow="true">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="625" y="0" width="125" height="20" uuid="f133df1b-5661-443a-afb6-c287103b0081">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="5"/>
+								</reportElement>
+								<textFieldExpression><![CDATA["Event Type"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA["Event Type"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField isStretchWithOverflow="true">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="750" y="0" width="125" height="20" uuid="e8b74efc-5b08-46bf-9484-8f5304bf3979">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="6"/>
+								</reportElement>
+								<textFieldExpression><![CDATA["Event Context"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA["Event Context"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField isStretchWithOverflow="true">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="875" y="0" width="125" height="20" uuid="7e60577b-4caf-4e55-afd8-26fc43035c59">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="7"/>
+								</reportElement>
+								<textFieldExpression><![CDATA["User Organization"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA["User Organization"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField isStretchWithOverflow="true">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="1000" y="0" width="125" height="20" uuid="589f173a-65d8-4245-86ae-339c23051cce">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="8"/>
+								</reportElement>
+								<textFieldExpression><![CDATA["User Name"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA["User Name"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField isStretchWithOverflow="true">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="1125" y="0" width="125" height="20" uuid="25345e0b-f4e1-4898-a355-481a68a291cc">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="9"/>
+								</reportElement>
+								<textFieldExpression><![CDATA["Report URI"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA["Report URI"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField isStretchWithOverflow="true">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="1250" y="0" width="125" height="20" uuid="aaad80b2-b7fb-4c14-9fa8-75ae86745bed">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="10"/>
+								</reportElement>
+								<textFieldExpression><![CDATA["Editing Action"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA["Editing Action"]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabHeader>
+					<crosstabColumnHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="CrosstabColumnMeasureHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="7d8ddd19-cfd5-4086-99ea-421b32eb0cb6">
+									<propertyExpression name="net.sf.jasperreports.crosstab.column.header.sort.measure.index"><![CDATA[$P{CrosstabMeasureIndexes}.get($V{Measures}.key())]]></propertyExpression>
+								</reportElement>
+								<textFieldExpression><![CDATA[$V{Measures}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{Measures}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="jireportmonitoringfact.query_execution_time_m0" class="java.lang.Double">
+					<measureExpression><![CDATA[$F{jireportmonitoringfact.query_execution_time_m0}]]></measureExpression>
+				</measure>
+				<measure name="jireportmonitoringfact.report_rendering_time_m1" class="java.lang.Double">
+					<measureExpression><![CDATA[$F{jireportmonitoringfact.report_rendering_time_m1}]]></measureExpression>
+				</measure>
+				<measure name="jireportmonitoringfact.total_report_execution_time_m2" class="java.lang.Double">
+					<measureExpression><![CDATA[$F{jireportmonitoringfact.total_report_execution_time_m2}]]></measureExpression>
+				</measure>
+				<measure name="CROSSTAB_TOTAL_DISCRIMINATOR" class="java.lang.Boolean" calculation="First">
+					<measureExpression><![CDATA[Boolean.FALSE || $F{jireportmonitoringfact.date_year__DISCRIMINATOR} || $F{jireportmonitoringfact.date_month__DISCRIMINATOR} || $F{jireportmonitoringfact.date_day__DISCRIMINATOR} || $F{jireportmonitoringfact.time_hour__DISCRIMINATOR} || $F{jireportmonitoringfact.time_minute__DISCRIMINATOR} || $F{jireportmonitoringfact.event_type__DISCRIMINATOR} || $F{jireportmonitoringfact.event_context__DISCRIMINATOR} || $F{jireportmonitoringfact.user_organization__DISCRIMINATOR} || $F{jireportmonitoringfact.user_name__DISCRIMINATOR} || $F{jireportmonitoringfact.report_uri__DISCRIMINATOR} || $F{jireportmonitoringfact.editing_action__DISCRIMINATOR}]]></measureExpression>
+				</measure>
+				<crosstabCell width="100" height="20">
+					<cellContents style="CrosstabBaseCellStyle">
+						<box padding="0"/>
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="f34191a8-c671-499c-9e58-fab52ff50005">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("jireportmonitoringfact.query_execution_time_m0")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{jireportmonitoringfact.query_execution_time_m0}]]></textFieldExpression>
+							<patternExpression><![CDATA[AdhocEngineServiceImpl.getInstance().getDefaultMask("java.lang.Double", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></patternExpression>
+						</textField>
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="c0d6230e-c041-4d4b-a757-3a3ae4bd6002">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("jireportmonitoringfact.report_rendering_time_m1")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{jireportmonitoringfact.report_rendering_time_m1}]]></textFieldExpression>
+							<patternExpression><![CDATA[AdhocEngineServiceImpl.getInstance().getDefaultMask("java.lang.Double", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></patternExpression>
+						</textField>
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="70e90359-33b9-4ddc-932b-278dc360f029">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("jireportmonitoringfact.total_report_execution_time_m2")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{jireportmonitoringfact.total_report_execution_time_m2}]]></textFieldExpression>
+							<patternExpression><![CDATA[AdhocEngineServiceImpl.getInstance().getDefaultMask("java.lang.Double", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></patternExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,1541 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 8.2.0.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Ellensburg_Main" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b514e032-6953-47f0-95a9-5b94f5dfedc3">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="NO_DATA_ADAPTER"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="384"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="616"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="asingh|Origin_DEMO"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Bill/Bill_ThreeServices_files/Bill_ThreeServices_Subreport.jrxml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Bill/Bill_ThreeServices"/>
+	<style name="msgStyle" fontName="Tahoma" fontSize="8"/>
+	<subDataset name="billMsgList" whenResourceMissingType="Empty" uuid="8131bb8c-b01e-4528-9a2a-65b64f3f92ea">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="v2_orig"/>
+		<parameter name="accountId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/billMsgList/billMsg[./msgPriority>=60]"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="sequence" class="java.lang.String"/>
+		<queryString language="XPath">
+			<![CDATA[$P{parameterQuery}]]>
+		</queryString>
+		<field name="billMsgType" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="billMsgType"/>
+			<fieldDescription><![CDATA[billMsgType]]></fieldDescription>
+		</field>
+		<field name="msgOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="msgOnBill"/>
+			<fieldDescription><![CDATA[msgOnBill]]></fieldDescription>
+		</field>
+		<field name="msgPriority" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="msgPriority"/>
+			<fieldDescription><![CDATA[msgPriority]]></fieldDescription>
+		</field>
+		<field name="accountId" class="java.lang.String">
+			<fieldDescription><![CDATA[../../accountId]]></fieldDescription>
+		</field>
+		<field name="premiseId" class="java.lang.String">
+			<fieldDescription><![CDATA[../../premList/premise/premiseId]]></fieldDescription>
+		</field>
+		<field name="sequence" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../sequence"/>
+			<fieldDescription><![CDATA[../../../sequence]]></fieldDescription>
+		</field>
+	</subDataset>
+	<subDataset name="PaymentList" whenResourceMissingType="Empty" uuid="ed5977a6-c354-49dc-acf1-dc45610ca7b1">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Ellensburg-Data Adapter"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/payList/payment"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="sequence" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[/C1-BillPrintRecords/C1-BillPrintRecord/billPrint/payList/payment]]>
+		</queryString>
+		<field name="premiseId" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../premList/premise/premiseId"/>
+			<fieldDescription><![CDATA[../../premList/premise/premiseId]]></fieldDescription>
+		</field>
+		<field name="currPayAmt" class="java.lang.Double">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="currPayAmt"/>
+			<fieldDescription><![CDATA[currPayAmt]]></fieldDescription>
+		</field>
+		<field name="payDate" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="payDate"/>
+			<fieldDescription><![CDATA[payDate]]></fieldDescription>
+		</field>
+		<variable name="payDate" class="java.util.Date">
+			<variableExpression><![CDATA[new SimpleDateFormat("yyyy-MM-dd").parse($F{payDate})]]></variableExpression>
+		</variable>
+		<filterExpression><![CDATA[$F{premiseId}.equalsIgnoreCase( $P{premiseId} )]]></filterExpression>
+	</subDataset>
+	<subDataset name="currentActivity" uuid="9ab79dc8-52a3-40be-8dac-a4583255de14">
+		<parameter name="CurrAdjAmt" class="java.math.BigDecimal"/>
+		<parameter name="CurrChgAmt" class="java.math.BigDecimal"/>
+		<parameter name="CurrBal" class="java.math.BigDecimal"/>
+		<parameter name="TotBal" class="java.math.BigDecimal"/>
+		<parameter name="accountId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/premList/premise[./premiseId="+$P{premiseId}+"]/billCalcHdrList/billCalcHdr/billCalcLine"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="sequence" class="java.lang.String"/>
+		<queryString language="XPath">
+			<![CDATA[$P{parameterQuery}]]>
+		</queryString>
+		<field name="calcLineCalcAmt" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcLineCalcAmt"/>
+			<fieldDescription><![CDATA[calcLineCalcAmt]]></fieldDescription>
+		</field>
+		<field name="calcLineDescrOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcLineDescrOnBill"/>
+		</field>
+		<field name="accountId" class="java.lang.String">
+			<fieldDescription><![CDATA[../../../../../accountId]]></fieldDescription>
+		</field>
+		<field name="premiseId" class="java.lang.String">
+			<fieldDescription><![CDATA[../../../premiseId]]></fieldDescription>
+		</field>
+		<field name="sequence" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../../sequence"/>
+			<fieldDescription><![CDATA[../../../../../../sequence]]></fieldDescription>
+		</field>
+		<field name="billId" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../../billId"/>
+			<fieldDescription><![CDATA[../../../../../../billId]]></fieldDescription>
+		</field>
+		<variable name="totalAmount" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{calcLineCalcAmt}==null?new BigDecimal(0):$F{calcLineCalcAmt}]]></variableExpression>
+		</variable>
+		<variable name="ReportCount" class="java.lang.Integer" resetType="Column">
+			<variableExpression><![CDATA[$V{REPORT_COUNT}]]></variableExpression>
+			<initialValueExpression><![CDATA[0]]></initialValueExpression>
+		</variable>
+		<filterExpression><![CDATA[$F{sequence}.equals( $P{sequence} )]]></filterExpression>
+	</subDataset>
+	<subDataset name="bsegReadList" uuid="bc0e5800-b1cc-4171-93e8-d32a4c5f4003">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="v2_orig"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/premList/premise[./premiseId="+$P{premiseId}+"]/bsegReadList/bsegRead"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="sequence" class="java.lang.String"/>
+		<queryString language="XPath">
+			<![CDATA[$P{parameterQuery}]]>
+		</queryString>
+		<field name="badge" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="badge"/>
+			<fieldDescription><![CDATA[badge]]></fieldDescription>
+		</field>
+		<field name="saTypeDescr" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="saTypeDescr"/>
+			<fieldDescription><![CDATA[saTypeDescr]]></fieldDescription>
+		</field>
+		<field name="startReadDttm" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startReadDttm"/>
+			<fieldDescription><![CDATA[startReadDttm]]></fieldDescription>
+		</field>
+		<field name="rateSched" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="rateSched"/>
+			<fieldDescription><![CDATA[rateSched]]></fieldDescription>
+		</field>
+		<field name="endReadDttm" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endReadDttm"/>
+			<fieldDescription><![CDATA[endReadDttm]]></fieldDescription>
+		</field>
+		<field name="startRegRdg" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startRegRdg"/>
+			<fieldDescription><![CDATA[startRegRdg]]></fieldDescription>
+		</field>
+		<field name="endRegRdg" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endRegRdg"/>
+			<fieldDescription><![CDATA[endRegRdg]]></fieldDescription>
+		</field>
+		<field name="regConst" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="regConst"/>
+			<fieldDescription><![CDATA[regConst]]></fieldDescription>
+		</field>
+		<field name="finalUom" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="finalUom"/>
+			<fieldDescription><![CDATA[finalUom]]></fieldDescription>
+		</field>
+		<field name="finalRegQty" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="finalRegQty"/>
+			<fieldDescription><![CDATA[finalRegQty]]></fieldDescription>
+		</field>
+		<field name="usage" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="usage"/>
+			<fieldDescription><![CDATA[usage]]></fieldDescription>
+		</field>
+		<field name="days" class="java.lang.Integer"/>
+		<field name="sequence" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../sequence"/>
+			<fieldDescription><![CDATA[../../../../../sequence]]></fieldDescription>
+		</field>
+		<variable name="startReadDttm" class="java.lang.String">
+			<variableExpression><![CDATA[$F{startReadDttm}.length()>=10?$F{startReadDttm}.substring( 0,10 ).replaceAll("-","/"):""]]></variableExpression>
+		</variable>
+		<variable name="endReadDttm" class="java.lang.String">
+			<variableExpression><![CDATA[$F{endReadDttm}.length()>=10?$F{endReadDttm}.substring( 0,10 ).replaceAll("-","/"):""]]></variableExpression>
+		</variable>
+		<variable name="Days" class="java.lang.Integer">
+			<variableExpression><![CDATA[$F{days}==null?"":$F{days}]]></variableExpression>
+		</variable>
+		<filterExpression><![CDATA[$F{sequence}.equals( $P{sequence} )]]></filterExpression>
+	</subDataset>
+	<subDataset name="GasConsptionHistoryGraph" uuid="be3f3432-7cf3-4958-8eb9-1b181b72df5e">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="v2_orig"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/premList/premise[./premiseId='"+$P{premiseId}+"']/consumptionHistoryList/billSqList[./svcType='G']"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="sequence" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[$P{parameterQuery}]]>
+		</queryString>
+		<field name="sqDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="sqDate"/>
+			<fieldDescription><![CDATA[sqDate]]></fieldDescription>
+		</field>
+		<field name="billSq" class="java.lang.Double">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="billSq"/>
+			<fieldDescription><![CDATA[billSq]]></fieldDescription>
+		</field>
+		<field name="premiseId" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../premiseId"/>
+			<fieldDescription><![CDATA[premiseId]]></fieldDescription>
+		</field>
+		<field name="billId" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../billId"/>
+			<fieldDescription><![CDATA[../../../../../billId]]></fieldDescription>
+		</field>
+		<field name="svcType" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="svcType"/>
+			<fieldDescription><![CDATA[svcType]]></fieldDescription>
+		</field>
+		<field name="sequence" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../sequence"/>
+			<fieldDescription><![CDATA[../../../../../sequence]]></fieldDescription>
+		</field>
+		<filterExpression><![CDATA[$F{svcType}.equalsIgnoreCase( "G" ) && $F{sequence}.equals( $P{sequence} )]]></filterExpression>
+	</subDataset>
+	<subDataset name="ElectricConsptionHistoryGraph" uuid="ae8fd5a1-9de5-47a1-ad3a-dd994b80f2b9">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="v2_orig"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/premList/premise[./premiseId="+$P{premiseId}+"]/consumptionHistoryList/billSqList"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="sequence" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[$P{parameterQuery}]]>
+		</queryString>
+		<field name="sqDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="sqDate"/>
+			<fieldDescription><![CDATA[sqDate]]></fieldDescription>
+		</field>
+		<field name="billSq" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="billSq"/>
+			<fieldDescription><![CDATA[billSq]]></fieldDescription>
+		</field>
+		<field name="premiseId" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../premiseId"/>
+			<fieldDescription><![CDATA[premiseId]]></fieldDescription>
+		</field>
+		<field name="billId" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../billId"/>
+			<fieldDescription><![CDATA[../../../../../billId]]></fieldDescription>
+		</field>
+		<field name="svcType" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="svcType"/>
+			<fieldDescription><![CDATA[svcType]]></fieldDescription>
+		</field>
+		<field name="sequence" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../sequence"/>
+			<fieldDescription><![CDATA[../../../../../sequence]]></fieldDescription>
+		</field>
+		<filterExpression><![CDATA[$F{svcType}.equalsIgnoreCase( "E" ) && $F{sequence}.equals( $P{sequence} )]]></filterExpression>
+	</subDataset>
+	<subDataset name="WaterConsptionHistoryGraph" uuid="99693d2b-6afd-41b0-9b5b-a8c1a8a3a880">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="v2_orig"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/premList/premise[./premiseId="+$P{premiseId}+"]/consumptionHistoryList/billSqList"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="sequence" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[$P{parameterQuery}]]>
+		</queryString>
+		<field name="sqDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="sqDate"/>
+			<fieldDescription><![CDATA[sqDate]]></fieldDescription>
+		</field>
+		<field name="billSq" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="billSq"/>
+			<fieldDescription><![CDATA[billSq]]></fieldDescription>
+		</field>
+		<field name="premiseId" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../premiseId"/>
+			<fieldDescription><![CDATA[premiseId]]></fieldDescription>
+		</field>
+		<field name="billId" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../billId"/>
+			<fieldDescription><![CDATA[../../../../../billId]]></fieldDescription>
+		</field>
+		<field name="svcType" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="svcType"/>
+			<fieldDescription><![CDATA[svcType]]></fieldDescription>
+		</field>
+		<field name="sequence" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../../sequence"/>
+			<fieldDescription><![CDATA[../../../../../sequence]]></fieldDescription>
+		</field>
+		<filterExpression><![CDATA[$F{svcType}.equalsIgnoreCase( "W" ) && $F{sequence}.equals( $P{sequence} )]]></filterExpression>
+	</subDataset>
+	<subDataset name="billMsgList2Page" whenResourceMissingType="Empty" uuid="101938a8-aa2e-4e0b-97c8-6aad6fe4d44d">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="v2_orig"/>
+		<parameter name="accountId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/billMsgList/billMsg[./msgPriority<60]"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="sequence" class="java.lang.String"/>
+		<queryString language="XPath">
+			<![CDATA[$P{parameterQuery}]]>
+		</queryString>
+		<field name="billMsgType" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="billMsgType"/>
+			<fieldDescription><![CDATA[billMsgType]]></fieldDescription>
+		</field>
+		<field name="msgOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="msgOnBill"/>
+			<fieldDescription><![CDATA[msgOnBill]]></fieldDescription>
+		</field>
+		<field name="msgPriority" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="msgPriority"/>
+			<fieldDescription><![CDATA[msgPriority]]></fieldDescription>
+		</field>
+		<field name="accountId" class="java.lang.String">
+			<fieldDescription><![CDATA[../../accountId]]></fieldDescription>
+		</field>
+		<field name="premiseId" class="java.lang.String">
+			<fieldDescription><![CDATA[../../premList/premise/premiseId]]></fieldDescription>
+		</field>
+		<field name="sequence" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../sequence"/>
+			<fieldDescription><![CDATA[../../../sequence]]></fieldDescription>
+		</field>
+		<filterExpression><![CDATA[$F{sequence}.equals( $P{sequence} )]]></filterExpression>
+		<group name="MsgOnBillGroup">
+			<groupExpression><![CDATA[$F{msgOnBill}]]></groupExpression>
+		</group>
+	</subDataset>
+	<subDataset name="adjList" whenResourceMissingType="Empty" uuid="d9abe9f7-6d27-4089-a216-4666b0012ef4">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="v2_orig"/>
+		<parameter name="accountId" class="java.lang.String"/>
+		<parameter name="premiseId" class="java.lang.String"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="parameterQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/premList/premise[./premiseId="+$P{premiseId}+"]/adjList/adj"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="sequence" class="java.lang.String"/>
+		<queryString language="XPath">
+			<![CDATA[$P{parameterQuery}]]>
+		</queryString>
+		<field name="currAmt" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="currAmt"/>
+			<fieldDescription><![CDATA[currAmt]]></fieldDescription>
+		</field>
+		<field name="descrOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="descrOnBill"/>
+			<fieldDescription><![CDATA[descrOnBill]]></fieldDescription>
+		</field>
+		<field name="accountId" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../accountId"/>
+			<fieldDescription><![CDATA[../../../../accountId]]></fieldDescription>
+		</field>
+		<field name="premiseId" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="../../premiseId"/>
+			<fieldDescription><![CDATA[../../premiseId]]></fieldDescription>
+		</field>
+		<group name="MsgOnBillGroup">
+			<groupExpression><![CDATA[$F{descrOnBill}]]></groupExpression>
+		</group>
+	</subDataset>
+	<parameter name="net.sf.jasperreports.xml.source" class="java.lang.String"/>
+	<parameter name="billId" class="java.lang.String"/>
+	<parameter name="query" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/premList/premise"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="sequence" class="java.lang.String" isForPrompting="false"/>
+	<queryString language="XPath">
+		<![CDATA[$P{query}]]>
+	</queryString>
+	<field name="svcCountry" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="svcCountry"/>
+		<fieldDescription><![CDATA[svcCountry]]></fieldDescription>
+	</field>
+	<field name="svcAddressLine1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="svcAddressLine1"/>
+		<fieldDescription><![CDATA[svcAddressLine1]]></fieldDescription>
+	</field>
+	<field name="svcInCityLimit" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="svcInCityLimit"/>
+		<fieldDescription><![CDATA[svcInCityLimit]]></fieldDescription>
+	</field>
+	<field name="svcCity" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="svcCity"/>
+		<fieldDescription><![CDATA[svcCity]]></fieldDescription>
+	</field>
+	<field name="svcState" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="svcState"/>
+		<fieldDescription><![CDATA[svcState]]></fieldDescription>
+	</field>
+	<field name="svcPostal" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="svcPostal"/>
+		<fieldDescription><![CDATA[svcPostal]]></fieldDescription>
+	</field>
+	<field name="companyAddress" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../C1-GlobalInformationRecord/companyAddress"/>
+		<fieldDescription><![CDATA[../../../../C1-GlobalInformationRecord/companyAddress]]></fieldDescription>
+	</field>
+	<field name="entityName" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../entityName"/>
+		<fieldDescription><![CDATA[../../entityName]]></fieldDescription>
+	</field>
+	<field name="accountId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../accountId"/>
+		<fieldDescription><![CDATA[../../accountId]]></fieldDescription>
+	</field>
+	<field name="billDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../billDate"/>
+		<fieldDescription><![CDATA[../../billDate]]></fieldDescription>
+	</field>
+	<field name="totBal" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../totBal"/>
+		<fieldDescription><![CDATA[../../totBal]]></fieldDescription>
+	</field>
+	<field name="dueDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../dueDate"/>
+		<fieldDescription><![CDATA[../../dueDate]]></fieldDescription>
+	</field>
+	<field name="currPrevBal" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../currPrevBal"/>
+		<fieldDescription><![CDATA[../../currPrevBal]]></fieldDescription>
+	</field>
+	<field name="currBal" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../currBal"/>
+		<fieldDescription><![CDATA[../../currBal]]></fieldDescription>
+	</field>
+	<field name="currAdjAmt" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../currAdjAmt"/>
+		<fieldDescription><![CDATA[../../currAdjAmt]]></fieldDescription>
+	</field>
+	<field name="currChgAmt" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../currChgAmt"/>
+		<fieldDescription><![CDATA[../../currChgAmt]]></fieldDescription>
+	</field>
+	<field name="mailingAddressLine1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingAddressLine1"/>
+		<fieldDescription><![CDATA[../../mailingAddressLine1]]></fieldDescription>
+	</field>
+	<field name="mailingAddressLine2" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingAddressLine2"/>
+		<fieldDescription><![CDATA[../../mailingAddressLine2]]></fieldDescription>
+	</field>
+	<field name="mailingCity" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingCity"/>
+		<fieldDescription><![CDATA[../../mailingCity]]></fieldDescription>
+	</field>
+	<field name="mailingCountry" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingCountry"/>
+		<fieldDescription><![CDATA[../../mailingCountry]]></fieldDescription>
+	</field>
+	<field name="mailingPostal" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingPostal"/>
+		<fieldDescription><![CDATA[../../mailingPostal]]></fieldDescription>
+	</field>
+	<field name="mailingState" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingState"/>
+		<fieldDescription><![CDATA[../../mailingState]]></fieldDescription>
+	</field>
+	<field name="mailingInCityLimit" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../mailingInCityLimit"/>
+		<fieldDescription><![CDATA[../../mailingInCityLimit]]></fieldDescription>
+	</field>
+	<field name="paymentInstruction" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../C1-GlobalInformationRecord/paymentInstruction"/>
+		<fieldDescription><![CDATA[../../../../C1-GlobalInformationRecord/paymentInstruction]]></fieldDescription>
+	</field>
+	<field name="moreInfo" class="java.lang.String">
+		<fieldDescription><![CDATA[../../../../C1-GlobalInformationRecord/moreInfo]]></fieldDescription>
+	</field>
+	<field name="premiseId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseId"/>
+		<fieldDescription><![CDATA[premiseId]]></fieldDescription>
+	</field>
+	<field name="payList" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../payList"/>
+		<fieldDescription><![CDATA[payList]]></fieldDescription>
+	</field>
+	<field name="waysToPay" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../../../C1-GlobalInformationRecord/waysToPay"/>
+		<fieldDescription><![CDATA[../../../../C1-GlobalInformationRecord/waysToPay]]></fieldDescription>
+	</field>
+	<field name="billId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../../billId"/>
+		<fieldDescription><![CDATA[../../../billId]]></fieldDescription>
+	</field>
+	<field name="entityName1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../entityName1"/>
+		<fieldDescription><![CDATA[../../entityName1]]></fieldDescription>
+	</field>
+	<field name="sequence" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../../sequence"/>
+		<fieldDescription><![CDATA[../../../sequence]]></fieldDescription>
+	</field>
+	<field name="paymentInstruction1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../paymentInstruction"/>
+		<fieldDescription><![CDATA[../../paymentInstruction]]></fieldDescription>
+	</field>
+	<field name="finalBill" class="java.lang.Boolean">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../finalBill"/>
+		<fieldDescription><![CDATA[../../finalBill]]></fieldDescription>
+	</field>
+	<field name="adjList" class="java.util.List">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="adjList"/>
+		<fieldDescription><![CDATA[adjList]]></fieldDescription>
+	</field>
+	<field name="totChgAmt" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../totChgAmt"/>
+		<fieldDescription><![CDATA[../../totChgAmt]]></fieldDescription>
+	</field>
+	<field name="isBudgetIndicator" class="java.lang.Boolean">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../isBudgetIndicator"/>
+		<fieldDescription><![CDATA[../../isBudgetIndicator]]></fieldDescription>
+	</field>
+	<field name="delinquentAmt" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../delinquentAmt"/>
+		<fieldDescription><![CDATA[../../delinquentAmt]]></fieldDescription>
+	</field>
+	<field name="premiseCount" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../premiseCount"/>
+		<fieldDescription><![CDATA[../../premiseCount]]></fieldDescription>
+	</field>
+	<field name="premSequence" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="sequence"/>
+		<fieldDescription><![CDATA[sequence]]></fieldDescription>
+	</field>
+	<variable name="companyAddress" class="java.lang.String" incrementType="Group" incrementGroup="accountId">
+		<variableExpression><![CDATA[$F{companyAddress}.replace( "~", "\n" )]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{companyAddress}.replace( "~", "\n" )]]></initialValueExpression>
+	</variable>
+	<variable name="paymentInstruction" class="java.lang.String" incrementType="Group" incrementGroup="accountId">
+		<variableExpression><![CDATA[$F{paymentInstruction1}==null ? ($F{paymentInstruction}.replace( "~", "\n" )) : ($F{paymentInstruction1}.replace( "~", "\n" ))]]></variableExpression>
+	</variable>
+	<variable name="mailingPostal" class="java.lang.String">
+		<variableExpression><![CDATA[$F{mailingPostal}.length()>5?"00270903360940"+($F{mailingPostal}.substring( 0, 5 ))+"4":
+"00270903360940"+($F{mailingPostal})+"4"]]></variableExpression>
+	</variable>
+	<variable name="finalBill" class="java.lang.Boolean" resetType="Group" resetGroup="accountId4_Group">
+		<variableExpression><![CDATA[$F{finalBill}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{finalBill}]]></initialValueExpression>
+	</variable>
+	<variable name="caReportCount" class="java.lang.Integer" resetType="Group" resetGroup="accountId4_Group" calculation="System"/>
+	<variable name="adjReportCount" class="java.lang.Integer" calculation="System"/>
+	<variable name="premiseSequence" class="java.lang.Integer" resetType="Group" resetGroup="accountId" calculation="System"/>
+	<filterExpression><![CDATA[$F{sequence}.equals( $P{sequence} )]]></filterExpression>
+	<group name="accountId4_Group" footerPosition="ForceAtBottom">
+		<groupExpression><![CDATA[$F{billId}+"-"+$F{premiseId}+"-"+$F{sequence}]]></groupExpression>
+		<groupHeader>
+			<band>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="100">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<printWhenExpression><![CDATA[($V{premiseSequence} <=1  && $V{premiseSequence}.equals( $F{premiseCount} ))]]></printWhenExpression>
+				<rectangle radius="5">
+					<reportElement positionType="FixRelativeToBottom" x="144" y="70" width="285" height="30" backcolor="#009639" uuid="4a86abc3-77bd-43b5-a0e3-2886eafee76c">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#009639"/>
+					</graphicElement>
+				</rectangle>
+				<textField>
+					<reportElement positionType="FixRelativeToBottom" mode="Transparent" x="149" y="70" width="275" height="30" forecolor="#FFFFFF" backcolor="#FFFFFF" uuid="2b98b07b-cf70-4875-a750-90b9400a602a">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma" size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{moreInfo}]]></textFieldExpression>
+				</textField>
+				<componentElement>
+					<reportElement x="0" y="0" width="229" height="60" isPrintWhenDetailOverflows="true" printWhenGroupChanges="accountId" uuid="4f1bcc8a-0a57-4ed4-9719-cd21e19d49ad">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="billMsgList2Page" uuid="1d54d872-6751-4ae2-b5c6-5ad37d5e64bf">
+							<datasetParameter name="accountId">
+								<datasetParameterExpression><![CDATA[$F{accountId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="premiseId">
+								<datasetParameterExpression><![CDATA[$F{premiseId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="billId">
+								<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="sequence">
+								<datasetParameterExpression><![CDATA[$F{sequence}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATA_DOCUMENT">
+								<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_INPUT_STREAM">
+								<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_FILE">
+								<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="net.sf.jasperreports.xml.source">
+								<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATE_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_NUMBER_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_LOCALE">
+								<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_TIME_ZONE">
+								<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="60" width="229">
+							<frame>
+								<reportElement x="0" y="0" width="229" height="60" uuid="400d9c35-458c-48b9-82c4-9b91de86599b"/>
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement stretchType="ElementGroupHeight" x="0" y="20" width="229" height="40" isPrintWhenDetailOverflows="true" uuid="acb1a88b-d347-4ba5-97cb-6af729d7089c">
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									</reportElement>
+									<box topPadding="2" leftPadding="2"/>
+									<textElement textAlignment="Left">
+										<font fontName="Tahoma" size="8"/>
+										<paragraph lineSpacingSize="1.0"/>
+									</textElement>
+									<textFieldExpression><![CDATA[($F{msgOnBill}.contains( "~" )?$F{msgOnBill}.substring( $F{msgOnBill}.lastIndexOf( "~" ) +1):$F{msgOnBill})]]></textFieldExpression>
+								</textField>
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement stretchType="ElementGroupHeight" x="0" y="0" width="229" height="20" isPrintWhenDetailOverflows="true" forecolor="#0077C8" uuid="0581940a-174c-4ac8-9c5b-a631279ccefb">
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									</reportElement>
+									<box leftPadding="2"/>
+									<textElement textAlignment="Left" verticalAlignment="Middle">
+										<font fontName="Tahoma" size="8" isBold="true"/>
+										<paragraph lineSpacingSize="1.0"/>
+									</textElement>
+									<textFieldExpression><![CDATA[($F{msgOnBill}.contains( "~" )?$F{msgOnBill}.substring( 0,$F{msgOnBill}.lastIndexOf( "~" ) ):"")]]></textFieldExpression>
+								</textField>
+							</frame>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+			</band>
+			<band height="600">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<printWhenExpression><![CDATA[((($V{PAGE_NUMBER})%2==1) && ($F{premSequence}.equals( $F{premiseCount})))]]></printWhenExpression>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="accountId" keepTogether="true">
+		<groupExpression><![CDATA[$F{billId}+"-"+$F{premiseId}+"-"+$F{premSequence}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<textField textAdjust="StretchHeight">
+					<reportElement stretchType="ContainerHeight" x="5" y="0" width="93" height="16" uuid="512dd3a0-245b-4bd9-adb8-c212c208bcd5">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Left" verticalAlignment="Top">
+						<font fontName="Tahoma" size="11"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Service Address:  "]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement stretchType="ContainerHeight" x="92" y="0" width="368" height="16" uuid="6a35e1d4-bef2-4b2c-82e9-ac33d2c331e6">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Left" verticalAlignment="Top">
+						<font fontName="Tahoma" size="11"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{svcAddressLine1}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="37">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<printWhenExpression><![CDATA[($V{premiseSequence}<=1)]]></printWhenExpression>
+				<componentElement>
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="5" width="572" height="32" uuid="438182f5-57f1-4ee0-9c0b-e116bbb9b052">
+						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+						<property name="com.jaspersoft.studio.table.style.table_header" value="Table 1_TH"/>
+						<property name="com.jaspersoft.studio.table.style.column_header" value="Table 1_CH"/>
+						<property name="com.jaspersoft.studio.table.style.detail" value="Table 1_TD"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" whenNoDataType="AllSectionsNoDetail">
+						<datasetRun subDataset="bsegReadList" uuid="6787a464-1983-486a-b53d-fdad1fdc39a5">
+							<datasetParameter name="billId">
+								<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="premiseId">
+								<datasetParameterExpression><![CDATA[$F{premiseId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATA_DOCUMENT">
+								<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATE_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_FILE">
+								<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_INPUT_STREAM">
+								<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_LOCALE">
+								<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_NUMBER_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_TIME_ZONE">
+								<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="net.sf.jasperreports.xml.source">
+								<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="sequence">
+								<datasetParameterExpression><![CDATA[$F{sequence}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="65" uuid="906b93a4-e369-4bcd-9c87-48d08e2390a8">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+							<jr:columnHeader height="20" rowSpan="1">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="65" height="20" uuid="24611363-cade-48bb-a7b2-3d27d9dfdb8d"/>
+									<rectangle radius="5">
+										<reportElement x="1" y="0" width="63" height="20" backcolor="#0077C8" uuid="3a8076b7-93b9-46ee-8afc-99abd3d7eb49">
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										</reportElement>
+										<graphicElement>
+											<pen lineColor="#0077C8"/>
+										</graphicElement>
+									</rectangle>
+									<staticText>
+										<reportElement x="2" y="0" width="61" height="20" forecolor="#FFFFFF" uuid="9c916ea5-ee64-4ab2-98cb-adfac82de381">
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8" isBold="true"/>
+										</textElement>
+										<text><![CDATA[Meter #]]></text>
+									</staticText>
+								</frame>
+							</jr:columnHeader>
+							<jr:detailCell height="16">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="65" height="16" uuid="29f66653-961b-4cd4-a1d0-0b01cf250a52"/>
+									<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+										<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="65" height="16" uuid="ab2ebb35-9151-4a77-bb5d-4a6c7c3812bb">
+											<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8"/>
+											<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{badge}]]></textFieldExpression>
+									</textField>
+								</frame>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="85" uuid="bf58f768-510f-4150-8b0b-315eb69051d6">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+							<jr:columnHeader height="20" rowSpan="1">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="85" height="20" uuid="8120dc25-d391-4909-85de-a8a5a01d3c04"/>
+									<rectangle radius="5">
+										<reportElement x="1" y="0" width="83" height="20" backcolor="#0077C8" uuid="085a24ef-d533-4efd-ad60-50ccc461b18a">
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										</reportElement>
+										<graphicElement>
+											<pen lineColor="#0077C8"/>
+										</graphicElement>
+									</rectangle>
+									<textField>
+										<reportElement x="5" y="0" width="75" height="20" forecolor="#FFFFFF" uuid="95019cb3-5ac3-43f1-9fb0-e8ee183fe6f5">
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8" isBold="true"/>
+										</textElement>
+										<textFieldExpression><![CDATA["Service\nDescription"]]></textFieldExpression>
+									</textField>
+								</frame>
+							</jr:columnHeader>
+							<jr:detailCell height="16">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="85" height="16" uuid="ac73a32b-f076-4200-979a-67f600584d06"/>
+									<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+										<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="85" height="16" uuid="53402dfb-1199-4a09-8115-6019a3d1936c">
+											<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<box topPadding="2"/>
+										<textElement textAlignment="Left" verticalAlignment="Top">
+											<font fontName="Tahoma" size="8"/>
+											<paragraph lineSpacing="1_1_2" lineSpacingSize="1.0"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{saTypeDescr}]]></textFieldExpression>
+									</textField>
+								</frame>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="58" uuid="372b1196-2c3f-4f00-8bd5-b39d2faa50f4">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+							<jr:columnHeader height="20" rowSpan="1">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="58" height="20" uuid="5f67fb32-1528-4da8-9c1f-4e2f93e26595"/>
+									<rectangle radius="5">
+										<reportElement x="1" y="0" width="56" height="20" backcolor="#0077C8" uuid="4e0ee2e8-5a9d-4f06-9cf5-90281f7aad14">
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<graphicElement>
+											<pen lineColor="#0077C8"/>
+										</graphicElement>
+									</rectangle>
+									<staticText>
+										<reportElement x="2" y="0" width="54" height="20" forecolor="#FFFFFF" uuid="39e0edc4-a0a2-46e8-aa35-64d4618113a7">
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8" isBold="true"/>
+										</textElement>
+										<text><![CDATA[Rate Class]]></text>
+									</staticText>
+								</frame>
+							</jr:columnHeader>
+							<jr:detailCell height="16">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="58" height="16" uuid="1bec38df-bd14-43c1-86bb-82d6a097c820"/>
+									<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+										<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="58" height="16" uuid="514ca35a-5773-48d9-ada4-16093b732a60">
+											<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8"/>
+											<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{rateSched}]]></textFieldExpression>
+									</textField>
+								</frame>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="50" uuid="412b7ca3-a04a-42fc-bf6b-6ed1a399d1eb">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
+							<jr:columnHeader height="20" rowSpan="1">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="50" height="20" uuid="1d7ff2c4-abe5-47bc-8f37-7030ef3517c5"/>
+									<rectangle radius="5">
+										<reportElement x="1" y="0" width="48" height="20" backcolor="#0077C8" uuid="6f341aa3-b883-4de5-af3f-b01d688eed0e">
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<graphicElement>
+											<pen lineColor="#0077C8"/>
+										</graphicElement>
+									</rectangle>
+									<staticText>
+										<reportElement x="2" y="0" width="46" height="20" forecolor="#FFFFFF" uuid="5a34cd0d-48b6-43bb-8028-3875dbe81fab">
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8" isBold="true"/>
+										</textElement>
+										<text><![CDATA[Units]]></text>
+									</staticText>
+								</frame>
+							</jr:columnHeader>
+							<jr:detailCell height="16">
+								<frame>
+									<reportElement x="0" y="0" width="50" height="16" uuid="9092968f-94c5-488d-8771-cadb0d5c96d7"/>
+									<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+										<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="50" height="16" uuid="925a3faa-e032-4548-8f64-b3db528f28fe">
+											<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8"/>
+											<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{finalUom}]]></textFieldExpression>
+									</textField>
+								</frame>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="100" uuid="3b447e8d-c5f7-42f1-9911-95fb61d1f1c0">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
+							<jr:columnHeader height="20" rowSpan="1">
+								<frame>
+									<reportElement x="0" y="0" width="100" height="20" uuid="683b15cb-1e44-40f7-8793-e38d4802924a"/>
+									<rectangle radius="5">
+										<reportElement x="1" y="0" width="98" height="20" backcolor="#0077C8" uuid="0fb2c5ff-6221-4495-9f49-aa79e4ac80eb">
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<graphicElement>
+											<pen lineColor="#0077C8"/>
+										</graphicElement>
+									</rectangle>
+									<staticText>
+										<reportElement x="5" y="0" width="89" height="20" forecolor="#FFFFFF" uuid="742fbdb9-362d-44fa-b1a8-434d369a58fe">
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8" isBold="true"/>
+										</textElement>
+										<text><![CDATA[Read Dates
+From            To]]></text>
+									</staticText>
+								</frame>
+							</jr:columnHeader>
+							<jr:detailCell height="16">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="100" height="16" uuid="05d957eb-362c-44ac-951d-52d6d0d54944"/>
+									<textField textAdjust="StretchHeight" pattern="MM/dd/yyyy" isBlankWhenNull="true">
+										<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="50" height="16" uuid="95be1511-4c7b-498b-a355-830cbb987b24">
+											<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8"/>
+											<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$V{startReadDttm}]]></textFieldExpression>
+									</textField>
+									<textField textAdjust="StretchHeight" pattern="MM/dd/yyyy" isBlankWhenNull="true">
+										<reportElement stretchType="RelativeToBandHeight" x="50" y="0" width="50" height="16" uuid="648eede3-b51a-4be0-9eb5-61dfb049aa40">
+											<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8"/>
+											<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$V{endReadDttm}]]></textFieldExpression>
+									</textField>
+								</frame>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="35" uuid="c38b79f9-b1f8-4da0-a176-89f44df237a5">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column6"/>
+							<jr:columnHeader height="20" rowSpan="1">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="35" height="20" uuid="21636e69-b254-4327-bcd5-14f8aeb82d9e"/>
+									<rectangle radius="5">
+										<reportElement x="1" y="0" width="32" height="20" backcolor="#0077C8" uuid="c496d2b1-c9b5-4500-969c-1041a4b0d1bf">
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<graphicElement>
+											<pen lineColor="#0077C8"/>
+										</graphicElement>
+									</rectangle>
+									<staticText>
+										<reportElement x="5" y="0" width="25" height="20" forecolor="#FFFFFF" uuid="75dad6db-6995-420b-84e1-aa345ad1ae8c">
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8" isBold="true"/>
+										</textElement>
+										<text><![CDATA[Days]]></text>
+									</staticText>
+								</frame>
+							</jr:columnHeader>
+							<jr:detailCell height="16">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="35" height="16" uuid="67b3c6db-8fc3-4870-b044-0cb401b9d5ff"/>
+									<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+										<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="35" height="16" uuid="f4aec430-3f2b-4486-944a-99fb6bba3f0d">
+											<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8"/>
+											<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$V{Days}]]></textFieldExpression>
+									</textField>
+								</frame>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="95" uuid="fb869f2f-ee36-4c46-8e78-32046eb1067f">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column7"/>
+							<jr:columnHeader height="20" rowSpan="1">
+								<frame>
+									<reportElement x="0" y="0" width="95" height="20" uuid="6b3aeea4-d8fa-4a42-b9e0-a0f6c12c3cbe"/>
+									<rectangle radius="5">
+										<reportElement x="0" y="0" width="94" height="20" backcolor="#0077C8" uuid="4aba94b3-1f29-4e49-a8bc-0fd6b184e9f5">
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<graphicElement>
+											<pen lineColor="#0077C8"/>
+										</graphicElement>
+									</rectangle>
+									<staticText>
+										<reportElement x="5" y="0" width="85" height="20" forecolor="#FFFFFF" uuid="cb5c8318-77df-42c2-8a1d-3dcf9c35693f">
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8" isBold="true"/>
+										</textElement>
+										<text><![CDATA[Readings
+Previous     Current
+]]></text>
+									</staticText>
+								</frame>
+							</jr:columnHeader>
+							<jr:detailCell height="16">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="95" height="16" uuid="847dd852-3bc1-4e40-9df9-59d18ef3056c"/>
+									<textField textAdjust="StretchHeight" pattern="#,##0.###;(-#,##0.###)" isBlankWhenNull="true">
+										<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="47" height="16" uuid="6a91aabe-57f2-41b8-a452-9466f0d73283">
+											<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8"/>
+											<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{startRegRdg}]]></textFieldExpression>
+									</textField>
+									<textField textAdjust="StretchHeight" pattern="#,##0.###;(-#,##0.###)" isBlankWhenNull="true">
+										<reportElement stretchType="RelativeToBandHeight" x="47" y="0" width="48" height="16" uuid="694f8215-8379-4a22-98d8-b8f57730e2b5">
+											<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8"/>
+											<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{endRegRdg}]]></textFieldExpression>
+									</textField>
+								</frame>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="45" uuid="4c7e61de-3d93-4d3d-bd89-a23b1afc2512">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column8"/>
+							<jr:columnHeader height="20" rowSpan="1">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="45" height="20" uuid="a10d6177-0f14-4149-b307-c5aee45c7142"/>
+									<rectangle radius="5">
+										<reportElement x="1" y="0" width="43" height="20" backcolor="#0077C8" uuid="fe798132-3b0d-48de-87f8-4fb02d0c15ad">
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<graphicElement>
+											<pen lineColor="#0077C8"/>
+										</graphicElement>
+									</rectangle>
+									<staticText>
+										<reportElement x="1" y="0" width="42" height="20" forecolor="#FFFFFF" uuid="321a88a6-89a3-4d10-987c-422488e2e19c">
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8" isBold="true"/>
+										</textElement>
+										<text><![CDATA[Multiplier]]></text>
+									</staticText>
+								</frame>
+							</jr:columnHeader>
+							<jr:detailCell height="16">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="45" height="16" uuid="4523d509-bbe1-49e8-9fa7-3c59e2cb4285"/>
+									<textField textAdjust="StretchHeight" pattern="##0" isBlankWhenNull="true">
+										<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="45" height="16" uuid="a6c54c71-b418-42c3-99d4-f68e6af7d2ae">
+											<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8"/>
+											<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{regConst}]]></textFieldExpression>
+									</textField>
+								</frame>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="40" uuid="91eff35a-34b3-4d35-8901-d4c40e2d604a">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column9"/>
+							<jr:columnHeader height="20" rowSpan="1">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<frame>
+									<reportElement x="0" y="0" width="40" height="20" uuid="c20e8db7-cef6-4575-bfaf-e781e4b30bf9"/>
+									<rectangle radius="5">
+										<reportElement x="1" y="0" width="38" height="20" backcolor="#0077C8" uuid="0ce51941-2cda-4d6b-91cc-ba24857478c5">
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<graphicElement>
+											<pen lineColor="#0077C8"/>
+										</graphicElement>
+									</rectangle>
+									<staticText>
+										<reportElement x="2" y="0" width="36" height="20" forecolor="#FFFFFF" uuid="d336e865-0627-47a1-bdd8-7a9b990274a5">
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8" isBold="true"/>
+										</textElement>
+										<text><![CDATA[Usage]]></text>
+									</staticText>
+								</frame>
+							</jr:columnHeader>
+							<jr:detailCell height="16">
+								<frame>
+									<reportElement x="0" y="0" width="40" height="16" uuid="88c459c3-e3bd-472a-afb9-92aacdbd5d85"/>
+									<textField textAdjust="StretchHeight" pattern="#,##0.###;(-#,##0.###)" isBlankWhenNull="true">
+										<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="16" uuid="68c3a0ab-4e38-4f74-869c-616c25fe3e65">
+											<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c8f314ed-fb42-4a25-985f-5855291346f2"/>
+											<property name="com.jaspersoft.studio.unit.x" value="px"/>
+											<property name="com.jaspersoft.studio.unit.y" value="px"/>
+										</reportElement>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="Tahoma" size="8"/>
+											<paragraph lineSpacing="Double" lineSpacingSize="2.0"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{finalRegQty}]]></textFieldExpression>
+									</textField>
+								</frame>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band height="170">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<printWhenExpression><![CDATA[($V{premiseSequence}<=1 )]]></printWhenExpression>
+				<barChart>
+					<chart isShowLegend="false" evaluationTime="Group" evaluationGroup="accountId">
+						<reportElement isPrintRepeatedValues="false" x="1" y="30" width="179" height="128" isRemoveLineWhenBlank="true" printWhenGroupChanges="accountId" uuid="9954b388-2568-4240-8f21-027bcc564a14">
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						</reportElement>
+						<chartTitle position="Top">
+							<font size="8"/>
+							<titleExpression><![CDATA["          Gas Usage - CCF"]]></titleExpression>
+						</chartTitle>
+						<chartSubtitle/>
+						<chartLegend/>
+					</chart>
+					<categoryDataset>
+						<dataset>
+							<datasetRun subDataset="GasConsptionHistoryGraph" uuid="a62666c2-cae2-4bb6-94c4-e050153c1bce">
+								<datasetParameter name="billId">
+									<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="premiseId">
+									<datasetParameterExpression><![CDATA[$F{premiseId}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_DATA_DOCUMENT">
+									<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_DATE_PATTERN">
+									<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="net.sf.jasperreports.xml.source">
+									<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_FILE">
+									<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_INPUT_STREAM">
+									<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_LOCALE">
+									<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_TIME_ZONE">
+									<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_NUMBER_PATTERN">
+									<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="sequence">
+									<datasetParameterExpression><![CDATA[$F{sequence}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+						</dataset>
+						<categorySeries>
+							<seriesExpression><![CDATA[""]]></seriesExpression>
+							<categoryExpression><![CDATA[new SimpleDateFormat("MMM yy").format($F{sqDate})]]></categoryExpression>
+							<valueExpression><![CDATA[$F{billSq}]]></valueExpression>
+							<labelExpression><![CDATA[""]]></labelExpression>
+						</categorySeries>
+					</categoryDataset>
+					<barPlot>
+						<plot backgroundAlpha="1.0" foregroundAlpha="1.0" labelRotation="55.0">
+							<seriesColor seriesOrder="0" color="#0077C8"/>
+							<seriesColor seriesOrder="1" color="#009639"/>
+							<seriesColor seriesOrder="2" color="#BA0C2F"/>
+						</plot>
+						<itemLabel>
+							<font size="8"/>
+						</itemLabel>
+						<categoryAxisFormat labelRotation="55.0">
+							<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000">
+								<labelFont>
+									<font size="7"/>
+								</labelFont>
+								<tickLabelFont>
+									<font size="7"/>
+								</tickLabelFont>
+							</axisFormat>
+						</categoryAxisFormat>
+						<valueAxisFormat>
+							<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000">
+								<labelFont>
+									<font size="8"/>
+								</labelFont>
+								<tickLabelFont>
+									<font size="8"/>
+								</tickLabelFont>
+							</axisFormat>
+						</valueAxisFormat>
+					</barPlot>
+				</barChart>
+				<barChart>
+					<chart isShowLegend="false" evaluationTime="Group" evaluationGroup="accountId">
+						<reportElement isPrintRepeatedValues="false" x="400" y="30" width="170" height="128" isRemoveLineWhenBlank="true" printWhenGroupChanges="accountId" uuid="61f39809-18e5-4ac8-a75f-84023a899f9b">
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<chartTitle position="Top">
+							<font size="8"/>
+							<titleExpression><![CDATA["          Water Usage - Gallons"]]></titleExpression>
+						</chartTitle>
+						<chartSubtitle/>
+						<chartLegend/>
+					</chart>
+					<categoryDataset>
+						<dataset>
+							<datasetRun subDataset="WaterConsptionHistoryGraph" uuid="849576f5-7f81-4015-ba72-79a90d2b49c9">
+								<datasetParameter name="premiseId">
+									<datasetParameterExpression><![CDATA[$F{premiseId}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_DATA_DOCUMENT">
+									<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_DATE_PATTERN">
+									<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_FILE">
+									<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_INPUT_STREAM">
+									<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_LOCALE">
+									<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_TIME_ZONE">
+									<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_NUMBER_PATTERN">
+									<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="net.sf.jasperreports.xml.source">
+									<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="billId">
+									<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="sequence">
+									<datasetParameterExpression><![CDATA[$F{sequence}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+						</dataset>
+						<categorySeries>
+							<seriesExpression><![CDATA[""]]></seriesExpression>
+							<categoryExpression><![CDATA[new SimpleDateFormat("MMM yy").format($F{sqDate})]]></categoryExpression>
+							<valueExpression><![CDATA[$F{billSq}]]></valueExpression>
+							<labelExpression><![CDATA[""]]></labelExpression>
+						</categorySeries>
+					</categoryDataset>
+					<barPlot>
+						<plot backgroundAlpha="1.0" foregroundAlpha="1.0" labelRotation="55.0">
+							<seriesColor seriesOrder="0" color="#0077C8"/>
+							<seriesColor seriesOrder="1" color="#009639"/>
+							<seriesColor seriesOrder="2" color="#BA0C2F"/>
+						</plot>
+						<itemLabel>
+							<font size="8"/>
+						</itemLabel>
+						<categoryAxisFormat labelRotation="55.0">
+							<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000">
+								<labelFont>
+									<font size="8"/>
+								</labelFont>
+								<tickLabelFont>
+									<font size="7"/>
+								</tickLabelFont>
+							</axisFormat>
+						</categoryAxisFormat>
+						<valueAxisFormat>
+							<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000">
+								<labelFont>
+									<font size="8"/>
+								</labelFont>
+								<tickLabelFont>
+									<font size="8"/>
+								</tickLabelFont>
+							</axisFormat>
+						</valueAxisFormat>
+					</barPlot>
+				</barChart>
+				<barChart>
+					<chart isShowLegend="false" evaluationTime="Group" evaluationGroup="accountId">
+						<reportElement isPrintRepeatedValues="false" x="200" y="30" width="179" height="128" isRemoveLineWhenBlank="true" printWhenGroupChanges="accountId" uuid="7888ff83-db47-4ba5-a45b-c4634fadefe8">
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						</reportElement>
+						<chartTitle position="Top">
+							<font size="8"/>
+							<titleExpression><![CDATA["          Electric Usage - kWh"]]></titleExpression>
+						</chartTitle>
+						<chartSubtitle/>
+						<chartLegend/>
+					</chart>
+					<categoryDataset>
+						<dataset>
+							<datasetRun subDataset="ElectricConsptionHistoryGraph" uuid="97fd8be7-880f-40d4-aaab-1195dde8c50d">
+								<datasetParameter name="premiseId">
+									<datasetParameterExpression><![CDATA[$F{premiseId}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_DATA_DOCUMENT">
+									<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_DATE_PATTERN">
+									<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_FILE">
+									<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_INPUT_STREAM">
+									<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_LOCALE">
+									<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_TIME_ZONE">
+									<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_NUMBER_PATTERN">
+									<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="net.sf.jasperreports.xml.source">
+									<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="billId">
+									<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="sequence">
+									<datasetParameterExpression><![CDATA[$F{sequence}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+						</dataset>
+						<categorySeries>
+							<seriesExpression><![CDATA[""]]></seriesExpression>
+							<categoryExpression><![CDATA[new SimpleDateFormat("MMM yy").format($F{sqDate})]]></categoryExpression>
+							<valueExpression><![CDATA[$F{billSq}]]></valueExpression>
+							<labelExpression><![CDATA[""]]></labelExpression>
+						</categorySeries>
+					</categoryDataset>
+					<barPlot>
+						<plot backgroundAlpha="1.0" foregroundAlpha="1.0" labelRotation="55.0">
+							<seriesColor seriesOrder="0" color="#0077C8"/>
+							<seriesColor seriesOrder="1" color="#009639"/>
+							<seriesColor seriesOrder="2" color="#BA0C2F"/>
+						</plot>
+						<itemLabel>
+							<font size="8"/>
+						</itemLabel>
+						<categoryAxisFormat labelRotation="55.0">
+							<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000">
+								<labelFont>
+									<font size="8"/>
+								</labelFont>
+								<tickLabelFont>
+									<font size="7"/>
+								</tickLabelFont>
+							</axisFormat>
+						</categoryAxisFormat>
+						<valueAxisFormat>
+							<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000">
+								<labelFont>
+									<font size="8"/>
+								</labelFont>
+								<tickLabelFont>
+									<font size="8"/>
+								</tickLabelFont>
+							</axisFormat>
+						</valueAxisFormat>
+					</barPlot>
+				</barChart>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="account3" footerPosition="ForceAtBottom">
+		<groupExpression><![CDATA[$F{billId}+"-"+$F{premiseId}+"-"+$F{sequence}]]></groupExpression>
+		<groupFooter>
+			<band splitType="Stretch">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupFooter>
+	</group>
+	<detail>
+		<band height="5" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<subreport isUsingCache="true" runToBottom="true">
+				<reportElement x="0" y="0" width="572" height="5" uuid="603cde57-3204-4363-8bc7-a1194ac4fad2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<subreportParameter name="net.sf.jasperreports.xml.source">
+					<subreportParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="premiseId">
+					<subreportParameterExpression><![CDATA[$F{premiseId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="billId">
+					<subreportParameterExpression><![CDATA[$F{billId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="sequence">
+					<subreportParameterExpression><![CDATA[$F{sequence}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="caReportCount" toVariable="caReportCount"/>
+				<returnValue subreportVariable="adjReportCount" toVariable="adjReportCount"/>
+				<returnValue subreportVariable="premiseSequence" toVariable="premiseSequence"/>
+				<subreportExpression><![CDATA["repo:Current_Activity_Subreport.jrxml"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

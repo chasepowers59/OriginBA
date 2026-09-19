@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CMA_DETAILS" label="CMA_DETAILS" resourceId="CMA_DETAILS"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CityCorp_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="APPLIED_BY" label="Applied By" resourceId="CMA_DETAILS.APPLIED_BY"></item>
+    <item id="APPLIED_DTTM" label="CMA Applied Date Time" resourceId="CMA_DETAILS.APPLIED_DTTM"></item>
+    <item id="CMA_FILENAME" label="CMA Filie Name" resourceId="CMA_DETAILS.CMA_FILENAME"></item>
+    <item id="MAINT_OBJ" label="Maintenance Object" resourceId="CMA_DETAILS.MAINT_OBJ"></item>
+    <item id="PK_VALUE" label="Key Values" resourceId="CMA_DETAILS.PK_VALUE"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CMA_DETAILS" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="CMA_FILENAME" type="java.lang.String"></field>
+        <field id="APPLIED_DTTM" type="java.sql.Timestamp"></field>
+        <field id="APPLIED_BY" type="java.lang.String"></field>
+        <field id="MAINT_OBJ" type="java.lang.String"></field>
+        <field id="PK_VALUE" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT 
+    SUBSTR(ST.MIGR_FILENAME,instr(ST.MIGR_FILENAME,'/',-1)+1) CMA_FILENAME,
+    ST.STATUS_UPD_DTTM APPLIED_DTTM,
+    USR.USER_ID APPLIED_BY,
+    trim(MO.DESCR) MAINT_OBJ,
+    listagg('[' || TRIM(OBJ2.PK_VALUE1) || ',' || TRIM(OBJ2.PK_VALUE2) || ',' || TRIM(OBJ2.PK_VALUE3)|| ',' || TRIM(OBJ2.PK_VALUE4)|| ',' || TRIM(OBJ2.PK_VALUE5)|| ']', chr(13)||chr(10)) WITHIN GROUP (ORDER BY OBJ2.PK_VALUE1) AS PK_VALUE
+FROM 
+    CISADM.F1_MIGR_OBJ OBJ2, 
+    CISADM.F1_MIGR_DATA_ST ST, 
+    CISADM.SC_USER USR, 
+    CISADM.F1_BUS_OBJ_STATUS_L BOS,
+    CISADM.CI_MD_MO_L MO
+WHERE EXISTS (
+    SELECT 'X'
+    FROM CISADM.F1_MIGR_OBJ OBJ
+    WHERE ST.MIGR_DATA_SET_ID = OBJ.MIGR_DATA_SET_ID
+    AND OBJ.BO_STATUS_CD = 'APPLIED')
+AND ST.USER_ID = USR.USER_ID
+AND ST.MIGR_DATA_SET_ID = OBJ2.MIGR_DATA_SET_ID
+AND BOS.BO_STATUS_CD = OBJ2.BO_STATUS_CD
+AND BOS.BUS_OBJ_CD = 'F1-MigrObjectImport'
+AND OBJ2.BO_STATUS_CD = 'APPLIED'
+AND MO.MAINT_OBJ_CD = OBJ2.MAINT_OBJ_CD
+GROUP BY
+  ST.MIGR_FILENAME,
+  ST.STATUS_UPD_DTTM,
+  USR.USER_ID,
+  MO.DESCR
+ORDER BY
+  SUBSTR(ST.MIGR_FILENAME,instr(ST.MIGR_FILENAME,'/',-1)+1),
+  MO.DESCR,
+  ST.STATUS_UPD_DTTM DESC</query>
+    </jdbcQuery>
+  </resources>
+</schema>

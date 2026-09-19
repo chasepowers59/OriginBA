@@ -24,7 +24,7 @@ Domain Designer deletes / breaks when it cannot resolve:
 2. `02_refresh_cms_sa_snapshot_procedure.sql` — create `CISADM.REFRESH_CMS_SA_SNAPSHOT`
 3. `03_run_and_validate.sql` — run refresh + basic validation queries
 4. `04_validate_cms_sa_snapshot.sql` — bucket identity, FT parity, CISREAD smoke (no refresh)
-5. `05_schedule_cms_sa_snapshot_job.sql` — recurring 6-hour scheduler job
+5. `05_schedule_cms_sa_snapshot_job.sql` — recurring scheduler job (created on the 6-hour interval, re-timed to 12:30 and 18:30 UTC by step 07's cadence script)
 
 Centralized rollout wrappers: [deployment_steps/00_domain_support_deployment_manifest.md](../../deployment_steps/00_domain_support_deployment_manifest.md)
 

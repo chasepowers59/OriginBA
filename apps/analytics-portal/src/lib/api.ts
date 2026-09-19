@@ -20,6 +20,7 @@ import type {
   SnapshotsIndex,
   WorkstreamSummary,
 } from "./types";
+import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview, AssistantSpend } from "@/lib/types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
 import { localIsoDate } from "@/lib/format";
 import { parseApiError } from "@/lib/apiErrors";
@@ -463,5 +464,24 @@ export function countDatabaseSql(sql: string): Promise<DatabaseSqlCountResponse>
   return fetchJson<DatabaseSqlCountResponse>("/database/sql/count", {
     method: "POST",
     body: JSON.stringify({ sql, offset: 0, page_size: 50 }),
+  });
+}
+
+export function fetchIntegrity(): Promise<IntegrityOverview> {
+  return fetchJson<IntegrityOverview>("/portal/integrity");
+}
+
+export function fetchAssistantSpend(): Promise<AssistantSpend> {
+  return fetchJson<AssistantSpend>("/portal/assistant/spend");
+}
+
+export function fetchAssistantStatus(): Promise<AssistantStatus> {
+  return fetchJson<AssistantStatus>("/portal/assistant/status");
+}
+
+export function askAssistant(question: string, thread: AssistantMessage[]): Promise<AssistantResponse> {
+  return fetchJson<AssistantResponse>("/portal/assistant", {
+    method: "POST",
+    body: JSON.stringify({ question, thread }),
   });
 }

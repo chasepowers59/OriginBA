@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Latest_Reads" label="Latest_Reads" resourceId="Latest_Reads"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="C2M_ACCT" label="C2M Account ID" resourceId="Latest_Reads.C2M_ACCT"></item>
+    <item id="AS400_ACCT" label="AS400 Account" resourceId="Latest_Reads.AS400_ACCT"></item>
+    <item id="ADDRESS" label="Address" resourceId="Latest_Reads.ADDRESS"></item>
+    <item id="PROPERTY_TYPE" label="Property Type" resourceId="Latest_Reads.PROPERTY_TYPE"></item>
+    <item id="MSRMT_CYC_CD" label="Measurement Cycle" resourceId="Latest_Reads.MSRMT_CYC_CD"></item>
+    <item id="MSRMT_CYC_RTE_CD" label="Measurement Cycle Route" resourceId="Latest_Reads.MSRMT_CYC_RTE_CD"></item>
+    <item id="METER_NUMBER" label="Meter Number" resourceId="Latest_Reads.METER_NUMBER"></item>
+    <item id="MXU_NUMBER" label="MXU Number" resourceId="Latest_Reads.MXU_NUMBER"></item>
+    <item id="LATEST_READ_DATE" label="Latest Read Date" resourceId="Latest_Reads.LATEST_READ_DATE"></item>
+    <item id="LATEST_READING" label="Latest Reading" resourceId="Latest_Reads.LATEST_READING"></item>
+    <item id="LATEST_CONSUMPTION" label="Latest Consumption" resourceId="Latest_Reads.LATEST_CONSUMPTION"></item>
+    <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="MSRMT_COND_FLG" label="Measurement Condition" resourceId="Latest_Reads.MSRMT_COND_FLG"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Latest_Reads" datasourceId="Newark1_DS">
+      <fieldList>
+        <field id="C2M_ACCT" type="java.lang.String"></field>
+        <field id="AS400_ACCT" type="java.lang.String"></field>
+        <field id="ADDRESS" type="java.lang.String"></field>
+        <field id="PROPERTY_TYPE" type="java.lang.String"></field>
+        <field id="METER_NUMBER" type="java.lang.String"></field>
+        <field id="MXU_NUMBER" type="java.lang.String"></field>
+        <field id="LATEST_READ_DATE" type="java.sql.Timestamp"></field>
+        <field id="LATEST_READING" type="java.math.BigDecimal"></field>
+        <field id="LATEST_CONSUMPTION" type="java.math.BigDecimal"></field>
+        <field id="MSRMT_COND_FLG" type="java.math.BigDecimal"></field>
+        <field id="MSRMT_CYC_CD" type="java.lang.String"></field>
+        <field id="MSRMT_CYC_RTE_CD" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT 
+    SA.ACCT_ID AS "C2M_ACCT",
+    SA.OLD_ACCT_ID AS "AS400_ACCT",  
+    PREM.ADDRESS1 AS "ADDRESS",
+    PTL.DESCR AS "PROPERTY_TYPE",
+    SP.MSRMT_CYC_CD,
+    SP.MSRMT_CYC_RTE_CD,
+    BN.ID_VALUE AS "METER_NUMBER",
+    MXU.ID_VALUE AS "MXU_NUMBER",  
+    MSR.MSRMT_LOCAL_DTTM AS "LATEST_READ_DATE",
+    MSR.READING_VAL AS "LATEST_READING",
+    MSR.MSRMT_VAL AS "LATEST_CONSUMPTION",
+    CAST(MSR.MSRMT_COND_FLG AS INT) AS MSRMT_COND_FLG
+FROM CISADM.D1_SP SP 
+INNER JOIN CISADM.D1_SP_IDENTIFIER SPID ON SPID.D1_SP_ID = SP.D1_SP_ID AND SPID.SP_ID_TYPE_FLG = 'D1EP'
+INNER JOIN CISADM.CI_PREM PREM ON PREM.PREM_ID = SPID.ID_VALUE
+INNER JOIN CISADM.CI_PREM_TYPE_L PTL ON PTL.PREM_TYPE_CD = PREM.PREM_TYPE_CD
+INNER JOIN (
+            SELECT * FROM (
+                    SELECT TSA.ACCT_ID, 
+                       TSA.OLD_ACCT_ID,
+                       TSA.CHAR_PREM_ID,
+                       ROW_NUMBER() OVER (PARTITION BY TSA.CHAR_PREM_ID
+            ORDER BY TSA.START_DT DESC) RANK
+                FROM CISADM.CI_SA TSA
+                WHERE TSA.CHAR_PREM_ID != ' '
+                AND TSA.SA_STATUS_FLG NOT IN ('70')
+                ORDER BY TSA.START_DT DESC)
+            WHERE RANK = 1) SA
+       ON SA.CHAR_PREM_ID = PREM.PREM_ID
+INNER JOIN CISADM.D1_INSTALL_EVT IE ON IE.D1_SP_ID = SP.D1_SP_ID AND IE.D1_REMOVAL_DTTM IS NULL
+INNER JOIN CISADM.D1_SP_EQPMNT SPE ON SPE.D1_SP_ID = SP.D1_SP_ID AND SPE.D1_REMOVAL_DTTM IS NULL
+INNER JOIN CISADM.D1_DVC_IDENTIFIER MXU ON MXU.D1_DEVICE_ID = SPE.D1_DEVICE_ID AND MXU.DVC_ID_TYPE_FLG = 'D1BN'
+INNER JOIN CISADM.D1_DVC_CFG DC ON DC.DEVICE_CONFIG_ID = IE.DEVICE_CONFIG_ID
+INNER JOIN CISADM.D1_DVC_IDENTIFIER BN ON BN.D1_DEVICE_ID = DC.D1_DEVICE_ID AND BN.DVC_ID_TYPE_FLG = 'D1BN'
+INNER JOIN CISADM.D1_MEASR_COMP MC ON MC.DEVICE_CONFIG_ID = DC.DEVICE_CONFIG_ID
+LEFT JOIN CISADM.D1_MSRMT MSR
+      ON MSR.MEASR_COMP_ID = MC.MEASR_COMP_ID
+         AND MSR.MSRMT_DTTM = (SELECT MAX(MSR1.MSRMT_DTTM)
+                               FROM   CISADM.D1_MSRMT MSR1
+                               WHERE
+                                MSR1.MEASR_COMP_ID = MSR.MEASR_COMP_ID
+                                AND MSR1.MSRMT_USE_FLG &lt;&gt; 'D101')
+WHERE SP.MSRMT_CYC_CD = '01' AND SP.MSRMT_CYC_RTE_CD NOT IN ('ROUTE-500','ROUTE-739','ROUTE-740')</query>
+    </jdbcQuery>
+  </resources>
+</schema>

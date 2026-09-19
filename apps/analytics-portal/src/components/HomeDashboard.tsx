@@ -8,6 +8,7 @@ import type { SnapshotSummary } from "@/lib/types";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
 import { ExecutiveDashboard } from "@/components/ExecutiveDashboard";
 import { NlqSearchPanel } from "@/components/NlqSearchPanel";
+import { AssistantPanel } from "@/components/AssistantPanel";
 import { useBrand } from "@/components/PortalThemeProvider";
 
 export function HomeDashboard() {
@@ -61,6 +62,10 @@ export function HomeDashboard() {
         {/* The one executive overview: "/" is the Executive Overview page —
             /dashboard redirects here so the KPIs and search live in one place. */}
         <ExecutiveDashboard variant="full" initialDays={30} />
+      </section>
+
+      <section>
+        <AssistantPanel />
       </section>
 
       <section>

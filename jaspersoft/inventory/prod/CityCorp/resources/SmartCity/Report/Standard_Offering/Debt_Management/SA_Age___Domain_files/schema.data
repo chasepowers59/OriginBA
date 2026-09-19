@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="AR_AGING_SA_FIFO" label="AR Aging SA (FIFO As-Of)" resourceId="AR_AGING_SA_FIFO"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CityCorp_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="ServiceAgreement" label="Service Agreement" resourceId="AR_AGING_SA_FIFO">
+      <items>
+        <item id="SA_ID" label="Service Agreement ID" resourceId="AR_AGING_SA_FIFO.SA_ID"></item>
+        <item id="ACCT_ID" label="Account ID" resourceId="AR_AGING_SA_FIFO.ACCT_ID"></item>
+        <item id="SA_TYPE_CD" label="SA Type" resourceId="AR_AGING_SA_FIFO.SA_TYPE_CD"></item>
+        <item id="SERVICE_ADDRESS" label="Service Address" resourceId="AR_AGING_SA_FIFO.SERVICE_ADDRESS"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DistributionGL" label="Distribution &amp; GL Control" resourceId="AR_AGING_SA_FIFO">
+      <items>
+        <item id="DISTRIBUTION_CODE" label="Distribution Code" resourceId="AR_AGING_SA_FIFO.DISTRIBUTION_CODE"></item>
+        <item id="DISTRIBUTION_DESCR" label="Distribution Description" resourceId="AR_AGING_SA_FIFO.DISTRIBUTION_DESCR"></item>
+        <item id="GL_CONTROL_SECTION" label="GL Control Section" resourceId="AR_AGING_SA_FIFO.GL_CONTROL_SECTION"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="AmountsMeasures" label="Amounts &amp; Measures (FIFO)" resourceId="AR_AGING_SA_FIFO">
+      <items>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="CURRENT_BAL" label="Current Balance" resourceId="AR_AGING_SA_FIFO.CURRENT_BAL"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="PAYOFF_BAL" label="Payoff Balance" resourceId="AR_AGING_SA_FIFO.PAYOFF_BAL"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="AMT_0_30" label="Age 0-30 Days" resourceId="AR_AGING_SA_FIFO.AMT_0_30"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="AMT_31_60" label="Age 31-60 Days" resourceId="AR_AGING_SA_FIFO.AMT_31_60"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="AMT_61_90" label="Age 61-90 Days" resourceId="AR_AGING_SA_FIFO.AMT_61_90"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="AMT_91_120" label="Age 91-120 Days" resourceId="AR_AGING_SA_FIFO.AMT_91_120"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="AMT_121_PLUS" label="Age 121+ Days" resourceId="AR_AGING_SA_FIFO.AMT_121_PLUS"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="BUCKET_SUM" label="Bucket Sum (check = Current)" resourceId="AR_AGING_SA_FIFO.BUCKET_SUM"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DatesTimes" label="Dates &amp; Times" resourceId="AR_AGING_SA_FIFO">
+      <items>
+        <item id="AS_OF_DT" label="As-Of Report Date" resourceId="AR_AGING_SA_FIFO.AS_OF_DT"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcQuery id="AR_AGING_SA_FIFO" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="AS_OF_DT" type="java.sql.Timestamp"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="SERVICE_ADDRESS" type="java.lang.String"></field>
+        <field id="DISTRIBUTION_CODE" type="java.lang.String"></field>
+        <field id="DISTRIBUTION_DESCR" type="java.lang.String"></field>
+        <field id="GL_CONTROL_SECTION" type="java.lang.String"></field>
+        <field id="CURRENT_BAL" type="java.math.BigDecimal"></field>
+        <field id="PAYOFF_BAL" type="java.math.BigDecimal"></field>
+        <field id="AMT_0_30" type="java.math.BigDecimal"></field>
+        <field id="AMT_31_60" type="java.math.BigDecimal"></field>
+        <field id="AMT_61_90" type="java.math.BigDecimal"></field>
+        <field id="AMT_91_120" type="java.math.BigDecimal"></field>
+        <field id="AMT_121_PLUS" type="java.math.BigDecimal"></field>
+        <field id="BUCKET_SUM" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT * FROM (
+WITH
+asof AS (
+    SELECT TRUNC(DATE '2026-06-30') AS d FROM dual
+),
+base_ft AS (
+    SELECT
+        ft.sa_id,
+        TRUNC(ft.ars_dt) AS ars_dt,
+        ft.ft_id,
+        NVL(ft.cur_amt, 0) AS cur_amt,
+        CASE WHEN NVL(ft.cur_amt, 0) &gt; 0 THEN NVL(ft.cur_amt, 0) ELSE 0 END AS debt_amt,
+        CASE WHEN NVL(ft.cur_amt, 0) &lt; 0 THEN -NVL(ft.cur_amt, 0) ELSE 0 END AS credit_amt
+    FROM cisadm.ci_ft ft
+    CROSS JOIN asof a
+    WHERE ft.freeze_sw = 'Y'
+      AND ft.not_in_ars_sw = 'N'
+      AND ft.ars_dt IS NOT NULL
+      AND TRUNC(ft.ars_dt) &lt;= a.d
+),
+sa_tot AS (
+    SELECT
+        sa_id,
+        SUM(cur_amt) AS cur_bal,
+        SUM(debt_amt) AS total_debt,
+        SUM(credit_amt) AS total_credit
+    FROM base_ft
+    GROUP BY sa_id
+),
+debt_rows AS (
+    SELECT
+        b.sa_id,
+        b.ars_dt,
+        b.ft_id,
+        b.debt_amt,
+        SUM(b.debt_amt) OVER (
+            PARTITION BY b.sa_id
+            ORDER BY b.ars_dt, b.ft_id
+            ROWS UNBOUNDED PRECEDING
+        ) AS cum_debt
+    FROM base_ft b
+    WHERE b.debt_amt &gt; 0
+),
+unpaid_debt AS (
+    SELECT
+        d.sa_id,
+        d.ars_dt,
+        GREATEST(0, d.cum_debt - t.total_credit)
+            - GREATEST(0, (d.cum_debt - d.debt_amt) - t.total_credit) AS unpaid_amt
+    FROM debt_rows d
+    INNER JOIN sa_tot t ON t.sa_id = d.sa_id
+),
+aged_debt AS (
+    SELECT
+        u.sa_id,
+        NVL(SUM(CASE WHEN a.d - u.ars_dt BETWEEN 0 AND 30 THEN u.unpaid_amt ELSE 0 END), 0) AS ars_amt1,
+        NVL(SUM(CASE WHEN a.d - u.ars_dt BETWEEN 31 AND 60 THEN u.unpaid_amt ELSE 0 END), 0) AS ars_amt2,
+        NVL(SUM(CASE WHEN a.d - u.ars_dt BETWEEN 61 AND 90 THEN u.unpaid_amt ELSE 0 END), 0) AS ars_amt3,
+        NVL(SUM(CASE WHEN a.d - u.ars_dt BETWEEN 91 AND 120 THEN u.unpaid_amt ELSE 0 END), 0) AS ars_amt4,
+        NVL(SUM(CASE WHEN a.d - u.ars_dt &gt; 120 THEN u.unpaid_amt ELSE 0 END), 0) AS ars_amt5
+    FROM unpaid_debt u
+    CROSS JOIN asof a
+    GROUP BY u.sa_id
+),
+sa_aged AS (
+    SELECT
+        t.sa_id,
+        t.cur_bal,
+        NVL(ad.ars_amt1, 0) - GREATEST(0, t.total_credit - t.total_debt) AS ars_amt1,
+        NVL(ad.ars_amt2, 0) AS ars_amt2,
+        NVL(ad.ars_amt3, 0) AS ars_amt3,
+        NVL(ad.ars_amt4, 0) AS ars_amt4,
+        NVL(ad.ars_amt5, 0) AS ars_amt5
+    FROM sa_tot t
+    LEFT JOIN aged_debt ad ON ad.sa_id = t.sa_id
+),
+sa_dst AS (
+    SELECT
+        sa.sa_id,
+        sa.acct_id,
+        sa.sa_type_cd,
+        sa.char_prem_id,
+        TRIM(st.dst_id) AS dist_code,
+        NVL(TRIM(dl.descr), TRIM(st.dst_id)) AS dist_descr
+    FROM cisadm.ci_sa sa
+    JOIN cisadm.ci_sa_type st
+      ON st.sa_type_cd = sa.sa_type_cd
+     AND st.cis_division = sa.cis_division
+    LEFT JOIN cisadm.ci_dst_code_l dl
+      ON dl.dst_id = st.dst_id
+     AND dl.language_cd = 'ENG'
+)
+SELECT
+    a.d AS as_of_dt,
+    s.sa_id,
+    d.acct_id,
+    d.sa_type_cd,
+    NVL(TRIM(p.address1), ' ') AS service_address,
+    d.dist_code AS distribution_code,
+    d.dist_descr AS distribution_descr,
+    CASE
+        WHEN d.dist_code IN ('A/R-WATER', 'A/R-SEWER', 'A/R-PA', 'A/P-OVPY')
+            THEN '142000 Customer AR'
+        WHEN d.dist_code = 'A/R-SOLWST'
+            THEN '142050 Solid Waste AR'
+        WHEN d.dist_code = 'A/R-CARDS'
+            THEN '142060 Cards AR'
+        WHEN d.dist_code = 'A/P-DEPOS'
+            THEN '235000 Customer Deposits'
+        WHEN d.dist_code LIKE 'E-WO%'
+            THEN 'Write-Off DST (not AR control)'
+        ELSE 'Other'
+    END AS gl_control_section,
+    ROUND(s.cur_bal, 2) AS current_bal,
+    ROUND(s.cur_bal, 2) AS payoff_bal,
+    ROUND(s.ars_amt1, 2) AS amt_0_30,
+    ROUND(s.ars_amt2, 2) AS amt_31_60,
+    ROUND(s.ars_amt3, 2) AS amt_61_90,
+    ROUND(s.ars_amt4, 2) AS amt_91_120,
+    ROUND(s.ars_amt5, 2) AS amt_121_plus,
+    ROUND(s.ars_amt1 + s.ars_amt2 + s.ars_amt3 + s.ars_amt4 + s.ars_amt5, 2) AS bucket_sum
+FROM sa_aged s
+JOIN sa_dst d ON d.sa_id = s.sa_id
+LEFT JOIN cisadm.ci_prem p ON p.prem_id = d.char_prem_id
+CROSS JOIN asof a
+WHERE ABS(s.cur_bal) &gt; 0.005
+) X</query>
+    </jdbcQuery>
+  </resources>
+</schema>

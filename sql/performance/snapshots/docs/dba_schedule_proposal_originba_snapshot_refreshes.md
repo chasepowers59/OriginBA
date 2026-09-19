@@ -1,3 +1,5 @@
+> **Superseded (2026-09-18).** This proposal (2026-04-22) describes a once-daily 01:00 schedule over four tables. The live state is eight tables, two runs a day at 10:00 and 16:00 UTC with a 30-minute stagger, applied by `../apply_3x_daily_schedule_11utc_base.sql` through `../deployment_steps/07_schedule_all_active_snapshots.sql`. Do not hand this file to a DBA; hand them the SQL or the explorer's Snapshot Layer page.
+
 # DBA Schedule Proposal for OriginBA Snapshot Refreshes
 
 Scheduling Recommendation Based on Current Refresh Runtime, Current Scheduler Configuration, and Current Refresh Design
