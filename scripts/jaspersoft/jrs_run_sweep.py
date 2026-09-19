@@ -98,6 +98,8 @@ def _inline_parameters(query: dict) -> dict:
         return node
     out = json.loads(json.dumps(query))
     fe = _drop_any_value(walk(where["filterExpression"])) if "filterExpression" in where else None
+    if isinstance(fe, dict) and fe.get("object") is None:   # every filter was "any value"
+        fe = None
     out["where"] = {"filterExpression": fe} if fe else {}
     return out
 
