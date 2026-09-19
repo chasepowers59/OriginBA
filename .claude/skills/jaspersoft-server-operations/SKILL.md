@@ -119,8 +119,10 @@ Cannot: server configuration, JDBC drivers, font extensions (Aptos), Ad Hoc desi
     fix is real: a client-specific filter value (audit_adhoc_saved_filters.py), a feature the client
     does not use, or a date window with nothing in it. Verified by bisecting the saved filters one at
     a time (`jrs_view_calibrate.py` is the harness for the next such question).
-11. **Speed:** the sweep is bounded by the slowest views and by dashboards, not by count
-    (Fond du Lac 174 resources in 7 min at 3 workers; CityCorp prod 28 min at 2 workers of which
-    20 min were five views at the 240 s cap). Load check = 60 s cap, 6 workers, every prod org AT
-    ONCE (`--org A --org B ...`, each client is its own database); rerun only timeouts with a
-    600 s cap if the slow list matters. Whole-tenant, five orgs, expect ~30 min wall clock.
+11. **Speed, corrected (2026-09-19):** running five prod orgs at once with 6 workers each (30
+    concurrent executions) SATURATED the prod 9.0 server: descriptor GETs and TLS handshakes timed
+    out, the median successful view took 20 s (2 s on test), Newark1 read 120 timeouts of 160. A
+    baseline taken that way hides real breakage. Prod sweeps run ONE org at a time, 3 workers, 120 s
+    cap (whole tenant ~1,300 resources, ~1-1.5 h). The parallel `--org A --org B` form is for the
+    test server. A run's honesty check: the median ok time should be single-digit seconds, and no
+    "descriptor None" errors.
