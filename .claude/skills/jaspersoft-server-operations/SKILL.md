@@ -112,16 +112,13 @@ Cannot: server configuration, JDBC drivers, font extensions (Aptos), Ad Hoc desi
 9. **Slow views are real findings**, not tool faults: Usage_Transaction___Not_Used_on_Bill
    exceeds 240 s at Fond du Lac; Measurements___No_Reads 100 s. A view over 30 s is a candidate
    for the snapshot layer.
-10. **"Empty" from the sweep is NOT yet a verified signal (2026-09-18, VPN off).** 40 views are
-    empty at BOTH CityCorp prod and Fond du Lac test, including "Customers Accounts with Active
-    Services" (SA status 10/20, primary name) which cannot be empty at a live client. Suspect
-    the runner's handling of value-less filters (`startsWith(x, '')`, `isAnyValue(...)`) or of
-    inlined relative dates. Calibrate first: open Billed_Amount___Billing_Activity and
-    Customer___Customers_Accounts_with_Active_Services in the UI at CityCorp; if they show rows,
-    run `jrs_view_calibrate.py --env prod --org CityCorp <view uris>` (four execution variants:
-    inline, params, trimmed, stripped) and adopt the variant whose counts match the UI; then
-    re-sweep before trusting any empty. Until then, read the sweep for BROKE/healed/slower only.
-    Chase's theory: trailing whitespace in padded CHAR values ('Y   ', 'ACCTENRL  ').
+10. **"Empty" is calibrated (2026-09-19, CityCorp prod).** The cause was never whitespace: an Ad Hoc
+    "is any value" filter is saved as `in (field, [])` -- an empty list -- which the UI ignores and
+    the query-executions service applies literally (`x IN ()` = no rows). The runner drops those
+    (`_drop_any_value`); views that read 0 now answer 14,574 / 6,945 / 392 rows. An empty after the
+    fix is real: a client-specific filter value (audit_adhoc_saved_filters.py), a feature the client
+    does not use, or a date window with nothing in it. Verified by bisecting the saved filters one at
+    a time (`jrs_view_calibrate.py` is the harness for the next such question).
 11. **Speed:** the sweep is bounded by the slowest views and by dashboards, not by count
     (Fond du Lac 174 resources in 7 min at 3 workers; CityCorp prod 28 min at 2 workers of which
     20 min were five views at the 240 s cap). Load check = 60 s cap, 6 workers, every prod org AT

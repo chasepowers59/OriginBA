@@ -97,8 +97,33 @@ def _inline_parameters(query: dict) -> dict:
             return [walk(v) for v in node]
         return node
     out = json.loads(json.dumps(query))
-    out["where"] = {"filterExpression": walk(where["filterExpression"])} if "filterExpression" in where else {}
+    fe = _drop_any_value(walk(where["filterExpression"])) if "filterExpression" in where else None
+    out["where"] = {"filterExpression": fe} if fe else {}
     return out
+
+
+def _drop_any_value(node):
+    """An Ad Hoc "is any value" filter is saved as `in (field, [])` -- an EMPTY list. The UI treats
+    it as no filter; the query-executions service applies it literally and `x IN ()` returns no
+    rows, which is why 40 views read as empty at two clients on 2026-09-18 (calibrated on CityCorp
+    prod: the same view answers 27,532 rows without them). Remove them, and any and/or left empty."""
+    if isinstance(node, dict):
+        if "in" in node and isinstance(node["in"], dict):
+            ops = node["in"].get("operands", [])
+            if len(ops) == 2 and isinstance(ops[1], dict) and ops[1].get("list", {}).get("items") == []:
+                return None
+        if "function" in node and node["function"].get("functionName") == "filter":
+            ops = node["function"].get("operands", [])
+            inner = _drop_any_value(ops[-1]) if ops else None
+            return None if inner is None else {"function": {**node["function"], "operands": ops[:-1] + [inner]}}
+        for key in ("and", "or"):
+            if key in node:
+                kept = [k for k in (_drop_any_value(o) for o in node[key].get("operands", [])) if k is not None]
+                if not kept:
+                    return None
+                return kept[0] if len(kept) == 1 else {key: {**node[key], "operands": kept}}
+        return {k: _drop_any_value(v) for k, v in node.items()}
+    return node
 
 
 def run_view(uri: str, timeout: int) -> dict:
