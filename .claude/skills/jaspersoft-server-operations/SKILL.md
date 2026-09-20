@@ -200,3 +200,30 @@ Parallelism, honestly: one prod server serves every org, so five orgs at once sa
 test server takes `--org A --org B` at once. Agents in parallel pay off on the work that does not
 hit the server: reading five summaries, the per-client filter reviews, domain fixes for different
 clients, writing up. A short cap is what makes the run fast: nothing is waited for.
+
+## JRXML 6 on the 10.0 server, settled (2026-09-20, before the prod upgrade)
+
+Measured here: the JasperReports 7.0.7 LIBRARY refuses JRXML 6 ("Unable to load report" on a repo
+report, the legacy Odessa letter, and Ellensburg's live bill pulled from the 10.0 test server), and
+6.20.6 refuses JRXML 7; `net.sf.jasperreports:jasperreports-legacy` is not on Maven Central. The
+vendor: JR 7 replaced the Digester parser with Jackson and deliberately broke loading of 6.x files;
+Studio 7+ converts. BUT JasperReports Server 10.0 **PRO** carries the `LegacyXmlLoader` from
+JRL-Pro, gated on a valid license; the upgrade guide has the script check the license for exactly
+that reason. So prod's 596 JRXML 6 report units (CityCorp 109, College Station 149, Ellensburg 159,
+Fond du Lac 61, Newark 118) keep loading on 10.0 PRO -- as the 10.0 TEST server already proves with
+its JRXML 6 bills -- provided the license is in place. Monday's first check after `serverInfo` says
+10.0.0: `licenseType` and `expiration` in the same answer, then run one legacy JRXML 6 unit per org.
+A JRXML 6 unit that fails with "Unable to load report" on 10.0 = license/legacy-loader problem, not
+a report problem. Authoring stays: JRXML 7 for new units on 10.0; the 7-to-6 converter only for a
+9.0 target. Sources: community.jaspersoft.com upgrade guide 9.0->10.0.0; jasperreports README
+(Jaspersoft/jasperreports GitHub); Jaspersoft/jasperreports issue #442.
+
+## Cursor's Ad Hoc topic brief, checked (2026-09-20)
+Agreed and already in the repo: `strip_jrs8_incompatible_jrxml_uuid.py` converts `<query
+language="domain">` to `<queryString>`, strips `uuid` and parameter `nestedType`, for Ad Hoc
+`topicJRXML` bound for a 9.0 Ad Hoc loader; `verify_prepared_import.py --expect-jrs8-adhoc-compat`
+gates it; JRXML 7 units use `<query>`, domain reports use `<queryString language="domain">` with the
+domain `<query>` XML inside the CDATA. Two corrections: (1) "no rootTenantId for in-tenant import" is
+the UI's Repository > Import; the REST importer REQUIRES `rootTenantId=<Org>` (measured 2026-09-18);
+(2) after the 10.0 upgrade the strip is probably unnecessary (10.0 emits `<query>` topics itself and
+the 10.0 test server opens them) -- decide by opening one promoted Ad Hoc view on prod, not by rule.

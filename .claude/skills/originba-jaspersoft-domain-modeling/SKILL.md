@@ -179,3 +179,9 @@ hid it with a filter on the raw pointer that picked the wrong row. Record and pa
 `domains/manual_imports/fonddulac_asset_domain/` (REST import needs the org's own datasource
 export listed first, `rootTenantId`, folder XML with `<parent>`+`<name>`, descriptions under 250
 characters -- each of those failed once).
+
+## Version matrix addendum (2026-09-20): JRS 10 PRO loads JRXML 6 through a licensed legacy loader
+The JR 7 library alone cannot load JRXML 6 (measured, and vendor-confirmed); JasperReports Server
+10.0 PRO adds `LegacyXmlLoader` (JRL-Pro, license-gated), which is why the 10.0 test server serves
+JRXML 6 bills. "Mutually unreadable" is true of the LIBRARIES and of Studio; on the PRO server old
+units keep running. Details in `jaspersoft-server-operations`.
