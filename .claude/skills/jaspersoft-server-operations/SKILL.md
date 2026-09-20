@@ -144,12 +144,14 @@ test|prod|internal` and `--org <Org>` (the login becomes `user|Org`; paths are t
 | Promote a client's folder TEST org -> PROD org (the production deployment path from 2026-09-21 on) | `jrs_promote_test_to_prod.py --org Y --folder /SmartCity/Report/Standard_Offering --ds <DS> --dry-run` then with `--i-mean-prod`. Both orgs name the datasource the SAME (FondDuLac_DS) at DIFFERENT hosts, and the folder export CARRIES the datasource XML: imported as-is it would repoint prod at the test database. The script replaces the DataSource tree with prod's own export taken minutes earlier, lists it first, sets rootTenantId, and refuses if any test-host string survives | prod DS byte-identical to its own export; `jrs_inventory.py diff test:Y prod:Y --folder ...` = dates/version only; sweep the folder |
 | Promote one report or folder | `jrs_repository.py --org Origin_DEV export /SmartCity/Report/X --out x.zip`, then the tenant-import builder (`build_client_tenant_report_import.py`) or, for Origin-owned orgs, `import` the export as-is | `search` finds it in the target; `run` renders it |
 | Deploy a SQL report unit | `jrs_deploy_report_units.py --org Y --datasource <DS>` (REST descriptors; never an import zip for these) | `--run FROM TO` renders the PDF |
+| Fix a domain, Chase's way (preferred, no package) | Domain Designer > open the domain > Edit > Import the schema XML: replaces ONLY the schema file, the datasource and everything else stay; `jrs_debug.py domain-apply URI --schema file` is the same operation over REST. Prove the schema first as a copy (`domain-copy`) or on TEST |
 | Fix a domain without breaking reports | change the derived-table SQL or a join in the schema, keep every item id/label; import as a COPY first (`domains/manual_imports/fonddulac_asset_domain/` is the pattern), prove it, then paste into the original | `jrs_view_calibrate.py`-style queryExecutions against copy and original on the same keys |
 | Rearrange folders | `mkdir`, `move`, `copy` (destination is a FOLDER; the resource keeps its name); Ad Hoc views and dashboards keep working because references are by URI and the server rewrites them on move | `list` the new place; `jrs_run_sweep.py --folder <new>` runs everything there |
 | Retire a resource | `export` it to a zip first, then `delete` | the zip re-imports it |
 | Who can see what | `perms /uri`; change with `perms-set /uri role/ROLE_X:18 ...` (REPLACES the list: name every recipient you keep; 18 = read+execute, 30 = full, 1 = administer) | `perms` again |
 | Scheduled reports | `jobs [--report /uri]`, `job ID`, `job-run ID`, `job-delete ID`. Jobs are NOT in a repository export: list them before an upgrade or a move (a moved report's jobs follow it; a deleted report's jobs die) | `jobs` before and after |
 | Users and roles | `users [--role R]`, `roles` (read). Creating users is a UI task here: it needs the org's password policy and is not something to script against a client tenant | |
+| The whole check for one org in one command (upgrade morning, post-promotion) | `jrs_validate.py --env prod --org Y [--folder /SmartCity] [--cap 20] [--baseline <before>.json] --label post_upgrade [--exclude <hanging folders>]`: snapshot (rollback zip), inventory diff vs the last committed tree, sweep with a per-resource cap (past it = SLOW, move on), compare with the baseline, write `jaspersoft/sweeps/<env>_<org>_<label>_<stamp>.md` | the .md: verdict line, broke / went empty / now slow / healed / missing / new, inventory added/removed/changed, errors, slow list |
 | Does everything still load (upgrade, promotion) | `jrs_run_sweep.py --env prod --org Y --folder /SmartCity --types view,report --workers 3 --timeout 120 --out jaspersoft/sweeps/<name>.json`, ONE org at a time on prod; then `jrs_run_sweep.py compare before.json after.json` | broke / healed / emptied / slower lists; row-count drift is the snapshot refresh |
 | A client says a report or view is wrong | `jrs_debug.py --env X --org Y [--client id] inspect URI` (a view's domain, fields, every saved filter with its value, any-value placeholders, values the client does not configure, the derived tables and joins its tables touch; a report's query and controls), `run URI --bisect` (execute; when empty, each saved filter alone with its row count). Fix: `domain-copy URI --name NEW --set-query ID=file.sql --set-join "OLD=>NEW"` (a second domain beside the original, org's own DS listed first), prove on it, then `domain-apply URI --schema file` (in place; item ids unchanged so bound views survive), `view-update URI --drop-filter F --set-filter F=a,b --swap-field OLD=NEW`, `report-update URI --jrxml f`. All writes: `--confirm Org`, prod `--i-mean-prod`, `--dry-run` first | `run` on the copy vs the original on the same keys (the Fond du Lac pattern: 16,672 = 16,672, 0 blank) |
 | A client says a view is empty | `audit_adhoc_saved_filters.py --env X --org Y --client <id>` (Ellensburg-only filter values), then `jrs_view_calibrate.py` on the view | the review markdown names what the client configures instead |
@@ -178,3 +180,23 @@ domain copy import, export_zip. Authored offline with dry-run tests only, first 
 `jrs_debug.py` domain-apply (PUT of `<domain>_files/schema` as a file resource), view-update (PUT
 of the adhocDataView descriptor), report-update (PUT of `<unit>_files/main_jrxml`), and
 `jrs_promote_test_to_prod.py` end to end (its packaging is proven on the real 2026-09-18 exports).
+
+## Tomorrow's order (10.0 upgrade review, then test-to-prod deployments), 2026-09-21
+
+1. VPN on. `jrs_repository.py --env prod whoami` must say 10.0.0. Read `/DataSource` of each prod
+   org (`--org Y list /DataSource`) and confirm the URLs are the prod hosts.
+2. Per prod org, one at a time: `jrs_validate.py --env prod --org Y --label post_upgrade --cap 20`
+   (CityCorp first, its Standard Offering has the 2026-09-18 baseline sweep; Fond_Du_Lac with
+   `--exclude /SmartCity/Report/FDL_Bill_Processing_Reports__Linda_ /SmartCity/Report/FDL_Trial_Balance`).
+   Snapshot ~5-10 min, sweep ~10-15 min at a 20 s cap. Commit `jaspersoft/inventory` + `sweeps`.
+3. Read the five .md files: BROKE lists and inventory "changed" are the upgrade's effects; SLOW is a
+   list to hand the DBAs, not a blocker; row-count drift is the refresh.
+4. Then, per client Chase names: `jrs_promote_test_to_prod.py --org Y --ds <DS> --dry-run` (package
+   on disk, PASS), then `--i-mean-prod`, then `jrs_validate.py --env prod --org Y --folder
+   /SmartCity/Report/Standard_Offering --label post_promote --baseline <the post_upgrade sweep>`.
+
+Parallelism, honestly: one prod server serves every org, so five orgs at once saturates it (measured
+2026-09-19: median ok 20 s, fake timeouts). The sweep's 3 workers ARE the parallelism on prod; the
+test server takes `--org A --org B` at once. Agents in parallel pay off on the work that does not
+hit the server: reading five summaries, the per-client filter reviews, domain fixes for different
+clients, writing up. A short cap is what makes the run fast: nothing is waited for.
