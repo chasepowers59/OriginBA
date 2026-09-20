@@ -58,7 +58,8 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
 
 | | |
 | --- | --- |
-| `scripts/jaspersoft/jrs_repository.py --env X whoami / search / list / import` | who am I, where is a resource, what a folder holds |
+| `scripts/jaspersoft/jrs_repository.py --env X [--org Y] whoami / search / list / perms / jobs / job / users / roles / export / run` | read the server: who am I, where is a resource, what a folder holds, who can see it, what is scheduled, a report's PDF |
+| `scripts/jaspersoft/jrs_repository.py --env X --org Y --confirm Y [--i-mean-prod] [--dry-run] import / copy / move / delete / mkdir / perms-set / job-run / job-delete` | WRITE the server. Every write must name the org back (`--confirm`), prod also needs `--i-mean-prod`, and `--dry-run` prints the exact call. `tests/test_jrs_repository_ops.py` pins the calls and the guards |
 | `scripts/jaspersoft/jrs_inventory.py snapshot [--orgs] [--split] / diff / summary / clients / environments` | backup + inventory + comparison; `jaspersoft/inventory/{README,CLIENTS,ENVIRONMENTS}.md` are generated |
 | `scripts/jaspersoft/jrs_deploy_report_units.py --org X --datasource Y [--run FROM TO]` | create/overwrite report units from the finance-pack specs and execute them |
 | `scripts/jaspersoft/jrs_run_sweep.py --env X --org Y [--folder F] --out jaspersoft/sweeps/<env>_<org>_<date>.json` | RUN everything in a folder and classify it: Ad Hoc views through queryExecutions with the view as datasource (ok / EMPTY / error), report units through the reports service, dashboards through dashboardExecutions. The post-promotion smoke, and the before/after of a server upgrade (diff the two JSON files by uri). On the test server dashboards answer `ERR_CONNECTION_REFUSED` from the server's own headless export engine, not from the dashboard: classified `export-engine`, and the UI opens them fine (Chase, 2026-09-18) |
@@ -126,3 +127,43 @@ Cannot: server configuration, JDBC drivers, font extensions (Aptos), Ad Hoc desi
     cap (whole tenant ~1,300 resources, ~1-1.5 h). The parallel `--org A --org B` form is for the
     test server. A run's honesty check: the median ok time should be single-digit seconds, and no
     "descriptor None" errors.
+
+## The playbook: what to run for each thing Chase needs (2026-09-20)
+
+Every entry assumes the VPN is up and follows the rules above: snapshot before, diff after,
+Origin_DEV by default, prod only when named with `--i-mean-prod`. All commands take `--env
+test|prod|internal` and `--org <Org>` (the login becomes `user|Org`; paths are then tenant-relative
+`/SmartCity/...`).
+
+| Need | Command(s) | Proof |
+| --- | --- | --- |
+| What is on a server / in an org | `jrs_inventory.py snapshot --env X --org Y` (superuser) or `--orgs Y` (org-scoped, prod); commit `jaspersoft/inventory/` | `jaspersoft/inventory/{README,CLIENTS,ENVIRONMENTS}.md` regenerate with `summary`, `clients`, `environments` |
+| Back up before a change | the same snapshot: the zip under `backups/jaspersoft/<env>/<stamp>/` is the rollback | `jrs_repository.py import <that zip>` restores it (org-export shape carries `rootTenantId`) |
+| Roll back | `jrs_repository.py --env X --org Y --confirm Y import backups/.../Y.zip` (or one folder: `export` it first, keep the zip) | snapshot again, `jrs_inventory.py diff` shows the change undone |
+| Promote the Standard Offering to a client org | `jaspersoft/docs/origin_dev_to_origin_test_promotion_plan.md` steps: org-scoped `export` of the folder from Origin_DEV, export the TARGET org's `/DataSource/<DS>` fresh, `run_client_import_pipeline.py` with that overlay, both verifiers PASS, add `rootTenantId`, `jrs_repository.py import` as `user|Org` | after-snapshot vs source: same file set, only DS name / componentType / Workstreams rewiring differ; datasource XML byte-identical to its own export |
+| Promote one report or folder | `jrs_repository.py --org Origin_DEV export /SmartCity/Report/X --out x.zip`, then the tenant-import builder (`build_client_tenant_report_import.py`) or, for Origin-owned orgs, `import` the export as-is | `search` finds it in the target; `run` renders it |
+| Deploy a SQL report unit | `jrs_deploy_report_units.py --org Y --datasource <DS>` (REST descriptors; never an import zip for these) | `--run FROM TO` renders the PDF |
+| Fix a domain without breaking reports | change the derived-table SQL or a join in the schema, keep every item id/label; import as a COPY first (`domains/manual_imports/fonddulac_asset_domain/` is the pattern), prove it, then paste into the original | `jrs_view_calibrate.py`-style queryExecutions against copy and original on the same keys |
+| Rearrange folders | `mkdir`, `move`, `copy` (destination is a FOLDER; the resource keeps its name); Ad Hoc views and dashboards keep working because references are by URI and the server rewrites them on move | `list` the new place; `jrs_run_sweep.py --folder <new>` runs everything there |
+| Retire a resource | `export` it to a zip first, then `delete` | the zip re-imports it |
+| Who can see what | `perms /uri`; change with `perms-set /uri role/ROLE_X:18 ...` (REPLACES the list: name every recipient you keep; 18 = read+execute, 30 = full, 1 = administer) | `perms` again |
+| Scheduled reports | `jobs [--report /uri]`, `job ID`, `job-run ID`, `job-delete ID`. Jobs are NOT in a repository export: list them before an upgrade or a move (a moved report's jobs follow it; a deleted report's jobs die) | `jobs` before and after |
+| Users and roles | `users [--role R]`, `roles` (read). Creating users is a UI task here: it needs the org's password policy and is not something to script against a client tenant | |
+| Does everything still load (upgrade, promotion) | `jrs_run_sweep.py --env prod --org Y --folder /SmartCity --types view,report --workers 3 --timeout 120 --out jaspersoft/sweeps/<name>.json`, ONE org at a time on prod; then `jrs_run_sweep.py compare before.json after.json` | broke / healed / emptied / slower lists; row-count drift is the snapshot refresh |
+| A client says a view is empty | `audit_adhoc_saved_filters.py --env X --org Y --client <id>` (Ellensburg-only filter values), then `jrs_view_calibrate.py` on the view | the review markdown names what the client configures instead |
+| Letters | not the report pipeline: `~/originba-letterprint/.claude/skills/jaspersoft-letter-delivery` |
+
+What the server cannot be asked to do over REST, so it stays a human task: server configuration
+and JDBC drivers, font extensions (Aptos), the Ad Hoc designer itself (a view's layout is edited in
+the UI; its query and filters can be read and changed as JSON through `resources?expanded=true`),
+and datasource passwords (an export carries them encrypted; `perms` and `users` never print them).
+
+### About mr-wolf-gb/jasperreports-mcp-server (assessed 2026-09-20)
+A Node MCP wrapper over the same `/rest_v2` API: generic resource CRUD, run/async execution,
+jobs, users/roles, permissions, domain read, health. It adds nothing the scripts above do not
+already do against these servers, and it lacks the parts that matter here: export/import zips
+(the backup, rollback and promotion path), org-scoped logins per call, Ad Hoc view execution via
+`queryExecutions` with the any-value fix, inventory diffs, and the write guards. Its delete /
+permissions / user tools with one global credential are exactly the footgun the rules exist to
+prevent on a shared multi-tenant server. Not adopted; the gaps it exposed (copy/move/delete/mkdir/
+permissions/jobs/users) were added to `jrs_repository.py` with `--confirm` and `--i-mean-prod`.
