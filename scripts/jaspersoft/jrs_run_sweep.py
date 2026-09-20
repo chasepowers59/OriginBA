@@ -48,6 +48,7 @@ import base64
 import threading
 
 _AUTH = threading.local()   # the org-scoped Authorization header of the sweep running on this thread
+_LINK_DOWN = threading.Event()   # set when the VPN/DNS fails mid-sweep; everything after is "aborted", not "error"
 
 
 def _auth_for(org: str) -> str:
@@ -192,7 +193,7 @@ def sweep(org: str, folder: str, types: set[str], workers: int, timeout: int, li
     _AUTH.header = _auth_for(org)
     code, text, _ = _http(f"/rest_v2/resources?folderUri={urllib.parse.quote(folder)}&recursive=true&limit=5000")
     if code != 200:
-        sys.exit(f"[{org}] list {folder}: {code} {text[:200]}")
+        sys.exit(f"[{org}] list {folder}: {code} {text[:200]} -- is the VPN up?")
     items = [i for i in json.loads(text).get("resourceLookup", []) if i["resourceType"] in RUNNERS and RUNNERS[i["resourceType"]][0] in types]
     items = items[:limit] if limit else items
     print(f"[{org}] {len(items)} resources under {folder}: " + ", ".join(f"{sum(1 for i in items if i['resourceType'] == t)} {n}s" for t, (n, _) in RUNNERS.items()), flush=True)
@@ -201,8 +202,14 @@ def sweep(org: str, folder: str, types: set[str], workers: int, timeout: int, li
     def one(i):
         _AUTH.header = _auth_for(org)
         name, fn = RUNNERS[i["resourceType"]]
+        if _LINK_DOWN.is_set():
+            return {"outcome": "aborted", "detail": "VPN/DNS down earlier in this sweep", "seconds": 0, "uri": i["uri"], "type": name, "label": i.get("label", "")}
         r = fn(i["uri"], timeout); r.update({"uri": i["uri"], "type": name, "label": i.get("label", "")})
-        flag = {"ok": " ", "empty": "0", "error": "X", "timeout": "T", "export-engine": "E"}[r["outcome"]]
+        if "gaierror" in (r.get("detail") or "") or "handshake operation timed out" in (r.get("detail") or ""):
+            # name resolution or TLS to the server failed: the VPN dropped. Every later result would be
+            # a fake error (2026-09-19: 224 of them on CityCorp prod), so the sweep stops recording.
+            r["outcome"] = "aborted"; _LINK_DOWN.set()
+        flag = {"ok": " ", "empty": "0", "error": "X", "timeout": "T", "export-engine": "E", "aborted": "!"}[r["outcome"]]
         print(f"  [{org}] [{flag}] {name:9} {r['seconds']:5.0f}s {i['uri'].split('/Report/')[-1][:70]}" + (f"  {r.get('detail', '')[:100]}" if r["outcome"] not in ("ok", "empty") else (f"  rows={r['rows']}" if "rows" in r else "")), flush=True)
         return r
     with cf.ThreadPoolExecutor(max_workers=workers) as ex:
@@ -265,7 +272,10 @@ def main() -> int:
         return counts
     with cf.ThreadPoolExecutor(max_workers=len(a.orgs)) as ex:
         all_counts = list(ex.map(run, a.orgs))
-    bad = sum(c.get("error", 0) + c.get("timeout", 0) for c in all_counts)
+    bad = sum(c.get("error", 0) + c.get("timeout", 0) + c.get("aborted", 0) for c in all_counts)
+    if any(c.get("aborted") for c in all_counts):
+        print("ABORTED: the link to the server dropped mid-sweep; this file is NOT a baseline. Rerun with the VPN up.")
+        return 2
     return 1 if bad else 0
 
 
