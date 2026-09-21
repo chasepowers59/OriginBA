@@ -88,3 +88,16 @@ Offline checks (no server): `python3 -m pytest tests/test_domain_characteristics
 python3 scripts/jaspersoft/validate_domain_schema.py \
   domains/manual_imports/service_agreement_360_prem_char/Service_Agreement___Domain_files/schema.data
 ```
+
+## Deployed
+
+| Org (server) | When | How | Proof |
+| --- | --- | --- | --- |
+| Origin_DEV (test) | 2026-09-17 | Domain Designer schema import | both derived tables preview in Domain Designer |
+| College_Station (test) | 2026-09-21 | `jrs_debug.py --env test --org College_Station --confirm College_Station domain-apply <domain> --schema college_station/.../schema.data` (in-place PUT of `_files/schema`, version 0 -> 1); the org's own export taken minutes before is the rollback | schema read back byte-equal; the domain opens on `CollegeStation_DS`; the one bound view (`Service_Agreements___SA__Accounts__and_Customer`) executes; a flat query of **2.1) Premise Characteristics** returns 191,114 rows with College Station's own types (Type of Residence, Drainage Square Footage, Inside/Outside City Limits, Residential Pickup Type) resolved and `Is Current Characteristic = Y` |
+
+The College Station schema was produced by `patch_schema()` on **that org's** export, not by
+copying Origin_DEV's file: every table keeps `CollegeStation_DS`. Structural check against
+Origin_DEV after normalising the datasource id: same 27 tables, 25 joins, 271 items, 15 item
+groups and both derived queries; Origin_DEV alone carries an unreferenced `CI_RS_L.DESCRLONG`
+join-tree field (pre-existing, backs no item).

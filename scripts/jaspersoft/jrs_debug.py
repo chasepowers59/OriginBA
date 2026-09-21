@@ -298,9 +298,13 @@ def domain_copy(uri: str, name: str, set_query: list[str], set_join: list[str], 
 
 
 def domain_apply(uri: str, schema_path: str) -> int:
+    """A file PUT must carry the file's CURRENT version or the server answers 409 (measured 2026-09-21)."""
     xml = pathlib.Path(schema_path).read_bytes()
-    body = json.dumps({"type": "xml", "label": "schema", "content": base64.b64encode(xml).decode()}).encode()
-    return put(f"/rest_v2/resources{urllib.parse.quote(uri)}_files/schema", body, "application/repository.file+json", "domain schema replaced in place")
+    code, d, _ = sw._http(f"/rest_v2/resources{urllib.parse.quote(uri)}_files/schema", accept="application/repository.file+json")
+    meta = json.loads(d) if code == 200 else {}
+    body = json.dumps({"uri": uri + "_files/schema", "type": "xml", "label": meta.get("label", "schema"), "version": meta.get("version", 0),
+                       "content": base64.b64encode(xml).decode()}).encode()
+    return put(f"/rest_v2/resources{urllib.parse.quote(uri)}_files/schema", body, "application/repository.file+json", f"domain schema replaced in place (version {meta.get('version')})")
 
 
 def view_update(uri: str, drop: list[str], setf: list[str], swap: list[str]) -> int:

@@ -68,11 +68,13 @@ def test_view_update_drops_a_filter_sets_a_value_and_puts_the_descriptor(monkeyp
 
 def test_domain_apply_and_report_update_put_file_resources(monkeypatch, tmp_path):
     calls = []
-    monkeypatch.setattr(dbg, "put", lambda path, body, ctype, what: calls.append((path, ctype)) or 0)
+    monkeypatch.setattr(dbg, "put", lambda path, body, ctype, what: calls.append((path, ctype, json.loads(body))) or 0)
+    monkeypatch.setattr(dbg.sw, "_http", lambda path, *a, **k: (200, b'{"label": "schema", "version": 7}', 0.0))   # the file's descriptor
     f = tmp_path / "s.xml"; f.write_text("<schema/>"); j = tmp_path / "r.jrxml"; j.write_text("<jasperReport/>")
     dbg.domain_apply("/SmartCity/Report/FDL_Asset/SC_Asset_Domain", str(f)); dbg.report_update("/SmartCity/Report/X/r", str(j))
-    assert calls == [("/rest_v2/resources/SmartCity/Report/FDL_Asset/SC_Asset_Domain_files/schema", "application/repository.file+json"),
-                     ("/rest_v2/resources/SmartCity/Report/X/r_files/main_jrxml", "application/repository.file+json")]
+    assert [(c[0], c[1]) for c in calls] == [("/rest_v2/resources/SmartCity/Report/FDL_Asset/SC_Asset_Domain_files/schema", "application/repository.file+json"),
+                                             ("/rest_v2/resources/SmartCity/Report/X/r_files/main_jrxml", "application/repository.file+json")]
+    assert calls[0][2]["version"] == 7 and calls[0][2]["uri"].endswith("_files/schema")   # without the current version the server answers 409
 
 
 def test_domain_copy_package_has_the_proven_shape():

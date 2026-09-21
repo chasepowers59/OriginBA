@@ -178,8 +178,8 @@ permissions/jobs/users) were added to `jrs_repository.py` with `--confirm` and `
 Verified against a server: inventory/snapshot/diff, REST import (org-export shape), report-unit
 deploy and run, view execution via queryExecutions (any-value fix), dashboard execution, the
 domain copy import, export_zip. Live-verified 2026-09-21 as well: `jrs_promote_test_to_prod.py` end to end (Ellensburg, Newark1),
-`jrs_fix_stripped_topics.py` (111 views), file-resource PUT with version. Still authored offline only, dry-run first: `jrs_repository.py` copy/move/delete/mkdir/perms-set/jobs/users/roles,
-`jrs_debug.py` domain-apply (PUT of `<domain>_files/schema` as a file resource), view-update (PUT
+`jrs_fix_stripped_topics.py` (111 views), file-resource PUT with version, `jrs_debug.py domain-apply` (College_Station SA 360, 2026-09-21: it now fetches the file's version first; without it the PUT is a 409). Still authored offline only, dry-run first: `jrs_repository.py` copy/move/delete/mkdir/perms-set/jobs/users/roles,
+`jrs_debug.py` view-update (PUT
 of the adhocDataView descriptor), report-update (PUT of `<unit>_files/main_jrxml`), and
 `jrs_promote_test_to_prod.py` end to end (its packaging is proven on the real 2026-09-18 exports).
 
