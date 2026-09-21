@@ -96,6 +96,9 @@ python3 scripts/jaspersoft/validate_domain_schema.py \
 | Origin_DEV (test) | 2026-09-17 | Domain Designer schema import | both derived tables preview in Domain Designer |
 | College_Station (test) | 2026-09-21 | `jrs_debug.py --env test --org College_Station --confirm College_Station domain-apply <domain> --schema college_station/.../schema.data` (in-place PUT of `_files/schema`, version 0 -> 1); the org's own export taken minutes before is the rollback | schema read back byte-equal; the domain opens on `CollegeStation_DS`; the one bound view (`Service_Agreements___SA__Accounts__and_Customer`) executes; a flat query of **2.1) Premise Characteristics** returns 191,114 rows with College Station's own types (Type of Residence, Drainage Square Footage, Inside/Outside City Limits, Residential Pickup Type) resolved and `Is Current Characteristic = Y` |
 
+| Ellensburg (test) | 2026-09-21 | `jrs_sa360_prem_char_apply.py --env test --org Ellensburg` (export = rollback, patch the org's own export, in-place PUT, four proofs) | byte-equal read-back; Ad Hoc metadata lists the group, 17 items; the one bound view executes; probe 65,937 rows (ERU Square Footage, Residential Fire Protection, Inside/Outside City Limits) |
+| Ellensburg (prod) | 2026-09-21 | same, `--env prod --i-mean-prod`; `Ellensburg_DS` untouched | same proofs; probe 66,078 rows on the prod database |
+
 The College Station schema was produced by `patch_schema()` on **that org's** export, not by
 copying Origin_DEV's file: every table keeps `CollegeStation_DS`. Structural check against
 Origin_DEV after normalising the datasource id: same 27 tables, 25 joins, 271 items, 15 item

@@ -65,6 +65,7 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
 | `scripts/jaspersoft/jrs_run_sweep.py --env X --org Y [--folder F] --out jaspersoft/sweeps/<env>_<org>_<date>.json` | RUN everything in a folder and classify it: Ad Hoc views through queryExecutions with the view as datasource (ok / EMPTY / error), report units through the reports service, dashboards through dashboardExecutions. The post-promotion smoke, and the before/after of a server upgrade (diff the two JSON files by uri). On the test server dashboards answer `ERR_CONNECTION_REFUSED` from the server's own headless export engine, not from the dashboard: classified `export-engine`, and the UI opens them fine (Chase, 2026-09-18) |
 | `scripts/jaspersoft/audit_adhoc_saved_filters.py --env X --org Y --client <config id>` | saved Ad Hoc filter values that name the SOURCE client's configuration and the target does not have (the promoted view returns nothing there); reads the explorer's per-client config export |
 | `scripts/jaspersoft/jrs_adhoc_chart_props.py --env X --org Y --folder F --set name=value [--only-if name=value] [--dry-run] [--i-mean-prod]` | set Highcharts advanced properties on EVERY Ad Hoc chart state under a folder, dashboard-embedded copies included; backs each state up under `backups/jaspersoft/adhoc_state/`, reads every PUT back. `tests/test_jrs_adhoc_chart_props.py` pins the XML patch on real states |
+| `scripts/jaspersoft/jrs_sa360_prem_char_apply.py --env X --org Y [--dry-run] [--i-mean-prod]` | give an org's Service Agreement 360 domain the premise-characteristics group IN PLACE: export (the rollback), patch THAT org's export (its own DS id), PUT the schema with its version, then four proofs (read-back byte-equal, `/domains/<uri>/metadata` lists the group, every bound view runs, a flat query of the new items returns rows). Live 2026-09-21: College_Station test, Ellensburg test + prod |
 | `tests/test_jrs_inventory.py` | the offline half of the inventory tool on a real export |
 
 ## What the REST API can and cannot do here
@@ -145,6 +146,7 @@ test|prod|internal` and `--org <Org>` (the login becomes `user|Org`; paths are t
 | Promote a client's folder TEST org -> PROD org (the production deployment path from 2026-09-21 on) | `jrs_promote_test_to_prod.py --org Y --folder /SmartCity/Report/Standard_Offering --ds <DS> --dry-run` then with `--i-mean-prod`. Both orgs name the datasource the SAME (FondDuLac_DS) at DIFFERENT hosts, and the folder export CARRIES the datasource XML: imported as-is it would repoint prod at the test database. The script replaces the DataSource tree with prod's own export taken minutes earlier, lists it first, sets rootTenantId, and refuses if any test-host string survives | prod DS byte-identical to its own export; `jrs_inventory.py diff test:Y prod:Y --folder ...` = dates/version only; sweep the folder |
 | Promote one report or folder | `jrs_repository.py --org Origin_DEV export /SmartCity/Report/X --out x.zip`, then the tenant-import builder (`build_client_tenant_report_import.py`) or, for Origin-owned orgs, `import` the export as-is | `search` finds it in the target; `run` renders it |
 | Reformat charts (label size, colour, axis text) across a folder | `jrs_adhoc_chart_props.py --env X --org Y --folder F --set plotOptions.series.dataLabels.style.fontSize=15px ... --dry-run`, then for real; never `style.color=contrast` for labels outside the bars | reload the dashboard in the Browser pane and read computed colour/size of `.highcharts-data-label text` and what `elementsFromPoint` finds under each label |
+| Add the premise-characteristics group to a client's SA 360 domain | `jrs_sa360_prem_char_apply.py --env X --org Y --dry-run`, then for real (prod: `--i-mean-prod`); never copy Origin_DEV's schema file into another org | the tool's four proofs print PASS; then the Ad Hoc designer in the Browser pane (Chase logs in) before the client is told; tell them to create a NEW Ad Hoc view on the domain |
 | Deploy a SQL report unit | `jrs_deploy_report_units.py --org Y --datasource <DS>` (REST descriptors; never an import zip for these) | `--run FROM TO` renders the PDF |
 | Fix a domain, Chase's way (preferred, no package) | Domain Designer > open the domain > Edit > Import the schema XML: replaces ONLY the schema file, the datasource and everything else stay; `jrs_debug.py domain-apply URI --schema file` is the same operation over REST. Prove the schema first as a copy (`domain-copy`) or on TEST |
 | Fix a domain without breaking reports | change the derived-table SQL or a join in the schema, keep every item id/label; import as a COPY first (`domains/manual_imports/fonddulac_asset_domain/` is the pattern), prove it, then paste into the original | `jrs_view_calibrate.py`-style queryExecutions against copy and original on the same keys |
@@ -259,6 +261,25 @@ identical to the 09-18 export; folder identical to test in every file after vola
 7 empty / 27 slow (20 s) / 0 errors; Newark1 69 / 10 / 74 slow (15 s) / 0 errors -- Newark's volume
 makes half its views slow, not broken. Wall clock ~11 min Ellensburg, ~21 min Newark (its 306 MB
 org export twice). Standard Offering now on prod: CityCorp, Ellensburg, Newark1.
+
+## After a domain change, prove it where the USER looks, before announcing it (2026-09-21)
+College_Station's SA 360 got the premise-characteristics group by in-place schema PUT; the
+file read back byte-equal, the domain opened, the bound view ran, a flat query returned
+191,114 rows -- and the client replied that he could not see it. What the server-side checks do
+NOT cover, in the order to check:
+1. `GET /rest_v2/domains/<uri>/metadata` is the Ad Hoc-facing presentation (sets + items as the
+   designer lists them). Run it after every schema change; the file is not the proof.
+2. An in-place `_files/schema` PUT leaves the DOMAIN resource's version/updateDate untouched
+   (College_Station: version 0, 2026-06-17), so anything cached on the domain resource -- a
+   user's Ad Hoc session, the designer's metadata cache -- can keep the old field tree. A
+   re-save in Domain Designer (or log out/in for the user) refreshes it.
+3. Users open EXISTING saved views. Say in the announcement: create a NEW Ad Hoc view from the
+   domain (Create > Ad Hoc View > Domains > Service Agreement 360), then the new set is in the
+   field tree. Name the environment (test vs prod) in the same message: prod College_Station
+   has no Standard Offering, so a user who checks prod sees nothing.
+4. The definitive proof is the Ad Hoc designer itself: Chase logs into that server/org in the
+   Browser pane, open Create > Ad Hoc View on the domain, screenshot the field tree. Do this
+   BEFORE the reply goes to the client, not after.
 
 ## Ad Hoc chart formatting from here (2026-09-21, internal Origin_DEMO demo tweak)
 A chart's look is Highcharts options in the view's `stateXML` under
