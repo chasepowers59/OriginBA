@@ -272,3 +272,16 @@ Applied to 20 states (Usage, Measurements, Device): dataLabels 15px bold, no tex
 headless dashboard export is broken (chromium will not start), so visual proof is a person's reload.
 Crosstab header alignment needs the live DOM: open the dashboard in the Browser pane, Chase logs
 in, inspect and test CSS there before touching the theme.
+
+## Theme CSS from here (2026-09-21): how a stylesheet change actually reaches the page
+An org's `/themes/default/overrides_custom.css` may be a REFERENCE (`referenceUri`) to a root theme
+(`/themes/OriginBA Branded/...` on internal); edit the root file. Theme files refuse REST PUT (403,
+even as superuser); the import service takes them: a package with the exporter's own file shape --
+`<fileResource dataFile="overrides_custom.css.data">` descriptor + `.data` file + index listing the
+resource -- imports "succeeded" and writes the file (a descriptor WITHOUT `dataFile` also says
+succeeded and writes nothing). Then the server keeps serving the OLD bytes from its theme cache
+(`/_themes/<hash>/...`, max-age 1 year) until someone clicks **Set as Active Theme** on the theme in
+the repository UI; re-setting the org's theme over REST does not flush it. Ellensburg-style scope
+check: DEV and STAGE hold their own copies, so the root edit reached only Origin_DEMO.
+Chart labels: `dataLabels.style.color = contrast` (dark on light bars, white on dark) with
+`textOutline none` is the readable combination; a fixed dark colour fails on maroon/blue bars.
