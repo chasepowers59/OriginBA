@@ -430,11 +430,11 @@ Snapshot 20260918-102329 · 482 files, 363 views, 110 domains, 80 reports, 61 da
 
 ## prod / CityCorp
 
-Snapshot 20260918-051522 · 301 views, 126 domains, 88 reports, 17 files, 14 dashboards, 3 outputs, 3 jndiJdbcDataSource, 1 datasources, 1 reportOptions, 1 virtualDataSource, 1 customDataSource
+Snapshot 20260921-050805 · 301 views, 257 files, 126 domains, 88 reports, 14 dashboards, 3 outputs, 3 jndiJdbcDataSource, 1 datasources, 1 reportOptions, 1 virtualDataSource, 1 customDataSource
 
 | Datasource | User | Connection |
 | --- | --- | --- |
-| CityCorp_DS | JRS2C2M | jdbc:oracle:thin:@smartcity-db-prod-v1-2.originsmartops.com:1521/PPRODDB_CITYCORP.prodprivatesn.prodvcn.oraclevcn.com |
+| CityCorp_DS | JRS2C2M | jdbc:oracle:thin:@smartcity-db-dr-v1-2.originsmartops.com:1521/PPRODDB_CITYCORP.prodprivatesn.prodvcn.oraclevcn.com |
 | AuditDataSource |  | jdbc/jasperserverAudit |
 | AuditVirtualDataSource |  |  |
 | JasperserverDataSource |  | jdbc/jasperserver |
@@ -448,6 +448,7 @@ Snapshot 20260918-051522 · 301 views, 126 domains, 88 reports, 17 files, 14 das
 | /SmartCity | 269 views, 119 domains, 63 reports, 14 dashboards, 5 files, 2 outputs, 1 reportOptions |
 | /adhoc | 2 reports |
 | /public | 22 reports, 20 views, 12 files, 7 domains, 3 jndiJdbcDataSource, 1 virtualDataSource, 1 customDataSource |
+| /themes | 240 files |
 
 **/SmartCity/Report/Standard_Offering**
 
@@ -600,11 +601,11 @@ Snapshot 20260918-071832 · 128 views, 63 reports, 47 domains, 41 outputs, 14 fi
 
 ## prod / Newark1
 
-Snapshot 20260918-051522 · 102 views, 99 reports, 60 domains, 38 outputs, 32 files, 6 controls, 3 dashboards, 3 jndiJdbcDataSource, 1 datasources, 1 reportOptions, 1 virtualDataSource, 1 customDataSource
+Snapshot 20260921-050805 · 512 files, 102 views, 99 reports, 60 domains, 38 outputs, 6 controls, 3 dashboards, 3 jndiJdbcDataSource, 1 datasources, 1 reportOptions, 1 virtualDataSource, 1 customDataSource
 
 | Datasource | User | Connection |
 | --- | --- | --- |
-| Newark1_DS | JRS2C2M | jdbc:oracle:thin:@smartcity-db-prod-v1-2.originsmartops.com:1521/PPRODDB_NEWARK.prodprivatesn.prodvcn.oraclevcn.com |
+| Newark1_DS | JRS2C2M | jdbc:oracle:thin:@smartcity-db-dr-v1-2.originsmartops.com:1521/PPRODDB_NEWARK.prodprivatesn.prodvcn.oraclevcn.com |
 | AuditDataSource |  | jdbc/jasperserverAudit |
 | AuditVirtualDataSource |  |  |
 | JasperserverDataSource |  | jdbc/jasperserver |
@@ -618,6 +619,7 @@ Snapshot 20260918-051522 · 102 views, 99 reports, 60 domains, 38 outputs, 32 fi
 | /public | 22 reports, 19 views, 12 files, 7 domains, 3 jndiJdbcDataSource, 1 virtualDataSource, 1 customDataSource |
 | /temp | 1 domains |
 | /templates | 1 files |
+| /themes | 480 files |
 
 **/SmartCity/Report/Standard_Offering**
 
