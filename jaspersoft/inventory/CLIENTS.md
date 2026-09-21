@@ -525,11 +525,11 @@ Snapshot 20260918-074641 · 891 outputs, 178 views, 147 reports, 73 domains, 5 r
 
 ## prod / Ellensburg
 
-Snapshot 20260918-051522 · 197 views, 151 reports, 90 domains, 27 files, 8 outputs, 3 jndiJdbcDataSource, 2 dashboards, 1 datasources, 1 reportOptions, 1 dataDefinerUnit, 1 virtualDataSource, 1 customDataSource
+Snapshot 20260921-054758 · 507 files, 347 views, 151 reports, 142 domains, 15 dashboards, 9 outputs, 3 jndiJdbcDataSource, 1 datasources, 1 reportOptions, 1 dataDefinerUnit, 1 virtualDataSource, 1 customDataSource
 
 | Datasource | User | Connection |
 | --- | --- | --- |
-| Ellensburg_DS | JRS2C2M | jdbc:oracle:thin:@smartcity-db-prod-v1-2.originsmartops.com:1521/PPRODDB_ELLENSBURG.prodprivatesn.prodvcn.oraclevcn.com |
+| Ellensburg_DS | JRS2C2M | jdbc:oracle:thin:@smartcity-db-dr-v1-2.originsmartops.com:1521/PPRODDB_ELLENSBURG.prodprivatesn.prodvcn.oraclevcn.com |
 | AuditDataSource |  | jdbc/jasperserverAudit |
 | AuditVirtualDataSource |  |  |
 | JasperserverDataSource |  | jdbc/jasperserver |
@@ -539,9 +539,24 @@ Snapshot 20260918-051522 · 197 views, 151 reports, 90 domains, 27 files, 8 outp
 | Top-level folder | Contents |
 | --- | --- |
 | /DataSource | 1 datasources |
-| /SmartCity | 176 views, 129 reports, 83 domains, 15 files, 8 outputs, 2 dashboards, 1 reportOptions |
+| /SmartCity | 326 views, 135 domains, 129 reports, 15 files, 15 dashboards, 9 outputs, 1 reportOptions |
 | /adhoc | 1 dataDefinerUnit |
 | /public | 22 reports, 21 views, 12 files, 7 domains, 3 jndiJdbcDataSource, 1 virtualDataSource, 1 customDataSource |
+| /themes | 480 files |
+
+**/SmartCity/Report/Standard_Offering**
+
+| Folder | Contents |
+| --- | --- |
+| Billing_and_Rates | 21 views, 5 domains, 2 dashboards, 1 outputs |
+| Cashiering | 18 views, 5 domains, 1 dashboards |
+| Common | 13 views, 6 domains, 2 dashboards |
+| Customer_Operations | 17 views, 11 domains, 1 dashboards |
+| Debt_Management | 17 views, 6 domains, 1 dashboards |
+| Field_Operations | 7 views, 3 domains, 1 dashboards |
+| Finance | 25 views, 5 domains, 2 dashboards |
+| Meter_Operations | 25 views, 9 domains, 2 dashboards |
+| New_Services___Planning | 7 views, 2 domains, 1 dashboards |
 
 **/SmartCity/Report/Workstreams**
 
@@ -601,7 +616,7 @@ Snapshot 20260918-071832 · 128 views, 63 reports, 47 domains, 41 outputs, 14 fi
 
 ## prod / Newark1
 
-Snapshot 20260921-050805 · 512 files, 102 views, 99 reports, 60 domains, 38 outputs, 6 controls, 3 dashboards, 3 jndiJdbcDataSource, 1 datasources, 1 reportOptions, 1 virtualDataSource, 1 customDataSource
+Snapshot 20260921-060337 · 512 files, 246 views, 111 domains, 99 reports, 38 outputs, 15 dashboards, 6 controls, 3 jndiJdbcDataSource, 1 datasources, 1 reportOptions, 1 virtualDataSource, 1 customDataSource
 
 | Datasource | User | Connection |
 | --- | --- | --- |
@@ -615,7 +630,7 @@ Snapshot 20260921-050805 · 512 files, 102 views, 99 reports, 60 domains, 38 out
 | Top-level folder | Contents |
 | --- | --- |
 | /DataSource | 1 datasources |
-| /SmartCity | 83 views, 77 reports, 52 domains, 38 outputs, 19 files, 6 controls, 3 dashboards, 1 reportOptions |
+| /SmartCity | 227 views, 103 domains, 77 reports, 38 outputs, 19 files, 15 dashboards, 6 controls, 1 reportOptions |
 | /public | 22 reports, 19 views, 12 files, 7 domains, 3 jndiJdbcDataSource, 1 virtualDataSource, 1 customDataSource |
 | /temp | 1 domains |
 | /templates | 1 files |
@@ -625,7 +640,15 @@ Snapshot 20260921-050805 · 512 files, 102 views, 99 reports, 60 domains, 38 out
 
 | Folder | Contents |
 | --- | --- |
-| Debt_Management | 9 views, 2 domains, 1 dashboards |
+| Billing_and_Rates | 20 views, 5 domains, 2 dashboards |
+| Cashiering | 18 views, 5 domains, 1 dashboards |
+| Common | 13 views, 6 domains, 2 dashboards |
+| Customer_Operations | 17 views, 11 domains, 1 dashboards |
+| Debt_Management | 20 views, 7 domains, 1 dashboards |
+| Field_Operations | 7 views, 3 domains, 1 dashboards |
+| Finance | 26 views, 5 domains, 2 dashboards |
+| Meter_Operations | 25 views, 9 domains, 2 dashboards |
+| New_Services___Planning | 7 views, 2 domains, 1 dashboards |
 
 **/SmartCity/Report/Workstreams**
 

@@ -175,8 +175,8 @@ permissions/jobs/users) were added to `jrs_repository.py` with `--confirm` and `
 ### Live-verified vs authored-offline (2026-09-20)
 Verified against a server: inventory/snapshot/diff, REST import (org-export shape), report-unit
 deploy and run, view execution via queryExecutions (any-value fix), dashboard execution, the
-domain copy import, export_zip. Authored offline with dry-run tests only, first live use should be
-`--dry-run` then Origin_DEV: `jrs_repository.py` copy/move/delete/mkdir/perms-set/jobs/users/roles,
+domain copy import, export_zip. Live-verified 2026-09-21 as well: `jrs_promote_test_to_prod.py` end to end (Ellensburg, Newark1),
+`jrs_fix_stripped_topics.py` (111 views), file-resource PUT with version. Still authored offline only, dry-run first: `jrs_repository.py` copy/move/delete/mkdir/perms-set/jobs/users/roles,
 `jrs_debug.py` domain-apply (PUT of `<domain>_files/schema` as a file resource), view-update (PUT
 of the adhocDataView descriptor), report-update (PUT of `<unit>_files/main_jrxml`), and
 `jrs_promote_test_to_prod.py` end to end (its packaging is proven on the real 2026-09-18 exports).
@@ -247,3 +247,13 @@ target**; `--expect-jrs8-adhoc-compat` is a 9.0-era check and stays off. A prod 
 drops a PUT: the tool retries once, and a rerun resumes from the scan.
 Also learned: a file resource PUT needs the current `version` echoed back (409 "versions not
 match" otherwise) and its descriptor is read with Accept `application/repository.file+json`.
+
+## Test-to-prod promotions of 2026-09-21 (the deployment path, live)
+Ellensburg and Newark1: `jrs_promote_test_to_prod.py --org Y --ds Y_DS --dry-run` (PASS), then
+`--i-mean-prod`. Each: prod org snapshot (rollback), test folder export, prod's own DS export,
+package, verify, import ("Import succeeded", no warnings), snapshot again. Proof per org: DS host
+identical to the 09-18 export; folder identical to test in every file after volatile fields (691 /
+697); zero stripped topics; every view opened and executed with a short cap. Ellensburg 116 rows /
+7 empty / 27 slow (20 s) / 0 errors; Newark1 69 / 10 / 74 slow (15 s) / 0 errors -- Newark's volume
+makes half its views slow, not broken. Wall clock ~11 min Ellensburg, ~21 min Newark (its 306 MB
+org export twice). Standard Offering now on prod: CityCorp, Ellensburg, Newark1.

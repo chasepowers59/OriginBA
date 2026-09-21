@@ -25,7 +25,7 @@ each snapshot is under `backups/jaspersoft/<env>/<stamp>/` (gitignored). Never h
 | College_Station | 20260918-074641 | 147 | 73 | 178 | 1 | 3 | CollegeStation_DS (JRS2C2M @ smartcity-db-prod-v1-2.originsmartops.com:1521), CollegeStation_DS_1 (JRS2C2M @ jdbc:tibcosoftware:oracle:) |
 | Ellensburg | 20260921-054758 | 151 | 142 | 347 | 15 | 507 | Ellensburg_DS (JRS2C2M @ smartcity-db-dr-v1-2.originsmartops.com:1521), AuditDataSource (? @ jdbc), AuditVirtualDataSource (? @ ?), JasperserverDataSource (? @ jdbc), JSDiagnosticDataSource (? @ ?), ReportMonitoringDataSource (? @ jdbc) |
 | Fond_Du_Lac | 20260918-071832 | 63 | 47 | 128 | 1 | 14 | FondDuLac_DS (JRS2C2M @ 10.14.0.19:1521) |
-| Newark1 | 20260921-050805 | 99 | 60 | 102 | 3 | 512 | Newark1_DS (JRS2C2M @ smartcity-db-dr-v1-2.originsmartops.com:1521), AuditDataSource (? @ jdbc), AuditVirtualDataSource (? @ ?), JasperserverDataSource (? @ jdbc), JSDiagnosticDataSource (? @ ?), ReportMonitoringDataSource (? @ jdbc) |
+| Newark1 | 20260921-060337 | 99 | 111 | 246 | 15 | 512 | Newark1_DS (JRS2C2M @ smartcity-db-dr-v1-2.originsmartops.com:1521), AuditDataSource (? @ jdbc), AuditVirtualDataSource (? @ ?), JasperserverDataSource (? @ jdbc), JSDiagnosticDataSource (? @ ?), ReportMonitoringDataSource (? @ jdbc) |
 
 Partial: Fond_Du_Lac is missing `/SmartCity/Report/FDL_Bill_Processing_Reports__Linda_`, `/SmartCity/Report/FDL_Trial_Balance` (the server's exporter never finishes them; see the operations skill).
 

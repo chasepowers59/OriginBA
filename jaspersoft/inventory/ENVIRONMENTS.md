@@ -341,9 +341,9 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 
 ### Ellensburg
 
-282 same · 31 differ · 352 only in test · 102 only in prod
+373 same · 156 differ · 136 only in test · 102 only in prod
 
-**only in test** — 233 views, 83 domains, 13 dashboards, 10 files, 10 reports, 1 datasources, 1 reportOptions, 1 outputs
+**only in test** — 83 views, 31 domains, 10 files, 10 reports, 1 datasources, 1 reportOptions
 
 - views: `/SmartCity/Origin_Tools/DataVergence/Configuration/Admin_Configuration___Ad_Hoc_View___Tabular_1`
 - views: `/SmartCity/Origin_Tools/Routine_Reports/Batch_Process___Ad_Hoc_View___Batch_Run_by_Status`
@@ -360,36 +360,23 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - views: `/SmartCity/Report/My_Reports/ELL_OriginPay_Convinience_Fee/Ad_Hoc_View`
 - views: `/SmartCity/Report/My_Reports/ELL_Payment_Plans/ELL_Payment_Plans_Ad_Hoc_View`
 - views: `/SmartCity/Report/My_Reports/EMMA_Testing/ELL_Billed_Amount___Highest_Billed_Customer`
-- views: … 218 more
+- views: … 68 more
 - domains: `/SmartCity/Origin_Tools/DataVergence/Configuration/Admin_Configuration___Domain`
 - domains: `/SmartCity/Report/My_Reports/ELL_12_Month_History_and_Arrears/ELL_HopeSource`
 - domains: `/SmartCity/Report/My_Reports/ELL_OriginPay_Convinience_Fee/SC_OriginPay_Payments_Domain`
 - domains: `/SmartCity/Report/My_Reports/ELL_Payment_Plans/ELL_Payment_Plans_Domain`
 - domains: `/SmartCity/Report/My_Reports/SC_V/SC_Left_Side_V_Domain`
 - domains: `/SmartCity/Report/My_Reports/SC_V/SC_Right_Side_V_Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Usage_Snapshot___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Bill_Segment___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage_SQ_Snapshot___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billing_360___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billing_Errors/SC_Unbilled_Billing_Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Cashiering/Cashiering_360___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Cashiering/Deposit_Control/Deposit_Control___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Cashiering/Pay_Plan/Pay_Plan___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Cashiering/Payment_Header/Payment_Header___Domain`
-- domains: … 68 more
-- dashboards: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Amount___Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage___Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Cashiering/Payment_Header/Cashiering_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Common/Batch/Batch_Process_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Common/To_Do/Exception_and_To_Do_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Customer_Operations/Customer_Contact/Customer_Operations_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Debt_Management/SA_Snapshot___Aged_Balance/Collections_Performance_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Field_Operations/Field_Activity/Field_Operations_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Finance/Financial_Transaction/Finance_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Finance/General_Ledger/General_Ledger___Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Meter_Operations/Measurements/Measurements___Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Meter_Operations/Usage/Usage_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/New_Services___Planning/New_Services/New_Services_Dashboard`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/Billed_Usage/Total_Consumption___Domain`
+- domains: `/SmartCity/Report/Workstreams/Cashiering/Auto_Pay/Cstat_items`
+- domains: `/SmartCity/Report/Workstreams/Cashiering/Deposit_Control/Deposit_Control___Domain`
+- domains: `/SmartCity/Report/Workstreams/Cashiering/Payment_Header/Payment_Header___Domain`
+- domains: `/SmartCity/Report/Workstreams/Common/Batch_Process/Batch_Process___Domain`
+- domains: `/SmartCity/Report/Workstreams/Common/Exception/Usage_Transaction_Exception___Domain`
+- domains: `/SmartCity/Report/Workstreams/Common/Exception/VEE_Exception___Domain`
+- domains: `/SmartCity/Report/Workstreams/Common/To_Do/To_Do___Domain`
+- domains: `/SmartCity/Report/Workstreams/Customer_Operations/Case/Case___Domain`
+- domains: … 16 more
 - files: `/SmartCity/Admin/sshKeys/id_rsa_jasper_ssh_oldversion.ppk`
 - files: `/SmartCity/Admin/sshKeys/jasper_rsa_new`
 - files: `/SmartCity/Letter/inputXML/Letter_CM04DOORTAG.xml`
@@ -412,7 +399,6 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - reports: `/SmartCity/Report/Workstreams/Common/Exception/Usage_Transaction_Exception___Report___Tabular_1`
 - datasources: `/DataSource/Origin_DEV_DS`
 - reportOptions: `/SmartCity/Report/My_Reports/ELL_CWU_Billing/Default_Options`
-- outputs: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/bill_segment_domain_client_note.txt`
 
 **only in prod** — 69 views, 21 reports, 6 outputs, 3 domains, 2 dashboards, 1 reportOptions
 
@@ -461,12 +447,16 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - dashboards: `/SmartCity/Report/My_Reports/ELL_HOPESOURCE_USAGE`
 - reportOptions: `/SmartCity/Report/My_Reports/ELL_HopeSource_12_Month_History/Options`
 
-**differ** — 21 views, 5 reports, 4 domains, 1 datasources
+**differ** — 142 views, 5 reports, 4 domains, 4 dashboards, 1 datasources
 
 - views: `/SmartCity/Origin_Tools/Routine_Reports/OriginPay___Ad_Hoc_View___Monthly_Transactions`
 - views: `/SmartCity/Report/Custom_Reports/SC_AR_Aging_Balance/SC_AR_Aging_Balance___90_Day_Interval___Ad_Hoc_View`
+- views: `/SmartCity/Report/Custom_Reports/SC_Asset/SC_Asset_AdHoc_View_Table`
+- views: `/SmartCity/Report/Custom_Reports/SC_Tender_Control/SC_Tender_Control_Ad_Hoc_View`
 - views: `/SmartCity/Report/Custom_Reports/SC_To_Do/SC_To_Do_Ad_Hoc_View`
 - views: `/SmartCity/Report/Custom_Reports/SC_V/SC_Right_Side_V_Ad_Hoc_View`
+- views: `/SmartCity/Report/Inventory/SC_Billed_Usage/SC_Billed_Usage_Ad_Hoc_View`
+- views: `/SmartCity/Report/Inventory/SC_Unbilled_Billing/SC_Unbilled_Billing_Ad_Hoc_View`
 - views: `/SmartCity/Report/Inventory/SC_V/SC_Right_Side_V_Ad_Hoc_View`
 - views: `/SmartCity/Report/My_Reports/ELL_12_Month_History_and_Arrears/ELL_12_Month_History_and_Arrears_Ad_Hoc_View`
 - views: `/SmartCity/Report/My_Reports/ELL_Account_Balances/ELL_Summarized_Account_Balances_Ad_Hoc_View`
@@ -474,11 +464,7 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - views: `/SmartCity/Report/My_Reports/ELL_Billed_Revenue/ELL_Billed_Revenue__New__Ad_Hoc_View`
 - views: `/SmartCity/Report/My_Reports/ELL_CWU_Billing/ELL_CWU_Billing_Ad_Hoc_View`
 - views: `/SmartCity/Report/My_Reports/ELL_CWU_Billing/ELL_CWU_Billing_Ad_Hoc_View_KTB`
-- views: `/SmartCity/Report/My_Reports/ELL_CWU_Billing/ELL_CWU_Billing_Ad_Hoc_View__GCINCO_`
-- views: `/SmartCity/Report/My_Reports/ELL_User_Security/ELL_C2M_Users_Ad_Hoc_View`
-- views: `/SmartCity/Report/My_Reports/ELL_Write_Off_Processes/ELL_Write_Off_Processes_Ad_Hoc_View`
-- views: `/SmartCity/Report/My_Reports/SC_AR_Aging_Balance/SC_AR_Aging_Balance___Standard`
-- views: … 6 more
+- views: … 127 more
 - reports: `/SmartCity/Bill/Bill_ThreeServices`
 - reports: `/SmartCity/Letter/Letter_CM04DOORTAG`
 - reports: `/SmartCity/Report/My_Reports/ELL_Billed_Revenue/ELL_Billed_Revenue__New__Report`
@@ -488,6 +474,10 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - domains: `/SmartCity/Report/Custom_Reports/SC_Payment_Tender/SC_Payment_Tender_Domain`
 - domains: `/SmartCity/Report/My_Reports/SC_Payment_Tender/SC_Payment_Tender_Domain`
 - domains: `/SmartCity/Report/Workstreams/Cashiering/Payment_Tender/Payment_Tender___Domain`
+- dashboards: `/SmartCity/Report/Standard_Offering/Cashiering/Payment_Header/Cashiering_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Common/To_Do/Exception_and_To_Do_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Finance/Financial_Transaction/Finance_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Finance/General_Ledger/General_Ledger___Dashboard`
 - datasources: `/DataSource/Ellensburg_DS`
 
 ### Fond_Du_Lac
@@ -681,9 +671,9 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 
 ### Newark1
 
-40 same · 12 differ · 613 only in test · 229 only in prod
+156 same · 103 differ · 406 only in test · 229 only in prod
 
-**only in test** — 333 views, 120 domains, 106 reports, 42 dashboards, 7 outputs, 5 files
+**only in test** — 189 views, 106 reports, 69 domains, 30 dashboards, 7 outputs, 5 files
 
 - views: `/SmartCity/Origin_Tools/DataVergence/Configuration/Admin_Configuration___Ad_Hoc_View___Tabular_1`
 - views: `/SmartCity/Origin_Tools/Routine_Reports/Batch_Process___Ad_Hoc_View___Batch_Run_by_Status`
@@ -695,28 +685,12 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - views: `/SmartCity/Report/My_Reports/Training___Customer_Contact/Customer_Contact___Ad_Hoc_View___Graph_1`
 - views: `/SmartCity/Report/My_Reports/Training___Customer_Contact/Customer_Contact___Ad_Hoc_View___Graph_2`
 - views: `/SmartCity/Report/My_Reports/Training___Customer_Contact/Customer_Contact___Ad_Hoc_View___Graph_3`
-- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Amount___Amount_Billed_by_Budget_Plan`
-- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Amount___Billing_Activity`
-- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Amount___Canceled_Segments`
-- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Amount___Highest_Billed_Customer`
-- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Totals___Rebills`
-- views: … 318 more
-- domains: `/SmartCity/Origin_Tools/DataVergence/Configuration/Admin_Configuration___Domain`
-- domains: `/SmartCity/Report/My_Reports/Training___Bill_Exception/Bill_Exception___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Usage_Snapshot___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Bill_Segment___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage_SQ_Snapshot___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billing_360___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billing_Errors/SC_Unbilled_Billing_Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Cashiering/Cashiering_360___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Cashiering/Deposit_Control/Deposit_Control___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Cashiering/Pay_Plan/Pay_Plan___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Cashiering/Payment_Header/Payment_Header___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Cashiering/Payment_Tender/Payment_Tender___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Common/Batch/Batch_Process___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Common/Common_360___Domain`
-- domains: `/SmartCity/Report/Standard_Offering/Common/Exception/Bill_Segment_Exception___Domain`
-- domains: … 105 more
+- views: `/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Bill_Segment___Ad_Hoc_View_1`
+- views: `/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Bill_Segment___Ad_Hoc_View_2`
+- views: `/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Bill_Segment___Ad_Hoc_View___Tabular_1`
+- views: `/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Bill_Segment___Ad_Hoc_View___Tabular_2`
+- views: `/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Bill_Segment___Ad_Hoc_View___Tabular_3`
+- views: … 174 more
 - reports: `/SmartCity/Origin_Tools/Routine_Reports/Batch_Process___Scheduled_Report___Batch_Run_by_Status_Report`
 - reports: `/SmartCity/Origin_Tools/Routine_Reports/Checker___Premise_City_Report`
 - reports: `/SmartCity/Report/My_Reports/REP4_Requests_From_Auditors_Specialist`
@@ -733,22 +707,38 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - reports: `/SmartCity/Report/Workstreams/Billing_and_Rates/NW_Second_River/REP20_Second_River_List_Report___Newark_Regular`
 - reports: `/SmartCity/Report/Workstreams/Billing_and_Rates/NW_Second_River/REP20_Second_River_List_Report___Newark_Senior___Medical_Patient___Veteran`
 - reports: … 91 more
+- domains: `/SmartCity/Origin_Tools/DataVergence/Configuration/Admin_Configuration___Domain`
+- domains: `/SmartCity/Report/My_Reports/Training___Bill_Exception/Bill_Exception___Domain`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Bill_Segment___Domain`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/NW_Pending_Bills/NW_Pending_Bills_Domain`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/NW_Pending_Bills/NW_Pending_Bills_and_Amounts_Domain`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/NW_Second_River/REP20_Second_River_Water_Consumption_Domain`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/NW_Second_River/REP20_Second_River_Water_Consumption_Summary_Domain`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/New_Domain`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/SC_Bill_Print_Audit/SC_Bill_Print_Audit_Domain`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/SC_Billed_Revenue/SC_Billed_Revenue_Domain`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/SC_Billed_Usage/SC_Billed_Usage_Domain`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/SC_Billing_Overview/SC_Billing_Overview_Domain`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/SC_SA_Rate_History/SC_SA_Rate_History_Domain`
+- domains: `/SmartCity/Report/Workstreams/Billing_and_Rates/SC_Unbilled_Billing/SC_Unbilled_Billing_Domain`
+- domains: `/SmartCity/Report/Workstreams/Cashiering/Auto_Pay/Auto_Pay___Domain`
+- domains: … 54 more
 - dashboards: `/SmartCity/Report/My_Reports/Training___Bill_Exception/Bill_Exception___Dashboard`
 - dashboards: `/SmartCity/Report/My_Reports/Training___Customer_Contact/Customer_Contact___Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Amount___Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage___Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Cashiering/Payment_Header/Cashiering_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Common/Batch/Batch_Process_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Common/To_Do/Exception_and_To_Do_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Customer_Operations/Customer_Contact/Customer_Operations_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Field_Operations/Field_Activity/Field_Operations_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Finance/Financial_Transaction/Finance_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Finance/General_Ledger/General_Ledger___Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Meter_Operations/Measurements/Measurements___Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/Meter_Operations/Usage/Usage_Dashboard`
-- dashboards: `/SmartCity/Report/Standard_Offering/New_Services___Planning/New_Services/New_Services_Dashboard`
 - dashboards: `/SmartCity/Report/Workstreams/Billing_and_Rates/Bill_Segment/Bill_Segment___Dashboard_1`
-- dashboards: … 27 more
+- dashboards: `/SmartCity/Report/Workstreams/Cashiering/Auto_Pay/Auto_Pay___Dashboard`
+- dashboards: `/SmartCity/Report/Workstreams/Cashiering/Deposit_Control/Deposit_Control___Dashboard`
+- dashboards: `/SmartCity/Report/Workstreams/Cashiering/Pay_Plan/Pay_Plan___Dashboard`
+- dashboards: `/SmartCity/Report/Workstreams/Cashiering/Payment_Header/Payment_Header___Dashboard`
+- dashboards: `/SmartCity/Report/Workstreams/Cashiering/Payment_Tender/Tender___Dashboard_1`
+- dashboards: `/SmartCity/Report/Workstreams/Cashiering/Payment_Tender/Tender___Dashboard_2`
+- dashboards: `/SmartCity/Report/Workstreams/Common/Batch/Batch_Process___Dashboard`
+- dashboards: `/SmartCity/Report/Workstreams/Common/Exception/Exception___Dashboard_1`
+- dashboards: `/SmartCity/Report/Workstreams/Common/Exception/Exception___Dashboard_2`
+- dashboards: `/SmartCity/Report/Workstreams/Common/Release/Release___Dashboard`
+- dashboards: `/SmartCity/Report/Workstreams/Common/Security/User_Group___Dashboard_1`
+- dashboards: `/SmartCity/Report/Workstreams/Common/To_Do/To_Do___Dashboard`
+- dashboards: … 15 more
 - outputs: `/SmartCity/Origin_Tools/Routine_Reports/Checker___Premise_City_Report.pdf`
 - outputs: `/SmartCity/Report/Workstreams/Billing_and_Rates/NW_Pending_Bills/NW_Pending_Bills_Report.pdf`
 - outputs: `/SmartCity/Report/Workstreams/Customer_Operations/Customer_Contact/zz___Training/Customer_Contact___Report_2.pdf`
@@ -840,20 +830,33 @@ ignored; 'differs' when the content differs; counts exclude folders and generate
 - dashboards: `/SmartCity/Report/Inventory/SC_Case/Case_Dashboard`
 - reportOptions: `/SmartCity/Report/My_Reports/Options`
 
-**differ** — 4 views, 3 domains, 2 reports, 1 datasources, 1 controls, 1 dashboards
+**differ** — 94 views, 3 dashboards, 2 reports, 2 domains, 1 datasources, 1 controls
 
 - views: `/SmartCity/Origin_Tools/Routine_Reports/OriginPay___Ad_Hoc_View___Monthly_Transactions`
-- views: `/SmartCity/Report/Standard_Offering/Debt_Management/SA_Snapshot___Aged_Balance/Aged_Debt___Accounts_with_Highest_Debt`
-- views: `/SmartCity/Report/Standard_Offering/Debt_Management/SA_Snapshot___Aged_Balance/Aged_Debt___By_Debt_Class`
-- views: `/SmartCity/Report/Standard_Offering/Debt_Management/SA_Snapshot___Aged_Balance/SA_Snapshot___Ad_Hoc_View_1`
-- domains: `/SmartCity/Report/Standard_Offering/Debt_Management/SA_Snapshot___Aged_Balance/aged_debt_domain`
-- domains: `/SmartCity/Report/Workstreams/Cashiering/Payment_Tender/Payment_Tender___Domain`
-- domains: `/SmartCity/Report/Workstreams/Customer_Operations/V/M_Side___Domain`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Amount___Amount_Billed_by_Budget_Plan`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Amount___Billing_Activity`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Amount___Canceled_Segments`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Amount___Highest_Billed_Customer`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Usage___By_Service_Type`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Usage___Customer_Class_Summary`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_Usage___Estimated_Segment`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Amount/Billed_revenue_by_Rate_Schedule`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage___Account_Level_View`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage___Across_Customer_Class`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage___Amount_Billed___Consumption`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage___Amount_Billed___Consumption_1`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage___Amount_Billed___Consumption_1_1`
+- views: `/SmartCity/Report/Standard_Offering/Billing_and_Rates/Billed_Usage/Billed_Usage___Amount_Billed___Consumption_2`
+- views: … 79 more
+- dashboards: `/SmartCity/Report/Standard_Offering/Common/To_Do/Exception_and_To_Do_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Debt_Management/SA_Snapshot___Aged_Balance/Collections_Performance_Dashboard`
+- dashboards: `/SmartCity/Report/Standard_Offering/Field_Operations/Field_Activity/Field_Operations_Dashboard`
 - reports: `/SmartCity/Bill/Bill_Consolidated_Trigger`
 - reports: `/SmartCity/Bill/Bill_Newark`
+- domains: `/SmartCity/Report/Workstreams/Cashiering/Payment_Tender/Payment_Tender___Domain`
+- domains: `/SmartCity/Report/Workstreams/Customer_Operations/V/M_Side___Domain`
 - datasources: `/DataSource/Newark1_DS`
 - controls: `/SmartCity/Admin/Parameters/Report_Date`
-- dashboards: `/SmartCity/Report/Standard_Offering/Debt_Management/SA_Snapshot___Aged_Balance/Collections_Performance_Dashboard`
 
 ## internal vs test
 
