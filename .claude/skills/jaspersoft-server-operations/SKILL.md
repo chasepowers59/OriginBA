@@ -64,6 +64,7 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
 | `scripts/jaspersoft/jrs_deploy_report_units.py --org X --datasource Y [--run FROM TO]` | create/overwrite report units from the finance-pack specs and execute them |
 | `scripts/jaspersoft/jrs_run_sweep.py --env X --org Y [--folder F] --out jaspersoft/sweeps/<env>_<org>_<date>.json` | RUN everything in a folder and classify it: Ad Hoc views through queryExecutions with the view as datasource (ok / EMPTY / error), report units through the reports service, dashboards through dashboardExecutions. The post-promotion smoke, and the before/after of a server upgrade (diff the two JSON files by uri). On the test server dashboards answer `ERR_CONNECTION_REFUSED` from the server's own headless export engine, not from the dashboard: classified `export-engine`, and the UI opens them fine (Chase, 2026-09-18) |
 | `scripts/jaspersoft/audit_adhoc_saved_filters.py --env X --org Y --client <config id>` | saved Ad Hoc filter values that name the SOURCE client's configuration and the target does not have (the promoted view returns nothing there); reads the explorer's per-client config export |
+| `scripts/jaspersoft/jrs_adhoc_chart_props.py --env X --org Y --folder F --set name=value [--only-if name=value] [--dry-run] [--i-mean-prod]` | set Highcharts advanced properties on EVERY Ad Hoc chart state under a folder, dashboard-embedded copies included; backs each state up under `backups/jaspersoft/adhoc_state/`, reads every PUT back. `tests/test_jrs_adhoc_chart_props.py` pins the XML patch on real states |
 | `tests/test_jrs_inventory.py` | the offline half of the inventory tool on a real export |
 
 ## What the REST API can and cannot do here
@@ -143,6 +144,7 @@ test|prod|internal` and `--org <Org>` (the login becomes `user|Org`; paths are t
 | Promote the Standard Offering to a client org | `jaspersoft/docs/origin_dev_to_origin_test_promotion_plan.md` steps: org-scoped `export` of the folder from Origin_DEV, export the TARGET org's `/DataSource/<DS>` fresh, `run_client_import_pipeline.py` with that overlay, both verifiers PASS, add `rootTenantId`, `jrs_repository.py import` as `user|Org` | after-snapshot vs source: same file set, only DS name / componentType / Workstreams rewiring differ; datasource XML byte-identical to its own export |
 | Promote a client's folder TEST org -> PROD org (the production deployment path from 2026-09-21 on) | `jrs_promote_test_to_prod.py --org Y --folder /SmartCity/Report/Standard_Offering --ds <DS> --dry-run` then with `--i-mean-prod`. Both orgs name the datasource the SAME (FondDuLac_DS) at DIFFERENT hosts, and the folder export CARRIES the datasource XML: imported as-is it would repoint prod at the test database. The script replaces the DataSource tree with prod's own export taken minutes earlier, lists it first, sets rootTenantId, and refuses if any test-host string survives | prod DS byte-identical to its own export; `jrs_inventory.py diff test:Y prod:Y --folder ...` = dates/version only; sweep the folder |
 | Promote one report or folder | `jrs_repository.py --org Origin_DEV export /SmartCity/Report/X --out x.zip`, then the tenant-import builder (`build_client_tenant_report_import.py`) or, for Origin-owned orgs, `import` the export as-is | `search` finds it in the target; `run` renders it |
+| Reformat charts (label size, colour, axis text) across a folder | `jrs_adhoc_chart_props.py --env X --org Y --folder F --set plotOptions.series.dataLabels.style.fontSize=15px ... --dry-run`, then for real; never `style.color=contrast` for labels outside the bars | reload the dashboard in the Browser pane and read computed colour/size of `.highcharts-data-label text` and what `elementsFromPoint` finds under each label |
 | Deploy a SQL report unit | `jrs_deploy_report_units.py --org Y --datasource <DS>` (REST descriptors; never an import zip for these) | `--run FROM TO` renders the PDF |
 | Fix a domain, Chase's way (preferred, no package) | Domain Designer > open the domain > Edit > Import the schema XML: replaces ONLY the schema file, the datasource and everything else stay; `jrs_debug.py domain-apply URI --schema file` is the same operation over REST. Prove the schema first as a copy (`domain-copy`) or on TEST |
 | Fix a domain without breaking reports | change the derived-table SQL or a join in the schema, keep every item id/label; import as a COPY first (`domains/manual_imports/fonddulac_asset_domain/` is the pattern), prove it, then paste into the original | `jrs_view_calibrate.py`-style queryExecutions against copy and original on the same keys |
@@ -283,5 +285,13 @@ succeeded and writes nothing). Then the server keeps serving the OLD bytes from 
 (`/_themes/<hash>/...`, max-age 1 year) until someone clicks **Set as Active Theme** on the theme in
 the repository UI; re-setting the org's theme over REST does not flush it. Ellensburg-style scope
 check: DEV and STAGE hold their own copies, so the root edit reached only Origin_DEMO.
-Chart labels: `dataLabels.style.color = contrast` (dark on light bars, white on dark) with
-`textOutline none` is the readable combination; a fixed dark colour fails on maroon/blue bars.
+Chart labels, CORRECTED the same day from the live DOM: `dataLabels.style.color = contrast` is right
+only for a label INSIDE its bar. Every label on these dashboards sits OUTSIDE (above a column, beside
+a bar, over a gauge), and there this Highcharts build resolves `contrast` to WHITE on the white plot
+area: four labels vanished and Chase asked whether they had been removed. The fix is an explicit
+`#1F2933` with `textOutline none` (`jrs_adhoc_chart_props.py --only-if ...=contrast --set ...=#1F2933`,
+20 states, each read back; both dashboards re-measured: every label rgb(31,41,51) over
+`highcharts-plot-background`). Gauge numbers carry inline colours and never changed. Rule 2 (chart
+text, gauge captions 9px) is served after the UI flush: the org's theme hash changed (A966A7AA) and
+the served overrides_custom.css is 37,012 bytes with both rules. Measure a formatting change in the
+DOM (colour, size, what lies under the label) before calling it done; the state file cannot tell you.
