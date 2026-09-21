@@ -96,3 +96,92 @@ Prepare SQL for Jaspersoft Domain or Ad Hoc derived-table ingestion only when a 
 - Supports report filters via dataset fields.
 - No environment-specific hardcoded values unless intentionally scoped.
 - Preserves the intended grain and row population on the validation slice.
+
+## Client-configured, effective-dated tables in a domain: the derived-table recipe
+
+C2M's core tables are the same at every client. What differs client to client lives in the
+EXTENSION tables: characteristics (`CI_*_CHAR`, `D1_*_CHAR` -- type, code and value are the
+client's own configuration, described by `CI_CHAR_TYPE`, `CI_CHAR_TYPE_L`, `CI_CHAR_VAL_L`),
+and the other effective-dated detail tables (`CI_SA_RS_HIST`, `CI_SA_RCHG_HIST`,
+`CI_SA_CONTERM`, `CI_PREM_CHAR` ...). Joined raw into a domain they misbehave in three ways
+that are invisible on a small tenant and wrong on a real one (found on Service Agreement
+360, 2026-09-17; verified imported on DEV, both derived tables preview):
+
+1. **A label table is a table of everything.** Drag *Characteristic Type Code* from
+   `CI_CHAR_TYPE_L` and Ad Hoc offers every type in the system (account, person, SA,
+   premise); select label fields alone and it queries the label table alone. The outer join
+   is not the cause and must stay (the 360 domains exist to pull anything, then filter).
+2. **Effective dating.** PK is `entity + type + EFFDT`; every version is a row and nothing
+   says which is current. Ad Hoc cannot rank.
+3. **One value column is not enough.** `CI_CHAR_TYPE.CHAR_TYPE_FLG` decides where the value
+   lives: `DFV` -> `CHAR_VAL` (label in `CI_CHAR_VAL_L`), `ADV` -> `ADHOC_CHAR_VAL`,
+   `FKV` -> `CHAR_VAL_FK1`. A description from `CI_CHAR_VAL_L` alone is null for every ad hoc
+   and FK characteristic (Ellensburg slice: 19 of 50 premise chars are ADV).
+
+**The recipe** (`scripts/jaspersoft/patch_domain_characteristics.py`, tested by
+`tests/test_domain_characteristics_patch.py`; `--target TABLE:KEY:TYPE_L_ALIAS:VAL_L_ALIAS`
+applies it to any characteristic table in any domain):
+
+- Replace the raw table AND its label joins with ONE `<jdbcQuery>` derived table **under the
+  raw table's id**. Joins, join-tree fields and item `resourceId`s that named the table keep
+  resolving, so saved Ad Hoc views survive; repoint the label items (same item ids) to the
+  folded columns.
+- The derived row carries: the raw columns, `CHAR_TYPE_DESCR`, `CHAR_TYPE_FLG`,
+  `CHAR_VAL_DESCR`, **`CHAR_VALUE`** (resolved by kind), **`IS_CURRENT_SW`** = 'Y' on the
+  latest version whose `EFFDT` is not in the future, per `(entity, type)`. **No row is
+  removed** -- history stays; "current" is a filter the user applies.
+- SQL rules the JRS domain parser enforces: starts with `SELECT`, one outer wrapper, no CTE,
+  no bind, no semicolon; ANSI so the same text runs on Oracle and on the local Postgres
+  slice (`COALESCE`, `CASE`, `MAX() OVER`, `TRIM`, `CURRENT_DATE`; XML-escape `<`).
+- One datasource id per schema, and it must be the one the domain wrapper references
+  (`<uri>/DataSource/X</uri>`); a domain cannot join across datasource ids. The SA 360
+  builder reads the id from the export and refuses a mismatch -- the first Newark bundle
+  had every table on `Origin_DEV_DS` under a `Newark1_DS` wrapper.
+- Prove it before import: derived rows = raw rows, one current row per key with a
+  non-future version, zero unresolved values (`sql/validation/service_agreement_prem_char_grain_check.sql`
+  gates 5-6); the offline test proves every reference resolves.
+
+Same pattern for a rate-schedule history or a contract-term table: derived table under the
+raw id, `IS_CURRENT_SW` over the table's own effective-date key, descriptions folded in.
+
+**Anchors that are right and look wrong:** `CI_SA.CHAR_PREM_ID` is C2M's designated
+"characteristic premise" for the SA (populated on ~54% of Ellensburg SAs; deposits and fees
+have none) -- the correct link for premise characteristics, used by five Standard Offering
+domains and `rpt_service_agreement`. The physical service premise is a different fact
+(`CI_SA_SP -> CI_SP -> CI_PREM`, many-to-many). Never swap one for the other.
+
+## JasperReports versions (measured, not assumed)
+
+| Server | Library / JRXML model | Notes |
+| --- | --- | --- |
+| JRS 8.1.0 PRO (Odessa tenant, `jsVersion` measured from its export) | JasperReports 6.20, JRXML 6 model | reads 6.x JRXML only |
+| JRS 9.0.x (Origin DEV; Studio 9.0.x) | 6.x JRXML model | reads 6.x only; JRS 9 Ad Hoc adds date-time calcs, chart options in `knowledge_base/jaspersoft_charts_visuals_jrs9.md` |
+| **JRS 10.0.0 PRO -- the SmartCity server today** (`/rest_v2/serverInfo`, 2026-09-17; one instance, every client an org) | JasperReports 7, JRXML 7 model | reads 7 only: 6.x files fail "Unable to load report" and vice versa (measured both ways in originba-letterprint). The 8.1.0 PRO rows above are what the same server was before its 2026-05 upgrade; old exports still say 8.1.0 |
+
+JRXML 7 vs 6: boolean attributes lose the `is` prefix (`isBold` -> `bold`), `reportElement` /
+`textElement` / `font` attributes flatten onto the element, `hTextAlign`/`vTextAlign` replace
+`textAlignment`/`verticalAlignment`, the XSD lives at `/xsd/jasperreport.xsd`. The converter
+that encodes every measured difference is `~/originba-letterprint/jasperserver/tools/jrxml7to6.py`
+(author once in 7, generate the 6.20 twin, render both and assert equal text). `jsVersion` in
+an import bundle is measured from a real export of the target, never typed.
+
+## Placement history: join from the CURRENT row, never the raw history (2026-09-18, Fond du Lac)
+
+`W1_ASSET_NODE` (asset placement, PK ASSET_ID + EFF_DTTM) carries a "current" pointer
+(`CURR_ASSET_ID`/`CURR_NODE_ID`) that C2M fills on one row per asset -- and leaves stale when a
+meter is re-installed minutes after an In Store entry (2 of 16,672 at Fond du Lac). Three rules,
+each learned the hard way the same day: (1) the current placement is the LATEST EFF_DTTM row,
+what Disposition History shows; expose `NVL(CURR_NODE_ID, NODE_ID) AS CURR_NODE_ID` under the same
+field id; (2) never select the current row BY the pointer (it showed those meters as In Store);
+(3) join service-point/premise tables FROM the derived current-placement table, not from the raw
+history table -- the raw join fanned 16,672 installed meters into 20,541 rows, and the legacy views
+hid it with a filter on the raw pointer that picked the wrong row. Record and packages:
+`domains/manual_imports/fonddulac_asset_domain/` (REST import needs the org's own datasource
+export listed first, `rootTenantId`, folder XML with `<parent>`+`<name>`, descriptions under 250
+characters -- each of those failed once).
+
+## Version matrix addendum (2026-09-20): JRS 10 PRO loads JRXML 6 through a licensed legacy loader
+The JR 7 library alone cannot load JRXML 6 (measured, and vendor-confirmed); JasperReports Server
+10.0 PRO adds `LegacyXmlLoader` (JRL-Pro, license-gated), which is why the 10.0 test server serves
+JRXML 6 bills. "Mutually unreadable" is true of the LIBRARIES and of Studio; on the PRO server old
+units keep running. Details in `jaspersoft-server-operations`.

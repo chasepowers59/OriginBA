@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reportUnit exportedWithPermissions="true">
+    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering</folder>
+    <name>payments_by_tender_type_period</name>
+    <version>0</version>
+    <label>Payments by Tender Type</label>
+    <description>Tenders in a payment-date window by tender type: count and amount of live tenders, cancelled tenders shown apart, with a month-by-month breakdown under each type.</description>
+    <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+    <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+    <mainReport>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" dataFile="Main_jrxml.data" xsi:type="fileResource">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files</folder>
+            <name>Main_jrxml</name>
+            <version>0</version>
+            <label>Main jrxml</label>
+            <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+            <fileType>jrxml</fileType>
+        </localResource>
+    </mainReport>
+    <dataSource>
+        <uri>/organizations/organization_1/organizations/Origin_DEV/DataSource/Origin_DEV_DS</uri>
+    </dataSource>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files</folder>
+            <name>FROM_DT</name>
+            <version>0</version>
+            <label>Payment date from (inclusive)</label>
+            <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+            <type>2</type>
+            <mandatory>true</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files/FROM_DT_files</folder>
+                    <name>myDatatype</name>
+                    <version>0</version>
+                    <label>myDatatype</label>
+                    <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+                    <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+                    <type>3</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files</folder>
+            <name>TO_DT</name>
+            <version>0</version>
+            <label>Payment date to (inclusive)</label>
+            <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+            <type>2</type>
+            <mandatory>true</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files/TO_DT_files</folder>
+                    <name>myDatatype</name>
+                    <version>0</version>
+                    <label>myDatatype</label>
+                    <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+                    <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+                    <type>3</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files</folder>
+            <name>TENDER_TYPE_CD_F</name>
+            <version>0</version>
+            <label>Tender types (blank = all)</label>
+            <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+            <type>7</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files/TENDER_TYPE_CD_F_files</folder>
+                    <name>TENDER_TYPE_CD_F_query</name>
+                    <version>0</version>
+                    <label>TENDER_TYPE_CD_F_query</label>
+                    <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+                    <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+                    <language>sql</language>
+                    <queryString>SELECT TRIM(tender_type_cd) AS CODE, TRIM(tender_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_TENDER_TYPE_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_PAY_TNDR t JOIN CISADM.CI_PAY_EVENT e ON e.pay_event_id = t.pay_event_id WHERE t.tender_type_cd = l.tender_type_cd AND e.pay_dt &gt;= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1</queryString>
+                    <dataSource>
+                        <uri>/organizations/organization_1/organizations/Origin_DEV/DataSource/Origin_DEV_DS</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>DESCR</queryVisibleColumn>
+            <queryValueColumn>CODE</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files</folder>
+            <name>PAYOR_ACCT_ID_F</name>
+            <version>0</version>
+            <label>Payor account ID (blank = all)</label>
+            <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+            <type>2</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files/PAYOR_ACCT_ID_F_files</folder>
+                    <name>myDatatype</name>
+                    <version>0</version>
+                    <label>myDatatype</label>
+                    <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+                    <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+                    <type>1</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files</folder>
+            <name>TNDR_CTL_ID_F</name>
+            <version>0</version>
+            <label>Tender control ID (blank = all)</label>
+            <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+            <type>2</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files/TNDR_CTL_ID_F_files</folder>
+                    <name>myDatatype</name>
+                    <version>0</version>
+                    <label>myDatatype</label>
+                    <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+                    <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+                    <type>1</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files</folder>
+            <name>MIN_AMT_F</name>
+            <version>0</version>
+            <label>Minimum tender amount (blank = all)</label>
+            <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+            <type>2</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files/MIN_AMT_F_files</folder>
+                    <name>myDatatype</name>
+                    <version>0</version>
+                    <label>myDatatype</label>
+                    <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+                    <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+                    <type>2</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+        </localResource>
+    </inputControl>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false"
+            dataFile="payments_by_tender_type_month.data" xsi:type="fileResource">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Cashiering/payments_by_tender_type_period_files</folder>
+            <name>payments_by_tender_type_month</name>
+            <version>0</version>
+            <label>payments_by_tender_type_month</label>
+            <creationDate>2026-09-18T11:09:55.000Z</creationDate>
+            <updateDate>2026-09-18T11:09:55.000Z</updateDate>
+            <fileType>jrxml</fileType>
+        </localResource>
+    </resource>
+    <alwaysPromptControls>true</alwaysPromptControls>
+    <controlsLayout>1</controlsLayout>
+</reportUnit>

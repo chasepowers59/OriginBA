@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CMA_SUMMARY" label="CMA_SUMMARY" resourceId="CMA_SUMMARY"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CityCorp_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="APPLIED_BY" label="Applied By" resourceId="CMA_SUMMARY.APPLIED_BY"></item>
+    <item id="APPLIED_DTTM" label="CMA Applied Date Time" resourceId="CMA_SUMMARY.APPLIED_DTTM"></item>
+    <item id="CMA_FILENAME" label="CMA File Name" resourceId="CMA_SUMMARY.CMA_FILENAME"></item>
+    <item id="CMA_FILEPATH" label="CMA File Path" resourceId="CMA_SUMMARY.CMA_FILEPATH"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CMA_SUMMARY" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="CMA_FILENAME" type="java.lang.String"></field>
+        <field id="APPLIED_DTTM" type="java.sql.Timestamp"></field>
+        <field id="APPLIED_BY" type="java.lang.String"></field>
+        <field id="CMA_FILEPATH" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT 
+    SUBSTR(ST.MIGR_FILENAME,instr(ST.MIGR_FILENAME,'/',-1)+1) CMA_FILENAME,
+    SUBSTR(ST.MIGR_FILENAME,1,instr(ST.MIGR_FILENAME,'/',-1)) CMA_FILEPATH,
+    ST.STATUS_UPD_DTTM APPLIED_DTTM,
+    TRIM(USR.LAST_NAME) || ' , ' || TRIM(USR.FIRST_NAME) || ' ( ' || TRIM(USR.USER_ID) || ' )' APPLIED_BY
+FROM CISADM.F1_MIGR_DATA_ST ST, CISADM.SC_USER USR
+WHERE EXISTS (
+    SELECT 'X'
+    FROM CISADM.F1_MIGR_OBJ OBJ
+    WHERE ST.MIGR_DATA_SET_ID = OBJ.MIGR_DATA_SET_ID
+    AND OBJ.BO_STATUS_CD = 'APPLIED')
+AND ST.USER_ID = USR.USER_ID</query>
+    </jdbcQuery>
+  </resources>
+</schema>

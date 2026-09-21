@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <itemGroups>
+    <itemGroup id="FDL_AGED_30_FROM0930" label="FDL_AGED_30_FROM0930" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_CUR_AMT__2" label="AGED 09/30 - 30" resourceId="JoinTree_1.FDL_AGED_30_FROM0930.SUM_FT1_CUR_AMT__2"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="FDL_AGED_30_FROM0831" label="FDL_AGED_30_FROM0831" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_CUR_AMT__1" label="AGED 08/31 - 30" resourceId="JoinTree_1.FDL_AGED_30_FROM0831.SUM_FT1_CUR_AMT__1"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="FDL_AGED_CURRENT" label="FDL_AGED_CURRENT" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_CUR_AMT_" label="Current" resourceId="JoinTree_1.FDL_AGED_CURRENT.SUM_FT1_CUR_AMT_"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="FDL_AGED_DETAILS" label="FDL_AGED_DETAILS" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID" label="ACCT_ID" resourceId="JoinTree_1.FDL_AGED_DETAILS.ACCT_ID"></item>
+        <item id="ADDRESS1" label="SERVICE ADDRESS1" resourceId="JoinTree_1.FDL_AGED_DETAILS.ADDRESS1"></item>
+        <item id="BILL_CYC_CD" label="BILL_CYC_CD" resourceId="JoinTree_1.FDL_AGED_DETAILS.BILL_CYC_CD"></item>
+        <item id="DST_ID" label="DST_ID" resourceId="JoinTree_1.FDL_AGED_DETAILS.DST_ID"></item>
+        <item id="ENTITY_NAME" label="ENTITY_NAME" resourceId="JoinTree_1.FDL_AGED_DETAILS.ENTITY_NAME"></item>
+        <item id="SA_ID" label="SA_ID" resourceId="JoinTree_1.FDL_AGED_DETAILS.SA_ID"></item>
+        <item id="SA_STATUS_FLG" label="SA_STATUS_FLG" resourceId="JoinTree_1.FDL_AGED_DETAILS.SA_STATUS_FLG"></item>
+        <item id="SA_TYPE_CD" label="SA_TYPE_CD" resourceId="JoinTree_1.FDL_AGED_DETAILS.SA_TYPE_CD"></item>
+        <item id="GEO_VAL" label="PARCEL SHORT" resourceId="JoinTree_1.FDL_AGED_DETAILS.GEO_VAL"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcQuery id="FDL_AGED_DETAILS" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="GEO_VAL" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    a.bill_cyc_cd,
+    sa.sa_type_cd,
+    p.address1,
+    a.acct_id,
+    sa.sa_id,
+    sa.sa_status_flg,
+    sat.dst_id,
+    pn.entity_name,pg.geo_val
+
+FROM
+         cisadm.ci_acct a 
+    JOIN cisadm.ci_acct_per      ap ON a.acct_id = ap.acct_id
+                                  AND main_cust_sw = 'Y'
+    JOIN cisadm.ci_per_name      pn ON ap.per_id = pn.per_id
+                                  AND pn.prim_name_sw = 'Y'
+    JOIN cisadm.ci_sa            sa ON a.acct_id = sa.acct_id
+                            AND sa.sa_type_cd not in ('EXCSCRED', 'OVR-UNDR', 'PA', 'REBATE','SUSPENSE')
+                            and SA.sa_status_flg &lt; 60 
+    join cisadm.ci_sa_type  sat on sa.sa_type_cd = sat.sa_type_cd
+    JOIN cisadm.ci_prem          p ON sa.char_prem_id = p.prem_id
+    join CISADM.ci_PREM_GEO PG on p.prem_id =pg.prem_id and pg.geo_type_cd = 'PARCELSH'
+    where a.acct_id not in (select acct_id from cisadm.ci_coll_proc where coll_status_flg = '10')</query>
+    </jdbcQuery>
+    <jdbcQuery id="FDL_AGED_CURRENT" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT_" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+            ft1.sa_id,
+            sum(ft1.cur_amt)
+            
+        FROM
+            cisadm.ci_ft ft1
+        WHERE
+                ft1.freeze_sw = 'Y'
+            AND ( ft1.ars_dt &lt;= trunc(sysdate) )
+group by ft1.sa_id</query>
+    </jdbcQuery>
+    <jdbcQuery id="FDL_AGED_30_FROM0831" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT__1" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+            ft1.sa_id, sum(ft1.cur_amt)
+            
+        FROM
+            cisadm.ci_ft ft1
+        WHERE
+                ft1.freeze_sw = 'Y'
+            AND ( ft1.ars_dt BETWEEN (to_date('08/31/2023','MM/DD/RRRR') - 30 ) AND to_date('08/31/2023','MM/DD/RRRR') )
+group by ft1.sa_id</query>
+    </jdbcQuery>
+    <jdbcQuery id="FDL_AGED_30_FROM0930" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT__2" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+            ft1.sa_id, sum(ft1.cur_amt)
+            
+        FROM
+            cisadm.ci_ft ft1
+        WHERE
+                ft1.freeze_sw = 'Y'
+            AND ( ft1.ars_dt &lt;= (to_date('09/30/2023','MM/DD/RRRR') -30))
+group by ft1.sa_id</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_1" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="FDL_AGED_30_FROM0831.SA_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_30_FROM0831.SUM_FT1_CUR_AMT__1" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_AGED_30_FROM0930.SA_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_30_FROM0930.SUM_FT1_CUR_AMT__2" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_AGED_DETAILS.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.ADDRESS1" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.ACCT_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.SA_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.ENTITY_NAME" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.DST_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="FDL_AGED_DETAILS.GEO_VAL" type="java.lang.String"></field>
+        <field id="FDL_AGED_CURRENT.SA_ID" type="java.lang.String"></field>
+        <field id="FDL_AGED_CURRENT.SUM_FT1_CUR_AMT_" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <joinInfo alias="FDL_AGED_DETAILS" referenceId="FDL_AGED_DETAILS"></joinInfo>
+      <joinList>
+        <join expr="FDL_AGED_DETAILS.SA_ID == FDL_AGED_CURRENT.SA_ID" left="FDL_AGED_DETAILS" right="FDL_AGED_CURRENT" type="inner" weight="1"></join>
+        <join expr="FDL_AGED_30_FROM0831.SA_ID == FDL_AGED_DETAILS.SA_ID" left="FDL_AGED_30_FROM0831" right="FDL_AGED_DETAILS" type="inner" weight="1"></join>
+        <join expr="FDL_AGED_30_FROM0930.SA_ID == FDL_AGED_DETAILS.SA_ID" left="FDL_AGED_30_FROM0930" right="FDL_AGED_DETAILS" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>SELECT
+    a.bill_cyc_cd,
+    sa.sa_type_cd,
+    p.address1,
+    a.acct_id,
+    sa.sa_id,
+    sa.sa_status_flg,
+    sat.dst_id,
+    pn.entity_name,pg.geo_val
+
+FROM
+         cisadm.ci_acct a 
+    JOIN cisadm.ci_acct_per      ap ON a.acct_id = ap.acct_id
+                                  AND main_cust_sw = 'Y'
+    JOIN cisadm.ci_per_name      pn ON ap.per_id = pn.per_id
+                                  AND pn.prim_name_sw = 'Y'
+    JOIN cisadm.ci_sa            sa ON a.acct_id = sa.acct_id
+                            AND sa.sa_type_cd not in ('EXCSCRED', 'OVR-UNDR', 'PA', 'REBATE','SUSPENSE')
+                            and SA.sa_status_flg &lt; 60 
+    join cisadm.ci_sa_type  sat on sa.sa_type_cd = sat.sa_type_cd
+    JOIN cisadm.ci_prem          p ON sa.char_prem_id = p.prem_id
+    join CISADM.ci_PREM_GEO PG on p.prem_id =pg.prem_id and pg.geo_type_cd = 'PARCELSH'
+    where a.acct_id not in (select acct_id from cisadm.ci_coll_proc where coll_status_flg = '10')</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_AGED_30_FROM0831" tableId="FDL_AGED_30_FROM0831"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_AGED_30_FROM0930" tableId="FDL_AGED_30_FROM0930"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_AGED_CURRENT" tableId="FDL_AGED_CURRENT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_AGED_DETAILS" tableId="FDL_AGED_DETAILS"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Letter_NOBILLER" pageWidth="612" pageHeight="792" columnWidth="552" leftMargin="40" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4c516a84-2bc8-4fb6-aa9f-74bc4b108917">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="NO_DATA_ADAPTER"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin|CityCorp"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Letter/Letter_NOBILLER"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="WRA Start"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Letter/Letter_NOBILLER_files/main_jrxml"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="281"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="705"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="net.sf.jasperreports.xml.source" class="java.lang.String"/>
+	<parameter name="customerContactId" class="java.lang.String"/>
+	<parameter name="query" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{customerContactId}==null?"/root/C1-LetterPrintRecord/letter":"/root/C1-LetterPrintRecord[./customerContactId='"+$P{customerContactId}+"']/letter"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="XPath">
+		<![CDATA[$P{query}]]>
+	</queryString>
+	<field name="printerKey" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="printerKey"/>
+		<fieldDescription><![CDATA[printerKey]]></fieldDescription>
+	</field>
+	<field name="customerContactId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../customerContactId"/>
+		<fieldDescription><![CDATA[../customerContactId]]></fieldDescription>
+	</field>
+	<field name="personId" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/personId"/>
+		<fieldDescription><![CDATA[customerContactDetails/personId]]></fieldDescription>
+	</field>
+	<field name="contactDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/contactDate"/>
+		<fieldDescription><![CDATA[customerContactDetails/contactDate]]></fieldDescription>
+	</field>
+	<field name="contactTime" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/contactTime"/>
+		<fieldDescription><![CDATA[customerContactDetails/contactTime]]></fieldDescription>
+	</field>
+	<field name="contactClass" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/contactClass"/>
+		<fieldDescription><![CDATA[customerContactDetails/contactClass]]></fieldDescription>
+	</field>
+	<field name="contactType" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/contactType"/>
+		<fieldDescription><![CDATA[customerContactDetails/contactType]]></fieldDescription>
+	</field>
+	<field name="letterTemplate" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/letterTemplate"/>
+		<fieldDescription><![CDATA[customerContactDetails/letterTemplate]]></fieldDescription>
+	</field>
+	<field name="letterDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/letterDate"/>
+		<fieldDescription><![CDATA[customerContactDetails/letterDate]]></fieldDescription>
+	</field>
+	<field name="country" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/country"/>
+		<fieldDescription><![CDATA[premiseDetails/country]]></fieldDescription>
+	</field>
+	<field name="address1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/address1"/>
+		<fieldDescription><![CDATA[premiseDetails/address1]]></fieldDescription>
+	</field>
+	<field name="address2" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/address2"/>
+		<fieldDescription><![CDATA[premiseDetails/address2]]></fieldDescription>
+	</field>
+	<field name="address3" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/address3"/>
+		<fieldDescription><![CDATA[premiseDetails/address3]]></fieldDescription>
+	</field>
+	<field name="address4" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/address4"/>
+		<fieldDescription><![CDATA[premiseDetails/address4]]></fieldDescription>
+	</field>
+	<field name="city" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/city"/>
+		<fieldDescription><![CDATA[premiseDetails/city]]></fieldDescription>
+	</field>
+	<field name="number1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/number1"/>
+		<fieldDescription><![CDATA[premiseDetails/number1]]></fieldDescription>
+	</field>
+	<field name="number2" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/number2"/>
+		<fieldDescription><![CDATA[premiseDetails/number2]]></fieldDescription>
+	</field>
+	<field name="houseType" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/houseType"/>
+		<fieldDescription><![CDATA[premiseDetails/houseType]]></fieldDescription>
+	</field>
+	<field name="county" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/county"/>
+		<fieldDescription><![CDATA[premiseDetails/county]]></fieldDescription>
+	</field>
+	<field name="state" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/state"/>
+		<fieldDescription><![CDATA[premiseDetails/state]]></fieldDescription>
+	</field>
+	<field name="postal" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/postal"/>
+		<fieldDescription><![CDATA[premiseDetails/postal]]></fieldDescription>
+	</field>
+	<field name="geographicCode" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="premiseDetails/geographicCode"/>
+		<fieldDescription><![CDATA[premiseDetails/geographicCode]]></fieldDescription>
+	</field>
+	<field name="cityLimit" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/inCityLimit"/>
+		<fieldDescription><![CDATA[premiseDetails/inCityLimit]]></fieldDescription>
+	</field>
+	<field name="dueDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/dueDate"/>
+		<fieldDescription><![CDATA[customerContactDetails/dueDate]]></fieldDescription>
+	</field>
+	<field name="DEADLINE" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactCharacteristics/DEADLINE"/>
+		<fieldDescription><![CDATA[customerContactCharacteristics/DEADLINE]]></fieldDescription>
+	</field>
+	<field name="accountId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="writeOffDetails/accountId"/>
+		<fieldDescription><![CDATA[writeOffDetails/accountId]]></fieldDescription>
+	</field>
+	<field name="amountStillOwed" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="collectionDetails/amountStillOwed"/>
+		<fieldDescription><![CDATA[collectionDetails/amountStillOwed]]></fieldDescription>
+	</field>
+	<field name="writeOffBalance" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="writeOffDetails/writeOffBalance"/>
+		<fieldDescription><![CDATA[writeOffDetails/writeOffBalance]]></fieldDescription>
+	</field>
+	<group name="AccountIDGroup" footerPosition="ForceAtBottom">
+		<groupExpression><![CDATA[$F{customerContactId}+"-"+$F{personId}]]></groupExpression>
+		<groupHeader>
+			<band height="85">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement x="0" y="0" width="552" height="85" uuid="157fad14-5fad-4f39-b89e-55a8841efc90"/>
+					<image scaleImage="FillFrame">
+						<reportElement x="0" y="0" width="190" height="85" uuid="0be1cdad-f9a1-4502-9d9e-26201adda125">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box topPadding="0" bottomPadding="0"/>
+						<imageExpression><![CDATA["repo:logo.png"]]></imageExpression>
+					</image>
+					<textField>
+						<reportElement x="190" y="10" width="362" height="40" uuid="174e69db-cc55-4290-bdf8-f5ba768b939c">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box rightPadding="20"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font size="12" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Phone: (479) 968-2105"+"\n"+
+"FAX: (479) 968-3265"]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="190" y="50" width="362" height="30" uuid="0862e333-84d8-423d-9c48-ba5ed81c930c">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box rightPadding="20"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font size="16" isBold="true" isItalic="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA["\"Award Winning Water\""]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="70">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement x="0" y="0" width="552" height="70" uuid="421680d6-e214-4381-b698-532449f2cb32"/>
+					<textField>
+						<reportElement x="0" y="0" width="410" height="70" forecolor="#000000" uuid="e3cbcd53-3250-4c67-809f-6d7d62b661ce"/>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font fontName="SansSerif" size="10" isBold="true" isItalic="false"/>
+							<paragraph lineSpacing="1_1_2" lineSpacingSize="2.0"/>
+						</textElement>
+						<textFieldExpression><![CDATA["205 W 3rd Place\n"+
+"PO Box 3186\n"+
+"Russellville, AR 72811\n"+
+"citycorporation.com"]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="410" y="0" width="142" height="70" forecolor="#000000" uuid="5242659f-973a-4bd4-a352-f03d0587aef2"/>
+						<box topPadding="5" rightPadding="20"/>
+						<textElement textAlignment="Right" verticalAlignment="Top">
+							<font fontName="Cambria" size="10" isItalic="false"/>
+							<paragraph lineSpacing="1_1_2" lineSpacingSize="2.0"/>
+						</textElement>
+						<textFieldExpression><![CDATA["321957"]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="130">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement x="0" y="0" width="552" height="130" uuid="74ae1019-4fdf-4002-85fc-f304a0db1a59"/>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="552" height="25" isPrintWhenDetailOverflows="true" uuid="e128db94-962a-4538-abce-134569b7c888">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="10" rightPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" markup="html">
+						<font fontName="SansSerif" size="10" isBold="true"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new SimpleDateFormat("MMMM dd, yyyy").format($F{letterDate})]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="40" width="552" height="90" isPrintWhenDetailOverflows="true" uuid="49cd1201-d61a-45b0-b1b2-5d6ef91f88e2">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="5" leftPadding="10" rightPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+						<font fontName="SansSerif" size="10" isBold="true"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["CURRENT RESIDENT"+"<br />"+
+($F{address1}==null?"":$F{address1})+
+($F{address2}==null?"":", "+$F{address2})+
+($F{address3}==null?"":", "+$F{address3})+
+($F{address4}==null?"":", "+$F{address4})+"<br />"+
+($F{city}==null?"":$F{city})+
+($F{state}==null?"":", "+$F{state})+ 
+($F{postal}==null?"":" "+" "+$F{postal})]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="110" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement x="0" y="0" width="552" height="110" uuid="74b851a6-3e32-4786-90d4-2334cdaa2287"/>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="552" height="110" uuid="95d0e317-8ea0-48bb-ba9e-992431a4ad6e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="10" bottomPadding="2" rightPadding="50"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+						<font fontName="SansSerif" size="10"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["RE: LOCATION: "+($F{address1}==null?"":$F{address1})+"<br /><br />"+
+
+"Dear Customer:<br /><br />"+
+
+"Our records indicate that you have not made application for service. If you feel our records are in error, please call our business office telephone number or come by the office no later than "+new SimpleDateFormat("MM/dd/yyyy").format($F{DEADLINE})+" or water service will be discontinued.<br /><br />"+
+
+"If you have any questions, please contact customer service at 479/968-2105.<br/><br/><br/>"]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="60">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="552" height="60" isPrintWhenDetailOverflows="true" uuid="caf209ab-6e8d-4aa5-99e7-bce8857dcd31">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box topPadding="5" leftPadding="10" rightPadding="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<br /><br />Sincerely,"+
+"<br /><br />City Corporation Business Office<br />"+
+"(479) 968-2105"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

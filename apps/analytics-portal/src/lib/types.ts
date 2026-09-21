@@ -548,3 +548,62 @@ export type ReportLibraryResponse = {
   packs: ReportLibraryPack[];
   error?: string;
 };
+
+// ---- the analytics assistant (api/assistant.py)
+export type AssistantStep = { tool: string; input: string; ok: boolean };
+export type CanvasIntegrity = {
+  canvas: string;
+  verdict: "proven" | "differences" | "not covered" | "unavailable";
+  canvas_as_of: string | null;
+  summary: string;
+};
+export type AssistantQuery = {
+  purpose: string;
+  sql: string;
+  columns: string[];
+  rows: unknown[][];
+  row_count: number;
+  truncated: boolean;
+  ms: number;
+  integrity?: CanvasIntegrity[];
+};
+export type AssistantMessage = { role: "user" | "assistant"; content: unknown };
+export type AssistantResponse = {
+  answer: string;
+  steps: AssistantStep[];
+  queries: AssistantQuery[];
+  model: string;
+  usage: {
+    input_tokens: number;
+    output_tokens: number;
+    cache_read_input_tokens?: number;
+    cache_creation_input_tokens?: number;
+    turns?: number;
+  };
+  thread: AssistantMessage[];
+};
+export type AssistantStatus = { configured: boolean; model: string | null };
+export type AssistantSpend = {
+  organization: string;
+  day: string;
+  today: number;
+  questions: number;
+  budget: number | null;
+  people: { actor: string; questions: number; tokens: number }[];
+};
+export type IntegrityOverview = {
+  available: boolean;
+  client?: string | null;
+  canvas_as_of?: string | null;
+  canvas_age_hours?: number | null;
+  source_run_at?: string | null;
+  snapshot_run_at?: string | null;
+  canvases: {
+    canvas: string;
+    verdict: CanvasIntegrity["verdict"];
+    source_green: number | null;
+    source_checks: number | null;
+    snapshot_against: string | null;
+    snapshot_ok: boolean | null;
+  }[];
+};

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="ACCT_DEBT_RPT_CURR" label="Account Debt" resourceId="ACCT_DEBT_RPT_CURR"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="ACCT_DEBT_AUDIT" label="Snapshot Audit" resourceId="ACCT_DEBT_RPT_CURR">
+      <items>
+        <item id="LOAD_DTTM" label="Snapshot Load Date Time" resourceId="ACCT_DEBT_RPT_CURR.LOAD_DTTM"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="ACCT_DEBT_ACCOUNT" label="Account And Customer" resourceId="ACCT_DEBT_RPT_CURR">
+      <items>
+        <item id="ACCT_ID" label="Account ID" resourceId="ACCT_DEBT_RPT_CURR.ACCT_ID"></item>
+        <item id="PER_ID" label="Person ID" resourceId="ACCT_DEBT_RPT_CURR.PER_ID"></item>
+        <item id="CUSTOMER_NAME" label="Customer Name" resourceId="ACCT_DEBT_RPT_CURR.CUSTOMER_NAME"></item>
+        <item id="COLL_CL_DESC" label="Collection Class" resourceId="ACCT_DEBT_RPT_CURR.COLL_CL_DESC"></item>
+        <item id="COLL_CL_CD" label="Collection Class Code" resourceId="ACCT_DEBT_RPT_CURR.COLL_CL_CD"></item>
+        <item id="CR_REVIEW_DT" label="Credit Review Date" resourceId="ACCT_DEBT_RPT_CURR.CR_REVIEW_DT"></item>
+        <item id="POSTPONE_CR_RVW_DT" label="Postpone Credit Review Date" resourceId="ACCT_DEBT_RPT_CURR.POSTPONE_CR_RVW_DT"></item>
+        <item id="LAST_BILL_DT" label="Last Bill Date" resourceId="ACCT_DEBT_RPT_CURR.LAST_BILL_DT"></item>
+        <item id="ACTIVE_SA_COUNT" label="Active Service Agreement Count" resourceId="ACCT_DEBT_RPT_CURR.ACTIVE_SA_COUNT"></item>
+        <item id="GOVERNED_ARREARS_SA_COUNT" label="Governed Arrears Service Agreement Count" resourceId="ACCT_DEBT_RPT_CURR.GOVERNED_ARREARS_SA_COUNT"></item>
+        <item id="GOVERNED_ARREARS_FT_COUNT" label="Governed Arrears Financial Transaction Count" resourceId="ACCT_DEBT_RPT_CURR.GOVERNED_ARREARS_FT_COUNT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="ACCT_DEBT_BALANCE" label="Debt Balance And Aging" resourceId="ACCT_DEBT_RPT_CURR">
+      <items>
+        <item id="TOTAL_DEBT" label="Total Debt" resourceId="ACCT_DEBT_RPT_CURR.TOTAL_DEBT"></item>
+        <item id="DEBT_0_30" label="Debt 0 To 30 Days" resourceId="ACCT_DEBT_RPT_CURR.DEBT_0_30"></item>
+        <item id="DEBT_31_60" label="Debt 31 To 60 Days" resourceId="ACCT_DEBT_RPT_CURR.DEBT_31_60"></item>
+        <item id="DEBT_61_90" label="Debt 61 To 90 Days" resourceId="ACCT_DEBT_RPT_CURR.DEBT_61_90"></item>
+        <item id="DEBT_OVER_90" label="Debt Over 90 Days" resourceId="ACCT_DEBT_RPT_CURR.DEBT_OVER_90"></item>
+        <item id="OLDEST_AGE_DAYS" label="Oldest Age Days" resourceId="ACCT_DEBT_RPT_CURR.OLDEST_AGE_DAYS"></item>
+        <item id="NEWEST_AGE_DAYS" label="Newest Age Days" resourceId="ACCT_DEBT_RPT_CURR.NEWEST_AGE_DAYS"></item>
+        <item id="OLDEST_ARS_DT" label="Oldest Arrears Date" resourceId="ACCT_DEBT_RPT_CURR.OLDEST_ARS_DT"></item>
+        <item id="NEWEST_ARS_DT" label="Newest Arrears Date" resourceId="ACCT_DEBT_RPT_CURR.NEWEST_ARS_DT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="ACCT_DEBT_CLASS" label="Debt Class Profile" resourceId="ACCT_DEBT_RPT_CURR">
+      <items>
+        <item id="DEBT_CL_COUNT" label="Debt Class Count" resourceId="ACCT_DEBT_RPT_CURR.DEBT_CL_COUNT"></item>
+        <item id="SOLE_DEBT_CL_DESC" label="Sole Debt Class" resourceId="ACCT_DEBT_RPT_CURR.SOLE_DEBT_CL_DESC"></item>
+        <item id="SOLE_DEBT_CL_CD" label="Sole Debt Class Code" resourceId="ACCT_DEBT_RPT_CURR.SOLE_DEBT_CL_CD"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="ACCT_DEBT_COLLECTIONS" label="Latest Collection Process" resourceId="ACCT_DEBT_RPT_CURR">
+      <items>
+        <item id="COLL_PROC_COUNT" label="Collection Process Count" resourceId="ACCT_DEBT_RPT_CURR.COLL_PROC_COUNT"></item>
+        <item id="LATEST_COLL_PROC_ID" label="Latest Collection Process ID" resourceId="ACCT_DEBT_RPT_CURR.LATEST_COLL_PROC_ID"></item>
+        <item id="LATEST_COLL_PROC_CRE_DTTM" label="Latest Collection Process Create Date Time" resourceId="ACCT_DEBT_RPT_CURR.LATEST_COLL_PROC_CRE_DTTM"></item>
+        <item id="LATEST_COLL_STATUS_DESC" label="Latest Collection Status" resourceId="ACCT_DEBT_RPT_CURR.LATEST_COLL_STATUS_DESC"></item>
+        <item id="LATEST_COLL_STATUS_FLG" label="Latest Collection Status Code" resourceId="ACCT_DEBT_RPT_CURR.LATEST_COLL_STATUS_FLG"></item>
+        <item id="LATEST_COLL_STAT_RSN_FLG" label="Latest Collection Status Reason Code" resourceId="ACCT_DEBT_RPT_CURR.LATEST_COLL_STAT_RSN_FLG"></item>
+        <item id="LATEST_COLL_PROC_TMPL_DESC" label="Latest Collection Process Template" resourceId="ACCT_DEBT_RPT_CURR.LATEST_COLL_PROC_TMPL_DESC"></item>
+        <item id="LATEST_COLL_PROC_TMPL_CD" label="Latest Collection Process Template Code" resourceId="ACCT_DEBT_RPT_CURR.LATEST_COLL_PROC_TMPL_CD"></item>
+        <item id="LATEST_COLL_ARS_DT" label="Latest Collection Arrears Date" resourceId="ACCT_DEBT_RPT_CURR.LATEST_COLL_ARS_DT"></item>
+        <item id="LATEST_COLL_ARS_AMT" label="Latest Collection Arrears Amount" resourceId="ACCT_DEBT_RPT_CURR.LATEST_COLL_ARS_AMT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="ACCT_DEBT_WRITEOFF" label="Latest Write Off Process" resourceId="ACCT_DEBT_RPT_CURR">
+      <items>
+        <item id="WO_PROC_COUNT" label="Write Off Process Count" resourceId="ACCT_DEBT_RPT_CURR.WO_PROC_COUNT"></item>
+        <item id="LATEST_WO_PROC_ID" label="Latest Write Off Process ID" resourceId="ACCT_DEBT_RPT_CURR.LATEST_WO_PROC_ID"></item>
+        <item id="LATEST_WO_PROC_CRE_DTTM" label="Latest Write Off Process Create Date Time" resourceId="ACCT_DEBT_RPT_CURR.LATEST_WO_PROC_CRE_DTTM"></item>
+        <item id="LATEST_WO_STATUS_DESC" label="Latest Write Off Status" resourceId="ACCT_DEBT_RPT_CURR.LATEST_WO_STATUS_DESC"></item>
+        <item id="LATEST_WO_STATUS_FLG" label="Latest Write Off Status Code" resourceId="ACCT_DEBT_RPT_CURR.LATEST_WO_STATUS_FLG"></item>
+        <item id="LATEST_WO_STAT_RSN_FLG" label="Latest Write Off Status Reason Code" resourceId="ACCT_DEBT_RPT_CURR.LATEST_WO_STAT_RSN_FLG"></item>
+        <item id="LATEST_WO_PROC_TMPL_DESC" label="Latest Write Off Process Template" resourceId="ACCT_DEBT_RPT_CURR.LATEST_WO_PROC_TMPL_DESC"></item>
+        <item id="LATEST_WO_PROC_TMPL_CD" label="Latest Write Off Process Template Code" resourceId="ACCT_DEBT_RPT_CURR.LATEST_WO_PROC_TMPL_CD"></item>
+        <item id="LATEST_WO_PROC_COMPL_DT" label="Latest Write Off Process Completion Date" resourceId="ACCT_DEBT_RPT_CURR.LATEST_WO_PROC_COMPL_DT"></item>
+        <item id="LATEST_WO_ARS_AT_START" label="Latest Write Off Arrears At Start" resourceId="ACCT_DEBT_RPT_CURR.LATEST_WO_ARS_AT_START"></item>
+        <item id="LATEST_WO_ARS_AT_END" label="Latest Write Off Arrears At End" resourceId="ACCT_DEBT_RPT_CURR.LATEST_WO_ARS_AT_END"></item>
+        <item id="COLL_AGY_REF_COUNT" label="Collection Agency Reference Count" resourceId="ACCT_DEBT_RPT_CURR.COLL_AGY_REF_COUNT"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="ACCT_DEBT_RPT_CURR" datasourceId="Origin_DEV_DS" datasourceTableName="ACCT_DEBT_RPT_CURR" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="COLL_CL_CD" type="java.lang.String"></field>
+        <field id="COLL_CL_DESC" type="java.lang.String"></field>
+        <field id="CR_REVIEW_DT" type="java.sql.Timestamp"></field>
+        <field id="POSTPONE_CR_RVW_DT" type="java.sql.Timestamp"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="CUSTOMER_NAME" type="java.lang.String"></field>
+        <field id="ACTIVE_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="DEBT_CL_COUNT" type="java.math.BigDecimal"></field>
+        <field id="SOLE_DEBT_CL_CD" type="java.lang.String"></field>
+        <field id="SOLE_DEBT_CL_DESC" type="java.lang.String"></field>
+        <field id="GOVERNED_ARREARS_FT_COUNT" type="java.math.BigDecimal"></field>
+        <field id="GOVERNED_ARREARS_SA_COUNT" type="java.math.BigDecimal"></field>
+        <field id="TOTAL_DEBT" type="java.math.BigDecimal"></field>
+        <field id="DEBT_0_30" type="java.math.BigDecimal"></field>
+        <field id="DEBT_31_60" type="java.math.BigDecimal"></field>
+        <field id="DEBT_61_90" type="java.math.BigDecimal"></field>
+        <field id="DEBT_OVER_90" type="java.math.BigDecimal"></field>
+        <field id="OLDEST_AGE_DAYS" type="java.math.BigDecimal"></field>
+        <field id="NEWEST_AGE_DAYS" type="java.math.BigDecimal"></field>
+        <field id="OLDEST_ARS_DT" type="java.sql.Timestamp"></field>
+        <field id="NEWEST_ARS_DT" type="java.sql.Timestamp"></field>
+        <field id="LAST_BILL_DT" type="java.sql.Timestamp"></field>
+        <field id="COLL_PROC_COUNT" type="java.math.BigDecimal"></field>
+        <field id="LATEST_COLL_PROC_ID" type="java.lang.String"></field>
+        <field id="LATEST_COLL_PROC_CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="LATEST_COLL_STATUS_FLG" type="java.lang.String"></field>
+        <field id="LATEST_COLL_STATUS_DESC" type="java.lang.String"></field>
+        <field id="LATEST_COLL_STAT_RSN_FLG" type="java.lang.String"></field>
+        <field id="LATEST_COLL_PROC_TMPL_CD" type="java.lang.String"></field>
+        <field id="LATEST_COLL_PROC_TMPL_DESC" type="java.lang.String"></field>
+        <field id="LATEST_COLL_ARS_DT" type="java.sql.Timestamp"></field>
+        <field id="LATEST_COLL_ARS_AMT" type="java.math.BigDecimal"></field>
+        <field id="WO_PROC_COUNT" type="java.math.BigDecimal"></field>
+        <field id="LATEST_WO_PROC_ID" type="java.lang.String"></field>
+        <field id="LATEST_WO_PROC_CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="LATEST_WO_STATUS_FLG" type="java.lang.String"></field>
+        <field id="LATEST_WO_STATUS_DESC" type="java.lang.String"></field>
+        <field id="LATEST_WO_STAT_RSN_FLG" type="java.lang.String"></field>
+        <field id="LATEST_WO_PROC_TMPL_CD" type="java.lang.String"></field>
+        <field id="LATEST_WO_PROC_TMPL_DESC" type="java.lang.String"></field>
+        <field id="LATEST_WO_PROC_COMPL_DT" type="java.sql.Timestamp"></field>
+        <field id="LATEST_WO_ARS_AT_START" type="java.math.BigDecimal"></field>
+        <field id="LATEST_WO_ARS_AT_END" type="java.math.BigDecimal"></field>
+        <field id="COLL_AGY_REF_COUNT" type="java.math.BigDecimal"></field>
+        <field id="LOAD_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+    </jdbcTable>
+  </resources>
+</schema>

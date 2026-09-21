@@ -1,0 +1,390 @@
+/*
+ * Copyright (C) 2005 - 2025 Cloud Software Group, Inc. All Rights Reserved. Confidential & Proprietary.
+ * Licensed pursuant to commercial Cloud Software Group, Inc. End User License Agreement.
+ */
+
+/* --------------------------------------
+   TABLE OF CONTENTS
+
+    1. SHARED
+
+    2. EXPORT
+       2a. base rules
+       2b. export dialog
+
+    3. IMPORT
+       3a. base rules
+       3b. import dialog
+       3c. import conflict dialog
+
+  --------------------------------------
+    File last modified Aug 29, 2024
+  --------------------------------------  */
+
+/* ----------------- */
+/*  1. SHARED        */
+/* ----------------- */
+.export-view .hint,
+.import-view .hint {
+    color: var(--text-lightest);
+    font-family: source_sans_proregular, Franklin Gothic, Verdana, Arial, sans-serif;
+    font-size: 11px;
+    font-weight: normal;
+}
+
+
+/* ----------------- */
+/*  2. EXPORT        */
+/* ----------------- */
+/*  2a. base rules   */
+/* ----------------- */
+.export-view {
+    font-family: source_sans_proregular, Franklin Gothic, Verdana, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: normal;
+    overflow: hidden;
+}
+
+.export-view .section {
+    margin: 0 0 28px 0;
+    overflow: hidden;
+}
+
+.export-view p.title,
+.export-view p.jr-mDialog-header-title {
+    color: var(--text-medium);
+    font-family: source_sans_prosemibold, Franklin Gothic Medium, Verdana, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    margin: 0 0 16px;
+}
+
+.export-view #secretKey {
+    padding-bottom: 18px;
+}
+
+.export-view .section.resources,
+.export-view .section.roles-users {
+    margin-left: 20px;
+}
+
+.export-view .section.events {
+    float: left;
+    margin-bottom: 0;
+    width: 30%;
+}
+
+.export-view .section.resources,
+.export-view .section.assets {
+    float: left;
+    width: 33%;
+    margin-bottom: 0;
+}
+
+.export-view .section > .group {
+    margin: 0;
+    overflow: hidden;
+    padding-left: 0;
+}
+
+.export-view .control > .wrap {
+    color: var(--text-medium);
+    font-family: source_sans_proregular, Franklin Gothic, Verdana, Arial, sans-serif;
+    font-size: 13px;
+}
+
+.export-view #secretKey legend {
+    color: var(--text-medium);
+    margin-bottom: 10px;
+    margin-left: 0;
+}
+
+.export-view .group.rolesAndUsers {
+    margin-bottom: 12px;
+}
+
+.export-view .control.checkBox {
+    float: left;
+    min-width: 180px;
+}
+
+.export-view .section.file-name .control.input {
+    float: left;
+    margin: 0 40px 0 0;
+    width: 400px;
+}
+
+.export-view .section.file-name .control.checkBox {
+    margin-top: 22px;
+}
+
+.export-view .section.file-name .encryptFileWrapper {
+    margin-right: 55px;
+}
+
+.export-view .selectRolesUsers.pickWells {
+    height: 220px;
+    margin: 4px;
+    width: auto;
+    user-select: none;
+}
+
+.export-view .group.rolesAndUsers .control.radio {
+    float: left;
+    margin-right: 28px;
+}
+
+.export-view .button-select-all {
+    border: 1px solid var(--border-grey-20);
+    bottom: 0;
+    cursor: pointer;
+    height: 25px;
+    line-height: 25px;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+}
+
+.export-view .button-select-all .label {
+    display: inline;
+    line-height: 21px;
+    vertical-align: top;
+}
+
+.export-view .button-select-all .label .text {
+    vertical-align: top;
+}
+
+.export-view .authorityPicker {
+    margin-bottom: 25px;
+}
+
+.export-view .authorityPicker .selectBorder.lower {
+    display: none;
+}
+
+.export-view .button-select-all .icon {
+    background-color: transparent;
+    background-image: url("./images/icontrol_icons_sprite.png");
+    background-position: 0 5px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 22px;
+    pointer-events: auto;
+    position: relative;
+    vertical-align: top;
+    width: 11px;
+    zoom: 1;
+}
+
+/* States */
+.export-view .button-select-all .disabled {
+    cursor: default;
+}
+
+.export-view .button-select-all.disabled {
+    pointer-events: none;
+}
+
+/* found selectBorder on Export page
+   moved from pageSpecific.css */
+.selectBorder {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 5px;
+    border: 1px none #C1C1C1;
+    z-index: 10;
+}
+
+.selectBorder.upper {
+    top: 0;
+    border-top-color: var(--border-grey-47);
+    border-top-style: solid;
+}
+
+.selectBorder.lower {
+    bottom: 0;
+    border-bottom-color: var(--border-grey-10);
+    border-bottom-style: solid;
+}
+
+/* -------------------- */
+/*  2b. export dialog   */
+/* -------------------- */
+.jr-mDialog.jr.tenant-export-dialog {
+    height: 680px;
+    min-width: 630px;
+    min-height: 350px !important;
+    width: 745px;
+}
+
+.jr-mDialog.jr.tenant-export-dialog > .jr-mDialog-body.jr {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    margin-bottom: 40px;
+    max-height: 100%;
+    padding: 0;
+    position: absolute;
+    top: 2.909em;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.repository-export-dialog {
+    height: 530px;
+    min-width: 245px;
+    width: 650px;
+}
+
+.jr-mDialog.jr.repository-export-dialog .jr-mDialog-body {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+.repository-export-dialog #secretKey {
+    padding-left: 0;
+}
+
+.repository-export-dialog .jr-mDialog-body .export-view {
+    padding: 0;
+}
+
+.repository-export-dialog .export-view .section.resources,
+.repository-export-dialog .export-view .section.assets,
+.repository-export-dialog .export-view .section.file-name > .group {
+    margin: 0;
+}
+
+.repository-export-dialog .export-view .section.resources > .group,
+.repository-export-dialog .export-view .section.assets > .group {
+    margin-left: 10px;
+}
+
+.repository-export-dialog .export-view .section.file-name .control.input {
+    margin: 0;
+    width: 100%;
+}
+
+.repository-export-dialog .export-view .control.checkBox {
+    float: none;
+    margin-top: 2px;
+    margin-bottom: 8px;
+    min-width: 200px;
+}
+
+
+/* ----------------- */
+/*  3. IMPORT       */
+/* ----------------- */
+/*  3a. base rules   */
+/* ----------------- */
+.import-view {
+    font-family: source_sans_proregular, Franklin Gothic, Verdana, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: normal;
+}
+
+.import-view > .group {
+    margin-top: 0;
+    margin-bottom: 24px;
+    padding-left: 0;
+}
+
+.import-view .group legend {
+    color: var(--text-medium);
+    margin-left: 0;
+    margin-bottom: 10px;
+}
+
+.import-view .list.inputSet label {
+    color: var(--text-medium);
+}
+
+.import-view input.hidden {
+    display: none;
+}
+
+#importDataFile.import-view #uploadFile {
+    width: 358px;
+}
+
+/* -------------------- */
+/*  3b. import dialog   */
+/* -------------------- */
+.tenant-export-dialog .export-view,
+.repository-export-dialog .export-view {
+    width: 100%;
+}
+
+.jr-mDialog.jr.tenant-import-dialog .jr-mDialog-body.jr {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+.repository-export-dialog .export-view .section.resources {
+    width: auto;
+}
+
+.repository-export-dialog .section.resources p {
+    color: var(--text-medium);
+    margin-bottom: 10px;
+}
+
+.tenant-export-dialog .export-view {
+    padding: 12px 23px 0 15px;
+}
+
+.jr-mDialog.jr.tenant-import-dialog {
+    height: 590px;
+}
+
+.jr-mDialog.tenant-export-dialog .jr-mDialog-footer,
+.jr-mDialog.tenant-import-dialog .jr-mDialog-footer,
+.jr-mDialog.repository-export-dialog .jr-mDialog-footer {
+    background-color: #ffffff;
+    bottom: 0;
+    clear: both;
+    position: absolute;
+    width: 100%;
+}
+
+.jr-mDialog.tenant-import-dialog .jr-mDialog-body {
+    overflow-x: hidden;
+}
+
+.tenant-import-dialog {
+    height: 450px;
+}
+
+.tenant-import-dialog .import-view {
+    width: 100%;
+}
+
+.jr-mDialog.tenant-import-dialog .jr-mDialog-body {
+    padding: 8px 0 0 0;
+}
+
+.jr-mDialog.tenant-import-dialog.jr .jr-mDialog-body-wrapper.jr {
+    padding-top: 0;
+}
+
+/* ----------------------------- */
+/*  3c. import conflict dialog   */
+/* ----------------------------- */
+.merge-tenant-dialog {
+    min-height: 249px;
+    min-width: 450px;
+    width: 450px;
+}
+
+.merge-tenant-dialog .jr-mDialog-body > .message {
+    height: 26px;
+}
+
+.jr-mDialog.merge-tenant-dialog .jr-mDialog-body {
+    padding: 16px 16px 5px;
+}
+
+.merge-tenant-dialog p.imported-tenant,
+.merge-tenant-dialog p.selected-tenant {
+    margin: 15px 0 15px 20px;
+}

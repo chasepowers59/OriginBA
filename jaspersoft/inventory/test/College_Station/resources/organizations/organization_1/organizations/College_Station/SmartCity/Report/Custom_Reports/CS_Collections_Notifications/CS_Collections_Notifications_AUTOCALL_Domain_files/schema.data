@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_5" label="JoinTree_5" resourceId="JoinTree_5"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CollegeStation_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="CS_ACCT_DET_AUTO_CALL" label="CS_ACCT_DET_AUTO_CALL" resourceId="JoinTree_5">
+      <items>
+        <item id="ACCT_ID" label="Account Number" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.ACCT_ID"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.BILL_CYC_CD"></item>
+        <item id="CELLPHONE" label="Cell Phone" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.CELLPHONE"></item>
+        <item id="CUT_DATE" label="Cut Date" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.CUT_DATE"></item>
+        <item id="CUT_DATE_FILTER" label="Cut Date (For Filtering) " resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.CUT_DATE_FILTER"></item>
+        <item id="FIRST_NAME" label="First Name" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.FIRST_NAME"></item>
+        <item id="HOMEPHONE" label="Home Phone" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.HOMEPHONE"></item>
+        <item id="LAST_NAME" label="Last Name" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.LAST_NAME"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="PAST_DUE" label="Past Due" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.PAST_DUE"></item>
+        <item id="PAST_DUE1" label="Base Past Due" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.PAST_DUE1"></item>
+        <item dimensionOrMeasure="Dimension" id="TRIGGER_DT" label="Trigger Date" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.TRIGGER_DT"></item>
+        <item id="PRIMARYEMAIL" label="Email Address" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.PRIMARYEMAIL"></item>
+        <item id="COLL_EVT_TYP_CD" label="Collection Event Type" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.COLL_EVT_TYP_CD"></item>
+        <item id="COLL_PROC_ID" label="Collection Process ID" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.COLL_PROC_ID"></item>
+        <item id="SUM_CUR_AMT" label="Total Due" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.SUM_CUR_AMT"></item>
+        <item id="CONTACT_DATE" label="Contact Date" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.CONTACT_DATE"></item>
+        <item id="PAYMENTS" label="Payments after Collections" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.PAYMENTS"></item>
+        <item id="CALCULATED_PAST_DUE" label="Past Due" resourceId="JoinTree_5.CS_ACCT_DET_AUTO_CALL.CALCULATED_PAST_DUE"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="CM_CUS_LOC_BAL" datasourceId="CollegeStation_DS" datasourceTableName="CM_CUS_LOC_BAL" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="DUT_DT" type="java.sql.Timestamp"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="BALANCE" type="java.math.BigDecimal"></field>
+        <field id="CURRENT_CHARGES" type="java.math.BigDecimal"></field>
+        <field id="PASTDUE" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcQuery id="CS_ACCT_DET_AUTO_CALL" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="PER_OR_BUS_FLG" type="java.lang.String"></field>
+        <field id="FIRST_NAME" type="java.lang.String"></field>
+        <field id="LAST_NAME" type="java.lang.String"></field>
+        <field id="HOMEPHONE" type="java.lang.String"></field>
+        <field id="CELLPHONE" type="java.lang.String"></field>
+        <field id="PRIMARYEMAIL" type="java.lang.String"></field>
+        <field id="COLL_PROC_ID" type="java.lang.String"></field>
+        <field id="CUT_DATE" type="java.lang.String"></field>
+        <field id="COLL_EVT_TYP_CD" type="java.lang.String"></field>
+        <field id="TRIGGER_DT" type="java.sql.Timestamp"></field>
+        <field id="CONTACT_DATE" type="java.sql.Timestamp"></field>
+        <field id="PAST_DUE" type="java.math.BigDecimal"></field>
+        <field id="PAST_DUE1" type="java.lang.String"></field>
+        <field id="CUT_DATE_FILTER" type="java.sql.Timestamp"></field>
+        <field id="PAYMENTS" type="java.math.BigDecimal"></field>
+        <field id="CALCULATED_PAST_DUE" type="java.lang.String"></field>
+        <field id="SUM_CUR_AMT" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    a.bill_cyc_cd as BILL_CYC_CD,
+    a.acct_id AS ACCT_ID,
+    pn.entity_name as ENTITY_NAME,
+    per.PER_OR_BUS_FLG,
+    trim(substr(pn.entity_name, instr(pn.entity_name,',')+1 )) AS FIRST_NAME,
+    CASE
+    when per.PER_OR_BUS_FLG = 'B' then
+        ' ' 
+    else
+        trim(substr(pn.entity_name,0,instr(pn.entity_name,',')-1 )) 
+    END AS LAST_NAME,
+    CASE
+    WHEN (select ct.comm_rte_type_cd from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd='CELLPHONE' )= 'CELLPHONE' then
+        replace(translate((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='CELLPHONE' ), '()- ', '$'), '$', '')
+    WHEN (select ct.comm_rte_type_cd from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd='HOMEPHONE' )= 'HOMEPHONE' then
+        replace(translate((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='HOMEPHONE' ), '()- ', '$'), '$', '')
+        
+    WHEN (select ct.comm_rte_type_cd from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd='WORKPHONE' )= 'WORKPHONE' then
+        replace(translate((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='WORKPHONE' ), '()- ', '$'), '$', '')
+    else
+        ' '
+    END AS CELLPHONE,
+    
+    CASE
+    WHEN (select ct.comm_rte_type_cd from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd='CELLPHONE' )= 'CELLPHONE' then
+        replace(translate((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='CELLPHONE' ), '()- ', '$'), '$', '')
+    WHEN (select ct.comm_rte_type_cd from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd='HOMEPHONE' )= 'HOMEPHONE' then
+        replace(translate((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='HOMEPHONE' ), '()- ', '$'), '$', '')
+        
+    WHEN (select ct.comm_rte_type_cd from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd='WORKPHONE' )= 'WORKPHONE' then
+        replace(translate((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='WORKPHONE' ), '()- ', '$'), '$', '')
+    else
+        ' '
+    END AS HOMEPHONE,
+	NVL((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='PRIMARYEMAIL'  ),' ') AS PRIMARYEMAIL,
+    COLL.COLL_PROC_ID,
+    coll.ars_amt AS PAST_DUE,
+    CASE
+    WHEN ABS(coll.ars_amt) &lt; 1 then
+      TO_CHAR(coll.ars_amt, 'fm0D00')
+    else
+      TO_CHAR(coll.ars_amt, 'fm999999999999999D00')
+    END AS PAST_DUE1,
+    to_char(EVT2.TRIGGER_dt ,'MMDDRRRR')AS cut_date,
+    EVT2.TRIGGER_dt AS cut_date_filter,
+    EVT.COLL_EVT_TYP_CD,
+    EVT.trigger_dt,
+    EVT.completion_dt as contact_date,
+    NVL((SELECT SUM(PAY.PAY_AMT) from CISADM.CI_PAY PAY where PAY.ACCT_ID = A.ACCT_ID and PAY.ILM_DT &gt;= COLL.CRE_DTTM and PAY.PAY_STATUS_FLG = '50'),0) AS PAYMENTS,
+    
+    (NVL((TRIM(SUBSTR(comments, INSTR(comments, '||') + 2))),'0.00')) AS CALCULATED_PAST_DUE
+,
+    CASE 
+    WHEN ABS(NVL((select sum(ft.cur_amt) from cisadm.ci_ft ft where ft.sa_id in (select ss.sa_id from cisadm.ci_sa ss where ss.acct_id = a.acct_id) and ft.not_in_ars_sw = 'N'),0)) &lt; 1 then
+      TO_CHAR(NVL((select sum(ft.cur_amt) from cisadm.ci_ft ft where ft.sa_id in (select ss.sa_id from cisadm.ci_sa ss where ss.acct_id = a.acct_id) and ft.not_in_ars_sw = 'N'),0), 'fm0D00')
+    else
+      TO_CHAR(NVL((select sum(ft.cur_amt) from cisadm.ci_ft ft where ft.sa_id in (select ss.sa_id from cisadm.ci_sa ss where ss.acct_id = a.acct_id) and ft.not_in_ars_sw = 'N'),0), 'fm999999999999999D00')
+    END AS SUM_CUR_AMT
+FROM
+         cisadm.ci_acct a
+    JOIN cisadm.ci_acct_per      ap ON a.acct_id = ap.acct_id
+                                  AND main_cust_sw = 'Y'
+    JOIN CISADM.cI_PER           per on ap.PER_ID = per.PER_Id                                  
+    JOIN cisadm.ci_per_name      pn ON ap.per_id = pn.per_id
+                                  AND pn.prim_name_sw = 'Y'
+    JOIN CISADM.CI_COLL_PROC     COLL on A.ACCT_ID = COLL.ACCT_ID and coll.coll_status_flg = '10'
+    JOIN CISADM.CI_COLL_EVT EVT on coll.COLL_PROC_ID = EVT.COLL_PROC_ID
+                                 aND evt.COLL_EVT_TYP_CD IN ('AUTOCALL    ')
+    JOIN CISADM.CI_COLL_EVT EVT2 on coll.COLL_PROC_ID = EVT2.COLL_PROC_ID
+                                aND evt2.COLL_EVT_TYP_CD IN ('START-SEVER ','SEV-ALL     ')</query>
+    </jdbcQuery>
+    <jdbcQuery id="CS_CUS_LOC_BAL_SUM" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SUM_BALANCE_" fieldDBName="SUM(BALANCE)" type="java.math.BigDecimal"></field>
+        <field id="SUM_CURRENT_CHARGES_" fieldDBName="SUM(CURRENT_CHARGES)" type="java.math.BigDecimal"></field>
+        <field id="SUM_PASTDUE_" fieldDBName="SUM(PASTDUE)" type="java.math.BigDecimal"></field>
+        <field id="BALANCE_1" type="java.lang.String"></field>
+      </fieldList>
+      <query>select acct_id, sum(BALANCE), 
+    CASE
+    WHEN ABS(SUM(BALANCE)) &lt; 1 then
+      TO_CHAR(SUM(BALANCE), 'fm0D00')
+    else
+      TO_CHAR(SUM(BALANCE), 'fm999999999999999D00')
+    END AS BALANCE_1,
+sum(CURRENT_CHARGES),sum(PASTDUE) from cisadm.cm_CUS_LOC_BAL group by acct_id</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_5" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="CS_ACCT_DET_AUTO_CALL.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.ACCT_ID" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.ENTITY_NAME" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.PER_OR_BUS_FLG" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.FIRST_NAME" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.LAST_NAME" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.HOMEPHONE" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.CELLPHONE" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.PRIMARYEMAIL" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.COLL_PROC_ID" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.CUT_DATE" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.COLL_EVT_TYP_CD" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.TRIGGER_DT" type="java.sql.Timestamp"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.CONTACT_DATE" type="java.sql.Timestamp"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.PAST_DUE" type="java.math.BigDecimal"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.PAST_DUE1" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.CUT_DATE_FILTER" type="java.sql.Timestamp"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.PAYMENTS" type="java.math.BigDecimal"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.CALCULATED_PAST_DUE" type="java.lang.String"></field>
+        <field id="CS_ACCT_DET_AUTO_CALL.SUM_CUR_AMT" type="java.lang.String"></field>
+        <field id="CS_CUS_LOC_BAL_SUM.ACCT_ID" type="java.lang.String"></field>
+        <field id="CS_CUS_LOC_BAL_SUM.SUM_BALANCE_" fieldDBName="SUM(BALANCE)" type="java.math.BigDecimal"></field>
+        <field id="CS_CUS_LOC_BAL_SUM.SUM_CURRENT_CHARGES_" fieldDBName="SUM(CURRENT_CHARGES)" type="java.math.BigDecimal"></field>
+        <field id="CS_CUS_LOC_BAL_SUM.SUM_PASTDUE_" fieldDBName="SUM(PASTDUE)" type="java.math.BigDecimal"></field>
+        <field id="CS_CUS_LOC_BAL_SUM.BALANCE_1" type="java.lang.String"></field>
+      </fieldList>
+      <joinInfo alias="CS_ACCT_DET_AUTO_CALL" referenceId="CS_ACCT_DET_AUTO_CALL"></joinInfo>
+      <joinList>
+        <join expr="CS_ACCT_DET_AUTO_CALL.ACCT_ID == CS_CUS_LOC_BAL_SUM.ACCT_ID" left="CS_ACCT_DET_AUTO_CALL" right="CS_CUS_LOC_BAL_SUM" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>SELECT
+    a.bill_cyc_cd as BILL_CYC_CD,
+    a.acct_id AS ACCT_ID,
+    pn.entity_name as ENTITY_NAME,
+    per.PER_OR_BUS_FLG,
+    trim(substr(pn.entity_name, instr(pn.entity_name,',')+1 )) AS FIRST_NAME,
+    CASE
+    when per.PER_OR_BUS_FLG = 'B' then
+        ' ' 
+    else
+        trim(substr(pn.entity_name,0,instr(pn.entity_name,',')-1 )) 
+    END AS LAST_NAME,
+    CASE
+    WHEN (select ct.comm_rte_type_cd from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd='CELLPHONE' )= 'CELLPHONE' then
+        replace(translate((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='CELLPHONE' ), '()- ', '$'), '$', '')
+    WHEN (select ct.comm_rte_type_cd from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd='HOMEPHONE' )= 'HOMEPHONE' then
+        replace(translate((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='HOMEPHONE' ), '()- ', '$'), '$', '')
+        
+    WHEN (select ct.comm_rte_type_cd from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd='WORKPHONE' )= 'WORKPHONE' then
+        replace(translate((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='WORKPHONE' ), '()- ', '$'), '$', '')
+    else
+        ' '
+    END AS CELLPHONE,
+    
+    CASE
+    WHEN (select ct.comm_rte_type_cd from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd='CELLPHONE' )= 'CELLPHONE' then
+        replace(translate((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='CELLPHONE' ), '()- ', '$'), '$', '')
+    WHEN (select ct.comm_rte_type_cd from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd='HOMEPHONE' )= 'HOMEPHONE' then
+        replace(translate((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='HOMEPHONE' ), '()- ', '$'), '$', '')
+        
+    WHEN (select ct.comm_rte_type_cd from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd='WORKPHONE' )= 'WORKPHONE' then
+        replace(translate((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='WORKPHONE' ), '()- ', '$'), '$', '')
+    else
+        ' '
+    END AS HOMEPHONE,
+	NVL((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.cnd_primary_flg = 'C1YS' and ct.comm_rte_type_cd ='PRIMARYEMAIL'  ),' ') AS PRIMARYEMAIL,
+    COLL.COLL_PROC_ID,
+    coll.ars_amt AS PAST_DUE,
+    CASE
+    WHEN ABS(coll.ars_amt) &lt; 1 then
+      TO_CHAR(coll.ars_amt, 'fm0D00')
+    else
+      TO_CHAR(coll.ars_amt, 'fm999999999999999D00')
+    END AS PAST_DUE1,
+    to_char(EVT2.TRIGGER_dt ,'MMDDRRRR')AS cut_date,
+    EVT2.TRIGGER_dt AS cut_date_filter,
+    EVT.COLL_EVT_TYP_CD,
+    EVT.trigger_dt,
+    EVT.completion_dt as contact_date,
+    NVL((SELECT SUM(PAY.PAY_AMT) from CISADM.CI_PAY PAY where PAY.ACCT_ID = A.ACCT_ID and PAY.ILM_DT &gt;= COLL.CRE_DTTM and PAY.PAY_STATUS_FLG = '50'),0) AS PAYMENTS,
+    
+    (NVL((TRIM(SUBSTR(comments, INSTR(comments, '||') + 2))),'0.00')) AS CALCULATED_PAST_DUE
+,
+    CASE 
+    WHEN ABS(NVL((select sum(ft.cur_amt) from cisadm.ci_ft ft where ft.sa_id in (select ss.sa_id from cisadm.ci_sa ss where ss.acct_id = a.acct_id) and ft.not_in_ars_sw = 'N'),0)) &lt; 1 then
+      TO_CHAR(NVL((select sum(ft.cur_amt) from cisadm.ci_ft ft where ft.sa_id in (select ss.sa_id from cisadm.ci_sa ss where ss.acct_id = a.acct_id) and ft.not_in_ars_sw = 'N'),0), 'fm0D00')
+    else
+      TO_CHAR(NVL((select sum(ft.cur_amt) from cisadm.ci_ft ft where ft.sa_id in (select ss.sa_id from cisadm.ci_sa ss where ss.acct_id = a.acct_id) and ft.not_in_ars_sw = 'N'),0), 'fm999999999999999D00')
+    END AS SUM_CUR_AMT
+FROM
+         cisadm.ci_acct a
+    JOIN cisadm.ci_acct_per      ap ON a.acct_id = ap.acct_id
+                                  AND main_cust_sw = 'Y'
+    JOIN CISADM.cI_PER           per on ap.PER_ID = per.PER_Id                                  
+    JOIN cisadm.ci_per_name      pn ON ap.per_id = pn.per_id
+                                  AND pn.prim_name_sw = 'Y'
+    JOIN CISADM.CI_COLL_PROC     COLL on A.ACCT_ID = COLL.ACCT_ID and coll.coll_status_flg = '10'
+    JOIN CISADM.CI_COLL_EVT EVT on coll.COLL_PROC_ID = EVT.COLL_PROC_ID
+                                 aND evt.COLL_EVT_TYP_CD IN ('AUTOCALL    ')
+    JOIN CISADM.CI_COLL_EVT EVT2 on coll.COLL_PROC_ID = EVT2.COLL_PROC_ID
+                                aND evt2.COLL_EVT_TYP_CD IN ('START-SEVER ','SEV-ALL     ')</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CS_ACCT_DET_AUTO_CALL" tableId="CS_ACCT_DET_AUTO_CALL"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CS_CUS_LOC_BAL_SUM" tableId="CS_CUS_LOC_BAL_SUM"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

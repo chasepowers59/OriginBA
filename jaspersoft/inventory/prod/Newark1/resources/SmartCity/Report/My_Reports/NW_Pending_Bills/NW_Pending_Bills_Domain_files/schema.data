@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Pending_Bills" label="Pending_Bills" resourceId="Pending_Bills"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="ACCT_ID" resourceId="Pending_Bills.ACCT_ID"></item>
+    <item id="BILL_CYC_CD" label="BILL_CYC_CD" resourceId="Pending_Bills.BILL_CYC_CD"></item>
+    <item id="BILL_ID" label="BILL_ID" resourceId="Pending_Bills.BILL_ID"></item>
+    <item id="CRE_DTTM" label="CRE_DTTM" resourceId="Pending_Bills.CRE_DTTM"></item>
+    <item id="CUST_CL_CD" label="CUST_CL_CD" resourceId="Pending_Bills.CUST_CL_CD"></item>
+    <item id="ENTITY_NAME" label="ENTITY_NAME" resourceId="Pending_Bills.ENTITY_NAME"></item>
+    <item id="WIN_START_DT" label="WIN_START_DT" resourceId="Pending_Bills.WIN_START_DT"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Pending_Bills" datasourceId="Newark1_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="WIN_START_DT" type="java.sql.Timestamp"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>SELECT B.ACCT_ID, PN.ENTITY_NAME, ACCT.CUST_CL_CD, B.BILL_ID, B.BILL_CYC_CD, B.WIN_START_DT, B.CRE_DTTM
+FROM CISADM.CI_BILL B
+INNER JOIN CISADM.CI_ACCT ACCT ON ACCT.ACCT_ID = B.ACCT_ID
+INNER JOIN CISADM.CI_ACCT_PER AP ON AP.ACCT_ID = ACCT.ACCT_ID
+    AND AP.MAIN_CUST_SW = 'Y'
+INNER JOIN CISADM.CI_PER_NAME PN ON PN.PER_ID = AP.PER_ID
+    AND PN.PRIM_NAME_SW = 'Y'
+WHERE B.BILL_STAT_FLG = 'P'</query>
+    </jdbcQuery>
+  </resources>
+</schema>

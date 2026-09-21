@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperTemplate xmlns="http://jasperreports.sourceforge.net/jasperreports/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/template http://jasperreports.sourceforge.net/xsd/jaspertemplate.xsd">
+  <style name="ReportDefault" isDefault="true" mode="Transparent" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+    <box>
+      <pen lineColor="#AAAAAA"/>
+    </box>
+  </style>
+  <style name="TableBaseFrameStyle" mode="Transparent">
+    <box padding="0">
+      <pen lineWidth="0.0"/>
+    </box>
+  </style>
+  <style name="TableFrameStyle" style="TableBaseFrameStyle">
+    <box padding="0">
+      <bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+    </box>
+  </style>
+  <style name="TableColumnHeaderFrameStyle" style="TableBaseFrameStyle">
+    <box>
+      <topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+      <leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+      <bottomPen lineWidth="1.0" lineColor="#AAAAAA"/>
+      <rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+    </box>
+  </style>
+  <style name="TableColumnFooterFrameStyle" style="TableBaseFrameStyle">
+    <box>
+      <topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+    </box>
+  </style>
+  <style name="TableColumnHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" isBold="true">
+    <box leftPadding="5" rightPadding="5">
+      <pen lineWidth="1.0" lineStyle="Solid"/>
+      <topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+    </box>
+  </style>
+  <style name="TableGroupHeaderFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#D9E4F1">
+    <box>
+      <topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+    </box>
+  </style>
+  <style name="TableGroupHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" isBold="true">
+    <box leftPadding="5" rightPadding="5">
+      <topPen lineWidth="0.0"/>
+      <leftPen lineWidth="0.0"/>
+      <bottomPen lineWidth="0.0"/>
+      <rightPen lineWidth="0.0"/>
+    </box>
+  </style>
+  <style name="TableGroupFooterFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#F2F2F2">
+    <box>
+      <topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+    </box>
+  </style>
+  <style name="TableGroupFooterTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#F2F2F2" isBold="true">
+    <box leftPadding="5" rightPadding="5">
+      <topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+    </box>
+  </style>
+  <style name="TableSummaryFrameStyle" style="TableBaseFrameStyle">
+    <box>
+      <leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+      <rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+    </box>
+  </style>
+  <style name="TableSummaryTextNoBorderStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" isBold="true">
+    <box leftPadding="5" rightPadding="5"/>
+  </style>
+  <style name="TableSummaryTextStyle" style="TableSummaryTextNoBorderStyle">
+    <box>
+      <pen lineWidth="1.0" lineColor="#D4D4D4"/>
+    </box>
+  </style>
+  <style name="TableTitleFrameStyle" style="TableFrameStyle">
+    <box topPadding="0" bottomPadding="0">
+      <topPen lineWidth="0.0"/>
+      <leftPen lineWidth="0.0"/>
+      <bottomPen lineWidth="0.0"/>
+      <rightPen lineWidth="0.0"/>
+    </box>
+  </style>
+  <style name="TableTitleTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+    <box bottomPadding="8">
+      <pen lineColor="#000000"/>
+      <topPen lineWidth="0.0"/>
+    </box>
+  </style>
+  <style name="TableDetailFrameStyle" style="TableBaseFrameStyle">
+    <box>
+      <leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+      <rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+    </box>
+  </style>
+  <style name="TableDetailTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" isBold="false">
+    <box leftPadding="5" rightPadding="5">
+      <leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+    </box>
+    <conditionalStyle>
+      <conditionExpression><![CDATA[$V{IS_EVEN_ROW}]]></conditionExpression>
+      <style backcolor="#F4F4F4"/>
+    </conditionalStyle>
+  </style>
+  <style name="ChartReportTitle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+    <box>
+      <pen lineColor="#000000"/>
+      <topPen lineWidth="0.0" lineStyle="Solid"/>
+    </box>
+  </style>
+  <style name="ChartTitle" forecolor="#000000" fontSize="12" isBold="true"/>
+  <style name="CrosstabElementStyle" mode="Transparent" forecolor="#000033" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center">
+    <box>
+      <bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+    </box>
+  </style>
+  <style name="CrosstabBaseCellStyle" mode="Transparent">
+    <box padding="0">
+      <pen lineWidth="0.0"/>
+    </box>
+  </style>
+  <style name="CrosstabBaseTextStyle" mode="Opaque" forecolor="#666666" backcolor="#FFFFFF" vTextAlign="Top" vImageAlign="Top" isBold="true">
+    <box topPadding="3" leftPadding="5" bottomPadding="3" rightPadding="5">
+      <topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+      <rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+    </box>
+  </style>
+  <style name="CrosstabTitleTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" fontSize="18" isBold="false" hTextAlign="Center">
+    <box>
+      <pen lineWidth="0.0" lineColor="#000000"/>
+    </box>
+  </style>
+  <style name="CrosstabHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+  <style name="CrosstabHeaderLabelStyle" style="CrosstabHeaderTextStyle" mode="Transparent">
+    <box>
+      <pen lineWidth="0.0"/>
+    </box>
+  </style>
+  <style name="CrosstabMeasureHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+  <style name="CrosstabMeasureHeaderLabelStyle" style="CrosstabMeasureHeaderTextStyle" mode="Transparent">
+    <box>
+      <pen lineWidth="0.0"/>
+    </box>
+  </style>
+  <style name="CrosstabColumnMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" isBold="false"/>
+  <style name="CrosstabRowMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+    <conditionalStyle>
+      <conditionExpression><![CDATA[$V{IS_EVEN_ROW}]]></conditionExpression>
+      <style backcolor="#F4F4F4"/>
+    </conditionalStyle>
+  </style>
+  <style name="CrosstabRowDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+  </style>
+  <style name="CrosstabRowDimensionHeaderTotalTextStyle" style="CrosstabRowDimensionHeaderTextStyle" forecolor="#262626" isBold="true">
+  </style>
+  <style name="CrosstabInnerRowDimensionHeaderTextStyle" style="CrosstabRowDimensionHeaderTextStyle">
+    <conditionalStyle>
+      <conditionExpression><![CDATA[$V{IS_EVEN_ROW}]]></conditionExpression>
+      <style backcolor="#F4F4F4"/>
+    </conditionalStyle>
+  </style>
+  <style name="CrosstabInnerRowDimensionHeaderTotalTextStyle" style="CrosstabRowDimensionHeaderTotalTextStyle">
+    <conditionalStyle>
+      <conditionExpression><![CDATA[$V{IS_EVEN_ROW}]]></conditionExpression>
+      <style backcolor="#F4F4F4"/>
+    </conditionalStyle>
+  </style>
+  <style name="CrosstabColumnDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#D9E4F1" hTextAlign="Center" isBold="false">
+  </style>
+  <style name="CrosstabColumnDimensionHeaderTotalTextStyle" style="CrosstabColumnDimensionHeaderTextStyle" forecolor="#262626" isBold="true">
+  </style>
+  <style name="CrosstabDetailTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Right" hImageAlign="Right" isBold="false">
+    <box>
+      <topPen lineWidth="0.0"/>
+      <bottomPen lineWidth="0.0"/>
+    </box>
+    <conditionalStyle>
+      <conditionExpression><![CDATA[$V{IS_EVEN_ROW}]]></conditionExpression>
+      <style backcolor="#F4F4F4"/>
+    </conditionalStyle>
+  </style>
+  <style name="CrosstabDetailTotalTextStyle" style="CrosstabDetailTextStyle" forecolor="#262626" isBold="true">
+    <box>
+      <topPen lineWidth="0.0"/>
+      <bottomPen lineWidth="0.0"/>
+    </box>
+    <conditionalStyle>
+      <conditionExpression><![CDATA[$V{IS_EVEN_ROW}]]></conditionExpression>
+      <style backcolor="#F4F4F4"/>
+    </conditionalStyle>
+  </style>
+  <style name="CrosstabDummyHeaderTextStyle" style="CrosstabBaseTextStyle" backcolor="#F2F2F2"/>
+</jasperTemplate>

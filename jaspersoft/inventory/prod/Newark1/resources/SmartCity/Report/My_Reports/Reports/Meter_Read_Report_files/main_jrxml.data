@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 8.2.0.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Meter_Read_Report" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1774974d-4ac2-4e14-b165-3bc2f0d9997b">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Newark - JRS TST DB"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="sromano|Newark"/>
+	<property name="ireport.jasperserver.report.resource" value="/Reports/Meter_Read_Report_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/Reports/Meter_Read_Report"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="MeterReadReport" uuid="60724ef9-d927-4799-9251-4edeffd8e145">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Newark-JRS2C2M-TST"/>
+		<parameter name="Report_Date" class="java.sql.Date"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT PCHAR.CHAR_VAL PROPERTY_TYPE,
+       PREM.ADDRESS1  ADDRESS,
+       SASP.ACCT_ID     C2M_ACCT_ID,
+       SASP.OLD_ACCT_ID AS400_ACCT_ID,
+       MSR.MSRMT_DTTM   CURRENT_READ_DATE,
+       MSR.READING_VAL  CURRENT_READING,
+       MSR2.MSRMT_DTTM  PREVIOUS_READ_DATE,
+       MSR2.READING_VAL PREVIOUS_READING
+FROM   CISADM.CI_PREM PREM
+       LEFT JOIN CISADM.CI_PREM_CHAR PCHAR
+              ON PCHAR.PREM_ID = PREM.PREM_ID
+                 AND PCHAR.CHAR_TYPE_CD = 'PRPRTYTY'
+       INNER JOIN CISADM.CI_SP SP
+               ON SP.PREM_ID = PREM.PREM_ID
+       INNER JOIN (SELECT *
+                   FROM   (SELECT SA.ACCT_ID,
+                                  SA.OLD_ACCT_ID,
+                                  SASP1.SP_ID,
+                                  SA.SA_ID,
+                                  ROW_NUMBER()
+                                    OVER (
+                                      PARTITION BY SA.ACCT_ID
+                                      ORDER BY SA.SA_ID DESC) RANK
+                           FROM   CISADM.CI_SA_SP SASP1,
+                                  CISADM.CI_SA SA
+                           WHERE  SASP1.SA_ID = SA.SA_ID)
+                   WHERE  RANK = 1) SASP
+               ON SASP.SP_ID = SP.SP_ID
+       INNER JOIN CISADM.D1_SP_IDENTIFIER SPIDENTIFIER
+               ON SPIDENTIFIER.SP_ID_TYPE_FLG = 'D1EI'
+                  AND SPIDENTIFIER.ID_VALUE = SASP.SP_ID
+       INNER JOIN CISADM.D1_SP MDMSP
+               ON MDMSP.D1_SP_ID = SPIDENTIFIER.D1_SP_ID
+       INNER JOIN CISADM.D1_INSTALL_EVT IE
+               ON IE.D1_SP_ID = MDMSP.D1_SP_ID
+                  AND ( IE.D1_REMOVAL_DTTM IS NULL OR IE.D1_REMOVAL_DTTM >= $P{Report_Date})
+       INNER JOIN CISADM.D1_MEASR_COMP MC
+               ON MC.DEVICE_CONFIG_ID = IE.DEVICE_CONFIG_ID
+       LEFT JOIN CISADM.D1_MSRMT MSR
+              ON MSR.MEASR_COMP_ID = MC.MEASR_COMP_ID
+                 AND MSR.MSRMT_DTTM = (SELECT MAX(MSR1.MSRMT_DTTM)
+                                       FROM   CISADM.D1_MSRMT MSR1
+                                       WHERE
+                     MSR1.MEASR_COMP_ID = MSR.MEASR_COMP_ID
+                     AND MSR1.MSRMT_USE_FLG != 'D101'
+                     AND MSR1.MSRMT_DTTM <= $P{Report_Date})
+       LEFT JOIN CISADM.D1_MSRMT MSR2
+              ON MSR2.MEASR_COMP_ID = MSR.MEASR_COMP_ID
+                 AND MSR2.MSRMT_DTTM = MSR.PREV_MSRMT_DTTM
+                 AND MSR2.MSRMT_USE_FLG != 'D101']]>
+		</queryString>
+		<field name="PROPERTY_TYPE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="PROPERTY_TYPE"/>
+			<property name="com.jaspersoft.studio.field.label" value="PROPERTY_TYPE"/>
+		</field>
+		<field name="ADDRESS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ADDRESS"/>
+			<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+		</field>
+		<field name="C2M_ACCT_ID" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="C2M_ACCT_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="C2M_ACCT_ID"/>
+		</field>
+		<field name="AS400_ACCT_ID" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="AS400_ACCT_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="AS400_ACCT_ID"/>
+		</field>
+		<field name="CURRENT_READ_DATE" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.name" value="CURRENT_READ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="CURRENT_READ_DATE"/>
+		</field>
+		<field name="CURRENT_READING" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="CURRENT_READING"/>
+			<property name="com.jaspersoft.studio.field.label" value="CURRENT_READING"/>
+		</field>
+		<field name="PREVIOUS_READ_DATE" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.name" value="PREVIOUS_READ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="PREVIOUS_READ_DATE"/>
+		</field>
+		<field name="PREVIOUS_READING" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="PREVIOUS_READING"/>
+			<property name="com.jaspersoft.studio.field.label" value="PREVIOUS_READING"/>
+		</field>
+	</subDataset>
+	<parameter name="Report_Date" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 1 FROM CISADM.CI_ACCT WHERE ROWNUM = 1]]>
+	</queryString>
+	<field name="1" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="1"/>
+		<property name="com.jaspersoft.studio.field.label" value="1"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="750" height="80" uuid="a1a017a8-a1a5-451d-a091-5de262dd2d96"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Meter Read Report " + $P{Report_Date}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="61" splitType="Stretch">
+			<componentElement>
+				<reportElement x="0" y="0" width="750" height="60" uuid="2ebc823f-af06-460c-b501-a8bb94c2e58d">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+					<property name="com.jaspersoft.studio.components.autoresize.proportional" value="true"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="MeterReadReport" uuid="e73725f8-2e6a-45a8-8231-94b64d9a8d05">
+						<datasetParameter name="Report_Date">
+							<datasetParameterExpression><![CDATA[$P{Report_Date}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="93" uuid="53efd4a3-63ab-4f47-a8e7-11cd8af5c36b">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="93" height="30" uuid="e190cb19-d1cb-46ff-a884-9f24fa8edd96"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[PROPERTY_TYPE]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="93" height="30" uuid="63eefb11-8e1a-4b32-809c-49d1ec9ff61c"/>
+								<textFieldExpression><![CDATA[$F{PROPERTY_TYPE}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="93" uuid="ebe978f1-ac57-439c-86aa-5d5bd02cf768">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="93" height="30" uuid="1b5f881b-171d-4e45-bef0-f6ccc1a63803"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[ADDRESS]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="93" height="30" uuid="83ffe8f2-92f8-40de-8cc5-69e413c672ff"/>
+								<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="93" uuid="ca0fbd55-57ff-4c77-9012-4f6c3e6c318d">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="93" height="30" uuid="cc77a2d1-bf59-41c3-92bb-600385777676"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[C2M_ACCT_ID]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="93" height="30" uuid="95285914-a302-4883-aa82-82cdfd0e4968"/>
+								<textFieldExpression><![CDATA[$F{C2M_ACCT_ID}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="93" uuid="e48c515f-756a-4097-bd76-4da9f1b391c2">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="93" height="30" uuid="6457051d-bd7b-4b80-83f9-3bbb4b3d9cd0"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[AS400_ACCT_ID]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="93" height="30" uuid="e144b267-db08-4299-93f0-5cbe6fe889d3"/>
+								<textFieldExpression><![CDATA[$F{AS400_ACCT_ID}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="93" uuid="9f5c1538-5346-421b-9c0e-544b989e8269">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="93" height="30" uuid="2ff3ffbd-2cd4-4058-b400-864c0091bb1a"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[CURR_READ_DT]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="93" height="30" uuid="a75b29a7-f472-4979-9c75-c12eeb208333"/>
+								<textFieldExpression><![CDATA[new SimpleDateFormat("MM/dd/yyyy").format($F{CURRENT_READ_DATE})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="93" uuid="6f7d817f-2aaa-4e3b-a2f6-d05e02bce1bd">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column6"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="93" height="30" uuid="e423d9c6-49df-4519-9428-92b15131220d"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[CURR_READING]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="93" height="30" uuid="e89aeb53-0dd1-4c92-8f25-e49e8f33d3af"/>
+								<textFieldExpression><![CDATA[$F{CURRENT_READING}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="93" uuid="5ef12f86-6747-4754-917f-c996fc182662">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column7"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="93" height="30" uuid="94dc8d40-b781-4bb3-9a4f-4cbb716fefaf"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[PREV_READ_DT]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="93" height="30" uuid="fe98892c-0f4f-468a-b3f5-6f386c52cd56"/>
+								<textFieldExpression><![CDATA[new SimpleDateFormat("MM/dd/yyyy").format($F{PREVIOUS_READ_DATE})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="99" uuid="62d8cf34-37c8-4a21-85f9-543225df70f9">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column8"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="99" height="30" uuid="8202daf4-45ff-4107-b8f8-d78c9110346f"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[PREV_READING]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="99" height="30" uuid="8c587fec-0823-4eab-ae89-df6036c66c10"/>
+								<textFieldExpression><![CDATA[$F{PREVIOUS_READING}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</detail>
+</jasperReport>

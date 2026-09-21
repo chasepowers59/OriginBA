@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Training_DB">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="DeviceInfo" label="Device Info" resourceId="JoinTree_1">
+      <items>
+        <item id="ASSET_ID" label="Asset ID" resourceId="JoinTree_1.DeviceInfo.ASSET_ID"></item>
+        <item id="BADGE_NUMBER" label="Badge Number" resourceId="JoinTree_1.DeviceInfo.BADGE_NUMBER"></item>
+        <item id="D1_INSTALL_DTTM" label="Meter Install Date" resourceId="JoinTree_1.DeviceInfo.D1_INSTALL_DTTM"></item>
+        <item id="DEVICE_SPECIFICATION" label="Device Specification" resourceId="JoinTree_1.DeviceInfo.DEVICE_SPECIFICATION"></item>
+        <item id="DEVICE_TYPE_CD" label="Device Type" resourceId="JoinTree_1.DeviceInfo.DEVICE_TYPE_CD"></item>
+        <item id="MANUFACTURER_CD" label="Manufacturer" resourceId="JoinTree_1.DeviceInfo.MANUFACTURER_CD"></item>
+        <item id="SERIAL_NUMBER" label="Serial Number" resourceId="JoinTree_1.DeviceInfo.SERIAL_NUMBER"></item>
+        <item id="SP_ID" label="Service Point ID" resourceId="JoinTree_1.DeviceInfo.SP_ID"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="MASTER_SOURCE" label="UnBilled Info" resourceId="JoinTree_1">
+      <items>
+        <item id="ADDRESS1" label="Address" resourceId="JoinTree_1.MASTER_SOURCE.ADDRESS1"></item>
+        <item id="CITY" label="City" resourceId="JoinTree_1.MASTER_SOURCE.CITY"></item>
+        <item id="MSRMT_DTTM" label="Measurement Date Time" resourceId="JoinTree_1.MASTER_SOURCE.MSRMT_DTTM"></item>
+        <item id="MSRMT_VAL" label="Measurement Value" resourceId="JoinTree_1.MASTER_SOURCE.MSRMT_VAL"></item>
+        <item id="SA_ID" label="Service Agreement ID" resourceId="JoinTree_1.MASTER_SOURCE.SA_ID"></item>
+        <item id="SA_STATUS" label="Service Agreement Status" resourceId="JoinTree_1.MASTER_SOURCE.SA_STATUS"></item>
+        <item id="SA_STATUS_FLG" label="Service Agreement Status Code" resourceId="JoinTree_1.MASTER_SOURCE.SA_STATUS_FLG"></item>
+        <item id="SA_STOP_DATE" label="Service Stop Date" resourceId="JoinTree_1.MASTER_SOURCE.SA_STOP_DATE"></item>
+        <item id="SP_ID_1" label="Service Point ID" resourceId="JoinTree_1.MASTER_SOURCE.SP_ID"></item>
+        <item id="SP_STATUS" label="Service Point Status" resourceId="JoinTree_1.MASTER_SOURCE.SP_STATUS"></item>
+        <item id="SVC_TYPE" label="Service Type" resourceId="JoinTree_1.MASTER_SOURCE.SVC_TYPE"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcQuery id="MASTER_SOURCE" datasourceId="Training_DB">
+      <fieldList>
+        <field id="SP_ID" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="CITY" type="java.lang.String"></field>
+        <field id="SP_STATUS" type="java.lang.String"></field>
+        <field id="SVC_TYPE" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SA_STATUS" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="SA_STOP_DATE" type="java.util.Date"></field>
+        <field id="MSRMT_DTTM" type="java.util.Date"></field>
+        <field id="MSRMT_VAL" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT 
+            sp.SP_ID,
+            p.ADDRESS1,
+            p.CITY,
+            sl.DESCR AS SP_STATUS,
+            svl.DESCR AS SVC_TYPE,
+            latest_sa.SA_ID,
+            latest_sa.SA_STATUS,
+            latest_sa.SA_STATUS_FLG,
+            latest_sa.STOP_DTTM AS SA_STOP_DATE,
+            m.MSRMT_DTTM,
+            m.MSRMT_VAL
+        FROM CISADM.CI_SP sp
+        LEFT JOIN CISADM.CI_PREM p ON sp.PREM_ID = p.PREM_ID
+        LEFT JOIN CISADM.CI_SP_TYPE spt ON sp.SP_TYPE_CD = spt.SP_TYPE_CD
+        LEFT JOIN CISADM.CI_SVC_TYPE_L svl ON spt.SVC_TYPE_CD = svl.SVC_TYPE_CD AND svl.LANGUAGE_CD = 'ENG'
+        LEFT JOIN CISADM.CI_LOOKUP_VAL_L sl ON sp.SP_STATUS_FLG = sl.FIELD_VALUE AND sl.FIELD_NAME = 'SP_STATUS_FLG' AND sl.LANGUAGE_CD = 'ENG'
+        -- Normalized Meter Bridge
+        LEFT JOIN CISADM.D1_INSTALL_EVT ie ON sp.SP_ID = SUBSTR(ie.D1_SP_ID, 1, 10)
+        LEFT JOIN CISADM.D1_MEASR_COMP mc ON ie.DEVICE_CONFIG_ID = mc.DEVICE_CONFIG_ID
+        LEFT JOIN CISADM.D1_MSRMT m ON mc.MEASR_COMP_ID = m.MEASR_COMP_ID
+        -- Current SA Logic
+        LEFT JOIN (
+            SELECT SP_ID, SA_ID, SA_STATUS_FLG, DESCR AS SA_STATUS, STOP_DTTM
+            FROM (
+                SELECT sasp.SP_ID, sa.SA_ID, sa.SA_STATUS_FLG, l.DESCR, sasp.STOP_DTTM,
+                       ROW_NUMBER() OVER (PARTITION BY sasp.SP_ID ORDER BY sasp.START_DTTM DESC) as rn
+                FROM CISADM.CI_SA_SP sasp
+                JOIN CISADM.CI_SA sa ON sasp.SA_ID = sa.SA_ID
+                JOIN CISADM.CI_LOOKUP_VAL_L l ON sa.SA_STATUS_FLG = l.FIELD_VALUE 
+                     AND l.FIELD_NAME = 'SA_STATUS_FLG' AND l.LANGUAGE_CD = 'ENG'
+            ) WHERE rn = 1
+        ) latest_sa ON sp.SP_ID = latest_sa.SP_ID</query>
+    </jdbcQuery>
+    <jdbcQuery id="DeviceInfo" datasourceId="Training_DB">
+      <fieldList>
+        <field id="SP_ID" type="java.lang.String"></field>
+        <field id="INSTALL_EVT_ID" type="java.lang.String"></field>
+        <field id="DEVICE_CONFIG_ID" type="java.lang.String"></field>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="DEVICE_TYPE_CD" type="java.lang.String"></field>
+        <field id="MANUFACTURER_CD" type="java.lang.String"></field>
+        <field id="D1_MODEL_CD" type="java.lang.String"></field>
+        <field id="BADGE_NUMBER" type="java.lang.String"></field>
+        <field id="SERIAL_NUMBER" type="java.lang.String"></field>
+        <field id="DEVICE_SPECIFICATION" type="java.lang.String"></field>
+        <field id="ASSET_ID" type="java.lang.String"></field>
+        <field id="D1_INSTALL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_REMOVAL_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>SELECT
+    sp.SP_ID,
+
+    ie.INSTALL_EVT_ID,
+
+    ie.DEVICE_CONFIG_ID,
+
+    dc.D1_DEVICE_ID,
+
+    dvc.DEVICE_TYPE_CD,
+
+    dvc.MANUFACTURER_CD,
+
+    dvc.D1_MODEL_CD,
+
+    MAX(
+        CASE
+            WHEN di.DVC_ID_TYPE_FLG = 'D1BN'
+            THEN di.ID_VALUE
+        END
+    ) AS BADGE_NUMBER,
+
+    MAX(
+        CASE
+            WHEN di.DVC_ID_TYPE_FLG = 'D1SN'
+            THEN di.ID_VALUE
+        END
+    ) AS SERIAL_NUMBER,
+
+    MAX(
+        CASE
+            WHEN di.DVC_ID_TYPE_FLG = 'D1SP'
+            THEN di.ID_VALUE
+        END
+    ) AS DEVICE_SPECIFICATION,
+
+    MAX(
+        CASE
+            WHEN di.DVC_ID_TYPE_FLG = 'D1AS'
+            THEN di.ID_VALUE
+        END
+    ) AS ASSET_ID,
+
+    ie.D1_INSTALL_DTTM,
+
+    ie.D1_REMOVAL_DTTM
+
+FROM CISADM.CI_SP sp
+
+LEFT JOIN CISADM.D1_INSTALL_EVT ie
+    ON sp.SP_ID = SUBSTR(ie.D1_SP_ID,1,10)
+
+LEFT JOIN CISADM.D1_DVC_CFG dc
+    ON ie.DEVICE_CONFIG_ID = dc.DEVICE_CONFIG_ID
+
+LEFT JOIN CISADM.D1_DVC dvc
+    ON dc.D1_DEVICE_ID = dvc.D1_DEVICE_ID
+
+LEFT JOIN CISADM.D1_DVC_IDENTIFIER di
+    ON dvc.D1_DEVICE_ID = di.D1_DEVICE_ID
+
+WHERE ie.D1_REMOVAL_DTTM IS NULL
+
+GROUP BY
+    sp.SP_ID,
+    ie.INSTALL_EVT_ID,
+    ie.DEVICE_CONFIG_ID,
+    dc.D1_DEVICE_ID,
+    dvc.DEVICE_TYPE_CD,
+    dvc.MANUFACTURER_CD,
+    dvc.D1_MODEL_CD,
+    ie.D1_INSTALL_DTTM,
+    ie.D1_REMOVAL_DTTM</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_1" datasourceId="Training_DB">
+      <fieldList>
+        <field id="DeviceInfo.SP_ID" type="java.lang.String"></field>
+        <field id="DeviceInfo.INSTALL_EVT_ID" type="java.lang.String"></field>
+        <field id="DeviceInfo.DEVICE_CONFIG_ID" type="java.lang.String"></field>
+        <field id="DeviceInfo.D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="DeviceInfo.DEVICE_TYPE_CD" type="java.lang.String"></field>
+        <field id="DeviceInfo.MANUFACTURER_CD" type="java.lang.String"></field>
+        <field id="DeviceInfo.D1_MODEL_CD" type="java.lang.String"></field>
+        <field id="DeviceInfo.BADGE_NUMBER" type="java.lang.String"></field>
+        <field id="DeviceInfo.SERIAL_NUMBER" type="java.lang.String"></field>
+        <field id="DeviceInfo.DEVICE_SPECIFICATION" type="java.lang.String"></field>
+        <field id="DeviceInfo.ASSET_ID" type="java.lang.String"></field>
+        <field id="DeviceInfo.D1_INSTALL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="DeviceInfo.D1_REMOVAL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="MASTER_SOURCE.SP_ID" type="java.lang.String"></field>
+        <field id="MASTER_SOURCE.ADDRESS1" type="java.lang.String"></field>
+        <field id="MASTER_SOURCE.CITY" type="java.lang.String"></field>
+        <field id="MASTER_SOURCE.SP_STATUS" type="java.lang.String"></field>
+        <field id="MASTER_SOURCE.SVC_TYPE" type="java.lang.String"></field>
+        <field id="MASTER_SOURCE.SA_ID" type="java.lang.String"></field>
+        <field id="MASTER_SOURCE.SA_STATUS" type="java.lang.String"></field>
+        <field id="MASTER_SOURCE.SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="MASTER_SOURCE.SA_STOP_DATE" type="java.util.Date"></field>
+        <field id="MASTER_SOURCE.MSRMT_DTTM" type="java.util.Date"></field>
+        <field id="MASTER_SOURCE.MSRMT_VAL" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <joinInfo alias="MASTER_SOURCE" referenceId="MASTER_SOURCE"></joinInfo>
+      <joinList>
+        <join expr="MASTER_SOURCE.SP_ID == DeviceInfo.SP_ID" left="MASTER_SOURCE" right="DeviceInfo" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>SELECT 
+            sp.SP_ID,
+            p.ADDRESS1,
+            p.CITY,
+            sl.DESCR AS SP_STATUS,
+            svl.DESCR AS SVC_TYPE,
+            latest_sa.SA_ID,
+            latest_sa.SA_STATUS,
+            latest_sa.SA_STATUS_FLG,
+            latest_sa.STOP_DTTM AS SA_STOP_DATE,
+            m.MSRMT_DTTM,
+            m.MSRMT_VAL
+        FROM CISADM.CI_SP sp
+        LEFT JOIN CISADM.CI_PREM p ON sp.PREM_ID = p.PREM_ID
+        LEFT JOIN CISADM.CI_SP_TYPE spt ON sp.SP_TYPE_CD = spt.SP_TYPE_CD
+        LEFT JOIN CISADM.CI_SVC_TYPE_L svl ON spt.SVC_TYPE_CD = svl.SVC_TYPE_CD AND svl.LANGUAGE_CD = 'ENG'
+        LEFT JOIN CISADM.CI_LOOKUP_VAL_L sl ON sp.SP_STATUS_FLG = sl.FIELD_VALUE AND sl.FIELD_NAME = 'SP_STATUS_FLG' AND sl.LANGUAGE_CD = 'ENG'
+        -- Normalized Meter Bridge
+        LEFT JOIN CISADM.D1_INSTALL_EVT ie ON sp.SP_ID = SUBSTR(ie.D1_SP_ID, 1, 10)
+        LEFT JOIN CISADM.D1_MEASR_COMP mc ON ie.DEVICE_CONFIG_ID = mc.DEVICE_CONFIG_ID
+        LEFT JOIN CISADM.D1_MSRMT m ON mc.MEASR_COMP_ID = m.MEASR_COMP_ID
+        -- Current SA Logic
+        LEFT JOIN (
+            SELECT SP_ID, SA_ID, SA_STATUS_FLG, DESCR AS SA_STATUS, STOP_DTTM
+            FROM (
+                SELECT sasp.SP_ID, sa.SA_ID, sa.SA_STATUS_FLG, l.DESCR, sasp.STOP_DTTM,
+                       ROW_NUMBER() OVER (PARTITION BY sasp.SP_ID ORDER BY sasp.START_DTTM DESC) as rn
+                FROM CISADM.CI_SA_SP sasp
+                JOIN CISADM.CI_SA sa ON sasp.SA_ID = sa.SA_ID
+                JOIN CISADM.CI_LOOKUP_VAL_L l ON sa.SA_STATUS_FLG = l.FIELD_VALUE 
+                     AND l.FIELD_NAME = 'SA_STATUS_FLG' AND l.LANGUAGE_CD = 'ENG'
+            ) WHERE rn = 1
+        ) latest_sa ON sp.SP_ID = latest_sa.SP_ID</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="MASTER_SOURCE" tableId="MASTER_SOURCE"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="DeviceInfo" tableId="DeviceInfo"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

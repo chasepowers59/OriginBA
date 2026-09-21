@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="CI_ACCT" label="1.) Account" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID" label="Account ID" resourceId="JoinTree_1.CI_ACCT.ACCT_ID"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle" resourceId="JoinTree_1.CI_ACCT.BILL_CYC_CD"></item>
+        <item id="CIS_DIVISION" label="CIS Division" resourceId="JoinTree_1.CI_ACCT.CIS_DIVISION"></item>
+        <item id="CUST_CL_CD" label="Customer Class" resourceId="JoinTree_1.CI_ACCT.CUST_CL_CD"></item>
+        <item id="COLL_CL_CD" label="Collection Class" resourceId="JoinTree_1.CI_ACCT.COLL_CL_CD"></item>
+        <item id="ACCT_MGMT_GRP_CD" label="Account Management Group" resourceId="JoinTree_1.CI_ACCT.ACCT_MGMT_GRP_CD"></item>
+        <item id="ACCESS_GRP_CD" label="Access Group" resourceId="JoinTree_1.CI_ACCT.ACCESS_GRP_CD"></item>
+        <item id="CURRENCY_CD" label="Currency Code" resourceId="JoinTree_1.CI_ACCT.CURRENCY_CD"></item>
+        <item id="SETUP_DT" label="Set Up Date" resourceId="JoinTree_1.CI_ACCT.SETUP_DT"></item>
+        <item id="CR_REVIEW_DT" label="Last Credit Review Date" resourceId="JoinTree_1.CI_ACCT.CR_REVIEW_DT"></item>
+        <item id="BUD_PLAN_CD" label="Budget Plan" resourceId="JoinTree_1.CI_ACCT.BUD_PLAN_CD"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="CI_SA" label="1.) SA (Service Agreement)" resourceId="JoinTree_1">
+      <items>
+        <item id="SA_ID" label="Service Agreement" resourceId="JoinTree_1.CI_SA.SA_ID"></item>
+        <item id="ACCT_ID_1" label="Account ID" resourceId="JoinTree_1.CI_SA.ACCT_ID"></item>
+        <item id="SA_TYPE_CD" label="SA Type" resourceId="JoinTree_1.CI_SA.SA_TYPE_CD"></item>
+        <item id="SA_STATUS_FLG" label="SA Status" resourceId="JoinTree_1.CI_SA.SA_STATUS_FLG"></item>
+        <item id="CIS_DIVISION_1" label="CIS Division" resourceId="JoinTree_1.CI_SA.CIS_DIVISION"></item>
+        <item id="CURRENCY_CD_1" label="Currency Code" resourceId="JoinTree_1.CI_SA.CURRENCY_CD"></item>
+        <item id="START_DT" label="SA Start Date" resourceId="JoinTree_1.CI_SA.START_DT"></item>
+        <item id="END_DT" label="SA End Date" resourceId="JoinTree_1.CI_SA.END_DT"></item>
+        <item id="CHAR_PREM_ID" label="Premise ID (SA)" resourceId="JoinTree_1.CI_SA.CHAR_PREM_ID"></item>
+        <item id="SA_REL_ID" label="SA Relationship ID" resourceId="JoinTree_1.CI_SA.SA_REL_ID"></item>
+        <item id="ALLOW_EST_SW" label="Allow Estimates" resourceId="JoinTree_1.CI_SA.ALLOW_EST_SW"></item>
+        <item id="CUST_READ_FLG" label="Customer Read" resourceId="JoinTree_1.CI_SA.CUST_READ_FLG"></item>
+        <item id="SIC_CD" label="SIC" resourceId="JoinTree_1.CI_SA.SIC_CD"></item>
+        <item id="START_OPT_CD" label="Start Option" resourceId="JoinTree_1.CI_SA.START_OPT_CD"></item>
+        <item id="STRT_RSN_FLG" label="Start Reason" resourceId="JoinTree_1.CI_SA.STRT_RSN_FLG"></item>
+        <item id="STOP_RSN_FLG" label="Stop Reason" resourceId="JoinTree_1.CI_SA.STOP_RSN_FLG"></item>
+        <item id="SPECIAL_USAGE_FLG" label="Special Usage" resourceId="JoinTree_1.CI_SA.SPECIAL_USAGE_FLG"></item>
+        <item id="EXPIRE_DT" label="Expire Date" resourceId="JoinTree_1.CI_SA.EXPIRE_DT"></item>
+        <item id="RENEWAL_DT" label="Renewal Date" resourceId="JoinTree_1.CI_SA.RENEWAL_DT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="HIGH_BILL_AMT" label="Maximum Bill Threshold" resourceId="JoinTree_1.CI_SA.HIGH_BILL_AMT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOT_TO_BILL_AMT" label="Total Amount to Bill" resourceId="JoinTree_1.CI_SA.TOT_TO_BILL_AMT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="D1_USAGE" label="1.) Usage" resourceId="JoinTree_1">
+      <items>
+        <item id="D1_USAGE_ID" label="Usage Transaction ID" resourceId="JoinTree_1.D1_USAGE.D1_USAGE_ID"></item>
+        <item id="US_ID" label="Usage Subscription" resourceId="JoinTree_1.D1_USAGE.US_ID"></item>
+        <item id="USG_EXT_ID" label="Usage External ID" resourceId="JoinTree_1.D1_USAGE.USG_EXT_ID"></item>
+        <item id="BO_STATUS_CD" label="Usage Status" resourceId="JoinTree_1.D1_USAGE.BO_STATUS_CD"></item>
+        <item id="BO_STATUS_REASON_CD" label="Usage Status Reason" resourceId="JoinTree_1.D1_USAGE.BO_STATUS_REASON_CD"></item>
+        <item id="START_DTTM" label="Usage Start Date/Time" resourceId="JoinTree_1.D1_USAGE.START_DTTM"></item>
+        <item id="END_DTTM" label="Usage End Date/Time" resourceId="JoinTree_1.D1_USAGE.END_DTTM"></item>
+        <item id="STATUS_UPD_DTTM" label="Usage Status Date/Time" resourceId="JoinTree_1.D1_USAGE.STATUS_UPD_DTTM"></item>
+        <item id="SCH_SELECTION_DT" label="Scheduled Selection Date" resourceId="JoinTree_1.D1_USAGE.SCH_SELECTION_DT"></item>
+        <item id="USG_GRP_CD" label="Calculation Group" resourceId="JoinTree_1.D1_USAGE.USG_GRP_CD"></item>
+        <item id="D1_USG_CAL_TYPE_CD" label="Usage Calculation Type" resourceId="JoinTree_1.D1_USAGE.D1_USG_CAL_TYPE_CD"></item>
+        <item id="D1_SPR_CD" label="Service Provider" resourceId="JoinTree_1.D1_USAGE.D1_SPR_CD"></item>
+        <item id="MSRMT_CYC_CD" label="Measurement Cycle" resourceId="JoinTree_1.D1_USAGE.MSRMT_CYC_CD"></item>
+        <item id="MSRMT_CYC_RTE_CD" label="Route" resourceId="JoinTree_1.D1_USAGE.MSRMT_CYC_RTE_CD"></item>
+        <item id="USED_ON_BILL_FLG" label="Used on Bill Flag" resourceId="JoinTree_1.D1_USAGE.USED_ON_BILL_FLG"></item>
+        <item id="LINKED_TO_FRZN_BSEG_FLG" label="Linked to Frozen Bill Segment" resourceId="JoinTree_1.D1_USAGE.LINKED_TO_FRZN_BSEG_FLG"></item>
+        <item id="USG_SRC_FLG" label="Usage Source" resourceId="JoinTree_1.D1_USAGE.USG_SRC_FLG"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOT_USG_TRANS_CNT" label="Total Usage Transaction Count" resourceId="JoinTree_1.D1_USAGE.TOT_USG_TRANS_CNT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="D1_USAGE_SCALAR_DTL" label="1.) Usage Scalar Detail" resourceId="JoinTree_1">
+      <items>
+        <item id="D1_USAGE_ID_1" label="Usage Transaction ID (Scalar)" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.D1_USAGE_ID"></item>
+        <item id="D1_SP_ID" label="Service Point ID" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.D1_SP_ID"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="SEQ_NUM" label="Sequence" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.SEQ_NUM"></item>
+        <item id="MEASR_COMP_ID" label="Measuring Component ID" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.MEASR_COMP_ID"></item>
+        <item id="D1_SQI_CD" label="SQI (Raw)" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.D1_SQI_CD"></item>
+        <item id="D1_TOU_CD" label="TOU (Raw)" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.D1_TOU_CD"></item>
+        <item id="D1_UOM_CD" label="UOM (Raw)" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.D1_UOM_CD"></item>
+        <item id="D1_FINAL_SQI_CD" label="Final SQI" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.D1_FINAL_SQI_CD"></item>
+        <item id="D1_FINAL_TOU_CD" label="Final TOU" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.D1_FINAL_TOU_CD"></item>
+        <item id="D1_FINAL_UOM_CD" label="Final UOM" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.D1_FINAL_UOM_CD"></item>
+        <item id="START_DTTM_1" label="Scalar Read Start" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.START_DTTM"></item>
+        <item id="END_DTTM_1" label="Scalar Read End" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.END_DTTM"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="START_MSRMT" label="Start Measurement" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.START_MSRMT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="END_MSRMT" label="End Measurement" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.END_MSRMT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="QUANTITY" label="Quantity (Raw)" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.QUANTITY"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="FINAL_QUANTITY" label="Final Quantity" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.FINAL_QUANTITY"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="APPLIED_MLTR" label="Applied Multiplier" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.APPLIED_MLTR"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="USE_PERCENT" label="Use Percent" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.USE_PERCENT"></item>
+        <item id="USG_GRP_CD_1" label="Calculation Group (Scalar)" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.USG_GRP_CD"></item>
+        <item id="USG_RULE_CD" label="Calculation Rule" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.USG_RULE_CD"></item>
+        <item id="D1_USAGE_FLG" label="Usage Flag" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.D1_USAGE_FLG"></item>
+        <item id="MEASR_COMP_USAGE_FLG" label="How To Use" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.MEASR_COMP_USAGE_FLG"></item>
+        <item id="MSR_PEAK_QTY_FLG" label="Measures Peak Quantity" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.MSR_PEAK_QTY_FLG"></item>
+        <item id="MSRMT_COND_FLG" label="Measurement Condition" resourceId="JoinTree_1.D1_USAGE_SCALAR_DTL.MSRMT_COND_FLG"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="CI_PREM" label="1.) Premise" resourceId="JoinTree_1">
+      <items>
+        <item id="PREM_ID" label="Premise ID" resourceId="JoinTree_1.CI_PREM.PREM_ID"></item>
+        <item id="ADDRESS1_UPR" label="Address" resourceId="JoinTree_1.CI_PREM.ADDRESS1_UPR"></item>
+        <item id="CITY_UPR" label="City" resourceId="JoinTree_1.CI_PREM.CITY_UPR"></item>
+        <item id="STATE" label="State" resourceId="JoinTree_1.CI_PREM.STATE"></item>
+        <item id="POSTAL" label="Postal" resourceId="JoinTree_1.CI_PREM.POSTAL"></item>
+        <item id="COUNTRY" label="Country" resourceId="JoinTree_1.CI_PREM.COUNTRY"></item>
+        <item id="COUNTY" label="County" resourceId="JoinTree_1.CI_PREM.COUNTY"></item>
+        <item id="PREM_TYPE_CD" label="Premise Type" resourceId="JoinTree_1.CI_PREM.PREM_TYPE_CD"></item>
+        <item id="CIS_DIVISION_2" label="CIS Division (Premise)" resourceId="JoinTree_1.CI_PREM.CIS_DIVISION"></item>
+        <item id="TIME_ZONE_CD" label="Time Zone" resourceId="JoinTree_1.CI_PREM.TIME_ZONE_CD"></item>
+        <item id="LS_SL_FLG" label="Life Support / Sensitive Load" resourceId="JoinTree_1.CI_PREM.LS_SL_FLG"></item>
+        <item id="LS_SL_DESCR" label="Life Support Details" resourceId="JoinTree_1.CI_PREM.LS_SL_DESCR"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet1" label="1.) Descriptions" resourceId="JoinTree_1">
+      <items>
+        <item id="DESCR_BILL_CYC" label="Bill Cycle Description" resourceId="JoinTree_1.CI_BILL_CYC_L.DESCR"></item>
+        <item id="DESCR_BUD_PLAN" label="Budget Plan Description" resourceId="JoinTree_1.CI_BUD_PLAN_L.DESCR"></item>
+        <item id="DESCR_COLL_CL" label="Collection Class Description" resourceId="JoinTree_1.CI_COLL_CL_L.DESCR"></item>
+        <item id="DESCR_CUST_CL" label="Customer Class Description" resourceId="JoinTree_1.CI_CUST_CL_L.DESCR"></item>
+        <item id="DESCR_ACCT_MGMT_GRP" label="Account Management Group Description" resourceId="JoinTree_1.CI_ACCT_MGMT_GR_L.DESCR"></item>
+        <item id="DESCR_SA_TYPE" label="SA Type Description" resourceId="JoinTree_1.CI_SA_TYPE_L.DESCR"></item>
+        <item id="DESCR_USG_STATUS" label="Usage Status Description" resourceId="JoinTree_1.F1_BUS_OBJ_STATUS_L.DESCR"></item>
+        <item id="DESCR_USG_GRP" label="Calculation Group Description (Usage)" resourceId="JoinTree_1.D1_USG_GRP_L.DESCR100"></item>
+        <item id="DESCR_USG_GRP_SCL" label="Calculation Group Description (Scalar)" resourceId="JoinTree_1.D1_USG_GRP_L_1.DESCR100"></item>
+        <item id="DESCR_USG_RULE" label="Calculation Rule Description" resourceId="JoinTree_1.D1_USG_RULE_L.DESCR100"></item>
+        <item id="DESCR_USG_CAL_TYPE" label="Usage Calculation Type Description" resourceId="JoinTree_1.D1_USG_CAL_TYPE_L.DESCR100"></item>
+        <item id="DESCR_SPR" label="Service Provider Description" resourceId="JoinTree_1.D1_SPR_L.DESCR100"></item>
+        <item id="DESCR_MSRMT_CYC" label="Measurement Cycle Description" resourceId="JoinTree_1.D1_MSRMT_CYC_L.DESCR100"></item>
+        <item id="DESCR_MSRMT_CYC_RTE" label="Route Description" resourceId="JoinTree_1.D1_MSRMT_CYC_RTE_L.DESCR100"></item>
+        <item id="DESCR_FINAL_SQI" label="Final SQI Description" resourceId="JoinTree_1.D1_SQI_L.DESCR100"></item>
+        <item id="DESCR_FINAL_TOU" label="Final TOU Description" resourceId="JoinTree_1.D1_TOU_L.DESCR100"></item>
+        <item id="DESCR_FINAL_UOM" label="Final UOM Description" resourceId="JoinTree_1.D1_UOM_L.DESCR100"></item>
+        <item id="DESCR_FINAL_UOM_SHORT" label="Final UOM Short" resourceId="JoinTree_1.D1_UOM_L.SHORT_DESCR"></item>
+        <item id="DESCR_TIME_ZONE" label="Time Zone Description" resourceId="JoinTree_1.CI_TIME_ZONE_L.DESCR"></item>
+        <item id="DESCR_PREM_TYPE" label="Premise Type Description" resourceId="JoinTree_1.CI_PREM_TYPE_L.DESCR"></item>
+        <item id="DESCR_SA_STATUS" label="SA Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+        <item id="DESCR_MEASR_COMP_USAGE" label="How To Use Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_2.DESCR"></item>
+        <item id="DESCR_MSRMT_COND" label="Measurement Condition Description" resourceId="JoinTree_1.F1_EXT_LOOKUP_VAL_L.DESCR"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet2" label="1.) Formulas" resourceId="JoinTree_1">
+      <items>
+        <item id="ENTITY_NAME_UPR" label="Customer Name" resourceId="JoinTree_1.CI_PER_NAME.ENTITY_NAME_UPR"></item>
+        <item id="D1_USAGE_ID_DISTINCT" label="Distinct Usage Transactions" resourceId="JoinTree_1.D1_USAGE_ID_DISTINCT"></item>
+        <item id="CI_ACCT_ID_DISTINCT" label="Distinct Accounts" resourceId="JoinTree_1.CI_ACCT_ID_DISTINCT"></item>
+        <item id="CI_SA_ID_DISTINCT" label="Distinct Service Agreements" resourceId="JoinTree_1.CI_SA_ID_DISTINCT"></item>
+        <item id="CHAR_PREM_ID_DISTINCT" label="Distinct Premises" resourceId="JoinTree_1.CHAR_PREM_ID_DISTINCT"></item>
+        <item id="DESCR_D1_USAGE_FLG" label="Usage Flag Description" resourceId="JoinTree_1.DESCR_D1_USAGE_FLG"></item>
+        <item id="DESCR_MSR_PEAK_QTY" label="Measures Peak Quantity Description" resourceId="JoinTree_1.DESCR_MSR_PEAK_QTY"></item>
+        <item id="DESCR_LINKED_FRZN" label="Linked to Frozen Bill Segment" resourceId="JoinTree_1.DESCR_LINKED_FRZN"></item>
+        <item id="DESCR_USED_ON_BILL" label="Used on Bill" resourceId="JoinTree_1.DESCR_USED_ON_BILL"></item>
+        <item id="DESCR_USG_SRC" label="Usage Source Description" resourceId="JoinTree_1.DESCR_USG_SRC"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="CI_ACCT" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="COLL_CL_CD" type="java.lang.String"></field>
+        <field id="ACCT_MGMT_GRP_CD" type="java.lang.String"></field>
+        <field id="ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="CURRENCY_CD" type="java.lang.String"></field>
+        <field id="SETUP_DT" type="java.sql.Timestamp"></field>
+        <field id="CR_REVIEW_DT" type="java.sql.Timestamp"></field>
+        <field id="BUD_PLAN_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_SA" datasourceId="Origin_DEV_DS" datasourceTableName="CI_SA" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CURRENCY_CD" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="CHAR_PREM_ID" type="java.lang.String"></field>
+        <field id="SA_REL_ID" type="java.lang.String"></field>
+        <field id="ALLOW_EST_SW" type="java.lang.String"></field>
+        <field id="CUST_READ_FLG" type="java.lang.String"></field>
+        <field id="SIC_CD" type="java.lang.String"></field>
+        <field id="START_OPT_CD" type="java.lang.String"></field>
+        <field id="STRT_RSN_FLG" type="java.lang.String"></field>
+        <field id="STOP_RSN_FLG" type="java.lang.String"></field>
+        <field id="SPECIAL_USAGE_FLG" type="java.lang.String"></field>
+        <field id="EXPIRE_DT" type="java.sql.Timestamp"></field>
+        <field id="RENEWAL_DT" type="java.sql.Timestamp"></field>
+        <field id="HIGH_BILL_AMT" type="java.math.BigDecimal"></field>
+        <field id="TOT_TO_BILL_AMT" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="C1_USAGE" datasourceId="Origin_DEV_DS" datasourceTableName="C1_USAGE" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USAGE_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SP_ID" type="java.lang.String"></field>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="END_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <filterString>BO_STATUS_CD == 'BD-PROC' and START_DTTM &gt;= ts'2025-11-01'</filterString>
+    </jdbcTable>
+    <jdbcTable id="D1_USAGE" datasourceId="Origin_DEV_DS" datasourceTableName="D1_USAGE" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="US_ID" type="java.lang.String"></field>
+        <field id="USG_EXT_ID" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="BO_STATUS_REASON_CD" type="java.lang.String"></field>
+        <field id="START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="SCH_SELECTION_DT" type="java.sql.Timestamp"></field>
+        <field id="USG_GRP_CD" type="java.lang.String"></field>
+        <field id="D1_USG_CAL_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_SPR_CD" type="java.lang.String"></field>
+        <field id="MSRMT_CYC_CD" type="java.lang.String"></field>
+        <field id="MSRMT_CYC_RTE_CD" type="java.lang.String"></field>
+        <field id="USED_ON_BILL_FLG" type="java.lang.String"></field>
+        <field id="LINKED_TO_FRZN_BSEG_FLG" type="java.lang.String"></field>
+        <field id="USG_SRC_FLG" type="java.lang.String"></field>
+        <field id="TOT_USG_TRANS_CNT" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <filterString>BO_STATUS_CD == 'SENT' and BUS_OBJ_CD == 'D2-UsageTransaction           '</filterString>
+    </jdbcTable>
+    <jdbcTable id="D1_USAGE_SCALAR_DTL" datasourceId="Origin_DEV_DS" datasourceTableName="D1_USAGE_SCALAR_DTL" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="SEQ_NUM" type="java.math.BigDecimal"></field>
+        <field id="MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="D1_SQI_CD" type="java.lang.String"></field>
+        <field id="D1_TOU_CD" type="java.lang.String"></field>
+        <field id="D1_UOM_CD" type="java.lang.String"></field>
+        <field id="D1_FINAL_SQI_CD" type="java.lang.String"></field>
+        <field id="D1_FINAL_TOU_CD" type="java.lang.String"></field>
+        <field id="D1_FINAL_UOM_CD" type="java.lang.String"></field>
+        <field id="START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="START_MSRMT" type="java.math.BigDecimal"></field>
+        <field id="END_MSRMT" type="java.math.BigDecimal"></field>
+        <field id="QUANTITY" type="java.math.BigDecimal"></field>
+        <field id="FINAL_QUANTITY" type="java.math.BigDecimal"></field>
+        <field id="APPLIED_MLTR" type="java.math.BigDecimal"></field>
+        <field id="USE_PERCENT" type="java.math.BigDecimal"></field>
+        <field id="USG_GRP_CD" type="java.lang.String"></field>
+        <field id="USG_RULE_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_FLG" type="java.lang.String"></field>
+        <field id="MEASR_COMP_USAGE_FLG" type="java.lang.String"></field>
+        <field id="MSR_PEAK_QTY_FLG" type="java.lang.String"></field>
+        <field id="MSRMT_COND_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_PREM" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PREM" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="PREM_TYPE_CD" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="ADDRESS1_UPR" type="java.lang.String"></field>
+        <field id="CITY_UPR" type="java.lang.String"></field>
+        <field id="STATE" type="java.lang.String"></field>
+        <field id="POSTAL" type="java.lang.String"></field>
+        <field id="COUNTRY" type="java.lang.String"></field>
+        <field id="COUNTY" type="java.lang.String"></field>
+        <field id="TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="LS_SL_FLG" type="java.lang.String"></field>
+        <field id="LS_SL_DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_ACCT_PER" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT_PER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="MAIN_CUST_SW" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>MAIN_CUST_SW == 'Y'</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_PER_NAME" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PER_NAME" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="ENTITY_NAME_UPR" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>NAME_TYPE_FLG == 'PRIM'</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_BILL_CYC_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BILL_CYC_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_BUD_PLAN_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BUD_PLAN_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BUD_PLAN_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_COLL_CL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_COLL_CL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="COLL_CL_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_CUST_CL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_CUST_CL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_ACCT_MGMT_GR_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT_MGMT_GR_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_MGMT_GRP_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_SA_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_SA_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="F1_BUS_OBJ_STATUS_L" datasourceId="Origin_DEV_DS" datasourceTableName="F1_BUS_OBJ_STATUS_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_USG_GRP_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_USG_GRP_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USG_GRP_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_USG_GRP_L_1" datasourceId="Origin_DEV_DS" datasourceTableName="D1_USG_GRP_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USG_GRP_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_USG_RULE_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_USG_RULE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USG_GRP_CD" type="java.lang.String"></field>
+        <field id="USG_RULE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_USG_CAL_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_USG_CAL_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_USG_CAL_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_SPR_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_SPR_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_SPR_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_MSRMT_CYC_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_MSRMT_CYC_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="MSRMT_CYC_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_MSRMT_CYC_RTE_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_MSRMT_CYC_RTE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="MSRMT_CYC_RTE_CD" type="java.lang.String"></field>
+        <field id="MSRMT_CYC_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_SQI_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_SQI_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_SQI_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_TOU_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_TOU_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_TOU_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_UOM_L" datasourceId="Origin_DEV_DS" datasourceTableName="D1_UOM_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_UOM_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR100" type="java.lang.String"></field>
+        <field id="SHORT_DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>FIELD_NAME == 'SA_STATUS_FLG                 ' and LANGUAGE_CD == 'ENG'</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L_2" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>FIELD_NAME == 'MEASR_COMP_USAGE_FLG         ' and LANGUAGE_CD == 'ENG'</filterString>
+    </jdbcTable>
+    <jdbcTable id="F1_EXT_LOOKUP_VAL_L" datasourceId="Origin_DEV_DS" datasourceTableName="F1_EXT_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="F1_EXT_LOOKUP_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_PREM_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PREM_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PREM_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_TIME_ZONE_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_TIME_ZONE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CI_LOOKUP_VAL_L_2.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_2.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_2.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_2.DESCR" type="java.lang.String"></field>
+        <field id="CI_TIME_ZONE_L.TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="CI_TIME_ZONE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_TIME_ZONE_L.DESCR" type="java.lang.String"></field>
+        <field id="D1_USG_GRP_L_1.USG_GRP_CD" type="java.lang.String"></field>
+        <field id="D1_USG_GRP_L_1.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_USG_GRP_L_1.DESCR100" type="java.lang.String"></field>
+        <field id="CI_PREM_TYPE_L.PREM_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_PREM_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_PREM_TYPE_L.DESCR" type="java.lang.String"></field>
+        <field id="D1_MSRMT_CYC_L.MSRMT_CYC_CD" type="java.lang.String"></field>
+        <field id="D1_MSRMT_CYC_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_MSRMT_CYC_L.DESCR100" type="java.lang.String"></field>
+        <field id="CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_MGMT_GR_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_MGMT_GR_L.DESCR" type="java.lang.String"></field>
+        <field id="D1_TOU_L.D1_TOU_CD" type="java.lang.String"></field>
+        <field id="D1_TOU_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_TOU_L.DESCR100" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.PER_ID" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.ENTITY_NAME_UPR" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.SEQ_NUM" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE_SCALAR_DTL.MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.D1_SQI_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.D1_TOU_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.D1_UOM_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.D1_FINAL_SQI_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.D1_FINAL_TOU_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.D1_FINAL_UOM_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE_SCALAR_DTL.END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE_SCALAR_DTL.START_MSRMT" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE_SCALAR_DTL.END_MSRMT" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE_SCALAR_DTL.QUANTITY" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE_SCALAR_DTL.FINAL_QUANTITY" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE_SCALAR_DTL.APPLIED_MLTR" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE_SCALAR_DTL.USE_PERCENT" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE_SCALAR_DTL.USG_GRP_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.USG_RULE_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.D1_USAGE_FLG" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.MEASR_COMP_USAGE_FLG" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.MSR_PEAK_QTY_FLG" type="java.lang.String"></field>
+        <field id="D1_USAGE_SCALAR_DTL.MSRMT_COND_FLG" type="java.lang.String"></field>
+        <field id="D1_USG_GRP_L.USG_GRP_CD" type="java.lang.String"></field>
+        <field id="D1_USG_GRP_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_USG_GRP_L.DESCR100" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_STATUS_L.BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_STATUS_L.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_STATUS_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="F1_BUS_OBJ_STATUS_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.PER_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="CI_PREM.PREM_ID" type="java.lang.String"></field>
+        <field id="CI_PREM.PREM_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_PREM.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CI_PREM.ADDRESS1_UPR" type="java.lang.String"></field>
+        <field id="CI_PREM.CITY_UPR" type="java.lang.String"></field>
+        <field id="CI_PREM.STATE" type="java.lang.String"></field>
+        <field id="CI_PREM.POSTAL" type="java.lang.String"></field>
+        <field id="CI_PREM.COUNTRY" type="java.lang.String"></field>
+        <field id="CI_PREM.COUNTY" type="java.lang.String"></field>
+        <field id="CI_PREM.TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="CI_PREM.LS_SL_FLG" type="java.lang.String"></field>
+        <field id="CI_PREM.LS_SL_DESCR" type="java.lang.String"></field>
+        <field id="C1_USAGE.USAGE_ID" type="java.lang.String"></field>
+        <field id="C1_USAGE.SA_ID" type="java.lang.String"></field>
+        <field id="C1_USAGE.SP_ID" type="java.lang.String"></field>
+        <field id="C1_USAGE.BSEG_ID" type="java.lang.String"></field>
+        <field id="C1_USAGE.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="C1_USAGE.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="C1_USAGE.START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="C1_USAGE.END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_ACCT.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CI_ACCT.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT.COLL_CL_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT.ACCT_MGMT_GRP_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT.ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT.CURRENCY_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT.SETUP_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_ACCT.CR_REVIEW_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_ACCT.BUD_PLAN_CD" type="java.lang.String"></field>
+        <field id="D1_SPR_L.D1_SPR_CD" type="java.lang.String"></field>
+        <field id="D1_SPR_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_SPR_L.DESCR100" type="java.lang.String"></field>
+        <field id="D1_MSRMT_CYC_RTE_L.MSRMT_CYC_RTE_CD" type="java.lang.String"></field>
+        <field id="D1_MSRMT_CYC_RTE_L.MSRMT_CYC_CD" type="java.lang.String"></field>
+        <field id="D1_MSRMT_CYC_RTE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_MSRMT_CYC_RTE_L.DESCR100" type="java.lang.String"></field>
+        <field id="CI_BILL_CYC_L.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_BILL_CYC_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_BILL_CYC_L.DESCR" type="java.lang.String"></field>
+        <field id="D1_USG_CAL_TYPE_L.D1_USG_CAL_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_USG_CAL_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_USG_CAL_TYPE_L.DESCR100" type="java.lang.String"></field>
+        <field id="CI_CUST_CL_L.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CI_CUST_CL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_CUST_CL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_BUD_PLAN_L.BUD_PLAN_CD" type="java.lang.String"></field>
+        <field id="CI_BUD_PLAN_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_BUD_PLAN_L.DESCR" type="java.lang.String"></field>
+        <field id="D1_SQI_L.D1_SQI_CD" type="java.lang.String"></field>
+        <field id="D1_SQI_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_SQI_L.DESCR100" type="java.lang.String"></field>
+        <field id="D1_USAGE.D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE.BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE.US_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE.USG_EXT_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE.BO_STATUS_REASON_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE.START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE.END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE.STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE.SCH_SELECTION_DT" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE.USG_GRP_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE.D1_USG_CAL_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE.D1_SPR_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE.MSRMT_CYC_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE.MSRMT_CYC_RTE_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE.USED_ON_BILL_FLG" type="java.lang.String"></field>
+        <field id="D1_USAGE.LINKED_TO_FRZN_BSEG_FLG" type="java.lang.String"></field>
+        <field id="D1_USAGE.USG_SRC_FLG" type="java.lang.String"></field>
+        <field id="D1_USAGE.TOT_USG_TRANS_CNT" type="java.math.BigDecimal"></field>
+        <field id="F1_EXT_LOOKUP_VAL_L.BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="F1_EXT_LOOKUP_VAL_L.F1_EXT_LOOKUP_VALUE" type="java.lang.String"></field>
+        <field id="F1_EXT_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="F1_EXT_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+        <field id="D1_UOM_L.D1_UOM_CD" type="java.lang.String"></field>
+        <field id="D1_UOM_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_UOM_L.DESCR100" type="java.lang.String"></field>
+        <field id="D1_UOM_L.SHORT_DESCR" type="java.lang.String"></field>
+        <field id="CI_SA.SA_ID" type="java.lang.String"></field>
+        <field id="CI_SA.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_SA.SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_SA.SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CI_SA.CURRENCY_CD" type="java.lang.String"></field>
+        <field id="CI_SA.START_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_SA.END_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_SA.CHAR_PREM_ID" type="java.lang.String"></field>
+        <field id="CI_SA.SA_REL_ID" type="java.lang.String"></field>
+        <field id="CI_SA.ALLOW_EST_SW" type="java.lang.String"></field>
+        <field id="CI_SA.CUST_READ_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.SIC_CD" type="java.lang.String"></field>
+        <field id="CI_SA.START_OPT_CD" type="java.lang.String"></field>
+        <field id="CI_SA.STRT_RSN_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.STOP_RSN_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.SPECIAL_USAGE_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.EXPIRE_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_SA.RENEWAL_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_SA.HIGH_BILL_AMT" type="java.math.BigDecimal"></field>
+        <field id="CI_SA.TOT_TO_BILL_AMT" type="java.math.BigDecimal"></field>
+        <field id="D1_USG_RULE_L.USG_GRP_CD" type="java.lang.String"></field>
+        <field id="D1_USG_RULE_L.USG_RULE_CD" type="java.lang.String"></field>
+        <field id="D1_USG_RULE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="D1_USG_RULE_L.DESCR100" type="java.lang.String"></field>
+        <field id="CI_COLL_CL_L.COLL_CL_CD" type="java.lang.String"></field>
+        <field id="CI_COLL_CL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_COLL_CL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_SA_TYPE_L.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CI_SA_TYPE_L.SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_SA_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_SA_TYPE_L.DESCR" type="java.lang.String"></field>
+        <field id="D1_USAGE_ID_DISTINCT" dataSetExpression="CountDistinct(D1_USAGE.D1_USAGE_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="CI_ACCT_ID_DISTINCT" dataSetExpression="CountDistinct(CI_ACCT.ACCT_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="CI_SA_ID_DISTINCT" dataSetExpression="CountDistinct(CI_SA.SA_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="CHAR_PREM_ID_DISTINCT" dataSetExpression="CountDistinct(CI_SA.CHAR_PREM_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="DESCR_D1_USAGE_FLG" dataSetExpression="Case(D1_USAGE_SCALAR_DTL.D1_USAGE_FLG, 'D2YS', 'Yes', 'D2NO', 'No', 'Unknown')" type="java.lang.String"></field>
+        <field id="DESCR_MSR_PEAK_QTY" dataSetExpression="Case(D1_USAGE_SCALAR_DTL.MSR_PEAK_QTY_FLG, 'D2YS', 'Yes', 'D2NO', 'No', 'Unknown')" type="java.lang.String"></field>
+        <field id="DESCR_LINKED_FRZN" dataSetExpression="Case(D1_USAGE.LINKED_TO_FRZN_BSEG_FLG, 'D2YS', 'Yes', 'D2NO', 'No', 'Unknown')" type="java.lang.String"></field>
+        <field id="DESCR_USED_ON_BILL" dataSetExpression="Case(D1_USAGE.USED_ON_BILL_FLG, 'D2YS', 'Yes', 'D2NO', 'No', 'Unknown')" type="java.lang.String"></field>
+        <field id="DESCR_USG_SRC" dataSetExpression="Case(D1_USAGE.USG_SRC_FLG, 'D2SY', 'System', 'D2MN', 'Manual', 'D2EX', 'External', 'Unknown')" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG' and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'MEASR_COMP_USAGE_FLG         ' and CI_ACCT_PER.MAIN_CUST_SW == 'Y' and C1_USAGE.BO_STATUS_CD == 'BD-PROC' and C1_USAGE.START_DTTM &gt;= ts'2025-11-01' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG' and D1_USAGE.BO_STATUS_CD == 'SENT' and D1_USAGE.BUS_OBJ_CD == 'D2-UsageTransaction           ' and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM' and CI_LOOKUP_VAL_L.FIELD_NAME == 'SA_STATUS_FLG                 '</filterString>
+      <joinInfo alias="CI_ACCT" referenceId="CI_ACCT"></joinInfo>
+      <joinList>
+        <join expr="CI_ACCT.ACCT_ID == CI_SA.ACCT_ID" left="CI_ACCT" right="CI_SA" type="inner" weight="1"></join>
+        <join expr="CI_SA.SA_ID == C1_USAGE.SA_ID" left="CI_SA" right="C1_USAGE" type="inner" weight="1"></join>
+        <join expr="C1_USAGE.USAGE_ID == D1_USAGE.USG_EXT_ID" left="C1_USAGE" right="D1_USAGE" type="inner" weight="1"></join>
+        <join expr="D1_USAGE.D1_USAGE_ID == D1_USAGE_SCALAR_DTL.D1_USAGE_ID" left="D1_USAGE" right="D1_USAGE_SCALAR_DTL" type="leftOuter" weight="1"></join>
+        <join expr="CI_SA.CHAR_PREM_ID == CI_PREM.PREM_ID" left="CI_SA" right="CI_PREM" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID" left="CI_ACCT" right="CI_ACCT_PER" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID" left="CI_ACCT_PER" right="CI_PER_NAME" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT" right="CI_BILL_CYC_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT.BUD_PLAN_CD == CI_BUD_PLAN_L.BUD_PLAN_CD and CI_BUD_PLAN_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT" right="CI_BUD_PLAN_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT.COLL_CL_CD == CI_COLL_CL_L.COLL_CL_CD and CI_COLL_CL_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT" right="CI_COLL_CL_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT.CUST_CL_CD == CI_CUST_CL_L.CUST_CL_CD and CI_CUST_CL_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT" right="CI_CUST_CL_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT.ACCT_MGMT_GRP_CD == CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD and CI_ACCT_MGMT_GR_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT" right="CI_ACCT_MGMT_GR_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_SA.SA_TYPE_CD == CI_SA_TYPE_L.SA_TYPE_CD and CI_SA.CIS_DIVISION == CI_SA_TYPE_L.CIS_DIVISION and CI_SA_TYPE_L.LANGUAGE_CD == 'ENG'" left="CI_SA" right="CI_SA_TYPE_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L.BO_STATUS_CD and D1_USAGE.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L.BUS_OBJ_CD and F1_BUS_OBJ_STATUS_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE" right="F1_BUS_OBJ_STATUS_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE.USG_GRP_CD == D1_USG_GRP_L.USG_GRP_CD and D1_USG_GRP_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE" right="D1_USG_GRP_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE.D1_USG_CAL_TYPE_CD == D1_USG_CAL_TYPE_L.D1_USG_CAL_TYPE_CD and D1_USG_CAL_TYPE_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE" right="D1_USG_CAL_TYPE_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE.D1_SPR_CD == D1_SPR_L.D1_SPR_CD and D1_SPR_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE" right="D1_SPR_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE.MSRMT_CYC_CD == D1_MSRMT_CYC_L.MSRMT_CYC_CD and D1_MSRMT_CYC_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE" right="D1_MSRMT_CYC_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE.MSRMT_CYC_RTE_CD == D1_MSRMT_CYC_RTE_L.MSRMT_CYC_RTE_CD and D1_USAGE.MSRMT_CYC_CD == D1_MSRMT_CYC_RTE_L.MSRMT_CYC_CD and D1_MSRMT_CYC_RTE_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE" right="D1_MSRMT_CYC_RTE_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_SCALAR_DTL.D1_FINAL_SQI_CD == D1_SQI_L.D1_SQI_CD and D1_SQI_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE_SCALAR_DTL" right="D1_SQI_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_SCALAR_DTL.D1_FINAL_TOU_CD == D1_TOU_L.D1_TOU_CD and D1_TOU_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE_SCALAR_DTL" right="D1_TOU_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_SCALAR_DTL.D1_FINAL_UOM_CD == D1_UOM_L.D1_UOM_CD and D1_UOM_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE_SCALAR_DTL" right="D1_UOM_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_SCALAR_DTL.USG_GRP_CD == D1_USG_GRP_L_1.USG_GRP_CD and D1_USG_GRP_L_1.LANGUAGE_CD == 'ENG'" left="D1_USAGE_SCALAR_DTL" right="D1_USG_GRP_L_1" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_SCALAR_DTL.USG_GRP_CD == D1_USG_RULE_L.USG_GRP_CD and D1_USAGE_SCALAR_DTL.USG_RULE_CD == D1_USG_RULE_L.USG_RULE_CD and D1_USG_RULE_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE_SCALAR_DTL" right="D1_USG_RULE_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_SA.SA_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'SA_STATUS_FLG                 ' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="CI_SA" right="CI_LOOKUP_VAL_L" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_SCALAR_DTL.MEASR_COMP_USAGE_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'MEASR_COMP_USAGE_FLG         ' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'" left="D1_USAGE_SCALAR_DTL" right="CI_LOOKUP_VAL_L_2" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE_SCALAR_DTL.MSRMT_COND_FLG == F1_EXT_LOOKUP_VAL_L.F1_EXT_LOOKUP_VALUE and F1_EXT_LOOKUP_VAL_L.BUS_OBJ_CD == 'D1-MeasurementConditionLookup' and F1_EXT_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="D1_USAGE_SCALAR_DTL" right="F1_EXT_LOOKUP_VAL_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_PREM.PREM_TYPE_CD == CI_PREM_TYPE_L.PREM_TYPE_CD and CI_PREM_TYPE_L.LANGUAGE_CD == 'ENG'" left="CI_PREM" right="CI_PREM_TYPE_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_PREM.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'" left="CI_PREM" right="CI_TIME_ZONE_L" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_TIME_ZONE_L" tableId="CI_TIME_ZONE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L" tableId="F1_BUS_OBJ_STATUS_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PREM" tableId="CI_PREM"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_USG_RULE_L" tableId="D1_USG_RULE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_COLL_CL_L" tableId="CI_COLL_CL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_USG_GRP_L_1" tableId="D1_USG_GRP_L_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_SQI_L" tableId="D1_SQI_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_SA" tableId="CI_SA"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BUD_PLAN_L" tableId="CI_BUD_PLAN_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_MSRMT_CYC_RTE_L" tableId="D1_MSRMT_CYC_RTE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_MGMT_GR_L" tableId="CI_ACCT_MGMT_GR_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_SA_TYPE_L" tableId="CI_SA_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_USG_GRP_L" tableId="D1_USG_GRP_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_USG_CAL_TYPE_L" tableId="D1_USG_CAL_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="C1_USAGE" tableId="C1_USAGE"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT" tableId="CI_ACCT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_SPR_L" tableId="D1_SPR_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_CUST_CL_L" tableId="CI_CUST_CL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PREM_TYPE_L" tableId="CI_PREM_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_2" tableId="CI_LOOKUP_VAL_L_2"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_USAGE_SCALAR_DTL" tableId="D1_USAGE_SCALAR_DTL"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_MSRMT_CYC_L" tableId="D1_MSRMT_CYC_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_TOU_L" tableId="D1_TOU_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BILL_CYC_L" tableId="CI_BILL_CYC_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L" tableId="F1_EXT_LOOKUP_VAL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_USAGE" tableId="D1_USAGE"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_UOM_L" tableId="D1_UOM_L"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

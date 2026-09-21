@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Pending_Bills" label="Pending_Bills" resourceId="Pending_Bills"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account Id" resourceId="Pending_Bills.ACCT_ID"></item>
+    <item id="BILL_CYC_CD" label="Bill Cycle " resourceId="Pending_Bills.BILL_CYC_CD"></item>
+    <item id="BILL_ID" label="Bill Id" resourceId="Pending_Bills.BILL_ID"></item>
+    <item id="CRE_DTTM" label="Create Date/Time" resourceId="Pending_Bills.CRE_DTTM"></item>
+    <item id="CUST_CL_CD" label="Customer Class" resourceId="Pending_Bills.CUST_CL_CD"></item>
+    <item id="ENTITY_NAME" label="Entity Name" resourceId="Pending_Bills.ENTITY_NAME"></item>
+    <item id="WIN_START_DT" label="Window Start Date" resourceId="Pending_Bills.WIN_START_DT"></item>
+    <item id="BSEG_ID" label="Bill Segment Id" resourceId="Pending_Bills.BSEG_ID"></item>
+    <item id="BSEG_STAT_FLG" label="Bill Segment Status" resourceId="Pending_Bills.BSEG_STAT_FLG"></item>
+    <item id="SUM_CALC_AMT_" label="Calculated Amount" resourceId="Pending_Bills.SUM_CALC_AMT_"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Pending_Bills" datasourceId="Newark1_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="WIN_START_DT" type="java.sql.Timestamp"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="BSEG_STAT_FLG" type="java.lang.String"></field>
+        <field id="SUM_CALC_AMT_" fieldDBName="SUM(CALC_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT B.ACCT_ID, PN.ENTITY_NAME, ACCT.CUST_CL_CD, B.BILL_ID, B.BILL_CYC_CD, B.WIN_START_DT, B.CRE_DTTM, BS.BSEG_ID, BS.BSEG_STAT_FLG, sum(CALC_AMT)
+FROM CISADM.CI_BILL B
+INNER JOIN CISADM.CI_ACCT ACCT ON ACCT.ACCT_ID = B.ACCT_ID
+INNER JOIN CISADM.CI_ACCT_PER AP ON AP.ACCT_ID = ACCT.ACCT_ID
+    AND AP.MAIN_CUST_SW = 'Y'
+INNER JOIN CISADM.CI_PER_NAME PN ON PN.PER_ID = AP.PER_ID
+    AND PN.PRIM_NAME_SW = 'Y'
+INNER JOIN CISADM.CI_BSEG BS on B.BILL_ID = BS.BILL_ID    
+LEFT OUTER JOIN CISADM.CI_BSEG_CALC BC on BS.BSEG_ID = BC.BSEG_ID
+WHERE B.BILL_STAT_FLG = 'P'
+group by B.ACCT_ID, PN.ENTITY_NAME, ACCT.CUST_CL_CD, B.BILL_ID, B.BILL_CYC_CD, B.WIN_START_DT, B.CRE_DTTM, BS.BSEG_ID, BS.BSEG_STAT_FLG</query>
+    </jdbcQuery>
+  </resources>
+</schema>

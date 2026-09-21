@@ -1,0 +1,936 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 8.2.0.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ELL Billed Revenue Report" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" isFloatColumnFooter="true" isIgnorePagination="true" uuid="07f1d5f2-336a-495e-acbb-1adb53af5138">
+	<property name="net.sf.jasperreports.export.xls.collapse.row.span" value="false"/>
+	<property name="net.sf.jasperreports.export.html.border.collapse" value="collapse"/>
+	<property name="net.sf.jasperreports.export.docx.frames.as.nested.tables" value="false"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.actual.size" value="true"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.group.indent" value="0"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.min.group.label.width" value="100"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.detail.band.height" value="25"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.header.band.height" value="25"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.row.header.width" value="125"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.cell.width" value="100"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.cell.height" value="20"/>
+	<property name="com.jaspersoft.ji.adhoc" value="1"/>
+	<property name="com.jaspersoft.ji.adhoc.preferredDataStrategy" value="domainDataStrategy"/>
+	<property name="net.sf.jasperreports.export.pdf.tagged" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.tag.language" value="EN-US"/>
+	<property name="net.sf.jasperreports.export.pdf.metadata.title" value="Ad Hoc Report"/>
+	<property name="net.sf.jasperreports.export.pdf.display.metadata.title" value="true"/>
+	<property name="net.sf.jasperreports.text.truncate.suffix" value="..."/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.size.page.to.content" value="true"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="asingh|Ellensburg"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Report/Custom_Reports/ELL_Billed_Revenue/ELL_Billed_Revenue_Report"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Report/Custom_Reports/ELL_Billed_Revenue/ELL_Billed_Revenue_Report_files/mainReportJrxml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<propertyExpression name="com.jaspersoft.jrs.export.report.empty"><![CDATA[$P{com.jaspersoft.jrs.report.data.source.is.empty} == null? null : $P{com.jaspersoft.jrs.report.data.source.is.empty}.toString()]]></propertyExpression>
+	<import value="com.jaspersoft.ji.adhoc.jr.AdhocReportUtils"/>
+	<style name="ReportDefault" isDefault="true" mode="Transparent" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<pen lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableBaseFrameStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableFrameStyle" style="TableBaseFrameStyle">
+		<box padding="0">
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<bottomPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnFooterFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<pen lineWidth="1.0" lineStyle="Solid"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#D9E4F1">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#F2F2F2">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#F2F2F2" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableSummaryFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableSummaryTextNoBorderStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" fontName="DejaVu Sans" isBold="true">
+		<box leftPadding="5" rightPadding="5"/>
+	</style>
+	<style name="TableSummaryTextStyle" style="TableSummaryTextNoBorderStyle">
+		<box>
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableTitleFrameStyle" style="TableFrameStyle">
+		<box topPadding="0" bottomPadding="0">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableTitleTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box bottomPadding="8">
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableDetailFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableDetailTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="false">
+		<box leftPadding="5" rightPadding="5">
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{PAGE_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="ChartReportTitle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box>
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineStyle="Solid"/>
+		</box>
+	</style>
+	<style name="ChartTitle" forecolor="#000000" fontName="DejaVu Sans" fontSize="12" isBold="true"/>
+	<style name="ChartSubtitle" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartLegend" forecolor="#000000" backcolor="#FFFFFF" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartSeriesColor0" backcolor="#87C4FE"/>
+	<style name="ChartSeriesColor1" backcolor="#E96270"/>
+	<style name="ChartSeriesColor2" backcolor="#D1D1D1"/>
+	<style name="ChartSeriesColor3" backcolor="#FFEE99"/>
+	<style name="ChartSeriesColor4" backcolor="#6164FF"/>
+	<style name="ChartSeriesColor5" backcolor="#B0E992"/>
+	<style name="ChartSeriesColor6" backcolor="#AE9CEA"/>
+	<style name="ChartSeriesColor7" backcolor="#F5B05E"/>
+	<style name="ChartSeriesColor8" backcolor="#589EE1"/>
+	<style name="ChartSeriesColor9" backcolor="#AE4E59"/>
+	<style name="ChartSeriesColor10" backcolor="#747474"/>
+	<style name="ChartSeriesColor11" backcolor="#E2DC77"/>
+	<style name="ChartSeriesColor12" backcolor="#4749A5"/>
+	<style name="ChartSeriesColor13" backcolor="#81B963"/>
+	<style name="ChartSeriesColor14" backcolor="#7764B4"/>
+	<style name="ChartSeriesColor15" backcolor="#F27B4C"/>
+	<style name="ChartCategoryAxisLabelFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="ChartCategoryAxisTickFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartValueAxisLabelFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="ChartValueAxisTickFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartContext" backcolor="#D1CA67"/>
+	<style name="CrosstabElementStyle" mode="Transparent" forecolor="#000033" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseCellStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseTextStyle" mode="Opaque" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Top" vImageAlign="Top" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box topPadding="3" leftPadding="5" bottomPadding="3" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabTitleTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" fontSize="18" isBold="false">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabHeaderLabelStyle" style="CrosstabHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabMeasureHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabMeasureHeaderLabelStyle" style="CrosstabMeasureHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabColumnMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" isBold="false"/>
+	<style name="CrosstabRowMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabColumnDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#D9E4F1" hTextAlign="Center" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDetailTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Right" hImageAlign="Right" isBold="false">
+		<box>
+			<topPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" hTextAlign="Right" hImageAlign="Right" isBold="true"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDummyHeaderTextStyle" style="CrosstabBaseTextStyle" backcolor="#F2F2F2"/>
+	<style name="CrosstabRowDimensionHeaderTextStyle_CI_SA_RS_HIST.RS_CD" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{CI_SA_RS_HIST.RS_CD}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_CI_FT.GL_DIVISION" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{CI_FT.GL_DIVISION}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_CI_ACCT.CIS_DIVISION_1" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{CI_ACCT.CIS_DIVISION_1}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_CI_ACCT.CUST_CL_CD" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{CI_ACCT.CUST_CL_CD}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle_CI_SA_TYPE.SVC_TYPE_CD" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{CI_SA_TYPE.SVC_TYPE_CD}).isTotal()]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabInnerRowDimensionHeaderTextStyle" style="CrosstabRowDimensionHeaderTextStyle_CI_SA_TYPE.SVC_TYPE_CD">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="com.jaspersoft.jrs.report.data.source.is.empty" class="java.lang.Boolean" isForPrompting="false">
+		<property name="net.sf.jasperreports.data.cache.included" value="true"/>
+	</parameter>
+	<parameter name="REPORT_TITLE" class="java.lang.String" isForPrompting="false">
+		<property name="net.sf.jasperreports.data.cache.included" value="true"/>
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Collator" class="java.text.Collator" isForPrompting="false">
+		<defaultValueExpression><![CDATA[java.text.Collator.getInstance($P{REPORT_LOCALE})]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ReportTitle" class="java.lang.String">
+		<property name="net.sf.jasperreports.data.cache.included" value=""/>
+		<defaultValueExpression><![CDATA["Billed Revenue Report"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BILL_DT_1" class="net.sf.jasperreports.types.date.DateRange" isForPrompting="false"/>
+	<parameter name="BILL_DT_2" class="net.sf.jasperreports.types.date.DateRange" isForPrompting="false"/>
+	<parameter name="LoggedInUsername" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="GL_DIVISION_1" class="java.util.Collection" isForPrompting="false"/>
+	<parameter name="CLOSING_BSEG_SW_1" class="java.util.Collection" isForPrompting="false"/>
+	<parameter name="RS_CD_1" class="java.util.Collection" isForPrompting="false"/>
+	<parameter name="CUST_CL_CD_1" class="java.util.Collection" isForPrompting="false"/>
+	<field name="CI_ACCT.CUST_CL_CD" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="CI_SA_TYPE.SVC_TYPE_CD" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="CI_BSEG.CLOSING_BSEG_SW" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CI_SA_RS_HIST.RS_CD" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="Sum_CI_FT_CUR_AMT" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CI_BILL.BILL_DT" class="java.sql.Timestamp">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CI_ACCT.CIS_DIVISION" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CI_FT.GL_DIVISION" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="CI_FT.CUR_AMT" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CI_ACCT.CIS_DIVISION_1" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="Measures" class="java.lang.String">
+		<property name="udds_mapping" value="COLUMN_LEVEL"/>
+	</field>
+	<field name="Measures__IDENTIFIER" class="java.lang.String">
+		<property name="udds_mapping" value="COLUMN_MEASURE_ID"/>
+	</field>
+	<field name="CI_FT.CUR_AMT_m0" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Current Amount"/>
+	</field>
+	<field name="CI_SA_RS_HIST.RS_CD__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="CI_SA_RS_HIST.RS_CD__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="CI_FT.GL_DIVISION__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="CI_FT.GL_DIVISION__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="CI_ACCT.CIS_DIVISION_1__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="CI_ACCT.CIS_DIVISION_1__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="CI_ACCT.CUST_CL_CD__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="CI_ACCT.CUST_CL_CD__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="CI_SA_TYPE.SVC_TYPE_CD__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="CI_SA_TYPE.SVC_TYPE_CD__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="Measures__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="COLUMN_RAW_VALUE"/>
+	</field>
+	<title>
+		<band height="1" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="180">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement x="0" y="0" width="752" height="180" uuid="5421f230-1dd0-4c6b-876b-509abad93210">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="752" height="30" uuid="7bf9f667-f31c-44a2-9642-4f7bf816b833">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{ReportTitle}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="30" width="190" height="20" uuid="fa0f7ba9-ab8c-4379-a1ce-c2757ef0822d">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Selection Values"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="170" y="50" width="190" height="20" uuid="4b6c968b-df01-412f-be6f-91d153c5fbd2">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($P{BILL_DT_1}==null?"                        ":($P{BILL_DT_1}.getStart()==null?"                         ":DATEFORMAT($P{BILL_DT_1}.getStart(),"MMM. dd, yyyy")))]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="170" y="90" width="582" height="20" uuid="5de30567-0763-42e0-8a48-fba9d67d88a0">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($P{GL_DIVISION_1}.isEmpty()?"All":$P{GL_DIVISION_1}.toString().replaceAll( "   ,", "," ).replaceAll( "  ,", "," ).replaceAll( "  ", "" ))]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement stretchType="ContainerBottom" x="170" y="110" width="582" height="20" uuid="ef7c2f95-83bf-4a31-8468-d186a6dd9de9">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+						<paragraph leftIndent="0"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($P{CLOSING_BSEG_SW_1}.isEmpty()?"All":$P{CLOSING_BSEG_SW_1}.toString().replaceAll( "   ,", "," ).replaceAll( "  ,", "," ).replaceAll( "  ", "" ))]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="50" width="160" height="20" uuid="57768c95-7b5f-4c9f-9e51-15e17061e504">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Bill Date (From)"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="90" width="160" height="20" uuid="df265f40-0ddf-437e-9a9a-b5cc673bce9f">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["General Ledger Division"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="110" width="160" height="20" uuid="7ff68594-1dc6-4936-b6b5-d3c03ffa4b3a">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Closing Bill Segment"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="155" y="50" width="20" height="20" uuid="c982f9b7-0427-4d01-9bb3-3b909ca9a3f3">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Center">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="155" y="90" width="20" height="20" uuid="9f1ab0ff-0c02-4f34-a5e6-5d744fa982f0">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Center">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="155" y="110" width="20" height="20" uuid="240c29f2-a83b-4d5b-88a8-d0444456bf01">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Center">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+				</textField>
+				<frame>
+					<reportElement x="472" y="30" width="280" height="60" uuid="638f14d9-3f0d-4242-80c1-d61b3e4aa821">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textField>
+						<reportElement x="10" y="0" width="110" height="20" uuid="75e899e7-6da8-47f3-a62b-d0cd933127da">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box leftPadding="15" bottomPadding="0" rightPadding="0"/>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Page"]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="120" y="0" width="15" height="20" uuid="c17095e8-73ae-4290-b7ef-4443b8120fcf">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box leftPadding="0" bottomPadding="0" rightPadding="0"/>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="135" y="0" width="40" height="20" uuid="b5253803-fe9d-48d2-a1c2-6780ca9ab34d">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box leftPadding="1" bottomPadding="0" rightPadding="0"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+					</textField>
+					<textField evaluationTime="Report">
+						<reportElement x="175" y="0" width="105" height="20" uuid="a4b1b93e-7fac-41fb-9a51-9d225acc1684">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box leftPadding="0" bottomPadding="0" rightPadding="5"/>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA[" of "+$V{PAGE_NUMBER}]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="10" y="20" width="110" height="20" uuid="31d53c5e-0be9-4cc0-9ed8-5ad677ad390e">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="15" rightPadding="0"/>
+						<textElement>
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Run Date/Time"]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="120" y="20" width="160" height="20" uuid="98aa2fde-109f-498f-bb79-0b908fed5f50">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="5"/>
+						<textElement>
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA[": "+DATEFORMAT(new Date(),"MMM. dd, yyyy hh:mm a")]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="10" y="40" width="110" height="20" uuid="5e2d33b1-c033-41b3-8094-8d1dc81a4596">
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="15" rightPadding="0"/>
+						<textElement>
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Prepared By"]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="120" y="40" width="160" height="20" uuid="989c945a-404f-49ce-be88-bbbb27f34fcb">
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="5"/>
+						<textElement>
+							<font size="12"/>
+						</textElement>
+						<textFieldExpression><![CDATA[": "+$P{LoggedInUsername}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<textField>
+					<reportElement x="0" y="70" width="160" height="20" uuid="dcb489b9-9e77-43e4-80ea-5f5f7daa664c">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Bill Date (To)"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="155" y="70" width="20" height="20" uuid="4635153c-5e60-4612-98ae-4c30f0d35387">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Center">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="170" y="70" width="190" height="20" uuid="5a0c2187-87c3-4713-8517-510366430bc3">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($P{BILL_DT_2}==null?"                        ":($P{BILL_DT_2}.getStart()==null?"                        ":DATEFORMAT($P{BILL_DT_2}.getStart(),"MMM. dd, yyyy")))]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="130" width="160" height="20" uuid="8ea9a79f-34b6-4cb0-b664-79a1ae1b1199">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Customer Class"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="155" y="130" width="20" height="20" uuid="82a22f53-2975-452c-a0f0-76c04f790434">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Center">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement stretchType="ContainerBottom" x="170" y="130" width="582" height="20" uuid="e1ba2a92-984d-4e96-84dd-c2f84618c057">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+						<paragraph leftIndent="0"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($P{CUST_CL_CD_1}.isEmpty()?"All":$P{CUST_CL_CD_1}.toString().replaceAll( "   ,", "," ).replaceAll( "  ,", "," ).replaceAll( "  ", "" ))]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="150" width="160" height="20" uuid="05bc9228-0644-4d1b-a6e7-9fd84933f01a">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Rate Schedule"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="155" y="150" width="20" height="20" uuid="93378912-2fa9-4715-8fe9-68bff8b101b3">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Center">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement stretchType="ContainerBottom" x="170" y="150" width="582" height="20" uuid="3e85ea3a-8620-4801-b034-d72cb0f7bd46">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+						<paragraph leftIndent="0"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($P{RS_CD_1}.isEmpty()?"All":$P{RS_CD_1}.toString().replaceAll( "   ,", "," ).replaceAll( " ,", "," ).replaceAll( "  ", "" ))]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageHeader>
+	<summary>
+		<band height="25" splitType="Stretch">
+			<crosstab>
+				<reportElement style="CrosstabElementStyle" x="0" y="0" width="752" height="25" uuid="24a4d579-fe2d-4f0a-ae78-2127a7672fb6"/>
+				<crosstabParameter name="CrosstabRowGroupsCount" class="java.lang.Integer">
+					<parameterValueExpression><![CDATA[new Integer(5)]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="CrosstabColumnGroupsCount" class="java.lang.Integer">
+					<parameterValueExpression><![CDATA[new Integer(1)]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabDataset isDataPreSorted="true"/>
+				<rowGroup name="CI_SA_RS_HIST.RS_CD" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{CI_SA_RS_HIST.RS_CD__RAW}, $F{CI_SA_RS_HIST.RS_CD}, $F{CI_SA_RS_HIST.RS_CD__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_CI_SA_RS_HIST.RS_CD" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="cdea9737-4cbd-401f-a564-66de2b5a52e4"/>
+								<textFieldExpression><![CDATA[$V{CI_SA_RS_HIST.RS_CD}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{CI_SA_RS_HIST.RS_CD}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="CI_FT.GL_DIVISION" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{CI_FT.GL_DIVISION__RAW}, $F{CI_FT.GL_DIVISION}, $F{CI_FT.GL_DIVISION__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_CI_FT.GL_DIVISION" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="bcab395a-ffe7-49f4-bc54-47de1d0c9f37"/>
+								<textFieldExpression><![CDATA[$V{CI_FT.GL_DIVISION}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{CI_FT.GL_DIVISION}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="CI_ACCT.CIS_DIVISION_1" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{CI_ACCT.CIS_DIVISION_1__RAW}, $F{CI_ACCT.CIS_DIVISION_1}, $F{CI_ACCT.CIS_DIVISION_1__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_CI_ACCT.CIS_DIVISION_1" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="71e49e78-6408-49ea-b202-3d94c349069b"/>
+								<textFieldExpression><![CDATA[$V{CI_ACCT.CIS_DIVISION_1}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{CI_ACCT.CIS_DIVISION_1}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="CI_ACCT.CUST_CL_CD" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{CI_ACCT.CUST_CL_CD__RAW}, $F{CI_ACCT.CUST_CL_CD}, $F{CI_ACCT.CUST_CL_CD__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabRowDimensionHeaderTextStyle_CI_ACCT.CUST_CL_CD" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="2cbde3f4-d955-4e7b-8acf-ddc156ff6e60"/>
+								<textFieldExpression><![CDATA[$V{CI_ACCT.CUST_CL_CD}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{CI_ACCT.CUST_CL_CD}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="CI_SA_TYPE.SVC_TYPE_CD" width="125" headerPosition="Stretch">
+					<bucket class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{CI_SA_TYPE.SVC_TYPE_CD__RAW}, $F{CI_SA_TYPE.SVC_TYPE_CD}, $F{CI_SA_TYPE.SVC_TYPE_CD__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabInnerRowDimensionHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="158d46e0-c43e-42de-9034-b67a114a0df6"/>
+								<textFieldExpression><![CDATA[$V{CI_SA_TYPE.SVC_TYPE_CD}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{CI_SA_TYPE.SVC_TYPE_CD}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="Measures" height="20" headerPosition="Stretch">
+					<bucket class="net.sf.jasperreports.engine.util.DisplayComparableValue">
+						<bucketExpression><![CDATA[new net.sf.jasperreports.engine.util.DisplayComparableValue($F{Measures__IDENTIFIER}, $F{Measures})]]></bucketExpression>
+						<comparatorExpression><![CDATA[new net.sf.jasperreports.engine.util.DisplayValueLabelComparator($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="20" uuid="2e6df139-445e-4146-aeba-784c369063ae">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="0"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{CI_SA_RS_HIST.RS_CD} != null) ? $R{CI_SA_RS_HIST.RS_CD} : "CI_SA_RS_HIST.RS_CD"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{CI_SA_RS_HIST.RS_CD} != null) ? $R{CI_SA_RS_HIST.RS_CD} : "CI_SA_RS_HIST.RS_CD"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="125" y="0" width="125" height="20" uuid="7bab0b8d-cc55-4785-82bb-6ee1835b3635">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="1"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{CI_FT.GL_DIVISION} != null) ? $R{CI_FT.GL_DIVISION} : "CI_FT.GL_DIVISION"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{CI_FT.GL_DIVISION} != null) ? $R{CI_FT.GL_DIVISION} : "CI_FT.GL_DIVISION"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="250" y="0" width="125" height="20" uuid="e19e7109-5b87-4924-b9cc-fc49fa710a62">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="2"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{CI_ACCT.CIS_DIVISION_1} != null) ? $R{CI_ACCT.CIS_DIVISION_1} : "CI_ACCT.CIS_DIVISION_1"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{CI_ACCT.CIS_DIVISION_1} != null) ? $R{CI_ACCT.CIS_DIVISION_1} : "CI_ACCT.CIS_DIVISION_1"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="375" y="0" width="125" height="20" uuid="29a7af16-9e10-4896-9be0-164139f7f933">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="3"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{CI_ACCT.CUST_CL_CD} != null) ? $R{CI_ACCT.CUST_CL_CD} : "CI_ACCT.CUST_CL_CD"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{CI_ACCT.CUST_CL_CD} != null) ? $R{CI_ACCT.CUST_CL_CD} : "CI_ACCT.CUST_CL_CD"]]></hyperlinkTooltipExpression>
+							</textField>
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="RelativeToBandHeight" x="500" y="0" width="125" height="20" uuid="3515cb3b-fa3d-4efd-a794-2bbb7db22def">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="4"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{CI_SA_TYPE.SVC_TYPE_CD} != null) ? $R{CI_SA_TYPE.SVC_TYPE_CD} : "CI_SA_TYPE.SVC_TYPE_CD"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{CI_SA_TYPE.SVC_TYPE_CD} != null) ? $R{CI_SA_TYPE.SVC_TYPE_CD} : "CI_SA_TYPE.SVC_TYPE_CD"]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabHeader>
+					<crosstabColumnHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabColumnMeasureHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="b94ea0b9-fe72-419c-8f40-5f887b9e2a8c">
+									<property name="net.sf.jasperreports.crosstab.column.header.sort.measure.index" value="0"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[$V{Measures}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{Measures}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="CI_FT.CUR_AMT_m0" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{CI_FT.CUR_AMT_m0}]]></measureExpression>
+				</measure>
+				<measure name="CROSSTAB_TOTAL_DISCRIMINATOR" class="java.lang.Boolean" calculation="First">
+					<measureExpression><![CDATA[Boolean.FALSE || $F{CI_SA_RS_HIST.RS_CD__DISCRIMINATOR} || $F{CI_FT.GL_DIVISION__DISCRIMINATOR} || $F{CI_ACCT.CIS_DIVISION_1__DISCRIMINATOR} || $F{CI_ACCT.CUST_CL_CD__DISCRIMINATOR} || $F{CI_SA_TYPE.SVC_TYPE_CD__DISCRIMINATOR}]]></measureExpression>
+				</measure>
+				<crosstabCell width="100" height="20">
+					<cellContents style="CrosstabBaseCellStyle">
+						<box padding="0"/>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="6be22daf-f3c8-44d0-a553-0178c99011d6">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("CI_FT.CUR_AMT_m0")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{CI_FT.CUR_AMT_m0}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

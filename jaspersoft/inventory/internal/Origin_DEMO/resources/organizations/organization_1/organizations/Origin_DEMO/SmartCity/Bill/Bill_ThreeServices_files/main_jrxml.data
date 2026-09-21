@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 8.2.0.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Ellensburg_Main" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="10" uuid="b514e032-6953-47f0-95a9-5b94f5dfedc3">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="NO_DATA_ADAPTER"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="305"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="681"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://origin-c2m-demo.originsmartops.com:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="gcinco@originconsults.com|Origin_DEMO"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Bill/Bill_ThreeServices_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Bill/Bill_ThreeServices"/>
+	<style name="msgStyle" fontName="Tahoma" fontSize="8"/>
+	<parameter name="net.sf.jasperreports.xml.source" class="java.lang.String"/>
+	<parameter name="billId" class="java.lang.String"/>
+	<parameter name="query" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{billId}==null 
+				? "/C1-BillPrintRecords/C1-BillPrintRecord/billPrint"
+				: "/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="XPath">
+		<![CDATA[$P{query}]]>
+	</queryString>
+	<field name="companyAddress" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../C1-GlobalInformationRecord/companyAddress"/>
+		<fieldDescription><![CDATA[../../C1-GlobalInformationRecord/companyAddress]]></fieldDescription>
+	</field>
+	<field name="entityName" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="entityName"/>
+		<fieldDescription><![CDATA[entityName]]></fieldDescription>
+	</field>
+	<field name="accountId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="accountId"/>
+		<fieldDescription><![CDATA[accountId]]></fieldDescription>
+	</field>
+	<field name="billDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billDate"/>
+		<fieldDescription><![CDATA[billDate]]></fieldDescription>
+	</field>
+	<field name="totBal" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="totBal"/>
+		<fieldDescription><![CDATA[totBal]]></fieldDescription>
+	</field>
+	<field name="dueDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="dueDate"/>
+		<fieldDescription><![CDATA[dueDate]]></fieldDescription>
+	</field>
+	<field name="currPrevBal" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="currPrevBal"/>
+		<fieldDescription><![CDATA[currPrevBal]]></fieldDescription>
+	</field>
+	<field name="currBal" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="currBal"/>
+		<fieldDescription><![CDATA[currBal]]></fieldDescription>
+	</field>
+	<field name="currAdjAmt" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="currAdjAmt"/>
+		<fieldDescription><![CDATA[currAdjAmt]]></fieldDescription>
+	</field>
+	<field name="currChgAmt" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="currChgAmt"/>
+		<fieldDescription><![CDATA[currChgAmt]]></fieldDescription>
+	</field>
+	<field name="mailingAddressLine1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingAddressLine1"/>
+		<fieldDescription><![CDATA[mailingAddressLine1]]></fieldDescription>
+	</field>
+	<field name="mailingAddressLine2" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingAddressLine2"/>
+		<fieldDescription><![CDATA[mailingAddressLine2]]></fieldDescription>
+	</field>
+	<field name="mailingCity" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingCity"/>
+		<fieldDescription><![CDATA[mailingCity]]></fieldDescription>
+	</field>
+	<field name="mailingCountry" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingCountry"/>
+		<fieldDescription><![CDATA[mailingCountry]]></fieldDescription>
+	</field>
+	<field name="mailingPostal" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingPostal"/>
+		<fieldDescription><![CDATA[mailingPostal]]></fieldDescription>
+	</field>
+	<field name="mailingState" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingState"/>
+		<fieldDescription><![CDATA[mailingState]]></fieldDescription>
+	</field>
+	<field name="mailingInCityLimit" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInCityLimit"/>
+		<fieldDescription><![CDATA[mailingInCityLimit]]></fieldDescription>
+	</field>
+	<field name="paymentInstruction" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../C1-GlobalInformationRecord/paymentInstruction"/>
+		<fieldDescription><![CDATA[../../C1-GlobalInformationRecord/paymentInstruction]]></fieldDescription>
+	</field>
+	<field name="moreInfo" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../C1-GlobalInformationRecord/moreInfo"/>
+		<fieldDescription><![CDATA[../../C1-GlobalInformationRecord/moreInfo]]></fieldDescription>
+	</field>
+	<field name="waysToPay" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../../C1-GlobalInformationRecord/waysToPay"/>
+		<fieldDescription><![CDATA[../../C1-GlobalInformationRecord/waysToPay]]></fieldDescription>
+	</field>
+	<field name="billId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../billId"/>
+		<fieldDescription><![CDATA[../billId]]></fieldDescription>
+	</field>
+	<field name="entityName1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="entityName1"/>
+		<fieldDescription><![CDATA[entityName1]]></fieldDescription>
+	</field>
+	<field name="sequence" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../sequence"/>
+		<fieldDescription><![CDATA[../sequence]]></fieldDescription>
+	</field>
+	<field name="paymentInstruction1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="paymentInstruction"/>
+		<fieldDescription><![CDATA[paymentInstruction]]></fieldDescription>
+	</field>
+	<field name="finalBill" class="java.lang.Boolean">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="finalBill"/>
+		<fieldDescription><![CDATA[finalBill]]></fieldDescription>
+	</field>
+	<field name="totChgAmt" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="totChgAmt"/>
+		<fieldDescription><![CDATA[totChgAmt]]></fieldDescription>
+	</field>
+	<field name="isBudgetIndicator" class="java.lang.Boolean">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="isBudgetIndicator"/>
+		<fieldDescription><![CDATA[isBudgetIndicator]]></fieldDescription>
+	</field>
+	<field name="delinquentAmt" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="delinquentAmt"/>
+		<fieldDescription><![CDATA[delinquentAmt]]></fieldDescription>
+	</field>
+	<variable name="companyAddress" class="java.lang.String" incrementType="Group" incrementGroup="accountId">
+		<variableExpression><![CDATA[$F{companyAddress}.replace( "~", "\n" )]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{companyAddress}.replace( "~", "\n" )]]></initialValueExpression>
+	</variable>
+	<variable name="paymentInstruction" class="java.lang.String" incrementType="Group" incrementGroup="accountId">
+		<variableExpression><![CDATA[$F{paymentInstruction1}==null ? ($F{paymentInstruction}.replace( "~", "\n" )) : ($F{paymentInstruction1}.replace( "~", "\n" ))]]></variableExpression>
+	</variable>
+	<variable name="mailingPostal" class="java.lang.String">
+		<variableExpression><![CDATA[$F{mailingPostal}.length()>5?"00270903360940"+($F{mailingPostal}.substring( 0, 5 ))+"4":
+"00270903360940"+($F{mailingPostal})+"4"]]></variableExpression>
+	</variable>
+	<variable name="finalBill" class="java.lang.Boolean" resetType="Group" resetGroup="accountId">
+		<variableExpression><![CDATA[$F{finalBill}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{finalBill}]]></initialValueExpression>
+	</variable>
+	<group name="accountId" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{billId}+"-"+$F{sequence}]]></groupExpression>
+		<groupHeader>
+			<band height="104">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement x="0" y="0" width="572" height="104" uuid="d834d0aa-2422-49f3-bd21-294dc1a187be">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<image hAlign="Center" vAlign="Middle" onErrorType="Blank">
+						<reportElement x="9" y="0" width="130" height="53" uuid="b961be15-d608-4677-b864-ed7bd5956750">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<imageExpression><![CDATA["repo:Los_Alamos_County_Logo"]]></imageExpression>
+					</image>
+					<textField>
+						<reportElement x="151" y="0" width="165" height="70" uuid="9174e13f-d844-4e1a-8355-978f5b5a8b87">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.spacingAfter" value="px"/>
+						</reportElement>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Tahoma" size="9"/>
+							<paragraph lineSpacing="Single" lineSpacingSize="1.0" spacingAfter="0"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$V{companyAddress}]]></textFieldExpression>
+					</textField>
+					<rectangle radius="5">
+						<reportElement x="330" y="0" width="230" height="20" backcolor="#0077C8" uuid="794f88b9-1359-4cb1-ab36-e31fb4267320">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<graphicElement>
+							<pen lineColor="#0077C8"/>
+						</graphicElement>
+					</rectangle>
+					<staticText>
+						<reportElement x="335" y="0" width="220" height="20" forecolor="#FFFFFF" uuid="30f02ad7-1571-4b83-b013-9cc12d905ff9">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Tahoma" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Payment Information]]></text>
+					</staticText>
+					<textField>
+						<reportElement x="330" y="20" width="100" height="12" uuid="6b90a5c3-844e-4d76-a550-a20fa130cb41">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box leftPadding="5">
+							<pen lineWidth="0.5"/>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Tahoma" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Account Number:"]]></textFieldExpression>
+					</textField>
+					<textField isBlankWhenNull="true">
+						<reportElement x="430" y="20" width="130" height="12" uuid="f5260466-9e73-4b78-ab08-cb0a1576ec7f">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="5">
+							<pen lineWidth="0.5"/>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Tahoma" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{accountId}]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="330" y="32" width="100" height="12" uuid="f5c5ee95-af88-45cd-a13f-bb11b5e63d43">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box leftPadding="5">
+							<pen lineWidth="0.5"/>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Tahoma" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Customer:"]]></textFieldExpression>
+					</textField>
+					<textField isBlankWhenNull="true">
+						<reportElement x="430" y="32" width="130" height="12" uuid="c53adac5-29ed-4b92-9dfd-579cd9a937ab">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="5">
+							<pen lineWidth="0.5"/>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Tahoma" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{entityName}]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="330" y="56" width="100" height="12" uuid="a14346fe-9ac5-410a-853d-5f5e4957615d">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box leftPadding="5">
+							<pen lineWidth="0.5"/>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Tahoma" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Bill Date:"]]></textFieldExpression>
+					</textField>
+					<textField pattern="MM/dd/yy" isBlankWhenNull="true">
+						<reportElement x="430" y="56" width="130" height="12" uuid="220261db-32df-4e59-896b-de46c8789ee3">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="5">
+							<pen lineWidth="0.5"/>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Tahoma" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{billDate}]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="330" y="68" width="150" height="12" uuid="dea1dce3-630b-444e-a214-ac4d77153082">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box leftPadding="5">
+							<pen lineWidth="0.5"/>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Tahoma" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[($F{isBudgetIndicator} == null || $F{isBudgetIndicator}==false)?"Amount Due:" : "Budget Payment Amount Due:"]]></textFieldExpression>
+					</textField>
+					<textField pattern="¤#,##0.00;¤-#,##0.00" isBlankWhenNull="true">
+						<reportElement x="430" y="68" width="130" height="12" uuid="fcc37dd4-5bf7-44a0-9ae8-cfdca37ef908">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="5">
+							<pen lineWidth="0.5"/>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Tahoma" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currBal}]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="330" y="44" width="100" height="12" uuid="351b1539-f70f-427e-992e-254c0eb33e9f">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box leftPadding="5">
+							<pen lineWidth="0.5"/>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Tahoma" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Bill ID:"]]></textFieldExpression>
+					</textField>
+					<textField isBlankWhenNull="true">
+						<reportElement x="430" y="44" width="130" height="12" uuid="67846d80-cb8b-4b1d-bbfa-1c9748804ef8">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="5">
+							<pen lineWidth="0.5"/>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Tahoma" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{billId}]]></textFieldExpression>
+					</textField>
+					<frame>
+						<reportElement x="330" y="80" width="230" height="24" uuid="19344d7d-08e7-4163-b682-282a5326cc45">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<printWhenExpression><![CDATA[false]]></printWhenExpression>
+						</reportElement>
+						<textField>
+							<reportElement x="0" y="0" width="100" height="12" uuid="155e6b68-491f-4f22-ba23-3992587bb709">
+								<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							</reportElement>
+							<box leftPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font fontName="Tahoma" size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Actual Total Charges:"]]></textFieldExpression>
+						</textField>
+						<textField pattern="¤#,##0.00;¤-#,##0.00" isBlankWhenNull="true">
+							<reportElement x="100" y="0" width="130" height="12" uuid="cb48efc1-80a4-4ccd-b11a-c54a181c437e">
+								<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</reportElement>
+							<box leftPadding="0" rightPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Right" verticalAlignment="Middle">
+								<font fontName="Tahoma" size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{totChgAmt}]]></textFieldExpression>
+						</textField>
+						<textField pattern="MM/dd/yy" isBlankWhenNull="true">
+							<reportElement x="100" y="12" width="130" height="12" uuid="1841dbd8-c758-4eec-a154-50ddc1d656df">
+								<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							</reportElement>
+							<box leftPadding="0" rightPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Right" verticalAlignment="Middle">
+								<font fontName="Tahoma" size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{dueDate}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="12" width="100" height="12" uuid="d0a3567b-25b8-44fd-91f0-9f56f1f3b070">
+								<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							</reportElement>
+							<box leftPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font fontName="Tahoma" size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Due Date:"]]></textFieldExpression>
+						</textField>
+					</frame>
+					<frame>
+						<reportElement x="330" y="80" width="230" height="12" uuid="e201850f-8044-4bb1-98a2-5203c4b1ff5b">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<textField pattern="MM/dd/yy" isBlankWhenNull="true">
+							<reportElement x="100" y="0" width="130" height="12" uuid="a4e5d8fe-7bac-4122-bbf8-640d18dfb9e8">
+								<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							</reportElement>
+							<box leftPadding="0" rightPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Right" verticalAlignment="Middle">
+								<font fontName="Tahoma" size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{dueDate}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="0" width="100" height="12" uuid="90f95b4b-f589-466c-864f-c0b4691de64d">
+								<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							</reportElement>
+							<box leftPadding="5">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font fontName="Tahoma" size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Due Date:"]]></textFieldExpression>
+						</textField>
+					</frame>
+				</frame>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band height="712">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<image scaleImage="RetainShape" hAlign="Center" vAlign="Middle">
+				<reportElement x="0" y="10" width="572" height="692" printWhenGroupChanges="accountId" uuid="00c7aa4d-b8ea-4bab-9f81-95985a4a73e2">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$V{finalBill}]]></printWhenExpression>
+				</reportElement>
+				<box topPadding="120" leftPadding="65" bottomPadding="100" rightPadding="65"/>
+				<imageExpression><![CDATA["repo:FS_img.png"]]></imageExpression>
+			</image>
+		</band>
+	</background>
+	<detail>
+		<band height="5" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<subreport isUsingCache="true" runToBottom="true">
+				<reportElement x="0" y="0" width="572" height="5" uuid="603cde57-3204-4363-8bc7-a1194ac4fad2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<subreportParameter name="net.sf.jasperreports.xml.source">
+					<subreportParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="billId">
+					<subreportParameterExpression><![CDATA[$F{billId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Param_PageNumber">
+					<subreportParameterExpression><![CDATA[$V{PAGE_NUMBER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="sequence">
+					<subreportParameterExpression><![CDATA[$F{sequence}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:Bill_ThreeServices_Subreport.jrxml"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

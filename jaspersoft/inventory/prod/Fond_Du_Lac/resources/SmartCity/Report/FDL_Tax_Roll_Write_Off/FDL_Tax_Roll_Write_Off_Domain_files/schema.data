@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="FDL_TAX_ROL_WO" label="FDL_TAX_ROL_WO" resourceId="FDL_TAX_ROL_WO"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="A_ADJ_AMT_1" label="Total" resourceId="FDL_TAX_ROL_WO.A_ADJ_AMT_1"></item>
+    <item id="ADJ_ID" label="Adjustment ID" resourceId="FDL_TAX_ROL_WO.ADJ_ID"></item>
+    <item id="ADJ_STATUS_FLG" label="Adjustment Status" resourceId="FDL_TAX_ROL_WO.ADJ_STATUS_FLG"></item>
+    <item id="ADJ_TYPE_CD" label="Adjustment Type" resourceId="FDL_TAX_ROL_WO.ADJ_TYPE_CD"></item>
+    <item id="CODE" label="Code" resourceId="FDL_TAX_ROL_WO.CODE"></item>
+    <item id="CRE_DT" label="Create Date" resourceId="FDL_TAX_ROL_WO.CRE_DT"></item>
+    <item id="GEO_VAL" label="Parcel Number" resourceId="FDL_TAX_ROL_WO.GEO_VAL"></item>
+    <item id="MUNI_CODE" label="Muni Code" resourceId="FDL_TAX_ROL_WO.MUNI_CODE"></item>
+    <item id="PREM_ID" label="Premise ID" resourceId="FDL_TAX_ROL_WO.PREM_ID"></item>
+    <item id="SA_ID" label="Service Agreement ID" resourceId="FDL_TAX_ROL_WO.SA_ID"></item>
+    <item id="SA_STATUS_FLG" label="SA Status" resourceId="FDL_TAX_ROL_WO.SA_STATUS_FLG"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="FDL_TAX_ROL_WO" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="MUNI_CODE" type="java.lang.String"></field>
+        <field id="CODE" type="java.lang.String"></field>
+        <field id="ADJ_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="ADJ_TYPE_CD" type="java.lang.String"></field>
+        <field id="CRE_DT" type="java.sql.Timestamp"></field>
+        <field id="ADJ_AMT" type="java.math.BigDecimal"></field>
+        <field id="A_ADJ_AMT_1" fieldDBName="A.ADJ_AMT*-1" type="java.math.BigDecimal"></field>
+        <field id="ADJ_STATUS_FLG" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="GEO_VAL" type="java.lang.String"></field>
+      </fieldList>
+      <query>select '20226' as muni_code, '8' as code, a.adj_id, b.sa_id, a.adj_type_cd, a.cre_dt, a.adj_amt, a.adj_amt*-1, a.adj_status_flg, b.sa_status_flg, c.prem_id, d.geo_val
+from cisadm.ci_adj a, cisadm.ci_sa b, cisadm.ci_prem c, cisadm.ci_prem_geo d
+where a.sa_id = b.sa_id
+and b.char_prem_id = c.prem_id
+and c.prem_id = d.prem_id
+and adj_type_cd = 'WDWNBAL' and adj_status_flg = '50'
+and d.geo_type_cd = 'PARCELSH'</query>
+    </jdbcQuery>
+  </resources>
+</schema>

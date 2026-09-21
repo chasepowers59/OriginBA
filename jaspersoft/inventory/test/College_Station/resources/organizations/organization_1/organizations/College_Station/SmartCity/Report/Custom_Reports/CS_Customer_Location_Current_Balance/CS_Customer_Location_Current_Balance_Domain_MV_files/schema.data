@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CM_CUS_LOC_BAL" label="CM_CUS_LOC_BAL" resourceId="CM_CUS_LOC_BAL"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CollegeStation_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="ACCT_ID" label="Account Id" resourceId="CM_CUS_LOC_BAL.ACCT_ID"></item>
+    <item id="ADDRESS1" label="Location" resourceId="CM_CUS_LOC_BAL.ADDRESS1"></item>
+    <item id="BALANCE" label="Current Balance" resourceId="CM_CUS_LOC_BAL.BALANCE"></item>
+    <item id="BILL_CYC_CD" label="Bill Cycle Code" resourceId="CM_CUS_LOC_BAL.BILL_CYC_CD"></item>
+    <item id="CURRENT_CHARGES" label="Current Charges" resourceId="CM_CUS_LOC_BAL.CURRENT_CHARGES"></item>
+    <item id="DUT_DT" label="Due Date" resourceId="CM_CUS_LOC_BAL.DUT_DT"></item>
+    <item id="ENTITY_NAME" label="Entity Name" resourceId="CM_CUS_LOC_BAL.ENTITY_NAME"></item>
+    <item id="PASTDUE" label="Past Due" resourceId="CM_CUS_LOC_BAL.PASTDUE"></item>
+    <item id="PREM_ID" label="Premise Id" resourceId="CM_CUS_LOC_BAL.PREM_ID"></item>
+  </items>
+  <resources>
+    <jdbcTable id="CM_CUS_LOC_BAL" datasourceId="CollegeStation_DS" datasourceTableName="CM_CUS_LOC_BAL" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="DUT_DT" type="java.sql.Timestamp"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="BALANCE" type="java.math.BigDecimal"></field>
+        <field id="CURRENT_CHARGES" type="java.math.BigDecimal"></field>
+        <field id="PASTDUE" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <filterString>BALANCE &gt; 0</filterString>
+    </jdbcTable>
+  </resources>
+</schema>

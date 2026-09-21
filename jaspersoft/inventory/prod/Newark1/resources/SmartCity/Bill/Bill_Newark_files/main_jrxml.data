@@ -1,0 +1,2554 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 8.2.0.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BillPrintFinal" pageWidth="612" pageHeight="1008" columnWidth="540" leftMargin="36" rightMargin="36" topMargin="20" bottomMargin="20" uuid="6874c4c9-55c3-4d4a-8fcd-e36d874a6c73">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="NO_DATA_ADAPTER"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="gcinco@originutility.com|Newark1"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Bill/Bill_Newark_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Bill/Bill_Newark"/>
+	<property name="net.sf.jasperreports.export.docx.embed.fonts" value="true"/>
+	<property name="net.sf.jasperreports.export.html.embedded.svg.use.fonts" value="true"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Bill Newark"/>
+	<property name="net.sf.jasperreports.data.cache.persistable" value="false"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_CH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="BillCalcHdrList" uuid="e308cd09-60fb-467d-8f9b-9faa8bff64a4">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Bill_021434513428"/>
+		<parameter name="billCalcHdrQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/billCalcHdrList"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="billId" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[$P{billCalcHdrQuery}]]>
+		</queryString>
+		<field name="printerKey" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="printerKey"/>
+			<fieldDescription><![CDATA[printerKey]]></fieldDescription>
+		</field>
+		<field name="startDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startDate"/>
+			<fieldDescription><![CDATA[startDate]]></fieldDescription>
+		</field>
+		<field name="endDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endDate"/>
+			<fieldDescription><![CDATA[endDate]]></fieldDescription>
+		</field>
+		<field name="rateSched" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="rateSched"/>
+			<fieldDescription><![CDATA[rateSched]]></fieldDescription>
+		</field>
+		<field name="calcAmt" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcAmt"/>
+			<fieldDescription><![CDATA[calcAmt]]></fieldDescription>
+		</field>
+		<field name="descrOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="descrOnBill"/>
+			<fieldDescription><![CDATA[descrOnBill]]></fieldDescription>
+		</field>
+	</subDataset>
+	<subDataset name="BillMsgDataSet" uuid="2d2f20f2-c40c-4c19-acea-af765a3e7cbb">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Bill_647822185266"/>
+		<parameter name="billMsgQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/billMsgList[./billMsg!='LTP' and ./billMsg != 'FIN' and ./billMsg != 'PV1Q' and ./billMsg != 'PV2Q' and ./billMsg != 'PV3Q' and ./billMsg != 'PV4Q' and ./billMsg != 'O241' and ./billMsg != 'O242' and ./billMsg != 'O243' and ./billMsg != 'O240' and ./billMsg != 'NOV1' and ./billMsg != 'NOV2' and ./billMsg != 'NOV3' and ./billMsg != 'NOV4' and ./billMsg != 'NOV5' and ./billMsg != 'NOV6' and ./billMsg != 'NOV7'  and ./billMsg != 'DE20' and ./billMsg != 'DE24' and ./billMsg != 'FE24'and ./billMsg != 'FE25' and ./billMsg != 'FE26' and ./billMsg != 'FE27' and ./billMsg != 'JUL0' and ./billMsg != 'JUL1' and ./billMsg != 'JUL2' and ./billMsg != 'JUL3' and ./billMsg != 'JUL4' and ./billMsg != 'JUL5' and ./billMsg != 'JUL6'] "]]></defaultValueExpression>
+		</parameter>
+		<parameter name="billId" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[$P{billMsgQuery}]]>
+		</queryString>
+		<field name="msgOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="msgOnBill"/>
+			<fieldDescription><![CDATA[msgOnBill]]></fieldDescription>
+		</field>
+		<field name="billMsg" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="billMsg"/>
+			<fieldDescription><![CDATA[billMsg]]></fieldDescription>
+		</field>
+		<variable name="msgOnBill_Concat" class="java.lang.String">
+			<variableExpression><![CDATA[$V{msgOnBill_Concat}  +  $F{msgOnBill}]]></variableExpression>
+			<initialValueExpression><![CDATA[""]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="BillSegmentReadList" uuid="c3358bbd-74aa-45c0-a5e8-410b1ef621b3">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Bill_647822185266"/>
+		<parameter name="billSegmentReadQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/bsegReadList"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="billId" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[$P{billSegmentReadQuery}]]>
+		</queryString>
+		<field name="startRegRdg" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startRegRdg"/>
+			<fieldDescription><![CDATA[startRegRdg]]></fieldDescription>
+		</field>
+		<field name="startReadDttm" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startReadDttm"/>
+			<fieldDescription><![CDATA[startReadDttm]]></fieldDescription>
+		</field>
+		<field name="endRegRdg" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endRegRdg"/>
+			<fieldDescription><![CDATA[endRegRdg]]></fieldDescription>
+		</field>
+		<field name="endReadDttm" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endReadDttm"/>
+			<fieldDescription><![CDATA[endReadDttm]]></fieldDescription>
+		</field>
+		<field name="finalUom" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="finalUom"/>
+			<fieldDescription><![CDATA[finalUom]]></fieldDescription>
+		</field>
+		<field name="finalRegQty" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="finalRegQty"/>
+			<fieldDescription><![CDATA[finalRegQty]]></fieldDescription>
+		</field>
+		<field name="badge" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="badge"/>
+			<fieldDescription><![CDATA[badge]]></fieldDescription>
+		</field>
+		<field name="endEstimate" class="java.lang.Boolean">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endEstimate"/>
+			<fieldDescription><![CDATA[endEstimate]]></fieldDescription>
+		</field>
+	</subDataset>
+	<subDataset name="BillLTPMsg" uuid="e0848540-3c65-4130-9560-f09b4d298506">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="POSTROUT_2023-01-23-08_22.xml"/>
+		<parameter name="billId" class="java.lang.String"/>
+		<parameter name="billLTPMsgQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/billMsgList[./billMsg='LTP']"]]></defaultValueExpression>
+		</parameter>
+		<queryString language="xPath">
+			<![CDATA[$P{billLTPMsgQuery}]]>
+		</queryString>
+		<field name="msgOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="msgOnBill"/>
+			<fieldDescription><![CDATA[msgOnBill]]></fieldDescription>
+		</field>
+	</subDataset>
+	<subDataset name="SEWER_BILLING" uuid="8451dc76-afb8-4c22-ad46-b0923fae53e5">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="POSTROUT_2023-01-23-08_22.xml"/>
+		<parameter name="billCalcHdrQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/billCalcHdrList"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="billId" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[$P{billCalcHdrQuery}]]>
+		</queryString>
+		<field name="printerKey" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="printerKey"/>
+			<fieldDescription><![CDATA[printerKey]]></fieldDescription>
+		</field>
+		<field name="startDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startDate"/>
+			<fieldDescription><![CDATA[startDate]]></fieldDescription>
+		</field>
+		<field name="endDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endDate"/>
+			<fieldDescription><![CDATA[endDate]]></fieldDescription>
+		</field>
+		<field name="rateSched" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="rateSched"/>
+			<fieldDescription><![CDATA[rateSched]]></fieldDescription>
+		</field>
+		<field name="calcAmt" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcAmt"/>
+			<fieldDescription><![CDATA[calcAmt]]></fieldDescription>
+		</field>
+		<field name="descrOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="descrOnBill"/>
+			<fieldDescription><![CDATA[descrOnBill]]></fieldDescription>
+		</field>
+		<filterExpression><![CDATA[$F{descrOnBill}.equals("SEWER BILLING")]]></filterExpression>
+	</subDataset>
+	<subDataset name="WATER_BILLING" uuid="c0461c50-2bc5-437e-be60-fd1ddeb36f5c">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="POSTROUT_2023-01-23-08_22.xml"/>
+		<parameter name="billCalcHdrQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/billCalcHdrList"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="billId" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[$P{billCalcHdrQuery}]]>
+		</queryString>
+		<field name="printerKey" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="printerKey"/>
+			<fieldDescription><![CDATA[printerKey]]></fieldDescription>
+		</field>
+		<field name="startDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startDate"/>
+			<fieldDescription><![CDATA[startDate]]></fieldDescription>
+		</field>
+		<field name="endDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endDate"/>
+			<fieldDescription><![CDATA[endDate]]></fieldDescription>
+		</field>
+		<field name="rateSched" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="rateSched"/>
+			<fieldDescription><![CDATA[rateSched]]></fieldDescription>
+		</field>
+		<field name="calcAmt" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcAmt"/>
+			<fieldDescription><![CDATA[calcAmt]]></fieldDescription>
+		</field>
+		<field name="descrOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="descrOnBill"/>
+			<fieldDescription><![CDATA[descrOnBill]]></fieldDescription>
+		</field>
+		<filterExpression><![CDATA[$F{descrOnBill}.equals("WATER BILLING")]]></filterExpression>
+	</subDataset>
+	<subDataset name="PASSAIC_VALLEY" uuid="490f1111-e9db-4d49-a5ce-d533d0fd289e">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="POSTROUT_2023-01-23-08_22.xml"/>
+		<parameter name="billCalcHdrQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/billCalcHdrList"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="billId" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[$P{billCalcHdrQuery}]]>
+		</queryString>
+		<field name="printerKey" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="printerKey"/>
+			<fieldDescription><![CDATA[printerKey]]></fieldDescription>
+		</field>
+		<field name="startDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startDate"/>
+			<fieldDescription><![CDATA[startDate]]></fieldDescription>
+		</field>
+		<field name="endDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endDate"/>
+			<fieldDescription><![CDATA[endDate]]></fieldDescription>
+		</field>
+		<field name="rateSched" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="rateSched"/>
+			<fieldDescription><![CDATA[rateSched]]></fieldDescription>
+		</field>
+		<field name="calcAmt" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcAmt"/>
+			<fieldDescription><![CDATA[calcAmt]]></fieldDescription>
+		</field>
+		<field name="descrOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="descrOnBill"/>
+			<fieldDescription><![CDATA[descrOnBill]]></fieldDescription>
+		</field>
+		<filterExpression><![CDATA[$F{descrOnBill}.equals("PASSAIC VALLEY")]]></filterExpression>
+	</subDataset>
+	<subDataset name="ASS. FIRE LINE" uuid="b8881ff1-d06e-40d0-a6d5-f81c1daa509f">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="POSTROUT_2023-01-23-08_22.xml"/>
+		<parameter name="billCalcHdrQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/billCalcHdrList"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="billId" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[$P{billCalcHdrQuery}]]>
+		</queryString>
+		<field name="printerKey" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="printerKey"/>
+			<fieldDescription><![CDATA[printerKey]]></fieldDescription>
+		</field>
+		<field name="startDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startDate"/>
+			<fieldDescription><![CDATA[startDate]]></fieldDescription>
+		</field>
+		<field name="endDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endDate"/>
+			<fieldDescription><![CDATA[endDate]]></fieldDescription>
+		</field>
+		<field name="rateSched" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="rateSched"/>
+			<fieldDescription><![CDATA[rateSched]]></fieldDescription>
+		</field>
+		<field name="calcAmt" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcAmt"/>
+			<fieldDescription><![CDATA[calcAmt]]></fieldDescription>
+		</field>
+		<field name="descrOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="descrOnBill"/>
+			<fieldDescription><![CDATA[descrOnBill]]></fieldDescription>
+		</field>
+		<filterExpression><![CDATA[$F{descrOnBill}.equals("ASS. FIRE LINE")]]></filterExpression>
+	</subDataset>
+	<subDataset name="PVSC_DIRECT_BIL" uuid="e9e42591-05d3-439e-82e1-f8a8a919e9ec">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="POSTROUT_2023-01-23-08_22.xml"/>
+		<parameter name="billCalcHdrQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/billCalcHdrList"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="billId" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[$P{billCalcHdrQuery}]]>
+		</queryString>
+		<field name="printerKey" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="printerKey"/>
+			<fieldDescription><![CDATA[printerKey]]></fieldDescription>
+		</field>
+		<field name="startDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startDate"/>
+			<fieldDescription><![CDATA[startDate]]></fieldDescription>
+		</field>
+		<field name="endDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endDate"/>
+			<fieldDescription><![CDATA[endDate]]></fieldDescription>
+		</field>
+		<field name="rateSched" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="rateSched"/>
+			<fieldDescription><![CDATA[rateSched]]></fieldDescription>
+		</field>
+		<field name="calcAmt" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcAmt"/>
+			<fieldDescription><![CDATA[calcAmt]]></fieldDescription>
+		</field>
+		<field name="descrOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="descrOnBill"/>
+			<fieldDescription><![CDATA[descrOnBill]]></fieldDescription>
+		</field>
+		<filterExpression><![CDATA[$F{descrOnBill}.equalsIgnoreCase( "PVSC DIRECT BILL" )]]></filterExpression>
+	</subDataset>
+	<subDataset name="PAYARR_DIRECT_BIL" uuid="e9e42591-05d3-439e-82e1-f8a8a919e9ec">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="POSTROUT_2023-01-23-08_22.xml"/>
+		<parameter name="billCalcHdrQuery" class="java.lang.String">
+			<defaultValueExpression><![CDATA["C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']/billPrint/billCalcHdrList"]]></defaultValueExpression>
+		</parameter>
+		<parameter name="billId" class="java.lang.String"/>
+		<queryString language="xPath">
+			<![CDATA[$P{billCalcHdrQuery}]]>
+		</queryString>
+		<field name="printerKey" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="printerKey"/>
+			<fieldDescription><![CDATA[printerKey]]></fieldDescription>
+		</field>
+		<field name="startDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="startDate"/>
+			<fieldDescription><![CDATA[startDate]]></fieldDescription>
+		</field>
+		<field name="endDate" class="java.sql.Date">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="endDate"/>
+			<fieldDescription><![CDATA[endDate]]></fieldDescription>
+		</field>
+		<field name="rateSched" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="rateSched"/>
+			<fieldDescription><![CDATA[rateSched]]></fieldDescription>
+		</field>
+		<field name="calcAmt" class="java.math.BigDecimal">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="calcAmt"/>
+			<fieldDescription><![CDATA[calcAmt]]></fieldDescription>
+		</field>
+		<field name="descrOnBill" class="java.lang.String">
+			<property name="net.sf.jasperreports.xpath.field.expression" value="descrOnBill"/>
+			<fieldDescription><![CDATA[descrOnBill]]></fieldDescription>
+		</field>
+		<filterExpression><![CDATA[$F{descrOnBill}.equalsIgnoreCase( "Payment arrangement" )]]></filterExpression>
+	</subDataset>
+	<parameter name="net.sf.jasperreports.xml.source" class="java.lang.String"/>
+	<parameter name="billId" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="query" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{billId}==null 
+	? "/C1-BillPrintRecords/C1-BillPrintRecord"
+	: "/C1-BillPrintRecords/C1-BillPrintRecord[./billId='"+$P{billId}+"']"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="xPath">
+		<![CDATA[$P{query}]]>
+	</queryString>
+	<field name="billId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billId"/>
+		<fieldDescription><![CDATA[billId]]></fieldDescription>
+	</field>
+	<field name="accountId" class="java.lang.Double">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/accountId"/>
+		<fieldDescription><![CDATA[billPrint/accountId]]></fieldDescription>
+	</field>
+	<field name="billDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/billDate"/>
+		<fieldDescription><![CDATA[billPrint/billDate]]></fieldDescription>
+	</field>
+	<field name="dueDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/dueDate"/>
+		<fieldDescription><![CDATA[billPrint/dueDate]]></fieldDescription>
+	</field>
+	<field name="currBal" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/currBal"/>
+		<fieldDescription><![CDATA[billPrint/currBal]]></fieldDescription>
+	</field>
+	<field name="currChgAmt" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/currChgAmt"/>
+		<fieldDescription><![CDATA[billPrint/currChgAmt]]></fieldDescription>
+	</field>
+	<field name="currCorrAmt" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/currCorrAmt"/>
+		<fieldDescription><![CDATA[billPrint/currCorrAmt]]></fieldDescription>
+	</field>
+	<field name="currAdjAmt" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/currAdjAmt"/>
+		<fieldDescription><![CDATA[billPrint/currAdjAmt]]></fieldDescription>
+	</field>
+	<field name="currPayAmt" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/currPayAmt"/>
+		<fieldDescription><![CDATA[billPrint/currPayAmt]]></fieldDescription>
+	</field>
+	<field name="currPrevBal" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/currPrevBal"/>
+		<fieldDescription><![CDATA[billPrint/currPrevBal]]></fieldDescription>
+	</field>
+	<field name="acctEntityName" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/acctEntityName"/>
+		<fieldDescription><![CDATA[billPrint/acctEntityName]]></fieldDescription>
+	</field>
+	<field name="acctCurrencySym" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/acctCurrencySym"/>
+		<fieldDescription><![CDATA[billPrint/acctCurrencySym]]></fieldDescription>
+	</field>
+	<field name="addressLine1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/mailingAddressLine1"/>
+		<fieldDescription><![CDATA[billPrint/mailingAddressLine1]]></fieldDescription>
+	</field>
+	<field name="country" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/mailingCountry"/>
+		<fieldDescription><![CDATA[billPrint/mailingCountry]]></fieldDescription>
+	</field>
+	<field name="city" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/mailingCity"/>
+		<fieldDescription><![CDATA[billPrint/mailingCity]]></fieldDescription>
+	</field>
+	<field name="state" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/mailingState"/>
+		<fieldDescription><![CDATA[billPrint/mailingState]]></fieldDescription>
+	</field>
+	<field name="finalMessage" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="FIN"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="FIN"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="pvs1Message" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="PV1Q"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="PV1Q"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="pvs2Message" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="PV2Q"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="PV2Q"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="pvs3Message" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="PV3Q"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="PV3Q"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="pvs4Message" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="PV4Q"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="PV4Q"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="o240Message" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="O240"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="O240"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="o241Message" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="O241"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="O241"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="o242Message" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="O242"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="O242"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="o243Message" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="O243"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="O243"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="nov1Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="NOV1"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="NOV1"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="nov2Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="NOV2"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="NOV2"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="nov3Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="NOV3"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="NOV3"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="nov4Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="NOV4"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="NOV4"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="nov5Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="NOV5"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="NOV5"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="nov6Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="NOV6"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="NOV6"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="nov7Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="NOV7"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="NOV7"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="de20Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="DE20"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="DE20"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="de24Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="DE24"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="DE24"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="fe24Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="FE24"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="FE24"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="fe25Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="FE25"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="FE25"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="fe26Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="FE26"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="FE26"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="fe27Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="FE27"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="FE27"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="j250Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="JUL0"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="JUL0"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="j251Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="JUL1"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="JUL1"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="j252Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="JUL2"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="JUL2"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="j253Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="JUL3"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="JUL3"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="j254Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="JUL4"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="JUL4"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="j255Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="JUL5"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="JUL5"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="j256Msg" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression">
+			<![CDATA[billPrint/billMsgList[billMsg="JUL6"]/msgOnBill]]>
+		</property>
+		<fieldDescription><![CDATA[billPrint/billMsgList[billMsg="JUL6"]/msgOnBill]]></fieldDescription>
+	</field>
+	<field name="postal" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/mailingPostal"/>
+		<fieldDescription><![CDATA[billPrint/mailingPostal]]></fieldDescription>
+	</field>
+	<field name="serviceaddress_country" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/svcCountry"/>
+		<fieldDescription><![CDATA[billPrint/svcCountry]]></fieldDescription>
+	</field>
+	<field name="serviceaddress_addressLine1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/svcAddressLine1"/>
+		<fieldDescription><![CDATA[billPrint/svcAddressLine1]]></fieldDescription>
+	</field>
+	<field name="serviceaddress_city" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/svcCity"/>
+		<fieldDescription><![CDATA[billPrint/svcCity]]></fieldDescription>
+	</field>
+	<field name="serviceaddress_state" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/svcState"/>
+		<fieldDescription><![CDATA[billPrint/svcState]]></fieldDescription>
+	</field>
+	<field name="serviceaddress_postal" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/svcPostal"/>
+		<fieldDescription><![CDATA[billPrint/svcPostal]]></fieldDescription>
+	</field>
+	<field name="lastPayDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/cmLastPayDate"/>
+		<fieldDescription><![CDATA[billPrint/cmLastPayDate]]></fieldDescription>
+	</field>
+	<field name="cmCheckDigit" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billPrint/cmCheckDigit"/>
+		<fieldDescription><![CDATA[billPrint/cmCheckDigit]]></fieldDescription>
+	</field>
+	<variable name="Service_Address" class="java.lang.String">
+		<variableExpression><![CDATA[$F{serviceaddress_addressLine1} + ", " +$F{serviceaddress_city} + ", " +  $F{serviceaddress_state} + " " + $F{serviceaddress_postal}]]></variableExpression>
+	</variable>
+	<variable name="OCR_Account_String" class="java.lang.String">
+		<variableExpression><![CDATA[new DecimalFormat("0000000000").format ( $F{accountId} ) + new DecimalFormat("00000000.##").format($F{currBal}).replace(".","") + $F{cmCheckDigit}]]></variableExpression>
+	</variable>
+	<variable name="AccountIdPadded" class="java.lang.String">
+		<variableExpression><![CDATA[new DecimalFormat("0000000000").format ( $F{accountId} )]]></variableExpression>
+	</variable>
+	<variable name="msgOnBill_Concat" class="java.lang.String" resetType="None" calculation="System"/>
+	<group name="BillAccountIDGroup">
+		<groupExpression><![CDATA[$F{billId}+(new DecimalFormat("0000000000").format ( $F{accountId} ))]]></groupExpression>
+		<groupHeader>
+			<band height="102">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement x="0" y="0" width="540" height="102" uuid="1c03a228-f94e-4cf6-8442-21e43345b539">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<staticText>
+						<reportElement x="0" y="54" width="233" height="48" forecolor="#000000" uuid="3379a0f2-c31f-4415-b292-93c3ba7eaeed">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Left">
+							<font fontName="Arial" size="9"/>
+						</textElement>
+						<text><![CDATA[920 Mayor Kenneth A Gibson Boulevard Room 117, Newark, New Jersey 07102
+watersewer.customerservice@ci.newark.nj.us
+(973) 733-6370]]></text>
+					</staticText>
+					<image scaleImage="FillFrame">
+						<reportElement x="0" y="0" width="58" height="51" printWhenGroupChanges="BillAccountIDSubGroup" uuid="820764f5-1e04-4f23-81a0-98b0a5a242fa"/>
+						<imageExpression><![CDATA["repo:WaterSewer.png"]]></imageExpression>
+					</image>
+					<textField textAdjust="ScaleFont">
+						<reportElement x="71" y="103" width="396" height="18" isRemoveLineWhenBlank="true" uuid="c3455e1b-2b36-4dc2-b176-8a3f898a4969">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="12" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{finalMessage} == null ? "" : $F{finalMessage}]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="61" y="0" width="214" height="26" forecolor="#000000" uuid="6e8794a7-a9a0-4916-8f66-416fc2dadaf0"/>
+						<textElement textAlignment="Justified" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="16" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA["City of Newark"]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="61" y="26" width="214" height="14" forecolor="#000000" uuid="b1c0a91e-0ea1-4867-956a-c0e4c8164c27"/>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font fontName="Arial" size="10"/>
+						</textElement>
+						<text><![CDATA[Department of Water and Sewer Utilities]]></text>
+					</staticText>
+					<componentElement>
+						<reportElement x="307" y="26" width="226" height="30" forecolor="#4C4E52" uuid="68b389d9-e050-47fc-9768-eb3d1c0a1c3e">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+							<datasetRun subDataset="BillLTPMsg" uuid="5ec61375-e068-4834-8caf-ce672d4d5204">
+								<datasetParameter name="billId">
+									<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_DATA_DOCUMENT">
+									<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_INPUT_STREAM">
+									<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_FILE">
+									<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="net.sf.jasperreports.xml.source">
+									<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_DATE_PATTERN">
+									<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_NUMBER_PATTERN">
+									<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_LOCALE">
+									<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_TIME_ZONE">
+									<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+							<jr:listContents height="30" width="226">
+								<textField>
+									<reportElement x="0" y="0" width="226" height="30" forecolor="#7D7C7C" uuid="7f9f9806-82c6-4530-8457-851c6aca4cda"/>
+									<box topPadding="2"/>
+									<textElement textAlignment="Left" verticalAlignment="Top">
+										<font fontName="Arial Black" size="9" isBold="true" isItalic="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{msgOnBill}]]></textFieldExpression>
+								</textField>
+							</jr:listContents>
+						</jr:list>
+					</componentElement>
+					<rectangle radius="1">
+						<reportElement mode="Transparent" x="306" y="5" width="233" height="21" uuid="3665526a-5f10-40c2-9b45-72de3c3247f8">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<graphicElement>
+							<pen lineWidth="2.0" lineColor="#1E51A4"/>
+						</graphicElement>
+					</rectangle>
+					<textField>
+						<reportElement x="307" y="5" width="193" height="21" isRemoveLineWhenBlank="true" uuid="f9f9a3ea-b881-4a90-a9ba-aeb1a252cc14">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box topPadding="0" leftPadding="2" bottomPadding="0" rightPadding="4"/>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="10" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Total Amount Due by " + DATEFORMAT(DATE(Integer.valueOf($F{dueDate}.substring(0,4)),Integer.valueOf($F{dueDate}.substring(5,7)),Integer.valueOf($F{dueDate}.substring(8,10))), "MM/dd/yy")]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="451" y="5" width="86" height="21" forecolor="#1E51A4" uuid="8aa741b4-ba14-49b9-ad78-a9646bdd05b0">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<box leftPadding="1" rightPadding="2"/>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="10" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{acctCurrencySym} +  new DecimalFormat("#,##0.00").format($F{currBal})]]></textFieldExpression>
+					</textField>
+					<image>
+						<reportElement mode="Transparent" x="473" y="40" width="61" height="60" printWhenGroupChanges="BillAccountIDSubGroup" uuid="7aed8959-4c76-4870-8c15-ecd1574b957c"/>
+						<imageExpression><![CDATA["repo:CitySealDarker.png"]]></imageExpression>
+					</image>
+					<textField textAdjust="ScaleFont">
+						<reportElement x="71" y="102" width="396" height="18" isRemoveLineWhenBlank="true" uuid="652f7de7-8ab4-401d-8d35-f99b5521eb30">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="12" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{pvs1Message} == null ? "" : $F{pvs1Message}]]></textFieldExpression>
+					</textField>
+					<textField textAdjust="ScaleFont">
+						<reportElement x="70" y="102" width="396" height="18" isRemoveLineWhenBlank="true" uuid="3e6c159e-1feb-4ec8-9543-87394a14b044">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="12" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{pvs2Message} == null ? "" : $F{pvs2Message}]]></textFieldExpression>
+					</textField>
+					<textField textAdjust="ScaleFont">
+						<reportElement x="70" y="102" width="396" height="18" isRemoveLineWhenBlank="true" uuid="3558102f-4442-4276-999d-cab6967ecc79">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="12" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{pvs3Message} == null ? "" : $F{pvs3Message}]]></textFieldExpression>
+					</textField>
+					<textField textAdjust="ScaleFont">
+						<reportElement x="71" y="102" width="396" height="18" isRemoveLineWhenBlank="true" uuid="d1091250-90e5-4e2c-8310-41ce6687ddb0">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Left" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="12" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{pvs4Message} == null ? "" : $F{pvs4Message}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="910">
+				<break>
+					<reportElement x="0" y="0" width="535" height="1" uuid="c1f78d88-41ec-40b2-b62d-9d0a265284b6">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+				</break>
+				<staticText>
+					<reportElement x="45" y="40" width="216" height="40" uuid="504a9064-0860-428f-b4c1-89b3360204a0"/>
+					<textElement>
+						<font fontName="Tahoma" size="25" isBold="true"/>
+					</textElement>
+					<text><![CDATA[City Of Newark]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="45" y="80" width="314" height="60" uuid="ed485802-094a-4e35-98de-6134053b761f"/>
+					<textElement>
+						<font fontName="Verdana" size="14"/>
+					</textElement>
+					<text><![CDATA[Division of Water/Billing & Customer Service
+920 Mayor Kenneth A. Gibson Boulevard
+Newark, NJ 07102]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="380" y="40" width="135" height="40" uuid="e9b55f24-a56d-4eeb-bf58-409aff6e1661"/>
+					<textElement textAlignment="Center">
+						<font fontName="Tahoma&#xD;&#xA;&#xD;&#xA;" size="14"/>
+					</textElement>
+					<text><![CDATA[PRESORTED
+FIRST CLASS MAIL]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="380" y="80" width="135" height="40" uuid="6985f0bb-8daa-417a-b72b-a67c44b8e2db"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Tahoma&#xD;&#xA;" size="10"/>
+					</textElement>
+					<text><![CDATA[U.S POSTAGE PAID
+NEWARK, NJ
+PERMIT NO. 684]]></text>
+				</staticText>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="150" y="250" width="240" height="19" uuid="7e210926-6731-4149-9ec9-aa0129988657">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctEntityName}]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="61" y="360" width="186" height="20" uuid="16d805a3-561e-40e4-b03d-7ee0211e8b8d">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Tahoma&#xD;&#xA;" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{AccountIdPadded}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="13" y="360" width="48" height="20" uuid="411492a9-e390-4ec6-bff0-53c322c8c1b7"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Tahoma&#xD;&#xA;" size="14"/>
+					</textElement>
+					<text><![CDATA[ACCT # ]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="0" y="269" width="537" height="20" uuid="cb4a3195-69a0-4780-856f-74c91338c425">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{addressLine1}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="150" y="289" width="240" height="20" uuid="3765816f-c831-4721-99a9-298d12f53a85">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{city} + " " + $F{state} + " " + $F{postal}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="400" y="773" width="58" height="50" uuid="7424dee5-3243-4e30-b1ec-575ba13752ac"/>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma&#xD;&#xA;" size="10"/>
+					</textElement>
+					<text><![CDATA[PLACE
+STAMP
+HERE]]></text>
+				</staticText>
+				<frame>
+					<reportElement x="147" y="800" width="247" height="110" uuid="baa03899-b796-4c97-b8de-05a54fd54e54"/>
+					<staticText>
+						<reportElement x="0" y="0" width="216" height="20" uuid="ffbce4ce-d18d-45af-9bb1-802b685faafe"/>
+						<textElement>
+							<font fontName="Tahoma&#xD;&#xA;&#xD;&#xA;" size="16" isBold="true"/>
+						</textElement>
+						<text><![CDATA[City Of Newark / Water]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="0" y="20" width="205" height="40" uuid="21578884-9598-4de3-a280-72218fbaf4ed"/>
+						<textElement>
+							<font fontName="Tahoma&#xD;&#xA;" size="14"/>
+						</textElement>
+						<text><![CDATA[PO Box 64000 
+Newark, NJ 07101-8068]]></text>
+					</staticText>
+					<componentElement>
+						<reportElement x="0" y="60" width="243" height="30" uuid="1a0ff618-673a-4926-b735-2fe3604cafa9"/>
+						<jr:USPSIntelligentMail xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+							<jr:codeExpression><![CDATA["00700567094987654321071018068"]]></jr:codeExpression>
+						</jr:USPSIntelligentMail>
+					</componentElement>
+				</frame>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="BillAccountIDSubGroup" footerPosition="ForceAtBottom">
+		<groupExpression><![CDATA[$F{billId}+(new DecimalFormat("0000000000").format ( $F{accountId} ))]]></groupExpression>
+		<groupHeader>
+			<band>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="225" splitType="Stretch">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement x="0" y="15" width="540" height="22" uuid="e1d1cba1-fce7-4871-9ccf-afb5ab6aee9f">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textField textAdjust="ScaleFont" isBlankWhenNull="true">
+						<reportElement x="0" y="0" width="540" height="22" isRemoveLineWhenBlank="true" uuid="ff972924-c75d-4555-8c01-71e207b6adf0">
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="OCR A Extended" size="10" isBold="true" pdfFontName="repo:OCRAEXT.TTF" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$V{OCR_Account_String}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement x="279" y="41" width="262" height="121" uuid="10ec8515-6974-40d5-996b-cc21bbfc5cdc">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.25" lineColor="#C6C6C6"/>
+						<topPen lineWidth="1.0" lineStyle="Solid"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid"/>
+					</box>
+					<staticText>
+						<reportElement x="0" y="0" width="90" height="20" uuid="e2c923b5-b586-4343-bc4f-93057302ba2f">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="3"/>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Arial Black" size="10" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Bill Date]]></text>
+					</staticText>
+					<textField textAdjust="ScaleFont">
+						<reportElement x="91" y="0" width="171" height="20" uuid="ec9097c1-254d-4e8e-a466-2eea7b7d7024">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="3" rightPadding="3"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="10" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[DATEFORMAT(DATE(Integer.valueOf($F{billDate}.substring(0,4)),Integer.valueOf($F{billDate}.substring(5,7)),Integer.valueOf($F{billDate}.substring(8,10))), "MM/dd/yy")]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="20" width="116" height="20" uuid="42dd920b-cc0e-4fb0-9242-a7ac1452a414">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="3"/>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Arial Black" size="10" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Account Number]]></text>
+					</staticText>
+					<textField textAdjust="ScaleFont">
+						<reportElement x="91" y="20" width="171" height="20" uuid="a7982516-2c6c-473e-9e73-857600ed3421">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="3" rightPadding="3"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="10" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$V{AccountIdPadded}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="60" width="90" height="20" uuid="9a34e1ab-5e46-4f87-b0ab-7ce98d9ac586">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="3"/>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Arial Black" size="10" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Due Date]]></text>
+					</staticText>
+					<textField textAdjust="ScaleFont">
+						<reportElement x="90" y="60" width="172" height="20" uuid="f6cf670f-47b1-4b7c-afd2-cbc640251ddb">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="3" rightPadding="3"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="10" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[DATEFORMAT(DATE(Integer.valueOf($F{dueDate}.substring(0,4)),Integer.valueOf($F{dueDate}.substring(5,7)),Integer.valueOf($F{dueDate}.substring(8,10))), "MM/dd/yy")]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="0" y="80" width="116" height="20" uuid="eb5fc62e-e881-4d8b-a30f-abcadf938996">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="3"/>
+						<textElement textAlignment="Left">
+							<font fontName="Arial Black" size="10" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Amount Due After " +DATEFORMAT(DATE(Integer.valueOf($F{dueDate}.substring(0,4)),Integer.valueOf($F{dueDate}.substring(5,7)),Integer.valueOf($F{dueDate}.substring(8,10))), "MMM-dd-yyyy")]]></textFieldExpression>
+					</textField>
+					<textField textAdjust="ScaleFont">
+						<reportElement x="100" y="80" width="162" height="20" uuid="6d5f64d2-41a3-45fb-9b5a-aa257e092276">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="3" rightPadding="3"/>
+						<textElement textAlignment="Right">
+							<font fontName="Arial Black" size="10" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{acctCurrencySym} + new DecimalFormat("#,##0.00").format($F{currBal})]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement mode="Opaque" x="0" y="101" width="261" height="26" forecolor="#FFFFFF" backcolor="#1E51A4" uuid="9cd8e82c-f14e-417a-9e98-10f0f666eccd"/>
+						<box leftPadding="3"/>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Arial Black" size="12" isBold="true"/>
+						</textElement>
+						<text><![CDATA[ Total Amount Due]]></text>
+					</staticText>
+					<textField textAdjust="ScaleFont">
+						<reportElement x="140" y="102" width="122" height="25" forecolor="#FFFFFF" uuid="dc706d39-f74f-4525-addb-034f1b7ef3c0">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box rightPadding="3"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="14" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{acctCurrencySym} + new DecimalFormat("#,##0.00").format($F{currBal})]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="40" width="90" height="20" uuid="8a9c253d-0ade-44e5-95f0-ced06038d66c">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="3"/>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Arial Black" size="10" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Account Name]]></text>
+					</staticText>
+					<textField textAdjust="ScaleFont">
+						<reportElement x="90" y="40" width="172" height="20" uuid="5cfdd6c6-8eb2-4935-a128-ed64c0044e5d">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box leftPadding="3" rightPadding="3"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="10" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{acctEntityName}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement stretchType="ContainerHeight" x="20" y="50" width="240" height="150" isPrintWhenDetailOverflows="true" uuid="91fafda1-7182-4d7d-9e8d-71a5ea6a0246">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<staticText>
+						<reportElement mode="Opaque" x="0" y="-10" width="240" height="20" forecolor="#FFFFFF" backcolor="#00AFCA" uuid="dd05f156-6c76-4b75-972c-3204552bb25a">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Arial Black" size="12" isBold="true"/>
+						</textElement>
+						<text><![CDATA[ Message Board]]></text>
+					</staticText>
+					<componentElement>
+						<reportElement stretchType="ContainerHeight" x="0" y="10" width="240" height="1" isPrintWhenDetailOverflows="true" uuid="4edab109-fda5-4408-b4d1-9e4747f404ae">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+							<datasetRun subDataset="BillMsgDataSet" uuid="2cf5d7a9-fc4f-4a64-81fd-586d8acf1526">
+								<datasetParameter name="billId">
+									<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_DATA_DOCUMENT">
+									<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_INPUT_STREAM">
+									<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_FILE">
+									<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="net.sf.jasperreports.xml.source">
+									<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_DATE_PATTERN">
+									<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_NUMBER_PATTERN">
+									<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_LOCALE">
+									<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="XML_TIME_ZONE">
+									<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+								<returnValue fromVariable="msgOnBill_Concat" toVariable="msgOnBill_Concat"/>
+							</datasetRun>
+							<jr:listContents height="1" width="240">
+								<textField textAdjust="StretchHeight">
+									<reportElement x="0" y="0" width="240" height="1" uuid="ab336ed3-8f0e-4b02-9252-d619c75f4f4d">
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										<printWhenExpression><![CDATA[false]]></printWhenExpression>
+									</reportElement>
+									<box topPadding="1" leftPadding="2" bottomPadding="0" rightPadding="0"/>
+									<textElement textAlignment="Justified">
+										<font fontName="Arial" size="7"/>
+										<paragraph lineSpacingSize="1.5"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{msgOnBill}]]></textFieldExpression>
+								</textField>
+							</jr:listContents>
+						</jr:list>
+					</componentElement>
+					<textField textAdjust="StretchHeight" evaluationTime="Group" evaluationGroup="BillAccountIDSubGroup">
+						<reportElement stretchType="ElementGroupBottom" x="0" y="10" width="240" height="164" isPrintWhenDetailOverflows="true" uuid="2d6eddda-32d1-4d39-adc5-7c971292a1ad">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box topPadding="5"/>
+						<textElement textAlignment="Left" markup="styled">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[IF($F{j250Msg}!=null, "<style isBold='true' pdfFontName='Helvetica-Bold'>"+ $F{j250Msg}+ "</style>"+"<br/>" +$F{j251Msg}+  $F{j252Msg}+  $F{j253Msg} + " "+"<br/>" +"<style isBold='true' pdfFontName='Helvetica-Bold'>"+$F{j254Msg} + "</style>"+ " "+$F{j255Msg}+$F{j256Msg}+" ",IF($F{nov1Msg}!=null, "<style isBold='true' pdfFontName='Helvetica-Bold'>" + $F{nov1Msg}  + "</style>"  +" " +$F{nov2Msg} + "<style isBold='true' pdfFontName='Helvetica-Bold'>" +  $F{nov3Msg} + "</style>" + $F{nov4Msg} +"<br/>" + "<style isBold='true' pdfFontName='Helvetica-Bold'>" +$F{nov5Msg} + "</style>" + " " + $F{nov6Msg} + $F{nov7Msg} +" ",IF($F{de20Msg}!=null,$F{de20Msg} + "<br/>" + $V{msgOnBill_Concat} + "<br/>" +$F{de24Msg},IF($F{fe24Msg}!=null,$F{fe24Msg}+$F{fe25Msg}+ "<br/>"+$F{fe26Msg}+ "<br/>"+$F{fe27Msg},$V{msgOnBill_Concat} ))))]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+			<band height="165">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement x="1" y="7" width="538" height="158" uuid="5980aabd-9c35-4865-a2cc-3d013bff861e">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<staticText>
+						<reportElement x="27" y="61" width="121" height="19" forecolor="#1E51A4" uuid="6ca60132-486f-49d8-8217-3acd611bf5c5">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box>
+							<rightPen lineWidth="0.0" lineColor="#C6C6C6"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="8" isBold="true"/>
+						</textElement>
+						<text><![CDATA[e-billing]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="148" y="61" width="120" height="19" forecolor="#1E51A4" uuid="10246676-e76f-46ec-bd3a-ddaa074ae3f0"/>
+						<box>
+							<rightPen lineWidth="0.0" lineColor="#C6C6C6"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="8" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Pay by Phone]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="268" y="61" width="121" height="19" forecolor="#1E51A4" uuid="666072a5-09bb-4b54-a006-249d6da47812"/>
+						<box>
+							<rightPen lineWidth="0.0" lineColor="#C6C6C6"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="8" isBold="true"/>
+						</textElement>
+						<text><![CDATA[In Person]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="389" y="61" width="120" height="19" forecolor="#1E51A4" uuid="9a8949ab-cf0c-44e0-b605-9918540d84f0"/>
+						<box>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial Black" size="8" isBold="true"/>
+						</textElement>
+						<text><![CDATA[By Mail]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="17" y="76" width="121" height="94" uuid="1ca65030-06bf-453a-8f25-61fbbba86e66">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box topPadding="0" leftPadding="2" bottomPadding="0" rightPadding="2">
+							<rightPen lineWidth="0.25" lineStyle="Solid" lineColor="#C6C6C6"/>
+						</box>
+						<textElement textAlignment="Center">
+							<font fontName="Arial" size="6.5"/>
+						</textElement>
+						<text><![CDATA[Try our new online Water and Sewer Utility Payment System. Through our secure site, you can pay all or part of your bill with an e-check, credit or debit card for a small convenience fee. Simply click on the link below and follow the instructions.
+
+https://mywateraccount.newarknj.gov/]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="148" y="76" width="120" height="82" uuid="f672cefb-b7d5-481b-a7c9-31a46407ca6c">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box padding="3">
+							<rightPen lineWidth="0.25" lineStyle="Solid" lineColor="#C6C6C6"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Top">
+							<font fontName="Arial" size="6.5"/>
+						</textElement>
+						<text><![CDATA[Call 1(888)-877-0450 to pay by phone with credit card. You can pay 24 hours a day. Your payment will post immediately.]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="268" y="76" width="121" height="82" uuid="6cd9464f-ae5e-41d5-886a-4f1fb61f8a33">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box padding="3">
+							<rightPen lineWidth="0.25" lineStyle="Solid" lineColor="#C6C6C6"/>
+						</box>
+						<textElement textAlignment="Center">
+							<font fontName="Arial" size="6.5"/>
+						</textElement>
+						<text><![CDATA[Residents can pay in person by cash, check, money order or credit card at the Water Department office in City Hall:
+
+920 Mayor Kenneth A Gibson Blvd
+Room 117
+Newark, New Jersey 07102
+Checks and money orders are payable to: City of Newark Water Department]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="389" y="76" width="120" height="82" uuid="e5de1f13-bfd2-47a0-8904-272da831aa5c">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box padding="3">
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Center">
+							<font fontName="Arial" size="6.5"/>
+						</textElement>
+						<text><![CDATA[Customers can mail their payments to the Department. Make checks payable to City of Newark Water Department and Send to:
+
+City of Newark Water Department
+920 Mayor Kenneth A Gibson Blvd
+Room 117
+Newark, New Jersey 07102]]></text>
+					</staticText>
+					<image>
+						<reportElement x="60" y="27" width="54" height="37" printWhenGroupChanges="BillAccountIDSubGroup" uuid="098d1115-e092-42d5-96e2-327fc90894d3"/>
+						<imageExpression><![CDATA["repo:e_billing.png"]]></imageExpression>
+					</image>
+					<image>
+						<reportElement x="184" y="27" width="45" height="37" printWhenGroupChanges="BillAccountIDSubGroup" uuid="279c3efb-2d08-44bd-bf6d-7c18a192463f"/>
+						<imageExpression><![CDATA["repo:PaybyPhone.png"]]></imageExpression>
+					</image>
+					<image>
+						<reportElement x="302" y="27" width="49" height="37" printWhenGroupChanges="BillAccountIDSubGroup" uuid="c4889a23-f99f-4dbd-9090-d3f891d2dd7f"/>
+						<imageExpression><![CDATA["repo:InPerson.png"]]></imageExpression>
+					</image>
+					<image>
+						<reportElement x="421" y="27" width="46" height="37" printWhenGroupChanges="BillAccountIDSubGroup" uuid="11b50030-040d-4353-80dd-ec383713b25b"/>
+						<imageExpression><![CDATA["repo:ByMail.png"]]></imageExpression>
+					</image>
+				</frame>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band height="936" splitType="Stretch">
+			<printWhenExpression><![CDATA[$V{PAGE_NUMBER}%2 == 0]]></printWhenExpression>
+			<image>
+				<reportElement mode="Transparent" x="65" y="170" width="410" height="410" printWhenGroupChanges="BillAccountIDGroup" uuid="7a259441-edd6-4e56-98c3-576cf51e928b"/>
+				<imageExpression><![CDATA["repo:CitySeal_Watermark.png"]]></imageExpression>
+			</image>
+		</band>
+	</background>
+	<detail>
+		<band height="57" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<staticText>
+				<reportElement x="330" y="0" width="70" height="18" uuid="372b2437-62a3-4397-9a3c-ab51ec0f8204"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Service Address:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="177" y="0" width="81" height="18" uuid="544cd590-dea0-4708-954a-545f233698ec">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Account Number:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="0" width="70" height="18" uuid="ce071bcc-e2b6-48c0-a27b-2a13630d62bf"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Account Name:]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="258" y="0" width="72" height="18" uuid="1ce7ff94-7aa3-4c76-ba59-f1ced2a1080e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{AccountIdPadded}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="71" y="0" width="106" height="18" uuid="cfeeaf18-3eef-45f6-9635-c3a863375699"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{acctEntityName}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="400" y="0" width="140" height="18" uuid="901d1424-59cf-4c72-854f-823b66844804"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Service_Address}]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement x="1" y="19" width="540" height="36" uuid="10f490a3-4324-474f-a38b-e32bcdb4ce2b"/>
+				<rectangle>
+					<reportElement x="1" y="14" width="60" height="22" forecolor="#BDD42C" uuid="a264546d-6dd8-4109-8580-b2ca09089280"/>
+				</rectangle>
+				<rectangle>
+					<reportElement x="472" y="14" width="67" height="22" forecolor="#BDD42C" uuid="2b0c387d-e4fc-4b3f-a2e2-1463c9d30674">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="394" y="14" width="60" height="22" forecolor="#BDD42C" uuid="2d67bb96-bee1-40c6-a586-52d8a12744fb"/>
+				</rectangle>
+				<rectangle>
+					<reportElement x="236" y="14" width="60" height="22" forecolor="#BDD42C" uuid="e3f9ea9a-5218-4533-8c50-e1ecb019ff17"/>
+				</rectangle>
+				<rectangle>
+					<reportElement x="157" y="14" width="60" height="22" forecolor="#BDD42C" uuid="e3dfc8ad-16bd-4669-a61a-3c5ec0df5f1b"/>
+				</rectangle>
+				<rectangle>
+					<reportElement x="315" y="14" width="60" height="22" forecolor="#BDD42C" uuid="66a71036-56c1-4fec-ab21-461eb356b65f"/>
+				</rectangle>
+				<rectangle>
+					<reportElement x="79" y="14" width="60" height="22" forecolor="#BDD42C" uuid="f1e39623-8150-4a49-94b1-53293a7ede61"/>
+				</rectangle>
+				<staticText>
+					<reportElement x="0" y="2" width="61" height="10" uuid="727cbc31-6442-48b4-a9d4-d75c15337ced"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial Black" size="6.2" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Previous Balance]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="83" y="2" width="50" height="10" uuid="0b5c8e7b-7692-48b7-816f-ed59f16f6883"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial Black" size="6.2" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Payments]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="321" y="2" width="48" height="10" uuid="abed002a-ef16-4f0d-9360-dce395ca6056"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial Black" size="6.2" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Adjustments]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="232" y="2" width="68" height="10" uuid="78e70c2e-2209-44b5-a20e-e71d9745e85a"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial Black" size="6.2" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Balance Forward]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="393" y="2" width="62" height="10" uuid="0cf7bdf7-6c75-4500-81ce-6deeb849b16e"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial Black" size="6.2" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Current Charges]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="472" y="2" width="67" height="10" uuid="b9a24c38-0c4c-4f62-880e-bf568f0b7f51">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial Black" size="6.2" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total Amount Due]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="61" y="19" width="18" height="11" uuid="4458e931-305e-4c01-a1f6-dbef426ed380"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[-]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="139" y="19" width="18" height="11" uuid="e22a50c6-ff24-4b17-b335-56085d096b5b"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[+]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="217" y="19" width="19" height="11" uuid="0784b841-e69b-4762-95bf-468e30cae1ca"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[=]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="375" y="19" width="19" height="11" uuid="01032fd3-e39a-44bc-a483-da0ae8fab0e6"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[+]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="455" y="19" width="17" height="11" uuid="e147ab12-8f86-47f5-8b01-927051f91e0d">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[=]]></text>
+				</staticText>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="1" y="20" width="60" height="10" uuid="3fb5736f-dabf-43ea-a293-102e2ecef383"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} +  new DecimalFormat("#,##0.00").format($F{currPrevBal})]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="79" y="19" width="60" height="11" uuid="9e0aee46-2c79-4464-ab85-275f8289ffed"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} +  new DecimalFormat("#,##0.00").format($F{currPayAmt}.negate())]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="394" y="19" width="60" height="11" uuid="810f195d-b578-4ec8-ac97-c4da62dd8d0e"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} +  new DecimalFormat("#,##0.00").format($F{currChgAmt})]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="394" y="36" width="60" height="11" uuid="92960dc6-60c0-4394-ba71-c42ae47ca1b8"/>
+					<textElement>
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Due by " + DATEFORMAT(DATE(Integer.valueOf($F{dueDate}.substring(0,4)),Integer.valueOf($F{dueDate}.substring(5,7)),Integer.valueOf($F{dueDate}.substring(8,10))), "MM/dd/yy")]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="315" y="19" width="60" height="11" uuid="89f9dd31-466e-466c-a058-7502b296ed9d"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} + new DecimalFormat("#,##0.00").format($F{currAdjAmt})]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="472" y="19" width="67" height="11" uuid="c496a4f6-5f4b-4060-a411-6d541c7014d8">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} +   new DecimalFormat("#,##0.00").format($F{currBal})]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="236" y="19" width="60" height="11" uuid="293ce3e6-e22f-46a2-bcb6-f45c03da837f"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} +  new DecimalFormat("#,##0.00").format(SUM($F{currPrevBal},$F{currPayAmt},$F{currCorrAmt}))]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="157" y="19" width="60" height="11" uuid="b4c6f205-f464-4e6e-92ac-f13ede64cf48"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} +  new DecimalFormat("#,##0.00").format($F{currCorrAmt})]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="152" y="2" width="71" height="10" uuid="41761132-02b3-4acb-ba04-0a64b91f7829"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial Black" size="6.2" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Correction Amount]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="296" y="19" width="19" height="11" uuid="8cad8d44-8c32-414e-b0bf-a003c317ec6f"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[+]]></text>
+				</staticText>
+			</frame>
+		</band>
+		<band height="38">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement x="0" y="0" width="540" height="37" uuid="833da8fc-7dd3-4c9b-a20f-ff049c078d17">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<staticText>
+					<reportElement x="0" y="0" width="50" height="16" uuid="a4169cc8-9055-4911-bc68-f04753586325">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial Black" size="11" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Meter Detail]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="14" width="80" height="12" forecolor="#00AFCA" uuid="8d7d0847-0e7a-4d95-b27c-0eb45dd19b5d">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="inch"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.25" lineStyle="Solid" lineColor="#C6C6C6"/>
+						<topPen lineWidth="0.0" lineStyle="Solid"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial Black" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Badge Number]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="80" y="14" width="110" height="12" forecolor="#00AFCA" uuid="186a79da-578a-490f-839c-a950a985f16e">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.25" lineStyle="Solid" lineColor="#C6C6C6"/>
+						<topPen lineWidth="0.0" lineStyle="Solid"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial Black" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Read Dates]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="190" y="14" width="70" height="12" forecolor="#00AFCA" uuid="6c50868f-4c9f-4a59-adb5-97d91c3fb492">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.25" lineStyle="Solid" lineColor="#C6C6C6"/>
+						<topPen lineWidth="0.0" lineStyle="Solid"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial Black" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Previous Read]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="260" y="14" width="80" height="12" forecolor="#00AFCA" uuid="1d764b54-dd5b-4d25-9ce1-541b6f649782">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.25" lineStyle="Solid" lineColor="#C6C6C6"/>
+						<topPen lineWidth="0.0" lineStyle="Solid"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial Black" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Current Read]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="420" y="14" width="70" height="12" forecolor="#00AFCA" uuid="e25a4dc8-349f-411e-9fbc-ee4b4cd40760">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.25" lineStyle="Solid" lineColor="#C6C6C6"/>
+						<topPen lineWidth="0.0" lineStyle="Solid"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial Black" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Usage]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="490" y="14" width="50" height="12" forecolor="#00AFCA" uuid="4af2f66c-b2a5-4119-9974-d4eb77f33b07">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.25" lineStyle="Solid" lineColor="#C6C6C6"/>
+						<topPen lineWidth="0.0" lineStyle="Solid"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial Black" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[UOM]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement isPrintRepeatedValues="false" x="0" y="25" width="540" height="12" uuid="baf77a98-90d1-4fc9-a1f8-44339da027dd">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="BillSegmentReadList" uuid="5508bec6-2cb5-409c-b21a-c82208f515e6">
+							<datasetParameter name="XML_DATA_DOCUMENT">
+								<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_INPUT_STREAM">
+								<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_FILE">
+								<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="net.sf.jasperreports.xml.source">
+								<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATE_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_NUMBER_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_LOCALE">
+								<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_TIME_ZONE">
+								<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="billId">
+								<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="12" width="540">
+							<textField textAdjust="ScaleFont">
+								<reportElement x="80" y="0" width="110" height="12" uuid="f5394d76-d7bd-49ad-afdc-a2112438e69e">
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[DATEFORMAT(DATE(Integer.valueOf($F{startReadDttm}.substring(0,4)),Integer.valueOf($F{startReadDttm}.substring(5,7)),Integer.valueOf($F{startReadDttm}.substring(8,10))), "MM/dd/yy") + " - " + DATEFORMAT(DATE(Integer.valueOf($F{endReadDttm}.substring(0,4)),Integer.valueOf($F{endReadDttm}.substring(5,7)),Integer.valueOf($F{endReadDttm}.substring(8,10))), "MM/dd/yy")]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement x="190" y="0" width="70" height="12" uuid="a96fc601-1ae7-4ba8-b44b-3ae07ac28226">
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="inch"/>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[new DecimalFormat("#,##0.00").format($F{startRegRdg})]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement x="340" y="0" width="80" height="12" uuid="8a00edc9-be65-4c8e-abbb-4fa4330137fe">
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="inch"/>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{endEstimate}==true?"Estimate":"Actual"]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement x="420" y="0" width="70" height="12" uuid="02bfad9e-3b77-47b6-abaf-b44d2a7bcb1b">
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="inch"/>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{finalUom}.equals("CF") ? new DecimalFormat("#,##0.00").format($F{finalRegQty}.divide(new BigDecimal(100))) : new DecimalFormat("#,##0.00").format($F{finalRegQty})]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement x="490" y="0" width="50" height="12" uuid="25e0c2b6-aa93-4e89-b484-03c98453e919">
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{finalUom}.equals("CF") ? "CCF" : $F{finalUom}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement x="0" y="0" width="80" height="12" uuid="2b5931bb-69c1-48e5-b1c5-bbc5b6129e93">
+									<property name="com.jaspersoft.studio.unit.height" value="inch"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{badge}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement x="260" y="0" width="80" height="12" uuid="b17ec646-891e-4c9f-bef0-47baffb30f38">
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="inch"/>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[new DecimalFormat("#,##0.00").format($F{endRegRdg})]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<staticText>
+					<reportElement x="340" y="14" width="80" height="12" forecolor="#00AFCA" uuid="3f21f414-48a3-4e73-b55e-b9e895815e31">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.25" lineStyle="Solid" lineColor="#C6C6C6"/>
+						<topPen lineWidth="0.0" lineStyle="Solid"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial Black" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Read Type]]></text>
+				</staticText>
+			</frame>
+		</band>
+		<band height="112">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement x="279" y="5" width="241" height="107" uuid="de09eb5a-8db1-43d3-888f-f364a5a1bdbf">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25" lineColor="#C6C6C6"/>
+					<bottomPen lineWidth="0.0" lineColor="#C6C6C6"/>
+					<rightPen lineWidth="0.25" lineStyle="Solid" lineColor="#C6C6C6"/>
+				</box>
+				<textField>
+					<reportElement mode="Opaque" x="163" y="51" width="76" height="14" backcolor="#FFFFFF" uuid="5f3529d2-358a-4893-8ab3-2c92ecc45ecf">
+						<property name="com.jaspersoft.studio.unit.height" value="inch"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box leftPadding="3" rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} + new DecimalFormat("#,##0.00").format($F{currCorrAmt})]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement mode="Opaque" x="163" y="37" width="76" height="14" backcolor="#FFFFFF" uuid="b5b40112-4720-42cf-bee9-741cb83d0fd3">
+						<property name="com.jaspersoft.studio.unit.height" value="inch"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box leftPadding="3" rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} + new DecimalFormat("#,##0.00").format($F{currPrevBal})]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement mode="Opaque" x="0" y="37" width="170" height="14" backcolor="#FFFFFF" uuid="28dc71ca-ff38-46f7-ba30-5bd08c1f78aa">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement>
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<text><![CDATA[Previous Balance]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="0" y="65" width="159" height="14" forecolor="#ED1C24" uuid="da7964af-9c99-445b-bc61-fd7d946521c9">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box leftPadding="3">
+						<pen lineWidth="0.0" lineStyle="Solid"/>
+						<leftPen lineColor="#C6C6C6"/>
+						<bottomPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Balance Forward]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="0" y="51" width="174" height="14" backcolor="#FFFFFF" uuid="eb92e6bf-f6cc-4bae-824c-ba17437464ec">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement>
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<text><![CDATA[Corrections]]></text>
+				</staticText>
+				<textField>
+					<reportElement mode="Transparent" x="163" y="65" width="76" height="14" uuid="55d459d8-a4f9-4332-ba79-322142e081fa">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box leftPadding="3" rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} +  new DecimalFormat("#,##0.00").format(SUM($F{currPrevBal},$F{currPayAmt},$F{currCorrAmt}))]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement mode="Opaque" x="0" y="23" width="170" height="14" backcolor="#FFFFFF" uuid="34f71551-1899-4b63-a2d9-f0d2fb2cdbc0">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement>
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{lastPayDate} != null ? "Payments Received - "+   DATEFORMAT(DATE(Integer.valueOf($F{lastPayDate}.substring(0,4)),Integer.valueOf($F{lastPayDate}.substring(5,7)),Integer.valueOf($F{lastPayDate}.substring(8,10))), "MM/dd/yy") + " - Thank you!" : "Payments Received - Thank you!"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement mode="Opaque" x="163" y="23" width="76" height="14" backcolor="#FFFFFF" uuid="ec7c164c-e1d8-4d6e-9329-d62142864d7a">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="inch"/>
+					</reportElement>
+					<box leftPadding="3" rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} + new DecimalFormat("#,##0.00").format($F{currPayAmt})]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement mode="Opaque" x="0" y="0" width="241" height="23" forecolor="#FFFFFF" backcolor="#1E51A4" uuid="7195678a-f079-4975-a460-86240c6b065d">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial Black" size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[DATEFORMAT(DATE(Integer.valueOf($F{billDate}.substring(0,4)),Integer.valueOf($F{billDate}.substring(5,7)),Integer.valueOf($F{billDate}.substring(8,10))),"MMMM") + " Bill Details"]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="20" y="5" width="259" height="107" uuid="6d06bcae-9f28-4088-bba7-940c42b4d772">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Solid"/>
+					<topPen lineWidth="0.25" lineColor="#C6C6C6"/>
+					<leftPen lineWidth="0.25" lineColor="#C6C6C6"/>
+					<bottomPen lineWidth="0.0" lineColor="#C6C6C6"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<staticText>
+					<reportElement x="0" y="37" width="87" height="14" uuid="8a3174f4-8a85-4bec-a477-0c9242c3fb98">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9.9"/>
+					</textElement>
+					<text><![CDATA[Sewer Billing]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="23" width="87" height="14" uuid="ef7eedc7-6b10-4dac-8b74-94e4a08c4954">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9.9"/>
+					</textElement>
+					<text><![CDATA[Water Billing]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="51" width="87" height="14" uuid="73126d16-98f5-44c6-90af-837703cf288f">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9.9"/>
+					</textElement>
+					<text><![CDATA[Passaic Valley]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="79" width="146" height="14" uuid="ace43996-4f99-46ef-979a-7b846f462c84">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9.9"/>
+					</textElement>
+					<text><![CDATA[PVSC Direct Billing]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="108" width="87" height="14" uuid="e00edc60-b938-4c6a-afb7-70c06f07b214">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9.9"/>
+					</textElement>
+					<text><![CDATA[Other]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="65" width="87" height="14" uuid="dbadee75-85fd-4110-869a-321aecda74e4">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9.9"/>
+					</textElement>
+					<text><![CDATA[ASS. Fire Line]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement x="147" y="37" width="93" height="14" uuid="6963a716-d1da-4368-9fc5-16d86e3afa5b">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="SEWER_BILLING" uuid="5909b24f-d736-4bea-8cf0-2e2613308e0f">
+							<datasetParameter name="XML_DATA_DOCUMENT">
+								<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_INPUT_STREAM">
+								<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_FILE">
+								<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="net.sf.jasperreports.xml.source">
+								<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATE_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_NUMBER_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_LOCALE">
+								<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_TIME_ZONE">
+								<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="billId">
+								<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="14" width="93">
+							<textField>
+								<reportElement x="0" y="0" width="93" height="14" uuid="7176dd23-36cd-4a83-b857-6baf1eaeed30"/>
+								<box rightPadding="3">
+									<pen lineWidth="0.25" lineColor="#C6C6C6"/>
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial" size="9.9"/>
+								</textElement>
+								<textFieldExpression><![CDATA["$" + ($F{calcAmt} == null ? "0.00" : new DecimalFormat("#,##0.00").format($F{calcAmt}))]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<componentElement>
+					<reportElement x="147" y="23" width="93" height="14" uuid="ce285196-093e-4da5-aa29-9f5a00f317ae">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="WATER_BILLING" uuid="f20bf30c-8bc6-4987-8960-ed3f55fbdc6e">
+							<datasetParameter name="XML_DATA_DOCUMENT">
+								<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_INPUT_STREAM">
+								<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_FILE">
+								<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="net.sf.jasperreports.xml.source">
+								<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATE_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_NUMBER_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_LOCALE">
+								<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_TIME_ZONE">
+								<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="billId">
+								<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="14" width="93">
+							<textField>
+								<reportElement x="0" y="0" width="93" height="14" uuid="8a807849-d8b5-447d-9d21-bbc595369555"/>
+								<box rightPadding="3">
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0" lineColor="#C6C6C6"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial" size="9.9"/>
+								</textElement>
+								<textFieldExpression><![CDATA["$" + ($F{calcAmt} == null ? "0.00" : new DecimalFormat("#,##0.00").format($F{calcAmt}))]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<componentElement>
+					<reportElement x="147" y="51" width="93" height="14" uuid="06afa59f-6616-4f7b-85ff-468ddfa8a215">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="PASSAIC_VALLEY" uuid="17852f87-0b02-4def-9e2b-18b70f912359">
+							<datasetParameter name="XML_DATA_DOCUMENT">
+								<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_INPUT_STREAM">
+								<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_FILE">
+								<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="net.sf.jasperreports.xml.source">
+								<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATE_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_NUMBER_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_LOCALE">
+								<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_TIME_ZONE">
+								<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="billId">
+								<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="14" width="93">
+							<textField>
+								<reportElement x="0" y="0" width="93" height="14" uuid="be88e2e8-df1c-4dcf-a090-8659fba31c4a"/>
+								<box rightPadding="3">
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial" size="9.9"/>
+								</textElement>
+								<textFieldExpression><![CDATA["$" + ($F{calcAmt} == null ? "0.00" : new DecimalFormat("#,##0.00").format($F{calcAmt}))]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<componentElement>
+					<reportElement x="146" y="79" width="93" height="14" uuid="28f439cc-f533-4a81-ab17-a37b5c308cdf">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="PVSC_DIRECT_BIL" uuid="e55efc5e-0944-40c7-81eb-ee1ac46ab5e4">
+							<datasetParameter name="billId">
+								<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATA_DOCUMENT">
+								<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_INPUT_STREAM">
+								<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_FILE">
+								<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="net.sf.jasperreports.xml.source">
+								<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATE_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_NUMBER_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_LOCALE">
+								<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_TIME_ZONE">
+								<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="14" width="93">
+							<textField>
+								<reportElement x="0" y="0" width="93" height="14" uuid="a56b0732-4895-4d23-a521-5367b6ee93f1"/>
+								<box rightPadding="3">
+									<pen lineWidth="0.25" lineColor="#C6C6C6"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial"/>
+								</textElement>
+								<textFieldExpression><![CDATA["$" + ($F{calcAmt} == null ? "0.00" : new DecimalFormat("#,##0.00").format($F{calcAmt}))]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<componentElement>
+					<reportElement x="147" y="65" width="93" height="14" uuid="439e9b86-88b8-47f3-89f6-65b2427d95c6">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="ASS. FIRE LINE" uuid="fb387f44-05fa-4c52-8a1a-697b8836c552">
+							<datasetParameter name="billId">
+								<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATA_DOCUMENT">
+								<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_INPUT_STREAM">
+								<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_FILE">
+								<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="net.sf.jasperreports.xml.source">
+								<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATE_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_NUMBER_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_LOCALE">
+								<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_TIME_ZONE">
+								<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="14" width="93">
+							<textField isBlankWhenNull="false">
+								<reportElement x="0" y="0" width="93" height="14" uuid="c0f39e48-73df-4e28-956b-f18582315e61"/>
+								<box>
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial" size="9.9"/>
+								</textElement>
+								<textFieldExpression><![CDATA["$" + ($F{calcAmt} == null ? "0.00" : new DecimalFormat("#,##0.00").format($F{calcAmt}))]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<componentElement>
+					<reportElement x="146" y="65" width="93" height="14" uuid="439e9b86-88b8-47f3-89f6-65b2427d95c6">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="ASS. FIRE LINE" uuid="45d21d4f-3846-4844-a394-dda7eb2966a3">
+							<datasetParameter name="billId">
+								<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATA_DOCUMENT">
+								<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_INPUT_STREAM">
+								<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_FILE">
+								<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="net.sf.jasperreports.xml.source">
+								<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATE_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_NUMBER_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_LOCALE">
+								<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_TIME_ZONE">
+								<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="14" width="93">
+							<textField isBlankWhenNull="false">
+								<reportElement x="0" y="0" width="93" height="14" uuid="c0f39e48-73df-4e28-956b-f18582315e61"/>
+								<box>
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#C6C6C6"/>
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial" size="9.9"/>
+								</textElement>
+								<textFieldExpression><![CDATA["$" + ($F{calcAmt} == null ? "0.00" : new DecimalFormat("#,##0.00").format($F{calcAmt}))]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="145" y="108" width="94" height="14" uuid="54033dc3-818b-4458-9500-f5d9f053a8ab">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} + new DecimalFormat("#,##0.00").format($F{currAdjAmt})]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="ScaleFont">
+					<reportElement mode="Opaque" x="0" y="0" width="241" height="23" forecolor="#FFFFFF" backcolor="#1E51A4" uuid="7bb08186-f41a-470c-ab19-77bc94f0082a">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="Arial Black" size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Current Charges / Adjustments"]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="93" width="146" height="14" uuid="5ccea981-203b-472f-ad69-82d51eace814">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9.9"/>
+					</textElement>
+					<text><![CDATA[Payment Arrangement]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement x="146" y="93" width="93" height="14" uuid="de5ba537-48db-4298-92df-1e1efba98d17">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="PAYARR_DIRECT_BIL" uuid="4829f3d0-7107-4e57-9f7b-e3203e9a977e">
+							<datasetParameter name="billId">
+								<datasetParameterExpression><![CDATA[$F{billId}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATA_DOCUMENT">
+								<datasetParameterExpression><![CDATA[$P{XML_DATA_DOCUMENT}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_INPUT_STREAM">
+								<datasetParameterExpression><![CDATA[$P{XML_INPUT_STREAM}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_FILE">
+								<datasetParameterExpression><![CDATA[$P{XML_FILE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="net.sf.jasperreports.xml.source">
+								<datasetParameterExpression><![CDATA[$P{net.sf.jasperreports.xml.source}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_DATE_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_DATE_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_NUMBER_PATTERN">
+								<datasetParameterExpression><![CDATA[$P{XML_NUMBER_PATTERN}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_LOCALE">
+								<datasetParameterExpression><![CDATA[$P{XML_LOCALE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="XML_TIME_ZONE">
+								<datasetParameterExpression><![CDATA[$P{XML_TIME_ZONE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="14" width="93">
+							<textField>
+								<reportElement x="0" y="0" width="93" height="14" uuid="52925319-96b8-4ab7-a4d9-c96b67ef753b"/>
+								<box rightPadding="3">
+									<pen lineWidth="0.25" lineColor="#C6C6C6"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial"/>
+								</textElement>
+								<textFieldExpression><![CDATA["$" + ($F{calcAmt} == null ? "0.00" : new DecimalFormat("#,##0.00").format($F{calcAmt}))]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+			</frame>
+		</band>
+		<band height="56">
+			<frame>
+				<reportElement x="20" y="15" width="500" height="40" uuid="f5925134-6d1f-445e-8248-3fdcb0ca379e"/>
+				<box>
+					<pen lineColor="#C6C6C6"/>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<staticText>
+					<reportElement x="0" y="1" width="207" height="14" uuid="343b5c04-f242-4bcf-9fb7-289cd82ba0a6">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="3" rightPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial Black" size="9.9" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total Current Charges/Adjustments]]></text>
+				</staticText>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="160" y="1" width="90" height="14" uuid="8bb41899-d5fe-4f20-9412-184272f6db77"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9.9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} +  new DecimalFormat("#,##0.00").format(SUM($F{currAdjAmt},$F{currChgAmt}))]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="ScaleFont">
+					<reportElement mode="Opaque" x="271" y="15" width="229" height="25" forecolor="#FFFFFF" backcolor="#1E51A4" uuid="ffb8b722-6784-417d-9047-3ed16aa092a8">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box leftPadding="3" rightPadding="10"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial Black" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{acctCurrencySym} + new DecimalFormat("#,##0.00").format($F{currBal})]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="ScaleFont">
+					<reportElement mode="Opaque" x="0" y="15" width="279" height="25" forecolor="#FFFFFF" backcolor="#1E51A4" uuid="7da29f6b-82c5-4fc5-acfe-6304022accc9">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="3" rightPadding="3"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="Arial Black" size="10" isBold="true" isItalic="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Total Amount Due by " + DATEFORMAT(DATE(Integer.valueOf($F{dueDate}.substring(0,4)),Integer.valueOf($F{dueDate}.substring(5,7)),Integer.valueOf($F{dueDate}.substring(8,10))), "MM/dd/yy")]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+</jasperReport>

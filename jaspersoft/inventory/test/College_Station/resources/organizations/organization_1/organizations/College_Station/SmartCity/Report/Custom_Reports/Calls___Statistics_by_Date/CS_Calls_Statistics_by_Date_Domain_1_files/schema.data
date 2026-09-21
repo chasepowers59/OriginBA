@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CS_CALLS_STATISTICS" label="CS_CALLS_STATISTICS" resourceId="CS_CALLS_STATISTICS"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="CC_CLASS" label="Customer Contact Class" resourceId="CS_CALLS_STATISTICS.CC_CLASS"></item>
+    <item id="CC_DESCR" label="Customer Contact Description" resourceId="CS_CALLS_STATISTICS.CC_DESCR"></item>
+    <item id="CC_DTTM" label="Contact Date/Time" resourceId="CS_CALLS_STATISTICS.CC_DTTM"></item>
+    <item id="CC_TYPE" label="Customer Contact Type" resourceId="CS_CALLS_STATISTICS.CC_TYPE"></item>
+    <item id="COUNT_COL" label="Number of Customer Contacts" resourceId="CS_CALLS_STATISTICS.COUNT_COL"></item>
+    <item id="USER_ID" label="User" resourceId="CS_CALLS_STATISTICS.USER_ID"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CS_CALLS_STATISTICS" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="COUNT_COL" type="java.math.BigDecimal"></field>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="CC_CLASS" type="java.lang.String"></field>
+        <field id="CC_TYPE" type="java.lang.String"></field>
+        <field id="CC_DESCR" type="java.lang.String"></field>
+        <field id="CC_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>SELECT COUNT(CC.CC_ID) AS COUNT_COL, CC.USER_ID AS USER_ID, CC.CC_CL_CD AS CC_CLASS, CC.CC_TYPE_CD AS CC_TYPE, CCTL.DESCR AS CC_DESCR, CC.CC_DTTM AS CC_DTTM 
+FROM CISADM.CI_CC CC, CISADM.CI_CC_TYPE_L CCTL 
+WHERE CC.CC_TYPE_CD = CCTL.CC_TYPE_CD 
+AND CC.CC_CL_CD = CCTL.CC_CL_CD 
+AND CCTL.LANGUAGE_CD = 'ENG' 
+GROUP BY CC.USER_ID, CC.CC_CL_CD, CC.CC_TYPE_CD, CCTL.DESCR, CC.CC_DTTM</query>
+    </jdbcQuery>
+  </resources>
+</schema>

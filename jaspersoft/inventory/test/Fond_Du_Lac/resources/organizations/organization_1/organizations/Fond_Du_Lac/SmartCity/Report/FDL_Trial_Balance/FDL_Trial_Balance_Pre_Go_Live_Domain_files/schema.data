@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <itemGroups>
+    <itemGroup id="FDL_TRIAL_BAL_180" label="FDL_TRIAL_BAL_180" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT_CUR_AMT__2" label="91 to 180 Days (Current)" resourceId="JoinTree_1.FDL_TRIAL_BAL_180.SUM_FT_CUR_AMT__2"></item>
+        <item id="SUM_FT_TOT_AMT__4" label="91 to 180 Days (Payoff)" resourceId="JoinTree_1.FDL_TRIAL_BAL_180.SUM_FT_TOT_AMT__4"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="FDL_TRIAL_BAL_270" label="FDL_TRIAL_BAL_270" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT_CUR_AMT__3" label="181 to 270 Days (Current)" resourceId="JoinTree_1.FDL_TRIAL_BAL_270.SUM_FT_CUR_AMT__3"></item>
+        <item id="SUM_FT_TOT_AMT__3" label="181 to 270 Days (Payoff)" resourceId="JoinTree_1.FDL_TRIAL_BAL_270.SUM_FT_TOT_AMT__3"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="FDL_TRIAL_BAL_90" label="FDL_TRIAL_BAL_90" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT_CUR_AMT__1" label="0 to 90 Days (Current)" resourceId="JoinTree_1.FDL_TRIAL_BAL_90.SUM_FT_CUR_AMT__1"></item>
+        <item id="SUM_FT_TOT_AMT__2" label="0 to 90 Days (Payoff)" resourceId="JoinTree_1.FDL_TRIAL_BAL_90.SUM_FT_TOT_AMT__2"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="FDL_TRIAL_BAL_O" label="FDL_TRIAL_BAL_O" resourceId="JoinTree_1">
+      <items>
+        <item id="DESCR" label="Description" resourceId="JoinTree_1.FDL_TRIAL_BAL_O.DESCR"></item>
+        <item id="DST_ID" label="Dist Code" resourceId="JoinTree_1.FDL_TRIAL_BAL_O.DST_ID"></item>
+        <item id="FREEZE_SW" label="Frozen Switch" resourceId="JoinTree_1.FDL_TRIAL_BAL_O.FREEZE_SW"></item>
+        <item id="SUM_FT_CUR_AMT_" label="All Days (Current)" resourceId="JoinTree_1.FDL_TRIAL_BAL_O.SUM_FT_CUR_AMT_"></item>
+        <item id="SUM_FT_TOT_AMT_" label="All Days (Payoff)" resourceId="JoinTree_1.FDL_TRIAL_BAL_O.SUM_FT_TOT_AMT_"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="FDL_TRIAL_BAL_OLD" label="FDL_TRIAL_BAL_OLD" resourceId="JoinTree_1"></itemGroup>
+  </itemGroups>
+  <items>
+    <item id="SUM_FT_CUR_AMT__5" label="271 Days and Older (Current)" resourceId="JoinTree_1.FDL_TRIAL_BAL_OLD.SUM_FT_CUR_AMT__5"></item>
+    <item id="SUM_FT_TOT_AMT__6" label="271 Days and Older (Payoff)" resourceId="JoinTree_1.FDL_TRIAL_BAL_OLD.SUM_FT_TOT_AMT__6"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="FDL_TRIAL_BAL_O" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="SUM_FT_CUR_AMT_" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT_TOT_AMT_" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FREEZE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <query>select DCL.DST_ID, DCL.DESCR, FT.FREEZE_SW,
+    SUM(FT.CUR_AMT), SUM(FT.TOT_AMT) from cisadm.ci_ft FT, cisadm.CI_SA sa, cisadm.ci_sa_type SAT, cisadm.CI_DST_CODE_L DCL
+    where FT.SA_ID = SA.SA_ID
+          and SA.SA_TYPE_CD = SAT.SA_TYPE_CD
+          and SAT.DST_ID = DCL.DST_ID
+    group by DCL.DST_ID, DCL.DESCR, FT.FREEZE_SW</query>
+    </jdbcQuery>
+    <jdbcQuery id="FDL_TRIAL_BAL_90" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="SUM_FT_CUR_AMT__1" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT_TOT_AMT__2" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FREEZE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <query>select DCL.DST_ID, DCL.DESCR, FT.FREEZE_SW,
+    SUM(FT.CUR_AMT), SUM(FT.TOT_AMT) from cisadm.ci_ft FT, cisadm.CI_SA sa, cisadm.ci_sa_type SAT, cisadm.CI_DST_CODE_L DCL
+    where FT.SA_ID = SA.SA_ID
+          and FT.ars_dt between trunc(sysdate) -90 and trunc(sysdate)
+          and SA.SA_TYPE_CD = SAT.SA_TYPE_CD
+          and SAT.DST_ID = DCL.DST_ID
+    group by DCL.DST_ID, DCL.DESCR, FT.FREEZE_SW</query>
+    </jdbcQuery>
+    <jdbcQuery id="FDL_TRIAL_BAL_180" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="SUM_FT_CUR_AMT__2" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT_TOT_AMT__4" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FREEZE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <query>select DCL.DST_ID, DCL.DESCR, FT.FREEZE_SW,
+    SUM(FT.CUR_AMT), SUM(FT.TOT_AMT) from cisadm.ci_ft FT, cisadm.CI_SA sa, cisadm.ci_sa_type SAT, cisadm.CI_DST_CODE_L DCL
+    where FT.SA_ID = SA.SA_ID
+          and FT.ars_dt between trunc(sysdate) -180 and trunc(sysdate) - 91
+          and SA.SA_TYPE_CD = SAT.SA_TYPE_CD
+          and SAT.DST_ID = DCL.DST_ID
+    group by DCL.DST_ID, DCL.DESCR, FT.FREEZE_SW</query>
+    </jdbcQuery>
+    <jdbcQuery id="FDL_TRIAL_BAL_270" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="SUM_FT_CUR_AMT__3" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT_TOT_AMT__3" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FREEZE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <query>select DCL.DST_ID, DCL.DESCR, FT.FREEZE_SW,
+    SUM(FT.CUR_AMT), SUM(FT.TOT_AMT) from cisadm.ci_ft FT, cisadm.CI_SA sa, cisadm.ci_sa_type SAT, cisadm.CI_DST_CODE_L DCL
+    where FT.SA_ID = SA.SA_ID
+          and FT.ars_dt between trunc(sysdate) -270 and trunc(sysdate) - 181
+          and SA.SA_TYPE_CD = SAT.SA_TYPE_CD
+          and SAT.DST_ID = DCL.DST_ID
+    group by DCL.DST_ID, DCL.DESCR, FT.FREEZE_SW</query>
+    </jdbcQuery>
+    <jdbcQuery id="FDL_TRIAL_BAL_OLD" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="FREEZE_SW" type="java.lang.String"></field>
+        <field id="SUM_FT_CUR_AMT__5" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT_TOT_AMT__6" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select DCL.DST_ID, DCL.DESCR, FT.FREEZE_SW,
+    SUM(FT.CUR_AMT), SUM(FT.TOT_AMT) from cisadm.ci_ft FT, cisadm.CI_SA sa, cisadm.ci_sa_type SAT, cisadm.CI_DST_CODE_L DCL
+    where FT.SA_ID = SA.SA_ID
+          and FT.ars_dt &lt;= trunc(sysdate) - 271
+          and SA.SA_TYPE_CD = SAT.SA_TYPE_CD
+          and SAT.DST_ID = DCL.DST_ID
+    group by DCL.DST_ID, DCL.DESCR, FT.FREEZE_SW</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_1" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="FDL_TRIAL_BAL_OLD.DST_ID" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_OLD.DESCR" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_OLD.FREEZE_SW" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_OLD.SUM_FT_CUR_AMT__5" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_TRIAL_BAL_OLD.SUM_FT_TOT_AMT__6" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_TRIAL_BAL_O.DST_ID" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_O.DESCR" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_O.SUM_FT_CUR_AMT_" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_TRIAL_BAL_O.SUM_FT_TOT_AMT_" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_TRIAL_BAL_O.FREEZE_SW" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_270.DST_ID" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_270.DESCR" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_270.SUM_FT_CUR_AMT__3" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_TRIAL_BAL_270.SUM_FT_TOT_AMT__3" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_TRIAL_BAL_270.FREEZE_SW" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_180.DST_ID" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_180.DESCR" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_180.SUM_FT_CUR_AMT__2" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_TRIAL_BAL_180.SUM_FT_TOT_AMT__4" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_TRIAL_BAL_180.FREEZE_SW" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_90.DST_ID" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_90.DESCR" type="java.lang.String"></field>
+        <field id="FDL_TRIAL_BAL_90.SUM_FT_CUR_AMT__1" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_TRIAL_BAL_90.SUM_FT_TOT_AMT__2" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="FDL_TRIAL_BAL_90.FREEZE_SW" type="java.lang.String"></field>
+      </fieldList>
+      <joinInfo alias="FDL_TRIAL_BAL_O" referenceId="FDL_TRIAL_BAL_O"></joinInfo>
+      <joinList>
+        <join expr="FDL_TRIAL_BAL_O.DST_ID == FDL_TRIAL_BAL_90.DST_ID" left="FDL_TRIAL_BAL_O" right="FDL_TRIAL_BAL_90" type="inner" weight="1"></join>
+        <join expr="FDL_TRIAL_BAL_O.DST_ID == FDL_TRIAL_BAL_180.DST_ID" left="FDL_TRIAL_BAL_O" right="FDL_TRIAL_BAL_180" type="inner" weight="1"></join>
+        <join expr="FDL_TRIAL_BAL_O.DST_ID == FDL_TRIAL_BAL_270.DST_ID" left="FDL_TRIAL_BAL_O" right="FDL_TRIAL_BAL_270" type="inner" weight="1"></join>
+        <join expr="FDL_TRIAL_BAL_O.DST_ID == FDL_TRIAL_BAL_OLD.DST_ID" left="FDL_TRIAL_BAL_O" right="FDL_TRIAL_BAL_OLD" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>select DCL.DST_ID, DCL.DESCR, FT.FREEZE_SW,
+    SUM(FT.CUR_AMT), SUM(FT.TOT_AMT) from cisadm.ci_ft FT, cisadm.CI_SA sa, cisadm.ci_sa_type SAT, cisadm.CI_DST_CODE_L DCL
+    where FT.SA_ID = SA.SA_ID
+          and SA.SA_TYPE_CD = SAT.SA_TYPE_CD
+          and SAT.DST_ID = DCL.DST_ID
+    group by DCL.DST_ID, DCL.DESCR, FT.FREEZE_SW</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_TRIAL_BAL_O" tableId="FDL_TRIAL_BAL_O"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_TRIAL_BAL_90" tableId="FDL_TRIAL_BAL_90"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_TRIAL_BAL_270" tableId="FDL_TRIAL_BAL_270"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_TRIAL_BAL_180" tableId="FDL_TRIAL_BAL_180"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="FDL_TRIAL_BAL_OLD" tableId="FDL_TRIAL_BAL_OLD"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>
