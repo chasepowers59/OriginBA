@@ -69,7 +69,10 @@ def fix(env, org, src_env, uri, out_dir):
     body = json.dumps({"uri": meta.get("uri", uri + "_files/topicJRXML"), "label": meta.get("label", "topicJRXML"), "version": meta.get("version", 0),
                        "type": "jrxml", "content": base64.b64encode(new).decode()}).encode()
     c4, b4, _ = sw._http(f"/rest_v2/resources{urllib.parse.quote(uri)}_files/topicJRXML", "PUT", body, "application/repository.file+json", timeout=120)
-    if c4 >= 300:
+    if c4 is None:   # the call itself dropped (timeout); one retry, then report it rather than die
+        time.sleep(5)
+        c4, b4, _ = sw._http(f"/rest_v2/resources{urllib.parse.quote(uri)}_files/topicJRXML", "PUT", body, "application/repository.file+json", timeout=180)
+    if c4 is None or c4 >= 300:
         return uri, f"PUT {c4}: {sw._message(b4)[:120]}", None
     c5, b5, _ = sw._http(f"/rest_v2/resources{urllib.parse.quote(uri)}?expanded=true")
     if c5 != 200:

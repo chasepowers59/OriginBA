@@ -227,3 +227,23 @@ domain `<query>` XML inside the CDATA. Two corrections: (1) "no rootTenantId for
 the UI's Repository > Import; the REST importer REQUIRES `rootTenantId=<Org>` (measured 2026-09-18);
 (2) after the 10.0 upgrade the strip is probably unnecessary (10.0 emits `<query>` topics itself and
 the 10.0 test server opens them) -- decide by opening one promoted Ad Hoc view on prod, not by rule.
+
+## First morning on prod 10.0 (2026-09-21): the 9.0 Ad Hoc strip is the thing that broke
+
+Symptom: "AdhocDataView state initialization error" opening Ad Hoc views; whole folders of the
+Standard Offering on CityCorp, a folder on Newark1, nothing elsewhere. Cause: every view promoted
+to the 9.0 server through `strip_jrs8_incompatible_jrxml_uuid.py` carries a topic JRXML with no
+namespace, no uuid, no nestedType and `<queryString>`. 10.0's licensed legacy loader keys on the
+JRXML 6 namespace; a namespace-less topic is parsed as JRXML 7 and fails. The view's state and the
+domain were fine (state byte-identical to the test org's; domain schema identical). Views re-saved
+on the server after promotion had a normal JRXML 6 topic and worked -- which is why some views in
+the same folder worked and others did not.
+Fix: `jrs_fix_stripped_topics.py --env prod --org Y [--scan | --i-mean-prod]`: scans every Ad Hoc
+view's topic for the stripped shape, backs the old topic up under `backups/jaspersoft/topics/`,
+replaces it with the 10.0-generated topic the same view carries on the test org (same state,
+same domain), then opens and runs it. 2026-09-21: CityCorp 103/103, Newark1 8/8, all open; zero
+stripped topics remain on any prod org. Rule from now on: **never run the 9.0 strip for a 10.0
+target**; `--expect-jrs8-adhoc-compat` is a 9.0-era check and stays off. A prod restart mid-run
+drops a PUT: the tool retries once, and a rerun resumes from the scan.
+Also learned: a file resource PUT needs the current `version` echoed back (409 "versions not
+match" otherwise) and its descriptor is read with Accept `application/repository.file+json`.
