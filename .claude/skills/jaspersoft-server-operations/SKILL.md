@@ -257,3 +257,18 @@ identical to the 09-18 export; folder identical to test in every file after vola
 7 empty / 27 slow (20 s) / 0 errors; Newark1 69 / 10 / 74 slow (15 s) / 0 errors -- Newark's volume
 makes half its views slow, not broken. Wall clock ~11 min Ellensburg, ~21 min Newark (its 306 MB
 org export twice). Standard Offering now on prod: CityCorp, Ellensburg, Newark1.
+
+## Ad Hoc chart formatting from here (2026-09-21, internal Origin_DEMO demo tweak)
+A chart's look is Highcharts options in the view's `stateXML` under
+`<chartState><advancedProperties><advancedChartProperty><name>plotOptions.series.dataLabels.style.fontSize</name><value>15px</value>...`
+(the UI's Chart Format > Advanced Properties). Dashboards EMBED their own copy of every view
+(`<Dashboard>_files/tmpAdv_*` and `.../dashboardReport`), so a change to the standalone view does
+not reach the dashboard: edit every `stateXML` under the folder whose mode is `ichart`. PUT the file
+resource with its current `version`, back the originals up under `backups/jaspersoft/adhoc_state/`.
+Applied to 20 states (Usage, Measurements, Device): dataLabels 15px bold, no text outline (the
+"fuzzy" look is Highcharts' contrast outline at 11px), axis and legend labels 13px. The org's theme
+(`/themes/default`, byte-identical to NewestOriginBATheme) has no chart rules; a theme CSS rule
+(`.highcharts-data-labels text{...!important}`) is the global alternative. The internal server's
+headless dashboard export is broken (chromium will not start), so visual proof is a person's reload.
+Crosstab header alignment needs the live DOM: open the dashboard in the Browser pane, Chase logs
+in, inspect and test CSS there before touching the theme.
