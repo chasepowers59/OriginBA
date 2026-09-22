@@ -233,11 +233,25 @@ def run(uri: str, fmt: str, params: list[str], out: str | None) -> int:
 
 
 def whoami() -> int:
-    code, text = _call("/rest_v2/users/" + urllib.parse.quote(os.environ["JRS_USER"].split("|")[0])
-                       + ("" if "|" not in os.environ["JRS_USER"] else ""), accept="application/json")
-    print(code, text[:600])
+    """Who the login is and what it can see. `_env_var` resolves JRS_<ENV>_USER, so this works
+    against prod and internal; reading os.environ["JRS_USER"] made it a test-only command."""
+    user = _env_var("USER")
+    if not user:
+        env = env_name().upper()
+        print(f"no credentials for --env {env.lower()}: set JRS_{env}_USER / JRS_{env}_PASSWORD / JRS_{env}_URL "
+              "(scripts/jaspersoft/jrs.sh loads them from .env)")
+        return 2
+    name = user.split("|")[0]
+    org = user.split("|")[1] if "|" in user else None
+    print(f"login scope: {'organization ' + org if org else 'root (no organization in the user name)'}")
+    code, text = _call("/rest_v2/users/" + urllib.parse.quote(name), accept="application/json")
+    print("user:", code, text[:600])
     code, text = _call("/rest_v2/serverInfo")
     print("serverInfo:", code, text[:400])
+    # What the login can actually reach is the real answer: root sees the organization tree.
+    code, text = _call("/rest_v2/organizations?maxDepth=2", accept="application/json")
+    print("organizations:", code, (text[:600] if code == 200 else text[:200]))
+    print("  -> root access confirmed" if code == 200 else "  -> not root, or the account cannot list organizations")
     return 0
 
 
