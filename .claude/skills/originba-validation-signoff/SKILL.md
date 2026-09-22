@@ -35,6 +35,41 @@ description: Produce Standard Offering QA documents, manager updates, and struct
 4. Jira tickets: one ticket per defect class (JRXML schema, import wrapper, Domain join, perf, scheduler).
 5. Do not claim functional CIS testing when only Jaspersoft execution was validated.
 
+## Client QA documents are built from the DEPLOYED library, not the catalog (2026-09-22)
+
+`tmp/docs/report_library_catalog.json` (144 reports + 13 dashboards) is a curated list from the
+July report-library document. It is NOT what any tenant actually carries: matched by name against
+Ellensburg prod, only 43 of its 157 rows correspond to a deployed object, and 94 deployed objects
+are missing from it. A document built on it marks real reports absent and omits most of the library.
+
+The rows come from the tenant's own repository snapshot, the verdicts from a sweep:
+
+```bash
+# 1. snapshot the org (jrs_inventory.py snapshot) so jaspersoft/inventory/<env>/<Org>/ is current
+# 2. execute the library; a QA cap wants 90-120s, not the 15-20s a post-promotion smoke uses
+python3 scripts/jaspersoft/jrs_run_sweep.py --env prod --org Ellensburg \
+  --folder /SmartCity/Report/Standard_Offering --types view,report,dashboard \
+  --workers 3 --timeout 90 --out jaspersoft/sweeps/prod_Ellensburg_qa_<date>.json
+# 3. per-object evidence, then the document
+python3 scripts/doc/build_validation_evidence.py --env prod --org Ellensburg \
+  --sweep jaspersoft/sweeps/prod_Ellensburg_qa_<date>.json --cap 90 \
+  --out output/doc/evidence/prod_Ellensburg_evidence.json
+python3 scripts/doc/build_standard_offering_validation_doc.py --client Ellensburg \
+  --test-version 25.4 --deployment-tier PROD --datasource Ellensburg_DS \
+  --author "Chase Powers" --status PASS --evidence output/doc/evidence/prod_Ellensburg_evidence.json
+```
+
+Verdict mapping, and why it is not negotiable: `ok` and `empty` are PASS (executed, no error);
+`timeout` is NA worded as "invoked and accepted, still running at the cap, not waited for" --
+true, and it does not read as broken; an execution error is FAIL with its message. A row with no
+execution behind it never says PASS, however the overall result reads. Without `--evidence` every
+row carries the single `--status`, which is only honest for the blank template.
+
+**The signoff sentence that IS supportable without executing every row**: the import is proven by
+the snapshot count plus the test-vs-prod folder diff, and "nothing is broken" is proven by zero
+execution errors across everything that ran. State those two, and let the cap and the unexecuted
+dashboards show as NA in their own summary lines.
+
 ## Output contract
 
 - Client-named `.docx` under `output/doc/` when generating QA docs

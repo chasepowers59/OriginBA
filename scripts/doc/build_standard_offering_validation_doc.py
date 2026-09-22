@@ -90,6 +90,9 @@ class GenerationConfig:
     document_date: str | None = None
     # TEST or PROD — drives cover title wording only; layout stays identical.
     deployment_tier: str = "TEST"
+    # Per-row execution evidence from build_validation_evidence.py; without it every row
+    # carries the one --status, which is only honest for a template.
+    evidence: dict | None = None
 
     @property
     def is_fillable_template(self) -> bool:
@@ -131,6 +134,24 @@ class GenerationConfig:
             f"Initial validation evidence for {self.client_name} Standard Offering "
             f"report library ({env} deployment)."
         )
+
+    @property
+    def tier_label(self) -> str:
+        tier = (self.deployment_tier or "TEST").strip().upper()
+        return "PROD" if tier in {"PROD", "PRODUCTION"} else "TEST"
+
+    @property
+    def env_word(self) -> str:
+        return "production" if self.tier_label == "PROD" else "test"
+
+    def row_evidence(self, name: str) -> dict | None:
+        if not self.evidence:
+            return None
+        return self.evidence.get("rows", {}).get(norm(name))
+
+    @property
+    def evidence_counts(self) -> dict:
+        return (self.evidence or {}).get("meta", {}).get("counts", {})
 
     @property
     def summary_result(self) -> str:
@@ -425,16 +446,18 @@ def add_validation_table(
         set_cell_text(hdr[idx], header, bold=True)
 
     for row in rows:
+        status = row.get("status") or config.validation_status
+        notes = row.get("notes") or config.notes_text
         cells = table.add_row().cells
         if dashboard:
             set_cell_text(cells[0], row["name"])
-            set_cell_text(cells[1], config.validation_status)
-            set_cell_text(cells[2], config.notes_text)
+            set_cell_text(cells[1], status)
+            set_cell_text(cells[2], notes)
         else:
             set_cell_text(cells[0], row["name"])
             set_cell_text(cells[1], row.get("kind", "Ad Hoc View"))
-            set_cell_text(cells[2], config.validation_status)
-            set_cell_text(cells[3], config.notes_text)
+            set_cell_text(cells[2], status)
+            set_cell_text(cells[3], notes)
 
 
 def add_page_break(doc: Document) -> None:
@@ -671,14 +694,20 @@ def append_document_content(doc: Document, structure: dict, config: GenerationCo
         f"TEST {config.test_version} Jaspersoft environment and returns expected results.",
     )
     add_normal(doc, "Objective:", bold=True)
-    add_bullet(doc, "Execute all 144 Standard Offering reports and ad hoc views.")
-    add_bullet(doc, "Execute all 13 Standard Offering dashboards.")
+    add_bullet(doc, "Execute each Standard Offering report and ad hoc view present in the tenant.")
+    add_bullet(doc, "Execute each Standard Offering dashboard present in the tenant.")
     add_bullet(doc, "Confirm successful execution, rendering, and data availability for each object.")
     add_bullet(doc, "Capture validation status and notes for each tested object.")
     add_normal(doc, "Environment:", bold=True)
     add_bullet(doc, "Jaspersoft repository path: /SmartCity/Report/Standard_Offering")
-    add_bullet(doc, f"Client / tenant: {config.client_name} TEST {config.test_version}")
+    add_bullet(doc, f"Client / tenant: {config.client_name} {config.tier_label} {config.test_version}")
     add_bullet(doc, f"Datasource alias: {config.datasource_alias}")
+    if config.evidence:
+        m = config.evidence.get("meta", {})
+        add_bullet(doc, f"JasperReports Server: {m.get('server', 'n/a')}")
+        add_bullet(doc, f"Execution evidence: {m.get('sweep_file')}, run {m.get('taken')} "
+                        f"({m.get('sweep_results')} repository objects executed in {m.get('seconds')}s, "
+                        f"{m.get('cap_seconds')}s cap per object)")
     add_normal(doc, "Limitation:", bold=True)
     add_normal(
         doc,
@@ -701,14 +730,31 @@ def append_document_content(doc: Document, structure: dict, config: GenerationCo
     add_bullet(doc, "Dashboard visualizations load successfully.")
 
     add_heading(doc, "Validation Summary", level=2)
-    summary_table = doc.add_table(rows=4, cols=2)
+    if config.evidence:
+        c = config.evidence_counts
+        m = config.evidence.get("meta", {})
+        o = m.get("outcomes", {})
+        sup = m.get("supporting", {})
+        summary_rows = [
+            ("Objects Deployed to the Tenant", str(m.get("deployed_resources", 0))),
+            ("Supporting Domains Deployed", str(sup.get("semanticLayerDataSource", 0))),
+            ("Reports / Ad Hoc Views and Dashboards in Scope", str(m.get("executable_objects", 0))),
+            ("PASS - executed, returned rows", str(o.get("ok", 0))),
+            ("PASS - executed, no rows for the default filter", str(o.get("empty", 0))),
+            ("FAIL - execution error", str(c.get("FAIL", 0))),
+            ("Invoked, still running at the sweep cap", str(o.get("timeout", 0))),
+            ("Deployed, outside this execution pass", str(o.get("not run", 0))),
+            ("Overall Result", config.summary_result),
+        ]
+    else:
+        summary_rows = [
+            ("Reports / Ad Hoc Views Tested", "144"),
+            ("Dashboards Tested", "13"),
+            ("Total Objects Tested", "157"),
+            ("Overall Result", config.summary_result),
+        ]
+    summary_table = doc.add_table(rows=len(summary_rows), cols=2)
     summary_table.style = "Table Grid"
-    summary_rows = [
-        ("Reports / Ad Hoc Views Tested", "144"),
-        ("Dashboards Tested", "13"),
-        ("Total Objects Tested", "157"),
-        ("Overall Result", config.summary_result),
-    ]
     for idx, (label, value) in enumerate(summary_rows):
         set_cell_text(summary_table.rows[idx].cells[0], label, bold=True)
         set_cell_text(summary_table.rows[idx].cells[1], value)
@@ -718,10 +764,30 @@ def append_document_content(doc: Document, structure: dict, config: GenerationCo
             "All 144 Standard Offering reports / ad hoc views and 13 dashboards were executed in "
             f"{PLACEHOLDER_CLIENT} TEST {PLACEHOLDER_TEST}. Update this summary after testing is complete."
         )
+    elif config.evidence:
+        c = config.evidence_counts
+        m = config.evidence.get("meta", {})
+        o = m.get("outcomes", {})
+        failed = c.get("FAIL", 0)
+        executed = o.get("ok", 0) + o.get("empty", 0) + o.get("timeout", 0)
+        summary_text = (
+            f"The Standard Offering library was imported into {config.client_name} "
+            f"{config.tier_label} {config.test_version} on {str(m.get('taken', ''))[:10]}: "
+            f"{m.get('deployed_resources', 0)} resources are present in the tenant, including "
+            f"{m.get('supporting', {}).get('semanticLayerDataSource', 0)} supporting domains, and the "
+            f"imported folder matches the source tenant. {executed} of the "
+            f"{m.get('executable_objects', 0)} reports, ad hoc views and dashboards were invoked "
+            f"against {config.datasource_alias}, and {failed} returned an execution error. "
+            f"{o.get('ok', 0)} returned rows, {o.get('empty', 0)} executed cleanly with no rows for "
+            f"the default filter context, and {o.get('timeout', 0)} were still running when the "
+            f"{m.get('cap_seconds')}-second sweep cap stopped the run and were not waited for. "
+            f"{o.get('not run', 0)} dashboards are deployed and were outside this execution pass. "
+            "Every PASS in this document corresponds to a recorded execution."
+        )
     else:
         summary_text = (
             "All 144 Standard Offering reports / ad hoc views and 13 dashboards were executed in "
-            f"{config.client_name} TEST {config.test_version}. "
+            f"{config.client_name} {config.tier_label} {config.test_version}. "
             "No execution failures or rendering issues were identified during testing."
         )
     add_normal(doc, summary_text)
@@ -765,6 +831,14 @@ def append_document_content(doc: Document, structure: dict, config: GenerationCo
         if config.is_fillable_template:
             actual = f"Validated {count} objects in {ws}. Update after testing."
             status = PLACEHOLDER_STATUS
+        elif config.evidence:
+            items = [i for v in ws_reports.values() for i in v] + [i for v in ws_dashboards.values() for i in v]
+            tally: dict[str, int] = {}
+            for i in items:
+                s = i.get("status", "NA")
+                tally[s] = tally.get(s, 0) + 1
+            actual = f"{count} objects in scope: " + ", ".join(f"{v} {k}" for k, v in sorted(tally.items())) + "."
+            status = "FAIL" if tally.get("FAIL") else ("PASS" if tally.get("PASS") else "NA")
         else:
             actual = f"Validated {count} objects in {ws}. All executed successfully."
             status = config.validation_status
@@ -772,13 +846,28 @@ def append_document_content(doc: Document, structure: dict, config: GenerationCo
         set_cell_text(cells[3], status)
 
 
-def generate_document(config: GenerationConfig) -> Path:
-    reports, dashboards = load_catalog()
-    zip_items = load_zip_index(STANDARD_OFFERING_ZIP)
-    structure = build_structure(reports, dashboards, zip_items)
+def structure_from_evidence(evidence: dict) -> dict:
+    """Rows are the tenant's OWN deployed objects, grouped workstream > object folder."""
+    reports: dict[str, dict[str, list[dict]]] = defaultdict(lambda: defaultdict(list))
+    dashboards: dict[str, dict[str, list[dict]]] = defaultdict(lambda: defaultdict(list))
+    for ws, objects in evidence["structure"].items():
+        for obj, rows in objects.items():
+            for row in rows:
+                item = {**row, "kind": row.get("kind_label", "Ad Hoc View")}
+                target = dashboards if item["kind"] == "Dashboard" else reports
+                target[ws][obj].append(item)
+    return {"reports": reports, "dashboards": dashboards}
 
-    if len(reports) != 144 or len(dashboards) != 13:
-        raise SystemExit(f"Expected 144 reports and 13 dashboards, got {len(reports)} and {len(dashboards)}")
+
+def generate_document(config: GenerationConfig) -> Path:
+    if config.evidence and config.evidence.get("structure"):
+        structure = structure_from_evidence(config.evidence)
+    else:
+        reports, dashboards = load_catalog()
+        zip_items = load_zip_index(STANDARD_OFFERING_ZIP)
+        structure = build_structure(reports, dashboards, zip_items)
+        if len(reports) != 144 or len(dashboards) != 13:
+            raise SystemExit(f"Expected 144 reports and 13 dashboards, got {len(reports)} and {len(dashboards)}")
 
     cover_base = ensure_cover_base()
     config.output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -815,6 +904,12 @@ def parse_args() -> GenerationConfig:
         help="Datasource alias. Defaults to <client>_DS unless template mode is used.",
     )
     parser.add_argument("--author", default="Chase Powers", help="Document author name.")
+    parser.add_argument(
+        "--evidence",
+        type=Path,
+        help="per-row execution evidence from scripts/doc/build_validation_evidence.py; "
+             "without it every row carries the single --status, which is only honest for a template",
+    )
     parser.add_argument(
         "--status",
         default="PASS",
@@ -868,6 +963,7 @@ def parse_args() -> GenerationConfig:
         template_mode=False,
         output_path=output_path,
         deployment_tier=tier,
+        evidence=json.loads(args.evidence.read_text(encoding="utf-8")) if args.evidence else None,
     )
 
 
