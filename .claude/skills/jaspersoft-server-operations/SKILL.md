@@ -10,7 +10,7 @@ description: Operate the three SmartCity JasperReports Server environments (inte
 | env | URL | what it holds |
 | --- | --- | --- |
 | `test` | https://smartcity-jrs-test.originsmartops.com/jasperserver-pro | JRS 10.0.0 PRO; one instance, every client an org under `organization_1`: Ellensburg, Fond_Du_Lac, CityCorp, College_Station, Odessa, Newark1, Origin_DEV, Origin_TEST |
-| `prod` | https://smartcity-jrs.originsmartops.com/jasperserver-pro | **JRS 9.0.0 PRO (JRXML 6 model) until its 10.0 upgrade, due days after 2026-09-18** -- re-snapshot and diff right after. Org-scoped logins only (`user\|Org`): CityCorp, Ellensburg, Newark1, Fond_Du_Lac, College_Station; Odessa 401 with this account |
+| `prod` | https://smartcity-jrs.originsmartops.com/jasperserver-pro | **JRS 9.0.0 PRO (JRXML 6 model) until its 10.0 upgrade, upgraded 2026-09-21** . Driven so far with org-scoped logins (`user\|Org`): CityCorp, Ellensburg, Newark1, Fond_Du_Lac, College_Station; Odessa answered 401. **Chase says 2026-09-22 the account has ROOT here too** -- unverified (the check was blocked as credential exploration), so re-measure with `whoami` and no `--org` before assuming it |
 | `internal` | https://origin-c2m-demo.originsmartops.com:8443/jasperserver-pro | JRS 10.0.0 PRO; three orgs (see `jaspersoft/inventory/CLIENTS.md`) |
 
 Reachable only over the VPN. Credentials: `JRS_<ENV>_URL / _USER / _PASSWORD / _INSECURE` in
@@ -24,9 +24,11 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
    server's own export lands as a re-importable zip under `backups/jaspersoft/` (gitignored)
    and a diffable tree under `jaspersoft/inventory/<env>/<org>/` (committed, passwords
    redacted). That zip is the rollback. No snapshot, no change.
-   - `prod` is org-scoped (the login is `user|Org`, it sees only that org): `--orgs A B C`
+   - `prod` has been run org-scoped (the login is `user|Org` and sees only that org): `--orgs A B C`
      exports each org's root with the login re-scoped. Works for CityCorp, Ellensburg,
-     Newark1, Fond_Du_Lac, College_Station; Odessa and Origin_* answer 401 there.
+     Newark1, Fond_Du_Lac, College_Station; Odessa and Origin_* answered 401 there.
+     If the root access Chase reports on 2026-09-22 checks out, a plain `snapshot --env prod`
+     takes every org in one pass instead, the way test and internal already run.
    - **A prod (JRS 9.0) export can hang forever on one folder** (Fond_Du_Lac 2026-09-18:
      `/SmartCity/Report/FDL_Bill_Processing_Reports__Linda_` and `FDL_Trial_Balance` never
      finished, even alone). `--split /SmartCity /SmartCity/Report --part-cap 300` exports the
