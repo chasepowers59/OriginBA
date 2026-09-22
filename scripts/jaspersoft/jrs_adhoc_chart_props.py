@@ -89,15 +89,47 @@ def put_state(env, org, uri, new: str) -> tuple[int | None, str]:
     return c2, sw._message(b2)[:160] if c2 is None or c2 >= 300 else ""
 
 
+SIZE_PROP = re.compile(r"(fontSize|lineHeight|letterSpacing|borderWidth|padding)$", re.I)
+UNITLESS = re.compile(r"^\s*-?\d+(\.\d+)?\s*$")
+
+
+def scan(env: str, org: str, folder: str) -> int:
+    """Chart properties whose value is a bare number where CSS needs a unit.
+
+    Found on Ellensburg prod 2026-09-22: `legend.itemStyle.fontSize=17` on two Standard Offering
+    views. Highcharts writes the value straight into the SVG style, so `font-size: 17` is invalid
+    CSS and the browser drops the declaration -- the chart still executes and returns data, which
+    is why a sweep calls it healthy while a person says the report is broken.
+    """
+    uris = list_states(env, org, folder)
+    hits = 0
+    for uri in uris:
+        c, b, _ = _http(env, org, f"/rest_v2/resources{urllib.parse.quote(uri)}")
+        if c != 200:
+            continue
+        state = b.decode()
+        for name, value in re.findall(r"<name>([^<]*)</name>\s*<value>([^<]*)</value>", state):
+            if SIZE_PROP.search(name) and UNITLESS.match(value):
+                print(f"  {name}={value}  {uri}")
+                hits += 1
+    print(f"{len(uris)} chart states under {folder} in {env}/{org}: {hits} malformed size properties")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--env", required=True); ap.add_argument("--org", required=True)
     ap.add_argument("--folder", required=True)
     ap.add_argument("--set", action="append", default=[], metavar="NAME=VALUE", help="property to set (repeatable)")
     ap.add_argument("--only-if", action="append", default=[], metavar="NAME=VALUE", help="touch a state only when it carries this value (repeatable, all must hold)")
+    ap.add_argument("--scan", action="store_true",
+                    help="report chart properties that are malformed rather than change anything: a CSS size with no unit "
+                         "(Highcharts wants '17px'; a bare 17 is invalid CSS and the browser drops it)")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--i-mean-prod", action="store_true")
     a = ap.parse_args()
+    if a.scan:                       # read-only: no prod guard, nothing is written
+        return scan(a.env, a.org, a.folder)
     if a.env == "prod" and not a.i_mean_prod and not a.dry_run:
         raise SystemExit("refusing to write to prod without --i-mean-prod")
     sets = [tuple(s.split("=", 1)) for s in a.set]

@@ -76,6 +76,15 @@ def kind_of(d: dict) -> str:
     for k in ("adhocDataView", "reportUnit", "semanticLayerDataSource", "domain"):
         if k in d or d.get("resourceType") == k:
             return k
+    # A direct GET returns the resource ITSELF, not wrapped in a type key, so the name check above
+    # misses a view fetched that way: inspect printed "?" and run refused it (Ellensburg prod,
+    # 2026-09-22). Fall back to the descriptor's shape.
+    if "query" in d and "dataSource" in d:
+        return "adhocDataView"
+    if "jrxml" in d:
+        return "reportUnit"
+    if "schema" in d:
+        return "semanticLayerDataSource"
     return d.get("resourceType") or "?"
 
 
@@ -176,13 +185,44 @@ def schema_report(domain_uri: str, tables: set[str] | None) -> None:
 
 
 # ---------------------------------------------------------------- run and bisect
-def run(uri: str, bisect: bool, timeout: int) -> int:
+def show_data(uri: str, d: dict, limit: int, timeout: int) -> None:
+    """What the person actually sees. A view can execute and still render nothing useful:
+    empty dimension labels, all-null measures, a date filter past the end of the data."""
+    qk = next(iter(d["query"]))
+    payload = json.dumps({"dataSource": {"reference": {"uri": uri}}, "query": sw._inline_parameters(d["query"][qk])}).encode()
+    code, body, _ = sw._http(f"/rest_v2/queryExecutions?offset=0&pageSize={limit}", "POST", payload,
+                             f"application/execution.{qk}Query+json", f"application/{qk}Data+json", timeout)
+    if code != 200:
+        print(f"  data: {code} {sw._message(body)[:200]}"); return
+    j = json.loads(body)
+    ds = j.get("dataset") or j
+    rows = ds.get("rows") or ds.get("data") or []
+    if rows:
+        for row in rows[:limit]:
+            print("   ", json.dumps(row)[:300])
+        return
+    # multiAxis answers as axes plus measure values, not as rows
+    for name in ("axes", "axis"):
+        for ax in (ds.get(name) or []):
+            members = ax.get("members") or ax.get("tuples") or []
+            labels = [m.get("label") if isinstance(m, dict) else m for m in members][:limit]
+            print(f"    axis {ax.get('id') or ax.get('name') or '?'}: {len(members)} members -> {json.dumps(labels)[:300]}")
+    vals = ds.get("values") or ds.get("measureValues") or []
+    if vals:
+        print(f"    values: {json.dumps(vals)[:300]}")
+    if not ds.get("axes") and not vals:
+        print("   ", json.dumps(j)[:600])
+
+
+def run(uri: str, bisect: bool, timeout: int, show: int | None = None) -> int:
     d = get(uri); k = kind_of(d)
     if k == "reportUnit":
         r = sw.run_report(uri, timeout); print(json.dumps(r)); return 0 if r["outcome"] == "ok" else 1
     if k != "adhocDataView":
         sys.exit(f"run: {k} is not executable here (use jrs_repository.py run for reports)")
     r = sw.run_view(uri, timeout); print("as saved (any-value filters dropped):", json.dumps(r))
+    if show:
+        show_data(uri, d, show, timeout)
     if not bisect or r["outcome"] not in ("empty", "ok"):
         return 0 if r["outcome"] == "ok" else 1
     qk = next(iter(d["query"])); q = sw._inline_parameters(d["query"][qk]); fl = filters_of(d["query"][qk])
@@ -350,6 +390,7 @@ def main() -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("inspect").add_argument("uri")
     r = sub.add_parser("run"); r.add_argument("uri"); r.add_argument("--bisect", action="store_true")
+    r.add_argument("--show", type=int, metavar="N", help="print the first N rows the view actually returns: 'it runs' and 'it shows something' are different questions")
     c = sub.add_parser("domain-copy"); c.add_argument("uri"); c.add_argument("--name", required=True); c.add_argument("--set-query", action="append", default=[]); c.add_argument("--set-join", action="append", default=[])
     c.add_argument("--out", default=str(jrs.__file__ and pathlib.Path(HERE.parents[1], "backups/jaspersoft/promotion")))
     da = sub.add_parser("domain-apply"); da.add_argument("uri"); da.add_argument("--schema", required=True)
@@ -362,7 +403,7 @@ def main() -> int:
     if a.cmd in ("domain-copy", "domain-apply", "view-update", "report-update"):
         jrs.guard_write(a.cmd, a)
     if a.cmd == "inspect": return inspect(a.uri, a.client)
-    if a.cmd == "run": return run(a.uri, a.bisect, a.timeout)
+    if a.cmd == "run": return run(a.uri, a.bisect, a.timeout, a.show)
     if a.cmd == "domain-copy": return domain_copy(a.uri, a.name, a.set_query, a.set_join, a.org, pathlib.Path(a.out))
     if a.cmd == "domain-apply": return domain_apply(a.uri, a.schema)
     if a.cmd == "view-update": return view_update(a.uri, a.drop_filter, a.set_filter, a.swap_field)
