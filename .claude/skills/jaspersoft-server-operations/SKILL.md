@@ -10,7 +10,7 @@ description: Operate the three SmartCity JasperReports Server environments (inte
 | env | URL | what it holds |
 | --- | --- | --- |
 | `test` | https://smartcity-jrs-test.originsmartops.com/jasperserver-pro | JRS 10.0.0 PRO; one instance, every client an org under `organization_1`: Ellensburg, Fond_Du_Lac, CityCorp, College_Station, Odessa, Newark1, Origin_DEV, Origin_TEST |
-| `prod` | https://smartcity-jrs.originsmartops.com/jasperserver-pro | **JRS 9.0.0 PRO (JRXML 6 model) until its 10.0 upgrade, upgraded 2026-09-21** . Driven so far with org-scoped logins (`user\|Org`): CityCorp, Ellensburg, Newark1, Fond_Du_Lac, College_Station; Odessa answered 401. **Chase says 2026-09-22 the account has ROOT here too** -- unverified (the check was blocked as credential exploration), so re-measure with `whoami` and no `--org` before assuming it |
+| `prod` | https://smartcity-jrs.originsmartops.com/jasperserver-pro | **JRS 9.0.0 PRO (JRXML 6 model) until its 10.0 upgrade, upgraded 2026-09-21**. **ROOT, measured 2026-09-22**: `cpowers@originutility.com` holds ROLE_SUPERUSER + ROLE_ADMINISTRATOR here exactly as on test and internal, and `/rest_v2/organizations` lists the tree. The old "org-scoped only, bare login 401" note was never the server: `JRS_PROD_USER` carried `\|CityCorp`, so every call inherited that org. The key now holds the BARE user name and `--org` re-scopes per call |
 | `internal` | https://origin-c2m-demo.originsmartops.com:8443/jasperserver-pro | JRS 10.0.0 PRO; three orgs (see `jaspersoft/inventory/CLIENTS.md`) |
 
 Reachable only over the VPN. Credentials: `JRS_<ENV>_URL / _USER / _PASSWORD / _INSECURE` in
@@ -24,11 +24,15 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
    server's own export lands as a re-importable zip under `backups/jaspersoft/` (gitignored)
    and a diffable tree under `jaspersoft/inventory/<env>/<org>/` (committed, passwords
    redacted). That zip is the rollback. No snapshot, no change.
-   - `prod` has been run org-scoped (the login is `user|Org` and sees only that org): `--orgs A B C`
-     exports each org's root with the login re-scoped. Works for CityCorp, Ellensburg,
-     Newark1, Fond_Du_Lac, College_Station; Odessa and Origin_* answered 401 there.
-     If the root access Chase reports on 2026-09-22 checks out, a plain `snapshot --env prod`
-     takes every org in one pass instead, the way test and internal already run.
+   - `prod` is ROOT since the credential was corrected (2026-09-22), so a plain
+     `snapshot --env prod` takes the whole server in one superuser pass, the way test and
+     internal already run; `--orgs A B C` still re-scopes per org when that is what you want.
+     Odessa's old 401 was the CityCorp-scoped login, not a permission: re-check it at root.
+   - **A stored credential can carry an org, and then nothing is un-scoped.** `JRS_PROD_USER`
+     read `user|CityCorp`, so `whoami` with no `--org` still answered "organization CityCorp"
+     and `/rest_v2/organizations` returned 204 -- which reads exactly like a permission wall
+     and is not one. Check the login's SCOPE before concluding anything about its RIGHTS:
+     `whoami` prints the scope first, then the roles, then whether the org tree lists.
    - **A prod (JRS 9.0) export can hang forever on one folder** (Fond_Du_Lac 2026-09-18:
      `/SmartCity/Report/FDL_Bill_Processing_Reports__Linda_` and `FDL_Trial_Balance` never
      finished, even alone). `--split /SmartCity /SmartCity/Report --part-cap 300` exports the
