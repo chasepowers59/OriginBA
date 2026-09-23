@@ -297,9 +297,17 @@ every referenced field resolving, filters well formed. Two plausible culprits we
 comparing against CityCorp's working copy of the same view: a unitless `legend.itemStyle.fontSize=17`
 (CityCorp works WITH it; 43 states in the org carry it) and a missing `<seriesColors>` (17 of 24
 states in the folder lack it). What remained was the saved crosstab layout itself -- the
-transaction-type dimension sitting in `columnGroups` with an `expandedLevels` entry. A saved state
-the 10.0 editor cannot rebuild; the data layer never notices. **A sweep calling a view "ok" says
-nothing about whether it OPENS.**
+transaction-type dimension sitting in `columnGroups` with an `expandedLevels` entry -- and THAT
+theory died at calibration the same morning: "Meter Operations - Daily Installations" in
+Ellensburg prod carries the identical shape and opens fine (Chase, 2026-09-23). The trigger inside
+the saved state is NOT isolated. What holds: the state itself is bad, a copy of it elsewhere is
+bad too, and the data layer never notices. **A sweep calling a view "ok" says nothing about
+whether it OPENS.** Finding other copies is therefore an IDENTITY check, not a signature:
+`jrs_scan_adhoc_layout.py --env prod --org Y --like <known-broken stateXML>` (ignores temp ids,
+stamps and the sample/full run flags). It found Newark1 carrying the same Bill Cycle state; the
+`layout_scan_prod_*_20260923.json` files committed before calibration list signature hits and
+are NOT a defect list. Fit a signature to one sample, then have a person open one hit before
+believing it.
 
 Fix: `scripts/jaspersoft/jrs_copy_resources.py --from prod:CityCorp --to prod:Ellensburg
 --view <uri> [--dry-run] --i-mean-prod` (also `--folder`, and across environments: FDL's
