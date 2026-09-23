@@ -57,7 +57,7 @@ class Col:
     label: str
     cls: str = "java.lang.String"
     width: int = 80
-    align: str = "Left"
+    align: str = "Center"     # text and dates centre under their header; amounts pass "Right" so decimals line up
     pattern: str | None = None
     total: bool = False       # Sum variable + summary cell
 
@@ -188,7 +188,8 @@ def _header_row(cols: list[Col], style: str, seed: str, h: int = HDR_H, y: int =
     x, out = 0, []
     for c in cols:
         if style == "HeaderSapphire" or c.name:
-            out.append(_static(x, y, c.width, h, c.label if c.name else "", style, "Center" if style == "HeaderSapphire" else c.align, f"{seed}/h/{c.name}"))
+            # a header label sits exactly where its column's cells sit: same alignment (Chase, 2026-09-23)
+            out.append(_static(x, y, c.width, h, c.label if c.name else "", style, c.align, f"{seed}/h/{c.name}"))
         x += c.width
     return "\n".join(out)
 
@@ -489,7 +490,7 @@ SELECT ADJ_ID, CRE_DT, SA_ID, ACCT_ID, CUSTOMER_NAME, ADJ_AMT FROM (
 ) x
 FETCH FIRST $P{{TOP_N}} ROWS ONLY""",
             header=True,
-            columns=[Col("ADJ_ID", "Adjustment", width=90), Col("CRE_DT", "Created", "java.sql.Timestamp", 80, "Left", "yyyy-MM-dd"),
+            columns=[Col("ADJ_ID", "Adjustment", width=90), Col("CRE_DT", "Created", "java.sql.Timestamp", 80, "Center", "yyyy-MM-dd"),
                      Col("SA_ID", "SA", width=90), Col("ACCT_ID", "Account", width=90), Col("CUSTOMER_NAME", "Main Customer", width=308),
                      Col("ADJ_AMT", "Amount", "java.math.BigDecimal", 120, "Right", MONEY, True)]),
         filters=[
@@ -621,8 +622,8 @@ ORDER BY a.cre_dt, r.ap_req_id""",
             columns=[Col("AP_REQ_ID", "A/P Request", width=90), Col("ADJ_ID", "Adjustment", width=90),
                      Col("ADJ_TYPE_DESCR", "Adjustment Type", width=100), Col("ACCT_ID", "Account", width=80),
                      Col("PAYEE", "Payee", width=120),
-                     Col("CRE_DT", "Created", "java.sql.Timestamp", 50, "Left", "yyyy-MM-dd"),
-                     Col("SCHEDULED_PAY_DT", "Scheduled", "java.sql.Timestamp", 48, "Left", "yyyy-MM-dd"),
+                     Col("CRE_DT", "Created", "java.sql.Timestamp", 50, "Center", "yyyy-MM-dd"),
+                     Col("SCHEDULED_PAY_DT", "Scheduled", "java.sql.Timestamp", 48, "Center", "yyyy-MM-dd"),
                      Col("ADJ_AMT", "Adjustment Amount", "java.math.BigDecimal", 100, "Right", MONEY, True),
                      Col("PAID_AMT", "Paid Amount", "java.math.BigDecimal", 100, "Right", MONEY, True)]),
         filters=[
