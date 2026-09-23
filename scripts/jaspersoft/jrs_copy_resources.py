@@ -166,7 +166,11 @@ def verify_package(pkg: pathlib.Path, src: dict[str, bytes], tgt: dict[str, byte
 
 
 def normalised(data: bytes) -> bytes:
-    return VOLATILE.sub("", data.decode("utf-8", "replace").replace("\r", "")).encode()
+    """The importer re-serialises a descriptor: stamps, componentType and the whitespace between
+    tags all change, the content does not (test Ellensburg 2026-09-23: 0 lines differed once
+    whitespace was collapsed, yet the byte compare flagged it)."""
+    text = VOLATILE.sub("", data.decode("utf-8", "replace").replace("\r", ""))
+    return re.sub(r">\s+<", "><", text).strip().encode()
 
 
 def verify_after(after: dict[str, bytes], src: dict[str, bytes], before: dict[str, bytes], scope: str, folder: bool) -> list[str]:

@@ -313,7 +313,13 @@ says nothing about whether it OPENS.** The `layout_scan_prod_*_20260923.json` fi
 before calibration are signature hits, NOT a defect list; `jrs_scan_adhoc_layout.py` compares
 states by identity, which also does not predict this. The predictor is
 `jrs_check_topic_kinds.py`: for every view, each field the state aggregates must be
-`kind=MEASURE` in its topic. Fix for a hit: `jrs_copy_resources.py --view` from an org whose
+`kind=MEASURE` in its topic. Fleet result 2026-09-23 (Standard Offering folder): prod Ellensburg /
+CityCorp / Newark1 = 0 hits (Ellensburg because the CityCorp copy replaced its topic); test
+CityCorp / Newark1 / College_Station / Fond_Du_Lac / Origin_DEV = 0; test Ellensburg = 1, the
+same Bill Cycle view, the SOURCE the prod copy was promoted from -- replaced from test CityCorp
+so the next promotion does not carry it back. Only real measures count: a table view records
+EVERY column as a `<measure>` element, and only `measure="true"` aggregates (the first cut of the
+rule flagged 64 of 150 views for that). test Odessa answers 401 to the org-scoped login: unchecked. Fix for a hit: `jrs_copy_resources.py --view` from an org whose
 topic is right, or re-create the view so the topic is regenerated from the domain.
 
 Fix: `scripts/jaspersoft/jrs_copy_resources.py --from prod:CityCorp --to prod:Ellensburg
