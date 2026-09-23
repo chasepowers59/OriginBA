@@ -402,8 +402,10 @@ Odessa adjustments point at a missing SA, so everything past the adjustment is o
 Chase's pattern, set from the root superuser in each client org: explicit permissions on the
 folder, `role:/ROLE_USER` = 0 AND `role:/ROLE_ADMINISTRATOR` = 0 (No Access), so only the root
 superuser sees it; org admins lose it too. Tested by logging in as a user. Applied to
-`/SmartCity/Report/Workstreams` (by Chase) and `/SmartCity/Origin_Tools` (by tool) on the five
-test client orgs; prod already had `ROLE_USER=0` on Origin_Tools everywhere and on Workstreams for
+`/SmartCity/Report/Workstreams` (by Chase) on the five test client orgs; applied to
+`/SmartCity/Origin_Tools` by tool and then rolled back the same hour on Chase's word (a theme looked
+broken at the time; it recovered on its own, and permission entries on a reports folder cannot
+reach a theme) -- Origin_Tools is visible again there; re-hide only on an explicit go; prod already had `ROLE_USER=0` on Origin_Tools everywhere and on Workstreams for
 CityCorp / Fond_Du_Lac / College_Station only -- Ellensburg and Newark1 prod Workstreams still
 inherit (visible), a gap to close on Chase's word. `perms-set` REPLACES the list; the recipient is
 `role:/ROLE_X` (colon) -- `role/ROLE_X` is a 400. Before hiding, prove nothing outside depends on
