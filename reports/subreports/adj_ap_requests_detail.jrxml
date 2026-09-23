@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="adj_ap_requests_detail" pageWidth="778" pageHeight="595" orientation="Landscape"
+    columnWidth="778" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0"
+    whenNoDataType="AllSectionsNoDetail">
+    <property name="net.sf.jasperreports.query.timeout" value="600"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+    <style name="Base" default="true" fontName="SansSerif" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
+    <style name="H3" style="Base" fontSize="9" forecolor="#0F4761"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="RowBand" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="SubHeader" style="Base" fontSize="8" forecolor="#5B6470"/>
+    <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
+    <style name="SubTotal" style="Base" fontSize="8" bold="true" forecolor="#0F4761"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
+    <query language="SQL"><![CDATA[
+SELECT TRIM(r.ap_req_id) AS AP_REQ_ID, TRIM(r.adj_id) AS ADJ_ID,
+       COALESCE(tl.descr, TRIM(a.adj_type_cd)) AS ADJ_TYPE_DESCR, TRIM(sa.acct_id) AS ACCT_ID,
+       r.entity_name AS PAYEE, a.adj_amt AS ADJ_AMT, r.paid_amt AS PAID_AMT,
+       a.cre_dt AS CRE_DT, r.scheduled_pay_dt AS SCHEDULED_PAY_DT
+FROM CISADM.CI_ADJ_APREQ r
+JOIN CISADM.CI_ADJ a ON a.adj_id = r.adj_id
+LEFT JOIN CISADM.CI_ADJ_TYPE_L tl ON tl.adj_type_cd = a.adj_type_cd AND tl.language_cd = 'ENG'
+LEFT JOIN CISADM.CI_SA sa ON sa.sa_id = a.sa_id
+WHERE a.cre_dt >= $P{FROM_DT} AND a.cre_dt < $P{TO_DT} + INTERVAL '1' DAY
+  AND TRIM(r.pymnt_sel_stat_flg) = TRIM($P{REQ_STATUS}) AND TRIM(a.adj_status_flg) = TRIM($P{ADJ_STATUS})
+    AND ($P{REQ_STATUS_F} IS NULL OR TRIM(r.pymnt_sel_stat_flg) = TRIM($P{REQ_STATUS_F}))
+  AND ($P{ADJ_STATUS_F} IS NULL OR TRIM(a.adj_status_flg) = TRIM($P{ADJ_STATUS_F}))
+  AND ($P{ACTION_ONLY_F} IS NULL OR (TRIM(r.pymnt_sel_stat_flg) = 'X' AND TRIM(a.adj_status_flg) IN ('30', '50')) OR (TRIM(r.pymnt_sel_stat_flg) = 'P' AND TRIM(a.adj_status_flg) = '60'))
+  AND ($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))
+ORDER BY a.cre_dt, r.ap_req_id
+]]></query>
+    <parameter name="FROM_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TO_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="REQ_STATUS" class="java.lang.String">
+        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ADJ_STATUS" class="java.lang.String">
+        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+    </parameter>
+    <parameter name="REQ_STATUS_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ADJ_STATUS_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ACTION_ONLY_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ACCT_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <field name="AP_REQ_ID" class="java.lang.String"/>
+    <field name="ADJ_ID" class="java.lang.String"/>
+    <field name="ADJ_TYPE_DESCR" class="java.lang.String"/>
+    <field name="ACCT_ID" class="java.lang.String"/>
+    <field name="PAYEE" class="java.lang.String"/>
+    <field name="CRE_DT" class="java.sql.Timestamp"/>
+    <field name="SCHEDULED_PAY_DT" class="java.sql.Timestamp"/>
+    <field name="ADJ_AMT" class="java.math.BigDecimal"/>
+    <field name="PAID_AMT" class="java.math.BigDecimal"/>
+    <variable name="SUM_ADJ_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{ADJ_AMT}]]></expression>
+    </variable>
+    <variable name="SUM_PAID_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{PAID_AMT}]]></expression>
+    </variable>
+    <columnHeader height="13">
+            <element kind="staticText" x="0" y="0" width="90" height="12" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[A/P Request]]></text></element>
+            <element kind="staticText" x="90" y="0" width="90" height="12" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Adjustment]]></text></element>
+            <element kind="staticText" x="180" y="0" width="100" height="12" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Adjustment Type]]></text></element>
+            <element kind="staticText" x="280" y="0" width="80" height="12" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Account]]></text></element>
+            <element kind="staticText" x="360" y="0" width="120" height="12" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Payee]]></text></element>
+            <element kind="staticText" x="480" y="0" width="50" height="12" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Created]]></text></element>
+            <element kind="staticText" x="530" y="0" width="48" height="12" style="SubHeader" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Scheduled]]></text></element>
+            <element kind="staticText" x="578" y="0" width="100" height="12" style="SubHeader" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Adjustment Amount]]></text></element>
+            <element kind="staticText" x="678" y="0" width="100" height="12" style="SubHeader" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Paid Amount]]></text></element>
+            <element kind="line" x="0" y="12" width="778" height="1"><pen lineWidth="0.5" lineColor="#B9C6D2"/></element>
+    </columnHeader>
+    <detail>
+        <band height="12">
+            <element kind="textField" x="0" y="0" width="90" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{AP_REQ_ID}]]></expression></element>
+            <element kind="textField" x="90" y="0" width="90" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ADJ_ID}]]></expression></element>
+            <element kind="textField" x="180" y="0" width="100" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ADJ_TYPE_DESCR}]]></expression></element>
+            <element kind="textField" x="280" y="0" width="80" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ACCT_ID}]]></expression></element>
+            <element kind="textField" x="360" y="0" width="120" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{PAYEE}]]></expression></element>
+            <element kind="textField" x="480" y="0" width="50" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="yyyy-MM-dd"><expression><![CDATA[$F{CRE_DT}]]></expression></element>
+            <element kind="textField" x="530" y="0" width="48" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="yyyy-MM-dd"><expression><![CDATA[$F{SCHEDULED_PAY_DT}]]></expression></element>
+            <element kind="textField" x="578" y="0" width="100" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{ADJ_AMT}]]></expression></element>
+            <element kind="textField" x="678" y="0" width="100" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{PAID_AMT}]]></expression></element>
+        </band>
+    </detail>
+    <summary height="20">
+            <element kind="line" x="0" y="1" width="778" height="1"><pen lineWidth="0.5" lineColor="#B9C6D2"/></element>
+            <element kind="staticText" x="0" y="2" width="90" height="12" style="SubTotal" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Subtotal]]></text></element>
+            <element kind="textField" x="578" y="2" width="100" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_ADJ_AMT}]]></expression></element>
+            <element kind="textField" x="678" y="2" width="100" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_PAID_AMT}]]></expression></element>
+    </summary>
+</jasperReport>

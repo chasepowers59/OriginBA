@@ -1,0 +1,57 @@
+{
+  "reportUnitUri": "/SmartCity/Report/Standard_Offering/Finance/adj_ap_requests_control",
+  "label": "Adjustment A/P Requests - Control",
+  "description": "Every adjustment A/P request in a window, grouped by request status and adjustment status, with the action each combination needs: a request the ERP canceled while the adjustment is still open must have its adjustment canceled by a user; a paid request on a canceled adjustment is a refund to recover. The requests behind each combination are listed underneath.",
+  "dataSources": {
+    "DEV": "ORIGIN_DEV_DS",
+    "QA": "C2M_QA_DS",
+    "PROD": "C2M_PROD_DS"
+  },
+  "subreport": "reports/subreports/adj_ap_requests_detail.jrxml  (a local jrxml resource of the unit named adj_ap_requests_detail; the main says repo:adj_ap_requests_detail)",
+  "inputControls": [
+    {
+      "id": "FROM_DT",
+      "label": "Adjustment created date from (inclusive)",
+      "type": "singleValueDate",
+      "mandatory": true,
+      "visible": true
+    },
+    {
+      "id": "TO_DT",
+      "label": "Adjustment created date to (inclusive)",
+      "type": "singleValueDate",
+      "mandatory": true,
+      "visible": true
+    },
+    {
+      "id": "REQ_STATUS_F",
+      "label": "A/P request status (blank = all)",
+      "type": "singleSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "query": "SELECT TRIM(l.field_value) AS CODE, TRIM(l.field_value) || ' - ' || l.descr AS DESCR FROM CISADM.CI_LOOKUP_VAL_L l WHERE TRIM(l.field_name) = 'PYMNT_SEL_STAT_FLG' AND l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ADJ_APREQ r JOIN CISADM.CI_ADJ a ON a.adj_id = r.adj_id WHERE TRIM(r.pymnt_sel_stat_flg) = TRIM(l.field_value) AND a.cre_dt >= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1"
+    },
+    {
+      "id": "ADJ_STATUS_F",
+      "label": "Adjustment status (blank = all)",
+      "type": "singleSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "query": "SELECT TRIM(l.field_value) AS CODE, TRIM(l.field_value) || ' - ' || l.descr AS DESCR FROM CISADM.CI_LOOKUP_VAL_L l WHERE TRIM(l.field_name) = 'ADJ_STATUS_FLG' AND l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ADJ a JOIN CISADM.CI_ADJ_APREQ r ON r.adj_id = a.adj_id WHERE TRIM(a.adj_status_flg) = TRIM(l.field_value) AND a.cre_dt >= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1"
+    },
+    {
+      "id": "ACTION_ONLY_F",
+      "label": "Action needed only (type anything for yes) (blank = all)",
+      "type": "singleValueText",
+      "mandatory": false,
+      "visible": true
+    },
+    {
+      "id": "ACCT_ID_F",
+      "label": "Account ID (blank = all)",
+      "type": "singleValueText",
+      "mandatory": false,
+      "visible": true
+    }
+  ]
+}

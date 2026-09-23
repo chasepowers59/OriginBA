@@ -71,7 +71,8 @@ def deploy(org: str | None, ds: str) -> list[str]:
     root = org_root(org)
     ds_uri = f"{root}/DataSource/{ds}"
     uris = []
-    for spec in g.SPECS:
+    specs = [s for s in g.SPECS if not a.only or s.name in a.only]
+    for spec in specs:
         uri = f"{root}{g.FOLDERS[spec.name]}/{spec.name}"
         body = json.dumps(descriptor(spec, ds_uri)).encode()
         code, text = _call(f"/rest_v2/resources{uri}?overwrite=true&createFolders=true", method="PUT", body=body,
@@ -123,6 +124,7 @@ def main() -> int:
     ap.add_argument("--run", nargs=2, metavar=("FROM", "TO"), help="execute each unit as a PDF with this window")
     ap.add_argument("--out", type=Path, default=Path("/tmp/finance_pack_pdfs"))
     ap.add_argument("--param", action="append", default=[], metavar="NAME=VALUE", help="a filter to pass on the run (repeatable)")
+    ap.add_argument("--only", action="append", default=[], metavar="SPEC", help="deploy only these spec names (default: every spec)")
     a = ap.parse_args()
     uris = deploy(a.org, a.datasource)
     if a.run and uris:
@@ -130,7 +132,7 @@ def main() -> int:
         for kv in a.param:
             k, v = kv.split("=", 1); extra.setdefault(k, []).append(v)
         return 1 if run(uris, a.run[0], a.run[1], a.out, extra) else 0
-    return 0 if len(uris) == len(g.SPECS) else 1
+    return 0 if len(uris) == len(specs) else 1
 
 
 if __name__ == "__main__":

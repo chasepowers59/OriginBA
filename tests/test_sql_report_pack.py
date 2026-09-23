@@ -58,7 +58,10 @@ class Sql(unittest.TestCase):
                     self.assertIn(f"TRIM(", sql, flag)
             # only lifecycle constants are literal: '50' frozen, 'C' completed, 'Y', 'ENG', 'PRIM'
             literals = set(re.findall(r"= '([^']+)'", s.main_sql() + s.sub_sql()))
-            self.assertTrue(literals <= {"50", "C", "Y", "ENG", "PRIM"}, f"{s.name}: {literals}")
+            allowed = {"50", "C", "Y", "ENG", "PRIM"} | set(s.constants)   # a spec may add lifecycle codes / lookup names, each with its reason
+            self.assertTrue(literals <= allowed, f"{s.name}: {literals - allowed}")
+            for lit, why in s.constants.items():
+                self.assertTrue(why and ("lifecycle" in why or "lookup field name" in why or "PYMNT_SEL_STAT_FLG" in why), f"{s.name}: literal {lit!r} needs a base-product reason")
 
     def test_subreport_wiring(self):
         for s in g.SPECS:

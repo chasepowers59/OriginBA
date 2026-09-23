@@ -104,6 +104,8 @@ class Spec:
     params: dict = field(default_factory=dict)   # extra parameters name -> (class, default expr)
     filters: list[Filter] = field(default_factory=list)
     window_label: str = "Date"                    # the column the FROM/TO window filters on, as the user knows it
+    constants: dict = field(default_factory=dict) # extra literals the SQL may compare against: base-product lifecycle
+                                                  # codes or lookup FIELD_NAMEs only, each with the reason it is safe
 
     def all_params(self) -> dict:
         return {**self.params, **{f.param: ("java.util.Collection" if f.multi else f.cls, "null") for f in self.filters}}
@@ -318,6 +320,7 @@ FOLDERS = {
     "payments_by_tender_type_period": "/SmartCity/Report/Standard_Offering/Cashiering",
     "adjustments_by_type_period": "/SmartCity/Report/Standard_Offering/Finance",
     "gl_by_distribution_code_period": "/SmartCity/Report/Standard_Offering/Finance",
+    "adj_ap_requests_control": "/SmartCity/Report/Standard_Offering/Finance",
 }
 
 # ------------------------------------------------------------------ the specs
@@ -564,6 +567,79 @@ ORDER BY ACCT_MONTH""",
                    "($P{FT_TYPE_FLG_F} IS NULL OR TRIM(f.ft_type_flg) = TRIM($P{FT_TYPE_FLG_F}))",
                    "($P{FT_TYPE_FLG_F} IS NULL OR TRIM(f.ft_type_flg) = TRIM($P{FT_TYPE_FLG_F}))",
                    lov_sql="SELECT TRIM(field_value) AS CODE, TRIM(field_value) || ' - ' || descr AS DESCR FROM CISADM.CI_LOOKUP_VAL_L l WHERE l.field_name = 'FT_TYPE_FLG' AND l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_FT f WHERE f.ft_type_flg = l.field_value AND f.accounting_dt >= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1"),
+        ]),
+    Spec(
+        name="adj_ap_requests_control", label="Adjustment A/P Requests - Control",
+        window_label="Adjustment created date",
+        description="Every adjustment A/P request in a window, grouped by request status and adjustment status, with the action each combination needs: a request the ERP canceled while the adjustment is still open must have its adjustment canceled by a user; a paid request on a canceled adjustment is a refund to recover. The requests behind each combination are listed underneath.",
+        order_note="one row per A/P request; the request-to-adjustment link is one-to-one (measured Odessa 2026-09-23: 16 of 16); the adjustment's service agreement can be missing (2 of 16), so account and customer are outer",
+        constants={"X": "PYMNT_SEL_STAT_FLG canceled (base-product A/P request lifecycle)",
+                   "P": "PYMNT_SEL_STAT_FLG paid",
+                   "60": "ADJ_STATUS_FLG canceled (base-product adjustment lifecycle; 30 freezable, 50 frozen)",
+                   "PYMNT_SEL_STAT_FLG": "lookup field name", "ADJ_STATUS_FLG": "lookup field name"},
+        sql=f"""
+SELECT TRIM(r.pymnt_sel_stat_flg) AS REQ_STATUS, COALESCE(rl.descr, TRIM(r.pymnt_sel_stat_flg)) AS REQ_STATUS_DESCR,
+       TRIM(a.adj_status_flg) AS ADJ_STATUS, COALESCE(al.descr, TRIM(a.adj_status_flg)) AS ADJ_STATUS_DESCR,
+       CASE WHEN TRIM(r.pymnt_sel_stat_flg) = 'X' AND TRIM(a.adj_status_flg) IN ('30', '50') THEN 'Cancel the adjustment: its A/P request was canceled'
+            WHEN TRIM(r.pymnt_sel_stat_flg) = 'P' AND TRIM(a.adj_status_flg) = '60' THEN 'Paid, but the adjustment was canceled: recover'
+            ELSE ' ' END AS ACTION,
+       COUNT(*) AS REQUESTS, COALESCE(SUM(a.adj_amt), 0) AS ADJ_AMT, COALESCE(SUM(r.paid_amt), 0) AS PAID_AMT
+FROM CISADM.CI_ADJ_APREQ r
+JOIN CISADM.CI_ADJ a ON a.adj_id = r.adj_id
+LEFT JOIN CISADM.CI_LOOKUP_VAL_L rl ON TRIM(rl.field_name) = 'PYMNT_SEL_STAT_FLG' AND TRIM(rl.field_value) = TRIM(r.pymnt_sel_stat_flg) AND rl.language_cd = 'ENG'
+LEFT JOIN CISADM.CI_LOOKUP_VAL_L al ON TRIM(al.field_name) = 'ADJ_STATUS_FLG' AND TRIM(al.field_value) = TRIM(a.adj_status_flg) AND al.language_cd = 'ENG'
+WHERE {WINDOW.format(col='a.cre_dt')}
+GROUP BY TRIM(r.pymnt_sel_stat_flg), COALESCE(rl.descr, TRIM(r.pymnt_sel_stat_flg)), TRIM(a.adj_status_flg), COALESCE(al.descr, TRIM(a.adj_status_flg))
+ORDER BY CASE WHEN TRIM(r.pymnt_sel_stat_flg) = 'X' AND TRIM(a.adj_status_flg) IN ('30', '50') THEN 0
+              WHEN TRIM(r.pymnt_sel_stat_flg) = 'P' AND TRIM(a.adj_status_flg) = '60' THEN 1 ELSE 2 END,
+         TRIM(r.pymnt_sel_stat_flg), TRIM(a.adj_status_flg)""",
+        columns=[Col("REQ_STATUS", "Req", width=40), Col("REQ_STATUS_DESCR", "A/P Request Status", width=150),
+                 Col("ADJ_STATUS", "Adj", width=40), Col("ADJ_STATUS_DESCR", "Adjustment Status", width=120),
+                 Col("ACTION", "Action", width=182),
+                 Col("REQUESTS", "Requests", "java.lang.Long", 70, "Right", INT, True),
+                 Col("ADJ_AMT", "Adjustment Amount", "java.math.BigDecimal", 100, "Right", MONEY, True),
+                 Col("PAID_AMT", "Paid Amount", "java.math.BigDecimal", 100, "Right", MONEY, True)],
+        sub=Sub(
+            name="adj_ap_requests_detail", key_param="REQ_STATUS", key_field="REQ_STATUS",
+            extra_keys={"ADJ_STATUS": "ADJ_STATUS"},
+            intro='"Requests"',
+            sql=f"""
+SELECT TRIM(r.ap_req_id) AS AP_REQ_ID, TRIM(r.adj_id) AS ADJ_ID,
+       COALESCE(tl.descr, TRIM(a.adj_type_cd)) AS ADJ_TYPE_DESCR, TRIM(sa.acct_id) AS ACCT_ID,
+       r.entity_name AS PAYEE, a.adj_amt AS ADJ_AMT, r.paid_amt AS PAID_AMT,
+       a.cre_dt AS CRE_DT, r.scheduled_pay_dt AS SCHEDULED_PAY_DT
+FROM CISADM.CI_ADJ_APREQ r
+JOIN CISADM.CI_ADJ a ON a.adj_id = r.adj_id
+LEFT JOIN CISADM.CI_ADJ_TYPE_L tl ON tl.adj_type_cd = a.adj_type_cd AND tl.language_cd = 'ENG'
+LEFT JOIN CISADM.CI_SA sa ON sa.sa_id = a.sa_id
+WHERE {WINDOW.format(col='a.cre_dt')}
+  AND TRIM(r.pymnt_sel_stat_flg) = TRIM($P{{REQ_STATUS}}) AND TRIM(a.adj_status_flg) = TRIM($P{{ADJ_STATUS}})
+  /*FILTERS*/
+ORDER BY a.cre_dt, r.ap_req_id""",
+            header=True,
+            # amounts end at x=702 and x=802, under the main grid's Adjustment Amount and Paid Amount
+            columns=[Col("AP_REQ_ID", "A/P Request", width=90), Col("ADJ_ID", "Adjustment", width=90),
+                     Col("ADJ_TYPE_DESCR", "Adjustment Type", width=100), Col("ACCT_ID", "Account", width=80),
+                     Col("PAYEE", "Payee", width=120),
+                     Col("CRE_DT", "Created", "java.sql.Timestamp", 50, "Left", "yyyy-MM-dd"),
+                     Col("SCHEDULED_PAY_DT", "Scheduled", "java.sql.Timestamp", 48, "Left", "yyyy-MM-dd"),
+                     Col("ADJ_AMT", "Adjustment Amount", "java.math.BigDecimal", 100, "Right", MONEY, True),
+                     Col("PAID_AMT", "Paid Amount", "java.math.BigDecimal", 100, "Right", MONEY, True)]),
+        filters=[
+            Filter("REQ_STATUS_F", "A/P request status",
+                   "($P{REQ_STATUS_F} IS NULL OR TRIM(r.pymnt_sel_stat_flg) = TRIM($P{REQ_STATUS_F}))",
+                   "($P{REQ_STATUS_F} IS NULL OR TRIM(r.pymnt_sel_stat_flg) = TRIM($P{REQ_STATUS_F}))",
+                   lov_sql="SELECT TRIM(l.field_value) AS CODE, TRIM(l.field_value) || ' - ' || l.descr AS DESCR FROM CISADM.CI_LOOKUP_VAL_L l WHERE TRIM(l.field_name) = 'PYMNT_SEL_STAT_FLG' AND l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ADJ_APREQ r JOIN CISADM.CI_ADJ a ON a.adj_id = r.adj_id WHERE TRIM(r.pymnt_sel_stat_flg) = TRIM(l.field_value) AND a.cre_dt >= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1"),
+            Filter("ADJ_STATUS_F", "Adjustment status",
+                   "($P{ADJ_STATUS_F} IS NULL OR TRIM(a.adj_status_flg) = TRIM($P{ADJ_STATUS_F}))",
+                   "($P{ADJ_STATUS_F} IS NULL OR TRIM(a.adj_status_flg) = TRIM($P{ADJ_STATUS_F}))",
+                   lov_sql="SELECT TRIM(l.field_value) AS CODE, TRIM(l.field_value) || ' - ' || l.descr AS DESCR FROM CISADM.CI_LOOKUP_VAL_L l WHERE TRIM(l.field_name) = 'ADJ_STATUS_FLG' AND l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ADJ a JOIN CISADM.CI_ADJ_APREQ r ON r.adj_id = a.adj_id WHERE TRIM(a.adj_status_flg) = TRIM(l.field_value) AND a.cre_dt >= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1"),
+            Filter("ACTION_ONLY_F", "Action needed only (type anything for yes)",
+                   "($P{ACTION_ONLY_F} IS NULL OR (TRIM(r.pymnt_sel_stat_flg) = 'X' AND TRIM(a.adj_status_flg) IN ('30', '50')) OR (TRIM(r.pymnt_sel_stat_flg) = 'P' AND TRIM(a.adj_status_flg) = '60'))",
+                   "($P{ACTION_ONLY_F} IS NULL OR (TRIM(r.pymnt_sel_stat_flg) = 'X' AND TRIM(a.adj_status_flg) IN ('30', '50')) OR (TRIM(r.pymnt_sel_stat_flg) = 'P' AND TRIM(a.adj_status_flg) = '60'))"),
+            Filter("ACCT_ID_F", "Account ID",
+                   "($P{ACCT_ID_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = a.sa_id AND TRIM(fsa.acct_id) = TRIM($P{ACCT_ID_F})))",
+                   "($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))"),
         ]),
 ]
 
