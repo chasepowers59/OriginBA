@@ -397,3 +397,18 @@ validator does NOT catch and the server does: `<joinInfo alias>` must be the roo
 report-unit descriptions over 250 characters are refused. Verify grain and join reachability in
 Oracle FIRST (read-only MCP): the request->adjustment link is 1:1 and never fails, but 2 of 16
 Odessa adjustments point at a missing SA, so everything past the adjustment is outer.
+
+## Hiding a folder from every client user (2026-09-23, Workstreams and Origin_Tools)
+Chase's pattern, set from the root superuser in each client org: explicit permissions on the
+folder, `role:/ROLE_USER` = 0 AND `role:/ROLE_ADMINISTRATOR` = 0 (No Access), so only the root
+superuser sees it; org admins lose it too. Tested by logging in as a user. Applied to
+`/SmartCity/Report/Workstreams` (by Chase) and `/SmartCity/Origin_Tools` (by tool) on the five
+test client orgs; prod already had `ROLE_USER=0` on Origin_Tools everywhere and on Workstreams for
+CityCorp / Fond_Du_Lac / College_Station only -- Ellensburg and Newark1 prod Workstreams still
+inherit (visible), a gap to close on Chase's word. `perms-set` REPLACES the list; the recipient is
+`role:/ROLE_X` (colon) -- `role/ROLE_X` is a 400. Before hiding, prove nothing outside depends on
+it: scan every inventory file (descriptors AND `.data` -- dashboards embed views by path) for the
+folder's URIs, and the org's jobs. Workstreams' only dependents were five Origin_Tools views
+(three Workstreams domains), and Origin_Tools has none, so hiding both breaks nothing a user
+could still run. Deleting Workstreams (90 resources) needs those five repointed or removed
+first; hide now, delete later.
