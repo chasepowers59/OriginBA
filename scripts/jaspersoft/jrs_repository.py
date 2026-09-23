@@ -21,7 +21,7 @@ the login is scoped to, named back; on prod also --i-mean-prod; --dry-run prints
     --org Origin_DEV delete /SmartCity/Report/X/old_report                  --confirm Origin_DEV
     --org Origin_DEV mkdir  /SmartCity/Report/New_Folder --label "New Folder" --confirm Origin_DEV
     --org Origin_DEV perms  /SmartCity/Report/Standard_Offering
-    --org Origin_DEV perms-set /SmartCity/Report/X role/ROLE_BILLING:18 role/ROLE_ADMINISTRATOR:1 --confirm Origin_DEV
+    --org Origin_DEV perms-set /SmartCity/Report/X role:/ROLE_BILLING:18 role:/ROLE_ADMINISTRATOR:1 --confirm Origin_DEV
     --org Origin_DEV jobs [--report /SmartCity/Report/X/r] | job ID | job-run ID | job-delete ID
     --org Origin_DEV users [--role ROLE_BILLING] | roles
     --org Origin_DEV export /SmartCity/Report/Standard_Offering/Finance --out backups/finance.zip
@@ -157,7 +157,7 @@ def perms(uri: str) -> int:
 
 
 def perms_set(uri: str, grants: list[str], a) -> int:
-    """role/ROLE_X:mask or user/name:mask, e.g. role/ROLE_BILLING:18 -- the whole list REPLACES the
+    """role:/ROLE_X:mask or user:/name:mask, e.g. role:/ROLE_BILLING:18 (measured 2026-09-23: without the colon the server answers 400) -- the whole list REPLACES the
     resource's own permissions (PUT), so name every recipient you want to keep."""
     perm = []
     for g in grants:
@@ -329,7 +329,7 @@ def main() -> int:
     d = sub.add_parser("delete"); d.add_argument("uri")
     m = sub.add_parser("mkdir"); m.add_argument("uri"); m.add_argument("--label")
     pr = sub.add_parser("perms", help="who can do what on a resource"); pr.add_argument("uri")
-    ps = sub.add_parser("perms-set", help="REPLACE a resource's permissions: role/ROLE_X:18 user/name:30 ..."); ps.add_argument("uri"); ps.add_argument("grants", nargs="+")
+    ps = sub.add_parser("perms-set", help="REPLACE a resource's permissions: role:/ROLE_X:18 user:/name:30 ... (the recipient carries a colon; 0 = no access, 1 administer, 2 read, 32 execute only)"); ps.add_argument("uri"); ps.add_argument("grants", nargs="+")
     j = sub.add_parser("jobs", help="scheduled report jobs, optionally for one report"); j.add_argument("--report")
     for c in ("job", "job-delete", "job-run"):
         x = sub.add_parser(c); x.add_argument("id")
