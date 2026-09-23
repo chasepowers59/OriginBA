@@ -21,7 +21,7 @@ python3 -m pytest tests/test_write_offs_domain_patch.py -q
 | --- | --- | --- |
 | `WO_PAY_AGG` window | `cre_dttm >= 2025-09-01` and `pay_dt >= 2025-09-01`, hard-coded | payments dated on or after each process's own create date; "in window" still stops at completion |
 | `WO_PAY_AGG` chain | `ci_pay_tndr.pay_tender_id = ci_pay_seg.pay_id` (two id spaces; events never matched) | segment -> `CI_PAY` (pay_id, frozen `PAY_STATUS_FLG='50'`) -> `CI_PAY_EVENT` (pay_event_id) |
-| `WO_ACCT_BAL` | | new: account current and payoff balance, `FREEZE_SW='Y' AND NOT_IN_ARS_SW='N'` (the snapshot's CUR_BAL regime; the redundant regime matched the client's snapshot on 13 of 752 write-off accounts), accounts with a write-off process only |
+| `WO_ACCT_BAL` | | new: account current and payoff balance, the snapshot's CUR_BAL rule (`FREEZE_SW='Y'`, `NOT_IN_ARS_SW='N'`, `ARS_DT` set and not after today): 752 of 752 write-off accounts equal to the cent against the client's CMS_ACCT_SNAPSHOT; 13 of 752 without the arrears-date condition, accounts with a write-off process only |
 | `WO_PROC_ARS` | | new: sum of `CI_WO_PROC_SA.ARS_AMT` per process |
 | `RUNNING_ARS_ROW` | | new calculated field: process arrears minus frozen payments since start |
 | items | 60 | 66: four `(Row)` items in Debt And Recovery, two Sum measures in Measures |
@@ -34,7 +34,28 @@ netted to zero -- the opposite of a balance), `CI_PAY.ILM_DT` as a payment date 
 information-lifecycle date), and the payment-arrangement adjustment keyed on `SA_TYPE_CD='PA'`
 (a client-configured code).
 
-## When the VPN is back: apply, then prove
+## Applied and proven, 2026-09-23 (test Origin_DEV and test Fond_Du_Lac)
+
+| Proof | Origin_DEV (Ellensburg DB) | Fond_Du_Lac test |
+| --- | --- | --- |
+| schema read back == patch output | byte-equal | byte-equal |
+| bound views open (topic kinds) and execute | 4 of 4 | 4 of 4 open; 3 rows, 1 empty (empty since the 18 Sep sweep, before this change) |
+| six new items in the Ad Hoc metadata | yes | yes |
+| running arrears == arrears - payments since start | 822 of 822 | 787 of 787 |
+| processes showing payments, before -> after | 0 -> 364 | (not sampled before) 274 |
+| Write Off Arrears Amount vs FDL's own report, same process ids | | 787 of 787 equal |
+| Account Current Balance vs the client's CMS_ACCT_SNAPSHOT | 633 of 633 to the cent | 752 of 752 to the cent |
+| Process Start DTTM vs FDL's Create Date/Time | | 787 of 787 equal (same timestamp) |
+
+For scale: FDL's own report's Current Balance ties to the same snapshot on 23 of 903 accounts.
+The rollback for each org is its `*_before.zip` under `backups/jaspersoft/write_offs/`.
+
+**Open, not changed:** the join tree carries its own filter, `C1_BI_WOPROC_VW.CRE_DTTM >=
+ts'2025-09-01'`, a third hard-coded floor. It applies to every view on the domain: at FDL it hides
+777 of the 1,564 processes (all of 2023 and 2024). Removing it widens what every bound view shows,
+so it is a product decision, not part of this patch.
+
+## Apply to another org (one at a time; prod needs --i-mean-prod)
 
 1. Export the live domain fresh and patch THAT (the reference here is a same-day copy, but the
    patch is anchored, so it refuses a schema whose shape moved):

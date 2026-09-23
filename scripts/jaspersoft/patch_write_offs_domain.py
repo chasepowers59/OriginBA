@@ -17,14 +17,16 @@ from CISADM.C1_BI_WOPROC_VW). Three changes, all additive to the ids views bind 
      (pay_event_id), the extractor graph's verified edges. Only frozen payments count
      (CI_PAY.PAY_STATUS_FLG = '50', the payment lifecycle's frozen status).
 2. WO_ACCT_BAL, new derived table: the whole account's current and payoff balance across all of
-   its service agreements, restricted to accounts that have a write-off process. Regime:
-   `FREEZE_SW='Y' AND NOT_IN_ARS_SW='N'`, the one CISADM.REFRESH_CMS_SA_SNAPSHOT uses for
-   CUR_BAL, so this equals the "Current Balance" the client already sees in the SA Snapshot
-   domain. Measured on Fond du Lac test 2026-09-23: the first cut used the redundant-FT regime
-   (`REDUNDANT_SW='N'`) and matched the snapshot on 13 of 752 write-off accounts -- on a
-   written-off account the debt and its write-off adjustments net to zero and are flagged
-   redundant, so that regime empties exactly these accounts. NOT FDL's `REDUNDANT_SW='Y'`
-   either (the netted rows alone). Exposed as row items only: an account balance repeated on
+   its service agreements, restricted to accounts that have a write-off process. The rule is
+   CISADM.REFRESH_CMS_SA_SNAPSHOT's, all three conditions: `FREEZE_SW='Y'`, `NOT_IN_ARS_SW='N'`,
+   and `ARS_DT` set and not after today. Measured on Fond du Lac test, 2026-09-23, against the
+   client's own CMS_ACCT_SNAPSHOT.CUR_BAL for the 752 write-off accounts: with the three
+   conditions 752 of 752 equal to the cent; with only the first two, 13 of 752 (a write-off
+   adjustment carries no arrears date, so without the third condition it nets the debt to zero
+   while the snapshot keeps the debt standing); the redundant-FT regime (`REDUNDANT_SW='N'`)
+   also 13 of 752. So "Account Current Balance" here IS the Current Balance the client sees in
+   the SA Snapshot domain. Not FDL's `REDUNDANT_SW='Y'` either: their report ties to the same
+   snapshot on 23 of 903 accounts. Exposed as row items only: an account balance repeated on
    every one of the account's processes is not additive, so it gets no Sum measure.
 3. WO_PROC_ARS, new derived table: the arrears recorded on the process's service agreements
    (CI_WO_PROC_SA.ARS_AMT, FDL's "Write Off Arrears Amount"), plus a calculated
@@ -68,6 +70,8 @@ from cisadm.ci_ft ft
 join cisadm.ci_sa sa on sa.sa_id = ft.sa_id
 where ft.freeze_sw = 'Y'
   and ft.not_in_ars_sw = 'N'
+  and ft.ars_dt is not null
+  and ft.ars_dt <= trunc(sysdate)
   and sa.acct_id in (select wp.acct_id from cisadm.ci_wo_proc wp)
 group by sa.acct_id"""
 

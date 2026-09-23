@@ -187,7 +187,7 @@ JRXML 6 bills. "Mutually unreadable" is true of the LIBRARIES and of Studio; on 
 units keep running. Details in `jaspersoft-server-operations`.
 
 
-## Write Offs domain: prepared 2026-09-23, NOT yet applied (VPN was down)
+## Write Offs domain: applied and proven 2026-09-23 (test Origin_DEV, test Fond_Du_Lac)
 
 `scripts/jaspersoft/patch_write_offs_domain.py` + `tests/test_write_offs_domain_patch.py` +
 `domains/manual_imports/write_offs_domain/README.md` (apply-and-prove runbook). What it fixes and
@@ -206,3 +206,20 @@ code). Also learned: "Process Start DTTM" (BI view CRE_DTTM) and FDL's "Create D
 (CI_WO_PROC.CRE_DTTM) are the SAME timestamp; a list comparison differs only because FDL's
 domain fans out per characteristic premise (right-outer joins) and both sides carry different
 date floors. Pre-existing item ids/joins are byte-identical after the patch (tested).
+
+Validation record (`domains/manual_imports/write_offs_domain/README.md` has the table). Three
+lessons that cost the morning:
+- **"Current Balance" is the snapshot's rule, all THREE conditions**: `FREEZE_SW='Y'`,
+  `NOT_IN_ARS_SW='N'`, and `ARS_DT` set and not after today. With the first two only, a
+  write-off adjustment (no arrears date) nets the debt to zero: 13 of 752 accounts tied. With
+  all three, 752 of 752 and 633 of 633 to the cent. The independent oracle is
+  `CMS_ACCT_SNAPSHOT.CUR_BAL_1` in the SA Snapshot domain, queried by account.
+- **A regime change that does not move the number was never the cause.** Swapping
+  `REDUNDANT_SW='N'` for `NOT_IN_ARS_SW='N'` left 13 of 752 unchanged; the missing condition was
+  the third one. Compare against the oracle after EVERY change, not once at the end.
+- **Look for a hard-coded floor in three places**: the derived query, the join tree's
+  `<filterString>`, and the view's own filters. The Write Offs domain had the first two
+  (`>= 2025-09-01` in WO_PAY_AGG, fixed; `CRE_DTTM >= ts'2025-09-01'` in the join tree, still
+  there -- it hides all of FDL's 2023-2024 processes and is a product decision).
+Also measured: the BI view's process count equals the raw table's once the join-tree filter is
+accounted for; "Process Start DTTM" and FDL's "Create Date/Time" agree on 787 of 787.

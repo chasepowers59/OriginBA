@@ -46,7 +46,9 @@ class Patched(unittest.TestCase):
     def test_two_derived_tables_joined_from_the_process_row(self):
         for qid in ("WO_ACCT_BAL", "WO_PROC_ARS"):
             self.assertIn(qid, self.queries)
-        self.assertIn("ft.not_in_ars_sw = 'n'", self.queries["WO_ACCT_BAL"].lower(), "the snapshot's CUR_BAL regime")
+        q = self.queries["WO_ACCT_BAL"].lower()
+        for cond in ("ft.freeze_sw = 'y'", "ft.not_in_ars_sw = 'n'", "ft.ars_dt is not null", "ft.ars_dt <= trunc(sysdate)"):
+            self.assertIn(cond, q, "the snapshot's CUR_BAL rule has three conditions; 752/752 with all three, 13/752 without the arrears date")
         self.assertNotIn("redundant_sw", self.queries["WO_ACCT_BAL"].lower(), "the redundant regime empties written-off accounts")
         self.assertIn("ft.freeze_sw = 'y'", self.queries["WO_ACCT_BAL"].lower())
         self.assertNotIn("sa_type_cd = 'pa'", self.queries["WO_PROC_ARS"].lower(), "a client-configured SA type must not be carried")
