@@ -287,6 +287,38 @@ NOT cover, in the order to check:
    Browser pane, open Create > Ad Hoc View on the domain, screenshot the field tree. Do this
    BEFORE the reply goes to the client, not after.
 
+## Copying ONE view between client orgs, and what the importer really does (2026-09-23)
+
+Ellensburg prod's "Financial Transaction - Bill Cycle Transactions" would not open in the Ad Hoc
+editor (console: `fetchFieldsList` -> `Cannot read properties of null (reading 'rootNode')`, then
+`hardEscape(...).join is not a function`) while executing perfectly through the API. Everything
+server-side was healthy and byte-identical to test: query 1.6s with real rows, domain items 45/45,
+every referenced field resolving, filters well formed. Two plausible culprits were DISPROVED by
+comparing against CityCorp's working copy of the same view: a unitless `legend.itemStyle.fontSize=17`
+(CityCorp works WITH it; 43 states in the org carry it) and a missing `<seriesColors>` (17 of 24
+states in the folder lack it). What remained was the saved crosstab layout itself -- the
+transaction-type dimension sitting in `columnGroups` with an `expandedLevels` entry. A saved state
+the 10.0 editor cannot rebuild; the data layer never notices. **A sweep calling a view "ok" says
+nothing about whether it OPENS.**
+
+Fix: `scripts/jaspersoft/jrs_copy_view_between_orgs.py --env prod --from CityCorp --to Ellensburg
+--view <uri> [--dry-run] --i-mean-prod`. Two import facts it encodes, both measured here:
+
+1. **The importer resolves a resource's references only against what is IN the package.** A package
+   holding the view alone returns "Import succeeded" WITH an `import.reference.resource.not.found`
+   warning naming the domain, and writes NOTHING (the view's updateDate never moved). Any warning
+   is a failed deploy until explained.
+2. So the package is the TARGET's own export -- its datasource and domain byte for byte, verified
+   file by file -- with only the view's `.xml` and `_files/` taken from the source org. The
+   precondition is checked first: the two orgs' domains must expose identical item ids.
+
+Importing the target's own datasource back bumps its `<version>` and re-encrypts
+`connectionPassword` with a fresh salt; `connectionUrl` and `connectionUser` are unchanged, and the
+view executing afterwards proves the connection. Do not read that ciphertext change as a repoint.
+
+Also: `jrs_repository.py` takes `--confirm` / `--i-mean-prod` as GLOBAL flags, before the
+subcommand; after it, argparse rejects the call and nothing is written.
+
 ## Ad Hoc chart formatting from here (2026-09-21, internal Origin_DEMO demo tweak)
 A chart's look is Highcharts options in the view's `stateXML` under
 `<chartState><advancedProperties><advancedChartProperty><name>plotOptions.series.dataLabels.style.fontSize</name><value>15px</value>...`

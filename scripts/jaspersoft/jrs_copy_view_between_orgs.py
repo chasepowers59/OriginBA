@@ -3,9 +3,13 @@
 
 Why this is not just "export and import": an org-scoped export of a view carries its whole
 dependency chain -- the domain AND the datasource. Imported as-is into another tenant that would
-overwrite the target's domain and repoint its datasource at the source client's database. This
-builds a package holding the VIEW ALONE, so it binds to the target org's existing domain at the
-same tenant-relative path and therefore to the target's own datasource.
+overwrite the target's domain and repoint its datasource at the source client's database.
+
+Nor can the package hold the view alone: the importer resolves a resource's references only
+against what is inside the package, so a view-only package "succeeds" with an
+import.reference.resource.not.found warning and writes nothing (measured, Ellensburg prod
+2026-09-23). So the package is the TARGET's own export -- its datasource and its domain, byte for
+byte, verified as such -- with only the view's files taken from the source org.
 
 Precondition, checked and refused if it fails: the two orgs' domains must expose the SAME item
 ids, or the copied view references fields the target domain does not have.
@@ -74,29 +78,35 @@ def view_fields(zip_path: pathlib.Path, view: str) -> set[str]:
 
 
 def build_package(src_zip: pathlib.Path, tgt_zip: pathlib.Path, view: str, to_org: str, out: pathlib.Path) -> pathlib.Path:
-    """The view's own files from the SOURCE, inside the TARGET's export envelope.
-
-    The envelope (keyalias / encrypted / jsVersion) comes from the target org's own export, and
-    the resource list names the view only -- no DataSource entry, no domain entry.
-    """
+    """The view's own files from the SOURCE, inside the TARGET's export envelope."""
     leaf = view.rsplit("/", 1)[-1]
-    keep = []
-    with zipfile.ZipFile(src_zip) as z:
+    # The importer resolves a resource's references ONLY against what is in the package: a package
+    # holding the view alone imports "successfully" with an
+    # import.reference.resource.not.found warning and silently writes nothing (measured on
+    # Ellensburg prod, 2026-09-23). So the package is the TARGET's own export -- its datasource and
+    # its domain, byte for byte -- with only the view's files replaced by the source org's.
+    keep: list[tuple[str, bytes]] = []
+    with zipfile.ZipFile(tgt_zip) as z:
         for n in z.namelist():
+            if n == "index.xml":
+                continue
             if f"/{leaf}.xml" in n or f"/{leaf}_files/" in n:
-                keep.append((n, z.read(n)))
-            elif n.endswith("/.folder.xml") and "/DataSource" not in n:
-                keep.append((n, z.read(n)))
-    if not any(f"/{leaf}.xml" in n for n, _ in keep):
+                continue                      # the target's own copy of the view: replaced below
+            keep.append((n, z.read(n)))
+    with zipfile.ZipFile(src_zip) as z:
+        view_files = [(n, z.read(n)) for n in z.namelist() if f"/{leaf}.xml" in n or f"/{leaf}_files/" in n]
+    if not any(f"/{leaf}.xml" in n for n, _ in view_files):
         raise SystemExit(f"the source export does not contain {leaf}.xml")
+    keep += view_files
 
     with zipfile.ZipFile(tgt_zip) as z:
         envelope = z.read("index.xml").decode("utf-8", "replace")
+        tgt_resources = re.findall(r"<resource>([^<]+)</resource>", envelope)
     props = dict(re.findall(r'<property name="([^"]+)" value="([^"]*)"', envelope))
     index = ('<?xml version="1.0" encoding="UTF-8"?>\n<export>'
              + f'<property name="keyalias" value="{props.get("keyalias", "")}"/>'
              + '<module id="repositoryResources">'
-             + f"<resource>{view}</resource>"
+             + "".join(f"<resource>{r}</resource>" for r in (tgt_resources or [view]))
              + '</module><module id="favorites"/>'
              + '<property name="pathProcessorId" value="zip"/>'
              + f'<property name="rootTenantId" value="{to_org}"/>'
@@ -111,21 +121,33 @@ def build_package(src_zip: pathlib.Path, tgt_zip: pathlib.Path, view: str, to_or
     return out
 
 
-def verify(pkg: pathlib.Path, view: str, from_org: str, to_org: str) -> None:
+def verify(pkg: pathlib.Path, tgt_zip: pathlib.Path, view: str, from_org: str, to_org: str) -> None:
+    """Everything except the view must be the TARGET's own bytes, or this repoints a client."""
+    leaf = view.rsplit("/", 1)[-1]
     with zipfile.ZipFile(pkg) as z:
-        names = z.namelist()
+        names = [n for n in z.namelist() if n != "index.xml"]
         index = z.read("index.xml").decode()
-        blob = b"".join(z.read(n) for n in names if n != "index.xml")
-    bad = [n for n in names if "/DataSource/" in n or n.endswith("_files/schema.data")]
-    if bad:
-        raise SystemExit(f"package would overwrite the target's datasource or domain: {bad}")
+        pkg_files = {n: z.read(n) for n in names}
+    with zipfile.ZipFile(tgt_zip) as z:
+        tgt_files = {n: z.read(n) for n in z.namelist() if n != "index.xml"}
+
+    carried = [n for n in pkg_files if f"/{leaf}.xml" not in n and f"/{leaf}_files/" not in n]
+    changed = [n for n in carried if tgt_files.get(n) != pkg_files[n]]
+    if changed:
+        raise SystemExit(f"these are not the target's own bytes: {changed[:6]}")
+    ds = [n for n in carried if "/DataSource/" in n and n.endswith(".xml")]
+    if not ds:
+        raise SystemExit("no datasource in the package: the domain reference will not resolve")
+    if from_org.encode() in b"".join(pkg_files.values()):
+        raise SystemExit(f"the source org name {from_org} survives inside the package")
     if f'value="{to_org}"' not in index:
         raise SystemExit("index.xml does not carry the TARGET rootTenantId")
-    if from_org.encode() in blob:
-        raise SystemExit(f"the source org name {from_org} survives inside the package")
     if f"<resource>{view}</resource>" not in index:
         raise SystemExit("index.xml does not list the view")
-    print(f"  verified: {len(names)} entries, no datasource, no domain, rootTenantId={to_org}")
+    # The server's own export lists ONLY the requested resource and ships its dependencies as
+    # files; the importer reads them from the package to resolve references. Keep that shape.
+    print(f"  verified: {len(names)} entries; {len(carried)} carried from the target byte for byte "
+          f"(datasource {[pathlib.PurePosixPath(d).name for d in ds]}), only the view replaced")
 
 
 def main() -> int:
@@ -162,12 +184,15 @@ def main() -> int:
     print("3. every field the view references exists in the target domain")
 
     pkg = build_package(src_zip, tgt_zip, a.view, a.dst, work / f"{a.dst}_import.zip")
-    verify(pkg, a.view, a.src, a.dst)
+    verify(pkg, tgt_zip, a.view, a.src, a.dst)
     if a.dry_run:
         print(f"4. dry run: {pkg.relative_to(REPO)} built, nothing imported"); return 0
 
-    cmd = [sys.executable, str(HERE / "jrs_repository.py"), "--env", a.env, "--org", a.dst,
-           "--confirm", a.dst, "import", str(pkg)] + (["--i-mean-prod"] if a.env == "prod" else [])
+    # jrs_repository.py takes its guards as GLOBAL flags, before the subcommand; appending them
+    # after `import <zip>` is an argparse error, not a write.
+    cmd = ([sys.executable, str(HERE / "jrs_repository.py"), "--env", a.env, "--org", a.dst, "--confirm", a.dst]
+           + (["--i-mean-prod"] if a.env == "prod" else [])
+           + ["import", str(pkg)])
     r = subprocess.run(cmd, capture_output=True, text=True, check=False)
     print("4. import:", (r.stdout or r.stderr).strip()[-300:])
     if r.returncode != 0:
