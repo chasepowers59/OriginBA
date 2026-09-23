@@ -301,8 +301,10 @@ transaction-type dimension sitting in `columnGroups` with an `expandedLevels` en
 the 10.0 editor cannot rebuild; the data layer never notices. **A sweep calling a view "ok" says
 nothing about whether it OPENS.**
 
-Fix: `scripts/jaspersoft/jrs_copy_view_between_orgs.py --env prod --from CityCorp --to Ellensburg
---view <uri> [--dry-run] --i-mean-prod`. Two import facts it encodes, both measured here:
+Fix: `scripts/jaspersoft/jrs_copy_resources.py --from prod:CityCorp --to prod:Ellensburg
+--view <uri> [--dry-run] --i-mean-prod` (also `--folder`, and across environments: FDL's
+`/SmartCity/Report/FDL_Active_Write_Off_Process` went prod -> test on 2026-09-23 the same way).
+Three import facts it encodes, all measured here:
 
 1. **The importer resolves a resource's references only against what is IN the package.** A package
    holding the view alone returns "Import succeeded" WITH an `import.reference.resource.not.found`
@@ -315,6 +317,10 @@ Fix: `scripts/jaspersoft/jrs_copy_view_between_orgs.py --env prod --from CityCor
 Importing the target's own datasource back bumps its `<version>` and re-encrypts
 `connectionPassword` with a fresh salt; `connectionUrl` and `connectionUser` are unchanged, and the
 view executing afterwards proves the connection. Do not read that ciphertext change as a repoint.
+
+3. **The index tag is literal.** A folder export lists itself as `<folder>`, a resource export as
+   `<resource>`. Writing a folder as `<resource>` answers "Reference resource not found" for the
+   folder and nothing inside it lands. Keep the target export's own entries.
 
 Also: `jrs_repository.py` takes `--confirm` / `--i-mean-prod` as GLOBAL flags, before the
 subcommand; after it, argparse rejects the call and nothing is written.
