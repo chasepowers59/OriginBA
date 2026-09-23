@@ -21,7 +21,7 @@ python3 -m pytest tests/test_write_offs_domain_patch.py -q
 | --- | --- | --- |
 | `WO_PAY_AGG` window | `cre_dttm >= 2025-09-01` and `pay_dt >= 2025-09-01`, hard-coded | payments dated on or after each process's own create date; "in window" still stops at completion |
 | `WO_PAY_AGG` chain | `ci_pay_tndr.pay_tender_id = ci_pay_seg.pay_id` (two id spaces; events never matched) | segment -> `CI_PAY` (pay_id, frozen `PAY_STATUS_FLG='50'`) -> `CI_PAY_EVENT` (pay_event_id) |
-| `WO_ACCT_BAL` | | new: account current and payoff balance, `FREEZE_SW='Y' AND REDUNDANT_SW='N'`, accounts with a write-off process only |
+| `WO_ACCT_BAL` | | new: account current and payoff balance, `FREEZE_SW='Y' AND NOT_IN_ARS_SW='N'` (the snapshot's CUR_BAL regime; the redundant regime matched the client's snapshot on 13 of 752 write-off accounts), accounts with a write-off process only |
 | `WO_PROC_ARS` | | new: sum of `CI_WO_PROC_SA.ARS_AMT` per process |
 | `RUNNING_ARS_ROW` | | new calculated field: process arrears minus frozen payments since start |
 | items | 60 | 66: four `(Row)` items in Debt And Recovery, two Sum measures in Measures |

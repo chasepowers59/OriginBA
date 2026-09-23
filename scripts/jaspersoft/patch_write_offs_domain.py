@@ -17,11 +17,15 @@ from CISADM.C1_BI_WOPROC_VW). Three changes, all additive to the ids views bind 
      (pay_event_id), the extractor graph's verified edges. Only frozen payments count
      (CI_PAY.PAY_STATUS_FLG = '50', the payment lifecycle's frozen status).
 2. WO_ACCT_BAL, new derived table: the whole account's current and payoff balance across all of
-   its service agreements, restricted to accounts that have a write-off process. Uses THIS
-   repo's balance regime (`FREEZE_SW='Y' AND REDUNDANT_SW='N'`, cisadm-sql skill), NOT the
-   FDL domain's `REDUNDANT_SW='Y'`, which selects the transactions already netted to zero.
-   Exposed as row items only: an account balance repeated on every one of the account's
-   processes is not additive, so it gets no Sum measure.
+   its service agreements, restricted to accounts that have a write-off process. Regime:
+   `FREEZE_SW='Y' AND NOT_IN_ARS_SW='N'`, the one CISADM.REFRESH_CMS_SA_SNAPSHOT uses for
+   CUR_BAL, so this equals the "Current Balance" the client already sees in the SA Snapshot
+   domain. Measured on Fond du Lac test 2026-09-23: the first cut used the redundant-FT regime
+   (`REDUNDANT_SW='N'`) and matched the snapshot on 13 of 752 write-off accounts -- on a
+   written-off account the debt and its write-off adjustments net to zero and are flagged
+   redundant, so that regime empties exactly these accounts. NOT FDL's `REDUNDANT_SW='Y'`
+   either (the netted rows alone). Exposed as row items only: an account balance repeated on
+   every one of the account's processes is not additive, so it gets no Sum measure.
 3. WO_PROC_ARS, new derived table: the arrears recorded on the process's service agreements
    (CI_WO_PROC_SA.ARS_AMT, FDL's "Write Off Arrears Amount"), plus a calculated
    RUNNING_ARS_ROW = that amount minus the frozen payments since the process started, which
@@ -63,7 +67,7 @@ WO_ACCT_BAL_SQL = """select sa.acct_id,
 from cisadm.ci_ft ft
 join cisadm.ci_sa sa on sa.sa_id = ft.sa_id
 where ft.freeze_sw = 'Y'
-  and ft.redundant_sw = 'N'
+  and ft.not_in_ars_sw = 'N'
   and sa.acct_id in (select wp.acct_id from cisadm.ci_wo_proc wp)
 group by sa.acct_id"""
 

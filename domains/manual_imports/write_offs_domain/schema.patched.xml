@@ -236,7 +236,7 @@ group by w.uncoll_proc_id</query>
 from cisadm.ci_ft ft
 join cisadm.ci_sa sa on sa.sa_id = ft.sa_id
 where ft.freeze_sw = 'Y'
-  and ft.redundant_sw = 'N'
+  and ft.not_in_ars_sw = 'N'
   and sa.acct_id in (select wp.acct_id from cisadm.ci_wo_proc wp)
 group by sa.acct_id</query>
     </jdbcQuery>
