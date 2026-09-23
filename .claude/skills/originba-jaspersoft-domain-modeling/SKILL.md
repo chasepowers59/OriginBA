@@ -185,3 +185,24 @@ The JR 7 library alone cannot load JRXML 6 (measured, and vendor-confirmed); Jas
 10.0 PRO adds `LegacyXmlLoader` (JRL-Pro, license-gated), which is why the 10.0 test server serves
 JRXML 6 bills. "Mutually unreadable" is true of the LIBRARIES and of Studio; on the PRO server old
 units keep running. Details in `jaspersoft-server-operations`.
+
+
+## Write Offs domain: prepared 2026-09-23, NOT yet applied (VPN was down)
+
+`scripts/jaspersoft/patch_write_offs_domain.py` + `tests/test_write_offs_domain_patch.py` +
+`domains/manual_imports/write_offs_domain/README.md` (apply-and-prove runbook). What it fixes and
+adds, found by comparing the Standard Offering Write Offs domain with FDL's custom write-off domain:
+- `WO_PAY_AGG` had a HARD-CODED floor (`>= date '2025-09-01'`, twice): every older process showed
+  empty payment figures and the cut-off never moved. Now relative to each process's own start.
+- `WO_PAY_AGG` joined `ci_pay_tndr.pay_tender_id = ci_pay_seg.pay_id` -- two different id spaces,
+  so event counts and first/last dates never matched. Chain is segment -> CI_PAY -> CI_PAY_EVENT
+  (the extractor graph's edges). Lesson: a derived query is SQL nobody executes in review; read
+  its joins against `extract_slice.py` EDGES before trusting a number that comes out of it.
+- New `WO_ACCT_BAL` (account current/payoff balance, balance regime FREEZE_SW='Y' AND
+  REDUNDANT_SW='N') and `WO_PROC_ARS` (+ calculated running arrears net of payments since start).
+Not carried from FDL, each a defect there: `REDUNDANT_SW='Y'` (the netted-to-zero rows, i.e. the
+opposite of a balance), `CI_PAY.ILM_DT` used as a payment date, and an SA-type 'PA' term (client
+code). Also learned: "Process Start DTTM" (BI view CRE_DTTM) and FDL's "Create Date/Time"
+(CI_WO_PROC.CRE_DTTM) are the SAME timestamp; a list comparison differs only because FDL's
+domain fans out per characteristic premise (right-outer joins) and both sides carry different
+date floors. Pre-existing item ids/joins are byte-identical after the patch (tested).
