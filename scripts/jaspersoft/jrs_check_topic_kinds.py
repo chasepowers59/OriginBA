@@ -20,9 +20,11 @@ import jrs_adhoc_chart_props as cp  # noqa: E402
 
 
 def aggregated_fields(state: str) -> set[str]:
-    """Fields the saved state uses as measures: <measure ... fieldName="X" function="..."> entries."""
-    return {m.group(1) for m in re.finditer(r'<measure\b[^>]*fieldName="([^"]+)"[^>]*function="', state)
-            if m.group(1) and not m.group(1).startswith("_")}
+    """Fields the saved state truly aggregates. Every column of a TABLE view is also a <measure>
+    element with a function attribute; only real measures carry measure="true" (the first cut of
+    this rule flagged 64 of Ellensburg's 150 views for that reason -- all table columns)."""
+    return {m.group(1) for m in re.finditer(r'<measure\b[^>]*\bfieldName="([^"]+)"[^>]*\bmeasure="true"', state)
+            if not m.group(1).startswith("_")}
 
 
 def topic_kinds(topic: str) -> dict[str, str]:
