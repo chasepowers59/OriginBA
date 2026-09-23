@@ -72,6 +72,7 @@ class Schema(unittest.TestCase):
         r = subprocess.run([sys.executable, str(ROOT / "scripts/jaspersoft/validate_domain_schema.py"), str(out)], capture_output=True, text=True, check=False)
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         self.assertNotIn("/>", self.xml, "JRS exports use explicit close tags")
+        self.assertNotIn("<filterString></filterString>", self.xml, "an empty filter string breaks query parsing")
 
 
 if __name__ == "__main__":

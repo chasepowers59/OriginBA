@@ -67,11 +67,11 @@ def descriptor(spec: g.Spec, ds_uri: str) -> dict:
     }
 
 
-def deploy(org: str | None, ds: str) -> list[str]:
+def deploy(org, ds_name, only=None) -> list[str]:
     root = org_root(org)
     ds_uri = f"{root}/DataSource/{ds}"
     uris = []
-    specs = [s for s in g.SPECS if not a.only or s.name in a.only]
+    specs = [s for s in g.SPECS if not only or s.name in only]
     for spec in specs:
         uri = f"{root}{g.FOLDERS[spec.name]}/{spec.name}"
         body = json.dumps(descriptor(spec, ds_uri)).encode()
@@ -126,7 +126,7 @@ def main() -> int:
     ap.add_argument("--param", action="append", default=[], metavar="NAME=VALUE", help="a filter to pass on the run (repeatable)")
     ap.add_argument("--only", action="append", default=[], metavar="SPEC", help="deploy only these spec names (default: every spec)")
     a = ap.parse_args()
-    uris = deploy(a.org, a.datasource)
+    uris = deploy(a.org, a.datasource, a.only)
     if a.run and uris:
         extra: dict[str, list[str]] = {}
         for kv in a.param:
