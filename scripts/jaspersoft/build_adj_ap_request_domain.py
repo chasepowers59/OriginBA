@@ -172,7 +172,8 @@ def schema(ds: str) -> str:
     out += [f'        <field id="{fid}" dataSetExpression="{escape(expr)}" type="{t}"></field>' for fid, expr, t in CALCULATED]
     # no <filterString>: an EMPTY one is parsed and the query engine answers
     # "exception parsing filter string ''" (measured on Origin_DEV, 2026-09-23)
-    out += ['      </fieldList>', '      <joinInfo alias="JoinTree_1" referenceId="CI_ADJ_APREQ"></joinInfo>', '      <joinList>']
+    # joinInfo alias = the ROOT TABLE id, not the tree (500 "ordering minJoins" otherwise)
+    out += ['      </fieldList>', '      <joinInfo alias="CI_ADJ_APREQ" referenceId="CI_ADJ_APREQ"></joinInfo>', '      <joinList>']
     out += [f'        <join expr="{escape(e)}" left="{l}" right="{r}" type="{ty}" weight="1"></join>' for e, l, r, ty in JOINS]
     out += ['      </joinList>', '      <joinOptions></joinOptions>', '      <tableRefList>']
     out += [f'        <tableRef alwaysIncludeTable="false" tableAlias="{tid}" tableId="{tid}"></tableRef>' for tid in TABLES]

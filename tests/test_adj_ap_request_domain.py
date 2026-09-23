@@ -73,6 +73,7 @@ class Schema(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         self.assertNotIn("/>", self.xml, "JRS exports use explicit close tags")
         self.assertNotIn("<filterString></filterString>", self.xml, "an empty filter string breaks query parsing")
+        self.assertIn('<joinInfo alias="CI_ADJ_APREQ" referenceId="CI_ADJ_APREQ">', self.xml, "the join-tree alias is the root TABLE id (500 'ordering minJoins' otherwise)")
 
 
 if __name__ == "__main__":

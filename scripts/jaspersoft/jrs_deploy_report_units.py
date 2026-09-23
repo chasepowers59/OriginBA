@@ -54,7 +54,7 @@ def descriptor(spec: g.Spec, ds_uri: str) -> dict:
                          "dataType": {"dataType": {"label": "myDatatype", "type": DATATYPE[ic["type"]], "strictMin": False, "strictMax": False}}})
         controls.append({"inputControl": base})
     return {
-        "label": spec.label, "description": spec.description,
+        "label": spec.label, "description": spec.description[:240],   # the server refuses > 250 chars (ORA-12899 class)
         "alwaysPromptControls": True, "controlsLayout": "popupScreen",
         "dataSource": {"dataSourceReference": {"uri": ds_uri}},
         "jrxml": {"jrxmlFile": {"label": "Main jrxml", "type": "jrxml",
@@ -67,7 +67,7 @@ def descriptor(spec: g.Spec, ds_uri: str) -> dict:
     }
 
 
-def deploy(org, ds_name, only=None) -> list[str]:
+def deploy(org, ds, only=None) -> list[str]:
     root = org_root(org)
     ds_uri = f"{root}/DataSource/{ds}"
     uris = []
@@ -132,7 +132,7 @@ def main() -> int:
         for kv in a.param:
             k, v = kv.split("=", 1); extra.setdefault(k, []).append(v)
         return 1 if run(uris, a.run[0], a.run[1], a.out, extra) else 0
-    return 0 if len(uris) == len(specs) else 1
+    return 0 if len(uris) == len([s for s in g.SPECS if not a.only or s.name in a.only]) else 1
 
 
 if __name__ == "__main__":

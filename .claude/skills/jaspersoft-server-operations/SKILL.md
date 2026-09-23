@@ -72,6 +72,12 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
 | `scripts/jaspersoft/audit_adhoc_saved_filters.py --env X --org Y --client <config id>` | saved Ad Hoc filter values that name the SOURCE client's configuration and the target does not have (the promoted view returns nothing there); reads the explorer's per-client config export |
 | `scripts/jaspersoft/jrs_adhoc_chart_props.py --env X --org Y --folder F --set name=value [--only-if name=value] [--dry-run] [--i-mean-prod]` | set Highcharts advanced properties on EVERY Ad Hoc chart state under a folder, dashboard-embedded copies included; backs each state up under `backups/jaspersoft/adhoc_state/`, reads every PUT back. `tests/test_jrs_adhoc_chart_props.py` pins the XML patch on real states |
 | `scripts/jaspersoft/jrs_sa360_prem_char_apply.py --env X --org Y [--dry-run] [--i-mean-prod]` | give an org's Service Agreement 360 domain the premise-characteristics group IN PLACE: export (the rollback), patch THAT org's export (its own DS id), PUT the schema with its version, then four proofs (read-back byte-equal, `/domains/<uri>/metadata` lists the group, every bound view runs, a flat query of the new items returns rows). Live 2026-09-21: College_Station test, Ellensburg test + prod |
+| `scripts/jaspersoft/jrs_copy_resources.py --from env:Org --to env:Org --view U / --folder F` | copy a view or a folder between orgs/environments inside the target's own export (its datasource and domain byte for byte); refuses on domain item mismatch |
+| `scripts/jaspersoft/jrs_check_topic_kinds.py --env X --org Y [--folder F]` | views whose topic disagrees with their state about a measure: the one predictor of 'executes but will not open' that survived calibration |
+| `scripts/jaspersoft/jrs_domain_query.py --env X --org Y --domain U --fields set.item,... --out f.json` | rows out of a domain by item id; the before/after instrument for a domain change |
+| `scripts/jaspersoft/jrs_import_domain.py --env X --org Y --ds <DS> --folder F --name N --label L --schema f.xml` | CREATE a domain from a schema, packaged with the org's own datasource; then metadata + a probe query |
+| `scripts/jaspersoft/jrs_sa360_prem_char_apply.py`, `patch_write_offs_domain.py`, `build_adj_ap_request_domain.py` | the domain builders/patches of 2026-09-21..23, each with its tests and README under `domains/manual_imports/` |
+| `scripts/jaspersoft/jrs_deploy_report_units.py --org Y --datasource DS [--only SPEC] [--run FROM TO]` | the finance-pack report units from `generate_sql_report_pack.py` SPECS; `--only` for one |
 | `tests/test_jrs_inventory.py` | the offline half of the inventory tool on a real export |
 
 ## What the REST API can and cannot do here
@@ -381,3 +387,13 @@ area: four labels vanished and Chase asked whether they had been removed. The fi
 text, gauge captions 9px) is served after the UI flush: the org's theme hash changed (A966A7AA) and
 the served overrides_custom.css is 37,012 bytes with both rules. Measure a formatting change in the
 DOM (colour, size, what lies under the label) before calling it done; the state file cannot tell you.
+
+## Building a NEW domain from scratch (2026-09-23, Adjustment A/P Request domain)
+Author the schema in a builder (`build_adj_ap_request_domain.py` is the template: TABLES, JOINS,
+CALCULATED, SETS, MEASURES -> XML), test it offline (`tests/test_adj_ap_request_domain.py`), import
+with `jrs_import_domain.py`, prove with its probe and `jrs_domain_query.py`. Three things the
+validator does NOT catch and the server does: `<joinInfo alias>` must be the root TABLE id (500
+"ordering minJoins" otherwise); no empty `<filterString>` ("exception parsing filter string ''");
+report-unit descriptions over 250 characters are refused. Verify grain and join reachability in
+Oracle FIRST (read-only MCP): the request->adjustment link is 1:1 and never fails, but 2 of 16
+Odessa adjustments point at a missing SA, so everything past the adjustment is outer.
