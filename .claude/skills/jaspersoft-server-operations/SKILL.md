@@ -299,15 +299,22 @@ comparing against CityCorp's working copy of the same view: a unitless `legend.i
 states in the folder lack it). What remained was the saved crosstab layout itself -- the
 transaction-type dimension sitting in `columnGroups` with an `expandedLevels` entry -- and THAT
 theory died at calibration the same morning: "Meter Operations - Daily Installations" in
-Ellensburg prod carries the identical shape and opens fine (Chase, 2026-09-23). The trigger inside
-the saved state is NOT isolated. What holds: the state itself is bad, a copy of it elsewhere is
-bad too, and the data layer never notices. **A sweep calling a view "ok" says nothing about
-whether it OPENS.** Finding other copies is therefore an IDENTITY check, not a signature:
-`jrs_scan_adhoc_layout.py --env prod --org Y --like <known-broken stateXML>` (ignores temp ids,
-stamps and the sample/full run flags). It found Newark1 carrying the same Bill Cycle state; the
-`layout_scan_prod_*_20260923.json` files committed before calibration list signature hits and
-are NOT a defect list. Fit a signature to one sample, then have a person open one hit before
-believing it.
+Ellensburg prod carries the identical shape and opens fine (Chase, 2026-09-23). Then Newark1's
+copy of the SAME view, whose saved state is Ellensburg's broken state byte for byte apart from two
+run-mode flags, opened fine too. So the stateXML is not the cause either. **The cause is in the
+TOPIC** (`<view>_files/topicJRXML`, generated per org): the view's only measure is CountAll of
+`FT_CORE.FT_ID`, and both broken Ellensburg topics declare that field `kind=DIMENSION` while
+both working copies (Newark1, CityCorp) declare it `kind=MEASURE`. The editor builds its
+measures list from a field the topic says is not a measure -> `fetchFieldsList` null rootNode,
+then a template joins a non-list. A re-save in the editor does NOT fix it: the topic is
+regenerated from the existing topic's metadata and keeps the bad kind. The data layer never
+notices because queryExecutions reads the state, not the topic. **A sweep calling a view "ok"
+says nothing about whether it OPENS.** The `layout_scan_prod_*_20260923.json` files committed
+before calibration are signature hits, NOT a defect list; `jrs_scan_adhoc_layout.py` compares
+states by identity, which also does not predict this. The predictor is
+`jrs_check_topic_kinds.py`: for every view, each field the state aggregates must be
+`kind=MEASURE` in its topic. Fix for a hit: `jrs_copy_resources.py --view` from an org whose
+topic is right, or re-create the view so the topic is regenerated from the domain.
 
 Fix: `scripts/jaspersoft/jrs_copy_resources.py --from prod:CityCorp --to prod:Ellensburg
 --view <uri> [--dry-run] --i-mean-prod` (also `--folder`, and across environments: FDL's
