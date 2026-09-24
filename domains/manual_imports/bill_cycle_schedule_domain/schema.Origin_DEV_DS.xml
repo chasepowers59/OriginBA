@@ -39,9 +39,24 @@
         <item id="LAST_DUE_DT" label="Last Due Date" resourceId="JoinTree_1.WINDOW_BILLS.LAST_DUE_DT"></item>
       </items>
     </itemGroup>
-    <itemGroup id="SET_CYCLE" label="1.2) Cycle Today" resourceId="JoinTree_1">
+    <itemGroup id="SET_WINDOW_BSEG" label="1.2) Bill Segments In The Window" resourceId="JoinTree_1">
+      <items>
+        <item id="BSEG_COUNT" label="Bill Segment Count" resourceId="JoinTree_1.WINDOW_BSEG.BSEG_COUNT"></item>
+        <item id="FROZEN_BSEG_COUNT" label="Frozen Bill Segment Count" resourceId="JoinTree_1.WINDOW_BSEG.FROZEN_BSEG_COUNT"></item>
+        <item id="CANCELED_BSEG_COUNT" label="Canceled Bill Segment Count" resourceId="JoinTree_1.WINDOW_BSEG.CANCELED_BSEG_COUNT"></item>
+        <item id="OPEN_BSEG_COUNT" label="Open Bill Segment Count (Not Frozen, Not Canceled)" resourceId="JoinTree_1.WINDOW_BSEG.OPEN_BSEG_COUNT"></item>
+        <item id="ESTIMATED_BSEG_COUNT" label="Estimated Bill Segment Count" resourceId="JoinTree_1.WINDOW_BSEG.ESTIMATED_BSEG_COUNT"></item>
+        <item id="BSEG_WITH_EXCEPTION_COUNT" label="Bill Segments With Exceptions" resourceId="JoinTree_1.WINDOW_BSEG.BSEG_WITH_EXCEPTION_COUNT"></item>
+        <item id="BSEG_SA_COUNT" label="Service Agreements Billed" resourceId="JoinTree_1.WINDOW_BSEG.SA_COUNT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SET_CYCLE" label="1.3) Cycle Today And Neighbouring Windows" resourceId="JoinTree_1">
       <items>
         <item id="ACCOUNT_COUNT" label="Accounts On Cycle" resourceId="JoinTree_1.CYCLE_ACCOUNTS.ACCOUNT_COUNT"></item>
+        <item id="WINDOW_SEQ" label="Window Sequence Within Cycle" resourceId="JoinTree_1.WINDOW_AGE.WINDOW_SEQ"></item>
+        <item id="PREV_WIN_END_DT" label="Previous Window End Date" resourceId="JoinTree_1.WINDOW_AGE.PREV_WIN_END_DT"></item>
+        <item id="NEXT_WIN_START_DT" label="Next Window Start Date" resourceId="JoinTree_1.WINDOW_AGE.NEXT_WIN_START_DT"></item>
+        <item id="DAYS_GAP_FROM_PREV_WINDOW" label="Days Gap From Previous Window" resourceId="JoinTree_1.WINDOW_AGE.DAYS_GAP_FROM_PREV_WINDOW"></item>
       </items>
     </itemGroup>
     <itemGroup id="SET_FLAGS" label="2.) Flags And Formulas" resourceId="JoinTree_1">
@@ -50,6 +65,11 @@
         <item id="HAS_BILLS" label="Window Has Bills" resourceId="JoinTree_1.HAS_BILLS"></item>
         <item id="WINDOW_IS_PAST" label="Window Is Past" resourceId="JoinTree_1.WINDOW_AGE.WINDOW_IS_PAST"></item>
         <item id="WINDOW_IS_CURRENT" label="Window Is Current" resourceId="JoinTree_1.WINDOW_AGE.WINDOW_IS_CURRENT"></item>
+        <item id="WINDOW_IS_FUTURE" label="Window Is Future" resourceId="JoinTree_1.WINDOW_AGE.WINDOW_IS_FUTURE"></item>
+        <item id="ACCOUNTS_NOT_BILLED" label="Accounts On Cycle Not Billed In Window" resourceId="JoinTree_1.ACCOUNTS_NOT_BILLED"></item>
+        <item id="FROZEN_BUT_PENDING_BILLS" label="Freeze Complete But Bills Pending" resourceId="JoinTree_1.FROZEN_BUT_PENDING_BILLS"></item>
+        <item id="HAS_OPEN_SEGMENTS" label="Window Has Open Segments" resourceId="JoinTree_1.HAS_OPEN_SEGMENTS"></item>
+        <item id="HAS_EXCEPTIONS" label="Window Has Segment Exceptions" resourceId="JoinTree_1.HAS_EXCEPTIONS"></item>
         <item id="PAST_AND_NOT_FROZEN" label="Past And Freeze Not Complete" resourceId="JoinTree_1.WINDOW_AGE.PAST_AND_NOT_FROZEN"></item>
         <item id="DAYS_SINCE_WINDOW_END" label="Days Since Window End" resourceId="JoinTree_1.WINDOW_AGE.DAYS_SINCE_WINDOW_END"></item>
         <item id="WINDOW_DAYS" label="Window Length (Days)" resourceId="JoinTree_1.WINDOW_DAYS"></item>
@@ -64,6 +84,9 @@
         <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="COMPLETED_COUNT_TOTAL" label="Completed Bill Count Total" resourceId="JoinTree_1.WINDOW_BILLS.COMPLETED_COUNT"></item>
         <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="PENDING_COUNT_TOTAL" label="Pending Bill Count Total" resourceId="JoinTree_1.WINDOW_BILLS.PENDING_COUNT"></item>
         <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="ACCOUNTS_BILLED_TOTAL" label="Accounts Billed Total" resourceId="JoinTree_1.WINDOW_BILLS.ACCOUNTS_BILLED"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="BSEG_COUNT_TOTAL" label="Bill Segment Count Total" resourceId="JoinTree_1.WINDOW_BSEG.BSEG_COUNT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="ESTIMATED_BSEG_TOTAL" label="Estimated Bill Segment Total" resourceId="JoinTree_1.WINDOW_BSEG.ESTIMATED_BSEG_COUNT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="BSEG_EXCEPTION_TOTAL" label="Bill Segments With Exceptions Total" resourceId="JoinTree_1.WINDOW_BSEG.BSEG_WITH_EXCEPTION_COUNT"></item>
         <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="CYCLE_COUNT" label="Cycle Count" resourceId="JoinTree_1.CI_BILL_CYC_SCH.BILL_CYC_CD"></item>
       </items>
     </itemGroup>
@@ -121,6 +144,29 @@ group by b.bill_cyc_cd, b.win_start_dt</query>
 from cisadm.ci_acct a
 group by a.bill_cyc_cd</query>
     </jdbcQuery>
+    <jdbcQuery id="WINDOW_BSEG" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="WIN_START_DT" type="java.sql.Timestamp"></field>
+        <field id="BSEG_COUNT" type="java.lang.Long"></field>
+        <field id="FROZEN_BSEG_COUNT" type="java.lang.Long"></field>
+        <field id="CANCELED_BSEG_COUNT" type="java.lang.Long"></field>
+        <field id="OPEN_BSEG_COUNT" type="java.lang.Long"></field>
+        <field id="ESTIMATED_BSEG_COUNT" type="java.lang.Long"></field>
+        <field id="BSEG_WITH_EXCEPTION_COUNT" type="java.lang.Long"></field>
+        <field id="SA_COUNT" type="java.lang.Long"></field>
+      </fieldList>
+      <query>select g.bill_cyc_cd, g.win_start_dt,
+       count(*) as bseg_count,
+       sum(case when g.bseg_stat_flg = '50' then 1 else 0 end) as frozen_bseg_count,
+       sum(case when g.bseg_stat_flg = '60' then 1 else 0 end) as canceled_bseg_count,
+       sum(case when g.bseg_stat_flg not in ('50', '60') then 1 else 0 end) as open_bseg_count,
+       sum(case when g.est_sw = 'Y' then 1 else 0 end) as estimated_bseg_count,
+       sum(case when exists (select 1 from cisadm.ci_bseg_excp x where x.bseg_id = g.bseg_id) then 1 else 0 end) as bseg_with_exception_count,
+       count(distinct g.sa_id) as sa_count
+from cisadm.ci_bseg g
+group by g.bill_cyc_cd, g.win_start_dt</query>
+    </jdbcQuery>
     <jdbcQuery id="WINDOW_AGE" datasourceId="Origin_DEV_DS">
       <fieldList>
         <field id="BILL_CYC_CD" type="java.lang.String"></field>
@@ -129,12 +175,22 @@ group by a.bill_cyc_cd</query>
         <field id="WINDOW_IS_PAST" type="java.lang.String"></field>
         <field id="PAST_AND_NOT_FROZEN" type="java.lang.String"></field>
         <field id="WINDOW_IS_CURRENT" type="java.lang.String"></field>
+        <field id="WINDOW_IS_FUTURE" type="java.lang.String"></field>
+        <field id="PREV_WIN_END_DT" type="java.sql.Timestamp"></field>
+        <field id="NEXT_WIN_START_DT" type="java.sql.Timestamp"></field>
+        <field id="DAYS_GAP_FROM_PREV_WINDOW" type="java.math.BigDecimal"></field>
+        <field id="WINDOW_SEQ" type="java.lang.Long"></field>
       </fieldList>
       <query>select s.bill_cyc_cd, s.win_start_dt,
        trunc(sysdate) - s.win_end_dt as days_since_window_end,
        case when s.win_end_dt &lt; trunc(sysdate) then 'Y' else 'N' end as window_is_past,
        case when s.win_end_dt &lt; trunc(sysdate) and s.freeze_complete_sw &lt;&gt; 'Y' then 'Y' else 'N' end as past_and_not_frozen,
-       case when s.win_start_dt &lt;= trunc(sysdate) and s.win_end_dt &gt;= trunc(sysdate) then 'Y' else 'N' end as window_is_current
+       case when s.win_start_dt &lt;= trunc(sysdate) and s.win_end_dt &gt;= trunc(sysdate) then 'Y' else 'N' end as window_is_current,
+       case when s.win_start_dt &gt; trunc(sysdate) then 'Y' else 'N' end as window_is_future,
+       lag(s.win_end_dt) over (partition by s.bill_cyc_cd order by s.win_start_dt) as prev_win_end_dt,
+       lead(s.win_start_dt) over (partition by s.bill_cyc_cd order by s.win_start_dt) as next_win_start_dt,
+       s.win_start_dt - lag(s.win_end_dt) over (partition by s.bill_cyc_cd order by s.win_start_dt) as days_gap_from_prev_window,
+       row_number() over (partition by s.bill_cyc_cd order by s.win_start_dt) as window_seq
 from cisadm.ci_bill_cyc_sch s</query>
     </jdbcQuery>
     <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BILL_CYC_SCH" schemaAlias="CISADM">
@@ -161,24 +217,43 @@ from cisadm.ci_bill_cyc_sch s</query>
         <field id="WINDOW_BILLS.LAST_DUE_DT" type="java.sql.Timestamp"></field>
         <field id="CYCLE_ACCOUNTS.BILL_CYC_CD" type="java.lang.String"></field>
         <field id="CYCLE_ACCOUNTS.ACCOUNT_COUNT" type="java.lang.Long"></field>
+        <field id="WINDOW_BSEG.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="WINDOW_BSEG.WIN_START_DT" type="java.sql.Timestamp"></field>
+        <field id="WINDOW_BSEG.BSEG_COUNT" type="java.lang.Long"></field>
+        <field id="WINDOW_BSEG.FROZEN_BSEG_COUNT" type="java.lang.Long"></field>
+        <field id="WINDOW_BSEG.CANCELED_BSEG_COUNT" type="java.lang.Long"></field>
+        <field id="WINDOW_BSEG.OPEN_BSEG_COUNT" type="java.lang.Long"></field>
+        <field id="WINDOW_BSEG.ESTIMATED_BSEG_COUNT" type="java.lang.Long"></field>
+        <field id="WINDOW_BSEG.BSEG_WITH_EXCEPTION_COUNT" type="java.lang.Long"></field>
+        <field id="WINDOW_BSEG.SA_COUNT" type="java.lang.Long"></field>
         <field id="WINDOW_AGE.BILL_CYC_CD" type="java.lang.String"></field>
         <field id="WINDOW_AGE.WIN_START_DT" type="java.sql.Timestamp"></field>
         <field id="WINDOW_AGE.DAYS_SINCE_WINDOW_END" type="java.math.BigDecimal"></field>
         <field id="WINDOW_AGE.WINDOW_IS_PAST" type="java.lang.String"></field>
         <field id="WINDOW_AGE.PAST_AND_NOT_FROZEN" type="java.lang.String"></field>
         <field id="WINDOW_AGE.WINDOW_IS_CURRENT" type="java.lang.String"></field>
+        <field id="WINDOW_AGE.WINDOW_IS_FUTURE" type="java.lang.String"></field>
+        <field id="WINDOW_AGE.PREV_WIN_END_DT" type="java.sql.Timestamp"></field>
+        <field id="WINDOW_AGE.NEXT_WIN_START_DT" type="java.sql.Timestamp"></field>
+        <field id="WINDOW_AGE.DAYS_GAP_FROM_PREV_WINDOW" type="java.math.BigDecimal"></field>
+        <field id="WINDOW_AGE.WINDOW_SEQ" type="java.lang.Long"></field>
         <field id="IS_FREEZE_COMPLETE" dataSetExpression="CaseWhen(CI_BILL_CYC_SCH.FREEZE_COMPLETE_SW == 'Y', 'Y', 'N')" type="java.lang.String"></field>
         <field id="HAS_BILLS" dataSetExpression="CaseWhen(IsNull(WINDOW_BILLS.BILL_CYC_CD), 'N', 'Y')" type="java.lang.String"></field>
         <field id="WINDOW_DAYS" dataSetExpression="ElapsedDays(CI_BILL_CYC_SCH.WIN_END_DT, CI_BILL_CYC_SCH.WIN_START_DT)" type="java.math.BigDecimal"></field>
         <field id="DAYS_WINDOW_END_TO_LAST_COMPLETE" dataSetExpression="ElapsedDays(WINDOW_BILLS.LAST_COMPLETE_DTTM, CI_BILL_CYC_SCH.WIN_END_DT)" type="java.math.BigDecimal"></field>
         <field id="DAYS_ESTIMATE_TO_ACCOUNTING" dataSetExpression="ElapsedDays(CI_BILL_CYC_SCH.ACCOUNTING_DT, CI_BILL_CYC_SCH.EST_DT)" type="java.math.BigDecimal"></field>
         <field id="WINDOW_DIST" dataSetExpression="CountDistinct(Concatenate(CI_BILL_CYC_SCH.BILL_CYC_CD, '_', CI_BILL_CYC_SCH.WIN_START_DT), 'Current')" type="java.lang.Long"></field>
+        <field id="ACCOUNTS_NOT_BILLED" dataSetExpression="CYCLE_ACCOUNTS.ACCOUNT_COUNT - WINDOW_BILLS.ACCOUNTS_BILLED" type="java.lang.Long"></field>
+        <field id="FROZEN_BUT_PENDING_BILLS" dataSetExpression="CaseWhen(CI_BILL_CYC_SCH.FREEZE_COMPLETE_SW == 'Y' and WINDOW_BILLS.PENDING_COUNT &gt; 0, 'Y', 'N')" type="java.lang.String"></field>
+        <field id="HAS_OPEN_SEGMENTS" dataSetExpression="CaseWhen(WINDOW_BSEG.OPEN_BSEG_COUNT &gt; 0, 'Y', 'N')" type="java.lang.String"></field>
+        <field id="HAS_EXCEPTIONS" dataSetExpression="CaseWhen(WINDOW_BSEG.BSEG_WITH_EXCEPTION_COUNT &gt; 0, 'Y', 'N')" type="java.lang.String"></field>
       </fieldList>
       <joinInfo alias="CI_BILL_CYC_SCH" referenceId="CI_BILL_CYC_SCH"></joinInfo>
       <joinList>
         <join expr="CI_BILL_CYC_SCH.BILL_CYC_CD == CI_BILL_CYC_L.BILL_CYC_CD and CI_BILL_CYC_L.LANGUAGE_CD == 'ENG'" left="CI_BILL_CYC_SCH" right="CI_BILL_CYC_L" type="leftOuter" weight="1"></join>
         <join expr="CI_BILL_CYC_SCH.BILL_CYC_CD == WINDOW_BILLS.BILL_CYC_CD and CI_BILL_CYC_SCH.WIN_START_DT == WINDOW_BILLS.WIN_START_DT" left="CI_BILL_CYC_SCH" right="WINDOW_BILLS" type="leftOuter" weight="1"></join>
         <join expr="CI_BILL_CYC_SCH.BILL_CYC_CD == CYCLE_ACCOUNTS.BILL_CYC_CD" left="CI_BILL_CYC_SCH" right="CYCLE_ACCOUNTS" type="leftOuter" weight="1"></join>
+        <join expr="CI_BILL_CYC_SCH.BILL_CYC_CD == WINDOW_BSEG.BILL_CYC_CD and CI_BILL_CYC_SCH.WIN_START_DT == WINDOW_BSEG.WIN_START_DT" left="CI_BILL_CYC_SCH" right="WINDOW_BSEG" type="leftOuter" weight="1"></join>
         <join expr="CI_BILL_CYC_SCH.BILL_CYC_CD == WINDOW_AGE.BILL_CYC_CD and CI_BILL_CYC_SCH.WIN_START_DT == WINDOW_AGE.WIN_START_DT" left="CI_BILL_CYC_SCH" right="WINDOW_AGE" type="leftOuter" weight="1"></join>
       </joinList>
       <joinOptions></joinOptions>
@@ -187,6 +262,7 @@ from cisadm.ci_bill_cyc_sch s</query>
         <tableRef alwaysIncludeTable="false" tableAlias="CI_BILL_CYC_L" tableId="CI_BILL_CYC_L"></tableRef>
         <tableRef alwaysIncludeTable="false" tableAlias="WINDOW_BILLS" tableId="WINDOW_BILLS"></tableRef>
         <tableRef alwaysIncludeTable="false" tableAlias="CYCLE_ACCOUNTS" tableId="CYCLE_ACCOUNTS"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="WINDOW_BSEG" tableId="WINDOW_BSEG"></tableRef>
         <tableRef alwaysIncludeTable="false" tableAlias="WINDOW_AGE" tableId="WINDOW_AGE"></tableRef>
       </tableRefList>
     </jdbcTable>

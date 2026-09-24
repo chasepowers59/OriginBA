@@ -45,6 +45,12 @@ class Schema(unittest.TestCase):
         lits = set(re.findall(r"== '([^']*)'", " ".join(x for _, x, _ in b.CALCULATED)))
         self.assertTrue(lits <= b.BASE_PRODUCT_LITERALS, lits)
         self.assertTrue({"'C'", "'P'"} <= set(re.findall(r"'[CP]'", b.DERIVED["WINDOW_BILLS"][0])), "bill status P/C is the base-product lifecycle")
+        self.assertEqual(set(re.findall(r"'(\d\d)'", b.DERIVED["WINDOW_BSEG"][0])), {"50", "60"}, "segment lifecycle only")
+
+    def test_the_window_key_joins_every_fold(self):
+        for e, _, r, _ in b.JOINS:
+            if r in ("WINDOW_BILLS", "WINDOW_BSEG", "WINDOW_AGE"):
+                self.assertIn("WIN_START_DT == " + r + ".WIN_START_DT", e, r)
 
     def test_validator_accepts(self):
         out = ROOT / "backups" / "jaspersoft" / "bill_cycle_schedule_for_test.xml"

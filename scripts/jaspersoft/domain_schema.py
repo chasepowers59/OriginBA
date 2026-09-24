@@ -54,3 +54,45 @@ def schema(ds: str, root: str, tables: Tables, joins: Joins, calculated: Calcula
     out += [f'        <tableRef alwaysIncludeTable="false" tableAlias="{tid}" tableId="{tid}"></tableRef>' for tid in list(tables) + list(derived)]
     out += ['      </tableRefList>', '    </jdbcTable>', '  </resources>', '</schema>', '']
     return "\n".join(out)
+
+
+# ------------------------------------------------------------------ the additive-only guard
+# Chase, 2026-09-24: a change to a deployed domain must ADD; every existing id, label, join,
+# resource, calculation and measure stays byte for byte, or the views and reports bound to the
+# domain break. Every patch goes through this before it goes near a server.
+import xml.etree.ElementTree as _ET  # noqa: E402
+
+_NS = "{http://www.jaspersoft.com/2007/SL/XMLSchema}"
+
+
+def _facts(xml: str) -> set[tuple]:
+    r = _ET.fromstring(xml)
+    facts: set[tuple] = set()
+    for t in r.iter(_NS + "jdbcTable"):
+        for f in t.iter(_NS + "field"):
+            facts.add(("field", t.get("id"), f.get("id"), f.get("type"), f.get("dataSetExpression")))
+        facts.add(("table", t.get("id"), t.get("datasourceId"), t.get("datasourceTableName"), t.get("schemaAlias")))
+        for j in t.iter(_NS + "joinInfo"):
+            facts.add(("joinInfo", t.get("id"), j.get("alias"), j.get("referenceId")))
+        for j in t.iter(_NS + "join"):
+            facts.add(("join", t.get("id"), j.get("expr"), j.get("left"), j.get("right"), j.get("type"), j.get("weight")))
+        for f in t.iter(_NS + "filterString"):
+            facts.add(("filter", t.get("id"), f.text))
+    for q in r.iter(_NS + "jdbcQuery"):
+        facts.add(("query", q.get("id"), q.get("datasourceId"), (q.find(_NS + "query").text or "").strip()))
+        for f in q.iter(_NS + "field"):
+            facts.add(("field", q.get("id"), f.get("id"), f.get("type"), f.get("dataSetExpression")))
+    for g in r.iter(_NS + "itemGroup"):
+        facts.add(("group", g.get("id"), g.get("label"), g.get("resourceId")))
+        for i in g.iter(_NS + "item"):
+            facts.add(("item", g.get("id"), i.get("id"), i.get("label"), i.get("resourceId"), i.get("defaultAgg"), i.get("dimensionOrMeasure")))
+    for d in r.iter(_NS + "jdbcDataSource"):
+        facts.add(("datasource", d.get("id")))
+    return facts
+
+
+def additions_only(before: str, after: str) -> list[str]:
+    """Everything the old schema said is still said, unchanged, by the new one; the violations
+    are what was removed or altered (an empty list is the proof)."""
+    lost = _facts(before) - _facts(after)
+    return sorted(" ".join(str(x) for x in f if x is not None) for f in lost)

@@ -62,6 +62,15 @@ class Patch(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         self.assertNotIn("Today(", " ".join(x for _, x, _ in p.CALCULATED))
 
+    def test_the_patch_is_additive_only(self):
+        import domain_schema
+        self.assertEqual(domain_schema.additions_only(self.before, self.after), [])
+        # and the guard sees a change when one is made
+        altered = self.after.replace('label="Arrears Amount"', 'label="Arrears Amt"', 1)
+        self.assertTrue(any("Arrears Amount" in v for v in domain_schema.additions_only(self.before, altered)))
+        dropped = self.after.replace('<item id="ARS_AMT" label="Arrears Amount" resourceId="JoinTree_1.CI_SEV_PROC.ARS_AMT"></item>', "", 1)
+        self.assertEqual(len(domain_schema.additions_only(self.before, dropped)), 1)
+
     def test_refuses_to_patch_twice(self):
         with self.assertRaises(ValueError):
             p.patch_schema(self.after)

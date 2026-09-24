@@ -25,6 +25,7 @@ import urllib.parse
 
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+import domain_schema  # noqa: E402
 import jrs_debug as dbg  # noqa: E402
 import jrs_inventory as inv  # noqa: E402
 import jrs_run_sweep as sw  # noqa: E402
@@ -53,10 +54,13 @@ def main() -> int:
 
     patched = patch.patch_schema(before)
     out = work / "schema.patched.xml"; out.write_text(patched)
+    lost = domain_schema.additions_only(before, patched)
+    if lost:
+        raise SystemExit("2. the patch is not purely additive; refused. Lost or altered:\n   " + "\n   ".join(lost[:20]))
     r = subprocess.run([sys.executable, str(HERE / "validate_domain_schema.py"), str(out)], capture_output=True, text=True, check=False)
     if r.returncode != 0:
         raise SystemExit(f"2. validator refused the patched schema:\n{r.stdout}{r.stderr}")
-    print(f"2. patched and validated: +{len(patched) - len(before):,} bytes, sets {[s[0] for s in patch.SETS]}")
+    print(f"2. patched, validated, ADDITIVE ONLY (every existing id, label, join and expression unchanged): +{len(patched) - len(before):,} bytes, sets {[s[0] for s in patch.SETS]}")
     if a.dry_run:
         print("3. dry run: nothing written"); return 0
 
