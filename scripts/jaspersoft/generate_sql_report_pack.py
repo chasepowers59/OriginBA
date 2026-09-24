@@ -316,13 +316,11 @@ def controls(s: Spec) -> tuple[dict, list]:
 # Where each unit lives on the server: the Standard Offering tree the tenants already carry
 # (tenant-relative -- the import ZIP never names an organization). The datasource is bound
 # on the report unit at import time (/DataSource/<tenant>_DS), never inside the JRXML.
-FOLDERS = {
-    "billing_by_cycle_period": "/SmartCity/Report/Standard_Offering/Billing_and_Rates",
-    "payments_by_tender_type_period": "/SmartCity/Report/Standard_Offering/Cashiering",
-    "adjustments_by_type_period": "/SmartCity/Report/Standard_Offering/Finance",
-    "gl_by_distribution_code_period": "/SmartCity/Report/Standard_Offering/Finance",
-    "adj_ap_requests_control": "/SmartCity/Report/Standard_Offering/Finance",
-}
+# Chase, 2026-09-24: every static SQL report lives in ONE folder so a client schedules them from one
+# place instead of hunting the module folders (the 2026-09 layout put each under its module).
+FOLDER = "/SmartCity/Report/Standard_Offering/Standardized_Reports"
+FOLDERS = {name: FOLDER for name in ("billing_by_cycle_period", "payments_by_tender_type_period", "adjustments_by_type_period",
+                                     "gl_by_distribution_code_period", "adj_ap_requests_control")}
 
 # ------------------------------------------------------------------ the specs
 WINDOW = "{col} >= $P{{FROM_DT}} AND {col} < $P{{TO_DT}} + INTERVAL '1' DAY"
