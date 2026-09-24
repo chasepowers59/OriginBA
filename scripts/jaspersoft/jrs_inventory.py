@@ -70,14 +70,15 @@ class ExportStuck(Exception):
     pass
 
 
-def export_zip(uris: list[str], cap_seconds: int = 1800, attempts: int = 3) -> bytes:
-    """The server's export of these URIs with repository permissions; polls the task to done.
+def export_zip(uris: list[str], cap_seconds: int = 1800, attempts: int = 3, permissions: bool = True) -> bytes:
+    """The server's export of these URIs, with repository permissions unless told otherwise
+    (a promotion exports without them so the resources inherit their destination folder's); polls the task to done.
     Raises ExportStuck past cap_seconds -- prod's 9.0 exporter never finishes some folders
     (Fond_Du_Lac 2026-09-18), and a snapshot must not hang on one of them. A download cut
     mid-stream (VPN; College_Station prod, twice) is retried as a WHOLE new export: the server
     discards a finished export once its download starts, so a Range retry answers 404."""
     for attempt in range(1, attempts + 1):
-        tid = _export_task(uris, cap_seconds)
+        tid = _export_task(uris, cap_seconds, permissions)
         try:
             return _download(f"/rest_v2/export/{tid}/export.zip")
         except DownloadCut as exc:
@@ -85,8 +86,8 @@ def export_zip(uris: list[str], cap_seconds: int = 1800, attempts: int = 3) -> b
     raise ExportStuck(f"download of {uris} cut {attempts} times")
 
 
-def _export_task(uris: list[str], cap_seconds: int) -> str:
-    body = json.dumps({"uris": uris, "parameters": ["repository-permissions"]}).encode()
+def _export_task(uris: list[str], cap_seconds: int, permissions: bool = True) -> str:
+    body = json.dumps({"uris": uris, "parameters": ["repository-permissions"] if permissions else []}).encode()
     code, text = _call("/rest_v2/export", method="POST", body=body, ctype="application/json")
     if code not in (200, 201):
         raise ExportStuck(f"export request: {code} {text[:300]}")

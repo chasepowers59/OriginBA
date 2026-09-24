@@ -72,9 +72,10 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
 | `scripts/jaspersoft/audit_adhoc_saved_filters.py --env X --org Y --client <config id>` | saved Ad Hoc filter values that name the SOURCE client's configuration and the target does not have (the promoted view returns nothing there); reads the explorer's per-client config export |
 | `scripts/jaspersoft/jrs_adhoc_chart_props.py --env X --org Y --folder F --set name=value [--only-if name=value] [--dry-run] [--i-mean-prod]` | set Highcharts advanced properties on EVERY Ad Hoc chart state under a folder, dashboard-embedded copies included; backs each state up under `backups/jaspersoft/adhoc_state/`, reads every PUT back. `tests/test_jrs_adhoc_chart_props.py` pins the XML patch on real states |
 | `scripts/jaspersoft/jrs_sa360_prem_char_apply.py --env X --org Y [--dry-run] [--i-mean-prod]` | give an org's Service Agreement 360 domain the premise-characteristics group IN PLACE: export (the rollback), patch THAT org's export (its own DS id), PUT the schema with its version, then four proofs (read-back byte-equal, `/domains/<uri>/metadata` lists the group, every bound view runs, a flat query of the new items returns rows). Live 2026-09-21: College_Station test, Ellensburg test + prod |
-| `scripts/jaspersoft/jrs_copy_resources.py --from env:Org --to env:Org --view U / --folder F` | copy a view or a folder between orgs/environments inside the target's own export (its datasource and domain byte for byte); refuses on domain item mismatch |
+| `scripts/jaspersoft/jrs_promote.py --from env:Org --to env:Org --resource U [--resource U2] [--into F] [--ds DS] [--param K=V] [--replace] [--dry-run] [--check-only] [--i-mean-prod]` | **THE org-to-org move (2026-09-24)**: domains, report units, Ad Hoc views, dashboards or whole folders, as ROOT on both sides (no per-org login, so Odessa is reachable like any org), across servers too. Package = the target's own datasource (+ any referenced domain) byte for byte, plus the scope rewritten onto the target org/destination folder with every datasource reference repointed; refuses if the source org path, datasource name or database host survives; after import re-exports and compares, then EXECUTES every promoted resource (domain metadata + probe query, report PDF with `--param`, view query, dashboard). `--check-only` re-runs just the execution proof. `tests/test_jrs_promote.py` pins the package on root-export shapes. Live 2026-09-24: A/P request domain + report Origin_DEV -> Odessa, ties Oracle 21/21 |
+| `scripts/jaspersoft/jrs_copy_resources.py --from env:Org --to env:Org --view U / --folder F` | the ORG-SCOPED predecessor (needs a login in both orgs): replaces a view or folder inside the target's own export; keep for a server where root is not held |
 | `scripts/jaspersoft/jrs_check_topic_kinds.py --env X --org Y [--folder F]` | views whose topic disagrees with their state about a measure: the one predictor of 'executes but will not open' that survived calibration |
-| `scripts/jaspersoft/jrs_domain_query.py --env X --org Y --domain U --fields set.item,... --out f.json` | rows out of a domain by item id; the before/after instrument for a domain change |
+| `scripts/jaspersoft/jrs_domain_query.py --env X --org Y|ROOT --domain U --fields set.item,... --out f.json` | rows out of a domain by item id; the before/after instrument for a domain change |
 | `scripts/jaspersoft/jrs_import_domain.py --env X --org Y --ds <DS> --folder F --name N --label L --schema f.xml` | CREATE a domain from a schema, packaged with the org's own datasource; then metadata + a probe query |
 | `scripts/jaspersoft/jrs_sa360_prem_char_apply.py`, `patch_write_offs_domain.py`, `build_adj_ap_request_domain.py` | the domain builders/patches of 2026-09-21..23, each with its tests and README under `domains/manual_imports/` |
 | `scripts/jaspersoft/jrs_deploy_report_units.py --org Y --datasource DS [--only SPEC] [--run FROM TO]` | the finance-pack report units from `generate_sql_report_pack.py` SPECS; `--only` for one |
@@ -156,7 +157,7 @@ test|prod|internal` and `--org <Org>` (the login becomes `user|Org`; paths are t
 | Roll back | `jrs_repository.py --env X --org Y --confirm Y import backups/.../Y.zip` (or one folder: `export` it first, keep the zip) | snapshot again, `jrs_inventory.py diff` shows the change undone |
 | Promote the Standard Offering to a client org | `jaspersoft/docs/origin_dev_to_origin_test_promotion_plan.md` steps: org-scoped `export` of the folder from Origin_DEV, export the TARGET org's `/DataSource/<DS>` fresh, `run_client_import_pipeline.py` with that overlay, both verifiers PASS, add `rootTenantId`, `jrs_repository.py import` as `user|Org` | after-snapshot vs source: same file set, only DS name / componentType / Workstreams rewiring differ; datasource XML byte-identical to its own export |
 | Promote a client's folder TEST org -> PROD org (the production deployment path from 2026-09-21 on) | `jrs_promote_test_to_prod.py --org Y --folder /SmartCity/Report/Standard_Offering --ds <DS> --dry-run` then with `--i-mean-prod`. Both orgs name the datasource the SAME (FondDuLac_DS) at DIFFERENT hosts, and the folder export CARRIES the datasource XML: imported as-is it would repoint prod at the test database. The script replaces the DataSource tree with prod's own export taken minutes earlier, lists it first, sets rootTenantId, and refuses if any test-host string survives | prod DS byte-identical to its own export; `jrs_inventory.py diff test:Y prod:Y --folder ...` = dates/version only; sweep the folder |
-| Promote one report or folder | `jrs_repository.py --org Origin_DEV export /SmartCity/Report/X --out x.zip`, then the tenant-import builder (`build_client_tenant_report_import.py`) or, for Origin-owned orgs, `import` the export as-is | `search` finds it in the target; `run` renders it |
+| Promote one report / domain / view / folder to another org (any org, any server) | `jrs_promote.py --from test:Origin_DEV --to test:Odessa --resource U --into F --ds <DS> --param FROM_DT=... --dry-run`, then without `--dry-run` (prod: `--i-mean-prod`). Root on both sides; `--into` places it, `--ds` names the target's datasource when it has more than one (Odessa: `Origin_DataVergence_DS` = the DEV database, what its 51 Standard Offering domains use; `Odessa_DS` = the TEST database) | steps 1-7 of the tool: package verified, import without warnings, re-export matches, every promoted resource executes; then tie a domain or report count to the client's database as in the 2026-09-24 section |
 | Reformat charts (label size, colour, axis text) across a folder | `jrs_adhoc_chart_props.py --env X --org Y --folder F --set plotOptions.series.dataLabels.style.fontSize=15px ... --dry-run`, then for real; never `style.color=contrast` for labels outside the bars | reload the dashboard in the Browser pane and read computed colour/size of `.highcharts-data-label text` and what `elementsFromPoint` finds under each label |
 | Add the premise-characteristics group to a client's SA 360 domain | `jrs_sa360_prem_char_apply.py --env X --org Y --dry-run`, then for real (prod: `--i-mean-prod`); never copy Origin_DEV's schema file into another org | the tool's four proofs print PASS; then the Ad Hoc designer in the Browser pane (Chase logs in) before the client is told; tell them to create a NEW Ad Hoc view on the domain |
 | Deploy a SQL report unit | `jrs_deploy_report_units.py --org Y --datasource <DS>` (REST descriptors; never an import zip for these) | `--run FROM TO` renders the PDF |
@@ -414,3 +415,39 @@ folder's URIs, and the org's jobs. Workstreams' only dependents were five Origin
 (three Workstreams domains), and Origin_Tools has none, so hiding both breaks nothing a user
 could still run. Deleting Workstreams (90 resources) needs those five repointed or removed
 first; hide now, delete later.
+
+## Moving anything between orgs as ROOT (2026-09-24, `jrs_promote.py`)
+
+Chase: promote the A/P request domain + report from Origin_DEV to "Odessa dev" fast, with every
+safe check kept, and make that the way objects move from now on. "Odessa dev" is the Odessa org
+on the TEST server whose Standard Offering binds to `Origin_DataVergence_DS` (label
+"Odessa_DataVergence_DS (DEV)", pdevdb_odessa: 51 of 51 domain references); `Odessa_DS` points at
+the TEST database. Chase's own Odessa login differs from the root one; it was never needed.
+
+Why root, measured: the superuser exports and imports with ABSOLUTE paths
+(`/organizations/organization_1/organizations/<Org>/...`, index `rootTenantId="organizations"`),
+so a package rewritten from one org's paths to another's lands in the other org, and no
+org-scoped login (the thing that answered 401 on Odessa) is involved. What the root export
+shape taught, each now a test in `tests/test_jrs_promote.py`:
+- A root export drags EVERY ancestor `.folder.xml` along, up to `/organizations` itself. None of
+  it may travel: the org root folder is never re-imported. The package carries only the
+  referenced resources' own files (datasource, a view's domain) from the target's export.
+- A domain names its datasource in THREE places: the descriptor `<dataSourceReference><uri>`
+  and `<alias>`, and inside `schema.data` as `datasourceId="X"` on every table AND
+  `<jdbcDataSource id="X">` under `<dataSources>`. The verify step (source datasource name must
+  not survive) caught the fourth one on the first dry run.
+- A moved resource's own descriptor (or a folder's `.folder.xml`) names its PARENT, which no
+  path move covers when `--into` is a different folder: repointed first, then the path moves
+  (longest first, on uri boundaries so `/adj` never rewrites `/adj_ap_requests_control`).
+- Exports for a promotion are taken WITHOUT repository permissions: the resources inherit the
+  destination folder's, which is what a client org wants.
+- Importing two resources whose parent folder exists, with no folder entries in the package,
+  works (Odessa Adjustments, 2026-09-24): the importer needs referenced RESOURCES in the
+  package, not ancestor folders. Missing destination folders are written into the package.
+Proof on Odessa: import without warnings; re-export of all 8 package files matches (stamps
+ignored); domain metadata 6 sets, flat query 21 rows = `count(*) from ci_adj_apreq` on
+pdevdb_odessa (21, all with an adjustment); status x adjustment-status groups (H/50 1, P/50 10,
+R/50 2, X/50 4, X/60 4) and the report's group sums (686.00, 191.23, 2,078.07 / 2,085.84) tie the
+database to the cent. Package under `backups/jaspersoft/promote/<stamp>/` with `source.zip`,
+`target_carried.zip`, `target_after.zip` (a replace also writes `target_before.zip`, the rollback;
+a fresh add rolls back with `jrs_repository.py delete`).

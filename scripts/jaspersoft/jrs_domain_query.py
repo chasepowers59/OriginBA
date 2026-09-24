@@ -26,7 +26,7 @@ import jrs_run_sweep as sw  # noqa: E402
 
 
 def query(env: str, org: str, domain: str, fields: list[str], limit: int, page: int, timeout: int) -> list[list]:
-    os.environ["JRS_ENV"] = env; sw._AUTH.header = sw._auth_for(org)
+    os.environ["JRS_ENV"] = env; sw._AUTH.header = None if org == "ROOT" else sw._auth_for(org)   # ROOT: the superuser, absolute /organizations/... uris
     q = {"select": {"fields": [{"id": f"f{i}", "field": f} for i, f in enumerate(fields)]}}
     payload = json.dumps({"dataSource": {"reference": {"uri": domain}}, "query": q}).encode()
     rows: list[list] = []
