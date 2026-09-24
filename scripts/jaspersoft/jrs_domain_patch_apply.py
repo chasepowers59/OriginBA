@@ -39,12 +39,15 @@ def main() -> int:
     ap.add_argument("--env", required=True); ap.add_argument("--org", required=True); ap.add_argument("--domain", required=True)
     ap.add_argument("--patch", required=True, help="module under scripts/jaspersoft with patch_schema() and SETS")
     ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--i-mean-prod", action="store_true")
+    ap.add_argument("--restore", type=pathlib.Path, metavar="schema.before.xml", help="PUT this saved pre-patch schema back (the rollback); the patch's sets must then be absent")
     a = ap.parse_args()
     if a.env == "prod" and not a.i_mean_prod and not a.dry_run:
         raise SystemExit("prod needs --i-mean-prod")
     patch = importlib.import_module(a.patch)
     os.environ["JRS_ENV"] = a.env; sw._AUTH.header = None
     uri = org_root(a.org) + a.domain
+    if a.restore:
+        return restore(uri, a.restore.read_text(encoding="utf-8"), patch, f"{a.env}:{a.org}{a.domain}")
     work = REPO / "backups" / "jaspersoft" / "domain_patch" / f"{a.env}_{a.org}_{a.domain.rsplit('/', 1)[-1]}_{time.strftime('%Y%m%d-%H%M%S')}"
     work.mkdir(parents=True, exist_ok=True)
     (work / "before.zip").write_bytes(inv.export_zip([uri]))
@@ -103,6 +106,29 @@ def main() -> int:
     print(f"7. probe of {len(items)} added items answers {json.loads(body).get('totalCounts')} rows in {dt:.1f}s")
     print(("PASS" if not bad else "CHECK: a bound view failed; the export above restores the org") + f"  {a.env}:{a.org}{a.domain}")
     return 1 if bad else 0
+
+
+def restore(uri: str, before: str, patch, what: str) -> int:
+    """Roll a patched domain back to its saved schema: PUT, read back byte-equal, metadata without the sets."""
+    live = dbg.get_file(uri + "_files/schema").decode("utf-8")
+    if live == before:
+        print(f"already the pre-patch schema, nothing to do  {what}"); return 0
+    if dbg.domain_apply(uri, str(_tmp(before))) != 0:
+        raise SystemExit("restore PUT failed")
+    if dbg.get_file(uri + "_files/schema").decode("utf-8") != before:
+        raise SystemExit("restore read-back differs from the saved schema")
+    code, body, _ = sw._http(f"/rest_v2/domains{urllib.parse.quote(uri)}/metadata", timeout=300)
+    levels = {l["id"] for l in json.loads(body)["rootLevel"]["subLevels"]} if code == 200 else set()
+    left = [s[0] for s in patch.SETS if s[0] in levels]
+    if left:
+        raise SystemExit(f"restored schema but metadata still lists {left}")
+    print(f"RESTORED  {what}: schema back to the saved pre-patch bytes, {len(levels)} sets, none of the patch's")
+    return 0
+
+
+def _tmp(text: str) -> pathlib.Path:
+    p = REPO / "backups" / "jaspersoft" / "domain_patch" / f"restore_{time.strftime('%Y%m%d-%H%M%S')}.xml"
+    p.write_text(text, encoding="utf-8"); return p
 
 
 if __name__ == "__main__":
