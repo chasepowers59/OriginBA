@@ -96,3 +96,33 @@ def additions_only(before: str, after: str) -> list[str]:
     are what was removed or altered (an empty list is the proof)."""
     lost = _facts(before) - _facts(after)
     return sorted(" ".join(str(x) for x in f if x is not None) for f in lost)
+
+
+# ------------------------------------------------------------------ additive patching of an exported schema
+def add_to_schema(schema: str, tables: Tables, joins: list[tuple[str, str, str]], calculated: Calculated, sets: Sets, guard_id: str) -> str:
+    """Return the exported schema with tables (before the join tree), their join-tree fields,
+    calculated fields, outer joins, table refs and item groups ADDED; nothing existing is touched
+    (prove it with additions_only). guard_id: a new table id whose presence means 'already patched'."""
+    import re as _re
+    from xml.sax.saxutils import escape as _esc
+    if f'id="{guard_id}"' in schema:
+        raise ValueError(f"the schema already carries {guard_id}: not patching twice")
+    ds = _re.search(r'<jdbcDataSource id="([^"]+)"', schema).group(1)
+    new_tables = "".join(f'    <jdbcTable id="{tid}" datasourceId="{ds}" datasourceTableName="{tb}" schemaAlias="CISADM">\n      <fieldList>\n'
+                         + "".join(f'        <field id="{f}" type="{t}"></field>\n' for f, t in fields) + "      </fieldList>\n    </jdbcTable>\n"
+                         for tid, (tb, fields) in tables.items())
+    start = schema.index('<jdbcTable id="JoinTree_1"'); line_start = schema.rfind("\n", 0, start) + 1
+    schema = schema[:line_start] + new_tables + schema[line_start:]
+    jt0 = schema.index('<jdbcTable id="JoinTree_1"'); jt1 = schema.index("</jdbcTable>", jt0)
+    tree = schema[jt0:jt1]
+    fields = "".join(f'        <field id="{tid}.{f}" type="{t}"></field>\n' for tid, (_, fs) in tables.items() for f, t in fs)
+    fields += "".join(f'        <field id="{fid}" dataSetExpression="{_esc(expr)}" type="{t}"></field>\n' for fid, expr, t in calculated)
+    join_xml = "".join(f'        <join expr="{_esc(e)}" left="{l}" right="{r}" type="leftOuter" weight="1"></join>\n' for e, l, r in joins)
+    refs = "".join(f'        <tableRef alwaysIncludeTable="false" tableAlias="{tid}" tableId="{tid}"></tableRef>\n' for tid in tables)
+    tree = (tree.replace("      </fieldList>", fields + "      </fieldList>", 1).replace("      </joinList>", join_xml + "      </joinList>", 1)
+                .replace("      </tableRefList>", refs + "      </tableRefList>", 1))
+    schema = schema[:jt0] + tree + schema[jt1:]
+    groups = "".join(f'    <itemGroup id="{sid}" label="{_esc(label)}" resourceId="JoinTree_1">\n      <items>\n'
+                     + "".join(f'        <item id="{i}" label="{_esc(l)}" resourceId="JoinTree_1.{r}"></item>\n' for i, l, r in items) + "      </items>\n    </itemGroup>\n"
+                     for sid, label, items in sets)
+    return schema.replace("  </itemGroups>", groups + "  </itemGroups>", 1)

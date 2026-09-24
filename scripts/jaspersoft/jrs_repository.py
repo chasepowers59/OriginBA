@@ -133,8 +133,9 @@ def _show(code: int, text: str) -> int:
 def copy_or_move(cmd: str, src: str, dst: str, a) -> int:
     """POST copies, PUT moves: Content-Location names the source, the URL names the DESTINATION
     FOLDER (the server keeps the resource's own name). createFolders makes the target path."""
+    # a body-less PUT/POST must still name a media type: 10.0 answers 500 "MediaType.getSubtype() ... null" otherwise (2026-09-24)
     return _show(*_write("POST" if cmd == "copy" else "PUT", f"/rest_v2/resources{urllib.parse.quote(dst)}?createFolders=true&overwrite={'true' if a.overwrite else 'false'}", a,
-                         headers={"Content-Location": src}))
+                         b"", "application/json", headers={"Content-Location": src}))
 
 
 def delete(uri: str, a) -> int:

@@ -53,6 +53,7 @@
     <itemGroup id="SET_CYCLE" label="1.3) Cycle Today And Neighbouring Windows" resourceId="JoinTree_1">
       <items>
         <item id="ACCOUNT_COUNT" label="Accounts On Cycle" resourceId="JoinTree_1.CYCLE_ACCOUNTS.ACCOUNT_COUNT"></item>
+        <item id="ACTIVE_ACCOUNT_COUNT" label="Accounts On Cycle With An Active SA" resourceId="JoinTree_1.CYCLE_ACCOUNTS.ACTIVE_ACCOUNT_COUNT"></item>
         <item id="WINDOW_SEQ" label="Window Sequence Within Cycle" resourceId="JoinTree_1.WINDOW_AGE.WINDOW_SEQ"></item>
         <item id="PREV_WIN_END_DT" label="Previous Window End Date" resourceId="JoinTree_1.WINDOW_AGE.PREV_WIN_END_DT"></item>
         <item id="NEXT_WIN_START_DT" label="Next Window Start Date" resourceId="JoinTree_1.WINDOW_AGE.NEXT_WIN_START_DT"></item>
@@ -66,7 +67,7 @@
         <item id="WINDOW_IS_PAST" label="Window Is Past" resourceId="JoinTree_1.WINDOW_AGE.WINDOW_IS_PAST"></item>
         <item id="WINDOW_IS_CURRENT" label="Window Is Current" resourceId="JoinTree_1.WINDOW_AGE.WINDOW_IS_CURRENT"></item>
         <item id="WINDOW_IS_FUTURE" label="Window Is Future" resourceId="JoinTree_1.WINDOW_AGE.WINDOW_IS_FUTURE"></item>
-        <item id="ACCOUNTS_NOT_BILLED" label="Accounts On Cycle Not Billed In Window" resourceId="JoinTree_1.ACCOUNTS_NOT_BILLED"></item>
+        <item id="ACCOUNTS_NOT_BILLED" label="Active Accounts On Cycle Not Billed In Window" resourceId="JoinTree_1.ACCOUNTS_NOT_BILLED"></item>
         <item id="FROZEN_BUT_PENDING_BILLS" label="Freeze Complete But Bills Pending" resourceId="JoinTree_1.FROZEN_BUT_PENDING_BILLS"></item>
         <item id="HAS_OPEN_SEGMENTS" label="Window Has Open Segments" resourceId="JoinTree_1.HAS_OPEN_SEGMENTS"></item>
         <item id="HAS_EXCEPTIONS" label="Window Has Segment Exceptions" resourceId="JoinTree_1.HAS_EXCEPTIONS"></item>
@@ -75,7 +76,6 @@
         <item id="WINDOW_DAYS" label="Window Length (Days)" resourceId="JoinTree_1.WINDOW_DAYS"></item>
         <item id="DAYS_WINDOW_END_TO_LAST_COMPLETE" label="Days From Window End To Last Completion" resourceId="JoinTree_1.DAYS_WINDOW_END_TO_LAST_COMPLETE"></item>
         <item id="DAYS_ESTIMATE_TO_ACCOUNTING" label="Days From Estimated To Accounting Date" resourceId="JoinTree_1.DAYS_ESTIMATE_TO_ACCOUNTING"></item>
-        <item id="WINDOW_DIST" label="Distinct Windows" resourceId="JoinTree_1.WINDOW_DIST"></item>
       </items>
     </itemGroup>
     <itemGroup id="SET_METRICS" label="Measures" resourceId="JoinTree_1">
@@ -88,6 +88,7 @@
         <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="ESTIMATED_BSEG_TOTAL" label="Estimated Bill Segment Total" resourceId="JoinTree_1.WINDOW_BSEG.ESTIMATED_BSEG_COUNT"></item>
         <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="BSEG_EXCEPTION_TOTAL" label="Bill Segments With Exceptions Total" resourceId="JoinTree_1.WINDOW_BSEG.BSEG_WITH_EXCEPTION_COUNT"></item>
         <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="CYCLE_COUNT" label="Cycle Count" resourceId="JoinTree_1.CI_BILL_CYC_SCH.BILL_CYC_CD"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Measure" id="WINDOW_COUNT" label="Window Count" resourceId="JoinTree_1.CI_BILL_CYC_SCH.WIN_START_DT"></item>
       </items>
     </itemGroup>
   </itemGroups>
@@ -139,8 +140,10 @@ group by b.bill_cyc_cd, b.win_start_dt</query>
       <fieldList>
         <field id="BILL_CYC_CD" type="java.lang.String"></field>
         <field id="ACCOUNT_COUNT" type="java.lang.Long"></field>
+        <field id="ACTIVE_ACCOUNT_COUNT" type="java.lang.Long"></field>
       </fieldList>
-      <query>select a.bill_cyc_cd, count(*) as account_count
+      <query>select a.bill_cyc_cd, count(*) as account_count,
+       sum(case when exists (select 1 from cisadm.ci_sa s where s.acct_id = a.acct_id and s.sa_status_flg = '20') then 1 else 0 end) as active_account_count
 from cisadm.ci_acct a
 group by a.bill_cyc_cd</query>
     </jdbcQuery>
@@ -217,6 +220,7 @@ from cisadm.ci_bill_cyc_sch s</query>
         <field id="WINDOW_BILLS.LAST_DUE_DT" type="java.sql.Timestamp"></field>
         <field id="CYCLE_ACCOUNTS.BILL_CYC_CD" type="java.lang.String"></field>
         <field id="CYCLE_ACCOUNTS.ACCOUNT_COUNT" type="java.lang.Long"></field>
+        <field id="CYCLE_ACCOUNTS.ACTIVE_ACCOUNT_COUNT" type="java.lang.Long"></field>
         <field id="WINDOW_BSEG.BILL_CYC_CD" type="java.lang.String"></field>
         <field id="WINDOW_BSEG.WIN_START_DT" type="java.sql.Timestamp"></field>
         <field id="WINDOW_BSEG.BSEG_COUNT" type="java.lang.Long"></field>
@@ -242,8 +246,7 @@ from cisadm.ci_bill_cyc_sch s</query>
         <field id="WINDOW_DAYS" dataSetExpression="ElapsedDays(CI_BILL_CYC_SCH.WIN_END_DT, CI_BILL_CYC_SCH.WIN_START_DT)" type="java.math.BigDecimal"></field>
         <field id="DAYS_WINDOW_END_TO_LAST_COMPLETE" dataSetExpression="ElapsedDays(WINDOW_BILLS.LAST_COMPLETE_DTTM, CI_BILL_CYC_SCH.WIN_END_DT)" type="java.math.BigDecimal"></field>
         <field id="DAYS_ESTIMATE_TO_ACCOUNTING" dataSetExpression="ElapsedDays(CI_BILL_CYC_SCH.ACCOUNTING_DT, CI_BILL_CYC_SCH.EST_DT)" type="java.math.BigDecimal"></field>
-        <field id="WINDOW_DIST" dataSetExpression="CountDistinct(Concatenate(CI_BILL_CYC_SCH.BILL_CYC_CD, '_', CI_BILL_CYC_SCH.WIN_START_DT), 'Current')" type="java.lang.Long"></field>
-        <field id="ACCOUNTS_NOT_BILLED" dataSetExpression="CYCLE_ACCOUNTS.ACCOUNT_COUNT - WINDOW_BILLS.ACCOUNTS_BILLED" type="java.lang.Long"></field>
+        <field id="ACCOUNTS_NOT_BILLED" dataSetExpression="CYCLE_ACCOUNTS.ACTIVE_ACCOUNT_COUNT - WINDOW_BILLS.ACCOUNTS_BILLED" type="java.lang.Long"></field>
         <field id="FROZEN_BUT_PENDING_BILLS" dataSetExpression="CaseWhen(CI_BILL_CYC_SCH.FREEZE_COMPLETE_SW == 'Y' and WINDOW_BILLS.PENDING_COUNT &gt; 0, 'Y', 'N')" type="java.lang.String"></field>
         <field id="HAS_OPEN_SEGMENTS" dataSetExpression="CaseWhen(WINDOW_BSEG.OPEN_BSEG_COUNT &gt; 0, 'Y', 'N')" type="java.lang.String"></field>
         <field id="HAS_EXCEPTIONS" dataSetExpression="CaseWhen(WINDOW_BSEG.BSEG_WITH_EXCEPTION_COUNT &gt; 0, 'Y', 'N')" type="java.lang.String"></field>

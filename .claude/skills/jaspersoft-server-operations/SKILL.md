@@ -489,3 +489,38 @@ exact on all six. Two tool lessons from the run: a JDBC url can read `@//host:po
 not foreign (Origin_DEV_DS, Ellensburg_DS and CityCorp_DS all sit on 10.13.4.91); the repository
 search can lag an import by seconds, so the execution step re-lists before calling a resource
 missing. Prod: not touched; same command with `--i-mean-prod` per org on Chase's word.
+
+## Additive-only domain changes, and the three that shipped this way (2026-09-24)
+
+Chase's rule: a change to a deployed domain ADDS; every existing id, label, join, resource,
+calculation and measure stays, or bound views and reports break. `domain_schema.additions_only(before,
+after)` is the proof (empty list) and `jrs_domain_patch_apply.py --patch <module>` refuses anything
+else before it writes; `domain_schema.add_to_schema(...)` is how a patch module adds tables, joins,
+calculated fields and sets to an org's EXPORTED schema (never a rebuilt one). Seven proofs per org:
+export (rollback), patch + validate + additive, PUT with version, read-back byte-equal, metadata lists
+the new sets, every bound view executes, probe of the new items. Bound views are found by reading
+every Ad Hoc view descriptor in the org (minutes on 300 views; the slow step).
+
+- **Severance Process domain** `patch_severance_domain`: `CI_SEV_EVT_FA` -> `CI_FA` (the field
+  activity each event created; 15,297 of 15,297 resolve at Ellensburg) + labels, `CI_SEV_PROC_TMP`.
+  Probe = 226,391 rows = the event count: grain untouched.
+- **Field Activity domain** `patch_field_activity_domain`: the CCB field activity behind the MDM
+  activity through `D1_ACTIVITY_IDENTIFIER` type **`D1RI`** (101,668 of 101,668 resolve to `CI_FA`,
+  max ONE per activity, up to 8 activities per FA; the old dbt note that they "do not link" tested
+  FA_EXT_ID and the BO external reference, which are empty). 33,886 of the domain's 37,057 activities
+  carry one (completed 15,641 / pending 2,549 / canceled 15,696), 3,171 do not. Also `CI_FO`, the
+  FA type / dispatch group / cancel reason labels, the C/P/X status lookup.
+- **Bill Cycle Schedule domain** (new, `build_bill_cycle_schedule_domain.py`): see its README; the
+  equality join cycle + window start is right (0 unmatched bills inside any window range; the
+  unmatched are off-cycle bills with no cycle at all).
+- **Standardized_Reports**: the five static SQL report units moved from their module folders to
+  `Standard_Offering/Standardized_Reports` on Origin_DEV (`jrs_repository.py --confirm ROOT move`;
+  a body-less PUT needs `Content-Type: application/json` or 10.0 answers 500 "MediaType ... null"),
+  all five render from there; `generate_sql_report_pack.FOLDER` deploys there from now on. No
+  scheduled job referenced them (every job on the server is a paused College_Station legacy one plus
+  one Odessa test job). Clients get the folder with `jrs_promote.py --resource .../Standardized_Reports
+  --into /SmartCity/Report/Standard_Offering`.
+Scheduling, for the record: a job = report + trigger (once / simple / calendar) + fixed parameter
+values + output formats + destination (repository folder, email, FTP), runs as its creator; REST
+`/rest_v2/jobs` (our `jobs / job / job-run / job-delete`). A schedulable standard report needs
+RELATIVE date defaults (last month), which the pack's FROM_DT / TO_DT do not have yet.

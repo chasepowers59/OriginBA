@@ -43,9 +43,12 @@ from cisadm.ci_bill b
 group by b.bill_cyc_cd, b.win_start_dt""",
                      [("BILL_CYC_CD", S), ("WIN_START_DT", T), ("BILL_COUNT", L), ("COMPLETED_COUNT", L), ("PENDING_COUNT", L), ("ACCOUNTS_BILLED", L),
                       ("FIRST_COMPLETE_DTTM", T), ("LAST_COMPLETE_DTTM", T), ("FIRST_BILL_DT", T), ("LAST_DUE_DT", T)]),
-    "CYCLE_ACCOUNTS": ("""select a.bill_cyc_cd, count(*) as account_count
+    # accounts on the cycle: all of them, and those with an ACTIVE service agreement (the billable base;
+    # cycle 01 at Ellensburg has 18,367 accounts but 2,427 active ones and 2,386 bills in a window)
+    "CYCLE_ACCOUNTS": ("""select a.bill_cyc_cd, count(*) as account_count,
+       sum(case when exists (select 1 from cisadm.ci_sa s where s.acct_id = a.acct_id and s.sa_status_flg = '20') then 1 else 0 end) as active_account_count
 from cisadm.ci_acct a
-group by a.bill_cyc_cd""", [("BILL_CYC_CD", S), ("ACCOUNT_COUNT", L)]),
+group by a.bill_cyc_cd""", [("BILL_CYC_CD", S), ("ACCOUNT_COUNT", L), ("ACTIVE_ACCOUNT_COUNT", L)]),
     # bill segments carry the cycle and window start themselves: folded per window without going through the bill
     "WINDOW_BSEG": ("""select g.bill_cyc_cd, g.win_start_dt,
        count(*) as bseg_count,
@@ -81,15 +84,14 @@ JOINS: domain_schema.Joins = [(e, l, r, "leftOuter") for e, l, r in [
     ("CI_BILL_CYC_SCH.BILL_CYC_CD == WINDOW_BSEG.BILL_CYC_CD and CI_BILL_CYC_SCH.WIN_START_DT == WINDOW_BSEG.WIN_START_DT", "CI_BILL_CYC_SCH", "WINDOW_BSEG"),
     ("CI_BILL_CYC_SCH.BILL_CYC_CD == WINDOW_AGE.BILL_CYC_CD and CI_BILL_CYC_SCH.WIN_START_DT == WINDOW_AGE.WIN_START_DT", "CI_BILL_CYC_SCH", "WINDOW_AGE"),
 ]]
-BASE_PRODUCT_LITERALS = {"Y", "N"}   # bill P/C and segment 50/60 lifecycles live in the folds' SQL
+BASE_PRODUCT_LITERALS = {"Y", "N"}   # bill P/C, segment 50/60 and SA 20 lifecycles live in the folds' SQL
 CALCULATED: domain_schema.Calculated = [
     ("IS_FREEZE_COMPLETE", "CaseWhen(CI_BILL_CYC_SCH.FREEZE_COMPLETE_SW == 'Y', 'Y', 'N')", S),
     ("HAS_BILLS", "CaseWhen(IsNull(WINDOW_BILLS.BILL_CYC_CD), 'N', 'Y')", S),
     ("WINDOW_DAYS", "ElapsedDays(CI_BILL_CYC_SCH.WIN_END_DT, CI_BILL_CYC_SCH.WIN_START_DT)", N),
     ("DAYS_WINDOW_END_TO_LAST_COMPLETE", "ElapsedDays(WINDOW_BILLS.LAST_COMPLETE_DTTM, CI_BILL_CYC_SCH.WIN_END_DT)", N),
     ("DAYS_ESTIMATE_TO_ACCOUNTING", "ElapsedDays(CI_BILL_CYC_SCH.ACCOUNTING_DT, CI_BILL_CYC_SCH.EST_DT)", N),
-    ("WINDOW_DIST", "CountDistinct(Concatenate(CI_BILL_CYC_SCH.BILL_CYC_CD, '_', CI_BILL_CYC_SCH.WIN_START_DT), 'Current')", L),
-    ("ACCOUNTS_NOT_BILLED", "CYCLE_ACCOUNTS.ACCOUNT_COUNT - WINDOW_BILLS.ACCOUNTS_BILLED", L),
+    ("ACCOUNTS_NOT_BILLED", "CYCLE_ACCOUNTS.ACTIVE_ACCOUNT_COUNT - WINDOW_BILLS.ACCOUNTS_BILLED", L),
     ("FROZEN_BUT_PENDING_BILLS", "CaseWhen(CI_BILL_CYC_SCH.FREEZE_COMPLETE_SW == 'Y' and WINDOW_BILLS.PENDING_COUNT > 0, 'Y', 'N')", S),
     ("HAS_OPEN_SEGMENTS", "CaseWhen(WINDOW_BSEG.OPEN_BSEG_COUNT > 0, 'Y', 'N')", S),
     ("HAS_EXCEPTIONS", "CaseWhen(WINDOW_BSEG.BSEG_WITH_EXCEPTION_COUNT > 0, 'Y', 'N')", S),
@@ -125,6 +127,7 @@ SETS: domain_schema.Sets = [
     ]),
     ("SET_CYCLE", "1.3) Cycle Today And Neighbouring Windows", [
         ("ACCOUNT_COUNT", "Accounts On Cycle", "CYCLE_ACCOUNTS.ACCOUNT_COUNT"),
+        ("ACTIVE_ACCOUNT_COUNT", "Accounts On Cycle With An Active SA", "CYCLE_ACCOUNTS.ACTIVE_ACCOUNT_COUNT"),
         ("WINDOW_SEQ", "Window Sequence Within Cycle", "WINDOW_AGE.WINDOW_SEQ"),
         ("PREV_WIN_END_DT", "Previous Window End Date", "WINDOW_AGE.PREV_WIN_END_DT"),
         ("NEXT_WIN_START_DT", "Next Window Start Date", "WINDOW_AGE.NEXT_WIN_START_DT"),
@@ -136,7 +139,7 @@ SETS: domain_schema.Sets = [
         ("WINDOW_IS_PAST", "Window Is Past", "WINDOW_AGE.WINDOW_IS_PAST"),
         ("WINDOW_IS_CURRENT", "Window Is Current", "WINDOW_AGE.WINDOW_IS_CURRENT"),
         ("WINDOW_IS_FUTURE", "Window Is Future", "WINDOW_AGE.WINDOW_IS_FUTURE"),
-        ("ACCOUNTS_NOT_BILLED", "Accounts On Cycle Not Billed In Window", "ACCOUNTS_NOT_BILLED"),
+        ("ACCOUNTS_NOT_BILLED", "Active Accounts On Cycle Not Billed In Window", "ACCOUNTS_NOT_BILLED"),
         ("FROZEN_BUT_PENDING_BILLS", "Freeze Complete But Bills Pending", "FROZEN_BUT_PENDING_BILLS"),
         ("HAS_OPEN_SEGMENTS", "Window Has Open Segments", "HAS_OPEN_SEGMENTS"),
         ("HAS_EXCEPTIONS", "Window Has Segment Exceptions", "HAS_EXCEPTIONS"),
@@ -145,7 +148,6 @@ SETS: domain_schema.Sets = [
         ("WINDOW_DAYS", "Window Length (Days)", "WINDOW_DAYS"),
         ("DAYS_WINDOW_END_TO_LAST_COMPLETE", "Days From Window End To Last Completion", "DAYS_WINDOW_END_TO_LAST_COMPLETE"),
         ("DAYS_ESTIMATE_TO_ACCOUNTING", "Days From Estimated To Accounting Date", "DAYS_ESTIMATE_TO_ACCOUNTING"),
-        ("WINDOW_DIST", "Distinct Windows", "WINDOW_DIST"),
     ]),
 ]
 MEASURES: domain_schema.Measures = [
@@ -157,6 +159,7 @@ MEASURES: domain_schema.Measures = [
     ("ESTIMATED_BSEG_TOTAL", "Estimated Bill Segment Total", "WINDOW_BSEG.ESTIMATED_BSEG_COUNT", "Sum"),
     ("BSEG_EXCEPTION_TOTAL", "Bill Segments With Exceptions Total", "WINDOW_BSEG.BSEG_WITH_EXCEPTION_COUNT", "Sum"),
     ("CYCLE_COUNT", "Cycle Count", "CI_BILL_CYC_SCH.BILL_CYC_CD", "CountDistinct"),
+    ("WINDOW_COUNT", "Window Count", "CI_BILL_CYC_SCH.WIN_START_DT", "CountAll"),
 ]
 
 

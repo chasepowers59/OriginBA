@@ -16,8 +16,11 @@ added; nothing existing is touched. Applied live by `jrs_domain_patch_apply.py`.
 """
 from __future__ import annotations
 
-import re
-from xml.sax.saxutils import escape
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import domain_schema  # noqa: E402
 
 S, T, N = "java.lang.String", "java.sql.Timestamp", "java.math.BigDecimal"
 TABLES = {
@@ -72,23 +75,4 @@ SETS = [
 
 
 def patch_schema(schema: str) -> str:
-    if 'id="CI_SEV_EVT_FA"' in schema:
-        raise ValueError("the schema already carries CI_SEV_EVT_FA: not patching twice")
-    ds = re.search(r'<jdbcDataSource id="([^"]+)"', schema).group(1)
-    tables = "".join(f'    <jdbcTable id="{tid}" datasourceId="{ds}" datasourceTableName="{tb}" schemaAlias="CISADM">\n      <fieldList>\n'
-                     + "".join(f'        <field id="{f}" type="{t}"></field>\n' for f, t in fields) + "      </fieldList>\n    </jdbcTable>\n"
-                     for tid, (tb, fields) in TABLES.items())
-    start = schema.index('<jdbcTable id="JoinTree_1"'); line_start = schema.rfind("\n", 0, start) + 1
-    schema = schema[:line_start] + tables + schema[line_start:]
-    jt0 = schema.index('<jdbcTable id="JoinTree_1"'); jt1 = schema.index("</jdbcTable>", jt0)
-    tree = schema[jt0:jt1]
-    fields = "".join(f'        <field id="{tid}.{f}" type="{t}"></field>\n' for tid, (_, fs) in TABLES.items() for f, t in fs)
-    fields += "".join(f'        <field id="{fid}" dataSetExpression="{escape(expr)}" type="{t}"></field>\n' for fid, expr, t in CALCULATED)
-    joins = "".join(f'        <join expr="{escape(e)}" left="{l}" right="{r}" type="leftOuter" weight="1"></join>\n' for e, l, r in JOINS)
-    refs = "".join(f'        <tableRef alwaysIncludeTable="false" tableAlias="{tid}" tableId="{tid}"></tableRef>\n' for tid in TABLES)
-    tree = tree.replace("      </fieldList>", fields + "      </fieldList>", 1).replace("      </joinList>", joins + "      </joinList>", 1).replace("      </tableRefList>", refs + "      </tableRefList>", 1)
-    schema = schema[:jt0] + tree + schema[jt1:]
-    groups = "".join(f'    <itemGroup id="{sid}" label="{escape(label)}" resourceId="JoinTree_1">\n      <items>\n'
-                     + "".join(f'        <item id="{i}" label="{escape(l)}" resourceId="JoinTree_1.{r}"></item>\n' for i, l, r in items) + "      </items>\n    </itemGroup>\n"
-                     for sid, label, items in SETS)
-    return schema.replace("  </itemGroups>", groups + "  </itemGroups>", 1)
+    return domain_schema.add_to_schema(schema, TABLES, JOINS, CALCULATED, SETS, guard_id="CI_SEV_EVT_FA")
