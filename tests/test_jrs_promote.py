@@ -163,10 +163,19 @@ class Package:
         src, scope, mv = promotion()
         pkg = p.build_package(src, scope, target_ds_export(), mv, "Origin_DEV_DS", "Origin_DataVergence_DS", [], [DOMAIN], "Odessa")
         assert p.verify_package(pkg, target_ds_export(), "Origin_DEV", "Origin_DEV_DS", "src-db-host", "Origin_DataVergence_DS") == []
-        assert any("tgt-db-host" in x for x in p.verify_package(pkg, target_ds_export(), "Origin_DEV", "Origin_DEV_DS", "tgt-db-host", "Origin_DataVergence_DS"))   # a host that IS in the package
+        assert not any("host" in x for x in p.verify_package(pkg, target_ds_export(), "Origin_DEV", "Origin_DEV_DS", "tgt-db-host", "Origin_DataVergence_DS")), "the target's own host is not foreign (Origin_DEV_DS points at Ellensburg's database)"
+        pkg2 = p.build_package(src, scope, {**target_ds_export(), f"resources{TGT}/DataSource/Origin_DataVergence_DS.xml": target_ds_export()[f"resources{TGT}/DataSource/Origin_DataVergence_DS.xml"].replace(b"pdevdb_odessa", b"pdevdb_odessa src-db-host")}, mv, "Origin_DEV_DS", "Origin_DataVergence_DS", [], [DOMAIN], "Odessa")
+        assert any("src-db-host" in x for x in p.verify_package(pkg2, target_ds_export(), "Origin_DEV", "Origin_DEV_DS", "src-db-host", "Origin_DataVergence_DS")), "a foreign host inside the package is caught"
         assert any("Origin_DataVergence_DS" in x for x in p.verify_package(pkg, target_ds_export(), "Origin_DEV", "Origin_DEV_DS", "src-db-host", "Other_DS"))
         assert any("Odessa" in x for x in p.verify_package(pkg, target_ds_export(), "Odessa", "Origin_DEV_DS", "src-db-host", "Origin_DataVergence_DS"))
         assert any("datasource" in x.lower() for x in p.verify_package(pkg, {"index.xml": b""}, "Origin_DEV", "Origin_DEV_DS", "src-db-host", "Origin_DataVergence_DS"))
+
+
+class Hosts:
+    def test_both_jdbc_url_forms_yield_the_host(self):
+        plain = {"resources/x/DataSource/A.xml": b"<jdbcDataSource><connectionUrl>jdbc:oracle:thin:@10.13.4.91:1521/ptestdb_ellensburg</connectionUrl></jdbcDataSource>"}
+        slashed = {"resources/x/DataSource/B.xml": b"<jdbcDataSource><connectionUrl>jdbc:oracle:thin:@//10.13.4.91:1521/ptestdb_citycorp.testvcn</connectionUrl></jdbcDataSource>"}
+        assert p.db_host(plain) == "10.13.4.91" and p.db_host(slashed) == "10.13.4.91"
 
 
 class Dependencies:
@@ -198,5 +207,5 @@ class After:
         assert p.after_problems({}, pkg) == [f"missing after import: resources{TGT}{DOMAIN}.xml"]
 
 
-for cls in (Scope, Rewrite, Datasources, Package, Dependencies, After):
+for cls in (Scope, Rewrite, Datasources, Package, Hosts, Dependencies, After):
     globals()["Test" + cls.__name__] = type("Test" + cls.__name__, (cls,), {})

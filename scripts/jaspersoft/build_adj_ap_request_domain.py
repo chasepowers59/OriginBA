@@ -22,7 +22,9 @@ import argparse
 import pathlib
 import subprocess
 import sys
-from xml.sax.saxutils import escape
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import domain_schema  # noqa: E402
 
 S, T, N = "java.lang.String", "java.sql.Timestamp", "java.math.BigDecimal"
 
@@ -148,37 +150,7 @@ MEASURES = [  # (item id, label, resource, defaultAgg)
 
 
 def schema(ds: str) -> str:
-    out = ['<?xml version="1.0" encoding="UTF-8"?>',
-           '<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">',
-           '  <dataIslands>', '    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>', '  </dataIslands>',
-           '  <dataSources>', f'    <jdbcDataSource id="{ds}">', '      <schemaMap>',
-           '        <entry key="defaultSchema">', '          <string></string>', '        </entry>',
-           '        <entry key="CISADM">', '          <string>CISADM</string>', '        </entry>',
-           '      </schemaMap>', '    </jdbcDataSource>', '  </dataSources>', '  <itemGroups>']
-    for sid, label, items in SETS:
-        out += [f'    <itemGroup id="{sid}" label="{escape(label)}" resourceId="JoinTree_1">', '      <items>']
-        out += [f'        <item id="{i}" label="{escape(l)}" resourceId="JoinTree_1.{r}"></item>' for i, l, r in items]
-        out += ['      </items>', '    </itemGroup>']
-    out += ['    <itemGroup id="SET_METRICS" label="Measures" resourceId="JoinTree_1">', '      <items>']
-    out += [f'        <item defaultAgg="{agg}" dimensionOrMeasure="Measure" id="{i}" label="{escape(l)}" resourceId="JoinTree_1.{r}"></item>' for i, l, r, agg in MEASURES]
-    out += ['      </items>', '    </itemGroup>', '  </itemGroups>', '  <resources>']
-    for tid, (table, fields) in TABLES.items():
-        out += [f'    <jdbcTable id="{tid}" datasourceId="{ds}" datasourceTableName="{table}" schemaAlias="CISADM">', '      <fieldList>']
-        out += [f'        <field id="{f}" type="{t}"></field>' for f, t in fields]
-        out += ['      </fieldList>', '    </jdbcTable>']
-    out += [f'    <jdbcTable id="JoinTree_1" datasourceId="{ds}" datasourceTableName="CI_ADJ_APREQ" schemaAlias="CISADM">', '      <fieldList>']
-    for tid, (_, fields) in TABLES.items():
-        out += [f'        <field id="{tid}.{f}" type="{t}"></field>' for f, t in fields]
-    out += [f'        <field id="{fid}" dataSetExpression="{escape(expr)}" type="{t}"></field>' for fid, expr, t in CALCULATED]
-    # no <filterString>: an EMPTY one is parsed and the query engine answers
-    # "exception parsing filter string ''" (measured on Origin_DEV, 2026-09-23)
-    # joinInfo alias = the ROOT TABLE id, not the tree (500 "ordering minJoins" otherwise)
-    out += ['      </fieldList>', '      <joinInfo alias="CI_ADJ_APREQ" referenceId="CI_ADJ_APREQ"></joinInfo>', '      <joinList>']
-    out += [f'        <join expr="{escape(e)}" left="{l}" right="{r}" type="{ty}" weight="1"></join>' for e, l, r, ty in JOINS]
-    out += ['      </joinList>', '      <joinOptions></joinOptions>', '      <tableRefList>']
-    out += [f'        <tableRef alwaysIncludeTable="false" tableAlias="{tid}" tableId="{tid}"></tableRef>' for tid in TABLES]
-    out += ['      </tableRefList>', '    </jdbcTable>', '  </resources>', '</schema>', '']
-    return "\n".join(out)
+    return domain_schema.schema(ds, "CI_ADJ_APREQ", TABLES, JOINS, CALCULATED, SETS, MEASURES)
 
 
 def validate(path: pathlib.Path) -> None:

@@ -110,7 +110,8 @@ def view_fields(files: dict[str, bytes], scope: str, folder: bool) -> set[str]:
 def db_host(files: dict[str, bytes]) -> str | None:
     for name, data in files.items():
         if "/DataSource/" in name and name.endswith(".xml"):
-            m = re.search(r"<connectionUrl>[^<]*?@([^:/<]+)", data.decode("utf-8", "replace"))
+            # both JDBC forms: @host:port/service and @//host:port/service (CityCorp_DS, 2026-09-24)
+            m = re.search(r"<connectionUrl>[^<]*?@(?://)?([^:/<]+)", data.decode("utf-8", "replace"))
             if m:
                 return m.group(1)
     return None

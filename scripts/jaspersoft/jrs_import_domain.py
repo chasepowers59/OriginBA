@@ -83,7 +83,7 @@ def main() -> int:
         raise SystemExit(f"3. metadata: {code} {sw._message(body)[:300]}")
     levels = json.loads(body)["rootLevel"]["subLevels"]
     print("3. Ad Hoc metadata:", ", ".join(f"{l['id']} ({len(l.get('items', []))})" for l in levels))
-    probe = [f"{l['id']}.{i['id']}" for l in levels for i in l.get("items", [])[:2] if i.get("kind") != "measure"][:12]
+    probe = [f"{l['id']}.{i['id']}" for l in levels[:1] for i in l.get("items", [])[:2] if i.get("kind") != "measure"]   # the root set only: two items of every set drags every derived table in (152s on 501k adjustments)
     q = {"select": {"fields": [{"id": f"f{i}", "field": f} for i, f in enumerate(probe)]}}
     payload = json.dumps({"dataSource": {"reference": {"uri": uri}}, "query": q}).encode()
     code, body, dt = sw._http("/rest_v2/queryExecutions?offset=0&pageSize=5", "POST", payload,
@@ -91,7 +91,8 @@ def main() -> int:
     if code != 200:
         raise SystemExit(f"4. probe query: {code} {sw._message(body)[:300]}")
     j = json.loads(body)
-    print(f"4. probe query of {len(probe)} items: {j.get('totalCounts')} rows in {dt:.1f}s; first: {json.dumps((j.get('dataset') or {}).get('rows', [])[:1])[:240]}")
+    cap = " (the server's Ad Hoc row cap; count through an aggregate query)" if j.get("totalCounts") == 300001 else ""
+    print(f"4. probe query of {len(probe)} items: {j.get('totalCounts')} rows{cap} in {dt:.1f}s; first: {json.dumps((j.get('dataset') or {}).get('rows', [])[:1])[:240]}")
     print(f"PASS  {uri}")
     return 0
 

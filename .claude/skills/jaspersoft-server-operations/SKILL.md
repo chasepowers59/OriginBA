@@ -75,7 +75,8 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
 | `scripts/jaspersoft/jrs_promote.py --from env:Org --to env:Org --resource U [--resource U2] [--into F] [--ds DS] [--param K=V] [--replace] [--dry-run] [--check-only] [--i-mean-prod]` | **THE org-to-org move (2026-09-24)**: domains, report units, Ad Hoc views, dashboards or whole folders, as ROOT on both sides (no per-org login, so Odessa is reachable like any org), across servers too. Package = the target's own datasource (+ any referenced domain) byte for byte, plus the scope rewritten onto the target org/destination folder with every datasource reference repointed; refuses if the source org path, datasource name or database host survives; after import re-exports and compares, then EXECUTES every promoted resource (domain metadata + probe query, report PDF with `--param`, view query, dashboard). `--check-only` re-runs just the execution proof. `tests/test_jrs_promote.py` pins the package on root-export shapes. Live 2026-09-24: A/P request domain + report Origin_DEV -> Odessa, ties Oracle 21/21 |
 | `scripts/jaspersoft/jrs_copy_resources.py --from env:Org --to env:Org --view U / --folder F` | the ORG-SCOPED predecessor (needs a login in both orgs): replaces a view or folder inside the target's own export; keep for a server where root is not held |
 | `scripts/jaspersoft/jrs_check_topic_kinds.py --env X --org Y [--folder F]` | views whose topic disagrees with their state about a measure: the one predictor of 'executes but will not open' that survived calibration |
-| `scripts/jaspersoft/jrs_domain_query.py --env X --org Y|ROOT --domain U --fields set.item,... --out f.json` | rows out of a domain by item id; the before/after instrument for a domain change |
+| `scripts/jaspersoft/jrs_domain_query.py --env X --org Y|ROOT --domain U [--fields set.item,...] [--agg set.item:Function ...] [--where DomEL] --out f.json` | rows out of a domain by item id; with `--agg` a GROUPED query (fields = group-by, none = grand total; the only way to a total through a domain, a flat query is row-level whatever the item's default aggregation); `--where` a DomEL filter (`ts'2026-01-01 00:00:00'` date literal). Measured shapes: aggregations name `fieldRef`; groupBy is a list of `{"group": {...}}` / `{"allGroup": {...}}`; a grouped query with detail fields answers one row per detail row |
+| `scripts/jaspersoft/build_adjustment_domain.py --ds DS --out f.xml` | the comprehensive Adjustment domain (root CI_ADJ, every join outer, 40 tables + 3 derived, 221 items); `tests/test_adjustment_domain.py`; README under `domains/manual_imports/adjustment_domain/` |
 | `scripts/jaspersoft/jrs_import_domain.py --env X --org Y --ds <DS> --folder F --name N --label L --schema f.xml` | CREATE a domain from a schema, packaged with the org's own datasource; then metadata + a probe query |
 | `scripts/jaspersoft/jrs_sa360_prem_char_apply.py`, `patch_write_offs_domain.py`, `build_adj_ap_request_domain.py` | the domain builders/patches of 2026-09-21..23, each with its tests and README under `domains/manual_imports/` |
 | `scripts/jaspersoft/jrs_deploy_report_units.py --org Y --datasource DS [--only SPEC] [--run FROM TO]` | the finance-pack report units from `generate_sql_report_pack.py` SPECS; `--only` for one |
@@ -451,3 +452,40 @@ R/50 2, X/50 4, X/60 4) and the report's group sums (686.00, 191.23, 2,078.07 / 
 database to the cent. Package under `backups/jaspersoft/promote/<stamp>/` with `source.zip`,
 `target_carried.zip`, `target_after.zip` (a replace also writes `target_before.zip`, the rollback;
 a fresh add rolls back with `jrs_repository.py delete`).
+
+## The Adjustment domain, and the two Ad Hoc engine facts it exposed (2026-09-24)
+
+Chase: take the Workstreams Adjustment domain into the Standard Offering and make it comprehensive
+("all things adjustments"); then put the domain and the static A/P report in every client's
+Adjustments folder. Built as `build_adjustment_domain.py` (see its README for the design and the
+proofs, all exact against Oracle), imported on Origin_DEV with `jrs_import_domain.py`, rolled out
+with `jrs_promote.py` per org (`--ds` from `clients.yml`: Ellensburg_DS, FondDuLac_DS, CityCorp_DS,
+CollegeStation_DS, Newark1_DS, Origin_DataVergence_DS).
+
+1. **The Ad Hoc engine's 300,000-row cap is a SERVER setting** (Chase; he can raise it). A query
+   whose work is pushed to the database (distinct counts, grouping on real columns or on a
+   CaseWhen of real columns) counts everything: 2,237,269 FTs on the FT and GL snapshot domain,
+   501,193 adjustments. A query with a Sum / CountAll / a group on a non-pushable field is
+   evaluated in memory and answers 300,001 -- silently, per group (Credit 159,498 right, Debit cut
+   at 140,503 = the remainder to 300,001). A flat detail query reports `totalCounts` 300001 too.
+   QA rule from here: tie COUNTS on the full population with `--agg X:CountDistinct`, tie MONEY on
+   a window under the cap with `--where`; both are exact on the Adjustment domain. Ad Hoc users
+   are under the same cap on every domain: a view that sums an unfiltered big domain is wrong,
+   quietly, above 300k rows.
+2. **`ElapsedDays(Today(0), col)` is evaluated in memory**: a flag built on it grouped 478,372 of
+   501,193 rows. Anything with "today" in it belongs in a derived table's SQL (`trunc(sysdate) -
+   col`), which is pushed down and exact. `IsNull(x) or x == ' '` is the right test for an unset
+   CHAR key (they hold spaces, not null): transfers tied 261,050 with it.
+3. `jrs_import_domain.py` with `update=true` REPLACES an existing domain in place (used twice on
+   Origin_DEV the same hour); the probe now reads two items of the ROOT set only, because two of
+   every set drags every derived table in (152 s on 501k rows).
+
+Rollout result (test server, 2026-09-24, domain + static report into every client's
+`Finance/Adjustments`): Ellensburg 501,193 / 748, Fond_Du_Lac 719,248 / 1,574, CityCorp 328,285 /
+1,352, College_Station 3,449,442 / 11,299, Newark1 9,963,883 / 52, Odessa 44,410 / 21 -- each pair
+is the domain's distinct count of adjustments / A/P requests AND the client database's `count(*)`,
+exact on all six. Two tool lessons from the run: a JDBC url can read `@//host:port/service`
+(CityCorp_DS), and the host check must treat a host the TARGET's own datasource shares as
+not foreign (Origin_DEV_DS, Ellensburg_DS and CityCorp_DS all sit on 10.13.4.91); the repository
+search can lag an import by seconds, so the execution step re-lists before calling a resource
+missing. Prod: not touched; same command with `--i-mean-prod` per org on Chase's word.

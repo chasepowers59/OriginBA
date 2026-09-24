@@ -216,7 +216,9 @@ def verify_package(pkg: bytes, tgt_files: dict[str, bytes], src_org: str, src_ds
     blob = b"".join(files[n] for n in sorted(files) if n != "index.xml")
     if org_root(src_org).encode() in blob or any(org_root(src_org) in n for n in files):
         problems.append(f"the source org path {org_root(src_org)} survives inside the package")
-    if src_host and src_host.encode() in blob:
+    # the target's own datasource may legitimately name the same host (Origin_DEV_DS points at
+    # Ellensburg's test database): the check is for a FOREIGN host
+    if src_host and src_host != db_host(tgt_files) and src_host.encode() in blob:
         problems.append(f"the source database host {src_host} survives inside the package")
     if src_ds and src_ds != tgt_ds and src_ds.encode() in blob:
         problems.append(f"the source datasource name {src_ds} survives inside the package")
@@ -274,13 +276,14 @@ def probe_domain(uri: str) -> str:
     if code != 200:
         raise RuntimeError(f"metadata {code}: {sw._message(body)[:200]}")
     levels = json.loads(body)["rootLevel"]["subLevels"]
-    probe = [f"{l['id']}.{i['id']}" for l in levels for i in l.get("items", [])[:2] if i.get("kind") != "measure"][:12]
+    probe = [f"{l['id']}.{i['id']}" for l in levels[:1] for i in l.get("items", [])[:2] if i.get("kind") != "measure"]   # the root set only: two items of every set drags every derived table in (152s on 501k adjustments)
     payload = json.dumps({"dataSource": {"reference": {"uri": uri}}, "query": {"select": {"fields": [{"id": f"f{i}", "field": f} for i, f in enumerate(probe)]}}}).encode()
     code, body, dt = sw._http("/rest_v2/queryExecutions?offset=0&pageSize=5", "POST", payload,
                               "application/execution.multiLevelQuery+json", "application/flatData+json", 300)
     if code != 200:
         raise RuntimeError(f"probe query {code}: {sw._message(body)[:200]}")
-    return f"{len(levels)} sets, probe of {len(probe)} items answers {json.loads(body).get('totalCounts')} rows in {dt:.1f}s"
+    n = json.loads(body).get("totalCounts")
+    return f"{len(levels)} sets, probe of {len(probe)} items answers {n} rows in {dt:.1f}s" + (" (the server's Ad Hoc row cap; count through an aggregate query)" if n == 300001 else "")
 
 
 def run_report(uri: str, params: list[str], out_dir: pathlib.Path) -> str:
@@ -416,9 +419,13 @@ def execute_all(tenv: str, tgt_root: str, uris: list[str], params: list[str], wo
     _root(tenv)
     todo: list[tuple[str, str]] = []
     for u in uris:
-        for r in listing((tgt_root + u).rsplit("/", 1)[0], False):
-            if r["uri"] == tgt_root + u:
-                todo += [(x["uri"], x["resourceType"]) for x in listing(r["uri"], True)] if r["resourceType"] == "folder" else [(r["uri"], r["resourceType"])]
+        for attempt in range(4):   # the repository search lags an import by seconds (Newark1 2026-09-24: present, unlisted)
+            hit = next((r for r in listing((tgt_root + u).rsplit("/", 1)[0], False) if r["uri"] == tgt_root + u), None)
+            if hit or not exists(tgt_root + u):
+                break
+            time.sleep(5)
+        if hit:
+            todo += [(x["uri"], x["resourceType"]) for x in listing(hit["uri"], True)] if hit["resourceType"] == "folder" else [(hit["uri"], hit["resourceType"])]
     missing = [u for u in uris if tgt_root + u not in {t[0] for t in todo} and not any(t[0].startswith(tgt_root + u + "/") for t in todo)]
     failed = len(missing)
     for u in missing:
