@@ -97,7 +97,9 @@ def run(uris: list[str], from_dt: str, to_dt: str, out_dir: Path, extra: dict[st
     out_dir.mkdir(parents=True, exist_ok=True)
     bad = 0
     for uri in uris:
-        pairs = [("FROM_DT", from_dt), ("TO_DT", to_dt)] + [(k, v) for k, vs in (extra or {}).items() for v in (vs if isinstance(vs, list) else [vs])]
+        spec = next((x for x in g.SPECS if x.name == uri.rsplit("/", 1)[-1]), None)
+        dates = [("AS_OF_DT", to_dt)] if spec and spec.as_of else [("FROM_DT", from_dt), ("TO_DT", to_dt)]   # a position report takes the TO date as its day
+        pairs = dates + [(k, v) for k, vs in (extra or {}).items() for v in (vs if isinstance(vs, list) else [vs])]
         q = urllib.parse.urlencode(pairs)
         url, auth = _cfg()
         req = urllib.request.Request(f"{url}/rest_v2/reports{uri}.pdf?{q}")

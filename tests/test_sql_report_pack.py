@@ -53,7 +53,7 @@ class Sql(unittest.TestCase):
                     self.assertNotIn(bad, up, f"{s.name}: {bad}")
                 if re.search(r"\b\w+_L\b", up):
                     self.assertIn("LANGUAGE_CD = 'ENG'", up, f"{s.name}: label join without a language")
-                self.assertIn("INTERVAL '1' DAY", sql, f"{s.name}: inclusive TO date")
+                self.assertIn("INTERVAL '1' DAY", sql, f"{s.name}: inclusive TO date (or the as-of day's end)")
                 for flag in re.findall(r"\b\w+\.(bseg_stat_flg|bill_stat_flg|adj_status_flg|freeze_sw|est_sw|main_cust_sw|name_type_flg)\b", sql):
                     self.assertIn(f"TRIM(", sql, flag)
             # only lifecycle constants are literal: '50' frozen, 'C' completed, 'Y', 'ENG', 'PRIM'
@@ -67,7 +67,7 @@ class Sql(unittest.TestCase):
         for s in g.SPECS:
             main = g.main_jrxml(s)
             self.assertIn(f'"repo:{s.sub.name}"', main, "the subreport is a local resource of the unit, named without a path")
-            for p in ("FROM_DT", "TO_DT", *s.sub.keys(), *s.all_params()):
+            for p in (*s.date_params(), *s.sub.keys(), *s.all_params()):
                 self.assertIn(f'<parameter name="{p}"><expression>', main, f"{s.name}: {p}")
             self.assertIn("$P{REPORT_CONNECTION}", main)
             for k in s.sub.keys():
@@ -87,9 +87,9 @@ class Sql(unittest.TestCase):
                     self.assertIn(f", {f.param}}}", main)
                     self.assertIn(f'<parameter name="{f.param}" class="java.util.Collection">', g.main_jrxml(s))
                 self.assertIn(f'<parameter name="{f.param}"', g.sub_jrxml(s), f"{s.sub.name}: {f.param} undeclared")
-            # the filters sit inside the WHERE, before any GROUP BY
-            for sql in (main, sub):
-                if "GROUP BY" in sql:
+            # the filters sit inside the WHERE, before any GROUP BY (a CTE query says where with the marker)
+            for sql, raw in ((main, s.sql), (sub, s.sub.sql)):
+                if "GROUP BY" in sql and "/*FILTERS*/" not in raw:
                     self.assertLess(max(sql.rfind("IS NULL OR"), sql.rfind("$X{IN")), sql.find("\nGROUP BY"), s.name)
             self.assertNotIn("/*FILTERS*/", main + sub)
 
@@ -199,3 +199,27 @@ class MultiSelect(unittest.TestCase):
             for c in desc["inputControls"]:
                 ic = c["inputControl"]; name = ic["uri"].rsplit("/", 1)[-1]
                 self.assertEqual(ic["type"] == d.MULTI_SELECT_QUERY, (s.name, name) in multi, f"{s.name}.{name}")
+
+
+class AsOf(unittest.TestCase):
+    """The position report: one day, the snapshot's arithmetic, and history as it stood."""
+    def setUp(self):
+        self.s = next(x for x in g.SPECS if x.name == "aged_debt_as_of")
+
+    def test_one_date_control_and_parameter(self):
+        doc, rest = g.controls(self.s)
+        ids = [c["id"] for c in doc["inputControls"]] if isinstance(doc, dict) and "inputControls" in doc else [c["id"] for c in (doc if isinstance(doc, list) else rest)]
+        self.assertIn("AS_OF_DT", ids); self.assertNotIn("FROM_DT", ids); self.assertNotIn("TO_DT", ids)
+        main = g.main_jrxml(self.s)
+        self.assertIn('<parameter name="AS_OF_DT" class="java.sql.Date">', main); self.assertNotIn('name="FROM_DT"', main)
+        self.assertIn('<parameter name="AS_OF_DT"><expression>', main, "the as-of day reaches the subreport")
+
+    def test_the_snapshot_arithmetic_and_the_history_filter(self):
+        for sql in (self.s.main_sql(), self.s.sub_sql()):
+            for must in ("TRIM(ft.freeze_sw) = 'Y'", "TRIM(ft.not_in_ars_sw) = 'N'", "TRUNC(ft.ars_dt) <= $P{AS_OF_DT}",
+                         "ft.freeze_dttm < $P{AS_OF_DT} + INTERVAL '1' DAY", "ROWS UNBOUNDED PRECEDING", "GREATEST(0, t.total_credit - t.total_debt)",
+                         "BETWEEN 91 AND 120", "> 120"):
+                self.assertIn(must, sql, must)
+            self.assertIn("$P{AS_KNOWN_TODAY} = 'Y' OR", sql, "the switch that counts later cancellations back into history")
+            self.assertIn("COALESCE(TRUNC(b.due_dt), TRUNC(ft.ars_dt))", sql, "Age By DUE uses the bill's real due date, never a shifted constant")
+        self.assertIn("TRIM($P{SA_CIS_DIVISION})", self.s.sub_sql(), "SA types are division-qualified: the sub takes both keys")

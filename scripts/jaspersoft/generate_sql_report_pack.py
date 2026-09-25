@@ -106,6 +106,10 @@ class Spec:
     window_label: str = "Date"                    # the column the FROM/TO window filters on, as the user knows it
     constants: dict = field(default_factory=dict) # extra literals the SQL may compare against: base-product lifecycle
                                                   # codes or lookup FIELD_NAMEs only, each with the reason it is safe
+    as_of: bool = False                           # a POSITION report: one AS_OF_DT instead of the FROM/TO window
+
+    def date_params(self) -> tuple[str, ...]:
+        return ("AS_OF_DT",) if self.as_of else ("FROM_DT", "TO_DT")
 
     def all_params(self) -> dict:
         return {**self.params, **{f.param: ("java.util.Collection" if f.multi else f.cls, "null") for f in self.filters}}
@@ -143,8 +147,8 @@ def _xml_esc(s: str) -> str:
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def _params(extra: dict[str, tuple[str, str]]) -> str:
-    base = {
+def _params(extra: dict[str, tuple[str, str]], as_of: bool = False) -> str:
+    base = {"AS_OF_DT": ("java.sql.Date", 'java.sql.Date.valueOf(java.time.LocalDate.now().toString())')} if as_of else {
         "FROM_DT": ("java.sql.Date", 'java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())'),
         "TO_DT": ("java.sql.Date", 'java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())'),
     }
@@ -232,17 +236,18 @@ def _head(name: str, page_w: int, page_h: int, margin: int, col_w: int, orientat
 def main_jrxml(s: Spec) -> str:
     sub_params = "\n".join(
         f'                <parameter name="{p}"><expression><![CDATA[$P{{{p}}}]]></expression></parameter>'
-        for p in ("FROM_DT", "TO_DT", *s.all_params()))
+        for p in (*s.date_params(), *s.all_params()))
     sub_key = "\n".join(f'                <parameter name="{p}"><expression><![CDATA[$F{{{f}}}]]></expression></parameter>'
                         for p, f in s.sub.keys().items())
-    window = (f'"{s.window_label} " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{{FROM_DT}}) '
-              '+ " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT})'
+    window = ((f'"{s.window_label} " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{{AS_OF_DT}})' if s.as_of else
+               f'"{s.window_label} " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{{FROM_DT}}) '
+               '+ " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT})')
               + (f' + "  |  {s.order_note}"' if s.order_note else "")
               + "".join((f' + ($P{{{f.param}}} == null || $P{{{f.param}}}.isEmpty() ? "" : "  |  {f.label}: " + String.join(", ", $P{{{f.param}}}))'
                          if f.multi else f' + ($P{{{f.param}}} == null ? "" : "  |  {f.label}: " + $P{{{f.param}}})') for f in s.filters))
     return (_head(s.name, PAGE_W, PAGE_H, MARGIN, COL_W) + STYLES +
             f'    <query language="SQL"><![CDATA[\n{s.main_sql().strip()}\n]]></query>\n'
-            + _params(s.all_params()) + "\n"
+            + _params(s.all_params(), s.as_of) + "\n"
             + _fields(s.columns) + "\n" + _variables(s.columns) + "\n"
             f'    <title height="52">\n'
             + _text(0, 0, COL_W, 26, f'"{s.label}"', "TitleSapphire", "Left", s.name + "/title") + "\n"
@@ -273,7 +278,7 @@ def main_jrxml(s: Spec) -> str:
 
 def sub_jrxml(s: Spec) -> str:
     sub, w = s.sub, COL_W - 24
-    params = _params({**{k: ("java.lang.String", '""') for k in sub.keys()}, **s.all_params()})
+    params = _params({**{k: ("java.lang.String", '""') for k in sub.keys()}, **s.all_params()}, s.as_of)
     header = (f'    <columnHeader height="13">\n' + _header_row(sub.columns, "SubHeader", sub.name, 12) + "\n"
               + _rule(0, 12, w, sub.name + "/hrule") + "\n    </columnHeader>\n") if sub.header else ""
     return (_head(sub.name, w, PAGE_H, 0, w) + STYLES +
@@ -290,7 +295,7 @@ def sub_jrxml(s: Spec) -> str:
 
 
 def controls(s: Spec) -> tuple[dict, list]:
-    ics = [
+    ics = [{"id": "AS_OF_DT", "label": s.window_label, "type": "singleValueDate", "mandatory": True, "visible": True}] if s.as_of else [
         {"id": "FROM_DT", "label": f"{s.window_label} from (inclusive)", "type": "singleValueDate", "mandatory": True, "visible": True},
         {"id": "TO_DT", "label": f"{s.window_label} to (inclusive)", "type": "singleValueDate", "mandatory": True, "visible": True},
     ]
@@ -320,10 +325,66 @@ def controls(s: Spec) -> tuple[dict, list]:
 # place instead of hunting the module folders (the 2026-09 layout put each under its module).
 FOLDER = "/SmartCity/Report/Standard_Offering/Standardized_Reports"
 FOLDERS = {name: FOLDER for name in ("billing_by_cycle_period", "payments_by_tender_type_period", "adjustments_by_type_period",
-                                     "gl_by_distribution_code_period", "adj_ap_requests_control")}
+                                     "gl_by_distribution_code_period", "adj_ap_requests_control", "aged_debt_as_of")}
 
 # ------------------------------------------------------------------ the specs
 WINDOW = "{col} >= $P{{FROM_DT}} AND {col} < $P{{TO_DT}} + INTERVAL '1' DAY"
+
+# the CMS_SA_SNAPSHOT arithmetic (sql/performance/snapshots/debt_mgmt/cms_sa_snapshot) for ANY day: eligible frozen
+# arrears FTs with ars_dt on or before the day AND, unless As Known Today, frozen by that day; credits retire the
+# oldest debt first; excess credit nets bucket 1; buckets sum to the balance.
+AGED = '''WITH base AS (
+  SELECT ft.sa_id, ft.ft_id, TRUNC(ft.ars_dt) AS ars_dt,
+         COALESCE(ft.cur_amt, 0) AS cur_amt, COALESCE(ft.tot_amt, 0) AS tot_amt,
+         CASE WHEN COALESCE(ft.cur_amt, 0) > 0 THEN ft.cur_amt ELSE 0 END AS debt_amt,
+         CASE WHEN COALESCE(ft.cur_amt, 0) < 0 THEN -ft.cur_amt ELSE 0 END AS credit_amt,
+         CASE WHEN $P{{AGE_BY}} = 'DUE' AND TRIM(ft.ft_type_flg) IN ('BS', 'BX') THEN COALESCE(TRUNC(b.due_dt), TRUNC(ft.ars_dt)) ELSE TRUNC(ft.ars_dt) END AS aging_dt
+  FROM CISADM.CI_FT ft
+  JOIN CISADM.CI_SA sa ON sa.sa_id = ft.sa_id
+  JOIN CISADM.CI_ACCT ac ON ac.acct_id = sa.acct_id
+  LEFT JOIN CISADM.CI_BSEG bs ON TRIM(ft.ft_type_flg) IN ('BS', 'BX') AND bs.bseg_id = ft.sibling_id
+  LEFT JOIN CISADM.CI_BILL b ON b.bill_id = bs.bill_id
+  WHERE TRIM(ft.freeze_sw) = 'Y' AND TRIM(ft.not_in_ars_sw) = 'N' AND ft.ars_dt IS NOT NULL
+    AND TRUNC(ft.ars_dt) <= $P{{AS_OF_DT}}
+    AND ($P{{AS_KNOWN_TODAY}} = 'Y' OR ft.freeze_dttm < $P{{AS_OF_DT}} + INTERVAL '1' DAY){restrict}
+    /*FILTERS*/
+),
+sa_tot AS (
+  SELECT sa_id, SUM(cur_amt) AS cur_bal, SUM(tot_amt) AS tot_bal, SUM(debt_amt) AS total_debt, SUM(credit_amt) AS total_credit
+  FROM base
+  GROUP BY sa_id
+),
+debt_rows AS (
+  SELECT sa_id, aging_dt, debt_amt,
+         SUM(debt_amt) OVER (PARTITION BY sa_id ORDER BY ars_dt, ft_id ROWS UNBOUNDED PRECEDING) AS cum_debt
+  FROM base
+  WHERE debt_amt > 0
+),
+unpaid AS (
+  SELECT d.sa_id, d.aging_dt,
+         GREATEST(0, d.cum_debt - t.total_credit) - GREATEST(0, d.cum_debt - d.debt_amt - t.total_credit) AS unpaid_amt
+  FROM debt_rows d
+  JOIN sa_tot t ON t.sa_id = d.sa_id
+),
+aged AS (
+  SELECT sa_id,
+         SUM(CASE WHEN GREATEST(0, $P{{AS_OF_DT}} - aging_dt) BETWEEN 0 AND 30 THEN unpaid_amt ELSE 0 END) AS ars_amt1,
+         SUM(CASE WHEN GREATEST(0, $P{{AS_OF_DT}} - aging_dt) BETWEEN 31 AND 60 THEN unpaid_amt ELSE 0 END) AS ars_amt2,
+         SUM(CASE WHEN GREATEST(0, $P{{AS_OF_DT}} - aging_dt) BETWEEN 61 AND 90 THEN unpaid_amt ELSE 0 END) AS ars_amt3,
+         SUM(CASE WHEN GREATEST(0, $P{{AS_OF_DT}} - aging_dt) BETWEEN 91 AND 120 THEN unpaid_amt ELSE 0 END) AS ars_amt4,
+         SUM(CASE WHEN GREATEST(0, $P{{AS_OF_DT}} - aging_dt) > 120 THEN unpaid_amt ELSE 0 END) AS ars_amt5
+  FROM unpaid
+  GROUP BY sa_id
+),
+sa_pos AS (
+  SELECT t.sa_id, t.cur_bal, t.tot_bal,
+         COALESCE(a.ars_amt1, 0) - GREATEST(0, t.total_credit - t.total_debt) AS ars_amt1,
+         COALESCE(a.ars_amt2, 0) AS ars_amt2, COALESCE(a.ars_amt3, 0) AS ars_amt3,
+         COALESCE(a.ars_amt4, 0) AS ars_amt4, COALESCE(a.ars_amt5, 0) AS ars_amt5
+  FROM sa_tot t
+  LEFT JOIN aged a ON a.sa_id = t.sa_id
+)
+'''
 
 SPECS: list[Spec] = [
     Spec(
@@ -639,6 +700,55 @@ ORDER BY a.cre_dt, r.ap_req_id""",
             Filter("ACCT_ID_F", "Account ID",
                    "($P{ACCT_ID_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = a.sa_id AND TRIM(fsa.acct_id) = TRIM($P{ACCT_ID_F})))",
                    "($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))"),
+        ]),
+    Spec(
+        name="aged_debt_as_of", label="Aged Debt As Of Date", as_of=True,
+        window_label="Position as of",
+        description="The arrears position on a chosen day, by service agreement type: SAs with a balance, current balance and the 0-30 / 31-60 / 61-90 / 91-120 / 120+ buckets, with the largest balances (account, customer) under each type. The same arithmetic as CMS_SA_SNAPSHOT, for any date.",
+        order_note="frozen arrears FTs as they stood on that day (Age By: ARS = arrears date like the snapshot, DUE = bill due date like the CIS zone; As Known Today = Y counts later cancellations back into history)",
+        params={"TOP_N": ("java.lang.Integer", "10"), "AGE_BY": ("java.lang.String", '"ARS"'), "AS_KNOWN_TODAY": ("java.lang.String", '"N"')},
+        constants={"N": "the report's own As Known Today switch and the NOT_IN_ARS_SW lifecycle switch, not a client code",
+                   "DUE": "the report's own Age By switch value, not a lifecycle code or client code"},
+        sql=AGED.format(restrict="") + """SELECT TRIM(sa.cis_division) AS SA_CIS_DIVISION, TRIM(sa.sa_type_cd) AS SA_TYPE_CD, COALESCE(stl.descr, TRIM(sa.sa_type_cd)) AS SA_TYPE_DESCR,
+       COUNT(*) AS SA_COUNT, SUM(p.cur_bal) AS CUR_BAL,
+       SUM(p.ars_amt1) AS ARS_AMT1, SUM(p.ars_amt2) AS ARS_AMT2, SUM(p.ars_amt3) AS ARS_AMT3, SUM(p.ars_amt4) AS ARS_AMT4, SUM(p.ars_amt5) AS ARS_AMT5
+FROM sa_pos p
+JOIN CISADM.CI_SA sa ON sa.sa_id = p.sa_id
+LEFT JOIN CISADM.CI_SA_TYPE_L stl ON stl.sa_type_cd = sa.sa_type_cd AND stl.cis_division = sa.cis_division AND stl.language_cd = 'ENG'
+WHERE p.cur_bal <> 0
+GROUP BY TRIM(sa.cis_division), TRIM(sa.sa_type_cd), COALESCE(stl.descr, TRIM(sa.sa_type_cd))
+ORDER BY SUM(p.cur_bal) DESC""",
+        columns=[Col("SA_CIS_DIVISION", "Div", width=40), Col("SA_TYPE_CD", "SA Type", width=56), Col("SA_TYPE_DESCR", "Service Agreement Type", width=136),
+                 Col("SA_COUNT", "SAs", "java.lang.Long", 60, "Right", INT, True), Col("CUR_BAL", "Balance", "java.math.BigDecimal", 90, "Right", MONEY, True),
+                 Col("ARS_AMT1", "0-30", "java.math.BigDecimal", 84, "Right", MONEY, True), Col("ARS_AMT2", "31-60", "java.math.BigDecimal", 84, "Right", MONEY, True),
+                 Col("ARS_AMT3", "61-90", "java.math.BigDecimal", 84, "Right", MONEY, True), Col("ARS_AMT4", "91-120", "java.math.BigDecimal", 84, "Right", MONEY, True),
+                 Col("ARS_AMT5", "120+", "java.math.BigDecimal", 84, "Right", MONEY, True)],
+        sub=Sub(
+            name="aged_debt_as_of_top", key_param="SA_TYPE_CD", key_field="SA_TYPE_CD", extra_keys={"SA_CIS_DIVISION": "SA_CIS_DIVISION"},
+            intro='"Largest balances of SA type " + $P{SA_TYPE_CD}',
+            sql=AGED.format(restrict="\n    AND TRIM(sa.cis_division) = TRIM($P{SA_CIS_DIVISION}) AND TRIM(sa.sa_type_cd) = TRIM($P{SA_TYPE_CD})") + """SELECT TRIM(sa.acct_id) AS ACCT_ID, pn.entity_name AS CUSTOMER_NAME, TRIM(p.sa_id) AS SA_ID, p.cur_bal AS CUR_BAL,
+       p.ars_amt1 AS ARS_AMT1, p.ars_amt2 AS ARS_AMT2, p.ars_amt3 AS ARS_AMT3, p.ars_amt4 AS ARS_AMT4, p.ars_amt5 AS ARS_AMT5
+FROM sa_pos p
+JOIN CISADM.CI_SA sa ON sa.sa_id = p.sa_id
+LEFT JOIN CISADM.CI_ACCT_PER ap ON ap.acct_id = sa.acct_id AND TRIM(ap.main_cust_sw) = 'Y'
+LEFT JOIN CISADM.CI_PER_NAME pn ON pn.per_id = ap.per_id AND TRIM(pn.name_type_flg) = 'PRIM'
+WHERE p.cur_bal <> 0
+ORDER BY p.cur_bal DESC
+FETCH FIRST $P{TOP_N} ROWS ONLY""",
+            columns=[Col("ACCT_ID", "Account", width=72), Col("CUSTOMER_NAME", "Customer", width=136), Col("SA_ID", "SA", width=60),
+                     Col("CUR_BAL", "Balance", "java.math.BigDecimal", 90, "Right", MONEY, True),
+                     Col("ARS_AMT1", "0-30", "java.math.BigDecimal", 84, "Right", MONEY, True), Col("ARS_AMT2", "31-60", "java.math.BigDecimal", 84, "Right", MONEY, True),
+                     Col("ARS_AMT3", "61-90", "java.math.BigDecimal", 84, "Right", MONEY, True), Col("ARS_AMT4", "91-120", "java.math.BigDecimal", 84, "Right", MONEY, True),
+                     Col("ARS_AMT5", "120+", "java.math.BigDecimal", 84, "Right", MONEY, True)]),
+        filters=[
+            Filter("CUST_CL_F", "Customer class",
+                   "($P{CUST_CL_F} IS NULL OR TRIM(ac.cust_cl_cd) = TRIM($P{CUST_CL_F}))", "($P{CUST_CL_F} IS NULL OR TRIM(ac.cust_cl_cd) = TRIM($P{CUST_CL_F}))",
+                   lov_sql="SELECT TRIM(cust_cl_cd) AS CODE, TRIM(cust_cl_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_CUST_CL_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ACCT a JOIN CISADM.CI_SA sa ON sa.acct_id = a.acct_id WHERE a.cust_cl_cd = l.cust_cl_cd AND (sa.end_dt IS NULL OR sa.end_dt >= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1"),
+            Filter("CIS_DIVISION_F", "CIS division",
+                   "($P{CIS_DIVISION_F} IS NULL OR TRIM(sa.cis_division) = TRIM($P{CIS_DIVISION_F}))", "($P{CIS_DIVISION_F} IS NULL OR TRIM(sa.cis_division) = TRIM($P{CIS_DIVISION_F}))",
+                   lov_sql="SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_SA sa WHERE sa.cis_division = l.cis_division AND (sa.end_dt IS NULL OR sa.end_dt >= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1"),
+            Filter("ACCT_ID_F", "Account ID",
+                   "($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))", "($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))"),
         ]),
 ]
 
