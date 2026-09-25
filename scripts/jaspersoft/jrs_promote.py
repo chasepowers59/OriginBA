@@ -204,7 +204,7 @@ def build_package(src: dict[str, bytes], scope: set[str], tgt_files: dict[str, b
     return out.getvalue()
 
 
-def verify_package(pkg: bytes, tgt_files: dict[str, bytes], src_org: str, src_ds: str, src_host: str | None, tgt_ds: str) -> list[str]:
+def verify_package(pkg: bytes, tgt_files: dict[str, bytes], src_org: str, src_ds: str, src_host: str | None, tgt_ds: str, tgt_org: str = "") -> list[str]:
     files = files_of_bytes(pkg)
     problems = []
     found = sorted(datasources_in(files, [n for n in files if "/DataSource/" in n]))
@@ -214,7 +214,8 @@ def verify_package(pkg: bytes, tgt_files: dict[str, bytes], src_org: str, src_ds
         if "/DataSource/" in n and tgt_files.get(n) != d:
             problems.append(f"datasource file is not the target's own bytes: {n}")
     blob = b"".join(files[n] for n in sorted(files) if n != "index.xml")
-    if org_root(src_org).encode() in blob or any(org_root(src_org) in n for n in files):
+    # the same org id on two servers (College_Station prod -> test) shares its root path: nothing to catch
+    if org_root(src_org) != org_root(tgt_org) and (org_root(src_org).encode() in blob or any(org_root(src_org) in n for n in files)):
         problems.append(f"the source org path {org_root(src_org)} survives inside the package")
     # the target's own datasource may legitimately name the same host (Origin_DEV_DS points at
     # Ellensburg's test database): the check is for a FOREIGN host
@@ -383,7 +384,7 @@ def main() -> int:
 
     pkg = build_package(src, scope, tgt_files, mv, src_ds, tgt_ds, new_folders, new_uris, torg)
     (work / "import.zip").write_bytes(pkg)
-    problems = verify_package(pkg, tgt_files, sorg, src_ds, db_host(src), tgt_ds)
+    problems = verify_package(pkg, tgt_files, sorg, src_ds, db_host(src), tgt_ds, torg)
     if problems:
         raise SystemExit("4. package refused: " + "; ".join(problems))
     print(f"4. package {(work / 'import.zip').relative_to(REPO)} ({len(pkg):,} bytes) verified: target bytes outside the scope, no trace of {sorg}")
@@ -404,9 +405,10 @@ def main() -> int:
         raise SystemExit(f"5. import did not complete cleanly: {json.dumps(st)[:800]}")
     print("5. import finished, no warnings")
 
-    expected = {n: d for n, d in files_of_bytes(pkg).items() if n != "index.xml"}
+    # a folder the tool created is re-serialised by the server (children, stamps): its existence is the proof
+    expected = {n: d for n, d in files_of_bytes(pkg).items() if n != "index.xml" and not any(n == f"resources{tgt_root}{f}/.folder.xml" for f in new_folders)}
     after = export_root(tenv, carry + [tgt_root + u for u in new_uris] + [tgt_root + f for f in new_folders], work / "target_after.zip")
-    problems = after_problems(after, expected)
+    problems = after_problems(after, expected) + [f"folder not created: {f}" for f in new_folders if f"resources{tgt_root}{f}/.folder.xml" not in after]
     if problems:
         raise SystemExit("6. target re-exported: " + "; ".join(problems[:8]))
     print(f"6. target re-exported: all {len(expected)} package files match, datasource connection unchanged")

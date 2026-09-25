@@ -171,6 +171,17 @@ class Package:
         assert any("datasource" in x.lower() for x in p.verify_package(pkg, {"index.xml": b""}, "Origin_DEV", "Origin_DEV_DS", "src-db-host", "Origin_DataVergence_DS"))
 
 
+class SameOrgAcrossServers:
+    def test_the_org_path_guard_does_not_fire_when_source_and_target_are_the_same_org(self):
+        src = source_export()
+        scope = p.scope_names(src, "Origin_DEV", [DOMAIN])
+        mv = p.moves("Origin_DEV", "Origin_DEV", [DOMAIN], None, "Origin_DEV_DS", "Origin_DEV_DS")
+        tgt = {"index.xml": target_ds_export()["index.xml"], f"resources{SRC}/DataSource/Origin_DEV_DS.xml": src[f"resources{SRC}/DataSource/Origin_DEV_DS.xml"]}
+        pkg = p.build_package(src, scope, tgt, mv, "Origin_DEV_DS", "Origin_DEV_DS", [], [DOMAIN], "Origin_DEV")
+        assert p.verify_package(pkg, tgt, "Origin_DEV", "Origin_DEV_DS", "src-db-host", "Origin_DEV_DS", "Origin_DEV") == []
+        assert any("survives" in x for x in p.verify_package(pkg, tgt, "Origin_DEV", "Origin_DEV_DS", "src-db-host", "Origin_DEV_DS", "Odessa"))
+
+
 class Hosts:
     def test_both_jdbc_url_forms_yield_the_host(self):
         plain = {"resources/x/DataSource/A.xml": b"<jdbcDataSource><connectionUrl>jdbc:oracle:thin:@10.13.4.91:1521/ptestdb_ellensburg</connectionUrl></jdbcDataSource>"}
@@ -207,5 +218,5 @@ class After:
         assert p.after_problems({}, pkg) == [f"missing after import: resources{TGT}{DOMAIN}.xml"]
 
 
-for cls in (Scope, Rewrite, Datasources, Package, Hosts, Dependencies, After):
+for cls in (Scope, Rewrite, Datasources, Package, SameOrgAcrossServers, Hosts, Dependencies, After):
     globals()["Test" + cls.__name__] = type("Test" + cls.__name__, (cls,), {})
