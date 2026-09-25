@@ -198,6 +198,7 @@ class Metadata:
         flat = {"rootLevel": {"id": "root", "items": [{"id": "X"}, {"id": "Y"}]}}
         assert [l["id"] for l in p.domain_levels(grouped)] == ["A"]
         assert [l["id"] for l in p.domain_levels(flat)] == ["root"] and len(p.domain_levels(flat)[0]["items"]) == 2
+        assert p.probe_fields(grouped) == ["A.X"] and p.probe_fields(flat) == ["X", "Y"], "a group-less domain is queried by bare item id"
 
 
 class Hosts:

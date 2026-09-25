@@ -82,9 +82,9 @@ def main() -> int:
     code, body, _ = sw._http(f"/rest_v2/domains{urllib.parse.quote(uri)}/metadata", timeout=180)
     if code != 200:
         raise SystemExit(f"3. metadata: {code} {sw._message(body)[:300]}")
-    levels = jrs_promote.domain_levels(json.loads(body))
+    meta = json.loads(body); levels = jrs_promote.domain_levels(meta)
     print("3. Ad Hoc metadata:", ", ".join(f"{l['id']} ({len(l.get('items', []))})" for l in levels))
-    probe = [f"{l['id']}.{i['id']}" for l in levels[:1] for i in l.get("items", [])[:2] if i.get("kind") != "measure"]   # the root set only: two items of every set drags every derived table in (152s on 501k adjustments)
+    probe = jrs_promote.probe_fields(meta)   # the root set only: two items of every set drags every derived table in (152s on 501k adjustments)
     q = {"select": {"fields": [{"id": f"f{i}", "field": f} for i, f in enumerate(probe)]}}
     payload = json.dumps({"dataSource": {"reference": {"uri": uri}}, "query": q}).encode()
     code, body, dt = sw._http("/rest_v2/queryExecutions?offset=0&pageSize=5", "POST", payload,

@@ -279,12 +279,19 @@ def domain_levels(meta: dict) -> list[dict]:
     return root.get("subLevels") or [root]
 
 
+def probe_fields(meta: dict, per_level: int = 2) -> list[str]:
+    """Query field ids for a probe: `group.item` inside a group, the bare item id on a group-less
+    domain (the server rejects `root.ITEM`: 'The query fields do not exist')."""
+    grouped = bool(meta["rootLevel"].get("subLevels"))
+    return [(f"{l['id']}.{i['id']}" if grouped else i["id"]) for l in domain_levels(meta)[:1] for i in l.get("items", [])[:per_level] if i.get("kind") != "measure"]
+
+
 def probe_domain(uri: str) -> str:
     code, body, _ = sw._http(f"/rest_v2/domains{urllib.parse.quote(uri)}/metadata", timeout=180)
     if code != 200:
         raise RuntimeError(f"metadata {code}: {sw._message(body)[:200]}")
-    levels = domain_levels(json.loads(body))
-    probe = [f"{l['id']}.{i['id']}" for l in levels[:1] for i in l.get("items", [])[:2] if i.get("kind") != "measure"]   # the root set only: two items of every set drags every derived table in (152s on 501k adjustments)
+    meta = json.loads(body); levels = domain_levels(meta)
+    probe = probe_fields(meta)   # the root set only: two items of every set drags every derived table in (152s on 501k adjustments)
     payload = json.dumps({"dataSource": {"reference": {"uri": uri}}, "query": {"select": {"fields": [{"id": f"f{i}", "field": f} for i, f in enumerate(probe)]}}}).encode()
     code, body, dt = sw._http("/rest_v2/queryExecutions?offset=0&pageSize=5", "POST", payload,
                               "application/execution.multiLevelQuery+json", "application/flatData+json", 300)
