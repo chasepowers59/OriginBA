@@ -29,6 +29,7 @@ sys.path.insert(0, str(HERE))
 import jrs_run_sweep as sw  # noqa: E402
 import jrs_debug as dbg  # noqa: E402
 import jrs_inventory as inv  # noqa: E402
+import jrs_promote  # noqa: E402
 
 REPO = HERE.parents[1]
 
@@ -81,7 +82,7 @@ def main() -> int:
     code, body, _ = sw._http(f"/rest_v2/domains{urllib.parse.quote(uri)}/metadata", timeout=180)
     if code != 200:
         raise SystemExit(f"3. metadata: {code} {sw._message(body)[:300]}")
-    levels = json.loads(body)["rootLevel"]["subLevels"]
+    levels = jrs_promote.domain_levels(json.loads(body))
     print("3. Ad Hoc metadata:", ", ".join(f"{l['id']} ({len(l.get('items', []))})" for l in levels))
     probe = [f"{l['id']}.{i['id']}" for l in levels[:1] for i in l.get("items", [])[:2] if i.get("kind") != "measure"]   # the root set only: two items of every set drags every derived table in (152s on 501k adjustments)
     q = {"select": {"fields": [{"id": f"f{i}", "field": f} for i, f in enumerate(probe)]}}

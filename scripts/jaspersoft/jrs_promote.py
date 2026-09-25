@@ -272,11 +272,18 @@ def listing(folder: str, recursive: bool) -> list[dict]:
     return json.loads(body).get("resourceLookup", []) if code == 200 else []
 
 
+def domain_levels(meta: dict) -> list[dict]:
+    """A domain's item groups from /domains/<uri>/metadata; a domain with no groups keeps its
+    items on the root level itself (CS_Connect_Domain and four more on College_Station, 2026-09-25)."""
+    root = meta["rootLevel"]
+    return root.get("subLevels") or [root]
+
+
 def probe_domain(uri: str) -> str:
     code, body, _ = sw._http(f"/rest_v2/domains{urllib.parse.quote(uri)}/metadata", timeout=180)
     if code != 200:
         raise RuntimeError(f"metadata {code}: {sw._message(body)[:200]}")
-    levels = json.loads(body)["rootLevel"]["subLevels"]
+    levels = domain_levels(json.loads(body))
     probe = [f"{l['id']}.{i['id']}" for l in levels[:1] for i in l.get("items", [])[:2] if i.get("kind") != "measure"]   # the root set only: two items of every set drags every derived table in (152s on 501k adjustments)
     payload = json.dumps({"dataSource": {"reference": {"uri": uri}}, "query": {"select": {"fields": [{"id": f"f{i}", "field": f} for i, f in enumerate(probe)]}}}).encode()
     code, body, dt = sw._http("/rest_v2/queryExecutions?offset=0&pageSize=5", "POST", payload,

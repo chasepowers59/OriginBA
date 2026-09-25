@@ -192,6 +192,14 @@ class NestedGroups:
         assert items == {"CI_BILL.BILL_DT", "CI_BILL_SA_1.CUR_AMT_1"}
 
 
+class Metadata:
+    def test_levels_come_from_groups_or_the_root_itself(self):
+        grouped = {"rootLevel": {"id": "root", "subLevels": [{"id": "A", "items": [{"id": "X"}]}]}}
+        flat = {"rootLevel": {"id": "root", "items": [{"id": "X"}, {"id": "Y"}]}}
+        assert [l["id"] for l in p.domain_levels(grouped)] == ["A"]
+        assert [l["id"] for l in p.domain_levels(flat)] == ["root"] and len(p.domain_levels(flat)[0]["items"]) == 2
+
+
 class Hosts:
     def test_both_jdbc_url_forms_yield_the_host(self):
         plain = {"resources/x/DataSource/A.xml": b"<jdbcDataSource><connectionUrl>jdbc:oracle:thin:@10.13.4.91:1521/ptestdb_ellensburg</connectionUrl></jdbcDataSource>"}
@@ -228,5 +236,5 @@ class After:
         assert p.after_problems({}, pkg) == [f"missing after import: resources{TGT}{DOMAIN}.xml"]
 
 
-for cls in (Scope, Rewrite, Datasources, Package, SameOrgAcrossServers, NestedGroups, Hosts, Dependencies, After):
+for cls in (Scope, Rewrite, Datasources, Package, SameOrgAcrossServers, NestedGroups, Metadata, Hosts, Dependencies, After):
     globals()["Test" + cls.__name__] = type("Test" + cls.__name__, (cls,), {})
