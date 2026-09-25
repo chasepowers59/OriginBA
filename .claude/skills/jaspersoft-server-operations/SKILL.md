@@ -524,3 +524,22 @@ Scheduling, for the record: a job = report + trigger (once / simple / calendar) 
 values + output formats + destination (repository folder, email, FTP), runs as its creator; REST
 `/rest_v2/jobs` (our `jobs / job / job-run / job-delete`). A schedulable standard report needs
 RELATIVE date defaults (last month), which the pack's FROM_DT / TO_DT do not have yet.
+
+## College_Station PROD -> TEST, 21 custom resources + their domains (2026-09-25)
+
+Chase's list (20 Ad Hoc views + 1 report under `/SmartCity/Report/Custom_Reports`), all moved with
+`jrs_promote.py --from prod:College_Station --to test:College_Station --ds CollegeStation_DS`, prod
+read only. Two prerequisites first (the cash-receipt domain and the "Status Updates" view the report
+is built on), then the 21 (5 replaced test copies), then EVERY referenced domain replaced with
+prod's (13) at Chase's word ("they may have changed the domain and built the prod views on it"),
+then all 22 executed on test again. Proof per item: import without warnings, re-export byte-equal
+to prod inside the scope, execution. Row counts differ between test and prod because the two
+databases are at different points in time; that is not a defect (Chase). Tool lessons, each now a
+test: the same org id on two servers shares its root path (the "source org path survives" guard
+only fires when the roots differ); a folder the tool creates is re-serialised on import (proved by
+existence); domain item ids are FULL group paths (`CI_ADJ_1.CI_ADJ_TYPE_L.DESCR`) and groups nest,
+so `domain_items` walks the tree; view field ids are read from the state's `fieldName` / `name`
+attributes, never bare tokens; a group-less domain keeps its items on the root level and is probed
+by bare item id; the repository search lags an import by seconds (re-list before calling a
+resource missing); a heavy view's execution can exceed the 600 s API read (Status Updates the
+first time) -- it imported byte-equal and executed on the re-check.
