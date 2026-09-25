@@ -40,7 +40,7 @@ def source_export() -> dict[str, bytes]:
         f"resources{SRC}{REPORT}_files/main_jrxml.data": "<jasperReport><queryString>select 1 from cisadm.ci_adj_apreq</queryString></jasperReport>",
         f"resources{SRC}{VIEW}.xml": (f"<adhocDataView><folder>{SRC}{FIN}/Adjustments</folder><name>Adjustment___Cancelation_Reason</name>"
                                       f"<dataSource><dataSourceReference><uri>{SRC}{FIN}/General_Ledger/FT_and_GL_Snapshot___Domain</uri></dataSourceReference></dataSource></adhocDataView>"),
-        f"resources{SRC}{VIEW}_files/stateXML.data": "<state>FT_CORE.FT_ID ADJ.ADJ_CAN_RSN_CD</state>",
+        f"resources{SRC}{VIEW}_files/stateXML.data": '<state><measure fieldName="FT_CORE.FT_ID" name="FT_CORE.FT_ID"></measure><queryField name="ADJ.ADJ_CAN_RSN_CD"></queryField> ADJ.STRAY_TOKEN</state>',
         f"resources{SRC}{FIN}/General_Ledger/FT_and_GL_Snapshot___Domain.xml": f"<semanticLayerDataSource><folder>{SRC}{FIN}/General_Ledger</folder><name>FT_and_GL_Snapshot___Domain</name></semanticLayerDataSource>",
         f"resources{SRC}{FIN}/General_Ledger/FT_and_GL_Snapshot___Domain_files/schema.data": '<schema><itemGroups><itemGroup id="FT_CORE"><item id="FT_ID"></item></itemGroup><itemGroup id="ADJ"><item id="ADJ_CAN_RSN_CD"></item></itemGroup></itemGroups></schema>',
     }
@@ -189,7 +189,7 @@ class NestedGroups:
                   '<item id="CUR_AMT_1" label="Current Amount" resourceId="JoinTree_1.CI_BILL_SA.CUR_AMT"></item></items></itemGroup></itemGroups>'
                   '<items><item id="BILL_DT" label="Bill Date" resourceId="JoinTree_1.CI_BILL.BILL_DT"></item></items></itemGroup></itemGroups></schema>')
         items = p.domain_items({"resources/x/D_files/schema.data": schema.encode()})["resources/x/D"]
-        assert items == {"CI_BILL.BILL_DT", "CI_BILL_SA_1.CUR_AMT_1"}
+        assert items == {"CI_BILL.BILL_DT", "CI_BILL.CI_BILL_SA_1.CUR_AMT_1"}, "the full group path, as the engine names the item"
 
 
 class Metadata:

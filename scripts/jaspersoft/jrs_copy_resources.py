@@ -81,26 +81,37 @@ def in_scope(name: str, scope: str, folder: bool) -> bool:
 
 
 def domain_items(files: dict[str, bytes]) -> dict[str, set[str]]:
-    """Every `group.item` id a domain exposes. Groups NEST (CS_Bill_Details on College_Station:
-    three <itemGroups> containers, eleven groups), so this walks the tree and pairs each item
-    with its DIRECT parent group -- a regex over the flat text paired inner items with the
-    outer group and called real fields missing (2026-09-25)."""
+    """Every item id a domain exposes as the Ad Hoc engine names it: the FULL group path
+    (`group.subgroup.item`, e.g. CI_ADJ_1.CI_ADJ_TYPE_L.DESCR on College_Station's SC_Adjustment
+    domain). Groups nest, so this walks the tree (a flat regex paired inner items with the wrong
+    group and read only two levels, 2026-09-25)."""
     import xml.etree.ElementTree as ET
     ns = "{http://www.jaspersoft.com/2007/SL/XMLSchema}"
+
+    def walk(group, path, ids):
+        p = f"{path}.{group.get('id')}" if path else group.get("id")
+        items = group.find(ns + "items")
+        for i in (items if items is not None else []):
+            if i.tag == ns + "item":
+                ids.add(f"{p}.{i.get('id')}")
+        subs = group.find(ns + "itemGroups")
+        for g in (subs if subs is not None else []):
+            if g.tag == ns + "itemGroup":
+                walk(g, p, ids)
+
     out: dict[str, set[str]] = {}
     for name, data in files.items():
         if not name.endswith("_files/schema.data"):
             continue
-        ids = set()
+        ids: set[str] = set()
         try:
             root = ET.fromstring(data)
+            top = root.find(ns + "itemGroups")
+            for g in (top if top is not None else []):
+                if g.tag == ns + "itemGroup":
+                    walk(g, "", ids)
         except ET.ParseError:
-            out[name.rsplit("_files/", 1)[0]] = ids; continue
-        for g in root.iter(ns + "itemGroup"):
-            items = g.find(ns + "items")
-            for i in (items if items is not None else []):
-                if i.tag == ns + "item":
-                    ids.add(f"{g.get('id')}.{i.get('id')}")
+            pass
         out[name.rsplit("_files/", 1)[0]] = ids
     return out
 
@@ -112,9 +123,9 @@ def view_fields(files: dict[str, bytes], scope: str, folder: bool) -> set[str]:
             continue
         text = data.decode("utf-8", "replace")
         if name.endswith("_files/topicJRXML.data"):
-            fields |= set(re.findall(r'<field name="([A-Z][A-Z0-9_]*\.[A-Z][A-Z0-9_]*)"', text))
-        elif name.endswith("_files/stateXML.data"):
-            fields |= set(re.findall(r'\b([A-Z][A-Z0-9_]*\.[A-Z][A-Z0-9_]*)\b', text))
+            fields |= set(re.findall(r'<field name="([A-Z][A-Z0-9_]*(?:\.[A-Z][A-Z0-9_]*)+)"', text))
+        elif name.endswith("_files/stateXML.data"):   # ids live in field attributes; any depth of group path
+            fields |= set(re.findall(r'(?:fieldName|name)="([A-Z][A-Z0-9_]*(?:\.[A-Z][A-Z0-9_]*)+)"', text))
     return fields
 
 

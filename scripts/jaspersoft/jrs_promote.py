@@ -156,9 +156,9 @@ def unresolved_fields(src: dict[str, bytes], scope: set[str], items: set[str]) -
     for n in scope:
         text = _text(src[n]) or ""
         if n.endswith("_files/topicJRXML.data"):
-            fields |= set(re.findall(r'<field name="([A-Z][A-Z0-9_]*\.[A-Z][A-Z0-9_]*)"', text))
-        elif n.endswith("_files/stateXML.data"):
-            fields |= set(re.findall(r"\b([A-Z][A-Z0-9_]*\.[A-Z][A-Z0-9_]*)\b", text))
+            fields |= set(re.findall(r'<field name="([A-Z][A-Z0-9_]*(?:\.[A-Z][A-Z0-9_]*)+)"', text))
+        elif n.endswith("_files/stateXML.data"):   # ids live in field attributes; any depth of group path
+            fields |= set(re.findall(r'(?:fieldName|name)="([A-Z][A-Z0-9_]*(?:\.[A-Z][A-Z0-9_]*)+)"', text))
     return fields - items
 
 
