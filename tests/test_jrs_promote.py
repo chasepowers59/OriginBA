@@ -182,6 +182,16 @@ class SameOrgAcrossServers:
         assert any("survives" in x for x in p.verify_package(pkg, tgt, "Origin_DEV", "Origin_DEV_DS", "src-db-host", "Origin_DEV_DS", "Odessa"))
 
 
+class NestedGroups:
+    def test_items_pair_with_their_direct_group_when_groups_nest(self):
+        schema = ('<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3"><itemGroups>'
+                  '<itemGroup id="CI_BILL" label="Bill"><itemGroups><itemGroup id="CI_BILL_SA_1" label="Bill SA"><items>'
+                  '<item id="CUR_AMT_1" label="Current Amount" resourceId="JoinTree_1.CI_BILL_SA.CUR_AMT"></item></items></itemGroup></itemGroups>'
+                  '<items><item id="BILL_DT" label="Bill Date" resourceId="JoinTree_1.CI_BILL.BILL_DT"></item></items></itemGroup></itemGroups></schema>')
+        items = p.domain_items({"resources/x/D_files/schema.data": schema.encode()})["resources/x/D"]
+        assert items == {"CI_BILL.BILL_DT", "CI_BILL_SA_1.CUR_AMT_1"}
+
+
 class Hosts:
     def test_both_jdbc_url_forms_yield_the_host(self):
         plain = {"resources/x/DataSource/A.xml": b"<jdbcDataSource><connectionUrl>jdbc:oracle:thin:@10.13.4.91:1521/ptestdb_ellensburg</connectionUrl></jdbcDataSource>"}
@@ -218,5 +228,5 @@ class After:
         assert p.after_problems({}, pkg) == [f"missing after import: resources{TGT}{DOMAIN}.xml"]
 
 
-for cls in (Scope, Rewrite, Datasources, Package, SameOrgAcrossServers, Hosts, Dependencies, After):
+for cls in (Scope, Rewrite, Datasources, Package, SameOrgAcrossServers, NestedGroups, Hosts, Dependencies, After):
     globals()["Test" + cls.__name__] = type("Test" + cls.__name__, (cls,), {})

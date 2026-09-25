@@ -81,15 +81,26 @@ def in_scope(name: str, scope: str, folder: bool) -> bool:
 
 
 def domain_items(files: dict[str, bytes]) -> dict[str, set[str]]:
+    """Every `group.item` id a domain exposes. Groups NEST (CS_Bill_Details on College_Station:
+    three <itemGroups> containers, eleven groups), so this walks the tree and pairs each item
+    with its DIRECT parent group -- a regex over the flat text paired inner items with the
+    outer group and called real fields missing (2026-09-25)."""
+    import xml.etree.ElementTree as ET
+    ns = "{http://www.jaspersoft.com/2007/SL/XMLSchema}"
     out: dict[str, set[str]] = {}
     for name, data in files.items():
         if not name.endswith("_files/schema.data"):
             continue
-        sch = data.decode("utf-8", "replace")
         ids = set()
-        for g in re.finditer(r'<itemGroup id="([^"]+)"[^>]*>(.*?)</itemGroup>', sch, re.S):
-            for i in re.findall(r'<item id="([^"]+)"', g.group(2)):
-                ids.add(f"{g.group(1)}.{i}")
+        try:
+            root = ET.fromstring(data)
+        except ET.ParseError:
+            out[name.rsplit("_files/", 1)[0]] = ids; continue
+        for g in root.iter(ns + "itemGroup"):
+            items = g.find(ns + "items")
+            for i in (items if items is not None else []):
+                if i.tag == ns + "item":
+                    ids.add(f"{g.get('id')}.{i.get('id')}")
         out[name.rsplit("_files/", 1)[0]] = ids
     return out
 
