@@ -102,6 +102,17 @@ def _source_part(source: dict | None, canvas: str, canvas_as_of: str | None) -> 
     return {"run_at": run_at, "checks": len(rows), "green": len(rows) - len(diffs), "differences": diffs}
 
 
+# The spec's own definition of soft (qa_specs/oracle_snapshot_parity.yml). Without it the
+# assistant read 18,954 aging-bucket differences as "real mismatches" (2026-09-28).
+SOFT_MEANING = ("by design: the canvas and the snapshot procedure define this value differently; "
+                "reported for information, never a failure")
+
+
+def _soft_meaning(value: dict[str, Any]) -> str:
+    reason = value.get("soft_reason")
+    return f"by design: {reason}" if reason else SOFT_MEANING
+
+
 def _snapshot_part(snapshot: dict | None, canvas: str) -> dict[str, Any] | None:
     if not snapshot:
         return None
@@ -118,8 +129,8 @@ def _snapshot_part(snapshot: dict | None, canvas: str) -> dict[str, Any] | None:
         "newer": c.get("newer", 0),
         "missing": c.get("missing_stable", 0),
         "strict_mismatches": sum(v["mismatch"] for v in values.values() if not v.get("soft")),
-        "soft_differences": [{"name": k, "mismatch": v["mismatch"]} for k, v in values.items()
-                             if v.get("soft") and v["mismatch"]],
+        "soft_differences": [{"name": k, "mismatch": v["mismatch"], "meaning": _soft_meaning(v)}
+                             for k, v in values.items() if v.get("soft") and v["mismatch"]],
         "ok": bool(c.get("ok")),
         "others": [r["snapshot"].split(".")[-1] for r in rows[1:]],
     }

@@ -77,6 +77,22 @@ class WithReports(unittest.TestCase):
         self.assertEqual([v["name"] for v in s["snapshot"]["soft_differences"]], ["bucket_0_30"])
         self.assertEqual(s["canvas_as_of"], "2026-09-09T12:32:41")
 
+    def test_a_soft_difference_says_it_is_by_design(self):
+        """Found 2026-09-28: the assistant read 18,954 bucket differences as "real mismatches"
+        against the snapshot Jaspersoft reads. They are soft: the two designs age debt
+        differently. A bare name let the model guess; the meaning travels with it now."""
+        soft = integrity.canvas_summary("ellensburg", "rpt_sa_aged_balance")["snapshot"]["soft_differences"][0]
+        self.assertIn("by design", soft["meaning"])
+        self.assertIn("never a failure", soft["meaning"])
+
+    def test_the_parity_run_s_own_reason_wins_when_it_carries_one(self):
+        doc = json.loads(json.dumps(SNAPSHOT))
+        doc["checks"][0]["values"]["bucket_0_30"]["soft_reason"] = "the procedure ages by ARS_DT, the canvas by days past due"
+        (Path(self.dir.name) / "snapshot_parity_ellensburg_latest.json").write_text(json.dumps(doc))
+        integrity._cache.clear()
+        soft = integrity.canvas_summary("ellensburg", "rpt_sa_aged_balance")["snapshot"]["soft_differences"][0]
+        self.assertEqual(soft["meaning"], "by design: the procedure ages by ARS_DT, the canvas by days past due")
+
     def test_a_source_that_moved_on_after_the_build_is_named_not_blamed(self):
         s = integrity.canvas_summary("ellensburg", "rpt_financial_txn")
         self.assertEqual(s["verdict"], "differences")
