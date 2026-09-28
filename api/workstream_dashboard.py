@@ -9,6 +9,7 @@ from typing import Any
 from api.demo_db import demo_configured
 from api.warehouse_db import warehouse_configured
 from api.executive_dashboard import present_card_errors, unavailable_note
+from api.money_rules import MONEY_FILTERS
 from api.reporting_dates import data_as_of
 from api.kpi_runner import date_windows, execute_kpi_definition
 from api.snapshot_catalog import load_catalog
@@ -26,9 +27,9 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
          "snapshot_id": "rpt_bill_segment", "format": "currency", "workstream": "billing",
          "explore_report_id": None, "date_field": "Bill Date",
          "value": {"dimensions": [], "measures": [{"field": "Billed Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Frozen", "op": "eq", "value": True}]},
+                   "filters": MONEY_FILTERS["rpt_bill_segment"]},
          "trend": {"dimensions": ["SA Type"], "measures": [{"field": "Billed Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Frozen", "op": "eq", "value": True}], "limit": 6}},
+                   "filters": MONEY_FILTERS["rpt_bill_segment"], "limit": 6}},
         {"id": "bills_completed", "label": "Bills completed", "subtitle": "Completed in the period",
          "snapshot_id": "rpt_bill", "format": "number", "workstream": "billing",
          "explore_report_id": None, "date_field": "Completed Date/Time",
@@ -55,15 +56,15 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
         {"id": "payments_collected", "label": "Payments collected", "subtitle": "Payments on frozen pay segments",
          "snapshot_id": "rpt_payment", "format": "currency", "workstream": "cashiering",
          "explore_report_id": None, "date_field": "Payment Date",
-         "value": {"dimensions": [], "measures": [{"field": "Pay Segment Amount", "agg": "sum"}], "filters": []},
+         "value": {"dimensions": [], "measures": [{"field": "Pay Segment Amount", "agg": "sum"}], "filters": MONEY_FILTERS["rpt_payment"]},
          "trend": {"dimensions": ["Payment Status"], "measures": [{"field": "Pay Segment Amount", "agg": "sum"}],
-                   "filters": [], "limit": 6}},
-        {"id": "tender_amount", "label": "Tenders received", "subtitle": "By tender type",
+                   "filters": MONEY_FILTERS["rpt_payment"], "limit": 6}},
+        {"id": "tender_amount", "label": "Tenders received", "subtitle": "Not cancelled, by tender type",
          "snapshot_id": "rpt_payment_tender", "format": "currency", "workstream": "cashiering",
          "explore_report_id": None, "date_field": "Payment Date",
-         "value": {"dimensions": [], "measures": [{"field": "Tender Amount", "agg": "sum"}], "filters": []},
+         "value": {"dimensions": [], "measures": [{"field": "Tender Amount", "agg": "sum"}], "filters": MONEY_FILTERS["rpt_payment_tender"]},
          "trend": {"dimensions": ["Tender Type"], "measures": [{"field": "Tender Amount", "agg": "sum"}],
-                   "filters": [], "limit": 6}},
+                   "filters": MONEY_FILTERS["rpt_payment_tender"], "limit": 6}},
         {"id": "unbalanced_events", "label": "Unbalanced pay events", "subtitle": "Cashiering exceptions",
          "snapshot_id": "rpt_payment", "format": "number", "workstream": "cashiering",
          "explore_report_id": None, "windowless": True,
@@ -206,13 +207,13 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
                    "filters": [{"field": "Is Frozen", "op": "eq", "value": True}]},
          "trend": {"dimensions": ["FT Type"], "measures": [{"field": "Current Amount", "agg": "sum"}],
                    "filters": [{"field": "Is Frozen", "op": "eq", "value": True}], "limit": 6}},
-        {"id": "adjustments", "label": "Adjustment dollars", "subtitle": "Adjustments (AD/AX) in the period",
+        {"id": "adjustments", "label": "Adjustment dollars", "subtitle": "Frozen adjustments in the period",
          "snapshot_id": "rpt_financial_txn", "format": "currency", "workstream": "finance",
          "explore_report_id": None, "date_field": "Accounting Date",
          "value": {"dimensions": [], "measures": [{"field": "Current Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Adjustment", "op": "eq", "value": True}]},
+                   "filters": [{"field": "Is Adjustment", "op": "eq", "value": True}, *MONEY_FILTERS["rpt_financial_txn"]]},
          "trend": {"dimensions": ["SA Type"], "measures": [{"field": "Current Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Adjustment", "op": "eq", "value": True}], "limit": 6}},
+                   "filters": [{"field": "Is Adjustment", "op": "eq", "value": True}, *MONEY_FILTERS["rpt_financial_txn"]], "limit": 6}},
         {"id": "gl_lines", "label": "GL distribution lines", "subtitle": "Posting detail rows",
          "snapshot_id": "rpt_gl", "format": "number", "workstream": "finance",
          "explore_report_id": None, "date_field": "Accounting Date",

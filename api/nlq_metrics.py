@@ -12,6 +12,7 @@ catalog actually carries, so a metric is never offered where it cannot run.
 
 from __future__ import annotations
 
+from api.money_rules import MONEY_FILTERS
 from api.reporting_dates import reporting_today
 
 import re
@@ -244,13 +245,10 @@ def _sum(field_name: str, filters: list[dict[str, Any]] | None = None,
             "filters": filters or []}
 
 
-# Only frozen, non-cancelled bill segments are billed money (and billed usage); only
-# frozen financial transactions are money at all. See tests/test_nlq_money_filters.py.
-BILLED = [{"field": "Is Frozen", "op": "eq", "value": True},
-          {"field": "Is Cancelled", "op": "eq", "value": False}]
-FROZEN = [{"field": "Is Frozen", "op": "eq", "value": True}]
-# A cancelled tender is money that came back out.
-NOT_CANCELLED = [{"field": "Is Cancelled", "op": "eq", "value": False}]
+# What counts as money on each canvas: api/money_rules.py, checked by tests/test_money_rules.py.
+BILLED = MONEY_FILTERS["rpt_bill_segment"]
+FROZEN = MONEY_FILTERS["rpt_financial_txn"]
+NOT_CANCELLED = MONEY_FILTERS["rpt_payment_tender"]
 
 METRICS: list[NlqMetric] = [
     # ------------------------------------------------------------- Customers
