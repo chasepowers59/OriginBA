@@ -17,7 +17,7 @@ import {
 } from "@/lib/businessLabels";
 import { getFavorite } from "@/lib/favorites";
 import { getViewRemote, saveViewRemote } from "@/lib/savedViews";
-import { applyDatePresetConfig, estimatePeriodDays, widenDateRange } from "@/lib/datePresets";
+import { anchoredLabel, applyDatePresetConfig, estimatePeriodDays, widenDateRange } from "@/lib/datePresets";
 import { applyProcessGuide } from "@/lib/processGuide";
 import { resolveDateField } from "@/lib/tileDateField";
 import { PinMenu } from "@/components/PinMenu";
@@ -144,13 +144,13 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
 
   const applyDatePreset = useCallback((preset: DatePreset) => {
     let range: [string, string];
-    if (preset.kind === "ytd") range = defaultDateRangeYtd();
-    else if (preset.kind === "last_month") range = defaultDateRangeLastMonth();
-    else range = defaultDateRange(preset.days);
+    if (preset.kind === "ytd") range = defaultDateRangeYtd(metadata.data_as_of);
+    else if (preset.kind === "last_month") range = defaultDateRangeLastMonth(metadata.data_as_of);
+    else range = defaultDateRange(preset.days, metadata.data_as_of);
     setDateStart(range[0]);
     setDateEnd(range[1]);
     setActivePreset(preset.label);
-  }, []);
+  }, [metadata.data_as_of]);
 
   const buildFilters = useCallback(
     (extra: PremadeReport["filters"] = []) => {
@@ -208,7 +208,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   );
 
   useEffect(() => {
-    const { range, label } = applyDatePresetConfig(metadata.default_date_preset);
+    const { range, label } = applyDatePresetConfig(metadata.default_date_preset, metadata.data_as_of);
     const defaultMeasure = defaultMeasureSelection({
       measures,
       trusted_measures: metadata.trusted_measures,
@@ -230,6 +230,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     processId,
     scopeFilters,
     metadata.default_date_preset,
+    metadata.data_as_of,
     metadata.trusted_measures,
     measures,
   ]);
@@ -332,9 +333,11 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     syncCrossFilterUrl(null);
   };
 
+  const periodLabel = anchoredLabel(activePreset, metadata.data_as_of);
+
   const handleWidenPeriod = () => {
     const currentDays = estimatePeriodDays(dateStart, dateEnd);
-    const wider = widenDateRange(currentDays);
+    const wider = widenDateRange(currentDays, metadata.data_as_of);
     setDateStart(wider.range[0]);
     setDateEnd(wider.range[1]);
     setActivePreset(wider.label);
@@ -419,7 +422,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       ) : null}
       {tab !== "model" ? (
         <GlobalFilterBar
-          periodLabel={activePreset}
+          periodLabel={periodLabel}
           dateRange={[dateStart, dateEnd]}
           scopeLabel={scopeLabel && scopeValue ? `${scopeLabel}: ${scopeValue}` : null}
           drillFilter={drillFilter}
@@ -622,7 +625,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             booleanColumns={booleanColumns}
             measureField={measureField}
             measureAgg={measureAgg}
-            periodLabel={activePreset}
+            periodLabel={periodLabel}
             scopeLabel={scopeLabel ? `${scopeLabel}: ${scopeValue}` : undefined}
             dateRange={[dateStart, dateEnd]}
             drillFilter={drillFilter}
@@ -630,7 +633,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             onClearDrill={clearDrill}
             sortTimeSeries={false}
             emptyContext={{
-              periodLabel: activePreset,
+              periodLabel,
               dateRange: [dateStart, dateEnd],
               scopeLabel: scopeLabel ? `${scopeLabel}: ${scopeValue}` : undefined,
               drillFilter,

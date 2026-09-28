@@ -39,8 +39,8 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
     let cancelled = false;
     (async () => {
       try {
-        const [start, end] = defaultDateRange(days);
         const meta = await fetchSnapshotMetadata(tile.snapshot_id);
+        const [start, end] = defaultDateRange(days, meta.data_as_of);
         const report = tile.report_id
           ? meta.premade_reports.find((r) => r.id === tile.report_id)
           : null;

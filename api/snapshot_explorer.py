@@ -21,7 +21,7 @@ from api.warehouse_db import warehouse_configured
 from api.org_db import require_org_for_data
 from api.query_builder import QueryValidationError, build_query
 from api.raw_sql_validator import RawSqlValidationError, apply_row_cap, validate_raw_sql
-from api.reporting_dates import (DEFAULT_WINDOW_DAYS, DEFAULT_WINDOW_MIN_ROWS, reporting_today,
+from api.reporting_dates import (DEFAULT_WINDOW_DAYS, DEFAULT_WINDOW_MIN_ROWS, data_as_of, reporting_today,
                                  window_date_field, window_date_label)
 from api.executive_dashboard import (WAREHOUSE_NOT_BUILT_NOTE, build_executive_summary,
                                      is_missing_relation_error)
@@ -415,6 +415,8 @@ def snapshot_metadata(
         "organization_id": org_id,
         **snapshot,
         "suggested_default_filter": default_filter.model_dump() if default_filter else None,
+        # The browser computes its date presets; a frozen copy's presets end here.
+        "data_as_of": data_as_of(org_id),
     }
 
 

@@ -182,6 +182,8 @@ export type SnapshotMetadata = {
   large_domain?: boolean;
   skip_sample_rows?: boolean;
   default_date_preset?: DatePresetConfig;
+  // The org's data-as-of date when its copy is frozen; date presets end there.
+  data_as_of?: string | null;
   trusted_measures?: string[];
   process_guides?: Record<string, ProcessFieldGuide>;
 };

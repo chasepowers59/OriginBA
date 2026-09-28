@@ -8,7 +8,7 @@ home page read "Billed revenue, last 30 days: $268.20" -- true, and useless for 
 
 An organization may now declare `data_as_of` (ISO date) in portal_organizations.json. Every
 relative window for that org ends there instead of today, and the payloads say so, so the
-screen reads "30 days to 18 Jun 2026" rather than implying it is live. An org without the key
+screen reads "30 days to 18 Jun 2026" (the explorer: "Last 30 days, as of 18 Jun 2026") rather than implying it is live. An org without the key
 keeps ending at today: the default is the live behaviour, the anchor is an opt-in for copies.
 """
 from __future__ import annotations
@@ -104,3 +104,24 @@ class TestTheAssistantKnows:
         monkeypatch.setattr(assistant, "tool_list_canvases", lambda org_id, engine: [])
         head = assistant.system_prompt("live", "Live Town", "oracle")[0]["text"]
         assert ">= TRUNC(SYSDATE) - 90" in head and "runs through" not in head
+
+
+class TestTheExplorerIsTold:
+    """The explorer computes its date presets in the browser, so the anchor has to travel."""
+
+    def _metadata(self, monkeypatch, org_id):
+        from api import snapshot_explorer as se
+        monkeypatch.setattr(se, "require_org_for_data", lambda ctx: org_id)
+        monkeypatch.setattr(se, "_require_snapshot_access", lambda ctx, sid: {"label": "Bill Segment"})
+        monkeypatch.setattr(se, "_default_date_filter", lambda snapshot, org: None)
+
+        class Ctx:
+            def require_permission(self, _):
+                return None
+        return se.snapshot_metadata("rpt_bill_segment", ctx=Ctx())
+
+    def test_a_frozen_org_metadata_carries_its_anchor(self, orgs, monkeypatch):
+        assert self._metadata(monkeypatch, "frozen")["data_as_of"] == "2026-06-18"
+
+    def test_a_live_org_metadata_carries_none(self, orgs, monkeypatch):
+        assert self._metadata(monkeypatch, "live")["data_as_of"] is None

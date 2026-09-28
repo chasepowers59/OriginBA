@@ -415,21 +415,28 @@ export function fetchSnapshotSampleRows(
 // (every US utility here) the END rolled to TOMORROW for the last hours of each
 // evening, and "Prior month" ENDED on the 1st of the CURRENT month, including a day of
 // the very month it exists to exclude.
-export function defaultDateRange(days = 90): [string, string] {
-  const end = new Date();
-  const start = new Date();
+// `asOf` is the org's data-as-of date (a frozen copy such as Ellensburg TEST): when
+// present, every range ends there instead of today, which would read the empty tail.
+export function anchorDate(asOf?: string | null): Date {
+  const m = asOf?.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date();
+}
+
+export function defaultDateRange(days = 90, asOf?: string | null): [string, string] {
+  const end = anchorDate(asOf);
+  const start = new Date(end);
   start.setDate(end.getDate() - days);
   return [localIsoDate(start), localIsoDate(end)];
 }
 
-export function defaultDateRangeYtd(): [string, string] {
-  const end = new Date();
+export function defaultDateRangeYtd(asOf?: string | null): [string, string] {
+  const end = anchorDate(asOf);
   const start = new Date(end.getFullYear(), 0, 1);
   return [localIsoDate(start), localIsoDate(end)];
 }
 
-export function defaultDateRangeLastMonth(): [string, string] {
-  const end = new Date();
+export function defaultDateRangeLastMonth(asOf?: string | null): [string, string] {
+  const end = anchorDate(asOf);
   end.setDate(0); // day 0 of this month == the last day of the previous one
   const start = new Date(end.getFullYear(), end.getMonth(), 1);
   return [localIsoDate(start), localIsoDate(end)];

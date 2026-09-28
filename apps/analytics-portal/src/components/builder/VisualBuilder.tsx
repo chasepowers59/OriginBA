@@ -119,7 +119,7 @@ export function VisualBuilder({
         );
       } else if (shelf === "filters") {
         const op = field.role === "date" ? "between" : "eq";
-        const value = field.role === "date" ? defaultDateRange(90) : "";
+        const value = field.role === "date" ? defaultDateRange(90, meta?.data_as_of) : "";
         setFils((f) =>
           f.some((x) => x.field === field.id)
             ? f
