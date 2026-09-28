@@ -26,8 +26,9 @@ import { DashboardTile } from "./DashboardTile";
 import { PresentationToolbar } from "./PresentationToolbar";
 import { NotesDialog } from "./NotesDialog";
 import { CrossFilterBanner } from "@/components/CrossFilterBanner";
+import { ALL_SLOTS, MAX_TILES, visibleSlots } from "@/lib/dashboardSlots";
 
-const SLOTS = [0, 1, 2, 3];
+const SLOTS = ALL_SLOTS;
 
 function emptyTile(slot: number, snapshotId = "rpt_financial_txn"): DashboardTileDef {
   // Callers with the org's catalog loaded pass its first snapshot instead.
@@ -117,7 +118,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       const used = new Set(real.map((t) => t.slot));
       const free = SLOTS.find((sl) => !used.has(sl));
       if (free === undefined) {
-        setSaveError("This dashboard is full (4 tiles) — remove one before pinning.");
+        setSaveError(`This dashboard is full (${MAX_TILES} tiles) — remove one before pinning.`);
         return current;
       }
       return [...real, pinnedTile(free)];
@@ -210,7 +211,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
             className="mt-2 block w-full max-w-lg bg-transparent text-2xl font-bold text-heading outline-none border-b border-edge-subtle focus:border-edge"
           />
           <p className="mt-1 text-sm text-fg-muted">
-            Drag tiles between slots · up to 4 visuals · saved to server
+            Drag tiles between slots · up to {MAX_TILES} visuals · saved to server
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -276,7 +277,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <div id="dashboard-export-root" className="grid gap-4 md:grid-cols-2">
-          {SLOTS.map((slot) => (
+          {visibleSlots([...tileBySlot.keys()]).map((slot) => (
             <SlotCell key={slot} slot={slot} hasTile={Boolean(tileBySlot.get(slot))}>
               {tileBySlot.get(slot) ? (
                 <div className="relative h-full">

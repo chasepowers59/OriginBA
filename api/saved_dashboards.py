@@ -13,7 +13,8 @@ ROOT = Path(__file__).resolve().parent.parent
 STORE_PATH = ROOT / "data" / "analytics_portal" / "saved_dashboards.json"
 # Per organization; past it a save is refused out loud, never an old dashboard dropped.
 MAX_DASHBOARDS = 50
-MAX_TILES = 4
+# Must match apps/analytics-portal/src/lib/dashboardSlots.ts MAX_TILES.
+MAX_TILES = 8
 
 from api import portal_state_store as _pss  # noqa: E402
 _COLLECTION = "saved_dashboards"

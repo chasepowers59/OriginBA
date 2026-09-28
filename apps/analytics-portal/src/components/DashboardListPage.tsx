@@ -50,7 +50,7 @@ export function DashboardListPage() {
           </p>
           <h1 className="portal-heading mt-1 text-2xl font-bold">My dashboards</h1>
           <p className="mt-1 text-sm text-fg-muted">
-            Pinboards of up to four visuals, saved to the server and shared across your sessions.
+            Pinboards of up to eight visuals, saved to the server and shared across your sessions.
           </p>
         </div>
         <Link href="/dashboards/new" className="btn-primary text-sm">
