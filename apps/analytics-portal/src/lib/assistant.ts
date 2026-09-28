@@ -3,6 +3,7 @@
  * and the model-facing thread the API hands back for a follow-up.
  */
 import { formatCellValue, isIdentifierColumn } from "@/lib/format";
+import { measureIsCurrency } from "@/lib/businessLabels";
 import type { AssistantSpend, CanvasIntegrity, AssistantMessage, AssistantResponse, IntegrityOverview } from "@/lib/types";
 
 export type Turn =
@@ -47,7 +48,22 @@ export function summarise(r: AssistantResponse): string {
  */
 export function cell(v: unknown, column?: string): string {
   if (column && (isIdentifierColumn(column) || /\byear\b/i.test(column))) return v == null ? "—" : String(v);
+  if (column && measureIsCurrency(column)) {
+    const money = moneyCell(v);
+    if (money) return money;
+  }
   return formatCellValue(v, { columnId: column });
+}
+
+/** Cents always, so a column lines up; a unit price keeps the precision it was stored at. */
+function moneyCell(v: unknown): string | null {
+  const raw = typeof v === "number" ? String(v) : typeof v === "string" ? v.trim() : "";
+  const m = raw.match(/^-?\d+(?:\.(\d+))?$/);
+  if (!m) return null;
+  const decimals = Math.min(Math.max(m[1]?.length ?? 0, 2), 6);
+  return Number(raw).toLocaleString("en-US", {
+    style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: decimals,
+  });
 }
 
 /** One line per canvas a query read: what it was proven against and how old the build is. */

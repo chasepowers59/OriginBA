@@ -37,6 +37,23 @@ describe("the assistant conversation", () => {
     expect(cell(2026, "Year")).toBe("2026");
     expect(cell(3837610416, "Account ID")).toBe("3837610416");
   });
+
+  it("shows money as money, by the portal's own money-column rule", () => {
+    expect(cell("2682879.14", "Billed Amount")).toBe("$2,682,879.14");
+    expect(cell(815333.03, "Arrears Over 90 Days")).toBe("$815,333.03");
+    expect(cell(-1265, "Adjustment Amount")).toBe("-$1,265.00");
+    expect(cell(null, "Billed Amount")).toBe("—");
+  });
+
+  it("keeps a unit price's precision instead of rounding it to cents", () => {
+    expect(cell(0.04523, "Price Per Unit")).toBe("$0.04523");
+  });
+
+  it("leaves counts, ratios and text beside a money word alone", () => {
+    expect(cell(1764, "Bill Count")).toBe("1,764");
+    expect(cell(12.5, "% of Arrears Collected")).toBe("12.5");
+    expect(cell("Flat", "Amount Basis")).toBe("Flat");
+  });
 });
 
 describe("what a figure can be trusted to", () => {
