@@ -4,9 +4,9 @@ database, read here so a figure in the portal can say when it was last proven an
 Two proofs, both produced in originba_dbt and read as files (never recomputed here):
   qa_reports/parity_<client>_latest.json           run_source_parity.py -- canvas vs RAW CISADM
                                                     (counts, money totals, flags, labels)
-  qa_reports/snapshot_parity_<client>_latest.json  run_snapshot_parity.py -- canvas vs the legacy
+  qa_reports/snapshot_parity_<client>_latest.json  run_snapshot_parity.py -- canvas vs the
                                                     snapshot tables the client's CURRENT Jaspersoft
-                                                    views read (CMS_SA_SNAPSHOT, *_RPT_CURR), key by
+                                                    views read (CMS_SA_SNAPSHOT and the active set), key by
                                                     key, over rows unchanged since the canvas build
 Resolution: ORIGINBA_QA_REPORTS, else the sibling checkout (the dq_routes idiom). A deployment
 without the files answers available=False; nothing is inferred from the data itself.

@@ -211,8 +211,8 @@ TOOLS: list[dict[str, Any]] = [
                       "required": ["sql", "purpose"]}},
     {"name": "verification_status",
      "description": "When a canvas was last proven against the client's own database and against "
-                    "what: raw CISADM (counts, money totals) and the legacy snapshot tables today's "
-                    "reports read (CMS_SA_SNAPSHOT, *_RPT_CURR), plus how old the canvas build is. "
+                    "what: raw CISADM (counts, money totals) and the snapshot tables today's Jaspersoft "
+                    "reports read (CMS_SA_SNAPSHOT and the other active snapshots), plus how old the canvas build is. "
                     "Call it for every canvas whose figures you report, and tell the user.",
      "input_schema": {"type": "object",
                       "properties": {"canvas_id": {"type": "string", "description": "e.g. rpt_financial_txn"}},

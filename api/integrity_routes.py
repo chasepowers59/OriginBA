@@ -1,5 +1,5 @@
 """GET /portal/integrity -- when each canvas was last proven against the client's own database,
-and against what (raw CISADM; the legacy snapshot tables today's reports read)."""
+and against what (raw CISADM; the snapshot tables today's Jaspersoft reports read)."""
 from __future__ import annotations
 
 from typing import Any
