@@ -28,7 +28,7 @@ in this folder; the style reference is `shared/style-reference.md` in the repo.
 
 ## The Origin style, as draw.io style strings
 
-Since 2026-09-28 the palette is the Origin BA app's (Chase: no oranges, nothing from the DV deck): page `#0B1723`, text on page `#E6ECF2`, cards `#F2F5F8` with titles `#004B86` and body `#56636E`, chips `#FFFFFF`, one accent `#006FAC` with white text (gates, badges, accent pills), group outlines `#8ACAD4`. The table below is the shape grammar; read its colours through those roles (the converter's constants are PAGE, PAGE_FG, CARD, CARD_TITLE, CARD_BODY, CHIP, ACCENT, ON_ACCENT, GROUP_LINE).
+Since 2026-09-28 the palette is the Origin BA app's (Chase: no oranges, nothing from the DV deck): page `#16283C` (brand navy), text on page `#E6ECF2`, cards `#F2F5F8` with titles `#004B86` and body `#56636E`, chips `#FFFFFF`, one accent `#006FAC` with white text (gates, badges, accent pills), group outlines `#8ACAD4`. The table below is the shape grammar; read its colours through those roles (the converter's constants are PAGE, PAGE_FG, CARD, CARD_TITLE, CARD_BODY, CHIP, ACCENT, ON_ACCENT, GROUP_LINE).
 
 Same palette as the deck skill, measured from the reference deck: BLUE `#0B3D7A`, CREAM `#F5EFE9`,
 GREY `#4C5D69`, ORANGE `#FFA418`, WHITE `#FFFFFF`. One rule, every diagram: cream containers, white

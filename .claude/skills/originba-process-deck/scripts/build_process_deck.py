@@ -32,7 +32,7 @@ TEMPLATE = HERE.parent / "assets" / "origin_blue_template.pptx"
 # Chase's word: no oranges, no DV-deck colours. Page = the app's dark background; cards = its light muted surface;
 # one accent = the sapphire primary with white text on it; teal for secondary headers; group outlines = the dark
 # theme's heading accent.
-PAGE, PAGE_FG, PAGE_MUTED = "0B1723", "E6ECF2", "A4ACB4"
+PAGE, PAGE_FG, PAGE_MUTED = "16283C", "E6ECF2", "A4ACB4"
 CARD, CARD_TITLE, CARD_BODY, CHIP = "F2F5F8", "004B86", "56636E", "FFFFFF"
 ACCENT, ON_ACCENT, ACCENT_SOFT, TEAL, GROUP_LINE, BAD = "006FAC", "FFFFFF", "28A0EE", "1C7884", "8ACAD4", "8B1515"
 FOOTER = "@2026, Origin Utility, Inc / Proprietary & Confidential / Internal Use Only"

@@ -28,7 +28,7 @@ from textfit import fit   # noqa: E402  shared with the pptx builder: an overflo
 
 PX = 96.0
 # the Origin BA app palette (apps/analytics-portal/src/app/globals.css), the same roles as the pptx builder
-PAGE, PAGE_FG, CARD, CARD_TITLE, CARD_BODY, CHIP = "#0B1723", "#E6ECF2", "#F2F5F8", "#004B86", "#56636E", "#FFFFFF"
+PAGE, PAGE_FG, CARD, CARD_TITLE, CARD_BODY, CHIP = "#16283C", "#E6ECF2", "#F2F5F8", "#004B86", "#56636E", "#FFFFFF"
 ACCENT, ON_ACCENT, GROUP_LINE = "#006FAC", "#FFFFFF", "#8ACAD4"
 FONT = "Arial"
 
