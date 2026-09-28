@@ -244,6 +244,14 @@ def _sum(field_name: str, filters: list[dict[str, Any]] | None = None,
             "filters": filters or []}
 
 
+# Only frozen, non-cancelled bill segments are billed money (and billed usage); only
+# frozen financial transactions are money at all. See tests/test_nlq_money_filters.py.
+BILLED = [{"field": "Is Frozen", "op": "eq", "value": True},
+          {"field": "Is Cancelled", "op": "eq", "value": False}]
+FROZEN = [{"field": "Is Frozen", "op": "eq", "value": True}]
+# A cancelled tender is money that came back out.
+NOT_CANCELLED = [{"field": "Is Cancelled", "op": "eq", "value": False}]
+
 METRICS: list[NlqMetric] = [
     # ------------------------------------------------------------- Customers
     NlqMetric(
@@ -298,7 +306,7 @@ METRICS: list[NlqMetric] = [
         format="currency",
         param_keys=["days", "customer_class", "bill_cycle"],
         example="Total billed revenue last 90 days",
-        build=lambda _p: {"kind": "scalar", "query": _sum("Billed Amount")},
+        build=lambda _p: {"kind": "scalar", "query": _sum("Billed Amount", BILLED)},
     ),
     NlqMetric(
         id="billed_by_class",
@@ -309,7 +317,7 @@ METRICS: list[NlqMetric] = [
         format="currency",
         example="Billed revenue by customer class",
         build=lambda _p: {"kind": "trend",
-                          "query": _sum("Billed Amount", dims=["Customer Class"])},
+                          "query": _sum("Billed Amount", BILLED, dims=["Customer Class"])},
     ),
     NlqMetric(
         id="billed_by_cycle",
@@ -320,7 +328,7 @@ METRICS: list[NlqMetric] = [
         format="currency",
         example="Billed revenue by bill cycle",
         build=lambda _p: {"kind": "trend",
-                          "query": _sum("Billed Amount", dims=["Bill Cycle"])},
+                          "query": _sum("Billed Amount", BILLED, dims=["Bill Cycle"])},
     ),
     NlqMetric(
         id="bills_completed",
@@ -356,7 +364,7 @@ METRICS: list[NlqMetric] = [
         # Usage is only additive WITHIN a unit of measure -- always grouped, never
         # a bare total (the cisadm-sql never-sum-across-UOMs rule).
         build=lambda _p: {"kind": "trend",
-                          "query": _sum("Billed Quantity", dims=["Unit of Measure"])},
+                          "query": _sum("Billed Quantity", BILLED, dims=["Unit of Measure"])},
     ),
     # -------------------------------------------------------------- Payments
     NlqMetric(
@@ -371,7 +379,7 @@ METRICS: list[NlqMetric] = [
         example="Payments collected last 30 days",
         default_days=30,
         build=lambda _p: {"kind": "scalar", "date_field": "Payment Date",
-                          "query": _sum("Tender Amount")},
+                          "query": _sum("Tender Amount", NOT_CANCELLED)},
     ),
     NlqMetric(
         id="payments_by_type",
@@ -382,7 +390,7 @@ METRICS: list[NlqMetric] = [
         format="currency",
         example="Payments by tender type",
         build=lambda _p: {"kind": "trend", "date_field": "Payment Date",
-                          "query": _sum("Tender Amount", dims=["Tender Type"])},
+                          "query": _sum("Tender Amount", NOT_CANCELLED, dims=["Tender Type"])},
     ),
     NlqMetric(
         id="cancelled_tenders",
@@ -585,7 +593,7 @@ METRICS: list[NlqMetric] = [
         example="Adjustment dollars last 90 days",
         build=lambda _p: {"kind": "scalar", "date_field": "Accounting Date",
                           "query": _sum("Current Amount",
-                                        [{"field": "Is Adjustment", "op": "eq", "value": True}])},
+                                        [{"field": "Is Adjustment", "op": "eq", "value": True}, *FROZEN])},
     ),
     NlqMetric(
         id="gl_by_account",
