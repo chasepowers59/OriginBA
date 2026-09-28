@@ -136,6 +136,12 @@ def _edge(slide, nodes, a, b, via=None):
         vx, vy = via
         ah_ = nodes[a].get("h", 0.62 if nodes[a].get("kind") == "accent" else ah)
         start = (ax + aw / 2, ay + ah_ + 0.1) if vy > ay else (ax + aw / 2, ay - 0.1)
+        if vy < by or vy > by + bh:   # the waypoint is above or below B: come straight down (or up) into its middle
+            end = (bx + bw / 2, by - 0.1) if vy < by else (bx + bw / 2, by + bh + 0.1)
+            if vx and abs(vx - start[0]) > 0.5:   # leave A sideways and run the vertical in the channel at vx (around whatever sits above A)
+                side = (ax + aw + 0.1, ay + ah_ / 2) if vx > ax else (ax - 0.1, ay + ah_ / 2)
+                _arrow_segments(slide, [side, (vx, side[1]), (vx, vy), (end[0], vy), end]); return
+            _arrow_segments(slide, [start, (start[0], vy), (end[0], vy), end]); return
         end = (bx - 0.1, by + bh / 2) if vx < bx else (bx + bw + 0.1, by + bh / 2)
         _arrow_segments(slide, [start, (start[0], vy), (vx, vy), (vx, end[1]), end] if abs(vx - start[0]) > 0.05 else [start, (start[0], vy), end])
         return
@@ -166,6 +172,13 @@ def slide_process(prs, s, footer):
             _edge(sl, nodes, e["from"], e["to"], e.get("via"))
         else:
             _edge(sl, nodes, e[0], e[1])
+    if s.get("proofs"):   # a strip of white pills: what the stage proves before it counts as done
+        t = sl.shapes.add_textbox(Inches(0.81), Inches(9.35), Inches(3.0), Inches(0.5))
+        _text(t, [[("Proofs", 16, CREAM, True)]], margin=0.0)
+        px = 2.4
+        for p in s["proofs"]:
+            w = 0.25 + 0.115 * len(p)
+            _chip(sl, px, 9.3, w, 0.55, p, fill=WHITE, size=14); px += w + 0.25
     if s.get("legend"):
         t = sl.shapes.add_textbox(Inches(0.81), Inches(10.75), Inches(20), Inches(0.6))
         _text(t, [[(s["legend"], 14, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
@@ -273,7 +286,51 @@ def slide_statement(prs, s, footer):
     return sl
 
 
-BUILDERS = {"title": slide_title, "section": slide_section, "statement": slide_statement, "process": slide_process,
+def _chip(slide, x, y, w, h, text, fill=WHITE, color=BLUE, size=16, bold=False):
+    b = _box(slide, x, y, w, h, fill, radius=0.35)
+    _text(b, [[(text, size, color, bold)]], align=PP_ALIGN.CENTER, margin=0.08)
+    return b
+
+
+def slide_layers(prs, s, footer):
+    """Stacked bands, one per layer, each with a label and a row of chips; a thin arrow between bands."""
+    sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
+    bands = s["bands"]; gap = 0.45; h = min(1.75, (8.9 - gap * (len(bands) - 1)) / len(bands)); y = 2.0
+    for i, b in enumerate(bands):
+        fill = GREY if b.get("kind") == "manual" else CREAM
+        box = _box(sl, 0.81, y, 20.4, h, fill, radius=0.1)
+        lab = sl.shapes.add_textbox(Inches(1.1), Inches(y), Inches(4.4), Inches(h))
+        _text(lab, [[(b["label"], 24, CREAM if fill == GREY else BLUE, True)]] + ([[(b["sub"], 15, CREAM if fill == GREY else GREY, False)]] if b.get("sub") else []), margin=0.0)
+        items = b.get("items", []); cw = (15.2 - 0.3 * (len(items) - 1)) / max(len(items), 1); ch = min(1.05, h - 0.4)
+        for j, it in enumerate(items):
+            _chip(sl, 5.7 + j * (cw + 0.3), y + (h - ch) / 2, cw, ch, it, fill=WHITE if fill == CREAM else CREAM, size=15)
+        if i < len(bands) - 1:
+            _arrow_segments(sl, [(11.0, y + h + 0.06), (11.0, y + h + gap - 0.06)])
+        y += h + gap
+    return sl
+
+
+def slide_compare(prs, s, footer):
+    """Rows of before (grey) -> after (cream) pairs under two column headings."""
+    sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
+    left, right = s.get("headings", ["By hand", "Now"])
+    for x, txt in ((0.81, left), (11.6, right)):
+        t = sl.shapes.add_textbox(Inches(x), Inches(2.15), Inches(9.6), Inches(0.5))
+        _text(t, [[(txt, 22, CREAM, True)]], margin=0.0, anchor=MSO_ANCHOR.TOP)
+    rows = s["rows"]; gap = 0.3; h = min(1.45, (8.0 - gap * (len(rows) - 1)) / len(rows)); y = 2.8
+    for r in rows:
+        a = _box(sl, 0.81, y, 9.6, h, GREY, radius=0.1)
+        _text(a, [[(r["before"], 18, CREAM, False)]], margin=0.3)
+        b = _box(sl, 11.6, y, 9.6, h, CREAM, radius=0.1)
+        _text(b, [[(r["after"], 18, BLUE, True)]] + ([[(r["proof"], 15, GREY, False)]] if r.get("proof") else []), margin=0.3)
+        _arrow_segments(sl, [(10.55, y + h / 2), (11.5, y + h / 2)])
+        y += h + gap
+    return sl
+
+
+BUILDERS = {"layers": slide_layers, "compare": slide_compare, "title": slide_title, "section": slide_section, "statement": slide_statement, "process": slide_process,
             "roadmap": slide_roadmap, "cards": slide_cards, "bullets": slide_bullets, "table": slide_table}
 
 
