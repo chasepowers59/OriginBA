@@ -1,4 +1,4 @@
-# OriginBA automated deployment, end to end (2026-09-28)
+# Standard Offering Release 26: the automated deployment, end to end (2026-09-28)
 
 The written companion of `OriginBA_Automated_Deployment.pptx` (built from `deployment_deck/spec.json` by
 the `originba-process-deck` skill). For a developer joining the product: what moves data from a
@@ -143,3 +143,77 @@ every prod org with domains bound to the warehouse.
 `OriginBA-3/.claude/skills/jaspersoft-server-operations/SKILL.md`,
 `jaspersoft/docs/origin_dev_to_origin_test_promotion_plan.md`,
 `sql/performance/snapshots/deployment_steps/README.md`, `docs/TENANT_ONBOARDING.md`.
+
+
+## Release 26 focus: the snapshot deployment workflow
+
+Per client, as `scripts/local/prod_snapshot_rollout_25_4.sh <client>` runs it (each step is also a
+`run_snapshot_rollout_step.py --step <name> --clients <c>` call, logged under
+`deploy/snapshot_rollout_logs/<client>/`):
+
+1. Preflight access verification as the deploy user (`impact/16_snapshot_access_verification.sql`).
+2. Create the active-8 tables and the domain-support objects (`01`, `01b`).
+3. Deploy the full-history baseline procedures and the domain refresh procedures (`02`, `02a`, `02b`).
+4. Submit all 8 baselines as parallel, asynchronous scheduler jobs (`clients/run_all_baselines_parallel_now.sql`);
+   the VPN may drop once they are submitted.
+5. Wait for the ready gate (`03d_baseline_jobs_ready_gate.sql`, polled up to 8 hours; fails while any
+   one-time job is not SUCCEEDED).
+6. Post-load indexes (`clients/post_load_snapshot_indexes_direct.sql`).
+7. Rolling procedures and schedule: the rolling procedure deletes and rebuilds only the most recent
+   months (12 by default; 6 at CityCorp and Odessa; 3 rolling with 24 kept at College Station and
+   Newark, `clients/<client>/02_deploy_3mo_rolling_24mo_retain_procedures.sql`), then
+   `07_schedule_all_active_snapshots.sql` creates the DBMS_SCHEDULER jobs (twice daily, 10:00 and
+   16:00 UTC, 30-minute stagger; held on TEST until approved).
+8. Domain-support refresh and the gates: `04_validate_all_active_snapshots.sql` (row counts, 12-month
+   monthly parity, additive totals, duplicate-key safety), `04b_snapshot_install_validation_gate.sql`
+   (no empty tables, no duplicate grain keys), `04d_domain_support_install_validation_gate.sql` (valid
+   CMS views, bucket gaps, FT parity on CMS_SA_SNAPSHOT); `08` captures the latest runs, `13` the
+   high-level data-quality checks. Validate after the baseline, after the cutover, and after the first
+   scheduled run.
+
+The rule behind the background jobs: a refresh longer than the 15-minute client timeout once committed
+its DELETE without the INSERT (Newark usage), so long refreshes run through
+`RUN_JOB(use_current_session=>FALSE)`, never in the session.
+
+## How the Python was built with AI
+
+The prompt pattern that produced every tool: the manual step, its SQL, and the last failure. The AI
+writes the script with a dry run (every write printed before it is made), it runs on TEST, the real
+error is read, the failure becomes a gate that fails first, and the lesson is written into a skill
+with its number and date for the next session. Failures that became tooling: the 246 GB TEMP blowout
+(staged builds, TEMP capped before the first run); an import that "succeeded" and wrote nothing (the
+package must carry the target's own datasource); a view that executes but will not open (the
+topic-kind checker); the Ad Hoc 300,000-row cap (count on the whole, sum on a window); the same org
+id on two servers; nested domain item groups; reading a scheduled job's own error before blaming the
+database. The rule: a lesson is not learned until it is a test or a gate.
+
+## The REST promotion, step by step
+
+`jrs_promote.py` (any resource, any org, any server, as root) and `jrs_promote_test_to_prod.py`
+(the Standard Offering, test org to prod org): 1 export task (`POST /rest_v2/export`, poll, download);
+2 rebuild the package: the target's own `/DataSource/<ds>` export carried byte for byte, the scope
+files rewritten (org path, destination folder, datasource uri, alias and schema `datasourceId`,
+`rootTenantId`), permissions left to inherit; 3 verify (no source host or datasource name survives,
+every outside reference exists on the target, every field the views use resolves); 4 import
+(`POST /rest_v2/import?update=true`, polled; a warning is a failure); 5 re-export and compare
+(byte-equal inside the scope, importer stamps ignored, datasource connection unchanged); 6 execute
+(views through `queryExecutions`, reports as PDF, domains by metadata and probe); 7 sweep the folder
+and generate the sign-off. `jrs_inventory.py snapshot` before and `diff` after is the rollback record.
+Prod writes need `--i-mean-prod`.
+
+## Time saved
+
+Chase's measure: what took one to two weeks per client by hand (scripts run one by one in SQL
+Developer, packages edited and imported by hand, reports opened one by one, sign-offs assembled from
+screenshots) now takes hours: Standard Offering to prod in 11 minutes (Ellensburg) and 21 (Newark)
+with 0 errors; 21 College Station reports and 13 domains prod to test in a morning; a domain change
+on six orgs in an afternoon with seven proofs each; a sign-off document in minutes.
+
+## The constraint today, and what replaces it
+
+Manual QA: opening each Ad Hoc view in the designer (the API says ok, only the editor shows a broken
+topic), checking dashboards and themes by eye, nightlies that skip when the laptop is off the VPN,
+sign-offs assembled on request. Next: Playwright signs in, opens every view and dashboard,
+screenshots and asserts no error in page or console, and reads computed styles; AI agents hosted in
+the cloud on the VPN network run the nightlies, sweeps and parity checks continuously, so no run
+depends on a person being connected and the sign-off is always current.
