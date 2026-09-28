@@ -560,6 +560,24 @@ export async function downloadPdf(body: {
   URL.revokeObjectURL(url);
 }
 
+export type EmbedData = {
+  title: string;
+  columns: string[];
+  rows: Record<string, unknown>[];
+};
+
+/** An embedded view's rows: public, authorised by the signed link alone (api/embed.py). */
+export async function fetchEmbed(token: string): Promise<EmbedData> {
+  const res = await fetch(`${API_BASE}/embed/${encodeURIComponent(token)}/data`, { cache: "no-store" });
+  if (!res.ok) throw new Error(parseApiError(await res.text(), res.statusText));
+  return res.json();
+}
+
+/** A signed link that embeds one organization-visible saved view (owner or admin). */
+export function createEmbedToken(viewId: string, ttlMinutes = 24 * 60): Promise<{ token: string; expires_at: string }> {
+  return fetchJson("/portal/embed-tokens", { method: "POST", body: JSON.stringify({ view_id: viewId, ttl_minutes: ttlMinutes }) });
+}
+
 export function askAssistant(
   question: string,
   thread: AssistantMessage[],

@@ -108,6 +108,11 @@ cold-start after idle; use the Starter plan or Fly for always-on. The API comes 
   (team `chase-powers-projects`). It builds the repo's production branch.
 - Set env `NEXT_PUBLIC_API_URL` = the API container URL, then redeploy.
 - CORS: the API must allow the Vercel origin (`FRONTEND_ORIGINS` / CORS config).
+- Embedding (optional): `EMBED_ALLOWED_ORIGINS` = the https origins (space-separated) that
+  may frame `/embed/<token>` pages. An owner or admin makes the link from a saved view's
+  "Embed" action (`POST /portal/embed-tokens`, signed with `PORTAL_AUTH_SECRET`, at most a
+  day); it serves that one view with its creator's current access, and stops when the view
+  is deleted or the creator deactivated. Every other page refuses framing.
 
 ### 4. Warehouse data (what the `dev` org reads)
 - Quick start / fabricated demo: `deploy/load_test_data.sh` dumps the local fixture

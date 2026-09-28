@@ -13,6 +13,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { AuthUser } from "@/lib/auth";
 import { authDisabled, getAccessToken, hasPermission } from "@/lib/auth";
 import { fetchAuthStatus, fetchCurrentUser, logout as clearAuth } from "@/lib/authApi";
+import { isPublicPath } from "@/lib/publicPaths";
 
 type AuthContextValue = {
   loading: boolean;
@@ -24,8 +25,6 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-
-const PUBLIC_PATHS = ["/login", "/change-password"];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -79,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (loading || authDisabled() || !enabled) return;
-    const isPublic = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+    const isPublic = isPublicPath(pathname);
     if (!user && !isPublic) {
       router.replace(`/login?next=${encodeURIComponent(pathname)}`);
       return;

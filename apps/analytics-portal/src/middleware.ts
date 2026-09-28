@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { isPublicPath } from "@/lib/publicPaths";
 
 const AUTH_DISABLED = process.env.NEXT_PUBLIC_PORTAL_AUTH_DISABLED === "true";
 
@@ -19,6 +20,7 @@ const APP_ROUTES = new Set([
   "workstream",
   "login",
   "change-password",
+  "embed",
 ]);
 
 function isAuthed(request: NextRequest): boolean {
@@ -33,7 +35,7 @@ export function middleware(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl;
-  if (pathname.startsWith("/login") || pathname.startsWith("/change-password")) {
+  if (isPublicPath(pathname)) {
     return NextResponse.next();
   }
 

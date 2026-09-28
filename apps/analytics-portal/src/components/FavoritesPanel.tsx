@@ -6,6 +6,7 @@ import { loadSavedViews, removeViewRemote } from "@/lib/savedViews";
 import type { SavedFavorite } from "@/lib/favorites";
 import { ScheduleDialog } from "@/components/ScheduleDialog";
 import { NotesDialog } from "@/components/NotesDialog";
+import { EmbedDialog } from "@/components/EmbedDialog";
 import { useAuth } from "@/components/AuthProvider";
 import { ownershipLabel } from "@/lib/ownership";
 import { groupByFolder } from "@/lib/folders";
@@ -16,6 +17,7 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
   const [loading, setLoading] = useState(true);
   const [scheduling, setScheduling] = useState<SavedFavorite | null>(null);
   const [noting, setNoting] = useState<SavedFavorite | null>(null);
+  const [embedding, setEmbedding] = useState<SavedFavorite | null>(null);
   const { user } = useAuth();
 
   const refresh = () => {
@@ -92,6 +94,16 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
             >
               Schedule
             </button>
+            {fav.canEdit !== false && fav.visibility !== "private" ? (
+              <button
+                type="button"
+                onClick={() => setEmbedding(fav)}
+                className="shrink-0 text-xs text-fg-muted hover:text-primary"
+                title="Show this view in another site"
+              >
+                Embed
+              </button>
+            ) : null}
             {fav.canEdit !== false ? (
               <button
                 type="button"
@@ -132,6 +144,9 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
           viewTitle={scheduling.title}
           onClose={() => setScheduling(null)}
         />
+      ) : null}
+      {embedding ? (
+        <EmbedDialog viewId={embedding.id} title={embedding.title} onClose={() => setEmbedding(null)} />
       ) : null}
       {noting ? (
         <NotesDialog

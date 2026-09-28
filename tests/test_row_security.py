@@ -233,7 +233,10 @@ class ListingsAndMetricsTests(unittest.TestCase):
 
     def test_alerts_are_refused(self):
         from api import kpi_alert_routes as kr
-        with mock.patch.object(kr, "require_org_for_data", return_value="dev"):
+        # a store in a temp dir: were the refusal ever lost, the alert must not land in data/
+        with tempfile.TemporaryDirectory() as tmp, \
+             mock.patch.object(kr.ka, "ALERTS_PATH", Path(tmp) / "a.json"), \
+             mock.patch.object(kr, "require_org_for_data", return_value="dev"):
             with self.assertRaises(HTTPException) as err:
                 kr.create_alert(kr.AlertCreateRequest(kpi_id="billed_revenue", condition="above", threshold=1,
                                                       recipients=["a@utility.gov"]), ctx=_ctx(WATER))
@@ -276,7 +279,9 @@ class ScheduleWorkstreamTests(unittest.TestCase):
                                    organization_id="dev", organization_name="Dev", permissions=set(PERMS),
                                    workstreams=["billing"])
         view = {"id": "v", "title": "t", "snapshot_id": "rpt_sa_aged_balance", "visibility": "organization"}
-        with mock.patch.object(rr, "require_org_for_data", return_value="dev"), \
+        with tempfile.TemporaryDirectory() as tmp, \
+             mock.patch.object(rr.rs, "SCHEDULES_PATH", Path(tmp) / "s.json"), \
+             mock.patch.object(rr, "require_org_for_data", return_value="dev"), \
              mock.patch.object(rr.rs, "_find_view", return_value=view):
             with self.assertRaises(HTTPException) as err:
                 rr.create_schedule(rr.ScheduleCreateRequest(saved_view_id="v", recipients=["a@utility.gov"]), ctx=billing_only)

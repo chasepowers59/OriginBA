@@ -28,10 +28,10 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 | Alerts | Partly | Thresholds on the home KPIs, emailed on breach. Not on arbitrary views |
 | Input controls / prompts | Yes | Any saved filter can be asked for when the view opens (Report parameters: value lists narrowed by the answers above them, date ranges, saved defaults for schedules) |
 | Formatted, paginated reports (JRXML) | No | Letters and statements live in Jaspersoft and the separate letter-print app |
-| Security | Mostly | Roles, workstream grants, org isolation, **row-level security within an org** (per-user rules on a column, fail-closed; raw SQL, the assistant and data quality refused to restricted users; schedules keep the creator's rules), OIDC sign-in with IdP group mapping (role, client, access groups, row rules synced at every sign-in), audit log. **No** SAML |
+| Security | Mostly | Roles, workstream grants, org isolation, **row-level security within an org** (per-user rules on a column, fail-closed; raw SQL, the assistant and data quality refused to restricted users; schedules keep the creator's rules), OIDC sign-in with IdP group mapping (role, client, access groups, row rules synced at every sign-in; removal from every group deactivates the account), audit log. **No** SAML |
 | Ownership and sharing | Yes | Owner on every view, dashboard and schedule; private items; only owner or admin edits; folders for views and dashboards |
 | Per-client branding | Yes | An organization's `branding` block in `config/portal_organizations.json` (`brand`: name, tagline, `logo_src` a path the portal serves; `theme`: accent colours) is merged over the default for that organization; its logo sits beside Origin's in the header and heads its PDFs. Invalid colours and outside logos are ignored |
-| Embedding / API keys | No | OpenAPI docs are on; no embed SDK, API keys only for `/nlq` |
+| Embedding | Yes | A saved view's "Embed" action makes a signed link (at most a day) and an iframe snippet: that one view, with its creator's current access, framed only by the sites in `EMBED_ALLOWED_ORIGINS` (`api/embed.py`, `tests/test_embed.py`). No API keys for other systems yet |
 | Observability | Partly | Request id on every response, one log line per request, 500s name a reference. No error-reporting service or metrics yet |
 | Performance at scale | Partly | Row counts from statistics, 5-minute result cache. First visits over multi-million-row canvases are slow (25 s on Ellensburg); pre-aggregates are a scale-plan item |
 
@@ -50,7 +50,7 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
    `docs/LARGE_CLIENT_SCALE_PLAN.md`).
 7. **Formatted reports** (L): decide whether letters and statements move into the portal
    or stay in the letter-print app with the portal linking to them.
-8. **Embedding** (M), when a client asks.
+8. Done 2026-09-28: embedding.
 
 ## Known risks
 
