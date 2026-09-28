@@ -23,6 +23,9 @@ import pathlib
 import sys
 from xml.sax.saxutils import escape
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "originba-process-deck" / "scripts"))
+from textfit import fit   # noqa: E402  shared with the pptx builder: an overflow fails the build
+
 PX = 96.0
 BLUE, CREAM, GREY, ORANGE, WHITE = "#0B3D7A", "#F5EFE9", "#4C5D69", "#FFA418", "#FFFFFF"
 FONT = "Arial"
@@ -57,6 +60,13 @@ def node_cell(n: dict, parent: str, ox: float, oy: float) -> str:
     x, y, w, h = n["x"] - ox, n["y"] - oy, n["w"], n["h"]
     title, body = n.get("title", ""), n.get("body", "")
     tp, bp = n.get("title_pt", 14), n.get("body_pt", 11)
+    if kind in ("step", "data", "stop", "domain", "accent", "gate"):
+        pad = 0.24 if kind in ("step", "data") else (w * 0.32 if kind == "gate" else 0.16)
+        t0 = tp if kind in ("step", "data") else n.get("title_pt", 12 if kind == "accent" else (10 if kind == "stop" else 11))
+        paras = [(title, t0, True)] + ([(body, bp if kind == "step" else 9.5, False)] if body and kind in ("step", "data") else [])
+        sizes = fit(paras, w - pad, (h - 0.12) if kind in ("step", "data") else None, f"{n['id']} ({title[:30]})")
+        tp = sizes[0]; bp = sizes[1] if len(sizes) > 1 else bp
+        n = dict(n, title_pt=tp)
     if kind == "group":
         st = style(rounded=1, arcSize=6, fillColor="none", strokeColor=CREAM, strokeWidth=1.5, container=1, pointerEvents=0,
                    align="left", verticalAlign="top", spacingLeft=14, spacingTop=4, fontColor=CREAM)
@@ -82,7 +92,7 @@ def node_cell(n: dict, parent: str, ox: float, oy: float) -> str:
         centred = kind == "data" or n.get("center")
         st = style(rounded=1, arcSize=10, fillColor=CREAM, strokeColor="none", align="center" if centred else "left",
                    verticalAlign="middle", spacingLeft=0 if centred else 10, spacingRight=0 if centred else 8)
-        val = label(title, body, tp, bp)
+        val = label(title, body, tp, bp if kind == "step" else min(bp, 9.5))
     geom = f'<mxGeometry x="{px(x)}" y="{px(y)}" width="{px(w)}" height="{px(h)}" as="geometry"/>'
     if n.get("tooltip"):   # hover text in draw.io: the detail that stays off the picture
         tip = escape(n["tooltip"], {'"': "&quot;"})

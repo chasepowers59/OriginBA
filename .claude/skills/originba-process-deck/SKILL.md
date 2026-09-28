@@ -40,6 +40,8 @@ template, not an imitation. Slide types and their spec keys:
 | `bullets` | `title`, `columns[{heading, items[]}]` |
 | `table` (`font` sets the body size for dense tables) | `title`, `columns[]`, `rows[[]]`, `widths[]` (inches, sum 20.4) |
 
+Text fit (enforced): every diagram label is measured in Arial against its box by `scripts/textfit.py`, scaled down only as far as 7pt, and the build FAILS if it still does not fit. Identifiers with no spaces (table and view names) cannot wrap, so give them a box wide enough for the size you want: at 9pt bold, `D1_USAGE_SCALAR_DTL_RPT_CURR` needs 2.33 in plus 0.24 in of padding. When the fit report shows a label shrunk, widen the box; do not accept the smaller type.
+
 Colour system (one rule, every slide): every container is cream, every chip or pill is white, orange is the highlight (kicker, accent pill, current roadmap step, the `tag` on a manual node), blue is titles and grey is body text. Nothing else is filled.
 
 A process node: `{"id", "col", "row"}` on the grid or `{"x", "y", "w", "h"}` in inches, `title`,

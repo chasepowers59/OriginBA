@@ -89,6 +89,8 @@ spec.json  --spec_to_drawio.py-->  name.drawio  --drawio_pass.mjs route-->  name
 
 ## Rules
 
+- **A label can never leave its box.** `spec_to_drawio.py` runs the same `textfit.fit()` as the pptx builder: Arial measured against the box, scaled down to 7pt at most, and a `DoesNotFit` error stops the build. Table and view names cannot wrap, so size their boxes for 9pt (measure with `textfit.width_in`) rather than letting the fit shrink them.
+
 - **Declare structure; let the router route.** Never hand-compute waypoints in XML. If a route is wrong,
   fix the placement or the connection sides, then re-run the pass.
 - **Every edge cell has a child mxGeometry**, every label is XML-escaped, no XML comments, unique ids,

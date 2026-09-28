@@ -23,6 +23,9 @@ from pptx.enum.shapes import MSO_CONNECTOR, MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Emu, Inches, Pt
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from textfit import fit   # noqa: E402  every label is measured against its box; an overflow fails the build
+
 HERE = pathlib.Path(__file__).resolve().parent
 TEMPLATE = HERE.parent / "assets" / "origin_blue_template.pptx"
 # the reference deck's palette (theme + slide fills), measured 2026-09-28
@@ -524,6 +527,12 @@ def _edge_free(slide, nodes, e):
 def _draw_free_node(slide, n):
     x, y, w, h = n["x"], n["y"], n["w"], n["h"]; kind = n.get("kind", "step"); title, body = n.get("title", ""), n.get("body", "")
     tp, bp = n.get("title_pt", 14), n.get("body_pt", 11)
+    if kind in ("step", "data", "stop", "domain", "accent", "gate"):
+        pad = 0.24 if kind in ("step", "data") else (w * 0.32 if kind == "gate" else 0.16)   # a diamond's usable width is the middle third
+        paras = [(title, tp if kind in ("step", "data") else n.get("title_pt", 11 if kind != "accent" else 12), True)] + ([(body, bp if kind == "step" else 9.5, False)] if body and kind in ("step", "data") else [])
+        sizes = fit(paras, w - pad, (h - 0.12) if kind in ("step", "data") else None, f"{n['id']} ({title[:30]})")
+        tp = sizes[0]; bp = sizes[1] if len(sizes) > 1 else bp
+        n = dict(n, title_pt=tp)
     if kind == "group":   # an outline with a label, drawn first so nodes sit on it
         g = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
         g.fill.background(); g.line.color.rgb = rgb(CREAM); g.line.width = Pt(1.5); g.adjustments[0] = 0.04; g.shadow.inherit = False
@@ -535,7 +544,7 @@ def _draw_free_node(slide, n):
         _text(d, [[(title, n.get("title_pt", 11), BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.02)
     elif kind == "data":   # a table: the same flat cream box as a step, centred, so nothing on the page pretends to be 3-D
         c = _box(slide, x, y, w, h, CREAM, radius=0.1)
-        _text(c, [[(title, n.get("title_pt", 11), BLUE, True)]] + ([[(body, 9.5, GREY, False)]] if body else []), align=PP_ALIGN.CENTER, margin=0.05)
+        _text(c, [[(title, tp, BLUE, True)]] + ([[(body, bp, GREY, False)]] if body else []), align=PP_ALIGN.CENTER, margin=0.05)
     elif kind == "domain":
         _chip(slide, x, y, w, h, title, fill=WHITE, size=n.get("title_pt", 11), bold=True)
     elif kind == "accent":
