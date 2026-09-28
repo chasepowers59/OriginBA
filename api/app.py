@@ -29,6 +29,7 @@ from api.auth import auth_router, init_auth_database
 from api.auth.config import auth_disabled
 from api.auth.dependencies import get_auth_context
 from api.security import is_development, is_production
+from api.request_tracing import install as install_request_tracing
 from api.snapshot_explorer import router as snapshot_router
 from api.portal_routes import router as portal_router
 from api.data_source_routes import router as data_source_router
@@ -75,12 +76,17 @@ def _cors_origins() -> list[str]:
     return origins
 
 
+# Installed BEFORE CORS: the middleware added last runs outermost, so CORS wraps this one
+# and a 500 answered here still carries CORS headers (else the browser shows a CORS error).
+install_request_tracing(app)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    # the browser may read the id, so an error on screen can quote its reference
+    expose_headers=["X-Request-ID"],
 )
 
 app.include_router(auth_router)
