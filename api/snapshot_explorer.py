@@ -726,14 +726,17 @@ def snapshot_query(
     except QueryValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    try:
+    def run() -> tuple[list[str], list]:
         if warehouse:
             from api.warehouse_db import execute_query as run_warehouse
-            columns, rows = run_warehouse(sql, binds, organization_id=org_id,
-                                          max_rows=body.limit)
-        else:
-            columns, rows = execute_query(sql, binds, organization_id=org_id,
-                                          max_rows=body.limit)
+            return run_warehouse(sql, binds, organization_id=org_id, max_rows=body.limit)
+        return execute_query(sql, binds, organization_id=org_id, max_rows=body.limit)
+
+    try:
+        # The same statement for the same org is answered from memory for five minutes:
+        # a report over Ellensburg's rpt_billed_charge took ~25 s. Every run is audited below.
+        columns, rows = cached(("query", org_id, backend, sql, repr(sorted(binds.items())), body.limit),
+                               run, keep=lambda _: True)
     except Exception as exc:
         raise _query_failure(f"{'Warehouse' if warehouse else 'Demo'} query failed", exc) from exc
 

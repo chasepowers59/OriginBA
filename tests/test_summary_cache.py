@@ -21,6 +21,7 @@ from api import summary_cache  # noqa: E402
 
 class Ctx:
     workstreams = ["*"]
+    email, id = "t@x", "t"
 
     def require_permission(self, _):
         return None
@@ -62,3 +63,43 @@ class SummaryCacheTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class QueryCacheTests(unittest.TestCase):
+    """An explorer report on Ellensburg's rpt_billed_charge (589K rows in its six-month
+    window, 2.2 GB) took ~25 s, and a canvas changes only when the warehouse is rebuilt.
+    The same statement for the same org is answered from memory for five minutes; every
+    run is still audited."""
+
+    def setUp(self):
+        summary_cache.clear()
+
+    def tearDown(self):
+        summary_cache.clear()
+
+    def _query(self, run, start="2025-12-20"):
+        body = se.QueryRequest(dimensions=["Customer Class"], measures=[{"field": "Billed Amount", "agg": "sum"}],
+                               filters=[{"field": "Bill Date", "op": "between", "value": [start, "2026-06-18"]}],
+                               limit=500)
+        snap = {"table_name": "rpt_billed_charge", "fields": [], "trusted_measures": ["Billed Amount"]}
+        with mock.patch.object(se, "require_org_for_data", return_value="ellensburg"), \
+             mock.patch.object(se, "_require_snapshot_access", return_value=snap), \
+             mock.patch.object(se, "allowed_fields", return_value={"Customer Class", "Billed Amount", "Bill Date"}), \
+             mock.patch.object(se, "snapshot_backend", return_value=("oracle", "oracle_dbt", "ORIGINBA_REPORTING")), \
+             mock.patch.object(se, "execute_query", side_effect=run) as ex, \
+             mock.patch("api.access_audit.record_access_event") as audit:
+            out = se.snapshot_query("rpt_billed_charge", body, ctx=Ctx())
+        return out, ex.call_count, audit.call_count
+
+    def test_the_same_report_is_run_once(self):
+        run = lambda *a, **k: (["Customer Class", "m0"], [["Residential", 10.0]])  # noqa: E731
+        self._query(run)
+        out, runs, audits = self._query(run)
+        self.assertEqual(runs, 0)
+        self.assertEqual(audits, 1, "every run is still audited")
+        self.assertEqual(out["rows"], [{"Customer Class": "Residential", "m0": 10.0}])
+
+    def test_a_different_window_runs_again(self):
+        run = lambda *a, **k: (["Customer Class", "m0"], [])  # noqa: E731
+        self._query(run)
+        self.assertEqual(self._query(run, start="2026-01-01")[1], 1)
