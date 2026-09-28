@@ -37,11 +37,11 @@ No 3-D shapes (no cylinders, no shadows, no gradients), no grey or tan fills.
 | --- | --- |
 | Page | `<mxGraphModel adaptiveColors="none" grid="0" page="0" background="#0B3D7A">` |
 | Step / table box | `rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#F5EFE9;strokeColor=none;align=left;spacingLeft=10;fontFamily=Arial;` label `<b><font color="#0B3D7A" style="font-size:19px">Title</font></b><br><font color="#4C5D69" style="font-size:15px">body</font>` |
-| Gate (a check that stops the run) | `rhombus;whiteSpace=wrap;html=1;fillColor=#FFA418;strokeColor=none;fontColor=#0B3D7A;fontStyle=1;fontFamily=Arial;` |
+| Gate (a check that stops the run) | `rhombus;whiteSpace=wrap;html=1;fillColor=#FFA418;strokeColor=none;fontColor=#0B3D7A;fontStyle=1;fontFamily=Arial;spacingLeft=40;spacingRight=40;` (the side spacing, about 16% of the width, keeps the wrapped label inside the diamond; without it the first and last words land on the blue page in blue text and vanish) |
 | Domain chip | `rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;fontColor=#0B3D7A;fontStyle=1;` |
 | Accent pill | same as the chip with `fillColor=#FFA418` |
 | Group (outline with a label) | `rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#F5EFE9;strokeWidth=1.5;container=1;pointerEvents=0;align=left;verticalAlign=top;spacingLeft=14;fontColor=#F5EFE9;` children carry `parent="<group id>"` and coordinates relative to the group |
-| Arrow | `edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#F5EFE9;strokeWidth=2;endArrow=block;endFill=1;fontColor=#F5EFE9;labelBackgroundColor=none;` |
+| Arrow | `edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#F5EFE9;strokeWidth=2;endArrow=block;endFill=1;fontColor=#F5EFE9;whiteSpace=nowrap;labelBackgroundColor=#0B3D7A;` (an edge label with `whiteSpace=wrap` stacks one word per line; the page-blue background lets the label sit on the line) |
 | Note text | `text;html=1;fillColor=none;strokeColor=none;align=left;verticalAlign=top;fontColor=#F5EFE9;` |
 
 Fonts: Arial (renders identically in the browser viewer, Desktop export and PowerPoint). Sizes are
@@ -77,7 +77,7 @@ spec.json  --spec_to_drawio.py-->  name.drawio  --drawio_pass.mjs route-->  name
    Look for: an arrow crossing a box, a label wrapping mid-word (widen the box), a group label colliding
    with its first child, an edge that went the long way round (give it `via` waypoints or `from_side` /
    `to_side` in the spec).
-4. **Export.** With draw.io Desktop installed (`brew install --cask drawio`):
+4. **Export.** draw.io Desktop 31.5.3 is installed on this Mac (2026-09-28, `brew install --cask drawio`):
    ```bash
    /Applications/draw.io.app/Contents/MacOS/draw.io -x -f png -e -b 10 -s 2 -o name.drawio.png name.drawio
    /Applications/draw.io.app/Contents/MacOS/draw.io -x -f svg -e -o name.drawio.svg name.drawio
