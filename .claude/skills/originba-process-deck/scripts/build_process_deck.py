@@ -181,11 +181,11 @@ def slide_roadmap(prs, s, footer):
     for i, st in enumerate(steps):
         x = 0.81 + i * pitch; current = st.get("current", False)
         b = _box(sl, x, 6.67, w, 3.7, ORANGE if current else CREAM)
-        paras = [[(st["title"], 22, BLUE, True)]]
+        paras = [[(st["title"], 24, BLUE, True)]]
         if st.get("owner"):
-            paras.append([(st["owner"], 16, BLUE if current else GREY, False)])
+            paras.append([(st["owner"], 18, BLUE if current else GREY, False)])
         if st.get("body"):
-            paras.append([(st["body"], 14, BLUE if current else GREY, False)])
+            paras.append([(st["body"], 18, BLUE if current else GREY, False)])
         _text(b, paras, anchor=MSO_ANCHOR.TOP)
         c = sl.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x + w / 2 - 0.45), Inches(5.32), Inches(0.9), Inches(0.9))
         c.fill.solid(); c.fill.fore_color.rgb = rgb(CREAM if current else ORANGE); c.line.fill.background(); c.shadow.inherit = False
