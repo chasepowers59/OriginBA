@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { AssistantDrawer } from "./AssistantDrawer";
 import { BrandMark } from "@/components/BrandMark";
 import { useAuth } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -193,6 +194,7 @@ export function AppShell({
       <div className="mx-auto max-w-[1700px] px-6 py-8 2xl:px-10">
         <main className="min-w-0 animate-fade-in">{children}</main>
       </div>
+      {user ? <AssistantDrawer /> : null}
 
       <footer className="portal-footer no-print mt-8 py-6 text-center text-xs">
         {brand.name} · {brand.footer}

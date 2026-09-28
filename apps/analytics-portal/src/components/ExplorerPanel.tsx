@@ -28,6 +28,7 @@ import {
 } from "@/lib/datePresets";
 import { applyProcessGuide } from "@/lib/processGuide";
 import { resolveDateField } from "@/lib/tileDateField";
+import { setPageContext } from "@/lib/assistantContext";
 import { PinMenu } from "@/components/PinMenu";
 import { useAuth } from "@/components/AuthProvider";
 import { FavoritesPanel } from "./FavoritesPanel";
@@ -371,6 +372,20 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const periodLabel = allDates
     ? fellBackFrom ? `${ALL_DATES} (nothing in ${anchoredLabel(fellBackFrom, metadata.data_as_of).toLowerCase()})` : ALL_DATES
     : anchoredLabel(activePreset, metadata.data_as_of);
+
+  // Tell the assistant which canvas and window the reader is looking at.
+  useEffect(() => {
+    setPageContext({
+      canvas_id: metadata.id,
+      label: metadata.label,
+      period: periodLabel,
+      filters: [
+        ...(scopeField && scopeValue ? [`${scopeField} = ${scopeValue}`] : []),
+        ...(drillFilter ? [`${drillFilter.field} = ${drillFilter.value}`] : []),
+      ],
+    });
+  }, [metadata.id, metadata.label, periodLabel, scopeField, scopeValue, drillFilter]);
+  useEffect(() => () => setPageContext(null), []);
 
   const handleWidenPeriod = () => {
     const currentDays = estimatePeriodDays(dateStart, dateEnd);

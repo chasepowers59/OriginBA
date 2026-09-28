@@ -486,9 +486,13 @@ export function fetchAssistantStatus(): Promise<AssistantStatus> {
   return fetchJson<AssistantStatus>("/portal/assistant/status");
 }
 
-export function askAssistant(question: string, thread: AssistantMessage[]): Promise<AssistantResponse> {
+export function askAssistant(
+  question: string,
+  thread: AssistantMessage[],
+  context?: { canvas_id: string; period?: string; filters?: string[] } | null,
+): Promise<AssistantResponse> {
   return fetchJson<AssistantResponse>("/portal/assistant", {
     method: "POST",
-    body: JSON.stringify({ question, thread }),
+    body: JSON.stringify({ question, thread, context: context ?? null }),
   });
 }

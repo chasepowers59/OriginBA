@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { askAssistant, fetchAssistantSpend, fetchAssistantStatus, fetchIntegrity } from "@/lib/api";
 import { STARTER_QUESTIONS, WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, spendLabel, summarise, threadFor, type Turn } from "@/lib/assistant";
 import { useAuth } from "@/components/AuthProvider";
+import { contextLabel, getPageContext, loadTurns, saveTurns, subscribePageContext } from "@/lib/assistantContext";
 import { DatabaseResultChart } from "@/components/DatabaseResultChart";
 import type { AssistantQuery, AssistantResponse, AssistantSpend, AssistantStatus, IntegrityOverview } from "@/lib/types";
 import { parseAnswer, parseInline, type Inline } from "@/lib/answerMarkdown";
@@ -23,6 +24,19 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const { can } = useAuth();
+  // The page the reader is on (a canvas), sent with the question unless they turn it off.
+  const page = useSyncExternalStore(subscribePageContext, getPageContext, () => null);
+  const [usePage, setUsePage] = useState(true);
+  // The conversation follows the reader between pages: loaded after mount (the server
+  // render has no session storage), saved on every change.
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    setTurns(loadTurns());
+    setLoaded(true);
+  }, []);
+  useEffect(() => {
+    if (loaded) saveTurns(turns);
+  }, [turns, loaded]);
 
   useEffect(() => {
     fetchAssistantStatus().then(setStatus).catch(() => setStatus({ configured: false, model: null }));
@@ -39,7 +53,10 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
     setBusy(true);
     setQuestion("");
     try {
-      const response = await askAssistant(q, threadFor(turns));
+      const context = page && usePage
+        ? { canvas_id: page.canvas_id, period: page.period, filters: page.filters }
+        : null;
+      const response = await askAssistant(q, threadFor(turns), context);
       setTurns((t) => appendTurns(t, q, response));
       fetchAssistantSpend().then(setSpend).catch(() => undefined);
     } catch (err) {
@@ -116,6 +133,13 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
           {busy ? <p className="text-xs text-fg-muted">Working — reading the canvases and running the query…</p> : null}
           <div ref={endRef} />
         </div>
+      ) : null}
+
+      {page ? (
+        <label className="mb-3 flex w-fit items-center gap-2 rounded-full bg-chip px-3 py-1 text-xs text-fg-muted">
+          <input type="checkbox" checked={usePage} onChange={(e) => setUsePage(e.target.checked)} />
+          About this page: <span className="text-heading">{contextLabel(page)}</span>
+        </label>
       ) : null}
 
       {!turns.length && configured ? (

@@ -361,7 +361,7 @@ class Routes(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.json()["answer"], "42")
         self.assertEqual(A.call_args.kwargs["org_id"], "dev")
-        A.return_value.ask.assert_called_once_with("how many?", [])
+        A.return_value.ask.assert_called_once_with("how many?", [], None)
 
     def test_a_model_api_failure_says_what_the_api_said(self):
         # the first real call failed with "credit balance is too low"; a bare 502 with the
@@ -410,7 +410,7 @@ class Routes(unittest.TestCase):
         with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-only", "ASSISTANT_QUESTIONS_PER_MINUTE": "1",
                                           "ASSISTANT_DAILY_TOKEN_BUDGET": ""}), \
              mock.patch("api.assistant_routes.Assistant") as A:
-            A.return_value.ask.side_effect = lambda q, t: (self._spend("dev", "dev@origin.local", input_tokens=1)
+            A.return_value.ask.side_effect = lambda q, t, c: (self._spend("dev", "dev@origin.local", input_tokens=1)
                                                            or {"answer": "42", "steps": [], "queries": [], "thread": []})
             first = self.client.post("/portal/assistant", json={"question": "one"})
             second = self.client.post("/portal/assistant", json={"question": "two"})
@@ -592,3 +592,38 @@ class RespectsReportAccess(unittest.TestCase):
         Assistant(org_id="dev", org_name="Dev", actor_email="t@x", actor_id="t",
                   client_factory=lambda: client).ask("hi")
         self.assertIn("- rpt_bill_segment", client.requests[0]["system"][0]["text"])
+
+
+class KnowsWhereThePersonIs(unittest.TestCase):
+    """Asked from a canvas page, the question carries which canvas and window the person is
+    looking at, so "why is this so high?" needs no list_canvases/describe_canvas detour. It
+    rides in the user turn, not the system prompt, which is the cached prefix."""
+
+    setUp, tearDown, _assistant = TheLoop.setUp, TheLoop.tearDown, TheLoop._assistant
+
+    def _first_user_text(self, client):
+        m = client.requests[0]["messages"][-1]["content"]
+        return m if isinstance(m, str) else "".join(b.get("text", "") for b in m)
+
+    def test_the_page_context_reaches_the_model_with_the_question(self):
+        client = FakeClient([_resp([_text("ok")], "end_turn")])
+        self._assistant(client).ask("why is this so high?", context={
+            "canvas_id": "rpt_bill_segment", "period": "Last 180 days, as of 18 Jun 2026",
+            "filters": ["Is Frozen = true"]})
+        text = self._first_user_text(client)
+        self.assertIn("rpt_bill_segment", text)
+        self.assertIn("Last 180 days, as of 18 Jun 2026", text)
+        self.assertIn("Is Frozen = true", text)
+        self.assertTrue(text.rstrip().endswith("why is this so high?"))
+
+    def test_an_unknown_canvas_is_dropped_not_trusted(self):
+        client = FakeClient([_resp([_text("ok")], "end_turn")])
+        self._assistant(client).ask("hi", context={"canvas_id": "cisadm.ci_acct"})
+        self.assertNotIn("cisadm", self._first_user_text(client).lower())
+
+    def test_the_system_prompt_is_the_same_with_or_without_context(self):
+        a = FakeClient([_resp([_text("ok")], "end_turn")])
+        b = FakeClient([_resp([_text("ok")], "end_turn")])
+        self._assistant(a).ask("q")
+        self._assistant(b).ask("q", context={"canvas_id": "rpt_payment"})
+        self.assertEqual(a.requests[0]["system"], b.requests[0]["system"])

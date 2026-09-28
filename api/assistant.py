@@ -477,16 +477,19 @@ class Assistant:
                                 actor_id=self.actor_id, purpose=args.get("purpose", ""))
         return {"error": f"unknown tool {name}"}
 
-    def ask(self, question: str, thread: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    def ask(self, question: str, thread: list[dict[str, Any]] | None = None,
+            context: dict[str, Any] | None = None) -> dict[str, Any]:
         token = _CAN_READ.set(self.can_read)
         try:
-            return self._ask(question, thread)
+            return self._ask(question, thread, context)
         finally:
             _CAN_READ.reset(token)
 
-    def _ask(self, question: str, thread: list[dict[str, Any]] | None) -> dict[str, Any]:
+    def _ask(self, question: str, thread: list[dict[str, Any]] | None,
+             context: dict[str, Any] | None) -> dict[str, Any]:
         client = self._client_factory()
-        messages = _from_a_question(list(thread or [])[-MAX_THREAD:]) + [{"role": "user", "content": question}]
+        asked = _with_page_context(self.org_id, question, context)
+        messages = _from_a_question(list(thread or [])[-MAX_THREAD:]) + [{"role": "user", "content": asked}]
         system = system_prompt(self.org_id, self.org_name, self.engine)
         steps: list[dict[str, Any]] = []
         queries: list[dict[str, Any]] = []
@@ -571,6 +574,24 @@ def _block_dict(b: Any) -> dict[str, Any]:
 def _brief(inp: Any) -> str:
     s = json.dumps(inp, default=str)
     return s if len(s) <= 200 else s[:197] + "..."
+
+
+def _with_page_context(org_id: str, question: str, context: dict[str, Any] | None) -> str:
+    """The page the person asked from, said before their question. Only a canvas they can
+    read is named; the period and filters are the page's own labels, clipped short. It
+    rides in the user turn so the cached system prompt stays identical for everyone."""
+    canvas_id = str((context or {}).get("canvas_id") or "").strip().lower()
+    entry = _canvases(org_id).get(canvas_id) if canvas_id else None
+    if not entry:
+        return question
+    period = str(context.get("period") or "")[:80]
+    filters = [str(f)[:80] for f in (context.get("filters") or [])][:6]
+    said = [f"(Asked from the {entry.get('label') or canvas_id} page, canvas {canvas_id}"]
+    if period:
+        said.append(f"; period shown: {period}")
+    if filters:
+        said.append(f"; filters shown: {', '.join(filters)}")
+    return "".join(said) + ".)\n" + question
 
 
 def _is_question(m: dict[str, Any]) -> bool:

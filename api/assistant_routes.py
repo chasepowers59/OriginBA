@@ -20,6 +20,8 @@ router = APIRouter(prefix="/portal/assistant", tags=["assistant"])
 class AskRequest(BaseModel):
     question: str = Field(min_length=1, max_length=4000)
     thread: list[dict[str, Any]] = Field(default_factory=list)
+    # The page the question was asked from: {canvas_id, period, filters}. Optional.
+    context: dict[str, Any] | None = None
 
 
 @router.get("/status")
@@ -48,7 +50,7 @@ def ask(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> dict[
                           actor_email=ctx.email, actor_id=ctx.id,
                           can_read=None if unrestricted else (lambda cid: can_access_snapshot(ctx, cid)))
     try:
-        return assistant.ask(body.question, body.thread)
+        return assistant.ask(body.question, body.thread, body.context)
     except Exception as exc:  # noqa: BLE001 -- the model API is an external dependency
         if "anthropic" in type(exc).__module__:
             # the API's own message is the actionable part (billing, an invalid model id,
