@@ -532,6 +532,32 @@ export async function askAssistantStream(
   throw new Error("The answer stream ended early. Try again.");
 }
 
+/**
+ * The rows on screen as the server-built PDF (the one schedules send): Origin mark, table,
+ * page numbers, and a bar chart when the result is one label against one number.
+ */
+export async function downloadPdf(body: {
+  title: string;
+  note?: string;
+  columns: string[];
+  labels?: Record<string, string>;
+  rows: Record<string, unknown>[];
+}): Promise<void> {
+  const res = await fetch(`${API_BASE}/portal/export/pdf`, {
+    method: "POST",
+    headers: await resolveRequestHeaders(),
+    body: JSON.stringify({ ...body, rows: body.rows.slice(0, 5000) }),
+  });
+  if (!res.ok) throw new Error(parseApiError(await res.text(), res.statusText));
+  const name = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? "report.pdf";
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export function askAssistant(
   question: string,
   thread: AssistantMessage[],

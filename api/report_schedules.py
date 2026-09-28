@@ -259,8 +259,38 @@ _LOGO = Path(__file__).resolve().parent.parent / "apps" / "analytics-portal" / "
 _BRAND_BLUE = "#006FAC"
 
 
+def _bar_chart(columns: list[str], labels: dict[str, str], rows: list[dict[str, Any]], width: float):
+    """A horizontal bar chart of the first label column against the first numeric one, top 20,
+    or None when the result is not one label against one number."""
+    from reportlab.graphics.charts.barcharts import HorizontalBarChart
+    from reportlab.graphics.shapes import Drawing
+    from reportlab.lib import colors
+
+    number = next((c for c in columns if rows and all(isinstance(r.get(c), (int, float)) and not isinstance(r.get(c), bool)
+                                                       for r in rows if r.get(c) is not None)
+                   and any(r.get(c) is not None for r in rows)), None)
+    label = next((c for c in columns if c != number and any(isinstance(r.get(c), str) for r in rows)), None)
+    if not number or not label:
+        return None
+    top = [r for r in rows if r.get(number) is not None][:20]
+    height = 30 + 16 * len(top)
+    d = Drawing(width, height)
+    chart = HorizontalBarChart()
+    chart.x, chart.y, chart.width, chart.height = 150, 10, width - 170, height - 20
+    chart.data = [[float(r[number]) for r in reversed(top)]]
+    chart.categoryAxis.categoryNames = [str(r.get(label))[:28] for r in reversed(top)]
+    for axis_labels in (chart.categoryAxis.labels, chart.valueAxis.labels):
+        axis_labels.fontName, axis_labels.fontSize = "Helvetica", 7
+    chart.valueAxis.labelTextFormat = lambda v: f"{v:,.0f}"
+    chart.valueAxis.valueMin = min(0, min(chart.data[0]))
+    chart.bars[0].fillColor = colors.HexColor(_BRAND_BLUE)
+    chart.bars[0].strokeColor = None
+    d.add(chart)
+    return d
+
+
 def rows_to_pdf(title: str, window_note: str, columns: list[str], labels: dict[str, str],
-                rows: list[dict[str, Any]], now: datetime) -> bytes:
+                rows: list[dict[str, Any]], now: datetime, chart: bool = False) -> bytes:
     """A formatted report a schedule can send: the Origin mark and title on every page, the
     window it applied, the table with its header repeated on each page, page numbers."""
     from reportlab.lib import colors
@@ -315,8 +345,11 @@ def rows_to_pdf(title: str, window_note: str, columns: list[str], labels: dict[s
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=size, topMargin=1.0 * inch, bottomMargin=0.8 * inch,
                             leftMargin=0.6 * inch, rightMargin=0.6 * inch, title=title)
-    story = [Paragraph(title, styles["Heading2"]), Paragraph(window_note or "", body), Spacer(1, 0.15 * inch),
-             table if rows else Paragraph("No rows in this window.", body)]
+    story = [Paragraph(title, styles["Heading2"]), Paragraph(window_note or "", body), Spacer(1, 0.15 * inch)]
+    drawing = _bar_chart(columns, labels, rows, size[0] - 1.2 * inch) if chart and rows else None
+    if drawing is not None:
+        story += [drawing, Spacer(1, 0.2 * inch)]
+    story.append(table if rows else Paragraph("No rows in this window.", body))
     doc.build(story, onFirstPage=chrome, onLaterPages=chrome)
     return buf.getvalue()
 
@@ -336,7 +369,7 @@ def _message(schedule: dict[str, Any], columns: list[str], labels: dict[str, str
     safe = re.sub(r"[^A-Za-z0-9_-]+", "_", str(title))[:60] or "report"
     stem = f"{safe}_{now.date().isoformat()}"
     if fmt == "pdf":
-        msg.add_attachment(rows_to_pdf(str(title), schedule.get("window_note") or "", columns, labels, rows, now),
+        msg.add_attachment(rows_to_pdf(str(title), schedule.get("window_note") or "", columns, labels, rows, now, chart=True),
                            maintype="application", subtype="pdf", filename=f"{stem}.pdf")
     elif excel:
         msg.add_attachment(rows_to_xlsx(columns, labels, rows), maintype="application",

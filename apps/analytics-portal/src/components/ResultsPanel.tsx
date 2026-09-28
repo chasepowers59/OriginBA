@@ -21,6 +21,7 @@ import { downloadWorkbook } from "@/lib/exportXlsx";
 import { printCouncilPack } from "@/lib/councilPack";
 import { useBrand } from "@/components/PortalThemeProvider";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
+import { downloadPdf } from "@/lib/api";
 
 type SortDir = "asc" | "desc";
 
@@ -81,6 +82,7 @@ export function ResultsPanel({
   onShowAllDates,
 }: ResultsPanelProps) {
   const brand = useBrand();
+  const [pdfState, setPdfState] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const kpi = kpiLabelsForMeasure(measureField, measureAgg);
@@ -191,6 +193,22 @@ export function ResultsPanel({
     );
   };
 
+  const handlePdf = async () => {
+    setPdfState("Preparing…");
+    try {
+      await downloadPdf({
+        title: reportTitle ?? snapshotLabel ?? snapshotId,
+        note: [periodLabel, dateRange ? `${dateRange[0]} to ${dateRange[1]}` : null].filter(Boolean).join(" · "),
+        columns: result.columns,
+        labels: Object.fromEntries(result.columns.map((c) => [c, columnLabels[c] ?? prettifyFieldName(c)])),
+        rows: result.rows,
+      });
+      setPdfState(null);
+    } catch (err) {
+      setPdfState(err instanceof Error ? err.message : "The PDF could not be made.");
+    }
+  };
+
   const formatMeasure = (value: unknown) =>
     isCurrency ? formatCurrency(value) : formatNumber(value);
 
@@ -238,6 +256,10 @@ export function ResultsPanel({
           </button>
           <button type="button" onClick={handleExport} className="btn-ghost">
             Export to Excel
+          </button>
+          <button type="button" onClick={() => void handlePdf()} className="btn-ghost" disabled={pdfState === "Preparing…"}
+                  title={pdfState && pdfState !== "Preparing…" ? pdfState : "A formatted PDF: table, chart and page numbers"}>
+            {pdfState === "Preparing…" ? "Preparing PDF…" : "Download PDF"}
           </button>
           <button
             type="button"
