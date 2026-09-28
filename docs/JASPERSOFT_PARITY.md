@@ -28,7 +28,7 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 | Alerts | Partly | Thresholds on the home KPIs, emailed on breach. Not on arbitrary views |
 | Input controls / prompts | Yes | Any saved filter can be asked for when the view opens (Report parameters: value lists, date ranges, saved defaults for schedules). Not yet: cascading lists |
 | Formatted, paginated reports (JRXML) | No | Letters and statements live in Jaspersoft and the separate letter-print app |
-| Security | Mostly | Roles, workstream grants, org isolation, **row-level security within an org** (per-user rules on a column, fail-closed; raw SQL, the assistant and data quality refused to restricted users; schedules keep the creator's rules), OIDC sign-in, audit log. **No** SAML, no IdP group-to-role mapping |
+| Security | Mostly | Roles, workstream grants, org isolation, **row-level security within an org** (per-user rules on a column, fail-closed; raw SQL, the assistant and data quality refused to restricted users; schedules keep the creator's rules), OIDC sign-in with IdP group mapping (role, client, access groups, row rules synced at every sign-in), audit log. **No** SAML |
 | Ownership and sharing | Yes | Owner on every view, dashboard and schedule; private items; only owner or admin edits. Not yet: folders |
 | Per-client branding | No | One brand for all orgs; the org name is swapped |
 | Embedding / API keys | No | OpenAPI docs are on; no embed SDK, API keys only for `/nlq` |
@@ -45,7 +45,7 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 3. **Server-side PDF for on-screen exports** (S): reuse the schedule PDF renderer for the
    explorer and dashboard PDF buttons, so a PDF looks the same wherever it comes from.
 4. **Folders and cascading parameters** (M each).
-5. **IdP group-to-role mapping, then SAML** (M).
+5. **SAML** (M), for identity providers without OIDC.
 6. **Pre-aggregated tables** for the heavy ready-to-run reports (see the dbt repo's
    `docs/LARGE_CLIENT_SCALE_PLAN.md`).
 7. **Formatted reports** (L): decide whether letters and statements move into the portal

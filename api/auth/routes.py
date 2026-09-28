@@ -31,6 +31,7 @@ from api.auth.schemas import (
 from api.auth.models import User
 from api.auth.security import create_access_token, hash_password
 from api.auth.service import (
+    sync_sso_access,
     AUDIT_CATEGORIES,
     AuthError,
     authenticate_user,
@@ -245,6 +246,18 @@ def oidc_callback(
     if not email:
         raise HTTPException(status_code=400, detail="Identity token carried no email address")
 
+    # With a group map, the person's IdP groups decide their access at every sign-in.
+    access = None
+    try:
+        mapping = oidc.group_map()
+        if mapping is not None:
+            access = oidc.mapped_access(claims, mapping, oidc.groups_claim_name())
+    except oidc.SsoAccessError as exc:
+        log_audit(session, actor_id=None, actor_email=email, action="sso_refused",
+                  target_type="user", target_id="", detail=str(exc))
+        session.commit()
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+
     user = session.query(User).filter(User.email == email).one_or_none()
     if user is None:
         user = User(
@@ -252,8 +265,9 @@ def oidc_callback(
             display_name=str(claims.get("name") or email.split("@")[0]),
             # unusable password: SSO users authenticate at the IdP only
             password_hash=hash_password(secrets.token_urlsafe(24)),
-            role="user",
-            organization_id=cfg.get("OIDC_DEFAULT_ORGANIZATION") or None,
+            role=access["role"] if access else "user",
+            organization_id=(access["organization_id"] if access else None)
+            or cfg.get("OIDC_DEFAULT_ORGANIZATION") or None,
             is_active=True,
         )
         session.add(user)
@@ -264,6 +278,15 @@ def oidc_callback(
         session.commit()
     if not user.is_active:
         raise HTTPException(status_code=403, detail="This account is deactivated")
+    if access and user.role != "admin":   # an admin is managed in the portal, never by a group
+        before = (user.role, user.organization_id, user.row_rules_json)
+        sync_sso_access(session, user, access)
+        after = (user.role, user.organization_id, user.row_rules_json)
+        if after != before:
+            log_audit(session, actor_id=user.id, actor_email=email, action="sso_group_sync",
+                      target_type="user", target_id=user.id, detail=f"{before} -> {after}")
+        session.commit()
+        session.refresh(user)
 
     public = user_to_public(user)
     token = create_access_token(
