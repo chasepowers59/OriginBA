@@ -70,11 +70,13 @@ spec.json  --spec_to_drawio.py-->  name.drawio  --drawio_pass.mjs route-->  name
    were absolute, so on a diagram with group containers every column's children overlap and it routes the
    wires along the container edges. For hand-placed layouts with groups, keep the spec's waypoints and skip
    the pass; use the passes for flat diagrams (no `group` nodes). Run `npm install` in this folder once.
-3. **QA in the browser pane.** `node scripts/drawio_pass.mjs viewer in.drawio` prints a
-   `viewer.diagrams.net` lightbox URL; open it with the browser tools, resize the window wide, screenshot.
-   `url` prints the `app.diagrams.net` editor URL for hand edits. Look for: an arrow crossing a box, a
-   label wrapping mid-word (widen the box), a group label colliding with its first child, an edge that
-   libavoid sent the long way round (give that edge `from_side`/`to_side` in the spec or shorten the path).
+3. **Preview in the browser pane.** `python3 scripts/viewer_urls.py in.drawio` prints one
+   `viewer.diagrams.net` lightbox URL per page (`--editor` for `app.diagrams.net` editor URLs); open it with
+   the browser tools and screenshot. The pane caps screenshots at about 800 px, so this is a look, not the
+   QA: it shows layout and colour, not text fit. Real QA is the exported PNG (step 4) read at full size.
+   Look for: an arrow crossing a box, a label wrapping mid-word (widen the box), a group label colliding
+   with its first child, an edge that went the long way round (give it `via` waypoints or `from_side` /
+   `to_side` in the spec).
 4. **Export.** With draw.io Desktop installed (`brew install --cask drawio`):
    ```bash
    /Applications/draw.io.app/Contents/MacOS/draw.io -x -f png -e -b 10 -s 2 -o name.drawio.png name.drawio
