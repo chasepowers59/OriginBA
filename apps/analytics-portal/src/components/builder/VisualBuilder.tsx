@@ -11,7 +11,6 @@ import {
 import {
   defaultDateRange,
   fetchBuilderQuestions,
-  fetchScopeOptions,
   fetchSnapshotMetadata,
   fetchSnapshots,
   fetchSavedViews,
@@ -25,7 +24,7 @@ import {
   measureDisplaysAsCurrency,
   workstreamDisplayName,
 } from "@/lib/businessLabels";
-import { activeFilters, optionsWithCurrent, restoreFilters, questionFilters } from "@/lib/builderFilters";
+import { activeFilters, restoreFilters, questionFilters, savedFilters, type ShelfFilter } from "@/lib/builderFilters";
 import { formatNumber, formatCellValue } from "@/lib/format";
 import type {
   BuilderQuestion,
@@ -42,10 +41,12 @@ import { BuilderChart, type ChartSeries } from "./BuilderChart";
 import { QuestionGallery } from "./QuestionGallery";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
 import { VisibilityToggle } from "@/components/VisibilityToggle";
+import { FilterValuePicker } from "./FilterValuePicker";
+import { ReportParameters } from "./ReportParameters";
 
 type ColItem = { field: string; label: string; kind: "dim" | "time"; grain?: string };
 type ValItem = { field: string; label: string; agg: string; trusted: boolean };
-type FilItem = { field: string; label: string; op: string; value: unknown; role: string };
+type FilItem = ShelfFilter;
 
 const GRAINS = ["month", "quarter", "year"];
 
@@ -65,6 +66,8 @@ export function VisualBuilder({
   const [cols, setCols] = useState<ColItem[]>([]);
   const [vals, setVals] = useState<ValItem[]>([]);
   const [fils, setFils] = useState<FilItem[]>([]);
+  // A saved view with report parameters waits for them before it runs.
+  const [asking, setAsking] = useState(false);
   const [visual, setVisual] = useState<VisualChoice>("bar");
   const [limit] = useState(200);
   const [result, setResult] = useState<QueryResponse | null>(null);
@@ -147,7 +150,7 @@ export function VisualBuilder({
     // Empty shelves are not a query. The count(*) default below is for "how many",
     // asked by putting a measure on VALUES; with nothing on either shelf it ran anyway
     // and drew an axis with no bars and "1 rows" under it (demo25, 2026-09-04).
-    if (!cols.length && !vals.length) return null;
+    if (asking || (!cols.length && !vals.length)) return null;
     const { dimensions: dims, timeDimensions: timeDims } = shelfDimensions(cols);
     const measures = vals.length
       ? vals.map((v) => ({ field: v.field, agg: v.agg }))
@@ -166,7 +169,7 @@ export function VisualBuilder({
       time_dimensions: timeDims.length ? timeDims : undefined,
       limit,
     };
-  }, [meta, cols, vals, fils, limit]);
+  }, [meta, cols, vals, fils, limit, asking]);
 
   // debounced auto-run
   const runTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -279,7 +282,9 @@ export function VisualBuilder({
         );
         // Restore the scope too. Without this the view reopened over the whole canvas
         // while its title still described the scoped question.
-        setFils(restoreFilters(v.filters ?? null, m.fields));
+        const restored = restoreFilters(v.filters ?? null, m.fields);
+        setFils(restored);
+        setAsking(restored.some((f) => f.prompt));
         const ct = v.chart_type;
         setVisual(
           (ct === "line" || ct === "pie" || ct === "horizontal" || ct === "area" ||
@@ -331,7 +336,7 @@ export function VisualBuilder({
         measures,
         // The scoping is part of the view. Saving without it meant reopening over the
         // whole canvas: different numbers, and nothing said why.
-        filters: activeFilters(fils),
+        filters: savedFilters(fils),
         chart_type: visual,
         visibility: privateOnly ? "private" : "organization",
       });
@@ -437,7 +442,9 @@ export function VisualBuilder({
                     <span key={f.field} className="chip flex items-center gap-1.5">
                       {f.label}
                       {f.role === "date" ? (
-                        <span className="text-[10px]" style={{ color: "var(--foreground-subtle)" }}>last 90d</span>
+                        <span className="text-[10px]" style={{ color: "var(--foreground-subtle)" }}>
+                          {Array.isArray(f.value) ? `${f.value[0]} to ${f.value[1]}` : "last 90d"}
+                        </span>
                       ) : (
                         <FilterValuePicker
                           snapshotId={snapshotId}
@@ -446,12 +453,25 @@ export function VisualBuilder({
                           onChange={(v) => setFils((ff) => ff.map((x) => (x.field === f.field ? { ...x, value: v } : x)))}
                         />
                       )}
+                      <button
+                        type="button"
+                        aria-pressed={Boolean(f.prompt)}
+                        title="Ask for this value each time the saved view is opened"
+                        onClick={() => setFils((ff) => ff.map((x) => (x.field === f.field ? { ...x, prompt: !x.prompt } : x)))}
+                        className={`rounded px-1.5 text-[10px] ${f.prompt ? "bg-primary/15 text-primary" : "text-fg-subtle hover:text-heading"}`}
+                      >
+                        Ask
+                      </button>
                       <button type="button" onClick={() => setFils((ff) => ff.filter((x) => x.field !== f.field))} aria-label="remove" className="-my-2 -mr-1 rounded p-2 leading-none hover:text-heading">×</button>
                     </span>
                   ))}
                 </Shelf>
               </div>
 
+              {asking ? (
+                <ReportParameters snapshotId={snapshotId} fils={fils}
+                                  onRun={(answered) => { setFils(answered); setAsking(false); }} />
+              ) : null}
               <div className="glass-panel space-y-3 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <VisualPicker
@@ -497,6 +517,7 @@ export function VisualBuilder({
                     // axis has to read chronologically rather than ranked by size.
                     sortTimeSeries={cols.some((c) => c.kind === "time")}
                     xGrain={cols.find((c) => c.kind === "time")?.grain ?? null}
+                    emptyMessage={asking ? "Set the report parameters above, then run the report" : undefined}
                   />
                 )}
               </div>
@@ -509,91 +530,6 @@ export function VisualBuilder({
         <QuestionGallery questions={questions} onPick={applyQuestion} onClose={() => setGalleryOpen(false)} />
       ) : null}
     </DndContext>
-  );
-}
-
-/**
- * Value picker for a filter pill: fetches the field's distinct values (governed, capped
- * at 100) so users pick from what actually exists instead of typing blind. Falls back
- * to a free-text input when the list is unavailable or the value set is capped-out.
- */
-function FilterValuePicker({
-  snapshotId,
-  field,
-  value,
-  onChange,
-}: {
-  snapshotId: string;
-  field: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  const [values, setValues] = useState<string[] | null>(null);
-  const [failed, setFailed] = useState(false);
-  // Why the list is unavailable, when the API declined rather than errored.
-  const [declined, setDeclined] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    setValues(null);
-    setFailed(false);
-    fetchScopeOptions(snapshotId, field)
-      .then((r) => {
-        if (!active) return;
-        // enumerable === false means the canvas is too large to list values from;
-        // absent means an older API, which always enumerated.
-        setDeclined(r.enumerable === false ? r.reason ?? "Too many rows to list values." : null);
-        setValues(r.values ?? []);
-      })
-      .catch(() => {
-        if (active) setFailed(true);
-      });
-    return () => {
-      active = false;
-    };
-  }, [snapshotId, field]);
-
-  // Free text when the list is unavailable — because the fetch failed, because the
-  // column has no values, or because the canvas is too large to list from. The filter
-  // works identically either way; only the convenience of picking is lost. `title`
-  // carries the reason so declining is explained rather than mysterious.
-  if (declined || failed || (values && values.length === 0)) {
-    return (
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="= value"
-        title={declined ?? undefined}
-        className="w-24 rounded bg-transparent text-[10px]"
-        style={{ color: "var(--chart-4)" }}
-      />
-    );
-  }
-  if (values === null) {
-    return (
-      <span className="text-[10px]" style={{ color: "var(--foreground-subtle)" }}>
-        loading…
-      </span>
-    );
-  }
-  // The list is capped at 100, so a restored filter's value is often not in it. A
-  // select whose value matches no option shows "choose value…" while the filter is
-  // still applied — an empty chart with nothing to explain it.
-  const options = optionsWithCurrent(values, value) ?? [];
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="max-w-[150px] truncate rounded border-none bg-transparent text-[10px] outline-none"
-      style={{ color: "var(--chart-4)" }}
-    >
-      <option value="">choose value…</option>
-      {options.map((v) => (
-        <option key={v} value={v}>
-          {v}
-        </option>
-      ))}
-    </select>
   );
 }
 

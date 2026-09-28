@@ -325,6 +325,13 @@ class ScheduleIsFaithfulTests(unittest.TestCase):
         dated = [f for f in filters if f["field"] == "Bill Date"]
         self.assertEqual(dated, [{"field": "Bill Date", "op": "between", "value": ["2026-05-20", "2026-06-18"]}])
 
+    def test_a_filter_asked_for_on_open_runs_on_its_saved_value(self):
+        """Nobody is there to answer a report parameter at 06:00; the schedule uses the
+        value the view was saved with."""
+        filters = self._render({"snapshot_id": "rpt_bill_segment",
+                                "filters": [{"field": "Bill Cycle", "op": "eq", "value": "C1", "prompt": True}]})
+        self.assertIn("C1", [f.get("value") for f in filters if f["field"] == "Bill Cycle"])
+
     def test_a_missed_monthly_run_is_caught_up_once(self):
         s = {"cadence": "monthly", "hour_utc": 13, "enabled": True,
              "last_run_at": datetime(2026, 8, 1, 13, 5, tzinfo=UTC).isoformat()}

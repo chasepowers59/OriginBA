@@ -13,9 +13,13 @@ export type ShelfFilter = {
   op: string;
   value: unknown;
   role: string;
+  /** Ask for this filter's value when the saved view is opened (a report parameter). */
+  prompt?: boolean;
 };
 
 export type QueryFilter = { field: string; op: string; value: unknown };
+/** A filter as a saved view stores it: the query filter plus whether to ask for it. */
+export type SavedFilter = QueryFilter & { prompt?: boolean };
 
 type FieldLike = { id: string; label?: string; role?: string };
 
@@ -47,8 +51,26 @@ export function optionsWithCurrent(
 }
 
 /** Rebuild shelf pills from a saved view, dropping fields the canvas no longer has. */
+/** What a saved view stores: the query's filters, each marked if it is asked for on open. */
+export function savedFilters(fils: readonly ShelfFilter[] | undefined): SavedFilter[] {
+  const asked = new Set((fils ?? []).filter((f) => f.prompt).map((f) => f.field));
+  return activeFilters(fils).map((f) => (asked.has(f.field) ? { ...f, prompt: true } : f));
+}
+
+/** The shelf with the person's answers in place of the saved defaults. */
+export function answerPrompts(fils: readonly ShelfFilter[], answers: Record<string, unknown>): ShelfFilter[] {
+  return fils.map((f) => (f.prompt && f.field in answers ? { ...f, value: answers[f.field] } : f));
+}
+
+/** The asked-for filters still without a value: a blank, or a range missing an end. */
+export function unanswered(fils: readonly ShelfFilter[]): string[] {
+  const blank = (v: unknown) => (Array.isArray(v) ? v.length < 2 || v.some((x) => String(x ?? "") === "")
+                                                  : String(v ?? "") === "");
+  return fils.filter((f) => f.prompt && blank(f.value)).map((f) => f.field);
+}
+
 export function restoreFilters(
-  saved: QueryFilter[] | null | undefined,
+  saved: SavedFilter[] | null | undefined,
   fields: FieldLike[] | undefined,
 ): ShelfFilter[] {
   if (!saved?.length || !fields?.length) return [];
@@ -64,6 +86,7 @@ export function restoreFilters(
       op: f.op,
       value: f.value,
       role: field.role ?? "dimension",
+      ...(f.prompt ? { prompt: true } : {}),
     });
   }
   return out;
