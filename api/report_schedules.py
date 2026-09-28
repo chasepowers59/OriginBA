@@ -10,6 +10,7 @@ from __future__ import annotations
 import csv
 import io
 import re
+from xml.sax.saxutils import escape as xml_escape
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -255,6 +256,26 @@ def rows_to_xlsx(columns: list[str], labels: dict[str, str], rows: list[dict[str
     return buf.getvalue()
 
 
+class _Text(str):
+    """A text cell (wrapped as a paragraph); numbers and flags stay plain, right-aligned strings."""
+
+
+def _pdf_cells(columns: list[str], rows: list[dict[str, Any]]) -> list[list[str]]:
+    """Each cell as its display string. A number column with any decimals shows two
+    throughout, so 1,234.50 and 99.00 line up instead of 1,234.50 and 99."""
+    decimal = {c for c in columns if any(isinstance(r.get(c), float) and not float(r[c]).is_integer() for r in rows)}
+
+    def cell(c: str, v: Any) -> str:
+        if v is None:
+            return ""
+        if isinstance(v, bool):
+            return "True" if v else "False"
+        if isinstance(v, (int, float)):
+            return f"{v:,.2f}" if c in decimal else f"{int(v):,}"
+        return _Text(v)
+    return [[cell(c, r.get(c)) for c in columns] for r in rows]
+
+
 _LOGO = Path(__file__).resolve().parent.parent / "apps" / "analytics-portal" / "public" / "origin-logo.png"
 _BRAND_BLUE = "#006FAC"
 
@@ -304,15 +325,6 @@ def rows_to_pdf(title: str, window_note: str, columns: list[str], labels: dict[s
     body = styles["BodyText"]
     small = ParagraphStyle("cell", parent=body, fontSize=8, leading=10)
 
-    def cell(v: Any) -> Any:
-        if v is None:
-            return ""
-        if isinstance(v, bool):
-            return "True" if v else "False"
-        if isinstance(v, (int, float)):
-            return f"{v:,.2f}" if isinstance(v, float) and not v.is_integer() else f"{int(v):,}"
-        return Paragraph(str(v), small)
-
     def chrome(canvas, doc) -> None:
         canvas.saveState()
         top = size[1] - 0.5 * inch
@@ -327,8 +339,10 @@ def rows_to_pdf(title: str, window_note: str, columns: list[str], labels: dict[s
         canvas.drawRightString(size[0] - 0.6 * inch, 0.45 * inch, f"Page {doc.page}")
         canvas.restoreState()
 
-    header = [labels.get(c, c) for c in columns]
-    data = [header] + [[cell(r.get(c)) for c in columns] for r in rows]
+    header = [Paragraph(xml_escape(labels.get(c, c)), ParagraphStyle("head", parent=small, textColor="white",
+                                                                     fontName="Helvetica-Bold")) for c in columns]
+    data = [header] + [[Paragraph(xml_escape(v), small) if isinstance(v, _Text) else v for v in r]
+                       for r in _pdf_cells(columns, rows)]
     numeric = [i for i, c in enumerate(columns) if rows and all(isinstance(r.get(c), (int, float))
                and not isinstance(r.get(c), bool) for r in rows if r.get(c) is not None)]
     table = Table(data, repeatRows=1)
@@ -345,7 +359,10 @@ def rows_to_pdf(title: str, window_note: str, columns: list[str], labels: dict[s
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=size, topMargin=1.0 * inch, bottomMargin=0.8 * inch,
                             leftMargin=0.6 * inch, rightMargin=0.6 * inch, title=title)
-    story = [Paragraph(title, styles["Heading2"]), Paragraph(window_note or "", body), Spacer(1, 0.15 * inch)]
+    # Paragraph reads its text as markup: escaped, a value is only ever text (an '&' broke the
+    # PDF; '<link href=...>' in a cell became a live link).
+    story = [Paragraph(xml_escape(title), styles["Heading2"]), Paragraph(xml_escape(window_note or ""), body),
+             Spacer(1, 0.15 * inch)]
     drawing = _bar_chart(columns, labels, rows, size[0] - 1.2 * inch) if chart and rows else None
     if drawing is not None:
         story += [drawing, Spacer(1, 0.2 * inch)]

@@ -68,3 +68,26 @@ class ExportRouteTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class MarkupSafetyTests(unittest.TestCase):
+    """reportlab reads Paragraph text as markup: an '&' or '<' in a customer name broke the
+    PDF (a scheduled report would fail), and exported text could inject a link."""
+
+    def test_ampersands_and_angle_brackets_render_as_text(self):
+        rows = [{"name": "AT&T <Main St> & Sons", "amt": 1.5}]
+        data = rs.rows_to_pdf("Owed by A&B <billing>", "note with <b>tags</b> & more", ["name", "amt"],
+                              {"name": "Name & Title", "amt": "Amount"}, rows, NOW)
+        self.assertTrue(data.startswith(b"%PDF-"))
+
+    def test_injected_markup_does_not_become_a_link(self):
+        rows = [{"name": '<link href="https://evil.test">click</link>', "amt": 1.0}]
+        data = rs.rows_to_pdf("t", "", ["name", "amt"], {}, rows, NOW)
+        self.assertNotIn(b"/URI", data)
+
+
+class NumberColumnTests(unittest.TestCase):
+    def test_a_column_with_any_decimals_shows_two_decimals_throughout(self):
+        cells = rs._pdf_cells(["amt", "n"], [{"amt": 1234.5, "n": 3}, {"amt": 99.0, "n": 4}])
+        self.assertEqual([r[0] for r in cells], ["1,234.50", "99.00"])
+        self.assertEqual([r[1] for r in cells], ["3", "4"])
