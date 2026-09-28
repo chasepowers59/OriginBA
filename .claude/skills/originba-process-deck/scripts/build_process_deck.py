@@ -264,7 +264,7 @@ def slide_table(prs, s, footer):
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     cols, rows = s["columns"], s["rows"]
-    rh = min(0.85, 8.9 / (len(rows) + 1))
+    rh = min(s.get("row_h", 0.85), 8.9 / (len(rows) + 1))   # row_h lets a short, dense table fill the body
     shape = sl.shapes.add_table(len(rows) + 1, len(cols), Inches(0.81), Inches(2.0), Inches(20.4), Inches(rh * (len(rows) + 1)))
     tbl = shape.table
     widths = s.get("widths") or [20.4 / len(cols)] * len(cols)
@@ -276,9 +276,9 @@ def slide_table(prs, s, footer):
     for i, row in enumerate(rows, start=1):
         for j, v in enumerate(row):
             cell = tbl.cell(i, j); cell.fill.solid(); cell.fill.fore_color.rgb = rgb(CREAM)
-            cell.text = ""; _text(cell, [[(str(v), 19, GREY if j else BLUE, j == 0)]], margin=0.15)
-    for r in tbl.rows:
-        r.height = Inches(rh)
+            cell.text = ""; _text(cell, [[(str(v), s.get("font", 19), GREY if j else BLUE, j == 0)]], margin=0.15)
+    for i, r in enumerate(tbl.rows):
+        r.height = Inches(min(rh, 0.85) if i == 0 else rh)   # the header never grows with the body rows
     return sl
 
 
@@ -449,9 +449,31 @@ def slide_chevrons(prs, s, footer):
     return sl
 
 
+def slide_steps(prs, s, footer):
+    """Numbered steps in two columns, each a cream box with an orange number, a title and detail lines: the step-by-step visual."""
+    sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
+    steps = s["steps"]; cols = s.get("cols", 2); rows = -(-len(steps) // cols); gap = 0.25
+    w = (20.4 - gap * (cols - 1)) / cols; h = (8.85 - gap * (rows - 1)) / rows
+    body_pt = s.get("body_pt", 15 if rows <= 5 else 13.5)
+    for i, st in enumerate(steps):
+        c, r = (i // rows, i % rows) if s.get("fill", "column") == "column" else (i % cols, i // cols)
+        x = 0.81 + c * (w + gap); y = 2.0 + r * (h + gap)
+        _box(sl, x, y, w, h, CREAM, radius=0.08)
+        o = sl.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x + 0.22), Inches(y + 0.22), Inches(0.5), Inches(0.5))
+        o.fill.solid(); o.fill.fore_color.rgb = rgb(ORANGE); o.line.fill.background(); o.shadow.inherit = False
+        _text(o, [[(str(i + 1), 15, BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.0)
+        t = sl.shapes.add_textbox(Inches(x + 0.85), Inches(y + 0.1), Inches(w - 1.05), Inches(h - 0.2))
+        _text(t, [[(st["title"], 19, BLUE, True)]] + [[(line, body_pt, GREY, False)] for line in st.get("lines", [])], anchor=MSO_ANCHOR.TOP, margin=0.0)
+    if s.get("legend"):
+        t = sl.shapes.add_textbox(Inches(0.81), Inches(10.95), Inches(20), Inches(0.5))
+        _text(t, [[(s["legend"], 14, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+    return sl
+
+
 BUILDERS = {"layers": slide_layers, "compare": slide_compare, "title": slide_title, "section": slide_section, "statement": slide_statement, "process": slide_process,
             "roadmap": slide_roadmap, "cards": slide_cards, "bullets": slide_bullets, "table": slide_table,
-            "timebar": slide_timebar, "donut": slide_donut, "chevrons": slide_chevrons}
+            "timebar": slide_timebar, "donut": slide_donut, "chevrons": slide_chevrons, "steps": slide_steps}
 
 
 def build(spec: dict, out: pathlib.Path) -> pathlib.Path:

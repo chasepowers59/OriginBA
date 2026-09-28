@@ -34,9 +34,10 @@ template, not an imitation. Slide types and their spec keys:
 | `cards` | `title`, `cards[{heading, lines[], accent, stat, stat_label}]`, `cols`; `stat` is a big-number callout above the heading (results slides) |
 | `timebar` | `title`, `rows[{label, note, before_days, before_label, after_hours, after_label}]`, `legend`: a cream bar per activity for the days it took by hand and an orange bar for the hours it takes now, drawn to one scale |
 | `donut` | `title`, `parts[{label, value, fill, means}]`, `stat`, `stat_label`, `legend`: a native doughnut chart (transparent over the gradient) with a chip legend and a stat box; zero-value parts appear in the legend only |
+| `steps` | `title`, `steps[{title, lines[]}]`, `cols` (2), `fill` (column or row), `body_pt`, `legend`: numbered cream boxes in columns, an orange number each; the step-by-step visual (8 to 10 steps) |
 | `chevrons` | `title`, `stages[{title, sub, lines[], accent}]`, `notes[{title, body}]`: a left-to-right chevron chain (the promotion path), a description under each stage, a band of cream notes below |
 | `bullets` | `title`, `columns[{heading, items[]}]` |
-| `table` | `title`, `columns[]`, `rows[[]]`, `widths[]` (inches, sum 20.4) |
+| `table` (`font` sets the body size for dense tables) | `title`, `columns[]`, `rows[[]]`, `widths[]` (inches, sum 20.4) |
 
 Colour system (one rule, every slide): every container is cream, every chip or pill is white, orange is the highlight (kicker, accent pill, current roadmap step, the `tag` on a manual node), blue is titles and grey is body text. Nothing else is filled.
 

@@ -519,9 +519,180 @@
       ]
     },
     {
+      "type": "steps",
+      "title": "Database Deployment, Step By Step",
+      "kicker": "S8",
+      "steps": [
+        {
+          "title": "Preflight",
+          "lines": [
+            "Proves the deploy user can read every CISADM table the snapshots need and write the target objects. A limited-privilege variant exists for locked-down instances."
+          ]
+        },
+        {
+          "title": "Create the seven rolling snapshot tables",
+          "lines": [
+            "Financial transactions, billed usage, SQ usage, GL distribution, measurements, usage and usage scalar detail: created empty with their keys, nothing loaded yet."
+          ]
+        },
+        {
+          "title": "Create the domain-support objects",
+          "lines": [
+            "The SA aged-balance snapshot table, its snapshot-type lookup seed, and eight CMS views for device, asset, crew, field activity and case, with grants and the read-schema synonyms repaired."
+          ]
+        },
+        {
+          "title": "Deploy the procedures",
+          "lines": [
+            "One baseline procedure per snapshot (the retained 24 months, loaded once) and one operational procedure; the aged-balance refresh procedure for the SA snapshot."
+          ]
+        },
+        {
+          "title": "Submit the baselines",
+          "lines": [
+            "All eight loads submitted at once as database scheduler jobs; they run unattended and survive a dropped connection. The SA snapshot refresh runs alongside from live financial transactions."
+          ]
+        },
+        {
+          "title": "Ready gate",
+          "lines": [
+            "The scheduler's job table is polled up to eight hours until every job reports SUCCEEDED. A FAILED or missing job stops the rollout."
+          ]
+        },
+        {
+          "title": "Validate and gate",
+          "lines": [
+            "Row counts, twelve monthly totals against the source, duplicate keys. The install gate fails on any empty table or duplicate key. Domain support: views valid, lookup seeded, aging buckets sum to the balance, FT parity."
+          ]
+        },
+        {
+          "title": "Post-load indexes",
+          "lines": [
+            "Indexes on the keys and dates the domains filter on, created after the load so the baseline is never slowed by them."
+          ]
+        },
+        {
+          "title": "Rolling cutover",
+          "lines": [
+            "Rolling procedures installed (3 months rebuilt, 24 kept; 6-month at CityCorp and Odessa), one operational refresh run by hand and validated again. Long refreshes run as background jobs, never in the session."
+          ]
+        },
+        {
+          "title": "Schedule and monitor",
+          "lines": [
+            "One scheduler job per table, twice daily with a 30-minute stagger, held on TEST until approved. Last-run capture and data-quality checks per client; validate again after the first scheduled run."
+          ]
+        }
+      ],
+      "legend": "Steps 1 to 8 are the baseline; 9 and 10 are the cutover to rolling refresh. The domain-support objects ride the same rollout so the live domains work the day the snapshots do."
+    },
+    {
+      "type": "table",
+      "title": "The Objects The Domains Depend On (1 of 2)",
+      "kicker": "S9",
+      "font": 16,
+      "row_h": 1.45,
+      "widths": [
+        4.3,
+        2.0,
+        8.9,
+        5.2
+      ],
+      "columns": [
+        "Object",
+        "Kind",
+        "What it is",
+        "Depended on by"
+      ],
+      "rows": [
+        [
+          "CMS_SA_SNAPSHOT",
+          "table + refresh procedure",
+          "One end-of-day (LDAY) aged-balance row per service agreement: current and payoff balance, new charges, and ten aging buckets built from frozen ARS financial transactions dated up to today. Credits and payments retire the oldest debt first; excess credit sits in the current bucket; buckets 1 to 5 always sum to the current balance; future-dated amounts are excluded.",
+          "Debt Management: the SA Snapshot Aged Balance domain, its account roll-up (a derived query over this table, not a second object), and every aged-debt view and dashboard on it"
+        ],
+        [
+          "CM_SNAPSHOT_TYPE_FLG",
+          "lookup seed",
+          "The four snapshot-type codes (LDAY, EMON, ARCH, LEMN) written into the C2M lookup tables. The domain inner-joins them, so a fresh database without the seed returns zero rows in every Ad Hoc view.",
+          "Debt Management: SA Snapshot Aged Balance domain"
+        ],
+        [
+          "CMS_D1_DVC_IDENTIFIER_VW",
+          "view",
+          "One row per device with its identifiers pivoted from rows into columns: asset id, badge number, serial number, internal meter number, external and MDM ids, NIC id and serial, name, utility device id.",
+          "Meter Operations: Device domain; Daily Installations, Disconnected Service Points, Meters Not Recently Read"
+        ],
+        [
+          "CMS_D1_DVC_BODA_VW",
+          "view",
+          "The device's business-object data area parsed out of its XML: business object code, latest status, retirement date and time. One row per device.",
+          "Meter Operations: Device domain"
+        ],
+        [
+          "CMS_W1_ASSET_IDENTIFIER_VW",
+          "view",
+          "One row per asset with its identifiers pivoted into columns, the asset-side twin of the device identifier view, so the Asset domain can join by badge, serial or external id.",
+          "Meter Operations: Asset domain; In Storage, Distribution of Installed Assets, Non-Meter Assets"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "title": "The Objects The Domains Depend On (2 of 2)",
+      "kicker": "S10",
+      "font": 16,
+      "row_h": 1.45,
+      "widths": [
+        4.3,
+        2.0,
+        8.9,
+        5.2
+      ],
+      "columns": [
+        "Object",
+        "Kind",
+        "What it is",
+        "Depended on by"
+      ],
+      "rows": [
+        [
+          "CMS_C1_REPRESENTATIVE_BODA_VW",
+          "view",
+          "Field representative (crew member) mobile details parsed out of the representative's XML data area: the service areas they cover and their worker capabilities, one row per representative and area or capability.",
+          "Field Operations: Crew domain and its views"
+        ],
+        [
+          "CMS_D1_ACTIVITY_CHAR_VW",
+          "view",
+          "Activity characteristics pivoted per field activity: internal field-activity status, priority, and the third-party representative code, so the domain filters on them as columns.",
+          "Field Operations: Crew domain"
+        ],
+        [
+          "CMS_D1_ACTIVITY_D1FA_BODA_VW",
+          "view",
+          "The field activity's business-object data parsed from XML: instructions and comments, the appointment window and who took it, expiration, requester, external references, and the customer and contact names and phone numbers.",
+          "Field Operations: Crew and Field Activity domains; Upcoming Field Work, Cancelations, Average Days per Field Task"
+        ],
+        [
+          "CMS_CI_CASE_VW",
+          "view",
+          "One row per case with its create and close timestamps derived from the case log (the case-created entry and the closing status entry) and the duration in minutes, measured to now while the case is open.",
+          "Customer Operations: Case domain and every case view"
+        ],
+        [
+          "CMS_CI_CASE_LOG_VW",
+          "view",
+          "The case log as a timeline: every status change with the previous status, the previous log time, and how long the case sat in the previous and the current state.",
+          "Customer Operations: Case domain (state durations and the case timeline views)"
+        ]
+      ],
+      "legend": "All ten objects are created by one wrapper step in the rollout, validated by their own pack, and gated before the snapshots are scheduled; the CISREAD synonyms are repaired in the same step because CityCorp shipped with synonyms pointing at missing objects."
+    },
+    {
       "type": "process",
       "title": "Full History, Then Rolling Refresh",
-      "kicker": "S8",
+      "kicker": "S11",
       "nodes": [
         {
           "id": "full",
@@ -633,7 +804,7 @@
     {
       "type": "process",
       "title": "How AI Built The Python",
-      "kicker": "S9",
+      "kicker": "S12",
       "nodes": [
         {
           "id": "ask",
@@ -751,7 +922,7 @@
     {
       "type": "chevrons",
       "title": "The Promotion Path",
-      "kicker": "S10",
+      "kicker": "S13",
       "stages": [
         {
           "title": "Origin_DEV",
@@ -803,9 +974,77 @@
       ]
     },
     {
+      "type": "steps",
+      "title": "Standard Offering In Jaspersoft, Step By Step",
+      "kicker": "S14",
+      "steps": [
+        {
+          "title": "Author on Origin_DEV",
+          "lines": [
+            "Every domain, Ad Hoc view, report and dashboard is built in the Workstreams tree on the internal server: the only place anything is edited by hand."
+          ]
+        },
+        {
+          "title": "Inventory and classify the export",
+          "lines": [
+            "The org export is scanned for domains, Ad Hoc views, report units, dashboards and the datasource. Matching uses the business-facing labels, never the generic internal ids."
+          ]
+        },
+        {
+          "title": "Select the offering",
+          "lines": [
+            "Only the Standard Offering list is kept, remapped into nine workstream folders by business process. The Workstreams tree is left untouched: a curated copy, not a move."
+          ]
+        },
+        {
+          "title": "Carry only what it needs",
+          "lines": [
+            "One packaged copy of each domain (53 today) in one business-process home, every report and view reference rewritten to that copy, and the datasource resource carried because the domains reference it."
+          ]
+        },
+        {
+          "title": "Clean the package",
+          "lines": [
+            "Print-wrapper reports stripped from saved Ad Hoc views, dashboards tied to public templates left out, folder metadata generated, the import index narrowed to the offering folder plus the datasource."
+          ]
+        },
+        {
+          "title": "Prove on Origin_TEST",
+          "lines": [
+            "The first promotion, with the seven proofs: import without warnings, re-export byte-equal inside the scope, every resource executed, datasource connection unchanged."
+          ]
+        },
+        {
+          "title": "Client test org",
+          "lines": [
+            "The datasource switched to the client's test database by carrying the target's own datasource export byte for byte; org path, folder, alias and tenant root rewritten; verified before import."
+          ]
+        },
+        {
+          "title": "Sweep and sign off",
+          "lines": [
+            "Every view queried, every report rendered, every domain probed on the client's own numbers. PASS, EMPTY, SLOW or FAIL per resource with its timing; one sign-off document per org."
+          ]
+        },
+        {
+          "title": "Client prod org",
+          "lines": [
+            "The same tool and the same proofs with an explicit prod flag. A repository inventory snapshot before and a diff after are the rollback record."
+          ]
+        },
+        {
+          "title": "Keep it current",
+          "lines": [
+            "Additive-only domain patches with seven proofs and a one-command restore, the Standardized Reports folder for scheduled SQL reports, and every change swept and re-signed."
+          ]
+        }
+      ],
+      "legend": "Steps 1 to 5 build the package once; steps 6 to 9 repeat per client org; step 10 is every change after go-live."
+    },
+    {
       "type": "process",
       "title": "Jaspersoft REST Promotion",
-      "kicker": "S11",
+      "kicker": "S15",
       "nodes": [
         {
           "id": "exp",
@@ -916,7 +1155,7 @@
     {
       "type": "bullets",
       "title": "Inside The Promotion",
-      "kicker": "S12",
+      "kicker": "S16",
       "columns": [
         {
           "heading": "What gets rewritten",
@@ -1014,7 +1253,7 @@
     {
       "type": "process",
       "title": "How AI Runs It",
-      "kicker": "S13",
+      "kicker": "S17",
       "nodes": [
         {
           "id": "ask",
@@ -1168,7 +1407,7 @@
     {
       "type": "donut",
       "title": "One Sweep, Read Closely",
-      "kicker": "S14",
+      "kicker": "S18",
       "parts": [
         {
           "label": "OK",
@@ -1202,7 +1441,7 @@
     {
       "type": "compare",
       "title": "The Constraint Today, And What Replaces It",
-      "kicker": "S15",
+      "kicker": "S19",
       "headings": [
         "Manual QA now",
         "Next: Playwright, and agents on the network (Shankar)"
@@ -1233,7 +1472,7 @@
     {
       "type": "roadmap",
       "title": "Roadmap",
-      "kicker": "S16",
+      "kicker": "S20",
       "intro": "In the order that removes the most manual work.",
       "steps": [
         {
@@ -1267,7 +1506,7 @@
     {
       "type": "cards",
       "title": "Next: The Origin BA App And dbt",
-      "kicker": "S17",
+      "kicker": "S21",
       "cols": 3,
       "cards": [
         {
