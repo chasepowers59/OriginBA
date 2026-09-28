@@ -61,8 +61,10 @@ def node_cell(n: dict, parent: str, ox: float, oy: float) -> str:
         st = style(rounded=1, arcSize=6, fillColor="none", strokeColor=CREAM, strokeWidth=1.5, container=1, pointerEvents=0,
                    align="left", verticalAlign="top", spacingLeft=14, spacingTop=4, fontColor=CREAM)
         val = label(title, body, 14, 11, CREAM, CREAM)
-    elif kind == "gate":
-        st = style(rhombus=None, fillColor=ORANGE, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(n.get("title_pt", 11)))
+    elif kind == "gate":   # side spacing keeps the wrapped label inside the diamond, where blue text is readable
+        pad = int(w * PX * 0.16)
+        st = style(rhombus=None, fillColor=ORANGE, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(n.get("title_pt", 11)),
+                   spacingLeft=pad, spacingRight=pad)
         val = escape(title, {'"': "&quot;"})
     elif kind == "domain":
         st = style(rounded=1, arcSize=50, fillColor=WHITE, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(n.get("title_pt", 11)))
@@ -133,8 +135,9 @@ def diagram_xml(slide: dict) -> str:
         a, b = e["from"], e["to"]
         anc_a, anc_b = ancestors(a, parent_of), ancestors(b, parent_of)   # innermost container holding both endpoints
         common = next((x for x in anc_a if x in anc_b), "1")
+        # edge labels: no wrapping (a wrapped edge label stacks one word per line) and the page colour behind the text
         kv = dict(edgeStyle="orthogonalEdgeStyle", rounded=1, strokeColor=CREAM, strokeWidth=2, endArrow="block", endFill=1,
-                  fontColor=CREAM, fontSize=pt(11), fontStyle=1, labelBackgroundColor="none")
+                  fontColor=CREAM, fontSize=pt(11), fontStyle=1, labelBackgroundColor=BLUE, whiteSpace="nowrap")
         via = [tuple(v) for v in e.get("via", [])]
         fa, tb = e.get("from_side"), e.get("to_side")
         if via and not fa:
