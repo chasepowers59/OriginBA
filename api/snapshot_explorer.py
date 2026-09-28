@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import time
 
 from datetime import date, timedelta
 from typing import Any
@@ -428,22 +429,46 @@ def snapshot_stats(
     ctx.require_permission("snapshots:read")
     org_id = require_org_for_data(ctx)
     snapshot = _require_snapshot_access(ctx, snapshot_id)
-    # A canvas carries no load watermark of its own; the row count is the honest figure.
-    sql = f"SELECT COUNT(*) AS row_count, NULL AS latest_load_dttm FROM {_qualified(snapshot, org_id)}"
-    try:
-        columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=1)
-    except Exception as exc:
-        raise _query_failure("Stats failed", exc) from exc
-    row = rows[0] if rows else [0, None]
+    key = (org_id, snapshot_id)
+    hit = _STATS_CACHE.get(key)
+    if hit and time.monotonic() - hit[0] < STATS_TTL_SECONDS:
+        count = hit[1]
+    else:
+        try:
+            count = _row_count(snapshot, org_id)
+        except Exception as exc:
+            raise _query_failure("Stats failed", exc) from exc
+        _STATS_CACHE[key] = (time.monotonic(), count)
     return {
         "client": org_id,
         "organization_id": org_id,
         # As written. Upper-casing was an Oracle habit and a dbt canvas id is lowercase;
         # returning RPT_BILL_SEGMENT for rpt_bill_segment breaks the caller's own lookups.
         "snapshot_id": snapshot_id,
-        "row_count": int(row[0] or 0),
-        "latest_load_dttm": _serialize_value(row[1]) if len(row) > 1 else None,
+        "row_count": count,
+        # A canvas carries no load watermark of its own; the row count is the honest figure.
+        "latest_load_dttm": None,
     }
+
+
+# A canvas changes only when the warehouse is rebuilt, so its count is not re-taken per
+# visit. COUNT(*) over Ellensburg's rpt_gl (6.08M rows) cost ~10 s of every page view.
+_STATS_CACHE: dict[tuple[str, str], tuple[float, int]] = {}
+STATS_TTL_SECONDS = 900
+
+
+def _row_count(snapshot: dict, org_id: str) -> int:
+    backend, _, schema = snapshot_backend(snapshot, org_id)
+    if backend != "postgres":
+        # The build gathers statistics after every table, so NUM_ROWS is the count as built.
+        _, rows = _run(snapshot, "SELECT num_rows FROM all_tables WHERE owner = :owner AND table_name = :t",
+                       {"owner": schema.upper(), "t": snapshot["table_name"].upper()},
+                       organization_id=org_id, max_rows=1)
+        if rows and rows[0][0] is not None:
+            return int(rows[0][0])
+    _, rows = _run(snapshot, f"SELECT COUNT(*) AS row_count FROM {_qualified(snapshot, org_id)}",
+                   organization_id=org_id, max_rows=1)
+    return int(rows[0][0] or 0) if rows else 0
 
 
 @router.get("/{snapshot_id}/scope-options/{field_id}")

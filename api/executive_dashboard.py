@@ -292,13 +292,46 @@ def is_missing_relation_error(message: str | None) -> bool:
     return bool(message) and bool(_MISSING_RELATION.search(str(message)))
 
 
-def warehouse_not_built(kpis: list[dict[str, Any]]) -> bool:
-    """True when EVERY KPI failed for want of its table -- the signature of an org
-    pointed at the dbt catalog before its warehouse exists. Since every org reads the
-    catalog, available_kpis() resolves every KPI everywhere; this is the check against
-    the DATABASE that it cannot make. A partial failure is a real per-KPI problem and
-    is left alone."""
-    return bool(kpis) and all(is_missing_relation_error(k.get("error")) for k in kpis)
+# An org the API cannot reach at all: no connection configured, or the database refused
+# or never answered. One note, pointing at where an administrator connects it.
+_NOT_CONNECTED = re.compile(
+    r"No warehouse is configured|could not connect|Connection refused|ORA-125\d\d|ORA-12170|DPY-6005",
+    re.IGNORECASE)
+
+WAREHOUSE_NOT_CONNECTED_NOTE = (
+    "This organization's data is not connected yet. An administrator can connect it "
+    "under Settings, Data source.")
+
+_TIMEOUT = re.compile(r"ORA-01013|statement timeout|canceling statement|DPY-4024|ORA-03156", re.IGNORECASE)
+
+
+def unavailable_note(kpis: list[dict[str, Any]]) -> str | None:
+    """One sentence for a page where EVERY card failed for the same reason, else None."""
+    errors = [k.get("error") for k in kpis]
+    if not kpis or not all(errors):
+        return None
+    if all(is_missing_relation_error(e) for e in errors):
+        return WAREHOUSE_NOT_BUILT_NOTE
+    if all(_NOT_CONNECTED.search(str(e)) for e in errors):
+        return WAREHOUSE_NOT_CONNECTED_NOTE
+    return None
+
+
+def present_card_errors(kpis: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """A card says what went wrong in words; the driver text moves to error_detail."""
+    out = []
+    for k in kpis:
+        raw = k.get("error")
+        if raw:
+            if _TIMEOUT.search(raw):
+                message = "This figure took too long to load. Try a shorter period."
+            elif is_missing_relation_error(raw):
+                message = "This figure's report table has not been built yet."
+            else:
+                message = "This figure could not be loaded right now."
+            k = {**k, "error": message, "error_detail": raw}
+        out.append(k)
+    return out
 
 
 def available_kpis(
@@ -453,10 +486,12 @@ def build_executive_summary(
         kpis = []
     # Nine cards each saying ORA-00942 is worse than empty. Collapse to the one note
     # the front-end already renders for a catalog that lacks the canvases.
-    if warehouse_not_built(kpis):
-        catalog_note = WAREHOUSE_NOT_BUILT_NOTE
+    note = unavailable_note(kpis)
+    if note:
+        catalog_note = note
         kpis = []
         kpi_defs = []
+    kpis = present_card_errors(kpis)
     return {
         "client": client_id,
         "db_configured": True,

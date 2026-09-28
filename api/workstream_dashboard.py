@@ -8,7 +8,7 @@ from typing import Any
 
 from api.demo_db import demo_configured
 from api.warehouse_db import warehouse_configured
-from api.executive_dashboard import WAREHOUSE_NOT_BUILT_NOTE, warehouse_not_built
+from api.executive_dashboard import present_card_errors, unavailable_note
 from api.reporting_dates import data_as_of
 from api.kpi_runner import date_windows, execute_kpi_definition
 from api.snapshot_catalog import load_catalog
@@ -340,11 +340,10 @@ def build_workstream_summary(
 
     with ThreadPoolExecutor(max_workers=min(8, max(1, len(kpis_def)))) as pool:
         kpis = list(pool.map(_run, kpis_def))
-    # An org whose warehouse is not built yet fails every KPI for want of its table.
-    # One sentence, not a grid of ORA-00942 -- the same collapse the home page does.
-    note = WAREHOUSE_NOT_BUILT_NOTE if warehouse_not_built(kpis) else None
-    if note:
-        kpis = []
+    # An org whose warehouse is unbuilt or unconnected fails every KPI the same way.
+    # One sentence, not a grid of driver errors -- the same collapse the home page does.
+    note = unavailable_note(kpis)
+    kpis = [] if note else present_card_errors(kpis)
     return {
         "note": note,
         "client": client_id,

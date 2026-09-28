@@ -190,3 +190,88 @@ class QueryRouteTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def _unconnected(kpi, **_):
+    d = _errored(kpi)
+    d["error"] = "Query failed: No warehouse is configured for organization 'newark'. Set WAREHOUSE_DATABASE_URL_NEWARK."
+    return d
+
+
+class NotConnectedTests(unittest.TestCase):
+    """An org with no connection read nine cards of 'Set WAREHOUSE_DATABASE_URL_DEMO25'
+    (the crawl, 2026-09-28): a setup instruction for a developer, shown to an end user."""
+
+    def setUp(self):
+        self._env = mock.patch.dict(os.environ, {"PORTAL_AUTH_DISABLED": "true",
+                                                 "PORTAL_DEV_ORGANIZATION": "dev"})
+        self._env.start()
+
+    def tearDown(self):
+        self._env.stop()
+
+    def _executive(self, runner):
+        from api.executive_dashboard import build_executive_summary
+        with mock.patch("api.executive_dashboard.execute_kpi_definition", side_effect=runner), \
+             mock.patch("api.executive_dashboard.warehouse_configured", return_value=True), \
+             mock.patch("api.executive_dashboard.demo_configured", return_value=False), \
+             mock.patch("api.executive_dashboard._refresh_insight", return_value=None):
+            return build_executive_summary(30, organization_id="newark")
+
+    def _workstream(self, runner):
+        from api.workstream_dashboard import build_workstream_summary
+        with mock.patch("api.workstream_dashboard.execute_kpi_definition", side_effect=runner), \
+             mock.patch("api.workstream_dashboard.warehouse_configured", return_value=True), \
+             mock.patch("api.workstream_dashboard.demo_configured", return_value=False):
+            return build_workstream_summary("finance", 30, organization_id="newark")
+
+    def test_an_unconnected_org_gets_one_note_that_says_where_to_connect_it(self):
+        out = self._executive(_unconnected)
+        self.assertEqual(out["kpis"], [])
+        self.assertIn("not connected", out["catalog_note"].lower())
+        self.assertIn("Settings", out["catalog_note"])
+        self.assertNotIn("WAREHOUSE_DATABASE_URL", out["catalog_note"])
+
+    def test_the_workstream_page_says_the_same(self):
+        out = self._workstream(_unconnected)
+        self.assertEqual(out["kpis"], [])
+        self.assertIn("not connected", (out.get("note") or "").lower())
+
+
+class CardErrorTests(unittest.TestCase):
+    """A single failing card says what happened in words; the driver text is kept apart."""
+
+    def setUp(self):
+        self._env = mock.patch.dict(os.environ, {"PORTAL_AUTH_DISABLED": "true",
+                                                 "PORTAL_DEV_ORGANIZATION": "dev"})
+        self._env.start()
+
+    def tearDown(self):
+        self._env.stop()
+
+    def _one_fails(self, error):
+        from api.executive_dashboard import build_executive_summary
+        calls = {"n": 0}
+        def mixed(kpi, **_):
+            calls["n"] += 1
+            if calls["n"] > 1:
+                return _ok(kpi)
+            d = _errored(kpi); d["error"] = error
+            return d
+        with mock.patch("api.executive_dashboard.execute_kpi_definition", side_effect=mixed), \
+             mock.patch("api.executive_dashboard.warehouse_configured", return_value=True), \
+             mock.patch("api.executive_dashboard.demo_configured", return_value=False), \
+             mock.patch("api.executive_dashboard._refresh_insight", return_value=None):
+            out = build_executive_summary(30, organization_id="newark")
+        return next(k for k in out["kpis"] if k.get("error"))
+
+    def test_a_timeout_says_to_try_a_shorter_period(self):
+        card = self._one_fails("Query failed: ORA-01013: user requested cancel of current operation")
+        self.assertNotIn("ORA-", card["error"])
+        self.assertIn("shorter period", card["error"])
+        self.assertIn("ORA-01013", card["error_detail"])
+
+    def test_any_other_failure_is_a_plain_sentence(self):
+        card = self._one_fails("Query failed: ORA-00904: \"X\": invalid identifier")
+        self.assertNotIn("ORA-", card["error"])
+        self.assertNotIn("Query failed", card["error"])
