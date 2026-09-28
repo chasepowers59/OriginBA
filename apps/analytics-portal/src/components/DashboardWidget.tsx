@@ -8,6 +8,7 @@ import { formatTimeBucket } from "@/lib/timeBucketLabel";
 import { workstreamDisplayName } from "@/lib/businessLabels";
 import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
 import type { ExecutiveKpi } from "@/lib/types";
+import { explainQuestion, requestAsk } from "@/lib/assistantContext";
 
 type DashboardWidgetProps = {
   kpi: ExecutiveKpi;
@@ -16,6 +17,8 @@ type DashboardWidgetProps = {
   selectedTrendLabel?: string | null;
   onTrendClick?: (kpi: ExecutiveKpi, label: string) => void;
   onLensChange?: (kpiId: string, lensId: string) => void;
+  /** The page's period, named when the reader asks the assistant to explain the figure. */
+  periodLabel?: string;
 };
 
 export function DashboardWidget({
@@ -25,6 +28,7 @@ export function DashboardWidget({
   selectedTrendLabel,
   onTrendClick,
   onLensChange,
+  periodLabel,
 }: DashboardWidgetProps) {
   const formatted =
     kpi.value == null
@@ -184,9 +188,26 @@ export function DashboardWidget({
     return (
       <div className="group glass-panel block overflow-hidden transition hover:border-edge">
         {inner}
-        <Link href={exploreHref} className="block border-t border-edge-subtle px-4 py-2 text-xs text-primary">
-          Open full report →
-        </Link>
+        <div className="flex items-center justify-between gap-2 border-t border-edge-subtle px-4 py-2 text-xs">
+          <Link href={exploreHref} className="text-primary">
+            Open full report →
+          </Link>
+          {kpi.value != null && !kpi.error ? (
+            <button
+              type="button"
+              className="text-fg-muted hover:text-primary"
+              onClick={() =>
+                requestAsk({
+                  question: explainQuestion(kpi, formatted, periodLabel),
+                  context: { canvas_id: kpi.snapshot_id, label: kpi.label, period: periodLabel,
+                             filters: kpi.subtitle ? [kpi.subtitle] : [] },
+                })
+              }
+            >
+              Explain this number
+            </button>
+          ) : null}
+        </div>
       </div>
     );
   }

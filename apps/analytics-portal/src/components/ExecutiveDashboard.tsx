@@ -164,6 +164,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
                 }
                 onTrendClick={isHome ? undefined : handleTrendClick}
                 onLensChange={handleLensChange}
+                periodLabel={summary.period.label}
               />
             ))}
           </div>

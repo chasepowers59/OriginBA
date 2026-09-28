@@ -6,7 +6,7 @@ import { askAssistant, fetchAssistantSpend, fetchAssistantStatus, fetchIntegrity
 import { formatCurrency, formatNumber } from "@/lib/format";
 import { STARTER_QUESTIONS, WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, spendLabel, summarise, threadFor, tryGovernedFirst, type Turn } from "@/lib/assistant";
 import { useAuth } from "@/components/AuthProvider";
-import { contextLabel, getPageContext, loadTurns, saveTurns, subscribePageContext } from "@/lib/assistantContext";
+import { contextLabel, getPageContext, loadTurns, saveTurns, subscribeAsk, subscribePageContext, takeAsk, type PageContext } from "@/lib/assistantContext";
 import { DatabaseResultChart } from "@/components/DatabaseResultChart";
 import type { NlqResponse, AssistantQuery, AssistantResponse, AssistantSpend, AssistantStatus, IntegrityOverview } from "@/lib/types";
 import { parseAnswer, parseInline, type Inline } from "@/lib/answerMarkdown";
@@ -48,12 +48,14 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
     endRef.current?.scrollIntoView({ block: "nearest" });
   }, [turns, busy]);
 
-  const send = async (raw: string, { assistantOnly = false } = {}) => {
+  const send = async (raw: string,
+                      { assistantOnly = false, about }: { assistantOnly?: boolean; about?: PageContext | null } = {}) => {
     const q = raw.trim();
     if (!q || busy) return;
     setBusy(true);
     setQuestion("");
-    const aboutThePage = Boolean(page && usePage);
+    const onPage = about !== undefined ? about : page && usePage ? page : null;
+    const aboutThePage = Boolean(onPage);
     if (!assistantOnly && tryGovernedFirst(q, aboutThePage)) {
       // A vetted metric answers at no token cost; anything it does not match (a 404) or
       // cannot run falls through to the assistant.
@@ -69,8 +71,8 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
       }
     }
     try {
-      const context = page && usePage
-        ? { canvas_id: page.canvas_id, period: page.period, filters: page.filters }
+      const context = onPage
+        ? { canvas_id: onPage.canvas_id, period: onPage.period, filters: onPage.filters }
         : null;
       const response = await askAssistant(q, threadFor(turns), context);
       setTurns((t) => appendTurns(t, q, response));
@@ -94,9 +96,24 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
     void send(failed.text);
   };
   const configured = status ? status.configured : true;
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // A question asked from elsewhere on the page ("Explain this number"): taken on mount
+  // (the drawer mounts this panel to answer it) and whenever one arrives.
+  useEffect(() => {
+    if (!loaded) return;
+    const takeOne = () => {
+      const ask = takeAsk();
+      if (!ask) return;
+      sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      void send(ask.question, { assistantOnly: true, about: ask.context });
+    };
+    takeOne();
+    return subscribeAsk(takeOne);
+  }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <section className={`glass-panel ${compact ? "p-4" : "p-6"}`} aria-label="Ask the assistant">
+    <section ref={sectionRef} className={`glass-panel ${compact ? "p-4" : "p-6"}`} aria-label="Ask the assistant">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">Ask the assistant</p>

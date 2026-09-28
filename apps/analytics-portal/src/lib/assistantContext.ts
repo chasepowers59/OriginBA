@@ -58,3 +58,32 @@ export function saveTurns(turns: Turn[], store: Store | undefined = sessionStore
     /* storage full or unavailable: the conversation just won't follow the reader */
   }
 }
+
+// A question asked from elsewhere on the page ("Explain this number" on a card): held until
+// a panel takes it. The drawer opens on the request; the panel that mounts takes it.
+export type AskRequest = { question: string; context: PageContext | null };
+let pendingAsk: AskRequest | null = null;
+const askListeners = new Set<() => void>();
+
+export function requestAsk(ask: AskRequest): void {
+  pendingAsk = ask;
+  askListeners.forEach((l) => l());
+}
+
+export function takeAsk(): AskRequest | null {
+  const ask = pendingAsk;
+  pendingAsk = null;
+  return ask;
+}
+
+export function subscribeAsk(listener: () => void): () => void {
+  askListeners.add(listener);
+  return () => void askListeners.delete(listener);
+}
+
+/** The question behind "Explain this number": the figure, the card's own definition, the period. */
+export function explainQuestion(card: { label: string; subtitle?: string | null }, value: string, period?: string | null): string {
+  const definition = card.subtitle ? ` (defined as: ${card.subtitle})` : "";
+  const when = period ? ` for ${period}` : "";
+  return `Explain the "${card.label}" figure of ${value}${when}${definition}: how is it calculated, and what drives it? Reconcile to this figure.`;
+}

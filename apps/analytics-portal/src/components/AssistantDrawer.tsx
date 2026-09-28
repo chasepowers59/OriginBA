@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { subscribeAsk } from "@/lib/assistantContext";
 import { AssistantPanel } from "./AssistantPanel";
 
 /**
@@ -12,6 +13,9 @@ import { AssistantPanel } from "./AssistantPanel";
 export function AssistantDrawer() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  // "Explain this number" on a card opens the drawer; the panel inside takes the question.
+  useEffect(() => subscribeAsk(() => setOpen(true)), []);
 
   useEffect(() => {
     if (!open) return;

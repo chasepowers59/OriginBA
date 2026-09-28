@@ -183,6 +183,7 @@ function WorkstreamDashboardInner({
                   filter && filter.field === kpi.trend_dimension ? filter.value : null
                 }
                 onTrendClick={handleTrendClick}
+                periodLabel={summary.period?.label}
               />
             ))}
           </div>
