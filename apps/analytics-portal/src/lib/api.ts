@@ -215,6 +215,7 @@ export type ReportSchedule = {
   weekday: number;
   hour_utc: number;
   window_days: number;
+  format?: "csv" | "xlsx";
   enabled: boolean;
   last_run_at?: string | null;
   last_status?: string | null;
@@ -234,8 +235,14 @@ export function createReportSchedule(body: {
   weekday?: number;
   hour_utc?: number;
   window_days?: number;
+  format?: "csv" | "xlsx";
 }): Promise<ReportSchedule> {
   return fetchJson("/report-schedules", { method: "POST", body: JSON.stringify(body) });
+}
+
+/** Render and send one schedule now: proof the address, filters and format are right. */
+export function runReportScheduleNow(scheduleId: string): Promise<{ row_count?: number; status?: string }> {
+  return fetchJson(`/report-schedules/${scheduleId}/run-now`, { method: "POST" });
 }
 
 export function deleteReportSchedule(scheduleId: string): Promise<void> {

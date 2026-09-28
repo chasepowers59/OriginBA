@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   createReportSchedule,
   deleteReportSchedule,
+  runReportScheduleNow,
   fetchReportSchedules,
   type ReportSchedule,
 } from "@/lib/api";
@@ -41,6 +42,8 @@ export function ScheduleDialog({
   const [weekday, setWeekday] = useState(0);
   const [hourUtc, setHourUtc] = useState(13);
   const [windowDays, setWindowDays] = useState(30);
+  const [format, setFormat] = useState<"csv" | "xlsx">("xlsx");
+  const [sent, setSent] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -66,6 +69,7 @@ export function ScheduleDialog({
         weekday,
         hour_utc: hourUtc,
         window_days: windowDays,
+        format,
       });
       setRecipients("");
       refresh();
@@ -93,8 +97,27 @@ export function ScheduleDialog({
                 {s.cadence === "weekly" ? `${WEEKDAYS[s.weekday]}s` : s.cadence}
                 {" · "}
                 {s.recipients.join(", ")}
-                {s.last_status ? ` · ${s.last_status}` : ""}
+                {` · ${(s.format ?? "csv").toUpperCase()}`}
+                {sent[s.id] ? ` · ${sent[s.id]}` : s.last_status ? ` · last run: ${s.last_status}` : ""}
               </span>
+              {smtpReady ? (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setSent((m) => ({ ...m, [s.id]: "sending…" }));
+                    try {
+                      const r = await runReportScheduleNow(s.id);
+                      setSent((m) => ({ ...m, [s.id]: `sent now${r.row_count != null ? `, ${r.row_count} rows` : ""}` }));
+                    } catch (err) {
+                      setSent((m) => ({ ...m, [s.id]: err instanceof Error ? err.message : "send failed" }));
+                    }
+                    refresh();
+                  }}
+                  className="shrink-0 text-fg-muted hover:text-primary"
+                >
+                  Send now
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={async () => {
@@ -173,6 +196,17 @@ export function ScheduleDialog({
             onChange={(e) => setWindowDays(Number(e.target.value))}
             className="mt-1 w-full rounded-lg border border-edge-subtle bg-surface px-3 py-2 text-sm text-fg"
           />
+        </label>
+        <label className="block text-xs font-medium text-fg-muted">
+          Attach as
+          <select
+            value={format}
+            onChange={(e) => setFormat(e.target.value as "csv" | "xlsx")}
+            className="mt-1 w-full rounded-lg border border-edge-subtle bg-surface px-3 py-2 text-sm text-fg"
+          >
+            <option value="xlsx">Excel workbook (.xlsx)</option>
+            <option value="csv">CSV (.csv)</option>
+          </select>
         </label>
         {error ? <FormError>{error}</FormError> : null}
         <button

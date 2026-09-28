@@ -337,3 +337,30 @@ class ScheduleIsFaithfulTests(unittest.TestCase):
              "created_at": datetime(2026, 9, 10, 8, 0, tzinfo=UTC).isoformat()}
         self.assertFalse(rs.is_due(s, datetime(2026, 9, 12, 13, 0, tzinfo=UTC)))
         self.assertTrue(rs.is_due(s, datetime(2026, 10, 1, 13, 0, tzinfo=UTC)))
+
+
+class ExcelAttachmentTests(unittest.TestCase):
+    """A schedule can deliver Excel as well as CSV: numbers stay numbers, the header is the
+    business labels, and the file opens as a real workbook."""
+
+    def test_rows_become_a_real_workbook(self):
+        import io
+        from openpyxl import load_workbook
+        data = rs.rows_to_xlsx(["cycle", "amt", "frozen"], {"cycle": "Bill Cycle", "amt": "Billed Amount", "frozen": "Is Frozen"},
+                               [{"cycle": "C1", "amt": 2682879.14, "frozen": True}, {"cycle": "C2", "amt": None, "frozen": False}])
+        ws = load_workbook(io.BytesIO(data)).active
+        self.assertEqual([c.value for c in ws[1]], ["Bill Cycle", "Billed Amount", "Is Frozen"])
+        self.assertEqual(ws["B2"].value, 2682879.14)
+        self.assertIsNone(ws["B3"].value)
+        self.assertEqual(ws["C2"].value, "True")
+
+    def test_an_excel_schedule_attaches_xlsx(self):
+        msg = rs._message({"view_title": "Billed by cycle", "recipients": ["a@b.gov"], "format": "xlsx"},
+                          ["cycle"], {"cycle": "Bill Cycle"}, [{"cycle": "C1"}], datetime(2026, 9, 1, tzinfo=UTC))
+        (att,) = list(msg.iter_attachments())
+        self.assertTrue(att.get_filename().endswith(".xlsx"))
+        self.assertIn("spreadsheetml", att.get_content_type())
+
+    def test_an_unknown_format_is_refused(self):
+        with self.assertRaisesRegex(rs.ScheduleError, "[Ff]ormat"):
+            rs.create_schedule({**_payload(), "format": "pdf"}, organization_id="dev", created_by="a@b.gov")

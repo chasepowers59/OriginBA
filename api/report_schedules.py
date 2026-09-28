@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SCHEDULES_PATH = ROOT / "data" / "analytics_portal" / "report_schedules.json"
 MAX_SCHEDULES = 20
 CADENCES = ("daily", "weekly", "monthly")
+FORMATS = ("csv", "xlsx")
 
 _store = OrgRecordStore("report_schedules", lambda: SCHEDULES_PATH, "schedules")
 
@@ -45,6 +46,9 @@ def list_schedules(organization_id: str) -> list[dict[str, Any]]:
 
 def create_schedule(payload: dict[str, Any], *, organization_id: str,
                     created_by: str) -> dict[str, Any]:
+    fmt = str(payload.get("format") or "csv").lower()
+    if fmt not in FORMATS:
+        raise ScheduleError(f"Format must be one of {', '.join(FORMATS)}")
     view_id = str(payload.get("saved_view_id") or "")
     view = _find_view(view_id, organization_id)
     if view is None:
@@ -82,6 +86,7 @@ def create_schedule(payload: dict[str, Any], *, organization_id: str,
         "weekday": weekday,
         "hour_utc": hour_utc,
         "window_days": window_days,
+        "format": fmt,
         "enabled": True,
         "created_by": created_by,
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -226,17 +231,44 @@ def window_sentence(date_field: str | None, window_days: int, as_of: str) -> str
     return f"Data window: trailing {window_days} days on {date_field}, as of {as_of}."
 
 
-def _message(schedule: dict[str, Any], csv_text: str, now: datetime):
+def rows_to_xlsx(columns: list[str], labels: dict[str, str], rows: list[dict[str, Any]]) -> bytes:
+    """The same table as rows_to_csv, as a workbook: numbers stay numbers, header bold."""
+    from openpyxl import Workbook
+    from openpyxl.styles import Font
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Report"
+    ws.append([labels.get(c, c) for c in columns])
+    for cell in ws[1]:
+        cell.font = Font(bold=True)
+    for row in rows:
+        ws.append([None if (v := row.get(c)) is None else "True" if v is True else "False" if v is False
+                   else v for c in columns])
+    buf = io.BytesIO()
+    wb.save(buf)
+    return buf.getvalue()
+
+
+def _message(schedule: dict[str, Any], columns: list[str], labels: dict[str, str],
+             rows: list[dict[str, Any]], now: datetime):
     title = schedule.get("view_title") or schedule.get("snapshot_id") or "Report"
+    excel = schedule.get("format") == "xlsx"
     msg = build_message(
         f"{title} — {now.date().isoformat()}",
         schedule.get("recipients", []),
         f"Scheduled report: {title}\n"
         f"{schedule.get('window_note') or ''}\n\n"
-        "The data is attached as CSV. Open the portal for the interactive view.\n")
+        f"The data is attached as {'Excel' if excel else 'CSV'}. Open the portal for the interactive view.\n")
     safe = re.sub(r"[^A-Za-z0-9_-]+", "_", str(title))[:60] or "report"
-    msg.add_attachment(csv_text.encode("utf-8"), maintype="text", subtype="csv",
-                       filename=f"{safe}_{now.date().isoformat()}.csv")
+    stem = f"{safe}_{now.date().isoformat()}"
+    if excel:
+        msg.add_attachment(rows_to_xlsx(columns, labels, rows), maintype="application",
+                           subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                           filename=f"{stem}.xlsx")
+    else:
+        msg.add_attachment(rows_to_csv(columns, labels, rows).encode("utf-8"), maintype="text",
+                           subtype="csv", filename=f"{stem}.csv")
     return msg
 
 
@@ -244,7 +276,7 @@ def deliver(schedule: dict[str, Any], view: dict[str, Any], now: datetime,
             send: Callable[[Any], None]) -> int:
     """Render and send one schedule; returns the row count delivered."""
     columns, labels, rows = render_schedule(schedule, view)
-    send(_message(schedule, rows_to_csv(columns, labels, rows), now))
+    send(_message(schedule, columns, labels, rows, now))
     return len(rows)
 
 

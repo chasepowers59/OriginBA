@@ -28,6 +28,7 @@ class ScheduleCreateRequest(BaseModel):
     weekday: int = 0
     hour_utc: int = 13
     window_days: int = 30
+    format: str = "csv"
 
 
 @router.get("")
