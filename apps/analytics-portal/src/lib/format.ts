@@ -228,16 +228,23 @@ export function localIsoDate(d: Date): string {
   return `${d.getFullYear()}-${month}-${day}`;
 }
 
-export function exportRowsCsv(columns: string[], rows: Record<string, unknown>[], filename: string) {
-  const escape = (v: unknown) => {
-    const s = String(v ?? "");
-    return s.includes(",") || s.includes('"') ? `"${s.replace(/"/g, '""')}"` : s;
+/**
+ * RFC 4180 CSV that is safe to open in Excel. A text cell starting with = + - @ is prefixed
+ * with ' so it cannot run as a formula (a customer name of =HYPERLINK(...) would otherwise
+ * be live in whoever opens the export); real numbers, negatives included, are left alone.
+ */
+export function toCsv(columns: string[], rows: Record<string, unknown>[]): string {
+  const cell = (v: unknown) => {
+    let s = v == null ? "" : String(v);
+    if (typeof v !== "number" && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+    return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
-  const lines = [columns.join(",")];
-  for (const row of rows) {
-    lines.push(columns.map((c) => escape(row[c])).join(","));
-  }
-  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  return [columns.map(cell).join(","), ...rows.map((row) => columns.map((c) => cell(row[c])).join(","))].join("\r\n");
+}
+
+export function exportRowsCsv(columns: string[], rows: Record<string, unknown>[], filename: string) {
+  // A byte-order mark so Excel reads the file as UTF-8 (names with accents stay intact).
+  const blob = new Blob(["\ufeff" + toCsv(columns, rows)], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

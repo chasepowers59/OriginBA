@@ -24,6 +24,7 @@ import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOve
 import { authHeaders, activeOrganizationHeader } from "./auth";
 import { localIsoDate } from "@/lib/format";
 import { parseApiError } from "@/lib/apiErrors";
+import { parseSse } from "@/lib/sse";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -484,6 +485,42 @@ export function fetchAssistantSpend(): Promise<AssistantSpend> {
 
 export function fetchAssistantStatus(): Promise<AssistantStatus> {
   return fetchJson<AssistantStatus>("/portal/assistant/status");
+}
+
+/**
+ * The same ask as askAssistant, streamed: onStep hears each tool step as the model takes it,
+ * and the promise resolves with the full answer. Falls back to the plain ask when the API
+ * has no streaming route.
+ */
+export async function askAssistantStream(
+  question: string,
+  thread: AssistantMessage[],
+  context: { canvas_id: string; period?: string; filters?: string[] } | null,
+  onStep: (event: { type: string; data: Record<string, unknown> }) => void,
+): Promise<AssistantResponse> {
+  const res = await fetch(`${API_BASE}/portal/assistant/stream`, {
+    method: "POST",
+    headers: await resolveRequestHeaders(),
+    body: JSON.stringify({ question, thread, context: context ?? null }),
+    cache: "no-store",
+  });
+  if (res.status === 404 || res.status === 405) return askAssistant(question, thread, context);
+  if (!res.ok || !res.body) throw new Error(parseApiError(await res.text(), res.statusText));
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    const { events, rest } = parseSse(buffer + decoder.decode(value, { stream: true }));
+    buffer = rest;
+    for (const e of events) {
+      if (e.type === "answer") return e.data as unknown as AssistantResponse;
+      if (e.type === "error") throw new Error(String(e.data.detail ?? "The assistant could not answer."));
+      onStep(e);
+    }
+  }
+  throw new Error("The answer stream ended early. Try again.");
 }
 
 export function askAssistant(

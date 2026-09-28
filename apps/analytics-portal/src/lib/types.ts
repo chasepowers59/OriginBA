@@ -568,6 +568,9 @@ export type AssistantQuery = {
   truncated: boolean;
   ms: number;
   integrity?: CanvasIntegrity[];
+  /** The query as a builder definition, present only when the server proved it reproduces these rows. */
+  view_spec?: import("./assistant").ViewSpec;
+  view_spec_note?: string;
 };
 export type AssistantMessage = { role: "user" | "assistant"; content: unknown };
 export type AssistantResponse = {

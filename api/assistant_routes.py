@@ -5,9 +5,13 @@ from typing import Any
 
 from api.auth.workstream_access import can_access_snapshot
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+import json
 import os
+import queue
+import threading
 
 from api.assistant import (Assistant, assistant_configured, model_name, questions_last_minute, spend_report,
                            spend_today)
@@ -37,8 +41,8 @@ def spend(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     return spend_report(require_org_for_data(ctx))
 
 
-@router.post("")
-def ask(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
+def _assistant_for(ctx: AuthContext) -> Assistant:
+    """Checks, limits, and the assistant for this person: shared by the plain and streaming asks."""
     ctx.require_permission("nlq:read")
     org_id = require_org_for_data(ctx)
     if not assistant_configured():
@@ -46,21 +50,58 @@ def ask(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> dict[
     _within_limits(org_id, ctx.email)
     # A person granted some workstreams asks about those canvases only, as everywhere else.
     unrestricted = not ctx.workstreams or "*" in ctx.workstreams
-    assistant = Assistant(org_id=org_id, org_name=ctx.organization_name or org_id,
-                          actor_email=ctx.email, actor_id=ctx.id,
-                          can_read=None if unrestricted else (lambda cid: can_access_snapshot(ctx, cid)))
+    return Assistant(org_id=org_id, org_name=ctx.organization_name or org_id,
+                     actor_email=ctx.email, actor_id=ctx.id,
+                     can_read=None if unrestricted else (lambda cid: can_access_snapshot(ctx, cid)))
+
+
+def _model_api_failure(exc: Exception) -> str | None:
+    """The API's own message is the actionable part (billing, an invalid model id, a
+    malformed request); the class name alone sent us to the server logs."""
+    if "anthropic" not in type(exc).__module__:
+        return None
+    body = getattr(exc, "body", None)
+    said = (body.get("error", {}).get("message") if isinstance(body, dict) else None) or str(exc)
+    return f"The model API failed ({type(exc).__name__}): {said[:300]}"
+
+
+@router.post("")
+def ask(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
+    assistant = _assistant_for(ctx)
     try:
         return assistant.ask(body.question, body.thread, body.context)
     except Exception as exc:  # noqa: BLE001 -- the model API is an external dependency
-        if "anthropic" in type(exc).__module__:
-            # the API's own message is the actionable part (billing, an invalid model id,
-            # a malformed request); the class name alone sent us to the server logs
-            body = getattr(exc, "body", None)
-            said = (body.get("error", {}).get("message") if isinstance(body, dict) else None) or str(exc)
-            said = said[:300]
-            raise HTTPException(status_code=502,
-                                detail=f"The model API failed ({type(exc).__name__}): {said}") from exc
+        detail = _model_api_failure(exc)
+        if detail:
+            raise HTTPException(status_code=502, detail=detail) from exc
         raise
+
+
+@router.post("/stream")
+def ask_streaming(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> StreamingResponse:
+    """The same question as POST, as server-sent events: a `step` and `step_done` per tool
+    call while the model works, then one `answer` (the POST body) or one `error`."""
+    assistant = _assistant_for(ctx)
+    events: queue.Queue = queue.Queue()
+
+    def work() -> None:
+        try:
+            result = assistant.ask(body.question, body.thread, body.context, on_event=events.put)
+            events.put({"type": "answer", **result})
+        except Exception as exc:  # noqa: BLE001
+            events.put({"type": "error", "detail": _model_api_failure(exc) or "The assistant could not answer."})
+        events.put(None)
+
+    threading.Thread(target=work, daemon=True).start()
+
+    def sse():
+        while (event := events.get()) is not None:
+            kind = event.pop("type")
+            yield f"event: {kind}\ndata: {json.dumps(event, default=str)}\n\n"
+
+    # no-transform/no buffering: a proxy that buffers the body turns progress back into a wait
+    return StreamingResponse(sse(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"})
 
 
 

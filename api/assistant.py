@@ -211,7 +211,14 @@ TOOLS: list[dict[str, Any]] = [
                     "refused, the message says why: fix it and run again.",
      "input_schema": {"type": "object",
                       "properties": {"sql": {"type": "string"},
-                                     "purpose": {"type": "string", "description": "one line: what this query establishes"}},
+                                     "purpose": {"type": "string", "description": "one line: what this query establishes"},
+                                     "view_spec": {
+                                         "type": "object",
+                                         "description": "Optional, when the query reads ONE canvas, groups by plain columns and "
+                                                        "aggregates measures with simple filters: the same result as the report "
+                                                        "builder's definition, so the reader can save it as a view. "
+                                                        "{canvas_id, dimensions: [column], measures: [{field, agg: sum|count|avg|min|max}], "
+                                                        "filters: [{field, op: eq|in|between|gte|lte, value}]}. Omit it otherwise."}},
                       "required": ["sql", "purpose"]}},
     {"name": "verification_status",
      "description": "When a canvas was last proven against the client's own database and against "
@@ -312,7 +319,7 @@ def tool_search_knowledge(org_id: str, query: str, limit: int = 8) -> list[dict[
 
 
 def tool_run_sql(org_id: str, engine: str, sql: str, *, actor_email: str, actor_id: str | None,
-                 purpose: str) -> dict[str, Any]:
+                 purpose: str, view_spec: dict[str, Any] | None = None) -> dict[str, Any]:
     from api.access_audit import record_access_event
     from api.database_routes import _run, _validate
     try:
@@ -342,7 +349,63 @@ def tool_run_sql(org_id: str, engine: str, sql: str, *, actor_email: str, actor_
     if ms > SLOW_MS:
         out["note"] = (f"This query took {ms / 1000:.1f}s. Narrow the date window or aggregate "
                        f"further before running another like it.")
+    if isinstance(view_spec, dict):
+        spec, why_not = _checked_view_spec(org_id, view_spec, rows)
+        if spec:
+            out["view_spec"] = spec
+        else:
+            out["view_spec_note"] = f"Not offered as a saved view: the definition {why_not}."
     return out
+
+
+def _checked_view_spec(org_id: str, spec: dict[str, Any], sql_rows: list) -> tuple[dict[str, Any] | None, str]:
+    """The model's builder definition, kept only if the query builder reproduces the SQL's
+    result with it: a saved view the reader reopens must show the numbers they saw."""
+    from api.query_builder import build_query
+    from api.snapshot_catalog import allowed_fields, snapshot_backend
+    from api.snapshot_explorer import _run as run_canvas
+
+    canvas_id = str(spec.get("canvas_id") or "").strip().lower()
+    entry = _canvases(org_id).get(canvas_id)
+    if not entry:
+        return None, "names a canvas this person cannot read"
+    dims = [str(d) for d in spec.get("dimensions") or []]
+    measures = [{"field": str(m.get("field")), "agg": str(m.get("agg"))}
+                for m in spec.get("measures") or [] if isinstance(m, dict)]
+    filters = [{"field": str(f.get("field")), "op": str(f.get("op")), "value": f.get("value")}
+               for f in spec.get("filters") or [] if isinstance(f, dict)]
+    if not measures:
+        return None, "has no measure"
+    try:
+        _, dialect, schema = snapshot_backend(entry, org_id)
+        built, binds = build_query(table_name=entry["table_name"], allowed_fields=allowed_fields(entry),
+                                   trusted_measures=set(entry.get("trusted_measures") or []),
+                                   dimensions=dims, measures=measures, filters=filters,
+                                   limit=MAX_ROWS + 1, dialect=dialect, schema=schema)
+        _, spec_rows = run_canvas(entry, built, binds, organization_id=org_id, max_rows=MAX_ROWS + 1)
+    except Exception as exc:  # noqa: BLE001 -- any refusal just means no save button
+        return None, f"is not a valid view ({str(exc)[:120]})"
+    if not _same_result(sql_rows, spec_rows):
+        return None, "did not reproduce the query's result"
+    return {"canvas_id": canvas_id, "canvas_label": entry.get("label") or canvas_id,
+            "dimensions": dims, "measures": measures, "filters": filters}, ""
+
+
+def _same_result(a: list, b: list) -> bool:
+    """Same number of rows and the same numeric total, to the cent: row order and column
+    names differ between hand-written SQL and the builder's."""
+    def total(rows):
+        n = 0.0
+        for r in rows:
+            for v in r:
+                if isinstance(v, bool):
+                    continue
+                try:
+                    n += float(v)
+                except (TypeError, ValueError):
+                    pass
+        return round(n, 2)
+    return len(a) == len(b) and total(a) == total(b)
 
 
 def _cell(v: Any) -> Any:
@@ -474,19 +537,30 @@ class Assistant:
             return tool_verification_status(self.org_id, args.get("canvas_id", ""))
         if name == "run_sql":
             return tool_run_sql(self.org_id, self.engine, args.get("sql", ""), actor_email=self.actor_email,
-                                actor_id=self.actor_id, purpose=args.get("purpose", ""))
+                                actor_id=self.actor_id, purpose=args.get("purpose", ""),
+                                view_spec=args.get("view_spec"))
         return {"error": f"unknown tool {name}"}
 
     def ask(self, question: str, thread: list[dict[str, Any]] | None = None,
-            context: dict[str, Any] | None = None) -> dict[str, Any]:
+            context: dict[str, Any] | None = None,
+            on_event: Callable[[dict[str, Any]], None] | None = None) -> dict[str, Any]:
         token = _CAN_READ.set(self.can_read)
         try:
-            return self._ask(question, thread, context)
+            return self._ask(question, thread, context, on_event)
         finally:
             _CAN_READ.reset(token)
 
     def _ask(self, question: str, thread: list[dict[str, Any]] | None,
-             context: dict[str, Any] | None) -> dict[str, Any]:
+             context: dict[str, Any] | None,
+             on_event: Callable[[dict[str, Any]], None] | None) -> dict[str, Any]:
+        def tell(event: dict[str, Any]) -> None:
+            # progress for a streaming client; a listener that has gone away never costs the answer
+            if on_event:
+                try:
+                    on_event(event)
+                except Exception:  # noqa: BLE001
+                    pass
+
         client = self._client_factory()
         asked = _with_page_context(self.org_id, question, context)
         messages = _from_a_question(list(thread or [])[-MAX_THREAD:]) + [{"role": "user", "content": asked}]
@@ -523,8 +597,16 @@ class Assistant:
                 break
             results = []
             for call in calls:
-                out = self._dispatch(call["name"], call["input"] or {})
+                args = call["input"] or {}
+                detail = args.get("purpose") or args.get("query") or ""
+                if args.get("canvas_id"):   # the canvas's own name, not its table id
+                    detail = (_canvases(self.org_id).get(str(args["canvas_id"]).lower()) or {}).get("label") \
+                        or args["canvas_id"]
+                tell({"type": "step", "tool": call["name"], "detail": detail})
+                out = self._dispatch(call["name"], args)
                 is_error = isinstance(out, dict) and "error" in out
+                tell({"type": "step_done", "tool": call["name"], "ok": not is_error,
+                      "rows": out.get("row_count") if isinstance(out, dict) else None})
                 steps.append({"tool": call["name"], "input": _brief(call["input"]), "ok": not is_error})
                 if call["name"] == "run_sql" and not is_error:
                     queries.append({"purpose": call["input"].get("purpose", ""), **out})

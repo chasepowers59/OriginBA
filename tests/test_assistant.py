@@ -363,6 +363,41 @@ class Routes(unittest.TestCase):
         self.assertEqual(A.call_args.kwargs["org_id"], "dev")
         A.return_value.ask.assert_called_once_with("how many?", [], None)
 
+    def _events(self, body_text):
+        out = []
+        for block in body_text.strip().split("\n\n"):
+            kind = next(l[7:] for l in block.split("\n") if l.startswith("event: "))
+            data = json.loads(next(l[6:] for l in block.split("\n") if l.startswith("data: ")))
+            out.append((kind, data))
+        return out
+
+    def test_the_stream_sends_each_step_then_the_answer(self):
+        def ask(q, thread, context, on_event=None):
+            on_event({"type": "step", "tool": "run_sql", "detail": "billed by cycle"})
+            on_event({"type": "step_done", "tool": "run_sql", "ok": True, "rows": 10})
+            return {"answer": "42", "steps": [], "queries": [], "thread": []}
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-only"}), \
+             mock.patch("api.assistant_routes.Assistant") as A:
+            A.return_value.ask.side_effect = ask
+            r = self.client.post("/portal/assistant/stream", json={"question": "how many?"})
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(r.headers["content-type"].startswith("text/event-stream"))
+        events = self._events(r.text)
+        self.assertEqual([k for k, _ in events], ["step", "step_done", "answer"])
+        self.assertEqual(events[-1][1]["answer"], "42")
+
+    def test_the_stream_says_what_went_wrong(self):
+        class BadRequestError(Exception):
+            __module__ = "anthropic"
+            body = {"error": {"message": "credit balance is too low"}}
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-only"}), \
+             mock.patch("api.assistant_routes.Assistant") as A:
+            A.return_value.ask.side_effect = BadRequestError("x")
+            r = self.client.post("/portal/assistant/stream", json={"question": "how many?"})
+        kind, data = self._events(r.text)[-1]
+        self.assertEqual(kind, "error")
+        self.assertIn("credit balance is too low", data["detail"])
+
     def test_a_model_api_failure_says_what_the_api_said(self):
         # the first real call failed with "credit balance is too low"; a bare 502 with the
         # exception class name sent us to the server logs to learn that
@@ -627,3 +662,78 @@ class KnowsWhereThePersonIs(unittest.TestCase):
         self._assistant(a).ask("q")
         self._assistant(b).ask("q", context={"canvas_id": "rpt_payment"})
         self.assertEqual(a.requests[0]["system"], b.requests[0]["system"])
+
+
+class ProgressAsItHappens(unittest.TestCase):
+    """A question takes several model turns and queries; the panel sat on 'Working...' for
+    all of it. Each tool step is reported when it starts and when it ends."""
+
+    setUp, tearDown, _assistant = TheLoop.setUp, TheLoop.tearDown, TheLoop._assistant
+
+    def test_each_step_is_reported_as_it_starts_and_ends(self):
+        client = FakeClient([
+            _resp([_tool("c1", "describe_canvas", {"canvas_id": "rpt_bill_segment"})], "tool_use"),
+            _resp([_tool("c2", "run_sql", {"sql": 'select "Bill Cycle", "Billed Amount" from reporting.rpt_bill_segment limit 5',
+                                          "purpose": "billed by cycle"})], "tool_use"),
+            _resp([_text("done")], "end_turn"),
+        ])
+        events = []
+        out = self._assistant(client).ask("by cycle?", on_event=events.append)
+        self.assertEqual([(e["type"], e["tool"]) for e in events],
+                         [("step", "describe_canvas"), ("step_done", "describe_canvas"),
+                          ("step", "run_sql"), ("step_done", "run_sql")])
+        self.assertEqual(events[0]["detail"], "Bill Segment", "the canvas's name, not rpt_bill_segment")
+        self.assertEqual(events[2]["detail"], "billed by cycle")
+        self.assertEqual(events[3]["rows"], MAX_ROWS)
+        self.assertEqual(out["answer"], "done")
+
+    def test_a_listener_that_fails_never_breaks_the_answer(self):
+        client = FakeClient([_resp([_tool("l1", "list_canvases", {})], "tool_use"), _resp([_text("ok")], "end_turn")])
+        def boom(_):
+            raise RuntimeError("socket closed")
+        self.assertEqual(self._assistant(client).ask("hi", on_event=boom)["answer"], "ok")
+
+
+class SaveTheAnswerAsAView(unittest.TestCase):
+    """A saved view is a builder definition (canvas, dimensions, measures, filters), never
+    SQL. The model may state its query as one; the server keeps it only when that
+    definition, run through the query builder, reproduces the SQL's own result."""
+
+    SPEC = {"canvas_id": "rpt_bill_segment", "dimensions": ["Bill Cycle"],
+            "measures": [{"field": "Billed Amount", "agg": "sum"}],
+            "filters": [{"field": "Is Frozen", "op": "eq", "value": True}]}
+
+    def setUp(self):
+        self.patches = [
+            mock.patch("api.assistant.org_backend", return_value=("postgres", "dbt")),
+            mock.patch("api.database_routes._run", return_value=(["Bill Cycle", "Billed Amount"], [["C1", 12.5], ["C2", 7.5]])),
+            mock.patch("api.access_audit.record_access_event"),
+        ]
+        for p in self.patches:
+            p.start()
+
+    def tearDown(self):
+        for p in self.patches:
+            p.stop()
+
+    def _run(self, spec, builder_rows):
+        from api.assistant import tool_run_sql
+        with mock.patch("api.snapshot_explorer._run", return_value=(["Bill Cycle", "m0"], builder_rows)):
+            return tool_run_sql("dev", "postgres", 'select "Bill Cycle", sum("Billed Amount") from reporting.rpt_bill_segment group by 1 limit 50',
+                                actor_email="t@x", actor_id="t", purpose="p", view_spec=spec)
+
+    def test_a_definition_that_reproduces_the_result_is_offered_to_save(self):
+        out = self._run(self.SPEC, [["C2", 7.5], ["C1", 12.5]])
+        self.assertEqual(out["view_spec"]["canvas_id"], "rpt_bill_segment")
+        self.assertEqual(out["view_spec"]["dimensions"], ["Bill Cycle"])
+        self.assertTrue(out["view_spec"]["canvas_label"])
+
+    def test_a_definition_that_gives_different_numbers_is_not(self):
+        out = self._run(self.SPEC, [["C1", 12.5], ["C2", 99.0]])
+        self.assertNotIn("view_spec", out)
+        self.assertIn("did not reproduce", out["view_spec_note"])
+
+    def test_an_unknown_column_is_not(self):
+        spec = {**self.SPEC, "dimensions": ["Made Up Column"]}
+        out = self._run(spec, [["C1", 12.5], ["C2", 7.5]])
+        self.assertNotIn("view_spec", out)

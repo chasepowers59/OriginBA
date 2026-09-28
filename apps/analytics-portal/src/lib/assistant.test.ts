@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { STARTER_QUESTIONS, ageLabel, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, spendLabel, tryGovernedFirst, summarise, threadFor, type Turn } from "./assistant";
+import { STARTER_QUESTIONS, ageLabel, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, savedViewFromSpec, spendLabel, tryGovernedFirst, summarise, threadFor, type Turn } from "./assistant";
 import type { AssistantResponse, CanvasIntegrity, IntegrityOverview } from "./types";
 
 const answer = (thread: unknown[] = []): AssistantResponse => ({
@@ -151,5 +151,27 @@ describe("vetted metrics answer first", () => {
       { role: "governed", question: "q2", result: { narrative: "n", metric_label: "Billed revenue" } },
     ];
     expect(threadFor(turns)).toEqual([{ role: "user", content: "q1" }]);
+  });
+});
+
+describe("saving an answer as a view", () => {
+  it("becomes the same saved view the builder makes, filters included", () => {
+    const view = savedViewFromSpec({
+      canvas_id: "rpt_bill_segment", canvas_label: "Bill Segment", dimensions: ["Bill Cycle"],
+      measures: [{ field: "Billed Amount", agg: "sum" }],
+      filters: [{ field: "Is Frozen", op: "eq", value: true }],
+    }, "billed by cycle");
+    expect(view).toEqual({
+      snapshot_id: "rpt_bill_segment", snapshot_label: "Bill Segment", title: "billed by cycle", kind: "custom",
+      dimensions: ["Bill Cycle"], measure_field: "Billed Amount", measure_agg: "sum",
+      measures: [{ field: "Billed Amount", agg: "sum" }],
+      filters: [{ field: "Is Frozen", op: "eq", value: true }], chart_type: "bar",
+    });
+  });
+
+  it("a title is never empty or overlong", () => {
+    const spec = { canvas_id: "rpt_gl", canvas_label: "General Ledger", dimensions: [], measures: [{ field: "Amount", agg: "sum" }], filters: [] };
+    expect(savedViewFromSpec(spec, "").title).toBe("General Ledger");
+    expect(savedViewFromSpec(spec, "x".repeat(200)).title.length).toBe(80);
   });
 });

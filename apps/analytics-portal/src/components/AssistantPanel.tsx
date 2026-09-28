@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { askAssistant, fetchAssistantSpend, fetchAssistantStatus, fetchIntegrity, runAnalyticsNlq } from "@/lib/api";
-import { formatCurrency, formatNumber } from "@/lib/format";
-import { STARTER_QUESTIONS, WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, spendLabel, summarise, threadFor, tryGovernedFirst, type Turn } from "@/lib/assistant";
+import { askAssistantStream, createSavedView, fetchAssistantSpend, fetchAssistantStatus, fetchIntegrity, runAnalyticsNlq } from "@/lib/api";
+import { stepLabel } from "@/lib/sse";
+import { exportRowsCsv, formatCurrency, formatNumber } from "@/lib/format";
+import { STARTER_QUESTIONS, WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, savedViewFromSpec, spendLabel, summarise, threadFor, tryGovernedFirst, type Turn } from "@/lib/assistant";
 import { useAuth } from "@/components/AuthProvider";
 import { contextLabel, getPageContext, loadTurns, saveTurns, subscribeAsk, subscribePageContext, takeAsk, type PageContext } from "@/lib/assistantContext";
 import { DatabaseResultChart } from "@/components/DatabaseResultChart";
@@ -23,6 +24,10 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
   const [question, setQuestion] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [busy, setBusy] = useState(false);
+  // What the model is doing right now, one line per tool step, while it works.
+  // The question being answered, shown at once rather than after the answer arrives.
+  const [pending, setPending] = useState<string | null>(null);
+  const [steps, setSteps] = useState<{ label: string; done: boolean; ok: boolean; rows?: number | null }[]>([]);
   const endRef = useRef<HTMLDivElement>(null);
   const { can } = useAuth();
   // The page the reader is on (a canvas), sent with the question unless they turn it off.
@@ -54,6 +59,8 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
     if (!q || busy) return;
     setBusy(true);
     setQuestion("");
+    setPending(q);
+    setSteps([]);
     const onPage = about !== undefined ? about : page && usePage ? page : null;
     const aboutThePage = Boolean(onPage);
     if (!assistantOnly && tryGovernedFirst(q, aboutThePage)) {
@@ -64,6 +71,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
         if (result.metric_id && result.table?.rows?.length) {
           setTurns((t) => [...t, { role: "user", text: q }, { role: "governed", question: q, result }]);
           setBusy(false);
+          setPending(null);
           return;
         }
       } catch {
@@ -74,7 +82,14 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
       const context = onPage
         ? { canvas_id: onPage.canvas_id, period: onPage.period, filters: onPage.filters }
         : null;
-      const response = await askAssistant(q, threadFor(turns), context);
+      const response = await askAssistantStream(q, threadFor(turns), context, (e) => {
+        if (e.type === "step") {
+          setSteps((s) => [...s, { label: stepLabel(e.data), done: false, ok: true }]);
+        } else if (e.type === "step_done") {
+          setSteps((s) => s.map((x, i) => i === s.length - 1
+            ? { ...x, done: true, ok: e.data.ok !== false, rows: e.data.rows as number | null } : x));
+        }
+      });
       setTurns((t) => appendTurns(t, q, response));
       fetchAssistantSpend().then(setSpend).catch(() => undefined);
     } catch (err) {
@@ -82,6 +97,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
         { role: "error", text: err instanceof Error ? err.message : "The assistant could not answer." }]);
     } finally {
       setBusy(false);
+      setPending(null);
     }
   };
   const ask = (e: React.FormEvent) => {
@@ -143,7 +159,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
         </p>
       ) : null}
 
-      {turns.length ? (
+      {turns.length || pending ? (
         <div className="mb-4 max-h-[60vh] space-y-3 overflow-y-auto pr-1">
           {turns.map((t, i) => (
             <div key={i}>
@@ -169,7 +185,19 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
               )}
             </div>
           ))}
-          {busy ? <p className="text-xs text-fg-muted">Working — reading the canvases and running the query…</p> : null}
+          {pending ? (
+            <p className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-primary/10 px-4 py-2 text-sm text-heading">{pending}</p>
+          ) : null}
+          {busy ? (
+            <ul className="space-y-1 text-xs text-fg-muted" aria-live="polite">
+              {steps.length ? steps.map((s, i) => (
+                <li key={i} className={s.done && !s.ok ? "text-over" : undefined}>
+                  {s.done ? (s.ok ? "✓" : "✗") : "…"} {s.label}
+                  {s.done && s.rows != null ? ` · ${s.rows.toLocaleString()} rows` : ""}
+                </li>
+              )) : <li>Thinking about the question…</li>}
+            </ul>
+          ) : null}
           <div ref={endRef} />
         </div>
       ) : null}
@@ -264,6 +292,22 @@ function Answer({ response }: { response: AssistantResponse }) {
 function QueryResult({ q }: { q: AssistantQuery }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { can } = useAuth();
+  const [saved, setSaved] = useState<{ id?: string; error?: string } | null>(null);
+  const save = async () => {
+    if (!q.view_spec) return;
+    try {
+      const view = await createSavedView(savedViewFromSpec(q.view_spec, q.purpose));
+      setSaved({ id: view.id });
+    } catch (err) {
+      setSaved({ error: err instanceof Error ? err.message : "Could not save the view." });
+    }
+  };
+  const download = () => exportRowsCsv(
+    q.columns,
+    q.rows.map((r) => Object.fromEntries(q.columns.map((c, i) => [c, r[i]]))),
+    `${(q.purpose || "answer").replace(/[^a-z0-9]+/gi, "_").slice(0, 60)}.csv`,
+  );
   const copy = async () => {
     try { await navigator.clipboard.writeText(q.sql); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* clipboard unavailable */ }
   };
@@ -282,9 +326,20 @@ function QueryResult({ q }: { q: AssistantQuery }) {
         <div className="flex flex-wrap gap-2">
           <button type="button" className="btn-ghost text-xs" onClick={() => setOpen((o) => !o)}>{open ? "Hide SQL" : "Show SQL"}</button>
           <button type="button" className="btn-ghost text-xs" onClick={copy}>{copied ? "Copied" : "Copy SQL"}</button>
+          <button type="button" className="btn-ghost text-xs" onClick={download}>Download CSV</button>
+          {q.view_spec && can("saved_views:write") ? (
+            saved?.id ? (
+              <Link href={`/build?view=${encodeURIComponent(saved.id)}`} className="btn-ghost text-xs">Saved · open in builder</Link>
+            ) : (
+              <button type="button" className="btn-ghost text-xs" onClick={save} title="Save as a view you can reopen, pin and schedule">
+                Save as view
+              </button>
+            )
+          ) : null}
           <Link href="/database" className="btn-ghost text-xs" onClick={handoff}>Open in SQL workspace</Link>
         </div>
       </div>
+      {saved?.error ? <p className="px-3 pb-2 text-xs text-over">{saved.error}</p> : null}
       {q.integrity?.length ? (
         <ul className="border-t border-edge-subtle px-3 py-2 text-xs text-fg-muted">
           {q.integrity.map((i) => (

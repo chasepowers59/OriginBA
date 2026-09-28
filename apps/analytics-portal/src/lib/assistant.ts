@@ -137,3 +137,28 @@ export function resultChart(q: { columns: string[]; rows: unknown[][] }): ChartS
     : suggestChart(q.columns, records);
   return s ? { ...s, isCurrency: measureIsCurrency(s.measureKey) } : null;
 }
+
+export type ViewSpec = {
+  canvas_id: string;
+  canvas_label: string;
+  dimensions: string[];
+  measures: { field: string; agg: string }[];
+  filters: { field: string; op: string; value: unknown }[];
+};
+
+/** A checked answer definition as the saved view the builder would make of it. */
+export function savedViewFromSpec(spec: ViewSpec, purpose: string) {
+  const first = spec.measures[0];
+  return {
+    snapshot_id: spec.canvas_id,
+    snapshot_label: spec.canvas_label,
+    title: (purpose.trim() || spec.canvas_label).slice(0, 80),
+    kind: "custom" as const,
+    dimensions: spec.dimensions,
+    measure_field: first?.field,
+    measure_agg: first?.agg,
+    measures: spec.measures,
+    filters: spec.filters,
+    chart_type: "bar",
+  };
+}
