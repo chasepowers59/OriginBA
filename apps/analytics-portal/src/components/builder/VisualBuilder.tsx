@@ -25,7 +25,7 @@ import {
   measureDisplaysAsCurrency,
   workstreamDisplayName,
 } from "@/lib/businessLabels";
-import { activeFilters, optionsWithCurrent, restoreFilters } from "@/lib/builderFilters";
+import { activeFilters, optionsWithCurrent, restoreFilters, questionFilters } from "@/lib/builderFilters";
 import { formatNumber, formatCellValue } from "@/lib/format";
 import type {
   BuilderQuestion,
@@ -236,12 +236,7 @@ export function VisualBuilder({
         });
       setCols(nextCols);
       setVals(nextVals);
-      setFils(
-        (question.filters ?? []).map((f) => {
-          const fd = m.fields?.find((x) => x.id === f.field);
-          return { field: f.field, label: fd?.label ?? f.field, op: f.op, value: f.value, role: fd?.role ?? "dimension" };
-        }),
-      );
+      setFils(questionFilters(question.filters, m.fields, m.suggested_default_filter));
       const ct = question.chart_type;
       setVisual((ct === "line" ? "line" : ct === "pie" ? "pie" : ct === "horizontal" ? "horizontal" : "bar") as VisualChoice);
     },

@@ -68,3 +68,25 @@ export function restoreFilters(
   }
   return out;
 }
+
+/**
+ * The pills a governed question opens with. The server windows a query only when it has NO
+ * filters (a caller's filter is never overlaid with a hidden window), so a question that
+ * declares flag filters -- revenue on frozen segments -- ran over all time. When a question
+ * filters but not on a date, the canvas's default window joins the shelf as its own pill:
+ * visible, labelled, and removable.
+ */
+export function questionFilters(
+  declared: readonly QueryFilter[] | null | undefined,
+  fields: FieldLike[] | undefined,
+  defaultWindow: QueryFilter | null | undefined,
+): ShelfFilter[] {
+  const pill = (f: QueryFilter): ShelfFilter => {
+    const fd = fields?.find((x) => x.id === f.field);
+    return { field: f.field, label: fd?.label ?? f.field, op: f.op, value: f.value, role: fd?.role ?? "dimension" };
+  };
+  const pills = (declared ?? []).map(pill);
+  const datesFiltered = pills.some((p) => p.role === "date");
+  if (pills.length && !datesFiltered && defaultWindow) pills.push({ ...pill(defaultWindow), role: "date" });
+  return pills;
+}

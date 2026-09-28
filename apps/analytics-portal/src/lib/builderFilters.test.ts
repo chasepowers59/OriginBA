@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activeFilters, optionsWithCurrent, restoreFilters } from "./builderFilters";
+import { activeFilters, optionsWithCurrent, restoreFilters, questionFilters } from "./builderFilters";
 
 /**
  * The builder never saved its filters shelf, and the restore never set it. A view
@@ -127,5 +127,38 @@ describe("optionsWithCurrent", () => {
     const out = optionsWithCurrent(["A", "A", "B"], "A");
     expect(out!.filter((v) => v === "A")).toHaveLength(2); // preserves the source list
     expect(optionsWithCurrent(["A"], "A")).toEqual(["A"]);
+  });
+});
+
+describe("questionFilters", () => {
+  const fields = [
+    { id: "Bill Date", label: "Bill Date", role: "date" },
+    { id: "Is Frozen", label: "Is Frozen", role: "dimension" },
+    { id: "Is Cancelled", label: "Is Cancelled", role: "dimension" },
+  ];
+  const window = { field: "Bill Date", op: "between", value: ["2026-03-20", "2026-06-18"] };
+  const frozen = [{ field: "Is Frozen", op: "eq", value: true }, { field: "Is Cancelled", op: "eq", value: false }];
+
+  it("adds the canvas's default window, as a visible pill, to a question that filters on flags only", () => {
+    // Declaring "Is Frozen" on revenue-by-cycle (2026-09-28) turned "last 90 days" into all
+    // time: the server windows only a query with NO filters. The window is now the builder's
+    // own pill, so it is seen and can be removed.
+    const pills = questionFilters(frozen, fields, window);
+    expect(pills.map((p) => p.field)).toEqual(["Is Frozen", "Is Cancelled", "Bill Date"]);
+    expect(pills[2]).toMatchObject({ op: "between", value: ["2026-03-20", "2026-06-18"], role: "date" });
+  });
+
+  it("leaves a question that already filters on a date alone", () => {
+    const own = [...frozen, { field: "Bill Date", op: "gte", value: "2026-01-01" }];
+    expect(questionFilters(own, fields, window).map((p) => p.field)).toEqual(["Is Frozen", "Is Cancelled", "Bill Date"]);
+    expect(questionFilters(own, fields, window)[2].op).toBe("gte");
+  });
+
+  it("adds nothing to a question with no filters: the server's disclosed window covers it", () => {
+    expect(questionFilters([], fields, window)).toEqual([]);
+  });
+
+  it("adds nothing when the canvas has no default window", () => {
+    expect(questionFilters(frozen, fields, null).map((p) => p.field)).toEqual(["Is Frozen", "Is Cancelled"]);
   });
 });
