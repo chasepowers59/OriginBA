@@ -507,10 +507,18 @@ def _edge_free(slide, nodes, e):
         pts = [p0, (p0[0], p1[1]), p1]
     _arrow_segments(slide, pts, width_pt=e.get("width", 2.25))
     if e.get("label"):
-        mid = pts[len(pts) // 2] if len(pts) > 2 else ((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2)
-        lx, ly = e.get("label_at", (mid[0] + 0.1, mid[1] - 0.42))
-        t = slide.shapes.add_textbox(Inches(lx), Inches(ly), Inches(e.get("label_w", 3.2)), Inches(0.4))
-        _text(t, [[(e["label"], 11, CREAM, True)]], anchor=MSO_ANCHOR.BOTTOM, margin=0.0)
+        mx, my = (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2
+        if "label_at" in e or len(pts) > 2:   # a routed edge: the label sits where the spec says, else above the middle bend
+            mid = pts[len(pts) // 2] if len(pts) > 2 else (mx, my)
+            lx, ly = e.get("label_at", (mid[0] + 0.1, mid[1] - 0.42))
+            t = slide.shapes.add_textbox(Inches(lx), Inches(ly), Inches(e.get("label_w", 3.2)), Inches(0.4))
+            _text(t, [[(e["label"], 11, CREAM, True)]], anchor=MSO_ANCHOR.BOTTOM, margin=0.0)
+        elif abs(p0[1] - p1[1]) < 0.05:   # a straight horizontal edge: the label centred just above the line
+            t = slide.shapes.add_textbox(Inches(mx - 0.6), Inches(my - 0.34), Inches(1.2), Inches(0.3))
+            _text(t, [[(e["label"], 11, CREAM, True)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.BOTTOM, margin=0.0)
+        else:   # a straight vertical edge: the label just right of the line
+            t = slide.shapes.add_textbox(Inches(mx + 0.07), Inches(my - 0.15), Inches(1.2), Inches(0.3))
+            _text(t, [[(e["label"], 11, CREAM, True)]], anchor=MSO_ANCHOR.MIDDLE, margin=0.0)
 
 
 def _draw_free_node(slide, n):

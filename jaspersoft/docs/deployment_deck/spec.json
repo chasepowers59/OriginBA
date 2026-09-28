@@ -669,9 +669,9 @@
         {
           "id": "q1",
           "x": 18.7,
-          "y": 4.4,
+          "y": 4.45,
           "w": 2.3,
-          "h": 1.05,
+          "h": 0.95,
           "title": "ready gate: every job SUCCEEDED?",
           "kind": "gate",
           "title_pt": 10,
@@ -681,19 +681,19 @@
         {
           "id": "sq1",
           "x": 18.9,
-          "y": 5.6,
+          "y": 5.75,
           "w": 1.9,
-          "h": 0.45,
-          "title": "no: stop, fix, re-run",
+          "h": 0.42,
+          "title": "stop, fix, re-run",
           "kind": "stop",
           "title_pt": 9
         },
         {
           "id": "q2",
           "x": 15.6,
-          "y": 4.4,
+          "y": 4.45,
           "w": 2.6,
-          "h": 1.05,
+          "h": 0.95,
           "title": "validate and install gates pass?",
           "kind": "gate",
           "title_pt": 10,
@@ -703,19 +703,19 @@
         {
           "id": "sq2",
           "x": 15.85,
-          "y": 5.6,
+          "y": 5.75,
           "w": 2.1,
-          "h": 0.45,
-          "title": "no: stop, fix, re-run",
+          "h": 0.42,
+          "title": "stop, fix, re-run",
           "kind": "stop",
           "title_pt": 9
         },
         {
           "id": "q3",
           "x": 12.7,
-          "y": 4.5,
+          "y": 4.45,
           "w": 2.4,
-          "h": 0.85,
+          "h": 0.95,
           "title": "Post-load indexes",
           "kind": "step",
           "body": "keys and dates the domains filter on",
@@ -735,9 +735,9 @@
         {
           "id": "q5",
           "x": 6.5,
-          "y": 4.4,
+          "y": 4.45,
           "w": 2.2,
-          "h": 1.05,
+          "h": 0.95,
           "title": "validated again?",
           "kind": "gate",
           "title_pt": 10,
@@ -747,10 +747,10 @@
         {
           "id": "sq5",
           "x": 6.6,
-          "y": 3.75,
+          "y": 3.65,
           "w": 2.0,
-          "h": 0.45,
-          "title": "no: stop, fix, re-run",
+          "h": 0.42,
+          "title": "stop, fix, re-run",
           "kind": "stop",
           "title_pt": 9
         },
@@ -1188,7 +1188,8 @@
         },
         {
           "from": "q1",
-          "to": "q2"
+          "to": "q2",
+          "label": "yes"
         },
         {
           "from": "q2",
@@ -1197,7 +1198,8 @@
         },
         {
           "from": "q2",
-          "to": "q3"
+          "to": "q3",
+          "label": "yes"
         },
         {
           "from": "q3",
@@ -1214,7 +1216,8 @@
         },
         {
           "from": "q5",
-          "to": "q6"
+          "to": "q6",
+          "label": "yes"
         },
         {
           "from": "q6",
@@ -1327,7 +1330,7 @@
           "to": "m9"
         }
       ],
-      "legend": "Every box in the map is one database object the domains read: seven rolling snapshot tables, the SA aged-balance table with its lookup seed, and eight CMS views. Numbers are the order of one rollout; orange diamonds are gates and a 'no' stops it there. The loop under the second row is the twice-daily rolling refresh (3 months rebuilt, 24 kept; 6 months at CityCorp and Odessa).",
+      "legend": "Every box in the map is one database object the domains read: seven rolling snapshot tables, the SA aged-balance table with its lookup seed, and eight CMS views. Numbers are the order of one rollout; orange diamonds are gates: yes continues, no stops the rollout there. The loop under the second row is the twice-daily rolling refresh (3 months rebuilt, 24 kept; 6 months at CityCorp and Odessa).",
       "layers": {
         "Commands": [
           {
@@ -1879,9 +1882,9 @@
         },
         {
           "id": "a4",
-          "x": 2.3899999999999997,
+          "x": 2.49,
           "y": 6.65,
-          "w": 1.7,
+          "w": 1.5,
           "h": 0.9,
           "title": "package verifies?",
           "kind": "gate",
@@ -1892,9 +1895,9 @@
           "id": "sa4",
           "x": 1.01,
           "y": 6.875,
-          "w": 1.15,
+          "w": 0.98,
           "h": 0.45,
-          "title": "no: stop",
+          "title": "stop",
           "kind": "stop",
           "title_pt": 9
         },
@@ -1933,9 +1936,9 @@
         },
         {
           "id": "b4",
-          "x": 7.57,
+          "x": 7.67,
           "y": 5.9,
-          "w": 1.7,
+          "w": 1.5,
           "h": 0.9,
           "title": "seven proofs pass?",
           "kind": "gate",
@@ -1944,11 +1947,11 @@
         },
         {
           "id": "sb4",
-          "x": 9.35,
+          "x": 9.67,
           "y": 6.125,
-          "w": 1.3000000000000003,
+          "w": 0.98,
           "h": 0.45,
-          "title": "no: stop",
+          "title": "stop",
           "kind": "stop",
           "title_pt": 9
         },
@@ -1999,29 +2002,29 @@
         },
         {
           "id": "c3",
-          "x": 12.299999999999999,
+          "x": 12.85,
           "y": 5.7,
-          "w": 2.6,
-          "h": 1.05,
-          "title": "verified? no source strings, references exist, fields resolve",
+          "w": 1.5,
+          "h": 0.9,
+          "title": "package verified?",
           "kind": "gate",
-          "title_pt": 10,
-          "num": 12
+          "num": 12,
+          "tooltip": "No source host, org path or datasource name survives; every outside reference exists on the target; every field the views use resolves in its domain."
         },
         {
           "id": "sc3",
-          "x": 14.979999999999999,
-          "y": 6.0,
-          "w": 0.850000000000001,
+          "x": 14.85,
+          "y": 5.925,
+          "w": 0.98,
           "h": 0.45,
-          "title": "no: stop",
+          "title": "stop",
           "kind": "stop",
           "title_pt": 9
         },
         {
           "id": "c4",
           "x": 11.35,
-          "y": 6.9,
+          "y": 6.8,
           "w": 4.5,
           "h": 0.8,
           "title": "Import, compare, execute",
@@ -2032,7 +2035,7 @@
         {
           "id": "c5",
           "x": 11.35,
-          "y": 7.85,
+          "y": 7.75,
           "w": 4.5,
           "h": 1.0,
           "title": "Sweep and sign off",
@@ -2074,9 +2077,9 @@
         },
         {
           "id": "d3",
-          "x": 17.93,
+          "x": 18.03,
           "y": 5.55,
-          "w": 1.7,
+          "w": 1.5,
           "h": 0.9,
           "title": "seven proofs pass?",
           "kind": "gate",
@@ -2085,11 +2088,11 @@
         },
         {
           "id": "sd3",
-          "x": 19.71,
+          "x": 20.03,
           "y": 5.775,
-          "w": 1.3000000000000003,
+          "w": 0.98,
           "h": 0.45,
-          "title": "no: stop",
+          "title": "stop",
           "kind": "stop",
           "title_pt": 9
         },
@@ -2185,7 +2188,13 @@
               5.83,
               3.175
             ]
-          ]
+          ],
+          "label": "yes",
+          "label_at": [
+            4.4,
+            6.72
+          ],
+          "label_w": 1.0
         },
         {
           "from": "b1",
@@ -2206,7 +2215,8 @@
         },
         {
           "from": "b4",
-          "to": "b5"
+          "to": "b5",
+          "label": "yes"
         },
         {
           "from": "b5",
@@ -2241,7 +2251,8 @@
         },
         {
           "from": "c3",
-          "to": "c4"
+          "to": "c4",
+          "label": "yes"
         },
         {
           "from": "c4",
@@ -2253,7 +2264,7 @@
           "via": [
             [
               16.19,
-              8.35
+              8.25
             ],
             [
               16.19,
@@ -2280,7 +2291,8 @@
         },
         {
           "from": "d3",
-          "to": "d4"
+          "to": "d4",
+          "label": "yes"
         },
         {
           "from": "d4",
@@ -2322,7 +2334,7 @@
           ]
         }
       ],
-      "legend": "Orange diamonds are gates: a 'no' stops the run and names the rollback. Numbers are the order of one full promotion. The Workstreams tree is never moved; the offering is a curated copy promoted org by org.",
+      "legend": "Orange diamonds are gates: yes continues, no stops the run and names the rollback. Numbers are the order of one full promotion. The Workstreams tree is never moved; the offering is a curated copy promoted org by org.",
       "legend_y": 11.3,
       "layers": {
         "Commands": [

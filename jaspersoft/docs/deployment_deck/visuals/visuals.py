@@ -22,13 +22,13 @@ SEVEN = ("the seven proofs: 1 no source host, org path or datasource name surviv
 GX = [0.81, 5.99, 11.17, 16.35]; GW = 4.86; NX = [g + 0.18 for g in GX]; NW = 4.5
 
 
-def gate(id, col, y, title, w=1.7, h=0.9, **kw):
+def gate(id, col, y, title, w=1.5, h=0.9, **kw):
     return N(id, NX[col] + (NW - w) / 2, y, w, h, title, kind="gate", **kw)
 
 
-def stop_right(id, col, y, gw=1.7):
-    x = NX[col] + (NW + gw) / 2 + 0.08
-    return N(id, x, y, NX[col] + NW - x - 0.02, 0.45, "no: stop", kind="stop", title_pt=9)
+def stop_right(id, col, y, gw=1.5):
+    x = NX[col] + (NW + gw) / 2 + 0.5
+    return N(id, x, y, NX[col] + NW - x - 0.02, 0.45, "stop", kind="stop", title_pt=9)
 
 
 SO_FLOW = {"type": "diagram", "title": "Standard Offering Deployment Flow", "kicker": "V1",
@@ -44,7 +44,7 @@ SO_FLOW = {"type": "diagram", "title": "Standard Offering Deployment Flow", "kic
    tooltip="A REST export task on the internal server, polled until done, downloaded as a zip package."),
  N("a3", NX[0], 4.85, NW, 1.55, "Build the package", "inventory and classify the export; keep the offering list; one copy of each domain in one home; carry the datasource; rewrite every path; strip print wrappers; narrow the import index", num=3),
  gate("a4", 0, 6.65, "package verifies?", num=4, tooltip="No source host, org path or datasource name left in the package; every outside reference exists on the target; every field the views use resolves."),
- N("sa4", NX[0] + 0.02, 6.875, 1.15, 0.45, "no: stop", kind="stop", title_pt=9),
+ N("sa4", NX[0] + 0.02, 6.875, 0.98, 0.45, "stop", kind="stop", title_pt=9),
  N("b1", NX[1], 2.75, NW, 0.85, "Import, update in place", "polled; an importer warning counts as a failure", num=5),
  N("b2", NX[1], 3.75, NW, 0.85, "Re-export and compare", "byte-equal inside the scope, importer stamps ignored", num=6),
  N("b3", NX[1], 4.75, NW, 0.95, "Execute everything", "views by query, reports as PDF, domains by metadata and probe", num=7),
@@ -55,10 +55,10 @@ SO_FLOW = {"type": "diagram", "title": "Standard Offering Deployment Flow", "kic
    tooltip="The target org's own /DataSource export is unzipped and carried into the package unchanged; never an edited copy of the source's datasource."),
  N("c1", NX[2], 3.4, NW, 0.8, "Inventory snapshot", "every resource on the org before anything changes", num=10),
  N("c2", NX[2], 4.35, NW, 1.2, "Rebuild for the client", "the client's datasource carried; org path, folder, alias and tenant root rewritten by tested replacements", num=11),
- gate("c3", 2, 5.7, "verified? no source strings, references exist, fields resolve", w=2.6, h=1.05, title_pt=10, num=12),
- stop_right("sc3", 2, 6.0, gw=2.6),
- N("c4", NX[2], 6.9, NW, 0.8, "Import, compare, execute", "the same three proofs as Origin_TEST", num=13),
- N("c5", NX[2], 7.85, NW, 1.0, "Sweep and sign off", "PASS, EMPTY, SLOW or FAIL per resource with timing; one document per org", num=14),
+ gate("c3", 2, 5.7, "package verified?", num=12, tooltip="No source host, org path or datasource name survives; every outside reference exists on the target; every field the views use resolves in its domain."),
+ stop_right("sc3", 2, 5.925),
+ N("c4", NX[2], 6.8, NW, 0.8, "Import, compare, execute", "the same three proofs as Origin_TEST", num=13),
+ N("c5", NX[2], 7.75, NW, 1.0, "Sweep and sign off", "PASS, EMPTY, SLOW or FAIL per resource with timing; one document per org", num=14),
  N("d0", NX[3], 2.75, NW, 0.5, "explicit prod flag required", kind="accent",
    tooltip="Prod writes refuse to run without the explicit prod flag; every other command is read-only against prod."),
  N("d1", NX[3], 3.4, NW, 0.75, "Inventory snapshot", "the rollback baseline", num=15),
@@ -72,15 +72,15 @@ SO_FLOW = {"type": "diagram", "title": "Standard Offering Deployment Flow", "kic
  N("e3", 14.6, 9.95, 6.4, 1.05, "Sweep after every change", "the sign-off is regenerated; the first red row is the alert"),
  N("loopnote", 13.7, 1.45, 7.3, 0.35, "every later change re-enters at the client test org and repeats steps 10 to 19", kind="note")],
  "edges": [E("a1","a2"), E("a2","a3"), E("a3","a4"), E("a4","sa4", label="no"),
-  E("a4","b1", via=[(5.83, 7.1), (5.83, 3.175)]),
-  E("b1","b2"), E("b2","b3"), E("b3","b4"), E("b4","sb4", label="no"), E("b4","b5"),
+  E("a4","b1", via=[(5.83, 7.1), (5.83, 3.175)], label="yes", label_at=(4.4, 6.72), label_w=1.0),
+  E("b1","b2"), E("b2","b3"), E("b3","b4"), E("b4","sb4", label="no"), E("b4","b5", label="yes"),
   E("b5","c1", via=[(11.01, 7.425), (11.01, 3.8)]),
-  E("c0","c1"), E("c1","c2"), E("c2","c3"), E("c3","sc3", label="no"), E("c3","c4"), E("c4","c5"),
-  E("c5","d0", via=[(16.19, 8.35), (16.19, 3.0)]),
-  E("d0","d1"), E("d1","d2"), E("d2","d3"), E("d3","sd3", label="no"), E("d3","d4"), E("d4","d5"),
+  E("c0","c1"), E("c1","c2"), E("c2","c3"), E("c3","sc3", label="no"), E("c3","c4", label="yes"), E("c4","c5"),
+  E("c5","d0", via=[(16.19, 8.25), (16.19, 3.0)]),
+  E("d0","d1"), E("d1","d2"), E("d2","d3"), E("d3","sd3", label="no"), E("d3","d4", label="yes"), E("d4","d5"),
   E("d5","e3", via=[(18.78, 9.2), (17.8, 9.2)], to_side="top"),
   E("e3","c0", from_side="right", to_side="top", via=[(21.5, 10.475), (21.5, 1.85), (13.6, 1.85)])],
- "legend": "Orange diamonds are gates: a 'no' stops the run and names the rollback. Numbers are the order of one full promotion. The Workstreams tree is never moved; the offering is a curated copy promoted org by org.",
+ "legend": "Orange diamonds are gates: yes continues, no stops the run and names the rollback. Numbers are the order of one full promotion. The Workstreams tree is never moved; the offering is a curated copy promoted org by org.",
  "legend_y": 11.3,
  "layers": {
   "Commands": [
@@ -115,16 +115,16 @@ DB_FLOW = {"type": "diagram", "title": "Database Deployment Flow", "kicker": "V2
  N("p3", 6.81, 2.5, 3.1, 1.0, "Create the domain-support objects", "SA snapshot table, lookup seed, 8 CMS views, grants, synonyms", num=3),
  N("p4", 10.21, 2.5, 2.9, 1.0, "Deploy the procedures", "baseline (the retained 24 months, once) and operational per table; the SA aged-balance refresh", num=4),
  N("p5", 13.41, 2.15, 7.8, 1.65, "5. Submit 8 baselines as parallel scheduler jobs", "unattended; they survive a dropped connection", kind="group")] + job_nodes + [
- N("q1", 18.7, 4.4, 2.3, 1.05, "ready gate: every job SUCCEEDED?", kind="gate", title_pt=10, num=6,
+ N("q1", 18.7, 4.45, 2.3, 0.95, "ready gate: every job SUCCEEDED?", kind="gate", title_pt=10, num=6,
    tooltip="The scheduler's job table is polled up to eight hours; every one-time baseline job must report SUCCEEDED; a FAILED or missing job stops the rollout."),
- N("sq1", 18.9, 5.6, 1.9, 0.45, "no: stop, fix, re-run", kind="stop", title_pt=9),
- N("q2", 15.6, 4.4, 2.6, 1.05, "validate and install gates pass?", kind="gate", title_pt=10, num=7,
+ N("sq1", 18.9, 5.75, 1.9, 0.42, "stop, fix, re-run", kind="stop", title_pt=9),
+ N("q2", 15.6, 4.45, 2.6, 0.95, "validate and install gates pass?", kind="gate", title_pt=10, num=7,
    tooltip="Row counts, twelve monthly totals against the source, duplicate keys; no empty table; the CMS views valid, the lookup seeded, the aging buckets sum to the balance, FT parity."),
- N("sq2", 15.85, 5.6, 2.1, 0.45, "no: stop, fix, re-run", kind="stop", title_pt=9),
- N("q3", 12.7, 4.5, 2.4, 0.85, "Post-load indexes", "keys and dates the domains filter on", num=8),
+ N("sq2", 15.85, 5.75, 2.1, 0.42, "stop, fix, re-run", kind="stop", title_pt=9),
+ N("q3", 12.7, 4.45, 2.4, 0.95, "Post-load indexes", "keys and dates the domains filter on", num=8),
  N("q4", 9.2, 4.45, 3.0, 0.95, "Rolling procedures", "3 months rebuilt, 24 kept; one operational refresh run by hand", num=9),
- N("q5", 6.5, 4.4, 2.2, 1.05, "validated again?", kind="gate", title_pt=10, num=10, tooltip="The same validation pack after the operational refresh, so the rolling result is compared to the baseline result."),
- N("sq5", 6.6, 3.75, 2.0, 0.45, "no: stop, fix, re-run", kind="stop", title_pt=9),
+ N("q5", 6.5, 4.45, 2.2, 0.95, "validated again?", kind="gate", title_pt=10, num=10, tooltip="The same validation pack after the operational refresh, so the rolling result is compared to the baseline result."),
+ N("sq5", 6.6, 3.65, 2.0, 0.42, "stop, fix, re-run", kind="stop", title_pt=9),
  N("q6", 3.35, 4.45, 2.7, 0.95, "Schedule", "twice daily from 10:00 and 16:00 UTC, 30-minute stagger; held on TEST until approved", num=11),
  N("q7", 0.81, 4.45, 2.1, 0.95, "Capture runs, data quality", "per client, kept with the log", num=12),
  N("cad", 0.81, 5.47, 3.8, 0.6, "runs at (UTC), one job every 30 minutes", "10:00 to 13:30, then again 16:00 to 19:30", kind="note")] + cadence + [
@@ -161,7 +161,7 @@ DB_FLOW = {"type": "diagram", "title": "Database Deployment Flow", "kicker": "V2
  N("m9", 18.6, 9.85, 2.4, 0.6, "Case domain", kind="domain", title_pt=10)],
  "edges": [E("p1","p2"), E("p2","p3"), E("p3","p4"), E("p4","p5"),
   E("p5","q1", from_side="bottom", to_side="top", via=[(17.31, 4.1), (19.85, 4.1)]),
-  E("q1","sq1", label="no"), E("q1","q2"), E("q2","sq2", label="no"), E("q2","q3"), E("q3","q4"), E("q4","q5"), E("q5","sq5", label="no"), E("q5","q6"), E("q6","q7"),
+  E("q1","sq1", label="no"), E("q1","q2", label="yes"), E("q2","sq2", label="no"), E("q2","q3", label="yes"), E("q3","q4"), E("q4","q5"), E("q5","sq5", label="no"), E("q5","q6", label="yes"), E("q6","q7"),
   E("q6","q4", from_side="bottom", to_side="bottom", via=[(4.7, 5.85), (10.7, 5.85)], label="every 12 hours: the newest 3 months rebuilt, older rows kept", label_at=(5.0, 5.5), label_w=6.0),
   E("wf","m1"), E("wb","m2"), E("wm","m3"), E("wd","m4"),
   E("wv","m5", from_side="bottom", to_side="top", via=[(13.125, 9.7), (12.27, 9.7)]),
@@ -169,7 +169,7 @@ DB_FLOW = {"type": "diagram", "title": "Database Deployment Flow", "kicker": "V2
   E("wo","m7", from_side="bottom", to_side="top", via=[(16.675, 9.7), (15.8, 9.7)]),
   E("wo","m8", from_side="bottom", to_side="top", via=[(16.675, 9.7), (17.55, 9.7)]),
   E("wc","m9")],
- "legend": "Every box in the map is one database object the domains read: seven rolling snapshot tables, the SA aged-balance table with its lookup seed, and eight CMS views. Numbers are the order of one rollout; orange diamonds are gates and a 'no' stops it there. The loop under the second row is the twice-daily rolling refresh (3 months rebuilt, 24 kept; 6 months at CityCorp and Odessa).",
+ "legend": "Every box in the map is one database object the domains read: seven rolling snapshot tables, the SA aged-balance table with its lookup seed, and eight CMS views. Numbers are the order of one rollout; orange diamonds are gates: yes continues, no stops the rollout there. The loop under the second row is the twice-daily rolling refresh (3 months rebuilt, 24 kept; 6 months at CityCorp and Odessa).",
  "layers": {
   "Commands": [
    dict(x=0.9, y=3.05, w=2.3, h=0.42, title="prod_snapshot_rollout_25_4.sh <client>  (steps 1 to 8, logged)"),

@@ -163,7 +163,14 @@ def diagram_xml(slide: dict) -> str:
         val = escape(e.get("label", ""), {'"': "&quot;"})
         ox, oy = origin[common]
         pts = "".join(f'<mxPoint x="{px(vx - ox)}" y="{px(vy - oy)}"/>' for vx, vy in via)
-        geom = f'<mxGeometry relative="1" as="geometry"><Array as="points">{pts}</Array></mxGeometry>' if via else '<mxGeometry relative="1" as="geometry"/>'
+        # a label on a straight edge sits beside the line, not on it: above a horizontal edge, right of a vertical one
+        off = ""
+        if e.get("label") and not via:
+            na, nb = by_id[a], by_id[b]
+            horizontal = abs((na["y"] + na["h"] / 2) - (nb["y"] + nb["h"] / 2)) < abs((na["x"] + na["w"] / 2) - (nb["x"] + nb["w"] / 2))
+            off = '<mxPoint as="offset" x="0" y="-12"/>' if horizontal else '<mxPoint as="offset" x="18" y="-6"/>'
+        inner = (f'<Array as="points">{pts}</Array>' if via else "") + off
+        geom = f'<mxGeometry relative="1" as="geometry">{inner}</mxGeometry>' if inner else '<mxGeometry relative="1" as="geometry"/>'
         cells.append(f'<mxCell id="e{i}" value="{val}" style="{st}" edge="1" source="{a}" target="{b}" parent="{common}">{geom}</mxCell>')
     # the picture stands alone outside the deck: title and subtitle above, legend and footer below
     xs = [n["x"] for n in nodes]; ys = [n["y"] + n["h"] for n in nodes]
