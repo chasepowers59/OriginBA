@@ -103,27 +103,37 @@ class RouteTests(unittest.TestCase):
             "WAREHOUSE_DATABASE_URL": "postgresql://test@localhost/test",
         })
         cls._env.start()
+        # a note needs an item the caller can see
+        from api import saved_views as sv
+        cls._views = [mock.patch.object(sv, "VIEWS_PATH", Path(cls._tmp.name) / "views.json"),
+                      mock.patch.object(sv._pss, "enabled", return_value=False)]
+        for p in cls._views:
+            p.start()
+        cls.view_id = sv.create_saved_view({"snapshot_id": "rpt_bill_segment", "snapshot_label": "Bill Segment",
+                                            "title": "Rebills", "kind": "custom"}, organization_id="dev")["id"]
         app = FastAPI()
         app.include_router(router)
         cls.client = TestClient(app)
 
     @classmethod
     def tearDownClass(cls):
+        for p in cls._views:
+            p.stop()
         cls._env.stop()
         cls._path.stop()
         cls._tmp.cleanup()
 
     def test_crud_roundtrip(self):
         r = self.client.post("/annotations", json={
-            "target_type": "saved_view", "target_id": "view-9",
+            "target_type": "saved_view", "target_id": self.view_id,
             "text": "Watch this one — rebill wave inbound."})
         self.assertEqual(r.status_code, 200, r.text)
         nid = r.json()["id"]
-        r = self.client.get("/annotations?target_type=saved_view&target_id=view-9")
+        r = self.client.get(f"/annotations?target_type=saved_view&target_id={self.view_id}")
         self.assertIn(nid, [n["id"] for n in r.json()["annotations"]])
         r = self.client.delete(f"/annotations/{nid}")
         self.assertEqual(r.status_code, 200)
-        r = self.client.get("/annotations?target_type=saved_view&target_id=view-9")
+        r = self.client.get(f"/annotations?target_type=saved_view&target_id={self.view_id}")
         self.assertEqual(r.json()["annotations"], [])
 
     def test_bad_target_type_is_400(self):

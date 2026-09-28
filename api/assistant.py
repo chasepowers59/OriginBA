@@ -292,6 +292,8 @@ def _clause(text: str | None, limit: int = 90) -> str:
 
 
 def tool_verification_status(org_id: str, canvas_id: str) -> dict[str, Any]:
+    if (canvas_id or "").strip().lower() not in _canvases(org_id):
+        return {"error": f"{canvas_id} is not a canvas this organization has; call list_canvases."}
     return canvas_summary(org_id, canvas_id)
 
 

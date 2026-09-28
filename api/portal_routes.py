@@ -168,7 +168,7 @@ def import_saved_views(
     ctx: AuthContext = Depends(require_permission("saved_views:write")),
 ) -> dict[str, Any]:
     org_id = ctx.require_organization()
-    imported = bulk_import_views([v.model_dump() for v in body.views], organization_id=org_id)
+    imported = bulk_import_views([stamp(v.model_dump(), ctx) for v in body.views], organization_id=org_id)
     return {"imported": len(imported), "views": imported}
 
 

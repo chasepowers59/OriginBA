@@ -7,8 +7,13 @@ The group claim is OIDC_GROUPS_CLAIM ("groups" by default; Entra can send "roles
 With a map configured, access follows the person's groups at every sign-in, so removing
 them from a group at the IdP takes effect at their next login. The highest matching role
 wins; the map never grants admin, and an existing admin is never changed by it. Someone in
-no mapped group is refused, and groups pointing at two different clients are refused rather
-than guessed. Without a map, first sign-in provisions a user in the default org, as before.
+no mapped group is refused, and an existing account of theirs is deactivated (removal at
+the IdP ends their sessions, schedules and embeds); groups pointing at two different
+clients are refused rather than guessed. Row rules change only when a matching group
+DECLARES them ("row_rules": [] declares no restriction): a map that says nothing about rows
+never widens rules an administrator set. A malformed groups claim, a broken rule in the map
+or an identity token saying the address is unverified is refused, never half-applied.
+Without a map, first sign-in provisions a user in the default org, as before.
 """
 from __future__ import annotations
 
@@ -33,6 +38,7 @@ MAP = [
     {"group": "portal-users", "role": "user", "organization_id": "dev"},
     {"group": "billing-analysts", "role": "editor", "organization_id": "dev",
      "row_rules": [{"field": "Service Type", "values": ["Water"]}]},
+    {"group": "all-data", "role": "user", "organization_id": "dev", "row_rules": []},
     {"group": "citycorp-users", "role": "user", "organization_id": "citycorp"},
     {"group": "it-admins", "role": "admin", "organization_id": None},
 ]
@@ -59,6 +65,21 @@ class MappingTests(unittest.TestCase):
 
     def test_a_single_string_claim_counts_as_one_group(self):
         self.assertEqual(oidc.mapped_access({"roles": "portal-users"}, MAP, "roles")["role"], "user")
+
+    def test_a_malformed_groups_claim_is_refused(self):
+        for raw in ({"portal-users": 1}, 5, ["portal-users", {"x": 1}]):
+            with self.assertRaises(oidc.SsoAccessError):
+                oidc.mapped_access({"groups": raw}, MAP, "groups")
+
+    def test_a_broken_rule_in_the_map_refuses_rather_than_widening(self):
+        broken = [{"group": "g", "role": "editor", "organization_id": "dev",
+                   "row_rules": [{"field": "Service Type", "values": []}]}]
+        with self.assertRaises(oidc.SsoAccessError):
+            oidc.mapped_access({"groups": ["g"]}, broken, "groups")
+
+    def test_rules_are_undeclared_unless_a_group_declares_them(self):
+        self.assertIsNone(oidc.mapped_access({"groups": ["portal-users"]}, MAP, "groups")["row_rules"])
+        self.assertEqual(oidc.mapped_access({"groups": ["all-data"]}, MAP, "groups")["row_rules"], [])
 
 
 FAKE_DISCOVERY = {"authorization_endpoint": "https://idp.test/authorize", "token_endpoint": "https://idp.test/token",
@@ -91,10 +112,11 @@ class SignInTests(unittest.TestCase):
         self.env.stop()
         self.tmp.cleanup()
 
-    def _sign_in(self, groups, email="ana@utility.gov"):
+    def _sign_in(self, groups, email="ana@utility.gov", **claims):
         with mock.patch.object(oidc, "fetch_discovery", return_value=FAKE_DISCOVERY), \
              mock.patch.object(oidc, "exchange_code", return_value={"id_token": "x"}), \
-             mock.patch.object(oidc, "verify_id_token", return_value={"email": email, "name": "Ana", "groups": groups}):
+             mock.patch.object(oidc, "verify_id_token",
+                               return_value={"email": email, "name": "Ana", "groups": groups, **claims}):
             return self.client.get(f"/auth/oidc/callback?code=c&state={oidc.make_state()}", follow_redirects=False)
 
     def _user(self, email="ana@utility.gov"):
@@ -117,7 +139,23 @@ class SignInTests(unittest.TestCase):
         self._sign_in(["portal-users"])
         u = self._user()
         self.assertEqual(u["role"], "user")
-        self.assertEqual(u["row_rules"], [])
+        # portal-users says nothing about rows, so the restriction stays
+        self.assertEqual(u["row_rules"], [{"field": "Service Type", "values": ["Water"]}])
+        self._sign_in(["all-data"])
+        self.assertEqual(self._user()["row_rules"], [])
+
+    def test_removal_from_every_group_deactivates_the_account(self):
+        self._sign_in(["billing-analysts"])
+        self.assertEqual(self._sign_in(["marketing"]).status_code, 403)
+        self.assertFalse(self._user()["is_active"])
+
+    def test_an_unverified_address_is_refused(self):
+        r = self._sign_in(["billing-analysts"], email_verified=False)
+        self.assertEqual(r.status_code, 403)
+        from api.auth.database import get_session_factory
+        from api.auth.models import User
+        with get_session_factory()() as s:
+            self.assertEqual(s.query(User).filter(User.email == "ana@utility.gov").count(), 0)
 
     def test_someone_in_no_mapped_group_is_refused(self):
         r = self._sign_in(["marketing"])

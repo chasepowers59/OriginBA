@@ -57,7 +57,12 @@ Railway was retired 2026-09-08: its root `Dockerfile`/`railway.toml` are archive
     just-in-time provisioned users — always role `user`; SSO never mints admins) and
     `OIDC_POST_LOGIN_URL` (the portal login page, which receives `#sso_token=`).
     The login page shows "Sign in with Microsoft" automatically once `/auth/status`
-    reports `oidc_enabled`.
+    reports `oidc_enabled`. Optional `OIDC_GROUP_MAP` (JSON list of `{group, role,
+    organization_id, access_groups?, row_rules?}`; claim name `OIDC_GROUPS_CLAIM`, default
+    `groups`) makes access follow IdP groups at every sign-in: someone in no mapped group
+    is refused and their account deactivated; row rules change only where a group
+    declares `row_rules` (`[]` = unrestricted); the map never grants admin. Contract:
+    `tests/test_oidc_group_map.py`.
   - Scheduled report delivery (optional): `SMTP_HOST`/`SMTP_PORT`/`SMTP_USERNAME`/
     `SMTP_PASSWORD`/`SMTP_FROM`/`SMTP_STARTTLS`, then add an hourly cron job running
     `python -m api.report_schedule_runner` with the same env (`--dry-run` to verify).

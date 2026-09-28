@@ -31,6 +31,7 @@ from typing import Any
 import jwt
 
 from api.auth.config import jwt_secret
+from api.row_security import clean_rules
 
 _DISCOVERY_CACHE: dict[str, dict[str, Any]] = {}
 _STATE_TTL_SECONDS = 600
@@ -117,7 +118,9 @@ _ROLE_RANK = {"user": 0, "editor": 1}
 
 
 class SsoAccessError(Exception):
-    pass
+    def __init__(self, message: str, *, revoke: bool = False):
+        super().__init__(message)
+        self.revoke = revoke   # the person is in no mapped group: their account is switched off
 
 
 def group_map() -> list[dict[str, Any]] | None:
@@ -139,19 +142,33 @@ def groups_claim_name() -> str:
 
 def mapped_access(claims: dict[str, Any], mapping: list[dict[str, Any]], claim: str) -> dict[str, Any]:
     """The access a person's groups give: the highest role among matching rules (admin never
-    granted), their one organization, and the union of access groups and row rules."""
+    granted), their one organization, and the union of access groups and row rules. Row rules
+    are None when no matching group at that role declares any."""
     raw = claims.get(claim) or []
-    groups = {raw} if isinstance(raw, str) else set(raw)
+    if isinstance(raw, str):
+        groups = {raw}
+    elif isinstance(raw, list) and all(isinstance(g, str) for g in raw):
+        groups = set(raw)
+    else:
+        raise SsoAccessError("Your sign-in carried its groups in a form the portal cannot read. "
+                             "Ask your administrator to check the groups claim.")
     matched = [r for r in mapping if r.get("group") in groups and r.get("role") in _ROLE_RANK]
     if not matched:
         raise SsoAccessError("Your account is not in a group that has access to the portal. "
-                             "Ask your administrator to add you to one.")
+                             "Ask your administrator to add you to one.", revoke=True)
     orgs = {r.get("organization_id") for r in matched if r.get("organization_id")}
     if len(orgs) > 1:
         raise SsoAccessError("Your sign-in groups give access to more than one client. "
                              "Ask your administrator to keep you in one.")
     best = max(matched, key=lambda r: _ROLE_RANK[r["role"]])
-    rules = [rule for r in matched if r["role"] == best["role"] for rule in (r.get("row_rules") or [])]
+    at_best = [r for r in matched if r["role"] == best["role"]]
+    rules = None
+    if any("row_rules" in r for r in at_best):
+        try:
+            rules = clean_rules([rule for r in at_best for rule in (r.get("row_rules") or [])])
+        except ValueError as exc:
+            raise SsoAccessError("The portal's sign-in group map has a row rule it cannot apply. "
+                                 "Ask your administrator to correct it.") from exc
     return {"role": best["role"], "organization_id": next(iter(orgs), None),
             "access_groups": sorted({g for r in matched for g in (r.get("access_groups") or [])}),
             "row_rules": rules}

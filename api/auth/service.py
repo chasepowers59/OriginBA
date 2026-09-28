@@ -426,8 +426,8 @@ def sync_sso_access(session: Session, user: User, access: dict[str, Any]) -> Non
     from their identity-provider groups. Never called for an admin."""
     user.role = access["role"]
     user.organization_id = access.get("organization_id") or user.organization_id
-    rules = clean_rules(access.get("row_rules") or [])
-    user.row_rules_json = json.dumps(rules) if rules else None
+    if access.get("row_rules") is not None:   # already checked by mapped_access
+        user.row_rules_json = json.dumps(access["row_rules"]) if access["row_rules"] else None
     if access.get("access_groups"):
         ids = [g.id for g in session.scalars(select(AccessGroup).where(AccessGroup.name.in_(access["access_groups"])))]
         _set_user_groups(session, user, ids)

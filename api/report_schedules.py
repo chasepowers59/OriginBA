@@ -253,6 +253,10 @@ def rows_to_xlsx(columns: list[str], labels: dict[str, str], rows: list[dict[str
     for row in rows:
         ws.append([None if (v := row.get(c)) is None else "True" if v is True else "False" if v is False
                    else v for c in columns])
+        # openpyxl stores a string starting with "=" as a formula; a value is never one
+        for cell in ws[ws.max_row]:
+            if cell.data_type == "f":
+                cell.data_type = "s"
     buf = io.BytesIO()
     wb.save(buf)
     return buf.getvalue()

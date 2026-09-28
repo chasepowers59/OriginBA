@@ -31,7 +31,9 @@ class AlertCreateRequest(BaseModel):
 def get_alerts(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     ctx.require_permission("portal:read")
     org_id = require_org_for_data(ctx)
-    return {"alerts": ka.list_alerts(org_id),
+    # Alerts watch organization-wide cards and carry their last value: none of that is
+    # for a person limited to part of the data.
+    return {"alerts": [] if ctx.row_rules else ka.list_alerts(org_id),
             "available_kpis": ka.watchable_kpis(),
             "smtp_configured": smtp_configured()}
 
@@ -59,6 +61,11 @@ def delete_alert(
 ) -> dict[str, Any]:
     ctx.require_permission("saved_views:write")
     org_id = require_org_for_data(ctx)
-    if not ka.delete_alert(alert_id, org_id):
+    alert = next((a for a in ka.list_alerts(org_id) if a["id"] == alert_id), None)
+    if alert is None:
         raise HTTPException(status_code=404, detail="Unknown alert")
+    if ctx.role != "admin" and alert.get("created_by") not in (None, "", ctx.email):
+        raise HTTPException(status_code=403, detail=f"Only the alert's creator ({alert['created_by']}) "
+                                                    "or an administrator can remove it")
+    ka.delete_alert(alert_id, org_id)
     return {"deleted": alert_id}

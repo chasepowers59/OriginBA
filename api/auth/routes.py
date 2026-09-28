@@ -245,6 +245,10 @@ def oidc_callback(
     email = oidc.claims_email(claims)
     if not email:
         raise HTTPException(status_code=400, detail="Identity token carried no email address")
+    # An IdP that says it has not verified the address has not proven who this is.
+    if str(claims.get("email_verified", "")).lower() == "false":
+        raise HTTPException(status_code=403, detail="Your identity provider has not verified this email address")
+    user = session.query(User).filter(User.email == email).one_or_none()
 
     # With a group map, the person's IdP groups decide their access at every sign-in.
     access = None
@@ -255,38 +259,42 @@ def oidc_callback(
     except oidc.SsoAccessError as exc:
         log_audit(session, actor_id=None, actor_email=email, action="sso_refused",
                   target_type="user", target_id="", detail=str(exc))
+        # Removed from every group at the IdP: switch the account off, which also ends its
+        # open sessions, schedules and embeds. An admin is managed in the portal.
+        if exc.revoke and user is not None and user.is_active and user.role != "admin":
+            user.is_active = False
+            log_audit(session, actor_id=user.id, actor_email=email, action="sso_deactivated",
+                      target_type="user", target_id=user.id, detail="in no mapped sign-in group")
         session.commit()
         raise HTTPException(status_code=403, detail=str(exc)) from exc
 
-    user = session.query(User).filter(User.email == email).one_or_none()
-    if user is None:
+    created = user is None
+    if created:
         user = User(
             email=email,
             display_name=str(claims.get("name") or email.split("@")[0]),
             # unusable password: SSO users authenticate at the IdP only
             password_hash=hash_password(secrets.token_urlsafe(24)),
-            role=access["role"] if access else "user",
-            organization_id=(access["organization_id"] if access else None)
-            or cfg.get("OIDC_DEFAULT_ORGANIZATION") or None,
+            role="user",
+            organization_id=cfg.get("OIDC_DEFAULT_ORGANIZATION") or None,
             is_active=True,
         )
         session.add(user)
-        session.commit()
-        session.refresh(user)
+        session.flush()
         log_audit(session, actor_id=user.id, actor_email=email, action="sso_jit_provision",
                   target_type="user", target_id=user.id, detail="OIDC first login")
-        session.commit()
     if not user.is_active:
         raise HTTPException(status_code=403, detail="This account is deactivated")
     if access and user.role != "admin":   # an admin is managed in the portal, never by a group
         before = (user.role, user.organization_id, user.row_rules_json)
         sync_sso_access(session, user, access)
         after = (user.role, user.organization_id, user.row_rules_json)
-        if after != before:
+        if after != before and not created:
             log_audit(session, actor_id=user.id, actor_email=email, action="sso_group_sync",
                       target_type="user", target_id=user.id, detail=f"{before} -> {after}")
-        session.commit()
-        session.refresh(user)
+    # one commit: a new account never exists without the access its groups give
+    session.commit()
+    session.refresh(user)
 
     public = user_to_public(user)
     token = create_access_token(

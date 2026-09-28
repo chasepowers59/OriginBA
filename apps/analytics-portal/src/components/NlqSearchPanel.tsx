@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchNlqMetricCatalog, runAnalyticsNlq, runNlqQuery } from "@/lib/api";
+import { fetchNlqMetricCatalog, runAnalyticsNlq } from "@/lib/api";
 import { pinReportUrl } from "@/lib/pinReport";
 import type { NlqMetricCatalogItem, NlqResponse } from "@/lib/types";
 import { NlqAnswerCard } from "./NlqAnswerCard";
@@ -50,14 +50,9 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
         payment_type: paymentType.trim() || undefined,
         rate_code: rateCode.trim() || undefined,
       };
-      try {
-        const analytics = await runAnalyticsNlq(text || catalog.find((m) => m.id === metricId)?.example || "", params);
-        setResult(analytics);
-        if (analytics.metric_id) setSelectedMetric(analytics.metric_id);
-      } catch {
-        const response = await runNlqQuery(text);
-        setResult(response);
-      }
+      const analytics = await runAnalyticsNlq(text || catalog.find((m) => m.id === metricId)?.example || "", params);
+      setResult(analytics);
+      if (analytics.metric_id) setSelectedMetric(analytics.metric_id);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to run this question");
     } finally {

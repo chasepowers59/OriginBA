@@ -110,6 +110,7 @@ def run_now(
                  if v.get("id") == schedule["saved_view_id"]), None)
     if view is None:
         raise HTTPException(status_code=400, detail="Saved view no longer exists")
+    assert_snapshot_access(ctx, view["snapshot_id"])
     try:
         count = rs.deliver(schedule, view, datetime.now(timezone.utc), send_message)
     except Exception as exc:  # noqa: BLE001

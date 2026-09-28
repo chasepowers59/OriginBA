@@ -329,13 +329,6 @@ export function importSavedViews(
   });
 }
 
-export function runNlqQuery(query: string): Promise<NlqResponse> {
-  return fetchJson<NlqResponse>("/nlq", {
-    method: "POST",
-    body: JSON.stringify({ query }),
-  });
-}
-
 export function runAnalyticsNlq(
   query: string,
   params?: {

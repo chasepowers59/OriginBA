@@ -542,10 +542,7 @@ def snapshot_scope_options(
             "label": allowed_scope.get(field, {}).get("label", field),
             "values": [],
             "enumerable": False,
-            "reason": (
-                f"{int(estimate):,} rows — too many to list values from. "
-                f"Type the value instead."
-            ),
+            "reason": "Too many rows to list this column's values. Type the value instead.",
         }
 
     col = f'"{field}"'
