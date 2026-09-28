@@ -31,7 +31,7 @@ template, not an imitation. Slide types and their spec keys:
 | `statement` | `title`, `lines[]` (a paragraph each) |
 | `process` | `title`, `kicker`, `nodes[]`, `edges[]`, `legend`, `notes` |
 | `roadmap` | `title`, `kicker`, `intro`, `steps[{title, owner, body, current}]` |
-| `cards` | `title`, `cards[{heading, lines[], accent}]`, `cols` |
+| `cards` | `title`, `cards[{heading, lines[], accent, stat, stat_label}]`, `cols`; `stat` is a big-number callout above the heading (results slides) |
 | `bullets` | `title`, `columns[{heading, items[]}]` |
 | `table` | `title`, `columns[]`, `rows[[]]`, `widths[]` (inches, sum 20.4) |
 

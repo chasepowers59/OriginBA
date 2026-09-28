@@ -215,11 +215,16 @@ def slide_cards(prs, s, footer):
     cards = s["cards"]; cols = s.get("cols", 3 if len(cards) > 4 else min(len(cards), 4)); rows = -(-len(cards) // cols)
     w = (20.4 - (cols - 1) * 0.5) / cols
     most = max(len(c.get("lines", [])) for c in cards)
-    h = min((8.9 - (rows - 1) * 0.5) / rows, 1.5 + 0.75 * most)   # sized to the fullest card, never taller than the page allows
+    stat_h = 2.1 if any(c.get("stat") for c in cards) else 0.0   # a stat callout: big number, small label, then the heading
+    h = min((8.9 - (rows - 1) * 0.5) / rows, 1.5 + 0.75 * most + stat_h)   # sized to the fullest card, never taller than the page allows
+    top = 2.0 + max(0.0, (8.9 - rows * h - (rows - 1) * 0.5) / 2)   # the block sits centred in the body, not stranded at the top
     for i, c in enumerate(cards):
-        x = 0.81 + (i % cols) * (w + 0.5); y = 2.0 + (i // cols) * (h + 0.5)
+        x = 0.81 + (i % cols) * (w + 0.5); y = top + (i // cols) * (h + 0.5)
         b = _box(sl, x, y, w, h, ORANGE if c.get("accent") else CREAM, radius=0.08)
-        paras = [[(c["heading"], 30, BLUE, True)]] + [[(line, 22, BLUE if c.get("accent") else GREY, False)] for line in c.get("lines", [])]
+        paras = []
+        if c.get("stat"):
+            paras += [[(c["stat"], 60, BLUE, True)], [(c.get("stat_label", ""), 18, GREY, False)]]
+        paras += [[(c["heading"], 30, BLUE, True)]] + [[(line, 22, BLUE if c.get("accent") else GREY, False)] for line in c.get("lines", [])]
         _text(b, paras, anchor=MSO_ANCHOR.TOP, margin=0.35)
     return sl
 
