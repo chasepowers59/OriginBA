@@ -1,0 +1,178 @@
+#!/usr/bin/env python3
+"""Turn a process-deck `diagram` spec (the same JSON the pptx builder reads) into an Origin-styled
+draw.io file: cream boxes, orange gates and pills, white domain chips, cream outlines for groups,
+cream orthogonal arrows, on the Origin blue background.
+
+    python3 spec_to_drawio.py spec.json --slide "Database Deployment Flow" -o out.drawio
+    python3 spec_to_drawio.py visuals.json -o out.drawio            # one page per diagram slide
+
+Coordinates in the spec are inches on the 22" x 12.37" slide; here 1 inch = 96 px. Groups become
+real draw.io containers (children carry coordinates relative to the group), and every edge is filed
+at the innermost container holding both ends, which is what the libavoid router and ELK expect.
+Edges keep the spec's `via` waypoints and `from_side` / `to_side` (as exit/entry points): a hand-placed
+layout with known-good routes should not be re-routed. Edges without waypoints get draw.io's own
+orthogonal router, which is right for stacked or adjacent boxes. Run drawio_pass.mjs route (libavoid)
+only on diagrams WITHOUT containers: the pass reads child coordinates as absolute, so every column's
+children overlap and it routes along the container edges (measured 2026-09-28).
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import pathlib
+import sys
+from xml.sax.saxutils import escape
+
+PX = 96.0
+BLUE, CREAM, GREY, ORANGE, WHITE = "#0B3D7A", "#F5EFE9", "#4C5D69", "#FFA418", "#FFFFFF"
+FONT = "Arial"
+
+
+def px(v: float) -> str:
+    return f"{round(v * PX, 1):g}"
+
+
+def pt(size: float) -> str:
+    return f"{round(size * 1.33, 1):g}"   # PowerPoint points to CSS pixels
+
+
+def label(title: str, body: str = "", title_pt: float = 14, body_pt: float = 11, title_color: str = BLUE, body_color: str = GREY) -> str:
+    t = f'<b><font style="font-size:{pt(title_pt)}px" color="{title_color}">{escape(title)}</font></b>'
+    if body:
+        t += f'<br><font style="font-size:{pt(body_pt)}px" color="{body_color}">{escape(body)}</font>'
+    return escape(t, {'"': "&quot;"})
+
+
+def style(**kv) -> str:
+    base = {"html": 1, "whiteSpace": "wrap", "fontFamily": FONT}
+    base.update(kv)
+    parts = []
+    for k, v in base.items():
+        parts.append(k if v is None else f"{k}={v}")
+    return ";".join(parts) + ";"
+
+
+def node_cell(n: dict, parent: str, ox: float, oy: float) -> str:
+    kind = n.get("kind", "step")
+    x, y, w, h = n["x"] - ox, n["y"] - oy, n["w"], n["h"]
+    title, body = n.get("title", ""), n.get("body", "")
+    tp, bp = n.get("title_pt", 14), n.get("body_pt", 11)
+    if kind == "group":
+        st = style(rounded=1, arcSize=6, fillColor="none", strokeColor=CREAM, strokeWidth=1.5, container=1, pointerEvents=0,
+                   align="left", verticalAlign="top", spacingLeft=14, spacingTop=4, fontColor=CREAM)
+        val = label(title, body, 14, 11, CREAM, CREAM)
+    elif kind == "gate":
+        st = style(rhombus=None, fillColor=ORANGE, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(n.get("title_pt", 11)))
+        val = escape(title, {'"': "&quot;"})
+    elif kind == "domain":
+        st = style(rounded=1, arcSize=50, fillColor=WHITE, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(n.get("title_pt", 11)))
+        val = escape(title, {'"': "&quot;"})
+    elif kind == "accent":
+        st = style(rounded=1, arcSize=50, fillColor=ORANGE, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(n.get("title_pt", 12)))
+        val = escape(title, {'"': "&quot;"})
+    elif kind == "note":
+        st = style(text=None, fillColor="none", strokeColor="none", align="left", verticalAlign="top", fontColor=CREAM)
+        val = label(title, body, 12, 11, CREAM, CREAM)
+    else:   # step and data: the same flat cream box
+        centred = kind == "data" or n.get("center")
+        st = style(rounded=1, arcSize=10, fillColor=CREAM, strokeColor="none", align="center" if centred else "left",
+                   verticalAlign="middle", spacingLeft=0 if centred else 10, spacingRight=0 if centred else 8)
+        val = label(title, body, tp, bp)
+    return (f'<mxCell id="{n["id"]}" value="{val}" style="{st}" vertex="1" parent="{parent}">'
+            f'<mxGeometry x="{px(x)}" y="{px(y)}" width="{px(w)}" height="{px(h)}" as="geometry"/></mxCell>')
+
+
+SIDES = {"right": (1, 0.5), "left": (0, 0.5), "top": (0.5, 0), "bottom": (0.5, 1)}
+
+
+def facing(n: dict, x: float, y: float) -> str:
+    """The side of n that faces the point (x, y): the larger displacement from the centre wins."""
+    dx, dy = x - (n["x"] + n["w"] / 2), y - (n["y"] + n["h"] / 2)
+    if abs(dx) >= abs(dy):
+        return "right" if dx > 0 else "left"
+    return "bottom" if dy > 0 else "top"
+
+
+def inside(n: dict, g: dict) -> bool:
+    return (n is not g and n["x"] >= g["x"] - 0.01 and n["y"] >= g["y"] - 0.01
+            and n["x"] + n["w"] <= g["x"] + g["w"] + 0.01 and n["y"] + n["h"] <= g["y"] + g["h"] + 0.01)
+
+
+def innermost_group(n: dict, groups: list[dict]) -> dict | None:
+    cands = [g for g in groups if inside(n, g)]
+    return min(cands, key=lambda g: g["w"] * g["h"]) if cands else None
+
+
+def ancestors(nid: str, parent_of: dict) -> list[str]:
+    out = []
+    while nid in parent_of and parent_of[nid] != "1":
+        nid = parent_of[nid]; out.append(nid)
+    return out
+
+
+def diagram_xml(slide: dict) -> str:
+    nodes = slide["nodes"]
+    groups = [n for n in nodes if n.get("kind") == "group"]
+    parent_of: dict[str, str] = {}
+    origin: dict[str, tuple[float, float]] = {"1": (0.0, 0.0)}
+    for g in sorted(groups, key=lambda g: -g["w"] * g["h"]):   # outer groups first so nesting resolves
+        og = innermost_group(g, [x for x in groups if x is not g and x["w"] * x["h"] > g["w"] * g["h"]])
+        parent_of[g["id"]] = og["id"] if og else "1"
+        origin[g["id"]] = (g["x"], g["y"])
+    for n in nodes:
+        if n.get("kind") != "group":
+            og = innermost_group(n, groups)
+            parent_of[n["id"]] = og["id"] if og else "1"
+    cells = ['<mxCell id="0"/>', '<mxCell id="1" parent="0"/>']
+    order = sorted(groups, key=lambda g: -g["w"] * g["h"]) + [n for n in nodes if n.get("kind") != "group"]
+    for n in order:
+        p = parent_of[n["id"]]; ox, oy = origin[p]
+        cells.append(node_cell(n, p, ox, oy))
+    by_id = {n["id"]: n for n in nodes}
+    for i, e in enumerate(slide.get("edges", [])):
+        a, b = e["from"], e["to"]
+        anc_a, anc_b = ancestors(a, parent_of), ancestors(b, parent_of)   # innermost container holding both endpoints
+        common = next((x for x in anc_a if x in anc_b), "1")
+        kv = dict(edgeStyle="orthogonalEdgeStyle", rounded=1, strokeColor=CREAM, strokeWidth=2, endArrow="block", endFill=1,
+                  fontColor=CREAM, fontSize=pt(11), fontStyle=1, labelBackgroundColor="none")
+        via = [tuple(v) for v in e.get("via", [])]
+        fa, tb = e.get("from_side"), e.get("to_side")
+        if via and not fa:
+            fa = facing(by_id[a], via[0][0], via[0][1])
+        if via and not tb:
+            tb = facing(by_id[b], via[-1][0], via[-1][1])
+        for key, side in (("exit", fa), ("entry", tb)):
+            if side:
+                sx, sy = SIDES[side]; kv[f"{key}X"] = sx; kv[f"{key}Y"] = sy; kv[f"{key}Dx"] = 0; kv[f"{key}Dy"] = 0
+        st = style(**kv)
+        val = escape(e.get("label", ""), {'"': "&quot;"})
+        ox, oy = origin[common]
+        pts = "".join(f'<mxPoint x="{px(vx - ox)}" y="{px(vy - oy)}"/>' for vx, vy in via)
+        geom = f'<mxGeometry relative="1" as="geometry"><Array as="points">{pts}</Array></mxGeometry>' if via else '<mxGeometry relative="1" as="geometry"/>'
+        cells.append(f'<mxCell id="e{i}" value="{val}" style="{st}" edge="1" source="{a}" target="{b}" parent="{common}">{geom}</mxCell>')
+    return f'<mxGraphModel adaptiveColors="none" grid="0" page="0" background="{BLUE}"><root>' + "".join(cells) + "</root></mxGraphModel>"
+
+
+def mxfile(pages: list[tuple[str, str]]) -> str:
+    out = ["<mxfile>"]
+    for i, (name, model) in enumerate(pages):
+        out.append(f'<diagram id="page{i + 1}" name="{escape(name, {chr(34): "&quot;"})}">{model}</diagram>')
+    out.append("</mxfile>")
+    return "".join(out)
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("spec"); ap.add_argument("-o", "--out", required=True); ap.add_argument("--slide", help="title of one diagram slide")
+    a = ap.parse_args()
+    spec = json.loads(pathlib.Path(a.spec).read_text())
+    slides = [s for s in spec["slides"] if s.get("type") == "diagram" and (not a.slide or s["title"] == a.slide)]
+    if not slides:
+        print("no diagram slides matched", file=sys.stderr); return 1
+    pathlib.Path(a.out).write_text(mxfile([(s["title"], diagram_xml(s)) for s in slides]))
+    print(f"wrote {a.out}: {len(slides)} page(s)")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
