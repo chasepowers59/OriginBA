@@ -66,8 +66,8 @@ def _box(slide, x, y, w, h, fill, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.12
 
 
 def _title(slide, text, y=0.42, size=60):
-    t = slide.shapes.add_textbox(Inches(0.81), Inches(y), Inches(15.0), Inches(1.05))
-    _text(t, [[(text, size, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+    t = slide.shapes.add_textbox(Inches(0.81), Inches(y), Inches(20.4), Inches(1.05))
+    _text(t, [[(text, size if len(text) <= 40 else 46, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
 
 
 def _footer(slide, text):
@@ -193,7 +193,7 @@ def slide_roadmap(prs, s, footer):
     steps = s["steps"]; n = len(steps); pitch = 4.15 if n <= 5 else (20.4 / n); w = min(3.79, pitch - 0.36)
     for i, st in enumerate(steps):
         x = 0.81 + i * pitch; current = st.get("current", False)
-        b = _box(sl, x, 6.67, w, 3.7, ORANGE if current else CREAM)
+        b = _box(sl, x, 6.67, w, 3.1, ORANGE if current else CREAM, radius=0.1)
         paras = [[(st["title"], 24, BLUE, True)]]
         if st.get("owner"):
             paras.append([(st["owner"], 18, BLUE if current else GREY, False)])
@@ -204,7 +204,7 @@ def slide_roadmap(prs, s, footer):
         c.fill.solid(); c.fill.fore_color.rgb = rgb(CREAM if current else ORANGE); c.line.fill.background(); c.shadow.inherit = False
         _text(c, [[(str(i + 1), 24, BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.0)
     if s.get("intro"):
-        t = sl.shapes.add_textbox(Inches(0.81), Inches(2.0), Inches(20), Inches(2.6))
+        t = sl.shapes.add_textbox(Inches(0.81), Inches(2.3), Inches(20), Inches(2.6))
         _text(t, [[(s["intro"], 24, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
     return sl
 
