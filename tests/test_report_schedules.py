@@ -166,7 +166,14 @@ class RunnerTests(unittest.TestCase):
         self._views = mock.patch.object(rs, "_find_view", side_effect=lambda vid, org: (
             VIEW if vid == "view-1" else None))
         self._views.start()
-        rs.create_schedule(_payload(), organization_id="dev", created_by="a@b.gov")
+        self._create("a@b.gov")
+
+    def _create(self, who):
+        # The runs below are dated 1 Sep 2026; a schedule is never owed a moment from
+        # before it existed, so the fixture exists from August.
+        entry = rs.create_schedule(_payload(), organization_id="dev", created_by=who)
+        entry["created_at"] = datetime(2026, 8, 1, tzinfo=UTC).isoformat()
+        rs._store.update(entry)
 
     def tearDown(self):
         self._views.stop()
@@ -209,7 +216,7 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(live[0]["status"], "sent")
 
     def test_render_failure_recorded_not_fatal(self):
-        rs.create_schedule(_payload(), organization_id="dev", created_by="b@b.gov")
+        self._create("b@b.gov")
         now = datetime(2026, 9, 1, 13, 5, tzinfo=UTC)
         calls = {"n": 0}
 
@@ -279,3 +286,54 @@ class RouteTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ScheduleIsFaithfulTests(unittest.TestCase):
+    """A scheduled report must be the view the person saved, delivered when it was due.
+
+    Found by the parity inventory (2026-09-28): the runner applied the date window and
+    the legacy single scope pair but never the view's saved `filters`, so the emailed
+    CSV could differ from the view on screen; and a monthly schedule fired only when the
+    runner happened to run on the 1st, so one missed hour lost the whole month."""
+
+    def _render(self, view):
+        seen = {}
+
+        def build(**kw):
+            seen.update(kw)
+            return "select 1", {}
+        snap = {"table_name": "rpt_bill_segment", "trusted_measures": []}
+        with mock.patch("api.snapshot_catalog.get_snapshot", return_value=snap), \
+             mock.patch("api.snapshot_catalog.snapshot_backend", return_value=("postgres", "postgres", "reporting")), \
+             mock.patch("api.snapshot_catalog.allowed_fields", return_value=set()), \
+             mock.patch.object(rs, "schedule_date_field", return_value="Bill Date"), \
+             mock.patch("api.reporting_dates.reporting_window", return_value=("2026-05-20", "2026-06-18")), \
+             mock.patch("api.query_builder.build_query", side_effect=build), \
+             mock.patch("api.warehouse_db.execute_query", return_value=(["m0"], [])):
+            rs.render_schedule({"organization_id": "dev", "window_days": 30}, view)
+        return seen["filters"]
+
+    def test_the_saved_filters_are_applied(self):
+        filters = self._render({"snapshot_id": "rpt_bill_segment", "dimensions": ["Bill Cycle"],
+                                "measures": [{"field": "Billed Amount", "agg": "sum"}],
+                                "filters": [{"field": "Is Frozen", "op": "eq", "value": True}]})
+        self.assertIn({"field": "Is Frozen", "op": "eq", "value": True}, filters)
+
+    def test_a_saved_date_range_gives_way_to_the_schedules_trailing_window(self):
+        filters = self._render({"snapshot_id": "rpt_bill_segment",
+                                "filters": [{"field": "Bill Date", "op": "between", "value": ["2025-01-01", "2025-01-31"]}]})
+        dated = [f for f in filters if f["field"] == "Bill Date"]
+        self.assertEqual(dated, [{"field": "Bill Date", "op": "between", "value": ["2026-05-20", "2026-06-18"]}])
+
+    def test_a_missed_monthly_run_is_caught_up_once(self):
+        s = {"cadence": "monthly", "hour_utc": 13, "enabled": True,
+             "last_run_at": datetime(2026, 8, 1, 13, 5, tzinfo=UTC).isoformat()}
+        self.assertTrue(rs.is_due(s, datetime(2026, 9, 3, 9, 0, tzinfo=UTC)), "the runner was down on the 1st")
+        s["last_run_at"] = datetime(2026, 9, 3, 9, 1, tzinfo=UTC).isoformat()
+        self.assertFalse(rs.is_due(s, datetime(2026, 9, 4, 13, 0, tzinfo=UTC)))
+
+    def test_a_new_schedule_waits_for_its_first_scheduled_moment(self):
+        s = {"cadence": "monthly", "hour_utc": 13, "enabled": True, "last_run_at": None,
+             "created_at": datetime(2026, 9, 10, 8, 0, tzinfo=UTC).isoformat()}
+        self.assertFalse(rs.is_due(s, datetime(2026, 9, 12, 13, 0, tzinfo=UTC)))
+        self.assertTrue(rs.is_due(s, datetime(2026, 10, 1, 13, 0, tzinfo=UTC)))

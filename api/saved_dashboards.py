@@ -11,7 +11,8 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 STORE_PATH = ROOT / "data" / "analytics_portal" / "saved_dashboards.json"
-MAX_DASHBOARDS = 12
+# Per organization; past it a save is refused out loud, never an old dashboard dropped.
+MAX_DASHBOARDS = 50
 MAX_TILES = 4
 
 from api import portal_state_store as _pss  # noqa: E402
@@ -106,14 +107,15 @@ def create_dashboard(payload: dict[str, Any], *, organization_id: str) -> dict[s
         "created_at": now,
         "updated_at": now,
     }
+    if len(list_dashboards(organization_id)) >= MAX_DASHBOARDS:
+        raise DashboardError(f"This organization has reached its limit of {MAX_DASHBOARDS} dashboards. "
+                             "Delete one you no longer need, then create the new one.")
     if _pss.enabled():
         _pss.upsert(_COLLECTION, entry["id"], organization_id, entry)
-        for stale in _pss.list_records(_COLLECTION, organization_id)[MAX_DASHBOARDS:]:
-            _pss.delete(_COLLECTION, stale["id"], organization_id)
         return entry
     store = _load_store()
     boards = [d for d in store.get("dashboards", []) if _matches_scope(d, organization_id)]
-    boards = [entry, *boards][:MAX_DASHBOARDS]
+    boards = [entry, *boards]
     other = [d for d in store.get("dashboards", []) if not _matches_scope(d, organization_id)]
     store["dashboards"] = other + boards
     _save_store(store)

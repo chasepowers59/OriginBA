@@ -94,21 +94,36 @@ def delete_schedule(schedule_id: str, organization_id: str) -> bool:
     return _store.delete(schedule_id, organization_id)
 
 
+def _last_occurrence(schedule: dict[str, Any], now: datetime) -> datetime:
+    """The most recent scheduled moment at or before `now`."""
+    hour = schedule.get("hour_utc")
+    at = now.replace(hour=13 if hour is None else int(hour), minute=0, second=0, microsecond=0)
+    cadence = schedule.get("cadence", "daily")
+    if cadence == "weekly":
+        at -= timedelta(days=(now.weekday() - int(schedule.get("weekday") or 0)) % 7)
+        return at if at <= now else at - timedelta(days=7)
+    if cadence == "monthly":
+        at = at.replace(day=1)
+        if at > now:
+            at = (at - timedelta(days=1)).replace(day=1)
+        return at
+    return at if at <= now else at - timedelta(days=1)
+
+
 def is_due(schedule: dict[str, Any], now: datetime) -> bool:
-    """Due once per period, at or after the configured UTC hour."""
+    """Due when a scheduled moment has passed that this schedule has not run for.
+
+    A missed moment is caught up once: the runner fired a monthly report only if it
+    happened to run on the 1st, so one down hour lost the month. A schedule with no run
+    and no creation time fires only on its scheduled day, never retroactively.
+    """
     if not schedule.get("enabled", True):
         return False
-    hour = schedule.get("hour_utc")
-    if now.hour < (13 if hour is None else int(hour)):
-        return False
-    cadence = schedule.get("cadence", "daily")
-    if cadence == "weekly" and now.weekday() != int(schedule.get("weekday") or 0):
-        return False
-    if cadence == "monthly" and now.day != 1:
-        return False
-    last = schedule.get("last_run_at")
-    # All cadences fire at most once a day, so a same-day run means done.
-    return not (last and datetime.fromisoformat(last).date() == now.date())
+    due = _last_occurrence(schedule, now)
+    since = schedule.get("last_run_at") or schedule.get("created_at")
+    if not since:
+        return due.date() == now.date()
+    return due > datetime.fromisoformat(since)
 
 
 def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
@@ -143,6 +158,11 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
     if view.get("scope_field") and view.get("scope_value") is not None:
         filters.append({"field": view["scope_field"], "op": "eq",
                         "value": view["scope_value"]})
+    # The view's own filters, as saved: without them the emailed rows could differ from
+    # the view on screen. A saved range on the windowed date gives way to the trailing
+    # window above -- a schedule that mailed the same fixed dates every week would go stale.
+    filters.extend(f for f in view.get("filters") or []
+                   if not (date_field and f.get("field") == date_field))
 
     measures = view.get("measures") or [{
         "field": view.get("measure_field") or "*",
