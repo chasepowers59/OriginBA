@@ -15,9 +15,8 @@ from api.auth.workstream_access import (
     filter_nlq_metrics_for_auth,
     filter_report_library_for_auth,
 )
-from api.portal_config import load_portal_config
+from api.portal_config import config_for_organization
 from api.org_db import require_org_for_data
-from api.organizations import get_organization
 from api.saved_dashboards import (
     DashboardError,
     create_dashboard,
@@ -119,14 +118,8 @@ class AnalyticsNlqRequest(BaseModel):
 @router.get("/config")
 def portal_config(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     ctx.require_permission("portal:read")
-    config = load_portal_config().copy()
-    org_id = ctx.effective_organization_id()
-    if org_id:
-        org = get_organization(org_id)
-        config["organization_id"] = org_id
-        if org:
-            config["organization_name"] = org["display_name"]
-    return config
+    # The organization's own brand over the portal default (api/portal_config.py).
+    return config_for_organization(ctx.effective_organization_id())
 
 
 @router.get("/report-library")

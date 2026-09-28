@@ -18,6 +18,7 @@ from typing import Any, Callable
 
 from api.notifications import build_message, clean_recipients, send_message
 from api.org_store import OrgRecordStore
+from api.portal_config import pdf_logo_path
 from api.row_security import row_filters
 from api.reporting_dates import window_date_field
 from api.saved_views import list_saved_views
@@ -311,7 +312,7 @@ def _bar_chart(columns: list[str], labels: dict[str, str], rows: list[dict[str, 
 
 
 def rows_to_pdf(title: str, window_note: str, columns: list[str], labels: dict[str, str],
-                rows: list[dict[str, Any]], now: datetime, chart: bool = False) -> bytes:
+                rows: list[dict[str, Any]], now: datetime, chart: bool = False, logo: Path | None = None) -> bytes:
     """A formatted report a schedule can send: the Origin mark and title on every page, the
     window it applied, the table with its header repeated on each page, page numbers."""
     from reportlab.lib import colors
@@ -328,8 +329,9 @@ def rows_to_pdf(title: str, window_note: str, columns: list[str], labels: dict[s
     def chrome(canvas, doc) -> None:
         canvas.saveState()
         top = size[1] - 0.5 * inch
-        if _LOGO.exists():
-            canvas.drawImage(str(_LOGO), 0.6 * inch, top - 0.3 * inch, height=0.3 * inch, width=1.1 * inch,
+        mark = logo or _LOGO   # the organization's own logo when it set one
+        if mark.exists():
+            canvas.drawImage(str(mark), 0.6 * inch, top - 0.3 * inch, height=0.3 * inch, width=1.1 * inch,
                              preserveAspectRatio=True, mask="auto")
         canvas.setFont("Helvetica-Bold", 11)
         canvas.drawRightString(size[0] - 0.6 * inch, top - 0.2 * inch, title[:90])
@@ -386,7 +388,8 @@ def _message(schedule: dict[str, Any], columns: list[str], labels: dict[str, str
     safe = re.sub(r"[^A-Za-z0-9_-]+", "_", str(title))[:60] or "report"
     stem = f"{safe}_{now.date().isoformat()}"
     if fmt == "pdf":
-        msg.add_attachment(rows_to_pdf(str(title), schedule.get("window_note") or "", columns, labels, rows, now, chart=True),
+        msg.add_attachment(rows_to_pdf(str(title), schedule.get("window_note") or "", columns, labels, rows, now,
+                                       chart=True, logo=pdf_logo_path(schedule.get("organization_id"))),
                            maintype="application", subtype="pdf", filename=f"{stem}.pdf")
     elif excel:
         msg.add_attachment(rows_to_xlsx(columns, labels, rows), maintype="application",

@@ -12,6 +12,7 @@ import OrgSwitcher from "@/components/OrgSwitcher";
 import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 import { isRestricted, visibleNav } from "@/lib/rowRules";
+import { clientLogo } from "@/lib/branding";
 
 // One clean top nav, one job per destination. "/" is the executive Home; Explore is the
 // single self-serve builder; Library is the one report catalog (and hosts the workstream
@@ -79,6 +80,10 @@ export function AppShell({
               <BrandMark className="h-6 w-auto sm:h-7" />
             </Link>
             <span aria-hidden className="hidden h-6 w-px bg-edge-subtle sm:block" />
+            {clientLogo(portal) ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={clientLogo(portal)!} alt={portal.organization_name ?? "Client"} className="hidden h-7 w-auto sm:block" />
+            ) : null}
             <div className="hidden min-w-0 sm:block">
               <OrgSwitcher role={user?.role ?? ""} homeOrganizationId={user?.organization_id ?? null} />
               {user?.role !== "admin" ? (
