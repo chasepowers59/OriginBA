@@ -134,7 +134,7 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
     # local calendar date. On a non-UTC server the two disagreed for the offset's worth
     # of hours each day -- six here -- so a scheduled report's "last 30 days" ended a
     # day later than the same window on screen and the emailed figure did not tie.
-    start_iso, end_iso = reporting_window(window_days)
+    start_iso, end_iso = reporting_window(window_days, organization_id=org_id)
     if date_field:
         filters.append({"field": date_field, "op": "between",
                         "value": [start_iso, end_iso]})

@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 import re
 
 from typing import Any
 
 from api.demo_db import demo_configured
 from api.warehouse_db import warehouse_configured
+from api.reporting_dates import data_as_of
 from api.kpi_runner import date_windows, execute_kpi_definition, public_lenses, select_lens
 
 
@@ -366,8 +369,11 @@ def build_executive_summary(
     lenses: dict[str, str] | None = None,
     organization_id: str | None = None,
 ) -> dict[str, Any]:
-    (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode)
+    (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode, organization_id)
+    as_of = data_as_of(organization_id)
     period_label = f"Last {days} days" if compare_mode != "mom" else "Month to date"
+    if as_of:   # a frozen copy: say where the window ends instead of implying it is live
+        period_label = f"{period_label} to {date.fromisoformat(as_of).strftime('%-d %b %Y')}"
     client_id = organization_id or "demo"
     kpi_defs, catalog_note = available_kpis(
         _kpis_for_workstreams(allowed_workstreams), organization_id)
@@ -388,6 +394,7 @@ def build_executive_summary(
                 "end": date_end,
                 "label": period_label,
                 "days": days,
+                "data_as_of": as_of,
             },
             "prior_period": {
                 "start": prior_start,
@@ -465,6 +472,7 @@ def build_executive_summary(
             "end": date_end,
             "label": period_label,
             "days": days,
+            "data_as_of": as_of,
         },
         "prior_period": {
             "start": prior_start,

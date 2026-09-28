@@ -190,7 +190,7 @@ def _default_date_filter(snapshot: dict[str, Any],
         estimate = _row_estimate(snapshot, organization_id)
         if estimate is not None and estimate < DEFAULT_WINDOW_MIN_ROWS:
             return None
-    end = reporting_today()
+    end = reporting_today(organization_id)
     start = end - timedelta(days=DEFAULT_WINDOW_DAYS)
     return FilterRequest(field=field, op="between", value=[start.isoformat(), end.isoformat()])
 

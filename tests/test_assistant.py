@@ -274,6 +274,23 @@ class TheLoop(unittest.TestCase):
         self.assertIn("not a reporting canvas", result["content"])
         self.assertIn("assistant_sql_refused", [c.kwargs["action"] for c in self.mocks[2].call_args_list])
 
+    def test_a_statement_the_database_rejects_goes_back_to_the_model_and_the_question_survives(self):
+        """Found in the first demo run (2026-09-28): the model wrote a nested aggregate, Oracle
+        raised ORA-00935, and the exception escaped as a 500 -- the whole question died as
+        "Failed to fetch". A database error is the model's to fix, like a refusal."""
+        self.mocks[1].side_effect = RuntimeError("ORA-00935: group function is nested too deeply")
+        client = FakeClient([
+            _resp([_tool("c1", "run_sql", {"sql": "select sum(count(*)) from reporting.rpt_bill", "purpose": "x"})], "tool_use"),
+            _resp([_text("Fixed the query.")], "end_turn"),
+        ])
+        out = self._assistant(client).ask("how many bills?")
+        self.assertEqual(out["answer"], "Fixed the query.")
+        self.assertEqual(out["steps"], [{"tool": "run_sql", "input": mock.ANY, "ok": False}])
+        result = client.requests[1]["messages"][-1]["content"][0]
+        self.assertTrue(result["is_error"])
+        self.assertIn("ORA-00935", result["content"])
+        self.assertIn("assistant_sql_failed", [c.kwargs["action"] for c in self.mocks[2].call_args_list])
+
     def test_the_loop_stops_at_the_turn_cap(self):
         forever = _resp([_tool("c", "list_canvases", {})], "tool_use")
         client = FakeClient([forever] * (MAX_TURNS + 5))

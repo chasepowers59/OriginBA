@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { askAssistant, fetchAssistantSpend, fetchAssistantStatus, fetchIntegrity } from "@/lib/api";
 import { WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, spendLabel, summarise, threadFor, type Turn } from "@/lib/assistant";
 import type { AssistantQuery, AssistantResponse, AssistantSpend, AssistantStatus, IntegrityOverview } from "@/lib/types";
+import { parseAnswer, parseInline, type Inline } from "@/lib/answerMarkdown";
 
 /**
  * Ask a question about this organization's data in plain language. The answer comes from
@@ -114,10 +115,52 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
   );
 }
 
+function Inlines({ parts }: { parts: Inline[] }) {
+  return (
+    <>
+      {parts.map((p, i) =>
+        p.kind === "bold" ? <strong key={i} className="font-semibold">{p.text}</strong>
+        : p.kind === "code" ? <code key={i} className="rounded bg-surface-subtle px-1 py-0.5 text-[0.85em]">{p.text}</code>
+        : <span key={i}>{p.text}</span>)}
+    </>
+  );
+}
+
+const ALIGN = { left: "text-left", right: "text-right", center: "text-center" } as const;
+
+/** The assistant's light markdown as real elements: paragraphs, bullets, tables. Never raw HTML. */
+function AnswerText({ text }: { text: string }) {
+  return (
+    <div className="space-y-2 text-sm leading-relaxed text-heading" data-testid="assistant-answer">
+      {parseAnswer(text).map((b, i) =>
+        b.kind === "p" ? (
+          <p key={i}>{b.lines.map((l, j) => <span key={j}>{j ? " " : null}<Inlines parts={l} /></span>)}</p>
+        ) : b.kind === "ul" ? (
+          <ul key={i} className="list-disc space-y-1 pl-5">{b.items.map((it, j) => <li key={j}><Inlines parts={it} /></li>)}</ul>
+        ) : (
+          <div key={i} className="overflow-x-auto rounded-lg border border-edge-subtle">
+            <table className="w-full text-sm">
+              <thead className="bg-surface-subtle text-xs text-fg-muted">
+                <tr>{b.header.map((h, j) => <th key={j} className={`px-3 py-1.5 font-semibold ${ALIGN[b.align[j] ?? "left"]}`}>{h}</th>)}</tr>
+              </thead>
+              <tbody>
+                {b.rows.map((r, j) => (
+                  <tr key={j} className="border-t border-edge-subtle">
+                    {r.map((c, k) => <td key={k} className={`px-3 py-1.5 tabular-nums ${ALIGN[b.align[k] ?? "left"]}`}><Inlines parts={parseInline(c)} /></td>)}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+    </div>
+  );
+}
+
 function Answer({ response }: { response: AssistantResponse }) {
   return (
     <div className="rounded-xl border border-edge tint-panel-br p-4">
-      <p className="whitespace-pre-wrap text-sm leading-relaxed text-heading">{response.answer}</p>
+      <AnswerText text={response.answer} />
       {response.queries.map((q, i) => <QueryResult key={i} q={q} />)}
       <p className="mt-3 text-xs text-fg-muted">{summarise(response)} · {response.model}</p>
     </div>

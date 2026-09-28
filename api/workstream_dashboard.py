@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 from typing import Any
 
 from api.demo_db import demo_configured
 from api.warehouse_db import warehouse_configured
 from api.executive_dashboard import WAREHOUSE_NOT_BUILT_NOTE, warehouse_not_built
+from api.reporting_dates import data_as_of
 from api.kpi_runner import date_windows, execute_kpi_definition
 from api.snapshot_catalog import load_catalog
 
@@ -278,8 +281,11 @@ def build_workstream_summary(
     ws = workstream_id.lower()
     kpis_def = WORKSTREAM_KPIS.get(ws, [])
 
-    (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode)
+    (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode, organization_id)
+    as_of = data_as_of(organization_id)
     period_label = f"Last {days} days" if compare_mode != "mom" else "Month to date"
+    if as_of:   # a frozen copy: say where the window ends instead of implying it is live
+        period_label = f"{period_label} to {date.fromisoformat(as_of).strftime('%-d %b %Y')}"
     client_id = organization_id or catalog.get("client", "demo")
 
     if ws not in WORKSTREAM_KPIS:
@@ -297,7 +303,7 @@ def build_workstream_summary(
             "compare_label": compare_label,
             "workstream": ws,
             "workstream_label": labels.get(ws, ws),
-            "period": {"start": date_start, "end": date_end, "label": period_label, "days": days},
+            "period": {"start": date_start, "end": date_end, "label": period_label, "days": days, "data_as_of": as_of},
             "prior_period": {
                 "start": prior_start,
                 "end": prior_end,
@@ -348,7 +354,7 @@ def build_workstream_summary(
         "compare_label": compare_label,
         "workstream": ws,
         "workstream_label": labels.get(ws, ws),
-        "period": {"start": date_start, "end": date_end, "label": period_label, "days": days},
+        "period": {"start": date_start, "end": date_end, "label": period_label, "days": days, "data_as_of": as_of},
         "prior_period": {
             "start": prior_start,
             "end": prior_end,

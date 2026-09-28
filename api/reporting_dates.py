@@ -18,6 +18,8 @@ from __future__ import annotations
 from datetime import date, timedelta
 from typing import Any
 
+from api.organizations import get_organization
+
 # Two years. A window is a filter, not an export: a mistyped 99999 should not turn an
 # interactive chart into a whole-warehouse scan.
 MAX_WINDOW_DAYS = 730
@@ -55,12 +57,31 @@ def window_date_label(snapshot: dict[str, Any], field: str) -> str:
     return field
 
 
-def reporting_today() -> date:
-    """The calendar date the business is in."""
-    return date.today()
+def data_as_of(organization_id: str | None = None) -> str | None:
+    """The org's declared `data_as_of` (ISO date) when it is a valid past-or-today date, else None.
+
+    A frozen copy (a TEST instance that stopped receiving activity) declares the last day its
+    data is normal, so relative windows end there instead of on an empty tail; see
+    tests/test_data_as_of.py for the Ellensburg measurement. A live org declares nothing.
+    """
+    org = get_organization(organization_id) if organization_id else None
+    raw = (org or {}).get("data_as_of")
+    if not raw:
+        return None
+    try:
+        return date.fromisoformat(str(raw)).isoformat()
+    except ValueError:
+        return None
 
 
-def reporting_window(days: int, *, max_days: int = MAX_WINDOW_DAYS) -> tuple[str, str]:
+def reporting_today(organization_id: str | None = None) -> date:
+    """The calendar date the business is in: the org's data_as_of anchor when declared, else today."""
+    anchored = data_as_of(organization_id)
+    return date.fromisoformat(anchored) if anchored else date.today()
+
+
+def reporting_window(days: int, *, max_days: int = MAX_WINDOW_DAYS,
+                     organization_id: str | None = None) -> tuple[str, str]:
     """(start, end) as ISO dates for a trailing window ending today.
 
     Clamped to at least one day so a zero or negative request cannot produce a window
@@ -72,5 +93,5 @@ def reporting_window(days: int, *, max_days: int = MAX_WINDOW_DAYS) -> tuple[str
     except (TypeError, ValueError):
         requested = 1
     span = max(1, min(requested, max_days))
-    end = reporting_today()
+    end = reporting_today(organization_id)
     return (end - timedelta(days=span)).isoformat(), end.isoformat()

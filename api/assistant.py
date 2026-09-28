@@ -308,7 +308,13 @@ def tool_run_sql(org_id: str, engine: str, sql: str, *, actor_email: str, actor_
                             target_type="sql", target_id=org_id, detail=f"{exc} | sql: {sql[:300]}")
         return {"error": str(exc)}
     started = time.perf_counter()
-    columns, rows = _run(engine, validated, org_id, MAX_ROWS + 1)
+    try:
+        columns, rows = _run(engine, validated, org_id, MAX_ROWS + 1)
+    except Exception as exc:   # the database's own error (ORA-00935 and the like) is the model's to fix
+        message = str(exc).split("\nHelp:")[0][:400]
+        record_access_event(actor_email=actor_email, actor_id=actor_id, action="assistant_sql_failed",
+                            target_type="sql", target_id=org_id, detail=f"{message} | sql: {validated[:300]}")
+        return {"error": f"The database rejected the statement: {message}. Fix the SQL and run it again."}
     truncated = len(rows) > MAX_ROWS
     rows = rows[:MAX_ROWS]
     ms = int((time.perf_counter() - started) * 1000)
@@ -360,6 +366,12 @@ def system_prompt(org_id: str, org_name: str, engine: str) -> list[dict[str, Any
     quoting = ('reporting.rpt_bill_segment' if engine == "postgres" else 'ORIGINBA_REPORTING.rpt_bill_segment')
     limit = "LIMIT 50" if engine == "postgres" else "FETCH FIRST 50 ROWS ONLY"
     window = "CURRENT_DATE - 90" if engine == "postgres" else "TRUNC(SYSDATE) - 90"
+    from api.reporting_dates import data_as_of
+    as_of = data_as_of(org_id)
+    if as_of:   # a frozen copy: every relative window ends where its data ends, and the answer says so
+        window = f"DATE '{as_of}' - 90"
+    as_of_note = (f"\n   This organization's data is a copy that runs through {as_of}: \"last N days\" means the N days"
+                  f"\n   ending {as_of}, not today, and every answer names that end date.") if as_of else ""
     head = f"""You are the OriginBA analytics assistant for {org_name}, a utility running Oracle C2M.
 You answer questions about their data by reading their reporting canvases and running SQL.
 
@@ -369,8 +381,10 @@ How you work:
 2. Write a read-only SELECT against the canvas table exactly as describe_canvas names it, e.g.
    SELECT "Account ID", "Billed Amount" FROM {quoting} WHERE "Bill Date" >= DATE '2026-01-01' {limit}
    The engine is {'PostgreSQL' if engine == 'postgres' else 'Oracle'}. Always add a row limit.
+   Alias every computed column in Title Case, double-quoted ("Segment Count", "Billed Amount"):
+   the reader sees these names as the column headers under your answer.
    A trailing window starts at midnight: "last 90 days" is >= {window} (a whole bill-cycle day
-   can sit on the boundary; SYSDATE - 90 moved a 90-day total by $340K).
+   can sit on the boundary; SYSDATE - 90 moved a 90-day total by $340K).{as_of_note}
 3. Run it with run_sql. If it is refused, read the reason, fix the statement, run again.
    Canvases hold years of data (a bill-segment canvas can be millions of rows): aggregate in
    SQL rather than fetching detail, filter on the canvas's default date field to a recent window
@@ -393,7 +407,8 @@ Rules you never break:
   the SQL workspace for ad hoc SQL, the report builder for a saved view, or which canvas
   would need extending. Never invent a figure.
 - Keep answers short: a sentence of answer, a sentence of scope, the caveat if any.
-  Do not repeat the SQL or the rows in the answer; the reader sees each query and its rows under it.
+  Do not repeat the SQL or the rows in the answer, and never write a table of the result: the reader
+  sees each query and its rows under it. Name the total or the top item, then the scope.
 
 The organization's canvases:
 {listing}

@@ -12,6 +12,8 @@ catalog actually carries, so a metric is never offered where it cannot run.
 
 from __future__ import annotations
 
+from api.reporting_dates import reporting_today
+
 import re
 from dataclasses import dataclass, field
 from datetime import date, timedelta
@@ -35,9 +37,9 @@ class NlqMetric:
     build: Callable[[dict[str, Any]], dict[str, Any]] | None = None
 
 
-def _window(days: int) -> tuple[str, str]:
+def _window(days: int, organization_id: str | None = None) -> tuple[str, str]:
     capped = max(1, min(int(days), 730))
-    end = date.today()
+    end = reporting_today(organization_id)
     start = end - timedelta(days=capped)
     return start.isoformat(), end.isoformat()
 
@@ -78,7 +80,7 @@ def _scalar(
     if not field_name and not windowless:
         raise ValueError(f"No date field for {snapshot_id}")
     days = int(params.get("days") or 90)
-    start, end = _window(days)
+    start, end = _window(days, organization_id)
     filters = list(query.get("filters") or [])
     filters.extend(_extra(params, allowed_fields(snap)))
     payload = {**query, "filters": filters}
@@ -103,7 +105,7 @@ def _trend(
     field_name = None if windowless else (
         date_field or snap.get("default_date_field"))
     days = int(params.get("days") or 90)
-    start, end = _window(days)
+    start, end = _window(days, organization_id)
     filters = list(query.get("filters") or [])
     filters.extend(_extra(params, allowed_fields(snap)))
     payload = {**query, "filters": filters}

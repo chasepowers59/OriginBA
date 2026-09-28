@@ -8,7 +8,7 @@ from typing import Any
 
 from api.demo_db import execute_query
 from api.query_builder import QueryValidationError, build_query
-from api.reporting_dates import window_date_field
+from api.reporting_dates import reporting_today, window_date_field
 from api.snapshot_catalog import allowed_fields, get_snapshot, snapshot_backend
 
 
@@ -181,7 +181,7 @@ def empty_window_note(
 
 
 def date_windows(
-    days: int, compare_mode: str = "prior_period"
+    days: int, compare_mode: str = "prior_period", organization_id: str | None = None
 ) -> tuple[tuple[str, str], tuple[str, str], str]:
     """(current_start, current_end), (prior_start, prior_end), compare_label.
 
@@ -191,7 +191,7 @@ def date_windows(
     yoy -- seasonal: the same window one year earlier (July vs LAST July is signal).
     """
     capped = max(1, min(days, 365))
-    today = date.today()
+    today = reporting_today(organization_id)
 
     if compare_mode == "mom":
         cur_start = today.replace(day=1)
@@ -334,7 +334,7 @@ def execute_kpi_definition(
         if not date_field and not windowless:
             raise ValueError("Snapshot has no date field and KPI is not windowless")
 
-        (cur_start, cur_end), (pri_start, pri_end), compare_label = date_windows(days, compare_mode)
+        (cur_start, cur_end), (pri_start, pri_end), compare_label = date_windows(days, compare_mode, organization_id)
 
         value_cols, value_rows = run_kpi_query(
             snapshot_id, kpi["value"], date_field, cur_start, cur_end, extra_filters, organization_id=organization_id

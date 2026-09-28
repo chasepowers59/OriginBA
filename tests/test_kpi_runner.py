@@ -64,7 +64,8 @@ class DateWindowsTests(unittest.TestCase):
     def test_yoy_survives_february_29(self):
         """`.replace(year=...)` raises on Feb 29; the fallback subtracts 365 instead."""
         import api.kpi_runner as kr
-        with mock.patch.object(kr, "date", wraps=date) as fake:
+        import api.reporting_dates as rd   # the one clock every window reads
+        with mock.patch.object(rd, "date", wraps=date) as fake:
             fake.today.return_value = date(2028, 2, 29)  # a leap day
             (cs, ce), (ps, pe), _ = date_windows(30, "yoy")
         self.assertEqual(ce, "2028-02-29")
@@ -72,7 +73,8 @@ class DateWindowsTests(unittest.TestCase):
 
     def test_mom_runs_month_to_date_against_the_same_span_last_month(self):
         import api.kpi_runner as kr
-        with mock.patch.object(kr, "date", wraps=date) as fake:
+        import api.reporting_dates as rd   # the one clock every window reads
+        with mock.patch.object(rd, "date", wraps=date) as fake:
             fake.today.return_value = date(2026, 7, 10)
             (cs, ce), (ps, pe), label = date_windows(30, "mom")
         self.assertEqual((cs, ce), ("2026-07-01", "2026-07-10"))
@@ -81,7 +83,8 @@ class DateWindowsTests(unittest.TestCase):
 
     def test_mom_on_the_first_of_the_month_does_not_invert(self):
         import api.kpi_runner as kr
-        with mock.patch.object(kr, "date", wraps=date) as fake:
+        import api.reporting_dates as rd   # the one clock every window reads
+        with mock.patch.object(rd, "date", wraps=date) as fake:
             fake.today.return_value = date(2026, 7, 1)
             (cs, ce), (ps, pe), _ = date_windows(30, "mom")
         self.assertLessEqual(cs, ce)
@@ -90,7 +93,8 @@ class DateWindowsTests(unittest.TestCase):
     def test_mom_clamps_to_a_shorter_previous_month(self):
         """31 March compared to February must not run off the end of February."""
         import api.kpi_runner as kr
-        with mock.patch.object(kr, "date", wraps=date) as fake:
+        import api.reporting_dates as rd   # the one clock every window reads
+        with mock.patch.object(rd, "date", wraps=date) as fake:
             fake.today.return_value = date(2026, 3, 31)
             _, (ps, pe), _ = date_windows(30, "mom")
         self.assertEqual(ps, "2026-02-01")
