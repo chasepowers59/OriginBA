@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import time
 
@@ -489,10 +490,23 @@ def _row_count(snapshot: dict, org_id: str, row_rules: tuple = ()) -> int:
     return int(rows[0][0] or 0) if rows else 0
 
 
+def _where_filters(where: Any) -> list[dict[str, Any]]:
+    if not isinstance(where, str) or not where:   # absent (or the route called directly)
+        return []
+    try:
+        parsed = json.loads(where)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=400, detail="where must be a JSON list of filters") from exc
+    if not isinstance(parsed, list) or not all(isinstance(f, dict) for f in parsed) or len(parsed) > 10:
+        raise HTTPException(status_code=400, detail="where must be a JSON list of at most 10 filters")
+    return [{"field": str(f.get("field")), "op": str(f.get("op")), "value": f.get("value")} for f in parsed]
+
+
 @router.get("/{snapshot_id}/scope-options/{field_id}")
 def snapshot_scope_options(
     snapshot_id: str,
     field_id: str,
+    where: str | None = Query(default=None, description="JSON list of filters the values must occur under"),
     ctx: AuthContext = Depends(get_auth_context),
 ) -> dict[str, Any]:
     ctx.require_permission("snapshots:query")
@@ -538,12 +552,19 @@ def snapshot_scope_options(
     sql = (f"SELECT DISTINCT {col} AS val FROM {_qualified(snapshot, org_id)} "
            f"WHERE {col} IS NOT NULL ORDER BY 1 FETCH FIRST 100 ROWS ONLY")
     binds = None
-    if ctx.row_rules:
-        # Only the values in this person's rows: grouped through the query builder, filtered.
+    narrowing = _where_filters(where)
+    if narrowing or ctx.row_rules:
+        # Only the values that occur under the answers above (cascading parameters) and in
+        # this person's rows: grouped through the query builder, which validates every filter.
         _, dialect, schema = snapshot_backend(snapshot, org_id)
-        sql, binds = build_query(table_name=snapshot["table_name"], allowed_fields=allowed_fields(snapshot),
-                                 trusted_measures=set(), dimensions=[field], measures=[{"field": "*", "agg": "count"}],
-                                 filters=row_filters(ctx.row_rules, snapshot), limit=100, dialect=dialect, schema=schema)
+        try:
+            sql, binds = build_query(table_name=snapshot["table_name"], allowed_fields=allowed_fields(snapshot),
+                                     trusted_measures=set(), dimensions=[field],
+                                     measures=[{"field": "*", "agg": "count"}],
+                                     filters=narrowing + row_filters(ctx.row_rules, snapshot),
+                                     limit=100, dialect=dialect, schema=schema)
+        except QueryValidationError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
     try:
         columns, rows = _run(snapshot, sql, binds, organization_id=org_id, max_rows=100)
     except Exception as exc:

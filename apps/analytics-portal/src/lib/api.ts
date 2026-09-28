@@ -404,8 +404,11 @@ export function runSnapshotQuery(
 export function fetchScopeOptions(
   snapshotId: string,
   fieldId: string,
+  /** Only the values occurring under these filters (cascading report parameters). */
+  where?: { field: string; op: string; value: unknown }[],
 ): Promise<ScopeOptionsResponse> {
-  return fetchJson<ScopeOptionsResponse>(`/snapshots/${snapshotId}/scope-options/${fieldId}`);
+  const qs = where?.length ? `?where=${encodeURIComponent(JSON.stringify(where))}` : "";
+  return fetchJson<ScopeOptionsResponse>(`/snapshots/${snapshotId}/scope-options/${fieldId}${qs}`);
 }
 
 export function fetchSnapshotStats(snapshotId: string): Promise<SnapshotStats> {

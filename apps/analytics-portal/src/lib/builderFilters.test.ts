@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activeFilters, answerPrompts, optionsWithCurrent, restoreFilters, questionFilters, savedFilters, unanswered, type ShelfFilter } from "./builderFilters";
+import { activeFilters, answerPrompts, cascadeFilters, optionsWithCurrent, restoreFilters, questionFilters, savedFilters, unanswered, type ShelfFilter } from "./builderFilters";
 
 /**
  * The builder never saved its filters shelf, and the restore never set it. A view
@@ -195,5 +195,39 @@ describe("report parameters (filters asked for when a view opens)", () => {
     expect(answered.find((f) => f.field === "Bill Date")?.value).toEqual(["2026-04-01", "2026-06-18"]);
     expect(unanswered(answerPrompts(fils, { "Bill Cycle": "" }))).toEqual(["Bill Cycle"]);
     expect(unanswered(answerPrompts(fils, { "Bill Date": ["2026-04-01", ""] }))).toEqual(["Bill Date"]);
+  });
+});
+
+describe("cascading report parameters", () => {
+  const asked: ShelfFilter[] = [
+    { field: "Bill Date", label: "Bill Date", op: "between", value: ["2026-01-01", "2026-03-31"], role: "date", prompt: true },
+    { field: "Bill Cycle", label: "Bill Cycle", op: "eq", value: "", role: "dimension", prompt: true },
+    { field: "Customer Class", label: "Customer Class", op: "eq", value: "", role: "dimension", prompt: true },
+  ];
+
+  it("each list is narrowed by the answered parameters above it", () => {
+    const answers = { "Bill Date": ["2026-01-01", "2026-03-31"], "Bill Cycle": "C1" };
+    expect(cascadeFilters(asked, answers, 2)).toEqual([
+      { field: "Bill Date", op: "between", value: ["2026-01-01", "2026-03-31"] },
+      { field: "Bill Cycle", op: "eq", value: "C1" },
+    ]);
+  });
+
+  it("the first list and unanswered parameters narrow nothing", () => {
+    expect(cascadeFilters(asked, {}, 0)).toEqual([]);
+    expect(cascadeFilters(asked, { "Bill Cycle": "" }, 2)).toEqual([
+      { field: "Bill Date", op: "between", value: ["2026-01-01", "2026-03-31"] },
+    ]);
+  });
+});
+
+describe("a parameter with no default", () => {
+  it("is still saved, so it is asked for; the query leaves it out until answered", () => {
+    const fils: ShelfFilter[] = [
+      { field: "Customer Class", label: "Customer Class", op: "eq", value: "", role: "dimension", prompt: true },
+      { field: "Bill Cycle", label: "Bill Cycle", op: "eq", value: "", role: "dimension" },
+    ];
+    expect(savedFilters(fils)).toEqual([{ field: "Customer Class", op: "eq", value: "", prompt: true }]);
+    expect(activeFilters(fils)).toEqual([]);
   });
 });

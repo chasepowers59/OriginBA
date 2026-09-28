@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { answerPrompts, unanswered, type ShelfFilter } from "@/lib/builderFilters";
+import { answerPrompts, cascadeFilters, unanswered, type ShelfFilter } from "@/lib/builderFilters";
 import { FilterValuePicker } from "./FilterValuePicker";
 
 /**
@@ -34,7 +34,7 @@ export function ReportParameters({ snapshotId, fils, onRun }: {
         <p className="text-sm text-fg-muted">This view asks for these values before it runs.</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
-        {asked.map((f) => {
+        {asked.map((f, i) => {
           const value = answers[f.field];
           const range = Array.isArray(value) ? (value as string[]) : ["", ""];
           return (
@@ -52,7 +52,7 @@ export function ReportParameters({ snapshotId, fils, onRun }: {
                 </div>
               ) : (
                 <FilterValuePicker snapshotId={snapshotId} field={f.field} value={String(value ?? "")}
-                                   onChange={(v) => set(f.field, v)} />
+                                   onChange={(v) => set(f.field, v)} where={cascadeFilters(asked, answers, i)} />
               )}
             </div>
           );

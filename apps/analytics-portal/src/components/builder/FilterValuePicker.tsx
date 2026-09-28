@@ -14,11 +14,14 @@ export function FilterValuePicker({
   field,
   value,
   onChange,
+  where,
 }: {
   snapshotId: string;
   field: string;
   value: string;
   onChange: (v: string) => void;
+  /** Narrow the list to values occurring under these filters (cascading parameters). */
+  where?: { field: string; op: string; value: unknown }[];
 }) {
   const [values, setValues] = useState<string[] | null>(null);
   const [failed, setFailed] = useState(false);
@@ -29,7 +32,7 @@ export function FilterValuePicker({
     let active = true;
     setValues(null);
     setFailed(false);
-    fetchScopeOptions(snapshotId, field)
+    fetchScopeOptions(snapshotId, field, where)
       .then((r) => {
         if (!active) return;
         // enumerable === false means the canvas is too large to list values from;
@@ -43,7 +46,7 @@ export function FilterValuePicker({
     return () => {
       active = false;
     };
-  }, [snapshotId, field]);
+  }, [snapshotId, field, JSON.stringify(where ?? [])]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Free text when the list is unavailable — because the fetch failed, because the
   // column has no values, or because the canvas is too large to list from. The filter
