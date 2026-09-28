@@ -76,5 +76,20 @@ class WarehouseOrgStatusTests(unittest.TestCase):
         self.assertEqual(s["user_masked"], "CP***")
 
 
+class EngineDecidesTests(unittest.TestCase):
+    """demo25 reads a Postgres warehouse but also has DEMO25_* Oracle keys in the
+    environment; Settings showed that Oracle DSN as its connection and offered an Oracle
+    form that changes nothing the org reads (the crawl, 2026-09-28). The org's declared
+    engine decides which connection Settings describes."""
+
+    def test_a_postgres_org_describes_its_warehouse_even_with_oracle_keys_present(self):
+        with mock.patch.object(store, "load_config", return_value=None), \
+             mock.patch.object(store, "warehouse_configured", return_value=True), \
+             mock.patch.object(store, "org_backend", return_value=("postgres", "dbt")):
+            s = store.public_status(organization_id="demo25", env_configured=True)
+        self.assertEqual(s["source"], "warehouse")
+        self.assertIsNone(s["dsn_masked"])
+
+
 if __name__ == "__main__":
     unittest.main()

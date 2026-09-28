@@ -49,6 +49,8 @@ const SEV = {
   info: { label: "INFO", pill: "bg-chip text-fg-muted ring-1 ring-edge-subtle" },
 } as const;
 
+const ROWS_PER_PAGE = 20;
+
 export function DataQualityBoard() {
   const [data, setData] = useState<DqResponse | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -241,6 +243,9 @@ function RuleCard({
   onMark: (key: string, done: boolean) => Promise<void>;
 }) {
   const sev = SEV[r.severity];
+  // A rule can return hundreds of rows (848 future-dated bills on the demo org); the page
+  // showed all of them and grew past 7,000px. A page of rows at a time keeps every rule in reach.
+  const [shown, setShown] = useState(ROWS_PER_PAGE);
   return (
     <details open={defaultOpen && r.count > 0} className="glass-panel overflow-hidden">
       <summary className="flex cursor-pointer flex-wrap items-center gap-3 px-4 py-3">
@@ -285,7 +290,7 @@ function RuleCard({
                 </tr>
               </thead>
               <tbody>
-                {r.rows.map((row, i) => (
+                {r.rows.slice(0, shown).map((row, i) => (
                   <tr key={i} className="border-b border-edge-subtle/60 hover:bg-chip">
                     <td className="px-2 py-1">
                       <button
@@ -307,9 +312,20 @@ function RuleCard({
                 ))}
               </tbody>
             </table>
+            {r.rows.length > shown ? (
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-fg-muted">
+                <span>Showing {shown.toLocaleString()} of {r.rows.length.toLocaleString()}</span>
+                <button type="button" className="btn-ghost text-xs" onClick={() => setShown((n) => n + ROWS_PER_PAGE)}>
+                  Show {Math.min(ROWS_PER_PAGE, r.rows.length - shown)} more
+                </button>
+                <button type="button" className="btn-ghost text-xs" onClick={() => setShown(r.rows.length)}>
+                  Show all
+                </button>
+              </div>
+            ) : null}
             {r.capped && (
               <p className="mt-1 text-xs text-fg-subtle">
-                showing the first {r.count} of {r.total ?? r.count}
+                The rule found {(r.total ?? r.count).toLocaleString()}; the first {r.count.toLocaleString()} are listed here.
               </p>
             )}
           </div>
