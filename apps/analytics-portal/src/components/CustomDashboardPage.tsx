@@ -212,6 +212,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            aria-label="Dashboard title"
             className="mt-2 block w-full max-w-lg bg-transparent text-2xl font-bold text-heading outline-none border-b border-edge-subtle focus:border-edge"
           />
           <p className="mt-1 text-sm text-fg-muted">

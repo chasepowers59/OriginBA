@@ -402,6 +402,7 @@ export function DatabaseWorkspace({
           <label className="portal-text-muted flex items-center gap-1.5 text-xs">
             Page size
             <select
+              aria-label="Rows per page"
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
               className="input-modern py-1 text-xs"
@@ -458,6 +459,7 @@ export function DatabaseWorkspace({
               {sidebarTab === "starters" ? (
                 <div className="space-y-2">
                   <select
+                    aria-label="Starter query category"
                     value={templateCategory}
                     onChange={(e) => setTemplateCategory(e.target.value)}
                     className="input-modern w-full py-1.5 text-xs"

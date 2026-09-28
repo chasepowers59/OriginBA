@@ -121,7 +121,7 @@ export function ReportLibrary() {
               className={`chip ${activePack === ALL ? "chip-active" : ""}`}
             >
               All packs
-              <span className="ml-1 opacity-60">({totalReports})</span>
+              <span className="ml-1 text-fg-subtle">({totalReports})</span>
             </button>
             {packs.map((pack) => (
               <button
@@ -131,7 +131,7 @@ export function ReportLibrary() {
                 className={`chip ${activePack === pack.id ? "chip-active" : ""}`}
               >
                 {pack.title}
-                <span className="ml-1 opacity-60">({pack.report_count})</span>
+                <span className="ml-1 text-fg-subtle">({pack.report_count})</span>
               </button>
             ))}
           </div>

@@ -15,7 +15,7 @@ export default defineConfig({
     baseURL: process.env.PORTAL_URL ?? "http://localhost:3001",
     channel: "chrome",
     headless: true,
-    colorScheme: "light",
+    colorScheme: (process.env.COLOR_SCHEME as "light" | "dark" | undefined) ?? "light",
   },
   projects: [
     { name: "desktop", use: { viewport: { width: 1440, height: 900 } } },

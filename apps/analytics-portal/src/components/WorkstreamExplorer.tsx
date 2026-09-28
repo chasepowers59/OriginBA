@@ -121,15 +121,12 @@ export function WorkstreamSidebar({
         const processes = ws.processes ?? [];
         return (
           <div key={ws.id}>
-            <button
-              type="button"
-              onClick={() => setExpandedWs((p) => ({ ...p, [ws.id]: !wsOpen }))}
-              className="mb-1 flex w-full items-center gap-2 text-left text-[11px] font-semibold uppercase tracking-wide text-fg-muted"
-            >
-              <span className="text-primary">{workstreamIcon(ws.id)}</span>
+            {/* A link and its own toggle side by side: a link inside a button is two
+                controls a keyboard or screen reader cannot tell apart. */}
+            <div className="mb-1 flex w-full items-center gap-2 text-left text-[11px] font-semibold uppercase tracking-wide text-fg-muted">
+              <span className="text-primary" aria-hidden>{workstreamIcon(ws.id)}</span>
               <Link
                 href={filterMode ? `/reports?workstream=${ws.id}` : `/workstream/${ws.id}`}
-                onClick={(e) => e.stopPropagation()}
                 aria-current={activeId === ws.id ? "true" : undefined}
                 className={`flex-1 hover:text-primary ${
  activeId === ws.id ? "text-primary" : ""
@@ -137,11 +134,19 @@ export function WorkstreamSidebar({
               >
                 {ws.label ?? workstreamDisplayName(ws.id)}
                 {typeof ws.snapshot_count === "number" ? (
-                  <span className="ml-1 font-normal opacity-60">({ws.snapshot_count})</span>
+                  <span className="ml-1 font-normal text-fg-subtle">({ws.snapshot_count})</span>
                 ) : null}
               </Link>
-              <span className="text-fg-muted">{wsOpen ? "▾" : "▸"}</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setExpandedWs((p) => ({ ...p, [ws.id]: !wsOpen }))}
+                aria-expanded={wsOpen}
+                aria-label={`${wsOpen ? "Collapse" : "Expand"} ${ws.label ?? workstreamDisplayName(ws.id)}`}
+                className="rounded px-1 text-fg-muted hover:text-heading"
+              >
+                {wsOpen ? "▾" : "▸"}
+              </button>
+            </div>
             {wsOpen ? (
               <ul className="space-y-2 pl-1">
                 {processes.map((process) => {

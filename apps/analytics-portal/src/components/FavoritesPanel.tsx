@@ -38,7 +38,7 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
       <div className="glass-panel-subtle p-4 text-sm text-fg-muted">
         Save reports you run often — they sync to your client workspace for one-click
         access.{" "}
-        <Link href="/build" className="text-primary hover:underline dark:text-primary">
+        <Link href="/build" className="text-primary underline underline-offset-2 dark:text-primary">
           Build your first view →
         </Link>
       </div>
