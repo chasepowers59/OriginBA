@@ -75,13 +75,25 @@ def node_cell(n: dict, parent: str, ox: float, oy: float) -> str:
     elif kind == "note":
         st = style(text=None, fillColor="none", strokeColor="none", align="left", verticalAlign="top", fontColor=CREAM)
         val = label(title, body, 12, 11, CREAM, CREAM)
+    elif kind == "stop":
+        st = style(rounded=1, arcSize=30, fillColor=CREAM, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(n.get("title_pt", 10)))
+        val = escape(title, {'"': "&quot;"})
     else:   # step and data: the same flat cream box
         centred = kind == "data" or n.get("center")
         st = style(rounded=1, arcSize=10, fillColor=CREAM, strokeColor="none", align="center" if centred else "left",
                    verticalAlign="middle", spacingLeft=0 if centred else 10, spacingRight=0 if centred else 8)
         val = label(title, body, tp, bp)
-    return (f'<mxCell id="{n["id"]}" value="{val}" style="{st}" vertex="1" parent="{parent}">'
-            f'<mxGeometry x="{px(x)}" y="{px(y)}" width="{px(w)}" height="{px(h)}" as="geometry"/></mxCell>')
+    geom = f'<mxGeometry x="{px(x)}" y="{px(y)}" width="{px(w)}" height="{px(h)}" as="geometry"/>'
+    if n.get("tooltip"):   # hover text in draw.io: the detail that stays off the picture
+        tip = escape(n["tooltip"], {'"': "&quot;"})
+        cell = (f'<object id="{n["id"]}" label="{val}" tooltip="{tip}"><mxCell style="{st}" vertex="1" parent="{parent}">{geom}</mxCell></object>')
+    else:
+        cell = f'<mxCell id="{n["id"]}" value="{val}" style="{st}" vertex="1" parent="{parent}">{geom}</mxCell>'
+    if n.get("num") is not None and kind not in ("group", "note"):   # step badge, same parent and frame as the node
+        bst = style(ellipse=None, fillColor=ORANGE, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(10), spacing=0)
+        cell += (f'<mxCell id="{n["id"]}_n" value="{n["num"]}" style="{bst}" vertex="1" parent="{parent}">'
+                 f'<mxGeometry x="{px(x - 0.14)}" y="{px(y - 0.14)}" width="{px(0.34)}" height="{px(0.34)}" as="geometry"/></mxCell>')
+    return cell
 
 
 SIDES = {"right": (1, 0.5), "left": (0, 0.5), "top": (0.5, 0), "bottom": (0.5, 1)}
@@ -153,6 +165,36 @@ def diagram_xml(slide: dict) -> str:
         pts = "".join(f'<mxPoint x="{px(vx - ox)}" y="{px(vy - oy)}"/>' for vx, vy in via)
         geom = f'<mxGeometry relative="1" as="geometry"><Array as="points">{pts}</Array></mxGeometry>' if via else '<mxGeometry relative="1" as="geometry"/>'
         cells.append(f'<mxCell id="e{i}" value="{val}" style="{st}" edge="1" source="{a}" target="{b}" parent="{common}">{geom}</mxCell>')
+    # the picture stands alone outside the deck: title and subtitle above, legend and footer below
+    xs = [n["x"] for n in nodes]; ys = [n["y"] + n["h"] for n in nodes]
+    left, bottom = min(xs), max(ys)
+    tst = style(text=None, fillColor="none", strokeColor="none", align="left", verticalAlign="top", fontColor=CREAM)
+    # label() escapes once, which is what an attribute needs; escaping its result again shows raw tags (seen 2026-09-28)
+    head = f'<b><font style="font-size:{pt(30)}px">{escape(slide["title"])}</font></b>'
+    if slide.get("subtitle"):
+        head += f'<br><font style="font-size:{pt(14)}px">{escape(slide["subtitle"])}</font>'
+    cells.append(f'<mxCell id="_title" value="{escape(head, {chr(34): "&quot;"})}" style="{tst}" vertex="1" parent="1">'
+                 f'<mxGeometry x="{px(left)}" y="{px(0.35)}" width="{px(20.4)}" height="{px(1.3)}" as="geometry"/></mxCell>')
+    foot_y = bottom + 0.3
+    if slide.get("legend"):
+        cells.append(f'<mxCell id="_legend" value="{label(slide["legend"], "", 11, 11, CREAM, CREAM)}" style="{tst}" vertex="1" parent="1">'
+                     f'<mxGeometry x="{px(left)}" y="{px(foot_y)}" width="{px(20.4)}" height="{px(0.6)}" as="geometry"/></mxCell>')
+        foot_y += 0.55
+    footer = slide.get("footer", "Origin Utility, Inc  /  Proprietary and Confidential  /  Internal Use Only")
+    cells.append(f'<mxCell id="_footer" value="{label(footer, "", 9, 9, CREAM, CREAM)}" style="{tst}" vertex="1" parent="1">'
+                 f'<mxGeometry x="{px(left)}" y="{px(foot_y)}" width="{px(20.4)}" height="{px(0.4)}" as="geometry"/></mxCell>')
+    # optional layers, hidden by default: notes for engineers (commands, checks) that never reach the exported picture
+    layer_cells = []
+    for li, (lname, notes) in enumerate(slide.get("layers", {}).items()):
+        lid = f"_layer{li}"
+        layer_cells.append(f'<mxCell id="{lid}" value="{escape(lname)}" parent="0" visible="0"/>')
+        nst = style(rounded=1, arcSize=8, fillColor=WHITE, strokeColor=ORANGE, strokeWidth=1.5, align="left", verticalAlign="top",
+                    spacingLeft=6, fontColor=BLUE, fontFamily="Courier New")
+        for j, note in enumerate(notes):
+            v = escape(label(note.get("title", ""), note.get("body", ""), 10, 9), {'"': "&quot;"})
+            layer_cells.append(f'<mxCell id="{lid}_{j}" value="{v}" style="{nst}" vertex="1" parent="{lid}">'
+                               f'<mxGeometry x="{px(note["x"])}" y="{px(note["y"])}" width="{px(note.get("w", 3.0))}" height="{px(note.get("h", 0.7))}" as="geometry"/></mxCell>')
+    cells = cells[:2] + [c for c in layer_cells if 'parent="0"' in c] + cells[2:] + [c for c in layer_cells if 'parent="0"' not in c]
     return f'<mxGraphModel adaptiveColors="none" grid="0" page="0" background="{BLUE}"><root>' + "".join(cells) + "</root></mxGraphModel>"
 
 

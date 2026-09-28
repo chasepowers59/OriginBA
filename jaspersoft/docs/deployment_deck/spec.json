@@ -522,6 +522,7 @@
       "type": "diagram",
       "title": "Database Deployment Flow",
       "kicker": "S8",
+      "subtitle": "one client, from preflight to the twice-daily rolling refresh, and the objects every Standard Offering domain reads",
       "nodes": [
         {
           "id": "p1",
@@ -531,7 +532,8 @@
           "h": 1.0,
           "title": "Preflight",
           "kind": "step",
-          "body": "the deploy user can read every source table and write the targets"
+          "body": "the deploy user can read every source table and write the targets",
+          "num": 1
         },
         {
           "id": "p2",
@@ -541,7 +543,8 @@
           "h": 1.0,
           "title": "Create the 7 snapshot tables",
           "kind": "step",
-          "body": "empty, with their keys"
+          "body": "empty, with their keys",
+          "num": 2
         },
         {
           "id": "p3",
@@ -551,7 +554,8 @@
           "h": 1.0,
           "title": "Create the domain-support objects",
           "kind": "step",
-          "body": "SA snapshot table, lookup seed, 8 CMS views, grants, synonyms"
+          "body": "SA snapshot table, lookup seed, 8 CMS views, grants, synonyms",
+          "num": 3
         },
         {
           "id": "p4",
@@ -561,7 +565,8 @@
           "h": 1.0,
           "title": "Deploy the procedures",
           "kind": "step",
-          "body": "baseline (the retained 24 months, once) and operational per table; the SA aged-balance refresh"
+          "body": "baseline (the retained 24 months, once) and operational per table; the SA aged-balance refresh",
+          "num": 4
         },
         {
           "id": "p5",
@@ -569,7 +574,7 @@
           "y": 2.15,
           "w": 7.8,
           "h": 1.65,
-          "title": "Submit 8 baselines as parallel scheduler jobs",
+          "title": "5. Submit 8 baselines as parallel scheduler jobs",
           "kind": "group",
           "body": "unattended; they survive a dropped connection"
         },
@@ -669,7 +674,19 @@
           "h": 1.05,
           "title": "ready gate: every job SUCCEEDED?",
           "kind": "gate",
-          "title_pt": 10
+          "title_pt": 10,
+          "num": 6,
+          "tooltip": "The scheduler's job table is polled up to eight hours; every one-time baseline job must report SUCCEEDED; a FAILED or missing job stops the rollout."
+        },
+        {
+          "id": "sq1",
+          "x": 18.9,
+          "y": 5.6,
+          "w": 1.9,
+          "h": 0.45,
+          "title": "no: stop, fix, re-run",
+          "kind": "stop",
+          "title_pt": 9
         },
         {
           "id": "q2",
@@ -679,7 +696,19 @@
           "h": 1.05,
           "title": "validate and install gates pass?",
           "kind": "gate",
-          "title_pt": 10
+          "title_pt": 10,
+          "num": 7,
+          "tooltip": "Row counts, twelve monthly totals against the source, duplicate keys; no empty table; the CMS views valid, the lookup seeded, the aging buckets sum to the balance, FT parity."
+        },
+        {
+          "id": "sq2",
+          "x": 15.85,
+          "y": 5.6,
+          "w": 2.1,
+          "h": 0.45,
+          "title": "no: stop, fix, re-run",
+          "kind": "stop",
+          "title_pt": 9
         },
         {
           "id": "q3",
@@ -689,7 +718,8 @@
           "h": 0.85,
           "title": "Post-load indexes",
           "kind": "step",
-          "body": "keys and dates the domains filter on"
+          "body": "keys and dates the domains filter on",
+          "num": 8
         },
         {
           "id": "q4",
@@ -699,7 +729,8 @@
           "h": 0.95,
           "title": "Rolling procedures",
           "kind": "step",
-          "body": "3 months rebuilt, 24 kept; one operational refresh run by hand"
+          "body": "3 months rebuilt, 24 kept; one operational refresh run by hand",
+          "num": 9
         },
         {
           "id": "q5",
@@ -709,7 +740,19 @@
           "h": 1.05,
           "title": "validated again?",
           "kind": "gate",
-          "title_pt": 10
+          "title_pt": 10,
+          "num": 10,
+          "tooltip": "The same validation pack after the operational refresh, so the rolling result is compared to the baseline result."
+        },
+        {
+          "id": "sq5",
+          "x": 6.6,
+          "y": 3.75,
+          "w": 2.0,
+          "h": 0.45,
+          "title": "no: stop, fix, re-run",
+          "kind": "stop",
+          "title_pt": 9
         },
         {
           "id": "q6",
@@ -719,7 +762,8 @@
           "h": 0.95,
           "title": "Schedule",
           "kind": "step",
-          "body": "twice daily from 10:00 and 16:00 UTC, 30-minute stagger; held on TEST until approved"
+          "body": "twice daily from 10:00 and 16:00 UTC, 30-minute stagger; held on TEST until approved",
+          "num": 11
         },
         {
           "id": "q7",
@@ -729,7 +773,18 @@
           "h": 0.95,
           "title": "Capture runs, data quality",
           "kind": "step",
-          "body": "per client, kept with the log"
+          "body": "per client, kept with the log",
+          "num": 12
+        },
+        {
+          "id": "cad",
+          "x": 0.81,
+          "y": 5.47,
+          "w": 3.8,
+          "h": 0.6,
+          "title": "runs at (UTC), one job every 30 minutes",
+          "kind": "note",
+          "body": "10:00 to 13:30, then again 16:00 to 19:30"
         },
         {
           "id": "big",
@@ -739,146 +794,147 @@
           "h": 4.5,
           "title": "What the domains read",
           "kind": "group",
-          "body": "created in steps 2 and 3, validated and gated before anything is scheduled; each stack feeds the domain chip beneath it"
+          "body": "created in steps 2 and 3, validated at step 7 before anything is scheduled; each outlined stack feeds the domain chip beneath it"
         },
         {
-          "id": "l1",
+          "id": "wf",
           "x": 0.95,
-          "y": 6.92,
+          "y": 6.95,
           "w": 2.3,
-          "h": 0.35,
+          "h": 2.6,
           "title": "Finance tables",
-          "kind": "note"
+          "kind": "group"
         },
         {
-          "id": "l2",
+          "id": "wb",
           "x": 3.4,
-          "y": 6.92,
+          "y": 6.95,
           "w": 2.3,
-          "h": 0.35,
-          "title": "Billing and Rates tables",
-          "kind": "note"
+          "h": 2.6,
+          "title": "Billing tables",
+          "kind": "group"
         },
         {
-          "id": "l3",
+          "id": "wm",
           "x": 5.85,
-          "y": 6.92,
+          "y": 6.95,
           "w": 2.3,
-          "h": 0.35,
-          "title": "Meter Operations tables",
-          "kind": "note"
+          "h": 2.6,
+          "title": "Meter Ops tables",
+          "kind": "group"
         },
         {
-          "id": "l4",
+          "id": "wd",
           "x": 8.6,
-          "y": 6.92,
+          "y": 6.95,
           "w": 2.6,
-          "h": 0.35,
-          "title": "Debt Management table + seed",
-          "kind": "note"
+          "h": 2.6,
+          "title": "Debt Mgmt objects",
+          "kind": "group"
         },
         {
-          "id": "l5",
+          "id": "wv",
           "x": 11.5,
-          "y": 6.92,
+          "y": 6.95,
           "w": 3.25,
-          "h": 0.35,
-          "title": "Meter Operations views",
-          "kind": "note"
+          "h": 2.6,
+          "title": "Meter Ops views",
+          "kind": "group"
         },
         {
-          "id": "l6",
+          "id": "wo",
           "x": 15.0,
-          "y": 6.92,
+          "y": 6.95,
           "w": 3.35,
-          "h": 0.35,
-          "title": "Field Operations views",
-          "kind": "note"
+          "h": 2.6,
+          "title": "Field Ops views",
+          "kind": "group"
         },
         {
-          "id": "l7",
+          "id": "wc",
           "x": 18.6,
-          "y": 6.92,
+          "y": 6.95,
           "w": 2.4,
-          "h": 0.35,
-          "title": "Customer Operations views",
-          "kind": "note"
+          "h": 2.6,
+          "title": "Customer Ops views",
+          "kind": "group"
         },
         {
           "id": "t1",
-          "x": 0.95,
-          "y": 7.3,
-          "w": 2.3,
-          "h": 0.9,
+          "x": 1.05,
+          "y": 7.4,
+          "w": 2.1,
+          "h": 0.85,
           "title": "FT_RPT_CURR",
           "kind": "data",
-          "body": "financial transactions"
+          "body": "financial transactions",
+          "tooltip": "Every financial transaction in the retained 24 months, refreshed twice daily"
         },
         {
           "id": "t2",
-          "x": 0.95,
-          "y": 8.35,
-          "w": 2.3,
-          "h": 0.9,
+          "x": 1.05,
+          "y": 8.4,
+          "w": 2.1,
+          "h": 0.85,
           "title": "FT_GL_DISTRIBUTION_RPT_CURR",
           "kind": "data",
           "body": "GL distribution",
-          "title_pt": 9.5
+          "title_pt": 9
         },
         {
           "id": "t3",
-          "x": 3.4,
-          "y": 7.3,
-          "w": 2.3,
-          "h": 0.9,
+          "x": 3.5,
+          "y": 7.4,
+          "w": 2.1,
+          "h": 0.85,
           "title": "BSEG_BILLED_USAGE_RPT_CURR",
           "kind": "data",
           "body": "billed usage per segment",
-          "title_pt": 9.5
+          "title_pt": 9
         },
         {
           "id": "t4",
-          "x": 3.4,
-          "y": 8.35,
-          "w": 2.3,
-          "h": 0.9,
+          "x": 3.5,
+          "y": 8.4,
+          "w": 2.1,
+          "h": 0.85,
           "title": "BSEG_SQ_USAGE_RPT_CURR",
           "kind": "data",
           "body": "service quantities",
-          "title_pt": 9.5
+          "title_pt": 9
         },
         {
           "id": "t5",
-          "x": 5.85,
-          "y": 7.3,
-          "w": 2.3,
-          "h": 0.65,
+          "x": 5.95,
+          "y": 7.4,
+          "w": 2.1,
+          "h": 0.62,
           "title": "D1_MSRMT_RPT_CURR",
           "kind": "data",
           "body": "measurements",
-          "title_pt": 9.5
+          "title_pt": 9
         },
         {
           "id": "t6",
-          "x": 5.85,
-          "y": 8.05,
-          "w": 2.3,
-          "h": 0.65,
+          "x": 5.95,
+          "y": 8.12,
+          "w": 2.1,
+          "h": 0.62,
           "title": "D1_USAGE_RPT_CURR",
           "kind": "data",
           "body": "usage transactions",
-          "title_pt": 9.5
+          "title_pt": 9
         },
         {
           "id": "t7",
-          "x": 5.85,
-          "y": 8.8,
-          "w": 2.3,
-          "h": 0.65,
+          "x": 5.95,
+          "y": 8.84,
+          "w": 2.1,
+          "h": 0.62,
           "title": "D1_USAGE_SCALAR_DTL_RPT_CURR",
           "kind": "data",
           "body": "usage scalar detail",
-          "title_pt": 9
+          "title_pt": 8.5
         },
         {
           "id": "m1",
@@ -911,27 +967,29 @@
         },
         {
           "id": "s1",
-          "x": 8.6,
-          "y": 7.3,
-          "w": 2.6,
-          "h": 0.95,
+          "x": 8.7,
+          "y": 7.4,
+          "w": 2.4,
+          "h": 0.9,
           "title": "CMS_SA_SNAPSHOT",
           "kind": "data",
           "body": "aged balance per SA, refreshed by procedure",
-          "title_pt": 10
+          "title_pt": 10,
+          "tooltip": "One end-of-day row per service agreement: current and payoff balance, ten aging buckets from frozen ARS transactions; credits retire the oldest debt first; buckets 1 to 5 sum to the current balance."
         },
         {
           "id": "s2",
-          "x": 8.6,
+          "x": 8.7,
           "y": 8.45,
-          "w": 2.6,
+          "w": 2.4,
           "h": 0.7,
           "title": "CM_SNAPSHOT_TYPE_FLG",
           "kind": "step",
           "body": "lookup seed: LDAY, EMON, ARCH, LEMN",
           "center": true,
           "title_pt": 10,
-          "body_pt": 9.5
+          "body_pt": 9.5,
+          "tooltip": "The domain inner-joins these four codes; a fresh database without the seed returns zero rows in every Ad Hoc view."
         },
         {
           "id": "m4",
@@ -945,36 +1003,39 @@
         },
         {
           "id": "v1",
-          "x": 11.5,
-          "y": 7.3,
-          "w": 3.25,
+          "x": 11.6,
+          "y": 7.4,
+          "w": 3.05,
           "h": 0.5,
           "title": "CMS_D1_DVC_IDENTIFIER_VW",
           "kind": "step",
           "center": true,
-          "title_pt": 9
+          "title_pt": 9,
+          "tooltip": "Device identifiers pivoted into columns: asset id, badge, serial, internal meter number, external and MDM ids, NIC id and serial"
         },
         {
           "id": "v2",
-          "x": 11.5,
-          "y": 7.9,
-          "w": 3.25,
+          "x": 11.6,
+          "y": 8.0,
+          "w": 3.05,
           "h": 0.5,
           "title": "CMS_D1_DVC_BODA_VW",
           "kind": "step",
           "center": true,
-          "title_pt": 9
+          "title_pt": 9,
+          "tooltip": "The device's business-object data parsed from XML: business object, latest status, retirement date"
         },
         {
           "id": "v3",
-          "x": 11.5,
-          "y": 8.5,
-          "w": 3.25,
+          "x": 11.6,
+          "y": 8.6,
+          "w": 3.05,
           "h": 0.5,
           "title": "CMS_W1_ASSET_IDENTIFIER_VW",
           "kind": "step",
           "center": true,
-          "title_pt": 9
+          "title_pt": 9,
+          "tooltip": "Asset identifiers pivoted into columns, the asset-side twin of the device identifier view"
         },
         {
           "id": "m5",
@@ -998,36 +1059,39 @@
         },
         {
           "id": "v4",
-          "x": 15.0,
-          "y": 7.3,
-          "w": 3.35,
+          "x": 15.1,
+          "y": 7.4,
+          "w": 3.15,
           "h": 0.5,
           "title": "CMS_C1_REPRESENTATIVE_BODA_VW",
           "kind": "step",
           "center": true,
-          "title_pt": 9
+          "title_pt": 9,
+          "tooltip": "Field representative mobile details parsed from XML: service areas and worker capabilities"
         },
         {
           "id": "v5",
-          "x": 15.0,
-          "y": 7.9,
-          "w": 3.35,
+          "x": 15.1,
+          "y": 8.0,
+          "w": 3.15,
           "h": 0.5,
           "title": "CMS_D1_ACTIVITY_CHAR_VW",
           "kind": "step",
           "center": true,
-          "title_pt": 9
+          "title_pt": 9,
+          "tooltip": "Activity characteristics pivoted per activity: internal status, priority, third-party representative"
         },
         {
           "id": "v6",
-          "x": 15.0,
-          "y": 8.5,
-          "w": 3.35,
+          "x": 15.1,
+          "y": 8.6,
+          "w": 3.15,
           "h": 0.5,
           "title": "CMS_D1_ACTIVITY_D1FA_BODA_VW",
           "kind": "step",
           "center": true,
-          "title_pt": 9
+          "title_pt": 9,
+          "tooltip": "Field activity business-object data parsed from XML: instructions, appointment window, requester, external references, contact names and phones"
         },
         {
           "id": "m7",
@@ -1051,25 +1115,27 @@
         },
         {
           "id": "v7",
-          "x": 18.6,
-          "y": 7.3,
-          "w": 2.4,
+          "x": 18.7,
+          "y": 7.4,
+          "w": 2.2,
           "h": 0.5,
           "title": "CMS_CI_CASE_VW",
           "kind": "step",
           "center": true,
-          "title_pt": 9
+          "title_pt": 9,
+          "tooltip": "One row per case with create and close times derived from the case log and the duration in minutes"
         },
         {
           "id": "v8",
-          "x": 18.6,
-          "y": 7.9,
-          "w": 2.4,
+          "x": 18.7,
+          "y": 8.0,
+          "w": 2.2,
           "h": 0.5,
           "title": "CMS_CI_CASE_LOG_VW",
           "kind": "step",
           "center": true,
-          "title_pt": 9
+          "title_pt": 9,
+          "tooltip": "The case log as a timeline: each status change with the previous status and the time spent in each state"
         },
         {
           "id": "m9",
@@ -1117,7 +1183,17 @@
         },
         {
           "from": "q1",
+          "to": "sq1",
+          "label": "no"
+        },
+        {
+          "from": "q1",
           "to": "q2"
+        },
+        {
+          "from": "q2",
+          "to": "sq2",
+          "label": "no"
         },
         {
           "from": "q2",
@@ -1130,6 +1206,11 @@
         {
           "from": "q4",
           "to": "q5"
+        },
+        {
+          "from": "q5",
+          "to": "sq5",
+          "label": "no"
         },
         {
           "from": "q5",
@@ -1162,95 +1243,162 @@
           "label_w": 6.0
         },
         {
-          "from": "t2",
+          "from": "wf",
           "to": "m1"
         },
         {
-          "from": "t4",
+          "from": "wb",
           "to": "m2"
         },
         {
-          "from": "t7",
+          "from": "wm",
           "to": "m3"
         },
         {
-          "from": "s2",
+          "from": "wd",
           "to": "m4"
         },
         {
-          "from": "v2",
+          "from": "wv",
           "to": "m5",
-          "from_side": "left",
+          "from_side": "bottom",
           "to_side": "top",
           "via": [
             [
-              11.3,
-              8.15
-            ],
-            [
-              11.3,
-              9.55
+              13.125,
+              9.7
             ],
             [
               12.27,
-              9.55
+              9.7
             ]
           ]
         },
         {
-          "from": "v3",
+          "from": "wv",
           "to": "m6",
           "from_side": "bottom",
           "to_side": "top",
           "via": [
             [
-              13.12,
-              9.55
+              13.125,
+              9.7
             ],
             [
               13.97,
-              9.55
+              9.7
             ]
           ]
         },
         {
-          "from": "v6",
+          "from": "wo",
           "to": "m7",
           "from_side": "bottom",
           "to_side": "top",
           "via": [
             [
               16.675,
-              9.4
+              9.7
             ],
             [
               15.8,
-              9.4
+              9.7
             ]
           ]
         },
         {
-          "from": "v6",
+          "from": "wo",
           "to": "m8",
           "from_side": "bottom",
           "to_side": "top",
           "via": [
             [
               16.675,
-              9.4
+              9.7
             ],
             [
               17.55,
-              9.4
+              9.7
             ]
           ]
         },
         {
-          "from": "v8",
+          "from": "wc",
           "to": "m9"
         }
       ],
-      "legend": "Every box in the map is one database object the domains read: seven rolling snapshot tables, the SA aged-balance table with its lookup seed, and eight CMS views. Orange diamonds are gates that stop the rollout; the loop under the second row is the twice-daily rolling refresh (3 months rebuilt, 24 kept; 6 months at CityCorp and Odessa)."
+      "legend": "Every box in the map is one database object the domains read: seven rolling snapshot tables, the SA aged-balance table with its lookup seed, and eight CMS views. Numbers are the order of one rollout; orange diamonds are gates and a 'no' stops it there. The loop under the second row is the twice-daily rolling refresh (3 months rebuilt, 24 kept; 6 months at CityCorp and Odessa).",
+      "layers": {
+        "Commands": [
+          {
+            "x": 0.9,
+            "y": 3.05,
+            "w": 2.3,
+            "h": 0.42,
+            "title": "prod_snapshot_rollout_25_4.sh <client>  (steps 1 to 8, logged)"
+          },
+          {
+            "x": 3.7,
+            "y": 3.05,
+            "w": 6.0,
+            "h": 0.42,
+            "title": "run_snapshot_rollout_step.py --step baseline-and-validate --clients <c>  (tables, procedures, baselines, ready gate, validation, install gate)"
+          },
+          {
+            "x": 12.8,
+            "y": 4.95,
+            "w": 2.2,
+            "h": 0.42,
+            "title": "clients/post_load_snapshot_indexes_direct.sql"
+          },
+          {
+            "x": 6.6,
+            "y": 5.0,
+            "w": 5.5,
+            "h": 0.42,
+            "title": "run_snapshot_rollout_step.py --step cutover-and-validate --clients <c>"
+          },
+          {
+            "x": 3.45,
+            "y": 4.95,
+            "w": 2.5,
+            "h": 0.42,
+            "title": "--step schedule-operational"
+          },
+          {
+            "x": 0.9,
+            "y": 4.95,
+            "w": 1.9,
+            "h": 0.42,
+            "title": "08 capture, 13 data quality"
+          }
+        ],
+        "Checks": [
+          {
+            "x": 18.5,
+            "y": 3.6,
+            "w": 2.6,
+            "h": 0.55,
+            "title": "03d ready gate",
+            "body": "every JOB_BASELINE_*_ONCE job SUCCEEDED; none FAILED or missing"
+          },
+          {
+            "x": 15.5,
+            "y": 3.35,
+            "w": 2.8,
+            "h": 0.8,
+            "title": "04 / 04b / 04c / 04d",
+            "body": "row counts; 12 monthly totals vs source; duplicate keys; no empty table; CMS views valid; lookup seeded; ARS buckets sum to CUR_BAL; FT parity"
+          },
+          {
+            "x": 8.7,
+            "y": 3.7,
+            "w": 2.8,
+            "h": 0.45,
+            "title": "04 again, after the operational refresh"
+          }
+        ]
+      }
     },
     {
       "type": "table",
@@ -1643,13 +1791,14 @@
       "type": "diagram",
       "title": "Standard Offering Deployment Flow",
       "kicker": "S14",
+      "subtitle": "authored on Origin_DEV, proven on Origin_TEST, then every client org by the same tool with the same seven proofs",
       "nodes": [
         {
           "id": "g1",
           "x": 0.81,
           "y": 2.0,
           "w": 4.86,
-          "h": 6.55,
+          "h": 7.05,
           "title": "Origin_DEV",
           "kind": "group",
           "body": "authoring, the internal server"
@@ -1659,7 +1808,7 @@
           "x": 5.99,
           "y": 2.0,
           "w": 4.86,
-          "h": 6.55,
+          "h": 7.05,
           "title": "Origin_TEST",
           "kind": "group",
           "body": "proving, before any client"
@@ -1669,7 +1818,7 @@
           "x": 11.17,
           "y": 2.0,
           "w": 4.86,
-          "h": 6.55,
+          "h": 7.05,
           "title": "Client test org",
           "kind": "group",
           "body": "the client's own data"
@@ -1679,7 +1828,7 @@
           "x": 16.35,
           "y": 2.0,
           "w": 4.86,
-          "h": 6.55,
+          "h": 7.05,
           "title": "Client prod org",
           "kind": "group",
           "body": "read-only until the prod flag is given"
@@ -1687,9 +1836,9 @@
         {
           "id": "g5",
           "x": 0.81,
-          "y": 8.85,
+          "y": 9.35,
           "w": 20.4,
-          "h": 1.95,
+          "h": 1.85,
           "title": "After go-live",
           "kind": "group",
           "body": "every change is a tool run with the same proofs, never a hand edit"
@@ -1702,7 +1851,8 @@
           "h": 1.0,
           "title": "Workstreams tree",
           "kind": "step",
-          "body": "domains, Ad Hoc views, reports and dashboards: the only content edited by hand"
+          "body": "domains, Ad Hoc views, reports and dashboards: the only content edited by hand",
+          "num": 1
         },
         {
           "id": "a2",
@@ -1712,7 +1862,9 @@
           "h": 0.8,
           "title": "Export the org",
           "kind": "step",
-          "body": "one API export task, polled, downloaded"
+          "body": "one API export task, polled, downloaded",
+          "num": 2,
+          "tooltip": "A REST export task on the internal server, polled until done, downloaded as a zip package."
         },
         {
           "id": "a3",
@@ -1722,16 +1874,29 @@
           "h": 1.55,
           "title": "Build the package",
           "kind": "step",
-          "body": "inventory and classify the export; keep the offering list; one copy of each domain in one home; carry the datasource; rewrite every path; strip print wrappers; narrow the import index"
+          "body": "inventory and classify the export; keep the offering list; one copy of each domain in one home; carry the datasource; rewrite every path; strip print wrappers; narrow the import index",
+          "num": 3
         },
         {
           "id": "a4",
           "x": 2.3899999999999997,
-          "y": 6.7,
+          "y": 6.65,
           "w": 1.7,
           "h": 0.9,
           "title": "package verifies?",
-          "kind": "gate"
+          "kind": "gate",
+          "num": 4,
+          "tooltip": "No source host, org path or datasource name left in the package; every outside reference exists on the target; every field the views use resolves."
+        },
+        {
+          "id": "sa4",
+          "x": 1.01,
+          "y": 6.875,
+          "w": 1.15,
+          "h": 0.45,
+          "title": "no: stop",
+          "kind": "stop",
+          "title_pt": 9
         },
         {
           "id": "b1",
@@ -1741,7 +1906,8 @@
           "h": 0.85,
           "title": "Import, update in place",
           "kind": "step",
-          "body": "polled; an importer warning counts as a failure"
+          "body": "polled; an importer warning counts as a failure",
+          "num": 5
         },
         {
           "id": "b2",
@@ -1751,7 +1917,8 @@
           "h": 0.85,
           "title": "Re-export and compare",
           "kind": "step",
-          "body": "byte-equal inside the scope, importer stamps ignored"
+          "body": "byte-equal inside the scope, importer stamps ignored",
+          "num": 6
         },
         {
           "id": "b3",
@@ -1761,7 +1928,8 @@
           "h": 0.95,
           "title": "Execute everything",
           "kind": "step",
-          "body": "views by query, reports as PDF, domains by metadata and probe"
+          "body": "views by query, reports as PDF, domains by metadata and probe",
+          "num": 7
         },
         {
           "id": "b4",
@@ -1770,7 +1938,19 @@
           "w": 1.7,
           "h": 0.9,
           "title": "seven proofs pass?",
-          "kind": "gate"
+          "kind": "gate",
+          "num": 8,
+          "tooltip": "the seven proofs: 1 no source host, org path or datasource name survives in the package; 2 every reference to something outside the package exists on the target; 3 every field the views use resolves in its domain; 4 import without warnings; 5 re-export byte-equal inside the scope; 6 every resource executes; 7 datasource connection unchanged"
+        },
+        {
+          "id": "sb4",
+          "x": 9.35,
+          "y": 6.125,
+          "w": 1.3000000000000003,
+          "h": 0.45,
+          "title": "no: stop",
+          "kind": "stop",
+          "title_pt": 9
         },
         {
           "id": "b5",
@@ -1781,57 +1961,84 @@
           "title": "Proven offering",
           "kind": "step",
           "body": "the package every client promotion starts from",
-          "center": true
+          "center": true,
+          "num": 9
+        },
+        {
+          "id": "c0",
+          "x": 11.35,
+          "y": 2.75,
+          "w": 4.5,
+          "h": 0.5,
+          "title": "datasource: the client's own export, carried byte for byte",
+          "kind": "accent",
+          "title_pt": 11,
+          "tooltip": "The target org's own /DataSource export is unzipped and carried into the package unchanged; never an edited copy of the source's datasource."
         },
         {
           "id": "c1",
           "x": 11.35,
-          "y": 2.75,
+          "y": 3.4,
           "w": 4.5,
           "h": 0.8,
           "title": "Inventory snapshot",
           "kind": "step",
-          "body": "every resource on the org before anything changes"
+          "body": "every resource on the org before anything changes",
+          "num": 10
         },
         {
           "id": "c2",
           "x": 11.35,
-          "y": 3.7,
+          "y": 4.35,
           "w": 4.5,
           "h": 1.2,
           "title": "Rebuild for the client",
           "kind": "step",
-          "body": "the client's own datasource export carried byte for byte; org path, folder, alias and tenant root rewritten"
+          "body": "the client's datasource carried; org path, folder, alias and tenant root rewritten by tested replacements",
+          "num": 11
         },
         {
           "id": "c3",
           "x": 12.299999999999999,
-          "y": 5.05,
+          "y": 5.7,
           "w": 2.6,
           "h": 1.05,
           "title": "verified? no source strings, references exist, fields resolve",
           "kind": "gate",
-          "title_pt": 10
+          "title_pt": 10,
+          "num": 12
+        },
+        {
+          "id": "sc3",
+          "x": 14.979999999999999,
+          "y": 6.0,
+          "w": 0.850000000000001,
+          "h": 0.45,
+          "title": "no: stop",
+          "kind": "stop",
+          "title_pt": 9
         },
         {
           "id": "c4",
           "x": 11.35,
-          "y": 6.25,
+          "y": 6.9,
           "w": 4.5,
           "h": 0.8,
           "title": "Import, compare, execute",
           "kind": "step",
-          "body": "the same three proofs as Origin_TEST"
+          "body": "the same three proofs as Origin_TEST",
+          "num": 13
         },
         {
           "id": "c5",
           "x": 11.35,
-          "y": 7.2,
+          "y": 7.85,
           "w": 4.5,
           "h": 1.0,
           "title": "Sweep and sign off",
           "kind": "step",
-          "body": "PASS, EMPTY, SLOW or FAIL per resource with timing; one document per org"
+          "body": "PASS, EMPTY, SLOW or FAIL per resource with timing; one document per org",
+          "num": 14
         },
         {
           "id": "d0",
@@ -1840,7 +2047,8 @@
           "w": 4.5,
           "h": 0.5,
           "title": "explicit prod flag required",
-          "kind": "accent"
+          "kind": "accent",
+          "tooltip": "Prod writes refuse to run without the explicit prod flag; every other command is read-only against prod."
         },
         {
           "id": "d1",
@@ -1850,7 +2058,8 @@
           "h": 0.75,
           "title": "Inventory snapshot",
           "kind": "step",
-          "body": "the rollback baseline"
+          "body": "the rollback baseline",
+          "num": 15
         },
         {
           "id": "d2",
@@ -1860,7 +2069,8 @@
           "h": 1.1,
           "title": "Same promotion, same proofs",
           "kind": "step",
-          "body": "target datasource carried; rewritten; verified; imported; compared; executed"
+          "body": "target datasource carried; rewritten; verified; imported; compared; executed",
+          "num": 16
         },
         {
           "id": "d3",
@@ -1869,7 +2079,19 @@
           "w": 1.7,
           "h": 0.9,
           "title": "seven proofs pass?",
-          "kind": "gate"
+          "kind": "gate",
+          "num": 17,
+          "tooltip": "the seven proofs: 1 no source host, org path or datasource name survives in the package; 2 every reference to something outside the package exists on the target; 3 every field the views use resolves in its domain; 4 import without warnings; 5 re-export byte-equal inside the scope; 6 every resource executes; 7 datasource connection unchanged"
+        },
+        {
+          "id": "sd3",
+          "x": 19.71,
+          "y": 5.775,
+          "w": 1.3000000000000003,
+          "h": 0.45,
+          "title": "no: stop",
+          "kind": "stop",
+          "title_pt": 9
         },
         {
           "id": "d4",
@@ -1879,7 +2101,8 @@
           "h": 0.75,
           "title": "Sweep and sign off",
           "kind": "step",
-          "body": "on the client's prod numbers"
+          "body": "on the client's prod numbers",
+          "num": 18
         },
         {
           "id": "d5",
@@ -1889,14 +2112,15 @@
           "h": 0.85,
           "title": "Diff after = rollback record",
           "kind": "step",
-          "body": "inventory before against after: nothing else moved"
+          "body": "inventory before against after: nothing else moved",
+          "num": 19
         },
         {
           "id": "e1",
           "x": 1.0,
-          "y": 9.45,
+          "y": 9.95,
           "w": 6.4,
-          "h": 1.15,
+          "h": 1.05,
           "title": "Additive-only domain patch",
           "kind": "step",
           "body": "the additions guard refuses any change to what is there; seven proofs per org; one-command restore"
@@ -1904,9 +2128,9 @@
         {
           "id": "e2",
           "x": 7.8,
-          "y": 9.45,
+          "y": 9.95,
           "w": 6.4,
-          "h": 1.15,
+          "h": 1.05,
           "title": "Standardized Reports folder",
           "kind": "step",
           "body": "scheduled SQL reports in one folder; on Origin_DEV today, promoted to client orgs by the same tool when approved"
@@ -1914,12 +2138,21 @@
         {
           "id": "e3",
           "x": 14.6,
-          "y": 9.45,
+          "y": 9.95,
           "w": 6.4,
-          "h": 1.15,
+          "h": 1.05,
           "title": "Sweep after every change",
           "kind": "step",
           "body": "the sign-off is regenerated; the first red row is the alert"
+        },
+        {
+          "id": "loopnote",
+          "x": 13.7,
+          "y": 1.45,
+          "w": 7.3,
+          "h": 0.35,
+          "title": "every later change re-enters at the client test org and repeats steps 10 to 19",
+          "kind": "note"
         }
       ],
       "edges": [
@@ -1937,15 +2170,20 @@
         },
         {
           "from": "a4",
+          "to": "sa4",
+          "label": "no"
+        },
+        {
+          "from": "a4",
           "to": "b1",
           "via": [
             [
               5.83,
-              7.15
+              7.1
             ],
             [
               5.83,
-              3.17
+              3.175
             ]
           ]
         },
@@ -1963,6 +2201,11 @@
         },
         {
           "from": "b4",
+          "to": "sb4",
+          "label": "no"
+        },
+        {
+          "from": "b4",
           "to": "b5"
         },
         {
@@ -1971,13 +2214,17 @@
           "via": [
             [
               11.01,
-              7.42
+              7.425
             ],
             [
               11.01,
-              3.15
+              3.8
             ]
           ]
+        },
+        {
+          "from": "c0",
+          "to": "c1"
         },
         {
           "from": "c1",
@@ -1986,6 +2233,11 @@
         {
           "from": "c2",
           "to": "c3"
+        },
+        {
+          "from": "c3",
+          "to": "sc3",
+          "label": "no"
         },
         {
           "from": "c3",
@@ -2001,7 +2253,7 @@
           "via": [
             [
               16.19,
-              7.7
+              8.35
             ],
             [
               16.19,
@@ -2023,6 +2275,11 @@
         },
         {
           "from": "d3",
+          "to": "sd3",
+          "label": "no"
+        },
+        {
+          "from": "d3",
           "to": "d4"
         },
         {
@@ -2034,18 +2291,118 @@
           "to": "e3",
           "via": [
             [
-              18.6,
-              8.68
+              18.78,
+              9.2
             ],
             [
               17.8,
-              8.68
+              9.2
             ]
           ],
           "to_side": "top"
+        },
+        {
+          "from": "e3",
+          "to": "c0",
+          "from_side": "right",
+          "to_side": "top",
+          "via": [
+            [
+              21.5,
+              10.475
+            ],
+            [
+              21.5,
+              1.85
+            ],
+            [
+              13.6,
+              1.85
+            ]
+          ]
         }
       ],
-      "legend": "Orange diamonds are gates: a failed gate stops the run and names the rollback. The Workstreams tree is never moved; the offering is a curated copy promoted org by org."
+      "legend": "Orange diamonds are gates: a 'no' stops the run and names the rollback. Numbers are the order of one full promotion. The Workstreams tree is never moved; the offering is a curated copy promoted org by org.",
+      "legend_y": 11.3,
+      "layers": {
+        "Commands": [
+          {
+            "x": 1.0,
+            "y": 5.95,
+            "w": 4.3,
+            "h": 0.42,
+            "title": "build_standard_offering_package.py, then verify_standard_offering_package.py"
+          },
+          {
+            "x": 6.2,
+            "y": 3.15,
+            "w": 4.3,
+            "h": 0.42,
+            "title": "jrs_promote.py --from internal:Origin_DEV --to test:Origin_TEST --resource /SmartCity/Report/Standard_Offering --ds Origin_TEST_DS"
+          },
+          {
+            "x": 11.4,
+            "y": 3.75,
+            "w": 4.3,
+            "h": 0.42,
+            "title": "jrs_inventory.py snapshot --env test --orgs <Org>"
+          },
+          {
+            "x": 11.4,
+            "y": 5.1,
+            "w": 4.3,
+            "h": 0.42,
+            "title": "jrs_promote.py --from test:Origin_TEST --to test:<Org> --resource /SmartCity/Report/Standard_Offering --ds <Org>_DS"
+          },
+          {
+            "x": 11.4,
+            "y": 8.4,
+            "w": 4.3,
+            "h": 0.42,
+            "title": "jrs_run_sweep.py --env test --org <Org> --folder /SmartCity/Report/Standard_Offering; build_standard_offering_validation_doc.py --evidence"
+          },
+          {
+            "x": 16.6,
+            "y": 4.95,
+            "w": 4.3,
+            "h": 0.42,
+            "title": "jrs_promote_test_to_prod.py --org <Org> --folder /SmartCity/Report/Standard_Offering --ds <DS> --i-mean-prod"
+          },
+          {
+            "x": 1.0,
+            "y": 10.55,
+            "w": 6.2,
+            "h": 0.42,
+            "title": "jrs_domain_patch_apply.py --env test --org <Org> --domain <uri> --patch <module>  (--restore rolls back)"
+          }
+        ],
+        "Checks": [
+          {
+            "x": 1.0,
+            "y": 7.45,
+            "w": 4.3,
+            "h": 0.55,
+            "title": "package gate",
+            "body": "no source host / org / datasource string; every outside reference exists on the target; every view field resolves in its domain"
+          },
+          {
+            "x": 6.2,
+            "y": 6.9,
+            "w": 4.3,
+            "h": 0.75,
+            "title": "seven proofs",
+            "body": "1 no source host, org path or datasource name survives in the package; 2 every reference to something outside the package exists on the target; 3 every field the views use resolves in its domain; 4 import without warnings; 5 re-export byte-equal inside the scope; 6 every resource executes; 7 datasource connection unchanged"
+          },
+          {
+            "x": 16.6,
+            "y": 6.6,
+            "w": 4.3,
+            "h": 0.75,
+            "title": "seven proofs, on prod",
+            "body": "1 no source host, org path or datasource name survives in the package; 2 every reference to something outside the package exists on the target; 3 every field the views use resolves in its domain; 4 import without warnings; 5 re-export byte-equal inside the scope; 6 every resource executes; 7 datasource connection unchanged"
+          }
+        ]
+      }
     },
     {
       "type": "process",

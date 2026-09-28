@@ -536,12 +536,19 @@ def _draw_free_node(slide, n):
     elif kind == "note":
         t = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
         _text(t, [[(title, 12, CREAM, True)]] + ([[(body, 11, CREAM, False)]] if body else []), anchor=MSO_ANCHOR.TOP, margin=0.0)
+    elif kind == "stop":   # where a failed gate lands: a small cream box, the legend says what happens next
+        b = _box(slide, x, y, w, h, CREAM, radius=0.2)
+        _text(b, [[(title, n.get("title_pt", 10), BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.04)
     else:   # step
         b = _box(slide, x, y, w, h, CREAM, radius=0.1)
         paras = [[(title, tp, BLUE, True)]] + ([[(body, bp, GREY, False)]] if body else [])
         _text(b, paras, align=PP_ALIGN.CENTER if n.get("center") else PP_ALIGN.LEFT, margin=0.12)
         if n.get("tag"):
             _tag(slide, x + w - 0.08, y - 0.3, n["tag"])
+    if n.get("num") is not None and kind not in ("group", "note"):   # step badge: reading order at a glance
+        o = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x - 0.14), Inches(y - 0.14), Inches(0.34), Inches(0.34))
+        o.fill.solid(); o.fill.fore_color.rgb = rgb(ORANGE); o.line.fill.background(); o.shadow.inherit = False
+        _text(o, [[(str(n["num"]), 10, BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.0)
 
 
 def slide_diagram(prs, s, footer):
@@ -558,7 +565,7 @@ def slide_diagram(prs, s, footer):
     for e in s.get("edges", []):
         _edge_free(sl, nodes, e)
     if s.get("legend"):
-        t = sl.shapes.add_textbox(Inches(0.81), Inches(10.95), Inches(20.4), Inches(0.5))
+        t = sl.shapes.add_textbox(Inches(0.81), Inches(s.get("legend_y", 10.95)), Inches(20.4), Inches(0.5))
         _text(t, [[(s["legend"], 12, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
     return sl
 
