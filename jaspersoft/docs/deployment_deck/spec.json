@@ -58,64 +58,56 @@
           "col": 0,
           "row": 0,
           "title": "1. Export each report",
-          "body": "one at a time from the server UI, folder by folder, per client",
-          "kind": "manual"
+          "body": "one at a time from the server UI, folder by folder, per client"
         },
         {
           "id": "e2",
           "col": 1,
           "row": 0,
           "title": "2. Open in Notepad++",
-          "body": "find every server endpoint, org path and folder path by eye",
-          "kind": "manual"
+          "body": "find every server endpoint, org path and folder path by eye"
         },
         {
           "id": "e3",
           "col": 2,
           "row": 0,
           "title": "3. Replace all",
-          "body": "host, org, folder and datasource strings, in every file, hoping nothing was missed",
-          "kind": "manual"
+          "body": "host, org, folder and datasource strings, in every file, hoping nothing was missed"
         },
         {
           "id": "e4",
           "col": 3,
           "row": 0,
           "title": "4. Export the datasource",
-          "body": "separately from the target server, then hand-edit its reference into each file",
-          "kind": "manual"
+          "body": "separately from the target server, then hand-edit its reference into each file"
         },
         {
           "id": "e5",
           "col": 3,
           "row": 1,
           "title": "5. Re-zip and import",
-          "body": "read the import log, fix the file, import again",
-          "kind": "manual"
+          "body": "read the import log, fix the file, import again"
         },
         {
           "id": "e6",
           "col": 2,
           "row": 1,
           "title": "6. Open every report",
-          "body": "click through each one; a broken topic only shows in the editor",
-          "kind": "manual"
+          "body": "click through each one; a broken topic only shows in the editor"
         },
         {
           "id": "e7",
           "col": 1,
           "row": 1,
           "title": "7. Fix and repeat",
-          "body": "back to step 2 for whatever broke; no record of what changed",
-          "kind": "manual"
+          "body": "back to step 2 for whatever broke; no record of what changed"
         },
         {
           "id": "e8",
           "col": 0,
           "row": 1,
           "title": "8. Next client",
-          "body": "the same again for every org on every server",
-          "kind": "manual"
+          "body": "the same again for every org on every server"
         },
         {
           "id": "cost",
@@ -170,8 +162,7 @@
         "no rollback",
         "no two runs alike",
         "no proof at the end"
-      ],
-      "legend": "Tan = a step a person did by hand"
+      ]
     },
     {
       "type": "process",
@@ -325,9 +316,57 @@
       ]
     },
     {
+      "type": "timebar",
+      "title": "Time Per Client, To Scale",
+      "kicker": "S5",
+      "rows": [
+        {
+          "label": "Standard Offering to a client org",
+          "note": "export, rewrite, datasource, import, verify, execute, sign off",
+          "before_days": 10,
+          "before_label": "one to two weeks",
+          "after_hours": 0.35,
+          "after_label": "11 minutes at Ellensburg, 21 at Newark"
+        },
+        {
+          "label": "Snapshot layer to a client",
+          "note": "tables, procedures, baselines, gates, schedule",
+          "before_days": 5,
+          "before_label": "a working week",
+          "after_hours": 4,
+          "after_label": "a morning, then the baselines load unattended"
+        },
+        {
+          "label": "A domain change on every client",
+          "note": "one patch, additive-only, six orgs",
+          "before_days": 3,
+          "before_label": "days, one org at a time",
+          "after_hours": 4,
+          "after_label": "an afternoon for six orgs, seven proofs each"
+        },
+        {
+          "label": "A batch of reports between environments",
+          "note": "21 reports and their 13 domains",
+          "before_days": 1,
+          "before_label": "a day per batch",
+          "after_hours": 3,
+          "after_label": "one morning, byte-equal"
+        },
+        {
+          "label": "Validation sign-off",
+          "note": "one document per org",
+          "before_days": 2,
+          "before_label": "days of screenshots",
+          "after_hours": 0.25,
+          "after_label": "minutes, generated from the sweep"
+        }
+      ],
+      "legend": "The by-hand figures are the team's own estimates of the old process; the now figures are measured runs."
+    },
+    {
       "type": "process",
       "title": "Snapshot Deployment Workflow",
-      "kicker": "S5",
+      "kicker": "S6",
       "nodes": [
         {
           "id": "pre",
@@ -363,7 +402,8 @@
           "row": 1,
           "title": "5. Wait and gate",
           "body": "polls the job table up to 8 hours until every job says SUCCEEDED",
-          "kind": "manual"
+          "kind": "manual",
+          "tag": "waits"
         },
         {
           "id": "idx",
@@ -444,7 +484,7 @@
     {
       "type": "bullets",
       "title": "Inside The Snapshot Deployment",
-      "kicker": "S6",
+      "kicker": "S7",
       "columns": [
         {
           "heading": "Baseline and validate",
@@ -481,7 +521,7 @@
     {
       "type": "process",
       "title": "Full History, Then Rolling Refresh",
-      "kicker": "S7",
+      "kicker": "S8",
       "nodes": [
         {
           "id": "full",
@@ -531,7 +571,8 @@
           "row": 1,
           "title": "Warehouse parity",
           "body": "nightly comparison of the dbt canvases to these tables",
-          "kind": "manual"
+          "kind": "manual",
+          "tag": "nightly"
         },
         {
           "id": "win",
@@ -592,7 +633,7 @@
     {
       "type": "process",
       "title": "How AI Built The Python",
-      "kicker": "S8",
+      "kicker": "S9",
       "nodes": [
         {
           "id": "ask",
@@ -635,7 +676,8 @@
           "row": 1,
           "title": "TEMP blew to 246 GB",
           "body": "now: staged builds and TEMP capped before the first run",
-          "kind": "manual"
+          "kind": "manual",
+          "tag": "failure"
         },
         {
           "id": "d2",
@@ -643,7 +685,8 @@
           "row": 1,
           "title": "Import 'succeeded', wrote nothing",
           "body": "now: the package must carry the target's own datasource",
-          "kind": "manual"
+          "kind": "manual",
+          "tag": "failure"
         },
         {
           "id": "d3",
@@ -651,7 +694,8 @@
           "row": 1,
           "title": "View runs but will not open",
           "body": "now: a checker predicts the broken topic before promotion",
-          "kind": "manual"
+          "kind": "manual",
+          "tag": "failure"
         },
         {
           "id": "more",
@@ -702,12 +746,66 @@
         "the failure becomes a gate",
         "lesson dated in a skill"
       ],
-      "legend": "Tan = a real failure and the tool it produced"
+      "legend": "Orange tag = a real failure and the tool it produced"
+    },
+    {
+      "type": "chevrons",
+      "title": "The Promotion Path",
+      "kicker": "S10",
+      "stages": [
+        {
+          "title": "Origin_DEV",
+          "sub": "authoring",
+          "lines": [
+            "Every domain, view, report and dashboard is built here first",
+            "The only place content is ever edited by hand"
+          ]
+        },
+        {
+          "title": "Origin_TEST",
+          "sub": "proving",
+          "lines": [
+            "The first promotion, with the seven proofs",
+            "The offering is executed end to end before any client sees it"
+          ]
+        },
+        {
+          "title": "Client test org",
+          "sub": "the client's own data",
+          "lines": [
+            "Datasource switched to the client's test database",
+            "Sweep and sign-off on the client's own numbers"
+          ]
+        },
+        {
+          "title": "Client prod org",
+          "sub": "explicit prod flag",
+          "accent": true,
+          "lines": [
+            "Same tool, same proofs, a prod write flag required",
+            "Inventory before and diff after: the rollback record"
+          ]
+        }
+      ],
+      "notes": [
+        {
+          "title": "The datasource changes at every hop",
+          "body": "the package carries the target's own datasource export, never an edited copy"
+        },
+        {
+          "title": "The same tool at every hop",
+          "body": "one promotion path from authoring to prod, so every hop is proven the same way"
+        },
+        {
+          "title": "Nothing edited by hand after Origin_DEV",
+          "body": "every change downstream is a promotion or an additive patch with a rollback"
+        }
+      ]
     },
     {
       "type": "process",
       "title": "Jaspersoft REST Promotion",
-      "kicker": "S9",
+      "kicker": "S11",
       "nodes": [
         {
           "id": "exp",
@@ -818,7 +916,7 @@
     {
       "type": "bullets",
       "title": "Inside The Promotion",
-      "kicker": "S10",
+      "kicker": "S12",
       "columns": [
         {
           "heading": "What gets rewritten",
@@ -916,7 +1014,7 @@
     {
       "type": "process",
       "title": "How AI Runs It",
-      "kicker": "S11",
+      "kicker": "S13",
       "nodes": [
         {
           "id": "ask",
@@ -973,7 +1071,8 @@
           "row": 1,
           "title": "What it never does",
           "body": "write to prod unasked, print a credential, guess a client code",
-          "kind": "manual"
+          "kind": "manual",
+          "tag": "guardrail"
         },
         {
           "id": "guard",
@@ -994,12 +1093,13 @@
         {
           "id": "human",
           "x": 16.88,
-          "y": 7.45,
+          "y": 7.8,
           "w": 4.3,
-          "h": 1.3,
+          "h": 1.2,
           "title": "Human-only today",
           "body": "Ad Hoc designer checks, users, themes, server config",
-          "kind": "manual"
+          "kind": "manual",
+          "tag": "human"
         }
       ],
       "edges": [
@@ -1066,9 +1166,43 @@
       ]
     },
     {
+      "type": "donut",
+      "title": "One Sweep, Read Closely",
+      "kicker": "S14",
+      "parts": [
+        {
+          "label": "OK",
+          "value": 116,
+          "fill": "F5EFE9",
+          "means": "ran and returned rows inside the time limit"
+        },
+        {
+          "label": "Slow",
+          "value": 27,
+          "fill": "FFA418",
+          "means": "ran and returned rows, but took over a minute: a tuning list, not a failure"
+        },
+        {
+          "label": "Empty",
+          "value": 7,
+          "fill": "FFFFFF",
+          "means": "ran without error and returned no rows: the client has no data there yet"
+        },
+        {
+          "label": "Failed",
+          "value": 0,
+          "fill": "1D6F42",
+          "means": "did not run; there were none"
+        }
+      ],
+      "stat": "150 resources, 0 failures",
+      "stat_label": "Ellensburg prod, the Standard Offering, 11 minutes end to end; the same sweep runs after every promotion and every domain patch",
+      "legend": "Every sweep is classified the same way, so two sweeps of the same org can be compared row by row."
+    },
+    {
       "type": "compare",
       "title": "The Constraint Today, And What Replaces It",
-      "kicker": "S12",
+      "kicker": "S15",
       "headings": [
         "Manual QA now",
         "Next: Playwright, and agents on the network (Shankar)"
@@ -1099,7 +1233,7 @@
     {
       "type": "roadmap",
       "title": "Roadmap",
-      "kicker": "S13",
+      "kicker": "S16",
       "intro": "In the order that removes the most manual work.",
       "steps": [
         {
@@ -1133,7 +1267,7 @@
     {
       "type": "cards",
       "title": "Next: The Origin BA App And dbt",
-      "kicker": "S14",
+      "kicker": "S17",
       "cols": 3,
       "cards": [
         {

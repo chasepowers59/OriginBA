@@ -32,11 +32,16 @@ template, not an imitation. Slide types and their spec keys:
 | `process` | `title`, `kicker`, `nodes[]`, `edges[]`, `legend`, `notes` |
 | `roadmap` | `title`, `kicker`, `intro`, `steps[{title, owner, body, current}]` |
 | `cards` | `title`, `cards[{heading, lines[], accent, stat, stat_label}]`, `cols`; `stat` is a big-number callout above the heading (results slides) |
+| `timebar` | `title`, `rows[{label, note, before_days, before_label, after_hours, after_label}]`, `legend`: a cream bar per activity for the days it took by hand and an orange bar for the hours it takes now, drawn to one scale |
+| `donut` | `title`, `parts[{label, value, fill, means}]`, `stat`, `stat_label`, `legend`: a native doughnut chart (transparent over the gradient) with a chip legend and a stat box; zero-value parts appear in the legend only |
+| `chevrons` | `title`, `stages[{title, sub, lines[], accent}]`, `notes[{title, body}]`: a left-to-right chevron chain (the promotion path), a description under each stage, a band of cream notes below |
 | `bullets` | `title`, `columns[{heading, items[]}]` |
 | `table` | `title`, `columns[]`, `rows[[]]`, `widths[]` (inches, sum 20.4) |
 
+Colour system (one rule, every slide): every container is cream, every chip or pill is white, orange is the highlight (kicker, accent pill, current roadmap step, the `tag` on a manual node), blue is titles and grey is body text. Nothing else is filled.
+
 A process node: `{"id", "col", "row"}` on the grid or `{"x", "y", "w", "h"}` in inches, `title`,
-`body`, and `kind`: `step` (cream, the automated thing), `manual` (tan, a scheduled or hand
+`body`, and `kind`: `step` (cream, the automated thing), `manual` (cream with an orange `tag`, default "by hand": a scheduled or hand
 step), `accent` (orange pill, a constraint), `card` (white sheet, an artifact), `note` (cream
 text). Edges are `["from", "to"]` (straight when aligned, elbow otherwise) or
 `{"from", "to", "via": [x, y]}` to route around something. Keep node bodies under about 60

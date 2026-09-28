@@ -6,7 +6,7 @@ reference deck's own layouts, so the blue gradient background, fonts and footer 
 
 Slide types (see SKILL.md and examples/sample_spec.json): title, section, statement, process,
 roadmap, cards, table, bullets. A process slide is a grid of cream nodes (col, row) joined by
-cream arrows; node kinds: step (cream), manual (tan: by hand, a failure, a constraint), accent (orange pill), card (white sheet with
+cream arrows; node kinds: step (cream), manual (cream with an orange tag: by hand, a failure, a constraint), accent (orange pill), card (white sheet with
 a green header), note (small cream text).
 """
 from __future__ import annotations
@@ -121,12 +121,21 @@ def _draw_node(slide, n):
         t = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
         _text(t, [[(title, 16, CREAM, True)]] + ([[(body, 14, CREAM, False)]] if body else []), anchor=MSO_ANCHOR.TOP, margin=0.0)
     else:
-        fill, tcol, bcol = (TAN, BLUE, GREY) if kind == "manual" else (CREAM, BLUE, GREY)
-        b = _box(slide, x, y, w, h, fill)
-        paras = [[(title, 25 if len(title) < 22 else 21, tcol, True)]]
+        b = _box(slide, x, y, w, h, CREAM)
+        paras = [[(title, 25 if len(title) < 22 else 21, BLUE, True)]]
         if body:
-            paras.append([(body, 20 if len(body) < 60 else 16, bcol, False)])
+            paras.append([(body, 20 if len(body) < 60 else 16, GREY, False)])
         _text(b, paras)
+        if kind == "manual":   # same container as every other node; the orange tag carries the meaning
+            _tag(slide, x + w - 0.1, y - 0.42, n.get("tag", "by hand"))
+
+
+def _tag(slide, right, y, label):
+    """A small orange pill anchored by its right edge: by hand, failure, waits, human."""
+    w = 0.3 + 0.1 * len(label)
+    b = _box(slide, right - w, y, w, 0.34, ORANGE, radius=0.5)
+    _text(b, [[(label, 11, BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.04)
+    return b
 
 
 def _edge(slide, nodes, a, b, via=None):
@@ -185,7 +194,7 @@ def slide_process(prs, s, footer):
         px = 2.4
         for p in s["missing"]:
             w = 0.25 + 0.115 * len(p)
-            _chip(sl, px, 9.3, w, 0.55, p, fill=TAN, size=14); px += w + 0.25
+            _chip(sl, px, 9.3, w, 0.55, p, fill=WHITE, size=14); px += w + 0.25
     if s.get("legend"):
         t = sl.shapes.add_textbox(Inches(0.81), Inches(10.75), Inches(20), Inches(0.6))
         _text(t, [[(s["legend"], 14, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
@@ -266,7 +275,7 @@ def slide_table(prs, s, footer):
         cell.text = ""; _text(cell, [[(c, 22, CREAM, True)]], margin=0.15)
     for i, row in enumerate(rows, start=1):
         for j, v in enumerate(row):
-            cell = tbl.cell(i, j); cell.fill.solid(); cell.fill.fore_color.rgb = rgb(CREAM if i % 2 else WHITE)
+            cell = tbl.cell(i, j); cell.fill.solid(); cell.fill.fore_color.rgb = rgb(CREAM)
             cell.text = ""; _text(cell, [[(str(v), 19, GREY if j else BLUE, j == 0)]], margin=0.15)
     for r in tbl.rows:
         r.height = Inches(rh)
@@ -312,13 +321,12 @@ def slide_layers(prs, s, footer):
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     bands = s["bands"]; gap = 0.45; h = min(1.75, (8.9 - gap * (len(bands) - 1)) / len(bands)); y = 2.0
     for i, b in enumerate(bands):
-        fill = TAN if b.get("kind") == "manual" else CREAM
-        box = _box(sl, 0.81, y, 20.4, h, fill, radius=0.1)
+        box = _box(sl, 0.81, y, 20.4, h, CREAM, radius=0.1)
         lab = sl.shapes.add_textbox(Inches(1.1), Inches(y), Inches(4.4), Inches(h))
         _text(lab, [[(b["label"], 24, BLUE, True)]] + ([[(b["sub"], 15, GREY, False)]] if b.get("sub") else []), margin=0.0)
         items = b.get("items", []); cw = (15.2 - 0.3 * (len(items) - 1)) / max(len(items), 1); ch = min(1.05, h - 0.4)
         for j, it in enumerate(items):
-            _chip(sl, 5.7 + j * (cw + 0.3), y + (h - ch) / 2, cw, ch, it, fill=WHITE if fill == CREAM else CREAM, size=15)
+            _chip(sl, 5.7 + j * (cw + 0.3), y + (h - ch) / 2, cw, ch, it, fill=WHITE, size=15)
         if i < len(bands) - 1:
             _arrow_segments(sl, [(11.0, y + h + 0.06), (11.0, y + h + gap - 0.06)])
         y += h + gap
@@ -326,7 +334,7 @@ def slide_layers(prs, s, footer):
 
 
 def slide_compare(prs, s, footer):
-    """Rows of before (tan) -> after (cream) pairs under two column headings."""
+    """Rows of before -> after pairs under two column headings; both cream, the after side leads in bold blue."""
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     left, right = s.get("headings", ["By hand", "Now"])
@@ -335,8 +343,8 @@ def slide_compare(prs, s, footer):
         _text(t, [[(txt, 22, CREAM, True)]], margin=0.0, anchor=MSO_ANCHOR.TOP)
     rows = s["rows"]; gap = 0.3; h = min(1.45, (8.0 - gap * (len(rows) - 1)) / len(rows)); y = 2.8
     for r in rows:
-        a = _box(sl, 0.81, y, 9.6, h, TAN, radius=0.1)
-        _text(a, [[(r["before"], 18, BLUE, False)]], margin=0.3)
+        a = _box(sl, 0.81, y, 9.6, h, CREAM, radius=0.1)
+        _text(a, [[(r["before"], 18, GREY, False)]], margin=0.3)
         b = _box(sl, 11.6, y, 9.6, h, CREAM, radius=0.1)
         _text(b, [[(r["after"], 18, BLUE, True)]] + ([[(r["proof"], 15, GREY, False)]] if r.get("proof") else []), margin=0.3)
         _arrow_segments(sl, [(10.55, y + h / 2), (11.5, y + h / 2)])
@@ -344,8 +352,106 @@ def slide_compare(prs, s, footer):
     return sl
 
 
+def slide_timebar(prs, s, footer):
+    """One row per activity: a cream bar proportional to the days it took by hand, an orange bar for the hours it takes now."""
+    sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
+    rows = s["rows"]; max_days = max(r["before_days"] for r in rows); scale = 13.2 / max_days   # inches per working day
+    t = sl.shapes.add_textbox(Inches(6.4), Inches(2.05), Inches(13.2), Inches(0.45))
+    _text(t, [[("Working days by hand (cream) against hours now (orange), drawn to the same scale", 18, CREAM, False)]], margin=0.0, anchor=MSO_ANCHOR.TOP)
+    gap = 0.3; h = min(1.35, (7.7 - gap * (len(rows) - 1)) / len(rows)); y = 2.7
+    for r in rows:
+        lab = sl.shapes.add_textbox(Inches(0.81), Inches(y), Inches(5.3), Inches(h))
+        _text(lab, [[(r["label"], 20, CREAM, True)]] + ([[(r["note"], 14, CREAM, False)]] if r.get("note") else []), margin=0.0)
+        bw = r["before_days"] * scale
+        b = _box(sl, 6.4, y + 0.05, bw, h * 0.42, CREAM, radius=0.3)
+        blabel = r.get("before_label", f'{r["before_days"]} working days')
+        if bw >= 3.2:
+            _text(b, [[(blabel, 16, BLUE, True)]], margin=0.2)
+        else:   # too short a bar to hold its label: write it beside the bar instead
+            bt = sl.shapes.add_textbox(Inches(6.4 + bw + 0.15), Inches(y + 0.05), Inches(8), Inches(h * 0.42))
+            _text(bt, [[(blabel, 15, CREAM, True)]], margin=0.0)
+        aw = max(0.28, r["after_hours"] / 8.0 * scale)
+        a = _box(sl, 6.4, y + 0.05 + h * 0.42 + 0.1, aw, h * 0.42, ORANGE, radius=0.3)
+        at = sl.shapes.add_textbox(Inches(6.4 + aw + 0.15), Inches(y + 0.05 + h * 0.42 + 0.1), Inches(8), Inches(h * 0.42))
+        _text(at, [[(r["after_label"], 15, CREAM, True)]], margin=0.0)
+        y += h + gap
+    if s.get("legend"):
+        t = sl.shapes.add_textbox(Inches(0.81), Inches(10.75), Inches(20), Inches(0.6))
+        _text(t, [[(s["legend"], 14, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+    return sl
+
+
+def slide_donut(prs, s, footer):
+    """A native doughnut chart of one classification (left) beside a stat and its reading (right)."""
+    from pptx.chart.data import CategoryChartData
+    from pptx.enum.chart import XL_CHART_TYPE
+    sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
+    parts = [p for p in s["parts"] if p["value"]]
+    cd = CategoryChartData(); cd.categories = [p["label"] for p in parts]; cd.add_series(s.get("series", "count"), [p["value"] for p in parts])
+    gf = sl.shapes.add_chart(XL_CHART_TYPE.DOUGHNUT, Inches(0.81), Inches(2.0), Inches(9.4), Inches(9.0), cd); ch = gf.chart
+    ch.has_legend = False; ch.has_title = False
+    ns = "{http://schemas.openxmlformats.org/drawingml/2006/main}"; cns = "{http://schemas.openxmlformats.org/drawingml/2006/chart}"
+    for el in (ch._chartSpace, ch._chartSpace.find(cns + "chart").find(cns + "plotArea")):   # transparent over the gradient
+        spPr = el.find(cns + "spPr")
+        if spPr is None:
+            spPr = etree.SubElement(el, cns + "spPr")
+        for c in list(spPr): spPr.remove(c)
+        etree.SubElement(spPr, ns + "noFill"); ln = etree.SubElement(spPr, ns + "ln"); etree.SubElement(ln, ns + "noFill")
+    plot = ch.plots[0]
+    hole = plot._element.find(cns + "holeSize")
+    if hole is None:
+        hole = etree.SubElement(plot._element, cns + "holeSize")
+    hole.set("val", "55")
+    plot.has_data_labels = True; dl = plot.data_labels; dl.show_value = True; dl.show_category_name = False
+    dl.font.size = Pt(20); dl.font.bold = True; dl.font.color.rgb = rgb(BLUE)
+    for pt, part in zip(plot.series[0].points, parts):
+        pt.format.fill.solid(); pt.format.fill.fore_color.rgb = rgb(part.get("fill", CREAM)); pt.format.line.fill.background()
+    # legend as chips, one per class, in the class colour
+    y = 2.3
+    for part in s["parts"]:
+        fill = part.get("fill", CREAM)
+        _chip(sl, 10.8, y, 2.6, 0.55, f'{part["label"]}  {part["value"]}', fill=fill, color=CREAM if fill in (GREEN, BLUE) else BLUE, size=15)
+        t = sl.shapes.add_textbox(Inches(13.6), Inches(y), Inches(7.6), Inches(0.6))
+        _text(t, [[(part.get("means", ""), 15, CREAM, False)]], margin=0.0)
+        y += 0.8
+    if s.get("stat"):
+        b = _box(sl, 10.8, y + 0.4, 10.4, 2.6, CREAM, radius=0.08)
+        _text(b, [[(s["stat"], 48, BLUE, True)], [(s.get("stat_label", ""), 18, GREY, False)]], anchor=MSO_ANCHOR.MIDDLE, margin=0.35)
+    if s.get("legend"):
+        t = sl.shapes.add_textbox(Inches(0.81), Inches(10.75), Inches(20), Inches(0.6))
+        _text(t, [[(s["legend"], 14, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+    return sl
+
+
+def slide_chevrons(prs, s, footer):
+    """A left-to-right chain of chevrons (stages), a description under each, an optional band of notes below."""
+    sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
+    st = s["stages"]; n = len(st); overlap = 0.35; w = (20.4 + overlap * (n - 1)) / n; y = 3.1; h = 1.8
+    for i, stage in enumerate(st):
+        x = 0.81 + i * (w - overlap)
+        shape = sl.shapes.add_shape(MSO_SHAPE.PENTAGON if i == 0 else MSO_SHAPE.CHEVRON, Inches(x), Inches(y), Inches(w), Inches(h))
+        shape.fill.solid(); shape.fill.fore_color.rgb = rgb(ORANGE if stage.get("accent") else CREAM); shape.line.fill.background(); shape.shadow.inherit = False
+        shape.adjustments[0] = 0.32
+        _text(shape, [[(stage["title"], 22, BLUE, True)]] + ([[(stage["sub"], 14, GREY if not stage.get("accent") else BLUE, False)]] if stage.get("sub") else []), align=PP_ALIGN.CENTER, margin=0.5)
+        t = sl.shapes.add_textbox(Inches(x + 0.3), Inches(y + h + 0.3), Inches(w - overlap - 0.5), Inches(2.6))
+        _text(t, [[(line, 16, CREAM, False)] for line in stage.get("lines", [])], anchor=MSO_ANCHOR.TOP, margin=0.0)
+    if s.get("notes"):
+        items = s["notes"]; cw = (20.4 - 0.4 * (len(items) - 1)) / len(items)
+        for j, it in enumerate(items):
+            b = _box(sl, 0.81 + j * (cw + 0.4), 7.4, cw, 2.1, CREAM, radius=0.08)
+            _text(b, [[(it["title"], 20, BLUE, True)], [(it["body"], 15, GREY, False)]], anchor=MSO_ANCHOR.TOP, margin=0.3)
+    if s.get("legend"):
+        t = sl.shapes.add_textbox(Inches(0.81), Inches(10.75), Inches(20), Inches(0.6))
+        _text(t, [[(s["legend"], 14, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+    return sl
+
+
 BUILDERS = {"layers": slide_layers, "compare": slide_compare, "title": slide_title, "section": slide_section, "statement": slide_statement, "process": slide_process,
-            "roadmap": slide_roadmap, "cards": slide_cards, "bullets": slide_bullets, "table": slide_table}
+            "roadmap": slide_roadmap, "cards": slide_cards, "bullets": slide_bullets, "table": slide_table,
+            "timebar": slide_timebar, "donut": slide_donut, "chevrons": slide_chevrons}
 
 
 def build(spec: dict, out: pathlib.Path) -> pathlib.Path:
