@@ -29,6 +29,7 @@ from api.saved_dashboards import (
 from api.row_security import only_readable
 from api.ownership import VISIBILITIES, can_edit, for_caller, require_edit, stamp, visible
 from api.saved_views import (
+    update_saved_view,
     SavedViewError,
     bulk_import_views,
     create_saved_view,
@@ -43,6 +44,7 @@ router = APIRouter(prefix="/portal", tags=["portal"])
 class SavedViewCreate(BaseModel):
     # 'organization' (everyone in it) or 'private' (only you): api/ownership.py
     visibility: str = "organization"
+    folder: str | None = Field(default=None, max_length=80)
     snapshot_id: str
     snapshot_label: str
     title: str
@@ -87,6 +89,7 @@ class DashboardTile(BaseModel):
 
 class DashboardCreate(BaseModel):
     visibility: str = "organization"
+    folder: str | None = Field(default=None, max_length=80)
     title: str
     description: str | None = None
     days: int = 30
@@ -95,6 +98,7 @@ class DashboardCreate(BaseModel):
 
 class DashboardUpdate(BaseModel):
     visibility: str | None = None
+    folder: str | None = Field(default=None, max_length=80)
     title: str | None = None
     description: str | None = None
     days: int | None = None
@@ -173,6 +177,23 @@ def import_saved_views(
     org_id = ctx.require_organization()
     imported = bulk_import_views([v.model_dump() for v in body.views], organization_id=org_id)
     return {"imported": len(imported), "views": imported}
+
+
+class SavedViewPatch(BaseModel):
+    folder: str | None = Field(default=None, max_length=80)
+
+
+@router.patch("/saved-views/{view_id}")
+def patch_saved_view(
+    view_id: str,
+    body: SavedViewPatch,
+    ctx: AuthContext = Depends(require_permission("saved_views:write")),
+) -> dict[str, Any]:
+    """Move a view to another folder (or out of one, with an empty folder)."""
+    org_id = ctx.require_organization()
+    require_edit(next((v for v in list_saved_views(org_id) if v.get("id") == view_id), None), ctx, "Saved view")
+    updated = update_saved_view(view_id, body.model_dump(exclude_unset=True), organization_id=org_id)
+    return {**updated, "can_edit": True}
 
 
 @router.delete("/saved-views/{view_id}")

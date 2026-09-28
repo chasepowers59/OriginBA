@@ -13,6 +13,7 @@ import { formatTimeBucket } from "@/lib/timeBucketLabel";
 import type { SavedDashboard } from "@/lib/types";
 import { useAuth } from "@/components/AuthProvider";
 import { ownershipLabel } from "@/lib/ownership";
+import { groupByFolder } from "@/lib/folders";
 
 export function DashboardListPage() {
   const { user } = useAuth();
@@ -85,8 +86,14 @@ export function DashboardListPage() {
           </Link>
         </div>
       ) : (
+        <div className="space-y-6">
+        {groupByFolder(boards).map((group) => (
+        <section key={group.folder ?? "__unfiled"} aria-label={group.folder ?? "Not in a folder"}>
+        {group.folder || groupByFolder(boards).length > 1 ? (
+          <h2 className="mb-2 text-sm font-semibold text-heading">{group.folder ?? "Not in a folder"}</h2>
+        ) : null}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {boards.map((b) => {
+          {group.items.map((b) => {
             const contents = tileSummary(b.tiles);
             return (
               <div key={b.id} className="glass-panel group flex flex-col p-5 transition hover:border-edge">
@@ -143,6 +150,9 @@ export function DashboardListPage() {
               </div>
             );
           })}
+        </div>
+        </section>
+        ))}
         </div>
       )}
     </div>

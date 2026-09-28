@@ -17,6 +17,7 @@ export type SavedFavorite = {
   visibility?: import("./ownership").Visibility;
   ownerEmail?: string | null;
   canEdit?: boolean;
+  folder?: string | null;
   savedAt: string;
 };
 

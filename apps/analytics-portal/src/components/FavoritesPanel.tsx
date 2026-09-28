@@ -8,6 +8,8 @@ import { ScheduleDialog } from "@/components/ScheduleDialog";
 import { NotesDialog } from "@/components/NotesDialog";
 import { useAuth } from "@/components/AuthProvider";
 import { ownershipLabel } from "@/lib/ownership";
+import { groupByFolder } from "@/lib/folders";
+import { moveSavedView } from "@/lib/api";
 
 export function FavoritesPanel({ compact }: { compact?: boolean }) {
   const [favorites, setFavorites] = useState<SavedFavorite[]>([]);
@@ -52,8 +54,14 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
           Saved views
         </p>
       ) : null}
+      <div className="space-y-4">
+      {groupByFolder(favorites).map((group) => (
+      <section key={group.folder ?? "__unfiled"} aria-label={group.folder ?? "Not in a folder"}>
+      {group.folder || groupByFolder(favorites).length > 1 ? (
+        <p className="mb-1.5 text-xs font-semibold text-heading">{group.folder ?? "Not in a folder"}</p>
+      ) : null}
       <ul className="space-y-2">
-        {favorites.map((fav) => (
+        {group.items.map((fav) => (
           <li
             key={fav.id}
             className="flex items-center gap-2 rounded-xl border border-edge-subtle bg-surface-subtle px-3 py-2"
@@ -88,6 +96,21 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
               <button
                 type="button"
                 onClick={async () => {
+                  const next = window.prompt("Move to folder (leave empty for no folder)", fav.folder ?? "");
+                  if (next === null) return;
+                  await moveSavedView(fav.id, next.trim());
+                  refresh();
+                }}
+                className="shrink-0 text-xs text-fg-muted hover:text-primary"
+                title="Move to another folder"
+              >
+                Move
+              </button>
+            ) : null}
+            {fav.canEdit !== false ? (
+              <button
+                type="button"
+                onClick={async () => {
                   await removeViewRemote(fav.id);
                   refresh();
                 }}
@@ -100,6 +123,9 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
           </li>
         ))}
       </ul>
+      </section>
+      ))}
+      </div>
       {scheduling ? (
         <ScheduleDialog
           savedViewId={scheduling.id}

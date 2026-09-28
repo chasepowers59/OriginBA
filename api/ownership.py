@@ -22,6 +22,12 @@ def stamp(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
     return {**payload, "visibility": visibility, "owner_id": ctx.id, "owner_email": ctx.email}
 
 
+def clean_folder(value: Any) -> str | None:
+    """A folder name trimmed, or None for no folder."""
+    folder = str(value or "").strip()
+    return folder[:80] or None
+
+
 def visible(item: dict[str, Any], ctx: Any) -> bool:
     return item.get("visibility") != "private" or item.get("owner_id") == ctx.id
 

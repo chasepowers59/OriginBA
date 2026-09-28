@@ -30,6 +30,7 @@ export function savedViewToFavorite(view: SavedView): SavedFavorite {
     visibility: view.visibility ?? "organization",
     ownerEmail: view.owner_email ?? null,
     canEdit: view.can_edit ?? true,
+    folder: view.folder ?? null,
     savedAt: view.saved_at,
   };
 }
@@ -53,6 +54,7 @@ export function favoriteToSavedViewPayload(
     scope_field: favorite.scopeField ?? null,
     scope_value: favorite.scopeValue ?? null,
     visibility: favorite.visibility ?? "organization",
+    folder: favorite.folder ?? null,
   };
 }
 

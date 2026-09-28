@@ -37,6 +37,7 @@ import { ResultsPanel } from "./ResultsPanel";
 import { ScopeFilterSelect } from "./ScopeFilterSelect";
 import { SnapshotDataModelPanel } from "./SnapshotDataModelPanel";
 import { VisibilityToggle } from "./VisibilityToggle";
+import { FolderInput } from "./FolderInput";
 
 type DatePreset =
   | { kind: "days"; label: string; days: number }
@@ -93,6 +94,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const [activePreset, setActivePreset] = useState("Last 6 months");
   const [allDates, setAllDates] = useState(false);
   const [privateOnly, setPrivateOnly] = useState(false);
+  const [folder, setFolder] = useState("");
   // The opening window the page fell back from, said beside "All dates" so the reader knows why.
   const [fellBackFrom, setFellBackFrom] = useState<string | null>(null);
   const firstRun = useRef(true);
@@ -444,6 +446,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     scopeField: scopeField || undefined,
     scopeValue: scopeValue || undefined,
     visibility: (privateOnly ? "private" : "organization") as "private" | "organization",
+    folder: folder.trim() || null,
   });
 
   const handleSaveFavorite = async () => {
@@ -642,7 +645,10 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
 
         {result ? (
           <div className="space-y-2">
-            <VisibilityToggle privateOnly={privateOnly} onChange={setPrivateOnly} />
+            <div className="flex items-center gap-2">
+              <FolderInput kind="views" value={folder} onChange={setFolder} />
+              <VisibilityToggle privateOnly={privateOnly} onChange={setPrivateOnly} />
+            </div>
             <button type="button" onClick={() => void handleSaveFavorite()} className="btn-ghost w-full">
               Save view
             </button>

@@ -132,7 +132,11 @@ class ScheduleOwnershipTests(_Stores):
         super().setUp()
         from api import report_schedules as rs
         self.rs = rs
-        self.more = [mock.patch.object(rs, "SCHEDULES_PATH", Path(self.tmp.name) / "s.json")]
+        from api import report_schedule_routes as rr
+        # The routes ask for the org's data source; these tests never touch one, and must not
+        # depend on another test file having configured it.
+        self.more = [mock.patch.object(rs, "SCHEDULES_PATH", Path(self.tmp.name) / "s.json"),
+                     mock.patch.object(rr, "require_org_for_data", return_value="dev")]
         for p in self.more:
             p.start()
 
@@ -169,3 +173,31 @@ class ScheduleOwnershipTests(_Stores):
             rr.delete_schedule(sched["id"], ctx=BOB)
         self.assertEqual(err.exception.status_code, 403)
         rr.delete_schedule(sched["id"], ctx=ADMIN)
+
+
+class FolderTests(_Stores):
+    """Saved views and dashboards can sit in a folder; the owner (or an admin) moves them."""
+
+    def test_a_view_is_saved_into_a_folder(self):
+        v = pr.post_saved_view(pr.SavedViewCreate(snapshot_id="rpt_bill", snapshot_label="Bill", title="t", kind="custom",
+                                                  folder="  Month-end close  "), ctx=ALICE)
+        self.assertEqual(v["folder"], "Month-end close")
+
+    def test_the_owner_moves_a_view_and_others_cannot(self):
+        v = self._view(ALICE, "t")
+        moved = pr.patch_saved_view(v["id"], pr.SavedViewPatch(folder="Collections"), ctx=ALICE)
+        self.assertEqual(moved["folder"], "Collections")
+        with self.assertRaises(HTTPException) as err:
+            pr.patch_saved_view(v["id"], pr.SavedViewPatch(folder="Mine now"), ctx=BOB)
+        self.assertEqual(err.exception.status_code, 403)
+        cleared = pr.patch_saved_view(v["id"], pr.SavedViewPatch(folder=""), ctx=ALICE)
+        self.assertIsNone(cleared["folder"])
+
+    def test_a_dashboard_has_a_folder(self):
+        b = pr.post_dashboard(pr.DashboardCreate(title="d", tiles=[], folder="Board pack"), ctx=ALICE)
+        self.assertEqual(b["folder"], "Board pack")
+        self.assertEqual(pr.put_dashboard(b["id"], pr.DashboardUpdate(folder="Ops"), ctx=ALICE)["folder"], "Ops")
+
+    def test_an_overlong_folder_is_refused(self):
+        with self.assertRaises(Exception):
+            pr.SavedViewCreate(snapshot_id="rpt_bill", snapshot_label="Bill", title="t", kind="custom", folder="x" * 81)

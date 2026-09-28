@@ -459,6 +459,7 @@ export type SavedView = {
   owner_email?: string | null;
   /** Whether the caller may change or delete it, as the API decided. */
   can_edit?: boolean;
+  folder?: string | null;
   saved_at: string;
 };
 
@@ -519,6 +520,7 @@ export type SavedDashboard = {
   visibility?: import("./ownership").Visibility;
   owner_email?: string | null;
   can_edit?: boolean;
+  folder?: string | null;
   created_at: string;
   updated_at: string;
 };

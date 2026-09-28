@@ -17,6 +17,7 @@ MAX_DASHBOARDS = 50
 MAX_TILES = 8
 
 from api import portal_state_store as _pss  # noqa: E402
+from api.ownership import clean_folder  # noqa: E402
 _COLLECTION = "saved_dashboards"
 
 
@@ -108,6 +109,7 @@ def create_dashboard(payload: dict[str, Any], *, organization_id: str) -> dict[s
         "owner_id": payload.get("owner_id"),
         "owner_email": payload.get("owner_email"),
         "visibility": payload.get("visibility") or "organization",
+        "folder": clean_folder(payload.get("folder")),
         "created_at": now,
         "updated_at": now,
     }
@@ -137,6 +139,8 @@ def _apply_update(found: dict[str, Any], payload: dict[str, Any]) -> dict[str, A
         found["tiles"] = _validate_tiles(list(payload["tiles"] or []))
     if payload.get("visibility"):
         found["visibility"] = payload["visibility"]
+    if "folder" in payload:
+        found["folder"] = clean_folder(payload["folder"])
     found["updated_at"] = datetime.now(timezone.utc).isoformat()
     return found
 

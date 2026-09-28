@@ -21,15 +21,15 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 | Capability | Status | Where / what is missing |
 | --- | --- | --- |
 | Ad hoc exploration | Yes | Explorer per canvas, visual builder, SQL workspace (read-only, fenced) |
-| Saved views | Yes | Builder definitions (never SQL); owner and 'Only me' / organization visibility; refused past 200 per org, never silently deleted |
-| Dashboards | Yes | Up to 8 tiles, cross-filtering, drill to the explorer, owner and visibility, 50 per org |
+| Saved views | Yes | Builder definitions (never SQL); owner, private or organization-wide, folders; refused past 200 per org, never silently deleted |
+| Dashboards | Yes | Up to 8 tiles, cross-filtering, drill to the explorer, owner, visibility and folders, 50 per org |
 | Scheduled delivery | Partly | Daily, weekly, monthly email of a saved view as **PDF, Excel or CSV**, with its saved filters; missed runs caught up once; Send now. **Needs:** the hourly runner deployed, SMTP configured |
 | Exports | Partly | Excel from explorer and dashboards, CSV from SQL and assistant answers (formula-safe), server-side PDF on schedules. On-screen PDF buttons still use the browser print dialog |
 | Alerts | Partly | Thresholds on the home KPIs, emailed on breach. Not on arbitrary views |
 | Input controls / prompts | Yes | Any saved filter can be asked for when the view opens (Report parameters: value lists narrowed by the answers above them, date ranges, saved defaults for schedules) |
 | Formatted, paginated reports (JRXML) | No | Letters and statements live in Jaspersoft and the separate letter-print app |
 | Security | Mostly | Roles, workstream grants, org isolation, **row-level security within an org** (per-user rules on a column, fail-closed; raw SQL, the assistant and data quality refused to restricted users; schedules keep the creator's rules), OIDC sign-in with IdP group mapping (role, client, access groups, row rules synced at every sign-in), audit log. **No** SAML |
-| Ownership and sharing | Yes | Owner on every view, dashboard and schedule; private items; only owner or admin edits. Not yet: folders |
+| Ownership and sharing | Yes | Owner on every view, dashboard and schedule; private items; only owner or admin edits; folders for views and dashboards |
 | Per-client branding | No | One brand for all orgs; the org name is swapped |
 | Embedding / API keys | No | OpenAPI docs are on; no embed SDK, API keys only for `/nlq` |
 | Observability | Partly | Request id on every response, one log line per request, 500s name a reference. No error-reporting service or metrics yet |
@@ -44,7 +44,7 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 2. Done 2026-09-28: owners and private items; report parameters; row-level security.
 3. **Server-side PDF for on-screen exports** (S): reuse the schedule PDF renderer for the
    explorer and dashboard PDF buttons, so a PDF looks the same wherever it comes from.
-4. **Folders** for saved views and dashboards (M).
+4. Done 2026-09-28: folders.
 5. **SAML** (M), for identity providers without OIDC.
 6. **Pre-aggregated tables** for the heavy ready-to-run reports (see the dbt repo's
    `docs/LARGE_CLIENT_SCALE_PLAN.md`).

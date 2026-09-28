@@ -202,6 +202,11 @@ export function createSavedView(
   });
 }
 
+/** Move a view to another folder; an empty folder takes it out of any. */
+export function moveSavedView(viewId: string, folder: string): Promise<SavedView> {
+  return fetchJson(`/portal/saved-views/${viewId}`, { method: "PATCH", body: JSON.stringify({ folder }) });
+}
+
 export function deleteSavedView(viewId: string): Promise<void> {
   return fetchJson(`/portal/saved-views/${viewId}`, { method: "DELETE" });
 }
@@ -367,6 +372,7 @@ export function createDashboard(body: {
   days?: number;
   tiles: DashboardTileDef[];
   visibility?: "organization" | "private";
+  folder?: string | null;
 }): Promise<SavedDashboard> {
   return fetchJson("/portal/dashboards", { method: "POST", body: JSON.stringify(body) });
 }
@@ -374,7 +380,7 @@ export function createDashboard(body: {
 export function updateDashboard(
   id: string,
   body: Partial<{ title: string; description: string; days: number; tiles: DashboardTileDef[];
-    visibility: "organization" | "private" }>,
+    visibility: "organization" | "private"; folder: string | null }>,
 ): Promise<SavedDashboard> {
   return fetchJson(`/portal/dashboards/${id}`, { method: "PUT", body: JSON.stringify(body) });
 }
