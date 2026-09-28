@@ -27,6 +27,7 @@ from api.reporting_dates import (DEFAULT_WINDOW_DAYS, DEFAULT_WINDOW_MIN_ROWS, d
 from api.executive_dashboard import (WAREHOUSE_NOT_BUILT_NOTE, build_executive_summary,
                                      is_missing_relation_error)
 from api.kpi_runner import COMPARE_MODES
+from api.summary_cache import cached
 from api.workstream_dashboard import build_workstream_about, build_workstream_summary
 from api.snapshot_catalog import (CatalogError, allowed_fields, get_snapshot,
                                   list_snapshots, list_workstreams,
@@ -349,15 +350,18 @@ def executive_summary(
     extra = _cross_filter(cross_field, cross_value)
     if compare_mode not in COMPARE_MODES:
         raise HTTPException(status_code=400, detail=f"compare_mode must be one of {COMPARE_MODES}")
-    return build_executive_summary(
+    lenses = _lens_selection(lens)
+    key = ("home", org_id, days, compare, compare_mode, repr(extra), tuple(sorted(ctx.workstreams or [])),
+           repr(sorted((lenses or {}).items())))
+    return cached(key, lambda: build_executive_summary(
         days,
         compare=compare,
         compare_mode=compare_mode,
         extra_filters=extra,
         allowed_workstreams=ctx.workstreams,
-        lenses=_lens_selection(lens),
+        lenses=lenses,
         organization_id=org_id,
-    )
+    ))
 
 
 @router.get("/workstream-summary/{workstream_id}")
@@ -376,14 +380,15 @@ def workstream_summary(
     extra = _cross_filter(cross_field, cross_value)
     if compare_mode not in COMPARE_MODES:
         raise HTTPException(status_code=400, detail=f"compare_mode must be one of {COMPARE_MODES}")
-    result = build_workstream_summary(
-        workstream_id,
-        days,
-        compare=compare,
-        compare_mode=compare_mode,
-        extra_filters=extra,
-        organization_id=org_id,
-    )
+    result = cached(("workstream", org_id, workstream_id, days, compare, compare_mode, repr(extra)),
+                    lambda: build_workstream_summary(
+                        workstream_id,
+                        days,
+                        compare=compare,
+                        compare_mode=compare_mode,
+                        extra_filters=extra,
+                        organization_id=org_id,
+                    ))
     if result.get("error"):
         raise HTTPException(status_code=404, detail=result["error"])
     return result
