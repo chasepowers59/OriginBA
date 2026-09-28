@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { askAssistant, fetchAssistantSpend, fetchAssistantStatus, fetchIntegrity } from "@/lib/api";
-import { STARTER_QUESTIONS, WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, spendLabel, summarise, threadFor, type Turn } from "@/lib/assistant";
+import { askAssistant, fetchAssistantSpend, fetchAssistantStatus, fetchIntegrity, runAnalyticsNlq } from "@/lib/api";
+import { formatCurrency, formatNumber } from "@/lib/format";
+import { STARTER_QUESTIONS, WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, spendLabel, summarise, threadFor, tryGovernedFirst, type Turn } from "@/lib/assistant";
 import { useAuth } from "@/components/AuthProvider";
 import { contextLabel, getPageContext, loadTurns, saveTurns, subscribePageContext } from "@/lib/assistantContext";
 import { DatabaseResultChart } from "@/components/DatabaseResultChart";
-import type { AssistantQuery, AssistantResponse, AssistantSpend, AssistantStatus, IntegrityOverview } from "@/lib/types";
+import type { NlqResponse, AssistantQuery, AssistantResponse, AssistantSpend, AssistantStatus, IntegrityOverview } from "@/lib/types";
 import { parseAnswer, parseInline, type Inline } from "@/lib/answerMarkdown";
 
 /**
@@ -47,11 +48,26 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
     endRef.current?.scrollIntoView({ block: "nearest" });
   }, [turns, busy]);
 
-  const send = async (raw: string) => {
+  const send = async (raw: string, { assistantOnly = false } = {}) => {
     const q = raw.trim();
     if (!q || busy) return;
     setBusy(true);
     setQuestion("");
+    const aboutThePage = Boolean(page && usePage);
+    if (!assistantOnly && tryGovernedFirst(q, aboutThePage)) {
+      // A vetted metric answers at no token cost; anything it does not match (a 404) or
+      // cannot run falls through to the assistant.
+      try {
+        const result = await runAnalyticsNlq(q);
+        if (result.metric_id && result.table?.rows?.length) {
+          setTurns((t) => [...t, { role: "user", text: q }, { role: "governed", question: q, result }]);
+          setBusy(false);
+          return;
+        }
+      } catch {
+        /* no governed metric for this question */
+      }
+    }
     try {
       const context = page && usePage
         ? { canvas_id: page.canvas_id, period: page.period, filters: page.filters }
@@ -125,6 +141,12 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
                     </button>
                   ) : null}
                 </div>
+              ) : t.role === "governed" ? (
+                <GovernedAnswer
+                  result={t.result}
+                  onAskAssistant={() => void send(t.question, { assistantOnly: true })}
+                  busy={busy}
+                />
               ) : (
                 <Answer response={t.response} />
               )}
@@ -281,6 +303,47 @@ function QueryResult({ q }: { q: AssistantQuery }) {
           ) : null}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+/** A question the vetted metrics answered: the same definition the dashboards use, no tokens. */
+function GovernedAnswer({ result, onAskAssistant, busy }: {
+  result: NlqResponse;
+  onAskAssistant: () => void;
+  busy: boolean;
+}) {
+  const money = result.format === "currency";
+  const rows = result.table?.rows ?? [];
+  return (
+    <div className="rounded-2xl rounded-bl-sm border border-edge-subtle bg-surface-subtle px-4 py-3 text-sm text-heading">
+      <p className="text-xs font-semibold uppercase tracking-widest text-heading-accent">
+        {result.metric_label ?? "Governed metric"}
+      </p>
+      <p className="mt-1">{result.narrative}</p>
+      {rows.length ? (
+        <table className="mt-3 min-w-full text-left text-xs">
+          <thead>
+            <tr>
+              {(result.table?.columns ?? ["", ""]).map((c) => <th key={c} className="px-2 py-1 text-fg-muted">{c}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.slice(0, 15).map((r) => (
+              <tr key={r.label} className="border-t border-edge-subtle">
+                <td className="px-2 py-1">{r.label}</td>
+                <td className="px-2 py-1 text-right tabular-nums">{money ? formatCurrency(r.value) : formatNumber(r.value)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : null}
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-fg-muted">
+        <span>Answered from the vetted metric the dashboards use.</span>
+        <button type="button" className="btn-ghost text-xs" onClick={onAskAssistant} disabled={busy}>
+          Ask the assistant instead
+        </button>
+      </div>
     </div>
   );
 }

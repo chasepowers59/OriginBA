@@ -5,12 +5,22 @@
 import { formatCellValue, isIdentifierColumn } from "@/lib/format";
 import { measureIsCurrency } from "@/lib/businessLabels";
 import { suggestChart, type ChartSuggestion } from "@/lib/databaseChartUtils";
-import type { AssistantSpend, CanvasIntegrity, AssistantMessage, AssistantResponse, IntegrityOverview } from "@/lib/types";
+import type { NlqResponse, AssistantSpend, CanvasIntegrity, AssistantMessage, AssistantResponse, IntegrityOverview } from "@/lib/types";
 
 export type Turn =
   | { role: "user"; text: string }
   | { role: "assistant"; response: AssistantResponse }
+  | { role: "governed"; question: string; result: NlqResponse }
   | { role: "error"; text: string };
+
+/**
+ * Whether a question tries the governed metrics before the model. A vetted metric answers
+ * "how much / how many" at no token cost with the definition the dashboards use; a
+ * why-question needs reasoning, and a question about the page on screen needs its context.
+ */
+export function tryGovernedFirst(question: string, aboutThePage: boolean): boolean {
+  return !aboutThePage && !/^\s*(why|explain|what caused|how come)\b/i.test(question);
+}
 
 /** The SQL workspace handoff: one key, the last query the reader chose to open. */
 export const WORKSPACE_SQL_KEY = "portal.assistant.sql";

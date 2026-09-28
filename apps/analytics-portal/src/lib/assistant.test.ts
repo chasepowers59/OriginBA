@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { STARTER_QUESTIONS, ageLabel, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, spendLabel, summarise, threadFor, type Turn } from "./assistant";
+import { STARTER_QUESTIONS, ageLabel, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, spendLabel, tryGovernedFirst, summarise, threadFor, type Turn } from "./assistant";
 import type { AssistantResponse, CanvasIntegrity, IntegrityOverview } from "./types";
 
 const answer = (thread: unknown[] = []): AssistantResponse => ({
@@ -131,5 +131,25 @@ describe("starter questions", () => {
   it("offers a few, each a real question", () => {
     expect(STARTER_QUESTIONS.length).toBeGreaterThanOrEqual(3);
     for (const s of STARTER_QUESTIONS) expect(s.trim().endsWith("?")).toBe(true);
+  });
+});
+
+describe("vetted metrics answer first", () => {
+  it("tries the governed metrics for a plain what/how-much question", () => {
+    expect(tryGovernedFirst("How much was billed by bill cycle in the last 90 days?", false)).toBe(true);
+  });
+
+  it("goes straight to the assistant for a why-question or one about the page on screen", () => {
+    expect(tryGovernedFirst("Why did billing drop in May?", false)).toBe(false);
+    expect(tryGovernedFirst("How much was billed?", true)).toBe(false);
+  });
+
+  it("a governed answer is not part of the model's thread", () => {
+    const turns: Turn[] = [
+      { role: "user", text: "q1" }, { role: "assistant", response: answer([{ role: "user", content: "q1" }]) },
+      { role: "user", text: "q2" },
+      { role: "governed", question: "q2", result: { narrative: "n", metric_label: "Billed revenue" } },
+    ];
+    expect(threadFor(turns)).toEqual([{ role: "user", content: "q1" }]);
   });
 });
