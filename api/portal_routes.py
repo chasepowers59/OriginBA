@@ -26,6 +26,7 @@ from api.saved_dashboards import (
     list_dashboards,
     update_dashboard,
 )
+from api.ownership import VISIBILITIES, can_edit, for_caller, require_edit, stamp, visible
 from api.saved_views import (
     SavedViewError,
     bulk_import_views,
@@ -39,6 +40,8 @@ router = APIRouter(prefix="/portal", tags=["portal"])
 
 
 class SavedViewCreate(BaseModel):
+    # 'organization' (everyone in it) or 'private' (only you): api/ownership.py
+    visibility: str = "organization"
     snapshot_id: str
     snapshot_label: str
     title: str
@@ -82,6 +85,7 @@ class DashboardTile(BaseModel):
 
 
 class DashboardCreate(BaseModel):
+    visibility: str = "organization"
     title: str
     description: str | None = None
     days: int = 30
@@ -89,6 +93,7 @@ class DashboardCreate(BaseModel):
 
 
 class DashboardUpdate(BaseModel):
+    visibility: str | None = None
     title: str | None = None
     description: str | None = None
     days: int | None = None
@@ -135,7 +140,7 @@ def get_saved_views(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, A
     return {
         "client_id": org_id,
         "organization_id": org_id,
-        "views": list_saved_views(org_id),
+        "views": for_caller(list_saved_views(org_id), ctx),
     }
 
 
@@ -146,7 +151,7 @@ def post_saved_view(
 ) -> dict[str, Any]:
     org_id = ctx.require_organization()
     try:
-        entry = create_saved_view(body.model_dump(), organization_id=org_id)
+        entry = create_saved_view(stamp(body.model_dump(), ctx), organization_id=org_id)
     except SavedViewError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return entry
@@ -168,6 +173,7 @@ def remove_saved_view(
     ctx: AuthContext = Depends(require_permission("saved_views:write")),
 ) -> dict[str, Any]:
     org_id = ctx.require_organization()
+    require_edit(next((v for v in list_saved_views(org_id) if v.get("id") == view_id), None), ctx, "Saved view")
     if not delete_saved_view(view_id, organization_id=org_id):
         raise HTTPException(status_code=404, detail="Saved view not found")
     return {"deleted": view_id}
@@ -180,7 +186,7 @@ def get_dashboards(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, An
     return {
         "client_id": org_id,
         "organization_id": org_id,
-        "dashboards": filter_dashboards_for_auth(list_dashboards(org_id), ctx),
+        "dashboards": for_caller(filter_dashboards_for_auth(list_dashboards(org_id), ctx), ctx),
     }
 
 
@@ -192,12 +198,12 @@ def get_dashboard_by_id(
     ctx.require_permission("portal:read")
     org_id = ctx.require_organization()
     board = get_dashboard(dashboard_id, organization_id=org_id)
-    if not board:
+    if not board or not visible(board, ctx):
         raise HTTPException(status_code=404, detail="Dashboard not found")
     scoped = filter_dashboard_for_auth(board, ctx)
     if not scoped:
         raise HTTPException(status_code=403, detail="Access denied for this dashboard")
-    return scoped
+    return {**scoped, "can_edit": can_edit(board, ctx)}
 
 
 @router.post("/dashboards")
@@ -210,7 +216,7 @@ def post_dashboard(
     for tile in payload.get("tiles") or []:
         assert_snapshot_access(ctx, str(tile.get("snapshot_id", "")))
     try:
-        return create_dashboard(payload, organization_id=org_id)
+        return create_dashboard(stamp(payload, ctx), organization_id=org_id)
     except DashboardError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -223,6 +229,9 @@ def put_dashboard(
 ) -> dict[str, Any]:
     org_id = ctx.require_organization()
     patch = body.model_dump(exclude_unset=True)
+    require_edit(get_dashboard(dashboard_id, organization_id=org_id), ctx, "Dashboard")
+    if patch.get("visibility") and patch["visibility"] not in VISIBILITIES:
+        raise HTTPException(status_code=400, detail=f"Visibility must be one of {', '.join(VISIBILITIES)}")
     for tile in patch.get("tiles") or []:
         assert_snapshot_access(ctx, str(tile.get("snapshot_id", "")))
     try:
@@ -237,6 +246,7 @@ def remove_dashboard(
     ctx: AuthContext = Depends(require_permission("dashboards:write")),
 ) -> dict[str, Any]:
     org_id = ctx.require_organization()
+    require_edit(get_dashboard(dashboard_id, organization_id=org_id), ctx, "Dashboard")
     if not delete_dashboard(dashboard_id, organization_id=org_id):
         raise HTTPException(status_code=404, detail="Dashboard not found")
     return {"deleted": dashboard_id}

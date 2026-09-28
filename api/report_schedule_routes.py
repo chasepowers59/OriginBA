@@ -15,6 +15,7 @@ from pydantic import BaseModel
 from api.auth.dependencies import AuthContext, get_auth_context
 from api.notifications import send_message, smtp_configured
 from api.org_db import require_org_for_data
+from api.ownership import visible
 from api.saved_views import list_saved_views
 from api import report_schedules as rs
 
@@ -35,8 +36,30 @@ class ScheduleCreateRequest(BaseModel):
 def get_schedules(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     ctx.require_permission("portal:read")
     org_id = require_org_for_data(ctx)
-    return {"schedules": rs.list_schedules(org_id),
+    # A schedule follows its view: a private view's schedules are listed only for its owner.
+    # A schedule whose view was deleted stays listed, so it can be removed.
+    return {"schedules": [{**s, "can_edit": _can_edit(s, ctx)} for s in rs.list_schedules(org_id)
+                          if _may_see(rs._find_view(s.get("saved_view_id", ""), org_id), ctx)],
             "smtp_configured": smtp_configured()}
+
+
+def _may_see(view: dict[str, Any] | None, ctx: AuthContext) -> bool:
+    return view is None or visible(view, ctx)
+
+
+def _can_edit(schedule: dict[str, Any], ctx: AuthContext) -> bool:
+    return ctx.role == "admin" or not schedule.get("created_by") or schedule["created_by"] == ctx.email
+
+
+def _own_schedule(schedule_id: str, org_id: str, ctx: AuthContext) -> dict[str, Any]:
+    """The schedule, if this person may act on it: 404 unseen, 403 not theirs."""
+    schedule = next((s for s in rs.list_schedules(org_id) if s["id"] == schedule_id), None)
+    if schedule is None or not _may_see(rs._find_view(schedule["saved_view_id"], org_id), ctx):
+        raise HTTPException(status_code=404, detail="Unknown schedule")
+    if not _can_edit(schedule, ctx):
+        raise HTTPException(status_code=403, detail=f"Only the schedule's creator ({schedule.get('created_by')}) "
+                                                    "or an administrator can change it")
+    return schedule
 
 
 @router.post("")
@@ -46,6 +69,9 @@ def create_schedule(
 ) -> dict[str, Any]:
     ctx.require_permission("saved_views:write")
     org_id = require_org_for_data(ctx)
+    view = rs._find_view(body.saved_view_id, org_id)
+    if view is None or not visible(view, ctx):
+        raise HTTPException(status_code=404, detail="Unknown saved view for this organization")
     try:
         return rs.create_schedule(body.model_dump(), organization_id=org_id,
                                   created_by=ctx.email)
@@ -60,6 +86,7 @@ def delete_schedule(
 ) -> dict[str, Any]:
     ctx.require_permission("saved_views:write")
     org_id = require_org_for_data(ctx)
+    _own_schedule(schedule_id, org_id, ctx)
     if not rs.delete_schedule(schedule_id, org_id):
         raise HTTPException(status_code=404, detail="Unknown schedule")
     return {"deleted": schedule_id}
@@ -73,9 +100,7 @@ def run_now(
     """Render and send ONE schedule immediately — proof the pipe works."""
     ctx.require_permission("saved_views:write")
     org_id = require_org_for_data(ctx)
-    schedule = next((s for s in rs.list_schedules(org_id) if s["id"] == schedule_id), None)
-    if schedule is None:
-        raise HTTPException(status_code=404, detail="Unknown schedule")
+    schedule = _own_schedule(schedule_id, org_id, ctx)
     if not smtp_configured():
         raise HTTPException(status_code=503, detail="SMTP is not configured on the API")
     view = next((v for v in list_saved_views(org_id)

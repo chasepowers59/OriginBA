@@ -6,12 +6,15 @@ import { loadSavedViews, removeViewRemote } from "@/lib/savedViews";
 import type { SavedFavorite } from "@/lib/favorites";
 import { ScheduleDialog } from "@/components/ScheduleDialog";
 import { NotesDialog } from "@/components/NotesDialog";
+import { useAuth } from "@/components/AuthProvider";
+import { ownershipLabel } from "@/lib/ownership";
 
 export function FavoritesPanel({ compact }: { compact?: boolean }) {
   const [favorites, setFavorites] = useState<SavedFavorite[]>([]);
   const [loading, setLoading] = useState(true);
   const [scheduling, setScheduling] = useState<SavedFavorite | null>(null);
   const [noting, setNoting] = useState<SavedFavorite | null>(null);
+  const { user } = useAuth();
 
   const refresh = () => {
     loadSavedViews()
@@ -60,7 +63,10 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
               className="min-w-0 flex-1 text-sm text-heading hover:text-primary"
             >
               <span className="block truncate font-medium">{fav.title}</span>
-              <span className="block truncate text-xs text-fg-muted">{fav.snapshotLabel}</span>
+              <span className="block truncate text-xs text-fg-muted">
+                {fav.snapshotLabel}
+                {ownershipLabel(fav, user?.email) ? ` · ${ownershipLabel(fav, user?.email)}` : ""}
+              </span>
             </Link>
             <button
               type="button"
@@ -78,17 +84,19 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
             >
               Schedule
             </button>
-            <button
-              type="button"
-              onClick={async () => {
-                await removeViewRemote(fav.id);
-                refresh();
-              }}
-              className="shrink-0 text-xs text-fg-muted hover:text-over dark:hover:text-over"
-              title="Remove saved view"
-            >
-              Remove
-            </button>
+            {fav.canEdit !== false ? (
+              <button
+                type="button"
+                onClick={async () => {
+                  await removeViewRemote(fav.id);
+                  refresh();
+                }}
+                className="shrink-0 text-xs text-fg-muted hover:text-over dark:hover:text-over"
+                title="Remove saved view"
+              >
+                Remove
+              </button>
+            ) : null}
           </li>
         ))}
       </ul>

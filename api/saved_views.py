@@ -89,10 +89,16 @@ def create_saved_view(payload: dict[str, Any], *, organization_id: str) -> dict[
         "date_end": payload.get("date_end"),
         "scope_field": payload.get("scope_field"),
         "scope_value": payload.get("scope_value"),
+        "owner_id": payload.get("owner_id"),
+        "owner_email": payload.get("owner_email"),
+        "visibility": payload.get("visibility") or "organization",
         "saved_at": datetime.now(timezone.utc).isoformat(),
     }
 
-    same = lambda v: v.get("snapshot_id") == entry["snapshot_id"] and v.get("title") == entry["title"]  # noqa: E731
+    # Re-saving YOUR view (same canvas, title and owner) replaces it; a colleague's view
+    # with the same title is theirs and is left alone.
+    same = lambda v: (v.get("snapshot_id") == entry["snapshot_id"] and v.get("title") == entry["title"]  # noqa: E731
+                      and v.get("owner_id") == entry["owner_id"])
     if _pss.enabled():
         # re-saving a view (same canvas and title) replaces it; a new one needs room
         existing = _pss.list_records(_COLLECTION, organization_id)

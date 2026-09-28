@@ -454,6 +454,11 @@ export type SavedView = {
   date_end?: string | null;
   scope_field?: string | null;
   scope_value?: string | null;
+  /** 'organization' or 'private' (api/ownership.py); absent on views saved before owners. */
+  visibility?: import("./ownership").Visibility;
+  owner_email?: string | null;
+  /** Whether the caller may change or delete it, as the API decided. */
+  can_edit?: boolean;
   saved_at: string;
 };
 
@@ -511,6 +516,9 @@ export type SavedDashboard = {
   description?: string;
   days: number;
   tiles: DashboardTileDef[];
+  visibility?: import("./ownership").Visibility;
+  owner_email?: string | null;
+  can_edit?: boolean;
   created_at: string;
   updated_at: string;
 };

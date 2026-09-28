@@ -36,6 +36,7 @@ import { GlobalFilterBar } from "./GlobalFilterBar";
 import { ResultsPanel } from "./ResultsPanel";
 import { ScopeFilterSelect } from "./ScopeFilterSelect";
 import { SnapshotDataModelPanel } from "./SnapshotDataModelPanel";
+import { VisibilityToggle } from "./VisibilityToggle";
 
 type DatePreset =
   | { kind: "days"; label: string; days: number }
@@ -91,6 +92,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const [dateEnd, setDateEnd] = useState("");
   const [activePreset, setActivePreset] = useState("Last 6 months");
   const [allDates, setAllDates] = useState(false);
+  const [privateOnly, setPrivateOnly] = useState(false);
   // The opening window the page fell back from, said beside "All dates" so the reader knows why.
   const [fellBackFrom, setFellBackFrom] = useState<string | null>(null);
   const firstRun = useRef(true);
@@ -441,11 +443,12 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     dateEnd,
     scopeField: scopeField || undefined,
     scopeValue: scopeValue || undefined,
+    visibility: (privateOnly ? "private" : "organization") as "private" | "organization",
   });
 
   const handleSaveFavorite = async () => {
     await saveViewRemote(viewPayload());
-    setSavedMsg("Saved to workspace");
+    setSavedMsg(privateOnly ? "Saved for you only" : "Saved to workspace");
     window.setTimeout(() => setSavedMsg(null), 2500);
   };
 
@@ -639,6 +642,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
 
         {result ? (
           <div className="space-y-2">
+            <VisibilityToggle privateOnly={privateOnly} onChange={setPrivateOnly} />
             <button type="button" onClick={() => void handleSaveFavorite()} className="btn-ghost w-full">
               Save view
             </button>

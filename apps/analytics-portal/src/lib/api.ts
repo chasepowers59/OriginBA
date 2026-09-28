@@ -366,13 +366,15 @@ export function createDashboard(body: {
   description?: string;
   days?: number;
   tiles: DashboardTileDef[];
+  visibility?: "organization" | "private";
 }): Promise<SavedDashboard> {
   return fetchJson("/portal/dashboards", { method: "POST", body: JSON.stringify(body) });
 }
 
 export function updateDashboard(
   id: string,
-  body: Partial<{ title: string; description: string; days: number; tiles: DashboardTileDef[] }>,
+  body: Partial<{ title: string; description: string; days: number; tiles: DashboardTileDef[];
+    visibility: "organization" | "private" }>,
 ): Promise<SavedDashboard> {
   return fetchJson(`/portal/dashboards/${id}`, { method: "PUT", body: JSON.stringify(body) });
 }

@@ -11,8 +11,11 @@ import { deleteDashboard, fetchDashboards } from "@/lib/api";
 import { tileSummary } from "@/lib/dashboardCard";
 import { formatTimeBucket } from "@/lib/timeBucketLabel";
 import type { SavedDashboard } from "@/lib/types";
+import { useAuth } from "@/components/AuthProvider";
+import { ownershipLabel } from "@/lib/ownership";
 
 export function DashboardListPage() {
+  const { user } = useAuth();
   const [boards, setBoards] = useState<SavedDashboard[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Two-step delete: a board is somebody's saved work, so the first click asks.
@@ -100,10 +103,14 @@ export function DashboardListPage() {
                     {b.tiles?.length ?? 0} tile{(b.tiles?.length ?? 0) === 1 ? "" : "s"} · last{" "}
                     {b.days} days
                     {b.updated_at ? ` · updated ${formatTimeBucket(b.updated_at, "day")}` : ""}
+                    {ownershipLabel({ visibility: b.visibility, ownerEmail: b.owner_email }, user?.email)
+                      ? ` · ${ownershipLabel({ visibility: b.visibility, ownerEmail: b.owner_email }, user?.email)}` : ""}
                   </p>
                 </Link>
                 <div className="mt-3 flex justify-end border-t border-edge-subtle pt-2">
-                  {confirming === b.id ? (
+                  {b.can_edit === false ? (
+                    <span className="px-2 py-1 text-xs text-fg-subtle">View only</span>
+                  ) : confirming === b.id ? (
                     <div className="flex items-center gap-2 text-xs">
                       <span className="text-fg-muted">Delete this dashboard?</span>
                       <button

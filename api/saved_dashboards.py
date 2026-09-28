@@ -105,6 +105,9 @@ def create_dashboard(payload: dict[str, Any], *, organization_id: str) -> dict[s
         "description": payload.get("description") or "",
         "days": int(payload.get("days") or 30),
         "tiles": tiles,
+        "owner_id": payload.get("owner_id"),
+        "owner_email": payload.get("owner_email"),
+        "visibility": payload.get("visibility") or "organization",
         "created_at": now,
         "updated_at": now,
     }
@@ -132,6 +135,8 @@ def _apply_update(found: dict[str, Any], payload: dict[str, Any]) -> dict[str, A
         found["days"] = int(payload["days"])
     if "tiles" in payload:
         found["tiles"] = _validate_tiles(list(payload["tiles"] or []))
+    if payload.get("visibility"):
+        found["visibility"] = payload["visibility"]
     found["updated_at"] = datetime.now(timezone.utc).isoformat()
     return found
 

@@ -27,6 +27,7 @@ import { PresentationToolbar } from "./PresentationToolbar";
 import { NotesDialog } from "./NotesDialog";
 import { CrossFilterBanner } from "@/components/CrossFilterBanner";
 import { ALL_SLOTS, MAX_TILES, visibleSlots } from "@/lib/dashboardSlots";
+import { VisibilityToggle } from "./VisibilityToggle";
 
 const SLOTS = ALL_SLOTS;
 
@@ -51,6 +52,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
   const [snapshots, setSnapshots] = useState<SnapshotSummary[]>([]);
   const [board, setBoard] = useState<SavedDashboard | null>(null);
   const [title, setTitle] = useState("My dashboard");
+  const [privateOnly, setPrivateOnly] = useState(false);
   const [days, setDays] = useState(30);
   const [tiles, setTiles] = useState<DashboardTileDef[]>([]);
   const [editSlot, setEditSlot] = useState<number | null>(null);
@@ -76,6 +78,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       setBoard(d);
       setTitle(d.title);
       setDays(d.days);
+      setPrivateOnly(d.visibility === "private");
       setTiles(d.tiles.length ? d.tiles : [emptyTile(0)]);
       setBoardLoaded(true);
     });
@@ -148,10 +151,11 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     setSaveError(null);
     try {
       if (board?.id) {
-        const updated = await updateDashboard(board.id, { title, days, tiles });
+        const updated = await updateDashboard(board.id, { title, days, tiles,
+          visibility: privateOnly ? "private" : "organization" });
         setBoard(updated);
       } else {
-        const created = await createDashboard({ title, days, tiles });
+        const created = await createDashboard({ title, days, tiles, visibility: privateOnly ? "private" : "organization" });
         setBoard(created);
         window.history.replaceState(null, "", `/dashboards/${created.id}`);
       }
@@ -221,9 +225,18 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
             </button>
           ) : null}
           <PresentationToolbar title={title} exportSections={exportSections} />
-          <button type="button" onClick={() => void save()} disabled={saving} className="btn-primary">
-            {saving ? "Saving…" : "Save dashboard"}
-          </button>
+          {board?.can_edit === false ? (
+            <span className="self-center text-xs text-fg-muted">
+              View only · owned by {board.owner_email}
+            </span>
+          ) : (
+            <>
+              <VisibilityToggle privateOnly={privateOnly} onChange={setPrivateOnly} />
+              <button type="button" onClick={() => void save()} disabled={saving} className="btn-primary">
+                {saving ? "Saving…" : "Save dashboard"}
+              </button>
+            </>
+          )}
         </div>
       </div>
 

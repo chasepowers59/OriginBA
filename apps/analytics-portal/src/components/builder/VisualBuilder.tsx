@@ -41,6 +41,7 @@ import { shelfDimensions } from "@/lib/builderShelves";
 import { BuilderChart, type ChartSeries } from "./BuilderChart";
 import { QuestionGallery } from "./QuestionGallery";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
+import { VisibilityToggle } from "@/components/VisibilityToggle";
 
 type ColItem = { field: string; label: string; kind: "dim" | "time"; grain?: string };
 type ValItem = { field: string; label: string; agg: string; trusted: boolean };
@@ -312,6 +313,7 @@ export function VisualBuilder({
     }
   }, [index, questions, initialCanvas, initialReport, applyQuestion, loadCanvas]);
 
+  const [privateOnly, setPrivateOnly] = useState(false);
   const saveView = useCallback(async () => {
     if (!meta) return;
     const measures = vals.length ? vals.map((v) => ({ field: v.field, agg: v.agg })) : [{ field: "*", agg: "count" }];
@@ -331,14 +333,15 @@ export function VisualBuilder({
         // whole canvas: different numbers, and nothing said why.
         filters: activeFilters(fils),
         chart_type: visual,
+        visibility: privateOnly ? "private" : "organization",
       });
-      setSaved("Saved — find it under Saved views on Home");
+      setSaved(`Saved${privateOnly ? " for you only" : ""} — find it under Saved views on Home`);
       setTimeout(() => setSaved(null), 3500);
     } catch (err) {
       setSaved(`Save failed: ${err instanceof Error && err.message ? err.message : "try again"}`);
       setTimeout(() => setSaved(null), 3500);
     }
-  }, [meta, snapshotId, cols, vals, fils, visual, series]);
+  }, [meta, snapshotId, cols, vals, fils, visual, series, privateOnly]);
 
   const grouped = useMemo(() => {
     const g = new Map<string, SnapshotSummary[]>();
@@ -471,6 +474,7 @@ export function VisualBuilder({
                       </span>
                     ) : null}
                     <AppliedWindowNote result={result} />
+                    <VisibilityToggle privateOnly={privateOnly} onChange={setPrivateOnly} />
                     <button type="button" onClick={saveView} className="btn-ghost text-xs" disabled={!result}>
                       Save view
                     </button>

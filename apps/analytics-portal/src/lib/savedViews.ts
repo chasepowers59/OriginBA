@@ -27,6 +27,9 @@ export function savedViewToFavorite(view: SavedView): SavedFavorite {
     dateEnd: view.date_end ?? undefined,
     scopeField: view.scope_field ?? undefined,
     scopeValue: view.scope_value ?? undefined,
+    visibility: view.visibility ?? "organization",
+    ownerEmail: view.owner_email ?? null,
+    canEdit: view.can_edit ?? true,
     savedAt: view.saved_at,
   };
 }
@@ -49,6 +52,7 @@ export function favoriteToSavedViewPayload(
     date_end: favorite.dateEnd ?? null,
     scope_field: favorite.scopeField ?? null,
     scope_value: favorite.scopeValue ?? null,
+    visibility: favorite.visibility ?? "organization",
   };
 }
 
