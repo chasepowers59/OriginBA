@@ -52,6 +52,7 @@ type ResultsPanelProps = {
     drillFilter?: { field: string; value: string } | null;
   };
   onWidenPeriod?: () => void;
+  onShowAllDates?: () => void;
 };
 
 export function ResultsPanel({
@@ -77,6 +78,7 @@ export function ResultsPanel({
   sortTimeSeries,
   emptyContext,
   onWidenPeriod,
+  onShowAllDates,
 }: ResultsPanelProps) {
   const brand = useBrand();
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -151,8 +153,13 @@ export function ResultsPanel({
           field.
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-2">
+          {onShowAllDates ? (
+            <button type="button" onClick={onShowAllDates} className="btn-primary text-xs">
+              Show all dates
+            </button>
+          ) : null}
           {onWidenPeriod ? (
-            <button type="button" onClick={onWidenPeriod} className="btn-primary text-xs">
+            <button type="button" onClick={onWidenPeriod} className={`${onShowAllDates ? "btn-ghost" : "btn-primary"} text-xs`}>
               Widen date range
             </button>
           ) : null}

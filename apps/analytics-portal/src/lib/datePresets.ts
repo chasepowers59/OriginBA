@@ -50,3 +50,25 @@ export function estimatePeriodDays(start: string, end: string): number {
   const b = new Date(end);
   return Math.max(1, Math.round((b.getTime() - a.getTime()) / 86400000));
 }
+
+export const ALL_DATES = "All dates";
+
+/** The explorer's date filter: none when the reader chose all dates or the canvas has no date. */
+export function windowFilter(
+  dateField: string | null | undefined,
+  allDates: boolean,
+  start: string,
+  end: string,
+): { field: string; op: "between"; value: [string, string] }[] {
+  return dateField && !allDates ? [{ field: dateField, op: "between", value: [start, end] }] : [];
+}
+
+/**
+ * Whether the page should drop its opening window. A canvas dated by an effective date
+ * (rate versions, configuration) can hold every row outside any recent window; the
+ * reader should land on the data, told why, not on "No data". Only the first run: a
+ * window the reader picked themselves is theirs to widen.
+ */
+export function fallBackToAllDates(r: { rowCount: number; windowed: boolean; firstRun: boolean }): boolean {
+  return r.firstRun && r.windowed && r.rowCount === 0;
+}

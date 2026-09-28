@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   defaultDateRange,
@@ -17,7 +17,15 @@ import {
 } from "@/lib/businessLabels";
 import { getFavorite } from "@/lib/favorites";
 import { getViewRemote, saveViewRemote } from "@/lib/savedViews";
-import { anchoredLabel, applyDatePresetConfig, estimatePeriodDays, widenDateRange } from "@/lib/datePresets";
+import {
+  ALL_DATES,
+  anchoredLabel,
+  applyDatePresetConfig,
+  estimatePeriodDays,
+  fallBackToAllDates,
+  widenDateRange,
+  windowFilter,
+} from "@/lib/datePresets";
 import { applyProcessGuide } from "@/lib/processGuide";
 import { resolveDateField } from "@/lib/tileDateField";
 import { PinMenu } from "@/components/PinMenu";
@@ -81,6 +89,10 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const [dateStart, setDateStart] = useState("");
   const [dateEnd, setDateEnd] = useState("");
   const [activePreset, setActivePreset] = useState("Last 6 months");
+  const [allDates, setAllDates] = useState(false);
+  // The opening window the page fell back from, said beside "All dates" so the reader knows why.
+  const [fellBackFrom, setFellBackFrom] = useState<string | null>(null);
+  const firstRun = useRef(true);
   const [scopeField, setScopeField] = useState(scopeFilters[0]?.field ?? "");
   const [scopeValue, setScopeValue] = useState("");
   const [chartType, setChartType] = useState<"bar" | "line" | "pie" | "horizontal" | "table">("bar");
@@ -150,7 +162,15 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     setDateStart(range[0]);
     setDateEnd(range[1]);
     setActivePreset(preset.label);
+    setAllDates(false);
+    setFellBackFrom(null);
   }, [metadata.data_as_of]);
+
+  const showAllDates = useCallback(() => {
+    setAllDates(true);
+    setActivePreset(ALL_DATES);
+    setFellBackFrom(null);
+  }, []);
 
   const buildFilters = useCallback(
     (extra: PremadeReport["filters"] = []) => {
@@ -161,9 +181,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       // correct: a transaction window means nothing on a dimension table.
       const dateField = resolveDateField(metadata);
       const filters: PremadeReport["filters"] = [
-        ...(dateField
-          ? [{ field: dateField, op: "between" as const, value: [dateStart, dateEnd] }]
-          : []),
+        ...windowFilter(dateField, allDates, dateStart, dateEnd),
         ...extra,
       ];
       if (scopeField && scopeValue) {
@@ -174,7 +192,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       }
       return filters;
     },
-    [metadata, dateStart, dateEnd, scopeField, scopeValue, drillFilter],
+    [metadata, allDates, dateStart, dateEnd, scopeField, scopeValue, drillFilter],
   );
 
   const runPremade = useCallback(
@@ -196,6 +214,19 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           time_dimensions: [],
           limit: 500,
         });
+        const fallBack = fallBackToAllDates({
+          rowCount: response.row_count,
+          windowed: Boolean(resolveDateField(metadata)) && !allDates,
+          firstRun: firstRun.current,
+        });
+        firstRun.current = false;
+        if (fallBack) {
+          // Re-run without the window (the auto-run effect follows allDates).
+          setFellBackFrom(activePreset);
+          setActivePreset(ALL_DATES);
+          setAllDates(true);
+          return;
+        }
         setResult(response);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unable to run this report");
@@ -204,7 +235,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         setLoading(false);
       }
     },
-    [metadata.id, buildFilters],
+    [metadata, allDates, activePreset, buildFilters],
   );
 
   useEffect(() => {
@@ -216,6 +247,9 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     setDateStart(range[0]);
     setDateEnd(range[1]);
     setActivePreset(label);
+    setAllDates(false);
+    setFellBackFrom(null);
+    firstRun.current = true;
     setActiveReportId(null);
     setActiveReportTitle(null);
     setMeasureField(defaultMeasure.field);
@@ -276,6 +310,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       if (fav.dateStart) setDateStart(fav.dateStart);
       if (fav.dateEnd) setDateEnd(fav.dateEnd);
       if (fav.datePreset) setActivePreset(fav.datePreset);
+      setAllDates(fav.datePreset === ALL_DATES);
       if (fav.scopeField) setScopeField(fav.scopeField);
       if (fav.scopeValue) setScopeValue(fav.scopeValue);
       if (fav.chartType) setChartType(fav.chartType);
@@ -305,7 +340,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       premadeReports.find((r) => r.id === activeReportId) ?? premadeReports[0];
     if (!report) return;
     runPremade(report);
-  }, [dateStart, dateEnd, scopeField, scopeValue, drillFilter, metadata.id, tab]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [allDates, dateStart, dateEnd, scopeField, scopeValue, drillFilter, metadata.id, tab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeReport = premadeReports.find((r) => r.id === activeReportId) ?? null;
 
@@ -333,7 +368,9 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     syncCrossFilterUrl(null);
   };
 
-  const periodLabel = anchoredLabel(activePreset, metadata.data_as_of);
+  const periodLabel = allDates
+    ? fellBackFrom ? `${ALL_DATES} (nothing in ${anchoredLabel(fellBackFrom, metadata.data_as_of).toLowerCase()})` : ALL_DATES
+    : anchoredLabel(activePreset, metadata.data_as_of);
 
   const handleWidenPeriod = () => {
     const currentDays = estimatePeriodDays(dateStart, dateEnd);
@@ -341,6 +378,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     setDateStart(wider.range[0]);
     setDateEnd(wider.range[1]);
     setActivePreset(wider.label);
+    setAllDates(false);
   };
 
   const dimensionKey = drillDimension || dimensions[0] || "";
@@ -423,7 +461,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       {tab !== "model" ? (
         <GlobalFilterBar
           periodLabel={periodLabel}
-          dateRange={[dateStart, dateEnd]}
+          dateRange={allDates ? undefined : [dateStart, dateEnd]}
           scopeLabel={scopeLabel && scopeValue ? `${scopeLabel}: ${scopeValue}` : null}
           drillFilter={drillFilter}
           onClearDrill={clearDrill}
@@ -509,6 +547,15 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 {p.label}
               </button>
             ))}
+            {dateFieldLabel ? (
+              <button
+                type="button"
+                onClick={showAllDates}
+                className={`chip ${allDates ? "chip-active" : ""}`}
+              >
+                {ALL_DATES}
+              </button>
+            ) : null}
           </div>
           <div className="grid grid-cols-2 gap-2">
             <label className="block text-xs text-fg-muted">
@@ -519,6 +566,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 onChange={(e) => {
                   setDateStart(e.target.value);
                   setActivePreset("Custom range");
+                  setAllDates(false);
                 }}
                 className="input-modern mt-1"
               />
@@ -531,6 +579,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 onChange={(e) => {
                   setDateEnd(e.target.value);
                   setActivePreset("Custom range");
+                  setAllDates(false);
                 }}
                 className="input-modern mt-1"
               />
@@ -627,18 +676,19 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             measureAgg={measureAgg}
             periodLabel={periodLabel}
             scopeLabel={scopeLabel ? `${scopeLabel}: ${scopeValue}` : undefined}
-            dateRange={[dateStart, dateEnd]}
+            dateRange={allDates ? undefined : [dateStart, dateEnd]}
             drillFilter={drillFilter}
             onDrillSelect={drillDimension ? handleDrill : undefined}
             onClearDrill={clearDrill}
             sortTimeSeries={false}
             emptyContext={{
               periodLabel,
-              dateRange: [dateStart, dateEnd],
+              dateRange: allDates ? undefined : [dateStart, dateEnd],
               scopeLabel: scopeLabel ? `${scopeLabel}: ${scopeValue}` : undefined,
               drillFilter,
             }}
             onWidenPeriod={handleWidenPeriod}
+            onShowAllDates={allDates || !dateFieldLabel ? undefined : showAllDates}
           />
         )}
       </main>

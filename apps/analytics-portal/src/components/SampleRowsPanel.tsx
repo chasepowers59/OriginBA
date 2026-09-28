@@ -23,10 +23,12 @@ export function SampleRowsPanel({
 }) {
   const [data, setData] = useState<SampleRowsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState(true);
+  // Closed until asked for: open, three rows of every field pushed the page's reports
+  // below the fold, and the rows cost a warehouse query on every visit.
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
-    if (skipSampleRows) return;
+    if (skipSampleRows || !expanded) return;
     setData(null);
     setError(null);
     fetchSnapshotSampleRows(snapshotId, 3)
@@ -34,7 +36,7 @@ export function SampleRowsPanel({
       .catch((err) =>
         setError(err instanceof Error ? err.message : "Unable to load sample rows"),
       );
-  }, [snapshotId, skipSampleRows]);
+  }, [snapshotId, skipSampleRows, expanded]);
 
   if (skipSampleRows) return null;
 
@@ -43,6 +45,7 @@ export function SampleRowsPanel({
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
         className="flex w-full items-center justify-between px-5 py-4 text-left"
       >
         <div>

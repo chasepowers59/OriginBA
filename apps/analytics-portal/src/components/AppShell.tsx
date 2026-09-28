@@ -71,10 +71,10 @@ export function AppShell({
           that used to crowd the bar (workstream counts, role, org, sign out) lives in
           the user menu, so the bar itself stays one clean row at every width. */}
       <header ref={headerRef} className="portal-header no-print sticky top-0 z-50">
-        <div className="mx-auto flex h-16 max-w-[1700px] items-center gap-4 px-6 2xl:px-10">
+        <div className="mx-auto flex h-16 max-w-[1700px] items-center gap-2 px-4 sm:gap-4 sm:px-6 2xl:px-10">
           <div className="flex min-w-0 items-center gap-3">
-            <Link href="/" className="group flex shrink-0 items-center">
-              <BrandMark className="h-7 w-auto" />
+            <Link href="/" aria-label="Origin home" className="group flex shrink-0 items-center">
+              <BrandMark className="h-6 w-auto sm:h-7" />
             </Link>
             <span aria-hidden className="hidden h-6 w-px bg-edge-subtle sm:block" />
             <div className="hidden min-w-0 sm:block">
@@ -104,7 +104,7 @@ export function AppShell({
             })}
           </nav>
 
-          <div className="ml-auto flex shrink-0 items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
             {/* Mobile nav: below md the top nav is hidden, so this menu is the ONLY
                 route to the app's surfaces on a phone. */}
             <details className="relative md:hidden">
@@ -133,7 +133,7 @@ export function AppShell({
             {can("data_source:manage") ? (
               <Link
                 href="/settings"
-                className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium text-fg-muted transition hover:bg-chip"
+                className="hidden items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium text-fg-muted transition hover:bg-chip sm:flex"
                 title={dbConfigured ? `${brand.connection_label} — database connection settings` : "Connect database"}
               >
                 <span

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { defaultDateRange, defaultDateRangeLastMonth, defaultDateRangeYtd } from "./api";
-import { anchoredLabel, applyDatePresetConfig, widenDateRange } from "./datePresets";
+import { anchoredLabel, applyDatePresetConfig, fallBackToAllDates, widenDateRange, windowFilter } from "./datePresets";
 
 // A frozen copy declares where its data ends (Ellensburg TEST: 18 Jun 2026). The explorer's
 // presets were computed from the browser's today, so "Last 6 months" there read mostly the
@@ -38,5 +38,26 @@ describe("anchored date ranges", () => {
 
   it("widening keeps the anchor", () => {
     expect(widenDateRange(90, asOf).range).toEqual(["2025-12-20", "2026-06-18"]);
+  });
+});
+
+describe("all dates", () => {
+  it("sends no window when the reader chose all dates", () => {
+    expect(windowFilter("Bill Date", true, "2026-01-01", "2026-06-18")).toEqual([]);
+  });
+
+  it("sends the window otherwise, and none on a canvas with no date", () => {
+    expect(windowFilter("Bill Date", false, "2026-01-01", "2026-06-18"))
+      .toEqual([{ field: "Bill Date", op: "between", value: ["2026-01-01", "2026-06-18"] }]);
+    expect(windowFilter(null, false, "2026-01-01", "2026-06-18")).toEqual([]);
+  });
+
+  // Rate Configuration dates each row by when its rate version took effect -- 2010 on
+  // the demo org -- so a 180-day window showed "No data for this view" over 305 rows.
+  it("falls back to all dates once, when the opening window is empty", () => {
+    expect(fallBackToAllDates({ rowCount: 0, windowed: true, firstRun: true })).toBe(true);
+    expect(fallBackToAllDates({ rowCount: 0, windowed: true, firstRun: false })).toBe(false);
+    expect(fallBackToAllDates({ rowCount: 12, windowed: true, firstRun: true })).toBe(false);
+    expect(fallBackToAllDates({ rowCount: 0, windowed: false, firstRun: true })).toBe(false);
   });
 });
