@@ -157,7 +157,7 @@ class EnforcementTests(unittest.TestCase):
 class ScheduleTests(unittest.TestCase):
     """A schedule runs at 06:00 with nobody signed in; it keeps its creator's rules."""
 
-    def test_a_schedule_keeps_and_applies_its_creators_rules(self):
+    def test_a_schedule_runs_with_its_creators_rules(self):
         from api import report_schedules as rs
         with tempfile.TemporaryDirectory() as tmp, \
              mock.patch.object(rs, "SCHEDULES_PATH", Path(tmp) / "s.json"), \
@@ -172,7 +172,10 @@ class ScheduleTests(unittest.TestCase):
             return "select 1", {}
         with mock.patch("api.snapshot_catalog.snapshot_backend", return_value=("postgres", "postgres", "reporting")), \
              mock.patch("api.query_builder.build_query", side_effect=build), \
-             mock.patch("api.warehouse_db.execute_query", return_value=(["m0"], [])):
+             mock.patch("api.warehouse_db.execute_query", return_value=(["m0"], [])), \
+             mock.patch.object(rsec, "auth_disabled", return_value=False), \
+             mock.patch.object(rsec, "_user_record",
+                               return_value={"is_active": True, "role": "editor", "row_rules": list(WATER)}):
             rs.render_schedule({**s, "window_days": 30}, {"snapshot_id": "rpt_bill_segment"})
         self.assertIn({"field": "Service Type", "op": "in", "value": ["Water"]}, seen["filters"])
 
@@ -234,4 +237,47 @@ class ListingsAndMetricsTests(unittest.TestCase):
             with self.assertRaises(HTTPException) as err:
                 kr.create_alert(kr.AlertCreateRequest(kpi_id="billed_revenue", condition="above", threshold=1,
                                                       recipients=["a@utility.gov"]), ctx=_ctx(WATER))
+        self.assertEqual(err.exception.status_code, 403)
+
+
+class CreatorsCurrentAccessTests(unittest.TestCase):
+    """A schedule or embed runs with its creator's CURRENT access, not a snapshot of it:
+    restricting or deactivating someone later must reach what they set up (security
+    review, 2026-09-28: high)."""
+
+    def _rules(self, record, stored=()):
+        with mock.patch.object(rsec, "auth_disabled", return_value=False), \
+             mock.patch.object(rsec, "_user_record", return_value=record):
+            return rsec.creator_rules("u1@utility.gov", stored)
+
+    def test_rules_added_later_apply(self):
+        self.assertEqual(self._rules({"is_active": True, "role": "editor", "row_rules": list(WATER)}), WATER)
+
+    def test_rules_lifted_later_are_lifted(self):
+        self.assertEqual(self._rules({"is_active": True, "role": "editor", "row_rules": []}, stored=WATER), ())
+
+    def test_a_deactivated_or_removed_creator_stops_it(self):
+        for record in ({"is_active": False, "role": "editor", "row_rules": []}, None):
+            with self.assertRaises(rsec.RowAccessDenied):
+                self._rules(record)
+
+    def test_with_sign_in_switched_off_the_stored_rules_are_used(self):
+        with mock.patch.object(rsec, "auth_disabled", return_value=True):
+            self.assertEqual(rsec.creator_rules("dev@origin.local", WATER), WATER)
+
+
+class ScheduleWorkstreamTests(unittest.TestCase):
+    """A person granted only some workstreams cannot schedule (and so mail themselves) a view
+    on a canvas outside them (security review, 2026-09-28: high)."""
+
+    def test_scheduling_a_view_outside_ones_workstreams_is_refused(self):
+        from api import report_schedule_routes as rr
+        billing_only = AuthContext(id="u2", email="u2@utility.gov", display_name="u2", role="editor", client_id="dev",
+                                   organization_id="dev", organization_name="Dev", permissions=set(PERMS),
+                                   workstreams=["billing"])
+        view = {"id": "v", "title": "t", "snapshot_id": "rpt_sa_aged_balance", "visibility": "organization"}
+        with mock.patch.object(rr, "require_org_for_data", return_value="dev"), \
+             mock.patch.object(rr.rs, "_find_view", return_value=view):
+            with self.assertRaises(HTTPException) as err:
+                rr.create_schedule(rr.ScheduleCreateRequest(saved_view_id="v", recipients=["a@utility.gov"]), ctx=billing_only)
         self.assertEqual(err.exception.status_code, 403)

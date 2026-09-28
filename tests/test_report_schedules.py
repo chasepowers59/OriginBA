@@ -309,7 +309,8 @@ class ScheduleIsFaithfulTests(unittest.TestCase):
              mock.patch.object(rs, "schedule_date_field", return_value="Bill Date"), \
              mock.patch("api.reporting_dates.reporting_window", return_value=("2026-05-20", "2026-06-18")), \
              mock.patch("api.query_builder.build_query", side_effect=build), \
-             mock.patch("api.warehouse_db.execute_query", return_value=(["m0"], [])):
+             mock.patch("api.warehouse_db.execute_query", return_value=(["m0"], [])), \
+             mock.patch.object(rs, "creator_rules", return_value=()):
             rs.render_schedule({"organization_id": "dev", "window_days": 30}, view)
         return seen["filters"]
 

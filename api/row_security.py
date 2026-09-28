@@ -91,3 +91,38 @@ def enforce(ctx: Any, snapshot: dict[str, Any]) -> list[dict[str, Any]]:
         return row_filters(getattr(ctx, "row_rules", ()), snapshot)
     except RowAccessDenied as exc:
         raise HTTPException(status_code=403, detail=str(exc)) from exc
+
+
+def auth_disabled() -> bool:
+    # imported here: the auth package imports this module (clean_rules), so a top-level
+    # import would be circular
+    from api.auth.config import auth_disabled as disabled
+    return disabled()
+
+
+def _user_record(email: str) -> dict[str, Any] | None:
+    """The account's current access, or None when there is no such account."""
+    from sqlalchemy import func, select
+
+    from api.auth.database import get_session_factory
+    from api.auth.models import User
+
+    with get_session_factory()() as session:
+        user = session.scalar(select(User).where(func.lower(User.email) == (email or "").strip().lower()))
+        if user is None:
+            return None
+        import json
+        return {"is_active": user.is_active, "role": user.role,
+                "row_rules": json.loads(user.row_rules_json) if user.row_rules_json else []}
+
+
+def creator_rules(email: str, stored: Iterable[dict[str, Any]] | None) -> tuple:
+    """The row rules a schedule or embed runs with: its creator's CURRENT rules. Restricting
+    or deactivating someone later reaches what they set up; with sign-in switched off (local
+    development) there are no accounts, so the rules stored with it are used."""
+    if auth_disabled():
+        return tuple(stored or ())
+    record = _user_record(email)
+    if record is None or not record["is_active"]:
+        raise RowAccessDenied("The person who set this up no longer has access, so it no longer runs.")
+    return () if record["role"] == "admin" else tuple(record["row_rules"])

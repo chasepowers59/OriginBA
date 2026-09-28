@@ -15,6 +15,7 @@ from pydantic import BaseModel
 from api.auth.dependencies import AuthContext, get_auth_context
 from api.notifications import send_message, smtp_configured
 from api.org_db import require_org_for_data
+from api.auth.workstream_access import assert_snapshot_access
 from api.ownership import visible
 from api.saved_views import list_saved_views
 from api import report_schedules as rs
@@ -72,6 +73,8 @@ def create_schedule(
     view = rs._find_view(body.saved_view_id, org_id)
     if view is None or not visible(view, ctx):
         raise HTTPException(status_code=404, detail="Unknown saved view for this organization")
+    # Workstream grants hold for mail too: nobody schedules a canvas they cannot open.
+    assert_snapshot_access(ctx, str(view.get("snapshot_id", "")))
     try:
         return rs.create_schedule(body.model_dump(), organization_id=org_id,
                                   created_by=ctx.email, row_rules=list(ctx.row_rules))

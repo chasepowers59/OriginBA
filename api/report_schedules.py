@@ -19,7 +19,7 @@ from typing import Any, Callable
 from api.notifications import build_message, clean_recipients, send_message
 from api.org_store import OrgRecordStore
 from api.portal_config import pdf_logo_path
-from api.row_security import row_filters
+from api.row_security import creator_rules, row_filters
 from api.reporting_dates import window_date_field
 from api.saved_views import list_saved_views
 
@@ -173,8 +173,9 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
     # window above -- a schedule that mailed the same fixed dates every week would go stale.
     filters.extend(f for f in view.get("filters") or []
                    if not (date_field and f.get("field") == date_field))
-    # Raises RowAccessDenied (recorded as the run's error) if the canvas lacks a rule's column.
-    filters.extend(row_filters(schedule.get("row_rules") or (), snapshot))
+    # The creator's CURRENT rules (a deactivated creator stops it). Raises RowAccessDenied, recorded
+    # as the run's error, if the creator is gone or the canvas lacks a rule's column.
+    filters.extend(row_filters(creator_rules(schedule.get("created_by", ""), schedule.get("row_rules")), snapshot))
 
     measures = view.get("measures") or [{
         "field": view.get("measure_field") or "*",
