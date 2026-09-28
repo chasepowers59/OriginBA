@@ -369,9 +369,14 @@ def system_prompt(org_id: str, org_name: str, engine: str) -> list[dict[str, Any
     from api.reporting_dates import data_as_of
     as_of = data_as_of(org_id)
     if as_of:   # a frozen copy: every relative window ends where its data ends, and the answer says so
-        window = f"DATE '{as_of}' - 90"
+        # Closed on BOTH ends: the copy holds rows dated after its as-of (Ellensburg bills 1,509 on
+        # 10 July), so ">= start" alone added $601,089.26 to one cycle in the first demo run while
+        # the answer named an end date it never applied (2026-09-28).
+        window = f"BETWEEN DATE '{as_of}' - 90 AND DATE '{as_of}'"
+    window_clause = window if as_of else f">= {window}"
     as_of_note = (f"\n   This organization's data is a copy that runs through {as_of}: \"last N days\" means the N days"
-                  f"\n   ending {as_of}, not today, and every answer names that end date.") if as_of else ""
+                  f"\n   ending {as_of}, not today: bound BOTH ends of every date filter (the copy holds rows dated after"
+                  f"\n   {as_of}), and every answer names that end date.") if as_of else ""
     head = f"""You are the OriginBA analytics assistant for {org_name}, a utility running Oracle C2M.
 You answer questions about their data by reading their reporting canvases and running SQL.
 
@@ -383,7 +388,7 @@ How you work:
    The engine is {'PostgreSQL' if engine == 'postgres' else 'Oracle'}. Always add a row limit.
    Alias every computed column in Title Case, double-quoted ("Segment Count", "Billed Amount"):
    the reader sees these names as the column headers under your answer.
-   A trailing window starts at midnight: "last 90 days" is >= {window} (a whole bill-cycle day
+   A trailing window starts at midnight: "last 90 days" is {window_clause} (a whole bill-cycle day
    can sit on the boundary; SYSDATE - 90 moved a 90-day total by $340K).{as_of_note}
 3. Run it with run_sql. If it is refused, read the reason, fix the statement, run again.
    Canvases hold years of data (a bill-segment canvas can be millions of rows): aggregate in
@@ -391,7 +396,7 @@ How you work:
    unless the question names one, and do not ORDER BY a whole canvas just to show a few rows.
    Prefer one well-aimed query to several; three is usually the most a question needs.
 4. Answer in plain language first: the number or the list, what it covers (which canvas, which
-   date window, which filters), and any caveat from the reference notes (frozen vs unfrozen,
+   date window -- stated as the exact bounds your SQL applied, never recomputed -- which filters), and any caveat from the reference notes (frozen vs unfrozen,
    final vs initial measurements, units, grain).
 5. Say how far the figure can be trusted: call verification_status for each canvas you used and
    state when it was last proven against the client's database (raw CISADM and the snapshot

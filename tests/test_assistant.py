@@ -10,6 +10,7 @@ from __future__ import annotations
 import copy
 import json
 import os
+import tempfile
 import sys
 import unittest
 from pathlib import Path
@@ -322,10 +323,18 @@ class Routes(unittest.TestCase):
         from fastapi.testclient import TestClient
         from api.auth import init_auth_database
         from api.assistant_routes import router
+        from api.auth.database import temporary_engine
+        # A throwaway audit database: the per-minute cap and the spend view read audit rows, and
+        # the shared local one also holds questions asked in a running portal under the same
+        # dev user -- which turned this suite's first request into a 429 (2026-09-28).
+        cls._tmp = tempfile.TemporaryDirectory()
         cls._env = mock.patch.dict(os.environ, {
             "PORTAL_AUTH_DISABLED": "true", "PORTAL_DEV_ORGANIZATION": "dev",
-            "WAREHOUSE_DATABASE_URL": "postgresql://test@localhost/test"})
+            "WAREHOUSE_DATABASE_URL": "postgresql://test@localhost/test",
+            "PORTAL_AUTH_DATABASE_URL": f"sqlite:///{cls._tmp.name}/audit.db"})
         cls._env.start()
+        cls._engine = temporary_engine()
+        cls._engine.__enter__()
         init_auth_database()
         app = FastAPI()
         app.include_router(router)
@@ -333,7 +342,9 @@ class Routes(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        cls._engine.__exit__(None, None, None)
         cls._env.stop()
+        cls._tmp.cleanup()
 
     def test_unconfigured_is_a_503_that_says_what_to_set(self):
         with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": ""}):

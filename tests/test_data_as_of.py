@@ -93,11 +93,14 @@ class TestTheAssistantKnows:
         from api import assistant
         monkeypatch.setattr(assistant, "tool_list_canvases", lambda org_id, engine: [])
         head = assistant.system_prompt("frozen", "Frozen Town", "oracle")[0]["text"]
-        assert "DATE '2026-06-18' - 90" in head and "runs through 2026-06-18" in head
+        # closed on both ends: the copy holds rows after its as-of, and ">= start" alone added
+        # $601,089.26 of July billing to one cycle in the first demo run
+        assert "BETWEEN DATE '2026-06-18' - 90 AND DATE '2026-06-18'" in head
+        assert "bound BOTH ends" in head and "runs through 2026-06-18" in head
         assert "TRUNC(SYSDATE) - 90" not in head
 
     def test_a_live_org_prompt_is_unchanged(self, orgs, monkeypatch):
         from api import assistant
         monkeypatch.setattr(assistant, "tool_list_canvases", lambda org_id, engine: [])
         head = assistant.system_prompt("live", "Live Town", "oracle")[0]["text"]
-        assert "TRUNC(SYSDATE) - 90" in head and "runs through" not in head
+        assert ">= TRUNC(SYSDATE) - 90" in head and "runs through" not in head
