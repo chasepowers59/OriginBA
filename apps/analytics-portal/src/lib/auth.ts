@@ -11,6 +11,8 @@ export type AuthUser = {
   is_active: boolean;
   must_change_password: boolean;
   workstreams: string[];
+  /** Row-level security (api/row_security.py); absent or empty means every row. */
+  row_rules?: import("./rowRules").RowRule[];
   permissions: string[];
   group_ids: string[];
   group_names: string[];

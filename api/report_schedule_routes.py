@@ -74,7 +74,7 @@ def create_schedule(
         raise HTTPException(status_code=404, detail="Unknown saved view for this organization")
     try:
         return rs.create_schedule(body.model_dump(), organization_id=org_id,
-                                  created_by=ctx.email)
+                                  created_by=ctx.email, row_rules=list(ctx.row_rules))
     except rs.ScheduleError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

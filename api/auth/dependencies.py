@@ -32,6 +32,8 @@ class AuthContext:
     # Set ONLY for an admin who has switched tenant in the header control. It is the
     # tenant they are currently looking at, never the tenant they belong to.
     active_organization_id: str | None = None
+    # Row-level security (api/row_security.py): empty means every row of the organization.
+    row_rules: tuple = ()
 
     def has_permission(self, permission: str) -> bool:
         return permission in self.permissions
@@ -164,6 +166,7 @@ def _resolve_auth_context(
         organization_name=public.get("organization_name"),
         permissions=set(public["permissions"]),
         workstreams=public["workstreams"],
+        row_rules=tuple(public.get("row_rules") or ()),
         must_change_password=public["must_change_password"],
         active_organization_id=_resolve_active_organization(
             public["role"], active_organization),

@@ -20,6 +20,7 @@ from api import summary_cache  # noqa: E402
 
 
 class Ctx:
+    row_rules = ()
     workstreams = ["*"]
     email, id = "t@x", "t"
 

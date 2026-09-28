@@ -20,6 +20,7 @@ from api import snapshot_explorer as se  # noqa: E402
 
 
 class Ctx:
+    row_rules = ()
     def require_permission(self, _):
         return None
 

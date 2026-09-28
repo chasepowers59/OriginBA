@@ -25,6 +25,7 @@ def run_snapshot_analytics_nlq(
     metric_id: str | None = None,
     params: dict[str, Any] | None = None,
     organization_id: str,
+    row_rules: tuple | list = (),
 ) -> dict[str, Any] | None:
     # Either backend counts — the metric's snapshot routes to whichever database
     # serves it, exactly like the dashboards.
@@ -39,7 +40,8 @@ def run_snapshot_analytics_nlq(
     if metric and metric.snapshot_id not in _org_snapshot_ids(organization_id):
         return None
     try:
-        result = run_metric_nlq(q, metric_id=metric_id, params=params, organization_id=organization_id)
+        result = run_metric_nlq(q, metric_id=metric_id, params=params, organization_id=organization_id,
+                                row_rules=row_rules)
         if result:
             return result
     except Exception as exc:

@@ -1,6 +1,6 @@
 # Origin BA and JasperSoft: what the portal replaces today
 
-Status as of 2026-09-28, after the crawl-and-refinement pass on `feature/assistant`. It says
+Status as of 2026-09-28, after the parity build-out on `feature/assistant`. It says
 what a utility gets from JasperSoft Server that the Origin BA portal does, partly does, or
 does not do yet, and the order to close the gaps. Evidence is the code; each row names where.
 
@@ -21,15 +21,15 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 | Capability | Status | Where / what is missing |
 | --- | --- | --- |
 | Ad hoc exploration | Yes | Explorer per canvas, visual builder, SQL workspace (read-only, fenced) |
-| Saved views | Yes | Builder definitions (never SQL); refused past 200 per org, never silently deleted |
-| Dashboards | Yes | Up to 8 tiles, cross-filtering, drill to the explorer, 50 per org |
+| Saved views | Yes | Builder definitions (never SQL); owner and 'Only me' / organization visibility; refused past 200 per org, never silently deleted |
+| Dashboards | Yes | Up to 8 tiles, cross-filtering, drill to the explorer, owner and visibility, 50 per org |
 | Scheduled delivery | Partly | Daily, weekly, monthly email of a saved view as **PDF, Excel or CSV**, with its saved filters; missed runs caught up once; Send now. **Needs:** the hourly runner deployed, SMTP configured |
 | Exports | Partly | Excel from explorer and dashboards, CSV from SQL and assistant answers (formula-safe), server-side PDF on schedules. On-screen PDF buttons still use the browser print dialog |
 | Alerts | Partly | Thresholds on the home KPIs, emailed on breach. Not on arbitrary views |
-| Input controls / prompts | Partly | Filters and date presets on every view; no prompted or cascading parameters on open |
+| Input controls / prompts | Yes | Any saved filter can be asked for when the view opens (Report parameters: value lists, date ranges, saved defaults for schedules). Not yet: cascading lists |
 | Formatted, paginated reports (JRXML) | No | Letters and statements live in Jaspersoft and the separate letter-print app |
-| Security | Partly | Roles, workstream grants (the assistant respects them), org isolation, OIDC sign-in, audit log. **No** row-level security within an org, no SAML, no IdP group-to-role mapping |
-| Ownership and sharing | No | Views and dashboards are org-wide; no owner, no private items, no folders |
+| Security | Mostly | Roles, workstream grants, org isolation, **row-level security within an org** (per-user rules on a column, fail-closed; raw SQL, the assistant and data quality refused to restricted users; schedules keep the creator's rules), OIDC sign-in, audit log. **No** SAML, no IdP group-to-role mapping |
+| Ownership and sharing | Yes | Owner on every view, dashboard and schedule; private items; only owner or admin edits. Not yet: folders |
 | Per-client branding | No | One brand for all orgs; the org name is swapped |
 | Embedding / API keys | No | OpenAPI docs are on; no embed SDK, API keys only for `/nlq` |
 | Observability | Partly | Request id on every response, one log line per request, 500s name a reference. No error-reporting service or metrics yet |
@@ -41,20 +41,16 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
    `python -m api.report_schedule_runner` and SMTP settings, schedules and alerts save but
    never send. The Docker image needs `openpyxl` and `reportlab` (already in
    `deploy/requirements-api.txt`).
-2. **Owners and private items** for views and dashboards (M): an owner field, "only me /
-   my organization" sharing, and a folder per workstream.
-3. **Prompted parameters** on saved views (M): mark a filter as "ask when opened", with
-   a value list from the canvas; cascading lists after that.
-4. **Server-side PDF for on-screen exports** (S): reuse the schedule PDF renderer for the
+2. Done 2026-09-28: owners and private items; report parameters; row-level security.
+3. **Server-side PDF for on-screen exports** (S): reuse the schedule PDF renderer for the
    explorer and dashboard PDF buttons, so a PDF looks the same wherever it comes from.
-5. **Row-level security within an org** (L): a per-user filter (division, service type)
-   applied by the query builder to every canvas that carries the column.
-6. **IdP group-to-role mapping, then SAML** (M).
-7. **Pre-aggregated tables** for the heavy ready-to-run reports (see the dbt repo's
+4. **Folders and cascading parameters** (M each).
+5. **IdP group-to-role mapping, then SAML** (M).
+6. **Pre-aggregated tables** for the heavy ready-to-run reports (see the dbt repo's
    `docs/LARGE_CLIENT_SCALE_PLAN.md`).
-8. **Formatted reports** (L): decide whether letters and statements move into the portal
+7. **Formatted reports** (L): decide whether letters and statements move into the portal
    or stay in the letter-print app with the portal linking to them.
-9. **Per-client branding and embedding** (M each), when a client asks.
+8. **Per-client branding and embedding** (M each), when a client asks.
 
 ## Known risks
 

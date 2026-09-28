@@ -9,6 +9,7 @@ import { auditActionLabel } from "@/lib/auditLabels";
 import { groupDeletionWarning } from "@/lib/groupDeletion";
 import { formatDateTime } from "@/lib/format";
 import type { AccessGroup, AuthUser, PortalOrganization } from "@/lib/auth";
+import { RowRulesCell } from "@/components/RowRulesCell";
 import {
   createAccessGroup,
   createPortalUser,
@@ -198,6 +199,7 @@ export function AdminAccessPanel() {
                 <th className="px-3 py-2">Organization</th>
                 <th className="px-3 py-2">Role</th>
                 <th className="px-3 py-2">Groups</th>
+                <th className="px-3 py-2">Rows</th>
                 <th className="px-3 py-2">Status</th>
                 <th className="px-3 py-2">Password</th>
               </tr>
@@ -267,6 +269,9 @@ export function AdminAccessPanel() {
                     <p className="mt-1 text-xs portal-text-subtle">
                       {user.group_ids.length ? `${user.group_ids.length} selected` : "All workstreams"}
                     </p>
+                  </td>
+                  <td className="px-3 py-2">
+                    <RowRulesCell user={user} onSave={(rules) => void runUserUpdate(user.id, { row_rules: rules })} />
                   </td>
                   <td className="px-3 py-2">
                     <button

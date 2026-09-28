@@ -10,6 +10,7 @@ from api.demo_db import demo_configured
 from api.warehouse_db import warehouse_configured
 from api.executive_dashboard import present_card_errors, unavailable_note
 from api.money_rules import MONEY_FILTERS
+from api.row_security import only_readable, rule_filters
 from api.reporting_dates import data_as_of
 from api.kpi_runner import date_windows, execute_kpi_definition
 from api.snapshot_catalog import load_catalog
@@ -276,11 +277,13 @@ def build_workstream_summary(
     compare_mode: str = "prior_period",
     extra_filters: list[dict[str, Any]] | None = None,
     organization_id: str | None = None,
+    row_rules: tuple | list = (),
 ) -> dict[str, Any]:
     catalog = load_catalog()
     labels = catalog.get("workstream_labels", {})
     ws = workstream_id.lower()
-    kpis_def = WORKSTREAM_KPIS.get(ws, [])
+    kpis_def = only_readable(WORKSTREAM_KPIS.get(ws, []), row_rules, organization_id)
+    extra_filters = [*(extra_filters or []), *rule_filters(row_rules)]
 
     (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode, organization_id)
     as_of = data_as_of(organization_id)

@@ -14,6 +14,7 @@ from api.auth.dependencies import AuthContext, get_auth_context
 from api.notifications import smtp_configured
 from api.org_db import require_org_for_data
 from api import kpi_alerts as ka
+from api.row_security import require_unrestricted
 
 router = APIRouter(prefix="/kpi-alerts", tags=["kpi-alerts"])
 
@@ -41,6 +42,8 @@ def create_alert(
     ctx: AuthContext = Depends(get_auth_context),
 ) -> dict[str, Any]:
     ctx.require_permission("saved_views:write")
+    # An alert watches an organization-wide card and emails it: not for part of the data.
+    require_unrestricted(ctx)
     org_id = require_org_for_data(ctx)
     try:
         return ka.create_alert(body.model_dump(), organization_id=org_id,

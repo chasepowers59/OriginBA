@@ -10,8 +10,11 @@ import { ExecutiveDashboard } from "@/components/ExecutiveDashboard";
 import { NlqSearchPanel } from "@/components/NlqSearchPanel";
 import { AssistantPanel } from "@/components/AssistantPanel";
 import { useBrand } from "@/components/PortalThemeProvider";
+import { isRestricted } from "@/lib/rowRules";
+import { useAuth } from "@/components/AuthProvider";
 
 export function HomeDashboard() {
+  const { user } = useAuth();
   const brand = useBrand();
   const [snapshotCount, setSnapshotCount] = useState(0);
   const [workstreamCount, setWorkstreamCount] = useState(0);
@@ -64,9 +67,12 @@ export function HomeDashboard() {
         <ExecutiveDashboard variant="full" initialDays={30} />
       </section>
 
-      <section>
-        <AssistantPanel />
-      </section>
+      {/* The assistant writes its own SQL, which cannot carry a person's row rules. */}
+      {!isRestricted(user) ? (
+        <section>
+          <AssistantPanel />
+        </section>
+      ) : null}
 
       <section>
         <NlqSearchPanel />

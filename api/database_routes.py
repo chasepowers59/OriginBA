@@ -30,6 +30,7 @@ from api.sql_workspace_validator import (
 )
 from api.warehouse_db import execute_query as execute_warehouse_query
 from api.warehouse_db import warehouse_configured
+from api.row_security import require_unrestricted
 
 
 router = APIRouter(prefix="/database", tags=["database"])
@@ -277,6 +278,7 @@ def execute_sql(
     body: SqlExecuteRequest,
     ctx: AuthContext = Depends(require_permission("database:sql")),
 ) -> dict[str, Any]:
+    require_unrestricted(ctx)
     org_id = require_org_for_data(ctx)
     engine = _require_db(org_id)
 

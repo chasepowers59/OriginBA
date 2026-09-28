@@ -28,6 +28,7 @@ from api.executive_dashboard import (WAREHOUSE_NOT_BUILT_NOTE, build_executive_s
                                      is_missing_relation_error)
 from api.kpi_runner import COMPARE_MODES
 from api.summary_cache import cached
+from api.row_security import enforce as enforce_row_rules, readable, require_unrestricted, row_filters
 from api.workstream_dashboard import build_workstream_about, build_workstream_summary
 from api.snapshot_catalog import (CatalogError, allowed_fields, get_snapshot,
                                   list_snapshots, list_workstreams,
@@ -243,6 +244,7 @@ def _require_snapshot_access(ctx: AuthContext, snapshot_id: str) -> dict[str, An
     except CatalogError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     assert_workstream_access(ctx, snapshot["workstream"])
+    enforce_row_rules(ctx, snapshot)   # a canvas without a rule's column is refused
     return snapshot
 
 
@@ -253,6 +255,8 @@ def snapshots_index(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, A
     catalog = load_catalog(organization_id=org_id)
     workstreams = filter_workstreams_for_auth(list_workstreams(org_id), ctx)
     snapshots = filter_snapshots_for_auth(list_snapshots(organization_id=org_id), ctx)
+    if ctx.row_rules:
+        snapshots = [s for s in snapshots if readable(ctx.row_rules, get_snapshot(s["id"], org_id))]
     return {
         "client": org_id or catalog.get("client", "demo"),
         "organization_id": org_id,
@@ -291,7 +295,7 @@ def snapshot_questions(ctx: AuthContext = Depends(get_auth_context)) -> dict[str
         if not meta.get("portal_enabled", True):
             continue
         workstream = meta.get("workstream", "")
-        if not ctx.can_access_workstream(workstream):
+        if not ctx.can_access_workstream(workstream) or not readable(ctx.row_rules, meta):
             continue
         for report in meta.get("premade_reports", []) or []:
             questions.append({
@@ -352,7 +356,7 @@ def executive_summary(
         raise HTTPException(status_code=400, detail=f"compare_mode must be one of {COMPARE_MODES}")
     lenses = _lens_selection(lens)
     key = ("home", org_id, days, compare, compare_mode, repr(extra), tuple(sorted(ctx.workstreams or [])),
-           repr(sorted((lenses or {}).items())))
+           repr(sorted((lenses or {}).items())), repr(ctx.row_rules))
     return cached(key, lambda: build_executive_summary(
         days,
         compare=compare,
@@ -361,6 +365,7 @@ def executive_summary(
         allowed_workstreams=ctx.workstreams,
         lenses=lenses,
         organization_id=org_id,
+        row_rules=ctx.row_rules,
     ))
 
 
@@ -380,7 +385,7 @@ def workstream_summary(
     extra = _cross_filter(cross_field, cross_value)
     if compare_mode not in COMPARE_MODES:
         raise HTTPException(status_code=400, detail=f"compare_mode must be one of {COMPARE_MODES}")
-    result = cached(("workstream", org_id, workstream_id, days, compare, compare_mode, repr(extra)),
+    result = cached(("workstream", org_id, workstream_id, days, compare, compare_mode, repr(extra), repr(ctx.row_rules)),
                     lambda: build_workstream_summary(
                         workstream_id,
                         days,
@@ -388,6 +393,7 @@ def workstream_summary(
                         compare_mode=compare_mode,
                         extra_filters=extra,
                         organization_id=org_id,
+                        row_rules=ctx.row_rules,
                     ))
     if result.get("error"):
         raise HTTPException(status_code=404, detail=result["error"])
@@ -434,13 +440,13 @@ def snapshot_stats(
     ctx.require_permission("snapshots:read")
     org_id = require_org_for_data(ctx)
     snapshot = _require_snapshot_access(ctx, snapshot_id)
-    key = (org_id, snapshot_id)
+    key = (org_id, snapshot_id, repr(ctx.row_rules))
     hit = _STATS_CACHE.get(key)
     if hit and time.monotonic() - hit[0] < STATS_TTL_SECONDS:
         count = hit[1]
     else:
         try:
-            count = _row_count(snapshot, org_id)
+            count = _row_count(snapshot, org_id, ctx.row_rules)
         except Exception as exc:
             raise _query_failure("Stats failed", exc) from exc
         _STATS_CACHE[key] = (time.monotonic(), count)
@@ -462,8 +468,15 @@ _STATS_CACHE: dict[tuple[str, str], tuple[float, int]] = {}
 STATS_TTL_SECONDS = 900
 
 
-def _row_count(snapshot: dict, org_id: str) -> int:
-    backend, _, schema = snapshot_backend(snapshot, org_id)
+def _row_count(snapshot: dict, org_id: str, row_rules: tuple = ()) -> int:
+    backend, dialect, schema = snapshot_backend(snapshot, org_id)
+    if row_rules:
+        # A restricted person's count is of their rows: no table statistics, a filtered count.
+        sql, binds = build_query(table_name=snapshot["table_name"], allowed_fields=allowed_fields(snapshot),
+                                 trusted_measures=set(), dimensions=[], measures=[{"field": "*", "agg": "count"}],
+                                 filters=row_filters(row_rules, snapshot), limit=1, dialect=dialect, schema=schema)
+        _, rows = _run(snapshot, sql, binds, organization_id=org_id, max_rows=1)
+        return int(rows[0][0] or 0) if rows else 0
     if backend != "postgres":
         # The build gathers statistics after every table, so NUM_ROWS is the count as built.
         _, rows = _run(snapshot, "SELECT num_rows FROM all_tables WHERE owner = :owner AND table_name = :t",
@@ -524,8 +537,15 @@ def snapshot_scope_options(
     col = f'"{field}"'
     sql = (f"SELECT DISTINCT {col} AS val FROM {_qualified(snapshot, org_id)} "
            f"WHERE {col} IS NOT NULL ORDER BY 1 FETCH FIRST 100 ROWS ONLY")
+    binds = None
+    if ctx.row_rules:
+        # Only the values in this person's rows: grouped through the query builder, filtered.
+        _, dialect, schema = snapshot_backend(snapshot, org_id)
+        sql, binds = build_query(table_name=snapshot["table_name"], allowed_fields=allowed_fields(snapshot),
+                                 trusted_measures=set(), dimensions=[field], measures=[{"field": "*", "agg": "count"}],
+                                 filters=row_filters(ctx.row_rules, snapshot), limit=100, dialect=dialect, schema=schema)
     try:
-        columns, rows = _run(snapshot, sql, organization_id=org_id, max_rows=100)
+        columns, rows = _run(snapshot, sql, binds, organization_id=org_id, max_rows=100)
     except Exception as exc:
         raise _query_failure("Scope options failed", exc) from exc
 
@@ -552,6 +572,7 @@ def snapshot_sample_rows(
     ctx.require_permission("snapshots:read")
     org_id = require_org_for_data(ctx)
     snapshot = _require_snapshot_access(ctx, snapshot_id)
+    require_unrestricted(ctx)   # the preview is SELECT *, which cannot carry row rules
 
     row_cap = max(1, min(limit, 10))
     # No recency window: the canvases are already scoped to a client's own data and ten
@@ -635,6 +656,7 @@ def snapshot_raw_sql(
 ) -> dict[str, Any]:
     org_id = require_org_for_data(ctx)
     snapshot = _require_snapshot_access(ctx, snapshot_id)
+    require_unrestricted(ctx)
 
     table = snapshot["table_name"].upper()
     try:
@@ -703,6 +725,10 @@ def snapshot_query(
                 "note": (f"No filter was set, so this shows the trailing "
                          f"{DEFAULT_WINDOW_DAYS} days on {label}."),
             }
+
+    # A restricted person's rows only (api/row_security.py). Added after the default window
+    # so it never counts as a filter the caller set.
+    filters = filters + enforce_row_rules(ctx, snapshot)
 
     try:
         # The ORG decides the backend and dialect: the same canvas runs in Postgres for

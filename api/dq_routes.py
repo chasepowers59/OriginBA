@@ -21,6 +21,7 @@ from fastapi import APIRouter, Body, Depends
 from api.auth import AuthContext, get_auth_context
 from api.org_db import require_org_for_data
 from api.warehouse_db import warehouse_configured, warehouse_connection
+from api.row_security import require_unrestricted
 
 ROOT = Path(__file__).resolve().parent.parent
 # Rules resolution order: the sibling originba_dbt checkout is the SOURCE (dev machines),
@@ -108,6 +109,7 @@ def summarise_counts(rules: list[dict[str, Any]]) -> dict[str, int]:
 @router.get("/findings")
 def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     ctx.require_permission("portal:read")
+    require_unrestricted(ctx)   # the rules run their own SQL over whole canvases
     org = require_org_for_data(ctx)
     if not warehouse_configured(org):
         return {"configured": False, "rules": []}

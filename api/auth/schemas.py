@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -46,6 +48,7 @@ class AuthUserPublic(BaseModel):
     is_active: bool
     must_change_password: bool = False
     workstreams: list[str] = Field(default_factory=list)
+    row_rules: list[dict[str, Any]] = Field(default_factory=list)
     permissions: list[str] = Field(default_factory=list)
     group_ids: list[str] = Field(default_factory=list)
     group_names: list[str] = Field(default_factory=list)
@@ -111,3 +114,5 @@ class UserUpdate(BaseModel):
     group_ids: list[str] | None = None
     is_active: bool | None = None
     password: str | None = Field(default=None, min_length=8, max_length=128)
+    # Row-level security: [{field, values}] (api/row_security.py); [] clears it.
+    row_rules: list[dict[str, Any]] | None = None

@@ -26,6 +26,7 @@ from api.saved_dashboards import (
     list_dashboards,
     update_dashboard,
 )
+from api.row_security import only_readable
 from api.ownership import VISIBILITIES, can_edit, for_caller, require_edit, stamp, visible
 from api.saved_views import (
     SavedViewError,
@@ -129,8 +130,15 @@ def report_library(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, An
     ctx.require_permission("report_library:read")
     from api.report_library import get_report_library
 
-    return filter_report_library_for_auth(
-        get_report_library(ctx.effective_organization_id()), ctx)
+    org_id = ctx.effective_organization_id()
+    library = filter_report_library_for_auth(get_report_library(org_id), ctx)
+    if not ctx.row_rules:
+        return library
+    packs = [{**p, "reports": only_readable(p.get("reports") or [], ctx.row_rules, org_id)}
+             for p in library.get("packs") or []]
+    packs = [{**p, "report_count": len(p["reports"])} for p in packs if p["reports"]]
+    return {**library, "packs": packs, "pack_count": len(packs),
+            "report_count": sum(p["report_count"] for p in packs)}
 
 
 @router.get("/saved-views")
@@ -259,7 +267,8 @@ def analytics_nlq_metrics(ctx: AuthContext = Depends(get_auth_context)) -> dict[
 
     # Per-org: only metrics whose snapshot exists in this org's catalog are offered.
     org_id = ctx.effective_organization_id()
-    return {"metrics": filter_nlq_metrics_for_auth(get_nlq_metric_catalog(org_id), ctx)}
+    return {"metrics": only_readable(filter_nlq_metrics_for_auth(get_nlq_metric_catalog(org_id), ctx),
+                                     ctx.row_rules, org_id)}
 
 
 @router.post("/analytics-nlq")
@@ -281,11 +290,15 @@ def analytics_nlq(
     metric = match_nlq_metric(body.query, metric_id=body.metric_id)
     if metric:
         assert_snapshot_access(ctx, str(metric.get("snapshot_id", "")))
+        if ctx.row_rules and not only_readable([metric], ctx.row_rules, org_id):
+            raise HTTPException(status_code=403, detail=f"{metric.get('label') or 'This metric'} reads a report "
+                                                        "that does not carry the column your access is limited by.")
     result = run_snapshot_analytics_nlq(
         body.query,
         metric_id=body.metric_id,
         params=params,
         organization_id=org_id,
+        row_rules=ctx.row_rules,
     )
     if not result:
         raise HTTPException(status_code=404, detail="No matching snapshot analytics pattern for this question")

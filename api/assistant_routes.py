@@ -17,6 +17,7 @@ from api.assistant import (Assistant, assistant_configured, model_name, question
                            spend_today)
 from api.auth.dependencies import AuthContext, get_auth_context
 from api.org_db import require_org_for_data
+from api.row_security import require_unrestricted
 
 router = APIRouter(prefix="/portal/assistant", tags=["assistant"])
 
@@ -44,6 +45,7 @@ def spend(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
 def _assistant_for(ctx: AuthContext) -> Assistant:
     """Checks, limits, and the assistant for this person: shared by the plain and streaming asks."""
     ctx.require_permission("nlq:read")
+    require_unrestricted(ctx)   # the assistant writes its own SQL, which cannot carry row rules
     org_id = require_org_for_data(ctx)
     if not assistant_configured():
         raise HTTPException(status_code=503, detail="The assistant is not configured: set ANTHROPIC_API_KEY.")

@@ -11,6 +11,7 @@ import { roleLabel } from "@/lib/auth";
 import OrgSwitcher from "@/components/OrgSwitcher";
 import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
+import { isRestricted, visibleNav } from "@/lib/rowRules";
 
 // One clean top nav, one job per destination. "/" is the executive Home; Explore is the
 // single self-serve builder; Library is the one report catalog (and hosts the workstream
@@ -87,7 +88,7 @@ export function AppShell({
           </div>
 
           <nav className="hidden flex-1 items-center justify-center gap-0.5 md:flex">
-            {NAV.filter((item) => item.id !== "settings" || can("settings:manage")).map((item) => {
+            {visibleNav(NAV, user).filter((item) => item.id !== "settings" || can("settings:manage")).map((item) => {
               const active = activeNav === item.id || (!activeNav && item.id === "home");
               return (
                 <Link
@@ -116,7 +117,7 @@ export function AppShell({
                 ☰
               </summary>
               <div className="glass-panel absolute right-0 top-full z-50 mt-2 w-56 p-2 shadow-xl">
-                {NAV.filter((item) => item.id !== "settings" || can("settings:manage")).map((item) => (
+                {visibleNav(NAV, user).filter((item) => item.id !== "settings" || can("settings:manage")).map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
@@ -194,7 +195,7 @@ export function AppShell({
       <div className="mx-auto max-w-[1700px] px-6 py-8 2xl:px-10">
         <main className="min-w-0 animate-fade-in">{children}</main>
       </div>
-      {user ? <AssistantDrawer /> : null}
+      {user && !isRestricted(user) ? <AssistantDrawer /> : null}
 
       <footer className="portal-footer no-print mt-8 py-6 text-center text-xs">
         {brand.name} · {brand.footer}

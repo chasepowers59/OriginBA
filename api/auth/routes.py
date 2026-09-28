@@ -321,7 +321,8 @@ def admin_update_user(
             action="user.update",
             target_type="user",
             target_id=user_id,
-            detail=public["email"],
+            # Access changes are recorded as what they became, not just that they happened.
+            detail=public["email"] + (f"; row_rules={public['row_rules']}" if "row_rules" in body.model_fields_set else ""),
         )
         return AuthUserPublic(**public)
     except AuthError as exc:

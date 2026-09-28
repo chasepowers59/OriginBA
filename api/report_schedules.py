@@ -17,6 +17,7 @@ from typing import Any, Callable
 
 from api.notifications import build_message, clean_recipients, send_message
 from api.org_store import OrgRecordStore
+from api.row_security import row_filters
 from api.reporting_dates import window_date_field
 from api.saved_views import list_saved_views
 
@@ -45,7 +46,7 @@ def list_schedules(organization_id: str) -> list[dict[str, Any]]:
 
 
 def create_schedule(payload: dict[str, Any], *, organization_id: str,
-                    created_by: str) -> dict[str, Any]:
+                    created_by: str, row_rules: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     fmt = str(payload.get("format") or "csv").lower()
     if fmt not in FORMATS:
         raise ScheduleError(f"Format must be one of {', '.join(FORMATS)}")
@@ -89,6 +90,8 @@ def create_schedule(payload: dict[str, Any], *, organization_id: str,
         "format": fmt,
         "enabled": True,
         "created_by": created_by,
+        # The creator's row-level security, kept: the run at 06:00 has nobody signed in.
+        "row_rules": list(row_rules or []),
         "created_at": datetime.now(timezone.utc).isoformat(),
         "last_run_at": None,
         "last_status": None,
@@ -168,6 +171,8 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
     # window above -- a schedule that mailed the same fixed dates every week would go stale.
     filters.extend(f for f in view.get("filters") or []
                    if not (date_field and f.get("field") == date_field))
+    # Raises RowAccessDenied (recorded as the run's error) if the canvas lacks a rule's column.
+    filters.extend(row_filters(schedule.get("row_rules") or (), snapshot))
 
     measures = view.get("measures") or [{
         "field": view.get("measure_field") or "*",

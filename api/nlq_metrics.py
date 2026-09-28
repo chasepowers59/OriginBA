@@ -13,6 +13,7 @@ catalog actually carries, so a metric is never offered where it cannot run.
 from __future__ import annotations
 
 from api.money_rules import MONEY_FILTERS
+from api.row_security import rule_filters
 from api.reporting_dates import reporting_today
 
 import re
@@ -211,10 +212,13 @@ def _result(
     return out
 
 
-def _run_metric(metric: NlqMetric, params: dict[str, Any], *, organization_id: str) -> dict[str, Any]:
+def _run_metric(metric: NlqMetric, params: dict[str, Any], *, organization_id: str,
+                row_rules: tuple | list = ()) -> dict[str, Any]:
     if not metric.build:
         raise ValueError(f"Metric {metric.id} has no builder")
     spec = metric.build(params)
+    if row_rules:   # row-level security: the person's rows only (api/row_security.py)
+        spec["query"] = {**spec["query"], "filters": [*(spec["query"].get("filters") or []), *rule_filters(row_rules)]}
     kind = spec.get("kind", "scalar")
     kwargs = {
         "organization_id": organization_id,
@@ -644,6 +648,7 @@ def run_metric_nlq(
     metric_id: str | None = None,
     params: dict[str, Any] | None = None,
     organization_id: str,
+    row_rules: tuple | list = (),
 ) -> dict[str, Any] | None:
     metric = match_metric(question, metric_id)
     if not metric:
@@ -651,4 +656,4 @@ def run_metric_nlq(
     merged = parse_params(question, params)
     if merged.get("days") is None:
         merged["days"] = metric.default_days
-    return _run_metric(metric, merged, organization_id=organization_id)
+    return _run_metric(metric, merged, organization_id=organization_id, row_rules=row_rules)

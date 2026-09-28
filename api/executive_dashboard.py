@@ -12,6 +12,7 @@ from api.demo_db import demo_configured
 from api.warehouse_db import warehouse_configured
 from api.reporting_dates import data_as_of
 from api.kpi_runner import date_windows, execute_kpi_definition, public_lenses, select_lens
+from api.row_security import only_readable, rule_filters
 
 
 EXECUTIVE_KPIS: list[dict[str, Any]] = [
@@ -401,7 +402,10 @@ def build_executive_summary(
     allowed_workstreams: list[str] | None = None,
     lenses: dict[str, str] | None = None,
     organization_id: str | None = None,
+    row_rules: tuple | list = (),
 ) -> dict[str, Any]:
+    # Row-level security: only cards on canvases carrying the rules' columns, each filtered.
+    extra_filters = [*(extra_filters or []), *rule_filters(row_rules)]
     (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode, organization_id)
     as_of = data_as_of(organization_id)
     period_label = f"Last {days} days" if compare_mode != "mom" else "Month to date"
@@ -409,7 +413,7 @@ def build_executive_summary(
         period_label = f"{period_label} to {date.fromisoformat(as_of).strftime('%-d %b %Y')}"
     client_id = organization_id or "demo"
     kpi_defs, catalog_note = available_kpis(
-        _kpis_for_workstreams(allowed_workstreams), organization_id)
+        only_readable(_kpis_for_workstreams(allowed_workstreams), row_rules, organization_id), organization_id)
 
     # The KPI set runs on the canvases from whichever engine serves this org. Either
     # backend being configured is enough -- the runner routes per snapshot and reports

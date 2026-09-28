@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Collection
 from datetime import datetime, timezone
 from typing import Any
@@ -14,6 +15,7 @@ from api.auth.permissions import ROLES, can_assign_role, permissions_for_role
 from api.auth.security import hash_password, verify_password
 from api.organizations import get_organization, is_valid_org_id
 from api.portal_config import load_portal_config
+from api.row_security import clean_rules
 
 
 class AuthError(ValueError):
@@ -147,6 +149,7 @@ def user_to_public(user: User) -> dict[str, Any]:
         "is_active": user.is_active,
         "must_change_password": bool(user.must_change_password),
         "workstreams": workstreams,
+        "row_rules": json.loads(user.row_rules_json) if user.row_rules_json else [],
         "permissions": sorted(permissions_for_role(user.role)),
         "group_ids": [g.id for g in groups],
         "group_names": [g.name for g in groups],
@@ -317,6 +320,14 @@ def update_user(
         user.must_change_password = actor_user_id != user_id
     if payload.get("group_ids") is not None:
         _set_user_groups(session, user, payload["group_ids"])
+    if payload.get("row_rules") is not None:
+        try:
+            rules = clean_rules(payload["row_rules"])
+        except ValueError as exc:
+            raise AuthError(str(exc)) from exc
+        if rules and payload.get("role", user.role) == "admin":
+            raise AuthError("Administrators see every row; row rules apply to users and editors")
+        user.row_rules_json = json.dumps(rules) if rules else None
     if "organization_id" in payload:
         next_role = payload.get("role", user.role)
         user.organization_id = _validate_organization_id(payload.get("organization_id"), next_role)
