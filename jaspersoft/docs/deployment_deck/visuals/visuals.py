@@ -80,7 +80,7 @@ SO_FLOW = {"type": "diagram", "title": "Standard Offering Deployment Flow", "kic
   E("d0","d1"), E("d1","d2"), E("d2","d3"), E("d3","sd3", label="no"), E("d3","d4", label="yes"), E("d4","d5"),
   E("d5","e3", via=[(18.78, 9.2), (17.8, 9.2)], to_side="top"),
   E("e3","c0", from_side="right", to_side="top", via=[(21.5, 10.475), (21.5, 1.85), (13.6, 1.85)])],
- "legend": "Orange diamonds are gates: yes continues, no stops the run and names the rollback. Numbers are the order of one full promotion. The Workstreams tree is never moved; the offering is a curated copy promoted org by org.",
+ "legend": "Blue diamonds are gates: yes continues, no stops the run and names the rollback. Numbers are the order of one full promotion. The Workstreams tree is never moved; the offering is a curated copy promoted org by org.",
  "legend_y": 11.3,
  "layers": {
   "Commands": [
@@ -169,7 +169,7 @@ DB_FLOW = {"type": "diagram", "title": "Database Deployment Flow", "kicker": "V2
   E("wo","m7", from_side="bottom", to_side="top", via=[(17.075, 9.7), (16.31, 9.7)]),
   E("wo","m8", from_side="bottom", to_side="top", via=[(17.075, 9.7), (17.84, 9.7)]),
   E("wc","m9")],
- "legend": "Every box in the map is one database object the domains read: seven rolling snapshot tables, the SA aged-balance table with its lookup seed, and eight CMS views. Numbers are the order of one rollout; orange diamonds are gates: yes continues, no stops the rollout there. The loop under the second row is the twice-daily rolling refresh (3 months rebuilt, 24 kept; 6 months at CityCorp and Odessa).",
+ "legend": "Every box in the map is one database object the domains read: seven rolling snapshot tables, the SA aged-balance table with its lookup seed, and eight CMS views. Numbers are the order of one rollout; blue diamonds are gates: yes continues, no stops the rollout there. The loop under the second row is the twice-daily rolling refresh (3 months rebuilt, 24 kept; 6 months at CityCorp and Odessa).",
  "layers": {
   "Commands": [
    dict(x=0.9, y=3.05, w=2.3, h=0.42, title="prod_snapshot_rollout_25_4.sh <client>  (steps 1 to 8, logged)"),

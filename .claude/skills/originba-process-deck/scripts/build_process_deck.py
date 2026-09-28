@@ -28,8 +28,13 @@ from textfit import fit   # noqa: E402  every label is measured against its box;
 
 HERE = pathlib.Path(__file__).resolve().parent
 TEMPLATE = HERE.parent / "assets" / "origin_blue_template.pptx"
-# the reference deck's palette (theme + slide fills), measured 2026-09-28
-BLUE, CREAM, GREY, ORANGE, TAN, GREEN, WHITE = "0B3D7A", "F5EFE9", "4C5D69", "FFA418", "DBD3CC", "1D6F42", "FFFFFF"
+# the Origin BA app palette (apps/analytics-portal/src/app/globals.css, the Soul tokens), adopted 2026-09-28 at
+# Chase's word: no oranges, no DV-deck colours. Page = the app's dark background; cards = its light muted surface;
+# one accent = the sapphire primary with white text on it; teal for secondary headers; group outlines = the dark
+# theme's heading accent.
+PAGE, PAGE_FG, PAGE_MUTED = "0B1723", "E6ECF2", "A4ACB4"
+CARD, CARD_TITLE, CARD_BODY, CHIP = "F2F5F8", "004B86", "56636E", "FFFFFF"
+ACCENT, ON_ACCENT, ACCENT_SOFT, TEAL, GROUP_LINE, BAD = "006FAC", "FFFFFF", "28A0EE", "1C7884", "8ACAD4", "8B1515"
 FOOTER = "@2026, Origin Utility, Inc / Proprietary & Confidential / Internal Use Only"
 # the process grid of the reference: 4 columns of 4.30" nodes at 5.36" pitch, rows 2.0" apart
 GRID_X0, GRID_PITCH_X, NODE_W, NODE_H = 0.81, 5.36, 4.30, 1.55
@@ -68,24 +73,31 @@ def _box(slide, x, y, w, h, fill, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.12
     return s
 
 
+def _ground(slide):
+    """The app's dark page behind every slide: covers the template's gradient art, sits behind the placeholders."""
+    r = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(22.0), Inches(12.375))
+    r.fill.solid(); r.fill.fore_color.rgb = rgb(PAGE); r.line.fill.background(); r.shadow.inherit = False
+    tree = slide.shapes._spTree; tree.remove(r._element); tree.insert(2, r._element)
+
+
 def _title(slide, text, y=0.42, size=60):
     t = slide.shapes.add_textbox(Inches(0.81), Inches(y), Inches(20.4), Inches(1.05))
-    _text(t, [[(text, size if len(text) <= 40 else 46, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+    _text(t, [[(text, size if len(text) <= 40 else 46, PAGE_FG, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
 
 
 def _footer(slide, text):
     t = slide.shapes.add_textbox(Inches(5.52), Inches(11.71), Inches(10.95), Inches(0.5))
-    _text(t, [[(text, 10.5, CREAM, True)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.TOP, margin=0.0)
+    _text(t, [[(text, 10.5, PAGE_FG, True)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.TOP, margin=0.0)
 
 
 def _kicker(slide, label):
     if not label:
         return
-    b = _box(slide, 0.81, 1.55, 0.6, 0.5, ORANGE, radius=0.3)
-    _text(b, [[(label, 16, BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.0)
+    b = _box(slide, 0.81, 1.55, 0.6, 0.5, ACCENT, radius=0.3)
+    _text(b, [[(label, 16, ON_ACCENT, True)]], align=PP_ALIGN.CENTER, margin=0.0)
 
 
-def _arrow_segments(slide, pts, color=CREAM, width_pt=2.75):
+def _arrow_segments(slide, pts, color=PAGE_FG, width_pt=2.75):
     """Polyline of straight connectors, arrowhead on the last segment."""
     for i in range(len(pts) - 1):
         (x1, y1), (x2, y2) = pts[i], pts[i + 1]
@@ -107,37 +119,37 @@ def _draw_node(slide, n):
     title, body = n.get("title", ""), n.get("body", "")
     if kind == "accent":
         ph = n.get("h", 0.62 if len(title) <= 40 else 0.9)
-        b = _box(slide, x, y, w, ph, ORANGE, radius=0.5)
-        _text(b, [[(title, 17, BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.1)
+        b = _box(slide, x, y, w, ph, ACCENT, radius=0.5)
+        _text(b, [[(title, 17, ON_ACCENT, True)]], align=PP_ALIGN.CENTER, margin=0.1)
     elif kind == "card":
         h = n.get("h", 2.9); w = n.get("w", 2.28)
-        _box(slide, x, y, w, h, WHITE, radius=0.08)
-        _box(slide, x, y, w, 0.36, GREEN, shape=MSO_SHAPE.ROUND_2_SAME_RECTANGLE, radius=0.3)
+        _box(slide, x, y, w, h, CHIP, radius=0.08)
+        _box(slide, x, y, w, 0.36, TEAL, shape=MSO_SHAPE.ROUND_2_SAME_RECTANGLE, radius=0.3)
         grid = slide.shapes.add_table(3, 4, Inches(x + 0.14), Inches(y + 0.5), Inches(w - 0.28), Inches(0.96)).table
         for r in grid.rows:
             r.height = Inches(0.32)
             for c in r.cells:
-                c.fill.solid(); c.fill.fore_color.rgb = rgb(WHITE); c.text = ""
+                c.fill.solid(); c.fill.fore_color.rgb = rgb(CHIP); c.text = ""
         lbl = slide.shapes.add_textbox(Inches(x + 0.06), Inches(y + 1.6), Inches(w - 0.12), Inches(h - 1.7))
-        _text(lbl, [[(title, 17, BLUE, True)]] + ([[(body, 12, GREY, False)]] if body else []), align=PP_ALIGN.CENTER, margin=0.05)
+        _text(lbl, [[(title, 17, CARD_TITLE, True)]] + ([[(body, 12, CARD_BODY, False)]] if body else []), align=PP_ALIGN.CENTER, margin=0.05)
     elif kind == "note":
         t = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
-        _text(t, [[(title, 16, CREAM, True)]] + ([[(body, 14, CREAM, False)]] if body else []), anchor=MSO_ANCHOR.TOP, margin=0.0)
+        _text(t, [[(title, 16, PAGE_FG, True)]] + ([[(body, 14, PAGE_FG, False)]] if body else []), anchor=MSO_ANCHOR.TOP, margin=0.0)
     else:
-        b = _box(slide, x, y, w, h, CREAM)
-        paras = [[(title, 25 if len(title) < 22 else 21, BLUE, True)]]
+        b = _box(slide, x, y, w, h, CARD)
+        paras = [[(title, 25 if len(title) < 22 else 21, CARD_TITLE, True)]]
         if body:
-            paras.append([(body, 20 if len(body) < 60 else 16, GREY, False)])
+            paras.append([(body, 20 if len(body) < 60 else 16, CARD_BODY, False)])
         _text(b, paras)
         if kind == "manual":   # same container as every other node; the orange tag carries the meaning
             _tag(slide, x + w - 0.1, y - 0.42, n.get("tag", "by hand"))
 
 
 def _tag(slide, right, y, label):
-    """A small orange pill anchored by its right edge: by hand, failure, waits, human."""
+    """A small accent pill anchored by its right edge: by hand, failure, waits, human."""
     w = 0.3 + 0.1 * len(label)
-    b = _box(slide, right - w, y, w, 0.34, ORANGE, radius=0.5)
-    _text(b, [[(label, 11, BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.04)
+    b = _box(slide, right - w, y, w, 0.34, ACCENT, radius=0.5)
+    _text(b, [[(label, 11, ON_ACCENT, True)]], align=PP_ALIGN.CENTER, margin=0.04)
     return b
 
 
@@ -175,6 +187,7 @@ def _edge(slide, nodes, a, b, via=None):
 
 def slide_process(prs, s, footer):
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     nodes = {n["id"]: n for n in s.get("nodes", [])}
     for n in s.get("nodes", []):
@@ -186,21 +199,21 @@ def slide_process(prs, s, footer):
             _edge(sl, nodes, e[0], e[1])
     if s.get("proofs"):   # a strip of white pills: what the stage proves before it counts as done
         t = sl.shapes.add_textbox(Inches(0.81), Inches(9.35), Inches(3.0), Inches(0.5))
-        _text(t, [[("Proofs", 16, CREAM, True)]], margin=0.0)
+        _text(t, [[("Proofs", 16, PAGE_FG, True)]], margin=0.0)
         px = 2.4
         for p in s["proofs"]:
             w = 0.25 + 0.115 * len(p)
-            _chip(sl, px, 9.3, w, 0.55, p, fill=WHITE, size=14); px += w + 0.25
+            _chip(sl, px, 9.3, w, 0.55, p, fill=CHIP, size=14); px += w + 0.25
     if s.get("missing"):   # the by-hand counterpart of proofs: a strip of tan pills, what the old way never had
         t = sl.shapes.add_textbox(Inches(0.81), Inches(9.35), Inches(3.0), Inches(0.5))
-        _text(t, [[("Missing", 16, CREAM, True)]], margin=0.0)
+        _text(t, [[("Missing", 16, PAGE_FG, True)]], margin=0.0)
         px = 2.4
         for p in s["missing"]:
             w = 0.25 + 0.115 * len(p)
-            _chip(sl, px, 9.3, w, 0.55, p, fill=WHITE, size=14); px += w + 0.25
+            _chip(sl, px, 9.3, w, 0.55, p, fill=CHIP, size=14); px += w + 0.25
     if s.get("legend"):
         t = sl.shapes.add_textbox(Inches(0.81), Inches(10.75), Inches(20), Inches(0.6))
-        _text(t, [[(s["legend"], 14, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+        _text(t, [[(s["legend"], 14, PAGE_FG, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
     if s.get("notes"):
         sl.notes_slide.notes_text_frame.text = s["notes"]
     return sl
@@ -208,28 +221,31 @@ def slide_process(prs, s, footer):
 
 def slide_roadmap(prs, s, footer):
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     steps = s["steps"]; n = len(steps); pitch = 4.15 if n <= 5 else (20.4 / n); w = min(3.79, pitch - 0.36)
     for i, st in enumerate(steps):
         x = 0.81 + i * pitch; current = st.get("current", False)
-        b = _box(sl, x, 6.67, w, 3.1, ORANGE if current else CREAM, radius=0.1)
-        paras = [[(st["title"], 24, BLUE, True)]]
+        b = _box(sl, x, 6.67, w, 3.1, ACCENT if current else CARD, radius=0.1)
+        tc = ON_ACCENT if current else CARD_TITLE
+        paras = [[(st["title"], 24, tc, True)]]
         if st.get("owner"):
-            paras.append([(st["owner"], 18, BLUE if current else GREY, False)])
+            paras.append([(st["owner"], 18, tc if current else CARD_BODY, False)])
         if st.get("body"):
-            paras.append([(st["body"], 18, BLUE if current else GREY, False)])
+            paras.append([(st["body"], 18, tc if current else CARD_BODY, False)])
         _text(b, paras, anchor=MSO_ANCHOR.TOP)
         c = sl.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x + w / 2 - 0.45), Inches(5.32), Inches(0.9), Inches(0.9))
-        c.fill.solid(); c.fill.fore_color.rgb = rgb(CREAM if current else ORANGE); c.line.fill.background(); c.shadow.inherit = False
-        _text(c, [[(str(i + 1), 24, BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.0)
+        c.fill.solid(); c.fill.fore_color.rgb = rgb(CHIP if current else ACCENT); c.line.fill.background(); c.shadow.inherit = False
+        _text(c, [[(str(i + 1), 24, CARD_TITLE if current else ON_ACCENT, True)]], align=PP_ALIGN.CENTER, margin=0.0)
     if s.get("intro"):
         t = sl.shapes.add_textbox(Inches(0.81), Inches(2.3), Inches(20), Inches(2.6))
-        _text(t, [[(s["intro"], 24, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+        _text(t, [[(s["intro"], 24, PAGE_FG, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
     return sl
 
 
 def slide_cards(prs, s, footer):
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     cards = s["cards"]; cols = s.get("cols", 3 if len(cards) > 4 else min(len(cards), 4)); rows = -(-len(cards) // cols)
     w = (20.4 - (cols - 1) * 0.5) / cols
@@ -241,30 +257,32 @@ def slide_cards(prs, s, footer):
     top = 2.0 + max(0.0, (8.9 - rows * h - (rows - 1) * 0.5) / 2)   # the block sits centred in the body, not stranded at the top
     for i, c in enumerate(cards):
         x = 0.81 + (i % cols) * (w + 0.5); y = top + (i // cols) * (h + 0.5)
-        b = _box(sl, x, y, w, h, ORANGE if c.get("accent") else CREAM, radius=0.08)
-        paras = []
+        b = _box(sl, x, y, w, h, ACCENT if c.get("accent") else CARD, radius=0.08)
+        paras = []; tc = ON_ACCENT if c.get("accent") else CARD_TITLE
         if c.get("stat"):
-            paras += [[(c["stat"], 60, BLUE, True)], [(c.get("stat_label", ""), 18, GREY, False)]]
-        paras += [[(c["heading"], 30, BLUE, True)]] + [[(line, 22, BLUE if c.get("accent") else GREY, False)] for line in c.get("lines", [])]
+            paras += [[(c["stat"], 60, tc, True)], [(c.get("stat_label", ""), 18, tc if c.get("accent") else CARD_BODY, False)]]
+        paras += [[(c["heading"], 30, tc, True)]] + [[(line, 22, tc if c.get("accent") else CARD_BODY, False)] for line in c.get("lines", [])]
         _text(b, paras, anchor=MSO_ANCHOR.TOP, margin=0.35)
     return sl
 
 
 def slide_bullets(prs, s, footer):
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     cols = s["columns"]; w = (20.4 - (len(cols) - 1) * 0.5) / len(cols)
     h = min(8.9, 1.6 + 1.05 * max(len(c["items"]) for c in cols))   # sized to the longest column
     for i, c in enumerate(cols):
         x = 0.81 + i * (w + 0.5)
-        b = _box(sl, x, 2.0, w, h, CREAM, radius=0.08)
-        paras = [[(c["heading"], 30, BLUE, True)]] + [[("•  " + it, 21, GREY, False)] for it in c["items"]]
+        b = _box(sl, x, 2.0, w, h, CARD, radius=0.08)
+        paras = [[(c["heading"], 30, CARD_TITLE, True)]] + [[("•  " + it, 21, CARD_BODY, False)] for it in c["items"]]
         _text(b, paras, anchor=MSO_ANCHOR.TOP, margin=0.35)
     return sl
 
 
 def slide_table(prs, s, footer):
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     cols, rows = s["columns"], s["rows"]
     rh = min(s.get("row_h", 0.85), 8.9 / (len(rows) + 1))   # row_h lets a short, dense table fill the body
@@ -274,12 +292,12 @@ def slide_table(prs, s, footer):
     for j, wd in enumerate(widths):
         tbl.columns[j].width = Inches(wd)
     for j, c in enumerate(cols):
-        cell = tbl.cell(0, j); cell.fill.solid(); cell.fill.fore_color.rgb = rgb(BLUE)
-        cell.text = ""; _text(cell, [[(c, 22, CREAM, True)]], margin=0.15)
+        cell = tbl.cell(0, j); cell.fill.solid(); cell.fill.fore_color.rgb = rgb(ACCENT)
+        cell.text = ""; _text(cell, [[(c, 22, ON_ACCENT, True)]], margin=0.15)
     for i, row in enumerate(rows, start=1):
         for j, v in enumerate(row):
-            cell = tbl.cell(i, j); cell.fill.solid(); cell.fill.fore_color.rgb = rgb(CREAM)
-            cell.text = ""; _text(cell, [[(str(v), s.get("font", 19), GREY if j else BLUE, j == 0)]], margin=0.15)
+            cell = tbl.cell(i, j); cell.fill.solid(); cell.fill.fore_color.rgb = rgb(PAGE_FG)
+            cell.text = ""; _text(cell, [[(str(v), s.get("font", 19), CARD_BODY if j else CARD_TITLE, j == 0)]], margin=0.15)
     for i, r in enumerate(tbl.rows):
         r.height = Inches(min(rh, 0.85) if i == 0 else rh)   # the header never grows with the body rows
     return sl
@@ -287,15 +305,20 @@ def slide_table(prs, s, footer):
 
 def slide_title(prs, s, footer):
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["title"]])
+    _ground(sl)
     ph = sl.placeholders[0]; ph.text = s["title"]
+    for para in ph.text_frame.paragraphs:
+        for run in para.runs:
+            run.font.color.rgb = rgb(PAGE_FG)
     if s.get("subtitle"):
         t = sl.shapes.add_textbox(Inches(4.31), Inches(8.3), Inches(12.68), Inches(1.0))
-        _text(t, [[(s["subtitle"], 24, CREAM, False)]], align=PP_ALIGN.CENTER, margin=0.0)
+        _text(t, [[(s["subtitle"], 24, PAGE_FG, False)]], align=PP_ALIGN.CENTER, margin=0.0)
     return sl
 
 
 def slide_section(prs, s, footer):
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["section"]])
+    _ground(sl)
     sl.placeholders[0].text = s["title"]
     for ph in sl.placeholders:
         if ph.placeholder_format.idx == 10:
@@ -305,14 +328,15 @@ def slide_section(prs, s, footer):
 
 def slide_statement(prs, s, footer):
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"], y=1.2, size=44)
     t = sl.shapes.add_textbox(Inches(0.81), Inches(3.4), Inches(20.4), Inches(7))
-    _text(t, [[(line, 26, CREAM, False)] for line in s["lines"]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+    _text(t, [[(line, 26, PAGE_FG, False)] for line in s["lines"]], anchor=MSO_ANCHOR.TOP, margin=0.0)
     _footer(sl, footer)
     return sl
 
 
-def _chip(slide, x, y, w, h, text, fill=WHITE, color=BLUE, size=16, bold=False):
+def _chip(slide, x, y, w, h, text, fill=CHIP, color=CARD_TITLE, size=16, bold=False):
     b = _box(slide, x, y, w, h, fill, radius=0.35)
     _text(b, [[(text, size, color, bold)]], align=PP_ALIGN.CENTER, margin=0.08)
     return b
@@ -321,15 +345,16 @@ def _chip(slide, x, y, w, h, text, fill=WHITE, color=BLUE, size=16, bold=False):
 def slide_layers(prs, s, footer):
     """Stacked bands, one per layer, each with a label and a row of chips; a thin arrow between bands."""
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     bands = s["bands"]; gap = 0.45; h = min(1.75, (8.9 - gap * (len(bands) - 1)) / len(bands)); y = 2.0
     for i, b in enumerate(bands):
-        box = _box(sl, 0.81, y, 20.4, h, CREAM, radius=0.1)
+        box = _box(sl, 0.81, y, 20.4, h, CARD, radius=0.1)
         lab = sl.shapes.add_textbox(Inches(1.1), Inches(y), Inches(4.4), Inches(h))
-        _text(lab, [[(b["label"], 24, BLUE, True)]] + ([[(b["sub"], 15, GREY, False)]] if b.get("sub") else []), margin=0.0)
+        _text(lab, [[(b["label"], 24, CARD_TITLE, True)]] + ([[(b["sub"], 15, CARD_BODY, False)]] if b.get("sub") else []), margin=0.0)
         items = b.get("items", []); cw = (15.2 - 0.3 * (len(items) - 1)) / max(len(items), 1); ch = min(1.05, h - 0.4)
         for j, it in enumerate(items):
-            _chip(sl, 5.7 + j * (cw + 0.3), y + (h - ch) / 2, cw, ch, it, fill=WHITE, size=15)
+            _chip(sl, 5.7 + j * (cw + 0.3), y + (h - ch) / 2, cw, ch, it, fill=CHIP, size=15)
         if i < len(bands) - 1:
             _arrow_segments(sl, [(11.0, y + h + 0.06), (11.0, y + h + gap - 0.06)])
         y += h + gap
@@ -339,17 +364,18 @@ def slide_layers(prs, s, footer):
 def slide_compare(prs, s, footer):
     """Rows of before -> after pairs under two column headings; both cream, the after side leads in bold blue."""
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     left, right = s.get("headings", ["By hand", "Now"])
     for x, txt in ((0.81, left), (11.6, right)):
         t = sl.shapes.add_textbox(Inches(x), Inches(2.15), Inches(9.6), Inches(0.5))
-        _text(t, [[(txt, 22, CREAM, True)]], margin=0.0, anchor=MSO_ANCHOR.TOP)
+        _text(t, [[(txt, 22, PAGE_FG, True)]], margin=0.0, anchor=MSO_ANCHOR.TOP)
     rows = s["rows"]; gap = 0.3; h = min(1.45, (8.0 - gap * (len(rows) - 1)) / len(rows)); y = 2.8
     for r in rows:
-        a = _box(sl, 0.81, y, 9.6, h, CREAM, radius=0.1)
-        _text(a, [[(r["before"], 18, GREY, False)]], margin=0.3)
-        b = _box(sl, 11.6, y, 9.6, h, CREAM, radius=0.1)
-        _text(b, [[(r["after"], 18, BLUE, True)]] + ([[(r["proof"], 15, GREY, False)]] if r.get("proof") else []), margin=0.3)
+        a = _box(sl, 0.81, y, 9.6, h, CARD, radius=0.1)
+        _text(a, [[(r["before"], 18, CARD_BODY, False)]], margin=0.3)
+        b = _box(sl, 11.6, y, 9.6, h, CARD, radius=0.1)
+        _text(b, [[(r["after"], 18, CARD_TITLE, True)]] + ([[(r["proof"], 15, CARD_BODY, False)]] if r.get("proof") else []), margin=0.3)
         _arrow_segments(sl, [(10.55, y + h / 2), (11.5, y + h / 2)])
         y += h + gap
     return sl
@@ -358,30 +384,31 @@ def slide_compare(prs, s, footer):
 def slide_timebar(prs, s, footer):
     """One row per activity: a cream bar proportional to the days it took by hand, an orange bar for the hours it takes now."""
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     rows = s["rows"]; max_days = max(r["before_days"] for r in rows); scale = 13.2 / max_days   # inches per working day
     t = sl.shapes.add_textbox(Inches(6.4), Inches(2.05), Inches(13.2), Inches(0.45))
-    _text(t, [[("Working days by hand (cream) against hours now (orange), drawn to the same scale", 18, CREAM, False)]], margin=0.0, anchor=MSO_ANCHOR.TOP)
+    _text(t, [[("Working days by hand (cream) against hours now (orange), drawn to the same scale", 18, PAGE_FG, False)]], margin=0.0, anchor=MSO_ANCHOR.TOP)
     gap = 0.3; h = min(1.35, (7.7 - gap * (len(rows) - 1)) / len(rows)); y = 2.7
     for r in rows:
         lab = sl.shapes.add_textbox(Inches(0.81), Inches(y), Inches(5.3), Inches(h))
-        _text(lab, [[(r["label"], 20, CREAM, True)]] + ([[(r["note"], 14, CREAM, False)]] if r.get("note") else []), margin=0.0)
+        _text(lab, [[(r["label"], 20, PAGE_FG, True)]] + ([[(r["note"], 14, PAGE_FG, False)]] if r.get("note") else []), margin=0.0)
         bw = r["before_days"] * scale
-        b = _box(sl, 6.4, y + 0.05, bw, h * 0.42, CREAM, radius=0.3)
+        b = _box(sl, 6.4, y + 0.05, bw, h * 0.42, CARD, radius=0.3)
         blabel = r.get("before_label", f'{r["before_days"]} working days')
         if bw >= 3.2:
-            _text(b, [[(blabel, 16, BLUE, True)]], margin=0.2)
+            _text(b, [[(blabel, 16, CARD_TITLE, True)]], margin=0.2)
         else:   # too short a bar to hold its label: write it beside the bar instead
             bt = sl.shapes.add_textbox(Inches(6.4 + bw + 0.15), Inches(y + 0.05), Inches(8), Inches(h * 0.42))
-            _text(bt, [[(blabel, 15, CREAM, True)]], margin=0.0)
+            _text(bt, [[(blabel, 15, PAGE_FG, True)]], margin=0.0)
         aw = max(0.28, r["after_hours"] / 8.0 * scale)
-        a = _box(sl, 6.4, y + 0.05 + h * 0.42 + 0.1, aw, h * 0.42, ORANGE, radius=0.3)
+        a = _box(sl, 6.4, y + 0.05 + h * 0.42 + 0.1, aw, h * 0.42, ACCENT, radius=0.3)
         at = sl.shapes.add_textbox(Inches(6.4 + aw + 0.15), Inches(y + 0.05 + h * 0.42 + 0.1), Inches(8), Inches(h * 0.42))
-        _text(at, [[(r["after_label"], 15, CREAM, True)]], margin=0.0)
+        _text(at, [[(r["after_label"], 15, PAGE_FG, True)]], margin=0.0)
         y += h + gap
     if s.get("legend"):
         t = sl.shapes.add_textbox(Inches(0.81), Inches(10.75), Inches(20), Inches(0.6))
-        _text(t, [[(s["legend"], 14, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+        _text(t, [[(s["legend"], 14, PAGE_FG, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
     return sl
 
 
@@ -390,6 +417,7 @@ def slide_donut(prs, s, footer):
     from pptx.chart.data import CategoryChartData
     from pptx.enum.chart import XL_CHART_TYPE
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     parts = [p for p in s["parts"] if p["value"]]
     cd = CategoryChartData(); cd.categories = [p["label"] for p in parts]; cd.add_series(s.get("series", "count"), [p["value"] for p in parts])
@@ -407,54 +435,56 @@ def slide_donut(prs, s, footer):
     if hole is None:
         hole = etree.SubElement(plot._element, cns + "holeSize")
     hole.set("val", "55")
-    plot.has_data_labels = True; dl = plot.data_labels; dl.show_value = True; dl.show_category_name = False
-    dl.font.size = Pt(20); dl.font.bold = True; dl.font.color.rgb = rgb(BLUE)
+    plot.has_data_labels = False   # the chip legend carries the numbers; in-slice labels cannot read on both the dark and light slices
     for pt, part in zip(plot.series[0].points, parts):
-        pt.format.fill.solid(); pt.format.fill.fore_color.rgb = rgb(part.get("fill", CREAM)); pt.format.line.fill.background()
+        pt.format.fill.solid(); pt.format.fill.fore_color.rgb = rgb(part.get("fill", CARD)); pt.format.line.fill.background()
     # legend as chips, one per class, in the class colour
     y = 2.3
     for part in s["parts"]:
-        fill = part.get("fill", CREAM)
-        _chip(sl, 10.8, y, 2.6, 0.55, f'{part["label"]}  {part["value"]}', fill=fill, color=CREAM if fill in (GREEN, BLUE) else BLUE, size=15)
+        fill = part.get("fill", CARD)
+        _chip(sl, 10.8, y, 2.6, 0.55, f'{part["label"]}  {part["value"]}', fill=fill, color=ON_ACCENT if fill in (ACCENT, TEAL, BAD, CARD_TITLE) else CARD_TITLE, size=15)
         t = sl.shapes.add_textbox(Inches(13.6), Inches(y), Inches(7.6), Inches(0.6))
-        _text(t, [[(part.get("means", ""), 15, CREAM, False)]], margin=0.0)
+        _text(t, [[(part.get("means", ""), 15, PAGE_FG, False)]], margin=0.0)
         y += 0.8
     if s.get("stat"):
-        b = _box(sl, 10.8, y + 0.4, 10.4, 2.6, CREAM, radius=0.08)
-        _text(b, [[(s["stat"], 48, BLUE, True)], [(s.get("stat_label", ""), 18, GREY, False)]], anchor=MSO_ANCHOR.MIDDLE, margin=0.35)
+        b = _box(sl, 10.8, y + 0.4, 10.4, 2.6, CARD, radius=0.08)
+        _text(b, [[(s["stat"], 48, CARD_TITLE, True)], [(s.get("stat_label", ""), 18, CARD_BODY, False)]], anchor=MSO_ANCHOR.MIDDLE, margin=0.35)
     if s.get("legend"):
         t = sl.shapes.add_textbox(Inches(0.81), Inches(10.75), Inches(20), Inches(0.6))
-        _text(t, [[(s["legend"], 14, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+        _text(t, [[(s["legend"], 14, PAGE_FG, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
     return sl
 
 
 def slide_chevrons(prs, s, footer):
     """A left-to-right chain of chevrons (stages), a description under each, an optional band of notes below."""
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     st = s["stages"]; n = len(st); overlap = 0.35; w = (20.4 + overlap * (n - 1)) / n; y = 3.1; h = 1.8
     for i, stage in enumerate(st):
         x = 0.81 + i * (w - overlap)
         shape = sl.shapes.add_shape(MSO_SHAPE.PENTAGON if i == 0 else MSO_SHAPE.CHEVRON, Inches(x), Inches(y), Inches(w), Inches(h))
-        shape.fill.solid(); shape.fill.fore_color.rgb = rgb(ORANGE if stage.get("accent") else CREAM); shape.line.fill.background(); shape.shadow.inherit = False
+        shape.fill.solid(); shape.fill.fore_color.rgb = rgb(ACCENT if stage.get("accent") else CARD); shape.line.fill.background(); shape.shadow.inherit = False
         shape.adjustments[0] = 0.32
-        _text(shape, [[(stage["title"], 22, BLUE, True)]] + ([[(stage["sub"], 14, GREY if not stage.get("accent") else BLUE, False)]] if stage.get("sub") else []), align=PP_ALIGN.CENTER, margin=0.5)
+        tc = ON_ACCENT if stage.get("accent") else CARD_TITLE
+        _text(shape, [[(stage["title"], 22, tc, True)]] + ([[(stage["sub"], 14, CARD_BODY if not stage.get("accent") else tc, False)]] if stage.get("sub") else []), align=PP_ALIGN.CENTER, margin=0.5)
         t = sl.shapes.add_textbox(Inches(x + 0.3), Inches(y + h + 0.3), Inches(w - overlap - 0.5), Inches(2.6))
-        _text(t, [[(line, 16, CREAM, False)] for line in stage.get("lines", [])], anchor=MSO_ANCHOR.TOP, margin=0.0)
+        _text(t, [[(line, 16, PAGE_FG, False)] for line in stage.get("lines", [])], anchor=MSO_ANCHOR.TOP, margin=0.0)
     if s.get("notes"):
         items = s["notes"]; cw = (20.4 - 0.4 * (len(items) - 1)) / len(items)
         for j, it in enumerate(items):
-            b = _box(sl, 0.81 + j * (cw + 0.4), 7.4, cw, 2.1, CREAM, radius=0.08)
-            _text(b, [[(it["title"], 20, BLUE, True)], [(it["body"], 15, GREY, False)]], anchor=MSO_ANCHOR.TOP, margin=0.3)
+            b = _box(sl, 0.81 + j * (cw + 0.4), 7.4, cw, 2.1, CARD, radius=0.08)
+            _text(b, [[(it["title"], 20, CARD_TITLE, True)], [(it["body"], 15, CARD_BODY, False)]], anchor=MSO_ANCHOR.TOP, margin=0.3)
     if s.get("legend"):
         t = sl.shapes.add_textbox(Inches(0.81), Inches(10.75), Inches(20), Inches(0.6))
-        _text(t, [[(s["legend"], 14, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+        _text(t, [[(s["legend"], 14, PAGE_FG, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
     return sl
 
 
 def slide_steps(prs, s, footer):
     """Numbered steps in two columns, each a cream box with an orange number, a title and detail lines: the step-by-step visual."""
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     steps = s["steps"]; cols = s.get("cols", 2); rows = -(-len(steps) // cols); gap = 0.25
     w = (20.4 - gap * (cols - 1)) / cols; h = (8.85 - gap * (rows - 1)) / rows
@@ -462,15 +492,15 @@ def slide_steps(prs, s, footer):
     for i, st in enumerate(steps):
         c, r = (i // rows, i % rows) if s.get("fill", "column") == "column" else (i % cols, i // cols)
         x = 0.81 + c * (w + gap); y = 2.0 + r * (h + gap)
-        _box(sl, x, y, w, h, CREAM, radius=0.08)
+        _box(sl, x, y, w, h, CARD, radius=0.08)
         o = sl.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x + 0.22), Inches(y + 0.22), Inches(0.5), Inches(0.5))
-        o.fill.solid(); o.fill.fore_color.rgb = rgb(ORANGE); o.line.fill.background(); o.shadow.inherit = False
-        _text(o, [[(str(i + 1), 15, BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.0)
+        o.fill.solid(); o.fill.fore_color.rgb = rgb(ACCENT); o.line.fill.background(); o.shadow.inherit = False
+        _text(o, [[(str(i + 1), 15, ON_ACCENT, True)]], align=PP_ALIGN.CENTER, margin=0.0)
         t = sl.shapes.add_textbox(Inches(x + 0.85), Inches(y + 0.1), Inches(w - 1.05), Inches(h - 0.2))
-        _text(t, [[(st["title"], 19, BLUE, True)]] + [[(line, body_pt, GREY, False)] for line in st.get("lines", [])], anchor=MSO_ANCHOR.TOP, margin=0.0)
+        _text(t, [[(st["title"], 19, CARD_TITLE, True)]] + [[(line, body_pt, CARD_BODY, False)] for line in st.get("lines", [])], anchor=MSO_ANCHOR.TOP, margin=0.0)
     if s.get("legend"):
         t = sl.shapes.add_textbox(Inches(0.81), Inches(10.95), Inches(20), Inches(0.5))
-        _text(t, [[(s["legend"], 14, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+        _text(t, [[(s["legend"], 14, PAGE_FG, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
     return sl
 
 
@@ -515,13 +545,13 @@ def _edge_free(slide, nodes, e):
             mid = pts[len(pts) // 2] if len(pts) > 2 else (mx, my)
             lx, ly = e.get("label_at", (mid[0] + 0.1, mid[1] - 0.42))
             t = slide.shapes.add_textbox(Inches(lx), Inches(ly), Inches(e.get("label_w", 3.2)), Inches(0.4))
-            _text(t, [[(e["label"], 11, CREAM, True)]], anchor=MSO_ANCHOR.BOTTOM, margin=0.0)
+            _text(t, [[(e["label"], 11, PAGE_FG, True)]], anchor=MSO_ANCHOR.BOTTOM, margin=0.0)
         elif abs(p0[1] - p1[1]) < 0.05:   # a straight horizontal edge: the label centred just above the line
             t = slide.shapes.add_textbox(Inches(mx - 0.6), Inches(my - 0.34), Inches(1.2), Inches(0.3))
-            _text(t, [[(e["label"], 11, CREAM, True)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.BOTTOM, margin=0.0)
+            _text(t, [[(e["label"], 11, PAGE_FG, True)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.BOTTOM, margin=0.0)
         else:   # a straight vertical edge: the label just right of the line
             t = slide.shapes.add_textbox(Inches(mx + 0.07), Inches(my - 0.15), Inches(1.2), Inches(0.3))
-            _text(t, [[(e["label"], 11, CREAM, True)]], anchor=MSO_ANCHOR.MIDDLE, margin=0.0)
+            _text(t, [[(e["label"], 11, PAGE_FG, True)]], anchor=MSO_ANCHOR.MIDDLE, margin=0.0)
 
 
 def _draw_free_node(slide, n):
@@ -535,42 +565,43 @@ def _draw_free_node(slide, n):
         n = dict(n, title_pt=tp)
     if kind == "group":   # an outline with a label, drawn first so nodes sit on it
         g = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
-        g.fill.background(); g.line.color.rgb = rgb(CREAM); g.line.width = Pt(1.5); g.adjustments[0] = 0.04; g.shadow.inherit = False
+        g.fill.background(); g.line.color.rgb = rgb(GROUP_LINE); g.line.width = Pt(1.5); g.adjustments[0] = 0.04; g.shadow.inherit = False
         t = slide.shapes.add_textbox(Inches(x + 0.18), Inches(y + 0.05), Inches(w - 0.36), Inches(0.45))
-        _text(t, [[(title, 14, CREAM, True)]] + ([[(body, 11, CREAM, False)]] if body else []), anchor=MSO_ANCHOR.TOP, margin=0.0)
+        _text(t, [[(title, 14, PAGE_FG, True)]] + ([[(body, 11, PAGE_FG, False)]] if body else []), anchor=MSO_ANCHOR.TOP, margin=0.0)
     elif kind == "gate":
         d = slide.shapes.add_shape(MSO_SHAPE.DIAMOND, Inches(x), Inches(y), Inches(w), Inches(h))
-        d.fill.solid(); d.fill.fore_color.rgb = rgb(ORANGE); d.line.fill.background(); d.shadow.inherit = False
-        _text(d, [[(title, n.get("title_pt", 11), BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.02)
+        d.fill.solid(); d.fill.fore_color.rgb = rgb(ACCENT); d.line.fill.background(); d.shadow.inherit = False
+        _text(d, [[(title, n.get("title_pt", 11), ON_ACCENT, True)]], align=PP_ALIGN.CENTER, margin=0.02)
     elif kind == "data":   # a table: the same flat cream box as a step, centred, so nothing on the page pretends to be 3-D
-        c = _box(slide, x, y, w, h, CREAM, radius=0.1)
-        _text(c, [[(title, tp, BLUE, True)]] + ([[(body, bp, GREY, False)]] if body else []), align=PP_ALIGN.CENTER, margin=0.05)
+        c = _box(slide, x, y, w, h, CARD, radius=0.1)
+        _text(c, [[(title, tp, CARD_TITLE, True)]] + ([[(body, bp, CARD_BODY, False)]] if body else []), align=PP_ALIGN.CENTER, margin=0.05)
     elif kind == "domain":
-        _chip(slide, x, y, w, h, title, fill=WHITE, size=n.get("title_pt", 11), bold=True)
+        _chip(slide, x, y, w, h, title, fill=CHIP, size=n.get("title_pt", 11), bold=True)
     elif kind == "accent":
-        b = _box(slide, x, y, w, h, ORANGE, radius=0.5)
-        _text(b, [[(title, n.get("title_pt", 12), BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.08)
+        b = _box(slide, x, y, w, h, ACCENT, radius=0.5)
+        _text(b, [[(title, n.get("title_pt", 12), ON_ACCENT, True)]], align=PP_ALIGN.CENTER, margin=0.08)
     elif kind == "note":
         t = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
-        _text(t, [[(title, 12, CREAM, True)]] + ([[(body, 11, CREAM, False)]] if body else []), anchor=MSO_ANCHOR.TOP, margin=0.0)
+        _text(t, [[(title, 12, PAGE_FG, True)]] + ([[(body, 11, PAGE_FG, False)]] if body else []), anchor=MSO_ANCHOR.TOP, margin=0.0)
     elif kind == "stop":   # where a failed gate lands: a small cream box, the legend says what happens next
-        b = _box(slide, x, y, w, h, CREAM, radius=0.2)
-        _text(b, [[(title, n.get("title_pt", 10), BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.04)
+        b = _box(slide, x, y, w, h, CARD, radius=0.2)
+        _text(b, [[(title, n.get("title_pt", 10), CARD_TITLE, True)]], align=PP_ALIGN.CENTER, margin=0.04)
     else:   # step
-        b = _box(slide, x, y, w, h, CREAM, radius=0.1)
-        paras = [[(title, tp, BLUE, True)]] + ([[(body, bp, GREY, False)]] if body else [])
+        b = _box(slide, x, y, w, h, CARD, radius=0.1)
+        paras = [[(title, tp, CARD_TITLE, True)]] + ([[(body, bp, CARD_BODY, False)]] if body else [])
         _text(b, paras, align=PP_ALIGN.CENTER if n.get("center") else PP_ALIGN.LEFT, margin=0.12)
         if n.get("tag"):
             _tag(slide, x + w - 0.08, y - 0.3, n["tag"])
     if n.get("num") is not None and kind not in ("group", "note"):   # step badge: reading order at a glance
         o = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x - 0.14), Inches(y - 0.14), Inches(0.34), Inches(0.34))
-        o.fill.solid(); o.fill.fore_color.rgb = rgb(ORANGE); o.line.fill.background(); o.shadow.inherit = False
-        _text(o, [[(str(n["num"]), 10, BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.0)
+        o.fill.solid(); o.fill.fore_color.rgb = rgb(ACCENT); o.line.fill.background(); o.shadow.inherit = False
+        _text(o, [[(str(n["num"]), 10, ON_ACCENT, True)]], align=PP_ALIGN.CENTER, margin=0.0)
 
 
 def slide_diagram(prs, s, footer):
     """A free-layout flow diagram: nodes at x/y/w/h in inches (step, gate, data, domain, group, accent, note) and orthogonal arrows."""
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _ground(sl)
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     nodes = {n["id"]: n for n in s["nodes"]}
     for n in s["nodes"]:
@@ -583,7 +614,7 @@ def slide_diagram(prs, s, footer):
         _edge_free(sl, nodes, e)
     if s.get("legend"):
         t = sl.shapes.add_textbox(Inches(0.81), Inches(s.get("legend_y", 10.95)), Inches(20.4), Inches(0.5))
-        _text(t, [[(s["legend"], 12, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+        _text(t, [[(s["legend"], 12, PAGE_FG, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
     return sl
 
 

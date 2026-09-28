@@ -27,7 +27,9 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "originba-p
 from textfit import fit   # noqa: E402  shared with the pptx builder: an overflow fails the build
 
 PX = 96.0
-BLUE, CREAM, GREY, ORANGE, WHITE = "#0B3D7A", "#F5EFE9", "#4C5D69", "#FFA418", "#FFFFFF"
+# the Origin BA app palette (apps/analytics-portal/src/app/globals.css), the same roles as the pptx builder
+PAGE, PAGE_FG, CARD, CARD_TITLE, CARD_BODY, CHIP = "#0B1723", "#E6ECF2", "#F2F5F8", "#004B86", "#56636E", "#FFFFFF"
+ACCENT, ON_ACCENT, GROUP_LINE = "#006FAC", "#FFFFFF", "#8ACAD4"
 FONT = "Arial"
 
 
@@ -39,7 +41,7 @@ def pt(size: float) -> str:
     return f"{round(size * 1.33, 1):g}"   # PowerPoint points to CSS pixels
 
 
-def label(title: str, body: str = "", title_pt: float = 14, body_pt: float = 11, title_color: str = BLUE, body_color: str = GREY) -> str:
+def label(title: str, body: str = "", title_pt: float = 14, body_pt: float = 11, title_color: str = CARD_TITLE, body_color: str = CARD_BODY) -> str:
     t = f'<b><font style="font-size:{pt(title_pt)}px" color="{title_color}">{escape(title)}</font></b>'
     if body:
         t += f'<br><font style="font-size:{pt(body_pt)}px" color="{body_color}">{escape(body)}</font>'
@@ -68,29 +70,29 @@ def node_cell(n: dict, parent: str, ox: float, oy: float) -> str:
         tp = sizes[0]; bp = sizes[1] if len(sizes) > 1 else bp
         n = dict(n, title_pt=tp)
     if kind == "group":
-        st = style(rounded=1, arcSize=6, fillColor="none", strokeColor=CREAM, strokeWidth=1.5, container=1, pointerEvents=0,
-                   align="left", verticalAlign="top", spacingLeft=14, spacingTop=4, fontColor=CREAM)
-        val = label(title, body, 14, 11, CREAM, CREAM)
+        st = style(rounded=1, arcSize=6, fillColor="none", strokeColor=GROUP_LINE, strokeWidth=1.5, container=1, pointerEvents=0,
+                   align="left", verticalAlign="top", spacingLeft=14, spacingTop=4, fontColor=PAGE_FG)
+        val = label(title, body, 14, 11, PAGE_FG, PAGE_FG)
     elif kind == "gate":   # side spacing keeps the wrapped label inside the diamond, where blue text is readable
         pad = int(w * PX * 0.16)
-        st = style(rhombus=None, fillColor=ORANGE, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(n.get("title_pt", 11)),
+        st = style(rhombus=None, fillColor=ACCENT, strokeColor="none", fontColor=ON_ACCENT, fontStyle=1, fontSize=pt(n.get("title_pt", 11)),
                    spacingLeft=pad, spacingRight=pad)
         val = escape(title, {'"': "&quot;"})
     elif kind == "domain":
-        st = style(rounded=1, arcSize=50, fillColor=WHITE, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(n.get("title_pt", 11)))
+        st = style(rounded=1, arcSize=50, fillColor=CHIP, strokeColor="none", fontColor=CARD_TITLE, fontStyle=1, fontSize=pt(n.get("title_pt", 11)))
         val = escape(title, {'"': "&quot;"})
     elif kind == "accent":
-        st = style(rounded=1, arcSize=50, fillColor=ORANGE, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(n.get("title_pt", 12)))
+        st = style(rounded=1, arcSize=50, fillColor=ACCENT, strokeColor="none", fontColor=ON_ACCENT, fontStyle=1, fontSize=pt(n.get("title_pt", 12)))
         val = escape(title, {'"': "&quot;"})
     elif kind == "note":
-        st = style(text=None, fillColor="none", strokeColor="none", align="left", verticalAlign="top", fontColor=CREAM)
-        val = label(title, body, 12, 11, CREAM, CREAM)
+        st = style(text=None, fillColor="none", strokeColor="none", align="left", verticalAlign="top", fontColor=PAGE_FG)
+        val = label(title, body, 12, 11, PAGE_FG, PAGE_FG)
     elif kind == "stop":
-        st = style(rounded=1, arcSize=30, fillColor=CREAM, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(n.get("title_pt", 10)))
+        st = style(rounded=1, arcSize=30, fillColor=CARD, strokeColor="none", fontColor=CARD_TITLE, fontStyle=1, fontSize=pt(n.get("title_pt", 10)))
         val = escape(title, {'"': "&quot;"})
     else:   # step and data: the same flat cream box
         centred = kind == "data" or n.get("center")
-        st = style(rounded=1, arcSize=10, fillColor=CREAM, strokeColor="none", align="center" if centred else "left",
+        st = style(rounded=1, arcSize=10, fillColor=CARD, strokeColor="none", align="center" if centred else "left",
                    verticalAlign="middle", spacingLeft=0 if centred else 10, spacingRight=0 if centred else 8)
         val = label(title, body, tp, bp if kind == "step" else min(bp, 9.5))
     geom = f'<mxGeometry x="{px(x)}" y="{px(y)}" width="{px(w)}" height="{px(h)}" as="geometry"/>'
@@ -100,7 +102,7 @@ def node_cell(n: dict, parent: str, ox: float, oy: float) -> str:
     else:
         cell = f'<mxCell id="{n["id"]}" value="{val}" style="{st}" vertex="1" parent="{parent}">{geom}</mxCell>'
     if n.get("num") is not None and kind not in ("group", "note"):   # step badge, same parent and frame as the node
-        bst = style(ellipse=None, fillColor=ORANGE, strokeColor="none", fontColor=BLUE, fontStyle=1, fontSize=pt(10), spacing=0)
+        bst = style(ellipse=None, fillColor=ACCENT, strokeColor="none", fontColor=ON_ACCENT, fontStyle=1, fontSize=pt(10), spacing=0)
         cell += (f'<mxCell id="{n["id"]}_n" value="{n["num"]}" style="{bst}" vertex="1" parent="{parent}">'
                  f'<mxGeometry x="{px(x - 0.14)}" y="{px(y - 0.14)}" width="{px(0.34)}" height="{px(0.34)}" as="geometry"/></mxCell>')
     return cell
@@ -158,8 +160,8 @@ def diagram_xml(slide: dict) -> str:
         anc_a, anc_b = ancestors(a, parent_of), ancestors(b, parent_of)   # innermost container holding both endpoints
         common = next((x for x in anc_a if x in anc_b), "1")
         # edge labels: no wrapping (a wrapped edge label stacks one word per line) and the page colour behind the text
-        kv = dict(edgeStyle="orthogonalEdgeStyle", rounded=1, strokeColor=CREAM, strokeWidth=2, endArrow="block", endFill=1,
-                  fontColor=CREAM, fontSize=pt(11), fontStyle=1, labelBackgroundColor=BLUE, whiteSpace="nowrap")
+        kv = dict(edgeStyle="orthogonalEdgeStyle", rounded=1, strokeColor=PAGE_FG, strokeWidth=2, endArrow="block", endFill=1,
+                  fontColor=PAGE_FG, fontSize=pt(11), fontStyle=1, labelBackgroundColor=PAGE, whiteSpace="nowrap")
         via = [tuple(v) for v in e.get("via", [])]
         fa, tb = e.get("from_side"), e.get("to_side")
         if via and not fa:
@@ -185,7 +187,7 @@ def diagram_xml(slide: dict) -> str:
     # the picture stands alone outside the deck: title and subtitle above, legend and footer below
     xs = [n["x"] for n in nodes]; ys = [n["y"] + n["h"] for n in nodes]
     left, bottom = min(xs), max(ys)
-    tst = style(text=None, fillColor="none", strokeColor="none", align="left", verticalAlign="top", fontColor=CREAM)
+    tst = style(text=None, fillColor="none", strokeColor="none", align="left", verticalAlign="top", fontColor=PAGE_FG)
     # label() escapes once, which is what an attribute needs; escaping its result again shows raw tags (seen 2026-09-28)
     head = f'<b><font style="font-size:{pt(30)}px">{escape(slide["title"])}</font></b>'
     if slide.get("subtitle"):
@@ -194,25 +196,25 @@ def diagram_xml(slide: dict) -> str:
                  f'<mxGeometry x="{px(left)}" y="{px(0.35)}" width="{px(20.4)}" height="{px(1.3)}" as="geometry"/></mxCell>')
     foot_y = bottom + 0.3
     if slide.get("legend"):
-        cells.append(f'<mxCell id="_legend" value="{label(slide["legend"], "", 11, 11, CREAM, CREAM)}" style="{tst}" vertex="1" parent="1">'
+        cells.append(f'<mxCell id="_legend" value="{label(slide["legend"], "", 11, 11, PAGE_FG, PAGE_FG)}" style="{tst}" vertex="1" parent="1">'
                      f'<mxGeometry x="{px(left)}" y="{px(foot_y)}" width="{px(20.4)}" height="{px(0.6)}" as="geometry"/></mxCell>')
         foot_y += 0.55
     footer = slide.get("footer", "Origin Utility, Inc  /  Proprietary and Confidential  /  Internal Use Only")
-    cells.append(f'<mxCell id="_footer" value="{label(footer, "", 9, 9, CREAM, CREAM)}" style="{tst}" vertex="1" parent="1">'
+    cells.append(f'<mxCell id="_footer" value="{label(footer, "", 9, 9, PAGE_FG, PAGE_FG)}" style="{tst}" vertex="1" parent="1">'
                  f'<mxGeometry x="{px(left)}" y="{px(foot_y)}" width="{px(20.4)}" height="{px(0.4)}" as="geometry"/></mxCell>')
     # optional layers, hidden by default: notes for engineers (commands, checks) that never reach the exported picture
     layer_cells = []
     for li, (lname, notes) in enumerate(slide.get("layers", {}).items()):
         lid = f"_layer{li}"
         layer_cells.append(f'<mxCell id="{lid}" value="{escape(lname)}" parent="0" visible="0"/>')
-        nst = style(rounded=1, arcSize=8, fillColor=WHITE, strokeColor=ORANGE, strokeWidth=1.5, align="left", verticalAlign="top",
-                    spacingLeft=6, fontColor=BLUE, fontFamily="Courier New")
+        nst = style(rounded=1, arcSize=8, fillColor=CHIP, strokeColor=ACCENT, strokeWidth=1.5, align="left", verticalAlign="top",
+                    spacingLeft=6, fontColor=CARD_TITLE, fontFamily="Courier New")
         for j, note in enumerate(notes):
             v = escape(label(note.get("title", ""), note.get("body", ""), 10, 9), {'"': "&quot;"})
             layer_cells.append(f'<mxCell id="{lid}_{j}" value="{v}" style="{nst}" vertex="1" parent="{lid}">'
                                f'<mxGeometry x="{px(note["x"])}" y="{px(note["y"])}" width="{px(note.get("w", 3.0))}" height="{px(note.get("h", 0.7))}" as="geometry"/></mxCell>')
     cells = cells[:2] + [c for c in layer_cells if 'parent="0"' in c] + cells[2:] + [c for c in layer_cells if 'parent="0"' not in c]
-    return f'<mxGraphModel adaptiveColors="none" grid="0" page="0" background="{BLUE}"><root>' + "".join(cells) + "</root></mxGraphModel>"
+    return f'<mxGraphModel adaptiveColors="none" grid="0" page="0" background="{PAGE}"><root>' + "".join(cells) + "</root></mxGraphModel>"
 
 
 def mxfile(pages: list[tuple[str, str]]) -> str:
