@@ -543,3 +543,18 @@ attributes, never bare tokens; a group-less domain keeps its items on the root l
 by bare item id; the repository search lags an import by seconds (re-list before calling a
 resource missing); a heavy view's execution can exceed the 600 s API read (Status Updates the
 first time) -- it imported byte-equal and executed on the re-check.
+
+## A scheduled job that "fails" may have rendered fine: read `lastError` first (FDL prod, 2026-09-28)
+
+Four Fond_Du_Lac prod jobs (three runs of `FDL_Asset/FDLWU_Meter_View_C2M_All`, one of
+`FDL_Asset/FDL_LSV_SA_Mail_Addr`) alerted FAIL right after the client's C2M 25.4 upgrade, and the
+alert body said "error while generating this report". Every job's own `lastError`
+(`jrs_get.py --env prod /rest_v2/jobs/<id>`) said `report.scheduling.error.upload.to.ftp.server ...
+2: no such file`: SFTP status 2 = the remote folder is gone. Both reports rendered on request with
+the jobs' exact parameters (16,666 and 14,369 CSV rows), the domains and derived tables answered,
+no dropped view involved. The jobs deliver CSV by SFTP to `sftp.originsmartops.com:2022` as
+`fdl-sftpuser` into `/u00/fonddulac/interface/Origin/Analytics/Download` (the C2M interface
+directory the utility's import reads); the upgrade rebuilt that side. Fix is on the SFTP host
+(recreate the directory / permissions) or the four jobs' `folderPath` (PUT /rest_v2/jobs/<id>,
+prod write). The `job` subcommand truncates at 800 characters; `jrs_get.py` prints the whole thing
+with passwords masked. `jrs_repository.py run --format csv --param K=V` reproduces a job's run.
