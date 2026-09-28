@@ -6,7 +6,7 @@ reference deck's own layouts, so the blue gradient background, fonts and footer 
 
 Slide types (see SKILL.md and examples/sample_spec.json): title, section, statement, process,
 roadmap, cards, table, bullets. A process slide is a grid of cream nodes (col, row) joined by
-cream arrows; node kinds: step (cream), manual (grey), accent (orange pill), card (white sheet with
+cream arrows; node kinds: step (cream), manual (tan: by hand, a failure, a constraint), accent (orange pill), card (white sheet with
 a green header), note (small cream text).
 """
 from __future__ import annotations
@@ -121,7 +121,7 @@ def _draw_node(slide, n):
         t = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
         _text(t, [[(title, 16, CREAM, True)]] + ([[(body, 14, CREAM, False)]] if body else []), anchor=MSO_ANCHOR.TOP, margin=0.0)
     else:
-        fill, tcol, bcol = (GREY, CREAM, CREAM) if kind == "manual" else (CREAM, BLUE, GREY)
+        fill, tcol, bcol = (TAN, BLUE, GREY) if kind == "manual" else (CREAM, BLUE, GREY)
         b = _box(slide, x, y, w, h, fill)
         paras = [[(title, 25 if len(title) < 22 else 21, tcol, True)]]
         if body:
@@ -179,6 +179,13 @@ def slide_process(prs, s, footer):
         for p in s["proofs"]:
             w = 0.25 + 0.115 * len(p)
             _chip(sl, px, 9.3, w, 0.55, p, fill=WHITE, size=14); px += w + 0.25
+    if s.get("missing"):   # the by-hand counterpart of proofs: a strip of tan pills, what the old way never had
+        t = sl.shapes.add_textbox(Inches(0.81), Inches(9.35), Inches(3.0), Inches(0.5))
+        _text(t, [[("Missing", 16, CREAM, True)]], margin=0.0)
+        px = 2.4
+        for p in s["missing"]:
+            w = 0.25 + 0.115 * len(p)
+            _chip(sl, px, 9.3, w, 0.55, p, fill=TAN, size=14); px += w + 0.25
     if s.get("legend"):
         t = sl.shapes.add_textbox(Inches(0.81), Inches(10.75), Inches(20), Inches(0.6))
         _text(t, [[(s["legend"], 14, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
@@ -214,9 +221,11 @@ def slide_cards(prs, s, footer):
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     cards = s["cards"]; cols = s.get("cols", 3 if len(cards) > 4 else min(len(cards), 4)); rows = -(-len(cards) // cols)
     w = (20.4 - (cols - 1) * 0.5) / cols
-    most = max(len(c.get("lines", [])) for c in cards)
-    stat_h = 2.1 if any(c.get("stat") for c in cards) else 0.0   # a stat callout: big number, small label, then the heading
-    h = min((8.9 - (rows - 1) * 0.5) / rows, 1.5 + 0.75 * most + stat_h)   # sized to the fullest card, never taller than the page allows
+    def _card_h(c):   # estimated from wrapped lines at the card's width, so long lines never spill past the box
+        cpl = max(int((w - 0.7) * 6.4), 20)   # 22pt Calibri: about 6.4 characters per inch
+        lines = sum(-(-len(line) // cpl) for line in c.get("lines", []))
+        return 1.35 + 0.42 * lines + 0.12 * len(c.get("lines", [])) + (2.1 if c.get("stat") else 0.0)
+    h = min((8.9 - (rows - 1) * 0.5) / rows, max(_card_h(c) for c in cards))   # sized to the fullest card, never taller than the page allows
     top = 2.0 + max(0.0, (8.9 - rows * h - (rows - 1) * 0.5) / 2)   # the block sits centred in the body, not stranded at the top
     for i, c in enumerate(cards):
         x = 0.81 + (i % cols) * (w + 0.5); y = top + (i // cols) * (h + 0.5)
@@ -303,10 +312,10 @@ def slide_layers(prs, s, footer):
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     bands = s["bands"]; gap = 0.45; h = min(1.75, (8.9 - gap * (len(bands) - 1)) / len(bands)); y = 2.0
     for i, b in enumerate(bands):
-        fill = GREY if b.get("kind") == "manual" else CREAM
+        fill = TAN if b.get("kind") == "manual" else CREAM
         box = _box(sl, 0.81, y, 20.4, h, fill, radius=0.1)
         lab = sl.shapes.add_textbox(Inches(1.1), Inches(y), Inches(4.4), Inches(h))
-        _text(lab, [[(b["label"], 24, CREAM if fill == GREY else BLUE, True)]] + ([[(b["sub"], 15, CREAM if fill == GREY else GREY, False)]] if b.get("sub") else []), margin=0.0)
+        _text(lab, [[(b["label"], 24, BLUE, True)]] + ([[(b["sub"], 15, GREY, False)]] if b.get("sub") else []), margin=0.0)
         items = b.get("items", []); cw = (15.2 - 0.3 * (len(items) - 1)) / max(len(items), 1); ch = min(1.05, h - 0.4)
         for j, it in enumerate(items):
             _chip(sl, 5.7 + j * (cw + 0.3), y + (h - ch) / 2, cw, ch, it, fill=WHITE if fill == CREAM else CREAM, size=15)
@@ -317,7 +326,7 @@ def slide_layers(prs, s, footer):
 
 
 def slide_compare(prs, s, footer):
-    """Rows of before (grey) -> after (cream) pairs under two column headings."""
+    """Rows of before (tan) -> after (cream) pairs under two column headings."""
     sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
     _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
     left, right = s.get("headings", ["By hand", "Now"])
@@ -326,8 +335,8 @@ def slide_compare(prs, s, footer):
         _text(t, [[(txt, 22, CREAM, True)]], margin=0.0, anchor=MSO_ANCHOR.TOP)
     rows = s["rows"]; gap = 0.3; h = min(1.45, (8.0 - gap * (len(rows) - 1)) / len(rows)); y = 2.8
     for r in rows:
-        a = _box(sl, 0.81, y, 9.6, h, GREY, radius=0.1)
-        _text(a, [[(r["before"], 18, CREAM, False)]], margin=0.3)
+        a = _box(sl, 0.81, y, 9.6, h, TAN, radius=0.1)
+        _text(a, [[(r["before"], 18, BLUE, False)]], margin=0.3)
         b = _box(sl, 11.6, y, 9.6, h, CREAM, radius=0.1)
         _text(b, [[(r["after"], 18, BLUE, True)]] + ([[(r["proof"], 15, GREY, False)]] if r.get("proof") else []), margin=0.3)
         _arrow_segments(sl, [(10.55, y + h / 2), (11.5, y + h / 2)])

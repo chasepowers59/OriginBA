@@ -8,7 +8,7 @@ description: Build Origin-styled process and architecture decks (the DV_App_Over
 The look is Reed's `DV_App_Overview.pptx` (2026-09-24), measured: 22" x 12.37" slides on a blue
 gradient background, title in light 60pt cream at the top left, cream (`F5EFE9`) rounded nodes
 4.30" x 1.55" on a 4-column grid (5.36" pitch, 2.05" row pitch) with a bold dark-blue (`0B3D7A`)
-25pt title and grey (`4C5D69`) 20pt body, thin cream arrows (2.75pt, triangle head), orange
+25pt title and grey (`4C5D69`) 20pt body, tan (`DBD3CC`, the reference deck's darker cream) fills for by-hand steps, failures and the 'before' side of a compare (no dark-grey fills anywhere: grey is body text only), thin cream arrows (2.75pt, triangle head), orange
 (`FFA418`) pills for constraints and pain points, white "spreadsheet" cards with a green
 (`1D6F42`) header for artifacts, numbered orange circles over cream boxes for a roadmap (the
 current step inverted), and the footer `@2026, Origin Utility, Inc / Proprietary & Confidential
@@ -36,7 +36,7 @@ template, not an imitation. Slide types and their spec keys:
 | `table` | `title`, `columns[]`, `rows[[]]`, `widths[]` (inches, sum 20.4) |
 
 A process node: `{"id", "col", "row"}` on the grid or `{"x", "y", "w", "h"}` in inches, `title`,
-`body`, and `kind`: `step` (cream, the automated thing), `manual` (grey, a scheduled or hand
+`body`, and `kind`: `step` (cream, the automated thing), `manual` (tan, a scheduled or hand
 step), `accent` (orange pill, a constraint), `card` (white sheet, an artifact), `note` (cream
 text). Edges are `["from", "to"]` (straight when aligned, elbow otherwise) or
 `{"from", "to", "via": [x, y]}` to route around something. Keep node bodies under about 60

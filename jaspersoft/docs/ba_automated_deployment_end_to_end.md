@@ -145,6 +145,28 @@ every prod org with domains bound to the warehouse.
 `sql/performance/snapshots/deployment_steps/README.md`, `docs/TENANT_ONBOARDING.md`.
 
 
+## Before the automation
+
+Every step was done by hand. Each report was exported one at a time from the server UI, folder by
+folder, per client. The exported files were opened in Notepad++ and every server endpoint, org path
+and folder path was found by eye and replaced, hoping nothing was missed. The datasource was
+exported separately from the target server and its reference hand-edited into each file. The
+package was re-zipped and imported, the import log read, the file fixed and imported again. Then
+every report was opened by hand, because a broken Ad Hoc topic only shows in the editor. Whatever
+broke went back to the replace step, with no record of what had changed, and the same was done for
+the next client. The database side matched: nineteen SQL scripts run one by one in SQL Developer,
+results copied into spreadsheets. Days per client and one to two weeks for a full offering; a missed
+replace surfaced weeks later as a report a user could not open; no two promotions were identical,
+so no result could be compared to the last one. Nothing was tested, recorded, repeatable or proven.
+
+Now every one of those steps is a tool with a test: the export is one API task; the rewrite is a
+list of tested replacements applied longest match first; the target's own datasource export is
+carried into the package byte for byte; the package is verified before import (no source string
+survives, every reference exists, every field resolves); the import is read back and compared byte
+for byte; every resource is executed; the sign-off is generated. The same checks run every time and
+the tool stops at the first failure and names the rollback, so fewer hands are in the loop and the
+result is the same for every org.
+
 ## Release 26 focus: the snapshot deployment workflow
 
 Per client, as `scripts/local/prod_snapshot_rollout_25_4.sh <client>` runs it (each step is also a
@@ -215,5 +237,18 @@ Manual QA: opening each Ad Hoc view in the designer (the API says ok, only the e
 topic), checking dashboards and themes by eye, nightlies that skip when the laptop is off the VPN,
 sign-offs assembled on request. Next: Playwright signs in, opens every view and dashboard,
 screenshots and asserts no error in page or console, and reads computed styles; AI agents hosted in
-the cloud on the VPN network run the nightlies, sweeps and parity checks continuously, so no run
+the cloud on the VPN network (the hosting is Shankar's, as infrastructure) run the nightlies, sweeps and parity checks continuously, so no run
 depends on a person being connected and the sign-off is always current.
+
+## Next: the Origin BA app and dbt
+
+Taken up after the Fond du Lac and College Station deployments finish in the coming weeks. The app
+is a web portal over the reporting layer (workstream pages, explore views, a build page and a
+data-quality page per client), each client isolated to its own org and warehouse connection, with
+an analytics assistant that answers questions from the canvases through tool calls fenced to the
+client's data. The dbt project turns CISADM into 38 reporting canvases with a data dictionary and
+enforced contracts, and the same models build natively inside a client's Oracle instance (three
+schemas beside CISADM, read-only grants, no CDC), which the app reads directly, so one transformation
+layer serves the portal, the assistant and Jaspersoft. Next there: Jaspersoft domains generated from
+the dbt contracts so the snapshot tables are replaced rather than maintained, data-quality rules,
+nightly parity against the snapshots, and the assistant proven with real client questions.
