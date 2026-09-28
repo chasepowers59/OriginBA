@@ -26,6 +26,7 @@ import json
 import os
 import re
 import time
+from contextvars import ContextVar
 from pathlib import Path
 from typing import Any, Callable
 
@@ -182,6 +183,9 @@ def enforce_canvases_only(sql: str) -> None:
                 raise SqlWorkspaceValidationError(
                     f"{schema} is not a reporting canvas. The assistant reads the rpt_* "
                     f"canvases only; use list_canvases to see them.")
+        if not _readable(t):
+            raise SqlWorkspaceValidationError(
+                f"{t} is outside the reports this person can see; use list_canvases for the ones they can.")
 
 
 # ---------------------------------------------------------------- the tools
@@ -228,10 +232,21 @@ TOOLS: list[dict[str, Any]] = [
 ]
 
 
+# Which canvases the asking person may read, for the length of one question. Every tool
+# reads the canvas list through _canvases, so the grant holds in the list, the prompt, the
+# knowledge search and the SQL fence alike. None means every canvas.
+_CAN_READ: ContextVar[Callable[[str], bool] | None] = ContextVar("assistant_can_read", default=None)
+
+
+def _readable(canvas_id: str) -> bool:
+    can_read = _CAN_READ.get()
+    return can_read is None or can_read(canvas_id)
+
+
 def _canvases(org_id: str) -> dict[str, dict[str, Any]]:
     cat = load_catalog(organization_id=org_id)
     enabled = set(cat.get("portal_snapshots") or cat["snapshots"].keys())
-    return {k: v for k, v in cat["snapshots"].items() if k in enabled}
+    return {k: v for k, v in cat["snapshots"].items() if k in enabled and _readable(k)}
 
 
 def _table_ref(engine: str, entry: dict[str, Any]) -> str:
@@ -432,8 +447,10 @@ The organization's canvases:
 # ---------------------------------------------------------------- the loop
 class Assistant:
     def __init__(self, *, org_id: str, org_name: str, actor_email: str, actor_id: str | None,
-                 client_factory: Callable[[], Any] | None = None):
+                 client_factory: Callable[[], Any] | None = None,
+                 can_read: Callable[[str], bool] | None = None):
         self.org_id, self.org_name = org_id, org_name
+        self.can_read = can_read
         self.actor_email, self.actor_id = actor_email, actor_id
         engine, _ = org_backend(org_id)
         self.engine = "postgres" if engine == "postgres" else "oracle_dbt"
@@ -461,8 +478,15 @@ class Assistant:
         return {"error": f"unknown tool {name}"}
 
     def ask(self, question: str, thread: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+        token = _CAN_READ.set(self.can_read)
+        try:
+            return self._ask(question, thread)
+        finally:
+            _CAN_READ.reset(token)
+
+    def _ask(self, question: str, thread: list[dict[str, Any]] | None) -> dict[str, Any]:
         client = self._client_factory()
-        messages = list(thread or [])[-MAX_THREAD:] + [{"role": "user", "content": question}]
+        messages = _from_a_question(list(thread or [])[-MAX_THREAD:]) + [{"role": "user", "content": question}]
         system = system_prompt(self.org_id, self.org_name, self.engine)
         steps: list[dict[str, Any]] = []
         queries: list[dict[str, Any]] = []
@@ -485,6 +509,14 @@ class Assistant:
                 answer = text
             calls = [b for b in content if b["type"] == "tool_use"]
             if resp.stop_reason != "tool_use" or not calls:
+                if resp.stop_reason == "refusal":
+                    answer = "I can't help with that question. Try asking about your billing, payments or other reporting data."
+                elif resp.stop_reason == "max_tokens":
+                    answer = (answer + "\n\n" if answer else "") + "The answer was cut short. Ask for a narrower slice."
+                # a tool call the turn never finished can never get its result, and an empty
+                # assistant turn is refused: either would break the next follow-up
+                kept = [b for b in content if b["type"] != "tool_use"]
+                messages[-1]["content"] = kept or [{"type": "text", "text": answer}]
                 break
             results = []
             for call in calls:
@@ -541,11 +573,24 @@ def _brief(inp: Any) -> str:
     return s if len(s) <= 200 else s[:197] + "..."
 
 
+def _is_question(m: dict[str, Any]) -> bool:
+    c = m["content"]
+    return m["role"] == "user" and (isinstance(c, str) or not any(b.get("type") == "tool_result" for b in c))
+
+
+def _from_a_question(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Drop leading turns until the thread starts on a person's question. A cut by count
+    can land on an assistant turn or a tool result whose call was cut away, and the API
+    refuses both."""
+    start = next((i for i, m in enumerate(messages) if _is_question(m)), len(messages))
+    return messages[start:]
+
+
 def _trim_thread(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """The thread a client sends back for a follow-up. Tool results are replaced by a stub:
     the model can re-run anything it needs, and rows do not belong in a browser round trip."""
     out = []
-    for m in messages[-MAX_THREAD:]:
+    for m in _from_a_question(messages[-MAX_THREAD:]):
         c = m["content"]
         if isinstance(c, list):
             c = [{k: v for k, v in b.items() if k != "cache_control"} for b in c]

@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { askAssistant, fetchAssistantSpend, fetchAssistantStatus, fetchIntegrity } from "@/lib/api";
-import { WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, spendLabel, summarise, threadFor, type Turn } from "@/lib/assistant";
+import { STARTER_QUESTIONS, WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, spendLabel, summarise, threadFor, type Turn } from "@/lib/assistant";
+import { useAuth } from "@/components/AuthProvider";
+import { DatabaseResultChart } from "@/components/DatabaseResultChart";
 import type { AssistantQuery, AssistantResponse, AssistantSpend, AssistantStatus, IntegrityOverview } from "@/lib/types";
 import { parseAnswer, parseInline, type Inline } from "@/lib/answerMarkdown";
 
@@ -20,6 +22,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const { can } = useAuth();
 
   useEffect(() => {
     fetchAssistantStatus().then(setStatus).catch(() => setStatus({ configured: false, model: null }));
@@ -30,9 +33,8 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
     endRef.current?.scrollIntoView({ block: "nearest" });
   }, [turns, busy]);
 
-  const ask = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const q = question.trim();
+  const send = async (raw: string) => {
+    const q = raw.trim();
     if (!q || busy) return;
     setBusy(true);
     setQuestion("");
@@ -47,6 +49,18 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
       setBusy(false);
     }
   };
+  const ask = (e: React.FormEvent) => {
+    e.preventDefault();
+    void send(question);
+  };
+  // The failed question and its error leave the conversation, and the question is asked again.
+  const retry = (index: number) => {
+    const failed = turns[index - 1];
+    if (!failed || failed.role !== "user") return;
+    setTurns((t) => t.slice(0, index - 1));
+    void send(failed.text);
+  };
+  const configured = status ? status.configured : true;
 
   return (
     <section className={`glass-panel ${compact ? "p-4" : "p-6"}`} aria-label="Ask the assistant">
@@ -57,13 +71,13 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
             A question about your data, in plain language
           </h2>
           <p className="mt-1 text-sm text-fg-muted">
-            It reads your reporting canvases, writes and runs read-only SQL, and shows you every query
-            it ran. It never sees CISADM tables or another organization&rsquo;s data.
+            It reads your reporting data, runs read-only queries, and shows you every query it ran.
+            It only ever sees your own organization&rsquo;s reports.
           </p>
           {integrity ? (
             <p className="mt-1 text-xs text-fg-muted" data-testid="integrity-headline">{integrityHeadline(integrity)}</p>
           ) : null}
-          {spend ? <p className="text-xs text-fg-muted" data-testid="spend-line">{spendLabel(spend)}</p> : null}
+          {spend && can("settings:manage") ? <p className="text-xs text-fg-muted" data-testid="spend-line">{spendLabel(spend)}</p> : null}
         </div>
         {turns.length ? (
           <button type="button" className="btn-ghost text-xs" onClick={() => setTurns([])} disabled={busy}>
@@ -86,7 +100,14 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
               {t.role === "user" ? (
                 <p className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-primary/10 px-4 py-2 text-sm text-heading">{t.text}</p>
               ) : t.role === "error" ? (
-                <p className="rounded-xl border border-over bg-over-bg px-4 py-2 text-sm text-over">{t.text}</p>
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-over bg-over-bg px-4 py-2 text-sm text-over">
+                  <p>{t.text}</p>
+                  {i === turns.length - 1 ? (
+                    <button type="button" className="btn-ghost text-xs" onClick={() => retry(i)} disabled={busy}>
+                      Try again
+                    </button>
+                  ) : null}
+                </div>
               ) : (
                 <Answer response={t.response} />
               )}
@@ -97,6 +118,16 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
         </div>
       ) : null}
 
+      {!turns.length && configured ? (
+        <div className="mb-3 flex flex-wrap gap-2" aria-label="Example questions">
+          {STARTER_QUESTIONS.map((s) => (
+            <button key={s} type="button" className="chip text-xs" onClick={() => void send(s)} disabled={busy}>
+              {s}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       <form onSubmit={ask} className="flex gap-2">
         <input
           type="text"
@@ -104,10 +135,10 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
           onChange={(e) => setQuestion(e.target.value)}
           placeholder={turns.length ? "Ask a follow-up…" : "How much was billed by cycle in the last 90 days?"}
           className="input-modern w-full"
-          disabled={busy || (status ? !status.configured : false)}
+          disabled={busy || !configured}
           aria-label="Your question"
         />
-        <button type="submit" className="btn-primary" disabled={busy || !question.trim() || (status ? !status.configured : false)}>
+        <button type="submit" className="btn-primary" disabled={busy || !question.trim() || !configured}>
           {busy ? "Asking…" : "Ask"}
         </button>
       </form>
@@ -177,6 +208,7 @@ function QueryResult({ q }: { q: AssistantQuery }) {
     try { sessionStorage.setItem(WORKSPACE_SQL_KEY, q.sql); } catch { /* storage unavailable */ }
   };
   const shown = q.rows.slice(0, 25);
+  const chart = resultChart(q);
   return (
     <div className="mt-3 rounded-lg border border-edge-subtle">
       <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
@@ -184,7 +216,7 @@ function QueryResult({ q }: { q: AssistantQuery }) {
           {q.purpose ? <span className="text-heading">{q.purpose} · </span> : null}
           {q.row_count.toLocaleString()} row{q.row_count === 1 ? "" : "s"}{q.truncated ? " (capped)" : ""} · {q.ms} ms
         </p>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button type="button" className="btn-ghost text-xs" onClick={() => setOpen((o) => !o)}>{open ? "Hide SQL" : "Show SQL"}</button>
           <button type="button" className="btn-ghost text-xs" onClick={copy}>{copied ? "Copied" : "Copy SQL"}</button>
           <Link href="/database" className="btn-ghost text-xs" onClick={handoff}>Open in SQL workspace</Link>
@@ -198,6 +230,14 @@ function QueryResult({ q }: { q: AssistantQuery }) {
         </ul>
       ) : null}
       {open ? <pre className="overflow-x-auto border-t border-edge-subtle px-3 py-2 text-xs text-heading">{q.sql}</pre> : null}
+      {chart ? (
+        <div className="border-t border-edge-subtle">
+          <DatabaseResultChart
+            rows={q.rows.map((r) => Object.fromEntries(q.columns.map((c, i) => [c, r[i]])))}
+            suggestion={chart}
+          />
+        </div>
+      ) : null}
       {shown.length ? (
         <div className="overflow-auto border-t border-edge-subtle">
           <table className="min-w-full text-left text-xs">

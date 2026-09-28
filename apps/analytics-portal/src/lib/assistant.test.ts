@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ageLabel, appendTurns, cell, integrityHeadline, integrityLabel, spendLabel, summarise, threadFor, type Turn } from "./assistant";
+import { STARTER_QUESTIONS, ageLabel, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, spendLabel, summarise, threadFor, type Turn } from "./assistant";
 import type { AssistantResponse, CanvasIntegrity, IntegrityOverview } from "./types";
 
 const answer = (thread: unknown[] = []): AssistantResponse => ({
@@ -97,5 +97,39 @@ describe("what the organization has spent", () => {
     expect(spendLabel({ ...base, budget: null })).toBe("Today: 44,464 tokens (2 questions)");
     expect(spendLabel({ ...base, budget: 2000000 })).toBe("Today: 44,464 tokens (2 questions) of a 2,000,000 budget");
     expect(spendLabel({ ...base, questions: 1, budget: null })).toBe("Today: 44,464 tokens (1 question)");
+  });
+});
+
+describe("a chart under the answer", () => {
+  const q = (columns: string[], rows: unknown[][]) => ({ columns, rows });
+
+  it("charts one label column against one money column, as money", () => {
+    const s = resultChart(q(["Bill Cycle", "Billed Amount"], [["C1", "2682879.14"], ["C2", "1200.5"], ["C3", "99"]]));
+    expect(s?.dimensionKey).toBe("Bill Cycle");
+    expect(s?.measureKey).toBe("Billed Amount");
+    expect(s?.isCurrency).toBe(true);
+  });
+
+  it("does not chart a single figure, a long detail list, or ids", () => {
+    expect(resultChart(q(["Total Billed"], [["10"]]))).toBeNull();
+    expect(resultChart(q(["Account ID", "Billed Amount"], Array.from({ length: 80 }, (_, i) => [`A${i}`, i])))).toBeNull();
+    expect(resultChart(q(["Account ID", "Bill ID"], [["1", "2"], ["3", "4"]]))).toBeNull();
+  });
+
+  it("a year or month column is the label axis, even though it holds numbers", () => {
+    const s = resultChart(q(["Year", "Rows"], [[2026, 247], [2025, 273], [2024, 167]]));
+    expect(s?.dimensionKey).toBe("Year");
+    expect(s?.measureKey).toBe("Rows");
+  });
+
+  it("counts are not money", () => {
+    expect(resultChart(q(["Tender Type", "Payment Count"], [["Cash", 5], ["Check", 9]]))?.isCurrency).toBe(false);
+  });
+});
+
+describe("starter questions", () => {
+  it("offers a few, each a real question", () => {
+    expect(STARTER_QUESTIONS.length).toBeGreaterThanOrEqual(3);
+    for (const s of STARTER_QUESTIONS) expect(s.trim().endsWith("?")).toBe(true);
   });
 });

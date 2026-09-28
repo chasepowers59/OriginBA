@@ -488,3 +488,107 @@ class FromInsideFunctions(unittest.TestCase):
                     'SELECT 1 FROM (SELECT * FROM cisadm.ci_acct) x'):
             with self.assertRaises(SqlWorkspaceValidationError, msg=sql):
                 enforce_canvases_only(sql)
+
+
+def _exchange(n):
+    """One past question with a tool call, the way a thread comes back from the browser."""
+    return [
+        {"role": "user", "content": f"question {n}"},
+        {"role": "assistant", "content": [{"type": "tool_use", "id": f"u{n}", "name": "list_canvases", "input": {}}]},
+        {"role": "user", "content": [{"type": "tool_result", "tool_use_id": f"u{n}", "content": "(omitted)"}]},
+        {"role": "assistant", "content": [{"type": "text", "text": f"answer {n}"}]},
+    ]
+
+
+def _well_formed(messages):
+    """What the API accepts: starts on a plain user question, every tool_result answers a
+    tool_use in the turn before it, and no assistant turn is empty."""
+    first = messages[0]
+    if first["role"] != "user":
+        return False
+    if isinstance(first["content"], list) and any(b.get("type") == "tool_result" for b in first["content"]):
+        return False
+    for i, m in enumerate(messages):
+        c = m["content"]
+        if m["role"] == "assistant" and isinstance(c, list) and not c:
+            return False
+        uses = {b["id"] for b in c if b.get("type") == "tool_use"} if isinstance(c, list) else set()
+        if uses:
+            nxt = messages[i + 1]["content"] if i + 1 < len(messages) else []
+            answered = {b.get("tool_use_id") for b in nxt} if isinstance(nxt, list) else set()
+            if uses - answered:
+                return False
+        if isinstance(c, list) and any(b.get("type") == "tool_result" for b in c):
+            prev = messages[i - 1]["content"] if i else []
+            asked = {b.get("id") for b in prev} if isinstance(prev, list) else set()
+            if {b["tool_use_id"] for b in c if b.get("type") == "tool_result"} - asked:
+                return False
+    return True
+
+
+class LongConversations(unittest.TestCase):
+    """By the fourth or fifth follow-up the thread passed 20 messages, and a count-based cut
+    could start it on an assistant turn or an orphaned tool result: a 400 from the API, a
+    502 to the user (the AI review, 2026-09-28)."""
+
+    setUp, tearDown, _assistant = TheLoop.setUp, TheLoop.tearDown, TheLoop._assistant
+
+    def test_a_long_thread_is_cut_at_a_question(self):
+        thread = [m for n in range(7) for m in _exchange(n)]
+        for drop in range(4):   # every alignment of the cut
+            client = FakeClient([_resp([_text("fine")], "end_turn")])
+            out = self._assistant(client).ask("next question", thread=thread[drop:])
+            self.assertTrue(_well_formed(client.requests[0]["messages"]), f"sent malformed at offset {drop}")
+            self.assertTrue(_well_formed(out["thread"]), f"returned malformed at offset {drop}")
+
+    def test_an_answer_cut_off_mid_tool_call_leaves_a_usable_thread(self):
+        client = FakeClient([_resp([_text("Here is"), _tool("t9", "run_sql", {"sql": "sel"})], "max_tokens")])
+        out = self._assistant(client).ask("everything, please")
+        self.assertIn("cut short", out["answer"])
+        self.assertTrue(_well_formed(out["thread"]))
+
+    def test_a_refusal_says_so_and_leaves_a_usable_thread(self):
+        client = FakeClient([_resp([], "refusal")])
+        out = self._assistant(client).ask("something it declines")
+        self.assertTrue(out["answer"])
+        self.assertTrue(_well_formed(out["thread"]))
+
+
+class RespectsReportAccess(unittest.TestCase):
+    """A person granted one workstream could ask the assistant about every canvas: its list
+    came from the whole catalog and the fence checked only that a table was a canvas. The
+    governed metrics already checked grants (the AI review, 2026-09-28)."""
+
+    setUp, tearDown = TheLoop.setUp, TheLoop.tearDown
+
+    def _assistant(self, client):
+        return Assistant(org_id="dev", org_name="Dev", actor_email="t@x", actor_id="t",
+                         client_factory=lambda: client, can_read=lambda cid: cid == "rpt_payment")
+
+    def test_the_list_and_the_prompt_hold_only_granted_canvases(self):
+        client = FakeClient([
+            _resp([_tool("l1", "list_canvases", {})], "tool_use"),
+            _resp([_text("done")], "end_turn"),
+        ])
+        self._assistant(client).ask("what can I see?")
+        listed = json.loads(client.requests[1]["messages"][-1]["content"][0]["content"])
+        self.assertEqual([c["id"] for c in listed], ["rpt_payment"])
+        canvas_list = client.requests[0]["system"][0]["text"].split("The organization's canvases:")[1]
+        self.assertIn("- rpt_payment", canvas_list)
+        self.assertNotIn("- rpt_bill_segment", canvas_list)
+
+    def test_a_query_on_a_canvas_outside_the_grant_is_refused(self):
+        client = FakeClient([
+            _resp([_tool("q1", "run_sql", {"sql": 'select count(*) from reporting.rpt_bill_segment',
+                                           "purpose": "p"})], "tool_use"),
+            _resp([_text("done")], "end_turn"),
+        ])
+        out = self._assistant(client).ask("how many bill segments?")
+        self.assertFalse(out["steps"][0]["ok"])
+        self.assertEqual(out["queries"], [])
+
+    def test_everyone_else_is_unchanged(self):
+        client = FakeClient([_resp([_text("done")], "end_turn")])
+        Assistant(org_id="dev", org_name="Dev", actor_email="t@x", actor_id="t",
+                  client_factory=lambda: client).ask("hi")
+        self.assertIn("- rpt_bill_segment", client.requests[0]["system"][0]["text"])

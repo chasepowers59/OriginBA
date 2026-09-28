@@ -4,6 +4,7 @@
  */
 import { formatCellValue, isIdentifierColumn } from "@/lib/format";
 import { measureIsCurrency } from "@/lib/businessLabels";
+import { suggestChart, type ChartSuggestion } from "@/lib/databaseChartUtils";
 import type { AssistantSpend, CanvasIntegrity, AssistantMessage, AssistantResponse, IntegrityOverview } from "@/lib/types";
 
 export type Turn =
@@ -95,4 +96,34 @@ export function spendLabel(s: AssistantSpend): string {
   const q = `${s.questions} question${s.questions === 1 ? "" : "s"}`;
   const base = `Today: ${s.today.toLocaleString()} tokens (${q})`;
   return s.budget ? `${base} of a ${s.budget.toLocaleString()} budget` : base;
+}
+
+/** Questions a new user can start from, each answerable from the canvases. */
+export const STARTER_QUESTIONS = [
+  "How much was billed by bill cycle in the last 90 days?",
+  "Which accounts owe the most more than 90 days past due?",
+  "How were payments taken last month, by tender type?",
+  "Which batch jobs ended in error in the last week?",
+];
+
+const MAX_CHART_ROWS = 50;
+const PERIOD_COLUMN = /\b(year|quarter|month|week|period)\b/i;
+
+/**
+ * A chart for a query result when one reads better than the table: a label column against
+ * a number, a handful to a few dozen rows. A single figure or a long detail list stays a table.
+ */
+export function resultChart(q: { columns: string[]; rows: unknown[][] }): ChartSuggestion | null {
+  if (q.rows.length < 2 || q.rows.length > MAX_CHART_ROWS) return null;
+  const records = q.rows.map((r) => Object.fromEntries(q.columns.map((c, i) => [c, r[i]])));
+  // A year or month is the label axis even when it is stored as a number, which the
+  // general suggestion reads as a measure.
+  const period = q.columns.find((c) => PERIOD_COLUMN.test(c));
+  const measure = period && q.columns.find((c, i) => c !== period && !isIdentifierColumn(c)
+    && q.rows.every((r) => r[i] == null || Number.isFinite(Number(r[i]))));
+  const s = period && measure
+    ? { dimensionKey: period, measureKey: measure, chartType: "line" as const, sortTimeSeries: true,
+        isCurrency: false, label: measure }
+    : suggestChart(q.columns, records);
+  return s ? { ...s, isCurrency: measureIsCurrency(s.measureKey) } : null;
 }

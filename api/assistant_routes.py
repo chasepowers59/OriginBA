@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from api.auth.workstream_access import can_access_snapshot
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
@@ -41,8 +42,11 @@ def ask(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> dict[
     if not assistant_configured():
         raise HTTPException(status_code=503, detail="The assistant is not configured: set ANTHROPIC_API_KEY.")
     _within_limits(org_id, ctx.email)
+    # A person granted some workstreams asks about those canvases only, as everywhere else.
+    unrestricted = not ctx.workstreams or "*" in ctx.workstreams
     assistant = Assistant(org_id=org_id, org_name=ctx.organization_name or org_id,
-                          actor_email=ctx.email, actor_id=ctx.id)
+                          actor_email=ctx.email, actor_id=ctx.id,
+                          can_read=None if unrestricted else (lambda cid: can_access_snapshot(ctx, cid)))
     try:
         return assistant.ask(body.question, body.thread)
     except Exception as exc:  # noqa: BLE001 -- the model API is an external dependency
