@@ -525,9 +525,8 @@ def _draw_free_node(slide, n):
         d = slide.shapes.add_shape(MSO_SHAPE.DIAMOND, Inches(x), Inches(y), Inches(w), Inches(h))
         d.fill.solid(); d.fill.fore_color.rgb = rgb(ORANGE); d.line.fill.background(); d.shadow.inherit = False
         _text(d, [[(title, n.get("title_pt", 11), BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.02)
-    elif kind == "data":
-        c = slide.shapes.add_shape(MSO_SHAPE.CAN, Inches(x), Inches(y), Inches(w), Inches(h))
-        c.fill.solid(); c.fill.fore_color.rgb = rgb(CREAM); c.line.fill.background(); c.shadow.inherit = False
+    elif kind == "data":   # a table: the same flat cream box as a step, centred, so nothing on the page pretends to be 3-D
+        c = _box(slide, x, y, w, h, CREAM, radius=0.1)
         _text(c, [[(title, n.get("title_pt", 11), BLUE, True)]] + ([[(body, 9.5, GREY, False)]] if body else []), align=PP_ALIGN.CENTER, margin=0.05)
     elif kind == "domain":
         _chip(slide, x, y, w, h, title, fill=WHITE, size=n.get("title_pt", 11), bold=True)

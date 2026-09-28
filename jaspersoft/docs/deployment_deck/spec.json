@@ -14,8 +14,8 @@
           "label": "Snapshot layer",
           "sub": "built inside the client's CISADM",
           "items": [
-            "8 reporting tables (the active 8) loaded once from full history",
-            "Refresh procedures: full history for the baseline, then a rolling window",
+            "8 reporting tables (the active 8) loaded once from the retained history",
+            "Refresh procedures: the retained 24 months once, then a rolling window",
             "Database scheduler jobs, twice daily, staggered so they never overlap"
           ]
         },
@@ -561,7 +561,7 @@
           "h": 1.0,
           "title": "Deploy the procedures",
           "kind": "step",
-          "body": "baseline (24 months, once) and operational per table; SA refresh"
+          "body": "baseline (the retained 24 months, once) and operational per table; the SA aged-balance refresh"
         },
         {
           "id": "p5",
@@ -719,7 +719,7 @@
           "h": 0.95,
           "title": "Schedule",
           "kind": "step",
-          "body": "twice daily, 30-minute stagger, held on TEST until approved"
+          "body": "twice daily from 10:00 and 16:00 UTC, 30-minute stagger; held on TEST until approved"
         },
         {
           "id": "q7",
@@ -747,7 +747,7 @@
           "y": 6.92,
           "w": 2.3,
           "h": 0.35,
-          "title": "Finance",
+          "title": "Finance tables",
           "kind": "note"
         },
         {
@@ -756,7 +756,7 @@
           "y": 6.92,
           "w": 2.3,
           "h": 0.35,
-          "title": "Billing and Rates",
+          "title": "Billing and Rates tables",
           "kind": "note"
         },
         {
@@ -765,7 +765,7 @@
           "y": 6.92,
           "w": 2.3,
           "h": 0.35,
-          "title": "Meter Operations",
+          "title": "Meter Operations tables",
           "kind": "note"
         },
         {
@@ -774,7 +774,7 @@
           "y": 6.92,
           "w": 2.6,
           "h": 0.35,
-          "title": "Debt Management",
+          "title": "Debt Management table + seed",
           "kind": "note"
         },
         {
@@ -1106,8 +1106,12 @@
           "to_side": "top",
           "via": [
             [
+              17.31,
+              4.1
+            ],
+            [
               19.85,
-              4.05
+              4.1
             ]
           ]
         },
@@ -1246,7 +1250,7 @@
           "to": "m9"
         }
       ],
-      "legend": "Cylinders are the tables the domains read; the boxes under the three view columns are the CMS views; orange diamonds are gates that stop the rollout. The loop under the second row is the twice-daily rolling refresh."
+      "legend": "Every box in the map is one database object the domains read: seven rolling snapshot tables, the SA aged-balance table with its lookup seed, and eight CMS views. Orange diamonds are gates that stop the rollout; the loop under the second row is the twice-daily rolling refresh (3 months rebuilt, 24 kept; 6 months at CityCorp and Odessa)."
     },
     {
       "type": "table",
@@ -1361,7 +1365,7 @@
           "col": 0,
           "row": 0,
           "title": "Baseline procedure",
-          "body": "loads every year of history once, one job per table"
+          "body": "loads the retained 24 months once, one job per table"
         },
         {
           "id": "g1",
@@ -1412,7 +1416,7 @@
           "col": 0,
           "row": 1,
           "title": "Windows per client",
-          "body": "12 months; 6 at CityCorp and Odessa; 3 rolling with 24 kept at College Station and Newark"
+          "body": "3 months rebuilt, 24 kept, on every table; 6-month rolling at CityCorp and Odessa"
         },
         {
           "id": "les",
@@ -1905,7 +1909,7 @@
           "h": 1.15,
           "title": "Standardized Reports folder",
           "kind": "step",
-          "body": "scheduled SQL reports in one place on every org, promoted by the same tool"
+          "body": "scheduled SQL reports in one folder; on Origin_DEV today, promoted to client orgs by the same tool when approved"
         },
         {
           "id": "e3",

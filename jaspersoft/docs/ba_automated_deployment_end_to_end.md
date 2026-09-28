@@ -182,8 +182,8 @@ Per client, as `scripts/local/prod_snapshot_rollout_25_4.sh <client>` runs it (e
    one-time job is not SUCCEEDED).
 6. Post-load indexes (`clients/post_load_snapshot_indexes_direct.sql`).
 7. Rolling procedures and schedule: the rolling procedure deletes and rebuilds only the most recent
-   months (12 by default; 6 at CityCorp and Odessa; 3 rolling with 24 kept at College Station and
-   Newark, `clients/<client>/02_deploy_3mo_rolling_24mo_retain_procedures.sql`), then
+   months (3 months rebuilt and 24 kept on every table; 6-month rolling procedures at CityCorp and
+   Odessa; College Station and Newark carry their own 3-month / 24-month variants), then
    `07_schedule_all_active_snapshots.sql` creates the DBMS_SCHEDULER jobs (twice daily, 10:00 and
    16:00 UTC, 30-minute stagger; held on TEST until approved).
 8. Domain-support refresh and the gates: `04_validate_all_active_snapshots.sql` (row counts, 12-month
