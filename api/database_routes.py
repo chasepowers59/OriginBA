@@ -195,6 +195,7 @@ def list_tables(
     search: str = Query(default="", max_length=128),
     include_stats: bool = Query(default=False),
 ) -> dict[str, Any]:
+    require_unrestricted(ctx)   # whole-table row counts, and the workspace is refused to them anyway
     org_id = require_org_for_data(ctx)
     engine = _require_db(org_id)
 
@@ -355,6 +356,9 @@ def count_sql(
     body: SqlExecuteRequest,
     ctx: AuthContext = Depends(require_permission("database:sql")),
 ) -> dict[str, Any]:
+    # The count of arbitrary SQL answers any question one bit at a time: refused exactly
+    # like /sql/execute (security review, 2026-09-28).
+    require_unrestricted(ctx)
     org_id = require_org_for_data(ctx)
     engine = _require_db(org_id)
 

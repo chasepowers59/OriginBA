@@ -124,7 +124,13 @@ class EnforcementTests(unittest.TestCase):
             dr.execute_sql(dr.SqlExecuteRequest(sql="select 1"), ctx=_ctx(WATER))
         with self.assertRaises(HTTPException) as c:
             ask(AskRequest(question="how much?"), ctx=_ctx(WATER))
-        for err in (a, b, c):
+        # The row count of arbitrary SQL answers questions one bit at a time (security review,
+        # 2026-09-28: critical), and the table list gives whole-table row counts.
+        with self.assertRaises(HTTPException) as d:
+            dr.count_sql(dr.SqlExecuteRequest(sql="select 1"), ctx=_ctx(WATER))
+        with self.assertRaises(HTTPException) as e:
+            dr.list_tables(ctx=_ctx(WATER))
+        for err in (a, b, c, d, e):
             self.assertEqual(err.exception.status_code, 403)
             self.assertIn("limited to part of the data", err.exception.detail)
 
