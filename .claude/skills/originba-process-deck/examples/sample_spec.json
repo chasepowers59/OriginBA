@@ -1,0 +1,21 @@
+{
+  "slides": [
+    {"type": "title", "title": "OriginBA Automated Deployment", "subtitle": "Sample built by the originba-process-deck skill"},
+    {"type": "process", "title": "Current Process", "kicker": "S1",
+     "nodes": [
+       {"id": "client", "col": 0, "row": 0, "title": "Client", "body": "C2M Oracle (CISADM)"},
+       {"id": "dbt", "col": 1, "row": 0, "title": "dbt build", "body": "staging, core, reporting"},
+       {"id": "domains", "col": 2, "row": 0, "title": "Domains", "body": "generated from contracts"},
+       {"id": "jrs", "col": 3, "row": 0, "title": "JasperReports Server", "body": "promoted per org"},
+       {"id": "qa", "col": 2, "row": 1, "title": "Parity QA", "body": "121 checks nightly", "kind": "manual"},
+       {"id": "warn", "col": 3, "row": 1, "h": 0.62, "title": "VPN required", "kind": "accent"},
+       {"id": "doc", "x": 6.11, "y": 7.37, "title": "Validation doc", "kind": "card"}
+     ],
+     "edges": [["client", "dbt"], ["dbt", "domains"], ["domains", "jrs"], ["dbt", "qa"], ["jrs", "doc"]],
+     "legend": "Cream = automated step   Grey = on demand   Orange = constraint"},
+    {"type": "roadmap", "title": "Roadmap", "kicker": "S2", "intro": "What comes next.",
+     "steps": [{"title": "Interactive tables", "owner": "Chase"}, {"title": "As-of reports", "owner": "Chase"}, {"title": "Relative dates", "owner": "Chase"}, {"title": "Client rollout", "owner": "Chase / clients", "current": true}]},
+    {"type": "cards", "title": "What is automated", "cards": [{"heading": "Nightly build", "lines": ["06:30 per client", "incremental merge"]}, {"heading": "Parity", "lines": ["121 source checks", "8 snapshot checks"]}, {"heading": "Promotion", "lines": ["one command per org", "seven proofs"]}]},
+    {"type": "table", "title": "Tools", "columns": ["Tool", "Does"], "widths": [6, 14.4], "rows": [["jrs_promote.py", "moves anything between orgs as root"], ["jrs_domain_patch_apply.py", "additive-only domain changes with proofs"]]}
+  ]
+}

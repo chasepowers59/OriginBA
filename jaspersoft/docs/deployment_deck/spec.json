@@ -1,0 +1,758 @@
+{
+ "slides": [
+  {
+   "type": "title",
+   "title": "OriginBA Automated Deployment",
+   "subtitle": "How client data becomes reports, end to end  |  internal documentation for developers  |  September 2026"
+  },
+  {
+   "type": "statement",
+   "title": "What this document covers",
+   "lines": [
+    "OriginBA turns a client's Oracle Utilities C2M database (CISADM) into a governed reporting layer and delivers it through JasperReports Server: Ad Hoc domains, dashboards, standardized reports and scheduled exports, one org per client.",
+    "Two repositories carry it. originba_dbt owns the data layer: the dbt models, the Oracle-native build, nightly QA, the client registry and generated domains. OriginBA-3 owns delivery: hand-built domains, report packs, promotion tools, the snapshot layer, the portal.",
+    "Almost every step below is a command with a proof attached. The steps that are not are named as such, together with what it would take to close them."
+   ]
+  },
+  {
+   "type": "process",
+   "title": "End to End",
+   "kicker": "S1",
+   "nodes": [
+    {
+     "id": "c2m",
+     "col": 0,
+     "row": 0,
+     "title": "Client C2M",
+     "body": "Oracle CISADM, read-only, reached over the VPN"
+    },
+    {
+     "id": "wh",
+     "col": 1,
+     "row": 0,
+     "title": "Reporting layer",
+     "body": "dbt in the client's own instance, or the snapshot tables"
+    },
+    {
+     "id": "dom",
+     "col": 2,
+     "row": 0,
+     "title": "Jaspersoft domains",
+     "body": "Standard Offering per workstream, bound to the client datasource"
+    },
+    {
+     "id": "jrs",
+     "col": 3,
+     "row": 0,
+     "title": "JasperReports Server",
+     "body": "Origin_DEV, Origin_TEST, client test, client prod"
+    },
+    {
+     "id": "qa",
+     "col": 1,
+     "row": 1,
+     "title": "Parity QA",
+     "body": "121 source checks and 8 snapshot checks after every build",
+     "kind": "manual"
+    },
+    {
+     "id": "promo",
+     "col": 2,
+     "row": 1,
+     "title": "Promotion with proofs",
+     "body": "export, package, import, re-export compare, execute"
+    },
+    {
+     "id": "user",
+     "col": 3,
+     "row": 1,
+     "title": "Client users",
+     "body": "Ad Hoc views, dashboards, scheduled CSV and PDF"
+    },
+    {
+     "id": "ai",
+     "x": 0.81,
+     "y": 6.35,
+     "w": 9.66,
+     "h": 1.55,
+     "title": "Claude Code sessions",
+     "body": "run the tools above on instruction, with the skills as the operating manual; nothing writes to prod without --i-mean-prod"
+    },
+    {
+     "id": "vpn",
+     "x": 11.52,
+     "y": 6.35,
+     "h": 0.62,
+     "title": "Everything client-side needs the VPN from Chase's Mac",
+     "kind": "accent"
+    },
+    {
+     "id": "doc",
+     "x": 16.88,
+     "y": 6.9,
+     "title": "Validation sign-off",
+     "body": "docx per org from the sweep",
+     "kind": "card"
+    }
+   ],
+   "edges": [
+    [
+     "c2m",
+     "wh"
+    ],
+    [
+     "wh",
+     "dom"
+    ],
+    [
+     "dom",
+     "jrs"
+    ],
+    [
+     "wh",
+     "qa"
+    ],
+    [
+     "dom",
+     "promo"
+    ],
+    [
+     "jrs",
+     "user"
+    ],
+    [
+     "user",
+     "doc"
+    ]
+   ],
+   "legend": "Cream = automated by a tool with a proof   Grey = scheduled QA   Orange = the standing constraint",
+   "notes": "The three shapes of the reporting layer: legacy snapshot tables in CISADM (in production today), the in-database dbt warehouse (INT_DEV bench and Ellensburg test), and Postgres slices for validation. Jaspersoft reads the reporting layer only."
+  },
+  {
+   "type": "process",
+   "title": "Client Database Side",
+   "kicker": "S2",
+   "nodes": [
+    {
+     "id": "reg",
+     "col": 0,
+     "row": 0,
+     "title": "1. Registry",
+     "body": "clients.yml row: org, datasource, PDB, version, threads"
+    },
+    {
+     "id": "gate",
+     "col": 1,
+     "row": 0,
+     "title": "2. Capacity gate",
+     "body": "size the warehouse, cap TEMP first (the 246 GB lesson)",
+     "kind": "manual"
+    },
+    {
+     "id": "drift",
+     "col": 2,
+     "row": 0,
+     "title": "3. Drift check",
+     "body": "oracle_source_drift.py; compat views only where columns differ"
+    },
+    {
+     "id": "schem",
+     "col": 3,
+     "row": 0,
+     "title": "4. Schemas and grants",
+     "body": "ORIGINBA_STAGING, CORE, REPORTING beside CISADM"
+    },
+    {
+     "id": "build",
+     "col": 3,
+     "row": 1,
+     "title": "5. Build both paths",
+     "body": "build_oracle_warehouse.sh: full refresh, then incremental"
+    },
+    {
+     "id": "proof",
+     "col": 2,
+     "row": 1,
+     "title": "6. Merge proofs",
+     "body": "idempotence and propagation, then reconcile to CMS_SA_SNAPSHOT 100%"
+    },
+    {
+     "id": "bi",
+     "col": 1,
+     "row": 1,
+     "title": "7. BI views and domains",
+     "body": "create_bi_views.py, generated domains, one Ad Hoc query"
+    },
+    {
+     "id": "sched",
+     "col": 0,
+     "row": 1,
+     "title": "8. Schedule",
+     "body": "launchd every 6 hours; the overnight fire is the full refresh"
+    },
+    {
+     "id": "night",
+     "x": 0.81,
+     "y": 6.35,
+     "w": 15.0,
+     "h": 1.75,
+     "title": "Nightly chain",
+     "body": "lock, VPN gate, build, BI views, canary, source parity, snapshot parity, scorecard, fleet page, alert on red"
+    },
+    {
+     "id": "hold",
+     "x": 16.88,
+     "y": 6.35,
+     "h": 0.62,
+     "title": "Live only on INT_DEV and Ellensburg test",
+     "kind": "accent"
+    },
+    {
+     "id": "wk",
+     "x": 16.88,
+     "y": 7.3,
+     "w": 4.3,
+     "h": 1.55,
+     "title": "Weekly QA",
+     "body": "Monday 07:00: fixtures, slices, DQ rules, drift, tenant sweep"
+    }
+   ],
+   "edges": [
+    [
+     "reg",
+     "gate"
+    ],
+    [
+     "gate",
+     "drift"
+    ],
+    [
+     "drift",
+     "schem"
+    ],
+    [
+     "schem",
+     "build"
+    ],
+    [
+     "build",
+     "proof"
+    ],
+    [
+     "proof",
+     "bi"
+    ],
+    [
+     "bi",
+     "sched"
+    ]
+   ],
+   "legend": "Steps 1 to 8 are the onboarding runbook (skill oracle-native-rollout). Grey = still a manual measurement; the capacity-gate tool is on the roadmap."
+  },
+  {
+   "type": "process",
+   "title": "Snapshot Layer (Production Today)",
+   "kicker": "S3",
+   "nodes": [
+    {
+     "id": "t",
+     "col": 0,
+     "row": 0,
+     "title": "01. Tables",
+     "body": "the active 8 *_RPT_CURR tables and CMS_SA_SNAPSHOT"
+    },
+    {
+     "id": "p",
+     "col": 1,
+     "row": 0,
+     "title": "02. Procedures",
+     "body": "REFRESH_* full-history and rolling-window PL/SQL"
+    },
+    {
+     "id": "b",
+     "col": 2,
+     "row": 0,
+     "title": "03. Baselines",
+     "body": "one-time staggered jobs, ready gate, CMS refresh"
+    },
+    {
+     "id": "v",
+     "col": 3,
+     "row": 0,
+     "title": "04. Validation gates",
+     "body": "no empty tables, no duplicate keys, FT parity"
+    },
+    {
+     "id": "s",
+     "col": 3,
+     "row": 1,
+     "title": "05 to 08. Schedule",
+     "body": "DBMS_SCHEDULER, twice daily, 30-minute stagger"
+    },
+    {
+     "id": "d",
+     "col": 2,
+     "row": 1,
+     "title": "Domains bind here",
+     "body": "Standard Offering snapshot domains read these tables"
+    },
+    {
+     "id": "par",
+     "col": 1,
+     "row": 1,
+     "title": "dbt parity",
+     "body": "nightly run_snapshot_parity.py ties the canvases to these tables",
+     "kind": "manual"
+    },
+    {
+     "id": "run",
+     "x": 0.81,
+     "y": 6.35,
+     "w": 9.66,
+     "h": 1.55,
+     "title": "Runner",
+     "body": "run_snapshot_rollout_step.py --step <name> --clients <c>; logs under deploy/snapshot_rollout_logs"
+    },
+    {
+     "id": "warn",
+     "x": 11.52,
+     "y": 6.35,
+     "h": 0.62,
+     "title": "Long refreshes need RUN_JOB with use_current_session false",
+     "kind": "accent"
+    }
+   ],
+   "edges": [
+    [
+     "t",
+     "p"
+    ],
+    [
+     "p",
+     "b"
+    ],
+    [
+     "b",
+     "v"
+    ],
+    [
+     "v",
+     "s"
+    ],
+    [
+     "s",
+     "d"
+    ],
+    [
+     "d",
+     "par"
+    ]
+   ],
+   "legend": "This is the layer the in-database dbt warehouse replaces; until then it is what every client's Standard Offering reads."
+  },
+  {
+   "type": "process",
+   "title": "Jaspersoft Delivery",
+   "kicker": "S4",
+   "nodes": [
+    {
+     "id": "dev",
+     "col": 0,
+     "row": 0,
+     "title": "Origin_DEV",
+     "body": "the only place changes are authored"
+    },
+    {
+     "id": "test",
+     "col": 1,
+     "row": 0,
+     "title": "Origin_TEST",
+     "body": "internal promotion proof: same file set, only the datasource differs"
+    },
+    {
+     "id": "ct",
+     "col": 2,
+     "row": 0,
+     "title": "Client test orgs",
+     "body": "packaged against each org's own datasource, verified before import"
+    },
+    {
+     "id": "cp",
+     "col": 3,
+     "row": 0,
+     "title": "Client prod orgs",
+     "body": "jrs_promote_test_to_prod.py; refuses if a test host survives"
+    },
+    {
+     "id": "sweep",
+     "col": 3,
+     "row": 1,
+     "title": "Sweep and sign-off",
+     "body": "jrs_run_sweep.py executes everything; the docx records PASS per row"
+    },
+    {
+     "id": "inv",
+     "col": 2,
+     "row": 1,
+     "title": "Inventory",
+     "body": "jrs_inventory.py snapshot before, diff after: the rollback"
+    },
+    {
+     "id": "any",
+     "col": 1,
+     "row": 1,
+     "title": "Any resource, any org",
+     "body": "jrs_promote.py as root: domains, views, reports, folders, across servers"
+    },
+    {
+     "id": "patch",
+     "col": 0,
+     "row": 1,
+     "title": "Domain changes",
+     "body": "additive only, seven proofs, restore in one command"
+    },
+    {
+     "id": "rep",
+     "x": 0.81,
+     "y": 6.35,
+     "w": 9.66,
+     "h": 1.55,
+     "title": "Standardized reports",
+     "body": "SQL report pack generated with tests, deployed by REST, one folder clients schedule from"
+    },
+    {
+     "id": "gate",
+     "x": 11.52,
+     "y": 6.35,
+     "h": 0.62,
+     "title": "Prod writes only when named, with --i-mean-prod",
+     "kind": "accent"
+    },
+    {
+     "id": "doc",
+     "x": 16.88,
+     "y": 6.9,
+     "title": "Validation doc",
+     "body": "per org, from the sweep",
+     "kind": "card"
+    }
+   ],
+   "edges": [
+    [
+     "dev",
+     "test"
+    ],
+    [
+     "test",
+     "ct"
+    ],
+    [
+     "ct",
+     "cp"
+    ],
+    [
+     "cp",
+     "sweep"
+    ],
+    [
+     "sweep",
+     "doc"
+    ]
+   ]
+  },
+  {
+   "type": "cards",
+   "title": "What Is Automated Today",
+   "cards": [
+    {
+     "heading": "Warehouse build",
+     "lines": [
+      "One entry point with nine gates and a preflight",
+      "Incremental 11 min, full refresh 33 min at 5.4M FTs",
+      "Merge proven idempotent"
+     ]
+    },
+    {
+     "heading": "Nightly QA",
+     "lines": [
+      "Every 6 hours per client under launchd",
+      "Canary, 121 parity checks, 8 snapshot checks",
+      "Scorecard, fleet page, alert on red"
+     ]
+    },
+    {
+     "heading": "Regeneration",
+     "lines": [
+      "Contracts, dictionary, catalog, domains, explorer",
+      "One script; the build fails on drift",
+      "Generated domains byte-identical on rebuild"
+     ]
+    },
+    {
+     "heading": "Promotion",
+     "lines": [
+      "Package = target's own datasource + source scope",
+      "Import, re-export compare, execute",
+      "Rollback zip written before every write"
+     ]
+    },
+    {
+     "heading": "Domain changes",
+     "lines": [
+      "Additive-only guard on every patch",
+      "Seven proofs per org",
+      "Row ties to Oracle before promotion"
+     ]
+    },
+    {
+     "heading": "Reports",
+     "lines": [
+      "JRXML generated from specs with tests",
+      "Deployed by REST, rendered as proof",
+      "Sign-off documents from the sweep"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "table",
+   "title": "What Runs When",
+   "widths": [
+    5.2,
+    7.2,
+    8.0
+   ],
+   "columns": [
+    "Job",
+    "Trigger",
+    "Does"
+   ],
+   "rows": [
+    [
+     "Nightly INT_DEV",
+     "launchd 05:45, 11:45, 17:45, 23:45",
+     "Oracle-native build and the QA chain on the bench"
+    ],
+    [
+     "Nightly Ellensburg",
+     "launchd 00:30, 06:30, 12:30, 18:30",
+     "Same chain on Ellensburg 25.4 test; 00:30 is the full refresh"
+    ],
+    [
+     "Weekly QA",
+     "launchd Monday 07:00",
+     "Fixtures, slices, DQ rules, drift, tenant sweep, regenerate_all"
+    ],
+    [
+     "Snapshot refreshes",
+     "Oracle DBMS_SCHEDULER, twice daily",
+     "REFRESH_* procedures per client in CISADM"
+    ],
+    [
+     "CI",
+     "GitHub Actions on pull request",
+     "dbt build both paths on Postgres 13 and 16"
+    ],
+    [
+     "CD",
+     "GitHub Actions on merge to main",
+     "Slim CI per client warehouse (failing: no reachable warehouse)"
+    ],
+    [
+     "Promotions, patches, sign-offs",
+     "On instruction, in a Claude Code session",
+     "The tools above, each with its proof"
+    ]
+   ]
+  },
+  {
+   "type": "cards",
+   "title": "Where AI Sits In The Loop",
+   "cards": [
+    {
+     "heading": "Runs the tools",
+     "lines": [
+      "Builds, promotions, domain patches, sweeps, sign-off docs",
+      "Each step prints its proof and stops on a failed one",
+      "Nothing autonomous against prod"
+     ]
+    },
+    {
+     "heading": "Carries the knowledge",
+     "lines": [
+      "Skills under .claude/skills in both repos",
+      "Measured facts with numbers, dated lessons, runbooks",
+      "Updated in the same session a fact is learned"
+     ]
+    },
+    {
+     "heading": "Guardrails",
+     "lines": [
+      "--confirm on every write, --i-mean-prod on prod",
+      "Read-only Oracle access, prod disabled",
+      "Never print a credential value"
+     ]
+    },
+    {
+     "heading": "Scale",
+     "lines": [
+      "255 of 351 commits in originba_dbt",
+      "303 of 379 commits in OriginBA-3",
+      "Since February 2026"
+     ],
+     "accent": true
+    }
+   ]
+  },
+  {
+   "type": "cards",
+   "title": "What The Automation Achieved",
+   "cols": 3,
+   "cards": [
+    {
+     "heading": "Build speed",
+     "lines": [
+      "fct_billed_charge: 31 min and 246 GB TEMP, now 21 seconds",
+      "BODA staging: 1,898 s to 6.8 s",
+      "rpt_unbilled_revenue: 14 min to 4 s"
+     ]
+    },
+    {
+     "heading": "Proven parity",
+     "lines": [
+      "120 of 120 checks across 38 tables",
+      "138,086 of 138,086 SA balances to the cent",
+      "Adjustment domain exact on six client orgs"
+     ]
+    },
+    {
+     "heading": "Delivery",
+     "lines": [
+      "Standard Offering to prod: 11 min Ellensburg, 21 min Newark, 0 errors",
+      "111 views repaired the morning prod went 10.0",
+      "21 client reports moved prod to test, byte-equal"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "bullets",
+   "title": "Where It Needs To Improve",
+   "columns": [
+    {
+     "heading": "Runs on a laptop",
+     "items": [
+      "The nightlies need the VPN from one Mac: 93% of runs in the last 30 days were skipped",
+      "The CD workflow has failed 13 of 13 times: no reachable warehouse from GitHub",
+      "The fix is a runner inside the VCN (an OKE CronJob); the design notes exist, the job does not"
+     ]
+    },
+    {
+     "heading": "Two reporting layers",
+     "items": [
+      "Clients read the snapshot tables; the dbt warehouse is live only on INT_DEV and Ellensburg test",
+      "Generated domains exist for two targets but no server binds to them yet",
+      "Other clients wait on DBA approval for ORIGINBA_* schemas and a service account"
+     ]
+    },
+    {
+     "heading": "Gaps in the tooling",
+     "items": [
+      "No capacity-gate script; it is manual SQL",
+      "Standard Offering on prod for three of five clients",
+      "Standardized reports are not yet schedulable with relative dates",
+      "Schedule documentation disagrees in three places"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "roadmap",
+   "title": "Roadmap",
+   "kicker": "S5",
+   "intro": "In the order that unblocks the most.",
+   "steps": [
+    {
+     "title": "Runner in the VCN",
+     "owner": "Chase / infrastructure",
+     "body": "OKE CronJob so nightlies never skip"
+    },
+    {
+     "title": "Capacity gate tool",
+     "owner": "Chase",
+     "body": "size, TEMP cap, go or no-go per client"
+    },
+    {
+     "title": "Client onboarding",
+     "owner": "Chase / DBAs",
+     "body": "schemas, service account, first client on the in-database warehouse"
+    },
+    {
+     "title": "Standardized reports",
+     "owner": "Chase",
+     "body": "interactive tables, as-of reports, relative dates"
+    },
+    {
+     "title": "Prod coverage",
+     "owner": "Chase / clients",
+     "body": "Standard Offering on every prod org, domains bound to the warehouse",
+     "current": true
+    }
+   ]
+  },
+  {
+   "type": "table",
+   "title": "Read These First",
+   "widths": [
+    8.4,
+    12.0
+   ],
+   "columns": [
+    "File",
+    "Why"
+   ],
+   "rows": [
+    [
+     "originba_dbt/CLAUDE.md",
+     "The rules of the data layer and where everything is"
+    ],
+    [
+     "originba_dbt/docs/ORACLE_NATIVE_ROLLOUT_PLAN.md",
+     "The in-database shape, its phases and what blocks each"
+    ],
+    [
+     "originba_dbt/.claude/skills/oracle-native-rollout/SKILL.md",
+     "The per-client onboarding runbook"
+    ],
+    [
+     "originba_dbt/.claude/skills/oracle-nightly-operations/SKILL.md",
+     "How to read a red night"
+    ],
+    [
+     "originba_dbt/scripts/build_oracle_warehouse.sh, nightly_oracle_build.sh, weekly_qa.sh",
+     "The three entry points"
+    ],
+    [
+     "originba_dbt/clients.yml and scripts/client_registry.py",
+     "The one client registry"
+    ],
+    [
+     "OriginBA-3/.claude/skills/jaspersoft-server-operations/SKILL.md",
+     "The server estate, every tool, every dated lesson"
+    ],
+    [
+     "OriginBA-3/jaspersoft/docs/origin_dev_to_origin_test_promotion_plan.md",
+     "The promotion path, proven"
+    ],
+    [
+     "OriginBA-3/sql/performance/snapshots/deployment_steps/README.md",
+     "The snapshot layer, step by step"
+    ],
+    [
+     "OriginBA-3/jaspersoft/docs/ba_automated_deployment_end_to_end.md",
+     "The written version of this deck"
+    ]
+   ]
+  }
+ ]
+}
