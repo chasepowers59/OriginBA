@@ -363,4 +363,32 @@ class ExcelAttachmentTests(unittest.TestCase):
 
     def test_an_unknown_format_is_refused(self):
         with self.assertRaisesRegex(rs.ScheduleError, "[Ff]ormat"):
-            rs.create_schedule({**_payload(), "format": "pdf"}, organization_id="dev", created_by="a@b.gov")
+            rs.create_schedule({**_payload(), "format": "docx"}, organization_id="dev", created_by="a@b.gov")
+
+
+class PdfAttachmentTests(unittest.TestCase):
+    """A schedule can deliver a formatted PDF built on the server: the Origin mark, title,
+    the data window it applied, a table whose header repeats on every page, and page
+    numbers. Every PDF in the portal before this was the browser's print dialog, which
+    cannot run on a schedule."""
+
+    ROWS = [{"cycle": f"Cycle {i}", "amt": 1000.5 + i} for i in range(120)]
+
+    def _pdf(self, rows):
+        return rs.rows_to_pdf("Billed by cycle", "Data window: trailing 30 days on Bill Date, as of 2026-06-18.",
+                              ["cycle", "amt"], {"cycle": "Bill Cycle", "amt": "Billed Amount"}, rows,
+                              datetime(2026, 9, 28, tzinfo=UTC))
+
+    def test_it_is_a_pdf(self):
+        self.assertTrue(self._pdf(self.ROWS[:3]).startswith(b"%PDF-"))
+
+    def test_a_long_table_runs_to_several_pages(self):
+        pages = self._pdf(self.ROWS).count(b"/Type /Page\n") + self._pdf(self.ROWS).count(b"/Type /Page ")
+        self.assertGreater(pages, 1)
+
+    def test_a_pdf_schedule_attaches_pdf(self):
+        msg = rs._message({"view_title": "Billed by cycle", "recipients": ["a@b.gov"], "format": "pdf"},
+                          ["cycle"], {"cycle": "Bill Cycle"}, [{"cycle": "C1"}], datetime(2026, 9, 1, tzinfo=UTC))
+        (att,) = list(msg.iter_attachments())
+        self.assertEqual(att.get_content_type(), "application/pdf")
+        self.assertTrue(att.get_filename().endswith(".pdf"))

@@ -215,7 +215,7 @@ export type ReportSchedule = {
   weekday: number;
   hour_utc: number;
   window_days: number;
-  format?: "csv" | "xlsx";
+  format?: "csv" | "xlsx" | "pdf";
   enabled: boolean;
   last_run_at?: string | null;
   last_status?: string | null;
@@ -235,7 +235,7 @@ export function createReportSchedule(body: {
   weekday?: number;
   hour_utc?: number;
   window_days?: number;
-  format?: "csv" | "xlsx";
+  format?: "csv" | "xlsx" | "pdf";
 }): Promise<ReportSchedule> {
   return fetchJson("/report-schedules", { method: "POST", body: JSON.stringify(body) });
 }

@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SCHEDULES_PATH = ROOT / "data" / "analytics_portal" / "report_schedules.json"
 MAX_SCHEDULES = 20
 CADENCES = ("daily", "weekly", "monthly")
-FORMATS = ("csv", "xlsx")
+FORMATS = ("csv", "xlsx", "pdf")
 
 _store = OrgRecordStore("report_schedules", lambda: SCHEDULES_PATH, "schedules")
 
@@ -250,19 +250,90 @@ def rows_to_xlsx(columns: list[str], labels: dict[str, str], rows: list[dict[str
     return buf.getvalue()
 
 
+_LOGO = Path(__file__).resolve().parent.parent / "apps" / "analytics-portal" / "public" / "origin-logo.png"
+_BRAND_BLUE = "#006FAC"
+
+
+def rows_to_pdf(title: str, window_note: str, columns: list[str], labels: dict[str, str],
+                rows: list[dict[str, Any]], now: datetime) -> bytes:
+    """A formatted report a schedule can send: the Origin mark and title on every page, the
+    window it applied, the table with its header repeated on each page, page numbers."""
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import landscape, letter
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import inch
+    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+    size = landscape(letter) if len(columns) > 5 else letter
+    styles = getSampleStyleSheet()
+    body = styles["BodyText"]
+    small = ParagraphStyle("cell", parent=body, fontSize=8, leading=10)
+
+    def cell(v: Any) -> Any:
+        if v is None:
+            return ""
+        if isinstance(v, bool):
+            return "True" if v else "False"
+        if isinstance(v, (int, float)):
+            return f"{v:,.2f}" if isinstance(v, float) and not v.is_integer() else f"{int(v):,}"
+        return Paragraph(str(v), small)
+
+    def chrome(canvas, doc) -> None:
+        canvas.saveState()
+        top = size[1] - 0.5 * inch
+        if _LOGO.exists():
+            canvas.drawImage(str(_LOGO), 0.6 * inch, top - 0.3 * inch, height=0.3 * inch, width=1.1 * inch,
+                             preserveAspectRatio=True, mask="auto")
+        canvas.setFont("Helvetica-Bold", 11)
+        canvas.drawRightString(size[0] - 0.6 * inch, top - 0.2 * inch, title[:90])
+        canvas.setFont("Helvetica", 8)
+        canvas.setFillColor(colors.grey)
+        canvas.drawString(0.6 * inch, 0.45 * inch, f"Generated {now:%d %b %Y %H:%M} UTC · Origin")
+        canvas.drawRightString(size[0] - 0.6 * inch, 0.45 * inch, f"Page {doc.page}")
+        canvas.restoreState()
+
+    header = [labels.get(c, c) for c in columns]
+    data = [header] + [[cell(r.get(c)) for c in columns] for r in rows]
+    numeric = [i for i, c in enumerate(columns) if rows and all(isinstance(r.get(c), (int, float))
+               and not isinstance(r.get(c), bool) for r in rows if r.get(c) is not None)]
+    table = Table(data, repeatRows=1)
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor(_BRAND_BLUE)),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, -1), 8),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F2F5F8")]),
+        ("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#D5DDE5")),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        *[("ALIGN", (i, 1), (i, -1), "RIGHT") for i in numeric],
+    ]))
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=size, topMargin=1.0 * inch, bottomMargin=0.8 * inch,
+                            leftMargin=0.6 * inch, rightMargin=0.6 * inch, title=title)
+    story = [Paragraph(title, styles["Heading2"]), Paragraph(window_note or "", body), Spacer(1, 0.15 * inch),
+             table if rows else Paragraph("No rows in this window.", body)]
+    doc.build(story, onFirstPage=chrome, onLaterPages=chrome)
+    return buf.getvalue()
+
+
 def _message(schedule: dict[str, Any], columns: list[str], labels: dict[str, str],
              rows: list[dict[str, Any]], now: datetime):
     title = schedule.get("view_title") or schedule.get("snapshot_id") or "Report"
-    excel = schedule.get("format") == "xlsx"
+    fmt = schedule.get("format") or "csv"
+    excel = fmt == "xlsx"
     msg = build_message(
         f"{title} — {now.date().isoformat()}",
         schedule.get("recipients", []),
         f"Scheduled report: {title}\n"
         f"{schedule.get('window_note') or ''}\n\n"
-        f"The data is attached as {'Excel' if excel else 'CSV'}. Open the portal for the interactive view.\n")
+        f"The data is attached as {'Excel' if excel else 'a PDF report' if fmt == 'pdf' else 'CSV'}. "
+        "Open the portal for the interactive view.\n")
     safe = re.sub(r"[^A-Za-z0-9_-]+", "_", str(title))[:60] or "report"
     stem = f"{safe}_{now.date().isoformat()}"
-    if excel:
+    if fmt == "pdf":
+        msg.add_attachment(rows_to_pdf(str(title), schedule.get("window_note") or "", columns, labels, rows, now),
+                           maintype="application", subtype="pdf", filename=f"{stem}.pdf")
+    elif excel:
         msg.add_attachment(rows_to_xlsx(columns, labels, rows), maintype="application",
                            subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                            filename=f"{stem}.xlsx")

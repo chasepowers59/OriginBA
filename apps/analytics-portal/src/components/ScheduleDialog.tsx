@@ -42,7 +42,7 @@ export function ScheduleDialog({
   const [weekday, setWeekday] = useState(0);
   const [hourUtc, setHourUtc] = useState(13);
   const [windowDays, setWindowDays] = useState(30);
-  const [format, setFormat] = useState<"csv" | "xlsx">("xlsx");
+  const [format, setFormat] = useState<"csv" | "xlsx" | "pdf">("xlsx");
   const [sent, setSent] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -201,10 +201,11 @@ export function ScheduleDialog({
           Attach as
           <select
             value={format}
-            onChange={(e) => setFormat(e.target.value as "csv" | "xlsx")}
+            onChange={(e) => setFormat(e.target.value as "csv" | "xlsx" | "pdf")}
             className="mt-1 w-full rounded-lg border border-edge-subtle bg-surface px-3 py-2 text-sm text-fg"
           >
             <option value="xlsx">Excel workbook (.xlsx)</option>
+            <option value="pdf">PDF report (.pdf)</option>
             <option value="csv">CSV (.csv)</option>
           </select>
         </label>
