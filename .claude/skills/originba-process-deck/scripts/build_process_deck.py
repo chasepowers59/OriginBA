@@ -471,9 +471,102 @@ def slide_steps(prs, s, footer):
     return sl
 
 
+def _side_point(n, side):
+    x, y, w, h = n["x"], n["y"], n["w"], n["h"]
+    return {"right": (x + w, y + h / 2), "left": (x, y + h / 2), "top": (x + w / 2, y), "bottom": (x + w / 2, y + h)}[side]
+
+
+def _facing(a, b):
+    """Which side of a faces b, from their centres: the larger displacement wins."""
+    acx, acy = a["x"] + a["w"] / 2, a["y"] + a["h"] / 2; bcx, bcy = b["x"] + b["w"] / 2, b["y"] + b["h"] / 2
+    dx, dy = bcx - acx, bcy - acy
+    if abs(dx) >= abs(dy):
+        return ("right", "left") if dx > 0 else ("left", "right")
+    return ("bottom", "top") if dy > 0 else ("top", "bottom")
+
+
+def _edge_free(slide, nodes, e):
+    """An orthogonal arrow between free-layout nodes: sides chosen from geometry unless given, optional waypoints and a label."""
+    a, b = nodes[e["from"]], nodes[e["to"]]
+    via = [tuple(v) for v in e.get("via", [])]
+    if via:
+        fa = e.get("from_side") or _facing(a, {"x": via[0][0], "y": via[0][1], "w": 0, "h": 0})[0]
+        tb = e.get("to_side") or _facing(b, {"x": via[-1][0], "y": via[-1][1], "w": 0, "h": 0})[0]
+    else:
+        fa, tb = _facing(a, b); fa = e.get("from_side", fa); tb = e.get("to_side", tb)
+    p0, p1 = _side_point(a, fa), _side_point(b, tb)
+    if via:
+        pts = [p0] + via + [p1]
+    elif fa in ("right", "left") and tb in ("left", "right"):
+        pts = [p0, p1] if abs(p0[1] - p1[1]) < 0.05 else [p0, ((p0[0] + p1[0]) / 2, p0[1]), ((p0[0] + p1[0]) / 2, p1[1]), p1]
+    elif fa in ("top", "bottom") and tb in ("top", "bottom"):
+        pts = [p0, p1] if abs(p0[0] - p1[0]) < 0.05 else [p0, (p0[0], (p0[1] + p1[1]) / 2), (p1[0], (p0[1] + p1[1]) / 2), p1]
+    elif fa in ("right", "left"):
+        pts = [p0, (p1[0], p0[1]), p1]
+    else:
+        pts = [p0, (p0[0], p1[1]), p1]
+    _arrow_segments(slide, pts, width_pt=e.get("width", 2.25))
+    if e.get("label"):
+        mid = pts[len(pts) // 2] if len(pts) > 2 else ((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2)
+        lx, ly = e.get("label_at", (mid[0] + 0.1, mid[1] - 0.42))
+        t = slide.shapes.add_textbox(Inches(lx), Inches(ly), Inches(e.get("label_w", 3.2)), Inches(0.4))
+        _text(t, [[(e["label"], 11, CREAM, True)]], anchor=MSO_ANCHOR.BOTTOM, margin=0.0)
+
+
+def _draw_free_node(slide, n):
+    x, y, w, h = n["x"], n["y"], n["w"], n["h"]; kind = n.get("kind", "step"); title, body = n.get("title", ""), n.get("body", "")
+    tp, bp = n.get("title_pt", 14), n.get("body_pt", 11)
+    if kind == "group":   # an outline with a label, drawn first so nodes sit on it
+        g = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
+        g.fill.background(); g.line.color.rgb = rgb(CREAM); g.line.width = Pt(1.5); g.adjustments[0] = 0.04; g.shadow.inherit = False
+        t = slide.shapes.add_textbox(Inches(x + 0.18), Inches(y + 0.05), Inches(w - 0.36), Inches(0.45))
+        _text(t, [[(title, 14, CREAM, True)]] + ([[(body, 11, CREAM, False)]] if body else []), anchor=MSO_ANCHOR.TOP, margin=0.0)
+    elif kind == "gate":
+        d = slide.shapes.add_shape(MSO_SHAPE.DIAMOND, Inches(x), Inches(y), Inches(w), Inches(h))
+        d.fill.solid(); d.fill.fore_color.rgb = rgb(ORANGE); d.line.fill.background(); d.shadow.inherit = False
+        _text(d, [[(title, n.get("title_pt", 11), BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.02)
+    elif kind == "data":
+        c = slide.shapes.add_shape(MSO_SHAPE.CAN, Inches(x), Inches(y), Inches(w), Inches(h))
+        c.fill.solid(); c.fill.fore_color.rgb = rgb(CREAM); c.line.fill.background(); c.shadow.inherit = False
+        _text(c, [[(title, n.get("title_pt", 11), BLUE, True)]] + ([[(body, 9.5, GREY, False)]] if body else []), align=PP_ALIGN.CENTER, margin=0.05)
+    elif kind == "domain":
+        _chip(slide, x, y, w, h, title, fill=WHITE, size=n.get("title_pt", 11), bold=True)
+    elif kind == "accent":
+        b = _box(slide, x, y, w, h, ORANGE, radius=0.5)
+        _text(b, [[(title, n.get("title_pt", 12), BLUE, True)]], align=PP_ALIGN.CENTER, margin=0.08)
+    elif kind == "note":
+        t = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
+        _text(t, [[(title, 12, CREAM, True)]] + ([[(body, 11, CREAM, False)]] if body else []), anchor=MSO_ANCHOR.TOP, margin=0.0)
+    else:   # step
+        b = _box(slide, x, y, w, h, CREAM, radius=0.1)
+        paras = [[(title, tp, BLUE, True)]] + ([[(body, bp, GREY, False)]] if body else [])
+        _text(b, paras, align=PP_ALIGN.CENTER if n.get("center") else PP_ALIGN.LEFT, margin=0.12)
+        if n.get("tag"):
+            _tag(slide, x + w - 0.08, y - 0.3, n["tag"])
+
+
+def slide_diagram(prs, s, footer):
+    """A free-layout flow diagram: nodes at x/y/w/h in inches (step, gate, data, domain, group, accent, note) and orthogonal arrows."""
+    sl = prs.slides.add_slide(prs.slide_layouts[LAYOUT["blank"]])
+    _title(sl, s["title"]); _kicker(sl, s.get("kicker")); _footer(sl, footer)
+    nodes = {n["id"]: n for n in s["nodes"]}
+    for n in s["nodes"]:
+        if n.get("kind") == "group":
+            _draw_free_node(sl, n)
+    for n in s["nodes"]:
+        if n.get("kind") != "group":
+            _draw_free_node(sl, n)
+    for e in s.get("edges", []):
+        _edge_free(sl, nodes, e)
+    if s.get("legend"):
+        t = sl.shapes.add_textbox(Inches(0.81), Inches(10.95), Inches(20.4), Inches(0.5))
+        _text(t, [[(s["legend"], 12, CREAM, False)]], anchor=MSO_ANCHOR.TOP, margin=0.0)
+    return sl
+
+
 BUILDERS = {"layers": slide_layers, "compare": slide_compare, "title": slide_title, "section": slide_section, "statement": slide_statement, "process": slide_process,
             "roadmap": slide_roadmap, "cards": slide_cards, "bullets": slide_bullets, "table": slide_table,
-            "timebar": slide_timebar, "donut": slide_donut, "chevrons": slide_chevrons, "steps": slide_steps}
+            "timebar": slide_timebar, "donut": slide_donut, "chevrons": slide_chevrons, "steps": slide_steps, "diagram": slide_diagram}
 
 
 def build(spec: dict, out: pathlib.Path) -> pathlib.Path:
