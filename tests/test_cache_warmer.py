@@ -37,6 +37,7 @@ class WarmerTests(unittest.TestCase):
         self.ws = mock.patch.object(se, "build_workstream_summary", side_effect=lambda ws, *a, **k: {"kpis": [], "ws": ws})
         self.patches = [self.home, self.ws,
                         mock.patch("api.ori_series.cached_history", return_value=({}, {})),
+                        mock.patch("api.dq_routes.warm"),
                         mock.patch.object(cw, "data_version", side_effect=lambda org: self.version[0]),
                         mock.patch.object(se, "data_version", side_effect=lambda org: self.version[0]),
                         mock.patch.object(cw, "_workstreams", return_value=["billing", "finance"]),
@@ -49,7 +50,7 @@ class WarmerTests(unittest.TestCase):
             p.stop()
 
     def test_a_new_stamp_warms_what_the_pages_ask_for(self):
-        self.assertEqual(cw.warm_once("demo25"), ["home", "ori findings", "ori trends", "billing", "finance"])
+        self.assertEqual(cw.warm_once("demo25"), ["home", "ori findings", "ori trends", "data quality", "billing", "finance"])
         home, ws = self.mocks[0], self.mocks[1]
         home.reset_mock(), ws.reset_mock()
         # the pages' default requests are now answered from memory
@@ -63,14 +64,14 @@ class WarmerTests(unittest.TestCase):
     def test_the_last_warm_is_recorded_for_system_health(self):
         cw.warm_once("demo25")
         last = cw.status()["demo25"]
-        self.assertEqual((last["version"], last["built"], last["failed"]), ("v1", ["home", "ori findings", "ori trends", "billing", "finance"], []))
+        self.assertEqual((last["version"], last["built"], last["failed"]), ("v1", ["home", "ori findings", "ori trends", "data quality", "billing", "finance"], []))
         self.assertIn("at", last)
 
     def test_an_unchanged_stamp_does_nothing(self):
         cw.warm_once("demo25")
         self.assertEqual(cw.warm_once("demo25"), [])
         self.version[0] = "v2"
-        self.assertEqual(cw.warm_once("demo25"), ["home", "ori findings", "ori trends", "billing", "finance"])
+        self.assertEqual(cw.warm_once("demo25"), ["home", "ori findings", "ori trends", "data quality", "billing", "finance"])
 
     def test_an_unknown_stamp_does_nothing(self):
         self.version[0] = None
@@ -79,7 +80,7 @@ class WarmerTests(unittest.TestCase):
     def test_a_failed_build_does_not_stop_the_rest(self):
         self.mocks[0].side_effect = RuntimeError("ORA-03113")
         with self.assertLogs("originba.api", level="WARNING"):
-            self.assertEqual(cw.warm_once("demo25"), ["ori trends", "billing", "finance"])
+            self.assertEqual(cw.warm_once("demo25"), ["ori trends", "data quality", "billing", "finance"])
 
 
 BIG = {"id": "rpt_billed_charge", "label": "Billed Charge", "table_name": "rpt_billed_charge",
@@ -103,6 +104,7 @@ class ReportWarmingTests(unittest.TestCase):
         catalog = {"snapshots": {"rpt_billed_charge": BIG, "rpt_bill": SMALL}}
         self.patches = [
             mock.patch("api.ori_series.cached_history", return_value=({}, {})),
+            mock.patch("api.dq_routes.warm"),
             mock.patch.object(cw, "data_version", return_value="v1"),
             mock.patch.object(se, "data_version", return_value="v1"),
             mock.patch.object(cw, "_workstreams", return_value=[]),
@@ -122,7 +124,7 @@ class ReportWarmingTests(unittest.TestCase):
             p.stop()
 
     def test_the_opening_report_of_a_large_canvas_is_warm(self):
-        self.assertEqual(cw.warm_once("demo25"), ["home", "ori findings", "ori trends", "report rpt_billed_charge"])
+        self.assertEqual(cw.warm_once("demo25"), ["home", "ori findings", "ori trends", "data quality", "report rpt_billed_charge"])
         self.assertEqual(len(self.runs), 1)
         # what the explorer sends when the page opens (ExplorerPanel.runPremade): the canvas's
         # window first (last_12_months as of 2026-09-29), then the report's own filters

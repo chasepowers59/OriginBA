@@ -54,6 +54,9 @@ class OracleOrgHarness(unittest.TestCase):
         rules = tmp / "rules.oracle.yml"
         rules.write_text(yaml.safe_dump(ORACLE_RULES, sort_keys=False))
         self.executed: list[str] = []
+        from api import summary_cache
+        summary_cache.clear()
+        self.addCleanup(summary_cache.clear)
         self.stamp = "20260929063012:20260929063015:38"
         self.failing: set[str] = set()
         patches = [
@@ -251,16 +254,60 @@ class PostgresOrgUnchangedTests(unittest.TestCase):
              mock.patch.dict("os.environ", {"DQ_RULES_PATH": str(rules)}), \
              mock.patch.object(dq_routes, "oracle_query",
                                side_effect=AssertionError("a Postgres org must not reach Oracle")), \
-             mock.patch.object(dq_routes, "data_version",
-                               side_effect=AssertionError("Postgres keeps its load_dttm marker")):
+             mock.patch.object(dq_routes, "data_version", return_value="pg-build-1"):   # the cache key only
             out = dq_routes.dq_findings(ctx=_ctx())
         self.assertTrue(out["configured"])
         self.assertEqual(out["rules"][0]["rows"], [["SP1"]])
-        self.assertEqual(out["refresh_marker"], "2026-09-28 06:31:02")
+        self.assertEqual(out["refresh_marker"], "2026-09-28 06:31:02")   # acks keep the load watermark
         self.assertEqual(out["built_at"], "2026-09-28T06:31:02")
         executed = [c.args[0] for c in cur.execute.call_args_list]
         self.assertIn("from reporting.rpt_premise_sp", executed[0])
         self.assertIn("max(load_dttm)::text from staging.stg_financial_txn", executed[-1])
+
+
+class OracleOrgCachingTests(OracleOrgHarness):
+    """The rules take ~40 s on Ellensburg; their results change only when the warehouse is
+    rebuilt, so they are kept until the build stamp moves (the home page's cache, 12 h cap).
+    Acknowledgements are applied on every request, never baked into what is kept."""
+
+    def test_a_second_visit_is_served_without_running_the_rules(self):
+        dq_routes.dq_findings(ctx=_ctx())
+        ran = len(self.executed)
+        dq_routes.dq_findings(ctx=_ctx())
+        self.assertEqual(len(self.executed), ran)
+        self.stamp = "20260929123000:20260929123004:38"
+        dq_routes.dq_findings(ctx=_ctx())
+        self.assertEqual(len(self.executed), 2 * ran)
+
+    def test_acknowledgements_apply_to_kept_results_without_changing_them(self):
+        key = dq_routes.dq_findings(ctx=_ctx())["rules"][0]["row_keys"][0]
+        dq_routes.dq_ack(payload={"key": key}, ctx=_ctx())
+        self.assertIn(key, dq_routes.dq_findings(ctx=_ctx())["rules"][0]["acked_row_keys"])
+        dq_routes.dq_unack(payload={"key": key}, ctx=_ctx())
+        self.assertIn(key, dq_routes.dq_findings(ctx=_ctx())["rules"][0]["row_keys"])
+
+    def test_the_warmer_builds_the_rules_after_a_rebuild(self):
+        from api import cache_warmer as cw
+        cw.reset()
+        with mock.patch.object(cw, "data_version", return_value="V1"), \
+             mock.patch.object(cw, "_workstreams", return_value=[]), \
+             mock.patch.object(cw, "_opening_reports", return_value=[]), \
+             mock.patch("api.snapshot_explorer.cached_home_summary", return_value={"kpis": []}), \
+             mock.patch("api.ori_series.cached_history", return_value=({}, {})):
+            self.assertIn("data quality", cw.warm_once("ellensburg"))
+        ran = len(self.executed)
+        self.assertGreater(ran, 0)
+        dq_routes.dq_findings(ctx=_ctx())
+        self.assertEqual(len(self.executed), ran)   # the page is served what the warmer built
+
+    def test_an_outage_is_not_kept(self):
+        self.failing = {r["id"] for r in ORACLE_RULES}
+        dq_routes.dq_findings(ctx=_ctx())
+        ran = len(self.executed)
+        self.failing = set()
+        out = dq_routes.dq_findings(ctx=_ctx())
+        self.assertGreater(len(self.executed), ran)
+        self.assertTrue(out["configured"])
 
 
 if __name__ == "__main__":

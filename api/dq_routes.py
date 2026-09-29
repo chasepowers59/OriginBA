@@ -13,6 +13,7 @@ per-tenant warehouse pool (Postgres) or Oracle session pool every canvas query u
 """
 from __future__ import annotations
 
+import copy
 import json
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -28,6 +29,7 @@ from api.demo_db import execute_query as oracle_query
 from api.executive_dashboard import is_missing_relation_error
 from api.org_db import require_org_for_data
 from api.snapshot_catalog import org_backend
+from api.summary_cache import cached
 from api.warehouse_db import warehouse_configured, warehouse_connection
 from api.row_security import require_unrestricted
 
@@ -173,6 +175,50 @@ def summarise_counts(rules: list[dict[str, Any]]) -> dict[str, int]:
     }
 
 
+def _run_rules(org: str, engine: str, path: Path) -> list[dict[str, Any]]:
+    rules = yaml.safe_load(path.read_text())
+    if engine == "oracle":
+        def run_oracle(sql: str):
+            return oracle_query(sql, organization_id=org, max_rows=ROW_CAP + 1)
+
+        with ThreadPoolExecutor(max_workers=ORACLE_RULE_WORKERS) as pool:
+            return list(pool.map(lambda r: _run_rule(r, run_oracle), rules))
+    with warehouse_connection(org) as conn:
+        cur = conn.cursor()
+
+        def run(sql: str):
+            try:
+                cur.execute(sql)
+            except Exception:
+                conn.rollback()   # an aborted transaction would fail every later rule
+                raise
+            return [d[0] for d in cur.description], cur.fetchmany(ROW_CAP + 1)
+
+        return [_run_rule(r, run) for r in rules]
+
+
+def rule_results(org: str, engine: str | None = None, path: Path | None = None) -> list[dict[str, Any]] | None:
+    """Every rule's findings, kept until the warehouse is rebuilt (the build stamp, 12 h cap):
+    ~40 s on Ellensburg. The parity rules also read CISADM, so they can trail it by up to the
+    cap. None when the organization is connected but has no warehouse built (every rule
+    ORA-00942): the same answer as no warehouse, not a page of errors. A copy is returned;
+    acknowledgements are applied to it per request, never to what is kept."""
+    engine = engine or org_backend(org)[0]
+    path = path or _rules_path(engine)
+    out = cached(("dq", org, engine, str(path)), lambda: _run_rules(org, engine, path),
+                 keep=lambda res: any(not e.get("error") for e in res), version=data_version(org))
+    if out and all(is_missing_relation_error(e.get("error")) for e in out):
+        return None
+    return copy.deepcopy(out)
+
+
+def warm(org: str) -> None:
+    """The cache warmer's entry: build what /dq/findings serves, where it would run the rules."""
+    engine = org_backend(org)[0]
+    if (engine == "oracle" or warehouse_configured(org)) and _rules_path(engine).exists():
+        rule_results(org, engine)
+
+
 @router.get("/findings")
 def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     ctx.require_permission("portal:read")
@@ -186,30 +232,9 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     if not path.exists():
         return {"configured": True, "rules": [],
                 "error": "rules file not found (set DQ_RULES_PATH)"}
-    rules = yaml.safe_load(path.read_text())
-    if engine == "oracle":
-        def run_oracle(sql: str):
-            return oracle_query(sql, organization_id=org, max_rows=ROW_CAP + 1)
-
-        with ThreadPoolExecutor(max_workers=ORACLE_RULE_WORKERS) as pool:
-            out = list(pool.map(lambda r: _run_rule(r, run_oracle), rules))
-        # Connected but not built (ORIGINBA_REPORTING absent): the same answer as an org
-        # with no warehouse, not a page of ORA-00942s.
-        if out and all(is_missing_relation_error(e.get("error")) for e in out):
-            return {"configured": False, "rules": []}
-    else:
-        with warehouse_connection(org) as conn:
-            cur = conn.cursor()
-
-            def run(sql: str):
-                try:
-                    cur.execute(sql)
-                except Exception:
-                    conn.rollback()   # an aborted transaction would fail every later rule
-                    raise
-                return [d[0] for d in cur.description], cur.fetchmany(ROW_CAP + 1)
-
-            out = [_run_rule(r, run) for r in rules]
+    out = rule_results(org, engine, path)
+    if out is None:
+        return {"configured": False, "rules": []}
     # ---- acknowledgements: hidden until the warehouse refreshes -------------
     marker = _refresh_marker(org, engine)
     acks = _load_acks(org)

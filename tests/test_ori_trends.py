@@ -292,6 +292,7 @@ class WarmTests(unittest.TestCase):
              mock.patch.object(cw, "_workstreams", return_value=[]), \
              mock.patch.object(cw, "_opening_reports", return_value=[]), \
              mock.patch("api.snapshot_explorer.cached_home_summary", return_value={"kpis": []}), \
+             mock.patch("api.dq_routes.warm"), \
              mock.patch.object(ori_series, "cached_history", return_value=({}, {})) as history:
             built = cw.warm_once("demo25")
         self.assertIn("ori trends", built)
