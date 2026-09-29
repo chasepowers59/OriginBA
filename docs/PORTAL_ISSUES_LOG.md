@@ -36,8 +36,8 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
-| 2026-09-29 | On phones the organization switcher and the "viewing another client" warning disappear | UI-12: e1ae07a8 | e2e/shell.spec.ts |
-| 2026-09-29 | The floating Ask Ori button covers content, worst on phones | UI-11: e1ae07a8 | e2e/shell.spec.ts |
+| 2026-09-29 | On phones the organization switcher and the "viewing another client" warning disappear | UI-12: 3a8fbb68 | e2e/shell.spec.ts |
+| 2026-09-29 | The floating Ask Ori button covers content, worst on phones | UI-11: 3a8fbb68 | e2e/shell.spec.ts |
 | 2026-09-29 | Every canvas declared `default_date_preset: "last_12_months"` but the explorer ignored the string and opened on an unlisted 180-day window; no date chip was ever highlighted | 72c0d1a0 | tests/fixtures/date_presets.json (both suites) |
 | 2026-09-29 | Saved-view alert values came back as Decimal; the JSON alert store would refuse them on the first real run | 8cf3cf47 | tests/test_view_alerts.py |
 | 2026-09-29 | Settings > Users & access: role, organization and group dropdowns had no accessible name; the admin activity list scrolled out of keyboard reach | b931a4b6 | e2e/a11y.spec.ts (every Settings tab) |
