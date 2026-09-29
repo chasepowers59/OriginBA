@@ -24,6 +24,13 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-29 | The test suite queried the real Ellensburg instance on every run: a warmer-loop test missed the two warm jobs added that day, from a thread that outlived the test | 222a7c72 (conftest refuses any live Oracle session) | tests/conftest.py, tests/test_bug_hunt_fixes.py |
+| 2026-09-29 | Letters: a read that passed its 120 s limit said only "could not be read" | 506ebd73 (504 with what to try) | tests/test_letters_routes.py |
+| 2026-09-29 | Review: concurrent misses on one cold key each built it (DQ 4 + Ori history 5 of 8 Oracle sessions) | 2b956fad | tests/test_summary_cache_single_flight.py |
+| 2026-09-29 | Review: Ori treated a month the last build had not finished as complete (false "unusually low") | 5d85750e | tests/test_ori_trends.py |
+| 2026-09-29 | Review: a timed-out DQ rule or a history missing a failed card was kept until the next build | 8ccb4f47 | tests/test_dq_oracle_orgs.py, tests/test_ori_trends.py |
+| 2026-09-29 | Review: Postgres freshness followed CDC arrival (a staging view), not the reporting build, and scanned CI_FT on every page | 8e2e722d | tests/test_freshness.py |
+| 2026-09-29 | Review: an Oracle outage made the DQ page delete every acknowledgement for the organization | 15d9af2f | tests/test_dq_oracle_orgs.py |
 | 2026-09-29 | Vetted answers: billed usage totalled across units (794,109,405 of gallons+kWh+therms); GL by account totalled a balanced ledger ($0.00, then "No rows in this period"); sources named by table id ("rpt financial txn", "Sa Aged Balance") | 1e382d34 | tests/test_vetted_totals.py |
 | 2026-09-29 | No page said the reporting data had stopped refreshing (Ellensburg 19 days old; the home refresh line is Postgres-only) | ee9c84d4 | tests/test_freshness.py, src/lib/freshness.test.ts, e2e/freshness.spec.ts |
 | 2026-09-29 | Data quality at Ellensburg: all five pipeline-parity rules flagged CISADM ahead of the canvases (bills +21, FTs +512, ...) | Staleness, not a model bug: the reporting tables dated 2026-09-10 because a stranded RPT_CHARACTERISTICS__DBT_BACKUP blocked every scheduled build once the VPN was back. Dropped by the preflight's safe flag and fully rebuilt 2026-09-29 (320/320): all five parity rules 0, source parity 120/120 | e2e/dq.spec.ts; scripts/run_source_parity.py (originba_dbt) |
