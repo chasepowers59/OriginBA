@@ -250,10 +250,14 @@ def build_query(
     # evict the real leaders -- the same bug this ordering exists to prevent. Measured on
     # Demo 25.4, bill-segment status returned Error (null) ahead of Frozen at 868,262.10.
     # measure_specs is never empty -- a query with no measure is rejected above.
+    # Ties fall to the rest of the grouping, in order, so the limit keeps the SAME rows
+    # whichever table answers: a canvas and its pre-aggregate (api/aggregate_routing.py)
+    # return equal groups in whatever order each plan produces them.
+    groups = [f'"TD{i}"' for i in range(len(time_dimensions or []))] + [_quote(d, dialect) for d in dims]
     if time_dimensions:
-        sql += ' ORDER BY "TD0" DESC NULLS LAST'
+        sql += ' ORDER BY "TD0" DESC NULLS LAST' + "".join(f", {g}" for g in groups[1:])
     else:
-        sql += f' ORDER BY "{measure_specs[0].alias}" DESC NULLS LAST'
+        sql += f' ORDER BY "{measure_specs[0].alias}" DESC NULLS LAST' + "".join(f", {g}" for g in groups)
     # FETCH FIRST is standard SQL and valid in both, so the tail needs no branch.
     sql += f" FETCH FIRST {int(limit)} ROWS ONLY"
     return sql, binds
