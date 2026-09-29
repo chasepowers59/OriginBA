@@ -37,6 +37,9 @@ class NlqMetric:
     param_keys: list[str] = field(default_factory=lambda: ["days"])
     example: str = ""
     build: Callable[[dict[str, Any]], dict[str, Any]] | None = None
+    # False where the groups cannot be added: units of measure, or a double-entry ledger (zero
+    # by construction); the answer then lists the groups with no headline total
+    total: bool = True
 
 
 def _window(days: int, organization_id: str | None = None) -> tuple[str, str]:
@@ -171,18 +174,18 @@ def _source_label(snapshot_id: str) -> str:
 def _result(
     metric: NlqMetric,
     params: dict[str, Any],
-    value: float,
+    value: float | None,
     table: list[dict[str, Any]] | None = None,
     *,
     narrative_extra: str = "",
     spec: dict[str, Any] | None = None,
+    source_label: str | None = None,
 ) -> dict[str, Any]:
     days = int(params.get("days") or metric.default_days)
     window_txt = "as of now" if (spec or {}).get("windowless") else f"last {days} days"
-    narrative = (
-        f"{metric.label}: {_fmt(value, metric.format)} "
-        f"({window_txt} on {_source_label(metric.snapshot_id)})."
-    )
+    source = source_label or _source_label(metric.snapshot_id)
+    headline = metric.label if value is None else f"{metric.label}: {_fmt(value, metric.format)}"
+    narrative = f"{headline} ({window_txt} on {source})."
     if narrative_extra:
         narrative += " " + narrative_extra
     if table:
@@ -202,6 +205,7 @@ def _result(
         "narrative": narrative,
         "metrics": {"value": value, "period_days": days},
         "resolved_from": metric.snapshot_id,
+        "source_label": source,
         "source": "snapshot_analytics",
         "param_schema": metric.param_keys,
         "params_used": {k: params.get(k) for k in metric.param_keys if params.get(k) is not None},
@@ -229,16 +233,15 @@ def _run_metric(metric: NlqMetric, params: dict[str, Any], *, organization_id: s
         "date_field": spec.get("date_field"),
         "windowless": bool(spec.get("windowless")),
     }
+    label = get_snapshot(metric.snapshot_id, organization_id).get("label")
     if kind == "trend":
         table = _trend(metric.snapshot_id, spec["query"], params, **kwargs)
-        total = sum(float(r["value"]) for r in table)
-        return _result(
-            metric, params, total, table, narrative_extra=spec.get("note", ""), spec=spec
-        )
+        total = sum(float(r["value"]) for r in table) if metric.total else None
+        return _result(metric, params, total, table, narrative_extra=spec.get("note", ""), spec=spec,
+                       source_label=label)
     value, table = _scalar(metric.snapshot_id, spec["query"], params, **kwargs)
-    return _result(
-        metric, params, value, table or None, narrative_extra=spec.get("note", ""), spec=spec
-    )
+    return _result(metric, params, value, table or None, narrative_extra=spec.get("note", ""), spec=spec,
+                   source_label=label)
 
 
 def _count(filters: list[dict[str, Any]] | None = None,
@@ -371,6 +374,7 @@ METRICS: list[NlqMetric] = [
         example="Billed usage by unit of measure",
         # Usage is only additive WITHIN a unit of measure -- always grouped, never
         # a bare total (the cisadm-sql never-sum-across-UOMs rule).
+        total=False,
         build=lambda _p: {"kind": "trend",
                           "query": _sum("Billed Quantity", BILLED, dims=["Unit of Measure"])},
     ),
@@ -613,8 +617,9 @@ METRICS: list[NlqMetric] = [
         snapshot_id="rpt_gl",
         format="currency",
         example="GL dollars by account last 90 days",
+        total=False,
         build=lambda _p: {"kind": "trend", "date_field": "Accounting Date",
-                          "query": _sum("GL Amount", dims=["GL Account"])},
+                          "query": {**_sum("GL Amount", dims=["GL Account"]), "rank": "magnitude"}},
     ),
 ]
 

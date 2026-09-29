@@ -488,6 +488,8 @@ export type NlqResponse = {
   acct_id?: number | null;
   metrics?: Record<string, unknown> | null;
   resolved_from?: string | null;
+  /** the data set's name as the catalog gives it ("General Ledger"), never the table id */
+  source_label?: string;
   source?: string;
   metric_id?: string;
   metric_label?: string;

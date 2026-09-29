@@ -37,7 +37,7 @@ export function NlqAnswerCard({ result, days, onPinToDashboard }: NlqAnswerCardP
             href={`/explore/${result.resolved_from}?tab=model`}
             className="text-primary hover:text-primary"
           >
-            {result.resolved_from.replace(/_/g, " ")}
+            {result.source_label ?? "its data set"}
           </Link>
           {days ? ` · last ${days} days` : ""}
         </p>
