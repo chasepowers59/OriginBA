@@ -9,7 +9,11 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 - **Natural-language answers: Ori.** Ori, the intelligence inside Origin BA, writes and runs read-only SQL over the
   reporting canvases, shows every query, streams its progress, and each answer can be
   charted, downloaded as CSV, or saved as a view. Plain "how much" questions are answered by
-  the vetted metrics first, at no model cost. Jaspersoft has nothing comparable.
+  the vetted metrics first, at no model cost. Unprompted, Ori reads the home page: the
+  period in a paragraph, the large moves against the prior period, any month outside the
+  year before it, and a three-month projection for each card whose projections have held on
+  the client's own past (and silence for the ones that have not). Jaspersoft has nothing
+  comparable.
 - **One money rule.** Every total the portal shows counts only frozen, non-cancelled money
   (`api/money_rules.py`, checked by `tests/test_money_rules.py`).
 - **Proof of the numbers.** Canvases are reconciled to the client's own database and the
@@ -27,7 +31,7 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 | Exports | Yes | Excel from explorer and dashboards (formula-safe), CSV from SQL and assistant answers, and one server-built PDF renderer for schedules, the explorer's Download PDF and a dashboard's Export PDF pack (every tile: headline value, chart, table; `api/export_routes.py`). Only the council and lineage packs still print the page |
 | Alerts | Yes | Thresholds on the home KPIs (value or period change) and on any saved view (its first measure as one total over its saved filters and a trailing window, with the creator's current access), emailed once per breach by the hourly runner. **Needs:** the runner deployed, SMTP configured |
 | Input controls / prompts | Yes | Any saved filter can be asked for when the view opens (Report parameters: value lists narrowed by the answers above them, date ranges, saved defaults for schedules) |
-| Formatted, paginated reports (JRXML) | No | Letters and statements live in Jaspersoft and the separate letter-print app |
+| Formatted, paginated reports (JRXML) | Partly | Collections letters in the portal (`/letters`: list, preview, PDF with USPS IMb) for Postgres organizations; Oracle organizations and statements are the next phases |
 | Security | Mostly | Roles, workstream grants, org isolation, **row-level security within an org** (per-user rules on a column, fail-closed; raw SQL, the assistant and data quality refused to restricted users; schedules keep the creator's rules), OIDC sign-in with IdP group mapping (role, client, access groups, row rules synced at every sign-in; removal from every group deactivates the account), audit log. **No** SAML |
 | Promotion between clients | Yes | Content packs (Settings, admins): export an organization's shared views and dashboards (all, or one folder) as a JSON file and import it into another. Each item is checked against the target's own canvases first; anything naming a canvas, column or ready-to-run report the client lacks is left out with the reason, with a preview before anything is saved (`api/content_packs.py`) |
 | Ownership and sharing | Yes | Owner on every view, dashboard and schedule; private items; only owner or admin edits; folders for views and dashboards |
@@ -48,8 +52,9 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 5. **SAML** (M), for identity providers without OIDC.
 6. **Pre-aggregated tables** for the heavy ready-to-run reports (see the dbt repo's
    `docs/LARGE_CLIENT_SCALE_PLAN.md`).
-7. **Formatted reports** (L): decide whether letters and statements move into the portal
-   or stay in the letter-print app with the portal linking to them.
+7. **Formatted reports** (L): decided 2026-09-29, letters and statements move into the portal
+   (docs/letters/LETTERS_MIGRATION_PLAN.md); phase 1 (Postgres organizations) is live, the
+   Oracle organizations (Ellensburg) are phase 2.
 8. Done 2026-09-28: embedding.
 
 ## Known risks

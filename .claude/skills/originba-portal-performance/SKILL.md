@@ -24,7 +24,9 @@ from and falls back to the slow, correct path when unsure.
   is new, builds home + each workstream summary (30 days, no compare, all workstreams, no row
   rules) and each canvas of >= 1M rows' OPENING report (first premade report over the canvas's
   default window), through the routes' own functions (`cached_home_summary`,
-  `cached_workstream_summary`, `cached_query`) so keys cannot drift. Off under tests and with
+  `cached_workstream_summary`, `cached_query`) so keys cannot drift. Also the compare-mode home
+  summary ("ori findings") and the cards' 36-month history ("ori trends", `api/ori_series.py`:
+  one monthly query per windowed card, ~6-10 s cold on Ellensburg, 35 ms warm). Off under tests and with
   `PORTAL_WARM_CACHE=false`. Its last run per org is in Settings > System health.
 - **Date-window contract** `tests/fixtures/date_presets.json`: the browser (`datePresets.ts`) and
   the server (`api/date_presets.py`) must compute the same opening window, or the warmed report is

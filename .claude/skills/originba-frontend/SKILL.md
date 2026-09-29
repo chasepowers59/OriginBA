@@ -539,7 +539,16 @@ will be Ori too, so they never need renaming.
   and one `OriForecastChart` each, "Ask Ori about this", footnote "A projection from past months,
   not a promise."). Up to ~30 s cold, so it loads on its own, shows `ORI.thinking` meanwhile, is
   aborted on unmount, and shows nothing on error. The panel is absent only when the brief,
-  findings, unusual months and projections are all empty (`lib/oriPanel.oriPanelShows`). New
+  findings, unusual months and projections are all empty (`lib/oriPanel.oriPanelShows`). The
+  rules (`api/ori_insights.py`, `api/ori_series.py`, pinned by `tests/test_ori_trends.py`):
+  complete months only; an unusual month is outside all 12 before it AND 3.5 robust deviations
+  AND 15% from their median; a projection is the better-replaying of "same months last year x
+  recent growth" and "12-month average", published only when its THREE-MONTH TOTAL missed at
+  most 15% typically and 25% in four cases of five on the org's own past. An estimate reads
+  compact (`_approx`, as `formatCompact`: "$11.2M"); a measured value keeps every digit. Ori's
+  read never names a move on a card under the volume floor ("had too little activity to
+  compare"). Ellensburg 2026-09-29: payments and bills projected, billing and field activities
+  honestly refused. New
   Ori insight types should follow this shape: rules in a pure, tested backend module; words
   from `ORI`; one follow-up question to Ori.
 - Code identifiers (`AssistantPanel`, `/portal/assistant`, `ASSISTANT_*` env keys) keep their
