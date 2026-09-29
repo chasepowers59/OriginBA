@@ -22,7 +22,7 @@ import { printCouncilPack } from "@/lib/councilPack";
 import { useBrand } from "@/components/PortalThemeProvider";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
 import { downloadPdf } from "@/lib/api";
-import { summarizeResult } from "@/lib/resultSummary";
+import { isMeasureColumn, summarizeResult } from "@/lib/resultSummary";
 
 type SortDir = "asc" | "desc";
 
@@ -331,7 +331,7 @@ export function ResultsPanel({
             <thead className="sticky top-0 border-b border-edge-subtle bg-surface-solid backdrop-blur">
               <tr>
                 {result.columns.map((col) => (
-                  <th key={col} className="px-4 py-3 font-medium text-fg-muted">
+                  <th key={col} className={`px-4 py-3 font-medium text-fg-muted ${isMeasureColumn(col) ? "text-right" : ""}`}>
                     {columnLabels[col] ?? prettifyFieldName(col)}
                   </th>
                 ))}
@@ -344,16 +344,16 @@ export function ResultsPanel({
                   onClick={() =>
                     onDrillSelect?.(String(row[dimensionKey] ?? ""))
                   }
-                  className={`border-b border-edge-subtle transition hover:bg-white/[0.03] ${
+                  className={`border-b border-edge-subtle transition ${
  onDrillSelect ? "cursor-pointer" : ""
  } ${
  drillFilter?.value === String(row[dimensionKey])
  ? "bg-warn-bg"
- : ""
+ : "hover:bg-chip"
  }`}
                 >
                   {result.columns.map((col) => (
-                    <td key={col} className="px-4 py-2.5 text-heading">
+                    <td key={col} className={`px-4 py-2.5 text-heading ${isMeasureColumn(col) ? "text-right tabular-nums" : ""}`}>
                       {formatCellValue(row[col], {
                         columnId: col,
                         isMeasure: col === measureKey,

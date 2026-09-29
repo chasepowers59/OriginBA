@@ -1,5 +1,10 @@
 import { isUnitOfMeasureField, measureDisplaysAsCurrency } from "./businessLabels";
 
+/** The query names its aggregates m0, m1... (api/query_builder.py): the number columns. */
+export function isMeasureColumn(column: string): boolean {
+  return /^m\d+$/.test(column);
+}
+
 export const MIXED_UNITS_NOTE = "Not totalled: the rows are in different units.";
 
 export type ResultSummary = {

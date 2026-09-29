@@ -246,19 +246,18 @@ export function measureColumnLabel(
     return measureAgg === "count" ? "Number of records" : aggregationLabel(measureAgg);
   }
   const base = measureLabel ?? prettifyFieldName(measureField);
-  if (measureAgg === "sum" && measureIsCurrency(measureField)) {
-    return `Total ${base.toLowerCase()}`;
-  }
-  if (measureAgg === "sum") {
-    return `Total ${base.toLowerCase()}`;
-  }
-  if (measureAgg === "count") {
-    return `Rows with ${base.toLowerCase()}`;
-  }
-  if (measureAgg === "count_distinct") {
-    return `Distinct ${base.toLowerCase()}`;
-  }
+  if (measureAgg === "sum") return withoutRepeatedLeadingWord(`Total ${base.toLowerCase()}`);
+  if (measureAgg === "count") return `Rows with ${base.toLowerCase()}`;
+  if (measureAgg === "count_distinct") return withoutRepeatedLeadingWord(`Distinct ${base.toLowerCase()}`);
   return `${aggregationLabel(measureAgg)} — ${base}`;
+}
+
+/**
+ * "Total" + "Total Balance" reads "Total Balance". Six catalog measures already start
+ * with their aggregate's word, and the server's labels prefix it too ("Total Total Balance").
+ */
+export function withoutRepeatedLeadingWord(label: string): string {
+  return label.replace(/^(\S+)\s+\1\b/i, "$1");
 }
 
 export function kpiLabelsForMeasure(measureField: string, measureAgg: string) {

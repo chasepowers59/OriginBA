@@ -14,6 +14,7 @@ import {
   allowedAggsForMeasure,
   buildColumnLabels,
   defaultMeasureSelection,
+  withoutRepeatedLeadingWord,
 } from "@/lib/businessLabels";
 import { getFavorite } from "@/lib/favorites";
 import { getViewRemote, saveViewRemote } from "@/lib/savedViews";
@@ -412,7 +413,8 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     // only names the last measure column, so a two-measure report left the other as
     // "m0". Kept as the fallback for anything the server did not label.
     const local = buildColumnLabels(metadata, dimensions, measureField, measureAgg, result.columns);
-    return { ...local, ...(result.column_labels ?? {}) };
+    const server = Object.entries(result.column_labels ?? {}).map(([c, l]) => [c, withoutRepeatedLeadingWord(l)]);
+    return { ...local, ...Object.fromEntries(server) };
   }, [result, metadata, dimensions, measureField, measureAgg]);
 
   // Flag columns keyed by declared type, so the detail table renders True/False rather
