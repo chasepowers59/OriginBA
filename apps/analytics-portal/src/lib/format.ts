@@ -67,11 +67,13 @@ const STEP_RATIOS = [1, 2, 2.5, 5];
 /**
  * Axis ticks from min(0, lo) to max(0, hi) in a round step -- 1, 2, 2.5 or 5 x 10^n --
  * at most `maxTicks` of them. Recharts' own steps are any multiple of 0.05 x 10^n,
- * which put "$5.5K" on an axis.
+ * which put "$5.5K" on an axis. `zero: false` fits a trend line's axis to its data (a bar
+ * always starts at zero); a labelled axis is what keeps that honest.
  */
-export function niceTicks(lo: number, hi: number, maxTicks = 6): number[] {
-  const from = Math.min(0, lo);
-  const to = Math.max(0, hi);
+export function niceTicks(lo: number, hi: number, maxTicks = 6, { zero = true } = {}): number[] {
+  const fit = !zero && hi > lo;
+  const from = fit ? lo : Math.min(0, lo);
+  const to = fit ? hi : Math.max(0, hi);
   const intervals = maxTicks - 1;
   for (let power = 10 ** Math.floor(Math.log10((to - from || 1) / intervals)); ; power *= 10) {
     for (const ratio of STEP_RATIOS) {
@@ -89,13 +91,16 @@ export function niceTicks(lo: number, hi: number, maxTicks = 6): number[] {
 export type ValueAxis = { ticks: number[]; domain: [number, number]; format: (v: number) => string };
 
 /**
- * A chart's value axis: round ticks covering zero and every value (pass stack totals
- * for a stacked chart), labelled alike -- all compact when the axis reaches 10,000, none
- * otherwise. A tick is a round number, so money on an axis carries no cents.
+ * A chart's value axis: round ticks covering every value, and zero unless `zero: false`
+ * (pass stack totals for a stacked chart), labelled alike -- all compact when the axis
+ * reaches 10,000, none otherwise. A tick is a round number, so money on an axis carries
+ * no cents.
  */
-export function valueAxis(values: number[], { currency = false } = {}): ValueAxis {
+export function valueAxis(values: number[], { currency = false, zero = true, maxTicks = 6 } = {}): ValueAxis {
   const finite = values.filter(Number.isFinite);
-  const ticks = niceTicks(finite.reduce((a, b) => Math.min(a, b), 0), finite.reduce((a, b) => Math.max(a, b), 0));
+  const lo = finite.reduce((a, b) => Math.min(a, b), Infinity);
+  const hi = finite.reduce((a, b) => Math.max(a, b), -Infinity);
+  const ticks = niceTicks(lo, hi, maxTicks, { zero });
   const compactAll = ticks.some((t) => Math.abs(t) >= COMPACT_FROM);
   const format = (v: number) =>
     compactAll
@@ -276,6 +281,16 @@ export function formatDateTime(value: unknown): string {
   if (!value) return "—";
   if (typeof value === "string" && DATE_ONLY_RE.test(value)) return formatDate(value);
   return parseDate(value)?.toLocaleString(LOCALE, { ...DAY, hour: "numeric", minute: "2-digit" }) ?? String(value);
+}
+
+const MONTH_RE = /^(\d{4})-(0[1-9]|1[0-2])$/;
+
+/** "May 2026" from "2026-05", built on the local calendar so no timezone can move the month. */
+export function formatMonth(value: unknown): string {
+  if (!value) return "—";
+  const m = MONTH_RE.exec(String(value));
+  if (!m) return String(value);
+  return new Date(Number(m[1]), Number(m[2]) - 1, 1).toLocaleDateString(LOCALE, { month: "short", year: "numeric" });
 }
 
 /**

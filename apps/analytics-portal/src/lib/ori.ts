@@ -18,4 +18,12 @@ export const ORI = {
     "Ori is not set up for this deployment yet (no model key). The governed metrics below still answer everyday questions.",
   worthInvestigating: "Ori found something worth investigating",
   askWhy: "Ask Ori why",
+  read: "Ori's read",
+  heading: "Where it's heading",
+  actual: "Actual",
+  projection: "Projection",
+  likelyRange: (low: string, high: string) => `Likely ${low} to ${high}`,
+  forecastChart: (label: string) => `${label} by month: actual, then projected`,
+  askAbout: "Ask Ori about this",
+  projectionNote: "A projection from past months, not a promise.",
 } as const;

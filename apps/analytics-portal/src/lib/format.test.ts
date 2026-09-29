@@ -7,6 +7,7 @@ import {
   formatCurrency,
   formatDate,
   formatDateTime,
+  formatMonth,
   formatNumber,
   niceTicks,
   valueAxis,
@@ -39,6 +40,33 @@ describe("dates", () => {
     expect(formatDate(null)).toBe("—");
     expect(formatDate("")).toBe("—");
     expect(formatDate("not a date")).toBe("not a date");
+  });
+});
+
+describe("months", () => {
+  // Ori's trends speak in months ("2026-05"); a month reads like a date, short month first.
+  it("a month reads May 2026", () => {
+    expect(formatMonth("2026-05")).toBe("May 2026");
+    expect(formatMonth("2025-12")).toBe("Dec 2025");
+  });
+
+  it("stays in its own month west and east of UTC", () => {
+    const tz = process.env.TZ;
+    try {
+      for (const zone of ["America/Denver", "Australia/Sydney"]) {
+        process.env.TZ = zone;
+        expect(formatMonth("2026-01")).toBe("Jan 2026");
+      }
+    } finally {
+      process.env.TZ = tz;
+    }
+  });
+
+  it("missing and unreadable values stay honest", () => {
+    expect(formatMonth(null)).toBe("—");
+    expect(formatMonth("")).toBe("—");
+    expect(formatMonth("2026-13")).toBe("2026-13");
+    expect(formatMonth("soon")).toBe("soon");
   });
 });
 
@@ -142,6 +170,16 @@ describe("value axis labels", () => {
     expect(big.ticks.map(big.format)).toEqual(["0", "2.5K", "5K", "7.5K", "10K", "12.5K"]);
     const small = valueAxis([0, 5_500], { currency: true });
     expect(small.ticks.map(small.format)).toEqual(["$0", "$2,000", "$4,000", "$6,000"]);
+  });
+
+  it("a trend line's axis fits its data in round steps, rather than flattening it against zero", () => {
+    expect(niceTicks(3_450_000, 4_380_000, 4, { zero: false })).toEqual([3_000_000, 3_500_000, 4_000_000, 4_500_000]);
+    const bills = valueAxis([30_300, 32_220], { zero: false, maxTicks: 4 });
+    expect(bills.ticks.map(bills.format)).toEqual(["30K", "31K", "32K", "33K"]);
+  });
+
+  it("a fitted axis over one repeated value falls back to zero, so it still has a height", () => {
+    expect(valueAxis([5, 5], { zero: false }).domain[0]).toBe(0);
   });
 
   it("the axis runs from its first tick to its last", () => {

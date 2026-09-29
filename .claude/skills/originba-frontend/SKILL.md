@@ -51,8 +51,11 @@ share these token names and values — changing a V2.1 value is a cross-app deci
 ## Charts — one renderer, one colour rule
 
 - `builder/BuilderChart` (+ `ui/chart.tsx` primitives) is THE chart renderer.
-  `MiniSparkChart` is the only other (KPI sparklines). Never add a third; never
-  reintroduce raw Recharts with hex colours (the deleted ChartView anti-pattern).
+  `MiniSparkChart` is the only other (KPI sparklines), plus `OriForecastChart` for Ori's
+  projections alone (actual months solid, projection dashed from the last of them, the
+  likely range a band; one hue, `--chart-1`, on the `ui/chart` primitives). Never add
+  another; never reintroduce raw Recharts with hex colours (the deleted ChartView
+  anti-pattern).
 - **Categorical series come from `--chart-1..6`** — blue and teal only. Teal is NEVER
   paired with blue as a category; two-series charts use chart-1 with chart-3.
 - **One hue per series (UI-2, Chase 2026-09-29, cross-app):** a single-series bar
@@ -85,8 +88,9 @@ share these token names and values — changing a V2.1 value is a cross-app deci
   `formatDateTime` "Sep 1, 2026, 10:11 AM" (a date, or a zone-less midnight in a
   non-date-time column, never shows a time); `formatNumber`/`formatCurrency` give every
   digit ("-$12,071.26") for tables, sentences and tooltips; `formatCompact` (from
-  10,000) is for KPI headlines only; `valueAxis` gives a chart round ticks (1, 2, 2.5,
-  5 x 10^n) labelled alike. `format.test.ts` fails on any `toLocaleString`, `Intl` or
+  10,000) is for KPI headlines only; `formatMonth` "May 2026" for a "YYYY-MM" month;
+  `valueAxis` gives a chart round ticks (1, 2, 2.5, 5 x 10^n) labelled alike, from zero
+  unless `zero: false` fits a trend LINE to its data -- only with the axis shown. `format.test.ts` fails on any `toLocaleString`, `Intl` or
   `` `$${ `` outside format.ts. Date inputs keep the browser control; API values and
   exports stay ISO/machine-friendly.
 - Panel headers lead with a small rounded icon chip coloured from the chart palette
@@ -525,12 +529,18 @@ will be Ori too, so they never need renaming.
 - The backend speaks as Ori too: the system prompt opens "You are Ori…" (`api/assistant.py`),
   and user-facing errors say "Ori could not answer." / "Ori is not configured" /
   "Today's Ori budget…" (`api/assistant_routes.py`).
-- **Ori's findings** (first proactive surface, 2026-09-29): `OriFindings` above Ask Ori on home
-  reads `GET /portal/ori/findings` (`api/ori_insights.py`): the home cards against the prior
-  period, from the SAME vetted summary (so a finding never disagrees with its card), moves of
-  15% or more with a volume floor (count 20, money 1,000), windowed cards only, at most three;
-  "Ask Ori why" hands the question to Ori via `requestAsk`. No findings, no card. New Ori
-  insight types should follow this shape: rules in a pure, tested backend module; words from
-  `ORI`; one follow-up question to Ori.
+- **Ori's findings** (first proactive surface, 2026-09-29): `OriInsights` ("Ori's read") above
+  Ask Ori on home reads `GET /portal/ori/findings` (`api/ori_insights.py`): the home cards against
+  the prior period, from the SAME vetted summary (so a finding never disagrees with its card),
+  moves of 15% or more with a volume floor (count 20, money 1,000), windowed cards only, at most
+  three, plus a one-paragraph `brief`; "Ask Ori why" hands the question to Ori via `requestAsk`.
+- **Ori's trends** (2026-09-29): the same panel reads `GET /portal/ori/trends` for unusual
+  months (listed after the findings, one list) and projections ("Where it's heading", one row
+  and one `OriForecastChart` each, "Ask Ori about this", footnote "A projection from past months,
+  not a promise."). Up to ~30 s cold, so it loads on its own, shows `ORI.thinking` meanwhile, is
+  aborted on unmount, and shows nothing on error. The panel is absent only when the brief,
+  findings, unusual months and projections are all empty (`lib/oriPanel.oriPanelShows`). New
+  Ori insight types should follow this shape: rules in a pure, tested backend module; words
+  from `ORI`; one follow-up question to Ori.
 - Code identifiers (`AssistantPanel`, `/portal/assistant`, `ASSISTANT_*` env keys) keep their
   names: renaming them buys nothing and breaks deployments.

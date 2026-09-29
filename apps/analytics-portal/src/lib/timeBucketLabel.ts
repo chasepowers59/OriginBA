@@ -1,4 +1,4 @@
-import { formatDate } from "@/lib/format";
+import { formatDate, formatMonth } from "@/lib/format";
 
 /**
  * Label a time bucket for a chart axis.
@@ -12,11 +12,6 @@ import { formatDate } from "@/lib/format";
  * Date would shift them into the viewer's, which can move a bucket into the previous
  * month.
  */
-const MONTHS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
-
 const ISO = /^(\d{4})-(\d{2})-(\d{2})(?:[T ]|$)/;
 
 export function formatTimeBucket(value: string, grain?: string | null): string {
@@ -36,6 +31,6 @@ export function formatTimeBucket(value: string, grain?: string | null): string {
     case "week":
       return formatDate(`${m[1]}-${m[2]}-${m[3]}`);
     default:
-      return `${MONTHS[month - 1]} ${year}`;
+      return formatMonth(`${m[1]}-${m[2]}`);
   }
 }
