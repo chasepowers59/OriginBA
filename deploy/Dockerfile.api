@@ -8,7 +8,8 @@
 # BUILD CONTEXT = repo root (fly.toml lives at the repo root and points here).
 FROM python:3.12-slim
 WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends libpq5 \
+# fonts-dejavu-core: the face collections letters are laid out in (api/letters/render.py).
+RUN apt-get update && apt-get install -y --no-install-recommends libpq5 fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/*
 COPY deploy/requirements-api.txt ./requirements-api.txt
 RUN pip install --no-cache-dir -r requirements-api.txt

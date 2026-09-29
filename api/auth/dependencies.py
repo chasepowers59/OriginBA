@@ -87,6 +87,7 @@ def _dev_context() -> AuthContext:
             "saved_views:write",
             "dashboards:write",
             "explorer:builder",
+            "letters:read",
             "users:manage",
             "groups:manage",
             "data_source:manage",

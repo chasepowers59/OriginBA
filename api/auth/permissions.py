@@ -31,6 +31,8 @@ ROLE_PERMISSIONS: Final[dict[str, frozenset[str]]] = {
             "saved_views:write",
             "dashboards:write",
             "explorer:builder",
+            # Collections letters carry names, addresses and amounts owed: editors and up.
+            "letters:read",
         }
     ),
     "admin": frozenset(
