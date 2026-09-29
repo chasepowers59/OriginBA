@@ -101,10 +101,10 @@ export function explorerPeriodLabel(p: {
   activePreset: string;
   asOf?: string | null;
   fellBackFrom?: string | null;
-  appliedWindow?: { days: number; label: string } | null;
+  appliedWindow?: { days: number } | null;
 }): string {
   if (!p.allDates) return anchoredLabel(p.activePreset, p.asOf);
-  if (p.appliedWindow) return `Last ${p.appliedWindow.days} days of ${p.appliedWindow.label}`;
+  if (p.appliedWindow) return `Last ${p.appliedWindow.days} days`;
   if (!p.fellBackFrom) return ALL_DATES;
   const from = anchoredLabel(p.fellBackFrom, p.asOf);
   return `${ALL_DATES} (nothing in ${from.charAt(0).toLowerCase()}${from.slice(1)})`;

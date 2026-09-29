@@ -7,7 +7,7 @@ export function isMeasureColumn(column: string): boolean {
 
 export const MIXED_UNITS_NOTE = "Not totalled: the rows are in different units.";
 
-export type ResultSummary = {
+type ResultSummary = {
   total: number | null;
   leader: { label: string; share: number; value: number } | null;
   notTotalled: string | null;

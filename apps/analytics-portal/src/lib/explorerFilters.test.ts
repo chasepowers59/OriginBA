@@ -59,8 +59,8 @@ describe("explorerPeriodLabel", () => {
 
   it("names the window the server applied instead of claiming All dates", () => {
     expect(explorerPeriodLabel({
-      allDates: true, activePreset: "All dates", asOf, appliedWindow: { days: 90, label: "Snapshot Date" },
-    })).toBe("Last 90 days of Snapshot Date");
+      allDates: true, activePreset: "All dates", asOf, appliedWindow: { days: 90 },
+    })).toBe("Last 90 days");
   });
 
   it("names the reader's own window as before", () => {

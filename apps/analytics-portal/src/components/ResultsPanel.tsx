@@ -264,11 +264,7 @@ export function ResultsPanel({
           <ExportMenu
             items={[
               { label: "Excel workbook", onSelect: handleExport },
-              {
-                label: pdfState === "Preparing…" ? "Preparing PDF…" : "Download PDF",
-                onSelect: () => void handlePdf(),
-                disabled: pdfState === "Preparing…",
-              },
+              { label: "Download PDF", onSelect: () => void handlePdf(), disabled: pdfState === "Preparing…" },
               {
                 label: "Council pack (PDF)",
                 onSelect: () => printCouncilPack(reportTitle ?? snapshotLabel ?? snapshotId),
