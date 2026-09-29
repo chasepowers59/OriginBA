@@ -28,7 +28,7 @@ export default async function BuildPage({
           </p>
           <h1 className="portal-heading mt-1 text-2xl font-bold">Build a view</h1>
           <p className="mt-1 text-sm text-fg-muted">
-            Pick a table, add columns to the shelves, and choose a
+            Pick a data set, add columns to the shelves, and choose a
             visualization — or start from a governed business question.
           </p>
         </div>

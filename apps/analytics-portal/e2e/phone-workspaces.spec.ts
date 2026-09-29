@@ -21,6 +21,6 @@ test("the SQL workspace gives its results real room", async ({ page }) => {
 
 test("the builder's empty state does not depend on the layout", async ({ page }) => {
   await page.goto("/build");
-  await expect(page.getByText(/Pick a table/).first()).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText(/Pick a data set/).first()).toBeVisible({ timeout: 60_000 });
   await expect(page.getByText(/on the left/)).toHaveCount(0);
 });

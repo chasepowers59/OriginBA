@@ -388,8 +388,8 @@ export function VisualBuilder({
 
           {!meta ? (
             <div className="glass-panel flex items-center justify-center px-6 py-16 text-center text-sm" style={{ color: "var(--foreground-subtle)" }}>
-              Pick a table to see its columns, or open “Start from a question”
-              for a ready-made view.
+              Pick a data set to see its columns, or open “Start from a question”
+              for a ready-to-run report.
             </div>
           ) : (
             <div className="space-y-4">
