@@ -20,6 +20,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-29 | Explorer: the results table and a tall bar chart scroll with no keyboard access (axe scrollable-region-focusable, serious); only Ellensburg's volumes scroll, so demo25 never showed it | 381079bf | e2e/a11y.spec.ts (Ellensburg, both themes) |
 | 2026-09-29 | Letters: X-Letter-Font headers not exposed through CORS; the frontend cannot read them | 2589495c | tests/test_letters_routes.py |
 | 2026-09-29 | The frontend skill still describes long axis labels as skipped ticks (preserveStartEnd); since 552cde49 that applies only to date/ordered axes | 2823f081 | skill text |
 | 2026-09-29 | The server PDF still prints "No rows in this window." under a card that failed to load (its note now says why) | 2823f081 | tests/test_dashboard_pdf.py |
