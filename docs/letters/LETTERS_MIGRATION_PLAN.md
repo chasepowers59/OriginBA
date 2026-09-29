@@ -95,4 +95,4 @@ at retirement.
 | Phase | State |
 | --- | --- |
 | 0 | not started |
-| 1 | not started |
+| 1 | backend on `feature/letters-phase1`: `/portal/letters` list, preview and PDF for Postgres orgs, `letters:read` (editor, admin); demo25 smoke passed. Frontend and the `rpt_collection_letter` parity test next |

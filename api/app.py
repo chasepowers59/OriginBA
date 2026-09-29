@@ -116,6 +116,8 @@ from api.assistant_routes import router as assistant_router
 app.include_router(assistant_router)
 from api.integrity_routes import router as integrity_router  # noqa: E402
 app.include_router(integrity_router)
+from api.letters.routes import router as letters_router  # noqa: E402
+app.include_router(letters_router)
 
 
 @app.get("/health")
