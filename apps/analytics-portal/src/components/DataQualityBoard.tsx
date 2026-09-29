@@ -278,7 +278,7 @@ function RuleCard({
             <table className="min-w-full text-xs">
               <thead>
                 <tr>
-                  <th className="border-b border-edge-subtle px-2 py-1.5" />
+                  <th className="border-b border-edge-subtle px-2 py-1.5"><span className="sr-only">Action</span></th>
                   {r.columns.map((c) => (
                     <th
                       key={c}
@@ -294,11 +294,13 @@ function RuleCard({
                   <tr key={i} className="border-b border-edge-subtle/60 hover:bg-chip">
                     <td className="px-2 py-1">
                       <button
+                        type="button"
                         onClick={() => onMark(r.row_keys?.[i] ?? `${r.id}|${row[0]}`, true)}
                         title="Mark done until the next data refresh"
-                        className="rounded border border-ok px-1.5 py-0.5 text-[10px] font-semibold text-ok hover:bg-ok-bg dark:text-ok"
+                        aria-label={`Mark ${String(row[0] ?? "this row")} done`}
+                        className="btn-ghost inline-flex min-h-8 items-center gap-1 whitespace-nowrap px-2 text-xs"
                       >
-                        Done
+                        <span aria-hidden>✓</span> Mark done
                       </button>
                     </td>
                     {row.map((v, j) => (
