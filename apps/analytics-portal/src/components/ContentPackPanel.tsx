@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { fetchContentPack, fetchDashboards, fetchSavedViews, importContentPack } from "@/lib/api";
 import { packFilename, packSummary, type PackImportResult } from "@/lib/contentPack";
 import { FormError } from "@/components/Modal";
+import { saveBlob } from "@/lib/format";
 
 /**
  * Carry shared views and dashboards to another organization: export a pack here, switch to
@@ -44,12 +45,8 @@ export function ContentPackPanel() {
     const data = await run(() => fetchContentPack(folder || null));
     if (!data) return;
     const org = String((data as { source_organization?: string }).source_organization ?? "portal");
-    const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = packFilename(org, new Date().toISOString().slice(0, 10), folder || null);
-    a.click();
-    URL.revokeObjectURL(url);
+    saveBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
+             packFilename(org, new Date().toISOString().slice(0, 10), folder || null));
   }
 
   async function onFile(file: File | undefined) {

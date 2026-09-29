@@ -68,6 +68,13 @@ def _problem(item: dict[str, Any], organization_id: str) -> str | None:
     return None
 
 
+def _note(bucket: dict[str, list], title: str, reason: str | None) -> None:
+    if reason:
+        bucket["skipped"].append({"title": title, "reason": reason})
+    else:
+        bucket["imported"].append(title)
+
+
 def import_pack(pack: dict[str, Any], organization_id: str, ctx: Any, dry_run: bool) -> dict[str, Any]:
     if not isinstance(pack, dict) or pack.get("format") != FORMAT:
         raise HTTPException(status_code=400, detail="This file is not an Origin BA content pack.")
@@ -84,7 +91,7 @@ def import_pack(pack: dict[str, Any], organization_id: str, ctx: Any, dry_run: b
                                   organization_id=organization_id)
             except SavedViewError as exc:
                 reason = str(exc)
-        out["views"]["skipped" if reason else "imported"].append({"title": title, "reason": reason} if reason else title)
+        _note(out["views"], title, reason)
         have.add((view.get("snapshot_id"), title))
 
     boards = {b.get("title") for b in list_dashboards(organization_id)}
@@ -99,6 +106,6 @@ def import_pack(pack: dict[str, Any], organization_id: str, ctx: Any, dry_run: b
                                         "visibility": "organization"}, ctx), organization_id=organization_id)
             except DashboardError as exc:
                 reason = str(exc)
-        out["dashboards"]["skipped" if reason else "imported"].append({"title": title, "reason": reason} if reason else title)
+        _note(out["dashboards"], title, reason)
         boards.add(title)
     return out

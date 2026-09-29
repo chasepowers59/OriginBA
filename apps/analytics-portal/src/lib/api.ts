@@ -25,7 +25,7 @@ import type { PackImportResult } from "./contentPack";
 import type { SystemHealth } from "./systemHealth";
 import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview, AssistantSpend } from "@/lib/types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
-import { localIsoDate } from "@/lib/format";
+import { localIsoDate, saveBlob } from "@/lib/format";
 import { parseApiError } from "@/lib/apiErrors";
 import { parseSse } from "@/lib/sse";
 
@@ -566,12 +566,7 @@ async function savePdf(path: string, body: unknown): Promise<void> {
   });
   if (!res.ok) throw new Error(parseApiError(await res.text(), res.statusText));
   const name = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? "report.pdf";
-  const url = URL.createObjectURL(await res.blob());
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = name;
-  a.click();
-  URL.revokeObjectURL(url);
+  saveBlob(await res.blob(), name);
 }
 
 export type EmbedData = {

@@ -244,7 +244,11 @@ export function toCsv(columns: string[], rows: Record<string, unknown>[]): strin
 
 export function exportRowsCsv(columns: string[], rows: Record<string, unknown>[], filename: string) {
   // A byte-order mark so Excel reads the file as UTF-8 (names with accents stay intact).
-  const blob = new Blob(["\ufeff" + toCsv(columns, rows)], { type: "text/csv;charset=utf-8;" });
+  saveBlob(new Blob(["\ufeff" + toCsv(columns, rows)], { type: "text/csv;charset=utf-8;" }), filename);
+}
+
+/** Hand a file built in the browser (or fetched) to the reader as a download. */
+export function saveBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
