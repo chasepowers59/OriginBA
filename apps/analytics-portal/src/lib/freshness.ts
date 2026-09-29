@@ -6,9 +6,14 @@ export type Freshness = { built_at: string | null; age_hours: number | null; sta
 /** The notice every page shows once the last build is over a day and a half old; null otherwise. */
 export function freshnessNotice(f: Freshness | null): string | null {
   if (!f?.stale || !f.built_at || f.age_hours == null) return null;
-  const ago = f.age_hours < 48 ? `${formatNumber(Math.floor(f.age_hours))} hours` : `${formatNumber(Math.floor(f.age_hours / 24))} days`;
   return (
-    `Reporting data was last refreshed ${formatDateTime(f.built_at)} (${ago} ago). The scheduled refresh has ` +
+    `Reporting data was last refreshed ${formatDateTime(f.built_at)} (${age(f.age_hours)} ago). The scheduled refresh has ` +
     "not completed since, so figures may be out of date."
   );
+}
+
+/** "1 hour", "37 hours", "19 days": hours under two days, whole days after. */
+export function age(hours: number): string {
+  const [n, unit] = hours < 48 ? [Math.floor(hours), "hour"] : [Math.floor(hours / 24), "day"];
+  return `${formatNumber(n)} ${unit}${n === 1 ? "" : "s"}`;
 }

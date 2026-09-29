@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchSystemHealth } from "@/lib/api";
-import { findReference, hitRate, type SystemHealth } from "@/lib/systemHealth";
+import { findReference, freshnessRows, hitRate, type SystemHealth } from "@/lib/systemHealth";
 import { formatDateTime, formatNumber } from "@/lib/format";
 import { FormError } from "@/components/Modal";
 
@@ -78,6 +78,9 @@ export function SystemHealthPanel() {
       <HealthTable title="Slowest recent requests" empty="Nothing slow since the API started."
                    head={["When", "Reference", "Route", "Organization", "Seconds"]}
                    rows={health.slow.map((s) => [formatDateTime(s.at), s.reference, s.route, s.org, formatNumber(s.ms / 1000)])} />
+      <HealthTable title="Data refresh by organization" empty="No organization read yet."
+                   head={["Organization", "Last built", "Age", "Status"]}
+                   rows={freshnessRows(health.freshness ?? {})} />
       <HealthTable title="Cache warming after a rebuild" empty="Nothing warmed yet: the first pass runs a minute after the API starts."
                    head={["Organization", "When", "Built", "Failed"]}
                    rows={Object.entries(health.warmed).map(([org, w]) => [org, formatDateTime(w.at), w.built.join(", "), w.failed.join(", ") || "—"])} />

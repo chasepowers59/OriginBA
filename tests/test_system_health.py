@@ -92,5 +92,17 @@ class HealthTests(unittest.TestCase):
             self.assertIn(key, out)
 
 
+    def test_each_known_organizations_last_build_and_whether_it_is_stale(self):
+        # an administrator could not see Ellensburg's tables were 19 days old (2026-09-29)
+        from api import health_routes as hr
+        fresh = {"ellensburg": {"built_at": "2026-09-29T12:39:07-04:00", "age_hours": 1.2, "stale": False},
+                 "int_dev": {"built_at": "2026-09-27T05:45:00-04:00", "age_hours": 55.0, "stale": True}}
+        with mock.patch.object(hr.data_version, "known",
+                               return_value={o: {"version": "v", "read_seconds_ago": 1} for o in fresh}), \
+             mock.patch.object(hr, "freshness", side_effect=lambda org: fresh[org]):
+            out = hr.system_health(ctx=_ctx("admin"))
+        self.assertEqual(out["freshness"], fresh)
+
+
 if __name__ == "__main__":
     unittest.main()
