@@ -317,6 +317,11 @@ WAREHOUSE_NOT_CONNECTED_NOTE = (
 _TIMEOUT = re.compile(r"ORA-01013|statement timeout|canceling statement|DPY-4024|ORA-03156", re.IGNORECASE)
 
 
+def is_transient_error(message: str | None) -> bool:
+    """A dropped connection or a timeout: the same query may well answer next time."""
+    return is_not_connected_error(message) or bool(message and _TIMEOUT.search(str(message)))
+
+
 def unavailable_note(kpis: list[dict[str, Any]]) -> str | None:
     """One sentence for a page where EVERY card failed for the same reason, else None."""
     errors = [k.get("error") for k in kpis]

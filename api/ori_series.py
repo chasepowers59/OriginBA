@@ -57,25 +57,27 @@ def monthly_history(kpi: dict[str, Any], organization_id: str, months: int = HIS
     return series_from_rows(span, rows)
 
 
-def _build(organization_id: str) -> tuple[dict[str, list], dict[str, dict]]:
+def _build(organization_id: str) -> tuple[dict[str, list], dict[str, dict], bool]:
     from api.executive_dashboard import EXECUTIVE_KPIS, available_kpis
     kpis, _ = available_kpis([k for k in EXECUTIVE_KPIS if not k.get("windowless")], organization_id)
 
-    def one(kpi: dict[str, Any]) -> list[dict[str, Any]]:
+    def one(kpi: dict[str, Any]) -> list[dict[str, Any]] | None:
         try:
             return monthly_history(kpi, organization_id)
         except Exception as exc:  # noqa: BLE001 -- one card failing leaves the others
             log.warning("ori history %s %s failed: %s", organization_id, kpi["id"], exc)
-            return []
+            return None
 
     with ThreadPoolExecutor(max_workers=max(1, min(8, len(kpis)))) as pool:
         histories = list(pool.map(one, kpis))
     history = {k["id"]: h for k, h in zip(kpis, histories) if h}
     meta = {k["id"]: {"label": k["label"], "format": k.get("format", "number"), "workstream": k.get("workstream")}
             for k in kpis if k["id"] in history}
-    return history, meta
+    return history, meta, None in histories
 
 
 def cached_history(organization_id: str) -> tuple[dict[str, list], dict[str, dict]]:
-    return cached(("ori history", organization_id), lambda: _build(organization_id),
-                  keep=lambda built: bool(built[0]), version=data_version(organization_id))
+    # a history missing a card that failed is served but not kept: the next request retries it
+    history, meta, _ = cached(("ori history", organization_id), lambda: _build(organization_id),
+                              keep=lambda built: bool(built[0]) and not built[2], version=data_version(organization_id))
+    return history, meta

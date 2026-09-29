@@ -285,6 +285,29 @@ class RouteTests(unittest.TestCase):
         self.assertEqual(out["brief"], "In the last 30 days, bills held within 5% of the 30 days before.")
 
 
+class HistoryKeepTests(unittest.TestCase):
+    def test_a_history_missing_a_failed_card_is_not_kept(self):
+        # review 2026-09-29: one card timing out left it without projections until the next build
+        from api import summary_cache
+        summary_cache.clear()
+        kpis = [{"id": "a", "label": "A", "format": "number", "workstream": "billing"},
+                {"id": "b", "label": "B", "format": "number", "workstream": "billing"}]
+        calls = {"n": 0}
+
+        def history(kpi, org):
+            calls["n"] += 1
+            if kpi["id"] == "b" and calls["n"] <= 2:
+                raise RuntimeError("DPY-4024: call timeout")
+            return series([100] * 13)
+        with mock.patch("api.executive_dashboard.available_kpis", return_value=(kpis, None)), \
+             mock.patch.object(ori_series, "monthly_history", side_effect=history), \
+             mock.patch.object(ori_series, "data_version", return_value="V1"):
+            first, _ = ori_series.cached_history("ellensburg")
+            second, _ = ori_series.cached_history("ellensburg")
+        self.assertEqual(set(first), {"a"})
+        self.assertEqual(set(second), {"a", "b"})
+
+
 class WarmTests(unittest.TestCase):
     def test_the_warmer_builds_the_monthly_history_after_a_rebuild(self):
         from api import cache_warmer as cw

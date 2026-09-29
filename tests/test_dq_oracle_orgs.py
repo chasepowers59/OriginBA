@@ -337,6 +337,23 @@ class OracleOrgCachingTests(OracleOrgHarness):
         from api.executive_dashboard import is_not_connected_error
         self.assertTrue(is_not_connected_error("ORA-12262: Cannot connect to database. Could not resolve hostname"))
 
+    def test_a_run_with_a_timed_out_rule_is_not_kept(self):
+        # review 2026-09-29: the parity rules full-scan CISADM right after a rebuild, when the
+        # warmer runs them; a 60 s call timeout must not stand as the answer until the next build
+        first = ORACLE_RULES[0]["sql"].strip()
+        original, calls = self._oracle, {"n": 0}
+
+        def slow_once(sql, binds=None, *, organization_id, max_rows):
+            if first in sql:
+                calls["n"] += 1
+                if calls["n"] == 1:
+                    raise RuntimeError("DPY-4024: call timeout of 60000 ms exceeded with ORA-03156")
+            return original(sql, binds, organization_id=organization_id, max_rows=max_rows)
+        with mock.patch.object(dq_routes, "oracle_query", side_effect=slow_once):
+            dq_routes.dq_findings(ctx=_ctx())
+            again = dq_routes.dq_findings(ctx=_ctx())
+        self.assertFalse(any(r.get("error") for r in again["rules"]))
+
     def test_an_outage_is_not_kept(self):
         self.failing = {r["id"] for r in ORACLE_RULES}
         dq_routes.dq_findings(ctx=_ctx())

@@ -26,7 +26,7 @@ from fastapi import APIRouter, Body, Depends
 from api.auth import AuthContext, get_auth_context
 from api.data_version import data_version
 from api.demo_db import execute_query as oracle_query
-from api.executive_dashboard import is_missing_relation_error, is_not_connected_error
+from api.executive_dashboard import is_missing_relation_error, is_not_connected_error, is_transient_error
 from api.freshness import built_at, refresh_marker
 from api.org_db import require_org_for_data
 from api.snapshot_catalog import org_backend
@@ -171,9 +171,10 @@ def rule_results(org: str, engine: str | None = None, path: Path | None = None) 
     engine = engine or org_backend(org)[0]
     path = path or _rules_path(engine)
     out = cached(("dq", org, engine, str(path)), lambda: _run_rules(org, engine, path),
-                 # a rule that fails for good is kept; one cut off by a dropped connection is not
+                 # a rule that fails for good is kept; one cut off by a dropped connection or a
+                 # timeout (the parity rules full-scan CISADM right after a rebuild) is not
                  keep=lambda res: (any(not e.get("error") for e in res)
-                                   and not any(is_not_connected_error(e.get("error")) for e in res)),
+                                   and not any(is_transient_error(e.get("error")) for e in res)),
                  version=data_version(org))
     if out and all(is_missing_relation_error(e.get("error")) for e in out):
         return None
