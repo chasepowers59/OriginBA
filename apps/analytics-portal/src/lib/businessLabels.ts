@@ -197,6 +197,20 @@ export function measureIsCurrency(fieldId: string): boolean {
   return words.some((w) => CURRENCY_WORDS.has(w));
 }
 
+/**
+ * Whether a column names a unit of measure (kWh, therms, gallons), in either naming world.
+ * Tokens, for the reason measureIsCurrency gives; a COUNT of units is a number, not a unit.
+ */
+export function isUnitOfMeasureField(fieldId: string): boolean {
+  const words = fieldId.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
+  if (words.includes("COUNT") || words.includes("COUNTS")) return false;
+  if (words.includes("UOM")) return true;
+  const phrase = words.join(" ");
+  if (phrase.includes("UNIT OF MEASURE") || phrase.includes("MEASURE UNIT")) return true;
+  const bare = words.filter((w) => w !== "CODE" && w !== "CD");
+  return bare.length === 1 && (bare[0] === "UNIT" || bare[0] === "UNITS");
+}
+
 /** Dollar formatting only for sum/min/max on amount-like fields — never for counts. */
 export function measureDisplaysAsCurrency(measureField: string, measureAgg: string): boolean {
   if (measureField === "*") return false;

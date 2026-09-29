@@ -22,6 +22,7 @@ import { printCouncilPack } from "@/lib/councilPack";
 import { useBrand } from "@/components/PortalThemeProvider";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
 import { downloadPdf } from "@/lib/api";
+import { summarizeResult } from "@/lib/resultSummary";
 
 type SortDir = "asc" | "desc";
 
@@ -30,7 +31,6 @@ type ResultsPanelProps = {
   dimensionKey: string;
   measureKey: string;
   chartType: "bar" | "line" | "pie" | "horizontal" | "table";
-  totalMeasure: number | null;
   loading: boolean;
   snapshotId: string;
   snapshotLabel?: string;
@@ -61,7 +61,6 @@ export function ResultsPanel({
   dimensionKey,
   measureKey,
   chartType,
-  totalMeasure,
   loading,
   snapshotId,
   snapshotLabel,
@@ -88,19 +87,22 @@ export function ResultsPanel({
   const kpi = kpiLabelsForMeasure(measureField, measureAgg);
   const isCurrency = measureDisplaysAsCurrency(measureField, measureAgg);
 
-  const insight = useMemo(() => {
-    if (!result || !measureKey || !dimensionKey || !result.rows.length) return null;
-    const sorted = [...result.rows].sort(
-      (a, b) => Number(b[measureKey] ?? 0) - Number(a[measureKey] ?? 0),
-    );
-    const top = sorted[0];
-    if (!top) return null;
-    const topValue = Number(top[measureKey] ?? 0);
-    const total = sorted.reduce((s, r) => s + Number(r[measureKey] ?? 0), 0);
-    if (total <= 0) return null; // "leads at 0.0% of total" is noise, not an insight
-    const label = String(top[dimensionKey] ?? "Top value");
-    return { label, share: (topValue / total) * 100, topValue };
-  }, [result, measureKey, dimensionKey]);
+  const summary = useMemo(
+    () =>
+      result
+        ? summarizeResult({
+            columns: result.columns,
+            rows: result.rows,
+            measureKey,
+            dimensionKey,
+            measureField,
+            measureAgg,
+            labels: columnLabels,
+          })
+        : null,
+    [result, measureKey, dimensionKey, measureField, measureAgg, columnLabels],
+  );
+  const insight = summary?.leader;
 
   const sortedRows = useMemo(() => {
     if (!result || !measureKey) return [];
@@ -281,7 +283,7 @@ export function ResultsPanel({
         <div className="rounded-xl border border-edge tint-panel px-4 py-3 text-sm text-heading">
           <span className="font-medium text-heading">{insight.label}</span> leads this view at{" "}
           <span className="font-semibold text-primary">{formatPercent(insight.share)}</span> of the
-          total ({formatMeasure(insight.topValue)}).
+          total ({formatMeasure(insight.value)}).
         </div>
       ) : null}
 
@@ -289,7 +291,8 @@ export function ResultsPanel({
         <KpiCard label={kpi.groups} value={formatNumber(result.row_count)} />
         <KpiCard
           label={kpi.total}
-          value={totalMeasure != null ? formatMeasure(totalMeasure) : "—"}
+          value={summary?.total != null ? formatMeasure(summary.total) : "—"}
+          note={summary?.notTotalled}
           highlight
         />
         <KpiCard label={kpi.breakdown} value={breakdownLabel} small />
@@ -381,11 +384,13 @@ export function ResultsPanel({
 function KpiCard({
   label,
   value,
+  note,
   highlight,
   small,
 }: {
   label: string;
   value: string;
+  note?: string | null;
   highlight?: boolean;
   small?: boolean;
 }) {
@@ -404,6 +409,7 @@ function KpiCard({
       >
         {value}
       </p>
+      {note ? <p className="mt-1 text-xs text-fg-muted">{note}</p> : null}
     </div>
   );
 }

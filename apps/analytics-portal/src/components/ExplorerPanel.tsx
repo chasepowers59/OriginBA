@@ -422,11 +422,6 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     [metadata.fields],
   );
 
-  const totalMeasure = useMemo(() => {
-    if (!result || !measureKey) return null;
-    return result.rows.reduce((sum, row) => sum + Number(row[measureKey] ?? 0), 0);
-  }, [result, measureKey]);
-
   const scopeLabel =
     scopeValue && scopeFilters.find((f) => f.field === scopeField)?.label;
 
@@ -690,7 +685,6 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             dimensionKey={dimensionKey}
             measureKey={measureKey}
             chartType={chartType}
-            totalMeasure={totalMeasure}
             loading={loading}
             snapshotId={metadata.id}
             snapshotLabel={metadata.label}
