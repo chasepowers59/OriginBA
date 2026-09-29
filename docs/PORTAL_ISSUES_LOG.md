@@ -8,6 +8,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Reproduce / where | Next step |
 | --- | --- | --- | --- |
+| 2026-09-29 | Letter runs: the live e2e (create a run from a one-day Ellensburg window, the creator's Approve disabled, then cancel it) has not run. A worktree API has no Ellensburg connection (it lives in the owner's `.env`), so the list answered 503; the stubbed approve/release test passed | `npx playwright test e2e/letters.spec.ts -g "creator cannot approve"` against an API that reaches Ellensburg | Run it on the owner's stack after the merge |
 | 2026-09-29 | Locally, the "INT_DEV (internal dev CISADM)" organization shows demo25 data: the local launch config sets `WAREHOUSE_DATABASE_URL` (the `dev` org's key) to the demo25 database. In the cloud deployment it is INT_DEV | Settings > System health: `dev` and `demo25` stamps are equal | Owner's call: point the local key at an INT_DEV copy, or accept the alias locally |
 | 2026-09-29 | `scripts/jaspersoft/jrs_repository.py job-run` calls `POST /rest_v2/jobs/<id>/run`, which JasperReports Server 10.0 does not have (404) | Any job-run against prod or test | Remove or rebuild the command (task queued); JRS 10 has no REST run-now |
 | 2026-09-29 | `.env` line 17 (`JAVA_HOME`) has an unquoted value with a space; `set -a; . ./.env` prints `command not found` in zsh | `set -a && . ./.env` | Quote the value (owner's file; never print it) |
@@ -92,5 +93,9 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 - 2026-09-29: the assistant is **Ori** ("Ask Ori, your AI analytics assistant"); words live in `src/lib/ori.ts`.
 - 2026-09-29: letters and statements move INTO the portal; the separate letter-print app will not be used.
+- 2026-09-29 (defaults applied for letter runs, the owner can change each; docs/letters/LETTERS_MIGRATION_PLAN.md):
+  editors and admins create, approve and release, never approving their own run (the same id or the
+  same email); the last 200 runs are kept per organization, the oldest released or cancelled run makes
+  room, and a new draft is refused while 200 are still open; a run holds at most 5,000 letters.
 - 2026-09-29: the hourly schedule runner and SMTP stay parked (not a priority); the UI, correctness and speed come first.
 - 2026-09-29: the explorer opens on the catalog's declared window (Last 12 months); switching back to six months is one line in the dbt catalog builder.

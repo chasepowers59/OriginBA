@@ -100,7 +100,7 @@ share these token names and values — changing a V2.1 value is a cross-app deci
 
 Home (exec KPIs) · Build `/build` (THE builder; deep links `?canvas=&report=`) ·
 Dashboards `/dashboards` (@dnd-kit pinboard) · Library `/reports` (reports grouped by
-workstream, the one grouping, beside the workstream rail) · Letters `/letters` (collections letters: the PDF beside the data behind it; nav
+workstream, the one grouping, beside the workstream rail) · Letters `/letters` (collections letters: the PDF beside the data behind it, and runs approved by a second person and released as one print file; nav
 behind `letters:read`, hidden from row-restricted people) · SQL `/database` (CISADM
 workspace; `?table=` seeds a query) · Data Quality · Settings. A new top-level route
 must also join `APP_ROUTES` in `middleware.ts`, or signed-in people are sent home from it. `/explore/[snapshotId]` is the data set overview, under Library (Reports + Data model only —
