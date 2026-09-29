@@ -35,6 +35,14 @@ from and falls back to the slow, correct path when unsure.
 
 ## Measured (say where a number came from)
 
+- Ellensburg, 2026-09-29 after the full refresh, every ready-to-run report on the eight
+  largest data sets over a 12-month window, cold: 24 of 26 answer in 0.05-1.7 s. The two
+  exceptions are OPENING reports: rpt_billed_charge "billed by customer class" 58.5 s and
+  rpt_gl "not yet reached the GL" 50.8 s cold, 30 ms and 45 ms warm. The warmer builds both
+  after every rebuild; agg_billed_charge_daily (routed once built and proven) takes the first
+  off the canvas; an aggregate by GL Distribution Status + Accounting Date is the candidate
+  for the second.
+
 - Ellensburg (Oracle in-database, 2.47M bill segments): opening report 0.6-0.8 s over 180 days,
   0.7-0.8 s over 365; the first query after an API restart 11.5 s cold; rpt_billed_charge's
   opening report ~25 s cold (2026-09-28) and ~0.7 s served warm. Full warm of Ellensburg: 20
