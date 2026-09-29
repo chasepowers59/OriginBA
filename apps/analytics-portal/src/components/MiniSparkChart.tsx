@@ -11,8 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import type { ExecutiveTrendPoint } from "@/lib/types";
-import { valueRampColors } from "@/lib/chartEmphasis";
-import { useColorMode } from "@/components/PortalThemeProvider";
+import { emphasisFills } from "@/lib/chartEmphasis";
 import { AxisTick, useElementWidth, type TickText } from "@/components/builder/BuilderChart";
 import { SPARK_AXIS, chartLayout } from "@/lib/chartLayout";
 import { formatTooltipCurrency, formatTooltipNumber } from "@/lib/format";
@@ -57,16 +56,16 @@ export function MiniSparkChart({
   selectedLabel,
   onBarClick,
 }: MiniSparkChartProps) {
-  // App-wide value ramp: blue = highest, shifting toward red as values drop; the
-  // cross-filter selection overrides its bar to the selection hue.
-  const { colorMode } = useColorMode();
   const [measureRef, width] = useElementWidth();
-  const fills = valueRampColors(points.map((p) => p.value), { dark: colorMode === "dark" });
+  const fills = emphasisFills(
+    points.map((p) => p.value),
+    (i) => selectedLabel === points[i].label,
+  );
   const data = points.map((p, i) => ({
     name: p.label,
     fullName: p.label,
     value: p.value,
-    fill: selectedLabel === p.label ? "var(--chart-selected)" : fills[i],
+    fill: fills[i],
   }));
 
   const labels = points.map((p) => p.label);

@@ -75,14 +75,10 @@
   --chart-selected: #a85e00;
   --chart-selected-foreground: #ffffff;
 
-  /* Value ramp. Single-series bars encode MAGNITUDE by colour: brand blue at
-     the top of the range shifting to the V2.1 "over" red at the bottom, so the
-     one red in the suite means the same thing in both apps. Interpolated in
-     Oklab, which keeps the middle low-chroma instead of detouring through
-     magenta the way an HSL sweep does. */
-  --ramp-high: var(--brand-blue-2);
-  --ramp-mid: #695166;
-  --ramp-low: var(--over);
+  /* No value ramp (retired 2026-09-29, UI-2). A single series is ONE hue,
+     --chart-1: the leader at full strength, the rest tints of it toward the
+     surface; red (--over) marks only negatives and explicit thresholds. The
+     blue-to-red ramp painted small ordinary categories red, which read as "bad". */
 
   /* Gradient end for the primary button, kept inside the blue ramp. */
   --accent: var(--primary);
@@ -141,9 +137,6 @@
   --title: var(--neutral-6);
   --chart-selected: #f0b429;
   --chart-selected-foreground: #07121e;
-  --ramp-high: var(--brand-blue-2);
-  --ramp-mid: #bfaabe;
-  --ramp-low: var(--over);
   --accent: var(--primary);
   --accent-2: var(--brand-blue-3);
   --brand-navy: #16283c;
