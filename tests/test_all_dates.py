@@ -27,7 +27,7 @@ class AllDatesTests(unittest.TestCase):
 
         def cached_query(org_id, snapshot, request, filters):
             seen["filters"] = filters
-            return "select 1", ["m0"], [[1]]
+            return "select 1", ["m0"], [[1]], "rpt_bill_segment"
         snapshot = se.get_snapshot("rpt_bill_segment", "dev")
         with mock.patch.object(se, "require_org_for_data", return_value="dev"), \
              mock.patch.object(se, "_require_snapshot_access", return_value=snapshot), \
