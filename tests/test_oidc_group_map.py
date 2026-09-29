@@ -11,7 +11,10 @@ no mapped group is refused, and an existing account of theirs is deactivated (re
 the IdP ends their sessions, schedules and embeds); groups pointing at two different
 clients are refused rather than guessed. Row rules change only when a matching group
 DECLARES them ("row_rules": [] declares no restriction): a map that says nothing about rows
-never widens rules an administrator set. A malformed groups claim, a broken rule in the map
+never widens rules an administrator set. Groups at the winning role each grant their own
+rows, so their rules merge: values on one field join (Water + Sewer), a group declaring no
+restriction lifts it, and limits on different fields, which no set of filters can join
+exactly, are refused. A malformed groups claim, a broken rule in the map
 or an identity token saying the address is unverified is refused, never half-applied.
 Without a map, first sign-in provisions a user in the default org, as before.
 """
@@ -39,6 +42,12 @@ MAP = [
     {"group": "billing-analysts", "role": "editor", "organization_id": "dev",
      "row_rules": [{"field": "Service Type", "values": ["Water"]}]},
     {"group": "all-data", "role": "user", "organization_id": "dev", "row_rules": []},
+    {"group": "water", "role": "user", "organization_id": "dev",
+     "row_rules": [{"field": "Service Type", "values": ["Water"]}]},
+    {"group": "sewer", "role": "user", "organization_id": "dev",
+     "row_rules": [{"field": "Service Type", "values": ["Sewer", "Water"]}]},
+    {"group": "cycle-a", "role": "user", "organization_id": "dev",
+     "row_rules": [{"field": "Bill Cycle", "values": ["A"]}]},
     {"group": "citycorp-users", "role": "user", "organization_id": "citycorp"},
     {"group": "it-admins", "role": "admin", "organization_id": None},
 ]
@@ -76,6 +85,33 @@ class MappingTests(unittest.TestCase):
                    "row_rules": [{"field": "Service Type", "values": []}]}]
         with self.assertRaises(oidc.SsoAccessError):
             oidc.mapped_access({"groups": ["g"]}, broken, "groups")
+
+    def test_groups_limited_on_one_field_see_both_groups_values(self):
+        """Two groups ANDed gave Service Type IN (Water) AND IN (Sewer): no rows at all."""
+        out = oidc.mapped_access({"groups": ["water", "sewer"]}, MAP, "groups")
+        self.assertEqual(out["row_rules"], [{"field": "Service Type", "values": ["Water", "Sewer"]}])
+
+    def test_an_unrestricted_group_at_the_winning_role_lifts_the_limit(self):
+        self.assertEqual(oidc.mapped_access({"groups": ["all-data", "water"]}, MAP, "groups")["row_rules"], [])
+        self.assertEqual(oidc.mapped_access({"groups": ["water", "portal-users"]}, MAP, "groups")["row_rules"],
+                         [{"field": "Service Type", "values": ["Water"]}])
+
+    def test_an_unrestricted_group_below_the_winning_role_does_not(self):
+        out = oidc.mapped_access({"groups": ["billing-analysts", "all-data"]}, MAP, "groups")
+        self.assertEqual(out["row_rules"], [{"field": "Service Type", "values": ["Water"]}])
+
+    def test_limits_on_different_fields_are_refused_not_narrowed_or_widened(self):
+        with self.assertRaisesRegex(oidc.SsoAccessError, "cannot combine"):
+            oidc.mapped_access({"groups": ["water", "cycle-a"]}, MAP, "groups")
+        two_fields = [{"group": g, "role": "user", "organization_id": "dev",
+                       "row_rules": [{"field": "Service Type", "values": [st]}, {"field": "Bill Cycle", "values": [bc]}]}
+                      for g, st, bc in (("wa", "Water", "A"), ("sb", "Sewer", "B"), ("wb", "Water", "B"))]
+        # Water/A with Sewer/B merged field by field would also grant Water/B and Sewer/A
+        with self.assertRaises(oidc.SsoAccessError):
+            oidc.mapped_access({"groups": ["wa", "sb"]}, two_fields, "groups")
+        # differing on one field only, the merge is exact: Water on cycle A or B
+        self.assertEqual(oidc.mapped_access({"groups": ["wa", "wb"]}, two_fields, "groups")["row_rules"],
+                         [{"field": "Service Type", "values": ["Water"]}, {"field": "Bill Cycle", "values": ["A", "B"]}])
 
     def test_rules_are_undeclared_unless_a_group_declares_them(self):
         self.assertIsNone(oidc.mapped_access({"groups": ["portal-users"]}, MAP, "groups")["row_rules"])

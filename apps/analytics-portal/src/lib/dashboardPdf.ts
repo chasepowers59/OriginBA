@@ -16,8 +16,17 @@ export function dashboardPdfSections(sections: ExportSection[]) {
     .map((s) => {
       const rows = s.rows.slice(0, budget);
       budget -= rows.length;
-      return { title: s.name, note: s.note ?? "", columns: s.headers, rows };
+      const cut = rows.length < s.rows.length
+        ? `Showing the first ${rows.length.toLocaleString("en-US")} of ${s.rows.length.toLocaleString("en-US")} rows (truncated)`
+        : "";
+      return { title: s.name, note: [s.note, cut].filter(Boolean).join(" · "), columns: s.headers, rows };
     });
+}
+
+/** The first line of an error, short: a PDF note, not a stack. */
+function briefError(error: string) {
+  const line = error.trim().split("\n")[0].trim();
+  return line.length > 120 ? `${line.slice(0, 119)}…` : line;
 }
 
 /** KPI cards as export sections: the headline value and what it counts, then its breakdown. */
@@ -29,7 +38,7 @@ export function kpiSections(kpis: ExecutiveKpi[]): ExportSection[] {
       : [`${kpi.change_pct > 0 ? "+" : ""}${kpi.change_pct}%${kpi.compare_label ? ` ${kpi.compare_label}` : ""}`];
     return {
       name: kpi.label,
-      note: [value, kpi.subtitle, ...change].join(" · "),
+      note: kpi.error ? `This card could not load: ${briefError(kpi.error)}` : [value, kpi.subtitle, ...change].join(" · "),
       headers: ["Category", "Value"],
       rows: kpi.trend.map((t) => ({ Category: t.label, Value: t.value })),
     };

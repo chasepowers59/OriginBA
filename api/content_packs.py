@@ -14,6 +14,7 @@ from typing import Any
 
 from fastapi import HTTPException
 
+from api.auth.workstream_access import can_access_snapshot, filter_dashboards_for_auth
 from api.ownership import stamp
 from api.saved_dashboards import DashboardError, create_dashboard, list_dashboards
 from api.saved_views import SavedViewError, create_saved_view, list_saved_views
@@ -35,9 +36,12 @@ def _shared(items: list[dict[str, Any]], folder: str | None) -> list[dict[str, A
 
 
 def build_pack(organization_id: str, ctx: Any, folder: str | None = None) -> dict[str, Any]:
-    views = [{k: v.get(k) for k in _VIEW_KEYS} for v in _shared(list_saved_views(organization_id), folder)]
+    """Only what the caller's workstream grants show them: a billing-only editor exported the
+    debt dashboards GET /portal/dashboards withholds."""
+    views = [{k: v.get(k) for k in _VIEW_KEYS} for v in _shared(list_saved_views(organization_id), folder)
+             if can_access_snapshot(ctx, str(v.get("snapshot_id") or ""))]
     boards = [{**{k: b.get(k) for k in _BOARD_KEYS}, "tiles": [{k: t.get(k) for k in _TILE_KEYS} for t in b.get("tiles") or []]}
-              for b in _shared(list_dashboards(organization_id), folder)]
+              for b in filter_dashboards_for_auth(_shared(list_dashboards(organization_id), folder), ctx)]
     return {"format": FORMAT, "exported_at": datetime.now(timezone.utc).isoformat(),
             "source_organization": organization_id, "exported_by": ctx.email, "folder": folder,
             "views": views, "dashboards": boards}

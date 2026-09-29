@@ -91,6 +91,42 @@ class ViewAlertTests(unittest.TestCase):
         self.assertEqual(out[0]["status"], "breached-notified")
         self.assertEqual(ka.list_alerts("dev")[0]["last_value"], 76992.39)
 
+    def _run_empty(self, rows, measures, last_state="breached"):
+        """The aggregate over a window with no rows: SUM is NULL, COUNT is 0."""
+        a = self._alert(condition="below")
+        a["last_state"] = last_state
+        ka._store.update(a)
+        sent = []
+        with mock.patch("api.report_schedules._find_view", return_value={**VIEW, "measures": measures}), \
+             mock.patch("api.report_schedules.render_schedule", return_value=(["m0"], {}, rows)):
+            out = ka.run_kpi_alerts(now=NOW, send=sent.append)
+        return out[0], ka.list_alerts("dev")[0], sent
+
+    def test_a_sum_over_an_empty_window_is_zero_and_keeps_the_breach(self):
+        """It read as 'ok at None' and reset a breach that never cleared."""
+        result, stored, sent = self._run_empty([{"m0": None}], [{"field": "Past Due Amount", "agg": "sum"}])
+        self.assertEqual(result["status"], "breached-quiet")
+        self.assertEqual((stored["last_state"], stored["last_value"]), ("breached", 0.0))
+        self.assertIn("no rows in the window", stored["last_status"])
+        self.assertEqual(sent, [])
+
+    def test_an_empty_window_notifies_a_below_alert(self):
+        result, stored, sent = self._run_empty([{"m0": None}], [{"field": "Past Due Amount", "agg": "sum"}],
+                                               last_state="ok")
+        self.assertEqual(result["status"], "breached-notified")
+        self.assertIn("no rows in the window", sent[0].get_content())
+
+    def test_a_count_with_no_rows_is_zero(self):
+        result, stored, _ = self._run_empty([], [{"field": "*", "agg": "count"}], last_state="ok")
+        self.assertEqual((result["status"], stored["last_value"]), ("breached-notified", 0.0))
+
+    def test_a_highest_value_over_no_rows_is_no_value_and_keeps_the_breach(self):
+        result, stored, sent = self._run_empty([{"m0": None}], [{"field": "Past Due Amount", "agg": "max"}])
+        self.assertEqual(stored["last_state"], "breached")
+        self.assertNotIn("ok", stored["last_status"])
+        self.assertNotEqual(result["status"], "ok")
+        self.assertEqual(sent, [])
+
     def test_a_deleted_view_is_an_error_not_an_all_clear(self):
         self._alert()
         with mock.patch("api.report_schedules._find_view", return_value=None):

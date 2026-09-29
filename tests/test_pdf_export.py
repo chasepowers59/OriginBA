@@ -11,6 +11,7 @@ import os
 import sys
 import unittest
 from datetime import datetime, timezone
+from decimal import Decimal
 from pathlib import Path
 from unittest import mock
 
@@ -91,3 +92,22 @@ class NumberColumnTests(unittest.TestCase):
         cells = rs._pdf_cells(["amt", "n"], [{"amt": 1234.5, "n": 3}, {"amt": 99.0, "n": 4}])
         self.assertEqual([r[0] for r in cells], ["1,234.50", "99.00"])
         self.assertEqual([r[1] for r in cells], ["3", "4"])
+
+
+class DatabaseDecimalTests(unittest.TestCase):
+    """psycopg2 returns NUMERIC as Decimal: a Postgres organization's money is Decimal, not float."""
+    ROWS = [{"cycle": "Cycle A", "amt": Decimal("1234567.50")}, {"cycle": "Cycle B", "amt": Decimal("99.00")}]
+
+    def test_decimal_money_is_formatted_as_a_number(self):
+        cells = rs._pdf_cells(["cycle", "amt"], self.ROWS)
+        self.assertEqual([r[1] for r in cells], ["1,234,567.50", "99.00"])
+        self.assertFalse(any(isinstance(r[1], rs._Text) for r in cells))
+
+    def test_decimal_money_is_right_aligned(self):
+        self.assertEqual(rs._number_columns(["cycle", "amt"], self.ROWS), ["amt"])
+
+    def test_decimal_money_gets_a_chart(self):
+        self.assertIsNotNone(rs._bar_chart(["cycle", "amt"], {}, self.ROWS, 500))
+
+    def test_a_flag_is_still_not_a_number(self):
+        self.assertEqual(rs._number_columns(["cycle", "on"], [{"cycle": "A", "on": True}]), [])

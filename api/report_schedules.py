@@ -13,6 +13,7 @@ import re
 from xml.sax.saxutils import escape as xml_escape
 import uuid
 from datetime import datetime, timedelta, timezone
+from numbers import Number
 from pathlib import Path
 from typing import Any, Callable
 
@@ -266,17 +267,29 @@ class _Text(str):
     """A text cell (wrapped as a paragraph); numbers and flags stay plain, right-aligned strings."""
 
 
+def _is_number(v: Any) -> bool:
+    # Number, not (int, float): psycopg2 returns NUMERIC money as Decimal, which printed
+    # unformatted, left-aligned and without a chart
+    return isinstance(v, Number) and not isinstance(v, bool)
+
+
+def _number_columns(columns: list[str], rows: list[dict[str, Any]]) -> list[str]:
+    """The columns holding a number in some row and nothing but numbers (or blanks) in any."""
+    return [c for c in columns if any(r.get(c) is not None for r in rows)
+            and all(_is_number(r.get(c)) for r in rows if r.get(c) is not None)]
+
+
 def _pdf_cells(columns: list[str], rows: list[dict[str, Any]]) -> list[list[str]]:
     """Each cell as its display string. A number column with any decimals shows two
     throughout, so 1,234.50 and 99.00 line up instead of 1,234.50 and 99."""
-    decimal = {c for c in columns if any(isinstance(r.get(c), float) and not float(r[c]).is_integer() for r in rows)}
+    decimal = {c for c in columns if any(_is_number(v := r.get(c)) and not float(v).is_integer() for r in rows)}
 
     def cell(c: str, v: Any) -> str:
         if v is None:
             return ""
         if isinstance(v, bool):
             return "True" if v else "False"
-        if isinstance(v, (int, float)):
+        if _is_number(v):
             return f"{v:,.2f}" if c in decimal else f"{int(v):,}"
         return _Text(v)
     return [[cell(c, r.get(c)) for c in columns] for r in rows]
@@ -293,9 +306,7 @@ def _bar_chart(columns: list[str], labels: dict[str, str], rows: list[dict[str, 
     from reportlab.graphics.shapes import Drawing
     from reportlab.lib import colors
 
-    number = next((c for c in columns if rows and all(isinstance(r.get(c), (int, float)) and not isinstance(r.get(c), bool)
-                                                       for r in rows if r.get(c) is not None)
-                   and any(r.get(c) is not None for r in rows)), None)
+    number = next(iter(_number_columns(columns, rows)), None)
     label = next((c for c in columns if c != number and any(isinstance(r.get(c), str) for r in rows)), None)
     if not number or not label:
         return None
@@ -366,8 +377,8 @@ def sections_to_pdf(title: str, note: str, sections: list[dict[str, Any]], now: 
                                                                          fontName="Helvetica-Bold")) for c in columns]
         data = [header] + [[Paragraph(xml_escape(v), small) if isinstance(v, _Text) else v for v in r]
                            for r in _pdf_cells(columns, rows)]
-        numeric = [i for i, c in enumerate(columns) if rows and all(isinstance(r.get(c), (int, float))
-                   and not isinstance(r.get(c), bool) for r in rows if r.get(c) is not None)]
+        numbers = set(_number_columns(columns, rows))
+        numeric = [i for i, c in enumerate(columns) if c in numbers]
         table = Table(data, repeatRows=1)
         table.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor(_BRAND_BLUE)),
