@@ -20,7 +20,7 @@ const ORGS = (process.env.CRAWL_ORGS ?? ORG).split(",");
 const OUT = path.join(__dirname, ".out");
 
 const STATIC = ["/", "/reports", "/dashboards", "/dashboard", "/dashboard/custom", "/build", "/database",
-  "/data-quality", "/settings"];
+  "/data-quality", "/letters", "/settings"];
 const WORKSTREAMS = ["billing", "cashiering", "debt", "meter_ops", "field_ops", "customer_ops", "finance",
   "assets", "common"];
 const CANVASES = JSON.parse(fs.readFileSync(path.join(__dirname, "../../../output/catalog_dbt.json"), "utf8"));
