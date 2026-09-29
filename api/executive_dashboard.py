@@ -284,7 +284,7 @@ def _kpis_for_workstreams(allowed_workstreams: list[str] | None) -> list[dict[st
 _MISSING_RELATION = re.compile(r"ORA-00942|ORA-00903|relation .* does not exist|42P01", re.IGNORECASE)
 
 WAREHOUSE_NOT_BUILT_NOTE = (
-    "This organization's reporting warehouse has not been built yet, so its canvases "
+    "This organization's reporting warehouse has not been built yet, so its data sets "
     "hold no data. Nothing is wrong with the request: the in-database build is the "
     "step that fills them.")
 
@@ -358,9 +358,8 @@ def available_kpis(
     if avail or not kpi_defs:
         return avail, None
     return [], (
-        "Executive KPIs read the governed reporting canvases, which are not part of "
-        "this organization's catalog. Its reports are available under Library and "
-        "the canvas pages."
+        "Executive KPIs read governed data sets that are not part of this "
+        "organization's catalog. Its reports are available in the Library."
     )
 
 

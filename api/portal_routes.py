@@ -318,7 +318,7 @@ def analytics_nlq(
         row_rules=ctx.row_rules,
     )
     if not result:
-        raise HTTPException(status_code=404, detail="No matching snapshot analytics pattern for this question")
+        raise HTTPException(status_code=404, detail="No vetted metric matches this question")
     snapshot_id = str(result.get("resolved_from") or (metric or {}).get("snapshot_id") or "")
     if snapshot_id:
         assert_snapshot_access(ctx, snapshot_id)

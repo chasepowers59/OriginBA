@@ -332,7 +332,7 @@ def execute_kpi_definition(
         date_field = None if windowless else (
             kpi.get("date_field") or window_date_field(snapshot))
         if not date_field and not windowless:
-            raise ValueError("Snapshot has no date field and KPI is not windowless")
+            raise ValueError("This KPI needs a date to filter on, and its data set has none.")
 
         (cur_start, cur_end), (pri_start, pri_end), compare_label = date_windows(days, compare_mode, organization_id)
 
