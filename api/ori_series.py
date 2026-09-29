@@ -72,7 +72,10 @@ def _build(organization_id: str) -> tuple[dict[str, list], dict[str, dict], bool
         try:
             return monthly_history(kpi, organization_id)
         except Exception as exc:  # noqa: BLE001 -- one card failing leaves the others
-            log.warning("ori history %s %s failed: %s", organization_id, kpi["id"], exc)
+            from api.executive_dashboard import is_missing_relation_error
+            # an organization whose warehouse is not built yet says so on every card: expected
+            (log.debug if is_missing_relation_error(str(exc)) else log.warning)(
+                "ori history %s %s failed: %s", organization_id, kpi["id"], exc)
             return None
 
     with ThreadPoolExecutor(max_workers=max(1, min(8, len(kpis)))) as pool:

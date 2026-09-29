@@ -20,7 +20,7 @@ from api.access_audit import record_access_event
 from api.reporting_dates import data_as_of
 from api.auth.dependencies import AuthContext, require_permission
 from api.demo_db import demo_configured
-from api.executive_dashboard import is_not_connected_error
+from api.executive_dashboard import is_not_connected_error, is_transient_error
 from api.letters import render, repository, runs
 from api.letters.catalog import Words, catalog
 from api.letters.composer import compose
@@ -89,6 +89,9 @@ def _read(fn: Callable, *args: Any) -> Any:
         if is_not_connected_error(str(exc)):
             raise HTTPException(status_code=503, detail="This organization's database cannot be reached right "
                                                         "now. Try again shortly.") from exc
+        if is_transient_error(str(exc)):   # what is left of the class: a timeout
+            raise HTTPException(status_code=504, detail="Reading these letters took too long. Try a shorter "
+                                                        "window, or again in a few minutes.") from exc
         raise HTTPException(status_code=502, detail="The letters could not be read from this organization's "
                                                     "database.") from exc
 

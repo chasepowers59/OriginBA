@@ -147,6 +147,16 @@ class RouteTests(unittest.TestCase):
         self.assertIn("cannot be reached", r.json()["detail"])
         self.assertNotIn("example.internal", r.text)
 
+    def test_504_when_the_read_times_out(self):
+        # Ellensburg 2026-09-29: the balances query passed its 120 s limit while the warehouse
+        # rebuilt, and the page said only "could not be read"
+        self.oracle_org()
+        repository.list_letters.side_effect = RuntimeError(
+            "DPY-4024: call timeout of 120000 ms exceeded\nORA-03156: OCI call timed out")
+        r = self.get(self.LIST)
+        self.assertEqual(r.status_code, 504)
+        self.assertIn("took too long", r.json()["detail"])
+
     def test_501_for_an_engine_letters_do_not_read(self):
         with mock.patch.object(routes, "org_backend", return_value=("snowflake", "dbt")):
             r = self.get(self.LIST)
