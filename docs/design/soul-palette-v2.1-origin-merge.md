@@ -4,6 +4,13 @@
 **Merged:** OriginBA analytics portal, 2026-09-01
 **Contrast:** 14 pairs, all AA in both columns
 
+> **Superseded in part, 2026-09-29 (UI-2, Chase):** the value ramp below is retired.
+> A single-series chart is one hue (`--chart-1`), the leader at full strength and the
+> rest lighter tints of it; red (`--over`) marks only negatives and explicit
+> thresholds, because the ramp painted small ordinary categories red and they read as
+> "bad". The three `ramp-*` anchors are gone from `soul-palette-v2.1-origin.css`; this
+> document stays as the 2026-09-01 merge record.
+
 V2.1 is adopted **verbatim** — all fifteen V1 anchors, the neutral ramp, both brand
 ramps and the six chart aliases keep their approved values. The OriginBA portal adds
 seven tokens for roles the conversion app does not have, and asks for **no changes to

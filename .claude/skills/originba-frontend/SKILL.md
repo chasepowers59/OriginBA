@@ -1,6 +1,6 @@
 ---
 name: originba-frontend
-description: The OriginBA portal front-end conventions — Origin brand, theme tokens, one chart renderer, the value-ramp colour rule, flat axes, TDD. Load before any UI work in apps/analytics-portal.
+description: The OriginBA portal front-end conventions — Origin brand, theme tokens, one chart renderer, the one-hue-per-series colour rule, flat axes, TDD. Load before any UI work in apps/analytics-portal.
 ---
 
 # OriginBA front-end conventions
@@ -55,15 +55,22 @@ share these token names and values — changing a V2.1 value is a cross-app deci
   reintroduce raw Recharts with hex colours (the deleted ChartView anti-pattern).
 - **Categorical series come from `--chart-1..6`** — blue and teal only. Teal is NEVER
   paired with blue as a category; two-series charts use chart-1 with chart-3.
-- **Value ramp rule (app-wide):** single-series bars are coloured by MAGNITUDE —
-  `--primary` at the top of the range shifting to the palette's own `over` red at the
-  bottom, so the suite has exactly one red. Interpolated in **Oklab**, not HSL: a hue
-  sweep between those endpoints takes the short way round the wheel and renders
-  mid-range values as vivid magenta/violet (the 2026-09-01 bug — bars that looked like
-  a third category). `lib/chartEmphasis.ts` `valueRampColors(values, {dark})` — the
-  anchors differ per theme, so callers pass `colorMode`. Unit-tested including the
-  magenta guard; change the tests first.
-- Cross-filter selection overrides a bar/slice to `var(--chart-selected)` (amber).
+- **One hue per series (UI-2, Chase 2026-09-29, cross-app):** a single-series bar
+  chart is `--chart-1` only. The leader takes the full hue; every other bar is a tint
+  of it mixed toward `--surface` in proportion to its value (55-80% strength), so the
+  leader is emphasised by STRENGTH, never by another colour. Zero is the lightest tint,
+  not red. **Red (`--over`) means a negative value or an explicit threshold, nothing
+  else.** This replaced the primary-to-red value ramp, which painted small ordinary
+  categories dark red (read as "bad" when they were merely small) and put mauve in
+  the middle of the range. `lib/chartEmphasis.ts` `emphasisFills(values, isSelected)`
+  returns tokens only (`var()` / `color-mix(in oklab, …)`), so each theme and print
+  resolve it in CSS and no caller passes `colorMode`. The tests resolve the real
+  globals.css tokens in both columns: every tint keeps the series hue (the old
+  magenta guard's successor), the lightest clears 2:1 on card and muted, and the
+  leader sits ≥0.06 Oklab L above the strongest other bar. Change the tests first.
+- Multi-series charts keep the categorical `--chart-1..n`, one per series.
+- Cross-filter selection overrides a bar/slice to `var(--chart-selected)` (amber);
+  for single-series bars `emphasisFills` applies it.
 - **Axis text is FLAT — never rotated.** Layout is decided by `src/lib/chartLayout.ts`
   (tested): above 6 categories (5 on KPI cards), or when columns are too narrow, bars go
   HORIZONTAL and every category is labelled; truncation never makes two labels identical
