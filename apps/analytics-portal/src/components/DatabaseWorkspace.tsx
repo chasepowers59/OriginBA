@@ -332,7 +332,8 @@ export function DatabaseWorkspace({
       {/* Says what this org's workspace can actually reach; the engine is learned on
           mount, so until then it promises no schema at all. */}
       <p className="portal-text-muted -mt-2 mb-3 max-w-3xl text-sm">{workspaceScope(engine)}</p>
-    <div className="flex h-[calc(100vh-8.5rem)] min-h-[560px] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-solid)] shadow-lg">
+      {/* one screen tall from lg; below it the panels stack at natural height, so results get room */}
+    <div className="flex flex-col overflow-hidden rounded-2xl lg:h-[calc(100vh-8.5rem)] lg:min-h-[560px] border border-[var(--border)] bg-[var(--surface-solid)] shadow-lg">
       <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border)] bg-[var(--surface-subtle)] px-3 py-2">
         <button
           type="button"
@@ -599,7 +600,7 @@ export function DatabaseWorkspace({
             </div>
           ) : null}
 
-          <div className="flex min-h-0 flex-1 flex-col">
+          <div data-testid="sql-results" className="flex min-h-[320px] flex-1 flex-col lg:min-h-0">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--chip-bg)] px-3 py-1">
               <span className="text-[10px] font-semibold uppercase tracking-widest text-fg-muted">
                 Results

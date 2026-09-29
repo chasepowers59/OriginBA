@@ -388,7 +388,7 @@ export function VisualBuilder({
 
           {!meta ? (
             <div className="glass-panel flex items-center justify-center px-6 py-16 text-center text-sm" style={{ color: "var(--foreground-subtle)" }}>
-              Pick a table on the left to see its columns, or open “Start from a question”
+              Pick a table to see its columns, or open “Start from a question”
               for a ready-made view.
             </div>
           ) : (
