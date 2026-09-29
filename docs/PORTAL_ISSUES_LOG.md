@@ -8,6 +8,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Reproduce / where | Next step |
 | --- | --- | --- | --- |
+| 2026-09-29 | Letters on Ellensburg: the balances query is 28.4 s average / 44 s worst cold (every other letters query <= 2 s): 730K buffer gets per run, CI_FT reached by XT112S1 (SA_ID, REDUNDANT_SW, BILL_ID) then every row fetched for FREEZE_SW/FREEZE_DTTM/CUR_AMT | v$sql, letters:balances | DECISION (Chase + client DBA): a covering CM_ index on CISADM.CI_FT (SA_ID, FREEZE_SW, FREEZE_DTTM, CUR_AMT), as CM_XT112S1/S2 already are; the portal never writes to CISADM |
 | 2026-09-29 | Letter runs: the live e2e (create a run from a one-day Ellensburg window, the creator's Approve disabled, then cancel it) has not run. A worktree API has no Ellensburg connection (it lives in the owner's `.env`), so the list answered 503; the stubbed approve/release test passed | `npx playwright test e2e/letters.spec.ts -g "creator cannot approve"` against an API that reaches Ellensburg | Run it on the owner's stack after the merge |
 | 2026-09-29 | Locally, the "INT_DEV (internal dev CISADM)" organization shows demo25 data: the local launch config sets `WAREHOUSE_DATABASE_URL` (the `dev` org's key) to the demo25 database. In the cloud deployment it is INT_DEV | Settings > System health: `dev` and `demo25` stamps are equal | Owner's call: point the local key at an INT_DEV copy, or accept the alias locally |
 | 2026-09-29 | `scripts/jaspersoft/jrs_repository.py job-run` calls `POST /rest_v2/jobs/<id>/run`, which JasperReports Server 10.0 does not have (404) | Any job-run against prod or test | Remove or rebuild the command (task queued); JRS 10 has no REST run-now |
@@ -24,6 +25,8 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-29 | A dropped Oracle connection: explorer 502 with driver text ("Demo query failed: DPY-4011 ..."), data quality 22 rule errors, home "connect it under Settings" for a configured org | 1ff792d0 | tests/test_oracle_outage.py |
+| 2026-09-29 | The stale-data notice would call demo25/dev (loaded once, no nightly) overdue | 6ee7cb5e ("scheduled_builds": false) | tests/test_freshness.py |
 | 2026-09-29 | The test suite queried the real Ellensburg instance on every run: a warmer-loop test missed the two warm jobs added that day, from a thread that outlived the test | 222a7c72 (conftest refuses any live Oracle session) | tests/conftest.py, tests/test_bug_hunt_fixes.py |
 | 2026-09-29 | Letters: a read that passed its 120 s limit said only "could not be read" | 506ebd73 (504 with what to try) | tests/test_letters_routes.py |
 | 2026-09-29 | Review: concurrent misses on one cold key each built it (DQ 4 + Ori history 5 of 8 Oracle sessions) | 2b956fad | tests/test_summary_cache_single_flight.py |
