@@ -2,25 +2,21 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { packsStartOpen } from "@/lib/libraryLayout";
+import { reportsByWorkstream, sectionsStartOpen } from "@/lib/libraryLayout";
 import { useSearchParams } from "next/navigation";
 import { fetchReportLibrary } from "@/lib/api";
 import { reportShape } from "@/lib/reportShape";
 import type { ReportLibraryPack, ReportLibraryEntry } from "@/lib/types";
 
-const ALL = "__all__";
-
 /**
  * The library is where somebody who does not know the data goes to find a question
- * already answered. Two things it could not do: SEARCH -- 92 reports behind six pack
- * chips, one pack visible at a time, so finding "arrears" meant clicking through every
- * pack and reading -- and say what a report RETURNS. A title tells you the question and
+ * already answered: search across every report, grouped by workstream (the one grouping,
+ * UI-4), and each card says what the report RETURNS. A title tells you the question and
  * the paragraph tells you why it matters; neither says whether it counts rows or sums
  * money, or that it is already filtered.
  */
-export function ReportLibrary() {
+export function ReportLibrary({ workstreamOrder }: { workstreamOrder: string[] }) {
   const [packs, setPacks] = useState<ReportLibraryPack[]>([]);
-  const [activePack, setActivePack] = useState<string>(ALL);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,22 +33,19 @@ export function ReportLibrary() {
       .finally(() => setLoading(false));
   }, []);
 
-  const totalReports = useMemo(
-    () => packs.reduce((n, p) => n + p.reports.length, 0),
-    [packs],
-  );
+  const sections = useMemo(() => reportsByWorkstream(packs, workstreamOrder), [packs, workstreamOrder]);
+  const totalReports = sections.reduce((n, s) => n + s.reports.length, 0);
 
   // Search covers everything a reader might remember: the question, why it matters, the
-  // canvas it reads, and the columns it groups by. Matching only the title meant
+  // data set it reads, and the columns it groups by. Matching only the title meant
   // "arrears" found nothing while three reports grouped by an arrears band.
   const results = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    const inScope = activePack === ALL ? packs : packs.filter((p) => p.id === activePack);
+    const inScope = workstreamFilter ? sections.filter((s) => s.workstream === workstreamFilter) : sections;
     return inScope
-      .map((pack) => ({
-        pack,
-        reports: pack.reports.filter((r) => {
-          if (workstreamFilter && r.workstream !== workstreamFilter) return false;
+      .map((section) => ({
+        section,
+        reports: section.reports.filter((r) => {
           if (!needle) return true;
           const haystack = [
             r.title,
@@ -67,12 +60,10 @@ export function ReportLibrary() {
         }),
       }))
       .filter((group) => group.reports.length > 0);
-  }, [packs, activePack, query, workstreamFilter]);
+  }, [sections, query, workstreamFilter]);
 
   const shown = results.reduce((n, g) => n + g.reports.length, 0);
-  // browsing everything: packs folded; narrowed by search, workstream or pack: open
-  const open = packsStartOpen({ query, workstream: workstreamFilter, pack: activePack === ALL ? "all" : activePack,
-                                packCount: results.length });
+  const open = sectionsStartOpen({ query, workstream: workstreamFilter, sectionCount: results.length });
 
   return (
     <div className="space-y-6">
@@ -89,9 +80,9 @@ export function ReportLibrary() {
 
       {loading ? (
         <div className="loading-shimmer h-48 rounded-2xl" />
-      ) : error || !packs.length ? (
+      ) : error || !sections.length ? (
         <div className="glass-panel p-8 text-center text-sm text-fg-muted">
-          {error ?? "No report packs are available for this organization yet."}{" "}
+          {error ?? "No reports are available for this organization yet."}{" "}
           <button
             type="button"
             onClick={() => location.reload()}
@@ -114,30 +105,8 @@ export function ReportLibrary() {
             <p className="text-xs text-fg-muted" aria-live="polite">
               {query.trim() || workstreamFilter
                 ? `${shown} of ${totalReports} reports match`
-                : `${totalReports} reports across ${packs.length} packs`}
+                : `${totalReports} reports in ${sections.length} workstreams`}
             </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setActivePack(ALL)}
-              className={`chip ${activePack === ALL ? "chip-active" : ""}`}
-            >
-              All packs
-              <span className="ml-1 text-fg-subtle">({totalReports})</span>
-            </button>
-            {packs.map((pack) => (
-              <button
-                key={pack.id}
-                type="button"
-                onClick={() => setActivePack(pack.id)}
-                className={`chip ${activePack === pack.id ? "chip-active" : ""}`}
-              >
-                {pack.title}
-                <span className="ml-1 text-fg-subtle">({pack.report_count})</span>
-              </button>
-            ))}
           </div>
 
           {results.length === 0 ? (
@@ -148,34 +117,30 @@ export function ReportLibrary() {
                   : "No reports in this workstream."}
               </p>
               <p className="mt-1 text-xs text-fg-muted">
-                Try a broader word, or build the question yourself in Explore.
+                Try a broader word, or build the question yourself.
               </p>
               <div className="mt-3 flex justify-center gap-2">
                 <button type="button" onClick={() => setQuery("")} className="btn-ghost text-xs">
                   Clear search
                 </button>
                 <Link href="/build" className="btn-ghost text-xs">
-                  Open Explore →
+                  Open Build →
                 </Link>
               </div>
             </div>
           ) : (
-            results.map(({ pack, reports }) => (
-              // keyed on `open` so narrowing the list re-opens packs the reader had folded
-              <details key={`${pack.id}-${open}`} open={open} className="glass-panel group p-5">
+            results.map(({ section, reports }) => (
+              // keyed on `open` so narrowing the list re-opens sections the reader had folded
+              <details key={`${section.workstream}-${open}`} open={open} className="glass-panel group p-5">
                 <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h2 className="text-lg font-semibold text-heading">{pack.title}</h2>
+                    <h2 className="text-lg font-semibold text-heading">{section.label}</h2>
                     <span className="flex items-center gap-2 text-xs text-fg-muted">
                       {reports.length}
-                      {reports.length !== pack.report_count ? ` of ${pack.report_count}` : ""} reports
+                      {reports.length !== section.reports.length ? ` of ${section.reports.length}` : ""} reports
                       <span aria-hidden className="transition group-open:rotate-180">▾</span>
                     </span>
                   </div>
-                  <p className="mt-1 text-sm text-fg-muted">{pack.description}</p>
-                  {pack.audience ? (
-                    <p className="mt-1 text-xs text-fg-muted">For {pack.audience}</p>
-                  ) : null}
                 </summary>
                 <div className="mt-4 grid gap-3 border-t border-edge-subtle pt-4 sm:grid-cols-2">
                   {reports.map((report) => (
@@ -199,16 +164,13 @@ function ReportCard({ report }: { report: ReportLibraryEntry }) {
       className="group flex flex-col rounded-xl border border-edge-subtle bg-surface-subtle p-4 transition hover:border-edge"
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="text-[10px] font-medium uppercase tracking-wide text-fg-subtle">
-          {report.workstream_label}
-        </span>
+        <h3 className="font-medium text-heading group-hover:text-primary dark:group-hover:text-primary">
+          {report.title}
+        </h3>
         <span className="shrink-0 text-fg-muted transition group-hover:text-primary dark:group-hover:text-primary">
           Open →
         </span>
       </div>
-      <h3 className="mt-2 font-medium text-heading group-hover:text-primary dark:group-hover:text-primary">
-        {report.title}
-      </h3>
       <p className="mt-1 line-clamp-2 text-xs text-fg-muted">{report.description}</p>
 
       {/* What you actually get, in one line, before you open it. */}
@@ -219,7 +181,7 @@ function ReportCard({ report }: { report: ReportLibraryEntry }) {
       ) : null}
 
       <p className="mt-auto pt-2 text-[10px] text-fg-subtle">
-        Reads {report.snapshot_label}
+        From the {report.snapshot_label} data set
         {report.grain_description ? ` · ${report.grain_description.toLowerCase()}` : ""}
       </p>
     </Link>

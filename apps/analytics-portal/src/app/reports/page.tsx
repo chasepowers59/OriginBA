@@ -3,6 +3,7 @@ import { fetchSnapshots } from "@/lib/api";
 import { AppShell } from "@/components/AppShell";
 import { ReportLibrary } from "@/components/ReportLibrary";
 import { WorkstreamSidebar, WorkstreamSidebarNav } from "@/components/WorkstreamExplorer";
+import { groupByDataset } from "@/lib/workstreamDatasets";
 
 export default async function ReportsPage() {
   let index;
@@ -27,9 +28,9 @@ export default async function ReportsPage() {
       dbConfigured={index.db_configured}
       activeNav="reports"
     >
-      {/* Library is the one browseable catalog: the workstream tree is the filter rail,
-          the governed report packs are the content. This is the tree's single home now
-          that the global sidebar is gone. */}
+      {/* Library is the one browseable catalog: the workstream tree is the filter rail and
+          the reports are grouped by the same workstreams, in the rail's order. This is the
+          tree's single home now that the global sidebar is gone. */}
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         {/* on a phone the title and search come first, the rail after them */}
         <aside className="no-print order-2 lg:order-none lg:sticky lg:top-24 lg:self-start">
@@ -43,7 +44,9 @@ export default async function ReportsPage() {
           </div>
         </aside>
         <div className="order-1 min-w-0 lg:order-none">
-          <ReportLibrary />
+          <ReportLibrary
+            workstreamOrder={groupByDataset(workstreams).flatMap((d) => d.workstreams.map((w) => w.id))}
+          />
         </div>
       </div>
     </AppShell>

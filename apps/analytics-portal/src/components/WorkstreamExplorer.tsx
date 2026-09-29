@@ -136,9 +136,6 @@ export function WorkstreamSidebar({
  }`}
               >
                 {ws.label ?? workstreamDisplayName(ws.id)}
-                {typeof ws.snapshot_count === "number" ? (
-                  <span className="ml-1 font-normal text-fg-subtle">({ws.snapshot_count})</span>
-                ) : null}
               </Link>
               <button
                 type="button"
