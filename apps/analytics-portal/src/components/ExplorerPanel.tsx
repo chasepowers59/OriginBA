@@ -28,6 +28,7 @@ import {
   widenDateRange,
 } from "@/lib/datePresets";
 import { explorerFilters } from "@/lib/explorerFilters";
+import { runningLabel } from "@/lib/queryProgress";
 import { applyProcessGuide } from "@/lib/processGuide";
 import { resolveDateField } from "@/lib/tileDateField";
 import { setPageContext } from "@/lib/assistantContext";
@@ -56,6 +57,18 @@ const DATE_PRESETS: DatePreset[] = [
 ];
 
 type Tab = "reports" | "model";
+
+type ChartType = "bar" | "line" | "pie" | "horizontal" | "table";
+
+/** The report behind the result on screen, restored when a newer run is cancelled. */
+type ShownReport = {
+  id: string;
+  title: string;
+  dimensions: string[];
+  measureField: string;
+  measureAgg: string;
+  chartType: ChartType;
+};
 
 type ExplorerPanelProps = {
   metadata: SnapshotMetadata;
@@ -103,7 +116,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const firstRun = useRef(true);
   const [scopeField, setScopeField] = useState(scopeFilters[0]?.field ?? "");
   const [scopeValue, setScopeValue] = useState("");
-  const [chartType, setChartType] = useState<"bar" | "line" | "pie" | "horizontal" | "table">("bar");
+  const [chartType, setChartType] = useState<ChartType>("bar");
   const [drillFilter, setDrillFilter] = useState<{ field: string; value: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -111,6 +124,10 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [favoriteApplied, setFavoriteApplied] = useState(false);
   const [openAbout, setOpenAbout] = useState<string | null>(null);
+  const [elapsedMs, setElapsedMs] = useState(0);
+  const [cancelNote, setCancelNote] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const shownRef = useRef<ShownReport | null>(null);
   const aboutIdPrefix = useId();
 
   const allowedTabs = new Set<Tab>(tabOptions.map(([key]) => key));
@@ -201,17 +218,35 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     [metadata, allDates, dateStart, dateEnd, scopeField, scopeValue, drillFilter],
   );
 
+  const showReport = useCallback((shown: ShownReport | null) => {
+    setActiveReportId(shown?.id ?? null);
+    setActiveReportTitle(shown?.title ?? null);
+    setDimensions(shown?.dimensions ?? []);
+    if (!shown) return;
+    setMeasureField(shown.measureField);
+    setMeasureAgg(shown.measureAgg);
+    setChartType(shown.chartType);
+  }, []);
+
   const runPremade = useCallback(
     async (report: PremadeReport) => {
-      setActiveReportId(report.id);
-      setActiveReportTitle(report.title);
-      setDimensions(report.dimensions);
-      setMeasureField(report.measures[0]?.field ?? "*");
-      setMeasureAgg(report.measures[0]?.agg ?? "count");
-      setChartType(report.chart_type);
+      const shown: ShownReport = {
+        id: report.id,
+        title: report.title,
+        dimensions: report.dimensions,
+        measureField: report.measures[0]?.field ?? "*",
+        measureAgg: report.measures[0]?.agg ?? "count",
+        chartType: report.chart_type,
+      };
+      showReport(shown);
       setTab("reports");
       setLoading(true);
       setError(null);
+      setCancelNote(null);
+      // A newer run supersedes an older one, so a slow response can no longer land on top.
+      abortRef.current?.abort();
+      const run = new AbortController();
+      abortRef.current = run;
       try {
         const response = await runSnapshotQuery(metadata.id, {
           dimensions: report.dimensions,
@@ -219,7 +254,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           filters: buildFilters(report.filters),
           time_dimensions: [],
           limit: 500,
-        });
+        }, run.signal);
         const fallBack = fallBackToAllDates({
           rowCount: response.row_count,
           windowed: Boolean(resolveDateField(metadata)) && !allDates,
@@ -234,15 +269,40 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           return;
         }
         setResult(response);
+        shownRef.current = shown;
       } catch (err) {
+        if (run.signal.aborted) return;
         setError(err instanceof Error ? err.message : "Unable to run this report");
         setResult(null);
       } finally {
-        setLoading(false);
+        if (abortRef.current === run) {
+          abortRef.current = null;
+          setLoading(false);
+        }
       }
     },
-    [metadata, allDates, activePreset, buildFilters],
+    [metadata, allDates, activePreset, buildFilters, showReport],
   );
+
+  const cancelRun = () => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setLoading(false);
+    showReport(shownRef.current);
+    setCancelNote(result ? "Cancelled. Showing the previous result." : "Cancelled.");
+  };
+
+  useEffect(() => {
+    if (!loading) return;
+    const started = Date.now();
+    const timer = window.setInterval(() => setElapsedMs(Date.now() - started), 1000);
+    return () => {
+      window.clearInterval(timer);
+      setElapsedMs(0);
+    };
+  }, [loading]);
+
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   useEffect(() => {
     const { range, label } = applyDatePresetConfig(metadata.default_date_preset, metadata.data_as_of);
@@ -263,6 +323,9 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     setScopeField(scopeFilters[0]?.field ?? "");
     setScopeValue("");
     setDrillFilter(null);
+    abortRef.current?.abort();
+    shownRef.current = null;
+    setCancelNote(null);
     setResult(null);
     setFavoriteApplied(false);
   }, [
@@ -463,6 +526,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     window.setTimeout(() => setSavedMsg(null), 2500);
   };
 
+  const running = loading ? runningLabel(elapsedMs) : null;
   const resolvedDateField = resolveDateField(metadata);
   const dateFieldLabel =
     metadata.date_fields.find((d) => d.id === resolvedDateField)?.label ??
@@ -632,6 +696,17 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             {error}
           </div>
         ) : null}
+        {running ? (
+          <div className="glass-panel-subtle flex items-center justify-between gap-3 px-4 py-2 text-sm text-heading">
+            {/* Read out by the status line at the end of this column. */}
+            <span aria-hidden="true">{running}</span>
+            <button type="button" onClick={cancelRun} className="btn-ghost text-xs">
+              Cancel
+            </button>
+          </div>
+        ) : cancelNote ? (
+          <p className="text-xs text-fg-muted">{cancelNote}</p>
+        ) : null}
         {loading && !result ? (
           <div className="glass-panel p-8">
             <div className="loading-shimmer mb-4 h-8 w-48 rounded-lg" />
@@ -701,6 +776,10 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             }
           />
         )}
+        {/* Always mounted, so a screen reader hears the running count and a cancel. */}
+        <p role="status" aria-live="polite" className="sr-only">
+          {running ?? cancelNote ?? ""}
+        </p>
       </main>
 
       <aside className="no-print min-w-0 space-y-4 self-start xl:col-start-1 xl:row-start-2">

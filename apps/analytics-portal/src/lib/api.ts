@@ -401,10 +401,12 @@ export function fetchSnapshotMetadata(snapshotId: string): Promise<SnapshotMetad
 export function runSnapshotQuery(
   snapshotId: string,
   body: QueryRequest,
+  signal?: AbortSignal,
 ): Promise<QueryResponse> {
   return fetchJson<QueryResponse>(`/snapshots/${snapshotId}/query`, {
     method: "POST",
     body: JSON.stringify(body),
+    signal,
   });
 }
 
