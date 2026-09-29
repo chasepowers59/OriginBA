@@ -224,12 +224,15 @@ class WarmerTests(unittest.TestCase):
              mock.patch.object(cw, "_workstreams", side_effect=workstreams), \
              mock.patch.object(cw, "_opening_reports", return_value=[]), \
              mock.patch.object(se, "cached_home_summary", return_value={}), \
+             mock.patch("api.ori_series.cached_history", return_value=({}, {})), \
+             mock.patch("api.dq_routes.warm"), \
              self.assertLogs("originba.api", level="WARNING"):
             t = threading.Thread(target=cw._loop, args=(stop,), daemon=True)
             t.start()
             time.sleep(0.4)
             alive = t.is_alive()
             stop.set()
+            t.join(5)   # the loop ends inside the patches, never on the real warehouse
         self.assertTrue(alive)
         self.assertGreater(n["calls"], 1)
 
