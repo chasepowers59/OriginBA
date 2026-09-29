@@ -202,9 +202,10 @@ class WarmerTests(unittest.TestCase):
              mock.patch.object(cw, "_workstreams", return_value=[]), \
              mock.patch.object(cw, "_opening_reports", return_value=[]), \
              mock.patch.object(se, "cached_home_summary", side_effect=home), \
+             mock.patch("api.ori_series.cached_history", return_value=({}, {})), \
              self.assertLogs("originba.api", level="WARNING"):
-            self.assertEqual(cw.warm_once("ellensburg"), ["ori findings"])   # home failed
-            self.assertEqual(cw.warm_once("ellensburg"), ["home", "ori findings"])
+            self.assertEqual(cw.warm_once("ellensburg"), ["ori findings", "ori trends"])   # home failed
+            self.assertEqual(cw.warm_once("ellensburg"), ["home", "ori findings", "ori trends"])
 
     def test_b8_the_thread_survives_an_error_in_one_pass(self):
         n = {"calls": 0}

@@ -232,6 +232,7 @@ def run_kpi_query(
     extra_filters: list[dict[str, Any]] | None = None,
     *,
     organization_id: str,
+    time_dimensions: list[dict[str, Any]] | None = None,
 ) -> tuple[list[str], list[list[Any]]]:
     # organization_id is already a parameter here; the catalog must follow it.
     snapshot = get_snapshot(snapshot_id, organization_id)
@@ -254,6 +255,7 @@ def run_kpi_query(
         dimensions=query_spec.get("dimensions") or [],
         measures=query_spec.get("measures") or [{"field": "*", "agg": "count"}],
         filters=filters,
+        time_dimensions=time_dimensions,
         limit=int(query_spec.get("limit") or 500),
         dialect=dialect,
         schema=schema,

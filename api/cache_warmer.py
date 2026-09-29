@@ -68,6 +68,7 @@ def _opening_reports(org_id: str) -> list[tuple[str, Any]]:
 
 def warm_once(org_id: str) -> list[str]:
     """What was built for this organization: nothing unless its stamp is new."""
+    from api.ori_series import cached_history
     from api.snapshot_explorer import cached_home_summary, cached_workstream_summary
 
     version = data_version(org_id)
@@ -80,7 +81,9 @@ def warm_once(org_id: str) -> list[str]:
     _attempts[org_id] = (version, tries)
     jobs = [("home", lambda: cached_home_summary(org_id, 30, False, "prior_period", [], ["*"], {}, ())),
             # the home summary in compare mode: what Ori's findings read (api/ori_routes.py)
-            ("ori findings", lambda: cached_home_summary(org_id, 30, True, "prior_period", [], ["*"], {}, ()))]
+            ("ori findings", lambda: cached_home_summary(org_id, 30, True, "prior_period", [], ["*"], {}, ())),
+            # the cards' monthly history: Ori's unusual months and projections (api/ori_series.py)
+            ("ori trends", lambda: cached_history(org_id))]
     jobs += [(ws, lambda ws=ws: cached_workstream_summary(org_id, ws, 30, False, "prior_period", [], ()))
              for ws in _workstreams(org_id)]
     try:
