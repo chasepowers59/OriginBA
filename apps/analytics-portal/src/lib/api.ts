@@ -20,6 +20,7 @@ import type {
   SnapshotsIndex,
   WorkstreamSummary,
 } from "./types";
+import { dashboardPdfSections, type ExportSection } from "./dashboardPdf";
 import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview, AssistantSpend } from "@/lib/types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
 import { localIsoDate } from "@/lib/format";
@@ -545,10 +546,19 @@ export async function downloadPdf(body: {
   labels?: Record<string, string>;
   rows: Record<string, unknown>[];
 }): Promise<void> {
-  const res = await fetch(`${API_BASE}/portal/export/pdf`, {
+  await savePdf("/portal/export/pdf", { ...body, rows: body.rows.slice(0, 5000) });
+}
+
+/** A dashboard's tiles as one server-built PDF (api/export_routes.py). */
+export async function downloadDashboardPdf(title: string, sections: ExportSection[]): Promise<void> {
+  await savePdf("/portal/export/dashboard-pdf", { title, sections: dashboardPdfSections(sections) });
+}
+
+async function savePdf(path: string, body: unknown): Promise<void> {
+  const res = await fetch(`${API_BASE}${path}`, {
     method: "POST",
     headers: await resolveRequestHeaders(),
-    body: JSON.stringify({ ...body, rows: body.rows.slice(0, 5000) }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(parseApiError(await res.text(), res.statusText));
   const name = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? "report.pdf";

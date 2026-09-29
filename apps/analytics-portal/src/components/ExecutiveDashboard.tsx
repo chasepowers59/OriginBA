@@ -10,6 +10,7 @@ import { DashboardWidget } from "./DashboardWidget";
 import { DashboardControls, type CompareMode } from "./DashboardControls";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { PresentationToolbar } from "./PresentationToolbar";
+import { kpiSections } from "@/lib/dashboardPdf";
 import { formatDateTime } from "@/lib/format";
 import { CrossFilterBanner } from "@/components/CrossFilterBanner";
 
@@ -58,15 +59,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
 
   const isHome = variant === "home";
 
-  const exportSections = useMemo(
-    () =>
-      (summary?.kpis ?? []).map((kpi) => ({
-        name: kpi.label,
-        headers: ["Category", "Value"],
-        rows: kpi.trend.map((t) => ({ Category: t.label, Value: t.value })),
-      })),
-    [summary],
-  );
+  const exportSections = useMemo(() => kpiSections(summary?.kpis ?? []), [summary]);
 
   const handleTrendClick = useCallback(
     (kpi: { trend_dimension?: string | null }, label: string) => {

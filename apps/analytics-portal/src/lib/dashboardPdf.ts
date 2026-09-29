@@ -1,0 +1,37 @@
+/** A dashboard's tiles as the server PDF's sections (POST /portal/export/dashboard-pdf). */
+import { formatCurrency, formatNumber } from "./format";
+import type { ExecutiveKpi } from "./types";
+
+export type ExportSection = { name: string; headers: string[]; rows: Record<string, unknown>[]; note?: string };
+
+// api/export_routes.py refuses more than these
+const MAX_SECTIONS = 12;
+const MAX_ROWS = 5000;
+
+export function dashboardPdfSections(sections: ExportSection[]) {
+  let budget = MAX_ROWS;
+  return sections
+    .filter((s) => s.headers.length)
+    .slice(0, MAX_SECTIONS)
+    .map((s) => {
+      const rows = s.rows.slice(0, budget);
+      budget -= rows.length;
+      return { title: s.name, note: s.note ?? "", columns: s.headers, rows };
+    });
+}
+
+/** KPI cards as export sections: the headline value and what it counts, then its breakdown. */
+export function kpiSections(kpis: ExecutiveKpi[]): ExportSection[] {
+  return kpis.map((kpi) => {
+    const value = kpi.value == null ? "No value" : kpi.format === "currency" ? formatCurrency(kpi.value) : formatNumber(kpi.value);
+    const change = kpi.change_pct == null
+      ? []
+      : [`${kpi.change_pct > 0 ? "+" : ""}${kpi.change_pct}%${kpi.compare_label ? ` ${kpi.compare_label}` : ""}`];
+    return {
+      name: kpi.label,
+      note: [value, kpi.subtitle, ...change].join(" · "),
+      headers: ["Category", "Value"],
+      rows: kpi.trend.map((t) => ({ Category: t.label, Value: t.value })),
+    };
+  });
+}

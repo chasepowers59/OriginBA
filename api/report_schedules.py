@@ -305,10 +305,16 @@ def _bar_chart(columns: list[str], labels: dict[str, str], rows: list[dict[str, 
     chart = HorizontalBarChart()
     chart.x, chart.y, chart.width, chart.height = 150, 10, width - 170, height - 20
     chart.data = [[float(r[number]) for r in reversed(top)]]
-    chart.categoryAxis.categoryNames = [str(r.get(label))[:28] for r in reversed(top)]
+    chart.categoryAxis.categoryNames = [n if len(n := str(r.get(label))) <= 28 else n[:27] + "…"
+                                        for r in reversed(top)]
     for axis_labels in (chart.categoryAxis.labels, chart.valueAxis.labels):
         axis_labels.fontName, axis_labels.fontSize = "Helvetica", 7
-    chart.valueAxis.labelTextFormat = lambda v: f"{v:,.0f}"
+    # Below 10 the axis ticks at halves: whole counts tick by one, fractions keep a decimal
+    # (a count of 3 printed "0 0 1 2 2 2 3").
+    small = max(abs(v) for v in chart.data[0]) < 10
+    if small and all(v.is_integer() for v in chart.data[0]):
+        chart.valueAxis.valueStep = 1
+    chart.valueAxis.labelTextFormat = (lambda v: f"{v:,.2f}".rstrip("0").rstrip(".")) if small else (lambda v: f"{v:,.0f}")
     chart.valueAxis.valueMin = min(0, min(chart.data[0]))
     chart.bars[0].fillColor = colors.HexColor(_BRAND_BLUE)
     chart.bars[0].strokeColor = None
@@ -320,13 +326,22 @@ def rows_to_pdf(title: str, window_note: str, columns: list[str], labels: dict[s
                 rows: list[dict[str, Any]], now: datetime, chart: bool = False, logo: Path | None = None) -> bytes:
     """A formatted report a schedule can send: the Origin mark and title on every page, the
     window it applied, the table with its header repeated on each page, page numbers."""
+    return sections_to_pdf(title, "", [{"title": title, "note": window_note, "columns": columns, "labels": labels,
+                                        "rows": rows, "chart": chart}], now, logo=logo, headed=False)
+
+
+def sections_to_pdf(title: str, note: str, sections: list[dict[str, Any]], now: datetime,
+                    logo: Path | None = None, headed: bool = True) -> bytes:
+    """Several tables in one PDF (a dashboard's tiles): per section its title, note, a bar chart
+    when it is one label against one number (unless chart is False) and its table. `headed`
+    adds the document's own title and note above the first section."""
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import landscape, letter
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
     from reportlab.lib.units import inch
     from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-    size = landscape(letter) if len(columns) > 5 else letter
+    size = landscape(letter) if any(len(sec["columns"]) > 5 for sec in sections) else letter
     styles = getSampleStyleSheet()
     body = styles["BodyText"]
     small = ParagraphStyle("cell", parent=body, fontSize=8, leading=10)
@@ -346,34 +361,42 @@ def rows_to_pdf(title: str, window_note: str, columns: list[str], labels: dict[s
         canvas.drawRightString(size[0] - 0.6 * inch, 0.45 * inch, f"Page {doc.page}")
         canvas.restoreState()
 
-    header = [Paragraph(xml_escape(labels.get(c, c)), ParagraphStyle("head", parent=small, textColor="white",
-                                                                     fontName="Helvetica-Bold")) for c in columns]
-    data = [header] + [[Paragraph(xml_escape(v), small) if isinstance(v, _Text) else v for v in r]
-                       for r in _pdf_cells(columns, rows)]
-    numeric = [i for i, c in enumerate(columns) if rows and all(isinstance(r.get(c), (int, float))
-               and not isinstance(r.get(c), bool) for r in rows if r.get(c) is not None)]
-    table = Table(data, repeatRows=1)
-    table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor(_BRAND_BLUE)),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, -1), 8),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F2F5F8")]),
-        ("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#D5DDE5")),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        *[("ALIGN", (i, 1), (i, -1), "RIGHT") for i in numeric],
-    ]))
+    def table_of(columns: list[str], labels: dict[str, str], rows: list[dict[str, Any]]):
+        header = [Paragraph(xml_escape(labels.get(c, c)), ParagraphStyle("head", parent=small, textColor="white",
+                                                                         fontName="Helvetica-Bold")) for c in columns]
+        data = [header] + [[Paragraph(xml_escape(v), small) if isinstance(v, _Text) else v for v in r]
+                           for r in _pdf_cells(columns, rows)]
+        numeric = [i for i, c in enumerate(columns) if rows and all(isinstance(r.get(c), (int, float))
+                   and not isinstance(r.get(c), bool) for r in rows if r.get(c) is not None)]
+        table = Table(data, repeatRows=1)
+        table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor(_BRAND_BLUE)),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (-1, -1), 8),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F2F5F8")]),
+            ("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#D5DDE5")),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            *[("ALIGN", (i, 1), (i, -1), "RIGHT") for i in numeric],
+        ]))
+        return table
+
+    # Paragraph reads its text as markup: escaped, a value is only ever text (an '&' broke the
+    # PDF; '<link href=...>' in a cell became a live link).
+    story = [Paragraph(xml_escape(title), styles["Heading1"]), Paragraph(xml_escape(note or ""), body),
+             Spacer(1, 0.2 * inch)] if headed else []
+    for sec in sections:
+        columns, labels, rows = sec["columns"], sec.get("labels") or {}, sec.get("rows") or []
+        story += [Paragraph(xml_escape(sec.get("title") or ""), styles["Heading2"]),
+                  Paragraph(xml_escape(sec.get("note") or ""), body), Spacer(1, 0.15 * inch)]
+        drawing = _bar_chart(columns, labels, rows, size[0] - 1.2 * inch) if sec.get("chart", True) and rows else None
+        if drawing is not None:
+            story += [drawing, Spacer(1, 0.2 * inch)]
+        story += [table_of(columns, labels, rows) if rows else Paragraph("No rows in this window.", body),
+                  Spacer(1, 0.3 * inch)]
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=size, topMargin=1.0 * inch, bottomMargin=0.8 * inch,
                             leftMargin=0.6 * inch, rightMargin=0.6 * inch, title=title)
-    # Paragraph reads its text as markup: escaped, a value is only ever text (an '&' broke the
-    # PDF; '<link href=...>' in a cell became a live link).
-    story = [Paragraph(xml_escape(title), styles["Heading2"]), Paragraph(xml_escape(window_note or ""), body),
-             Spacer(1, 0.15 * inch)]
-    drawing = _bar_chart(columns, labels, rows, size[0] - 1.2 * inch) if chart and rows else None
-    if drawing is not None:
-        story += [drawing, Spacer(1, 0.2 * inch)]
-    story.append(table if rows else Paragraph("No rows in this window.", body))
     doc.build(story, onFirstPage=chrome, onLaterPages=chrome)
     return buf.getvalue()
 

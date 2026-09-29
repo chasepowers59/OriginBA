@@ -24,7 +24,7 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 | Saved views | Yes | Builder definitions (never SQL); owner, private or organization-wide, folders; refused past 200 per org, never silently deleted |
 | Dashboards | Yes | Up to 8 tiles, cross-filtering, drill to the explorer, owner, visibility and folders, 50 per org |
 | Scheduled delivery | Partly | Daily, weekly, monthly email of a saved view as **PDF, Excel or CSV**, with its saved filters; missed runs caught up once; Send now. **Needs:** the hourly runner deployed, SMTP configured |
-| Exports | Partly | Excel from explorer and dashboards, CSV from SQL and assistant answers (formula-safe), server-side PDF on schedules. On-screen PDF buttons still use the browser print dialog |
+| Exports | Yes | Excel from explorer and dashboards (formula-safe), CSV from SQL and assistant answers, and one server-built PDF renderer for schedules, the explorer's Download PDF and a dashboard's Export PDF pack (every tile: headline value, chart, table; `api/export_routes.py`). Only the council and lineage packs still print the page |
 | Alerts | Partly | Thresholds on the home KPIs, emailed on breach. Not on arbitrary views |
 | Input controls / prompts | Yes | Any saved filter can be asked for when the view opens (Report parameters: value lists narrowed by the answers above them, date ranges, saved defaults for schedules) |
 | Formatted, paginated reports (JRXML) | No | Letters and statements live in Jaspersoft and the separate letter-print app |
@@ -42,8 +42,7 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
    never send. The Docker image needs `openpyxl` and `reportlab` (already in
    `deploy/requirements-api.txt`).
 2. Done 2026-09-28: owners and private items; report parameters; row-level security.
-3. **Server-side PDF for on-screen exports** (S): reuse the schedule PDF renderer for the
-   explorer and dashboard PDF buttons, so a PDF looks the same wherever it comes from.
+3. Done 2026-09-29: server-side PDF for on-screen exports (explorer and dashboards).
 4. Done 2026-09-28: folders.
 5. **SAML** (M), for identity providers without OIDC.
 6. **Pre-aggregated tables** for the heavy ready-to-run reports (see the dbt repo's
