@@ -21,14 +21,20 @@ Next dev, hot reload), `portal-api-stub` (Ori with `ASSISTANT_MODEL=stub`, zero 
 A browser with no active organization sends no `X-Organization-Id` and reads the default
 (Ellensburg). The API log shows `org=-` for those requests; that is not a bug.
 
+## Desktop web only (Chase, 2026-09-29)
+
+The portal ships as a desktop web app, not a phone app: run every browser check with
+`--project=desktop`, and do not open or fix findings that only affect phone widths. The
+phone-only specs (shell, library, phone-workspaces) stay in `e2e/` but are not routine.
+
 ## The specs (apps/analytics-portal/e2e/, Playwright with the installed Chrome)
 
 | Spec | Command | Time |
 | --- | --- | --- |
-| Crawl: every route x demo25 + ellensburg x desktop/phone/320 | `npx playwright test e2e/crawl.spec.ts` | ~14 min, 336 visits |
+| Crawl: every route x demo25 + ellensburg | `npx playwright test e2e/crawl.spec.ts --project=desktop` | ~5 min, 112 visits |
 | Accessibility (axe, WCAG 2.1 AA) incl. every Settings tab | `npx playwright test e2e/a11y.spec.ts --project=desktop` (`COLOR_SCHEME=dark` for dark) | ~45 s |
-| Pixels (local baselines) | `npx playwright test e2e/visual.spec.ts --project=desktop --project=phone` | ~45 s |
-| Ori naming | `npx playwright test e2e/ori.spec.ts --project=desktop` | ~4 s |
+| Pixels (local baselines) | `npx playwright test e2e/visual.spec.ts --project=desktop` | ~25 s |
+| Ori naming, data quality, library | `npx playwright test e2e/ori.spec.ts e2e/dq.spec.ts e2e/library.spec.ts --project=desktop` | ~15 s |
 
 Unit suites: `cd /Users/chase/OriginBA-3 && ENVIRONMENT=test python3 -m pytest tests -q`,
 `cd apps/analytics-portal && npx tsc --noEmit && npx vitest run`.
