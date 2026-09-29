@@ -24,7 +24,7 @@ import { printCouncilPack } from "@/lib/councilPack";
 import { useBrand } from "@/components/PortalThemeProvider";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
 import { downloadPdf } from "@/lib/api";
-import { isMeasureColumn, summarizeResult } from "@/lib/resultSummary";
+import { isMeasureColumn, summarizeResult, totalRow } from "@/lib/resultSummary";
 import { POPOVER_PANEL, menuFocusIndex, usePopover } from "@/lib/popover";
 
 type SortDir = "asc" | "desc";
@@ -109,6 +109,7 @@ export function ResultsPanel({
     [result, measureKey, dimensionKey, measureField, measureAgg, columnLabels],
   );
   const insight = summary?.leader;
+  const footer = result && !summary?.notTotalled ? totalRow(result.columns, measureKey, summary?.total ?? null) : null;
 
   const sortedRows = useMemo(() => {
     if (!result || !measureKey) return [];
@@ -335,7 +336,7 @@ export function ResultsPanel({
             ? "Results table — click a row to cross-filter"
             : "Detail table — click a row to cross-filter"}
         </div>
-        <div className={chartType === "table" ? "max-h-[560px] overflow-auto" : "max-h-[420px] overflow-auto"}
+        <div className="max-h-[70vh] overflow-auto"
              tabIndex={0} role="region" aria-label={chartType === "table" ? "Results table" : "Detail table"}>
           <table className="min-w-full text-left text-sm">
             <thead className="sticky top-0 border-b border-edge-subtle bg-surface-solid backdrop-blur">
@@ -375,6 +376,18 @@ export function ResultsPanel({
                 </tr>
               ))}
             </tbody>
+            {footer ? (
+              <tfoot className="sticky bottom-0 border-t border-edge-subtle bg-surface-solid">
+                <tr>
+                  {footer.map((v, i) => (
+                    <td key={result.columns[i]}
+                        className={`px-4 py-2.5 font-semibold text-heading ${isMeasureColumn(result.columns[i]) ? "text-right tabular-nums" : ""}`}>
+                      {typeof v === "number" ? formatCellValue(v, { columnId: measureKey, isMeasure: true, asCurrency: isCurrency }) : v}
+                    </td>
+                  ))}
+                </tr>
+              </tfoot>
+            ) : null}
           </table>
         </div>
       </div>

@@ -52,3 +52,11 @@ export function summarizeResult(r: {
     notTotalled: null,
   };
 }
+
+/** The detail table's footer: "Total" in the first non-measure column, the total under the
+ *  measure, blanks elsewhere. Null when the result is not totalled (see summarizeResult). */
+export function totalRow(columns: string[], measureKey: string, total: number | null): (string | number | null)[] | null {
+  if (!measureKey || total == null) return null;
+  const labelAt = columns.findIndex((c) => c !== measureKey);
+  return columns.map((c, i) => (c === measureKey ? total : i === labelAt ? "Total" : null));
+}

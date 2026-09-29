@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { isUnitOfMeasureField } from "./businessLabels";
-import { MIXED_UNITS_NOTE, summarizeResult, NOT_ADDITIVE_NOTE } from "./resultSummary";
+import { MIXED_UNITS_NOTE, summarizeResult, NOT_ADDITIVE_NOTE, totalRow } from "./resultSummary";
 
 /**
  * "Billed usage by unit of measure" showed a Combined total of kWh + therms + gallons and
@@ -120,5 +120,20 @@ describe("only sums and counts add across groups", () => {
       expect(out.leader).toBeNull();
       expect(out.notTotalled).toBe(NOT_ADDITIVE_NOTE);
     }
+  });
+});
+
+describe("the detail table's total row", () => {
+  // design review 2026-09-29: a finance lead reconciles to a total, and the table showed
+  // 9 of 64 SA types with none
+  it("labels the first column and totals the measure", () => {
+    expect(totalRow(["d0", "d1", "m0"], "m0", 1234.5)).toEqual(["Total", null, 1234.5]);
+  });
+  it("puts the label in the first non-measure column even when the measure leads", () => {
+    expect(totalRow(["m0", "d0"], "m0", 10)).toEqual([10, "Total"]);
+  });
+  it("has no row when the result is not totalled", () => {
+    expect(totalRow(["d0", "m0"], "m0", null)).toBeNull();
+    expect(totalRow(["d0", "m0"], "", 5)).toBeNull();
   });
 });
