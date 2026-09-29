@@ -478,3 +478,21 @@ text glyphs, audit the text ones separately.
   aria-label on every chart, click/Enter adds fields (drag is optional).
 - Route-test hygiene: modules share one interpreter — pin `PORTAL_AUTH_DISABLED` etc.
   per test class with `mock.patch.dict(os.environ, ...)`, never rely on import-time env.
+
+## Ori, the intelligence inside Origin BA (named 2026-09-29, Chase)
+
+Origin BA is the analytics platform; **Ori** is the intelligence inside it. The chat assistant
+is the first Ori surface; automated insights, anomaly notes, report summaries and forecasts
+will be Ori too, so they never need renaming.
+
+- Every Ori string comes from `src/lib/ori.ts` (`ORI.ask` "Ask Ori", `ORI.tagline` "Your AI
+  analytics assistant", `ORI.thinking` "Ori is analyzing your data…", `ORI.followUp`,
+  `ORI.worthInvestigating` "Ori found something worth investigating", …). Never write "the
+  assistant" in UI copy; `e2e/ori.spec.ts` fails if the home page says it.
+- Ori's mark is `OriMark` (the Origin infinity mark in a soft brand circle); the floating
+  "Ask Ori" button carries the mark on a white disc.
+- The backend speaks as Ori too: the system prompt opens "You are Ori…" (`api/assistant.py`),
+  and user-facing errors say "Ori could not answer." / "Ori is not configured" /
+  "Today's Ori budget…" (`api/assistant_routes.py`).
+- Code identifiers (`AssistantPanel`, `/portal/assistant`, `ASSISTANT_*` env keys) keep their
+  names: renaming them buys nothing and breaks deployments.

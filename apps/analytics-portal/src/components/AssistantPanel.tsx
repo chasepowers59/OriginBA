@@ -7,6 +7,8 @@ import { stepLabel } from "@/lib/sse";
 import { exportRowsCsv, formatCurrency, formatNumber } from "@/lib/format";
 import { STARTER_QUESTIONS, WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, savedViewFromSpec, spendLabel, summarise, threadFor, tryGovernedFirst, type Turn } from "@/lib/assistant";
 import { useAuth } from "@/components/AuthProvider";
+import { ORI } from "@/lib/ori";
+import { OriMark } from "@/components/OriMark";
 import { contextLabel, getPageContext, loadTurns, saveTurns, subscribeAsk, subscribePageContext, takeAsk, type PageContext } from "@/lib/assistantContext";
 import { DatabaseResultChart } from "@/components/DatabaseResultChart";
 import type { NlqResponse, AssistantQuery, AssistantResponse, AssistantSpend, AssistantStatus, IntegrityOverview } from "@/lib/types";
@@ -94,7 +96,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
       fetchAssistantSpend().then(setSpend).catch(() => undefined);
     } catch (err) {
       setTurns((t) => [...t, { role: "user", text: q },
-        { role: "error", text: err instanceof Error ? err.message : "The assistant could not answer." }]);
+        { role: "error", text: err instanceof Error ? err.message : ORI.cannotAnswer }]);
     } finally {
       setBusy(false);
       setPending(null);
@@ -129,17 +131,17 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
   }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <section ref={sectionRef} className={`glass-panel ${compact ? "p-4" : "p-6"}`} aria-label="Ask the assistant">
+    <section ref={sectionRef} className={`glass-panel ${compact ? "p-4" : "p-6"}`} aria-label={ORI.ask}>
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">Ask the assistant</p>
-          <h2 className={`mt-1 font-bold text-heading ${compact ? "text-lg" : "text-xl"}`}>
-            A question about your data, in plain language
-          </h2>
-          <p className="mt-1 text-sm text-fg-muted">
-            It reads your reporting data, runs read-only queries, and shows you every query it ran.
-            It only ever sees your own organization&rsquo;s reports.
-          </p>
+          <div className="flex items-center gap-2.5">
+            <OriMark size={compact ? "h-8 w-8" : "h-10 w-10"} />
+            <div>
+              <h2 className={`font-bold text-heading ${compact ? "text-lg" : "text-xl"}`}>{ORI.ask}</h2>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">{ORI.tagline}</p>
+            </div>
+          </div>
+          <p className="mt-2 text-sm text-fg-muted">{ORI.intro}</p>
           {integrity ? (
             <p className="mt-1 text-xs text-fg-muted" data-testid="integrity-headline">{integrityHeadline(integrity)}</p>
           ) : null}
@@ -154,8 +156,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
 
       {status && !status.configured ? (
         <p className="rounded-xl border border-over bg-over-bg px-4 py-3 text-sm text-over">
-          The assistant is not configured for this deployment yet (no model key). The governed
-          metrics below still answer everyday questions.
+          {ORI.notConfigured}
         </p>
       ) : null}
 
@@ -195,7 +196,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
                   {s.done ? (s.ok ? "✓" : "✗") : "…"} {s.label}
                   {s.done && s.rows != null ? ` · ${s.rows.toLocaleString()} rows` : ""}
                 </li>
-              )) : <li>Thinking about the question…</li>}
+              )) : <li>{ORI.thinking}</li>}
             </ul>
           ) : null}
           <div ref={endRef} />
@@ -224,7 +225,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
           type="text"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder={turns.length ? "Ask a follow-up…" : "How much was billed by cycle in the last 90 days?"}
+          placeholder={turns.length ? ORI.followUp : ORI.firstQuestion}
           className="input-modern w-full"
           disabled={busy || !configured}
           aria-label="Your question"
@@ -413,7 +414,7 @@ function GovernedAnswer({ result, onAskAssistant, busy }: {
       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-fg-muted">
         <span>Answered from the vetted metric the dashboards use.</span>
         <button type="button" className="btn-ghost text-xs" onClick={onAskAssistant} disabled={busy}>
-          Ask the assistant instead
+          {ORI.askInstead}
         </button>
       </div>
     </div>

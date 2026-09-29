@@ -48,7 +48,7 @@ def _assistant_for(ctx: AuthContext) -> Assistant:
     require_unrestricted(ctx)   # the assistant writes its own SQL, which cannot carry row rules
     org_id = require_org_for_data(ctx)
     if not assistant_configured():
-        raise HTTPException(status_code=503, detail="The assistant is not configured: set ANTHROPIC_API_KEY.")
+        raise HTTPException(status_code=503, detail="Ori is not configured: set ANTHROPIC_API_KEY.")
     _within_limits(org_id, ctx.email)
     # A person granted some workstreams asks about those canvases only, as everywhere else.
     unrestricted = not ctx.workstreams or "*" in ctx.workstreams
@@ -91,7 +91,7 @@ def ask_streaming(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)
             result = assistant.ask(body.question, body.thread, body.context, on_event=events.put)
             events.put({"type": "answer", **result})
         except Exception as exc:  # noqa: BLE001
-            events.put({"type": "error", "detail": _model_api_failure(exc) or "The assistant could not answer."})
+            events.put({"type": "error", "detail": _model_api_failure(exc) or "Ori could not answer."})
         events.put(None)
 
     threading.Thread(target=work, daemon=True).start()
@@ -115,7 +115,7 @@ def _within_limits(org_id: str, actor_email: str) -> None:
     or until tomorrow."""
     budget = os.getenv("ASSISTANT_DAILY_TOKEN_BUDGET", "").strip()
     if budget and spend_today(org_id) >= int(budget):
-        raise HTTPException(status_code=429, detail=f"Today's assistant budget for this organization "
+        raise HTTPException(status_code=429, detail=f"Today's Ori budget for this organization "
                                                     f"({int(budget):,} tokens) is used up; it resets at midnight UTC.")
     per_minute = os.getenv("ASSISTANT_QUESTIONS_PER_MINUTE", "").strip()
     if per_minute and questions_last_minute(actor_email) >= int(per_minute):

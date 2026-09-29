@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { subscribeAsk } from "@/lib/assistantContext";
 import { AssistantPanel } from "./AssistantPanel";
+import { ORI } from "@/lib/ori";
 
 /**
- * The assistant on every page: a button that opens it beside the page. Home carries the
+ * Ori on every page: a button that opens it beside the page. Home carries the
  * panel inline, so the button is not shown there. The conversation is the same one the
  * home panel shows (both read it from session storage).
  */
@@ -31,7 +32,7 @@ export function AssistantDrawer() {
       {open ? (
         <aside
           role="dialog"
-          aria-label="Ask the assistant"
+          aria-label={ORI.ask}
           className="fixed inset-y-0 right-0 z-[60] w-full max-w-[480px] overflow-y-auto border-l border-edge-subtle bg-surface-solid p-3 shadow-2xl"
         >
           <div className="mb-2 flex justify-end">
@@ -45,9 +46,13 @@ export function AssistantDrawer() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="btn-primary fixed bottom-5 right-5 z-[60] rounded-full px-5 py-3 shadow-xl"
+          className="btn-primary fixed bottom-5 right-5 z-[60] inline-flex items-center gap-2 rounded-full py-2.5 pl-2.5 pr-5 shadow-xl"
         >
-          Ask the assistant
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/origin-mark.png" alt="" className="h-3.5 w-auto" />
+          </span>
+          {ORI.ask}
         </button>
       )}
     </div>

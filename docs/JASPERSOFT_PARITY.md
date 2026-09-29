@@ -6,7 +6,7 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 
 ## Where the portal already goes further
 
-- **Natural-language answers.** The assistant writes and runs read-only SQL over the
+- **Natural-language answers: Ori.** Ori, the intelligence inside Origin BA, writes and runs read-only SQL over the
   reporting canvases, shows every query, streams its progress, and each answer can be
   charted, downloaded as CSV, or saved as a view. Plain "how much" questions are answered by
   the vetted metrics first, at no model cost. Jaspersoft has nothing comparable.

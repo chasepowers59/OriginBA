@@ -23,6 +23,7 @@ import type {
 import { dashboardPdfSections, type ExportSection } from "./dashboardPdf";
 import type { PackImportResult } from "./contentPack";
 import type { SystemHealth } from "./systemHealth";
+import { ORI } from "./ori";
 import type { ScheduleRun } from "./scheduleHistory";
 import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview, AssistantSpend } from "@/lib/types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
@@ -534,7 +535,7 @@ export async function askAssistantStream(
     buffer = rest;
     for (const e of events) {
       if (e.type === "answer") return e.data as unknown as AssistantResponse;
-      if (e.type === "error") throw new Error(String(e.data.detail ?? "The assistant could not answer."));
+      if (e.type === "error") throw new Error(String(e.data.detail ?? ORI.cannotAnswer));
       onStep(e);
     }
   }
