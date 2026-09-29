@@ -14,28 +14,37 @@ Next dev, hot reload), `portal-api-stub` (Ori with `ASSISTANT_MODEL=stub`, zero 
 | Org id | Picker label | Reads |
 | --- | --- | --- |
 | `ellensburg` | Ellensburg | Oracle in-database dbt warehouse `ORIGINBA_REPORTING` on the Ellensburg 25.4 TEST instance (VPN). Real client data: the local default org |
-| `demo25` | Demo 25.4 | local Postgres demo warehouse |
+| `demo25` | Demo 25.4 | local Postgres demo warehouse. NOT a comparison source (below); only the letters check still uses it |
 | `dev` | INT_DEV (internal dev CISADM) | the SAME Postgres as demo25 (identical build stamp), despite its label |
 | citycorp, college_station, fond_du_lac, newark, odessa, demo | client names | Oracle, no dbt warehouse yet: pages say the warehouse is not built |
 
 A browser with no active organization sends no `X-Organization-Id` and reads the default
 (Ellensburg). The API log shows `org=-` for those requests; that is not a bug.
 
+## Ellensburg only (Chase, 2026-09-29)
+
+"Stop using Demo25's data and stick to only using Ellensburg": every check, live verification
+and measured number uses Ellensburg. The specs take their organization from `e2e/org.ts`
+(`E2E_ORG`, default `ellensburg`; `CRAWL_ORGS` for several). With the VPN down, say the check
+could not run; never fall back to demo25. The one exception until the Oracle letters exist:
+`e2e/letters.spec.ts` (letters read raw CISADM and run only for Postgres organizations).
+Moving the checks found the data-quality worklist refusing Oracle organizations
+(docs/PORTAL_ISSUES_LOG.md).
+
 ## Desktop web only (Chase, 2026-09-29)
 
-The portal ships as a desktop web app, not a phone app: run every browser check with
-`--project=desktop`, and do not open or fix findings that only affect phone widths. The
-phone-only specs (shell, library, phone-workspaces) stay in `e2e/` but are not routine.
+The portal ships as a desktop web app, not a phone app: the Playwright config has one
+project, `desktop` (1440 x 900), and the phone-only specs are gone (in git history).
 
 ## The specs (apps/analytics-portal/e2e/, Playwright with the installed Chrome)
 
 | Spec | Command | Time |
 | --- | --- | --- |
-| Crawl: every route x demo25 + ellensburg | `npx playwright test e2e/crawl.spec.ts --project=desktop` | ~5 min, 112 visits |
-| Accessibility (axe, WCAG 2.1 AA) incl. every Settings tab | `npx playwright test e2e/a11y.spec.ts --project=desktop` (`COLOR_SCHEME=dark` for dark) | ~45 s |
-| Pixels (local baselines) | `npx playwright test e2e/visual.spec.ts --project=desktop` | ~25 s |
-| Ori naming, data quality, library | `npx playwright test e2e/ori.spec.ts e2e/dq.spec.ts e2e/library.spec.ts --project=desktop` | ~15 s |
-| Letters (demo25, August 2022: rows, PDF preview, 366-day refusal) | `npx playwright test e2e/letters.spec.ts --project=desktop` | ~15 s |
+| Crawl: every route on Ellensburg | `npx playwright test e2e/crawl.spec.ts` | ~4 min, 56 visits |
+| Accessibility (axe, WCAG 2.1 AA) incl. every Settings tab | `npx playwright test e2e/a11y.spec.ts` (`COLOR_SCHEME=dark` for dark) | ~1 min |
+| Pixels (local baselines, Ellensburg; retake after a rebuild) | `npx playwright test e2e/visual.spec.ts` | ~1 min |
+| Ori (naming, the home panel with stubbed routes), data quality, library | `npx playwright test e2e/ori.spec.ts e2e/ori-findings.spec.ts e2e/dq.spec.ts e2e/library.spec.ts` | ~1 min |
+| Letters (demo25, the exception above: August 2022 rows, PDF preview, 366-day refusal) | `npx playwright test e2e/letters.spec.ts` | ~15 s |
 
 Unit suites: `cd /Users/chase/OriginBA-3 && ENVIRONMENT=test python3 -m pytest tests -q`,
 `cd apps/analytics-portal && npx tsc --noEmit && npx vitest run`.

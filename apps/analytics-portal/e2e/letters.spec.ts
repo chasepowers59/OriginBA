@@ -1,7 +1,8 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * Letters for demo25: pick August 2022 (the demo warehouse has 15 letters then), see the rows,
+ * Letters for demo25 -- the one check not on Ellensburg (e2e/org.ts): letters read raw CISADM
+ * and run only for Postgres organizations until the Oracle letters (phase 2) are built. Pick August 2022 (the demo warehouse has 15 letters then), see the rows,
  * choose one, and see its PDF preview. Customer names are never read or asserted here.
  *
  *   npx playwright test e2e/letters.spec.ts --project=desktop

@@ -1,8 +1,10 @@
 import { test, expect } from "@playwright/test";
+import { asOrg } from "./org";
 
 /**
  * Pixel comparison of the key pages against a baseline, so a layout change is seen before
- * a user sees it. Runs on the demo org, whose data does not move. Baselines live in
+ * a user sees it. Runs on Ellensburg (e2e/org.ts), a frozen copy whose data does not move
+ * between rebuilds; retake the baseline after a rebuild. Baselines live in
  * e2e/.out/baseline (gitignored, like every screenshot here); take them on a known-good
  * build, then compare after each change:
  *
@@ -12,7 +14,6 @@ import { test, expect } from "@playwright/test";
  * Timestamps, token spend and the dev-server badge are masked: they change on every run.
  */
 
-const ORG = process.env.VISUAL_ORG ?? "demo25";
 const PAGES = [
   "/", "/reports", "/dashboards", "/build", "/database", "/data-quality", "/settings",
   "/workstream/billing", "/workstream/finance",
@@ -21,7 +22,7 @@ const PAGES = [
 
 for (const route of PAGES) {
   test(`looks the same: ${route}`, async ({ page, context }, info) => {
-    await context.addCookies([{ name: "portal_active_organization", value: ORG, url: info.project.use.baseURL! }]);
+    await asOrg(context, info);
     await page.goto(route, { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("networkidle", { timeout: 120_000 }).catch(() => undefined);
     await page.waitForTimeout(1000);

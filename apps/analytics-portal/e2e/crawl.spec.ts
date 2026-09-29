@@ -1,21 +1,22 @@
 import { test, expect, type Page, type ConsoleMessage } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
+import { ORG } from "./org";
 
 /**
- * Crawl every page of the portal, per org and viewport, and record what an end user
+ * Crawl every page of the portal, per org, and record what an end user
  * would trip over: console errors, failed API calls, "NaN"/"undefined" on screen,
  * sideways scrolling, clipped text, unlabelled controls, and slow loads. Each page
  * writes a findings file and a full-page screenshot under e2e/.out (gitignored); the
  * test fails only on the hard faults (errors, failed calls, broken text, overflow).
  *
  *   npx playwright test e2e/crawl.spec.ts                      # every org below
- *   CRAWL_ORGS=demo25 npx playwright test e2e/crawl.spec.ts    # one org
+ *   CRAWL_ORGS=ellensburg,citycorp npx playwright test e2e/crawl.spec.ts    # several orgs
  *   CRAWL_ROUTES=/,/reports npx playwright test e2e/crawl.spec.ts
  */
 
 const API = process.env.PORTAL_API_URL ?? "http://127.0.0.1:8010";
-const ORGS = (process.env.CRAWL_ORGS ?? "demo25,ellensburg").split(",");
+const ORGS = (process.env.CRAWL_ORGS ?? ORG).split(",");
 const OUT = path.join(__dirname, ".out");
 
 const STATIC = ["/", "/reports", "/dashboards", "/dashboard", "/dashboard/custom", "/build", "/database",

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { asOrg } from "./org";
 import AxeBuilder from "@axe-core/playwright";
 import fs from "node:fs";
 import path from "node:path";
@@ -9,13 +10,12 @@ import path from "node:path";
  *
  *   npx playwright test e2e/a11y.spec.ts --project=desktop
  */
-const ORG = process.env.VISUAL_ORG ?? "demo25";
 const PAGES = ["/", "/reports", "/dashboards", "/dashboards/new", "/build", "/database", "/data-quality", "/settings",
   "/workstream/billing", "/explore/rpt_bill_segment"];
 
 for (const route of PAGES) {
   test(`accessible: ${route}`, async ({ page, context }, info) => {
-    await context.addCookies([{ name: "portal_active_organization", value: ORG, url: info.project.use.baseURL! }]);
+    await asOrg(context, info);
     await page.goto(route, { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("networkidle", { timeout: 120_000 }).catch(() => undefined);
     await page.waitForTimeout(800);
@@ -39,7 +39,7 @@ for (const route of PAGES) {
 // The admin tabs render only when clicked, so the page check above sees just the first.
 for (const tab of ["Users & access", "Content packs", "System health"]) {
   test(`accessible: /settings tab ${tab}`, async ({ page, context }, info) => {
-    await context.addCookies([{ name: "portal_active_organization", value: ORG, url: info.project.use.baseURL! }]);
+    await asOrg(context, info);
     await page.goto("/settings", { waitUntil: "domcontentloaded" });
     await page.getByRole("button", { name: tab, exact: true }).click();
     await page.waitForLoadState("networkidle", { timeout: 120_000 }).catch(() => undefined);

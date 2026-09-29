@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { asOrg } from "./org";
 
 /**
  * The analytics assistant is Ori: "Ask Ori, your AI analytics assistant" on the home page, an
@@ -7,10 +8,9 @@ import { test, expect } from "@playwright/test";
  *
  *   npx playwright test e2e/ori.spec.ts --project=desktop
  */
-const ORG = process.env.VISUAL_ORG ?? "demo25";
 
 test.beforeEach(async ({ context }, info) => {
-  await context.addCookies([{ name: "portal_active_organization", value: ORG, url: info.project.use.baseURL! }]);
+  await asOrg(context, info);
 });
 
 test("home presents Ask Ori", async ({ page }) => {

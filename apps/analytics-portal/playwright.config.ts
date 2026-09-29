@@ -17,10 +17,6 @@ export default defineConfig({
     headless: true,
     colorScheme: (process.env.COLOR_SCHEME as "light" | "dark" | undefined) ?? "light",
   },
-  projects: [
-    { name: "desktop", use: { viewport: { width: 1440, height: 900 } } },
-    { name: "phone", use: { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } },
-    // The smallest phone in use; the header overlapped the logo here and nowhere wider.
-    { name: "small-phone", use: { viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true } },
-  ],
+  // Desktop web only (Chase, 2026-09-29): no app store, no phone target.
+  projects: [{ name: "desktop", use: { viewport: { width: 1440, height: 900 } } }],
 });

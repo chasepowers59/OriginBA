@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { asOrg } from "./org";
 
 /**
  * Data quality rows carry an action, not a status: "Mark done" reads as something to press, is
@@ -7,7 +8,7 @@ import { test, expect } from "@playwright/test";
  *   npx playwright test e2e/dq.spec.ts --project=desktop
  */
 test("each finding row has a Mark done button", async ({ page, context }, info) => {
-  await context.addCookies([{ name: "portal_active_organization", value: "demo25", url: info.project.use.baseURL! }]);
+  await asOrg(context, info);
   await page.goto("/data-quality");
   const mark = page.getByRole("button", { name: /^Mark .+ done$/ }).first();
   await expect(mark).toBeVisible({ timeout: 60_000 });
