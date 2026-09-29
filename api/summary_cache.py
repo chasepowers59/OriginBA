@@ -20,6 +20,7 @@ MAX_ENTRIES = 500
 _entries: dict[tuple, tuple[float, Any]] = {}
 _lock = threading.Lock()
 _counts = {"hits": 0, "misses": 0}
+_building: dict[tuple, threading.Lock] = {}
 
 
 def _no_failed_card(result: Any) -> bool:
@@ -35,18 +36,37 @@ def cached(key: tuple, build: Callable[[], Any], keep: Callable[[Any], bool] = _
            version: str | None = None) -> Any:
     full = (date.today().isoformat(), version, *key)
     ttl = VERSIONED_TTL_SECONDS if version else TTL_SECONDS
-    with _lock:
-        hit = _entries.get(full)
-    if hit and time.monotonic() - hit[0] < ttl:
-        _counts["hits"] += 1
-        return hit[1]
-    _counts["misses"] += 1
-    result = build()
-    if keep(result):
+
+    def fresh() -> tuple[bool, Any]:
         with _lock:
-            _entries[full] = (time.monotonic(), result)
-            while len(_entries) > MAX_ENTRIES:
-                _entries.pop(next(iter(_entries)))
+            hit = _entries.get(full)
+        if hit and time.monotonic() - hit[0] < ttl:
+            _counts["hits"] += 1
+            return True, hit[1]
+        return False, None
+
+    found, value = fresh()
+    if found:
+        return value
+    # One build per key at a time: a second caller waits and reads what the first kept, rather
+    # than taking more of the organization's database sessions for the same answer.
+    with _lock:
+        key_lock = _building.setdefault(full, threading.Lock())
+    with key_lock:
+        found, value = fresh()
+        if found:
+            return value
+        _counts["misses"] += 1
+        try:
+            result = build()
+            with _lock:
+                if keep(result):
+                    _entries[full] = (time.monotonic(), result)
+                    while len(_entries) > MAX_ENTRIES:
+                        _entries.pop(next(iter(_entries)))
+        finally:
+            with _lock:
+                _building.pop(full, None)
     return result
 
 
