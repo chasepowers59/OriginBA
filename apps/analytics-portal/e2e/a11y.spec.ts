@@ -35,3 +35,21 @@ for (const route of PAGES) {
       .toEqual([]);
   });
 }
+
+// The admin tabs render only when clicked, so the page check above sees just the first.
+for (const tab of ["Users & access", "Content packs", "System health"]) {
+  test(`accessible: /settings tab ${tab}`, async ({ page, context }, info) => {
+    await context.addCookies([{ name: "portal_active_organization", value: ORG, url: info.project.use.baseURL! }]);
+    await page.goto("/settings", { waitUntil: "domcontentloaded" });
+    await page.getByRole("button", { name: tab, exact: true }).click();
+    await page.waitForLoadState("networkidle", { timeout: 120_000 }).catch(() => undefined);
+    await page.waitForTimeout(800);
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .exclude("nextjs-portal")
+      .analyze();
+    const serious = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical")
+      .map((v) => ({ id: v.id, help: v.help, where: v.nodes.slice(0, 10).map((n) => n.target.join(" ")) }));
+    expect(serious, "serious accessibility violations").toEqual([]);
+  });
+}

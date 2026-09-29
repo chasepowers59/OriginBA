@@ -211,6 +211,7 @@ export function AdminAccessPanel() {
                   <td className="px-3 py-2 portal-text-muted">{user.email}</td>
                   <td className="px-3 py-2">
                     <select
+                      aria-label={`Organization for ${user.email}`}
                       value={user.organization_id ?? ""}
                       // An admin has no client of their own, so there is nothing to
                       // choose here; offering the list would only compose a request the
@@ -238,6 +239,7 @@ export function AdminAccessPanel() {
                   </td>
                   <td className="px-3 py-2">
                     <select
+                      aria-label={`Role for ${user.email}`}
                       value={user.role}
                       disabled={user.id === currentUser?.id}
                       onChange={(e) => void runUserUpdate(user.id, rolePatch(e.target.value))}
@@ -252,6 +254,7 @@ export function AdminAccessPanel() {
                   <td className="px-3 py-2">
                     <select
                       multiple
+                      aria-label={`Access groups for ${user.email}`}
                       value={user.group_ids}
                       onChange={(e) =>
                         void runUserUpdate(user.id, {
@@ -330,6 +333,7 @@ export function AdminAccessPanel() {
             required
           />
           <select
+            aria-label="Role"
             className="input-modern"
             value={newUser.role}
             onChange={(e) => setNewUser((s) => ({ ...s, role: e.target.value }))}
@@ -339,6 +343,7 @@ export function AdminAccessPanel() {
             <option value="admin">Admin</option>
           </select>
           <select
+            aria-label="Organization"
             className="input-modern"
             value={newUser.role === "admin" ? "" : newUser.organization_id}
             onChange={(e) => setNewUser((s) => ({ ...s, organization_id: e.target.value }))}
@@ -356,6 +361,7 @@ export function AdminAccessPanel() {
           </select>
           <select
             multiple
+            aria-label="Access groups"
             className="input-modern md:col-span-2"
             value={newUser.group_ids}
             onChange={(e) =>
@@ -399,6 +405,7 @@ export function AdminAccessPanel() {
                   />
                   <select
                     multiple
+                    aria-label="Workstreams"
                     className="input-modern md:col-span-2"
                     value={groupDraft.workstreams.includes("*") ? [] : groupDraft.workstreams}
                     onChange={(e) => {
@@ -479,6 +486,7 @@ export function AdminAccessPanel() {
           />
           <select
             multiple
+            aria-label="Workstreams"
             className="input-modern md:col-span-2"
             value={newGroup.workstreams.includes("*") ? [] : newGroup.workstreams}
             onChange={(e) => {
@@ -512,7 +520,8 @@ export function AdminAccessPanel() {
           User, group and password changes, SSO account provisioning, and blocked SQL.
           Report and query activity is not listed here.
         </p>
-        <ul className="mt-4 max-h-64 space-y-2 overflow-y-auto text-sm">
+        {/* scrolls, so it takes keyboard focus */}
+        <ul tabIndex={0} aria-label="Recent admin activity" className="mt-4 max-h-64 space-y-2 overflow-y-auto text-sm">
           {auditEvents.length ? (
             auditEvents.map((event) => (
               <li key={event.id} className="rounded-lg border border-edge-subtle px-3 py-2">
