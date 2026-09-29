@@ -79,7 +79,7 @@ export function DashboardListPage() {
         <div className="glass-panel p-10 text-center">
           <p className="text-sm font-medium text-heading">No dashboards yet</p>
           <p className="mx-auto mt-2 max-w-md text-sm text-fg-muted">
-            Build one from a starter template, or pin a report from the Library or Explore.
+            Build one from a starter template, or pin a report from the Library or Build.
           </p>
           <Link href="/dashboards/new" className="btn-primary mt-4 inline-block text-sm">
             Create your first dashboard

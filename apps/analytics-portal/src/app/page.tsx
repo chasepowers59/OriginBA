@@ -10,7 +10,7 @@ export default async function HomePage() {
   try {
     index = await fetchSnapshots();
   } catch (err) {
-    error = err instanceof Error ? err.message : "Failed to load snapshots";
+    error = err instanceof Error ? err.message : "Couldn't load the data sets.";
     index = {
       client: "demo",
       poc_enabled: [],

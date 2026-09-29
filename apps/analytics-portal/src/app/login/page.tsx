@@ -238,7 +238,7 @@ export default function LoginPage() {
             <span className="text-[#6aa9dd]">governed end to end</span>
           </h2>
           <p className="mt-5 max-w-md text-sm leading-relaxed text-slate-300">
-            Reporting canvases transformed from Oracle C2M and validated against your own
+            Data sets transformed from Oracle C2M and validated against your own
             live system — the numbers tie back to CIS because they are proven to, per key.
           </p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
