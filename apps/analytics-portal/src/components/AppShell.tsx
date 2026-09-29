@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { AssistantDrawer } from "./AssistantDrawer";
 import { BrandMark } from "@/components/BrandMark";
@@ -9,6 +9,8 @@ import { useAuth } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { roleLabel } from "@/lib/auth";
 import OrgSwitcher from "@/components/OrgSwitcher";
+import { getActiveOrganization } from "@/lib/auth";
+import { viewingAnotherClient } from "@/lib/orgContext";
 import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 import { isRestricted, visibleNav } from "@/lib/rowRules";
@@ -45,6 +47,11 @@ export function AppShell({
   const brand = useBrand();
   const portal = usePortalConfig();
   const { user, logout, can } = useAuth();
+  // the active-organization cookie exists only in the browser: read after hydration
+  const [otherClient, setOtherClient] = useState(false);
+  useEffect(() => {
+    setOtherClient(user?.role === "admin" && viewingAnotherClient(getActiveOrganization(), user.organization_id));
+  }, [user]);
 
   // Native <details> menus stay open until their summary is re-clicked; close
   // them on outside click and on navigation so they behave like real dropdowns.
@@ -77,12 +84,28 @@ export function AppShell({
         <div className="mx-auto flex h-16 max-w-[1700px] items-center gap-2 px-4 sm:gap-4 sm:px-6 2xl:px-10">
           <div className="flex min-w-0 items-center gap-3">
             <Link href="/" aria-label="Origin home" className="group flex shrink-0 items-center">
-              <BrandMark className="h-6 w-auto sm:h-7" />
+              {/* the mark alone on phones leaves room for the organization chip */}
+              <span className="sm:hidden"><BrandMark mark className="h-6 w-auto" /></span>
+              <span className="hidden sm:inline-flex"><BrandMark className="h-7 w-auto" /></span>
             </Link>
             <span aria-hidden className="hidden h-6 w-px bg-edge-subtle sm:block" />
             {clientLogo(portal) ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={clientLogo(portal)!} alt={portal.organization_name ?? "Client"} className="hidden h-7 w-auto sm:block" />
+            ) : null}
+            {/* Below sm the switcher is in the account menu; the chip keeps whose data this is in view. */}
+            {portal.organization_name ? (
+              <span
+                data-testid="org-chip"
+                className={`inline-flex min-w-0 max-w-[42vw] items-center gap-1.5 truncate rounded-full border px-2.5 py-1 text-xs font-medium sm:hidden ${
+ otherClient ? "border-warn bg-warn-bg text-warn" : "border-edge-subtle bg-chip text-fg"
+ }`}
+              >
+                {otherClient ? (
+                  <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-warn" />
+                ) : null}
+                <span className="truncate">{portal.organization_name}</span>
+              </span>
             ) : null}
             <div className="hidden min-w-0 sm:block">
               <OrgSwitcher role={user?.role ?? ""} homeOrganizationId={user?.organization_id ?? null} />
@@ -198,7 +221,8 @@ export function AppShell({
       </header>
 
       <div className="mx-auto max-w-[1700px] px-6 py-8 2xl:px-10">
-        <main className="min-w-0 animate-fade-in">{children}</main>
+        {/* bottom room so the floating Ask Ori button never covers the page's last content */}
+        <main className="min-w-0 animate-fade-in pb-20">{children}</main>
       </div>
       {user && !isRestricted(user) ? <AssistantDrawer /> : null}
 

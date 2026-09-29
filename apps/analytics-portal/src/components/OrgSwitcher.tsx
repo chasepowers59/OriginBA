@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getActiveOrganization, setActiveOrganization } from "../lib/auth";
+import { viewingAnotherClient } from "../lib/orgContext";
 import type { PortalOrganization } from "../lib/auth";
 
 /**
@@ -59,7 +60,7 @@ export default function OrgSwitcher({
     window.location.reload();
   }
 
-  const viewingOther = Boolean(active) && active !== (homeOrganizationId ?? "");
+  const viewingOther = viewingAnotherClient(active, homeOrganizationId);
 
   return (
     <label

@@ -22,8 +22,6 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 | 2026-09-29 | Explorer charts hide half their labels; 15-character cut makes look-alike labels | Explorer charts with >6 categories | UI-8: horizontal layout above 6 categories |
 | 2026-09-29 | Detail tables: amounts left-aligned, "Total Total Balance", invisible row hover in light theme | Explorer detail table | UI-9: right-aligned tabular numbers, no duplicate prefix, token hover |
 | 2026-09-29 | Explorer: results buried under a 3,300 px list of report cards below 1280 px; Save/Pin at the bottom of the rail | Explorer at laptop width | UI-10: titles-only rail, results first when stacked, save in the result toolbar |
-| 2026-09-29 | The floating Ask Ori button covers content, worst on phones | Every page on phone | UI-11: icon-only below md, bottom padding on main |
-| 2026-09-29 | On phones the organization switcher and the "viewing another client" warning disappear | Any page at 390 px | UI-12: org chip in the mobile header/menu |
 | 2026-09-29 | Data quality: every row shows a green "Done" that reads as a status; 10 px, ~20 px target | /data-quality | UI-13: "Mark done" button, 32 px target |
 | 2026-09-29 | Zero and single-category results look broken (dashed "No trend data", $0-$4 axis, one "Unknown" bar, "leads at 100%") | Home cards, explorer | UI-14: hide chart/insight at one category or all zeros, say so plainly |
 | 2026-09-29 | Donut colours repeat past 5 slices; nulls show as a dash | Read quality, device events | UI-15: 4 slices + Other or bars; label nulls "Not recorded" |
@@ -38,6 +36,8 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-29 | On phones the organization switcher and the "viewing another client" warning disappear | UI-12: e1ae07a8 | e2e/shell.spec.ts |
+| 2026-09-29 | The floating Ask Ori button covers content, worst on phones | UI-11: e1ae07a8 | e2e/shell.spec.ts |
 | 2026-09-29 | Every canvas declared `default_date_preset: "last_12_months"` but the explorer ignored the string and opened on an unlisted 180-day window; no date chip was ever highlighted | 72c0d1a0 | tests/fixtures/date_presets.json (both suites) |
 | 2026-09-29 | Saved-view alert values came back as Decimal; the JSON alert store would refuse them on the first real run | 8cf3cf47 | tests/test_view_alerts.py |
 | 2026-09-29 | Settings > Users & access: role, organization and group dropdowns had no accessible name; the admin activity list scrolled out of keyboard reach | b931a4b6 | e2e/a11y.spec.ts (every Settings tab) |
