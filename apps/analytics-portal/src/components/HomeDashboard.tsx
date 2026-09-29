@@ -8,6 +8,7 @@ import type { SnapshotSummary } from "@/lib/types";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
 import { ExecutiveDashboard } from "@/components/ExecutiveDashboard";
 import { NlqSearchPanel } from "@/components/NlqSearchPanel";
+import { OriFindings } from "@/components/OriFindings";
 import { AssistantPanel } from "@/components/AssistantPanel";
 import { useBrand } from "@/components/PortalThemeProvider";
 import { isRestricted } from "@/lib/rowRules";
@@ -69,9 +70,12 @@ export function HomeDashboard() {
 
       {/* The assistant writes its own SQL, which cannot carry a person's row rules. */}
       {!isRestricted(user) ? (
-        <section>
-          <AssistantPanel />
-        </section>
+        <>
+          <OriFindings />
+          <section>
+            <AssistantPanel />
+          </section>
+        </>
       ) : null}
 
       {/* One question box: with Ori present, the vetted-metric form (fixed figures, your own

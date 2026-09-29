@@ -3,14 +3,14 @@
 Built from the SAME summary the home page shows (the vetted KPI runner, compare mode), so a
 finding can never disagree with its card. A finding needs a windowed card (a balance or a
 population has no prior period), both values present, a non-zero prior, a move of at least
-25%, and enough behind it to matter: a count of at least 20 or money of at least 1,000 in
+15%, and enough behind it to matter: a count of at least 20 or money of at least 1,000 in
 either period. At most three, largest first.
 """
 from __future__ import annotations
 
 from typing import Any
 
-MIN_CHANGE_PCT = 25.0
+MIN_CHANGE_PCT = 15.0   # 25% missed Ellensburg billed revenue down 17.9% ($733K), 2026-09-29
 MIN_COUNT = 20
 MIN_MONEY = 1000.0
 MAX_FINDINGS = 3

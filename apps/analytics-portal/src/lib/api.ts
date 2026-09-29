@@ -617,3 +617,10 @@ export function importContentPack(pack: unknown, dryRun: boolean): Promise<PackI
 export function fetchSystemHealth(): Promise<SystemHealth> {
   return fetchJson("/portal/health");
 }
+
+export type OriFinding = { kpi_id: string; change_pct: number; headline: string; detail: string; question: string };
+
+/** "Ori found something worth investigating": the large moves in the home cards (api/ori_routes.py). */
+export function fetchOriFindings(): Promise<{ findings: OriFinding[] }> {
+  return fetchJson("/portal/ori/findings");
+}

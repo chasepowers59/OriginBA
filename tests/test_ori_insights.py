@@ -1,11 +1,14 @@
 """Ori's first proactive surface: "Ori found something worth investigating".
 
 From the home cards' own vetted figures (the same KPI runner the dashboard uses), compared
-with the prior period, Ori names the large moves: at least 25% up or down, with enough
+with the prior period, Ori names the large moves: at least 15% up or down, with enough
 behind it to matter (a count of at least 20, or money of at least 1,000 in either period),
 on cards that are windowed (a balance or a population has no prior period). A missing
 value, a failed card or a zero prior never becomes a finding. At most three, largest first,
 each worded in plain numbers with the question to ask Ori next.
+
+The bar is 15%: at 25% Ori stayed silent on Ellensburg's billed revenue falling 17.9%
+($3.36M vs $4.09M, measured 2026-09-29), which is exactly what a finance lead wants raised.
 """
 from __future__ import annotations
 
@@ -43,6 +46,10 @@ class FindingTests(unittest.TestCase):
         for bad in (kpi(value=None), kpi(prior_value=None), kpi(change_pct=None), kpi(error="could not connect"),
                     kpi(prior_value=0.0), kpi(compare_label=None)):
             self.assertEqual(findings({"kpis": [bad]}), [], bad)
+
+    def test_a_large_money_drop_under_a_quarter_is_raised(self):
+        [f] = findings({"kpis": [kpi(value=3359173.66, prior_value=4092306.21, change_pct=-17.9)]})
+        self.assertEqual(f["headline"], "Billed revenue is down 18% vs prior 30 days")
 
     def test_at_most_three_largest_first(self):
         cards = [kpi(id=f"k{i}", label=f"Card {i}", value=1000.0 + 100 * i, prior_value=1000.0, change_pct=10.0 * i)

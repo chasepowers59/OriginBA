@@ -17,4 +17,5 @@ export const ORI = {
   notConfigured:
     "Ori is not set up for this deployment yet (no model key). The governed metrics below still answer everyday questions.",
   worthInvestigating: "Ori found something worth investigating",
+  askWhy: "Ask Ori why",
 } as const;
