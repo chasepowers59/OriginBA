@@ -674,7 +674,9 @@ def _result_labels(snapshot: dict, columns: list[str], dimensions: list[str],
         if field == "*":
             labels[f"m{idx}"] = "Number of records"
         else:
-            labels[f"m{idx}"] = f"{_AGG_WORD.get(agg, agg.title())} {label_of(field)}"
+            word, name = _AGG_WORD.get(agg, agg.title()), label_of(field)
+            # "Total Balance" summed is "Total Balance", not "Total Total Balance"
+            labels[f"m{idx}"] = name if name.split(" ", 1)[0] == word else f"{word} {name}"
     # Anything the query returned that was not requested keeps its own name rather than
     # disappearing from the map.
     return {c: labels.get(c, field_labels.get(c, c)) for c in columns}

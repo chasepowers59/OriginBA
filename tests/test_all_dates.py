@@ -50,3 +50,14 @@ class AllDatesTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class MeasureLabelTests(unittest.TestCase):
+    """A measure whose name already starts with its aggregate's word is not prefixed twice
+    ("Total Total Balance" in the explorer and the builder)."""
+
+    def test_no_doubled_prefix(self):
+        snapshot = {"fields": [{"id": "Total Balance"}, {"id": "Billed Amount"}]}
+        labels = se._result_labels(snapshot, ["m0", "m1"], [], [{"field": "Total Balance", "agg": "sum"},
+                                                               {"field": "Billed Amount", "agg": "sum"}], [])
+        self.assertEqual((labels["m0"], labels["m1"]), ("Total Balance", "Total Billed Amount"))

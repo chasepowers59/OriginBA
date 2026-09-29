@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { isUnitOfMeasureField } from "./businessLabels";
-import { MIXED_UNITS_NOTE, summarizeResult } from "./resultSummary";
+import { MIXED_UNITS_NOTE, summarizeResult, NOT_ADDITIVE_NOTE } from "./resultSummary";
 
 /**
  * "Billed usage by unit of measure" showed a Combined total of kWh + therms + gallons and
@@ -101,5 +101,24 @@ describe("summarizeResult", () => {
       rows: [{ "Customer Class": "A", m0: 0 }], measureField: "*", measureAgg: "count",
     });
     expect(s.leader).toBeNull();
+  });
+});
+
+describe("only sums and counts add across groups", () => {
+  const rows = [{ d: "A", m0: 10 }, { d: "B", m0: 30 }];
+  const base = { columns: ["d", "m0"], rows, measureKey: "m0", dimensionKey: "d", measureField: "Days Open" };
+
+  it("a sum or count totals, with the leader's share", () => {
+    expect(summarizeResult({ ...base, measureAgg: "sum" }).total).toBe(40);
+    expect(summarizeResult({ ...base, measureField: "*", measureAgg: "count" }).leader?.share).toBe(75);
+  });
+
+  it("an average, distinct count, highest or lowest value is not totalled, and says why", () => {
+    for (const agg of ["avg", "count_distinct", "max", "min"]) {
+      const out = summarizeResult({ ...base, measureAgg: agg });
+      expect(out.total).toBeNull();
+      expect(out.leader).toBeNull();
+      expect(out.notTotalled).toBe(NOT_ADDITIVE_NOTE);
+    }
   });
 });

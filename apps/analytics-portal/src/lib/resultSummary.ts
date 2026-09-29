@@ -6,6 +6,7 @@ export function isMeasureColumn(column: string): boolean {
 }
 
 export const MIXED_UNITS_NOTE = "Not totalled: the rows are in different units.";
+export const NOT_ADDITIVE_NOTE = "Not totalled: averages, distinct counts and highest or lowest values do not add up across groups.";
 
 type ResultSummary = {
   total: number | null;
@@ -30,8 +31,9 @@ export function summarizeResult(r: {
 }): ResultSummary {
   const none: ResultSummary = { total: null, leader: null, notTotalled: null };
   if (!r.measureKey) return none;
+  if (r.measureAgg !== "sum" && r.measureAgg !== "count") return { ...none, notTotalled: NOT_ADDITIVE_NOTE };
 
-  const isQuantity = r.measureField !== "*" && r.measureAgg !== "count" && r.measureAgg !== "count_distinct"
+  const isQuantity = r.measureField !== "*" && r.measureAgg === "sum"
     && !measureDisplaysAsCurrency(r.measureField, r.measureAgg);
   const mixesUnits = isQuantity && r.columns.some((col) =>
     col !== r.measureKey
