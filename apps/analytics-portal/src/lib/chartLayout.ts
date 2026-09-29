@@ -21,8 +21,26 @@ export const SPARK_AXIS: AxisPreset = { maxColumns: 5, fontSize: 10, valueAxisWi
 /** The explorer and builder chart (UI-8). */
 export const BUILDER_AXIS: AxisPreset = { maxColumns: 6, fontSize: 11, valueAxisWidth: 68, rowLines: 2 };
 
-/** Average glyph advance of the UI sans at tick sizes, as a share of the font size; errs wide. */
+/**
+ * Glyph advance of the UI sans at tick sizes, as a share of the font size; errs wide.
+ * Capitals run wider than the 0.6 average (measured 0.68), and client codes are all
+ * capitals: at 0.6 "DISCONNECT-METER" lost its first letter on the home KPI card.
+ */
 const CHAR_EM = 0.6;
+const UPPER_EM = 0.7;
+
+/** The widest label's average advance, so a budget in characters holds every label. */
+function labelEm(labels: string[]): number {
+  return Math.max(
+    CHAR_EM,
+    ...labels.map((label) => {
+      const s = label.trim();
+      const upper = s.replace(/[^A-Z]/g, "").length;
+      return s ? CHAR_EM + ((UPPER_EM - CHAR_EM) * upper) / s.length : CHAR_EM;
+    }),
+  );
+}
+
 /** Columns narrower than this many characters cannot carry a readable label. */
 const MIN_LINE_CHARS = 8;
 /** Before the chart is measured: the budgets the fixed layouts used. */
@@ -65,7 +83,7 @@ export function chartLayout({
   horizontal?: boolean;
 }): ChartLayout {
   const note = chartNote(labels, values);
-  const charPx = fontSize * CHAR_EM;
+  const charPx = fontSize * labelEm(labels);
   const columnChars =
     width > 0 && labels.length ? Math.floor((width - valueAxisWidth) / labels.length / charPx) : null;
   const rows =

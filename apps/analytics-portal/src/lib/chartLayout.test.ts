@@ -137,6 +137,26 @@ describe("chartLayout: the explorer and builder chart (UI-8)", () => {
     expect(out.axisSize).toBeGreaterThanOrEqual(longest * charPx(BUILDER_AXIS.fontSize));
   });
 
+  it("leaves room for uppercase codes as they render, not at the average glyph", () => {
+    // Widths of the portal's tick font (Aptos stack) in Chrome, 2026-09-29. Capitals run
+    // ~0.68em against the 0.6em average, so "DISCONNECT-METER" was clipped on home.
+    const rendered: Record<number, Record<string, number>> = {
+      10: { "DISCONNECT-METER": 103.9, "ERT-EXCHANGE-W": 91.8, "SUB-CORRECT": 72.6, "MIMO-R": 39.4 },
+      11: { "DISCONNECT-METER": 114.3, "ERT-EXCHANGE-W": 101, "SUB-CORRECT": 79.9, "MIMO-R": 43.4 },
+    };
+    // recharts draws a row label tickSize (6) + tickMargin (2) inside the axis edge.
+    const TICK_OFFSET = 8;
+    for (const preset of [SPARK_AXIS, BUILDER_AXIS]) {
+      const labels = [...Object.keys(rendered[preset.fontSize]), "A", "B", "C"];
+      const out = chartLayout({ ...preset, width: 600, labels, values: labels.map((_, i) => i + 1) });
+      expect(out.orientation).toBe("horizontal");
+      for (const [label, px] of Object.entries(rendered[preset.fontSize])) {
+        expect(out.tickLines[labels.indexOf(label)]).toEqual([label]);
+        expect(out.axisSize).toBeGreaterThanOrEqual(px + TICK_OFFSET);
+      }
+    }
+  });
+
   it("decides by count alone before the chart has been measured", () => {
     const out = chartLayout({ ...BUILDER_AXIS, width: 0, labels: CLASSES.slice(0, 3), values: [1, 2, 3] });
     expect(out.orientation).toBe("vertical");
