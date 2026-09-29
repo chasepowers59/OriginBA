@@ -1,0 +1,104 @@
+# Which letter each C2M template / contact type is, and the words each client's letters carry.
+# Ported from the letter-print app's specs/letters.yml (api/letters/catalog.py reads it).
+# Template and contact-type codes are CLIENT CONFIGURED; a client whose codes differ adds them
+# here or relies on the regex fallbacks and the contact type description.
+kinds:
+  # The CIR-* templates are the Origin standard configuration, present at all five 25.4 clients
+  # (measured from their own CI_LETTER_TMPL). The CM04*/LTR-*/BADDEBT* entries are per-client
+  # customs listed so they classify correctly wherever they exist. A template not listed here still
+  # prints, as a generic collections letter, when its contact is in a collections class.
+  reminder:
+    templates: [CIR-REG-REM, CIR-OD-REM, CIR-RISKYREM, CIR-LRG-REM, CIR-CHA-REM, CIR-LS-REM, CIR-PAY-REM,
+                CM04LATENOTC, CM04INV1NOTC, CM04INA1NOTC]
+    contact_types: [REG-REMINDER, ODBIL-REMIND, RSKY-REMINDR, LRGE-REMINDR, CHAR-REMINDR, LIFESUP-REM,
+                    PAY-REMINDER, LATEPAY, FIRSTNOTICE, INVOICELATE]
+  deposit:
+    templates: [CIR-DEP-REM, DEPCHARGED, DEPWARN]
+    contact_types: [DEP-REMINDER, DEP-TODO, DEPOSIT]
+  payment_plan:                      # budget / payment arrangement gone off track
+    templates: [CIR-BUD-REM, CM04BUDGTREM, LTR-BUDGET, LTR-BUDUP]
+    contact_types: [BUD-REMINDER, CAN-BUDGET, BREAK-PA, PA-REQ, PP-REQ]
+  disconnect:                        # a WARNING before the cut; upgraded to "disconnected" by the data
+    templates: [CIR-OD-DISC, CM04SVCDCNTF, SHUTOFFGOOD, SHUTOFFPOOR, CIR-SP-DISCN]
+    contact_types: [DISCWARNING, DISCON-WARN, DISCONNECTED, DISCON-LETTR, SVC-DISCONN]
+  lien:                              # how unpaid debt ends where there is no collection agency:
+                                     # Fond du Lac certifies it to the property TAX ROLL, Newark liens
+    templates: [TXRLLTR, TXRLLLLTR, TXLLLTRWO, TXRLLLWO, CM-DELINQ, CM04-DELINQ, DELQ1]
+    contact_types: [TXRLLTR, TXRLLLLTR, TXLLLTRWO, TXRLLLWO, TAXROLL, LIEN]
+  final_notice:
+    templates: [CIR-AGY-WARN, CM04INVFNOTC, CM04INALNOTC, BADDEBT, BADDEBT2]
+    contact_types: [AGENCY-WARN, FINAL-NOTICE, LASTNOTICE, DELINQUENT, WRITE-OFF, INVOICEFINAL]
+  nsf:
+    templates: [CIR-NSF, RTNCHECK]
+    contact_types: [NSF, RETURNED-PAY]
+  cash_only:
+    templates: [CIR-CASHONLY]
+    contact_types: [CASHONLY, CASH-ONLY]
+  autopay_ended:
+    templates: [CIR-STAPYNSF]
+    contact_types: [APAY-TERM, STOP-AUTOPAY, STOP-APAYNTC]
+  not_a_letter:                      # logged as a contact, never posted: a dialer call, a hand-hung door tag
+    templates: [CIR-AUTOCALL, CM04DOORTAG]
+    contact_types: [AUTOCALL, DOORTAG, DOOR-TAG]
+# Fallbacks for a code not listed above: the FIRST regex that matches the CONTACT TYPE wins, then
+# the contact type DESCRIPTION, then the template code. A client whose codes are all local
+# (CityCorp's SHUTOFFGOOD, BADDEBT2) still classifies without an entry per code.
+patterns:
+  - {kind: disconnect,    regex: "(?i)disc|sever|\\bcut\\b|shut"}
+  - {kind: lien,          regex: "(?i)tax.?roll|lien"}
+  - {kind: autopay_ended, regex: "(?i)auto ?pay|apay"}
+  - {kind: final_notice,  regex: "(?i)agency|final|write.?off|delinq|bad.?debt|last.?notice"}
+  - {kind: nsf,           regex: "(?i)nsf|\\brtn|return"}
+  - {kind: cash_only,     regex: "(?i)cash.?only"}
+  # A plan letter has to be about the plan going WRONG. "Non-billed budget activated" is a welcome,
+  # not a delinquency, and the bare word "budget" swept it in.
+  - {kind: payment_plan,  regex: "(?i)(budget|payment ?(plan|arrangement)).{0,24}(late|remind|notice|miss|break|cancel|past.?due)|\\bpa-req|\\bpp-req"}
+  - {kind: deposit,       regex: "(?i)\\bdep"}
+  - {kind: reminder,      regex: "(?i)rem|overdue|collect|notice|past.?due|late"}
+
+# Only credit & collections contacts are letters: a contact whose template resolves to a kind
+# above, or an unknown template in one of these contact classes.
+collection_contact_classes: [C&C]
+# A severance event that actually CUTS service. Measured on demo25: the "disconnect letter" event
+# fires two days AFTER the cut event, so a letter whose process already has a COMPLETED cut is a
+# "your service has been disconnected" letter, and one whose cut is still ahead is a WARNING.
+# Codes are client configured; the regex is matched against the event type code and its ENG
+# description, so base-product wording resolves at a client with other codes.
+severance_cut_events:
+  codes: [CUT-NONPAY, SEV-CUT, CUT-SERV]
+  regex: "(?i)\\bcut\\b|disconnect service|shut ?off"
+# Late payment charges are ADJUSTMENTS (CI_ADJ), not customer contacts; a late-fee letter is
+# generated per frozen adjustment of these types in the window.
+late_fee_adjustment_types: [LPC]
+defaults:
+  client_name: ""                    # the letterhead wordmark; the organization's display name when empty
+  disconnect_grace_days: 10          # cut-off when no pending severance event carries a date
+  reconnect_fee: 0                   # 0 = the sentence about the fee is left out
+  contact_phone: ""                  # letterhead, contact line, "by phone" payment option
+  payment_url: ""                    # letterhead, "online" payment option
+  office_hours: ""
+  utility_address: []                # letterhead lines, the "in person" option and the return address in the window
+  remit_address: []                  # "Mail payments to" on the stub; the utility address when empty
+  payee: ""                          # "check payable to"
+  department: "Credit & Collections" # signature block
+  signature: "Customer Service"
+  notes: []                          # small print: assistance programs, disputes, medical certification
+  lien_action: "recorded as a lien against the property"   # Fond du Lac: "placed on the property tax roll"
+  logo: ""                           # the client's OFFICIAL artwork only (phase 2); the wordmark prints when empty
+  brand_color: "006FAC"              # headings, rules, amounts (Origin Sapphire by default)
+  accent_color: ""                   # the call-to-action bar and the glance box rule; the brand colour when empty
+clients:                             # per-client overrides of the defaults, by organization id
+  demo25:                            # the demo database's utility: every value here is invented
+    client_name: "Demo Utility"
+    contact_phone: "(555) 555-0100"
+    payment_url: "https://pay.example.org"
+    reconnect_fee: 35.00
+    office_hours: "Monday to Friday, 8 a.m. to 5 p.m."
+    utility_address: ["Utility Billing Office", "200 Main Street", "Beaumont, TX 77707"]
+    remit_address: ["Demo Utility", "PO Box 1000", "Beaumont, TX 77704-1000"]
+    payee: "Demo Utility"
+    signature: "Customer Accounts Team"
+    notes:
+      - "Payment assistance: if you are experiencing hardship, ask us about payment arrangements, budget billing and local assistance programs before the date in this notice."
+      - "If you believe this notice is in error or have already paid, call us so we can review your account; a disputed amount is not subject to disconnection while under review."
+      - "Customers with a medical condition requiring continuous service may qualify for a temporary delay of disconnection with a physician's certification."
