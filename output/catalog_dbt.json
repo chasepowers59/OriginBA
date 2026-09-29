@@ -6581,6 +6581,22 @@
    "workstream_label": "Billing & Rates"
   },
   "rpt_billed_charge": {
+   "aggregate": {
+    "build_column": "Canvas Build",
+    "count": "Record Count",
+    "date": "Bill Date",
+    "dimensions": [
+     "Customer Class",
+     "Budget Plan",
+     "Service Type",
+     "Is Frozen",
+     "Is Cancelled"
+    ],
+    "measures": {
+     "Billed Amount": "sum"
+    },
+    "table": "agg_billed_charge_daily"
+   },
    "data_model": {
     "columns_traced_to_cisadm": 53,
     "domain_table": "rpt_billed_charge",
@@ -24756,6 +24772,8 @@
        "Start Reason",
        "Stop Reason",
        "Characteristic Premise ID",
+       "Premise Characteristics",
+       "Premise Characteristic Count",
        "Snapshot Date",
        "Snapshot Type Code",
        "Current Balance",
@@ -24850,6 +24868,13 @@
       "on": "da.acct_id = sa.acct_id",
       "role": "model",
       "table": "dim_account"
+     },
+     {
+      "alias": "pch",
+      "join_type": "left join",
+      "on": "pch.prem_id = sa.characteristic_prem_id",
+      "role": "step",
+      "table": "premise_characteristics"
      }
     ],
     "population_filter": null,
@@ -24871,6 +24896,7 @@
     "trusted_measures": [
      "Consecutive Estimated Bills",
      "Days Pending",
+     "Premise Characteristic Count",
      "Current Balance",
      "Total Balance",
      "New Charge Balance",
@@ -25009,6 +25035,10 @@
     {
      "id": "Characteristic Premise ID",
      "label": "Characteristic Premise ID"
+    },
+    {
+     "id": "Premise Characteristics",
+     "label": "Premise Characteristics"
     },
     {
      "id": "Snapshot Type Code",
@@ -25293,6 +25323,22 @@
      "type": "text"
     },
     {
+     "description": "",
+     "group": "billing",
+     "id": "Premise Characteristics",
+     "label": "Premise Characteristics",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Pre-aggregated count, additive at this canvas's grain.",
+     "group": "billing",
+     "id": "Premise Characteristic Count",
+     "label": "Premise Characteristic Count",
+     "role": "measure",
+     "type": "bigint"
+    },
+    {
      "description": "Date.",
      "group": "billing",
      "id": "Snapshot Date",
@@ -25573,6 +25619,16 @@
       "min",
       "max"
      ],
+     "id": "Premise Characteristic Count",
+     "label": "Premise Characteristic Count"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
      "id": "Current Balance",
      "label": "Current Balance"
     },
@@ -25734,6 +25790,7 @@
    "trusted_measures": [
     "Consecutive Estimated Bills",
     "Days Pending",
+    "Premise Characteristic Count",
     "Current Balance",
     "Total Balance",
     "New Charge Balance",
