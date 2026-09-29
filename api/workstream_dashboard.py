@@ -16,6 +16,10 @@ from api.kpi_runner import date_windows, execute_kpi_definition
 from api.snapshot_catalog import load_catalog
 
 
+CHARGE_FTS = [{"field": "Is Frozen", "op": "eq", "value": True},
+              {"field": "Is Payment", "op": "eq", "value": False},
+              {"field": "Is Payment Cancellation", "op": "eq", "value": False}]
+
 WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
     # DBT-CANVAS section dashboards (2026-08-26): every snapshot is a governed
     # reporting canvas (schema=reporting -> per-tenant warehouse routing). These are
@@ -202,13 +206,15 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
                    "filters": [], "limit": 6}},
     ],
     "finance": [
-        {"id": "frozen_charge_fts", "label": "Frozen charge FTs", "subtitle": "Bill segments + adjustments",
+        # Bill segments and adjustments net of their cancellations; payments are not charges
+        # (summing every FT showed -$414K at Ellensburg for $3.24M of charges, 2026-09-29).
+        {"id": "frozen_charge_fts", "label": "Frozen charge FTs", "subtitle": "Bill segments + adjustments, net of cancellations",
          "snapshot_id": "rpt_financial_txn", "format": "currency", "workstream": "finance",
          "explore_report_id": None, "date_field": "Accounting Date",
          "value": {"dimensions": [], "measures": [{"field": "Current Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Frozen", "op": "eq", "value": True}]},
+                   "filters": CHARGE_FTS},
          "trend": {"dimensions": ["FT Type"], "measures": [{"field": "Current Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Frozen", "op": "eq", "value": True}], "limit": 6}},
+                   "filters": CHARGE_FTS, "limit": 6}},
         {"id": "adjustments", "label": "Adjustment dollars", "subtitle": "Frozen adjustments in the period",
          "snapshot_id": "rpt_financial_txn", "format": "currency", "workstream": "finance",
          "explore_report_id": None, "date_field": "Accounting Date",

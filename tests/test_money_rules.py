@@ -48,5 +48,27 @@ class MoneyRuleTests(unittest.TestCase):
                 self.assertEqual(missing_money_filters(m.snapshot_id, q), [])
 
 
+# The one sum over every FT type on purpose: its label says it is the net of everything posted.
+ALL_TYPES_NET = {"frozen_ft_dollars"}
+FT_TYPE_FIELDS = {"Is Bill Segment", "Is Bill Cancellation", "Is Adjustment", "Is Adjustment Cancellation",
+                  "Is Payment", "Is Payment Cancellation", "FT Type Code"}
+
+
+class TransactionTypeTests(unittest.TestCase):
+    """A card summing financial transactions says which types. Ellensburg 2026-09-29: Finance's
+    "Frozen charge FTs -- Bill segments + adjustments" summed every frozen FT, payments too, and
+    showed -$414K for 30 days whose bill segments and adjustments net to $3.24M."""
+
+    def test_every_money_sum_over_transactions_names_its_types(self):
+        cards = [*EXECUTIVE_KPIS, *(k for ks in WORKSTREAM_KPIS.values() for k in ks)]
+        queries = [(k["id"], k["value"]) for k in cards if k["snapshot_id"] == "rpt_financial_txn"]
+        queries += [(m.id, m.build({})["query"]) for m in METRICS
+                    if m.snapshot_id == "rpt_financial_txn" and m.id not in ALL_TYPES_NET]
+        for kid, q in queries:
+            if any(meas.get("agg") == "sum" for meas in q.get("measures") or []):
+                with self.subTest(kpi=kid):
+                    self.assertTrue({f["field"] for f in q.get("filters") or []} & FT_TYPE_FIELDS)
+
+
 if __name__ == "__main__":
     unittest.main()
