@@ -77,10 +77,13 @@ class AlertQueryFailureTests(unittest.TestCase):
         self.assertIn("not been built", updates[-1]["last_status"].lower())
         self.assertNotIn("ORA-", updates[-1]["last_status"])
 
-    def test_a_genuine_no_data_answer_is_still_not_a_breach(self):
-        """value None with NO error is an honest empty window, and stays quiet."""
+    def test_a_genuine_no_data_answer_is_not_a_breach_nor_an_all_clear(self):
+        """value None with NO error is an honest empty window: it stays quiet, and it does not
+        reset a breach, or the next working run re-notifies for a condition that never cleared."""
         results, updates, sent = self._run({"value": None, "pct_change": None, "error": None})
-        self.assertEqual(results[0]["status"], "ok")
+        self.assertEqual(results[0]["status"], "no-data")
+        self.assertEqual(updates[-1]["last_state"], "breached")
+        self.assertNotIn("ok at None", updates[-1]["last_status"])
         self.assertEqual(sent, [])
 
     def test_a_working_query_still_notifies_on_the_transition(self):
