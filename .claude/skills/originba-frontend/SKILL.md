@@ -564,3 +564,11 @@ will be Ori too, so they never need renaming.
   from `ORI`; one follow-up question to Ori.
 - Code identifiers (`AssistantPanel`, `/portal/assistant`, `ASSISTANT_*` env keys) keep their
   names: renaming them buys nothing and breaks deployments.
+
+## Breakdowns use the name column, never the code (2026-09-29)
+
+A card, workstream tile or vetted metric groups by "X", never "X Code": codes are client
+configuration (DNP, SENT, SUB-CORRECT) and mean nothing to a reader. The dbt canvases
+carry the name beside every code (falling back to the code when the client never named
+it). tests/test_kpi_breakdowns.py fails any breakdown on a column ending " Code" or
+described "Code configured by this utility".
