@@ -18,4 +18,4 @@ COPY config ./config
 ENV PORT=8000
 # Concurrency comes from the DB pools, not many workers per machine. Scale out
 # with more Fly machines behind the anycast address, not more workers per pod.
-CMD ["sh", "-c", "uvicorn api.app:app --host 0.0.0.0 --port ${PORT} --workers 2"]
+CMD ["sh", "-c", "uvicorn api.app:app --host 0.0.0.0 --port ${PORT} --workers 2 --no-access-log"]

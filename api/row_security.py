@@ -112,7 +112,9 @@ def _user_record(email: str) -> dict[str, Any] | None:
         if user is None:
             return None
         import json
-        return {"is_active": user.is_active, "role": user.role,
+
+        from api.auth.service import _workstreams_for_user
+        return {"is_active": user.is_active, "role": user.role, "workstreams": _workstreams_for_user(user),
                 "row_rules": json.loads(user.row_rules_json) if user.row_rules_json else []}
 
 
@@ -126,3 +128,19 @@ def creator_rules(email: str, stored: Iterable[dict[str, Any]] | None) -> tuple:
     if record is None or not record["is_active"]:
         raise RowAccessDenied("The person who set this up no longer has access, so it no longer runs.")
     return () if record["role"] == "admin" else tuple(record["row_rules"])
+
+
+def creator_can_read(email: str, snapshot_id: str, organization_id: str | None) -> bool:
+    """Whether the person who set something up may STILL open this canvas: their current
+    workstream grants, like their current row rules. Without sign-in (local development) yes."""
+    if auth_disabled():
+        return True
+    record = _user_record(email)
+    if record is None or not record["is_active"]:
+        return False
+    if record["role"] == "admin":
+        return True
+    from api.auth.service import workstreams_allowed
+    from api.auth.workstream_access import snapshot_workstream
+    return workstreams_allowed(record.get("workstreams") or [], snapshot_workstream(snapshot_id, organization_id))
+

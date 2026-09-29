@@ -24,8 +24,10 @@ from api.reporting_dates import data_as_of
 
 log = logging.getLogger("originba.api")
 INTERVAL_SECONDS = 60
+MAX_ATTEMPTS = 3   # passes per build stamp before a failing warm waits for the next rebuild
 WARM_MIN_ROWS = 1_000_000
 _warmed: dict[str, str] = {}
+_attempts: dict[str, tuple[str, int]] = {}
 _last: dict[str, dict[str, Any]] = {}
 _started = threading.Event()
 
@@ -71,7 +73,11 @@ def warm_once(org_id: str) -> list[str]:
     version = data_version(org_id)
     if not version or _warmed.get(org_id) == version:
         return []
-    _warmed[org_id] = version
+    seen, tries = _attempts.get(org_id, ("", 0))
+    tries = tries + 1 if seen == version else 1
+    if tries > MAX_ATTEMPTS:
+        return []
+    _attempts[org_id] = (version, tries)
     jobs = [("home", lambda: cached_home_summary(org_id, 30, False, "prior_period", [], ["*"], {}, ()))]
     jobs += [(ws, lambda ws=ws: cached_workstream_summary(org_id, ws, 30, False, "prior_period", [], ()))
              for ws in _workstreams(org_id)]
@@ -88,7 +94,9 @@ def warm_once(org_id: str) -> list[str]:
             failed.append(name)
             log.warning("cache warm %s %s failed: %s", org_id, name, exc)
     _last[org_id] = {"at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "version": version,
-                     "built": built, "failed": failed}
+                     "built": built, "failed": failed, "attempt": tries}
+    if not failed:   # a pass with a failure is tried again on the next pass
+        _warmed[org_id] = version
     return built
 
 
@@ -105,9 +113,19 @@ def _organizations() -> list[str]:
 
 
 def _loop(stop: threading.Event) -> None:
+    # nothing may end this thread: an error in one organization's pass is logged and the rest go on
     while not stop.wait(INTERVAL_SECONDS):
-        for org_id in _organizations():
-            built = warm_once(org_id)
+        try:
+            orgs = _organizations()
+        except Exception as exc:  # noqa: BLE001
+            log.warning("cache warm: organizations unreadable: %s", exc)
+            continue
+        for org_id in orgs:
+            try:
+                built = warm_once(org_id)
+            except Exception as exc:  # noqa: BLE001
+                log.warning("cache warm %s failed: %s", org_id, exc)
+                continue
             if built:
                 log.info("cache warmed org=%s pages=%s", org_id, ",".join(built))
 
@@ -120,4 +138,5 @@ def start(stop: threading.Event) -> None:
 
 def reset() -> None:
     _warmed.clear()
+    _attempts.clear()
     _last.clear()

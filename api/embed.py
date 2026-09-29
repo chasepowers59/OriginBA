@@ -10,7 +10,7 @@ frame the embed page is the web app's EMBED_ALLOWED_ORIGINS (frame-ancestors).
 from __future__ import annotations
 
 import time
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any
 
 import jwt
@@ -19,8 +19,11 @@ from pydantic import BaseModel, Field
 
 from api.auth.config import jwt_secret
 from api.auth.dependencies import AuthContext, require_permission
+from api.auth.workstream_access import assert_snapshot_access
+from api.date_presets import saved_window
 from api.ownership import require_edit
-from api.row_security import RowAccessDenied, creator_rules, row_filters
+from api.reporting_dates import data_as_of
+from api.row_security import RowAccessDenied, creator_can_read, creator_rules, row_filters
 from api.saved_views import list_saved_views
 from api.data_version import data_version
 from api.summary_cache import cached
@@ -48,6 +51,9 @@ def create_embed_token(body: EmbedTokenRequest,
     require_edit(view, ctx, "Saved view")
     if view.get("visibility") == "private":
         raise HTTPException(status_code=400, detail="A private view cannot be embedded; share it with your organization first.")
+    # an ownerless legacy view is editable by any writer, so the grant is what stops publishing
+    # a canvas this person may not open
+    assert_snapshot_access(ctx, view["snapshot_id"])
     now = int(time.time())
     exp = now + min(body.ttl_minutes, MAX_TTL_MINUTES) * 60
     token = jwt.encode({"purpose": PURPOSE, "org": org_id, "view": view["id"], "rules": list(ctx.row_rules),
@@ -56,6 +62,24 @@ def create_embed_token(body: EmbedTokenRequest,
     record_access_event(actor_email=ctx.email, actor_id=ctx.id, action="embed_token_created",
                         target_type="saved_view", target_id=view["id"], detail=f"expires {exp}")
     return {"token": token, "expires_at": datetime.fromtimestamp(exp, timezone.utc).isoformat()}
+
+
+def _view_filters(view: dict[str, Any], snapshot: dict[str, Any], org_id: str) -> list[dict[str, Any]]:
+    """The view as its creator saved it: its window (a named one stays relative to the data's end),
+    its scope, its ready-to-run report's own filters and its saved filters with a value."""
+    field = snapshot.get("default_date_field") or ((snapshot.get("date_fields") or [{}])[0] or {}).get("id")
+    anchored = data_as_of(org_id)
+    window = saved_window(view.get("date_preset"), view.get("date_start"), view.get("date_end"),
+                          date.fromisoformat(anchored) if anchored else date.today()) if field else None
+    out = [{"field": field, "op": "between", "value": window}] if window else []
+    if view.get("scope_field") and view.get("scope_value") not in (None, ""):
+        out.append({"field": view["scope_field"], "op": "eq", "value": view["scope_value"]})
+    report = next((r for r in snapshot.get("premade_reports") or [] if r.get("id") == view.get("report_id")), None)
+    out += list((report or {}).get("filters") or [])
+    # an unanswered parameter narrows nothing; a saved range on the windowed date gives way to the window
+    out += [{"field": f["field"], "op": f["op"], "value": f["value"]} for f in view.get("filters") or []
+            if f.get("value") not in (None, "") and not (window and f.get("field") == field)]
+    return out
 
 
 def _claims(token: str) -> dict[str, Any]:
@@ -80,6 +104,8 @@ def embed_data(token: str) -> dict[str, Any]:
     if view is None or view.get("visibility") == "private":
         raise HTTPException(status_code=404, detail="This view is no longer available.")
     snapshot = get_snapshot(view["snapshot_id"], org_id)
+    if not creator_can_read(claims.get("by", ""), view["snapshot_id"], org_id):
+        raise HTTPException(status_code=403, detail="The person who shared this view can no longer open it, so it no longer shows.")
     try:
         # The creator's CURRENT rules: restricting or deactivating them reaches their embeds.
         rules = row_filters(creator_rules(claims.get("by", ""), claims.get("rules")), snapshot)
@@ -87,9 +113,7 @@ def embed_data(token: str) -> dict[str, Any]:
         raise HTTPException(status_code=403, detail=str(exc)) from exc
     measures = view.get("measures") or [{"field": view.get("measure_field") or "*",
                                          "agg": view.get("measure_agg") or "count"}]
-    # The saved filters at their saved values (an unanswered parameter narrows nothing).
-    filters = [{"field": f["field"], "op": f["op"], "value": f["value"]} for f in view.get("filters") or []
-               if f.get("value") not in (None, "")]
+    filters = _view_filters(view, snapshot, org_id)
     _, dialect, schema = snapshot_backend(snapshot, org_id)
     sql, binds = build_query(table_name=snapshot["table_name"], allowed_fields=allowed_fields(snapshot),
                              trusted_measures=set(snapshot.get("trusted_measures") or []),
