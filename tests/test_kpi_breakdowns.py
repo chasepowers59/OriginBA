@@ -10,6 +10,7 @@ and Field Task Type (eight: DNP 737, MIMO-R 636, ...), measured on the last 30 d
 """
 from __future__ import annotations
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -71,6 +72,25 @@ class BreakdownTests(unittest.TestCase):
         for kpi in _cards():
             for d in (kpi.get("trend") or {}).get("dimensions") or []:
                 self.assertNotIn((kpi["snapshot_id"], d), MEASURED_CONSTANT, kpi["id"])
+
+    def test_every_breakdown_reads_as_names_not_client_codes(self):
+        # Ellensburg, 2026-09-29: Field activities drew DNP, MIMO-R, ERT-EXCHANGE-W and Usage
+        # transactions SENT, SUB-CORRECT, ISSUE-DETD -- codes each client configures differently.
+        # The dictionary marks every such column "Code configured by this utility" and pairs
+        # it with a name column; a breakdown must use the name.
+        from api.nlq_metrics import METRICS
+        snaps = json.loads((ROOT / "output" / "catalog_dbt.json").read_text())["snapshots"]
+        axes = [(k["snapshot_id"], d, k["id"]) for k in _cards()
+                for d in (k.get("trend") or {}).get("dimensions") or []]
+        axes += [(m.snapshot_id, d, m.id) for m in METRICS
+                 for d in (m.build({}).get("query") or {}).get("dimensions") or []]
+        self.assertTrue(axes)
+        for snap, dim, owner in axes:
+            fields = {f["id"]: f for f in snaps[snap]["fields"]}
+            self.assertIn(dim, fields, f"{owner}: {dim} is not a column of {snap}")
+            self.assertFalse(dim.endswith(" Code"), f"{owner} breaks down by the code {dim}")
+            self.assertNotIn("Code configured by this utility", fields[dim].get("description") or "",
+                             f"{owner} breaks down by {dim}, a client code column")
 
 
 if __name__ == "__main__":

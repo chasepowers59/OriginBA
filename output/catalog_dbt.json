@@ -1238,7 +1238,7 @@
      "id": "Location Level 2",
      "label": "Location Level 2",
      "role": "dimension",
-     "type": "text"
+     "type": "character varying"
     },
     {
      "description": "Level 3 of the W1_NODE location hierarchy, flattened for reporting. Null when the node sits shallower than level 3. Falls back to the node id when the node has no description.",
@@ -1246,7 +1246,7 @@
      "id": "Location Level 3",
      "label": "Location Level 3",
      "role": "dimension",
-     "type": "text"
+     "type": "character varying"
     },
     {
      "description": "Level 4 of the W1_NODE location hierarchy, flattened for reporting. Null when the node sits shallower than level 4. Falls back to the node id when the node has no description.",
@@ -1254,7 +1254,7 @@
      "id": "Location Level 4",
      "label": "Location Level 4",
      "role": "dimension",
-     "type": "text"
+     "type": "character varying"
     },
     {
      "description": "Level 5 of the W1_NODE location hierarchy, flattened for reporting. Null when the node sits shallower than level 5. Falls back to the node id when the node has no description.",
@@ -1262,7 +1262,7 @@
      "id": "Location Level 5",
      "label": "Location Level 5",
      "role": "dimension",
-     "type": "text"
+     "type": "character varying"
     },
     {
      "description": "First address line of the asset location.",
@@ -12993,12 +12993,12 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
      "group": "debt",
      "id": "Linked Collection Process ID",
      "label": "Linked Collection Process ID",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "",
@@ -13006,7 +13006,7 @@
      "id": "Write-Off Control",
      "label": "Write-Off Control",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"SA Debt Status\" for the description: report on the description, filter on the code.",
@@ -13500,6 +13500,7 @@
        "Switched Off Since Date/Time",
        "Days Switched Off",
        "Switch-Off Field Task Type",
+       "Switch-Off Field Task Type Code",
        "Installation Constant",
        "Device Config ID",
        "Service Point ID",
@@ -13887,6 +13888,10 @@
     {
      "id": "Switch-Off Field Task Type",
      "label": "Switch-Off Field Task Type"
+    },
+    {
+     "id": "Switch-Off Field Task Type Code",
+     "label": "Switch-Off Field Task Type Code"
     },
     {
      "id": "Device Config ID",
@@ -14311,6 +14316,14 @@
      "group": "assets",
      "id": "Switch-Off Field Task Type",
      "label": "Switch-Off Field Task Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Switch-Off Field Task Type\" for the description: report on the description, filter on the code.",
+     "group": "assets",
+     "id": "Switch-Off Field Task Type Code",
+     "label": "Switch-Off Field Task Type Code",
      "role": "dimension",
      "type": "text"
     },
@@ -15793,20 +15806,20 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
      "group": "field_ops",
      "id": "Rule Code",
      "label": "Rule Code",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
-     "description": "",
+     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
      "group": "field_ops",
      "id": "VEE Group Code",
      "label": "VEE Group Code",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "",
@@ -15825,12 +15838,12 @@
      "type": "varchar(60)"
     },
     {
-     "description": "",
+     "description": "Base-product code, fixed by Oracle and the same at every utility. Paired with \"Severity\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Severity Code",
      "label": "Severity Code",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "English description of \"Open/Closed Code\". Group and report on this; filter on the code.",
@@ -15841,12 +15854,12 @@
      "type": "varchar(60)"
     },
     {
-     "description": "",
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Open/Closed\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Open/Closed Code",
      "label": "Open/Closed Code",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "Flag. Filter on it; do not sum it.",
@@ -15881,12 +15894,12 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "MDM measuring component. The hinge between a device and its measurements -- a device can carry several (kWh delivered, kWh received, demand).",
      "group": "field_ops",
      "id": "Measuring Component ID",
      "label": "Measuring Component ID",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
@@ -15905,12 +15918,12 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The MDM-side service point. Bridged to the CIS service point through D1_SP_IDENTIFIER at SP_ID_TYPE_FLG = 'D1EI'; the two systems do not share a key.",
      "group": "field_ops",
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
@@ -16057,12 +16070,12 @@
      "type": "varchar(60)"
     },
     {
-     "description": "",
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
      "group": "field_ops",
      "id": "Usage ID",
      "label": "Usage ID",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -16198,14 +16211,19 @@
        "Activity Type",
        "Activity Type Code",
        "Activity Category Code",
+       "Field Activity Type",
        "Field Activity Type Code",
+       "Activity Status",
        "Activity Status Code",
        "Activity Status Reason Code",
        "Completed Code",
        "Current Error State",
        "Field Task Type",
+       "Field Task Type Code",
        "Cancel Reason",
+       "Cancel Reason Code",
        "Reschedule Reason",
+       "Reschedule Reason Code",
        "Event Date/Time",
        "Start Event Date/Time",
        "Stop Event Date/Time",
@@ -16272,6 +16290,41 @@
       "on": "lvpr.field_name='FA_PRIORITY_FLG' and lvpr.field_value = f.fa_priority_cd",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "fat",
+      "join_type": "left join",
+      "on": "fat.fa_type_cd = f.fa_type_cd",
+      "role": "model",
+      "table": "stg_fa_type_label"
+     },
+     {
+      "alias": "st",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_bo_status_label"
+     },
+     {
+      "alias": "tk",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_ext_lookup_value_label"
+     },
+     {
+      "alias": "cr",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_ext_lookup_value_label"
+     },
+     {
+      "alias": "rr",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_ext_lookup_value_label"
      }
     ],
     "population_filter": null,
@@ -16353,8 +16406,16 @@
      "label": "Activity Category Code"
     },
     {
+     "id": "Field Activity Type",
+     "label": "Field Activity Type"
+    },
+    {
      "id": "Field Activity Type Code",
      "label": "Field Activity Type Code"
+    },
+    {
+     "id": "Activity Status",
+     "label": "Activity Status"
     },
     {
      "id": "Activity Status Code",
@@ -16377,12 +16438,24 @@
      "label": "Field Task Type"
     },
     {
+     "id": "Field Task Type Code",
+     "label": "Field Task Type Code"
+    },
+    {
      "id": "Cancel Reason",
      "label": "Cancel Reason"
     },
     {
+     "id": "Cancel Reason Code",
+     "label": "Cancel Reason Code"
+    },
+    {
      "id": "Reschedule Reason",
      "label": "Reschedule Reason"
+    },
+    {
+     "id": "Reschedule Reason Code",
+     "label": "Reschedule Reason Code"
     },
     {
      "id": "Number of Retries",
@@ -16523,7 +16596,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Field Activity Type Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "Field Activity Type",
+     "label": "Field Activity Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Field Activity Type\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Field Activity Type Code",
      "label": "Field Activity Type Code",
@@ -16531,7 +16612,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Activity Status Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "Activity Status",
+     "label": "Activity Status",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Activity Status\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Activity Status Code",
      "label": "Activity Status Code",
@@ -16563,7 +16652,7 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "English description of \"Field Task Type Code\". Group and report on this; filter on the code.",
      "group": "field_ops",
      "id": "Field Task Type",
      "label": "Field Task Type",
@@ -16571,7 +16660,15 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Field Task Type\" for the description: report on the description, filter on the code.",
+     "group": "field_ops",
+     "id": "Field Task Type Code",
+     "label": "Field Task Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Cancel Reason Code\". Group and report on this; filter on the code.",
      "group": "field_ops",
      "id": "Cancel Reason",
      "label": "Cancel Reason",
@@ -16579,10 +16676,26 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Cancel Reason\" for the description: report on the description, filter on the code.",
+     "group": "field_ops",
+     "id": "Cancel Reason Code",
+     "label": "Cancel Reason Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Reschedule Reason Code\". Group and report on this; filter on the code.",
      "group": "field_ops",
      "id": "Reschedule Reason",
      "label": "Reschedule Reason",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Reschedule Reason\" for the description: report on the description, filter on the code.",
+     "group": "field_ops",
+     "id": "Reschedule Reason Code",
+     "label": "Reschedule Reason Code",
      "role": "dimension",
      "type": "text"
     },
@@ -19506,6 +19619,7 @@
        "Hours Since Previous Event",
        "MDM Activity ID",
        "Field Task Type",
+       "Field Task Type Code",
        "Device ID",
        "Meter Badge Number",
        "Device Is Retired",
@@ -19531,6 +19645,13 @@
       "on": "act.d1_activity_id = h.d1_activity_id",
       "role": "model",
       "table": "stg_d1_activity"
+     },
+     {
+      "alias": "tk",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_ext_lookup_value_label"
      },
      {
       "alias": "ie",
@@ -19624,6 +19745,10 @@
     {
      "id": "Field Task Type",
      "label": "Field Task Type"
+    },
+    {
+     "id": "Field Task Type Code",
+     "label": "Field Task Type Code"
     },
     {
      "id": "Device ID",
@@ -19720,10 +19845,18 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "English description of \"Field Task Type Code\". Group and report on this; filter on the code.",
      "group": "meter_ops",
      "id": "Field Task Type",
      "label": "Field Task Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Field Task Type\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "Field Task Type Code",
+     "label": "Field Task Type Code",
      "role": "dimension",
      "type": "text"
     },
@@ -27248,6 +27381,7 @@
        "Measuring Component ID",
        "Device ID",
        "Meter Badge Number",
+       "Usage Status",
        "Usage Status Code",
        "Used on Bill Code",
        "Is Used on Bill",
@@ -27276,6 +27410,13 @@
       "on": "u.d1_usage_id = r.d1_usage_id",
       "role": "model",
       "table": "stg_d1_usage"
+     },
+     {
+      "alias": "ust",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_bo_status_label"
      },
      {
       "alias": "mc",
@@ -27422,6 +27563,10 @@
     {
      "id": "Meter Badge Number",
      "label": "Meter Badge Number"
+    },
+    {
+     "id": "Usage Status",
+     "label": "Usage Status"
     },
     {
      "id": "Usage Status Code",
@@ -27618,7 +27763,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Usage Status Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Usage Status",
+     "label": "Usage Status",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Usage Status\" for the description: report on the description, filter on the code.",
      "group": "meter_ops",
      "id": "Usage Status Code",
      "label": "Usage Status Code",

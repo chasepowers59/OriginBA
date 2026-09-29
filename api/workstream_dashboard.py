@@ -139,7 +139,7 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
          "snapshot_id": "rpt_usage_txn", "format": "number", "workstream": "meter_ops",
          "explore_report_id": None, "date_field": "Start Date/Time",
          "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
-         "trend": {"dimensions": ["Usage Status Code"], "measures": [{"field": "*", "agg": "count"}],
+         "trend": {"dimensions": ["Usage Status"], "measures": [{"field": "*", "agg": "count"}],
                    "filters": [], "limit": 6}},
         {"id": "never_registered", "label": "Never registered at head-end", "subtitle": "AMI rollout worklist",
          "snapshot_id": "rpt_device_asset", "format": "number", "workstream": "meter_ops",
