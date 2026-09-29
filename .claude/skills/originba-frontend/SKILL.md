@@ -64,9 +64,14 @@ share these token names and values — changing a V2.1 value is a cross-app deci
   anchors differ per theme, so callers pass `colorMode`. Unit-tested including the
   magenta guard; change the tests first.
 - Cross-filter selection overrides a bar/slice to `var(--chart-selected)` (amber).
-- **Axis text is FLAT — never rotated.** Long labels truncate (`slice + …`) with
-  `interval="preserveStartEnd"` / `minTickGap`; grids/axes colour from
-  `--border-subtle` / `--foreground-subtle` only.
+- **Axis text is FLAT — never rotated.** Layout is decided by `src/lib/chartLayout.ts`
+  (tested): above 6 categories (5 on KPI cards), or when columns are too narrow, bars go
+  HORIZONTAL and every category is labelled; truncation never makes two labels identical
+  (middle ellipsis), the full label is in the tooltip; one group, all zeros or all nulls
+  draw no chart but a plain sentence; pies keep at most 4 slices + "Other" and fall back
+  to bars; missing values read "Not recorded" (the backend trend label too). Only date
+  axes and ordered bands keep columns with `preserveStartEnd` tick skipping. Grids/axes
+  colour from `--border-subtle` / `--foreground-subtle` only.
 - Booleans render as True/False everywhere (`formatBoolean` / `formatCellValue`
   `isBoolean`), driven by the column's declared type — never raw 1/0.
 - Panel headers lead with a small rounded icon chip coloured from the chart palette
@@ -468,8 +473,8 @@ text glyphs, audit the text ones separately.
 - **Guardrails live in libs, tested**: `visualGuardrails` (pie >30 slices, 1-series
   stacked → disabled with reason), `dashboardTileMath` (tile charts the FIRST
   measure's column; KPI headline sums only sum/count), `databaseChartUtils`
-  (identifier columns never chart as measures), `axisLabels.tickLabels` (truncate
-  ONCE; head…tail when two labels would collide), `recipients.parseRecipients`.
+  (identifier columns never chart as measures), `chartLayout` (orientation, ticks,
+  no-chart sentences, pie plan; `axisLabels.tickLabels` now delegates to it), `recipients.parseRecipients`.
 - **Errors**: `fetchJson` runs `parseApiError` once, so `err.message` is already a
   human message everywhere — never re-parse JSON at a call site.
 - **Pinning**: PinMenu targets a NEW or EXISTING dashboard; pins APPEND to the first

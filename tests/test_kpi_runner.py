@@ -113,8 +113,9 @@ class TrendFromRowsTests(unittest.TestCase):
             trend_from_rows(["month", "total"], [["2026-01", 5], ["2026-02", 7.5]]),
             [{"label": "2026-01", "value": 5.0}, {"label": "2026-02", "value": 7.5}])
 
-    def test_a_null_label_reads_as_Unknown_rather_than_None(self):
-        self.assertEqual(trend_from_rows(["m", "t"], [[None, 3]])[0]["label"], "Unknown")
+    def test_a_null_label_reads_as_Not_recorded_rather_than_None(self):
+        # the charts' word for a missing value (src/lib/chartLayout.ts)
+        self.assertEqual(trend_from_rows(["m", "t"], [[None, 3]])[0]["label"], "Not recorded")
 
     def test_a_null_value_is_zero_on_a_bar_chart(self):
         self.assertEqual(trend_from_rows(["m", "t"], [["x", None]])[0]["value"], 0.0)

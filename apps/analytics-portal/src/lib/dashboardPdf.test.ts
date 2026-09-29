@@ -10,7 +10,7 @@ const tile = (name: string, n: number) => ({
 describe("dashboard PDF sections", () => {
   it("sends each tile as a titled table", () => {
     expect(dashboardPdfSections([tile("Billed revenue", 2)])).toEqual([
-      { title: "Billed revenue", note: "", columns: ["Category", "Value"], rows: [{ Category: "c0", Value: 0 }, { Category: "c1", Value: 1 }] },
+      { title: "Billed revenue", note: "", columns: ["Category", "Value"], rows: [{ Category: "c0", Value: 0 }, { Category: "c1", Value: 1 }], failed: false },
     ]);
   });
 
@@ -66,5 +66,15 @@ describe("KPI sections", () => {
 
   it("says when a card has no value instead of printing zero", () => {
     expect(kpiSections([{ ...kpi, value: null, change_pct: null }])[0].note).toBe("No value · Charges on frozen bill segments");
+  });
+});
+
+describe("failed cards in the PDF", () => {
+  it("are marked failed so the server does not print \"No rows\" under them", () => {
+    const failed = { id: "x", label: "Payments", subtitle: "", snapshot_id: "rpt_payment", format: "number" as const,
+      workstream: "cashiering", value: null, trend: [], error: "could not connect" };
+    const [section] = kpiSections([failed]);
+    expect(section.failed).toBe(true);
+    expect(dashboardPdfSections([section])[0].failed).toBe(true);
   });
 });

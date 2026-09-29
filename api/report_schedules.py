@@ -403,7 +403,8 @@ def sections_to_pdf(title: str, note: str, sections: list[dict[str, Any]], now: 
         drawing = _bar_chart(columns, labels, rows, size[0] - 1.2 * inch) if sec.get("chart", True) and rows else None
         if drawing is not None:
             story += [drawing, Spacer(1, 0.2 * inch)]
-        story += [table_of(columns, labels, rows) if rows else Paragraph("No rows in this window.", body),
+        empty = [] if sec.get("failed") else [Paragraph("No rows in this window.", body)]
+        story += [*([table_of(columns, labels, rows)] if rows else empty),
                   Spacer(1, 0.3 * inch)]
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=size, topMargin=1.0 * inch, bottomMargin=0.8 * inch,

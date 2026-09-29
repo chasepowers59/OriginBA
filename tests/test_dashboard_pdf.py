@@ -48,6 +48,11 @@ class SectionsPdfTests(unittest.TestCase):
     def test_a_tile_with_no_rows_says_so(self):
         self.assertIn(b"No rows", _plain([{**ACCOUNTS, "rows": []}]))
 
+    def test_a_failed_card_does_not_claim_there_were_no_rows(self):
+        data = _plain([{**ACCOUNTS, "rows": [], "failed": True, "note": "This card could not load."}])
+        self.assertIn(b"This card could not load.", data)
+        self.assertNotIn(b"No rows", data)
+
     def test_a_chart_is_drawn_for_a_label_against_a_number(self):
         self.assertGreater(len(_plain([BILLED])), len(_plain([{**BILLED, "chart": False}])))
 

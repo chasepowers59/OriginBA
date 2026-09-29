@@ -277,7 +277,7 @@ def trend_from_rows(columns: list[str], rows: list[list[Any]]) -> list[dict[str,
         return []
     return [
         {
-            "label": str(row[0]) if row[0] is not None else "Unknown",
+            "label": str(row[0]) if row[0] is not None else "Not recorded",
             "value": float(row[-1] or 0),
         }
         for row in rows

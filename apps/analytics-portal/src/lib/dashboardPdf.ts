@@ -2,7 +2,7 @@
 import { formatCurrency, formatNumber } from "./format";
 import type { ExecutiveKpi } from "./types";
 
-export type ExportSection = { name: string; headers: string[]; rows: Record<string, unknown>[]; note?: string };
+export type ExportSection = { name: string; headers: string[]; rows: Record<string, unknown>[]; note?: string; failed?: boolean };
 
 // api/export_routes.py refuses more than these
 const MAX_SECTIONS = 12;
@@ -19,7 +19,7 @@ export function dashboardPdfSections(sections: ExportSection[]) {
       const cut = rows.length < s.rows.length
         ? `Showing the first ${rows.length.toLocaleString("en-US")} of ${s.rows.length.toLocaleString("en-US")} rows (truncated)`
         : "";
-      return { title: s.name, note: [s.note, cut].filter(Boolean).join(" · "), columns: s.headers, rows };
+      return { title: s.name, note: [s.note, cut].filter(Boolean).join(" · "), columns: s.headers, rows, failed: Boolean(s.failed) };
     });
 }
 
@@ -41,6 +41,7 @@ export function kpiSections(kpis: ExecutiveKpi[]): ExportSection[] {
       note: kpi.error ? `This card could not load: ${briefError(kpi.error)}` : [value, kpi.subtitle, ...change].join(" · "),
       headers: ["Category", "Value"],
       rows: kpi.trend.map((t) => ({ Category: t.label, Value: t.value })),
+      failed: Boolean(kpi.error),
     };
   });
 }

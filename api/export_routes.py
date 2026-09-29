@@ -49,6 +49,7 @@ class PdfSection(BaseModel):
     labels: dict[str, str] = Field(default_factory=dict)
     rows: list[dict[str, Any]] = Field(max_length=MAX_EXPORT_ROWS)
     chart: bool = True
+    failed: bool = False   # the card could not load: its note says why, so no "No rows" line
 
 
 class DashboardPdfRequest(BaseModel):
