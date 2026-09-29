@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   defaultDateRange,
@@ -33,6 +33,7 @@ import { resolveDateField } from "@/lib/tileDateField";
 import { setPageContext } from "@/lib/assistantContext";
 import { PinMenu } from "@/components/PinMenu";
 import { useAuth } from "@/components/AuthProvider";
+import { POPOVER_PANEL, usePopover } from "@/lib/popover";
 import { FavoritesPanel } from "./FavoritesPanel";
 import { GlobalFilterBar } from "./GlobalFilterBar";
 import { ResultsPanel } from "./ResultsPanel";
@@ -109,6 +110,8 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const [result, setResult] = useState<QueryResponse | null>(null);
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [favoriteApplied, setFavoriteApplied] = useState(false);
+  const [openAbout, setOpenAbout] = useState<string | null>(null);
+  const aboutIdPrefix = useId();
 
   const allowedTabs = new Set<Tab>(tabOptions.map(([key]) => key));
 
@@ -540,12 +543,12 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           }
         />
       ) : (
-        <div className="grid gap-6 xl:grid-cols-[340px_1fr]">
-      {/* min-w-0: a grid item defaults to min-width:auto, so one wide child sized this
-          column to 860px in a 375px viewport and scrolled the whole PAGE sideways. */}
-      <aside className="no-print min-w-0 space-y-4">
-        <FavoritesPanel compact />
-
+        // Stacked (below xl), the results come straight after the filters and before the
+        // report list; side by side, the filters and the list share the left column.
+        <div className="grid gap-6 xl:grid-cols-[340px_1fr] xl:grid-rows-[auto_1fr]">
+      {/* min-w-0 on every item: a grid item defaults to min-width:auto, so one wide child
+          sized this column to 860px in a 375px viewport and scrolled the whole PAGE sideways. */}
+      <div className="no-print min-w-0 space-y-4 xl:col-start-1 xl:row-start-1">
         <div className="glass-panel p-4">
           <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
             Reporting period
@@ -553,7 +556,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           <p className="mb-3 text-xs text-fg-muted">
             {resolvedDateField
               ? `Filtered by ${dateFieldLabel.toLowerCase()}`
-              : "This canvas has no date to filter on."}
+              : "This report has no date to filter on."}
           </p>
           <div className="mb-3 flex flex-wrap gap-2">
             {DATE_PRESETS.map((p) => (
@@ -621,62 +624,9 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             onValueChange={setScopeValue}
           />
         ) : null}
+      </div>
 
-        <div className="glass-panel p-4">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
-            Ready-to-run reports
-          </p>
-          <div className="space-y-2">
-            {premadeReports.map((report) => (
-              <button
-                key={report.id}
-                type="button"
-                onClick={() => runPremade(report)}
-                disabled={loading}
-                className={`w-full rounded-xl border px-4 py-3 text-left transition disabled:opacity-60 ${
- activeReportId === report.id
- ? "border-edge bg-band ring-1 ring-edge"
- : "border-edge-subtle bg-surface-subtle hover:border-edge-subtle hover:bg-chip"
- }`}
-              >
-                <div className="font-medium text-heading">{report.title}</div>
-                <div className="mt-1 text-xs text-fg-muted">{report.description}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {result ? (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <FolderInput kind="views" value={folder} onChange={setFolder} />
-              <VisibilityToggle privateOnly={privateOnly} onChange={setPrivateOnly} />
-            </div>
-            <button type="button" onClick={() => void handleSaveFavorite()} className="btn-ghost w-full">
-              Save view
-            </button>
-            <button type="button" onClick={() => void handleSaveCopy()} className="btn-ghost w-full text-xs">
-              Save a copy
-            </button>
-            {activeReportId ? (
-              <PinMenu
-                target={{
-                  snapshotId: metadata.id,
-                  reportId: activeReportId,
-                  title: activeReportTitle ?? metadata.label,
-                  chartType,
-                  days: estimatePeriodDays(dateStart, dateEnd),
-                }}
-              />
-            ) : null}
-          </div>
-        ) : null}
-        {savedMsg ? (
-          <p className="text-center text-xs text-ok">{savedMsg}</p>
-        ) : null}
-      </aside>
-
-      <main className="min-w-0 space-y-4">
+      <main className="min-w-0 space-y-4 xl:col-start-2 xl:row-span-2 xl:row-start-1">
         {error ? (
           <div className="glass-panel border-over bg-over-bg px-4 py-3 text-sm text-over">
             {error}
@@ -724,11 +674,116 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
                 : undefined
             }
             onShowAllDates={allDates || !dateFieldLabel ? undefined : showAllDates}
+            actions={
+              <SaveMenu message={savedMsg}>
+                <div className="flex flex-wrap items-center gap-2">
+                  <FolderInput kind="views" value={folder} onChange={setFolder} />
+                  <VisibilityToggle privateOnly={privateOnly} onChange={setPrivateOnly} />
+                </div>
+                <button type="button" onClick={() => void handleSaveFavorite()} className="btn-ghost w-full">
+                  Save view
+                </button>
+                <button type="button" onClick={() => void handleSaveCopy()} className="btn-ghost w-full text-xs">
+                  Save a copy
+                </button>
+                {activeReportId ? (
+                  <PinMenu
+                    target={{
+                      snapshotId: metadata.id,
+                      reportId: activeReportId,
+                      title: activeReportTitle ?? metadata.label,
+                      chartType,
+                      days: estimatePeriodDays(dateStart, dateEnd),
+                    }}
+                  />
+                ) : null}
+              </SaveMenu>
+            }
           />
         )}
       </main>
+
+      <aside className="no-print min-w-0 space-y-4 self-start xl:col-start-1 xl:row-start-2">
+        <div className="glass-panel p-4">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
+            Ready-to-run reports
+          </p>
+          <ul className="space-y-2">
+            {premadeReports.map((report) => {
+              const aboutId = `${aboutIdPrefix}-${report.id}`;
+              const aboutOpen = openAbout === report.id;
+              return (
+                <li
+                  key={report.id}
+                  className={`rounded-xl border transition ${
+ activeReportId === report.id
+ ? "border-edge bg-band ring-1 ring-edge"
+ : "border-edge-subtle bg-surface-subtle hover:bg-chip"
+ }`}
+                >
+                  <div className="flex items-start">
+                    <button
+                      type="button"
+                      onClick={() => runPremade(report)}
+                      disabled={loading}
+                      aria-current={activeReportId === report.id ? "true" : undefined}
+                      className="min-w-0 flex-1 px-4 py-3 text-left font-medium text-heading disabled:opacity-60"
+                    >
+                      {report.title}
+                    </button>
+                    {report.description ? (
+                      <button
+                        type="button"
+                        onClick={() => setOpenAbout(aboutOpen ? null : report.id)}
+                        aria-expanded={aboutOpen}
+                        aria-controls={aboutId}
+                        aria-label={`About ${report.title}`}
+                        className="shrink-0 rounded-xl px-3 py-3 text-fg-muted hover:text-heading"
+                      >
+                        <span aria-hidden="true">{aboutOpen ? "▴" : "▾"}</span>
+                      </button>
+                    ) : null}
+                  </div>
+                  {aboutOpen ? (
+                    <p id={aboutId} className="px-4 pb-3 text-xs text-fg-muted">
+                      {report.description}
+                    </p>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <FavoritesPanel compact />
+      </aside>
         </div>
       )}
+    </div>
+  );
+}
+
+/** Save and pin, behind one toolbar button; the panel stays open to confirm a save. */
+function SaveMenu({ message, children }: { message: string | null; children: ReactNode }) {
+  const { open, setOpen, rootRef, triggerRef } = usePopover();
+  const panelId = useId();
+  return (
+    <div ref={rootRef} className="sm:relative">
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="btn-ghost whitespace-nowrap"
+        aria-expanded={open}
+        aria-controls={open ? panelId : undefined}
+      >
+        Save <span aria-hidden="true">▾</span>
+      </button>
+      {open ? (
+        <div id={panelId} role="group" aria-label="Save or pin this view" className={`${POPOVER_PANEL} space-y-2 p-3 sm:w-72`}>
+          {children}
+          {message ? <p role="status" className="text-center text-xs text-ok">{message}</p> : null}
+        </div>
+      ) : null}
     </div>
   );
 }

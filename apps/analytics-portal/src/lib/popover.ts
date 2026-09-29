@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
  * screen, a fixed-width panel opened off the page.
  */
 export const POPOVER_PANEL =
-  "glass-panel absolute inset-x-0 z-40 mt-1 p-1.5 shadow-xl sm:inset-x-auto sm:right-0";
+  "glass-panel absolute inset-x-0 z-40 mt-1 shadow-xl sm:inset-x-auto sm:right-0";
 
 /** The item a menu key moves focus to, or null for a key the menu leaves to the browser. */
 export function menuFocusIndex(key: string, current: number, count: number): number | null {

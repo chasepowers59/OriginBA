@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import type { QueryResponse } from "@/lib/types";
 import {
   formatBoolean,
@@ -55,6 +55,8 @@ type ResultsPanelProps = {
   };
   onWidenPeriod?: () => void;
   onShowAllDates?: () => void;
+  /** Beside Export in the result toolbar (the explorer's Save menu). */
+  actions?: ReactNode;
 };
 
 export function ResultsPanel({
@@ -80,6 +82,7 @@ export function ResultsPanel({
   emptyContext,
   onWidenPeriod,
   onShowAllDates,
+  actions,
 }: ResultsPanelProps) {
   const brand = useBrand();
   const [pdfState, setPdfState] = useState<string | null>(null);
@@ -156,7 +159,7 @@ export function ResultsPanel({
           Try widening the reporting period, clearing scope or cross-filters, or pick a different
           field.
         </p>
-        <div className="mt-5 flex flex-wrap justify-center gap-2">
+        <div className="relative mt-5 flex flex-wrap justify-center gap-2">
           {onShowAllDates ? (
             <button type="button" onClick={onShowAllDates} className="btn-primary text-xs">
               Show all dates
@@ -172,6 +175,7 @@ export function ResultsPanel({
               Clear cross-filter
             </button>
           ) : null}
+          {actions}
         </div>
       </div>
     );
@@ -271,6 +275,7 @@ export function ResultsPanel({
               },
             ]}
           />
+          {actions}
         </div>
       </div>
       {pdfState ? (
@@ -424,7 +429,7 @@ function ExportMenu({ items }: { items: ExportItem[] }) {
         Export <span aria-hidden="true">▾</span>
       </button>
       {open ? (
-        <div id={menuId} role="menu" aria-label="Export" onKeyDown={onKeyDown} className={`${POPOVER_PANEL} sm:w-56`}>
+        <div id={menuId} role="menu" aria-label="Export" onKeyDown={onKeyDown} className={`${POPOVER_PANEL} p-1.5 sm:w-56`}>
           {items.map((item, i) => (
             <button
               key={i}
