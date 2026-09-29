@@ -8,7 +8,6 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Reproduce / where | Next step |
 | --- | --- | --- | --- |
-| 2026-09-29 | Data quality at Ellensburg: all five pipeline-parity rules flag CISADM ahead of the canvases (bills +21, bill segments +22, FTs +512, tenders +21, measurements +26; no canvas bill is missing from CISADM). The 39 ORIGINBA_REPORTING tables were last created 2026-09-10 08:41 (max LAST_DDL_TIME), although LAST_ANALYZED moved on 2026-09-28, so the six-hourly rebuild looks stale. None of the 21 missing bills was written in the last 3 days; older writes are beyond the SCN map, so staleness versus a model drop is not yet settled | /data-quality as Ellensburg, ETL pipeline rules | Check the Ellensburg nightly (originba_dbt oracle-nightly-operations), rebuild, re-run; if parity still fails, the model drops rows |
 | 2026-09-29 | Locally, the "INT_DEV (internal dev CISADM)" organization shows demo25 data: the local launch config sets `WAREHOUSE_DATABASE_URL` (the `dev` org's key) to the demo25 database. In the cloud deployment it is INT_DEV | Settings > System health: `dev` and `demo25` stamps are equal | Owner's call: point the local key at an INT_DEV copy, or accept the alias locally |
 | 2026-09-29 | `scripts/jaspersoft/jrs_repository.py job-run` calls `POST /rest_v2/jobs/<id>/run`, which JasperReports Server 10.0 does not have (404) | Any job-run against prod or test | Remove or rebuild the command (task queued); JRS 10 has no REST run-now |
 | 2026-09-29 | `.env` line 17 (`JAVA_HOME`) has an unquoted value with a space; `set -a; . ./.env` prints `command not found` in zsh | `set -a && . ./.env` | Quote the value (owner's file; never print it) |
@@ -24,6 +23,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-29 | Data quality at Ellensburg: all five pipeline-parity rules flagged CISADM ahead of the canvases (bills +21, FTs +512, ...) | Staleness, not a model bug: the reporting tables dated 2026-09-10 because a stranded RPT_CHARACTERISTICS__DBT_BACKUP blocked every scheduled build once the VPN was back. Dropped by the preflight's safe flag and fully rebuilt 2026-09-29 (320/320): all five parity rules 0, source parity 120/120 | e2e/dq.spec.ts; scripts/run_source_parity.py (originba_dbt) |
 | 2026-09-29 | Finance "Adjustment dollars" nets $17,350 at Ellensburg over bars summing ~$127K: transfers (7,198 of 9,874, netting $0) split across SA types and the credits ranked last | fc2d13bc (by Adjustment Type, ranked by size) | tests/test_rank_by_magnitude.py, tests/test_kpi_breakdowns.py |
 | 2026-09-29 | Data quality for an Oracle organization printed the raw build stamp ("data as of 20260928180601:20260910084138:39") | cbf593a1 | tests/test_dq_oracle_orgs.py, e2e/dq.spec.ts |
 | 2026-09-29 | Finance "Frozen charge FTs" (bill segments + adjustments) summed payments too: -$414K on Ellensburg for $3.24M of charges | 711a273e | tests/test_money_rules.py (TransactionTypeTests) |
