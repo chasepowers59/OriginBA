@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   DndContext,
+  DragOverlay,
   PointerSensor,
   useDraggable,
   useDroppable,
@@ -190,7 +191,10 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     });
   };
 
+  // the tile under the cursor while it is dragged (the DragOverlay draws its title card)
+  const [draggingSlot, setDraggingSlot] = useState<number | null>(null);
   const handleDragEnd = (event: DragEndEvent) => {
+    setDraggingSlot(null);
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     setTiles((prev) => swapTileSlots(prev, Number(active.id), Number(over.id)));
@@ -294,7 +298,8 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
         <p className="text-xs text-fg-muted">Click a chart value to cross-filter all tiles.</p>
       )}
 
-      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} onDragStart={(e) => setDraggingSlot(Number(e.active.id))}
+                  onDragEnd={handleDragEnd} onDragCancel={() => setDraggingSlot(null)}>
         <div id="dashboard-export-root" className="grid gap-4 md:grid-cols-2">
           {visibleSlots([...tileBySlot.keys()]).map((slot) => (
             <SlotCell key={slot} slot={slot} hasTile={Boolean(tileBySlot.get(slot))}>
@@ -331,6 +336,16 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
             </SlotCell>
           ))}
         </div>
+        <DragOverlay dropAnimation={null}>
+          {draggingSlot != null && tileBySlot.get(draggingSlot) ? (
+            <div data-testid="tile-drag-preview"
+                 className="glass-panel w-72 cursor-grabbing border px-4 py-3 text-sm font-medium text-heading shadow-lg"
+                 style={{ borderColor: "var(--chart-2)" }}>
+              <span aria-hidden className="mr-2 text-fg-muted">⠿</span>
+              {tileBySlot.get(draggingSlot)!.title || "Untitled tile"}
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
 
       {editSlot != null ? (

@@ -514,6 +514,14 @@ text glyphs, audit the text ones separately.
 - Route-test hygiene: modules share one interpreter — pin `PORTAL_AUTH_DISABLED` etc.
   per test class with `mock.patch.dict(os.environ, ...)`, never rely on import-time env.
 
+## Drag and drop (dnd-kit)
+
+dnd-kit moves nothing by itself: a `useDraggable` item needs a `DragOverlay` (or a transform)
+or the drag looks empty (Chase, 2026-09-29: "I want to see the field I'm dragging"). The builder
+renders `FieldDragPreview` (the same `PillFace` as the palette pill) in a `DragOverlay`, the
+source pill keeps a dashed outline while dragged, and dashboards float the tile's title card.
+Any new draggable gets an overlay; `e2e/builder-drag.spec.ts` pins the builder's.
+
 ## Ori, the intelligence inside Origin BA (named 2026-09-29, Chase)
 
 Origin BA is the analytics platform; **Ori** is the intelligence inside it. The chat assistant

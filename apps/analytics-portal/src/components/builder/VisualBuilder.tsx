@@ -3,11 +3,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   DndContext,
+  DragOverlay,
   PointerSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
 } from "@dnd-kit/core";
+import { FieldDragPreview } from "./FieldPill";
 import {
   defaultDateRange,
   fetchBuilderQuestions,
@@ -135,8 +138,15 @@ export function VisualBuilder({
     [meta, trusted],
   );
 
+  // the field under the cursor while it is dragged (the DragOverlay below draws it)
+  const [dragging, setDragging] = useState<{ field: FieldDef; trusted?: boolean } | null>(null);
+  const onDragStart = useCallback((e: DragStartEvent) => {
+    const data = e.active.data.current as { field?: FieldDef; trusted?: boolean } | undefined;
+    setDragging(data?.field ? { field: data.field, trusted: data.trusted } : null);
+  }, []);
   const onDragEnd = useCallback(
     (e: DragEndEvent) => {
+      setDragging(null);
       const overId = e.over?.id;
       const field = e.active.data.current?.field as FieldDef | undefined;
       if (!overId || !field) return;
@@ -362,7 +372,7 @@ export function VisualBuilder({
   }, [index]);
 
   return (
-    <DndContext sensors={sensors} onDragEnd={onDragEnd}>
+    <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setDragging(null)}>
       <div className="space-y-4">
         <div className="flex flex-wrap items-center gap-3">
           <button type="button" className="btn-ghost text-sm" onClick={() => setGalleryOpen(true)}>
@@ -533,6 +543,9 @@ export function VisualBuilder({
       {galleryOpen ? (
         <QuestionGallery questions={questions} onPick={applyQuestion} onClose={() => setGalleryOpen(false)} />
       ) : null}
+      <DragOverlay dropAnimation={null}>
+        {dragging ? <FieldDragPreview field={dragging.field} trusted={dragging.trusted} /> : null}
+      </DragOverlay>
     </DndContext>
   );
 }
