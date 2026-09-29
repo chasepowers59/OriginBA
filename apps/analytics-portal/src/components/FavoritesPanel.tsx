@@ -7,6 +7,8 @@ import type { SavedFavorite } from "@/lib/favorites";
 import { ScheduleDialog } from "@/components/ScheduleDialog";
 import { NotesDialog } from "@/components/NotesDialog";
 import { EmbedDialog } from "@/components/EmbedDialog";
+import { KpiAlertsDialog } from "@/components/KpiAlertsDialog";
+import { isRestricted } from "@/lib/rowRules";
 import { useAuth } from "@/components/AuthProvider";
 import { ownershipLabel } from "@/lib/ownership";
 import { groupByFolder } from "@/lib/folders";
@@ -18,6 +20,7 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
   const [scheduling, setScheduling] = useState<SavedFavorite | null>(null);
   const [noting, setNoting] = useState<SavedFavorite | null>(null);
   const [embedding, setEmbedding] = useState<SavedFavorite | null>(null);
+  const [alerting, setAlerting] = useState<SavedFavorite | null>(null);
   const { user } = useAuth();
 
   const refresh = () => {
@@ -94,6 +97,16 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
             >
               Schedule
             </button>
+            {!isRestricted(user) ? (
+              <button
+                type="button"
+                onClick={() => setAlerting(fav)}
+                className="shrink-0 text-xs text-fg-muted hover:text-primary"
+                title="Email when this view's total crosses a line"
+              >
+                Alert
+              </button>
+            ) : null}
             {fav.canEdit !== false && fav.visibility !== "private" ? (
               <button
                 type="button"
@@ -144,6 +157,9 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
           viewTitle={scheduling.title}
           onClose={() => setScheduling(null)}
         />
+      ) : null}
+      {alerting ? (
+        <KpiAlertsDialog view={{ id: alerting.id, title: alerting.title }} onClose={() => setAlerting(null)} />
       ) : null}
       {embedding ? (
         <EmbedDialog viewId={embedding.id} title={embedding.title} onClose={() => setEmbedding(null)} />

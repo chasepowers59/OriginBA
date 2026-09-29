@@ -259,7 +259,8 @@ export function deleteReportSchedule(scheduleId: string): Promise<void> {
 
 export type KpiAlert = {
   id: string;
-  kpi_id: string;
+  kpi_id: string | null;
+  saved_view_id?: string | null;
   kpi_label: string;
   condition: "above" | "below" | "pct_change_above" | "pct_change_below";
   threshold: number;
@@ -281,7 +282,8 @@ export function fetchKpiAlerts(): Promise<{
 }
 
 export function createKpiAlert(body: {
-  kpi_id: string;
+  kpi_id?: string;
+  saved_view_id?: string;
   condition: string;
   threshold: number;
   window_days?: number;

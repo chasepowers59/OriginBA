@@ -20,7 +20,8 @@ router = APIRouter(prefix="/kpi-alerts", tags=["kpi-alerts"])
 
 
 class AlertCreateRequest(BaseModel):
-    kpi_id: str
+    kpi_id: str | None = None
+    saved_view_id: str | None = None
     condition: str
     threshold: float
     window_days: int = 7
@@ -47,6 +48,14 @@ def create_alert(
     # An alert watches an organization-wide card and emails it: not for part of the data.
     require_unrestricted(ctx)
     org_id = require_org_for_data(ctx)
+    if body.saved_view_id:
+        from api.auth.workstream_access import assert_snapshot_access
+        from api.ownership import visible
+        from api.report_schedules import _find_view
+        view = _find_view(body.saved_view_id, org_id)
+        if view is None or not visible(view, ctx):
+            raise HTTPException(status_code=404, detail="Saved view not found")
+        assert_snapshot_access(ctx, view["snapshot_id"])
     try:
         return ka.create_alert(body.model_dump(), organization_id=org_id,
                                created_by=ctx.email)

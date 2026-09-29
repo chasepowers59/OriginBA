@@ -10,6 +10,7 @@ import {
 } from "@/lib/api";
 import { FormError, Modal, SmtpNotice } from "@/components/Modal";
 import { parseRecipients } from "@/lib/recipients";
+import { alertConditions, alertsFor } from "@/lib/alerts";
 
 const CONDITION_LABELS: Record<string, string> = {
   above: "value rises above",
@@ -23,12 +24,12 @@ const CONDITION_LABELS: Record<string, string> = {
  * crosses a line. Evaluation runs server-side on the hourly runner, through the
  * same KPI queries the dashboard shows — an alert can't disagree with its tile.
  */
-export function KpiAlertsDialog({ onClose }: { onClose: () => void }) {
+export function KpiAlertsDialog({ onClose, view }: { onClose: () => void; view?: { id: string; title: string } }) {
   const [alerts, setAlerts] = useState<KpiAlert[]>([]);
   const [kpis, setKpis] = useState<WatchableKpi[]>([]);
   const [smtpReady, setSmtpReady] = useState(true);
   const [kpiId, setKpiId] = useState("");
-  const [condition, setCondition] = useState("below");
+  const [condition, setCondition] = useState(view ? "above" : "below");
   const [threshold, setThreshold] = useState("");
   const [windowDays, setWindowDays] = useState(7);
   const [recipients, setRecipients] = useState("");
@@ -38,7 +39,7 @@ export function KpiAlertsDialog({ onClose }: { onClose: () => void }) {
   const refresh = () => {
     fetchKpiAlerts()
       .then((r) => {
-        setAlerts(r.alerts);
+        setAlerts(alertsFor(r.alerts, view?.id ?? null));
         setKpis(r.available_kpis);
         setSmtpReady(r.smtp_configured);
         if (!kpiId && r.available_kpis.length) setKpiId(r.available_kpis[0].id);
@@ -54,7 +55,7 @@ export function KpiAlertsDialog({ onClose }: { onClose: () => void }) {
     setError(null);
     try {
       await createKpiAlert({
-        kpi_id: kpiId,
+        ...(view ? { saved_view_id: view.id } : { kpi_id: kpiId }),
         condition,
         threshold: Number(threshold),
         window_days: windowDays,
@@ -74,8 +75,10 @@ export function KpiAlertsDialog({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal
-      title="KPI threshold alerts"
-      subtitle="Email when a metric crosses a line — sent once per breach, not daily."
+      title={view ? "Alert on this view" : "KPI threshold alerts"}
+      subtitle={view
+        ? `${view.title}: email when its total crosses a line, over its saved filters. Sent once per breach.`
+        : "Email when a metric crosses a line — sent once per breach, not daily."}
       onClose={onClose}
       size="lg"
     >
@@ -125,7 +128,7 @@ export function KpiAlertsDialog({ onClose }: { onClose: () => void }) {
 
       <div className="mt-4 space-y-3 border-t border-edge-subtle pt-4 text-sm">
         <div className="grid grid-cols-2 gap-3">
-          <label className="block text-xs font-medium text-fg-muted">
+          {view ? null : <label className="block text-xs font-medium text-fg-muted">
             KPI
             <select
               value={kpiId}
@@ -138,7 +141,7 @@ export function KpiAlertsDialog({ onClose }: { onClose: () => void }) {
                 </option>
               ))}
             </select>
-          </label>
+          </label>}
           <label className="block text-xs font-medium text-fg-muted">
             Condition
             <select
@@ -146,9 +149,9 @@ export function KpiAlertsDialog({ onClose }: { onClose: () => void }) {
               onChange={(e) => setCondition(e.target.value)}
               className="mt-1 w-full rounded-lg border border-edge-subtle bg-surface px-3 py-2 text-sm text-fg"
             >
-              {Object.entries(CONDITION_LABELS).map(([value, label]) => (
+              {alertConditions(Boolean(view)).map((value) => (
                 <option key={value} value={value}>
-                  {label}
+                  {CONDITION_LABELS[value]}
                 </option>
               ))}
             </select>

@@ -5,6 +5,10 @@ crossing a threshold, or the period-over-period change moving too far. The hourl
 runner evaluates each alert through the SAME kpi_runner the dashboard uses, so an
 alert can never disagree with the tile it watches.
 
+An alert can instead watch a saved view: its first measure as one total over the view's
+saved filters and a trailing window, through the query a schedule of that view runs, with
+its creator's current access. Above and below only: a view has no prior period defined.
+
 Notification fires only on the TRANSITION into breach — a KPI that stays red all
 week sends one email, not seven. Recovery resets last_state so the next breach
 notifies again.
@@ -45,15 +49,38 @@ def list_alerts(organization_id: str) -> list[dict[str, Any]]:
     return _store.list(organization_id)
 
 
+def _first_measure(view: dict[str, Any]) -> dict[str, Any]:
+    measures = view.get("measures") or [{"field": view.get("measure_field") or "*", "agg": view.get("measure_agg") or "count"}]
+    return measures[0]
+
+
+def _view_label(view: dict[str, Any]) -> str:
+    from api.snapshot_explorer import _AGG_WORD
+    m = _first_measure(view)
+    measure = "Number of records" if m.get("field") in (None, "*") else \
+        f"{_AGG_WORD.get(str(m.get('agg')).lower(), str(m.get('agg')).title())} {m['field']}"
+    return f"{view.get('title')}: {measure}"
+
+
 def create_alert(payload: dict[str, Any], *, organization_id: str,
                  created_by: str) -> dict[str, Any]:
-    kpi = _kpi_by_id(str(payload.get("kpi_id") or ""))
-    if kpi is None:
-        raise AlertError("Unknown KPI")
     condition = str(payload.get("condition") or "")
     if condition not in CONDITIONS:
         raise AlertError(f"Condition must be one of {', '.join(CONDITIONS)}")
-    assert_condition_can_fire(str(payload.get("kpi_id") or ""), condition)
+    view_id = payload.get("saved_view_id")
+    if view_id:
+        from api.report_schedules import _find_view
+        view = _find_view(str(view_id), organization_id)
+        if view is None:
+            raise AlertError("Saved view not found")
+        if condition.startswith("pct_change"):
+            raise AlertError("A saved view alert watches its total above or below a threshold.")
+        kpi = {"id": None, "label": _view_label(view)}
+    else:
+        kpi = _kpi_by_id(str(payload.get("kpi_id") or ""))
+        if kpi is None:
+            raise AlertError("Unknown KPI")
+        assert_condition_can_fire(str(payload.get("kpi_id") or ""), condition)
     try:
         threshold = float(payload.get("threshold"))
     except (TypeError, ValueError) as exc:
@@ -72,6 +99,7 @@ def create_alert(payload: dict[str, Any], *, organization_id: str,
         "id": str(uuid.uuid4()),
         "organization_id": organization_id,
         "kpi_id": kpi["id"],
+        "saved_view_id": str(view_id) if view_id else None,
         "kpi_label": kpi["label"],
         "condition": condition,
         "threshold": threshold,
@@ -129,10 +157,27 @@ def evaluate_condition(condition: str, threshold: float, *,
     return False
 
 
+def _view_result(alert: dict[str, Any]) -> dict[str, Any]:
+    """The watched view's first measure as one total, through the schedule query path."""
+    from api.report_schedules import _find_view, render_schedule
+
+    view = _find_view(alert["saved_view_id"], alert["organization_id"])
+    if view is None:
+        raise AlertError("The saved view this alert watches no longer exists")
+    schedule = {"organization_id": alert["organization_id"], "window_days": alert.get("window_days") or 7,
+                "created_by": alert.get("created_by", ""), "row_rules": []}
+    columns, _, rows = render_schedule(schedule, {**view, "dimensions": [], "measures": [_first_measure(view)]})
+    value = rows[0].get(columns[0]) if rows else None
+    # the warehouse answers Decimal; the alert store is JSON
+    return {"value": None if value is None else float(value), "pct_change": None}
+
+
 def _kpi_result(alert: dict[str, Any]) -> dict[str, Any]:
     """The alert's KPI, computed exactly as the dashboard computes it."""
     from api.kpi_runner import execute_kpi_definition
 
+    if alert.get("saved_view_id"):
+        return _view_result(alert)
     kpi = _kpi_by_id(alert["kpi_id"])
     if kpi is None:
         raise AlertError("KPI no longer exists")
@@ -169,7 +214,8 @@ def _message(alert: dict[str, Any], result: dict[str, Any], now: datetime):
         f"{alert['threshold']}{unit}.\n\n"
         f"Current value{_window_phrase(alert)}: {result.get('value')}\n"
         + (f"Period-over-period change: {pct:.1f}%\n" if pct is not None else "")
-        + "\nOpen the portal's executive overview for the full picture.\n")
+        + ("\nOpen the saved view in the portal for the full picture.\n" if alert.get("saved_view_id")
+           else "\nOpen the portal's executive overview for the full picture.\n"))
 
 
 def run_kpi_alerts(*, now: datetime | None = None,
