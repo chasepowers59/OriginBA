@@ -185,4 +185,4 @@ class ExecutiveCatalogAvailabilityTests(unittest.TestCase):
         avail, note = available_kpis(ghost, "dev")
         self.assertEqual(avail, [])
         self.assertIsNotNone(note)
-        self.assertIn("canvas", note.lower())
+        self.assertIn("data set", note.lower())

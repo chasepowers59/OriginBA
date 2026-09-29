@@ -8,16 +8,10 @@ import type { SampleRowsResponse } from "@/lib/types";
 
 export function SampleRowsPanel({
   snapshotId,
-  tableName,
-  schemaName = "CISADM",
   grainDescription,
   skipSampleRows,
 }: {
   snapshotId: string;
-  tableName: string;
-  /** The snapshot's own schema (`reporting`, or ORIGINBA_REPORTING in-database).
-   *  Hardcoding one labelled every canvas wrongly. */
-  schemaName?: string;
   grainDescription?: string;
   skipSampleRows?: boolean;
 }) {
@@ -54,8 +48,7 @@ export function SampleRowsPanel({
           </p>
           <h3 className="mt-1 text-lg font-semibold text-heading">What one row looks like</h3>
           <p className="mt-1 text-sm text-fg-muted">
-            {grainDescription ?? "Sample rows from the governed canvas"} ·{" "}
-            <code className="text-xs text-fg-muted">{schemaName}.{tableName}</code>
+            {grainDescription ?? "Sample rows from this data set"}
           </p>
         </div>
         <span className="text-fg-muted">{expanded ? "▾" : "▸"}</span>
@@ -98,7 +91,7 @@ export function SampleRowsPanel({
             </div>
           ) : null}
           {data && !data.rows.length && !error ? (
-            <p className="mt-4 text-sm text-fg-muted">No sample rows returned for this domain.</p>
+            <p className="mt-4 text-sm text-fg-muted">No sample rows returned for this data set.</p>
           ) : null}
         </div>
       ) : null}

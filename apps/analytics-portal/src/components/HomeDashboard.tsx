@@ -47,13 +47,13 @@ export function HomeDashboard() {
               {/* Real counts only — fabricated placeholders confidently lied when the
                   API was down. */}
               {workstreamCount
-                ? `${workstreamCount} workstreams · ${snapshotCount} reporting tables`
+                ? `${workstreamCount} workstreams · ${snapshotCount} data sets`
                 : "\u00a0"}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href="/build" className="btn-primary text-sm">
-              Explore your data
+              Build a view
             </Link>
             <Link href="/reports" className="btn-ghost text-sm">
               Open report library
@@ -129,7 +129,7 @@ export function SnapshotCard({ snap }: { snap: SnapshotSummary }) {
         {snap.label}
       </h3>
       <p className="mt-2 line-clamp-3 text-sm text-fg-muted">
-        {summary || snap.grain_description || "Explore this governed reporting canvas."}
+        {summary || snap.grain_description || "Explore this data set."}
       </p>
     </Link>
   );

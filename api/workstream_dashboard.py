@@ -389,7 +389,7 @@ WORKSTREAM_ABOUT: dict[str, dict[str, Any]] = {
             "Aged balances and arrears -- Collections & Debt",
         ],
         "related": [
-            {"workstream": "finance", "via": "Bill Segment ID -> frozen bill-segment FTs (the revenue tie the reconciliation canvas asserts)"},
+            {"workstream": "finance", "via": "Bill Segment ID -> frozen bill-segment FTs (the revenue tie the reconciliation data set asserts)"},
             {"workstream": "cashiering", "via": "Account ID / Bill ID -> payments applied against billed balances"},
             {"workstream": "meter_ops", "via": "Bill Segment ID -> the usage and service-quantity lines behind each segment"},
             {"workstream": "customer_ops", "via": "SA ID -> the agreement and customer context on every segment"},
@@ -411,8 +411,8 @@ WORKSTREAM_ABOUT: dict[str, dict[str, Any]] = {
     },
     "debt": {
         "summary": "What is owed and what is being done about it: aged balances "
-                   "(rederived from raw FTs and verified 100% against the client's own "
-                   "snapshot), collection/severance processes, pay plans, credit rating.",
+                   "(rederived from raw FTs and verified 100% against the aged balances the "
+                   "client's own reports read), collection/severance processes, pay plans, credit rating.",
         "not_included": [
             "Current bill production -- Billing & Rates",
             "The cash drawer itself -- Cashiering & Payments",
@@ -470,7 +470,7 @@ WORKSTREAM_ABOUT: dict[str, dict[str, Any]] = {
     "finance": {
         "summary": "The ledger view: every financial transaction (bill segments, "
                    "payments, adjustments) net of cancellation, GL distribution "
-                   "lines, and the revenue reconciliation control canvas.",
+                   "lines, and the revenue reconciliation control data set.",
         "not_included": [
             "Tender-level cash detail -- Cashiering & Payments",
             "Calc-line pricing itemization -- Billing & Rates",
@@ -487,7 +487,7 @@ WORKSTREAM_ABOUT: dict[str, dict[str, Any]] = {
                    "lifecycle header, batch runs, To Do queues, and characteristics "
                    "for every entity type.",
         "not_included": [
-            "Domain detail -- each canvas here cross-links into its owning workstream by id",
+            "Workstream detail -- each data set here links into its owning workstream by ID",
         ],
         "related": [
             {"workstream": "billing", "via": "Bill ID -> the segments inside each bill"},

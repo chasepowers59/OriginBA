@@ -24,10 +24,15 @@ describe("the assistant conversation", () => {
   });
 
   it("summarises an answer in words a reader scans", () => {
-    expect(summarise(answer())).toBe("1 step · 1 query · 1,240 tokens");
-    const cached = { ...answer(), usage: { input_tokens: 1000, output_tokens: 240, cache_read_input_tokens: 22000, cache_creation_input_tokens: 0 } };
-    expect(summarise(cached)).toBe("1 step · 1 query · 1,240 tokens (22,000 cached)");
+    expect(summarise(answer())).toBe("1 step · 1 query");
     expect(summarise({ ...answer(), steps: [], queries: [], usage: { input_tokens: 0, output_tokens: 0 } })).toBe("0 steps · 0 queries");
+  });
+
+  it("adds the token count and the model for an admin only", () => {
+    expect(summarise(answer(), { admin: true })).toBe("1 step · 1 query · 1,240 tokens · m");
+    const cached = { ...answer(), usage: { input_tokens: 1000, output_tokens: 240, cache_read_input_tokens: 22000, cache_creation_input_tokens: 0 } };
+    expect(summarise(cached, { admin: true })).toBe("1 step · 1 query · 1,240 tokens (22,000 cached) · m");
+    expect(summarise(cached)).not.toMatch(/token|\bm$/);
   });
 
   it("formats cells like the rest of the portal, and never a year with a comma", () => {
@@ -59,17 +64,18 @@ describe("the assistant conversation", () => {
 describe("what a figure can be trusted to", () => {
   const now = new Date("2026-09-15T12:00:00");
   const proven: CanvasIntegrity = {
-    canvas: "rpt_sa_aged_balance", verdict: "proven", canvas_as_of: "2026-09-09T12:32:41",
+    canvas: "rpt_sa_aged_balance", label: "SA Aged Balance", verdict: "proven", canvas_as_of: "2026-09-09T12:32:41",
     summary: "12/12 checks vs CISADM; 138,086 rows vs CMS_SA_SNAPSHOT, 0 differ",
   };
 
-  it("names the canvas, the proof and the build age", () => {
-    expect(integrityLabel({ ...proven })).toMatch(/^rpt_sa_aged_balance: proven \(12\/12 checks vs CISADM; 138,086 rows vs CMS_SA_SNAPSHOT, 0 differ\) · built /);
+  it("names the data set by its label, the proof and the build age", () => {
+    expect(integrityLabel({ ...proven })).toMatch(/^SA Aged Balance: proven \(12\/12 checks vs CISADM; 138,086 rows vs CMS_SA_SNAPSHOT, 0 differ\) · built /);
   });
 
   it("says plainly when nothing is on record", () => {
-    expect(integrityLabel({ canvas: "rpt_x", verdict: "unavailable", canvas_as_of: null, summary: "" })).toBe("rpt_x: no verification on record");
-    expect(integrityLabel({ canvas: "rpt_x", verdict: "not covered", canvas_as_of: null, summary: "" })).toBe("rpt_x: not covered by a parity check");
+    const x = { canvas: "rpt_x", label: "X", canvas_as_of: null, summary: "" };
+    expect(integrityLabel({ ...x, verdict: "unavailable" })).toBe("X: no verification on record");
+    expect(integrityLabel({ ...x, verdict: "not covered" })).toBe("X: not covered by a parity check");
   });
 
   it("ages a build in hours, then days", () => {
@@ -86,8 +92,8 @@ describe("what a figure can be trusted to", () => {
         { canvas: "b", verdict: "differences", source_green: 1, source_checks: 3, snapshot_against: "FT_RPT_CURR", snapshot_ok: true },
       ],
     };
-    expect(integrityHeadline(o, now)).toBe("Report data refreshed 5 days ago · 1 of 2 reports checked against the source system");
-    expect(integrityHeadline({ available: false, canvases: [] }, now)).toBe("These reports have not been checked against the source system yet.");
+    expect(integrityHeadline(o, now)).toBe("Data refreshed 5 days ago · 1 of 2 data sets checked against the source system");
+    expect(integrityHeadline({ available: false, canvases: [] }, now)).toBe("These data sets have not been checked against the source system yet.");
   });
 });
 

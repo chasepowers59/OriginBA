@@ -15,10 +15,10 @@ export type DatabaseQueryTemplate = {
 };
 
 export const DATABASE_TIPS = [
-  "Start with a starter query below — each one is tuned for the governed canvass.",
+  "Start with a starter query below — each one is written for your CIS schema and this database.",
   "Results load 50 rows at a time. Use Fetch next when you need more rows without waiting for the full result set.",
   "Add a date filter (last 6 months) to keep queries fast on large tables like CI_FT and CI_BSEG.",
-  "The reporting canvases (rpt_*) are queryable here too, beside CISADM — the governed, already-joined view of the same data.",
+  "The data sets (rpt_*) are queryable here too, beside CISADM — the governed, already-joined view of the same data.",
   "Press Ctrl+Enter (⌘+Enter on Mac) to run the statement.",
   "Toggle Chart view when your result has categories and numbers — great for monthly trends or class breakdowns.",
   "Row count runs a full COUNT(*) and can be slow on big tables — use it when you really need the total.",

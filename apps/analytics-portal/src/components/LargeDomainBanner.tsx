@@ -19,19 +19,18 @@ export function LargeDomainBanner({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-2xl">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-warn">
-            Large governed domain
+            Large data set
           </p>
           <h3 className="mt-1 text-lg font-semibold text-heading">{snapshotLabel}</h3>
           <p className="mt-2 text-sm text-warn">
-            This canvas has{" "}
+            This data set has{" "}
             {rowCount != null ? (
               <strong>{formatNumber(rowCount)}</strong>
             ) : (
               "millions of"
             )}{" "}
-            rows. Row preview is skipped in the portal so analysis stays fast — use a{" "}
-            <strong>30-day default period</strong>, premade reports, or the data model tab
-            instead of loading sample rows.
+            rows. Row preview is skipped so analysis stays fast: start from a ready-to-run
+            report, narrow the dates, or use the data model tab instead of loading sample rows.
           </p>
           {grainDescription ? (
             <p className="mt-2 text-xs text-warn">{grainDescription}</p>

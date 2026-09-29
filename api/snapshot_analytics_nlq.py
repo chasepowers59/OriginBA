@@ -51,7 +51,7 @@ def run_snapshot_analytics_nlq(
         reason = WAREHOUSE_NOT_BUILT_NOTE if is_missing_relation_error(str(exc)) else str(exc)
         return {
             "narrative": (reason if reason is WAREHOUSE_NOT_BUILT_NOTE
-                          else f"Could not run snapshot analytics: {reason}"),
+                          else f"Could not run the metric: {reason}"),
             "source": "snapshot_analytics",
             "resolved_from": metric_id,
         }

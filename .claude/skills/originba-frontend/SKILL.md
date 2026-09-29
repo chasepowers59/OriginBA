@@ -94,13 +94,22 @@ share these token names and values — changing a V2.1 value is a cross-app deci
 
 ## Information architecture — one job per surface
 
-Home (exec KPIs) · Explore `/build` (THE builder; deep links `?canvas=&report=`) ·
-Dashboards `/dashboards` (@dnd-kit pinboard) · Library `/reports` (catalog + workstream
-rail) · Letters `/letters` (collections letters: the PDF beside the data behind it; nav
+Home (exec KPIs) · Build `/build` (THE builder; deep links `?canvas=&report=`) ·
+Dashboards `/dashboards` (@dnd-kit pinboard) · Library `/reports` (reports grouped by
+workstream, the one grouping, beside the workstream rail) · Letters `/letters` (collections letters: the PDF beside the data behind it; nav
 behind `letters:read`, hidden from row-restricted people) · SQL `/database` (CISADM
 workspace; `?table=` seeds a query) · Data Quality · Settings. A new top-level route
-must also join `APP_ROUTES` in `middleware.ts`, or signed-in people are sent home from it. `/explore/[snapshotId]` is the canvas overview (Reports + Data model only —
+must also join `APP_ROUTES` in `middleware.ts`, or signed-in people are sent home from it. `/explore/[snapshotId]` is the data set overview, under Library (Reports + Data model only —
 builder/SQL tabs redirect out). Never add a second builder/SQL/chart surface.
+
+**One glossary (UI-4, Chase 2026-09-29).** Readers see **data set** (never canvas, reporting
+table, domain or snapshot), **report** (a ready-to-run question), **view** (a saved view),
+**dashboard**, **workstream**; **organization**, never tenant; **unit of measure**, never UOM;
+and no rpt_ table names. The data model tab, the SQL workspace, the settings data source page
+and "for IT review" disclosures may be technical. `src/glossary.test.ts` (every string a reader
+can see in components/ and app/) and `tests/test_glossary.py` (API notes and errors) enforce
+it; code identifiers (`snapshotId`, `canvas_id`, `/snapshots` routes) keep their names. Ori's
+per-answer token count and model show only with `settings:manage`.
 
 ## SQL workspace rules
 

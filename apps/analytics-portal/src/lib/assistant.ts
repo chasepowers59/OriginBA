@@ -38,17 +38,21 @@ export function threadFor(turns: Turn[]): AssistantMessage[] {
   return [];
 }
 
-/** "3 steps · 2 queries · 1,240 tokens (22,000 cached)" -- the footer under an answer.
+/** "3 steps · 2 queries" -- the footer under an answer. An admin (settings:manage) also sees
+ *  "· 1,240 tokens (22,000 cached) · <model>": cost is theirs to watch, not every reader's.
  *  Cached reads are the bulk of a question's tokens and cost a tenth; they are shown apart
- *  so the number a reader sees tracks the bill. */
-export function summarise(r: AssistantResponse): string {
-  const tokens = (r.usage?.input_tokens ?? 0) + (r.usage?.output_tokens ?? 0);
-  const cached = (r.usage?.cache_read_input_tokens ?? 0) + (r.usage?.cache_creation_input_tokens ?? 0);
+ *  so the number an admin sees tracks the bill. */
+export function summarise(r: AssistantResponse, { admin = false }: { admin?: boolean } = {}): string {
   const parts = [
     `${r.steps.length} step${r.steps.length === 1 ? "" : "s"}`,
     `${r.queries.length} ${r.queries.length === 1 ? "query" : "queries"}`,
   ];
-  if (tokens) parts.push(`${formatNumber(tokens)} tokens${cached ? ` (${formatNumber(cached)} cached)` : ""}`);
+  if (admin) {
+    const tokens = (r.usage?.input_tokens ?? 0) + (r.usage?.output_tokens ?? 0);
+    const cached = (r.usage?.cache_read_input_tokens ?? 0) + (r.usage?.cache_creation_input_tokens ?? 0);
+    if (tokens) parts.push(`${formatNumber(tokens)} tokens${cached ? ` (${formatNumber(cached)} cached)` : ""}`);
+    if (r.model) parts.push(r.model);
+  }
   return parts.join(" · ");
 }
 
@@ -63,13 +67,14 @@ export function cell(v: unknown, column?: string): string {
   return formatCellValue(v, { columnId: column });
 }
 
-/** One line per canvas a query read: what it was proven against and how old the build is. */
+/** One line per data set a query read, by its label: what it was proven against and how old the build is. */
 export function integrityLabel(i: CanvasIntegrity): string {
+  const name = i.label ?? i.canvas;
   const age = i.canvas_as_of ? ageLabel(i.canvas_as_of) : null;
   const built = age ? ` · built ${age}` : "";
-  if (i.verdict === "unavailable") return `${i.canvas}: no verification on record`;
-  if (i.verdict === "not covered") return `${i.canvas}: not covered by a parity check${built}`;
-  return `${i.canvas}: ${i.verdict === "proven" ? "proven" : "differences"} (${i.summary})${built}`;
+  if (i.verdict === "unavailable") return `${name}: no verification on record`;
+  if (i.verdict === "not covered") return `${name}: not covered by a parity check${built}`;
+  return `${name}: ${i.verdict === "proven" ? "proven" : "differences"} (${i.summary})${built}`;
 }
 
 export function ageLabel(iso: string, now: Date = new Date()): string {
@@ -79,12 +84,12 @@ export function ageLabel(iso: string, now: Date = new Date()): string {
   return `${Math.floor(h / 24)} days ago`;
 }
 
-/** Ori's standing line: how fresh the report data is and how many reports are checked against the source. */
+/** Ori's standing line: how fresh the data is and how many data sets are checked against the source. */
 export function integrityHeadline(o: IntegrityOverview, now: Date = new Date()): string {
-  if (!o.available) return "These reports have not been checked against the source system yet.";
+  if (!o.available) return "These data sets have not been checked against the source system yet.";
   const proven = o.canvases.filter((c) => c.verdict === "proven").length;
-  const built = o.canvas_as_of ? `Report data refreshed ${ageLabel(o.canvas_as_of, now)}` : "Refresh time unknown";
-  return `${built} · ${proven} of ${o.canvases.length} reports checked against the source system`;
+  const built = o.canvas_as_of ? `Data refreshed ${ageLabel(o.canvas_as_of, now)}` : "Refresh time unknown";
+  return `${built} · ${proven} of ${o.canvases.length} data sets checked against the source system`;
 }
 
 /** "Ori today: 2 questions · 44,464 of 2,000,000 tokens" -- what the organization has spent (admins). */

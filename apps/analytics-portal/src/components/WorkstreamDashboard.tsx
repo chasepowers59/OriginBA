@@ -76,7 +76,7 @@ function WorkstreamDashboardInner({
               {WORKSTREAM_DESCRIPTIONS[workstreamId] ?? "Governed analytics for this business area."}
             </p>
             {snapshotCount != null ? (
-              <p className="mt-2 text-xs text-fg-muted">{snapshotCount} reporting canvases</p>
+              <p className="mt-2 text-xs text-fg-muted">{snapshotCount} data sets</p>
             ) : null}
           </div>
           <PresentationToolbar title={`${label} Dashboard`} exportSections={exportSections} />
@@ -94,7 +94,7 @@ function WorkstreamDashboardInner({
           <div className="mt-4 grid gap-6 md:grid-cols-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
-                Included ({about.canvases.length} canvases · {about.kpis.length} KPIs)
+                Included ({about.canvases.length} data sets · {about.kpis.length} KPIs)
               </p>
               {about.summary ? (
                 <p className="mt-2 text-xs leading-relaxed text-fg-muted">{about.summary}</p>

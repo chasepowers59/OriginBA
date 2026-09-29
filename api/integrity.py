@@ -200,7 +200,10 @@ def canvases_read(sql: str) -> list[str]:
 
 
 def for_query(org_id: str, sql: str) -> list[dict[str, Any]]:
-    """The compact form a query card shows: one line per canvas the query read."""
+    """The compact form a query card shows: one line per canvas the query read, named by
+    the label a reader knows it by (the card is a business screen, not a technical one)."""
+    from api.snapshot_catalog import load_catalog
+    catalog = load_catalog(organization_id=org_id)["snapshots"]
     out = []
     for canvas in canvases_read(sql):
         s = canvas_summary(org_id, canvas)
@@ -214,7 +217,7 @@ def for_query(org_id: str, sql: str) -> list[dict[str, Any]]:
             parts.append(f"{sn['compared']:,} rows vs {sn['against']}, "
                          f"{sn['strict_mismatches']:,} differ" + (f", {sn['missing']:,} missing" if sn["missing"] else ""))
         if not parts:
-            parts.append("no parity check covers this canvas")
-        out.append({"canvas": canvas, "verdict": s["verdict"], "canvas_as_of": s["canvas_as_of"],
-                    "summary": "; ".join(parts)})
+            parts.append("no parity check covers this data set")
+        out.append({"canvas": canvas, "label": (catalog.get(canvas) or {}).get("label") or canvas,
+                    "verdict": s["verdict"], "canvas_as_of": s["canvas_as_of"], "summary": "; ".join(parts)})
     return out

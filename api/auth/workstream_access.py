@@ -106,7 +106,7 @@ def assert_snapshot_access(ctx: AuthContext, snapshot_id: str) -> None:
     if not can_access_snapshot(ctx, snapshot_id):
         from fastapi import HTTPException
 
-        raise HTTPException(status_code=403, detail=f"Access denied for snapshot: {snapshot_id}")
+        raise HTTPException(status_code=403, detail="Access denied for this data set")
 
 
 def filter_report_library_for_auth(library: dict[str, Any], ctx: AuthContext) -> dict[str, Any]:

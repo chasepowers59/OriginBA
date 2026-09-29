@@ -281,11 +281,12 @@ function AnswerText({ text }: { text: string }) {
 }
 
 function Answer({ response }: { response: AssistantResponse }) {
+  const { can } = useAuth();
   return (
     <div className="rounded-xl border border-edge tint-panel-br p-4">
       <AnswerText text={response.answer} />
       {response.queries.map((q, i) => <QueryResult key={i} q={q} />)}
-      <p className="mt-3 text-xs text-fg-muted">{summarise(response)} · {response.model}</p>
+      <p className="mt-3 text-xs text-fg-muted">{summarise(response, { admin: can("settings:manage") })}</p>
     </div>
   );
 }

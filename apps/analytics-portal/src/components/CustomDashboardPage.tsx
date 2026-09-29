@@ -420,7 +420,7 @@ function TileEditor({
           />
         </label>
         <label className="text-xs text-fg-muted sm:col-span-2">
-          Snapshot
+          Data set
           <select
             className="input-modern mt-1"
             value={draft.snapshot_id}

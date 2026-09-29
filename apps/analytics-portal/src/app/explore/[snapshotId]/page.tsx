@@ -24,7 +24,7 @@ export default async function ExplorePage({ params }: PageProps) {
   try {
     [index, metadata] = await Promise.all([fetchSnapshots(), fetchSnapshotMetadata(id)]);
   } catch (err) {
-    error = err instanceof Error ? err.message : "Failed to load snapshot";
+    error = err instanceof Error ? err.message : "Couldn't load this data set.";
     index = {
       client: "demo",
       poc_enabled: [],
@@ -47,7 +47,7 @@ export default async function ExplorePage({ params }: PageProps) {
     >
       {error || !metadata ? (
         <div className="glass-panel border-over bg-over-bg px-4 py-3 text-over">
-          {error ?? "Snapshot not found"}
+          {error ?? "Data set not found"}
         </div>
       ) : (
         <div className="space-y-6">
@@ -60,9 +60,7 @@ export default async function ExplorePage({ params }: PageProps) {
             />
           ) : (
             <SampleRowsPanel
-              schemaName={metadata.schema}
               snapshotId={metadata.id}
-              tableName={metadata.table_name}
               grainDescription={metadata.grain_description}
               skipSampleRows={metadata.skip_sample_rows}
             />

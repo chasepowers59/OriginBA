@@ -150,7 +150,7 @@ def get_snapshot(snapshot_id: str, organization_id: str | None = None) -> dict[s
     key = resolve_snapshot_key(catalog["snapshots"], snapshot_id)
     if key in catalog["snapshots"]:
         return catalog["snapshots"][key]
-    raise CatalogError(f"Unknown snapshot: {snapshot_id}")
+    raise CatalogError(f"Unknown data set: {snapshot_id}")
 
 
 # Columns that may never be queryable, whatever a catalog says. The SQL workspace

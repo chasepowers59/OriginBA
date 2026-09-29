@@ -81,7 +81,7 @@ export function FieldPalette({
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search tables & columns…"
+          placeholder="Search data sets & columns…"
           className="input-modern mt-2 w-full text-xs"
         />
       </div>

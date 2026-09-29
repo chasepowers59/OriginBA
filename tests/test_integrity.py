@@ -126,6 +126,7 @@ class WithReports(unittest.TestCase):
     def test_the_compact_form_fits_a_query_card(self):
         c = integrity.for_query("ellensburg", "select 1 from ORIGINBA_REPORTING.RPT_SA_AGED_BALANCE")
         self.assertEqual(c[0]["canvas"], "rpt_sa_aged_balance")
+        self.assertEqual(c[0]["label"], "Service Agreement Aged Balance", "a reader sees the data set, not the table")
         self.assertEqual(c[0]["verdict"], "proven")
         self.assertIn("CMS_SA_SNAPSHOT", c[0]["summary"])
         self.assertIn("138,086", c[0]["summary"])

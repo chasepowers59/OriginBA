@@ -16,13 +16,13 @@ import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 import { isRestricted, visibleNav } from "@/lib/rowRules";
 import { clientLogo } from "@/lib/branding";
 
-// One clean top nav, one job per destination. "/" is the executive Home; Explore is the
+// One clean top nav, one job per destination. "/" is the executive Home; Build is the
 // single self-serve builder; Library is the one report catalog (and hosts the workstream
 // browse tree); SQL is the one query surface. The ids are stable so each page's activeNav
 // prop is unchanged even though labels/routes were rationalised.
 const NAV = [
   { href: "/", label: "Home", id: "home" as const },
-  { href: "/build", label: "Explore", id: "build" as const },
+  { href: "/build", label: "Build", id: "build" as const },
   { href: "/dashboards", label: "Dashboards", id: "custom" as const },
   { href: "/reports", label: "Library", id: "reports" as const },
   { href: "/letters", label: "Letters", id: "letters" as const, permission: "letters:read" },
@@ -209,7 +209,7 @@ export function AppShell({
                     className="mt-2 flex min-w-0 items-center gap-1.5 xl:hidden"
                   />
                   <p className="portal-text-subtle mt-2 border-t border-edge-subtle pt-2 text-xs">
-                    {workstreams.length} workstreams · {snapshots.length} reporting tables
+                    {workstreams.length} workstreams · {snapshots.length} data sets
                   </p>
                   <button type="button" onClick={logout} className="btn-ghost mt-3 w-full text-xs">
                     Sign out

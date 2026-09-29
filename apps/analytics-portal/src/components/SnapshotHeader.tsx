@@ -85,7 +85,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
               href={`/explore/${metadata.related_snapshot.id}`}
               className="mt-3 inline-flex items-center gap-2 rounded-lg border border-edge bg-band px-3 py-2 text-xs text-primary transition hover:border-edge"
             >
-              <span className="font-medium text-primary">Related domain →</span>
+              <span className="font-medium text-primary">Related data set →</span>
               {metadata.related_snapshot.label}
               <span className="text-primary">· {metadata.related_snapshot.hint}</span>
             </Link>
@@ -93,7 +93,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
         </div>
         <div className="flex flex-wrap gap-3">
           <StatPill
-            label="Records in domain"
+            label="Rows in this data set"
             value={rowCount != null ? formatCompact(rowCount) : statsLoaded ? "—" : "…"}
           />
           {/* Dropped entirely when the canvas has no watermark: a pill reading

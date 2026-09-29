@@ -129,7 +129,7 @@ export function DataQualityBoard() {
           </p>
           <h1 className="portal-heading mt-1 text-2xl font-bold">Worklist</h1>
           <p className="mt-1 text-sm text-fg-muted">
-            Rules run against this tenant&apos;s data; every finding says exactly where
+            Rules run against this organization&apos;s data; every finding says exactly where
             to act in CIS.
             {data.refresh_marker ? (
               <span className="text-fg-subtle"> · data as of {data.refresh_marker}</span>

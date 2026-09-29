@@ -105,6 +105,15 @@ class Tools(unittest.TestCase):
         self.assertIn("Do not repeat the SQL", head)
         self.assertIn("CURRENT_DATE - 90", system_prompt("dev", "Dev", "postgres")[0]["text"])
 
+    def test_the_prompt_speaks_the_readers_words(self):
+        """UI-4: an answer names a data set by its label; "canvas" and a table name are
+        engineering words on a business screen."""
+        from api.assistant import system_prompt
+        head = system_prompt("dev", "Dev", "postgres")[0]["text"]
+        self.assertIn('"data set" named by its label', head)
+        self.assertIn("never a table name", head)
+        self.assertNotIn("(which canvas,", head)
+
     def test_knowledge_search_finds_the_frozen_rule(self):
         hits = tool_search_knowledge("dev", "frozen financial transaction money")
         self.assertTrue(hits, "the SQL skill's frozen rule should be findable")
