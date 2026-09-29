@@ -13,7 +13,8 @@ import {
 import type { ExecutiveTrendPoint } from "@/lib/types";
 import { valueRampColors } from "@/lib/chartEmphasis";
 import { useColorMode } from "@/components/PortalThemeProvider";
-import { splitTickLabel } from "@/lib/axisLabels";
+import { AxisTick, useElementWidth, type TickText } from "@/components/builder/BuilderChart";
+import { SPARK_AXIS, chartLayout } from "@/lib/chartLayout";
 import { formatTooltipCurrency, formatTooltipNumber } from "@/lib/format";
 
 type MiniSparkChartProps = {
@@ -24,25 +25,14 @@ type MiniSparkChartProps = {
   onBarClick?: (label: string) => void;
 };
 
-/** Two whole words on two lines beats "Elec…tial": see splitTickLabel. */
-function SparkTick({ x, y, payload }: { x?: number; y?: number; payload?: { value?: unknown } }) {
-  const lines = splitTickLabel(String(payload?.value ?? ""), 11);
-  return (
-    <text x={x} y={y} textAnchor="middle" fontSize={8.5} fill="var(--foreground-subtle)">
-      {lines.map((line, i) => (
-        <tspan key={i} x={x} dy={i === 0 ? 9 : 9.5}>
-          {line}
-        </tspan>
-      ))}
-    </text>
-  );
-}
+/** Horizontal rows stay at least this tall, so one-line labels never touch. */
+const MIN_ROW_PX = 16;
 
 function SparkTooltip({
   active,
   payload,
-  isCurrency,
-}: TooltipProps<number, string> & { isCurrency: boolean }) {
+  formatValue,
+}: TooltipProps<number, string> & { formatValue: (n: number) => string }) {
   if (!active || !payload?.length) return null;
   const point = payload[0];
   const category =
@@ -54,7 +44,7 @@ function SparkTooltip({
         {category}
       </p>
       <p className="mt-1 text-lg font-bold tabular-nums leading-none text-[var(--tooltip-text)]">
-        {isCurrency ? formatTooltipCurrency(n) : formatTooltipNumber(n)}
+        {formatValue(n)}
       </p>
     </div>
   );
@@ -70,6 +60,7 @@ export function MiniSparkChart({
   // App-wide value ramp: blue = highest, shifting toward red as values drop; the
   // cross-filter selection overrides its bar to the selection hue.
   const { colorMode } = useColorMode();
+  const [measureRef, width] = useElementWidth();
   const fills = valueRampColors(points.map((p) => p.value), { dark: colorMode === "dark" });
   const data = points.map((p, i) => ({
     name: p.label,
@@ -78,49 +69,65 @@ export function MiniSparkChart({
     fill: selectedLabel === p.label ? "var(--chart-selected)" : fills[i],
   }));
 
-  if (!data.length) {
+  const labels = points.map((p) => p.label);
+  const layout = chartLayout({ ...SPARK_AXIS, labels, values: points.map((p) => p.value), width });
+  const ticks: TickText = new Map(labels.map((label, i) => [label, { lines: layout.tickLines[i], title: label }]));
+  const tick = <AxisTick ticks={ticks} fontSize={SPARK_AXIS.fontSize} />;
+  const rows = layout.orientation === "horizontal";
+  const formatValue = format === "currency" ? formatTooltipCurrency : formatTooltipNumber;
+
+  if (!layout.showChart) {
     return (
-      <div
-        className="flex items-center justify-center rounded-lg border border-dashed border-edge-subtle text-xs text-fg-muted"
-        style={{ height }}
-      >
-        No trend data
-      </div>
+      <p ref={measureRef} className="flex items-center justify-center px-2 text-center text-xs text-fg-muted" style={{ height }}>
+        {layout.note}
+      </p>
     );
   }
 
+  // Axis labels stay FLAT and every bar keeps its label: columns wrap to two lines,
+  // and above five categories each gets its own row (chartLayout decides).
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} barCategoryGap="18%" margin={{ top: 4, right: 2, left: 2, bottom: 0 }}>
-        {/* Axis labels stay FLAT (design standard): wrap to two lines rather than
-            rotate — angled text is harder to scan. Every bar keeps its label
-            (interval 0): a KPI trend has at most a handful of categories. */}
-        <XAxis
-          dataKey="name"
-          tick={<SparkTick />}
-          interval={0}
-          height={26}
-          tickLine={false}
-          axisLine={false}
-        />
-        <YAxis hide domain={["auto", "auto"]} />
-        <Tooltip
-          content={<SparkTooltip isCurrency={format === "currency"} />}
-          wrapperStyle={{ zIndex: 50, outline: "none" }}
-          cursor={{ fill: "var(--chip-bg)" }}
-        />
-        <Bar
-          dataKey="value"
-          radius={[3, 3, 0, 0]}
-          onClick={(payload) => onBarClick?.(String((payload as { fullName?: string }).fullName ?? ""))}
-          style={{ cursor: onBarClick ? "pointer" : "default" }}
-          isAnimationActive={false}
+    <div
+      ref={measureRef}
+      className="w-full min-w-0"
+      role="img"
+      aria-label={`${rows ? "Horizontal bar" : "Bar"} chart: ${points.map((p) => `${p.label} ${formatValue(p.value)}`).join(", ")}`}
+    >
+      <ResponsiveContainer width="100%" height={rows ? Math.max(height, points.length * MIN_ROW_PX) : height}>
+        <BarChart
+          data={data}
+          layout={rows ? "vertical" : "horizontal"}
+          barCategoryGap="18%"
+          margin={{ top: 4, right: 2, left: 2, bottom: 0 }}
         >
-          {data.map((entry, index) => (
-            <Cell key={index} fill={entry.fill} />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+          {rows ? (
+            <XAxis type="number" hide domain={["auto", "auto"]} />
+          ) : (
+            <XAxis dataKey="name" tick={tick} interval={0} height={layout.axisSize} tickLine={false} axisLine={false} />
+          )}
+          {rows ? (
+            <YAxis type="category" dataKey="name" width={layout.axisSize} tick={tick} interval={0} tickLine={false} axisLine={false} />
+          ) : (
+            <YAxis hide domain={["auto", "auto"]} />
+          )}
+          <Tooltip
+            content={<SparkTooltip formatValue={formatValue} />}
+            wrapperStyle={{ zIndex: 50, outline: "none" }}
+            cursor={{ fill: "var(--chip-bg)" }}
+          />
+          <Bar
+            dataKey="value"
+            radius={rows ? [0, 3, 3, 0] : [3, 3, 0, 0]}
+            onClick={(payload) => onBarClick?.(String((payload as { fullName?: string }).fullName ?? ""))}
+            style={{ cursor: onBarClick ? "pointer" : "default" }}
+            isAnimationActive={false}
+          >
+            {data.map((entry, index) => (
+              <Cell key={index} fill={entry.fill} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   );
 }

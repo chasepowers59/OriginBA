@@ -12,10 +12,11 @@ describe("categoryLabel", () => {
     expect(categoryLabel(true)).toBe("True");
     expect(categoryLabel(false)).toBe("False");
   });
-  it("renders a missing category as a dash, not an empty axis slot", () => {
-    expect(categoryLabel(null)).toBe("—");
-    expect(categoryLabel(undefined)).toBe("—");
-    expect(categoryLabel("")).toBe("—");
+  // UI-15: a dash in a legend or on an axis reads as a glitch, not as a group of rows.
+  it("names a missing category in plain words, not a dash", () => {
+    expect(categoryLabel(null)).toBe("Not recorded");
+    expect(categoryLabel(undefined)).toBe("Not recorded");
+    expect(categoryLabel("")).toBe("Not recorded");
   });
   it("leaves text and numbers as they are", () => {
     expect(categoryLabel("Residential")).toBe("Residential");

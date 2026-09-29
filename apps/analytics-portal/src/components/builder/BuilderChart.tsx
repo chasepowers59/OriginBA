@@ -1,7 +1,7 @@
 "use client";
 
 import { categoryLabel } from "@/lib/chartLabels";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import {
   Area,
   AreaChart,
@@ -27,6 +27,7 @@ import {
 import { formatCurrency, formatNumber, formatTooltipNumber } from "@/lib/format";
 import { valueRampColors } from "@/lib/chartEmphasis";
 import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
+import { BUILDER_AXIS, chartLayout, piePlan, tickLineHeight } from "@/lib/chartLayout";
 import { formatTimeBucket } from "@/lib/timeBucketLabel";
 import { useColorMode } from "@/components/PortalThemeProvider";
 
@@ -67,6 +68,56 @@ const SERIES_VARS = [
   "var(--chart-5)",
 ];
 
+/** Container width in px, 0 until measured: the charts lay out from it. */
+export function useElementWidth() {
+  const [width, setWidth] = useState(0);
+  const ref = useCallback((node: HTMLElement | null) => {
+    if (!node) return undefined;
+    const observer = new ResizeObserver(([entry]) => setWidth(Math.round(entry.contentRect.width)));
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, width] as const;
+}
+
+export type TickText = Map<string, { lines: string[]; title: string }>;
+
+/** A flat tick of one or two lines (chartLayout decides them); hover shows the full label. */
+export function AxisTick({
+  x = 0,
+  y = 0,
+  payload,
+  textAnchor,
+  verticalAnchor,
+  ticks,
+  fontSize,
+}: {
+  x?: number;
+  y?: number;
+  payload?: { value?: unknown };
+  textAnchor?: "start" | "middle" | "end" | "inherit";
+  verticalAnchor?: string;
+  ticks: TickText;
+  fontSize: number;
+}) {
+  const value = String(payload?.value ?? "");
+  const { lines, title } = ticks.get(value) ?? { lines: [value], title: value };
+  const lineHeight = tickLineHeight(fontSize);
+  // Row labels centre on their bar; column labels hang below the axis.
+  const firstDy =
+    verticalAnchor === "middle" ? fontSize * 0.35 - ((lines.length - 1) * lineHeight) / 2 : fontSize;
+  return (
+    <text x={x} y={y} textAnchor={textAnchor} fontSize={fontSize} fill="var(--foreground-subtle)">
+      <title>{title}</title>
+      {lines.map((line, i) => (
+        <tspan key={i} x={x} dy={i === 0 ? firstDy : lineHeight}>
+          {line}
+        </tspan>
+      ))}
+    </text>
+  );
+}
+
 export function BuilderChart({
   rows,
   xKey,
@@ -81,6 +132,7 @@ export function BuilderChart({
   xGrain = null,
 }: BuilderChartProps) {
   const { colorMode } = useColorMode();
+  const [measureRef, width] = useElementWidth();
 
   const config = useMemo<ChartConfig>(() => {
     const c: ChartConfig = {};
@@ -90,6 +142,9 @@ export function BuilderChart({
     return c;
   }, [series]);
 
+  // An ordered axis (dates, aging bands) keeps its order and its columns: a reader
+  // infers a thinned tick from its neighbours. A categorical one never hides a label.
+  const ordered = sortTimeSeries || isOrderedAxis(xLabel);
   const data = useMemo(() => {
     const mapped = rows.map((r) => {
       const row: Record<string, unknown> = { [xKey]: categoryLabel(r[xKey]) };
@@ -100,9 +155,34 @@ export function BuilderChart({
       mapped,
       xKey,
       series.map((s) => s.key),
-      sortTimeSeries || isOrderedAxis(xLabel),
+      ordered,
     );
-  }, [rows, xKey, xLabel, series, sortTimeSeries]);
+  }, [rows, xKey, series, ordered]);
+
+  // A time bucket is a timestamp; naming its period beats truncating its first instant.
+  const labels = useMemo(
+    () => data.map((d) => (sortTimeSeries ? formatTimeBucket(String(d[xKey]), xGrain) : String(d[xKey]))),
+    [data, xKey, sortTimeSeries, xGrain],
+  );
+  const layout = chartLayout({
+    ...BUILDER_AXIS,
+    labels,
+    values: rows.flatMap((r) => series.map((s) => r[s.key])),
+    width,
+    horizontal: visual === "horizontal",
+  });
+  const pie =
+    visual === "pie" && series.length
+      ? piePlan(data.map((d) => String(d[xKey])), data.map((d) => Number(d[series[0].key])))
+      : null;
+  const shown: BuilderVisual = visual === "pie" && !pie?.slices ? "bar" : visual;
+  const asRows =
+    shown === "horizontal" ||
+    ((shown === "bar" || shown === "stacked-bar") && !ordered && layout.orientation === "horizontal");
+  const ticks: TickText = new Map(
+    data.map((d, i) => [String(d[xKey]), { lines: layout.tickLines[i], title: labels[i] }]),
+  );
+  const categoryTick = <AxisTick ticks={ticks} fontSize={BUILDER_AXIS.fontSize} />;
 
   const anyCurrency = series.some((s) => s.currency);
   // Axis ticks COMPACT ($12.3M) so they fit the axis width; tooltips show the full
@@ -130,68 +210,69 @@ export function BuilderChart({
 
   // Screen readers get a description of what the chart encodes; the data itself
   // is available through the result table, so a summary is the right depth here.
-  const a11yLabel = `${visual} chart: ${series.map((s) => s.label).join(", ")} by ${xLabel ?? xKey}, ${data.length} categories`;
+  const a11yLabel = `${asRows ? "horizontal bar" : shown.replace("-", " ")} chart: ${series.map((s) => s.label).join(", ")} by ${xLabel ?? xKey}, ${data.length} categories`;
 
   const handleSelect = (category: unknown) => {
     if (onCategorySelect && category != null) onCategorySelect(String(category));
   };
   const clickCursor = onCategorySelect ? "pointer" : "default";
 
-  if (!data.length || !series.length) {
-    return (
-      <div
-        className="flex items-center justify-center rounded-xl border border-dashed"
-        style={{ height, borderColor: "var(--border)", color: "var(--foreground-subtle)" }}
-      >
-        {emptyMessage}
-      </div>
-    );
-  }
-
-  // A time bucket is a timestamp; naming its period beats truncating its first instant.
   const xTickLabel = (v: string) => {
-    const label = sortTimeSeries ? formatTimeBucket(String(v), xGrain) : String(v);
+    const label = ticks.get(String(v))?.title ?? String(v);
     return label.length > 16 ? `${label.slice(0, 15)}…` : label;
   };
 
   const grid = <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />;
   const tip = <ChartTooltip content={<ChartTooltipContent valueFormatter={tipFormatter} />} />;
   const legend = series.length > 1 ? <ChartLegend content={<ChartLegendContent />} /> : null;
-  const xAxis = (
+  const xAxis = ordered ? (
     <XAxis
       dataKey={xKey}
       tickLine={false}
       axisLine={false}
-      tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }}
+      tick={{ fontSize: BUILDER_AXIS.fontSize, fill: "var(--foreground-subtle)" }}
       tickFormatter={xTickLabel}
       interval="preserveStartEnd"
       minTickGap={12}
     />
+  ) : (
+    <XAxis
+      dataKey={xKey}
+      tickLine={false}
+      axisLine={false}
+      tick={categoryTick}
+      interval={0}
+      height={layout.axisSize}
+    />
   );
 
-  if (visual === "pie") {
+  // Every outcome renders in the one measured frame, so the layout knows its width.
+  const frame = (node: ReactNode) => (
+    <div ref={measureRef} className="w-full min-w-0">
+      {pie?.note && layout.showChart ? <p className="mb-2 text-xs text-fg-muted">{pie.note}</p> : null}
+      {node}
+    </div>
+  );
+
+  if (!data.length || !series.length) {
+    return frame(
+      <div
+        className="flex items-center justify-center rounded-xl border border-dashed"
+        style={{ height, borderColor: "var(--border)", color: "var(--foreground-subtle)" }}
+      >
+        {emptyMessage}
+      </div>,
+    );
+  }
+
+  if (!layout.showChart) {
+    return frame(<p className="px-4 py-10 text-center text-sm text-fg-muted">{layout.note}</p>);
+  }
+
+  if (shown === "pie" && pie?.slices) {
     const key = series[0].key;
-    // A readable pie: positive slices only (negative arcs are broken by definition —
-    // adjustments/refunds go negative routinely), capped at 7 + an "Other" bucket, and
-    // a legend config keyed by CATEGORY so names actually render.
-    const positive = data.filter((d) => Number(d[key]) > 0);
-    if (!positive.length) {
-      return (
-        <div
-          className="flex items-center justify-center rounded-xl border border-dashed px-6 text-center text-sm"
-          style={{ height, borderColor: "var(--border)", color: "var(--foreground-subtle)" }}
-        >
-          A pie needs positive values — switch to a bar for this result.
-        </div>
-      );
-    }
-    const sorted = [...positive].sort((a, b) => Number(b[key]) - Number(a[key]));
-    const MAX_SLICES = 7;
-    const head = sorted.slice(0, MAX_SLICES);
-    const tail = sorted.slice(MAX_SLICES);
-    const pieData = tail.length
-      ? [...head, { [xKey]: `Other (${tail.length})`, [key]: tail.reduce((a, d) => a + Number(d[key]), 0) }]
-      : head;
+    // Legend config keyed by CATEGORY so names actually render.
+    const pieData = pie.slices.map((s) => ({ [xKey]: s.label, [key]: s.value }));
     const pieConfig: ChartConfig = { ...config };
     pieData.forEach((d, i) => {
       pieConfig[String(d[xKey])] = {
@@ -199,7 +280,7 @@ export function BuilderChart({
         color: SERIES_VARS[i % SERIES_VARS.length],
       };
     });
-    return (
+    return frame(
       <ChartContainer config={pieConfig} style={{ height }} className="w-full" role="img" aria-label={a11yLabel}>
         <PieChart>
           {tip}
@@ -227,21 +308,22 @@ export function BuilderChart({
           </Pie>
           <ChartLegend content={<ChartLegendContent nameKey={xKey} />} />
         </PieChart>
-      </ChartContainer>
+      </ChartContainer>,
     );
   }
 
-  if (visual === "horizontal") {
+  if (asRows) {
+    const stackId = shown === "stacked-bar" ? "a" : undefined;
     // Rows drive the chart's own height, but the VIEWPORT is capped and scrolls: a
     // 200-row result no longer produces a 7,000px page (or blows out a dashboard tile).
     const chartHeight = Math.max(height, data.length * 34);
-    return (
+    return frame(
       <div style={{ maxHeight: Math.max(height, 560), overflowY: chartHeight > Math.max(height, 560) ? "auto" : "visible" }}>
       <ChartContainer config={config} style={{ height: chartHeight }} className="w-full" role="img" aria-label={a11yLabel}>
         <BarChart data={data} layout="vertical" margin={{ left: 8 }} maxBarSize={40}>
           <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />
           <XAxis type="number" tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} tickFormatter={fmt} axisLine={false} tickLine={false} />
-          <YAxis type="category" dataKey={xKey} width={130} tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} tickFormatter={(v: string) => (v.length > 18 ? v.slice(0, 17) + "…" : v)} axisLine={false} tickLine={false} />
+          <YAxis type="category" dataKey={xKey} width={layout.axisSize} tick={categoryTick} interval={0} axisLine={false} tickLine={false} />
           {tip}
           {legend}
           {singleSeries ? (
@@ -257,17 +339,17 @@ export function BuilderChart({
             </Bar>
           ) : (
             series.map((s) => (
-              <Bar key={s.key} dataKey={s.key} fill={`var(--color-${s.key})`} radius={[0, 4, 4, 0]} />
+              <Bar key={s.key} dataKey={s.key} fill={`var(--color-${s.key})`} radius={stackId ? 0 : [0, 4, 4, 0]} stackId={stackId} />
             ))
           )}
         </BarChart>
       </ChartContainer>
-      </div>
+      </div>,
     );
   }
 
-  if (visual === "line") {
-    return (
+  if (shown === "line") {
+    return frame(
       <ChartContainer config={config} style={{ height }} className="w-full" role="img" aria-label={a11yLabel}>
         <LineChart data={data} margin={{ left: 4, right: 8 }}>
           {grid}
@@ -279,13 +361,13 @@ export function BuilderChart({
             <Line key={s.key} type="monotone" dataKey={s.key} stroke={`var(--color-${s.key})`} strokeWidth={2} dot={data.length < 3} />
           ))}
         </LineChart>
-      </ChartContainer>
+      </ChartContainer>,
     );
   }
 
-  if (visual === "area" || visual === "stacked-area") {
-    const stackId = visual === "stacked-area" ? "a" : undefined;
-    return (
+  if (shown === "area" || shown === "stacked-area") {
+    const stackId = shown === "stacked-area" ? "a" : undefined;
+    return frame(
       <ChartContainer config={config} style={{ height }} className="w-full" role="img" aria-label={a11yLabel}>
         <AreaChart data={data} margin={{ left: 4, right: 8 }}>
           <defs>
@@ -313,13 +395,13 @@ export function BuilderChart({
             />
           ))}
         </AreaChart>
-      </ChartContainer>
+      </ChartContainer>,
     );
   }
 
   // bar / stacked-bar
-  const stackId = visual === "stacked-bar" ? "a" : undefined;
-  return (
+  const stackId = shown === "stacked-bar" ? "a" : undefined;
+  return frame(
     <ChartContainer config={config} style={{ height }} className="w-full" role="img" aria-label={a11yLabel}>
       <BarChart data={data} margin={{ left: 4, right: 8 }} maxBarSize={64}>
         {grid}
@@ -345,6 +427,6 @@ export function BuilderChart({
           ))
         )}
       </BarChart>
-    </ChartContainer>
+    </ChartContainer>,
   );
 }
