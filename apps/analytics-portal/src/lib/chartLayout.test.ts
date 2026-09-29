@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BUILDER_AXIS, ROW_PITCH, SPARK_AXIS, chartLayout, piePlan, rowScroll } from "./chartLayout";
+import { BUILDER_AXIS, ROW_PITCH, SPARK_AXIS, chartLayout, minBarPx, piePlan, rowScroll } from "./chartLayout";
 
 const CLASSES = [
   "Electric Residential",
@@ -243,5 +243,18 @@ describe("rowScroll: a long horizontal bar chart scrolls in whole rows", () => {
     expect(out.scrolls).toBe(false);
     expect(out.chartHeight).toBe(460);
     expect(out.viewport).toBe(460);
+  });
+});
+
+describe("minBarPx: a small value still draws a bar you can see", () => {
+  it("gives any non-zero value, negative too, at least 2px", () => {
+    expect(minBarPx(0.4)).toBe(2);
+    expect(minBarPx(-3)).toBe(2);
+  });
+
+  it("draws nothing for zero or a missing value", () => {
+    expect(minBarPx(0)).toBe(0);
+    expect(minBarPx(null)).toBe(0);
+    expect(minBarPx(undefined)).toBe(0);
   });
 });

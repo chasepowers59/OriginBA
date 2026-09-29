@@ -167,6 +167,13 @@ export function rowScroll({ rows, height, legend }: { rows: number; height: numb
   return { chartHeight, chrome, viewport: chrome + wholeRows * ROW_PITCH, scrolls: true };
 }
 
+/**
+ * recharts `minPointSize` for KPI bars: a small or negative value would draw a 1px
+ * sliver, so it gets 2px; zero and missing stay empty, since recharts would otherwise
+ * draw zero as a 2px bar too.
+ */
+export const minBarPx = (value: number | null | undefined) => (value ? 2 : 0);
+
 export type PieSlice = { label: string; value: number };
 
 /** Four named slices and "Other": the five chart colours, none repeated (UI-15). */

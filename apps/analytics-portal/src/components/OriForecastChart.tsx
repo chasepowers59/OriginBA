@@ -5,7 +5,7 @@ import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import type { OriForecast } from "@/lib/api";
 import { formatCurrency, formatMonth, formatNumber, valueAxis } from "@/lib/format";
 import { ORI } from "@/lib/ori";
-import { forecastRows, type ForecastRow } from "@/lib/oriPanel";
+import { FORECAST_FRAME, forecastRows, type ForecastRow } from "@/lib/oriPanel";
 
 // One series, one hue: the actual line, its dashed projection and the likely band are all --chart-1.
 const HUE = "var(--chart-1)";
@@ -47,7 +47,7 @@ export function OriForecastChart({ forecast }: { forecast: OriForecast }) {
 
   return (
     <ChartContainer config={{}} style={{ height: 140 }} className="w-full min-w-0" role="img" aria-label={ORI.forecastChart(forecast.label)}>
-      <ComposedChart data={rows} margin={{ top: 6, right: 4, bottom: 0, left: 0 }}>
+      <ComposedChart data={rows} margin={FORECAST_FRAME.margin}>
         <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />
         <XAxis
           dataKey="month"
@@ -61,6 +61,7 @@ export function OriForecastChart({ forecast }: { forecast: OriForecast }) {
         <YAxis
           ticks={axis.ticks}
           domain={axis.domain}
+          padding={FORECAST_FRAME.valuePadding}
           tickFormatter={axis.format}
           tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }}
           tickLine={false}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { OriAnomaly, OriFinding, OriForecast } from "./api";
-import { forecastRows, investigations, oriPanelShows } from "./oriPanel";
+import { FORECAST_FRAME, forecastRows, investigations, oriPanelShows } from "./oriPanel";
 
 const FINDING: OriFinding = {
   kpi_id: "billed_revenue", change_pct: -17.9,
@@ -103,5 +103,18 @@ describe("whether Ori's panel shows", () => {
     expect(oriPanelShows({ ...read, findings: [FINDING] }, trends)).toBe(true);
     expect(oriPanelShows(read, { ...trends, anomalies: [ANOMALY] })).toBe(true);
     expect(oriPanelShows(read, { ...trends, forecasts: [FORECAST] })).toBe(true);
+  });
+});
+
+describe("the forecast chart's frame", () => {
+  // Design review, Ellensburg 1440px: the band ran into the card's right edge, and the
+  // lowest value tick ("$2M") sat on the first month label ("Jun 2025").
+  it("leaves room right of the last month's band", () => {
+    expect(FORECAST_FRAME.margin.right).toBeGreaterThanOrEqual(8);
+  });
+
+  it("lifts the lowest value tick off the month labels", () => {
+    expect(FORECAST_FRAME.valuePadding.bottom).toBeGreaterThanOrEqual(6);
+    expect(FORECAST_FRAME.margin.bottom).toBeGreaterThanOrEqual(4);
   });
 });

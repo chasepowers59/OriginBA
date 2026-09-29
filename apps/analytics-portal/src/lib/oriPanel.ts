@@ -33,3 +33,9 @@ export function oriPanelShows(read: OriRead | null, trends: OriTrends | null): b
   if (!trends) return true;
   return Boolean(read.brief?.trim()) || read.findings.length + trends.anomalies.length + trends.forecasts.length > 0;
 }
+
+/** The forecast chart's frame: margins round the plot, and room under the lowest value tick. */
+export const FORECAST_FRAME = {
+  margin: { top: 6, right: 12, bottom: 4, left: 0 },
+  valuePadding: { top: 0, bottom: 8 },
+} as const;

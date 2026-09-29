@@ -232,14 +232,14 @@ export function AppShell({
       </header>
 
       <div className="mx-auto max-w-[1700px] px-6 py-8 2xl:px-10">
-        {/* bottom room so the floating Ask Ori button never covers the page's last content */}
         {staleNotice ? (
           <p role="status" data-testid="stale-data"
              className="mb-6 rounded-xl border border-warn bg-warn-bg px-4 py-3 text-sm text-warn">
             {staleNotice}
           </p>
         ) : null}
-        <main className="min-w-0 animate-fade-in pb-20">{children}</main>
+        {/* bottom room so the floating Ask Ori button never covers the page's last content */}
+        <main className="min-w-0 animate-fade-in pb-24">{children}</main>
       </div>
       {user && !isRestricted(user) ? <AssistantDrawer /> : null}
 

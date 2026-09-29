@@ -13,7 +13,7 @@ import {
 import type { ExecutiveTrendPoint } from "@/lib/types";
 import { emphasisFills } from "@/lib/chartEmphasis";
 import { AxisTick, useElementWidth, type TickText } from "@/components/builder/BuilderChart";
-import { SPARK_AXIS, chartLayout } from "@/lib/chartLayout";
+import { SPARK_AXIS, chartLayout, minBarPx } from "@/lib/chartLayout";
 import { formatCurrency, formatNumber } from "@/lib/format";
 
 type MiniSparkChartProps = {
@@ -117,6 +117,7 @@ export function MiniSparkChart({
           <Bar
             dataKey="value"
             radius={rows ? [0, 3, 3, 0] : [3, 3, 0, 0]}
+            minPointSize={minBarPx}
             onClick={(payload) => onBarClick?.(String((payload as { fullName?: string }).fullName ?? ""))}
             style={{ cursor: onBarClick ? "pointer" : "default" }}
             isAnimationActive={false}
