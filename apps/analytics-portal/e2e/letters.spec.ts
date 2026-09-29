@@ -1,24 +1,28 @@
 import { test, expect } from "@playwright/test";
+import { asOrg } from "./org";
 
 /**
- * Letters for demo25 -- the one check not on Ellensburg (e2e/org.ts): letters read raw CISADM
- * and run only for Postgres organizations until the Oracle letters (phase 2) are built. Pick August 2022 (the demo warehouse has 15 letters then), see the rows,
- * choose one, and see its PDF preview. Customer names are never read or asserted here.
+ * Letters on Ellensburg (e2e/org.ts): raw CISADM read through the org's own Oracle connection.
+ * May 2026 is the last complete month before its data_as_of (2026-06-18) and holds about 3,200
+ * letters; a cold month takes tens of seconds over the VPN. See the rows, choose one, and see its
+ * PDF preview. Customer names are never read or asserted here.
  *
  *   npx playwright test e2e/letters.spec.ts --project=desktop
  */
+const LOAD = { timeout: 150_000 };
+
 test("a letter in the window opens its PDF preview", async ({ page, context }, info) => {
-  await context.addCookies([{ name: "portal_active_organization", value: "demo25", url: info.project.use.baseURL! }]);
+  await asOrg(context, info);
   await page.goto("/letters");
   const from = page.getByLabel("From", { exact: true });
   await expect(from).not.toHaveValue("", { timeout: 60_000 }); // the default month is set after hydration
 
-  await from.fill("2022-08-01");
-  await page.getByLabel("To", { exact: true }).fill("2022-08-31");
+  await from.fill("2026-05-01");
+  await page.getByLabel("To", { exact: true }).fill("2026-05-31");
   await page.getByRole("button", { name: "Show letters" }).click();
 
   const rows = page.locator("tbody tr");
-  await expect(rows.first()).toBeVisible({ timeout: 60_000 });
+  await expect(rows.first()).toBeVisible(LOAD);
   expect(await rows.count()).toBeGreaterThan(0);
 
   await rows.first().click();
@@ -29,15 +33,15 @@ test("a letter in the window opens its PDF preview", async ({ page, context }, i
 });
 
 test("a window longer than the server allows is refused before it is asked", async ({ page, context }, info) => {
-  await context.addCookies([{ name: "portal_active_organization", value: "demo25", url: info.project.use.baseURL! }]);
+  await asOrg(context, info);
   await page.goto("/letters");
   const from = page.getByLabel("From", { exact: true });
   await expect(from).not.toHaveValue("", { timeout: 60_000 });
   const asked: string[] = [];
-  page.on("request", (r) => { if (r.url().includes("/portal/letters?from=2021-01-01")) asked.push(r.url()); });
+  page.on("request", (r) => { if (r.url().includes("/portal/letters?from=2025-01-01")) asked.push(r.url()); });
 
-  await from.fill("2021-01-01");
-  await page.getByLabel("To", { exact: true }).fill("2022-08-31");
+  await from.fill("2025-01-01");
+  await page.getByLabel("To", { exact: true }).fill("2026-05-31");
   await page.getByRole("button", { name: "Show letters" }).click();
 
   // by text, not role: the router's own announcer is an alert too

@@ -14,7 +14,7 @@ Next dev, hot reload), `portal-api-stub` (Ori with `ASSISTANT_MODEL=stub`, zero 
 | Org id | Picker label | Reads |
 | --- | --- | --- |
 | `ellensburg` | Ellensburg | Oracle in-database dbt warehouse `ORIGINBA_REPORTING` on the Ellensburg 25.4 TEST instance (VPN). Real client data: the local default org |
-| `demo25` | Demo 25.4 | local Postgres demo warehouse. NOT a comparison source (below); only the letters check still uses it |
+| `demo25` | Demo 25.4 | local Postgres demo warehouse. NOT a comparison source (below) |
 | `dev` | INT_DEV (internal dev CISADM) | the SAME Postgres as demo25 (identical build stamp), despite its label |
 | citycorp, college_station, fond_du_lac, newark, odessa, demo | client names | Oracle, no dbt warehouse yet: pages say the warehouse is not built |
 
@@ -26,9 +26,8 @@ A browser with no active organization sends no `X-Organization-Id` and reads the
 "Stop using Demo25's data and stick to only using Ellensburg": every check, live verification
 and measured number uses Ellensburg. The specs take their organization from `e2e/org.ts`
 (`E2E_ORG`, default `ellensburg`; `CRAWL_ORGS` for several). With the VPN down, say the check
-could not run; never fall back to demo25. The one exception until the Oracle letters exist:
-`e2e/letters.spec.ts` (letters read raw CISADM and run only for Postgres organizations).
-Moving the checks found the data-quality worklist refusing Oracle organizations
+could not run; never fall back to demo25. Letters included: they read raw CISADM through
+the org's own Oracle connection. Moving the checks found the data-quality worklist refusing Oracle organizations
 (docs/PORTAL_ISSUES_LOG.md).
 
 ## Desktop web only (Chase, 2026-09-29)
@@ -44,7 +43,7 @@ project, `desktop` (1440 x 900), and the phone-only specs are gone (in git histo
 | Accessibility (axe, WCAG 2.1 AA) incl. every Settings tab | `npx playwright test e2e/a11y.spec.ts` (`COLOR_SCHEME=dark` for dark) | ~1 min |
 | Pixels (local baselines, Ellensburg; retake after a rebuild) | `npx playwright test e2e/visual.spec.ts` | ~1 min |
 | Ori (naming, the home panel with stubbed routes), data quality, library | `npx playwright test e2e/ori.spec.ts e2e/ori-findings.spec.ts e2e/dq.spec.ts e2e/library.spec.ts` | ~1 min |
-| Letters (demo25, the exception above: August 2022 rows, PDF preview, 366-day refusal) | `npx playwright test e2e/letters.spec.ts` | ~15 s |
+| Letters (Ellensburg May 2026 rows, PDF preview, 366-day refusal; a cold month is tens of seconds over the VPN) | `npx playwright test e2e/letters.spec.ts` | ~35 s |
 
 Unit suites: `cd /Users/chase/OriginBA-3 && ENVIRONMENT=test python3 -m pytest tests -q`,
 `cd apps/analytics-portal && npx tsc --noEmit && npx vitest run`.
