@@ -303,6 +303,11 @@ _NOT_CONNECTED = re.compile(
     r"No warehouse is configured|could not connect|Connection refused|ORA-125\d\d|ORA-12170|DPY-6005",
     re.IGNORECASE)
 
+
+def is_not_connected_error(message: str | None) -> bool:
+    return bool(message) and bool(_NOT_CONNECTED.search(str(message)))
+
+
 WAREHOUSE_NOT_CONNECTED_NOTE = (
     "This organization's data is not connected yet. An administrator can connect it "
     "under Settings, Data source.")
@@ -317,7 +322,7 @@ def unavailable_note(kpis: list[dict[str, Any]]) -> str | None:
         return None
     if all(is_missing_relation_error(e) for e in errors):
         return WAREHOUSE_NOT_BUILT_NOTE
-    if all(_NOT_CONNECTED.search(str(e)) for e in errors):
+    if all(is_not_connected_error(e) for e in errors):
         return WAREHOUSE_NOT_CONNECTED_NOTE
     return None
 

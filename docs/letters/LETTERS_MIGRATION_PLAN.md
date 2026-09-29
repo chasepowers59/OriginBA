@@ -39,7 +39,8 @@ is kept at the bottom.
   sidecar (second image, JVM, service auth) and JRS REST (per-client reachability, seconds per
   render) cost more; WeasyPrint needs native libraries and has no IMb.
 - **Read raw CISADM** per organization through the portal's own connections (Postgres orgs: the
-  `cisadm` landing schema; Oracle orgs: `CURRENT_SCHEMA=CISADM`). Never reuse `execute_query`
+  `cisadm` landing schema; Oracle orgs: `CISADM.`-qualified names, so the pooled session is never
+  altered). Never reuse `execute_query`
   for letters: it stops at 5,000 rows silently (a month of Ellensburg events is 23,157); fetch
   all with a ceiling that raises.
 - **dbt adds `rpt_collection_letter`** (one row per letter: type, process, arrears, next action,
@@ -95,4 +96,5 @@ at retirement.
 | Phase | State |
 | --- | --- |
 | 0 | not started |
-| 1 | backend on `feature/letters-phase1`: `/portal/letters` list, preview and PDF for Postgres orgs, `letters:read` (editor, admin); demo25 smoke passed. Frontend on `feature/letters-ui`: `/letters` (window picker, search, type and status filters, sort, PDF preview beside the data behind it, Download PDF), nav entry behind `letters:read` and never for row-restricted people; `e2e/letters.spec.ts` written, not yet run. The `rpt_collection_letter` parity test next |
+| 1 | merged: `/portal/letters` list, preview and PDF for Postgres orgs behind `letters:read` (editor, admin); `/letters` (window picker, search, type and status filters, sort, PDF preview beside the data behind it, Download PDF), nav entry never for row-restricted people; `e2e/letters.spec.ts` ran on demo25. The `rpt_collection_letter` parity test is still to do |
+| 2 | on `feature/letters-oracle`: `sql/oracle/*.sql` (the letter app's SQL, `CISADM.`-qualified), the dialect picked from the org's engine, one `SET TRANSACTION READ ONLY`, NUMBER as Decimal, Oracle orgs served (no connection or unreachable: 503; other engines: 501). Ellensburg May 2026: 3,171 letters (1,499 contacts + 1,672 late fees), the same ids as the letter app's `letters.sql` and `late_fees.sql`; 5.0 s database time warm, 20-45 s wall over the VPN (the candidate-process events and services are ~62,000 rows each); a cold `CI_FT` made the balances query 45-60+ s, hence a 120 s call timeout. PDFs one page, address in the window (839 letters checked). `e2e/letters.spec.ts` runs on Ellensburg. Not done: Ellensburg/Odessa wording and branding, `oracledb` in the deployed image, late fees and NSF wording at real clients |
