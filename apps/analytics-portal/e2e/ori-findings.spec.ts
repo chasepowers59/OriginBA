@@ -116,3 +116,19 @@ test("a workstream page reads its own cards, with no projections", async ({ page
   await expect(page.getByRole("region", { name: "Where it's heading" })).toHaveCount(0);
   expect(asked).toEqual([]);
 });
+
+test("switching workstreams never shows the previous page's read", async ({ page }) => {
+  await page.route("**/portal/ori/findings?workstream=billing", (route) =>
+    route.fulfill({ json: { findings: [FINDING], brief: "Billing read." } }));
+  await page.route("**/portal/ori/findings?workstream=finance", async (route) => {
+    await new Promise((r) => setTimeout(r, 4000));   // a cold compare-mode summary
+    await route.fulfill({ json: { findings: [], brief: "Finance read." } });
+  });
+  await page.goto("/workstream/billing");
+  await expect(page.getByText("Billing read.")).toBeVisible({ timeout: 60_000 });
+  // an in-app move keeps the page component mounted, as the library's links do
+  await page.evaluate(() => (window as unknown as { next: { router: { push: (u: string) => void } } }).next.router.push("/workstream/finance"));
+  await expect(page).toHaveURL(/workstream\/finance/);
+  await expect(page.getByText("Billing read.")).toHaveCount(0);
+  await expect(page.getByText("Finance read.")).toBeVisible({ timeout: 60_000 });
+});
