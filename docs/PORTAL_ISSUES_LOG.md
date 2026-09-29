@@ -19,8 +19,6 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 | 2026-09-29 | The server PDF still prints "No rows in this window." under a card that failed to load (its note now says why) | api/report_schedules.py sections_to_pdf | no "No rows" line when the section note reports a failure |
 | 2026-09-29 | The frontend skill still describes long axis labels as skipped ticks (preserveStartEnd); since 552cde49 that applies only to date/ordered axes | .claude/skills/originba-frontend/SKILL.md | update the chart section |
 | 2026-09-29 | UI-5 remainder: "canvas", "UOM", table names and "tenant" still appear in some screens; per-answer token line shows to all users | explorer, builder, Ori answers | second copy pass; tokens for admins only |
-| 2026-09-29 | The API builds a doubled measure label ("Total Total Balance") in _result_labels; the explorer collapses it but the builder still shows it | api/snapshot_explorer.py:~675, VisualBuilder.tsx:222 | fix at the source |
-| 2026-09-29 | The explorer's total card adds per-group results for min, max, average and distinct count, which do not add | ResultsPanel total card | total only sum and count |
 | 2026-09-29 | Letters: the JRXML footer "(c)2025 Origin Utility ... Expressly for <client>" prints on customer letters | api/letters/render.py | DECISION: keep or drop |
 | 2026-09-29 | Letters: #10 envelope window assumed; Odessa's stock says Left 1/2 Bottom 5/8 | api/letters/render.py | per-client window in config/letters.yml |
 | 2026-09-29 | Letters: X-Letter-Font headers not exposed through CORS; the frontend cannot read them | api/app.py CORS | add to expose_headers with the letters page |
@@ -30,6 +28,8 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-29 | The explorer's total card adds per-group results for min, max, average and distinct count, which do not add | 57ebf188 | src/lib/resultSummary.test.ts |
+| 2026-09-29 | The API builds a doubled measure label ("Total Total Balance") in _result_labels; the explorer collapses it but the builder still shows it | 57ebf188 | tests/test_all_dates.py |
 | 2026-09-29 | Slow Ellensburg explorer pages (17-32 s) show only a grey skeleton | UI-20: 257c7c1e | src/lib tests (abort, elapsed) |
 | 2026-09-29 | Explorer: results buried under a 3,300 px list of report cards below 1280 px; Save/Pin at the bottom of the rail | UI-10: f5190f32 | visual baseline |
 | 2026-09-29 | Explorer overflows at 320 px: the export row does not wrap (page 347 px wide); the crawl's overflow check misses it | UI-6: 2248a49a | e2e/crawl.spec.ts overflow measure |
