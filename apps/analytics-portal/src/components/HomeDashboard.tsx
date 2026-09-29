@@ -8,7 +8,7 @@ import type { SnapshotSummary } from "@/lib/types";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
 import { ExecutiveDashboard } from "@/components/ExecutiveDashboard";
 import { NlqSearchPanel } from "@/components/NlqSearchPanel";
-import { OriFindings } from "@/components/OriFindings";
+import { OriInsights } from "@/components/OriInsights";
 import { AssistantPanel } from "@/components/AssistantPanel";
 import { useBrand } from "@/components/PortalThemeProvider";
 import { isRestricted } from "@/lib/rowRules";
@@ -71,7 +71,7 @@ export function HomeDashboard() {
       {/* The assistant writes its own SQL, which cannot carry a person's row rules. */}
       {!isRestricted(user) ? (
         <>
-          <OriFindings />
+          <OriInsights />
           <section>
             <AssistantPanel />
           </section>

@@ -621,9 +621,35 @@ export function fetchSystemHealth(): Promise<SystemHealth> {
 
 export type OriFinding = { kpi_id: string; change_pct: number; headline: string; detail: string; question: string };
 
+/** Ori's read of the home cards: the large moves, and a short brief of the period (null when there is none). */
+export type OriRead = { findings: OriFinding[]; brief?: string | null };
+
+/** A month unusually high or low against the months before it. Months are "YYYY-MM". */
+export type OriAnomaly = {
+  kpi_id: string; month: string; direction: "high" | "low";
+  headline: string; detail: string; question: string;
+};
+
+/** Where a home card is heading: the actual months, then a projection with its likely range. */
+export type OriForecast = {
+  kpi_id: string; label: string; format: "currency" | "number";
+  history: { month: string; value: number }[];
+  forecast: { month: string; value: number; low: number; high: number }[];
+  total: number; total_low: number; total_high: number;
+  typical_error_pct: number; checks: number;
+  headline: string; detail: string; question: string;
+};
+
+export type OriTrends = { through: string; anomalies: OriAnomaly[]; forecasts: OriForecast[] };
+
 /** "Ori found something worth investigating": the large moves in the home cards (api/ori_routes.py). */
-export function fetchOriFindings(): Promise<{ findings: OriFinding[] }> {
-  return fetchJson("/portal/ori/findings");
+export function fetchOriFindings(signal?: AbortSignal): Promise<OriRead> {
+  return fetchJson("/portal/ori/findings", { signal });
+}
+
+/** Unusual months and projections for the home cards; slow on a cold cache, so callers abort it. */
+export function fetchOriTrends(signal?: AbortSignal): Promise<OriTrends> {
+  return fetchJson("/portal/ori/trends", { signal });
 }
 
 /** The organization's collections letters dated within the window (at most 366 days). */
