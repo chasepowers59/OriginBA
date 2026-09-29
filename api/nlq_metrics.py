@@ -141,7 +141,7 @@ def parse_params(question: str, overrides: dict[str, Any] | None = None) -> dict
 
 def _fmt(value: float, fmt: str) -> str:
     if fmt == "currency":
-        return f"${value:,.2f}"
+        return f"{'-' if value < 0 else ''}${abs(value):,.2f}"
     return f"{value:,.0f}"
 
 

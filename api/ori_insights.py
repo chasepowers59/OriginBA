@@ -17,7 +17,7 @@ MAX_FINDINGS = 3
 
 
 def _amount(value: float, fmt: str) -> str:
-    return f"${value:,.2f}" if fmt == "currency" else f"{value:,.0f}"
+    return f"{'-' if value < 0 else ''}${abs(value):,.2f}" if fmt == "currency" else f"{value:,.0f}"
 
 
 def findings(summary: dict[str, Any]) -> list[dict[str, Any]]:
