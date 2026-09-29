@@ -25,8 +25,8 @@ from api.query_builder import QueryValidationError, build_query
 from api.raw_sql_validator import RawSqlValidationError, apply_row_cap, validate_raw_sql
 from api.reporting_dates import (DEFAULT_WINDOW_DAYS, DEFAULT_WINDOW_MIN_ROWS, data_as_of, reporting_today,
                                  window_date_field, window_date_label)
-from api.executive_dashboard import (WAREHOUSE_NOT_BUILT_NOTE, build_executive_summary,
-                                     is_missing_relation_error)
+from api.executive_dashboard import (DATABASE_UNREACHABLE_NOTE, WAREHOUSE_NOT_BUILT_NOTE, build_executive_summary,
+                                     is_missing_relation_error, is_not_connected_error, is_transient_error)
 from api.kpi_runner import COMPARE_MODES
 from api.data_version import data_version
 from api.summary_cache import cached
@@ -211,6 +211,11 @@ def _query_failure(prefix: str, exc: Exception) -> HTTPException:
     """
     if is_missing_relation_error(str(exc)):
         return HTTPException(status_code=502, detail=WAREHOUSE_NOT_BUILT_NOTE)
+    # a dropped connection or a timeout is said in words: the driver's text can name hosts
+    if is_not_connected_error(str(exc)):
+        return HTTPException(status_code=503, detail=DATABASE_UNREACHABLE_NOTE)
+    if is_transient_error(str(exc)):
+        return HTTPException(status_code=504, detail="This took too long to load. Try a shorter period.")
     return HTTPException(status_code=502, detail=f"{prefix}: {exc}")
 
 
@@ -812,7 +817,7 @@ def snapshot_query(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         warehouse = snapshot_backend(snapshot, org_id)[0] == "postgres"
-        raise _query_failure(f"{'Warehouse' if warehouse else 'Demo'} query failed", exc) from exc
+        raise _query_failure("The query failed", exc) from exc
 
     serialized_rows = [
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}

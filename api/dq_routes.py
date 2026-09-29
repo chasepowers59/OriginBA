@@ -26,7 +26,8 @@ from fastapi import APIRouter, Body, Depends
 from api.auth import AuthContext, get_auth_context
 from api.data_version import data_version
 from api.demo_db import execute_query as oracle_query
-from api.executive_dashboard import is_missing_relation_error, is_not_connected_error, is_transient_error
+from api.executive_dashboard import (DATABASE_UNREACHABLE_NOTE, is_missing_relation_error, is_not_connected_error,
+                                     is_transient_error)
 from api.freshness import built_at, refresh_marker
 from api.org_db import require_org_for_data
 from api.snapshot_catalog import org_backend
@@ -204,6 +205,8 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     out = rule_results(org, engine, path)
     if out is None:
         return {"configured": False, "rules": []}
+    if out and all(is_not_connected_error(e.get("error")) for e in out):   # one sentence, not 22 errors
+        return {"configured": True, "rules": [], "error": DATABASE_UNREACHABLE_NOTE}
     # ---- acknowledgements: hidden until the warehouse refreshes -------------
     marker = refresh_marker(org, engine)
     acks = _load_acks(org)

@@ -313,6 +313,9 @@ def is_not_connected_error(message: str | None) -> bool:
 WAREHOUSE_NOT_CONNECTED_NOTE = (
     "This organization's data is not connected yet. An administrator can connect it "
     "under Settings, Data source.")
+# a connection that IS configured but cannot be reached now (VPN down, a dropped session)
+DATABASE_UNREACHABLE_NOTE = "This organization's database cannot be reached right now. Try again shortly."
+_UNCONFIGURED = re.compile(r"No warehouse is configured", re.IGNORECASE)
 
 _TIMEOUT = re.compile(r"ORA-01013|statement timeout|canceling statement|DPY-4024|ORA-03156", re.IGNORECASE)
 
@@ -329,8 +332,10 @@ def unavailable_note(kpis: list[dict[str, Any]]) -> str | None:
         return None
     if all(is_missing_relation_error(e) for e in errors):
         return WAREHOUSE_NOT_BUILT_NOTE
-    if all(is_not_connected_error(e) for e in errors):
+    if all(_UNCONFIGURED.search(str(e)) for e in errors):
         return WAREHOUSE_NOT_CONNECTED_NOTE
+    if all(is_not_connected_error(e) for e in errors):
+        return DATABASE_UNREACHABLE_NOTE
     return None
 
 

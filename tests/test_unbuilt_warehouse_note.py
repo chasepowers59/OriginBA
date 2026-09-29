@@ -183,9 +183,10 @@ class QueryRouteTests(unittest.TestCase):
             self.assertNotIn("relation", r.json()["detail"], path)
 
     def test_any_other_failure_still_says_what_happened(self):
-        r = self._post(RuntimeError("connection refused"))
+        # a refused or dropped connection is now its own sentence (tests/test_oracle_outage.py)
+        r = self._post(RuntimeError('ORA-00904: "Bill Cycel": invalid identifier'))
         self.assertEqual(r.status_code, 502)
-        self.assertIn("connection refused", r.json()["detail"])
+        self.assertIn("invalid identifier", r.json()["detail"])
 
 
 if __name__ == "__main__":

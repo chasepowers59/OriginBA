@@ -26,8 +26,9 @@ _building: dict[tuple, threading.Lock] = {}
 def _no_failed_card(result: Any) -> bool:
     # A page whose every card failed collapses to one note and no cards; that note (not
     # connected, not built) is as transient as the failures, so it is never kept either.
-    from api.executive_dashboard import WAREHOUSE_NOT_BUILT_NOTE, WAREHOUSE_NOT_CONNECTED_NOTE
-    transient = {WAREHOUSE_NOT_BUILT_NOTE, WAREHOUSE_NOT_CONNECTED_NOTE}
+    from api.executive_dashboard import (DATABASE_UNREACHABLE_NOTE, WAREHOUSE_NOT_BUILT_NOTE,
+                                         WAREHOUSE_NOT_CONNECTED_NOTE)
+    transient = {WAREHOUSE_NOT_BUILT_NOTE, WAREHOUSE_NOT_CONNECTED_NOTE, DATABASE_UNREACHABLE_NOTE}
     return (not any(k.get("error") for k in result.get("kpis") or []) and not result.get("error")
             and result.get("catalog_note") not in transient and result.get("note") not in transient)
 

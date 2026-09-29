@@ -122,6 +122,9 @@ export function DataQualityBoard() {
       </div>
     );
   }
+  if (data.error && !data.rules.length) {
+    return <div role="status" className="glass-panel p-8 text-center text-sm text-fg-muted">{data.error}</div>;
+  }
 
   return (
     <div className="space-y-6">
