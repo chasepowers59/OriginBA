@@ -81,8 +81,10 @@ share these token names and values — changing a V2.1 value is a cross-app deci
 
 Home (exec KPIs) · Explore `/build` (THE builder; deep links `?canvas=&report=`) ·
 Dashboards `/dashboards` (@dnd-kit pinboard) · Library `/reports` (catalog + workstream
-rail) · SQL `/database` (CISADM workspace; `?table=` seeds a query) · Data Quality ·
-Settings. `/explore/[snapshotId]` is the canvas overview (Reports + Data model only —
+rail) · Letters `/letters` (collections letters: the PDF beside the data behind it; nav
+behind `letters:read`, hidden from row-restricted people) · SQL `/database` (CISADM
+workspace; `?table=` seeds a query) · Data Quality · Settings. A new top-level route
+must also join `APP_ROUTES` in `middleware.ts`, or signed-in people are sent home from it. `/explore/[snapshotId]` is the canvas overview (Reports + Data model only —
 builder/SQL tabs redirect out). Never add a second builder/SQL/chart surface.
 
 ## SQL workspace rules

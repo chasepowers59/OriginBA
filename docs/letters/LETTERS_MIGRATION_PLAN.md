@@ -95,4 +95,4 @@ at retirement.
 | Phase | State |
 | --- | --- |
 | 0 | not started |
-| 1 | backend on `feature/letters-phase1`: `/portal/letters` list, preview and PDF for Postgres orgs, `letters:read` (editor, admin); demo25 smoke passed. Frontend and the `rpt_collection_letter` parity test next |
+| 1 | backend on `feature/letters-phase1`: `/portal/letters` list, preview and PDF for Postgres orgs, `letters:read` (editor, admin); demo25 smoke passed. Frontend on `feature/letters-ui`: `/letters` (window picker, search, type and status filters, sort, PDF preview beside the data behind it, Download PDF), nav entry behind `letters:read` and never for row-restricted people; `e2e/letters.spec.ts` written, not yet run. The `rpt_collection_letter` parity test next |

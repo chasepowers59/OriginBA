@@ -28,7 +28,8 @@ import type { ScheduleRun } from "./scheduleHistory";
 import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview, AssistantSpend } from "@/lib/types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
 import { localIsoDate, saveBlob } from "@/lib/format";
-import { parseApiError } from "@/lib/apiErrors";
+import { ApiError, parseApiError } from "@/lib/apiErrors";
+import type { LetterDetail, LetterList, LetterPdf } from "@/lib/letters";
 import { parseSse } from "@/lib/sse";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -67,7 +68,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
     cache: "no-store",
   });
   if (!res.ok) {
-    throw new Error(parseApiError(await res.text(), res.statusText));
+    throw new ApiError(parseApiError(await res.text(), res.statusText), res.status);
   }
   return res.json() as Promise<T>;
 }
@@ -616,4 +617,24 @@ export function importContentPack(pack: unknown, dryRun: boolean): Promise<PackI
 /** What this API process has been doing (administrators). */
 export function fetchSystemHealth(): Promise<SystemHealth> {
   return fetchJson("/portal/health");
+}
+
+/** The organization's collections letters dated within the window (at most 366 days). */
+export function fetchLetters(from: string, to: string): Promise<LetterList> {
+  return fetchJson(`/portal/letters?${new URLSearchParams({ from, to })}`);
+}
+
+/** One letter with its words and the process facts behind it. */
+export function fetchLetter(letterId: string): Promise<LetterDetail> {
+  return fetchJson(`/portal/letters/${encodeURIComponent(letterId)}`);
+}
+
+/** The letter's one-page PDF, fetched with the signed-in headers: a bare link would carry neither. */
+export async function fetchLetterPdf(letterId: string): Promise<LetterPdf> {
+  const res = await fetch(`${API_BASE}/portal/letters/${encodeURIComponent(letterId)}/pdf`, {
+    headers: await resolveRequestHeaders(),
+    cache: "no-store",
+  });
+  if (!res.ok) throw new ApiError(parseApiError(await res.text(), res.statusText), res.status);
+  return { blob: await res.blob(), font: res.headers.get("X-Letter-Font") ?? "", fontNote: res.headers.get("X-Letter-Font-Note") };
 }

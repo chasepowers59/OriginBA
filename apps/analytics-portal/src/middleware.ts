@@ -13,6 +13,7 @@ const APP_ROUTES = new Set([
   "reports",
   "dashboards",
   "dashboard",
+  "letters",
   "database",
   "data-quality",
   "settings",
