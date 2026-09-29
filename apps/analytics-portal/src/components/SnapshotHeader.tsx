@@ -44,7 +44,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
         <div className="max-w-2xl">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className="chip chip-active">{workstream}</span>
-            <span className="chip">Trusted data domain</span>
+            <span className="chip">Checked report data</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-heading">{metadata.label}</h2>
           <p className="mt-2 text-sm leading-relaxed text-fg">
@@ -58,7 +58,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
                 className="inline-flex items-center gap-2 rounded-lg border text-chart-2 text-chart-2 px-3 py-2 text-xs text-chart-2 dark:text-chart-2 transition hover:text-chart-2"
               >
                 <span className="font-medium text-chart-2 dark:text-chart-2">View data model →</span>
-                {model.source_tables.length} source tables · {metadata.fields?.length ?? 0} fields
+                {metadata.fields?.length ?? 0} columns from {model.source_tables.length} CIS tables
               </Link>
               <Link
                 href={`/explore/${metadata.id}?tab=model&modelTab=joins`}

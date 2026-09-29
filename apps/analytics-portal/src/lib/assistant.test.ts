@@ -86,17 +86,17 @@ describe("what a figure can be trusted to", () => {
         { canvas: "b", verdict: "differences", source_green: 1, source_checks: 3, snapshot_against: "FT_RPT_CURR", snapshot_ok: true },
       ],
     };
-    expect(integrityHeadline(o, now)).toBe("Canvases built 5 days ago · 1 of 2 canvases proven against the source database");
-    expect(integrityHeadline({ available: false, canvases: [] }, now)).toBe("No verification on record for this organization yet.");
+    expect(integrityHeadline(o, now)).toBe("Report data refreshed 5 days ago · 1 of 2 reports checked against the source system");
+    expect(integrityHeadline({ available: false, canvases: [] }, now)).toBe("These reports have not been checked against the source system yet.");
   });
 });
 
 describe("what the organization has spent", () => {
   it("reads as a sentence, with the budget when there is one", () => {
     const base = { organization: "o", day: "2026-09-15", today: 44464, questions: 2, people: [] };
-    expect(spendLabel({ ...base, budget: null })).toBe("Today: 44,464 tokens (2 questions)");
-    expect(spendLabel({ ...base, budget: 2000000 })).toBe("Today: 44,464 tokens (2 questions) of a 2,000,000 budget");
-    expect(spendLabel({ ...base, questions: 1, budget: null })).toBe("Today: 44,464 tokens (1 question)");
+    expect(spendLabel({ ...base, budget: null })).toBe("Ori today: 2 questions · 44,464 tokens");
+    expect(spendLabel({ ...base, budget: 2000000 })).toBe("Ori today: 2 questions · 44,464 of 2,000,000 tokens");
+    expect(spendLabel({ ...base, questions: 1, budget: null })).toBe("Ori today: 1 question · 44,464 tokens");
   });
 });
 
