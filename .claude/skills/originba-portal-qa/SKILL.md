@@ -49,6 +49,16 @@ project, `desktop` (1440 x 900), and the phone-only specs are gone (in git histo
 Unit suites: `cd /Users/chase/OriginBA-3 && ENVIRONMENT=test python3 -m pytest tests -q`,
 `cd apps/analytics-portal && npx tsc --noEmit && npx vitest run`.
 
+## Tests never touch a live database
+
+`tests/conftest.py` replaces the Oracle pool for the whole suite: a test (or a thread it leaves
+behind) that tries to open a real session raises "tests must not reach a live Oracle database".
+Found 2026-09-29: a warmer-loop test stubbed the warm jobs it knew about, the two added that day
+queried the real Ellensburg instance on every run, and the only symptom was stray ORA-03156 lines
+printed AFTER pytest's summary. When you add a warm job or any background work, stub it in the
+tests that run the loop (tests/test_bug_hunt_fixes.py b8, tests/test_cache_warmer.py) and join
+threads inside the patches. Output after the summary line is a leak, not noise.
+
 ## False failures (recognise them, then re-run just that page)
 
 - `Execution context was destroyed ... navigation` during a crawl: you edited a frontend file
