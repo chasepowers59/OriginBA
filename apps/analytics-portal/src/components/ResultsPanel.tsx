@@ -249,7 +249,7 @@ export function ResultsPanel({
           </h3>
           <p className="text-sm text-fg-muted">
             {periodLabel ? `${periodLabel} · ` : ""}
-            {formatNumber(result.row_count)} field values
+            {formatNumber(result.row_count)} {result.row_count === 1 ? "row" : "rows"}
             {loading ? " · updating…" : ""}
           </p>
           <AppliedWindowNote result={result} />
