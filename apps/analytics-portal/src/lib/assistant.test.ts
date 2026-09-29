@@ -69,7 +69,7 @@ describe("what a figure can be trusted to", () => {
   };
 
   it("names the data set by its label, the proof and the build age", () => {
-    expect(integrityLabel({ ...proven })).toMatch(/^SA Aged Balance: proven \(12\/12 checks vs CISADM; 138,086 rows vs CMS_SA_SNAPSHOT, 0 differ\) · built /);
+    expect(integrityLabel({ ...proven })).toMatch(/^SA Aged Balance: proven \(12\/12 checks vs CISADM; 138,086 rows vs CMS_SA_SNAPSHOT, 0 differ\) · on the build of /);
   });
 
   it("says plainly when nothing is on record", () => {
@@ -92,7 +92,13 @@ describe("what a figure can be trusted to", () => {
         { canvas: "b", verdict: "differences", source_green: 1, source_checks: 3, snapshot_against: "FT_RPT_CURR", snapshot_ok: true },
       ],
     };
-    expect(integrityHeadline(o, now)).toBe("Data refreshed 5 days ago · 1 of 2 data sets checked against the source system");
+    expect(integrityHeadline(o, now)).toBe("Refresh time unknown · 1 of 2 data sets checked against the source system");
+    // the build dates the data; the parity run dates the check (Ellensburg 2026-09-29 said
+    // "refreshed 20 days ago" the morning it was rebuilt)
+    const built = { ...o, built_at: new Date(now.getTime() - 30 * 60_000).toISOString(),
+                    source_run_at: "2026-09-09T13:00:00", snapshot_run_at: "2026-09-10T09:00:00" };
+    expect(integrityHeadline(built, now)).toBe(
+      "Data refreshed within the hour · 1 of 2 data sets checked against the source system, last checked 5 days ago");
     expect(integrityHeadline({ available: false, canvases: [] }, now)).toBe("These data sets have not been checked against the source system yet.");
   });
 });

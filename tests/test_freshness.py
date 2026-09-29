@@ -42,7 +42,7 @@ class FreshnessTests(unittest.TestCase):
 
     def test_a_build_this_morning_is_fresh(self):
         out = self._fresh("20260929163000:20260929123907:39:-0400")
-        self.assertEqual(out, {"built_at": "2026-09-29T12:39:07-04:00", "age_hours": 0.3, "stale": False})
+        self.assertEqual(out, {"built_at": "2026-09-29T12:39:07-04:00", "age_hours": 0.3, "stale": False, "scheduled": True})
 
     def test_nineteen_days_is_stale(self):
         out = self._fresh("20260928180601:20260910084138:39:-0400")
@@ -54,7 +54,7 @@ class FreshnessTests(unittest.TestCase):
         self.assertTrue(self._fresh("x:20260928040000:39:+0000")["stale"])    # 37 hours
 
     def test_unknown_is_not_stale(self):
-        self.assertEqual(self._fresh(None), {"built_at": None, "age_hours": None, "stale": False})
+        self.assertEqual(self._fresh(None), {"built_at": None, "age_hours": None, "stale": False, "scheduled": True})
 
     def test_postgres_reads_the_built_reporting_table_not_the_staging_view(self):
         # review 2026-09-29: staging is a VIEW over landing, so CDC kept it current through a
@@ -89,6 +89,8 @@ class FreshnessTests(unittest.TestCase):
             out = fr.freshness("demo25", now=NOW)
         self.assertEqual(out["built_at"], "2026-09-01T10:11:22")
         self.assertFalse(out["stale"])
+        # System health said "Fresh" beside a 28-day-old load; it is "not scheduled", not fresh
+        self.assertFalse(out["scheduled"])
 
     def test_the_route_answers_for_the_callers_organization(self):
         from api.auth.dependencies import AuthContext
@@ -96,7 +98,7 @@ class FreshnessTests(unittest.TestCase):
                           organization_id="ellensburg", organization_name="Ellensburg", permissions={"portal:read"},
                           workstreams=["*"], row_rules=())
         with mock.patch.object(fr, "require_org_for_data", return_value="ellensburg"), \
-             mock.patch.object(fr, "freshness", return_value={"built_at": None, "age_hours": None, "stale": False}) as f:
+             mock.patch.object(fr, "freshness", return_value={"built_at": None, "age_hours": None, "stale": False, "scheduled": True}) as f:
             self.assertEqual(fr.freshness_route(ctx=ctx)["stale"], False)
         f.assert_called_once_with("ellensburg")
 

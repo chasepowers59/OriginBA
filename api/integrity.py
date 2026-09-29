@@ -167,6 +167,16 @@ def _age_hours(as_of: str | None) -> int | None:
         return None
 
 
+def _built_at(org_id: str) -> str | None:
+    """When the data was last built. canvas_as_of is the build the last parity run COMPARED,
+    which is only the data's age when parity ran after the latest build."""
+    from api.freshness import last_build
+    try:
+        return last_build(org_id)
+    except Exception:  # an unreachable warehouse leaves the build time unknown, not the page broken
+        return None
+
+
 def overview(org_id: str) -> dict[str, Any]:
     source, snapshot = _reports(org_id)
     if source is None and snapshot is None:
@@ -182,7 +192,8 @@ def overview(org_id: str) -> dict[str, Any]:
                     "source_checks": s["source"]["checks"] if s["source"] else None,
                     "snapshot_against": s["snapshot"]["against"] if s["snapshot"] else None,
                     "snapshot_ok": s["snapshot"]["ok"] if s["snapshot"] else None})
-    return {"available": True, "client": client_for_org(org_id), "canvas_as_of": as_of,
+    return {"available": True, "client": client_for_org(org_id), "built_at": _built_at(org_id),
+            "canvas_as_of": as_of,
             "canvas_age_hours": _age_hours(as_of),
             "source_run_at": (source or {}).get("run_at"), "snapshot_run_at": (snapshot or {}).get("run_at"),
             "canvases": out}

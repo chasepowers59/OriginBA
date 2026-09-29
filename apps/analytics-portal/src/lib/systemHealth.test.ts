@@ -32,9 +32,11 @@ describe("data refresh by organization", () => {
       ellensburg: { built_at: "2026-09-29T12:39:07-04:00", age_hours: 1.2, stale: false },
       int_dev: { built_at: "2026-09-27T05:45:00-04:00", age_hours: 55.4, stale: true },
       citycorp: null,
+      demo25: { built_at: "2026-09-01T10:11:22", age_hours: 675, stale: false, scheduled: false },
     });
     expect(rows).toEqual([
       ["int_dev", "Sep 27, 2026, 3:45 AM", "2 days ago", "Stale"],
+      ["demo25", "Sep 1, 2026, 10:11 AM", "28 days ago", "Not scheduled"],
       ["ellensburg", "Sep 29, 2026, 10:39 AM", "1 hour ago", "Fresh"],
       ["citycorp", "—", "—", "Unknown"],
     ]);

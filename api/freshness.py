@@ -85,14 +85,15 @@ def last_build(org: str) -> str | None:
 
 def freshness(org: str, *, now: datetime | None = None) -> dict[str, Any]:
     when = last_build(org)
+    scheduled = bool((get_organization(org) or {}).get("scheduled_builds", True))
     if not when:
-        return {"built_at": None, "age_hours": None, "stale": False}
+        return {"built_at": None, "age_hours": None, "stale": False, "scheduled": scheduled}
     built = datetime.fromisoformat(when)
     built = built if built.tzinfo else built.astimezone()   # no offset: the API host's clock
     age = ((now or datetime.now(timezone.utc)) - built).total_seconds() / 3600
     # an organization declared "scheduled_builds": false (a demo loaded once) is never overdue
-    scheduled = (get_organization(org) or {}).get("scheduled_builds", True)
-    return {"built_at": when, "age_hours": round(age, 1), "stale": bool(scheduled) and age > STALE_HOURS}
+    return {"built_at": when, "age_hours": round(age, 1), "stale": scheduled and age > STALE_HOURS,
+            "scheduled": scheduled}
 
 
 @router.get("/freshness")

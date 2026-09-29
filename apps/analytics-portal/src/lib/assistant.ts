@@ -67,13 +67,14 @@ export function cell(v: unknown, column?: string): string {
   return formatCellValue(v, { columnId: column });
 }
 
-/** One line per data set a query read, by its label: what it was proven against and how old the build is. */
+/** One line per data set a query read, by its label: what it was proven against, on which build.
+ *  canvas_as_of is the build the check compared, not the data's age (Ori said "built 20 days
+ *  ago" of data rebuilt that morning). */
 export function integrityLabel(i: CanvasIntegrity): string {
   const name = i.label ?? i.canvas;
-  const age = i.canvas_as_of ? ageLabel(i.canvas_as_of) : null;
-  const built = age ? ` · built ${age}` : "";
+  const built = i.canvas_as_of ? ` · on the build of ${ageLabel(i.canvas_as_of)}` : "";
   if (i.verdict === "unavailable") return `${name}: no verification on record`;
-  if (i.verdict === "not covered") return `${name}: not covered by a parity check${built}`;
+  if (i.verdict === "not covered") return `${name}: not covered by a parity check`;
   return `${name}: ${i.verdict === "proven" ? "proven" : "differences"} (${i.summary})${built}`;
 }
 
@@ -88,8 +89,10 @@ export function ageLabel(iso: string, now: Date = new Date()): string {
 export function integrityHeadline(o: IntegrityOverview, now: Date = new Date()): string {
   if (!o.available) return "These data sets have not been checked against the source system yet.";
   const proven = o.canvases.filter((c) => c.verdict === "proven").length;
-  const built = o.canvas_as_of ? `Data refreshed ${ageLabel(o.canvas_as_of, now)}` : "Refresh time unknown";
-  return `${built} · ${proven} of ${o.canvases.length} data sets checked against the source system`;
+  const built = o.built_at ? `Data refreshed ${ageLabel(o.built_at, now)}` : "Refresh time unknown";
+  const checked = [o.source_run_at, o.snapshot_run_at].filter((d): d is string => !!d).sort().pop();
+  return `${built} · ${proven} of ${o.canvases.length} data sets checked against the source system` +
+    (checked ? `, last checked ${ageLabel(checked, now)}` : "");
 }
 
 /** "Ori today: 2 questions · 44,464 of 2,000,000 tokens" -- what the organization has spent (admins). */

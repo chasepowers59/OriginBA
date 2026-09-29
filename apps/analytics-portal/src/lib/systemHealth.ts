@@ -40,7 +40,8 @@ export function freshnessRows(byOrg: Record<string, Freshness | null>): string[]
     .sort(([a, fa], [b, fb]) => rank(fa) - rank(fb) || a.localeCompare(b))
     .map(([org, f]) =>
       f?.built_at && f.age_hours != null
-        ? [org, formatDateTime(f.built_at), `${age(f.age_hours)} ago`, f.stale ? "Stale" : "Fresh"]
+        ? [org, formatDateTime(f.built_at), `${age(f.age_hours)} ago`,
+           f.stale ? "Stale" : f.scheduled === false ? "Not scheduled" : "Fresh"]
         : [org, "—", "—", "Unknown"],
     );
 }

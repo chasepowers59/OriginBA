@@ -118,6 +118,14 @@ class WithReports(unittest.TestCase):
                          {"rpt_financial_txn": "differences", "rpt_bill": "proven", "rpt_gl": "differences",
                           "rpt_sa_aged_balance": "proven"})
 
+    def test_the_overview_dates_the_data_by_its_build_not_by_the_last_check(self):
+        # Ellensburg 2026-09-29: rebuilt that morning, yet Ori said "Data refreshed 20 days
+        # ago" -- the age of the build the last completed snapshot parity had compared.
+        with mock.patch("api.freshness.last_build", return_value="2026-09-29T12:39:07-04:00"):
+            o = integrity.overview("ellensburg")
+        self.assertEqual(o["built_at"], "2026-09-29T12:39:07-04:00")
+        self.assertEqual(o["canvas_as_of"], "2026-09-09T12:32:41")
+
     def test_a_query_names_the_canvases_it_read(self):
         sql = ('select b."Bill ID" from ORIGINBA_REPORTING.RPT_BILL b '
                'join reporting."rpt_gl" g on g."Bill ID" = b."Bill ID" where "x" > 1')

@@ -615,6 +615,7 @@ export type AssistantSpend = {
 export type IntegrityOverview = {
   available: boolean;
   client?: string | null;
+  built_at?: string | null;
   canvas_as_of?: string | null;
   canvas_age_hours?: number | null;
   source_run_at?: string | null;

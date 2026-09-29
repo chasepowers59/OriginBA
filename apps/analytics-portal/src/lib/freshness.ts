@@ -1,7 +1,7 @@
 import { formatDateTime, formatNumber } from "@/lib/format";
 
 /** GET /portal/freshness: when the organization's reporting tables were last built (api/freshness.py). */
-export type Freshness = { built_at: string | null; age_hours: number | null; stale: boolean };
+export type Freshness = { built_at: string | null; age_hours: number | null; stale: boolean; scheduled?: boolean };
 
 /** The notice every page shows once the last build is over a day and a half old; null otherwise. */
 export function freshnessNotice(f: Freshness | null): string | null {
