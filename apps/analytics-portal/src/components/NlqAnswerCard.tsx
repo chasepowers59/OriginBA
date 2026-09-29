@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { formatCurrency, formatNumber } from "@/lib/format";
+import { formatCompact } from "@/lib/format";
 import type { NlqResponse } from "@/lib/types";
 
 type NlqAnswerCardProps = {
@@ -14,15 +14,7 @@ export function NlqAnswerCard({ result, days, onPinToDashboard }: NlqAnswerCardP
   const value = result.metrics?.value;
   const format = result.format ?? "number";
   const display =
-    value != null && typeof value === "number" && value > 0
-      ? format === "currency"
-        ? formatCurrency(value)
-        : formatNumber(value)
-      : value === 0
-        ? format === "currency"
-          ? formatCurrency(0)
-          : formatNumber(0)
-        : null;
+    typeof value === "number" && value >= 0 ? formatCompact(value, { currency: format === "currency" }) : null;
 
   return (
     <div className="rounded-xl border border-edge tint-panel-br p-4">

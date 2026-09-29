@@ -25,7 +25,7 @@ import {
   workstreamDisplayName,
 } from "@/lib/businessLabels";
 import { activeFilters, restoreFilters, questionFilters, savedFilters, type ShelfFilter } from "@/lib/builderFilters";
-import { formatNumber, formatCellValue } from "@/lib/format";
+import { formatCellValue, formatDate } from "@/lib/format";
 import type {
   BuilderQuestion,
   FieldDef,
@@ -446,7 +446,7 @@ export function VisualBuilder({
                       {f.label}
                       {f.role === "date" ? (
                         <span className="text-[10px]" style={{ color: "var(--foreground-subtle)" }}>
-                          {Array.isArray(f.value) ? `${f.value[0]} to ${f.value[1]}` : "last 90d"}
+                          {Array.isArray(f.value) ? `${formatDate(f.value[0])} to ${formatDate(f.value[1])}` : "last 90d"}
                         </span>
                       ) : (
                         <FilterValuePicker
@@ -509,7 +509,7 @@ export function VisualBuilder({
                     {error}
                   </p>
                 ) : visual === "table" ? (
-                  <ResultTable result={result} booleanCols={booleanCols} />
+                  <ResultTable result={result} booleanCols={booleanCols} series={series} />
                 ) : (
                   <BuilderChart
                     rows={result?.rows ?? []}
@@ -537,15 +537,15 @@ export function VisualBuilder({
   );
 }
 
-function ResultTable({ result, booleanCols }: { result: QueryResponse | null; booleanCols?: Set<string> }) {
+function ResultTable({ result, booleanCols, series }: { result: QueryResponse | null; booleanCols?: Set<string>; series: ChartSeries[] }) {
   if (!result?.rows.length) {
     return <p className="py-8 text-center text-sm" style={{ color: "var(--foreground-subtle)" }}>No rows.</p>;
   }
   const cols = result.columns;
   const label = (c: string) => result.column_labels?.[c] ?? c;
   const fmt = (v: unknown, c: string) => {
-    if (booleanCols?.has(c) || typeof v === "boolean") return formatCellValue(v, { isBoolean: true });
-    return v == null || v === "" ? "—" : typeof v === "number" ? formatNumber(v) : String(v);
+    const measure = series.find((s) => s.key === c);
+    return formatCellValue(v, { columnId: c, isMeasure: Boolean(measure), asCurrency: measure?.currency, isBoolean: booleanCols?.has(c) });
   };
   return (
     <div className="max-h-[min(70vh,900px)] overflow-auto">

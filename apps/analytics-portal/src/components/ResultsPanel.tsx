@@ -5,7 +5,9 @@ import type { QueryResponse } from "@/lib/types";
 import {
   formatBoolean,
   formatCellValue,
+  formatCompact,
   formatCurrency,
+  formatDate,
   formatNumber,
   formatPercent,
   formatDateTime,
@@ -145,7 +147,7 @@ export function ResultsPanel({
           ) : ctx?.periodLabel ? (
             <>
               Nothing matched <strong className="text-heading">{ctx.periodLabel}</strong>
-              {ctx.dateRange ? ` (${ctx.dateRange[0]} to ${ctx.dateRange[1]})` : ""}.
+              {ctx.dateRange ? ` (${formatDate(ctx.dateRange[0])} to ${formatDate(ctx.dateRange[1])})` : ""}.
             </>
           ) : (
             "Nothing matched your current filters."
@@ -204,7 +206,7 @@ export function ResultsPanel({
     try {
       await downloadPdf({
         title: reportTitle ?? snapshotLabel ?? snapshotId,
-        note: [periodLabel, dateRange ? `${dateRange[0]} to ${dateRange[1]}` : null].filter(Boolean).join(" · "),
+        note: [periodLabel, dateRange ? `${formatDate(dateRange[0])} to ${formatDate(dateRange[1])}` : null].filter(Boolean).join(" · "),
         columns: result.columns,
         labels: Object.fromEntries(result.columns.map((c) => [c, columnLabels[c] ?? prettifyFieldName(c)])),
         rows: result.rows,
@@ -231,7 +233,7 @@ export function ResultsPanel({
         <p className="mt-1 text-sm text-fg-muted">{snapshotLabel}</p>
         <p className="mt-2 text-xs text-fg-muted">
           {periodLabel ?? "Reporting period"}
-          {dateRange ? ` · ${dateRange[0]} to ${dateRange[1]}` : ""}
+          {dateRange ? ` · ${formatDate(dateRange[0])} to ${formatDate(dateRange[1])}` : ""}
           {scopeLabel ? ` · ${scopeLabel}` : ""}
         </p>
         <p className="mt-1 text-xs text-fg-muted">
@@ -247,7 +249,7 @@ export function ResultsPanel({
           </h3>
           <p className="text-sm text-fg-muted">
             {periodLabel ? `${periodLabel} · ` : ""}
-            {result.row_count} field values
+            {formatNumber(result.row_count)} field values
             {loading ? " · updating…" : ""}
           </p>
           <AppliedWindowNote result={result} />
@@ -295,10 +297,10 @@ export function ResultsPanel({
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <KpiCard label={kpi.groups} value={formatNumber(result.row_count)} />
+        <KpiCard label={kpi.groups} value={formatCompact(result.row_count)} />
         <KpiCard
           label={kpi.total}
-          value={summary?.total != null ? formatMeasure(summary.total) : "—"}
+          value={formatCompact(summary?.total, { currency: isCurrency })}
           note={summary?.notTotalled}
           highlight
         />

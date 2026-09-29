@@ -54,7 +54,7 @@ describe("explorerPeriodLabel", () => {
   it("says All dates when no window applied", () => {
     expect(explorerPeriodLabel({ allDates: true, activePreset: "All dates", asOf })).toBe("All dates");
     expect(explorerPeriodLabel({ allDates: true, activePreset: "All dates", fellBackFrom: "Last 12 months", asOf }))
-      .toBe("All dates (nothing in last 12 months, as of 18 Jun 2026)");
+      .toBe("All dates (nothing in last 12 months, as of Jun 18, 2026)");
   });
 
   it("names the window the server applied instead of claiming All dates", () => {
@@ -65,7 +65,7 @@ describe("explorerPeriodLabel", () => {
 
   it("names the reader's own window as before", () => {
     expect(explorerPeriodLabel({ allDates: false, activePreset: "Last 12 months", asOf }))
-      .toBe("Last 12 months, as of 18 Jun 2026");
+      .toBe("Last 12 months, as of Jun 18, 2026");
   });
 });
 

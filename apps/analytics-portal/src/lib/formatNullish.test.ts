@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  formatCurrency,
-  formatNumber,
-  formatTooltipCurrency,
-  formatTooltipNumber,
-} from "@/lib/format";
+import { formatCompact, formatCurrency, formatNumber } from "@/lib/format";
 
 /**
  * A missing value is not zero, and on a finance canvas the difference is the point.
@@ -31,9 +26,7 @@ describe("a missing value renders as missing, not as zero", () => {
   it("null is not $0", () => {
     expect(formatCurrency(null)).toBe("—");
     expect(formatNumber(null)).toBe("—");
-    expect(formatTooltipNumber(null)).toBe("—");
-    // the tooltip twin had the identical defect; a hovered null must not read $0 either
-    expect(formatTooltipCurrency(null)).toBe("—");
+    expect(formatCompact(null, { currency: true })).toBe("—");
   });
 
   it("an empty string is not $0 either", () => {
@@ -48,17 +41,17 @@ describe("a missing value renders as missing, not as zero", () => {
 
   it("a REAL zero is still a real zero", () => {
     // The whole point: this is the value the missing cases must stop impersonating.
-    expect(formatCurrency(0)).toBe("$0");
+    expect(formatCurrency(0)).toBe("$0.00");
     expect(formatNumber(0)).toBe("0");
-    expect(formatCurrency("0")).toBe("$0");
+    expect(formatCurrency("0")).toBe("$0.00");
     expect(formatNumber("0")).toBe("0");
   });
 
   it("ordinary values are untouched", () => {
-    expect(formatCurrency(1234)).toBe("$1,234");
+    expect(formatCurrency(1234)).toBe("$1,234.00");
     expect(formatCurrency(1234.56)).toBe("$1,234.56");
-    expect(formatNumber(1_500_000)).toBe("1.50M");
-    expect(formatNumber(1234)).toBe("1.2K");
+    expect(formatNumber(1_500_000)).toBe("1,500,000");
+    expect(formatCompact(1_500_000)).toBe("1.5M");
     expect(formatNumber(42)).toBe("42");
   });
 

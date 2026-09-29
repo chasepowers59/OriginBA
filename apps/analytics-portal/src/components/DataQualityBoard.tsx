@@ -1,6 +1,6 @@
 "use client";
 
-import { formatCellValue } from "@/lib/format";
+import { formatCellValue, formatNumber } from "@/lib/format";
 
 /**
  * Data Quality board — the rules engine's findings as a CIS worklist.
@@ -316,7 +316,7 @@ function RuleCard({
             </table>
             {r.rows.length > shown ? (
               <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-fg-muted">
-                <span>Showing {shown.toLocaleString()} of {r.rows.length.toLocaleString()}</span>
+                <span>Showing {formatNumber(shown)} of {formatNumber(r.rows.length)}</span>
                 <button type="button" className="btn-ghost text-xs" onClick={() => setShown((n) => n + ROWS_PER_PAGE)}>
                   Show {Math.min(ROWS_PER_PAGE, r.rows.length - shown)} more
                 </button>
@@ -327,7 +327,7 @@ function RuleCard({
             ) : null}
             {r.capped && (
               <p className="mt-1 text-xs text-fg-subtle">
-                The rule found {(r.total ?? r.count).toLocaleString()}; the first {r.count.toLocaleString()} are listed here.
+                The rule found {formatNumber(r.total ?? r.count)}; the first {formatNumber(r.count)} are listed here.
               </p>
             )}
           </div>

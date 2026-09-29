@@ -1,3 +1,5 @@
+import { formatDate } from "@/lib/format";
+
 /**
  * Label a time bucket for a chart axis.
  *
@@ -23,7 +25,6 @@ export function formatTimeBucket(value: string, grain?: string | null): string {
 
   const year = Number(m[1]);
   const month = Number(m[2]);
-  const day = Number(m[3]);
   if (month < 1 || month > 12) return value;
 
   switch (grain) {
@@ -33,7 +34,7 @@ export function formatTimeBucket(value: string, grain?: string | null): string {
       return `Q${Math.floor((month - 1) / 3) + 1} ${year}`;
     case "day":
     case "week":
-      return `${day} ${MONTHS[month - 1]} ${year}`;
+      return formatDate(`${m[1]}-${m[2]}-${m[3]}`);
     default:
       return `${MONTHS[month - 1]} ${year}`;
   }

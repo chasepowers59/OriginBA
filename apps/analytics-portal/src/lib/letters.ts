@@ -3,6 +3,7 @@
  * the letter-print app's review UI (originba-letterprint web/src/lib/letters.ts).
  */
 import { ApiError } from "./apiErrors";
+import { formatCurrency } from "./format";
 
 /** The API serializes Decimal as text ("132.69"); every helper here takes the wire shape. */
 export type Money = string | number | null;
@@ -165,9 +166,7 @@ export function totals(letters: LetterSummary[]): { letters: number; accounts: n
 /** Money with cents always shown, so a right-aligned column lines up. */
 export function formatAmount(value: Money | undefined): string {
   const n = amountValue(value);
-  return n === null
-    ? "—"
-    : n.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return n === null ? "—" : formatCurrency(n);
 }
 
 /** The server's ceiling (MAX_WINDOW_DAYS in api/letters/routes.py), checked before calling it. */

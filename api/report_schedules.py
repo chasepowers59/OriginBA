@@ -237,7 +237,7 @@ def window_sentence(date_field: str | None, window_days: int, as_of: str) -> str
     """
     if not date_field:
         return "Data window: all rows — this canvas carries no date to window on."
-    return f"Data window: trailing {window_days} days on {date_field}, as of {as_of}."
+    return f"Data window: trailing {window_days} days on {date_field}, as of {datetime.fromisoformat(as_of):%b %-d, %Y}."
 
 
 def rows_to_xlsx(columns: list[str], labels: dict[str, str], rows: list[dict[str, Any]]) -> bytes:
@@ -368,7 +368,7 @@ def sections_to_pdf(title: str, note: str, sections: list[dict[str, Any]], now: 
         canvas.drawRightString(size[0] - 0.6 * inch, top - 0.2 * inch, title[:90])
         canvas.setFont("Helvetica", 8)
         canvas.setFillColor(colors.grey)
-        canvas.drawString(0.6 * inch, 0.45 * inch, f"Generated {now:%d %b %Y %H:%M} UTC · Origin")
+        canvas.drawString(0.6 * inch, 0.45 * inch, f"Generated {now:%b %-d, %Y, %-I:%M %p} UTC · Origin")
         canvas.drawRightString(size[0] - 0.6 * inch, 0.45 * inch, f"Page {doc.page}")
         canvas.restoreState()
 

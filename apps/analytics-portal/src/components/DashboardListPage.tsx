@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { deleteDashboard, fetchDashboards } from "@/lib/api";
 import { tileSummary } from "@/lib/dashboardCard";
-import { formatTimeBucket } from "@/lib/timeBucketLabel";
+import { formatDate } from "@/lib/format";
 import type { SavedDashboard } from "@/lib/types";
 import { useAuth } from "@/components/AuthProvider";
 import { ownershipLabel } from "@/lib/ownership";
@@ -109,7 +109,7 @@ export function DashboardListPage() {
                   <p className="mt-2 text-[11px] text-fg-subtle">
                     {b.tiles?.length ?? 0} tile{(b.tiles?.length ?? 0) === 1 ? "" : "s"} · last{" "}
                     {b.days} days
-                    {b.updated_at ? ` · updated ${formatTimeBucket(b.updated_at, "day")}` : ""}
+                    {b.updated_at ? ` · updated ${formatDate(b.updated_at)}` : ""}
                     {ownershipLabel({ visibility: b.visibility, ownerEmail: b.owner_email }, user?.email)
                       ? ` · ${ownershipLabel({ visibility: b.visibility, ownerEmail: b.owner_email }, user?.email)}` : ""}
                   </p>

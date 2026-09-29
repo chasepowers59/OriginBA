@@ -22,8 +22,8 @@ describe("formatTimeBucket", () => {
   });
 
   it("labels day and week buckets with the date", () => {
-    expect(formatTimeBucket("2024-03-05T00:00:00", "day")).toBe("5 Mar 2024");
-    expect(formatTimeBucket("2024-03-04T00:00:00", "week")).toBe("4 Mar 2024");
+    expect(formatTimeBucket("2024-03-05T00:00:00", "day")).toBe("Mar 5, 2024");
+    expect(formatTimeBucket("2024-03-04T00:00:00", "week")).toBe("Mar 4, 2024");
   });
 
   it("accepts a date with no time part", () => {

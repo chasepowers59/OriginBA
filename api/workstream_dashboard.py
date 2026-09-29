@@ -289,7 +289,7 @@ def build_workstream_summary(
     as_of = data_as_of(organization_id)
     period_label = f"Last {days} days" if compare_mode != "mom" else "Month to date"
     if as_of:   # a frozen copy: say where the window ends instead of implying it is live
-        period_label = f"{period_label} to {date.fromisoformat(as_of).strftime('%-d %b %Y')}"
+        period_label = f"{period_label} to {date.fromisoformat(as_of).strftime('%b %-d, %Y')}"
     client_id = organization_id or catalog.get("client", "demo")
 
     if ws not in WORKSTREAM_KPIS:

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchSnapshotStats } from "@/lib/api";
-import { formatDateTime, formatNumber } from "@/lib/format";
+import { formatCompact, formatDateTime } from "@/lib/format";
 import type { SnapshotMetadata } from "@/lib/types";
 import { snapshotDetailLine, snapshotSubtitle } from "@/lib/snapshot";
 import { snapshotSummary, workstreamDisplayName } from "@/lib/businessLabels";
@@ -94,7 +94,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
         <div className="flex flex-wrap gap-3">
           <StatPill
             label="Records in domain"
-            value={rowCount != null ? formatNumber(rowCount) : statsLoaded ? "—" : "…"}
+            value={rowCount != null ? formatCompact(rowCount) : statsLoaded ? "—" : "…"}
           />
           {/* Dropped entirely when the canvas has no watermark: a pill reading
               "Data refreshed —" is noise, and one reading "…" is a lie. */}

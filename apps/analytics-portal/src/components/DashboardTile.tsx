@@ -6,7 +6,7 @@ import {
   fetchSnapshotMetadata,
   runSnapshotQuery,
 } from "@/lib/api";
-import { formatCurrency, formatNumber } from "@/lib/format";
+import { formatCompact } from "@/lib/format";
 import { chartedMeasureColumn, kpiHeadline } from "@/lib/dashboardTileMath";
 import { resolveDateField } from "@/lib/tileDateField";
 import { measureDisplaysAsCurrency } from "@/lib/businessLabels";
@@ -129,7 +129,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
 
   if (tile.visual === "kpi") {
     const formatted =
-      total === null ? null : isCurrency ? formatCurrency(total) : formatNumber(total);
+      total === null ? null : formatCompact(total, { currency: isCurrency });
     return (
       <div className="glass-panel flex h-full flex-col justify-center p-6">
         <p className="text-xs uppercase tracking-wide text-fg-muted">{tile.title}</p>

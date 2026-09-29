@@ -2,7 +2,7 @@
  * The assistant conversation as the browser holds it: what the user asked, what came back,
  * and the model-facing thread the API hands back for a follow-up.
  */
-import { formatCellValue, isIdentifierColumn } from "@/lib/format";
+import { formatCellValue, formatCurrency, formatNumber, isIdentifierColumn } from "@/lib/format";
 import { measureIsCurrency } from "@/lib/businessLabels";
 import { suggestChart, type ChartSuggestion } from "@/lib/databaseChartUtils";
 import type { NlqResponse, AssistantSpend, CanvasIntegrity, AssistantMessage, AssistantResponse, IntegrityOverview } from "@/lib/types";
@@ -48,7 +48,7 @@ export function summarise(r: AssistantResponse): string {
     `${r.steps.length} step${r.steps.length === 1 ? "" : "s"}`,
     `${r.queries.length} ${r.queries.length === 1 ? "query" : "queries"}`,
   ];
-  if (tokens) parts.push(`${tokens.toLocaleString()} tokens${cached ? ` (${cached.toLocaleString()} cached)` : ""}`);
+  if (tokens) parts.push(`${formatNumber(tokens)} tokens${cached ? ` (${formatNumber(cached)} cached)` : ""}`);
   return parts.join(" · ");
 }
 
@@ -59,22 +59,8 @@ export function summarise(r: AssistantResponse): string {
  */
 export function cell(v: unknown, column?: string): string {
   if (column && (isIdentifierColumn(column) || /\byear\b/i.test(column))) return v == null ? "—" : String(v);
-  if (column && measureIsCurrency(column)) {
-    const money = moneyCell(v);
-    if (money) return money;
-  }
+  if (column && measureIsCurrency(column) && /^-?\d+(?:\.\d+)?$/.test(String(v ?? "").trim())) return formatCurrency(v);
   return formatCellValue(v, { columnId: column });
-}
-
-/** Cents always, so a column lines up; a unit price keeps the precision it was stored at. */
-function moneyCell(v: unknown): string | null {
-  const raw = typeof v === "number" ? String(v) : typeof v === "string" ? v.trim() : "";
-  const m = raw.match(/^-?\d+(?:\.(\d+))?$/);
-  if (!m) return null;
-  const decimals = Math.min(Math.max(m[1]?.length ?? 0, 2), 6);
-  return Number(raw).toLocaleString("en-US", {
-    style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: decimals,
-  });
 }
 
 /** One line per canvas a query read: what it was proven against and how old the build is. */
@@ -104,7 +90,7 @@ export function integrityHeadline(o: IntegrityOverview, now: Date = new Date()):
 /** "Ori today: 2 questions · 44,464 of 2,000,000 tokens" -- what the organization has spent (admins). */
 export function spendLabel(s: AssistantSpend): string {
   const q = `${s.questions} question${s.questions === 1 ? "" : "s"}`;
-  const tokens = s.budget ? `${s.today.toLocaleString()} of ${s.budget.toLocaleString()} tokens` : `${s.today.toLocaleString()} tokens`;
+  const tokens = s.budget ? `${formatNumber(s.today)} of ${formatNumber(s.budget)} tokens` : `${formatNumber(s.today)} tokens`;
   return `Ori today: ${q} · ${tokens}`;
 }
 

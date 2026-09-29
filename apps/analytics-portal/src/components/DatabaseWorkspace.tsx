@@ -15,7 +15,7 @@ import {
   type DatabaseQueryTemplate,
   type WorkspaceEngine,
 } from "@/lib/databaseQueryTemplates";
-import { exportRowsCsv, formatBoolean, formatCurrency, formatNumber, isIdentifierColumn } from "@/lib/format";
+import { exportRowsCsv, formatBoolean, formatCellValue, formatCurrency, formatNumber, isIdentifierColumn } from "@/lib/format";
 import { prettifyFieldName } from "@/lib/businessLabels";
 import { cisadmTableGuide } from "@/lib/cisadmTableGuide";
 import { DatabaseResultChart } from "@/components/DatabaseResultChart";
@@ -36,6 +36,7 @@ function formatCell(value: unknown, isNumericCol = false, columnId?: string): st
   if (isNumericCol && value !== "" && !Number.isNaN(Number(value))) {
     return formatNumber(Number(value));
   }
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}/.test(value)) return formatCellValue(value, { columnId });
   const text = String(value);
   if (text.length > 200) return `${text.slice(0, 200)}…`;
   return text;
@@ -299,9 +300,9 @@ export function DatabaseWorkspace({
     if (fetchingMore) return "Fetching next page…";
     if (fetchingAll) return "Fetching all remaining rows…";
     if (!fetchedTotal) return "Ready";
-    const parts = [`${fetchedTotal.toLocaleString()} row${fetchedTotal === 1 ? "" : "s"} fetched`];
-    if (lastExecutionMs) parts.push(`${lastExecutionMs.toLocaleString()} ms`);
-    if (totalCount != null) parts.push(`of ${totalCount.toLocaleString()} total`);
+    const parts = [`${formatNumber(fetchedTotal)} row${fetchedTotal === 1 ? "" : "s"} fetched`];
+    if (lastExecutionMs) parts.push(`${formatNumber(lastExecutionMs)} ms`);
+    if (totalCount != null) parts.push(`of ${formatNumber(totalCount)} total`);
     else if (hasMore) parts.push("(more available)");
     return parts.join(" · ");
   }, [loading, fetchingMore, fetchingAll, fetchedTotal, lastExecutionMs, totalCount, hasMore]);
@@ -529,7 +530,7 @@ export function DatabaseWorkspace({
                                 <span className="font-mono text-primary">{t.table_name}</span>
                                 {t.num_rows != null ? (
                                   <span className="shrink-0 tabular-nums text-fg-subtle">
-                                    {Number(t.num_rows).toLocaleString()}
+                                    {formatNumber(t.num_rows)}
                                   </span>
                                 ) : null}
                               </span>

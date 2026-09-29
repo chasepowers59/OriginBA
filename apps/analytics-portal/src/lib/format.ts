@@ -1,18 +1,110 @@
-/** Format currency for utility revenue / billing amounts */
-export function formatCurrency(value: unknown): string {
-  // A missing value is NOT zero: Number(null) and Number("") are both 0, so a NULL
-  // amount rendered as a real "$0" while undefined rendered "—". A SUM over zero
-  // matching rows IS null, and the backend distinguishes that state deliberately
-  // (kpi_runner.empty_window_note), so erasing it here turns "no data" into a business
-  // fact the reader will act on. formatCellValue already guarded this way.
-  if (value == null || value === "") return "—";
+/**
+ * UI-16 (issues log, Decisions): ONE format set, used everywhere. The locale is fixed
+ * because the decision fixes the format -- "Sep 1, 2026", "$1,234.56" -- not the browser.
+ */
+const LOCALE = "en-US";
+const USD = { style: "currency", currency: "USD" } as const;
+
+/** From this magnitude on, a chart axis or KPI headline reads compact (12.3K). */
+const COMPACT_FROM = 10_000;
+
+/**
+ * A missing value is NOT zero: Number(null) and Number("") are both 0, so a NULL
+ * amount rendered as a real "$0" while undefined rendered "—". A SUM over zero
+ * matching rows IS null, and the backend distinguishes that state deliberately
+ * (kpi_runner.empty_window_note), so erasing it here turns "no data" into a business
+ * fact the reader will act on.
+ */
+function toNumber(value: unknown): number | null {
+  if (value == null || value === "") return null;
   const n = Number(value);
-  if (!Number.isFinite(n)) return "—";
-  return n.toLocaleString(undefined, {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: n % 1 === 0 ? 0 : 2,
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Money: "$1,234.56", "-$12,071.26". Cents always, so a column lines up; a unit price
+ * keeps the precision it was stored at (up to 6), while float noise and a computed
+ * average's tail round to cents.
+ */
+export function formatCurrency(value: unknown): string {
+  const n = toNumber(value);
+  if (n == null) return "—";
+  const stored = String(value).trim().match(/\.(\d*?)0*$/)?.[1].length ?? 0;
+  return n.toLocaleString(LOCALE, {
+    ...USD,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: stored > 6 ? 2 : Math.max(2, stored),
   });
+}
+
+/** Every digit, with separators: tables, sentences and tooltips. */
+export function formatNumber(value: unknown): string {
+  const n = toNumber(value);
+  return n == null ? "—" : n.toLocaleString(LOCALE, { maximumFractionDigits: 2 });
+}
+
+function compact(n: number, currency: boolean): string {
+  return n.toLocaleString(LOCALE, {
+    notation: "compact",
+    maximumSignificantDigits: 3,
+    ...(currency ? USD : {}),
+  });
+}
+
+/**
+ * A KPI headline: compact from 10,000 ("12.3K", "-$9.5K"), every digit below it.
+ * Compact belongs on chart axes and headlines only; a table never compacts.
+ */
+export function formatCompact(value: unknown, { currency = false } = {}): string {
+  const n = toNumber(value);
+  if (n == null) return "—";
+  if (Math.abs(n) < COMPACT_FROM) return currency ? formatCurrency(n) : formatNumber(n);
+  return compact(n, currency);
+}
+
+const STEP_RATIOS = [1, 2, 2.5, 5];
+
+/**
+ * Axis ticks from min(0, lo) to max(0, hi) in a round step -- 1, 2, 2.5 or 5 x 10^n --
+ * at most `maxTicks` of them. Recharts' own steps are any multiple of 0.05 x 10^n,
+ * which put "$5.5K" on an axis.
+ */
+export function niceTicks(lo: number, hi: number, maxTicks = 6): number[] {
+  const from = Math.min(0, lo);
+  const to = Math.max(0, hi);
+  const intervals = maxTicks - 1;
+  for (let power = 10 ** Math.floor(Math.log10((to - from || 1) / intervals)); ; power *= 10) {
+    for (const ratio of STEP_RATIOS) {
+      const step = Number((ratio * power).toPrecision(12));
+      const first = Math.floor(from / step + 1e-9);
+      const last = Math.ceil(to / step - 1e-9);
+      if (last - first <= intervals) {
+        // + 0 turns -0 into 0, which would otherwise print "-0"
+        return Array.from({ length: last - first + 1 }, (_, i) => Number(((first + i) * step).toPrecision(12)) + 0);
+      }
+    }
+  }
+}
+
+export type ValueAxis = { ticks: number[]; domain: [number, number]; format: (v: number) => string };
+
+/**
+ * A chart's value axis: round ticks covering zero and every value (pass stack totals
+ * for a stacked chart), labelled alike -- all compact when the axis reaches 10,000, none
+ * otherwise. A tick is a round number, so money on an axis carries no cents.
+ */
+export function valueAxis(values: number[], { currency = false } = {}): ValueAxis {
+  const finite = values.filter(Number.isFinite);
+  const ticks = niceTicks(finite.reduce((a, b) => Math.min(a, b), 0), finite.reduce((a, b) => Math.max(a, b), 0));
+  const compactAll = ticks.some((t) => Math.abs(t) >= COMPACT_FROM);
+  const format = (v: number) =>
+    compactAll
+      ? compact(v, currency)
+      : v.toLocaleString(LOCALE, {
+          maximumFractionDigits: 2,
+          ...(currency ? { ...USD, minimumFractionDigits: 0 } : {}),
+        });
+  return { ticks, domain: [ticks[0], ticks[ticks.length - 1]], format };
 }
 
 export function formatPercent(value: number, digits = 1): string {
@@ -80,7 +172,7 @@ export function formatBoolean(value: unknown): string {
   return String(value);
 }
 
-/** Table / preview cells — compact only for measure columns. */
+/** Table / preview cells: every digit, never compact (UI-16); a measure rounds to 2 decimals. */
 export function formatCellValue(
   value: unknown,
   options?: { columnId?: string; isMeasure?: boolean; asCurrency?: boolean; isBoolean?: boolean },
@@ -90,14 +182,8 @@ export function formatCellValue(
   // a NUMBER(1) 1/0 flag is indistinguishable from an integer by value alone, so the
   // caller declares it via isBoolean from the column's declared type (Oracle path).
   if (options?.isBoolean || typeof value === "boolean") return formatBoolean(value);
-  if (typeof value === "string" && value.match(/^\d{4}-\d{2}-\d{2}/)) {
-    // "X Date" is a calendar date by the reporting layer's naming contract ("X
-    // Date/Time" is the instant), whatever type the engine stored it as: CISADM DATE
-    // columns land as timestamps and rendered "Jul 21, 2026, 12:00 AM" on every canvas.
-    if (options?.columnId && /\bDate$/.test(options.columnId)) {
-      return formatDateTime(value.slice(0, 10));
-    }
-    return formatDateTime(value);
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}/.test(value)) {
+    return isCalendarDate(value, options?.columnId) ? formatDate(value.slice(0, 10)) : formatDateTime(value);
   }
   if (options?.asCurrency) return formatCurrency(value);
   if (isIdentifierColumn(options?.columnId)) return String(value);
@@ -119,42 +205,25 @@ export function formatCellValue(
     if (!m || !Number.isSafeInteger(Math.trunc(n))) return value;
     if (options?.isMeasure) return formatNumber(n);
     const scale = Math.min(m[2]?.length ?? 0, 6);
-    return n.toLocaleString(undefined, { minimumFractionDigits: scale, maximumFractionDigits: scale });
+    return n.toLocaleString(LOCALE, { minimumFractionDigits: scale, maximumFractionDigits: scale });
   }
   if (options?.isMeasure) return formatNumber(n);
-  if (Number.isInteger(n)) return n.toLocaleString();
-  return n.toLocaleString(undefined, { maximumFractionDigits: 6 });
+  return n.toLocaleString(LOCALE, { maximumFractionDigits: 6 });
 }
 
-/** Format numbers for charts and KPIs */
-export function formatNumber(value: unknown): string {
-  if (value == null || value === "") return "—";
-  const n = Number(value);
-  if (!Number.isFinite(n)) return "—";
-  if (Math.abs(n) >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
-  if (Math.abs(n) >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  if (Number.isInteger(n)) return n.toLocaleString();
-  return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
-}
-
-/** Full-precision values for chart hover tooltips (no K/M compaction). */
-export function formatTooltipNumber(value: unknown): string {
-  if (value == null || value === "") return "—";
-  const n = Number(value);
-  if (!Number.isFinite(n)) return "—";
-  if (Number.isInteger(n)) return n.toLocaleString();
-  return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
-}
-
-export function formatTooltipCurrency(value: unknown): string {
-  if (value == null || value === "") return "—";
-  const n = Number(value);
-  if (!Number.isFinite(n)) return "—";
-  return n.toLocaleString(undefined, {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: n % 1 === 0 ? 0 : 2,
-  });
+/**
+ * Whether a timestamp in this column is a calendar date, so it shows no time (UI-16:
+ * "12:00 AM" never appears on a date). "X Date" is a date by the reporting layer's
+ * naming contract and "X Date/Time" the instant; CISADM says "_DT" and "_DTTM". CISADM
+ * DATE columns land as timestamps and rendered "Jul 21, 2026, 12:00 AM" on every
+ * canvas. Under any other name a zone-less local midnight is a date too -- a time
+ * bucket ("TD0") or a DATE column the name cannot vouch for -- unless the column calls
+ * itself a date-time.
+ */
+function isCalendarDate(raw: string, columnId = ""): boolean {
+  if (/\bDate$|_DT$/i.test(columnId)) return true;
+  if (/Date\/Time|\bTime\b|_DTTM$/i.test(columnId)) return false;
+  return /^\d{4}-\d{2}-\d{2}(?:[T ]00:00(?::00(?:\.0+)?)?)?$/.test(raw);
 }
 
 /**
@@ -169,8 +238,10 @@ export function isoDateTimeString(raw: string): string {
 /** YYYY-MM-DD with nothing after it: a calendar date, not an instant. */
 const DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+const DAY: Intl.DateTimeFormatOptions = { month: "short", day: "numeric", year: "numeric" };
+
 /**
- * A timestamp in the viewer's clock, or a plain date left on its own calendar day.
+ * A plain date stays on its own calendar day; a timestamp is read in the viewer's clock.
  *
  * `new Date("2026-09-02")` is specified to parse as UTC MIDNIGHT, while
  * `new Date("2026-09-02T00:00:00")` parses as local midnight. Feeding the first form to
@@ -179,33 +250,32 @@ const DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
  * serializes a Postgres DATE column with `date.isoformat()`, which is exactly that
  * form, so a bill dated the 1st displayed the 31st on every canvas that has one.
  *
- * Found by running real Ellensburg values through this function. Bug class 12 a third
+ * Found by running real Ellensburg values through the formatter. Bug class 12 a third
  * time, after report_schedules and the date-range builders: a business date belongs in
- * the utility's own calendar, never as a UTC instant. A date with no time is also
- * rendered WITHOUT one, rather than inventing midnight-shifted-into-evening.
+ * the utility's own calendar, never as a UTC instant.
  */
-export function formatDateTime(value: unknown): string {
-  if (!value) return "—";
+function parseDate(value: unknown): Date | null {
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
   const raw = String(value);
   if (DATE_ONLY_RE.test(raw)) {
     const [y, m, d] = raw.split("-").map(Number);
-    const local = new Date(y, m - 1, d);          // local midnight, so the day survives
-    if (Number.isNaN(local.getTime())) return raw;
-    return local.toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    return new Date(y, m - 1, d);
   }
   const d = new Date(isoDateTimeString(raw));
-  if (Number.isNaN(d.getTime())) return raw;
-  return d.toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+/** "Sep 1, 2026". */
+export function formatDate(value: unknown): string {
+  if (!value) return "—";
+  return parseDate(value)?.toLocaleDateString(LOCALE, DAY) ?? String(value);
+}
+
+/** "Sep 1, 2026, 10:11 AM"; a date with no time is rendered without one. */
+export function formatDateTime(value: unknown): string {
+  if (!value) return "—";
+  if (typeof value === "string" && DATE_ONLY_RE.test(value)) return formatDate(value);
+  return parseDate(value)?.toLocaleString(LOCALE, { ...DAY, hour: "numeric", minute: "2-digit" }) ?? String(value);
 }
 
 /**

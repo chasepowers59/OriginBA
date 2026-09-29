@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { defaultDateRangeLastMonth, fetchLetters } from "@/lib/api";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatNumber } from "@/lib/format";
 import {
   activeFilterCount,
   applyFilters,
@@ -41,7 +41,7 @@ const STATUSES: { value: Printed; label: string }[] = [
   { value: "printed", label: "Printed" },
 ];
 
-const plural = (n: number, word: string) => `${n.toLocaleString()} ${word}${n === 1 ? "" : "s"}`;
+const plural = (n: number, word: string) => `${formatNumber(n)} ${word}${n === 1 ? "" : "s"}`;
 
 /**
  * The letters review page: a date window, the letters dated in it, and the selected letter's PDF
@@ -168,7 +168,7 @@ export function LettersWorkspace() {
 
             <p className="text-xs text-fg-muted" aria-live="polite">
               {shown.length === letters.length ? plural(t.letters, "letter") : `${t.letters} of ${plural(letters.length, "letter")}`}
-              {" · "}{plural(t.accounts, "account")} · {formatAmount(t.amount)} due · {t.notPrinted.toLocaleString()} not printed
+              {" · "}{plural(t.accounts, "account")} · {formatAmount(t.amount)} due · {formatNumber(t.notPrinted)} not printed
             </p>
 
             <div className="max-h-[65vh] overflow-auto rounded-xl border border-edge-subtle">

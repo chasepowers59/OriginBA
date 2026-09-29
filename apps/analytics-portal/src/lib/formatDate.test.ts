@@ -35,9 +35,7 @@ describe("a date-only value keeps its calendar day", () => {
   });
 
   it("still renders a real timestamp with its time", () => {
-    const out = formatDateTime("2026-09-02T14:30:00");
-    expect(out).toContain("Sep 2, 2026");
-    expect(out).toMatch(/02:30|14:30/);
+    expect(formatDateTime("2026-09-02T14:30:00")).toBe("Sep 2, 2026, 2:30 PM");
   });
 
   it("a timestamp carrying an explicit zone is still honoured", () => {
@@ -81,9 +79,9 @@ describe("a column named '... Date' is a calendar date, whatever the engine stor
     expect(formatCellValue("2026-07-21 00:00:00", { columnId: "Bill Date" })).toBe("Jul 21, 2026");
   });
 
-  it("keeps the time on a Date/Time column and on an unnamed value", () => {
+  it("keeps the time on a Date/Time column; an unnamed midnight is a date (UI-16)", () => {
     expect(formatCellValue("2026-07-21T17:52:00", { columnId: "Freeze Date/Time" })).toContain("5:52");
-    expect(formatCellValue("2026-07-21T00:00:00")).toContain("12:00");
+    expect(formatCellValue("2026-07-21T00:00:00")).toBe("Jul 21, 2026");
   });
 
   it("does not mistake 'Update' or 'Validate' for a date column", () => {

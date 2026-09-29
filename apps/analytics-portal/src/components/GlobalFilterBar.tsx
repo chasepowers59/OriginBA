@@ -1,6 +1,7 @@
 "use client";
 
 import { prettifyFieldName } from "@/lib/businessLabels";
+import { formatDate } from "@/lib/format";
 
 type GlobalFilterBarProps = {
   periodLabel?: string;
@@ -28,7 +29,7 @@ export function GlobalFilterBar({
       {periodLabel ? (
         <span className="chip chip-active">
           {periodLabel}
-          {dateRange ? ` · ${dateRange[0]} → ${dateRange[1]}` : ""}
+          {dateRange ? ` · ${formatDate(dateRange[0])} → ${formatDate(dateRange[1])}` : ""}
         </span>
       ) : null}
       {scopeLabel ? (

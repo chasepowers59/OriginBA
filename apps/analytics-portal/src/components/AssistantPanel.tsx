@@ -194,7 +194,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
               {steps.length ? steps.map((s, i) => (
                 <li key={i} className={s.done && !s.ok ? "text-over" : undefined}>
                   {s.done ? (s.ok ? "✓" : "✗") : "…"} {s.label}
-                  {s.done && s.rows != null ? ` · ${s.rows.toLocaleString()} rows` : ""}
+                  {s.done && s.rows != null ? ` · ${formatNumber(s.rows)} rows` : ""}
                 </li>
               )) : <li>{ORI.thinking}</li>}
             </ul>
@@ -322,7 +322,7 @@ function QueryResult({ q }: { q: AssistantQuery }) {
       <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
         <p className="text-xs text-fg-muted">
           {q.purpose ? <span className="text-heading">{q.purpose} · </span> : null}
-          {q.row_count.toLocaleString()} row{q.row_count === 1 ? "" : "s"}{q.truncated ? " (capped)" : ""} · {q.ms} ms
+          {formatNumber(q.row_count)} row{q.row_count === 1 ? "" : "s"}{q.truncated ? " (capped)" : ""} · {q.ms} ms
         </p>
         <div className="flex flex-wrap gap-2">
           <button type="button" className="btn-ghost text-xs" onClick={() => setOpen((o) => !o)}>{open ? "Hide SQL" : "Show SQL"}</button>
