@@ -10,7 +10,7 @@ operations, and per-client SQL. The data layer -- CISADM -> dbt reporting canvas
 Jaspersoft domains generated from them -- is the sibling repo `~/originba_dbt`.
 
 ## Core Structure
-- `api/` FastAPI backend (`api.app`); `apps/analytics-portal/` Next.js portal (Vercel root); `config/` runtime config (`portal_organizations.json`, `dq_rules.yml`, the generated `clients.export.json`); `data/` runtime state; `output/catalog_dbt.json` the one canvas catalog (generated in `~/originba_dbt`)
+- `api/` FastAPI backend (`api.app`); `apps/analytics-portal/` Next.js portal (Vercel root); `config/` runtime config (`portal_organizations.json`, `dq_rules.yml` and its generated Oracle twin `dq_rules.oracle.yml`, the generated `clients.export.json`); `data/` runtime state; `output/catalog_dbt.json` the one canvas catalog (generated in `~/originba_dbt`)
 - `jaspersoft/` the Jaspersoft delivery home: `jaspersoft/README.md` is the index, `jaspersoft/docs/` the standards and runbooks, `jaspersoft/dashboards/` the dashboard packs
 - `reports/`, `reports/templates/`, `reports/subreports/` JRXML; `server/input_controls/` the paired input-control JSON per report
 - `domains/` hand-built domains and client deliverables (`domains/README.md`)

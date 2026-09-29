@@ -103,7 +103,8 @@ together (grep for `catalog_name_for_org` to find every routing point).
 - **Fleet-identical**: the dbt models and contracts, the canvas catalog
   (`output/catalog_dbt.json`, generated from the contracts), all KPI definitions,
   DQ rules (`dq_rules/rules.yml` runs unchanged at every client because the canvas
-  contract is identical), starter queries and dashboard templates.
+  contract is identical; an Oracle in-database client runs `dq_rules/rules.oracle.yml`,
+  generated from it), starter queries and dashboard templates.
 - **Per-client**: the warehouse database, client-configured codes (captured in
   `client-mappings.md` and the convention seeds, never hardcoded in models),
   accepted schema drift, and the DQ findings themselves.
