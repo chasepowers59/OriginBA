@@ -25,11 +25,10 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { formatCurrency, formatNumber, formatTooltipNumber } from "@/lib/format";
-import { valueRampColors } from "@/lib/chartEmphasis";
+import { emphasisFills } from "@/lib/chartEmphasis";
 import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
 import { BUILDER_AXIS, chartLayout, piePlan, tickLineHeight } from "@/lib/chartLayout";
 import { formatTimeBucket } from "@/lib/timeBucketLabel";
-import { useColorMode } from "@/components/PortalThemeProvider";
 
 export type BuilderVisual =
   | "bar"
@@ -131,7 +130,6 @@ export function BuilderChart({
   sortTimeSeries = false,
   xGrain = null,
 }: BuilderChartProps) {
-  const { colorMode } = useColorMode();
   const [measureRef, width] = useElementWidth();
 
   const config = useMemo<ChartConfig>(() => {
@@ -192,21 +190,17 @@ export function BuilderChart({
     ? (value: unknown) => formatCurrency(Number(value))
     : (value: unknown) => formatTooltipNumber(Number(value));
 
-  // Single-measure bars use the app-wide value ramp: blue = highest, shifting toward
-  // red as values drop. A cross-filter selection overrides its bar to the selection hue.
+  // Single-measure bars: one hue, the leader emphasised by strength, red only for
+  // negatives (lib/chartEmphasis); a cross-filter selection takes the selection hue.
   const singleSeries = series.length === 1;
-  const rampFills = useMemo<string[] | null>(() => {
-    if (!singleSeries) return null;
+  const barFills = useMemo(() => {
+    if (!singleSeries) return [];
     const key = series[0].key;
-    return valueRampColors(data.map((d) => Number(d[key] ?? 0)), { dark: colorMode === "dark" });
-  }, [singleSeries, data, series, colorMode]);
-
-  const cellFill = (i: number, fallback: string) => {
-    if (selectedCategory != null && String(data[i]?.[xKey]) === selectedCategory) {
-      return "var(--chart-selected)";
-    }
-    return rampFills ? rampFills[i] : fallback;
-  };
+    return emphasisFills(
+      data.map((d) => Number(d[key] ?? 0)),
+      (i) => selectedCategory != null && String(data[i][xKey]) === selectedCategory,
+    );
+  }, [singleSeries, data, series, selectedCategory, xKey]);
 
   // Screen readers get a description of what the chart encodes; the data itself
   // is available through the result table, so a summary is the right depth here.
@@ -334,7 +328,7 @@ export function BuilderChart({
               style={{ cursor: clickCursor }}
             >
               {data.map((_, i) => (
-                <Cell key={i} fill={cellFill(i, `var(--color-${series[0].key})`)} />
+                <Cell key={i} fill={barFills[i]} />
               ))}
             </Bar>
           ) : (
@@ -418,7 +412,7 @@ export function BuilderChart({
             style={{ cursor: clickCursor }}
           >
             {data.map((_, i) => (
-              <Cell key={i} fill={cellFill(i, `var(--color-${series[0].key})`)} />
+              <Cell key={i} fill={barFills[i]} />
             ))}
           </Bar>
         ) : (
