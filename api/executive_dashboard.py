@@ -300,7 +300,9 @@ def is_missing_relation_error(message: str | None) -> bool:
 # An org the API cannot reach at all: no connection configured, or the database refused
 # or never answered. One note, pointing at where an administrator connects it.
 _NOT_CONNECTED = re.compile(
-    r"No warehouse is configured|could not connect|Connection refused|ORA-125\d\d|ORA-12170|DPY-6005",
+    # ...and a connection lost mid-query (a VPN drop or a sleeping laptop, Ellensburg 2026-09-29)
+    r"No warehouse is configured|could not connect|Connection refused|ORA-125\d\d|ORA-12170|DPY-6005"
+    r"|DPY-4011|DPY-1001|ORA-12262|ORA-0311[34]|ORA-03135|closed the connection",
     re.IGNORECASE)
 
 

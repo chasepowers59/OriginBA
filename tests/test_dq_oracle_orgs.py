@@ -300,6 +300,25 @@ class OracleOrgCachingTests(OracleOrgHarness):
         dq_routes.dq_findings(ctx=_ctx())
         self.assertEqual(len(self.executed), ran)   # the page is served what the warmer built
 
+    def test_a_run_cut_off_by_a_dropped_connection_is_not_kept(self):
+        # Ellensburg 2026-09-29: the laptop slept mid-warm; four rules failed DPY-4011 / ORA-12262
+        # and that half result was kept until the next rebuild
+        first = ORACLE_RULES[0]["id"]
+        original = self._oracle
+
+        def flaky(sql, binds=None, *, organization_id, max_rows):
+            if first in self.cut and ORACLE_RULES[0]["sql"].strip() in sql:
+                raise RuntimeError("DPY-4011: the database or network closed the connection")
+            return original(sql, binds, organization_id=organization_id, max_rows=max_rows)
+        self.cut = {first}
+        with mock.patch.object(dq_routes, "oracle_query", side_effect=flaky):
+            dq_routes.dq_findings(ctx=_ctx())
+            self.cut = set()
+            again = dq_routes.dq_findings(ctx=_ctx())
+        self.assertFalse(any(r.get("error") for r in again["rules"]))
+        from api.executive_dashboard import is_not_connected_error
+        self.assertTrue(is_not_connected_error("ORA-12262: Cannot connect to database. Could not resolve hostname"))
+
     def test_an_outage_is_not_kept(self):
         self.failing = {r["id"] for r in ORACLE_RULES}
         dq_routes.dq_findings(ctx=_ctx())
