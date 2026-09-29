@@ -24,7 +24,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { formatCurrency, formatNumber, formatTooltipNumber } from "@/lib/format";
+import { formatCurrency, formatNumber, valueAxis } from "@/lib/format";
 import { valueRampColors } from "@/lib/chartEmphasis";
 import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
 import { BUILDER_AXIS, chartLayout, piePlan, tickLineHeight } from "@/lib/chartLayout";
@@ -185,12 +185,18 @@ export function BuilderChart({
   const categoryTick = <AxisTick ticks={ticks} fontSize={BUILDER_AXIS.fontSize} />;
 
   const anyCurrency = series.some((s) => s.currency);
-  // Axis ticks COMPACT ($12.3M) so they fit the axis width; tooltips show the full
-  // value. formatCurrency never compacts, which clipped revenue axes at width 56.
-  const fmt = (v: number) => (anyCurrency ? `$${formatNumber(v)}` : formatNumber(v));
-  const tipFormatter = anyCurrency
-    ? (value: unknown) => formatCurrency(Number(value))
-    : (value: unknown) => formatTooltipNumber(Number(value));
+  // A stack reaches the sum of its positives (or of its negatives), not its largest part.
+  const stacked = shown === "stacked-bar" || shown === "stacked-area";
+  const plotted = data.flatMap((d) => {
+    const v = series.map((s) => Number(d[s.key]));
+    if (!stacked) return v;
+    const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
+    return [sum(v.filter((x) => x > 0)), sum(v.filter((x) => x < 0))];
+  });
+  // Round ticks, compact ($12.3M) so they fit the axis width; tooltips show the full value.
+  const axis = valueAxis(plotted, { currency: anyCurrency });
+  const valueTicks = { ticks: axis.ticks, domain: axis.domain, tickFormatter: axis.format };
+  const tipFormatter = anyCurrency ? formatCurrency : formatNumber;
 
   // Single-measure bars use the app-wide value ramp: blue = highest, shifting toward
   // red as values drop. A cross-filter selection overrides its bar to the selection hue.
@@ -223,7 +229,9 @@ export function BuilderChart({
   };
 
   const grid = <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />;
-  const tip = <ChartTooltip content={<ChartTooltipContent valueFormatter={tipFormatter} />} />;
+  // A time bucket's tooltip names its period, as its tick does, not its first instant.
+  const tipLabel = sortTimeSeries ? (v: unknown) => ticks.get(String(v))?.title ?? String(v) : undefined;
+  const tip = <ChartTooltip content={<ChartTooltipContent valueFormatter={tipFormatter} labelFormatter={tipLabel} />} />;
   const legend = series.length > 1 ? <ChartLegend content={<ChartLegendContent />} /> : null;
   const xAxis = ordered ? (
     <XAxis
@@ -322,7 +330,7 @@ export function BuilderChart({
       <ChartContainer config={config} style={{ height: chartHeight }} className="w-full" role="img" aria-label={a11yLabel}>
         <BarChart data={data} layout="vertical" margin={{ left: 8 }} maxBarSize={40}>
           <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />
-          <XAxis type="number" tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} tickFormatter={fmt} axisLine={false} tickLine={false} />
+          <XAxis type="number" tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} {...valueTicks} axisLine={false} tickLine={false} />
           <YAxis type="category" dataKey={xKey} width={layout.axisSize} tick={categoryTick} interval={0} axisLine={false} tickLine={false} />
           {tip}
           {legend}
@@ -354,7 +362,7 @@ export function BuilderChart({
         <LineChart data={data} margin={{ left: 4, right: 8 }}>
           {grid}
           {xAxis}
-          <YAxis tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} tickFormatter={fmt} axisLine={false} tickLine={false} width={56} />
+          <YAxis tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} {...valueTicks} axisLine={false} tickLine={false} width={56} />
           {tip}
           {legend}
           {series.map((s) => (
@@ -380,7 +388,7 @@ export function BuilderChart({
           </defs>
           {grid}
           {xAxis}
-          <YAxis tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} tickFormatter={fmt} axisLine={false} tickLine={false} width={56} />
+          <YAxis tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} {...valueTicks} axisLine={false} tickLine={false} width={56} />
           {tip}
           {legend}
           {series.map((s) => (
@@ -406,7 +414,7 @@ export function BuilderChart({
       <BarChart data={data} margin={{ left: 4, right: 8 }} maxBarSize={64}>
         {grid}
         {xAxis}
-        <YAxis tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} tickFormatter={fmt} axisLine={false} tickLine={false} width={56} />
+        <YAxis tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} {...valueTicks} axisLine={false} tickLine={false} width={56} />
         {tip}
         {legend}
         {singleSeries ? (

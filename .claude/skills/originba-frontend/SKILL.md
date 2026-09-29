@@ -74,6 +74,14 @@ share these token names and values — changing a V2.1 value is a cross-app deci
   colour from `--border-subtle` / `--foreground-subtle` only.
 - Booleans render as True/False everywhere (`formatBoolean` / `formatCellValue`
   `isBoolean`), driven by the column's declared type — never raw 1/0.
+- **One format set (UI-16), all in `lib/format.ts`**: `formatDate` "Sep 1, 2026",
+  `formatDateTime` "Sep 1, 2026, 10:11 AM" (a date, or a zone-less midnight in a
+  non-date-time column, never shows a time); `formatNumber`/`formatCurrency` give every
+  digit ("-$12,071.26") for tables, sentences and tooltips; `formatCompact` (from
+  10,000) is for KPI headlines only; `valueAxis` gives a chart round ticks (1, 2, 2.5,
+  5 x 10^n) labelled alike. `format.test.ts` fails on any `toLocaleString`, `Intl` or
+  `` `$${ `` outside format.ts. Date inputs keep the browser control; API values and
+  exports stay ISO/machine-friendly.
 - Panel headers lead with a small rounded icon chip coloured from the chart palette
   (see DashboardWidget) — the reference-dashboard signature.
 
@@ -254,7 +262,7 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     distinction that code exists to preserve. Guard `value == null || value === ""`
     BEFORE coercing — `formatCellValue` always did, which is how you can tell the
     convention existed and the others just missed it. Check the **tooltip twin** of any
-    formatter you fix; `formatTooltipCurrency`/`formatTooltipNumber` carried it too.
+    formatter you fix (the tooltip twins carried it too; UI-16 merged them into `formatNumber`/`formatCurrency`).
 
 14. **A string rendered as a number that cannot represent it.** The sibling of 13, same
     function family. `formatCellValue` numeric-formats anything parsing finite, guarded

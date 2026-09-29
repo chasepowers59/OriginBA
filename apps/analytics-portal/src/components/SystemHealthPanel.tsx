@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { fetchSystemHealth } from "@/lib/api";
 import { findReference, hitRate, type SystemHealth } from "@/lib/systemHealth";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatNumber } from "@/lib/format";
 import { FormError } from "@/components/Modal";
 
 const cell = "px-3 py-1.5 text-left align-top";
@@ -32,8 +32,8 @@ export function SystemHealthPanel() {
   const found = reference.trim() ? findReference(health.errors, reference) : null;
   const stats = [
     ["Since", formatDateTime(health.started_at)],
-    ["Requests", health.requests.toLocaleString()],
-    ["Server errors", health.server_errors.toLocaleString()],
+    ["Requests", formatNumber(health.requests)],
+    ["Server errors", formatNumber(health.server_errors)],
     ["Cache hit rate", hitRate(health.cache)],
   ];
 
@@ -77,7 +77,7 @@ export function SystemHealthPanel() {
                    rows={health.errors.map((e) => [formatDateTime(e.at), e.reference, e.route, e.org, e.error])} />
       <HealthTable title="Slowest recent requests" empty="Nothing slow since the API started."
                    head={["When", "Reference", "Route", "Organization", "Seconds"]}
-                   rows={health.slow.map((s) => [formatDateTime(s.at), s.reference, s.route, s.org, (s.ms / 1000).toFixed(1)])} />
+                   rows={health.slow.map((s) => [formatDateTime(s.at), s.reference, s.route, s.org, formatNumber(s.ms / 1000)])} />
       <HealthTable title="Cache warming after a rebuild" empty="Nothing warmed yet: the first pass runs a minute after the API starts."
                    head={["Organization", "When", "Built", "Failed"]}
                    rows={Object.entries(health.warmed).map(([org, w]) => [org, formatDateTime(w.at), w.built.join(", "), w.failed.join(", ") || "—"])} />

@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { MiniSparkChart } from "./MiniSparkChart";
 import { KpiCompareBadge } from "./KpiCompareBadge";
-import { formatCurrency, formatNumber } from "@/lib/format";
-import { formatTimeBucket } from "@/lib/timeBucketLabel";
+import { formatCompact, formatDate } from "@/lib/format";
 import { workstreamDisplayName } from "@/lib/businessLabels";
 import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
 import type { ExecutiveKpi } from "@/lib/types";
@@ -30,12 +29,7 @@ export function DashboardWidget({
   onLensChange,
   periodLabel,
 }: DashboardWidgetProps) {
-  const formatted =
-    kpi.value == null
-      ? "—"
-      : kpi.format === "currency"
-        ? formatCurrency(kpi.value)
-        : formatNumber(kpi.value);
+  const formatted = formatCompact(kpi.value, { currency: kpi.format === "currency" });
 
   const exploreHref = kpi.explore_report_id
     ? `/explore/${kpi.snapshot_id}?report=${kpi.explore_report_id}`
@@ -149,7 +143,7 @@ export function DashboardWidget({
             When the canvas has rows but none in range, say so and name the last date. */}
         {kpi.empty_window ? (
           <p className="mt-1 text-xs text-warn">
-            No data in this window — latest {formatTimeBucket(kpi.empty_window.latest, "day")}
+            No data in this window — latest {formatDate(kpi.empty_window.latest.slice(0, 10))}
           </p>
         ) : null}
         {showCompare ? (

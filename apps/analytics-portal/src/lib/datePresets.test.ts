@@ -31,7 +31,7 @@ describe("anchored date ranges", () => {
   });
 
   it("the period a reader sees names the date an anchored window is measured from", () => {
-    expect(anchoredLabel("Last 6 months", asOf)).toBe("Last 6 months, as of 18 Jun 2026");
+    expect(anchoredLabel("Last 6 months", asOf)).toBe("Last 6 months, as of Jun 18, 2026");
     expect(anchoredLabel("Last 6 months", null)).toBe("Last 6 months");
     expect(anchoredLabel("Custom range", asOf)).toBe("Custom range");
   });

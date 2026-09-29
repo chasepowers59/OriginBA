@@ -11,7 +11,7 @@ import { DashboardControls, type CompareMode } from "./DashboardControls";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { PresentationToolbar } from "./PresentationToolbar";
 import { kpiSections } from "@/lib/dashboardPdf";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatNumber } from "@/lib/format";
 import { CrossFilterBanner } from "@/components/CrossFilterBanner";
 
 type ExecutiveDashboardProps = {
@@ -86,7 +86,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
             {summary?.refresh?.last_refresh ? (
               <span className="ml-2 text-xs text-fg-muted">
                 · data refreshed {formatDateTime(summary.refresh.last_refresh)} (
-                {summary.refresh.tables.reduce((a, t) => a + t.batch_rows, 0).toLocaleString()}{" "}
+                {formatNumber(summary.refresh.tables.reduce((a, t) => a + t.batch_rows, 0))}{" "}
                 rows in latest batch)
               </span>
             ) : null}

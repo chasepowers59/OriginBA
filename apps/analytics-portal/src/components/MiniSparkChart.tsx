@@ -15,7 +15,7 @@ import { valueRampColors } from "@/lib/chartEmphasis";
 import { useColorMode } from "@/components/PortalThemeProvider";
 import { AxisTick, useElementWidth, type TickText } from "@/components/builder/BuilderChart";
 import { SPARK_AXIS, chartLayout } from "@/lib/chartLayout";
-import { formatTooltipCurrency, formatTooltipNumber } from "@/lib/format";
+import { formatCurrency, formatNumber } from "@/lib/format";
 
 type MiniSparkChartProps = {
   points: ExecutiveTrendPoint[];
@@ -74,7 +74,7 @@ export function MiniSparkChart({
   const ticks: TickText = new Map(labels.map((label, i) => [label, { lines: layout.tickLines[i], title: label }]));
   const tick = <AxisTick ticks={ticks} fontSize={SPARK_AXIS.fontSize} />;
   const rows = layout.orientation === "horizontal";
-  const formatValue = format === "currency" ? formatTooltipCurrency : formatTooltipNumber;
+  const formatValue = format === "currency" ? formatCurrency : formatNumber;
 
   if (!layout.showChart) {
     return (

@@ -1,5 +1,5 @@
 /** A dashboard's tiles as the server PDF's sections (POST /portal/export/dashboard-pdf). */
-import { formatCurrency, formatNumber } from "./format";
+import { formatCompact, formatNumber } from "./format";
 import type { ExecutiveKpi } from "./types";
 
 export type ExportSection = { name: string; headers: string[]; rows: Record<string, unknown>[]; note?: string; failed?: boolean };
@@ -17,7 +17,7 @@ export function dashboardPdfSections(sections: ExportSection[]) {
       const rows = s.rows.slice(0, budget);
       budget -= rows.length;
       const cut = rows.length < s.rows.length
-        ? `Showing the first ${rows.length.toLocaleString("en-US")} of ${s.rows.length.toLocaleString("en-US")} rows (truncated)`
+        ? `Showing the first ${formatNumber(rows.length)} of ${formatNumber(s.rows.length)} rows (truncated)`
         : "";
       return { title: s.name, note: [s.note, cut].filter(Boolean).join(" · "), columns: s.headers, rows, failed: Boolean(s.failed) };
     });
@@ -32,7 +32,7 @@ function briefError(error: string) {
 /** KPI cards as export sections: the headline value and what it counts, then its breakdown. */
 export function kpiSections(kpis: ExecutiveKpi[]): ExportSection[] {
   return kpis.map((kpi) => {
-    const value = kpi.value == null ? "No value" : kpi.format === "currency" ? formatCurrency(kpi.value) : formatNumber(kpi.value);
+    const value = kpi.value == null ? "No value" : formatCompact(kpi.value, { currency: kpi.format === "currency" });
     const change = kpi.change_pct == null
       ? []
       : [`${kpi.change_pct > 0 ? "+" : ""}${kpi.change_pct}%${kpi.compare_label ? ` ${kpi.compare_label}` : ""}`];

@@ -4,6 +4,7 @@ import {
   defaultDateRangeLastMonth,
   defaultDateRangeYtd,
 } from "@/lib/api";
+import { formatDate } from "@/lib/format";
 import type { DatePresetConfig } from "@/lib/types";
 
 // The period label a reader sees: an anchored window says what date it is measured from, so "Last 6
@@ -11,8 +12,7 @@ import type { DatePresetConfig } from "@/lib/types";
 // keep the plain label (they match on it); a custom range already shows its own dates.
 export function anchoredLabel(label: string, asOf?: string | null): string {
   if (!asOf || label === "Custom range") return label;
-  const d = anchorDate(asOf);
-  return `${label}, as of ${d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`;
+  return `${label}, as of ${formatDate(anchorDate(asOf))}`;
 }
 
 // A canvas may name its default (the catalog builder writes "last_12_months"): the name picks
