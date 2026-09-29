@@ -14,7 +14,8 @@ export function NlqAnswerCard({ result, days, onPinToDashboard }: NlqAnswerCardP
   const value = result.metrics?.value;
   const format = result.format ?? "number";
   const display =
-    typeof value === "number" && value >= 0 ? formatCompact(value, { currency: format === "currency" }) : null;
+    // a net can be negative (payments above charges): "-$757K" is an answer, not a blank
+    typeof value === "number" && Number.isFinite(value) ? formatCompact(value, { currency: format === "currency" }) : null;
 
   return (
     <div className="rounded-xl border border-edge tint-panel-br p-4">
