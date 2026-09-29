@@ -69,14 +69,14 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
     <section className={`glass-panel ${compact ? "p-4" : "p-6"}`}>
       <div className="mb-4">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
-          Ask a question
+          Vetted metrics
         </p>
         <h2 className={`mt-1 font-bold text-heading ${compact ? "text-lg" : "text-xl"}`}>
           Everyday utility metrics
         </h2>
         <p className="mt-1 text-sm text-fg-muted">
-          Governed canvas answers for billing, payments, field work, debt, and operations — adjust
-          parameters and re-run.
+          The same figures the dashboards use, for billing, payments, field work, debt and
+          operations. Set the filters and run it again.
         </p>
       </div>
 

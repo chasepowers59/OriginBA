@@ -9,7 +9,6 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 | Found | Issue | Reproduce / where | Next step |
 | --- | --- | --- | --- |
 | 2026-09-29 | Locally, the "INT_DEV (internal dev CISADM)" organization shows demo25 data: the local launch config sets `WAREHOUSE_DATABASE_URL` (the `dev` org's key) to the demo25 database. In the cloud deployment it is INT_DEV | Settings > System health: `dev` and `demo25` stamps are equal | Owner's call: point the local key at an INT_DEV copy, or accept the alias locally |
-| 2026-09-29 | Home shows two question boxes: Ask Ori and "Ask a question / Everyday utility metrics" (the governed-metric search), which Ori already tries first | Home page, below Ori | Decide with the UI review: fold the governed search into Ori or label it as vetted metrics |
 | 2026-09-29 | `scripts/jaspersoft/jrs_repository.py job-run` calls `POST /rest_v2/jobs/<id>/run`, which JasperReports Server 10.0 does not have (404) | Any job-run against prod or test | Remove or rebuild the command (task queued); JRS 10 has no REST run-now |
 | 2026-09-29 | `.env` line 17 (`JAVA_HOME`) has an unquoted value with a space; `set -a; . ./.env` prints `command not found` in zsh | `set -a && . ./.env` | Quote the value (owner's file; never print it) |
 | 2026-09-29 | Explorer: "Combined total" and "X leads at N% of the total" add different units (kWh + therms + gallons) when the breakdown is the unit of measure | Explorer, billed usage by unit of measure | UI-1: suppress total and share when a unit column is a dimension (ResultsPanel, businessLabels) |
@@ -26,7 +25,6 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 | 2026-09-29 | Zero and single-category results look broken (dashed "No trend data", $0-$4 axis, one "Unknown" bar, "leads at 100%") | Home cards, explorer | UI-14: hide chart/insight at one category or all zeros, say so plainly |
 | 2026-09-29 | Donut colours repeat past 5 slices; nulls show as a dash | Read quality, device events | UI-15: 4 slices + Other or bars; label nulls "Not recorded" |
 | 2026-09-29 | Dates, numbers and money are formatted differently page to page; odd tick steps; "12:00 AM" on date-only values | Everywhere | UI-16: DECISION + one formatter set in format.ts |
-| 2026-09-29 | Home: two question boxes (Ori and the six-field governed-metric form); starter chips cut mid-row | Home | UI-17: fold the governed search into Ori |
 | 2026-09-29 | Library is a 10,000 px (22,000 on phone) scroll; rail above the title on phones; two search boxes | /reports | UI-18: collapsed sections, mobile drawer, one search |
 | 2026-09-29 | SQL workspace results ~50 px tall on phone; builder says "on the left" when the panel is above | /database, /build on phone | UI-19: natural-height stack, layout-free copy |
 | 2026-09-29 | Slow Ellensburg explorer pages (17-32 s) show only a grey skeleton | Ellensburg billed usage, billed charge, GL | UI-20: "Running…" with elapsed time and cancel |
@@ -36,6 +34,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-29 | Home: two question boxes (Ori and the six-field governed-metric form); starter chips cut mid-row | UI-17: vetted-metric form folded under Ori (open for restricted readers), eyebrow "Vetted metrics" | e2e/ori.spec.ts |
 | 2026-09-29 | On phones the organization switcher and the "viewing another client" warning disappear | UI-12: 3a8fbb68 | e2e/shell.spec.ts |
 | 2026-09-29 | The floating Ask Ori button covers content, worst on phones | UI-11: 3a8fbb68 | e2e/shell.spec.ts |
 | 2026-09-29 | Every canvas declared `default_date_preset: "last_12_months"` but the explorer ignored the string and opened on an unlisted 180-day window; no date chip was ever highlighted | 72c0d1a0 | tests/fixtures/date_presets.json (both suites) |

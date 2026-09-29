@@ -21,6 +21,14 @@ test("home presents Ask Ori", async ({ page }) => {
   await expect(page.getByText(/the assistant/i)).toHaveCount(0);
 });
 
+test("home has one question box: the vetted-metric form waits folded under Ori", async ({ page }) => {
+  await page.goto("/");
+  const form = page.getByPlaceholder("Total accounts billed by customer class…");
+  await expect(form).toBeHidden();
+  await page.getByText("Run a vetted metric with your own filters").click();
+  await expect(form).toBeVisible();
+});
+
 test("every other page offers Ask Ori beside it", async ({ page }) => {
   await page.goto("/reports");
   await page.getByRole("button", { name: "Ask Ori" }).click();
