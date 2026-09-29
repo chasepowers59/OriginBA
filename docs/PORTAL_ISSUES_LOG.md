@@ -70,6 +70,10 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 ## Decisions
 
+- 2026-09-29 (Chase: "go with your recommendations"):
+  - **UI-2 colour meaning:** one hue per series (`--chart-1`); the leading bar is emphasised by strength of that hue, not by another colour; red (`--over`) only for negative values and explicit thresholds; the cross-filter selection keeps `--chart-selected`. Replaces the primary-to-red value ramp.
+  - **UI-4 one glossary, one grouping:** user-facing words are **data set** (never canvas, reporting table, domain, snapshot), **report** (a ready-to-run question), **view** (a saved view), **dashboard**, **workstream** (the business area); organization, never tenant; unit of measure, never UOM. The Library groups by workstream only (the pack chips go); the builder's nav item is **Build**; data set pages sit under Library.
+  - **UI-16 one format set** (`src/lib/format.ts`): dates "Sep 1, 2026"; date-times "Sep 1, 2026, 10:11 AM"; a date-only value never shows a time; tables show full numbers with separators, compact (1.5K, 2.4M) only on chart axes and KPI headlines; money "$1,234.56" and "-$12,071.26" everywhere including axes ("-$9.5K"); axis steps are round (1, 2, 2.5, 5 x 10^n).
 - 2026-09-29: desktop web only (no app store, no phone target): phone-width findings are out of scope; checks run on desktop.
 
 - 2026-09-29: the assistant is **Ori** ("Ask Ori, your AI analytics assistant"); words live in `src/lib/ori.ts`.
