@@ -8,7 +8,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Reproduce / where | Next step |
 | --- | --- | --- | --- |
-| 2026-09-29 | The "INT_DEV (internal dev CISADM)" organization reads the demo25 Postgres warehouse (identical build stamp), not INT_DEV | Settings > System health: `dev` and `demo25` stamps are equal | Point `dev` at the INT_DEV in-database warehouse or rename the label |
+| 2026-09-29 | Locally, the "INT_DEV (internal dev CISADM)" organization shows demo25 data: the local launch config sets `WAREHOUSE_DATABASE_URL` (the `dev` org's key) to the demo25 database. In the cloud deployment it is INT_DEV | Settings > System health: `dev` and `demo25` stamps are equal | Owner's call: point the local key at an INT_DEV copy, or accept the alias locally |
 | 2026-09-29 | Home shows two question boxes: Ask Ori and "Ask a question / Everyday utility metrics" (the governed-metric search), which Ori already tries first | Home page, below Ori | Decide with the UI review: fold the governed search into Ori or label it as vetted metrics |
 | 2026-09-29 | `scripts/jaspersoft/jrs_repository.py job-run` calls `POST /rest_v2/jobs/<id>/run`, which JasperReports Server 10.0 does not have (404) | Any job-run against prod or test | Remove or rebuild the command (task queued); JRS 10 has no REST run-now |
 | 2026-09-29 | `.env` line 17 (`JAVA_HOME`) has an unquoted value with a space; `set -a; . ./.env` prints `command not found` in zsh | `set -a && . ./.env` | Quote the value (owner's file; never print it) |
