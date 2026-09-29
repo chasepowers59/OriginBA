@@ -499,5 +499,12 @@ will be Ori too, so they never need renaming.
 - The backend speaks as Ori too: the system prompt opens "You are Ori…" (`api/assistant.py`),
   and user-facing errors say "Ori could not answer." / "Ori is not configured" /
   "Today's Ori budget…" (`api/assistant_routes.py`).
+- **Ori's findings** (first proactive surface, 2026-09-29): `OriFindings` above Ask Ori on home
+  reads `GET /portal/ori/findings` (`api/ori_insights.py`): the home cards against the prior
+  period, from the SAME vetted summary (so a finding never disagrees with its card), moves of
+  15% or more with a volume floor (count 20, money 1,000), windowed cards only, at most three;
+  "Ask Ori why" hands the question to Ori via `requestAsk`. No findings, no card. New Ori
+  insight types should follow this shape: rules in a pure, tested backend module; words from
+  `ORI`; one follow-up question to Ori.
 - Code identifiers (`AssistantPanel`, `/portal/assistant`, `ASSISTANT_*` env keys) keep their
   names: renaming them buys nothing and breaks deployments.
