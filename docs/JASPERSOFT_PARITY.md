@@ -33,7 +33,7 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 | Per-client branding | Yes | An organization's `branding` block in `config/portal_organizations.json` (`brand`: name, tagline, `logo_src` a path the portal serves; `theme`: accent colours) is merged over the default for that organization; its logo sits beside Origin's in the header and heads its PDFs. Invalid colours and outside logos are ignored |
 | Embedding | Yes | A saved view's "Embed" action makes a signed link (at most a day) and an iframe snippet: that one view, with its creator's current access, framed only by the sites in `EMBED_ALLOWED_ORIGINS` (`api/embed.py`, `tests/test_embed.py`). No API keys for other systems yet |
 | Observability | Partly | Request id on every response, one log line per request, 500s name a reference. No error-reporting service or metrics yet |
-| Performance at scale | Partly | Row counts from statistics, 5-minute result cache. First visits over multi-million-row canvases are slow (25 s on Ellensburg); pre-aggregates are a scale-plan item |
+| Performance at scale | Partly | Row counts from statistics; results and page summaries kept until the warehouse is rebuilt (its build stamp, `api/data_version.py`; at most 12 hours), so only the first visit after a rebuild waits. That first visit over a multi-million-row canvas is still slow (25 s on Ellensburg); pre-aggregates are a scale-plan item |
 
 ## Order to close the gaps
 

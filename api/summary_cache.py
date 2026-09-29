@@ -1,5 +1,6 @@
-"""A five-minute cache for page summaries and report results, which change only when the
-warehouse is rebuilt.
+"""A cache for page summaries and report results, which change only when the warehouse is
+rebuilt. With the warehouse's build stamp (api/data_version.py) a result is kept until the
+stamp moves, at most twelve hours; without one, five minutes.
 
 The key is everything a summary depends on (org, window, comparison, filters, lenses, the
 caller's grants, and the day, so a window never outlives its date). A summary with any
@@ -13,6 +14,7 @@ from datetime import date
 from typing import Any, Callable
 
 TTL_SECONDS = 300
+VERSIONED_TTL_SECONDS = 12 * 3600
 # Report results ride here too; the oldest entry goes first past this many.
 MAX_ENTRIES = 500
 _entries: dict[tuple, tuple[float, Any]] = {}
@@ -23,11 +25,13 @@ def _no_failed_card(result: Any) -> bool:
     return not any(k.get("error") for k in result.get("kpis") or []) and not result.get("error")
 
 
-def cached(key: tuple, build: Callable[[], Any], keep: Callable[[Any], bool] = _no_failed_card) -> Any:
-    full = (date.today().isoformat(), *key)
+def cached(key: tuple, build: Callable[[], Any], keep: Callable[[Any], bool] = _no_failed_card,
+           version: str | None = None) -> Any:
+    full = (date.today().isoformat(), version, *key)
+    ttl = VERSIONED_TTL_SECONDS if version else TTL_SECONDS
     with _lock:
         hit = _entries.get(full)
-    if hit and time.monotonic() - hit[0] < TTL_SECONDS:
+    if hit and time.monotonic() - hit[0] < ttl:
         return hit[1]
     result = build()
     if keep(result):

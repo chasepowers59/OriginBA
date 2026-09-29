@@ -28,6 +28,7 @@ from api.reporting_dates import (DEFAULT_WINDOW_DAYS, DEFAULT_WINDOW_MIN_ROWS, d
 from api.executive_dashboard import (WAREHOUSE_NOT_BUILT_NOTE, build_executive_summary,
                                      is_missing_relation_error)
 from api.kpi_runner import COMPARE_MODES
+from api.data_version import data_version
 from api.summary_cache import cached
 from api.row_security import enforce as enforce_row_rules, readable, require_unrestricted, row_filters
 from api.workstream_dashboard import build_workstream_about, build_workstream_summary
@@ -367,7 +368,7 @@ def executive_summary(
         lenses=lenses,
         organization_id=org_id,
         row_rules=ctx.row_rules,
-    ))
+    ), version=data_version(org_id))
 
 
 @router.get("/workstream-summary/{workstream_id}")
@@ -395,7 +396,7 @@ def workstream_summary(
                         extra_filters=extra,
                         organization_id=org_id,
                         row_rules=ctx.row_rules,
-                    ))
+                    ), version=data_version(org_id))
     if result.get("error"):
         raise HTTPException(status_code=404, detail=result["error"])
     return result
@@ -777,10 +778,10 @@ def snapshot_query(
         return execute_query(sql, binds, organization_id=org_id, max_rows=body.limit)
 
     try:
-        # The same statement for the same org is answered from memory for five minutes:
-        # a report over Ellensburg's rpt_billed_charge took ~25 s. Every run is audited below.
+        # The same statement for the same org is answered from memory until the warehouse is
+        # rebuilt: a report over Ellensburg's rpt_billed_charge took ~25 s. Every run is audited below.
         columns, rows = cached(("query", org_id, backend, sql, repr(sorted(binds.items())), body.limit),
-                               run, keep=lambda _: True)
+                               run, keep=lambda _: True, version=data_version(org_id))
     except Exception as exc:
         raise _query_failure(f"{'Warehouse' if warehouse else 'Demo'} query failed", exc) from exc
 

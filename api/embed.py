@@ -22,6 +22,7 @@ from api.auth.dependencies import AuthContext, require_permission
 from api.ownership import require_edit
 from api.row_security import RowAccessDenied, creator_rules, row_filters
 from api.saved_views import list_saved_views
+from api.data_version import data_version
 from api.summary_cache import cached
 
 router = APIRouter(tags=["embed"])
@@ -96,7 +97,8 @@ def embed_data(token: str) -> dict[str, Any]:
                              limit=500, dialect=dialect, schema=schema)
     # Public route: repeated loads of an embed are served from memory, not re-queried.
     columns, rows = cached(("embed", org_id, view["id"], sql, repr(sorted(binds.items()))),
-                           lambda: _run(snapshot, sql, binds, organization_id=org_id, max_rows=500), keep=lambda _: True)
+                           lambda: _run(snapshot, sql, binds, organization_id=org_id, max_rows=500), keep=lambda _: True,
+                           version=data_version(org_id))
     from api.access_audit import record_access_event
     record_access_event(actor_email=f"embed:{claims.get('by', '')}", actor_id=None, action="embed_view",
                         target_type="saved_view", target_id=view["id"], detail=f"rows={len(rows)}")
