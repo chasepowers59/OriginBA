@@ -23,6 +23,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-29 | Vetted answers: billed usage totalled across units (794,109,405 of gallons+kWh+therms); GL by account totalled a balanced ledger ($0.00, then "No rows in this period"); sources named by table id ("rpt financial txn", "Sa Aged Balance") | 1e382d34 | tests/test_vetted_totals.py |
 | 2026-09-29 | No page said the reporting data had stopped refreshing (Ellensburg 19 days old; the home refresh line is Postgres-only) | ee9c84d4 | tests/test_freshness.py, src/lib/freshness.test.ts, e2e/freshness.spec.ts |
 | 2026-09-29 | Data quality at Ellensburg: all five pipeline-parity rules flagged CISADM ahead of the canvases (bills +21, FTs +512, ...) | Staleness, not a model bug: the reporting tables dated 2026-09-10 because a stranded RPT_CHARACTERISTICS__DBT_BACKUP blocked every scheduled build once the VPN was back. Dropped by the preflight's safe flag and fully rebuilt 2026-09-29 (320/320): all five parity rules 0, source parity 120/120 | e2e/dq.spec.ts; scripts/run_source_parity.py (originba_dbt) |
 | 2026-09-29 | Finance "Adjustment dollars" nets $17,350 at Ellensburg over bars summing ~$127K: transfers (7,198 of 9,874, netting $0) split across SA types and the credits ranked last | fc2d13bc (by Adjustment Type, ranked by size) | tests/test_rank_by_magnitude.py, tests/test_kpi_breakdowns.py |
