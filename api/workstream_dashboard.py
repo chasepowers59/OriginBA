@@ -208,7 +208,7 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
     "finance": [
         # Bill segments and adjustments net of their cancellations; payments are not charges
         # (summing every FT showed -$414K at Ellensburg for $3.24M of charges, 2026-09-29).
-        {"id": "frozen_charge_fts", "label": "Frozen charge FTs", "subtitle": "Bill segments + adjustments, net of cancellations",
+        {"id": "frozen_charge_fts", "label": "Charges posted", "subtitle": "Bills and adjustments, net of cancellations",
          "snapshot_id": "rpt_financial_txn", "format": "currency", "workstream": "finance",
          "explore_report_id": None, "date_field": "Accounting Date",
          "value": {"dimensions": [], "measures": [{"field": "Current Amount", "agg": "sum"}],
