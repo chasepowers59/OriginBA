@@ -108,6 +108,8 @@ from api.content_pack_routes import router as content_pack_router
 app.include_router(content_pack_router)
 from api.health_routes import router as health_router
 app.include_router(health_router)
+from api.ori_routes import router as ori_router
+app.include_router(ori_router)
 from api.kpi_alert_routes import router as kpi_alert_router
 app.include_router(kpi_alert_router)
 from api.annotation_routes import router as annotation_router

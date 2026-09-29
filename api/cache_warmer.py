@@ -78,7 +78,9 @@ def warm_once(org_id: str) -> list[str]:
     if tries > MAX_ATTEMPTS:
         return []
     _attempts[org_id] = (version, tries)
-    jobs = [("home", lambda: cached_home_summary(org_id, 30, False, "prior_period", [], ["*"], {}, ()))]
+    jobs = [("home", lambda: cached_home_summary(org_id, 30, False, "prior_period", [], ["*"], {}, ())),
+            # the home summary in compare mode: what Ori's findings read (api/ori_routes.py)
+            ("ori findings", lambda: cached_home_summary(org_id, 30, True, "prior_period", [], ["*"], {}, ()))]
     jobs += [(ws, lambda ws=ws: cached_workstream_summary(org_id, ws, 30, False, "prior_period", [], ()))
              for ws in _workstreams(org_id)]
     try:

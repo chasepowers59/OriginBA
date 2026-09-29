@@ -48,7 +48,7 @@ class WarmerTests(unittest.TestCase):
             p.stop()
 
     def test_a_new_stamp_warms_what_the_pages_ask_for(self):
-        self.assertEqual(cw.warm_once("demo25"), ["home", "billing", "finance"])
+        self.assertEqual(cw.warm_once("demo25"), ["home", "ori findings", "billing", "finance"])
         home, ws = self.mocks[0], self.mocks[1]
         home.reset_mock(), ws.reset_mock()
         # the pages' default requests are now answered from memory
@@ -62,14 +62,14 @@ class WarmerTests(unittest.TestCase):
     def test_the_last_warm_is_recorded_for_system_health(self):
         cw.warm_once("demo25")
         last = cw.status()["demo25"]
-        self.assertEqual((last["version"], last["built"], last["failed"]), ("v1", ["home", "billing", "finance"], []))
+        self.assertEqual((last["version"], last["built"], last["failed"]), ("v1", ["home", "ori findings", "billing", "finance"], []))
         self.assertIn("at", last)
 
     def test_an_unchanged_stamp_does_nothing(self):
         cw.warm_once("demo25")
         self.assertEqual(cw.warm_once("demo25"), [])
         self.version[0] = "v2"
-        self.assertEqual(cw.warm_once("demo25"), ["home", "billing", "finance"])
+        self.assertEqual(cw.warm_once("demo25"), ["home", "ori findings", "billing", "finance"])
 
     def test_an_unknown_stamp_does_nothing(self):
         self.version[0] = None
@@ -120,7 +120,7 @@ class ReportWarmingTests(unittest.TestCase):
             p.stop()
 
     def test_the_opening_report_of_a_large_canvas_is_warm(self):
-        self.assertEqual(cw.warm_once("demo25"), ["home", "report rpt_billed_charge"])
+        self.assertEqual(cw.warm_once("demo25"), ["home", "ori findings", "report rpt_billed_charge"])
         self.assertEqual(len(self.runs), 1)
         # what the explorer sends when the page opens (ExplorerPanel.runPremade): the canvas's
         # window first (last_12_months as of 2026-09-29), then the report's own filters
