@@ -44,10 +44,10 @@
     acknowledge this one finding rather than 794.
   # the systemic half of the guard above -- one row instead of a flooded worklist
   sql: >
-    select count(*) filter (where "Never Registered At Head-End") as unregistered,
-           count(*)                                               as attached_devices,
+    select count(*) filter (where "Never Registered At Head-End") as "Not Registered",
+           count(*)                                               as "Attached Devices",
            round(100.0 * count(*) filter (where not "Never Registered At Head-End")
-                 / greatest(count(*), 1), 2)                      as pct_registered
+                 / greatest(count(*), 1), 2)                      as "% Registered"
     from reporting.rpt_device_asset
     where "Is Attached To Service Point"
     having count(*) > 0
@@ -193,8 +193,8 @@
     Badge numbers are the field's identity for a meter -- a duplicate breaks
     exchanges and reads. CIS: Device > identifiers; correct the data entry.
   sql: >
-    select "Meter Badge Number", count(*) as devices,
-           string_agg("Device ID", ', ') as device_ids
+    select "Meter Badge Number", count(*) as "Devices",
+           string_agg("Device ID", ', ') as "Device IDs"
     from reporting.rpt_device_asset
     where "Meter Badge Number" is not null
     group by "Meter Badge Number" having count(*) > 1
@@ -227,9 +227,9 @@
     > components) for the SA types where uom_lines is zero.
   sql: >
     select bs."SA Type",
-           count(distinct bs."Bill Segment ID")            as usage_segments,
-           count(cl."Unit of Measure Code")                as calc_lines_with_uom,
-           count(*)                                        as calc_lines_total
+           count(distinct bs."Bill Segment ID")            as "Usage Bill Segments",
+           count(cl."Unit of Measure Code")                as "Charge Lines With a Unit",
+           count(*)                                        as "Charge Lines"
     from reporting.rpt_bill_segment bs
     join reporting.rpt_billed_charge cl on cl."Bill Segment ID" = bs."Bill Segment ID"
     where bs."Billed Usage" is not null
@@ -246,12 +246,12 @@
     revenue-by-component reports comparable across the fleet. No CIS action unless
     a client's convention changed unexpectedly.
   sql: >
-    select "Charge Description", count(*) as line_count,
-           sum("Billed Amount") as total_amount
+    select "Charge Description", count(*) as "Charge Lines",
+           sum("Billed Amount") as "Total Amount"
     from reporting.rpt_billed_charge
     where "Charge Description" ~* 'tax'
     group by "Charge Description"
-    order by line_count desc
+    order by "Charge Lines" desc
 
 # ---- ETL PIPELINE INTEGRITY (action severity): the source-side family.
 # Chase's point (2026-08-26): rules on the canvases assume the ETL was faithful.
@@ -271,9 +271,9 @@
     dropped or duplicated rows: diff staging.stg_financial_txn against the landing
     before trusting any financial number.
   sql: >
-    select 'financial transactions' as chain,
-           l.n as landing_rows, c.n as canvas_rows,
-           l.amt as landing_amount, c.amt as canvas_amount
+    select 'financial transactions' as "Chain",
+           l.n as "Source Rows", c.n as "Report Rows",
+           l.amt as "Source Amount", c.amt as "Report Amount"
     from (select count(*) n, round(sum(cur_amt)::numeric,2) amt from cisadm.ci_ft) l,
          (select count(*) n, round(sum("Current Amount")::numeric,2) amt
           from reporting.rpt_financial_txn) c
@@ -285,7 +285,7 @@
   title: Bills differ between landing and reporting
   action: One row per CI_BILL, no filter -- investigate the dbt chain on mismatch.
   sql: >
-    select 'bills' as chain, l.n as landing_rows, c.n as canvas_rows
+    select 'bills' as "Chain", l.n as "Source Rows", c.n as "Report Rows"
     from (select count(*) n from cisadm.ci_bill) l,
          (select count(*) n from reporting.rpt_bill) c
     where l.n <> c.n
@@ -296,7 +296,7 @@
   title: Bill segments differ between landing and reporting
   action: One row per CI_BSEG, no filter -- investigate the dbt chain on mismatch.
   sql: >
-    select 'bill segments' as chain, l.n as landing_rows, c.n as canvas_rows
+    select 'bill segments' as "Chain", l.n as "Source Rows", c.n as "Report Rows"
     from (select count(*) n from cisadm.ci_bseg) l,
          (select count(*) n from reporting.rpt_bill_segment) c
     where l.n <> c.n
@@ -307,9 +307,9 @@
   title: Payment tenders differ between landing and reporting (rows or dollars)
   action: One row per CI_PAY_TNDR -- counts and tender dollars must tie exactly.
   sql: >
-    select 'payment tenders' as chain,
-           l.n as landing_rows, c.n as canvas_rows,
-           l.amt as landing_amount, c.amt as canvas_amount
+    select 'payment tenders' as "Chain",
+           l.n as "Source Rows", c.n as "Report Rows",
+           l.amt as "Source Amount", c.amt as "Report Amount"
     from (select count(*) n, round(sum(tender_amt)::numeric,2) amt from cisadm.ci_pay_tndr) l,
          (select count(*) n, round(sum("Tender Amount")::numeric,2) amt
           from reporting.rpt_payment_tender) c
@@ -321,7 +321,7 @@
   title: Measurements differ between landing and reporting
   action: One row per D1_MSRMT -- investigate the dbt chain on mismatch.
   sql: >
-    select 'measurements' as chain, l.n as landing_rows, c.n as canvas_rows
+    select 'measurements' as "Chain", l.n as "Source Rows", c.n as "Report Rows"
     from (select count(*) n from cisadm.d1_msrmt) l,
          (select count(*) n from reporting.rpt_measurement) c
     where l.n <> c.n
