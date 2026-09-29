@@ -1,6 +1,6 @@
 "use client";
 
-import { formatCellValue, formatNumber } from "@/lib/format";
+import { formatCellValue, formatDateTime, formatNumber } from "@/lib/format";
 
 /**
  * Data Quality board — the rules engine's findings as a CIS worklist.
@@ -39,6 +39,7 @@ type DqResponse = {
   review?: number;
   acknowledged?: number;
   refresh_marker?: string;
+  built_at?: string | null;
   rules: DqRule[];
   error?: string;
 };
@@ -131,8 +132,8 @@ export function DataQualityBoard() {
           <p className="mt-1 text-sm text-fg-muted">
             Rules run against this organization&apos;s data; every finding says exactly where
             to act in CIS.
-            {data.refresh_marker ? (
-              <span className="text-fg-subtle"> · data as of {data.refresh_marker}</span>
+            {data.built_at ? (
+              <span className="text-fg-subtle"> · data refreshed {formatDateTime(data.built_at)}</span>
             ) : null}
           </p>
         </div>

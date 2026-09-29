@@ -92,6 +92,21 @@ def _refresh_marker(org: str, engine: str) -> str:
             return "none"
 
 
+def _built_at(marker: str, engine: str) -> str | None:
+    """When the warehouse was built, for the page (the marker itself is for acks only).
+    Oracle: the stamp's LAST_DDL half (last_analyzed:last_ddl:count); statistics can be
+    regathered without a rebuild, the tables' creation cannot."""
+    if marker == "none":
+        return None
+    if engine == "oracle":
+        parts = marker.split(":")
+        if len(parts) != 3 or len(parts[1]) != 14:
+            return None
+        d = parts[1]
+        return f"{d[:4]}-{d[4:6]}-{d[6:8]}T{d[8:10]}:{d[10:12]}:{d[12:]}"
+    return marker.replace(" ", "T", 1)
+
+
 def _rules_path(engine: str) -> Path:
     if engine == "oracle":
         return DEFAULT_ORACLE_RULES if DEFAULT_ORACLE_RULES.exists() else BUNDLED_ORACLE_RULES
@@ -231,6 +246,7 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     return {
         "configured": True,
         "refresh_marker": marker,
+        "built_at": _built_at(marker, engine),
         **summarise_counts(out),
         "acknowledged": sum(len(e.get("acked_rows") or []) for e in out),
         "rules": out,

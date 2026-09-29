@@ -15,4 +15,8 @@ test("each finding row has a Mark done button", async ({ page, context }, info) 
   await expect(mark).toContainText("Mark done");
   expect((await mark.boundingBox())!.height).toBeGreaterThanOrEqual(32);
   await expect(page.getByRole("button", { name: "Done", exact: true })).toHaveCount(0);
+  // the build time reads as a date, never the raw build stamp (20260928180601:20260910084138:39)
+  const header = page.getByText(/Rules run against this organization/);
+  await expect(header).toContainText(/data refreshed [A-Z][a-z]{2} \d{1,2}, \d{4}/);
+  await expect(header).not.toContainText(/\d{14}/);
 });

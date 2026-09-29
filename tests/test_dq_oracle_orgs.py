@@ -179,6 +179,14 @@ class OracleOrgAcknowledgementTests(OracleOrgHarness):
         out = dq_routes.dq_findings(ctx=_ctx())
         self.assertEqual(out["refresh_marker"], self.stamp)
 
+    def test_the_page_is_told_when_the_tables_were_built_not_the_raw_stamp(self):
+        # Ellensburg 2026-09-29 printed "data as of 20260928180601:20260910084138:39". The build
+        # is the LAST_DDL half: statistics can be regathered (09-28) without a rebuild (09-10).
+        self.stamp = "20260928180601:20260910084138:39"
+        self.assertEqual(dq_routes.dq_findings(ctx=_ctx())["built_at"], "2026-09-10T08:41:38")
+        self.stamp = None
+        self.assertIsNone(dq_routes.dq_findings(ctx=_ctx())["built_at"])
+
     def test_an_ack_lasts_until_the_warehouse_is_rebuilt(self):
         first = dq_routes.dq_findings(ctx=_ctx())
         key = first["rules"][0]["row_keys"][0]
@@ -249,6 +257,7 @@ class PostgresOrgUnchangedTests(unittest.TestCase):
         self.assertTrue(out["configured"])
         self.assertEqual(out["rules"][0]["rows"], [["SP1"]])
         self.assertEqual(out["refresh_marker"], "2026-09-28 06:31:02")
+        self.assertEqual(out["built_at"], "2026-09-28T06:31:02")
         executed = [c.args[0] for c in cur.execute.call_args_list]
         self.assertIn("from reporting.rpt_premise_sp", executed[0])
         self.assertIn("max(load_dttm)::text from staging.stg_financial_txn", executed[-1])
