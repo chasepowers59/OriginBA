@@ -4,14 +4,18 @@ The rules live in the originba_dbt repo (dq_rules/rules.yml -- single source, sa
 file the CLI runner uses); this route executes them against the requesting tenant's
 WAREHOUSE and returns CIS-navigable findings. Rules run on the governed reporting
 canvases, so one rule set serves every tenant whose warehouse carries the contract.
+An Oracle in-database organization (canvases in ORIGINBA_REPORTING inside its own C2M
+instance) runs dq_rules/rules.oracle.yml, GENERATED from rules.yml by originba_dbt's
+transpiler, never hand-edited.
 
 Read-only by construction: each rule is a SELECT; the connection is the same
-per-tenant warehouse pool every canvas query uses.
+per-tenant warehouse pool (Postgres) or Oracle session pool every canvas query uses.
 """
 from __future__ import annotations
 
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -19,21 +23,31 @@ import yaml
 from fastapi import APIRouter, Body, Depends
 
 from api.auth import AuthContext, get_auth_context
+from api.data_version import data_version
+from api.demo_db import execute_query as oracle_query
+from api.executive_dashboard import is_missing_relation_error
 from api.org_db import require_org_for_data
+from api.snapshot_catalog import org_backend
 from api.warehouse_db import warehouse_configured, warehouse_connection
 from api.row_security import require_unrestricted
 
 ROOT = Path(__file__).resolve().parent.parent
 # Rules resolution order: the sibling originba_dbt checkout is the SOURCE (dev machines),
-# and config/dq_rules.yml is the DEPLOY COPY bundled into the container (Render has no
-# sibling repo). Refresh the bundled copy whenever dq_rules/rules.yml changes:
+# and config/ holds the DEPLOY COPIES bundled into the container (Render has no sibling
+# repo). Refresh both whenever originba_dbt regenerates its rules:
 #   cp ../originba_dbt/dq_rules/rules.yml config/dq_rules.yml
+#   cp ../originba_dbt/dq_rules/rules.oracle.yml config/dq_rules.oracle.yml
 DEFAULT_RULES = ROOT.parent / "originba_dbt" / "dq_rules" / "rules.yml"
 BUNDLED_RULES = ROOT / "config" / "dq_rules.yml"
+DEFAULT_ORACLE_RULES = DEFAULT_RULES.with_name("rules.oracle.yml")
+BUNDLED_ORACLE_RULES = ROOT / "config" / "dq_rules.oracle.yml"
 
 router = APIRouter(prefix="/dq", tags=["data-quality"])
 
 ROW_CAP = 100
+# Oracle rules run side by side: serially the 22 took 101 s on Ellensburg over the VPN
+# (2026-09-29). Bounded well under the org's 8-session pool, which serves every page.
+ORACLE_RULE_WORKERS = 4
 ACK_DIR = ROOT / "data" / "dq_acks"
 
 
@@ -57,23 +71,30 @@ def _save_acks(org: str, acks: dict[str, Any]) -> None:
     _ack_path(org).write_text(json.dumps(acks, indent=1))
 
 
-def _refresh_marker(cur) -> str:
+def _refresh_marker(org: str, engine: str) -> str:
     """A value that changes when the warehouse is reloaded/rebuilt.
 
-    load_dttm is the CDC/build watermark every staging view carries; its max moves
-    on every refresh, which is EXACTLY the acknowledged-until-next-refresh contract:
-    mark a finding done and it stays hidden until new data arrives, then the rule
-    re-evaluates it fresh.
+    That is EXACTLY the acknowledged-until-next-refresh contract: mark a finding done
+    and it stays hidden until new data arrives, then the rule re-evaluates it fresh.
+    Postgres: load_dttm, the CDC/build watermark every staging view carries. Oracle
+    in-database: the build stamp, because staging there synthesizes load_dttm at
+    build time and CISADM carries none.
     """
-    try:
-        cur.execute("select max(load_dttm)::text from staging.stg_financial_txn")
-        row = cur.fetchone()
-        return str(row[0]) if row and row[0] else "none"
-    except Exception:  # noqa: BLE001
-        return "none"
+    if engine == "oracle":
+        return data_version(org) or "none"
+    with warehouse_connection(org) as conn:
+        cur = conn.cursor()
+        try:
+            cur.execute("select max(load_dttm)::text from staging.stg_financial_txn")
+            row = cur.fetchone()
+            return str(row[0]) if row and row[0] else "none"
+        except Exception:  # noqa: BLE001
+            return "none"
 
 
-def _rules_path() -> Path:
+def _rules_path(engine: str) -> Path:
+    if engine == "oracle":
+        return DEFAULT_ORACLE_RULES if DEFAULT_ORACLE_RULES.exists() else BUNDLED_ORACLE_RULES
     override = os.environ.get("DQ_RULES_PATH")
     if override:
         return Path(override)
@@ -83,6 +104,37 @@ def _rules_path() -> Path:
 
 
 TOTAL_COL = "_dq_total"
+
+
+def _run_rule(rule: dict[str, Any], run) -> dict[str, Any]:
+    """One rule's finding entry; `run(sql)` returns (columns, rows) or raises.
+
+    A failing rule is reported on its own entry and never stops the others.
+    """
+    entry: dict[str, Any] = {k: rule.get(k) for k in
+                             ("id", "object", "severity", "title", "action", "key_column")}
+    try:
+        # count(*) OVER () rides along with the capped page, so one query
+        # answers both "show me some" and "how many are there". Fetching
+        # ROW_CAP + 1 rows could only ever say "at least 101", and the
+        # headline was summing that: 200 shown for a real backlog of 1,455.
+        # Quoted: Oracle refuses an unquoted name starting with "_" (ORA-00911).
+        cols, rows = run(f'select t.*, count(*) over () as "{TOTAL_COL}" '
+                         f'from ({rule["sql"].rstrip().rstrip(";")}) t')
+        total_at = cols.index(TOTAL_COL)
+        entry["columns"] = [c for i, c in enumerate(cols) if i != total_at]
+        entry["rows"] = [[None if v is None else str(v)
+                          for i, v in enumerate(row) if i != total_at]
+                         for row in rows[:ROW_CAP]]
+        entry["count"] = len(rows[:ROW_CAP])
+        entry["total"] = int(rows[0][total_at]) if rows else 0
+        entry["capped"] = entry["total"] > ROW_CAP
+    except Exception as e:  # noqa: BLE001
+        # an exception with no message has no first line; that must not escape the rule
+        entry["error"] = (str(e).splitlines() or [type(e).__name__])[0][:200]
+        entry["columns"], entry["rows"] = [], []
+        entry["count"] = entry["total"] = 0
+    return entry
 
 
 def _finding_total(entry: dict[str, Any]) -> int:
@@ -111,45 +163,40 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     ctx.require_permission("portal:read")
     require_unrestricted(ctx)   # the rules run their own SQL over whole canvases
     org = require_org_for_data(ctx)
-    if not warehouse_configured(org):
+    engine, _catalog = org_backend(org)
+    # An Oracle org reaching here has its Oracle connection (require_org_for_data).
+    if engine != "oracle" and not warehouse_configured(org):
         return {"configured": False, "rules": []}
-    path = _rules_path()
+    path = _rules_path(engine)
     if not path.exists():
         return {"configured": True, "rules": [],
                 "error": "rules file not found (set DQ_RULES_PATH)"}
     rules = yaml.safe_load(path.read_text())
-    out = []
-    with warehouse_connection(org) as conn:
-        cur = conn.cursor()
-        for r in rules:
-            entry: dict[str, Any] = {k: r.get(k) for k in
-                                     ("id", "object", "severity", "title", "action", "key_column")}
-            try:
-                # count(*) OVER () rides along with the capped page, so one query
-                # answers both "show me some" and "how many are there". Fetching
-                # ROW_CAP + 1 rows could only ever say "at least 101", and the
-                # headline was summing that: 200 shown for a real backlog of 1,455.
-                cur.execute(f'select t.*, count(*) over () as {TOTAL_COL} '
-                            f'from ({r["sql"].rstrip().rstrip(";")}) t')
-                cols = [d[0] for d in cur.description]
-                total_at = cols.index(TOTAL_COL)
-                rows = cur.fetchmany(ROW_CAP + 1)
-                entry["columns"] = [c for i, c in enumerate(cols) if i != total_at]
-                entry["rows"] = [[None if v is None else str(v)
-                                  for i, v in enumerate(row) if i != total_at]
-                                 for row in rows[:ROW_CAP]]
-                entry["count"] = len(rows[:ROW_CAP])
-                entry["total"] = int(rows[0][total_at]) if rows else 0
-                entry["capped"] = entry["total"] > ROW_CAP
-            except Exception as e:  # noqa: BLE001
-                conn.rollback()
-                entry["error"] = str(e).splitlines()[0][:200]
-                entry["columns"], entry["rows"] = [], []
-                entry["count"] = entry["total"] = 0
-            out.append(entry)
+    if engine == "oracle":
+        def run_oracle(sql: str):
+            return oracle_query(sql, organization_id=org, max_rows=ROW_CAP + 1)
+
+        with ThreadPoolExecutor(max_workers=ORACLE_RULE_WORKERS) as pool:
+            out = list(pool.map(lambda r: _run_rule(r, run_oracle), rules))
+        # Connected but not built (ORIGINBA_REPORTING absent): the same answer as an org
+        # with no warehouse, not a page of ORA-00942s.
+        if out and all(is_missing_relation_error(e.get("error")) for e in out):
+            return {"configured": False, "rules": []}
+    else:
+        with warehouse_connection(org) as conn:
+            cur = conn.cursor()
+
+            def run(sql: str):
+                try:
+                    cur.execute(sql)
+                except Exception:
+                    conn.rollback()   # an aborted transaction would fail every later rule
+                    raise
+                return [d[0] for d in cur.description], cur.fetchmany(ROW_CAP + 1)
+
+            out = [_run_rule(r, run) for r in rules]
     # ---- acknowledgements: hidden until the warehouse refreshes -------------
-    with warehouse_connection(org) as conn:
-        marker = _refresh_marker(conn.cursor())
+    marker = _refresh_marker(org, engine)
     acks = _load_acks(org)
     # a marker change means new data arrived: every ack expires and findings
     # re-surface for the next quality pass
@@ -199,8 +246,7 @@ def dq_ack(payload: dict[str, Any] = Body(...),
     key = str(payload.get("key") or "")
     if not key:
         return {"ok": False, "error": "key required"}
-    with warehouse_connection(org) as conn:
-        marker = _refresh_marker(conn.cursor())
+    marker = _refresh_marker(org, org_backend(org)[0])
     acks = _load_acks(org)
     acks[key] = {"marker": marker, "by": getattr(ctx, "email", None) or "user"}
     _save_acks(org, acks)
