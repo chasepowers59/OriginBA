@@ -1,6 +1,6 @@
 -- Frozen late payment charge adjustments (types from config/letters.yml, status 50 = Frozen), each
--- with the account's main customer and mailing premise for the recipient block. {filter} is the
--- created-date window or one ADJ_ID.
+-- with the account's main customer and mailing premise for the recipient block. {types} is one
+-- bind per type, {filter} the created-date window or one ADJ_ID.
 select a.adj_id, a.adj_amt as amount, a.cre_dt as charged_on, a.sa_id, sa.acct_id as account_id,
        coalesce(t.descr, trim(sa.sa_type_cd)) as service_type,
        coalesce(sp.address1, '') as sp_address1, coalesce(sp.city, '') as sp_city, coalesce(sp.state, '') as sp_state, coalesce(sp.postal, '') as sp_postal,
@@ -18,5 +18,5 @@ left join ci_acct_per ap on ap.acct_id = sa.acct_id and trim(ap.main_cust_sw) = 
 left join ci_per p on p.per_id = ap.per_id
 left join ci_per_name pn on pn.per_id = ap.per_id and trim(pn.prim_name_sw) = 'Y'
 left join ci_prem pr on pr.prem_id = ac.mailing_prem_id
-where trim(a.adj_type_cd) = any(%(types)s) and trim(a.adj_status_flg) = '50' and {filter}
+where trim(a.adj_type_cd) in ({types}) and trim(a.adj_status_flg) = '50' and {filter}
 order by a.cre_dt, a.adj_id

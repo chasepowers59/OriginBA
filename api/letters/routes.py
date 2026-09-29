@@ -1,8 +1,8 @@
 """Collections letters for the caller's organization: the list for a date window, one letter with
 its words and the process behind it, and its PDF.
 
-Postgres organizations only for now; an Oracle organization is answered 501 until its SQL lands
-(docs/letters/LETTERS_MIGRATION_PLAN.md, phase 2).
+Postgres organizations read through their warehouse, Oracle organizations through their own
+connection (letters.source picks the SQL); any other engine is answered 501.
 """
 from __future__ import annotations
 
@@ -16,6 +16,8 @@ from fastapi.routing import APIRoute
 
 from api.access_audit import record_access_event
 from api.auth.dependencies import AuthContext, require_permission
+from api.demo_db import demo_configured
+from api.executive_dashboard import is_not_connected_error
 from api.letters import render, repository
 from api.letters.catalog import Words, catalog
 from api.letters.composer import compose
@@ -59,9 +61,13 @@ def _org(ctx: AuthContext) -> str:
     require_unrestricted(ctx)          # a letter cannot be cut down to a person's row rules
     org_id = require_org_for_data(ctx)
     engine, _ = org_backend(org_id)
-    if engine != "postgres":
+    if engine == "postgres":
+        configured = warehouse_configured(org_id)
+    elif engine == "oracle":
+        configured = demo_configured(org_id)
+    else:
         raise HTTPException(status_code=501, detail="Letters are not available for this organization yet.")
-    if not warehouse_configured(org_id):
+    if not configured:
         raise HTTPException(status_code=503, detail="Letters need this organization's database, and none is configured.")
     return org_id
 
@@ -74,6 +80,9 @@ def _read(fn: Callable, *args: Any) -> Any:
                                                     "read. Choose a shorter window.") from exc
     except Exception as exc:  # noqa: BLE001 -- the driver's text can name hosts and users
         logger.exception("letters read failed")
+        if is_not_connected_error(str(exc)):
+            raise HTTPException(status_code=503, detail="This organization's database cannot be reached right "
+                                                        "now. Try again shortly.") from exc
         raise HTTPException(status_code=502, detail="The letters could not be read from this organization's "
                                                     "database.") from exc
 

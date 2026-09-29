@@ -3,9 +3,10 @@ and what is recorded.
 
 letters:read (editor and admin); a row-restricted person is refused (a letter cannot be
 filtered by their rules); the org comes only from require_org_for_data; ids are validated
-before any read; an Oracle org is told letters are not available yet (phase 2); every
-response carries Cache-Control: no-store; every list, preview and PDF is audited with ids
-and counts, never a name or an address.
+before any read; Postgres and Oracle organizations are served, an org with no connection or
+an unreachable database gets a 503, and an engine letters do not read a 501; every response
+carries Cache-Control: no-store; every list, preview and PDF is audited with ids and counts,
+never a name or an address.
 """
 from __future__ import annotations
 
@@ -108,9 +109,46 @@ class RouteTests(unittest.TestCase):
             self.assertEqual(self.get("/portal/letters/CC-3000000001/pdf").status_code, 503)
         repository.list_letters.assert_not_called()
 
-    def test_501_for_an_oracle_org(self):
+    def oracle_org(self, *, connected=True):
+        """Ellensburg as the portal sees it: an Oracle org with its own connection and no warehouse."""
         self.as_(ctx(org="ellensburg"))
-        with mock.patch("api.org_db.demo_configured", return_value=True):
+        for p in (mock.patch("api.org_db.warehouse_configured", return_value=False),
+                  mock.patch("api.org_db.demo_configured", return_value=connected),
+                  mock.patch.object(routes, "warehouse_configured", return_value=False),
+                  mock.patch.object(routes, "demo_configured", return_value=connected)):
+            p.start()
+            self.addCleanup(p.stop)
+
+    def test_an_oracle_org_is_served(self):
+        self.oracle_org()
+        for path in (self.LIST, "/portal/letters/CC-3000000001", "/portal/letters/CC-3000000001/pdf"):
+            with self.subTest(path=path):
+                self.assertEqual(self.get(path).status_code, 200)
+        self.assertEqual(repository.list_letters.call_args.args[0], "ellensburg")
+        self.assertEqual(repository.get_letter.call_args.args[0], "ellensburg")
+
+    def test_503_when_an_oracle_org_has_no_connection(self):
+        self.oracle_org(connected=False)
+        r = self.get(self.LIST)
+        self.assertEqual(r.status_code, 503)
+        with mock.patch("api.org_db.warehouse_configured", return_value=True):   # past the org check
+            r = self.get("/portal/letters/CC-3000000001/pdf")
+        self.assertEqual(r.status_code, 503)
+        self.assertIn("none is configured", r.json()["detail"])
+        repository.list_letters.assert_not_called()
+        repository.get_letter.assert_not_called()
+
+    def test_503_when_the_database_cannot_be_reached(self):
+        self.oracle_org()
+        repository.list_letters.side_effect = RuntimeError(
+            "DPY-6005: cannot connect to database (CONNECTION_ID=x). ORA-12170 host=db.example.internal")
+        r = self.get(self.LIST)
+        self.assertEqual(r.status_code, 503)
+        self.assertIn("cannot be reached", r.json()["detail"])
+        self.assertNotIn("example.internal", r.text)
+
+    def test_501_for_an_engine_letters_do_not_read(self):
+        with mock.patch.object(routes, "org_backend", return_value=("snowflake", "dbt")):
             r = self.get(self.LIST)
         self.assertEqual(r.status_code, 501)
         self.assertIn("not available for this organization yet", r.json()["detail"])

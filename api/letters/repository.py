@@ -23,10 +23,11 @@ from api.letters.model import (Debt, DebtService, Kind, LateFee, Letter, Mailing
 
 LETTER_ID = re.compile(r"^(CC|ADJ)-(\d{1,14})$")
 
-_WINDOW = "c.cc_dttm >= %(from_ts)s and c.cc_dttm < %(to_ts)s"
-_ONE_CONTACT = "c.cc_id = %(cc_id)s"
-_FEE_WINDOW = "a.cre_dt >= %(from_ts)s and a.cre_dt < %(to_ts)s"
-_ONE_FEE = "a.adj_id = %(adj_id)s"
+# Each {field} becomes its dialect's bind marker (letters.source).
+_WINDOW = "c.cc_dttm >= {from_ts} and c.cc_dttm < {to_ts}"
+_ONE_CONTACT = "c.cc_id = {cc_id}"
+_FEE_WINDOW = "a.cre_dt >= {from_ts} and a.cre_dt < {to_ts}"
+_ONE_FEE = "a.adj_id = {adj_id}"
 
 # Base-product event statuses (CI_LOOKUP_VAL, owner F1).
 _COMPLETED, _CANCELED = "30", "40"
