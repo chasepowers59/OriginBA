@@ -95,7 +95,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
                   "measures": [{"field": "Current Amount", "agg": "sum"}],
                   "filters": [{"field": "Is Bill Segment", "op": "eq", "value": True},
                               {"field": "Is Frozen", "op": "eq", "value": True}],
-                  "limit": 6},
+                  "limit": 6, "rank": "magnitude"},
     },
     {
         "id": "payments_collected",

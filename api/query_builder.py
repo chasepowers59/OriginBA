@@ -101,6 +101,9 @@ def build_query(
     # schema.
     dialect: str,
     schema: str,
+    # Net money (adjustments: charges, credits, transfers) ranks by size either way, so a
+    # six-bar limit keeps the credits that explain the total (tests/test_rank_by_magnitude.py).
+    rank_by_magnitude: bool = False,
 ) -> tuple[str, dict[str, Any]]:
     if limit < 1 or limit > 5000:
         raise QueryValidationError("limit must be between 1 and 5000")
@@ -167,6 +170,7 @@ def build_query(
     for dim in dims:
         select_parts.append(_quote(dim, dialect))
         group_parts.append(_quote(dim, dialect))
+    first_measure = ""
     for spec in measure_specs:
         alias = f'"{spec.alias}"'
         if spec.agg == "count" and spec.field == "*":
@@ -181,6 +185,7 @@ def build_query(
             select_parts.append(f"MIN({_quote(spec.field, dialect)}) AS {alias}")
         elif spec.agg == "max":
             select_parts.append(f"MAX({_quote(spec.field, dialect)}) AS {alias}")
+        first_measure = first_measure or select_parts[-1].rsplit(" AS ", 1)[0]
 
     where_parts: list[str] = []
     for idx, spec in enumerate(filter_specs):
@@ -257,7 +262,9 @@ def build_query(
     if time_dimensions:
         sql += ' ORDER BY "TD0" DESC NULLS LAST' + "".join(f", {g}" for g in groups[1:])
     else:
-        sql += f' ORDER BY "{measure_specs[0].alias}" DESC NULLS LAST' + "".join(f", {g}" for g in groups)
+        # an alias cannot sit inside an ORDER BY expression in Postgres, so ABS takes the aggregate
+        rank = f"ABS({first_measure})" if rank_by_magnitude else f'"{measure_specs[0].alias}"'
+        sql += f" ORDER BY {rank} DESC NULLS LAST" + "".join(f", {g}" for g in groups)
     # FETCH FIRST is standard SQL and valid in both, so the tail needs no branch.
     sql += f" FETCH FIRST {int(limit)} ROWS ONLY"
     return sql, binds

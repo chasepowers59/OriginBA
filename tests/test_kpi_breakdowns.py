@@ -58,6 +58,15 @@ class BreakdownTests(unittest.TestCase):
             for d in (m.build({}).get("query") or {}).get("dimensions") or []:
                 self.assertNotIn((m.snapshot_id, d), MEASURED_CONSTANT, m.id)
 
+    def test_net_money_over_transactions_draws_its_credits(self):
+        # adjustments net charges against credits and transfers: by adjustment type, ranked by size
+        for kpi in _cards():
+            trend = kpi.get("trend") or {}
+            if kpi["snapshot_id"] == "rpt_financial_txn" and kpi.get("format") == "currency" and trend.get("dimensions"):
+                self.assertEqual(trend.get("rank"), "magnitude", kpi["id"])
+        adj = next(k for k in WORKSTREAM_KPIS["finance"] if k["id"] == "adjustments")
+        self.assertEqual(adj["trend"]["dimensions"], ["Adjustment Type"])
+
     def test_no_card_breaks_down_by_a_column_measured_constant(self):
         for kpi in _cards():
             for d in (kpi.get("trend") or {}).get("dimensions") or []:

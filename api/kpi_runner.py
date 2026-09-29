@@ -256,6 +256,7 @@ def run_kpi_query(
         measures=query_spec.get("measures") or [{"field": "*", "agg": "count"}],
         filters=filters,
         time_dimensions=time_dimensions,
+        rank_by_magnitude=query_spec.get("rank") == "magnitude",
         limit=int(query_spec.get("limit") or 500),
         dialect=dialect,
         schema=schema,
