@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { canWidenDateRange, explorerPeriodLabel } from "./datePresets";
-import { explorerFilters } from "./explorerFilters";
+import { explorerFilters, explorerQuery } from "./explorerFilters";
 
 const range = { dateField: "Snapshot Date", dateStart: "2025-06-18", dateEnd: "2026-06-18" };
 
@@ -69,3 +69,12 @@ describe("explorerPeriodLabel", () => {
   });
 });
 
+
+
+describe("the explorer's request", () => {
+  it("says All dates explicitly, so the server adds no default window", () => {
+    const base = { dateField: "Bill Date", dateStart: "2026-01-01", dateEnd: "2026-03-31" };
+    expect(explorerQuery({ ...base, allDates: true, dimensions: ["Bill Cycle"], measures: [] }).all_dates).toBe(true);
+    expect(explorerQuery({ ...base, allDates: false, dimensions: ["Bill Cycle"], measures: [] }).all_dates).toBe(false);
+  });
+});

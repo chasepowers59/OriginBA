@@ -227,6 +227,8 @@ export type QueryRequest = {
   filters: FilterDef[];
   time_dimensions?: { field: string; grain: string }[];
   limit: number;
+  /** The reader chose "All dates": the server adds no default window. */
+  all_dates?: boolean;
 };
 
 export type QueryResponse = {

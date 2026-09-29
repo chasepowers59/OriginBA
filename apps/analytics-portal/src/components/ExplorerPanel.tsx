@@ -27,7 +27,7 @@ import {
   fallBackToAllDates,
   widenDateRange,
 } from "@/lib/datePresets";
-import { explorerFilters } from "@/lib/explorerFilters";
+import { explorerQuery } from "@/lib/explorerFilters";
 import { runningLabel } from "@/lib/queryProgress";
 import { applyProcessGuide } from "@/lib/processGuide";
 import { resolveDateField } from "@/lib/tileDateField";
@@ -199,21 +199,23 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     setFellBackFrom(null);
   }, []);
 
-  const buildFilters = useCallback(
+  const buildQuery = useCallback(
     // The presets window on the canvas's MEASURED date. They used to key off a
     // mandatory-window field no canvas sets, so "Prior month" changed state and sent
     // nothing -- the query ran unwindowed and the reader had no way to tell. A canvas
     // with no date at all (the price list, asset locations) gets no window, which is
     // correct: a transaction window means nothing on a dimension table.
-    (extra: PremadeReport["filters"] = []) =>
-      explorerFilters({
+    (report: PremadeReport) =>
+      explorerQuery({
         dateField: resolveDateField(metadata),
         allDates,
         dateStart,
         dateEnd,
-        reportFilters: extra,
+        reportFilters: report.filters,
         scope: { field: scopeField, value: scopeValue },
         drill: drillFilter,
+        dimensions: report.dimensions,
+        measures: report.measures,
       }),
     [metadata, allDates, dateStart, dateEnd, scopeField, scopeValue, drillFilter],
   );
@@ -248,13 +250,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       const run = new AbortController();
       abortRef.current = run;
       try {
-        const response = await runSnapshotQuery(metadata.id, {
-          dimensions: report.dimensions,
-          measures: report.measures,
-          filters: buildFilters(report.filters),
-          time_dimensions: [],
-          limit: 500,
-        }, run.signal);
+        const response = await runSnapshotQuery(metadata.id, buildQuery(report), run.signal);
         const fallBack = fallBackToAllDates({
           rowCount: response.row_count,
           windowed: Boolean(resolveDateField(metadata)) && !allDates,
@@ -281,7 +277,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         }
       }
     },
-    [metadata, allDates, activePreset, buildFilters, showReport],
+    [metadata, allDates, activePreset, buildQuery, showReport],
   );
 
   const cancelRun = () => {

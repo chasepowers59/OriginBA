@@ -1,5 +1,5 @@
 import { windowFilter } from "./datePresets";
-import type { FilterDef } from "./types";
+import type { FilterDef, QueryRequest } from "./types";
 
 /**
  * The filters an explorer report runs with: the reporting window (none under All dates or
@@ -21,4 +21,20 @@ export function explorerFilters(p: {
       .filter((f): f is { field: string; value: string } => Boolean(f?.field && f.value))
       .map((f) => ({ field: f.field, op: "eq", value: f.value })),
   ];
+}
+
+/** The explorer's request: the filters above, and "All dates" said explicitly so the server
+ *  does not add its default window to an unfiltered query on a large canvas. */
+export function explorerQuery(p: Parameters<typeof explorerFilters>[0] & {
+  dimensions: string[];
+  measures: QueryRequest["measures"];
+}): QueryRequest {
+  return {
+    dimensions: p.dimensions,
+    measures: p.measures,
+    filters: explorerFilters(p),
+    time_dimensions: [],
+    limit: 500,
+    all_dates: p.allDates,
+  };
 }

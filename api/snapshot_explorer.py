@@ -62,6 +62,8 @@ class QueryRequest(BaseModel):
     filters: list[FilterRequest] = Field(default_factory=list)
     time_dimensions: list[TimeDimensionRequest] = Field(default_factory=list)
     limit: int = 500
+    # the reader chose "All dates": no default window, even on a large canvas
+    all_dates: bool = False
 
 
 class RawSqlRequest(BaseModel):
@@ -772,7 +774,7 @@ def snapshot_query(
     # that rather than fix it, so what we add is reported back and what the CALLER sent
     # is left alone and never described as ours.
     applied_window: dict[str, Any] | None = None
-    if not filters:
+    if not filters and not body.all_dates:
         default_filter = _default_date_filter(snapshot, org_id)
         if default_filter:
             filters = [default_filter.model_dump()]
