@@ -89,8 +89,12 @@ def _scalar(
     cols, rows = run_kpi_query(
         snapshot_id, payload, field_name, start, end, organization_id=organization_id
     )
-    value = float(rows[0][-1] or 0) if rows else 0.0
     table = trend_from_rows(cols, rows) if len(cols) >= 2 and rows else []
+    if query.get("dimensions"):
+        # the headline is the TOTAL, never the largest group (tests/test_vetted_totals.py)
+        _, rows = run_kpi_query(snapshot_id, {**payload, "dimensions": []}, field_name, start, end,
+                                organization_id=organization_id)
+    value = float(rows[0][-1] or 0) if rows else 0.0
     return value, table
 
 
@@ -340,7 +344,9 @@ METRICS: list[NlqMetric] = [
         snapshot_id="rpt_bill",
         example="How many bills completed last 30 days?",
         default_days=30,
-        build=lambda _p: {"kind": "scalar", "date_field": "Window Start Date",
+        # completed bills by completion, as the Billing page counts them (Window Start Date
+        # is empty at clients that do not use bill windows; tests/test_kpi_window_fields.py)
+        build=lambda _p: {"kind": "scalar", "date_field": "Completed Date/Time",
                           "query": _count(
                               [{"field": "Is Completed", "op": "eq", "value": True}])},
     ),
@@ -548,8 +554,10 @@ METRICS: list[NlqMetric] = [
         snapshot_id="rpt_field_activity",
         example="Field activities last 30 days",
         default_days=30,
-        build=lambda _p: {"kind": "scalar", "date_field": "Event Date/Time",
-                          "query": _count(dims=["Activity Type"])},
+        # Created, not Event: an activity gets an event date only once worked (Ellensburg
+        # 2026-09-29, 30 days: 647 on Event Date/Time, 1,573 created -- the home card's count)
+        build=lambda _p: {"kind": "scalar", "date_field": "Created Date/Time",
+                          "query": _count(dims=["Field Task Type"])},
     ),
     NlqMetric(
         id="open_todos",
