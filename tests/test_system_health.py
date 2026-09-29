@@ -88,7 +88,7 @@ class HealthTests(unittest.TestCase):
             hr.system_health(ctx=_ctx("editor"))
         self.assertEqual(err.exception.status_code, 403)
         out = hr.system_health(ctx=_ctx("admin"))
-        for key in ("started_at", "routes", "slow", "errors", "cache", "data_versions"):
+        for key in ("started_at", "routes", "slow", "errors", "cache", "data_versions", "warmed"):
             self.assertIn(key, out)
 
 

@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 import os
 import threading
-from datetime import date
+from datetime import date, datetime, timezone
 from typing import Any
 
 from api.data_version import data_version
@@ -26,6 +26,7 @@ log = logging.getLogger("originba.api")
 INTERVAL_SECONDS = 60
 WARM_MIN_ROWS = 1_000_000
 _warmed: dict[str, str] = {}
+_last: dict[str, dict[str, Any]] = {}
 _started = threading.Event()
 
 
@@ -78,14 +79,22 @@ def warm_once(org_id: str) -> list[str]:
         jobs += _opening_reports(org_id)
     except Exception as exc:  # noqa: BLE001 -- the summaries are still worth building
         log.warning("cache warm %s reports skipped: %s", org_id, exc)
-    built = []
+    built, failed = [], []
     for name, job in jobs:
         try:
             job()
             built.append(name)
         except Exception as exc:  # noqa: BLE001 -- one page failing must not stop the others
+            failed.append(name)
             log.warning("cache warm %s %s failed: %s", org_id, name, exc)
+    _last[org_id] = {"at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "version": version,
+                     "built": built, "failed": failed}
     return built
+
+
+def status() -> dict[str, dict[str, Any]]:
+    """Each organization's last warm, for System health."""
+    return {org: dict(v) for org, v in _last.items()}
 
 
 def _organizations() -> list[str]:
@@ -111,3 +120,4 @@ def start(stop: threading.Event) -> None:
 
 def reset() -> None:
     _warmed.clear()
+    _last.clear()

@@ -15,6 +15,7 @@ export type SystemHealth = {
   errors: HealthError[];
   cache: CacheStats;
   data_versions: Record<string, { version: string | null; read_seconds_ago: number }>;
+  warmed: Record<string, { at: string; version: string; built: string[]; failed: string[] }>;
 };
 
 /** The error a user's "Reference: 3f9c..." points at, however it was pasted. */

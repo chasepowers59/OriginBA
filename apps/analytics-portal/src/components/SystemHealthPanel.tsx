@@ -78,6 +78,9 @@ export function SystemHealthPanel() {
       <HealthTable title="Slowest recent requests" empty="Nothing slow since the API started."
                    head={["When", "Reference", "Route", "Organization", "Seconds"]}
                    rows={health.slow.map((s) => [formatDateTime(s.at), s.reference, s.route, s.org, (s.ms / 1000).toFixed(1)])} />
+      <HealthTable title="Cache warming after a rebuild" empty="Nothing warmed yet: the first pass runs a minute after the API starts."
+                   head={["Organization", "When", "Built", "Failed"]}
+                   rows={Object.entries(health.warmed).map(([org, w]) => [org, formatDateTime(w.at), w.built.join(", "), w.failed.join(", ") || "—"])} />
       <HealthTable title="Routes by total time" empty="No requests yet."
                    head={["Route", "Requests", "Server errors", "Average ms", "Longest ms"]}
                    rows={health.routes.slice(0, 20).map((r) => [r.route, r.requests, r.server_errors, r.avg_ms, r.max_ms])} />

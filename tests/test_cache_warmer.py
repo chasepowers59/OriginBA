@@ -59,6 +59,12 @@ class WarmerTests(unittest.TestCase):
         home.assert_not_called()
         ws.assert_not_called()
 
+    def test_the_last_warm_is_recorded_for_system_health(self):
+        cw.warm_once("demo25")
+        last = cw.status()["demo25"]
+        self.assertEqual((last["version"], last["built"], last["failed"]), ("v1", ["home", "billing", "finance"], []))
+        self.assertIn("at", last)
+
     def test_an_unchanged_stamp_does_nothing(self):
         cw.warm_once("demo25")
         self.assertEqual(cw.warm_once("demo25"), [])
