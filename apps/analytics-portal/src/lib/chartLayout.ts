@@ -140,6 +140,33 @@ function wholeLabelChars(labels: string[]): number {
   );
 }
 
+/** Horizontal bars: px per category row, and the tallest the scroll area grows. */
+export const ROW_PITCH = 34;
+const ROW_VIEWPORT_MAX = 560;
+/** recharts' default axis height, and the fixed legend box above the rows. */
+export const ROW_VALUE_AXIS_HEIGHT = 30;
+export const ROW_LEGEND_HEIGHT = 28;
+
+export type RowScroll = {
+  /** Height of the whole chart: the rows at ROW_PITCH plus `chrome`. */
+  chartHeight: number;
+  /** Px above the first row: the value axis, and the legend when there is one. */
+  chrome: number;
+  /** Height of the visible area; cut between rows, never through one. */
+  viewport: number;
+  scrolls: boolean;
+};
+
+/** How a horizontal bar chart of `rows` categories fits a scroll area. */
+export function rowScroll({ rows, height, legend }: { rows: number; height: number; legend: boolean }): RowScroll {
+  const chrome = ROW_VALUE_AXIS_HEIGHT + (legend ? ROW_LEGEND_HEIGHT : 0);
+  const chartHeight = Math.max(height, rows * ROW_PITCH + chrome);
+  const cap = Math.max(height, ROW_VIEWPORT_MAX);
+  if (chartHeight <= cap) return { chartHeight, chrome, viewport: chartHeight, scrolls: false };
+  const wholeRows = Math.floor((cap - chrome) / ROW_PITCH);
+  return { chartHeight, chrome, viewport: chrome + wholeRows * ROW_PITCH, scrolls: true };
+}
+
 export type PieSlice = { label: string; value: number };
 
 /** Four named slices and "Other": the five chart colours, none repeated (UI-15). */

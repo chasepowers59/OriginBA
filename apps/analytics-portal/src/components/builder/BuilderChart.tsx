@@ -13,6 +13,7 @@ import {
   LineChart,
   Pie,
   PieChart,
+  ReferenceLine,
   XAxis,
   YAxis,
 } from "recharts";
@@ -27,7 +28,15 @@ import {
 import { formatCurrency, formatNumber, valueAxis } from "@/lib/format";
 import { emphasisFills } from "@/lib/chartEmphasis";
 import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
-import { BUILDER_AXIS, chartLayout, piePlan, tickLineHeight } from "@/lib/chartLayout";
+import {
+  BUILDER_AXIS,
+  ROW_LEGEND_HEIGHT,
+  ROW_VALUE_AXIS_HEIGHT,
+  chartLayout,
+  piePlan,
+  rowScroll,
+  tickLineHeight,
+} from "@/lib/chartLayout";
 import { formatTimeBucket } from "@/lib/timeBucketLabel";
 
 export type BuilderVisual =
@@ -318,19 +327,21 @@ export function BuilderChart({
     const stackId = shown === "stacked-bar" ? "a" : undefined;
     // Rows drive the chart's own height, but the VIEWPORT is capped and scrolls: a
     // 200-row result no longer produces a 7,000px page (or blows out a dashboard tile).
-    const chartHeight = Math.max(height, data.length * 34);
-    const scrolls = chartHeight > Math.max(height, 560);
+    // The value axis and legend sit above the rows, where the reader starts, and the
+    // viewport ends between rows.
+    const fit = rowScroll({ rows: data.length, height, legend: !!legend });
     return frame(
       // a scrolling region must take keyboard focus (WCAG 2.1.1; only real volumes scroll)
-      <div style={{ maxHeight: Math.max(height, 560), overflowY: scrolls ? "auto" : "visible" }}
-           {...(scrolls ? { tabIndex: 0, role: "region", "aria-label": a11yLabel } : {})}>
-      <ChartContainer config={config} style={{ height: chartHeight }} className="w-full" role="img" aria-label={a11yLabel}>
-        <BarChart data={data} layout="vertical" margin={{ left: 8 }} maxBarSize={40}>
+      <div style={{ maxHeight: fit.viewport, overflowY: fit.scrolls ? "auto" : "visible" }}
+           {...(fit.scrolls ? { tabIndex: 0, role: "region", "aria-label": a11yLabel } : {})}>
+      <ChartContainer config={config} style={{ height: fit.chartHeight }} className="w-full" role="img" aria-label={a11yLabel}>
+        <BarChart data={data} layout="vertical" margin={{ top: 0, right: 8, bottom: 0, left: 8 }} maxBarSize={40}>
           <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />
-          <XAxis type="number" tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} {...valueTicks} axisLine={false} tickLine={false} />
+          <XAxis type="number" orientation="top" height={ROW_VALUE_AXIS_HEIGHT} tick={{ fontSize: 11, fill: "var(--foreground-subtle)" }} {...valueTicks} axisLine={false} tickLine={false} />
           <YAxis type="category" dataKey={xKey} width={layout.axisSize} tick={categoryTick} interval={0} axisLine={false} tickLine={false} />
+          <ReferenceLine x={0} stroke="var(--border)" />
           {tip}
-          {legend}
+          {legend ? <ChartLegend verticalAlign="top" height={ROW_LEGEND_HEIGHT} content={<ChartLegendContent />} /> : null}
           {singleSeries ? (
             <Bar
               dataKey={series[0].key}

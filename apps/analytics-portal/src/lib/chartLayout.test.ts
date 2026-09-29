@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BUILDER_AXIS, SPARK_AXIS, chartLayout, piePlan } from "./chartLayout";
+import { BUILDER_AXIS, ROW_PITCH, SPARK_AXIS, chartLayout, piePlan, rowScroll } from "./chartLayout";
 
 const CLASSES = [
   "Electric Residential",
@@ -213,5 +213,35 @@ describe("piePlan: a pie only while it stays readable (UI-15)", () => {
       const plan = piePlan(labels, values);
       if (plan.slices) expect(plan.slices.length).toBeLessThanOrEqual(5);
     }
+  });
+});
+
+describe("rowScroll: a long horizontal bar chart scrolls in whole rows", () => {
+  /**
+   * A 71-row explore chart scrolled inside a 560px area whose edge cut the last visible
+   * label mid-row, and whose value axis sat at the bottom, out of sight.
+   */
+  it("gives every row the same pitch and shows only whole rows", () => {
+    for (const legend of [false, true]) {
+      const out = rowScroll({ rows: 71, height: 460, legend });
+      expect(out.scrolls).toBe(true);
+      expect(out.chartHeight - out.chrome).toBe(71 * ROW_PITCH);
+      expect(out.viewport).toBeLessThanOrEqual(560);
+      expect((out.viewport - out.chrome) % ROW_PITCH).toBe(0);
+      expect(out.viewport - out.chrome).toBeGreaterThan(560 - out.chrome - ROW_PITCH);
+    }
+  });
+
+  it("reserves room for the legend above the rows", () => {
+    expect(rowScroll({ rows: 71, height: 460, legend: true }).chrome).toBeGreaterThan(
+      rowScroll({ rows: 71, height: 460, legend: false }).chrome,
+    );
+  });
+
+  it("does not scroll a chart that fits, and keeps the requested height", () => {
+    const out = rowScroll({ rows: 8, height: 460, legend: false });
+    expect(out.scrolls).toBe(false);
+    expect(out.chartHeight).toBe(460);
+    expect(out.viewport).toBe(460);
   });
 });
