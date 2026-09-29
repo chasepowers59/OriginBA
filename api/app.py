@@ -10,6 +10,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+import threading
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -36,7 +37,11 @@ from api.database_routes import router as database_router
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     init_auth_database()
+    from api import cache_warmer
+    stop = threading.Event()
+    cache_warmer.start(stop)
     yield
+    stop.set()
 
 
 app = FastAPI(

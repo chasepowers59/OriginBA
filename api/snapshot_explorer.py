@@ -356,19 +356,39 @@ def executive_summary(
     extra = _cross_filter(cross_field, cross_value)
     if compare_mode not in COMPARE_MODES:
         raise HTTPException(status_code=400, detail=f"compare_mode must be one of {COMPARE_MODES}")
-    lenses = _lens_selection(lens)
-    key = ("home", org_id, days, compare, compare_mode, repr(extra), tuple(sorted(ctx.workstreams or [])),
-           repr(sorted((lenses or {}).items())), repr(ctx.row_rules))
+    return cached_home_summary(org_id, days, compare, compare_mode, extra, ctx.workstreams,
+                               _lens_selection(lens), ctx.row_rules)
+
+
+def cached_home_summary(org_id: str, days: int, compare: bool, compare_mode: str, extra: list,
+                        workstreams: list | None, lenses: dict | None, row_rules: tuple) -> dict[str, Any]:
+    """The home summary through the cache; api/cache_warmer.py builds the same keys."""
+    key = ("home", org_id, days, compare, compare_mode, repr(extra), tuple(sorted(workstreams or [])),
+           repr(sorted((lenses or {}).items())), repr(row_rules))
     return cached(key, lambda: build_executive_summary(
         days,
         compare=compare,
         compare_mode=compare_mode,
         extra_filters=extra,
-        allowed_workstreams=ctx.workstreams,
+        allowed_workstreams=workstreams,
         lenses=lenses,
         organization_id=org_id,
-        row_rules=ctx.row_rules,
+        row_rules=row_rules,
     ), version=data_version(org_id))
+
+
+def cached_workstream_summary(org_id: str, workstream_id: str, days: int, compare: bool, compare_mode: str,
+                              extra: list, row_rules: tuple) -> dict[str, Any]:
+    return cached(("workstream", org_id, workstream_id, days, compare, compare_mode, repr(extra), repr(row_rules)),
+                  lambda: build_workstream_summary(
+                      workstream_id,
+                      days,
+                      compare=compare,
+                      compare_mode=compare_mode,
+                      extra_filters=extra,
+                      organization_id=org_id,
+                      row_rules=row_rules,
+                  ), version=data_version(org_id))
 
 
 @router.get("/workstream-summary/{workstream_id}")
@@ -387,16 +407,7 @@ def workstream_summary(
     extra = _cross_filter(cross_field, cross_value)
     if compare_mode not in COMPARE_MODES:
         raise HTTPException(status_code=400, detail=f"compare_mode must be one of {COMPARE_MODES}")
-    result = cached(("workstream", org_id, workstream_id, days, compare, compare_mode, repr(extra), repr(ctx.row_rules)),
-                    lambda: build_workstream_summary(
-                        workstream_id,
-                        days,
-                        compare=compare,
-                        compare_mode=compare_mode,
-                        extra_filters=extra,
-                        organization_id=org_id,
-                        row_rules=ctx.row_rules,
-                    ), version=data_version(org_id))
+    result = cached_workstream_summary(org_id, workstream_id, days, compare, compare_mode, extra, ctx.row_rules)
     if result.get("error"):
         raise HTTPException(status_code=404, detail=result["error"])
     return result
