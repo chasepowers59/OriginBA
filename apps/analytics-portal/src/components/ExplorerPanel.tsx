@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   defaultDateRange,
@@ -14,23 +14,27 @@ import {
   allowedAggsForMeasure,
   buildColumnLabels,
   defaultMeasureSelection,
+  withoutRepeatedLeadingWord,
 } from "@/lib/businessLabels";
 import { getFavorite } from "@/lib/favorites";
 import { getViewRemote, saveViewRemote } from "@/lib/savedViews";
 import {
   ALL_DATES,
-  anchoredLabel,
   applyDatePresetConfig,
+  canWidenDateRange,
   estimatePeriodDays,
+  explorerPeriodLabel,
   fallBackToAllDates,
   widenDateRange,
-  windowFilter,
 } from "@/lib/datePresets";
+import { explorerFilters } from "@/lib/explorerFilters";
+import { runningLabel } from "@/lib/queryProgress";
 import { applyProcessGuide } from "@/lib/processGuide";
 import { resolveDateField } from "@/lib/tileDateField";
 import { setPageContext } from "@/lib/assistantContext";
 import { PinMenu } from "@/components/PinMenu";
 import { useAuth } from "@/components/AuthProvider";
+import { POPOVER_PANEL, usePopover } from "@/lib/popover";
 import { FavoritesPanel } from "./FavoritesPanel";
 import { GlobalFilterBar } from "./GlobalFilterBar";
 import { ResultsPanel } from "./ResultsPanel";
@@ -53,6 +57,18 @@ const DATE_PRESETS: DatePreset[] = [
 ];
 
 type Tab = "reports" | "model";
+
+type ChartType = "bar" | "line" | "pie" | "horizontal" | "table";
+
+/** The report behind the result on screen, restored when a newer run is cancelled. */
+type ShownReport = {
+  id: string;
+  title: string;
+  dimensions: string[];
+  measureField: string;
+  measureAgg: string;
+  chartType: ChartType;
+};
 
 type ExplorerPanelProps = {
   metadata: SnapshotMetadata;
@@ -100,13 +116,19 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const firstRun = useRef(true);
   const [scopeField, setScopeField] = useState(scopeFilters[0]?.field ?? "");
   const [scopeValue, setScopeValue] = useState("");
-  const [chartType, setChartType] = useState<"bar" | "line" | "pie" | "horizontal" | "table">("bar");
+  const [chartType, setChartType] = useState<ChartType>("bar");
   const [drillFilter, setDrillFilter] = useState<{ field: string; value: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<QueryResponse | null>(null);
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [favoriteApplied, setFavoriteApplied] = useState(false);
+  const [openAbout, setOpenAbout] = useState<string | null>(null);
+  const [elapsedMs, setElapsedMs] = useState(0);
+  const [cancelNote, setCancelNote] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const shownRef = useRef<ShownReport | null>(null);
+  const aboutIdPrefix = useId();
 
   const allowedTabs = new Set<Tab>(tabOptions.map(([key]) => key));
 
@@ -178,39 +200,53 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   }, []);
 
   const buildFilters = useCallback(
-    (extra: PremadeReport["filters"] = []) => {
-      // The presets window on the canvas's MEASURED date. They used to key off a
-      // mandatory-window field no canvas sets, so "Prior month" changed state and sent
-      // nothing -- the query ran unwindowed and the reader had no way to tell. A canvas
-      // with no date at all (the price list, asset locations) gets no window, which is
-      // correct: a transaction window means nothing on a dimension table.
-      const dateField = resolveDateField(metadata);
-      const filters: PremadeReport["filters"] = [
-        ...windowFilter(dateField, allDates, dateStart, dateEnd),
-        ...extra,
-      ];
-      if (scopeField && scopeValue) {
-        filters.push({ field: scopeField, op: "eq", value: scopeValue });
-      }
-      if (drillFilter) {
-        filters.push({ field: drillFilter.field, op: "eq", value: drillFilter.value });
-      }
-      return filters;
-    },
+    // The presets window on the canvas's MEASURED date. They used to key off a
+    // mandatory-window field no canvas sets, so "Prior month" changed state and sent
+    // nothing -- the query ran unwindowed and the reader had no way to tell. A canvas
+    // with no date at all (the price list, asset locations) gets no window, which is
+    // correct: a transaction window means nothing on a dimension table.
+    (extra: PremadeReport["filters"] = []) =>
+      explorerFilters({
+        dateField: resolveDateField(metadata),
+        allDates,
+        dateStart,
+        dateEnd,
+        reportFilters: extra,
+        scope: { field: scopeField, value: scopeValue },
+        drill: drillFilter,
+      }),
     [metadata, allDates, dateStart, dateEnd, scopeField, scopeValue, drillFilter],
   );
 
+  const showReport = useCallback((shown: ShownReport | null) => {
+    setActiveReportId(shown?.id ?? null);
+    setActiveReportTitle(shown?.title ?? null);
+    setDimensions(shown?.dimensions ?? []);
+    if (!shown) return;
+    setMeasureField(shown.measureField);
+    setMeasureAgg(shown.measureAgg);
+    setChartType(shown.chartType);
+  }, []);
+
   const runPremade = useCallback(
     async (report: PremadeReport) => {
-      setActiveReportId(report.id);
-      setActiveReportTitle(report.title);
-      setDimensions(report.dimensions);
-      setMeasureField(report.measures[0]?.field ?? "*");
-      setMeasureAgg(report.measures[0]?.agg ?? "count");
-      setChartType(report.chart_type);
+      const shown: ShownReport = {
+        id: report.id,
+        title: report.title,
+        dimensions: report.dimensions,
+        measureField: report.measures[0]?.field ?? "*",
+        measureAgg: report.measures[0]?.agg ?? "count",
+        chartType: report.chart_type,
+      };
+      showReport(shown);
       setTab("reports");
       setLoading(true);
       setError(null);
+      setCancelNote(null);
+      // A newer run supersedes an older one, so a slow response can no longer land on top.
+      abortRef.current?.abort();
+      const run = new AbortController();
+      abortRef.current = run;
       try {
         const response = await runSnapshotQuery(metadata.id, {
           dimensions: report.dimensions,
@@ -218,7 +254,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           filters: buildFilters(report.filters),
           time_dimensions: [],
           limit: 500,
-        });
+        }, run.signal);
         const fallBack = fallBackToAllDates({
           rowCount: response.row_count,
           windowed: Boolean(resolveDateField(metadata)) && !allDates,
@@ -233,15 +269,40 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           return;
         }
         setResult(response);
+        shownRef.current = shown;
       } catch (err) {
+        if (run.signal.aborted) return;
         setError(err instanceof Error ? err.message : "Unable to run this report");
         setResult(null);
       } finally {
-        setLoading(false);
+        if (abortRef.current === run) {
+          abortRef.current = null;
+          setLoading(false);
+        }
       }
     },
-    [metadata, allDates, activePreset, buildFilters],
+    [metadata, allDates, activePreset, buildFilters, showReport],
   );
+
+  const cancelRun = () => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setLoading(false);
+    showReport(shownRef.current);
+    setCancelNote(result ? "Cancelled. Showing the previous result." : "Cancelled.");
+  };
+
+  useEffect(() => {
+    if (!loading) return;
+    const started = Date.now();
+    const timer = window.setInterval(() => setElapsedMs(Date.now() - started), 1000);
+    return () => {
+      window.clearInterval(timer);
+      setElapsedMs(0);
+    };
+  }, [loading]);
+
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   useEffect(() => {
     const { range, label } = applyDatePresetConfig(metadata.default_date_preset, metadata.data_as_of);
@@ -262,6 +323,9 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     setScopeField(scopeFilters[0]?.field ?? "");
     setScopeValue("");
     setDrillFilter(null);
+    abortRef.current?.abort();
+    shownRef.current = null;
+    setCancelNote(null);
     setResult(null);
     setFavoriteApplied(false);
   }, [
@@ -373,9 +437,13 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     syncCrossFilterUrl(null);
   };
 
-  const periodLabel = allDates
-    ? fellBackFrom ? `${ALL_DATES} (nothing in ${anchoredLabel(fellBackFrom, metadata.data_as_of).toLowerCase()})` : ALL_DATES
-    : anchoredLabel(activePreset, metadata.data_as_of);
+  const periodLabel = explorerPeriodLabel({
+    allDates,
+    activePreset,
+    asOf: metadata.data_as_of,
+    fellBackFrom,
+    appliedWindow: result?.applied_window,
+  });
 
   // Tell the assistant which canvas and window the reader is looking at.
   useEffect(() => {
@@ -412,7 +480,8 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     // only names the last measure column, so a two-measure report left the other as
     // "m0". Kept as the fallback for anything the server did not label.
     const local = buildColumnLabels(metadata, dimensions, measureField, measureAgg, result.columns);
-    return { ...local, ...(result.column_labels ?? {}) };
+    const server = Object.entries(result.column_labels ?? {}).map(([c, l]) => [c, withoutRepeatedLeadingWord(l)]);
+    return { ...local, ...Object.fromEntries(server) };
   }, [result, metadata, dimensions, measureField, measureAgg]);
 
   // Flag columns keyed by declared type, so the detail table renders True/False rather
@@ -421,11 +490,6 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     () => new Set((metadata.fields ?? []).filter((f) => f.type === "boolean").map((f) => f.id)),
     [metadata.fields],
   );
-
-  const totalMeasure = useMemo(() => {
-    if (!result || !measureKey) return null;
-    return result.rows.reduce((sum, row) => sum + Number(row[measureKey] ?? 0), 0);
-  }, [result, measureKey]);
 
   const scopeLabel =
     scopeValue && scopeFilters.find((f) => f.field === scopeField)?.label;
@@ -462,6 +526,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     window.setTimeout(() => setSavedMsg(null), 2500);
   };
 
+  const running = loading ? runningLabel(elapsedMs) : null;
   const resolvedDateField = resolveDateField(metadata);
   const dateFieldLabel =
     metadata.date_fields.find((d) => d.id === resolvedDateField)?.label ??
@@ -542,12 +607,12 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           }
         />
       ) : (
-        <div className="grid gap-6 xl:grid-cols-[340px_1fr]">
-      {/* min-w-0: a grid item defaults to min-width:auto, so one wide child sized this
-          column to 860px in a 375px viewport and scrolled the whole PAGE sideways. */}
-      <aside className="no-print min-w-0 space-y-4">
-        <FavoritesPanel compact />
-
+        // Stacked (below xl), the results come straight after the filters and before the
+        // report list; side by side, the filters and the list share the left column.
+        <div className="grid gap-6 xl:grid-cols-[340px_1fr] xl:grid-rows-[auto_1fr]">
+      {/* min-w-0 on every item: a grid item defaults to min-width:auto, so one wide child
+          sized this column to 860px in a 375px viewport and scrolled the whole PAGE sideways. */}
+      <div className="no-print min-w-0 space-y-4 xl:col-start-1 xl:row-start-1">
         <div className="glass-panel p-4">
           <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
             Reporting period
@@ -555,7 +620,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           <p className="mb-3 text-xs text-fg-muted">
             {resolvedDateField
               ? `Filtered by ${dateFieldLabel.toLowerCase()}`
-              : "This canvas has no date to filter on."}
+              : "This report has no date to filter on."}
           </p>
           <div className="mb-3 flex flex-wrap gap-2">
             {DATE_PRESETS.map((p) => (
@@ -583,7 +648,8 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
               Start date
               <input
                 type="date"
-                value={dateStart}
+                value={allDates ? "" : dateStart}
+                disabled={allDates}
                 onChange={(e) => {
                   setDateStart(e.target.value);
                   setActivePreset("Custom range");
@@ -596,7 +662,8 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
               End date
               <input
                 type="date"
-                value={dateEnd}
+                value={allDates ? "" : dateEnd}
+                disabled={allDates}
                 onChange={(e) => {
                   setDateEnd(e.target.value);
                   setActivePreset("Custom range");
@@ -606,6 +673,9 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
               />
             </label>
           </div>
+          {allDates ? (
+            <p className="mt-2 text-xs text-fg-muted">Pick a period above to choose dates.</p>
+          ) : null}
         </div>
 
         {scopeFilters.length ? (
@@ -618,66 +688,24 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             onValueChange={setScopeValue}
           />
         ) : null}
+      </div>
 
-        <div className="glass-panel p-4">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
-            Ready-to-run reports
-          </p>
-          <div className="space-y-2">
-            {premadeReports.map((report) => (
-              <button
-                key={report.id}
-                type="button"
-                onClick={() => runPremade(report)}
-                disabled={loading}
-                className={`w-full rounded-xl border px-4 py-3 text-left transition disabled:opacity-60 ${
- activeReportId === report.id
- ? "border-edge bg-band ring-1 ring-edge"
- : "border-edge-subtle bg-surface-subtle hover:border-edge-subtle hover:bg-chip"
- }`}
-              >
-                <div className="font-medium text-heading">{report.title}</div>
-                <div className="mt-1 text-xs text-fg-muted">{report.description}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {result ? (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <FolderInput kind="views" value={folder} onChange={setFolder} />
-              <VisibilityToggle privateOnly={privateOnly} onChange={setPrivateOnly} />
-            </div>
-            <button type="button" onClick={() => void handleSaveFavorite()} className="btn-ghost w-full">
-              Save view
-            </button>
-            <button type="button" onClick={() => void handleSaveCopy()} className="btn-ghost w-full text-xs">
-              Save a copy
-            </button>
-            {activeReportId ? (
-              <PinMenu
-                target={{
-                  snapshotId: metadata.id,
-                  reportId: activeReportId,
-                  title: activeReportTitle ?? metadata.label,
-                  chartType,
-                  days: estimatePeriodDays(dateStart, dateEnd),
-                }}
-              />
-            ) : null}
-          </div>
-        ) : null}
-        {savedMsg ? (
-          <p className="text-center text-xs text-ok">{savedMsg}</p>
-        ) : null}
-      </aside>
-
-      <main className="min-w-0 space-y-4">
+      <main className="min-w-0 space-y-4 xl:col-start-2 xl:row-span-2 xl:row-start-1">
         {error ? (
           <div className="glass-panel border-over bg-over-bg px-4 py-3 text-sm text-over">
             {error}
           </div>
+        ) : null}
+        {running ? (
+          <div className="glass-panel-subtle flex items-center justify-between gap-3 px-4 py-2 text-sm text-heading">
+            {/* Read out by the status line at the end of this column. */}
+            <span aria-hidden="true">{running}</span>
+            <button type="button" onClick={cancelRun} className="btn-ghost text-xs">
+              Cancel
+            </button>
+          </div>
+        ) : cancelNote ? (
+          <p className="text-xs text-fg-muted">{cancelNote}</p>
         ) : null}
         {loading && !result ? (
           <div className="glass-panel p-8">
@@ -690,7 +718,6 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             dimensionKey={dimensionKey}
             measureKey={measureKey}
             chartType={chartType}
-            totalMeasure={totalMeasure}
             loading={loading}
             snapshotId={metadata.id}
             snapshotLabel={metadata.label}
@@ -712,13 +739,130 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
               scopeLabel: scopeLabel ? `${scopeLabel}: ${scopeValue}` : undefined,
               drillFilter,
             }}
-            onWidenPeriod={handleWidenPeriod}
+            onWidenPeriod={
+              canWidenDateRange({
+                allDates,
+                dateField: resolvedDateField,
+                currentDays: estimatePeriodDays(dateStart, dateEnd),
+              })
+                ? handleWidenPeriod
+                : undefined
+            }
             onShowAllDates={allDates || !dateFieldLabel ? undefined : showAllDates}
+            actions={
+              <SaveMenu message={savedMsg}>
+                <div className="flex flex-wrap items-center gap-2">
+                  <FolderInput kind="views" value={folder} onChange={setFolder} />
+                  <VisibilityToggle privateOnly={privateOnly} onChange={setPrivateOnly} />
+                </div>
+                <button type="button" onClick={() => void handleSaveFavorite()} className="btn-ghost w-full">
+                  Save view
+                </button>
+                <button type="button" onClick={() => void handleSaveCopy()} className="btn-ghost w-full text-xs">
+                  Save a copy
+                </button>
+                {activeReportId ? (
+                  <PinMenu
+                    target={{
+                      snapshotId: metadata.id,
+                      reportId: activeReportId,
+                      title: activeReportTitle ?? metadata.label,
+                      chartType,
+                      days: estimatePeriodDays(dateStart, dateEnd),
+                    }}
+                  />
+                ) : null}
+              </SaveMenu>
+            }
           />
         )}
+        {/* Always mounted, so a screen reader hears the running count and a cancel. */}
+        <p role="status" aria-live="polite" className="sr-only">
+          {running ?? cancelNote ?? ""}
+        </p>
       </main>
+
+      <aside className="no-print min-w-0 space-y-4 self-start xl:col-start-1 xl:row-start-2">
+        <div className="glass-panel p-4">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
+            Ready-to-run reports
+          </p>
+          <ul className="space-y-2">
+            {premadeReports.map((report) => {
+              const aboutId = `${aboutIdPrefix}-${report.id}`;
+              const aboutOpen = openAbout === report.id;
+              return (
+                <li
+                  key={report.id}
+                  className={`rounded-xl border transition ${
+ activeReportId === report.id
+ ? "border-edge bg-band ring-1 ring-edge"
+ : "border-edge-subtle bg-surface-subtle hover:bg-chip"
+ }`}
+                >
+                  <div className="flex items-start">
+                    <button
+                      type="button"
+                      onClick={() => runPremade(report)}
+                      disabled={loading}
+                      aria-current={activeReportId === report.id ? "true" : undefined}
+                      className="min-w-0 flex-1 px-4 py-3 text-left font-medium text-heading disabled:opacity-60"
+                    >
+                      {report.title}
+                    </button>
+                    {report.description ? (
+                      <button
+                        type="button"
+                        onClick={() => setOpenAbout(aboutOpen ? null : report.id)}
+                        aria-expanded={aboutOpen}
+                        aria-controls={aboutId}
+                        aria-label={`About ${report.title}`}
+                        className="shrink-0 rounded-xl px-3 py-3 text-fg-muted hover:text-heading"
+                      >
+                        <span aria-hidden="true">{aboutOpen ? "▴" : "▾"}</span>
+                      </button>
+                    ) : null}
+                  </div>
+                  {aboutOpen ? (
+                    <p id={aboutId} className="px-4 pb-3 text-xs text-fg-muted">
+                      {report.description}
+                    </p>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <FavoritesPanel compact />
+      </aside>
         </div>
       )}
+    </div>
+  );
+}
+
+/** Save and pin, behind one toolbar button; the panel stays open to confirm a save. */
+function SaveMenu({ message, children }: { message: string | null; children: ReactNode }) {
+  const { open, setOpen, rootRef, triggerRef } = usePopover();
+  const panelId = useId();
+  return (
+    <div ref={rootRef} className="sm:relative">
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="btn-ghost whitespace-nowrap"
+        aria-expanded={open}
+        aria-controls={open ? panelId : undefined}
+      >
+        Save <span aria-hidden="true">▾</span>
+      </button>
+      {open ? (
+        <div id={panelId} role="group" aria-label="Save or pin this view" className={`${POPOVER_PANEL} space-y-2 p-3 sm:w-72`}>
+          {children}
+          {message ? <p role="status" className="text-center text-xs text-ok">{message}</p> : null}
+        </div>
+      ) : null}
     </div>
   );
 }
