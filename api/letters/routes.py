@@ -1,5 +1,6 @@
 """Collections letters for the caller's organization: the list for a date window, one letter with
-its words and the process behind it, and its PDF.
+its words and the process behind it, and its PDF; and runs of letters, approved by a second person
+and released as one print file (letters.runs).
 
 Postgres organizations read through their warehouse, Oracle organizations through their own
 connection (letters.source picks the SQL); any other engine is answered 501.
@@ -13,13 +14,14 @@ from typing import Any, Callable
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi.routing import APIRoute
+from pydantic import BaseModel, ConfigDict, Field
 
 from api.access_audit import record_access_event
 from api.reporting_dates import data_as_of
 from api.auth.dependencies import AuthContext, require_permission
 from api.demo_db import demo_configured
 from api.executive_dashboard import is_not_connected_error
-from api.letters import render, repository
+from api.letters import render, repository, runs
 from api.letters.catalog import Words, catalog
 from api.letters.composer import compose
 from api.letters.model import Letter
@@ -56,6 +58,9 @@ class _NoStore(APIRoute):
 
 router = APIRouter(prefix="/portal/letters", tags=["letters"], route_class=_NoStore)
 READ = Depends(require_permission("letters:read"))
+GENERATE = Depends(require_permission("letters:generate"))
+APPROVE = Depends(require_permission("letters:approve"))
+RELEASE = Depends(require_permission("letters:release"))
 
 
 def _org(ctx: AuthContext) -> str:
@@ -102,6 +107,16 @@ def _words(org_id: str) -> tuple[Words, str]:
     return words, words.client_name or organization_display_name(org_id) or org_id
 
 
+def _window(date_from: str, date_to: str) -> tuple[date, date]:
+    try:
+        start, end = date.fromisoformat(date_from), date.fromisoformat(date_to)
+    except ValueError:
+        raise HTTPException(status_code=422, detail="Give the window as from=YYYY-MM-DD&to=YYYY-MM-DD.") from None
+    if end < start or (end - start).days >= MAX_WINDOW_DAYS:
+        raise HTTPException(status_code=422, detail=f"A window runs forward and covers at most {MAX_WINDOW_DAYS} days.")
+    return start, end
+
+
 def _summary(letter: Letter) -> dict[str, Any]:
     debt = letter.debt
     amount = (debt.arrears_amount if debt else letter.returned_payment.fee_amount if letter.returned_payment
@@ -118,6 +133,13 @@ def _summary(letter: Letter) -> dict[str, Any]:
     }
 
 
+def _pdf(out: render.Rendered, disposition: str) -> Response:
+    headers = {"Content-Disposition": disposition, "X-Letter-Font": out.font}
+    if out.note:
+        headers["X-Letter-Font-Note"] = out.note
+    return Response(out.pdf, media_type="application/pdf", headers=headers)
+
+
 def _audit(ctx: AuthContext, action: str, target_type: str, target_id: str, detail: str) -> None:
     """Ids and counts only: never a name, an address or an amount."""
     record_access_event(actor_email=ctx.email, actor_id=ctx.id, action=action, target_type=target_type,
@@ -131,16 +153,105 @@ def letters_as_of(ctx: AuthContext = READ) -> dict[str, Any]:
     return {"data_as_of": data_as_of(_org(ctx))}
 
 
+# ---- runs: declared before /{letter_id}, which would otherwise answer GET /runs ----------------
+class RunRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+    date_from: str = Field("", alias="from")
+    date_to: str = Field("", alias="to")
+    filters: dict[str, Any] | None = None
+
+
+def _run_step(fn: Callable, *args: Any) -> Any:
+    try:
+        return fn(*args)
+    except runs.RunError as exc:
+        raise HTTPException(status_code=exc.status, detail=exc.detail) from None
+
+
+def _run_org(ctx: AuthContext, run_id: str | None = None) -> str:
+    """A run's own record needs no database connection, only the caller's organization."""
+    require_unrestricted(ctx)
+    org_id = require_org_for_data(ctx)
+    if run_id is not None and not runs.RUN_ID.match(run_id):
+        raise HTTPException(status_code=422, detail="That is not a run id.")
+    return org_id
+
+
+def _actor(ctx: AuthContext) -> dict[str, str]:
+    return {"id": ctx.id, "email": ctx.email}
+
+
+def _run_audit(ctx: AuthContext, action: str, run: dict[str, Any], detail: str = "") -> None:
+    _audit(ctx, action, "letter_run", run["id"],
+           f"org={run['organization_id']}; letters={len(run['manifest'])}" + (f"; {detail}" if detail else ""))
+
+
+@router.get("/runs")
+def list_runs(ctx: AuthContext = READ) -> dict[str, Any]:
+    org_id = _run_org(ctx)
+    return {"organization_id": org_id, "runs": [runs.public(r, _actor(ctx)) for r in runs.list_runs(org_id)]}
+
+
+@router.post("/runs")
+def create_run(body: RunRequest, ctx: AuthContext = GENERATE) -> dict[str, Any]:
+    start, end = _window(body.date_from, body.date_to)
+    filters = _run_step(runs.clean_filters, body.filters)
+    org_id = _org(ctx)
+    letters = _read(repository.list_letters, org_id, start, end)
+    run = _run_step(runs.create, org_id, start, end, filters, letters, *_words(org_id), _actor(ctx))
+    kinds = ",".join(f"{k}:{n}" for k, n in sorted(run["by_kind"].items()))
+    _run_audit(ctx, "letter_run_create", run, f"from={start}; to={end}; kinds={kinds}")
+    return runs.public(run, _actor(ctx))
+
+
+@router.get("/runs/{run_id}")
+def get_run(run_id: str, ctx: AuthContext = READ) -> dict[str, Any]:
+    return runs.public(_run_step(runs.get, _run_org(ctx, run_id), run_id), _actor(ctx), with_letters=True)
+
+
+@router.post("/runs/{run_id}/approve")
+def approve_run(run_id: str, ctx: AuthContext = APPROVE) -> dict[str, Any]:
+    run = _run_step(runs.approve, _run_org(ctx, run_id), run_id, _actor(ctx))
+    _run_audit(ctx, "letter_run_approve", run)
+    return runs.public(run, _actor(ctx))
+
+
+@router.post("/runs/{run_id}/cancel")
+def cancel_run(run_id: str, ctx: AuthContext = GENERATE) -> dict[str, Any]:
+    run = _run_step(runs.cancel, _run_org(ctx, run_id), run_id, _actor(ctx), ctx.role == "admin")
+    _run_audit(ctx, "letter_run_cancel", run)
+    return runs.public(run, _actor(ctx))
+
+
+@router.post("/runs/{run_id}/release")
+def release_run(run_id: str, ctx: AuthContext = RELEASE) -> Response:
+    """The approved letters as ONE PDF in manifest order, built in memory and never written to disk.
+    Every letter is read again first: one that changed or disappeared since the run was created
+    refuses the release. A released run downloads again the same way."""
+    run = _run_step(runs.get, _run_org(ctx, run_id), run_id)
+    _run_step(runs.require_releasable, run)
+    org_id = _org(ctx)
+    letters = _read(repository.list_letters, org_id, date.fromisoformat(run["from"]), date.fromisoformat(run["to"]))
+    words, client_name = _words(org_id)
+    try:
+        chosen = runs.letters_to_print(run, letters, words, client_name)
+    except runs.RunError as exc:
+        _run_audit(ctx, "letter_run_release_refused", run,
+                   f"changed={exc.counts.get('changed', 0)}; missing={exc.counts.get('missing', 0)}")
+        raise HTTPException(status_code=exc.status, detail=exc.detail) from None
+    out = render.render_letters(chosen, words, client_name)
+    first = run["status"] == "approved"
+    if first:
+        run = _run_step(runs.mark_released, org_id, run_id, _actor(ctx), out.pages)
+    _run_audit(ctx, "letter_run_release" if first else "letter_run_download", run, f"pages={out.pages}")
+    return _pdf(out, f'attachment; filename="letter-run-{run_id[:8]}.pdf"')
+
+
 @router.get("")
 def list_letters(ctx: AuthContext = READ, date_from: str = Query("", alias="from"),
                  date_to: str = Query("", alias="to")) -> dict[str, Any]:
     org_id = _org(ctx)
-    try:
-        start, end = date.fromisoformat(date_from), date.fromisoformat(date_to)
-    except ValueError:
-        raise HTTPException(status_code=422, detail="Give the window as from=YYYY-MM-DD&to=YYYY-MM-DD.") from None
-    if end < start or (end - start).days >= MAX_WINDOW_DAYS:
-        raise HTTPException(status_code=422, detail=f"A window runs forward and covers at most {MAX_WINDOW_DAYS} days.")
+    start, end = _window(date_from, date_to)
     letters = _read(repository.list_letters, org_id, start, end)
     _audit(ctx, "letters_list", "letters", org_id, f"from={start}; to={end}; letters={len(letters)}")
     return {"organization_id": org_id, "from": start, "to": end, "count": len(letters),
@@ -174,7 +285,4 @@ def letter_pdf(letter_id: str, ctx: AuthContext = READ) -> Response:
     out = render.render_letters([letter], *_words(org_id))
     _audit(ctx, "letter_pdf", "letter", letter.letter_id,
            f"org={org_id}; account={letter.account_id}; pages={out.pages}")
-    headers = {"Content-Disposition": f'inline; filename="{letter.letter_id}.pdf"', "X-Letter-Font": out.font}
-    if out.note:
-        headers["X-Letter-Font-Note"] = out.note
-    return Response(out.pdf, media_type="application/pdf", headers=headers)
+    return _pdf(out, f'inline; filename="{letter.letter_id}.pdf"')

@@ -32,7 +32,11 @@ ROLE_PERMISSIONS: Final[dict[str, frozenset[str]]] = {
             "dashboards:write",
             "explorer:builder",
             # Collections letters carry names, addresses and amounts owed: editors and up.
+            # A run is approved by someone other than its creator (api/letters/runs.py).
             "letters:read",
+            "letters:generate",
+            "letters:approve",
+            "letters:release",
         }
     ),
     "admin": frozenset(
