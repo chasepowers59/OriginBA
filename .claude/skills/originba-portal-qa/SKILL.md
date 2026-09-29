@@ -35,6 +35,7 @@ phone-only specs (shell, library, phone-workspaces) stay in `e2e/` but are not r
 | Accessibility (axe, WCAG 2.1 AA) incl. every Settings tab | `npx playwright test e2e/a11y.spec.ts --project=desktop` (`COLOR_SCHEME=dark` for dark) | ~45 s |
 | Pixels (local baselines) | `npx playwright test e2e/visual.spec.ts --project=desktop` | ~25 s |
 | Ori naming, data quality, library | `npx playwright test e2e/ori.spec.ts e2e/dq.spec.ts e2e/library.spec.ts --project=desktop` | ~15 s |
+| Letters (demo25, August 2022: rows, PDF preview, 366-day refusal) | `npx playwright test e2e/letters.spec.ts --project=desktop` | ~15 s |
 
 Unit suites: `cd /Users/chase/OriginBA-3 && ENVIRONMENT=test python3 -m pytest tests -q`,
 `cd apps/analytics-portal && npx tsc --noEmit && npx vitest run`.

@@ -11,6 +11,21 @@ describe("row rules in the interface", () => {
     expect(isRestricted(null)).toBe(false);
   });
 
+  it("a page behind a permission is offered only to someone who holds it", () => {
+    const withLetters = [{ id: "home" }, { id: "letters", permission: "letters:read" },
+      { id: "settings", permission: "settings:manage" }];
+    const editor = (p: string) => p === "letters:read";
+    expect(visibleNav(withLetters, { row_rules: [] }, editor).map((n) => n.id)).toEqual(["home", "letters"]);
+    expect(visibleNav(withLetters, { row_rules: [] }, () => false).map((n) => n.id)).toEqual(["home"]);
+    expect(visibleNav(withLetters, null, () => true).map((n) => n.id)).toEqual(["home", "letters", "settings"]);
+  });
+
+  it("letters are never offered to a restricted person, permission or not", () => {
+    // api/letters/routes.py refuses them: a letter cannot be cut down to a person's rows
+    const restricted = { row_rules: [{ field: "Service Type", values: ["Water"] }] };
+    expect(visibleNav([{ id: "letters", permission: "letters:read" }], restricted, () => true)).toEqual([]);
+  });
+
   it("reads as a sentence", () => {
     expect(describeRules([{ field: "Service Type", values: ["Water", "Sewer"] }])).toBe("Service Type is Water or Sewer");
     expect(describeRules([])).toBe("All rows");

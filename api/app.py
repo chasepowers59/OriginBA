@@ -87,8 +87,9 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    # the browser may read the id, so an error on screen can quote its reference
-    expose_headers=["X-Request-ID"],
+    # the browser may read the id, so an error on screen can quote its reference, and a
+    # letter's font, so its preview can say when the approved face was substituted
+    expose_headers=["X-Request-ID", "X-Letter-Font", "X-Letter-Font-Note"],
 )
 
 app.include_router(auth_router)

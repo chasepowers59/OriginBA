@@ -191,5 +191,35 @@ class RouteTests(unittest.TestCase):
                 self.assertNotIn(pii, recorded)
 
 
+
+class BrowserReadsTheFontHeadersTests(unittest.TestCase):
+    """The portal runs on another origin, so a browser hides every response header the CORS
+    policy does not expose: without this the preview could never say its font was substituted."""
+
+    def test_the_pdf_exposes_its_font_headers_and_the_request_id(self):
+        from api.app import app
+        letters = {l.letter_id: l for l in fx.every_kind()}
+        patches = [
+            mock.patch("api.org_db.warehouse_configured", return_value=True),
+            mock.patch("api.org_db.demo_configured", return_value=False),
+            mock.patch.object(routes, "warehouse_configured", return_value=True),
+            mock.patch.object(routes, "record_access_event"),
+            mock.patch.object(repository, "get_letter", side_effect=lambda _org, i: letters.get(i)),
+            mock.patch.object(routes.render, "resolve_font",
+                              return_value=routes.render.Font("Helvetica", "Helvetica-Bold", "Helvetica", "substituted")),
+        ]
+        for p in patches:
+            p.start()
+            self.addCleanup(p.stop)
+        app.dependency_overrides[get_auth_context] = lambda: ctx()
+        self.addCleanup(app.dependency_overrides.pop, get_auth_context, None)
+
+        r = TestClient(app).get("/portal/letters/ADJ-600000000002/pdf", headers={"Origin": "http://localhost:3000"})
+        self.assertEqual(r.status_code, 200, r.text)
+        self.assertEqual(r.headers["x-letter-font-note"], "substituted")
+        exposed = {h.strip().lower() for h in r.headers["access-control-expose-headers"].split(",")}
+        self.assertTrue({"x-request-id", "x-letter-font", "x-letter-font-note"} <= exposed, exposed)
+
+
 if __name__ == "__main__":
     unittest.main()
