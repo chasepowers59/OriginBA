@@ -91,7 +91,7 @@ export function SystemHealthPanel() {
   );
 }
 
-function HealthTable({ title, head, rows, empty }: { title: string; head: string[]; rows: (string | number)[][]; empty: string }) {
+export function HealthTable({ title, head, rows, empty }: { title: string; head: string[]; rows: (string | number)[][]; empty: string }) {
   return (
     <section className="glass-panel p-6">
       <h3 className="mb-3 text-sm font-semibold text-heading">{title}</h3>
@@ -102,7 +102,7 @@ function HealthTable({ title, head, rows, empty }: { title: string; head: string
             <tbody>
               {rows.map((r, i) => (
                 <tr key={i} className="border-t border-edge-subtle">
-                  {r.map((v, j) => <td key={j} className={`${cell} ${typeof v === "number" ? "tabular-nums" : ""} text-fg`}>{v}</td>)}
+                  {r.map((v, j) => <td key={j} className={`${cell} ${typeof v === "number" ? "tabular-nums" : ""} text-fg`}>{typeof v === "number" ? formatNumber(v) : v}</td>)}
                 </tr>
               ))}
             </tbody>

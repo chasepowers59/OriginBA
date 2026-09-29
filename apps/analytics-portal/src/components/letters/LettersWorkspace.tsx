@@ -16,6 +16,7 @@ import {
   toggle,
   totals,
   validateWindow,
+  type Facet,
   type Filters,
   type LetterSummary,
   type Printed,
@@ -163,21 +164,11 @@ export function LettersWorkspace() {
               ) : null}
             </div>
 
-            <div role="group" aria-label="Letter type" className="flex flex-wrap gap-1.5">
-              {kindFacets(letters, filters).map((f) => {
-                const on = filters.kinds.includes(f.value);
-                return (
-                  <button key={f.value} type="button" aria-pressed={on}
-                    onClick={() => setFilters({ ...filters, kinds: toggle(filters.kinds, f.value) })}
-                    className={`chip ${on ? "chip-active" : ""}`}>
-                    {f.label} <span className="tabular-nums text-fg-subtle">{f.count}</span>
-                  </button>
-                );
-              })}
-            </div>
+            <LetterTypeChips facets={kindFacets(letters, filters)} selected={filters.kinds}
+              onToggle={(value) => setFilters({ ...filters, kinds: toggle(filters.kinds, value) })} />
 
             <p className="text-xs text-fg-muted" aria-live="polite">
-              {shown.length === letters.length ? plural(t.letters, "letter") : `${t.letters} of ${plural(letters.length, "letter")}`}
+              {shown.length === letters.length ? plural(t.letters, "letter") : `${formatNumber(t.letters)} of ${plural(letters.length, "letter")}`}
               {" · "}{plural(t.accounts, "account")} · {formatAmount(t.amount)} due · {formatNumber(t.notPrinted)} not printed
             </p>
 
@@ -240,6 +231,26 @@ export function LettersWorkspace() {
       )}
 
       <LetterRunsPanel dates={applied} filters={filters} shown={load.state === "ready" ? shown.length : null} />
+    </div>
+  );
+}
+
+export function LetterTypeChips({ facets, selected, onToggle }: {
+  facets: Facet[];
+  selected: string[];
+  onToggle: (value: string) => void;
+}) {
+  return (
+    <div role="group" aria-label="Letter type" className="flex flex-wrap gap-1.5">
+      {facets.map((f) => {
+        const on = selected.includes(f.value);
+        return (
+          <button key={f.value} type="button" aria-pressed={on} onClick={() => onToggle(f.value)}
+            className={`chip ${on ? "chip-active" : ""}`}>
+            {f.label} <span className="tabular-nums text-fg-subtle">{formatNumber(f.count)}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }

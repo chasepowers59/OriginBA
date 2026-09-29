@@ -14,7 +14,7 @@ import { formatCellValue, formatDateTime, formatNumber } from "@/lib/format";
 import { useEffect, useMemo, useState } from "react";
 import { apiGet, apiPost } from "@/lib/api";
 
-type DqRule = {
+export type DqRule = {
   id: string;
   object: string;
   severity: "action" | "review" | "info";
@@ -240,7 +240,7 @@ function Section({
   );
 }
 
-function RuleCard({
+export function RuleCard({
   rule: r,
   defaultOpen,
   onMark,
@@ -265,7 +265,7 @@ function RuleCard({
             <span className="text-over">rule error</span>
           ) : (
             <span className="rounded-full bg-chip px-2 py-0.5 text-xs font-semibold tabular-nums text-fg">
-              {r.total ?? r.count}
+              {formatNumber(r.total ?? r.count)}
             </span>
           )}
           <span className="font-mono text-xs text-fg-subtle">{r.object}</span>
@@ -366,7 +366,7 @@ function RuleCard({
   );
 }
 
-function SummaryCard({
+export function SummaryCard({
   label,
   value,
   tone,
@@ -397,7 +397,7 @@ function SummaryCard({
         {glyph}
       </span>
       <div>
-        <div className={`text-2xl font-bold tabular-nums leading-none ${t.text}`}>{value}</div>
+        <div className={`text-2xl font-bold tabular-nums leading-none ${t.text}`}>{formatNumber(value)}</div>
         <div className="mt-1 text-xs text-fg-muted">{label}</div>
       </div>
     </div>
