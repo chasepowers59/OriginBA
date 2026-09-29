@@ -58,7 +58,8 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
          "snapshot_id": "rpt_payment", "format": "currency", "workstream": "cashiering",
          "explore_report_id": None, "date_field": "Payment Date",
          "value": {"dimensions": [], "measures": [{"field": "Pay Segment Amount", "agg": "sum"}], "filters": MONEY_FILTERS["rpt_payment"]},
-         "trend": {"dimensions": ["Payment Status"], "measures": [{"field": "Pay Segment Amount", "agg": "sum"}],
+         # by utility: the money filter pins the status (tests/test_kpi_breakdowns.py)
+         "trend": {"dimensions": ["Utility Type"], "measures": [{"field": "Pay Segment Amount", "agg": "sum"}],
                    "filters": MONEY_FILTERS["rpt_payment"], "limit": 6}},
         {"id": "tender_amount", "label": "Tenders received", "subtitle": "Not cancelled, by tender type",
          "snapshot_id": "rpt_payment_tender", "format": "currency", "workstream": "cashiering",
@@ -156,7 +157,7 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
          "snapshot_id": "rpt_field_activity", "format": "number", "workstream": "field_ops",
          "explore_report_id": None, "date_field": "Created Date/Time",
          "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
-         "trend": {"dimensions": ["Activity Type"], "measures": [{"field": "*", "agg": "count"}],
+         "trend": {"dimensions": ["Field Task Type"], "measures": [{"field": "*", "agg": "count"}],
                    "filters": [], "limit": 6}},
         {"id": "open_todos", "label": "Open To Do entries", "subtitle": "The operational queue",
          "snapshot_id": "rpt_todo", "format": "number", "workstream": "field_ops",

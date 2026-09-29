@@ -108,7 +108,9 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "date_field": "Payment Date",
         "value": {"dimensions": [],
                   "measures": [{"field": "Pay Segment Amount", "agg": "sum"}], "filters": []},
-        "trend": {"dimensions": ["Payment Status"],
+        # By utility, not by status: the default lens IS a status, so a status breakdown
+        # drew one bar (Ellensburg 2026-09-29; tests/test_kpi_breakdowns.py).
+        "trend": {"dimensions": ["Utility Type"],
                   "measures": [{"field": "Pay Segment Amount", "agg": "sum"}],
                   "filters": [], "limit": 6},
         # This card SAID "Frozen pay segments" and filtered on nothing, so it summed
@@ -228,7 +230,9 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         # is the date every activity has, whatever became of it.
         "date_field": "Created Date/Time",
         "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
-        "trend": {"dimensions": ["Activity Type"],
+        # By field task type: "Activity Type" is one value on every Ellensburg row
+        # (tests/test_kpi_breakdowns.py). Task types are the client's codes (DNP, MIMO-R).
+        "trend": {"dimensions": ["Field Task Type"],
                   "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
         # DISCOVERED, not declared. An activity's status is a business-object lifecycle
         # state a client can extend, unlike the base-product _FLG lookups above -- Demo
