@@ -79,6 +79,17 @@ class FreshnessTests(unittest.TestCase):
             fr.freshness("ellensburg")
         self.assertEqual(dv.call_count, 1)
 
+    def test_a_database_without_scheduled_builds_is_never_stale(self):
+        # demo25 was loaded once (2026-09-01) and has no nightly: "the scheduled refresh has not
+        # completed" would be false there
+        fr.clear()
+        with mock.patch.object(fr, "org_backend", return_value=("postgres", "dbt")), \
+             mock.patch.object(fr, "refresh_marker", return_value="2026-09-01 10:11:22"), \
+             mock.patch.object(fr, "get_organization", return_value={"id": "demo25", "scheduled_builds": False}):
+            out = fr.freshness("demo25", now=NOW)
+        self.assertEqual(out["built_at"], "2026-09-01T10:11:22")
+        self.assertFalse(out["stale"])
+
     def test_the_route_answers_for_the_callers_organization(self):
         from api.auth.dependencies import AuthContext
         ctx = AuthContext(id="u", email="u@x.gov", display_name="u", role="viewer", client_id="ellensburg",

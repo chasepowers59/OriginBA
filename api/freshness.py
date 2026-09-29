@@ -17,6 +17,7 @@ from fastapi import APIRouter, Depends
 from api.auth.dependencies import AuthContext, require_permission
 from api.data_version import data_version
 from api.org_db import require_org_for_data
+from api.organizations import get_organization
 from api.snapshot_catalog import org_backend
 from api.warehouse_db import warehouse_connection
 
@@ -89,7 +90,9 @@ def freshness(org: str, *, now: datetime | None = None) -> dict[str, Any]:
     built = datetime.fromisoformat(when)
     built = built if built.tzinfo else built.astimezone()   # no offset: the API host's clock
     age = ((now or datetime.now(timezone.utc)) - built).total_seconds() / 3600
-    return {"built_at": when, "age_hours": round(age, 1), "stale": age > STALE_HOURS}
+    # an organization declared "scheduled_builds": false (a demo loaded once) is never overdue
+    scheduled = (get_organization(org) or {}).get("scheduled_builds", True)
+    return {"built_at": when, "age_hours": round(age, 1), "stale": bool(scheduled) and age > STALE_HOURS}
 
 
 @router.get("/freshness")

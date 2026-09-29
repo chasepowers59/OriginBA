@@ -75,6 +75,11 @@ data and configuration, never in the models):
    }
    ```
 
+   Optional keys: `"data_as_of": "YYYY-MM-DD"` for a frozen copy (every relative window
+   ends there), and `"scheduled_builds": false` for a database loaded once with no
+   scheduled refresh (a demo): without it, every page warns once the last build is over
+   36 hours old (`api/freshness.py`).
+
 5. **Env key**: set `WAREHOUSE_DATABASE_URL_NEWCLIENT` in the deployment
    environment (never in git; the repo `.env` is local-only).
 6. **The acceptance gate** — nothing ships without it:
