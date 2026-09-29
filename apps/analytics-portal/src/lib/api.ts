@@ -657,6 +657,11 @@ export function fetchLetters(from: string, to: string): Promise<LetterList> {
   return fetchJson(`/portal/letters?${new URLSearchParams({ from, to })}`);
 }
 
+/** Where the organization's data ends (null for a live copy): the letters page opens on the month before. */
+export function fetchLettersAsOf(): Promise<{ data_as_of: string | null }> {
+  return fetchJson("/portal/letters/as-of");
+}
+
 /** One letter with its words and the process facts behind it. */
 export function fetchLetter(letterId: string): Promise<LetterDetail> {
   return fetchJson(`/portal/letters/${encodeURIComponent(letterId)}`);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { defaultDateRangeLastMonth, fetchLetters } from "@/lib/api";
+import { defaultDateRangeLastMonth, fetchLetters, fetchLettersAsOf } from "@/lib/api";
 import { formatDateTime, formatNumber } from "@/lib/format";
 import {
   activeFilterCount,
@@ -57,12 +57,21 @@ export function LettersWorkspace() {
   const [selected, setSelected] = useState<string | null>(null);
   const [tab, setTab] = useState<PaneTab>("letter");
 
-  // The default window is the last full month in the viewer's calendar, so it is chosen after
-  // hydration: a server in another timezone would pick a different month.
+  // The default window is the last full month the data covers: the month before a frozen copy's
+  // as-of date, else before today in the viewer's calendar (chosen after hydration, so a server in
+  // another timezone cannot pick a different month).
   useEffect(() => {
-    const [from, to] = defaultDateRangeLastMonth();
-    setDraft({ from, to });
-    setApplied({ from, to });
+    let live = true;
+    const open = (asOf: string | null) => {
+      if (!live) return;
+      const [from, to] = defaultDateRangeLastMonth(asOf);
+      setDraft({ from, to });
+      setApplied({ from, to });
+    };
+    fetchLettersAsOf().then((r) => open(r.data_as_of)).catch(() => open(null));
+    return () => {
+      live = false;
+    };
   }, []);
 
   useEffect(() => {

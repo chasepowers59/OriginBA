@@ -15,6 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi.routing import APIRoute
 
 from api.access_audit import record_access_event
+from api.reporting_dates import data_as_of
 from api.auth.dependencies import AuthContext, require_permission
 from api.demo_db import demo_configured
 from api.executive_dashboard import is_not_connected_error
@@ -121,6 +122,13 @@ def _audit(ctx: AuthContext, action: str, target_type: str, target_id: str, deta
     """Ids and counts only: never a name, an address or an amount."""
     record_access_event(actor_email=ctx.email, actor_id=ctx.id, action=action, target_type=target_type,
                         target_id=target_id, detail=detail)
+
+
+@router.get("/as-of")
+def letters_as_of(ctx: AuthContext = READ) -> dict[str, Any]:
+    """Where the organization's data ends (a frozen copy declares it), so the page opens on the
+    last full month the data covers rather than the viewer's."""
+    return {"data_as_of": data_as_of(_org(ctx))}
 
 
 @router.get("")

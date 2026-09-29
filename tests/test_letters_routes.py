@@ -186,6 +186,15 @@ class RouteTests(unittest.TestCase):
         self.assertNotIn("hunter2", r.text)
 
     # ---- what is served and recorded ----------------------------------------------
+    def test_the_page_opens_on_the_month_before_the_data_ends(self):
+        # a frozen copy (Ellensburg, as of 2026-06-18) opens on May 2026, not the viewer's last month
+        with mock.patch.object(routes, "data_as_of", return_value="2026-06-18"):
+            r = self.get("/portal/letters/as-of")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json(), {"data_as_of": "2026-06-18"})
+        with mock.patch.object(routes, "data_as_of", return_value=None):
+            self.assertEqual(self.get("/portal/letters/as-of").json(), {"data_as_of": None})
+
     def test_the_list(self):
         r = self.get(self.LIST)
         self.assertEqual(r.status_code, 200, r.text)

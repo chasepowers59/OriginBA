@@ -14,12 +14,9 @@ const LOAD = { timeout: 150_000 };
 test("a letter in the window opens its PDF preview", async ({ page, context }, info) => {
   await asOrg(context, info);
   await page.goto("/letters");
-  const from = page.getByLabel("From", { exact: true });
-  await expect(from).not.toHaveValue("", { timeout: 60_000 }); // the default month is set after hydration
-
-  await from.fill("2026-05-01");
-  await page.getByLabel("To", { exact: true }).fill("2026-05-31");
-  await page.getByRole("button", { name: "Show letters" }).click();
+  // it opens on the last full month the data covers (as of 2026-06-18), not the viewer's last month
+  await expect(page.getByLabel("From", { exact: true })).toHaveValue("2026-05-01", { timeout: 60_000 });
+  await expect(page.getByLabel("To", { exact: true })).toHaveValue("2026-05-31");
 
   const rows = page.locator("tbody tr");
   await expect(rows.first()).toBeVisible(LOAD);
