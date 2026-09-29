@@ -22,7 +22,6 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 | 2026-09-29 | Dates, numbers and money are formatted differently page to page; odd tick steps; "12:00 AM" on date-only values | Everywhere | UI-16: DECISION + one formatter set in format.ts |
 | 2026-09-29 | SQL workspace results ~50 px tall on phone; builder says "on the left" when the panel is above | /database, /build on phone | UI-19: natural-height stack, layout-free copy |
 | 2026-09-29 | Slow Ellensburg explorer pages (17-32 s) show only a grey skeleton | Ellensburg billed usage, billed charge, GL | UI-20: "Running…" with elapsed time and cancel |
-| 2026-09-29 | B-13 privacy: GET /portal/saved-views filters by visibility only, not by the caller's workstream grant (same shape as B-11) | api/portal_routes.py:148 | filter by can_access_snapshot |
 | 2026-09-29 | A missing KPI trend value is labelled "Unknown" by the backend; charts now say "Not recorded" | api/kpi_runner.py trend_from_rows | use "Not recorded" |
 | 2026-09-29 | The server PDF still prints "No rows in this window." under a card that failed to load (its note now says why) | api/report_schedules.py sections_to_pdf | no "No rows" line when the section note reports a failure |
 | 2026-09-29 | The frontend skill still describes long axis labels as skipped ticks (preserveStartEnd); since 552cde49 that applies only to date/ordered axes | .claude/skills/originba-frontend/SKILL.md | update the chart section |
@@ -33,6 +32,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-29 | B-13 privacy: GET /portal/saved-views filters by visibility only, not by the caller's workstream grant (same shape as B-11) | 2eb212b3 | tests/test_bug_hunt_fixes.py |
 | 2026-09-29 | B-12: the dashboard PDF shows a failed card as "No value" / "No rows" | 76c0acce | src/lib/dashboardPdf.test.ts |
 | 2026-09-29 | B-11: content-pack export includes dashboards the caller's workstream grants withhold (definitions only) | 0dfe87ac | tests/test_content_packs.py |
 | 2026-09-29 | B-7: a saved-view alert reads an empty window (SUM NULL) as all-clear and resets a breach | 93223292 | tests/test_view_alerts.py |
