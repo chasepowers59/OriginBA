@@ -43,6 +43,7 @@ project, `desktop` (1440 x 900), and the phone-only specs are gone (in git histo
 | Accessibility (axe, WCAG 2.1 AA) incl. every Settings tab | `npx playwright test e2e/a11y.spec.ts` (`COLOR_SCHEME=dark` for dark) | ~1 min |
 | Pixels (local baselines, Ellensburg; retake after a rebuild) | `npx playwright test e2e/visual.spec.ts` | ~1 min |
 | Ori (naming, the home panel with stubbed routes), data quality, library | `npx playwright test e2e/ori.spec.ts e2e/ori-findings.spec.ts e2e/dq.spec.ts e2e/library.spec.ts` | ~1 min |
+| Stale-data notice (live: none; stubbed stale: named on every page) | `npx playwright test e2e/freshness.spec.ts` | ~10 s |
 | Letters (Ellensburg May 2026 rows, PDF preview, 366-day refusal; a cold month is tens of seconds over the VPN) | `npx playwright test e2e/letters.spec.ts` | ~35 s |
 
 Unit suites: `cd /Users/chase/OriginBA-3 && ENVIRONMENT=test python3 -m pytest tests -q`,

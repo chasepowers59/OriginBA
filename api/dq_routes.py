@@ -27,6 +27,7 @@ from api.auth import AuthContext, get_auth_context
 from api.data_version import data_version
 from api.demo_db import execute_query as oracle_query
 from api.executive_dashboard import is_missing_relation_error, is_not_connected_error
+from api.freshness import built_at, refresh_marker
 from api.org_db import require_org_for_data
 from api.snapshot_catalog import org_backend
 from api.summary_cache import cached
@@ -71,43 +72,6 @@ def _load_acks(org: str) -> dict[str, Any]:
 def _save_acks(org: str, acks: dict[str, Any]) -> None:
     ACK_DIR.mkdir(parents=True, exist_ok=True)
     _ack_path(org).write_text(json.dumps(acks, indent=1))
-
-
-def _refresh_marker(org: str, engine: str) -> str:
-    """A value that changes when the warehouse is reloaded/rebuilt.
-
-    That is EXACTLY the acknowledged-until-next-refresh contract: mark a finding done
-    and it stays hidden until new data arrives, then the rule re-evaluates it fresh.
-    Postgres: load_dttm, the CDC/build watermark every staging view carries. Oracle
-    in-database: the build stamp, because staging there synthesizes load_dttm at
-    build time and CISADM carries none.
-    """
-    if engine == "oracle":
-        return data_version(org) or "none"
-    with warehouse_connection(org) as conn:
-        cur = conn.cursor()
-        try:
-            cur.execute("select max(load_dttm)::text from staging.stg_financial_txn")
-            row = cur.fetchone()
-            return str(row[0]) if row and row[0] else "none"
-        except Exception:  # noqa: BLE001
-            return "none"
-
-
-def _built_at(marker: str, engine: str) -> str | None:
-    """When the warehouse was built, for the page (the marker itself is for acks only).
-    Oracle: the stamp's LAST_DDL half with the server clock's offset; statistics can be
-    regathered without a rebuild, the tables' creation cannot."""
-    if marker == "none":
-        return None
-    if engine == "oracle":
-        parts = marker.split(":")   # last_analyzed:last_ddl:count[:server clock offset, e.g. -0400]
-        if len(parts) not in (3, 4) or len(parts[1]) != 14:
-            return None
-        d = parts[1]
-        offset = f"{parts[3][:3]}:{parts[3][3:]}" if len(parts) == 4 and len(parts[3]) == 5 else ""
-        return f"{d[:4]}-{d[4:6]}-{d[6:8]}T{d[8:10]}:{d[10:12]}:{d[12:]}{offset}"
-    return marker.replace(" ", "T", 1)
 
 
 def _rules_path(engine: str) -> Path:
@@ -240,7 +204,7 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     if out is None:
         return {"configured": False, "rules": []}
     # ---- acknowledgements: hidden until the warehouse refreshes -------------
-    marker = _refresh_marker(org, engine)
+    marker = refresh_marker(org, engine)
     acks = _load_acks(org)
     # a marker change means new data arrived: every ack expires and findings
     # re-surface for the next quality pass
@@ -275,7 +239,7 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     return {
         "configured": True,
         "refresh_marker": marker,
-        "built_at": _built_at(marker, engine),
+        "built_at": built_at(marker, engine),
         **summarise_counts(out),
         "acknowledged": sum(len(e.get("acked_rows") or []) for e in out),
         "rules": out,
@@ -291,7 +255,7 @@ def dq_ack(payload: dict[str, Any] = Body(...),
     key = str(payload.get("key") or "")
     if not key:
         return {"ok": False, "error": "key required"}
-    marker = _refresh_marker(org, org_backend(org)[0])
+    marker = refresh_marker(org, org_backend(org)[0])
     acks = _load_acks(org)
     acks[key] = {"marker": marker, "by": getattr(ctx, "email", None) or "user"}
     _save_acks(org, acks)

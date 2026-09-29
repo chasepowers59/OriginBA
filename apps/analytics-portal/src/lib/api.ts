@@ -1,3 +1,4 @@
+import type { Freshness } from "@/lib/freshness";
 import type {
   DashboardTileDef,
   DataSourcePayload,
@@ -641,6 +642,11 @@ export type OriForecast = {
 };
 
 export type OriTrends = { through: string; anomalies: OriAnomaly[]; forecasts: OriForecast[] };
+
+/** When the organization's reporting tables were last built, and whether that is stale (api/freshness.py). */
+export function fetchFreshness(): Promise<Freshness> {
+  return fetchJson("/portal/freshness");
+}
 
 /** "Ori found something worth investigating": the large moves in the home cards (api/ori_routes.py). */
 export function fetchOriFindings(signal?: AbortSignal): Promise<OriRead> {

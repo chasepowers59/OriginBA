@@ -15,6 +15,8 @@ import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 import { isRestricted, visibleNav } from "@/lib/rowRules";
 import { clientLogo } from "@/lib/branding";
+import { fetchFreshness } from "@/lib/api";
+import { freshnessNotice, type Freshness } from "@/lib/freshness";
 
 // One clean top nav, one job per destination. "/" is the executive Home; Build is the
 // single self-serve builder; Library is the one report catalog (and hosts the workstream
@@ -53,6 +55,14 @@ export function AppShell({
   useEffect(() => {
     setOtherClient(user?.role === "admin" && viewingAnotherClient(getActiveOrganization(), user.organization_id));
   }, [user]);
+
+  // Every page says when the reporting data stopped refreshing (19 days unnoticed, 2026-09-29)
+  const [freshness, setFreshness] = useState<Freshness | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    fetchFreshness().then(setFreshness).catch(() => setFreshness(null));
+  }, [user]);
+  const staleNotice = freshnessNotice(freshness);
 
   // Native <details> menus stay open until their summary is re-clicked; close
   // them on outside click and on navigation so they behave like real dropdowns.
@@ -223,6 +233,12 @@ export function AppShell({
 
       <div className="mx-auto max-w-[1700px] px-6 py-8 2xl:px-10">
         {/* bottom room so the floating Ask Ori button never covers the page's last content */}
+        {staleNotice ? (
+          <p role="status" data-testid="stale-data"
+             className="mb-6 rounded-xl border border-warn bg-warn-bg px-4 py-3 text-sm text-warn">
+            {staleNotice}
+          </p>
+        ) : null}
         <main className="min-w-0 animate-fade-in pb-20">{children}</main>
       </div>
       {user && !isRestricted(user) ? <AssistantDrawer /> : null}

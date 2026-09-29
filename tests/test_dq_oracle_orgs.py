@@ -67,6 +67,7 @@ class OracleOrgHarness(unittest.TestCase):
             mock.patch.object(dq_routes, "BUNDLED_ORACLE_RULES", rules),
             mock.patch.object(dq_routes, "oracle_query", side_effect=self._oracle),
             mock.patch.object(dq_routes, "data_version", side_effect=lambda org: self.stamp),
+            mock.patch("api.freshness.data_version", side_effect=lambda org: self.stamp),
             mock.patch.object(dq_routes, "warehouse_connection",
                               side_effect=AssertionError("an Oracle org must not borrow the Postgres pool")),
         ]
@@ -252,6 +253,7 @@ class PostgresOrgUnchangedTests(unittest.TestCase):
              mock.patch.object(dq_routes, "org_backend", return_value=("postgres", "dbt")), \
              mock.patch.object(dq_routes, "warehouse_configured", return_value=True), \
              mock.patch.object(dq_routes, "warehouse_connection", return_value=pool), \
+             mock.patch("api.freshness.warehouse_connection", return_value=pool), \
              mock.patch.object(dq_routes, "ACK_DIR", tmp / "acks"), \
              mock.patch.dict("os.environ", {"DQ_RULES_PATH": str(rules)}), \
              mock.patch.object(dq_routes, "oracle_query",
