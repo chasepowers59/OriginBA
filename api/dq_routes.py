@@ -96,16 +96,17 @@ def _refresh_marker(org: str, engine: str) -> str:
 
 def _built_at(marker: str, engine: str) -> str | None:
     """When the warehouse was built, for the page (the marker itself is for acks only).
-    Oracle: the stamp's LAST_DDL half (last_analyzed:last_ddl:count); statistics can be
+    Oracle: the stamp's LAST_DDL half with the server clock's offset; statistics can be
     regathered without a rebuild, the tables' creation cannot."""
     if marker == "none":
         return None
     if engine == "oracle":
-        parts = marker.split(":")
-        if len(parts) != 3 or len(parts[1]) != 14:
+        parts = marker.split(":")   # last_analyzed:last_ddl:count[:server clock offset, e.g. -0400]
+        if len(parts) not in (3, 4) or len(parts[1]) != 14:
             return None
         d = parts[1]
-        return f"{d[:4]}-{d[4:6]}-{d[6:8]}T{d[8:10]}:{d[10:12]}:{d[12:]}"
+        offset = f"{parts[3][:3]}:{parts[3][3:]}" if len(parts) == 4 and len(parts[3]) == 5 else ""
+        return f"{d[:4]}-{d[4:6]}-{d[6:8]}T{d[8:10]}:{d[10:12]}:{d[12:]}{offset}"
     return marker.replace(" ", "T", 1)
 
 

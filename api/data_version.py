@@ -4,7 +4,8 @@ into a reporting canvas, so a result keyed by it can be kept until the data chan
 
 Postgres: each reporting table's identity (a dbt table rebuild is a new table) plus its
 insert/update/delete counters (an incremental merge, rpt_billed_charge, keeps the table).
-Oracle: the reporting tables' last-analyzed and last-DDL times; every model build gathers
+Oracle: the reporting tables' last-analyzed and last-DDL times (in the database server's clock,
+so the stamp ends with that clock's UTC offset); every model build gathers
 statistics in its post-hook, merges included. Read at most once a minute per organization;
 None when it cannot be read, and callers then keep results for five minutes as before.
 """
@@ -29,6 +30,7 @@ where n.nspname = %(schema)s and c.relkind = 'r'
 _ORACLE = """
 select to_char(max(t.last_analyzed), 'YYYYMMDDHH24MISS') || ':'
        || to_char(max(o.last_ddl_time), 'YYYYMMDDHH24MISS') || ':' || count(*)
+       || ':' || to_char(systimestamp, 'TZHTZM')
 from all_tables t
 join all_objects o on o.owner = t.owner and o.object_name = t.table_name and o.object_type = 'TABLE'
 where t.owner = :owner

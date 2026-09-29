@@ -46,6 +46,10 @@ class StampTests(unittest.TestCase):
         self.assertIn("LAST_DDL_TIME", sql)
         self.assertIn("ORIGINBA_REPORTING", str(q.call_args))
 
+    def test_the_oracle_stamp_carries_the_database_clock_offset(self):
+        # LAST_DDL_TIME is in the server's clock (Ellensburg: 12:39 for a 10:39 MDT build)
+        self.assertIn("to_char(systimestamp, 'TZHTZM')", dv._ORACLE)
+
     def test_the_stamp_is_read_at_most_once_a_minute(self):
         with mock.patch.object(dv, "org_backend", return_value=("postgres", "dbt")), \
              mock.patch("api.warehouse_db.execute_query", return_value=(["v"], [["abc"]])) as q:

@@ -187,6 +187,8 @@ class OracleOrgAcknowledgementTests(OracleOrgHarness):
         # is the LAST_DDL half: statistics can be regathered (09-28) without a rebuild (09-10).
         self.stamp = "20260928180601:20260910084138:39"
         self.assertEqual(dq_routes.dq_findings(ctx=_ctx())["built_at"], "2026-09-10T08:41:38")
+        self.stamp = "20260929163000:20260929123907:39:-0400"   # with the database clock's offset
+        self.assertEqual(dq_routes.dq_findings(ctx=_ctx())["built_at"], "2026-09-29T12:39:07-04:00")
         self.stamp = None
         self.assertIsNone(dq_routes.dq_findings(ctx=_ctx())["built_at"])
 
