@@ -44,7 +44,7 @@ project, `desktop` (1440 x 900), and the phone-only specs are gone (in git histo
 | Pixels (local baselines, Ellensburg; retake after a rebuild) | `npx playwright test e2e/visual.spec.ts` | ~1 min |
 | Ori (naming, the home panel with stubbed routes), data quality, library | `npx playwright test e2e/ori.spec.ts e2e/ori-findings.spec.ts e2e/dq.spec.ts e2e/library.spec.ts` | ~1 min |
 | Stale-data notice (live: none; stubbed stale: named on every page) | `npx playwright test e2e/freshness.spec.ts` | ~10 s |
-| Letters (Ellensburg May 2026 rows, PDF preview, 366-day refusal; a cold month is tens of seconds over the VPN) | `npx playwright test e2e/letters.spec.ts` | ~35 s |
+| Letters (Ellensburg May 2026 rows, PDF preview, 366-day refusal; a run from a one-day window with the creator's Approve disabled, then cancelled; approve and release with stubbed answers only; a cold month is tens of seconds over the VPN) | `npx playwright test e2e/letters.spec.ts` | ~1 min |
 
 Unit suites: `cd /Users/chase/OriginBA-3 && ENVIRONMENT=test python3 -m pytest tests -q`,
 `cd apps/analytics-portal && npx tsc --noEmit && npx vitest run`.

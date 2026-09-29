@@ -31,7 +31,7 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
 | Exports | Yes | Excel from explorer and dashboards (formula-safe), CSV from SQL and assistant answers, and one server-built PDF renderer for schedules, the explorer's Download PDF and a dashboard's Export PDF pack (every tile: headline value, chart, table; `api/export_routes.py`). Only the council and lineage packs still print the page |
 | Alerts | Yes | Thresholds on the home KPIs (value or period change) and on any saved view (its first measure as one total over its saved filters and a trailing window, with the creator's current access), emailed once per breach by the hourly runner. **Needs:** the runner deployed, SMTP configured |
 | Input controls / prompts | Yes | Any saved filter can be asked for when the view opens (Report parameters: value lists narrowed by the answers above them, date ranges, saved defaults for schedules) |
-| Formatted, paginated reports (JRXML) | Partly | Collections letters in the portal (`/letters`: list, preview, PDF with USPS IMb) for Postgres and Oracle organizations (Ellensburg matches the letter-print app letter for letter); per-client wording and statements are next |
+| Formatted, paginated reports (JRXML) | Partly | Collections letters in the portal (`/letters`: list, preview, PDF with USPS IMb) for Postgres and Oracle organizations (Ellensburg matches the letter-print app letter for letter); runs of letters approved by a second person and released as one print file, refused when a letter changed since approval; per-client wording and statements are next |
 | Security | Mostly | Roles, workstream grants, org isolation, **row-level security within an org** (per-user rules on a column, fail-closed; raw SQL, the assistant and data quality refused to restricted users; schedules keep the creator's rules), OIDC sign-in with IdP group mapping (role, client, access groups, row rules synced at every sign-in; removal from every group deactivates the account), audit log. **No** SAML |
 | Promotion between clients | Yes | Content packs (Settings, admins): export an organization's shared views and dashboards (all, or one folder) as a JSON file and import it into another. Each item is checked against the target's own canvases first; anything naming a canvas, column or ready-to-run report the client lacks is left out with the reason, with a preview before anything is saved (`api/content_packs.py`) |
 | Ownership and sharing | Yes | Owner on every view, dashboard and schedule; private items; only owner or admin edits; folders for views and dashboards |
@@ -54,7 +54,8 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
    `docs/LARGE_CLIENT_SCALE_PLAN.md`).
 7. **Formatted reports** (L): decided 2026-09-29, letters and statements move into the portal
    (docs/letters/LETTERS_MIGRATION_PLAN.md); phase 1 (Postgres organizations) is live, phase 2
-   (Oracle organizations, proven on Ellensburg) is on `feature/letters-oracle`.
+   (Oracle organizations, proven on Ellensburg) is on `feature/letters-oracle`; phase 3 (runs with
+   four-eyes approval, one print file) is on `feature/letter-runs`.
 8. Done 2026-09-28: embedding.
 
 ## Known risks

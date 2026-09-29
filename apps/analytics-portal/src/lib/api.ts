@@ -31,6 +31,7 @@ import { authHeaders, activeOrganizationHeader } from "./auth";
 import { localIsoDate, saveBlob } from "@/lib/format";
 import { ApiError, parseApiError } from "@/lib/apiErrors";
 import type { LetterDetail, LetterList, LetterPdf } from "@/lib/letters";
+import type { LetterRun, RunFilters } from "@/lib/letterRuns";
 import { parseSse } from "@/lib/sse";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -672,6 +673,35 @@ export function fetchLettersAsOf(): Promise<{ data_as_of: string | null }> {
 /** One letter with its words and the process facts behind it. */
 export function fetchLetter(letterId: string): Promise<LetterDetail> {
   return fetchJson(`/portal/letters/${encodeURIComponent(letterId)}`);
+}
+
+/** The organization's letter runs, newest first. */
+export function fetchLetterRuns(): Promise<{ organization_id: string; runs: LetterRun[] }> {
+  return fetchJson("/portal/letters/runs");
+}
+
+/** Freeze the window's letters (by type and printed status) into a draft run. */
+export function createLetterRun(from: string, to: string, filters: RunFilters): Promise<LetterRun> {
+  return fetchJson("/portal/letters/runs", { method: "POST", body: JSON.stringify({ from, to, filters }) });
+}
+
+export function approveLetterRun(runId: string): Promise<LetterRun> {
+  return fetchJson(`/portal/letters/runs/${encodeURIComponent(runId)}/approve`, { method: "POST" });
+}
+
+export function cancelLetterRun(runId: string): Promise<LetterRun> {
+  return fetchJson(`/portal/letters/runs/${encodeURIComponent(runId)}/cancel`, { method: "POST" });
+}
+
+/** The approved run as one PDF; the server refuses (409) when any letter changed since it was created. */
+export async function releaseLetterRun(runId: string): Promise<Blob> {
+  const res = await fetch(`${API_BASE}/portal/letters/runs/${encodeURIComponent(runId)}/release`, {
+    method: "POST",
+    headers: await resolveRequestHeaders(),
+    cache: "no-store",
+  });
+  if (!res.ok) throw new ApiError(parseApiError(await res.text(), res.statusText), res.status);
+  return res.blob();
 }
 
 /** The letter's one-page PDF, fetched with the signed-in headers: a bare link would carry neither. */

@@ -23,6 +23,7 @@ import {
   type SortKey,
 } from "@/lib/letters";
 import { LetterDetailPane, type PaneTab } from "./LetterDetailPane";
+import { LetterRunsPanel } from "./LetterRunsPanel";
 
 type Load = { state: "loading" } | { state: "error"; message: string } | { state: "ready"; letters: LetterSummary[] };
 type DateWindow = { from: string; to: string };
@@ -237,6 +238,8 @@ export function LettersWorkspace() {
           </section>
         </div>
       )}
+
+      <LetterRunsPanel dates={applied} filters={filters} shown={load.state === "ready" ? shown.length : null} />
     </div>
   );
 }

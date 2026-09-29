@@ -84,8 +84,10 @@ at retirement.
 
 1. Does Odessa's JRS + C2M XML extract stay the production print path, or does the portal replace it?
 2. Is operating model A (C2M's extract keeps stamping LETTER_PRINT_DTTM) confirmed?
-3. Who approves runs: client editors only, or Origin platform admins too?
-4. Where are released PDFs stored, and for how long?
+3. Who approves runs: client editors only, or Origin platform admins too? (Default applied in
+   phase 3: editors and admins, never the run's creator.)
+4. Where are released PDFs stored, and for how long? (Default applied in phase 3: nowhere. The print
+   file is rebuilt from CISADM on every download and only the run's manifest is kept.)
 5. Is a "customer statement" a reprint of one bill, or an account statement over a date range?
 6. Should the letter-type mapping become a dbt seed beside rpt_collection_letter?
 7. Should EBILL routes be excluded from the mailing file?
@@ -98,3 +100,13 @@ at retirement.
 | 0 | not started |
 | 1 | merged: `/portal/letters` list, preview and PDF for Postgres orgs behind `letters:read` (editor, admin); `/letters` (window picker, search, type and status filters, sort, PDF preview beside the data behind it, Download PDF), nav entry never for row-restricted people; `e2e/letters.spec.ts` ran on demo25. The `rpt_collection_letter` parity test is still to do |
 | 2 | on `feature/letters-oracle`: `sql/oracle/*.sql` (the letter app's SQL, `CISADM.`-qualified), the dialect picked from the org's engine, one `SET TRANSACTION READ ONLY`, NUMBER as Decimal, Oracle orgs served (no connection or unreachable: 503; other engines: 501). Ellensburg May 2026: 3,171 letters (1,499 contacts + 1,672 late fees), the same ids as the letter app's `letters.sql` and `late_fees.sql`; 5.0 s database time warm, 20-45 s wall over the VPN (the candidate-process events and services are ~62,000 rows each); a cold `CI_FT` made the balances query 45-60+ s, hence a 120 s call timeout. PDFs one page, address in the window (839 letters checked). `e2e/letters.spec.ts` runs on Ellensburg. Not done: Ellensburg/Odessa wording and branding, `oracledb` in the deployed image, late fees and NSF wording at real clients |
+| 3 | on `feature/letter-runs`: `POST /portal/letters/runs` freezes a window's letters (optionally by type and printed status) into a draft run: ids, counts by type and a fingerprint per letter (a hash of everything the page prints: words, amounts, dates, address; never the words themselves) in the org store (`letter_runs`). `approve` (letters:approve) only from draft and never by the creator (403); `release` (letters:release) only from approved: every letter is read again and a changed or missing one refuses the release (409, with the counts) so the run is redrafted; otherwise ONE PDF in manifest order, built in memory and streamed, and the run is marked released (who, when, pages); a released run downloads again under the same check; `cancel` (creator or admin) from draft or approved. Every create, approve, release, download, refused release and cancel is audited with ids and counts. The Letters page has a Runs area (create from the letters shown, the runs table, Approve disabled with the four-eyes reason for its creator). Tests: `tests/test_letters_runs.py`, `src/lib/letterRuns.test.ts`, `e2e/letters.spec.ts` (the stubbed approve/release path passed; the live Ellensburg create has not run yet, see docs/PORTAL_ISSUES_LOG.md) |
+
+Phase 3 defaults, each the owner's to change: **who approves** is anyone with `letters:approve`
+(editors and admins) except the run's creator, matched by user id or email; **retention** keeps
+the last 200 runs per organization (`MAX_RUNS`), the oldest released or cancelled run makes room,
+and a new draft is refused while 200 are still open; a run holds at most **5,000 letters**
+(`MAX_RUN_LETTERS`: ~4 ms and ~3 KB a page rendered in memory; a month at Ellensburg is ~3,200); a
+run's filters are letter type and printed status only (a search could carry a customer's name into
+the store); the print stamp C2M adds after mailing (`LETTER_PRINT_DTTM`) is not part of a letter's
+fingerprint, so a stamped letter still downloads again.
