@@ -63,6 +63,13 @@ def data_version(organization_id: str) -> str | None:
     return version
 
 
+def known() -> dict[str, dict]:
+    """Each organization's last read stamp and how many seconds ago it was read."""
+    now = time.monotonic()
+    with _lock:
+        return {org: {"version": v, "read_seconds_ago": int(now - at)} for org, (at, v) in _memo.items()}
+
+
 def clear() -> None:
     with _lock:
         _memo.clear()

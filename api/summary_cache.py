@@ -19,6 +19,7 @@ VERSIONED_TTL_SECONDS = 12 * 3600
 MAX_ENTRIES = 500
 _entries: dict[tuple, tuple[float, Any]] = {}
 _lock = threading.Lock()
+_counts = {"hits": 0, "misses": 0}
 
 
 def _no_failed_card(result: Any) -> bool:
@@ -32,7 +33,9 @@ def cached(key: tuple, build: Callable[[], Any], keep: Callable[[Any], bool] = _
     with _lock:
         hit = _entries.get(full)
     if hit and time.monotonic() - hit[0] < ttl:
+        _counts["hits"] += 1
         return hit[1]
+    _counts["misses"] += 1
     result = build()
     if keep(result):
         with _lock:
@@ -42,6 +45,12 @@ def cached(key: tuple, build: Callable[[], Any], keep: Callable[[Any], bool] = _
     return result
 
 
+def stats() -> dict[str, int]:
+    with _lock:
+        return {**_counts, "entries": len(_entries)}
+
+
 def clear() -> None:
     with _lock:
         _entries.clear()
+        _counts.update(hits=0, misses=0)

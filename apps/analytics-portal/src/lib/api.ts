@@ -22,6 +22,7 @@ import type {
 } from "./types";
 import { dashboardPdfSections, type ExportSection } from "./dashboardPdf";
 import type { PackImportResult } from "./contentPack";
+import type { SystemHealth } from "./systemHealth";
 import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview, AssistantSpend } from "@/lib/types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
 import { localIsoDate } from "@/lib/format";
@@ -608,4 +609,9 @@ export function fetchContentPack(folder: string | null): Promise<Record<string, 
 /** Import a pack into the active organization (admins). A dry run only reports. */
 export function importContentPack(pack: unknown, dryRun: boolean): Promise<PackImportResult> {
   return fetchJson(`/portal/content-pack/import?dry_run=${dryRun}`, { method: "POST", body: JSON.stringify({ pack }) });
+}
+
+/** What this API process has been doing (administrators). */
+export function fetchSystemHealth(): Promise<SystemHealth> {
+  return fetchJson("/portal/health");
 }

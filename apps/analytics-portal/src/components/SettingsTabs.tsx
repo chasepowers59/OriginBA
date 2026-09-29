@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { AdminAccessPanel } from "@/components/AdminAccessPanel";
 import { ContentPackPanel } from "@/components/ContentPackPanel";
+import { SystemHealthPanel } from "@/components/SystemHealthPanel";
 import { DataSourceSettings } from "@/components/DataSourceSettings";
 import { useAuth } from "@/components/AuthProvider";
 
-type Tab = "connection" | "access" | "packs";
+type Tab = "connection" | "access" | "packs" | "health";
 
 export function SettingsTabs() {
   const { can } = useAuth();
@@ -17,12 +18,13 @@ export function SettingsTabs() {
     <div className="space-y-6">
       {isAdmin ? (
         <div className="glass-panel p-2">
-          <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-1 md:grid-cols-4">
             {(
               [
                 ["connection", "Database connection"],
                 ["access", "Users & access"],
                 ["packs", "Content packs"],
+                ["health", "System health"],
               ] as const
             ).map(([id, label]) => (
               <button
@@ -50,6 +52,7 @@ export function SettingsTabs() {
       ) : null}
       {tab === "access" && isAdmin ? <AdminAccessPanel /> : null}
       {tab === "packs" && isAdmin ? <ContentPackPanel /> : null}
+      {tab === "health" && isAdmin ? <SystemHealthPanel /> : null}
     </div>
   );
 }
