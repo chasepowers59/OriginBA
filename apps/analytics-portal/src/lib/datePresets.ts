@@ -15,11 +15,22 @@ export function anchoredLabel(label: string, asOf?: string | null): string {
   return `${label}, as of ${d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`;
 }
 
-export function applyDatePresetConfig(preset: DatePresetConfig | undefined, asOf?: string | null): {
+// A canvas may name its default (the catalog builder writes "last_12_months"): the name picks
+// the explorer's chip of that label. Mirrored by api/date_presets.py.
+const NAMED: Record<string, DatePresetConfig> = {
+  last_30_days: { kind: "days", days: 30, label: "Last 30 days" },
+  last_quarter: { kind: "days", days: 90, label: "Last quarter" },
+  prior_month: { kind: "last_month", label: "Prior month" },
+  year_to_date: { kind: "ytd", label: "Year to date" },
+  last_12_months: { kind: "days", days: 365, label: "Last 12 months" },
+};
+
+export function applyDatePresetConfig(preset: DatePresetConfig | string | undefined, asOf?: string | null): {
   range: [string, string];
   label: string;
 } {
-  const p = preset ?? { kind: "days", days: 180, label: "Last 6 months" };
+  const named = typeof preset === "string" ? NAMED[preset] : preset;
+  const p = named ?? { kind: "days", days: 180, label: "Last 6 months" };
   if (p.kind === "ytd") {
     return { range: defaultDateRangeYtd(asOf), label: p.label || "Year to date" };
   }

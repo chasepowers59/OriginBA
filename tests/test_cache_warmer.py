@@ -24,7 +24,7 @@ from api import summary_cache as sc  # noqa: E402
 from api.auth.dependencies import AuthContext  # noqa: E402
 
 CTX = AuthContext(id="u", email="u@utility.gov", display_name="u", role="editor", client_id="demo25",
-                  organization_id="demo25", organization_name="Demo", permissions={"snapshots:read"},
+                  organization_id="demo25", organization_name="Demo", permissions={"snapshots:read", "snapshots:query"},
                   workstreams=["*"])
 
 
@@ -73,6 +73,60 @@ class WarmerTests(unittest.TestCase):
         self.mocks[0].side_effect = RuntimeError("ORA-03113")
         with self.assertLogs("originba.api", level="WARNING"):
             self.assertEqual(cw.warm_once("demo25"), ["billing", "finance"])
+
+
+BIG = {"id": "rpt_billed_charge", "label": "Billed Charge", "table_name": "rpt_billed_charge",
+       "fields": [{"id": f} for f in ("Bill Date", "Customer Class", "Billed Amount", "Is Frozen")],
+       "trusted_measures": ["Billed Amount"], "default_date_field": "Bill Date",
+       "default_date_preset": "last_12_months", "max_rows": 500,
+       "premade_reports": [{"id": "by_class", "dimensions": ["Customer Class"],
+                            "measures": [{"field": "Billed Amount", "agg": "sum"}],
+                            "filters": [{"field": "Is Frozen", "op": "eq", "value": True}]}]}
+SMALL = {**BIG, "id": "rpt_bill", "table_name": "rpt_bill"}
+
+
+class ReportWarmingTests(unittest.TestCase):
+    """A large canvas's opening report (the first ready-to-run report over the canvas's default
+    window, which the explorer runs when the page opens) is run after a rebuild too."""
+
+    def setUp(self):
+        sc.clear()
+        cw.reset()
+        self.runs = []
+        catalog = {"snapshots": {"rpt_billed_charge": BIG, "rpt_bill": SMALL}}
+        self.patches = [
+            mock.patch.object(cw, "data_version", return_value="v1"),
+            mock.patch.object(se, "data_version", return_value="v1"),
+            mock.patch.object(cw, "_workstreams", return_value=[]),
+            mock.patch.object(se, "build_executive_summary", return_value={"kpis": []}),
+            mock.patch("api.snapshot_catalog.load_catalog", return_value=catalog),
+            mock.patch.object(se, "_row_estimate", side_effect=lambda snap, org: 3_160_000 if snap is BIG else 40_000),
+            mock.patch.object(se, "snapshot_backend", return_value=("postgres", "postgres", "reporting")),
+            mock.patch.object(cw, "data_as_of", return_value="2026-09-29"),
+            mock.patch("api.warehouse_db.execute_query",
+                       side_effect=lambda sql, binds=None, **k: self.runs.append(sql) or (["Customer Class", "m0"], [["R", 1.0]])),
+        ]
+        for p in self.patches:
+            p.start()
+
+    def tearDown(self):
+        for p in self.patches:
+            p.stop()
+
+    def test_the_opening_report_of_a_large_canvas_is_warm(self):
+        self.assertEqual(cw.warm_once("demo25"), ["home", "report rpt_billed_charge"])
+        self.assertEqual(len(self.runs), 1)
+        # what the explorer sends when the page opens (ExplorerPanel.runPremade): the canvas's
+        # window first (last_12_months as of 2026-09-29), then the report's own filters
+        body = se.QueryRequest(dimensions=["Customer Class"], measures=[{"field": "Billed Amount", "agg": "sum"}],
+                               filters=[{"field": "Bill Date", "op": "between", "value": ["2025-09-29", "2026-09-29"]},
+                                        {"field": "Is Frozen", "op": "eq", "value": True}],
+                               time_dimensions=[], limit=500)
+        with mock.patch.object(se, "require_org_for_data", return_value="demo25"), \
+             mock.patch.object(se, "_require_snapshot_access", return_value=BIG), \
+             mock.patch("api.access_audit.record_access_event"):
+            se.snapshot_query("rpt_billed_charge", body, ctx=CTX)
+        self.assertEqual(len(self.runs), 1)
 
 
 class SwitchTests(unittest.TestCase):

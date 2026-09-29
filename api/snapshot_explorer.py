@@ -722,6 +722,39 @@ def snapshot_raw_sql(
     }
 
 
+def cached_query(org_id: str, snapshot: dict[str, Any], body: QueryRequest,
+                 filters: list[dict[str, Any]]) -> tuple[str, list[str], list]:
+    """The governed statement for this request and its rows. The same statement for the same
+    org is answered from memory until the warehouse is rebuilt: a report over Ellensburg's
+    rpt_billed_charge took ~25 s. api/cache_warmer.py runs the same path."""
+    # The ORG decides the backend and dialect: the same canvas runs in Postgres for a
+    # CDC-fed tenant and in the client's own Oracle instance for an in-database one, with
+    # quoted Title Case columns identical in both.
+    backend, dialect, schema = snapshot_backend(snapshot, org_id)
+    sql, binds = build_query(
+        table_name=snapshot["table_name"],
+        allowed_fields=allowed_fields(snapshot),
+        trusted_measures=set(snapshot.get("trusted_measures", [])),
+        dimensions=body.dimensions,
+        measures=[m.model_dump() for m in body.measures],
+        filters=filters,
+        limit=min(body.limit, snapshot.get("max_rows", 500)),
+        time_dimensions=[t.model_dump() for t in body.time_dimensions],
+        dialect=dialect,
+        schema=schema,
+    )
+
+    def run() -> tuple[list[str], list]:
+        if backend == "postgres":
+            from api.warehouse_db import execute_query as run_warehouse
+            return run_warehouse(sql, binds, organization_id=org_id, max_rows=body.limit)
+        return execute_query(sql, binds, organization_id=org_id, max_rows=body.limit)
+
+    columns, rows = cached(("query", org_id, backend, sql, repr(sorted(binds.items())), body.limit),
+                           run, keep=lambda _: True, version=data_version(org_id))
+    return sql, columns, rows
+
+
 @router.post("/{snapshot_id}/query")
 def snapshot_query(
     snapshot_id: str,
@@ -761,39 +794,11 @@ def snapshot_query(
     filters = filters + enforce_row_rules(ctx, snapshot)
 
     try:
-        # The ORG decides the backend and dialect: the same canvas runs in Postgres for
-        # a CDC-fed tenant and in the client's own Oracle instance for an in-database
-        # one, with quoted Title Case columns identical in both.
-        backend, dialect, schema = snapshot_backend(snapshot, org_id)
-        warehouse = backend == "postgres"
-        trusted = set(snapshot.get("trusted_measures", []))
-        sql, binds = build_query(
-            table_name=snapshot["table_name"],
-            allowed_fields=allowed_fields(snapshot),
-            trusted_measures=trusted,
-            dimensions=body.dimensions,
-            measures=[m.model_dump() for m in body.measures],
-            filters=filters,
-            limit=min(body.limit, snapshot.get("max_rows", 500)),
-            time_dimensions=[t.model_dump() for t in body.time_dimensions],
-            dialect=dialect,
-            schema=schema,
-        )
+        sql, columns, rows = cached_query(org_id, snapshot, body, filters)
     except QueryValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-
-    def run() -> tuple[list[str], list]:
-        if warehouse:
-            from api.warehouse_db import execute_query as run_warehouse
-            return run_warehouse(sql, binds, organization_id=org_id, max_rows=body.limit)
-        return execute_query(sql, binds, organization_id=org_id, max_rows=body.limit)
-
-    try:
-        # The same statement for the same org is answered from memory until the warehouse is
-        # rebuilt: a report over Ellensburg's rpt_billed_charge took ~25 s. Every run is audited below.
-        columns, rows = cached(("query", org_id, backend, sql, repr(sorted(binds.items())), body.limit),
-                               run, keep=lambda _: True, version=data_version(org_id))
     except Exception as exc:
+        warehouse = snapshot_backend(snapshot, org_id)[0] == "postgres"
         raise _query_failure(f"{'Warehouse' if warehouse else 'Demo'} query failed", exc) from exc
 
     serialized_rows = [

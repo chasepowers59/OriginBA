@@ -4,7 +4,9 @@ so the first reader each morning is not the one who waits.
 Every minute, for each organization with a warehouse: when its build stamp
 (api/data_version.py) is new, build what those pages ask for by default -- 30 days, no
 comparison, no filters -- for a reader with every workstream and no row rules, through the
-routes' own cache functions. An unknown stamp does nothing; a failed build is logged and the
+routes' own cache functions; and on each canvas of a million rows or more, the report the
+explorer runs when the page opens (its first ready-to-run report over the canvas's default
+window, api/date_presets.py), which is the ~25 s wait at Ellensburg volume. An unknown stamp does nothing; a failed build is logged and the
 rest carry on. Off under tests and with PORTAL_WARM_CACHE=false. One per API process, since
 each process keeps its own cache.
 """
@@ -13,11 +15,16 @@ from __future__ import annotations
 import logging
 import os
 import threading
+from datetime import date
+from typing import Any
 
 from api.data_version import data_version
+from api.date_presets import preset_range
+from api.reporting_dates import data_as_of
 
 log = logging.getLogger("originba.api")
 INTERVAL_SECONDS = 60
+WARM_MIN_ROWS = 1_000_000
 _warmed: dict[str, str] = {}
 _started = threading.Event()
 
@@ -32,6 +39,30 @@ def _workstreams(org_id: str) -> list[str]:
     return [w["id"] for w in list_workstreams(org_id) if w.get("id") in WORKSTREAM_KPIS]
 
 
+def _opening_reports(org_id: str) -> list[tuple[str, Any]]:
+    """Each large canvas's opening report, as the explorer sends it (ExplorerPanel.runPremade):
+    the default window on the canvas's date field, then the report's own filters."""
+    from api import snapshot_explorer as se
+    from api.snapshot_catalog import load_catalog
+
+    catalog = load_catalog(organization_id=org_id)
+    enabled = set(catalog.get("portal_snapshots") or catalog["snapshots"])
+    anchored = data_as_of(org_id)
+    end = date.fromisoformat(anchored) if anchored else date.today()
+    jobs = []
+    for snapshot_id, snapshot in catalog["snapshots"].items():
+        reports = snapshot.get("premade_reports") or []
+        if snapshot_id not in enabled or not reports or (se._row_estimate(snapshot, org_id) or 0) < WARM_MIN_ROWS:
+            continue
+        field = snapshot.get("default_date_field") or ((snapshot.get("date_fields") or [{}])[0] or {}).get("id")
+        window = [{"field": field, "op": "between", "value": preset_range(snapshot.get("default_date_preset"), end)}] if field else []
+        body = se.QueryRequest(dimensions=reports[0]["dimensions"], measures=reports[0]["measures"],
+                               filters=window + list(reports[0].get("filters") or []), time_dimensions=[], limit=500)
+        jobs.append((f"report {snapshot_id}", lambda s=snapshot, b=body: se.cached_query(
+            org_id, s, b, [f.model_dump() for f in b.filters])))
+    return jobs
+
+
 def warm_once(org_id: str) -> list[str]:
     """What was built for this organization: nothing unless its stamp is new."""
     from api.snapshot_explorer import cached_home_summary, cached_workstream_summary
@@ -43,6 +74,10 @@ def warm_once(org_id: str) -> list[str]:
     jobs = [("home", lambda: cached_home_summary(org_id, 30, False, "prior_period", [], ["*"], {}, ()))]
     jobs += [(ws, lambda ws=ws: cached_workstream_summary(org_id, ws, 30, False, "prior_period", [], ()))
              for ws in _workstreams(org_id)]
+    try:
+        jobs += _opening_reports(org_id)
+    except Exception as exc:  # noqa: BLE001 -- the summaries are still worth building
+        log.warning("cache warm %s reports skipped: %s", org_id, exc)
     built = []
     for name, job in jobs:
         try:
