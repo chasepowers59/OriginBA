@@ -1,0 +1,1269 @@
+{
+ "business_processes": [],
+ "client": "originba",
+ "poc_enabled": [
+  "rpt_billed_charge"
+ ],
+ "portal_snapshots": [
+  "rpt_billed_charge"
+ ],
+ "report_library_packs": [],
+ "snapshots": {
+  "rpt_billed_charge": {
+   "aggregate": {
+    "build_column": "Canvas Build",
+    "count": "Record Count",
+    "date": "Bill Date",
+    "dimensions": [
+     "Customer Class",
+     "Budget Plan",
+     "Service Type",
+     "Is Frozen",
+     "Is Cancelled"
+    ],
+    "measures": {
+     "Billed Amount": "sum"
+    },
+    "table": "agg_billed_charge_daily"
+   },
+   "data_model": {
+    "columns_traced_to_cisadm": 53,
+    "domain_table": "rpt_billed_charge",
+    "driving_table": "CI_ACCT",
+    "field_groups": [
+     {
+      "fields": [
+       "Bill Segment ID",
+       "Calc Header Seq",
+       "Calc Line Seq",
+       "Bill ID",
+       "Bill Date",
+       "Bill Status",
+       "Bill Status Code",
+       "Account ID",
+       "Main Customer Name",
+       "Customer Class",
+       "Customer Class Code",
+       "Budget Plan",
+       "Budget Plan Code",
+       "Collection Class",
+       "Collection Class Code",
+       "Bill Cycle",
+       "Bill Cycle Code",
+       "Service Agreement ID",
+       "SA Type",
+       "SA Type Code",
+       "SA Special Role",
+       "SA Special Role Code",
+       "Is Revenue Bearing",
+       "SA Status",
+       "SA Status Code",
+       "Utility Type",
+       "Service Type",
+       "Service Type Code",
+       "Revenue Class",
+       "Revenue Class Code",
+       "Service Period Start",
+       "Service Period End",
+       "Due Date",
+       "Estimated Segment",
+       "Closing Segment",
+       "Rebill Segment ID",
+       "Cancel Reason Code",
+       "Canceled Segment ID",
+       "Window Start Date",
+       "Bill Segment Status",
+       "Bill Segment Status Code",
+       "Is Frozen",
+       "Is Cancelled",
+       "Premise ID",
+       "Premise Address",
+       "City",
+       "County",
+       "State",
+       "Postal Code",
+       "Premise Type",
+       "Premise Type Code",
+       "Service Point ID",
+       "Device ID",
+       "Meter Badge Number",
+       "Device Model",
+       "Rate Schedule Code",
+       "Rate Schedule",
+       "Calc Rule Code",
+       "Distribution Code",
+       "Charge Description",
+       "Charge Basis",
+       "Billed Amount",
+       "Base Amount",
+       "Exempt Amount",
+       "Billed Quantity (Per Rate Component)",
+       "Average Price Per Unit",
+       "Unit of Measure",
+       "Unit of Measure Code",
+       "Service Quantity Identifier",
+       "Service Quantity Identifier Code",
+       "Time of Use",
+       "Time of Use Code",
+       "Prints on Bill"
+      ],
+      "id": "billing",
+      "label": "Billing & Rates"
+     }
+    ],
+    "grain": "bill segment + calculation header sequence + calculation line sequence",
+    "grain_description": "One row per bill segment + calculation header sequence + calculation line sequence",
+    "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
+    "join_paths": [
+     {
+      "alias": "bl",
+      "join_type": "left join",
+      "on": "bl.bill_id = f.bill_id",
+      "role": "model",
+      "table": "dim_bill"
+     },
+     {
+      "alias": "bseg",
+      "join_type": "left join",
+      "on": "bseg.bseg_id = f.bseg_id",
+      "role": "model",
+      "table": "dim_bill_segment"
+     },
+     {
+      "alias": "dsp",
+      "join_type": "left join",
+      "on": "dsp.sp_id = f.sp_id",
+      "role": "model",
+      "table": "dim_service_point"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = f.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = f.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "dp",
+      "join_type": "left join",
+      "on": "dp.prem_id = f.prem_id",
+      "role": "model",
+      "table": "dim_premise"
+     },
+     {
+      "alias": "rs",
+      "join_type": "left join",
+      "on": "rs.rate_schedule_cd = f.rate_schedule_cd",
+      "role": "model",
+      "table": "dim_rate_schedule"
+     },
+     {
+      "alias": "uom",
+      "join_type": "left join",
+      "on": "uom.uom_cd = f.uom_cd",
+      "role": "model",
+      "table": "stg_uom_label"
+     },
+     {
+      "alias": "ucl",
+      "join_type": "left join",
+      "on": "ucl.uom_cd = f.uom_cd",
+      "role": "model",
+      "table": "uom_class"
+     },
+     {
+      "alias": "sqi",
+      "join_type": "left join",
+      "on": "sqi.sqi_cd = f.sqi_cd",
+      "role": "model",
+      "table": "stg_sqi_label"
+     },
+     {
+      "alias": "tou",
+      "join_type": "left join",
+      "on": "tou.tou_cd = f.tou_cd",
+      "role": "model",
+      "table": "stg_tou_label"
+     },
+     {
+      "alias": "bs",
+      "join_type": "left join",
+      "on": "bs.field_name='BILL_STAT_FLG' and bs.field_value = f.bill_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
+      "alias": "sg",
+      "join_type": "left join",
+      "on": "sg.field_name='BSEG_STAT_FLG' and sg.field_value = f.bseg_status_cd",
+      "role": "model",
+      "table": "stg_lookup_value"
+     }
+    ],
+    "population_filter": null,
+    "refresh_sql": "models/marts/reporting/rpt_billed_charge.sql",
+    "snapshot_table": "reporting.rpt_billed_charge",
+    "source_tables": [
+     "CI_ACCT",
+     "CI_BILL",
+     "CI_BILL_CYC_L",
+     "CI_BSEG",
+     "CI_BSEG_CALC",
+     "CI_BSEG_CALC_LN",
+     "CI_BUD_PLAN_L",
+     "CI_COLL_CL_L",
+     "CI_CUST_CL_L",
+     "CI_LOOKUP_VAL_L",
+     "CI_PREM",
+     "CI_PREM_TYPE_L",
+     "CI_REV_CL_L",
+     "CI_SA",
+     "CI_SA_TYPE",
+     "CI_SA_TYPE_L",
+     "CI_SQI_L",
+     "CI_SVC_TYPE_L",
+     "CI_TOU_L",
+     "CI_UOM_L"
+    ],
+    "trusted_measures": [
+     "Calc Header Seq",
+     "Calc Line Seq",
+     "Billed Amount",
+     "Base Amount",
+     "Exempt Amount"
+    ]
+   },
+   "date_fields": [
+    {
+     "id": "Bill Date",
+     "label": "Bill Date"
+    },
+    {
+     "id": "Service Period Start",
+     "label": "Service Period Start"
+    },
+    {
+     "id": "Service Period End",
+     "label": "Service Period End"
+    },
+    {
+     "id": "Due Date",
+     "label": "Due Date"
+    },
+    {
+     "id": "Window Start Date",
+     "label": "Window Start Date"
+    }
+   ],
+   "default_date_field": "Bill Date",
+   "default_date_preset": "last_12_months",
+   "dimensions": [
+    {
+     "id": "Bill Segment ID",
+     "label": "Bill Segment ID"
+    },
+    {
+     "id": "Bill ID",
+     "label": "Bill ID"
+    },
+    {
+     "id": "Bill Status",
+     "label": "Bill Status"
+    },
+    {
+     "id": "Bill Status Code",
+     "label": "Bill Status Code"
+    },
+    {
+     "id": "Account ID",
+     "label": "Account ID"
+    },
+    {
+     "id": "Main Customer Name",
+     "label": "Main Customer Name"
+    },
+    {
+     "id": "Customer Class",
+     "label": "Customer Class"
+    },
+    {
+     "id": "Customer Class Code",
+     "label": "Customer Class Code"
+    },
+    {
+     "id": "Budget Plan",
+     "label": "Budget Plan"
+    },
+    {
+     "id": "Budget Plan Code",
+     "label": "Budget Plan Code"
+    },
+    {
+     "id": "Collection Class",
+     "label": "Collection Class"
+    },
+    {
+     "id": "Collection Class Code",
+     "label": "Collection Class Code"
+    },
+    {
+     "id": "Bill Cycle",
+     "label": "Bill Cycle"
+    },
+    {
+     "id": "Bill Cycle Code",
+     "label": "Bill Cycle Code"
+    },
+    {
+     "id": "Service Agreement ID",
+     "label": "Service Agreement ID"
+    },
+    {
+     "id": "SA Type",
+     "label": "SA Type"
+    },
+    {
+     "id": "SA Type Code",
+     "label": "SA Type Code"
+    },
+    {
+     "id": "SA Special Role",
+     "label": "SA Special Role"
+    },
+    {
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code"
+    },
+    {
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing"
+    },
+    {
+     "id": "SA Status",
+     "label": "SA Status"
+    },
+    {
+     "id": "SA Status Code",
+     "label": "SA Status Code"
+    },
+    {
+     "id": "Utility Type",
+     "label": "Utility Type"
+    },
+    {
+     "id": "Service Type",
+     "label": "Service Type"
+    },
+    {
+     "id": "Service Type Code",
+     "label": "Service Type Code"
+    },
+    {
+     "id": "Revenue Class",
+     "label": "Revenue Class"
+    },
+    {
+     "id": "Revenue Class Code",
+     "label": "Revenue Class Code"
+    },
+    {
+     "id": "Estimated Segment",
+     "label": "Estimated Segment"
+    },
+    {
+     "id": "Closing Segment",
+     "label": "Closing Segment"
+    },
+    {
+     "id": "Rebill Segment ID",
+     "label": "Rebill Segment ID"
+    },
+    {
+     "id": "Cancel Reason Code",
+     "label": "Cancel Reason Code"
+    },
+    {
+     "id": "Canceled Segment ID",
+     "label": "Canceled Segment ID"
+    },
+    {
+     "id": "Bill Segment Status",
+     "label": "Bill Segment Status"
+    },
+    {
+     "id": "Bill Segment Status Code",
+     "label": "Bill Segment Status Code"
+    },
+    {
+     "id": "Is Frozen",
+     "label": "Is Frozen"
+    },
+    {
+     "id": "Is Cancelled",
+     "label": "Is Cancelled"
+    },
+    {
+     "id": "Premise ID",
+     "label": "Premise ID"
+    },
+    {
+     "id": "Premise Address",
+     "label": "Premise Address"
+    },
+    {
+     "id": "City",
+     "label": "City"
+    },
+    {
+     "id": "County",
+     "label": "County"
+    },
+    {
+     "id": "State",
+     "label": "State"
+    },
+    {
+     "id": "Postal Code",
+     "label": "Postal Code"
+    },
+    {
+     "id": "Premise Type",
+     "label": "Premise Type"
+    },
+    {
+     "id": "Premise Type Code",
+     "label": "Premise Type Code"
+    },
+    {
+     "id": "Service Point ID",
+     "label": "Service Point ID"
+    },
+    {
+     "id": "Device ID",
+     "label": "Device ID"
+    },
+    {
+     "id": "Meter Badge Number",
+     "label": "Meter Badge Number"
+    },
+    {
+     "id": "Device Model",
+     "label": "Device Model"
+    },
+    {
+     "id": "Rate Schedule Code",
+     "label": "Rate Schedule Code"
+    },
+    {
+     "id": "Rate Schedule",
+     "label": "Rate Schedule"
+    },
+    {
+     "id": "Calc Rule Code",
+     "label": "Calc Rule Code"
+    },
+    {
+     "id": "Distribution Code",
+     "label": "Distribution Code"
+    },
+    {
+     "id": "Charge Description",
+     "label": "Charge Description"
+    },
+    {
+     "id": "Charge Basis",
+     "label": "Charge Basis"
+    },
+    {
+     "id": "Unit of Measure",
+     "label": "Unit of Measure"
+    },
+    {
+     "id": "Unit of Measure Code",
+     "label": "Unit of Measure Code"
+    },
+    {
+     "id": "Service Quantity Identifier",
+     "label": "Service Quantity Identifier"
+    },
+    {
+     "id": "Service Quantity Identifier Code",
+     "label": "Service Quantity Identifier Code"
+    },
+    {
+     "id": "Time of Use",
+     "label": "Time of Use"
+    },
+    {
+     "id": "Time of Use Code",
+     "label": "Time of Use Code"
+    },
+    {
+     "id": "Prints on Bill",
+     "label": "Prints on Bill"
+    }
+   ],
+   "fields": [
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "billing",
+     "id": "Bill Segment ID",
+     "label": "Bill Segment ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Ordering sequence within its parent. Part of the grain, not a measure.",
+     "group": "billing",
+     "id": "Calc Header Seq",
+     "label": "Calc Header Seq",
+     "role": "measure",
+     "type": "numeric(3,0)"
+    },
+    {
+     "description": "Ordering sequence within its parent. Part of the grain, not a measure.",
+     "group": "billing",
+     "id": "Calc Line Seq",
+     "label": "Calc Line Seq",
+     "role": "measure",
+     "type": "numeric(5,0)"
+    },
+    {
+     "description": "The bill this row was processed on. For revenue attribution on cancellations use \"Owning Bill ID\" where the canvas offers it.",
+     "group": "billing",
+     "id": "Bill ID",
+     "label": "Bill ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
+     "group": "billing",
+     "id": "Bill Date",
+     "label": "Bill Date",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "English description of \"Bill Status Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "Bill Status",
+     "label": "Bill Status",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code, fixed by Oracle and the same at every utility. Paired with \"Bill Status\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "Bill Status Code",
+     "label": "Bill Status Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "billing",
+     "id": "Account ID",
+     "label": "Account ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Main Customer Name",
+     "label": "Main Customer Name",
+     "role": "dimension",
+     "type": "varchar(254)"
+    },
+    {
+     "description": "English description of \"Customer Class Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "Customer Class",
+     "label": "Customer Class",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Customer Class\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "Customer Class Code",
+     "label": "Customer Class Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Budget Plan Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "Budget Plan",
+     "label": "Budget Plan",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Budget Plan\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "Budget Plan Code",
+     "label": "Budget Plan Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Collection Class Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "Collection Class",
+     "label": "Collection Class",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Collection Class\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "Collection Class Code",
+     "label": "Collection Class Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Bill Cycle Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "Bill Cycle",
+     "label": "Bill Cycle",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Bill Cycle\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "Bill Cycle Code",
+     "label": "Bill Cycle Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "billing",
+     "id": "Service Agreement ID",
+     "label": "Service Agreement ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"SA Type Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "SA Type",
+     "label": "SA Type",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"SA Type\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "SA Type Code",
+     "label": "SA Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "The C2M special role of the SA type, decoded: Payment Arrangement, Cash Deposit, Write Off, Loan, Non-billed Budget, Billable Charge, Bill Determinants Required, Interval. Empty on ordinary fee and charge types. Filter on \"Is Revenue Bearing\"; use this to explain what came out and why.",
+     "group": "billing",
+     "id": "SA Special Role",
+     "label": "SA Special Role",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code behind \"SA Special Role\" (CI_SA_TYPE.SPECIAL_ROLE_FLG). Unlike \"SA Type Code\", the domain is fixed by C2M and is identical at every client, so a filter written on it ports between clients.",
+     "group": "billing",
+     "id": "SA Special Role Code",
+     "label": "SA Special Role Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "True when money on this service agreement is revenue EARNED. False for payment arrangements, cash deposits, write-offs, loans and non-billed budgets, where the money is existing debt being rescheduled, the customer's own refundable money, or revenue being removed. FILTER REVENUE REPORTING ON THIS: a payment arrangement counted as revenue books the bill it repays a second time. Derived from CI_SA_TYPE.SPECIAL_ROLE_FLG, whose domain is fixed by C2M.",
+     "group": "billing",
+     "id": "Is Revenue Bearing",
+     "label": "Is Revenue Bearing",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "English description of \"SA Status Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "SA Status",
+     "label": "SA Status",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code, fixed by Oracle and the same at every utility. Paired with \"SA Status\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "SA Status Code",
+     "label": "SA Status Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Which utility this service agreement is for, from C2M's own service type (CI_SA_TYPE.SVC_TYPE_CD). Payment arrangements, deposits, fees and write-offs are service type M and group under Other / Non-Utility. Was previously inferred from the SA type's English description, which read correctly at one client and misfiled sewer and stormwater at the others.",
+     "group": "billing",
+     "id": "Utility Type",
+     "label": "Utility Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "The client's label for the C2M service type -- Water, Waste Water, Storm Water, Electric, Gas, Telecom, Miscellaneous. Same information as \"Utility Type\", in the client's own wording rather than this project's rollup.",
+     "group": "billing",
+     "id": "Service Type",
+     "label": "Service Type",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product service type (W, WW, ST, E, G, T, M). The domain is fixed by C2M and identical at every client, unlike \"SA Type Code\", so a filter written on this one ports between clients.",
+     "group": "billing",
+     "id": "Service Type Code",
+     "label": "Service Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Revenue Class Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "Revenue Class",
+     "label": "Revenue Class",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Revenue Class\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "Revenue Class Code",
+     "label": "Revenue Class Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "",
+     "group": "billing",
+     "id": "Service Period Start",
+     "label": "Service Period Start",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "",
+     "group": "billing",
+     "id": "Service Period End",
+     "label": "Service Period End",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
+     "group": "billing",
+     "id": "Due Date",
+     "label": "Due Date",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "",
+     "group": "billing",
+     "id": "Estimated Segment",
+     "label": "Estimated Segment",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "",
+     "group": "billing",
+     "id": "Closing Segment",
+     "label": "Closing Segment",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "billing",
+     "id": "Rebill Segment ID",
+     "label": "Rebill Segment ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "group": "billing",
+     "id": "Cancel Reason Code",
+     "label": "Cancel Reason Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "billing",
+     "id": "Canceled Segment ID",
+     "label": "Canceled Segment ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
+     "group": "billing",
+     "id": "Window Start Date",
+     "label": "Window Start Date",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "English description of \"Bill Segment Status Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "Bill Segment Status",
+     "label": "Bill Segment Status",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Base-product code, fixed by Oracle and the same at every utility. Paired with \"Bill Segment Status\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "Bill Segment Status Code",
+     "label": "Bill Segment Status Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Flag. Filter on it; do not sum it.",
+     "group": "billing",
+     "id": "Is Frozen",
+     "label": "Is Frozen",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "Flag. Filter on it; do not sum it.",
+     "group": "billing",
+     "id": "Is Cancelled",
+     "label": "Is Cancelled",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "billing",
+     "id": "Premise ID",
+     "label": "Premise ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Address component, as held in C2M. Not validated or standardised here.",
+     "group": "billing",
+     "id": "Premise Address",
+     "label": "Premise Address",
+     "role": "dimension",
+     "type": "varchar(254)"
+    },
+    {
+     "description": "Address component, as held in C2M. Not validated or standardised here.",
+     "group": "billing",
+     "id": "City",
+     "label": "City",
+     "role": "dimension",
+     "type": "varchar(90)"
+    },
+    {
+     "description": "Address component, as held in C2M. Not validated or standardised here.",
+     "group": "billing",
+     "id": "County",
+     "label": "County",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Address component, as held in C2M. Not validated or standardised here.",
+     "group": "billing",
+     "id": "State",
+     "label": "State",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "group": "billing",
+     "id": "Postal Code",
+     "label": "Postal Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Premise Type Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "Premise Type",
+     "label": "Premise Type",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Premise Type\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "Premise Type Code",
+     "label": "Premise Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "billing",
+     "id": "Service Point ID",
+     "label": "Service Point ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "billing",
+     "id": "Device ID",
+     "label": "Device ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "The badge stamped on the physical unit. This is what a field crew and a customer read off it; the internal id is not visible in the field.",
+     "group": "billing",
+     "id": "Meter Badge Number",
+     "label": "Meter Badge Number",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "",
+     "group": "billing",
+     "id": "Device Model",
+     "label": "Device Model",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Rate Schedule\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "Rate Schedule Code",
+     "label": "Rate Schedule Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Rate Schedule Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "Rate Schedule",
+     "label": "Rate Schedule",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "group": "billing",
+     "id": "Calc Rule Code",
+     "label": "Calc Rule Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "group": "billing",
+     "id": "Distribution Code",
+     "label": "Distribution Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Charge Description",
+     "label": "Charge Description",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "How this line was priced: Service Quantity (has an SQI -- days, tiers, ERUs), Consumption / Demand (bare unit, classified by the uom_class seed), Flat (neither), Unclassified Unit (unit the seed does not know). Structural -- never a test on a client-configured code value.",
+     "group": "billing",
+     "id": "Charge Basis",
+     "label": "Charge Basis",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "What the segment billed: the sum of its calculation HEADERS (CI_BSEG_CALC.CALC_AMT). Not the calc lines: lines are itemisation and some clients itemise selectively (Newark: most headers carry no lines), so a line sum undercounts there. See \"Itemized Charge Amount\" for what the lines cover.",
+     "group": "billing",
+     "id": "Billed Amount",
+     "label": "Billed Amount",
+     "role": "measure",
+     "type": "numeric(15,2)"
+    },
+    {
+     "description": "Currency measure, additive at this canvas's grain.",
+     "group": "billing",
+     "id": "Base Amount",
+     "label": "Base Amount",
+     "role": "measure",
+     "type": "numeric(15,2)"
+    },
+    {
+     "description": "Currency measure, additive at this canvas's grain.",
+     "group": "billing",
+     "id": "Exempt Amount",
+     "label": "Exempt Amount",
+     "role": "measure",
+     "type": "numeric(15,2)"
+    },
+    {
+     "description": "NOT ADDITIVE. The quantity billed by ONE rate component. Several components can bill the same quantity, so summing this overstates usage -- measured against CI_BSEG_SQ it agrees for only 66% of segments, overstating by up to 3.75x. To total usage, use \"Billed Usage\" on rpt_billed_usage or rpt_bill_segment.",
+     "group": "billing",
+     "id": "Billed Quantity (Per Rate Component)",
+     "label": "Billed Quantity (Per Rate Component)",
+     "role": "measure",
+     "type": "numeric"
+    },
+    {
+     "description": "On rpt_bill_segment: Consumption Charge Amount / Billed Usage -- the unit price of METERED CONSUMPTION only, because dividing the full billed amount by usage overstates the price by the daily, service-quantity and flat charges (60% of ellensburg revenue). On rpt_billed_charge: this line's amount over this line's quantity. Null unless the quantity is a single unit of measure.",
+     "group": "billing",
+     "id": "Average Price Per Unit",
+     "label": "Average Price Per Unit",
+     "role": "measure",
+     "type": "numeric"
+    },
+    {
+     "description": "English description of \"Unit of Measure Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "Unit of Measure",
+     "label": "Unit of Measure",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Unit of Measure\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "Unit of Measure Code",
+     "label": "Unit of Measure Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Service Quantity Identifier Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "Service Quantity Identifier",
+     "label": "Service Quantity Identifier",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Service Quantity Identifier\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "Service Quantity Identifier Code",
+     "label": "Service Quantity Identifier Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Time of Use Code\". Group and report on this; filter on the code.",
+     "group": "billing",
+     "id": "Time of Use",
+     "label": "Time of Use",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Time of Use\" for the description: report on the description, filter on the code.",
+     "group": "billing",
+     "id": "Time of Use Code",
+     "label": "Time of Use Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "",
+     "group": "billing",
+     "id": "Prints on Bill",
+     "label": "Prints on Bill",
+     "role": "dimension",
+     "type": "boolean"
+    }
+   ],
+   "grain": "bill segment + calculation header sequence + calculation line sequence",
+   "grain_description": "One row per bill segment + calculation header sequence + calculation line sequence",
+   "label": "Billed Charge",
+   "large_domain": false,
+   "max_rows": 500,
+   "measures": [
+    {
+     "aggs": [
+      "count"
+     ],
+     "id": "*",
+     "label": "Number of records"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Calc Header Seq",
+     "label": "Calc Header Seq"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Calc Line Seq",
+     "label": "Calc Line Seq"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Billed Amount",
+     "label": "Billed Amount"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Base Amount",
+     "label": "Base Amount"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Exempt Amount",
+     "label": "Exempt Amount"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Billed Quantity (Per Rate Component)",
+     "label": "Billed Quantity (Per Rate Component)"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Average Price Per Unit",
+     "label": "Average Price Per Unit"
+    }
+   ],
+   "poc_enabled": true,
+   "portal_enabled": true,
+   "premade_reports": [
+    {
+     "chart_type": "horizontal",
+     "description": "The charge-line view of billed dollars \u2014 the level rate analysts reconcile at.",
+     "dimensions": [
+      "Customer Class"
+     ],
+     "filters": [],
+     "id": "billed_by_class_calc_lines",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Billed Amount"
+      }
+     ],
+     "title": "What was billed, by customer class (charge lines)?",
+     "workstream_label": "Billing"
+    },
+    {
+     "chart_type": "bar",
+     "description": "Budget billing shifts cash timing; the split shows how much revenue rides on it.",
+     "dimensions": [
+      "Budget Plan"
+     ],
+     "filters": [],
+     "id": "billed_by_budget_plan",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Billed Amount"
+      }
+     ],
+     "title": "How much was billed under each budget plan?",
+     "workstream_label": "Billing"
+    }
+   ],
+   "related_snapshot": null,
+   "schema": "reporting",
+   "scope_filters": [],
+   "skip_sample_rows": false,
+   "summary": "Billed charges at calc-line grain.",
+   "table_name": "rpt_billed_charge",
+   "trusted_measures": [
+    "Calc Header Seq",
+    "Calc Line Seq",
+    "Billed Amount",
+    "Base Amount",
+    "Exempt Amount"
+   ],
+   "usage_guidance": null,
+   "use_case": "Line-by-line billed amounts: exactly which rate components produced each charge. Use it for dollars, not for usage.",
+   "workstream": "billing",
+   "workstream_label": "Billing & Rates"
+  }
+ },
+ "source": "dbt reporting layer",
+ "workstream_featured": {
+  "billing": [
+   "rpt_billed_charge"
+  ]
+ },
+ "workstream_labels": {
+  "assets": "Asset Operations",
+  "billing": "Billing & Rates",
+  "cashiering": "Cashiering & Payments",
+  "common": "Operations & Shared Services",
+  "customer_ops": "Customer Operations",
+  "debt": "Collections & Debt",
+  "field_ops": "Field Operations",
+  "finance": "Finance",
+  "meter_ops": "Meter Operations",
+  "new_services": "New Services"
+ },
+ "workstream_order": [
+  "billing",
+  "finance",
+  "cashiering",
+  "debt",
+  "customer_ops",
+  "meter_ops",
+  "assets",
+  "field_ops",
+  "common"
+ ]
+}

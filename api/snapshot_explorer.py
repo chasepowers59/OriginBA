@@ -723,36 +723,45 @@ def snapshot_raw_sql(
 
 
 def cached_query(org_id: str, snapshot: dict[str, Any], body: QueryRequest,
-                 filters: list[dict[str, Any]]) -> tuple[str, list[str], list]:
-    """The governed statement for this request and its rows. The same statement for the same
-    org is answered from memory until the warehouse is rebuilt: a report over Ellensburg's
-    rpt_billed_charge took ~25 s. api/cache_warmer.py runs the same path."""
+                 filters: list[dict[str, Any]]) -> tuple[str, list[str], list, str]:
+    """The governed statement for this request, its columns and rows, and the table that
+    answered: the canvas, or its pre-aggregate when api/aggregate_routing.py proves the answer
+    is the canvas's. The same request for the same org is answered from memory until the
+    warehouse is rebuilt: a report over Ellensburg's rpt_billed_charge took ~25 s.
+    api/cache_warmer.py runs the same path."""
     # The ORG decides the backend and dialect: the same canvas runs in Postgres for a
     # CDC-fed tenant and in the client's own Oracle instance for an in-database one, with
     # quoted Title Case columns identical in both.
     backend, dialect, schema = snapshot_backend(snapshot, org_id)
+    request = {"dimensions": body.dimensions, "measures": [m.model_dump() for m in body.measures],
+               "filters": filters, "time_dimensions": [t.model_dump() for t in body.time_dimensions],
+               "limit": min(body.limit, snapshot.get("max_rows", 500))}
+    # Always built, so a request the canvas refuses is refused whichever table would answer it.
     sql, binds = build_query(
         table_name=snapshot["table_name"],
         allowed_fields=allowed_fields(snapshot),
         trusted_measures=set(snapshot.get("trusted_measures", [])),
-        dimensions=body.dimensions,
-        measures=[m.model_dump() for m in body.measures],
-        filters=filters,
-        limit=min(body.limit, snapshot.get("max_rows", 500)),
-        time_dimensions=[t.model_dump() for t in body.time_dimensions],
         dialect=dialect,
         schema=schema,
+        **request,
     )
 
-    def run() -> tuple[list[str], list]:
+    def run() -> tuple[str, list[str], list, str]:
+        # Routing is decided on a miss: it reads the aggregate's build once per miss, and the
+        # answer is the canvas's either way, so the canvas statement stays the key.
+        from api.aggregate_routing import routed_query
+        statement, statement_binds, served_from = (
+            routed_query(org_id, snapshot, dialect=dialect, schema=schema, **request)
+            or (sql, binds, snapshot["table_name"]))
         if backend == "postgres":
             from api.warehouse_db import execute_query as run_warehouse
-            return run_warehouse(sql, binds, organization_id=org_id, max_rows=body.limit)
-        return execute_query(sql, binds, organization_id=org_id, max_rows=body.limit)
+            columns, rows = run_warehouse(statement, statement_binds, organization_id=org_id, max_rows=body.limit)
+        else:
+            columns, rows = execute_query(statement, statement_binds, organization_id=org_id, max_rows=body.limit)
+        return statement, columns, rows, served_from
 
-    columns, rows = cached(("query", org_id, backend, sql, repr(sorted(binds.items())), body.limit),
-                           run, keep=lambda _: True, version=data_version(org_id))
-    return sql, columns, rows
+    return cached(("query", org_id, backend, sql, repr(sorted(binds.items())), body.limit),
+                  run, keep=lambda _: True, version=data_version(org_id))
 
 
 @router.post("/{snapshot_id}/query")
@@ -794,7 +803,7 @@ def snapshot_query(
     filters = filters + enforce_row_rules(ctx, snapshot)
 
     try:
-        sql, columns, rows = cached_query(org_id, snapshot, body, filters)
+        sql, columns, rows, served_from = cached_query(org_id, snapshot, body, filters)
     except QueryValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
@@ -829,4 +838,6 @@ def snapshot_query(
         # None when the caller set their own filters: only a window WE chose is ours to
         # announce, and labelling the caller's own range as a default would misreport it.
         "applied_window": applied_window,
+        # the canvas, or its pre-aggregate when that provably gives the same answer
+        "served_from": served_from,
     }
