@@ -140,10 +140,32 @@ def groups_claim_name() -> str:
     return (os.environ.get("OIDC_GROUPS_CLAIM") or "groups").strip()
 
 
+def _merged_rules(declared: list[list[dict[str, Any]]]) -> list[dict[str, Any]]:
+    """Several groups' row rules as one person's. Each group grants its own rows, so the person
+    sees their union: ANDing them gave Water AND Sewer, which is no rows. A group declaring none
+    lifts the limit. The union is a set of IN filters only when the groups agree on every field
+    but one, whose values then join; otherwise (Water from one group, cycle A from another)
+    merging field by field would widen and ANDing would narrow, so it is refused."""
+    if not all(declared):
+        return []
+    if len(declared) == 1:
+        return declared[0]
+    shapes = [{r["field"]: set(r["values"]) for r in rules} for rules in declared]
+    differ = {f for shape in shapes for f in shapes[0] if shape.get(f) != shapes[0][f]}
+    # a field named twice in one group is that group's own AND, which a merge cannot keep
+    if len(differ) > 1 or any(shape.keys() != shapes[0].keys() or len(shape) != len(rules)
+                              for shape, rules in zip(shapes, declared)):
+        raise SsoAccessError("Your sign-in groups limit your data in ways the portal cannot combine. "
+                             "Ask your administrator to limit your groups on the same field.")
+    joined = [v for rules in declared for r in rules if r["field"] in differ for v in r["values"]]
+    return [{**r, "values": list(dict.fromkeys(joined))} if r["field"] in differ else r for r in declared[0]]
+
+
 def mapped_access(claims: dict[str, Any], mapping: list[dict[str, Any]], claim: str) -> dict[str, Any]:
     """The access a person's groups give: the highest role among matching rules (admin never
-    granted), their one organization, and the union of access groups and row rules. Row rules
-    are None when no matching group at that role declares any."""
+    granted), their one organization, the union of access groups, and the row rules of the
+    groups at that role merged (_merged_rules). Row rules are None when no matching group at
+    that role declares any."""
     raw = claims.get(claim) or []
     if isinstance(raw, str):
         groups = {raw}
@@ -165,10 +187,11 @@ def mapped_access(claims: dict[str, Any], mapping: list[dict[str, Any]], claim: 
     rules = None
     if any("row_rules" in r for r in at_best):
         try:
-            rules = clean_rules([rule for r in at_best for rule in (r.get("row_rules") or [])])
+            declared = [clean_rules(r["row_rules"]) for r in at_best if "row_rules" in r]
         except ValueError as exc:
             raise SsoAccessError("The portal's sign-in group map has a row rule it cannot apply. "
                                  "Ask your administrator to correct it.") from exc
+        rules = _merged_rules(declared)
     return {"role": best["role"], "organization_id": next(iter(orgs), None),
             "access_groups": sorted({g for r in matched for g in (r.get("access_groups") or [])}),
             "row_rules": rules}
