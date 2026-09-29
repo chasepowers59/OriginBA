@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { shelfDimensions } from "./builderShelves";
+import { fieldGlyph, shelfDimensions } from "./builderShelves";
 
 /**
  * Dragging a date onto the Columns shelf used to WIPE every other column: the
@@ -56,5 +56,15 @@ describe("shelfDimensions", () => {
 
   it("handles an empty shelf", () => {
     expect(shelfDimensions([])).toEqual({ dimensions: [], timeDimensions: [] });
+  });
+});
+
+describe("the type chip on a field", () => {
+  it("marks a flag as true/false, not text (the design review read Is Frozen as Abc)", () => {
+    expect(fieldGlyph({ role: "dimension", type: "boolean" })).toBe("T/F");
+    expect(fieldGlyph({ role: "dimension", type: "text" })).toBe("Abc");
+    expect(fieldGlyph({ role: "measure", type: "numeric(17,2)" })).toBe("#");
+    expect(fieldGlyph({ role: "date", type: "timestamp" })).toBe("YMD");
+    expect(fieldGlyph({ role: "other", type: "text" })).toBe("?");
   });
 });

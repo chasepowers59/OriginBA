@@ -27,3 +27,13 @@ export function shelfDimensions(cols: ShelfColumn[]): {
       .map((c) => ({ field: c.field, grain: c.grain ?? "month" })),
   };
 }
+
+// Text glyphs, not emoji: a colour emoji ignores the badge colour and is illegible at 9px.
+const ROLE_GLYPH: Record<string, string> = { dimension: "Abc", measure: "#", date: "YMD" };
+
+/** The type chip on a field. A flag is a dimension, but reading "Abc" beside Is Frozen
+ *  says it holds words; it holds true or false. */
+export function fieldGlyph(field: { role: string; type: string }): string {
+  if (field.type === "boolean") return "T/F";
+  return ROLE_GLYPH[field.role] ?? "?";
+}

@@ -1,12 +1,9 @@
 "use client";
 
 import { useDraggable } from "@dnd-kit/core";
+import { fieldGlyph } from "@/lib/builderShelves";
 import type { FieldDef } from "@/lib/types";
 
-// Text glyphs, not emoji. A colour emoji renders in its own palette and ignores the
-// badge colour, so 📅 sat beside "Abc" and "#" in a different hue and stayed illegible
-// at 9px — and the app's marker convention is typographic/geometric throughout.
-const ROLE_GLYPH: Record<string, string> = { dimension: "Abc", measure: "#", date: "YMD" };
 /**
  * One readable tone, not three series colours. The glyph already says the role
  * unambiguously, and the palette has no third hue that is BOTH legible as 9px text and
@@ -33,7 +30,7 @@ function PillFace({ field, trusted }: { field: FieldDef; trusted?: boolean }) {
         className="grid h-4 w-5 shrink-0 place-items-center rounded text-[9px] font-bold"
         style={{ background: `color-mix(in srgb, ${tone} 20%, transparent)`, color: tone }}
       >
-        {ROLE_GLYPH[field.role] ?? "?"}
+        {fieldGlyph(field)}
       </span>
       <span className="truncate">{field.label}</span>
       {trusted ? (
