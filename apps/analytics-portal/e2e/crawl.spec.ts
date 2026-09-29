@@ -37,11 +37,12 @@ const BROKEN_TEXT = /\bNaN\b|\bundefined\b|\[object Object\]|\bInfinity\b/;
 type Findings = {
   org: string; route: string; viewport: string; ms: number;
   consoleErrors: string[]; failedRequests: string[]; brokenText: string[];
-  horizontalOverflow: number; headerOverlaps: string[]; clipped: string[]; unlabelled: string[]; emptyStates: string[];
+  horizontalOverflow: number; widestElement: string; headerOverlaps: string[]; clipped: string[]; unlabelled: string[]; emptyStates: string[];
 };
 
 async function audit(page: Page) {
-  return page.evaluate(() => {
+  const viewportWidth = page.viewportSize()!.width;
+  return page.evaluate((viewportWidth) => {
     const vis = (el: Element) => {
       const r = el.getBoundingClientRect();
       const s = getComputedStyle(el);
@@ -83,18 +84,43 @@ async function audit(page: Page) {
       const y = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top);
       if (x > 2 && y > 2) headerOverlaps.push(`${label(a.el) || a.el.getAttribute("aria-label")} / ${label(b.el) || b.el.getAttribute("aria-label")}`);
     }
+    // Sideways overflow is the widest element's right edge past the viewport, not
+    // documentElement.scrollWidth - innerWidth: on a phone the browser widens innerWidth to
+    // fit the content, and a clipping ancestor hides it from scrollWidth, so a 347 px
+    // explorer page at 320 measured 0. Skipped: content inside its own horizontal scroller
+    // (reachable), anything wholly off-screen (a closed drawer), and empty decoration (the
+    // home hero's blurred glow hangs 55 px past its clipping panel by design).
+    const MEDIA = "img,svg,canvas,video,input,select,textarea,button";
+    const hasContent = (el: Element) => Boolean(label(el)) || el.matches(MEDIA) || Boolean(el.querySelector(MEDIA));
+    const inScroller = (el: Element) => {
+      for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+        if (["auto", "scroll"].includes(getComputedStyle(p).overflowX)) return true;
+      }
+      return false;
+    };
+    let widestRight = 0;
+    let widestElement = "";
+    for (const el of Array.from(document.querySelectorAll("body *"))) {
+      if (!vis(el)) continue;
+      const r = el.getBoundingClientRect();
+      if (r.right <= widestRight || r.left >= viewportWidth || r.right <= 0) continue;
+      if (!hasContent(el) || inScroller(el)) continue;
+      widestRight = r.right;
+      widestElement = `${el.tagName.toLowerCase()}: ${label(el)}`;
+    }
     const text = document.body.innerText;
     const emptyStates = (text.match(/^.*\b(no data|no rows|nothing to show|no results|not available|could not|failed|error)\b.*$/gim) ?? [])
       .map((l) => l.trim()).slice(0, 12);
     return {
-      overflow: document.documentElement.scrollWidth - window.innerWidth,
+      overflow: Math.ceil(widestRight) - viewportWidth,
+      widestElement,
       clipped: clipped.slice(0, 20),
       unlabelled: Array.from(new Set(unlabelled)).slice(0, 20),
       emptyStates,
       headerOverlaps,
       text,
     };
-  });
+  }, viewportWidth);
 }
 
 for (const org of ORGS) {
@@ -122,7 +148,7 @@ for (const org of ORGS) {
         const f: Findings = {
           org, route, viewport: info.project.name, ms,
           consoleErrors, failedRequests, brokenText: broken,
-          horizontalOverflow: a.overflow, headerOverlaps: a.headerOverlaps, clipped: a.clipped, unlabelled: a.unlabelled, emptyStates: a.emptyStates,
+          horizontalOverflow: a.overflow, widestElement: a.widestElement, headerOverlaps: a.headerOverlaps, clipped: a.clipped, unlabelled: a.unlabelled, emptyStates: a.emptyStates,
         };
         const slug = route === "/" ? "home" : route.slice(1).replace(/\//g, "__");
         const dir = path.join(OUT, "crawl", info.project.name, org);

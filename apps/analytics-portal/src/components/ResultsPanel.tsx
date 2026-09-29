@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { QueryResponse } from "@/lib/types";
 import {
   formatBoolean,
@@ -23,6 +23,7 @@ import { useBrand } from "@/components/PortalThemeProvider";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
 import { downloadPdf } from "@/lib/api";
 import { isMeasureColumn, summarizeResult } from "@/lib/resultSummary";
+import { POPOVER_PANEL, menuFocusIndex, usePopover } from "@/lib/popover";
 
 type SortDir = "asc" | "desc";
 
@@ -236,7 +237,7 @@ export function ResultsPanel({
       </div>
 
       <div className="no-print flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <h3 className="text-lg font-semibold text-heading">
             {reportTitle ?? "Analysis results"}
           </h3>
@@ -247,30 +248,36 @@ export function ResultsPanel({
           </p>
           <AppliedWindowNote result={result} />
         </div>
-        <div className="flex gap-2">
+        {/* relative: below sm a toolbar popup spans this row, not its button. */}
+        <div className="relative flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))}
-            className="btn-ghost"
+            className="btn-ghost whitespace-nowrap"
           >
             Sort {sortDir === "desc" ? "high → low" : "low → high"}
           </button>
-          <button type="button" onClick={handleExport} className="btn-ghost">
-            Export to Excel
-          </button>
-          <button type="button" onClick={() => void handlePdf()} className="btn-ghost" disabled={pdfState === "Preparing…"}
-                  title={pdfState && pdfState !== "Preparing…" ? pdfState : "A formatted PDF: table, chart and page numbers"}>
-            {pdfState === "Preparing…" ? "Preparing PDF…" : "Download PDF"}
-          </button>
-          <button
-            type="button"
-            onClick={() => printCouncilPack(reportTitle ?? snapshotLabel ?? snapshotId)}
-            className="btn-primary"
-          >
-            Council pack (PDF)
-          </button>
+          <ExportMenu
+            items={[
+              { label: "Excel workbook", onSelect: handleExport },
+              {
+                label: pdfState === "Preparing…" ? "Preparing PDF…" : "Download PDF",
+                onSelect: () => void handlePdf(),
+                disabled: pdfState === "Preparing…",
+              },
+              {
+                label: "Council pack (PDF)",
+                onSelect: () => printCouncilPack(reportTitle ?? snapshotLabel ?? snapshotId),
+              },
+            ]}
+          />
         </div>
       </div>
+      {pdfState ? (
+        <p role="status" className="no-print text-xs text-fg-muted">
+          {pdfState === "Preparing…" ? "Preparing the PDF…" : pdfState}
+        </p>
+      ) : null}
 
       {onDrillSelect && !drillFilter ? (
         <p className="no-print text-xs text-fg-muted">
@@ -376,6 +383,68 @@ export function ResultsPanel({
           {result.sql}
         </pre>
       </details>
+    </div>
+  );
+}
+
+type ExportItem = { label: string; onSelect: () => void; disabled?: boolean };
+
+function ExportMenu({ items }: { items: ExportItem[] }) {
+  const { open, setOpen, rootRef, triggerRef } = usePopover();
+  const menuId = useId();
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  useEffect(() => {
+    if (open) itemRefs.current[0]?.focus();
+  }, [open]);
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Tab") {
+      setOpen(false);
+      return;
+    }
+    const current = itemRefs.current.findIndex((el) => el === document.activeElement);
+    const next = menuFocusIndex(e.key, current, items.length);
+    if (next == null) return;
+    e.preventDefault();
+    itemRefs.current[next]?.focus();
+  };
+
+  return (
+    <div ref={rootRef} className="sm:relative">
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="btn-ghost whitespace-nowrap"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-controls={open ? menuId : undefined}
+      >
+        Export <span aria-hidden="true">▾</span>
+      </button>
+      {open ? (
+        <div id={menuId} role="menu" aria-label="Export" onKeyDown={onKeyDown} className={`${POPOVER_PANEL} sm:w-56`}>
+          {items.map((item, i) => (
+            <button
+              key={i}
+              ref={(el) => {
+                itemRefs.current[i] = el;
+              }}
+              type="button"
+              role="menuitem"
+              disabled={item.disabled}
+              onClick={() => {
+                setOpen(false);
+                item.onSelect();
+              }}
+              className="block w-full rounded-lg px-3 py-2 text-left text-sm text-heading hover:bg-chip disabled:opacity-60"
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
