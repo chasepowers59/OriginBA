@@ -1,10 +1,11 @@
 import { test, expect, type Page } from "@playwright/test";
+import { asOrg } from "./org";
 
 /**
  * Ori's read on home: the brief, what is worth investigating (large moves in the home cards and
  * unusual months), and where each card is heading, each with a one-click question to Ori. Both
  * responses are stubbed so the test does not depend on Ellensburg's data moving this month (the
- * rules are pinned in tests/test_ori_insights.py).
+ * rules are pinned in tests/test_ori_insights.py and tests/test_ori_trends.py).
  */
 const FINDING = {
   kpi_id: "billed_revenue", change_pct: -17.9,
@@ -47,7 +48,7 @@ async function stubOri(page: Page, read: object, trends: object) {
 }
 
 test.beforeEach(async ({ context }, info) => {
-  await context.addCookies([{ name: "portal_active_organization", value: "ellensburg", url: info.project.use.baseURL! }]);
+  await asOrg(context, info);
 });
 
 test("home shows Ori's read and hands a finding's question to Ori", async ({ page }) => {
