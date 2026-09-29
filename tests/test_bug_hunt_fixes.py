@@ -10,6 +10,7 @@ pinned by the reproduction that found it.
 - B-4: the alert list shows only alerts on views the caller can see and canvases they may open.
 - B-8: the warmer thread survives any error in one organization's pass.
 - B-9: a warm pass that failed is retried on the next pass, not after the next rebuild.
+- B-13: the saved-view list keeps to the canvases the caller's workstreams reach.
 """
 from __future__ import annotations
 
@@ -170,6 +171,19 @@ class AlertListTests(unittest.TestCase):
                         side_effect=lambda sid, org=None: "debt" if "aged" in sid else "billing"):
             ids = [a["id"] for a in kr.get_alerts(ctx=_ctx("bob", workstreams=["billing"]))["alerts"]]
         self.assertEqual(ids, ["a1", "a4"])
+
+
+class SavedViewListTests(unittest.TestCase):
+    """B-13: the saved-view list keeps to the canvases the caller's workstreams reach."""
+
+    def test_b13_views_on_ungranted_canvases_are_not_listed(self):
+        views = [{"id": "v1", "snapshot_id": "rpt_bill_segment", "visibility": "organization"},
+                 {"id": "v2", "snapshot_id": "rpt_sa_aged_balance", "visibility": "organization"}]
+        with mock.patch.object(pr, "list_saved_views", return_value=views), \
+             mock.patch("api.auth.workstream_access.snapshot_workstream",
+                        side_effect=lambda sid, org=None: "debt" if "aged" in sid else "billing"):
+            out = pr.get_saved_views(ctx=_ctx("bob", workstreams=["billing"]))
+        self.assertEqual([v["id"] for v in out["views"]], ["v1"])
 
 
 class WarmerTests(unittest.TestCase):

@@ -26,6 +26,7 @@ from api.saved_dashboards import (
     update_dashboard,
 )
 from api.row_security import only_readable
+from api.auth import workstream_access as _workstream_access
 from api.ownership import VISIBILITIES, can_edit, for_caller, require_edit, stamp, visible
 from api.saved_views import (
     update_saved_view,
@@ -145,7 +146,9 @@ def get_saved_views(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, A
     return {
         "client_id": org_id,
         "organization_id": org_id,
-        "views": for_caller(list_saved_views(org_id), ctx),
+        # only views on canvases this person's workstreams reach (B-13)
+        "views": for_caller([v for v in list_saved_views(org_id)
+                             if _workstream_access.can_access_snapshot(ctx, v["snapshot_id"])], ctx),
     }
 
 
