@@ -20,6 +20,8 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-29 | Ori's vetted answers with a breakdown reported their largest group as the total (Ellensburg customer contacts 1,345 vs the card's 3,148; new service agreements, collection processes, field activities too); field activities and bills completed windowed on columns the cards refuse (647 vs 1,573) | e1946f14 | tests/test_vetted_totals.py, tests/test_kpi_window_fields.py |
+| 2026-09-29 | Home and Cashiering Payments, and Field activities, drew "Nothing to compare: one group" on Ellensburg: a breakdown by the lensed/pinned status, or by a column with one value | 28d19869 | tests/test_kpi_breakdowns.py |
 | 2026-09-29 | Explorer: the results table and a tall bar chart scroll with no keyboard access (axe scrollable-region-focusable, serious); only Ellensburg's volumes scroll, so demo25 never showed it | 381079bf | e2e/a11y.spec.ts (Ellensburg, both themes) |
 | 2026-09-29 | Letters: X-Letter-Font headers not exposed through CORS; the frontend cannot read them | 2589495c | tests/test_letters_routes.py |
 | 2026-09-29 | The frontend skill still describes long axis labels as skipped ticks (preserveStartEnd); since 552cde49 that applies only to date/ordered axes | 2823f081 | skill text |
