@@ -19,7 +19,7 @@ const BRIEF =
 
 const ANOMALY = {
   kpi_id: "billed_revenue", month: "2026-05", direction: "low",
-  headline: "Billed revenue for May 2026 was unusually low",
+  headline: "Billed revenue for May 2026: unusually low",
   detail: "$1,212,408.55, below every one of the 12 months before ($2,904,117.20 to $3,611,845.02; typical $3,240,560.18).",
   question: "Why was billed revenue so low in May 2026? What changed from the months before?",
 };

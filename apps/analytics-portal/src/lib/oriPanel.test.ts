@@ -11,7 +11,7 @@ const FINDING: OriFinding = {
 
 const ANOMALY: OriAnomaly = {
   kpi_id: "billed_revenue", month: "2026-05", direction: "low",
-  headline: "Billed revenue for May 2026 was unusually low",
+  headline: "Billed revenue for May 2026: unusually low",
   detail: "$1,212,408.55, below every one of the 12 months before.",
   question: "Why was billed revenue so low in May 2026?",
 };
