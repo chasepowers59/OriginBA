@@ -17,28 +17,33 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 | 2026-09-29 | One thing, eight names (report, canvas, reporting table, domain, data model, pack, workstream, process); nav "Explore" opens the builder; two library taxonomies with different counts | Nav, library, workstreams | UI-4: DECISION: one glossary and one grouping |
 | 2026-09-29 | Engineering text on business screens: "contracted models", "0 tokens", "Trusted data domain", table names, "UOM", Fernet / PORTAL_SETTINGS_TOKEN | Footer, home, explorer header, settings | UI-5: plain-language copy; lineage behind the IT-review disclosure |
 | 2026-09-29 | Explorer overflows at 320 px: the export row does not wrap (page 347 px wide); the crawl's overflow check misses it | Any /explore at small-phone | UI-6: wrap + one Export menu; crawl measures the widest element |
-| 2026-09-29 | KPI spark charts: 8.5 px labels, second line clipped, overlaps at 320 px | Home, workstreams | UI-7: taller axis, 10-11 px, horizontal bars above 5 categories |
-| 2026-09-29 | Explorer charts hide half their labels; 15-character cut makes look-alike labels | Explorer charts with >6 categories | UI-8: horizontal layout above 6 categories |
 | 2026-09-29 | Detail tables: amounts left-aligned, "Total Total Balance", invisible row hover in light theme | Explorer detail table | UI-9: right-aligned tabular numbers, no duplicate prefix, token hover |
 | 2026-09-29 | Explorer: results buried under a 3,300 px list of report cards below 1280 px; Save/Pin at the bottom of the rail | Explorer at laptop width | UI-10: titles-only rail, results first when stacked, save in the result toolbar |
-| 2026-09-29 | Data quality: every row shows a green "Done" that reads as a status; 10 px, ~20 px target | /data-quality | UI-13: "Mark done" button, 32 px target |
-| 2026-09-29 | Zero and single-category results look broken (dashed "No trend data", $0-$4 axis, one "Unknown" bar, "leads at 100%") | Home cards, explorer | UI-14: hide chart/insight at one category or all zeros, say so plainly |
-| 2026-09-29 | Donut colours repeat past 5 slices; nulls show as a dash | Read quality, device events | UI-15: 4 slices + Other or bars; label nulls "Not recorded" |
 | 2026-09-29 | Dates, numbers and money are formatted differently page to page; odd tick steps; "12:00 AM" on date-only values | Everywhere | UI-16: DECISION + one formatter set in format.ts |
-| 2026-09-29 | Library is a 10,000 px (22,000 on phone) scroll; rail above the title on phones; two search boxes | /reports | UI-18: collapsed sections, mobile drawer, one search |
 | 2026-09-29 | SQL workspace results ~50 px tall on phone; builder says "on the left" when the panel is above | /database, /build on phone | UI-19: natural-height stack, layout-free copy |
 | 2026-09-29 | Slow Ellensburg explorer pages (17-32 s) show only a grey skeleton | Ellensburg billed usage, billed charge, GL | UI-20: "Running…" with elapsed time and cancel |
-| 2026-09-29 | B-5: SSO row rules from two groups AND together (Water AND Sewer = no rows); a matching unrestricted group is overridden | api/auth/oidc.py:165-171; bughunt/b3_sso_rules.py | union values per field; [] at best role = unrestricted; refuse cross-field combos |
-| 2026-09-29 | B-6: scheduled PDFs from Postgres orgs print Decimal money unformatted, left-aligned, with no chart | api/report_schedules.py _pdf_cells/_bar_chart; bughunt/b2_decimal_pdf.py | treat Decimal as a number |
-| 2026-09-29 | B-7: a saved-view alert reads an empty window (SUM NULL) as all-clear and resets a breach | api/kpi_alerts.py _view_result; bughunt/b10_view_alert_none.py | empty sum/count = 0 (count) or record no data without resetting |
-| 2026-09-29 | B-11: content-pack export includes dashboards the caller's workstream grants withhold (definitions only) | api/content_packs.py:39-40; bughunt/b6_pack_ws.py | filter through the caller's grants |
-| 2026-09-29 | B-12: the dashboard PDF shows a failed card as "No value" / "No rows" | src/lib/dashboardPdf.ts kpiSections | put the error in the section note |
+| 2026-09-29 | B-13 privacy: GET /portal/saved-views filters by visibility only, not by the caller's workstream grant (same shape as B-11) | api/portal_routes.py:148 | filter by can_access_snapshot |
+| 2026-09-29 | A missing KPI trend value is labelled "Unknown" by the backend; charts now say "Not recorded" | api/kpi_runner.py trend_from_rows | use "Not recorded" |
+| 2026-09-29 | The server PDF still prints "No rows in this window." under a card that failed to load (its note now says why) | api/report_schedules.py sections_to_pdf | no "No rows" line when the section note reports a failure |
+| 2026-09-29 | The frontend skill still describes long axis labels as skipped ticks (preserveStartEnd); since 552cde49 that applies only to date/ordered axes | .claude/skills/originba-frontend/SKILL.md | update the chart section |
+| 2026-09-29 | UI-5 remainder: "canvas", "UOM", table names and "tenant" still appear in some screens; per-answer token line shows to all users | explorer, builder, Ori answers | second copy pass; tokens for admins only |
 | 2026-09-28 | The opening report of a >1M-row canvas is still slow on the first visit to any report other than the warmed opening one (~25 s at Ellensburg for rpt_billed_charge) | Explorer, pick a second ready-to-run report on rpt_billed_charge | Pre-aggregates, with exactness tests (plan in progress) |
 
 ## Fixed
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-29 | B-12: the dashboard PDF shows a failed card as "No value" / "No rows" | 76c0acce | src/lib/dashboardPdf.test.ts |
+| 2026-09-29 | B-11: content-pack export includes dashboards the caller's workstream grants withhold (definitions only) | 0dfe87ac | tests/test_content_packs.py |
+| 2026-09-29 | B-7: a saved-view alert reads an empty window (SUM NULL) as all-clear and resets a breach | 93223292 | tests/test_view_alerts.py |
+| 2026-09-29 | B-6: scheduled PDFs from Postgres orgs print Decimal money unformatted, left-aligned, with no chart | 7971e2be | tests/test_pdf_export.py |
+| 2026-09-29 | B-5: SSO row rules from two groups AND together (Water AND Sewer = no rows); a matching unrestricted group is overridden | e305f3b9 | tests/test_oidc_group_map.py |
+| 2026-09-29 | Library is a 10,000 px (22,000 on phone) scroll; rail above the title on phones; two search boxes | 36797f76 | e2e/library.spec.ts, src/lib/libraryLayout.test.ts |
+| 2026-09-29 | Data quality: every row shows a green "Done" that reads as a status; 10 px, ~20 px target | 3fd723e4 | e2e/dq.spec.ts |
+| 2026-09-29 | Donut colours repeat past 5 slices; nulls show as a dash | 2b326ded, 552cde49 | src/lib/chartLayout.test.ts |
+| 2026-09-29 | Zero and single-category results look broken (dashed "No trend data", $0-$4 axis, one "Unknown" bar, "leads at 100%") | 2b326ded, 552cde49 | src/lib/chartLayout.test.ts |
+| 2026-09-29 | Explorer charts hide half their labels; 15-character cut makes look-alike labels | 2b326ded, 552cde49 | src/lib/chartLayout.test.ts |
+| 2026-09-29 | KPI spark charts: 8.5 px labels, second line clipped, overlaps at 320 px | 2b326ded, 552cde49 | src/lib/chartLayout.test.ts |
 | 2026-09-29 | B-10: uvicorn's default access log still prints /embed/<token> (credential) in full | f32ead4c | tests/test_deploy_access_log.py |
 | 2026-09-29 | B-9: a warm pass that fails is never retried until the next rebuild (stamp marked warmed before building) | f32ead4c | tests/test_bug_hunt_fixes.py |
 | 2026-09-29 | B-8: the cache warmer thread dies on the first unexpected error (catalog read, org list) and never warms again | f32ead4c | tests/test_bug_hunt_fixes.py |
