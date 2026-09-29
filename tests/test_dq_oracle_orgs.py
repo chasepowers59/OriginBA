@@ -193,6 +193,20 @@ class OracleOrgAcknowledgementTests(OracleOrgHarness):
         self.stamp = None
         self.assertIsNone(dq_routes.dq_findings(ctx=_ctx())["built_at"])
 
+    def test_a_connection_outage_never_expires_acknowledgements(self):
+        # review 2026-09-29: an outage made the marker "none" and the page saved {} over every ack
+        key = dq_routes.dq_findings(ctx=_ctx())["rules"][0]["row_keys"][0]
+        dq_routes.dq_ack(payload={"key": key}, ctx=_ctx())
+        stamp, self.stamp = self.stamp, None
+        self.failing = {r["id"] for r in ORACLE_RULES}
+        with mock.patch.object(dq_routes, "oracle_query",
+                               side_effect=RuntimeError("DPY-4011: the database or network closed the connection")):
+            dq_routes.dq_findings(ctx=_ctx())
+            self.assertFalse(dq_routes.dq_ack(payload={"key": "x|1"}, ctx=_ctx())["ok"])
+        self.stamp, self.failing = stamp, set()
+        self.assertIn(key, dq_routes.dq_findings(ctx=_ctx())["rules"][0]["acked_row_keys"])
+        self.assertNotIn("x|1", dq_routes._load_acks("ellensburg"))
+
     def test_an_ack_lasts_until_the_warehouse_is_rebuilt(self):
         first = dq_routes.dq_findings(ctx=_ctx())
         key = first["rules"][0]["row_keys"][0]

@@ -207,8 +207,10 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     marker = refresh_marker(org, engine)
     acks = _load_acks(org)
     # a marker change means new data arrived: every ack expires and findings
-    # re-surface for the next quality pass
-    live_acks = {k: v for k, v in acks.items() if v.get("marker") == marker}
+    # re-surface for the next quality pass. An unreadable marker or a dropped connection
+    # says nothing about new data, so acks are neither expired nor rewritten then.
+    outage = marker == "none" or any(is_not_connected_error(e.get("error")) for e in out)
+    live_acks = acks if outage else {k: v for k, v in acks.items() if v.get("marker") == marker}
     if live_acks != acks:
         _save_acks(org, live_acks)
     for e in out:
@@ -256,6 +258,8 @@ def dq_ack(payload: dict[str, Any] = Body(...),
     if not key:
         return {"ok": False, "error": "key required"}
     marker = refresh_marker(org, org_backend(org)[0])
+    if marker == "none":   # an ack tied to no build could never match one again
+        return {"ok": False, "error": "The data's build cannot be read right now; try again shortly."}
     acks = _load_acks(org)
     acks[key] = {"marker": marker, "by": getattr(ctx, "email", None) or "user"}
     _save_acks(org, acks)

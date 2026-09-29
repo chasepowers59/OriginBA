@@ -66,8 +66,10 @@ export function DataQualityBoard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [markErr, setMarkErr] = useState<string | null>(null);
   const mark = async (key: string, done: boolean) => {
-    await apiPost(done ? "/dq/ack" : "/dq/unack", { key });
+    const res = await apiPost<{ ok: boolean; error?: string }>(done ? "/dq/ack" : "/dq/unack", { key });
+    setMarkErr(res.ok ? null : res.error ?? "That could not be saved; try again.");
     await reload();
   };
 
@@ -136,6 +138,7 @@ export function DataQualityBoard() {
               <span className="text-fg-subtle"> · data refreshed {formatDateTime(data.built_at)}</span>
             ) : null}
           </p>
+          {markErr ? <p role="alert" className="mt-2 text-sm text-over">{markErr}</p> : null}
         </div>
         <input
           value={filter}
