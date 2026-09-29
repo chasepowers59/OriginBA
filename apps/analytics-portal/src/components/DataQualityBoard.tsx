@@ -1,6 +1,7 @@
 "use client";
 
 import { formatCellValue, formatDateTime, formatNumber } from "@/lib/format";
+import { SlowNotice } from "@/components/SlowNotice";
 
 /**
  * Data Quality board — the rules engine's findings as a CIS worklist.
@@ -107,10 +108,14 @@ export function DataQualityBoard() {
   }
   if (!data) {
     return (
-      <div className="animate-pulse space-y-3 p-2">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="loading-shimmer h-16 rounded-xl" />
-        ))}
+      <div className="p-2">
+        <div className="animate-pulse space-y-3">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="loading-shimmer h-16 rounded-xl" />
+          ))}
+        </div>
+        <SlowNotice load={{ doing: "Running the data-quality checks against the warehouse",
+                            typical: "the first run after a refresh can take about a minute; later visits are instant" }} />
       </div>
     );
   }

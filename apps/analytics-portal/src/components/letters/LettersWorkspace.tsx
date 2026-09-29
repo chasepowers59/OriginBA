@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { SlowNotice } from "@/components/SlowNotice";
 import { defaultDateRangeLastMonth, fetchLetters, fetchLettersAsOf } from "@/lib/api";
 import { formatDateTime, formatNumber } from "@/lib/format";
 import {
@@ -136,7 +137,11 @@ export function LettersWorkspace() {
       </form>
 
       {load.state === "loading" ? (
-        <div role="status" aria-label="Loading letters" className="loading-shimmer h-64 rounded-2xl" />
+        <div>
+          <div role="status" aria-label="Loading letters" className="loading-shimmer h-64 rounded-2xl" />
+          <SlowNotice load={{ doing: "Reading the letters from your CIS database",
+                              typical: "a month not read recently can take a minute or more" }} />
+        </div>
       ) : load.state === "error" ? (
         <div role="alert" className="glass-panel p-8 text-center text-sm text-heading">{load.message}</div>
       ) : letters.length === 0 ? (
