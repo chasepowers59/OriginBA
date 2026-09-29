@@ -23,7 +23,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "logo_initials": "BA",
         "logo_src": "/brand-icon.svg",
         "connection_label": "Connected",
-        "footer": "Built on the OriginBA reporting layer · contracted models · traceable to the source column",
+        "footer": "Built on the Origin reporting layer · every figure traceable to its source in your CIS",
     },
     "theme": {
         "accent_from": "#3BAFE2",
