@@ -21,6 +21,16 @@ describe("dashboard PDF sections", () => {
     expect(out[0].rows).toHaveLength(600);
   });
 
+  it("says so when the row budget cuts a tile short", () => {
+    const out = dashboardPdfSections(Array.from({ length: 10 }, (_, i) => tile(`t${i}`, 600)));
+    expect(out[0].note).toBe("");
+    expect(out[8].rows).toHaveLength(200);
+    expect(out[8].note).toBe("Showing the first 200 of 600 rows (truncated)");
+    expect(out[9].note).toBe("Showing the first 0 of 600 rows (truncated)");
+    expect(dashboardPdfSections([{ ...tile("t", 5001), note: "Last 30 days" }])[0].note)
+      .toBe("Last 30 days · Showing the first 5,000 of 5,001 rows (truncated)");
+  });
+
   it("leaves out a tile with no columns, which the server would refuse", () => {
     expect(dashboardPdfSections([{ name: "empty", headers: [], rows: [] }, tile("ok", 1)]).map((s) => s.title)).toEqual(["ok"]);
   });
@@ -38,6 +48,20 @@ describe("KPI sections", () => {
     expect(s.name).toBe("Billed revenue");
     expect(s.note).toBe("$236.18 · Charges on frozen bill segments · +12.5% vs August");
     expect(s.rows).toEqual([{ Category: "Electric Residential", Value: 236.18 }]);
+  });
+
+  it("says a card that failed could not load, never 'No value'", () => {
+    const [s] = kpiSections([{
+      ...kpi, value: null, change_pct: null, trend: [],
+      error: 'Query failed: relation "reporting.rpt_bill_segment" does not exist\nLINE 1: SELECT "SA Type"',
+    }]);
+    expect(s.note).toBe('This card could not load: Query failed: relation "reporting.rpt_bill_segment" does not exist');
+  });
+
+  it("keeps a long error to a line", () => {
+    const [s] = kpiSections([{ ...kpi, value: null, trend: [], error: "x".repeat(400) }]);
+    expect(s.note?.length).toBeLessThanOrEqual(160);
+    expect(s.note).toMatch(/…$/);
   });
 
   it("says when a card has no value instead of printing zero", () => {
