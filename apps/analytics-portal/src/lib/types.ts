@@ -567,6 +567,8 @@ export type ReportLibraryResponse = {
 export type AssistantStep = { tool: string; input: string; ok: boolean };
 export type CanvasIntegrity = {
   canvas: string;
+  /** The data set's label: what a reader sees in place of the table name. */
+  label?: string;
   verdict: "proven" | "differences" | "not covered" | "unavailable";
   canvas_as_of: string | null;
   summary: string;
