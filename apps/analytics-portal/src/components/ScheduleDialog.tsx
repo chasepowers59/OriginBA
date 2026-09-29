@@ -10,6 +10,8 @@ import {
 } from "@/lib/api";
 import { FormError, Modal, SmtpNotice } from "@/components/Modal";
 import { parseRecipients } from "@/lib/recipients";
+import { runLine } from "@/lib/scheduleHistory";
+import { formatDateTime } from "@/lib/format";
 
 const WEEKDAYS = [
   "Monday",
@@ -89,10 +91,8 @@ export function ScheduleDialog({
       {existing.length ? (
         <ul className="mt-3 space-y-1.5">
           {existing.map((s) => (
-            <li
-              key={s.id}
-              className="flex items-center gap-2 rounded-lg border border-edge-subtle bg-surface-subtle px-3 py-2 text-xs"
-            >
+            <li key={s.id} className="rounded-lg border border-edge-subtle bg-surface-subtle px-3 py-2 text-xs">
+              <div className="flex items-center gap-2">
               <span className="min-w-0 flex-1 truncate text-fg">
                 {s.cadence === "weekly" ? `${WEEKDAYS[s.weekday]}s` : s.cadence}
                 {" · "}
@@ -128,6 +128,15 @@ export function ScheduleDialog({
               >
                 Remove
               </button>
+              </div>
+              {s.history?.length ? (
+                <details className="mt-1.5">
+                  <summary className="cursor-pointer text-fg-muted">Recent runs ({s.history.length})</summary>
+                  <ul className="mt-1 space-y-0.5 text-fg-muted">
+                    {s.history.map((run) => <li key={run.at + run.trigger}>{runLine(run, formatDateTime)}</li>)}
+                  </ul>
+                </details>
+              ) : null}
             </li>
           ))}
         </ul>

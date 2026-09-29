@@ -112,7 +112,7 @@ def run_now(
         raise HTTPException(status_code=400, detail="Saved view no longer exists")
     assert_snapshot_access(ctx, view["snapshot_id"])
     try:
-        count = rs.deliver(schedule, view, datetime.now(timezone.utc), send_message)
+        count = rs.deliver(schedule, view, datetime.now(timezone.utc), send_message, trigger="send now")
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=502, detail=f"Delivery failed: {exc}") from exc
     return {"status": "sent", "row_count": count, "recipients": schedule["recipients"]}

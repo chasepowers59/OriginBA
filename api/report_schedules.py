@@ -429,11 +429,36 @@ def _message(schedule: dict[str, Any], columns: list[str], labels: dict[str, str
     return msg
 
 
+HISTORY_KEEP = 20
+
+
+def _record_run(schedule: dict[str, Any], now: datetime, trigger: str, status: str, rows: int | None) -> None:
+    """Keep this run on the schedule, newest first, so "did it go out?" has an answer."""
+    schedule["history"] = [{"at": now.isoformat(), "trigger": trigger, "status": status, "rows": rows},
+                           *(schedule.get("history") or [])][:HISTORY_KEEP]
+    _store.update(schedule)
+
+
+def _failure(exc: Exception) -> str:
+    from api.executive_dashboard import WAREHOUSE_NOT_BUILT_NOTE, is_missing_relation_error
+    # the schedule dialog shows this: an unbuilt warehouse gets the sentence the dashboards
+    # use rather than the driver's ORA-00942
+    return WAREHOUSE_NOT_BUILT_NOTE if is_missing_relation_error(str(exc)) else f"error: {exc}"
+
+
 def deliver(schedule: dict[str, Any], view: dict[str, Any], now: datetime,
-            send: Callable[[Any], None]) -> int:
-    """Render and send one schedule; returns the row count delivered."""
-    columns, labels, rows = render_schedule(schedule, view)
-    send(_message(schedule, columns, labels, rows, now))
+            send: Callable[[Any], None], trigger: str | None = None) -> int:
+    """Render and send one schedule; returns the row count delivered. With a trigger ("send
+    now"), the run is also kept in the schedule's history, failed or not."""
+    try:
+        columns, labels, rows = render_schedule(schedule, view)
+        send(_message(schedule, columns, labels, rows, now))
+    except Exception as exc:
+        if trigger:
+            _record_run(schedule, now, trigger, _failure(exc), None)
+        raise
+    if trigger:
+        _record_run(schedule, now, trigger, "sent", len(rows))
     return len(rows)
 
 
@@ -462,14 +487,11 @@ def run_due_schedules(*, now: datetime | None = None,
                 result.update(status="sent", row_count=count)
                 schedule["last_run_at"] = now.isoformat()
                 schedule["last_status"] = f"sent {count} rows"
-                _store.update(schedule)
+                _record_run(schedule, now, "schedule", "sent", count)
         except Exception as exc:  # noqa: BLE001 — the runner must survive any one failure
-            from api.executive_dashboard import WAREHOUSE_NOT_BUILT_NOTE, is_missing_relation_error
-            # ScheduleDialog renders last_status; an unbuilt warehouse gets the sentence
-            # the dashboards use rather than the driver's ORA-00942.
-            reason = WAREHOUSE_NOT_BUILT_NOTE if is_missing_relation_error(str(exc)) else f"error: {exc}"
+            reason = _failure(exc)
             result["status"] = reason
             schedule["last_status"] = reason
-            _store.update(schedule)
+            _record_run(schedule, now, "schedule", reason, None)
         results.append(result)
     return results

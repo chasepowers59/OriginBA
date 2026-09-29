@@ -23,6 +23,7 @@ import type {
 import { dashboardPdfSections, type ExportSection } from "./dashboardPdf";
 import type { PackImportResult } from "./contentPack";
 import type { SystemHealth } from "./systemHealth";
+import type { ScheduleRun } from "./scheduleHistory";
 import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview, AssistantSpend } from "@/lib/types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
 import { localIsoDate, saveBlob } from "@/lib/format";
@@ -227,6 +228,7 @@ export type ReportSchedule = {
   enabled: boolean;
   last_run_at?: string | null;
   last_status?: string | null;
+  history?: ScheduleRun[];
 };
 
 export function fetchReportSchedules(): Promise<{

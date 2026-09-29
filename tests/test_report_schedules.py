@@ -234,6 +234,45 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(len(sent), 1)
 
 
+class RunHistoryTests(RunnerTests):
+    """Each run is kept on the schedule, newest first and at most 20, so "did last Tuesday's
+    go out?" has an answer: when, whether it was the schedule or Send now, the outcome and
+    the rows. A dry run is not a run."""
+
+    def _history(self):
+        return rs.list_schedules("dev")[0]["history"]
+
+    def test_a_sent_run_is_recorded(self):
+        now = datetime(2026, 9, 1, 13, 5, tzinfo=UTC)
+        with mock.patch.object(rs, "render_schedule", side_effect=self._render_ok):
+            rs.run_due_schedules(now=now, send=lambda m: None)
+        self.assertEqual(self._history(), [{"at": now.isoformat(), "trigger": "schedule", "status": "sent", "rows": 1}])
+
+    def test_a_failed_run_is_recorded_with_its_reason(self):
+        now = datetime(2026, 9, 1, 13, 5, tzinfo=UTC)
+        with mock.patch.object(rs, "render_schedule", side_effect=RuntimeError("warehouse down")):
+            rs.run_due_schedules(now=now, send=lambda m: None)
+        run = self._history()[0]
+        self.assertEqual((run["trigger"], run["rows"]), ("schedule", None))
+        self.assertIn("warehouse down", run["status"])
+
+    def test_a_dry_run_is_not_recorded(self):
+        with mock.patch.object(rs, "render_schedule", side_effect=self._render_ok):
+            rs.run_due_schedules(now=datetime(2026, 9, 1, 13, 5, tzinfo=UTC), send=lambda m: None, dry_run=True)
+        self.assertEqual(rs.list_schedules("dev")[0].get("history") or [], [])
+
+    def test_send_now_is_recorded_and_history_keeps_the_newest_twenty(self):
+        schedule = rs.list_schedules("dev")[0]
+        with mock.patch.object(rs, "render_schedule", side_effect=self._render_ok):
+            for day in range(1, 26):
+                rs.deliver(schedule, VIEW, datetime(2026, 9, day, 9, tzinfo=UTC), lambda m: None, trigger="send now")
+                schedule = rs.list_schedules("dev")[0]
+        history = self._history()
+        self.assertEqual(len(history), 20)
+        self.assertEqual(history[0]["at"], datetime(2026, 9, 25, 9, tzinfo=UTC).isoformat())
+        self.assertEqual(history[0]["trigger"], "send now")
+
+
 class RouteTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
