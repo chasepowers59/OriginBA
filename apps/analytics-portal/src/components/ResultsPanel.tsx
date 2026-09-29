@@ -335,7 +335,8 @@ export function ResultsPanel({
             ? "Results table — click a row to cross-filter"
             : "Detail table — click a row to cross-filter"}
         </div>
-        <div className={chartType === "table" ? "max-h-[560px] overflow-auto" : "max-h-[420px] overflow-auto"}>
+        <div className={chartType === "table" ? "max-h-[560px] overflow-auto" : "max-h-[420px] overflow-auto"}
+             tabIndex={0} role="region" aria-label={chartType === "table" ? "Results table" : "Detail table"}>
           <table className="min-w-full text-left text-sm">
             <thead className="sticky top-0 border-b border-edge-subtle bg-surface-solid backdrop-blur">
               <tr>

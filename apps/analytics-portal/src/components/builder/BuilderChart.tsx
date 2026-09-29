@@ -319,8 +319,11 @@ export function BuilderChart({
     // Rows drive the chart's own height, but the VIEWPORT is capped and scrolls: a
     // 200-row result no longer produces a 7,000px page (or blows out a dashboard tile).
     const chartHeight = Math.max(height, data.length * 34);
+    const scrolls = chartHeight > Math.max(height, 560);
     return frame(
-      <div style={{ maxHeight: Math.max(height, 560), overflowY: chartHeight > Math.max(height, 560) ? "auto" : "visible" }}>
+      // a scrolling region must take keyboard focus (WCAG 2.1.1; only real volumes scroll)
+      <div style={{ maxHeight: Math.max(height, 560), overflowY: scrolls ? "auto" : "visible" }}
+           {...(scrolls ? { tabIndex: 0, role: "region", "aria-label": a11yLabel } : {})}>
       <ChartContainer config={config} style={{ height: chartHeight }} className="w-full" role="img" aria-label={a11yLabel}>
         <BarChart data={data} layout="vertical" margin={{ left: 8 }} maxBarSize={40}>
           <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />
