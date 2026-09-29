@@ -20,13 +20,14 @@ import { getFavorite } from "@/lib/favorites";
 import { getViewRemote, saveViewRemote } from "@/lib/savedViews";
 import {
   ALL_DATES,
-  anchoredLabel,
   applyDatePresetConfig,
+  canWidenDateRange,
   estimatePeriodDays,
+  explorerPeriodLabel,
   fallBackToAllDates,
   widenDateRange,
-  windowFilter,
 } from "@/lib/datePresets";
+import { explorerFilters } from "@/lib/explorerFilters";
 import { applyProcessGuide } from "@/lib/processGuide";
 import { resolveDateField } from "@/lib/tileDateField";
 import { setPageContext } from "@/lib/assistantContext";
@@ -179,25 +180,21 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   }, []);
 
   const buildFilters = useCallback(
-    (extra: PremadeReport["filters"] = []) => {
-      // The presets window on the canvas's MEASURED date. They used to key off a
-      // mandatory-window field no canvas sets, so "Prior month" changed state and sent
-      // nothing -- the query ran unwindowed and the reader had no way to tell. A canvas
-      // with no date at all (the price list, asset locations) gets no window, which is
-      // correct: a transaction window means nothing on a dimension table.
-      const dateField = resolveDateField(metadata);
-      const filters: PremadeReport["filters"] = [
-        ...windowFilter(dateField, allDates, dateStart, dateEnd),
-        ...extra,
-      ];
-      if (scopeField && scopeValue) {
-        filters.push({ field: scopeField, op: "eq", value: scopeValue });
-      }
-      if (drillFilter) {
-        filters.push({ field: drillFilter.field, op: "eq", value: drillFilter.value });
-      }
-      return filters;
-    },
+    // The presets window on the canvas's MEASURED date. They used to key off a
+    // mandatory-window field no canvas sets, so "Prior month" changed state and sent
+    // nothing -- the query ran unwindowed and the reader had no way to tell. A canvas
+    // with no date at all (the price list, asset locations) gets no window, which is
+    // correct: a transaction window means nothing on a dimension table.
+    (extra: PremadeReport["filters"] = []) =>
+      explorerFilters({
+        dateField: resolveDateField(metadata),
+        allDates,
+        dateStart,
+        dateEnd,
+        reportFilters: extra,
+        scope: { field: scopeField, value: scopeValue },
+        drill: drillFilter,
+      }),
     [metadata, allDates, dateStart, dateEnd, scopeField, scopeValue, drillFilter],
   );
 
@@ -374,9 +371,13 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     syncCrossFilterUrl(null);
   };
 
-  const periodLabel = allDates
-    ? fellBackFrom ? `${ALL_DATES} (nothing in ${anchoredLabel(fellBackFrom, metadata.data_as_of).toLowerCase()})` : ALL_DATES
-    : anchoredLabel(activePreset, metadata.data_as_of);
+  const periodLabel = explorerPeriodLabel({
+    allDates,
+    activePreset,
+    asOf: metadata.data_as_of,
+    fellBackFrom,
+    appliedWindow: result?.applied_window,
+  });
 
   // Tell the assistant which canvas and window the reader is looking at.
   useEffect(() => {
@@ -580,7 +581,8 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
               Start date
               <input
                 type="date"
-                value={dateStart}
+                value={allDates ? "" : dateStart}
+                disabled={allDates}
                 onChange={(e) => {
                   setDateStart(e.target.value);
                   setActivePreset("Custom range");
@@ -593,7 +595,8 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
               End date
               <input
                 type="date"
-                value={dateEnd}
+                value={allDates ? "" : dateEnd}
+                disabled={allDates}
                 onChange={(e) => {
                   setDateEnd(e.target.value);
                   setActivePreset("Custom range");
@@ -603,6 +606,9 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
               />
             </label>
           </div>
+          {allDates ? (
+            <p className="mt-2 text-xs text-fg-muted">Pick a period above to choose dates.</p>
+          ) : null}
         </div>
 
         {scopeFilters.length ? (
@@ -708,7 +714,15 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
               scopeLabel: scopeLabel ? `${scopeLabel}: ${scopeValue}` : undefined,
               drillFilter,
             }}
-            onWidenPeriod={handleWidenPeriod}
+            onWidenPeriod={
+              canWidenDateRange({
+                allDates,
+                dateField: resolvedDateField,
+                currentDays: estimatePeriodDays(dateStart, dateEnd),
+              })
+                ? handleWidenPeriod
+                : undefined
+            }
             onShowAllDates={allDates || !dateFieldLabel ? undefined : showAllDates}
           />
         )}

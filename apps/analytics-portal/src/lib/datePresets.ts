@@ -43,17 +43,24 @@ export function applyDatePresetConfig(preset: DatePresetConfig | string | undefi
   };
 }
 
+const WIDEST_DAYS = 730;
+
 export function widenDateRange(currentDays: number, asOf?: string | null): {
   range: [string, string];
   label: string;
   days: number;
 } {
-  const next = currentDays <= 90 ? 180 : currentDays <= 180 ? 365 : 730;
+  const next = currentDays <= 90 ? 180 : currentDays <= 180 ? 365 : WIDEST_DAYS;
   return {
     range: defaultDateRange(next, asOf),
     label: `Last ${Math.round(next / 30)} months`,
     days: next,
   };
+}
+
+/** "Widen date range" only when a wider window exists: under All dates, or past the widest step, it would narrow. */
+export function canWidenDateRange(p: { allDates: boolean; dateField: string | null; currentDays: number }): boolean {
+  return !p.allDates && Boolean(p.dateField) && p.currentDays < WIDEST_DAYS;
 }
 
 export function estimatePeriodDays(start: string, end: string): number {
@@ -82,4 +89,23 @@ export function windowFilter(
  */
 export function fallBackToAllDates(r: { rowCount: number; windowed: boolean; firstRun: boolean }): boolean {
   return r.firstRun && r.windowed && r.rowCount === 0;
+}
+
+/**
+ * The period the page names. Under All dates the request carries no window, but a
+ * request with no filters at all gets the SERVER's trailing window on a large canvas
+ * (applied_window); naming "All dates" then describes a scope the query did not apply.
+ */
+export function explorerPeriodLabel(p: {
+  allDates: boolean;
+  activePreset: string;
+  asOf?: string | null;
+  fellBackFrom?: string | null;
+  appliedWindow?: { days: number; label: string } | null;
+}): string {
+  if (!p.allDates) return anchoredLabel(p.activePreset, p.asOf);
+  if (p.appliedWindow) return `Last ${p.appliedWindow.days} days of ${p.appliedWindow.label}`;
+  if (!p.fellBackFrom) return ALL_DATES;
+  const from = anchoredLabel(p.fellBackFrom, p.asOf);
+  return `${ALL_DATES} (nothing in ${from.charAt(0).toLowerCase()}${from.slice(1)})`;
 }

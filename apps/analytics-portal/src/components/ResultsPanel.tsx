@@ -134,16 +134,15 @@ export function ResultsPanel({
         <EmptyStateIcon variant="search" />
         <h3 className="text-lg font-semibold text-heading">No data for this view</h3>
         <p className="mt-3 max-w-md text-sm text-fg-muted">
-          {ctx?.periodLabel ? (
+          {result.applied_window ? (
+            // The window is the server's, so neither "your current filters" nor the
+            // reader's own period (under All dates) is what matched nothing.
+            <>{result.applied_window.note}</>
+          ) : ctx?.periodLabel ? (
             <>
               Nothing matched <strong className="text-heading">{ctx.periodLabel}</strong>
               {ctx.dateRange ? ` (${ctx.dateRange[0]} to ${ctx.dateRange[1]})` : ""}.
             </>
-          ) : result.applied_window ? (
-            // "your current filters" is wrong in exactly this case: the reader set
-            // none, and the window is the server's. Blaming filters they never chose
-            // sends them looking for something that is not on screen.
-            <>{result.applied_window.note}</>
           ) : (
             "Nothing matched your current filters."
           )}
