@@ -14,11 +14,11 @@ const NO_TRENDS: OriTrends = { through: "", anomalies: [], forecasts: [] };
 const ask = (question: string) => requestAsk({ question, context: null });
 
 /**
- * Ori's read on home: a brief of the period, what is worth investigating (large moves against the
+ * Ori's read on home (and, with `workstream`, on that page from its own cards): a brief of the period, what is worth investigating (large moves against the
  * prior period from api/ori_insights.py, and unusual months) and where each card is heading. The
  * findings are fast and the trends can take half a minute cold, so each arrives on its own.
  */
-export function OriInsights() {
+export function OriInsights({ workstream }: { workstream?: string } = {}) {
   const [read, setRead] = useState<OriRead | null>(null);
   const [trends, setTrends] = useState<OriTrends | null>(null);
 
@@ -26,10 +26,12 @@ export function OriInsights() {
     const controller = new AbortController();
     const { signal } = controller;
     // An aborted request is not an empty answer: Strict Mode aborts the first mount's requests.
-    fetchOriFindings(signal).then(setRead, () => signal.aborted || setRead(NO_READ));
-    fetchOriTrends(signal).then(setTrends, () => signal.aborted || setTrends(NO_TRENDS));
+    fetchOriFindings(signal, workstream).then(setRead, () => signal.aborted || setRead(NO_READ));
+    // projections read the home cards' monthly history, so a workstream page has none
+    if (workstream) setTrends(NO_TRENDS);
+    else fetchOriTrends(signal).then(setTrends, () => signal.aborted || setTrends(NO_TRENDS));
     return () => controller.abort();
-  }, []);
+  }, [workstream]);
 
   if (!read || !oriPanelShows(read, trends)) return null;
 

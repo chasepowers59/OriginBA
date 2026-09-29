@@ -9,7 +9,7 @@ import { asOrg } from "./org";
  */
 const FINDING = {
   kpi_id: "billed_revenue", change_pct: -17.9,
-  headline: "Billed revenue is down 18% vs prior 30 days",
+  headline: "Billed revenue: down 18% vs prior 30 days",
   detail: "$3,342,118.20 now, $4,071,002.11 before.",
   question: "Why is Billed revenue down 18% vs prior 30 days? What changed?",
 };
@@ -99,4 +99,20 @@ test("nothing to say, no panel", async ({ page }) => {
   await expect(page.getByRole("region", { name: "Ask Ori" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Ori's read" })).toHaveCount(0);
   await expect(page.getByRole("region", { name: "Ori found something worth investigating" })).toHaveCount(0);
+});
+
+test("a workstream page reads its own cards, with no projections", async ({ page }) => {
+  const asked: string[] = [];
+  await page.route("**/portal/ori/findings?workstream=billing", (route) =>
+    route.fulfill({ json: { findings: [FINDING], brief: BRIEF } }));
+  await page.route("**/portal/ori/trends", (route) => {
+    asked.push(route.request().url());
+    return route.fulfill({ json: { through: "", anomalies: [], forecasts: [] } });
+  });
+  await page.goto("/workstream/billing");
+  const panel = page.getByRole("region", { name: "Ori's read" });
+  await expect(panel.getByText(BRIEF)).toBeVisible({ timeout: 60_000 });
+  await expect(panel.getByText(FINDING.headline)).toBeVisible();
+  await expect(page.getByRole("region", { name: "Where it's heading" })).toHaveCount(0);
+  expect(asked).toEqual([]);
 });

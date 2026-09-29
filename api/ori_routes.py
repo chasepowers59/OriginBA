@@ -7,6 +7,7 @@ from typing import Any
 from fastapi import APIRouter, Depends
 
 from api.auth.dependencies import AuthContext, get_auth_context
+from api.auth.workstream_access import assert_workstream_access
 from api.ori_insights import anomalies, brief, findings, forecasts
 from api.ori_series import cached_history
 from api.org_db import require_org_for_data
@@ -15,13 +16,19 @@ router = APIRouter(prefix="/portal/ori", tags=["ori"])
 
 
 @router.get("/findings")
-def ori_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
+def ori_findings(workstream: str | None = None, ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
+    """The home cards, or with `workstream` that page's own cards: a finding never disagrees
+    with a card on the page it is shown on."""
     ctx.require_permission("snapshots:read")
+    if workstream:
+        assert_workstream_access(ctx, workstream)
     # Ori is not offered to a person limited to part of the data (it writes its own SQL)
     if ctx.row_rules:
         return {"findings": [], "brief": None}
-    from api.snapshot_explorer import cached_home_summary
-    summary = cached_home_summary(require_org_for_data(ctx), 30, True, "prior_period", [], ctx.workstreams, {}, ())
+    from api.snapshot_explorer import cached_home_summary, cached_workstream_summary
+    org = require_org_for_data(ctx)
+    summary = (cached_workstream_summary(org, workstream, 30, True, "prior_period", [], ()) if workstream
+               else cached_home_summary(org, 30, True, "prior_period", [], ctx.workstreams, {}, ()))
     return {"findings": findings(summary), "brief": brief(summary), "period": summary.get("period")}
 
 

@@ -32,10 +32,9 @@ class FindingTests(unittest.TestCase):
     def test_a_large_move_is_a_finding_in_plain_words(self):
         [f] = findings({"kpis": [kpi()]})
         self.assertEqual(f["kpi_id"], "billed")
-        self.assertEqual(f["headline"], "Billed revenue is down 30% vs prior 30 days")
+        self.assertEqual(f["headline"], "Billed revenue: down 30% vs prior 30 days")
         self.assertEqual(f["detail"], "$700.00 now, $1,000.00 before.")
-        self.assertIn("Billed revenue", f["question"])
-        self.assertIn("down", f["question"])
+        self.assertEqual(f["question"], "Why did billed revenue go down 30% vs prior 30 days? What changed?")
 
     def test_small_moves_and_thin_volume_are_not_findings(self):
         self.assertEqual(findings({"kpis": [kpi(value=900.0, change_pct=-10.0)]}), [])
@@ -49,16 +48,26 @@ class FindingTests(unittest.TestCase):
 
     def test_a_large_money_drop_under_a_quarter_is_raised(self):
         [f] = findings({"kpis": [kpi(value=3359173.66, prior_value=4092306.21, change_pct=-17.9)]})
-        self.assertEqual(f["headline"], "Billed revenue is down 18% vs prior 30 days")
+        self.assertEqual(f["headline"], "Billed revenue: down 18% vs prior 30 days")
 
     def test_at_most_three_largest_first(self):
         cards = [kpi(id=f"k{i}", label=f"Card {i}", value=1000.0 + 100 * i, prior_value=1000.0, change_pct=10.0 * i)
                  for i in range(3, 8)]
         self.assertEqual([f["kpi_id"] for f in findings({"kpis": cards})], ["k7", "k6", "k5"])
 
+    def test_plural_labels_and_names_read_right(self):
+        # Ellensburg 2026-09-29: "Usage transactions is down 71%", "to Do entries created rose 16%"
+        [f] = findings({"kpis": [kpi(label="Usage transactions", format="number", value=30, prior_value=100, change_pct=-70.0)]})
+        self.assertEqual(f["headline"], "Usage transactions: down 70% vs prior 30 days")
+        self.assertEqual(f["question"], "Why did usage transactions go down 70% vs prior 30 days? What changed?")
+        from api.ori_insights import brief
+        read = brief({"period": {"label": "Last 30 days", "days": 30},
+                      "kpis": [kpi(label="To Do entries created", format="number", value=116, prior_value=100, change_pct=16.0)]})
+        self.assertIn("To Do entries created rose 16%", read)
+
     def test_counts_read_as_counts(self):
         [f] = findings({"kpis": [kpi(format="number", label="Bills completed", value=150, prior_value=100, change_pct=50.0)]})
-        self.assertEqual(f["headline"], "Bills completed is up 50% vs prior 30 days")
+        self.assertEqual(f["headline"], "Bills completed: up 50% vs prior 30 days")
         self.assertEqual(f["detail"], "150 now, 100 before.")
 
 
@@ -81,6 +90,25 @@ class RouteTests(unittest.TestCase):
             out = ori_routes.ori_findings(ctx=self._ctx())
         self.assertEqual(home.call_args.args[:5], ("dev", 30, True, "prior_period", []))
         self.assertEqual([f["kpi_id"] for f in out["findings"]], ["billed"])
+
+    def test_a_workstream_page_reads_its_own_cards(self):
+        from unittest import mock
+        from fastapi import HTTPException
+        from api import ori_routes
+        summary = {"kpis": [kpi()], "period": {"label": "Last 30 days", "days": 30}}
+        with mock.patch.object(ori_routes, "require_org_for_data", return_value="dev"), \
+             mock.patch("api.snapshot_explorer.cached_workstream_summary", return_value=summary) as ws, \
+             mock.patch("api.snapshot_explorer.cached_home_summary") as home:
+            out = ori_routes.ori_findings(workstream="billing", ctx=self._ctx())
+            home.assert_not_called()
+            self.assertEqual(ws.call_args.args[:5], ("dev", "billing", 30, True, "prior_period"))
+            self.assertEqual([f["kpi_id"] for f in out["findings"]], ["billed"])
+            self.assertTrue(out["brief"])
+            import dataclasses
+            finance_only = dataclasses.replace(self._ctx(), workstreams=["finance"])
+            with self.assertRaises(HTTPException) as denied:
+                ori_routes.ori_findings(workstream="billing", ctx=finance_only)
+            self.assertEqual(denied.exception.status_code, 403)
 
     def test_a_restricted_reader_gets_none(self):
         from api import ori_routes

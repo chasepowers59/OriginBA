@@ -100,7 +100,8 @@ class AnomalyTests(unittest.TestCase):
     def test_a_month_far_outside_the_year_before_is_unusual(self):
         [a] = anomalies({"billed": series(BASE12 + [153])}, META)
         self.assertEqual((a["kpi_id"], a["month"], a["direction"]), ("billed", "2024-06", "low"))
-        self.assertEqual(a["headline"], "Billed revenue for Jun 2024 was unusually low")
+        self.assertEqual(a["headline"], "Billed revenue for Jun 2024: unusually low")
+        self.assertEqual(a["question"], "What made billed revenue so low in Jun 2024? What changed from the months before?")
         self.assertEqual(a["detail"], "$153.00, below every one of the 12 months before "
                                       "($640.00 to $2,728.00; typical $1,900.50).")
         self.assertIn("Jun 2024", a["question"])

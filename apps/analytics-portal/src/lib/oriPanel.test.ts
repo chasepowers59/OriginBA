@@ -4,7 +4,7 @@ import { forecastRows, investigations, oriPanelShows } from "./oriPanel";
 
 const FINDING: OriFinding = {
   kpi_id: "billed_revenue", change_pct: -17.9,
-  headline: "Billed revenue is down 18% vs prior 30d",
+  headline: "Billed revenue: down 18% vs prior 30d",
   detail: "$3,342,118.20 now, $4,071,002.11 before.",
   question: "Why is billed revenue down?",
 };

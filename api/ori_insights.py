@@ -67,9 +67,11 @@ def findings(summary: dict[str, Any]) -> list[dict[str, Any]]:
         out.append({
             "kpi_id": k.get("id"),
             "change_pct": change,
-            "headline": f"{label} is {direction} {abs(change):.0f}% {k['compare_label']}",
+            # "label: down 18%" reads right for a plural label ("Usage transactions") as well
+            "headline": f"{label}: {direction} {abs(change):.0f}% {k['compare_label']}",
             "detail": f"{_amount(now, fmt)} now, {_amount(before, fmt)} before.",
-            "question": f"Why is {label} {direction} {abs(change):.0f}% {k['compare_label']}? What changed?",
+            "question": f"Why did {_lower_first(label)} go {direction} {abs(change):.0f}% {k['compare_label']}? "
+                        "What changed?",
         })
     return sorted(out, key=lambda f: -abs(f["change_pct"]))[:MAX_FINDINGS]
 
@@ -98,7 +100,12 @@ def _floor(fmt: str) -> float:
 
 
 def _lower_first(label: str) -> str:
-    return label[0].lower() + label[1:] if len(label) > 1 and label[1].islower() else label
+    """Mid-sentence case: "Billed revenue" -> "billed revenue"; an acronym ("GL lines") or a name
+    ("To Do entries", its second word capitalised too) keeps its capital."""
+    words = label.split()
+    if len(label) < 2 or not label[1].islower() or (len(words) > 1 and words[1][:1].isupper()):
+        return label
+    return label[0].lower() + label[1:]
 
 
 def anomalies(history: dict[str, list[dict[str, Any]]], meta: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
@@ -124,10 +131,10 @@ def anomalies(history: dict[str, list[dict[str, Any]]], meta: dict[str, dict[str
             "month": latest["month"],
             "direction": "high" if high else "low",
             "z": z,
-            "headline": f"{label} for {month} was unusually {'high' if high else 'low'}",
+            "headline": f"{label} for {month}: unusually {'high' if high else 'low'}",
             "detail": f"{_amount(x, fmt)}, {'above' if high else 'below'} every one of the {BASELINE_MONTHS} months "
                       f"before ({_amount(lo, fmt)} to {_amount(hi, fmt)}; typical {_amount(typical, fmt)}).",
-            "question": f"Why was {_lower_first(label)} so {'high' if high else 'low'} in {month}? "
+            "question": f"What made {_lower_first(label)} so {'high' if high else 'low'} in {month}? "
                         "What changed from the months before?",
         })
     out.sort(key=lambda a: -a["z"])

@@ -16,6 +16,7 @@ import { kpiSections } from "@/lib/dashboardPdf";
 import { WorkstreamHeroLinks } from "./WorkstreamHeroLinks";
 import type { WorkstreamGroup } from "@/lib/types";
 import { CrossFilterBanner } from "@/components/CrossFilterBanner";
+import { OriInsights } from "@/components/OriInsights";
 
 function WorkstreamDashboardInner({
   workstreamId,
@@ -191,6 +192,7 @@ function WorkstreamDashboardInner({
           </div>
         ) : null}
       </div>
+      {summary?.kpis.length ? <OriInsights workstream={workstreamId} /> : null}
     </section>
   );
 }

@@ -649,8 +649,9 @@ export function fetchFreshness(): Promise<Freshness> {
 }
 
 /** "Ori found something worth investigating": the large moves in the home cards (api/ori_routes.py). */
-export function fetchOriFindings(signal?: AbortSignal): Promise<OriRead> {
-  return fetchJson("/portal/ori/findings", { signal });
+export function fetchOriFindings(signal?: AbortSignal, workstream?: string): Promise<OriRead> {
+  const query = workstream ? `?${new URLSearchParams({ workstream })}` : "";
+  return fetchJson(`/portal/ori/findings${query}`, { signal });
 }
 
 /** Unusual months and projections for the home cards; slow on a cold cache, so callers abort it. */
