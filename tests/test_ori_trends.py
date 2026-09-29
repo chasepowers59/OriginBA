@@ -72,6 +72,25 @@ class MonthTests(unittest.TestCase):
                           {"month": "2025-04", "value": 0.0}, {"month": "2025-05", "value": 7.5}])
         self.assertEqual(ori_series.series_from_rows(months, []), [])
 
+    def test_a_month_the_last_build_did_not_finish_is_not_complete(self):
+        # review 2026-09-29: builds stopped Sep 20, today Oct 3 -> September has 19 days of data
+        kpi = {"id": "k", "snapshot_id": "rpt_payment", "date_field": "Payment Date",
+               "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []}}
+        spans = []
+
+        def run(snapshot_id, spec, date_field, start, end, extra, *, organization_id, time_dimensions=None):
+            spans.append(end)
+            return ["TD0", "m0"], []
+        for built, want in (("2026-09-20T01:00:00-06:00", "2026-08-31"),   # data through Sep 19
+                            ("2026-10-01T00:30:00-06:00", "2026-09-30"),   # data through Sep 30
+                            (None, "2026-09-30")):                          # unknown: the calendar
+            with mock.patch.object(ori_series, "run_kpi_query", side_effect=run), \
+                 mock.patch.object(ori_series, "resolve_lenses", side_effect=lambda k, **_: k), \
+                 mock.patch.object(ori_series, "reporting_today", return_value=date(2026, 10, 3)), \
+                 mock.patch.object(ori_series, "last_build", return_value=built):
+                ori_series.monthly_history(kpi, "ellensburg", months=3)
+            self.assertEqual(spans[-1], want, built)
+
     def test_the_history_is_the_cards_own_number_by_month(self):
         kpi = {"id": "payments_collected", "snapshot_id": "rpt_payment", "date_field": "Payment Date",
                "value": {"dimensions": [], "measures": [{"field": "Pay Segment Amount", "agg": "sum"}],
@@ -85,7 +104,8 @@ class MonthTests(unittest.TestCase):
 
         with mock.patch.object(ori_series, "run_kpi_query", side_effect=run), \
              mock.patch.object(ori_series, "resolve_lenses", side_effect=lambda k, **_: k), \
-             mock.patch.object(ori_series, "reporting_today", return_value=date(2026, 6, 18)):
+             mock.patch.object(ori_series, "reporting_today", return_value=date(2026, 6, 18)), \
+             mock.patch.object(ori_series, "last_build", return_value=None):
             out = ori_series.monthly_history(kpi, "demo25", months=3)
         self.assertEqual(out, [{"month": "2026-04", "value": 5.0}, {"month": "2026-05", "value": 10.0}])
         [(snap, spec, field, start, end, extra, org, tds)] = calls

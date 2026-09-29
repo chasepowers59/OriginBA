@@ -69,7 +69,7 @@ def clear() -> None:
         _memo.clear()
 
 
-def _last_build(org: str) -> str | None:
+def last_build(org: str) -> str | None:
     """Read at most once a minute per organization: every page asks."""
     with _lock:
         hit = _memo.get(org)
@@ -83,7 +83,7 @@ def _last_build(org: str) -> str | None:
 
 
 def freshness(org: str, *, now: datetime | None = None) -> dict[str, Any]:
-    when = _last_build(org)
+    when = last_build(org)
     if not when:
         return {"built_at": None, "age_hours": None, "stale": False}
     built = datetime.fromisoformat(when)

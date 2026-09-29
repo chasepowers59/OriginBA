@@ -1,8 +1,8 @@
 """Monthly history of the home cards, for Ori's unusual months and projections.
 
 Each windowed home card's OWN number (its value query, filters and default lens) by calendar
-month, complete months only, ending at the organization's reporting date: a partial month
-would read as a collapse. Built for every card of the organization, filtered by the reader's
+month, complete months only, ending at the organization's reporting date or the day before its
+last build, whichever is earlier: a partial month would read as a collapse. Built for every card of the organization, filtered by the reader's
 workstreams at the route, and kept until the warehouse is rebuilt (its build stamp).
 """
 from __future__ import annotations
@@ -10,10 +10,11 @@ from __future__ import annotations
 import logging
 from calendar import monthrange
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date
+from datetime import date, timedelta
 from typing import Any
 
 from api.data_version import data_version
+from api.freshness import last_build
 from api.kpi_runner import lens_filters, resolve_lenses, run_kpi_query
 from api.reporting_dates import reporting_today, window_date_field
 from api.summary_cache import cached
@@ -48,7 +49,13 @@ def monthly_history(kpi: dict[str, Any], organization_id: str, months: int = HIS
     if not date_field:
         from api.snapshot_catalog import get_snapshot
         date_field = window_date_field(get_snapshot(kpi["snapshot_id"], organization_id))
-    span = complete_months(reporting_today(organization_id), months)
+    # the last day the data covers: the reporting date, but never past the day before the last
+    # build (builds stopped Sep 20 -> September is partial, not a collapse)
+    through = reporting_today(organization_id)
+    built = last_build(organization_id)
+    if built:
+        through = min(through, date.fromisoformat(built[:10]) - timedelta(days=1))
+    span = complete_months(through, months)
     last_y, last_m = map(int, span[-1].split("-"))
     end = f"{span[-1]}-{monthrange(last_y, last_m)[1]:02d}"
     _, rows = run_kpi_query(kpi["snapshot_id"], {**kpi["value"], "limit": months + 1}, date_field,
