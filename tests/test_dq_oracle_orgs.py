@@ -280,7 +280,7 @@ class PostgresOrgUnchangedTests(unittest.TestCase):
         self.assertEqual(out["built_at"], "2026-09-28T06:31:02")
         executed = [c.args[0] for c in cur.execute.call_args_list]
         self.assertIn("from reporting.rpt_premise_sp", executed[0])
-        self.assertIn("max(load_dttm)::text from staging.stg_financial_txn", executed[-1])
+        self.assertIn('max("Load Date/Time")::text from reporting.rpt_financial_txn', executed[-1])
 
 
 class OracleOrgCachingTests(OracleOrgHarness):

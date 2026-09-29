@@ -35,6 +35,7 @@ class BuiltAtTests(unittest.TestCase):
 
 class FreshnessTests(unittest.TestCase):
     def _fresh(self, stamp, engine="oracle"):
+        fr.clear()
         with mock.patch.object(fr, "org_backend", return_value=(engine, "dbt")), \
              mock.patch.object(fr, "data_version", return_value=stamp):
             return fr.freshness("ellensburg", now=NOW)
@@ -54,6 +55,29 @@ class FreshnessTests(unittest.TestCase):
 
     def test_unknown_is_not_stale(self):
         self.assertEqual(self._fresh(None), {"built_at": None, "age_hours": None, "stale": False})
+
+    def test_postgres_reads_the_built_reporting_table_not_the_staging_view(self):
+        # review 2026-09-29: staging is a VIEW over landing, so CDC kept it current through a
+        # failed dbt build and no page said stale
+        cur = mock.MagicMock()
+        cur.fetchone.return_value = ["2026-09-28 06:31:02"]
+        conn = mock.MagicMock()
+        conn.cursor.return_value = cur
+        pool = mock.MagicMock()
+        pool.__enter__.return_value = conn
+        with mock.patch.object(fr, "warehouse_connection", return_value=pool):
+            self.assertEqual(fr.refresh_marker("demo25", "postgres"), "2026-09-28 06:31:02")
+        sql = cur.execute.call_args.args[0]
+        self.assertIn('reporting.rpt_financial_txn', sql)
+        self.assertIn('"Load Date/Time"', sql)
+
+    def test_the_answer_is_kept_for_a_minute(self):
+        fr.clear()
+        with mock.patch.object(fr, "org_backend", return_value=("oracle", "dbt")), \
+             mock.patch.object(fr, "data_version", return_value="x:20260929123907:39:-0400") as dv:
+            fr.freshness("ellensburg")
+            fr.freshness("ellensburg")
+        self.assertEqual(dv.call_count, 1)
 
     def test_the_route_answers_for_the_callers_organization(self):
         from api.auth.dependencies import AuthContext

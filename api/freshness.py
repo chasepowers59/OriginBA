@@ -7,6 +7,8 @@ caller's organization; the app shell warns on every page when it is stale.
 """
 from __future__ import annotations
 
+import threading
+import time
 from datetime import datetime, timezone
 from typing import Any
 
@@ -19,6 +21,7 @@ from api.snapshot_catalog import org_backend
 from api.warehouse_db import warehouse_connection
 
 STALE_HOURS = 36
+RECHECK_SECONDS = 60
 
 router = APIRouter(prefix="/portal", tags=["freshness"])
 
@@ -26,13 +29,15 @@ router = APIRouter(prefix="/portal", tags=["freshness"])
 def refresh_marker(org: str, engine: str) -> str:
     """A value that changes when the warehouse is rebuilt. Oracle in-database: the build stamp
     (staging synthesizes load_dttm, CISADM carries none). Postgres: load_dttm, the CDC/build
-    watermark every staging view carries."""
+    watermark as of the last build (the reporting table's "Load Date/Time")."""
     if engine == "oracle":
         return data_version(org) or "none"
     with warehouse_connection(org) as conn:
         cur = conn.cursor()
         try:
-            cur.execute("select max(load_dttm)::text from staging.stg_financial_txn")
+            # the built reporting table, not the staging VIEW: CDC keeps landing (and a view's
+            # max current) while a failed dbt build leaves the reporting tables behind
+            cur.execute('select max("Load Date/Time")::text from reporting.rpt_financial_txn')
             row = cur.fetchone()
             return str(row[0]) if row and row[0] else "none"
         except Exception:  # noqa: BLE001
@@ -55,9 +60,30 @@ def built_at(marker: str, engine: str) -> str | None:
     return marker.replace(" ", "T", 1)
 
 
-def freshness(org: str, *, now: datetime | None = None) -> dict[str, Any]:
+_memo: dict[str, tuple[float, str | None]] = {}
+_lock = threading.Lock()
+
+
+def clear() -> None:
+    with _lock:
+        _memo.clear()
+
+
+def _last_build(org: str) -> str | None:
+    """Read at most once a minute per organization: every page asks."""
+    with _lock:
+        hit = _memo.get(org)
+    if hit and time.monotonic() - hit[0] < RECHECK_SECONDS:
+        return hit[1]
     engine, _ = org_backend(org)
     when = built_at(refresh_marker(org, engine), engine)
+    with _lock:
+        _memo[org] = (time.monotonic(), when)
+    return when
+
+
+def freshness(org: str, *, now: datetime | None = None) -> dict[str, Any]:
+    when = _last_build(org)
     if not when:
         return {"built_at": None, "age_hours": None, "stale": False}
     built = datetime.fromisoformat(when)
