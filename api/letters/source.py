@@ -63,7 +63,7 @@ def _load(path: Path, dialect: str) -> str:
     return text
 
 
-def sql(name: str, dialect: str = "postgres") -> str:
+def sql(name: str, dialect: str) -> str:
     return _load(SQL_ROOT / dialect / f"{name}.sql", dialect)
 
 
@@ -75,7 +75,7 @@ def _exact_numbers(cursor: Any, metadata: Any) -> Any:
 
 
 class Source:
-    def __init__(self, conn: Any, ceiling: int, dialect: str = "postgres"):
+    def __init__(self, conn: Any, ceiling: int, dialect: str):
         self._conn, self._ceiling, self.dialect = conn, ceiling, dialect
 
     def _marker(self, key: str) -> str:
