@@ -8,6 +8,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Reproduce / where | Next step |
 | --- | --- | --- | --- |
+| 2026-09-29 | A net-money card's breakdown shows only its six largest groups, so the bars can dwarf the headline: Finance "Adjustment dollars" $17,350 net over bars summing ~$127K (the negative groups fall outside the top six) | Ellensburg, Finance workstream, 30 days | Decide: say "largest 6 of N" under the bars, or draw negatives too (UI) |
 | 2026-09-29 | Locally, the "INT_DEV (internal dev CISADM)" organization shows demo25 data: the local launch config sets `WAREHOUSE_DATABASE_URL` (the `dev` org's key) to the demo25 database. In the cloud deployment it is INT_DEV | Settings > System health: `dev` and `demo25` stamps are equal | Owner's call: point the local key at an INT_DEV copy, or accept the alias locally |
 | 2026-09-29 | `scripts/jaspersoft/jrs_repository.py job-run` calls `POST /rest_v2/jobs/<id>/run`, which JasperReports Server 10.0 does not have (404) | Any job-run against prod or test | Remove or rebuild the command (task queued); JRS 10 has no REST run-now |
 | 2026-09-29 | `.env` line 17 (`JAVA_HOME`) has an unquoted value with a space; `set -a; . ./.env` prints `command not found` in zsh | `set -a && . ./.env` | Quote the value (owner's file; never print it) |
@@ -20,6 +21,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-29 | Finance "Frozen charge FTs" (bill segments + adjustments) summed payments too: -$414K on Ellensburg for $3.24M of charges | 711a273e | tests/test_money_rules.py (TransactionTypeTests) |
 | 2026-09-29 | Ori's vetted answers with a breakdown reported their largest group as the total (Ellensburg customer contacts 1,345 vs the card's 3,148; new service agreements, collection processes, field activities too); field activities and bills completed windowed on columns the cards refuse (647 vs 1,573) | e1946f14 | tests/test_vetted_totals.py, tests/test_kpi_window_fields.py |
 | 2026-09-29 | Home and Cashiering Payments, and Field activities, drew "Nothing to compare: one group" on Ellensburg: a breakdown by the lensed/pinned status, or by a column with one value | 28d19869 | tests/test_kpi_breakdowns.py |
 | 2026-09-29 | Explorer: the results table and a tall bar chart scroll with no keyboard access (axe scrollable-region-focusable, serious); only Ellensburg's volumes scroll, so demo25 never showed it | 381079bf | e2e/a11y.spec.ts (Ellensburg, both themes) |
