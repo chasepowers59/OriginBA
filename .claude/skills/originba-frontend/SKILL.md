@@ -548,7 +548,10 @@ will be Ori too, so they never need renaming.
   compact (`_approx`, as `formatCompact`: "$11.2M"); a measured value keeps every digit. Ori's
   read never names a move on a card under the volume floor ("had too little activity to
   compare"). Ellensburg 2026-09-29: payments and bills projected, billing and field activities
-  honestly refused. New
+  honestly refused. Every workstream page mounts `<OriInsights workstream={id} />`: the read and
+  findings from THAT page's cards (`/portal/ori/findings?workstream=`, grant checked), no
+  projections. Headlines are "label: down 18% vs prior 30d" and "label for May 2026: unusually
+  low", questions "Why did ... go down" / "What made ... so low" (plural labels read right). New
   Ori insight types should follow this shape: rules in a pure, tested backend module; words
   from `ORI`; one follow-up question to Ori.
 - Code identifiers (`AssistantPanel`, `/portal/assistant`, `ASSISTANT_*` env keys) keep their
