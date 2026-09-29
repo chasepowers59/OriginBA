@@ -21,6 +21,7 @@ import type {
   WorkstreamSummary,
 } from "./types";
 import { dashboardPdfSections, type ExportSection } from "./dashboardPdf";
+import type { PackImportResult } from "./contentPack";
 import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview, AssistantSpend } from "@/lib/types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
 import { localIsoDate } from "@/lib/format";
@@ -597,4 +598,14 @@ export function askAssistant(
     method: "POST",
     body: JSON.stringify({ question, thread, context: context ?? null }),
   });
+}
+
+/** The organization's shared views and dashboards (one folder, or all) as a content pack. */
+export function fetchContentPack(folder: string | null): Promise<Record<string, unknown>> {
+  return fetchJson(`/portal/content-pack${folder ? `?folder=${encodeURIComponent(folder)}` : ""}`);
+}
+
+/** Import a pack into the active organization (admins). A dry run only reports. */
+export function importContentPack(pack: unknown, dryRun: boolean): Promise<PackImportResult> {
+  return fetchJson(`/portal/content-pack/import?dry_run=${dryRun}`, { method: "POST", body: JSON.stringify({ pack }) });
 }
