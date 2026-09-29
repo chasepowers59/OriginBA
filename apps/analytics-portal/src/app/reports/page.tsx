@@ -31,7 +31,8 @@ export default async function ReportsPage() {
           the governed report packs are the content. This is the tree's single home now
           that the global sidebar is gone. */}
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-        <aside className="no-print lg:sticky lg:top-24 lg:self-start">
+        {/* on a phone the title and search come first, the rail after them */}
+        <aside className="no-print order-2 lg:order-none lg:sticky lg:top-24 lg:self-start">
           <div className="glass-panel p-4">
             <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-heading-accent">
               Workstreams
@@ -41,7 +42,7 @@ export default async function ReportsPage() {
             </Suspense>
           </div>
         </aside>
-        <div className="min-w-0">
+        <div className="order-1 min-w-0 lg:order-none">
           <ReportLibrary />
         </div>
       </div>

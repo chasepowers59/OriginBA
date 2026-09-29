@@ -88,13 +88,16 @@ export function WorkstreamSidebar({
           Custom dashboards
         </Link>
       </div>
-      <input
-        type="search"
-        placeholder="Search processes…"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        className="input-modern mb-3 text-xs"
-      />
+      {/* in the library the report search is the one search box */}
+      {!filterMode ? (
+        <input
+          type="search"
+          placeholder="Search processes…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="input-modern mb-3 text-xs"
+        />
+      ) : null}
       {filterMode && activeId ? (
         <Link
           href="/reports"

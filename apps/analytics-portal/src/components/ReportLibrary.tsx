@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { packsStartOpen } from "@/lib/libraryLayout";
 import { useSearchParams } from "next/navigation";
 import { fetchReportLibrary } from "@/lib/api";
 import { reportShape } from "@/lib/reportShape";
@@ -69,6 +70,9 @@ export function ReportLibrary() {
   }, [packs, activePack, query, workstreamFilter]);
 
   const shown = results.reduce((n, g) => n + g.reports.length, 0);
+  // browsing everything: packs folded; narrowed by search, workstream or pack: open
+  const open = packsStartOpen({ query, workstream: workstreamFilter, pack: activePack === ALL ? "all" : activePack,
+                                packCount: results.length });
 
   return (
     <div className="space-y-6">
@@ -157,26 +161,28 @@ export function ReportLibrary() {
             </div>
           ) : (
             results.map(({ pack, reports }) => (
-              <div key={pack.id} className="glass-panel p-5">
-                <div className="mb-4 border-b border-edge-subtle pb-4">
+              // keyed on `open` so narrowing the list re-opens packs the reader had folded
+              <details key={`${pack.id}-${open}`} open={open} className="glass-panel group p-5">
+                <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <h2 className="text-lg font-semibold text-heading">{pack.title}</h2>
-                    <span className="text-xs text-fg-muted">
+                    <span className="flex items-center gap-2 text-xs text-fg-muted">
                       {reports.length}
                       {reports.length !== pack.report_count ? ` of ${pack.report_count}` : ""} reports
+                      <span aria-hidden className="transition group-open:rotate-180">▾</span>
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-fg-muted">{pack.description}</p>
                   {pack.audience ? (
                     <p className="mt-1 text-xs text-fg-muted">For {pack.audience}</p>
                   ) : null}
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
+                </summary>
+                <div className="mt-4 grid gap-3 border-t border-edge-subtle pt-4 sm:grid-cols-2">
                   {reports.map((report) => (
                     <ReportCard key={`${report.snapshot_id}-${report.report_id}`} report={report} />
                   ))}
                 </div>
-              </div>
+              </details>
             ))
           )}
         </>
