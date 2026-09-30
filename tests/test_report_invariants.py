@@ -120,6 +120,32 @@ class ReportInvariants(unittest.TestCase):
         self.assertGreater(cases, 50)
         self.assertGreater(min(checked.values()), 30, checked)   # a fixture that empties the canvases proves nothing
 
+    def test_a_second_field_on_the_shelf_never_changes_the_first(self):
+        """Drag a second field onto a breakdown and roll it back up: the first field's values
+        must be exactly what they were."""
+        cases = 0
+        for sid, snapshot in sorted(CATALOG.items()):
+            flags = [f["id"] for f in snapshot["fields"] if f.get("type") == "boolean"]
+            for report in snapshot.get("premade_reports") or []:
+                measure, dims = report["measures"][0], report["dimensions"]
+                filters = list(report.get("filters") or [])
+                second = next((f for f in flags if f not in dims and f not in {x["field"] for x in filters}), None)
+                if measure["agg"] not in ADDITIVE or not second:
+                    continue
+                with self.subTest(report=f"{sid}.{report['id']}", second=second):
+                    one = self.run_query(snapshot, filters, dims, [measure])
+                    two = self.run_query(snapshot, filters, [*dims, second], [measure])
+                    if len(one) >= LIMIT or len(two) >= LIMIT:
+                        continue
+                    rolled: dict = {}
+                    for r in two:
+                        rolled[tuple(r[:len(dims)])] = (rolled.get(tuple(r[:len(dims)])) or 0) + (_num(r[-1]) or 0)
+                    for r in one:
+                        self.assertTrue(_close(rolled.get(tuple(r[:-1])), r[-1]), f"{r[:-1]} changed with {second} added")
+                    cases += 1
+        print(f"\n{cases} breakdowns keep their values with a second field added")
+        self.assertGreater(cases, 30)
+
 
 if __name__ == "__main__":
     unittest.main()
