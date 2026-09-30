@@ -7,7 +7,7 @@ import {
   runSnapshotQuery,
 } from "@/lib/api";
 import { formatCompact } from "@/lib/format";
-import { chartedMeasureColumn, kpiHeadline } from "@/lib/dashboardTileMath";
+import { chartedMeasureColumn, kpiHeadline, tileIsUnset } from "@/lib/dashboardTileMath";
 import { resolveDateField } from "@/lib/tileDateField";
 import { measureDisplaysAsCurrency } from "@/lib/businessLabels";
 import type { DashboardTileDef, QueryResponse } from "@/lib/types";
@@ -35,7 +35,9 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
   const [queryMeasureField, setQueryMeasureField] = useState("*");
   const [queryMeasureAgg, setQueryMeasureAgg] = useState("count");
 
+  const unset = tileIsUnset(tile);
   useEffect(() => {
+    if (unset) return;
     let cancelled = false;
     (async () => {
       try {
@@ -116,6 +118,15 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
     if (!dimensionKey || dimensionKey.startsWith("TD")) return;
     onCrossSelect?.(dimensionKey, category);
   };
+
+  if (unset) {
+    return (
+      <div className="glass-panel flex h-full min-h-[160px] flex-col items-center justify-center gap-1 p-6 text-center">
+        <p className="text-sm font-medium text-heading">{tile.title}</p>
+        <p className="text-sm text-fg-muted">Choose a data set and what to break it down by: edit this tile to set it up.</p>
+      </div>
+    );
+  }
 
   if (error) {
     return (

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { chartedMeasureColumn, kpiHeadline } from "./dashboardTileMath";
+import { chartedMeasureColumn, kpiHeadline, tileIsUnset } from "./dashboardTileMath";
 
 /**
  * UX-backlog fixes, tests first:
@@ -50,5 +50,23 @@ describe("kpiHeadline", () => {
 
   it("handles empty results", () => {
     expect(kpiHeadline([], "Amount", "sum")).toBeNull();
+  });
+});
+
+describe("a tile nobody has set up yet", () => {
+  // design review 2026-09-30: a new dashboard opened on a tile reading "Nothing to compare:
+  // one group (91114)" -- a chart with no breakdown, drawing its own row count as a category
+  const base = { id: "t", slot: 0, title: "New tile", snapshot_id: "rpt_financial_txn" };
+  it("is a chart or table with no ready-to-run report and no breakdown", () => {
+    expect(tileIsUnset({ ...base, visual: "chart" })).toBe(true);
+    expect(tileIsUnset({ ...base, visual: "table", dimensions: [] })).toBe(true);
+  });
+  it("is set up once it has a breakdown or a report", () => {
+    expect(tileIsUnset({ ...base, visual: "chart", dimensions: ["FT Type"] })).toBe(false);
+    expect(tileIsUnset({ ...base, visual: "chart", report_id: "by_type" })).toBe(false);
+    expect(tileIsUnset({ ...base, visual: "chart", time_grain: "month" })).toBe(false);   // a trend over time
+  });
+  it("a KPI needs no breakdown: it is one number", () => {
+    expect(tileIsUnset({ ...base, visual: "kpi" })).toBe(false);
   });
 });
