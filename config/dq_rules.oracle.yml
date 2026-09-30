@@ -8,7 +8,7 @@
   severity: action
   title: AMI device never registered at head-end
   action: >
-    The head-end has never seen this installed meter -- it measures nothing over the network.
+    The head-end has never seen this installed meter — it measures nothing over the network.
     In CIS: Main Menu > Device > search the Device ID; verify commissioning and the head-end
     registration; re-commission or replace.
   sql: |
@@ -84,7 +84,7 @@
   severity: action
   title: Usage recorded after the point went vacant
   action: >
-    A departed meter is still measuring consumption -- theft, leak, or a records error. CIS:
+    A departed meter is still measuring consumption — theft, leak, or a records error. CIS:
     Premise > Service Point > install history; reconcile the removal date against the measuring
     component's latest reads.
   sql: |
@@ -134,9 +134,9 @@
   severity: action
   title: Bill window open over 30 days
   action: >
-    The billing engine's stuck-bill worklist -- measured norm is p50 3.8 / p99 24.2 days,
-    so 30+ is genuinely stuck. CIS: Billing > Bill > check segment errors and the window;
-    complete or delete.
+    The billing engine's stuck-bill worklist — a bill normally completes in about 4 days and
+    almost never takes more than 24 days, so 30+ is genuinely stuck. CIS: Billing > Bill >
+    check segment errors and the window; complete or delete.
   sql: |
     SELECT
       "Bill ID",
@@ -155,7 +155,7 @@
   title: Cycled bill with no window start
   action: >
     Window-start and cycle partition EXACTLY in healthy data (360,376/359,785, zero crossovers
-    measured) -- a cycled bill without a window is an anomaly worth a look. CIS: Billing >
+    measured) — a cycled bill without a window is an anomaly worth a look. CIS: Billing >
     Bill.
   sql: |
     SELECT
@@ -227,7 +227,7 @@
   severity: action
   title: Two devices sharing one meter badge number
   action: >
-    Badge numbers are the field's identity for a meter -- a duplicate breaks exchanges and
+    Badge numbers are the field's identity for a meter — a duplicate breaks exchanges and
     reads. CIS: Device > identifiers; correct the data entry.
   sql: |
     SELECT
@@ -246,7 +246,7 @@
   severity: action
   title: Bill dated in the future
   action: >
-    Entry/clock error -- a bill date beyond tomorrow. CIS: Billing > Bill; verify the bill
+    Entry/clock error — a bill date beyond tomorrow. CIS: Billing > Bill; verify the bill
     date and the batch business date.
   sql: |
     SELECT
@@ -263,7 +263,7 @@
   title: 'Config profile: usage-billing segments whose calc lines carry no UOM'
   action: >
     The Ellensburg pattern: the SQ line carries gallons while the calc line carries no UOM
-    -- unit-of-measure reporting from calc lines silently loses those volumes. Per SA Type
+    — unit-of-measure reporting from calc lines silently loses those volumes. Per SA Type
     below: segments that billed usage vs how many of their calc lines carry a UOM. Review
     the rate component configuration in CIS (Rate Schedule > components) for the SA types
     where uom_lines is zero.
@@ -308,10 +308,9 @@
   severity: action
   title: Financial transactions differ between landing and reporting
   action: >
-    rpt_financial_txn is one row per CI_FT with no population filter -- counts and summed
-    current amounts must match EXACTLY. A mismatch means the dbt chain dropped or duplicated
-    rows: diff staging.stg_financial_txn against the landing before trusting any financial
-    number.
+    rpt_financial_txn is one row per CI_FT with no population filter — counts and summed current
+    amounts must match EXACTLY. A mismatch means the dbt chain dropped or duplicated rows:
+    diff staging.stg_financial_txn against the landing before trusting any financial number.
   sql: |
     SELECT
       'financial transactions' AS "Chain",
@@ -336,7 +335,7 @@
   object: ETL pipeline
   severity: action
   title: Bills differ between landing and reporting
-  action: One row per CI_BILL, no filter -- investigate the dbt chain on mismatch.
+  action: One row per CI_BILL, no filter — investigate the dbt chain on mismatch.
   sql: |
     SELECT
       'bills' AS "Chain",
@@ -357,7 +356,7 @@
   object: ETL pipeline
   severity: action
   title: Bill segments differ between landing and reporting
-  action: One row per CI_BSEG, no filter -- investigate the dbt chain on mismatch.
+  action: One row per CI_BSEG, no filter — investigate the dbt chain on mismatch.
   sql: |
     SELECT
       'bill segments' AS "Chain",
@@ -378,7 +377,7 @@
   object: ETL pipeline
   severity: action
   title: Payment tenders differ between landing and reporting (rows or dollars)
-  action: One row per CI_PAY_TNDR -- counts and tender dollars must tie exactly.
+  action: One row per CI_PAY_TNDR — counts and tender dollars must tie exactly.
   sql: |
     SELECT
       'payment tenders' AS "Chain",
@@ -403,7 +402,7 @@
   object: ETL pipeline
   severity: action
   title: Measurements differ between landing and reporting
-  action: One row per D1_MSRMT -- investigate the dbt chain on mismatch.
+  action: One row per D1_MSRMT — investigate the dbt chain on mismatch.
   sql: |
     SELECT
       'measurements' AS "Chain",
@@ -446,7 +445,7 @@
   object: Source integrity
   severity: action
   title: Financial transactions referencing a service agreement not in the landing
-  action: Same class -- CDC completeness or source orphan; check the SA ids listed.
+  action: Same class — CDC completeness or source orphan; check the SA ids listed.
   sql: |
     SELECT
       f.ft_id,

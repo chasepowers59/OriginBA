@@ -341,3 +341,9 @@ export function saveBlob(blob: Blob, filename: string): void {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+/** A cell that reads as a number lines up on the right; identifiers stay literal text on the left. */
+export function alignsRight(value: unknown, columnId?: string): boolean {
+  if (value == null || isIdentifierColumn(columnId)) return false;
+  return /^-?\d+(\.\d+)?$/.test(String(value).trim());
+}

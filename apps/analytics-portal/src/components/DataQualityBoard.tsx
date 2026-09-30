@@ -1,6 +1,6 @@
 "use client";
 
-import { formatCellValue, formatDateTime, formatNumber } from "@/lib/format";
+import { alignsRight, formatCellValue, formatDateTime, formatNumber } from "@/lib/format";
 import { SlowNotice } from "@/components/SlowNotice";
 
 /**
@@ -273,7 +273,7 @@ export function RuleCard({
               {formatNumber(r.total ?? r.count)}
             </span>
           )}
-          <span className="font-mono text-xs text-fg-subtle">{r.object}</span>
+          <span className="text-xs text-fg-subtle">{r.object}</span>
         </span>
       </summary>
       <div className="border-t border-edge-subtle px-4 py-3">
@@ -290,7 +290,6 @@ export function RuleCard({
             <table className="min-w-full text-xs">
               <thead>
                 <tr>
-                  <th className="border-b border-edge-subtle px-2 py-1.5"><span className="sr-only">Action</span></th>
                   {r.columns.map((c) => (
                     <th
                       key={c}
@@ -299,12 +298,20 @@ export function RuleCard({
                       {c}
                     </th>
                   ))}
+                  <th className="border-b border-edge-subtle px-2 py-1.5"><span className="sr-only">Action</span></th>
                 </tr>
               </thead>
               <tbody>
                 {r.rows.slice(0, shown).map((row, i) => (
                   <tr key={i} className="border-b border-edge-subtle/60 hover:bg-chip">
-                    <td className="px-2 py-1">
+                    {row.map((v, j) => (
+                      <td key={j} className={`whitespace-nowrap px-2 py-1 text-fg ${alignsRight(v, r.columns[j]) ? "text-right tabular-nums" : ""}`}>
+                        {/* The API sends str(value); render it like every other table --
+                            dates as dates, identifiers literal, numbers with separators. */}
+                        {formatCellValue(v, { columnId: r.columns[j] })}
+                      </td>
+                    ))}
+                    <td className="px-2 py-1 text-right">
                       <button
                         type="button"
                         onClick={() => onMark(r.row_keys?.[i] ?? `${r.id}|${row[0]}`, true)}
@@ -315,13 +322,6 @@ export function RuleCard({
                         <span aria-hidden>✓</span> Mark done
                       </button>
                     </td>
-                    {row.map((v, j) => (
-                      <td key={j} className="whitespace-nowrap px-2 py-1 text-fg">
-                        {/* The API sends str(value); render it like every other table --
-                            dates as dates, identifiers literal, numbers with separators. */}
-                        {formatCellValue(v, { columnId: r.columns[j] })}
-                      </td>
-                    ))}
                   </tr>
                 ))}
               </tbody>

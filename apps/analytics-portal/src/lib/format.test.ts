@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  alignsRight,
   formatCellValue,
   formatCompact,
   formatCurrency,
@@ -210,5 +211,16 @@ describe("nothing formats a date or number by hand", () => {
       .filter(([, src]) => HAND_FORMAT.some((re) => re.test(src)))
       .map(([path]) => path);
     expect(offenders).toEqual([]);
+  });
+});
+
+describe("which table cells line up on the right", () => {
+  // design review 2026-09-30: the Data Quality worklist left-aligned every number
+  it("numbers do, identifiers and text do not", () => {
+    expect(alignsRight("4938", "Devices")).toBe(true);
+    expect(alignsRight("-12.50", "Report Amount")).toBe(true);
+    expect(alignsRight("475233651900", "Device ID")).toBe(false);
+    expect(alignsRight("Residential", "Customer Class")).toBe(false);
+    expect(alignsRight(null, "Devices")).toBe(false);
   });
 });
