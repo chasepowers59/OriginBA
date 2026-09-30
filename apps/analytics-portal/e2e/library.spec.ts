@@ -14,15 +14,17 @@ test("folders lead with their essentials and a search looks across every folder"
   await page.goto("/reports");
   await expect(page.getByRole("heading", { name: "Report library" })).toBeVisible();
   const rail = page.getByRole("navigation", { name: "Report folders" });
-  const first = rail.getByRole("link").first();
-  await expect(first).toHaveAttribute("aria-current", "page");
+  // by name, not position: "Your saved views" leads the rail when the reader has any
+  const billing = rail.getByRole("link", { name: /^Billing & Revenue/ });
+  const finance = rail.getByRole("link", { name: /^Finance & Adjustments/ });
+  await expect(billing).toHaveAttribute("aria-current", "page");
   await expect(page.getByRole("heading", { name: "Start here" })).toBeVisible();
 
-  await rail.getByRole("link").nth(1).click();
-  await expect(page).toHaveURL(/[?&]folder=/);
-  await expect(rail.getByRole("link").nth(1)).toHaveAttribute("aria-current", "page");
+  await finance.click();
+  await expect(page).toHaveURL(/[?&]folder=finance_adjustments/);
+  await expect(finance).toHaveAttribute("aria-current", "page");
   await page.goBack();
-  await expect(first).toHaveAttribute("aria-current", "page");
+  await expect(billing).toHaveAttribute("aria-current", "page");
 
   await page.getByRole("searchbox", { name: "Search the report library" }).fill("arrears");
   await expect(page).toHaveURL(/[?&]q=arrears/);
