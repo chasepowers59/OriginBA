@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { subscribeAsk } from "@/lib/assistantContext";
 import { AssistantPanel } from "./AssistantPanel";
+import { OriMark } from "./OriMark";
 import { ORI } from "@/lib/ori";
 
 /**
@@ -49,10 +50,7 @@ export function AssistantDrawer() {
           aria-label={ORI.ask}
           className="btn-primary fixed bottom-4 right-4 z-[60] inline-flex h-12 w-12 items-center justify-center gap-2 rounded-full p-0 shadow-xl md:bottom-5 md:right-5 md:h-auto md:w-auto md:py-2.5 md:pl-2.5 md:pr-5"
         >
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/origin-mark.png" alt="" className="h-3.5 w-auto" />
-          </span>
+          <OriMark size="h-7 w-7" inverse />
           <span className="hidden md:inline">{ORI.ask}</span>
         </button>
       )}

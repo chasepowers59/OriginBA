@@ -135,7 +135,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <div>
           <div className="flex items-center gap-2.5">
-            <OriMark size={compact ? "h-8 w-8" : "h-10 w-10"} />
+            <OriMark size={compact ? "h-8 w-8" : "h-10 w-10"} thinking={busy} />
             <div>
               <h2 className={`font-bold text-heading ${compact ? "text-lg" : "text-xl"}`}>{ORI.ask}</h2>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">{ORI.tagline}</p>
