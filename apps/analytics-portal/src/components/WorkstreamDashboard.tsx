@@ -36,6 +36,8 @@ function WorkstreamDashboardInner({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // only the answer to the latest choice lands (see ExecutiveDashboard)
+    let latest = true;
     setLoading(true);
     fetchWorkstreamSummary(
       workstreamId,
@@ -44,9 +46,10 @@ function WorkstreamDashboardInner({
       filter ? { field: filter.field, value: filter.value } : undefined,
       compareMode,
     )
-      .then(setSummary)
-      .catch(() => setSummary(null))
-      .finally(() => setLoading(false));
+      .then((s) => { if (latest) setSummary(s); })
+      .catch(() => { if (latest) setSummary(null); })
+      .finally(() => { if (latest) setLoading(false); });
+    return () => { latest = false; };
   }, [workstreamId, days, compare, compareMode, filter]);
 
   useEffect(() => {

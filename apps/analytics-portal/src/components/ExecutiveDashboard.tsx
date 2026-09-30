@@ -40,6 +40,9 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
   const [lenses, setLenses] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    // Only the answer to the reader's latest choice lands: a slower one to an earlier choice
+    // (30 -> 90 -> 30 days) replaced it (e2e/dashboard-modes.spec.ts).
+    let latest = true;
     setLoading(true);
     fetchExecutiveSummary(
       days,
@@ -48,9 +51,10 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       compareMode,
       lenses,
     )
-      .then(setSummary)
-      .catch(() => setSummary(null))
-      .finally(() => setLoading(false));
+      .then((s) => { if (latest) setSummary(s); })
+      .catch(() => { if (latest) setSummary(null); })
+      .finally(() => { if (latest) setLoading(false); });
+    return () => { latest = false; };
   }, [days, compare, compareMode, filter, reloadKey, lenses]);
 
   const handleLensChange = useCallback((kpiId: string, lensId: string) => {
