@@ -36,6 +36,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-30 | Finance "Adjustment dollars" card and the governed adjustments metric counted cancelled adjustments: $17,349.97 for $14,738.88 standing (30 days) | 026bebe9 | tests/test_money_rules.py (filter rules) |
 | 2026-09-30 | "How much has not yet reached the general ledger?" drew $0.00 for every status: GL lines net to zero per transaction | 1fe37f20 (+ dbt c98f656) | tests/test_money_rules.py (GlNetsToZeroTests) |
 | 2026-09-30 | Backlog and age questions windowed on a creation date were capped by the window (oldest to-do 24,066 h shown as 8,974; oldest exception 943 days as 84.5) | 1fe37f20 (all_dates) | datePresets.test.ts, originba_dbt scripts/test_portal_catalog_reports.py |
 | 2026-09-30 | Charge-line billed reports summed cancelled and unfrozen calc lines: $167.9M vs $117.0M all time (12 months +$3.83M) | 65d8db72 | tests/test_money_rules.py |
