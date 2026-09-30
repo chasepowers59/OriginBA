@@ -22783,6 +22783,8 @@
        "Premise Address",
        "Life Support / Sensitive Load",
        "Life Support / Sensitive Load Code",
+       "Customer On Life Support",
+       "Life Support Here",
        "Geographic Code",
        "Parent Premise ID",
        "Landlord Agreement ID",
@@ -22830,6 +22832,27 @@
     "grain_description": "One row per service point",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
+     {
+      "alias": "sa",
+      "join_type": "join",
+      "on": "sa.sa_id = ssp.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "da",
+      "join_type": "join",
+      "on": "da.acct_id = sa.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "pc",
+      "join_type": "join",
+      "on": "pc.per_id = da.main_customer_per_id",
+      "role": "model",
+      "table": "stg_person_contact"
+     },
      {
       "alias": "u",
       "join_type": "join",
@@ -22892,6 +22915,13 @@
       "on": "asp.sp_id = sp.sp_id",
       "role": "step",
       "table": "active_sa_on_sp"
+     },
+     {
+      "alias": "cls",
+      "join_type": "left join",
+      "on": "cls.sp_id = sp.sp_id",
+      "role": "step",
+      "table": "customer_life_support"
      },
      {
       "alias": "spu",
@@ -23067,6 +23097,14 @@
     {
      "id": "Life Support / Sensitive Load Code",
      "label": "Life Support / Sensitive Load Code"
+    },
+    {
+     "id": "Customer On Life Support",
+     "label": "Customer On Life Support"
+    },
+    {
+     "id": "Life Support Here",
+     "label": "Life Support Here"
     },
     {
      "id": "Geographic Code",
@@ -23385,6 +23423,22 @@
      "label": "Life Support / Sensitive Load Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "",
+     "group": "meter_ops",
+     "id": "Customer On Life Support",
+     "label": "Customer On Life Support",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "",
+     "group": "meter_ops",
+     "id": "Life Support Here",
+     "label": "Life Support Here",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -23844,9 +23898,15 @@
      "chart_type": "bar",
      "description": "These customers must never be disconnected by an automated process. The flag exists so that every collections and field workflow can check it, which means someone has to know the list.",
      "dimensions": [
-      "Life Support / Sensitive Load"
+      "Premise Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Life Support Here",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "life_support_premises",
      "measures": [
       {
