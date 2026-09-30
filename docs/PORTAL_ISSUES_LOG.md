@@ -36,6 +36,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-30 | Auth writes (password change, create/update user, groups) committed AFTER the 200 was sent (FastAPI runs yield-dependency exit code after the response): signing in with a just-changed password failed 401 | this commit | tests/test_auth_commit_before_response.py, scripts/check_tenant_isolation.py |
 | 2026-09-30 | A dashboard backlog tile with no filters of its own sent no window and got the server's trailing 90 days: 'Which data exceptions are open longest?' lost every old open exception | d3dad1f7 | tileDateField.test.ts (tileWindow), e2e/library.spec.ts |
 | 2026-09-30 | The field backlog counted every activity ever (33,608 of Ellensburg's 37,057 are final) and grouped on MDM's constant 'Activity Type'; the appointments and replacement-value reports charted columns empty at every client | 79f49699, 3766a26e (+ dbt 0c93cd0, 917f7ec: F1_BUS_OBJ_STATUS landed) | originba_dbt scripts/test_portal_catalog_reports.py, assert_field_activity_open_follows_status_condition |
 | 2026-09-30 | 'Has Email On File' was false for all 92,832 Ellensburg accounts: it read CI_PER.EMAILID, empty at five of six clients; email lives in contact points (now 47,813) | dbt fbecaa1 | originba_dbt tests/assert_account_email_prefers_contact_point.sql |

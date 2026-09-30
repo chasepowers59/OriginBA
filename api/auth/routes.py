@@ -53,6 +53,10 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 def _db_session():
+    """One transaction per request. Declared scope="function" wherever it is used, so the
+    commit lands BEFORE the response: by default FastAPI runs this exit code after the
+    response is sent, and a caller could sign in with a new password before it was saved
+    (tests/test_auth_commit_before_response.py)."""
     factory = get_session_factory()
     session = factory()
     try:
@@ -83,7 +87,7 @@ def auth_status(authorization: str | None = Header(None)) -> AuthStatusResponse:
 def login(
     body: LoginRequest,
     request: Request,
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> LoginResponse:
     if auth_disabled():
         raise HTTPException(status_code=400, detail="Auth is disabled in this environment")
@@ -137,7 +141,7 @@ def login(
 def change_password_route(
     body: ChangePasswordRequest,
     ctx: AuthContext = Depends(get_session_auth_context),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> AuthUserPublic:
     try:
         public = change_password(session, ctx.id, body.current_password, body.new_password)
@@ -156,7 +160,7 @@ def change_password_route(
 
 
 @router.get("/me", response_model=AuthUserPublic)
-def me(ctx: AuthContext = Depends(get_session_auth_context), session: Session = Depends(_db_session)) -> AuthUserPublic:
+def me(ctx: AuthContext = Depends(get_session_auth_context), session: Session = Depends(_db_session, scope="function")) -> AuthUserPublic:
     if ctx.disabled:
         return AuthUserPublic(
             id=ctx.id,
@@ -222,7 +226,7 @@ def oidc_login():
 def oidc_callback(
     code: str = "",
     state: str = "",
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ):
     """IdP redirect target: verify state + id_token, JIT-provision, hand the SPA our JWT.
 
@@ -309,7 +313,7 @@ def oidc_callback(
 @router.get("/users", response_model=list[AuthUserPublic])
 def admin_list_users(
     _: AuthContext = Depends(require_permission("users:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> list[AuthUserPublic]:
     return [AuthUserPublic(**row) for row in list_users(session)]
 
@@ -318,7 +322,7 @@ def admin_list_users(
 def admin_create_user(
     body: UserCreate,
     ctx: AuthContext = Depends(require_permission("users:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> AuthUserPublic:
     try:
         public = create_user(session, ctx.role, body.model_dump())
@@ -341,7 +345,7 @@ def admin_update_user(
     user_id: str,
     body: UserUpdate,
     ctx: AuthContext = Depends(require_permission("users:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> AuthUserPublic:
     try:
         public = update_user(session, ctx.role, ctx.id, user_id, body.model_dump(exclude_unset=True))
@@ -363,7 +367,7 @@ def admin_update_user(
 @router.get("/groups", response_model=list[AccessGroupPublic])
 def admin_list_groups(
     _: AuthContext = Depends(require_permission("groups:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> list[AccessGroupPublic]:
     return [AccessGroupPublic(**row) for row in list_groups(session)]
 
@@ -372,7 +376,7 @@ def admin_list_groups(
 def admin_create_group(
     body: AccessGroupCreate,
     ctx: AuthContext = Depends(require_permission("groups:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> AccessGroupPublic:
     try:
         public = create_group(session, body.model_dump())
@@ -395,7 +399,7 @@ def admin_update_group(
     group_id: str,
     body: AccessGroupUpdate,
     ctx: AuthContext = Depends(require_permission("groups:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> AccessGroupPublic:
     try:
         public = update_group(session, group_id, body.model_dump(exclude_unset=True))
@@ -417,7 +421,7 @@ def admin_update_group(
 def admin_delete_group(
     group_id: str,
     ctx: AuthContext = Depends(require_permission("groups:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> dict[str, str]:
     if not delete_group(session, group_id):
         raise HTTPException(status_code=404, detail="Access group not found")
@@ -441,7 +445,7 @@ def admin_audit_log(
     # unknown category is a 422 rather than silently falling through to "everything".
     category: Literal["admin"] | None = None,
     _: AuthContext = Depends(require_permission("users:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> list[dict[str, Any]]:
     return list_audit_events(
         session,

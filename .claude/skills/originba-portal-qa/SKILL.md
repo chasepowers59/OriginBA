@@ -60,6 +60,15 @@ zeros or a single group, unless `KNOWN` records why that is true of the client (
 source column empty at every client, an axis constant on every row, a backlog without an
 open-only filter. Chase the finding to CISADM before recording it as a fact.
 
+Client separation through the running application: `python3 scripts/check_tenant_isolation.py`
+starts its own API with sign-in ON (a throwaway SQLite user database, a throwaway saved-view
+store on the 5433 container, random passwords never printed), creates the root admin, an
+Ellensburg user and editor and a Demo 25 user, and tries every boundary a client user could
+reach for: the tenant header, another client's sign-in address, user/group/audit
+administration, saved views across clients, and the admin's deliberate switch (2026-09-30:
+22 of 22 held). It found that auth writes committed after the response
+(tests/test_auth_commit_before_response.py).
+
 Unit suites: `cd /Users/chase/OriginBA-3 && ENVIRONMENT=test python3 -m pytest tests -q`,
 `cd apps/analytics-portal && npx tsc --noEmit && npx vitest run`.
 
