@@ -1,221 +1,302 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { fetchReportLibrary } from "@/lib/api";
-import { reportShape } from "@/lib/reportShape";
-import type { ReportLibraryPack, ReportLibraryEntry } from "@/lib/types";
-
-const ALL = "__all__";
+import { FavoritesPanel } from "@/components/FavoritesPanel";
+import { loadSavedViews } from "@/lib/savedViews";
+import {
+  SAVED_VIEWS, folderToShow, libraryHref, searchLibrary, shapeLine, showsSavedViews, splitFolder, type SearchGroup,
+} from "@/lib/libraryLayout";
+import type { ReportLibraryEntry, ReportLibraryFolder } from "@/lib/types";
 
 /**
  * The library is where somebody who does not know the data goes to find a question
- * already answered. Two things it could not do: SEARCH -- 92 reports behind six pack
- * chips, one pack visible at a time, so finding "arrears" meant clicking through every
- * pack and reading -- and say what a report RETURNS. A title tells you the question and
- * the paragraph tells you why it matters; neither says whether it counts rows or sums
- * money, or that it is already filtered.
+ * already answered. It is a folder tree: the rail lists the folders, the selected folder
+ * leads with the few reports to start with and keeps the rest folded underneath, and one
+ * search box looks across every folder. Folder and search ride in the URL (?folder=, ?q=)
+ * so a shared link and Back restore the view.
  */
 export function ReportLibrary() {
-  const [packs, setPacks] = useState<ReportLibraryPack[]>([]);
-  const [activePack, setActivePack] = useState<string>(ALL);
-  const [query, setQuery] = useState("");
+  const params = useSearchParams();
+  const requested = params.get("folder");
+  const urlQuery = params.get("q") ?? "";
+  const [folders, setFolders] = useState<ReportLibraryFolder[]>([]);
+  const [query, setQuery] = useState(urlQuery);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // The workstream rail beside this list is a filter, not a second navigation: picking
-  // "Collections & Debt" should narrow what is on screen, which is what a reader expects
-  // of a tree sitting next to a list. It rides in the URL so it survives a reload and a
-  // shared link, and composes with the search box rather than fighting it.
-  const workstreamFilter = useSearchParams().get("workstream");
+
+  const [savedCount, setSavedCount] = useState(0);
+  useEffect(() => {
+    loadSavedViews().then((views) => setSavedCount(views.length)).catch(() => setSavedCount(0));
+  }, []);
 
   useEffect(() => {
     fetchReportLibrary()
-      .then((data) => setPacks(data.packs))
+      .then((data) => setFolders(data.folders ?? []))
       .catch(() => setError("Couldn't load the report library."))
       .finally(() => setLoading(false));
   }, []);
 
-  const totalReports = useMemo(
-    () => packs.reduce((n, p) => n + p.reports.length, 0),
-    [packs],
-  );
+  // Only Back and Forward change ?q under the box. Syncing from the router's search params
+  // instead reverted a fast typist: the router applies each keystroke's URL in a transition,
+  // so an older value lands after newer keystrokes.
+  useEffect(() => {
+    const restore = () => setQuery(new URLSearchParams(window.location.search).get("q") ?? "");
+    window.addEventListener("popstate", restore);
+    return () => window.removeEventListener("popstate", restore);
+  }, []);
 
-  // Search covers everything a reader might remember: the question, why it matters, the
-  // canvas it reads, and the columns it groups by. Matching only the title meant
-  // "arrears" found nothing while three reports grouped by an arrears band.
-  const results = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    const inScope = activePack === ALL ? packs : packs.filter((p) => p.id === activePack);
-    return inScope
-      .map((pack) => ({
-        pack,
-        reports: pack.reports.filter((r) => {
-          if (workstreamFilter && r.workstream !== workstreamFilter) return false;
-          if (!needle) return true;
-          const haystack = [
-            r.title,
-            r.description,
-            r.snapshot_label,
-            r.workstream_label,
-            ...(r.dimensions ?? []),
-          ]
-            .join(" ")
-            .toLowerCase();
-          return haystack.includes(needle);
-        }),
-      }))
-      .filter((group) => group.reports.length > 0);
-  }, [packs, activePack, query, workstreamFilter]);
+  const folder = folderToShow(folders, requested);
+  const results = useMemo(() => searchLibrary(folders, query), [folders, query]);
+  const searching = query.trim().length > 0;
+  const totalReports = folders.reduce((n, f) => n + f.reports.length, 0);
 
-  const shown = results.reduce((n, g) => n + g.reports.length, 0);
+  function onSearch(value: string) {
+    setQuery(value);
+    // replaceState, not a navigation: a keystroke is not a history entry, and a router
+    // navigation would re-render the server page on every letter.
+    window.history.replaceState(null, "", libraryHref({ folder: requested, q: value }));
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
-          Utility analytics
-        </p>
-        <h1 className="mt-1 text-2xl font-bold text-heading">Report library</h1>
-        <p className="mt-2 max-w-2xl text-sm text-fg-muted">
-          Governed reports for billing, payments, operations, customer operations and finance —
-          each opens with the right period and chart for utility workflows.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">Utility analytics</p>
+          <h1 className="mt-1 text-2xl font-bold text-heading">Report library</h1>
+          <p className="mt-2 max-w-2xl text-sm text-fg-muted">
+            Governed reports, each opening with the right period and chart. Start with a folder&apos;s
+            essentials, or search every folder at once.
+          </p>
+        </div>
+        {folders.length ? (
+          <div className="w-full max-w-sm">
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => onSearch(e.target.value)}
+              placeholder="Search all reports — try arrears, meter, cycle…"
+              aria-label="Search the report library"
+              className="input-modern"
+            />
+            <p className="mt-1.5 text-xs text-fg-muted" aria-live="polite">
+              {searching
+                ? `${results.reduce((n, g) => n + g.reports.length, 0)} of ${totalReports} reports match`
+                : `${totalReports} reports in ${folders.length} folders`}
+            </p>
+          </div>
+        ) : null}
       </div>
 
       {loading ? (
         <div className="loading-shimmer h-48 rounded-2xl" />
-      ) : error || !packs.length ? (
+      ) : error || !folder ? (
         <div className="glass-panel p-8 text-center text-sm text-fg-muted">
-          {error ?? "No report packs are available for this organization yet."}{" "}
-          <button
-            type="button"
-            onClick={() => location.reload()}
-            className="text-primary hover:underline dark:text-primary"
-          >
+          {error ?? "No reports are available for this organization yet."}{" "}
+          <button type="button" onClick={() => location.reload()} className="text-primary hover:underline">
             Retry
           </button>
         </div>
       ) : (
-        <>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search reports — try arrears, meter, cycle…"
-              aria-label="Search the report library"
-              className="input-modern w-full sm:max-w-sm"
-            />
-            <p className="text-xs text-fg-muted" aria-live="polite">
-              {query.trim() || workstreamFilter
-                ? `${shown} of ${totalReports} reports match`
-                : `${totalReports} reports across ${packs.length} packs`}
-            </p>
+        <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+          <FolderRail
+            folders={folders}
+            savedCount={savedCount}
+            current={searching ? null : showsSavedViews(requested, savedCount) ? SAVED_VIEWS : folder.id}
+            onPick={() => setQuery("")}
+          />
+          <div className="min-w-0">
+            {searching ? (
+              <SearchResults query={query.trim()} results={results} onClear={() => onSearch("")} />
+            ) : showsSavedViews(requested, savedCount) ? (
+              <section className="glass-panel p-6">
+                <h2 className="mb-4 text-xl font-semibold text-heading">Your saved views</h2>
+                <FavoritesPanel compact />
+              </section>
+            ) : (
+              <FolderView folder={folder} />
+            )}
           </div>
-
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setActivePack(ALL)}
-              className={`chip ${activePack === ALL ? "chip-active" : ""}`}
-            >
-              All packs
-              <span className="ml-1 opacity-60">({totalReports})</span>
-            </button>
-            {packs.map((pack) => (
-              <button
-                key={pack.id}
-                type="button"
-                onClick={() => setActivePack(pack.id)}
-                className={`chip ${activePack === pack.id ? "chip-active" : ""}`}
-              >
-                {pack.title}
-                <span className="ml-1 opacity-60">({pack.report_count})</span>
-              </button>
-            ))}
-          </div>
-
-          {results.length === 0 ? (
-            <div className="glass-panel p-8 text-center">
-              <p className="text-sm text-heading">
-                {query.trim()
-                  ? `No report matches “${query.trim()}”${workstreamFilter ? " in this workstream" : ""}.`
-                  : "No reports in this workstream."}
-              </p>
-              <p className="mt-1 text-xs text-fg-muted">
-                Try a broader word, or build the question yourself in Explore.
-              </p>
-              <div className="mt-3 flex justify-center gap-2">
-                <button type="button" onClick={() => setQuery("")} className="btn-ghost text-xs">
-                  Clear search
-                </button>
-                <Link href="/build" className="btn-ghost text-xs">
-                  Open Explore →
-                </Link>
-              </div>
-            </div>
-          ) : (
-            results.map(({ pack, reports }) => (
-              <div key={pack.id} className="glass-panel p-5">
-                <div className="mb-4 border-b border-edge-subtle pb-4">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h2 className="text-lg font-semibold text-heading">{pack.title}</h2>
-                    <span className="text-xs text-fg-muted">
-                      {reports.length}
-                      {reports.length !== pack.report_count ? ` of ${pack.report_count}` : ""} reports
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm text-fg-muted">{pack.description}</p>
-                  {pack.audience ? (
-                    <p className="mt-1 text-xs text-fg-muted">For {pack.audience}</p>
-                  ) : null}
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {reports.map((report) => (
-                    <ReportCard key={`${report.snapshot_id}-${report.report_id}`} report={report} />
-                  ))}
-                </div>
-              </div>
-            ))
-          )}
-        </>
+        </div>
       )}
     </div>
   );
 }
 
-function ReportCard({ report }: { report: ReportLibraryEntry }) {
-  const shape = reportShape(report);
+/**
+ * A real link (copy it, open it in a tab) that, on a plain click, changes the URL in place:
+ * a router navigation would refetch the server-rendered page just to move a highlight.
+ */
+function inPlace(href: string, then?: () => void) {
+  return (e: MouseEvent<HTMLAnchorElement>) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    window.history.pushState(null, "", href);
+    then?.();
+  };
+}
+
+function FolderRail({ folders, savedCount, current, onPick }: {
+  folders: ReportLibraryFolder[];
+  savedCount: number;
+  current: string | null;
+  /** a folder click leaves search: its link carries no ?q */
+  onPick: () => void;
+}) {
+  return (
+    <nav aria-label="Report folders" className="glass-panel self-start p-3 lg:sticky lg:top-24">
+      <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-widest text-heading-accent">Folders</p>
+      <ul className="space-y-0.5">
+        {[...(savedCount ? [{ id: SAVED_VIEWS, title: "Your saved views", report_count: savedCount }] : []), ...folders].map((f) => {
+          const active = f.id === current;
+          const href = libraryHref({ folder: f.id });
+          return (
+            <li key={f.id}>
+              <a
+                href={href}
+                onClick={inPlace(href, onPick)}
+                aria-current={active ? "page" : undefined}
+                className={`flex items-baseline justify-between gap-3 rounded-lg px-3 py-2 text-sm transition ${
+                  active ? "tint-active font-medium text-heading" : "text-fg-muted hover:bg-chip hover:text-heading"
+                }`}
+              >
+                <span>{f.title}</span>
+                <span className="text-xs tabular-nums text-fg-subtle">{f.report_count}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
+
+function FolderView({ folder }: { folder: ReportLibraryFolder }) {
+  const { essentials, more } = splitFolder(folder);
+  return (
+    <section aria-labelledby="library-folder-title" className="glass-panel p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 id="library-folder-title" className="text-xl font-semibold text-heading">{folder.title}</h2>
+          {folder.description ? <p className="mt-1 text-sm text-fg-muted">{folder.description}</p> : null}
+        </div>
+        {folder.reports.length ? (
+          <Link href={`/dashboards/new?from_folder=${encodeURIComponent(folder.id)}`} className="btn-ghost shrink-0 text-xs">
+            Make a dashboard
+          </Link>
+        ) : null}
+      </div>
+
+      {essentials.length ? (
+        <>
+          <h3 className="mb-3 mt-6 text-[11px] font-semibold uppercase tracking-widest text-heading-accent">
+            Start here
+          </h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {essentials.map((r) => (
+              <EssentialCard key={`${r.snapshot_id}-${r.report_id}`} report={r} />
+            ))}
+          </div>
+        </>
+      ) : null}
+
+      {more.length ? (
+        // keyed on the folder so moving to another folder starts it folded again; open
+        // outright when access left this folder with no essentials to lead with
+        <details key={folder.id} open={!essentials.length} className="group/more mt-6 border-t border-edge-subtle pt-4">
+          <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg text-sm font-medium text-heading [&::-webkit-details-marker]:hidden">
+            <ChevronRight
+              aria-hidden
+              className="h-4 w-4 text-fg-muted transition-transform group-open/more:rotate-90 motion-reduce:transition-none"
+            />
+            {essentials.length ? "More in this folder" : "Reports in this folder"}
+            <span className="font-normal text-fg-muted">({more.length})</span>
+          </summary>
+          <ul className="mt-2 divide-y divide-edge-subtle">
+            {more.map((r) => (
+              <li key={`${r.snapshot_id}-${r.report_id}`}>
+                <ReportRow report={r} />
+              </li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
+    </section>
+  );
+}
+
+function SearchResults({ query, results, onClear }: { query: string; results: SearchGroup[]; onClear: () => void }) {
+  if (!results.length) {
+    return (
+      <div className="glass-panel p-8 text-center">
+        <p className="text-sm text-heading">No report matches “{query}”.</p>
+        <p className="mt-1 text-xs text-fg-muted">Try a broader word, or build the question yourself.</p>
+        <div className="mt-3 flex justify-center gap-2">
+          <button type="button" onClick={onClear} className="btn-ghost text-xs">
+            Clear search
+          </button>
+          <Link href="/build" className="btn-ghost text-xs">
+            Open Build
+          </Link>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-4">
+      {results.map(({ folder, reports }) => (
+        <section key={folder.id} aria-label={folder.title} className="glass-panel p-5">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="text-base font-semibold text-heading">{folder.title}</h2>
+            <span className="text-xs text-fg-muted">
+              {reports.length} of {folder.report_count}
+            </span>
+          </div>
+          <ul className="mt-2 divide-y divide-edge-subtle">
+            {reports.map((r) => (
+              <li key={`${r.snapshot_id}-${r.report_id}`}>
+                <ReportRow report={r} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function EssentialCard({ report }: { report: ReportLibraryEntry }) {
+  const shape = shapeLine(report);
   return (
     <Link
       href={report.explore_url}
-      className="group flex flex-col rounded-xl border border-edge-subtle bg-surface-subtle p-4 transition hover:border-edge"
+      className="group/report flex flex-col rounded-xl border border-edge-subtle bg-surface-subtle p-4 transition hover:border-edge motion-reduce:transition-none"
     >
-      <div className="flex items-start justify-between gap-2">
-        <span className="text-[10px] font-medium uppercase tracking-wide text-fg-subtle">
-          {report.workstream_label}
-        </span>
-        <span className="shrink-0 text-fg-muted transition group-hover:text-primary dark:group-hover:text-primary">
-          Open →
-        </span>
-      </div>
-      <h3 className="mt-2 font-medium text-heading group-hover:text-primary dark:group-hover:text-primary">
-        {report.title}
-      </h3>
-      <p className="mt-1 line-clamp-2 text-xs text-fg-muted">{report.description}</p>
+      <h4 className="font-medium text-heading group-hover/report:text-primary">{report.title}</h4>
+      <p className="mt-1.5 line-clamp-3 text-sm text-fg-muted">{report.description}</p>
+      {shape ? <p className="mt-auto pt-3 text-xs text-fg-subtle">{shape}</p> : null}
+    </Link>
+  );
+}
 
-      {/* What you actually get, in one line, before you open it. */}
-      {shape ? (
-        <p className="mt-2 line-clamp-2 text-[11px] text-fg" title={shape}>
-          {shape}
-        </p>
-      ) : null}
-
-      <p className="mt-auto pt-2 text-[10px] text-fg-subtle">
-        Reads {report.snapshot_label}
-        {report.grain_description ? ` · ${report.grain_description.toLowerCase()}` : ""}
-      </p>
+function ReportRow({ report }: { report: ReportLibraryEntry }) {
+  return (
+    <Link
+      href={report.explore_url}
+      className="group/report flex items-center justify-between gap-4 rounded-lg px-2 py-2.5 transition hover:bg-chip motion-reduce:transition-none"
+    >
+      <span className="min-w-0">
+        <span className="block text-sm font-medium text-heading group-hover/report:text-primary">{report.title}</span>
+        {report.description ? (
+          <span className="block truncate text-xs text-fg-muted" title={report.description}>
+            {report.description}
+          </span>
+        ) : null}
+      </span>
+      <ChevronRight aria-hidden className="h-4 w-4 shrink-0 text-fg-subtle group-hover/report:text-primary" />
     </Link>
   );
 }

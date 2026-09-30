@@ -1,3 +1,5 @@
+import { formatDate, formatMonth } from "@/lib/format";
+
 /**
  * Label a time bucket for a chart axis.
  *
@@ -10,11 +12,6 @@
  * Date would shift them into the viewer's, which can move a bucket into the previous
  * month.
  */
-const MONTHS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
-
 const ISO = /^(\d{4})-(\d{2})-(\d{2})(?:[T ]|$)/;
 
 export function formatTimeBucket(value: string, grain?: string | null): string {
@@ -23,7 +20,6 @@ export function formatTimeBucket(value: string, grain?: string | null): string {
 
   const year = Number(m[1]);
   const month = Number(m[2]);
-  const day = Number(m[3]);
   if (month < 1 || month > 12) return value;
 
   switch (grain) {
@@ -33,8 +29,8 @@ export function formatTimeBucket(value: string, grain?: string | null): string {
       return `Q${Math.floor((month - 1) / 3) + 1} ${year}`;
     case "day":
     case "week":
-      return `${day} ${MONTHS[month - 1]} ${year}`;
+      return formatDate(`${m[1]}-${m[2]}-${m[3]}`);
     default:
-      return `${MONTHS[month - 1]} ${year}`;
+      return formatMonth(`${m[1]}-${m[2]}`);
   }
 }

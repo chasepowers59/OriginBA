@@ -1,6 +1,6 @@
 ---
 name: originba-frontend
-description: The OriginBA portal front-end conventions — Origin brand, theme tokens, one chart renderer, the value-ramp colour rule, flat axes, TDD. Load before any UI work in apps/analytics-portal.
+description: The OriginBA portal front-end conventions — Origin brand, theme tokens, one chart renderer, the one-hue-per-series colour rule, flat axes, TDD. Load before any UI work in apps/analytics-portal.
 ---
 
 # OriginBA front-end conventions
@@ -51,34 +51,69 @@ share these token names and values — changing a V2.1 value is a cross-app deci
 ## Charts — one renderer, one colour rule
 
 - `builder/BuilderChart` (+ `ui/chart.tsx` primitives) is THE chart renderer.
-  `MiniSparkChart` is the only other (KPI sparklines). Never add a third; never
-  reintroduce raw Recharts with hex colours (the deleted ChartView anti-pattern).
+  `MiniSparkChart` is the only other (KPI sparklines), plus `OriForecastChart` for Ori's
+  projections alone (actual months solid, projection dashed from the last of them, the
+  likely range a band; one hue, `--chart-1`, on the `ui/chart` primitives). Never add
+  another; never reintroduce raw Recharts with hex colours (the deleted ChartView
+  anti-pattern).
 - **Categorical series come from `--chart-1..6`** — blue and teal only. Teal is NEVER
   paired with blue as a category; two-series charts use chart-1 with chart-3.
-- **Value ramp rule (app-wide):** single-series bars are coloured by MAGNITUDE —
-  `--primary` at the top of the range shifting to the palette's own `over` red at the
-  bottom, so the suite has exactly one red. Interpolated in **Oklab**, not HSL: a hue
-  sweep between those endpoints takes the short way round the wheel and renders
-  mid-range values as vivid magenta/violet (the 2026-09-01 bug — bars that looked like
-  a third category). `lib/chartEmphasis.ts` `valueRampColors(values, {dark})` — the
-  anchors differ per theme, so callers pass `colorMode`. Unit-tested including the
-  magenta guard; change the tests first.
-- Cross-filter selection overrides a bar/slice to `var(--chart-selected)` (amber).
-- **Axis text is FLAT — never rotated.** Long labels truncate (`slice + …`) with
-  `interval="preserveStartEnd"` / `minTickGap`; grids/axes colour from
-  `--border-subtle` / `--foreground-subtle` only.
+- **One hue per series (UI-2, Chase 2026-09-29, cross-app):** a single-series bar
+  chart is `--chart-1` only. The leader takes the full hue; every other bar is a tint
+  of it mixed toward `--surface` in proportion to its value (55-80% strength), so the
+  leader is emphasised by STRENGTH, never by another colour. Zero is the lightest tint,
+  not red. **Red (`--over`) means a negative value or an explicit threshold, nothing
+  else.** This replaced the primary-to-red value ramp, which painted small ordinary
+  categories dark red (read as "bad" when they were merely small) and put mauve in
+  the middle of the range. `lib/chartEmphasis.ts` `emphasisFills(values, isSelected)`
+  returns tokens only (`var()` / `color-mix(in oklab, …)`), so each theme and print
+  resolve it in CSS and no caller passes `colorMode`. The tests resolve the real
+  globals.css tokens in both columns: every tint keeps the series hue (the old
+  magenta guard's successor), the lightest clears 2:1 on card and muted, and the
+  leader sits ≥0.06 Oklab L above the strongest other bar. Change the tests first.
+- Multi-series charts keep the categorical `--chart-1..n`, one per series.
+- Cross-filter selection overrides a bar/slice to `var(--chart-selected)` (amber);
+  for single-series bars `emphasisFills` applies it.
+- **Axis text is FLAT — never rotated.** Layout is decided by `src/lib/chartLayout.ts`
+  (tested): above 6 categories (5 on KPI cards), or when columns are too narrow, bars go
+  HORIZONTAL and every category is labelled; truncation never makes two labels identical
+  (middle ellipsis), the full label is in the tooltip; one group, all zeros or all nulls
+  draw no chart but a plain sentence; pies keep at most 4 slices + "Other" and fall back
+  to bars; missing values read "Not recorded" (the backend trend label too). Only date
+  axes and ordered bands keep columns with `preserveStartEnd` tick skipping. Grids/axes
+  colour from `--border-subtle` / `--foreground-subtle` only.
 - Booleans render as True/False everywhere (`formatBoolean` / `formatCellValue`
   `isBoolean`), driven by the column's declared type — never raw 1/0.
+- **One format set (UI-16), all in `lib/format.ts`**: `formatDate` "Sep 1, 2026",
+  `formatDateTime` "Sep 1, 2026, 10:11 AM" (a date, or a zone-less midnight in a
+  non-date-time column, never shows a time); `formatNumber`/`formatCurrency` give every
+  digit ("-$12,071.26") for tables, sentences and tooltips; `formatCompact` (from
+  10,000) is for KPI headlines only; `formatMonth` "May 2026" for a "YYYY-MM" month;
+  `valueAxis` gives a chart round ticks (1, 2, 2.5, 5 x 10^n) labelled alike, from zero
+  unless `zero: false` fits a trend LINE to its data -- only with the axis shown. `format.test.ts` fails on any `toLocaleString`, `Intl` or
+  `` `$${ `` outside format.ts. Date inputs keep the browser control; API values and
+  exports stay ISO/machine-friendly.
 - Panel headers lead with a small rounded icon chip coloured from the chart palette
   (see DashboardWidget) — the reference-dashboard signature.
 
 ## Information architecture — one job per surface
 
-Home (exec KPIs) · Explore `/build` (THE builder; deep links `?canvas=&report=`) ·
-Dashboards `/dashboards` (@dnd-kit pinboard) · Library `/reports` (catalog + workstream
-rail) · SQL `/database` (CISADM workspace; `?table=` seeds a query) · Data Quality ·
-Settings. `/explore/[snapshotId]` is the canvas overview (Reports + Data model only —
+Home (exec KPIs) · Build `/build` (THE builder; deep links `?canvas=&report=`) ·
+Dashboards `/dashboards` (@dnd-kit pinboard) · Library `/reports` (reports grouped by
+workstream, the one grouping, beside the workstream rail) · Letters `/letters` (collections letters: the PDF beside the data behind it, and runs approved by a second person and released as one print file; nav
+behind `letters:read`, hidden from row-restricted people) · SQL `/database` (CISADM
+workspace; `?table=` seeds a query) · Data Quality · Settings. A new top-level route
+must also join `APP_ROUTES` in `middleware.ts`, or signed-in people are sent home from it. `/explore/[snapshotId]` is the data set overview, under Library (Reports + Data model only —
 builder/SQL tabs redirect out). Never add a second builder/SQL/chart surface.
+
+**One glossary (UI-4, Chase 2026-09-29).** Readers see **data set** (never canvas, reporting
+table, domain or snapshot), **report** (a ready-to-run question), **view** (a saved view),
+**dashboard**, **workstream**; **organization**, never tenant; **unit of measure**, never UOM;
+and no rpt_ table names. The data model tab, the SQL workspace, the settings data source page
+and "for IT review" disclosures may be technical. `src/glossary.test.ts` (every string a reader
+can see in components/ and app/) and `tests/test_glossary.py` (API notes and errors) enforce
+it; code identifiers (`snapshotId`, `canvas_id`, `/snapshots` routes) keep their names. Ori's
+per-answer token count and model show only with `settings:manage`.
 
 ## SQL workspace rules
 
@@ -249,7 +284,7 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     distinction that code exists to preserve. Guard `value == null || value === ""`
     BEFORE coercing — `formatCellValue` always did, which is how you can tell the
     convention existed and the others just missed it. Check the **tooltip twin** of any
-    formatter you fix; `formatTooltipCurrency`/`formatTooltipNumber` carried it too.
+    formatter you fix (the tooltip twins carried it too; UI-16 merged them into `formatNumber`/`formatCurrency`).
 
 14. **A string rendered as a number that cannot represent it.** The sibling of 13, same
     function family. `formatCellValue` numeric-formats anything parsing finite, guarded
@@ -320,6 +355,13 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     charted the other. When a fix touches the canvas name, the rename needs the
     contract mechanism (CLAUDE.md in the dbt repo: enforce_contracts var, then
     --accept-contract-changes) and a name the secrets rule does not hide.
+22. **A window rule fixed in one reader and missed in another.** The all-dates rule
+    (a canvas of what exists now is never windowed) went into the explorer, the cache
+    warmer and the metric catalog on 2026-09-30; the dashboard tile kept windowing on
+    Account Setup Date, so a Budget Billing board counted accounts opened this month.
+    A date rule has one owner (`lib/tileDateField.ts`: `resolveDateField` for the
+    date, `tileWindowField` for whether the window applies); when it changes, grep every
+    `defaultDateRange(` and `resolveDateField(` caller, not only the one in view.
 
 **How five of these were found: a widely-used export with no test.** Enumerate
 `export function` in `lib/`, count references across the app, and subtract anything
@@ -392,11 +434,9 @@ decision. Measured from the committed catalogs:
 
 The UI is wired for it end to end, so it fails quietly on the three dbt orgs —
 including Ellensburg, the strategic target. Two consequences:
-`ExplorerPanel`'s process-guide panel never renders (benign omission), and
-`WorkstreamExplorer`'s search box — placeholder "Search processes…" — can only ever
-match workstream NAMES, because `.filter(ws => ws.processes?.length > 0 || label
-matches)` has nothing to search. Empty query shows everything; typing anything
-collapses it to label hits.
+`ExplorerPanel`'s process-guide panel never renders (benign omission). (The workstream
+explorer whose search could only match workstream names is gone: since 2026-09-30 the
+Library is a folder tree searched by report -- ReportLibrary.tsx, lib/libraryLayout.ts.)
 
 Porting it is CONTENT work (process definitions and field guides for 38 canvases), not
 just code, so it is a product decision rather than a fix to slip in.
@@ -468,8 +508,8 @@ text glyphs, audit the text ones separately.
 - **Guardrails live in libs, tested**: `visualGuardrails` (pie >30 slices, 1-series
   stacked → disabled with reason), `dashboardTileMath` (tile charts the FIRST
   measure's column; KPI headline sums only sum/count), `databaseChartUtils`
-  (identifier columns never chart as measures), `axisLabels.tickLabels` (truncate
-  ONCE; head…tail when two labels would collide), `recipients.parseRecipients`.
+  (identifier columns never chart as measures), `chartLayout` (orientation, ticks,
+  no-chart sentences, pie plan; `axisLabels.tickLabels` now delegates to it), `recipients.parseRecipients`.
 - **Errors**: `fetchJson` runs `parseApiError` once, so `err.message` is already a
   human message everywhere — never re-parse JSON at a call site.
 - **Pinning**: PinMenu targets a NEW or EXISTING dashboard; pins APPEND to the first
@@ -478,3 +518,62 @@ text glyphs, audit the text ones separately.
   aria-label on every chart, click/Enter adds fields (drag is optional).
 - Route-test hygiene: modules share one interpreter — pin `PORTAL_AUTH_DISABLED` etc.
   per test class with `mock.patch.dict(os.environ, ...)`, never rely on import-time env.
+
+## Drag and drop (dnd-kit)
+
+dnd-kit moves nothing by itself: a `useDraggable` item needs a `DragOverlay` (or a transform)
+or the drag looks empty (Chase, 2026-09-29: "I want to see the field I'm dragging"). The builder
+renders `FieldDragPreview` (the same `PillFace` as the palette pill) in a `DragOverlay`, the
+source pill keeps a dashed outline while dragged, and dashboards float the tile's title card.
+Any new draggable gets an overlay; `e2e/builder-drag.spec.ts` pins the builder's.
+
+## Ori, the intelligence inside Origin BA (named 2026-09-29, Chase)
+
+Origin BA is the analytics platform; **Ori** is the intelligence inside it. The chat assistant
+is the first Ori surface; automated insights, anomaly notes, report summaries and forecasts
+will be Ori too, so they never need renaming.
+
+- Every Ori string comes from `src/lib/ori.ts` (`ORI.ask` "Ask Ori", `ORI.tagline` "Your AI
+  analytics assistant", `ORI.thinking` "Ori is analyzing your data…", `ORI.followUp`,
+  `ORI.worthInvestigating` "Ori found something worth investigating", …). Never write "the
+  assistant" in UI copy; `e2e/ori.spec.ts` fails if the home page says it.
+- Ori's mark is `OriMark` (the Origin infinity mark in a soft brand circle); the floating
+  "Ask Ori" button carries the mark on a white disc.
+- The backend speaks as Ori too: the system prompt opens "You are Ori…" (`api/assistant.py`),
+  and user-facing errors say "Ori could not answer." / "Ori is not configured" /
+  "Today's Ori budget…" (`api/assistant_routes.py`).
+- **Ori's findings** (first proactive surface, 2026-09-29): `OriInsights` ("Ori's read") above
+  Ask Ori on home reads `GET /portal/ori/findings` (`api/ori_insights.py`): the home cards against
+  the prior period, from the SAME vetted summary (so a finding never disagrees with its card),
+  moves of 15% or more with a volume floor (count 20, money 1,000), windowed cards only, at most
+  three, plus a one-paragraph `brief`; "Ask Ori why" hands the question to Ori via `requestAsk`.
+- **Ori's trends** (2026-09-29): the same panel reads `GET /portal/ori/trends` for unusual
+  months (listed after the findings, one list) and projections ("Where it's heading", one row
+  and one `OriForecastChart` each, "Ask Ori about this", footnote "A projection from past months,
+  not a promise."). Up to ~30 s cold, so it loads on its own, shows `ORI.thinking` meanwhile, is
+  aborted on unmount, and shows nothing on error. The panel is absent only when the brief,
+  findings, unusual months and projections are all empty (`lib/oriPanel.oriPanelShows`). The
+  rules (`api/ori_insights.py`, `api/ori_series.py`, pinned by `tests/test_ori_trends.py`):
+  complete months only; an unusual month is outside all 12 before it AND 3.5 robust deviations
+  AND 15% from their median; a projection is the better-replaying of "same months last year x
+  recent growth" and "12-month average", published only when its THREE-MONTH TOTAL missed at
+  most 15% typically and 25% in four cases of five on the org's own past. An estimate reads
+  compact (`_approx`, as `formatCompact`: "$11.2M"); a measured value keeps every digit. Ori's
+  read never names a move on a card under the volume floor ("had too little activity to
+  compare"). Ellensburg 2026-09-29: payments and bills projected, billing and field activities
+  honestly refused. Every workstream page mounts `<OriInsights workstream={id} />`: the read and
+  findings from THAT page's cards (`/portal/ori/findings?workstream=`, grant checked), no
+  projections. Headlines are "label: down 18% vs prior 30d" and "label for May 2026: unusually
+  low", questions "Why did ... go down" / "What made ... so low" (plural labels read right). New
+  Ori insight types should follow this shape: rules in a pure, tested backend module; words
+  from `ORI`; one follow-up question to Ori.
+- Code identifiers (`AssistantPanel`, `/portal/assistant`, `ASSISTANT_*` env keys) keep their
+  names: renaming them buys nothing and breaks deployments.
+
+## Breakdowns use the name column, never the code (2026-09-29)
+
+A card, workstream tile or vetted metric groups by "X", never "X Code": codes are client
+configuration (DNP, SENT, SUB-CORRECT) and mean nothing to a reader. The dbt canvases
+carry the name beside every code (falling back to the code when the client never named
+it). tests/test_kpi_breakdowns.py fails any breakdown on a column ending " Code" or
+described "Code configured by this utility".

@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="Financial" label="Financial" resourceId="JoinTree_1">
+      <items>
+        <item id="AUTOPAY_FLAG" label="AutoPay Flag" resourceId="JoinTree_1.Financial.AUTOPAY_FLAG"></item>
+        <item id="PAYMENT_METHOD" label="Payment Type" resourceId="JoinTree_1.Financial.PAYMENT_METHOD"></item>
+        <item id="ACCT_ID_1" label="Account ID" resourceId="JoinTree_1.Financial.ACCT_ID"></item>
+        <item id="BANKRUPTCY_FLAG" label="Bankruptcy Flag" resourceId="JoinTree_1.Financial.BANKRUPTCY_FLAG"></item>
+        <item id="BILL_ID" label="Bill ID" resourceId="JoinTree_1.Financial.BILL_ID"></item>
+        <item id="CUSTOMER_NAME" label="Customer Name" resourceId="JoinTree_1.Financial.CUSTOMER_NAME"></item>
+        <item id="DEPOSIT_BALANCE" label="Remaining Deposit Balance" resourceId="JoinTree_1.Financial.DEPOSIT_BALANCE"></item>
+        <item id="DRAFT_AMOUNT" label="Draft Amount" resourceId="JoinTree_1.Financial.DRAFT_AMOUNT"></item>
+        <item id="LATEST_BILL_DATE" label="Most Recent Draft Date" resourceId="JoinTree_1.Financial.LATEST_BILL_DATE"></item>
+        <item id="TOTAL_PAYOFF_AMT" label="Total Payoff Amount" resourceId="JoinTree_1.Financial.TOTAL_PAYOFF_AMT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="Equipment" label="Equipment" resourceId="JoinTree_1">
+      <items>
+        <item id="ADDRESS1" label="Address" resourceId="JoinTree_1.Equipment.ADDRESS1"></item>
+        <item id="CITY" label="City" resourceId="JoinTree_1.Equipment.CITY"></item>
+        <item id="SA_ACTIVITY_STATUS" label="Service Agreement Status" resourceId="JoinTree_1.Equipment.SA_ACTIVITY_STATUS"></item>
+        <item id="SERVICE_TYPE" label="Service Point Type" resourceId="JoinTree_1.Equipment.SERVICE_TYPE"></item>
+        <item id="SP_ID" label="Service Point ID" resourceId="JoinTree_1.Equipment.SP_ID"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcQuery id="Financial" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="CUSTOMER_NAME" type="java.lang.String"></field>
+        <field id="BANKRUPTCY_FLAG" type="java.lang.String"></field>
+        <field id="DEPOSIT_BALANCE" type="java.math.BigDecimal"></field>
+        <field id="TOTAL_PAYOFF_AMT" type="java.math.BigDecimal"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="DRAFT_AMOUNT" type="java.math.BigDecimal"></field>
+        <field id="LATEST_BILL_DATE" type="java.sql.Timestamp"></field>
+        <field id="AUTOPAY_FLAG" type="java.lang.String"></field>
+        <field id="PAYMENT_METHOD" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT 
+    A.ACCT_ID,
+
+    /* CUSTOMER NAME */
+    PN.ENTITY_NAME AS CUSTOMER_NAME,
+
+    /* BANKRUPTCY FLAG */
+    BC.CHAR_VAL AS BANKRUPTCY_FLAG,
+
+    /* FINANCIALS */
+    NVL(DEP.DEPOSIT_BALANCE, 0) AS DEPOSIT_BALANCE,
+    NVL(TOT.TOTAL_PAYOFF_AMT, 0) AS TOTAL_PAYOFF_AMT,
+
+    /* BILL */
+    B.BILL_ID,
+    B.BILL_DT AS LATEST_BILL_DATE,
+    B.REAL_DRAFT_AMT AS DRAFT_AMOUNT,
+
+    /* AUTOPAY + PAYMENT */
+    PAY.AUTOPAY_FLAG,
+    PAY.PAYMENT_METHOD
+
+FROM CISADM.CI_ACCT A
+
+/* =========================
+   MAIN CUSTOMER (ACCT → PER)
+   ========================= */
+LEFT JOIN (
+    SELECT ACCT_ID, PER_ID
+    FROM (
+        SELECT ACCT_ID, PER_ID,
+               ROW_NUMBER() OVER (PARTITION BY ACCT_ID ORDER BY ACCT_REL_TYPE_CD DESC) RN
+        FROM CISADM.CI_ACCT_PER
+        WHERE ACCT_REL_TYPE_CD = 'MAIN'
+    )
+    WHERE RN = 1
+) AP 
+    ON AP.ACCT_ID = A.ACCT_ID
+
+/* CUSTOMER NAME */
+LEFT JOIN (
+    SELECT PER_ID, ENTITY_NAME
+    FROM (
+        SELECT PER_ID, ENTITY_NAME,
+               ROW_NUMBER() OVER (PARTITION BY PER_ID ORDER BY VERSION DESC) RN
+        FROM CISADM.CI_PER_NAME
+        WHERE NAME_TYPE_FLG = 'PRIM'
+    )
+    WHERE RN = 1
+) PN 
+    ON PN.PER_ID = AP.PER_ID
+
+/* =========================
+   BANKRUPTCY FLAG
+   ========================= */
+LEFT JOIN (
+    SELECT ACCT_ID, CHAR_VAL
+    FROM (
+        SELECT ACCT_ID, CHAR_VAL,
+               ROW_NUMBER() OVER (PARTITION BY ACCT_ID ORDER BY EFFDT DESC) RN
+        FROM CISADM.CI_ACCT_CHAR
+        WHERE CHAR_TYPE_CD IN ('BANKRP', 'BR', 'CM_BKRPT')
+    )
+    WHERE RN = 1
+) BC 
+    ON BC.ACCT_ID = A.ACCT_ID
+
+/* =========================
+   DEPOSIT BALANCE
+   ========================= */
+LEFT JOIN (
+    SELECT 
+        S.ACCT_ID,
+        SUM(FT.CUR_AMT) AS DEPOSIT_BALANCE
+    FROM CISADM.CI_FT FT
+    JOIN CISADM.CI_SA S 
+        ON FT.SA_ID = S.SA_ID
+    WHERE S.SA_TYPE_CD LIKE '%DEP%'
+      AND FT.FREEZE_SW = 'Y'
+      AND FT.ACCOUNTING_DT &gt;= ADD_MONTHS(SYSDATE, -24)
+    GROUP BY S.ACCT_ID
+) DEP 
+    ON DEP.ACCT_ID = A.ACCT_ID
+
+/* =========================
+   TOTAL PAYOFF
+   ========================= */
+LEFT JOIN (
+    SELECT 
+        S.ACCT_ID,
+        SUM(FT.CUR_AMT) AS TOTAL_PAYOFF_AMT
+    FROM CISADM.CI_FT FT
+    JOIN CISADM.CI_SA S 
+        ON FT.SA_ID = S.SA_ID
+    WHERE S.SA_TYPE_CD NOT LIKE '%DEP%'
+      AND FT.FREEZE_SW = 'Y'
+      AND FT.ACCOUNTING_DT &gt;= ADD_MONTHS(SYSDATE, -24)
+    GROUP BY S.ACCT_ID
+) TOT 
+    ON TOT.ACCT_ID = A.ACCT_ID
+
+/* =========================
+   LATEST BILL PER ACCOUNT
+   ========================= */
+LEFT JOIN (
+    SELECT ACCT_ID, BILL_ID, BILL_DT, REAL_DRAFT_AMT
+    FROM (
+        SELECT 
+            B.ACCT_ID,
+            B.BILL_ID,
+            B.BILL_DT,
+            BSA.REAL_DRAFT_AMT,
+            ROW_NUMBER() OVER (
+                PARTITION BY B.ACCT_ID 
+                ORDER BY B.BILL_DT DESC
+            ) RN
+        FROM CISADM.CI_BILL B
+        LEFT JOIN (
+            SELECT BILL_ID, SUM(TOT_AMT) AS REAL_DRAFT_AMT
+            FROM CISADM.CI_BILL_SA
+            GROUP BY BILL_ID
+        ) BSA 
+            ON BSA.BILL_ID = B.BILL_ID
+    )
+    WHERE RN = 1
+) B 
+    ON B.ACCT_ID = A.ACCT_ID
+
+/* =========================
+   AUTOPAY + PAYMENT METHOD
+   ========================= */
+LEFT JOIN (
+    SELECT 
+        PT.PAYOR_ACCT_ID AS ACCT_ID,
+
+        /* AUTOPAY FLAG */
+        CASE 
+            WHEN MAX(CASE 
+                     WHEN PT.TENDER_TYPE_CD = 'EFT'
+                     THEN 1 ELSE 0 END) = 1
+            THEN 'Yes'
+            ELSE 'No'
+        END AS AUTOPAY_FLAG,
+
+        /* PAYMENT METHOD */
+        MAX(
+            CASE 
+                WHEN PT.TENDER_TYPE_CD = 'EFT' THEN 'AutoPay (EFT)'
+                WHEN PT.TENDER_TYPE_CD IN ('OPCC','OPOC') THEN 'Card'
+                WHEN PT.TENDER_TYPE_CD IN ('CHEC','CCHK','CKMA','CKWI') THEN 'Check'
+                WHEN PT.TENDER_TYPE_CD = 'CASH' THEN 'Cash'
+                ELSE 'Other'
+            END
+        ) AS PAYMENT_METHOD
+
+    FROM CISADM.CI_PAY_TNDR PT
+    GROUP BY PT.PAYOR_ACCT_ID
+) PAY
+    ON PAY.ACCT_ID = A.ACCT_ID</query>
+    </jdbcQuery>
+    <jdbcQuery id="Equipment" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SP_ID" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="CITY" type="java.lang.String"></field>
+        <field id="SERVICE_TYPE" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="SA_ACTIVITY_STATUS" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+  s1.acct_id,
+  sp1.sp_id,
+  pr.address1,
+  pr.city,
+  s1.sa_type_cd AS service_type,
+  s1.sa_status_flg,
+  CASE
+    WHEN s1.sa_status_flg = '20' THEN 'ACTIVE'
+    ELSE 'INACTIVE'
+  END AS sa_activity_status
+FROM (
+  SELECT acct_id, sa_id, sa_type_cd, sa_status_flg
+  FROM (
+    SELECT s.acct_id, s.sa_id, s.sa_type_cd, s.sa_status_flg,
+           ROW_NUMBER() OVER (
+             PARTITION BY s.acct_id
+             ORDER BY 
+               CASE WHEN s.sa_status_flg = '20' THEN 1 ELSE 2 END,
+               s.start_dt DESC,
+               s.sa_id DESC
+           ) rn
+    FROM cisadm.ci_sa s
+    WHERE s.sa_type_cd NOT IN ('DEP','DEPOSIT')
+  )
+  WHERE rn = 1
+) s1
+LEFT JOIN (
+  SELECT sa_id, sp_id
+  FROM (
+    SELECT sa_id, sp_id,
+           ROW_NUMBER() OVER (
+             PARTITION BY sa_id
+             ORDER BY start_dttm DESC, sa_sp_id DESC
+           ) rn
+    FROM cisadm.ci_sa_sp
+    WHERE stop_dttm IS NULL OR stop_dttm &gt; SYSDATE
+  )
+  WHERE rn = 1
+) sp1
+  ON sp1.sa_id = s1.sa_id
+LEFT JOIN cisadm.ci_sp sp_base
+  ON sp_base.sp_id = sp1.sp_id
+LEFT JOIN cisadm.ci_prem pr
+  ON pr.prem_id = sp_base.prem_id</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_1" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="Equipment.ACCT_ID" type="java.lang.String"></field>
+        <field id="Equipment.SP_ID" type="java.lang.String"></field>
+        <field id="Equipment.ADDRESS1" type="java.lang.String"></field>
+        <field id="Equipment.CITY" type="java.lang.String"></field>
+        <field id="Equipment.SERVICE_TYPE" type="java.lang.String"></field>
+        <field id="Equipment.SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="Equipment.SA_ACTIVITY_STATUS" type="java.lang.String"></field>
+        <field id="Financial.ACCT_ID" type="java.lang.String"></field>
+        <field id="Financial.CUSTOMER_NAME" type="java.lang.String"></field>
+        <field id="Financial.BANKRUPTCY_FLAG" type="java.lang.String"></field>
+        <field id="Financial.DEPOSIT_BALANCE" type="java.math.BigDecimal"></field>
+        <field id="Financial.TOTAL_PAYOFF_AMT" type="java.math.BigDecimal"></field>
+        <field id="Financial.BILL_ID" type="java.lang.String"></field>
+        <field id="Financial.DRAFT_AMOUNT" type="java.math.BigDecimal"></field>
+        <field id="Financial.LATEST_BILL_DATE" type="java.sql.Timestamp"></field>
+        <field id="Financial.AUTOPAY_FLAG" type="java.lang.String"></field>
+        <field id="Financial.PAYMENT_METHOD" type="java.lang.String"></field>
+      </fieldList>
+      <joinInfo alias="Financial" referenceId="Financial"></joinInfo>
+      <joinList>
+        <join expr="Financial.ACCT_ID == Equipment.ACCT_ID" left="Financial" right="Equipment" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>SELECT 
+    A.ACCT_ID,
+
+    /* CUSTOMER NAME */
+    PN.ENTITY_NAME AS CUSTOMER_NAME,
+
+    /* BANKRUPTCY FLAG */
+    BC.CHAR_VAL AS BANKRUPTCY_FLAG,
+
+    /* FINANCIALS */
+    NVL(DEP.DEPOSIT_BALANCE, 0) AS DEPOSIT_BALANCE,
+    NVL(TOT.TOTAL_PAYOFF_AMT, 0) AS TOTAL_PAYOFF_AMT,
+
+    /* BILL */
+    B.BILL_ID,
+    B.BILL_DT AS LATEST_BILL_DATE,
+    B.REAL_DRAFT_AMT AS DRAFT_AMOUNT,
+
+    /* AUTOPAY + PAYMENT */
+    PAY.AUTOPAY_FLAG,
+    PAY.PAYMENT_METHOD
+
+FROM CISADM.CI_ACCT A
+
+/* =========================
+   MAIN CUSTOMER (ACCT → PER)
+   ========================= */
+LEFT JOIN (
+    SELECT ACCT_ID, PER_ID
+    FROM (
+        SELECT ACCT_ID, PER_ID,
+               ROW_NUMBER() OVER (PARTITION BY ACCT_ID ORDER BY ACCT_REL_TYPE_CD DESC) RN
+        FROM CISADM.CI_ACCT_PER
+        WHERE ACCT_REL_TYPE_CD = 'MAIN'
+    )
+    WHERE RN = 1
+) AP 
+    ON AP.ACCT_ID = A.ACCT_ID
+
+/* CUSTOMER NAME */
+LEFT JOIN (
+    SELECT PER_ID, ENTITY_NAME
+    FROM (
+        SELECT PER_ID, ENTITY_NAME,
+               ROW_NUMBER() OVER (PARTITION BY PER_ID ORDER BY VERSION DESC) RN
+        FROM CISADM.CI_PER_NAME
+        WHERE NAME_TYPE_FLG = 'PRIM'
+    )
+    WHERE RN = 1
+) PN 
+    ON PN.PER_ID = AP.PER_ID
+
+/* =========================
+   BANKRUPTCY FLAG
+   ========================= */
+LEFT JOIN (
+    SELECT ACCT_ID, CHAR_VAL
+    FROM (
+        SELECT ACCT_ID, CHAR_VAL,
+               ROW_NUMBER() OVER (PARTITION BY ACCT_ID ORDER BY EFFDT DESC) RN
+        FROM CISADM.CI_ACCT_CHAR
+        WHERE CHAR_TYPE_CD IN ('BANKRP', 'BR', 'CM_BKRPT')
+    )
+    WHERE RN = 1
+) BC 
+    ON BC.ACCT_ID = A.ACCT_ID
+
+/* =========================
+   DEPOSIT BALANCE
+   ========================= */
+LEFT JOIN (
+    SELECT 
+        S.ACCT_ID,
+        SUM(FT.CUR_AMT) AS DEPOSIT_BALANCE
+    FROM CISADM.CI_FT FT
+    JOIN CISADM.CI_SA S 
+        ON FT.SA_ID = S.SA_ID
+    WHERE S.SA_TYPE_CD LIKE '%DEP%'
+      AND FT.FREEZE_SW = 'Y'
+      AND FT.ACCOUNTING_DT &gt;= ADD_MONTHS(SYSDATE, -24)
+    GROUP BY S.ACCT_ID
+) DEP 
+    ON DEP.ACCT_ID = A.ACCT_ID
+
+/* =========================
+   TOTAL PAYOFF
+   ========================= */
+LEFT JOIN (
+    SELECT 
+        S.ACCT_ID,
+        SUM(FT.CUR_AMT) AS TOTAL_PAYOFF_AMT
+    FROM CISADM.CI_FT FT
+    JOIN CISADM.CI_SA S 
+        ON FT.SA_ID = S.SA_ID
+    WHERE S.SA_TYPE_CD NOT LIKE '%DEP%'
+      AND FT.FREEZE_SW = 'Y'
+      AND FT.ACCOUNTING_DT &gt;= ADD_MONTHS(SYSDATE, -24)
+    GROUP BY S.ACCT_ID
+) TOT 
+    ON TOT.ACCT_ID = A.ACCT_ID
+
+/* =========================
+   LATEST BILL PER ACCOUNT
+   ========================= */
+LEFT JOIN (
+    SELECT ACCT_ID, BILL_ID, BILL_DT, REAL_DRAFT_AMT
+    FROM (
+        SELECT 
+            B.ACCT_ID,
+            B.BILL_ID,
+            B.BILL_DT,
+            BSA.REAL_DRAFT_AMT,
+            ROW_NUMBER() OVER (
+                PARTITION BY B.ACCT_ID 
+                ORDER BY B.BILL_DT DESC
+            ) RN
+        FROM CISADM.CI_BILL B
+        LEFT JOIN (
+            SELECT BILL_ID, SUM(TOT_AMT) AS REAL_DRAFT_AMT
+            FROM CISADM.CI_BILL_SA
+            GROUP BY BILL_ID
+        ) BSA 
+            ON BSA.BILL_ID = B.BILL_ID
+    )
+    WHERE RN = 1
+) B 
+    ON B.ACCT_ID = A.ACCT_ID
+
+/* =========================
+   AUTOPAY + PAYMENT METHOD
+   ========================= */
+LEFT JOIN (
+    SELECT 
+        PT.PAYOR_ACCT_ID AS ACCT_ID,
+
+        /* AUTOPAY FLAG */
+        CASE 
+            WHEN MAX(CASE 
+                     WHEN PT.TENDER_TYPE_CD = 'EFT'
+                     THEN 1 ELSE 0 END) = 1
+            THEN 'Yes'
+            ELSE 'No'
+        END AS AUTOPAY_FLAG,
+
+        /* PAYMENT METHOD */
+        MAX(
+            CASE 
+                WHEN PT.TENDER_TYPE_CD = 'EFT' THEN 'AutoPay (EFT)'
+                WHEN PT.TENDER_TYPE_CD IN ('OPCC','OPOC') THEN 'Card'
+                WHEN PT.TENDER_TYPE_CD IN ('CHEC','CCHK','CKMA','CKWI') THEN 'Check'
+                WHEN PT.TENDER_TYPE_CD = 'CASH' THEN 'Cash'
+                ELSE 'Other'
+            END
+        ) AS PAYMENT_METHOD
+
+    FROM CISADM.CI_PAY_TNDR PT
+    GROUP BY PT.PAYOR_ACCT_ID
+) PAY
+    ON PAY.ACCT_ID = A.ACCT_ID</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="Equipment" tableId="Equipment"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="Financial" tableId="Financial"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

@@ -22,6 +22,7 @@ from __future__ import annotations
 import logging
 import os
 import re
+import threading
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator
@@ -37,6 +38,11 @@ ROOT = Path(__file__).resolve().parent.parent
 SHARED_WAREHOUSE_ORGS = frozenset({"dev"})
 
 _pools: dict[str, Any] = {}
+# psycopg2's pool raises the moment every connection is lent out; a slot per connection
+# makes a borrower WAIT instead, so concurrent page loads queue rather than fail.
+_slots: dict[str, threading.BoundedSemaphore] = {}
+_pools_lock = threading.Lock()
+BORROW_WAIT_SECONDS = 60
 
 logger = logging.getLogger(__name__)
 
@@ -137,15 +143,25 @@ def _pool(organization_id: str | None):
             f"No warehouse is configured for organization '{organization_id}'. "
             f"Set WAREHOUSE_DATABASE_URL_{(organization_id or '').upper()}."
         )
-    if url not in _pools:
-        _pools[url] = ThreadedConnectionPool(1, _pool_max(), dsn=url)
+    with _pools_lock:
+        if url not in _pools:
+            size = _pool_max()
+            _pools[url] = ThreadedConnectionPool(1, size, dsn=url)
+            _slots[url] = threading.BoundedSemaphore(size)
     return _pools[url]
 
 
 @contextmanager
 def warehouse_connection(organization_id: str | None = None) -> Iterator[Any]:
     pool = _pool(organization_id)
-    conn = pool.getconn()
+    slot = _slots[warehouse_url(organization_id)]
+    if not slot.acquire(timeout=BORROW_WAIT_SECONDS):
+        raise RuntimeError("The warehouse is busy; every connection stayed in use. Try again shortly.")
+    try:
+        conn = pool.getconn()
+    except Exception:
+        slot.release()
+        raise
     try:
         yield conn
     finally:
@@ -156,6 +172,7 @@ def warehouse_connection(organization_id: str | None = None) -> Iterator[Any]:
         except Exception:  # noqa: BLE001
             pass
         pool.putconn(conn)
+        slot.release()
 
 
 def execute_query(

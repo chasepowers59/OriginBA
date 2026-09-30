@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   DndContext,
+  DragOverlay,
   PointerSensor,
   useDraggable,
   useDroppable,
@@ -16,18 +17,23 @@ import {
   createDashboard,
   fetchDashboard,
   fetchSnapshots,
+  fetchReportLibrary,
   updateDashboard,
 } from "@/lib/api";
 import type { DashboardTileDef, SavedDashboard, SnapshotSummary } from "@/lib/types";
 import { templatesForSnapshots, type DashboardTemplate } from "@/lib/dashboardTemplates";
 import { swapTileSlots } from "@/lib/dashboardSlots";
+import { folderDashboard } from "@/lib/folderDashboard";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { DashboardTile } from "./DashboardTile";
 import { PresentationToolbar } from "./PresentationToolbar";
 import { NotesDialog } from "./NotesDialog";
 import { CrossFilterBanner } from "@/components/CrossFilterBanner";
+import { ALL_SLOTS, MAX_TILES, visibleSlots } from "@/lib/dashboardSlots";
+import { VisibilityToggle } from "./VisibilityToggle";
+import { FolderInput } from "./FolderInput";
 
-const SLOTS = [0, 1, 2, 3];
+const SLOTS = ALL_SLOTS;
 
 function emptyTile(slot: number, snapshotId = "rpt_financial_txn"): DashboardTileDef {
   // Callers with the org's catalog loaded pass its first snapshot instead.
@@ -50,6 +56,8 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
   const [snapshots, setSnapshots] = useState<SnapshotSummary[]>([]);
   const [board, setBoard] = useState<SavedDashboard | null>(null);
   const [title, setTitle] = useState("My dashboard");
+  const [privateOnly, setPrivateOnly] = useState(false);
+  const [folder, setFolder] = useState("");
   const [days, setDays] = useState(30);
   const [tiles, setTiles] = useState<DashboardTileDef[]>([]);
   const [editSlot, setEditSlot] = useState<number | null>(null);
@@ -75,6 +83,8 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       setBoard(d);
       setTitle(d.title);
       setDays(d.days);
+      setPrivateOnly(d.visibility === "private");
+      setFolder(d.folder ?? "");
       setTiles(d.tiles.length ? d.tiles : [emptyTile(0)]);
       setBoardLoaded(true);
     });
@@ -117,7 +127,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       const used = new Set(real.map((t) => t.slot));
       const free = SLOTS.find((sl) => !used.has(sl));
       if (free === undefined) {
-        setSaveError("This dashboard is full (4 tiles) — remove one before pinning.");
+        setSaveError(`This dashboard is full (${MAX_TILES} tiles) — remove one before pinning.`);
         return current;
       }
       return [...real, pinnedTile(free)];
@@ -131,7 +141,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     return map;
   }, [tiles]);
 
-  const applyTemplate = (template: DashboardTemplate) => {
+  const applyTemplate = (template: Pick<DashboardTemplate, "title" | "days" | "tiles">) => {
     setTitle(template.title);
     setDays(template.days);
     setTiles(
@@ -142,15 +152,33 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     );
   };
 
+  // ?from_folder= (a Library folder's "Make a dashboard") lays that folder out on a new
+  // board; like a template, nothing is stored until Save.
+  const folderApplied = useRef(false);
+  useEffect(() => {
+    const folderId = searchParams.get("from_folder");
+    if (dashboardId || !folderId || folderApplied.current) return;
+    folderApplied.current = true;
+    fetchReportLibrary()
+      .then((library) => {
+        const found = library.folders?.find((f) => f.id === folderId);
+        if (found) applyTemplate(folderDashboard(found));
+      })
+      .catch(() => setSaveError("Couldn't load that Library folder. Add tiles yourself, or try again."));
+    router.replace("/dashboards/new", { scroll: false });
+  }, [dashboardId, router, searchParams]);
+
   const save = async () => {
     setSaving(true);
     setSaveError(null);
     try {
       if (board?.id) {
-        const updated = await updateDashboard(board.id, { title, days, tiles });
+        const updated = await updateDashboard(board.id, { title, days, tiles,
+          visibility: privateOnly ? "private" : "organization", folder: folder.trim() || null });
         setBoard(updated);
       } else {
-        const created = await createDashboard({ title, days, tiles });
+        const created = await createDashboard({ title, days, tiles, visibility: privateOnly ? "private" : "organization",
+          folder: folder.trim() || null });
         setBoard(created);
         window.history.replaceState(null, "", `/dashboards/${created.id}`);
       }
@@ -181,7 +209,10 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     });
   };
 
+  // the tile under the cursor while it is dragged (the DragOverlay draws its title card)
+  const [draggingSlot, setDraggingSlot] = useState<number | null>(null);
   const handleDragEnd = (event: DragEndEvent) => {
+    setDraggingSlot(null);
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     setTiles((prev) => swapTileSlots(prev, Number(active.id), Number(over.id)));
@@ -207,10 +238,11 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            aria-label="Dashboard title"
             className="mt-2 block w-full max-w-lg bg-transparent text-2xl font-bold text-heading outline-none border-b border-edge-subtle focus:border-edge"
           />
           <p className="mt-1 text-sm text-fg-muted">
-            Drag tiles between slots · up to 4 visuals · saved to server
+            Drag tiles between slots · up to {MAX_TILES} visuals · saved to server
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -220,9 +252,19 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
             </button>
           ) : null}
           <PresentationToolbar title={title} exportSections={exportSections} />
-          <button type="button" onClick={() => void save()} disabled={saving} className="btn-primary">
-            {saving ? "Saving…" : "Save dashboard"}
-          </button>
+          {board?.can_edit === false ? (
+            <span className="self-center text-xs text-fg-muted">
+              View only · owned by {board.owner_email}
+            </span>
+          ) : (
+            <>
+              <FolderInput kind="dashboards" value={folder} onChange={setFolder} />
+              <VisibilityToggle privateOnly={privateOnly} onChange={setPrivateOnly} />
+              <button type="button" onClick={() => void save()} disabled={saving} className="btn-primary">
+                {saving ? "Saving…" : "Save dashboard"}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -274,9 +316,10 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
         <p className="text-xs text-fg-muted">Click a chart value to cross-filter all tiles.</p>
       )}
 
-      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} onDragStart={(e) => setDraggingSlot(Number(e.active.id))}
+                  onDragEnd={handleDragEnd} onDragCancel={() => setDraggingSlot(null)}>
         <div id="dashboard-export-root" className="grid gap-4 md:grid-cols-2">
-          {SLOTS.map((slot) => (
+          {visibleSlots([...tileBySlot.keys()]).map((slot) => (
             <SlotCell key={slot} slot={slot} hasTile={Boolean(tileBySlot.get(slot))}>
               {tileBySlot.get(slot) ? (
                 <div className="relative h-full">
@@ -311,6 +354,16 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
             </SlotCell>
           ))}
         </div>
+        <DragOverlay dropAnimation={null}>
+          {draggingSlot != null && tileBySlot.get(draggingSlot) ? (
+            <div data-testid="tile-drag-preview"
+                 className="glass-panel w-72 cursor-grabbing border px-4 py-3 text-sm font-medium text-heading shadow-lg"
+                 style={{ borderColor: "var(--chart-2)" }}>
+              <span aria-hidden className="mr-2 text-fg-muted">⠿</span>
+              {tileBySlot.get(draggingSlot)!.title || "Untitled tile"}
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
 
       {editSlot != null ? (
@@ -400,7 +453,7 @@ function TileEditor({
           />
         </label>
         <label className="text-xs text-fg-muted sm:col-span-2">
-          Snapshot
+          Data set
           <select
             className="input-modern mt-1"
             value={draft.snapshot_id}

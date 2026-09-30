@@ -15,7 +15,7 @@ import {
   type DatabaseQueryTemplate,
   type WorkspaceEngine,
 } from "@/lib/databaseQueryTemplates";
-import { exportRowsCsv, formatBoolean, formatCurrency, formatNumber, isIdentifierColumn } from "@/lib/format";
+import { exportRowsCsv, formatBoolean, formatCellValue, formatCurrency, formatNumber, isIdentifierColumn } from "@/lib/format";
 import { prettifyFieldName } from "@/lib/businessLabels";
 import { cisadmTableGuide } from "@/lib/cisadmTableGuide";
 import { DatabaseResultChart } from "@/components/DatabaseResultChart";
@@ -36,6 +36,7 @@ function formatCell(value: unknown, isNumericCol = false, columnId?: string): st
   if (isNumericCol && value !== "" && !Number.isNaN(Number(value))) {
     return formatNumber(Number(value));
   }
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}/.test(value)) return formatCellValue(value, { columnId });
   const text = String(value);
   if (text.length > 200) return `${text.slice(0, 200)}…`;
   return text;
@@ -68,6 +69,17 @@ export function DatabaseWorkspace({
   initialTable?: string;
 }) {
   const [sql, setSql] = useState("");
+  // A query handed over from the assistant ("Open in SQL workspace"): read once, then cleared,
+  // so a reload does not resurrect it.
+  useEffect(() => {
+    try {
+      const handed = sessionStorage.getItem("portal.assistant.sql");
+      if (handed) {
+        setSql(handed);
+        sessionStorage.removeItem("portal.assistant.sql");
+      }
+    } catch { /* storage unavailable */ }
+  }, []);
   const [activeTemplate, setActiveTemplate] = useState<DatabaseQueryTemplate | null>(null);
   const [pageSize, setPageSize] = useState<number>(50);
   const [loading, setLoading] = useState(false);
@@ -288,9 +300,9 @@ export function DatabaseWorkspace({
     if (fetchingMore) return "Fetching next page…";
     if (fetchingAll) return "Fetching all remaining rows…";
     if (!fetchedTotal) return "Ready";
-    const parts = [`${fetchedTotal.toLocaleString()} row${fetchedTotal === 1 ? "" : "s"} fetched`];
-    if (lastExecutionMs) parts.push(`${lastExecutionMs.toLocaleString()} ms`);
-    if (totalCount != null) parts.push(`of ${totalCount.toLocaleString()} total`);
+    const parts = [`${formatNumber(fetchedTotal)} row${fetchedTotal === 1 ? "" : "s"} fetched`];
+    if (lastExecutionMs) parts.push(`${formatNumber(lastExecutionMs)} ms`);
+    if (totalCount != null) parts.push(`of ${formatNumber(totalCount)} total`);
     else if (hasMore) parts.push("(more available)");
     return parts.join(" · ");
   }, [loading, fetchingMore, fetchingAll, fetchedTotal, lastExecutionMs, totalCount, hasMore]);
@@ -321,7 +333,8 @@ export function DatabaseWorkspace({
       {/* Says what this org's workspace can actually reach; the engine is learned on
           mount, so until then it promises no schema at all. */}
       <p className="portal-text-muted -mt-2 mb-3 max-w-3xl text-sm">{workspaceScope(engine)}</p>
-    <div className="flex h-[calc(100vh-8.5rem)] min-h-[560px] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-solid)] shadow-lg">
+      {/* one screen tall from lg; below it the panels stack at natural height, so results get room */}
+    <div className="flex flex-col overflow-hidden rounded-2xl lg:h-[calc(100vh-8.5rem)] lg:min-h-[560px] border border-[var(--border)] bg-[var(--surface-solid)] shadow-lg">
       <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border)] bg-[var(--surface-subtle)] px-3 py-2">
         <button
           type="button"
@@ -391,6 +404,7 @@ export function DatabaseWorkspace({
           <label className="portal-text-muted flex items-center gap-1.5 text-xs">
             Page size
             <select
+              aria-label="Rows per page"
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
               className="input-modern py-1 text-xs"
@@ -447,6 +461,7 @@ export function DatabaseWorkspace({
               {sidebarTab === "starters" ? (
                 <div className="space-y-2">
                   <select
+                    aria-label="Starter query category"
                     value={templateCategory}
                     onChange={(e) => setTemplateCategory(e.target.value)}
                     className="input-modern w-full py-1.5 text-xs"
@@ -515,7 +530,7 @@ export function DatabaseWorkspace({
                                 <span className="font-mono text-primary">{t.table_name}</span>
                                 {t.num_rows != null ? (
                                   <span className="shrink-0 tabular-nums text-fg-subtle">
-                                    {Number(t.num_rows).toLocaleString()}
+                                    {formatNumber(t.num_rows)}
                                   </span>
                                 ) : null}
                               </span>
@@ -586,7 +601,7 @@ export function DatabaseWorkspace({
             </div>
           ) : null}
 
-          <div className="flex min-h-0 flex-1 flex-col">
+          <div data-testid="sql-results" className="flex min-h-[320px] flex-1 flex-col lg:min-h-0">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--chip-bg)] px-3 py-1">
               <span className="text-[10px] font-semibold uppercase tracking-widest text-fg-muted">
                 Results

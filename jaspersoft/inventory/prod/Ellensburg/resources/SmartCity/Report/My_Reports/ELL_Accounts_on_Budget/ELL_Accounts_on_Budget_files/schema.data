@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Ellensburg_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="SC_CUS_CONTACT" label="Account Details" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID" label="Account Id" resourceId="JoinTree_1.SC_CUS_CONTACT.ACCT_ID"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle Code" resourceId="JoinTree_1.SC_CUS_CONTACT.BILL_CYC_CD"></item>
+        <item id="CELLPHONE" label="Cell Phone" resourceId="JoinTree_1.SC_CUS_CONTACT.CELLPHONE"></item>
+        <item id="ENTITY_NAME" label="Entity Name" resourceId="JoinTree_1.SC_CUS_CONTACT.ENTITY_NAME"></item>
+        <item id="HOMEPHONE" label="Home Phone" resourceId="JoinTree_1.SC_CUS_CONTACT.HOMEPHONE"></item>
+        <item id="PRIMARYEMAIL" label="Email" resourceId="JoinTree_1.SC_CUS_CONTACT.PRIMARYEMAIL"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="CI_SA_RCHG_HIST" label="Recurring Charges" resourceId="JoinTree_1">
+      <items>
+        <item id="CURRENCY_CD" label="Currency" resourceId="JoinTree_1.CI_SA_RCHG_HIST.CURRENCY_CD"></item>
+        <item id="EFFDT" label="Effective Date" resourceId="JoinTree_1.CI_SA_RCHG_HIST.EFFDT"></item>
+        <item id="RCR_CHG_AMT" label="Recurrning Charge Amount" resourceId="JoinTree_1.CI_SA_RCHG_HIST.RCR_CHG_AMT"></item>
+        <item id="SA_ID" label="SA Id" resourceId="JoinTree_1.CI_SA_RCHG_HIST.SA_ID"></item>
+        <item id="END_DT" label="End Date" resourceId="JoinTree_1.CI_SA.END_DT"></item>
+        <item id="SA_STATUS_FLG" label="SA Status" resourceId="JoinTree_1.CI_SA.SA_STATUS_FLG"></item>
+        <item id="SA_TYPE_CD" label="SA Type Code" resourceId="JoinTree_1.CI_SA.SA_TYPE_CD"></item>
+        <item id="START_DT" label="Start Date" resourceId="JoinTree_1.CI_SA.START_DT"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="CI_SA" datasourceId="Ellensburg_DS" datasourceTableName="CI_SA" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="PROP_DCL_RSN_CD" type="java.lang.String"></field>
+        <field id="PROP_SA_ID" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="START_OPT_CD" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="OLD_ACCT_ID" type="java.lang.String"></field>
+        <field id="CUST_READ_FLG" type="java.lang.String"></field>
+        <field id="ALLOW_EST_SW" type="java.lang.String"></field>
+        <field id="SIC_CD" type="java.lang.String"></field>
+        <field id="CHAR_PREM_ID" type="java.lang.String"></field>
+        <field id="TOT_TO_BILL_AMT" type="java.math.BigDecimal"></field>
+        <field id="CURRENCY_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="SA_REL_ID" type="java.lang.String"></field>
+        <field id="STRT_RSN_FLG" type="java.lang.String"></field>
+        <field id="STOP_RSN_FLG" type="java.lang.String"></field>
+        <field id="STRT_REQED_BY" type="java.lang.String"></field>
+        <field id="STOP_REQED_BY" type="java.lang.String"></field>
+        <field id="HIGH_BILL_AMT" type="java.math.BigDecimal"></field>
+        <field id="INT_CALC_DT" type="java.sql.Timestamp"></field>
+        <field id="CIAC_REVIEW_DT" type="java.sql.Timestamp"></field>
+        <field id="BUS_ACTIVITY_DESC" type="java.lang.String"></field>
+        <field id="IB_SA_CUTOFF_TM" type="java.sql.Timestamp"></field>
+        <field id="IB_BASE_TM_DAY_FLG" type="java.lang.String"></field>
+        <field id="ENRL_ID" type="java.lang.String"></field>
+        <field id="SPECIAL_USAGE_FLG" type="java.lang.String"></field>
+        <field id="PROP_SA_STAT_FLG" type="java.lang.String"></field>
+        <field id="NBR_PYMNT_PERIODS" type="java.math.BigDecimal"></field>
+        <field id="NB_RULE_CD" type="java.lang.String"></field>
+        <field id="EXPIRE_DT" type="java.sql.Timestamp"></field>
+        <field id="RENEWAL_DT" type="java.sql.Timestamp"></field>
+        <field id="NB_APAY_FLG" type="java.lang.String"></field>
+        <field id="SA_DATA_AREA" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_SA_RCHG_HIST" datasourceId="Ellensburg_DS" datasourceTableName="CI_SA_RCHG_HIST" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="EFFDT" type="java.sql.Timestamp"></field>
+        <field id="RCR_CHG_AMT" type="java.math.BigDecimal"></field>
+        <field id="CURRENCY_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcQuery id="SC_BUD_ACCTS" datasourceId="Ellensburg_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+      </fieldList>
+      <query>select
+    acct.acct_id
+from
+    cisadm.ci_acct acct
+where acct.bud_plan_cd &lt;&gt; ' '
+    and 0 &lt; (SELECT count(SA.SA_ID)
+        FROM cisadm.CI_SA SA, cisadm.CI_SA_TYPE SAT
+        WHERE SA.ACCT_ID=acct.acct_id
+            AND SA.SA_STATUS_FLG IN ('10','20')
+            AND SAT.CIS_DIVISION = SA.CIS_DIVISION
+            AND SAT.SA_TYPE_CD = SA.SA_TYPE_CD
+            AND SAT.ELIG_BUDGET_SW = 'Y'
+            AND (0 != (SELECT RCHG2.RCR_CHG_AMT
+                    FROM cisadm.CI_SA_RCHG_HIST RCHG2
+                    WHERE RCHG2.SA_ID = SA.SA_ID
+                    AND RCHG2.EFFDT = (SELECT MAX(RCHG.EFFDT)
+                                    FROM cisadm.CI_SA_RCHG_HIST RCHG
+                                    WHERE RCHG.SA_ID=RCHG2.SA_ID))
+                )
+        )</query>
+    </jdbcQuery>
+    <jdbcQuery id="SC_CUS_CONTACT" datasourceId="Ellensburg_DS">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="HOMEPHONE" type="java.lang.String"></field>
+        <field id="CELLPHONE" type="java.lang.String"></field>
+        <field id="PRIMARYEMAIL" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    a.bill_cyc_cd as BILL_CYC_CD,
+    a.acct_id AS ACCT_ID,
+    pn.entity_name as ENTITY_NAME,
+	NVL((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.comm_rte_type_cd ='HOMEPHONE' and cnd_primary_flg = 'C1YS' and CND_ACTINACT_FLG = 'C1AC' ),' ') AS HOMEPHONE,
+	NVL((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.comm_rte_type_cd ='CELLPHONE' and cnd_primary_flg = 'C1YS' and CND_ACTINACT_FLG = 'C1AC' ),' ') AS CELLPHONE,
+	NVL((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.comm_rte_type_cd ='PRIMARYEMAIL' and cnd_primary_flg = 'C1YS' and CND_ACTINACT_FLG = 'C1AC' ),' ') AS PRIMARYEMAIL
+FROM
+         cisadm.ci_acct a
+    JOIN cisadm.ci_acct_per      ap ON a.acct_id = ap.acct_id
+                                  AND main_cust_sw = 'Y'
+    JOIN cisadm.ci_per_name      pn ON ap.per_id = pn.per_id
+                                  AND pn.prim_name_sw = 'Y'</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_1" datasourceId="Ellensburg_DS">
+      <fieldList>
+        <field id="CI_SA.SA_ID" type="java.lang.String"></field>
+        <field id="CI_SA.PROP_DCL_RSN_CD" type="java.lang.String"></field>
+        <field id="CI_SA.PROP_SA_ID" type="java.lang.String"></field>
+        <field id="CI_SA.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CI_SA.SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_SA.START_OPT_CD" type="java.lang.String"></field>
+        <field id="CI_SA.START_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_SA.SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_SA.END_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_SA.OLD_ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_SA.CUST_READ_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.ALLOW_EST_SW" type="java.lang.String"></field>
+        <field id="CI_SA.SIC_CD" type="java.lang.String"></field>
+        <field id="CI_SA.CHAR_PREM_ID" type="java.lang.String"></field>
+        <field id="CI_SA.TOT_TO_BILL_AMT" type="java.math.BigDecimal"></field>
+        <field id="CI_SA.CURRENCY_CD" type="java.lang.String"></field>
+        <field id="CI_SA.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_SA.SA_REL_ID" type="java.lang.String"></field>
+        <field id="CI_SA.STRT_RSN_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.STOP_RSN_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.STRT_REQED_BY" type="java.lang.String"></field>
+        <field id="CI_SA.STOP_REQED_BY" type="java.lang.String"></field>
+        <field id="CI_SA.HIGH_BILL_AMT" type="java.math.BigDecimal"></field>
+        <field id="CI_SA.INT_CALC_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_SA.CIAC_REVIEW_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_SA.BUS_ACTIVITY_DESC" type="java.lang.String"></field>
+        <field id="CI_SA.IB_SA_CUTOFF_TM" type="java.sql.Timestamp"></field>
+        <field id="CI_SA.IB_BASE_TM_DAY_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.ENRL_ID" type="java.lang.String"></field>
+        <field id="CI_SA.SPECIAL_USAGE_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.PROP_SA_STAT_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.NBR_PYMNT_PERIODS" type="java.math.BigDecimal"></field>
+        <field id="CI_SA.NB_RULE_CD" type="java.lang.String"></field>
+        <field id="CI_SA.EXPIRE_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_SA.RENEWAL_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_SA.NB_APAY_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.SA_DATA_AREA" type="java.lang.String"></field>
+        <field id="SC_BUD_ACCTS.ACCT_ID" type="java.lang.String"></field>
+        <field id="SC_CUS_CONTACT.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="SC_CUS_CONTACT.ACCT_ID" type="java.lang.String"></field>
+        <field id="SC_CUS_CONTACT.ENTITY_NAME" type="java.lang.String"></field>
+        <field id="SC_CUS_CONTACT.HOMEPHONE" type="java.lang.String"></field>
+        <field id="SC_CUS_CONTACT.CELLPHONE" type="java.lang.String"></field>
+        <field id="SC_CUS_CONTACT.PRIMARYEMAIL" type="java.lang.String"></field>
+        <field id="CI_SA_RCHG_HIST.SA_ID" type="java.lang.String"></field>
+        <field id="CI_SA_RCHG_HIST.EFFDT" type="java.sql.Timestamp"></field>
+        <field id="CI_SA_RCHG_HIST.RCR_CHG_AMT" type="java.math.BigDecimal"></field>
+        <field id="CI_SA_RCHG_HIST.CURRENCY_CD" type="java.lang.String"></field>
+        <field id="CI_SA_RCHG_HIST.VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <joinInfo alias="SC_BUD_ACCTS" referenceId="SC_BUD_ACCTS"></joinInfo>
+      <joinList>
+        <join expr="SC_BUD_ACCTS.ACCT_ID == SC_CUS_CONTACT.ACCT_ID" left="SC_BUD_ACCTS" right="SC_CUS_CONTACT" type="leftOuter" weight="1"></join>
+        <join expr="SC_BUD_ACCTS.ACCT_ID == CI_SA.ACCT_ID" left="SC_BUD_ACCTS" right="CI_SA" type="inner" weight="1"></join>
+        <join expr="CI_SA.SA_ID == CI_SA_RCHG_HIST.SA_ID" left="CI_SA" right="CI_SA_RCHG_HIST" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>select
+    acct.acct_id
+from
+    cisadm.ci_acct acct
+where acct.bud_plan_cd &lt;&gt; ' '
+    and 0 &lt; (SELECT count(SA.SA_ID)
+        FROM cisadm.CI_SA SA, cisadm.CI_SA_TYPE SAT
+        WHERE SA.ACCT_ID=acct.acct_id
+            AND SA.SA_STATUS_FLG IN ('10','20')
+            AND SAT.CIS_DIVISION = SA.CIS_DIVISION
+            AND SAT.SA_TYPE_CD = SA.SA_TYPE_CD
+            AND SAT.ELIG_BUDGET_SW = 'Y'
+            AND (0 != (SELECT RCHG2.RCR_CHG_AMT
+                    FROM cisadm.CI_SA_RCHG_HIST RCHG2
+                    WHERE RCHG2.SA_ID = SA.SA_ID
+                    AND RCHG2.EFFDT = (SELECT MAX(RCHG.EFFDT)
+                                    FROM cisadm.CI_SA_RCHG_HIST RCHG
+                                    WHERE RCHG.SA_ID=RCHG2.SA_ID))
+                )
+        )</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_SA" tableId="CI_SA"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_BUD_ACCTS" tableId="SC_BUD_ACCTS"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_CUS_CONTACT" tableId="SC_CUS_CONTACT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_SA_RCHG_HIST" tableId="CI_SA_RCHG_HIST"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

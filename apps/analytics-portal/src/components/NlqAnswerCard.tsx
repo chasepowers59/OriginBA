@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { formatCurrency, formatNumber } from "@/lib/format";
+import { formatCompact } from "@/lib/format";
 import type { NlqResponse } from "@/lib/types";
 
 type NlqAnswerCardProps = {
@@ -14,15 +14,8 @@ export function NlqAnswerCard({ result, days, onPinToDashboard }: NlqAnswerCardP
   const value = result.metrics?.value;
   const format = result.format ?? "number";
   const display =
-    value != null && typeof value === "number" && value > 0
-      ? format === "currency"
-        ? formatCurrency(value)
-        : formatNumber(value)
-      : value === 0
-        ? format === "currency"
-          ? formatCurrency(0)
-          : formatNumber(0)
-        : null;
+    // a net can be negative (payments above charges): "-$757K" is an answer, not a blank
+    typeof value === "number" && Number.isFinite(value) ? formatCompact(value, { currency: format === "currency" }) : null;
 
   return (
     <div className="rounded-xl border border-edge tint-panel-br p-4">
@@ -45,7 +38,7 @@ export function NlqAnswerCard({ result, days, onPinToDashboard }: NlqAnswerCardP
             href={`/explore/${result.resolved_from}?tab=model`}
             className="text-primary hover:text-primary"
           >
-            {result.resolved_from.replace(/_/g, " ")}
+            {result.source_label ?? "its data set"}
           </Link>
           {days ? ` · last ${days} days` : ""}
         </p>

@@ -110,6 +110,7 @@ export function updatePortalUser(
     group_ids: string[];
     is_active: boolean;
     password: string;
+    row_rules: import("./rowRules").RowRule[];
   }>,
 ): Promise<AuthUser> {
   return authFetch<AuthUser>(`/auth/users/${userId}`, {

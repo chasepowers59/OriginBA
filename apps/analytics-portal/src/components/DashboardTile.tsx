@@ -6,13 +6,13 @@ import {
   fetchSnapshotMetadata,
   runSnapshotQuery,
 } from "@/lib/api";
-import { formatCurrency, formatNumber } from "@/lib/format";
-import { chartedMeasureColumn, kpiHeadline } from "@/lib/dashboardTileMath";
-import { resolveDateField } from "@/lib/tileDateField";
+import { chartedMeasureColumn, kpiHeadline, tileHeadline, tileIsUnset, tileSeriesLabel } from "@/lib/dashboardTileMath";
+import { resolveDateField, tileWindow } from "@/lib/tileDateField";
 import { measureDisplaysAsCurrency } from "@/lib/businessLabels";
 import type { DashboardTileDef, QueryResponse } from "@/lib/types";
 import { BuilderChart } from "./builder/BuilderChart";
 import { useCrossFilter } from "./CrossFilterContext";
+import { aggIsAdditive } from "@/lib/chartLayout";
 
 type DashboardTileProps = {
   tile: DashboardTileDef;
@@ -34,13 +34,17 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
   const [measureKey, setMeasureKey] = useState("");
   const [queryMeasureField, setQueryMeasureField] = useState("*");
   const [queryMeasureAgg, setQueryMeasureAgg] = useState("count");
+  // the board's day window skipped this tile: say so beside the title
+  const [unwindowed, setUnwindowed] = useState(false);
 
+  const unset = tileIsUnset(tile);
   useEffect(() => {
+    if (unset) return;
     let cancelled = false;
     (async () => {
       try {
-        const [start, end] = defaultDateRange(days);
         const meta = await fetchSnapshotMetadata(tile.snapshot_id);
+        const [start, end] = defaultDateRange(days, meta.data_as_of);
         const report = tile.report_id
           ? meta.premade_reports.find((r) => r.id === tile.report_id)
           : null;
@@ -52,15 +56,10 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
         const groupDate = resolveDateField(meta);
         const timeDimensions =
           tile.time_grain && groupDate ? [{ field: groupDate, grain: tile.time_grain }] : [];
-        const filters: import("@/lib/types").FilterDef[] = [
-          // The dashboard's day window applies on the same date the tile groups by.
-          // It used to key off a mandatory-window field no canvas sets, so the
-          // "last N days" control changed nothing on any tile.
-          ...(groupDate
-            ? [{ field: groupDate, op: "between" as const, value: [start, end] }]
-            : []),
-          ...(report?.filters ?? []),
-        ];
+        // The board's day window applies on the same date the tile groups by. It once keyed
+        // off a mandatory-window field no canvas sets, so "last N days" changed no tile.
+        const dates = tileWindow(meta, report, [start, end]);
+        const filters: import("@/lib/types").FilterDef[] = [...dates.filters, ...(report?.filters ?? [])];
         if (filter) {
           filters.push({ field: filter.field, op: "eq", value: filter.value });
         }
@@ -69,6 +68,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
           measures,
           filters,
           time_dimensions: timeDimensions,
+          all_dates: dates.all_dates,
           limit: 500,
         });
         if (cancelled) return;
@@ -80,6 +80,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
         setMeasureKey(chartedMeasureColumn(response.columns, measures.length));
         setQueryMeasureField(primaryMeasure.field ?? "*");
         setQueryMeasureAgg(primaryMeasure.agg ?? "count");
+        setUnwindowed(Boolean(groupDate) && dates.all_dates);
         setError(null);
       } catch (err) {
         if (!cancelled) {
@@ -117,6 +118,15 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
     onCrossSelect?.(dimensionKey, category);
   };
 
+  if (unset) {
+    return (
+      <div className="glass-panel flex h-full min-h-[160px] flex-col items-center justify-center gap-1 p-6 text-center">
+        <p className="text-sm font-medium text-heading">{tile.title}</p>
+        <p className="text-sm text-fg-muted">Choose a data set and what to break it down by: edit this tile to set it up.</p>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="glass-panel h-full p-4 text-sm text-warn">{error}</div>
@@ -128,12 +138,11 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
   }
 
   if (tile.visual === "kpi") {
-    const formatted =
-      total === null ? null : isCurrency ? formatCurrency(total) : formatNumber(total);
+    const formatted = tileHeadline(total, queryMeasureField, queryMeasureAgg);
     return (
       <div className="glass-panel flex h-full flex-col justify-center p-6">
         <p className="text-xs uppercase tracking-wide text-fg-muted">{tile.title}</p>
-        <p className="mt-2 text-4xl font-bold text-heading">{formatted ?? "—"}</p>
+        <p className="mt-2 text-4xl font-bold text-heading">{formatted}</p>
       </div>
     );
   }
@@ -172,7 +181,10 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
 
   return (
     <div className="glass-panel flex h-full flex-col p-4">
-      <p className="mb-2 text-sm font-medium text-heading">{tile.title}</p>
+      <p className="mb-2 flex items-baseline justify-between gap-2 text-sm font-medium text-heading">
+        {tile.title}
+        {unwindowed ? <span className="shrink-0 text-xs font-normal text-fg-subtle">All dates</span> : null}
+      </p>
       <div className="flex-1">
         <BuilderChart
           visual={effectiveChart}
@@ -182,8 +194,9 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
           series={[
             {
               key: measureKey,
-              label: queryMeasureField === "*" ? "Count" : queryMeasureField,
+              label: tileSeriesLabel(result.column_labels, measureKey, queryMeasureField, queryMeasureAgg),
               currency: isCurrency,
+              additive: aggIsAdditive(queryMeasureAgg),
             },
           ]}
           sortTimeSeries={isTimeSeries}

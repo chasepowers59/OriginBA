@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from typing import Final
 
-RoleName = str  # "user" | "editor" | "admin"
+RoleName = str  # "user" | "editor" | "client_admin" | "admin"
 
-ROLES: Final[tuple[str, ...]] = ("user", "editor", "admin")
+ROLES: Final[tuple[str, ...]] = ("user", "editor", "client_admin", "admin")
 
 ROLE_LABELS: Final[dict[str, str]] = {
     "user": "User",
     "editor": "Editor",
+    "client_admin": "Client admin",
     "admin": "Admin",
 }
 
@@ -31,12 +32,25 @@ ROLE_PERMISSIONS: Final[dict[str, frozenset[str]]] = {
             "saved_views:write",
             "dashboards:write",
             "explorer:builder",
+            # Collections letters carry names, addresses and amounts owed: editors and up.
+            # A run is approved by someone other than its creator (api/letters/runs.py).
+            "letters:read",
+            "letters:generate",
+            "letters:approve",
+            "letters:release",
         }
     ),
-    "admin": frozenset(
+    # Administers ONE client: its users, groups and audit trail, scoped by organization in
+    # api/auth/service.py. Never the platform powers below, never another client.
+    "client_admin": frozenset(
         {
             "users:manage",
             "groups:manage",
+        }
+    ),
+    # The platform (root) admin: every client, no organization of their own.
+    "admin": frozenset(
+        {
             "data_source:manage",
             "snapshots:raw_sql",
             "settings:manage",
@@ -44,7 +58,7 @@ ROLE_PERMISSIONS: Final[dict[str, frozenset[str]]] = {
     ),
 }
 
-ROLE_RANK: Final[dict[str, int]] = {"user": 1, "editor": 2, "admin": 3}
+ROLE_RANK: Final[dict[str, int]] = {"user": 1, "editor": 2, "client_admin": 3, "admin": 4}
 
 
 def permissions_for_role(role: str) -> set[str]:
@@ -71,9 +85,10 @@ def role_at_least(role: str, minimum: str) -> bool:
 
 
 def can_assign_role(actor_role: str, target_role: str) -> bool:
-    """Admins may create editors/users; only admins assign admin."""
-    if not role_at_least(actor_role, "admin"):
-        return False
-    if target_role == "admin":
-        return actor_role == "admin"
-    return True
+    """The platform admin assigns any role; a client admin assigns every role but admin
+    (within their own client, which the service enforces); nobody else assigns roles."""
+    if actor_role == "admin":
+        return True
+    if actor_role == "client_admin":
+        return target_role in ("user", "editor", "client_admin")
+    return False

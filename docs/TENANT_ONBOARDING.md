@@ -75,6 +75,11 @@ data and configuration, never in the models):
    }
    ```
 
+   Optional keys: `"data_as_of": "YYYY-MM-DD"` for a frozen copy (every relative window
+   ends there), and `"scheduled_builds": false` for a database loaded once with no
+   scheduled refresh (a demo): without it, every page warns once the last build is over
+   36 hours old (`api/freshness.py`).
+
 5. **Env key**: set `WAREHOUSE_DATABASE_URL_NEWCLIENT` in the deployment
    environment (never in git; the repo `.env` is local-only).
 6. **The acceptance gate** — nothing ships without it:
@@ -103,7 +108,8 @@ together (grep for `catalog_name_for_org` to find every routing point).
 - **Fleet-identical**: the dbt models and contracts, the canvas catalog
   (`output/catalog_dbt.json`, generated from the contracts), all KPI definitions,
   DQ rules (`dq_rules/rules.yml` runs unchanged at every client because the canvas
-  contract is identical), starter queries and dashboard templates.
+  contract is identical; an Oracle in-database client runs `dq_rules/rules.oracle.yml`,
+  generated from it), starter queries and dashboard templates.
 - **Per-client**: the warehouse database, client-configured codes (captured in
   `client-mappings.md` and the convention seeds, never hardcoded in models),
   accepted schema drift, and the DQ findings themselves.

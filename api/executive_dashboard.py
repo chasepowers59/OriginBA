@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 import re
 
 from typing import Any
 
 from api.demo_db import demo_configured
 from api.warehouse_db import warehouse_configured
+from api.reporting_dates import data_as_of
 from api.kpi_runner import date_windows, execute_kpi_definition, public_lenses, select_lens
+from api.row_security import only_readable, rule_filters
 
 
 EXECUTIVE_KPIS: list[dict[str, Any]] = [
@@ -91,7 +95,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
                   "measures": [{"field": "Current Amount", "agg": "sum"}],
                   "filters": [{"field": "Is Bill Segment", "op": "eq", "value": True},
                               {"field": "Is Frozen", "op": "eq", "value": True}],
-                  "limit": 6},
+                  "limit": 6, "rank": "magnitude"},
     },
     {
         "id": "payments_collected",
@@ -104,7 +108,9 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "date_field": "Payment Date",
         "value": {"dimensions": [],
                   "measures": [{"field": "Pay Segment Amount", "agg": "sum"}], "filters": []},
-        "trend": {"dimensions": ["Payment Status"],
+        # By utility, not by status: the default lens IS a status, so a status breakdown
+        # drew one bar (Ellensburg 2026-09-29; tests/test_kpi_breakdowns.py).
+        "trend": {"dimensions": ["Utility Type"],
                   "measures": [{"field": "Pay Segment Amount", "agg": "sum"}],
                   "filters": [], "limit": 6},
         # This card SAID "Frozen pay segments" and filtered on nothing, so it summed
@@ -224,7 +230,9 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         # is the date every activity has, whatever became of it.
         "date_field": "Created Date/Time",
         "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
-        "trend": {"dimensions": ["Activity Type"],
+        # By field task type: "Activity Type" is one value on every Ellensburg row
+        # (tests/test_kpi_breakdowns.py). Task types are the client's codes (DNP, MIMO-R).
+        "trend": {"dimensions": ["Field Task Type"],
                   "measures": [{"field": "*", "agg": "count"}], "filters": [], "limit": 6},
         # DISCOVERED, not declared. An activity's status is a business-object lifecycle
         # state a client can extend, unlike the base-product _FLG lookups above -- Demo
@@ -280,7 +288,7 @@ def _kpis_for_workstreams(allowed_workstreams: list[str] | None) -> list[dict[st
 _MISSING_RELATION = re.compile(r"ORA-00942|ORA-00903|relation .* does not exist|42P01", re.IGNORECASE)
 
 WAREHOUSE_NOT_BUILT_NOTE = (
-    "This organization's reporting warehouse has not been built yet, so its canvases "
+    "This organization's reporting warehouse has not been built yet, so its data sets "
     "hold no data. Nothing is wrong with the request: the in-database build is the "
     "step that fills them.")
 
@@ -289,13 +297,63 @@ def is_missing_relation_error(message: str | None) -> bool:
     return bool(message) and bool(_MISSING_RELATION.search(str(message)))
 
 
-def warehouse_not_built(kpis: list[dict[str, Any]]) -> bool:
-    """True when EVERY KPI failed for want of its table -- the signature of an org
-    pointed at the dbt catalog before its warehouse exists. Since every org reads the
-    catalog, available_kpis() resolves every KPI everywhere; this is the check against
-    the DATABASE that it cannot make. A partial failure is a real per-KPI problem and
-    is left alone."""
-    return bool(kpis) and all(is_missing_relation_error(k.get("error")) for k in kpis)
+# An org the API cannot reach at all: no connection configured, or the database refused
+# or never answered. One note, pointing at where an administrator connects it.
+_NOT_CONNECTED = re.compile(
+    # ...and a connection lost mid-query (a VPN drop or a sleeping laptop, Ellensburg 2026-09-29)
+    r"No warehouse is configured|could not connect|Connection refused|ORA-125\d\d|ORA-12170|DPY-6005"
+    r"|DPY-4011|DPY-1001|ORA-12262|ORA-0311[34]|ORA-03135|closed the connection",
+    re.IGNORECASE)
+
+
+def is_not_connected_error(message: str | None) -> bool:
+    return bool(message) and bool(_NOT_CONNECTED.search(str(message)))
+
+
+WAREHOUSE_NOT_CONNECTED_NOTE = (
+    "This organization's data is not connected yet. An administrator can connect it "
+    "under Settings, Data source.")
+# a connection that IS configured but cannot be reached now (VPN down, a dropped session)
+DATABASE_UNREACHABLE_NOTE = "This organization's database cannot be reached right now. Try again shortly."
+_UNCONFIGURED = re.compile(r"No warehouse is configured", re.IGNORECASE)
+
+_TIMEOUT = re.compile(r"ORA-01013|statement timeout|canceling statement|DPY-4024|ORA-03156", re.IGNORECASE)
+
+
+def is_transient_error(message: str | None) -> bool:
+    """A dropped connection or a timeout: the same query may well answer next time."""
+    return is_not_connected_error(message) or bool(message and _TIMEOUT.search(str(message)))
+
+
+def unavailable_note(kpis: list[dict[str, Any]]) -> str | None:
+    """One sentence for a page where EVERY card failed for the same reason, else None."""
+    errors = [k.get("error") for k in kpis]
+    if not kpis or not all(errors):
+        return None
+    if all(is_missing_relation_error(e) for e in errors):
+        return WAREHOUSE_NOT_BUILT_NOTE
+    if all(_UNCONFIGURED.search(str(e)) for e in errors):
+        return WAREHOUSE_NOT_CONNECTED_NOTE
+    if all(is_not_connected_error(e) for e in errors):
+        return DATABASE_UNREACHABLE_NOTE
+    return None
+
+
+def present_card_errors(kpis: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """A card says what went wrong in words; the driver text moves to error_detail."""
+    out = []
+    for k in kpis:
+        raw = k.get("error")
+        if raw:
+            if _TIMEOUT.search(raw):
+                message = "This figure took too long to load. Try a shorter period."
+            elif is_missing_relation_error(raw):
+                message = "This figure's report table has not been built yet."
+            else:
+                message = "This figure could not be loaded right now."
+            k = {**k, "error": message, "error_detail": raw}
+        out.append(k)
+    return out
 
 
 def available_kpis(
@@ -321,9 +379,8 @@ def available_kpis(
     if avail or not kpi_defs:
         return avail, None
     return [], (
-        "Executive KPIs read the governed reporting canvases, which are not part of "
-        "this organization's catalog. Its reports are available under Library and "
-        "the canvas pages."
+        "Executive KPIs read governed data sets that are not part of this "
+        "organization's catalog. Its reports are available in the Library."
     )
 
 
@@ -365,12 +422,18 @@ def build_executive_summary(
     allowed_workstreams: list[str] | None = None,
     lenses: dict[str, str] | None = None,
     organization_id: str | None = None,
+    row_rules: tuple | list = (),
 ) -> dict[str, Any]:
-    (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode)
+    # Row-level security: only cards on canvases carrying the rules' columns, each filtered.
+    extra_filters = [*(extra_filters or []), *rule_filters(row_rules)]
+    (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode, organization_id)
+    as_of = data_as_of(organization_id)
     period_label = f"Last {days} days" if compare_mode != "mom" else "Month to date"
+    if as_of:   # a frozen copy: say where the window ends instead of implying it is live
+        period_label = f"{period_label} to {date.fromisoformat(as_of).strftime('%b %-d, %Y')}"
     client_id = organization_id or "demo"
     kpi_defs, catalog_note = available_kpis(
-        _kpis_for_workstreams(allowed_workstreams), organization_id)
+        only_readable(_kpis_for_workstreams(allowed_workstreams), row_rules, organization_id), organization_id)
 
     # The KPI set runs on the canvases from whichever engine serves this org. Either
     # backend being configured is enough -- the runner routes per snapshot and reports
@@ -388,6 +451,7 @@ def build_executive_summary(
                 "end": date_end,
                 "label": period_label,
                 "days": days,
+                "data_as_of": as_of,
             },
             "prior_period": {
                 "start": prior_start,
@@ -446,10 +510,12 @@ def build_executive_summary(
         kpis = []
     # Nine cards each saying ORA-00942 is worse than empty. Collapse to the one note
     # the front-end already renders for a catalog that lacks the canvases.
-    if warehouse_not_built(kpis):
-        catalog_note = WAREHOUSE_NOT_BUILT_NOTE
+    note = unavailable_note(kpis)
+    if note:
+        catalog_note = note
         kpis = []
         kpi_defs = []
+    kpis = present_card_errors(kpis)
     return {
         "client": client_id,
         "db_configured": True,
@@ -465,6 +531,7 @@ def build_executive_summary(
             "end": date_end,
             "label": period_label,
             "days": days,
+            "data_as_of": as_of,
         },
         "prior_period": {
             "start": prior_start,

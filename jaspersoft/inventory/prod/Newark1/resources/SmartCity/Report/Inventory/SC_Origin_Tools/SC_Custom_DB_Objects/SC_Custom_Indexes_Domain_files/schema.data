@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="ALL_INDEXES" label="ALL_INDEXES" resourceId="ALL_INDEXES"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Newark1_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="SYS">
+          <string>SYS</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="INDEX_NAME" label="Index Name" resourceId="ALL_INDEXES.INDEX_NAME"></item>
+    <item id="INDEX_TYPE" label="Index Type" resourceId="ALL_INDEXES.INDEX_TYPE"></item>
+    <item id="TABLE_OWNER" label="Table Owner" resourceId="ALL_INDEXES.TABLE_OWNER"></item>
+    <item id="TABLE_NAME" label="Table Name" resourceId="ALL_INDEXES.TABLE_NAME"></item>
+    <item id="UNIQUENESS" label="Uniqueness" resourceId="ALL_INDEXES.UNIQUENESS"></item>
+    <item id="TABLESPACE_NAME" label="Tablespace Name" resourceId="ALL_INDEXES.TABLESPACE_NAME"></item>
+  </items>
+  <resources>
+    <jdbcTable id="ALL_INDEXES" datasourceId="Newark1_DS" datasourceTableName="ALL_INDEXES" schemaAlias="SYS">
+      <fieldList>
+        <field id="OWNER" type="java.lang.String"></field>
+        <field id="INDEX_NAME" type="java.lang.String"></field>
+        <field id="INDEX_TYPE" type="java.lang.String"></field>
+        <field id="TABLE_OWNER" type="java.lang.String"></field>
+        <field id="TABLE_NAME" type="java.lang.String"></field>
+        <field id="TABLE_TYPE" type="java.lang.String"></field>
+        <field id="UNIQUENESS" type="java.lang.String"></field>
+        <field id="COMPRESSION" type="java.lang.String"></field>
+        <field id="PREFIX_LENGTH" type="java.math.BigDecimal"></field>
+        <field id="TABLESPACE_NAME" type="java.lang.String"></field>
+        <field id="INI_TRANS" type="java.math.BigDecimal"></field>
+        <field id="MAX_TRANS" type="java.math.BigDecimal"></field>
+        <field id="INITIAL_EXTENT" type="java.math.BigDecimal"></field>
+        <field id="NEXT_EXTENT" type="java.math.BigDecimal"></field>
+        <field id="MIN_EXTENTS" type="java.math.BigDecimal"></field>
+        <field id="MAX_EXTENTS" type="java.math.BigDecimal"></field>
+        <field id="PCT_INCREASE" type="java.math.BigDecimal"></field>
+        <field id="PCT_THRESHOLD" type="java.math.BigDecimal"></field>
+        <field id="INCLUDE_COLUMN" type="java.math.BigDecimal"></field>
+        <field id="FREELISTS" type="java.math.BigDecimal"></field>
+        <field id="FREELIST_GROUPS" type="java.math.BigDecimal"></field>
+        <field id="PCT_FREE" type="java.math.BigDecimal"></field>
+        <field id="LOGGING" type="java.lang.String"></field>
+        <field id="BLEVEL" type="java.math.BigDecimal"></field>
+        <field id="LEAF_BLOCKS" type="java.math.BigDecimal"></field>
+        <field id="DISTINCT_KEYS" type="java.math.BigDecimal"></field>
+        <field id="AVG_LEAF_BLOCKS_PER_KEY" type="java.math.BigDecimal"></field>
+        <field id="AVG_DATA_BLOCKS_PER_KEY" type="java.math.BigDecimal"></field>
+        <field id="CLUSTERING_FACTOR" type="java.math.BigDecimal"></field>
+        <field id="STATUS" type="java.lang.String"></field>
+        <field id="NUM_ROWS" type="java.math.BigDecimal"></field>
+        <field id="SAMPLE_SIZE" type="java.math.BigDecimal"></field>
+        <field id="LAST_ANALYZED" type="java.sql.Timestamp"></field>
+        <field id="DEGREE" type="java.lang.String"></field>
+        <field id="INSTANCES" type="java.lang.String"></field>
+        <field id="PARTITIONED" type="java.lang.String"></field>
+        <field id="TEMPORARY" type="java.lang.String"></field>
+        <field id="GENERATED" type="java.lang.String"></field>
+        <field id="SECONDARY" type="java.lang.String"></field>
+        <field id="BUFFER_POOL" type="java.lang.String"></field>
+        <field id="FLASH_CACHE" type="java.lang.String"></field>
+        <field id="CELL_FLASH_CACHE" type="java.lang.String"></field>
+        <field id="USER_STATS" type="java.lang.String"></field>
+        <field id="DURATION" type="java.lang.String"></field>
+        <field id="PCT_DIRECT_ACCESS" type="java.math.BigDecimal"></field>
+        <field id="ITYP_OWNER" type="java.lang.String"></field>
+        <field id="ITYP_NAME" type="java.lang.String"></field>
+        <field id="PARAMETERS" type="java.lang.String"></field>
+        <field id="GLOBAL_STATS" type="java.lang.String"></field>
+        <field id="DOMIDX_STATUS" type="java.lang.String"></field>
+        <field id="DOMIDX_OPSTATUS" type="java.lang.String"></field>
+        <field id="FUNCIDX_STATUS" type="java.lang.String"></field>
+        <field id="JOIN_INDEX" type="java.lang.String"></field>
+        <field id="IOT_REDUNDANT_PKEY_ELIM" type="java.lang.String"></field>
+        <field id="DROPPED" type="java.lang.String"></field>
+        <field id="VISIBILITY" type="java.lang.String"></field>
+        <field id="DOMIDX_MANAGEMENT" type="java.lang.String"></field>
+        <field id="SEGMENT_CREATED" type="java.lang.String"></field>
+        <field id="ORPHANED_ENTRIES" type="java.lang.String"></field>
+        <field id="INDEXING" type="java.lang.String"></field>
+        <field id="AUTO" type="java.lang.String"></field>
+        <field id="CONSTRAINT_INDEX" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>OWNER == 'CISADM' and startsWith(INDEX_NAME, 'CM')</filterString>
+    </jdbcTable>
+  </resources>
+</schema>

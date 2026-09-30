@@ -88,10 +88,7 @@ export function DataSourceSettings() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
-          Data connection
-        </p>
-        <h1 className="mt-1 text-2xl font-bold text-heading">Settings</h1>
+        <h2 className="text-lg font-semibold text-heading">Database connection</h2>
         <p className="mt-2 max-w-2xl text-sm text-fg-muted">
           {/* The EFFECTIVE organization -- the one this page reads and writes. It used
               to name the signed-in user's HOME org, so an admin who had switched tenant
@@ -275,8 +272,8 @@ export function DataSourceSettings() {
         <p className="font-medium text-fg-muted">Security notes</p>
         <ul className="mt-2 list-inside list-disc space-y-1">
           <li>Passwords are never returned by the API after save.</li>
-          <li>Portal vault file is gitignored and encrypted with Fernet on the API server.</li>
-          <li>Set <code className="text-fg-muted">PORTAL_SETTINGS_TOKEN</code> in production to gate changes.</li>
+          <li>A saved connection is encrypted on the API server and never sent back to the browser.</li>
+          <li>In production, set <code className="text-fg-muted">PORTAL_SETTINGS_TOKEN</code> on the server so changes need that token.</li>
           <li>Prefer a read-only database account for analytics exploration.</li>
         </ul>
       </div>

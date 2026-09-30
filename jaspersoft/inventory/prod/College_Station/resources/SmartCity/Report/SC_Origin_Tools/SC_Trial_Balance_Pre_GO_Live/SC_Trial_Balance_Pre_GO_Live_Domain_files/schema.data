@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <itemGroups>
+    <itemGroup id="SC_TRIAL_BAL_TOTAL" label="SC_TRIAL_BAL_TOTAL" resourceId="JoinTree_1">
+      <items>
+        <item id="DESCR_2" label="DESCR" resourceId="JoinTree_1.SC_TRIAL_BAL_TOTAL.DESCR"></item>
+        <item id="DST_ID_2" label="DST_ID" resourceId="JoinTree_1.SC_TRIAL_BAL_TOTAL.DST_ID"></item>
+        <item id="SUM_FT_CUR_AMT_" label="Current Amount" resourceId="JoinTree_1.SC_TRIAL_BAL_TOTAL.SUM_FT_CUR_AMT_"></item>
+        <item id="SUM_FT_TOT_AMT_" label="Total Amount" resourceId="JoinTree_1.SC_TRIAL_BAL_TOTAL.SUM_FT_TOT_AMT_"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SC_TRIAL_BALANCE_0_15" label="SC_TRIAL_BALANCE_0_15" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT_CUR_AMT__1" label="Current (0-15)" resourceId="JoinTree_1.SC_TRIAL_BALANCE_0_15.SUM_FT_CUR_AMT__1"></item>
+        <item id="SUM_FT_TOT_AMT__2" label="Total (0-15)" resourceId="JoinTree_1.SC_TRIAL_BALANCE_0_15.SUM_FT_TOT_AMT__2"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SC_TRIAL_BALANCE_15_45" label="SC_TRIAL_BALANCE_15_45" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT_CUR_AMT__2" label="Current(15-45)" resourceId="JoinTree_1.SC_TRIAL_BALANCE_15_45.SUM_FT_CUR_AMT__2"></item>
+        <item id="SUM_FT_TOT_AMT__3" label="Total (15-45)" resourceId="JoinTree_1.SC_TRIAL_BALANCE_15_45.SUM_FT_TOT_AMT__3"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SC_TRIAL_BALANCE_45_90" label="SC_TRIAL_BALANCE_45_90" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT_CUR_AMT__4" label="Current (45-90)" resourceId="JoinTree_1.SC_TRIAL_BALANCE_45_90.SUM_FT_CUR_AMT__4"></item>
+        <item id="SUM_FT_TOT_AMT__5" label="Current (45-90)" resourceId="JoinTree_1.SC_TRIAL_BALANCE_45_90.SUM_FT_TOT_AMT__5"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SC_TRIAL_BALANCE_90" label="SC_TRIAL_BALANCE_90" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT_CUR_AMT__3" label="Current (90 + Days)" resourceId="JoinTree_1.SC_TRIAL_BALANCE_90.SUM_FT_CUR_AMT__3"></item>
+        <item id="SUM_FT_TOT_AMT__4" label="Total (90 + Days)" resourceId="JoinTree_1.SC_TRIAL_BALANCE_90.SUM_FT_TOT_AMT__4"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcQuery id="SC_TRIAL_BAL_TOTAL" datasourceId="CollegeStation_DS_1">
+      <fieldList>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="SUM_FT_CUR_AMT_" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT_TOT_AMT_" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select DCL.DST_ID, DCL.DESCR,
+    SUM(FT.CUR_AMT), SUM(FT.TOT_AMT) from cisadm.ci_ft FT, cisadm.CI_SA sa, cisadm.ci_sa_type SAT, cisadm.CI_DST_CODE_L DCL
+    where FT.SA_ID = SA.SA_ID
+          and SA.SA_TYPE_CD = SAT.SA_TYPE_CD
+          and SAT.DST_ID = DCL.DST_ID
+    group by DCL.DST_ID, DCL.DESCR</query>
+    </jdbcQuery>
+    <jdbcQuery id="SC_TRIAL_BALANCE_0_15" datasourceId="CollegeStation_DS_1">
+      <fieldList>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="SUM_FT_CUR_AMT__1" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT_TOT_AMT__2" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select DCL.DST_ID, DCL.DESCR,
+    SUM(FT.CUR_AMT), SUM(FT.TOT_AMT) from cisadm.ci_ft FT, cisadm.CI_SA sa, cisadm.ci_sa_type SAT, cisadm.CI_DST_CODE_L DCL
+    where FT.SA_ID = SA.SA_ID
+          and FT.ars_dt between trunc(sysdate) -15 and trunc(sysdate)
+          and SA.SA_TYPE_CD = SAT.SA_TYPE_CD
+          and SAT.DST_ID = DCL.DST_ID
+    group by DCL.DST_ID, DCL.DESCR</query>
+    </jdbcQuery>
+    <jdbcQuery id="SC_TRIAL_BALANCE_15_45" datasourceId="CollegeStation_DS_1">
+      <fieldList>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="SUM_FT_CUR_AMT__2" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT_TOT_AMT__3" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select DCL.DST_ID, DCL.DESCR, 
+    SUM(FT.CUR_AMT), SUM(FT.TOT_AMT) from cisadm.ci_ft FT, cisadm.CI_SA sa, cisadm.ci_sa_type SAT, cisadm.CI_DST_CODE_L DCL
+    where FT.SA_ID = SA.SA_ID
+          and FT.ars_dt between trunc(sysdate) -45 and trunc(sysdate) - 15
+          and SA.SA_TYPE_CD = SAT.SA_TYPE_CD
+          and SAT.DST_ID = DCL.DST_ID
+    group by DCL.DST_ID, DCL.DESCR</query>
+    </jdbcQuery>
+    <jdbcQuery id="SC_TRIAL_BALANCE_90" datasourceId="CollegeStation_DS_1">
+      <fieldList>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="SUM_FT_CUR_AMT__3" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT_TOT_AMT__4" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select DCL.DST_ID, DCL.DESCR,
+    SUM(FT.CUR_AMT), SUM(FT.TOT_AMT) from cisadm.ci_ft FT, cisadm.CI_SA sa, cisadm.ci_sa_type SAT, cisadm.CI_DST_CODE_L DCL
+    where FT.SA_ID = SA.SA_ID
+          and FT.ars_dt &lt;= trunc(sysdate) - 90
+          and SA.SA_TYPE_CD = SAT.SA_TYPE_CD
+          and SAT.DST_ID = DCL.DST_ID
+    group by DCL.DST_ID, DCL.DESCR</query>
+    </jdbcQuery>
+    <jdbcQuery id="SC_TRIAL_BALANCE_45_90" datasourceId="CollegeStation_DS_1">
+      <fieldList>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="SUM_FT_CUR_AMT__4" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT_TOT_AMT__5" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select DCL.DST_ID, DCL.DESCR, 
+    SUM(FT.CUR_AMT), SUM(FT.TOT_AMT) from cisadm.ci_ft FT, cisadm.CI_SA sa, cisadm.ci_sa_type SAT, cisadm.CI_DST_CODE_L DCL
+    where FT.SA_ID = SA.SA_ID
+          and FT.ars_dt between trunc(sysdate) -90 and trunc(sysdate) - 45
+          and SA.SA_TYPE_CD = SAT.SA_TYPE_CD
+          and SAT.DST_ID = DCL.DST_ID
+    group by DCL.DST_ID, DCL.DESCR</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_1" datasourceId="CollegeStation_DS_1">
+      <fieldList>
+        <field id="SC_TRIAL_BALANCE_0_15.DST_ID" type="java.lang.String"></field>
+        <field id="SC_TRIAL_BALANCE_0_15.DESCR" type="java.lang.String"></field>
+        <field id="SC_TRIAL_BALANCE_0_15.SUM_FT_CUR_AMT__1" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SC_TRIAL_BALANCE_0_15.SUM_FT_TOT_AMT__2" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SC_TRIAL_BALANCE_45_90.DST_ID" type="java.lang.String"></field>
+        <field id="SC_TRIAL_BALANCE_45_90.DESCR" type="java.lang.String"></field>
+        <field id="SC_TRIAL_BALANCE_45_90.SUM_FT_CUR_AMT__4" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SC_TRIAL_BALANCE_45_90.SUM_FT_TOT_AMT__5" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SC_TRIAL_BAL_TOTAL.DST_ID" type="java.lang.String"></field>
+        <field id="SC_TRIAL_BAL_TOTAL.DESCR" type="java.lang.String"></field>
+        <field id="SC_TRIAL_BAL_TOTAL.SUM_FT_CUR_AMT_" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SC_TRIAL_BAL_TOTAL.SUM_FT_TOT_AMT_" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SC_TRIAL_BALANCE_90.DST_ID" type="java.lang.String"></field>
+        <field id="SC_TRIAL_BALANCE_90.DESCR" type="java.lang.String"></field>
+        <field id="SC_TRIAL_BALANCE_90.SUM_FT_CUR_AMT__3" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SC_TRIAL_BALANCE_90.SUM_FT_TOT_AMT__4" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SC_TRIAL_BALANCE_15_45.DST_ID" type="java.lang.String"></field>
+        <field id="SC_TRIAL_BALANCE_15_45.DESCR" type="java.lang.String"></field>
+        <field id="SC_TRIAL_BALANCE_15_45.SUM_FT_CUR_AMT__2" fieldDBName="SUM(FT.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SC_TRIAL_BALANCE_15_45.SUM_FT_TOT_AMT__3" fieldDBName="SUM(FT.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <joinInfo alias="SC_TRIAL_BAL_TOTAL" referenceId="SC_TRIAL_BAL_TOTAL"></joinInfo>
+      <joinList>
+        <join expr="SC_TRIAL_BAL_TOTAL.DST_ID == SC_TRIAL_BALANCE_0_15.DST_ID" left="SC_TRIAL_BAL_TOTAL" right="SC_TRIAL_BALANCE_0_15" type="inner" weight="1"></join>
+        <join expr="SC_TRIAL_BAL_TOTAL.DST_ID == SC_TRIAL_BALANCE_15_45.DST_ID" left="SC_TRIAL_BAL_TOTAL" right="SC_TRIAL_BALANCE_15_45" type="inner" weight="1"></join>
+        <join expr="SC_TRIAL_BAL_TOTAL.DST_ID == SC_TRIAL_BALANCE_45_90.DST_ID" left="SC_TRIAL_BAL_TOTAL" right="SC_TRIAL_BALANCE_45_90" type="inner" weight="1"></join>
+        <join expr="SC_TRIAL_BAL_TOTAL.DST_ID == SC_TRIAL_BALANCE_90.DST_ID" left="SC_TRIAL_BAL_TOTAL" right="SC_TRIAL_BALANCE_90" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>select DCL.DST_ID, DCL.DESCR,
+    SUM(FT.CUR_AMT), SUM(FT.TOT_AMT) from cisadm.ci_ft FT, cisadm.CI_SA sa, cisadm.ci_sa_type SAT, cisadm.CI_DST_CODE_L DCL
+    where FT.SA_ID = SA.SA_ID
+          and SA.SA_TYPE_CD = SAT.SA_TYPE_CD
+          and SAT.DST_ID = DCL.DST_ID
+    group by DCL.DST_ID, DCL.DESCR</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_TRIAL_BALANCE_90" tableId="SC_TRIAL_BALANCE_90"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_TRIAL_BALANCE_45_90" tableId="SC_TRIAL_BALANCE_45_90"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_TRIAL_BALANCE_0_15" tableId="SC_TRIAL_BALANCE_0_15"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_TRIAL_BALANCE_15_45" tableId="SC_TRIAL_BALANCE_15_45"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_TRIAL_BAL_TOTAL" tableId="SC_TRIAL_BAL_TOTAL"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

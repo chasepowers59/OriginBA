@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FDLWU_Meter_View_Active_MTRs Report_v2" pageWidth="1540" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="07f1d5f2-336a-495e-acbb-1adb53af5138">
+	<property name="net.sf.jasperreports.export.xls.collapse.row.span" value="false"/>
+	<property name="net.sf.jasperreports.export.html.border.collapse" value="collapse"/>
+	<property name="net.sf.jasperreports.export.docx.frames.as.nested.tables" value="false"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.actual.size" value="true"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.group.indent" value="0"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.min.group.label.width" value="100"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.detail.band.height" value="25"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.header.band.height" value="25"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.row.header.width" value="125"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.cell.width" value="100"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.cell.height" value="20"/>
+	<property name="com.jaspersoft.ji.adhoc.data.adapter" value="true"/>
+	<property name="com.jaspersoft.ji.adhoc" value="1"/>
+	<property name="com.jaspersoft.ji.adhoc.preferredDataStrategy" value="domainDataStrategy"/>
+	<property name="net.sf.jasperreports.export.pdf.tagged" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.tag.language" value="EN-US"/>
+	<property name="net.sf.jasperreports.export.pdf.metadata.title" value="Ad Hoc Report"/>
+	<property name="net.sf.jasperreports.export.pdf.display.metadata.title" value="true"/>
+	<property name="net.sf.jasperreports.components.table.generate.pdf.tags" value="true"/>
+	<property name="net.sf.jasperreports.text.truncate.suffix" value="..."/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.table.flattened.data.set" value="true"/>
+	<import value="com.jaspersoft.ji.adhoc.jr.AdhocReportUtils"/>
+	<style name="ReportDefault" isDefault="true" mode="Transparent" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<pen lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableBaseFrameStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableFrameStyle" style="TableBaseFrameStyle">
+		<box padding="0">
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<bottomPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnFooterFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<pen lineWidth="1.0" lineStyle="Solid"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#D9E4F1">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#F2F2F2">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#F2F2F2" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableSummaryFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableSummaryTextNoBorderStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" fontName="DejaVu Sans" isBold="true">
+		<box leftPadding="5" rightPadding="5"/>
+	</style>
+	<style name="TableSummaryTextStyle" style="TableSummaryTextNoBorderStyle">
+		<box>
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableTitleFrameStyle" style="TableFrameStyle">
+		<box topPadding="0" bottomPadding="0">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableTitleTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box bottomPadding="8">
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableDetailFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableDetailTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="false">
+		<box leftPadding="5" rightPadding="5">
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{PAGE_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="ChartReportTitle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box>
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineStyle="Solid"/>
+		</box>
+	</style>
+	<style name="ChartTitle" forecolor="#000000" fontName="DejaVu Sans" fontSize="12" isBold="true"/>
+	<style name="ChartSubtitle" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartLegend" forecolor="#000000" backcolor="#FFFFFF" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartSeriesColor0" backcolor="#87C4FE"/>
+	<style name="ChartSeriesColor1" backcolor="#E96270"/>
+	<style name="ChartSeriesColor2" backcolor="#D1D1D1"/>
+	<style name="ChartSeriesColor3" backcolor="#FFEE99"/>
+	<style name="ChartSeriesColor4" backcolor="#6164FF"/>
+	<style name="ChartSeriesColor5" backcolor="#B0E992"/>
+	<style name="ChartSeriesColor6" backcolor="#AE9CEA"/>
+	<style name="ChartSeriesColor7" backcolor="#F5B05E"/>
+	<style name="ChartSeriesColor8" backcolor="#589EE1"/>
+	<style name="ChartSeriesColor9" backcolor="#AE4E59"/>
+	<style name="ChartSeriesColor10" backcolor="#747474"/>
+	<style name="ChartSeriesColor11" backcolor="#E2DC77"/>
+	<style name="ChartSeriesColor12" backcolor="#4749A5"/>
+	<style name="ChartSeriesColor13" backcolor="#81B963"/>
+	<style name="ChartSeriesColor14" backcolor="#7764B4"/>
+	<style name="ChartSeriesColor15" backcolor="#F27B4C"/>
+	<style name="ChartCategoryAxisLabelFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="ChartCategoryAxisTickFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartValueAxisLabelFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="ChartValueAxisTickFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartContext" backcolor="#D1CA67"/>
+	<style name="CrosstabElementStyle" mode="Transparent" forecolor="#000033" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseCellStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseTextStyle" mode="Opaque" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Top" vImageAlign="Top" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box topPadding="3" leftPadding="5" bottomPadding="3" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabTitleTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" fontSize="18" isBold="false">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabHeaderLabelStyle" style="CrosstabHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabMeasureHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabMeasureHeaderLabelStyle" style="CrosstabMeasureHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabColumnMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" isBold="false"/>
+	<style name="CrosstabRowMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabInnerRowDimensionHeaderTextStyle" style="CrosstabRowDimensionHeaderTextStyle">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabColumnDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#D9E4F1" hTextAlign="Center" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDetailTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Right" hImageAlign="Right" isBold="false">
+		<box>
+			<topPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" hTextAlign="Right" hImageAlign="Right" isBold="true"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDummyHeaderTextStyle" style="CrosstabBaseTextStyle" backcolor="#F2F2F2"/>
+	<subDataset name="tableDataset" whenResourceMissingType="Key" uuid="63ff4a93-bd45-42c7-b1dd-ad142717cdc2">
+		<property name="net.sf.jasperreports.create.sort.fields.for.groups" value="true"/>
+		<parameter name="_W1_ASSET_NODE.EFF_DTTM_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_W1_ASSET_NODE.EFF_DTTM_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.sql.Timestamp", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_W1_ASSET.STATUS_UPD_DTTM_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_W1_ASSET.STATUS_UPD_DTTM_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.sql.Timestamp", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_CURRENT_DISPOSITION.EFF_DTTM_1_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_CURRENT_DISPOSITION.EFF_DTTM_1_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.sql.Timestamp", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_W1_ASSET_IDENTIFIER.W1_ID_VALUE_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_W1_ASSET_IDENTIFIER.W1_ID_VALUE_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_SP_EQUIPMENT.MSRMT_CYC_CD_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_SP_EQUIPMENT.MSRMT_CYC_CD_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_CURRENT_DISPOSITION.ASSET_DPOS_FLG_1_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_CURRENT_DISPOSITION.ASSET_DPOS_FLG_1_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_W1_ASSET.SPECIFICATION_CD_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_W1_ASSET.SPECIFICATION_CD_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_PREM_GEO.D1_SP_ID_1_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_PREM_GEO.D1_SP_ID_1_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_SP_MTR_LOC.ADHOC_CHAR_VAL_1_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_SP_MTR_LOC.ADHOC_CHAR_VAL_1_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_PREM_GEO.PREM_ID_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_PREM_GEO.PREM_ID_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_PREM_GEO.ADDRESS1_1_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_PREM_GEO.ADDRESS1_1_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_PREM_GEO.GEO_VAL_1_AdHocFunctionMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.Long", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<parameter name="_SC_PREM_GEO.GEO_VAL_1_AdHocMask" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[AdhocReportUtils.getDefaultMask("java.lang.String", $P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE})]]></defaultValueExpression>
+		</parameter>
+		<field name="W1_ASSET_NODE.EFF_DTTM" class="java.sql.Timestamp">
+			<property name="fieldType" value="LEVEL"/>
+			<property name="level" value="W1_ASSET_NODE.EFF_DTTM"/>
+		</field>
+		<field name="W1_ASSET.STATUS_UPD_DTTM" class="java.sql.Timestamp">
+			<property name="fieldType" value="LEVEL"/>
+			<property name="level" value="W1_ASSET_NODE.EFF_DTTM"/>
+		</field>
+		<field name="SC_CURRENT_DISPOSITION.EFF_DTTM_1" class="java.sql.Timestamp">
+			<property name="fieldType" value="LEVEL"/>
+			<property name="level" value="W1_ASSET_NODE.EFF_DTTM"/>
+		</field>
+		<field name="W1_ASSET_IDENTIFIER.W1_ID_VALUE" class="java.lang.String">
+			<property name="fieldType" value="LEVEL"/>
+			<property name="level" value="W1_ASSET_NODE.EFF_DTTM"/>
+		</field>
+		<field name="SC_SP_EQUIPMENT.MSRMT_CYC_CD" class="java.lang.String">
+			<property name="fieldType" value="LEVEL"/>
+			<property name="level" value="W1_ASSET_NODE.EFF_DTTM"/>
+		</field>
+		<field name="SC_CURRENT_DISPOSITION.ASSET_DPOS_FLG_1" class="java.lang.String">
+			<property name="fieldType" value="LEVEL"/>
+			<property name="level" value="W1_ASSET_NODE.EFF_DTTM"/>
+		</field>
+		<field name="W1_ASSET.SPECIFICATION_CD" class="java.lang.String">
+			<property name="fieldType" value="LEVEL"/>
+			<property name="level" value="W1_ASSET_NODE.EFF_DTTM"/>
+		</field>
+		<field name="SC_PREM_GEO.D1_SP_ID_1" class="java.lang.String">
+			<property name="fieldType" value="LEVEL"/>
+			<property name="level" value="W1_ASSET_NODE.EFF_DTTM"/>
+		</field>
+		<field name="SC_SP_MTR_LOC.ADHOC_CHAR_VAL_1" class="java.lang.String">
+			<property name="fieldType" value="LEVEL"/>
+			<property name="level" value="W1_ASSET_NODE.EFF_DTTM"/>
+		</field>
+		<field name="SC_PREM_GEO.PREM_ID" class="java.lang.String">
+			<property name="fieldType" value="LEVEL"/>
+			<property name="level" value="W1_ASSET_NODE.EFF_DTTM"/>
+		</field>
+		<field name="SC_PREM_GEO.ADDRESS1_1" class="java.lang.String">
+			<property name="fieldType" value="LEVEL"/>
+			<property name="level" value="W1_ASSET_NODE.EFF_DTTM"/>
+		</field>
+		<field name="SC_PREM_GEO.GEO_VAL_1" class="java.lang.String">
+			<property name="fieldType" value="LEVEL"/>
+			<property name="level" value="W1_ASSET_NODE.EFF_DTTM"/>
+		</field>
+	</subDataset>
+	<parameter name="REPORT_TITLE" class="java.lang.String" isForPrompting="false">
+		<property name="net.sf.jasperreports.data.cache.included" value="true"/>
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<title>
+		<band height="1" splitType="Stretch"/>
+	</title>
+	<summary>
+		<band height="25" splitType="Stretch">
+			<componentElement>
+				<reportElement style="TableFrameStyle" x="0" y="0" width="1500" height="25" uuid="fc7fd498-5e14-4ed7-a1e5-33615a7960d1"/>
+				<c:table xmlns:c="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" whenNoDataType="AllSectionsNoDetail">
+					<datasetRun subDataset="tableDataset" uuid="97dd8fb8-8671-4a47-ae56-e347a41cad4a">
+						<dataSourceExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get("com.jaspersoft.ji.adhoc.report.data.source")]]></dataSourceExpression>
+					</datasetRun>
+					<c:columnGroup width="1552" uuid="15a7b6d7-d8f1-49bd-800a-34fb600dbe20">
+						<c:column width="125" uuid="30567cc0-a311-4677-87b6-96f4b2e276be">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="125" height="25" forecolor="#262626" backcolor="#D9E4F1" uuid="78825b21-fb40-4a07-9843-d5b45256902b">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA["EFFECTIVE_DT"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" pattern="yyyy/MM/dd" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="125" height="25" forecolor="#333333" backcolor="#FFFFFF" uuid="47af0f7c-6cb6-4ec5-be6b-b4c2ff30abd0">
+										<property name="net.sf.jasperreports.components.headertoolbar.conditional.formatting">
+											<![CDATA[{"conditionType":"Date","conditionPattern":"yyyy-MM-dd HH:mm:ss","conditions":[]}]]>
+										</property>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="false" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{W1_ASSET_NODE.EFF_DTTM}]]></textFieldExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="52ac82d8-8002-496d-baa9-bc8239b5d7d4">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="125" height="25" forecolor="#262626" backcolor="#D9E4F1" uuid="22ad8c50-f850-4cf8-86f1-3fce73fb2fc4">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA["STATUS_DT"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" pattern="yyyy/MM/dd" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="125" height="25" forecolor="#333333" backcolor="#FFFFFF" uuid="800cdee0-9a34-491b-a3b4-cdac3d6a1f9e">
+										<property name="net.sf.jasperreports.components.headertoolbar.conditional.formatting">
+											<![CDATA[{"conditionType":"Date","conditionPattern":"yyyy-MM-dd HH:mm:ss","conditions":[]}]]>
+										</property>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="false" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{W1_ASSET.STATUS_UPD_DTTM}]]></textFieldExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="137" uuid="7ed571c9-1475-4476-8f32-1a5ef3f000f4">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="137" height="25" forecolor="#262626" backcolor="#D9E4F1" uuid="4682e251-89bc-4636-9045-7c7f3d9235ca">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA["EFFECTIVE_CNG_DT"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" pattern="yyyy/MM/dd" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="137" height="25" forecolor="#333333" backcolor="#FFFFFF" uuid="9076fa82-80e7-4cf9-a684-086e3186ca52">
+										<property name="net.sf.jasperreports.components.headertoolbar.conditional.formatting">
+											<![CDATA[{"conditionType":"Date","conditionPattern":"yyyy-MM-dd HH:mm:ss","conditions":[]}]]>
+										</property>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="false" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{SC_CURRENT_DISPOSITION.EFF_DTTM_1}]]></textFieldExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="c4d5c01d-adad-4a43-b810-0674e0653dfe">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="125" height="25" forecolor="#262626" backcolor="#D9E4F1" uuid="76c12ad7-f70c-4a64-9ebb-ea9797c4760a">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA["METER_NUMBER"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="dad311b6-c7f4-4f45-9d06-718bd02e0a42">
+										<property name="net.sf.jasperreports.components.headertoolbar.conditional.formatting">
+											<![CDATA[{"conditionType":"Text","conditionPattern":null,"conditions":[]}]]>
+										</property>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{W1_ASSET_IDENTIFIER.W1_ID_VALUE}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_W1_ASSET_IDENTIFIER.W1_ID_VALUE_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="156fd2a8-df2a-4573-940a-e78e8cb975a2">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="125" height="25" forecolor="#262626" backcolor="#D9E4F1" uuid="9cba1103-0acc-4c8a-97ea-c1f532b967ed">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA["BILL_CYCLE"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="b4f76e37-4a10-4349-8e62-d318c0c5b1e4">
+										<property name="net.sf.jasperreports.components.headertoolbar.conditional.formatting">
+											<![CDATA[{"conditionType":"Text","conditionPattern":null,"conditions":[]}]]>
+										</property>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{SC_SP_EQUIPMENT.MSRMT_CYC_CD}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_SC_SP_EQUIPMENT.MSRMT_CYC_CD_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="165" uuid="bd999abd-c7c9-4e43-ad26-53735fcf505f">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="165" height="25" forecolor="#262626" backcolor="#D9E4F1" uuid="036ae908-301f-4387-aab9-da2abe3ed99a">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA["CURRENT_DISPOSITION"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="165" height="25" uuid="7ecd5c9c-c9ae-4cd5-a252-ff37ecb14a53">
+										<property name="net.sf.jasperreports.components.headertoolbar.conditional.formatting">
+											<![CDATA[{"conditionType":"Text","conditionPattern":null,"conditions":[]}]]>
+										</property>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{SC_CURRENT_DISPOSITION.ASSET_DPOS_FLG_1}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_SC_CURRENT_DISPOSITION.ASSET_DPOS_FLG_1_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="92fb9770-eba2-4f93-88e6-282f6e08d387">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="125" height="25" forecolor="#262626" backcolor="#D9E4F1" uuid="cd68cfa0-5f33-4bf0-9418-6d4b9d760dea">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA["MTR_SPEC"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="76676e43-33ab-4045-9224-f1bbc18e5fba">
+										<property name="net.sf.jasperreports.components.headertoolbar.conditional.formatting">
+											<![CDATA[{"conditionType":"Text","conditionPattern":null,"conditions":[]}]]>
+										</property>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{W1_ASSET.SPECIFICATION_CD}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_W1_ASSET.SPECIFICATION_CD_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="c65ddb52-fd9b-4ff0-92ca-65757c030707">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="125" height="25" forecolor="#262626" backcolor="#D9E4F1" uuid="e913b121-ca8c-4c00-92fc-932858af1759">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA["SERVICE_POINT_ID"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="48f5334a-7e38-4f20-a445-032e313e70c7">
+										<property name="net.sf.jasperreports.components.headertoolbar.conditional.formatting">
+											<![CDATA[{"conditionType":"Text","conditionPattern":null,"conditions":[]}]]>
+										</property>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{SC_PREM_GEO.D1_SP_ID_1}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_SC_PREM_GEO.D1_SP_ID_1_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="9d5857b6-cf9a-4025-89bb-ed25f4377d47">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="125" height="25" forecolor="#262626" backcolor="#D9E4F1" uuid="3eeba166-fd77-4ec7-9951-a3f76fbc13cb">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA["MTR_SITE_ID"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="563c1c77-a1b8-4782-afb8-ba1d065ed4ec">
+										<property name="net.sf.jasperreports.components.headertoolbar.conditional.formatting">
+											<![CDATA[{"conditionType":"Text","conditionPattern":null,"conditions":[]}]]>
+										</property>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{SC_SP_MTR_LOC.ADHOC_CHAR_VAL_1}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_SC_SP_MTR_LOC.ADHOC_CHAR_VAL_1_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="ccdffe20-6c47-466b-9feb-06bc85052069">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="125" height="25" forecolor="#262626" backcolor="#D9E4F1" uuid="eb049f46-21c6-4626-a580-1708e6ab6ed3">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA["PREMISE_ID"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="5086868a-6d10-4b44-95f9-6b6f1728ea1a">
+										<property name="net.sf.jasperreports.components.headertoolbar.conditional.formatting">
+											<![CDATA[{"conditionType":"Text","conditionPattern":null,"conditions":[]}]]>
+										</property>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{SC_PREM_GEO.PREM_ID}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_SC_PREM_GEO.PREM_ID_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="cf0a6387-9813-42ea-a263-4708983c14f5">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="125" height="25" forecolor="#262626" backcolor="#D9E4F1" uuid="51357657-7048-41c7-9a11-878f6a1ad5da">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA["PREMISE_ADDR"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="8e055ad0-e642-4657-8e2a-a3fd33de87c0">
+										<property name="net.sf.jasperreports.components.headertoolbar.conditional.formatting">
+											<![CDATA[{"conditionType":"Text","conditionPattern":null,"conditions":[]}]]>
+										</property>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{SC_PREM_GEO.ADDRESS1_1}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_SC_PREM_GEO.ADDRESS1_1_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+						<c:column width="125" uuid="65885388-f32d-4285-98bf-5af0b0c2bd9e">
+							<c:columnHeader height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement style="TableColumnHeaderTextStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="125" height="25" forecolor="#262626" backcolor="#D9E4F1" uuid="b1c1e542-f5ce-4fd0-9854-b76338661b62">
+										<property name="net.sf.jasperreports.components.condition.type" value="Text"/>
+									</reportElement>
+									<textElement textAlignment="Left">
+										<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="false" isUnderline="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA["PIN"]]></textFieldExpression>
+								</textField>
+							</c:columnHeader>
+							<c:detailCell height="25">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement key="textField" style="TableDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="125" height="25" uuid="4421f951-de42-4026-9f9e-4064b2536673">
+										<property name="net.sf.jasperreports.components.headertoolbar.conditional.formatting">
+											<![CDATA[{"conditionType":"Text","conditionPattern":null,"conditions":[]}]]>
+										</property>
+									</reportElement>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression><![CDATA[$F{SC_PREM_GEO.GEO_VAL_1}]]></textFieldExpression>
+									<patternExpression><![CDATA[$P{_SC_PREM_GEO.GEO_VAL_1_AdHocMask}]]></patternExpression>
+								</textField>
+							</c:detailCell>
+						</c:column>
+					</c:columnGroup>
+				</c:table>
+			</componentElement>
+		</band>
+	</summary>
+</jasperReport>

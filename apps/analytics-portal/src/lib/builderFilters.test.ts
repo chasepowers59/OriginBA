@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activeFilters, optionsWithCurrent, restoreFilters } from "./builderFilters";
+import { activeFilters, answerPrompts, cascadeFilters, optionsWithCurrent, restoreFilters, questionFilters, savedFilters, unanswered, type ShelfFilter } from "./builderFilters";
 
 /**
  * The builder never saved its filters shelf, and the restore never set it. A view
@@ -127,5 +127,107 @@ describe("optionsWithCurrent", () => {
     const out = optionsWithCurrent(["A", "A", "B"], "A");
     expect(out!.filter((v) => v === "A")).toHaveLength(2); // preserves the source list
     expect(optionsWithCurrent(["A"], "A")).toEqual(["A"]);
+  });
+});
+
+describe("questionFilters", () => {
+  const fields = [
+    { id: "Bill Date", label: "Bill Date", role: "date" },
+    { id: "Is Frozen", label: "Is Frozen", role: "dimension" },
+    { id: "Is Cancelled", label: "Is Cancelled", role: "dimension" },
+  ];
+  const window = { field: "Bill Date", op: "between", value: ["2026-03-20", "2026-06-18"] };
+  const frozen = [{ field: "Is Frozen", op: "eq", value: true }, { field: "Is Cancelled", op: "eq", value: false }];
+
+  it("adds the canvas's default window, as a visible pill, to a question that filters on flags only", () => {
+    // Declaring "Is Frozen" on revenue-by-cycle (2026-09-28) turned "last 90 days" into all
+    // time: the server windows only a query with NO filters. The window is now the builder's
+    // own pill, so it is seen and can be removed.
+    const pills = questionFilters(frozen, fields, window);
+    expect(pills.map((p) => p.field)).toEqual(["Is Frozen", "Is Cancelled", "Bill Date"]);
+    expect(pills[2]).toMatchObject({ op: "between", value: ["2026-03-20", "2026-06-18"], role: "date" });
+  });
+
+  it("leaves a question that already filters on a date alone", () => {
+    const own = [...frozen, { field: "Bill Date", op: "gte", value: "2026-01-01" }];
+    expect(questionFilters(own, fields, window).map((p) => p.field)).toEqual(["Is Frozen", "Is Cancelled", "Bill Date"]);
+    expect(questionFilters(own, fields, window)[2].op).toBe("gte");
+  });
+
+  it("adds nothing to a question with no filters: the server's disclosed window covers it", () => {
+    expect(questionFilters([], fields, window)).toEqual([]);
+  });
+
+  it("adds nothing when the canvas has no default window", () => {
+    expect(questionFilters(frozen, fields, null).map((p) => p.field)).toEqual(["Is Frozen", "Is Cancelled"]);
+  });
+});
+
+describe("report parameters (filters asked for when a view opens)", () => {
+  const fils: ShelfFilter[] = [
+    { field: "Bill Cycle", label: "Bill Cycle", op: "eq", value: "C1", role: "dimension", prompt: true },
+    { field: "Is Frozen", label: "Is Frozen", op: "eq", value: true, role: "dimension" },
+    { field: "Bill Date", label: "Bill Date", op: "between", value: ["2026-01-01", "2026-03-31"], role: "date", prompt: true },
+  ];
+
+  it("a view saves which filters to ask for", () => {
+    expect(savedFilters(fils)).toEqual([
+      { field: "Bill Cycle", op: "eq", value: "C1", prompt: true },
+      { field: "Is Frozen", op: "eq", value: true },
+      { field: "Bill Date", op: "between", value: ["2026-01-01", "2026-03-31"], prompt: true },
+    ]);
+  });
+
+  it("the query never carries the prompt flag", () => {
+    expect(activeFilters(fils).every((f) => !("prompt" in f))).toBe(true);
+  });
+
+  it("reopening restores which filters to ask for", () => {
+    const back = restoreFilters(savedFilters(fils), [
+      { id: "Bill Cycle", role: "dimension" }, { id: "Is Frozen", role: "dimension" }, { id: "Bill Date", role: "date" },
+    ]);
+    expect(back.filter((f) => f.prompt).map((f) => f.field)).toEqual(["Bill Cycle", "Bill Date"]);
+  });
+
+  it("answers replace the saved defaults, and a blank answer is reported, not run", () => {
+    const answered = answerPrompts(fils, { "Bill Cycle": "C7", "Bill Date": ["2026-04-01", "2026-06-18"] });
+    expect(answered.find((f) => f.field === "Bill Cycle")?.value).toBe("C7");
+    expect(answered.find((f) => f.field === "Bill Date")?.value).toEqual(["2026-04-01", "2026-06-18"]);
+    expect(unanswered(answerPrompts(fils, { "Bill Cycle": "" }))).toEqual(["Bill Cycle"]);
+    expect(unanswered(answerPrompts(fils, { "Bill Date": ["2026-04-01", ""] }))).toEqual(["Bill Date"]);
+  });
+});
+
+describe("cascading report parameters", () => {
+  const asked: ShelfFilter[] = [
+    { field: "Bill Date", label: "Bill Date", op: "between", value: ["2026-01-01", "2026-03-31"], role: "date", prompt: true },
+    { field: "Bill Cycle", label: "Bill Cycle", op: "eq", value: "", role: "dimension", prompt: true },
+    { field: "Customer Class", label: "Customer Class", op: "eq", value: "", role: "dimension", prompt: true },
+  ];
+
+  it("each list is narrowed by the answered parameters above it", () => {
+    const answers = { "Bill Date": ["2026-01-01", "2026-03-31"], "Bill Cycle": "C1" };
+    expect(cascadeFilters(asked, answers, 2)).toEqual([
+      { field: "Bill Date", op: "between", value: ["2026-01-01", "2026-03-31"] },
+      { field: "Bill Cycle", op: "eq", value: "C1" },
+    ]);
+  });
+
+  it("the first list and unanswered parameters narrow nothing", () => {
+    expect(cascadeFilters(asked, {}, 0)).toEqual([]);
+    expect(cascadeFilters(asked, { "Bill Cycle": "" }, 2)).toEqual([
+      { field: "Bill Date", op: "between", value: ["2026-01-01", "2026-03-31"] },
+    ]);
+  });
+});
+
+describe("a parameter with no default", () => {
+  it("is still saved, so it is asked for; the query leaves it out until answered", () => {
+    const fils: ShelfFilter[] = [
+      { field: "Customer Class", label: "Customer Class", op: "eq", value: "", role: "dimension", prompt: true },
+      { field: "Bill Cycle", label: "Bill Cycle", op: "eq", value: "", role: "dimension" },
+    ];
+    expect(savedFilters(fils)).toEqual([{ field: "Customer Class", op: "eq", value: "", prompt: true }]);
+    expect(activeFilters(fils)).toEqual([]);
   });
 });

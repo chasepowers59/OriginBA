@@ -106,23 +106,5 @@ def assert_snapshot_access(ctx: AuthContext, snapshot_id: str) -> None:
     if not can_access_snapshot(ctx, snapshot_id):
         from fastapi import HTTPException
 
-        raise HTTPException(status_code=403, detail=f"Access denied for snapshot: {snapshot_id}")
+        raise HTTPException(status_code=403, detail="Access denied for this data set")
 
-
-def filter_report_library_for_auth(library: dict[str, Any], ctx: AuthContext) -> dict[str, Any]:
-    if not ctx.workstreams or "*" in ctx.workstreams:
-        return library
-    packs: list[dict[str, Any]] = []
-    for pack in library.get("packs") or []:
-        # workstreams_allowed, not set membership — see filter_snapshots_for_auth.
-        reports = [r for r in pack.get("reports") or []
-                   if workstreams_allowed(ctx.workstreams, r.get("workstream", ""))]
-        if not reports:
-            continue
-        packs.append({**pack, "reports": reports, "report_count": len(reports)})
-    return {
-        **library,
-        "packs": packs,
-        "pack_count": len(packs),
-        "report_count": sum(p.get("report_count", 0) for p in packs),
-    }

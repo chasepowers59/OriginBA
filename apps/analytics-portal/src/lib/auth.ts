@@ -1,4 +1,4 @@
-export type PortalRole = "user" | "editor" | "admin";
+export type PortalRole = "user" | "editor" | "client_admin" | "admin";
 
 export type AuthUser = {
   id: string;
@@ -11,6 +11,8 @@ export type AuthUser = {
   is_active: boolean;
   must_change_password: boolean;
   workstreams: string[];
+  /** Row-level security (api/row_security.py); absent or empty means every row. */
+  row_rules?: import("./rowRules").RowRule[];
   permissions: string[];
   group_ids: string[];
   group_names: string[];
@@ -108,6 +110,7 @@ export function roleLabel(role: PortalRole): string {
   const labels: Record<PortalRole, string> = {
     user: "User",
     editor: "Editor",
+    client_admin: "Client admin",
     admin: "Admin",
   };
   return labels[role] ?? role;

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Pending_Start_Severance" label="Pending_Start_Severance" resourceId="Pending_Start_Severance"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account ID" resourceId="Pending_Start_Severance.ACCT_ID"></item>
+    <item id="ADDRESS" label="Premise Address" resourceId="Pending_Start_Severance.ADDRESS"></item>
+    <item id="ENTITY_NAME" label="Person Name" resourceId="Pending_Start_Severance.ENTITY_NAME"></item>
+    <item id="PRIOR_ACCT_ID" label="Prior Account ID" resourceId="Pending_Start_Severance.PRIOR_ACCT_ID"></item>
+    <item id="PRIOR_ACCT_NAME" label="Prior Account Person Name" resourceId="Pending_Start_Severance.PRIOR_ACCT_NAME"></item>
+    <item id="START_DT" label="Start Date" resourceId="Pending_Start_Severance.START_DT"></item>
+    <item id="PRIOR_BALANCE" label="Prior Balance" resourceId="Pending_Start_Severance.PRIOR_BALANCE"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Pending_Start_Severance" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="ADDRESS" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="PRIOR_ACCT_ID" type="java.lang.String"></field>
+        <field id="PRIOR_ACCT_NAME" type="java.lang.String"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="PRIOR_SA_ID" type="java.lang.String"></field>
+        <field id="PRIOR_BALANCE" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+    E.*,
+    PNAME2.ENTITY_NAME AS PRIOR_ACCT_NAME,
+    (
+        SELECT
+            SUM (FT2.CUR_AMT) CUR_AMT
+        FROM
+            CISADM.CI_FT FT2,
+            CISADM.CI_SA SA3
+        WHERE
+            SA3.ACCT_ID = E.PRIOR_ACCT_ID
+            AND SA3.CHAR_PREM_ID = E.PREM_ID
+            AND FT2.SA_ID = SA3.SA_ID
+            AND FT2.REDUNDANT_SW = 'N'
+            AND FT2.NOT_IN_ARS_SW &lt;&gt; 'Y'
+            AND FT2.FREEZE_SW = 'Y'
+    ) AS PRIOR_BALANCE
+FROM
+    (
+    SELECT
+        D.ACCT_ID,
+        D.ENTITY_NAME,
+        D.PREM_ID,
+        D.ADDRESS,
+        D.START_DT,
+        D.PRIOR_ACCT_ID,
+        D.PRIOR_SA_ID
+    FROM
+        (
+        SELECT
+            C.*,
+            SA2.SA_ID PRIOR_SA_ID,
+            SA2.ACCT_ID PRIOR_ACCT_ID,
+            SA2.SA_STATUS_FLG PRIO_SA_STATUS_FLG,
+            SEVP.SEV_PROC_ID,
+            ROW_NUMBER() OVER (PARTITION BY C.ACCT_ID, C.PREM_ID, SA2.ACCT_ID ORDER BY SA2.SA_ID) RN
+        FROM
+            (
+            SELECT
+                B.ACCT_ID,
+                ACTP.PER_ID,
+                PNAME.ENTITY_NAME,
+                PREM2.PREM_ID,
+                PREM2.ADDRESS1 ||', '|| PREM2.CITY || ', ' 
+                    || DECODE(PREM2.COUNTY, ' ', '', TRIM(PREM2.COUNTY))  
+                    || TRIM(PREM2.STATE) || ', ' || TRIM(PREM2.POSTAL) || ', ' 
+                    || TRIM(PREM2.COUNTRY) AS ADDRESS,
+                B.START_DT
+            FROM 
+                (
+                SELECT
+                    A.*
+                FROM 
+                    (
+                    SELECT
+                        ACCT.ACCT_ID,
+                        PREM.PREM_ID,
+                        SA.SA_ID,
+                        SA.START_DT,
+                        ROW_NUMBER() OVER (PARTITION BY ACCT.ACCT_ID, PREM.PREM_ID ORDER BY SA.START_DT ASC) RN
+                    FROM
+                        CISADM.CI_ACCT ACCT,
+                        CISADM.CI_SA SA,
+                        CISADM.CI_SA_TYPE SATY,
+                        CISADM.CI_PREM PREM
+                    WHERE
+                        SA.ACCT_ID = ACCT.ACCT_ID
+                        AND SA.SA_STATUS_FLG = '10'
+                        AND SATY.SA_TYPE_CD = SA.SA_TYPE_CD
+                        AND SATY.CIS_DIVISION = SA.CIS_DIVISION
+                        AND SATY.SVC_TYPE_CD IN ('E', 'W', 'WW', 'SW', 'R', 'D')
+                        AND PREM.PREM_ID = SA.CHAR_PREM_ID
+                        AND PREM.LL_ID = ' ' ) A
+                WHERE
+                    A.RN = 1 ) B,
+                CISADM.CI_ACCT_PER ACTP,
+                CISADM.CI_PER_NAME PNAME,
+                CISADM.CI_PREM PREM2
+            WHERE
+                ACTP.ACCT_ID = B.ACCT_ID
+                AND ACTP.MAIN_CUST_SW = 'Y'
+                AND PNAME.PER_ID = ACTP.PER_ID
+                AND PNAME.NAME_TYPE_FLG = 'PRIM'
+                AND PREM2.PREM_ID = B.PREM_ID ) C,
+            CISADM.CI_SA SA2,
+            CISADM.CI_SEV_PROC SEVP
+        WHERE
+            SA2.CHAR_PREM_ID = C.PREM_ID
+            AND SA2.ACCT_ID &lt;&gt; C.ACCT_ID
+            AND SEVP.SA_ID = SA2.SA_ID
+            AND ( 
+                SEVP.SEV_STATUS_FLG = '10' 
+                OR (
+                    SEVP.SEV_STATUS_FLG = '20'
+                    AND ((
+                        SELECT
+                            SUM (FT.TOT_AMT) TOT_AMT
+                        FROM
+                            CISADM.CI_FT FT
+                        WHERE
+                            FT.SA_ID = SA2.SA_ID
+                            AND SA2.SA_STATUS_FLG IN ('30','40')
+                            AND FT.REDUNDANT_SW = 'N'
+                            AND FT.NOT_IN_ARS_SW &lt;&gt; 'Y'
+                            AND FT.FREEZE_SW = 'Y'
+                    ) &gt; 0 AND (SELECT COUNT(WO.ACCT_ID) FROM CISADM.CI_WO_PROC WO WHERE WO.ACCT_ID = SA2.ACCT_ID and WO.WO_STATUS_FLG = '10')=0)
+                )
+            )
+        ) D
+    WHERE
+        D.RN = 1 ) E,
+    CISADM.CI_ACCT_PER ACTP2,
+    CISADM.CI_PER_NAME PNAME2
+WHERE
+    ACTP2.ACCT_ID = E.PRIOR_ACCT_ID
+    AND ACTP2.MAIN_CUST_SW = 'Y'
+    AND PNAME2.PER_ID = ACTP2.PER_ID
+    AND PNAME2.NAME_TYPE_FLG = 'PRIM'</query>
+    </jdbcQuery>
+  </resources>
+</schema>

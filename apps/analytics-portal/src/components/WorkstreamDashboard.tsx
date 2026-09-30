@@ -12,9 +12,11 @@ import { DashboardWidget } from "./DashboardWidget";
 import { DashboardControls, type CompareMode } from "./DashboardControls";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { PresentationToolbar } from "./PresentationToolbar";
+import { kpiSections } from "@/lib/dashboardPdf";
 import { WorkstreamHeroLinks } from "./WorkstreamHeroLinks";
 import type { WorkstreamGroup } from "@/lib/types";
 import { CrossFilterBanner } from "@/components/CrossFilterBanner";
+import { OriInsights } from "@/components/OriInsights";
 
 function WorkstreamDashboardInner({
   workstreamId,
@@ -34,6 +36,8 @@ function WorkstreamDashboardInner({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // only the answer to the latest choice lands (see ExecutiveDashboard)
+    let latest = true;
     setLoading(true);
     fetchWorkstreamSummary(
       workstreamId,
@@ -42,9 +46,10 @@ function WorkstreamDashboardInner({
       filter ? { field: filter.field, value: filter.value } : undefined,
       compareMode,
     )
-      .then(setSummary)
-      .catch(() => setSummary(null))
-      .finally(() => setLoading(false));
+      .then((s) => { if (latest) setSummary(s); })
+      .catch(() => { if (latest) setSummary(null); })
+      .finally(() => { if (latest) setLoading(false); });
+    return () => { latest = false; };
   }, [workstreamId, days, compare, compareMode, filter]);
 
   useEffect(() => {
@@ -53,15 +58,7 @@ function WorkstreamDashboardInner({
 
   const label = summary?.workstream_label ?? workstreamDisplayName(workstreamId);
 
-  const exportSections = useMemo(
-    () =>
-      (summary?.kpis ?? []).map((kpi) => ({
-        name: kpi.label,
-        headers: ["Category", "Value"],
-        rows: kpi.trend.map((t) => ({ Category: t.label, Value: t.value })),
-      })),
-    [summary],
-  );
+  const exportSections = useMemo(() => kpiSections(summary?.kpis ?? []), [summary]);
 
   const handleTrendClick = useCallback(
     (kpi: { trend_dimension?: string | null }, trendLabel: string) => {
@@ -83,7 +80,7 @@ function WorkstreamDashboardInner({
               {WORKSTREAM_DESCRIPTIONS[workstreamId] ?? "Governed analytics for this business area."}
             </p>
             {snapshotCount != null ? (
-              <p className="mt-2 text-xs text-fg-muted">{snapshotCount} reporting canvases</p>
+              <p className="mt-2 text-xs text-fg-muted">{snapshotCount} data sets</p>
             ) : null}
           </div>
           <PresentationToolbar title={`${label} Dashboard`} exportSections={exportSections} />
@@ -101,7 +98,7 @@ function WorkstreamDashboardInner({
           <div className="mt-4 grid gap-6 md:grid-cols-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
-                Included ({about.canvases.length} canvases · {about.kpis.length} KPIs)
+                Included ({about.canvases.length} data sets · {about.kpis.length} KPIs)
               </p>
               {about.summary ? (
                 <p className="mt-2 text-xs leading-relaxed text-fg-muted">{about.summary}</p>
@@ -183,6 +180,7 @@ function WorkstreamDashboardInner({
                   filter && filter.field === kpi.trend_dimension ? filter.value : null
                 }
                 onTrendClick={handleTrendClick}
+                periodLabel={summary.period?.label}
               />
             ))}
           </div>
@@ -197,6 +195,7 @@ function WorkstreamDashboardInner({
           </div>
         ) : null}
       </div>
+      {summary?.kpis.length ? <OriInsights workstream={workstreamId} /> : null}
     </section>
   );
 }

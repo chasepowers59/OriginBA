@@ -15,8 +15,10 @@ Examples:
 
 This keeps snapshot DDL, refresh procedures, scheduler jobs, validation SQL, subset-level READMEs, and colocated Domain XML copies together without mixing them with broader validation or diagnostic folders.
 
-For the current 6-hour staggered cadence across the active governed snapshot jobs, use:
-- `sql/performance/snapshots/apply_6hour_staggered_schedule_1am_base.sql`
+For the current cadence across the active-8 snapshot jobs -- two runs a day, 10:00 and 16:00 UTC waves, 30-minute stagger, applied to every PROD client 2026-09-18 -- use:
+- `sql/performance/snapshots/apply_3x_daily_schedule_11utc_base.sql` (file name is historical; the content is 2x daily at 10 and 16 UTC)
+
+The 6-hour cadence it replaced is `apply_6hour_staggered_schedule_1am_base.sql`, kept for rollback.
 
 For governed snapshot-table indexes that are active or planned, use:
 - `sql/performance/snapshots/indexes/`

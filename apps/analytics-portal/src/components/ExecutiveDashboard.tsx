@@ -10,7 +10,8 @@ import { DashboardWidget } from "./DashboardWidget";
 import { DashboardControls, type CompareMode } from "./DashboardControls";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { PresentationToolbar } from "./PresentationToolbar";
-import { formatDateTime } from "@/lib/format";
+import { kpiSections } from "@/lib/dashboardPdf";
+import { formatDateTime, formatNumber } from "@/lib/format";
 import { CrossFilterBanner } from "@/components/CrossFilterBanner";
 
 type ExecutiveDashboardProps = {
@@ -39,6 +40,9 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
   const [lenses, setLenses] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    // Only the answer to the reader's latest choice lands: a slower one to an earlier choice
+    // (30 -> 90 -> 30 days) replaced it (e2e/dashboard-modes.spec.ts).
+    let latest = true;
     setLoading(true);
     fetchExecutiveSummary(
       days,
@@ -47,9 +51,10 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       compareMode,
       lenses,
     )
-      .then(setSummary)
-      .catch(() => setSummary(null))
-      .finally(() => setLoading(false));
+      .then((s) => { if (latest) setSummary(s); })
+      .catch(() => { if (latest) setSummary(null); })
+      .finally(() => { if (latest) setLoading(false); });
+    return () => { latest = false; };
   }, [days, compare, compareMode, filter, reloadKey, lenses]);
 
   const handleLensChange = useCallback((kpiId: string, lensId: string) => {
@@ -58,15 +63,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
 
   const isHome = variant === "home";
 
-  const exportSections = useMemo(
-    () =>
-      (summary?.kpis ?? []).map((kpi) => ({
-        name: kpi.label,
-        headers: ["Category", "Value"],
-        rows: kpi.trend.map((t) => ({ Category: t.label, Value: t.value })),
-      })),
-    [summary],
-  );
+  const exportSections = useMemo(() => kpiSections(summary?.kpis ?? []), [summary]);
 
   const handleTrendClick = useCallback(
     (kpi: { trend_dimension?: string | null }, label: string) => {
@@ -93,7 +90,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
             {summary?.refresh?.last_refresh ? (
               <span className="ml-2 text-xs text-fg-muted">
                 · data refreshed {formatDateTime(summary.refresh.last_refresh)} (
-                {summary.refresh.tables.reduce((a, t) => a + t.batch_rows, 0).toLocaleString()}{" "}
+                {formatNumber(summary.refresh.tables.reduce((a, t) => a + t.batch_rows, 0))}{" "}
                 rows in latest batch)
               </span>
             ) : null}
@@ -164,6 +161,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
                 }
                 onTrendClick={isHome ? undefined : handleTrendClick}
                 onLensChange={handleLensChange}
+                periodLabel={summary.period.label}
               />
             ))}
           </div>

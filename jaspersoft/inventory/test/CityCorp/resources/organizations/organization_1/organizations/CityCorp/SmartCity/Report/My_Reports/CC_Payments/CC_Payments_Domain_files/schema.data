@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CC_PAYMENTS" label="CC_PAYMENTS" resourceId="CC_PAYMENTS"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCOUNT_ID" label="Account Id" resourceId="CC_PAYMENTS.ACCOUNT_ID"></item>
+    <item id="ACCOUNTING_DATE" label="Accounting Date" resourceId="CC_PAYMENTS.ACCOUNTING_DATE"></item>
+    <item id="ADDRESS" label="Address 1" resourceId="CC_PAYMENTS.ADDRESS"></item>
+    <item id="DISTRIBUTION_AMOUNT" label="Distribution Amount" resourceId="CC_PAYMENTS.DISTRIBUTION_AMOUNT"></item>
+    <item id="DISTRIBUTION_TYPE" label="Distribution Type" resourceId="CC_PAYMENTS.DISTRIBUTION_TYPE"></item>
+    <item id="SA_END_DATE" label="End Date" resourceId="CC_PAYMENTS.SA_END_DATE"></item>
+    <item id="SA_ID" label="Service Agreement " resourceId="CC_PAYMENTS.SA_ID"></item>
+    <item id="SA_START_DATE" label="Start Date" resourceId="CC_PAYMENTS.SA_START_DATE"></item>
+    <item id="SA_STATUS" label="SA Status" resourceId="CC_PAYMENTS.SA_STATUS"></item>
+    <item id="SA_TYPE" label="SA Type" resourceId="CC_PAYMENTS.SA_TYPE"></item>
+    <item id="SA_TYPE_DESCRIPTION" label="SA Type Description" resourceId="CC_PAYMENTS.SA_TYPE_DESCRIPTION"></item>
+    <item id="CIS_DIVISION" label="CIS Division" resourceId="CC_PAYMENTS.CIS_DIVISION"></item>
+    <item id="GL_BATCH" label="GL Batch" resourceId="CC_PAYMENTS.GL_BATCH"></item>
+    <item id="GL_BATCH_NUMBER" label="Batch Number" resourceId="CC_PAYMENTS.GL_BATCH_NUMBER"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CC_PAYMENTS" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="ADDRESS" type="java.lang.String"></field>
+        <field id="ACCOUNT_ID" fieldDBName="ACCOUNT ID" type="java.lang.String"></field>
+        <field id="SA_ID" fieldDBName="SA ID" type="java.lang.String"></field>
+        <field id="SA_TYPE" fieldDBName="SA TYPE" type="java.lang.String"></field>
+        <field id="SA_TYPE_DESCRIPTION" fieldDBName="SA TYPE DESCRIPTION" type="java.lang.String"></field>
+        <field id="SA_STATUS" fieldDBName="SA STATUS" type="java.lang.String"></field>
+        <field id="SA_START_DATE" fieldDBName="SA START DATE" type="java.sql.Timestamp"></field>
+        <field id="SA_END_DATE" fieldDBName="SA END DATE" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNTING_DATE" fieldDBName="ACCOUNTING DATE" type="java.sql.Timestamp"></field>
+        <field id="DISTRIBUTION_TYPE" fieldDBName="DISTRIBUTION TYPE" type="java.lang.String"></field>
+        <field id="DISTRIBUTION_AMOUNT" fieldDBName="DISTRIBUTION AMOUNT" type="java.math.BigDecimal"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="GL_BATCH" fieldDBName="GL BATCH" type="java.lang.String"></field>
+        <field id="GL_BATCH_NUMBER" fieldDBName="GL BATCH NUMBER" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+(SELECT P.ADDRESS1
+FROM CISADM.CI_PREM P, CISADM.CI_SA SA1,  CISADM.CI_SA_REL SAR
+WHERE P.PREM_ID=SA1.CHAR_PREM_ID
+AND SAR.SA_ID=SA1.SA_ID
+AND SAR.SA_REL_ID=SA.SA_REL_ID) "ADDRESS",
+SA.ACCT_ID "ACCOUNT ID",
+SA.SA_ID "SA ID",
+SA.SA_TYPE_CD "SA TYPE",
+SATL.DESCR "SA TYPE DESCRIPTION",
+CASE
+ WHEN SA.SA_STATUS_FLG=10 THEN 'Pending Start'
+ WHEN SA.SA_STATUS_FLG=20 THEN 'Active'
+ WHEN SA.SA_STATUS_FLG=30 THEN 'Pending Stop'
+ WHEN SA.SA_STATUS_FLG=40 THEN 'Stopped'
+ WHEN SA.SA_STATUS_FLG=50 THEN 'Reactivated'
+ WHEN SA.SA_STATUS_FLG=60 THEN 'Closed'
+ WHEN SA.SA_STATUS_FLG=70 THEN 'Cancelled'
+END AS "SA STATUS",
+SA.START_DT "SA START DATE",
+SA.END_DT "SA END DATE",
+FT.ACCOUNTING_DT "ACCOUNTING DATE",
+FTGL.DST_ID "DISTRIBUTION TYPE",
+FTGL.AMOUNT "DISTRIBUTION AMOUNT",
+SA.CIS_DIVISION,
+FTP.BATCH_NBR "GL BATCH NUMBER",
+FTP.BATCH_CD "GL BATCH"
+FROM
+CISADM.CI_SA SA,
+CISADM.CI_SA_TYPE_L SATL,
+CISADM.CI_FT FT,
+CISADM.CI_FT_GL FTGL,
+CISADM.CI_FT_PROC FTP
+WHERE
+SA.SA_TYPE_CD=SATL.SA_TYPE_CD
+AND SA.SA_ID=FT.SA_ID
+AND FT.FT_ID=FTGL.FT_ID
+
+
+AND FTGL.DST_ID IN ('CASH','XFER')
+and FTP.FT_ID = FT.FT_ID
+ORDER BY 1,2,9</query>
+    </jdbcQuery>
+  </resources>
+</schema>

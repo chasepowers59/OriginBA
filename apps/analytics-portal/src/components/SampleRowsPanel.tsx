@@ -8,25 +8,21 @@ import type { SampleRowsResponse } from "@/lib/types";
 
 export function SampleRowsPanel({
   snapshotId,
-  tableName,
-  schemaName = "CISADM",
   grainDescription,
   skipSampleRows,
 }: {
   snapshotId: string;
-  tableName: string;
-  /** The snapshot's own schema (`reporting`, or ORIGINBA_REPORTING in-database).
-   *  Hardcoding one labelled every canvas wrongly. */
-  schemaName?: string;
   grainDescription?: string;
   skipSampleRows?: boolean;
 }) {
   const [data, setData] = useState<SampleRowsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState(true);
+  // Closed until asked for: open, three rows of every field pushed the page's reports
+  // below the fold, and the rows cost a warehouse query on every visit.
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
-    if (skipSampleRows) return;
+    if (skipSampleRows || !expanded) return;
     setData(null);
     setError(null);
     fetchSnapshotSampleRows(snapshotId, 3)
@@ -34,7 +30,7 @@ export function SampleRowsPanel({
       .catch((err) =>
         setError(err instanceof Error ? err.message : "Unable to load sample rows"),
       );
-  }, [snapshotId, skipSampleRows]);
+  }, [snapshotId, skipSampleRows, expanded]);
 
   if (skipSampleRows) return null;
 
@@ -43,6 +39,7 @@ export function SampleRowsPanel({
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
         className="flex w-full items-center justify-between px-5 py-4 text-left"
       >
         <div>
@@ -51,8 +48,7 @@ export function SampleRowsPanel({
           </p>
           <h3 className="mt-1 text-lg font-semibold text-heading">What one row looks like</h3>
           <p className="mt-1 text-sm text-fg-muted">
-            {grainDescription ?? "Sample rows from the governed canvas"} ·{" "}
-            <code className="text-xs text-fg-muted">{schemaName}.{tableName}</code>
+            {grainDescription ?? "Sample rows from this data set"}
           </p>
         </div>
         <span className="text-fg-muted">{expanded ? "▾" : "▸"}</span>
@@ -95,7 +91,7 @@ export function SampleRowsPanel({
             </div>
           ) : null}
           {data && !data.rows.length && !error ? (
-            <p className="mt-4 text-sm text-fg-muted">No sample rows returned for this domain.</p>
+            <p className="mt-4 text-sm text-fg-muted">No sample rows returned for this data set.</p>
           ) : null}
         </div>
       ) : null}

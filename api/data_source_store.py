@@ -20,6 +20,7 @@ from typing import Any
 
 from cryptography.fernet import Fernet, InvalidToken
 
+from api.snapshot_catalog import org_backend
 from api.warehouse_db import warehouse_configured
 
 
@@ -232,6 +233,11 @@ def _mask_host(host_part: str) -> str:
 
 
 def public_status(*, organization_id: str, env_configured: bool) -> dict[str, Any]:
+    # The org's declared engine decides which connection this describes. demo25 reads a
+    # Postgres warehouse but also has DEMO25_* Oracle keys, and Settings showed that
+    # Oracle DSN as its connection -- one the org never reads.
+    if org_backend(organization_id)[0] == "postgres":
+        return _warehouse_status(organization_id)
     cfg = load_config(organization_id)
     organizations = _read_vault_orgs()
     org_data = organizations.get(organization_id) or {}
@@ -273,6 +279,10 @@ def public_status(*, organization_id: str, env_configured: bool) -> dict[str, An
     # credential, and claiming it here would put a masked Oracle DSN on a Postgres
     # tenant's settings page. These orgs have no Oracle connection to manage, and the
     # page should be able to say so rather than invent one.
+    return _warehouse_status(organization_id)
+
+
+def _warehouse_status(organization_id: str) -> dict[str, Any]:
     if warehouse_configured(organization_id):
         return {
             "configured": True,

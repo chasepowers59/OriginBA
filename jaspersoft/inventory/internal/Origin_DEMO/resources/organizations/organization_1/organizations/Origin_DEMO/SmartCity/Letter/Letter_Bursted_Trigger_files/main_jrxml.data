@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.3.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Letter-Bursted-Parent" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="64860223-2be3-4ffa-a17a-d8ad244595fa">
+	<property name="ireport.domainUri"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Letter/Letter_Bursted_Trigger_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Letter/Letter_Bursted_Trigger"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Letter-TXRLLLLTR DS"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Trigger for Bursted Letter Printing"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin|Ellensburg"/>
+	<scriptlet name="bursting" class="com.jaspersoft.jasperreports.jrs.bursting.BurstingScriptlet">
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.result.variable" value="BurstedJob"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.output.formats" value="PDF"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.enabled_customSimpleMode" value="true"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.description" value="Letter-Bursted-Trigger"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.alert.enabled_customSimpleMode" value="true"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.overwrite.files_customSimpleMode" value="true"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.type" value="sftp"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.username" value="jasper"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.port" value="22"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.ssh.key" value="/SmartCity/Admin/sshKeys/jasper_rsa"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.save.to.repository_customSimpleMode" value="true"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.folder.uri" value="/SmartCity/Letter/export"/>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.timestamp.pattern"><![CDATA[]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.sequential.filenames"><![CDATA[false]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.enabled"><![CDATA[true]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.source.parameter.net.sf.jasperreports.xml.source"><![CDATA[$P{net.sf.jasperreports.xml.source}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.alert.enabled"><![CDATA[false]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.overwrite.files"><![CDATA[true]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.save.to.repository"><![CDATA[false]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.source.report.uri"><![CDATA["/SmartCity/Letter/"+$P{LetterName}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.base.output.filename"><![CDATA["CC_"+$F{customerContactId}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.source.parameter.customerContactId"><![CDATA[$F{customerContactId}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.label"><![CDATA["Letter-Bursted-Trigger"]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.folder.path"><![CDATA[$P{ftp.folder.path}==null?"//":$P{ftp.folder.path}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.server.name"><![CDATA[$P{ftp.server.name}]]></propertyExpression>
+	</scriptlet>
+	<parameter name="net.sf.jasperreports.xml.source" class="java.lang.String"/>
+	<parameter name="LetterName" class="java.lang.String"/>
+	<parameter name="ftp.server.name" class="java.lang.String"/>
+	<parameter name="ftp.folder.path" class="java.lang.String"/>
+	<queryString language="XPath">
+		<![CDATA[/root/C1-LetterPrintRecord]]>
+	</queryString>
+	<field name="customerContactId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactId"/>
+		<fieldDescription><![CDATA[customerContactId]]></fieldDescription>
+	</field>
+	<field name="accountId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="letter/accountId"/>
+		<fieldDescription><![CDATA[letter/accountId]]></fieldDescription>
+	</field>
+	<field name="batchCode" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/batchCode"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/batchCode]]></fieldDescription>
+	</field>
+	<field name="batchNumber" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/batchNumber"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/batchNumber]]></fieldDescription>
+	</field>
+	<field name="rerunNumber" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/rerunNumber"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/rerunNumber]]></fieldDescription>
+	</field>
+	<field name="letterCount" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/letterCount"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/letterCount]]></fieldDescription>
+	</field>
+	<field name="extractDateTime" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/extractDateTime"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/extractDateTime]]></fieldDescription>
+	</field>
+	<field name="ccIdStart" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/ccIdStart"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/ccIdStart]]></fieldDescription>
+	</field>
+	<field name="ccIdEnd" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/ccIdEnd"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/ccIdEnd]]></fieldDescription>
+	</field>
+	<field name="threadNumber" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/threadNumber"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/threadNumber]]></fieldDescription>
+	</field>
+	<field name="numOfThreads" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-SummaryLetterExtractRecord/numOfThreads"/>
+		<fieldDescription><![CDATA[/root/C1-SummaryLetterExtractRecord/numOfThreads]]></fieldDescription>
+	</field>
+	<variable name="BurstedJob" class="com.jaspersoft.jasperserver.dto.job.ClientReportJob" calculation="System"/>
+	<title>
+		<band height="54">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="54" uuid="4f7622eb-9110-466e-b71f-8b81f793e415"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial Black" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Letter - Bursted]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="290">
+			<textField>
+				<reportElement x="230" y="140" width="240" height="30" uuid="3d63b4fa-4ef1-46f8-a770-e85312772ddc"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numOfThreads}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="50" width="220" height="30" uuid="fe0fc838-8582-47ab-ba99-5e561332990a"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Batch]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="230" y="260" width="240" height="30" uuid="1d2c82ad-e371-4e56-b15c-34df1ac92a39"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ccIdEnd}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="200" width="240" height="30" uuid="8806a4e7-9ab9-4084-995b-cc00c40d079b"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{extractDateTime}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="170" width="220" height="30" uuid="b60f363a-4dec-47ed-968d-e234cc4a6819"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Letter Count]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="230" y="50" width="240" height="30" uuid="bc8697a1-f989-49df-bd9d-baa5d0deb9ee"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{batchCode}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="140" width="220" height="30" uuid="db33e767-2df0-469e-8cc7-3980c07bcab4"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Batch Thread Count]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="230" y="80" width="240" height="30" uuid="8fb01fdd-068d-4a76-b696-898899c07ef7"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{batchNumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="110" width="220" height="30" uuid="f9e58a36-6ee9-4bab-9296-55852680d022"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Batch Thread Number]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="230" y="110" width="240" height="30" uuid="4ade1729-5e59-4b1b-acc7-83cf0924431b"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{threadNumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="230" width="220" height="30" uuid="a3570873-7677-41f1-8948-49f652d02560"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Letter Id Start]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="260" width="220" height="30" uuid="64986917-f739-46cf-9b7a-2d94bd713ba8"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Letter Id End]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="200" width="220" height="30" uuid="68013f65-3348-42a4-b51c-0c377f55b850"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Extract Date Time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="80" width="220" height="30" uuid="1cfc39ef-2318-44f7-a072-4d627aa17aad"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Batch Number]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="230" y="170" width="240" height="30" uuid="2f8234cd-4c9e-4875-a147-b652524bc5ff"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{letterCount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="230" width="240" height="30" uuid="d97b3146-b7fc-4471-876e-111b8537b3c2"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ccIdStart}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+</jasperReport>

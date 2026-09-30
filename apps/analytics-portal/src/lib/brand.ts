@@ -8,7 +8,7 @@ export const DEFAULT_BRAND: PortalBrandConfig = {
   logo_initials: "O",
   logo_src: "/origin-mark.png",
   connection_label: "Connected",
-  footer: "Built on the Origin reporting layer · contracted models · traceable to the source column",
+  footer: "Built on the Origin reporting layer · every figure traceable to its source in your CIS",
 };
 
 /** Runtime brand (set by PortalThemeProvider). Falls back to defaults. */

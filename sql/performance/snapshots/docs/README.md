@@ -1,6 +1,6 @@
 # Snapshot Documentation
 
-> **Active set as of 2026-09-08:** eight tables -- FT_RPT_CURR, BSEG_BILLED_USAGE_RPT_CURR, BSEG_SQ_USAGE_RPT_CURR, D1_MSRMT_RPT_CURR, FT_GL_DISTRIBUTION_RPT_CURR, D1_USAGE_RPT_CURR, D1_USAGE_SCALAR_DTL_RPT_CURR and CMS_SA_SNAPSHOT -- on the 6-hour stagger in `../deployment_steps/07_schedule_all_active_snapshots.sql`. The twelve consolidation snapshots, ACCT_DEBT, COLL_PROC and PAY_TNDR_CASH are archived under `archive/2026-09-08_reorg/` (index there). Sections below that describe them are history.
+> **Active set as of 2026-09-08:** eight tables -- FT_RPT_CURR, BSEG_BILLED_USAGE_RPT_CURR, BSEG_SQ_USAGE_RPT_CURR, D1_MSRMT_RPT_CURR, FT_GL_DISTRIBUTION_RPT_CURR, D1_USAGE_RPT_CURR, D1_USAGE_SCALAR_DTL_RPT_CURR and CMS_SA_SNAPSHOT -- scheduled twice a day (10:00 and 16:00 UTC waves, 30-minute stagger; since 2026-09-18) by `../deployment_steps/07_schedule_all_active_snapshots.sql`. The twelve consolidation snapshots, ACCT_DEBT, COLL_PROC and PAY_TNDR_CASH are archived under `archive/2026-09-08_reorg/` (index there). Sections below that describe them are history.
 
 
 This folder is the central documentation package for the governed snapshot program.
@@ -10,6 +10,8 @@ Keep snapshot-facing resources here so the SQL workspaces and the documentation 
 The matching Domain XML files are now also copied into each active snapshot workspace. Use the snapshot folder when you want the full local implementation package in one place, and use `domains/exports/manual_imports/` when you need the importable server bundle.
 
 ## Core operating docs
+- `snapshot_procedure_change_test_playbook.md` — TEST-first procedure changes; disable jobs → deploy → validate → enable; PROD rolling runtime reference
+- `high_volume_snapshot_optimization_program.md` — Newark / College Station FT GL + usage optimization (parity contract, 02c batched refresh)
 - `legacy_domain_to_snapshot_modernization_playbook.md`
 - `snapshot_modernization_checklist.md`
 - `snapshot_sqldeveloper_runbook.md`

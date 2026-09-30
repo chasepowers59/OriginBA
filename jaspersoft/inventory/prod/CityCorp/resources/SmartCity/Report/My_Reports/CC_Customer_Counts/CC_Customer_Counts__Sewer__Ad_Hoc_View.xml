@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adhocDataView exportedWithPermissions="true">
+    <folder>/SmartCity/Report/My_Reports/CC_Customer_Counts</folder>
+    <name>CC_Customer_Counts__Sewer__Ad_Hoc_View</name>
+    <version>0</version>
+    <label>CC Customer Counts (Sewer) Ad Hoc View</label>
+    <creationDate>2025-01-06T08:02:38.000Z</creationDate>
+    <updateDate>2024-12-16T08:00:45.000Z</updateDate>
+    <dataSource>
+        <uri>/SmartCity/Report/My_Reports/CC_Customer_Counts/CC_Customer_Counts_Domain</uri>
+    </dataSource>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/SmartCity/Report/My_Reports/CC_Customer_Counts/CC_Customer_Counts__Sewer__Ad_Hoc_View_files</folder>
+            <name>SA_STATUS_FLG_1_1</name>
+            <version>0</version>
+            <label>SA Status is one of</label>
+            <creationDate>2025-01-06T08:02:38.000Z</creationDate>
+            <updateDate>2024-12-16T08:00:45.000Z</updateDate>
+            <type>7</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/SmartCity/Report/My_Reports/CC_Customer_Counts/CC_Customer_Counts__Sewer__Ad_Hoc_View_files/SA_STATUS_FLG_1_1_files</folder>
+                    <name>SA_STATUS_FLG_1_1</name>
+                    <version>0</version>
+                    <label>SA Status is one of</label>
+                    <creationDate>2025-01-06T08:02:38.000Z</creationDate>
+                    <updateDate>2024-12-16T08:00:45.000Z</updateDate>
+                    <language>domain</language>
+                    <queryString>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema"&gt;
+  &lt;groupList&gt;
+    &lt;group columnName="SA_STATUS_FLG_1" id="SA_STATUS_FLG_1"&gt;&lt;/group&gt;
+  &lt;/groupList&gt;
+  &lt;queryFields&gt;
+    &lt;queryField id="SA_STATUS_FLG_1"&gt;&lt;/queryField&gt;
+  &lt;/queryFields&gt;
+  &lt;sortList&gt;
+    &lt;sortColumn columnName="SA_STATUS_FLG_1"&gt;&lt;/sortColumn&gt;
+  &lt;/sortList&gt;
+&lt;/query&gt;
+</queryString>
+                    <dataSource>
+                        <uri>/SmartCity/Report/My_Reports/CC_Customer_Counts/CC_Customer_Counts_Domain</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>SA_STATUS_FLG_1</queryVisibleColumn>
+            <queryValueColumn>SA_STATUS_FLG_1</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/SmartCity/Report/My_Reports/CC_Customer_Counts/CC_Customer_Counts__Sewer__Ad_Hoc_View_files</folder>
+            <name>isACTIVE_1</name>
+            <version>0</version>
+            <label>isACTIVE equals</label>
+            <creationDate>2025-01-06T08:02:38.000Z</creationDate>
+            <updateDate>2024-12-16T08:00:45.000Z</updateDate>
+            <type>4</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/SmartCity/Report/My_Reports/CC_Customer_Counts/CC_Customer_Counts__Sewer__Ad_Hoc_View_files/isACTIVE_1_files</folder>
+                    <name>isACTIVE_1</name>
+                    <version>0</version>
+                    <label>isACTIVE equals</label>
+                    <creationDate>2025-01-06T08:02:38.000Z</creationDate>
+                    <updateDate>2024-12-16T08:00:45.000Z</updateDate>
+                    <language>domain</language>
+                    <queryString>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema"&gt;
+  &lt;groupList&gt;
+    &lt;group columnName="isACTIVE" id="isACTIVE"&gt;&lt;/group&gt;
+  &lt;/groupList&gt;
+  &lt;queryFields&gt;
+    &lt;queryField id="CaseWhen_and_lessOrEqual_START_DT_Date_2024m06m30_or_IsNull_END_DT_greaterOrEqual_END_DT_Date_2024m06m30_Y_N" resourceId="CaseWhen_and_lessOrEqual_START_DT_Date_2024m06m30_or_IsNull_END_DT_greaterOrEqual_END_DT_Date_2024m06m30_Y_N"&gt;&lt;/queryField&gt;
+    &lt;queryField expression="CaseWhen(START_DT_1 &amp;lt;= ReferenceDate and (IsNull(END_DT_1) or END_DT_1 &amp;gt;= ReferenceDate), 'Y', 'N')" id="isACTIVE" resourceId="isACTIVE"&gt;&lt;/queryField&gt;
+    &lt;queryField id="END_DT_1" resourceId="END_DT"&gt;&lt;/queryField&gt;
+    &lt;queryField expression="Date('2024-06-30')" id="ReferenceDate" resourceId="ReferenceDate"&gt;&lt;/queryField&gt;
+    &lt;queryField id="START_DT_1" resourceId="START_DT"&gt;&lt;/queryField&gt;
+  &lt;/queryFields&gt;
+  &lt;resources&gt;
+    &lt;memory id="default"&gt;
+      &lt;fieldList&gt;
+        &lt;field id="isACTIVE" dataSetExpression="CaseWhen_and_lessOrEqual_START_DT_Date_2024m06m30_or_IsNull_END_DT_greaterOrEqual_END_DT_Date_2024m06m30_Y_N" type="java.lang.String"&gt;&lt;/field&gt;
+      &lt;/fieldList&gt;
+      &lt;sortList&gt;
+        &lt;sortColumn columnName="isACTIVE"&gt;&lt;/sortColumn&gt;
+      &lt;/sortList&gt;
+      &lt;source&gt;
+        &lt;jdbcQuery datasourceId="CityCorp_DS" maxRows="200001"&gt;
+          &lt;fieldList&gt;
+            &lt;field id="START_DT" inResultSet="false" type="java.sql.Timestamp"&gt;&lt;/field&gt;
+            &lt;field id="END_DT" inResultSet="false" type="java.sql.Timestamp"&gt;&lt;/field&gt;
+            &lt;field id="CaseWhen_and_lessOrEqual_START_DT_Date_2024m06m30_or_IsNull_END_DT_greaterOrEqual_END_DT_Date_2024m06m30_Y_N" dataSetExpression="CaseWhen(START_DT &amp;lt;= Date('2024-06-30') and (IsNull(END_DT) or END_DT &amp;gt;= Date('2024-06-30')), 'Y', 'N')" type="java.lang.String"&gt;&lt;/field&gt;
+          &lt;/fieldList&gt;
+          &lt;groupList&gt;
+            &lt;group columnName="CaseWhen_and_lessOrEqual_START_DT_Date_2024m06m30_or_IsNull_END_DT_greaterOrEqual_END_DT_Date_2024m06m30_Y_N" id="CaseWhen_and_lessOrEqual_START_DT_Date_2024m06m30_or_IsNull_END_DT_greaterOrEqual_END_DT_Date_2024m06m30_Y_N"&gt;&lt;/group&gt;
+          &lt;/groupList&gt;
+          &lt;query&gt;select CUST_CL || ' - ' || SA_TYPE_CD AS COMBINED, CUST_CL, SA_TYPE_CD, START_DT, END_DT, SA_STATUS_FLG from (
+select case 
+        when a.cust_cl_cd = 'C' then 'Commercial'
+        when a.cust_cl_cd = 'R' then 'Residential'
+        when a.cust_cl_cd = 'PA' then 'Public Authority'
+        when a.cust_cl_cd = 'M' then 'Municipal'
+        when a.cust_cl_cd = 'W' then 'Wholesale'
+        when a.cust_cl_cd = 'F' then 'Facility'
+        when a.cust_cl_cd = 'P' then 'Preferred Plumber &amp;amp; Contractor'
+        when a.cust_cl_cd = 'V' then 'Non-Billed FD/Const'
+        when a.cust_cl_cd = 'I' then  'Industrial'        
+        else ' '
+       end CUST_CL
+,sa.sa_type_cd, sa.start_dt, sa.end_dt, sa.sa_status_flg from cisadm.ci_sa sa, cisadm.ci_acct a 
+    where sa.sa_type_cd in (select st.sa_type_cd from cisadm.ci_sa_type st where st.svc_type_cd = 'WW') 
+        and a.acct_id = sa.acct_id)&lt;/query&gt;
+          &lt;sortList&gt;
+            &lt;sortColumn columnName="CaseWhen_and_lessOrEqual_START_DT_Date_2024m06m30_or_IsNull_END_DT_greaterOrEqual_END_DT_Date_2024m06m30_Y_N"&gt;&lt;/sortColumn&gt;
+          &lt;/sortList&gt;
+        &lt;/jdbcQuery&gt;
+      &lt;/source&gt;
+    &lt;/memory&gt;
+  &lt;/resources&gt;
+  &lt;sortList&gt;
+    &lt;sortColumn columnName="isACTIVE"&gt;&lt;/sortColumn&gt;
+  &lt;/sortList&gt;
+&lt;/query&gt;
+</queryString>
+                    <dataSource>
+                        <uri>/SmartCity/Report/My_Reports/CC_Customer_Counts/CC_Customer_Counts_Domain</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>isACTIVE</queryVisibleColumn>
+            <queryValueColumn>isACTIVE</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" dataFile="topicJRXML.data" xsi:type="fileResource">
+            <folder>/SmartCity/Report/My_Reports/CC_Customer_Counts/CC_Customer_Counts__Sewer__Ad_Hoc_View_files</folder>
+            <name>topicJRXML</name>
+            <version>0</version>
+            <label>topicJRXML</label>
+            <creationDate>2025-01-06T08:02:38.000Z</creationDate>
+            <updateDate>2024-12-16T07:59:49.000Z</updateDate>
+            <fileType>jrxml</fileType>
+        </localResource>
+    </resource>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" dataFile="stateXML.data" xsi:type="fileResource">
+            <folder>/SmartCity/Report/My_Reports/CC_Customer_Counts/CC_Customer_Counts__Sewer__Ad_Hoc_View_files</folder>
+            <name>stateXML</name>
+            <version>0</version>
+            <label>stateXML</label>
+            <creationDate>2025-01-06T08:02:38.000Z</creationDate>
+            <updateDate>2024-12-16T07:59:49.000Z</updateDate>
+            <fileType>xml</fileType>
+        </localResource>
+    </resource>
+    <alwaysPromptControls>false</alwaysPromptControls>
+    <controlsLayout>1</controlsLayout>
+</adhocDataView>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="BILL_FT_GL" label="BILL_FT_GL" resourceId="BILL_FT_GL"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="AMOUNT" label="Amount" resourceId="BILL_FT_GL.AMOUNT"></item>
+    <item id="BILL_DT" label="Bill date" resourceId="BILL_FT_GL.BILL_DT"></item>
+    <item id="CUST_CL" label="Customer Class" resourceId="BILL_FT_GL.CUST_CL"></item>
+    <item id="DESCR" label="GL Distribution" resourceId="BILL_FT_GL.DESCR"></item>
+    <item id="DST_ID" label="Distribution Code" resourceId="BILL_FT_GL.DST_ID"></item>
+    <item id="END_DT" label="End Date" resourceId="BILL_FT_GL.END_DT"></item>
+    <item id="GL_ACCT" label="GL Account" resourceId="BILL_FT_GL.GL_ACCT"></item>
+    <item id="START_DT" label="Start Date" resourceId="BILL_FT_GL.START_DT"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="BILL_FT_GL" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="BILL_DT" type="java.sql.Timestamp"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="CUST_CL" type="java.lang.String"></field>
+        <field id="AMOUNT" type="java.math.BigDecimal"></field>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="GL_ACCT" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT B.BILL_DT, BS.START_DT,BS.END_DT,
+	CASE 
+        WHEN A.CUST_CL_CD = 'R' THEN 'Residential'
+        WHEN A.CUST_CL_CD = 'I' THEN 'Industrial'
+        WHEN A.CUST_CL_CD = 'C' THEN 'Commercial'
+        WHEN A.CUST_CL_CD = 'P' THEN 'Preferred Plumber &amp; Contractor'
+        WHEN A.CUST_CL_CD = 'V' THEN 'VIP'
+        WHEN A.CUST_CL_CD = 'F' THEN 'Facility'
+        WHEN A.CUST_CL_CD = 'W' THEN 'Wholesale'
+        WHEN A.CUST_CL_CD = 'PA' THEN 'Public Authority'
+        WHEN A.CUST_CL_CD = 'M' THEN 'Municipal'
+        else ' '
+     END as CUST_CL   ,
+    FTGL.AMOUNT,
+    FTGL.DST_ID,
+    DCL.DESCR,
+    FTGL.GL_ACCT
+	FROM CISADM.CI_ACCT A,
+	CISADM.CI_BILL B,
+	CISADM.CI_BSEG BS,
+    CISADM.CI_FT FT,
+    CISADM.CI_FT_GL FTGL,
+    CISADM.CI_DST_CODE_L DCL
+    WHERE A.ACCT_ID=B.ACCT_ID
+    AND B.BILL_STAT_FLG = 'C'
+	AND B.BILL_ID=BS.BILL_ID 
+    AND BS.BSEG_STAT_FLG = '50'
+    AND BS.BSEG_ID = FT.SIBLING_ID 
+    AND FT.FT_TYPE_FLG = 'BS'
+    AND FT.FT_ID = FTGL.FT_ID
+    and FTGL.DST_ID = DCL.DST_ID</query>
+    </jdbcQuery>
+  </resources>
+</schema>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { featuredCanvases } from "./featuredCanvases";
+import { featuredCanvases, startHereGrid } from "./featuredCanvases";
 
 /**
  * "Start here" is the primary call-to-action on every workstream page, and it was dead
@@ -68,5 +68,15 @@ describe("featuredCanvases", () => {
   it("returns nothing when there is nothing at all", () => {
     expect(featuredCanvases([], [])).toEqual([]);
     expect(featuredCanvases(undefined, undefined)).toEqual([]);
+  });
+});
+
+describe("the Start here grid", () => {
+  // design review 2026-09-30: four featured canvases in three columns left one card alone on a row
+  it("never leaves a card alone on its row", () => {
+    expect(startHereGrid(2)).toBe("sm:grid-cols-2");
+    expect(startHereGrid(3)).toBe("sm:grid-cols-3");
+    expect(startHereGrid(4)).toBe("sm:grid-cols-2 lg:grid-cols-4");
+    expect(startHereGrid(6)).toBe("sm:grid-cols-3");
   });
 });

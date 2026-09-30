@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CM_MONTHLY_USER_PAYMENT" label="CM_MONTHLY_USER_PAYMENT" resourceId="CM_MONTHLY_USER_PAYMENT"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="CRE_DTTM" label="CRE_DTTM" resourceId="CM_MONTHLY_USER_PAYMENT.CRE_DTTM"></item>
+    <item id="PAY_EVENT_ID" label="PAY_EVENT_ID" resourceId="CM_MONTHLY_USER_PAYMENT.PAY_EVENT_ID"></item>
+    <item id="PAY_TENDER_ID" label="PAY_TENDER_ID" resourceId="CM_MONTHLY_USER_PAYMENT.PAY_TENDER_ID"></item>
+    <item id="TNDR_CTL_ID" label="TNDR_CTL_ID" resourceId="CM_MONTHLY_USER_PAYMENT.TNDR_CTL_ID"></item>
+    <item id="USER_ID" label="USER_ID" resourceId="CM_MONTHLY_USER_PAYMENT.USER_ID"></item>
+    <item id="USER_NAME" label="USER_NAME" resourceId="CM_MONTHLY_USER_PAYMENT.USER_NAME"></item>
+    <item id="WORK_CENTER" label="WORK_CENTER" resourceId="CM_MONTHLY_USER_PAYMENT.WORK_CENTER"></item>
+    <item id="WORK_CENTER_DESCR" label="WORK_CENTER_DESCR" resourceId="CM_MONTHLY_USER_PAYMENT.WORK_CENTER_DESCR"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CM_MONTHLY_USER_PAYMENT" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="PAY_EVENT_ID" type="java.lang.String"></field>
+        <field id="PAY_TENDER_ID" type="java.lang.String"></field>
+        <field id="TNDR_CTL_ID" type="java.lang.String"></field>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="USER_NAME" type="java.lang.String"></field>
+        <field id="WORK_CENTER" type="java.lang.String"></field>
+        <field id="WORK_CENTER_DESCR" type="java.lang.String"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>SELECT 
+        PEVT.PAY_EVENT_ID,
+        PTDR.PAY_TENDER_ID,
+        TDRC.TNDR_CTL_ID,
+        USR.USER_ID,
+        USR.FIRST_NAME || ' ' || USR.LAST_NAME USER_NAME,
+        USC.CHAR_VAL WORK_CENTER,
+        CVL.DESCR WORK_CENTER_DESCR,
+		PEVT.CRE_DTTM
+    FROM CISADM.CI_PAY_EVENT PEVT
+    INNER JOIN CISADM.CI_PAY_TNDR PTDR ON (PEVT.PAY_EVENT_ID = PTDR.PAY_EVENT_ID)
+    INNER JOIN CISADM.CI_TNDR_CTL TDRC ON (PTDR.TNDR_CTL_ID = TDRC.TNDR_CTL_ID)
+    INNER JOIN CISADM.SC_USER USR ON (TDRC.USER_ID = USR.USER_ID)
+    LEFT OUTER JOIN CISADM.SC_USER_CHAR USC ON (USC.USER_ID = USR.USER_ID AND USC.CHAR_TYPE_CD = 'WRKCNTR')
+    LEFT OUTER JOIN CISADM.CI_CHAR_VAL_L CVL ON (USC.CHAR_TYPE_CD = CVL.CHAR_TYPE_CD AND USC.CHAR_VAL = CVL.CHAR_VAL)</query>
+    </jdbcQuery>
+  </resources>
+</schema>

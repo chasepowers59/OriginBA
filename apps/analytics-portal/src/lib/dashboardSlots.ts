@@ -20,3 +20,15 @@ export function swapTileSlots<T extends { slot: number }>(
   if (b) next.push({ ...b, slot: fromSlot });
   return next.sort((x, y) => x.slot - y.slot);
 }
+
+/** Tiles per dashboard; the API enforces the same number (api/saved_dashboards.py MAX_TILES). */
+export const MAX_TILES = 8;
+
+export const ALL_SLOTS = Array.from({ length: MAX_TILES }, (_, i) => i);
+
+/** The cells the grid shows: every filled slot, and the first empty one to add the next tile. */
+export function visibleSlots(filled: number[]): number[] {
+  const used = new Set(filled);
+  const next = ALL_SLOTS.find((s) => !used.has(s));
+  return ALL_SLOTS.filter((s) => used.has(s) || s === next);
+}

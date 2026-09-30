@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="BILLED_USAGE_DT" label="Billing - Billed Quantities and Amounts" resourceId="BILLED_USAGE_DT"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string>CISADM</string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="BILLED_USAGE_BILLING" label="1.) Billing" resourceId="BILLED_USAGE_DT">
+      <items>
+        <item id="BILL_ID" label="Bill ID" resourceId="BILLED_USAGE_DT.BILL_ID"></item>
+        <item id="BILL_DATE" label="Bill Date" resourceId="BILLED_USAGE_DT.BILL_DATE"></item>
+        <item id="BSEG_ID" label="Bill Segment ID" resourceId="BILLED_USAGE_DT.BSEG_ID"></item>
+        <item id="BSEG_START_DT" label="Bill Segment Start Date" resourceId="BILLED_USAGE_DT.BSEG_START_DT"></item>
+        <item id="BSEG_END_DT" label="Bill Segment End Date" resourceId="BILLED_USAGE_DT.BSEG_END_DT"></item>
+        <item id="BSEG_STAT_FLG" label="Bill Segment Status Code" resourceId="BILLED_USAGE_DT.BSEG_STAT_FLG"></item>
+        <item id="BSEG_STATUS_DESC" label="Bill Segment Status" resourceId="BILLED_USAGE_DT.BSEG_STATUS_DESC"></item>
+        <item id="BILLED_AMOUNT" label="Billed Amount" resourceId="BILLED_USAGE_DT.BILLED_AMOUNT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="BILLED_USAGE_SERVICE" label="2.) Service Agreement and Service Point" resourceId="BILLED_USAGE_DT">
+      <items>
+        <item id="SA_ID" label="Service Agreement ID" resourceId="BILLED_USAGE_DT.SA_ID"></item>
+        <item id="SA_TYPE_CD" label="Service Type Code" resourceId="BILLED_USAGE_DT.SA_TYPE_CD"></item>
+        <item id="SA_TYPE_DESC" label="Service Type" resourceId="BILLED_USAGE_DT.SA_TYPE_DESC"></item>
+        <item id="SA_STATUS_FLG" label="Service Agreement Status Code" resourceId="BILLED_USAGE_DT.SA_STATUS_FLG"></item>
+        <item id="SA_STATUS_DESC" label="Service Agreement Status" resourceId="BILLED_USAGE_DT.SA_STATUS_DESC"></item>
+        <item id="CIS_DIVISION" label="Division" resourceId="BILLED_USAGE_DT.CIS_DIVISION"></item>
+        <item id="SP_ID" label="Service Point ID" resourceId="BILLED_USAGE_DT.SP_ID"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="BILLED_USAGE_CUSTOMER" label="3.) Customer and Account" resourceId="BILLED_USAGE_DT">
+      <items>
+        <item id="ACCT_ID" label="Account ID" resourceId="BILLED_USAGE_DT.ACCT_ID"></item>
+        <item id="CUSTOMER_NAME" label="Customer Name" resourceId="BILLED_USAGE_DT.CUSTOMER_NAME"></item>
+        <item id="CUST_CL_CD" label="Customer Class Code" resourceId="BILLED_USAGE_DT.CUST_CL_CD"></item>
+        <item id="CUST_CLASS_DESC" label="Customer Class" resourceId="BILLED_USAGE_DT.CUST_CLASS_DESC"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="BILLED_USAGE_QUANTITY" label="4.) Billed Quantities" resourceId="BILLED_USAGE_DT">
+      <items>
+        <item id="UOM_CD" label="Unit of Measure Code" resourceId="BILLED_USAGE_DT.UOM_CD"></item>
+        <item id="UOM_DESC" label="Unit of Measure" resourceId="BILLED_USAGE_DT.UOM_DESC"></item>
+        <item id="TOU_CD" label="Time of Use Code" resourceId="BILLED_USAGE_DT.TOU_CD"></item>
+        <item id="SQI_CD" label="Quantity Type Code" resourceId="BILLED_USAGE_DT.SQI_CD"></item>
+        <item id="SQI_DESC" label="Quantity Type" resourceId="BILLED_USAGE_DT.SQI_DESC"></item>
+        <item id="BILLED_QUANTITY" label="Billed Quantity" resourceId="BILLED_USAGE_DT.BILLED_QUANTITY"></item>
+        <item id="INITIAL_QUANTITY" label="Initial Quantity" resourceId="BILLED_USAGE_DT.INITIAL_QUANTITY"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcQuery id="BILLED_USAGE_DT" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="BILL_DATE" type="java.util.Date"></field>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="BSEG_START_DT" type="java.util.Date"></field>
+        <field id="BSEG_END_DT" type="java.util.Date"></field>
+        <field id="BSEG_STAT_FLG" type="java.lang.String"></field>
+        <field id="BSEG_STATUS_DESC" type="java.lang.String"></field>
+        <field id="BILLED_AMOUNT" type="java.math.BigDecimal"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="SA_TYPE_DESC" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="SA_STATUS_DESC" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CUST_CLASS_DESC" type="java.lang.String"></field>
+        <field id="CUSTOMER_NAME" type="java.lang.String"></field>
+        <field id="SP_ID" type="java.lang.String"></field>
+        <field id="UOM_CD" type="java.lang.String"></field>
+        <field id="UOM_DESC" type="java.lang.String"></field>
+        <field id="TOU_CD" type="java.lang.String"></field>
+        <field id="SQI_CD" type="java.lang.String"></field>
+        <field id="SQI_DESC" type="java.lang.String"></field>
+        <field id="BILLED_QUANTITY" type="java.math.BigDecimal"></field>
+        <field id="INITIAL_QUANTITY" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+    b.BILL_ID,
+    TRUNC(b.BILL_DT)                           AS BILL_DATE,
+    s.BSEG_ID,
+    TRUNC(s.START_DT)                          AS BSEG_START_DT,
+    TRUNC(s.END_DT)                            AS BSEG_END_DT,
+    s.BSEG_STAT_FLG,
+    NVL(bss.DESCR, s.BSEG_STAT_FLG)            AS BSEG_STATUS_DESC,
+    calc.BILLED_AMOUNT                           AS BILLED_AMOUNT,
+    sa.SA_ID,
+    sa.SA_TYPE_CD,
+    NVL(satl.DESCR, sa.SA_TYPE_CD)             AS SA_TYPE_DESC,
+    sa.SA_STATUS_FLG,
+    NVL(sasl.DESCR, sa.SA_STATUS_FLG)          AS SA_STATUS_DESC,
+    sa.CIS_DIVISION,
+    a.ACCT_ID,
+    a.CUST_CL_CD,
+    NVL(ccl.DESCR, a.CUST_CL_CD)               AS CUST_CLASS_DESC,
+    TRIM(pn.ENTITY_NAME)                       AS CUSTOMER_NAME,
+    ssp.SP_ID,
+    sq.UOM_CD,
+    NVL(uoml.DESCR, sq.UOM_CD)                 AS UOM_DESC,
+    sq.TOU_CD,
+    sq.SQI_CD,
+    NVL(sqil.DESCR, sq.SQI_CD)                 AS SQI_DESC,
+    sq.BILL_SQ                                 AS BILLED_QUANTITY,
+    sq.INIT_SQ                                 AS INITIAL_QUANTITY
+FROM CISADM.CI_BSEG s
+JOIN CISADM.CI_BILL b
+  ON b.BILL_ID = s.BILL_ID
+JOIN CISADM.CI_BSEG_SQ sq
+  ON sq.BSEG_ID = s.BSEG_ID
+JOIN CISADM.CI_SA sa
+  ON sa.SA_ID = s.SA_ID
+JOIN CISADM.CI_ACCT a
+  ON a.ACCT_ID = sa.ACCT_ID
+LEFT JOIN CISADM.CI_ACCT_PER ap
+  ON ap.ACCT_ID = a.ACCT_ID
+ AND ap.MAIN_CUST_SW = 'Y'
+LEFT JOIN CISADM.CI_PER_NAME pn
+  ON pn.PER_ID = ap.PER_ID
+ AND pn.NAME_TYPE_FLG = 'PRIM'
+LEFT JOIN CISADM.CI_SA_TYPE_L satl
+  ON satl.SA_TYPE_CD = sa.SA_TYPE_CD
+ AND satl.CIS_DIVISION = sa.CIS_DIVISION
+ AND satl.LANGUAGE_CD = 'ENG'
+LEFT JOIN (
+    SELECT TRIM(FIELD_VALUE) AS CODE, MAX(DESCR) AS DESCR
+    FROM CISADM.CI_LOOKUP_VAL_L
+    WHERE TRIM(FIELD_NAME) = 'SA_STATUS_FLG'
+      AND LANGUAGE_CD = 'ENG'
+    GROUP BY TRIM(FIELD_VALUE)
+) sasl
+  ON sasl.CODE = TRIM(sa.SA_STATUS_FLG)
+LEFT JOIN (
+    SELECT TRIM(FIELD_VALUE) AS CODE, MAX(DESCR) AS DESCR
+    FROM CISADM.CI_LOOKUP_VAL_L
+    WHERE TRIM(FIELD_NAME) = 'BSEG_STAT_FLG'
+      AND LANGUAGE_CD = 'ENG'
+    GROUP BY TRIM(FIELD_VALUE)
+) bss
+  ON bss.CODE = TRIM(s.BSEG_STAT_FLG)
+LEFT JOIN CISADM.CI_CUST_CL_L ccl
+  ON ccl.CUST_CL_CD = a.CUST_CL_CD
+ AND ccl.LANGUAGE_CD = 'ENG'
+LEFT JOIN CISADM.CI_UOM_L uoml
+  ON uoml.UOM_CD = sq.UOM_CD
+ AND uoml.LANGUAGE_CD = 'ENG'
+LEFT JOIN CISADM.CI_SQI_L sqil
+  ON sqil.SQI_CD = sq.SQI_CD
+ AND sqil.LANGUAGE_CD = 'ENG'
+LEFT JOIN (
+    SELECT
+        BSEG_ID,
+        NVL(UOM_CD, '~') AS UOM_CD_KEY,
+        NVL(TOU_CD, '~') AS TOU_CD_KEY,
+        NVL(SQI_CD, '~') AS SQI_CD_KEY,
+        SUM(CALC_AMT) AS BILLED_AMOUNT
+    FROM CISADM.CI_BSEG_CALC_LN
+    GROUP BY
+        BSEG_ID,
+        NVL(UOM_CD, '~'),
+        NVL(TOU_CD, '~'),
+        NVL(SQI_CD, '~')
+) calc
+  ON calc.BSEG_ID = sq.BSEG_ID
+ AND calc.UOM_CD_KEY = NVL(sq.UOM_CD, '~')
+ AND calc.TOU_CD_KEY = NVL(sq.TOU_CD, '~')
+ AND calc.SQI_CD_KEY = NVL(sq.SQI_CD, '~')
+LEFT JOIN (
+    SELECT SA_ID, MIN(SP_ID) AS SP_ID
+    FROM CISADM.CI_SA_SP
+    GROUP BY SA_ID
+) ssp
+  ON ssp.SA_ID = sa.SA_ID</query>
+    </jdbcQuery>
+  </resources>
+</schema>

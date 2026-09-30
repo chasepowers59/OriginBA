@@ -227,6 +227,24 @@ def test_d10_micr_reaches_no_delivery_artifact():
     for f in tracked_files("jaspersoft", "domains/exports/manual_imports", "output/catalog_dbt.json"):
         if f.suffix.lower() in {".zip", ".jasper", ".xlsx"}:
             continue
+        if "jaspersoft/inventory/" in str(f.relative_to(ROOT)):
+            continue   # a mirror of what is ON the servers (the record of the exposure below), not something we deliver
         if "MICR_ID" in f.read_text(encoding="utf-8", errors="ignore"):
             hits.append(str(f.relative_to(ROOT)))
     assert hits == [], "MICR_ID in a delivery artifact:\n  " + "\n  ".join(hits)
+
+
+@pytest.mark.xfail(strict=True, reason=(
+    "OPEN FINDING 2026-09-28: the Standard Offering Payment Tender domain exposes CI_PAY_TNDR.MICR_ID "
+    "(bank routing and account), and two of its Ad Hoc views carry it in their topics; the package is on "
+    "every client test org and on CityCorp, Ellensburg and Newark prod. Strict: when the domain drops the "
+    "field this test passes, the xfail turns into a failure, and this marker must be removed."))
+def test_d10b_the_standard_offering_package_carries_no_micr():
+    # the tracked zip is what ships; the extracted folder is local only, so a CI checkout
+    # scanned nothing and the xfail turned into a strict XPASS
+    import zipfile
+    pkg = ROOT / "deploy" / "jaspersoft_standard_offering" / "Standard_Offering_import.zip"
+    with zipfile.ZipFile(pkg) as z:
+        hits = [n for n in z.namelist() if not n.endswith("/")
+                and b"MICR_ID" in z.read(n)]
+    assert hits == [], "MICR_ID in the Standard Offering package:\n  " + "\n  ".join(hits)

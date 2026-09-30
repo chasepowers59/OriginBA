@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CollegeStation_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="CI_ACCT_ALERT" label="Account Alert Details" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID" label="Account Id" resourceId="JoinTree_1.CI_ACCT_ALERT.ACCT_ID"></item>
+        <item id="ALERT_TYPE_CD" label="Alert Type " resourceId="JoinTree_1.CI_ACCT_ALERT.ALERT_TYPE_CD"></item>
+        <item id="END_DT" label="End Date" resourceId="JoinTree_1.CI_ACCT_ALERT.END_DT"></item>
+        <item id="START_DT" label="Start Date" resourceId="JoinTree_1.CI_ACCT_ALERT.START_DT"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle" resourceId="JoinTree_1.SC_CUS_CONTACT.BILL_CYC_CD"></item>
+        <item id="CELLPHONE" label="Cell Phone" resourceId="JoinTree_1.SC_CUS_CONTACT.CELLPHONE"></item>
+        <item id="ENTITY_NAME" label="Entity Name" resourceId="JoinTree_1.SC_CUS_CONTACT.ENTITY_NAME"></item>
+        <item id="HOMEPHONE" label="Home Phone" resourceId="JoinTree_1.SC_CUS_CONTACT.HOMEPHONE"></item>
+        <item id="PRIMARYEMAIL" label="Email" resourceId="JoinTree_1.SC_CUS_CONTACT.PRIMARYEMAIL"></item>
+        <item id="VERSION" label="VERSION" resourceId="JoinTree_1.CI_ACCT_ALERT.VERSION"></item>
+        <item id="DESCR80" label="Alert Description" resourceId="JoinTree_1.CI_ALERT_TYPE_L.DESCR80"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="CI_ACCT_ALERT" datasourceId="CollegeStation_DS" datasourceTableName="CI_ACCT_ALERT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ALERT_TYPE_CD" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_ALERT_TYPE_L" datasourceId="CollegeStation_DS" datasourceTableName="CI_ALERT_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ALERT_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR80" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcQuery id="SC_CUS_CONTACT" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="HOMEPHONE" type="java.lang.String"></field>
+        <field id="CELLPHONE" type="java.lang.String"></field>
+        <field id="PRIMARYEMAIL" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    a.bill_cyc_cd as BILL_CYC_CD,
+    a.acct_id AS ACCT_ID,
+    pn.entity_name as ENTITY_NAME,
+	NVL((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.comm_rte_type_cd ='HOMEPHONE' and cnd_primary_flg = 'C1YS' and CND_ACTINACT_FLG = 'C1AC' ),' ') AS HOMEPHONE,
+	NVL((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.comm_rte_type_cd ='CELLPHONE' and cnd_primary_flg = 'C1YS' and CND_ACTINACT_FLG = 'C1AC' ),' ') AS CELLPHONE,
+	NVL((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.comm_rte_type_cd ='PRIMARYEMAIL' and cnd_primary_flg = 'C1YS' and CND_ACTINACT_FLG = 'C1AC' ),' ') AS PRIMARYEMAIL
+FROM
+         cisadm.ci_acct a
+    JOIN cisadm.ci_acct_per      ap ON a.acct_id = ap.acct_id
+                                  AND main_cust_sw = 'Y'
+    JOIN cisadm.ci_per_name      pn ON ap.per_id = pn.per_id
+                                  AND pn.prim_name_sw = 'Y'</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_1" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="SC_CUS_CONTACT.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="SC_CUS_CONTACT.ACCT_ID" type="java.lang.String"></field>
+        <field id="SC_CUS_CONTACT.ENTITY_NAME" type="java.lang.String"></field>
+        <field id="SC_CUS_CONTACT.HOMEPHONE" type="java.lang.String"></field>
+        <field id="SC_CUS_CONTACT.CELLPHONE" type="java.lang.String"></field>
+        <field id="SC_CUS_CONTACT.PRIMARYEMAIL" type="java.lang.String"></field>
+        <field id="CI_ALERT_TYPE_L.ALERT_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_ALERT_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_ALERT_TYPE_L.DESCR80" type="java.lang.String"></field>
+        <field id="CI_ALERT_TYPE_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_ACCT_ALERT.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_ALERT.ALERT_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_ALERT.START_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_ACCT_ALERT.END_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_ACCT_ALERT.VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <joinInfo alias="SC_CUS_CONTACT" referenceId="SC_CUS_CONTACT"></joinInfo>
+      <joinList>
+        <join expr="SC_CUS_CONTACT.ACCT_ID == CI_ACCT_ALERT.ACCT_ID" left="SC_CUS_CONTACT" right="CI_ACCT_ALERT" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_ALERT.ALERT_TYPE_CD == CI_ALERT_TYPE_L.ALERT_TYPE_CD" left="CI_ACCT_ALERT" right="CI_ALERT_TYPE_L" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>SELECT
+    a.bill_cyc_cd as BILL_CYC_CD,
+    a.acct_id AS ACCT_ID,
+    pn.entity_name as ENTITY_NAME,
+	NVL((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.comm_rte_type_cd ='HOMEPHONE' and cnd_primary_flg = 'C1YS' and CND_ACTINACT_FLG = 'C1AC' ),' ') AS HOMEPHONE,
+	NVL((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.comm_rte_type_cd ='CELLPHONE' and cnd_primary_flg = 'C1YS' and CND_ACTINACT_FLG = 'C1AC' ),' ') AS CELLPHONE,
+	NVL((select ct.contact_value from cisadm.ci_acct_per ap, cisadm.c1_per_contdet ct where a.acct_id = ap.acct_id and ap.main_cust_sw='Y' and ap.per_id = ct.per_id and ct.comm_rte_type_cd ='PRIMARYEMAIL' and cnd_primary_flg = 'C1YS' and CND_ACTINACT_FLG = 'C1AC' ),' ') AS PRIMARYEMAIL
+FROM
+         cisadm.ci_acct a
+    JOIN cisadm.ci_acct_per      ap ON a.acct_id = ap.acct_id
+                                  AND main_cust_sw = 'Y'
+    JOIN cisadm.ci_per_name      pn ON ap.per_id = pn.per_id
+                                  AND pn.prim_name_sw = 'Y'</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ALERT_TYPE_L" tableId="CI_ALERT_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_ALERT" tableId="CI_ACCT_ALERT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_CUS_CONTACT" tableId="SC_CUS_CONTACT"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

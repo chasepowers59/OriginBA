@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="dashlet-image" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="eda12af7-469b-4d8c-8cae-3c88d290bc01">
+	<property name="net.sf.jasperreports.export.xls.ignore.graphics" value="false"/>
+	<style name="Sans_Normal" isDefault="true" fontName="DejaVu Sans" fontSize="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<parameter name="ImageComponentJSON" class="java.lang.String"/>
+	<parameter name="JSON_INPUT_STREAM" class="java.io.InputStream" isForPrompting="false">
+		<defaultValueExpression><![CDATA[new ByteArrayInputStream($P{ImageComponentJSON}.getBytes("UTF-8"))]]></defaultValueExpression>
+	</parameter>
+	<queryString language="json">
+		<![CDATA[.]]>
+	</queryString>
+	<field name="name" class="java.lang.String"/>
+	<field name="url" class="java.lang.String"/>
+	<field name="showDashletBorders" class="java.lang.Boolean"/>
+	<field name="borderColor" class="java.lang.String"/>
+	<summary>
+		<band height="20">
+			<image scaleImage="RealSize">
+				<reportElement x="0" y="0" width="572" height="20" uuid="50a0280c-d8f7-4852-8fb1-0f4e5b4c3710">
+					<propertyExpression name="net.sf.jasperreports.style.box.pen.lineWidth"><![CDATA[$F{showDashletBorders} ? "1" : null]]></propertyExpression>
+					<propertyExpression name="net.sf.jasperreports.style.box.pen.lineColor"><![CDATA[$F{borderColor}]]></propertyExpression>
+				</reportElement>
+				<imageExpression><![CDATA[$F{url}]]></imageExpression>
+			</image>
+		</band>
+	</summary>
+</jasperReport>

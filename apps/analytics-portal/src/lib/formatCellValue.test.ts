@@ -49,7 +49,7 @@ describe("a string is only formatted as a number when that round-trips", () => {
   });
 
   it("still formats a plain number string, which loses nothing", () => {
-    expect(formatCellValue("1234567", { isMeasure: true })).toBe("1.23M");
+    expect(formatCellValue("1234567", { isMeasure: true })).toBe("1,234,567");
     expect(formatCellValue("4210")).toBe("4,210");
   });
 

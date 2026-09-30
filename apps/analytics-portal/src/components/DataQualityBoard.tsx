@@ -1,6 +1,7 @@
 "use client";
 
-import { formatCellValue } from "@/lib/format";
+import { alignsRight, formatCellValue, formatDateTime, formatNumber } from "@/lib/format";
+import { SlowNotice } from "@/components/SlowNotice";
 
 /**
  * Data Quality board — the rules engine's findings as a CIS worklist.
@@ -14,7 +15,7 @@ import { formatCellValue } from "@/lib/format";
 import { useEffect, useMemo, useState } from "react";
 import { apiGet, apiPost } from "@/lib/api";
 
-type DqRule = {
+export type DqRule = {
   id: string;
   object: string;
   severity: "action" | "review" | "info";
@@ -39,6 +40,7 @@ type DqResponse = {
   review?: number;
   acknowledged?: number;
   refresh_marker?: string;
+  built_at?: string | null;
   rules: DqRule[];
   error?: string;
 };
@@ -48,6 +50,8 @@ const SEV = {
   review: { label: "REVIEW", pill: "bg-warn-bg text-warn ring-1 ring-warn dark:text-warn" },
   info: { label: "INFO", pill: "bg-chip text-fg-muted ring-1 ring-edge-subtle" },
 } as const;
+
+const ROWS_PER_PAGE = 20;
 
 export function DataQualityBoard() {
   const [data, setData] = useState<DqResponse | null>(null);
@@ -63,8 +67,10 @@ export function DataQualityBoard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [markErr, setMarkErr] = useState<string | null>(null);
   const mark = async (key: string, done: boolean) => {
-    await apiPost(done ? "/dq/ack" : "/dq/unack", { key });
+    const res = await apiPost<{ ok: boolean; error?: string }>(done ? "/dq/ack" : "/dq/unack", { key });
+    setMarkErr(res.ok ? null : res.error ?? "That could not be saved; try again.");
     await reload();
   };
 
@@ -102,10 +108,14 @@ export function DataQualityBoard() {
   }
   if (!data) {
     return (
-      <div className="animate-pulse space-y-3 p-2">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="loading-shimmer h-16 rounded-xl" />
-        ))}
+      <div className="p-2">
+        <div className="animate-pulse space-y-3">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="loading-shimmer h-16 rounded-xl" />
+          ))}
+        </div>
+        <SlowNotice load={{ doing: "Running the data-quality checks against the warehouse",
+                            typical: "the first run after a refresh can take about a minute; later visits are instant" }} />
       </div>
     );
   }
@@ -117,6 +127,9 @@ export function DataQualityBoard() {
       </div>
     );
   }
+  if (data.error && !data.rules.length) {
+    return <div role="status" className="glass-panel p-8 text-center text-sm text-fg-muted">{data.error}</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -127,12 +140,13 @@ export function DataQualityBoard() {
           </p>
           <h1 className="portal-heading mt-1 text-2xl font-bold">Worklist</h1>
           <p className="mt-1 text-sm text-fg-muted">
-            Rules run against this tenant&apos;s data; every finding says exactly where
+            Rules run against this organization&apos;s data; every finding says exactly where
             to act in CIS.
-            {data.refresh_marker ? (
-              <span className="text-fg-subtle"> · data as of {data.refresh_marker}</span>
+            {data.built_at ? (
+              <span className="text-fg-subtle"> · data refreshed {formatDateTime(data.built_at)}</span>
             ) : null}
           </p>
+          {markErr ? <p role="alert" className="mt-2 text-sm text-over">{markErr}</p> : null}
         </div>
         <input
           value={filter}
@@ -231,7 +245,7 @@ function Section({
   );
 }
 
-function RuleCard({
+export function RuleCard({
   rule: r,
   defaultOpen,
   onMark,
@@ -241,6 +255,9 @@ function RuleCard({
   onMark: (key: string, done: boolean) => Promise<void>;
 }) {
   const sev = SEV[r.severity];
+  // A rule can return hundreds of rows (848 future-dated bills on the demo org); the page
+  // showed all of them and grew past 7,000px. A page of rows at a time keeps every rule in reach.
+  const [shown, setShown] = useState(ROWS_PER_PAGE);
   return (
     <details open={defaultOpen && r.count > 0} className="glass-panel overflow-hidden">
       <summary className="flex cursor-pointer flex-wrap items-center gap-3 px-4 py-3">
@@ -253,10 +270,10 @@ function RuleCard({
             <span className="text-over">rule error</span>
           ) : (
             <span className="rounded-full bg-chip px-2 py-0.5 text-xs font-semibold tabular-nums text-fg">
-              {r.total ?? r.count}
+              {formatNumber(r.total ?? r.count)}
             </span>
           )}
-          <span className="font-mono text-xs text-fg-subtle">{r.object}</span>
+          <span className="text-xs text-fg-subtle">{r.object}</span>
         </span>
       </summary>
       <div className="border-t border-edge-subtle px-4 py-3">
@@ -273,7 +290,6 @@ function RuleCard({
             <table className="min-w-full text-xs">
               <thead>
                 <tr>
-                  <th className="border-b border-edge-subtle px-2 py-1.5" />
                   {r.columns.map((c) => (
                     <th
                       key={c}
@@ -282,34 +298,48 @@ function RuleCard({
                       {c}
                     </th>
                   ))}
+                  <th className="border-b border-edge-subtle px-2 py-1.5"><span className="sr-only">Action</span></th>
                 </tr>
               </thead>
               <tbody>
-                {r.rows.map((row, i) => (
+                {r.rows.slice(0, shown).map((row, i) => (
                   <tr key={i} className="border-b border-edge-subtle/60 hover:bg-chip">
-                    <td className="px-2 py-1">
-                      <button
-                        onClick={() => onMark(r.row_keys?.[i] ?? `${r.id}|${row[0]}`, true)}
-                        title="Mark done until the next data refresh"
-                        className="rounded border border-ok px-1.5 py-0.5 text-[10px] font-semibold text-ok hover:bg-ok-bg dark:text-ok"
-                      >
-                        Done
-                      </button>
-                    </td>
                     {row.map((v, j) => (
-                      <td key={j} className="whitespace-nowrap px-2 py-1 text-fg">
+                      <td key={j} className={`whitespace-nowrap px-2 py-1 text-fg ${alignsRight(v, r.columns[j]) ? "text-right tabular-nums" : ""}`}>
                         {/* The API sends str(value); render it like every other table --
                             dates as dates, identifiers literal, numbers with separators. */}
                         {formatCellValue(v, { columnId: r.columns[j] })}
                       </td>
                     ))}
+                    <td className="px-2 py-1 text-right">
+                      <button
+                        type="button"
+                        onClick={() => onMark(r.row_keys?.[i] ?? `${r.id}|${row[0]}`, true)}
+                        title="Mark done until the next data refresh"
+                        aria-label={`Mark ${String(row[0] ?? "this row")} done`}
+                        className="btn-ghost inline-flex min-h-8 items-center gap-1 whitespace-nowrap px-2 text-xs"
+                      >
+                        <span aria-hidden>✓</span> Mark done
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            {r.rows.length > shown ? (
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-fg-muted">
+                <span>Showing {formatNumber(shown)} of {formatNumber(r.rows.length)}</span>
+                <button type="button" className="btn-ghost text-xs" onClick={() => setShown((n) => n + ROWS_PER_PAGE)}>
+                  Show {Math.min(ROWS_PER_PAGE, r.rows.length - shown)} more
+                </button>
+                <button type="button" className="btn-ghost text-xs" onClick={() => setShown(r.rows.length)}>
+                  Show all
+                </button>
+              </div>
+            ) : null}
             {r.capped && (
               <p className="mt-1 text-xs text-fg-subtle">
-                showing the first {r.count} of {r.total ?? r.count}
+                The rule found {formatNumber(r.total ?? r.count)}; the first {formatNumber(r.count)} are listed here.
               </p>
             )}
           </div>
@@ -341,7 +371,7 @@ function RuleCard({
   );
 }
 
-function SummaryCard({
+export function SummaryCard({
   label,
   value,
   tone,
@@ -372,7 +402,7 @@ function SummaryCard({
         {glyph}
       </span>
       <div>
-        <div className={`text-2xl font-bold tabular-nums leading-none ${t.text}`}>{value}</div>
+        <div className={`text-2xl font-bold tabular-nums leading-none ${t.text}`}>{formatNumber(value)}</div>
         <div className="mt-1 text-xs text-fg-muted">{label}</div>
       </div>
     </div>

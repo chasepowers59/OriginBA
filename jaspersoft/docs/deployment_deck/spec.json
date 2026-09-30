@@ -1,0 +1,2916 @@
+{
+  "slides": [
+    {
+      "type": "title",
+      "title": "Standard Offering Release 26",
+      "subtitle": "How the database snapshot deployment and the Jaspersoft promotion were automated with AI, what the QA proves, what it saved, and what comes next  |  internal documentation  |  September 2026"
+    },
+    {
+      "type": "layers",
+      "title": "What Ships In Release 26",
+      "kicker": "S1",
+      "bands": [
+        {
+          "label": "Snapshot layer",
+          "sub": "built inside the client's CISADM",
+          "items": [
+            "8 reporting tables (the active 8) loaded once from the retained history",
+            "Refresh procedures: the retained 24 months once, then a rolling window",
+            "Database scheduler jobs, twice daily, staggered so they never overlap"
+          ]
+        },
+        {
+          "label": "Standard Offering",
+          "sub": "the Jaspersoft content",
+          "items": [
+            "9 workstream folders, 53 domains, 156 Ad Hoc views, 14 dashboards",
+            "A Standardized Reports folder of scheduled SQL reports",
+            "Theme, input controls, saved filters, folder permissions"
+          ]
+        },
+        {
+          "label": "Per client",
+          "sub": "one org, one datasource, one proof",
+          "items": [
+            "Authored on Origin_DEV, proven on Origin_TEST before any client",
+            "Client test org first, then the client prod org",
+            "Ellensburg, CityCorp, Newark on prod; Fond du Lac and College Station next"
+          ]
+        },
+        {
+          "label": "Proof",
+          "sub": "before anything counts as done",
+          "items": [
+            "Install gates in the database: no empty table, no duplicate key, balances tie",
+            "A sweep executes every view, report and dashboard on the org",
+            "A sign-off document per org; the inventory diff is the rollback record"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "process",
+      "title": "Before: Every Step By Hand",
+      "kicker": "S2",
+      "nodes": [
+        {
+          "id": "e1",
+          "col": 0,
+          "row": 0,
+          "title": "1. Export each report",
+          "body": "one at a time from the server UI, folder by folder, per client"
+        },
+        {
+          "id": "e2",
+          "col": 1,
+          "row": 0,
+          "title": "2. Open in Notepad++",
+          "body": "find every server endpoint, org path and folder path by eye"
+        },
+        {
+          "id": "e3",
+          "col": 2,
+          "row": 0,
+          "title": "3. Replace all",
+          "body": "host, org, folder and datasource strings, in every file, hoping nothing was missed"
+        },
+        {
+          "id": "e4",
+          "col": 3,
+          "row": 0,
+          "title": "4. Export the datasource",
+          "body": "separately from the target server, then hand-edit its reference into each file"
+        },
+        {
+          "id": "e5",
+          "col": 3,
+          "row": 1,
+          "title": "5. Re-zip and import",
+          "body": "read the import log, fix the file, import again"
+        },
+        {
+          "id": "e6",
+          "col": 2,
+          "row": 1,
+          "title": "6. Open every report",
+          "body": "click through each one; a broken topic only shows in the editor"
+        },
+        {
+          "id": "e7",
+          "col": 1,
+          "row": 1,
+          "title": "7. Fix and repeat",
+          "body": "back to step 2 for whatever broke; no record of what changed"
+        },
+        {
+          "id": "e8",
+          "col": 0,
+          "row": 1,
+          "title": "8. Next client",
+          "body": "the same again for every org on every server"
+        },
+        {
+          "id": "cost",
+          "title": "What it cost",
+          "body": "Days per client and one to two weeks for a full offering. A missed replace surfaced weeks later as a report a user could not open. No two promotions were identical, so no result could be compared to the last one. The database side was the same: nineteen SQL scripts run one by one in SQL Developer, results copied into spreadsheets.",
+          "x": 0.81,
+          "y": 6.35,
+          "w": 15.0,
+          "h": 1.55
+        },
+        {
+          "id": "acc",
+          "title": "Days and days of hand edits",
+          "kind": "accent",
+          "x": 16.88,
+          "y": 6.35
+        }
+      ],
+      "edges": [
+        [
+          "e1",
+          "e2"
+        ],
+        [
+          "e2",
+          "e3"
+        ],
+        [
+          "e3",
+          "e4"
+        ],
+        [
+          "e4",
+          "e5"
+        ],
+        [
+          "e5",
+          "e6"
+        ],
+        [
+          "e6",
+          "e7"
+        ],
+        [
+          "e7",
+          "e8"
+        ]
+      ],
+      "missing": [
+        "no test",
+        "no record of the change",
+        "no rollback",
+        "no two runs alike",
+        "no proof at the end"
+      ]
+    },
+    {
+      "type": "process",
+      "title": "Now: Every Step Is A Tool With A Test",
+      "kicker": "S3",
+      "nodes": [
+        {
+          "id": "n1",
+          "col": 0,
+          "row": 0,
+          "title": "1. Export by API",
+          "body": "the whole folder in one export task, polled and downloaded"
+        },
+        {
+          "id": "n2",
+          "col": 1,
+          "row": 0,
+          "title": "2. Rewrite by rule",
+          "body": "every endpoint, org path and folder replaced by a tested function, longest match first"
+        },
+        {
+          "id": "n3",
+          "col": 2,
+          "row": 0,
+          "title": "3. Carry the datasource",
+          "body": "the target's own datasource export goes into the package byte for byte"
+        },
+        {
+          "id": "n4",
+          "col": 3,
+          "row": 0,
+          "title": "4. Verify before import",
+          "body": "nothing from the source host survives; every reference exists; every field resolves"
+        },
+        {
+          "id": "n5",
+          "col": 3,
+          "row": 1,
+          "title": "5. Import and read back",
+          "body": "re-exported and compared byte for byte; an importer warning is a failure"
+        },
+        {
+          "id": "n6",
+          "col": 2,
+          "row": 1,
+          "title": "6. Execute everything",
+          "body": "every view queried, every report rendered, every domain probed for rows"
+        },
+        {
+          "id": "n7",
+          "col": 1,
+          "row": 1,
+          "title": "7. Sign-off generated",
+          "body": "PASS, EMPTY or FAIL per resource with timings, one document per org"
+        },
+        {
+          "id": "n8",
+          "col": 0,
+          "row": 1,
+          "title": "8. Same result every time",
+          "body": "the same tests, the same order, the same evidence, for every org"
+        },
+        {
+          "id": "why",
+          "title": "Why the result is consistent",
+          "body": "The same checks run on every promotion, and the tool stops at the first failure and names the rollback. No person edits a file, so nothing can be missed or typed wrong. Every run leaves its package, its diff and its evidence beside the sign-off, so any two promotions can be compared. Fewer hands in the loop, one outcome.",
+          "x": 0.81,
+          "y": 6.35,
+          "w": 15.0,
+          "h": 1.55
+        },
+        {
+          "id": "acc",
+          "title": "Hours, with proof",
+          "kind": "accent",
+          "x": 16.88,
+          "y": 6.35
+        }
+      ],
+      "edges": [
+        [
+          "n1",
+          "n2"
+        ],
+        [
+          "n2",
+          "n3"
+        ],
+        [
+          "n3",
+          "n4"
+        ],
+        [
+          "n4",
+          "n5"
+        ],
+        [
+          "n5",
+          "n6"
+        ],
+        [
+          "n6",
+          "n7"
+        ],
+        [
+          "n7",
+          "n8"
+        ]
+      ],
+      "proofs": [
+        "import without warnings",
+        "re-export byte-equal",
+        "every resource executes",
+        "datasource unchanged"
+      ]
+    },
+    {
+      "type": "compare",
+      "title": "Two Weeks Then, Hours Now",
+      "kicker": "S4",
+      "headings": [
+        "Before: by hand, one to two weeks per client",
+        "Now: AI-built tools, hours, repeatable"
+      ],
+      "rows": [
+        {
+          "before": "Snapshot deployment: nineteen scripts run one by one in SQL Developer, baselines watched in a session that could time out, validation totals copied into spreadsheets",
+          "after": "One runner command per step; the eight baselines submitted as parallel database jobs and gated; every step logged per client",
+          "proof": "baseline ready gate, install gates, 12-month parity, duplicate-key safety"
+        },
+        {
+          "before": "Standard Offering to a client: export, hand-edit the package in Notepad++, swap the datasource by hand, import, open the reports one at a time",
+          "after": "One promotion command: the datasource is the target's own export, every resource is re-exported, compared and executed",
+          "proof": "Ellensburg prod in 11 minutes, Newark in 21, 0 errors"
+        },
+        {
+          "before": "Moving a client's reports between environments: a day per batch, and breakage found later by the users",
+          "after": "21 College Station reports and their 13 domains moved prod to test in one morning, byte-equal, prod never written",
+          "proof": "22 executions on test, every domain and view matched"
+        },
+        {
+          "before": "A domain change on every client: the Domain Designer opened per org, days of clicking, nothing recorded",
+          "after": "One patch definition, an additive-only guard, applied to six orgs with seven proofs each and a one-command rollback",
+          "proof": "read-back byte-equal, bound views run, rows tie to Oracle"
+        },
+        {
+          "before": "Validation sign-off: assembled from screenshots over days, different every time",
+          "after": "Generated from the sweep in minutes: PASS, EMPTY or FAIL per row with timings and the evidence file beside it",
+          "proof": "one document per org, identical structure every time"
+        }
+      ]
+    },
+    {
+      "type": "timebar",
+      "title": "Time Per Client, To Scale",
+      "kicker": "S5",
+      "rows": [
+        {
+          "label": "Standard Offering to a client org",
+          "note": "export, rewrite, datasource, import, verify, execute, sign off",
+          "before_days": 10,
+          "before_label": "one to two weeks",
+          "after_hours": 0.35,
+          "after_label": "11 minutes at Ellensburg, 21 at Newark"
+        },
+        {
+          "label": "Snapshot layer to a client",
+          "note": "tables, procedures, baselines, gates, schedule",
+          "before_days": 5,
+          "before_label": "a working week",
+          "after_hours": 4,
+          "after_label": "a morning, then the baselines load unattended"
+        },
+        {
+          "label": "A domain change on every client",
+          "note": "one patch, additive-only, six orgs",
+          "before_days": 3,
+          "before_label": "days, one org at a time",
+          "after_hours": 4,
+          "after_label": "an afternoon for six orgs, seven proofs each"
+        },
+        {
+          "label": "A batch of reports between environments",
+          "note": "21 reports and their 13 domains",
+          "before_days": 1,
+          "before_label": "a day per batch",
+          "after_hours": 3,
+          "after_label": "one morning, byte-equal"
+        },
+        {
+          "label": "Validation sign-off",
+          "note": "one document per org",
+          "before_days": 2,
+          "before_label": "days of screenshots",
+          "after_hours": 0.25,
+          "after_label": "minutes, generated from the sweep"
+        }
+      ],
+      "legend": "The by-hand figures are the team's own estimates of the old process; the now figures are measured runs."
+    },
+    {
+      "type": "process",
+      "title": "Snapshot Deployment Workflow",
+      "kicker": "S6",
+      "nodes": [
+        {
+          "id": "pre",
+          "col": 0,
+          "row": 0,
+          "title": "1. Preflight",
+          "body": "proves the deploy user can read every CISADM table and write the target schema"
+        },
+        {
+          "id": "tbl",
+          "col": 1,
+          "row": 0,
+          "title": "2. Tables",
+          "body": "creates the active 8 and the domain-support objects, empty"
+        },
+        {
+          "id": "prc",
+          "col": 2,
+          "row": 0,
+          "title": "3. Procedures",
+          "body": "installs the full-history baseline and the domain refresh PL/SQL"
+        },
+        {
+          "id": "base",
+          "col": 3,
+          "row": 0,
+          "title": "4. Baselines",
+          "body": "submits 8 database jobs at once; they run unattended"
+        },
+        {
+          "id": "wait",
+          "col": 3,
+          "row": 1,
+          "title": "5. Wait and gate",
+          "body": "polls the job table up to 8 hours until every job says SUCCEEDED",
+          "kind": "manual",
+          "tag": "waits"
+        },
+        {
+          "id": "idx",
+          "col": 2,
+          "row": 1,
+          "title": "6. Indexes",
+          "body": "post-load indexes on the keys and dates the reports filter on"
+        },
+        {
+          "id": "roll",
+          "col": 1,
+          "row": 1,
+          "title": "7. Rolling and schedule",
+          "body": "installs the rolling procedures and creates the scheduler jobs"
+        },
+        {
+          "id": "gate",
+          "col": 0,
+          "row": 1,
+          "title": "8. Refresh and gates",
+          "body": "refreshes domain support, then the install and parity gates"
+        },
+        {
+          "id": "cmd",
+          "title": "One command per step, one wrapper for prod",
+          "body": "A Python runner takes a step name and a client and runs that step's SQL as the deploy user, logging every statement and result per client. Compound steps chain a stage with its validation so nothing moves on unvalidated. A shell wrapper runs the whole prod sequence, steps 1 to 8, and stops at the first failed gate.",
+          "x": 0.81,
+          "y": 6.35,
+          "w": 15.0,
+          "h": 1.55
+        },
+        {
+          "id": "vpn",
+          "title": "Network access to start; jobs keep running if it drops",
+          "kind": "accent",
+          "x": 16.88,
+          "y": 6.35
+        }
+      ],
+      "edges": [
+        [
+          "pre",
+          "tbl"
+        ],
+        [
+          "tbl",
+          "prc"
+        ],
+        [
+          "prc",
+          "base"
+        ],
+        [
+          "base",
+          "wait"
+        ],
+        [
+          "wait",
+          "idx"
+        ],
+        [
+          "idx",
+          "roll"
+        ],
+        [
+          "roll",
+          "gate"
+        ]
+      ],
+      "proofs": [
+        "baseline jobs SUCCEEDED",
+        "no empty tables",
+        "no duplicate keys",
+        "CMS FT parity",
+        "12-month monthly parity"
+      ]
+    },
+    {
+      "type": "bullets",
+      "title": "Inside The Snapshot Deployment",
+      "kicker": "S7",
+      "columns": [
+        {
+          "heading": "Baseline and validate",
+          "items": [
+            "Creates the eight reporting tables and the views the domains read, then installs the full-history procedures",
+            "Submits one database job per table so all eight load in parallel and the session is never the bottleneck",
+            "Polls the scheduler's job table until every job is SUCCEEDED; a FAILED or missing job stops the step",
+            "Validates row counts per table, twelve monthly totals against the source, and that no grain key repeats",
+            "The install gate fails on any empty table or duplicate key, so a wrong grant or filter cannot pass silently"
+          ]
+        },
+        {
+          "heading": "Cutover and validate",
+          "items": [
+            "Installs the rolling procedures: delete the newest months, rebuild them, leave the rest untouched",
+            "Runs one operational refresh by hand to prove the rolling path before it is scheduled",
+            "Runs the same validation again so the rolling result is compared to the baseline result",
+            "Refreshes the domain-support views and checks the aged-balance buckets sum to the balance",
+            "Refuses to schedule until both validations are green"
+          ]
+        },
+        {
+          "heading": "Schedule and monitor",
+          "items": [
+            "Creates one scheduler job per table, twice daily, staggered thirty minutes so two never overlap",
+            "Long refreshes run as background jobs, never in the session, after a 15-minute timeout once committed a delete without its insert",
+            "A capture step records the last run, its duration and its status for every job",
+            "High-level data-quality checks run per client and the results are kept with the rollout log",
+            "Validate after the baseline, after the cutover, and after the first scheduled run"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "diagram",
+      "title": "Database Deployment Flow",
+      "kicker": "S8",
+      "subtitle": "one client, from preflight to the twice-daily rolling refresh, and the objects every Standard Offering domain reads",
+      "nodes": [
+        {
+          "id": "p1",
+          "x": 0.81,
+          "y": 2.5,
+          "w": 2.5,
+          "h": 1.0,
+          "title": "Preflight",
+          "kind": "step",
+          "body": "the deploy user can read every source table and write the targets",
+          "num": 1
+        },
+        {
+          "id": "p2",
+          "x": 3.61,
+          "y": 2.5,
+          "w": 2.9,
+          "h": 1.0,
+          "title": "Create the 7 snapshot tables",
+          "kind": "step",
+          "body": "empty, with their keys",
+          "num": 2
+        },
+        {
+          "id": "p3",
+          "x": 6.81,
+          "y": 2.5,
+          "w": 3.1,
+          "h": 1.0,
+          "title": "Create the domain-support objects",
+          "kind": "step",
+          "body": "SA snapshot table, lookup seed, 8 CMS views, grants, synonyms",
+          "num": 3
+        },
+        {
+          "id": "p4",
+          "x": 10.21,
+          "y": 2.5,
+          "w": 2.9,
+          "h": 1.0,
+          "title": "Deploy the procedures",
+          "kind": "step",
+          "body": "baseline (the retained 24 months, once) and operational per table; the SA aged-balance refresh",
+          "num": 4
+        },
+        {
+          "id": "p5",
+          "x": 13.41,
+          "y": 2.15,
+          "w": 7.8,
+          "h": 1.65,
+          "title": "5. Submit 8 baselines as parallel scheduler jobs",
+          "kind": "group",
+          "body": "unattended; they survive a dropped connection"
+        },
+        {
+          "id": "j0",
+          "x": 13.62,
+          "y": 2.78,
+          "w": 1.78,
+          "h": 0.42,
+          "title": "FT",
+          "kind": "step",
+          "center": true,
+          "title_pt": 10
+        },
+        {
+          "id": "j1",
+          "x": 15.54,
+          "y": 2.78,
+          "w": 1.78,
+          "h": 0.42,
+          "title": "Billed usage",
+          "kind": "step",
+          "center": true,
+          "title_pt": 10
+        },
+        {
+          "id": "j2",
+          "x": 17.46,
+          "y": 2.78,
+          "w": 1.78,
+          "h": 0.42,
+          "title": "SQ usage",
+          "kind": "step",
+          "center": true,
+          "title_pt": 10
+        },
+        {
+          "id": "j3",
+          "x": 19.38,
+          "y": 2.78,
+          "w": 1.78,
+          "h": 0.42,
+          "title": "GL distribution",
+          "kind": "step",
+          "center": true,
+          "title_pt": 10
+        },
+        {
+          "id": "j4",
+          "x": 13.62,
+          "y": 3.3,
+          "w": 1.78,
+          "h": 0.42,
+          "title": "Measurement",
+          "kind": "step",
+          "center": true,
+          "title_pt": 10
+        },
+        {
+          "id": "j5",
+          "x": 15.54,
+          "y": 3.3,
+          "w": 1.78,
+          "h": 0.42,
+          "title": "Usage",
+          "kind": "step",
+          "center": true,
+          "title_pt": 10
+        },
+        {
+          "id": "j6",
+          "x": 17.46,
+          "y": 3.3,
+          "w": 1.78,
+          "h": 0.42,
+          "title": "Usage scalar detail",
+          "kind": "step",
+          "center": true,
+          "title_pt": 10
+        },
+        {
+          "id": "j7",
+          "x": 19.38,
+          "y": 3.3,
+          "w": 1.78,
+          "h": 0.42,
+          "title": "SA snapshot refresh",
+          "kind": "step",
+          "center": true,
+          "title_pt": 10
+        },
+        {
+          "id": "q1",
+          "x": 18.7,
+          "y": 4.45,
+          "w": 2.3,
+          "h": 0.95,
+          "title": "ready gate: every job SUCCEEDED?",
+          "kind": "gate",
+          "title_pt": 10,
+          "num": 6,
+          "tooltip": "The scheduler's job table is polled up to eight hours; every one-time baseline job must report SUCCEEDED; a FAILED or missing job stops the rollout."
+        },
+        {
+          "id": "sq1",
+          "x": 18.9,
+          "y": 5.75,
+          "w": 1.9,
+          "h": 0.42,
+          "title": "stop, fix, re-run",
+          "kind": "stop",
+          "title_pt": 9
+        },
+        {
+          "id": "q2",
+          "x": 15.6,
+          "y": 4.45,
+          "w": 2.6,
+          "h": 0.95,
+          "title": "validate and install gates pass?",
+          "kind": "gate",
+          "title_pt": 10,
+          "num": 7,
+          "tooltip": "Row counts, twelve monthly totals against the source, duplicate keys; no empty table; the CMS views valid, the lookup seeded, the aging buckets sum to the balance, FT parity."
+        },
+        {
+          "id": "sq2",
+          "x": 15.85,
+          "y": 5.75,
+          "w": 2.1,
+          "h": 0.42,
+          "title": "stop, fix, re-run",
+          "kind": "stop",
+          "title_pt": 9
+        },
+        {
+          "id": "q3",
+          "x": 12.7,
+          "y": 4.45,
+          "w": 2.4,
+          "h": 0.95,
+          "title": "Post-load indexes",
+          "kind": "step",
+          "body": "keys and dates the domains filter on",
+          "num": 8
+        },
+        {
+          "id": "q4",
+          "x": 9.2,
+          "y": 4.45,
+          "w": 3.0,
+          "h": 0.95,
+          "title": "Rolling procedures",
+          "kind": "step",
+          "body": "3 months rebuilt, 24 kept; one operational refresh run by hand",
+          "num": 9
+        },
+        {
+          "id": "q5",
+          "x": 6.5,
+          "y": 4.45,
+          "w": 2.2,
+          "h": 0.95,
+          "title": "validated again?",
+          "kind": "gate",
+          "title_pt": 10,
+          "num": 10,
+          "tooltip": "The same validation pack after the operational refresh, so the rolling result is compared to the baseline result."
+        },
+        {
+          "id": "sq5",
+          "x": 6.6,
+          "y": 3.65,
+          "w": 2.0,
+          "h": 0.42,
+          "title": "stop, fix, re-run",
+          "kind": "stop",
+          "title_pt": 9
+        },
+        {
+          "id": "q6",
+          "x": 3.35,
+          "y": 4.45,
+          "w": 2.7,
+          "h": 0.95,
+          "title": "Schedule",
+          "kind": "step",
+          "body": "twice daily from 10:00 and 16:00 UTC, 30-minute stagger; held on TEST until approved",
+          "num": 11
+        },
+        {
+          "id": "q7",
+          "x": 0.81,
+          "y": 4.45,
+          "w": 2.1,
+          "h": 0.95,
+          "title": "Capture runs, data quality",
+          "kind": "step",
+          "body": "per client, kept with the log",
+          "num": 12
+        },
+        {
+          "id": "cad",
+          "x": 0.81,
+          "y": 5.47,
+          "w": 3.8,
+          "h": 0.6,
+          "title": "runs at (UTC), one job every 30 minutes",
+          "kind": "note",
+          "body": "10:00 to 13:30, then again 16:00 to 19:30"
+        },
+        {
+          "id": "big",
+          "x": 0.81,
+          "y": 6.3,
+          "w": 20.4,
+          "h": 4.5,
+          "title": "What the domains read",
+          "kind": "group",
+          "body": "created in steps 2 and 3, validated at step 7 before anything is scheduled; each outlined stack feeds the domain chip beneath it"
+        },
+        {
+          "id": "wf",
+          "x": 0.95,
+          "y": 6.95,
+          "w": 2.85,
+          "h": 2.6,
+          "title": "Finance tables",
+          "kind": "group"
+        },
+        {
+          "id": "wb",
+          "x": 3.92,
+          "y": 6.95,
+          "w": 2.85,
+          "h": 2.6,
+          "title": "Billing tables",
+          "kind": "group"
+        },
+        {
+          "id": "wm",
+          "x": 6.89,
+          "y": 6.95,
+          "w": 2.85,
+          "h": 2.6,
+          "title": "Meter Ops tables",
+          "kind": "group"
+        },
+        {
+          "id": "wd",
+          "x": 9.86,
+          "y": 6.95,
+          "w": 2.6,
+          "h": 2.6,
+          "title": "Debt Mgmt objects",
+          "kind": "group"
+        },
+        {
+          "id": "wv",
+          "x": 12.58,
+          "y": 6.95,
+          "w": 2.9,
+          "h": 2.6,
+          "title": "Meter Ops views",
+          "kind": "group"
+        },
+        {
+          "id": "wo",
+          "x": 15.6,
+          "y": 6.95,
+          "w": 2.95,
+          "h": 2.6,
+          "title": "Field Ops views",
+          "kind": "group"
+        },
+        {
+          "id": "wc",
+          "x": 18.67,
+          "y": 6.95,
+          "w": 2.35,
+          "h": 2.6,
+          "title": "Customer Ops views",
+          "kind": "group"
+        },
+        {
+          "id": "t1",
+          "x": 1.05,
+          "y": 7.4,
+          "w": 2.65,
+          "h": 0.85,
+          "title": "FT_RPT_CURR",
+          "kind": "data",
+          "body": "financial transactions",
+          "title_pt": 9,
+          "tooltip": "Every financial transaction in the retained 24 months, refreshed twice daily"
+        },
+        {
+          "id": "t2",
+          "x": 1.05,
+          "y": 8.4,
+          "w": 2.65,
+          "h": 0.85,
+          "title": "FT_GL_DISTRIBUTION_RPT_CURR",
+          "kind": "data",
+          "body": "GL distribution",
+          "title_pt": 9
+        },
+        {
+          "id": "t3",
+          "x": 4.02,
+          "y": 7.4,
+          "w": 2.65,
+          "h": 0.85,
+          "title": "BSEG_BILLED_USAGE_RPT_CURR",
+          "kind": "data",
+          "body": "billed usage per segment",
+          "title_pt": 9
+        },
+        {
+          "id": "t4",
+          "x": 4.02,
+          "y": 8.4,
+          "w": 2.65,
+          "h": 0.85,
+          "title": "BSEG_SQ_USAGE_RPT_CURR",
+          "kind": "data",
+          "body": "service quantities",
+          "title_pt": 9
+        },
+        {
+          "id": "t5",
+          "x": 6.99,
+          "y": 7.4,
+          "w": 2.65,
+          "h": 0.62,
+          "title": "D1_MSRMT_RPT_CURR",
+          "kind": "data",
+          "body": "measurements",
+          "title_pt": 9
+        },
+        {
+          "id": "t6",
+          "x": 6.99,
+          "y": 8.12,
+          "w": 2.65,
+          "h": 0.62,
+          "title": "D1_USAGE_RPT_CURR",
+          "kind": "data",
+          "body": "usage transactions",
+          "title_pt": 9
+        },
+        {
+          "id": "t7",
+          "x": 6.99,
+          "y": 8.84,
+          "w": 2.65,
+          "h": 0.62,
+          "title": "D1_USAGE_SCALAR_DTL_RPT_CURR",
+          "kind": "data",
+          "body": "usage scalar detail",
+          "title_pt": 9
+        },
+        {
+          "id": "m1",
+          "x": 0.95,
+          "y": 9.85,
+          "w": 2.85,
+          "h": 0.6,
+          "title": "Finance domains",
+          "kind": "domain"
+        },
+        {
+          "id": "m2",
+          "x": 3.92,
+          "y": 9.85,
+          "w": 2.85,
+          "h": 0.6,
+          "title": "Billing and Rates domains",
+          "kind": "domain",
+          "title_pt": 10
+        },
+        {
+          "id": "m3",
+          "x": 6.89,
+          "y": 9.85,
+          "w": 2.85,
+          "h": 0.6,
+          "title": "Usage and measurement domains",
+          "kind": "domain",
+          "title_pt": 10
+        },
+        {
+          "id": "s1",
+          "x": 9.96,
+          "y": 7.4,
+          "w": 2.4,
+          "h": 0.9,
+          "title": "CMS_SA_SNAPSHOT",
+          "kind": "data",
+          "body": "aged balance per SA, refreshed by procedure",
+          "title_pt": 10,
+          "tooltip": "One end-of-day row per service agreement: current and payoff balance, ten aging buckets from frozen ARS transactions; credits retire the oldest debt first; buckets 1 to 5 sum to the current balance."
+        },
+        {
+          "id": "s2",
+          "x": 9.96,
+          "y": 8.45,
+          "w": 2.4,
+          "h": 0.7,
+          "title": "CM_SNAPSHOT_TYPE_FLG",
+          "kind": "step",
+          "body": "lookup seed: LDAY, EMON, ARCH, LEMN",
+          "center": true,
+          "title_pt": 10,
+          "body_pt": 9.5,
+          "tooltip": "The domain inner-joins these four codes; a fresh database without the seed returns zero rows in every Ad Hoc view."
+        },
+        {
+          "id": "m4",
+          "x": 9.86,
+          "y": 9.85,
+          "w": 2.6,
+          "h": 0.6,
+          "title": "SA Snapshot Aged Balance domain",
+          "kind": "domain",
+          "title_pt": 10
+        },
+        {
+          "id": "v1",
+          "x": 12.68,
+          "y": 7.4,
+          "w": 2.7,
+          "h": 0.5,
+          "title": "CMS_D1_DVC_IDENTIFIER_VW",
+          "kind": "step",
+          "center": true,
+          "title_pt": 9,
+          "tooltip": "Device identifiers pivoted into columns: asset id, badge, serial, internal meter number, external and MDM ids, NIC id and serial"
+        },
+        {
+          "id": "v2",
+          "x": 12.68,
+          "y": 8.0,
+          "w": 2.7,
+          "h": 0.5,
+          "title": "CMS_D1_DVC_BODA_VW",
+          "kind": "step",
+          "center": true,
+          "title_pt": 9,
+          "tooltip": "The device's business-object data parsed from XML: business object, latest status, retirement date"
+        },
+        {
+          "id": "v3",
+          "x": 12.68,
+          "y": 8.6,
+          "w": 2.7,
+          "h": 0.5,
+          "title": "CMS_W1_ASSET_IDENTIFIER_VW",
+          "kind": "step",
+          "center": true,
+          "title_pt": 9,
+          "tooltip": "Asset identifiers pivoted into columns, the asset-side twin of the device identifier view"
+        },
+        {
+          "id": "m5",
+          "x": 12.58,
+          "y": 9.85,
+          "w": 1.4,
+          "h": 0.6,
+          "title": "Device domain",
+          "kind": "domain",
+          "title_pt": 10
+        },
+        {
+          "id": "m6",
+          "x": 14.08,
+          "y": 9.85,
+          "w": 1.4,
+          "h": 0.6,
+          "title": "Asset domain",
+          "kind": "domain",
+          "title_pt": 10
+        },
+        {
+          "id": "v4",
+          "x": 15.7,
+          "y": 7.4,
+          "w": 2.75,
+          "h": 0.5,
+          "title": "CMS_C1_REPRESENTATIVE_BODA_VW",
+          "kind": "step",
+          "center": true,
+          "title_pt": 9,
+          "tooltip": "Field representative mobile details parsed from XML: service areas and worker capabilities"
+        },
+        {
+          "id": "v5",
+          "x": 15.7,
+          "y": 8.0,
+          "w": 2.75,
+          "h": 0.5,
+          "title": "CMS_D1_ACTIVITY_CHAR_VW",
+          "kind": "step",
+          "center": true,
+          "title_pt": 9,
+          "tooltip": "Activity characteristics pivoted per activity: internal status, priority, third-party representative"
+        },
+        {
+          "id": "v6",
+          "x": 15.7,
+          "y": 8.6,
+          "w": 2.75,
+          "h": 0.5,
+          "title": "CMS_D1_ACTIVITY_D1FA_BODA_VW",
+          "kind": "step",
+          "center": true,
+          "title_pt": 9,
+          "tooltip": "Field activity business-object data parsed from XML: instructions, appointment window, requester, external references, contact names and phones"
+        },
+        {
+          "id": "m7",
+          "x": 15.6,
+          "y": 9.85,
+          "w": 1.42,
+          "h": 0.6,
+          "title": "Crew domain",
+          "kind": "domain",
+          "title_pt": 10
+        },
+        {
+          "id": "m8",
+          "x": 17.13,
+          "y": 9.85,
+          "w": 1.42,
+          "h": 0.6,
+          "title": "Field Activity domain",
+          "kind": "domain",
+          "title_pt": 10
+        },
+        {
+          "id": "v7",
+          "x": 18.77,
+          "y": 7.4,
+          "w": 2.15,
+          "h": 0.5,
+          "title": "CMS_CI_CASE_VW",
+          "kind": "step",
+          "center": true,
+          "title_pt": 9,
+          "tooltip": "One row per case with create and close times derived from the case log and the duration in minutes"
+        },
+        {
+          "id": "v8",
+          "x": 18.77,
+          "y": 8.0,
+          "w": 2.15,
+          "h": 0.5,
+          "title": "CMS_CI_CASE_LOG_VW",
+          "kind": "step",
+          "center": true,
+          "title_pt": 9,
+          "tooltip": "The case log as a timeline: each status change with the previous status and the time spent in each state"
+        },
+        {
+          "id": "m9",
+          "x": 18.67,
+          "y": 9.85,
+          "w": 2.35,
+          "h": 0.6,
+          "title": "Case domain",
+          "kind": "domain",
+          "title_pt": 10
+        }
+      ],
+      "edges": [
+        {
+          "from": "p1",
+          "to": "p2"
+        },
+        {
+          "from": "p2",
+          "to": "p3"
+        },
+        {
+          "from": "p3",
+          "to": "p4"
+        },
+        {
+          "from": "p4",
+          "to": "p5"
+        },
+        {
+          "from": "p5",
+          "to": "q1",
+          "from_side": "bottom",
+          "to_side": "top",
+          "via": [
+            [
+              17.31,
+              4.1
+            ],
+            [
+              19.85,
+              4.1
+            ]
+          ]
+        },
+        {
+          "from": "q1",
+          "to": "sq1",
+          "label": "no"
+        },
+        {
+          "from": "q1",
+          "to": "q2",
+          "label": "yes"
+        },
+        {
+          "from": "q2",
+          "to": "sq2",
+          "label": "no"
+        },
+        {
+          "from": "q2",
+          "to": "q3",
+          "label": "yes"
+        },
+        {
+          "from": "q3",
+          "to": "q4"
+        },
+        {
+          "from": "q4",
+          "to": "q5"
+        },
+        {
+          "from": "q5",
+          "to": "sq5",
+          "label": "no"
+        },
+        {
+          "from": "q5",
+          "to": "q6",
+          "label": "yes"
+        },
+        {
+          "from": "q6",
+          "to": "q7"
+        },
+        {
+          "from": "q6",
+          "to": "q4",
+          "from_side": "bottom",
+          "to_side": "bottom",
+          "via": [
+            [
+              4.7,
+              5.85
+            ],
+            [
+              10.7,
+              5.85
+            ]
+          ],
+          "label": "every 12 hours: the newest 3 months rebuilt, older rows kept",
+          "label_at": [
+            5.0,
+            5.5
+          ],
+          "label_w": 6.0
+        },
+        {
+          "from": "wf",
+          "to": "m1"
+        },
+        {
+          "from": "wb",
+          "to": "m2"
+        },
+        {
+          "from": "wm",
+          "to": "m3"
+        },
+        {
+          "from": "wd",
+          "to": "m4"
+        },
+        {
+          "from": "wv",
+          "to": "m5",
+          "from_side": "bottom",
+          "to_side": "top",
+          "via": [
+            [
+              14.03,
+              9.7
+            ],
+            [
+              13.28,
+              9.7
+            ]
+          ]
+        },
+        {
+          "from": "wv",
+          "to": "m6",
+          "from_side": "bottom",
+          "to_side": "top",
+          "via": [
+            [
+              14.03,
+              9.7
+            ],
+            [
+              14.78,
+              9.7
+            ]
+          ]
+        },
+        {
+          "from": "wo",
+          "to": "m7",
+          "from_side": "bottom",
+          "to_side": "top",
+          "via": [
+            [
+              17.075,
+              9.7
+            ],
+            [
+              16.31,
+              9.7
+            ]
+          ]
+        },
+        {
+          "from": "wo",
+          "to": "m8",
+          "from_side": "bottom",
+          "to_side": "top",
+          "via": [
+            [
+              17.075,
+              9.7
+            ],
+            [
+              17.84,
+              9.7
+            ]
+          ]
+        },
+        {
+          "from": "wc",
+          "to": "m9"
+        }
+      ],
+      "legend": "Every box in the map is one database object the domains read: seven rolling snapshot tables, the SA aged-balance table with its lookup seed, and eight CMS views. Numbers are the order of one rollout; blue diamonds are gates: yes continues, no stops the rollout there. The loop under the second row is the twice-daily rolling refresh (3 months rebuilt, 24 kept; 6 months at CityCorp and Odessa).",
+      "layers": {
+        "Commands": [
+          {
+            "x": 0.9,
+            "y": 3.05,
+            "w": 2.3,
+            "h": 0.42,
+            "title": "prod_snapshot_rollout_25_4.sh <client>  (steps 1 to 8, logged)"
+          },
+          {
+            "x": 3.7,
+            "y": 3.05,
+            "w": 6.0,
+            "h": 0.42,
+            "title": "run_snapshot_rollout_step.py --step baseline-and-validate --clients <c>  (tables, procedures, baselines, ready gate, validation, install gate)"
+          },
+          {
+            "x": 12.8,
+            "y": 4.95,
+            "w": 2.2,
+            "h": 0.42,
+            "title": "clients/post_load_snapshot_indexes_direct.sql"
+          },
+          {
+            "x": 6.6,
+            "y": 5.0,
+            "w": 5.5,
+            "h": 0.42,
+            "title": "run_snapshot_rollout_step.py --step cutover-and-validate --clients <c>"
+          },
+          {
+            "x": 3.45,
+            "y": 4.95,
+            "w": 2.5,
+            "h": 0.42,
+            "title": "--step schedule-operational"
+          },
+          {
+            "x": 0.9,
+            "y": 4.95,
+            "w": 1.9,
+            "h": 0.42,
+            "title": "08 capture, 13 data quality"
+          }
+        ],
+        "Checks": [
+          {
+            "x": 18.5,
+            "y": 3.6,
+            "w": 2.6,
+            "h": 0.55,
+            "title": "03d ready gate",
+            "body": "every JOB_BASELINE_*_ONCE job SUCCEEDED; none FAILED or missing"
+          },
+          {
+            "x": 15.5,
+            "y": 3.35,
+            "w": 2.8,
+            "h": 0.8,
+            "title": "04 / 04b / 04c / 04d",
+            "body": "row counts; 12 monthly totals vs source; duplicate keys; no empty table; CMS views valid; lookup seeded; ARS buckets sum to CUR_BAL; FT parity"
+          },
+          {
+            "x": 8.7,
+            "y": 3.7,
+            "w": 2.8,
+            "h": 0.45,
+            "title": "04 again, after the operational refresh"
+          }
+        ]
+      }
+    },
+    {
+      "type": "table",
+      "title": "The Objects The Domains Depend On (1 of 2)",
+      "kicker": "S9",
+      "font": 16,
+      "row_h": 1.45,
+      "widths": [
+        4.3,
+        2.0,
+        8.9,
+        5.2
+      ],
+      "columns": [
+        "Object",
+        "Kind",
+        "What it is",
+        "Depended on by"
+      ],
+      "rows": [
+        [
+          "CMS_SA_SNAPSHOT",
+          "table + refresh procedure",
+          "One end-of-day (LDAY) aged-balance row per service agreement: current and payoff balance, new charges, and ten aging buckets built from frozen ARS financial transactions dated up to today. Credits and payments retire the oldest debt first; excess credit sits in the current bucket; buckets 1 to 5 always sum to the current balance; future-dated amounts are excluded.",
+          "Debt Management: the SA Snapshot Aged Balance domain, its account roll-up (a derived query over this table, not a second object), and every aged-debt view and dashboard on it"
+        ],
+        [
+          "CM_SNAPSHOT_TYPE_FLG",
+          "lookup seed",
+          "The four snapshot-type codes (LDAY, EMON, ARCH, LEMN) written into the C2M lookup tables. The domain inner-joins them, so a fresh database without the seed returns zero rows in every Ad Hoc view.",
+          "Debt Management: SA Snapshot Aged Balance domain"
+        ],
+        [
+          "CMS_D1_DVC_IDENTIFIER_VW",
+          "view",
+          "One row per device with its identifiers pivoted from rows into columns: asset id, badge number, serial number, internal meter number, external and MDM ids, NIC id and serial, name, utility device id.",
+          "Meter Operations: Device domain; Daily Installations, Disconnected Service Points, Meters Not Recently Read"
+        ],
+        [
+          "CMS_D1_DVC_BODA_VW",
+          "view",
+          "The device's business-object data area parsed out of its XML: business object code, latest status, retirement date and time. One row per device.",
+          "Meter Operations: Device domain"
+        ],
+        [
+          "CMS_W1_ASSET_IDENTIFIER_VW",
+          "view",
+          "One row per asset with its identifiers pivoted into columns, the asset-side twin of the device identifier view, so the Asset domain can join by badge, serial or external id.",
+          "Meter Operations: Asset domain; In Storage, Distribution of Installed Assets, Non-Meter Assets"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "title": "The Objects The Domains Depend On (2 of 2)",
+      "kicker": "S10",
+      "font": 16,
+      "row_h": 1.45,
+      "widths": [
+        4.3,
+        2.0,
+        8.9,
+        5.2
+      ],
+      "columns": [
+        "Object",
+        "Kind",
+        "What it is",
+        "Depended on by"
+      ],
+      "rows": [
+        [
+          "CMS_C1_REPRESENTATIVE_BODA_VW",
+          "view",
+          "Field representative (crew member) mobile details parsed out of the representative's XML data area: the service areas they cover and their worker capabilities, one row per representative and area or capability.",
+          "Field Operations: Crew domain and its views"
+        ],
+        [
+          "CMS_D1_ACTIVITY_CHAR_VW",
+          "view",
+          "Activity characteristics pivoted per field activity: internal field-activity status, priority, and the third-party representative code, so the domain filters on them as columns.",
+          "Field Operations: Crew domain"
+        ],
+        [
+          "CMS_D1_ACTIVITY_D1FA_BODA_VW",
+          "view",
+          "The field activity's business-object data parsed from XML: instructions and comments, the appointment window and who took it, expiration, requester, external references, and the customer and contact names and phone numbers.",
+          "Field Operations: Crew and Field Activity domains; Upcoming Field Work, Cancelations, Average Days per Field Task"
+        ],
+        [
+          "CMS_CI_CASE_VW",
+          "view",
+          "One row per case with its create and close timestamps derived from the case log (the case-created entry and the closing status entry) and the duration in minutes, measured to now while the case is open.",
+          "Customer Operations: Case domain and every case view"
+        ],
+        [
+          "CMS_CI_CASE_LOG_VW",
+          "view",
+          "The case log as a timeline: every status change with the previous status, the previous log time, and how long the case sat in the previous and the current state.",
+          "Customer Operations: Case domain (state durations and the case timeline views)"
+        ]
+      ],
+      "legend": "All ten objects are created by one wrapper step in the rollout, validated by their own pack, and gated before the snapshots are scheduled; the CISREAD synonyms are repaired in the same step because CityCorp shipped with synonyms pointing at missing objects."
+    },
+    {
+      "type": "process",
+      "title": "Full History, Then Rolling Refresh",
+      "kicker": "S11",
+      "nodes": [
+        {
+          "id": "full",
+          "col": 0,
+          "row": 0,
+          "title": "Baseline procedure",
+          "body": "loads the retained 24 months once, one job per table"
+        },
+        {
+          "id": "g1",
+          "col": 1,
+          "row": 0,
+          "title": "Validate",
+          "body": "row counts, monthly totals and keys checked after the load"
+        },
+        {
+          "id": "rol",
+          "col": 2,
+          "row": 0,
+          "title": "Rolling procedure",
+          "body": "deletes and rebuilds only the newest months, twice a day"
+        },
+        {
+          "id": "sch",
+          "col": 3,
+          "row": 0,
+          "title": "Schedule",
+          "body": "database jobs at 10:00 and 16:00 UTC, 30-minute stagger"
+        },
+        {
+          "id": "cap",
+          "col": 3,
+          "row": 1,
+          "title": "Capture runs",
+          "body": "last run, duration and status recorded per job"
+        },
+        {
+          "id": "dq",
+          "col": 2,
+          "row": 1,
+          "title": "Data quality",
+          "body": "high-level checks per client after every refresh"
+        },
+        {
+          "id": "par",
+          "col": 1,
+          "row": 1,
+          "title": "Warehouse parity",
+          "body": "nightly comparison of the dbt canvases to these tables",
+          "kind": "manual",
+          "tag": "nightly"
+        },
+        {
+          "id": "win",
+          "col": 0,
+          "row": 1,
+          "title": "Windows per client",
+          "body": "3 months rebuilt, 24 kept, on every table; 6-month rolling at CityCorp and Odessa"
+        },
+        {
+          "id": "les",
+          "title": "The lesson that shaped it",
+          "body": "A refresh longer than the 15-minute client timeout committed its DELETE without the INSERT (Newark usage). Long refreshes now run as background scheduler jobs, never in the session, and the window is sized per client so a refresh finishes well inside the gap between runs.",
+          "x": 0.81,
+          "y": 6.35,
+          "w": 15.0,
+          "h": 1.55
+        },
+        {
+          "id": "hold",
+          "title": "Rolling schedule held on TEST until approved",
+          "kind": "accent",
+          "x": 16.88,
+          "y": 6.35
+        }
+      ],
+      "edges": [
+        [
+          "full",
+          "g1"
+        ],
+        [
+          "g1",
+          "rol"
+        ],
+        [
+          "rol",
+          "sch"
+        ],
+        [
+          "sch",
+          "cap"
+        ],
+        [
+          "cap",
+          "dq"
+        ],
+        [
+          "dq",
+          "par"
+        ]
+      ],
+      "proofs": [
+        "validate after baseline",
+        "validate after cutover",
+        "validate after the first scheduled run"
+      ]
+    },
+    {
+      "type": "process",
+      "title": "How AI Built The Python",
+      "kicker": "S12",
+      "nodes": [
+        {
+          "id": "ask",
+          "col": 0,
+          "row": 0,
+          "title": "The prompt",
+          "body": "the manual step, the SQL it ran, and the last failure seen"
+        },
+        {
+          "id": "code",
+          "col": 1,
+          "row": 0,
+          "title": "Script with a dry run",
+          "body": "every write is printed before it is made; nothing runs blind"
+        },
+        {
+          "id": "test",
+          "col": 2,
+          "row": 0,
+          "title": "Run on TEST",
+          "body": "measured, and the real error read rather than guessed"
+        },
+        {
+          "id": "gate",
+          "col": 3,
+          "row": 0,
+          "title": "Gate added",
+          "body": "the failure becomes a check that fails first next time"
+        },
+        {
+          "id": "skill",
+          "col": 3,
+          "row": 1,
+          "title": "Skill records it",
+          "body": "dated, with the number, so the next session starts knowing"
+        },
+        {
+          "id": "d1",
+          "col": 0,
+          "row": 1,
+          "title": "TEMP blew to 246 GB",
+          "body": "now: staged builds and TEMP capped before the first run",
+          "kind": "manual",
+          "tag": "failure"
+        },
+        {
+          "id": "d2",
+          "col": 1,
+          "row": 1,
+          "title": "Import 'succeeded', wrote nothing",
+          "body": "now: the package must carry the target's own datasource",
+          "kind": "manual",
+          "tag": "failure"
+        },
+        {
+          "id": "d3",
+          "col": 2,
+          "row": 1,
+          "title": "View runs but will not open",
+          "body": "now: a checker predicts the broken topic before promotion",
+          "kind": "manual",
+          "tag": "failure"
+        },
+        {
+          "id": "more",
+          "title": "More debugging that became tooling",
+          "body": "The Ad Hoc engine's 300,000-row cap (count on the whole population, sum on a window). The same org id living on two servers. Nested domain item groups with three-level ids. Reading a scheduled job's own error before blaming the database (the Fond du Lac SFTP case). Each one is now a test, a gate, or a dated line in a skill.",
+          "x": 0.81,
+          "y": 6.35,
+          "w": 15.0,
+          "h": 1.55
+        },
+        {
+          "id": "rule",
+          "title": "Rule: a lesson is not learned until it is a test or a gate",
+          "kind": "accent",
+          "x": 16.88,
+          "y": 6.35
+        }
+      ],
+      "edges": [
+        [
+          "ask",
+          "code"
+        ],
+        [
+          "code",
+          "test"
+        ],
+        [
+          "test",
+          "gate"
+        ],
+        [
+          "gate",
+          "skill"
+        ],
+        {
+          "from": "skill",
+          "to": "ask",
+          "via": [
+            21.7,
+            1.98
+          ]
+        }
+      ],
+      "proofs": [
+        "dry run before every write",
+        "run on TEST first",
+        "the failure becomes a gate",
+        "lesson dated in a skill"
+      ],
+      "legend": "Blue tag = a real failure and the tool it produced"
+    },
+    {
+      "type": "chevrons",
+      "title": "The Promotion Path",
+      "kicker": "S13",
+      "stages": [
+        {
+          "title": "Origin_DEV",
+          "sub": "authoring",
+          "lines": [
+            "Every domain, view, report and dashboard is built here first",
+            "The only place content is ever edited by hand"
+          ]
+        },
+        {
+          "title": "Origin_TEST",
+          "sub": "proving",
+          "lines": [
+            "The first promotion, with the seven proofs",
+            "The offering is executed end to end before any client sees it"
+          ]
+        },
+        {
+          "title": "Client test org",
+          "sub": "the client's own data",
+          "lines": [
+            "Datasource switched to the client's test database",
+            "Sweep and sign-off on the client's own numbers"
+          ]
+        },
+        {
+          "title": "Client prod org",
+          "sub": "explicit prod flag",
+          "accent": true,
+          "lines": [
+            "Same tool, same proofs, a prod write flag required",
+            "Inventory before and diff after: the rollback record"
+          ]
+        }
+      ],
+      "notes": [
+        {
+          "title": "The datasource changes at every hop",
+          "body": "the package carries the target's own datasource export, never an edited copy"
+        },
+        {
+          "title": "The same tool at every hop",
+          "body": "one promotion path from authoring to prod, so every hop is proven the same way"
+        },
+        {
+          "title": "Nothing edited by hand after Origin_DEV",
+          "body": "every change downstream is a promotion or an additive patch with a rollback"
+        }
+      ]
+    },
+    {
+      "type": "diagram",
+      "title": "Standard Offering Deployment Flow",
+      "kicker": "S14",
+      "subtitle": "authored on Origin_DEV, proven on Origin_TEST, then every client org by the same tool with the same seven proofs",
+      "nodes": [
+        {
+          "id": "g1",
+          "x": 0.81,
+          "y": 2.0,
+          "w": 4.86,
+          "h": 7.05,
+          "title": "Origin_DEV",
+          "kind": "group",
+          "body": "authoring, the internal server"
+        },
+        {
+          "id": "g2",
+          "x": 5.99,
+          "y": 2.0,
+          "w": 4.86,
+          "h": 7.05,
+          "title": "Origin_TEST",
+          "kind": "group",
+          "body": "proving, before any client"
+        },
+        {
+          "id": "g3",
+          "x": 11.17,
+          "y": 2.0,
+          "w": 4.86,
+          "h": 7.05,
+          "title": "Client test org",
+          "kind": "group",
+          "body": "the client's own data"
+        },
+        {
+          "id": "g4",
+          "x": 16.35,
+          "y": 2.0,
+          "w": 4.86,
+          "h": 7.05,
+          "title": "Client prod org",
+          "kind": "group",
+          "body": "read-only until the prod flag is given"
+        },
+        {
+          "id": "g5",
+          "x": 0.81,
+          "y": 9.35,
+          "w": 20.4,
+          "h": 1.85,
+          "title": "After go-live",
+          "kind": "group",
+          "body": "every change is a tool run with the same proofs, never a hand edit"
+        },
+        {
+          "id": "a1",
+          "x": 0.99,
+          "y": 2.75,
+          "w": 4.5,
+          "h": 1.0,
+          "title": "Workstreams tree",
+          "kind": "step",
+          "body": "domains, Ad Hoc views, reports and dashboards: the only content edited by hand",
+          "num": 1
+        },
+        {
+          "id": "a2",
+          "x": 0.99,
+          "y": 3.9,
+          "w": 4.5,
+          "h": 0.8,
+          "title": "Export the org",
+          "kind": "step",
+          "body": "one API export task, polled, downloaded",
+          "num": 2,
+          "tooltip": "A REST export task on the internal server, polled until done, downloaded as a zip package."
+        },
+        {
+          "id": "a3",
+          "x": 0.99,
+          "y": 4.85,
+          "w": 4.5,
+          "h": 1.55,
+          "title": "Build the package",
+          "kind": "step",
+          "body": "inventory and classify the export; keep the offering list; one copy of each domain in one home; carry the datasource; rewrite every path; strip print wrappers; narrow the import index",
+          "num": 3
+        },
+        {
+          "id": "a4",
+          "x": 2.49,
+          "y": 6.65,
+          "w": 1.5,
+          "h": 0.9,
+          "title": "package verifies?",
+          "kind": "gate",
+          "num": 4,
+          "tooltip": "No source host, org path or datasource name left in the package; every outside reference exists on the target; every field the views use resolves."
+        },
+        {
+          "id": "sa4",
+          "x": 1.01,
+          "y": 6.875,
+          "w": 0.98,
+          "h": 0.45,
+          "title": "stop",
+          "kind": "stop",
+          "title_pt": 9
+        },
+        {
+          "id": "b1",
+          "x": 6.17,
+          "y": 2.75,
+          "w": 4.5,
+          "h": 0.85,
+          "title": "Import, update in place",
+          "kind": "step",
+          "body": "polled; an importer warning counts as a failure",
+          "num": 5
+        },
+        {
+          "id": "b2",
+          "x": 6.17,
+          "y": 3.75,
+          "w": 4.5,
+          "h": 0.85,
+          "title": "Re-export and compare",
+          "kind": "step",
+          "body": "byte-equal inside the scope, importer stamps ignored",
+          "num": 6
+        },
+        {
+          "id": "b3",
+          "x": 6.17,
+          "y": 4.75,
+          "w": 4.5,
+          "h": 0.95,
+          "title": "Execute everything",
+          "kind": "step",
+          "body": "views by query, reports as PDF, domains by metadata and probe",
+          "num": 7
+        },
+        {
+          "id": "b4",
+          "x": 7.67,
+          "y": 5.9,
+          "w": 1.5,
+          "h": 0.9,
+          "title": "seven proofs pass?",
+          "kind": "gate",
+          "num": 8,
+          "tooltip": "the seven proofs: 1 no source host, org path or datasource name survives in the package; 2 every reference to something outside the package exists on the target; 3 every field the views use resolves in its domain; 4 import without warnings; 5 re-export byte-equal inside the scope; 6 every resource executes; 7 datasource connection unchanged"
+        },
+        {
+          "id": "sb4",
+          "x": 9.67,
+          "y": 6.125,
+          "w": 0.98,
+          "h": 0.45,
+          "title": "stop",
+          "kind": "stop",
+          "title_pt": 9
+        },
+        {
+          "id": "b5",
+          "x": 6.17,
+          "y": 7.0,
+          "w": 4.5,
+          "h": 0.85,
+          "title": "Proven offering",
+          "kind": "step",
+          "body": "the package every client promotion starts from",
+          "center": true,
+          "num": 9
+        },
+        {
+          "id": "c0",
+          "x": 11.35,
+          "y": 2.75,
+          "w": 4.5,
+          "h": 0.5,
+          "title": "datasource: the client's own export, carried byte for byte",
+          "kind": "accent",
+          "title_pt": 11,
+          "tooltip": "The target org's own /DataSource export is unzipped and carried into the package unchanged; never an edited copy of the source's datasource."
+        },
+        {
+          "id": "c1",
+          "x": 11.35,
+          "y": 3.4,
+          "w": 4.5,
+          "h": 0.8,
+          "title": "Inventory snapshot",
+          "kind": "step",
+          "body": "every resource on the org before anything changes",
+          "num": 10
+        },
+        {
+          "id": "c2",
+          "x": 11.35,
+          "y": 4.35,
+          "w": 4.5,
+          "h": 1.2,
+          "title": "Rebuild for the client",
+          "kind": "step",
+          "body": "the client's datasource carried; org path, folder, alias and tenant root rewritten by tested replacements",
+          "num": 11
+        },
+        {
+          "id": "c3",
+          "x": 12.85,
+          "y": 5.7,
+          "w": 1.5,
+          "h": 0.9,
+          "title": "package verified?",
+          "kind": "gate",
+          "num": 12,
+          "tooltip": "No source host, org path or datasource name survives; every outside reference exists on the target; every field the views use resolves in its domain."
+        },
+        {
+          "id": "sc3",
+          "x": 14.85,
+          "y": 5.925,
+          "w": 0.98,
+          "h": 0.45,
+          "title": "stop",
+          "kind": "stop",
+          "title_pt": 9
+        },
+        {
+          "id": "c4",
+          "x": 11.35,
+          "y": 6.8,
+          "w": 4.5,
+          "h": 0.8,
+          "title": "Import, compare, execute",
+          "kind": "step",
+          "body": "the same three proofs as Origin_TEST",
+          "num": 13
+        },
+        {
+          "id": "c5",
+          "x": 11.35,
+          "y": 7.75,
+          "w": 4.5,
+          "h": 1.0,
+          "title": "Sweep and sign off",
+          "kind": "step",
+          "body": "PASS, EMPTY, SLOW or FAIL per resource with timing; one document per org",
+          "num": 14
+        },
+        {
+          "id": "d0",
+          "x": 16.53,
+          "y": 2.75,
+          "w": 4.5,
+          "h": 0.5,
+          "title": "explicit prod flag required",
+          "kind": "accent",
+          "tooltip": "Prod writes refuse to run without the explicit prod flag; every other command is read-only against prod."
+        },
+        {
+          "id": "d1",
+          "x": 16.53,
+          "y": 3.4,
+          "w": 4.5,
+          "h": 0.75,
+          "title": "Inventory snapshot",
+          "kind": "step",
+          "body": "the rollback baseline",
+          "num": 15
+        },
+        {
+          "id": "d2",
+          "x": 16.53,
+          "y": 4.3,
+          "w": 4.5,
+          "h": 1.1,
+          "title": "Same promotion, same proofs",
+          "kind": "step",
+          "body": "target datasource carried; rewritten; verified; imported; compared; executed",
+          "num": 16
+        },
+        {
+          "id": "d3",
+          "x": 18.03,
+          "y": 5.55,
+          "w": 1.5,
+          "h": 0.9,
+          "title": "seven proofs pass?",
+          "kind": "gate",
+          "num": 17,
+          "tooltip": "the seven proofs: 1 no source host, org path or datasource name survives in the package; 2 every reference to something outside the package exists on the target; 3 every field the views use resolves in its domain; 4 import without warnings; 5 re-export byte-equal inside the scope; 6 every resource executes; 7 datasource connection unchanged"
+        },
+        {
+          "id": "sd3",
+          "x": 20.03,
+          "y": 5.775,
+          "w": 0.98,
+          "h": 0.45,
+          "title": "stop",
+          "kind": "stop",
+          "title_pt": 9
+        },
+        {
+          "id": "d4",
+          "x": 16.53,
+          "y": 6.6,
+          "w": 4.5,
+          "h": 0.75,
+          "title": "Sweep and sign off",
+          "kind": "step",
+          "body": "on the client's prod numbers",
+          "num": 18
+        },
+        {
+          "id": "d5",
+          "x": 16.53,
+          "y": 7.5,
+          "w": 4.5,
+          "h": 0.85,
+          "title": "Diff after = rollback record",
+          "kind": "step",
+          "body": "inventory before against after: nothing else moved",
+          "num": 19
+        },
+        {
+          "id": "e1",
+          "x": 1.0,
+          "y": 9.95,
+          "w": 6.4,
+          "h": 1.05,
+          "title": "Additive-only domain patch",
+          "kind": "step",
+          "body": "the additions guard refuses any change to what is there; seven proofs per org; one-command restore"
+        },
+        {
+          "id": "e2",
+          "x": 7.8,
+          "y": 9.95,
+          "w": 6.4,
+          "h": 1.05,
+          "title": "Standardized Reports folder",
+          "kind": "step",
+          "body": "scheduled SQL reports in one folder; on Origin_DEV today, promoted to client orgs by the same tool when approved"
+        },
+        {
+          "id": "e3",
+          "x": 14.6,
+          "y": 9.95,
+          "w": 6.4,
+          "h": 1.05,
+          "title": "Sweep after every change",
+          "kind": "step",
+          "body": "the sign-off is regenerated; the first red row is the alert"
+        },
+        {
+          "id": "loopnote",
+          "x": 13.7,
+          "y": 1.45,
+          "w": 7.3,
+          "h": 0.35,
+          "title": "every later change re-enters at the client test org and repeats steps 10 to 19",
+          "kind": "note"
+        }
+      ],
+      "edges": [
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "a3"
+        },
+        {
+          "from": "a3",
+          "to": "a4"
+        },
+        {
+          "from": "a4",
+          "to": "sa4",
+          "label": "no"
+        },
+        {
+          "from": "a4",
+          "to": "b1",
+          "via": [
+            [
+              5.83,
+              7.1
+            ],
+            [
+              5.83,
+              3.175
+            ]
+          ],
+          "label": "yes",
+          "label_at": [
+            4.4,
+            6.72
+          ],
+          "label_w": 1.0
+        },
+        {
+          "from": "b1",
+          "to": "b2"
+        },
+        {
+          "from": "b2",
+          "to": "b3"
+        },
+        {
+          "from": "b3",
+          "to": "b4"
+        },
+        {
+          "from": "b4",
+          "to": "sb4",
+          "label": "no"
+        },
+        {
+          "from": "b4",
+          "to": "b5",
+          "label": "yes"
+        },
+        {
+          "from": "b5",
+          "to": "c1",
+          "via": [
+            [
+              11.01,
+              7.425
+            ],
+            [
+              11.01,
+              3.8
+            ]
+          ]
+        },
+        {
+          "from": "c0",
+          "to": "c1"
+        },
+        {
+          "from": "c1",
+          "to": "c2"
+        },
+        {
+          "from": "c2",
+          "to": "c3"
+        },
+        {
+          "from": "c3",
+          "to": "sc3",
+          "label": "no"
+        },
+        {
+          "from": "c3",
+          "to": "c4",
+          "label": "yes"
+        },
+        {
+          "from": "c4",
+          "to": "c5"
+        },
+        {
+          "from": "c5",
+          "to": "d0",
+          "via": [
+            [
+              16.19,
+              8.25
+            ],
+            [
+              16.19,
+              3.0
+            ]
+          ]
+        },
+        {
+          "from": "d0",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "to": "d2"
+        },
+        {
+          "from": "d2",
+          "to": "d3"
+        },
+        {
+          "from": "d3",
+          "to": "sd3",
+          "label": "no"
+        },
+        {
+          "from": "d3",
+          "to": "d4",
+          "label": "yes"
+        },
+        {
+          "from": "d4",
+          "to": "d5"
+        },
+        {
+          "from": "d5",
+          "to": "e3",
+          "via": [
+            [
+              18.78,
+              9.2
+            ],
+            [
+              17.8,
+              9.2
+            ]
+          ],
+          "to_side": "top"
+        },
+        {
+          "from": "e3",
+          "to": "c0",
+          "from_side": "right",
+          "to_side": "top",
+          "via": [
+            [
+              21.5,
+              10.475
+            ],
+            [
+              21.5,
+              1.85
+            ],
+            [
+              13.6,
+              1.85
+            ]
+          ]
+        }
+      ],
+      "legend": "Blue diamonds are gates: yes continues, no stops the run and names the rollback. Numbers are the order of one full promotion. The Workstreams tree is never moved; the offering is a curated copy promoted org by org.",
+      "legend_y": 11.3,
+      "layers": {
+        "Commands": [
+          {
+            "x": 1.0,
+            "y": 5.95,
+            "w": 4.3,
+            "h": 0.42,
+            "title": "build_standard_offering_package.py, then verify_standard_offering_package.py"
+          },
+          {
+            "x": 6.2,
+            "y": 3.15,
+            "w": 4.3,
+            "h": 0.42,
+            "title": "jrs_promote.py --from internal:Origin_DEV --to test:Origin_TEST --resource /SmartCity/Report/Standard_Offering --ds Origin_TEST_DS"
+          },
+          {
+            "x": 11.4,
+            "y": 3.75,
+            "w": 4.3,
+            "h": 0.42,
+            "title": "jrs_inventory.py snapshot --env test --orgs <Org>"
+          },
+          {
+            "x": 11.4,
+            "y": 5.1,
+            "w": 4.3,
+            "h": 0.42,
+            "title": "jrs_promote.py --from test:Origin_TEST --to test:<Org> --resource /SmartCity/Report/Standard_Offering --ds <Org>_DS"
+          },
+          {
+            "x": 11.4,
+            "y": 8.4,
+            "w": 4.3,
+            "h": 0.42,
+            "title": "jrs_run_sweep.py --env test --org <Org> --folder /SmartCity/Report/Standard_Offering; build_standard_offering_validation_doc.py --evidence"
+          },
+          {
+            "x": 16.6,
+            "y": 4.95,
+            "w": 4.3,
+            "h": 0.42,
+            "title": "jrs_promote_test_to_prod.py --org <Org> --folder /SmartCity/Report/Standard_Offering --ds <DS> --i-mean-prod"
+          },
+          {
+            "x": 1.0,
+            "y": 10.55,
+            "w": 6.2,
+            "h": 0.42,
+            "title": "jrs_domain_patch_apply.py --env test --org <Org> --domain <uri> --patch <module>  (--restore rolls back)"
+          }
+        ],
+        "Checks": [
+          {
+            "x": 1.0,
+            "y": 7.45,
+            "w": 4.3,
+            "h": 0.55,
+            "title": "package gate",
+            "body": "no source host / org / datasource string; every outside reference exists on the target; every view field resolves in its domain"
+          },
+          {
+            "x": 6.2,
+            "y": 6.9,
+            "w": 4.3,
+            "h": 0.75,
+            "title": "seven proofs",
+            "body": "1 no source host, org path or datasource name survives in the package; 2 every reference to something outside the package exists on the target; 3 every field the views use resolves in its domain; 4 import without warnings; 5 re-export byte-equal inside the scope; 6 every resource executes; 7 datasource connection unchanged"
+          },
+          {
+            "x": 16.6,
+            "y": 6.6,
+            "w": 4.3,
+            "h": 0.75,
+            "title": "seven proofs, on prod",
+            "body": "1 no source host, org path or datasource name survives in the package; 2 every reference to something outside the package exists on the target; 3 every field the views use resolves in its domain; 4 import without warnings; 5 re-export byte-equal inside the scope; 6 every resource executes; 7 datasource connection unchanged"
+          }
+        ]
+      }
+    },
+    {
+      "type": "process",
+      "title": "Jaspersoft REST Promotion",
+      "kicker": "S15",
+      "nodes": [
+        {
+          "id": "exp",
+          "col": 0,
+          "row": 0,
+          "title": "1. Export",
+          "body": "an export task on the source server, polled, downloaded as a package"
+        },
+        {
+          "id": "pkg",
+          "col": 1,
+          "row": 0,
+          "title": "2. Rebuild the package",
+          "body": "target datasource carried in; every file in scope rewritten"
+        },
+        {
+          "id": "ver",
+          "col": 2,
+          "row": 0,
+          "title": "3. Verify",
+          "body": "no source host or datasource name survives; references exist; fields resolve"
+        },
+        {
+          "id": "imp",
+          "col": 3,
+          "row": 0,
+          "title": "4. Import",
+          "body": "update in place, polled; a warning counts as a failure"
+        },
+        {
+          "id": "cmp",
+          "col": 3,
+          "row": 1,
+          "title": "5. Re-export and compare",
+          "body": "byte-equal inside the scope, importer stamps ignored"
+        },
+        {
+          "id": "run",
+          "col": 2,
+          "row": 1,
+          "title": "6. Execute",
+          "body": "views by query, reports as PDF, domains by metadata and probe"
+        },
+        {
+          "id": "swp",
+          "col": 1,
+          "row": 1,
+          "title": "7. Sweep and sign-off",
+          "body": "everything in the folder executed, then the document"
+        },
+        {
+          "id": "inv",
+          "col": 0,
+          "row": 1,
+          "title": "Inventory first",
+          "body": "a snapshot of the org before, a diff after: the rollback record"
+        },
+        {
+          "id": "sw",
+          "title": "What gets switched on the way",
+          "body": "The datasource reference, its alias and the schema's datasource id. The organization path and the destination folder. The tenant root the importer resolves against. Permissions are left to inherit from the folder. When the server version changed, the Ad Hoc topics were repaired by the same path.",
+          "x": 0.81,
+          "y": 6.35,
+          "w": 15.0,
+          "h": 1.55
+        },
+        {
+          "id": "root",
+          "title": "Root login on every server; prod writes need an explicit prod flag",
+          "kind": "accent",
+          "x": 16.88,
+          "y": 6.35
+        }
+      ],
+      "edges": [
+        [
+          "exp",
+          "pkg"
+        ],
+        [
+          "pkg",
+          "ver"
+        ],
+        [
+          "ver",
+          "imp"
+        ],
+        [
+          "imp",
+          "cmp"
+        ],
+        [
+          "cmp",
+          "run"
+        ],
+        [
+          "run",
+          "swp"
+        ]
+      ],
+      "proofs": [
+        "import without warnings",
+        "re-export byte-equal",
+        "every resource executes",
+        "datasource connection unchanged"
+      ]
+    },
+    {
+      "type": "bullets",
+      "title": "Inside The Promotion",
+      "kicker": "S16",
+      "columns": [
+        {
+          "heading": "What gets rewritten",
+          "items": [
+            "Every absolute repository path from the source org to the target org, longest path first so a folder never clips a file",
+            "The destination folder, so a resource can land somewhere other than where it came from",
+            "The datasource reference in every report, view and domain, plus the alias and schema id inside the domain XML",
+            "The tenant root in the package index so the importer resolves references against the right org",
+            "Nothing else: the rewrite is a list of tested replacements, not a free-text edit"
+          ]
+        },
+        {
+          "heading": "What gets verified",
+          "items": [
+            "No string from the source server, source org or source datasource remains anywhere in the package",
+            "Every reference a resource makes to something outside the package already exists on the target",
+            "Every field an Ad Hoc view uses resolves to an item in its domain, at any nesting depth",
+            "The target datasource in the package is byte-identical to the target's own export of it",
+            "The org path guard only fires when the two roots differ, so the same org on two servers is allowed"
+          ]
+        },
+        {
+          "heading": "What gets executed",
+          "items": [
+            "Each Ad Hoc view is run through the query engine and must return without error",
+            "Each report is rendered to PDF with its default parameters",
+            "Each domain is read for its metadata and probed with a query on its root set",
+            "The sweep classifies every resource PASS, EMPTY, SLOW or FAIL with its timing",
+            "The re-export after import is compared to the package byte for byte, stamps excluded"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "The Automations",
+      "widths": [
+        4.6,
+        9.4,
+        6.4
+      ],
+      "columns": [
+        "Automation",
+        "What it does",
+        "What it proves"
+      ],
+      "rows": [
+        [
+          "Snapshot runner",
+          "Runs one deployment step for one client as the deploy user, logging every statement; compound steps pair a stage with its validation",
+          "Every step has a log and a gate; nothing moves on unvalidated"
+        ],
+        [
+          "Prod rollout wrapper",
+          "Runs the whole prod sequence, steps 1 to 8, and stops at the first failed gate",
+          "A client is deployed the same way every time"
+        ],
+        [
+          "Baseline gate",
+          "Polls the database scheduler until every baseline job reports SUCCEEDED",
+          "No table is used before its load finished"
+        ],
+        [
+          "Install and parity gates",
+          "Row counts, monthly totals, duplicate keys, aged-balance buckets against the source",
+          "The tables match CISADM before they are scheduled"
+        ],
+        [
+          "Repository inventory",
+          "Snapshots every resource on an org before a change and diffs after",
+          "A rollback record and proof nothing else moved"
+        ],
+        [
+          "Promotion",
+          "Exports, rewrites, verifies, imports, re-exports, executes any resource from any org to any org",
+          "Seven proofs, and prod only with an explicit flag"
+        ],
+        [
+          "Domain patch",
+          "Applies an additive change to a domain on many orgs, refusing any change that alters what is there",
+          "Read-back byte-equal, bound views run, rows tie"
+        ],
+        [
+          "Sweep",
+          "Executes every view, report and dashboard in a folder and classifies each",
+          "PASS, EMPTY, SLOW or FAIL per resource with timing"
+        ],
+        [
+          "Sign-off builder",
+          "Turns the sweep evidence into the validation document",
+          "One document per org, identical structure every time"
+        ]
+      ]
+    },
+    {
+      "type": "process",
+      "title": "How AI Runs It",
+      "kicker": "S17",
+      "nodes": [
+        {
+          "id": "ask",
+          "col": 0,
+          "row": 0,
+          "title": "Instruction",
+          "body": "Chase names the org, the change and the environment"
+        },
+        {
+          "id": "skill",
+          "col": 1,
+          "row": 0,
+          "title": "Skills load",
+          "body": "runbooks, measured facts and dated lessons for that task"
+        },
+        {
+          "id": "tool",
+          "col": 2,
+          "row": 0,
+          "title": "Tool runs",
+          "body": "export, patch, build, promote, sweep, with a dry run first"
+        },
+        {
+          "id": "proof",
+          "col": 3,
+          "row": 0,
+          "title": "Proof printed",
+          "body": "or the step stops and names the rollback"
+        },
+        {
+          "id": "learn",
+          "col": 3,
+          "row": 1,
+          "title": "Skill updated",
+          "body": "the new fact, with its number, in the same session"
+        },
+        {
+          "id": "runs",
+          "col": 0,
+          "row": 1,
+          "title": "What it runs",
+          "body": "builds, promotions, domain patches, sweeps, sign-off documents, diagnostics"
+        },
+        {
+          "id": "knows",
+          "col": 1,
+          "row": 1,
+          "title": "What it knows",
+          "body": "C2M joins and cardinalities, the server estate, every dated lesson"
+        },
+        {
+          "id": "never",
+          "col": 2,
+          "row": 1,
+          "title": "What it never does",
+          "body": "write to prod unasked, print a credential, guess a client code",
+          "kind": "manual",
+          "tag": "guardrail"
+        },
+        {
+          "id": "guard",
+          "title": "Guardrails live in the tools, not in the conversation",
+          "body": "An explicit confirm on every write. A separate flag before any prod write. Oracle access read-only, with prod disabled. Domain changes additive only. Credentials resolved from the environment and never printed. Each rule is enforced by the tool, so it holds no matter who runs it.",
+          "x": 0.81,
+          "y": 6.35,
+          "w": 15.0,
+          "h": 1.3
+        },
+        {
+          "id": "scale",
+          "title": "303 of 379 commits in one repo, 255 of 351 in the other",
+          "kind": "accent",
+          "x": 16.88,
+          "y": 6.35
+        },
+        {
+          "id": "human",
+          "x": 16.88,
+          "y": 7.8,
+          "w": 4.3,
+          "h": 1.2,
+          "title": "Human-only today",
+          "body": "Ad Hoc designer checks, users, themes, server config",
+          "kind": "manual",
+          "tag": "human"
+        }
+      ],
+      "edges": [
+        [
+          "ask",
+          "skill"
+        ],
+        [
+          "skill",
+          "tool"
+        ],
+        [
+          "tool",
+          "proof"
+        ],
+        [
+          "proof",
+          "learn"
+        ],
+        {
+          "from": "learn",
+          "to": "skill",
+          "via": [
+            21.7,
+            1.98
+          ]
+        }
+      ],
+      "legend": "The loop: what a session learns goes back into the skills the next session loads."
+    },
+    {
+      "type": "cards",
+      "title": "Results, Measured",
+      "cols": 3,
+      "cards": [
+        {
+          "stat": "100%",
+          "stat_label": "138,086 of 138,086 SA balances tie to the cent",
+          "heading": "Snapshots on prod",
+          "lines": [
+            "Ellensburg, CityCorp, College Station, Newark refreshed twice daily",
+            "Baselines run as parallel jobs, gated, unattended"
+          ]
+        },
+        {
+          "stat": "11 min",
+          "stat_label": "Ellensburg, test org to prod org, 0 errors",
+          "heading": "Standard Offering to prod",
+          "lines": [
+            "Newark 21 minutes, 0 errors",
+            "116 ok, 7 empty, 27 slow on the first sweep",
+            "596 report units kept loading through the server upgrade"
+          ]
+        },
+        {
+          "stat": "6 orgs",
+          "stat_label": "one domain change, seven proofs each, in an afternoon",
+          "heading": "Day-to-day changes",
+          "lines": [
+            "21 College Station reports prod to test in a morning",
+            "111 views repaired the morning prod went to 10.0"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "donut",
+      "title": "One Sweep, Read Closely",
+      "kicker": "S18",
+      "parts": [
+        {
+          "label": "OK",
+          "value": 116,
+          "fill": "006FAC",
+          "means": "ran and returned rows inside the time limit"
+        },
+        {
+          "label": "Slow",
+          "value": 27,
+          "fill": "5DA5B0",
+          "means": "ran and returned rows, but took over a minute: a tuning list, not a failure"
+        },
+        {
+          "label": "Empty",
+          "value": 7,
+          "fill": "F2F5F8",
+          "means": "ran without error and returned no rows: the client has no data there yet"
+        },
+        {
+          "label": "Failed",
+          "value": 0,
+          "fill": "8B1515",
+          "means": "did not run; there were none"
+        }
+      ],
+      "stat": "150 resources, 0 failures",
+      "stat_label": "Ellensburg prod, the Standard Offering, 11 minutes end to end; the same sweep runs after every promotion and every domain patch",
+      "legend": "Every sweep is classified the same way, so two sweeps of the same org can be compared row by row."
+    },
+    {
+      "type": "compare",
+      "title": "The Constraint Today, And What Replaces It",
+      "kicker": "S19",
+      "headings": [
+        "Manual QA now",
+        "Next: Playwright, and agents on the network (Shankar)"
+      ],
+      "rows": [
+        {
+          "before": "Opening each Ad Hoc view in the designer by hand: the API says 'ok' but only the editor shows a broken topic",
+          "after": "Playwright signs in, opens every view and dashboard, screenshots it and asserts no error in the page or console",
+          "proof": "a pass list per org after every promotion"
+        },
+        {
+          "before": "Dashboards and themes checked by eye after formatting changes",
+          "after": "Playwright reads computed styles and element positions and diffs them against the last good render",
+          "proof": "measured, not eyeballed"
+        },
+        {
+          "before": "Nightly builds and sweeps skip when the laptop is off the network: 93% of runs in the last 30 days",
+          "after": "AI agents hosted in the cloud on the same network run the nightlies, the sweeps and the parity checks continuously; the hosting is Shankar's",
+          "proof": "no run depends on a person being connected"
+        },
+        {
+          "before": "Sign-off documents assembled when someone asks",
+          "after": "Continual monitoring: every change swept, every org validated, an alert on the first red row",
+          "proof": "the sign-off is always current"
+        }
+      ]
+    },
+    {
+      "type": "roadmap",
+      "title": "Roadmap",
+      "kicker": "S20",
+      "intro": "In the order that removes the most manual work.",
+      "steps": [
+        {
+          "title": "Fond du Lac and College Station prod",
+          "owner": "Chase, with the clients",
+          "body": "the Standard Offering on every prod org, in the coming weeks",
+          "current": true
+        },
+        {
+          "title": "Playwright UI QA",
+          "owner": "Chase",
+          "body": "designer and dashboard checks on Origin_DEV first"
+        },
+        {
+          "title": "Agents on the network",
+          "owner": "Shankar (infrastructure)",
+          "body": "cloud-hosted, continual sweeps and nightlies"
+        },
+        {
+          "title": "Schedulable reports",
+          "owner": "Chase",
+          "body": "interactive tables, as-of dates, relative windows"
+        },
+        {
+          "title": "Origin BA app and dbt",
+          "owner": "Chase",
+          "body": "the warehouse layer inside the app, after the deployments"
+        }
+      ]
+    },
+    {
+      "type": "cards",
+      "title": "Next: The Origin BA App And dbt",
+      "kicker": "S21",
+      "cols": 3,
+      "cards": [
+        {
+          "heading": "The app today",
+          "lines": [
+            "A web portal over the reporting layer: workstream pages, explore views, a build page and a data-quality page per client",
+            "Each client isolated to its own org and warehouse connection; admin scope settled and audited",
+            "An analytics assistant that answers questions from the canvases with tool calls, fenced to the client's data"
+          ]
+        },
+        {
+          "heading": "dbt inside the app",
+          "lines": [
+            "The dbt project turns CISADM into 38 reporting canvases with a data dictionary and enforced contracts",
+            "The same models build natively inside a client's Oracle instance: three schemas beside CISADM, read-only grants, no CDC",
+            "The app reads that in-database reporting layer directly, so one transformation layer serves the portal, the assistant and Jaspersoft"
+          ]
+        },
+        {
+          "heading": "What comes next",
+          "lines": [
+            "Taken up after the Fond du Lac and College Station deployments finish in the coming weeks",
+            "Jaspersoft domains generated from the dbt contracts, so the snapshot tables are replaced rather than maintained",
+            "Data-quality rules, nightly parity against the snapshots, and the assistant proven with real client questions"
+          ],
+          "accent": true
+        }
+      ]
+    }
+  ]
+}

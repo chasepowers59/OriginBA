@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.3.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Letter-Consolidated-Parent" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="64860223-2be3-4ffa-a17a-d8ad244595fa">
+	<property name="ireport.domainUri"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Letter/Letter_Consolidated_Trigger_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Letter/Letter_Consolidated_Trigger"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Letter-TXRLLLLTR DS"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Trigger for Consolidated Letter Printing"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin|Ellensburg"/>
+	<scriptlet name="bursting" class="com.jaspersoft.jasperreports.jrs.bursting.BurstingScriptlet">
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.result.variable" value="BurstedJob"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.output.formats" value="PDF"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.enabled_customSimpleMode" value="true"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.alert.enabled_customSimpleMode" value="true"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.type" value="sftp"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.port" value="22"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.overwrite.files_customSimpleMode" value="true"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.sequential.filenames_customSimpleMode" value="true"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.timestamp.pattern" value="yyyy-MM-dd_HH.mm.ss"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.save.to.repository_customSimpleMode" value="true"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.username" value="jasper"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.ssh.key" value="/SmartCity/Admin/sshKeys/jasper_rsa"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.folder.uri" value="/SmartCity/Letter/export"/>
+		<property name="com.jaspersoft.jasperreports.jrs.bursting.job.description" value="Letter-Consolidated-Trigger"/>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.enabled"><![CDATA[true]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.source.parameter.net.sf.jasperreports.xml.source"><![CDATA[$P{net.sf.jasperreports.xml.source}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.alert.enabled"><![CDATA[false]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.output.time.zone"><![CDATA[]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.overwrite.files"><![CDATA[true]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.sequential.filenames"><![CDATA[true]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.repository.save.to.repository"><![CDATA[false]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.label"><![CDATA["Letter - Consolidated - Trigger"]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.source.report.uri"><![CDATA["/SmartCity/Letter/"+$P{LetterName}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.base.output.filename"><![CDATA[$P{LetterName} + "_" + $F{batchNumber} + "_" + $F{threadNumber}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.folder.path"><![CDATA[$P{ftp.folder.path}==null?"//":$P{ftp.folder.path}]]></propertyExpression>
+		<propertyExpression name="com.jaspersoft.jasperreports.jrs.bursting.job.ftp.server.name"><![CDATA[$P{ftp.server.name}]]></propertyExpression>
+	</scriptlet>
+	<parameter name="net.sf.jasperreports.xml.source" class="java.lang.String"/>
+	<parameter name="LetterName" class="java.lang.String"/>
+	<parameter name="ftp.server.name" class="java.lang.String"/>
+	<parameter name="ftp.folder.path" class="java.lang.String"/>
+	<queryString language="XPath">
+		<![CDATA[/root/C1-SummaryLetterExtractRecord]]>
+	</queryString>
+	<field name="printerKey" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="printerKey"/>
+		<fieldDescription><![CDATA[printerKey]]></fieldDescription>
+	</field>
+	<field name="batchCode" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="batchCode"/>
+		<fieldDescription><![CDATA[batchCode]]></fieldDescription>
+	</field>
+	<field name="batchNumber" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="batchNumber"/>
+		<fieldDescription><![CDATA[batchNumber]]></fieldDescription>
+	</field>
+	<field name="rerunNumber" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="rerunNumber"/>
+		<fieldDescription><![CDATA[rerunNumber]]></fieldDescription>
+	</field>
+	<field name="letterCount" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="letterCount"/>
+		<fieldDescription><![CDATA[letterCount]]></fieldDescription>
+	</field>
+	<field name="extractDateTime" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="extractDateTime"/>
+		<fieldDescription><![CDATA[extractDateTime]]></fieldDescription>
+	</field>
+	<field name="ccIdStart" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="ccIdStart"/>
+		<fieldDescription><![CDATA[ccIdStart]]></fieldDescription>
+	</field>
+	<field name="ccIdEnd" class="java.lang.Long">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="ccIdEnd"/>
+		<fieldDescription><![CDATA[ccIdEnd]]></fieldDescription>
+	</field>
+	<field name="threadNumber" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="threadNumber"/>
+		<fieldDescription><![CDATA[threadNumber]]></fieldDescription>
+	</field>
+	<field name="numOfThreads" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="numOfThreads"/>
+		<fieldDescription><![CDATA[numOfThreads]]></fieldDescription>
+	</field>
+	<variable name="BurstedJob" class="com.jaspersoft.jasperserver.dto.job.ClientReportJob" calculation="System"/>
+	<title>
+		<band height="54">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="54" uuid="c57de297-73f3-4b88-bc33-5e807b965e94"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial Black" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Letter - Consolidated]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="297">
+			<textField>
+				<reportElement x="230" y="30" width="240" height="30" uuid="a84c3d50-5fc3-43c1-9f94-a41681d511de"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{batchCode}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="30" width="220" height="30" uuid="4d006d94-2772-4133-ae45-3e3c2d565e9e"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Batch]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="230" y="60" width="240" height="30" uuid="ca68dcdb-7b23-4b01-90fb-2bcfcedd75bd"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{batchNumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="60" width="220" height="30" uuid="9fe392e3-18cf-4889-b461-cdb5907f1d1d"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Batch Number]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="230" y="180" width="240" height="30" uuid="b5910815-ef96-4a09-bf31-66bdf92db305"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{extractDateTime}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="180" width="220" height="30" uuid="9bc88ce3-0004-42a6-91ee-7df2621600a1"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Extract Date Time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="90" width="220" height="30" uuid="654904a4-f415-4dc1-88c3-1648bf1f9e55"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Batch Thread Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="150" width="220" height="30" uuid="eb2ec987-3368-4efd-83bb-7fb527c55c32"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Letter Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="120" width="220" height="30" uuid="c6b1b370-0f48-4321-abe0-87370a6b66c6"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Batch Thread Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="210" width="220" height="30" uuid="b9037d4a-f1a2-41b7-aa37-58a48dee962b"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Letter Id Start]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="240" width="220" height="30" uuid="802c13d0-467d-4c70-818d-95c3098a10c3"/>
+				<textElement>
+					<font fontName="Arial Black" size="14"/>
+				</textElement>
+				<text><![CDATA[Letter Id End]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="230" y="90" width="240" height="30" uuid="9444825e-e64e-4787-98ab-90529014fd25"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{threadNumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="120" width="240" height="30" uuid="6725155d-cf82-48df-bd3e-6f9918f5c55b"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numOfThreads}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="150" width="240" height="30" uuid="c6ab4f70-a09b-4bf8-8302-9c2cd9e605e0"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{letterCount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="210" width="240" height="30" uuid="1b44c967-2a79-42c6-87f4-5801c0b1f192"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ccIdStart}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="240" width="240" height="30" uuid="074a7b21-2c26-47b9-9b70-1d2c818ad07f"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ccIdEnd}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

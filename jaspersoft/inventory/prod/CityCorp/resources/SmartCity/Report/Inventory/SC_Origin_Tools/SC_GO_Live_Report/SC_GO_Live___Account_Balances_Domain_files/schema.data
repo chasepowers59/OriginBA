@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <itemGroups>
+    <itemGroup id="AGED_ALL_BALANCES" label="SA Balances" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_CUR_AMT_" label="Current Amount" resourceId="JoinTree_1.AGED_ALL_BALANCES.SUM_FT1_CUR_AMT_"></item>
+        <item id="SUM_FT1_TOT_AMT_" label="Total Amouint" resourceId="JoinTree_1.AGED_ALL_BALANCES.SUM_FT1_TOT_AMT_"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="AGED_DETAILS" label="Account Details" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID" label="Account Id" resourceId="JoinTree_1.AGED_DETAILS.ACCT_ID"></item>
+        <item id="ADDRESS1" label="Address 1" resourceId="JoinTree_1.AGED_DETAILS.ADDRESS1"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle Code" resourceId="JoinTree_1.AGED_DETAILS.BILL_CYC_CD"></item>
+        <item id="DST_ID" label="Distribution Id" resourceId="JoinTree_1.AGED_DETAILS.DST_ID"></item>
+        <item id="ENTITY_NAME" label="Entity Name" resourceId="JoinTree_1.AGED_DETAILS.ENTITY_NAME"></item>
+        <item id="SA_ID" label="Service Agreement Id" resourceId="JoinTree_1.AGED_DETAILS.SA_ID"></item>
+        <item id="SA_TYPE_CD" label="SA Type Code" resourceId="JoinTree_1.AGED_DETAILS.SA_TYPE_CD"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcQuery id="AGED_DETAILS" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    a.bill_cyc_cd,
+    sa.sa_type_cd,
+    p.address1,
+    a.acct_id,
+    sa.sa_id,
+    sat.dst_id,
+    pn.entity_name
+
+FROM
+         cisadm.ci_acct a
+    JOIN cisadm.ci_acct_per      ap ON a.acct_id = ap.acct_id
+                                  AND main_cust_sw = 'Y'
+    JOIN cisadm.ci_per_name      pn ON ap.per_id = pn.per_id
+                                  AND pn.prim_name_sw = 'Y'
+    JOIN cisadm.ci_sa            sa ON a.acct_id = sa.acct_id
+                            AND sa.sa_type_cd IN (
+        SELECT
+            sa_type_cd
+        FROM
+            cisadm.ci_sa_type
+        WHERE
+                allow_billing_sw = 'Y'
+            AND prem_req_sw = 'Y'
+    )
+    join cisadm.ci_sa_type  sat on sa.sa_type_cd = sat.sa_type_cd
+    JOIN cisadm.ci_prem          p ON sa.char_prem_id = p.prem_id</query>
+    </jdbcQuery>
+    <jdbcQuery id="AGED_ALL_BALANCES" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT_" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT1_TOT_AMT_" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+            ft1.sa_id,
+            sum(ft1.cur_amt),sum(ft1.tot_amt)
+            
+        FROM
+            cisadm.ci_ft ft1
+        WHERE
+                ft1.freeze_sw = 'Y'
+
+group by ft1.sa_id</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_1" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="AGED_DETAILS.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="AGED_DETAILS.SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="AGED_DETAILS.ADDRESS1" type="java.lang.String"></field>
+        <field id="AGED_DETAILS.ACCT_ID" type="java.lang.String"></field>
+        <field id="AGED_DETAILS.SA_ID" type="java.lang.String"></field>
+        <field id="AGED_DETAILS.DST_ID" type="java.lang.String"></field>
+        <field id="AGED_DETAILS.ENTITY_NAME" type="java.lang.String"></field>
+        <field id="AGED_ALL_BALANCES.SA_ID" type="java.lang.String"></field>
+        <field id="AGED_ALL_BALANCES.SUM_FT1_CUR_AMT_" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="AGED_ALL_BALANCES.SUM_FT1_TOT_AMT_" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <joinInfo alias="AGED_DETAILS" referenceId="AGED_DETAILS"></joinInfo>
+      <joinList>
+        <join expr="AGED_DETAILS.SA_ID == AGED_ALL_BALANCES.SA_ID" left="AGED_DETAILS" right="AGED_ALL_BALANCES" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>SELECT
+    a.bill_cyc_cd,
+    sa.sa_type_cd,
+    p.address1,
+    a.acct_id,
+    sa.sa_id,
+    sat.dst_id,
+    pn.entity_name
+
+FROM
+         cisadm.ci_acct a
+    JOIN cisadm.ci_acct_per      ap ON a.acct_id = ap.acct_id
+                                  AND main_cust_sw = 'Y'
+    JOIN cisadm.ci_per_name      pn ON ap.per_id = pn.per_id
+                                  AND pn.prim_name_sw = 'Y'
+    JOIN cisadm.ci_sa            sa ON a.acct_id = sa.acct_id
+                            AND sa.sa_type_cd IN (
+        SELECT
+            sa_type_cd
+        FROM
+            cisadm.ci_sa_type
+        WHERE
+                allow_billing_sw = 'Y'
+            AND prem_req_sw = 'Y'
+    )
+    join cisadm.ci_sa_type  sat on sa.sa_type_cd = sat.sa_type_cd
+    JOIN cisadm.ci_prem          p ON sa.char_prem_id = p.prem_id</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="AGED_DETAILS" tableId="AGED_DETAILS"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="AGED_ALL_BALANCES" tableId="AGED_ALL_BALANCES"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

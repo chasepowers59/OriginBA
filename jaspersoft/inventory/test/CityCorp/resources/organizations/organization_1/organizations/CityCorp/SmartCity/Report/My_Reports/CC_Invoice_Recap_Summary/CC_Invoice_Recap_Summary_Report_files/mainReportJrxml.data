@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CC Invoice Recap Summary Report" pageWidth="612" pageHeight="792" orientation="Landscape" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" isIgnorePagination="true" uuid="07f1d5f2-336a-495e-acbb-1adb53af5138">
+	<property name="net.sf.jasperreports.export.xls.collapse.row.span" value="false"/>
+	<property name="net.sf.jasperreports.export.html.border.collapse" value="collapse"/>
+	<property name="net.sf.jasperreports.export.docx.frames.as.nested.tables" value="false"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.actual.size" value="true"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.group.indent" value="0"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.min.group.label.width" value="100"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.detail.band.height" value="25"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.header.band.height" value="25"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.row.header.width" value="125"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.cell.width" value="100"/>
+	<property name="com.jaspersoft.jasperserver.adhoc.crosstab.cell.height" value="20"/>
+	<property name="com.jaspersoft.ji.adhoc" value="1"/>
+	<property name="com.jaspersoft.ji.adhoc.preferredDataStrategy" value="domainDataStrategy"/>
+	<property name="net.sf.jasperreports.export.pdf.tagged" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.tag.language" value="EN-US"/>
+	<property name="net.sf.jasperreports.export.pdf.metadata.title" value="Ad Hoc Report"/>
+	<property name="net.sf.jasperreports.export.pdf.display.metadata.title" value="true"/>
+	<property name="net.sf.jasperreports.text.truncate.suffix" value="..."/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.size.page.to.content" value="true"/>
+	<propertyExpression name="com.jaspersoft.jrs.export.report.empty"><![CDATA[$P{com.jaspersoft.jrs.report.data.source.is.empty} == null? null : $P{com.jaspersoft.jrs.report.data.source.is.empty}.toString()]]></propertyExpression>
+	<import value="com.jaspersoft.ji.adhoc.jr.AdhocReportUtils"/>
+	<style name="ReportDefault" isDefault="true" mode="Transparent" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<pen lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableBaseFrameStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableFrameStyle" style="TableBaseFrameStyle">
+		<box padding="0">
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<bottomPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnFooterFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<pen lineWidth="1.0" lineStyle="Solid"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#D9E4F1">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#F2F2F2">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#F2F2F2" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableSummaryFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableSummaryTextNoBorderStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" fontName="DejaVu Sans" isBold="true">
+		<box leftPadding="5" rightPadding="5"/>
+	</style>
+	<style name="TableSummaryTextStyle" style="TableSummaryTextNoBorderStyle">
+		<box>
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableTitleFrameStyle" style="TableFrameStyle">
+		<box topPadding="0" bottomPadding="0">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableTitleTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box bottomPadding="8">
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableDetailFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableDetailTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11" isBold="false">
+		<box leftPadding="5" rightPadding="5">
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{PAGE_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="ChartReportTitle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box>
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineStyle="Solid"/>
+		</box>
+	</style>
+	<style name="ChartTitle" forecolor="#000000" fontName="DejaVu Sans" fontSize="12" isBold="true"/>
+	<style name="ChartSubtitle" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartLegend" forecolor="#000000" backcolor="#FFFFFF" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartSeriesColor0" backcolor="#87C4FE"/>
+	<style name="ChartSeriesColor1" backcolor="#E96270"/>
+	<style name="ChartSeriesColor2" backcolor="#D1D1D1"/>
+	<style name="ChartSeriesColor3" backcolor="#FFEE99"/>
+	<style name="ChartSeriesColor4" backcolor="#6164FF"/>
+	<style name="ChartSeriesColor5" backcolor="#B0E992"/>
+	<style name="ChartSeriesColor6" backcolor="#AE9CEA"/>
+	<style name="ChartSeriesColor7" backcolor="#F5B05E"/>
+	<style name="ChartSeriesColor8" backcolor="#589EE1"/>
+	<style name="ChartSeriesColor9" backcolor="#AE4E59"/>
+	<style name="ChartSeriesColor10" backcolor="#747474"/>
+	<style name="ChartSeriesColor11" backcolor="#E2DC77"/>
+	<style name="ChartSeriesColor12" backcolor="#4749A5"/>
+	<style name="ChartSeriesColor13" backcolor="#81B963"/>
+	<style name="ChartSeriesColor14" backcolor="#7764B4"/>
+	<style name="ChartSeriesColor15" backcolor="#F27B4C"/>
+	<style name="ChartCategoryAxisLabelFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="ChartCategoryAxisTickFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartValueAxisLabelFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="ChartValueAxisTickFormat" forecolor="#000000" fontName="DejaVu Sans" fontSize="9" isBold="false"/>
+	<style name="ChartContext" backcolor="#D1CA67"/>
+	<style name="CrosstabElementStyle" mode="Transparent" forecolor="#000033" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseCellStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseTextStyle" mode="Opaque" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Top" vImageAlign="Top" fontName="DejaVu Sans" fontSize="11" isBold="true">
+		<box topPadding="3" leftPadding="5" bottomPadding="3" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabTitleTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" fontSize="18" isBold="false">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabHeaderLabelStyle" style="CrosstabHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabMeasureHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabMeasureHeaderLabelStyle" style="CrosstabMeasureHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabColumnMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" isBold="false"/>
+	<style name="CrosstabRowMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabInnerRowDimensionHeaderTextStyle" style="CrosstabRowDimensionHeaderTextStyle">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabColumnDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#D9E4F1" hTextAlign="Center" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDetailTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Right" hImageAlign="Right" isBold="false">
+		<box>
+			<topPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR}]]></conditionExpression>
+			<style forecolor="#262626" hTextAlign="Right" hImageAlign="Right" isBold="true"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{ROW_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDummyHeaderTextStyle" style="CrosstabBaseTextStyle" backcolor="#F2F2F2"/>
+	<parameter name="com.jaspersoft.jrs.report.data.source.is.empty" class="java.lang.Boolean" isForPrompting="false">
+		<property name="net.sf.jasperreports.data.cache.included" value="true"/>
+	</parameter>
+	<parameter name="REPORT_TITLE" class="java.lang.String" isForPrompting="false">
+		<property name="net.sf.jasperreports.data.cache.included" value="true"/>
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Collator" class="java.text.Collator" isForPrompting="false">
+		<defaultValueExpression><![CDATA[java.text.Collator.getInstance($P{REPORT_LOCALE})]]></defaultValueExpression>
+	</parameter>
+	<field name="Sum_CaseWhen_and_notEqual_ADJ_ID_null_in_ADJ_TYPE_CD_CMCRDMSC_CMCRDMSI_CMCRDMSR_CMCRDMSV_1_0" class="java.lang.Long">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="BSEG_ID" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="NewMeasure" class="java.lang.Integer">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CaseWhen_and_notEqual_ADJ_ID_null_notEqual_ADJ_TYPE_CD_CMCRDMSC_notEqual_ADJ_TYPE_CD_CMCRDMSI_notEqual_ADJ_TYPE_CD_CMCRDMSR_notEqual_ADJ_TYPE_CD_CMCRDMSV_notEqual_ADJ_TYPE_CD_WMAINEXT_notEqual_ADJ_TYPE_CD_CMSWPRCC_notEqual_ADJ_TYPE_CD_CMSWPRCR_notEqual_ADJ_TYPE_CD_CMSWPRCI_notEqual_ADJ_TYPE_CD_CMSWPRCV_notEqual_ADJ_TYPE_CD_SHUTOFFP_CUR_AMT_0" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="ADJ_TYPE_CD" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CUR_AMT" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="UTILITY_INVOICE_COUNT" class="java.lang.Integer">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="DIRECT_COUNT" class="java.lang.Integer">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CaseWhen_and_notEqual_ADJ_ID_null_in_ADJ_TYPE_CD_WMAINEXT_CMSWPRCC_CMSWPRCR_CMSWPRCI_CMSWPRCV_CUR_AMT_0" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="OVERALL_COUNT" class="java.lang.Long">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="MEMO_AMOUNT" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="DEPOSIT_COUNT" class="java.lang.Integer">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="ADJ_ID" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="UTILITY_INVOICE_AMOUNT" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="DIRECT_AMOUNT" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CaseWhen_and_notEqual_ADJ_ID_null_equals_ADJ_TYPE_CD_SHUTOFFP_1_0" class="java.lang.Long">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CaseWhen_and_notEqual_ADJ_ID_null_equals_ADJ_TYPE_CD_SHUTOFFP_CUR_AMT_0" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CountAll_FT_ID" class="java.lang.Long">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CaseWhen_and_notEqual_BSEG_ID_null_notEqual_SPECIAL_ROLE_FLG_CD_1_0" class="java.lang.Long">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CaseWhen_and_notEqual_BSEG_ID_null_equals_SPECIAL_ROLE_FLG_CD_1_0" class="java.lang.Long">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CaseWhen_and_notEqual_ADJ_ID_null_in_ADJ_TYPE_CD_CMCRDMSC_CMCRDMSI_CMCRDMSR_CMCRDMSV_CUR_AMT_0" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="MEMO_COUNT" class="java.lang.Integer">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="SPECIAL_ROLE_FLG" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="FT_ID" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CaseWhen_and_notEqual_BSEG_ID_null_equals_SPECIAL_ROLE_FLG_CD_CUR_AMT_0" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CaseWhen_and_notEqual_ADJ_ID_null_in_ADJ_TYPE_CD_WMAINEXT_CMSWPRCC_CMSWPRCR_CMSWPRCI_CMSWPRCV_1_0" class="java.lang.Long">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="PERMIT_AMOUNT" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="SHUTOFFS_AMOUNT" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CUR_AMT" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="ARS_DT" class="java.sql.Timestamp">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="NewMeasure_1" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CaseWhen_and_notEqual_ADJ_ID_null_notEqual_ADJ_TYPE_CD_CMCRDMSC_notEqual_ADJ_TYPE_CD_CMCRDMSI_notEqual_ADJ_TYPE_CD_CMCRDMSR_notEqual_ADJ_TYPE_CD_CMCRDMSV_notEqual_ADJ_TYPE_CD_WMAINEXT_notEqual_ADJ_TYPE_CD_CMSWPRCC_notEqual_ADJ_TYPE_CD_CMSWPRCR_notEqual_ADJ_TYPE_CD_CMSWPRCI_notEqual_ADJ_TYPE_CD_CMSWPRCV_notEqual_ADJ_TYPE_CD_SHUTOFFP_1_0" class="java.lang.Long">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="DEPOSIT_AMOUNT" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="PERMIT_COUNT" class="java.lang.Integer">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_CaseWhen_and_notEqual_BSEG_ID_null_notEqual_SPECIAL_ROLE_FLG_CD_CUR_AMT_0" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Measures" class="java.lang.String">
+		<property name="udds_mapping" value="COLUMN_LEVEL"/>
+	</field>
+	<field name="Measures__IDENTIFIER" class="java.lang.String">
+		<property name="udds_mapping" value="COLUMN_MEASURE_ID"/>
+	</field>
+	<field name="UTILITY_INVOICE_AMOUNT_m0" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="UTILITY_INVOICE_AMOUNT"/>
+	</field>
+	<field name="UTILITY_INVOICE_COUNT_m1" class="java.lang.Long">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0"/>
+		<property name="adhoc.display" value="UTILITY_INVOICE_COUNT"/>
+	</field>
+	<field name="DEPOSIT_AMOUNT_m2" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="DEPOSIT_AMOUNT"/>
+	</field>
+	<field name="DEPOSIT_COUNT_m3" class="java.lang.Long">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0"/>
+		<property name="adhoc.display" value="DEPOSIT_COUNT"/>
+	</field>
+	<field name="DIRECT_AMOUNT_m4" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="DIRECT_AMOUNT"/>
+	</field>
+	<field name="DIRECT_COUNT_m5" class="java.lang.Long">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0"/>
+		<property name="adhoc.display" value="DIRECT_COUNT"/>
+	</field>
+	<field name="MEMO_AMOUNT_m6" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="MEMO_AMOUNT"/>
+	</field>
+	<field name="MEMO_COUNT_m7" class="java.lang.Long">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0"/>
+		<property name="adhoc.display" value="MEMO_COUNT"/>
+	</field>
+	<field name="PERMIT_AMOUNT_m8" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="PERMIT_AMOUNT"/>
+	</field>
+	<field name="PERMIT_COUNT_m9" class="java.lang.Long">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0"/>
+		<property name="adhoc.display" value="PERMIT_COUNT"/>
+	</field>
+	<field name="SHUTOFFS_AMOUNT_m10" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="SHUTOFFS_AMOUNT"/>
+	</field>
+	<field name="NewMeasure_m11" class="java.lang.Long">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0"/>
+		<property name="adhoc.display" value="SHUTOFFS_COUNT"/>
+	</field>
+	<field name="NewMeasure_1_m12" class="java.math.BigDecimal">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="OVERALL_AMOUNT"/>
+	</field>
+	<field name="OVERALL_COUNT_m13" class="java.lang.Long">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0"/>
+		<property name="adhoc.display" value="OVERALL_COUNT"/>
+	</field>
+	<field name="Measures__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="COLUMN_RAW_VALUE"/>
+	</field>
+	<title>
+		<band height="1" splitType="Stretch">
+			<textField textAdjust="StretchHeight">
+				<reportElement key="staticText" style="CrosstabTitleTextStyle" x="0" y="0" width="572" height="0" uuid="d797fa54-cb08-4446-8ada-a9337334e54c">
+					<printWhenExpression><![CDATA[$P{REPORT_TITLE} != null && $P{REPORT_TITLE}.length() > 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<summary>
+		<band height="25" splitType="Stretch">
+			<crosstab>
+				<reportElement style="CrosstabElementStyle" x="0" y="0" width="572" height="25" uuid="f4abc01e-ed99-496f-928d-ceb91302c909"/>
+				<crosstabParameter name="CrosstabRowGroupsCount" class="java.lang.Integer">
+					<parameterValueExpression><![CDATA[new Integer(0)]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="CrosstabColumnGroupsCount" class="java.lang.Integer">
+					<parameterValueExpression><![CDATA[new Integer(1)]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="CrosstabMeasureIndexes" class="java.util.Map">
+					<parameterValueExpression><![CDATA[org.apache.commons.collections.MapUtils.putAll(new java.util.HashMap(), new String[]{"UTILITY_INVOICE_AMOUNT_m0","0","UTILITY_INVOICE_COUNT_m1","1","DEPOSIT_AMOUNT_m2","2","DEPOSIT_COUNT_m3","3","DIRECT_AMOUNT_m4","4","DIRECT_COUNT_m5","5","MEMO_AMOUNT_m6","6","MEMO_COUNT_m7","7","PERMIT_AMOUNT_m8","8","PERMIT_COUNT_m9","9","SHUTOFFS_AMOUNT_m10","10","NewMeasure_m11","11","NewMeasure_1_m12","12","OVERALL_COUNT_m13","13"})]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabDataset isDataPreSorted="true">
+					<dataset resetType="Report"/>
+				</crosstabDataset>
+				<rowGroup name="DUMMYROWS" width="0" headerPosition="Stretch">
+					<bucket class="java.lang.Comparable">
+						<bucketExpression><![CDATA[null]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="Measures" height="20" headerPosition="Stretch">
+					<bucket class="net.sf.jasperreports.engine.util.DisplayComparableValue">
+						<bucketExpression><![CDATA[new net.sf.jasperreports.engine.util.DisplayComparableValue($F{Measures__IDENTIFIER}, $F{Measures})]]></bucketExpression>
+						<comparatorExpression><![CDATA[new net.sf.jasperreports.engine.util.DisplayValueLabelComparator($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabColumnMeasureHeaderTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="945972b3-ad1e-441c-84ae-8af2bac07268">
+									<propertyExpression name="net.sf.jasperreports.crosstab.column.header.sort.measure.index"><![CDATA[$P{CrosstabMeasureIndexes}.get($V{Measures}.key())]]></propertyExpression>
+								</reportElement>
+								<textFieldExpression><![CDATA[$V{Measures}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{Measures}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="UTILITY_INVOICE_AMOUNT_m0" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{UTILITY_INVOICE_AMOUNT_m0}]]></measureExpression>
+				</measure>
+				<measure name="UTILITY_INVOICE_COUNT_m1" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{UTILITY_INVOICE_COUNT_m1}]]></measureExpression>
+				</measure>
+				<measure name="DEPOSIT_AMOUNT_m2" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{DEPOSIT_AMOUNT_m2}]]></measureExpression>
+				</measure>
+				<measure name="DEPOSIT_COUNT_m3" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{DEPOSIT_COUNT_m3}]]></measureExpression>
+				</measure>
+				<measure name="DIRECT_AMOUNT_m4" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{DIRECT_AMOUNT_m4}]]></measureExpression>
+				</measure>
+				<measure name="DIRECT_COUNT_m5" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{DIRECT_COUNT_m5}]]></measureExpression>
+				</measure>
+				<measure name="MEMO_AMOUNT_m6" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{MEMO_AMOUNT_m6}]]></measureExpression>
+				</measure>
+				<measure name="MEMO_COUNT_m7" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{MEMO_COUNT_m7}]]></measureExpression>
+				</measure>
+				<measure name="PERMIT_AMOUNT_m8" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{PERMIT_AMOUNT_m8}]]></measureExpression>
+				</measure>
+				<measure name="PERMIT_COUNT_m9" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{PERMIT_COUNT_m9}]]></measureExpression>
+				</measure>
+				<measure name="SHUTOFFS_AMOUNT_m10" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{SHUTOFFS_AMOUNT_m10}]]></measureExpression>
+				</measure>
+				<measure name="NewMeasure_m11" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{NewMeasure_m11}]]></measureExpression>
+				</measure>
+				<measure name="NewMeasure_1_m12" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{NewMeasure_1_m12}]]></measureExpression>
+				</measure>
+				<measure name="OVERALL_COUNT_m13" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{OVERALL_COUNT_m13}]]></measureExpression>
+				</measure>
+				<measure name="CROSSTAB_TOTAL_DISCRIMINATOR" class="java.lang.Boolean" calculation="First">
+					<measureExpression><![CDATA[Boolean.FALSE]]></measureExpression>
+				</measure>
+				<crosstabCell width="100" height="20">
+					<cellContents style="CrosstabBaseCellStyle">
+						<box padding="0"/>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="4982ae9f-deff-4db3-965b-4f0c2d861ed5">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("UTILITY_INVOICE_AMOUNT_m0")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{UTILITY_INVOICE_AMOUNT_m0}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="db637c5f-9c47-45c3-9833-5df743ff2e36">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("UTILITY_INVOICE_COUNT_m1")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{UTILITY_INVOICE_COUNT_m1}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="ce173a54-8dca-457b-aab8-54660f5ab5b6">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("DEPOSIT_AMOUNT_m2")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{DEPOSIT_AMOUNT_m2}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="93b05d45-3cb2-493e-858d-d645633efe00">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("DEPOSIT_COUNT_m3")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{DEPOSIT_COUNT_m3}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="aa1f255c-e53c-43b0-beda-5b69956ae947">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("DIRECT_AMOUNT_m4")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{DIRECT_AMOUNT_m4}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="cc9b791c-5c88-49d6-b04c-8a23ce47c8ad">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("DIRECT_COUNT_m5")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{DIRECT_COUNT_m5}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="a5d487d3-b855-409b-a923-5ce64a3d29e5">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("MEMO_AMOUNT_m6")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{MEMO_AMOUNT_m6}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="d03b747d-ae61-4664-9c9d-abda05e94e83">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("MEMO_COUNT_m7")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{MEMO_COUNT_m7}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="135539d9-b66a-489a-8338-59da01353e4b">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("PERMIT_AMOUNT_m8")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{PERMIT_AMOUNT_m8}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="5ebf01ac-71b6-4f86-b95d-031283ee225e">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("PERMIT_COUNT_m9")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{PERMIT_COUNT_m9}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="6ca62487-0486-4a85-9f31-269681555c4c">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("SHUTOFFS_AMOUNT_m10")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{SHUTOFFS_AMOUNT_m10}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="973172b3-c003-4eec-80d2-f0851f1fd0b8">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("NewMeasure_m11")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{NewMeasure_m11}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="48dfe268-e9c6-4a8e-8c17-7aeaaf05cceb">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("NewMeasure_1_m12")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{NewMeasure_1_m12}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="5b848fc9-507c-43e3-9df9-7f663ff14fcb">
+								<printWhenExpression><![CDATA[$V{Measures}.key().equals("OVERALL_COUNT_m13")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{OVERALL_COUNT_m13}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

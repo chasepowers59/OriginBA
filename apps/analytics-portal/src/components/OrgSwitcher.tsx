@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getActiveOrganization, setActiveOrganization } from "../lib/auth";
+import { viewingAnotherClient } from "../lib/orgContext";
 import type { PortalOrganization } from "../lib/auth";
 
 /**
@@ -59,14 +60,14 @@ export default function OrgSwitcher({
     window.location.reload();
   }
 
-  const viewingOther = Boolean(active) && active !== (homeOrganizationId ?? "");
+  const viewingOther = viewingAnotherClient(active, homeOrganizationId);
 
   return (
     <label
       className={className}
-      title={viewingOther ? "Admin: viewing another client's tenant" : "Admin: view another client"}
+      title={viewingOther ? "Admin: viewing another client's organization" : "Admin: view another client"}
     >
-      {/* Viewing someone else's tenant should never look like the default state:
+      {/* Viewing someone else's organization should never look like the default state:
           the select itself turns amber, plus a dot for colour-blind redundancy. */}
       {viewingOther && (
         <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-warn" />

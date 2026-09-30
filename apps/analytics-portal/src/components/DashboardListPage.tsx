@@ -9,10 +9,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { deleteDashboard, fetchDashboards } from "@/lib/api";
 import { tileSummary } from "@/lib/dashboardCard";
-import { formatTimeBucket } from "@/lib/timeBucketLabel";
+import { formatDate } from "@/lib/format";
 import type { SavedDashboard } from "@/lib/types";
+import { useAuth } from "@/components/AuthProvider";
+import { ownershipLabel } from "@/lib/ownership";
+import { groupByFolder } from "@/lib/folders";
 
 export function DashboardListPage() {
+  const { user } = useAuth();
   const [boards, setBoards] = useState<SavedDashboard[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Two-step delete: a board is somebody's saved work, so the first click asks.
@@ -50,7 +54,7 @@ export function DashboardListPage() {
           </p>
           <h1 className="portal-heading mt-1 text-2xl font-bold">My dashboards</h1>
           <p className="mt-1 text-sm text-fg-muted">
-            Pinboards of up to four visuals, saved to the server and shared across your sessions.
+            Pinboards of up to eight visuals, saved to the server and shared across your sessions.
           </p>
         </div>
         <Link href="/dashboards/new" className="btn-primary text-sm">
@@ -75,15 +79,21 @@ export function DashboardListPage() {
         <div className="glass-panel p-10 text-center">
           <p className="text-sm font-medium text-heading">No dashboards yet</p>
           <p className="mx-auto mt-2 max-w-md text-sm text-fg-muted">
-            Build one from a starter template, or pin a report from the Library or Explore.
+            Build one from a starter template, or pin a report from the Library or Build.
           </p>
           <Link href="/dashboards/new" className="btn-primary mt-4 inline-block text-sm">
             Create your first dashboard
           </Link>
         </div>
       ) : (
+        <div className="space-y-6">
+        {groupByFolder(boards).map((group) => (
+        <section key={group.folder ?? "__unfiled"} aria-label={group.folder ?? "Not in a folder"}>
+        {group.folder || groupByFolder(boards).length > 1 ? (
+          <h2 className="mb-2 text-sm font-semibold text-heading">{group.folder ?? "Not in a folder"}</h2>
+        ) : null}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {boards.map((b) => {
+          {group.items.map((b) => {
             const contents = tileSummary(b.tiles);
             return (
               <div key={b.id} className="glass-panel group flex flex-col p-5 transition hover:border-edge">
@@ -99,11 +109,15 @@ export function DashboardListPage() {
                   <p className="mt-2 text-[11px] text-fg-subtle">
                     {b.tiles?.length ?? 0} tile{(b.tiles?.length ?? 0) === 1 ? "" : "s"} · last{" "}
                     {b.days} days
-                    {b.updated_at ? ` · updated ${formatTimeBucket(b.updated_at, "day")}` : ""}
+                    {b.updated_at ? ` · updated ${formatDate(b.updated_at)}` : ""}
+                    {ownershipLabel({ visibility: b.visibility, ownerEmail: b.owner_email }, user?.email)
+                      ? ` · ${ownershipLabel({ visibility: b.visibility, ownerEmail: b.owner_email }, user?.email)}` : ""}
                   </p>
                 </Link>
                 <div className="mt-3 flex justify-end border-t border-edge-subtle pt-2">
-                  {confirming === b.id ? (
+                  {b.can_edit === false ? (
+                    <span className="px-2 py-1 text-xs text-fg-subtle">View only</span>
+                  ) : confirming === b.id ? (
                     <div className="flex items-center gap-2 text-xs">
                       <span className="text-fg-muted">Delete this dashboard?</span>
                       <button
@@ -136,6 +150,9 @@ export function DashboardListPage() {
               </div>
             );
           })}
+        </div>
+        </section>
+        ))}
         </div>
       )}
     </div>

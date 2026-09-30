@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchSnapshotStats } from "@/lib/api";
-import { formatDateTime, formatNumber } from "@/lib/format";
+import { formatCompact, formatDateTime } from "@/lib/format";
 import type { SnapshotMetadata } from "@/lib/types";
 import { snapshotDetailLine, snapshotSubtitle } from "@/lib/snapshot";
 import { snapshotSummary, workstreamDisplayName } from "@/lib/businessLabels";
@@ -44,7 +44,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
         <div className="max-w-2xl">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className="chip chip-active">{workstream}</span>
-            <span className="chip">Trusted data domain</span>
+            <span className="chip">Checked report data</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-heading">{metadata.label}</h2>
           <p className="mt-2 text-sm leading-relaxed text-fg">
@@ -58,7 +58,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
                 className="inline-flex items-center gap-2 rounded-lg border text-chart-2 text-chart-2 px-3 py-2 text-xs text-chart-2 dark:text-chart-2 transition hover:text-chart-2"
               >
                 <span className="font-medium text-chart-2 dark:text-chart-2">View data model →</span>
-                {model.source_tables.length} source tables · {metadata.fields?.length ?? 0} fields
+                {metadata.fields?.length ?? 0} columns from {model.source_tables.length} CIS tables
               </Link>
               <Link
                 href={`/explore/${metadata.id}?tab=model&modelTab=joins`}
@@ -85,7 +85,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
               href={`/explore/${metadata.related_snapshot.id}`}
               className="mt-3 inline-flex items-center gap-2 rounded-lg border border-edge bg-band px-3 py-2 text-xs text-primary transition hover:border-edge"
             >
-              <span className="font-medium text-primary">Related domain →</span>
+              <span className="font-medium text-primary">Related data set →</span>
               {metadata.related_snapshot.label}
               <span className="text-primary">· {metadata.related_snapshot.hint}</span>
             </Link>
@@ -93,8 +93,8 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
         </div>
         <div className="flex flex-wrap gap-3">
           <StatPill
-            label="Records in domain"
-            value={rowCount != null ? formatNumber(rowCount) : statsLoaded ? "—" : "…"}
+            label="Rows in this data set"
+            value={rowCount != null ? formatCompact(rowCount) : statsLoaded ? "—" : "…"}
           />
           {/* Dropped entirely when the canvas has no watermark: a pill reading
               "Data refreshed —" is noise, and one reading "…" is a lie. */}

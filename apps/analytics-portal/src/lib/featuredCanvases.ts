@@ -51,3 +51,10 @@ export function featuredCanvases(
       };
     });
 }
+
+/** Columns for the Start here cards, so no card sits alone on its row. Literal class names:
+ *  Tailwind only ships classes it can find written out. */
+export function startHereGrid(count: number): string {
+  if (count === 4) return "sm:grid-cols-2 lg:grid-cols-4";
+  return count === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3";
+}

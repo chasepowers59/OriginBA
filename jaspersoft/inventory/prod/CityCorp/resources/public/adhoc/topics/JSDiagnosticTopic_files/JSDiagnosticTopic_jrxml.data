@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DiagnosticReportTemplate" language="groovy" pageWidth="1000" pageHeight="595" orientation="Landscape" columnWidth="960" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7c62d9fe-e0ee-42b2-9f9c-b9edd8b2d08f">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="92"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/diagnostic/JSDiagnosticReport"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver-pro/services/repository"/>
+	<style name="Sans_Normal" isDefault="true" fontName="SansSerif" fontSize="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+	<style name="Sans_Bold" fontName="SansSerif" fontSize="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+	<style name="Sans_Italic" fontName="SansSerif" fontSize="12" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Oblique" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#99CCFF" fill="Solid" radius="3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="DiagnosticDataset" uuid="5881cea6-37b6-4c3d-8fa8-458c4a18289f">
+		<field name="Section" class="java.lang.String"/>
+		<field name="Attribute" class="java.lang.String"/>
+		<field name="Value" class="java.lang.String"/>
+	</subDataset>
+	<field name="Section" class="java.lang.String"/>
+	<field name="Attribute" class="java.lang.String"/>
+	<field name="Value" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<componentElement>
+				<reportElement uuid="bfa52fbd-a1f5-47e2-92c7-e3ed3e93cd15" key="table" style="table" x="0" y="48" width="960" height="31"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="DiagnosticDataset" uuid="b9b34b63-6dea-45c2-bd0b-6309d3cb6b64">
+						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.ConsumedFirstRecordDataSource($P{REPORT_DATA_SOURCE})]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column uuid="ae24e5fd-9d7d-47a3-a155-956a40d9d361" width="172">
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement uuid="1057e08b-33b9-48bb-8413-dc0c7e17a7df" x="0" y="0" width="172" height="30"/>
+								<textElement verticalAlignment="Middle">
+									<font size="14" isBold="true"/>
+									<paragraph leftIndent="5"/>
+								</textElement>
+								<text><![CDATA[  Section]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="table_TD" height="22" rowSpan="1">
+							<textField>
+								<reportElement uuid="97b675da-eb18-4938-b35c-8bf3552ab00f" x="0" y="0" width="172" height="22"/>
+								<textElement verticalAlignment="Middle">
+									<font isStrikeThrough="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{Section}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column uuid="e62f3eae-b9b0-4ac0-a8b5-272cd9b19afb" width="239">
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement uuid="47de07c2-d756-47ea-922c-fcd93c5ac6d1" x="0" y="0" width="239" height="30"/>
+								<textElement verticalAlignment="Middle">
+									<font size="14" isBold="true"/>
+									<paragraph leftIndent="5"/>
+								</textElement>
+								<text><![CDATA[ Attribute]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="table_TD" height="22" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="d480e828-5382-4293-bae2-9ee5b6933e8d" x="0" y="0" width="239" height="22"/>
+								<textElement verticalAlignment="Middle">
+									<paragraph leftIndent="5"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{Attribute}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column uuid="5f3cf7de-d0a9-4b40-848e-e98295b31447" width="548">
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement uuid="1b1fd485-bf27-400f-bc1c-4137f4446ec1" x="0" y="0" width="548" height="30"/>
+								<textElement verticalAlignment="Middle">
+									<font size="14" isBold="true"/>
+									<paragraph leftIndent="5"/>
+								</textElement>
+								<text><![CDATA[ Value]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="table_TD" height="22" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="26b6fdd4-5c74-4a04-89ea-1c5eb6afe415" x="0" y="0" width="548" height="22"/>
+								<textElement verticalAlignment="Middle">
+									<paragraph leftIndent="5"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{Value}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<staticText>
+				<reportElement uuid="4bba8fa4-7574-46b2-8043-23d57094e8d6" x="0" y="0" width="960" height="48"/>
+				<textElement textAlignment="Center">
+					<font size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Jasper Server Diagnostics]]></text>
+			</staticText>
+		</band>
+	</title>
+</jasperReport>

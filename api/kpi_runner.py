@@ -8,8 +8,8 @@ from typing import Any
 
 from api.demo_db import execute_query
 from api.query_builder import QueryValidationError, build_query
-from api.reporting_dates import window_date_field
-from api.snapshot_catalog import allowed_fields, get_snapshot, snapshot_backend
+from api.reporting_dates import reporting_today, window_date_field
+from api.snapshot_catalog import allowed_fields, boolean_fields, get_snapshot, snapshot_backend
 
 
 COMPARE_MODES = ("prior_period", "mom", "yoy")
@@ -181,7 +181,7 @@ def empty_window_note(
 
 
 def date_windows(
-    days: int, compare_mode: str = "prior_period"
+    days: int, compare_mode: str = "prior_period", organization_id: str | None = None
 ) -> tuple[tuple[str, str], tuple[str, str], str]:
     """(current_start, current_end), (prior_start, prior_end), compare_label.
 
@@ -191,7 +191,7 @@ def date_windows(
     yoy -- seasonal: the same window one year earlier (July vs LAST July is signal).
     """
     capped = max(1, min(days, 365))
-    today = date.today()
+    today = reporting_today(organization_id)
 
     if compare_mode == "mom":
         cur_start = today.replace(day=1)
@@ -232,6 +232,7 @@ def run_kpi_query(
     extra_filters: list[dict[str, Any]] | None = None,
     *,
     organization_id: str,
+    time_dimensions: list[dict[str, Any]] | None = None,
 ) -> tuple[list[str], list[list[Any]]]:
     # organization_id is already a parameter here; the catalog must follow it.
     snapshot = get_snapshot(snapshot_id, organization_id)
@@ -251,9 +252,12 @@ def run_kpi_query(
         table_name=snapshot["table_name"],
         allowed_fields=allowed_fields(snapshot),
         trusted_measures=trusted,
+        boolean_fields=boolean_fields(snapshot),
         dimensions=query_spec.get("dimensions") or [],
         measures=query_spec.get("measures") or [{"field": "*", "agg": "count"}],
         filters=filters,
+        time_dimensions=time_dimensions,
+        rank_by_magnitude=query_spec.get("rank") == "magnitude",
         limit=int(query_spec.get("limit") or 500),
         dialect=dialect,
         schema=schema,
@@ -277,7 +281,7 @@ def trend_from_rows(columns: list[str], rows: list[list[Any]]) -> list[dict[str,
         return []
     return [
         {
-            "label": str(row[0]) if row[0] is not None else "Unknown",
+            "label": str(row[0]) if row[0] is not None else "Not recorded",
             "value": float(row[-1] or 0),
         }
         for row in rows
@@ -332,9 +336,9 @@ def execute_kpi_definition(
         date_field = None if windowless else (
             kpi.get("date_field") or window_date_field(snapshot))
         if not date_field and not windowless:
-            raise ValueError("Snapshot has no date field and KPI is not windowless")
+            raise ValueError("This KPI needs a date to filter on, and its data set has none.")
 
-        (cur_start, cur_end), (pri_start, pri_end), compare_label = date_windows(days, compare_mode)
+        (cur_start, cur_end), (pri_start, pri_end), compare_label = date_windows(days, compare_mode, organization_id)
 
         value_cols, value_rows = run_kpi_query(
             snapshot_id, kpi["value"], date_field, cur_start, cur_end, extra_filters, organization_id=organization_id

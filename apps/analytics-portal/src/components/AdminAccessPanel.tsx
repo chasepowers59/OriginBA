@@ -8,7 +8,9 @@ import { organizationForRole, rolePatch } from "@/lib/adminOrgBinding";
 import { auditActionLabel } from "@/lib/auditLabels";
 import { groupDeletionWarning } from "@/lib/groupDeletion";
 import { formatDateTime } from "@/lib/format";
-import type { AccessGroup, AuthUser, PortalOrganization } from "@/lib/auth";
+import { roleLabel, type AccessGroup, type AuthUser, type PortalOrganization, type PortalRole } from "@/lib/auth";
+import { assignableRoles } from "@/lib/settingsAccess";
+import { RowRulesCell } from "@/components/RowRulesCell";
 import {
   createAccessGroup,
   createPortalUser,
@@ -24,6 +26,11 @@ import {
 
 export function AdminAccessPanel() {
   const { user: currentUser } = useAuth();
+  // the roles this admin may give; a row keeps its current role listed even when this
+  // admin could not give it (a client admin never sees the platform admin, but be safe)
+  const assignable = assignableRoles(currentUser?.role);
+  const roleOptions = (current: PortalRole) =>
+    assignable.includes(current) ? assignable : [...assignable, current];
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [groups, setGroups] = useState<AccessGroup[]>([]);
   const [workstreamOptions, setWorkstreamOptions] = useState<GrantableWorkstream[]>([]);
@@ -198,6 +205,7 @@ export function AdminAccessPanel() {
                 <th className="px-3 py-2">Organization</th>
                 <th className="px-3 py-2">Role</th>
                 <th className="px-3 py-2">Groups</th>
+                <th className="px-3 py-2">Rows</th>
                 <th className="px-3 py-2">Status</th>
                 <th className="px-3 py-2">Password</th>
               </tr>
@@ -209,6 +217,7 @@ export function AdminAccessPanel() {
                   <td className="px-3 py-2 portal-text-muted">{user.email}</td>
                   <td className="px-3 py-2">
                     <select
+                      aria-label={`Organization for ${user.email}`}
                       value={user.organization_id ?? ""}
                       // An admin has no client of their own, so there is nothing to
                       // choose here; offering the list would only compose a request the
@@ -236,20 +245,22 @@ export function AdminAccessPanel() {
                   </td>
                   <td className="px-3 py-2">
                     <select
+                      aria-label={`Role for ${user.email}`}
                       value={user.role}
                       disabled={user.id === currentUser?.id}
                       onChange={(e) => void runUserUpdate(user.id, rolePatch(e.target.value))}
                       className="input-modern py-1 text-xs"
                       title={user.id === currentUser?.id ? "You cannot change your own role" : undefined}
                     >
-                      <option value="user">User</option>
-                      <option value="editor">Editor</option>
-                      <option value="admin">Admin</option>
+                      {roleOptions(user.role).map((r) => (
+                        <option key={r} value={r}>{roleLabel(r)}</option>
+                      ))}
                     </select>
                   </td>
                   <td className="px-3 py-2">
                     <select
                       multiple
+                      aria-label={`Access groups for ${user.email}`}
                       value={user.group_ids}
                       onChange={(e) =>
                         void runUserUpdate(user.id, {
@@ -267,6 +278,9 @@ export function AdminAccessPanel() {
                     <p className="mt-1 text-xs portal-text-subtle">
                       {user.group_ids.length ? `${user.group_ids.length} selected` : "All workstreams"}
                     </p>
+                  </td>
+                  <td className="px-3 py-2">
+                    <RowRulesCell user={user} onSave={(rules) => void runUserUpdate(user.id, { row_rules: rules })} />
                   </td>
                   <td className="px-3 py-2">
                     <button
@@ -325,15 +339,17 @@ export function AdminAccessPanel() {
             required
           />
           <select
+            aria-label="Role"
             className="input-modern"
             value={newUser.role}
             onChange={(e) => setNewUser((s) => ({ ...s, role: e.target.value }))}
           >
-            <option value="user">User</option>
-            <option value="editor">Editor</option>
-            <option value="admin">Admin</option>
+            {assignable.map((r) => (
+              <option key={r} value={r}>{roleLabel(r)}</option>
+            ))}
           </select>
           <select
+            aria-label="Organization"
             className="input-modern"
             value={newUser.role === "admin" ? "" : newUser.organization_id}
             onChange={(e) => setNewUser((s) => ({ ...s, organization_id: e.target.value }))}
@@ -351,6 +367,7 @@ export function AdminAccessPanel() {
           </select>
           <select
             multiple
+            aria-label="Access groups"
             className="input-modern md:col-span-2"
             value={newUser.group_ids}
             onChange={(e) =>
@@ -394,6 +411,7 @@ export function AdminAccessPanel() {
                   />
                   <select
                     multiple
+                    aria-label="Workstreams"
                     className="input-modern md:col-span-2"
                     value={groupDraft.workstreams.includes("*") ? [] : groupDraft.workstreams}
                     onChange={(e) => {
@@ -474,6 +492,7 @@ export function AdminAccessPanel() {
           />
           <select
             multiple
+            aria-label="Workstreams"
             className="input-modern md:col-span-2"
             value={newGroup.workstreams.includes("*") ? [] : newGroup.workstreams}
             onChange={(e) => {
@@ -507,7 +526,8 @@ export function AdminAccessPanel() {
           User, group and password changes, SSO account provisioning, and blocked SQL.
           Report and query activity is not listed here.
         </p>
-        <ul className="mt-4 max-h-64 space-y-2 overflow-y-auto text-sm">
+        {/* scrolls, so it takes keyboard focus */}
+        <ul tabIndex={0} aria-label="Recent admin activity" className="mt-4 max-h-64 space-y-2 overflow-y-auto text-sm">
           {auditEvents.length ? (
             auditEvents.map((event) => (
               <li key={event.id} className="rounded-lg border border-edge-subtle px-3 py-2">

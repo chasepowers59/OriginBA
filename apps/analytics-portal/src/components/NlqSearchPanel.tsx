@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchNlqMetricCatalog, runAnalyticsNlq, runNlqQuery } from "@/lib/api";
+import { fetchNlqMetricCatalog, runAnalyticsNlq } from "@/lib/api";
 import { pinReportUrl } from "@/lib/pinReport";
 import type { NlqMetricCatalogItem, NlqResponse } from "@/lib/types";
 import { NlqAnswerCard } from "./NlqAnswerCard";
@@ -50,14 +50,9 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
         payment_type: paymentType.trim() || undefined,
         rate_code: rateCode.trim() || undefined,
       };
-      try {
-        const analytics = await runAnalyticsNlq(text || catalog.find((m) => m.id === metricId)?.example || "", params);
-        setResult(analytics);
-        if (analytics.metric_id) setSelectedMetric(analytics.metric_id);
-      } catch {
-        const response = await runNlqQuery(text);
-        setResult(response);
-      }
+      const analytics = await runAnalyticsNlq(text || catalog.find((m) => m.id === metricId)?.example || "", params);
+      setResult(analytics);
+      if (analytics.metric_id) setSelectedMetric(analytics.metric_id);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to run this question");
     } finally {
@@ -74,14 +69,14 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
     <section className={`glass-panel ${compact ? "p-4" : "p-6"}`}>
       <div className="mb-4">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
-          Ask a question
+          Vetted metrics
         </p>
         <h2 className={`mt-1 font-bold text-heading ${compact ? "text-lg" : "text-xl"}`}>
           Everyday utility metrics
         </h2>
         <p className="mt-1 text-sm text-fg-muted">
-          Governed canvas answers for billing, payments, field work, debt, and operations — adjust
-          parameters and re-run.
+          The same figures the dashboards use, for billing, payments, field work, debt and
+          operations. Set the filters and run it again.
         </p>
       </div>
 

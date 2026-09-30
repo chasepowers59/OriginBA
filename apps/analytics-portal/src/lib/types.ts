@@ -134,6 +134,8 @@ export type PremadeReport = {
   measures: { field: string; agg: string }[];
   filters: FilterDef[];
   chart_type: "bar" | "line" | "pie" | "horizontal";
+  // a backlog question: it opens on All dates (lib/datePresets.opensOnAllDates)
+  all_dates?: boolean;
 };
 
 export type ScopeFilterDef = {
@@ -181,7 +183,9 @@ export type SnapshotMetadata = {
   data_model?: SnapshotDataModel;
   large_domain?: boolean;
   skip_sample_rows?: boolean;
-  default_date_preset?: DatePresetConfig;
+  default_date_preset?: DatePresetConfig | string;
+  // The org's data-as-of date when its copy is frozen; date presets end there.
+  data_as_of?: string | null;
   trusted_measures?: string[];
   process_guides?: Record<string, ProcessFieldGuide>;
 };
@@ -225,6 +229,8 @@ export type QueryRequest = {
   filters: FilterDef[];
   time_dimensions?: { field: string; grain: string }[];
   limit: number;
+  /** The reader chose "All dates": the server adds no default window. */
+  all_dates?: boolean;
 };
 
 export type QueryResponse = {
@@ -452,6 +458,12 @@ export type SavedView = {
   date_end?: string | null;
   scope_field?: string | null;
   scope_value?: string | null;
+  /** 'organization' or 'private' (api/ownership.py); absent on views saved before owners. */
+  visibility?: import("./ownership").Visibility;
+  owner_email?: string | null;
+  /** Whether the caller may change or delete it, as the API decided. */
+  can_edit?: boolean;
+  folder?: string | null;
   saved_at: string;
 };
 
@@ -478,6 +490,8 @@ export type NlqResponse = {
   acct_id?: number | null;
   metrics?: Record<string, unknown> | null;
   resolved_from?: string | null;
+  /** the data set's name as the catalog gives it ("General Ledger"), never the table id */
+  source_label?: string;
   source?: string;
   metric_id?: string;
   metric_label?: string;
@@ -509,6 +523,10 @@ export type SavedDashboard = {
   description?: string;
   days: number;
   tiles: DashboardTileDef[];
+  visibility?: import("./ownership").Visibility;
+  owner_email?: string | null;
+  can_edit?: boolean;
+  folder?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -530,6 +548,17 @@ export type ReportLibraryEntry = {
   filters?: { field?: string }[];
   grain_description?: string;
   explore_url: string;
+  /** Set on folder cards: one of the few reports a folder says to start with. */
+  essential?: boolean;
+};
+
+/** A Library folder (catalog `report_library`): its reports come essentials first. */
+export type ReportLibraryFolder = {
+  id: string;
+  title: string;
+  description: string;
+  report_count: number;
+  reports: ReportLibraryEntry[];
 };
 
 export type ReportLibraryPack = {
@@ -546,5 +575,71 @@ export type ReportLibraryResponse = {
   pack_count: number;
   report_count: number;
   packs: ReportLibraryPack[];
+  folders: ReportLibraryFolder[];
   error?: string;
+};
+
+// ---- the analytics assistant (api/assistant.py)
+export type AssistantStep = { tool: string; input: string; ok: boolean };
+export type CanvasIntegrity = {
+  canvas: string;
+  /** The data set's label: what a reader sees in place of the table name. */
+  label?: string;
+  verdict: "proven" | "differences" | "not covered" | "unavailable";
+  canvas_as_of: string | null;
+  summary: string;
+};
+export type AssistantQuery = {
+  purpose: string;
+  sql: string;
+  columns: string[];
+  rows: unknown[][];
+  row_count: number;
+  truncated: boolean;
+  ms: number;
+  integrity?: CanvasIntegrity[];
+  /** The query as a builder definition, present only when the server proved it reproduces these rows. */
+  view_spec?: import("./assistant").ViewSpec;
+  view_spec_note?: string;
+};
+export type AssistantMessage = { role: "user" | "assistant"; content: unknown };
+export type AssistantResponse = {
+  answer: string;
+  steps: AssistantStep[];
+  queries: AssistantQuery[];
+  model: string;
+  usage: {
+    input_tokens: number;
+    output_tokens: number;
+    cache_read_input_tokens?: number;
+    cache_creation_input_tokens?: number;
+    turns?: number;
+  };
+  thread: AssistantMessage[];
+};
+export type AssistantStatus = { configured: boolean; model: string | null };
+export type AssistantSpend = {
+  organization: string;
+  day: string;
+  today: number;
+  questions: number;
+  budget: number | null;
+  people: { actor: string; questions: number; tokens: number }[];
+};
+export type IntegrityOverview = {
+  available: boolean;
+  client?: string | null;
+  built_at?: string | null;
+  canvas_as_of?: string | null;
+  canvas_age_hours?: number | null;
+  source_run_at?: string | null;
+  snapshot_run_at?: string | null;
+  canvases: {
+    canvas: string;
+    verdict: CanvasIntegrity["verdict"];
+    source_green: number | null;
+    source_checks: number | null;
+    snapshot_against: string | null;
+    snapshot_ok: boolean | null;
+  }[];
 };

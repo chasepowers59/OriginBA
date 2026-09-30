@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="dashlet-text" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="abcf0dbf-5dee-4771-a625-775850375686">
+	<style name="Sans_Normal" isDefault="true" fontName="DejaVu Sans" fontSize="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<parameter name="TextComponentJSON" class="java.lang.String"/>
+	<parameter name="JSON_INPUT_STREAM" class="java.io.InputStream" isForPrompting="false">
+		<defaultValueExpression><![CDATA[new ByteArrayInputStream($P{TextComponentJSON}.getBytes("UTF-8"))]]></defaultValueExpression>
+	</parameter>
+	<queryString language="json">
+		<![CDATA[.]]>
+	</queryString>
+	<field name="name" class="java.lang.String"/>
+	<field name="text" class="java.lang.String"/>
+	<field name="alignment" class="java.lang.String"/>
+	<field name="bold" class="java.lang.Boolean"/>
+	<field name="italic" class="java.lang.Boolean"/>
+	<field name="font" class="java.lang.String"/>
+	<field name="size" class="java.lang.Integer"/>
+	<field name="color" class="java.lang.String"/>
+	<field name="backgroundColor" class="java.lang.String"/>
+	<field name="verticalAlignment" class="java.lang.String"/>
+	<field name="underline" class="java.lang.String"/>
+	<field name="showDashletBorders" class="java.lang.Boolean"/>
+	<field name="borderColor" class="java.lang.String"/>
+	<summary>
+		<band height="20">
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="0" width="572" height="20" uuid="a90b4339-38df-4219-8971-d1673d51c6eb">
+					<propertyExpression name="net.sf.jasperreports.style.mode"><![CDATA[$F{backgroundColor} == null ? null : "Opaque"]]></propertyExpression>
+					<propertyExpression name="net.sf.jasperreports.style.backcolor"><![CDATA[$F{backgroundColor}]]></propertyExpression>
+					<propertyExpression name="net.sf.jasperreports.style.box.pen.lineWidth"><![CDATA[$F{showDashletBorders} ? "1" : null]]></propertyExpression>
+					<propertyExpression name="net.sf.jasperreports.style.box.pen.lineColor"><![CDATA[$F{borderColor}]]></propertyExpression>
+					<propertyExpression name="net.sf.jasperreports.style.fontName"><![CDATA[$F{font}]]></propertyExpression>
+					<propertyExpression name="net.sf.jasperreports.style.fontSize"><![CDATA[$F{size}.toString()]]></propertyExpression>
+					<propertyExpression name="net.sf.jasperreports.style.forecolor"><![CDATA[$F{color}]]></propertyExpression>
+					<propertyExpression name="net.sf.jasperreports.style.hTextAlign"><![CDATA[$F{alignment}]]></propertyExpression>
+					<propertyExpression name="net.sf.jasperreports.style.isBold"><![CDATA[$F{bold}.toString()]]></propertyExpression>
+					<propertyExpression name="net.sf.jasperreports.style.isItalic"><![CDATA[$F{italic}.toString()]]></propertyExpression>
+					<propertyExpression name="net.sf.jasperreports.style.isUnderline"><![CDATA[$F{underline}]]></propertyExpression>
+					<propertyExpression name="net.sf.jasperreports.style.vTextAlign"><![CDATA[$F{verticalAlignment}]]></propertyExpression>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{text}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

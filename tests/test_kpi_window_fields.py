@@ -64,6 +64,13 @@ class WindowFieldsAreCarriedByTheRows(unittest.TestCase):
                 offenders.append(f"{ws}:{k['id']} on {k['date_field']!r}")
         self.assertEqual(offenders, [])
 
+    def test_no_vetted_metric_windows_on_a_measured_empty_column(self):
+        # Ori answers these at no model cost; on Ellensburg (2026-09-29, 30 days) its
+        # "Field activities" counted 647 on Event Date/Time against the home card's 1,573.
+        from api.nlq_metrics import METRICS
+        offenders = [m.id for m in METRICS if (m.snapshot_id, m.build({}).get("date_field")) in MEASURED_EMPTY]
+        self.assertEqual(offenders, [])
+
     def test_a_card_on_both_pages_windows_on_the_same_column(self):
         exec_by_key = {(k["id"], k["snapshot_id"]): k.get("date_field") for k in EXECUTIVE_KPIS}
         disagreements = []

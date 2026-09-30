@@ -150,7 +150,7 @@ def get_snapshot(snapshot_id: str, organization_id: str | None = None) -> dict[s
     key = resolve_snapshot_key(catalog["snapshots"], snapshot_id)
     if key in catalog["snapshots"]:
         return catalog["snapshots"][key]
-    raise CatalogError(f"Unknown snapshot: {snapshot_id}")
+    raise CatalogError(f"Unknown data set: {snapshot_id}")
 
 
 # Columns that may never be queryable, whatever a catalog says. The SQL workspace
@@ -187,6 +187,11 @@ def allowed_fields(snapshot: dict[str, Any]) -> set[str]:
     """
     return {field["id"] for field in snapshot.get("fields", [])
             if not is_protected_column(field.get("id", ""))}
+
+
+def boolean_fields(snapshot: dict[str, Any]) -> set[str]:
+    """The true/false fields a query may take a share of (api/query_builder.py)."""
+    return {field["id"] for field in snapshot.get("fields", []) if field.get("type") == "boolean"}
 
 
 def org_backend(organization_id: str | None) -> tuple[str, str]:

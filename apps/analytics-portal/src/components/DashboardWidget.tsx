@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { MiniSparkChart } from "./MiniSparkChart";
 import { KpiCompareBadge } from "./KpiCompareBadge";
-import { formatCurrency, formatNumber } from "@/lib/format";
-import { formatTimeBucket } from "@/lib/timeBucketLabel";
+import { formatCompact, formatDate } from "@/lib/format";
 import { workstreamDisplayName } from "@/lib/businessLabels";
 import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
 import type { ExecutiveKpi } from "@/lib/types";
+import { explainQuestion, requestAsk } from "@/lib/assistantContext";
 
 type DashboardWidgetProps = {
   kpi: ExecutiveKpi;
@@ -16,6 +16,8 @@ type DashboardWidgetProps = {
   selectedTrendLabel?: string | null;
   onTrendClick?: (kpi: ExecutiveKpi, label: string) => void;
   onLensChange?: (kpiId: string, lensId: string) => void;
+  /** The page's period, named when the reader asks the assistant to explain the figure. */
+  periodLabel?: string;
 };
 
 export function DashboardWidget({
@@ -25,13 +27,9 @@ export function DashboardWidget({
   selectedTrendLabel,
   onTrendClick,
   onLensChange,
+  periodLabel,
 }: DashboardWidgetProps) {
-  const formatted =
-    kpi.value == null
-      ? "—"
-      : kpi.format === "currency"
-        ? formatCurrency(kpi.value)
-        : formatNumber(kpi.value);
+  const formatted = formatCompact(kpi.value, { currency: kpi.format === "currency" });
 
   const exploreHref = kpi.explore_report_id
     ? `/explore/${kpi.snapshot_id}?report=${kpi.explore_report_id}`
@@ -145,7 +143,7 @@ export function DashboardWidget({
             When the canvas has rows but none in range, say so and name the last date. */}
         {kpi.empty_window ? (
           <p className="mt-1 text-xs text-warn">
-            No data in this window — latest {formatTimeBucket(kpi.empty_window.latest, "day")}
+            No data in this window — latest {formatDate(kpi.empty_window.latest.slice(0, 10))}
           </p>
         ) : null}
         {showCompare ? (
@@ -168,6 +166,7 @@ export function DashboardWidget({
             )}
             format={kpi.format}
             height={130}
+            ordered={isOrderedAxis(kpi.trend_dimension)}
             selectedLabel={selectedTrendLabel}
             onBarClick={
               onTrendClick && kpi.trend_dimension
@@ -184,9 +183,26 @@ export function DashboardWidget({
     return (
       <div className="group glass-panel block overflow-hidden transition hover:border-edge">
         {inner}
-        <Link href={exploreHref} className="block border-t border-edge-subtle px-4 py-2 text-xs text-primary">
-          Open full report →
-        </Link>
+        <div className="flex items-center justify-between gap-2 border-t border-edge-subtle px-4 py-2 text-xs">
+          <Link href={exploreHref} className="text-primary">
+            Open full report →
+          </Link>
+          {kpi.value != null && !kpi.error ? (
+            <button
+              type="button"
+              className="text-fg-muted hover:text-primary"
+              onClick={() =>
+                requestAsk({
+                  question: explainQuestion(kpi, formatted, periodLabel),
+                  context: { canvas_id: kpi.snapshot_id, label: kpi.label, period: periodLabel,
+                             filters: kpi.subtitle ? [kpi.subtitle] : [] },
+                })
+              }
+            >
+              Explain this number
+            </button>
+          ) : null}
+        </div>
       </div>
     );
   }

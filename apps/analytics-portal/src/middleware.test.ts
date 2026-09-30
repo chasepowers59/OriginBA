@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { config } from "./middleware";
+import { NextRequest } from "next/server";
+import { config, middleware } from "./middleware";
 
 /**
  * The matcher decides what auth even applies to, and getting it wrong is invisible: a file routed
@@ -43,5 +44,22 @@ describe("middleware matcher", () => {
     ]) {
       expect(matches(route), `${route} must still go through the middleware`).toBe(true);
     }
+  });
+});
+
+describe("app routes are not tenant slugs", () => {
+  // A top-level route missing from APP_ROUTES reads as a tenant landing: a signed-in person is
+  // sent home and never reaches it. Invisible locally, where sign-in is usually off.
+  const signedIn = (path: string) =>
+    middleware(new NextRequest(`http://localhost:3000${path}`, { headers: { cookie: "portal_session=1" } }));
+
+  it("opens /letters for a signed-in person instead of redirecting", () => {
+    const res = signedIn("/letters");
+    expect(res.headers.get("location")).toBeNull();
+    expect(res.headers.get("x-middleware-next")).toBe("1");
+  });
+
+  it("still treats an unknown single segment as a tenant landing", () => {
+    expect(signedIn("/ellensburg").headers.get("location")).toMatch(/\/$/);
   });
 });

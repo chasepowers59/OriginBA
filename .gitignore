@@ -65,6 +65,13 @@ output/.portal_vault_key
 # Portal identity store: password hashes and per-tenant user rows.
 # Local dev artefact, recreated on first run; must never be a repo file.
 data/analytics_portal/*.db
+# runtime stores: letter ids, recipients' emails, annotations and alerts written as people use
+# the portal (saved_views/saved_dashboards stay tracked as seeds)
+data/analytics_portal/letter_runs.json
+data/analytics_portal/report_schedules.json
+data/analytics_portal/kpi_alerts.json
+data/analytics_portal/annotations.json
+data/dq_acks/
 
 # scratch dbt project from a 4-model Oracle smoke test; its profiles.yml carried real credentials (reorg 2026-09-08)
 oracle_dbt_smoke/
@@ -72,3 +79,10 @@ oracle_dbt_smoke/
 # editor/session backups of env files are secrets too (reorg 2026-09-08)
 .env.local.bak*
 *.env.bak*
+
+# import-bundle build scratch (the zip is the artefact)
+_import_staging/
+
+
+# Jaspersoft server exports (the rollback zips); the diffable tree lives in jaspersoft/inventory/
+backups/

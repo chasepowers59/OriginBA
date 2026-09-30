@@ -4,7 +4,7 @@ import { workspaceScope } from "./workspaceScope";
 /**
  * The SQL page said "Query the CISADM schema you know from CIS" to everyone — right for
  * the legacy Oracle path, incomplete for both dbt engines, which reach CISADM AND the
- * reporting canvases beside it.
+ * governed data sets beside it.
  *
  * These expectations come from the running fence, not from reading the code: a Postgres
  * org's own rejection message is "The workspace is scoped to cisadm, reporting", and
@@ -17,7 +17,7 @@ describe("workspaceScope", () => {
   it("names both schemas on a Postgres warehouse", () => {
     const text = workspaceScope("postgres");
     expect(text).toMatch(/CISADM/);
-    expect(text).toMatch(/canvas/i);
+    expect(text).toMatch(/data sets/i);
   });
 
   it("names both schemas in the client's own Oracle instance", () => {
@@ -26,10 +26,10 @@ describe("workspaceScope", () => {
     expect(text).toMatch(/ORIGINBA_REPORTING/);
   });
 
-  it("names CISADM alone on the legacy Oracle path, which has no canvases", () => {
+  it("names CISADM alone on the legacy Oracle path, which has no data sets", () => {
     const text = workspaceScope("oracle");
     expect(text).toMatch(/CISADM/);
-    expect(text).not.toMatch(/canvas/i);
+    expect(text).not.toMatch(/data set|canvas/i);
   });
 
   it("never promises an internal build layer", () => {
@@ -49,7 +49,7 @@ describe("workspaceScope", () => {
 
   it("promises no schema at all until the engine is known", () => {
     const text = workspaceScope(undefined);
-    expect(text).not.toMatch(/CISADM|canvas/i);
+    expect(text).not.toMatch(/CISADM|data set|canvas/i);
     expect(text.trim().endsWith(".")).toBe(true);
   });
 });

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="gl_by_distribution_code_month" pageWidth="778" pageHeight="595" orientation="Landscape"
+    columnWidth="778" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0"
+    whenNoDataType="AllSectionsNoDetail">
+    <property name="net.sf.jasperreports.query.timeout" value="600"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+    <style name="Base" default="true" fontName="SansSerif" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
+    <style name="H3" style="Base" fontSize="9" forecolor="#0F4761"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="RowBand" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="SubHeader" style="Base" fontSize="8" forecolor="#5B6470"/>
+    <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
+    <style name="SubTotal" style="Base" fontSize="8" bold="true" forecolor="#0F4761"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
+    <query language="SQL"><![CDATA[
+SELECT TO_CHAR(f.accounting_dt, 'YYYY-MM') AS ACCT_MONTH, COUNT(*) AS GL_LINES,
+       COALESCE(SUM(CASE WHEN g.amount > 0 THEN g.amount ELSE 0 END), 0) AS DEBIT_AMT,
+       COALESCE(SUM(CASE WHEN g.amount < 0 THEN -g.amount ELSE 0 END), 0) AS CREDIT_AMT,
+       COALESCE(SUM(g.amount), 0) AS NET_AMT
+FROM CISADM.CI_FT_GL g
+JOIN CISADM.CI_FT f ON f.ft_id = g.ft_id
+WHERE TRIM(f.freeze_sw) = 'Y' AND f.accounting_dt >= $P{FROM_DT} AND f.accounting_dt < $P{TO_DT} + INTERVAL '1' DAY AND TRIM(g.dst_id) = TRIM($P{DST_ID})
+  AND COALESCE(TRIM(g.gl_acct), '(no GL account)') = $P{GL_ACCT}
+  AND ($P{DST_ID_F} IS NULL OR TRIM(g.dst_id) = TRIM($P{DST_ID_F}))
+  AND ($P{GL_ACCT_F} IS NULL OR TRIM(g.gl_acct) = TRIM($P{GL_ACCT_F}))
+  AND ($P{GL_DIVISION_F} IS NULL OR TRIM(f.gl_division) = TRIM($P{GL_DIVISION_F}))
+  AND ($P{CIS_DIVISION_F} IS NULL OR TRIM(f.cis_division) = TRIM($P{CIS_DIVISION_F}))
+  AND ($P{FT_TYPE_FLG_F} IS NULL OR TRIM(f.ft_type_flg) = TRIM($P{FT_TYPE_FLG_F}))
+GROUP BY TO_CHAR(f.accounting_dt, 'YYYY-MM')
+ORDER BY ACCT_MONTH
+]]></query>
+    <parameter name="FROM_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TO_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="DST_ID" class="java.lang.String">
+        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+    </parameter>
+    <parameter name="GL_ACCT" class="java.lang.String">
+        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+    </parameter>
+    <parameter name="DST_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="GL_ACCT_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="GL_DIVISION_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CIS_DIVISION_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="FT_TYPE_FLG_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <field name="ACCT_MONTH" class="java.lang.String"/>
+    <field name="GL_LINES" class="java.lang.Long"/>
+    <field name="DEBIT_AMT" class="java.math.BigDecimal"/>
+    <field name="CREDIT_AMT" class="java.math.BigDecimal"/>
+    <field name="NET_AMT" class="java.math.BigDecimal"/>
+    <variable name="SUM_GL_LINES" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{GL_LINES}]]></expression>
+    </variable>
+    <variable name="SUM_DEBIT_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{DEBIT_AMT}]]></expression>
+    </variable>
+    <variable name="SUM_CREDIT_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{CREDIT_AMT}]]></expression>
+    </variable>
+    <variable name="SUM_NET_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{NET_AMT}]]></expression>
+    </variable>
+    <detail>
+        <band height="12">
+            <element kind="textField" x="0" y="0" width="328" height="12" style="SubText" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ACCT_MONTH}]]></expression></element>
+            <element kind="textField" x="328" y="0" width="70" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{GL_LINES}]]></expression></element>
+            <element kind="textField" x="468" y="0" width="100" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{DEBIT_AMT}]]></expression></element>
+            <element kind="textField" x="568" y="0" width="100" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{CREDIT_AMT}]]></expression></element>
+            <element kind="textField" x="668" y="0" width="110" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{NET_AMT}]]></expression></element>
+        </band>
+    </detail>
+    <summary height="20">
+            <element kind="line" x="0" y="1" width="778" height="1"><pen lineWidth="0.5" lineColor="#B9C6D2"/></element>
+            <element kind="staticText" x="0" y="2" width="328" height="12" style="SubTotal" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Subtotal]]></text></element>
+            <element kind="textField" x="328" y="2" width="70" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_GL_LINES}]]></expression></element>
+            <element kind="textField" x="468" y="2" width="100" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_DEBIT_AMT}]]></expression></element>
+            <element kind="textField" x="568" y="2" width="100" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_CREDIT_AMT}]]></expression></element>
+            <element kind="textField" x="668" y="2" width="110" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_NET_AMT}]]></expression></element>
+    </summary>
+</jasperReport>

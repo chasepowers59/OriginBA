@@ -13,11 +13,9 @@ from api.auth.workstream_access import (
     filter_dashboard_for_auth,
     filter_dashboards_for_auth,
     filter_nlq_metrics_for_auth,
-    filter_report_library_for_auth,
 )
-from api.portal_config import load_portal_config
+from api.portal_config import config_for_organization
 from api.org_db import require_org_for_data
-from api.organizations import get_organization
 from api.saved_dashboards import (
     DashboardError,
     create_dashboard,
@@ -26,7 +24,11 @@ from api.saved_dashboards import (
     list_dashboards,
     update_dashboard,
 )
+from api.row_security import only_readable
+from api.auth import workstream_access as _workstream_access
+from api.ownership import VISIBILITIES, can_edit, for_caller, require_edit, stamp, visible
 from api.saved_views import (
+    update_saved_view,
     SavedViewError,
     bulk_import_views,
     create_saved_view,
@@ -39,6 +41,9 @@ router = APIRouter(prefix="/portal", tags=["portal"])
 
 
 class SavedViewCreate(BaseModel):
+    # 'organization' (everyone in it) or 'private' (only you): api/ownership.py
+    visibility: str = "organization"
+    folder: str | None = Field(default=None, max_length=80)
     snapshot_id: str
     snapshot_label: str
     title: str
@@ -82,6 +87,8 @@ class DashboardTile(BaseModel):
 
 
 class DashboardCreate(BaseModel):
+    visibility: str = "organization"
+    folder: str | None = Field(default=None, max_length=80)
     title: str
     description: str | None = None
     days: int = 30
@@ -89,6 +96,8 @@ class DashboardCreate(BaseModel):
 
 
 class DashboardUpdate(BaseModel):
+    visibility: str | None = None
+    folder: str | None = Field(default=None, max_length=80)
     title: str | None = None
     description: str | None = None
     days: int | None = None
@@ -109,23 +118,20 @@ class AnalyticsNlqRequest(BaseModel):
 @router.get("/config")
 def portal_config(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     ctx.require_permission("portal:read")
-    config = load_portal_config().copy()
-    org_id = ctx.effective_organization_id()
-    if org_id:
-        org = get_organization(org_id)
-        config["organization_id"] = org_id
-        if org:
-            config["organization_name"] = org["display_name"]
-    return config
+    # The organization's own brand over the portal default (api/portal_config.py).
+    return config_for_organization(ctx.effective_organization_id())
 
 
 @router.get("/report-library")
 def report_library(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     ctx.require_permission("report_library:read")
-    from api.report_library import get_report_library
+    from api.report_library import get_report_library, scope_library
 
-    return filter_report_library_for_auth(
-        get_report_library(ctx.effective_organization_id()), ctx)
+    org_id = ctx.effective_organization_id()
+    # Packs and folders are scoped by the same two rules: the caller's workstreams, then
+    # their row rules, which drop any canvas that does not carry a rule's column.
+    return scope_library(get_report_library(org_id), lambda cards: only_readable(
+        [c for c in cards if ctx.can_access_workstream(c.get("workstream") or "")], ctx.row_rules, org_id))
 
 
 @router.get("/saved-views")
@@ -135,7 +141,9 @@ def get_saved_views(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, A
     return {
         "client_id": org_id,
         "organization_id": org_id,
-        "views": list_saved_views(org_id),
+        # only views on canvases this person's workstreams reach (B-13)
+        "views": for_caller([v for v in list_saved_views(org_id)
+                             if _workstream_access.can_access_snapshot(ctx, v["snapshot_id"])], ctx),
     }
 
 
@@ -146,7 +154,7 @@ def post_saved_view(
 ) -> dict[str, Any]:
     org_id = ctx.require_organization()
     try:
-        entry = create_saved_view(body.model_dump(), organization_id=org_id)
+        entry = create_saved_view(stamp(body.model_dump(), ctx), organization_id=org_id)
     except SavedViewError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return entry
@@ -158,8 +166,25 @@ def import_saved_views(
     ctx: AuthContext = Depends(require_permission("saved_views:write")),
 ) -> dict[str, Any]:
     org_id = ctx.require_organization()
-    imported = bulk_import_views([v.model_dump() for v in body.views], organization_id=org_id)
+    imported = bulk_import_views([stamp(v.model_dump(), ctx) for v in body.views], organization_id=org_id)
     return {"imported": len(imported), "views": imported}
+
+
+class SavedViewPatch(BaseModel):
+    folder: str | None = Field(default=None, max_length=80)
+
+
+@router.patch("/saved-views/{view_id}")
+def patch_saved_view(
+    view_id: str,
+    body: SavedViewPatch,
+    ctx: AuthContext = Depends(require_permission("saved_views:write")),
+) -> dict[str, Any]:
+    """Move a view to another folder (or out of one, with an empty folder)."""
+    org_id = ctx.require_organization()
+    require_edit(next((v for v in list_saved_views(org_id) if v.get("id") == view_id), None), ctx, "Saved view")
+    updated = update_saved_view(view_id, body.model_dump(exclude_unset=True), organization_id=org_id)
+    return {**updated, "can_edit": True}
 
 
 @router.delete("/saved-views/{view_id}")
@@ -168,6 +193,7 @@ def remove_saved_view(
     ctx: AuthContext = Depends(require_permission("saved_views:write")),
 ) -> dict[str, Any]:
     org_id = ctx.require_organization()
+    require_edit(next((v for v in list_saved_views(org_id) if v.get("id") == view_id), None), ctx, "Saved view")
     if not delete_saved_view(view_id, organization_id=org_id):
         raise HTTPException(status_code=404, detail="Saved view not found")
     return {"deleted": view_id}
@@ -180,7 +206,7 @@ def get_dashboards(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, An
     return {
         "client_id": org_id,
         "organization_id": org_id,
-        "dashboards": filter_dashboards_for_auth(list_dashboards(org_id), ctx),
+        "dashboards": for_caller(filter_dashboards_for_auth(list_dashboards(org_id), ctx), ctx),
     }
 
 
@@ -192,12 +218,12 @@ def get_dashboard_by_id(
     ctx.require_permission("portal:read")
     org_id = ctx.require_organization()
     board = get_dashboard(dashboard_id, organization_id=org_id)
-    if not board:
+    if not board or not visible(board, ctx):
         raise HTTPException(status_code=404, detail="Dashboard not found")
     scoped = filter_dashboard_for_auth(board, ctx)
     if not scoped:
         raise HTTPException(status_code=403, detail="Access denied for this dashboard")
-    return scoped
+    return {**scoped, "can_edit": can_edit(board, ctx)}
 
 
 @router.post("/dashboards")
@@ -210,7 +236,7 @@ def post_dashboard(
     for tile in payload.get("tiles") or []:
         assert_snapshot_access(ctx, str(tile.get("snapshot_id", "")))
     try:
-        return create_dashboard(payload, organization_id=org_id)
+        return create_dashboard(stamp(payload, ctx), organization_id=org_id)
     except DashboardError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -223,6 +249,9 @@ def put_dashboard(
 ) -> dict[str, Any]:
     org_id = ctx.require_organization()
     patch = body.model_dump(exclude_unset=True)
+    require_edit(get_dashboard(dashboard_id, organization_id=org_id), ctx, "Dashboard")
+    if patch.get("visibility") and patch["visibility"] not in VISIBILITIES:
+        raise HTTPException(status_code=400, detail=f"Visibility must be one of {', '.join(VISIBILITIES)}")
     for tile in patch.get("tiles") or []:
         assert_snapshot_access(ctx, str(tile.get("snapshot_id", "")))
     try:
@@ -237,6 +266,7 @@ def remove_dashboard(
     ctx: AuthContext = Depends(require_permission("dashboards:write")),
 ) -> dict[str, Any]:
     org_id = ctx.require_organization()
+    require_edit(get_dashboard(dashboard_id, organization_id=org_id), ctx, "Dashboard")
     if not delete_dashboard(dashboard_id, organization_id=org_id):
         raise HTTPException(status_code=404, detail="Dashboard not found")
     return {"deleted": dashboard_id}
@@ -249,7 +279,8 @@ def analytics_nlq_metrics(ctx: AuthContext = Depends(get_auth_context)) -> dict[
 
     # Per-org: only metrics whose snapshot exists in this org's catalog are offered.
     org_id = ctx.effective_organization_id()
-    return {"metrics": filter_nlq_metrics_for_auth(get_nlq_metric_catalog(org_id), ctx)}
+    return {"metrics": only_readable(filter_nlq_metrics_for_auth(get_nlq_metric_catalog(org_id), ctx),
+                                     ctx.row_rules, org_id)}
 
 
 @router.post("/analytics-nlq")
@@ -271,14 +302,18 @@ def analytics_nlq(
     metric = match_nlq_metric(body.query, metric_id=body.metric_id)
     if metric:
         assert_snapshot_access(ctx, str(metric.get("snapshot_id", "")))
+        if ctx.row_rules and not only_readable([metric], ctx.row_rules, org_id):
+            raise HTTPException(status_code=403, detail=f"{metric.get('label') or 'This metric'} reads a report "
+                                                        "that does not carry the column your access is limited by.")
     result = run_snapshot_analytics_nlq(
         body.query,
         metric_id=body.metric_id,
         params=params,
         organization_id=org_id,
+        row_rules=ctx.row_rules,
     )
     if not result:
-        raise HTTPException(status_code=404, detail="No matching snapshot analytics pattern for this question")
+        raise HTTPException(status_code=404, detail="No vetted metric matches this question")
     snapshot_id = str(result.get("resolved_from") or (metric or {}).get("snapshot_id") or "")
     if snapshot_id:
         assert_snapshot_access(ctx, snapshot_id)

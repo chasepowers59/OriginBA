@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="CI_BATCH_INST" label="1.) Batch Thread Instance" resourceId="JoinTree_1">
+      <items>
+        <item id="BATCH_CD_1" label="Batch Control" resourceId="JoinTree_1.CI_BATCH_INST.BATCH_CD"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="BATCH_NBR" label="Batch Number" resourceId="JoinTree_1.CI_BATCH_INST.BATCH_NBR"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="BATCH_RERUN_NBR" label="Batch Rerun Number" resourceId="JoinTree_1.CI_BATCH_INST.BATCH_RERUN_NBR"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="BATCH_THREAD_NBR" label="Thread Nbr" resourceId="JoinTree_1.CI_BATCH_INST.BATCH_THREAD_NBR"></item>
+        <item id="END_DTTM" label="End Date/Time" resourceId="JoinTree_1.CI_BATCH_INST.END_DTTM"></item>
+        <item id="FILE_DETAILS" label="File Details" resourceId="JoinTree_1.CI_BATCH_INST.FILE_DETAILS"></item>
+        <item id="REC_ERR_CNT" label="Records in Error" resourceId="JoinTree_1.CI_BATCH_INST.REC_ERR_CNT"></item>
+        <item id="REC_PROC_CNT" label="Records Processed" resourceId="JoinTree_1.CI_BATCH_INST.REC_PROC_CNT"></item>
+        <item id="RESTART_DATA" label="Restart Data" resourceId="JoinTree_1.CI_BATCH_INST.RESTART_DATA"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="SCHEDULER_ID" label="Batch Instance" resourceId="JoinTree_1.CI_BATCH_INST.SCHEDULER_ID"></item>
+        <item id="START_DTTM" label="Start Date/Time" resourceId="JoinTree_1.CI_BATCH_INST.START_DTTM"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="CI_BATCH_RUN_1" label="1.) Batch Run" resourceId="JoinTree_1">
+      <items>
+        <item id="BATCH_BUS_DT_1" label="Batch Business Date" resourceId="JoinTree_1.CI_BATCH_RUN.BATCH_BUS_DT"></item>
+        <item id="BATCH_CD_2" label="Batch Control" resourceId="JoinTree_1.CI_BATCH_RUN.BATCH_CD"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="BATCH_NBR_2" label="Batch Number" resourceId="JoinTree_1.CI_BATCH_RUN.BATCH_NBR"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="BATCH_RERUN_NBR_2" label="Batch Rerun Number" resourceId="JoinTree_1.CI_BATCH_RUN.BATCH_RERUN_NBR"></item>
+        <item id="DO_NOT_RESTART_SW_1" label="Do Not Attempt Restart" resourceId="JoinTree_1.CI_BATCH_RUN.DO_NOT_RESTART_SW"></item>
+        <item id="END_DTTM_2" label="End Date/Time" resourceId="JoinTree_1.CI_BATCH_RUN.END_DTTM"></item>
+        <item id="RUN_STATUS_1" label="Run Status" resourceId="JoinTree_1.CI_BATCH_RUN.RUN_STATUS"></item>
+        <item id="START_DTTM_2" label="Start Date/Time" resourceId="JoinTree_1.CI_BATCH_RUN.START_DTTM"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="CI_BATCH_THD" label="1.) Batch Thread" resourceId="JoinTree_1">
+      <items>
+        <item id="BATCH_CD" label="Batch Control" resourceId="JoinTree_1.CI_BATCH_THD.BATCH_CD"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="BATCH_NBR_1" label="Batch Number" resourceId="JoinTree_1.CI_BATCH_THD.BATCH_NBR"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="BATCH_RERUN_NBR_1" label="Batch Rerun Number" resourceId="JoinTree_1.CI_BATCH_THD.BATCH_RERUN_NBR"></item>
+        <item defaultAgg="CountAll" dimensionOrMeasure="Dimension" id="BATCH_THREAD_NBR_1" label="Thread Nbr" resourceId="JoinTree_1.CI_BATCH_THD.BATCH_THREAD_NBR"></item>
+        <item id="LOG_FILE_NAME" label="Log File Name" resourceId="JoinTree_1.CI_BATCH_THD.LOG_FILE_NAME"></item>
+        <item id="THD_RETRY_CNT" label="Thread Retries Count" resourceId="JoinTree_1.CI_BATCH_THD.THD_RETRY_CNT"></item>
+        <item id="THREAD_STATUS" label="Thread Status" resourceId="JoinTree_1.CI_BATCH_THD.THREAD_STATUS"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet1" label="1.) Formulas" resourceId="JoinTree_1">
+      <items>
+        <item id="SCHEDULER_ID_DISTINCT" label="Distinct Batch Instance" resourceId="JoinTree_1.SCHEDULER_ID_DISTINCT"></item>
+        <item id="BATCH_RUN_DISTINCT" label="Distinct Batch Run" resourceId="JoinTree_1.BATCH_RUN_DISTINCT"></item>
+        <item id="BATCH_THREAD_DISTINCT" label="Distinct Batch Thread" resourceId="JoinTree_1.BATCH_THREAD_DISTINCT"></item>
+        <item id="SCHEDULER_ID_DURATION_HOURS" label="Duration (in Hours)" resourceId="JoinTree_1.SCHEDULER_ID_DURATION_HOURS"></item>
+        <item id="SCHEDULER_ID_DURATION" label="Duration (in Minutes)" resourceId="JoinTree_1.SCHEDULER_ID_DURATION_MINS"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet2" label="1.) Descriptions" resourceId="JoinTree_1">
+      <items>
+        <item id="BATCH_CD_DESCR" label="Batch Control (with Description)" resourceId="JoinTree_1.BATCH_CD_DESCR"></item>
+        <item id="DESCR" label="Run Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+        <item id="DESCR_1" label="Thread Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L_1.DESCR"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="CI_BATCH_CTRL" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BATCH_CTRL" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BATCH_CD" type="java.lang.String"></field>
+        <field id="NEXT_BATCH_NBR" type="java.math.BigDecimal"></field>
+        <field id="LAST_UPDATE_INST" type="java.math.BigDecimal"></field>
+        <field id="LAST_UPDATE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ACCUM_ALL_INST_SW" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="PROGRAM_NAME" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="PGM_TYPE_FLG" type="java.lang.String"></field>
+        <field id="F1_BATCH_CTRL_TYPE_FLG" type="java.lang.String"></field>
+        <field id="F1_TIMER_ACTIVE_FLG" type="java.lang.String"></field>
+        <field id="TIMER_INTERVAL" type="java.math.BigDecimal"></field>
+        <field id="BATCH_THREAD_CNT" type="java.math.BigDecimal"></field>
+        <field id="MAX_COMMIT_RECS" type="java.math.BigDecimal"></field>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="BATCH_LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="EMAILID" type="java.lang.String"></field>
+        <field id="TRC_PGM_STRT_SW" type="java.lang.String"></field>
+        <field id="TRC_PGM_END_SW" type="java.lang.String"></field>
+        <field id="TRC_SQL_SW" type="java.lang.String"></field>
+        <field id="TRC_STD_SW" type="java.lang.String"></field>
+        <field id="F1_BATCH_CTGY_FLG" type="java.lang.String"></field>
+        <field id="APP_SVC_ID" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_BATCH_CTRL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BATCH_CTRL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BATCH_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG'</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_BATCH_INST" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BATCH_INST" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BATCH_CD" type="java.lang.String"></field>
+        <field id="BATCH_NBR" type="java.math.BigDecimal"></field>
+        <field id="BATCH_RERUN_NBR" type="java.math.BigDecimal"></field>
+        <field id="BATCH_THREAD_NBR" type="java.math.BigDecimal"></field>
+        <field id="SCHEDULER_ID" type="java.math.BigDecimal"></field>
+        <field id="REC_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="REC_ERR_CNT" type="java.math.BigDecimal"></field>
+        <field id="RESTART_DATA" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="FILE_DETAILS" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_BATCH_RUN" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BATCH_RUN" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BATCH_CD" type="java.lang.String"></field>
+        <field id="BATCH_NBR" type="java.math.BigDecimal"></field>
+        <field id="BATCH_RERUN_NBR" type="java.math.BigDecimal"></field>
+        <field id="RUN_STATUS" type="java.lang.String"></field>
+        <field id="BATCH_BUS_DT" type="java.sql.Timestamp"></field>
+        <field id="DO_NOT_RESTART_SW" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="END_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_BATCH_THD" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BATCH_THD" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BATCH_CD" type="java.lang.String"></field>
+        <field id="BATCH_NBR" type="java.math.BigDecimal"></field>
+        <field id="BATCH_RERUN_NBR" type="java.math.BigDecimal"></field>
+        <field id="BATCH_THREAD_NBR" type="java.math.BigDecimal"></field>
+        <field id="THREAD_STATUS" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="LOG_FILE_NAME" type="java.lang.String"></field>
+        <field id="THD_RETRY_CNT" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="DESCR_OVRD" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG' and FIELD_NAME == 'RUN_STATUS                    '</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="DESCR_OVRD" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG' and FIELD_NAME == 'THREAD_STATUS                 '</filterString>
+    </jdbcTable>
+    <jdbcTable id="SC_USER" datasourceId="Origin_DEV_DS" datasourceTableName="SC_USER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="FIRST_NAME" type="java.lang.String"></field>
+        <field id="LAST_NAME" type="java.lang.String"></field>
+        <field id="TNDR_SOURCE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DISP_PROF_CD" type="java.lang.String"></field>
+        <field id="TD_ENTRY_AGE_DAYS1" type="java.math.BigDecimal"></field>
+        <field id="TD_ENTRY_AGE_DAYS2" type="java.math.BigDecimal"></field>
+        <field id="ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="EMAILID" type="java.lang.String"></field>
+        <field id="USER_TYPE_FLG" type="java.lang.String"></field>
+        <field id="PORTAL_OVRD_USER" type="java.lang.String"></field>
+        <field id="FAV_OVRD_USER" type="java.lang.String"></field>
+        <field id="DASHBOARD_WIDTH" type="java.lang.String"></field>
+        <field id="HOME_NAV_OPT_CD" type="java.lang.String"></field>
+        <field id="DISP_ALL_PREM_SW" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="EXT_USER_ID" type="java.lang.String"></field>
+        <field id="USER_ENABLE_FLG" type="java.lang.String"></field>
+        <field id="F1_SECURITY_HASH" type="java.lang.String"></field>
+        <field id="DASHBOARD_LOC_FLG" type="java.lang.String"></field>
+        <field id="DASHBOARD_STATE_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BATCH_INST" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CI_BATCH_RUN.BATCH_CD" type="java.lang.String"></field>
+        <field id="CI_BATCH_RUN.BATCH_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_RUN.BATCH_RERUN_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_RUN.RUN_STATUS" type="java.lang.String"></field>
+        <field id="CI_BATCH_RUN.BATCH_BUS_DT" type="java.sql.Timestamp"></field>
+        <field id="CI_BATCH_RUN.DO_NOT_RESTART_SW" type="java.lang.String"></field>
+        <field id="CI_BATCH_RUN.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_RUN.START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_BATCH_RUN.END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_BATCH_THD.BATCH_CD" type="java.lang.String"></field>
+        <field id="CI_BATCH_THD.BATCH_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_THD.BATCH_RERUN_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_THD.BATCH_THREAD_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_THD.THREAD_STATUS" type="java.lang.String"></field>
+        <field id="CI_BATCH_THD.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_THD.LOG_FILE_NAME" type="java.lang.String"></field>
+        <field id="CI_BATCH_THD.THD_RETRY_CNT" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_INST.BATCH_CD" type="java.lang.String"></field>
+        <field id="CI_BATCH_INST.BATCH_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_INST.BATCH_RERUN_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_INST.BATCH_THREAD_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_INST.SCHEDULER_ID" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_INST.REC_PROC_CNT" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_INST.REC_ERR_CNT" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_INST.RESTART_DATA" type="java.lang.String"></field>
+        <field id="CI_BATCH_INST.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_INST.START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_BATCH_INST.END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_BATCH_INST.FILE_DETAILS" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.BATCH_CD" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.NEXT_BATCH_NBR" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_CTRL.LAST_UPDATE_INST" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_CTRL.LAST_UPDATE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_BATCH_CTRL.ACCUM_ALL_INST_SW" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_CTRL.PROGRAM_NAME" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.PGM_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.F1_BATCH_CTRL_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.F1_TIMER_ACTIVE_FLG" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.TIMER_INTERVAL" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_CTRL.BATCH_THREAD_CNT" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_CTRL.MAX_COMMIT_RECS" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_CTRL.USER_ID" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.BATCH_LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.EMAILID" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.TRC_PGM_STRT_SW" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.TRC_PGM_END_SW" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.TRC_SQL_SW" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.TRC_STD_SW" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.F1_BATCH_CTGY_FLG" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL.APP_SVC_ID" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR_OVRD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCRLONG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_LOOKUP_VAL_L_1.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.DESCR_OVRD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L_1.DESCRLONG" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL_L.BATCH_CD" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_BATCH_CTRL_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CI_BATCH_CTRL_L.DESCRLONG" type="java.lang.String"></field>
+        <field id="SCHEDULER_ID_DURATION_MINS" dataSetExpression="ElapsedMinutes(CI_BATCH_INST.END_DTTM, CI_BATCH_INST.START_DTTM)" type="java.math.BigDecimal"></field>
+        <field id="BATCH_CD_DESCR" dataSetExpression="Concatenate(CI_BATCH_CTRL_L.BATCH_CD, ' (', CI_BATCH_CTRL_L.DESCR, ')')" type="java.lang.String"></field>
+        <field id="SCHEDULER_ID_DISTINCT" dataSetExpression="CountDistinct(CI_BATCH_INST.SCHEDULER_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="SCHEDULER_ID_DURATION_HOURS" dataSetExpression="ElapsedHours(CI_BATCH_INST.END_DTTM, CI_BATCH_INST.START_DTTM)" type="java.math.BigDecimal"></field>
+        <field id="BATCH_RUN_DISTINCT" dataSetExpression="CountDistinct(Concatenate(CI_BATCH_INST.BATCH_CD, '_', CI_BATCH_INST.BATCH_NBR), 'Current')" type="java.lang.Long"></field>
+        <field id="BATCH_THREAD_DISTINCT" dataSetExpression="CountDistinct&#xA;(Concatenate(&#xA;CI_BATCH_INST.BATCH_CD, '_',CI_BATCH_INST.BATCH_NBR)&#xA;, '_', CI_BATCH_INST.BATCH_THREAD_NBR, 'Current')&#xA;" type="java.lang.Long"></field>
+      </fieldList>
+      <filterString>CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG' and CI_BATCH_CTRL_L.LANGUAGE_CD == 'ENG' and CI_LOOKUP_VAL_L.FIELD_NAME == 'RUN_STATUS                    ' and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'THREAD_STATUS                 ' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'</filterString>
+      <joinInfo alias="CI_BATCH_INST" referenceId="CI_BATCH_INST"></joinInfo>
+      <joinList>
+        <join expr="CI_BATCH_INST.BATCH_CD == CI_BATCH_RUN.BATCH_CD and CI_BATCH_INST.BATCH_NBR == CI_BATCH_RUN.BATCH_NBR and CI_BATCH_INST.BATCH_RERUN_NBR == CI_BATCH_RUN.BATCH_RERUN_NBR" left="CI_BATCH_INST" right="CI_BATCH_RUN" type="inner" weight="1"></join>
+        <join expr="CI_BATCH_INST.BATCH_CD == CI_BATCH_CTRL.BATCH_CD" left="CI_BATCH_INST" right="CI_BATCH_CTRL" type="inner" weight="1"></join>
+        <join expr="CI_BATCH_INST.BATCH_CD == CI_BATCH_CTRL_L.BATCH_CD and CI_BATCH_CTRL_L.LANGUAGE_CD == 'ENG'" left="CI_BATCH_INST" right="CI_BATCH_CTRL_L" type="inner" weight="1"></join>
+        <join expr="CI_BATCH_INST.BATCH_CD == CI_BATCH_THD.BATCH_CD and CI_BATCH_INST.BATCH_NBR == CI_BATCH_THD.BATCH_NBR and CI_BATCH_INST.BATCH_RERUN_NBR == CI_BATCH_THD.BATCH_RERUN_NBR" left="CI_BATCH_INST" right="CI_BATCH_THD" type="inner" weight="1"></join>
+        <join expr="CI_BATCH_RUN.RUN_STATUS == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'RUN_STATUS' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="CI_BATCH_RUN" right="CI_LOOKUP_VAL_L" type="inner" weight="1"></join>
+        <join expr="CI_BATCH_THD.THREAD_STATUS == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'THREAD_STATUS' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'" left="CI_BATCH_THD" right="CI_LOOKUP_VAL_L_1" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BATCH_CTRL" tableId="CI_BATCH_CTRL"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BATCH_RUN" tableId="CI_BATCH_RUN"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BATCH_THD" tableId="CI_BATCH_THD"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BATCH_INST" tableId="CI_BATCH_INST"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BATCH_CTRL_L" tableId="CI_BATCH_CTRL_L"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

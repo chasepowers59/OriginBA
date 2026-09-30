@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DEV_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="GRP_ACCOUNT_SERVICE" label="1.) Account / Service" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID" label="Account ID" resourceId="JoinTree_1.CI_ACCT.ACCT_ID"></item>
+        <item id="SA_ID" label="Service Agreement ID" resourceId="JoinTree_1.CI_SA.SA_ID"></item>
+        <item id="SA_TYPE_CD" label="SA Type Code" resourceId="JoinTree_1.CI_SA.SA_TYPE_CD"></item>
+        <item id="CIS_DIVISION" label="CIS Division" resourceId="JoinTree_1.CI_SA.CIS_DIVISION"></item>
+        <item id="SA_STATUS_FLG" label="SA Status" resourceId="JoinTree_1.CI_SA.SA_STATUS_FLG"></item>
+        <item id="CUST_CL_CD" label="Customer Class Code" resourceId="JoinTree_1.CI_ACCT.CUST_CL_CD"></item>
+        <item id="ACCT_BILL_CYC_CD" label="Account Bill Cycle" resourceId="JoinTree_1.CI_ACCT.BILL_CYC_CD"></item>
+        <item id="CURRENCY_CD" label="Currency Code" resourceId="JoinTree_1.CI_ACCT.CURRENCY_CD"></item>
+        <item id="PER_ID" label="Person ID" resourceId="JoinTree_1.CI_ACCT_PER.PER_ID"></item>
+        <item id="ENTITY_NAME" label="Customer Name" resourceId="JoinTree_1.CI_PER_NAME.ENTITY_NAME"></item>
+        <item id="ENTITY_NAME_UPR" label="Customer Name (Upper)" resourceId="JoinTree_1.CI_PER_NAME.ENTITY_NAME_UPR"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="GRP_BILLING_PERIOD" label="2.) Billing Period" resourceId="JoinTree_1">
+      <items>
+        <item id="BILL_ID" label="Bill ID" resourceId="JoinTree_1.CI_BSEG.BILL_ID"></item>
+        <item id="BSEG_ID" label="Bill Segment ID" resourceId="JoinTree_1.CI_BSEG.BSEG_ID"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle Code" resourceId="JoinTree_1.CI_BSEG.BILL_CYC_CD"></item>
+        <item id="WIN_START_DT" label="Window Start Date" resourceId="JoinTree_1.CI_BSEG.WIN_START_DT"></item>
+        <item id="START_DT" label="Segment Start Date" resourceId="JoinTree_1.CI_BSEG.START_DT"></item>
+        <item id="END_DT" label="Segment End Date" resourceId="JoinTree_1.CI_BSEG.END_DT"></item>
+        <item id="BSEG_STAT_FLG" label="Segment Status Code" resourceId="JoinTree_1.CI_BSEG.BSEG_STAT_FLG"></item>
+        <item id="BSEG_STATUS_DESCR" label="Segment Status" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+        <item id="EST_SW" label="Estimated" resourceId="JoinTree_1.CI_BSEG.EST_SW"></item>
+        <item id="CLOSING_BSEG_SW" label="Closing Segment" resourceId="JoinTree_1.CI_BSEG.CLOSING_BSEG_SW"></item>
+        <item id="BILLING_DAYS" label="Billing Days" resourceId="JoinTree_1.BILLING_DAYS"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="GRP_FINANCIALS" label="3.) Financials / Charges" resourceId="JoinTree_1">
+      <items>
+        <item id="FT_ID" label="Financial Transaction ID" resourceId="JoinTree_1.CI_FT.FT_ID"></item>
+        <item id="FT_TYPE_FLG" label="FT Type Code" resourceId="JoinTree_1.CI_FT.FT_TYPE_FLG"></item>
+        <item id="CUR_AMT" label="Current Amount" resourceId="JoinTree_1.CI_FT.CUR_AMT"></item>
+        <item id="TOT_AMT" label="Payoff Amount" resourceId="JoinTree_1.CI_FT.TOT_AMT"></item>
+        <item id="FREEZE_SW" label="Frozen" resourceId="JoinTree_1.CI_FT.FREEZE_SW"></item>
+        <item id="FREEZE_DTTM" label="Freeze Date/Time" resourceId="JoinTree_1.CI_FT.FREEZE_DTTM"></item>
+        <item id="ARS_DT" label="Arrears Date" resourceId="JoinTree_1.CI_FT.ARS_DT"></item>
+        <item id="ACCOUNTING_DT" label="Accounting Date" resourceId="JoinTree_1.CI_FT.ACCOUNTING_DT"></item>
+        <item id="NOT_IN_ARS_SW" label="Not In Arrears" resourceId="JoinTree_1.CI_FT.NOT_IN_ARS_SW"></item>
+        <item id="NEW_DEBIT_SW" label="New Charge" resourceId="JoinTree_1.CI_FT.NEW_DEBIT_SW"></item>
+        <item id="SHOW_ON_BILL_SW" label="Show on Bill" resourceId="JoinTree_1.CI_FT.SHOW_ON_BILL_SW"></item>
+        <item id="FT_COUNT" label="Financial Transaction Count" resourceId="JoinTree_1.FT_COUNT"></item>
+        <item id="TOTAL_CUR_AMT" label="Total Current Amount" resourceId="JoinTree_1.TOTAL_CUR_AMT"></item>
+        <item id="TOTAL_TOT_AMT" label="Total Payoff Amount" resourceId="JoinTree_1.TOTAL_TOT_AMT"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="GRP_USAGE" label="4.) Usage Quantities" resourceId="JoinTree_1">
+      <items>
+        <item id="USAGE_ID" label="Usage ID (C1)" resourceId="JoinTree_1.C1_USAGE.USAGE_ID"></item>
+        <item id="C1_USAGE_STATUS" label="Usage Status (C1)" resourceId="JoinTree_1.C1_USAGE.BO_STATUS_CD"></item>
+        <item id="D1_USAGE_ID" label="Usage Transaction ID (D1)" resourceId="JoinTree_1.D1_USAGE.D1_USAGE_ID"></item>
+        <item id="D1_USAGE_STATUS" label="Usage Transaction Status" resourceId="JoinTree_1.D1_USAGE.BO_STATUS_CD"></item>
+        <item id="USG_START_DTTM" label="Usage Start Date/Time" resourceId="JoinTree_1.D1_USAGE.START_DTTM"></item>
+        <item id="USG_END_DTTM" label="Usage End Date/Time" resourceId="JoinTree_1.D1_USAGE.END_DTTM"></item>
+        <item id="QUANTITY" label="Usage Quantity" resourceId="JoinTree_1.D1_USAGE_PERIOD_SQ.QUANTITY"></item>
+        <item id="D1_UOM_CD" label="Unit of Measure" resourceId="JoinTree_1.D1_USAGE_PERIOD_SQ.D1_UOM_CD"></item>
+        <item id="D1_SQI_CD" label="Service Quantity Identifier" resourceId="JoinTree_1.D1_USAGE_PERIOD_SQ.D1_SQI_CD"></item>
+        <item id="USAGE_TXN_COUNT" label="Usage Transaction Count" resourceId="JoinTree_1.USAGE_TXN_COUNT"></item>
+        <item id="TOTAL_USAGE_QTY" label="Total Usage Quantity" resourceId="JoinTree_1.TOTAL_USAGE_QTY"></item>
+        <item id="NO_USAGE_FLG" label="No Usage Flag" resourceId="JoinTree_1.NO_USAGE_FLG"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="CI_BSEG" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BSEG" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="WIN_START_DT" type="java.util.Date"></field>
+        <field id="START_DT" type="java.util.Date"></field>
+        <field id="END_DT" type="java.util.Date"></field>
+        <field id="BSEG_STAT_FLG" type="java.lang.String"></field>
+        <field id="EST_SW" type="java.lang.String"></field>
+        <field id="CLOSING_BSEG_SW" type="java.lang.String"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_SA" datasourceId="Origin_DEV_DS" datasourceTableName="CI_SA" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="START_DT" type="java.util.Date"></field>
+        <field id="END_DT" type="java.util.Date"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_ACCT" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CURRENCY_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_FT" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FT_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="FT_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CUR_AMT" type="java.math.BigDecimal"></field>
+        <field id="TOT_AMT" type="java.math.BigDecimal"></field>
+        <field id="FREEZE_SW" type="java.lang.String"></field>
+        <field id="FREEZE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ARS_DT" type="java.util.Date"></field>
+        <field id="ACCOUNTING_DT" type="java.util.Date"></field>
+        <field id="NOT_IN_ARS_SW" type="java.lang.String"></field>
+        <field id="NEW_DEBIT_SW" type="java.lang.String"></field>
+        <field id="SHOW_ON_BILL_SW" type="java.lang.String"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <filterString>FREEZE_SW == 'Y'</filterString>
+    </jdbcTable>
+    <jdbcTable id="C1_USAGE" datasourceId="Origin_DEV_DS" datasourceTableName="C1_USAGE" schemaAlias="CISADM">
+      <fieldList>
+        <field id="USAGE_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="WIN_START_DT" type="java.util.Date"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_USAGE" datasourceId="Origin_DEV_DS" datasourceTableName="D1_USAGE" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="USG_EXT_ID" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="USG_GRP_CD" type="java.lang.String"></field>
+        <field id="USG_SRC_FLG" type="java.lang.String"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_USAGE_PERIOD_SQ" datasourceId="Origin_DEV_DS" datasourceTableName="D1_USAGE_PERIOD_SQ" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="QUANTITY" type="java.math.BigDecimal"></field>
+        <field id="D1_UOM_CD" type="java.lang.String"></field>
+        <field id="D1_SQI_CD" type="java.lang.String"></field>
+        <field id="D1_TOU_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_ACCT_PER" datasourceId="Origin_DEV_DS" datasourceTableName="CI_ACCT_PER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="ACCT_REL_TYPE_CD" type="java.lang.String"></field>
+        <field id="FIN_RESP_SW" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_PER_NAME" datasourceId="Origin_DEV_DS" datasourceTableName="CI_PER_NAME" schemaAlias="CISADM">
+      <fieldList>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="ENTITY_NAME_UPR" type="java.lang.String"></field>
+        <field id="NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="PRIM_NAME_SW" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_BSEG" schemaAlias="CISADM">
+      <fieldList>
+        <field id="C1_USAGE.USAGE_ID" type="java.lang.String"></field>
+        <field id="C1_USAGE.SA_ID" type="java.lang.String"></field>
+        <field id="C1_USAGE.BSEG_ID" type="java.lang.String"></field>
+        <field id="C1_USAGE.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="C1_USAGE.WIN_START_DT" type="java.util.Date"></field>
+        <field id="C1_USAGE.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="C1_USAGE.START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="C1_USAGE.END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="C1_USAGE.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_SA.SA_ID" type="java.lang.String"></field>
+        <field id="CI_SA.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_SA.SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_SA.CIS_DIVISION" type="java.lang.String"></field>
+        <field id="CI_SA.SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CI_SA.START_DT" type="java.util.Date"></field>
+        <field id="CI_SA.END_DT" type="java.util.Date"></field>
+        <field id="CI_SA.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_FT.FT_ID" type="java.lang.String"></field>
+        <field id="CI_FT.SA_ID" type="java.lang.String"></field>
+        <field id="CI_FT.BILL_ID" type="java.lang.String"></field>
+        <field id="CI_FT.FT_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_FT.CUR_AMT" type="java.math.BigDecimal"></field>
+        <field id="CI_FT.TOT_AMT" type="java.math.BigDecimal"></field>
+        <field id="CI_FT.FREEZE_SW" type="java.lang.String"></field>
+        <field id="CI_FT.FREEZE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_FT.ARS_DT" type="java.util.Date"></field>
+        <field id="CI_FT.ACCOUNTING_DT" type="java.util.Date"></field>
+        <field id="CI_FT.NOT_IN_ARS_SW" type="java.lang.String"></field>
+        <field id="CI_FT.NEW_DEBIT_SW" type="java.lang.String"></field>
+        <field id="CI_FT.SHOW_ON_BILL_SW" type="java.lang.String"></field>
+        <field id="CI_FT.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_FT.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_ACCT.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT.CURRENCY_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_BSEG.BSEG_ID" type="java.lang.String"></field>
+        <field id="CI_BSEG.BILL_ID" type="java.lang.String"></field>
+        <field id="CI_BSEG.SA_ID" type="java.lang.String"></field>
+        <field id="CI_BSEG.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CI_BSEG.WIN_START_DT" type="java.util.Date"></field>
+        <field id="CI_BSEG.START_DT" type="java.util.Date"></field>
+        <field id="CI_BSEG.END_DT" type="java.util.Date"></field>
+        <field id="CI_BSEG.BSEG_STAT_FLG" type="java.lang.String"></field>
+        <field id="CI_BSEG.EST_SW" type="java.lang.String"></field>
+        <field id="CI_BSEG.CLOSING_BSEG_SW" type="java.lang.String"></field>
+        <field id="CI_BSEG.PREM_ID" type="java.lang.String"></field>
+        <field id="CI_BSEG.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_BSEG.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_PER_NAME.PER_ID" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.ENTITY_NAME" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.ENTITY_NAME_UPR" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.NAME_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.PRIM_NAME_SW" type="java.lang.String"></field>
+        <field id="CI_PER_NAME.VERSION" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE_PERIOD_SQ.D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE_PERIOD_SQ.QUANTITY" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE_PERIOD_SQ.D1_UOM_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_PERIOD_SQ.D1_SQI_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_PERIOD_SQ.D1_TOU_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE_PERIOD_SQ.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_ACCT_PER.ACCT_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.PER_ID" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.ACCT_REL_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.FIN_RESP_SW" type="java.lang.String"></field>
+        <field id="CI_ACCT_PER.VERSION" type="java.math.BigDecimal"></field>
+        <field id="D1_USAGE.D1_USAGE_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE.USG_EXT_ID" type="java.lang.String"></field>
+        <field id="D1_USAGE.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE.START_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE.END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE.USG_GRP_CD" type="java.lang.String"></field>
+        <field id="D1_USAGE.USG_SRC_FLG" type="java.lang.String"></field>
+        <field id="D1_USAGE.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_USAGE.VERSION" type="java.math.BigDecimal"></field>
+        <field id="BILLING_DAYS" dataSetExpression="ElapsedDays(CI_BSEG.START_DT, CI_BSEG.END_DT)" type="java.math.BigDecimal"></field>
+        <field id="FT_COUNT" dataSetExpression="CountDistinct(CI_FT.FT_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="TOTAL_CUR_AMT" dataSetExpression="Sum(CI_FT.CUR_AMT, 'Current')" type="java.math.BigDecimal"></field>
+        <field id="TOTAL_TOT_AMT" dataSetExpression="Sum(CI_FT.TOT_AMT, 'Current')" type="java.math.BigDecimal"></field>
+        <field id="USAGE_TXN_COUNT" dataSetExpression="CountDistinct(D1_USAGE.D1_USAGE_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="TOTAL_USAGE_QTY" dataSetExpression="Sum(D1_USAGE_PERIOD_SQ.QUANTITY, 'Current')" type="java.math.BigDecimal"></field>
+        <field id="NO_USAGE_FLG" dataSetExpression="IIF(IsNull(C1_USAGE.USAGE_ID), 'Y', 'N')" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG' and Trim(CI_LOOKUP_VAL_L.FIELD_NAME) == 'BSEG_STAT_FLG' and CI_ACCT_PER.MAIN_CUST_SW == 'Y' and CI_FT.FREEZE_SW == 'Y' and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'</filterString>
+      <joinInfo alias="CI_BSEG" referenceId="CI_BSEG"></joinInfo>
+      <joinList>
+        <join expr="CI_BSEG.SA_ID == CI_SA.SA_ID" left="CI_BSEG" right="CI_SA" type="inner" weight="1"></join>
+        <join expr="CI_SA.ACCT_ID == CI_ACCT.ACCT_ID" left="CI_SA" right="CI_ACCT" type="inner" weight="1"></join>
+        <join expr="CI_BSEG.SA_ID == CI_FT.SA_ID and CI_BSEG.BILL_ID == CI_FT.BILL_ID" left="CI_BSEG" right="CI_FT" type="inner" weight="1"></join>
+        <join expr="CI_BSEG.SA_ID == C1_USAGE.SA_ID and CI_BSEG.BSEG_ID == C1_USAGE.BSEG_ID" left="CI_BSEG" right="C1_USAGE" type="leftOuter" weight="1"></join>
+        <join expr="C1_USAGE.USAGE_ID == D1_USAGE.USG_EXT_ID" left="C1_USAGE" right="D1_USAGE" type="leftOuter" weight="1"></join>
+        <join expr="D1_USAGE.D1_USAGE_ID == D1_USAGE_PERIOD_SQ.D1_USAGE_ID" left="D1_USAGE" right="D1_USAGE_PERIOD_SQ" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'" left="CI_ACCT" right="CI_ACCT_PER" type="leftOuter" weight="1"></join>
+        <join expr="CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'" left="CI_ACCT_PER" right="CI_PER_NAME" type="leftOuter" weight="1"></join>
+        <join expr="CI_BSEG.BSEG_STAT_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and Trim(CI_LOOKUP_VAL_L.FIELD_NAME) == 'BSEG_STAT_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="CI_BSEG" right="CI_LOOKUP_VAL_L" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="C1_USAGE" tableId="C1_USAGE"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT" tableId="CI_ACCT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_BSEG" tableId="CI_BSEG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_SA" tableId="CI_SA"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_FT" tableId="CI_FT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_USAGE_PERIOD_SQ" tableId="D1_USAGE_PERIOD_SQ"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_USAGE" tableId="D1_USAGE"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

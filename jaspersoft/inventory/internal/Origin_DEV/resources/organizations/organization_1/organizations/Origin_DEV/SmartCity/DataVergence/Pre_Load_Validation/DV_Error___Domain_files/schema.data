@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_DataVergence_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="DATAVERGENCE">
+          <string>DATAVERGENCE</string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="DV_VAL_ERROR_SUMMARY_VW" label="1.) DataVergence Validation Error" resourceId="JoinTree_1">
+      <items>
+        <item id="ERROR_MESSAGE" label="Error Message" resourceId="JoinTree_1.DV_VAL_ERROR_SUMMARY_VW.ERROR_MESSAGE"></item>
+        <item id="ERROR_VALUE" label="Error Value" resourceId="JoinTree_1.DV_VAL_ERROR_SUMMARY_VW.ERROR_VALUE"></item>
+        <item id="INPUT_GRP" label="Input Group" resourceId="JoinTree_1.DV_VAL_ERROR_SUMMARY_VW.INPUT_GRP"></item>
+        <item id="LEGACY_ID" label="Legacy ID" resourceId="JoinTree_1.DV_VAL_ERROR_SUMMARY_VW.LEGACY_ID"></item>
+        <item id="MAINT_OBJ_CD" label="Maintenance Object" resourceId="JoinTree_1.DV_VAL_ERROR_SUMMARY_VW.MAINT_OBJ_CD"></item>
+        <item id="SOURCE_FILE" label="Source File" resourceId="JoinTree_1.DV_VAL_ERROR_SUMMARY_VW.SOURCE_FILE"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet1" label="Descriptions" resourceId="JoinTree_1">
+      <items>
+        <item id="DESCR" label="Maintenance Object Description" resourceId="JoinTree_1.CI_MD_MO_L.DESCR"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet2" label="Formulas" resourceId="JoinTree_1">
+      <items>
+        <item id="LEGACY_ID_DIST" label="Distinct Legacy ID" resourceId="JoinTree_1.LEGACY_ID_DIST"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="DV_VAL_ERROR_SUMMARY_VW" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_VAL_ERROR_SUMMARY_VW" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="SOURCE_FILE" type="java.lang.String"></field>
+        <field id="LEGACY_ID" type="java.lang.String"></field>
+        <field id="ERROR_VALUE" type="java.lang.String"></field>
+        <field id="ERROR_MESSAGE" type="java.lang.String"></field>
+        <field id="MAINT_OBJ_CD" type="java.lang.String"></field>
+        <field id="INPUT_GRP" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_MD_MO_L" datasourceId="Origin_DataVergence_DS" datasourceTableName="CI_MD_MO_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="MAINT_OBJ_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_1" datasourceId="Origin_DataVergence_DS" datasourceTableName="DV_VAL_ERROR_SUMMARY_VW" schemaAlias="DATAVERGENCE">
+      <fieldList>
+        <field id="CI_MD_MO_L.MAINT_OBJ_CD" type="java.lang.String"></field>
+        <field id="CI_MD_MO_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_MD_MO_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_MD_MO_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_MD_MO_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="DV_VAL_ERROR_SUMMARY_VW.SOURCE_FILE" type="java.lang.String"></field>
+        <field id="DV_VAL_ERROR_SUMMARY_VW.LEGACY_ID" type="java.lang.String"></field>
+        <field id="DV_VAL_ERROR_SUMMARY_VW.ERROR_VALUE" type="java.lang.String"></field>
+        <field id="DV_VAL_ERROR_SUMMARY_VW.ERROR_MESSAGE" type="java.lang.String"></field>
+        <field id="DV_VAL_ERROR_SUMMARY_VW.MAINT_OBJ_CD" type="java.lang.String"></field>
+        <field id="DV_VAL_ERROR_SUMMARY_VW.INPUT_GRP" type="java.lang.String"></field>
+        <field id="LEGACY_ID_DIST" dataSetExpression="CountDistinct(DV_VAL_ERROR_SUMMARY_VW.LEGACY_ID, 'Current')" type="java.lang.Long"></field>
+      </fieldList>
+      <joinInfo alias="DV_VAL_ERROR_SUMMARY_VW" referenceId="DV_VAL_ERROR_SUMMARY_VW"></joinInfo>
+      <joinList>
+        <join expr="DV_VAL_ERROR_SUMMARY_VW.MAINT_OBJ_CD == CI_MD_MO_L.MAINT_OBJ_CD and CI_MD_MO_L.LANGUAGE_CD == 'ENG'" left="DV_VAL_ERROR_SUMMARY_VW" right="CI_MD_MO_L" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="DV_VAL_ERROR_SUMMARY_VW" tableId="DV_VAL_ERROR_SUMMARY_VW"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_MD_MO_L" tableId="CI_MD_MO_L"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

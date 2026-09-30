@@ -118,7 +118,7 @@ This chains baseline status capture, baseline job gate, full validation, and ins
 sanity gate. It exits non-zero and writes a failure marker under
 `deploy/snapshot_rollout_logs/` when anything fails.
 
-Do not deploy the rolling-window procedures or recurring 6-hour jobs until the
+Do not deploy the rolling-window procedures or the recurring jobs until the
 baseline job gate and validation output are acceptable.
 
 ## Install validation compound steps
@@ -155,8 +155,7 @@ Logs for compound steps:
 
 `07_schedule_all_active_snapshots.sql`:
 - creates the scheduler jobs from the package-level job scripts for the active 7 plus `CMS_SA_SNAPSHOT`
-- then applies the current approved staggered 6-hour cadence from:
-  - [apply_6hour_staggered_schedule_1am_base.sql](/C:/Users/cvpow/OneDrive/Desktop/OriginBA/sql/performance/snapshots/apply_6hour_staggered_schedule_1am_base.sql)
+- then applies the current cadence -- two runs a day (10:00 and 16:00 UTC waves, 30-minute stagger, fast tables first, FT GL and D1 scalar last) -- from `../apply_3x_daily_schedule_11utc_base.sql` (historical file name; content is 2x daily). The package job scripts still CREATE the jobs on the old 6-hour interval, so a fresh install passes through that cadence until this script re-times them a moment later.
 
 ## Consolidation snapshots (12 tables)
 

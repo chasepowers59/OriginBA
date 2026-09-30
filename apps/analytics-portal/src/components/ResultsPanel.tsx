@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import type { QueryResponse } from "@/lib/types";
 import {
   formatBoolean,
   formatCellValue,
+  formatCompact,
   formatCurrency,
+  formatDate,
   formatNumber,
   formatPercent,
   formatDateTime,
@@ -21,6 +23,10 @@ import { downloadWorkbook } from "@/lib/exportXlsx";
 import { printCouncilPack } from "@/lib/councilPack";
 import { useBrand } from "@/components/PortalThemeProvider";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
+import { downloadPdf } from "@/lib/api";
+import { isMeasureColumn, summarizeResult, totalRow } from "@/lib/resultSummary";
+import { POPOVER_PANEL, menuFocusIndex, usePopover } from "@/lib/popover";
+import { aggIsAdditive } from "@/lib/chartLayout";
 
 type SortDir = "asc" | "desc";
 
@@ -29,7 +35,6 @@ type ResultsPanelProps = {
   dimensionKey: string;
   measureKey: string;
   chartType: "bar" | "line" | "pie" | "horizontal" | "table";
-  totalMeasure: number | null;
   loading: boolean;
   snapshotId: string;
   snapshotLabel?: string;
@@ -52,6 +57,9 @@ type ResultsPanelProps = {
     drillFilter?: { field: string; value: string } | null;
   };
   onWidenPeriod?: () => void;
+  onShowAllDates?: () => void;
+  /** Beside Export in the result toolbar (the explorer's Save menu). */
+  actions?: ReactNode;
 };
 
 export function ResultsPanel({
@@ -59,7 +67,6 @@ export function ResultsPanel({
   dimensionKey,
   measureKey,
   chartType,
-  totalMeasure,
   loading,
   snapshotId,
   snapshotLabel,
@@ -77,26 +84,33 @@ export function ResultsPanel({
   sortTimeSeries,
   emptyContext,
   onWidenPeriod,
+  onShowAllDates,
+  actions,
 }: ResultsPanelProps) {
   const brand = useBrand();
+  const [pdfState, setPdfState] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const kpi = kpiLabelsForMeasure(measureField, measureAgg);
   const isCurrency = measureDisplaysAsCurrency(measureField, measureAgg);
 
-  const insight = useMemo(() => {
-    if (!result || !measureKey || !dimensionKey || !result.rows.length) return null;
-    const sorted = [...result.rows].sort(
-      (a, b) => Number(b[measureKey] ?? 0) - Number(a[measureKey] ?? 0),
-    );
-    const top = sorted[0];
-    if (!top) return null;
-    const topValue = Number(top[measureKey] ?? 0);
-    const total = sorted.reduce((s, r) => s + Number(r[measureKey] ?? 0), 0);
-    if (total <= 0) return null; // "leads at 0.0% of total" is noise, not an insight
-    const label = String(top[dimensionKey] ?? "Top value");
-    return { label, share: (topValue / total) * 100, topValue };
-  }, [result, measureKey, dimensionKey]);
+  const summary = useMemo(
+    () =>
+      result
+        ? summarizeResult({
+            columns: result.columns,
+            rows: result.rows,
+            measureKey,
+            dimensionKey,
+            measureField,
+            measureAgg,
+            labels: columnLabels,
+          })
+        : null,
+    [result, measureKey, dimensionKey, measureField, measureAgg, columnLabels],
+  );
+  const insight = summary?.leader;
+  const footer = result && !summary?.notTotalled ? totalRow(result.columns, measureKey, summary?.total ?? null) : null;
 
   const sortedRows = useMemo(() => {
     if (!result || !measureKey) return [];
@@ -128,16 +142,15 @@ export function ResultsPanel({
         <EmptyStateIcon variant="search" />
         <h3 className="text-lg font-semibold text-heading">No data for this view</h3>
         <p className="mt-3 max-w-md text-sm text-fg-muted">
-          {ctx?.periodLabel ? (
+          {result.applied_window ? (
+            // The window is the server's, so neither "your current filters" nor the
+            // reader's own period (under All dates) is what matched nothing.
+            <>{result.applied_window.note}</>
+          ) : ctx?.periodLabel ? (
             <>
               Nothing matched <strong className="text-heading">{ctx.periodLabel}</strong>
-              {ctx.dateRange ? ` (${ctx.dateRange[0]} to ${ctx.dateRange[1]})` : ""}.
+              {ctx.dateRange ? ` (${formatDate(ctx.dateRange[0])} to ${formatDate(ctx.dateRange[1])})` : ""}.
             </>
-          ) : result.applied_window ? (
-            // "your current filters" is wrong in exactly this case: the reader set
-            // none, and the window is the server's. Blaming filters they never chose
-            // sends them looking for something that is not on screen.
-            <>{result.applied_window.note}</>
           ) : (
             "Nothing matched your current filters."
           )}
@@ -150,9 +163,14 @@ export function ResultsPanel({
           Try widening the reporting period, clearing scope or cross-filters, or pick a different
           field.
         </p>
-        <div className="mt-5 flex flex-wrap justify-center gap-2">
+        <div className="relative mt-5 flex flex-wrap justify-center gap-2">
+          {onShowAllDates ? (
+            <button type="button" onClick={onShowAllDates} className="btn-primary text-xs">
+              Show all dates
+            </button>
+          ) : null}
           {onWidenPeriod ? (
-            <button type="button" onClick={onWidenPeriod} className="btn-primary text-xs">
+            <button type="button" onClick={onWidenPeriod} className={`${onShowAllDates ? "btn-ghost" : "btn-primary"} text-xs`}>
               Widen date range
             </button>
           ) : null}
@@ -161,6 +179,7 @@ export function ResultsPanel({
               Clear cross-filter
             </button>
           ) : null}
+          {actions}
         </div>
       </div>
     );
@@ -184,6 +203,22 @@ export function ResultsPanel({
     );
   };
 
+  const handlePdf = async () => {
+    setPdfState("Preparing…");
+    try {
+      await downloadPdf({
+        title: reportTitle ?? snapshotLabel ?? snapshotId,
+        note: [periodLabel, dateRange ? `${formatDate(dateRange[0])} to ${formatDate(dateRange[1])}` : null].filter(Boolean).join(" · "),
+        columns: result.columns,
+        labels: Object.fromEntries(result.columns.map((c) => [c, columnLabels[c] ?? prettifyFieldName(c)])),
+        rows: result.rows,
+      });
+      setPdfState(null);
+    } catch (err) {
+      setPdfState(err instanceof Error ? err.message : "The PDF could not be made.");
+    }
+  };
+
   const formatMeasure = (value: unknown) =>
     isCurrency ? formatCurrency(value) : formatNumber(value);
 
@@ -200,7 +235,7 @@ export function ResultsPanel({
         <p className="mt-1 text-sm text-fg-muted">{snapshotLabel}</p>
         <p className="mt-2 text-xs text-fg-muted">
           {periodLabel ?? "Reporting period"}
-          {dateRange ? ` · ${dateRange[0]} to ${dateRange[1]}` : ""}
+          {dateRange ? ` · ${formatDate(dateRange[0])} to ${formatDate(dateRange[1])}` : ""}
           {scopeLabel ? ` · ${scopeLabel}` : ""}
         </p>
         <p className="mt-1 text-xs text-fg-muted">
@@ -210,37 +245,44 @@ export function ResultsPanel({
       </div>
 
       <div className="no-print flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <h3 className="text-lg font-semibold text-heading">
             {reportTitle ?? "Analysis results"}
           </h3>
           <p className="text-sm text-fg-muted">
             {periodLabel ? `${periodLabel} · ` : ""}
-            {result.row_count} field values
+            {formatNumber(result.row_count)} {result.row_count === 1 ? "row" : "rows"}
             {loading ? " · updating…" : ""}
           </p>
           <AppliedWindowNote result={result} />
         </div>
-        <div className="flex gap-2">
+        {/* relative: below sm a toolbar popup spans this row, not its button. */}
+        <div className="relative flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))}
-            className="btn-ghost"
+            className="btn-ghost whitespace-nowrap"
           >
             Sort {sortDir === "desc" ? "high → low" : "low → high"}
           </button>
-          <button type="button" onClick={handleExport} className="btn-ghost">
-            Export to Excel
-          </button>
-          <button
-            type="button"
-            onClick={() => printCouncilPack(reportTitle ?? snapshotLabel ?? snapshotId)}
-            className="btn-primary"
-          >
-            Council pack (PDF)
-          </button>
+          <ExportMenu
+            items={[
+              { label: "Excel workbook", onSelect: handleExport },
+              { label: "Download PDF", onSelect: () => void handlePdf(), disabled: pdfState === "Preparing…" },
+              {
+                label: "Council pack (PDF)",
+                onSelect: () => printCouncilPack(reportTitle ?? snapshotLabel ?? snapshotId),
+              },
+            ]}
+          />
+          {actions}
         </div>
       </div>
+      {pdfState ? (
+        <p role="status" className="no-print text-xs text-fg-muted">
+          {pdfState === "Preparing…" ? "Preparing the PDF…" : pdfState}
+        </p>
+      ) : null}
 
       {onDrillSelect && !drillFilter ? (
         <p className="no-print text-xs text-fg-muted">
@@ -252,15 +294,16 @@ export function ResultsPanel({
         <div className="rounded-xl border border-edge tint-panel px-4 py-3 text-sm text-heading">
           <span className="font-medium text-heading">{insight.label}</span> leads this view at{" "}
           <span className="font-semibold text-primary">{formatPercent(insight.share)}</span> of the
-          total ({formatMeasure(insight.topValue)}).
+          total ({formatMeasure(insight.value)}).
         </div>
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <KpiCard label={kpi.groups} value={formatNumber(result.row_count)} />
+        <KpiCard label={kpi.groups} value={formatCompact(result.row_count)} />
         <KpiCard
           label={kpi.total}
-          value={totalMeasure != null ? formatMeasure(totalMeasure) : "—"}
+          value={formatCompact(summary?.total, { currency: isCurrency })}
+          note={summary?.notTotalled}
           highlight
         />
         <KpiCard label={kpi.breakdown} value={breakdownLabel} small />
@@ -278,6 +321,7 @@ export function ResultsPanel({
                 key: measureKey,
                 label: columnLabels[measureKey] ?? "Value",
                 currency: isCurrency,
+                additive: aggIsAdditive(measureAgg),
               },
             ]}
             selectedCategory={drillFilter?.value ?? null}
@@ -294,12 +338,13 @@ export function ResultsPanel({
             ? "Results table — click a row to cross-filter"
             : "Detail table — click a row to cross-filter"}
         </div>
-        <div className={chartType === "table" ? "max-h-[560px] overflow-auto" : "max-h-[420px] overflow-auto"}>
+        <div className="max-h-[70vh] overflow-auto"
+             tabIndex={0} role="region" aria-label={chartType === "table" ? "Results table" : "Detail table"}>
           <table className="min-w-full text-left text-sm">
             <thead className="sticky top-0 border-b border-edge-subtle bg-surface-solid backdrop-blur">
               <tr>
                 {result.columns.map((col) => (
-                  <th key={col} className="px-4 py-3 font-medium text-fg-muted">
+                  <th key={col} className={`px-4 py-3 font-medium text-fg-muted ${isMeasureColumn(col) ? "text-right" : ""}`}>
                     {columnLabels[col] ?? prettifyFieldName(col)}
                   </th>
                 ))}
@@ -312,16 +357,16 @@ export function ResultsPanel({
                   onClick={() =>
                     onDrillSelect?.(String(row[dimensionKey] ?? ""))
                   }
-                  className={`border-b border-edge-subtle transition hover:bg-white/[0.03] ${
+                  className={`border-b border-edge-subtle transition ${
  onDrillSelect ? "cursor-pointer" : ""
  } ${
  drillFilter?.value === String(row[dimensionKey])
  ? "bg-warn-bg"
- : ""
+ : "hover:bg-chip"
  }`}
                 >
                   {result.columns.map((col) => (
-                    <td key={col} className="px-4 py-2.5 text-heading">
+                    <td key={col} className={`px-4 py-2.5 text-heading ${isMeasureColumn(col) ? "text-right tabular-nums" : ""}`}>
                       {formatCellValue(row[col], {
                         columnId: col,
                         isMeasure: col === measureKey,
@@ -333,6 +378,18 @@ export function ResultsPanel({
                 </tr>
               ))}
             </tbody>
+            {footer ? (
+              <tfoot className="sticky bottom-0 border-t border-edge-subtle bg-surface-solid">
+                <tr>
+                  {footer.map((v, i) => (
+                    <td key={result.columns[i]}
+                        className={`px-4 py-2.5 font-semibold text-heading ${isMeasureColumn(result.columns[i]) ? "text-right tabular-nums" : ""}`}>
+                      {typeof v === "number" ? formatCellValue(v, { columnId: measureKey, isMeasure: true, asCurrency: isCurrency }) : v}
+                    </td>
+                  ))}
+                </tr>
+              </tfoot>
+            ) : null}
           </table>
         </div>
       </div>
@@ -349,14 +406,78 @@ export function ResultsPanel({
   );
 }
 
+type ExportItem = { label: string; onSelect: () => void; disabled?: boolean };
+
+function ExportMenu({ items }: { items: ExportItem[] }) {
+  const { open, setOpen, rootRef, triggerRef } = usePopover();
+  const menuId = useId();
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  useEffect(() => {
+    if (open) itemRefs.current[0]?.focus();
+  }, [open]);
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Tab") {
+      setOpen(false);
+      return;
+    }
+    const current = itemRefs.current.findIndex((el) => el === document.activeElement);
+    const next = menuFocusIndex(e.key, current, items.length);
+    if (next == null) return;
+    e.preventDefault();
+    itemRefs.current[next]?.focus();
+  };
+
+  return (
+    <div ref={rootRef} className="sm:relative">
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="btn-ghost whitespace-nowrap"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-controls={open ? menuId : undefined}
+      >
+        Export <span aria-hidden="true">▾</span>
+      </button>
+      {open ? (
+        <div id={menuId} role="menu" aria-label="Export" onKeyDown={onKeyDown} className={`${POPOVER_PANEL} p-1.5 sm:w-56`}>
+          {items.map((item, i) => (
+            <button
+              key={i}
+              ref={(el) => {
+                itemRefs.current[i] = el;
+              }}
+              type="button"
+              role="menuitem"
+              disabled={item.disabled}
+              onClick={() => {
+                setOpen(false);
+                item.onSelect();
+              }}
+              className="block w-full rounded-lg px-3 py-2 text-left text-sm text-heading hover:bg-chip disabled:opacity-60"
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function KpiCard({
   label,
   value,
+  note,
   highlight,
   small,
 }: {
   label: string;
   value: string;
+  note?: string | null;
   highlight?: boolean;
   small?: boolean;
 }) {
@@ -375,6 +496,7 @@ function KpiCard({
       >
         {value}
       </p>
+      {note ? <p className="mt-1 text-xs text-fg-muted">{note}</p> : null}
     </div>
   );
 }

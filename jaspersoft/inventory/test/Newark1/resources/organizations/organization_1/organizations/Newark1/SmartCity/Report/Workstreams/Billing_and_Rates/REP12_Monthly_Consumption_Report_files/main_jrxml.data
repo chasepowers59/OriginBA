@@ -1,0 +1,793 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 8.2.0.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="REP12_Monthly_Consumption_Report" pageWidth="870" pageHeight="595" orientation="Landscape" columnWidth="830" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="92f26fd8-4636-45c0-a8b6-eb249ac98aba">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Newark - JRS TST DB"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="gcinco@originutility.com|Newark1"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Report/Workstreams/Billing_and_Rates/REP12_Monthly_Consumption_Report_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Report/Workstreams/Billing_and_Rates/REP12_Monthly_Consumption_Report"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 1_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 1_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 1_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 1_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="MonthlyConsumptionReport" uuid="8ce37615-64b8-4692-8be9-981637faafcf">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Newark - JRS TST DB"/>
+		<parameter name="Start_Date" class="java.sql.Date"/>
+		<parameter name="End_Date" class="java.sql.Date"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT
+        BSEG.BILL_ID ,
+        BSEG.BSEG_ID ,
+        BSEG.SA_ID   ,
+        BSEG.START_DT,
+        BSEG.END_DT  ,
+        BSQ.BILL_SQ  ,
+        CASE
+        WHEN
+                PC.CHAR_VAL = 'M1'
+        THEN
+                'M1'
+        WHEN
+                PC.CHAR_VAL = 'MS1'
+        THEN
+                'MS1'
+        ELSE
+                SA.SA_TYPE_CD
+        END AS SA_TYPE_CD,
+        CASE
+        WHEN
+                SA.OLD_ACCT_ID IN ('0000013924',
+                                   '0000013925',
+                                   '0000051670',
+                                   '0000013928')
+        THEN
+                'BELLEVILLE'
+        WHEN
+                SA.OLD_ACCT_ID IN ('0000013927',
+                                   '0000013931',
+                                   '0000051057')
+        THEN
+                'COE'
+        WHEN
+                SA.OLD_ACCT_ID IN ('0000013934',
+                                   '0000013935',
+                                   '0000013936',
+                                   '0000013940',
+                                   '0000013941',
+                                   '0000013942')
+        THEN
+                'WAYNE'
+        WHEN
+                SA.OLD_ACCT_ID = '0000013943'
+        THEN
+                'BLOOMFIELD'
+        WHEN
+                SA.OLD_ACCT_ID IN ('0000013945',
+                                   '0000013948',
+                                   '0000045781')
+        THEN
+                'PEQUANNOCK'
+        WHEN
+                SA.OLD_ACCT_ID = '0000013951'
+        THEN
+                'ELIZABETH'
+        WHEN
+                SA.OLD_ACCT_ID IN ('0000050719',
+                                   '0000052861')
+        THEN
+                'ORANGE'
+        ELSE
+                SA.SA_TYPE_CD
+        END AS OOT_SA_TYP_CD,
+        SA.ACCT_ID          ,
+        SA.OLD_ACCT_ID      ,
+        SA.CHAR_PREM_ID     ,
+        PREM.ADDRESS1
+FROM
+        CISADM.CI_SA SA
+INNER JOIN
+        CISADM.CI_PREM_CHAR PC
+ON
+        PC.PREM_ID = SA.CHAR_PREM_ID
+AND     PC.CHAR_TYPE_CD = 'PVSCRATE'
+INNER JOIN
+        CISADM.CI_PREM PREM
+ON
+        PREM.PREM_ID = SA.CHAR_PREM_ID
+INNER JOIN
+        CISADM.CI_BSEG BSEG
+ON
+        BSEG.SA_ID = SA.SA_ID
+AND     BSEG.BSEG_STAT_FLG = '50'
+INNER JOIN
+        CISADM.CI_BSEG_SQ BSQ
+ON
+        BSQ.BSEG_ID = BSEG.BSEG_ID
+AND     BSQ.UOM_CD  = 'CF'
+AND     BSQ.TOU_CD  = ' '
+AND     BSQ.SQI_CD  = ' '
+WHERE
+        SA.SA_TYPE_CD IN ('W-COM', 'W-IND', 'W-OOT', 'W-RES')
+AND BSEG.END_DT >= $P{Start_Date}
+AND ((BSEG.END_DT <= $P{End_Date}
+    AND SA.SA_TYPE_CD IN ( 'W-COM', 'W-IND', 'W-RES' ))
+    OR (BSEG.END_DT <= $P{End_Date} + 5
+    AND SA.SA_TYPE_CD IN ( 'W-OOT' )))]]>
+		</queryString>
+		<field name="BILL_ID" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="BILL_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="BILL_ID"/>
+		</field>
+		<field name="BSEG_ID" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="BSEG_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="BSEG_ID"/>
+		</field>
+		<field name="SA_ID" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="SA_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="SA_ID"/>
+		</field>
+		<field name="START_DT" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.name" value="START_DT"/>
+			<property name="com.jaspersoft.studio.field.label" value="START_DT"/>
+		</field>
+		<field name="END_DT" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.name" value="END_DT"/>
+			<property name="com.jaspersoft.studio.field.label" value="END_DT"/>
+		</field>
+		<field name="BILL_SQ" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="BILL_SQ"/>
+			<property name="com.jaspersoft.studio.field.label" value="BILL_SQ"/>
+		</field>
+		<field name="SA_TYPE_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="SA_TYPE_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="SA_TYPE_CD"/>
+		</field>
+		<field name="OOT_SA_TYP_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="OOT_SA_TYP_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="OOT_SA_TYP_CD"/>
+		</field>
+		<field name="ACCT_ID" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ACCT_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="ACCT_ID"/>
+		</field>
+		<field name="OLD_ACCT_ID" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="OLD_ACCT_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="OLD_ACCT_ID"/>
+		</field>
+		<field name="CHAR_PREM_ID" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="CHAR_PREM_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="CHAR_PREM_ID"/>
+		</field>
+		<field name="ADDRESS1" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ADDRESS1"/>
+			<property name="com.jaspersoft.studio.field.label" value="ADDRESS1"/>
+		</field>
+	</subDataset>
+	<subDataset name="MonthlyConsumptionReportCrossTab" uuid="0ed76363-9678-45ab-b28f-0846d4c8aefc">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+		<parameter name="Start_Date" class="java.sql.Date"/>
+		<parameter name="End_Date" class="java.sql.Date"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT
+TO_CHAR(TRUNC(BSEG.END_DT, 'MM'),'YYYY-MM') AS MONTH,
+SUM(BSQ.BILL_SQ) AS BILL_SQ,
+SA.SA_TYPE_CD,
+SA.OOT_SA_TYP_CD
+FROM   
+    (SELECT
+        SA.SA_ID,
+        CASE
+                WHEN PC.CHAR_VAL = 'M1' THEN 'M1'
+                WHEN PC.CHAR_VAL = 'MS1' THEN 'MS1'
+                ELSE SA.SA_TYPE_CD
+        END AS SA_TYPE_CD,
+        SA.ACCT_ID,
+        SA.OLD_ACCT_ID,
+        SA.CHAR_PREM_ID,
+        CASE
+            WHEN SA.OLD_ACCT_ID = '0000013924' THEN 'BELLEVILLE'
+            WHEN SA.OLD_ACCT_ID = '0000013925' THEN 'BELLEVILLE'
+            WHEN SA.OLD_ACCT_ID = '0000051670' THEN 'BELLEVILLE'
+            WHEN SA.OLD_ACCT_ID = '0000013928' THEN 'BELLEVILLE'
+            WHEN SA.OLD_ACCT_ID = '0000013927' THEN 'COE'
+            WHEN SA.OLD_ACCT_ID = '0000013931' THEN 'COE'
+            WHEN SA.OLD_ACCT_ID = '0000051057' THEN 'COE'
+            WHEN SA.OLD_ACCT_ID = '0000013934' THEN 'WAYNE'
+            WHEN SA.OLD_ACCT_ID = '0000013935' THEN 'WAYNE'
+            WHEN SA.OLD_ACCT_ID = '0000013936' THEN 'WAYNE'
+            WHEN SA.OLD_ACCT_ID = '0000013940' THEN 'WAYNE'
+            WHEN SA.OLD_ACCT_ID = '0000013941' THEN 'WAYNE'
+            WHEN SA.OLD_ACCT_ID = '0000013942' THEN 'WAYNE'
+            WHEN SA.OLD_ACCT_ID = '0000013943' THEN 'BLOOMFIELD'
+            WHEN SA.OLD_ACCT_ID = '0000013945' THEN 'PEQUANNOCK'
+            WHEN SA.OLD_ACCT_ID = '0000013948' THEN 'PEQUANNOCK'
+            WHEN SA.OLD_ACCT_ID = '0000045781' THEN 'PEQUANNOCK'
+            WHEN SA.OLD_ACCT_ID = '0000013951' THEN 'ELIZABETH'
+            WHEN SA.OLD_ACCT_ID = '0000050719' THEN 'ORANGE'
+            WHEN SA.OLD_ACCT_ID = '0000052861' THEN 'ORANGE'
+            ELSE SA.SA_TYPE_CD
+        END AS OOT_SA_TYP_CD
+        FROM   CISADM.CI_SA SA, CISADM.CI_PREM_CHAR PC
+        WHERE  SA.CHAR_PREM_ID = PC.PREM_ID
+        AND PC.CHAR_TYPE_CD = 'PVSCRATE'
+        AND SA.SA_TYPE_CD IN ( 'W-COM', 'W-IND', 'W-OOT', 'W-RES')
+    ) SA
+    INNER JOIN CISADM.CI_PREM PREM
+        ON PREM.PREM_ID = SA.CHAR_PREM_ID
+    INNER JOIN CISADM.CI_BSEG BSEG
+        ON BSEG.SA_ID = SA.SA_ID
+    INNER JOIN CISADM.CI_BSEG_SQ BSQ
+        ON BSQ.BSEG_ID = BSEG.BSEG_ID
+        AND BSQ.UOM_CD = 'CF'
+        AND BSQ.TOU_CD = ' '
+        AND BSQ.SQI_CD = ' '    
+WHERE
+BSEG.END_DT >= $P{Start_Date}
+AND ((BSEG.END_DT <= $P{End_Date})
+    OR (BSEG.END_DT <= $P{End_Date} + 5
+        AND SA.SA_TYPE_CD IN ( 'W-OOT' )))
+AND BSEG.BSEG_STAT_FLG = '50'
+GROUP BY TRUNC(BSEG.END_DT, 'MM'), SA.OOT_SA_TYP_CD,SA.SA_TYPE_CD
+ORDER BY MONTH DESC]]>
+		</queryString>
+		<field name="MONTH" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="BILL_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="BILL_ID"/>
+		</field>
+		<field name="BILL_SQ" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="BILL_SQ"/>
+			<property name="com.jaspersoft.studio.field.label" value="BILL_SQ"/>
+		</field>
+		<field name="SA_TYPE_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="SA_TYPE_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="SA_TYPE_CD"/>
+		</field>
+		<field name="OOT_SA_TYP_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="OOT_SA_TYP_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="OOT_SA_TYP_CD"/>
+		</field>
+	</subDataset>
+	<parameter name="Start_Date" class="java.sql.Date"/>
+	<parameter name="End_Date" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 1 FROM CISADM.CI_ACCT WHERE ROWNUM = 1]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="0" width="829" height="75" uuid="9270367f-d362-4e24-beec-5bddd6ed9261"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Monthly Consumption Report for " + new SimpleDateFormat("MMMM dd yyyy").format($P{Start_Date}) + " to " + new SimpleDateFormat("MMMM dd yyyy").format($P{End_Date})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="150">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
+			<crosstab horizontalPosition="Center">
+				<reportElement x="0" y="0" width="830" height="150" uuid="388f4506-0ea8-4291-bf85-8ba56627b32e">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.crosstab.style.header" value="Crosstab 1_CH"/>
+					<property name="com.jaspersoft.studio.crosstab.style.group" value="Crosstab 1_CG"/>
+					<property name="com.jaspersoft.studio.crosstab.style.total" value="Crosstab 1_CT"/>
+					<property name="com.jaspersoft.studio.crosstab.style.detail" value="Crosstab 1_CD"/>
+				</reportElement>
+				<crosstabDataset>
+					<dataset>
+						<datasetRun subDataset="MonthlyConsumptionReport" uuid="900c4f79-f9df-4f28-8fc1-e3f1f568e3b2">
+							<datasetParameter name="Start_Date">
+								<datasetParameterExpression><![CDATA[$P{Start_Date}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="End_Date">
+								<datasetParameterExpression><![CDATA[$P{End_Date}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+					</dataset>
+				</crosstabDataset>
+				<rowGroup name="OOT_SA_TYP_CD" width="100" totalPosition="End">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{OOT_SA_TYP_CD}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents mode="Opaque" style="Crosstab 1_CH">
+							<textField>
+								<reportElement x="0" y="0" width="100" height="20" uuid="b5ec7bde-a8a8-41a0-88e1-13827b334294"/>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{OOT_SA_TYP_CD}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents mode="Opaque" style="Crosstab 1_CT">
+							<staticText>
+								<reportElement x="0" y="0" width="100" height="20" forecolor="#FFFFFF" uuid="1421256b-d7f5-4daa-bd5d-9bb8666adb1d"/>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Total OOT_SA_TYP_CD]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="SA_TYPE_CD" height="20" totalPosition="End">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{SA_TYPE_CD}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents mode="Opaque" style="Crosstab 1_CH">
+							<textField>
+								<reportElement x="0" y="0" width="100" height="20" uuid="ee232b2d-6651-4772-80f4-a09c4a92bc99"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{SA_TYPE_CD}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents mode="Opaque" style="Crosstab 1_CT">
+							<staticText>
+								<reportElement x="0" y="0" width="100" height="20" forecolor="#FFFFFF" uuid="074c4119-9280-4e1d-bddf-836af8ab8279"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Total SA_TYPE_CD]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="BILL_SQ_MEASURE" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{BILL_SQ}]]></measureExpression>
+				</measure>
+				<crosstabCell width="100" height="20">
+					<cellContents mode="Opaque" style="Crosstab 1_CD">
+						<textField>
+							<reportElement x="0" y="0" width="100" height="20" uuid="fc858646-934e-41c5-a490-fd4137501b2e"/>
+							<textFieldExpression><![CDATA[$V{BILL_SQ_MEASURE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="100" height="20" columnTotalGroup="SA_TYPE_CD">
+					<cellContents mode="Opaque" style="Crosstab 1_CT">
+						<textField>
+							<reportElement x="0" y="0" width="100" height="20" forecolor="#FFFFFF" uuid="c413fd2a-a9fe-4402-aa77-a1649973ee17"/>
+							<textElement>
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{BILL_SQ_MEASURE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="100" height="20" rowTotalGroup="OOT_SA_TYP_CD">
+					<cellContents mode="Opaque" style="Crosstab 1_CT">
+						<textField>
+							<reportElement x="0" y="0" width="100" height="20" forecolor="#FFFFFF" uuid="86197843-fae3-4604-b3fb-5d6233cef4cc"/>
+							<textElement>
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{BILL_SQ_MEASURE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="100" height="20" rowTotalGroup="OOT_SA_TYP_CD" columnTotalGroup="SA_TYPE_CD">
+					<cellContents mode="Opaque" style="Crosstab 1_CT">
+						<textField>
+							<reportElement x="0" y="0" width="100" height="20" forecolor="#FFFFFF" uuid="a9b43dee-defd-458b-bb9a-758f0315574e"/>
+							<textElement>
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{BILL_SQ_MEASURE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+		<band height="100" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<componentElement>
+				<reportElement x="1" y="20" width="829" height="60" uuid="39da621f-a61d-4eca-a77f-e29c95fb6f13">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="MonthlyConsumptionReportCrossTab" uuid="1faed632-1eb1-4b74-8acb-09d53cac0b58">
+						<datasetParameter name="Start_Date">
+							<datasetParameterExpression><![CDATA[$P{Start_Date}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="End_Date">
+							<datasetParameterExpression><![CDATA[$P{End_Date}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="69" uuid="0eeeb7ea-c776-4fe5-8bcb-b30aade24022">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="132004d2-a2bb-4f6a-bdb0-522c6ceb9eed"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[MONTH]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="9176eac3-5cd9-4a6d-b577-6f763ae0c62b"/>
+								<textFieldExpression><![CDATA[$F{MONTH}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="ea2113e3-c84c-409f-bdc7-b839e954c497">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="0bc0f733-6c2b-4888-b1c4-26c6896e0161"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[BILL_SQ]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="944766e4-e96b-486a-97ff-c3f77276cd46"/>
+								<textFieldExpression><![CDATA[$F{BILL_SQ}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="a049ad35-195c-4bd1-b8d4-2d8b4dfdb373">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="79f0382d-c5eb-4a5f-a709-7318a67ef340"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[SA_TYPE_CD]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="6adffe27-ace6-4259-9756-94fc4c0d03fb"/>
+								<textFieldExpression><![CDATA[$F{SA_TYPE_CD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="f8ba2ce6-0425-49df-87c3-d38d6de9f7e8">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="d7615bda-3b60-4d26-8620-4f2aabe7554e"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[OOT_SA_TYP_CD]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="dee9c88c-2a0b-4866-b1d2-cc87cf27052b"/>
+								<textFieldExpression><![CDATA[$F{OOT_SA_TYP_CD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="100" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<componentElement>
+				<reportElement x="1" y="20" width="829" height="60" uuid="0355de00-1edf-4b77-9b01-f7d8b96a76c3">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="MonthlyConsumptionReport" uuid="f71e19e0-7a53-4911-a12d-dd99977b4c63">
+						<datasetParameter name="Start_Date">
+							<datasetParameterExpression><![CDATA[$P{Start_Date}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="End_Date">
+							<datasetParameterExpression><![CDATA[$P{End_Date}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="69" uuid="507ddad4-2ed3-4fd6-823d-d1f9646fd0ae">
+						<jr:columnHeader style="Table_CH" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="4fee26cf-9a35-461d-ba60-fa4f81f2a5bc"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[BILL_ID]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="f8b39702-3295-43e4-8a0c-87980b1e6328"/>
+								<textFieldExpression><![CDATA[$F{BILL_ID}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="b41915ac-c57c-4521-a443-d34b6ee4e5e4">
+						<jr:columnHeader style="Table_CH" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="a17671bc-7c0c-45c8-ae5e-f44c92f6abad"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[BSEG_ID]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="a17fb737-eb9d-499b-8f2a-6d62ae11da25"/>
+								<textFieldExpression><![CDATA[$F{BSEG_ID}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="7f2db457-8ee6-4ee4-8c5b-17189e83f8e6">
+						<jr:columnHeader style="Table_CH" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="1b6438b9-56d7-4f56-8581-f1de39b47335"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[SA_ID]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="5c2e7b16-d341-423a-ae4a-3a000132e270"/>
+								<textFieldExpression><![CDATA[$F{SA_ID}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="d83878d8-43b9-4aba-a2fb-bc9e244cfa56">
+						<jr:columnHeader style="Table_CH" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="37d013a8-67f7-44df-b4e5-7c4b0f3cd4e5"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[START_DT]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="4be3ab02-7b6b-4700-9b22-d12599d07e9c"/>
+								<textFieldExpression><![CDATA[new SimpleDateFormat("MM/dd/yyyy").format($F{START_DT})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="5198b5fa-7820-4c88-9798-9b8f3bedd2c6">
+						<jr:columnHeader style="Table_CH" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="efe7c608-00f7-4489-962b-b8ad40691d11"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[END_DT]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="532dfb11-bc1b-44c6-8118-8b684fce4fbf"/>
+								<textFieldExpression><![CDATA[new SimpleDateFormat("MM/dd/yyyy").format($F{END_DT})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="11f0e8d4-aebf-4d05-a5e2-075e7f0825d2">
+						<jr:columnHeader style="Table_CH" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="0ab1e0a3-b3aa-4727-b987-680e3eaa2044"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[BILL_SQ]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="42c6b3c2-46c6-4dd3-8af7-31d98b13a05f"/>
+								<textFieldExpression><![CDATA[$F{BILL_SQ}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="d83810f3-bd78-4c6c-8687-b5bbf624208e">
+						<jr:columnHeader style="Table_CH" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="fb03eb9a-4d5c-4b16-821c-df17626e9a84"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[SA_TYPE_CD]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="52647e28-18a3-40eb-9e74-9a8bf3eb8cf8"/>
+								<textFieldExpression><![CDATA[$F{SA_TYPE_CD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="c117f2ba-44c8-4c85-9127-60322f81c0c3">
+						<jr:columnHeader style="Table_CH" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="ac7f5653-4e8a-4877-92c2-19c621d42a36"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[OOT_SA_TYP_CD]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="7f440dc9-933b-49ab-9ce1-e1f7f1ba53f9"/>
+								<textFieldExpression><![CDATA[$F{OOT_SA_TYP_CD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="cee281d4-964a-4a4a-9986-df2aca970b17">
+						<jr:columnHeader style="Table_CH" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="d569c1ac-7dc7-4e21-acc2-8628f044cb3a"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[ACCT_ID]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="338f348a-5011-4836-9fa3-528b6a46a673"/>
+								<textFieldExpression><![CDATA[$F{ACCT_ID}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="60575540-bef2-443d-9774-60eb4227535f">
+						<jr:columnHeader style="Table_CH" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="b0f3524b-060f-41fd-8751-3cd24ab6a9d5"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[OLD_ACCT_ID]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="78c0b78c-8364-4c8b-995b-73652c3a78ff"/>
+								<textFieldExpression><![CDATA[$F{OLD_ACCT_ID}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="8399dcb6-fe1a-4f37-8cab-ad0b0a9a3ba8">
+						<jr:columnHeader style="Table_CH" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="3524dc66-1423-4ba2-a702-836764e10b9d"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[CHAR_PREM_ID]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="765bc908-8e4d-4440-a866-fd2c7d2692b7"/>
+								<textFieldExpression><![CDATA[$F{CHAR_PREM_ID}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="08c00520-6bbf-485a-bec5-5d73f03b155e">
+						<jr:columnHeader style="Table_CH" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="69" height="30" uuid="1331c72e-5307-4075-a490-4dc5e1866f4f"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[ADDRESS1]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="69" height="30" uuid="5f425621-d092-4cfb-aae6-f29157515444"/>
+								<textFieldExpression><![CDATA[$F{ADDRESS1}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</detail>
+</jasperReport>

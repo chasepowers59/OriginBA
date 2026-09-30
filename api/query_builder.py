@@ -18,7 +18,10 @@ IDENT_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 # a declared field of the snapshot. This pattern is the second line, rejecting anything
 # that could not be a column name at all, and a double quote most of all.
 WAREHOUSE_IDENT_RE = re.compile(r"^[A-Za-z][A-Za-z0-9 _()/%.,+-]*$")
-ALLOWED_AGGS = {"count", "count_distinct", "sum", "min", "max"}
+# avg: over a trusted measure, like sum. share: the percentage of rows where a boolean
+# field is true, every row in the denominator. Neither adds up across groups
+# (tests/test_average_and_share.py).
+ALLOWED_AGGS = {"count", "count_distinct", "sum", "avg", "share", "min", "max"}
 ALLOWED_OPS = {"eq", "neq", "in", "between", "gte", "lte"}
 ALLOWED_TIME_GRAINS = {"month", "quarter", "year"}
 
@@ -101,6 +104,10 @@ def build_query(
     # schema.
     dialect: str,
     schema: str,
+    # Net money (adjustments: charges, credits, transfers) ranks by size either way, so a
+    # six-bar limit keeps the credits that explain the total (tests/test_rank_by_magnitude.py).
+    rank_by_magnitude: bool = False,
+    boolean_fields: set[str] | frozenset[str] = frozenset(),
 ) -> tuple[str, dict[str, Any]]:
     if limit < 1 or limit > 5000:
         raise QueryValidationError("limit must be between 1 and 5000")
@@ -124,8 +131,10 @@ def build_query(
             raise QueryValidationError(f"Invalid aggregation: {agg}")
         if field != "*" and field not in allowed_fields:
             raise QueryValidationError(f"Invalid measure field: {field}")
-        if agg == "sum" and field != "*" and field not in trusted_measures:
-            raise QueryValidationError(f"Sum not allowed on field: {field}")
+        if agg in ("sum", "avg") and field not in trusted_measures:
+            raise QueryValidationError(f"{agg.title()} not allowed on field: {field}")
+        if agg == "share" and field not in boolean_fields:
+            raise QueryValidationError(f"Share needs a true/false field: {field}")
         if agg == "count_distinct" and field == "*":
             raise QueryValidationError("count_distinct requires a field")
         alias = f"m{idx}"
@@ -167,6 +176,7 @@ def build_query(
     for dim in dims:
         select_parts.append(_quote(dim, dialect))
         group_parts.append(_quote(dim, dialect))
+    first_measure = ""
     for spec in measure_specs:
         alias = f'"{spec.alias}"'
         if spec.agg == "count" and spec.field == "*":
@@ -177,10 +187,17 @@ def build_query(
             select_parts.append(f"COUNT(DISTINCT {_quote(spec.field, dialect)}) AS {alias}")
         elif spec.agg == "sum":
             select_parts.append(f"SUM({_quote(spec.field, dialect)}) AS {alias}")
+        elif spec.agg == "avg":
+            select_parts.append(f"AVG({_quote(spec.field, dialect)}) AS {alias}")
+        elif spec.agg == "share":
+            # Oracle flags are BOOLEAN on 23ai canvases and NUMBER 1/0 elsewhere: = 1 reads both
+            true = _quote(spec.field, dialect) + ("" if pg else " = 1")
+            select_parts.append(f"100.0 * AVG(CASE WHEN {true} THEN 1 ELSE 0 END) AS {alias}")
         elif spec.agg == "min":
             select_parts.append(f"MIN({_quote(spec.field, dialect)}) AS {alias}")
         elif spec.agg == "max":
             select_parts.append(f"MAX({_quote(spec.field, dialect)}) AS {alias}")
+        first_measure = first_measure or select_parts[-1].rsplit(" AS ", 1)[0]
 
     where_parts: list[str] = []
     for idx, spec in enumerate(filter_specs):
@@ -250,10 +267,16 @@ def build_query(
     # evict the real leaders -- the same bug this ordering exists to prevent. Measured on
     # Demo 25.4, bill-segment status returned Error (null) ahead of Frozen at 868,262.10.
     # measure_specs is never empty -- a query with no measure is rejected above.
+    # Ties fall to the rest of the grouping, in order, so the limit keeps the SAME rows
+    # whichever table answers: a canvas and its pre-aggregate (api/aggregate_routing.py)
+    # return equal groups in whatever order each plan produces them.
+    groups = [f'"TD{i}"' for i in range(len(time_dimensions or []))] + [_quote(d, dialect) for d in dims]
     if time_dimensions:
-        sql += ' ORDER BY "TD0" DESC NULLS LAST'
+        sql += ' ORDER BY "TD0" DESC NULLS LAST' + "".join(f", {g}" for g in groups[1:])
     else:
-        sql += f' ORDER BY "{measure_specs[0].alias}" DESC NULLS LAST'
+        # an alias cannot sit inside an ORDER BY expression in Postgres, so ABS takes the aggregate
+        rank = f"ABS({first_measure})" if rank_by_magnitude else f'"{measure_specs[0].alias}"'
+        sql += f" ORDER BY {rank} DESC NULLS LAST" + "".join(f", {g}" for g in groups)
     # FETCH FIRST is standard SQL and valid in both, so the tail needs no branch.
     sql += f" FETCH FIRST {int(limit)} ROWS ONLY"
     return sql, binds

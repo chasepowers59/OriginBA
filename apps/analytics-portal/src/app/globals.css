@@ -68,7 +68,8 @@
      uppercase section labels — small text, so AA asks for 4.5. Mixed toward neutral-5
      rather than snapped to it, which would collapse "subtle" into "muted": 4.76:1,
      and Reed's ramp is read, never redefined. */
-  --foreground-subtle: color-mix(in srgb, var(--neutral-4) 40%, var(--neutral-5));
+  /* 25%, not 40%: at 40% this measured 4.35:1 on --muted cards, under WCAG AA's 4.5 (axe, 2026-09-28). */
+  --foreground-subtle: color-mix(in srgb, var(--neutral-4) 25%, var(--neutral-5));
   --foreground-muted: var(--muted-foreground);
   --accent-muted: var(--primary);
   --surface: var(--card);
@@ -508,11 +509,6 @@ body {
 
   .council-pack-header {
     display: block !important;
-  }
-
-  #dashboard-export-root.printing-dashboard .glass-panel {
-    break-inside: avoid;
-    page-break-inside: avoid;
   }
 
   .lineage-pack {

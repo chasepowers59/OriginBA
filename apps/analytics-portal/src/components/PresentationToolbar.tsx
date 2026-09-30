@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { exportDashboardXlsx, printDashboardPack } from "@/lib/exportDashboard";
+import { exportDashboardXlsx } from "@/lib/exportDashboard";
+import { downloadDashboardPdf } from "@/lib/api";
+import type { ExportSection } from "@/lib/dashboardPdf";
 import {
   enterPresentation,
   exitPresentation,
@@ -11,16 +13,25 @@ import {
 
 type PresentationToolbarProps = {
   title: string;
-  exportSections?: { name: string; headers: string[]; rows: Record<string, unknown>[] }[];
-  targetId?: string;
+  exportSections?: ExportSection[];
 };
 
 export function PresentationToolbar({
   title,
   exportSections = [],
-  targetId = "dashboard-export-root",
 }: PresentationToolbarProps) {
   const [presenting, setPresenting] = useState(false);
+  const [pdfState, setPdfState] = useState<"idle" | "busy" | "failed">("idle");
+
+  const exportPdf = async () => {
+    setPdfState("busy");
+    try {
+      await downloadDashboardPdf(title, exportSections);
+      setPdfState("idle");
+    } catch {
+      setPdfState("failed");
+    }
+  };
 
   const stop = useCallback(() => {
     exitPresentation(document.documentElement);
@@ -77,14 +88,13 @@ export function PresentationToolbar({
       <button type="button" onClick={start} className="btn-primary">
         Present
       </button>
-      {controls.showExports ? (
-        <button
-          type="button"
-          onClick={() => printDashboardPack(title, targetId)}
-          className="btn-ghost"
-        >
-          Export PDF pack
+      {controls.showExports && exportSections.length ? (
+        <button type="button" onClick={exportPdf} disabled={pdfState === "busy"} className="btn-ghost">
+          {pdfState === "busy" ? "Building PDF…" : "Export PDF pack"}
         </button>
+      ) : null}
+      {pdfState === "failed" ? (
+        <span role="alert" className="text-xs text-over">The PDF could not be built. Try again.</span>
       ) : null}
       {controls.showExports && exportSections.length ? (
         <button

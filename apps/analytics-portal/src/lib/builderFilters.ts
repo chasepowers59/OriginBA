@@ -13,9 +13,13 @@ export type ShelfFilter = {
   op: string;
   value: unknown;
   role: string;
+  /** Ask for this filter's value when the saved view is opened (a report parameter). */
+  prompt?: boolean;
 };
 
 export type QueryFilter = { field: string; op: string; value: unknown };
+/** A filter as a saved view stores it: the query filter plus whether to ask for it. */
+export type SavedFilter = QueryFilter & { prompt?: boolean };
 
 type FieldLike = { id: string; label?: string; role?: string };
 
@@ -47,8 +51,40 @@ export function optionsWithCurrent(
 }
 
 /** Rebuild shelf pills from a saved view, dropping fields the canvas no longer has. */
+/** What a saved view stores: the query's filters, each marked if it is asked for on open. */
+export function savedFilters(fils: readonly ShelfFilter[] | undefined): SavedFilter[] {
+  // An asked-for filter is kept even with no default: dropping it for being blank would
+  // silently turn the parameter off.
+  const active = new Set(activeFilters(fils).map((f) => f.field));
+  return (fils ?? [])
+    .filter((f) => active.has(f.field) || f.prompt)
+    .map((f) => ({ field: f.field, op: f.op, value: f.value, ...(f.prompt ? { prompt: true } : {}) }));
+}
+
+/** The shelf with the person's answers in place of the saved defaults. */
+export function answerPrompts(fils: readonly ShelfFilter[], answers: Record<string, unknown>): ShelfFilter[] {
+  return fils.map((f) => (f.prompt && f.field in answers ? { ...f, value: answers[f.field] } : f));
+}
+
+/** The asked-for filters still without a value: a blank, or a range missing an end. */
+export function unanswered(fils: readonly ShelfFilter[]): string[] {
+  const blank = (v: unknown) => (Array.isArray(v) ? v.length < 2 || v.some((x) => String(x ?? "") === "")
+                                                  : String(v ?? "") === "");
+  return fils.filter((f) => f.prompt && blank(f.value)).map((f) => f.field);
+}
+
+/**
+ * What narrows the value list of the index-th asked-for parameter: the answered ones above it
+ * (a blank answer narrows nothing), each with its current answer or saved value.
+ */
+export function cascadeFilters(asked: readonly ShelfFilter[], answers: Record<string, unknown>, index: number): QueryFilter[] {
+  return asked.slice(0, index)
+    .map((f) => ({ field: f.field, op: f.op, value: f.field in answers ? answers[f.field] : f.value }))
+    .filter((f) => !unanswered([{ ...f, label: "", role: "", prompt: true }]).length);
+}
+
 export function restoreFilters(
-  saved: QueryFilter[] | null | undefined,
+  saved: SavedFilter[] | null | undefined,
   fields: FieldLike[] | undefined,
 ): ShelfFilter[] {
   if (!saved?.length || !fields?.length) return [];
@@ -64,7 +100,30 @@ export function restoreFilters(
       op: f.op,
       value: f.value,
       role: field.role ?? "dimension",
+      ...(f.prompt ? { prompt: true } : {}),
     });
   }
   return out;
+}
+
+/**
+ * The pills a governed question opens with. The server windows a query only when it has NO
+ * filters (a caller's filter is never overlaid with a hidden window), so a question that
+ * declares flag filters -- revenue on frozen segments -- ran over all time. When a question
+ * filters but not on a date, the canvas's default window joins the shelf as its own pill:
+ * visible, labelled, and removable.
+ */
+export function questionFilters(
+  declared: readonly QueryFilter[] | null | undefined,
+  fields: FieldLike[] | undefined,
+  defaultWindow: QueryFilter | null | undefined,
+): ShelfFilter[] {
+  const pill = (f: QueryFilter): ShelfFilter => {
+    const fd = fields?.find((x) => x.id === f.field);
+    return { field: f.field, label: fd?.label ?? f.field, op: f.op, value: f.value, role: fd?.role ?? "dimension" };
+  };
+  const pills = (declared ?? []).map(pill);
+  const datesFiltered = pills.some((p) => p.role === "date");
+  if (pills.length && !datesFiltered && defaultWindow) pills.push({ ...pill(defaultWindow), role: "date" });
+  return pills;
 }

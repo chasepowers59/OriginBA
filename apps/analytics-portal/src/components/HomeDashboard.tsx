@@ -1,16 +1,21 @@
 "use client";
+import { ChevronDown } from "lucide-react";
 import { brandLine } from "../lib/brand";
 
 import { useEffect, useState } from "react";
 import { fetchSnapshots } from "@/lib/api";
 import Link from "next/link";
-import type { SnapshotSummary } from "@/lib/types";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
 import { ExecutiveDashboard } from "@/components/ExecutiveDashboard";
 import { NlqSearchPanel } from "@/components/NlqSearchPanel";
+import { OriInsights } from "@/components/OriInsights";
+import { AssistantPanel } from "@/components/AssistantPanel";
 import { useBrand } from "@/components/PortalThemeProvider";
+import { isRestricted } from "@/lib/rowRules";
+import { useAuth } from "@/components/AuthProvider";
 
 export function HomeDashboard() {
+  const { user } = useAuth();
   const brand = useBrand();
   const [snapshotCount, setSnapshotCount] = useState(0);
   const [workstreamCount, setWorkstreamCount] = useState(0);
@@ -42,13 +47,13 @@ export function HomeDashboard() {
               {/* Real counts only — fabricated placeholders confidently lied when the
                   API was down. */}
               {workstreamCount
-                ? `${workstreamCount} workstreams · ${snapshotCount} reporting tables`
+                ? `${workstreamCount} workstreams · ${snapshotCount} data sets`
                 : "\u00a0"}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href="/build" className="btn-primary text-sm">
-              Explore your data
+              Build a view
             </Link>
             <Link href="/reports" className="btn-ghost text-sm">
               Open report library
@@ -63,8 +68,32 @@ export function HomeDashboard() {
         <ExecutiveDashboard variant="full" initialDays={30} />
       </section>
 
+      {/* The assistant writes its own SQL, which cannot carry a person's row rules. */}
+      {!isRestricted(user) ? (
+        <>
+          <OriInsights />
+          <section>
+            <AssistantPanel />
+          </section>
+        </>
+      ) : null}
+
+      {/* One question box: with Ori present, the vetted-metric form (fixed figures, your own
+          filters) waits folded under it; a restricted reader, who has no Ori, gets it open. */}
       <section>
-        <NlqSearchPanel />
+        {isRestricted(user) ? (
+          <NlqSearchPanel />
+        ) : (
+          <details className="glass-panel-subtle group rounded-2xl">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-5 py-4 text-sm font-medium text-heading [&::-webkit-details-marker]:hidden">
+              Run a vetted metric with your own filters
+              <ChevronDown aria-hidden className="h-4 w-4 text-fg-muted transition group-open:rotate-180" />
+            </summary>
+            <div className="px-2 pb-2">
+              <NlqSearchPanel compact />
+            </div>
+          </details>
+        )}
       </section>
 
       <section>
@@ -77,32 +106,6 @@ export function HomeDashboard() {
         <FavoritesPanel />
       </section>
     </div>
-  );
-}
-
-export function SnapshotCard({ snap }: { snap: SnapshotSummary }) {
-  const summary = snap.summary ?? "";
-
-  return (
-    <Link
-      href={`/explore/${snap.id}`}
-      className="group glass-panel-subtle block p-5 transition hover:border-edge hover:bg-surface-subtle hover:shadow-lg hover:shadow-sky-500/5"
-    >
-      <div className="flex items-start justify-between gap-3">
-        {snap.poc_enabled ? (
-          <span className="chip chip-active text-[10px]">Analytics ready</span>
-        ) : (
-          <span className="chip text-[10px]">Browse & SQL</span>
-        )}
-        <span className="text-fg-muted transition group-hover:text-primary dark:group-hover:text-primary">View →</span>
-      </div>
-      <h3 className="mt-3 text-lg font-semibold text-heading group-hover:text-primary dark:group-hover:text-primary">
-        {snap.label}
-      </h3>
-      <p className="mt-2 line-clamp-3 text-sm text-fg-muted">
-        {summary || snap.grain_description || "Explore this governed reporting canvas."}
-      </p>
-    </Link>
   );
 }
 
