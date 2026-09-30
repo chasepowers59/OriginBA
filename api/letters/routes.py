@@ -16,6 +16,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi.routing import APIRoute
 from pydantic import BaseModel, ConfigDict, Field
 
+from api.summary_cache import cached
 from api.access_audit import record_access_event
 from api.reporting_dates import data_as_of
 from api.auth.dependencies import AuthContext, require_permission
@@ -255,7 +256,11 @@ def list_letters(ctx: AuthContext = READ, date_from: str = Query("", alias="from
                  date_to: str = Query("", alias="to")) -> dict[str, Any]:
     org_id = _org(ctx)
     start, end = _window(date_from, date_to)
-    letters = _read(repository.list_letters, org_id, start, end)
+    # Kept five minutes per organization and window: every visit to a month re-read raw CISADM for
+    # 20-22 s at Ellensburg. Only the list; a letter, its PDF and runs always read afresh, so a
+    # run's fingerprints are never checked against a kept copy. A failed read is never kept.
+    letters = _read(lambda o, a, b: cached(("letters_list", o, a, b), lambda: repository.list_letters(o, a, b),
+                                           keep=lambda _: True), org_id, start, end)
     _audit(ctx, "letters_list", "letters", org_id, f"from={start}; to={end}; letters={len(letters)}")
     return {"organization_id": org_id, "from": start, "to": end, "count": len(letters),
             "letters": [_summary(l) for l in letters]}

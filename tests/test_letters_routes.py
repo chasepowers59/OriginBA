@@ -26,6 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import letters_fixtures as fx  # noqa: E402
 from api.auth.dependencies import AuthContext, _dev_context, get_auth_context  # noqa: E402
 from api.auth.permissions import permissions_for_role  # noqa: E402
+from api import summary_cache  # noqa: E402
 from api.letters import repository, routes  # noqa: E402
 from api.letters.source import RowCeilingExceeded  # noqa: E402
 
@@ -58,6 +59,7 @@ class RouteTests(unittest.TestCase):
         ]
         for p in self.patches:
             p.start()
+        summary_cache.clear()
 
     def tearDown(self):
         for p in self.patches:
@@ -137,6 +139,28 @@ class RouteTests(unittest.TestCase):
         self.assertIn("none is configured", r.json()["detail"])
         repository.list_letters.assert_not_called()
         repository.get_letter.assert_not_called()
+
+    # ---- the list is kept for a few minutes (Ellensburg 2026-09-30: 20-22 s on EVERY visit to the
+    # same month, each re-reading raw CISADM); previews, PDFs and runs are never cached
+    def test_a_repeat_view_reads_the_database_once_and_is_audited_each_time(self):
+        self.assertEqual(self.get(self.LIST).status_code, 200)
+        self.assertEqual(self.get(self.LIST).status_code, 200)
+        self.assertEqual(repository.list_letters.call_count, 1)
+        listed = [c for c in self.audit.call_args_list if c.kwargs.get("action") == "letters_list"]
+        self.assertEqual(len(listed), 2)
+
+    def test_organizations_never_share_a_cached_list(self):
+        self.get(self.LIST)
+        self.oracle_org()
+        self.get(self.LIST)
+        self.assertEqual([c.args[0] for c in repository.list_letters.call_args_list], ["demo25", "ellensburg"])
+
+    def test_a_failed_read_is_not_kept(self):
+        self.oracle_org()
+        repository.list_letters.side_effect = [RuntimeError("DPY-4011: the database or network closed the connection"),
+                                                fx.every_kind()]
+        self.assertEqual(self.get(self.LIST).status_code, 503)
+        self.assertEqual(self.get(self.LIST).status_code, 200)
 
     def test_503_when_the_database_cannot_be_reached(self):
         self.oracle_org()
