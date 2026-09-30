@@ -88,10 +88,7 @@ export function DataSourceSettings() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
-          Data connection
-        </p>
-        <h1 className="mt-1 text-2xl font-bold text-heading">Settings</h1>
+        <h2 className="text-lg font-semibold text-heading">Database connection</h2>
         <p className="mt-2 max-w-2xl text-sm text-fg-muted">
           {/* The EFFECTIVE organization -- the one this page reads and writes. It used
               to name the signed-in user's HOME org, so an admin who had switched tenant

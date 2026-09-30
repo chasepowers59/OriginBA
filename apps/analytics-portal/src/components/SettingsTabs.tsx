@@ -16,6 +16,9 @@ export function SettingsTabs() {
 
   return (
     <div className="space-y-6">
+      {/* The page's title comes first, then the tabs: it used to sit inside the connection
+          panel, under the tab bar, and the other tabs had none. */}
+      <h1 className="text-2xl font-bold text-heading">Settings</h1>
       {isAdmin ? (
         <div className="glass-panel p-2">
           <div className="grid grid-cols-2 gap-1 md:grid-cols-4">
