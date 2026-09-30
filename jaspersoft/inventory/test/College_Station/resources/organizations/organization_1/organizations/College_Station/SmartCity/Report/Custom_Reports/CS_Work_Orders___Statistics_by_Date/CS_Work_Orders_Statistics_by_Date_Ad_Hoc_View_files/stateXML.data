@@ -1,4 +1,4 @@
-<unifiedState dataSize="sample" diagnosticMode="none" filterPanelShowing="true" hasMargins="true" ignoreMaxRows="false" initedSubFilterList="true" launchType="ADH_045a_DOMAIN" maxDisplayColumns="0" maxDisplayRows="0" maxRowChoices="0" maxRows="100" mode="crosstab" pageOrientation="Landscape" paperSize="content" showDistinctRowValues="false" showTableDetails="true" showTableTotals="false" summaryRowTitle="Totals" theme="default" titleBarShowing="true" titleHeight="0" topicName="CS Work Orders Statistics by Date Domain">
+<unifiedState dataSize="full" diagnosticMode="none" drilldownEnabled="false" filterPanelShowing="true" hasMargins="true" ignoreMaxRows="true" initedSubFilterList="true" launchType="ADH_045a_DOMAIN" maxDisplayColumns="0" maxDisplayRows="0" maxRowChoices="0" maxRows="100" mode="crosstab" pageOrientation="Landscape" paperSize="content" showDistinctRowValues="false" showTableDetails="true" showTableTotals="false" summaryRowTitle="Totals" theme="default" titleBarShowing="true" titleHeight="0" topicName="CS Work Orders Statistics by Date Domain">
   <chartState availableChartHeight="0" availableChartWidth="0" backgroundFilled="false" chartHeight="0" chartIsVertical="true" chartWidth="0" displayXAxisLabel="true" displayYAxisLabel="false" offsetX="0" offsetY="0">
     <chartTitle></chartTitle>
     <chartType>1_bar</chartType>
@@ -104,7 +104,7 @@
       </entry>
     </threeDMap>
   </chartState>
-  <crosstabState mergeCrosstabCells="true" numberOfColumns="0" safeColumnMode="true" safeRowMode="true" showLabels="true">
+  <crosstabState mergeCrosstabCells="true" numberOfColumns="0" safeColumnMode="true" safeRowMode="true" showLabels="true" useAllAvailableWidth="false">
     <columnGroups>
       <queryDimension categorizerName="all" fieldName="Measures" includeAll="true" name="Measures" sortStatus="0" type="java.lang.String">
         <visibleLevels>
@@ -156,23 +156,23 @@
       <string>false</string>
     </entry>
     <entry key="typeOfViewChange">
-      <string></string>
+      <string>willReflectChanges</string>
     </entry>
     <entry key="tempAruName">
-      <string>/temp/aru2040b8e0-260a-4ba5-a3cb-f503f5e2c48c</string>
+      <string>/temp/aruec61ea4e-4745-4815-b5fa-7c31f85e3c88</string>
     </entry>
   </propertyMap>
   <subFilterList>
     <subFilter id="filter_1" letter="A" sourceString="DYNAMIC">
-      <expressionString>isAnyValue(WORK_DTTM)</expressionString>
-      <parameterizedExpressionString>betweenDates(WORK_DTTM, WORK_DTTM_1, WORK_DTTM_2)</parameterizedExpressionString>
+      <expressionString>equalsDate(WORK_DTTM, 'DAY')</expressionString>
+      <parameterizedExpressionString>equalsDate(WORK_DTTM, WORK_DTTM_1)</parameterizedExpressionString>
     </subFilter>
     <subFilter id="filter_2" letter="B" sourceString="DYNAMIC">
-      <expressionString>isAnyValue(FIELD_TASK_TYPE)</expressionString>
+      <expressionString>FIELD_TASK_TYPE in ('MSRC-RECHECK', 'MSCN-CONNECT', 'MSCO-CHANGE OUT', 'MSCS-CUT SEAL', 'MSDE-DELINQUENT RECHECK', 'MSDN-DISCONNECT', 'MSDR-DELINQUENT RECONNECT', 'MSENS - ELECTRIC NEW SERVICE', 'MSNP-DELINQUENT DISCONNECT', 'MSPM-PULL METER')</expressionString>
       <parameterizedExpressionString>FIELD_TASK_TYPE in FIELD_TASK_TYPE_1</parameterizedExpressionString>
     </subFilter>
     <subFilter id="filter_3" letter="C" sourceString="DYNAMIC">
-      <expressionString>isAnyValue(ACT_STATUS)</expressionString>
+      <expressionString>ACT_STATUS in ('Communication In Progress', 'Completed')</expressionString>
       <parameterizedExpressionString>ACT_STATUS in ACT_STATUS_1</parameterizedExpressionString>
     </subFilter>
   </subFilterList>

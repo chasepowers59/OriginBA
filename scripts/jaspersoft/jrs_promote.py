@@ -151,6 +151,12 @@ def external_references(src: dict[str, bytes], scope: set[str], mv, src_ds: str,
     return {u for u in refs if u not in inside and u != ds}
 
 
+def exposed_items(src: dict[str, bytes], scope: set[str], tgt_files: dict[str, bytes]) -> set[str]:
+    """The item ids the copied views can resolve: the target's referenced domains AND any domain
+    travelling in the package itself (a folder promoted with its own domain, 2026-09-30)."""
+    return set().union(*domain_items(tgt_files).values(), *domain_items({n: src[n] for n in scope}).values())
+
+
 def unresolved_fields(src: dict[str, bytes], scope: set[str], items: set[str]) -> set[str]:
     fields: set[str] = set()
     for n in scope:
@@ -390,7 +396,7 @@ def main() -> int:
         raise SystemExit(f"the scope references resources the target lacks: {missing}")
     carry = ([f"{tgt_root}/DataSource/{tgt_ds}"] if tgt_ds else []) + sorted(u for u in refs if u.startswith(tgt_root))
     tgt_files = export_root(tenv, carry, work / "target_carried.zip") if carry else {"index.xml": b""}
-    items = set().union(*domain_items(tgt_files).values()) if tgt_files else set()
+    items = exposed_items(src, scope, tgt_files)
     bad = unresolved_fields(src, scope, items) if any(n.endswith(("stateXML.data", "topicJRXML.data")) for n in scope) else set()
     if bad:
         raise SystemExit(f"the copied views use fields the target's domains do not expose: {sorted(bad)[:10]}")

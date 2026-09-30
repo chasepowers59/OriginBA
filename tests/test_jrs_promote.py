@@ -227,6 +227,18 @@ class Dependencies:
         assert p.unresolved_fields(src, scope, {"FT_CORE.FT_ID"}) == {"ADJ.ADJ_CAN_RSN_CD"}
 
 
+    def test_a_domain_travelling_in_the_package_exposes_its_items(self):
+        # 2026-09-30, Budget_Billing folder Origin_DEV -> College_Station: the folder carries its own
+        # domain, which the target does not have yet; the check read the target's domains only and
+        # refused every field of the views beside it
+        ns = "http://www.jaspersoft.com/2007/SL/XMLSchema"
+        dom = f"resources{SRC}{FIN}/Budget/Budget___Domain_files/schema.data"
+        src = {dom: (f'<schema xmlns="{ns}"><itemGroups><itemGroup id="SET_BA"><items>'
+                     f'<item id="BA_ACCT_ID"></item></items></itemGroup></itemGroups></schema>').encode()}
+        assert "SET_BA.BA_ACCT_ID" in p.exposed_items(src, {dom}, {"index.xml": b""})
+        assert "SET_BA.BA_ACCT_ID" not in p.exposed_items(src, set(), {"index.xml": b""})
+
+
 class After:
     def test_after_compare_ignores_what_the_importer_rewrites(self):
         pkg = {f"resources{TGT}{DOMAIN}.xml": b"<semanticLayerDataSource>\n  <version>0</version><label>A</label></semanticLayerDataSource>"}

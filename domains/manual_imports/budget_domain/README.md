@@ -54,3 +54,23 @@ still execute, probe 389 rows in 0.9 s. College Station TEST (Oracle, same SQL):
 3. **Budget Billing - Budget Changes by Month**: Budget Changes tree, Change Month as rows, Change
    Kind as columns, Distinct Accounts as the measure; filter Change Effective Date in the last 12
    months up to today (a few future-dated recurring-charge rows exist -- 2030-2032 at Ellensburg).
+
+## Promoted to College_Station (test), 2026-09-30
+
+Chase's three views (Active Accounts, Late Fees Last 12 Months, Budget Changes by Month) were
+checked on Origin_DEV first: all tie Oracle, and none carries a measure its topic mislabels. The
+folder was then promoted with `jrs_promote.py --from test:Origin_DEV --to test:College_Station
+--resource .../Budget_Billing --into .../Billing_and_Rates --ds CollegeStation_DS` (the datasource
+College Station's Standard Offering domains use). Import clean, 21 files re-export identical,
+5 resources execute. Org diff: the new folder; CollegeStation_DS version 108 -> 109 only; the
+parent folder lists the child. Numbers, Jaspersoft = Oracle:
+
+| View | College Station |
+| --- | --- |
+| Active Accounts | 965 accounts / $336,581 / 5,552 budget SAs (80 pending stop) |
+| Late Fees Last 12 Months (LPC) | 594 accounts / 4,330 fees / $28,884.35 (19-31 s: the CI_ADJ scan) |
+| Budget Changes by Month | every month ties; Sep-25 230, Jul-26 168, total 1,081 accounts |
+
+The promotion first refused: `jrs_promote` checked view fields against the TARGET's domains only,
+so a folder carrying its own domain always failed. `exposed_items` now counts domains in the
+package too (`tests/test_jrs_promote.py`).
