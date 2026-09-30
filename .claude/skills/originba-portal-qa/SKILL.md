@@ -52,6 +52,14 @@ total, the month trend adds up to the total, clicking a bar reproduces it, share
 (2026-09-30: 63 breakdowns, 60 trends, 79 cross-filters); `tests/test_aggregate_parity.py` --
 the pre-aggregates answer exactly what the canvases answer.
 
+Answers that say nothing, on Ellensburg's real warehouse (API running, VPN up):
+`python3 scripts/check_report_health.py --org ellensburg` asks every Library report its
+question the way the explorer does and fails on an empty answer, one "not recorded" bar, all
+zeros or a single group, unless `KNOWN` records why that is true of the client (2026-09-30:
+89 reports, 5 known facts). Each unexplained one found so far was a bug no other test sees: a
+source column empty at every client, an axis constant on every row, a backlog without an
+open-only filter. Chase the finding to CISADM before recording it as a fact.
+
 Unit suites: `cd /Users/chase/OriginBA-3 && ENVIRONMENT=test python3 -m pytest tests -q`,
 `cd apps/analytics-portal && npx tsc --noEmit && npx vitest run`.
 
