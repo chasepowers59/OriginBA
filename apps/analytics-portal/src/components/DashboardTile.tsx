@@ -8,7 +8,7 @@ import {
 } from "@/lib/api";
 import { formatCompact } from "@/lib/format";
 import { chartedMeasureColumn, kpiHeadline, tileIsUnset } from "@/lib/dashboardTileMath";
-import { resolveDateField } from "@/lib/tileDateField";
+import { resolveDateField, tileWindowField } from "@/lib/tileDateField";
 import { measureDisplaysAsCurrency } from "@/lib/businessLabels";
 import type { DashboardTileDef, QueryResponse } from "@/lib/types";
 import { BuilderChart } from "./builder/BuilderChart";
@@ -34,6 +34,8 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
   const [measureKey, setMeasureKey] = useState("");
   const [queryMeasureField, setQueryMeasureField] = useState("*");
   const [queryMeasureAgg, setQueryMeasureAgg] = useState("count");
+  // the board's day window skipped this tile: say so beside the title
+  const [unwindowed, setUnwindowed] = useState(false);
 
   const unset = tileIsUnset(tile);
   useEffect(() => {
@@ -54,12 +56,13 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
         const groupDate = resolveDateField(meta);
         const timeDimensions =
           tile.time_grain && groupDate ? [{ field: groupDate, grain: tile.time_grain }] : [];
+        const windowDate = tileWindowField(meta, report);
         const filters: import("@/lib/types").FilterDef[] = [
           // The dashboard's day window applies on the same date the tile groups by.
           // It used to key off a mandatory-window field no canvas sets, so the
           // "last N days" control changed nothing on any tile.
-          ...(groupDate
-            ? [{ field: groupDate, op: "between" as const, value: [start, end] }]
+          ...(windowDate
+            ? [{ field: windowDate, op: "between" as const, value: [start, end] }]
             : []),
           ...(report?.filters ?? []),
         ];
@@ -82,6 +85,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
         setMeasureKey(chartedMeasureColumn(response.columns, measures.length));
         setQueryMeasureField(primaryMeasure.field ?? "*");
         setQueryMeasureAgg(primaryMeasure.agg ?? "count");
+        setUnwindowed(Boolean(groupDate) && !windowDate);
         setError(null);
       } catch (err) {
         if (!cancelled) {
@@ -183,7 +187,10 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
 
   return (
     <div className="glass-panel flex h-full flex-col p-4">
-      <p className="mb-2 text-sm font-medium text-heading">{tile.title}</p>
+      <p className="mb-2 flex items-baseline justify-between gap-2 text-sm font-medium text-heading">
+        {tile.title}
+        {unwindowed ? <span className="shrink-0 text-xs font-normal text-fg-subtle">All dates</span> : null}
+      </p>
       <div className="flex-1">
         <BuilderChart
           visual={effectiveChart}

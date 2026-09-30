@@ -178,8 +178,17 @@ function FolderView({ folder }: { folder: ReportLibraryFolder }) {
   const { essentials, more } = splitFolder(folder);
   return (
     <section aria-labelledby="library-folder-title" className="glass-panel p-6">
-      <h2 id="library-folder-title" className="text-xl font-semibold text-heading">{folder.title}</h2>
-      {folder.description ? <p className="mt-1 text-sm text-fg-muted">{folder.description}</p> : null}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 id="library-folder-title" className="text-xl font-semibold text-heading">{folder.title}</h2>
+          {folder.description ? <p className="mt-1 text-sm text-fg-muted">{folder.description}</p> : null}
+        </div>
+        {folder.reports.length ? (
+          <Link href={`/dashboards/new?from_folder=${encodeURIComponent(folder.id)}`} className="btn-ghost shrink-0 text-xs">
+            Make a dashboard
+          </Link>
+        ) : null}
+      </div>
 
       {essentials.length ? (
         <>

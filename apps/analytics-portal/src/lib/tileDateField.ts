@@ -1,6 +1,10 @@
+import { canvasOpensOnAllDates } from "@/lib/datePresets";
+import type { DatePresetConfig } from "@/lib/types";
+
 type DateFieldSource = {
   default_date_field?: string | null;
   date_fields?: { id: string }[] | null;
+  default_date_preset?: DatePresetConfig | string;
 };
 
 /**
@@ -18,4 +22,18 @@ type DateFieldSource = {
 export function resolveDateField(meta: DateFieldSource | undefined | null): string | null {
   if (!meta) return null;
   return meta.default_date_field || meta.date_fields?.[0]?.id || null;
+}
+
+/**
+ * The date a dashboard's "last N days" applies on, or null when it must not apply: a
+ * canvas of what exists now (accounts, agreements, meters) and a backlog report count
+ * every row whatever its date, or the window quietly turns "accounts on budget" into
+ * "accounts opened this month".
+ */
+export function tileWindowField(
+  meta: DateFieldSource | undefined | null,
+  report: { all_dates?: boolean } | null | undefined,
+): string | null {
+  if (canvasOpensOnAllDates(meta?.default_date_preset) || report?.all_dates) return null;
+  return resolveDateField(meta);
 }

@@ -355,6 +355,13 @@ Each found more than once. Hunt these by pattern; clicking around finds them slo
     charted the other. When a fix touches the canvas name, the rename needs the
     contract mechanism (CLAUDE.md in the dbt repo: enforce_contracts var, then
     --accept-contract-changes) and a name the secrets rule does not hide.
+22. **A window rule fixed in one reader and missed in another.** The all-dates rule
+    (a canvas of what exists now is never windowed) went into the explorer, the cache
+    warmer and the metric catalog on 2026-09-30; the dashboard tile kept windowing on
+    Account Setup Date, so a Budget Billing board counted accounts opened this month.
+    A date rule has one owner (`lib/tileDateField.ts`: `resolveDateField` for the
+    date, `tileWindowField` for whether the window applies); when it changes, grep every
+    `defaultDateRange(` and `resolveDateField(` caller, not only the one in view.
 
 **How five of these were found: a widely-used export with no test.** Enumerate
 `export function` in `lib/`, count references across the app, and subtract anything

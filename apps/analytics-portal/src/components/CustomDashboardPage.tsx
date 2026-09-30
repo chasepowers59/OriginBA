@@ -17,11 +17,13 @@ import {
   createDashboard,
   fetchDashboard,
   fetchSnapshots,
+  fetchReportLibrary,
   updateDashboard,
 } from "@/lib/api";
 import type { DashboardTileDef, SavedDashboard, SnapshotSummary } from "@/lib/types";
 import { templatesForSnapshots, type DashboardTemplate } from "@/lib/dashboardTemplates";
 import { swapTileSlots } from "@/lib/dashboardSlots";
+import { folderDashboard } from "@/lib/folderDashboard";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { DashboardTile } from "./DashboardTile";
 import { PresentationToolbar } from "./PresentationToolbar";
@@ -139,7 +141,7 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
     return map;
   }, [tiles]);
 
-  const applyTemplate = (template: DashboardTemplate) => {
+  const applyTemplate = (template: Pick<DashboardTemplate, "title" | "days" | "tiles">) => {
     setTitle(template.title);
     setDays(template.days);
     setTiles(
@@ -149,6 +151,22 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       })),
     );
   };
+
+  // ?from_folder= (a Library folder's "Make a dashboard") lays that folder out on a new
+  // board; like a template, nothing is stored until Save.
+  const folderApplied = useRef(false);
+  useEffect(() => {
+    const folderId = searchParams.get("from_folder");
+    if (dashboardId || !folderId || folderApplied.current) return;
+    folderApplied.current = true;
+    fetchReportLibrary()
+      .then((library) => {
+        const found = library.folders?.find((f) => f.id === folderId);
+        if (found) applyTemplate(folderDashboard(found));
+      })
+      .catch(() => setSaveError("Couldn't load that Library folder. Add tiles yourself, or try again."));
+    router.replace("/dashboards/new", { scroll: false });
+  }, [dashboardId, router, searchParams]);
 
   const save = async () => {
     setSaving(true);
