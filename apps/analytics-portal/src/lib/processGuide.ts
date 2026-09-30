@@ -58,15 +58,3 @@ export function applyProcessGuide(
     guidedPremadeReports,
   };
 }
-
-export function exploreUrl(
-  snapshotId: string,
-  opts?: { reportId?: string | null; processId?: string | null; tab?: string },
-): string {
-  const params = new URLSearchParams();
-  if (opts?.processId) params.set("process", opts.processId);
-  if (opts?.reportId) params.set("report", opts.reportId);
-  if (opts?.tab && opts.tab !== "reports") params.set("tab", opts.tab);
-  const qs = params.toString();
-  return qs ? `/explore/${snapshotId}?${qs}` : `/explore/${snapshotId}`;
-}

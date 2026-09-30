@@ -427,11 +427,9 @@ decision. Measured from the committed catalogs:
 
 The UI is wired for it end to end, so it fails quietly on the three dbt orgs —
 including Ellensburg, the strategic target. Two consequences:
-`ExplorerPanel`'s process-guide panel never renders (benign omission), and
-`WorkstreamExplorer`'s search box — placeholder "Search processes…" — can only ever
-match workstream NAMES, because `.filter(ws => ws.processes?.length > 0 || label
-matches)` has nothing to search. Empty query shows everything; typing anything
-collapses it to label hits.
+`ExplorerPanel`'s process-guide panel never renders (benign omission). (The workstream
+explorer whose search could only match workstream names is gone: since 2026-09-30 the
+Library is a folder tree searched by report -- ReportLibrary.tsx, lib/libraryLayout.ts.)
 
 Porting it is CONTENT work (process definitions and field guides for 38 canvases), not
 just code, so it is a product decision rather than a fix to slip in.

@@ -5,7 +5,6 @@ import { brandLine } from "../lib/brand";
 import { useEffect, useState } from "react";
 import { fetchSnapshots } from "@/lib/api";
 import Link from "next/link";
-import type { SnapshotSummary } from "@/lib/types";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
 import { ExecutiveDashboard } from "@/components/ExecutiveDashboard";
 import { NlqSearchPanel } from "@/components/NlqSearchPanel";
@@ -107,32 +106,6 @@ export function HomeDashboard() {
         <FavoritesPanel />
       </section>
     </div>
-  );
-}
-
-export function SnapshotCard({ snap }: { snap: SnapshotSummary }) {
-  const summary = snap.summary ?? "";
-
-  return (
-    <Link
-      href={`/explore/${snap.id}`}
-      className="group glass-panel-subtle block p-5 transition hover:border-edge hover:bg-surface-subtle hover:shadow-lg hover:shadow-sky-500/5"
-    >
-      <div className="flex items-start justify-between gap-3">
-        {snap.poc_enabled ? (
-          <span className="chip chip-active text-[10px]">Analytics ready</span>
-        ) : (
-          <span className="chip text-[10px]">Browse & SQL</span>
-        )}
-        <span className="text-fg-muted transition group-hover:text-primary dark:group-hover:text-primary">View →</span>
-      </div>
-      <h3 className="mt-3 text-lg font-semibold text-heading group-hover:text-primary dark:group-hover:text-primary">
-        {snap.label}
-      </h3>
-      <p className="mt-2 line-clamp-3 text-sm text-fg-muted">
-        {summary || snap.grain_description || "Explore this data set."}
-      </p>
-    </Link>
   );
 }
 

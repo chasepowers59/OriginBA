@@ -13,7 +13,6 @@ from api.auth.workstream_access import (
     filter_dashboard_for_auth,
     filter_dashboards_for_auth,
     filter_nlq_metrics_for_auth,
-    filter_report_library_for_auth,
 )
 from api.portal_config import config_for_organization
 from api.org_db import require_org_for_data
@@ -126,17 +125,13 @@ def portal_config(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any
 @router.get("/report-library")
 def report_library(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     ctx.require_permission("report_library:read")
-    from api.report_library import get_report_library
+    from api.report_library import get_report_library, scope_library
 
     org_id = ctx.effective_organization_id()
-    library = filter_report_library_for_auth(get_report_library(org_id), ctx)
-    if not ctx.row_rules:
-        return library
-    packs = [{**p, "reports": only_readable(p.get("reports") or [], ctx.row_rules, org_id)}
-             for p in library.get("packs") or []]
-    packs = [{**p, "report_count": len(p["reports"])} for p in packs if p["reports"]]
-    return {**library, "packs": packs, "pack_count": len(packs),
-            "report_count": sum(p["report_count"] for p in packs)}
+    # Packs and folders are scoped by the same two rules: the caller's workstreams, then
+    # their row rules, which drop any canvas that does not carry a rule's column.
+    return scope_library(get_report_library(org_id), lambda cards: only_readable(
+        [c for c in cards if ctx.can_access_workstream(c.get("workstream") or "")], ctx.row_rules, org_id))
 
 
 @router.get("/saved-views")

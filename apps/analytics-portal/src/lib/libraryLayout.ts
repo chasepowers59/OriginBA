@@ -1,36 +1,72 @@
-import type { ReportLibraryEntry, ReportLibraryPack } from "./types";
-
-export type LibrarySection = { workstream: string; label: string; reports: ReportLibraryEntry[] };
+import { aggregationLabel } from "./businessLabels";
+import type { ReportLibraryEntry, ReportLibraryFolder } from "./types";
 
 /**
- * The library's one grouping (UI-4): each report under its workstream, in the rail's order.
- * Packs are how the catalog curates reports; shown beside the rail they were a second
- * taxonomy with different counts. A workstream the rail does not list lands last.
+ * The Library is a folder tree (catalog `report_library`): each folder names a few reports
+ * to start with and keeps the rest one click away. These decide what is on screen; the
+ * component only draws it.
  */
-export function reportsByWorkstream(packs: ReportLibraryPack[], order: string[]): LibrarySection[] {
-  const sections = new Map<string, LibrarySection>();
-  const seen = new Set<string>();
-  for (const report of packs.flatMap((p) => p.reports)) {
-    const key = `${report.snapshot_id}:${report.report_id}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    const section = sections.get(report.workstream)
-      ?? { workstream: report.workstream, label: report.workstream_label, reports: [] };
-    section.reports.push(report);
-    sections.set(report.workstream, section);
+
+/** The folder the URL asks for, or the first one with reports in it; never an empty folder. */
+export function folderToShow(folders: ReportLibraryFolder[], requested: string | null): ReportLibraryFolder | null {
+  const withReports = folders.filter((f) => f.reports.length > 0);
+  return withReports.find((f) => f.id === requested) ?? withReports[0] ?? null;
+}
+
+/** "Start here" and "More in this folder", each in catalog order. */
+export function splitFolder(folder: ReportLibraryFolder): { essentials: ReportLibraryEntry[]; more: ReportLibraryEntry[] } {
+  return {
+    essentials: folder.reports.filter((r) => r.essential),
+    more: folder.reports.filter((r) => !r.essential),
+  };
+}
+
+export type SearchGroup = { folder: ReportLibraryFolder; reports: ReportLibraryEntry[] };
+
+/**
+ * Every report whose question, why, data set or dimensions carry every word of the query,
+ * grouped under its folder in folder order. A blank query is the folder view, not a search.
+ */
+export function searchLibrary(folders: ReportLibraryFolder[], query: string): SearchGroup[] {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!words.length) return [];
+  const matches = (r: ReportLibraryEntry) => {
+    const haystack = [r.title, r.description, r.snapshot_label, ...(r.dimensions ?? [])].join(" ").toLowerCase();
+    return words.every((w) => haystack.includes(w));
+  };
+  return folders
+    .map((folder) => {
+      const { essentials, more } = splitFolder(folder);
+      return { folder, reports: [...essentials, ...more].filter(matches) };
+    })
+    .filter((g) => g.reports.length > 0);
+}
+
+/** One quiet line under a card's title: what it groups by, then what it measures. */
+export function shapeLine(report: Pick<ReportLibraryEntry, "dimensions" | "measures">): string {
+  const dims = (report.dimensions ?? []).filter(Boolean);
+  const [first, ...rest] = report.measures ?? [];
+  const parts: string[] = [];
+  if (dims.length) {
+    parts.push(`By ${dims.length > 1 ? `${dims.slice(0, -1).join(", ")} and ${dims[dims.length - 1]}` : dims[0]}`);
   }
-  const rank = (id: string) => (order.includes(id) ? order.indexOf(id) : order.length);
-  return [...sections.values()].sort((a, b) => rank(a.workstream) - rank(b.workstream));
+  if (first) {
+    const agg = aggregationLabel(String(first.agg ?? "count"));
+    // "*" is the row count ("Count of records *" reads like a typo), and a field that
+    // already names its aggregation reads "Total Total Balance" with it prefixed.
+    const field = first.field && first.field !== "*" ? first.field : "";
+    const namesItsAgg = field.toLowerCase().startsWith(`${agg.toLowerCase()} `);
+    const head = !field ? agg : namesItsAgg ? field : `${agg} ${field}`;
+    parts.push(rest.length ? `${head} and ${rest.length} more` : head);
+  }
+  return parts.join(" · ");
 }
 
-/** How the report library opens: folded while browsing everything, open once the reader narrows it. */
-export function sectionsStartOpen(s: { query: string; workstream: string | null; sectionCount: number }): boolean {
-  return Boolean(s.query.trim() || s.workstream || s.sectionCount <= 1);
-}
-
-/** The line under a folded section's title: its first reports by name, so it does not read as empty. */
-export function sectionPreview(reports: Pick<ReportLibraryEntry, "title">[], shown = 3): string {
-  const names = reports.slice(0, shown).map((r) => r.title);
-  const more = reports.length - names.length;
-  return names.join(" · ") + (more > 0 ? ` · and ${more} more` : "");
+/** The Library URL for a folder and a search; both ride in the query so links and Back work. */
+export function libraryHref({ folder, q }: { folder?: string | null; q?: string | null }): string {
+  const params = new URLSearchParams();
+  if (folder) params.set("folder", folder);
+  if (q?.trim()) params.set("q", q.trim());
+  const qs = params.toString();
+  return qs ? `/reports?${qs}` : "/reports";
 }

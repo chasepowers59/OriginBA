@@ -548,6 +548,17 @@ export type ReportLibraryEntry = {
   filters?: { field?: string }[];
   grain_description?: string;
   explore_url: string;
+  /** Set on folder cards: one of the few reports a folder says to start with. */
+  essential?: boolean;
+};
+
+/** A Library folder (catalog `report_library`): its reports come essentials first. */
+export type ReportLibraryFolder = {
+  id: string;
+  title: string;
+  description: string;
+  report_count: number;
+  reports: ReportLibraryEntry[];
 };
 
 export type ReportLibraryPack = {
@@ -564,6 +575,7 @@ export type ReportLibraryResponse = {
   pack_count: number;
   report_count: number;
   packs: ReportLibraryPack[];
+  folders: ReportLibraryFolder[];
   error?: string;
 };
 
