@@ -92,6 +92,12 @@ class MeasureRuleTests(unittest.TestCase):
         adjustments = [FROZEN, {"field": "Is Adjustment", "op": "eq", "value": True}]
         self.assertEqual(self.sums("Current Amount", adjustments), ["Adjustment Status Code"])
 
+    def test_a_list_valued_filter_is_read_not_crashed_on(self):
+        # an in / between filter carries a list, which a set of (field, op, value) cannot hold
+        q = {"measures": [{"field": "Current Amount", "agg": "sum"}],
+             "filters": [FROZEN, {"field": "FT Type Code", "op": "in", "value": ["BS", "BX"]}]}
+        self.assertEqual(missing_money_filters("rpt_financial_txn", q), [])
+
     def test_other_measures_on_the_canvas_are_untouched(self):
         self.assertEqual(self.sums("Current Amount", [FROZEN]), [])
 

@@ -70,7 +70,8 @@ def missing_money_filters(snapshot_id: str, query: dict[str, Any],
     summed = [m.get("field") for m in query.get("measures") or [] if m.get("agg") == "sum"]
     if not summed:
         return []
-    have = {(f.get("field"), f.get("op"), f.get("value"))
+    # tuple(): an in / between filter's value is a list, which a set cannot hold
+    have = {(f.get("field"), f.get("op"), tuple(v) if isinstance(v := f.get("value"), list) else v)
             for f in [*(query.get("filters") or []), *(default_lens or [])]}
     required = [*MONEY_FILTERS.get(snapshot_id, []),
                 *(f for field in summed for f in MEASURE_FILTERS.get((snapshot_id, field), [])),

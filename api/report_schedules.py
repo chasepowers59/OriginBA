@@ -237,7 +237,8 @@ def window_sentence(date_field: str | None, window_days: int, as_of: str) -> str
     cannot check the number.
     """
     if not date_field:
-        return "Data window: all rows — this data set has no date to filter on."
+        # no date at all, or a canvas of what exists now (reporting_dates.window_date_field)
+        return "Data window: all rows, not limited by date."
     return f"Data window: trailing {window_days} days on {date_field}, as of {datetime.fromisoformat(as_of):%b %-d, %Y}."
 
 

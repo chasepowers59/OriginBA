@@ -52,6 +52,10 @@ class StateCanvases(unittest.TestCase):
         self.assertEqual(sent["rpt_customer_account"], [])
         self.assertEqual([f.field for f in sent["rpt_bill"]], ["Bill Date"])
 
+    def test_a_schedule_on_a_state_canvas_does_not_claim_there_is_no_date(self):
+        from api.report_schedules import window_sentence
+        self.assertEqual(window_sentence(None, 30, "2026-06-18"), "Data window: all rows, not limited by date.")
+
 
 if __name__ == "__main__":
     unittest.main()

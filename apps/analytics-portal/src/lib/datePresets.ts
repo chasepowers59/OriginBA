@@ -102,8 +102,11 @@ export function opensOnAllDates(r: {
   activeReportId: string | null;
   allDates: boolean;
   hasDateField: boolean;
+  /** a saved view restores its own window */
+  keepWindow?: boolean;
 }): boolean {
-  return Boolean(r.report.all_dates) && r.report.id !== r.activeReportId && !r.allDates && r.hasDateField;
+  return Boolean(r.report.all_dates) && r.report.id !== r.activeReportId && !r.allDates && r.hasDateField
+    && !r.keepWindow;
 }
 
 export function fallBackToAllDates(r: { rowCount: number; windowed: boolean; firstRun: boolean }): boolean {

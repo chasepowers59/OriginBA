@@ -103,6 +103,8 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
 
   const [tab, setTab] = useState<Tab>(initialTab);
   const [activeReportId, setActiveReportId] = useState<string | null>(null);
+  const [favoriteReportId, setFavoriteReportId] = useState<string | null>(null);
+  const favoriteRun = useRef<string | null>(null);
   const [activeReportTitle, setActiveReportTitle] = useState<string | null>(null);
   const [dimensions, setDimensions] = useState<string[]>([]);
   const [measureField, setMeasureField] = useState("*");
@@ -233,7 +235,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   }, []);
 
   const runPremade = useCallback(
-    async (report: PremadeReport) => {
+    async (report: PremadeReport, opts?: { keepWindow?: boolean }) => {
       const shown: ShownReport = {
         id: report.id,
         title: report.title,
@@ -244,7 +246,8 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       };
       showReport(shown);
       setTab("reports");
-      if (opensOnAllDates({ report, activeReportId, allDates, hasDateField: Boolean(resolveDateField(metadata)) })) {
+      if (opensOnAllDates({ report, activeReportId, allDates, hasDateField: Boolean(resolveDateField(metadata)),
+                            keepWindow: opts?.keepWindow })) {
         // the auto-run effect follows allDates and re-runs this report unwindowed
         setFellBackFrom(null);
         setActivePreset(ALL_DATES);
@@ -385,12 +388,11 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       if (fav.chartType) setChartType(fav.chartType);
       setFavoriteApplied(true);
 
-      if (fav.kind === "premade" && fav.reportId) {
-        const report = premadeReports.find((r) => r.id === fav.reportId);
-        if (report) {
-          window.setTimeout(() => runPremade(report), 0);
-          return;
-        }
+      if (fav.kind === "premade" && fav.reportId && premadeReports.some((r) => r.id === fav.reportId)) {
+        // the auto-run runs it with the saved window: a timer here ran a stale runPremade,
+        // which saw the window from before the favorite was applied
+        setFavoriteReportId(fav.reportId);
+        return;
       }
       if (fav.dimensions?.length) {
         // A custom (dimensions-based) saved view opens in the single builder surface,
@@ -407,11 +409,14 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
 
     // a ?report= link is applied here and only here: running it anywhere else raced this run
     const linked = favoriteApplied ? null : searchParams.get("report");
-    const report = reportToRun(premadeReports, activeReportId, linked);
+    const favorite = favoriteReportId !== favoriteRun.current ? favoriteReportId : null;
+    const report = reportToRun(premadeReports, activeReportId, linked ?? favorite);
     if (!report) return;
     if (linked) setFavoriteApplied(true);
-    runPremade(report);
-  }, [allDates, dateStart, dateEnd, scopeField, scopeValue, drillFilter, metadata.id, tab]); // eslint-disable-line react-hooks/exhaustive-deps
+    const fromFavorite = !linked && report.id === favorite;
+    if (fromFavorite) favoriteRun.current = favorite;
+    runPremade(report, { keepWindow: fromFavorite });
+  }, [allDates, dateStart, dateEnd, scopeField, scopeValue, drillFilter, metadata.id, tab, favoriteReportId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeReport = premadeReports.find((r) => r.id === activeReportId) ?? null;
 

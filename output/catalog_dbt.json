@@ -3136,8 +3136,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -4871,8 +4869,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -4941,8 +4937,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -6152,8 +6146,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -8307,8 +8299,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -8317,8 +8307,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -14094,8 +14082,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -15561,7 +15547,18 @@
      "dimensions": [
       "Device Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Never Registered At Head-End",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Attached To Service Point",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "meters_not_registered",
      "measures": [
       {
@@ -19042,7 +19039,7 @@
     },
     {
      "chart_type": "horizontal",
-     "description": "A late fee on a budget account means the level payment is not being kept. Filter to your late-fee adjustment type to see what budget customers were charged.",
+     "description": "A late fee on a budget account means the level payment is not being kept. Covers accounts on budget today, including fees from before they joined; filter to your late-fee adjustment type.",
      "dimensions": [
       "Adjustment Type"
      ],
@@ -27554,7 +27551,13 @@
      "dimensions": [
       "To Do Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Complete",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "todo_oldest",
      "measures": [
       {

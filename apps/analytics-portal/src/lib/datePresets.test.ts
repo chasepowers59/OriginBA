@@ -84,6 +84,10 @@ describe("opensOnAllDates", () => {
     expect(opensOnAllDates({ ...base, hasDateField: false })).toBe(false);
   });
 
+  it("a saved view keeps the window it was saved with", () => {
+    expect(opensOnAllDates({ ...base, keepWindow: true })).toBe(false);
+  });
+
   it("an ordinary report keeps the window", () => {
     expect(opensOnAllDates({ ...base, report: { id: "gl_by_account" } })).toBe(false);
   });

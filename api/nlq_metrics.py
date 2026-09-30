@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from api.money_rules import MONEY_FILTERS, STANDING_ADJUSTMENT
 from api.row_security import rule_filters
-from api.reporting_dates import reporting_today
+from api.reporting_dates import reporting_today, window_date_field
 
 import re
 from dataclasses import dataclass, field
@@ -80,8 +80,7 @@ def _scalar(
     # The catalog is per-org; resolving without it looks up ids in the wrong
     # catalog and misses (this had NLQ erroring for every tenant).
     snap = get_snapshot(snapshot_id, organization_id)
-    field_name = None if windowless else (
-        date_field or snap.get("default_date_field"))
+    field_name = None if windowless else (date_field or window_date_field(snap))
     if not field_name and not windowless:
         raise ValueError(f"No date field for {snapshot_id}")
     days = int(params.get("days") or 90)
@@ -111,8 +110,7 @@ def _trend(
     windowless: bool = False,
 ) -> list[dict[str, Any]]:
     snap = get_snapshot(snapshot_id, organization_id)
-    field_name = None if windowless else (
-        date_field or snap.get("default_date_field"))
+    field_name = None if windowless else (date_field or window_date_field(snap))
     days = int(params.get("days") or 90)
     start, end = _window(days, organization_id)
     filters = list(query.get("filters") or [])

@@ -169,12 +169,14 @@ export const QUESTIONS = [
     title: "Which installed meters never registered with the head-end?",
     why: "An installed meter the network has never heard from is an AMI rollout failure. It bills on estimates until someone visits it.",
     canvas: "rpt_device_asset",
+    filters: [{"field": "Never Registered At Head-End", "op": "eq", "value": true},
+              {"field": "Is Attached To Service Point", "op": "eq", "value": true}],
     axis: "Device Type", value: "Devices",
     sql: `select coalesce("Device Type", "Device Type Code") as "Device Type",
                  coalesce("Head-End Registration Status Code", '(none)') as "Head-End Status",
                  count(*)::bigint as "Devices"
           from reporting.rpt_device_asset
-          where "Is Attached To Service Point"
+          where "Is Attached To Service Point" and "Never Registered At Head-End"
           group by 1, 2 order by 3 desc`,
   }),
   q({
@@ -319,7 +321,7 @@ export const QUESTIONS = [
                  count(distinct "Account ID")::bigint as "Accounts",
                  round(sum(abs("Billed Amount"))::numeric, 2) as "Absolute Amount"
           from reporting.rpt_bill_segment
-          where "Is Cancelled"
+          where "Is Cancelled" and "Is Rebilled"
           group by 1 order by 2 desc`,
   }),
   q({
@@ -1472,6 +1474,7 @@ export const QUESTIONS = [
     title: "Which to-do entries have been open longest?",
     why: "A to-do is work the system could not finish alone. The oldest ones are the exceptions nobody has been made responsible for.",
     canvas: "rpt_todo",
+    filters: [{"field": "Is Complete", "op": "eq", "value": false}],
     axis: "To Do Type", value: "Hours Open",
     sql: `select "To Do Entry ID", coalesce("To Do Type", "To Do Type Code") as "To Do Type",
                  "Entry Status", "Priority Code", round("Hours Open"::numeric, 1) as "Hours Open",
@@ -1714,7 +1717,7 @@ export const QUESTIONS = [
     folder: "budget_billing", essential: true,
     kind: "distribution", unit: "money", chart: "horizontal",
     title: "What are budget accounts being charged in late fees and other adjustments?",
-    why: "A late fee on a budget account means the level payment is not being kept. Filter to your late-fee adjustment type to see what budget customers were charged.",
+    why: "A late fee on a budget account means the level payment is not being kept. Covers accounts on budget today, including fees from before they joined; filter to your late-fee adjustment type.",
     canvas: "rpt_financial_txn",
     filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Adjustment", "op": "eq", "value": true},
               {"field": "Adjustment Status Code", "op": "eq", "value": "50"},
