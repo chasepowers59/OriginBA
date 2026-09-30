@@ -36,6 +36,8 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-30 | "Consumption by unit of measure" summed tier repeats and unit-less SQI lines: a 31.85M blank bar, Gallons 47% high, kW demand and power factor counted as consumption (Ellensburg) | 610ade71 (+ dbt c52e6df: Is Usage on agg_billed_usage_daily) | originba_dbt scripts/test_portal_catalog_aggregate.py |
+| 2026-09-30 | A catalog ahead of the nightly could route to an aggregate missing the new column: the query failed instead of reading the canvas | 610ade71 | tests/test_aggregate_routing.py |
 | 2026-09-29 | A dropped Oracle connection: explorer 502 with driver text ("Demo query failed: DPY-4011 ..."), data quality 22 rule errors, home "connect it under Settings" for a configured org | 1ff792d0 | tests/test_oracle_outage.py |
 | 2026-09-29 | The stale-data notice would call demo25/dev (loaded once, no nightly) overdue | 6ee7cb5e ("scheduled_builds": false) | tests/test_freshness.py |
 | 2026-09-29 | The test suite queried the real Ellensburg instance on every run: a warmer-loop test missed the two warm jobs added that day, from a thread that outlived the test | 222a7c72 (conftest refuses any live Oracle session) | tests/conftest.py, tests/test_bug_hunt_fixes.py |
