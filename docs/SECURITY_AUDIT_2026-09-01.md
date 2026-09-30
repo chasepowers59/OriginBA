@@ -120,7 +120,7 @@ Verified: `build_query(dimensions=['ALERT_INFO'])` on the real cisadm snapshot â
 Every real client org still resolves its OWN credentials (checked across all eight);
 an unknown org resolves none. `sample-rows` returns 200 and writes its audit row.
 
-### Still open
+### As found (all six fixed above; kept as the original evidence)
 
 | # | Finding | Evidence |
 | --- | --- | --- |
