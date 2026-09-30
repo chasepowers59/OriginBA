@@ -25,6 +25,7 @@ describe("AuthProvider disabled-auth identity", () => {
   });
 
   it("asks the API for the current user", () => {
-    expect(SOURCE).toMatch(/fetchCurrentUser\(\)/);
+    // through lib/sessionBootstrap.ts, whose tests cover the open-access path itself
+    expect(SOURCE).toMatch(/fetchUser:\s*fetchCurrentUser/);
   });
 });

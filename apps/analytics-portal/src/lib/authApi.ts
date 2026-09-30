@@ -22,12 +22,16 @@ async function authFetch<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+// The session calls give up after this, so a server that never answers reads as unreachable
+// (lib/sessionBootstrap.ts) instead of leaving the page on "Loading session…".
+const SESSION_TIMEOUT_MS = 10_000;
+
 export function fetchAuthStatus(): Promise<AuthStatus> {
-  return authFetch<AuthStatus>("/auth/status", { headers: authHeaders() });
+  return authFetch<AuthStatus>("/auth/status", { headers: authHeaders(), signal: AbortSignal.timeout(SESSION_TIMEOUT_MS) });
 }
 
 export function fetchCurrentUser(): Promise<AuthUser> {
-  return authFetch<AuthUser>("/auth/me");
+  return authFetch<AuthUser>("/auth/me", { signal: AbortSignal.timeout(SESSION_TIMEOUT_MS) });
 }
 
 export async function login(

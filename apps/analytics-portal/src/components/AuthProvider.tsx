@@ -14,6 +14,7 @@ import type { AuthUser } from "@/lib/auth";
 import { authDisabled, getAccessToken, hasPermission } from "@/lib/auth";
 import { fetchAuthStatus, fetchCurrentUser, logout as clearAuth } from "@/lib/authApi";
 import { isPublicPath } from "@/lib/publicPaths";
+import { loadSession } from "@/lib/sessionBootstrap";
 
 type AuthContextValue = {
   loading: boolean;
@@ -32,44 +33,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [enabled, setEnabled] = useState(authDisabled());
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [unreachable, setUnreachable] = useState(false);
 
   const refresh = useCallback(async () => {
+    setUnreachable(false);
     // The client flag only skips the login redirect; it must not invent an identity.
     // A fabricated user drifted from the API's dev context -- which builds itself from
     // `dev_organization_id()` and so cannot be tracked by a constant -- and the header
     // ended up naming one tenant over another tenant's data.
-    const status = authDisabled() ? { enabled: false } : await fetchAuthStatus();
-    setEnabled(status.enabled);
-    if (!status.enabled) {
-      // Open-access mode still HAS a user -- the API answers /auth/me with its dev
-      // context, an admin. Setting null here made the two modes diverge exactly where it
-      // matters: anything keyed off a role silently disappeared, so the admin tenant
-      // switcher was invisible in the only mode you can browse without signing in, and
-      // looked like it had never been built.
-      try {
-        setUser(await fetchCurrentUser());
-      } catch {
-        setUser(null);
-      }
-      setLoading(false);
-      return;
-    }
-
-    if (!getAccessToken()) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const me = await fetchCurrentUser();
-      setUser(me);
-    } catch {
-      clearAuth();
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+    // Open access (auth disabled) still HAS a user -- the API's dev admin -- so anything keyed
+    // off a role (the tenant switcher) works in the mode you can browse without signing in.
+    const session = await loadSession({
+      authDisabled: authDisabled(),
+      hasToken: Boolean(getAccessToken()),
+      fetchStatus: fetchAuthStatus,
+      fetchUser: fetchCurrentUser,
+      clear: clearAuth,
+    });
+    setEnabled(session.enabled);
+    setUser(session.user);
+    setUnreachable(session.unreachable);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -112,6 +96,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }),
     [loading, enabled, user, logout, refresh],
   );
+
+  if (unreachable) {
+    return (
+      <div className="mesh-bg flex min-h-screen items-center justify-center">
+        <div role="alert" className="glass-panel max-w-sm space-y-3 px-8 py-6 text-center">
+          <p className="text-sm font-medium text-heading">The Origin BA service cannot be reached.</p>
+          <p className="text-sm portal-text-muted">Check your connection, or try again in a minute.</p>
+          <button type="button" className="btn-primary text-sm" onClick={() => { setLoading(true); void refresh(); }}>
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
