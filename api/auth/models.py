@@ -51,6 +51,9 @@ class AccessGroup(Base):
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False, default="")
     client_id: Mapped[str] = mapped_column(String(64), nullable=False, default="demo")
+    # The client whose admin made it; null for a platform group. A client admin sees,
+    # edits and hands out only their own client's groups.
+    organization_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     # Comma-separated workstream ids, or "*" for all workstreams.
     workstreams_csv: Mapped[str] = mapped_column(String(512), nullable=False, default="*")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
@@ -73,6 +76,9 @@ class AuditLog(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     client_id: Mapped[str] = mapped_column(String(64), nullable=False, default="demo")
+    # The client the event belongs to (the target user's, else the actor's); a client
+    # admin reads only their own client's trail. Null for platform-level events.
+    organization_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     actor_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     actor_email: Mapped[str] = mapped_column(String(320), nullable=False, default="system")
     action: Mapped[str] = mapped_column(String(64), nullable=False)

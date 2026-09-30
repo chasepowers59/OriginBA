@@ -123,7 +123,7 @@ def main() -> int:
         admin = sign_in("admin@origin.local", admin_pw)
         users = {}
         for key, role, org in (("ell_user", "user", HOME), ("ell_editor", "editor", HOME),
-                               ("demo_user", "user", OTHER)):
+                               ("ell_admin", "client_admin", HOME), ("demo_user", "user", OTHER)):
             pw = secrets.token_urlsafe(18)
             status, _ = call("POST", "/auth/users", admin, {
                 "email": f"{key}@isolation.test", "display_name": key, "password": pw,
@@ -131,7 +131,7 @@ def main() -> int:
             if status != 200:
                 raise RuntimeError(f"admin could not create {key}: {status}")
             users[key] = sign_in(f"{key}@isolation.test", pw)
-        u, e, d = users["ell_user"], users["ell_editor"], users["demo_user"]
+        u, e, d, ca = users["ell_user"], users["ell_editor"], users["demo_user"], users["ell_admin"]
 
         print("\nA client user reads their own client, whatever they ask for")
         check(served_org(u) == HOME, f"the Ellensburg user is served {HOME}")
@@ -150,6 +150,30 @@ def main() -> int:
                                                             "password": "y" * 12, "role": "admin"})):
             check(call(method, path, u)[0] == 403, f"user: {method} {path} is refused")
             check(call(method, path, e)[0] == 403, f"editor: {method} {path} is refused")
+
+        print("\nA client admin administers their own client and no other")
+        check(served_org(ca, org=OTHER) == HOME, "the Ellensburg client admin cannot switch to Demo 25")
+        status, listed = call("GET", "/auth/users", ca)
+        check(status == 200 and {x["organization_id"] for x in listed} == {HOME},
+              "the client admin sees Ellensburg's users only")
+        status, made = call("POST", "/auth/users", ca, {"email": "made@isolation.test", "display_name": "Made",
+                                                        "password": secrets.token_urlsafe(18), "role": "user"})
+        check(status == 200 and made.get("organization_id") == HOME, "the client admin adds an Ellensburg user")
+        status, _ = call("POST", "/auth/users", ca, {"email": "other@isolation.test", "display_name": "Other",
+                                                     "password": secrets.token_urlsafe(18), "role": "user",
+                                                     "organization_id": OTHER})
+        check(status in (400, 403), "the client admin cannot add a Demo 25 user")
+        status, _ = call("POST", "/auth/users", ca, {"email": "root2@isolation.test", "display_name": "Root",
+                                                     "password": secrets.token_urlsafe(18), "role": "admin"})
+        check(status in (400, 403), "the client admin cannot make a platform admin")
+        _, everyone = call("GET", "/auth/users", admin)
+        demo_id = next(x["id"] for x in everyone if x["email"] == "demo_user@isolation.test")
+        check(call("PUT", f"/auth/users/{demo_id}", ca, {"display_name": "Taken"})[0] == 404,
+              "the client admin cannot edit a Demo 25 user")
+        _, orgs = call("GET", "/auth/organizations", ca)
+        check([o["id"] for o in orgs] == [HOME], "the client admin's client list is Ellensburg alone")
+        _, trail = call("GET", "/auth/audit-log", ca)
+        check({x.get("organization_id") for x in trail} <= {HOME}, "the client admin's audit trail is Ellensburg's")
 
         print("\nSaved work stays inside its client")
         view = {"snapshot_id": PROBE[0], "snapshot_label": "Customer accounts", "title": "Isolation check",

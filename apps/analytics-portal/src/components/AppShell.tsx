@@ -31,7 +31,8 @@ const NAV = [
   { href: "/letters", label: "Letters", id: "letters" as const, permission: "letters:read" },
   { href: "/database", label: "SQL", id: "database" as const },
   { href: "/data-quality", label: "Data Quality", id: "dq" as const },
-  { href: "/settings", label: "Settings", id: "settings" as const, permission: "settings:manage" },
+  // a client admin reaches Settings for their users alone (lib/settingsAccess.ts)
+  { href: "/settings", label: "Settings", id: "settings" as const, permission: ["settings:manage", "users:manage"] as const },
 ];
 
 export function AppShell({

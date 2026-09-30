@@ -25,6 +25,11 @@ def _migrate_schema(engine) -> None:
         migrations.append("ALTER TABLE portal_users ADD COLUMN organization_id VARCHAR(64)")
     if "row_rules_json" not in columns:
         migrations.append("ALTER TABLE portal_users ADD COLUMN row_rules_json TEXT")
+    # A client admin's scope (2026-09-30): groups and the audit trail carry the client.
+    for table in ("portal_access_groups", "portal_audit_log"):
+        if table in inspector.get_table_names() and "organization_id" not in {
+                col["name"] for col in inspector.get_columns(table)}:
+            migrations.append(f"ALTER TABLE {table} ADD COLUMN organization_id VARCHAR(64)")
     for stmt in migrations:
         with engine.begin() as conn:
             conn.execute(text(stmt))

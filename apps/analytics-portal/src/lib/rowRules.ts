@@ -9,14 +9,16 @@ export function isRestricted(user: { row_rules?: RowRule[] | null } | null | und
   return Boolean(user?.row_rules?.length);
 }
 
-/** The pages to offer: none a person's row rules cannot cover, none behind a permission they lack. */
-export function visibleNav<T extends { id: string; permission?: string }>(
+/** The pages to offer: none a person's row rules cannot cover, none behind a permission they
+ *  lack. A list of permissions means any one of them opens the page. */
+export function visibleNav<T extends { id: string; permission?: string | readonly string[] }>(
   items: T[],
   user: { row_rules?: RowRule[] | null } | null,
   can: (permission: string) => boolean = () => true,
 ): T[] {
   const restricted = isRestricted(user);
-  return items.filter((i) => !(restricted && UNRESTRICTABLE.has(i.id)) && (!i.permission || can(i.permission)));
+  const allowed = (p: T["permission"]) => !p || (typeof p === "string" ? can(p) : p.some(can));
+  return items.filter((i) => !(restricted && UNRESTRICTABLE.has(i.id)) && allowed(i.permission));
 }
 
 export function describeRules(rules: RowRule[] | null | undefined): string {

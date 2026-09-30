@@ -8,7 +8,8 @@ import { organizationForRole, rolePatch } from "@/lib/adminOrgBinding";
 import { auditActionLabel } from "@/lib/auditLabels";
 import { groupDeletionWarning } from "@/lib/groupDeletion";
 import { formatDateTime } from "@/lib/format";
-import type { AccessGroup, AuthUser, PortalOrganization } from "@/lib/auth";
+import { roleLabel, type AccessGroup, type AuthUser, type PortalOrganization, type PortalRole } from "@/lib/auth";
+import { assignableRoles } from "@/lib/settingsAccess";
 import { RowRulesCell } from "@/components/RowRulesCell";
 import {
   createAccessGroup,
@@ -25,6 +26,11 @@ import {
 
 export function AdminAccessPanel() {
   const { user: currentUser } = useAuth();
+  // the roles this admin may give; a row keeps its current role listed even when this
+  // admin could not give it (a client admin never sees the platform admin, but be safe)
+  const assignable = assignableRoles(currentUser?.role);
+  const roleOptions = (current: PortalRole) =>
+    assignable.includes(current) ? assignable : [...assignable, current];
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [groups, setGroups] = useState<AccessGroup[]>([]);
   const [workstreamOptions, setWorkstreamOptions] = useState<GrantableWorkstream[]>([]);
@@ -246,9 +252,9 @@ export function AdminAccessPanel() {
                       className="input-modern py-1 text-xs"
                       title={user.id === currentUser?.id ? "You cannot change your own role" : undefined}
                     >
-                      <option value="user">User</option>
-                      <option value="editor">Editor</option>
-                      <option value="admin">Admin</option>
+                      {roleOptions(user.role).map((r) => (
+                        <option key={r} value={r}>{roleLabel(r)}</option>
+                      ))}
                     </select>
                   </td>
                   <td className="px-3 py-2">
@@ -338,9 +344,9 @@ export function AdminAccessPanel() {
             value={newUser.role}
             onChange={(e) => setNewUser((s) => ({ ...s, role: e.target.value }))}
           >
-            <option value="user">User</option>
-            <option value="editor">Editor</option>
-            <option value="admin">Admin</option>
+            {assignable.map((r) => (
+              <option key={r} value={r}>{roleLabel(r)}</option>
+            ))}
           </select>
           <select
             aria-label="Organization"

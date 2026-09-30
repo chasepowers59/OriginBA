@@ -82,7 +82,7 @@ class AdminHasNoOrganizationTests(unittest.TestCase):
         with self.assertRaises(AuthError) as caught:
             self._create("citycorp.admin@x.gov", "admin", "citycorp")
         # The message has to say what to do instead, or someone just retries.
-        self.assertIn("editor", str(caught.exception).lower())
+        self.assertIn("client admin", str(caught.exception).lower())
 
     def test_platform_admin_still_creates(self):
         created = self._create("platform@x.gov", "admin", None)

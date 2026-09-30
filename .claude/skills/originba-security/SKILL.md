@@ -21,15 +21,21 @@ only admins — may switch tenants with `X-Organization-Id`; for everyone else t
 header is ignored, never rejected, and never used as a connection detail.
 
 **An admin is a PLATFORM admin and has no organization of their own** (settled and
-enforced 2026-09-02). There is no per-client admin tier: users, access groups and the
-audit log are all filtered by `client_id`, which is ONE value for the whole deployment
-(`load_portal_config()["client_id"]`), so an admin bound to a client would have been a
-deployment-wide superuser wearing that client's name. `_validate_organization_id` now
-refuses the combination on both the create and the promote paths — the promote path
-mattered, because the panel's role dropdown sent `{role}` alone and the old client
-survived. Adding a real client-admin tier means giving `portal_access_groups` and
-`portal_audit_log` an organization first; it is a feature with a schema cost, not a
-dropdown. Evidence and reasoning: `tests/test_admin_org_isolation.py`.
+enforced 2026-09-02). Users, access groups and the audit log are filtered by `client_id`,
+which is ONE value for the whole deployment, so an admin bound to a client would have been
+a deployment-wide superuser wearing that client's name; `_validate_organization_id`
+refuses the combination on both the create and the promote paths.
+Evidence: `tests/test_admin_org_isolation.py`.
+
+**The per-client tier is `client_admin`** (2026-09-30), built the way the audit said it
+had to be: `portal_access_groups` and `portal_audit_log` carry `organization_id`, and
+every user, group and audit read or write takes `scope_org` from the caller's OWN account
+(`routes._scope`: None for the platform admin, never the request, never a switched
+tenant). A client admin holds `users:manage` + `groups:manage` and nothing platform-wide
+(no data sources, settings, raw SQL, content packs, health, tenant switch); assigns user,
+editor or client admin, never admin; hands out only their own client's groups; and an
+identity provider's group never demotes them (`PORTAL_MANAGED_ROLES`).
+Evidence: `tests/test_client_admin.py`, and live `scripts/check_tenant_isolation.py`.
 
 ## The rules
 

@@ -35,10 +35,16 @@ def log_audit(
     target_type: str = "",
     target_id: str = "",
     detail: str = "",
+    organization_id: str | None = None,
 ) -> None:
+    # The client the event belongs to: given (the target's), else the actor's own.
+    if organization_id is None and actor_id:
+        actor = session.get(User, actor_id)
+        organization_id = actor.organization_id if actor else None
     session.add(
         AuditLog(
             client_id=_client_id(),
+            organization_id=organization_id,
             actor_id=actor_id,
             actor_email=actor_email.strip().lower() or "system",
             action=action,
@@ -71,8 +77,11 @@ AUDIT_CATEGORIES: dict[str, frozenset[str]] = {"admin": ADMIN_AUDIT_ACTIONS}
 
 def list_audit_events(session: Session, limit: int = 100,
                       action: str | None = None,
-                      actions: Collection[str] | None = None) -> list[dict[str, Any]]:
+                      actions: Collection[str] | None = None,
+                      scope_org: str | None = None) -> list[dict[str, Any]]:
     stmt = select(AuditLog).where(AuditLog.client_id == _client_id())
+    if scope_org:
+        stmt = stmt.where(AuditLog.organization_id == scope_org)
     if action:
         stmt = stmt.where(AuditLog.action == action)
     if actions:
@@ -85,6 +94,7 @@ def list_audit_events(session: Session, limit: int = 100,
     return [
         {
             "id": row.id,
+            "organization_id": row.organization_id,
             "actor_email": row.actor_email,
             "action": row.action,
             "target_type": row.target_type,
@@ -113,11 +123,11 @@ def _workstreams_for_user(user: User) -> list[str]:
 # groups and the audit log are all filtered by client_id, which is one value for the
 # whole deployment -- so the account was a deployment-wide superuser wearing a client's
 # name. The invariant is enforced here so both the create and update paths inherit it.
-# A real per-client admin tier would need portal_access_groups and portal_audit_log to
-# carry an organization first; see tests/test_admin_org_isolation.py.
+# The per-client tier is the client_admin role (2026-09-30): groups and the audit log now
+# carry an organization, and every read and write is scoped to it (tests/test_client_admin.py).
 ADMIN_ORG_ERROR = (
     "An admin administers every client and cannot be bound to one. "
-    "Leave the organization blank, or use the editor role for client-scoped access."
+    "Leave the organization blank, or use the client admin role for one client."
 )
 
 
@@ -171,29 +181,36 @@ def authenticate_user(session: Session, email: str, password: str) -> User:
     return user
 
 
-def list_users(session: Session) -> list[dict[str, Any]]:
-    users = session.scalars(
-        select(User)
-        .options(selectinload(User.group_links).selectinload(UserAccessGroup.group))
-        .where(User.client_id == _client_id())
-        .order_by(User.display_name)
-    ).all()
+# `scope_org` below is the client a CLIENT ADMIN administers; None is the platform admin,
+# who sees every client. It comes from the caller's own account (api/auth/routes.py
+# _scope), never from the request.
+
+def list_users(session: Session, scope_org: str | None = None) -> list[dict[str, Any]]:
+    stmt = (select(User)
+            .options(selectinload(User.group_links).selectinload(UserAccessGroup.group))
+            .where(User.client_id == _client_id()))
+    if scope_org:
+        stmt = stmt.where(User.organization_id == scope_org)
+    users = session.scalars(stmt.order_by(User.display_name)).all()
     return [user_to_public(u) for u in users]
 
 
-def get_user(session: Session, user_id: str) -> User | None:
-    return session.scalar(
-        select(User)
-        .options(selectinload(User.group_links).selectinload(UserAccessGroup.group))
-        .where(User.id == user_id, User.client_id == _client_id())
-    )
+def get_user(session: Session, user_id: str, scope_org: str | None = None) -> User | None:
+    stmt = (select(User)
+            .options(selectinload(User.group_links).selectinload(UserAccessGroup.group))
+            .where(User.id == user_id, User.client_id == _client_id()))
+    if scope_org:
+        stmt = stmt.where(User.organization_id == scope_org)
+    return session.scalar(stmt)
 
 
 def _set_user_groups(session: Session, user: User, group_ids: list[str]) -> None:
+    # A user joins platform groups or their own client's, never another client's.
     valid_groups = session.scalars(
         select(AccessGroup).where(
             AccessGroup.client_id == _client_id(),
             AccessGroup.id.in_(group_ids),
+            (AccessGroup.organization_id.is_(None)) | (AccessGroup.organization_id == user.organization_id),
         )
     ).all()
     valid_ids = {g.id for g in valid_groups}
@@ -235,7 +252,11 @@ def change_password(session: Session, user_id: str, current_password: str, new_p
     return _public_user(session, user.id)
 
 
-def create_user(session: Session, actor_role: str, payload: dict[str, Any]) -> dict[str, Any]:
+CLIENT_SCOPE_ERROR = "A client admin manages users of their own client only."
+
+
+def create_user(session: Session, actor_role: str, payload: dict[str, Any],
+                scope_org: str | None = None) -> dict[str, Any]:
     role = payload.get("role", "user")
     if role not in ROLES:
         raise AuthError(f"Invalid role: {role}")
@@ -247,6 +268,11 @@ def create_user(session: Session, actor_role: str, payload: dict[str, Any]) -> d
     if existing:
         raise AuthError("A user with this email already exists")
 
+    if scope_org:
+        requested = (payload.get("organization_id") or "").strip() or scope_org
+        if requested != scope_org:
+            raise AuthError(CLIENT_SCOPE_ERROR)
+        payload = {**payload, "organization_id": scope_org}
     organization_id = _validate_organization_id(payload.get("organization_id"), role)
 
     user = User(
@@ -271,10 +297,13 @@ def update_user(
     actor_user_id: str,
     user_id: str,
     payload: dict[str, Any],
+    scope_org: str | None = None,
 ) -> dict[str, Any]:
-    user = get_user(session, user_id)
+    user = get_user(session, user_id, scope_org)
     if not user:
         raise AuthError("User not found")
+    if scope_org and "organization_id" in payload and payload["organization_id"] != scope_org:
+        raise AuthError(CLIENT_SCOPE_ERROR)
 
     is_self = actor_user_id == user_id
 
@@ -336,52 +365,58 @@ def update_user(
     return _public_user(session, user.id)
 
 
-def list_groups(session: Session) -> list[dict[str, Any]]:
-    groups = session.scalars(
-        select(AccessGroup).where(AccessGroup.client_id == _client_id()).order_by(AccessGroup.name)
-    ).all()
-    out = []
-    for group in groups:
-        count = session.scalar(
-            select(func.count()).select_from(UserAccessGroup).where(UserAccessGroup.group_id == group.id)
-        )
-        out.append(
-            {
-                "id": group.id,
-                "name": group.name,
-                "description": group.description,
-                "client_id": group.client_id,
-                "workstreams": group.workstream_ids(),
-                "member_count": int(count or 0),
-            }
-        )
-    return out
-
-
-def create_group(session: Session, payload: dict[str, Any]) -> dict[str, Any]:
-    workstreams = payload.get("workstreams") or ["*"]
-    group = AccessGroup(
-        name=payload["name"].strip(),
-        description=(payload.get("description") or "").strip(),
-        client_id=_client_id(),
-        workstreams_csv=",".join(workstreams) if workstreams != ["*"] else "*",
+def _group_public(session: Session, group: AccessGroup) -> dict[str, Any]:
+    count = session.scalar(
+        select(func.count()).select_from(UserAccessGroup).where(UserAccessGroup.group_id == group.id)
     )
-    session.add(group)
-    session.flush()
     return {
         "id": group.id,
         "name": group.name,
         "description": group.description,
         "client_id": group.client_id,
+        "organization_id": group.organization_id,
         "workstreams": group.workstream_ids(),
-        "member_count": 0,
+        "member_count": int(count or 0),
     }
 
 
-def update_group(session: Session, group_id: str, payload: dict[str, Any]) -> dict[str, Any]:
-    group = session.scalar(
-        select(AccessGroup).where(AccessGroup.id == group_id, AccessGroup.client_id == _client_id())
+def _group(session: Session, group_id: str, scope_org: str | None) -> AccessGroup | None:
+    stmt = select(AccessGroup).where(AccessGroup.id == group_id, AccessGroup.client_id == _client_id())
+    if scope_org:
+        stmt = stmt.where(AccessGroup.organization_id == scope_org)
+    return session.scalar(stmt)
+
+
+def list_groups(session: Session, scope_org: str | None = None) -> list[dict[str, Any]]:
+    stmt = select(AccessGroup).where(AccessGroup.client_id == _client_id())
+    if scope_org:
+        stmt = stmt.where(AccessGroup.organization_id == scope_org)
+    return [_group_public(session, g) for g in session.scalars(stmt.order_by(AccessGroup.name)).all()]
+
+
+def create_group(session: Session, payload: dict[str, Any], scope_org: str | None = None) -> dict[str, Any]:
+    workstreams = payload.get("workstreams") or ["*"]
+    requested = (payload.get("organization_id") or "").strip() or None
+    if scope_org and requested not in (None, scope_org):
+        raise AuthError("A client admin manages groups of their own client only.")
+    organization_id = scope_org or requested
+    if organization_id and not is_valid_org_id(organization_id):
+        raise AuthError("Invalid organization")
+    group = AccessGroup(
+        name=payload["name"].strip(),
+        description=(payload.get("description") or "").strip(),
+        client_id=_client_id(),
+        organization_id=organization_id,
+        workstreams_csv=",".join(workstreams) if workstreams != ["*"] else "*",
     )
+    session.add(group)
+    session.flush()
+    return _group_public(session, group)
+
+
+def update_group(session: Session, group_id: str, payload: dict[str, Any],
+                 scope_org: str | None = None) -> dict[str, Any]:
+    group = _group(session, group_id, scope_org)
     if not group:
         raise AuthError("Access group not found")
     if payload.get("name") is not None:
@@ -392,23 +427,11 @@ def update_group(session: Session, group_id: str, payload: dict[str, Any]) -> di
         ws = payload["workstreams"] or ["*"]
         group.workstreams_csv = ",".join(ws) if ws != ["*"] else "*"
     session.add(group)
-    count = session.scalar(
-        select(func.count()).select_from(UserAccessGroup).where(UserAccessGroup.group_id == group.id)
-    )
-    return {
-        "id": group.id,
-        "name": group.name,
-        "description": group.description,
-        "client_id": group.client_id,
-        "workstreams": group.workstream_ids(),
-        "member_count": int(count or 0),
-    }
+    return _group_public(session, group)
 
 
-def delete_group(session: Session, group_id: str) -> bool:
-    group = session.scalar(
-        select(AccessGroup).where(AccessGroup.id == group_id, AccessGroup.client_id == _client_id())
-    )
+def delete_group(session: Session, group_id: str, scope_org: str | None = None) -> bool:
+    group = _group(session, group_id, scope_org)
     if not group:
         return False
     session.delete(group)

@@ -1,4 +1,4 @@
-export type PortalRole = "user" | "editor" | "admin";
+export type PortalRole = "user" | "editor" | "client_admin" | "admin";
 
 export type AuthUser = {
   id: string;
@@ -110,6 +110,7 @@ export function roleLabel(role: PortalRole): string {
   const labels: Record<PortalRole, string> = {
     user: "User",
     editor: "Editor",
+    client_admin: "Client admin",
     admin: "Admin",
   };
   return labels[role] ?? role;

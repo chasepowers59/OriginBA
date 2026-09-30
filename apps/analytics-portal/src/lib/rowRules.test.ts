@@ -20,6 +20,13 @@ describe("row rules in the interface", () => {
     expect(visibleNav(withLetters, null, () => true).map((n) => n.id)).toEqual(["home", "letters", "settings"]);
   });
 
+  it("a page open to any of several permissions is offered to whoever holds one", () => {
+    const nav = [{ id: "home" }, { id: "settings", permission: ["settings:manage", "users:manage"] }];
+    const clientAdmin = (p: string) => p === "users:manage";
+    expect(visibleNav(nav, { row_rules: [] }, clientAdmin).map((n) => n.id)).toEqual(["home", "settings"]);
+    expect(visibleNav(nav, { row_rules: [] }, () => false).map((n) => n.id)).toEqual(["home"]);
+  });
+
   it("letters are never offered to a restricted person, permission or not", () => {
     // api/letters/routes.py refuses them: a letter cannot be cut down to a person's rows
     const restricted = { row_rules: [{ field: "Service Type", values: ["Water"] }] };
