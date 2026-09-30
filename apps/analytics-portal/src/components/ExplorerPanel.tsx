@@ -28,7 +28,7 @@ import {
   opensOnAllDates,
   widenDateRange,
 } from "@/lib/datePresets";
-import { explorerQuery } from "@/lib/explorerFilters";
+import { explorerQuery, reportToRun } from "@/lib/explorerFilters";
 import { runningLabel } from "@/lib/queryProgress";
 import { applyProcessGuide } from "@/lib/processGuide";
 import { resolveDateField } from "@/lib/tileDateField";
@@ -359,15 +359,6 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
 
   useEffect(() => {
     const favId = searchParams.get("favorite");
-    const reportParam = searchParams.get("report");
-    if (reportParam && !favoriteApplied && dateStart && dateEnd) {
-      const report = premadeReports.find((r) => r.id === reportParam);
-      if (report) {
-        runPremade(report);
-        setFavoriteApplied(true);
-        return;
-      }
-    }
     if (favId && !favoriteApplied) {
       void getViewRemote(favId).then((fav) => {
         if (!fav || fav.snapshotId !== metadata.id) {
@@ -409,9 +400,11 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     if (searchParams.get("favorite") && !favoriteApplied) return;
     if (tab === "model") return;
 
-    const report =
-      premadeReports.find((r) => r.id === activeReportId) ?? premadeReports[0];
+    // a ?report= link is applied here and only here: running it anywhere else raced this run
+    const linked = favoriteApplied ? null : searchParams.get("report");
+    const report = reportToRun(premadeReports, activeReportId, linked);
     if (!report) return;
+    if (linked) setFavoriteApplied(true);
     runPremade(report);
   }, [allDates, dateStart, dateEnd, scopeField, scopeValue, drillFilter, metadata.id, tab]); // eslint-disable-line react-hooks/exhaustive-deps
 

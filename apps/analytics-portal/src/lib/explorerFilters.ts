@@ -38,3 +38,15 @@ export function explorerQuery(p: Parameters<typeof explorerFilters>[0] & {
     all_dates: p.allDates,
   };
 }
+
+/** The report the explorer runs: a linked report until the link is applied, then the one the
+ *  reader has open, else the canvas's first. The one place this is decided, so a link's run
+ *  and the page's auto-run cannot race each other. */
+export function reportToRun<R extends { id: string }>(
+  reports: R[],
+  activeReportId: string | null,
+  linkedReportId: string | null,
+): R | undefined {
+  const find = (id: string | null) => (id ? reports.find((r) => r.id === id) : undefined);
+  return find(linkedReportId) ?? find(activeReportId) ?? reports[0];
+}

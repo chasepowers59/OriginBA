@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { canWidenDateRange, explorerPeriodLabel } from "./datePresets";
-import { explorerFilters, explorerQuery } from "./explorerFilters";
+import { explorerFilters, explorerQuery, reportToRun } from "./explorerFilters";
 
 const range = { dateField: "Snapshot Date", dateStart: "2025-06-18", dateEnd: "2026-06-18" };
 
@@ -76,5 +76,30 @@ describe("the explorer's request", () => {
     const base = { dateField: "Bill Date", dateStart: "2026-01-01", dateEnd: "2026-03-31" };
     expect(explorerQuery({ ...base, allDates: true, dimensions: ["Bill Cycle"], measures: [] }).all_dates).toBe(true);
     expect(explorerQuery({ ...base, allDates: false, dimensions: ["Bill Cycle"], measures: [] }).all_dates).toBe(false);
+  });
+});
+
+// A card links to /explore/<canvas>?report=<id>. The link's run and the page's auto-run both
+// fired and the later one aborted the earlier, so the canvas's FIRST report won: Finance's
+// adjustments link opened "What is the financial position, by transaction type?" (2026-09-30).
+// One function decides, and only the auto-run runs.
+describe("reportToRun", () => {
+  const reports = [{ id: "financial_position" }, { id: "adjustments_by_type" }, { id: "revenue_by_class" }];
+
+  it("a link's report wins until it has been applied", () => {
+    expect(reportToRun(reports, null, "adjustments_by_type")?.id).toBe("adjustments_by_type");
+  });
+
+  it("then the report the reader has open", () => {
+    expect(reportToRun(reports, "revenue_by_class", null)?.id).toBe("revenue_by_class");
+  });
+
+  it("else the canvas's first report, and an unknown link falls through to it", () => {
+    expect(reportToRun(reports, null, null)?.id).toBe("financial_position");
+    expect(reportToRun(reports, null, "no_such_report")?.id).toBe("financial_position");
+  });
+
+  it("nothing on a canvas with no reports", () => {
+    expect(reportToRun([], null, "adjustments_by_type")).toBeUndefined();
   });
 });
