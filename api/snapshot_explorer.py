@@ -33,7 +33,7 @@ from api.data_version import data_version
 from api.summary_cache import cached
 from api.row_security import enforce as enforce_row_rules, readable, require_unrestricted, row_filters
 from api.workstream_dashboard import build_workstream_about, build_workstream_summary
-from api.snapshot_catalog import (CatalogError, allowed_fields, get_snapshot,
+from api.snapshot_catalog import (CatalogError, allowed_fields, boolean_fields, get_snapshot,
                                   list_snapshots, list_workstreams,
                                   load_catalog, snapshot_backend)
 
@@ -680,6 +680,8 @@ def _result_labels(snapshot: dict, columns: list[str], dimensions: list[str],
         agg = str(m.get("agg", "count")).lower()
         if field == "*":
             labels[f"m{idx}"] = "Number of records"
+        elif agg == "share":
+            labels[f"m{idx}"] = f"% {label_of(field)}"
         else:
             word, name = _AGG_WORD.get(agg, agg.title()), label_of(field)
             # "Total Balance" summed is "Total Balance", not "Total Total Balance"
@@ -752,6 +754,7 @@ def cached_query(org_id: str, snapshot: dict[str, Any], body: QueryRequest,
         table_name=snapshot["table_name"],
         allowed_fields=allowed_fields(snapshot),
         trusted_measures=set(snapshot.get("trusted_measures", [])),
+        boolean_fields=boolean_fields(snapshot),
         dialect=dialect,
         schema=schema,
         **request,

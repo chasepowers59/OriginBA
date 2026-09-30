@@ -189,6 +189,11 @@ def allowed_fields(snapshot: dict[str, Any]) -> set[str]:
             if not is_protected_column(field.get("id", ""))}
 
 
+def boolean_fields(snapshot: dict[str, Any]) -> set[str]:
+    """The true/false fields a query may take a share of (api/query_builder.py)."""
+    return {field["id"] for field in snapshot.get("fields", []) if field.get("type") == "boolean"}
+
+
 def org_backend(organization_id: str | None) -> tuple[str, str]:
     """(engine, catalog) for an org.
 

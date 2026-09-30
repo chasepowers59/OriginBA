@@ -18,7 +18,10 @@ IDENT_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 # a declared field of the snapshot. This pattern is the second line, rejecting anything
 # that could not be a column name at all, and a double quote most of all.
 WAREHOUSE_IDENT_RE = re.compile(r"^[A-Za-z][A-Za-z0-9 _()/%.,+-]*$")
-ALLOWED_AGGS = {"count", "count_distinct", "sum", "min", "max"}
+# avg: over a trusted measure, like sum. share: the percentage of rows where a boolean
+# field is true, every row in the denominator. Neither adds up across groups
+# (tests/test_average_and_share.py).
+ALLOWED_AGGS = {"count", "count_distinct", "sum", "avg", "share", "min", "max"}
 ALLOWED_OPS = {"eq", "neq", "in", "between", "gte", "lte"}
 ALLOWED_TIME_GRAINS = {"month", "quarter", "year"}
 
@@ -104,6 +107,7 @@ def build_query(
     # Net money (adjustments: charges, credits, transfers) ranks by size either way, so a
     # six-bar limit keeps the credits that explain the total (tests/test_rank_by_magnitude.py).
     rank_by_magnitude: bool = False,
+    boolean_fields: set[str] | frozenset[str] = frozenset(),
 ) -> tuple[str, dict[str, Any]]:
     if limit < 1 or limit > 5000:
         raise QueryValidationError("limit must be between 1 and 5000")
@@ -127,8 +131,10 @@ def build_query(
             raise QueryValidationError(f"Invalid aggregation: {agg}")
         if field != "*" and field not in allowed_fields:
             raise QueryValidationError(f"Invalid measure field: {field}")
-        if agg == "sum" and field != "*" and field not in trusted_measures:
-            raise QueryValidationError(f"Sum not allowed on field: {field}")
+        if agg in ("sum", "avg") and field not in trusted_measures:
+            raise QueryValidationError(f"{agg.title()} not allowed on field: {field}")
+        if agg == "share" and field not in boolean_fields:
+            raise QueryValidationError(f"Share needs a true/false field: {field}")
         if agg == "count_distinct" and field == "*":
             raise QueryValidationError("count_distinct requires a field")
         alias = f"m{idx}"
@@ -181,6 +187,12 @@ def build_query(
             select_parts.append(f"COUNT(DISTINCT {_quote(spec.field, dialect)}) AS {alias}")
         elif spec.agg == "sum":
             select_parts.append(f"SUM({_quote(spec.field, dialect)}) AS {alias}")
+        elif spec.agg == "avg":
+            select_parts.append(f"AVG({_quote(spec.field, dialect)}) AS {alias}")
+        elif spec.agg == "share":
+            # Oracle flags are BOOLEAN on 23ai canvases and NUMBER 1/0 elsewhere: = 1 reads both
+            true = _quote(spec.field, dialect) + ("" if pg else " = 1")
+            select_parts.append(f"100.0 * AVG(CASE WHEN {true} THEN 1 ELSE 0 END) AS {alias}")
         elif spec.agg == "min":
             select_parts.append(f"MIN({_quote(spec.field, dialect)}) AS {alias}")
         elif spec.agg == "max":

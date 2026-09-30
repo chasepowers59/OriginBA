@@ -145,7 +145,7 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
     """
     from api.query_builder import build_query
     from api.reporting_dates import reporting_window
-    from api.snapshot_catalog import allowed_fields, get_snapshot, snapshot_backend
+    from api.snapshot_catalog import allowed_fields, boolean_fields, get_snapshot, snapshot_backend
     from api.snapshot_explorer import _result_labels, _serialize_value
 
     org_id = schedule["organization_id"]
@@ -186,6 +186,7 @@ def render_schedule(schedule: dict[str, Any], view: dict[str, Any]):
         table_name=snapshot["table_name"],
         allowed_fields=allowed_fields(snapshot),
         trusted_measures=trusted,
+        boolean_fields=boolean_fields(snapshot),
         dimensions=view.get("dimensions") or [],
         measures=measures,
         filters=filters,

@@ -95,7 +95,7 @@ def _claims(token: str) -> dict[str, Any]:
 @router.get("/embed/{token}/data")
 def embed_data(token: str) -> dict[str, Any]:
     from api.query_builder import build_query
-    from api.snapshot_catalog import allowed_fields, get_snapshot, snapshot_backend
+    from api.snapshot_catalog import allowed_fields, boolean_fields, get_snapshot, snapshot_backend
     from api.snapshot_explorer import _result_labels, _run, _serialize_value
 
     claims = _claims(token)
@@ -117,6 +117,7 @@ def embed_data(token: str) -> dict[str, Any]:
     _, dialect, schema = snapshot_backend(snapshot, org_id)
     sql, binds = build_query(table_name=snapshot["table_name"], allowed_fields=allowed_fields(snapshot),
                              trusted_measures=set(snapshot.get("trusted_measures") or []),
+                             boolean_fields=boolean_fields(snapshot),
                              dimensions=view.get("dimensions") or [], measures=measures, filters=filters + rules,
                              limit=500, dialect=dialect, schema=schema)
     # Public route: repeated loads of an embed are served from memory, not re-queried.

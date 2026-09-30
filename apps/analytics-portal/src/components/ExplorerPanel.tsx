@@ -343,11 +343,14 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   ]);
 
   useEffect(() => {
+    // a report's own aggregation stands, e.g. a share of a true/false field, which is not a measure
+    const own = premadeReports.find((r) => r.id === activeReportId)?.measures[0];
+    if (own?.field === measureField && own.agg === measureAgg) return;
     const aggs = allowedAggsForMeasure({ measures }, measureField);
     if (!aggs.includes(measureAgg)) {
       setMeasureAgg(aggs[0] ?? "count");
     }
-  }, [measureField, measureAgg, metadata]);
+  }, [measureField, measureAgg, metadata, activeReportId, premadeReports]);
 
   useEffect(() => {
     const field = searchParams.get("cross_field");

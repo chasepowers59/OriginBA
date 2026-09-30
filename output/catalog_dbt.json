@@ -184,16 +184,8 @@
      "snapshot_id": "rpt_premise_sp"
     },
     {
-     "report_id": "meter_age_replacement",
-     "snapshot_id": "rpt_device_asset"
-    },
-    {
      "report_id": "asset_replacement_value",
      "snapshot_id": "rpt_device_asset"
-    },
-    {
-     "report_id": "device_model_reliability",
-     "snapshot_id": "rpt_device_event"
     },
     {
      "report_id": "service_on_off_churn",
@@ -280,10 +272,6 @@
      "snapshot_id": "rpt_bill_segment"
     },
     {
-     "report_id": "consumption_outliers",
-     "snapshot_id": "rpt_bill_segment"
-    },
-    {
      "report_id": "rate_migration",
      "snapshot_id": "rpt_rate_schedule_history"
     },
@@ -350,10 +338,6 @@
     {
      "report_id": "revenue_reconciliation",
      "snapshot_id": "rpt_revenue_reconciliation"
-    },
-    {
-     "report_id": "payment_timing",
-     "snapshot_id": "rpt_customer_account"
     },
     {
      "report_id": "cancelled_payments",
@@ -462,10 +446,6 @@
     {
      "report_id": "kpi_exception_rate",
      "snapshot_id": "rpt_exception"
-    },
-    {
-     "report_id": "kpi_first_time_fix",
-     "snapshot_id": "rpt_field_activity"
     },
     {
      "report_id": "batch_runtime_trend",
@@ -1711,8 +1691,8 @@
      "id": "batch_runtime_trend",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "avg",
+       "field": "Duration (min)"
       }
      ],
      "title": "Which batch jobs take the longest, on average?",
@@ -4630,8 +4610,8 @@
      "id": "estimated_billing",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Estimated Segment"
       }
      ],
      "title": "How much billing is running on estimates?",
@@ -4722,9 +4702,9 @@
      "workstream_label": "Rates"
     },
     {
-     "benchmark": "above 95%",
+     "benchmark": "below 5%",
      "chart_type": "pie",
-     "description": "The headline meter-to-cash KPI. Every cancelled and rebilled segment is a bill the utility got wrong and had to redo, and the industry target is above 95% right first time.",
+     "description": "The headline meter-to-cash KPI. Every cancelled segment is a bill the utility got wrong and had to redo; the industry target is above 95% right first time, so below 5% here.",
      "dimensions": [
       "Bill Cycle"
      ],
@@ -4732,11 +4712,11 @@
      "id": "kpi_billing_accuracy",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Is Cancelled"
       }
      ],
-     "title": "Billing accuracy rate \u2014 what share of bills were not rebilled?",
+     "title": "Billing accuracy \u2014 what share of bill segments had to be cancelled and redone, by cycle?",
      "workstream_label": "Billing Performance"
     },
     {
@@ -4756,11 +4736,11 @@
      "id": "kpi_estimation_rate",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Estimated Segment"
       }
      ],
-     "title": "Estimation rate \u2014 how much revenue is billed on estimates?",
+     "title": "Estimation rate \u2014 what share of bill segments were estimated, by cycle?",
      "workstream_label": "Billing Performance"
     },
     {
@@ -4835,34 +4815,6 @@
      ],
      "title": "Which bills came out zero or negative?",
      "workstream_label": "Billing"
-    },
-    {
-     "chart_type": "horizontal",
-     "description": "High consumption is a leak, a theft, a faulty meter or a genuinely large customer. Comparing within a rate schedule is what separates the fourth from the first three.",
-     "dimensions": [
-      "Premise Address"
-     ],
-     "filters": [
-      {
-       "field": "Is Frozen",
-       "op": "eq",
-       "value": true
-      },
-      {
-       "field": "Is Cancelled",
-       "op": "eq",
-       "value": false
-      }
-     ],
-     "id": "consumption_outliers",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "Which premises consumed far more than others on the same rate?",
-     "workstream_label": "Usage"
     }
    ],
    "related_snapshot": null,
@@ -9382,12 +9334,18 @@
      "dimensions": [
       "Case Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Closed",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "case_resolution_time",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "avg",
+       "field": "Case Duration Hours"
       }
      ],
      "title": "How long do cases take to close, by type?",
@@ -11418,8 +11376,8 @@
      "id": "self_service_adoption",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Self-Service Enabled"
       }
      ],
      "title": "What is self-service adoption, by customer class?",
@@ -11470,8 +11428,8 @@
      "id": "kpi_write_off_exposure",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "sum",
+       "field": "Arrears 120+ Days"
       }
      ],
      "title": "Write-off exposure \u2014 how much debt is past the point of collection?",
@@ -11533,23 +11491,6 @@
      ],
      "title": "How are bills actually being delivered?",
      "workstream_label": "Channel & Deflection"
-    },
-    {
-     "chart_type": "pie",
-     "description": "Days between the bill and the payment is DSO in its rawest form. It is also the number that tells you whether a due-date change worked.",
-     "dimensions": [
-      "Customer Class"
-     ],
-     "filters": [],
-     "id": "payment_timing",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "How promptly are bills being paid?",
-     "workstream_label": "Payments"
     },
     {
      "chart_type": "horizontal",
@@ -12631,8 +12572,8 @@
      "id": "notification_error_detail",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Is Error"
       }
      ],
      "title": "Which notification types fail most often?",
@@ -14986,24 +14927,6 @@
      "workstream_label": "Device Management"
     },
     {
-     "all_dates": true,
-     "chart_type": "horizontal",
-     "description": "A meter past its useful life drifts, and a drifting meter under-reads. This is the replacement programme's work queue and its capital case at once.",
-     "dimensions": [
-      "Device Type"
-     ],
-     "filters": [],
-     "id": "meter_age_replacement",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "Which meters are oldest relative to their useful life?",
-     "workstream_label": "Asset Management"
-    },
-    {
      "chart_type": "bar",
      "description": "Replacement cost by asset type is the capital plan. Splitting it by disposition shows how much of it is already sitting in a warehouse.",
      "dimensions": [
@@ -15532,23 +15455,6 @@
       }
      ],
      "title": "What are the meters reporting?",
-     "workstream_label": "Device Events"
-    },
-    {
-     "chart_type": "horizontal",
-     "description": "Events per device normalises for fleet size, which is what turns a device-event count into a reliability comparison between models.",
-     "dimensions": [
-      "Device Model"
-     ],
-     "filters": [],
-     "id": "device_model_reliability",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "Which meter models report the most events per device?",
      "workstream_label": "Device Events"
     }
    ],
@@ -16286,11 +16192,11 @@
      "id": "kpi_exception_rate",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Is Open"
       }
      ],
-     "title": "Exception rate \u2014 what share of usage is stuck behind an exception?",
+     "title": "Exception backlog \u2014 what share of exceptions are still open, by domain?",
      "workstream_label": "Data Quality"
     },
     {
@@ -17156,24 +17062,6 @@
      ],
      "title": "What is the field activity backlog, by type?",
      "workstream_label": "Field Operations"
-    },
-    {
-     "benchmark": "high is good",
-     "chart_type": "pie",
-     "description": "First-time fix rate is the field KPI that moves cost and satisfaction together. Retries are the inverse: every one is a truck sent twice for the same job.",
-     "dimensions": [
-      "Activity Type"
-     ],
-     "filters": [],
-     "id": "kpi_first_time_fix",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "First-time fix \u2014 which field work needed more than one visit?",
-     "workstream_label": "Field Performance"
     },
     {
      "chart_type": "bar",
@@ -19773,11 +19661,11 @@
      "id": "read_coverage",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Is Estimated Measurement"
       }
      ],
-     "title": "Read quality \u2014 how many measurements are estimated or missing?",
+     "title": "Read quality \u2014 what share of measurements are estimated, by device type?",
      "workstream_label": "Meter Reading"
     }
    ],

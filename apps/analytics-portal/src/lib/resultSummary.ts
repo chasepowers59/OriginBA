@@ -6,7 +6,7 @@ export function isMeasureColumn(column: string): boolean {
 }
 
 export const MIXED_UNITS_NOTE = "Not totalled: the rows are in different units.";
-export const NOT_ADDITIVE_NOTE = "Not totalled: averages, distinct counts and highest or lowest values do not add up across groups.";
+export const NOT_ADDITIVE_NOTE = "Not totalled: averages, percentages, distinct counts and highest or lowest values do not add up across groups.";
 
 type ResultSummary = {
   total: number | null;

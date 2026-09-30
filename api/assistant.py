@@ -364,7 +364,7 @@ def _checked_view_spec(org_id: str, spec: dict[str, Any], sql_rows: list) -> tup
     """The model's builder definition, kept only if the query builder reproduces the SQL's
     result with it: a saved view the reader reopens must show the numbers they saw."""
     from api.query_builder import build_query
-    from api.snapshot_catalog import allowed_fields, snapshot_backend
+    from api.snapshot_catalog import allowed_fields, boolean_fields, snapshot_backend
     from api.snapshot_explorer import _run as run_canvas
 
     canvas_id = str(spec.get("canvas_id") or "").strip().lower()
@@ -382,6 +382,7 @@ def _checked_view_spec(org_id: str, spec: dict[str, Any], sql_rows: list) -> tup
         _, dialect, schema = snapshot_backend(entry, org_id)
         built, binds = build_query(table_name=entry["table_name"], allowed_fields=allowed_fields(entry),
                                    trusted_measures=set(entry.get("trusted_measures") or []),
+                                   boolean_fields=boolean_fields(entry),
                                    dimensions=dims, measures=measures, filters=filters,
                                    limit=MAX_ROWS + 1, dialect=dialect, schema=schema)
         _, spec_rows = run_canvas(entry, built, binds, organization_id=org_id, max_rows=MAX_ROWS + 1)

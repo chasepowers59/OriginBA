@@ -9,7 +9,7 @@ from typing import Any
 from api.demo_db import execute_query
 from api.query_builder import QueryValidationError, build_query
 from api.reporting_dates import reporting_today, window_date_field
-from api.snapshot_catalog import allowed_fields, get_snapshot, snapshot_backend
+from api.snapshot_catalog import allowed_fields, boolean_fields, get_snapshot, snapshot_backend
 
 
 COMPARE_MODES = ("prior_period", "mom", "yoy")
@@ -252,6 +252,7 @@ def run_kpi_query(
         table_name=snapshot["table_name"],
         allowed_fields=allowed_fields(snapshot),
         trusted_measures=trusted,
+        boolean_fields=boolean_fields(snapshot),
         dimensions=query_spec.get("dimensions") or [],
         measures=query_spec.get("measures") or [{"field": "*", "agg": "count"}],
         filters=filters,

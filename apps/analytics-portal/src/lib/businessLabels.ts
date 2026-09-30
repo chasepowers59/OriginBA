@@ -60,6 +60,8 @@ export const AGGREGATION_LABELS: Record<string, string> = {
   sum: "Total",
   min: "Minimum",
   max: "Maximum",
+  avg: "Average",
+  share: "Share of rows (%)",
 };
 
 export function workstreamDisplayName(key: string): string {
@@ -249,6 +251,8 @@ export function measureColumnLabel(
   if (measureAgg === "sum") return withoutRepeatedLeadingWord(`Total ${base.toLowerCase()}`);
   if (measureAgg === "count") return `Rows with ${base.toLowerCase()}`;
   if (measureAgg === "count_distinct") return withoutRepeatedLeadingWord(`Distinct ${base.toLowerCase()}`);
+  if (measureAgg === "avg") return withoutRepeatedLeadingWord(`Average ${base.toLowerCase()}`);
+  if (measureAgg === "share") return `% ${base}`;
   return `${aggregationLabel(measureAgg)} — ${base}`;
 }
 

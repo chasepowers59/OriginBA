@@ -102,3 +102,15 @@ describe("prettifyFieldName across BOTH deployment shapes", () => {
     }
   });
 });
+
+// A report can now ask for an average or for the share of rows where a flag is true
+// (api/query_builder.py); the chart and table must say which, never "Number of records".
+describe("average and share labels", () => {
+  it("names the aggregation", async () => {
+    const { measureColumnLabel, aggregationLabel } = await import("./businessLabels");
+    expect(measureColumnLabel("Days To Pay", "avg")).toBe("Average days to pay");
+    expect(measureColumnLabel("Estimated Segment", "share")).toBe("% Estimated Segment");
+    expect(aggregationLabel("avg")).toBe("Average");
+    expect(aggregationLabel("share")).toBe("Share of rows (%)");
+  });
+});
