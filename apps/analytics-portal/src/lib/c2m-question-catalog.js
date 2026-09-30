@@ -617,8 +617,9 @@ export const QUESTIONS = [
     title: "What is the field activity backlog, by type?",
     why: "Field work is the most expensive thing a utility does. Backlog by type shows which work is accumulating faster than the crews clear it.",
     canvas: "rpt_field_activity",
-    axis: "Activity Type", value: "Activities",
-    sql: `select coalesce("Activity Type", "Activity Type Code") as "Activity Type",
+    // the business type: "Activity Type" is MDM's category, "Field Activity" on every row
+    axis: "Field Activity Type", value: "Activities",
+    sql: `select coalesce("Field Activity Type", "Field Activity Type Code") as "Field Activity Type",
                  coalesce("Activity Status Code", '(unset)') as "Status",
                  count(*)::bigint as "Activities",
                  count(*) filter (where trim("Appointment Required") = 'Y')::bigint as "Appointment Required",
@@ -1001,6 +1002,9 @@ export const QUESTIONS = [
     process: "meter", workstream: "Asset Management",
     folder: "assets_devices",
     kind: "total", unit: "money",
+    // not ready to run: Replacement Cost is 0 on every asset and asset type at all six
+    // clients (2026-09-30); the column stays on the canvas for a client that records it
+    ready_to_run: false,
     title: "What would it cost to replace the estate?",
     why: "Replacement cost by asset type is the capital plan. Splitting it by disposition shows how much of it is already sitting in a warehouse.",
     canvas: "rpt_device_asset",
@@ -1489,11 +1493,14 @@ export const QUESTIONS = [
     process: "field", workstream: "Field Performance",
     folder: "field_operations", essential: true,
     kind: "count",
+    // not ready to run: "appointment necessary" is N on every field activity at Ellensburg,
+    // College Station (84,652) and Newark (21,426), 2026-09-30
+    ready_to_run: false,
     title: "How much field work needs an appointment?",
     why: "An appointment is a commitment to a customer and a constraint on the crew's day. The proportion needing one is what makes a route plannable or not.",
     canvas: "rpt_field_activity",
-    axis: "Activity Type", value: "Appointment Required",
-    sql: `select coalesce("Activity Type", "Activity Type Code") as "Activity Type",
+    axis: "Field Activity Type", value: "Appointment Required",
+    sql: `select coalesce("Field Activity Type", "Field Activity Type Code") as "Field Activity Type",
                  count(*)::bigint as "Activities",
                  count(*) filter (where trim("Appointment Required") = 'Y')::bigint as "Appointment Required",
                  count(*) filter (where "Appointment Taken Date/Time" is not null)::bigint as "Appointment Booked",

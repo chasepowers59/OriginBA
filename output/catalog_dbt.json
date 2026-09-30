@@ -412,11 +412,6 @@
      "essential": true,
      "report_id": "service_on_off_churn",
      "snapshot_id": "rpt_on_off_history"
-    },
-    {
-     "essential": true,
-     "report_id": "field_appointments",
-     "snapshot_id": "rpt_field_activity"
     }
    ],
    "title": "Field Operations"
@@ -444,11 +439,6 @@
      "essential": true,
      "report_id": "device_events",
      "snapshot_id": "rpt_device_event"
-    },
-    {
-     "essential": false,
-     "report_id": "asset_replacement_value",
-     "snapshot_id": "rpt_device_asset"
     },
     {
      "essential": false,
@@ -709,10 +699,6 @@
     {
      "report_id": "meter_read_routes",
      "snapshot_id": "rpt_premise_sp"
-    },
-    {
-     "report_id": "asset_replacement_value",
-     "snapshot_id": "rpt_device_asset"
     },
     {
      "report_id": "service_on_off_churn",
@@ -999,10 +985,6 @@
      "snapshot_id": "rpt_todo"
     },
     {
-     "report_id": "field_appointments",
-     "snapshot_id": "rpt_field_activity"
-    },
-    {
      "report_id": "exception_by_rule",
      "snapshot_id": "rpt_exception"
     },
@@ -1091,18 +1073,11 @@
       "table": "stg_bill_route_type_label"
      },
      {
-      "alias": "pc",
+      "alias": "em",
       "join_type": "left join",
-      "on": "pc.per_id = ap.per_id",
+      "on": "em.per_id = ap.per_id",
       "role": "model",
-      "table": "stg_person_contact"
-     },
-     {
-      "alias": "rt",
-      "join_type": "join",
-      "on": "",
-      "role": "model",
-      "table": "stg_comm_route_type"
+      "table": "int_person_email"
      }
     ],
     "population_filter": null,
@@ -10500,7 +10475,7 @@
   },
   "rpt_customer_account": {
    "data_model": {
-    "columns_traced_to_cisadm": 20,
+    "columns_traced_to_cisadm": 19,
     "domain_table": "rpt_customer_account",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -10700,11 +10675,11 @@
       "table": "int_account_autopay"
      },
      {
-      "alias": "pc",
+      "alias": "em",
       "join_type": "left join",
-      "on": "pc.per_id = da.main_customer_per_id",
+      "on": "em.per_id = da.main_customer_per_id",
       "role": "model",
-      "table": "stg_person_contact"
+      "table": "int_person_email"
      }
     ],
     "population_filter": null,
@@ -10716,8 +10691,7 @@
      "CI_BUD_PLAN_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
-     "CI_LOOKUP_VAL_L",
-     "CI_PER"
+     "CI_LOOKUP_VAL_L"
     ],
     "trusted_measures": [
      "Linked Person Count",
@@ -10977,7 +10951,7 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The main customer's email: their active contact point whose route method is EMAIL (C1_PER_CONTDET x C1_COMM_RTE_TYPE, primary first), else CI_PER.EMAILID. EMAILID is legacy and empty at five of six clients (2026-09-30).",
      "group": "customer_ops",
      "id": "Main Customer Email",
      "label": "Main Customer Email",
@@ -10985,7 +10959,7 @@
      "type": "text"
     },
     {
-     "description": "Flag. Filter on it; do not sum it.",
+     "description": "True when the main customer has an email (Main Customer Email). The paper-bill-and-phone-call population is the false side. Until 2026-09-30 this read CI_PER only and was false for every account at five of six clients.",
      "group": "customer_ops",
      "id": "Has Email On File",
      "label": "Has Email On File",
@@ -15568,23 +15542,6 @@
      ],
      "title": "Which installed meters never registered with the head-end?",
      "workstream_label": "Device Management"
-    },
-    {
-     "chart_type": "bar",
-     "description": "Replacement cost by asset type is the capital plan. Splitting it by disposition shows how much of it is already sitting in a warehouse.",
-     "dimensions": [
-      "Asset Type"
-     ],
-     "filters": [],
-     "id": "asset_replacement_value",
-     "measures": [
-      {
-       "agg": "sum",
-       "field": "Replacement Cost"
-      }
-     ],
-     "title": "What would it cost to replace the estate?",
-     "workstream_label": "Asset Management"
     }
    ],
    "related_snapshot": null,
@@ -17693,7 +17650,7 @@
      "chart_type": "bar",
      "description": "Field work is the most expensive thing a utility does. Backlog by type shows which work is accumulating faster than the crews clear it.",
      "dimensions": [
-      "Activity Type"
+      "Field Activity Type"
      ],
      "filters": [],
      "id": "field_activity_backlog",
@@ -17705,23 +17662,6 @@
      ],
      "title": "What is the field activity backlog, by type?",
      "workstream_label": "Field Operations"
-    },
-    {
-     "chart_type": "bar",
-     "description": "An appointment is a commitment to a customer and a constraint on the crew's day. The proportion needing one is what makes a route plannable or not.",
-     "dimensions": [
-      "Activity Type"
-     ],
-     "filters": [],
-     "id": "field_appointments",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "How much field work needs an appointment?",
-     "workstream_label": "Field Performance"
     }
    ],
    "related_snapshot": null,
