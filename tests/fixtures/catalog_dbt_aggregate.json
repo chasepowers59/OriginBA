@@ -2227,7 +2227,8 @@
      "Is Revenue Bearing",
      "Is Adjustment",
      "Is Payment",
-     "Is Payment Cancellation"
+     "Is Payment Cancellation",
+     "Account Is On Budget"
     ],
     "measures": {
      "Adjustment Amount": "sum",
@@ -2990,7 +2991,7 @@
      "type": "text"
     },
     {
-     "description": "Currency measure, additive at this canvas's grain.",
+     "description": "The adjustment's amount (CI_ADJ.ADJ_AMT), on its AD transaction AND, with the SAME sign, on the AX transaction that cancels it -- so a plain sum counts every cancelled adjustment twice. Sum it with Is Adjustment = true and Adjustment Status Code = '50' (standing adjustments; 60 is cancelled). For the ledger net of charge and cancel, sum Current Amount instead. Ellensburg 2026-09-30: $15,572,430.42 unfiltered, $15,096,751.09 standing.",
      "group": "finance",
      "id": "Adjustment Amount",
      "label": "Adjustment Amount",
@@ -2998,7 +2999,7 @@
      "type": "numeric(15,2)"
     },
     {
-     "description": "Currency measure, additive at this canvas's grain.",
+     "description": "The adjustment's base amount (CI_ADJ.BASE_AMT), carried like Adjustment Amount on both the AD transaction and its AX cancellation: sum it only with Is Adjustment = true and Adjustment Status Code = '50'.",
      "group": "finance",
      "id": "Adjustment Base Amount",
      "label": "Adjustment Base Amount",
@@ -3196,6 +3197,14 @@
      "label": "Account ID",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "The transaction's account is on budget billing TODAY (any of its agreements, by C2M's own rule; int_account_budget), not when the transaction posted. For the Budget Billing folder's late fees; filter on it, do not sum it.",
+     "group": "finance",
+     "id": "Account Is On Budget",
+     "label": "Account Is On Budget",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "Descriptive label.",
@@ -3489,6 +3498,44 @@
      ],
      "title": "Where does revenue come from, by revenue class?",
      "workstream_label": "Revenue"
+    },
+    {
+     "chart_type": "horizontal",
+     "description": "A late fee on a budget account means the level payment is not being kept. Filter to your late-fee adjustment type to see what budget customers were charged.",
+     "dimensions": [
+      "Adjustment Type"
+     ],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Adjustment",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Adjustment Status Code",
+       "op": "eq",
+       "value": "50"
+      },
+      {
+       "field": "Account Is On Budget",
+       "op": "eq",
+       "value": true
+      }
+     ],
+     "id": "budget_late_fees",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Adjustment Amount"
+      }
+     ],
+     "title": "What are budget accounts being charged in late fees and other adjustments?",
+     "workstream_label": "Budget Billing"
     }
    ],
    "related_snapshot": null,

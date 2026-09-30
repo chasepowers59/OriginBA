@@ -340,6 +340,11 @@
      "snapshot_id": "rpt_service_agreement"
     },
     {
+     "essential": true,
+     "report_id": "budget_late_fees",
+     "snapshot_id": "rpt_financial_txn"
+    },
+    {
      "essential": false,
      "report_id": "budget_accounts_by_cycle",
      "snapshot_id": "rpt_customer_account"
@@ -944,6 +949,10 @@
     {
      "report_id": "budget_agreements_by_sa_type",
      "snapshot_id": "rpt_service_agreement"
+    },
+    {
+     "report_id": "budget_late_fees",
+     "snapshot_id": "rpt_financial_txn"
     },
     {
      "report_id": "budget_accounts_by_cycle",
@@ -10598,13 +10607,6 @@
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
      {
-      "alias": "b",
-      "join_type": "left join",
-      "on": "b.sa_id = sa.sa_id",
-      "role": "model",
-      "table": "int_sa_budget"
-     },
-     {
       "alias": "sa",
       "join_type": "join",
       "on": "sa.sa_id = a.sa_id",
@@ -10624,6 +10626,13 @@
       "on": "ag.acct_id  = da.acct_id",
       "role": "step",
       "table": "agreements"
+     },
+     {
+      "alias": "bud",
+      "join_type": "left join",
+      "on": "bud.acct_id = da.acct_id",
+      "role": "model",
+      "table": "int_account_budget"
      },
      {
       "alias": "f",
@@ -17747,7 +17756,8 @@
      "Is Revenue Bearing",
      "Is Adjustment",
      "Is Payment",
-     "Is Payment Cancellation"
+     "Is Payment Cancellation",
+     "Account Is On Budget"
     ],
     "measures": {
      "Adjustment Amount": "sum",
@@ -17821,6 +17831,7 @@
        "SA Start Date",
        "SA End Date",
        "Account ID",
+       "Account Is On Budget",
        "Main Customer Name",
        "Customer Class",
        "Customer Class Code",
@@ -17888,6 +17899,13 @@
       "on": "da.acct_id = sa.acct_id",
       "role": "model",
       "table": "dim_account"
+     },
+     {
+      "alias": "bud",
+      "join_type": "left join",
+      "on": "bud.acct_id = sa.acct_id",
+      "role": "model",
+      "table": "int_account_budget"
      },
      {
       "alias": "ftt",
@@ -18178,6 +18196,10 @@
     {
      "id": "Account ID",
      "label": "Account ID"
+    },
+    {
+     "id": "Account Is On Budget",
+     "label": "Account Is On Budget"
     },
     {
      "id": "Main Customer Name",
@@ -18718,6 +18740,14 @@
      "type": "text"
     },
     {
+     "description": "The transaction's account is on budget billing TODAY (any of its agreements, by C2M's own rule; int_account_budget), not when the transaction posted. For the Budget Billing folder's late fees; filter on it, do not sum it.",
+     "group": "finance",
+     "id": "Account Is On Budget",
+     "label": "Account Is On Budget",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
      "description": "Descriptive label.",
      "group": "finance",
      "id": "Main Customer Name",
@@ -19009,6 +19039,44 @@
      ],
      "title": "Where does revenue come from, by revenue class?",
      "workstream_label": "Revenue"
+    },
+    {
+     "chart_type": "horizontal",
+     "description": "A late fee on a budget account means the level payment is not being kept. Filter to your late-fee adjustment type to see what budget customers were charged.",
+     "dimensions": [
+      "Adjustment Type"
+     ],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Adjustment",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Adjustment Status Code",
+       "op": "eq",
+       "value": "50"
+      },
+      {
+       "field": "Account Is On Budget",
+       "op": "eq",
+       "value": true
+      }
+     ],
+     "id": "budget_late_fees",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Adjustment Amount"
+      }
+     ],
+     "title": "What are budget accounts being charged in late fees and other adjustments?",
+     "workstream_label": "Budget Billing"
     }
    ],
    "related_snapshot": null,

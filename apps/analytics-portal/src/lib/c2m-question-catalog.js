@@ -1709,6 +1709,26 @@ export const QUESTIONS = [
           group by 1 order by 2 desc`,
   }),
   q({
+    id: "budget-late-fees",
+    process: "credit", workstream: "Budget Billing",
+    folder: "budget_billing", essential: true,
+    kind: "distribution", unit: "money", chart: "horizontal",
+    title: "What are budget accounts being charged in late fees and other adjustments?",
+    why: "A late fee on a budget account means the level payment is not being kept. Filter to your late-fee adjustment type to see what budget customers were charged.",
+    canvas: "rpt_financial_txn",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Adjustment", "op": "eq", "value": true},
+              {"field": "Adjustment Status Code", "op": "eq", "value": "50"},
+              {"field": "Account Is On Budget", "op": "eq", "value": true}],
+    axis: "Adjustment Type", value: "Adjustment Amount",
+    sql: `select coalesce("Adjustment Type", "Adjustment Type Code", '(unset)') as "Adjustment Type",
+                 count(*)::bigint as "Adjustments",
+                 count(distinct "Account ID")::bigint as "Accounts",
+                 round(sum("Adjustment Amount")::numeric, 2) as "Adjustment Amount"
+          from reporting.rpt_financial_txn
+          where "Is Frozen" and "Is Adjustment" and "Adjustment Status Code" = '50' and "Account Is On Budget"
+          group by 1 order by 4 desc nulls last`,
+  }),
+  q({
     id: "budget-accounts-by-cycle",
     process: "credit", workstream: "Budget Billing",
     folder: "budget_billing",
