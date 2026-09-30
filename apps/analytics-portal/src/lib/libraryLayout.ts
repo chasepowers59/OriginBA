@@ -27,3 +27,10 @@ export function reportsByWorkstream(packs: ReportLibraryPack[], order: string[])
 export function sectionsStartOpen(s: { query: string; workstream: string | null; sectionCount: number }): boolean {
   return Boolean(s.query.trim() || s.workstream || s.sectionCount <= 1);
 }
+
+/** The line under a folded section's title: its first reports by name, so it does not read as empty. */
+export function sectionPreview(reports: Pick<ReportLibraryEntry, "title">[], shown = 3): string {
+  const names = reports.slice(0, shown).map((r) => r.title);
+  const more = reports.length - names.length;
+  return names.join(" · ") + (more > 0 ? ` · and ${more} more` : "");
+}

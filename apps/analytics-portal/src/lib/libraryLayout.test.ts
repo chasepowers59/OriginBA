@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { reportsByWorkstream, sectionsStartOpen } from "./libraryLayout";
+import { reportsByWorkstream, sectionPreview, sectionsStartOpen } from "./libraryLayout";
 import type { ReportLibraryEntry, ReportLibraryPack } from "./types";
 
 const report = (report_id: string, workstream: string, workstream_label: string): ReportLibraryEntry => ({
@@ -47,5 +47,19 @@ describe("report library sections", () => {
     expect(sectionsStartOpen({ query: "arrears", workstream: null, sectionCount: 9 })).toBe(true);
     expect(sectionsStartOpen({ query: " ", workstream: "billing", sectionCount: 9 })).toBe(true);
     expect(sectionsStartOpen({ query: "", workstream: null, sectionCount: 1 })).toBe(true);
+  });
+});
+
+describe("a folded section's preview line", () => {
+  // design review 2026-09-30: nine folded cards with only a title and a count read as an empty page
+  const r = (title: string) => ({ title }) as never;
+  it("names the first reports, so the section says what is in it before it is opened", () => {
+    expect(sectionPreview([r("Billed by class"), r("Unbilled usage")])).toBe("Billed by class · Unbilled usage");
+  });
+  it("says how many more there are past three", () => {
+    expect(sectionPreview([r("A"), r("B"), r("C"), r("D"), r("E")])).toBe("A · B · C · and 2 more");
+  });
+  it("is empty for an empty section", () => {
+    expect(sectionPreview([])).toBe("");
   });
 });

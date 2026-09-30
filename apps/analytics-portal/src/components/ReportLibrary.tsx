@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { reportsByWorkstream, sectionsStartOpen } from "@/lib/libraryLayout";
+import { reportsByWorkstream, sectionsStartOpen, sectionPreview } from "@/lib/libraryLayout";
 import { useSearchParams } from "next/navigation";
 import { fetchReportLibrary } from "@/lib/api";
 import { reportShape } from "@/lib/reportShape";
@@ -138,9 +139,10 @@ export function ReportLibrary({ workstreamOrder }: { workstreamOrder: string[] }
                     <span className="flex items-center gap-2 text-xs text-fg-muted">
                       {reports.length}
                       {reports.length !== section.reports.length ? ` of ${section.reports.length}` : ""} reports
-                      <span aria-hidden className="transition group-open:rotate-180">▾</span>
+                      <ChevronDown aria-hidden className="h-4 w-4 transition group-open:rotate-180" />
                     </span>
                   </div>
+                  <p className="mt-1 truncate text-sm text-fg-muted group-open:hidden">{sectionPreview(reports)}</p>
                 </summary>
                 <div className="mt-4 grid gap-3 border-t border-edge-subtle pt-4 sm:grid-cols-2">
                   {reports.map((report) => (

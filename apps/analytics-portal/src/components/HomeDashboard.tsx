@@ -1,4 +1,5 @@
 "use client";
+import { ChevronDown } from "lucide-react";
 import { brandLine } from "../lib/brand";
 
 import { useEffect, useState } from "react";
@@ -87,7 +88,7 @@ export function HomeDashboard() {
           <details className="glass-panel-subtle group rounded-2xl">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-5 py-4 text-sm font-medium text-heading [&::-webkit-details-marker]:hidden">
               Run a vetted metric with your own filters
-              <span aria-hidden className="text-fg-muted transition group-open:rotate-180">▾</span>
+              <ChevronDown aria-hidden className="h-4 w-4 text-fg-muted transition group-open:rotate-180" />
             </summary>
             <div className="px-2 pb-2">
               <NlqSearchPanel compact />

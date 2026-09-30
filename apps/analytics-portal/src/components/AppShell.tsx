@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
@@ -203,7 +204,7 @@ export function AppShell({
                   <span className="portal-text-muted hidden max-w-[120px] truncate text-sm lg:block">
                     {user.display_name}
                   </span>
-                  <span aria-hidden className="portal-text-subtle text-[10px]">▾</span>
+                  <ChevronDown aria-hidden className="portal-text-subtle h-3.5 w-3.5" />
                 </summary>
                 <div className="glass-panel absolute right-0 top-full z-50 mt-2 w-64 p-3 shadow-xl">
                   <p className="truncate text-sm font-semibold text-heading">{user.display_name}</p>
