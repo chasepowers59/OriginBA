@@ -34,6 +34,7 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import pathlib
 import os
 import sys
 import time
@@ -95,7 +96,7 @@ def _call(path: str, *, method: str = "GET", body: bytes | None = None, ctype: s
 
 # ---- every write goes through here: the org must be named back, prod must be meant, and the
 # call is printed before it is made so a --dry-run shows exactly what would hit the server.
-WRITES = {"copy", "move", "delete", "mkdir", "perms-set", "job-delete", "job-run", "import"}
+WRITES = {"copy", "move", "delete", "mkdir", "perms-set", "job-delete", "job-run", "import", "put-file"}
 
 
 def guard_write(cmd: str, a) -> None:
@@ -136,6 +137,28 @@ def copy_or_move(cmd: str, src: str, dst: str, a) -> int:
     # a body-less PUT/POST must still name a media type: 10.0 answers 500 "MediaType.getSubtype() ... null" otherwise (2026-09-24)
     return _show(*_write("POST" if cmd == "copy" else "PUT", f"/rest_v2/resources{urllib.parse.quote(dst)}?createFolders=true&overwrite={'true' if a.overwrite else 'false'}", a,
                          b"", "application/json", headers={"Content-Location": src}))
+
+
+FILE_TYPES = {".jrxml": "application/jrxml", ".xml": "application/xml", ".png": "image/png", ".jpg": "image/jpeg"}
+
+
+def put_file(uri: str, local: str, kind: str, a) -> int:
+    """Replace an EXISTING file resource's content in place (a report unit's main_jrxml, an image):
+    nothing else in the unit changes. Refuses a URI that is not already a file, then reads the
+    content back and compares it byte for byte."""
+    code, _ = _call(f"/rest_v2/resources{urllib.parse.quote(uri)}", accept="application/repository.file+json")
+    if code != 200:
+        print(f"refused: {uri} is not an existing file resource ({code})")
+        return 1
+    body = pathlib.Path(local).read_bytes()
+    code, text = _write("PUT", f"/rest_v2/resources{urllib.parse.quote(uri)}", a, body, FILE_TYPES[kind],
+                        headers={"Content-Disposition": f'attachment; filename="{uri.rsplit("/", 1)[-1]}"'})
+    if code not in (200, 201) or a.dry_run:
+        return _show(code, text)
+    back, text_back = _call(f"/rest_v2/resources{urllib.parse.quote(uri)}", accept="application/octet-stream")
+    same = back == 200 and text_back == body.decode("utf-8", "replace")
+    print(f"{code} written; read back {'IDENTICAL' if same else 'DIFFERENT'} ({len(body)}B)")
+    return 0 if same else 1
 
 
 def delete(uri: str, a) -> int:
@@ -327,6 +350,8 @@ def main() -> int:
     i = sub.add_parser("import"); i.add_argument("zip"); i.add_argument("--no-update", action="store_true")
     for c in ("copy", "move"):
         x = sub.add_parser(c, help=f"{c} a resource into a destination FOLDER"); x.add_argument("src"); x.add_argument("dst"); x.add_argument("--overwrite", action="store_true")
+    pf = sub.add_parser("put-file", help="replace an existing file resource's content, then read it back")
+    pf.add_argument("uri"); pf.add_argument("local"); pf.add_argument("--kind", default=".jrxml", choices=sorted(FILE_TYPES))
     d = sub.add_parser("delete"); d.add_argument("uri")
     m = sub.add_parser("mkdir"); m.add_argument("uri"); m.add_argument("--label")
     pr = sub.add_parser("perms", help="who can do what on a resource"); pr.add_argument("uri")
@@ -352,6 +377,7 @@ def main() -> int:
     if a.cmd == "import": return do_import(a.zip, not a.no_update)
     if a.cmd in ("copy", "move"): return copy_or_move(a.cmd, a.src, a.dst, a)
     if a.cmd == "delete": return delete(a.uri, a)
+    if a.cmd == "put-file": return put_file(a.uri, a.local, a.kind, a)
     if a.cmd == "mkdir": return mkdir(a.uri, a.label, a)
     if a.cmd == "perms": return perms(a.uri)
     if a.cmd == "perms-set": return perms_set(a.uri, a.grants, a)
