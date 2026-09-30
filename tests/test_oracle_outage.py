@@ -37,6 +37,10 @@ class OracleOutageTests(unittest.TestCase):
                    mock.patch.object(demo_db, "_oracle_pool", side_effect=_dropped),
                    mock.patch("api.org_db.demo_configured", return_value=True),
                    mock.patch("api.demo_db.demo_configured", return_value=True),
+                   # imported by name there, so the patch above never reached it; a checkout
+                   # with a .env configured it for real, a clean one (CI) did not
+                   mock.patch("api.executive_dashboard.demo_configured", return_value=True),
+                   mock.patch("api.workstream_dashboard.demo_configured", return_value=True),
                    mock.patch("api.data_version.data_version", return_value=None)]
         for p in patches:
             p.start()

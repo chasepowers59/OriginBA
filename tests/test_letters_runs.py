@@ -58,11 +58,17 @@ def unique_letters():
 
 
 def page_refs(pdf: bytes) -> list[str]:
-    """The letter id printed on each page's stub, in page order (reportlab: ASCII85 + Flate)."""
+    """The letter id printed on each page's stub, in page order. Each stream is decoded by
+    its own /Filter: reportlab writes ASCII85 + Flate in some versions and Flate alone in
+    others (CI's did), so assuming one broke the other."""
     ids = []
-    for m in re.finditer(rb"stream\r?\n(.*?)endstream", pdf, re.S):
-        raw = m.group(1).strip().removesuffix(b"~>")
-        ids += [i.decode() for i in re.findall(rb"\(Ref ((?:CC|ADJ)-\d+)", zlib.decompress(base64.a85decode(raw)))]
+    for m in re.finditer(rb"<<(.*?)>>\s*stream\r?\n(.*?)endstream", pdf, re.S):
+        head, raw = m.group(1), m.group(2).strip()
+        if b"ASCII85Decode" in head:
+            raw = base64.a85decode(raw.removesuffix(b"~>"))
+        if b"FlateDecode" in head:
+            raw = zlib.decompress(raw)
+        ids += [i.decode() for i in re.findall(rb"\(Ref ((?:CC|ADJ)-\d+)", raw)]
     return ids
 
 

@@ -240,7 +240,11 @@ def test_d10_micr_reaches_no_delivery_artifact():
     "every client test org and on CityCorp, Ellensburg and Newark prod. Strict: when the domain drops the "
     "field this test passes, the xfail turns into a failure, and this marker must be removed."))
 def test_d10b_the_standard_offering_package_carries_no_micr():
-    pkg = ROOT / "deploy" / "jaspersoft_standard_offering" / "Standard_Offering_import"
-    hits = [str(f.relative_to(ROOT)) for f in pkg.rglob("*")
-            if f.is_file() and f.suffix.lower() not in {".zip"} and "MICR_ID" in f.read_text(encoding="utf-8", errors="ignore")]
+    # the tracked zip is what ships; the extracted folder is local only, so a CI checkout
+    # scanned nothing and the xfail turned into a strict XPASS
+    import zipfile
+    pkg = ROOT / "deploy" / "jaspersoft_standard_offering" / "Standard_Offering_import.zip"
+    with zipfile.ZipFile(pkg) as z:
+        hits = [n for n in z.namelist() if not n.endswith("/")
+                and b"MICR_ID" in z.read(n)]
     assert hits == [], "MICR_ID in the Standard Offering package:\n  " + "\n  ".join(hits)
