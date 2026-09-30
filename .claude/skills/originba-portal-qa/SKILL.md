@@ -46,6 +46,12 @@ project, `desktop` (1440 x 900), and the phone-only specs are gone (in git histo
 | Stale-data notice (live: none; stubbed stale: named on every page) | `npx playwright test e2e/freshness.spec.ts` | ~10 s |
 | Letters (Ellensburg May 2026 rows, PDF preview, 366-day refusal; a run from a one-day window with the creator's Approve disabled, then cancelled; approve and release with stubbed answers only; a cold month is tens of seconds over the VPN) | `npx playwright test e2e/letters.spec.ts` | ~1 min |
 
+Numbers that must agree with each other, on the fixture warehouse (port 5433, skips without it):
+`tests/test_report_invariants.py` -- for every ready-to-run report, the breakdown adds up to the
+total, the month trend adds up to the total, clicking a bar reproduces it, shares lie in 0-100
+(2026-09-30: 63 breakdowns, 60 trends, 79 cross-filters); `tests/test_aggregate_parity.py` --
+the pre-aggregates answer exactly what the canvases answer.
+
 Unit suites: `cd /Users/chase/OriginBA-3 && ENVIRONMENT=test python3 -m pytest tests -q`,
 `cd apps/analytics-portal && npx tsc --noEmit && npx vitest run`.
 
