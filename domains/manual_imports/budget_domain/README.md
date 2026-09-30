@@ -68,7 +68,7 @@ parent folder lists the child. Numbers, Jaspersoft = Oracle:
 | View | College Station |
 | --- | --- |
 | Active Accounts | 965 accounts / $336,581 / 5,552 budget SAs (80 pending stop) |
-| Late Fees Last 12 Months (LPC) | 594 accounts / 4,330 fees / $28,884.35 (19-31 s: the CI_ADJ scan) |
+| Late Fees Last 12 Months (LPC) | 594 accounts / 4,330 fees / $28,884.35 (19-31 s cold right after the promotion; 1.2-3.5 s once warm, the derived query alone 2.1 s) |
 | Budget Changes by Month | every month ties; Sep-25 230, Jul-26 168, total 1,081 accounts |
 
 The promotion first refused: `jrs_promote` checked view fields against the TARGET's domains only,
