@@ -36,6 +36,8 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-30 | Eight rate and average reports drew as pies (three estimate rates of 1.5%, 1.4%, 1.1% as thirds of a circle); dashboard tiles named a share after its raw field and printed a share KPI without % | dbt catalog + 6a51b190 | originba_dbt scripts/test_portal_catalog_reports.py, dashboardTileMath.test.ts |
+| 2026-09-30 | The Usage & Metering essential 'workload by route' grouped on CI_SP's meter-read route, empty at all six clients (0 of 502,622 points): one 'Not recorded' bar everywhere | bcec15c1 (+ dbt 270a44c) | originba_dbt scripts/test_portal_catalog_reports.py (fleet-empty guard) |
 | 2026-09-30 | Dashboard tiles still windowed canvases of what exists now: a Budget Billing board counted accounts by Account Setup Date in the last N days (the explorer fix of 9f62d0fe missed the tile) | 7792f23c | tileDateField.test.ts, e2e/library.spec.ts (fails with the fix reverted) |
 | 2026-09-30 | A saved view of a report ran a stale function: it saw the pre-favorite window, and an all-dates report dropped the saved window (found by review) | be0b3ee1 | datePresets.test.ts (keepWindow), verified live |
 | 2026-09-30 | "Oldest open to-dos" ranked closed ones; "meters never registered" charted every device; the builder offered Total/Average on measures the server refuses (found by review) | be0b3ee1 (+ dbt 4675732) | originba_dbt scripts/test_portal_catalog_reports.py |
