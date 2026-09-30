@@ -107,7 +107,7 @@ export const QUESTIONS = [
   q({
     id: "notifications-stuck",
     process: "customer", workstream: "Customer Notification",
-    kind: "outlier",
+    kind: "outlier", all_dates: true,
     title: "Which notifications have been outstanding longest?",
     why: "A task pending for weeks is not pending, it is stuck. These are the ones a person has to look at.",
     canvas: "rpt_customer_notification",
@@ -190,7 +190,7 @@ export const QUESTIONS = [
   q({
     id: "usage-no-active-sa",
     process: "meter", workstream: "Service Point",
-    kind: "outlier",
+    kind: "outlier", all_dates: true,
     title: "Which service points are recording usage with no active agreement?",
     why: "Consumption nobody is being billed for. Either service started without an agreement or one was stopped while the meter kept running.",
     canvas: "rpt_premise_sp",
@@ -359,7 +359,7 @@ export const QUESTIONS = [
   q({
     id: "unbilled-revenue",
     process: "usage", workstream: "Billing",
-    kind: "outlier",
+    kind: "outlier", all_dates: true,
     title: "What service is going unbilled?",
     why: "Revenue earned and not invoiced. A stopped agreement awaiting a final bill is the expensive kind — the customer has gone.",
     canvas: "rpt_unbilled_revenue",
@@ -449,17 +449,18 @@ export const QUESTIONS = [
   q({
     id: "gl-not-extracted",
     process: "financial", workstream: "General Ledger",
-    kind: "count",
+    kind: "count", all_dates: true,
     title: "How much has not yet reached the general ledger?",
     why: "Financial transactions post to the GL on a schedule. Anything sitting unextracted is a reconciliation difference between C2M and the finance system.",
     canvas: "rpt_gl",
+    filters: [{"field": "Is Extracted to GL", "op": "eq", "value": false}, {"field": "Is Debit", "op": "eq", "value": true}],
     axis: "GL Distribution Status", value: "GL Amount",
     sql: `select coalesce("GL Distribution Status", "GL Distribution Status Code", '(unset)') as "GL Distribution Status",
                  count(*)::bigint as "GL Lines",
                  count(distinct "FT ID")::bigint as "Transactions",
-                 round(sum("GL Amount")::numeric, 2) as "GL Amount",
-                 count(*) filter (where "Is Extracted to GL")::bigint as "Extracted"
+                 round(sum("GL Amount")::numeric, 2) as "GL Amount (Debits)"
           from reporting.rpt_gl
+          where not "Is Extracted to GL" and "Is Debit"
           group by 1 order by 4 desc nulls last`,
   }),
   q({
@@ -598,7 +599,7 @@ export const QUESTIONS = [
   q({
     id: "exceptions-open",
     process: "field", workstream: "Data Quality",
-    kind: "outlier",
+    kind: "outlier", all_dates: true,
     title: "Which data exceptions are open longest?",
     why: "A VEE or usage exception blocks a read from becoming a bill. Days open is how long that revenue has been stuck.",
     canvas: "rpt_exception",
@@ -925,7 +926,7 @@ export const QUESTIONS = [
   q({
     id: "meter-age-replacement",
     process: "meter", workstream: "Asset Management",
-    kind: "outlier", unit: "days",
+    kind: "outlier", unit: "days", all_dates: true,
     title: "Which meters are oldest relative to their useful life?",
     why: "A meter past its useful life drifts, and a drifting meter under-reads. This is the replacement programme's work queue and its capital case at once.",
     canvas: "rpt_device_asset",
@@ -1387,7 +1388,7 @@ export const QUESTIONS = [
   q({
     id: "todo-oldest",
     process: "field", workstream: "Work Queues",
-    kind: "outlier", unit: "days",
+    kind: "outlier", unit: "days", all_dates: true,
     title: "Which to-do entries have been open longest?",
     why: "A to-do is work the system could not finish alone. The oldest ones are the exceptions nobody has been made responsible for.",
     canvas: "rpt_todo",
@@ -1471,7 +1472,7 @@ export const QUESTIONS = [
     // Declared for the portal's governed query (pending bills only: a completed bill has no open clock; demo25, 2026-09-04).
     filters: [{"field": "Is Completed", "op": "eq", "value": false}],
     process: "usage", workstream: "Billing",
-    kind: "outlier", chart: "horizontal",
+    kind: "outlier", chart: "horizontal", all_dates: true,
     title: "Which bill cycles have the longest-open bills?",
     why: "A cycle whose bills sit open for weeks is where billing close is actually stuck.",
     canvas: "rpt_bill",

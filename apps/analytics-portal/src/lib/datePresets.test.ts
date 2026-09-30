@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { defaultDateRange, defaultDateRangeLastMonth, defaultDateRangeYtd } from "./api";
-import { anchoredLabel, applyDatePresetConfig, fallBackToAllDates, widenDateRange, windowFilter } from "./datePresets";
+import { anchoredLabel, applyDatePresetConfig, fallBackToAllDates, opensOnAllDates, widenDateRange, windowFilter } from "./datePresets";
 
 // A frozen copy declares where its data ends (Ellensburg TEST: 18 Jun 2026). The explorer's
 // presets were computed from the browser's today, so "Last 6 months" there read mostly the
@@ -59,5 +59,32 @@ describe("all dates", () => {
     expect(fallBackToAllDates({ rowCount: 0, windowed: true, firstRun: false })).toBe(false);
     expect(fallBackToAllDates({ rowCount: 12, windowed: true, firstRun: true })).toBe(false);
     expect(fallBackToAllDates({ rowCount: 0, windowed: false, firstRun: true })).toBe(false);
+  });
+});
+
+// A backlog question ("what has not yet reached the ledger?") asks about everything still
+// open, however old; under the default 12 months Ellensburg showed $207.74 of $187,957.69
+// pending. Such a report declares all_dates and opens on All dates when it is picked; the
+// reader can still narrow it afterwards.
+describe("opensOnAllDates", () => {
+  const backlog = { id: "gl_not_extracted", all_dates: true };
+  const base = { report: backlog, activeReportId: null, allDates: false, hasDateField: true };
+
+  it("a backlog report opens on All dates when it is picked", () => {
+    expect(opensOnAllDates(base)).toBe(true);
+    expect(opensOnAllDates({ ...base, activeReportId: "gl_by_account" })).toBe(true);
+  });
+
+  it("re-running the open report keeps the reader's window", () => {
+    expect(opensOnAllDates({ ...base, activeReportId: "gl_not_extracted" })).toBe(false);
+  });
+
+  it("nothing to do when already on All dates or the canvas has no date", () => {
+    expect(opensOnAllDates({ ...base, allDates: true })).toBe(false);
+    expect(opensOnAllDates({ ...base, hasDateField: false })).toBe(false);
+  });
+
+  it("an ordinary report keeps the window", () => {
+    expect(opensOnAllDates({ ...base, report: { id: "gl_by_account" } })).toBe(false);
   });
 });

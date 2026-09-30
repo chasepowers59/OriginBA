@@ -90,6 +90,27 @@ class MeasureRuleTests(unittest.TestCase):
         self.assertEqual(self.sums("Current Amount", [FROZEN]), [])
 
 
+class GlNetsToZeroTests(unittest.TestCase):
+    """A transaction's GL lines are its double entry and net to zero (rpt_gl's header), so a
+    sum of GL Amount means something only per GL account or on one side. Ellensburg
+    2026-09-30: "How much has not yet reached the general ledger?" summed every line by
+    distribution status and drew $0.00 for all four, with $187,957.69 pending."""
+
+    def test_every_gl_amount_sum_is_per_account_or_one_sided(self):
+        snapshots = json.loads((ROOT / "output" / "catalog_dbt.json").read_text())["snapshots"]
+        queries = [(r["id"], r) for r in snapshots["rpt_gl"]["premade_reports"]]
+        cards = [*EXECUTIVE_KPIS, *(k for ks in WORKSTREAM_KPIS.values() for k in ks)]
+        queries += [(k["id"], q) for k in cards if k["snapshot_id"] == "rpt_gl"
+                    for _, q, _ in _kpi_queries(k)]
+        queries += [(m.id, m.build({})["query"]) for m in METRICS if m.snapshot_id == "rpt_gl"]
+        for qid, q in queries:
+            if any(m.get("field") == "GL Amount" and m.get("agg") == "sum" for m in q.get("measures") or []):
+                with self.subTest(query=qid):
+                    per_account = "GL Account" in (q.get("dimensions") or [])
+                    one_side = any(f.get("field") == "Is Debit" for f in q.get("filters") or [])
+                    self.assertTrue(per_account or one_side)
+
+
 # The one sum over every FT type on purpose: its label says it is the net of everything posted.
 ALL_TYPES_NET = {"frozen_ft_dollars"}
 FT_TYPE_FIELDS = {"Is Bill Segment", "Is Bill Cancellation", "Is Adjustment", "Is Adjustment Cancellation",

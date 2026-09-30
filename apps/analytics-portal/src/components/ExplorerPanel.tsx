@@ -25,6 +25,7 @@ import {
   estimatePeriodDays,
   explorerPeriodLabel,
   fallBackToAllDates,
+  opensOnAllDates,
   widenDateRange,
 } from "@/lib/datePresets";
 import { explorerQuery } from "@/lib/explorerFilters";
@@ -242,6 +243,13 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       };
       showReport(shown);
       setTab("reports");
+      if (opensOnAllDates({ report, activeReportId, allDates, hasDateField: Boolean(resolveDateField(metadata)) })) {
+        // the auto-run effect follows allDates and re-runs this report unwindowed
+        setFellBackFrom(null);
+        setActivePreset(ALL_DATES);
+        setAllDates(true);
+        return;
+      }
       setLoading(true);
       setError(null);
       setCancelNote(null);
@@ -277,7 +285,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         }
       }
     },
-    [metadata, allDates, activePreset, buildQuery, showReport],
+    [metadata, allDates, activePreset, activeReportId, buildQuery, showReport],
   );
 
   const cancelRun = () => {

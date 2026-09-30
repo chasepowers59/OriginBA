@@ -3545,7 +3545,9 @@
     "dimensions": [
      "GL Distribution Status",
      "GL Account",
-     "Service Type"
+     "Service Type",
+     "Is Debit",
+     "Is Extracted to GL"
     ],
     "measures": {
      "GL Amount": "sum"
@@ -4264,12 +4266,24 @@
    "portal_enabled": true,
    "premade_reports": [
     {
+     "all_dates": true,
      "chart_type": "bar",
      "description": "Financial transactions post to the GL on a schedule. Anything sitting unextracted is a reconciliation difference between C2M and the finance system.",
      "dimensions": [
       "GL Distribution Status"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Extracted to GL",
+       "op": "eq",
+       "value": false
+      },
+      {
+       "field": "Is Debit",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "gl_not_extracted",
      "measures": [
       {

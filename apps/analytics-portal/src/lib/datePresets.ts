@@ -87,6 +87,20 @@ export function windowFilter(
  * reader should land on the data, told why, not on "No data". Only the first run: a
  * window the reader picked themselves is theirs to widen.
  */
+/**
+ * Whether picking this report switches the page to All dates. A backlog question (what is
+ * still open, however old) declares all_dates; only picking it switches, so a reader who
+ * then narrows the window keeps their choice on the re-run.
+ */
+export function opensOnAllDates(r: {
+  report: { id: string; all_dates?: boolean };
+  activeReportId: string | null;
+  allDates: boolean;
+  hasDateField: boolean;
+}): boolean {
+  return Boolean(r.report.all_dates) && r.report.id !== r.activeReportId && !r.allDates && r.hasDateField;
+}
+
 export function fallBackToAllDates(r: { rowCount: number; windowed: boolean; firstRun: boolean }): boolean {
   return r.firstRun && r.windowed && r.rowCount === 0;
 }

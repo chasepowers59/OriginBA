@@ -2289,6 +2289,7 @@
      "workstream_label": "Billing"
     },
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "A cycle whose bills sit open for weeks is where billing close is actually stuck.",
      "dimensions": [
@@ -12603,6 +12604,7 @@
      "workstream_label": "Customer Notification"
     },
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "A task pending for weeks is not pending, it is stuck. These are the ones a person has to look at.",
      "dimensions": [
@@ -14984,6 +14986,7 @@
      "workstream_label": "Device Management"
     },
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "A meter past its useful life drifts, and a drifting meter under-reads. This is the replacement programme's work queue and its capital case at once.",
      "dimensions": [
@@ -16255,6 +16258,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "A VEE or usage exception blocks a read from becoming a bill. Days open is how long that revenue has been stuck.",
      "dimensions": [
@@ -18508,7 +18512,9 @@
     "dimensions": [
      "GL Distribution Status",
      "GL Account",
-     "Service Type"
+     "Service Type",
+     "Is Debit",
+     "Is Extracted to GL"
     ],
     "measures": {
      "GL Amount": "sum"
@@ -19227,12 +19233,24 @@
    "portal_enabled": true,
    "premade_reports": [
     {
+     "all_dates": true,
      "chart_type": "bar",
      "description": "Financial transactions post to the GL on a schedule. Anything sitting unextracted is a reconciliation difference between C2M and the finance system.",
      "dimensions": [
       "GL Distribution Status"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Extracted to GL",
+       "op": "eq",
+       "value": false
+      },
+      {
+       "field": "Is Debit",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "gl_not_extracted",
      "measures": [
       {
@@ -23191,6 +23209,7 @@
      "workstream_label": "Service Point"
     },
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "Consumption nobody is being billed for. Either service started without an agreement or one was stopped while the meter kept running.",
      "dimensions": [
@@ -26872,6 +26891,7 @@
      "workstream_label": "Work Queues"
     },
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "A to-do is work the system could not finish alone. The oldest ones are the exceptions nobody has been made responsible for.",
      "dimensions": [
@@ -27485,6 +27505,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "Revenue earned and not invoiced. A stopped agreement awaiting a final bill is the expensive kind \u2014 the customer has gone.",
      "dimensions": [

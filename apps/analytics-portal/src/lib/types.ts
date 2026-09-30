@@ -134,6 +134,8 @@ export type PremadeReport = {
   measures: { field: string; agg: string }[];
   filters: FilterDef[];
   chart_type: "bar" | "line" | "pie" | "horizontal";
+  // a backlog question: it opens on All dates (lib/datePresets.opensOnAllDates)
+  all_dates?: boolean;
 };
 
 export type ScopeFilterDef = {
