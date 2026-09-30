@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { featuredCanvases } from "@/lib/featuredCanvases";
+import { featuredCanvases, startHereGrid } from "@/lib/featuredCanvases";
 import type { WorkstreamGroup } from "@/lib/types";
 
 export function WorkstreamHeroLinks({
@@ -21,7 +21,7 @@ export function WorkstreamHeroLinks({
       <p className="text-[11px] font-semibold uppercase tracking-widest text-heading-accent">
         Start here
       </p>
-      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+      <div className={`mt-3 grid gap-3 ${startHereGrid(top.length)}`}>
         {top.map((item) => {
           const reportQs = item.reportId ? `?report=${item.reportId}` : "";
           return (
