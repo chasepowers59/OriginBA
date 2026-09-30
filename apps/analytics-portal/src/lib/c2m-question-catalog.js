@@ -613,12 +613,14 @@ export const QUESTIONS = [
     id: "field-activity-backlog",
     process: "field", workstream: "Field Operations",
     folder: "field_operations", essential: true,
-    kind: "count",
+    kind: "count", all_dates: true,
     title: "What is the field activity backlog, by type?",
     why: "Field work is the most expensive thing a utility does. Backlog by type shows which work is accumulating faster than the crews clear it.",
     canvas: "rpt_field_activity",
     // the business type: "Activity Type" is MDM's category, "Field Activity" on every row
     axis: "Field Activity Type", value: "Activities",
+    // open work only: Is Open is C2M's final-status condition (F1_BUS_OBJ_STATUS)
+    filters: [{"field": "Is Open", "op": "eq", "value": true}],
     sql: `select coalesce("Field Activity Type", "Field Activity Type Code") as "Field Activity Type",
                  coalesce("Activity Status Code", '(unset)') as "Status",
                  count(*)::bigint as "Activities",
@@ -627,6 +629,7 @@ export const QUESTIONS = [
                  -- column and the canvas carries the source shape faithfully.
                  round(avg(nullif(trim("Number of Retries"),'')::numeric), 2) as "Avg Retries"
           from reporting.rpt_field_activity
+          where "Is Open"
           group by 1, 2 order by 3 desc`,
   }),
   q({

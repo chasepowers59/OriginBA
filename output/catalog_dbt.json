@@ -16848,6 +16848,7 @@
        "Field Activity Type Code",
        "Activity Status",
        "Activity Status Code",
+       "Is Open",
        "Activity Status Reason Code",
        "Completed Code",
        "Current Error State",
@@ -16937,6 +16938,13 @@
       "on": "",
       "role": "model",
       "table": "stg_bo_status_label"
+     },
+     {
+      "alias": "bos",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_bo_status"
      },
      {
       "alias": "tk",
@@ -17053,6 +17061,10 @@
     {
      "id": "Activity Status Code",
      "label": "Activity Status Code"
+    },
+    {
+     "id": "Is Open",
+     "label": "Is Open"
     },
     {
      "id": "Activity Status Reason Code",
@@ -17259,6 +17271,14 @@
      "label": "Activity Status Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "Flag. Filter on it; do not sum it.",
+     "group": "field_ops",
+     "id": "Is Open",
+     "label": "Is Open",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -17647,12 +17667,19 @@
    "portal_enabled": true,
    "premade_reports": [
     {
+     "all_dates": true,
      "chart_type": "bar",
      "description": "Field work is the most expensive thing a utility does. Backlog by type shows which work is accumulating faster than the crews clear it.",
      "dimensions": [
       "Field Activity Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Open",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "field_activity_backlog",
      "measures": [
       {
