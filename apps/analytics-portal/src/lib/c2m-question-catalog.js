@@ -1072,13 +1072,16 @@ export const QUESTIONS = [
     title: "Which premises are flagged life support or sensitive load?",
     why: "These customers must never be disconnected by an automated process. The flag exists so that every collections and field workflow can check it, which means someone has to know the list.",
     canvas: "rpt_premise_sp",
-    axis: "Life Support / Sensitive Load", value: "Service Points",
-    sql: `select coalesce("Life Support / Sensitive Load", "Life Support / Sensitive Load Code", '(none)') as "Life Support / Sensitive Load",
+    // either flag: C2M carries it on the person about four times as often as on the premise
+    axis: "Premise Type", value: "Service Points",
+    filters: [{"field": "Life Support Here", "op": "eq", "value": true}],
+    sql: `select coalesce("Premise Type", "Premise Type Code", '(unset)') as "Premise Type",
                  count(*)::bigint as "Service Points",
                  count(distinct "Premise ID")::bigint as "Premises",
-                 count(*) filter (where "Service Is On")::bigint as "Service On",
-                 sum("Active SA Count")::bigint as "Active Agreements"
+                 count(*) filter (where "Customer On Life Support")::bigint as "Flagged On The Customer",
+                 count(*) filter (where "Service Is On")::bigint as "Service On"
           from reporting.rpt_premise_sp
+          where "Life Support Here"
           group by 1 order by 2 desc`,
   }),
 
