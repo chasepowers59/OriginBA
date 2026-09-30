@@ -50,4 +50,4 @@ Convert ideas into repeatable client value with governed SQL, Jaspersoft templat
 2. Add/update Input Controls payload in `server/input_controls/`.
 3. Create JRXML using ALL_CAPS parameters and no hardcoded datasource credentials.
 4. Smoke-test render in JRS NON-PROD.
-5. Promote using strict 9-step deployment sequence in `docs/deployment-compliance-guide.md`.
+5. Promote using strict 9-step deployment sequence in `jaspersoft/docs/deployment-compliance-guide.md`.

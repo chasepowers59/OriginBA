@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="NW_ACCT_WNO_MXU" label="NW_ACCT_WNO_MXU" resourceId="NW_ACCT_WNO_MXU"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account ID" resourceId="NW_ACCT_WNO_MXU.ACCT_ID"></item>
+    <item id="ADDRESS1" label="Address 1" resourceId="NW_ACCT_WNO_MXU.ADDRESS1"></item>
+    <item id="BILL_CYC_CD" label="Bill Cycle" resourceId="NW_ACCT_WNO_MXU.BILL_CYC_CD"></item>
+    <item id="D1_SP_ID" label="Service Point ID" resourceId="NW_ACCT_WNO_MXU.D1_SP_ID"></item>
+    <item id="D1_SP_TYPE_CD" label="SP Type" resourceId="NW_ACCT_WNO_MXU.D1_SP_TYPE_CD"></item>
+    <item id="MSRMT_CYC_CD" label="Measurement Cycle" resourceId="NW_ACCT_WNO_MXU.MSRMT_CYC_CD"></item>
+    <item id="MSRMT_CYC_RTE_CD" label="Route" resourceId="NW_ACCT_WNO_MXU.MSRMT_CYC_RTE_CD"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="NW_ACCT_WNO_MXU" datasourceId="Newark1_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_SP_TYPE_CD" type="java.lang.String"></field>
+        <field id="MSRMT_CYC_CD" type="java.lang.String"></field>
+        <field id="MSRMT_CYC_RTE_CD" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+      </fieldList>
+      <query>select distinct acct.acct_id, acct.bill_cyc_cd, sp.d1_sp_id, sp.d1_sp_type_Cd, sp.msrmt_cyc_cd, sp.msrmt_cyc_rte_cd, sp.address1
+from cisadm.ci_acct acct
+inner join cisadm.ci_sa sa on sa.acct_id = acct.acct_id and sa.sa_status_flg in ('10','20')
+inner join cisadm.d1_us_identifier usi on usi.id_value = sa.sa_id and usi.us_id_type_flg = 'D2EI'
+inner join cisadm.d1_us_sp ussp on ussp.us_id = usi.us_id
+inner join cisadm.d1_sp sp on sp.d1_sp_id = ussp.d1_sp_id
+where 1=1
+and not exists (select 'x' from cisadm.d1_sp_eqpmnt x where x.d1_sp_id = ussp.d1_sp_id)</query>
+    </jdbcQuery>
+  </resources>
+</schema>

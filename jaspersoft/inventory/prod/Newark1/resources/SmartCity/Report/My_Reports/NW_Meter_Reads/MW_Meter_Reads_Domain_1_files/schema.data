@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_2" label="JoinTree_2" resourceId="JoinTree_2"></itemGroup>
+  </dataIslands>
+  <itemGroups>
+    <itemGroup id="Device_Details" label="Device Details" resourceId="JoinTree_2">
+      <items>
+        <item id="MEASR_COMP_ID_1" label="Measuring Component" resourceId="JoinTree_2.Device_Details.MEASR_COMP_ID"></item>
+        <item id="METER_NBR" label="Meter / Badge Number" resourceId="JoinTree_2.Device_Details.METER_NBR"></item>
+        <item id="MXU_NUMBER" label="MXU Number" resourceId="JoinTree_2.Device_Details.MXU_NUMBER"></item>
+        <item id="NBR_EST_READS" label="Number of Estimated Reads" resourceId="JoinTree_2.Device_Details.NBR_EST_READS"></item>
+        <item id="WARD" label="Ward" resourceId="JoinTree_2.Device_Details.WARD"></item>
+        <item id="NBR_REG_READS" label="Number of Regular Reads" resourceId="JoinTree_2.Device_Details.NBR_REG_READS"></item>
+        <item id="LATEST_REG_READ_DTTM" label="Latest Regular Read Date/Time" resourceId="JoinTree_2.Device_Details.LATEST_REG_READ_DTTM"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="Meter_Reads" label="Meter Reads" resourceId="JoinTree_2">
+      <items>
+        <item id="ADDRESS" label="Address" resourceId="JoinTree_2.Meter_Reads.ADDRESS"></item>
+        <item id="CUST_CL_CD" label="Customer Class" resourceId="JoinTree_2.Meter_Reads.CUST_CL_CD"></item>
+        <item id="AS400_ACCT_ID" label="AS400 Account ID" resourceId="JoinTree_2.Meter_Reads.AS400_ACCT_ID"></item>
+        <item id="C2M_ACCT_ID" label="Account ID" resourceId="JoinTree_2.Meter_Reads.C2M_ACCT_ID"></item>
+        <item id="D1_INSTALL_DTTM" label="Installation Date/Time" resourceId="JoinTree_2.Meter_Reads.D1_INSTALL_DTTM"></item>
+        <item id="METER_SIZE" label="Meter Size" resourceId="JoinTree_2.Meter_Reads.METER_SIZE"></item>
+        <item id="MEASURING_UNIT" label="Measuring Unit" resourceId="JoinTree_2.Meter_Reads.MEASURING_UNIT"></item>
+        <item id="CURRENT_READ_DATE" label="Current Read Date" resourceId="JoinTree_2.Meter_Reads.CURRENT_READ_DATE"></item>
+        <item id="CURRENT_READING" label="Current Reading" resourceId="JoinTree_2.Meter_Reads.CURRENT_READING"></item>
+        <item id="MEASR_COMP_ID" label="Measuring Component" resourceId="JoinTree_2.Meter_Reads.MEASR_COMP_ID"></item>
+        <item id="MSRMT_COND_FLG" label="Current Measurement Condition" resourceId="JoinTree_2.Meter_Reads.MSRMT_COND_FLG"></item>
+        <item id="PREVIOUS_MSRMT_COND_FLG" label="Previous Measurement Condition" resourceId="JoinTree_2.Meter_Reads.PREVIOUS_MSRMT_COND_FLG"></item>
+        <item id="PREVIOUS_READ_DATE" label="Previous Read Date" resourceId="JoinTree_2.Meter_Reads.PREVIOUS_READ_DATE"></item>
+        <item id="PREVIOUS_READING" label="Previous Reading" resourceId="JoinTree_2.Meter_Reads.PREVIOUS_READING"></item>
+        <item id="PROPERTY_TYPE" label="Property Type" resourceId="JoinTree_2.Meter_Reads.PROPERTY_TYPE"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcQuery id="Meter_Reads" datasourceId="Newark1_DS">
+      <fieldList>
+        <field id="PROPERTY_TYPE" type="java.lang.String"></field>
+        <field id="ADDRESS" type="java.lang.String"></field>
+        <field id="C2M_ACCT_ID" type="java.lang.String"></field>
+        <field id="AS400_ACCT_ID" type="java.lang.String"></field>
+        <field id="CURRENT_READ_DATE" type="java.sql.Timestamp"></field>
+        <field id="CURRENT_READING" type="java.math.BigDecimal"></field>
+        <field id="MSRMT_COND_FLG" type="java.lang.String"></field>
+        <field id="PREVIOUS_READ_DATE" type="java.sql.Timestamp"></field>
+        <field id="PREVIOUS_READING" type="java.math.BigDecimal"></field>
+        <field id="PREVIOUS_MSRMT_COND_FLG" type="java.lang.String"></field>
+        <field id="MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="D1_INSTALL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="METER_SIZE" type="java.lang.String"></field>
+        <field id="MEASURING_UNIT" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT 
+    PCHAR.CHAR_VAL PROPERTY_TYPE,
+    PREM.ADDRESS1 ADDRESS,
+    (SELECT CSUB.DESCR FROM CISADM.CI_ACCT ASUB LEFT JOIN CISADM.CI_CUST_CL_L CSUB ON ASUB.CUST_CL_CD = CSUB.CUST_CL_CD WHERE ACCT_ID = SASP.ACCT_ID) CUST_CL_CD,
+    SASP.ACCT_ID C2M_ACCT_ID,
+    SASP.OLD_ACCT_ID AS400_ACCT_ID,
+    MSR.MEASR_COMP_ID MEASR_COMP_ID,
+    IE.D1_INSTALL_DTTM D1_INSTALL_DTTM,
+    (SELECT CHAR_VAL FROM CISADM.CI_SP_CHAR WHERE SP_ID = SASP.SP_ID AND CHAR_TYPE_CD = 'C2M-PSZE') METER_SIZE,
+    MEASURING_UNITS.DESCR MEASURING_UNIT,
+    MSR.MSRMT_LOCAL_DTTM CURRENT_READ_DATE,
+    MSR.READING_VAL CURRENT_READING,
+    CASE MSR.MSRMT_COND_FLG
+        WHEN '100000'	THEN 'No Read - System'	
+        WHEN '100500'	THEN 'No Read - Field'	
+        WHEN '101500'	THEN 'No Read - Outage Fill'
+        WHEN '101000'	THEN 'No Read - Outage'
+        WHEN '102000'	THEN 'No Read - Disconnected'
+        WHEN '201000'	THEN 'Missing'	
+        WHEN '205001'	THEN 'Spike - Treat As Missing'
+        WHEN '206001'	THEN 'Bad AMI Data - Treat As Missing'
+        WHEN '301000'	THEN 'System Estimate'	
+        WHEN '401000'	THEN 'External Estimate'
+        WHEN '402000'	THEN 'Office Estimate'	
+        WHEN '409000'	THEN 'Combined Quantity'
+        WHEN '500001'	THEN 'Proration'
+        WHEN '501000'	THEN 'Regular'	
+        WHEN '901000'	THEN 'Super'
+        ELSE 'Others'	
+    END MSRMT_COND_FLG,
+    MSR2.MSRMT_LOCAL_DTTM  PREVIOUS_READ_DATE,
+    MSR2.READING_VAL PREVIOUS_READING,
+    CASE MSR2.MSRMT_COND_FLG
+        WHEN '100000'	THEN 'No Read - System'	
+        WHEN '100500'	THEN 'No Read - Field'	
+        WHEN '101500'	THEN 'No Read - Outage Fill'
+        WHEN '101000'	THEN 'No Read - Outage'
+        WHEN '102000'	THEN 'No Read - Disconnected'
+        WHEN '201000'	THEN 'Missing'	
+        WHEN '205001'	THEN 'Spike - Treat As Missing'
+        WHEN '206001'	THEN 'Bad AMI Data - Treat As Missing'
+        WHEN '301000'	THEN 'System Estimate'	
+        WHEN '401000'	THEN 'External Estimate'
+        WHEN '402000'	THEN 'Office Estimate'	
+        WHEN '409000'	THEN 'Combined Quantity'
+        WHEN '500001'	THEN 'Proration'
+        WHEN '501000'	THEN 'Regular'	
+        WHEN '901000'	THEN 'Super'
+        ELSE 'Others'	
+    END PREVIOUS_MSRMT_COND_FLG
+FROM 
+    CISADM.CI_PREM PREM
+    LEFT JOIN CISADM.CI_PREM_CHAR PCHAR
+        ON PCHAR.PREM_ID = PREM.PREM_ID
+        AND PCHAR.CHAR_TYPE_CD = 'PRPRTYTY'
+    INNER JOIN CISADM.CI_SP SP
+        ON SP.PREM_ID = PREM.PREM_ID
+    INNER JOIN (SELECT *
+                FROM   (SELECT SA.ACCT_ID,
+                               SA.OLD_ACCT_ID,
+                               SASP1.SP_ID,
+                               SA.SA_ID,
+                               ROW_NUMBER()
+                                   OVER (PARTITION BY SASP1.SP_ID
+                                         ORDER BY SA.SA_ID DESC) RANK
+                        FROM   CISADM.CI_SA_SP SASP1,
+                               CISADM.CI_SA SA
+                        WHERE  SASP1.SA_ID = SA.SA_ID
+                               AND SA.SA_STATUS_FLG = '20')
+                WHERE  RANK = 1) SASP
+        ON SASP.SP_ID = SP.SP_ID
+    INNER JOIN CISADM.D1_SP_IDENTIFIER SPIDENTIFIER
+        ON SPIDENTIFIER.SP_ID_TYPE_FLG = 'D1EI'
+        AND SPIDENTIFIER.ID_VALUE = SASP.SP_ID
+    INNER JOIN CISADM.D1_SP MDMSP
+        ON MDMSP.D1_SP_ID = SPIDENTIFIER.D1_SP_ID
+    INNER JOIN CISADM.D1_INSTALL_EVT IE
+        ON IE.D1_SP_ID = MDMSP.D1_SP_ID
+        AND ( IE.D1_REMOVAL_DTTM IS NULL OR IE.D1_REMOVAL_DTTM &gt;= SYSDATE)
+    INNER JOIN CISADM.D1_MEASR_COMP MC
+        ON MC.DEVICE_CONFIG_ID = IE.DEVICE_CONFIG_ID
+    LEFT JOIN (SELECT   MEASR_COMP_TYPE_CD,
+                        LISTAGG(DESCR100, '; ') WITHIN GROUP (ORDER BY DESCR100) DESCR
+               FROM     CISADM.D1_MC_TYPE_VALUE_IDENTIFIER_L
+               GROUP BY MEASR_COMP_TYPE_CD) MEASURING_UNITS
+        ON MC.MEASR_COMP_TYPE_CD = MEASURING_UNITS.MEASR_COMP_TYPE_CD
+    LEFT JOIN CISADM.D1_MSRMT MSR
+        ON MSR.MEASR_COMP_ID = MC.MEASR_COMP_ID
+        AND MSR.MSRMT_DTTM = (SELECT MAX(MSR1.MSRMT_DTTM)
+                              FROM   CISADM.D1_MSRMT MSR1
+                              WHERE  MSR1.MEASR_COMP_ID = MSR.MEASR_COMP_ID
+                                     AND MSR1.MSRMT_USE_FLG != 'D101')
+    LEFT JOIN CISADM.D1_MSRMT MSR2
+        ON MSR2.MEASR_COMP_ID = MSR.MEASR_COMP_ID
+        AND MSR2.MSRMT_DTTM = MSR.PREV_MSRMT_DTTM
+        AND MSR2.MSRMT_USE_FLG != 'D101'</query>
+    </jdbcQuery>
+    <jdbcQuery id="Device_Details" datasourceId="Newark1_DS">
+      <fieldList>
+        <field id="NBR_EST_READS" type="java.math.BigDecimal"></field>
+        <field id="METER_NBR" type="java.lang.String"></field>
+        <field id="WARD" type="java.lang.String"></field>
+        <field id="MXU_NUMBER" type="java.lang.String"></field>
+        <field id="MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="NBR_REG_READS" type="java.math.BigDecimal"></field>
+        <field id="LATEST_REG_READ_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>SELECT
+    MC.MEASR_COMP_ID,
+    (SELECT COUNT(*)
+        FROM CISADM.D1_MSRMT MSRMT
+        WHERE MSRMT.MEASR_COMP_ID = MC.MEASR_COMP_ID
+        AND MSRMT.MSRMT_COND_FLG &gt;= 301000  
+        AND MSRMT.MSRMT_COND_FLG &lt;= 402000
+        AND MSRMT.MSRMT_DTTM &gt; (
+        SELECT MAX(MSRMT_SUB.MSRMT_DTTM)
+        FROM CISADM.D1_MSRMT MSRMT_SUB
+        WHERE 
+            MSRMT_SUB.MSRMT_COND_FLG = 501000
+            AND MSRMT_SUB.MEASR_COMP_ID = MC.MEASR_COMP_ID
+            )
+    ) AS NBR_EST_READS,
+    (SELECT MAX(MSRMT_SUB.MSRMT_DTTM)
+        FROM CISADM.D1_MSRMT MSRMT_SUB
+        WHERE 
+            MSRMT_SUB.MSRMT_COND_FLG = 501000
+            AND MSRMT_SUB.MEASR_COMP_ID = MC.MEASR_COMP_ID
+    ) AS LATEST_REG_READ_DTTM,
+    (SELECT COUNT(*)
+        FROM CISADM.D1_MSRMT MSRMT
+        WHERE MSRMT.MEASR_COMP_ID = MC.MEASR_COMP_ID
+        AND MSRMT.MSRMT_COND_FLG = 501000
+    ) AS NBR_REG_READS,
+    DVCI.ID_VALUE AS METER_NBR,
+    -- 10-20-2025 / Start Change --
+    NVL((
+        SELECT 
+            CASE WHEN PREM.ADDRESS1 LIKE '%SLD' THEN 'NORTH WARD'
+                 ELSE PCH.SRCH_CHAR_VAL
+            END
+        FROM CISADM.CI_PREM_CHAR PCH
+        WHERE PREM.PREM_ID = PCH.PREM_ID
+        AND PCH.CHAR_TYPE_CD = 'WARD'),' ') AS WARD,
+   -- 10-20-2025 / End Change --
+    NVL((SELECT max(AI.W1_ID_VALUE)
+            FROM CISADM.W1_ASSET_NODE ALOC,
+                CISADM.W1_ASSET ASSET,
+                CISADM.W1_ASSET_IDENTIFIER AI
+            WHERE ALOC.NODE_ID = MDMSP.D1_SP_ID 
+                AND ALOC.CURR_ASSET_ID = ASSET.ASSET_ID
+                AND ASSET.ASSET_TYPE_CD = 'MXU-COMM'
+                AND ASSET.BO_STATUS_CD = 'INSTALLED'
+                AND ASSET.ASSET_ID = AI.ASSET_ID
+                AND AI.ASSET_ID_TYPE_FLG = 'W1BN'
+            ),' ' 
+    ) AS MXU_NUMBER
+FROM CISADM.D1_MEASR_COMP MC,
+    CISADM.D1_DVC_CFG DCFG,
+    CISADM.D1_DVC DVC,
+    CISADM.D1_DVC_IDENTIFIER DVCI,
+    CISADM.D1_INSTALL_EVT IE,
+    CISADM.D1_SP MDMSP,
+    CISADM.D1_SP_IDENTIFIER MDMSPI,
+    CISADM.CI_SP CCBSP,
+    CISADM.CI_PREM PREM
+WHERE MC.DEVICE_CONFIG_ID = DCFG.DEVICE_CONFIG_ID
+AND DCFG.DEVICE_CONFIG_ID = IE.DEVICE_CONFIG_ID
+AND IE.BO_STATUS_CD IN ('ON', 'OFF')
+AND (IE.D1_REMOVAL_DTTM IS NULL OR IE.D1_REMOVAL_DTTM &gt;= SYSDATE)
+AND IE.D1_SP_ID = MDMSP.D1_SP_ID
+AND MDMSP.D1_SP_ID = MDMSPI.D1_SP_ID
+AND MDMSPI.SP_ID_TYPE_FLG = 'D1EI' 
+AND MDMSPI.ID_VALUE = CCBSP.SP_ID
+AND CCBSP.PREM_ID = PREM.PREM_ID
+AND DCFG.D1_DEVICE_ID = DVC.D1_DEVICE_ID
+AND DVC.D1_DEVICE_ID = DVCI.D1_DEVICE_ID
+AND DVCI.DVC_ID_TYPE_FLG = 'D1BN'</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_2" datasourceId="Newark1_DS">
+      <fieldList>
+        <field id="Device_Details.NBR_EST_READS" type="java.math.BigDecimal"></field>
+        <field id="Device_Details.METER_NBR" type="java.lang.String"></field>
+        <field id="Device_Details.WARD" type="java.lang.String"></field>
+        <field id="Device_Details.MXU_NUMBER" type="java.lang.String"></field>
+        <field id="Device_Details.MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="Device_Details.NBR_REG_READS" type="java.math.BigDecimal"></field>
+        <field id="Device_Details.LATEST_REG_READ_DTTM" type="java.sql.Timestamp"></field>
+        <field id="Meter_Reads.PROPERTY_TYPE" type="java.lang.String"></field>
+        <field id="Meter_Reads.ADDRESS" type="java.lang.String"></field>
+        <field id="Meter_Reads.C2M_ACCT_ID" type="java.lang.String"></field>
+        <field id="Meter_Reads.AS400_ACCT_ID" type="java.lang.String"></field>
+        <field id="Meter_Reads.CURRENT_READ_DATE" type="java.sql.Timestamp"></field>
+        <field id="Meter_Reads.CURRENT_READING" type="java.math.BigDecimal"></field>
+        <field id="Meter_Reads.MSRMT_COND_FLG" type="java.lang.String"></field>
+        <field id="Meter_Reads.PREVIOUS_READ_DATE" type="java.sql.Timestamp"></field>
+        <field id="Meter_Reads.PREVIOUS_READING" type="java.math.BigDecimal"></field>
+        <field id="Meter_Reads.PREVIOUS_MSRMT_COND_FLG" type="java.lang.String"></field>
+        <field id="Meter_Reads.MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="Meter_Reads.CUST_CL_CD" type="java.lang.String"></field>
+        <field id="Meter_Reads.D1_INSTALL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="Meter_Reads.METER_SIZE" type="java.lang.String"></field>
+        <field id="Meter_Reads.MEASURING_UNIT" type="java.lang.String"></field>
+      </fieldList>
+      <joinInfo alias="Meter_Reads" referenceId="Meter_Reads"></joinInfo>
+      <joinList>
+        <join expr="Meter_Reads.MEASR_COMP_ID == Device_Details.MEASR_COMP_ID" left="Meter_Reads" right="Device_Details" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions suppressCircularJoins="true"></joinOptions>
+      <query>SELECT 
+    PCHAR.CHAR_VAL PROPERTY_TYPE,
+    PREM.ADDRESS1 ADDRESS,
+    (SELECT CSUB.DESCR FROM CISADM.CI_ACCT ASUB LEFT JOIN CISADM.CI_CUST_CL_L CSUB ON ASUB.CUST_CL_CD = CSUB.CUST_CL_CD WHERE ACCT_ID = SASP.ACCT_ID) CUST_CL_CD,
+    SASP.ACCT_ID C2M_ACCT_ID,
+    SASP.OLD_ACCT_ID AS400_ACCT_ID,
+    MSR.MEASR_COMP_ID MEASR_COMP_ID,
+    IE.D1_INSTALL_DTTM D1_INSTALL_DTTM,
+    (SELECT CHAR_VAL FROM CISADM.CI_SP_CHAR WHERE SP_ID = SASP.SP_ID AND CHAR_TYPE_CD = 'C2M-PSZE') METER_SIZE,
+    MEASURING_UNITS.DESCR MEASURING_UNIT,
+    MSR.MSRMT_LOCAL_DTTM CURRENT_READ_DATE,
+    MSR.READING_VAL CURRENT_READING,
+    CASE MSR.MSRMT_COND_FLG
+        WHEN '100000'	THEN 'No Read - System'	
+        WHEN '100500'	THEN 'No Read - Field'	
+        WHEN '101500'	THEN 'No Read - Outage Fill'
+        WHEN '101000'	THEN 'No Read - Outage'
+        WHEN '102000'	THEN 'No Read - Disconnected'
+        WHEN '201000'	THEN 'Missing'	
+        WHEN '205001'	THEN 'Spike - Treat As Missing'
+        WHEN '206001'	THEN 'Bad AMI Data - Treat As Missing'
+        WHEN '301000'	THEN 'System Estimate'	
+        WHEN '401000'	THEN 'External Estimate'
+        WHEN '402000'	THEN 'Office Estimate'	
+        WHEN '409000'	THEN 'Combined Quantity'
+        WHEN '500001'	THEN 'Proration'
+        WHEN '501000'	THEN 'Regular'	
+        WHEN '901000'	THEN 'Super'
+        ELSE 'Others'	
+    END MSRMT_COND_FLG,
+    MSR2.MSRMT_LOCAL_DTTM  PREVIOUS_READ_DATE,
+    MSR2.READING_VAL PREVIOUS_READING,
+    CASE MSR2.MSRMT_COND_FLG
+        WHEN '100000'	THEN 'No Read - System'	
+        WHEN '100500'	THEN 'No Read - Field'	
+        WHEN '101500'	THEN 'No Read - Outage Fill'
+        WHEN '101000'	THEN 'No Read - Outage'
+        WHEN '102000'	THEN 'No Read - Disconnected'
+        WHEN '201000'	THEN 'Missing'	
+        WHEN '205001'	THEN 'Spike - Treat As Missing'
+        WHEN '206001'	THEN 'Bad AMI Data - Treat As Missing'
+        WHEN '301000'	THEN 'System Estimate'	
+        WHEN '401000'	THEN 'External Estimate'
+        WHEN '402000'	THEN 'Office Estimate'	
+        WHEN '409000'	THEN 'Combined Quantity'
+        WHEN '500001'	THEN 'Proration'
+        WHEN '501000'	THEN 'Regular'	
+        WHEN '901000'	THEN 'Super'
+        ELSE 'Others'	
+    END PREVIOUS_MSRMT_COND_FLG
+FROM 
+    CISADM.CI_PREM PREM
+    LEFT JOIN CISADM.CI_PREM_CHAR PCHAR
+        ON PCHAR.PREM_ID = PREM.PREM_ID
+        AND PCHAR.CHAR_TYPE_CD = 'PRPRTYTY'
+    INNER JOIN CISADM.CI_SP SP
+        ON SP.PREM_ID = PREM.PREM_ID
+    INNER JOIN (SELECT *
+                FROM   (SELECT SA.ACCT_ID,
+                               SA.OLD_ACCT_ID,
+                               SASP1.SP_ID,
+                               SA.SA_ID,
+                               ROW_NUMBER()
+                                   OVER (PARTITION BY SASP1.SP_ID
+                                         ORDER BY SA.SA_ID DESC) RANK
+                        FROM   CISADM.CI_SA_SP SASP1,
+                               CISADM.CI_SA SA
+                        WHERE  SASP1.SA_ID = SA.SA_ID
+                               AND SA.SA_STATUS_FLG = '20')
+                WHERE  RANK = 1) SASP
+        ON SASP.SP_ID = SP.SP_ID
+    INNER JOIN CISADM.D1_SP_IDENTIFIER SPIDENTIFIER
+        ON SPIDENTIFIER.SP_ID_TYPE_FLG = 'D1EI'
+        AND SPIDENTIFIER.ID_VALUE = SASP.SP_ID
+    INNER JOIN CISADM.D1_SP MDMSP
+        ON MDMSP.D1_SP_ID = SPIDENTIFIER.D1_SP_ID
+    INNER JOIN CISADM.D1_INSTALL_EVT IE
+        ON IE.D1_SP_ID = MDMSP.D1_SP_ID
+        AND ( IE.D1_REMOVAL_DTTM IS NULL OR IE.D1_REMOVAL_DTTM &gt;= SYSDATE)
+    INNER JOIN CISADM.D1_MEASR_COMP MC
+        ON MC.DEVICE_CONFIG_ID = IE.DEVICE_CONFIG_ID
+    LEFT JOIN (SELECT   MEASR_COMP_TYPE_CD,
+                        LISTAGG(DESCR100, '; ') WITHIN GROUP (ORDER BY DESCR100) DESCR
+               FROM     CISADM.D1_MC_TYPE_VALUE_IDENTIFIER_L
+               GROUP BY MEASR_COMP_TYPE_CD) MEASURING_UNITS
+        ON MC.MEASR_COMP_TYPE_CD = MEASURING_UNITS.MEASR_COMP_TYPE_CD
+    LEFT JOIN CISADM.D1_MSRMT MSR
+        ON MSR.MEASR_COMP_ID = MC.MEASR_COMP_ID
+        AND MSR.MSRMT_DTTM = (SELECT MAX(MSR1.MSRMT_DTTM)
+                              FROM   CISADM.D1_MSRMT MSR1
+                              WHERE  MSR1.MEASR_COMP_ID = MSR.MEASR_COMP_ID
+                                     AND MSR1.MSRMT_USE_FLG != 'D101')
+    LEFT JOIN CISADM.D1_MSRMT MSR2
+        ON MSR2.MEASR_COMP_ID = MSR.MEASR_COMP_ID
+        AND MSR2.MSRMT_DTTM = MSR.PREV_MSRMT_DTTM
+        AND MSR2.MSRMT_USE_FLG != 'D101'</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="Meter_Reads" tableId="Meter_Reads"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="Device_Details" tableId="Device_Details"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

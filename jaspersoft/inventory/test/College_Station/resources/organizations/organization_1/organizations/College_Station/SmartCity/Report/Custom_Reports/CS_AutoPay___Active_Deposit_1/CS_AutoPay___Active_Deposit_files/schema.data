@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Autopay_Active_Deposit" label="Autopay_Active_Deposit" resourceId="Autopay_Active_Deposit"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account  ID" resourceId="Autopay_Active_Deposit.ACCT_ID"></item>
+    <item id="ADDRESS" label="Premise Address " resourceId="Autopay_Active_Deposit.ADDRESS"></item>
+    <item id="AUTO_PAY_EFFDT" label="AutoPay Effective Date " resourceId="Autopay_Active_Deposit.AUTO_PAY_EFFDT"></item>
+    <item id="DEP_PAID_FLG" label="Deposit Paid Flag" resourceId="Autopay_Active_Deposit.DEP_PAID_FLG"></item>
+    <item id="DEPOSIT_BILLED" label="Deposit Billed" resourceId="Autopay_Active_Deposit.DEPOSIT_BILLED"></item>
+    <item id="DEPOSIT_PAID" label="Deposit Paid" resourceId="Autopay_Active_Deposit.DEPOSIT_PAID"></item>
+    <item id="ENTITY_NAME" label="Person Name" resourceId="Autopay_Active_Deposit.ENTITY_NAME"></item>
+    <item id="SA_ID" label="Deposit SA ID" resourceId="Autopay_Active_Deposit.SA_ID"></item>
+    <item id="SA_TYPE_CD" label="Deposit SA Type" resourceId="Autopay_Active_Deposit.SA_TYPE_CD"></item>
+    <item id="START_DT" label="Deposit SA Effective Date" resourceId="Autopay_Active_Deposit.START_DT"></item>
+    <item id="TOT_TO_BILL_AMT" label="Deposit Amount To be Billed" resourceId="Autopay_Active_Deposit.TOT_TO_BILL_AMT"></item>
+    <item id="DEPOSIT_AMOUNT" label="Deposit Amount" resourceId="Autopay_Active_Deposit.DEPOSIT_AMOUNT"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Autopay_Active_Deposit" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="ADDRESS" type="java.lang.String"></field>
+        <field id="AUTO_PAY_EFFDT" type="java.sql.Timestamp"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="TOT_TO_BILL_AMT" type="java.math.BigDecimal"></field>
+        <field id="DEPOSIT_BILLED" type="java.math.BigDecimal"></field>
+        <field id="DEPOSIT_PAID" type="java.math.BigDecimal"></field>
+        <field id="DEP_PAID_FLG" type="java.lang.String"></field>
+        <field id="DEPOSIT_AMOUNT" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+    Z.ACCT_ID,
+    Z.ENTITY_NAME,
+    Z.ADDRESS,
+    Z.AUTO_PAY_EFFDT,
+    Z.START_DT,
+    Z.SA_TYPE_CD,
+    Z.SA_ID,
+    Z.DEPOSIT_AMOUNT,
+    DECODE(SIGN(Z.TOT_TO_BILL_AMT - Z.DEPOSIT_PAID), -1, 0, 0, 0, Z.TOT_TO_BILL_AMT) as TOT_TO_BILL_AMT,
+    Z.DEPOSIT_BILLED,
+    Z.DEPOSIT_PAID,
+    Z.DEP_PAID_FLG
+FROM (
+    SELECT
+        Y.ACCT_ID,
+        Y.ENTITY_NAME,
+        Y.ADDRESS,
+        Y.AUTO_PAY_EFFDT,
+        Y.START_DT,
+        Y.SA_TYPE_CD,
+        Y.SA_ID,
+        Y.DEPOSIT_AMOUNT,
+        DECODE(SIGN(Y.TOT_TO_BILL_AMT - Y.DEPOSIT_BILLED), -1, 0, 0, 0, Y.TOT_TO_BILL_AMT - Y.DEPOSIT_BILLED) as TOT_TO_BILL_AMT,
+        Y.DEPOSIT_BILLED,
+        Y.DEPOSIT_PAID,
+        (
+             CASE 
+                 WHEN Y.DEPOSIT_BILLED &gt; 0 AND Y.DEPOSIT_PAID &lt;= 0 THEN 'DEP_BILLED_NOT_PAID'
+                 WHEN Y.DEPOSIT_PAID &gt; 0 AND Y.DEPOSIT_PAID &lt; Y.TOT_TO_BILL_AMT THEN 'DEP_PARTIAL_PAID'
+                 WHEN Y.DEPOSIT_PAID &gt; 0 AND Y.DEPOSIT_PAID &gt;= Y.TOT_TO_BILL_AMT THEN 'DEP_PAID'
+                 WHEN Y.DEPOSIT_BILLED &lt;= 0 AND Y.DEPOSIT_PAID &lt;= 0 THEN 'DEP_TO_BE_BILLED'
+                 ELSE 'UNKNOWN'
+             END 
+        ) AS DEP_PAID_FLG
+    FROM 
+        (
+        SELECT 
+            X.ACCT_ID,
+            X.ENTITY_NAME,
+            X.ADDRESS,
+            X.AUTO_PAY_EFFDT,
+            X.START_DT,
+            X.SA_TYPE_CD,
+            X.SA_ID,
+            X.TOT_TO_BILL_AMT as DEPOSIT_AMOUNT,
+            X.TOT_TO_BILL_AMT,
+            DECODE(SIGN(X.DEPOSIT_BILLED - X.TOT_TO_BILL_AMT), 1, X.TOT_TO_BILL_AMT, X.DEPOSIT_BILLED) AS DEPOSIT_BILLED,
+            X.DEPOSIT_PAID
+        FROM (
+            SELECT
+                ACCT.ACCT_ID,
+                PNAME.ENTITY_NAME_UPR AS ENTITY_NAME,
+                PREM.ADDRESS1 ||', '|| PREM.CITY || ', ' 
+                    || DECODE(PREM.COUNTY, ' ', '', TRIM(PREM.COUNTY))  
+                    || TRIM(PREM.STATE) || ', ' || TRIM(PREM.POSTAL) || ', ' 
+                    || TRIM(PREM.COUNTRY) AS ADDRESS,
+                ACH.EFFDT AS AUTO_PAY_EFFDT,
+                SA.START_DT,
+                SA.SA_TYPE_CD,
+                SA.SA_ID,
+                SA.TOT_TO_BILL_AMT,
+                (
+                    SELECT
+                        NVL(SUM (FT.CUR_AMT), 0)
+                    FROM
+                        CISADM.CI_FT FT
+                    WHERE
+                        FT.SA_ID = SA.SA_ID
+                        AND FT.REDUNDANT_SW = 'N'
+                        AND FT.NOT_IN_ARS_SW &lt;&gt; 'Y'
+                        AND FT.FREEZE_SW = 'Y'
+                        AND FT.FT_TYPE_FLG IN ('BS','BX')
+                ) AS DEPOSIT_BILLED,
+                (
+                    SELECT
+                        NVL(SUM (FT.TOT_AMT * -1), 0)
+                    FROM
+                        CISADM.CI_FT FT
+                    WHERE
+                        FT.SA_ID = SA.SA_ID
+                        AND FT.REDUNDANT_SW = 'N'
+                        AND FT.NOT_IN_ARS_SW &lt;&gt; 'Y'
+                        AND FT.FREEZE_SW = 'Y'
+                        AND FT.FT_TYPE_FLG IN ('PS','PX','AD','AX')
+                ) AS DEPOSIT_PAID
+            FROM
+                CISADM.CI_ACCT ACCT,
+                CISADM.CI_ACCT_PER ACTP,
+                CISADM.CI_PER_NAME PNAME,
+                CISADM.CI_SA SA,
+                CISADM.CI_SA_TYPE SAT,
+                CISADM.CI_PREM PREM,
+                CISADM.CI_ACCT_CHAR ACH
+            WHERE
+                ACTP.ACCT_ID = ACCT.ACCT_ID
+                AND ACTP.MAIN_CUST_SW = 'Y'
+                AND PNAME.PER_ID = ACTP.PER_ID
+                AND PNAME.NAME_TYPE_FLG = 'PRIM'
+                AND SA.ACCT_ID = ACCT.ACCT_ID
+                AND SA.SA_STATUS_FLG IN ('10','20')
+                AND SAT.SA_TYPE_CD = SA.SA_TYPE_CD
+                AND SAT.CIS_DIVISION = SA.CIS_DIVISION
+                AND SAT.SPECIAL_ROLE_FLG = 'CD'
+                AND PREM.PREM_ID = SA.CHAR_PREM_ID
+                AND ACH.ACCT_ID = ACCT.ACCT_ID
+                AND ACH.CHAR_TYPE_CD = 'CM-INAP'
+                AND ACH.SRCH_CHAR_VAL = 'Y'
+                AND ACH.EFFDT = (
+                     SELECT
+                         MAX(ACH2.EFFDT)
+                     FROM
+                         CISADM.CI_ACCT_CHAR ACH2
+                     WHERE
+                         ACH2.ACCT_ID = ACCT.ACCT_ID
+                         AND ACH2.CHAR_TYPE_CD = ACH.CHAR_TYPE_CD
+                         AND ACH2.EFFDT &lt;= SYSDATE
+                ) ) X
+        ) Y 
+    ) Z</query>
+    </jdbcQuery>
+  </resources>
+</schema>

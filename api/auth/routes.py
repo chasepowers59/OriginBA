@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import secrets
-from typing import Any
+from typing import Any, Literal
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
@@ -31,6 +31,8 @@ from api.auth.schemas import (
 from api.auth.models import User
 from api.auth.security import create_access_token, hash_password
 from api.auth.service import (
+    sync_sso_access,
+    AUDIT_CATEGORIES,
     AuthError,
     authenticate_user,
     change_password,
@@ -51,6 +53,10 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 def _db_session():
+    """One transaction per request. Declared scope="function" wherever it is used, so the
+    commit lands BEFORE the response: by default FastAPI runs this exit code after the
+    response is sent, and a caller could sign in with a new password before it was saved
+    (tests/test_auth_commit_before_response.py)."""
     factory = get_session_factory()
     session = factory()
     try:
@@ -81,7 +87,7 @@ def auth_status(authorization: str | None = Header(None)) -> AuthStatusResponse:
 def login(
     body: LoginRequest,
     request: Request,
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> LoginResponse:
     if auth_disabled():
         raise HTTPException(status_code=400, detail="Auth is disabled in this environment")
@@ -135,7 +141,7 @@ def login(
 def change_password_route(
     body: ChangePasswordRequest,
     ctx: AuthContext = Depends(get_session_auth_context),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> AuthUserPublic:
     try:
         public = change_password(session, ctx.id, body.current_password, body.new_password)
@@ -154,7 +160,7 @@ def change_password_route(
 
 
 @router.get("/me", response_model=AuthUserPublic)
-def me(ctx: AuthContext = Depends(get_session_auth_context), session: Session = Depends(_db_session)) -> AuthUserPublic:
+def me(ctx: AuthContext = Depends(get_session_auth_context), session: Session = Depends(_db_session, scope="function")) -> AuthUserPublic:
     if ctx.disabled:
         return AuthUserPublic(
             id=ctx.id,
@@ -177,11 +183,23 @@ def me(ctx: AuthContext = Depends(get_session_auth_context), session: Session = 
     return AuthUserPublic(**user_to_public(user))
 
 
+# Roles an identity provider's group never demotes or revokes: they are granted here.
+PORTAL_MANAGED_ROLES = frozenset({"admin", "client_admin"})
+
+
+def _scope(ctx: AuthContext) -> str | None:
+    """The one client a client admin administers; None for the platform admin. Read from
+    the caller's own account, never the request, and never a tenant they switched to."""
+    return None if ctx.role == "admin" else ctx.require_organization()
+
+
 @router.get("/organizations", response_model=list[PortalOrganizationPublic])
 def list_organizations(
-    _: AuthContext = Depends(require_permission("users:manage")),
+    ctx: AuthContext = Depends(require_permission("users:manage")),
 ) -> list[PortalOrganizationPublic]:
-    return [PortalOrganizationPublic(**row) for row in list_organizations_public()]
+    scope = _scope(ctx)
+    return [PortalOrganizationPublic(**row) for row in list_organizations_public()
+            if scope is None or row["id"] == scope]
 
 
 @router.get("/tenants/{slug}", response_model=PortalOrganizationPublic)
@@ -220,7 +238,7 @@ def oidc_login():
 def oidc_callback(
     code: str = "",
     state: str = "",
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ):
     """IdP redirect target: verify state + id_token, JIT-provision, hand the SPA our JWT.
 
@@ -243,9 +261,31 @@ def oidc_callback(
     email = oidc.claims_email(claims)
     if not email:
         raise HTTPException(status_code=400, detail="Identity token carried no email address")
-
+    # An IdP that says it has not verified the address has not proven who this is.
+    if str(claims.get("email_verified", "")).lower() == "false":
+        raise HTTPException(status_code=403, detail="Your identity provider has not verified this email address")
     user = session.query(User).filter(User.email == email).one_or_none()
-    if user is None:
+
+    # With a group map, the person's IdP groups decide their access at every sign-in.
+    access = None
+    try:
+        mapping = oidc.group_map()
+        if mapping is not None:
+            access = oidc.mapped_access(claims, mapping, oidc.groups_claim_name())
+    except oidc.SsoAccessError as exc:
+        log_audit(session, actor_id=None, actor_email=email, action="sso_refused",
+                  target_type="user", target_id="", detail=str(exc))
+        # Removed from every group at the IdP: switch the account off, which also ends its
+        # open sessions, schedules and embeds. An admin is managed in the portal.
+        if exc.revoke and user is not None and user.is_active and user.role not in PORTAL_MANAGED_ROLES:
+            user.is_active = False
+            log_audit(session, actor_id=user.id, actor_email=email, action="sso_deactivated",
+                      target_type="user", target_id=user.id, detail="in no mapped sign-in group")
+        session.commit()
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+
+    created = user is None
+    if created:
         user = User(
             email=email,
             display_name=str(claims.get("name") or email.split("@")[0]),
@@ -256,13 +296,21 @@ def oidc_callback(
             is_active=True,
         )
         session.add(user)
-        session.commit()
-        session.refresh(user)
+        session.flush()
         log_audit(session, actor_id=user.id, actor_email=email, action="sso_jit_provision",
                   target_type="user", target_id=user.id, detail="OIDC first login")
-        session.commit()
     if not user.is_active:
         raise HTTPException(status_code=403, detail="This account is deactivated")
+    if access and user.role not in PORTAL_MANAGED_ROLES:   # admins are managed in the portal, never by a group
+        before = (user.role, user.organization_id, user.row_rules_json)
+        sync_sso_access(session, user, access)
+        after = (user.role, user.organization_id, user.row_rules_json)
+        if after != before and not created:
+            log_audit(session, actor_id=user.id, actor_email=email, action="sso_group_sync",
+                      target_type="user", target_id=user.id, detail=f"{before} -> {after}")
+    # one commit: a new account never exists without the access its groups give
+    session.commit()
+    session.refresh(user)
 
     public = user_to_public(user)
     token = create_access_token(
@@ -276,20 +324,20 @@ def oidc_callback(
 
 @router.get("/users", response_model=list[AuthUserPublic])
 def admin_list_users(
-    _: AuthContext = Depends(require_permission("users:manage")),
-    session: Session = Depends(_db_session),
+    ctx: AuthContext = Depends(require_permission("users:manage")),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> list[AuthUserPublic]:
-    return [AuthUserPublic(**row) for row in list_users(session)]
+    return [AuthUserPublic(**row) for row in list_users(session, _scope(ctx))]
 
 
 @router.post("/users", response_model=AuthUserPublic)
 def admin_create_user(
     body: UserCreate,
     ctx: AuthContext = Depends(require_permission("users:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> AuthUserPublic:
     try:
-        public = create_user(session, ctx.role, body.model_dump())
+        public = create_user(session, ctx.role, body.model_dump(), _scope(ctx))
         log_audit(
             session,
             actor_id=ctx.id,
@@ -298,6 +346,7 @@ def admin_create_user(
             target_type="user",
             target_id=public["id"],
             detail=public["email"],
+            organization_id=public.get("organization_id"),
         )
         return AuthUserPublic(**public)
     except AuthError as exc:
@@ -309,10 +358,11 @@ def admin_update_user(
     user_id: str,
     body: UserUpdate,
     ctx: AuthContext = Depends(require_permission("users:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> AuthUserPublic:
     try:
-        public = update_user(session, ctx.role, ctx.id, user_id, body.model_dump(exclude_unset=True))
+        public = update_user(session, ctx.role, ctx.id, user_id, body.model_dump(exclude_unset=True),
+                             _scope(ctx))
         log_audit(
             session,
             actor_id=ctx.id,
@@ -320,7 +370,9 @@ def admin_update_user(
             action="user.update",
             target_type="user",
             target_id=user_id,
-            detail=public["email"],
+            organization_id=public.get("organization_id"),
+            # Access changes are recorded as what they became, not just that they happened.
+            detail=public["email"] + (f"; row_rules={public['row_rules']}" if "row_rules" in body.model_fields_set else ""),
         )
         return AuthUserPublic(**public)
     except AuthError as exc:
@@ -329,20 +381,20 @@ def admin_update_user(
 
 @router.get("/groups", response_model=list[AccessGroupPublic])
 def admin_list_groups(
-    _: AuthContext = Depends(require_permission("groups:manage")),
-    session: Session = Depends(_db_session),
+    ctx: AuthContext = Depends(require_permission("groups:manage")),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> list[AccessGroupPublic]:
-    return [AccessGroupPublic(**row) for row in list_groups(session)]
+    return [AccessGroupPublic(**row) for row in list_groups(session, _scope(ctx))]
 
 
 @router.post("/groups", response_model=AccessGroupPublic)
 def admin_create_group(
     body: AccessGroupCreate,
     ctx: AuthContext = Depends(require_permission("groups:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> AccessGroupPublic:
     try:
-        public = create_group(session, body.model_dump())
+        public = create_group(session, body.model_dump(), _scope(ctx))
         log_audit(
             session,
             actor_id=ctx.id,
@@ -351,6 +403,7 @@ def admin_create_group(
             target_type="group",
             target_id=public["id"],
             detail=public["name"],
+            organization_id=public.get("organization_id"),
         )
         return AccessGroupPublic(**public)
     except AuthError as exc:
@@ -362,10 +415,10 @@ def admin_update_group(
     group_id: str,
     body: AccessGroupUpdate,
     ctx: AuthContext = Depends(require_permission("groups:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> AccessGroupPublic:
     try:
-        public = update_group(session, group_id, body.model_dump(exclude_unset=True))
+        public = update_group(session, group_id, body.model_dump(exclude_unset=True), _scope(ctx))
         log_audit(
             session,
             actor_id=ctx.id,
@@ -374,6 +427,7 @@ def admin_update_group(
             target_type="group",
             target_id=group_id,
             detail=public["name"],
+            organization_id=public.get("organization_id"),
         )
         return AccessGroupPublic(**public)
     except AuthError as exc:
@@ -384,9 +438,9 @@ def admin_update_group(
 def admin_delete_group(
     group_id: str,
     ctx: AuthContext = Depends(require_permission("groups:manage")),
-    session: Session = Depends(_db_session),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> dict[str, str]:
-    if not delete_group(session, group_id):
+    if not delete_group(session, group_id, _scope(ctx)):
         raise HTTPException(status_code=404, detail="Access group not found")
     log_audit(
         session,
@@ -403,7 +457,17 @@ def admin_delete_group(
 def admin_audit_log(
     limit: int = 100,
     action: str | None = None,
-    _: AuthContext = Depends(require_permission("users:manage")),
-    session: Session = Depends(_db_session),
+    # A named set, not a list of actions the caller assembles: "admin" is every event
+    # that changes who can do what, and it is defined once in service.py. Literal so an
+    # unknown category is a 422 rather than silently falling through to "everything".
+    category: Literal["admin"] | None = None,
+    ctx: AuthContext = Depends(require_permission("users:manage")),
+    session: Session = Depends(_db_session, scope="function"),
 ) -> list[dict[str, Any]]:
-    return list_audit_events(session, limit=limit, action=action)
+    return list_audit_events(
+        session,
+        limit=limit,
+        action=action,
+        actions=AUDIT_CATEGORIES.get(category) if category else None,
+        scope_org=_scope(ctx),
+    )

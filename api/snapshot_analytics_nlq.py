@@ -25,6 +25,7 @@ def run_snapshot_analytics_nlq(
     metric_id: str | None = None,
     params: dict[str, Any] | None = None,
     organization_id: str,
+    row_rules: tuple | list = (),
 ) -> dict[str, Any] | None:
     # Either backend counts — the metric's snapshot routes to whichever database
     # serves it, exactly like the dashboards.
@@ -33,18 +34,24 @@ def run_snapshot_analytics_nlq(
     q = (question or "").strip()
     if not q and not metric_id:
         return None
-    # Never run a metric this org's catalog cannot resolve: a dbt-catalog org has no
-    # legacy *_RPT_CURR snapshots, and offering the metric anyway just errors on click.
+    # Never run a metric this org's catalog cannot resolve; offering it anyway just
+    # errors on click.
     metric = match_metric(q, metric_id)
     if metric and metric.snapshot_id not in _org_snapshot_ids(organization_id):
         return None
     try:
-        result = run_metric_nlq(q, metric_id=metric_id, params=params, organization_id=organization_id)
+        result = run_metric_nlq(q, metric_id=metric_id, params=params, organization_id=organization_id,
+                                row_rules=row_rules)
         if result:
             return result
     except Exception as exc:
+        from api.executive_dashboard import WAREHOUSE_NOT_BUILT_NOTE, is_missing_relation_error
+        # An org whose warehouse is not built yet must not print ORA-00942 into the
+        # conversation; it gets the same sentence the dashboards use.
+        reason = WAREHOUSE_NOT_BUILT_NOTE if is_missing_relation_error(str(exc)) else str(exc)
         return {
-            "narrative": f"Could not run snapshot analytics: {exc}",
+            "narrative": (reason if reason is WAREHOUSE_NOT_BUILT_NOTE
+                          else f"Could not run the metric: {reason}"),
             "source": "snapshot_analytics",
             "resolved_from": metric_id,
         }

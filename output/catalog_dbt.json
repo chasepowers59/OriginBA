@@ -81,6 +81,518 @@
   "rpt_unbilled_revenue",
   "rpt_usage_txn"
  ],
+ "report_library": [
+  {
+   "description": "What was billed, by whom and when, and what went wrong on the way.",
+   "id": "billing_revenue",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "billed_revenue_by_type",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": true,
+     "report_id": "rebilled_segments",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": true,
+     "report_id": "unbilled_revenue",
+     "snapshot_id": "rpt_unbilled_revenue"
+    },
+    {
+     "essential": true,
+     "report_id": "revenue_by_cycle",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "billed_not_revenue",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "charge_basis_split",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "estimated_billing",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "highest_bills",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "price_per_unit_outliers",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "rate_configuration_shape",
+     "snapshot_id": "rpt_rate_configuration"
+    },
+    {
+     "essential": false,
+     "report_id": "kpi_billing_accuracy",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "kpi_estimation_rate",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "kpi_days_unbilled",
+     "snapshot_id": "rpt_unbilled_revenue"
+    },
+    {
+     "essential": false,
+     "report_id": "zero_and_negative_bills",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "rate_migration",
+     "snapshot_id": "rpt_rate_schedule_history"
+    },
+    {
+     "essential": false,
+     "report_id": "bill_factor_prices",
+     "snapshot_id": "rpt_bill_factor_price"
+    },
+    {
+     "essential": false,
+     "report_id": "billable_charges",
+     "snapshot_id": "rpt_billable_charge"
+    },
+    {
+     "essential": false,
+     "report_id": "bills_by_status",
+     "snapshot_id": "rpt_bill"
+    },
+    {
+     "essential": false,
+     "report_id": "bills_longest_open",
+     "snapshot_id": "rpt_bill"
+    },
+    {
+     "essential": false,
+     "report_id": "billed_by_class_calc_lines",
+     "snapshot_id": "rpt_billed_charge"
+    }
+   ],
+   "title": "Billing & Revenue"
+  },
+  {
+   "description": "The financial position, adjustments, and what reached the general ledger.",
+   "id": "finance_adjustments",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "financial_position",
+     "snapshot_id": "rpt_financial_txn"
+    },
+    {
+     "essential": true,
+     "report_id": "gl_not_extracted",
+     "snapshot_id": "rpt_gl"
+    },
+    {
+     "essential": true,
+     "report_id": "adjustments_by_type",
+     "snapshot_id": "rpt_financial_txn"
+    },
+    {
+     "essential": true,
+     "report_id": "gl_by_account",
+     "snapshot_id": "rpt_gl"
+    },
+    {
+     "essential": false,
+     "report_id": "revenue_reconciliation",
+     "snapshot_id": "rpt_revenue_reconciliation"
+    },
+    {
+     "essential": false,
+     "report_id": "revenue_by_class",
+     "snapshot_id": "rpt_financial_txn"
+    }
+   ],
+   "title": "Finance & Adjustments"
+  },
+  {
+   "description": "What is owed, how old it is, and whether collection is working.",
+   "id": "ar_collections",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "arrears_by_band",
+     "snapshot_id": "rpt_sa_aged_balance"
+    },
+    {
+     "essential": true,
+     "report_id": "largest_debtors",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": true,
+     "report_id": "kpi_write_off_exposure",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": true,
+     "report_id": "severance_pipeline",
+     "snapshot_id": "rpt_debt_process"
+    },
+    {
+     "essential": false,
+     "report_id": "arrears_by_class",
+     "snapshot_id": "rpt_sa_aged_balance"
+    },
+    {
+     "essential": false,
+     "report_id": "collection_effectiveness",
+     "snapshot_id": "rpt_debt_process"
+    },
+    {
+     "essential": false,
+     "report_id": "pay_plan_health",
+     "snapshot_id": "rpt_pay_plan"
+    },
+    {
+     "essential": false,
+     "report_id": "credit_rating_movement",
+     "snapshot_id": "rpt_credit_rating_history"
+    },
+    {
+     "essential": false,
+     "report_id": "arrears_without_process",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": false,
+     "report_id": "pay_plan_vs_actual",
+     "snapshot_id": "rpt_pay_plan"
+    },
+    {
+     "essential": false,
+     "report_id": "sa_aged_balance",
+     "snapshot_id": "rpt_sa_aged_balance"
+    },
+    {
+     "essential": false,
+     "report_id": "sa_balance_by_type",
+     "snapshot_id": "rpt_service_agreement"
+    }
+   ],
+   "title": "Accounts Receivable & Collections"
+  },
+  {
+   "description": "How customers paid, and what still has to balance.",
+   "id": "payments_cashiering",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "payments_by_tender",
+     "snapshot_id": "rpt_payment_tender"
+    },
+    {
+     "essential": true,
+     "report_id": "unbalanced_tender_controls",
+     "snapshot_id": "rpt_tender_control"
+    },
+    {
+     "essential": true,
+     "report_id": "cancelled_payments",
+     "snapshot_id": "rpt_payment"
+    },
+    {
+     "essential": true,
+     "report_id": "unbalanced_pay_events",
+     "snapshot_id": "rpt_payment"
+    }
+   ],
+   "title": "Payments & Cashiering"
+  },
+  {
+   "description": "Who is on a budget plan, what they pay monthly, and by which agreements.",
+   "id": "budget_billing",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "budget_accounts_by_class",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": true,
+     "report_id": "budget_amount_by_class",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": true,
+     "report_id": "budget_agreements_by_sa_type",
+     "snapshot_id": "rpt_service_agreement"
+    },
+    {
+     "essential": true,
+     "report_id": "budget_late_fees",
+     "snapshot_id": "rpt_financial_txn"
+    },
+    {
+     "essential": false,
+     "report_id": "budget_accounts_by_cycle",
+     "snapshot_id": "rpt_customer_account"
+    }
+   ],
+   "title": "Budget Billing"
+  },
+  {
+   "description": "What was consumed and measured, and how good the reads are.",
+   "id": "usage_metering",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "read_coverage",
+     "snapshot_id": "rpt_measurement"
+    },
+    {
+     "essential": true,
+     "report_id": "meter_read_routes",
+     "snapshot_id": "rpt_premise_sp"
+    },
+    {
+     "essential": true,
+     "report_id": "consumption_by_uom",
+     "snapshot_id": "rpt_billed_usage"
+    },
+    {
+     "essential": true,
+     "report_id": "usage_vs_read",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "usage_no_active_sa",
+     "snapshot_id": "rpt_premise_sp"
+    },
+    {
+     "essential": false,
+     "report_id": "measured_by_uom",
+     "snapshot_id": "rpt_bill_segment_read"
+    },
+    {
+     "essential": false,
+     "report_id": "reads_by_row_kind",
+     "snapshot_id": "rpt_bill_segment_read"
+    }
+   ],
+   "title": "Usage & Metering"
+  },
+  {
+   "description": "Field work waiting, and service switched on and off.",
+   "id": "field_operations",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "service_off_but_installed",
+     "snapshot_id": "rpt_premise_sp"
+    },
+    {
+     "essential": true,
+     "report_id": "field_activity_backlog",
+     "snapshot_id": "rpt_field_activity"
+    },
+    {
+     "essential": true,
+     "report_id": "service_on_off_churn",
+     "snapshot_id": "rpt_on_off_history"
+    }
+   ],
+   "title": "Field Operations"
+  },
+  {
+   "description": "The meter and asset estate, and what the meters report.",
+   "id": "assets_devices",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "device_estate",
+     "snapshot_id": "rpt_device_asset"
+    },
+    {
+     "essential": true,
+     "report_id": "asset_disposition",
+     "snapshot_id": "rpt_device_asset"
+    },
+    {
+     "essential": true,
+     "report_id": "meters_not_registered",
+     "snapshot_id": "rpt_device_asset"
+    },
+    {
+     "essential": true,
+     "report_id": "device_events",
+     "snapshot_id": "rpt_device_event"
+    },
+    {
+     "essential": false,
+     "report_id": "locations_by_type",
+     "snapshot_id": "rpt_asset_location"
+    },
+    {
+     "essential": false,
+     "report_id": "deepest_location_trees",
+     "snapshot_id": "rpt_asset_location"
+    }
+   ],
+   "title": "Assets & Devices"
+  },
+  {
+   "description": "Accounts, contacts, cases and notifications.",
+   "id": "customer_service",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "accounts_by_class",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": true,
+     "report_id": "notification_outcomes",
+     "snapshot_id": "rpt_customer_notification"
+    },
+    {
+     "essential": true,
+     "report_id": "contact_reasons",
+     "snapshot_id": "rpt_customer_contact"
+    },
+    {
+     "essential": true,
+     "report_id": "case_resolution_time",
+     "snapshot_id": "rpt_case"
+    },
+    {
+     "essential": false,
+     "report_id": "self_service_adoption",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": false,
+     "report_id": "accounts_no_email",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": false,
+     "report_id": "notifications_stuck",
+     "snapshot_id": "rpt_customer_notification"
+    },
+    {
+     "essential": false,
+     "report_id": "accounts_multi_utility",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": false,
+     "report_id": "accounts_on_alerts",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": false,
+     "report_id": "bill_routing_mix",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": false,
+     "report_id": "notification_error_detail",
+     "snapshot_id": "rpt_customer_notification"
+    },
+    {
+     "essential": false,
+     "report_id": "life_support_premises",
+     "snapshot_id": "rpt_premise_sp"
+    },
+    {
+     "essential": false,
+     "report_id": "sas_by_type",
+     "snapshot_id": "rpt_service_agreement"
+    },
+    {
+     "essential": false,
+     "report_id": "links_by_relationship",
+     "snapshot_id": "rpt_account_person"
+    },
+    {
+     "essential": false,
+     "report_id": "financially_responsible_split",
+     "snapshot_id": "rpt_account_person"
+    },
+    {
+     "essential": false,
+     "report_id": "characteristics_by_entity",
+     "snapshot_id": "rpt_characteristics"
+    },
+    {
+     "essential": false,
+     "report_id": "top_characteristic_types",
+     "snapshot_id": "rpt_characteristics"
+    }
+   ],
+   "title": "Customer Service"
+  },
+  {
+   "description": "Exceptions, batch runs and work queues that need attention.",
+   "id": "data_quality",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "exceptions_open",
+     "snapshot_id": "rpt_exception"
+    },
+    {
+     "essential": true,
+     "report_id": "batch_failures",
+     "snapshot_id": "rpt_batch"
+    },
+    {
+     "essential": true,
+     "report_id": "todo_backlog",
+     "snapshot_id": "rpt_todo"
+    },
+    {
+     "essential": true,
+     "report_id": "kpi_exception_rate",
+     "snapshot_id": "rpt_exception"
+    },
+    {
+     "essential": false,
+     "report_id": "batch_runtime_trend",
+     "snapshot_id": "rpt_batch"
+    },
+    {
+     "essential": false,
+     "report_id": "todo_oldest",
+     "snapshot_id": "rpt_todo"
+    },
+    {
+     "essential": false,
+     "report_id": "exception_by_rule",
+     "snapshot_id": "rpt_exception"
+    },
+    {
+     "essential": false,
+     "report_id": "usage_transactions",
+     "snapshot_id": "rpt_usage_txn"
+    }
+   ],
+   "title": "Data Quality & Operations"
+  }
+ ],
  "report_library_packs": [
   {
    "audience": "Customer service and billing operations",
@@ -106,10 +618,6 @@
     {
      "report_id": "notifications_stuck",
      "snapshot_id": "rpt_customer_notification"
-    },
-    {
-     "report_id": "kpi_call_deflection",
-     "snapshot_id": "rpt_customer_contact"
     },
     {
      "report_id": "accounts_multi_utility",
@@ -182,18 +690,6 @@
     {
      "report_id": "meter_read_routes",
      "snapshot_id": "rpt_premise_sp"
-    },
-    {
-     "report_id": "meter_age_replacement",
-     "snapshot_id": "rpt_device_asset"
-    },
-    {
-     "report_id": "asset_replacement_value",
-     "snapshot_id": "rpt_device_asset"
-    },
-    {
-     "report_id": "device_model_reliability",
-     "snapshot_id": "rpt_device_event"
     },
     {
      "report_id": "service_on_off_churn",
@@ -280,10 +776,6 @@
      "snapshot_id": "rpt_bill_segment"
     },
     {
-     "report_id": "consumption_outliers",
-     "snapshot_id": "rpt_bill_segment"
-    },
-    {
      "report_id": "rate_migration",
      "snapshot_id": "rpt_rate_schedule_history"
     },
@@ -305,10 +797,6 @@
     },
     {
      "report_id": "billed_by_class_calc_lines",
-     "snapshot_id": "rpt_billed_charge"
-    },
-    {
-     "report_id": "billed_by_budget_plan",
      "snapshot_id": "rpt_billed_charge"
     },
     {
@@ -350,10 +838,6 @@
     {
      "report_id": "revenue_reconciliation",
      "snapshot_id": "rpt_revenue_reconciliation"
-    },
-    {
-     "report_id": "payment_timing",
-     "snapshot_id": "rpt_customer_account"
     },
     {
      "report_id": "cancelled_payments",
@@ -430,6 +914,26 @@
     {
      "report_id": "sa_balance_by_type",
      "snapshot_id": "rpt_service_agreement"
+    },
+    {
+     "report_id": "budget_accounts_by_class",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "report_id": "budget_amount_by_class",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "report_id": "budget_agreements_by_sa_type",
+     "snapshot_id": "rpt_service_agreement"
+    },
+    {
+     "report_id": "budget_late_fees",
+     "snapshot_id": "rpt_financial_txn"
+    },
+    {
+     "report_id": "budget_accounts_by_cycle",
+     "snapshot_id": "rpt_customer_account"
     }
    ],
    "title": "Credit & Collections"
@@ -464,20 +968,12 @@
      "snapshot_id": "rpt_exception"
     },
     {
-     "report_id": "kpi_first_time_fix",
-     "snapshot_id": "rpt_field_activity"
-    },
-    {
      "report_id": "batch_runtime_trend",
      "snapshot_id": "rpt_batch"
     },
     {
      "report_id": "todo_oldest",
      "snapshot_id": "rpt_todo"
-    },
-    {
-     "report_id": "field_appointments",
-     "snapshot_id": "rpt_field_activity"
     },
     {
      "report_id": "exception_by_rule",
@@ -568,18 +1064,11 @@
       "table": "stg_bill_route_type_label"
      },
      {
-      "alias": "pc",
+      "alias": "em",
       "join_type": "left join",
-      "on": "pc.per_id = ap.per_id",
+      "on": "em.per_id = ap.per_id",
       "role": "model",
-      "table": "stg_person_contact"
-     },
-     {
-      "alias": "rt",
-      "join_type": "join",
-      "on": "",
-      "role": "model",
-      "table": "stg_comm_route_type"
+      "table": "int_person_email"
      }
     ],
     "population_filter": null,
@@ -598,7 +1087,7 @@
    },
    "date_fields": [],
    "default_date_field": null,
-   "default_date_preset": "last_12_months",
+   "default_date_preset": "all_dates",
    "dimensions": [
     {
      "id": "Account ID",
@@ -920,16 +1409,14 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "persons linked to accounts, with their billing preferences",
+   "summary": "Persons linked to accounts, with their billing preferences.",
    "table_name": "rpt_account_person",
    "trusted_measures": [],
    "usage_guidance": null,
-   "use_case": "Its own canvas rather than folded into rpt_customer_account because an account can",
+   "use_case": "Who is on each account: the main customer, co-applicants, landlords and third-party payors, with each person's bill copies and contact preferences.",
    "workstream": "customer_ops",
    "workstream_label": "Customer Operations"
   },
@@ -972,8 +1459,8 @@
        "Geo Longitude",
        "Time Zone Code"
       ],
-      "id": "meter_ops",
-      "label": "Meter Operations"
+      "id": "assets",
+      "label": "Asset Operations"
      }
     ],
     "grain": "asset location node",
@@ -1010,7 +1497,7 @@
    },
    "date_fields": [],
    "default_date_field": null,
-   "default_date_preset": "last_12_months",
+   "default_date_preset": "all_dates",
    "dimensions": [
     {
      "id": "Location ID",
@@ -1124,7 +1611,7 @@
    "fields": [
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Location ID",
      "label": "Location ID",
      "role": "dimension",
@@ -1132,7 +1619,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Location",
      "label": "Location",
      "role": "dimension",
@@ -1140,7 +1627,7 @@
     },
     {
      "description": "English description of \"Location Type Code\". Group and report on this; filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Location Type",
      "label": "Location Type",
      "role": "dimension",
@@ -1148,7 +1635,7 @@
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"Location Type\" for the description: report on the description, filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Location Type Code",
      "label": "Location Type Code",
      "role": "dimension",
@@ -1156,7 +1643,7 @@
     },
     {
      "description": "Base-product code, fixed by Oracle and the same at every utility, so a filter on it travels between clients unchanged.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Location Class Code",
      "label": "Location Class Code",
      "role": "dimension",
@@ -1164,7 +1651,7 @@
     },
     {
      "description": "Base-product code, fixed by Oracle and the same at every utility, so a filter on it travels between clients unchanged.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Criticality Code",
      "label": "Asset Criticality Code",
      "role": "dimension",
@@ -1172,7 +1659,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Disposition Code",
      "label": "Disposition Code",
      "role": "dimension",
@@ -1180,7 +1667,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Service Area Code",
      "label": "Service Area Code",
      "role": "dimension",
@@ -1188,7 +1675,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Owning Access Group Code",
      "label": "Owning Access Group Code",
      "role": "dimension",
@@ -1196,7 +1683,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Parent Location ID",
      "label": "Parent Location ID",
      "role": "dimension",
@@ -1204,7 +1691,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Root Location ID",
      "label": "Root Location ID",
      "role": "dimension",
@@ -1212,7 +1699,7 @@
     },
     {
      "description": "How many levels down from the root this node sits, from the recursive walk of W1_NODE. Root nodes are depth 1.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Hierarchy Depth",
      "label": "Hierarchy Depth",
      "role": "measure",
@@ -1220,7 +1707,7 @@
     },
     {
      "description": "The full root-to-node path as a single string. Useful as a report label; do not parse it.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Hierarchy Path",
      "label": "Hierarchy Path",
      "role": "dimension",
@@ -1228,7 +1715,7 @@
     },
     {
      "description": "Level 1 of the W1_NODE location hierarchy, flattened for reporting. Null when the node sits shallower than level 1. Falls back to the node id when the node has no description.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Location Level 1",
      "label": "Location Level 1",
      "role": "dimension",
@@ -1236,39 +1723,39 @@
     },
     {
      "description": "Level 2 of the W1_NODE location hierarchy, flattened for reporting. Null when the node sits shallower than level 2. Falls back to the node id when the node has no description.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Location Level 2",
      "label": "Location Level 2",
      "role": "dimension",
-     "type": "text"
+     "type": "character varying"
     },
     {
      "description": "Level 3 of the W1_NODE location hierarchy, flattened for reporting. Null when the node sits shallower than level 3. Falls back to the node id when the node has no description.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Location Level 3",
      "label": "Location Level 3",
      "role": "dimension",
-     "type": "text"
+     "type": "character varying"
     },
     {
      "description": "Level 4 of the W1_NODE location hierarchy, flattened for reporting. Null when the node sits shallower than level 4. Falls back to the node id when the node has no description.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Location Level 4",
      "label": "Location Level 4",
      "role": "dimension",
-     "type": "text"
+     "type": "character varying"
     },
     {
      "description": "Level 5 of the W1_NODE location hierarchy, flattened for reporting. Null when the node sits shallower than level 5. Falls back to the node id when the node has no description.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Location Level 5",
      "label": "Location Level 5",
      "role": "dimension",
-     "type": "text"
+     "type": "character varying"
     },
     {
      "description": "First address line of the asset location.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Location Address",
      "label": "Location Address",
      "role": "dimension",
@@ -1276,7 +1763,7 @@
     },
     {
      "description": "Address component, as held in C2M. Not validated or standardised here.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "City",
      "label": "City",
      "role": "dimension",
@@ -1284,7 +1771,7 @@
     },
     {
      "description": "Address component, as held in C2M. Not validated or standardised here.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "County",
      "label": "County",
      "role": "dimension",
@@ -1292,7 +1779,7 @@
     },
     {
      "description": "Address component, as held in C2M. Not validated or standardised here.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "State",
      "label": "State",
      "role": "dimension",
@@ -1300,7 +1787,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Postal Code",
      "label": "Postal Code",
      "role": "dimension",
@@ -1308,7 +1795,7 @@
     },
     {
      "description": "Address component, as held in C2M. Not validated or standardised here.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Country",
      "label": "Country",
      "role": "dimension",
@@ -1316,7 +1803,7 @@
     },
     {
      "description": "Address component, as held in C2M. Not validated or standardised here.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Building",
      "label": "Building",
      "role": "dimension",
@@ -1324,7 +1811,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Room",
      "label": "Room",
      "role": "dimension",
@@ -1332,7 +1819,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Position",
      "label": "Position",
      "role": "dimension",
@@ -1340,7 +1827,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Geo Latitude",
      "label": "Geo Latitude",
      "role": "measure",
@@ -1348,7 +1835,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Geo Longitude",
      "label": "Geo Longitude",
      "role": "measure",
@@ -1356,7 +1843,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Time Zone Code",
      "label": "Time Zone Code",
      "role": "dimension",
@@ -1446,12 +1933,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "asset locations with their hierarchy",
+   "summary": "Asset locations with their hierarchy.",
    "table_name": "rpt_asset_location",
    "trusted_measures": [
     "Hierarchy Depth",
@@ -1459,9 +1944,9 @@
     "Geo Longitude"
    ],
    "usage_guidance": null,
-   "use_case": "Oracle's WAM asset analyses slice by \"Location parent hierarchy levels 1-10\", so the",
-   "workstream": "meter_ops",
-   "workstream_label": "Meter Operations"
+   "use_case": "Where assets sit in the location hierarchy, flattened into levels so you can count and filter assets by site, area or region.",
+   "workstream": "assets",
+   "workstream_label": "Asset Operations"
   },
   "rpt_batch": {
    "data_model": {
@@ -1706,7 +2191,7 @@
      "workstream_label": "Batch Operations"
     },
     {
-     "chart_type": "pie",
+     "chart_type": "bar",
      "description": "The overnight window is finite. The jobs at the top of this list are the ones that decide whether the window holds when volumes grow.",
      "dimensions": [
       "Batch Code"
@@ -1715,8 +2200,8 @@
      "id": "batch_runtime_trend",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "avg",
+       "field": "Duration (min)"
       }
      ],
      "title": "Which batch jobs take the longest, on average?",
@@ -1724,12 +2209,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "Common / Operations \u2014 Batch run monitoring. Grain: batch code + run number.",
+   "summary": "Batch run monitoring.",
    "table_name": "rpt_batch",
    "trusted_measures": [
     "Run Number",
@@ -1737,7 +2220,7 @@
     "Duration (min)"
    ],
    "usage_guidance": null,
-   "use_case": "",
+   "use_case": "Monitoring C2M batch runs: which jobs ran, how long they took, and which ended in error.",
    "workstream": "common",
    "workstream_label": "Operations & Shared Services"
   },
@@ -1781,12 +2264,12 @@
        "Customer Class Code",
        "CIS Division"
       ],
-      "id": "common",
-      "label": "Operations & Shared Services"
+      "id": "billing",
+      "label": "Billing & Rates"
      }
     ],
-    "grain": "rpt_bill",
-    "grain_description": "",
+    "grain": "bill",
+    "grain_description": "One row per bill",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
      {
@@ -1872,7 +2355,7 @@
      "label": "Autopay Stopped Date/Time"
     }
    ],
-   "default_date_field": "Window Start Date",
+   "default_date_field": "Bill Date",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -1943,7 +2426,7 @@
    "fields": [
     {
      "description": "The bill this row was processed on. For revenue attribution on cancellations use \"Owning Bill ID\" where the canvas offers it.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill ID",
      "label": "Bill ID",
      "role": "dimension",
@@ -1951,7 +2434,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "common",
+     "group": "billing",
      "id": "Alternate Bill ID",
      "label": "Alternate Bill ID",
      "role": "dimension",
@@ -1959,7 +2442,7 @@
     },
     {
      "description": "English description of \"Bill Status Code\". Group and report on this; filter on the code.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill Status",
      "label": "Bill Status",
      "role": "dimension",
@@ -1967,7 +2450,7 @@
     },
     {
      "description": "Base-product code, fixed by Oracle and the same at every utility. Paired with \"Bill Status\" for the description: report on the description, filter on the code.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill Status Code",
      "label": "Bill Status Code",
      "role": "dimension",
@@ -1975,7 +2458,7 @@
     },
     {
      "description": "Flag. Filter on it; do not sum it.",
-     "group": "common",
+     "group": "billing",
      "id": "Is Completed",
      "label": "Is Completed",
      "role": "dimension",
@@ -1983,7 +2466,7 @@
     },
     {
      "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
-     "group": "common",
+     "group": "billing",
      "id": "Window Start Date",
      "label": "Window Start Date",
      "role": "date",
@@ -1991,7 +2474,7 @@
     },
     {
      "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill Date",
      "label": "Bill Date",
      "role": "date",
@@ -1999,7 +2482,7 @@
     },
     {
      "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
-     "group": "common",
+     "group": "billing",
      "id": "Due Date",
      "label": "Due Date",
      "role": "date",
@@ -2007,7 +2490,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "common",
+     "group": "billing",
      "id": "Created Date/Time",
      "label": "Created Date/Time",
      "role": "date",
@@ -2015,7 +2498,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "common",
+     "group": "billing",
      "id": "Completed Date/Time",
      "label": "Completed Date/Time",
      "role": "date",
@@ -2023,7 +2506,7 @@
     },
     {
      "description": "Window start to completion, whole days -- a CYCLED-bill metric by construction: off-cycle bills have no window at all (measured: the two populations partition 360,376 / 359,785 with zero crossovers at the reference client; \"Is Off-Cycle\" is the split). The billing engine's speedometer: measured norm p50 3.8 / p90 7.8 / p99 24.2, 2 bills over 30 days in a year. Never negative (asserted).",
-     "group": "common",
+     "group": "billing",
      "id": "Days To Complete",
      "label": "Days To Complete",
      "role": "measure",
@@ -2031,7 +2514,7 @@
     },
     {
      "description": "The same clock still running: days since window start on bills NOT yet complete, as of the build's as-of date. The stuck-bill worklist -- sort descending.",
-     "group": "common",
+     "group": "billing",
      "id": "Days Bill Open",
      "label": "Days Bill Open",
      "role": "measure",
@@ -2039,7 +2522,7 @@
     },
     {
      "description": "English description of \"Bill Cycle Code\". Group and report on this; filter on the code.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill Cycle",
      "label": "Bill Cycle",
      "role": "dimension",
@@ -2047,7 +2530,7 @@
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"Bill Cycle\" for the description: report on the description, filter on the code.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill Cycle Code",
      "label": "Bill Cycle Code",
      "role": "dimension",
@@ -2055,7 +2538,7 @@
     },
     {
      "description": "Flag. Filter on it; do not sum it.",
-     "group": "common",
+     "group": "billing",
      "id": "Is Off-Cycle",
      "label": "Is Off-Cycle",
      "role": "dimension",
@@ -2063,7 +2546,7 @@
     },
     {
      "description": "",
-     "group": "common",
+     "group": "billing",
      "id": "Late Payment Charge Applied",
      "label": "Late Payment Charge Applied",
      "role": "dimension",
@@ -2071,7 +2554,7 @@
     },
     {
      "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
-     "group": "common",
+     "group": "billing",
      "id": "Late Payment Charge Date",
      "label": "Late Payment Charge Date",
      "role": "date",
@@ -2079,7 +2562,7 @@
     },
     {
      "description": "",
-     "group": "common",
+     "group": "billing",
      "id": "Allows Reopen",
      "label": "Allows Reopen",
      "role": "dimension",
@@ -2087,7 +2570,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "common",
+     "group": "billing",
      "id": "Credit Note From Bill ID",
      "label": "Credit Note From Bill ID",
      "role": "dimension",
@@ -2095,7 +2578,7 @@
     },
     {
      "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
-     "group": "common",
+     "group": "billing",
      "id": "Autopay Extract Date",
      "label": "Autopay Extract Date",
      "role": "date",
@@ -2103,7 +2586,7 @@
     },
     {
      "description": "Currency measure, additive at this canvas's grain.",
-     "group": "common",
+     "group": "billing",
      "id": "Autopay Amount",
      "label": "Autopay Amount",
      "role": "measure",
@@ -2111,7 +2594,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "common",
+     "group": "billing",
      "id": "Autopay Stopped Date/Time",
      "label": "Autopay Stopped Date/Time",
      "role": "date",
@@ -2119,7 +2602,7 @@
     },
     {
      "description": "Pre-aggregated count, additive at this canvas's grain.",
-     "group": "common",
+     "group": "billing",
      "id": "Bill Segment Count",
      "label": "Bill Segment Count",
      "role": "measure",
@@ -2127,7 +2610,7 @@
     },
     {
      "description": "Pre-aggregated count, additive at this canvas's grain.",
-     "group": "common",
+     "group": "billing",
      "id": "Frozen Bill Segment Count",
      "label": "Frozen Bill Segment Count",
      "role": "measure",
@@ -2135,7 +2618,7 @@
     },
     {
      "description": "Pre-aggregated count, additive at this canvas's grain.",
-     "group": "common",
+     "group": "billing",
      "id": "Cancelled Bill Segment Count",
      "label": "Cancelled Bill Segment Count",
      "role": "measure",
@@ -2143,7 +2626,7 @@
     },
     {
      "description": "",
-     "group": "common",
+     "group": "billing",
      "id": "SA Count (Bill)",
      "label": "SA Count (Bill)",
      "role": "measure",
@@ -2151,7 +2634,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "common",
+     "group": "billing",
      "id": "Account ID",
      "label": "Account ID",
      "role": "dimension",
@@ -2159,7 +2642,7 @@
     },
     {
      "description": "Descriptive label.",
-     "group": "common",
+     "group": "billing",
      "id": "Main Customer Name",
      "label": "Main Customer Name",
      "role": "dimension",
@@ -2167,7 +2650,7 @@
     },
     {
      "description": "English description of \"Customer Class Code\". Group and report on this; filter on the code.",
-     "group": "common",
+     "group": "billing",
      "id": "Customer Class",
      "label": "Customer Class",
      "role": "dimension",
@@ -2175,7 +2658,7 @@
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"Customer Class\" for the description: report on the description, filter on the code.",
-     "group": "common",
+     "group": "billing",
      "id": "Customer Class Code",
      "label": "Customer Class Code",
      "role": "dimension",
@@ -2183,15 +2666,15 @@
     },
     {
      "description": "",
-     "group": "common",
+     "group": "billing",
      "id": "CIS Division",
      "label": "CIS Division",
      "role": "dimension",
      "type": "text"
     }
    ],
-   "grain": "rpt_bill",
-   "grain_description": "",
+   "grain": "bill",
+   "grain_description": "One row per bill",
    "label": "Bill",
    "large_domain": false,
    "max_rows": 500,
@@ -2295,12 +2778,19 @@
      "workstream_label": "Billing"
     },
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "A cycle whose bills sit open for weeks is where billing close is actually stuck.",
      "dimensions": [
       "Bill Cycle"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Completed",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "bills_longest_open",
      "measures": [
       {
@@ -2313,12 +2803,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "bills as C2M sees them. Grain: Bill ID",
+   "summary": "Bills as C2M sees them.",
    "table_name": "rpt_bill",
    "trusted_measures": [
     "Days To Complete",
@@ -2330,9 +2818,9 @@
     "SA Count (Bill)"
    ],
    "usage_guidance": null,
-   "use_case": "through their segments, which answers per-service questions but not the billing",
-   "workstream": "common",
-   "workstream_label": "Operations & Shared Services"
+   "use_case": "Bill-level questions: how many bills went out, when, their status and due dates, and how long they took to complete.",
+   "workstream": "billing",
+   "workstream_label": "Billing & Rates"
   },
   "rpt_bill_factor_price": {
    "data_model": {
@@ -2363,8 +2851,8 @@
       "label": "Billing & Rates"
      }
     ],
-    "grain": "rpt_bill_factor_price",
-    "grain_description": "",
+    "grain": "bill factor + characteristic value + effective date",
+    "grain_description": "One row per bill factor + characteristic value + effective date",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
      {
@@ -2408,7 +2896,7 @@
     }
    ],
    "default_date_field": "Effective Date",
-   "default_date_preset": "last_12_months",
+   "default_date_preset": "all_dates",
    "dimensions": [
     {
      "id": "Bill Factor Code",
@@ -2589,8 +3077,8 @@
      "type": "boolean"
     }
    ],
-   "grain": "rpt_bill_factor_price",
-   "grain_description": "",
+   "grain": "bill factor + characteristic value + effective date",
+   "grain_description": "One row per bill factor + characteristic value + effective date",
    "label": "Bill Factor Price",
    "large_domain": false,
    "max_rows": 500,
@@ -2614,8 +3102,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -2655,19 +3141,17 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "the prices behind the rules",
+   "summary": "The prices behind the rules.",
    "table_name": "rpt_bill_factor_price",
    "trusted_measures": [
     "Value",
     "Calculation Rule Count"
    ],
    "usage_guidance": null,
-   "use_case": "rpt_rate_configuration says a rule multiplies by bill factor X; this says what X is",
+   "use_case": "Looking up what a bill factor is worth and when its price changed, to explain a charge on a bill.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -4351,8 +4835,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -4421,8 +4903,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -4595,7 +5075,18 @@
      "dimensions": [
       "SA Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "charge_basis_split",
      "measures": [
       {
@@ -4607,17 +5098,23 @@
      "workstream_label": "Billing"
     },
     {
-     "chart_type": "pie",
+     "chart_type": "bar",
      "description": "An estimated bill is a read that did not arrive. A rising rate here is a metering problem showing up as a billing number.",
      "dimensions": [
       "SA Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "estimated_billing",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Estimated Segment"
       }
      ],
      "title": "How much billing is running on estimates?",
@@ -4629,7 +5126,18 @@
      "dimensions": [
       "Cancel Reason Code"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Rebilled",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "rebilled_segments",
      "measures": [
       {
@@ -4646,7 +5154,18 @@
      "dimensions": [
       "Main Customer Name"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "highest_bills",
      "measures": [
       {
@@ -4663,7 +5182,18 @@
      "dimensions": [
       "Sole Rate Schedule Code"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "price_per_unit_outliers",
      "measures": [
       {
@@ -4675,9 +5205,9 @@
      "workstream_label": "Rates"
     },
     {
-     "benchmark": "above 95%",
-     "chart_type": "pie",
-     "description": "The headline meter-to-cash KPI. Every cancelled and rebilled segment is a bill the utility got wrong and had to redo, and the industry target is above 95% right first time.",
+     "benchmark": "below 5%",
+     "chart_type": "bar",
+     "description": "The headline meter-to-cash KPI. Every cancelled segment is a bill the utility got wrong and had to redo; the industry target is above 95% right first time, so below 5% here.",
      "dimensions": [
       "Bill Cycle"
      ],
@@ -4685,29 +5215,35 @@
      "id": "kpi_billing_accuracy",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Is Cancelled"
       }
      ],
-     "title": "Billing accuracy rate \u2014 what share of bills were not rebilled?",
+     "title": "Billing accuracy \u2014 what share of bill segments had to be cancelled and redone, by cycle?",
      "workstream_label": "Billing Performance"
     },
     {
      "benchmark": "as low as possible",
-     "chart_type": "pie",
+     "chart_type": "bar",
      "description": "Estimated bills generate disputes, and disputes generate calls. A rising estimation rate is an AMI reliability problem arriving as a customer-service cost.",
      "dimensions": [
       "Bill Cycle"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "kpi_estimation_rate",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Estimated Segment"
       }
      ],
-     "title": "Estimation rate \u2014 how much revenue is billed on estimates?",
+     "title": "Estimation rate \u2014 what share of bill segments were estimated, by cycle?",
      "workstream_label": "Billing Performance"
     },
     {
@@ -4716,7 +5252,18 @@
      "dimensions": [
       "Bill Cycle"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "revenue_by_cycle",
      "measures": [
       {
@@ -4750,7 +5297,18 @@
      "dimensions": [
       "Main Customer Name"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "zero_and_negative_bills",
      "measures": [
       {
@@ -4760,32 +5318,13 @@
      ],
      "title": "Which bills came out zero or negative?",
      "workstream_label": "Billing"
-    },
-    {
-     "chart_type": "horizontal",
-     "description": "High consumption is a leak, a theft, a faulty meter or a genuinely large customer. Comparing within a rate schedule is what separates the fourth from the first three.",
-     "dimensions": [
-      "Premise Address"
-     ],
-     "filters": [],
-     "id": "consumption_outliers",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "Which premises consumed far more than others on the same rate?",
-     "workstream_label": "Usage"
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "bill segment summary: AMOUNT and USAGE together",
+   "summary": "Bill segment summary: AMOUNT and USAGE together.",
    "table_name": "rpt_bill_segment",
    "trusted_measures": [
     "Billed Amount",
@@ -4819,7 +5358,7 @@
     "Usage Request Count"
    ],
    "usage_guidance": null,
-   "use_case": "THE COMBINED VIEW, and it is only correct because each measure is aggregated from its",
+   "use_case": "The everyday billing view: what each bill segment charged and billed, with its dates, status, rate and customer.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -4860,6 +5399,8 @@
        "Bill ID",
        "Bill Date",
        "Bill Segment Status Code",
+       "Is Frozen",
+       "Is Cancelled",
        "Service Period Start",
        "Service Period End",
        "SA Type",
@@ -5080,6 +5621,14 @@
      "label": "Bill Segment Status Code"
     },
     {
+     "id": "Is Frozen",
+     "label": "Is Frozen"
+    },
+    {
+     "id": "Is Cancelled",
+     "label": "Is Cancelled"
+    },
+    {
      "id": "SA Type",
      "label": "SA Type"
     },
@@ -5274,7 +5823,7 @@
      "type": "numeric"
     },
     {
-     "description": "Quantity measure, additive at this canvas's grain.",
+     "description": "The register quantity on this copy of the read. One reading is carried at segment level, per service point and as an audit copy (Usage Flag 'X'), beside tier breakdowns and unit-less derived rows, and a cancelled segment keeps its reads: total it only with Is Frozen = true, Is Cancelled = false, Is Segment Level = true, Usage Flag = 'S' and Read Row Kind = 'measured', and never across units. That copy ties rpt_billed_usage's usage per unit exactly (Ellensburg 2026-09-30).",
      "group": "billing",
      "id": "Measured Quantity",
      "label": "Measured Quantity",
@@ -5376,6 +5925,22 @@
      "label": "Bill Segment Status Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "Flag. Filter on it; do not sum it.",
+     "group": "billing",
+     "id": "Is Frozen",
+     "label": "Is Frozen",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "Flag. Filter on it; do not sum it.",
+     "group": "billing",
+     "id": "Is Cancelled",
+     "label": "Is Cancelled",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "",
@@ -5547,8 +6112,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -5645,7 +6208,33 @@
      "dimensions": [
       "Unit of Measure"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      },
+      {
+       "field": "Is Segment Level",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Usage Flag",
+       "op": "eq",
+       "value": "S"
+      },
+      {
+       "field": "Read Row Kind",
+       "op": "eq",
+       "value": "measured"
+      }
+     ],
      "id": "measured_by_uom",
      "measures": [
       {
@@ -5662,7 +6251,28 @@
      "dimensions": [
       "Read Row Kind"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      },
+      {
+       "field": "Is Segment Level",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Usage Flag",
+       "op": "eq",
+       "value": "S"
+      }
+     ],
      "id": "reads_by_row_kind",
      "measures": [
       {
@@ -5675,12 +6285,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "the meter reads a bill segment was calculated from",
+   "summary": "The meter reads a bill segment was calculated from.",
    "table_name": "rpt_bill_segment_read",
    "trusted_measures": [
     "Sequence Number",
@@ -5694,7 +6302,7 @@
     "Measured less Raw x Constant"
    ],
    "usage_guidance": null,
-   "use_case": "(the real CI_BSEG_READ primary key)",
+   "use_case": "The meter reads a bill was calculated from, to answer a customer asking which reads their bill used.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -5759,8 +6367,8 @@
       "label": "Billing & Rates"
      }
     ],
-    "grain": "rpt_billable_charge",
-    "grain_description": "",
+    "grain": "billable charge line (Billable Charge ID + Line Sequence)",
+    "grain_description": "One row per billable charge line (Billable Charge ID + Line Sequence)",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
      {
@@ -6407,8 +7015,8 @@
      "type": "text"
     }
    ],
-   "grain": "rpt_billable_charge",
-   "grain_description": "",
+   "grain": "billable charge line (Billable Charge ID + Line Sequence)",
+   "grain_description": "One row per billable charge line (Billable Charge ID + Line Sequence)",
    "label": "Billable Charge",
    "large_domain": false,
    "max_rows": 500,
@@ -6468,9 +7076,15 @@
      "chart_type": "pie",
      "description": "A billable charge is a one-off the rate did not produce \u2014 a fee, a reconnection, a deposit. High volumes here mean manual work happening every cycle.",
      "dimensions": [
-      "Charge Template Code"
+      "Charge Description"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "billable_charges",
      "measures": [
       {
@@ -6483,12 +7097,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "charges that do not come from a rate",
+   "summary": "Charges that do not come from a rate.",
    "table_name": "rpt_billable_charge",
    "trusted_measures": [
     "Line Sequence",
@@ -6497,11 +7109,27 @@
     "Billed Calculation Amount"
    ],
    "usage_guidance": null,
-   "use_case": "Connection fees, deposits, service calls, miscellaneous billing. Real money on",
+   "use_case": "Charges that do not come from a rate: connection fees, deposits, service calls and other one-off billing.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
   "rpt_billed_charge": {
+   "aggregate": {
+    "build_column": "Canvas Build",
+    "count": "Record Count",
+    "date": "Bill Date",
+    "dimensions": [
+     "Customer Class",
+     "Budget Plan",
+     "Service Type",
+     "Is Frozen",
+     "Is Cancelled"
+    ],
+    "measures": {
+     "Billed Amount": "sum"
+    },
+    "table": "agg_billed_charge_daily"
+   },
    "data_model": {
     "columns_traced_to_cisadm": 53,
     "domain_table": "rpt_billed_charge",
@@ -7637,8 +8265,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -7647,8 +8273,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -7665,7 +8289,18 @@
      "dimensions": [
       "Customer Class"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "billed_by_class_calc_lines",
      "measures": [
       {
@@ -7675,32 +8310,13 @@
      ],
      "title": "What was billed, by customer class (charge lines)?",
      "workstream_label": "Billing"
-    },
-    {
-     "chart_type": "bar",
-     "description": "Budget billing shifts cash timing; the split shows how much revenue rides on it.",
-     "dimensions": [
-      "Budget Plan"
-     ],
-     "filters": [],
-     "id": "billed_by_budget_plan",
-     "measures": [
-      {
-       "agg": "sum",
-       "field": "Billed Amount"
-      }
-     ],
-     "title": "How much was billed under each budget plan?",
-     "workstream_label": "Billing"
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "billed charges at calc-line grain",
+   "summary": "Billed charges at calc-line grain.",
    "table_name": "rpt_billed_charge",
    "trusted_measures": [
     "Calc Header Seq",
@@ -7710,11 +8326,28 @@
     "Exempt Amount"
    ],
    "usage_guidance": null,
-   "use_case": "CI_BSEG_CALC_LN primary key)",
+   "use_case": "Line-by-line billed amounts: exactly which rate components produced each charge. Use it for dollars, not for usage.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
   "rpt_billed_usage": {
+   "aggregate": {
+    "build_column": "Canvas Build",
+    "count": "Record Count",
+    "date": "Bill Date",
+    "dimensions": [
+     "Unit of Measure",
+     "Customer Class",
+     "Service Type",
+     "Is Frozen",
+     "Is Cancelled",
+     "Is Usage"
+    ],
+    "measures": {
+     "Billed Quantity": "sum"
+    },
+    "table": "agg_billed_usage_daily"
+   },
    "data_model": {
     "columns_traced_to_cisadm": 30,
     "domain_table": "rpt_billed_usage",
@@ -8633,7 +9266,23 @@
      "dimensions": [
       "Unit of Measure"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      },
+      {
+       "field": "Is Usage",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "consumption_by_uom",
      "measures": [
       {
@@ -8646,12 +9295,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "billed consumption at determinant grain",
+   "summary": "Billed consumption at determinant grain.",
    "table_name": "rpt_billed_usage",
    "trusted_measures": [
     "Billed Quantity",
@@ -8659,7 +9306,7 @@
     "Billed less Initial Quantity"
    ],
    "usage_guidance": null,
-   "use_case": "AUTHORITATIVE FOR **USAGE**, but only when \"Is Usage\" is filtered on first",
+   "use_case": "Billed consumption by unit of measure and time of use. Filter on Is Usage first so quantities add up correctly.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -9151,17 +9798,23 @@
    "portal_enabled": true,
    "premade_reports": [
     {
-     "chart_type": "pie",
+     "chart_type": "bar",
      "description": "Case duration is the customer's experience of the utility's back office. The types that take longest are where the process, not the person, is slow.",
      "dimensions": [
       "Case Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Closed",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "case_resolution_time",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "avg",
+       "field": "Case Duration Hours"
       }
      ],
      "title": "How long do cases take to close, by type?",
@@ -9169,12 +9822,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "cases with their timing and current state",
+   "summary": "Cases with their timing and current state.",
    "table_name": "rpt_case",
    "trusted_measures": [
     "Case Duration Minutes",
@@ -9182,7 +9833,7 @@
     "Log Entry Count"
    ],
    "usage_guidance": null,
-   "use_case": "Its OWN canvas, not an account roll-up. Cases were originally folded into",
+   "use_case": "Customer cases: type, status, owner, and how long each has been open or took to close.",
    "workstream": "customer_ops",
    "workstream_label": "Customer Operations"
   },
@@ -9239,7 +9890,7 @@
     }
    ],
    "default_date_field": "Effective Date",
-   "default_date_preset": "last_12_months",
+   "default_date_preset": "all_dates",
    "dimensions": [
     {
      "id": "Entity Type",
@@ -9437,16 +10088,14 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "characteristics for every business area, in one canvas",
+   "summary": "Characteristics for every business area, in one canvas.",
    "table_name": "rpt_characteristics",
    "trusted_measures": [],
    "usage_guidance": null,
-   "use_case": "STANDALONE BY DESIGN. Characteristics are TALL (one row per characteristic per",
+   "use_case": "Looking up any characteristic on an account, premise, service agreement or person, including its history over time.",
    "workstream": "common",
    "workstream_label": "Operations & Shared Services"
   },
@@ -9482,8 +10131,8 @@
       "label": "Collections & Debt"
      }
     ],
-    "grain": "rpt_credit_rating_history",
-    "grain_description": "",
+    "grain": "account + credit rating history entry",
+    "grain_description": "One row per account + credit rating history entry",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
      {
@@ -9745,8 +10394,8 @@
      "type": "varchar(60)"
     }
    ],
-   "grain": "rpt_credit_rating_history",
-   "grain_description": "",
+   "grain": "account + credit rating history entry",
+   "grain_description": "One row per account + credit rating history entry",
    "label": "Credit Rating History",
    "large_domain": false,
    "max_rows": 500,
@@ -9801,25 +10450,23 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "credit rating history. Grain: Account ID + Credit Rating History ID",
+   "summary": "Credit rating history.",
    "table_name": "rpt_credit_rating_history",
    "trusted_measures": [
     "Credit Rating Points",
     "Cash-Only Points"
    ],
    "usage_guidance": null,
-   "use_case": "account's credit rating, and every event that moved the rating -- a collection",
+   "use_case": "Why an account entered collections: every event that raised or lowered its credit rating, and when.",
    "workstream": "debt",
    "workstream_label": "Collections & Debt"
   },
   "rpt_customer_account": {
    "data_model": {
-    "columns_traced_to_cisadm": 20,
+    "columns_traced_to_cisadm": 19,
     "domain_table": "rpt_customer_account",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -9841,6 +10488,9 @@
        "Bill Cycle Code",
        "Budget Plan",
        "Budget Plan Code",
+       "Is On Budget",
+       "Monthly Budget Amount",
+       "Budget Service Agreements",
        "CIS Division",
        "Currency Code",
        "Bill Route Types",
@@ -9857,7 +10507,7 @@
        "Any Person Receives Notifications",
        "Any Person Receives Bill Copy",
        "Interim Credit Review",
-       "Has Alert",
+       "Has Alert Text",
        "Current Balance",
        "Total Balance",
        "New Charge Balance",
@@ -9930,6 +10580,13 @@
       "on": "ag.acct_id  = da.acct_id",
       "role": "step",
       "table": "agreements"
+     },
+     {
+      "alias": "bud",
+      "join_type": "left join",
+      "on": "bud.acct_id = da.acct_id",
+      "role": "model",
+      "table": "int_account_budget"
      },
      {
       "alias": "f",
@@ -10009,11 +10666,11 @@
       "table": "int_account_autopay"
      },
      {
-      "alias": "pc",
+      "alias": "em",
       "join_type": "left join",
-      "on": "pc.per_id = da.main_customer_per_id",
+      "on": "em.per_id = da.main_customer_per_id",
       "role": "model",
-      "table": "stg_person_contact"
+      "table": "int_person_email"
      }
     ],
     "population_filter": null,
@@ -10025,12 +10682,13 @@
      "CI_BUD_PLAN_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
-     "CI_LOOKUP_VAL_L",
-     "CI_PER"
+     "CI_LOOKUP_VAL_L"
     ],
     "trusted_measures": [
      "Linked Person Count",
      "Financially Responsible Person Count",
+     "Monthly Budget Amount",
+     "Budget Service Agreements",
      "Self-Service Person Count",
      "Account Characteristic Count",
      "Active Alert Count",
@@ -10114,8 +10772,8 @@
      "label": "Autopay End Date"
     }
    ],
-   "default_date_field": "Bill After Date",
-   "default_date_preset": "last_12_months",
+   "default_date_field": "Account Setup Date",
+   "default_date_preset": "all_dates",
    "dimensions": [
     {
      "id": "Account ID",
@@ -10174,6 +10832,10 @@
      "label": "Budget Plan Code"
     },
     {
+     "id": "Is On Budget",
+     "label": "Is On Budget"
+    },
+    {
      "id": "CIS Division",
      "label": "CIS Division"
     },
@@ -10222,8 +10884,8 @@
      "label": "Interim Credit Review"
     },
     {
-     "id": "Has Alert",
-     "label": "Has Alert"
+     "id": "Has Alert Text",
+     "label": "Has Alert Text"
     },
     {
      "id": "Takes Multiple Utility Services",
@@ -10280,7 +10942,7 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The main customer's email: their active contact point whose route method is EMAIL (C1_PER_CONTDET x C1_COMM_RTE_TYPE, primary first), else CI_PER.EMAILID. EMAILID is legacy and empty at five of six clients (2026-09-30).",
      "group": "customer_ops",
      "id": "Main Customer Email",
      "label": "Main Customer Email",
@@ -10288,7 +10950,7 @@
      "type": "text"
     },
     {
-     "description": "Flag. Filter on it; do not sum it.",
+     "description": "True when the main customer has an email (Main Customer Email). The paper-bill-and-phone-call population is the false side. Until 2026-09-30 this read CI_PER only and was false for every account at five of six clients.",
      "group": "customer_ops",
      "id": "Has Email On File",
      "label": "Has Email On File",
@@ -10382,6 +11044,30 @@
      "label": "Budget Plan Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "On budget billing by C2M's own rule: a budget-ELIGIBLE SA type (ELIG_BUDGET_SW), Active or Pending Stop, with a current recurring charge above zero; on an account, any of its agreements. Not the Budget Plan code, which also sits on accounts that are not on budget (College Station: 104,826 carry a code, 965 are on budget).",
+     "group": "customer_ops",
+     "id": "Is On Budget",
+     "label": "Is On Budget",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "The current monthly budget charge (the latest CI_SA_RCHG_HIST amount not in the future) of the agreements on budget; on an account, their sum. Blank when not on budget. Additive.",
+     "group": "customer_ops",
+     "id": "Monthly Budget Amount",
+     "label": "Monthly Budget Amount",
+     "role": "measure",
+     "type": "numeric"
+    },
+    {
+     "description": "How many of the account's service agreements are on budget billing.",
+     "group": "customer_ops",
+     "id": "Budget Service Agreements",
+     "label": "Budget Service Agreements",
+     "role": "measure",
+     "type": "bigint"
     },
     {
      "description": "",
@@ -10512,10 +11198,10 @@
      "type": "boolean"
     },
     {
-     "description": "Flag. Filter on it; do not sum it.",
+     "description": "CI_ACCT.ALERT_INFO holds text -- on real accounts identity-verification data (PINs, security questions, reference contacts) -- redacted at staging to this flag: 'verification data exists in CIS, look there'. NOT a typed alert: the CI_ACCT_ALERT rollup is Active Alerts / Active Alert Count. Renamed from 'Has Alert' 2026-09-04, when a report filtered on this and charted that.",
      "group": "customer_ops",
-     "id": "Has Alert",
-     "label": "Has Alert",
+     "id": "Has Alert Text",
+     "label": "Has Alert Text",
      "role": "dimension",
      "type": "boolean"
     },
@@ -10904,6 +11590,26 @@
       "min",
       "max"
      ],
+     "id": "Monthly Budget Amount",
+     "label": "Monthly Budget Amount"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Budget Service Agreements",
+     "label": "Budget Service Agreements"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
      "id": "Self-Service Person Count",
      "label": "Self-Service Person Count"
     },
@@ -11189,7 +11895,7 @@
      "workstream_label": "Customer Information"
     },
     {
-     "chart_type": "pie",
+     "chart_type": "bar",
      "description": "Self-service take-up is the cheapest lever on contact volume. Splitting by class shows where a campaign would land.",
      "dimensions": [
       "Customer Class"
@@ -11198,8 +11904,8 @@
      "id": "self_service_adoption",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Self-Service Enabled"
       }
      ],
      "title": "What is self-service adoption, by customer class?",
@@ -11250,8 +11956,8 @@
      "id": "kpi_write_off_exposure",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "sum",
+       "field": "Arrears 120+ Days"
       }
      ],
      "title": "Write-off exposure \u2014 how much debt is past the point of collection?",
@@ -11280,7 +11986,13 @@
      "dimensions": [
       "Active Alerts"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Active Alert Count",
+       "op": "gte",
+       "value": 1
+      }
+     ],
      "id": "accounts_on_alerts",
      "measures": [
       {
@@ -11309,23 +12021,6 @@
      "workstream_label": "Channel & Deflection"
     },
     {
-     "chart_type": "pie",
-     "description": "Days between the bill and the payment is DSO in its rawest form. It is also the number that tells you whether a due-date change worked.",
-     "dimensions": [
-      "Customer Class"
-     ],
-     "filters": [],
-     "id": "payment_timing",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "How promptly are bills being paid?",
-     "workstream_label": "Payments"
-    },
-    {
      "chart_type": "horizontal",
      "description": "Debt nobody is chasing. Every account here is either an oversight or an exclusion somebody applied and never reviewed.",
      "dimensions": [
@@ -11341,19 +12036,88 @@
      ],
      "title": "Who is in arrears with no collection process running?",
      "workstream_label": "Collections"
+    },
+    {
+     "chart_type": "bar",
+     "description": "Budget billing evens out a customer's payments across the year. Who is on it tells you whose cash arrives flat and whose true-up is coming.",
+     "dimensions": [
+      "Customer Class"
+     ],
+     "filters": [
+      {
+       "field": "Is On Budget",
+       "op": "eq",
+       "value": true
+      }
+     ],
+     "id": "budget_accounts_by_class",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "Who is on budget billing, by customer class?",
+     "workstream_label": "Budget Billing"
+    },
+    {
+     "chart_type": "bar",
+     "description": "The monthly budget amount is cash the utility can count on. A class whose budget total drifts from its billed charges is heading for a large true-up.",
+     "dimensions": [
+      "Customer Class"
+     ],
+     "filters": [
+      {
+       "field": "Is On Budget",
+       "op": "eq",
+       "value": true
+      }
+     ],
+     "id": "budget_amount_by_class",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Monthly Budget Amount"
+      }
+     ],
+     "title": "What do budget customers pay each month, by customer class?",
+     "workstream_label": "Budget Billing"
+    },
+    {
+     "chart_type": "bar",
+     "description": "Budget reviews and true-ups run with the bill cycle. A cycle heavy with budget accounts is where the review workload lands.",
+     "dimensions": [
+      "Bill Cycle"
+     ],
+     "filters": [
+      {
+       "field": "Is On Budget",
+       "op": "eq",
+       "value": true
+      }
+     ],
+     "id": "budget_accounts_by_cycle",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "Which bill cycles carry the budget accounts?",
+     "workstream_label": "Budget Billing"
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "the account 360. Grain: Account ID",
+   "summary": "The account 360.",
    "table_name": "rpt_customer_account",
    "trusted_measures": [
     "Linked Person Count",
     "Financially Responsible Person Count",
+    "Monthly Budget Amount",
+    "Budget Service Agreements",
     "Self-Service Person Count",
     "Account Characteristic Count",
     "Active Alert Count",
@@ -11383,7 +12147,7 @@
     "Autopay Maximum Withdrawal Amount"
    ],
    "usage_guidance": null,
-   "use_case": "financial position, preferences, flags and activity history. This is the canvas a",
+   "use_case": "The account view a CSR or analyst starts from: who, where, how billed, what is owed and recent activity.",
    "workstream": "customer_ops",
    "workstream_label": "Customer Operations"
   },
@@ -11884,24 +12648,6 @@
    "portal_enabled": true,
    "premade_reports": [
     {
-     "benchmark": "high is good",
-     "chart_type": "pie",
-     "description": "Call deflection is the cheapest lever a utility has on contact cost. The contact method is what says whether a customer solved it themselves or needed a person.",
-     "dimensions": [
-      "Contact Method"
-     ],
-     "filters": [],
-     "id": "kpi_call_deflection",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "Channel mix \u2014 how much customer contact came through self-service?",
-     "workstream_label": "Channel & Deflection"
-    },
-    {
      "chart_type": "pie",
      "description": "Contact reason is the demand signal. The type that grows fastest is the process that is failing upstream.",
      "dimensions": [
@@ -11920,16 +12666,14 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "customer contacts. Grain: Customer Contact ID",
+   "summary": "Customer contacts.",
    "table_name": "rpt_customer_contact",
    "trusted_measures": [],
    "usage_guidance": null,
-   "use_case": "only be counted on rpt_customer_account, never joined. This is where the detail",
+   "use_case": "Every customer contact logged against an account: type, reason, date and who handled it.",
    "workstream": "customer_ops",
    "workstream_label": "Customer Operations"
   },
@@ -11966,7 +12710,7 @@
        "Customer Class Code",
        "Collection Class",
        "Bill Cycle",
-       "Has Alert"
+       "Has Alert Text"
       ],
       "id": "customer_ops",
       "label": "Customer Operations"
@@ -12123,8 +12867,8 @@
      "label": "Bill Cycle"
     },
     {
-     "id": "Has Alert",
-     "label": "Has Alert"
+     "id": "Has Alert Text",
+     "label": "Has Alert Text"
     }
    ],
    "fields": [
@@ -12329,10 +13073,10 @@
      "type": "varchar(60)"
     },
     {
-     "description": "Flag. Filter on it; do not sum it.",
+     "description": "CI_ACCT.ALERT_INFO holds text -- on real accounts identity-verification data (PINs, security questions, reference contacts) -- redacted at staging to this flag: 'verification data exists in CIS, look there'. NOT a typed alert: the CI_ACCT_ALERT rollup is Active Alerts / Active Alert Count. Renamed from 'Has Alert' 2026-09-04, when a report filtered on this and charted that.",
      "group": "customer_ops",
-     "id": "Has Alert",
-     "label": "Has Alert",
+     "id": "Has Alert Text",
+     "label": "Has Alert Text",
      "role": "dimension",
      "type": "boolean"
     }
@@ -12382,6 +13126,7 @@
      "workstream_label": "Customer Notification"
     },
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "A task pending for weeks is not pending, it is stuck. These are the ones a person has to look at.",
      "dimensions": [
@@ -12408,8 +13153,8 @@
      "id": "notification_error_detail",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Is Error"
       }
      ],
      "title": "Which notification types fail most often?",
@@ -12417,18 +13162,16 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "customer notifications and self-service requests",
+   "summary": "Customer notifications and self-service requests.",
    "table_name": "rpt_customer_notification",
    "trusted_measures": [
     "Days Outstanding"
    ],
    "usage_guidance": null,
-   "use_case": "The question no canvas could answer before: DID THE CUSTOMER ACTUALLY GET TOLD?",
+   "use_case": "Whether customers were actually told: notifications and self-service requests, with their delivery status.",
    "workstream": "customer_ops",
    "workstream_label": "Customer Operations"
   },
@@ -12897,12 +13640,12 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
      "group": "debt",
      "id": "Linked Collection Process ID",
      "label": "Linked Collection Process ID",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "",
@@ -12910,7 +13653,7 @@
      "id": "Write-Off Control",
      "label": "Write-Off Control",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"SA Debt Status\" for the description: report on the description, filter on the code.",
@@ -13286,8 +14029,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
       "min",
       "max"
      ],
@@ -13344,12 +14085,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "collection, severance and write-off processes with their events",
+   "summary": "Collection, severance and write-off processes with their events.",
    "table_name": "rpt_debt_process",
    "trusted_measures": [
     "Event Sequence",
@@ -13362,7 +14101,7 @@
     "Duration (Days)"
    ],
    "usage_guidance": null,
-   "use_case": "C2M runs three debt processes with the same shape -- a process header, the service",
+   "use_case": "Collection, severance and write-off processes step by step: which events ran, when, and where each process stands.",
    "workstream": "debt",
    "workstream_label": "Collections & Debt"
   },
@@ -13406,6 +14145,7 @@
        "Switched Off Since Date/Time",
        "Days Switched Off",
        "Switch-Off Field Task Type",
+       "Switch-Off Field Task Type Code",
        "Installation Constant",
        "Device Config ID",
        "Service Point ID",
@@ -13460,8 +14200,8 @@
        "Replacement Cost",
        "Useful Life Years"
       ],
-      "id": "meter_ops",
-      "label": "Meter Operations"
+      "id": "assets",
+      "label": "Asset Operations"
      }
     ],
     "grain": "device",
@@ -13675,8 +14415,8 @@
      "label": "Asset Placement Effective Date/Time"
     }
    ],
-   "default_date_field": "Retirement Date/Time",
-   "default_date_preset": "last_12_months",
+   "default_date_field": "Install Date/Time",
+   "default_date_preset": "all_dates",
    "dimensions": [
     {
      "id": "Device ID",
@@ -13793,6 +14533,10 @@
     {
      "id": "Switch-Off Field Task Type",
      "label": "Switch-Off Field Task Type"
+    },
+    {
+     "id": "Switch-Off Field Task Type Code",
+     "label": "Switch-Off Field Task Type Code"
     },
     {
      "id": "Device Config ID",
@@ -13966,7 +14710,7 @@
    "fields": [
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Device ID",
      "label": "Device ID",
      "role": "dimension",
@@ -13974,7 +14718,7 @@
     },
     {
      "description": "The badge stamped on the physical unit. This is what a field crew and a customer read off it; the internal id is not visible in the field.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Meter Badge Number",
      "label": "Meter Badge Number",
      "role": "dimension",
@@ -13982,7 +14726,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Serial Number",
      "label": "Serial Number",
      "role": "dimension",
@@ -13990,7 +14734,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "External ID",
      "label": "External ID",
      "role": "dimension",
@@ -13998,7 +14742,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "MDM External ID",
      "label": "MDM External ID",
      "role": "dimension",
@@ -14006,7 +14750,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "NIC ID",
      "label": "NIC ID",
      "role": "dimension",
@@ -14014,7 +14758,7 @@
     },
     {
      "description": "Manufacturer serial number as recorded in C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "NIC Serial Number",
      "label": "NIC Serial Number",
      "role": "dimension",
@@ -14022,7 +14766,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Neuron ID",
      "label": "Neuron ID",
      "role": "dimension",
@@ -14030,7 +14774,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Pallet Number",
      "label": "Pallet Number",
      "role": "dimension",
@@ -14038,7 +14782,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Utility Device ID",
      "label": "Utility Device ID",
      "role": "dimension",
@@ -14046,7 +14790,7 @@
     },
     {
      "description": "English description of \"Device Type Code\". Group and report on this; filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Device Type",
      "label": "Device Type",
      "role": "dimension",
@@ -14054,7 +14798,7 @@
     },
     {
      "description": "English description of \"Head-End Registration Status Code\". Group and report on this; filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Head-End Registration Status",
      "label": "Head-End Registration Status",
      "role": "dimension",
@@ -14062,7 +14806,7 @@
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"Head-End Registration Status\" for the description: report on the description, filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Head-End Registration Status Code",
      "label": "Head-End Registration Status Code",
      "role": "dimension",
@@ -14070,7 +14814,7 @@
     },
     {
      "description": "The head-end system has never seen this meter (status D1NR) -- an installed AMI device measuring nothing over the network. The rollout worklist: filter true and \"Is Attached To Service Point\" true. Honestly FALSE at a manual-read client whose estate carries no head-end status at all.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Never Registered At Head-End",
      "label": "Never Registered At Head-End",
      "role": "dimension",
@@ -14078,7 +14822,7 @@
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"Device Type\" for the description: report on the description, filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Device Type Code",
      "label": "Device Type Code",
      "role": "dimension",
@@ -14086,7 +14830,7 @@
     },
     {
      "description": "English description of \"Manufacturer Code\". Group and report on this; filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Manufacturer",
      "label": "Manufacturer",
      "role": "dimension",
@@ -14094,7 +14838,7 @@
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"Manufacturer\" for the description: report on the description, filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Manufacturer Code",
      "label": "Manufacturer Code",
      "role": "dimension",
@@ -14102,7 +14846,7 @@
     },
     {
      "description": "English description of \"Device Model Code\". Group and report on this; filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Device Model",
      "label": "Device Model",
      "role": "dimension",
@@ -14110,7 +14854,7 @@
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"Device Model\" for the description: report on the description, filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Device Model Code",
      "label": "Device Model Code",
      "role": "dimension",
@@ -14118,7 +14862,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Device Status Code",
      "label": "Device Status Code",
      "role": "dimension",
@@ -14126,7 +14870,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Business Object Status",
      "label": "Business Object Status",
      "role": "dimension",
@@ -14134,7 +14878,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Retirement Date/Time",
      "label": "Retirement Date/Time",
      "role": "date",
@@ -14142,7 +14886,7 @@
     },
     {
      "description": "Flag. Filter on it; do not sum it.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Is Retired",
      "label": "Is Retired",
      "role": "dimension",
@@ -14150,7 +14894,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Install Event ID",
      "label": "Install Event ID",
      "role": "dimension",
@@ -14158,7 +14902,7 @@
     },
     {
      "description": "The SERVICE CONNECTION at this point: ON (installed and flowing), OFF (meter in place, service switched off -- the disconnect population), REMOVE (meter pulled), PENDING. Different from device status (ACTIVE/RETIRED) and asset status (INSTORE/INSTALLED/INREPAIR/RETIRED).",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Install Status Code",
      "label": "Install Status Code",
      "role": "dimension",
@@ -14166,7 +14910,7 @@
     },
     {
      "description": "Flag. Install status ON: a meter is installed here and service is flowing.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Service Is On",
      "label": "Service Is On",
      "role": "dimension",
@@ -14174,7 +14918,7 @@
     },
     {
      "description": "Flag. The meter is physically present but service is switched off -- what a removal-date test alone cannot see (measured: 278 such points at the reference client, plus 127 switched off and later pulled).",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Installed But Switched Off",
      "label": "Installed But Switched Off",
      "role": "dimension",
@@ -14182,7 +14926,7 @@
     },
     {
      "description": "Flag. The install event reached REMOVE. Read WITH the removal date: 127 events carry a removal date while still sitting at OFF, so neither signal alone is complete.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Install Ended (Meter Removed)",
      "label": "Install Ended (Meter Removed)",
      "role": "dimension",
@@ -14190,7 +14934,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Install Status Reason Code",
      "label": "Install Status Reason Code",
      "role": "dimension",
@@ -14198,7 +14942,7 @@
     },
     {
      "description": "When this device went dark: the latest on/off history event, present only while the install status is OFF (present but disconnected). The install status and the history agree exactly on live states -- measured, then asserted per build.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Switched Off Since Date/Time",
      "label": "Switched Off Since Date/Time",
      "role": "date",
@@ -14206,7 +14950,7 @@
     },
     {
      "description": "Age of the current disconnection, in days as of the build's as-of date. The reconnect-after-payment clock regulators ask about: sort descending over \"Switch-Off Field Task Type\" = the credit-cut task to find customers dark the longest.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Days Switched Off",
      "label": "Days Switched Off",
      "role": "measure",
@@ -14214,15 +14958,23 @@
     },
     {
      "description": "The field task that performed the current switch-off (DNP = credit disconnect, DISCONNECT-SEASONAL = seasonal). Null = office-initiated or pre-MDM legacy -- left null, never guessed. Task vocabulary is CLIENT configuration; read values per client before filtering.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Switch-Off Field Task Type",
      "label": "Switch-Off Field Task Type",
      "role": "dimension",
      "type": "text"
     },
     {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Switch-Off Field Task Type\" for the description: report on the description, filter on the code.",
+     "group": "assets",
+     "id": "Switch-Off Field Task Type Code",
+     "label": "Switch-Off Field Task Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Installation Constant",
      "label": "Installation Constant",
      "role": "measure",
@@ -14230,7 +14982,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Device Config ID",
      "label": "Device Config ID",
      "role": "dimension",
@@ -14238,7 +14990,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Service Point ID",
      "label": "Service Point ID",
      "role": "dimension",
@@ -14246,7 +14998,7 @@
     },
     {
      "description": "The MDM-side service point. Bridged to the CIS service point through D1_SP_IDENTIFIER at SP_ID_TYPE_FLG = 'D1EI'; the two systems do not share a key.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID",
      "role": "dimension",
@@ -14254,7 +15006,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Install Date/Time",
      "label": "Install Date/Time",
      "role": "date",
@@ -14262,7 +15014,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Removal Date/Time",
      "label": "Removal Date/Time",
      "role": "date",
@@ -14270,7 +15022,7 @@
     },
     {
      "description": "Flag. Filter on it; do not sum it.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Is Installed",
      "label": "Is Installed",
      "role": "dimension",
@@ -14278,7 +15030,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Attachment Path",
      "label": "Attachment Path",
      "role": "dimension",
@@ -14286,7 +15038,7 @@
     },
     {
      "description": "Flag. Filter on it; do not sum it.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Is Attached To Service Point",
      "label": "Is Attached To Service Point",
      "role": "dimension",
@@ -14294,7 +15046,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Equipment Attached Date/Time",
      "label": "Equipment Attached Date/Time",
      "role": "date",
@@ -14302,7 +15054,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Equipment Removed Date/Time",
      "label": "Equipment Removed Date/Time",
      "role": "date",
@@ -14310,7 +15062,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Equipment Is Current",
      "label": "Equipment Is Current",
      "role": "dimension",
@@ -14318,7 +15070,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Service Point Type Code",
      "label": "Service Point Type Code",
      "role": "dimension",
@@ -14326,7 +15078,7 @@
     },
     {
      "description": "English description of \"Service Point Status Code\". Group and report on this; filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Service Point Status",
      "label": "Service Point Status",
      "role": "dimension",
@@ -14334,7 +15086,7 @@
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"Service Point Status\" for the description: report on the description, filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Service Point Status Code",
      "label": "Service Point Status Code",
      "role": "dimension",
@@ -14342,15 +15094,15 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Meter Read Cycle Code",
      "label": "Meter Read Cycle Code",
      "role": "dimension",
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "description": "CI_SP.MR_RTE_CD, CCB's own meter-read route. Empty at all six clients measured (0 of 502,622 service points, 2026-09-30): they read through MDM, whose route is Measurement Cycle Route. Kept for a client that routes in CCB.",
+     "group": "assets",
      "id": "Meter Read Route Code",
      "label": "Meter Read Route Code",
      "role": "dimension",
@@ -14358,7 +15110,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Premise ID",
      "label": "Premise ID",
      "role": "dimension",
@@ -14366,7 +15118,7 @@
     },
     {
      "description": "Address component, as held in C2M. Not validated or standardised here.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Premise Address",
      "label": "Premise Address",
      "role": "dimension",
@@ -14374,7 +15126,7 @@
     },
     {
      "description": "Address component, as held in C2M. Not validated or standardised here.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "City",
      "label": "City",
      "role": "dimension",
@@ -14382,7 +15134,7 @@
     },
     {
      "description": "Address component, as held in C2M. Not validated or standardised here.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "State",
      "label": "State",
      "role": "dimension",
@@ -14390,7 +15142,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Postal Code",
      "label": "Postal Code",
      "role": "dimension",
@@ -14398,7 +15150,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset ID",
      "label": "Asset ID",
      "role": "dimension",
@@ -14406,7 +15158,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Ownership Code",
      "label": "Asset Ownership Code",
      "role": "dimension",
@@ -14414,7 +15166,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Availability Code",
      "label": "Asset Availability Code",
      "role": "dimension",
@@ -14422,7 +15174,7 @@
     },
     {
      "description": "English description of \"Asset Type Code\". Group and report on this; filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Type",
      "label": "Asset Type",
      "role": "dimension",
@@ -14430,7 +15182,7 @@
     },
     {
      "description": "Code configured by this utility; the values differ between clients. Paired with \"Asset Type\" for the description: report on the description, filter on the code.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Type Code",
      "label": "Asset Type Code",
      "role": "dimension",
@@ -14438,7 +15190,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Status Code",
      "label": "Asset Status Code",
      "role": "dimension",
@@ -14446,7 +15198,7 @@
     },
     {
      "description": "The badge stamped on the physical unit. This is what a field crew and a customer read off it; the internal id is not visible in the field.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Badge Number",
      "label": "Asset Badge Number",
      "role": "dimension",
@@ -14454,7 +15206,7 @@
     },
     {
      "description": "Manufacturer serial number as recorded in C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Serial Number",
      "label": "Asset Serial Number",
      "role": "dimension",
@@ -14462,7 +15214,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Purchase Order",
      "label": "Purchase Order",
      "role": "dimension",
@@ -14470,7 +15222,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Metrology Firmware Version",
      "label": "Metrology Firmware Version",
      "role": "dimension",
@@ -14478,7 +15230,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "NIC Firmware Version",
      "label": "NIC Firmware Version",
      "role": "dimension",
@@ -14486,7 +15238,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Created Date/Time",
      "label": "Asset Created Date/Time",
      "role": "date",
@@ -14494,7 +15246,7 @@
     },
     {
      "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Acquisition Date",
      "label": "Asset Acquisition Date",
      "role": "date",
@@ -14502,7 +15254,7 @@
     },
     {
      "description": "Date. Typed as a timestamp because Oracle DATE always carries a time component; the time is midnight in the data we have measured. Filter with a range or cast to date -- an equality test against a bare date will still match here, but do not rely on it.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset In Service Date",
      "label": "Asset In Service Date",
      "role": "date",
@@ -14510,7 +15262,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Condition Code",
      "label": "Asset Condition Code",
      "role": "dimension",
@@ -14518,7 +15270,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Specification Code",
      "label": "Asset Specification Code",
      "role": "dimension",
@@ -14526,7 +15278,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Fixed Asset Number",
      "label": "Fixed Asset Number",
      "role": "dimension",
@@ -14534,7 +15286,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Disposition Code",
      "label": "Asset Disposition Code",
      "role": "dimension",
@@ -14542,7 +15294,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Is In Service",
      "label": "Asset Is In Service",
      "role": "dimension",
@@ -14550,7 +15302,7 @@
     },
     {
      "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Placement Effective Date/Time",
      "label": "Asset Placement Effective Date/Time",
      "role": "date",
@@ -14558,7 +15310,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Location Node ID",
      "label": "Asset Location Node ID",
      "role": "dimension",
@@ -14566,7 +15318,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Location",
      "label": "Asset Location",
      "role": "dimension",
@@ -14574,7 +15326,7 @@
     },
     {
      "description": "Descriptive label.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Location Description",
      "label": "Asset Location Description",
      "role": "dimension",
@@ -14582,7 +15334,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Location Type Code",
      "label": "Asset Location Type Code",
      "role": "dimension",
@@ -14590,7 +15342,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Location Criticality Code",
      "label": "Asset Location Criticality Code",
      "role": "dimension",
@@ -14598,7 +15350,7 @@
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Attached To Asset ID",
      "label": "Attached To Asset ID",
      "role": "dimension",
@@ -14606,7 +15358,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Component Relationship Code",
      "label": "Asset Component Relationship Code",
      "role": "dimension",
@@ -14614,7 +15366,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Class Code",
      "label": "Asset Class Code",
      "role": "dimension",
@@ -14622,7 +15374,7 @@
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Asset Assessment Class Code",
      "label": "Asset Assessment Class Code",
      "role": "dimension",
@@ -14630,7 +15382,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Replacement Cost",
      "label": "Replacement Cost",
      "role": "measure",
@@ -14638,7 +15390,7 @@
     },
     {
      "description": "",
-     "group": "meter_ops",
+     "group": "assets",
      "id": "Useful Life Years",
      "label": "Useful Life Years",
      "role": "measure",
@@ -14742,7 +15494,18 @@
      "dimensions": [
       "Device Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Never Registered At Head-End",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Attached To Service Point",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "meters_not_registered",
      "measures": [
       {
@@ -14752,49 +15515,13 @@
      ],
      "title": "Which installed meters never registered with the head-end?",
      "workstream_label": "Device Management"
-    },
-    {
-     "chart_type": "horizontal",
-     "description": "A meter past its useful life drifts, and a drifting meter under-reads. This is the replacement programme's work queue and its capital case at once.",
-     "dimensions": [
-      "Device Type"
-     ],
-     "filters": [],
-     "id": "meter_age_replacement",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "Which meters are oldest relative to their useful life?",
-     "workstream_label": "Asset Management"
-    },
-    {
-     "chart_type": "bar",
-     "description": "Replacement cost by asset type is the capital plan. Splitting it by disposition shows how much of it is already sitting in a warehouse.",
-     "dimensions": [
-      "Asset Type"
-     ],
-     "filters": [],
-     "id": "asset_replacement_value",
-     "measures": [
-      {
-       "agg": "sum",
-       "field": "Replacement Cost"
-      }
-     ],
-     "title": "What would it cost to replace the estate?",
-     "workstream_label": "Asset Management"
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "devices with their asset record and current install",
+   "summary": "Devices with their asset record and current install.",
    "table_name": "rpt_device_asset",
    "trusted_measures": [
     "Days Switched Off",
@@ -14803,9 +15530,9 @@
     "Useful Life Years"
    ],
    "usage_guidance": null,
-   "use_case": "Absorbs rpt_devices, rpt_assets and rpt_device_install. A device and its W1 asset",
-   "workstream": "meter_ops",
-   "workstream_label": "Meter Operations"
+   "use_case": "Meters and devices: what is installed where, its status, and its asset record from Work and Asset Management.",
+   "workstream": "assets",
+   "workstream_label": "Asset Operations"
   },
   "rpt_device_event": {
    "data_model": {
@@ -15302,38 +16029,19 @@
      ],
      "title": "What are the meters reporting?",
      "workstream_label": "Device Events"
-    },
-    {
-     "chart_type": "horizontal",
-     "description": "Events per device normalises for fleet size, which is what turns a device-event count into a reliability comparison between models.",
-     "dimensions": [
-      "Device Model"
-     ],
-     "filters": [],
-     "id": "device_model_reliability",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "Which meter models report the most events per device?",
-     "workstream_label": "Device Events"
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "device events reported by the head end",
+   "summary": "Device events reported by the head end.",
    "table_name": "rpt_device_event",
    "trusted_measures": [
     "Event Duration Minutes"
    ],
    "usage_guidance": null,
-   "use_case": "Outages, tampers, restorations, communication failures. Oracle's MDM Device Events",
+   "use_case": "Events reported by meters: outages, tampers, restorations and communication failures.",
    "workstream": "meter_ops",
    "workstream_label": "Meter Operations"
   },
@@ -15703,20 +16411,20 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
      "group": "field_ops",
      "id": "Rule Code",
      "label": "Rule Code",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
-     "description": "",
+     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
      "group": "field_ops",
      "id": "VEE Group Code",
      "label": "VEE Group Code",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "",
@@ -15735,12 +16443,12 @@
      "type": "varchar(60)"
     },
     {
-     "description": "",
+     "description": "Base-product code, fixed by Oracle and the same at every utility. Paired with \"Severity\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Severity Code",
      "label": "Severity Code",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "English description of \"Open/Closed Code\". Group and report on this; filter on the code.",
@@ -15751,12 +16459,12 @@
      "type": "varchar(60)"
     },
     {
-     "description": "",
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Open/Closed\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Open/Closed Code",
      "label": "Open/Closed Code",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "Flag. Filter on it; do not sum it.",
@@ -15791,12 +16499,12 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "MDM measuring component. The hinge between a device and its measurements -- a device can carry several (kWh delivered, kWh received, demand).",
      "group": "field_ops",
      "id": "Measuring Component ID",
      "label": "Measuring Component ID",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
@@ -15815,12 +16523,12 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The MDM-side service point. Bridged to the CIS service point through D1_SP_IDENTIFIER at SP_ID_TYPE_FLG = 'D1EI'; the two systems do not share a key.",
      "group": "field_ops",
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
@@ -15967,12 +16675,12 @@
      "type": "varchar(60)"
     },
     {
-     "description": "",
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
      "group": "field_ops",
      "id": "Usage ID",
      "label": "Usage ID",
      "role": "dimension",
-     "type": "character"
+     "type": "character varying"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -16029,6 +16737,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "A VEE or usage exception blocks a read from becoming a bill. Days open is how long that revenue has been stuck.",
      "dimensions": [
@@ -16047,7 +16756,7 @@
     },
     {
      "benchmark": "under 10%",
-     "chart_type": "pie",
+     "chart_type": "bar",
      "description": "An exception blocks a read from becoming a bill. The MDM benchmark is under 10%; above that the exception queue grows faster than anyone clears it and the billing window starts closing.",
      "dimensions": [
       "Exception Domain"
@@ -16056,11 +16765,11 @@
      "id": "kpi_exception_rate",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Is Open"
       }
      ],
-     "title": "Exception rate \u2014 what share of usage is stuck behind an exception?",
+     "title": "Exception backlog \u2014 what share of exceptions are still open, by domain?",
      "workstream_label": "Data Quality"
     },
     {
@@ -16082,19 +16791,17 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "every exception, from all three C2M exception engines, in one canvas",
+   "summary": "Every exception, from all three C2M exception engines, in one canvas.",
    "table_name": "rpt_exception",
    "trusted_measures": [
     "Days Open",
     "Message Number"
    ],
    "usage_guidance": null,
-   "use_case": "Replaces four legacy canvases (bill_segment_exceptions, usage_exceptions,",
+   "use_case": "Every exception raised by billing, usage and meter-data validation in one place, to work the queue or spot patterns.",
    "workstream": "field_ops",
    "workstream_label": "Field Operations"
   },
@@ -16110,14 +16817,20 @@
        "Activity Type",
        "Activity Type Code",
        "Activity Category Code",
+       "Field Activity Type",
        "Field Activity Type Code",
+       "Activity Status",
        "Activity Status Code",
+       "Is Open",
        "Activity Status Reason Code",
        "Completed Code",
        "Current Error State",
        "Field Task Type",
+       "Field Task Type Code",
        "Cancel Reason",
+       "Cancel Reason Code",
        "Reschedule Reason",
+       "Reschedule Reason Code",
        "Event Date/Time",
        "Start Event Date/Time",
        "Stop Event Date/Time",
@@ -16184,6 +16897,48 @@
       "on": "lvpr.field_name='FA_PRIORITY_FLG' and lvpr.field_value = f.fa_priority_cd",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "fat",
+      "join_type": "left join",
+      "on": "fat.fa_type_cd = f.fa_type_cd",
+      "role": "model",
+      "table": "stg_fa_type_label"
+     },
+     {
+      "alias": "st",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_bo_status_label"
+     },
+     {
+      "alias": "bos",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_bo_status"
+     },
+     {
+      "alias": "tk",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_ext_lookup_value_label"
+     },
+     {
+      "alias": "cr",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_ext_lookup_value_label"
+     },
+     {
+      "alias": "rr",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_ext_lookup_value_label"
      }
     ],
     "population_filter": null,
@@ -16245,7 +17000,7 @@
      "label": "Appointment Taken Date/Time"
     }
    ],
-   "default_date_field": "Event Date/Time",
+   "default_date_field": "Created Date/Time",
    "default_date_preset": "last_12_months",
    "dimensions": [
     {
@@ -16265,12 +17020,24 @@
      "label": "Activity Category Code"
     },
     {
+     "id": "Field Activity Type",
+     "label": "Field Activity Type"
+    },
+    {
      "id": "Field Activity Type Code",
      "label": "Field Activity Type Code"
     },
     {
+     "id": "Activity Status",
+     "label": "Activity Status"
+    },
+    {
      "id": "Activity Status Code",
      "label": "Activity Status Code"
+    },
+    {
+     "id": "Is Open",
+     "label": "Is Open"
     },
     {
      "id": "Activity Status Reason Code",
@@ -16289,12 +17056,24 @@
      "label": "Field Task Type"
     },
     {
+     "id": "Field Task Type Code",
+     "label": "Field Task Type Code"
+    },
+    {
      "id": "Cancel Reason",
      "label": "Cancel Reason"
     },
     {
+     "id": "Cancel Reason Code",
+     "label": "Cancel Reason Code"
+    },
+    {
      "id": "Reschedule Reason",
      "label": "Reschedule Reason"
+    },
+    {
+     "id": "Reschedule Reason Code",
+     "label": "Reschedule Reason Code"
     },
     {
      "id": "Number of Retries",
@@ -16435,7 +17214,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Field Activity Type Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "Field Activity Type",
+     "label": "Field Activity Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Field Activity Type\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Field Activity Type Code",
      "label": "Field Activity Type Code",
@@ -16443,12 +17230,28 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Activity Status Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "Activity Status",
+     "label": "Activity Status",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Activity Status\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Activity Status Code",
      "label": "Activity Status Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "Flag. Filter on it; do not sum it.",
+     "group": "field_ops",
+     "id": "Is Open",
+     "label": "Is Open",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -16475,7 +17278,7 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "English description of \"Field Task Type Code\". Group and report on this; filter on the code.",
      "group": "field_ops",
      "id": "Field Task Type",
      "label": "Field Task Type",
@@ -16483,7 +17286,15 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Field Task Type\" for the description: report on the description, filter on the code.",
+     "group": "field_ops",
+     "id": "Field Task Type Code",
+     "label": "Field Task Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Cancel Reason Code\". Group and report on this; filter on the code.",
      "group": "field_ops",
      "id": "Cancel Reason",
      "label": "Cancel Reason",
@@ -16491,10 +17302,26 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Cancel Reason\" for the description: report on the description, filter on the code.",
+     "group": "field_ops",
+     "id": "Cancel Reason Code",
+     "label": "Cancel Reason Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"Reschedule Reason Code\". Group and report on this; filter on the code.",
      "group": "field_ops",
      "id": "Reschedule Reason",
      "label": "Reschedule Reason",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Reschedule Reason\" for the description: report on the description, filter on the code.",
+     "group": "field_ops",
+     "id": "Reschedule Reason Code",
+     "label": "Reschedule Reason Code",
      "role": "dimension",
      "type": "text"
     },
@@ -16813,12 +17640,19 @@
    "portal_enabled": true,
    "premade_reports": [
     {
+     "all_dates": true,
      "chart_type": "bar",
      "description": "Field work is the most expensive thing a utility does. Backlog by type shows which work is accumulating faster than the crews clear it.",
      "dimensions": [
-      "Activity Type"
+      "Field Activity Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Open",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "field_activity_backlog",
      "measures": [
       {
@@ -16828,58 +17662,46 @@
      ],
      "title": "What is the field activity backlog, by type?",
      "workstream_label": "Field Operations"
-    },
-    {
-     "benchmark": "high is good",
-     "chart_type": "pie",
-     "description": "First-time fix rate is the field KPI that moves cost and satisfaction together. Retries are the inverse: every one is a truck sent twice for the same job.",
-     "dimensions": [
-      "Activity Type"
-     ],
-     "filters": [],
-     "id": "kpi_first_time_fix",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "First-time fix \u2014 which field work needed more than one visit?",
-     "workstream_label": "Field Performance"
-    },
-    {
-     "chart_type": "bar",
-     "description": "An appointment is a commitment to a customer and a constraint on the crew's day. The proportion needing one is what makes a route plannable or not.",
-     "dimensions": [
-      "Activity Type"
-     ],
-     "filters": [],
-     "id": "field_appointments",
-     "measures": [
-      {
-       "agg": "count",
-       "field": "*"
-      }
-     ],
-     "title": "How much field work needs an appointment?",
-     "workstream_label": "Field Performance"
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "MDM field activity. Grain: Activity ID",
+   "summary": "MDM field activity.",
    "table_name": "rpt_field_activity",
    "trusted_measures": [],
    "usage_guidance": null,
-   "use_case": "(client configuration, never a hardcoded type list)",
+   "use_case": "Field work: the type, status, dates and outcome of every field activity.",
    "workstream": "field_ops",
    "workstream_label": "Field Operations"
   },
   "rpt_financial_txn": {
+   "aggregate": {
+    "build_column": "Canvas Build",
+    "count": "Record Count",
+    "date": "Accounting Date",
+    "dimensions": [
+     "FT Type",
+     "Adjustment Type",
+     "Adjustment Status Code",
+     "Revenue Class",
+     "SA Type",
+     "Service Type",
+     "Is Frozen",
+     "Is Bill Segment",
+     "Is Revenue Bearing",
+     "Is Adjustment",
+     "Is Payment",
+     "Is Payment Cancellation",
+     "Account Is On Budget"
+    ],
+    "measures": {
+     "Adjustment Amount": "sum",
+     "Current Amount": "sum"
+    },
+    "table": "agg_financial_txn_daily"
+   },
    "data_model": {
     "columns_traced_to_cisadm": 48,
     "domain_table": "rpt_financial_txn",
@@ -16946,6 +17768,7 @@
        "SA Start Date",
        "SA End Date",
        "Account ID",
+       "Account Is On Budget",
        "Main Customer Name",
        "Customer Class",
        "Customer Class Code",
@@ -17013,6 +17836,13 @@
       "on": "da.acct_id = sa.acct_id",
       "role": "model",
       "table": "dim_account"
+     },
+     {
+      "alias": "bud",
+      "join_type": "left join",
+      "on": "bud.acct_id = sa.acct_id",
+      "role": "model",
+      "table": "int_account_budget"
      },
      {
       "alias": "ftt",
@@ -17303,6 +18133,10 @@
     {
      "id": "Account ID",
      "label": "Account ID"
+    },
+    {
+     "id": "Account Is On Budget",
+     "label": "Account Is On Budget"
     },
     {
      "id": "Main Customer Name",
@@ -17635,7 +18469,7 @@
      "type": "text"
     },
     {
-     "description": "Currency measure, additive at this canvas's grain.",
+     "description": "The adjustment's amount (CI_ADJ.ADJ_AMT), on its AD transaction AND, with the SAME sign, on the AX transaction that cancels it -- so a plain sum counts every cancelled adjustment twice. Sum it with Is Adjustment = true and Adjustment Status Code = '50' (standing adjustments; 60 is cancelled). For the ledger net of charge and cancel, sum Current Amount instead. Ellensburg 2026-09-30: $15,572,430.42 unfiltered, $15,096,751.09 standing.",
      "group": "finance",
      "id": "Adjustment Amount",
      "label": "Adjustment Amount",
@@ -17643,7 +18477,7 @@
      "type": "numeric(15,2)"
     },
     {
-     "description": "Currency measure, additive at this canvas's grain.",
+     "description": "The adjustment's base amount (CI_ADJ.BASE_AMT), carried like Adjustment Amount on both the AD transaction and its AX cancellation: sum it only with Is Adjustment = true and Adjustment Status Code = '50'.",
      "group": "finance",
      "id": "Adjustment Base Amount",
      "label": "Adjustment Base Amount",
@@ -17843,6 +18677,14 @@
      "type": "text"
     },
     {
+     "description": "The transaction's account is on budget billing TODAY (any of its agreements, by C2M's own rule; int_account_budget), not when the transaction posted. For the Budget Billing folder's late fees; filter on it, do not sum it.",
+     "group": "finance",
+     "id": "Account Is On Budget",
+     "label": "Account Is On Budget",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
      "description": "Descriptive label.",
      "group": "finance",
      "id": "Main Customer Name",
@@ -17981,7 +18823,7 @@
    ],
    "grain": "financial transaction",
    "grain_description": "One row per financial transaction",
-   "label": "Financial Txn",
+   "label": "Financial Transaction",
    "large_domain": false,
    "max_rows": 500,
    "measures": [
@@ -18052,7 +18894,13 @@
      "dimensions": [
       "FT Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "financial_position",
      "measures": [
       {
@@ -18064,12 +18912,28 @@
      "workstream_label": "Financial Transactions"
     },
     {
-     "chart_type": "pie",
+     "chart_type": "horizontal",
      "description": "Adjustments are the manual override on an automated system. A type that grows is a process people have stopped trusting.",
      "dimensions": [
       "Adjustment Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Adjustment",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Adjustment Status Code",
+       "op": "eq",
+       "value": "50"
+      }
+     ],
      "id": "adjustments_by_type",
      "measures": [
       {
@@ -18112,15 +18976,51 @@
      ],
      "title": "Where does revenue come from, by revenue class?",
      "workstream_label": "Revenue"
+    },
+    {
+     "chart_type": "horizontal",
+     "description": "A late fee on a budget account means the level payment is not being kept. Covers accounts on budget today, including fees from before they joined; filter to your late-fee adjustment type.",
+     "dimensions": [
+      "Adjustment Type"
+     ],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Adjustment",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Adjustment Status Code",
+       "op": "eq",
+       "value": "50"
+      },
+      {
+       "field": "Account Is On Budget",
+       "op": "eq",
+       "value": true
+      }
+     ],
+     "id": "budget_late_fees",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Adjustment Amount"
+      }
+     ],
+     "title": "What are budget accounts being charged in late fees and other adjustments?",
+     "workstream_label": "Budget Billing"
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "every financial transaction. Grain: FT ID",
+   "summary": "Every financial transaction.",
    "table_name": "rpt_financial_txn",
    "trusted_measures": [
     "Current Amount",
@@ -18130,13 +19030,29 @@
     "Pay Segment Amount"
    ],
    "usage_guidance": null,
-   "use_case": "adjustments, deposits, write-offs, refunds). They were never different grains --",
+   "use_case": "Every financial transaction (bills, payments, adjustments, deposits, write-offs, refunds) for balance and revenue questions.",
    "workstream": "finance",
    "workstream_label": "Finance"
   },
   "rpt_gl": {
+   "aggregate": {
+    "build_column": "Canvas Build",
+    "count": "Record Count",
+    "date": "Accounting Date",
+    "dimensions": [
+     "GL Distribution Status",
+     "GL Account",
+     "Service Type",
+     "Is Debit",
+     "Is Extracted to GL"
+    ],
+    "measures": {
+     "GL Amount": "sum"
+    },
+    "table": "agg_gl_daily"
+   },
    "data_model": {
-    "columns_traced_to_cisadm": 30,
+    "columns_traced_to_cisadm": 31,
     "domain_table": "rpt_gl",
     "driving_table": "CI_ACCT",
     "field_groups": [
@@ -18159,6 +19075,7 @@
        "Created Date/Time",
        "Freeze Date/Time",
        "Transferred to GL Date",
+       "GL Extract Batch Code",
        "GL Extract Run Number",
        "Is Extracted to GL",
        "GL Distribution Status",
@@ -18308,6 +19225,10 @@
     {
      "id": "Currency Code",
      "label": "Currency Code"
+    },
+    {
+     "id": "GL Extract Batch Code",
+     "label": "GL Extract Batch Code"
     },
     {
      "id": "Is Extracted to GL",
@@ -18548,7 +19469,15 @@
      "type": "timestamp"
     },
     {
-     "description": "Which run of the GL extract shipped this transaction to the financial system. This is the value a GL file reconciles against. Null until the transaction has been extracted, which is the same population as a null Transferred to GL Date.",
+     "description": "Which configured GL extract shipped this transaction (C1-GLFCX, GL Extract for Oracle Financial Cloud, at the reference client). Run numbers are issued PER BATCH CODE, so this column QUALIFIES the Run Number beside it: reconcile a GL file on the pair, never on the run number alone. Most clients configure a single extract and this reads as a constant; demo25 runs two (C1-GLFCX and GLDL), which is why the column is on the canvas at all.",
+     "group": "finance",
+     "id": "GL Extract Batch Code",
+     "label": "GL Extract Batch Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Which run of the GL extract shipped this transaction to the financial system, numbered WITHIN its GL Extract Batch Code -- read the two together, because run 5 of one extract is a different file from run 5 of another. Null until the transaction has been extracted, which is the same population as a null Transferred to GL Date.",
      "group": "finance",
      "id": "GL Extract Run Number",
      "label": "GL Extract Run Number",
@@ -18758,7 +19687,7 @@
    ],
    "grain": "financial transaction + GL sequence number",
    "grain_description": "One row per financial transaction + GL sequence number",
-   "label": "Gl",
+   "label": "General Ledger",
    "large_domain": false,
    "max_rows": 500,
    "measures": [
@@ -18834,12 +19763,24 @@
    "portal_enabled": true,
    "premade_reports": [
     {
+     "all_dates": true,
      "chart_type": "bar",
      "description": "Financial transactions post to the GL on a schedule. Anything sitting unextracted is a reconciliation difference between C2M and the finance system.",
      "dimensions": [
       "GL Distribution Status"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Extracted to GL",
+       "op": "eq",
+       "value": false
+      },
+      {
+       "field": "Is Debit",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "gl_not_extracted",
      "measures": [
       {
@@ -18869,12 +19810,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "general ledger distribution. Grain: FT ID + GL Sequence Number",
+   "summary": "General ledger distribution.",
    "table_name": "rpt_gl",
    "trusted_measures": [
     "GL Sequence Number",
@@ -18885,7 +19824,7 @@
     "GL Extract Run Number"
    ],
    "usage_guidance": null,
-   "use_case": "One financial transaction posts MULTIPLE GL lines -- the double-entry debits and",
+   "use_case": "General ledger postings for each transaction, to reconcile to the ledger by account and distribution code.",
    "workstream": "finance",
    "workstream_label": "Finance"
   },
@@ -19355,7 +20294,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
-     "chart_type": "pie",
+     "chart_type": "bar",
      "description": "A read that is estimated or missing is the root of an estimated bill and a future dispute. This is the number that should be watched daily during an AMI rollout.",
      "dimensions": [
       "Device Type"
@@ -19364,21 +20303,19 @@
      "id": "read_coverage",
      "measures": [
       {
-       "agg": "count",
-       "field": "*"
+       "agg": "share",
+       "field": "Is Estimated Measurement"
       }
      ],
-     "title": "Read quality \u2014 how many measurements are estimated or missing?",
+     "title": "Read quality \u2014 what share of measurements are estimated, by device type?",
      "workstream_label": "Meter Reading"
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "interval and register measurements",
+   "summary": "Interval and register measurements.",
    "table_name": "rpt_measurement",
    "trusted_measures": [
     "Measurement Value",
@@ -19387,7 +20324,7 @@
     "Read Sequence"
    ],
    "usage_guidance": null,
-   "use_case": "The measuring component is the hinge between a measurement and a device:",
+   "use_case": "Meter readings and interval data by measuring component, with their condition (actual or estimated).",
    "workstream": "meter_ops",
    "workstream_label": "Meter Operations"
   },
@@ -19407,6 +20344,7 @@
        "Hours Since Previous Event",
        "MDM Activity ID",
        "Field Task Type",
+       "Field Task Type Code",
        "Device ID",
        "Meter Badge Number",
        "Device Is Retired",
@@ -19422,8 +20360,8 @@
       "label": "Meter Operations"
      }
     ],
-    "grain": "rpt_on_off_history",
-    "grain_description": "",
+    "grain": "install event + sequence (one connect or disconnect step)",
+    "grain_description": "One row per install event + sequence (one connect or disconnect step)",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
      {
@@ -19432,6 +20370,13 @@
       "on": "act.d1_activity_id = h.d1_activity_id",
       "role": "model",
       "table": "stg_d1_activity"
+     },
+     {
+      "alias": "tk",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_ext_lookup_value_label"
      },
      {
       "alias": "ie",
@@ -19525,6 +20470,10 @@
     {
      "id": "Field Task Type",
      "label": "Field Task Type"
+    },
+    {
+     "id": "Field Task Type Code",
+     "label": "Field Task Type Code"
     },
     {
      "id": "Device ID",
@@ -19621,10 +20570,18 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "English description of \"Field Task Type Code\". Group and report on this; filter on the code.",
      "group": "meter_ops",
      "id": "Field Task Type",
      "label": "Field Task Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Field Task Type\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "Field Task Type Code",
+     "label": "Field Task Type Code",
      "role": "dimension",
      "type": "text"
     },
@@ -19709,9 +20666,9 @@
      "type": "text"
     }
    ],
-   "grain": "rpt_on_off_history",
-   "grain_description": "",
-   "label": "On Off History",
+   "grain": "install event + sequence (one connect or disconnect step)",
+   "grain_description": "One row per install event + sequence (one connect or disconnect step)",
+   "label": "On/Off History",
    "large_domain": false,
    "max_rows": 500,
    "measures": [
@@ -19765,19 +20722,17 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "connect and disconnect history. Grain: Install Event ID + Sequence",
+   "summary": "Connect and disconnect history.",
    "table_name": "rpt_on_off_history",
    "trusted_measures": [
     "Event Sequence",
     "Hours Since Previous Event"
    ],
    "usage_guidance": null,
-   "use_case": "device was commanded on or off, when, and through which MDM activity. Landed and",
+   "use_case": "Connect and disconnect history: every time a meter was turned on or off, when, and why.",
    "workstream": "meter_ops",
    "workstream_label": "Meter Operations"
   },
@@ -19912,7 +20867,7 @@
     }
    ],
    "default_date_field": "Start Date",
-   "default_date_preset": "last_12_months",
+   "default_date_preset": "all_dates",
    "dimensions": [
     {
      "id": "Pay Plan ID",
@@ -20394,12 +21349,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "pay plans / payment arrangements. Grain: Pay Plan ID",
+   "summary": "Pay plans / payment arrangements.",
    "table_name": "rpt_pay_plan",
    "trusted_measures": [
     "Scheduled Payment Count",
@@ -20410,7 +21363,7 @@
     "Paid vs Elapsed Schedule Variance"
    ],
    "usage_guidance": null,
-   "use_case": "one account can hold several plans. Folding it into rpt_service_agreement would",
+   "use_case": "Payment arrangements: who is on a plan, what is scheduled, and which plans are kept or broken.",
    "workstream": "debt",
    "workstream_label": "Collections & Debt"
   },
@@ -21062,7 +22015,13 @@
      "dimensions": [
       "Cancel Reason"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": true
+      }
+     ],
      "id": "cancelled_payments",
      "measures": [
       {
@@ -21092,12 +22051,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "payments at pay-segment grain. Grain: Pay Segment ID",
+   "summary": "Payments at pay-segment grain.",
    "table_name": "rpt_payment",
    "trusted_measures": [
     "Event Tender Total",
@@ -21106,7 +22063,7 @@
     "Payment Amount (Header)"
    ],
    "usage_guidance": null,
-   "use_case": "segments (CI_PAY_SEG). The segment is the finest grain and the only one at which",
+   "use_case": "Payments and how each was applied across an account's service agreements, by date, tender and status.",
    "workstream": "cashiering",
    "workstream_label": "Cashiering & Payments"
   },
@@ -21756,7 +22713,13 @@
      "dimensions": [
       "Tender Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "payments_by_tender",
      "measures": [
       {
@@ -21769,12 +22732,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "tenders: how money physically arrived. Grain: Payment Tender ID",
+   "summary": "Tenders: how money physically arrived.",
    "table_name": "rpt_payment_tender",
    "trusted_measures": [
     "Tender Amount",
@@ -21784,13 +22745,13 @@
     "Deposit End Balance"
    ],
    "usage_guidance": null,
-   "use_case": "the payment: one tender can settle several payments, and one payment event can be",
+   "use_case": "How money arrived: cash, cheque, card or electronic transfer, by tender source and date.",
    "workstream": "cashiering",
    "workstream_label": "Cashiering & Payments"
   },
   "rpt_premise_sp": {
    "data_model": {
-    "columns_traced_to_cisadm": 38,
+    "columns_traced_to_cisadm": 41,
     "domain_table": "rpt_premise_sp",
     "driving_table": "CI_LOOKUP_VAL_L",
     "field_groups": [
@@ -21805,6 +22766,10 @@
        "Meter Read Cycle Code",
        "Meter Read Route Code",
        "Meter Read Route Sequence",
+       "Measurement Cycle Code",
+       "Measurement Cycle Route Code",
+       "Measurement Cycle Route Sequence",
+       "Measurement Cycle Route",
        "Meter Location Code",
        "Meter Location Details",
        "Meter Read Instruction Code",
@@ -21908,6 +22873,13 @@
       "table": "int_sp_device"
      },
      {
+      "alias": "d1sp",
+      "join_type": "left join",
+      "on": "d1sp.d1_sp_id = dev.d1_sp_id",
+      "role": "model",
+      "table": "stg_d1_service_point"
+     },
+     {
       "alias": "rec",
       "join_type": "left join",
       "on": "rec.d1_sp_id = dev.d1_sp_id",
@@ -21961,10 +22933,12 @@
      "D1_DVC_CFG",
      "D1_DVC_TYPE_L",
      "D1_MANUFACTURER_L",
-     "D1_MODEL_L"
+     "D1_MODEL_L",
+     "D1_SP"
     ],
     "trusted_measures": [
      "Meter Read Route Sequence",
+     "Measurement Cycle Route Sequence",
      "Service Point Count (Premise)",
      "SA Count (Premise)",
      "Billed Segment Count (Premise)",
@@ -22004,7 +22978,7 @@
     }
    ],
    "default_date_field": "SP Install Date",
-   "default_date_preset": "last_12_months",
+   "default_date_preset": "all_dates",
    "dimensions": [
     {
      "id": "Service Point ID",
@@ -22029,6 +23003,18 @@
     {
      "id": "Meter Read Route Code",
      "label": "Meter Read Route Code"
+    },
+    {
+     "id": "Measurement Cycle Code",
+     "label": "Measurement Cycle Code"
+    },
+    {
+     "id": "Measurement Cycle Route Code",
+     "label": "Measurement Cycle Route Code"
+    },
+    {
+     "id": "Measurement Cycle Route",
+     "label": "Measurement Cycle Route"
     },
     {
      "id": "Meter Location Code",
@@ -22249,7 +23235,7 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "CI_SP.MR_RTE_CD, CCB's own meter-read route. Empty at all six clients measured (0 of 502,622 service points, 2026-09-30): they read through MDM, whose route is Measurement Cycle Route. Kept for a client that routes in CCB.",
      "group": "meter_ops",
      "id": "Meter Read Route Code",
      "label": "Meter Read Route Code",
@@ -22263,6 +23249,38 @@
      "label": "Meter Read Route Sequence",
      "role": "measure",
      "type": "numeric(8,0)"
+    },
+    {
+     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "group": "meter_ops",
+     "id": "Measurement Cycle Code",
+     "label": "Measurement Cycle Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Measurement Cycle Route\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "Measurement Cycle Route Code",
+     "label": "Measurement Cycle Route Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Ordering sequence within its parent. Part of the grain, not a measure.",
+     "group": "meter_ops",
+     "id": "Measurement Cycle Route Sequence",
+     "label": "Measurement Cycle Route Sequence",
+     "role": "measure",
+     "type": "numeric(9,0)"
+    },
+    {
+     "description": "The MDM route the point is read on, as 'cycle / route' (D1_SP.MSRMT_CYC_CD and MSRMT_CYC_RTE_CD): the one to group a reading workload by, because route codes repeat across cycles (College Station: 53 codes on 376 routes, 2026-09-30). Null when the point has no route.",
+     "group": "meter_ops",
+     "id": "Measurement Cycle Route",
+     "label": "Measurement Cycle Route",
+     "role": "dimension",
+     "type": "text"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -22675,7 +23693,7 @@
    ],
    "grain": "service point",
    "grain_description": "One row per service point",
-   "label": "Premise Sp",
+   "label": "Premise Service Point",
    "large_domain": false,
    "max_rows": 500,
    "measures": [
@@ -22695,6 +23713,16 @@
      ],
      "id": "Meter Read Route Sequence",
      "label": "Meter Read Route Sequence"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Measurement Cycle Route Sequence",
+     "label": "Measurement Cycle Route Sequence"
     },
     {
      "aggs": [
@@ -22778,6 +23806,7 @@
      "workstream_label": "Service Point"
     },
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "Consumption nobody is being billed for. Either service started without an agreement or one was stopped while the meter kept running.",
      "dimensions": [
@@ -22798,7 +23827,7 @@
      "chart_type": "bar",
      "description": "Route size is the daily workload of a reader or the daily load on the head-end. A route far larger than its neighbours is the one that runs late.",
      "dimensions": [
-      "Meter Read Route Code"
+      "Measurement Cycle Route"
      ],
      "filters": [],
      "id": "meter_read_routes",
@@ -22830,15 +23859,14 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "service point with its premise and installed device",
+   "summary": "Service point with its premise and installed device.",
    "table_name": "rpt_premise_sp",
    "trusted_measures": [
     "Meter Read Route Sequence",
+    "Measurement Cycle Route Sequence",
     "Service Point Count (Premise)",
     "SA Count (Premise)",
     "Billed Segment Count (Premise)",
@@ -22847,7 +23875,7 @@
     "Unbilled Usage Transaction Count (Point)"
    ],
    "usage_guidance": null,
-   "use_case": "Service point rather than premise, because a premise holds several service points",
+   "use_case": "Service points with their premise and installed meter: what is connected, vacant or switched off, and where.",
    "workstream": "meter_ops",
    "workstream_label": "Meter Operations"
   },
@@ -22895,8 +23923,8 @@
       "label": "Billing & Rates"
      }
     ],
-    "grain": "rpt_rate_configuration",
-    "grain_description": "",
+    "grain": "rate schedule + calculation group role + calculation group + calculation rule",
+    "grain_description": "One row per rate schedule + calculation group role + calculation group + calculation rule",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
      {
@@ -22966,7 +23994,7 @@
     }
    ],
    "default_date_field": "Rate Version Effective Date",
-   "default_date_preset": "last_12_months",
+   "default_date_preset": "all_dates",
    "dimensions": [
     {
      "id": "Rate Schedule Code",
@@ -23327,8 +24355,8 @@
      "type": "boolean"
     }
    ],
-   "grain": "rpt_rate_configuration",
-   "grain_description": "",
+   "grain": "rate schedule + calculation group role + calculation group + calculation rule",
+   "grain_description": "One row per rate schedule + calculation group role + calculation group + calculation rule",
    "label": "Rate Configuration",
    "large_domain": false,
    "max_rows": 500,
@@ -23393,12 +24421,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "how each rate schedule actually calculates",
+   "summary": "How each rate schedule actually calculates.",
    "table_name": "rpt_rate_configuration",
    "trusted_measures": [
     "Role Sequence",
@@ -23406,7 +24432,7 @@
     "Eligibility Criteria Count"
    ],
    "usage_guidance": null,
-   "use_case": "Rate configuration was reportable nowhere: an analyst could see the RESULT of a",
+   "use_case": "How each rate schedule calculates: the rules, factors and components behind a charge.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -23446,8 +24472,8 @@
       "label": "Billing & Rates"
      }
     ],
-    "grain": "rpt_rate_schedule_history",
-    "grain_description": "",
+    "grain": "service agreement + rate schedule effective date",
+    "grain_description": "One row per service agreement + rate schedule effective date",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
      {
@@ -23779,8 +24805,8 @@
      "type": "varchar(60)"
     }
    ],
-   "grain": "rpt_rate_schedule_history",
-   "grain_description": "",
+   "grain": "service agreement + rate schedule effective date",
+   "grain_description": "One row per service agreement + rate schedule effective date",
    "label": "Rate Schedule History",
    "large_domain": false,
    "max_rows": 500,
@@ -23815,16 +24841,14 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "rate schedule history. Grain: Service Agreement ID + Effective Date",
+   "summary": "Rate schedule history.",
    "table_name": "rpt_rate_schedule_history",
    "trusted_measures": [],
    "usage_guidance": null,
-   "use_case": "reporting: a rate change lands here before its first bill lands anywhere else, so",
+   "use_case": "Who is on which rate since when, and what they were on before, for rate migration questions.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -24021,12 +25045,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "CONTROL / QA CANVAS (not an end-user analytics canvas).",
+   "summary": "CONTROL / QA CANVAS (not an end-user analytics canvas). Reconciles billed revenue from calc lines vs CI_FT (Bill Segment) per bill.",
    "table_name": "rpt_revenue_reconciliation",
    "trusted_measures": [
     "Calc Line Revenue",
@@ -24036,7 +25058,7 @@
     "Variance"
    ],
    "usage_guidance": null,
-   "use_case": "",
+   "use_case": "A control check that billed revenue ties from bill lines to financial transactions, one completed bill at a time.",
    "workstream": "finance",
    "workstream_label": "Finance"
   },
@@ -24084,8 +25106,8 @@
       "label": "Collections & Debt"
      }
     ],
-    "grain": "rpt_sa_aged_balance",
-    "grain_description": "",
+    "grain": "service agreement + snapshot date",
+    "grain_description": "One row per service agreement + snapshot date",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
      {
@@ -24136,7 +25158,7 @@
     }
    ],
    "default_date_field": "Snapshot Date",
-   "default_date_preset": "last_12_months",
+   "default_date_preset": "all_dates",
    "dimensions": [
     {
      "id": "Service Agreement ID",
@@ -24325,7 +25347,7 @@
      "type": "boolean"
     },
     {
-     "description": "",
+     "description": "The oldest arrears bucket carrying an amount: '121+', '91-120', '61-90', '31-60' or '0-30'; 'No Aged Debt' when no bucket does (a zero or credit balance). A closed set, asserted by assert_debt_band_values.",
      "group": "debt",
      "id": "Oldest Debt Band",
      "label": "Oldest Debt Band",
@@ -24477,9 +25499,9 @@
      "type": "varchar(60)"
     }
    ],
-   "grain": "rpt_sa_aged_balance",
-   "grain_description": "",
-   "label": "Sa Aged Balance",
+   "grain": "service agreement + snapshot date",
+   "grain_description": "One row per service agreement + snapshot date",
+   "label": "Service Agreement Aged Balance",
    "large_domain": false,
    "max_rows": 500,
    "measures": [
@@ -24627,12 +25649,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "the aged trial balance. Grain: Service Agreement ID + Snapshot Date",
+   "summary": "The aged trial balance.",
    "table_name": "rpt_sa_aged_balance",
    "trusted_measures": [
     "Current Balance",
@@ -24645,7 +25665,7 @@
     "Past Due Amount"
    ],
    "usage_guidance": null,
-   "use_case": "30/60/90/120 bands, as of the snapshot date. This is the canvas the Jaspersoft",
+   "use_case": "The aged trial balance: every service agreement's balance in 30, 60, 90 and 120-day bands as of the snapshot date.",
    "workstream": "debt",
    "workstream_label": "Collections & Debt"
   },
@@ -24685,6 +25705,8 @@
        "Start Reason",
        "Stop Reason",
        "Characteristic Premise ID",
+       "Premise Characteristics",
+       "Premise Characteristic Count",
        "Snapshot Date",
        "Snapshot Type Code",
        "Current Balance",
@@ -24714,7 +25736,9 @@
        "Collection Class",
        "Collection Class Code",
        "Bill Cycle",
-       "Budget Plan"
+       "Budget Plan",
+       "Is On Budget",
+       "Monthly Budget Amount"
       ],
       "id": "billing",
       "label": "Billing & Rates"
@@ -24779,6 +25803,20 @@
       "on": "da.acct_id = sa.acct_id",
       "role": "model",
       "table": "dim_account"
+     },
+     {
+      "alias": "bud",
+      "join_type": "left join",
+      "on": "bud.sa_id = sa.sa_id",
+      "role": "model",
+      "table": "int_sa_budget"
+     },
+     {
+      "alias": "pch",
+      "join_type": "left join",
+      "on": "pch.prem_id = sa.characteristic_prem_id",
+      "role": "step",
+      "table": "premise_characteristics"
      }
     ],
     "population_filter": null,
@@ -24800,6 +25838,7 @@
     "trusted_measures": [
      "Consecutive Estimated Bills",
      "Days Pending",
+     "Premise Characteristic Count",
      "Current Balance",
      "Total Balance",
      "New Charge Balance",
@@ -24811,7 +25850,8 @@
      "Total Arrears",
      "Days Unbilled",
      "Pay Plan Count",
-     "Active Pay Plan Count"
+     "Active Pay Plan Count",
+     "Monthly Budget Amount"
     ]
    },
    "date_fields": [
@@ -24849,7 +25889,7 @@
     }
    ],
    "default_date_field": "SA Start Date",
-   "default_date_preset": "last_12_months",
+   "default_date_preset": "all_dates",
    "dimensions": [
     {
      "id": "Service Agreement ID",
@@ -24940,6 +25980,10 @@
      "label": "Characteristic Premise ID"
     },
     {
+     "id": "Premise Characteristics",
+     "label": "Premise Characteristics"
+    },
+    {
      "id": "Snapshot Type Code",
      "label": "Snapshot Type Code"
     },
@@ -24994,6 +26038,10 @@
     {
      "id": "Budget Plan",
      "label": "Budget Plan"
+    },
+    {
+     "id": "Is On Budget",
+     "label": "Is On Budget"
     }
    ],
    "fields": [
@@ -25220,6 +26268,22 @@
      "label": "Characteristic Premise ID",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "",
+     "group": "billing",
+     "id": "Premise Characteristics",
+     "label": "Premise Characteristics",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Pre-aggregated count, additive at this canvas's grain.",
+     "group": "billing",
+     "id": "Premise Characteristic Count",
+     "label": "Premise Characteristic Count",
+     "role": "measure",
+     "type": "bigint"
     },
     {
      "description": "Date.",
@@ -25460,6 +26524,22 @@
      "label": "Budget Plan",
      "role": "dimension",
      "type": "varchar(60)"
+    },
+    {
+     "description": "On budget billing by C2M's own rule: a budget-ELIGIBLE SA type (ELIG_BUDGET_SW), Active or Pending Stop, with a current recurring charge above zero; on an account, any of its agreements. Not the Budget Plan code, which also sits on accounts that are not on budget (College Station: 104,826 carry a code, 965 are on budget).",
+     "group": "billing",
+     "id": "Is On Budget",
+     "label": "Is On Budget",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "The current monthly budget charge (the latest CI_SA_RCHG_HIST amount not in the future) of the agreements on budget; on an account, their sum. Blank when not on budget. Additive.",
+     "group": "billing",
+     "id": "Monthly Budget Amount",
+     "label": "Monthly Budget Amount",
+     "role": "measure",
+     "type": "numeric"
     }
    ],
    "grain": "service agreement",
@@ -25494,6 +26574,16 @@
      ],
      "id": "Days Pending",
      "label": "Days Pending"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Premise Characteristic Count",
+     "label": "Premise Characteristic Count"
     },
     {
      "aggs": [
@@ -25614,6 +26704,16 @@
      ],
      "id": "Active Pay Plan Count",
      "label": "Active Pay Plan Count"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Monthly Budget Amount",
+     "label": "Monthly Budget Amount"
     }
    ],
    "poc_enabled": true,
@@ -25652,19 +26752,41 @@
      ],
      "title": "Where do balances sit, by SA type?",
      "workstream_label": "Credit & Collections"
+    },
+    {
+     "chart_type": "horizontal",
+     "description": "Budget plans usually cover the large, seasonal services. An SA type on budget that should not be is a configuration question worth asking.",
+     "dimensions": [
+      "SA Type"
+     ],
+     "filters": [
+      {
+       "field": "Is On Budget",
+       "op": "eq",
+       "value": true
+      }
+     ],
+     "id": "budget_agreements_by_sa_type",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "Which services are on budget billing?",
+     "workstream_label": "Budget Billing"
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "service agreement: lifecycle, balance, arrears, pay plan",
+   "summary": "Service agreement: lifecycle, balance, arrears, pay plan.",
    "table_name": "rpt_service_agreement",
    "trusted_measures": [
     "Consecutive Estimated Bills",
     "Days Pending",
+    "Premise Characteristic Count",
     "Current Balance",
     "Total Balance",
     "New Charge Balance",
@@ -25676,10 +26798,11 @@
     "Total Arrears",
     "Days Unbilled",
     "Pay Plan Count",
-    "Active Pay Plan Count"
+    "Active Pay Plan Count",
+    "Monthly Budget Amount"
    ],
    "usage_guidance": null,
-   "use_case": "Absorbs four legacy canvases (sa_aged_balance, unbilled_sas, pay_plans,",
+   "use_case": "Service agreements with their lifecycle, balance, arrears and pay plan, for collections and account questions.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -25720,8 +26843,8 @@
       "label": "Cashiering & Payments"
      }
     ],
-    "grain": "rpt_tender_control",
-    "grain_description": "",
+    "grain": "tender control (one cash drawer session)",
+    "grain_description": "One row per tender control (one cash drawer session)",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
      {
@@ -26046,8 +27169,8 @@
      "type": "timestamp"
     }
    ],
-   "grain": "rpt_tender_control",
-   "grain_description": "",
+   "grain": "tender control (one cash drawer session)",
+   "grain_description": "One row per tender control (one cash drawer session)",
    "label": "Tender Control",
    "large_domain": false,
    "max_rows": 500,
@@ -26132,12 +27255,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "drawer balancing. Grain: Tender Control ID",
+   "summary": "Drawer balancing.",
    "table_name": "rpt_tender_control",
    "trusted_measures": [
     "Start Balance",
@@ -26147,7 +27268,7 @@
     "Deposit End Balance"
    ],
    "usage_guidance": null,
-   "use_case": "batch), its start and end balance, whether it has been balanced, by whom, and which",
+   "use_case": "Drawer balancing: each teller session's start and end balance, whether it balanced, and who balanced it.",
    "workstream": "cashiering",
    "workstream_label": "Cashiering & Payments"
   },
@@ -26379,7 +27500,7 @@
    ],
    "grain": "to-do entry",
    "grain_description": "One row per to-do entry",
-   "label": "Todo",
+   "label": "To Do",
    "large_domain": false,
    "max_rows": 500,
    "measures": [
@@ -26432,12 +27553,19 @@
      "workstream_label": "Work Queues"
     },
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "A to-do is work the system could not finish alone. The oldest ones are the exceptions nobody has been made responsible for.",
      "dimensions": [
       "To Do Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Complete",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "todo_oldest",
      "measures": [
       {
@@ -26450,19 +27578,17 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "to-do entries: the work queue C2M raises for staff",
+   "summary": "To-do entries: the work queue C2M raises for staff.",
    "table_name": "rpt_todo",
    "trusted_measures": [
     "Hours Open",
     "Drill Key Count"
    ],
    "usage_guidance": null,
-   "use_case": "Kept separate from rpt_exception on purpose. An exception is a data-quality failure",
+   "use_case": "To-do entries: the work C2M assigns to staff, with its owner, age and completion.",
    "workstream": "common",
    "workstream_label": "Operations & Shared Services"
   },
@@ -26512,8 +27638,8 @@
       "label": "Billing & Rates"
      }
     ],
-    "grain": "rpt_unbilled_revenue",
-    "grain_description": "",
+    "grain": "service agreement",
+    "grain_description": "One row per service agreement",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
      {
@@ -26614,7 +27740,7 @@
     }
    ],
    "default_date_field": "SA Start Date",
-   "default_date_preset": "last_12_months",
+   "default_date_preset": "all_dates",
    "dimensions": [
     {
      "id": "Service Agreement ID",
@@ -26979,8 +28105,8 @@
      "type": "varchar(60)"
     }
    ],
-   "grain": "rpt_unbilled_revenue",
-   "grain_description": "",
+   "grain": "service agreement",
+   "grain_description": "One row per service agreement",
    "label": "Unbilled Revenue",
    "large_domain": false,
    "max_rows": 500,
@@ -27047,6 +28173,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
+     "all_dates": true,
      "chart_type": "horizontal",
      "description": "Revenue earned and not invoiced. A stopped agreement awaiting a final bill is the expensive kind \u2014 the customer has gone.",
      "dimensions": [
@@ -27083,12 +28210,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "unbilled revenue drivers. Grain: Service Agreement ID",
+   "summary": "Unbilled revenue drivers.",
    "table_name": "rpt_unbilled_revenue",
    "trusted_measures": [
     "Days Since Last Billed",
@@ -27098,7 +28223,7 @@
     "Active Service Point Count"
    ],
    "usage_guidance": null,
-   "use_case": "\"UNBILLED\" IS SEVERAL DIFFERENT PROBLEMS, owned by different people, so this canvas",
+   "use_case": "Why service is not being billed: each reason flagged separately so the right team can work it.",
    "workstream": "billing",
    "workstream_label": "Billing & Rates"
   },
@@ -27128,6 +28253,7 @@
        "Measuring Component ID",
        "Device ID",
        "Meter Badge Number",
+       "Usage Status",
        "Usage Status Code",
        "Used on Bill Code",
        "Is Used on Bill",
@@ -27156,6 +28282,13 @@
       "on": "u.d1_usage_id = r.d1_usage_id",
       "role": "model",
       "table": "stg_d1_usage"
+     },
+     {
+      "alias": "ust",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_bo_status_label"
      },
      {
       "alias": "mc",
@@ -27302,6 +28435,10 @@
     {
      "id": "Meter Badge Number",
      "label": "Meter Badge Number"
+    },
+    {
+     "id": "Usage Status",
+     "label": "Usage Status"
     },
     {
      "id": "Usage Status Code",
@@ -27498,7 +28635,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Usage Status Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Usage Status",
+     "label": "Usage Status",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Usage Status\" for the description: report on the description, filter on the code.",
      "group": "meter_ops",
      "id": "Usage Status Code",
      "label": "Usage Status Code",
@@ -27604,7 +28749,7 @@
    ],
    "grain": "usage transaction + MDM service point + sequence",
    "grain_description": "One row per usage transaction + MDM service point + sequence",
-   "label": "Usage Txn",
+   "label": "Usage Transaction",
    "large_domain": false,
    "max_rows": 500,
    "measures": [
@@ -27688,12 +28833,10 @@
     }
    ],
    "related_snapshot": null,
-   "required_date_field": null,
-   "required_date_label": null,
    "schema": "reporting",
    "scope_filters": [],
    "skip_sample_rows": false,
-   "summary": "usage transactions at scalar-detail grain",
+   "summary": "Usage transactions at scalar-detail grain.",
    "table_name": "rpt_usage_txn",
    "trusted_measures": [
     "Sequence Number",
@@ -27703,18 +28846,22 @@
     "End Measurement"
    ],
    "usage_guidance": null,
-   "use_case": "(the real D1_USAGE_SCALAR_DTL key)",
+   "use_case": "Usage calculations from meter data that feed billing, by measuring component, with their status.",
    "workstream": "meter_ops",
    "workstream_label": "Meter Operations"
   }
  },
  "source": "dbt reporting layer",
  "workstream_featured": {
+  "assets": [
+   "rpt_asset_location",
+   "rpt_device_asset"
+  ],
   "billing": [
+   "rpt_bill",
    "rpt_bill_factor_price",
    "rpt_bill_segment",
-   "rpt_bill_segment_read",
-   "rpt_billable_charge"
+   "rpt_bill_segment_read"
   ],
   "cashiering": [
    "rpt_payment",
@@ -27723,7 +28870,6 @@
   ],
   "common": [
    "rpt_batch",
-   "rpt_bill",
    "rpt_characteristics",
    "rpt_todo"
   ],
@@ -27749,13 +28895,14 @@
    "rpt_revenue_reconciliation"
   ],
   "meter_ops": [
-   "rpt_asset_location",
-   "rpt_device_asset",
    "rpt_device_event",
-   "rpt_measurement"
+   "rpt_measurement",
+   "rpt_on_off_history",
+   "rpt_premise_sp"
   ]
  },
  "workstream_labels": {
+  "assets": "Asset Operations",
   "billing": "Billing & Rates",
   "cashiering": "Cashiering & Payments",
   "common": "Operations & Shared Services",
@@ -27773,6 +28920,7 @@
   "debt",
   "customer_ops",
   "meter_ops",
+  "assets",
   "field_ops",
   "common"
  ]

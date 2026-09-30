@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="INVOICE_SUMMARY" label="INVOICE_SUMMARY" resourceId="INVOICE_SUMMARY"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ADJ_ID" label="ADJ_ID" resourceId="INVOICE_SUMMARY.ADJ_ID"></item>
+    <item id="ADJ_TYPE_CD" label="ADJ_TYPE_CD" resourceId="INVOICE_SUMMARY.ADJ_TYPE_CD"></item>
+    <item id="ARS_DT" label="ARS_DT" resourceId="INVOICE_SUMMARY.ARS_DT"></item>
+    <item id="BSEG_ID" label="BSEG_ID" resourceId="INVOICE_SUMMARY.BSEG_ID"></item>
+    <item id="CUR_AMT" label="CUR_AMT" resourceId="INVOICE_SUMMARY.CUR_AMT"></item>
+    <item id="FT_ID" label="FT_ID" resourceId="INVOICE_SUMMARY.FT_ID"></item>
+    <item id="SPECIAL_ROLE_FLG" label="SPECIAL_ROLE_FLG" resourceId="INVOICE_SUMMARY.SPECIAL_ROLE_FLG"></item>
+    <item id="TOT_AMT" label="TOT_AMT" resourceId="INVOICE_SUMMARY.TOT_AMT"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="INVOICE_SUMMARY" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="FT_ID" type="java.lang.String"></field>
+        <field id="CUR_AMT" type="java.math.BigDecimal"></field>
+        <field id="TOT_AMT" type="java.math.BigDecimal"></field>
+        <field id="ARS_DT" type="java.sql.Timestamp"></field>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="SPECIAL_ROLE_FLG" type="java.lang.String"></field>
+        <field id="ADJ_ID" type="java.lang.String"></field>
+        <field id="ADJ_TYPE_CD" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT 
+    FT.FT_ID,
+    FT.CUR_AMT,
+    FT.TOT_AMT,
+    FT.ARS_DT,
+    BS.BSEG_ID,
+    SAT.SPECIAL_ROLE_FLG,
+    AD.ADJ_ID,
+    AD.ADJ_TYPE_CD
+FROM CISADM.CI_FT FT
+LEFT OUTER JOIN CISADM.CI_BSEG BS ON (FT.SIBLING_ID = BS.BSEG_ID AND BS.BSEG_STAT_FLG = '50' AND FT.FT_TYPE_FLG = 'BS')
+LEFT OUTER JOIN CISADM.CI_SA SA ON (SA.SA_ID = FT.SA_ID)
+LEFT OUTER JOIN CISADM.CI_SA_TYPE SAT ON (SA.SA_TYPE_CD = SAT.SA_TYPE_CD AND SA.CIS_DIVISION = SAT.CIS_DIVISION)
+LEFT OUTER JOIN CISADM.CI_ADJ AD ON (FT.SIBLING_ID = AD.ADJ_ID AND AD.ADJ_STATUS_FLG = '50' AND FT.FT_TYPE_FLG = 'AD')
+WHERE FT.FREEZE_SW = 'Y'
+AND FT.FT_TYPE_FLG IN ('BS','AD')
+AND (BS.BSEG_ID IS NOT NULL OR AD.ADJ_ID IS NOT NULL)</query>
+    </jdbcQuery>
+  </resources>
+</schema>

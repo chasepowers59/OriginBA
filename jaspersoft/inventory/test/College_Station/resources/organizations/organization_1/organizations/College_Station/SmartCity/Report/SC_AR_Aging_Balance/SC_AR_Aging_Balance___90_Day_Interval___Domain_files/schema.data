@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CollegeStation_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="CM_AGED_180" label="CM_AGED_180" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_CUR_AMT__1" label="Current Amount (91-180)" resourceId="JoinTree_1.CM_AGED_180.SUM_FT1_CUR_AMT__1"></item>
+        <item id="SUM_FT1_TOT_AMT__1" label="Payoff Amount (91-180)" resourceId="JoinTree_1.CM_AGED_180.SUM_FT1_TOT_AMT__1"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="CM_AGED_270" label="CM_AGED_270" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_CUR_AMT_" label="Current Amount (181-270)" resourceId="JoinTree_1.CM_AGED_270.SUM_FT1_CUR_AMT_"></item>
+        <item id="SUM_FT1_TOT_AMT_" label="Payoff Amount (181-270)" resourceId="JoinTree_1.CM_AGED_270.SUM_FT1_TOT_AMT_"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="CM_AGED_90" label="CM_AGED_90" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_CUR_AMT__2" label="Current Amount (0-90)" resourceId="JoinTree_1.CM_AGED_90.SUM_FT1_CUR_AMT__2"></item>
+        <item id="SUM_FT1_TOT_AMT__2" label="Payoff Amount(0-90)" resourceId="JoinTree_1.CM_AGED_90.SUM_FT1_TOT_AMT__2"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="CM_AGED_CURRENT" label="CM_AGED_CURRENT" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_CUR_AMT__4" label="Current Amount" resourceId="JoinTree_1.CM_AGED_CURRENT.SUM_FT1_CUR_AMT__4"></item>
+        <item id="SUM_FT1_TOT_AMT__4" label="Payoff Amount" resourceId="JoinTree_1.CM_AGED_CURRENT.SUM_FT1_TOT_AMT__4"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="CM_AGED_OLD" label="CM_AGED_OLD" resourceId="JoinTree_1">
+      <items>
+        <item id="SUM_FT1_CUR_AMT__3" label="Current Amount (&gt;270)" resourceId="JoinTree_1.CM_AGED_OLD.SUM_FT1_CUR_AMT__3"></item>
+        <item id="SUM_FT1_TOT_AMT__3" label="Payoff Amount (&gt;270)" resourceId="JoinTree_1.CM_AGED_OLD.SUM_FT1_TOT_AMT__3"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="CM_CUS_DETAILS" label="CM_CUS_DETAILS" resourceId="JoinTree_1">
+      <items>
+        <item id="ACCT_ID" label="Account Id" resourceId="JoinTree_1.CM_CUS_DETAILS.ACCT_ID"></item>
+        <item id="ADDRESS1" label="Address" resourceId="JoinTree_1.CM_CUS_DETAILS.ADDRESS1"></item>
+        <item id="BILL_CYC_CD" label="Bill Cycle Code" resourceId="JoinTree_1.CM_CUS_DETAILS.BILL_CYC_CD"></item>
+        <item id="CELLPHONE" label="Cell Phone" resourceId="JoinTree_1.CM_CUS_DETAILS.CELLPHONE"></item>
+        <item id="DST_ID" label="Distribution Code" resourceId="JoinTree_1.CM_CUS_DETAILS.DST_ID"></item>
+        <item id="ENTITY_NAME" label="Entity Name" resourceId="JoinTree_1.CM_CUS_DETAILS.ENTITY_NAME"></item>
+        <item id="HOMEPHONE" label="Home Phone" resourceId="JoinTree_1.CM_CUS_DETAILS.HOMEPHONE"></item>
+        <item id="PRIMARYEMAIL" label="Email" resourceId="JoinTree_1.CM_CUS_DETAILS.PRIMARYEMAIL"></item>
+        <item id="SA_ID" label="SA Id" resourceId="JoinTree_1.CM_CUS_DETAILS.SA_ID"></item>
+        <item id="SA_TYPE_CD" label="SA Type Code" resourceId="JoinTree_1.CM_CUS_DETAILS.SA_TYPE_CD"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="CM_AGED_270" datasourceId="CollegeStation_DS" datasourceTableName="CM_AGED_270" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT_" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT1_TOT_AMT_" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CM_AGED_180" datasourceId="CollegeStation_DS" datasourceTableName="CM_AGED_180" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT__1" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT1_TOT_AMT__1" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CM_AGED_90" datasourceId="CollegeStation_DS" datasourceTableName="CM_AGED_90" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT__2" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT1_TOT_AMT__2" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CM_AGED_OLD" datasourceId="CollegeStation_DS" datasourceTableName="CM_AGED_OLD" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT__3" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT1_TOT_AMT__3" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CM_AGED_CURRENT" datasourceId="CollegeStation_DS" datasourceTableName="CM_AGED_CURRENT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SUM_FT1_CUR_AMT__4" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="SUM_FT1_TOT_AMT__4" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CM_CUS_DETAILS" datasourceId="CollegeStation_DS" datasourceTableName="CM_CUS_DETAILS" schemaAlias="CISADM">
+      <fieldList>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="DST_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="HOMEPHONE" type="java.lang.String"></field>
+        <field id="CELLPHONE" type="java.lang.String"></field>
+        <field id="PRIMARYEMAIL" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="JoinTree_1" datasourceId="CollegeStation_DS" datasourceTableName="CM_CUS_DETAILS" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CM_AGED_OLD.SA_ID" type="java.lang.String"></field>
+        <field id="CM_AGED_OLD.SUM_FT1_CUR_AMT__3" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="CM_AGED_OLD.SUM_FT1_TOT_AMT__3" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="CM_AGED_180.SA_ID" type="java.lang.String"></field>
+        <field id="CM_AGED_180.SUM_FT1_CUR_AMT__1" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="CM_AGED_180.SUM_FT1_TOT_AMT__1" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="CM_AGED_90.SA_ID" type="java.lang.String"></field>
+        <field id="CM_AGED_90.SUM_FT1_CUR_AMT__2" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="CM_AGED_90.SUM_FT1_TOT_AMT__2" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="CM_AGED_CURRENT.SA_ID" type="java.lang.String"></field>
+        <field id="CM_AGED_CURRENT.SUM_FT1_CUR_AMT__4" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="CM_AGED_CURRENT.SUM_FT1_TOT_AMT__4" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+        <field id="CM_CUS_DETAILS.BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CM_CUS_DETAILS.SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="CM_CUS_DETAILS.ADDRESS1" type="java.lang.String"></field>
+        <field id="CM_CUS_DETAILS.ACCT_ID" type="java.lang.String"></field>
+        <field id="CM_CUS_DETAILS.SA_ID" type="java.lang.String"></field>
+        <field id="CM_CUS_DETAILS.DST_ID" type="java.lang.String"></field>
+        <field id="CM_CUS_DETAILS.ENTITY_NAME" type="java.lang.String"></field>
+        <field id="CM_CUS_DETAILS.HOMEPHONE" type="java.lang.String"></field>
+        <field id="CM_CUS_DETAILS.CELLPHONE" type="java.lang.String"></field>
+        <field id="CM_CUS_DETAILS.PRIMARYEMAIL" type="java.lang.String"></field>
+        <field id="CM_AGED_270.SA_ID" type="java.lang.String"></field>
+        <field id="CM_AGED_270.SUM_FT1_CUR_AMT_" fieldDBName="SUM(FT1.CUR_AMT)" type="java.math.BigDecimal"></field>
+        <field id="CM_AGED_270.SUM_FT1_TOT_AMT_" fieldDBName="SUM(FT1.TOT_AMT)" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <joinInfo alias="CM_CUS_DETAILS" referenceId="CM_CUS_DETAILS"></joinInfo>
+      <joinList>
+        <join expr="CM_CUS_DETAILS.SA_ID == CM_AGED_OLD.SA_ID" left="CM_CUS_DETAILS" right="CM_AGED_OLD" type="leftOuter" weight="1"></join>
+        <join expr="CM_CUS_DETAILS.SA_ID == CM_AGED_CURRENT.SA_ID" left="CM_CUS_DETAILS" right="CM_AGED_CURRENT" type="leftOuter" weight="1"></join>
+        <join expr="CM_CUS_DETAILS.SA_ID == CM_AGED_90.SA_ID" left="CM_CUS_DETAILS" right="CM_AGED_90" type="leftOuter" weight="1"></join>
+        <join expr="CM_CUS_DETAILS.SA_ID == CM_AGED_270.SA_ID" left="CM_CUS_DETAILS" right="CM_AGED_270" type="leftOuter" weight="1"></join>
+        <join expr="CM_CUS_DETAILS.SA_ID == CM_AGED_180.SA_ID" left="CM_CUS_DETAILS" right="CM_AGED_180" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CM_AGED_270" tableId="CM_AGED_270"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CM_AGED_180" tableId="CM_AGED_180"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CM_AGED_OLD" tableId="CM_AGED_OLD"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CM_AGED_90" tableId="CM_AGED_90"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CM_CUS_DETAILS" tableId="CM_CUS_DETAILS"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CM_AGED_CURRENT" tableId="CM_AGED_CURRENT"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

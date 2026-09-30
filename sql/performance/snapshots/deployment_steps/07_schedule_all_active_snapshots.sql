@@ -26,5 +26,5 @@ PROMPT [7/8] D1_USAGE_SCALAR_DTL_RPT_CURR scheduler job
 PROMPT [8/8] CMS_SA_SNAPSHOT scheduler job
 @@..\debt_mgmt\cms_sa_snapshot\05_schedule_cms_sa_snapshot_job.sql
 
-PROMPT Apply the approved 6-hour staggered cadence to all active jobs
-@@..\apply_6hour_staggered_schedule_1am_base.sql
+PROMPT Apply the approved 2x-daily staggered cadence to all active jobs
+@@..\apply_3x_daily_schedule_11utc_base.sql

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reportUnit exportedWithPermissions="true">
+    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports</folder>
+    <name>adj_ap_requests_control</name>
+    <version>1</version>
+    <label>Adjustment A/P Requests - Control</label>
+    <description>Every adjustment A/P request in a window, grouped by request status and adjustment status, with the action each combination needs: a request the ERP canceled while the adjustment is still open must have its adjustment canceled by a user; a </description>
+    <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+    <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+    <mainReport>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" dataFile="Main_jrxml.data" xsi:type="fileResource">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files</folder>
+            <name>Main_jrxml</name>
+            <version>0</version>
+            <label>Main jrxml</label>
+            <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+            <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+            <fileType>jrxml</fileType>
+        </localResource>
+    </mainReport>
+    <dataSource>
+        <uri>/organizations/organization_1/organizations/Origin_DEV/DataSource/Origin_DEV_DS</uri>
+    </dataSource>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files</folder>
+            <name>FROM_DT</name>
+            <version>0</version>
+            <label>Adjustment created date from (inclusive)</label>
+            <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+            <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+            <type>2</type>
+            <mandatory>true</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files/FROM_DT_files</folder>
+                    <name>myDatatype</name>
+                    <version>0</version>
+                    <label>myDatatype</label>
+                    <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+                    <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+                    <type>3</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files</folder>
+            <name>TO_DT</name>
+            <version>0</version>
+            <label>Adjustment created date to (inclusive)</label>
+            <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+            <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+            <type>2</type>
+            <mandatory>true</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files/TO_DT_files</folder>
+                    <name>myDatatype</name>
+                    <version>0</version>
+                    <label>myDatatype</label>
+                    <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+                    <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+                    <type>3</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files</folder>
+            <name>REQ_STATUS_F</name>
+            <version>0</version>
+            <label>A/P request status (blank = all)</label>
+            <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+            <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+            <type>4</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files/REQ_STATUS_F_files</folder>
+                    <name>REQ_STATUS_F_query</name>
+                    <version>0</version>
+                    <label>REQ_STATUS_F_query</label>
+                    <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+                    <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+                    <language>sql</language>
+                    <queryString>SELECT TRIM(l.field_value) AS CODE, TRIM(l.field_value) || ' - ' || l.descr AS DESCR FROM CISADM.CI_LOOKUP_VAL_L l WHERE TRIM(l.field_name) = 'PYMNT_SEL_STAT_FLG' AND l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ADJ_APREQ r JOIN CISADM.CI_ADJ a ON a.adj_id = r.adj_id WHERE TRIM(r.pymnt_sel_stat_flg) = TRIM(l.field_value) AND a.cre_dt &gt;= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1</queryString>
+                    <dataSource>
+                        <uri>/organizations/organization_1/organizations/Origin_DEV/DataSource/Origin_DEV_DS</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>DESCR</queryVisibleColumn>
+            <queryValueColumn>CODE</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files</folder>
+            <name>ADJ_STATUS_F</name>
+            <version>0</version>
+            <label>Adjustment status (blank = all)</label>
+            <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+            <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+            <type>4</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files/ADJ_STATUS_F_files</folder>
+                    <name>ADJ_STATUS_F_query</name>
+                    <version>0</version>
+                    <label>ADJ_STATUS_F_query</label>
+                    <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+                    <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+                    <language>sql</language>
+                    <queryString>SELECT TRIM(l.field_value) AS CODE, TRIM(l.field_value) || ' - ' || l.descr AS DESCR FROM CISADM.CI_LOOKUP_VAL_L l WHERE TRIM(l.field_name) = 'ADJ_STATUS_FLG' AND l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ADJ a JOIN CISADM.CI_ADJ_APREQ r ON r.adj_id = a.adj_id WHERE TRIM(a.adj_status_flg) = TRIM(l.field_value) AND a.cre_dt &gt;= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1</queryString>
+                    <dataSource>
+                        <uri>/organizations/organization_1/organizations/Origin_DEV/DataSource/Origin_DEV_DS</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>DESCR</queryVisibleColumn>
+            <queryValueColumn>CODE</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files</folder>
+            <name>ACTION_ONLY_F</name>
+            <version>0</version>
+            <label>Action needed only (type anything for yes) (blank = all)</label>
+            <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+            <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+            <type>2</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files/ACTION_ONLY_F_files</folder>
+                    <name>myDatatype</name>
+                    <version>0</version>
+                    <label>myDatatype</label>
+                    <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+                    <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+                    <type>1</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files</folder>
+            <name>ACCT_ID_F</name>
+            <version>0</version>
+            <label>Account ID (blank = all)</label>
+            <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+            <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+            <type>2</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files/ACCT_ID_F_files</folder>
+                    <name>myDatatype</name>
+                    <version>0</version>
+                    <label>myDatatype</label>
+                    <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+                    <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+                    <type>1</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+        </localResource>
+    </inputControl>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false"
+            dataFile="adj_ap_requests_detail.data" xsi:type="fileResource">
+            <folder>/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Standardized_Reports/adj_ap_requests_control_files</folder>
+            <name>adj_ap_requests_detail</name>
+            <version>0</version>
+            <label>adj_ap_requests_detail</label>
+            <creationDate>2026-09-23T14:49:19.000Z</creationDate>
+            <updateDate>2026-09-23T14:49:19.000Z</updateDate>
+            <fileType>jrxml</fileType>
+        </localResource>
+    </resource>
+    <alwaysPromptControls>true</alwaysPromptControls>
+    <controlsLayout>1</controlsLayout>
+</reportUnit>

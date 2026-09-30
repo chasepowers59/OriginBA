@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Second_River_Water_Consumption_Summary" label="Second_River_Water_Consumption_Summary" resourceId="Second_River_Water_Consumption_Summary"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="BILLING_TYPE" label="BILLING_TYPE" resourceId="Second_River_Water_Consumption_Summary.BILLING_TYPE"></item>
+    <item id="CONSUMPTION" label="CONSUMPTION" resourceId="Second_River_Water_Consumption_Summary.CONSUMPTION"></item>
+    <item id="END_DT" label="END_DT" resourceId="Second_River_Water_Consumption_Summary.END_DT"></item>
+    <item id="SECOND_RIVER" label="SECOND_RIVER" resourceId="Second_River_Water_Consumption_Summary.SECOND_RIVER"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Second_River_Water_Consumption_Summary" datasourceId="Newark1_DS">
+      <fieldList>
+        <field id="BILLING_TYPE" type="java.lang.String"></field>
+        <field id="CONSUMPTION" type="java.math.BigDecimal"></field>
+        <field id="SECOND_RIVER" type="java.lang.String"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>SELECT EXT.DESCR "BILLING_TYPE", M.MSRMT_VAL "CONSUMPTION", BS.END_DT, CVL.DESCR "SECOND_RIVER"
+FROM CISADM.CI_PREM PRM
+INNER JOIN CISADM.CI_PREM_CHAR PCH ON PCH.PREM_ID = PRM.PREM_ID 
+    AND PCH.CHAR_TYPE_CD = 'SCNDRVR'
+INNER JOIN CISADM.CI_CHAR_VAL_L CVL ON CVL.CHAR_TYPE_CD = PCH.CHAR_TYPE_CD
+    AND CVL.CHAR_VAL = PCH.CHAR_VAL
+    AND CVL.LANGUAGE_CD = 'ENG'
+INNER JOIN CISADM.D1_SP_IDENTIFIER SPID ON SPID.ID_VALUE = PRM.PREM_ID
+    AND SPID.SP_ID_TYPE_FLG = 'D1EP'
+INNER JOIN CISADM.D1_SP SP ON SP.D1_SP_ID = SPID.D1_SP_ID
+INNER JOIN CISADM.D1_SP_TYPE SPTY ON SPTY.D1_SP_TYPE_CD = SP.D1_SP_TYPE_CD
+    AND SPTY.D1_SVC_TYPE_CD = 'W'
+INNER JOIN CISADM.D1_INSTALL_EVT IE ON IE.D1_SP_ID = SP.D1_SP_ID
+INNER JOIN CISADM.D1_DVC_CFG DC ON DC.DEVICE_CONFIG_ID = IE.DEVICE_CONFIG_ID
+INNER JOIN CISADM.D1_MEASR_COMP MC ON MC.DEVICE_CONFIG_ID = DC.DEVICE_CONFIG_ID
+INNER JOIN CISADM.D1_MSRMT M ON M.MEASR_COMP_ID = MC.MEASR_COMP_ID
+INNER JOIN CISADM.F1_EXT_LOOKUP_VAL_L EXT ON EXT.BUS_OBJ_CD = 'D1-MeasurementConditionLookup'
+    AND EXT.F1_EXT_LOOKUP_VALUE = M.MSRMT_COND_FLG
+INNER JOIN CISADM.CI_SA SA ON SA.CHAR_PREM_ID = PRM.PREM_ID
+INNER JOIN CISADM.CI_SA_TYPE SAT ON SAT.SA_TYPE_CD = SA.SA_TYPE_CD
+    AND SAT.CIS_DIVISION = SA.CIS_DIVISION
+    AND SAT.SVC_TYPE_CD = 'W'
+INNER JOIN CISADM.CI_BSEG BS ON BS.SA_ID = SA.SA_ID
+    AND BS.BSEG_STAT_FLG = '50'
+    AND BS.CLOSING_BSEG_SW = 'N'
+WHERE TRUNC(M.MSRMT_LOCAL_DTTM) &gt; BS.START_DT AND TRUNC(M.MSRMT_LOCAL_DTTM) &lt;= BS.END_DT
+AND M.MSRMT_USE_FLG != 'D101'
+UNION ALL
+SELECT 'Final Bill' "BILLING_TYPE", NVL(BSQ.BILL_SQ,0) "CONSUMPTION", BS.END_DT, CVL.DESCR "SECOND_RIVER"
+FROM CISADM.CI_PREM PRM
+INNER JOIN CISADM.CI_PREM_CHAR PCH ON PCH.PREM_ID = PRM.PREM_ID 
+    AND PCH.CHAR_TYPE_CD = 'SCNDRVR'
+INNER JOIN CISADM.CI_CHAR_VAL_L CVL ON CVL.CHAR_TYPE_CD = PCH.CHAR_TYPE_CD
+    AND CVL.CHAR_VAL = PCH.CHAR_VAL
+    AND CVL.LANGUAGE_CD = 'ENG'
+INNER JOIN CISADM.CI_SA SA ON SA.CHAR_PREM_ID = PCH.PREM_ID
+INNER JOIN CISADM.CI_SA_TYPE SAT ON SAT.SA_TYPE_CD = SA.SA_TYPE_CD
+    AND SAT.CIS_DIVISION = SA.CIS_DIVISION
+    AND SAT.SVC_TYPE_CD = 'W'
+INNER JOIN CISADM.CI_BSEG BS ON BS.SA_ID = SA.SA_ID
+    AND BS.BSEG_STAT_FLG = '50'
+    AND BS.CLOSING_BSEG_SW = 'Y'
+INNER JOIN CISADM.CI_BSEG_SQ BSQ ON BSQ.BSEG_ID = BS.BSEG_ID
+    AND BSQ.UOM_CD !=  ' '
+    AND BSQ.TOU_CD = ' '
+    AND BSQ.SQI_CD = ' '</query>
+    </jdbcQuery>
+  </resources>
+</schema>

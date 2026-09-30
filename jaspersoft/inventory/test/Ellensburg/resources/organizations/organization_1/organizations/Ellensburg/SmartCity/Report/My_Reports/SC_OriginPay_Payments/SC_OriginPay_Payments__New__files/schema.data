@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="SC_ORIGIN_PAY" label="SC_ORIGIN_PAY" resourceId="SC_ORIGIN_PAY"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCOUNT_ID" label="Account ID" resourceId="SC_ORIGIN_PAY.ACCOUNT_ID"></item>
+    <item id="CONVINIENCE_FEE" label="Convinience Fee" resourceId="SC_ORIGIN_PAY.CONVINIENCE_FEE"></item>
+    <item id="OCX_ORDER_ID" label="OCX Order ID" resourceId="SC_ORIGIN_PAY.OCX_ORDER_ID"></item>
+    <item id="PAYMENT_AMOUNT" label="Payment Amount" resourceId="SC_ORIGIN_PAY.PAYMENT_AMOUNT"></item>
+    <item id="PAYMENT_DATE" label="Payment Date" resourceId="SC_ORIGIN_PAY.PAYMENT_DATE"></item>
+    <item id="PAYMENT_EVENT_ID" label="Payment Event ID" resourceId="SC_ORIGIN_PAY.PAYMENT_EVENT_ID"></item>
+    <item id="TENDER_STATUS" label="Tender Status" resourceId="SC_ORIGIN_PAY.TENDER_STATUS"></item>
+    <item id="TENDER_TYPE_CD" label="Tender Type" resourceId="SC_ORIGIN_PAY.TENDER_TYPE_CD"></item>
+    <item id="PAYEVT_CRE_DTTM" label="Payment Event Create Date / Time" resourceId="SC_ORIGIN_PAY.PAYEVT_CRE_DTTM"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="SC_ORIGIN_PAY" datasourceId="Ellensburg_DS">
+      <fieldList>
+        <field id="PAYMENT_EVENT_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_ID" type="java.lang.String"></field>
+        <field id="PAYMENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="PAYMENT_AMOUNT" type="java.math.BigDecimal"></field>
+        <field id="CONVINIENCE_FEE" type="java.math.BigDecimal"></field>
+        <field id="OCX_ORDER_ID" type="java.lang.String"></field>
+        <field id="TENDER_STATUS" type="java.lang.String"></field>
+        <field id="TENDER_TYPE_CD" type="java.lang.String"></field>
+        <field id="PAYEVT_CRE_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>SELECT
+    payevt.pay_event_id                               AS payment_event_id,
+    paytndr.payor_acct_id                             AS account_id,
+    payevt.pay_dt                                     AS payment_date,
+    paytndr.tender_amt                                AS payment_amount,
+    nvl(to_number(paytndrchar2.adhoc_char_val), 0)    AS convinience_fee,
+    nvl(paytndrchar1.adhoc_char_val, 'Not Available') AS ocx_order_id,
+    lookup.descr                                      AS tender_status,
+    paytndr.tender_type_cd                            AS tender_type_cd,
+    payevt.CRE_DTTM                                   AS payevt_cre_dttm
+FROM
+    cisadm.ci_pay           pay,
+    cisadm.ci_pay_tndr      paytndr,
+    cisadm.ci_pay_event     payevt,
+    cisadm.ci_pay_tndr_char paytndrchar1,
+    cisadm.ci_pay_tndr_char paytndrchar2,
+    cisadm.ci_lookup_val_l  lookup,
+    dual                    d
+WHERE
+    payevt.pay_event_id = pay.pay_event_id
+    AND payevt.pay_event_id = paytndr.pay_event_id
+    AND pay.pay_status_flg = '50'
+    AND paytndr.tender_type_cd IN ( 'OPCC' )
+    AND paytndrchar1.pay_tender_id (+) = paytndr.pay_tender_id
+    AND paytndrchar1.char_type_cd (+) = 'OCX-ORID'
+    AND paytndrchar2.pay_tender_id (+) = paytndr.pay_tender_id
+    AND paytndrchar2.char_type_cd (+) = 'OCX-CFAM'
+    AND d.dummy &lt;&gt; paytndrchar1.char_type_cd (+)
+    AND d.dummy &lt;&gt; paytndrchar2.char_type_cd (+)
+    AND lookup.field_name = 'TNDR_STATUS_FLG'
+    AND lookup.field_value = paytndr.tndr_status_flg
+union
+SELECT
+    payevt.pay_event_id                               AS payment_event_id,
+    paytndr.payor_acct_id                             AS account_id,
+    payevt.pay_dt                                     AS payment_date,
+    paytndr.tender_amt                                AS payment_amount,
+    nvl(to_number(paytndrchar2.adhoc_char_val), 0)               AS convinience_fee,
+    'Not Available'                                               AS ocx_order_id,
+    lookup.descr                                      AS tender_status,
+    paytndr.tender_type_cd                            AS tender_type_cd,
+    payevt.CRE_DTTM                                   AS payevt_cre_dttm
+FROM
+    cisadm.ci_pay           pay,
+    cisadm.ci_pay_tndr      paytndr,
+    cisadm.ci_pay_event     payevt,
+    cisadm.ci_pay_tndr_char paytndrchar1,
+    cisadm.ci_pay_tndr_char paytndrchar2,
+    cisadm.ci_lookup_val_l  lookup,
+    dual                    d
+WHERE
+    payevt.pay_event_id = pay.pay_event_id
+    AND payevt.pay_event_id = paytndr.pay_event_id
+    AND pay.pay_status_flg = '50'
+    AND paytndr.tender_type_cd IN ( 'OPOC' )
+    AND paytndrchar1.pay_tender_id (+) = paytndr.pay_tender_id
+    AND paytndrchar1.char_type_cd (+) = 'OCX-ORID'
+    AND paytndrchar2.pay_tender_id (+) = paytndr.pay_tender_id
+    AND paytndrchar2.char_type_cd (+) = 'OCX-CFAM'
+    AND d.dummy &lt;&gt; paytndrchar1.char_type_cd (+)
+    AND d.dummy &lt;&gt; paytndrchar2.char_type_cd (+)
+    AND lookup.field_name = 'TNDR_STATUS_FLG'
+    AND lookup.field_value = paytndr.tndr_status_flg</query>
+    </jdbcQuery>
+  </resources>
+</schema>

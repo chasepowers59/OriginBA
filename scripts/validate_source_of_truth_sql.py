@@ -35,6 +35,7 @@ SUPPLEMENTAL_ALLOWED_TABLES = {
     "CI_CC_TYPE_L",
     "CI_DEBT_CL_L",
     "CI_SA_TYPE",
+    "CI_SA_TYPE_L",
     "CI_ALERT_TYPE_L",
     "CI_TENDER_TYPE_L",
     # Core usage/reporting tables may be absent from partial metadata snapshots.
@@ -61,6 +62,13 @@ SUPPLEMENTAL_ALLOWED_TABLES = {
     "ALL_CONS_COLUMNS",
     "ALL_INDEXES",
     "ALL_IND_COLUMNS",
+    "ALL_VIEWS",
+    "ALL_DEPENDENCIES",
+    "ALL_MVIEWS",
+    "ALL_SYNONYMS",
+    "ALL_TAB_PARTITIONS",
+    "ALL_TAB_STATISTICS",
+    "ALL_TAB_COL_STATISTICS",
 }
 
 

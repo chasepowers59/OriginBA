@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Water_Service_Counts" label="Water_Service_Counts" resourceId="Water_Service_Counts"></itemGroup>
+    <itemGroup id="Waste_Water_Service_Counts" label="Waste_Water_Service_Counts" resourceId="Waste_Water_Service_Counts"></itemGroup>
+  </dataIslands>
+  <items>
+    <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="COMBINED" label="Customer Class / SA Type" resourceId="Water_Service_Counts.COMBINED"></item>
+    <item id="CUST_CL" label="Customer Class" resourceId="Water_Service_Counts.CUST_CL"></item>
+    <item id="SA_TYPE_CD" label="Service Agreement Type" resourceId="Water_Service_Counts.SA_TYPE_CD"></item>
+    <item id="END_DT" label="End Date" resourceId="Water_Service_Counts.END_DT"></item>
+    <item id="SA_STATUS_FLG" label="SA Status" resourceId="Water_Service_Counts.SA_STATUS_FLG"></item>
+    <item id="START_DT" label="Start Date" resourceId="Water_Service_Counts.START_DT"></item>
+    <item id="CLASS_SA_TYPE_COUNTS" label="Customer Class / SA Count" resourceId="Water_Service_Counts.CLASS_SA_TYPE_COUNTS"></item>
+    <item id="CLASS_SA_TYPE_COUNTS_1" label="Customer Class / SA Count" resourceId="Waste_Water_Service_Counts.CLASS_SA_TYPE_COUNTS"></item>
+    <item defaultAgg="CountDistinct" dimensionOrMeasure="Measure" id="COMBINED_1" label="Customer Class / SA Type" resourceId="Waste_Water_Service_Counts.COMBINED"></item>
+    <item id="CUST_CL_1" label="Customer Class" resourceId="Waste_Water_Service_Counts.CUST_CL"></item>
+    <item id="END_DT_1" label="End Date" resourceId="Waste_Water_Service_Counts.END_DT"></item>
+    <item id="SA_STATUS_FLG_1" label="SA Status" resourceId="Waste_Water_Service_Counts.SA_STATUS_FLG"></item>
+    <item id="SA_TYPE_CD_1" label="Service Agreement Type" resourceId="Waste_Water_Service_Counts.SA_TYPE_CD"></item>
+    <item id="START_DT_1" label="Start Date" resourceId="Waste_Water_Service_Counts.START_DT"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Water_Service_Counts" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="CUST_CL" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="COMBINED" type="java.lang.String"></field>
+        <field id="CLASS_SA_TYPE_COUNTS" dataSetExpression="CountDistinct(COMBINED, 'Current')" type="java.lang.Long"></field>
+      </fieldList>
+      <query>select CUST_CL || ' - ' || SA_TYPE_CD AS COMBINED, CUST_CL, SA_TYPE_CD, START_DT, END_DT, SA_STATUS_FLG from (
+select case 
+        when a.cust_cl_cd = 'C' then 'Commercial'
+        when a.cust_cl_cd = 'R' then 'Residential'
+        when a.cust_cl_cd = 'PA' then 'Public Authority'
+        when a.cust_cl_cd = 'M' then 'Municipal'
+        when a.cust_cl_cd = 'W' then 'Wholesale'
+        when a.cust_cl_cd = 'F' then 'Facility'
+        when a.cust_cl_cd = 'P' then 'Preferred Plumber &amp; Contractor'
+        when a.cust_cl_cd = 'V' then 'Non-Billed FD/Const'
+        when a.cust_cl_cd = 'I' then  'Industrial'        
+        else ' '
+       end CUST_CL
+,sa.sa_type_cd, sa.start_dt, sa.end_dt, sa.sa_status_flg from cisadm.ci_sa sa, cisadm.ci_acct a 
+    where sa.sa_type_cd in (select st.sa_type_cd from cisadm.ci_sa_type st where st.svc_type_cd = 'W') 
+        and a.acct_id = sa.acct_id)</query>
+    </jdbcQuery>
+    <jdbcQuery id="Waste_Water_Service_Counts" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="CUST_CL" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="COMBINED" type="java.lang.String"></field>
+        <field id="CLASS_SA_TYPE_COUNTS" dataSetExpression="CountDistinct(COMBINED, 'Current')" type="java.lang.Long"></field>
+      </fieldList>
+      <query>select CUST_CL || ' - ' || SA_TYPE_CD AS COMBINED, CUST_CL, SA_TYPE_CD, START_DT, END_DT, SA_STATUS_FLG from (
+select case 
+        when a.cust_cl_cd = 'C' then 'Commercial'
+        when a.cust_cl_cd = 'R' then 'Residential'
+        when a.cust_cl_cd = 'PA' then 'Public Authority'
+        when a.cust_cl_cd = 'M' then 'Municipal'
+        when a.cust_cl_cd = 'W' then 'Wholesale'
+        when a.cust_cl_cd = 'F' then 'Facility'
+        when a.cust_cl_cd = 'P' then 'Preferred Plumber &amp; Contractor'
+        when a.cust_cl_cd = 'V' then 'Non-Billed FD/Const'
+        when a.cust_cl_cd = 'I' then  'Industrial'        
+        else ' '
+       end CUST_CL
+,sa.sa_type_cd, sa.start_dt, sa.end_dt, sa.sa_status_flg from cisadm.ci_sa sa, cisadm.ci_acct a 
+    where sa.sa_type_cd in (select st.sa_type_cd from cisadm.ci_sa_type st where st.svc_type_cd = 'WW') 
+        and a.acct_id = sa.acct_id)</query>
+    </jdbcQuery>
+  </resources>
+</schema>

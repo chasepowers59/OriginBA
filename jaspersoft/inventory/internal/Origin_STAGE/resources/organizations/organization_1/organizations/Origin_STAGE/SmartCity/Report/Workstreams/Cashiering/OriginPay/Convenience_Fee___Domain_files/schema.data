@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Origin_STAGE_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="CM_CONVINIENCE_FEE_VW" label="1.) Convinience Fee View" resourceId="JoinTree_1">
+      <items>
+        <item id="OCX_ORDER_ID" label="OCX Order ID" resourceId="JoinTree_1.CM_CONVENIENCE_FEE_VW.OCX_ORDER_ID"></item>
+        <item id="PAY_DT" label="Payment Date" resourceId="JoinTree_1.CM_CONVENIENCE_FEE_VW.PAY_DT"></item>
+        <item id="PAY_EVENT_ID" label="Payment Event ID" resourceId="JoinTree_1.CM_CONVENIENCE_FEE_VW.PAY_EVENT_ID"></item>
+        <item id="PAYOR_ACCT_ID" label="Payor Account" resourceId="JoinTree_1.CM_CONVENIENCE_FEE_VW.PAYOR_ACCT_ID"></item>
+        <item id="CONVENIENCE_FEE" label="Convenience Fee" resourceId="JoinTree_1.CM_CONVENIENCE_FEE_VW.CONVENIENCE_FEE"></item>
+        <item id="TENDER_AMT" label="Tender Amount" resourceId="JoinTree_1.CM_CONVENIENCE_FEE_VW.TENDER_AMT"></item>
+        <item id="TENDER_TYPE_CD" label="Tender Type" resourceId="JoinTree_1.CM_CONVENIENCE_FEE_VW.TENDER_TYPE_CD"></item>
+        <item id="TNDR_STATUS_FLG" label="Tender Status" resourceId="JoinTree_1.CM_CONVENIENCE_FEE_VW.TNDR_STATUS_FLG"></item>
+        <item id="TNDR_CTL_ID" label="Tender Control ID" resourceId="JoinTree_1.CM_CONVENIENCE_FEE_VW.TNDR_CTL_ID"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet1" label="1.) Descriptions" resourceId="JoinTree_1">
+      <items>
+        <item id="DESCR_1" label="Tender Status Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+        <item id="DESCR" label="Tender Type Description" resourceId="JoinTree_1.CI_TENDER_TYPE_L.DESCR"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet2" label="1.) Formulas" resourceId="JoinTree_1">
+      <items>
+        <item id="PAY_EVENT_ID_DISTINCT" label="Distinct Payment Event ID" resourceId="JoinTree_1.PAY_EVENT_ID_DISTINCT"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="CI_TENDER_TYPE_L" datasourceId="Origin_STAGE_DS" datasourceTableName="CI_TENDER_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="TENDER_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG'</filterString>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="Origin_STAGE_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="DESCR_OVRD" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>LANGUAGE_CD == 'ENG' and FIELD_NAME == 'TNDR_STATUS_FLG               '</filterString>
+    </jdbcTable>
+    <jdbcQuery id="CM_CONVENIENCE_FEE_VW" datasourceId="Origin_STAGE_DS">
+      <fieldList>
+        <field id="OCX_ORDER_ID" type="java.lang.String"></field>
+        <field id="TENDER_TYPE_CD" type="java.lang.String"></field>
+        <field id="PAY_EVENT_ID" type="java.lang.String"></field>
+        <field id="PAYOR_ACCT_ID" type="java.lang.String"></field>
+        <field id="PAY_DT" type="java.sql.Timestamp"></field>
+        <field id="TENDER_AMT" type="java.math.BigDecimal"></field>
+        <field id="TNDR_STATUS_FLG" type="java.lang.String"></field>
+        <field id="TNDR_CTL_ID" type="java.lang.String"></field>
+        <field id="CONVENIENCE_FEE" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+    payevt.pay_event_id,
+    paytndr.payor_acct_id,
+    payevt.pay_dt ,
+    paytndr.tender_amt ,
+    nvl(to_number(paytndrchar2.adhoc_char_val), 0)    AS convenience_fee,
+    nvl(paytndrchar1.adhoc_char_val, 'Not Available') AS ocx_order_id,
+    paytndr.tender_type_cd,
+    paytndr.tndr_status_flg,
+    paytndr.tndr_ctl_id
+FROM
+    cisadm.ci_pay           pay,
+    cisadm.ci_pay_tndr      paytndr,
+    cisadm.ci_pay_event     payevt,
+    cisadm.ci_pay_tndr_char paytndrchar1,
+    cisadm.ci_pay_tndr_char paytndrchar2,
+    dual                    d
+WHERE
+    payevt.pay_event_id = pay.pay_event_id
+    AND payevt.pay_event_id = paytndr.pay_event_id
+    AND pay.pay_status_flg = '50'
+    AND paytndr.tender_type_cd IN ( 'OPCC' )
+    AND paytndrchar1.pay_tender_id (+) = paytndr.pay_tender_id
+    AND paytndrchar1.char_type_cd (+) = 'OCX-ORID'
+    AND paytndrchar2.pay_tender_id (+) = paytndr.pay_tender_id
+    AND paytndrchar2.char_type_cd (+) = 'OCX-CFAM'
+    AND d.dummy &lt;&gt; paytndrchar1.char_type_cd (+)
+    AND d.dummy &lt;&gt; paytndrchar2.char_type_cd (+)
+union
+SELECT
+    payevt.pay_event_id,
+    paytndr.payor_acct_id,
+    payevt.pay_dt,
+    paytndr.tender_amt,
+    nvl(to_number(paytndrchar2.adhoc_char_val), 0)               AS convenience_fee,
+    'Not Available'                                               AS ocx_order_id,
+    paytndr.tender_type_cd,
+    paytndr.tndr_status_flg,
+    paytndr.tndr_ctl_id
+FROM
+    cisadm.ci_pay           pay,
+    cisadm.ci_pay_tndr      paytndr,
+    cisadm.ci_pay_event     payevt,
+    cisadm.ci_pay_tndr_char paytndrchar1,
+    cisadm.ci_pay_tndr_char paytndrchar2,
+    dual                    d
+WHERE
+    payevt.pay_event_id = pay.pay_event_id
+    AND payevt.pay_event_id = paytndr.pay_event_id
+    AND pay.pay_status_flg = '50'
+    AND paytndr.tender_type_cd IN ( 'OPOC' )
+    AND paytndrchar1.pay_tender_id (+) = paytndr.pay_tender_id
+    AND paytndrchar1.char_type_cd (+) = 'OCX-ORID'
+    AND paytndrchar2.pay_tender_id (+) = paytndr.pay_tender_id
+    AND paytndrchar2.char_type_cd (+) = 'OCX-CFAM'
+    AND d.dummy &lt;&gt; paytndrchar1.char_type_cd (+)
+    AND d.dummy &lt;&gt; paytndrchar2.char_type_cd (+)</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_1" datasourceId="Origin_STAGE_DS">
+      <fieldList>
+        <field id="CI_TENDER_TYPE_L.TENDER_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_TENDER_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_TENDER_TYPE_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_TENDER_TYPE_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CM_CONVENIENCE_FEE_VW.OCX_ORDER_ID" type="java.lang.String"></field>
+        <field id="CM_CONVENIENCE_FEE_VW.TENDER_TYPE_CD" type="java.lang.String"></field>
+        <field id="CM_CONVENIENCE_FEE_VW.PAY_EVENT_ID" type="java.lang.String"></field>
+        <field id="CM_CONVENIENCE_FEE_VW.PAYOR_ACCT_ID" type="java.lang.String"></field>
+        <field id="CM_CONVENIENCE_FEE_VW.PAY_DT" type="java.sql.Timestamp"></field>
+        <field id="CM_CONVENIENCE_FEE_VW.TENDER_AMT" type="java.math.BigDecimal"></field>
+        <field id="CM_CONVENIENCE_FEE_VW.TNDR_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CM_CONVENIENCE_FEE_VW.TNDR_CTL_ID" type="java.lang.String"></field>
+        <field id="CM_CONVENIENCE_FEE_VW.CONVENIENCE_FEE" type="java.math.BigDecimal"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR_OVRD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCRLONG" type="java.lang.String"></field>
+        <field id="PAY_EVENT_ID_DISTINCT" dataSetExpression="CountDistinct(CM_CONVENIENCE_FEE_VW.PAY_EVENT_ID, 'Current')" type="java.lang.Long"></field>
+      </fieldList>
+      <filterString>CI_LOOKUP_VAL_L.FIELD_NAME == 'TNDR_STATUS_FLG               ' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG' and CI_TENDER_TYPE_L.LANGUAGE_CD == 'ENG'</filterString>
+      <joinInfo alias="CM_CONVENIENCE_FEE_VW" referenceId="CM_CONVENIENCE_FEE_VW"></joinInfo>
+      <joinList>
+        <join expr="CM_CONVENIENCE_FEE_VW.TENDER_TYPE_CD == CI_TENDER_TYPE_L.TENDER_TYPE_CD and CI_TENDER_TYPE_L.LANGUAGE_CD == 'ENG'" left="CM_CONVENIENCE_FEE_VW" right="CI_TENDER_TYPE_L" type="inner" weight="1"></join>
+        <join expr="CM_CONVENIENCE_FEE_VW.TNDR_STATUS_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'TNDR_STATUS_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="CM_CONVENIENCE_FEE_VW" right="CI_LOOKUP_VAL_L" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>SELECT
+    payevt.pay_event_id,
+    paytndr.payor_acct_id,
+    payevt.pay_dt ,
+    paytndr.tender_amt ,
+    nvl(to_number(paytndrchar2.adhoc_char_val), 0)    AS convenience_fee,
+    nvl(paytndrchar1.adhoc_char_val, 'Not Available') AS ocx_order_id,
+    paytndr.tender_type_cd,
+    paytndr.tndr_status_flg,
+    paytndr.tndr_ctl_id
+FROM
+    cisadm.ci_pay           pay,
+    cisadm.ci_pay_tndr      paytndr,
+    cisadm.ci_pay_event     payevt,
+    cisadm.ci_pay_tndr_char paytndrchar1,
+    cisadm.ci_pay_tndr_char paytndrchar2,
+    dual                    d
+WHERE
+    payevt.pay_event_id = pay.pay_event_id
+    AND payevt.pay_event_id = paytndr.pay_event_id
+    AND pay.pay_status_flg = '50'
+    AND paytndr.tender_type_cd IN ( 'OPCC' )
+    AND paytndrchar1.pay_tender_id (+) = paytndr.pay_tender_id
+    AND paytndrchar1.char_type_cd (+) = 'OCX-ORID'
+    AND paytndrchar2.pay_tender_id (+) = paytndr.pay_tender_id
+    AND paytndrchar2.char_type_cd (+) = 'OCX-CFAM'
+    AND d.dummy &lt;&gt; paytndrchar1.char_type_cd (+)
+    AND d.dummy &lt;&gt; paytndrchar2.char_type_cd (+)
+union
+SELECT
+    payevt.pay_event_id,
+    paytndr.payor_acct_id,
+    payevt.pay_dt,
+    paytndr.tender_amt,
+    nvl(to_number(paytndrchar2.adhoc_char_val), 0)               AS convenience_fee,
+    'Not Available'                                               AS ocx_order_id,
+    paytndr.tender_type_cd,
+    paytndr.tndr_status_flg,
+    paytndr.tndr_ctl_id
+FROM
+    cisadm.ci_pay           pay,
+    cisadm.ci_pay_tndr      paytndr,
+    cisadm.ci_pay_event     payevt,
+    cisadm.ci_pay_tndr_char paytndrchar1,
+    cisadm.ci_pay_tndr_char paytndrchar2,
+    dual                    d
+WHERE
+    payevt.pay_event_id = pay.pay_event_id
+    AND payevt.pay_event_id = paytndr.pay_event_id
+    AND pay.pay_status_flg = '50'
+    AND paytndr.tender_type_cd IN ( 'OPOC' )
+    AND paytndrchar1.pay_tender_id (+) = paytndr.pay_tender_id
+    AND paytndrchar1.char_type_cd (+) = 'OCX-ORID'
+    AND paytndrchar2.pay_tender_id (+) = paytndr.pay_tender_id
+    AND paytndrchar2.char_type_cd (+) = 'OCX-CFAM'
+    AND d.dummy &lt;&gt; paytndrchar1.char_type_cd (+)
+    AND d.dummy &lt;&gt; paytndrchar2.char_type_cd (+)</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CM_CONVENIENCE_FEE_VW" tableId="CM_CONVENIENCE_FEE_VW"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

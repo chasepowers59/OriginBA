@@ -63,4 +63,5 @@ Do not import from server root (same rule as Origin_STAGE / Origin_DEV).
 - `prepared_imports/` — generated import ZIPs (gitignored)
 - `archive/` — source exports after successful batch (gitignored)
 
-See [jaspersoft_client_promotion_pipeline.md](/Users/chase/OriginBA-3/docs/jaspersoft_client_promotion_pipeline.md).
+See [jaspersoft_client_promotion_pipeline.md](/Users/chase/OriginBA-3/jaspersoft/docs/jaspersoft_client_promotion_pipeline.md).
+\n\n## client_org_mapping.csv is GENERATED (2026-09-08)\n\nRows come from `jaspersoft.tenant_org` / `jaspersoft.ds_name` in `~/originba_dbt/clients.yml`; regenerate with `scripts/client_registry.py export` there (or `scripts/regenerate_all.sh`). Edit the registry, not this file.\n

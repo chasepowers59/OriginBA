@@ -11,9 +11,12 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 VIEWS_PATH = ROOT / "data" / "analytics_portal" / "saved_views.json"
-MAX_VIEWS = 24
+# Per organization. Past it a save is refused out loud: the store used to drop the oldest
+# view silently, so saving one could delete a colleague's.
+MAX_VIEWS = 200
 
 from api import portal_state_store as _pss  # noqa: E402
+from api.ownership import clean_folder  # noqa: E402
 _COLLECTION = "saved_views"
 
 
@@ -49,6 +52,12 @@ def list_saved_views(organization_id: str) -> list[dict[str, Any]]:
     return sorted(views, key=lambda v: v.get("saved_at", ""), reverse=True)
 
 
+def _refuse_past_limit(others: list[dict[str, Any]]) -> None:
+    if len(others) >= MAX_VIEWS:
+        raise SavedViewError(f"This organization has reached its limit of {MAX_VIEWS} saved views. "
+                             "Delete one you no longer need, then save again.")
+
+
 def create_saved_view(payload: dict[str, Any], *, organization_id: str) -> dict[str, Any]:
     required = ("snapshot_id", "snapshot_label", "title", "kind")
     for key in required:
@@ -71,34 +80,64 @@ def create_saved_view(payload: dict[str, Any], *, organization_id: str) -> dict[
         # above stay populated with the first measure for backward compatibility
         # with tiles/readers that predate the array.
         "measures": payload.get("measures"),
+        # The scoping the user applied when they saved. Without it the view reopens
+        # over the whole canvas: different numbers, no warning. scope_field/value
+        # below hold only ONE pair and predate the builder's filters shelf.
+        "filters": payload.get("filters"),
         "chart_type": payload.get("chart_type"),
         "date_preset": payload.get("date_preset"),
         "date_start": payload.get("date_start"),
         "date_end": payload.get("date_end"),
         "scope_field": payload.get("scope_field"),
         "scope_value": payload.get("scope_value"),
+        "owner_id": payload.get("owner_id"),
+        "owner_email": payload.get("owner_email"),
+        "visibility": payload.get("visibility") or "organization",
+        "folder": clean_folder(payload.get("folder")),
         "saved_at": datetime.now(timezone.utc).isoformat(),
     }
 
+    # Re-saving YOUR view (same canvas, title and owner) replaces it; a colleague's view
+    # with the same title is theirs and is left alone.
+    same = lambda v: (v.get("snapshot_id") == entry["snapshot_id"] and v.get("title") == entry["title"]  # noqa: E731
+                      and v.get("owner_id") == entry["owner_id"])
     if _pss.enabled():
-        # de-dupe on (snapshot_id, title), then cap to MAX_VIEWS newest-first
-        for v in _pss.list_records(_COLLECTION, organization_id):
-            if v.get("snapshot_id") == entry["snapshot_id"] and v.get("title") == entry["title"]:
+        # re-saving a view (same canvas and title) replaces it; a new one needs room
+        existing = _pss.list_records(_COLLECTION, organization_id)
+        _refuse_past_limit([v for v in existing if not same(v)])
+        for v in existing:
+            if same(v):
                 _pss.delete(_COLLECTION, v["id"], organization_id)
         _pss.upsert(_COLLECTION, entry["id"], organization_id, entry)
-        for stale in _pss.list_records(_COLLECTION, organization_id)[MAX_VIEWS:]:
-            _pss.delete(_COLLECTION, stale["id"], organization_id)
         return entry
 
     store = _load_store()
     views = [v for v in store.get("views", []) if _matches_scope(v, organization_id)]
-    views = [v for v in views if not (v["snapshot_id"] == entry["snapshot_id"] and v["title"] == entry["title"])]
-    views = [entry, *views][:MAX_VIEWS]
+    views = [v for v in views if not same(v)]
+    _refuse_past_limit(views)
+    views = [entry, *views]
 
     other = [v for v in store.get("views", []) if not _matches_scope(v, organization_id)]
     store["views"] = other + views
     _save_store(store)
     return entry
+
+
+def update_saved_view(view_id: str, patch: dict[str, Any], *, organization_id: str) -> dict[str, Any] | None:
+    """Change what a view is filed under; its definition is never edited in place (save anew)."""
+    found = next((v for v in list_saved_views(organization_id) if v.get("id") == view_id), None)
+    if not found:
+        return None
+    if "folder" in patch:
+        found = {**found, "folder": clean_folder(patch["folder"])}
+    if _pss.enabled():
+        _pss.upsert(_COLLECTION, view_id, organization_id, found)
+        return found
+    store = _load_store()
+    store["views"] = [found if (v.get("id") == view_id and _matches_scope(v, organization_id)) else v
+                      for v in store.get("views", [])]
+    _save_store(store)
+    return found
 
 
 def delete_saved_view(view_id: str, *, organization_id: str) -> bool:

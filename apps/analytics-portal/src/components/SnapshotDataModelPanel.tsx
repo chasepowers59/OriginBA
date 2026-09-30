@@ -6,6 +6,8 @@ import { printLineagePack } from "@/lib/lineagePack";
 import { fieldRoleLabel } from "@/lib/businessLabels";
 import type { FieldDef, SnapshotDataModel, SnapshotMetadata } from "@/lib/types";
 import { cisadmTableGuide } from "@/lib/cisadmTableGuide";
+import { trustedMeasureSet } from "@/lib/trustedMeasures";
+import { formatDateTime } from "@/lib/format";
 
 type ModelTab = "overview" | "tables" | "joins" | "fields";
 
@@ -77,7 +79,7 @@ export function SnapshotDataModelPanel({
           {model.snapshot_table} · grain: {model.grain}
         </p>
         <p className="mt-2 text-xs text-fg-muted">
-          Generated {new Date().toLocaleString()} · {brand.name}
+          Generated {formatDateTime(new Date())} · {brand.name}
         </p>
         <hr className="my-4 border-slate-300" />
       </div>
@@ -111,7 +113,7 @@ export function SnapshotDataModelPanel({
               onClick={() => setTab(key)}
               className={`rounded-xl px-2 py-2.5 text-xs font-medium transition sm:text-sm ${
  tab === key
- ? "bg-gradient-to-r from-primary to-accent-2 text-heading ring-1 ring-edge"
+ ? "tint-active text-heading ring-1 ring-edge"
  : "text-fg-muted hover:bg-chip hover:text-heading"
  }`}
             >
@@ -235,9 +237,9 @@ function OverviewTab({
 
 function TablesTab({ model }: { model: SnapshotDataModel }) {
   const grouped = useMemo(() => {
-    // Two catalog shapes: the legacy Oracle build emits {table, role, alias} objects;
-    // the dbt build emits plain CISADM table names (lineage-derived — no per-table role,
-    // so they all group under "source"). Normalise so both render.
+    // Two payload shapes: older saved payloads carry {table, role, alias} objects; the
+    // catalog emits plain CISADM table names (lineage-derived — no per-table role, so
+    // they all group under "source"). Normalise so both render.
     const normalized = model.source_tables.map((t) =>
       typeof t === "string" ? { table: t, role: "source", alias: undefined } : t,
     );
@@ -312,7 +314,7 @@ function JoinsTab({ model, onPrint }: { model: SnapshotDataModel; onPrint?: () =
         ) : null}
       </div>
       <div className="relative space-y-3">
-        <div className="absolute bottom-4 left-5 top-4 w-px bg-gradient-to-b from-primary to-accent-2" />
+        <div className="absolute bottom-4 left-5 top-4 w-px tint-rule" />
         {model.driving_table ? (
           <div className="relative pl-12">
             <span className="absolute left-3 top-4 h-4 w-4 rounded-full bg-ok ring-4 ring-ok" />
@@ -368,7 +370,7 @@ function FieldsTab({
   onRoleFilterChange: (value: string) => void;
   trustedMeasures: string[];
 }) {
-  const trusted = new Set(trustedMeasures.map((m) => m.toUpperCase()));
+  const trusted = trustedMeasureSet(trustedMeasures);
 
   return (
     <div className="space-y-4">

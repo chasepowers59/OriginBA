@@ -6,7 +6,7 @@ Artifacts:
 - `standard_offering_package_audit.json`
 - `standard_offering_verification.json`
 - detailed runbook:
-  - [jaspersoft_standard_offering_build_and_import_runbook_2026-04-24.md](/Users/chase/OriginBA-3/docs/jaspersoft_standard_offering_build_and_import_runbook_2026-04-24.md)
+  - [jaspersoft_standard_offering_build_and_import_runbook_2026-04-24.md](/Users/chase/OriginBA-3/jaspersoft/docs/jaspersoft_standard_offering_build_and_import_runbook_2026-04-24.md)
 - one-command rebuild wrapper:
   - [run_standard_offering_pipeline.py](/Users/chase/OriginBA-3/scripts/jaspersoft/run_standard_offering_pipeline.py)
 

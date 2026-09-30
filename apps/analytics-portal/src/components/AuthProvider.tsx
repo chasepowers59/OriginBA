@@ -13,6 +13,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { AuthUser } from "@/lib/auth";
 import { authDisabled, getAccessToken, hasPermission } from "@/lib/auth";
 import { fetchAuthStatus, fetchCurrentUser, logout as clearAuth } from "@/lib/authApi";
+import { isPublicPath } from "@/lib/publicPaths";
 
 type AuthContextValue = {
   loading: boolean;
@@ -25,8 +26,6 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const PUBLIC_PATHS = ["/login", "/change-password"];
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -35,42 +34,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
 
   const refresh = useCallback(async () => {
-    if (authDisabled()) {
-      setEnabled(false);
-      setUser({
-        id: "dev-user",
-        email: "dev@origin.local",
-        display_name: "Development User",
-        role: "admin",
-        client_id: "demo",
-        organization_id: "ellensburg",
-        organization_name: "Ellensburg",
-        is_active: true,
-        must_change_password: false,
-        workstreams: ["*"],
-        permissions: [
-          "portal:read",
-          "report_library:read",
-          "snapshots:read",
-          "snapshots:query",
-          "nlq:read",
-          "saved_views:write",
-          "dashboards:write",
-          "explorer:builder",
-          "users:manage",
-          "groups:manage",
-          "data_source:manage",
-          "snapshots:raw_sql",
-          "settings:manage",
-        ],
-        group_ids: [],
-        group_names: [],
-      });
-      setLoading(false);
-      return;
-    }
-
-    const status = await fetchAuthStatus();
+    // The client flag only skips the login redirect; it must not invent an identity.
+    // A fabricated user drifted from the API's dev context -- which builds itself from
+    // `dev_organization_id()` and so cannot be tracked by a constant -- and the header
+    // ended up naming one tenant over another tenant's data.
+    const status = authDisabled() ? { enabled: false } : await fetchAuthStatus();
     setEnabled(status.enabled);
     if (!status.enabled) {
       // Open-access mode still HAS a user -- the API answers /auth/me with its dev
@@ -110,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (loading || authDisabled() || !enabled) return;
-    const isPublic = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+    const isPublic = isPublicPath(pathname);
     if (!user && !isPublic) {
       router.replace(`/login?next=${encodeURIComponent(pathname)}`);
       return;

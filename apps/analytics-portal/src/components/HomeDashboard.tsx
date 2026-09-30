@@ -1,16 +1,21 @@
 "use client";
+import { ChevronDown } from "lucide-react";
 import { brandLine } from "../lib/brand";
 
 import { useEffect, useState } from "react";
 import { fetchSnapshots } from "@/lib/api";
 import Link from "next/link";
-import type { SnapshotSummary } from "@/lib/types";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
 import { ExecutiveDashboard } from "@/components/ExecutiveDashboard";
 import { NlqSearchPanel } from "@/components/NlqSearchPanel";
+import { OriInsights } from "@/components/OriInsights";
+import { AssistantPanel } from "@/components/AssistantPanel";
 import { useBrand } from "@/components/PortalThemeProvider";
+import { isRestricted } from "@/lib/rowRules";
+import { useAuth } from "@/components/AuthProvider";
 
 export function HomeDashboard() {
+  const { user } = useAuth();
   const brand = useBrand();
   const [snapshotCount, setSnapshotCount] = useState(0);
   const [workstreamCount, setWorkstreamCount] = useState(0);
@@ -26,36 +31,34 @@ export function HomeDashboard() {
 
   return (
     <div className="space-y-8">
-      <section className="glass-panel relative overflow-hidden p-8 md:p-10">
-        <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-band blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 left-1/3 h-48 w-48 rounded-full text-chart-2 blur-3xl" />
-        <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
-            {brandLine(brand)}
-          </p>
-          <h1 className="mt-2 max-w-2xl text-4xl font-bold tracking-tight text-heading md:text-5xl">
-            Governed analytics across{" "}
-            <span className="bg-gradient-to-r from-primary to-accent-2 bg-clip-text text-transparent">
-              every utility workstream
-            </span>
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-fg-muted">
-            {brand.tagline}. Explore any reporting table yourself, start from a governed
-            report pack for billing close, payments, operations and collections, or ask a
-            question in plain language.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/build" className="btn-primary">
-              Explore your data
+      {/* A compact bar, not a landing page. Signed in, the reader already knows what the
+          product is; the marketing hero cost roughly half a laptop viewport before a
+          single number appeared, so the executive overview began below the fold on the
+          screen people open every morning. The two entry points and the honest counts
+          stay -- only the pitch goes. */}
+      <section className="glass-panel relative overflow-hidden px-5 py-4">
+        <div className="pointer-events-none absolute -right-20 -top-24 h-48 w-48 rounded-full bg-band blur-3xl" />
+        <div className="relative flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-heading-accent">
+              {brandLine(brand)}
+            </p>
+            <p className="mt-0.5 text-sm text-fg-muted">
+              {/* Real counts only — fabricated placeholders confidently lied when the
+                  API was down. */}
+              {workstreamCount
+                ? `${workstreamCount} workstreams · ${snapshotCount} data sets`
+                : "\u00a0"}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/build" className="btn-primary text-sm">
+              Build a view
             </Link>
-            <Link href="/reports" className="btn-ghost">
+            <Link href="/reports" className="btn-ghost text-sm">
               Open report library
             </Link>
           </div>
-          <p className="mt-4 text-xs text-fg-muted">
-            {/* Real counts only — fabricated placeholders confidently lied when the API was down. */}
-            {workstreamCount ? `${workstreamCount} workstreams · ${snapshotCount} reporting tables` : "\u00a0"}
-          </p>
         </div>
       </section>
 
@@ -65,8 +68,32 @@ export function HomeDashboard() {
         <ExecutiveDashboard variant="full" initialDays={30} />
       </section>
 
+      {/* The assistant writes its own SQL, which cannot carry a person's row rules. */}
+      {!isRestricted(user) ? (
+        <>
+          <OriInsights />
+          <section>
+            <AssistantPanel />
+          </section>
+        </>
+      ) : null}
+
+      {/* One question box: with Ori present, the vetted-metric form (fixed figures, your own
+          filters) waits folded under it; a restricted reader, who has no Ori, gets it open. */}
       <section>
-        <NlqSearchPanel />
+        {isRestricted(user) ? (
+          <NlqSearchPanel />
+        ) : (
+          <details className="glass-panel-subtle group rounded-2xl">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-5 py-4 text-sm font-medium text-heading [&::-webkit-details-marker]:hidden">
+              Run a vetted metric with your own filters
+              <ChevronDown aria-hidden className="h-4 w-4 text-fg-muted transition group-open:rotate-180" />
+            </summary>
+            <div className="px-2 pb-2">
+              <NlqSearchPanel compact />
+            </div>
+          </details>
+        )}
       </section>
 
       <section>
@@ -79,32 +106,6 @@ export function HomeDashboard() {
         <FavoritesPanel />
       </section>
     </div>
-  );
-}
-
-export function SnapshotCard({ snap }: { snap: SnapshotSummary }) {
-  const summary = snap.summary ?? "";
-
-  return (
-    <Link
-      href={`/explore/${snap.id}`}
-      className="group glass-panel-subtle block p-5 transition hover:border-edge hover:bg-surface-subtle hover:shadow-lg hover:shadow-sky-500/5"
-    >
-      <div className="flex items-start justify-between gap-3">
-        {snap.poc_enabled ? (
-          <span className="chip chip-active text-[10px]">Analytics ready</span>
-        ) : (
-          <span className="chip text-[10px]">Browse & SQL</span>
-        )}
-        <span className="text-fg-muted transition group-hover:text-primary dark:group-hover:text-primary">View →</span>
-      </div>
-      <h3 className="mt-3 text-lg font-semibold text-heading group-hover:text-primary dark:group-hover:text-primary">
-        {snap.label}
-      </h3>
-      <p className="mt-2 line-clamp-3 text-sm text-fg-muted">
-        {summary || snap.grain_description || "Explore this governed reporting canvas."}
-      </p>
-    </Link>
   );
 }
 

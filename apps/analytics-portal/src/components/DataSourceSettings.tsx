@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "@/components/AuthProvider";
+import { usePortalConfig } from "@/components/PortalThemeProvider";
 import {
   clearDataSourceConnection,
   fetchDataSourceStatus,
@@ -16,11 +16,12 @@ const SOURCE_LABELS: Record<DataSourceStatus["source"], string> = {
   portal_vault: "Portal vault (encrypted on server)",
   portal_memory: "Portal session (in-memory until API restart)",
   environment: "Server environment (.env)",
+  warehouse: "dbt warehouse (WAREHOUSE_DATABASE_URL)",
   none: "Not configured",
 };
 
 export function DataSourceSettings() {
-  const { user: authUser } = useAuth();
+  const portal = usePortalConfig();
   const [status, setStatus] = useState<DataSourceStatus | null>(null);
   const [dbUser, setDbUser] = useState("");
   const [password, setPassword] = useState("");
@@ -87,15 +88,27 @@ export function DataSourceSettings() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-heading-accent">
-          Data connection
-        </p>
-        <h1 className="mt-1 text-2xl font-bold text-heading">Settings</h1>
+        <h2 className="text-lg font-semibold text-heading">Database connection</h2>
         <p className="mt-2 max-w-2xl text-sm text-fg-muted">
-          Connect the analytics portal to your Oracle C2M database for{" "}
-          <span className="text-heading">{authUser?.organization_name ?? "your assigned client"}</span>.
-          Credentials are sent over HTTPS to the API only, encrypted at rest on the server, and never
-          written to browser storage or git.
+          {/* The EFFECTIVE organization -- the one this page reads and writes. It used
+              to name the signed-in user's HOME org, so an admin who had switched tenant
+              was told they were configuring one client while every save went to another. */}
+          {status?.source === "warehouse" ? (
+            <>
+              <span className="text-heading">{portal.organization_name ?? "This organization"}</span>{" "}
+              reads the dbt reporting layer through the API&apos;s warehouse connection, set by the
+              operator in the environment. Nothing to enter here.
+            </>
+          ) : (
+            <>
+              Connect the analytics portal to your Oracle C2M database for{" "}
+              <span className="text-heading">
+                {portal.organization_name ?? "your assigned client"}
+              </span>.
+              Credentials are sent over HTTPS to the API only, encrypted at rest on the server, and never
+              written to browser storage or git.
+            </>
+          )}
         </p>
       </div>
 
@@ -131,6 +144,9 @@ export function DataSourceSettings() {
         </div>
       ) : null}
 
+      {/* The Oracle form configures an in-database (Oracle) organization. A warehouse-
+          sourced one showed it anyway, inviting credentials that nothing would read. */}
+      {status?.source === "warehouse" ? null : (
       <form
         className="glass-panel space-y-4 p-6"
         onSubmit={(e) => {
@@ -250,13 +266,14 @@ export function DataSourceSettings() {
           </p>
         ) : null}
       </form>
+      )}
 
       <div className="glass-panel p-4 text-xs text-fg-muted">
         <p className="font-medium text-fg-muted">Security notes</p>
         <ul className="mt-2 list-inside list-disc space-y-1">
           <li>Passwords are never returned by the API after save.</li>
-          <li>Portal vault file is gitignored and encrypted with Fernet on the API server.</li>
-          <li>Set <code className="text-fg-muted">PORTAL_SETTINGS_TOKEN</code> in production to gate changes.</li>
+          <li>A saved connection is encrypted on the API server and never sent back to the browser.</li>
+          <li>In production, set <code className="text-fg-muted">PORTAL_SETTINGS_TOKEN</code> on the server so changes need that token.</li>
           <li>Prefer a read-only database account for analytics exploration.</li>
         </ul>
       </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getActiveOrganization, setActiveOrganization } from "../lib/auth";
+import { viewingAnotherClient } from "../lib/orgContext";
 import type { PortalOrganization } from "../lib/auth";
 
 /**
@@ -20,9 +21,12 @@ import type { PortalOrganization } from "../lib/auth";
 export default function OrgSwitcher({
   role,
   homeOrganizationId,
+  className = "hidden min-w-0 shrink-0 items-center gap-1.5 xl:flex",
 }: {
   role: string;
   homeOrganizationId?: string | null;
+  /** The app bar has room for this only at xl; below that it rides in the user menu. */
+  className?: string;
 }) {
   const [orgs, setOrgs] = useState<PortalOrganization[]>([]);
   const [active, setActive] = useState<string>("");
@@ -56,14 +60,14 @@ export default function OrgSwitcher({
     window.location.reload();
   }
 
-  const viewingOther = Boolean(active) && active !== (homeOrganizationId ?? "");
+  const viewingOther = viewingAnotherClient(active, homeOrganizationId);
 
   return (
     <label
-      className="hidden items-center gap-1.5 lg:flex"
-      title={viewingOther ? "Admin: viewing another client's tenant" : "Admin: view another client"}
+      className={className}
+      title={viewingOther ? "Admin: viewing another client's organization" : "Admin: view another client"}
     >
-      {/* Viewing someone else's tenant should never look like the default state:
+      {/* Viewing someone else's organization should never look like the default state:
           the select itself turns amber, plus a dot for colour-blind redundancy. */}
       {viewingOther && (
         <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-warn" />
@@ -72,7 +76,10 @@ export default function OrgSwitcher({
         value={active}
         onChange={(e) => choose(e.target.value)}
         aria-label="Client organization"
-        className={`max-w-[180px] truncate rounded-lg border px-2 py-1.5 text-sm ${
+        // min-w-0 is load-bearing: a select defaults to min-width:auto, so it refuses to
+        // shrink below its longest option and overflows the header's flex box instead of
+        // truncating -- it sat on top of the Home and Explore nav links between lg and 2xl.
+        className={`w-full min-w-[7.5rem] max-w-[180px] truncate rounded-lg border px-2 py-1.5 text-sm ${
  viewingOther
  ? "border-warn bg-warn-bg font-medium text-warn"
  : "border-edge-subtle bg-chip text-fg"

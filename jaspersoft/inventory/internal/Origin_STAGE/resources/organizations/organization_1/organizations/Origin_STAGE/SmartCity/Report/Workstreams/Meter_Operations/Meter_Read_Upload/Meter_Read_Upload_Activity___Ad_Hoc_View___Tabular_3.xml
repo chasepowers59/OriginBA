@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adhocDataView exportedWithPermissions="true">
+    <folder>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload</folder>
+    <name>Meter_Read_Upload_Activity___Ad_Hoc_View___Tabular_3</name>
+    <version>0</version>
+    <label>Meter Read Upload Activity - Ad Hoc View - Tabular 3</label>
+    <description>Tabular listing of Service Point Information for Meters without Initial Measurement Data. Filtered by Measurement Create Date/Time, Measurement Cycle, and Route.</description>
+    <creationDate>2025-11-27T22:54:33.000Z</creationDate>
+    <updateDate>2025-10-21T11:14:04.000Z</updateDate>
+    <dataSource>
+        <uri>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload___Domain</uri>
+    </dataSource>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload_Activity___Ad_Hoc_View___Tabular_3_files</folder>
+            <name>InitialMeasurementData_1</name>
+            <version>0</version>
+            <label>Initial Measurement Data equals</label>
+            <creationDate>2025-11-27T22:54:33.000Z</creationDate>
+            <updateDate>2025-10-21T09:24:02.000Z</updateDate>
+            <type>4</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload_Activity___Ad_Hoc_View___Tabular_3_files/InitialMeasurementData_1_files</folder>
+                    <name>InitialMeasurementData_1</name>
+                    <version>0</version>
+                    <label>Initial Measurement Data equals</label>
+                    <creationDate>2025-11-27T22:54:33.000Z</creationDate>
+                    <updateDate>2025-10-21T09:24:02.000Z</updateDate>
+                    <language>domain</language>
+                    <queryString>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema"&gt;
+  &lt;groupList&gt;
+    &lt;group columnName="InitialMeasurementData" id="InitialMeasurementData"&gt;&lt;/group&gt;
+  &lt;/groupList&gt;
+  &lt;queryFields&gt;
+    &lt;queryField id="D1_INIT_MSRMT_DATA.INIT_MSRMT_DATA_ID" resourceId="D1_INIT_MSRMT_DATA.INIT_MSRMT_DATA_ID"&gt;&lt;/queryField&gt;
+    &lt;queryField id="IF_IsNull_D1_INIT_MSRMT_DATA_INIT_MSRMT_DATA_ID_NozInitialzMeasurementzData" resourceId="IF_IsNull_D1_INIT_MSRMT_DATA_INIT_MSRMT_DATA_ID_NozInitialzMeasurementzData"&gt;&lt;/queryField&gt;
+    &lt;queryField expression="IF(IsNull(D1_INIT_MSRMT_DATA.INIT_MSRMT_DATA_ID), 'No Initial Measurement Data')" id="InitialMeasurementData" resourceId="InitialMeasurementData"&gt;&lt;/queryField&gt;
+  &lt;/queryFields&gt;
+  &lt;resources&gt;
+    &lt;memory id="default"&gt;
+      &lt;fieldList&gt;
+        &lt;field id="InitialMeasurementData" dataSetExpression="IF_IsNull_D1_INIT_MSRMT_DATA_INIT_MSRMT_DATA_ID_NozInitialzMeasurementzData" type="java.lang.String"&gt;&lt;/field&gt;
+      &lt;/fieldList&gt;
+      &lt;sortList&gt;
+        &lt;sortColumn columnName="InitialMeasurementData"&gt;&lt;/sortColumn&gt;
+      &lt;/sortList&gt;
+      &lt;source&gt;
+        &lt;jdbcTable id="CISADM_D1_MSRMT" datasourceId="Origin_STAGE_DS" datasourceTableName="D1_MSRMT" maxRows="200001" schemaAlias="CISADM"&gt;
+          &lt;fieldList&gt;
+            &lt;field id="D1_INIT_MSRMT_DATA.INIT_MSRMT_DATA_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="IF_IsNull_D1_INIT_MSRMT_DATA_INIT_MSRMT_DATA_ID_NozInitialzMeasurementzData" dataSetExpression="IF(IsNull(D1_INIT_MSRMT_DATA.INIT_MSRMT_DATA_ID), 'No Initial Measurement Data')" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="F1_EXT_LOOKUP_VAL_L.BUS_OBJ_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="F1_EXT_LOOKUP_VAL_L.LANGUAGE_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="D1_MSRMT.ORIG_INIT_MSRMT_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="D1_MSRMT.MSRMT_COND_FLG" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="F1_EXT_LOOKUP_VAL_L.F1_EXT_LOOKUP_VALUE" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+          &lt;/fieldList&gt;
+          &lt;filterString&gt;F1_EXT_LOOKUP_VAL_L.BUS_OBJ_CD == 'D1-MeasurementConditionLookup '&lt;/filterString&gt;
+          &lt;groupList&gt;
+            &lt;group columnName="IF_IsNull_D1_INIT_MSRMT_DATA_INIT_MSRMT_DATA_ID_NozInitialzMeasurementzData" id="IF_IsNull_D1_INIT_MSRMT_DATA_INIT_MSRMT_DATA_ID_NozInitialzMeasurementzData"&gt;&lt;/group&gt;
+          &lt;/groupList&gt;
+          &lt;joinInfo alias="D1_MSRMT"&gt;&lt;/joinInfo&gt;
+          &lt;joinList&gt;
+            &lt;join expr="D1_MEASR_COMP.MEASR_COMP_ID == D1_MSRMT.MEASR_COMP_ID" left="D1_MSRMT" right="D1_MEASR_COMP" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MSRMT.ORIG_INIT_MSRMT_ID == D1_INIT_MSRMT_DATA.INIT_MSRMT_DATA_ID" left="D1_MSRMT" right="D1_INIT_MSRMT_DATA" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_INIT_MSRMT_DATA.DATA_SRC_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'DATA_SRC_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'" left="D1_INIT_MSRMT_DATA" right="CI_LOOKUP_VAL_L_1" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_INIT_MSRMT_DATA.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'" left="D1_INIT_MSRMT_DATA" right="CI_TIME_ZONE_L" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_INIT_MSRMT_DATA.BUS_OBJ_CD == F1_BUS_OBJ_L_1.BUS_OBJ_CD and F1_BUS_OBJ_L_1.LANGUAGE_CD == 'ENG'" left="D1_INIT_MSRMT_DATA" right="F1_BUS_OBJ_L_1" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_INIT_MSRMT_DATA.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L_1.BO_STATUS_CD and D1_INIT_MSRMT_DATA.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_1.BUS_OBJ_CD and F1_BUS_OBJ_STATUS_L_1.LANGUAGE_CD == 'ENG'" left="D1_INIT_MSRMT_DATA" right="F1_BUS_OBJ_STATUS_L_1" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MSRMT.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L_2.BO_STATUS_CD and D1_MSRMT.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_2.BUS_OBJ_CD and F1_BUS_OBJ_STATUS_L_2.LANGUAGE_CD == 'ENG'" left="D1_MSRMT" right="F1_BUS_OBJ_STATUS_L_2" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MSRMT.MSRMT_COND_FLG == F1_EXT_LOOKUP_VAL_L.F1_EXT_LOOKUP_VALUE and F1_EXT_LOOKUP_VAL_L.BUS_OBJ_CD == 'D1-MeasurementConditionLookup' and F1_EXT_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="D1_MSRMT" right="F1_EXT_LOOKUP_VAL_L" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MSRMT.MSRMT_USE_FLG == CI_LOOKUP_VAL_L_2.FIELD_VALUE and CI_LOOKUP_VAL_L_2.FIELD_NAME == 'MSRMT_USE_FLG' and CI_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'" left="D1_MSRMT" right="CI_LOOKUP_VAL_L_2" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MSRMT.BUS_OBJ_CD == F1_BUS_OBJ_L_2.BUS_OBJ_CD and F1_BUS_OBJ_L_2.LANGUAGE_CD == 'ENG'" left="D1_MSRMT" right="F1_BUS_OBJ_L_2" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MSRMT.USER_EDITED_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'USER_EDITED_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'" left="D1_MSRMT" right="CI_LOOKUP_VAL_L_3" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MEASR_COMP.MEASR_COMP_TYPE_CD == D1_MEASR_COMP_TYPE_L.MEASR_COMP_TYPE_CD and D1_MEASR_COMP_TYPE_L.LANGUAGE_CD == 'ENG'" left="D1_MEASR_COMP" right="D1_MEASR_COMP_TYPE_L" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MEASR_COMP.BUS_OBJ_CD == F1_BUS_OBJ_L_4.BUS_OBJ_CD and F1_BUS_OBJ_L_4.LANGUAGE_CD == 'ENG'" left="D1_MEASR_COMP" right="F1_BUS_OBJ_L_4" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MEASR_COMP.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_4.BUS_OBJ_CD and D1_MEASR_COMP.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L_4.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L_4.LANGUAGE_CD == 'ENG'" left="D1_MEASR_COMP" right="F1_BUS_OBJ_STATUS_L_4" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MEASR_COMP.MEASR_COMP_USAGE_FLG == CI_LOOKUP_VAL_L_5.FIELD_VALUE and CI_LOOKUP_VAL_L_5.FIELD_NAME == 'MEASR_COMP_USAGE_FLG' and CI_LOOKUP_VAL_L_5.LANGUAGE_CD == 'ENG'" left="D1_MEASR_COMP" right="CI_LOOKUP_VAL_L_5" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MEASR_COMP.TIME_ZONE_CD == CI_TIME_ZONE_L_2.TIME_ZONE_CD and CI_TIME_ZONE_L_2.LANGUAGE_CD == 'ENG'" left="D1_MEASR_COMP" right="CI_TIME_ZONE_L_2" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MEASR_COMP.USER_ID == SC_USER.USER_ID" left="D1_MEASR_COMP" right="SC_USER" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MEASR_COMP.MOST_RECENT_MSRMT_READING_COND == F1_EXT_LOOKUP_VAL_L_4.F1_EXT_LOOKUP_VALUE and D1_MEASR_COMP.BUS_OBJ_CD == 'D1-MeasurementConditionLookup' and F1_EXT_LOOKUP_VAL_L_4.LANGUAGE_CD == 'ENG'" left="D1_MEASR_COMP" right="F1_EXT_LOOKUP_VAL_L_4" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MEASR_COMP.ACCESS_GRP_CD == CI_ACC_GRP_L_1.ACCESS_GRP_CD and CI_ACC_GRP_L_1.LANGUAGE_CD == 'ENG'" left="D1_MEASR_COMP" right="CI_ACC_GRP_L_1" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_MSRMT.READING_COND_FLG == F1_EXT_LOOKUP_VAL_L_5.F1_EXT_LOOKUP_VALUE and D1_MSRMT.BUS_OBJ_CD == 'D1-MeasurementConditionLookup' and F1_EXT_LOOKUP_VAL_L_5.LANGUAGE_CD == 'ENG'" left="D1_MSRMT" right="F1_EXT_LOOKUP_VAL_L_5" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_INSTALL_EVT.DEVICE_CONFIG_ID == D1_MEASR_COMP.DEVICE_CONFIG_ID and D1_INSTALL_EVT.BO_STATUS_CD in ('ON', 'CONN-COMM')" left="D1_MEASR_COMP" right="D1_INSTALL_EVT" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_SP.D1_SP_ID == D1_INSTALL_EVT.D1_SP_ID" left="D1_INSTALL_EVT" right="D1_SP" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_SP.D1_SP_TYPE_CD == D1_SP_TYPE_L.D1_SP_TYPE_CD and D1_SP_TYPE_L.LANGUAGE_CD == 'ENG'" left="D1_SP" right="D1_SP_TYPE_L" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_SP.MSRMT_CYC_CD == D1_MSRMT_CYC_L.MSRMT_CYC_CD and D1_MSRMT_CYC_L.LANGUAGE_CD == 'ENG'" left="D1_SP" right="D1_MSRMT_CYC_L" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_SP.MSRMT_CYC_CD == D1_MSRMT_CYC_RTE_L.MSRMT_CYC_CD and D1_SP.MSRMT_CYC_RTE_CD == D1_MSRMT_CYC_RTE_L.MSRMT_CYC_RTE_CD and D1_MSRMT_CYC_RTE_L.LANGUAGE_CD == 'ENG'" left="D1_SP" right="D1_MSRMT_CYC_RTE_L" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_SP.TIME_ZONE_CD == CI_TIME_ZONE_L_1.TIME_ZONE_CD and CI_TIME_ZONE_L_1.LANGUAGE_CD == 'ENG'" left="D1_SP" right="CI_TIME_ZONE_L_1" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_SP.BUS_OBJ_CD == F1_BUS_OBJ_L_3.BUS_OBJ_CD and F1_BUS_OBJ_L_3.LANGUAGE_CD == 'ENG'" left="D1_SP" right="F1_BUS_OBJ_L_3" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_SP.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L_3.BUS_OBJ_CD and D1_SP.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L_3.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L_3.LANGUAGE_CD == 'ENG'" left="D1_SP" right="F1_BUS_OBJ_STATUS_L_3" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_SP.DISCONN_LOC_FLG == CI_LOOKUP_VAL_L_4.FIELD_VALUE and CI_LOOKUP_VAL_L_4.FIELD_NAME == 'DISCONN_LOC_FLG' and CI_LOOKUP_VAL_L_4.LANGUAGE_CD == 'ENG'" left="D1_SP" right="CI_LOOKUP_VAL_L_4" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_SP.SP_SRC_STAT_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'SP_SRC_STAT_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="D1_SP" right="CI_LOOKUP_VAL_L" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_SP.ACCESS_GRP_CD == CI_ACC_GRP_L.ACCESS_GRP_CD and CI_ACC_GRP_L.ACCESS_GRP_CD == 'ENG'" left="D1_SP" right="CI_ACC_GRP_L" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_SP.D1_SP_ID == CMS_PERSON_NAME.D1_SP_ID" left="D1_SP" right="CMS_PERSON_NAME" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_ACTIVITY_REL_OBJ.PK_VALUE1 == D1_SP.D1_SP_ID and D1_ACTIVITY_REL_OBJ.MAINT_OBJ_CD == 'D1-SP'" left="D1_SP" right="D1_ACTIVITY_REL_OBJ" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_ACTIVITY.D1_ACTIVITY_ID == D1_ACTIVITY_REL_OBJ.D1_ACTIVITY_ID" left="D1_ACTIVITY_REL_OBJ" right="D1_ACTIVITY" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_ACTIVITY.BUS_OBJ_CD == F1_BUS_OBJ_L.BUS_OBJ_CD and F1_BUS_OBJ_L.LANGUAGE_CD == 'ENG'" left="D1_ACTIVITY" right="F1_BUS_OBJ_L" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_ACTIVITY.BUS_OBJ_CD == F1_BUS_OBJ_STATUS_L.BUS_OBJ_CD and D1_ACTIVITY.BO_STATUS_CD == F1_BUS_OBJ_STATUS_L.BO_STATUS_CD and F1_BUS_OBJ_STATUS_L.LANGUAGE_CD == 'ENG'" left="D1_ACTIVITY" right="F1_BUS_OBJ_STATUS_L" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_ACTIVITY.ACTIVITY_TYPE_CD == D1_ACTIVITY_TYPE_L.ACTIVITY_TYPE_CD and D1_ACTIVITY_TYPE_L.LANGUAGE_CD == 'ENG'" left="D1_ACTIVITY" right="D1_ACTIVITY_TYPE_L" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_ACTIVITY.CANCEL_REASON == F1_EXT_LOOKUP_VAL_L_1.F1_EXT_LOOKUP_VALUE and D1_ACTIVITY.BUS_OBJ_CD == 'D1-CancelReasonLookup         ' and F1_EXT_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'" left="D1_ACTIVITY" right="F1_EXT_LOOKUP_VAL_L_1" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_ACTIVITY.RESCHEDULE_REASON == F1_EXT_LOOKUP_VAL_L_2.F1_EXT_LOOKUP_VALUE and D1_ACTIVITY.BUS_OBJ_CD == 'D1-RescheduleReasonLookup     ' and F1_EXT_LOOKUP_VAL_L_2.LANGUAGE_CD == 'ENG'" left="D1_ACTIVITY" right="F1_EXT_LOOKUP_VAL_L_2" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="D1_ACTIVITY.FIELD_TASK_TYPE == F1_EXT_LOOKUP_VAL_L_3.F1_EXT_LOOKUP_VALUE and D1_ACTIVITY.BUS_OBJ_CD == 'D1-FieldTaskTypeLookup        ' and F1_EXT_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'" left="D1_ACTIVITY" right="F1_EXT_LOOKUP_VAL_L_3" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+          &lt;/joinList&gt;
+          &lt;joinOptions&gt;&lt;/joinOptions&gt;
+          &lt;joinedDataSetList&gt;
+            &lt;jdbcTable id="CISADM_D1_INIT_MSRMT_DATA" datasourceId="Origin_STAGE_DS" datasourceTableName="D1_INIT_MSRMT_DATA" schemaAlias="CISADM"&gt;
+              &lt;joinInfo alias="D1_INIT_MSRMT_DATA" joinType="leftOuter"&gt;
+                &lt;joinExpressionString&gt;D1_MSRMT.ORIG_INIT_MSRMT_ID == D1_INIT_MSRMT_DATA.INIT_MSRMT_DATA_ID&lt;/joinExpressionString&gt;
+              &lt;/joinInfo&gt;
+              &lt;joinOptions&gt;&lt;/joinOptions&gt;
+              &lt;tableRefList&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_SP_TYPE_L" tableId="D1_SP_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_5" tableId="F1_EXT_LOOKUP_VAL_L_5"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_4" tableId="F1_EXT_LOOKUP_VAL_L_4"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_ACTIVITY_TYPE_L" tableId="D1_ACTIVITY_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_ACTIVITY" tableId="D1_ACTIVITY"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="SC_USER" tableId="SC_USER"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L_1" tableId="F1_BUS_OBJ_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TIME_ZONE_L" tableId="CI_TIME_ZONE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L" tableId="F1_BUS_OBJ_STATUS_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L_3" tableId="F1_BUS_OBJ_L_3"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L" tableId="F1_BUS_OBJ_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L_2" tableId="F1_BUS_OBJ_L_2"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L_4" tableId="F1_BUS_OBJ_L_4"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L_1" tableId="F1_BUS_OBJ_STATUS_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L_2" tableId="F1_BUS_OBJ_STATUS_L_2"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L_3" tableId="F1_BUS_OBJ_STATUS_L_3"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L_4" tableId="F1_BUS_OBJ_STATUS_L_4"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MSRMT_CYC_RTE_L" tableId="D1_MSRMT_CYC_RTE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MEASR_COMP_TYPE_L" tableId="D1_MEASR_COMP_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_3" tableId="F1_EXT_LOOKUP_VAL_L_3"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_2" tableId="F1_EXT_LOOKUP_VAL_L_2"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_1" tableId="F1_EXT_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MSRMT" tableId="D1_MSRMT"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CMS_PERSON_NAME" tableId="CMS_PERSON_NAME"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACC_GRP_L" tableId="CI_ACC_GRP_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TIME_ZONE_L_2" tableId="CI_TIME_ZONE_L_2"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_3" tableId="CI_LOOKUP_VAL_L_3"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TIME_ZONE_L_1" tableId="CI_TIME_ZONE_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_4" tableId="CI_LOOKUP_VAL_L_4"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_ACTIVITY_REL_OBJ" tableId="D1_ACTIVITY_REL_OBJ"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_2" tableId="CI_LOOKUP_VAL_L_2"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_INIT_MSRMT_DATA" tableId="D1_INIT_MSRMT_DATA"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MEASR_COMP" tableId="D1_MEASR_COMP"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MSRMT_CYC_L" tableId="D1_MSRMT_CYC_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L" tableId="F1_EXT_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_INSTALL_EVT" tableId="D1_INSTALL_EVT"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_SP" tableId="D1_SP"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACC_GRP_L_1" tableId="CI_ACC_GRP_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_5" tableId="CI_LOOKUP_VAL_L_5"&gt;&lt;/tableRef&gt;
+              &lt;/tableRefList&gt;
+            &lt;/jdbcTable&gt;
+            &lt;jdbcTable id="CISADM_F1_EXT_LOOKUP_VAL_L" datasourceId="Origin_STAGE_DS" datasourceTableName="F1_EXT_LOOKUP_VAL_L" schemaAlias="CISADM"&gt;
+              &lt;fieldList&gt;
+                &lt;field id="BUS_OBJ_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+              &lt;/fieldList&gt;
+              &lt;filterString&gt;BUS_OBJ_CD == 'D1-MeasurementConditionLookup '&lt;/filterString&gt;
+              &lt;joinInfo alias="F1_EXT_LOOKUP_VAL_L"&gt;
+                &lt;joinExpressionString&gt;D1_MSRMT.MSRMT_COND_FLG == F1_EXT_LOOKUP_VAL_L.F1_EXT_LOOKUP_VALUE and F1_EXT_LOOKUP_VAL_L.BUS_OBJ_CD == 'D1-MeasurementConditionLookup' and F1_EXT_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'&lt;/joinExpressionString&gt;
+              &lt;/joinInfo&gt;
+              &lt;joinOptions&gt;&lt;/joinOptions&gt;
+              &lt;tableRefList&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_SP_TYPE_L" tableId="D1_SP_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_5" tableId="F1_EXT_LOOKUP_VAL_L_5"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_4" tableId="F1_EXT_LOOKUP_VAL_L_4"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_ACTIVITY_TYPE_L" tableId="D1_ACTIVITY_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_ACTIVITY" tableId="D1_ACTIVITY"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="SC_USER" tableId="SC_USER"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L_1" tableId="F1_BUS_OBJ_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TIME_ZONE_L" tableId="CI_TIME_ZONE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L" tableId="F1_BUS_OBJ_STATUS_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L_3" tableId="F1_BUS_OBJ_L_3"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L" tableId="F1_BUS_OBJ_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L_2" tableId="F1_BUS_OBJ_L_2"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L_4" tableId="F1_BUS_OBJ_L_4"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L_1" tableId="F1_BUS_OBJ_STATUS_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L_2" tableId="F1_BUS_OBJ_STATUS_L_2"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L_3" tableId="F1_BUS_OBJ_STATUS_L_3"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L_4" tableId="F1_BUS_OBJ_STATUS_L_4"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MSRMT_CYC_RTE_L" tableId="D1_MSRMT_CYC_RTE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MEASR_COMP_TYPE_L" tableId="D1_MEASR_COMP_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_3" tableId="F1_EXT_LOOKUP_VAL_L_3"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_2" tableId="F1_EXT_LOOKUP_VAL_L_2"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_1" tableId="F1_EXT_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MSRMT" tableId="D1_MSRMT"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CMS_PERSON_NAME" tableId="CMS_PERSON_NAME"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACC_GRP_L" tableId="CI_ACC_GRP_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TIME_ZONE_L_2" tableId="CI_TIME_ZONE_L_2"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_3" tableId="CI_LOOKUP_VAL_L_3"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TIME_ZONE_L_1" tableId="CI_TIME_ZONE_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_4" tableId="CI_LOOKUP_VAL_L_4"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_ACTIVITY_REL_OBJ" tableId="D1_ACTIVITY_REL_OBJ"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_2" tableId="CI_LOOKUP_VAL_L_2"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_INIT_MSRMT_DATA" tableId="D1_INIT_MSRMT_DATA"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MEASR_COMP" tableId="D1_MEASR_COMP"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MSRMT_CYC_L" tableId="D1_MSRMT_CYC_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L" tableId="F1_EXT_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_INSTALL_EVT" tableId="D1_INSTALL_EVT"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_SP" tableId="D1_SP"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACC_GRP_L_1" tableId="CI_ACC_GRP_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_5" tableId="CI_LOOKUP_VAL_L_5"&gt;&lt;/tableRef&gt;
+              &lt;/tableRefList&gt;
+            &lt;/jdbcTable&gt;
+          &lt;/joinedDataSetList&gt;
+          &lt;sortList&gt;
+            &lt;sortColumn columnName="IF_IsNull_D1_INIT_MSRMT_DATA_INIT_MSRMT_DATA_ID_NozInitialzMeasurementzData"&gt;&lt;/sortColumn&gt;
+          &lt;/sortList&gt;
+          &lt;tableRefList&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_SP_TYPE_L" tableId="D1_SP_TYPE_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_5" tableId="F1_EXT_LOOKUP_VAL_L_5"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_4" tableId="F1_EXT_LOOKUP_VAL_L_4"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_ACTIVITY_TYPE_L" tableId="D1_ACTIVITY_TYPE_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_ACTIVITY" tableId="D1_ACTIVITY"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="SC_USER" tableId="SC_USER"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L_1" tableId="F1_BUS_OBJ_L_1"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TIME_ZONE_L" tableId="CI_TIME_ZONE_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L" tableId="F1_BUS_OBJ_STATUS_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L_3" tableId="F1_BUS_OBJ_L_3"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L" tableId="F1_BUS_OBJ_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L_2" tableId="F1_BUS_OBJ_L_2"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_L_4" tableId="F1_BUS_OBJ_L_4"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L_1" tableId="F1_BUS_OBJ_STATUS_L_1"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L_2" tableId="F1_BUS_OBJ_STATUS_L_2"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L_3" tableId="F1_BUS_OBJ_STATUS_L_3"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_BUS_OBJ_STATUS_L_4" tableId="F1_BUS_OBJ_STATUS_L_4"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MSRMT_CYC_RTE_L" tableId="D1_MSRMT_CYC_RTE_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MEASR_COMP_TYPE_L" tableId="D1_MEASR_COMP_TYPE_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_3" tableId="F1_EXT_LOOKUP_VAL_L_3"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_2" tableId="F1_EXT_LOOKUP_VAL_L_2"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L_1" tableId="F1_EXT_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MSRMT" tableId="D1_MSRMT"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CMS_PERSON_NAME" tableId="CMS_PERSON_NAME"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACC_GRP_L" tableId="CI_ACC_GRP_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TIME_ZONE_L_2" tableId="CI_TIME_ZONE_L_2"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_3" tableId="CI_LOOKUP_VAL_L_3"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TIME_ZONE_L_1" tableId="CI_TIME_ZONE_L_1"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_4" tableId="CI_LOOKUP_VAL_L_4"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_ACTIVITY_REL_OBJ" tableId="D1_ACTIVITY_REL_OBJ"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_2" tableId="CI_LOOKUP_VAL_L_2"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_INIT_MSRMT_DATA" tableId="D1_INIT_MSRMT_DATA"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MEASR_COMP" tableId="D1_MEASR_COMP"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_MSRMT_CYC_L" tableId="D1_MSRMT_CYC_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L" tableId="F1_EXT_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_INSTALL_EVT" tableId="D1_INSTALL_EVT"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="D1_SP" tableId="D1_SP"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACC_GRP_L_1" tableId="CI_ACC_GRP_L_1"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_5" tableId="CI_LOOKUP_VAL_L_5"&gt;&lt;/tableRef&gt;
+          &lt;/tableRefList&gt;
+        &lt;/jdbcTable&gt;
+      &lt;/source&gt;
+    &lt;/memory&gt;
+  &lt;/resources&gt;
+  &lt;sortList&gt;
+    &lt;sortColumn columnName="InitialMeasurementData"&gt;&lt;/sortColumn&gt;
+  &lt;/sortList&gt;
+&lt;/query&gt;
+</queryString>
+                    <dataSource>
+                        <uri>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload___Domain</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>InitialMeasurementData</queryVisibleColumn>
+            <queryValueColumn>InitialMeasurementData</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload_Activity___Ad_Hoc_View___Tabular_3_files</folder>
+            <name>CRE_DTTM_2_1</name>
+            <version>0</version>
+            <label>Create Date/Time (Measurement) is on or after</label>
+            <creationDate>2025-11-27T22:54:33.000Z</creationDate>
+            <updateDate>2025-10-21T09:24:02.000Z</updateDate>
+            <type>2</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <dataType>
+                <localResource exportedWithPermissions="false" xsi:type="dataType">
+                    <folder>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload_Activity___Ad_Hoc_View___Tabular_3_files/CRE_DTTM_2_1_files</folder>
+                    <name>timestamp</name>
+                    <version>0</version>
+                    <label>Timestamp</label>
+                    <creationDate>2025-11-27T22:54:33.000Z</creationDate>
+                    <updateDate>2025-10-21T09:24:02.000Z</updateDate>
+                    <type>4</type>
+                    <strictMin>false</strictMin>
+                    <strictMax>false</strictMax>
+                </localResource>
+            </dataType>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload_Activity___Ad_Hoc_View___Tabular_3_files</folder>
+            <name>DESCR100_2_1</name>
+            <version>0</version>
+            <label>Measurement Cycle Description (SP) is one of</label>
+            <creationDate>2025-11-27T22:54:33.000Z</creationDate>
+            <updateDate>2025-10-21T09:24:02.000Z</updateDate>
+            <type>7</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload_Activity___Ad_Hoc_View___Tabular_3_files/DESCR100_2_1_files</folder>
+                    <name>DESCR100_2_1</name>
+                    <version>0</version>
+                    <label>Measurement Cycle Description (SP) is one of</label>
+                    <creationDate>2025-11-27T22:54:33.000Z</creationDate>
+                    <updateDate>2025-10-21T09:24:02.000Z</updateDate>
+                    <language>domain</language>
+                    <queryString>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema"&gt;
+  &lt;groupList&gt;
+    &lt;group columnName="NewSet1.DESCR100_2" id="NewSet1.DESCR100_2"&gt;&lt;/group&gt;
+  &lt;/groupList&gt;
+  &lt;queryFields&gt;
+    &lt;queryField id="NewSet1.DESCR100_2"&gt;&lt;/queryField&gt;
+  &lt;/queryFields&gt;
+  &lt;sortList&gt;
+    &lt;sortColumn columnName="NewSet1.DESCR100_2"&gt;&lt;/sortColumn&gt;
+  &lt;/sortList&gt;
+&lt;/query&gt;
+</queryString>
+                    <dataSource>
+                        <uri>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload___Domain</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>NewSet1.DESCR100_2</queryVisibleColumn>
+            <queryValueColumn>NewSet1.DESCR100_2</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload_Activity___Ad_Hoc_View___Tabular_3_files</folder>
+            <name>DESCR100_3_1</name>
+            <version>0</version>
+            <label>Route Description (SP) is one of</label>
+            <creationDate>2025-11-27T22:54:33.000Z</creationDate>
+            <updateDate>2025-10-21T09:24:02.000Z</updateDate>
+            <type>7</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload_Activity___Ad_Hoc_View___Tabular_3_files/DESCR100_3_1_files</folder>
+                    <name>DESCR100_3_1</name>
+                    <version>0</version>
+                    <label>Route Description (SP) is one of</label>
+                    <creationDate>2025-11-27T22:54:33.000Z</creationDate>
+                    <updateDate>2025-10-21T09:24:02.000Z</updateDate>
+                    <language>domain</language>
+                    <queryString>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema"&gt;
+  &lt;groupList&gt;
+    &lt;group columnName="NewSet1.DESCR100_3" id="NewSet1.DESCR100_3"&gt;&lt;/group&gt;
+  &lt;/groupList&gt;
+  &lt;queryFields&gt;
+    &lt;queryField id="NewSet1.DESCR100_3"&gt;&lt;/queryField&gt;
+  &lt;/queryFields&gt;
+  &lt;sortList&gt;
+    &lt;sortColumn columnName="NewSet1.DESCR100_3"&gt;&lt;/sortColumn&gt;
+  &lt;/sortList&gt;
+&lt;/query&gt;
+</queryString>
+                    <dataSource>
+                        <uri>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload___Domain</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>NewSet1.DESCR100_3</queryVisibleColumn>
+            <queryValueColumn>NewSet1.DESCR100_3</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" dataFile="topicJRXML.data" xsi:type="fileResource">
+            <folder>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload_Activity___Ad_Hoc_View___Tabular_3_files</folder>
+            <name>topicJRXML</name>
+            <version>0</version>
+            <label>topicJRXML</label>
+            <creationDate>2025-11-27T22:54:33.000Z</creationDate>
+            <updateDate>2025-10-21T09:07:07.000Z</updateDate>
+            <fileType>jrxml</fileType>
+        </localResource>
+    </resource>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" dataFile="stateXML.data" xsi:type="fileResource">
+            <folder>/organizations/organization_1/organizations/Origin_STAGE/SmartCity/Report/Workstreams/Meter_Operations/Meter_Read_Upload/Meter_Read_Upload_Activity___Ad_Hoc_View___Tabular_3_files</folder>
+            <name>stateXML</name>
+            <version>0</version>
+            <label>stateXML</label>
+            <creationDate>2025-11-27T22:54:33.000Z</creationDate>
+            <updateDate>2025-10-21T09:07:07.000Z</updateDate>
+            <fileType>xml</fileType>
+        </localResource>
+    </resource>
+    <alwaysPromptControls>false</alwaysPromptControls>
+    <controlsLayout>1</controlsLayout>
+</adhocDataView>

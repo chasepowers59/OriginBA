@@ -1,0 +1,189 @@
+import { describe, expect, it } from "vitest";
+import { STARTER_QUESTIONS, ageLabel, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, savedViewFromSpec, spendLabel, tryGovernedFirst, summarise, threadFor, type Turn } from "./assistant";
+import type { AssistantResponse, CanvasIntegrity, IntegrityOverview } from "./types";
+
+const answer = (thread: unknown[] = []): AssistantResponse => ({
+  answer: "42", steps: [{ tool: "run_sql", input: "{}", ok: true }],
+  queries: [{ purpose: "p", sql: "select 1", columns: ["n"], rows: [[42]], row_count: 1, truncated: false, ms: 3 }],
+  model: "m", usage: { input_tokens: 1000, output_tokens: 240 }, thread: thread as AssistantResponse["thread"],
+});
+
+describe("the assistant conversation", () => {
+  it("keeps question and answer as a pair", () => {
+    const turns = appendTurns([], "how many?", answer());
+    expect(turns.map((t) => t.role)).toEqual(["user", "assistant"]);
+  });
+
+  it("sends the API's own thread from the last answer, and nothing before the first", () => {
+    expect(threadFor([])).toEqual([]);
+    const turns: Turn[] = [
+      { role: "user", text: "a" }, { role: "assistant", response: answer([{ role: "user", content: "a" }]) },
+      { role: "user", text: "b" }, { role: "error", text: "boom" },
+    ];
+    expect(threadFor(turns)).toEqual([{ role: "user", content: "a" }]);
+  });
+
+  it("summarises an answer in words a reader scans", () => {
+    expect(summarise(answer())).toBe("1 step · 1 query");
+    expect(summarise({ ...answer(), steps: [], queries: [], usage: { input_tokens: 0, output_tokens: 0 } })).toBe("0 steps · 0 queries");
+  });
+
+  it("adds the token count and the model for an admin only", () => {
+    expect(summarise(answer(), { admin: true })).toBe("1 step · 1 query · 1,240 tokens · m");
+    const cached = { ...answer(), usage: { input_tokens: 1000, output_tokens: 240, cache_read_input_tokens: 22000, cache_creation_input_tokens: 0 } };
+    expect(summarise(cached, { admin: true })).toBe("1 step · 1 query · 1,240 tokens (22,000 cached) · m");
+    expect(summarise(cached)).not.toMatch(/token|\bm$/);
+  });
+
+  it("formats cells like the rest of the portal, and never a year with a comma", () => {
+    expect(cell(null, "Rows")).toBe("—");
+    expect(cell(12345, "Rows")).toBe("12,345");
+    expect(cell("CYCLE1", "Bill Cycle")).toBe("CYCLE1");
+    expect(cell(2026, "Year")).toBe("2026");
+    expect(cell(3837610416, "Account ID")).toBe("3837610416");
+  });
+
+  it("shows money as money, by the portal's own money-column rule", () => {
+    expect(cell("2682879.14", "Billed Amount")).toBe("$2,682,879.14");
+    expect(cell(815333.03, "Arrears Over 90 Days")).toBe("$815,333.03");
+    expect(cell(-1265, "Adjustment Amount")).toBe("-$1,265.00");
+    expect(cell(null, "Billed Amount")).toBe("—");
+  });
+
+  it("keeps a unit price's precision instead of rounding it to cents", () => {
+    expect(cell(0.04523, "Price Per Unit")).toBe("$0.04523");
+  });
+
+  it("leaves counts, ratios and text beside a money word alone", () => {
+    expect(cell(1764, "Bill Count")).toBe("1,764");
+    expect(cell(12.5, "% of Arrears Collected")).toBe("12.5");
+    expect(cell("Flat", "Amount Basis")).toBe("Flat");
+  });
+});
+
+describe("what a figure can be trusted to", () => {
+  const now = new Date("2026-09-15T12:00:00");
+  const proven: CanvasIntegrity = {
+    canvas: "rpt_sa_aged_balance", label: "SA Aged Balance", verdict: "proven", canvas_as_of: "2026-09-09T12:32:41",
+    summary: "12/12 checks vs CISADM; 138,086 rows vs CMS_SA_SNAPSHOT, 0 differ",
+  };
+
+  it("names the data set by its label, the proof and the build age", () => {
+    expect(integrityLabel({ ...proven })).toMatch(/^SA Aged Balance: proven \(12\/12 checks vs CISADM; 138,086 rows vs CMS_SA_SNAPSHOT, 0 differ\) · on the build of /);
+  });
+
+  it("says plainly when nothing is on record", () => {
+    const x = { canvas: "rpt_x", label: "X", canvas_as_of: null, summary: "" };
+    expect(integrityLabel({ ...x, verdict: "unavailable" })).toBe("X: no verification on record");
+    expect(integrityLabel({ ...x, verdict: "not covered" })).toBe("X: not covered by a parity check");
+  });
+
+  it("ages a build in hours, then days", () => {
+    expect(ageLabel("2026-09-15T11:30:00", now)).toBe("within the hour");
+    expect(ageLabel("2026-09-14T20:00:00", now)).toBe("16 h ago");
+    expect(ageLabel("2026-09-09T12:32:41", now)).toBe("5 days ago");
+  });
+
+  it("headlines the build age and the proven count", () => {
+    const o: IntegrityOverview = {
+      available: true, canvas_as_of: "2026-09-09T12:32:41",
+      canvases: [
+        { canvas: "a", verdict: "proven", source_green: 3, source_checks: 3, snapshot_against: null, snapshot_ok: null },
+        { canvas: "b", verdict: "differences", source_green: 1, source_checks: 3, snapshot_against: "FT_RPT_CURR", snapshot_ok: true },
+      ],
+    };
+    expect(integrityHeadline(o, now)).toBe("Refresh time unknown · 1 of 2 data sets checked against the source system");
+    // the build dates the data; the parity run dates the check (Ellensburg 2026-09-29 said
+    // "refreshed 20 days ago" the morning it was rebuilt)
+    const built = { ...o, built_at: new Date(now.getTime() - 30 * 60_000).toISOString(),
+                    source_run_at: "2026-09-09T13:00:00", snapshot_run_at: "2026-09-10T09:00:00" };
+    expect(integrityHeadline(built, now)).toBe(
+      "Data refreshed within the hour · 1 of 2 data sets checked against the source system, last checked 5 days ago");
+    expect(integrityHeadline({ available: false, canvases: [] }, now)).toBe("These data sets have not been checked against the source system yet.");
+  });
+});
+
+describe("what the organization has spent", () => {
+  it("reads as a sentence, with the budget when there is one", () => {
+    const base = { organization: "o", day: "2026-09-15", today: 44464, questions: 2, people: [] };
+    expect(spendLabel({ ...base, budget: null })).toBe("Ori today: 2 questions · 44,464 tokens");
+    expect(spendLabel({ ...base, budget: 2000000 })).toBe("Ori today: 2 questions · 44,464 of 2,000,000 tokens");
+    expect(spendLabel({ ...base, questions: 1, budget: null })).toBe("Ori today: 1 question · 44,464 tokens");
+  });
+});
+
+describe("a chart under the answer", () => {
+  const q = (columns: string[], rows: unknown[][]) => ({ columns, rows });
+
+  it("charts one label column against one money column, as money", () => {
+    const s = resultChart(q(["Bill Cycle", "Billed Amount"], [["C1", "2682879.14"], ["C2", "1200.5"], ["C3", "99"]]));
+    expect(s?.dimensionKey).toBe("Bill Cycle");
+    expect(s?.measureKey).toBe("Billed Amount");
+    expect(s?.isCurrency).toBe(true);
+  });
+
+  it("does not chart a single figure, a long detail list, or ids", () => {
+    expect(resultChart(q(["Total Billed"], [["10"]]))).toBeNull();
+    expect(resultChart(q(["Account ID", "Billed Amount"], Array.from({ length: 80 }, (_, i) => [`A${i}`, i])))).toBeNull();
+    expect(resultChart(q(["Account ID", "Bill ID"], [["1", "2"], ["3", "4"]]))).toBeNull();
+  });
+
+  it("a year or month column is the label axis, even though it holds numbers", () => {
+    const s = resultChart(q(["Year", "Rows"], [[2026, 247], [2025, 273], [2024, 167]]));
+    expect(s?.dimensionKey).toBe("Year");
+    expect(s?.measureKey).toBe("Rows");
+  });
+
+  it("counts are not money", () => {
+    expect(resultChart(q(["Tender Type", "Payment Count"], [["Cash", 5], ["Check", 9]]))?.isCurrency).toBe(false);
+  });
+});
+
+describe("starter questions", () => {
+  it("offers a few, each a real question", () => {
+    expect(STARTER_QUESTIONS.length).toBeGreaterThanOrEqual(3);
+    for (const s of STARTER_QUESTIONS) expect(s.trim().endsWith("?")).toBe(true);
+  });
+});
+
+describe("vetted metrics answer first", () => {
+  it("tries the governed metrics for a plain what/how-much question", () => {
+    expect(tryGovernedFirst("How much was billed by bill cycle in the last 90 days?", false)).toBe(true);
+  });
+
+  it("goes straight to the assistant for a why-question or one about the page on screen", () => {
+    expect(tryGovernedFirst("Why did billing drop in May?", false)).toBe(false);
+    expect(tryGovernedFirst("How much was billed?", true)).toBe(false);
+  });
+
+  it("a governed answer is not part of the model's thread", () => {
+    const turns: Turn[] = [
+      { role: "user", text: "q1" }, { role: "assistant", response: answer([{ role: "user", content: "q1" }]) },
+      { role: "user", text: "q2" },
+      { role: "governed", question: "q2", result: { narrative: "n", metric_label: "Billed revenue" } },
+    ];
+    expect(threadFor(turns)).toEqual([{ role: "user", content: "q1" }]);
+  });
+});
+
+describe("saving an answer as a view", () => {
+  it("becomes the same saved view the builder makes, filters included", () => {
+    const view = savedViewFromSpec({
+      canvas_id: "rpt_bill_segment", canvas_label: "Bill Segment", dimensions: ["Bill Cycle"],
+      measures: [{ field: "Billed Amount", agg: "sum" }],
+      filters: [{ field: "Is Frozen", op: "eq", value: true }],
+    }, "billed by cycle");
+    expect(view).toEqual({
+      snapshot_id: "rpt_bill_segment", snapshot_label: "Bill Segment", title: "billed by cycle", kind: "custom",
+      dimensions: ["Bill Cycle"], measure_field: "Billed Amount", measure_agg: "sum",
+      measures: [{ field: "Billed Amount", agg: "sum" }],
+      filters: [{ field: "Is Frozen", op: "eq", value: true }], chart_type: "bar",
+    });
+  });
+
+  it("a title is never empty or overlong", () => {
+    const spec = { canvas_id: "rpt_gl", canvas_label: "General Ledger", dimensions: [], measures: [{ field: "Amount", agg: "sum" }], filters: [] };
+    expect(savedViewFromSpec(spec, "").title).toBe("General Ledger");
+    expect(savedViewFromSpec(spec, "x".repeat(200)).title.length).toBe(80);
+  });
+});

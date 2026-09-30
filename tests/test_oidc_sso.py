@@ -28,6 +28,7 @@ _AUTH_DB.close()
 os.environ["PORTAL_AUTH_DATABASE_URL"] = f"sqlite:///{_AUTH_DB.name}"
 os.environ.pop("PORTAL_AUTH_DISABLED", None)
 os.environ["PORTAL_AUTH_SECRET"] = "test-secret-at-least-thirty-two-characters-long"
+os.environ.setdefault("PORTAL_BOOTSTRAP_ADMIN_PASSWORD", "test-bootstrap-admin-pw")
 os.environ["OIDC_ISSUER"] = "https://login.microsoftonline.com/test-tenant/v2.0"
 os.environ["OIDC_CLIENT_ID"] = "portal-client-id"
 os.environ["OIDC_CLIENT_SECRET"] = "portal-client-secret"

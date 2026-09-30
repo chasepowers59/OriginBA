@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adhocDataView exportedWithPermissions="true">
+    <folder>/organizations/organization_1/organizations/Newark1/SmartCity/Report/Workstreams/Cashiering/Auto_Pay</folder>
+    <name>Auto_Pay___Ad_Hoc_View_2</name>
+    <version>1</version>
+    <label>Auto Pay - Ad Hoc View 2</label>
+    <description>Crosstab view of Names and Accounts with Inactive Auto Pay.  Filtered by Effectivity.</description>
+    <creationDate>2025-07-24T08:58:15.000Z</creationDate>
+    <updateDate>2025-04-17T00:18:27.000Z</updateDate>
+    <dataSource>
+        <uri>/organizations/organization_1/organizations/Newark1/SmartCity/Report/Workstreams/Cashiering/Auto_Pay/Auto_Pay___Domain</uri>
+    </dataSource>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/organizations/organization_1/organizations/Newark1/SmartCity/Report/Workstreams/Cashiering/Auto_Pay/Auto_Pay___Ad_Hoc_View_2_files</folder>
+            <name>IsEffective_1</name>
+            <version>1</version>
+            <label>Is Effective equals</label>
+            <creationDate>2025-07-24T08:58:15.000Z</creationDate>
+            <updateDate>2025-04-17T00:18:27.000Z</updateDate>
+            <type>4</type>
+            <mandatory>false</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/organizations/organization_1/organizations/Newark1/SmartCity/Report/Workstreams/Cashiering/Auto_Pay/Auto_Pay___Ad_Hoc_View_2_files/IsEffective_1_files</folder>
+                    <name>IsEffective_1</name>
+                    <version>0</version>
+                    <label>Is Effective equals</label>
+                    <creationDate>2025-07-24T08:58:15.000Z</creationDate>
+                    <updateDate>2025-04-17T00:18:27.000Z</updateDate>
+                    <language>domain</language>
+                    <queryString>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;query xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema"&gt;
+  &lt;groupList&gt;
+    &lt;group columnName="IsEffective" id="IsEffective"&gt;&lt;/group&gt;
+  &lt;/groupList&gt;
+  &lt;queryFields&gt;
+    &lt;queryField expression="CaseWhen(ElapsedDays(Today(0), CI_ACCT_APAY.START_DT) &amp;gt; 0 and (IsNull(CI_ACCT_APAY.END_DT) or ElapsedDays(Today(0), CI_ACCT_APAY.END_DT) &amp;lt; -1), 'Y', 'N')" id="IsEffective" resourceId="IsEffective"&gt;&lt;/queryField&gt;
+    &lt;queryField id="CI_ACCT_APAY.START_DT" resourceId="CI_ACCT_APAY.START_DT"&gt;&lt;/queryField&gt;
+    &lt;queryField id="CI_ACCT_APAY.END_DT" resourceId="CI_ACCT_APAY.END_DT"&gt;&lt;/queryField&gt;
+  &lt;/queryFields&gt;
+  &lt;resources&gt;
+    &lt;memory id="default"&gt;
+      &lt;fieldList&gt;
+        &lt;field id="IsEffective" dataSetExpression="CaseWhen(ElapsedDays(Today(0), CI_ACCT_APAY.START_DT) &amp;gt; 0 and (IsNull(CI_ACCT_APAY.END_DT) or ElapsedDays(Today(0), CI_ACCT_APAY.END_DT) &amp;lt; -1), 'Y', 'N')" type="java.lang.String"&gt;&lt;/field&gt;
+      &lt;/fieldList&gt;
+      &lt;sortList&gt;
+        &lt;sortColumn columnName="IsEffective"&gt;&lt;/sortColumn&gt;
+      &lt;/sortList&gt;
+      &lt;source&gt;
+        &lt;jdbcTable id="CISADM_CI_ACCT_APAY" datasourceId="Newark1_DS" datasourceTableName="CI_ACCT_APAY" maxRows="200001" schemaAlias="CISADM"&gt;
+          &lt;fieldList&gt;
+            &lt;field id="CI_ACCT_APAY.START_DT" type="java.sql.Timestamp"&gt;&lt;/field&gt;
+            &lt;field id="CI_ACCT_APAY.END_DT" type="java.sql.Timestamp"&gt;&lt;/field&gt;
+            &lt;field id="CI_ACCT_PER.MAIN_CUST_SW" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_LOOKUP_VAL_L.FIELD_NAME" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_PER_NAME.NAME_TYPE_FLG" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_TENDER_TYPE_L.LANGUAGE_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_ACCT_APAY.ACCT_APAY_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_APAY_CLR_STG.ACCT_APAY_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_ACCT_APAY.APAY_METHOD_FLG" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_LOOKUP_VAL_L.FIELD_VALUE" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_APAY_CLR_STG.PAY_TENDER_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_PAY_TNDR.PAY_TENDER_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_PAY_TNDR.TENDER_TYPE_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_TENDER_TYPE_L.TENDER_TYPE_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_ACCT_APAY.ACCT_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_ACCT_PER.ACCT_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_ACCT_PER.PER_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+            &lt;field id="CI_PER_NAME.PER_ID" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+          &lt;/fieldList&gt;
+          &lt;filterString&gt;CI_ACCT_PER.MAIN_CUST_SW == 'Y' and CI_LOOKUP_VAL_L.FIELD_NAME == 'APAY_METHOD_FLG               ' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG' and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM' and CI_TENDER_TYPE_L.LANGUAGE_CD == 'ENG'&lt;/filterString&gt;
+          &lt;groupList&gt;
+            &lt;group columnName="CI_ACCT_APAY.START_DT" id="CI_ACCT_APAY.START_DT"&gt;&lt;/group&gt;
+            &lt;group columnName="CI_ACCT_APAY.END_DT" id="CI_ACCT_APAY.END_DT"&gt;&lt;/group&gt;
+          &lt;/groupList&gt;
+          &lt;joinInfo alias="CI_ACCT_APAY" referenceId="CI_ACCT_APAY"&gt;&lt;/joinInfo&gt;
+          &lt;joinList&gt;
+            &lt;join expr="CI_ACCT_APAY.ACCT_APAY_ID == CI_APAY_CLR_STG.ACCT_APAY_ID" left="CI_ACCT_APAY" right="CI_APAY_CLR_STG" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="CI_ACCT_APAY.APAY_SRC_CD == CI_APAY_SRC_L.APAY_SRC_CD and CI_APAY_SRC_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT_APAY" right="CI_APAY_SRC_L" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="CI_ACCT_APAY.APAY_METHOD_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'APAY_METHOD_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="CI_ACCT_APAY" right="CI_LOOKUP_VAL_L" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="CI_APAY_CLR_STG.PAY_TENDER_ID == CI_PAY_TNDR.PAY_TENDER_ID" left="CI_APAY_CLR_STG" right="CI_PAY_TNDR" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="CI_PAY_TNDR.TENDER_TYPE_CD == CI_TENDER_TYPE_L.TENDER_TYPE_CD and CI_TENDER_TYPE_L.LANGUAGE_CD == 'ENG'" left="CI_PAY_TNDR" right="CI_TENDER_TYPE_L" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="CI_PAY_TNDR.TNDR_STATUS_FLG == CI_LOOKUP_VAL_L_1.FIELD_VALUE and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'TNDR_STATUS_FLG' and CI_LOOKUP_VAL_L_1.LANGUAGE_CD == 'ENG'" left="CI_PAY_TNDR" right="CI_LOOKUP_VAL_L_1" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="CI_PAY_TNDR.CAN_RSN_CD == CI_PAY_CAN_RSN_L.CAN_RSN_CD and CI_PAY_CAN_RSN_L.LANGUAGE_CD == 'ENG'" left="CI_PAY_TNDR" right="CI_PAY_CAN_RSN_L" type="leftOuter" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="CI_ACCT_APAY.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'" left="CI_ACCT_APAY" right="CI_ACCT_PER" type="inner" weight="1"&gt;&lt;/join&gt;
+            &lt;join expr="CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y' and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'" left="CI_ACCT_PER" right="CI_PER_NAME" type="inner" weight="1"&gt;&lt;/join&gt;
+          &lt;/joinList&gt;
+          &lt;joinOptions&gt;&lt;/joinOptions&gt;
+          &lt;joinedDataSetList&gt;
+            &lt;jdbcTable id="CISADM_CI_APAY_CLR_STG" datasourceId="Newark1_DS" datasourceTableName="CI_APAY_CLR_STG" schemaAlias="CISADM"&gt;
+              &lt;joinInfo alias="CI_APAY_CLR_STG" joinType="leftOuter"&gt;
+                &lt;joinExpressionString&gt;CI_ACCT_APAY.ACCT_APAY_ID == CI_APAY_CLR_STG.ACCT_APAY_ID&lt;/joinExpressionString&gt;
+              &lt;/joinInfo&gt;
+              &lt;joinOptions&gt;&lt;/joinOptions&gt;
+              &lt;tableRefList&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_CAN_RSN_L" tableId="CI_PAY_CAN_RSN_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_SRC_L" tableId="CI_APAY_SRC_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_TNDR" tableId="CI_PAY_TNDR"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_APAY" tableId="CI_ACCT_APAY"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_CLR_STG" tableId="CI_APAY_CLR_STG"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"&gt;&lt;/tableRef&gt;
+              &lt;/tableRefList&gt;
+            &lt;/jdbcTable&gt;
+            &lt;jdbcTable id="CISADM_CI_LOOKUP_VAL_L" datasourceId="Newark1_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM"&gt;
+              &lt;fieldList&gt;
+                &lt;field id="LANGUAGE_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+                &lt;field id="FIELD_NAME" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+              &lt;/fieldList&gt;
+              &lt;filterString&gt;FIELD_NAME == 'APAY_METHOD_FLG               ' and LANGUAGE_CD == 'ENG'&lt;/filterString&gt;
+              &lt;joinInfo alias="CI_LOOKUP_VAL_L"&gt;
+                &lt;joinExpressionString&gt;CI_ACCT_APAY.APAY_METHOD_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'APAY_METHOD_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'&lt;/joinExpressionString&gt;
+              &lt;/joinInfo&gt;
+              &lt;joinOptions&gt;&lt;/joinOptions&gt;
+              &lt;tableRefList&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_CAN_RSN_L" tableId="CI_PAY_CAN_RSN_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_SRC_L" tableId="CI_APAY_SRC_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_TNDR" tableId="CI_PAY_TNDR"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_APAY" tableId="CI_ACCT_APAY"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_CLR_STG" tableId="CI_APAY_CLR_STG"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"&gt;&lt;/tableRef&gt;
+              &lt;/tableRefList&gt;
+            &lt;/jdbcTable&gt;
+            &lt;jdbcTable id="CISADM_CI_PAY_TNDR" datasourceId="Newark1_DS" datasourceTableName="CI_PAY_TNDR" schemaAlias="CISADM"&gt;
+              &lt;joinInfo alias="CI_PAY_TNDR"&gt;
+                &lt;joinExpressionString&gt;CI_APAY_CLR_STG.PAY_TENDER_ID == CI_PAY_TNDR.PAY_TENDER_ID&lt;/joinExpressionString&gt;
+              &lt;/joinInfo&gt;
+              &lt;joinOptions&gt;&lt;/joinOptions&gt;
+              &lt;tableRefList&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_CAN_RSN_L" tableId="CI_PAY_CAN_RSN_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_SRC_L" tableId="CI_APAY_SRC_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_TNDR" tableId="CI_PAY_TNDR"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_APAY" tableId="CI_ACCT_APAY"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_CLR_STG" tableId="CI_APAY_CLR_STG"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"&gt;&lt;/tableRef&gt;
+              &lt;/tableRefList&gt;
+            &lt;/jdbcTable&gt;
+            &lt;jdbcTable id="CISADM_CI_TENDER_TYPE_L" datasourceId="Newark1_DS" datasourceTableName="CI_TENDER_TYPE_L" schemaAlias="CISADM"&gt;
+              &lt;fieldList&gt;
+                &lt;field id="LANGUAGE_CD" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+              &lt;/fieldList&gt;
+              &lt;filterString&gt;LANGUAGE_CD == 'ENG'&lt;/filterString&gt;
+              &lt;joinInfo alias="CI_TENDER_TYPE_L"&gt;
+                &lt;joinExpressionString&gt;CI_PAY_TNDR.TENDER_TYPE_CD == CI_TENDER_TYPE_L.TENDER_TYPE_CD and CI_TENDER_TYPE_L.LANGUAGE_CD == 'ENG'&lt;/joinExpressionString&gt;
+              &lt;/joinInfo&gt;
+              &lt;joinOptions&gt;&lt;/joinOptions&gt;
+              &lt;tableRefList&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_CAN_RSN_L" tableId="CI_PAY_CAN_RSN_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_SRC_L" tableId="CI_APAY_SRC_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_TNDR" tableId="CI_PAY_TNDR"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_APAY" tableId="CI_ACCT_APAY"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_CLR_STG" tableId="CI_APAY_CLR_STG"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"&gt;&lt;/tableRef&gt;
+              &lt;/tableRefList&gt;
+            &lt;/jdbcTable&gt;
+            &lt;jdbcTable id="CISADM_CI_ACCT_PER" datasourceId="Newark1_DS" datasourceTableName="CI_ACCT_PER" schemaAlias="CISADM"&gt;
+              &lt;fieldList&gt;
+                &lt;field id="MAIN_CUST_SW" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+              &lt;/fieldList&gt;
+              &lt;filterString&gt;MAIN_CUST_SW == 'Y'&lt;/filterString&gt;
+              &lt;joinInfo alias="CI_ACCT_PER"&gt;
+                &lt;joinExpressionString&gt;CI_ACCT_APAY.ACCT_ID == CI_ACCT_PER.ACCT_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y'&lt;/joinExpressionString&gt;
+              &lt;/joinInfo&gt;
+              &lt;joinOptions&gt;&lt;/joinOptions&gt;
+              &lt;tableRefList&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_CAN_RSN_L" tableId="CI_PAY_CAN_RSN_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_SRC_L" tableId="CI_APAY_SRC_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_TNDR" tableId="CI_PAY_TNDR"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_APAY" tableId="CI_ACCT_APAY"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_CLR_STG" tableId="CI_APAY_CLR_STG"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"&gt;&lt;/tableRef&gt;
+              &lt;/tableRefList&gt;
+            &lt;/jdbcTable&gt;
+            &lt;jdbcTable id="CISADM_CI_PER_NAME" datasourceId="Newark1_DS" datasourceTableName="CI_PER_NAME" schemaAlias="CISADM"&gt;
+              &lt;fieldList&gt;
+                &lt;field id="NAME_TYPE_FLG" inResultSet="false" type="java.lang.String"&gt;&lt;/field&gt;
+              &lt;/fieldList&gt;
+              &lt;filterString&gt;NAME_TYPE_FLG == 'PRIM'&lt;/filterString&gt;
+              &lt;joinInfo alias="CI_PER_NAME"&gt;
+                &lt;joinExpressionString&gt;CI_ACCT_PER.PER_ID == CI_PER_NAME.PER_ID and CI_ACCT_PER.MAIN_CUST_SW == 'Y' and CI_PER_NAME.NAME_TYPE_FLG == 'PRIM'&lt;/joinExpressionString&gt;
+              &lt;/joinInfo&gt;
+              &lt;joinOptions&gt;&lt;/joinOptions&gt;
+              &lt;tableRefList&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_CAN_RSN_L" tableId="CI_PAY_CAN_RSN_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_SRC_L" tableId="CI_APAY_SRC_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_TNDR" tableId="CI_PAY_TNDR"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_APAY" tableId="CI_ACCT_APAY"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_CLR_STG" tableId="CI_APAY_CLR_STG"&gt;&lt;/tableRef&gt;
+                &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"&gt;&lt;/tableRef&gt;
+              &lt;/tableRefList&gt;
+            &lt;/jdbcTable&gt;
+          &lt;/joinedDataSetList&gt;
+          &lt;tableRefList&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_CAN_RSN_L" tableId="CI_PAY_CAN_RSN_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_PER" tableId="CI_ACCT_PER"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_SRC_L" tableId="CI_APAY_SRC_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_TENDER_TYPE_L" tableId="CI_TENDER_TYPE_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PAY_TNDR" tableId="CI_PAY_TNDR"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_ACCT_APAY" tableId="CI_ACCT_APAY"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_APAY_CLR_STG" tableId="CI_APAY_CLR_STG"&gt;&lt;/tableRef&gt;
+            &lt;tableRef alwaysIncludeTable="false" tableAlias="CI_PER_NAME" tableId="CI_PER_NAME"&gt;&lt;/tableRef&gt;
+          &lt;/tableRefList&gt;
+        &lt;/jdbcTable&gt;
+      &lt;/source&gt;
+    &lt;/memory&gt;
+  &lt;/resources&gt;
+  &lt;sortList&gt;
+    &lt;sortColumn columnName="IsEffective"&gt;&lt;/sortColumn&gt;
+  &lt;/sortList&gt;
+&lt;/query&gt;
+</queryString>
+                    <dataSource>
+                        <uri>/organizations/organization_1/organizations/Newark1/SmartCity/Report/Workstreams/Cashiering/Auto_Pay/Auto_Pay___Domain</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>IsEffective</queryVisibleColumn>
+            <queryValueColumn>IsEffective</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" dataFile="topicJRXML.data" xsi:type="fileResource">
+            <folder>/organizations/organization_1/organizations/Newark1/SmartCity/Report/Workstreams/Cashiering/Auto_Pay/Auto_Pay___Ad_Hoc_View_2_files</folder>
+            <name>topicJRXML</name>
+            <version>1</version>
+            <label>topicJRXML</label>
+            <creationDate>2025-07-24T08:58:15.000Z</creationDate>
+            <updateDate>2025-04-17T00:18:27.000Z</updateDate>
+            <fileType>jrxml</fileType>
+        </localResource>
+    </resource>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" dataFile="stateXML.data" xsi:type="fileResource">
+            <folder>/organizations/organization_1/organizations/Newark1/SmartCity/Report/Workstreams/Cashiering/Auto_Pay/Auto_Pay___Ad_Hoc_View_2_files</folder>
+            <name>stateXML</name>
+            <version>1</version>
+            <label>stateXML</label>
+            <creationDate>2025-07-24T08:58:15.000Z</creationDate>
+            <updateDate>2025-04-17T00:18:27.000Z</updateDate>
+            <fileType>xml</fileType>
+        </localResource>
+    </resource>
+    <reports>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="reportUnit">
+            <folder>/organizations/organization_1/organizations/Newark1/SmartCity/Report/Workstreams/Cashiering/Auto_Pay/Auto_Pay___Ad_Hoc_View_2_files</folder>
+            <name>dashboardReport</name>
+            <version>1</version>
+            <label>dashboardReport</label>
+            <creationDate>2025-07-24T08:58:15.000Z</creationDate>
+            <updateDate>2025-04-17T00:18:27.000Z</updateDate>
+            <mainReport>
+                <uri>/public/templates/actual_size.820.jrxml</uri>
+            </mainReport>
+            <resource>
+                <localResource exportedWithPermissions="false"
+                    dataFile="stateXML.data" xsi:type="fileResource">
+                    <folder>/organizations/organization_1/organizations/Newark1/SmartCity/Report/Workstreams/Cashiering/Auto_Pay/Auto_Pay___Ad_Hoc_View_2_files/dashboardReport_files</folder>
+                    <name>stateXML</name>
+                    <version>0</version>
+                    <label>stateXML</label>
+                    <creationDate>2025-07-24T08:58:15.000Z</creationDate>
+                    <updateDate>2025-04-17T00:18:27.000Z</updateDate>
+                    <fileType>xml</fileType>
+                </localResource>
+            </resource>
+            <alwaysPromptControls>false</alwaysPromptControls>
+            <controlsLayout>1</controlsLayout>
+        </localResource>
+    </reports>
+    <alwaysPromptControls>false</alwaysPromptControls>
+    <controlsLayout>1</controlsLayout>
+</adhocDataView>

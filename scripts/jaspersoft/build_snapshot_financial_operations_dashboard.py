@@ -106,7 +106,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--outdir",
-        default="/Users/chase/OriginBA-3/deploy/native_dashboard_pack_v1",
+        default=str(Path(__file__).resolve().parents[2] / "jaspersoft/dashboards/native_dashboard_pack_v1"),
         help="Output directory for the dashboard package.",
     )
     return parser.parse_args()

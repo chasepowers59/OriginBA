@@ -1,3 +1,4 @@
+-- 2026-09-08: ACCT_DEBT, COLL_PROC and PAY_TNDR_CASH removed from the list (archived; not part of the active-8).
 -- Purpose:
 --   Produce a single summary view combining observed SQL averages and storage footprint
 --   for high-level resource planning.
@@ -16,12 +17,9 @@ WITH snapshot_map AS (
     SELECT 'billing', 'BSEG_SQ_USAGE_RPT_CURR' FROM dual UNION ALL
     SELECT 'finance', 'FT_RPT_CURR' FROM dual UNION ALL
     SELECT 'finance', 'FT_GL_DISTRIBUTION_RPT_CURR' FROM dual UNION ALL
-    SELECT 'debt_mgmt', 'ACCT_DEBT_RPT_CURR' FROM dual UNION ALL
-    SELECT 'debt_mgmt', 'COLL_PROC_RPT_CURR' FROM dual UNION ALL
     SELECT 'meter_ops', 'D1_USAGE_RPT_CURR' FROM dual UNION ALL
     SELECT 'meter_ops', 'D1_USAGE_SCALAR_DTL_RPT_CURR' FROM dual UNION ALL
-    SELECT 'meter_ops', 'D1_MSRMT_RPT_CURR' FROM dual UNION ALL
-    SELECT 'payments_cashiering', 'PAY_TNDR_CASH_RPT_CURR' FROM dual
+    SELECT 'meter_ops', 'D1_MSRMT_RPT_CURR' FROM dual
 ),
 sql_usage AS (
     SELECT

@@ -14,3 +14,11 @@ export function parseApiError(raw: string, fallback = "Request failed"): string 
   }
   return text.length > 180 ? `${text.slice(0, 180)}…` : text;
 }
+
+/** A refused request, keeping its HTTP status so a page can say WHY (403 vs 501 vs 422). */
+export class ApiError extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message);
+    this.name = "ApiError";
+  }
+}

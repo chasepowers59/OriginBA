@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="SC_AR_Aging" label="SC_AR_Aging" resourceId="SC_AR_Aging"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="Ellensburg_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="ACCT_ID" label="Account ID" resourceId="SC_AR_Aging.ACCT_ID"></item>
+    <item id="ARREARS_30" label="Arrears - 30 Days" resourceId="SC_AR_Aging.ARREARS_30"></item>
+    <item id="ARREARS_60" label="Arrears - 60 Days" resourceId="SC_AR_Aging.ARREARS_60"></item>
+    <item id="ARREARS_90" label="Arrears - 90 Days" resourceId="SC_AR_Aging.ARREARS_90"></item>
+    <item id="ARREARS_TOTAL" label="Arrears Total" resourceId="SC_AR_Aging.ARREARS_TOTAL"></item>
+    <item id="BILL_CYC_CD" label="Bill Cycle" resourceId="SC_AR_Aging.BILL_CYC_CD"></item>
+    <item id="COLL_CL_CD" label="Collection Class" resourceId="SC_AR_Aging.COLL_CL_CD"></item>
+    <item id="CURRENT_BAL" label="Current Balance" resourceId="SC_AR_Aging.CURRENT_BAL"></item>
+    <item id="CUST_CL_CD" label="Customer Class" resourceId="SC_AR_Aging.CUST_CL_CD"></item>
+    <item id="DEBT_CL_CD" label="Debt Class" resourceId="SC_AR_Aging.DEBT_CL_CD"></item>
+    <item id="LATEST_PAY_DT" label="Latest Payment Date" resourceId="SC_AR_Aging.LATEST_PAY_DT"></item>
+    <item id="NEW_CHARGES" label="New Charges" resourceId="SC_AR_Aging.NEW_CHARGES"></item>
+    <item id="SA_STATUS_FLG" label="SA Status" resourceId="SC_AR_Aging.SA_STATUS_FLG"></item>
+    <item id="SA_TYPE_CD" label="SA  Type" resourceId="SC_AR_Aging.SA_TYPE_CD"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="SC_AR_Aging" datasourceId="Ellensburg_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="COLL_CL_CD" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="DEBT_CL_CD" type="java.lang.String"></field>
+        <field id="CURRENT_BAL" type="java.math.BigDecimal"></field>
+        <field id="NEW_CHARGES" type="java.math.BigDecimal"></field>
+        <field id="ARREARS_30" type="java.math.BigDecimal"></field>
+        <field id="ARREARS_60" type="java.math.BigDecimal"></field>
+        <field id="ARREARS_90" type="java.math.BigDecimal"></field>
+        <field id="ARREARS_TOTAL" type="java.math.BigDecimal"></field>
+        <field id="LATEST_PAY_DT" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>SELECT
+            a.acct_id,
+            a.bill_cyc_cd,
+            a.cust_cl_cd,
+            a.coll_cl_cd,
+            sa.sa_type_cd,
+            sa.sa_status_flg,
+            sat.debt_cl_cd,
+            (
+                SELECT
+                    nvl(SUM(cur_amt),0)
+                FROM
+                    cisadm.ci_ft ft
+                WHERE
+                    sa.sa_id = ft.sa_id
+                    AND   ft.redundant_sw = 'N'
+                    AND   ft.freeze_sw = 'Y'
+                    AND   ft.ars_dt IS NOT NULL
+            ) current_bal,
+/*
+    To calculate 'buckets'
+        1. Calculate all debits in the 'bucket'
+        2. Find the balance of all credits and debits older than the 'bucket'
+        3. If that balance is a credit, reduce the bucket by that amount.
+        4. However, the bucket may not be a negative unless it is new charges.
+*/
+            (
+                SELECT
+                    nvl(SUM(cur_amt),0)
+                FROM
+                    cisadm.ci_ft ft
+                WHERE
+                    sa.sa_id = ft.sa_id
+                    AND   ft.redundant_sw = 'N'
+                    AND   ft.freeze_sw = 'Y'
+                    AND   ft.ars_dt IS NOT NULL
+                    AND   ft.cur_amt &gt; 0
+                    AND   ft.ars_dt BETWEEN trunc(SYSDATE) - 30 AND trunc(SYSDATE)
+            ) + least( (
+                SELECT
+                    nvl(SUM(cur_amt),0)
+                FROM
+                    cisadm.ci_ft ft
+                WHERE
+                    sa.sa_id = ft.sa_id
+                    AND   ft.redundant_sw = 'N'
+                    AND   ft.freeze_sw = 'Y'
+                    AND   ft.ars_dt IS NOT NULL
+                    AND   (
+                        (
+                            ft.cur_amt &gt; 0
+                            AND   ft.ars_dt &lt; trunc(SYSDATE) - 30
+                        )
+                        OR    ft.cur_amt &lt; 0
+                    )
+            ),0) new_charges,
+            greatest( (
+                SELECT
+                    nvl(SUM(cur_amt),0)
+                FROM
+                    cisadm.ci_ft ft
+                WHERE
+                    sa.sa_id = ft.sa_id
+                    AND   ft.redundant_sw = 'N'
+                    AND   ft.freeze_sw = 'Y'
+                    AND   ft.ars_dt IS NOT NULL
+                    AND   ft.cur_amt &gt; 0
+                    AND   ft.ars_dt BETWEEN trunc(SYSDATE) - 60 AND trunc(SYSDATE) - 31
+            ) + least( (
+                SELECT
+                    nvl(SUM(cur_amt),0)
+                FROM
+                    cisadm.ci_ft ft
+                WHERE
+                    sa.sa_id = ft.sa_id
+                    AND   ft.redundant_sw = 'N'
+                    AND   ft.freeze_sw = 'Y'
+                    AND   ft.ars_dt IS NOT NULL
+                    AND   (
+                        (
+                            ft.cur_amt &gt; 0
+                            AND   ft.ars_dt &lt; trunc(SYSDATE) - 60
+                        )
+                        OR    ft.cur_amt &lt; 0
+                    )
+            ),0),0) arrears_30,
+            greatest( (
+                SELECT
+                    nvl(SUM(cur_amt),0)
+                FROM
+                    cisadm.ci_ft ft
+                WHERE
+                    sa.sa_id = ft.sa_id
+                    AND   ft.redundant_sw = 'N'
+                    AND   ft.freeze_sw = 'Y'
+                    AND   ft.ars_dt IS NOT NULL
+                    AND   ft.cur_amt &gt; 0
+                    AND   ft.ars_dt BETWEEN trunc(SYSDATE) - 90 AND trunc(SYSDATE) - 61
+            ) + least( (
+                SELECT
+                    nvl(SUM(cur_amt),0)
+                FROM
+                    cisadm.ci_ft ft
+                WHERE
+                    sa.sa_id = ft.sa_id
+                    AND   ft.redundant_sw = 'N'
+                    AND   ft.freeze_sw = 'Y'
+                    AND   ft.ars_dt IS NOT NULL
+                    AND   (
+                        (
+                            ft.cur_amt &gt; 0
+                            AND   ft.ars_dt &lt; trunc(SYSDATE) - 90
+                        )
+                        OR    ft.cur_amt &lt; 0
+                    )
+            ),0),0) arrears_60,
+            greatest( (
+                SELECT
+                    nvl(SUM(cur_amt),0)
+                FROM
+                    cisadm.ci_ft ft
+                WHERE
+                    sa.sa_id = ft.sa_id
+                    AND   ft.redundant_sw = 'N'
+                    AND   ft.freeze_sw = 'Y'
+                    AND   ft.ars_dt IS NOT NULL
+                    AND   (
+                        (
+                            ft.cur_amt &gt; 0
+                            AND   ft.ars_dt &lt; trunc(SYSDATE) - 91
+                        )
+                        OR    ft.cur_amt &lt; 0
+                    )
+            ),0) arrears_90,
+            greatest( (
+                SELECT
+                    nvl(SUM(cur_amt),0)
+                FROM
+                    cisadm.ci_ft ft
+                WHERE
+                    sa.sa_id = ft.sa_id
+                    AND   ft.redundant_sw = 'N'
+                    AND   ft.freeze_sw = 'Y'
+                    AND   ft.ars_dt IS NOT NULL
+                    AND   (
+                        (
+                            ft.cur_amt &gt; 0
+                            AND   ft.ars_dt &lt; trunc(SYSDATE) - 31
+                        )
+                        OR    ft.cur_amt &lt; 0
+                    )
+            ),0) arrears_total,
+            (
+                SELECT
+                    MAX(pe.pay_dt)
+                FROM
+                    cisadm.ci_pay p,
+                    cisadm.ci_pay_event pe
+                WHERE
+                    a.acct_id = p.acct_id
+                    AND   p.pay_event_id = pe.pay_event_id
+                    AND   p.pay_status_flg = '50'
+            ) latest_pay_dt
+        FROM
+            cisadm.ci_acct a
+            JOIN cisadm.ci_sa sa ON a.acct_id = sa.acct_id
+                                    AND sa.sa_status_flg &lt;&gt; '60'
+            JOIN cisadm.ci_sa_type sat ON sa.cis_division = sat.cis_division
+                                          AND sa.sa_type_cd = sat.sa_type_cd</query>
+    </jdbcQuery>
+  </resources>
+</schema>

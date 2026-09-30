@@ -1,81 +1,17 @@
-# Domain Packaging Layout
+# Domains
 
-- `exports/`: import-ready Jaspersoft domain ZIP packages.
-- `exports/manual_imports/`: manually retained import bundles that were cleaned out of the repo root.
-- `working/`: local extracted copies for safe domain editing and validation.
+Rewritten 2026-09-08. Two kinds of domain, two homes:
 
-Keep production-safe artifacts in `exports/`; use `working/` for temporary edits only.
+- **Generated** from the dbt reporting canvases: `~/originba_dbt/jaspersoft/domains/<target>/` (never hand-edited; item ids from `~/originba_dbt/scripts/bi_names.py`).
+- **Hand-built** over CISADM or the active-8 snapshot tables: here.
 
-## Active Manual Design XML (Standard Set)
+| Path | What it holds | Rule |
+| --- | --- | --- |
+| `exports/manual_imports/` | the seven active-8 snapshot domains (`FT`, `FT_GL_DISTRIBUTION`, `BSEG_BILLED_USAGE`, `BSEG_SQ_USAGE`, `D1_MSRMT`, `D1_USAGE`, `D1_USAGE_SCALAR_DTL`, each as *_RPT_CURR_End_User_Friendly.xml), the retained import bundles (`FinalDomain.zip`, `New Bill Cycle Domain.zip`, `New Export Billing.zip`) and `exports/manual_imports/current_snapshot_report_packages/` | import-ready; `CMS_SA_SNAPSHOT` is served by the Standard Offering package's `SA_Snapshot___Aged_Balance` domain, not a file here |
+| `manual_imports/newark_*` | Newark client deliverables (REP8 aged balance domain and report, account aged balance), each regenerated from its `schema.reference.xml` by `scripts/jaspersoft/build_newark_*.py` | a coupled unit with `sql/clients/newark/`; never moved by tooling |
+| `working/` | temporary extraction and editing area (`billing_requirements_domain_v2`, `new_bill_cycle_domain`) | nothing here is production-safe |
+| `archive/2026-09-08_reorg/domains/` | the 15 domain XMLs over snapshots that were never deployed or are retired, and the 2026-04-28 manual designs | history |
 
-- `working/manual_designs/Billed_Usage_Consumption_Billed_Amount_Perf_6M.xml`
-- `working/manual_designs/Billed_Usage_Consumption_Billed_Amount_UltraLean.xml`
-- `working/manual_designs/Billed_Revenue_By_Rate_Component_Perf_6M.xml`
-- `working/manual_designs/Billed_Revenue_Tax_Lean_Perf_6M.xml`
-- `working/manual_designs/Usage_Billing_Financial_Bridge_PerfFast_6M.xml`
-- `working/manual_designs/Usage_Billing_Financial_Bridge_No_Derived_UltraSafe.xml`
-- `working/manual_designs/Fund_Balance_Final_DB_Validated.xml`
-- `working/manual_designs/Fund_Balance_Monthly_PerfSafe.xml`
-- `working/manual_designs/Write_Off_Requirements_Final_DB_Validated.xml`
-- `working/manual_designs/Billing_Requirements_No_Derived_Full_Logic.xml`
-- `working/manual_designs/Unbilled_Revenue_Snapshot_Perf.xml`
-- `working/manual_designs/Collections_Process_Effectiveness_Debt_Reduction_180D.xml`
-- `working/manual_designs/D1_Usage_Device_Account_Outlier_180D.xml`
-- `working/manual_designs/To_Do_Entry_Operations_Account_Resolved.xml`
-
-## Archived Manual Design XML
-
-- Legacy and duplicate variants are in:
-- `working/archive/manual_designs/`
-
-## Domain Business Catalog
-
-- Business-purpose and use-case summary for each domain:
-- `working/manual_designs/DOMAIN_BUSINESS_CATALOG.md`
-- One-page domain chooser for business users:
-- `working/manual_designs/DOMAIN_DECISION_MATRIX.md`
-
-## Manual Import Bundles
-
-- `exports/manual_imports/FinalDomain.zip`
-- `exports/manual_imports/New Bill Cycle Domain.zip`
-- `exports/manual_imports/New Export Billing.zip`
-- `exports/manual_imports/D1_USAGE_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/D1_MSRMT_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/D1_USAGE_SCALAR_DTL_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/BSEG_BILLED_USAGE_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/BSEG_SQ_USAGE_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/ACCT_DEBT_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/COLL_PROC_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/PAY_TNDR_CASH_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/FT_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/FT_GL_DISTRIBUTION_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/ACCT_CUSTOMER_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/CASE_PREM_CONTACT_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/NEW_SERVICE_PIPELINE_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/FIELD_ACTIVITY_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/CREW_OPS_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/DEVICE_SP_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/PAY_EVENT_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/BILLABLE_CHARGE_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/SA_AGED_BAL_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/WO_PROC_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/OPS_EXCEPTION_RPT_CURR_End_User_Friendly.xml`
-- `exports/manual_imports/WORKFLOW_QUEUE_RPT_CURR_End_User_Friendly.xml`
-
-Archived patch and backup variants are in:
-- `../archive/2026-03-10/root_zip_cleanup/domain_variants/`
-
-## Bill Cycle Domain (`exports/manual_imports/New Bill Cycle Domain.zip`)
-
-- Updated domain model now includes:
-- `BC_CYCLE_NUMBERS_FAST`
-- `BC_EXPECTED_VS_ACTUAL_FAST`
-- `BC_SEGMENT_STATUS_DRILLDOWN_V2`
-- Primary verification fields now cover expected vs actual billing totals, detailed bill and bill segment status, and error flags (`IS_ERROR_SW`, `ERROR_REASON`).
-- Datasource resources are intentionally excluded from `exports/manual_imports/New Bill Cycle Domain.zip`; imports bind to existing repository alias/reference only.
-- Read-only Oracle index inspection confirms key lead-index prefilter columns in this area are mostly IDs/cycle keys, not `CI_BSEG.CRE_DTTM`.
-- Recommended ad hoc prefilters for performance:
-- `BILL_CYCLE_CODE` (from `CI_BILL_CYC_L.BILL_CYC_CD`)
-- Optional equality/IN filters on account/service identifiers for drilldown use cases.
-- Date windows are still included in derived queries to cap scan volume, but should not be treated as lead-index filters for these specific billing tables.
+Validation: `scripts/jaspersoft/validate_domain_schema.py` (SL XMLSchema 1.3). Format contract and
+import-and-verify protocol: `~/originba_dbt/.claude/skills/jaspersoft-domain-generation/SKILL.md`;
+modeling rules for hand-built domains: `.claude/skills/originba-jaspersoft-domain-modeling/SKILL.md`.

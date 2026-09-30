@@ -14,6 +14,10 @@ export type SavedFavorite = {
   dateEnd?: string;
   scopeField?: string;
   scopeValue?: string;
+  visibility?: import("./ownership").Visibility;
+  ownerEmail?: string | null;
+  canEdit?: boolean;
+  folder?: string | null;
   savedAt: string;
 };
 

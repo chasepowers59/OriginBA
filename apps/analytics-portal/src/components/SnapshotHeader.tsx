@@ -3,21 +3,23 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchSnapshotStats } from "@/lib/api";
-import { formatDateTime, formatNumber } from "@/lib/format";
+import { formatCompact, formatDateTime } from "@/lib/format";
 import type { SnapshotMetadata } from "@/lib/types";
 import { snapshotDetailLine, snapshotSubtitle } from "@/lib/snapshot";
-import {
-  requiredDateLabel,
-  snapshotSummary,
-  workstreamDisplayName,
-} from "@/lib/businessLabels";
+import { snapshotSummary, workstreamDisplayName } from "@/lib/businessLabels";
+import { dateScope } from "@/lib/dateScope";
 
 export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
   const model = metadata.data_model;
   const [rowCount, setRowCount] = useState<number | null>(null);
   const [loadDttm, setLoadDttm] = useState<string | null>(null);
+  // "…" means still fetching. Without this it also meant "there is no such value",
+  // and a dbt canvas has no CDC watermark to report -- so the refresh pill sat at an
+  // ellipsis forever, reading as a load that never finished.
+  const [statsLoaded, setStatsLoaded] = useState(false);
 
   useEffect(() => {
+    setStatsLoaded(false);
     fetchSnapshotStats(metadata.id)
       .then((s) => {
         setRowCount(s.row_count);
@@ -26,21 +28,23 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
       .catch(() => {
         setRowCount(null);
         setLoadDttm(null);
-      });
+      })
+      .finally(() => setStatsLoaded(true));
   }, [metadata.id]);
 
   const workstream =
     metadata.workstream_label ?? workstreamDisplayName(metadata.workstream);
   const summary = snapshotSummary(metadata);
+  const scope = dateScope(metadata);
 
   return (
     <div className="no-print glass-panel relative animate-slide-up overflow-hidden p-6">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary via-transparent to-accent-2" />
+      <div className="pointer-events-none absolute inset-0 tint-header" />
       <div className="relative flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="max-w-2xl">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className="chip chip-active">{workstream}</span>
-            <span className="chip">Trusted data domain</span>
+            <span className="chip">Checked report data</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-heading">{metadata.label}</h2>
           <p className="mt-2 text-sm leading-relaxed text-fg">
@@ -54,7 +58,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
                 className="inline-flex items-center gap-2 rounded-lg border text-chart-2 text-chart-2 px-3 py-2 text-xs text-chart-2 dark:text-chart-2 transition hover:text-chart-2"
               >
                 <span className="font-medium text-chart-2 dark:text-chart-2">View data model →</span>
-                {model.source_tables.length} source tables · {metadata.fields?.length ?? 0} fields
+                {metadata.fields?.length ?? 0} columns from {model.source_tables.length} CIS tables
               </Link>
               <Link
                 href={`/explore/${metadata.id}?tab=model&modelTab=joins`}
@@ -81,7 +85,7 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
               href={`/explore/${metadata.related_snapshot.id}`}
               className="mt-3 inline-flex items-center gap-2 rounded-lg border border-edge bg-band px-3 py-2 text-xs text-primary transition hover:border-edge"
             >
-              <span className="font-medium text-primary">Related domain →</span>
+              <span className="font-medium text-primary">Related data set →</span>
               {metadata.related_snapshot.label}
               <span className="text-primary">· {metadata.related_snapshot.hint}</span>
             </Link>
@@ -89,15 +93,21 @@ export function SnapshotHeader({ metadata }: { metadata: SnapshotMetadata }) {
         </div>
         <div className="flex flex-wrap gap-3">
           <StatPill
-            label="Records in domain"
-            value={rowCount != null ? formatNumber(rowCount) : "…"}
+            label="Rows in this data set"
+            value={rowCount != null ? formatCompact(rowCount) : statsLoaded ? "—" : "…"}
           />
-          <StatPill
-            label="Data refreshed"
-            value={loadDttm ? formatDateTime(loadDttm) : "…"}
-            accent
-          />
-          <StatPill label="Date filter" value={requiredDateLabel(metadata)} small />
+          {/* Dropped entirely when the canvas has no watermark: a pill reading
+              "Data refreshed —" is noise, and one reading "…" is a lie. */}
+          {loadDttm || !statsLoaded ? (
+            <StatPill
+              label="Data refreshed"
+              value={loadDttm ? formatDateTime(loadDttm) : "…"}
+              accent
+            />
+          ) : null}
+          {/* Only claim a date filter when the canvas really has one; otherwise name
+              the date it works in by default, which is something the reader can use. */}
+          {scope ? <StatPill label={scope.label} value={scope.value} small /> : null}
         </div>
       </div>
     </div>

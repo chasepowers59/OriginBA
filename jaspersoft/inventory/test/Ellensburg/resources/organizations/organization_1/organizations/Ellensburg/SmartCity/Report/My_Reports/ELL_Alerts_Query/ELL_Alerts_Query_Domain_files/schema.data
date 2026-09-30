@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_2" label="JoinTree_2" resourceId="JoinTree_2"></itemGroup>
+  </dataIslands>
+  <itemGroups>
+    <itemGroup id="ACCOUNT_ALERTS" label="Alerts Query" resourceId="JoinTree_2">
+      <items>
+        <item id="ACCT_ID" label="Account Id" resourceId="JoinTree_2.ACCOUNT_ALERTS.ACCT_ID"></item>
+        <item id="ACTIVEALERTS" label="Active Account Alerts" resourceId="JoinTree_2.ACCOUNT_ALERTS.ACTIVEALERTS"></item>
+        <item id="ACTIVEPAYPLAN" label="Active Payment Plan" resourceId="JoinTree_2.ACCOUNT_ALERTS.ACTIVEPAYPLAN"></item>
+        <item id="BROKENPAYPLAN" label="Broken Payment Plan" resourceId="JoinTree_2.ACCOUNT_ALERTS.BROKENPAYPLAN"></item>
+        <item id="COLLPROC" label="Collection Process" resourceId="JoinTree_2.ACCOUNT_ALERTS.COLLPROC"></item>
+        <item id="KEPTPAYPLAN" label="Kept Payment Plan" resourceId="JoinTree_2.ACCOUNT_ALERTS.KEPTPAYPLAN"></item>
+        <item id="SEVPROC" label="Severance Process" resourceId="JoinTree_2.ACCOUNT_ALERTS.SEVPROC"></item>
+        <item id="WOPROC" label="Write Off Process" resourceId="JoinTree_2.ACCOUNT_ALERTS.WOPROC"></item>
+        <item id="PER_ID" label="Person Id" resourceId="JoinTree_2.CUST_NAME.PER_ID"></item>
+        <item id="ENTITY_NAME_UPR" label="Entity Name" resourceId="JoinTree_2.CUST_NAME.ENTITY_NAME_UPR"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcQuery id="ACCOUNT_ALERTS" datasourceId="Ellensburg_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="COLLPROC" type="java.lang.String"></field>
+        <field id="SEVPROC" type="java.lang.String"></field>
+        <field id="WOPROC" type="java.lang.String"></field>
+        <field id="ACTIVEPAYPLAN" type="java.lang.String"></field>
+        <field id="BROKENPAYPLAN" type="java.lang.String"></field>
+        <field id="KEPTPAYPLAN" type="java.lang.String"></field>
+        <field id="ACTIVEALERTS" type="java.lang.String"></field>
+      </fieldList>
+      <query>select a.acct_id ,
+    NVL((select LISTAGG(c.COLL_PROC_ID,', ') within group (order by c.coll_proc_id, c.acct_id) from cisadm.ci_coll_proc c where c.acct_id = a.acct_id and c.coll_status_flg = '10' group by c.acct_id), 'N') collproc,
+    NVL((select LISTAGG(c.sev_PROC_ID,', ') within group (order by c.sev_proc_id, sa.acct_id) from CISADM.CI_SEV_PROC c ,CISADM.CI_SA SA  where c.SEV_STATUS_FLG = '10' and c.sa_id = sa.sa_id and sa.acct_id = a.acct_id group by sa.acct_id), 'N') sevproc,
+    NVL((select LISTAGG(c.wo_PROC_ID,', ') within group (order by c.wo_proc_id, c.acct_id) from cisadm.ci_wo_proc c where c.acct_id = a.acct_id and c.wo_status_flg = '10' group by c.acct_id),'N') woProc,
+    NVL((SELECT PP.PP_ID FROM CISADM.CI_PP PP WHERE PP.PP_STAT_FLG='20' AND a.ACCT_ID = PP.ACCT_ID and pp.last_STAT_DTTM = (select max(pp2.last_STAT_DTTM) from cisadm.CI_PP pp2 where pp2.acct_id = a.acct_id and pp2.pp_stat_flg='20')),'N') activePayPlan,
+    NVL((SELECT PP.PP_ID FROM CISADM.CI_PP PP WHERE PP.PP_STAT_FLG='40' AND a.ACCT_ID = PP.ACCT_ID and pp.last_STAT_DTTM = (select max(pp2.last_STAT_DTTM) from cisadm.CI_PP pp2 where pp2.acct_id = a.acct_id and pp2.pp_stat_flg='40')),'N') brokenPayPlan,
+    NVL((SELECT PP.PP_ID FROM CISADM.CI_PP PP WHERE PP.PP_STAT_FLG='50' AND a.ACCT_ID = PP.ACCT_ID and pp.last_STAT_DTTM = (select max(pp2.last_STAT_DTTM) from cisadm.CI_PP pp2 where pp2.acct_id = a.acct_id and pp2.pp_stat_flg='50')),'N') keptPayPlan,
+    NVL((SELECT LISTAGG(DESCR80 ,', ' ) WITHIN GROUP (ORDER BY ALERT.ACCT_ID,ALERTL.DESCR80)  FROM CISADM.CI_ACCT_ALERT ALERT , CISADM.CI_ALERT_TYPE_L ALERTL WHERE a.acct_id = alert.acct_id and ALERTL.ALERT_TYPE_CD = ALERT.ALERT_TYPE_CD  AND ALERT.START_DT &lt;= SYSDATE AND (END_DT IS NULL OR END_DT&gt;=SYSDATE)  GROUP BY ALERT.ACCT_ID ),'N') activeAlerts
+from cisadm.ci_acct a</query>
+    </jdbcQuery>
+    <jdbcQuery id="CUST_NAME" datasourceId="Ellensburg_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME_UPR" type="java.lang.String"></field>
+      </fieldList>
+      <query>select a.Acct_id,a.per_id, b.entity_name_upr from cisadm.ci_acct_per a, cisadm.ci_per_name b where a.main_cust_sw = 'Y' and a.per_id = b.per_id and b.name_type_flg = 'PRIM' and b.prim_name_sw = 'Y'</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_2" datasourceId="Ellensburg_DS">
+      <fieldList>
+        <field id="ACCOUNT_ALERTS.ACCT_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_ALERTS.COLLPROC" type="java.lang.String"></field>
+        <field id="ACCOUNT_ALERTS.SEVPROC" type="java.lang.String"></field>
+        <field id="ACCOUNT_ALERTS.WOPROC" type="java.lang.String"></field>
+        <field id="ACCOUNT_ALERTS.ACTIVEPAYPLAN" type="java.lang.String"></field>
+        <field id="ACCOUNT_ALERTS.BROKENPAYPLAN" type="java.lang.String"></field>
+        <field id="ACCOUNT_ALERTS.KEPTPAYPLAN" type="java.lang.String"></field>
+        <field id="ACCOUNT_ALERTS.ACTIVEALERTS" type="java.lang.String"></field>
+        <field id="CUST_NAME.ACCT_ID" type="java.lang.String"></field>
+        <field id="CUST_NAME.PER_ID" type="java.lang.String"></field>
+        <field id="CUST_NAME.ENTITY_NAME_UPR" type="java.lang.String"></field>
+      </fieldList>
+      <joinInfo alias="ACCOUNT_ALERTS" referenceId="ACCOUNT_ALERTS"></joinInfo>
+      <joinList>
+        <join expr="ACCOUNT_ALERTS.ACCT_ID == CUST_NAME.ACCT_ID" left="ACCOUNT_ALERTS" right="CUST_NAME" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>select a.acct_id ,
+    NVL((select LISTAGG(c.COLL_PROC_ID,', ') within group (order by c.coll_proc_id, c.acct_id) from cisadm.ci_coll_proc c where c.acct_id = a.acct_id and c.coll_status_flg = '10' group by c.acct_id), 'N') collproc,
+    NVL((select LISTAGG(c.sev_PROC_ID,', ') within group (order by c.sev_proc_id, sa.acct_id) from CISADM.CI_SEV_PROC c ,CISADM.CI_SA SA  where c.SEV_STATUS_FLG = '10' and c.sa_id = sa.sa_id and sa.acct_id = a.acct_id group by sa.acct_id), 'N') sevproc,
+    NVL((select LISTAGG(c.wo_PROC_ID,', ') within group (order by c.wo_proc_id, c.acct_id) from cisadm.ci_wo_proc c where c.acct_id = a.acct_id and c.wo_status_flg = '10' group by c.acct_id),'N') woProc,
+    NVL((SELECT PP.PP_ID FROM CISADM.CI_PP PP WHERE PP.PP_STAT_FLG='20' AND a.ACCT_ID = PP.ACCT_ID and pp.last_STAT_DTTM = (select max(pp2.last_STAT_DTTM) from cisadm.CI_PP pp2 where pp2.acct_id = a.acct_id and pp2.pp_stat_flg='20')),'N') activePayPlan,
+    NVL((SELECT PP.PP_ID FROM CISADM.CI_PP PP WHERE PP.PP_STAT_FLG='40' AND a.ACCT_ID = PP.ACCT_ID and pp.last_STAT_DTTM = (select max(pp2.last_STAT_DTTM) from cisadm.CI_PP pp2 where pp2.acct_id = a.acct_id and pp2.pp_stat_flg='40')),'N') brokenPayPlan,
+    NVL((SELECT PP.PP_ID FROM CISADM.CI_PP PP WHERE PP.PP_STAT_FLG='50' AND a.ACCT_ID = PP.ACCT_ID and pp.last_STAT_DTTM = (select max(pp2.last_STAT_DTTM) from cisadm.CI_PP pp2 where pp2.acct_id = a.acct_id and pp2.pp_stat_flg='50')),'N') keptPayPlan,
+    NVL((SELECT LISTAGG(DESCR80 ,', ' ) WITHIN GROUP (ORDER BY ALERT.ACCT_ID,ALERTL.DESCR80)  FROM CISADM.CI_ACCT_ALERT ALERT , CISADM.CI_ALERT_TYPE_L ALERTL WHERE a.acct_id = alert.acct_id and ALERTL.ALERT_TYPE_CD = ALERT.ALERT_TYPE_CD  AND ALERT.START_DT &lt;= SYSDATE AND (END_DT IS NULL OR END_DT&gt;=SYSDATE)  GROUP BY ALERT.ACCT_ID ),'N') activeAlerts
+from cisadm.ci_acct a</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="ACCOUNT_ALERTS" tableId="ACCOUNT_ALERTS"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CUST_NAME" tableId="CUST_NAME"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

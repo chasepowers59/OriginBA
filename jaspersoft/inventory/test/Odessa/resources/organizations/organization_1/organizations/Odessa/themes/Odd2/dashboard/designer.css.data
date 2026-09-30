@@ -1,0 +1,1002 @@
+/*
+ * Copyright (C) 2005 - 2025 Cloud Software Group, Inc. All Rights Reserved. Confidential & Proprietary.
+ * Licensed pursuant to commercial Cloud Software Group, Inc. End User License Agreement.
+ */
+
+
+/* --------------------------------------
+   TABLE OF CONTENTS
+
+    01. PAGE
+
+    02. TREE
+
+    03. SAVE AS DIALOG
+
+    04. HELPERS
+
+    05. BROWSE INPUT
+
+    06. DESIGNER
+
+    07. AVAILABLE CONTENT PANEL LISTS
+
+    08. FILTER MANAGER (PARAMETER MAPPING) DIALOG
+
+    09. ADD DASHBOARD COMPONENT DIALOG
+
+    10. CANVAS
+
+    11. COLOR PICKER
+
+    12. DASHLET HYPERLINK PROPERTIES
+
+   --------------------------------------
+    File last modified Aug 28, 2024
+   -------------------------------------- */
+
+/* -------------- */
+/*  01. PAGE      */
+/* -------------- */
+#dashboard #banner,
+#dashboard #frame {
+    -webkit-touch-callout: none;
+    user-select: none;
+}
+
+
+/* -------------- */
+/*  02. TREE      */
+/* -------------- */
+.treeBox > .content > .body {
+    padding: 6px;
+    height: 250px;
+}
+
+
+/* ----------------------- */
+/*  03. SAVE AS DIALOG     */
+/* ----------------------- */
+#dashboard .saveAs {
+    width: 440px;
+    height: auto;
+}
+
+#dashboard .saveAs .j-view-port-chunk{
+    width: auto;
+}
+
+#dashboard .saveAs .subcontainer .treeBox > .content {
+    height: 100%;
+}
+
+#dashboard .saveAs .subcontainer .treeBox > .content > .body {
+    height: 100%;
+    box-sizing: border-box;
+}
+
+
+/* ----------------- */
+/*  04. HELPERS      */
+/* ----------------- */
+.dragHelper {
+    z-index: 100000;
+    white-space: nowrap;
+}
+
+
+/* -------------------- */
+/*  05. BROWSE INPUT    */
+/* -------------------- */
+/* found in Dashlet Image dialog */
+.browsableInput input {
+    float: left;
+    width: 72%;
+}
+
+.browsableInput:before,
+.browsableInput:after {
+    content: "";
+    display: table;
+}
+
+.browsableInput:after {
+    clear: both;
+}
+.browsableInput button {
+    float: right;
+    top: 3px;
+    width: 25%;
+}
+
+
+/* ----------------- */
+/*  06. DESIGNER     */
+/* ----------------- */
+.dashboardDesigner .dashboardSidebar .newContentPanel .collapsible > li span.wrap,
+.dashboardDesigner .dashboardSidebar .libraryPanel .collapsible > li span.wrap,
+.dashboardDesigner .dashboardSidebar .reportParametersContentPanel .collapsible > li span.wrap{
+    text-decoration: none;
+    padding: 0;
+    white-space: nowrap;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.dashboardDesigner .dashboardSidebar .newContentPanel .collapsible > li p.wrap,
+.dashboardDesigner .dashboardSidebar .libraryPanel .collapsible > li p.wrap,
+.dashboardDesigner .dashboardSidebar .reportParametersContentPanel .collapsible > li p.wrap {
+    height: 26px;
+    margin: 0;
+    padding-left: 5px;
+}
+
+.dashboardDesigner .primary.column.dashboardToolbar {
+    height: 40px;
+    margin-left: 2px;
+    top: 40px;
+}
+
+.dashboardDesigner .primary.column.dashboardCanvasContainer {
+    overflow: auto !important;
+    margin-left: 2px;
+    top: 82px;
+}
+
+.dashboardDesigner .primary.column.dashboardCanvasContainer.previewMode {
+    top: 40px;
+    right: 2px!important;
+}
+
+.dashboardDesigner .primary.column.dashboardCanvas {
+    border: none;
+    height: auto;
+    position: absolute;
+    width: auto;
+}
+
+.dashboardDesigner .primary.column.dashboardCanvas > .content > .body {
+    height: auto;
+    width: auto;
+}
+
+.dashboardDesigner .column.decorated:not(.dashboardToolbar) > .content > .header {
+    background-color: #d6d6d6;
+    border-bottom: none;
+    height: 32px;
+}
+
+#display.dashboardDesigner .column.decorated > .content > .header > .title {
+    color: #333333;
+    font-family: source_sans_proregular, Franklin Gothic, Verdana, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+    line-height: 32px;
+    margin-left: 11px;
+    vertical-align: top;
+}
+
+.dashboardDesigner .column.decorated.secondary > .content > .body {
+    top: 34px;
+}
+
+.dashboardDesigner .previewMode .hyperlink {
+    cursor: pointer;
+}
+
+.dashboardDesigner .dashboardCanvas > .content > .body {
+    top: 0;
+}
+
+.dashboardDesigner .button.minimize {
+    background-color: var(--background-grey-40);
+    background-image: url(../images/disclosure_indicators_icons_sprite.svg);
+    background-repeat: no-repeat;
+    background-position: -61px -172px;
+    background-size: 170px;
+    display: inline-block;
+    height: 32px;
+    margin-top: 0;
+    width: 14px;
+    z-index: 10;
+}
+
+.dashboardDesigner .column.decorated.minimized > .button.minimize {
+    background-position: -57px -202px;
+    width: 24px;
+}
+
+.dashboardDesigner .column.secondary.dashboardSidebar {
+    border-right: none;
+    position: absolute;
+    top: 40px;
+}
+
+.dashboardDesigner.threeColumn .column.tertiary {
+    border-left: none;
+    bottom: 0;
+    display: flex;
+    min-width: auto;
+    top: 40px;
+    width: auto;
+}
+
+.dashboardDesigner .column.decorated.minimized {
+    background-color: #d6d6d6;
+}
+
+.dashboardDesigner .column.decorated.minimized .vtitle {
+    display: none !important;
+}
+
+/* panel type icon shown in minimized panel*/
+.dashboardDesigner .column.minimized > .icon.minimize {
+    background-image: url(../images/button_action_icons_sprite@1x.png);
+    background-repeat: no-repeat;
+    background-size: 240px;
+    cursor: pointer;
+    height: 32px;
+    width: 24px;
+}
+/* 2x ICONS */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .dashboardDesigner .column.minimized > .icon.minimize {
+        background-image: url(../images/button_action_icons_sprite@2x.png);
+    }
+}
+
+.dashboardDesigner .column.minimized > .icon.minimize {
+    background-position: -118px -444px;
+}
+
+.dashboardSidebar .newContentPanel .subcontainer .ui-resizable-handle,
+.dashboardSidebar .libraryPanel .subcontainer .ui-resizable-handle{
+    background-color: transparent;
+    border-top: 1px solid #dedede;
+    height: 4px;
+}
+
+.dashboardSidebar .libraryPanel .subcontainer .ui-resizable-handle {
+    background-color: #f8f8f8;
+}
+
+.dashboardDesigner .dashboardSidebar .panel.collapsiblePanel > .header {
+    background-color: #ebebeb;
+    border-bottom: none;
+    border-top: 1px solid #d6d6d6;
+    font-family: source_sans_proregular, Franklin Gothic, Verdana, Arial, sans-serif;
+    height: 32px;
+}
+
+.dashboardDesigner .dashboardSidebar .panel.collapsiblePanel:first-of-type > .header {
+    border-top: none;
+}
+
+.dashboardDesigner .dashboardSidebar .panel.collapsiblePanel > .header > .title {
+    color: #333333;
+    font-size: 13px;
+    font-weight: normal;
+    height: 32px;
+    line-height: 33px;
+}
+
+#dashboard .collapsible.folders > li .collapsible > li,
+.dashboardDesigner .collapsible.folders > li .collapsible > li {
+    line-height: 27px;
+    margin-top: 1px;
+}
+
+.dashboardDesigner .collapsible.folders .leaf.dashboard-existingContent-filter,
+.dashboardDesigner .collapsible.folders .leaf.dashboard-existingContent-filter-invisible {
+    margin-left: 10px;
+    margin-right: 5px;
+}
+.dashboardDesigner .dashboardSidebar .body > .panel > .subcontainer{
+    min-height: 135px;
+    width: 100%;
+}
+
+.dashboardDesigner .dashboardSidebar .body > .panel .ui-resizable-handle {
+    bottom: 0;
+    cursor: row-resize;
+}
+
+#dashboard .dashboard-existingContent-filter-invisible > p.wrap {
+    font-style: italic;
+}
+
+
+/* -------------------------------------- */
+/*  07. AVAILABLE CONTENT PANEL LISTS     */
+/* -------------------------------------- */
+#dashboard .newContentPanel .list.collapsible p.wrap > .icon,
+#dashboard .libraryPanel .list.collapsible p.wrap > .icon,
+#dashboard .reportChooserDialog .list.collapsible > li > .wrap > .icon,
+#dashboard .reportParametersContentPanel .list.collapsible p.wrap > .icon {
+    background-image: url("../images/dashboard_content_icons_sprite@1x.png");
+    background-size: 90px;
+    top: 2px;
+    width: 20px;
+}
+/* 2x DASHBOARD CONTENT ICONS */
+@media (-webkit-min-device-pixel-ratio: 2),(min-resolution: 192dpi) {
+    #dashboard .newContentPanel .list.collapsible p.wrap > .icon,
+    #dashboard .libraryPanel .list.collapsible p.wrap > .icon,
+    #dashboard .reportChooserDialog .list.collapsible > li > .wrap > .icon,
+    #dashboard .reportParametersContentPanel .list.collapsible p.wrap > .icon {
+        background-image: url("../images/dashboard_content_icons_sprite@2x.png");
+    }
+}
+
+/* New Content Icons */
+/* chart */
+#dashboard .dashboard-newContent-chart > p.wrap > .icon {
+    background-position: 0 1px;
+}
+#dashboard .dashboard-newContent-chart.selected > p.wrap > .icon {
+    background-position: -58px 2px;
+}
+
+/* crosstab */
+#dashboard .dashboard-newContent-crosstab > p.wrap > .icon {
+    background-position: 0 -28px;
+}
+#dashboard .dashboard-newContent-crosstab.selected > p.wrap > .icon {
+    background-position: -58px -28px;
+}
+
+/* table */
+#dashboard .dashboard-newContent-table > p.wrap > .icon {
+    background-position: 0 -58px;
+}
+#dashboard .dashboard-newContent-table.selected > p.wrap > .icon {
+    background-position: -58px -58px;
+}
+
+/* text */
+#dashboard .dashboard-newContent-text > p.wrap > .icon {
+    background-position: 0 -88px;
+}
+#dashboard .dashboard-newContent-text.selected > p.wrap > .icon {
+    background-position: -58px -88px;
+}
+
+/* web page */
+#dashboard .dashboard-newContent-webPageView > p.wrap > .icon {
+    background-position: 0 -118px;
+}
+#dashboard .dashboard-newContent-webPageView.selected > p.wrap > .icon {
+    background-position: -58px -118px;
+}
+
+/* image */
+#dashboard .dashboard-newContent-image > p.wrap > .icon {
+    background-position: 0 -148px;
+}
+#dashboard .dashboard-newContent-image.selected > p.wrap > .icon {
+    background-position: -58px -147px;
+}
+
+
+/* Existing Content Icons */
+/* adhoc */
+#dashboard .dashboard-existingContent-adhoc > p.wrap > .icon {
+    background-position: 0 -178px;
+}
+#dashboard .dashboard-existingContent-adhoc.selected > p.wrap > .icon {
+    background-position: -58px -178px;
+}
+
+/* report */
+#dashboard .dashboard-existingContent-report > p.wrap > .icon {
+    background-position: 0 -208px;
+}
+#dashboard .dashboard-existingContent-report.selected > p.wrap > .icon {
+    background-position: -58px -208px;
+}
+
+/* report option */
+#dashboard .dashboard-existingContent-reportOption > p.wrap > .icon {
+    background-position: 0 -580px;
+}
+#dashboard .dashboard-existingContent-reportOption.selected > p.wrap > .icon {
+    background-position: -58px -580px;
+}
+
+/* dashboard */
+#dashboard .leaf.dashboard-existingContent-dashboard > p.wrap > .icon {
+    background-position: 0 -238px;
+}
+#dashboard .leaf.dashboard-existingContent-dashboard.selected > p.wrap > .icon {
+    background-position: -58px -238px;
+}
+
+/* folders */
+#dashboard .reportChooserDialog .node.folders.closed  > p.wrap > .icon,
+#dashboard .node.dashboard-existingContent-.folders.closed > p.wrap > .icon {
+    background-position: 0 -521px;
+    width: 34px;
+}
+#dashboard .reportChooserDialog .node.folders.closed.selected  > p.wrap > .icon,
+#dashboard .node.dashboard-existingContent-.folders.closed.selected > p.wrap > .icon {
+    background-position: -58px -521px;
+}
+
+#dashboard .reportChooserDialog .node.folders.open > p.wrap > .icon,
+#dashboard .node.dashboard-existingContent-.folders.open > p.wrap > .icon {
+    background-position: 0 -551px;
+    width: 34px;
+}
+#dashboard .reportChooserDialog .node.folders.open.selected > p.wrap > .icon,
+#dashboard .node.dashboard-existingContent-.folders.open.selected > p.wrap > .icon {
+    background-position: -58px -551px;
+}
+
+#dashboard .node.dashboard-existingContent-.folders .leaf > p.wrap > .icon {
+    margin-left: 14px;
+}
+
+#dashboard .node.dashboard-existingContent-.folders .leaf.dashboard-existingContent-adhoc > p.wrap > .icon {
+    background-position: 0 -178px;
+}
+#dashboard .node.dashboard-existingContent-.folders .leaf.dashboard-existingContent-adhoc.selected > p.wrap > .icon {
+    background-position: -58px -178px;
+}
+
+#dashboard .node.dashboard-existingContent-.folders .leaf.dashboard-existingContent-report > p.wrap > .icon {
+    background-position: 0 -208px;
+}
+#dashboard .node.dashboard-existingContent-.folders .leaf.dashboard-existingContent-report.selected > p.wrap > .icon {
+    background-position: -58px -208px;
+}
+
+#dashboard .node.dashboard-existingContent-.folders .leaf.dashboard-existingContent-dashboard > p.wrap > .icon {
+    background-position: 0 -238px;
+}
+#dashboard .node.dashboard-existingContent-.folders .leaf.dashboard-existingContent-dashboard.selected > p.wrap > .icon {
+    background-position: -58px -238px;
+
+}
+
+/* Filter Section Icons */
+/* adhoc */
+#dashboard .node.folders.dashboard-existingContent-adhoc.closed > p.wrap > .icon {
+    background-position: 0 -269px;
+    width: 34px;
+}
+#dashboard .node.folders.dashboard-existingContent-adhoc.closed.selected > p.wrap > .icon {
+    background-position: -58px -269px;
+}
+
+#dashboard .node.folders.dashboard-existingContent-adhoc.open > p.wrap > .icon {
+    background-position: 0 -301px;
+    width: 34px;
+}
+#dashboard .node.folders.dashboard-existingContent-adhoc.open.selected > p.wrap > .icon {
+    background-position: -58px -301px;
+}
+
+/* report */
+#dashboard .node.folders.dashboard-existingContent-report.closed > p.wrap > .icon {
+    background-position: 0 -333px;
+    width: 34px;
+}
+#dashboard .node.folders.dashboard-existingContent-report.closed.selected > p.wrap > .icon {
+    background-position: -58px -333px;
+}
+
+#dashboard .node.folders.dashboard-existingContent-report.open > p.wrap > .icon {
+    background-position: 0 -365px;
+    width: 34px;
+}
+#dashboard .node.folders.dashboard-existingContent-report.open.selected > p.wrap > .icon {
+    background-position: -58px -365px;
+}
+
+/* dashboard */
+#dashboard .dashboard-existingContent-dashboard.closed > p.wrap > .icon {
+    background-position: 0 -397px;
+    width: 34px;
+}
+#dashboard .dashboard-existingContent-dashboard.closed.selected > p.wrap > .icon {
+    background-position: -58px -397px;
+}
+
+#dashboard .dashboard-existingContent-dashboard.open > p.wrap > .icon {
+    background-position: 0 -429px;
+    width: 34px;
+}
+#dashboard .dashboard-existingContent-dashboard.open.selected > p.wrap > .icon {
+    background-position: -58px -429px;
+}
+
+/* filter */
+#dashboard .dashboard-existingContent-filter > p.wrap > .icon {
+    background-position: 2px -459px;
+    margin-left: 2px;
+}
+#dashboard .dashboard-existingContent-filter.selected > p.wrap > .icon {
+    background-position: -56px -459px;
+}
+
+#dashboard .dashboard-existingContent-filter-invisible > p.wrap > .icon {
+    background-position: 2px -489px;
+    margin-left: 2px;
+}
+#dashboard .dashboard-existingContent-filter-invisible.selected > p.wrap > .icon {
+    opacity: 0.4;
+}
+
+/* dashlet properties dialog */
+#dashboard .dashboard-existingContent-adhoc-wide > p.wrap > .icon {
+    background-position: 0 -178px;
+    width: 34px;
+}
+#dashboard .dashboard-existingContent-adhoc-wide.selected > p.wrap > .icon {
+    background-position: -58px -178px;
+}
+
+.reportChooserDialog .list.collapsible:not(.hideRoot) .list.collapsible .leaf.dashboard-existingContent-adhoc-wide .icon,
+.reportChooserDialog .list.collapsible:not(.hideRoot) .list.collapsible .leaf.dashboard-existingContent-report .icon,
+.reportChooserDialog .list.collapsible:not(.hideRoot) .list.collapsible .leaf.dashboard-existingContent-dashboard .icon,
+.reportChooserDialog .list.collapsible:not(.hideRoot) .list.collapsible .leaf.dashboard-existingContent-reportOption .icon{
+    margin-left: 14px;
+}
+
+/* Search Input */
+.dashboardDesigner .dashboardSidebar .control.searchLockup > .wrap > input[type=text] {
+    box-sizing: border-box;
+    height: 24px;
+    padding: 0 6px;
+}
+
+/*.dashboardDesigner .dashboardSidebar .control.searchLockup .button.searchClear {
+    background-position: -30px -84px;
+    height: 24px;
+    top: -25px;
+} delete if there are no problems, nov 2021
+
+.dashboardDesigner .dashboardSidebar .control.searchLockup .button.search {
+    background-position: -30px -55px;
+} */
+
+#dashboard .adhocDesignerIframe {
+    visibility: visible !important;
+    margin: 15px;
+    position: absolute;
+    display: none;
+    left: 0;
+    z-index: 1002;
+}
+
+/* dashboardDesigner .dashboardSidebar .button.filter {
+    float: right;
+    padding-right: 15px;
+    margin-right: 5px;
+}
+
+.dashboardDesigner .dashboardSidebar .button.filter .icon {
+    background-image: url("../images/disclosure_indicators_sprite.png");
+    background-position: 0 -48px;
+    background-repeat: no-repeat;
+    height: 24px;
+    left: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 11px;
+} I can't find this element in use. Delete if there are no issues. */
+
+.dashboardDesigner .dashboardSidebar.minimized > .ui-resizable-handle {
+    display: none !important;
+}
+
+.dashboardDesigner .dashboardSidebar .vtitle {
+    width: 141px;
+    top: 141px;
+}
+
+#dashboard .oneColumn > .primary.column {
+    left:0 !important;
+}
+
+.dashboardDesigner.oneColumn .primary.column.dashboardToolbar,
+.dashboard.dimmer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #000;
+    opacity: .6;
+}
+
+.dashboardDesigner .collapsiblePanel > .header > .buttonIconToggle {
+    background-color: transparent;
+    background-image: url(../images/disclosure_indicators_icons_sprite.svg);
+    background-repeat: no-repeat;
+    background-size: 170px;
+    border: none;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    transform: none;
+    width: 22px;
+}
+
+.dashboardDesigner .collapsiblePanel.open > .header > .buttonIconToggle {
+    background-position: 3px -230px;
+}
+
+.dashboardDesigner .collapsiblePanel.closed > .header > .buttonIconToggle {
+    background-position: 3px -290px;
+}
+
+.dashboardDesigner .collapsiblePanel .searchLockup {
+    margin: 4px;
+}
+
+.dashboardDesigner .collapsiblePanel .searchLockup .wrap {
+    border-color: #cccccc;
+    height: 24px;
+    width: calc(100% - 48px);
+}
+
+
+/* ------------------------------ */
+/*  08. FILTER MANAGER DIALOG     */
+/* ------------------------------ */
+/* Parameter Mapping dialog */
+
+.filterManagerDialog .addNewFilter {
+    color: var(--jrs-theme-medium);
+    float: right;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    margin-top: 5px;
+    margin-right: 20px;
+    margin-bottom: 12px;
+}
+
+.filterManagerDialog .control.textProperty {
+    float: left;
+    margin-left: 11px;
+}
+
+.filterManagerDialog .control.textProperty input{
+    width: 205px;
+}
+
+.filterManagerDialog > .content > .subcontainer {
+    max-height: 450px;
+    overflow: auto;
+}
+
+.filterManager {
+    border-collapse: collapse;
+    border: 1px solid var(--border-grey-29);
+    border-bottom: none;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    margin: 12px;
+}
+
+.filterManager .filterManagerHeader {
+    background-color: #edf2f8;
+}
+
+.filterManager th, .filterManager td {
+    border-bottom: 1px solid var(--border-grey-29);
+    text-align: left;
+    vertical-align: middle;
+    padding: 0 5px;
+}
+
+.filterManager th {
+    font-weight: normal;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.filterManager .dashletColumn,
+.filterManager .parameterColumn {
+    width: 200px;
+}
+
+.filterManager .filterColumn,
+.filterManager .sourceColumn {
+    width: 200px;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+.filterManager td.sourceColumn {
+    border-right: 1px solid var(--border-grey-29);
+}
+
+/* .filterManager td.filterColumn > input[type="text"] {
+	margin-top: -6px;
+} */
+
+.filterManager td.filterColumn input {
+    width: 100%;
+    box-sizing: border-box;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.filterManager td.filterColumn p{
+    width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.filterManager td.filterColumn.invisible {
+    font-style: italic;
+}
+
+.filterManager td.addConsumerColumn {
+    vertical-align: bottom;
+    padding-bottom: 4px;
+}
+
+.filterManager .addConsumerColumn,
+.filterManager .removeConsumerColumn {
+    width: 50px;
+    text-align: center;
+}
+
+.filterManager .selectConsumerColumn {
+    padding: 0;
+    height: 35px;
+}
+
+.filterManager .consumerTable td {
+    border: none;
+}
+
+.filterManager .consumerTable .consumerRow {
+    height: 35px;
+}
+
+.filterManager .button.simple.action.over {
+    background-color: #ffffff;
+}
+
+.filterManager .button.simple.action.pressed {
+    background-color: #ffffff;
+}
+
+.filterManager .button.simple.action {
+    height: 20px;
+    margin-top: 6px;
+}
+
+/*.filterManager .button.simple.action.add {*/
+/*background-position: 4px -72px;*/
+/*}*/
+
+/*.filterManager .button.simple.action.delete {*/
+/*background-position: 4px -38px;*/
+/*}*/
+
+
+/* -------------------------------------- */
+/*  09. ADD DASHBOARD COMPONENT DIALOG    */
+/* -------------------------------------- */
+
+.addDashboardComponentDialog {
+    width: 480px;
+    min-width: 450px;
+}
+
+.addDashboardComponentDialog .control.input.text input {
+    padding: 5px;
+}
+
+
+/* -------------- */
+/*  10. CANVAS    */
+/* -------------- */
+.dashboardCanvas .nothingToDisplay .message > .welcomeList {
+    list-style-type: disc;
+}
+
+.dashboardCanvas .nothingToDisplay .message > .welcomeList li {
+    margin: 5px 20px;
+}
+
+.dashboardCanvas .ui-resizable-handle {
+    z-index: 3001 !important;
+}
+
+.dashboardCanvas .ui-resizable-se {
+    width: 9px;
+    height: 9px;
+}
+
+/* dashlet highlighting */
+/* drop area hover style */
+.dashboardCanvas > .helper {
+    background-color: var(--jrs-theme-light);
+    position: absolute;
+    opacity: .75;
+    z-index: 3000;
+}
+
+.helper.filter-dialog-drop {
+    background-color: var(--jrs-theme-light);
+    opacity: .75;
+    position: absolute;
+}
+
+.dashboardCanvas .ui-icon-gripsmall-diagonal-se {
+    background: none;
+}
+
+.dashboardCanvas > .grid {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 100%;
+    z-index: 3000
+}
+
+.dashboardCanvas > .grid > div {
+    background: var(--background-grey-20);
+    position: absolute;
+}
+
+.dashlet.hovered > .dashletContent,
+.filterRow .inputControlWrapper.hovered {
+    border: 1px solid #a1cbe6 !important;
+}
+
+.dashlet.selected > .dashletContent,
+.filterRow .inputControlWrapper.selected {
+    border: 1px solid var(--jrs-theme-light) !important;
+}
+
+.dashlet.selected > .dashletContent {
+    outline: 1px solid var(--jrs-theme-light);
+}
+
+.dashlet.hovered > .dashletContent {
+    outline: 1px solid #a1cbe6;
+}
+
+
+/* --------------------- */
+/*  11. COLOR PICKER     */
+/* ---------------------
+.colorPicker {
+    width: 175px;
+    position: absolute;
+    padding: 12px;
+    height: 180px;
+    z-index: 9999;
+    background-color: #EDEDED;
+}
+
+.colorPicker .colorInput {
+    width: 165px;
+    padding: 4px;
+} can't find in UI, remove if there are no issues, Aug 2024
+*/
+
+/* ------------------------------------- */
+/*  12. DASHLET HYPERLINK PROPERTIES     */
+/* -------------------------------------
+.hyperlinkParametersContainer {
+    position: relative;
+}
+
+.hyperlinkPropertiesSection {
+    background-color: var(--background-grey-02);
+    border: 1px solid var(--border-grey-29);
+    margin-bottom: 14px;
+    clear: both;
+}
+
+.hyperlinkPropertiesSection .table-container {
+    height: 150px;
+    overflow: auto;
+}
+
+.hyperlinkPropertiesSection .header-container {
+    line-height: 30px;
+    height: 30px;
+    border-bottom: 1px solid var(--border-grey-29);
+    background: #ecf1f7;
+}
+
+.hyperlinkPropertiesSection .name,
+.hyperlinkPropertiesSection .value,
+.hyperlinkPropertiesSection .actions {
+    float: left;
+}
+
+.hyperlinkPropertiesSection .name {
+    width: 40%;
+}
+
+.hyperlinkPropertiesSection .value {
+    width: 40%;
+}
+
+.hyperlinkPropertiesSection table {
+    background-color: #ffffff;
+    width: 100%;
+    margin-top: -29px;
+}
+
+.hyperlinkPropertiesSection thead th {
+    color: #333333;
+    font-weight: normal;
+    line-height: 28px;
+    padding-left: 10px;
+    text-align: left;
+}
+
+.hyperlinkPropertiesSection thead th > div {
+    position: absolute;
+    top: 0;
+}
+
+.hyperlinkPropertiesSection tbody td {
+    text-align: left;
+    color: #878787;
+    padding-left: 10px;
+    line-height: 28px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 28px;
+}
+
+.hyperlinkPropertiesSection tbody .edit td {
+    height: auto;
+}
+
+.hyperlinkPropertiesSection tbody tr {
+    border-bottom: 1px solid var(--border-grey-29);
+}
+
+.hyperlinkPropertiesSection .actions {
+    line-height: 0;
+    width: 70px;
+}
+
+.hyperlinkPropertiesSection .action.simple.edit,
+.hyperlinkPropertiesSection .action.simple.delete,
+.hyperlinkPropertiesSection .action.simple.button.save,
+.hyperlinkPropertiesSection .action.simple.button.cancel {
+    background-color: white;
+    margin: 6px 3px 0 3px;
+}
+
+.hyperlinkPropertiesSection td input {
+    margin-top: 2px;
+    width: 100%;
+}
+
+.hyperlinkPropertiesSection a.addNewItem {
+    color: #1388d8;
+    border: 1px solid #1388d8;
+    float: right;
+    bottom: 0;
+    cursor: pointer;
+    margin: 12px 5px 5px 8px;
+    text-decoration: none;
+}
+
+.hyperlinkPropertiesSection .warning {
+    margin-bottom: 5px;
+}
+
+.hyperlinkPropertiesSection .button-container {
+    height: 40px;
+    position: relative;
+} no longer in use, remove if there are no issues, Aug 2024
+*/

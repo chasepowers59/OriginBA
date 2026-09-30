@@ -30,11 +30,9 @@ export default async function DatabasePage({
     >
       <div className="space-y-4">
         <div>
+          {/* The scope sentence lives in the workspace, which is where the engine is
+              known: a Postgres org has no CISADM to offer. */}
           <h1 className="portal-heading text-2xl font-bold tracking-tight">SQL</h1>
-          <p className="portal-text-muted mt-1 max-w-2xl text-sm">
-            Query the CISADM schema you know from CIS. Start with a premade business question or
-            browse the table guide, fetch results a page at a time, and chart grouped results.
-          </p>
         </div>
         <DatabaseWorkspace dbConfigured={index.db_configured} initialTable={table} />
       </div>

@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="REP11_SEARCH_Weekly_OPRA_Request" pageWidth="1250" pageHeight="595" orientation="Landscape" columnWidth="1210" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1a4ed14b-e52a-4e72-96d2-1e42f228f967">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Newark - JRS TST DB"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin|Newark"/>
+	<property name="ireport.jasperserver.report.resource" value="/Reports/REP11_SEARCH_Weekly_OPRA_Request_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/Reports/REP11_SEARCH_Weekly_OPRA_Request"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="OpraRequest" uuid="b4458104-8916-42f7-9fbc-46714fdfd099">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Newark - JRS TST DB"/>
+		<parameter name="Report_Date" class="java.sql.Date"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT
+    SA.OLD_ACCT_ID          AS400_ACCT_ID,
+    SA.ACCT_ID              C2M_ACCT_ID,
+    PCH1.SRCH_CHAR_VAL      BLOCK_LOT,
+    PCH2.SRCH_CHAR_VAL      QUALIFIER,
+    PREM.ADDRESS1           SERVICE_ADDRESS,
+    PNAME.ENTITY_NAME_UPR   BILL_NAME,
+    NVL(CB.BALANCE, 0)      CURRENT_ENDING_BALANCE,
+    UPPER(PCH3L.DESCR)      CUSTOMER_STATUS,
+    NVL(LAST_BILL.LAST_BILLED_AMT, 0) LAST_BILLED_AMT,
+    TO_CHAR(LAST_BILL.LAST_BILLED_DATE,'YYYYMMDD') AS BILL_DATE
+FROM 
+    CISADM.CI_PREM PREM
+INNER JOIN (
+        SELECT * FROM (
+                SELECT TSA.ACCT_ID, 
+                   TSA.OLD_ACCT_ID,
+                   TSA.CHAR_PREM_ID,
+                   ROW_NUMBER() OVER (PARTITION BY TSA.CHAR_PREM_ID ORDER BY TSA.START_DT DESC) RANK
+            FROM CISADM.CI_SA TSA
+            WHERE TSA.CHAR_PREM_ID != ' '
+            AND TSA.SA_STATUS_FLG NOT IN ('70')
+            ORDER BY TSA.START_DT DESC)
+        WHERE RANK = 1) 
+SA ON SA.CHAR_PREM_ID = PREM.PREM_ID
+INNER JOIN CISADM.CI_ACCT_PER AP
+ON         AP.ACCT_ID = SA.ACCT_ID
+AND        AP.MAIN_CUST_SW = 'Y'
+INNER JOIN CISADM.CI_PER_NAME PNAME
+ON         PNAME.PER_ID = AP.PER_ID
+AND        PNAME.PRIM_NAME_SW = 'Y'
+LEFT JOIN  CISADM.CI_PREM_CHAR PCH1
+ON         PCH1.PREM_ID = PREM.PREM_ID
+AND        PCH1.CHAR_TYPE_CD = 'BLCK/LOT'
+LEFT JOIN  CISADM.CI_PREM_CHAR PCH2
+ON         PCH2.PREM_ID = PREM.PREM_ID
+AND        PCH2.CHAR_TYPE_CD = 'CMC-QLFR'
+LEFT JOIN  CISADM.CI_PREM_CHAR PCH3
+ON         PCH3.PREM_ID = PREM.PREM_ID
+AND        PCH3.CHAR_TYPE_CD = 'CUST STA'
+LEFT JOIN  CISADM.CI_CHAR_VAL_L PCH3L
+ON         PCH3L.CHAR_TYPE_CD = PCH3.CHAR_TYPE_CD
+AND        PCH3L.CHAR_VAL = PCH3.CHAR_VAL
+AND        PCH3L.LANGUAGE_CD = 'ENG'
+LEFT JOIN
+           (
+                    SELECT   /*+ FULL(FT) */ 
+                             SUM(FT.CUR_AMT) BALANCE,
+                             ACT.ACCT_ID
+                    FROM     CISADM.CI_SA SA,
+                             CISADM.CI_ACCT ACT,
+                             CISADM.CI_FT FT
+                    WHERE    FT.SA_ID = SA.SA_ID
+                    AND $X{LESS], FT.FREEZE_DTTM, Report_Date}
+                    AND      FT.FREEZE_SW = 'Y'
+                    AND      SA.ACCT_ID = ACT.ACCT_ID
+                    GROUP BY ACT.ACCT_ID) CB
+ON         CB.ACCT_ID = SA.ACCT_ID
+LEFT JOIN
+           (
+                      SELECT     SUM(BSA.CUR_AMT) AS LAST_BILLED_AMT,
+                                 BILL.BILL_DT     AS LAST_BILLED_DATE,
+                                 BILL.ACCT_ID
+                      FROM       CISADM.CI_BILL_SA BSA
+                      INNER JOIN CISADM.CI_BILL BILL
+                      ON         BILL.BILL_ID = BSA.BILL_ID
+                      WHERE      1=1
+                      AND        BILL.BILL_DT =
+                                 (
+                                        SELECT MAX(B.BILL_DT)
+                                        FROM   CISADM.CI_BILL B
+                                        WHERE  B.ACCT_ID = BILL.ACCT_ID
+                                        AND    B.BILL_STAT_FLG = 'C'
+                                        AND $X{LESS], B.BILL_DT, Report_Date})
+                      GROUP BY   BILL.BILL_DT,
+                                 BILL.ACCT_ID) LAST_BILL
+ON         LAST_BILL.ACCT_ID = SA.ACCT_ID]]>
+		</queryString>
+		<field name="AS400_ACCT_ID" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="AS400_ACCT_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="AS400_ACCT_ID"/>
+		</field>
+		<field name="C2M_ACCT_ID" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="C2M_ACCT_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="C2M_ACCT_ID"/>
+		</field>
+		<field name="BLOCK_LOT" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="BLOCK_LOT"/>
+			<property name="com.jaspersoft.studio.field.label" value="BLOCK_LOT"/>
+		</field>
+		<field name="QUALIFIER" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="QUALIFIER"/>
+			<property name="com.jaspersoft.studio.field.label" value="QUALIFIER"/>
+		</field>
+		<field name="SERVICE_ADDRESS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="SERVICE_ADDRESS"/>
+			<property name="com.jaspersoft.studio.field.label" value="SERVICE_ADDRESS"/>
+		</field>
+		<field name="BILL_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="BILL_NAME"/>
+			<property name="com.jaspersoft.studio.field.label" value="BILL_NAME"/>
+		</field>
+		<field name="CURRENT_ENDING_BALANCE" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="CURRENT_ENDING_BALANCE"/>
+			<property name="com.jaspersoft.studio.field.label" value="CURRENT_ENDING_BALANCE"/>
+		</field>
+		<field name="CUSTOMER_STATUS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="CUSTOMER_STATUS"/>
+			<property name="com.jaspersoft.studio.field.label" value="CUSTOMER_STATUS"/>
+		</field>
+		<field name="LAST_BILLED_AMT" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="LAST_BILLED_AMT"/>
+			<property name="com.jaspersoft.studio.field.label" value="LAST_BILLED_AMT"/>
+		</field>
+		<field name="BILL_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="BILL_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="BILL_DATE"/>
+		</field>
+	</subDataset>
+	<parameter name="Report_Date" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 1 FROM CISADM.CI_ACCT WHERE ROWNUM = 1]]>
+	</queryString>
+	<field name="1" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="1"/>
+		<property name="com.jaspersoft.studio.field.label" value="1"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="60">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<componentElement>
+				<reportElement x="0" y="-1" width="1210" height="60" uuid="0d6abceb-bf05-4a02-a1fe-d91eab9dd13e">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.components.autoresize.next" value="true"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="OpraRequest" uuid="a3ce7b0e-23ce-4f49-852b-7835f5385592">
+						<datasetParameter name="Report_Date">
+							<datasetParameterExpression><![CDATA[$P{Report_Date}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="109" uuid="f05fdf57-862a-487d-858a-954a62da3793">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="109" height="30" uuid="80e4e4ac-d567-45e6-b8d6-32ed48ed686d"/>
+								<text><![CDATA[AS400_ACCT_ID]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="109" height="30" uuid="e9fd4697-bece-421d-bf17-0bb4f4d491c0"/>
+								<textFieldExpression><![CDATA[$F{AS400_ACCT_ID}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="109" uuid="215eae38-35dc-4f88-9fc2-2929924119be">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="109" height="30" uuid="ab4824c3-6428-4381-b470-12f6dc352ac8"/>
+								<text><![CDATA[C2M_ACCT_ID]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<textField>
+								<reportElement x="0" y="0" width="109" height="30" uuid="1fadac12-67ec-4b64-a7c9-67406da18d6a"/>
+								<textFieldExpression><![CDATA[$F{C2M_ACCT_ID}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="109" uuid="0aba8012-bef7-46ac-b9e5-61ad8f21d44f">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="109" height="30" uuid="6a28334d-a295-47ca-be67-cabb879cea6c"/>
+								<text><![CDATA[BLOCKLOT]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="109" height="30" uuid="07dcd746-af81-4089-8f9a-027a2c9e5f43"/>
+								<textFieldExpression><![CDATA[$F{BLOCK_LOT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="109" uuid="b64c8ac2-49d2-4f9c-ad7f-02aa5909887b">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="109" height="30" uuid="cd5e5884-71d2-4ca5-9dc6-f400f6915093"/>
+								<text><![CDATA[QUALIFIER]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="109" height="30" uuid="250c7d19-908e-4248-83dd-6f349b33919e"/>
+								<textFieldExpression><![CDATA[$F{QUALIFIER}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="109" uuid="50d36c44-50d6-494d-a276-076ffbd37c29">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="109" height="30" uuid="e86f8fd0-ccf1-4c23-bb0c-f07e2859a3b1"/>
+								<text><![CDATA[STATUS]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="109" height="30" uuid="1ac9be18-efa6-4df5-894b-f6df9a456c0c"/>
+								<textFieldExpression><![CDATA[$F{CUSTOMER_STATUS}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="109" uuid="979cb3c6-af51-4cdd-95c9-09bbc7bda9a5">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column6"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="109" height="30" uuid="05f5bb37-9fc4-4cf4-8b41-141a40b3f61d"/>
+								<text><![CDATA[ADDRESS]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<textField>
+								<reportElement x="0" y="0" width="109" height="30" uuid="1b9df9bb-1c87-4868-8efe-61e55dafe40c"/>
+								<textFieldExpression><![CDATA[$F{SERVICE_ADDRESS}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="109" uuid="016a31b9-e61b-4c2c-809a-ec7a60c0c864">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column7"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="109" height="30" uuid="244ca210-d0ef-492d-a872-ee81cf784b0e"/>
+								<text><![CDATA[CUSTOMER_NAME]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<textField>
+								<reportElement x="0" y="0" width="109" height="30" uuid="6424cf52-23be-4caa-b398-3ccb072de045"/>
+								<textFieldExpression><![CDATA[$F{BILL_NAME}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="109" uuid="90d6fad9-f62e-4f10-b23b-8ec2f1f45bf7">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column8"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="109" height="30" uuid="4fa7705a-1cc4-4b7d-9fdf-35a65f41b0d9"/>
+								<text><![CDATA[CUR_BAL]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<textField>
+								<reportElement x="0" y="0" width="109" height="30" uuid="f5206f6e-202c-4e3f-8f23-d528354c0dec"/>
+								<textFieldExpression><![CDATA[$F{CURRENT_ENDING_BALANCE}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="109" uuid="6015e0c1-9c58-4e6e-bb95-23a3fa571831">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column9"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="109" height="30" uuid="0e5d1aa8-a71f-408c-a27a-c7ff7c1c4ded"/>
+								<text><![CDATA[LAST_BILLED_AMT]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<textField>
+								<reportElement x="0" y="0" width="109" height="30" uuid="95601b56-24e3-4231-973b-a4c3f3133d92"/>
+								<textFieldExpression><![CDATA[$F{LAST_BILLED_AMT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="109" uuid="5b145069-72bf-44f8-bae3-0c6fe008f217">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column10"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="109" height="30" uuid="bfb7a289-98c0-4395-8fc2-3cfb39ab5995"/>
+								<text><![CDATA[BILL_DATE]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="109" height="30" uuid="cc9e7875-1823-4f43-a576-1c79d05d06ce"/>
+								<textFieldExpression><![CDATA[$F{BILL_DATE}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="109" uuid="9eea8623-8006-4cea-a507-98e5e15ff6f5">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column11"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="109" height="30" uuid="53d773a3-d2cb-481f-8688-db03e60574d9"/>
+								<text><![CDATA[REPORT_DATE]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<textField>
+								<reportElement x="0" y="0" width="109" height="30" uuid="8a450d72-c11e-4845-826d-9d05a3f032cc"/>
+								<textFieldExpression><![CDATA[new SimpleDateFormat("yyyyMMdd").format($P{Report_Date})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</detail>
+</jasperReport>

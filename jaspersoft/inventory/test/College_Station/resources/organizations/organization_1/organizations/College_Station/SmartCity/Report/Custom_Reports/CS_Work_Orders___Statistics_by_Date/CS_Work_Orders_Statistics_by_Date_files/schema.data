@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CS_WORK_ORDER_STATISTICS" label="CS_WORK_ORDER_STATISTICS" resourceId="CS_WORK_ORDER_STATISTICS"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CollegeStation_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="ACT_STATUS" label="Status" resourceId="CS_WORK_ORDER_STATISTICS.ACT_STATUS"></item>
+    <item id="COUNT_VAL" label="Statistics" resourceId="CS_WORK_ORDER_STATISTICS.COUNT_VAL"></item>
+    <item id="FIELD_TASK_TYPE" label="Field Task Type" resourceId="CS_WORK_ORDER_STATISTICS.FIELD_TASK_TYPE"></item>
+    <item id="WORK_DTTM" label="Work Date/Time" resourceId="CS_WORK_ORDER_STATISTICS.WORK_DTTM"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CS_WORK_ORDER_STATISTICS" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="COUNT_VAL" type="java.math.BigDecimal"></field>
+        <field id="FIELD_TASK_TYPE" type="java.lang.String"></field>
+        <field id="ACT_STATUS" type="java.lang.String"></field>
+        <field id="WORK_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>SELECT COUNT(BOSL.DESCR) AS COUNT_VAL, EXLKV.DESCR AS FIELD_TASK_TYPE, BOSL.DESCR AS ACT_STATUS, ACT.START_DTTM AS WORK_DTTM
+FROM CISADM.D1_ACTIVITY ACT, CISADM.F1_EXT_LOOKUP_VAL_L EXLKV, CISADM.F1_BUS_OBJ_STATUS_L BOSL 
+WHERE ACT.FIELD_TASK_TYPE = EXLKV.F1_EXT_LOOKUP_VALUE
+AND EXLKV.BUS_OBJ_CD = 'D1-FieldTaskTypeLookup'
+AND EXLKV.LANGUAGE_CD = 'ENG'
+AND ACT.BUS_OBJ_CD = BOSL.BUS_OBJ_CD
+AND ACT.BO_STATUS_CD = BOSL.BO_STATUS_CD
+AND BOSL.LANGUAGE_CD = 'ENG'
+GROUP BY EXLKV.DESCR, BOSL.DESCR, ACT.START_DTTM</query>
+    </jdbcQuery>
+  </resources>
+</schema>

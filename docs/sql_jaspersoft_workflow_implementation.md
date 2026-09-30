@@ -6,11 +6,11 @@ Operational workflow for using local skills and knowledge base to deliver Oracle
 ## Workflow Stages
 1. Intake
 - Capture business question, consumer, metric definitions, expected output grain, target deliverable type, prompt contract, and validation slice.
-- Apply `docs/c2m_jaspersoft_delivery_playbook.md` as the default operating guide.
+- Apply `jaspersoft/docs/c2m_jaspersoft_delivery_playbook.md` as the default operating guide.
 - Use `knowledge_base/jaspersoft_artifact_model_and_performance.md` to decide report vs Domain vs Ad Hoc vs dashboard and to choose raw-table vs derived-table modeling.
 
 2. Build SQL Logic
-- Follow `skills/sql_report_builder/SKILL.md`.
+- Follow `.claude/skills/originba-cisadm-sql-builder/SKILL.md`.
 - Use `knowledge_base/oracle_c2m_query_patterns.md`.
 
 3. Convert for Jaspersoft

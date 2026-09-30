@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="/public/monitoring/reports/Origin___Summary_Report_Monitor" pageWidth="595" pageHeight="842" orientation="Landscape" whenNoDataType="NoPages" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isFloatColumnFooter="true" uuid="f55fb455-6c8a-4f92-937f-74aa23f1fa1c">
+	<property name="com.jaspersoft.ji.adhoc" value="1"/>
+	<property name="com.jaspersoft.ji.adhoc.preferredDataStrategy" value="domainDataStrategy"/>
+	<property name="net.sf.jasperreports.export.pdf.tagged" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.tag.language" value="EN-US"/>
+	<property name="net.sf.jasperreports.export.pdf.metadata.title" value="Ad Hoc Report"/>
+	<property name="net.sf.jasperreports.export.pdf.display.metadata.title" value="true"/>
+	<property name="net.sf.jasperreports.text.truncate.suffix" value="..."/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<propertyExpression name="com.jaspersoft.jrs.export.report.empty"><![CDATA[$P{com.jaspersoft.jrs.report.data.source.is.empty} == null? null : $P{com.jaspersoft.jrs.report.data.source.is.empty}.toString()]]></propertyExpression>
+	<import value="com.jaspersoft.ji.adhoc.jr.AdhocReportUtils"/>
+	<style name="ReportDefault" isDefault="true" mode="Transparent" forecolor="#666666" backcolor="#FFFFFF" hTextAlign="Left" hImageAlign="Left" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="11">
+		<box>
+			<pen lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableBaseFrameStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableFrameStyle" style="TableBaseFrameStyle">
+		<box padding="0">
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<bottomPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnFooterFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableColumnHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<pen lineWidth="1.0" lineStyle="Solid"/>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#D9E4F1">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupHeaderTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterFrameStyle" style="TableBaseFrameStyle" mode="Opaque" backcolor="#F2F2F2">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableGroupFooterTextStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#F2F2F2" isBold="true">
+		<box leftPadding="5" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableSummaryFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableSummaryTextNoBorderStyle" style="ReportDefault" mode="Opaque" forecolor="#262626" backcolor="#D9E4F1" isBold="true">
+		<box leftPadding="5" rightPadding="5"/>
+	</style>
+	<style name="TableSummaryTextStyle" style="TableSummaryTextNoBorderStyle">
+		<box>
+			<pen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="TableTitleFrameStyle" style="TableFrameStyle">
+		<box topPadding="0" bottomPadding="0">
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableTitleTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box bottomPadding="8">
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="TableDetailFrameStyle" style="TableBaseFrameStyle">
+		<box>
+			<leftPen lineWidth="1.0" lineColor="#AAAAAA"/>
+			<rightPen lineWidth="1.0" lineColor="#AAAAAA"/>
+		</box>
+	</style>
+	<style name="TableDetailTextStyle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" isBold="false">
+		<box leftPadding="5" rightPadding="5">
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{IS_EVEN_ROW}]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="ChartReportTitle" style="ReportDefault" mode="Opaque" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center" fontSize="18" isBold="false">
+		<box>
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineStyle="Solid"/>
+		</box>
+	</style>
+	<style name="ChartTitle" forecolor="#000000" fontSize="12" isBold="true"/>
+	<style name="CrosstabElementStyle" mode="Transparent" forecolor="#000033" backcolor="#FFFFFF" hTextAlign="Center" hImageAlign="Center">
+		<box>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseCellStyle" mode="Transparent">
+		<box padding="0">
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabBaseTextStyle" mode="Opaque" forecolor="#666666" backcolor="#FFFFFF" vTextAlign="Top" vImageAlign="Top" isBold="true">
+		<box topPadding="3" leftPadding="5" bottomPadding="3" rightPadding="5">
+			<topPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<leftPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<bottomPen lineWidth="1.0" lineColor="#D4D4D4"/>
+			<rightPen lineWidth="1.0" lineColor="#D4D4D4"/>
+		</box>
+	</style>
+	<style name="CrosstabTitleTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" hTextAlign="Center" fontSize="18" isBold="false">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabHeaderLabelStyle" style="CrosstabHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabMeasureHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#262626" backcolor="#D9E4F1"/>
+	<style name="CrosstabMeasureHeaderLabelStyle" style="CrosstabMeasureHeaderTextStyle" mode="Transparent">
+		<box>
+			<pen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="CrosstabColumnMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" isBold="false"/>
+	<style name="CrosstabRowMeasureHeaderTextStyle" style="CrosstabMeasureHeaderTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{IS_EVEN_ROW}]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabRowDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#FFFFFF" isBold="false"/>
+	<style name="CrosstabRowDimensionHeaderTotalTextStyle" style="CrosstabRowDimensionHeaderTextStyle" forecolor="#262626" isBold="true"/>
+	<style name="CrosstabInnerRowDimensionHeaderTextStyle" style="CrosstabRowDimensionHeaderTextStyle">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{IS_EVEN_ROW}]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabInnerRowDimensionHeaderTotalTextStyle" style="CrosstabRowDimensionHeaderTotalTextStyle">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{IS_EVEN_ROW}]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabColumnDimensionHeaderTextStyle" style="CrosstabBaseTextStyle" forecolor="#757575" backcolor="#D9E4F1" hTextAlign="Center" isBold="false"/>
+	<style name="CrosstabColumnDimensionHeaderTotalTextStyle" style="CrosstabColumnDimensionHeaderTextStyle" forecolor="#262626" isBold="true"/>
+	<style name="CrosstabDetailTextStyle" style="CrosstabBaseTextStyle" forecolor="#333333" backcolor="#FFFFFF" hTextAlign="Right" hImageAlign="Right" isBold="false">
+		<box>
+			<topPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{IS_EVEN_ROW}]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDetailTotalTextStyle" style="CrosstabDetailTextStyle" forecolor="#262626" isBold="true">
+		<box>
+			<topPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{IS_EVEN_ROW}]]></conditionExpression>
+			<style backcolor="#F4F4F4"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDummyHeaderTextStyle" style="CrosstabBaseTextStyle" backcolor="#F2F2F2"/>
+	<parameter name="com.jaspersoft.jrs.report.data.source.is.empty" class="java.lang.Boolean" isForPrompting="false">
+		<property name="net.sf.jasperreports.data.cache.included" value="true"/>
+	</parameter>
+	<parameter name="Collator" class="java.text.Collator" isForPrompting="false">
+		<defaultValueExpression><![CDATA[java.text.Collator.getInstance($P{REPORT_LOCALE})]]></defaultValueExpression>
+	</parameter>
+	<field name="TotalReportExecutionInMinutes" class="java.lang.Double">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CountAll_divide_TOTAL_REPORT_EXECUTION_TIME_60000" class="java.lang.Long">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_divide_QUERY_EXECUTION_TIME_60000" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_divide_TOTAL_REPORT_EXECUTION_TIME_60000" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="QueryExecutionInMinutes" class="java.lang.Double">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="ReportRenderingInMinutes" class="java.lang.Double">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Max_divide_REPORT_RENDERING_TIME_60000" class="java.lang.Double">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Max_divide_QUERY_EXECUTION_TIME_60000" class="java.lang.Double">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Max_divide_TOTAL_REPORT_EXECUTION_TIME_60000" class="java.lang.Double">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CountAll_divide_QUERY_EXECUTION_TIME_60000" class="java.lang.Long">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="CountAll_divide_REPORT_RENDERING_TIME_60000" class="java.lang.Long">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="TOTAL_REPORT_EXECUTION_TIME" class="java.lang.Integer">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="REPORT_URI" class="java.lang.String">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="REPORT_RENDERING_TIME" class="java.lang.Integer">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="QUERY_EXECUTION_TIME" class="java.lang.Integer">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="Sum_divide_REPORT_RENDERING_TIME_60000" class="java.math.BigDecimal">
+		<property name="kind" value="ANY"/>
+	</field>
+	<field name="jireportmonitoringfact.report_uri" class="java.lang.String">
+		<property name="udds_mapping" value="ROW_LEVEL"/>
+	</field>
+	<field name="Measures" class="java.lang.String">
+		<property name="udds_mapping" value="COLUMN_LEVEL"/>
+	</field>
+	<field name="Measures__IDENTIFIER" class="java.lang.String">
+		<property name="udds_mapping" value="COLUMN_MEASURE_ID"/>
+	</field>
+	<field name="QueryExecutionInMinutes_m0" class="java.lang.Double">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Query Execution in Minutes (Average)"/>
+	</field>
+	<field name="QueryExecutionInMinutes_JRS_Measure_m1" class="java.lang.Double">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Query Execution in Minutes (Maximum)"/>
+	</field>
+	<field name="ReportRenderingInMinutes_m2" class="java.lang.Double">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Report Rendering in Minutes (Average)"/>
+	</field>
+	<field name="ReportRenderingInMinutes_JRS_Measure_m3" class="java.lang.Double">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Report Rendering in Minutes (Maximum)"/>
+	</field>
+	<field name="TotalReportExecutionInMinutes_m4" class="java.lang.Double">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Total Report Execution in Minutes (Average)"/>
+	</field>
+	<field name="TotalReportExecutionInMinutes_JRS_Measure_m5" class="java.lang.Double">
+		<property name="udds_mapping" value="MEASURE"/>
+		<property name="format" value="#,##0.00"/>
+		<property name="adhoc.display" value="Total Report Execution in Minutes (Maximum)"/>
+	</field>
+	<field name="jireportmonitoringfact.report_uri__DISCRIMINATOR" class="java.lang.Boolean">
+		<property name="udds_mapping" value="ROW_DISCRIMINATOR"/>
+	</field>
+	<field name="jireportmonitoringfact.report_uri__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="ROW_RAW_VALUE"/>
+	</field>
+	<field name="Measures__RAW" class="java.lang.Comparable">
+		<property name="udds_mapping" value="COLUMN_RAW_VALUE"/>
+	</field>
+	<summary>
+		<band height="25" splitType="Stretch">
+			<crosstab>
+				<reportElement style="CrosstabElementStyle" x="0" y="0" width="572" height="25" uuid="1caf898f-5bc0-426c-8b95-c8141c0df720">
+					<property name="net.sf.jasperreports.crosstab.order.by.column">
+						<![CDATA[{"order":"Descending","measureIndex":0,"columnValues":[{"total":false,"valueType":"net.sf.jasperreports.engine.util.DisplayComparableValue","value":"rO0ABXNyADduZXQuc2YuamFzcGVycmVwb3J0cy5lbmdpbmUudXRpbC5EaXNwbGF5Q29tcGFyYWJs\nZVZhbHVlAAAAAAAAJ9gCAAB4cgAtbmV0LnNmLmphc3BlcnJlcG9ydHMuZW5naW5lLnV0aWwuRGlz\ncGxheVZhbHVlAAAAAAAAJ9gCAAJMAANrZXl0ABJMamF2YS9sYW5nL09iamVjdDtMAAVsYWJlbHQA\nEkxqYXZhL2xhbmcvU3RyaW5nO3hwdAAaUXVlcnlFeGVjdXRpb25Jbk1pbnV0ZXNfbTB0ACRRdWVy\neSBFeGVjdXRpb24gaW4gTWludXRlcyAoQXZlcmFnZSk="}]}]]>
+					</property>
+				</reportElement>
+				<crosstabParameter name="REPORT_TITLE">
+					<parameterValueExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get("REPORT_TITLE")]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="CrosstabRowGroupsCount" class="java.lang.Integer">
+					<parameterValueExpression><![CDATA[new Integer(1)]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="CrosstabColumnGroupsCount" class="java.lang.Integer">
+					<parameterValueExpression><![CDATA[new Integer(1)]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="CrosstabMeasureIndexes" class="java.util.Map">
+					<parameterValueExpression><![CDATA[org.apache.commons.collections.MapUtils.putAll(new java.util.HashMap(), new String[]{"QueryExecutionInMinutes_m0","0","QueryExecutionInMinutes_JRS_Measure_m1","1","ReportRenderingInMinutes_m2","2","ReportRenderingInMinutes_JRS_Measure_m3","3","TotalReportExecutionInMinutes_m4","4","TotalReportExecutionInMinutes_JRS_Measure_m5","5"})]]></parameterValueExpression>
+				</crosstabParameter>
+				<titleCell height="0" contentsPosition="Stretch">
+					<cellContents>
+						<textField textAdjust="StretchHeight">
+							<reportElement key="staticText" style="CrosstabTitleTextStyle" x="0" y="0" width="225" height="0" uuid="52547b49-ad45-4f9d-9caf-01726c0c1d28">
+								<printWhenExpression><![CDATA[$P{REPORT_TITLE} != null && $P{REPORT_TITLE}.length() > 0]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</titleCell>
+				<rowGroup name="jireportmonitoringfact.report_uri" width="125" headerPosition="Stretch">
+					<bucket order="None" class="com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator">
+						<bucketExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator.wrap($F{jireportmonitoringfact.report_uri__RAW}, $F{jireportmonitoringfact.report_uri}, $F{jireportmonitoringfact.report_uri__DISCRIMINATOR} ? net.sf.jasperreports.crosstabs.fill.calculation.BucketValueOrderDecorator.OrderPosition.LAST : null)]]></bucketExpression>
+						<comparatorExpression><![CDATA[com.jaspersoft.ji.adhoc.jr.CrosstabValueComparator.instance($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabInnerRowDimensionHeaderTextStyle" stretchType="ContainerHeight" x="0" y="0" width="125" height="20" uuid="28b5b7a6-973e-4a6a-becf-08a7fa9abf3e">
+									<styleExpression><![CDATA["CrosstabInnerRowDimensionHeader" + (((com.jaspersoft.ji.adhoc.jr.CrosstabValueDecorator)$V{jireportmonitoringfact.report_uri}).isTotal() ? "Total" : "") + "TextStyle"]]></styleExpression>
+								</reportElement>
+								<textFieldExpression><![CDATA[$V{jireportmonitoringfact.report_uri}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{jireportmonitoringfact.report_uri}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="Measures" height="20" headerPosition="Stretch">
+					<bucket order="None" class="net.sf.jasperreports.engine.util.DisplayComparableValue">
+						<bucketExpression><![CDATA[new net.sf.jasperreports.engine.util.DisplayComparableValue($F{Measures__IDENTIFIER}, $F{Measures})]]></bucketExpression>
+						<comparatorExpression><![CDATA[new net.sf.jasperreports.engine.util.DisplayValueLabelComparator($P{Collator})]]></comparatorExpression>
+					</bucket>
+					<crosstabHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<textField textAdjust="StretchHeight">
+								<reportElement style="CrosstabHeaderTextStyle" stretchType="ContainerHeight" x="0" y="0" width="125" height="20" uuid="d30e0466-10d1-491e-9414-b28a1bcc7e35">
+									<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+									<property name="net.sf.jasperreports.crosstab.row.group.column.header" value="0"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[($R{jireportmonitoringfact.report_uri} != null) ? $R{jireportmonitoringfact.report_uri} : "jireportmonitoringfact.report_uri"]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[($R{jireportmonitoringfact.report_uri} != null) ? $R{jireportmonitoringfact.report_uri} : "jireportmonitoringfact.report_uri"]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabHeader>
+					<crosstabColumnHeader>
+						<cellContents style="CrosstabBaseCellStyle">
+							<box padding="0"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="CrosstabColumnMeasureHeaderTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="938cf674-f226-4963-86bf-5be489899be0">
+									<propertyExpression name="net.sf.jasperreports.crosstab.column.header.sort.measure.index"><![CDATA[$P{CrosstabMeasureIndexes}.get($V{Measures}.key())]]></propertyExpression>
+								</reportElement>
+								<textFieldExpression><![CDATA[$V{Measures}.label()]]></textFieldExpression>
+								<hyperlinkTooltipExpression><![CDATA[$V{Measures}.label()]]></hyperlinkTooltipExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="QueryExecutionInMinutes_m0" class="java.lang.Double">
+					<measureExpression><![CDATA[$F{QueryExecutionInMinutes_m0}]]></measureExpression>
+				</measure>
+				<measure name="QueryExecutionInMinutes_JRS_Measure_m1" class="java.lang.Double">
+					<measureExpression><![CDATA[$F{QueryExecutionInMinutes_JRS_Measure_m1}]]></measureExpression>
+				</measure>
+				<measure name="ReportRenderingInMinutes_m2" class="java.lang.Double">
+					<measureExpression><![CDATA[$F{ReportRenderingInMinutes_m2}]]></measureExpression>
+				</measure>
+				<measure name="ReportRenderingInMinutes_JRS_Measure_m3" class="java.lang.Double">
+					<measureExpression><![CDATA[$F{ReportRenderingInMinutes_JRS_Measure_m3}]]></measureExpression>
+				</measure>
+				<measure name="TotalReportExecutionInMinutes_m4" class="java.lang.Double">
+					<measureExpression><![CDATA[$F{TotalReportExecutionInMinutes_m4}]]></measureExpression>
+				</measure>
+				<measure name="TotalReportExecutionInMinutes_JRS_Measure_m5" class="java.lang.Double">
+					<measureExpression><![CDATA[$F{TotalReportExecutionInMinutes_JRS_Measure_m5}]]></measureExpression>
+				</measure>
+				<measure name="CROSSTAB_TOTAL_DISCRIMINATOR" class="java.lang.Boolean" calculation="First">
+					<measureExpression><![CDATA[Boolean.FALSE || $F{jireportmonitoringfact.report_uri__DISCRIMINATOR}]]></measureExpression>
+				</measure>
+				<crosstabCell width="100" height="20">
+					<cellContents style="CrosstabBaseCellStyle">
+						<box padding="0"/>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="a0e83655-cb4b-4105-96d7-131d59de46fb">
+								<printWhenExpression><![CDATA[!$V{CROSSTAB_TOTAL_DISCRIMINATOR} && $V{Measures}.key().equals("QueryExecutionInMinutes_m0")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{QueryExecutionInMinutes_m0}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTotalTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="9a9a5e58-2370-457e-9180-9987d0abeb65">
+								<printWhenExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR} && $V{Measures}.key().equals("QueryExecutionInMinutes_m0")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{QueryExecutionInMinutes_m0}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="2743794d-4133-4b41-ae73-0e19f66a60dd">
+								<printWhenExpression><![CDATA[!$V{CROSSTAB_TOTAL_DISCRIMINATOR} && $V{Measures}.key().equals("QueryExecutionInMinutes_JRS_Measure_m1")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{QueryExecutionInMinutes_JRS_Measure_m1}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTotalTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="b1aace1a-e728-4e34-85f1-73ac424643b8">
+								<printWhenExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR} && $V{Measures}.key().equals("QueryExecutionInMinutes_JRS_Measure_m1")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{QueryExecutionInMinutes_JRS_Measure_m1}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="89161232-8cdf-4f05-87e5-8b61554e00cf">
+								<printWhenExpression><![CDATA[!$V{CROSSTAB_TOTAL_DISCRIMINATOR} && $V{Measures}.key().equals("ReportRenderingInMinutes_m2")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{ReportRenderingInMinutes_m2}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTotalTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="6b892dc5-56c8-4e68-8c0f-613362ffd247">
+								<printWhenExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR} && $V{Measures}.key().equals("ReportRenderingInMinutes_m2")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{ReportRenderingInMinutes_m2}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="7e0522e0-6325-4310-88b9-a586eb5afcf6">
+								<printWhenExpression><![CDATA[!$V{CROSSTAB_TOTAL_DISCRIMINATOR} && $V{Measures}.key().equals("ReportRenderingInMinutes_JRS_Measure_m3")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{ReportRenderingInMinutes_JRS_Measure_m3}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTotalTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="29cc5b3c-de06-4e2a-8c4c-54e8faee02f7">
+								<printWhenExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR} && $V{Measures}.key().equals("ReportRenderingInMinutes_JRS_Measure_m3")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{ReportRenderingInMinutes_JRS_Measure_m3}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="fbbd52c2-53c2-4b97-a8d0-68604627539b">
+								<printWhenExpression><![CDATA[!$V{CROSSTAB_TOTAL_DISCRIMINATOR} && $V{Measures}.key().equals("TotalReportExecutionInMinutes_m4")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{TotalReportExecutionInMinutes_m4}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTotalTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="1731b78b-6438-47af-963b-874b5ca655b7">
+								<printWhenExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR} && $V{Measures}.key().equals("TotalReportExecutionInMinutes_m4")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{TotalReportExecutionInMinutes_m4}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="c388e239-f90e-4d2b-9a9c-49c4fcb47131">
+								<printWhenExpression><![CDATA[!$V{CROSSTAB_TOTAL_DISCRIMINATOR} && $V{Measures}.key().equals("TotalReportExecutionInMinutes_JRS_Measure_m5")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{TotalReportExecutionInMinutes_JRS_Measure_m5}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="CrosstabDetailTotalTextStyle" stretchType="ContainerHeight" x="0" y="0" width="100" height="20" uuid="1a4fc7dc-5559-4cf2-af55-f78bc74c2e22">
+								<printWhenExpression><![CDATA[$V{CROSSTAB_TOTAL_DISCRIMINATOR} && $V{Measures}.key().equals("TotalReportExecutionInMinutes_JRS_Measure_m5")]]></printWhenExpression>
+							</reportElement>
+							<textFieldExpression><![CDATA[$V{TotalReportExecutionInMinutes_JRS_Measure_m5}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

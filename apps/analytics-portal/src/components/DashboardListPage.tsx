@@ -7,18 +7,43 @@
  */
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { fetchDashboards } from "@/lib/api";
+import { deleteDashboard, fetchDashboards } from "@/lib/api";
+import { tileSummary } from "@/lib/dashboardCard";
+import { formatDate } from "@/lib/format";
 import type { SavedDashboard } from "@/lib/types";
+import { useAuth } from "@/components/AuthProvider";
+import { ownershipLabel } from "@/lib/ownership";
+import { groupByFolder } from "@/lib/folders";
 
 export function DashboardListPage() {
+  const { user } = useAuth();
   const [boards, setBoards] = useState<SavedDashboard[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Two-step delete: a board is somebody's saved work, so the first click asks.
+  const [confirming, setConfirming] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = () =>
     fetchDashboards()
       .then((r) => setBoards(r.dashboards))
       .catch(() => setError("Couldn't load your dashboards."));
+
+  useEffect(() => {
+    void load();
   }, []);
+
+  const remove = async (id: string) => {
+    setBusy(id);
+    try {
+      await deleteDashboard(id);
+      await load();
+    } catch {
+      setError("Couldn't delete that dashboard.");
+    } finally {
+      setBusy(null);
+      setConfirming(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -29,7 +54,7 @@ export function DashboardListPage() {
           </p>
           <h1 className="portal-heading mt-1 text-2xl font-bold">My dashboards</h1>
           <p className="mt-1 text-sm text-fg-muted">
-            Pinboards of up to four visuals, saved to the server and shared across your sessions.
+            Pinboards of up to eight visuals, saved to the server and shared across your sessions.
           </p>
         </div>
         <Link href="/dashboards/new" className="btn-primary text-sm">
@@ -54,28 +79,80 @@ export function DashboardListPage() {
         <div className="glass-panel p-10 text-center">
           <p className="text-sm font-medium text-heading">No dashboards yet</p>
           <p className="mx-auto mt-2 max-w-md text-sm text-fg-muted">
-            Build one from a starter template, or pin a report from the Library or Explore.
+            Build one from a starter template, or pin a report from the Library or Build.
           </p>
           <Link href="/dashboards/new" className="btn-primary mt-4 inline-block text-sm">
             Create your first dashboard
           </Link>
         </div>
       ) : (
+        <div className="space-y-6">
+        {groupByFolder(boards).map((group) => (
+        <section key={group.folder ?? "__unfiled"} aria-label={group.folder ?? "Not in a folder"}>
+        {group.folder || groupByFolder(boards).length > 1 ? (
+          <h2 className="mb-2 text-sm font-semibold text-heading">{group.folder ?? "Not in a folder"}</h2>
+        ) : null}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {boards.map((b) => (
-            <Link
-              key={b.id}
-              href={`/dashboards/${b.id}`}
-              className="glass-panel group block p-5 transition hover:border-edge"
-            >
-              <p className="font-semibold text-heading group-hover:text-primary dark:group-hover:text-primary">
-                {b.title}
-              </p>
-              <p className="mt-1 text-xs text-fg-muted">
-                {b.tiles?.length ?? 0} tile{(b.tiles?.length ?? 0) === 1 ? "" : "s"} · last {b.days} days
-              </p>
-            </Link>
-          ))}
+          {group.items.map((b) => {
+            const contents = tileSummary(b.tiles);
+            return (
+              <div key={b.id} className="glass-panel group flex flex-col p-5 transition hover:border-edge">
+                <Link href={`/dashboards/${b.id}`} className="flex-1">
+                  <p className="font-semibold text-heading group-hover:text-primary dark:group-hover:text-primary">
+                    {b.title}
+                  </p>
+                  {/* What is actually on it — the card used to say only "4 tiles", which
+                      tells two boards apart from each other not at all. */}
+                  {contents ? (
+                    <p className="mt-1 line-clamp-2 text-xs text-fg">{contents}</p>
+                  ) : null}
+                  <p className="mt-2 text-[11px] text-fg-subtle">
+                    {b.tiles?.length ?? 0} tile{(b.tiles?.length ?? 0) === 1 ? "" : "s"} · last{" "}
+                    {b.days} days
+                    {b.updated_at ? ` · updated ${formatDate(b.updated_at)}` : ""}
+                    {ownershipLabel({ visibility: b.visibility, ownerEmail: b.owner_email }, user?.email)
+                      ? ` · ${ownershipLabel({ visibility: b.visibility, ownerEmail: b.owner_email }, user?.email)}` : ""}
+                  </p>
+                </Link>
+                <div className="mt-3 flex justify-end border-t border-edge-subtle pt-2">
+                  {b.can_edit === false ? (
+                    <span className="px-2 py-1 text-xs text-fg-subtle">View only</span>
+                  ) : confirming === b.id ? (
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-fg-muted">Delete this dashboard?</span>
+                      <button
+                        type="button"
+                        onClick={() => void remove(b.id)}
+                        disabled={busy === b.id}
+                        className="rounded-md bg-over-bg px-2 py-1 font-medium text-over disabled:opacity-60"
+                      >
+                        {busy === b.id ? "Deleting…" : "Delete"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirming(null)}
+                        className="btn-ghost px-2 py-1"
+                      >
+                        Keep
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirming(b.id)}
+                      className="btn-ghost px-2 py-1 text-xs"
+                      aria-label={`Delete ${b.title}`}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        </section>
+        ))}
         </div>
       )}
     </div>

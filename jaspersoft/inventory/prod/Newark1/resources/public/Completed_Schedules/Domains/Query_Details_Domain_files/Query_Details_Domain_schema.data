@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="AuditDataSource">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="JASPERSERVER">
+          <string>{attribute('auditDB')}</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="execution_id" label="Execution ID" resourceId="JoinTree_1.audit_properties_derived_table.EXECUTION_ID"></item>
+    <item id="sql_query" label="Query" resourceId="JoinTree_1.audit_properties_derived_table.SQL_QUERY"></item>
+    <item id="start_time" label="Start Time" resourceId="JoinTree_1.audit_properties_derived_table.START_TIME"></item>
+    <item id="end_time" label="End Time" resourceId="JoinTree_1.audit_properties_derived_table.END_TIME"></item>
+    <item id="execution_time" label="Run Time (ms)" resourceId="JoinTree_1.audit_properties_derived_table.EXECUTION_TIME"></item>
+    <item id="schedule_execution_id" label="Schedule ID" resourceId="JoinTree_1.audit_properties_derived_table.SCHEDULE_EXECUTION_ID"></item>
+  </items>
+  <resources>
+    <null id="constant_fields_level" datasourceId="AuditDataSource">
+      <fieldList>
+        <field id="tenantUri" dataSetExpression="groovy('tenant.getTenantUri()')" type="java.lang.String"></field>
+      </fieldList>
+    </null>
+    <jdbcTable id="JIAUDITEVENT" datasourceId="AuditDataSource" datasourceTableName="JIAUDITEVENT" schemaAlias="JASPERSERVER">
+      <fieldList>
+        <field id="ID" type="java.math.BigDecimal"></field>
+        <field id="USERNAME" type="java.lang.String"></field>
+        <field id="TENANT_ID" type="java.lang.String"></field>
+        <field id="EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="RESOURCE_URI" type="java.lang.String"></field>
+        <field id="RESOURCE_TYPE" type="java.lang.String"></field>
+        <field id="EVENT_TYPE" type="java.lang.String"></field>
+        <field id="REQUEST_TYPE" type="java.lang.String"></field>
+      </fieldList>
+      <filterString>EVENT_TYPE == 'executionQueryDetails' and REQUEST_TYPE == 'INTERNAL'</filterString>
+    </jdbcTable>
+    <jdbcQuery id="audit_properties_derived_table" datasourceId="AuditDataSource">
+      <fieldList>
+        <field id="AUDIT_EVENT_ID" type="java.math.BigDecimal"></field>
+        <field id="START_TIME" type="java.sql.Timestamp"></field>
+        <field id="END_TIME" type="java.sql.Timestamp"></field>
+        <field id="EXECUTION_ID" type="java.lang.String"></field>
+        <field id="EXECUTION_TIME" type="java.lang.String"></field>
+        <field id="SQL_QUERY" type="java.lang.String"></field>
+        <field id="SCHEDULE_EXECUTION_ID" type="java.lang.String"></field>
+        <field id="ORGANIZATION_URI" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT t.audit_event_id
+        , MAX(CASE WHEN t.property_type = 'reportScheduleExecutionID' THEN t.value END) schedule_execution_id
+        , MAX(CASE WHEN t.property_type = 'executionID' THEN t.value END) execution_id
+        , MAX(CASE WHEN t.property_type = 'queryExecutionTime' THEN t.value END) execution_time
+        , MAX(CASE WHEN t.property_type = 'sqlQuery' THEN TO_CHAR(SUBSTR(t.CLOB_VALUE ,0,4000)) END) sql_query
+		, MAX(CASE WHEN t.property_type = 'organizationURI' THEN t.value END) organization_uri
+        , MAX(CASE WHEN t.property_type = 'queryExecutionEpochStartTime' THEN cast(cast ( TO_TIMESTAMP_TZ('1970-01-01 00:00:00 UTC', 'YYYY-MM-DD HH24:MI:SS.FF TZR') + NUMTODSINTERVAL(value/1000, 'SECOND') as timestamp with local time zone)AT TIME ZONE TO_CHAR(SYSTIMESTAMP, 'tzr') as TIMESTAMP) END) start_time
+        , MAX(CASE WHEN t.property_type = 'queryExecutionEpochEndTime' THEN cast(cast ( TO_TIMESTAMP_TZ('1970-01-01 00:00:00 UTC', 'YYYY-MM-DD HH24:MI:SS.FF TZR') + NUMTODSINTERVAL(value/1000, 'SECOND') as timestamp with local time zone)AT TIME ZONE TO_CHAR(SYSTIMESTAMP, 'tzr') as TIMESTAMP) END) end_time
+        FROM jiauditeventproperty t
+        group by t.audit_event_id</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_1" datasourceId="AuditDataSource">
+      <fieldList>
+        <field id="JIAUDITEVENT.ID" type="java.math.BigDecimal"></field>
+        <field id="JIAUDITEVENT.USERNAME" type="java.lang.String"></field>
+        <field id="JIAUDITEVENT.TENANT_ID" type="java.lang.String"></field>
+        <field id="JIAUDITEVENT.EVENT_DATE" type="java.sql.Timestamp"></field>
+        <field id="JIAUDITEVENT.RESOURCE_URI" type="java.lang.String"></field>
+        <field id="JIAUDITEVENT.RESOURCE_TYPE" type="java.lang.String"></field>
+        <field id="JIAUDITEVENT.EVENT_TYPE" type="java.lang.String"></field>
+        <field id="JIAUDITEVENT.REQUEST_TYPE" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.AUDIT_EVENT_ID" type="java.math.BigDecimal"></field>
+        <field id="audit_properties_derived_table.START_TIME" type="java.sql.Timestamp"></field>
+        <field id="audit_properties_derived_table.END_TIME" type="java.sql.Timestamp"></field>
+        <field id="audit_properties_derived_table.EXECUTION_ID" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.EXECUTION_TIME" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.SQL_QUERY" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.SCHEDULE_EXECUTION_ID" type="java.lang.String"></field>
+        <field id="audit_properties_derived_table.ORGANIZATION_URI" type="java.lang.String"></field>
+        <field id="filter1" dataSetExpression="startsWith(audit_properties_derived_table.ORGANIZATION_URI, constant_fields_level.tenantUri)" type="java.lang.Boolean"></field>
+      </fieldList>
+      <filterString>JIAUDITEVENT.REQUEST_TYPE == 'INTERNAL' and filter1 == true and JIAUDITEVENT.EVENT_TYPE == 'executionQueryDetails'</filterString>
+      <joinInfo alias="audit_properties_derived_table" referenceId="audit_properties_derived_table"></joinInfo>
+      <joinList>
+        <join expr="audit_properties_derived_table.AUDIT_EVENT_ID == JIAUDITEVENT.ID" left="audit_properties_derived_table" right="JIAUDITEVENT" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>SELECT t.audit_event_id
+        , MAX(CASE WHEN t.property_type = 'reportScheduleExecutionID' THEN t.value END) schedule_execution_id
+        , MAX(CASE WHEN t.property_type = 'executionID' THEN t.value END) execution_id
+        , MAX(CASE WHEN t.property_type = 'queryExecutionTime' THEN t.value END) execution_time
+        , MAX(CASE WHEN t.property_type = 'sqlQuery' THEN TO_CHAR(SUBSTR(t.CLOB_VALUE ,0,4000)) END) sql_query
+		, MAX(CASE WHEN t.property_type = 'organizationURI' THEN t.value END) organization_uri
+        , MAX(CASE WHEN t.property_type = 'queryExecutionEpochStartTime' THEN cast(cast ( TO_TIMESTAMP_TZ('1970-01-01 00:00:00 UTC', 'YYYY-MM-DD HH24:MI:SS.FF TZR') + NUMTODSINTERVAL(value/1000, 'SECOND') as timestamp with local time zone)AT TIME ZONE TO_CHAR(SYSTIMESTAMP, 'tzr') as TIMESTAMP) END) start_time
+        , MAX(CASE WHEN t.property_type = 'queryExecutionEpochEndTime' THEN cast(cast ( TO_TIMESTAMP_TZ('1970-01-01 00:00:00 UTC', 'YYYY-MM-DD HH24:MI:SS.FF TZR') + NUMTODSINTERVAL(value/1000, 'SECOND') as timestamp with local time zone)AT TIME ZONE TO_CHAR(SYSTIMESTAMP, 'tzr') as TIMESTAMP) END) end_time
+        FROM jiauditeventproperty t
+        group by t.audit_event_id</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="audit_properties_derived_table" tableId="audit_properties_derived_table"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="JIAUDITEVENT" tableId="JIAUDITEVENT"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

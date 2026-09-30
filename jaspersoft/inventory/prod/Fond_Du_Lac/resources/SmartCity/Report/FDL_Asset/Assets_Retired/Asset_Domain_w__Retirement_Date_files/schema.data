@@ -1,0 +1,765 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="RawAssetDevice" label="Asset Domain" resourceId="RawAssetDevice"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="FondDuLac_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="ASSET" label="Asset" resourceId="RawAssetDevice">
+      <items>
+        <item id="ASSET_ID" label="Asset ID" resourceId="RawAssetDevice.W1_ASSET.ASSET_ID"></item>
+        <item id="ASSET_TYPE_CD" label="Asset Type" resourceId="RawAssetDevice.W1_ASSET.ASSET_TYPE_CD"></item>
+        <item id="ASSET_BUS_OBJ_CD" label="Asset Business Object" resourceId="RawAssetDevice.W1_ASSET.BUS_OBJ_CD"></item>
+        <item id="ASSET_STATUS_CD" label="Asset Status" resourceId="RawAssetDevice.W1_ASSET.BO_STATUS_CD"></item>
+        <item id="ASSET_STATUS_REASON_CD" label="Asset Status Reason" resourceId="RawAssetDevice.W1_ASSET.BO_STATUS_REASON_CD"></item>
+        <item id="ASSET_STATUS_UPD_DTTM" label="Asset Status Date/Time" resourceId="RawAssetDevice.W1_ASSET.STATUS_UPD_DTTM"></item>
+        <item id="ASSET_CRE_DTTM" label="Asset Create Date/Time" resourceId="RawAssetDevice.W1_ASSET.CRE_DTTM"></item>
+        <item id="ASSET_FINAL_DTTM" label="Asset Final Date/Time" resourceId="RawAssetDevice.W1_ASSET.FINAL_DTTM"></item>
+        <item id="ASSET_IN_SERVICE_DT" label="Asset In Service Date" resourceId="RawAssetDevice.W1_ASSET.IN_SERVICE_DT"></item>
+        <item id="ASSET_PREDCTD_WEAR_OUT_DT" label="Asset Predicted Wear Out Date" resourceId="RawAssetDevice.W1_ASSET.PREDCTD_WEAR_OUT_DT"></item>
+        <item id="ASSET_DEVICE_ID_FROM_XML" label="Asset Device ID From XML" resourceId="RawAssetDevice.W1_ASSET.D1_DEVICE_ID_FROM_ASSET"></item>
+        <item id="ASSET_RETIREMENT_STATUS" label="Asset Retirement Status" resourceId="RawAssetDevice.D1_DVC_BODA.STATUS"></item>
+        <item id="ASSET_RETIREMENT_DTTM" label="Asset Retirement Date/Time" resourceId="RawAssetDevice.D1_DVC_BODA.RETIREMENT_DTTM"></item>
+        <item id="ASSET_RETIREMENT_DTTM_RAW" label="Asset Retirement Date/Time Raw" resourceId="RawAssetDevice.D1_DVC_BODA.RETIREMENT_DTTM_RAW"></item>
+        <item id="ASSET_BO_DATA_AREA" label="Asset Business Object Data Area" resourceId="RawAssetDevice.W1_ASSET.BO_DATA_AREA"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="ASSET_IDENTIFIERS" label="Asset Identifiers" resourceId="RawAssetDevice">
+      <items>
+        <item id="ASSET_IDENTIFIER_ASSET_ID" label="Asset ID" resourceId="RawAssetDevice.W1_ASSET_IDENTIFIER.ASSET_ID"></item>
+        <item id="ASSET_ID_TYPE_FLG" label="Asset Identifier Type" resourceId="RawAssetDevice.W1_ASSET_IDENTIFIER.ASSET_ID_TYPE_FLG"></item>
+        <item id="ASSET_IDENTIFIER_VALUE" label="Asset Identifier Value" resourceId="RawAssetDevice.W1_ASSET_IDENTIFIER.W1_ID_VALUE"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="ASSET_LOCATION" label="Asset Location and Disposition" resourceId="RawAssetDevice">
+      <items>
+        <item id="ASSET_NODE_ASSET_ID" label="Asset ID" resourceId="RawAssetDevice.W1_ASSET_NODE.ASSET_ID"></item>
+        <item id="ASSET_NODE_EFF_DTTM" label="Asset Location Effective Date/Time" resourceId="RawAssetDevice.W1_ASSET_NODE.EFF_DTTM"></item>
+        <item id="ASSET_DPOS_FLG" label="Asset Disposition" resourceId="RawAssetDevice.W1_ASSET_NODE.ASSET_DPOS_FLG"></item>
+        <item id="NODE_ID" label="Location/Organization ID" resourceId="RawAssetDevice.W1_ASSET_NODE.NODE_ID"></item>
+        <item id="CURR_NODE_ID" label="Current Location/Organization ID" resourceId="RawAssetDevice.W1_ASSET_NODE.CURR_NODE_ID"></item>
+        <item id="ATTCH_TO_ASSET_ID" label="Attached To Asset ID" resourceId="RawAssetDevice.W1_ASSET_NODE.ATTCH_TO_ASSET_ID"></item>
+        <item id="CURR_ATTCH_TO_ASSET_ID" label="Current Attached To Asset ID" resourceId="RawAssetDevice.W1_ASSET_NODE.CURR_ATTCH_TO_ASSET_ID"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DEVICE_IDENTIFIERS" label="Device Identifiers" resourceId="RawAssetDevice">
+      <items>
+        <item id="DVC_IDENTIFIER_DEVICE_ID" label="Device ID" resourceId="RawAssetDevice.D1_DVC_IDENTIFIER.D1_DEVICE_ID"></item>
+        <item id="DVC_ID_TYPE_FLG" label="Device Identifier Type" resourceId="RawAssetDevice.D1_DVC_IDENTIFIER.DVC_ID_TYPE_FLG"></item>
+        <item id="DVC_ID_VALUE" label="Device Identifier Value" resourceId="RawAssetDevice.D1_DVC_IDENTIFIER.ID_VALUE"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="ASSET_DEVICE_LINK" label="Asset Device Link" resourceId="RawAssetDevice">
+      <items>
+        <item id="MATCHED_ASSET_DEVICE_ID" label="Matched Device ID" resourceId="RawAssetDevice.ASSET_DEVICE_IDENTIFIER_LINK.D1_DEVICE_ID"></item>
+        <item id="MATCHED_IDENTIFIER_VALUE" label="Matched Identifier Value" resourceId="RawAssetDevice.ASSET_DEVICE_IDENTIFIER_LINK.MATCHED_IDENTIFIER_VALUE"></item>
+        <item id="MATCHED_ASSET_IDENTIFIER_TYPE" label="Matched Asset Identifier Type" resourceId="RawAssetDevice.ASSET_DEVICE_IDENTIFIER_LINK.MATCHED_ASSET_IDENTIFIER_TYPE"></item>
+        <item id="MATCHED_DEVICE_IDENTIFIER_TYPE" label="Matched Device Identifier Type" resourceId="RawAssetDevice.ASSET_DEVICE_IDENTIFIER_LINK.MATCHED_DEVICE_IDENTIFIER_TYPE"></item>
+        <item id="LINK_SP_IDENTIFIER_VALUE" label="Linked Service Point Identifier" resourceId="RawAssetDevice.ASSET_SP_EQUIPMENT_LINK.ID_VALUE"></item>
+        <item id="LINK_SP_IDENTIFIER_TYPE" label="Linked Service Point Identifier Type" resourceId="RawAssetDevice.ASSET_SP_EQUIPMENT_LINK.SP_ID_TYPE_FLG"></item>
+        <item id="LINK_SP_ID" label="Linked Service Point ID" resourceId="RawAssetDevice.ASSET_SP_EQUIPMENT_LINK.D1_SP_ID"></item>
+        <item id="LINK_DEVICE_ID" label="Linked Device ID" resourceId="RawAssetDevice.ASSET_SP_EQUIPMENT_LINK.D1_DEVICE_ID"></item>
+        <item id="LINK_INSTALL_DTTM" label="Linked Device Install Date/Time" resourceId="RawAssetDevice.ASSET_SP_EQUIPMENT_LINK.D1_INSTALL_DTTM"></item>
+        <item id="LINK_REMOVAL_DTTM" label="Linked Device Removal Date/Time" resourceId="RawAssetDevice.ASSET_SP_EQUIPMENT_LINK.D1_REMOVAL_DTTM"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DEVICE" label="Device" resourceId="RawAssetDevice">
+      <items>
+        <item id="D1_DEVICE_ID" label="Device ID" resourceId="RawAssetDevice.D1_DVC.D1_DEVICE_ID"></item>
+        <item id="DEVICE_TYPE_CD" label="Device Type" resourceId="RawAssetDevice.D1_DVC.DEVICE_TYPE_CD"></item>
+        <item id="DEVICE_BUS_OBJ_CD" label="Device Business Object" resourceId="RawAssetDevice.D1_DVC.BUS_OBJ_CD"></item>
+        <item id="MANUFACTURER_CD" label="Manufacturer" resourceId="RawAssetDevice.D1_DVC.MANUFACTURER_CD"></item>
+        <item id="D1_MODEL_CD" label="Model" resourceId="RawAssetDevice.D1_DVC.D1_MODEL_CD"></item>
+        <item id="D1_SPR_CD" label="Service Provider" resourceId="RawAssetDevice.D1_DVC.D1_SPR_CD"></item>
+        <item id="DEVICE_STATUS_CD" label="Device Status" resourceId="RawAssetDevice.D1_DVC.BO_STATUS_CD"></item>
+        <item id="DEVICE_STATUS_REASON_CD" label="Device Status Reason" resourceId="RawAssetDevice.D1_DVC.BO_STATUS_REASON_CD"></item>
+        <item id="DEVICE_STATUS_UPD_DTTM" label="Device Status Date/Time" resourceId="RawAssetDevice.D1_DVC.STATUS_UPD_DTTM"></item>
+        <item id="DEVICE_CRE_DTTM" label="Device Create Date/Time" resourceId="RawAssetDevice.D1_DVC.CRE_DTTM"></item>
+        <item id="DEVICE_BO_DATA_AREA" label="Device Business Object Data Area" resourceId="RawAssetDevice.D1_DVC.BO_DATA_AREA"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="DEVICE_CONFIGURATION" label="Device Configuration" resourceId="RawAssetDevice">
+      <items>
+        <item id="DEVICE_CONFIG_ID" label="Device Configuration ID" resourceId="RawAssetDevice.D1_DVC_CFG.DEVICE_CONFIG_ID"></item>
+        <item id="CFG_DEVICE_ID" label="Device ID" resourceId="RawAssetDevice.D1_DVC_CFG.D1_DEVICE_ID"></item>
+        <item id="DEVICE_CONFIG_TYPE_CD" label="Device Configuration Type" resourceId="RawAssetDevice.D1_DVC_CFG.DEVICE_CONFIG_TYPE_CD"></item>
+        <item id="CFG_EFF_DTTM" label="Configuration Effective Date/Time" resourceId="RawAssetDevice.D1_DVC_CFG.EFF_DTTM"></item>
+        <item id="CFG_STATUS_CD" label="Configuration Status" resourceId="RawAssetDevice.D1_DVC_CFG.BO_STATUS_CD"></item>
+        <item id="CFG_STATUS_UPD_DTTM" label="Configuration Status Date/Time" resourceId="RawAssetDevice.D1_DVC_CFG.STATUS_UPD_DTTM"></item>
+        <item id="CFG_BO_DATA_AREA" label="Configuration Business Object Data Area" resourceId="RawAssetDevice.D1_DVC_CFG.BO_DATA_AREA"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="INSTALL_REMOVAL" label="Install and Removal" resourceId="RawAssetDevice">
+      <items>
+        <item id="INSTALL_EVT_ID" label="Install Event ID" resourceId="RawAssetDevice.D1_INSTALL_EVT.INSTALL_EVT_ID"></item>
+        <item id="INSTALL_SP_ID" label="Service Point ID" resourceId="RawAssetDevice.D1_INSTALL_EVT.D1_SP_ID"></item>
+        <item id="INSTALL_DEVICE_CONFIG_ID" label="Device Configuration ID" resourceId="RawAssetDevice.D1_INSTALL_EVT.DEVICE_CONFIG_ID"></item>
+        <item id="D1_INSTALL_DTTM" label="Installation Date/Time" resourceId="RawAssetDevice.D1_INSTALL_EVT.D1_INSTALL_DTTM"></item>
+        <item id="D1_REMOVAL_DTTM" label="Removal Date/Time" resourceId="RawAssetDevice.D1_INSTALL_EVT.D1_REMOVAL_DTTM"></item>
+        <item id="INSTALL_STATUS_CD" label="Install Event Status" resourceId="RawAssetDevice.D1_INSTALL_EVT.BO_STATUS_CD"></item>
+        <item id="INSTALL_STATUS_UPD_DTTM" label="Install Event Status Date/Time" resourceId="RawAssetDevice.D1_INSTALL_EVT.STATUS_UPD_DTTM"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SP_EQUIPMENT" label="Service Point Equipment" resourceId="RawAssetDevice">
+      <items>
+        <item id="EQ_SP_ID" label="Service Point ID" resourceId="RawAssetDevice.D1_SP_EQPMNT.D1_SP_ID"></item>
+        <item id="EQ_DEVICE_ID" label="Device ID" resourceId="RawAssetDevice.D1_SP_EQPMNT.D1_DEVICE_ID"></item>
+        <item id="EQ_INSTALL_DTTM" label="Equipment Installation Date/Time" resourceId="RawAssetDevice.D1_SP_EQPMNT.D1_INSTALL_DTTM"></item>
+        <item id="EQ_REMOVAL_DTTM" label="Equipment Removal Date/Time" resourceId="RawAssetDevice.D1_SP_EQPMNT.D1_REMOVAL_DTTM"></item>
+        <item id="EQPMNT_CNT" label="Equipment Count" resourceId="RawAssetDevice.D1_SP_EQPMNT.EQPMNT_CNT"></item>
+        <item id="EQ_COMMENTS" label="Equipment Comments" resourceId="RawAssetDevice.D1_SP_EQPMNT.COMMENTS"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SERVICE_POINT" label="Service Point" resourceId="RawAssetDevice">
+      <items>
+        <item id="D1_SP_ID" label="Service Point ID" resourceId="RawAssetDevice.D1_SP.D1_SP_ID"></item>
+        <item id="D1_SP_TYPE_CD" label="Service Point Type" resourceId="RawAssetDevice.D1_SP.D1_SP_TYPE_CD"></item>
+        <item id="SP_STATUS_CD" label="Service Point Status" resourceId="RawAssetDevice.D1_SP.BO_STATUS_CD"></item>
+        <item id="SP_STATUS_UPD_DTTM" label="Service Point Status Date/Time" resourceId="RawAssetDevice.D1_SP.STATUS_UPD_DTTM"></item>
+        <item id="SP_ADDRESS1" label="Address" resourceId="RawAssetDevice.D1_SP.ADDRESS1"></item>
+        <item id="SP_CITY" label="City" resourceId="RawAssetDevice.D1_SP.CITY"></item>
+        <item id="SP_STATE" label="State" resourceId="RawAssetDevice.D1_SP.STATE"></item>
+        <item id="SP_POSTAL" label="Postal" resourceId="RawAssetDevice.D1_SP.POSTAL"></item>
+        <item id="SP_MSRMT_CYC_CD" label="Measurement Cycle" resourceId="RawAssetDevice.D1_SP.MSRMT_CYC_CD"></item>
+        <item id="SP_MSRMT_CYC_RTE_CD" label="Measurement Route" resourceId="RawAssetDevice.D1_SP.MSRMT_CYC_RTE_CD"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="ACCOUNT_ADDRESS_SOURCE" label="Account Address Source" resourceId="RawAssetDevice">
+      <items>
+        <item id="ADDRESS_SOURCE_DEVICE_ID" label="Address Source Device ID" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.D1_DEVICE_ID"></item>
+        <item id="ADDRESS_SOURCE_SP_ID" label="Address Source Service Point ID" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.D1_SP_ID"></item>
+        <item id="ADDRESS_SOURCE_INSTALL_EVT_ID" label="Address Source Install Event ID" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.INSTALL_EVT_ID"></item>
+        <item id="ADDRESS_SOURCE_INSTALL_DTTM" label="Address Source Install Date/Time" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.D1_INSTALL_DTTM"></item>
+        <item id="ADDRESS_SOURCE_REMOVAL_DTTM" label="Address Source Removal Date/Time" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.D1_REMOVAL_DTTM"></item>
+        <item id="ADDRESS_SOURCE_PREM_ID" label="Address Source Premise ID" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.PREM_ID"></item>
+        <item id="ADDRESS_SOURCE_SA_ID" label="Address Source Service Agreement ID" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.SA_ID"></item>
+        <item id="ADDRESS_SOURCE_SA_STATUS_FLG" label="Address Source SA Status" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.SA_STATUS_FLG"></item>
+        <item id="ADDRESS_SOURCE_ACCT_ID" label="Address Source Account ID" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCT_ID"></item>
+        <item id="ADDRESS_SOURCE_PER_ID" label="Address Source Person ID" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.PER_ID"></item>
+        <item id="ADDRESS_SOURCE_MAIN_CUST_SW" label="Address Source Main Customer" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.MAIN_CUST_SW"></item>
+        <item id="ADDRESS_SOURCE_FIN_RESP_SW" label="Address Source Financially Responsible" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.FIN_RESP_SW"></item>
+        <item id="BILL_ADDR_SRCE_FLG" label="Bill Address Source" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.BILL_ADDR_SRCE_FLG"></item>
+        <item id="BILL_RTE_TYPE_CD" label="Bill Route Type" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.BILL_RTE_TYPE_CD"></item>
+        <item id="BILL_FORMAT_FLG" label="Bill Format" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.BILL_FORMAT_FLG"></item>
+        <item id="ACCOUNT_ACCT_ID" label="Account ID" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_ACCT_ID"></item>
+        <item id="ACCOUNT_BILL_CYC_CD" label="Account Bill Cycle" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_BILL_CYC_CD"></item>
+        <item id="ACCOUNT_SETUP_DT" label="Account Setup Date" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_SETUP_DT"></item>
+        <item id="ACCOUNT_CURRENCY_CD" label="Account Currency" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_CURRENCY_CD"></item>
+        <item id="ACCOUNT_ACCT_MGMT_GRP_CD" label="Account Management Group" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_ACCT_MGMT_GRP_CD"></item>
+        <item id="ACCOUNT_ALERT_INFO" label="Account Alert Info" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_ALERT_INFO"></item>
+        <item id="ACCOUNT_BILL_AFTER_DT" label="Account Bill After Date" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_BILL_AFTER_DT"></item>
+        <item id="ACCOUNT_PROTECT_CYC_SW" label="Account Protect Cycle" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_PROTECT_CYC_SW"></item>
+        <item id="ACCOUNT_CIS_DIVISION" label="Account CIS Division" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_CIS_DIVISION"></item>
+        <item id="ACCOUNT_MAILING_PREM_ID" label="Account Mailing Premise ID" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_MAILING_PREM_ID"></item>
+        <item id="ACCOUNT_PROTECT_PREM_SW" label="Account Protect Premise" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_PROTECT_PREM_SW"></item>
+        <item id="ACCOUNT_COLL_CL_CD" label="Account Collection Class" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_COLL_CL_CD"></item>
+        <item id="ACCOUNT_CR_REVIEW_DT" label="Account Credit Review Date" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_CR_REVIEW_DT"></item>
+        <item id="ACCOUNT_POSTPONE_CR_RVW_DT" label="Account Postpone Credit Review Date" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_POSTPONE_CR_RVW_DT"></item>
+        <item id="ACCOUNT_INT_CR_REVIEW_SW" label="Account Internal Credit Review" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_INT_CR_REVIEW_SW"></item>
+        <item id="ACCOUNT_CUST_CL_CD" label="Account Customer Class" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_CUST_CL_CD"></item>
+        <item id="ACCOUNT_BILL_PRT_INTERCEPT" label="Account Bill Print Intercept" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_BILL_PRT_INTERCEPT"></item>
+        <item id="ACCOUNT_NO_DEP_RVW_SW" label="Account No Deposit Review" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_NO_DEP_RVW_SW"></item>
+        <item id="ACCOUNT_BUD_PLAN_CD" label="Account Budget Plan" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_BUD_PLAN_CD"></item>
+        <item id="ACCOUNT_VERSION" label="Account Version" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_VERSION"></item>
+        <item id="ACCOUNT_PROTECT_DIV_SW" label="Account Protect Division" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_PROTECT_DIV_SW"></item>
+        <item id="ACCOUNT_ACCESS_GRP_CD" label="Account Access Group" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_ACCESS_GRP_CD"></item>
+        <item id="ACCOUNT_ACCT_DATA_AREA" label="Account Data Area" resourceId="RawAssetDevice.ACCOUNT_ADDRESS_SOURCE.ACCOUNT_ACCT_DATA_AREA"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="LEGACY_METER_LOCATION" label="Legacy Meter Location" resourceId="RawAssetDevice">
+      <items>
+        <item id="LEGACY_METER_LOCATION_ID" label="Legacy Meter Location Id" resourceId="RawAssetDevice.SC_SP_MTR_LOC.ADHOC_CHAR_VAL"></item>
+        <item id="LEGACY_METER_LOCATION_SP_ID" label="Legacy Meter Location Service Point ID" resourceId="RawAssetDevice.SC_SP_MTR_LOC.D1_SP_ID"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="W1_ASSET_IDENTIFIER" datasourceId="FondDuLac_DS" datasourceTableName="W1_ASSET_IDENTIFIER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ASSET_ID" type="java.lang.String"></field>
+        <field id="ASSET_ID_TYPE_FLG" type="java.lang.String"></field>
+        <field id="W1_ID_VALUE" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="W1_ASSET_NODE" datasourceId="FondDuLac_DS" datasourceTableName="W1_ASSET_NODE" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ASSET_ID" type="java.lang.String"></field>
+        <field id="EFF_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ASSET_DPOS_FLG" type="java.lang.String"></field>
+        <field id="NODE_ID" type="java.lang.String"></field>
+        <field id="CURR_NODE_ID" type="java.lang.String"></field>
+        <field id="ATTCH_TO_ASSET_ID" type="java.lang.String"></field>
+        <field id="CURR_ATTCH_TO_ASSET_ID" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_DVC_IDENTIFIER" datasourceId="FondDuLac_DS" datasourceTableName="D1_DVC_IDENTIFIER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="DVC_ID_TYPE_FLG" type="java.lang.String"></field>
+        <field id="ID_VALUE" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_DVC_CFG" datasourceId="FondDuLac_DS" datasourceTableName="D1_DVC_CFG" schemaAlias="CISADM">
+      <fieldList>
+        <field id="DEVICE_CONFIG_ID" type="java.lang.String"></field>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="DEVICE_CONFIG_TYPE_CD" type="java.lang.String"></field>
+        <field id="EFF_DTTM" type="java.sql.Timestamp"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="BO_DATA_AREA" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_INSTALL_EVT" datasourceId="FondDuLac_DS" datasourceTableName="D1_INSTALL_EVT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="INSTALL_EVT_ID" type="java.lang.String"></field>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="DEVICE_CONFIG_ID" type="java.lang.String"></field>
+        <field id="D1_INSTALL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_REMOVAL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_SP_EQPMNT" datasourceId="FondDuLac_DS" datasourceTableName="D1_SP_EQPMNT" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="D1_INSTALL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_REMOVAL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="EQPMNT_CNT" type="java.math.BigDecimal"></field>
+        <field id="COMMENTS" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="D1_SP" datasourceId="FondDuLac_DS" datasourceTableName="D1_SP" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_SP_TYPE_CD" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="CITY" type="java.lang.String"></field>
+        <field id="STATE" type="java.lang.String"></field>
+        <field id="POSTAL" type="java.lang.String"></field>
+        <field id="MSRMT_CYC_CD" type="java.lang.String"></field>
+        <field id="MSRMT_CYC_RTE_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcQuery id="W1_ASSET" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="ASSET_ID" type="java.lang.String"></field>
+        <field id="ASSET_TYPE_CD" type="java.lang.String"></field>
+        <field id="BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="BO_STATUS_REASON_CD" type="java.lang.String"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="FINAL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="IN_SERVICE_DT" type="java.sql.Timestamp"></field>
+        <field id="PREDCTD_WEAR_OUT_DT" type="java.sql.Timestamp"></field>
+        <field id="D1_DEVICE_ID_FROM_ASSET" type="java.lang.String"></field>
+        <field id="BO_DATA_AREA" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    a.asset_id,
+    a.asset_type_cd,
+    a.bus_obj_cd,
+    a.bo_status_cd,
+    a.status_upd_dttm,
+    a.bo_status_reason_cd,
+    a.cre_dttm,
+    a.final_dttm,
+    a.in_service_dt,
+    a.predctd_wear_out_dt,
+    EXTRACTVALUE(XMLTYPE(CONCAT(CONCAT('&lt;root&gt;', a.bo_data_area), '&lt;/root&gt;')), 'root/c2mDeviceId') AS d1_device_id_from_asset,
+    DBMS_LOB.SUBSTR(a.bo_data_area, 4000, 1) AS bo_data_area
+FROM cisadm.w1_asset a</query>
+    </jdbcQuery>
+    <jdbcQuery id="ASSET_DEVICE_IDENTIFIER_LINK" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="ASSET_ID" type="java.lang.String"></field>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="MATCHED_IDENTIFIER_VALUE" type="java.lang.String"></field>
+        <field id="MATCHED_ASSET_IDENTIFIER_TYPE" type="java.lang.String"></field>
+        <field id="MATCHED_DEVICE_IDENTIFIER_TYPE" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    AI.ASSET_ID,
+    MIN(DI.D1_DEVICE_ID) AS D1_DEVICE_ID,
+    MIN(AI.W1_ID_VALUE) AS MATCHED_IDENTIFIER_VALUE,
+    MIN(AI.ASSET_ID_TYPE_FLG) AS MATCHED_ASSET_IDENTIFIER_TYPE,
+    MIN(DI.DVC_ID_TYPE_FLG) AS MATCHED_DEVICE_IDENTIFIER_TYPE
+FROM CISADM.W1_ASSET_IDENTIFIER AI
+JOIN CISADM.D1_DVC_IDENTIFIER DI
+    ON DI.ID_VALUE = AI.W1_ID_VALUE
+   AND (
+        (AI.ASSET_ID_TYPE_FLG = 'W1BN' AND DI.DVC_ID_TYPE_FLG = 'D1BN')
+     OR (AI.ASSET_ID_TYPE_FLG = 'W1SN' AND DI.DVC_ID_TYPE_FLG = 'D1SN')
+     OR (AI.ASSET_ID_TYPE_FLG = 'W1EI' AND DI.DVC_ID_TYPE_FLG = 'D1AS')
+   )
+GROUP BY AI.ASSET_ID</query>
+    </jdbcQuery>
+    <jdbcQuery id="ASSET_SP_EQUIPMENT_LINK" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="ID_VALUE" type="java.lang.String"></field>
+        <field id="SP_ID_TYPE_FLG" type="java.lang.String"></field>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="D1_INSTALL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_REMOVAL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="EQPMNT_CNT" type="java.math.BigDecimal"></field>
+        <field id="COMMENTS" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+    SPID.ID_VALUE,
+    SPID.SP_ID_TYPE_FLG,
+    SPE.D1_SP_ID,
+    SPE.D1_DEVICE_ID,
+    SPE.D1_INSTALL_DTTM,
+    SPE.D1_REMOVAL_DTTM,
+    SPE.EQPMNT_CNT,
+    SPE.COMMENTS,
+    SPE.VERSION
+FROM CISADM.D1_SP_IDENTIFIER SPID
+JOIN CISADM.D1_SP_EQPMNT SPE
+    ON SPE.D1_SP_ID = SPID.D1_SP_ID
+WHERE SPID.SP_ID_TYPE_FLG = 'D1OI'</query>
+    </jdbcQuery>
+    <jdbcQuery id="D1_DVC" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="DEVICE_TYPE_CD" type="java.lang.String"></field>
+        <field id="BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="MANUFACTURER_CD" type="java.lang.String"></field>
+        <field id="D1_MODEL_CD" type="java.lang.String"></field>
+        <field id="D1_SPR_CD" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="BO_STATUS_REASON_CD" type="java.lang.String"></field>
+        <field id="STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="RETIREMENT_DTTM" type="java.sql.Timestamp"></field>
+        <field id="RETIREMENT_DTTM_RAW" type="java.lang.String"></field>
+        <field id="BO_DATA_AREA" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    d.d1_device_id,
+    d.device_type_cd,
+    d.bus_obj_cd,
+    d.manufacturer_cd,
+    d.d1_model_cd,
+    d.d1_spr_cd,
+    d.bo_status_cd,
+    d.bo_status_reason_cd,
+    d.status_upd_dttm,
+    d.cre_dttm,
+    CASE
+        WHEN DBMS_LOB.INSTR(d.bo_data_area, '&lt;retirementDateTime&gt;') &gt; 0
+        THEN TO_TIMESTAMP(
+            REGEXP_SUBSTR(
+                DBMS_LOB.SUBSTR(d.bo_data_area, 500, DBMS_LOB.INSTR(d.bo_data_area, '&lt;retirementDateTime&gt;')),
+                '&lt;retirementDateTime&gt;([^&lt;]+)&lt;/retirementDateTime&gt;',
+                1,
+                1,
+                NULL,
+                1
+            ),
+            'YYYY-MM-DD-HH24.MI.SS'
+        )
+    END AS retirement_dttm,
+    CASE
+        WHEN DBMS_LOB.INSTR(d.bo_data_area, '&lt;retirementDateTime&gt;') &gt; 0
+        THEN REGEXP_SUBSTR(
+            DBMS_LOB.SUBSTR(d.bo_data_area, 500, DBMS_LOB.INSTR(d.bo_data_area, '&lt;retirementDateTime&gt;')),
+            '&lt;retirementDateTime&gt;([^&lt;]+)&lt;/retirementDateTime&gt;',
+            1,
+            1,
+            NULL,
+            1
+        )
+    END AS retirement_dttm_raw,
+    DBMS_LOB.SUBSTR(d.bo_data_area, 4000, 1) AS bo_data_area
+FROM cisadm.d1_dvc d</query>
+    </jdbcQuery>
+    <jdbcQuery id="D1_DVC_BODA" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="STATUS" type="java.lang.String"></field>
+        <field id="RETIREMENT_DTTM" type="java.sql.Timestamp"></field>
+        <field id="RETIREMENT_DTTM_RAW" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    DVC.D1_DEVICE_ID,
+    MIN(DVC.BUS_OBJ_CD) AS BUS_OBJ_CD,
+    CAST(MIN(EXTRACTVALUE(XMLTYPE(CONCAT(CONCAT('&lt;root&gt;', DVC.BO_DATA_AREA), '&lt;/root&gt;')), 'root/latestBoStatus')) AS CHAR(12)) AS STATUS,
+    MIN(TO_DATE(EXTRACTVALUE(XMLTYPE(CONCAT(CONCAT('&lt;root&gt;', DVC.BO_DATA_AREA), '&lt;/root&gt;')), 'root/retirementDateTime'), 'YYYY-MM-DD-HH24.MI.SS')) AS RETIREMENT_DTTM,
+    MIN(EXTRACTVALUE(XMLTYPE(CONCAT(CONCAT('&lt;root&gt;', DVC.BO_DATA_AREA), '&lt;/root&gt;')), 'root/retirementDateTime')) AS RETIREMENT_DTTM_RAW
+FROM CISADM.D1_DVC DVC
+WHERE DVC.BO_DATA_AREA IS NOT NULL
+GROUP BY DVC.D1_DEVICE_ID</query>
+    </jdbcQuery>
+    <jdbcQuery id="ACCOUNT_ADDRESS_SOURCE" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="INSTALL_EVT_ID" type="java.lang.String"></field>
+        <field id="D1_INSTALL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_REMOVAL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="PER_ID" type="java.lang.String"></field>
+        <field id="MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="FIN_RESP_SW" type="java.lang.String"></field>
+        <field id="BILL_ADDR_SRCE_FLG" type="java.lang.String"></field>
+        <field id="BILL_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="BILL_FORMAT_FLG" type="java.lang.String"></field>
+        <field id="ACCOUNT_ACCT_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_SETUP_DT" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNT_CURRENCY_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_ACCT_MGMT_GRP_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_ALERT_INFO" type="java.lang.String"></field>
+        <field id="ACCOUNT_BILL_AFTER_DT" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNT_PROTECT_CYC_SW" type="java.lang.String"></field>
+        <field id="ACCOUNT_CIS_DIVISION" type="java.lang.String"></field>
+        <field id="ACCOUNT_MAILING_PREM_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_PROTECT_PREM_SW" type="java.lang.String"></field>
+        <field id="ACCOUNT_COLL_CL_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_CR_REVIEW_DT" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNT_POSTPONE_CR_RVW_DT" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNT_INT_CR_REVIEW_SW" type="java.lang.String"></field>
+        <field id="ACCOUNT_CUST_CL_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_BILL_PRT_INTERCEPT" type="java.lang.String"></field>
+        <field id="ACCOUNT_NO_DEP_RVW_SW" type="java.lang.String"></field>
+        <field id="ACCOUNT_BUD_PLAN_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_VERSION" type="java.math.BigDecimal"></field>
+        <field id="ACCOUNT_PROTECT_DIV_SW" type="java.lang.String"></field>
+        <field id="ACCOUNT_ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_ACCT_DATA_AREA" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    DSP.D1_DEVICE_ID,
+    DSP.D1_SP_ID,
+    DSP.INSTALL_EVT_ID,
+    DSP.D1_INSTALL_DTTM,
+    DSP.D1_REMOVAL_DTTM,
+    SP.PREM_ID,
+    PA.SA_ID,
+    PA.SA_STATUS_FLG,
+    PA.ACCT_ID,
+    AP.PER_ID,
+    AP.MAIN_CUST_SW,
+    AP.FIN_RESP_SW,
+    AP.BILL_ADDR_SRCE_FLG,
+    AP.BILL_RTE_TYPE_CD,
+    AP.BILL_FORMAT_FLG,
+    AC.ACCT_ID AS ACCOUNT_ACCT_ID,
+    AC.BILL_CYC_CD AS ACCOUNT_BILL_CYC_CD,
+    AC.SETUP_DT AS ACCOUNT_SETUP_DT,
+    AC.CURRENCY_CD AS ACCOUNT_CURRENCY_CD,
+    AC.ACCT_MGMT_GRP_CD AS ACCOUNT_ACCT_MGMT_GRP_CD,
+    AC.ALERT_INFO AS ACCOUNT_ALERT_INFO,
+    AC.BILL_AFTER_DT AS ACCOUNT_BILL_AFTER_DT,
+    AC.PROTECT_CYC_SW AS ACCOUNT_PROTECT_CYC_SW,
+    AC.CIS_DIVISION AS ACCOUNT_CIS_DIVISION,
+    AC.MAILING_PREM_ID AS ACCOUNT_MAILING_PREM_ID,
+    AC.PROTECT_PREM_SW AS ACCOUNT_PROTECT_PREM_SW,
+    AC.COLL_CL_CD AS ACCOUNT_COLL_CL_CD,
+    AC.CR_REVIEW_DT AS ACCOUNT_CR_REVIEW_DT,
+    AC.POSTPONE_CR_RVW_DT AS ACCOUNT_POSTPONE_CR_RVW_DT,
+    AC.INT_CR_REVIEW_SW AS ACCOUNT_INT_CR_REVIEW_SW,
+    AC.CUST_CL_CD AS ACCOUNT_CUST_CL_CD,
+    AC.BILL_PRT_INTERCEPT AS ACCOUNT_BILL_PRT_INTERCEPT,
+    AC.NO_DEP_RVW_SW AS ACCOUNT_NO_DEP_RVW_SW,
+    AC.BUD_PLAN_CD AS ACCOUNT_BUD_PLAN_CD,
+    AC.VERSION AS ACCOUNT_VERSION,
+    AC.PROTECT_DIV_SW AS ACCOUNT_PROTECT_DIV_SW,
+    AC.ACCESS_GRP_CD AS ACCOUNT_ACCESS_GRP_CD,
+    DBMS_LOB.SUBSTR(AC.ACCT_DATA_AREA, 4000, 1) AS ACCOUNT_ACCT_DATA_AREA
+FROM (
+    SELECT *
+    FROM (
+        SELECT
+            SPE.D1_DEVICE_ID,
+            SPE.D1_SP_ID,
+            IE.INSTALL_EVT_ID,
+            SPE.D1_INSTALL_DTTM,
+            SPE.D1_REMOVAL_DTTM,
+            ROW_NUMBER() OVER (
+                PARTITION BY SPE.D1_DEVICE_ID, SPE.D1_SP_ID
+                ORDER BY
+                    CASE WHEN SPE.D1_REMOVAL_DTTM IS NULL THEN 1 ELSE 2 END,
+                    SPE.D1_INSTALL_DTTM DESC,
+                    IE.INSTALL_EVT_ID
+            ) AS INSTALL_RANK
+        FROM CISADM.D1_SP_EQPMNT SPE
+        LEFT JOIN CISADM.D1_DVC_CFG DC
+            ON DC.D1_DEVICE_ID = SPE.D1_DEVICE_ID
+        LEFT JOIN CISADM.D1_INSTALL_EVT IE
+            ON IE.DEVICE_CONFIG_ID = DC.DEVICE_CONFIG_ID
+           AND IE.D1_SP_ID = SPE.D1_SP_ID
+    )
+    WHERE INSTALL_RANK = 1
+) DSP
+LEFT JOIN (
+    SELECT
+        SPID.D1_SP_ID,
+        SPID.ID_VALUE AS PREM_ID
+    FROM CISADM.D1_SP_IDENTIFIER SPID
+    WHERE SPID.SP_ID_TYPE_FLG = 'D1EP'
+) SP
+    ON SP.D1_SP_ID = DSP.D1_SP_ID
+LEFT JOIN (
+    SELECT *
+    FROM (
+        SELECT
+            SA.CHAR_PREM_ID AS PREM_ID,
+            SA.ACCT_ID,
+            SA.SA_ID,
+            SA.SA_STATUS_FLG,
+            ROW_NUMBER() OVER (
+                PARTITION BY SA.CHAR_PREM_ID
+                ORDER BY
+                    CASE WHEN SA.SA_STATUS_FLG IN ('20', '30') THEN 1 ELSE 2 END,
+                    SA.START_DT DESC,
+                    SA.SA_ID
+            ) AS SA_RANK
+        FROM CISADM.CI_SA SA
+        WHERE SA.CHAR_PREM_ID IS NOT NULL
+    )
+    WHERE SA_RANK = 1
+) PA
+    ON PA.PREM_ID = SP.PREM_ID
+LEFT JOIN CISADM.CI_ACCT AC
+    ON AC.ACCT_ID = PA.ACCT_ID
+LEFT JOIN (
+    SELECT *
+    FROM (
+        SELECT
+            AP.ACCT_ID,
+            AP.PER_ID,
+            AP.MAIN_CUST_SW,
+            AP.FIN_RESP_SW,
+            AP.BILL_ADDR_SRCE_FLG,
+            AP.BILL_RTE_TYPE_CD,
+            AP.BILL_FORMAT_FLG,
+            ROW_NUMBER() OVER (
+                PARTITION BY AP.ACCT_ID
+                ORDER BY
+                    CASE WHEN AP.MAIN_CUST_SW = 'Y' THEN 1 ELSE 2 END,
+                    CASE WHEN AP.FIN_RESP_SW = 'Y' THEN 1 ELSE 2 END,
+                    AP.PER_ID
+            ) AS ACCT_PER_RANK
+        FROM CISADM.CI_ACCT_PER AP
+    )
+    WHERE ACCT_PER_RANK = 1
+) AP
+    ON AP.ACCT_ID = PA.ACCT_ID</query>
+    </jdbcQuery>
+    <jdbcQuery id="SC_SP_MTR_LOC" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="D1_SP_ID" type="java.lang.String"></field>
+        <field id="ADHOC_CHAR_VAL" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    D1_SP_ID,
+    ADHOC_CHAR_VAL
+FROM
+    CISADM.D1_SP_CHAR
+WHERE
+    CHAR_TYPE_CD LIKE 'C2M-MLID'</query>
+    </jdbcQuery>
+    <jdbcQuery id="RawAssetDevice" datasourceId="FondDuLac_DS">
+      <fieldList>
+        <field id="ASSET_SP_EQUIPMENT_LINK.ID_VALUE" type="java.lang.String"></field>
+        <field id="ASSET_SP_EQUIPMENT_LINK.SP_ID_TYPE_FLG" type="java.lang.String"></field>
+        <field id="ASSET_SP_EQUIPMENT_LINK.D1_SP_ID" type="java.lang.String"></field>
+        <field id="ASSET_SP_EQUIPMENT_LINK.D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="ASSET_SP_EQUIPMENT_LINK.D1_INSTALL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ASSET_SP_EQUIPMENT_LINK.D1_REMOVAL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ASSET_SP_EQUIPMENT_LINK.EQPMNT_CNT" type="java.math.BigDecimal"></field>
+        <field id="ASSET_SP_EQUIPMENT_LINK.COMMENTS" type="java.lang.String"></field>
+        <field id="ASSET_SP_EQUIPMENT_LINK.VERSION" type="java.math.BigDecimal"></field>
+        <field id="W1_ASSET.ASSET_ID" type="java.lang.String"></field>
+        <field id="W1_ASSET.ASSET_TYPE_CD" type="java.lang.String"></field>
+        <field id="W1_ASSET.BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="W1_ASSET.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="W1_ASSET.STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="W1_ASSET.BO_STATUS_REASON_CD" type="java.lang.String"></field>
+        <field id="W1_ASSET.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="W1_ASSET.FINAL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="W1_ASSET.IN_SERVICE_DT" type="java.sql.Timestamp"></field>
+        <field id="W1_ASSET.PREDCTD_WEAR_OUT_DT" type="java.sql.Timestamp"></field>
+        <field id="W1_ASSET.D1_DEVICE_ID_FROM_ASSET" type="java.lang.String"></field>
+        <field id="W1_ASSET.BO_DATA_AREA" type="java.lang.String"></field>
+        <field id="D1_DVC_IDENTIFIER.D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="D1_DVC_IDENTIFIER.DVC_ID_TYPE_FLG" type="java.lang.String"></field>
+        <field id="D1_DVC_IDENTIFIER.ID_VALUE" type="java.lang.String"></field>
+        <field id="D1_DVC_BODA.D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="D1_DVC_BODA.BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="D1_DVC_BODA.STATUS" type="java.lang.String"></field>
+        <field id="D1_DVC_BODA.RETIREMENT_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_DVC_BODA.RETIREMENT_DTTM_RAW" type="java.lang.String"></field>
+        <field id="W1_ASSET_NODE.ASSET_ID" type="java.lang.String"></field>
+        <field id="W1_ASSET_NODE.EFF_DTTM" type="java.sql.Timestamp"></field>
+        <field id="W1_ASSET_NODE.ASSET_DPOS_FLG" type="java.lang.String"></field>
+        <field id="W1_ASSET_NODE.NODE_ID" type="java.lang.String"></field>
+        <field id="W1_ASSET_NODE.CURR_NODE_ID" type="java.lang.String"></field>
+        <field id="W1_ASSET_NODE.ATTCH_TO_ASSET_ID" type="java.lang.String"></field>
+        <field id="W1_ASSET_NODE.CURR_ATTCH_TO_ASSET_ID" type="java.lang.String"></field>
+        <field id="D1_DVC.D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="D1_DVC.DEVICE_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_DVC.BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="D1_DVC.MANUFACTURER_CD" type="java.lang.String"></field>
+        <field id="D1_DVC.D1_MODEL_CD" type="java.lang.String"></field>
+        <field id="D1_DVC.D1_SPR_CD" type="java.lang.String"></field>
+        <field id="D1_DVC.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="D1_DVC.BO_STATUS_REASON_CD" type="java.lang.String"></field>
+        <field id="D1_DVC.STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_DVC.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_DVC.RETIREMENT_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_DVC.RETIREMENT_DTTM_RAW" type="java.lang.String"></field>
+        <field id="D1_DVC.BO_DATA_AREA" type="java.lang.String"></field>
+        <field id="D1_SP.D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_SP.D1_SP_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_SP.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="D1_SP.STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_SP.ADDRESS1" type="java.lang.String"></field>
+        <field id="D1_SP.CITY" type="java.lang.String"></field>
+        <field id="D1_SP.STATE" type="java.lang.String"></field>
+        <field id="D1_SP.POSTAL" type="java.lang.String"></field>
+        <field id="D1_SP.MSRMT_CYC_CD" type="java.lang.String"></field>
+        <field id="D1_SP.MSRMT_CYC_RTE_CD" type="java.lang.String"></field>
+        <field id="SC_SP_MTR_LOC.D1_SP_ID" type="java.lang.String"></field>
+        <field id="SC_SP_MTR_LOC.ADHOC_CHAR_VAL" type="java.lang.String"></field>
+        <field id="D1_DVC_CFG.DEVICE_CONFIG_ID" type="java.lang.String"></field>
+        <field id="D1_DVC_CFG.D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="D1_DVC_CFG.DEVICE_CONFIG_TYPE_CD" type="java.lang.String"></field>
+        <field id="D1_DVC_CFG.EFF_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_DVC_CFG.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="D1_DVC_CFG.STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_DVC_CFG.BO_DATA_AREA" type="java.lang.String"></field>
+        <field id="D1_INSTALL_EVT.INSTALL_EVT_ID" type="java.lang.String"></field>
+        <field id="D1_INSTALL_EVT.D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_INSTALL_EVT.DEVICE_CONFIG_ID" type="java.lang.String"></field>
+        <field id="D1_INSTALL_EVT.D1_INSTALL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_INSTALL_EVT.D1_REMOVAL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_INSTALL_EVT.BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="D1_INSTALL_EVT.STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.D1_SP_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.INSTALL_EVT_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.D1_INSTALL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.D1_REMOVAL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.PREM_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.SA_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.SA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCT_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.PER_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.MAIN_CUST_SW" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.FIN_RESP_SW" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.BILL_ADDR_SRCE_FLG" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.BILL_RTE_TYPE_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.BILL_FORMAT_FLG" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_ACCT_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_SETUP_DT" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_CURRENCY_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_ACCT_MGMT_GRP_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_ALERT_INFO" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_BILL_AFTER_DT" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_PROTECT_CYC_SW" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_CIS_DIVISION" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_MAILING_PREM_ID" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_PROTECT_PREM_SW" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_COLL_CL_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_CR_REVIEW_DT" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_POSTPONE_CR_RVW_DT" type="java.sql.Timestamp"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_INT_CR_REVIEW_SW" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_CUST_CL_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_BILL_PRT_INTERCEPT" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_NO_DEP_RVW_SW" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_BUD_PLAN_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_VERSION" type="java.math.BigDecimal"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_PROTECT_DIV_SW" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="ACCOUNT_ADDRESS_SOURCE.ACCOUNT_ACCT_DATA_AREA" type="java.lang.String"></field>
+        <field id="D1_SP_EQPMNT.D1_SP_ID" type="java.lang.String"></field>
+        <field id="D1_SP_EQPMNT.D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="D1_SP_EQPMNT.D1_INSTALL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_SP_EQPMNT.D1_REMOVAL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_SP_EQPMNT.EQPMNT_CNT" type="java.math.BigDecimal"></field>
+        <field id="D1_SP_EQPMNT.COMMENTS" type="java.lang.String"></field>
+        <field id="ASSET_DEVICE_IDENTIFIER_LINK.ASSET_ID" type="java.lang.String"></field>
+        <field id="ASSET_DEVICE_IDENTIFIER_LINK.D1_DEVICE_ID" type="java.lang.String"></field>
+        <field id="ASSET_DEVICE_IDENTIFIER_LINK.MATCHED_IDENTIFIER_VALUE" type="java.lang.String"></field>
+        <field id="ASSET_DEVICE_IDENTIFIER_LINK.MATCHED_ASSET_IDENTIFIER_TYPE" type="java.lang.String"></field>
+        <field id="ASSET_DEVICE_IDENTIFIER_LINK.MATCHED_DEVICE_IDENTIFIER_TYPE" type="java.lang.String"></field>
+        <field id="W1_ASSET_IDENTIFIER.ASSET_ID" type="java.lang.String"></field>
+        <field id="W1_ASSET_IDENTIFIER.ASSET_ID_TYPE_FLG" type="java.lang.String"></field>
+        <field id="W1_ASSET_IDENTIFIER.W1_ID_VALUE" type="java.lang.String"></field>
+      </fieldList>
+      <joinInfo alias="W1_ASSET" referenceId="W1_ASSET"></joinInfo>
+      <joinList>
+        <join expr="W1_ASSET.ASSET_ID == W1_ASSET_IDENTIFIER.ASSET_ID" left="W1_ASSET" right="W1_ASSET_IDENTIFIER" type="leftOuter" weight="1"></join>
+        <join expr="W1_ASSET.ASSET_ID == W1_ASSET_NODE.ASSET_ID" left="W1_ASSET" right="W1_ASSET_NODE" type="leftOuter" weight="1"></join>
+        <join expr="W1_ASSET.ASSET_ID == ASSET_DEVICE_IDENTIFIER_LINK.ASSET_ID" left="W1_ASSET" right="ASSET_DEVICE_IDENTIFIER_LINK" type="leftOuter" weight="1"></join>
+        <join expr="W1_ASSET_NODE.NODE_ID == ASSET_SP_EQUIPMENT_LINK.ID_VALUE" left="W1_ASSET_NODE" right="ASSET_SP_EQUIPMENT_LINK" type="leftOuter" weight="1"></join>
+        <join expr="ASSET_DEVICE_IDENTIFIER_LINK.D1_DEVICE_ID == D1_DVC.D1_DEVICE_ID" left="ASSET_DEVICE_IDENTIFIER_LINK" right="D1_DVC" type="leftOuter" weight="1"></join>
+        <join expr="ASSET_DEVICE_IDENTIFIER_LINK.D1_DEVICE_ID == D1_DVC_BODA.D1_DEVICE_ID" left="ASSET_DEVICE_IDENTIFIER_LINK" right="D1_DVC_BODA" type="leftOuter" weight="1"></join>
+        <join expr="D1_DVC.D1_DEVICE_ID == D1_DVC_IDENTIFIER.D1_DEVICE_ID" left="D1_DVC" right="D1_DVC_IDENTIFIER" type="leftOuter" weight="1"></join>
+        <join expr="D1_DVC.D1_DEVICE_ID == D1_DVC_CFG.D1_DEVICE_ID" left="D1_DVC" right="D1_DVC_CFG" type="leftOuter" weight="1"></join>
+        <join expr="D1_DVC_CFG.DEVICE_CONFIG_ID == D1_INSTALL_EVT.DEVICE_CONFIG_ID" left="D1_DVC_CFG" right="D1_INSTALL_EVT" type="leftOuter" weight="1"></join>
+        <join expr="D1_DVC.D1_DEVICE_ID == D1_SP_EQPMNT.D1_DEVICE_ID" left="D1_DVC" right="D1_SP_EQPMNT" type="leftOuter" weight="1"></join>
+        <join expr="D1_SP_EQPMNT.D1_SP_ID == D1_SP.D1_SP_ID" left="D1_SP_EQPMNT" right="D1_SP" type="leftOuter" weight="1"></join>
+        <join expr="D1_SP_EQPMNT.D1_DEVICE_ID == ACCOUNT_ADDRESS_SOURCE.D1_DEVICE_ID and D1_SP_EQPMNT.D1_SP_ID == ACCOUNT_ADDRESS_SOURCE.D1_SP_ID" left="D1_SP_EQPMNT" right="ACCOUNT_ADDRESS_SOURCE" type="leftOuter" weight="1"></join>
+        <join expr="D1_SP_EQPMNT.D1_SP_ID == SC_SP_MTR_LOC.D1_SP_ID" left="D1_SP_EQPMNT" right="SC_SP_MTR_LOC" type="leftOuter" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>SELECT
+    a.asset_id,
+    a.asset_type_cd,
+    a.bus_obj_cd,
+    a.bo_status_cd,
+    a.status_upd_dttm,
+    a.bo_status_reason_cd,
+    a.cre_dttm,
+    a.final_dttm,
+    a.in_service_dt,
+    a.predctd_wear_out_dt,
+    EXTRACTVALUE(XMLTYPE(CONCAT(CONCAT('&lt;root&gt;', a.bo_data_area), '&lt;/root&gt;')), 'root/c2mDeviceId') AS d1_device_id_from_asset,
+    DBMS_LOB.SUBSTR(a.bo_data_area, 4000, 1) AS bo_data_area
+FROM cisadm.w1_asset a</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="W1_ASSET_IDENTIFIER" tableId="W1_ASSET_IDENTIFIER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_DVC_BODA" tableId="D1_DVC_BODA"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="W1_ASSET" tableId="W1_ASSET"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_DVC_CFG" tableId="D1_DVC_CFG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="ASSET_DEVICE_IDENTIFIER_LINK" tableId="ASSET_DEVICE_IDENTIFIER_LINK"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="ASSET_SP_EQUIPMENT_LINK" tableId="ASSET_SP_EQUIPMENT_LINK"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_SP_EQPMNT" tableId="D1_SP_EQPMNT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="W1_ASSET_NODE" tableId="W1_ASSET_NODE"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_DVC" tableId="D1_DVC"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SC_SP_MTR_LOC" tableId="SC_SP_MTR_LOC"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_INSTALL_EVT" tableId="D1_INSTALL_EVT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_DVC_IDENTIFIER" tableId="D1_DVC_IDENTIFIER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="D1_SP" tableId="D1_SP"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="ACCOUNT_ADDRESS_SOURCE" tableId="ACCOUNT_ADDRESS_SOURCE"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

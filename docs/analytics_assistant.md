@@ -1,0 +1,81 @@
+# The analytics assistant
+
+`POST /portal/assistant` answers a question about the signed-in organization's data by reading
+its reporting canvases and running SQL. It is a tool-using Claude; what it can reach is bounded
+by its tools, not by its instructions.
+
+## Tools
+
+| Tool | What it does |
+| --- | --- |
+| `list_canvases` | the `rpt_*` canvases this organization has (from its catalog), with grain, summary and the exact table to query |
+| `describe_canvas` | every column of one canvas with type, role and meaning, plus date fields |
+| `run_sql` | validated by the SQL workspace's validator (read-only, secrets guard, engine fence), then **fenced to `rpt_*` canvases only**, scoped to the organization, capped at 200 rows, audited as `assistant_sql` / `assistant_sql_refused` with the question's purpose |
+| `search_knowledge` | keyword search over the C2M skills (`api/assistant_knowledge/`) and the canvas column descriptions |
+| `verification_status` | When a canvas was last proven against the client's own database and against what: raw CISADM (`run_source_parity.py`) and the legacy snapshot tables today's reports read (`run_snapshot_parity.py`: `CMS_SA_SNAPSHOT`, `*_RPT_CURR`), plus the canvas build age. The prompt requires it for every canvas a figure comes from. `run_sql` also attaches the same evidence to every query it returns (`integrity[]`), and the panel prints it under the query. Source: `api/integrity.py`, reading the dbt repo's `qa_reports/*_latest.json` (`ORIGINBA_QA_REPORTS`); `GET /portal/integrity[/{canvas}]` serves it to the UI. Nothing on record = "no verification on record", never a guess. |
+
+
+## What it knows
+
+The system prompt is this organization's canvas list plus the same skills a Claude Code session
+loads to write CISADM SQL: `cisadm-sql`, `c2m-functional-architect` and its body of knowledge.
+They are copied from `originba_dbt/.claude/skills` by `scripts/local/sync_assistant_knowledge.py`
+so the API image is self-contained; re-run it when the skills change. The knowledge block is
+sent with prompt caching, so it is paid for once per cache window, not per question.
+
+Token cost and the levers that control it: `docs/assistant_token_budget.md`.
+
+## Configuration
+
+| Variable | |
+| --- | --- |
+| `ANTHROPIC_API_KEY` | required; unset means `/portal/assistant/status` reports `configured: false` and `POST` answers 503 |
+| `ASSISTANT_DAILY_TOKEN_BUDGET` | input-equivalent tokens (uncached input 1x, cache write 1.25x, cache read 0.1x, output 5x) an organization may spend per UTC day; past it `POST` answers 429 naming the budget and the reset. Read from the `assistant_ask` audit rows, so it needs nothing new. Unset = no cap. |
+| `ASSISTANT_QUESTIONS_PER_MINUTE` | questions one person may ask per minute; past it 429 "wait a moment". Unset = no cap. |
+| `ASSISTANT_CACHE_TTL` | `1h` keeps the cached prompt prefix an hour instead of five minutes: the write costs 2x instead of 1.25x, reads cost the same tenth, so it pays back from the second question when questions arrive more than five minutes apart. Set it in production; leave unset for burst testing. |
+| `ASSISTANT_INLINE_KNOWLEDGE` | `1` inlines the reference notes (~19.5K tokens) into every request. Off by default since 2026-09-15: they were ~85% of what every turn read from cache, and the model reaches them through `search_knowledge` (it did so unprompted). See `docs/assistant_token_budget.md` for the measurements. |
+| `ASSISTANT_MODEL` | default `claude-sonnet-5`. `stub` (development only, refused in production) is a scripted stand-in that lists the canvases, picks one by name, runs one aggregate on its default date field, and labels every answer as the stub -- so the whole path can be exercised with no key |
+
+Permission: `nlq:read`. The organization comes from the auth context, never from the request.
+
+`GET /portal/assistant/spend` — today's input-equivalent spend for the caller's organization, per
+person, against `ASSISTANT_DAILY_TOKEN_BUDGET` (null when no cap). The panel shows the same line.
+
+## Request and response
+
+```json
+POST /portal/assistant
+{ "question": "how much was billed by cycle in the last 90 days?", "thread": [] }
+
+{ "answer": "...", "steps": [{"tool": "describe_canvas", "input": "...", "ok": true}, ...],
+  "queries": [{"purpose": "...", "sql": "...", "columns": [...], "rows": [...], "row_count": 50, "truncated": false, "ms": 84}],
+  "model": "claude-sonnet-5", "usage": {"input_tokens": 0, "output_tokens": 0},
+  "thread": [ ...send back as `thread` for a follow-up... ] }
+```
+
+The returned thread has tool results replaced by a stub; the model re-runs what it needs.
+The loop stops after 8 tool calls and says so rather than run on.
+
+## Tests
+
+`tests/test_assistant.py` runs without a key or a network: a fake model client scripts the tool
+calls, the executor is patched, the catalog is real. It proves the canvases-only fence, the
+validated path, the row cap, the audit, the loop cap, and the routes' answers when unconfigured.
+
+## Measured (Ellensburg 25.4, 2026-09-15)
+
+Driven from the browser as the Ellensburg organization (Oracle, in-database warehouse, over the VPN):
+
+| | |
+| --- | --- |
+| list / describe / prompt build / knowledge search | 0-3 ms each (in-process; catalog and knowledge cached) |
+| system prompt | ~50,000 chars, ~12,500 tokens, sent with prompt caching |
+| bill segments by year (1.3M+ segments, aggregate) | 1,072 ms cold, 51 ms warm (Oracle pool + result cache) |
+| a 300-row detail with ORDER BY over the whole canvas | 5,800 ms -- the prompt now steers away from this shape |
+| request round trip, warm | 103 ms; answer payload 3 KB; `/status` 13 ms |
+| a CISADM read | refused in 0 ms, before any connection |
+
+Statement timeouts already exist below the assistant: 30 s on Postgres (`SET LOCAL statement_timeout`)
+and the Oracle call timeout on the pooled session. A query slower than 8 s comes back to the model
+with a note to narrow it. In development, React StrictMode fetches `/status` twice on mount; that
+is a development-only double effect, not a production cost.

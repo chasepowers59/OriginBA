@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_2" label="JoinTree_2" resourceId="JoinTree_2"></itemGroup>
+  </dataIslands>
+  <itemGroups>
+    <itemGroup id="CS_REVENUE_ADJ" label="CS_REVENUE_ADJ" resourceId="JoinTree_2">
+      <items>
+        <item id="ADJ_AMT_1" label="Adjustment Amount" resourceId="JoinTree_2.CS_REVENUE_ADJ.ADJ_AMT"></item>
+        <item id="ADJ_CONS_1" label="Adjustment Consumption" resourceId="JoinTree_2.CS_REVENUE_ADJ.ADJ_CONS"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="CS_REVENUE_BILLED_AMT" label="CS_REVENUE_BILLED_AMT" resourceId="JoinTree_2">
+      <items>
+        <item id="BILLED_AMT" label="Billed Amount" resourceId="JoinTree_2.CS_REVENUE_BILLED_AMT.BILLED_AMT"></item>
+        <item id="BILLED_CONS" label="Billed Consumption" resourceId="JoinTree_2.CS_REVENUE_BILLED_AMT.BILLED_CONS"></item>
+        <item id="RATE_DESC" label="Rate Schedule Description" resourceId="JoinTree_2.CS_REVENUE_BILLED_AMT.RATE_DESC"></item>
+        <item id="RATE_SCHED" label="Rate Schedule" resourceId="JoinTree_2.CS_REVENUE_BILLED_AMT.RATE_SCHED"></item>
+        <item id="REC_CODE" label="Distribution Code" resourceId="JoinTree_2.CS_REVENUE_BILLED_AMT.REC_CODE"></item>
+        <item id="TRANS_DT" label="Transaction Date" resourceId="JoinTree_2.CS_REVENUE_BILLED_AMT.TRANS_DT"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcQuery id="CS_REVENUE_BILLED_AMT" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="RATE_DESC" type="java.lang.String"></field>
+        <field id="RATE_SCHED" type="java.lang.String"></field>
+        <field id="REC_CODE" type="java.lang.String"></field>
+        <field id="BILLED_AMT" type="java.math.BigDecimal"></field>
+        <field id="BILLED_CONS" type="java.math.BigDecimal"></field>
+        <field id="ADJ_AMT" type="java.math.BigDecimal"></field>
+        <field id="ADJ_CONS" type="java.math.BigDecimal"></field>
+        <field id="TRANS_DT" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>SELECT RSL.DESCR AS RATE_DESC, SARH.RS_CD AS RATE_SCHED, DCL.DESCR AS REC_CODE, SUM(FT.CUR_AMT) AS BILLED_AMT, SUM(BSSQ.BILL_SQ) AS BILLED_CONS, 0 AS ADJ_AMT, 0 AS ADJ_CONS, FT.ARS_DT AS TRANS_DT
+FROM CISADM.CI_FT FT, CISADM.CI_SA_RS_HIST SARH, CISADM.CI_BSEG_SQ BSSQ, CISADM.CI_BSEG_CALC_LN BSCL, CISADM.CI_DST_CODE_L DCL, CISADM.CI_RS_L RSL
+WHERE FT.SA_ID = SARH.SA_ID
+AND BSSQ.BSEG_ID = FT.SIBLING_ID
+AND BSSQ.BSEG_ID = BSCL.BSEG_ID
+AND DCL.DST_ID = BSCL.DST_ID
+AND SARH.RS_CD = RSL.RS_CD
+AND FT.FT_TYPE_FLG = 'BS'
+AND FT.FREEZE_SW = 'Y'
+AND RSL.LANGUAGE_CD = 'ENG'
+GROUP BY RSL.DESCR, SARH.RS_CD, DCL.DESCR, FT.ARS_DT</query>
+    </jdbcQuery>
+    <jdbcQuery id="CS_REVENUE_ADJ" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="RATE_DESC" type="java.lang.String"></field>
+        <field id="RATE_SCHED" type="java.lang.String"></field>
+        <field id="REC_CODE" type="java.lang.String"></field>
+        <field id="BILLED_AMT" type="java.math.BigDecimal"></field>
+        <field id="BILLED_CONS" type="java.math.BigDecimal"></field>
+        <field id="ADJ_AMT" type="java.math.BigDecimal"></field>
+        <field id="ADJ_CONS" type="java.math.BigDecimal"></field>
+        <field id="TRANS_DT" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>SELECT RSL.DESCR AS RATE_DESC, SARH.RS_CD AS RATE_SCHED, DCL.DESCR AS REC_CODE, 0 AS BILLED_AMT, 0 AS BILLED_CONS, SUM(FT.CUR_AMT) AS ADJ_AMT, 0 AS ADJ_CONS, FT.ARS_DT AS TRANS_DT
+FROM CISADM.CI_FT FT, CISADM.CI_SA_RS_HIST SARH, CISADM.CI_ADJ_TYPE ADJT, CISADM.CI_DST_CODE_L DCL, CISADM.CI_ADJ ADJ, CISADM.CI_RS_L RSL
+WHERE FT.SA_ID = SARH.SA_ID
+AND ADJ.SA_ID = SARH.SA_ID
+AND SARH.RS_CD = RSL.RS_CD
+AND DCL.DST_ID = ADJT.DST_ID
+AND ADJ.ADJ_TYPE_CD = ADJT.ADJ_TYPE_CD
+AND DCL.LANGUAGE_CD = 'ENG'
+AND FT.FT_TYPE_FLG = 'AD'
+AND ADJ.ADJ_STATUS_FLG = '50'
+AND RSL.LANGUAGE_CD = 'ENG'
+GROUP BY RSL.DESCR, SARH.RS_CD, DCL.DESCR, FT.ARS_DT</query>
+    </jdbcQuery>
+    <jdbcQuery id="JoinTree_2" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="CS_REVENUE_BILLED_AMT.RATE_DESC" type="java.lang.String"></field>
+        <field id="CS_REVENUE_BILLED_AMT.RATE_SCHED" type="java.lang.String"></field>
+        <field id="CS_REVENUE_BILLED_AMT.REC_CODE" type="java.lang.String"></field>
+        <field id="CS_REVENUE_BILLED_AMT.BILLED_AMT" type="java.math.BigDecimal"></field>
+        <field id="CS_REVENUE_BILLED_AMT.BILLED_CONS" type="java.math.BigDecimal"></field>
+        <field id="CS_REVENUE_BILLED_AMT.ADJ_AMT" type="java.math.BigDecimal"></field>
+        <field id="CS_REVENUE_BILLED_AMT.ADJ_CONS" type="java.math.BigDecimal"></field>
+        <field id="CS_REVENUE_BILLED_AMT.TRANS_DT" type="java.sql.Timestamp"></field>
+        <field id="CS_REVENUE_ADJ.RATE_DESC" type="java.lang.String"></field>
+        <field id="CS_REVENUE_ADJ.RATE_SCHED" type="java.lang.String"></field>
+        <field id="CS_REVENUE_ADJ.REC_CODE" type="java.lang.String"></field>
+        <field id="CS_REVENUE_ADJ.BILLED_AMT" type="java.math.BigDecimal"></field>
+        <field id="CS_REVENUE_ADJ.BILLED_CONS" type="java.math.BigDecimal"></field>
+        <field id="CS_REVENUE_ADJ.ADJ_AMT" type="java.math.BigDecimal"></field>
+        <field id="CS_REVENUE_ADJ.ADJ_CONS" type="java.math.BigDecimal"></field>
+        <field id="CS_REVENUE_ADJ.TRANS_DT" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <joinInfo alias="CS_REVENUE_BILLED_AMT" referenceId="CS_REVENUE_BILLED_AMT"></joinInfo>
+      <joinList>
+        <join expr="CS_REVENUE_BILLED_AMT.RATE_SCHED == CS_REVENUE_ADJ.RATE_SCHED" left="CS_REVENUE_BILLED_AMT" right="CS_REVENUE_ADJ" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <query>SELECT RSL.DESCR AS RATE_DESC, SARH.RS_CD AS RATE_SCHED, DCL.DESCR AS REC_CODE, SUM(FT.CUR_AMT) AS BILLED_AMT, SUM(BSSQ.BILL_SQ) AS BILLED_CONS, 0 AS ADJ_AMT, 0 AS ADJ_CONS, FT.ARS_DT AS TRANS_DT
+FROM CISADM.CI_FT FT, CISADM.CI_SA_RS_HIST SARH, CISADM.CI_BSEG_SQ BSSQ, CISADM.CI_BSEG_CALC_LN BSCL, CISADM.CI_DST_CODE_L DCL, CISADM.CI_RS_L RSL
+WHERE FT.SA_ID = SARH.SA_ID
+AND BSSQ.BSEG_ID = FT.SIBLING_ID
+AND BSSQ.BSEG_ID = BSCL.BSEG_ID
+AND DCL.DST_ID = BSCL.DST_ID
+AND SARH.RS_CD = RSL.RS_CD
+AND FT.FT_TYPE_FLG = 'BS'
+AND FT.FREEZE_SW = 'Y'
+AND RSL.LANGUAGE_CD = 'ENG'
+GROUP BY RSL.DESCR, SARH.RS_CD, DCL.DESCR, FT.ARS_DT</query>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CS_REVENUE_BILLED_AMT" tableId="CS_REVENUE_BILLED_AMT"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CS_REVENUE_ADJ" tableId="CS_REVENUE_ADJ"></tableRef>
+      </tableRefList>
+    </jdbcQuery>
+  </resources>
+</schema>

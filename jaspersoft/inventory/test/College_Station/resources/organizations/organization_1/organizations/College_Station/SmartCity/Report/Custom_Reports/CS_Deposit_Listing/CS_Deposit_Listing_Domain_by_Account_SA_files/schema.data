@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CS_DEPOSIT_LISTING" label="CS_DEPOSIT_LISTING" resourceId="CS_DEPOSIT_LISTING"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCOUNTING_DT" label="Accounting Date" resourceId="CS_DEPOSIT_LISTING.ACCOUNTING_DT"></item>
+    <item id="ACCT_ID" label="Account Id" resourceId="CS_DEPOSIT_LISTING.ACCT_ID"></item>
+    <item id="CIS_DIVISION" label="CIS Division" resourceId="CS_DEPOSIT_LISTING.CIS_DIVISION"></item>
+    <item id="SA_ID" label="SA Id" resourceId="CS_DEPOSIT_LISTING.SA_ID"></item>
+    <item id="SA_TYPE" label="SA Type" resourceId="CS_DEPOSIT_LISTING.SA_TYPE"></item>
+    <item id="SA_TYPE_DESC" label="SA Type Description" resourceId="CS_DEPOSIT_LISTING.SA_TYPE_DESC"></item>
+    <item id="TOT_CUR_BAL" label="Current Balance" resourceId="CS_DEPOSIT_LISTING.TOT_CUR_BAL"></item>
+    <item id="TOT_DEPOSIT_AMT" label="Deposit Amount" resourceId="CS_DEPOSIT_LISTING.TOT_DEPOSIT_AMT"></item>
+    <item id="TOT_NUM_DEPOSIT" label="Number of Deposits" resourceId="CS_DEPOSIT_LISTING.TOT_NUM_DEPOSIT"></item>
+    <item id="TOT_PAYOFF_BAL" label="Payoff Balance" resourceId="CS_DEPOSIT_LISTING.TOT_PAYOFF_BAL"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CS_DEPOSIT_LISTING" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="TOT_NUM_DEPOSIT" type="java.math.BigDecimal"></field>
+        <field id="TOT_DEPOSIT_AMT" type="java.math.BigDecimal"></field>
+        <field id="TOT_CUR_BAL" type="java.math.BigDecimal"></field>
+        <field id="TOT_PAYOFF_BAL" type="java.math.BigDecimal"></field>
+        <field id="SA_TYPE_DESC" type="java.lang.String"></field>
+        <field id="CIS_DIVISION" type="java.lang.String"></field>
+        <field id="SA_TYPE" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ACCOUNTING_DT" type="java.sql.Timestamp"></field>
+      </fieldList>
+      <query>SELECT SUM(DEPOSIT_COUNT) AS TOT_NUM_DEPOSIT, SUM(DEPOSIT_AMT) AS TOT_DEPOSIT_AMT, SUM(CURRENT_BAL) as TOT_CUR_BAL,SUM(TOT_BAL) as TOT_PAYOFF_BAL, SA_TYPE_DESC, CIS_DIVISION, SA_TYPE, ACCOUNTING_DT, SA_ID, ACCT_ID
+FROM (
+SELECT ABS(SUM(FTD.CUR_AMT)) AS DEPOSIT_AMT,  0  AS CURRENT_BAL, 0 as TOT_BAL,SATL.DESCR AS SA_TYPE_DESC, SATL.CIS_DIVISION AS CIS_DIVISION, SATL.SA_TYPE_CD AS SA_TYPE, COUNT(FTD.FT_ID) AS DEPOSIT_COUNT, FTD.ACCOUNTING_DT AS ACCOUNTING_DT, SA.SA_ID, SA.ACCT_ID
+FROM CISADM.CI_FT FTD, CISADM.CI_SA SA, CISADM.CI_SA_TYPE_L SATL
+WHERE SA.SA_TYPE_CD IN ('E-DEP','GARB-DEP','IRR-DEP','SL-DEP','SW-DEP','W-DEP') AND SA.SA_STATUS_FLG = '20' 
+AND SA.SA_TYPE_CD = SATL.SA_TYPE_CD
+AND SA.CIS_DIVISION = SATL.CIS_DIVISION
+AND FTD.SA_ID = SA.SA_ID
+AND FTD.FT_TYPE_FLG = 'BS'
+AND FTD.FREEZE_SW = 'Y'
+AND SATL.LANGUAGE_CD = 'ENG'
+--AND SA.SA_TYPE_CD IN ('E-DEP','GARB-DEP','IRR-DEP','SL-DEP','SW-DEP','W-DEP')
+GROUP BY SATL.DESCR, SATL.CIS_DIVISION, SATL.SA_TYPE_CD, FTD.ACCOUNTING_DT, SA.SA_ID, SA.ACCT_ID
+union
+SELECT 0 AS DEPOSIT_AMT,(SUM(FTD.CUR_AMT)) AS CURRENT_BAL, (SUM(FTD.TOT_AMT)) AS TOT_BAL, SATL.DESCR AS SA_TYPE_DESC, SATL.CIS_DIVISION AS CIS_DIVISION, SATL.SA_TYPE_CD AS SA_TYPE, 0 AS DEPOSIT_COUNT, SYSDATE AS "ACCOUNTING_DT", SA.SA_ID, SA.ACCT_ID
+FROM CISADM.CI_FT FTD, CISADM.CI_SA SA, CISADM.CI_SA_TYPE_L SATL
+WHERE SA.SA_TYPE_CD IN ('E-DEP','GARB-DEP','IRR-DEP','SL-DEP','SW-DEP','W-DEP') AND SA.SA_STATUS_FLG = '20' 
+AND SA.SA_TYPE_CD = SATL.SA_TYPE_CD
+AND SA.CIS_DIVISION = SATL.CIS_DIVISION
+AND FTD.SA_ID = SA.SA_ID
+AND FTD.FREEZE_SW = 'Y'
+AND SATL.LANGUAGE_CD = 'ENG'
+--AND SA.SA_TYPE_CD IN ('E-DEP','GARB-DEP','IRR-DEP','SL-DEP','SW-DEP','W-DEP')
+GROUP BY SATL.DESCR, SATL.CIS_DIVISION, SATL.SA_TYPE_CD, FTD.ACCOUNTING_DT, SA.SA_ID, SA.ACCT_ID
+) GROUP BY CIS_DIVISION, SA_TYPE_DESC, SA_TYPE, ACCOUNTING_DT, SA_ID, ACCT_ID</query>
+    </jdbcQuery>
+  </resources>
+</schema>

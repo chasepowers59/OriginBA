@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="adj_ap_requests_control" pageWidth="842" pageHeight="595" orientation="Landscape"
+    columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+    whenNoDataType="AllSectionsNoDetail">
+    <property name="net.sf.jasperreports.query.timeout" value="600"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+    <style name="Base" default="true" fontName="SansSerif" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
+    <style name="H3" style="Base" fontSize="9" forecolor="#0F4761"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="RowBand" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="SubHeader" style="Base" fontSize="8" forecolor="#5B6470"/>
+    <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
+    <style name="SubTotal" style="Base" fontSize="8" bold="true" forecolor="#0F4761"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
+    <query language="SQL"><![CDATA[
+SELECT TRIM(r.pymnt_sel_stat_flg) AS REQ_STATUS, COALESCE(rl.descr, TRIM(r.pymnt_sel_stat_flg)) AS REQ_STATUS_DESCR,
+       TRIM(a.adj_status_flg) AS ADJ_STATUS, COALESCE(al.descr, TRIM(a.adj_status_flg)) AS ADJ_STATUS_DESCR,
+       CASE WHEN TRIM(r.pymnt_sel_stat_flg) = 'X' AND TRIM(a.adj_status_flg) IN ('30', '50') THEN 'Cancel the adjustment: its A/P request was canceled'
+            WHEN TRIM(r.pymnt_sel_stat_flg) = 'P' AND TRIM(a.adj_status_flg) = '60' THEN 'Paid, but the adjustment was canceled: recover'
+            ELSE ' ' END AS ACTION,
+       COUNT(*) AS REQUESTS, COALESCE(SUM(a.adj_amt), 0) AS ADJ_AMT, COALESCE(SUM(r.paid_amt), 0) AS PAID_AMT
+FROM CISADM.CI_ADJ_APREQ r
+JOIN CISADM.CI_ADJ a ON a.adj_id = r.adj_id
+LEFT JOIN CISADM.CI_LOOKUP_VAL_L rl ON TRIM(rl.field_name) = 'PYMNT_SEL_STAT_FLG' AND TRIM(rl.field_value) = TRIM(r.pymnt_sel_stat_flg) AND rl.language_cd = 'ENG'
+LEFT JOIN CISADM.CI_LOOKUP_VAL_L al ON TRIM(al.field_name) = 'ADJ_STATUS_FLG' AND TRIM(al.field_value) = TRIM(a.adj_status_flg) AND al.language_cd = 'ENG'
+WHERE a.cre_dt >= $P{FROM_DT} AND a.cre_dt < $P{TO_DT} + INTERVAL '1' DAY
+  AND ($P{REQ_STATUS_F} IS NULL OR TRIM(r.pymnt_sel_stat_flg) = TRIM($P{REQ_STATUS_F}))
+  AND ($P{ADJ_STATUS_F} IS NULL OR TRIM(a.adj_status_flg) = TRIM($P{ADJ_STATUS_F}))
+  AND ($P{ACTION_ONLY_F} IS NULL OR (TRIM(r.pymnt_sel_stat_flg) = 'X' AND TRIM(a.adj_status_flg) IN ('30', '50')) OR (TRIM(r.pymnt_sel_stat_flg) = 'P' AND TRIM(a.adj_status_flg) = '60'))
+  AND ($P{ACCT_ID_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = a.sa_id AND TRIM(fsa.acct_id) = TRIM($P{ACCT_ID_F})))
+GROUP BY TRIM(r.pymnt_sel_stat_flg), COALESCE(rl.descr, TRIM(r.pymnt_sel_stat_flg)), TRIM(a.adj_status_flg), COALESCE(al.descr, TRIM(a.adj_status_flg))
+ORDER BY CASE WHEN TRIM(r.pymnt_sel_stat_flg) = 'X' AND TRIM(a.adj_status_flg) IN ('30', '50') THEN 0
+              WHEN TRIM(r.pymnt_sel_stat_flg) = 'P' AND TRIM(a.adj_status_flg) = '60' THEN 1 ELSE 2 END,
+         TRIM(r.pymnt_sel_stat_flg), TRIM(a.adj_status_flg)
+]]></query>
+    <parameter name="FROM_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TO_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="REQ_STATUS_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ADJ_STATUS_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ACTION_ONLY_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ACCT_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <field name="REQ_STATUS" class="java.lang.String"/>
+    <field name="REQ_STATUS_DESCR" class="java.lang.String"/>
+    <field name="ADJ_STATUS" class="java.lang.String"/>
+    <field name="ADJ_STATUS_DESCR" class="java.lang.String"/>
+    <field name="ACTION" class="java.lang.String"/>
+    <field name="REQUESTS" class="java.lang.Long"/>
+    <field name="ADJ_AMT" class="java.math.BigDecimal"/>
+    <field name="PAID_AMT" class="java.math.BigDecimal"/>
+    <variable name="SUM_REQUESTS" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{REQUESTS}]]></expression>
+    </variable>
+    <variable name="SUM_ADJ_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{ADJ_AMT}]]></expression>
+    </variable>
+    <variable name="SUM_PAID_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{PAID_AMT}]]></expression>
+    </variable>
+    <title height="52">
+            <element kind="textField" x="0" y="0" width="802" height="26" style="TitleSapphire" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Adjustment A/P Requests - Control"]]></expression></element>
+            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Adjustment created date " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  one row per A/P request; the request-to-adjustment link is one-to-one (measured Odessa 2026-09-23: 16 of 16); the adjustment's service agreement can be missing (2 of 16), so account and customer are outer" + ($P{REQ_STATUS_F} == null ? "" : "  |  A/P request status: " + $P{REQ_STATUS_F}) + ($P{ADJ_STATUS_F} == null ? "" : "  |  Adjustment status: " + $P{ADJ_STATUS_F}) + ($P{ACTION_ONLY_F} == null ? "" : "  |  Action needed only (type anything for yes): " + $P{ACTION_ONLY_F}) + ($P{ACCT_ID_F} == null ? "" : "  |  Account ID: " + $P{ACCT_ID_F})]]></expression></element>
+    </title>
+    <columnHeader height="18">
+            <element kind="staticText" x="0" y="0" width="40" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Req]]></text></element>
+            <element kind="staticText" x="40" y="0" width="150" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[A/P Request Status]]></text></element>
+            <element kind="staticText" x="190" y="0" width="40" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Adj]]></text></element>
+            <element kind="staticText" x="230" y="0" width="120" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Adjustment Status]]></text></element>
+            <element kind="staticText" x="350" y="0" width="182" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Action]]></text></element>
+            <element kind="staticText" x="532" y="0" width="70" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Requests]]></text></element>
+            <element kind="staticText" x="602" y="0" width="100" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Adjustment Amount]]></text></element>
+            <element kind="staticText" x="702" y="0" width="100" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Paid Amount]]></text></element>
+    </columnHeader>
+    <detail>
+        <band height="22" splitType="Prevent">
+            <element kind="line" x="0" y="2" width="802" height="1"><pen lineWidth="0.75" lineColor="#006FAC"/></element>
+            <element kind="textField" x="0" y="3" width="40" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{REQ_STATUS}]]></expression></element>
+            <element kind="textField" x="40" y="3" width="150" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{REQ_STATUS_DESCR}]]></expression></element>
+            <element kind="textField" x="190" y="3" width="40" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ADJ_STATUS}]]></expression></element>
+            <element kind="textField" x="230" y="3" width="120" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ADJ_STATUS_DESCR}]]></expression></element>
+            <element kind="textField" x="350" y="3" width="182" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ACTION}]]></expression></element>
+            <element kind="textField" x="532" y="3" width="70" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{REQUESTS}]]></expression></element>
+            <element kind="textField" x="602" y="3" width="100" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{ADJ_AMT}]]></expression></element>
+            <element kind="textField" x="702" y="3" width="100" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{PAID_AMT}]]></expression></element>
+        </band>
+        <band height="20" splitType="Stretch">
+            <element kind="subreport" x="24" y="0" width="778" height="20" positionType="Float" removeLineWhenBlank="true" usingCache="false">
+                <parameter name="FROM_DT"><expression><![CDATA[$P{FROM_DT}]]></expression></parameter>
+                <parameter name="TO_DT"><expression><![CDATA[$P{TO_DT}]]></expression></parameter>
+                <parameter name="REQ_STATUS_F"><expression><![CDATA[$P{REQ_STATUS_F}]]></expression></parameter>
+                <parameter name="ADJ_STATUS_F"><expression><![CDATA[$P{ADJ_STATUS_F}]]></expression></parameter>
+                <parameter name="ACTION_ONLY_F"><expression><![CDATA[$P{ACTION_ONLY_F}]]></expression></parameter>
+                <parameter name="ACCT_ID_F"><expression><![CDATA[$P{ACCT_ID_F}]]></expression></parameter>
+                <parameter name="REQ_STATUS"><expression><![CDATA[$F{REQ_STATUS}]]></expression></parameter>
+                <parameter name="ADJ_STATUS"><expression><![CDATA[$F{ADJ_STATUS}]]></expression></parameter>
+                <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                <expression><![CDATA["repo:adj_ap_requests_detail"]]></expression>
+            </element>
+        </band>
+    </detail>
+    <pageFooter height="14">
+            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential"]]></expression></element>
+            <element kind="textField" x="600" y="0" width="150" height="14" style="FooterConfidential" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Page " + $V{PAGE_NUMBER} + " of"]]></expression></element>
+            <element kind="textField" x="750" y="0" width="52" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report"><expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression></element>
+    </pageFooter>
+    <summary height="24">
+            <element kind="line" x="0" y="2" width="802" height="1"><pen lineWidth="1.0" lineColor="#006FAC"/></element>
+            <element kind="staticText" x="0" y="4" width="40" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Total]]></text></element>
+            <element kind="staticText" x="40" y="4" width="150" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="staticText" x="190" y="4" width="40" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="staticText" x="230" y="4" width="120" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="staticText" x="350" y="4" width="182" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="textField" x="532" y="4" width="70" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_REQUESTS}]]></expression></element>
+            <element kind="textField" x="602" y="4" width="100" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_ADJ_AMT}]]></expression></element>
+            <element kind="textField" x="702" y="4" width="100" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_PAID_AMT}]]></expression></element>
+    </summary>
+</jasperReport>

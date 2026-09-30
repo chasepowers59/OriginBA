@@ -6,12 +6,22 @@ import { loadSavedViews, removeViewRemote } from "@/lib/savedViews";
 import type { SavedFavorite } from "@/lib/favorites";
 import { ScheduleDialog } from "@/components/ScheduleDialog";
 import { NotesDialog } from "@/components/NotesDialog";
+import { EmbedDialog } from "@/components/EmbedDialog";
+import { KpiAlertsDialog } from "@/components/KpiAlertsDialog";
+import { isRestricted } from "@/lib/rowRules";
+import { useAuth } from "@/components/AuthProvider";
+import { ownershipLabel } from "@/lib/ownership";
+import { groupByFolder } from "@/lib/folders";
+import { moveSavedView } from "@/lib/api";
 
 export function FavoritesPanel({ compact }: { compact?: boolean }) {
   const [favorites, setFavorites] = useState<SavedFavorite[]>([]);
   const [loading, setLoading] = useState(true);
   const [scheduling, setScheduling] = useState<SavedFavorite | null>(null);
   const [noting, setNoting] = useState<SavedFavorite | null>(null);
+  const [embedding, setEmbedding] = useState<SavedFavorite | null>(null);
+  const [alerting, setAlerting] = useState<SavedFavorite | null>(null);
+  const { user } = useAuth();
 
   const refresh = () => {
     loadSavedViews()
@@ -35,7 +45,7 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
       <div className="glass-panel-subtle p-4 text-sm text-fg-muted">
         Save reports you run often — they sync to your client workspace for one-click
         access.{" "}
-        <Link href="/build" className="text-primary hover:underline dark:text-primary">
+        <Link href="/build" className="text-primary underline underline-offset-2 dark:text-primary">
           Build your first view →
         </Link>
       </div>
@@ -49,8 +59,14 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
           Saved views
         </p>
       ) : null}
+      <div className="space-y-4">
+      {groupByFolder(favorites).map((group) => (
+      <section key={group.folder ?? "__unfiled"} aria-label={group.folder ?? "Not in a folder"}>
+      {group.folder || groupByFolder(favorites).length > 1 ? (
+        <p className="mb-1.5 text-xs font-semibold text-heading">{group.folder ?? "Not in a folder"}</p>
+      ) : null}
       <ul className="space-y-2">
-        {favorites.map((fav) => (
+        {group.items.map((fav) => (
           <li
             key={fav.id}
             className="flex items-center gap-2 rounded-xl border border-edge-subtle bg-surface-subtle px-3 py-2"
@@ -60,7 +76,10 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
               className="min-w-0 flex-1 text-sm text-heading hover:text-primary"
             >
               <span className="block truncate font-medium">{fav.title}</span>
-              <span className="block truncate text-xs text-fg-muted">{fav.snapshotLabel}</span>
+              <span className="block truncate text-xs text-fg-muted">
+                {fav.snapshotLabel}
+                {ownershipLabel(fav, user?.email) ? ` · ${ownershipLabel(fav, user?.email)}` : ""}
+              </span>
             </Link>
             <button
               type="button"
@@ -78,26 +97,72 @@ export function FavoritesPanel({ compact }: { compact?: boolean }) {
             >
               Schedule
             </button>
-            <button
-              type="button"
-              onClick={async () => {
-                await removeViewRemote(fav.id);
-                refresh();
-              }}
-              className="shrink-0 text-xs text-fg-muted hover:text-over dark:hover:text-over"
-              title="Remove saved view"
-            >
-              Remove
-            </button>
+            {!isRestricted(user) ? (
+              <button
+                type="button"
+                onClick={() => setAlerting(fav)}
+                className="shrink-0 text-xs text-fg-muted hover:text-primary"
+                title="Email when this view's total crosses a line"
+              >
+                Alert
+              </button>
+            ) : null}
+            {fav.canEdit !== false && fav.visibility !== "private" ? (
+              <button
+                type="button"
+                onClick={() => setEmbedding(fav)}
+                className="shrink-0 text-xs text-fg-muted hover:text-primary"
+                title="Show this view in another site"
+              >
+                Embed
+              </button>
+            ) : null}
+            {fav.canEdit !== false ? (
+              <button
+                type="button"
+                onClick={async () => {
+                  const next = window.prompt("Move to folder (leave empty for no folder)", fav.folder ?? "");
+                  if (next === null) return;
+                  await moveSavedView(fav.id, next.trim());
+                  refresh();
+                }}
+                className="shrink-0 text-xs text-fg-muted hover:text-primary"
+                title="Move to another folder"
+              >
+                Move
+              </button>
+            ) : null}
+            {fav.canEdit !== false ? (
+              <button
+                type="button"
+                onClick={async () => {
+                  await removeViewRemote(fav.id);
+                  refresh();
+                }}
+                className="shrink-0 text-xs text-fg-muted hover:text-over dark:hover:text-over"
+                title="Remove saved view"
+              >
+                Remove
+              </button>
+            ) : null}
           </li>
         ))}
       </ul>
+      </section>
+      ))}
+      </div>
       {scheduling ? (
         <ScheduleDialog
           savedViewId={scheduling.id}
           viewTitle={scheduling.title}
           onClose={() => setScheduling(null)}
         />
+      ) : null}
+      {alerting ? (
+        <KpiAlertsDialog view={{ id: alerting.id, title: alerting.title }} onClose={() => setAlerting(null)} />
+      ) : null}
+      {embedding ? (
+        <EmbedDialog viewId={embedding.id} title={embedding.title} onClose={() => setEmbedding(null)} />
       ) : null}
       {noting ? (
         <NotesDialog

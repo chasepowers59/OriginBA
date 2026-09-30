@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { fetchPortalConfig } from "@/lib/api";
+import { readableAccentStops } from "@/lib/accentContrast";
 import { applyBrandConfig, DEFAULT_BRAND } from "@/lib/brand";
 import {
   applyColorMode,
@@ -37,6 +38,14 @@ function applyThemeCss(theme: PortalConfig["theme"]): void {
   root.style.setProperty("--mesh-glow-1", theme.mesh_glow_1);
   root.style.setProperty("--mesh-glow-2", theme.mesh_glow_2);
   root.style.setProperty("--mesh-glow-3", theme.mesh_glow_3);
+
+  // A client can configure any accent, and the accent gradient carries button text.
+  // The stops above stay untouched for decoration (glows, shadows, focus rings); the
+  // text-bearing surfaces use this constrained pair so the label stays legible.
+  const readable = readableAccentStops(theme.accent_from, theme.accent_to);
+  root.style.setProperty("--accent-readable", readable.from);
+  root.style.setProperty("--accent-readable-2", readable.to);
+  root.style.setProperty("--on-accent", readable.onAccent);
 }
 
 const FALLBACK_CONFIG: PortalConfig = {

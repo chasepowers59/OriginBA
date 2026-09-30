@@ -146,4 +146,4 @@ Package it as:
 The import package also carries its own local input controls. `BATCH_NBR_FILTER` should remain a numeric prompt in the packaged report unit because the actual batch restriction is now applied in the Domain query itself through `queryFilterString`.
 
 This avoids the same import-debug cycle already documented in:
-- [jaspersoft_repository_import_debugging_runbook.md](/C:/Users/cvpow/OneDrive/Desktop/OriginBA/docs/jaspersoft_repository_import_debugging_runbook.md)
+- [jaspersoft_repository_import_debugging_runbook.md](/C:/Users/cvpow/OneDrive/Desktop/OriginBA/jaspersoft/docs/jaspersoft_repository_import_debugging_runbook.md)

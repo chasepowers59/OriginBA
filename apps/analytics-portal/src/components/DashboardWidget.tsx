@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { MiniSparkChart } from "./MiniSparkChart";
 import { KpiCompareBadge } from "./KpiCompareBadge";
-import { formatCurrency, formatNumber } from "@/lib/format";
+import { formatCompact, formatDate } from "@/lib/format";
 import { workstreamDisplayName } from "@/lib/businessLabels";
+import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
 import type { ExecutiveKpi } from "@/lib/types";
+import { explainQuestion, requestAsk } from "@/lib/assistantContext";
 
 type DashboardWidgetProps = {
   kpi: ExecutiveKpi;
@@ -13,6 +15,9 @@ type DashboardWidgetProps = {
   showCompare?: boolean;
   selectedTrendLabel?: string | null;
   onTrendClick?: (kpi: ExecutiveKpi, label: string) => void;
+  onLensChange?: (kpiId: string, lensId: string) => void;
+  /** The page's period, named when the reader asks the assistant to explain the figure. */
+  periodLabel?: string;
 };
 
 export function DashboardWidget({
@@ -21,19 +26,21 @@ export function DashboardWidget({
   showCompare,
   selectedTrendLabel,
   onTrendClick,
+  onLensChange,
+  periodLabel,
 }: DashboardWidgetProps) {
-  const formatted =
-    kpi.value == null
-      ? "—"
-      : kpi.format === "currency"
-        ? formatCurrency(kpi.value)
-        : formatNumber(kpi.value);
+  const formatted = formatCompact(kpi.value, { currency: kpi.format === "currency" });
 
   const exploreHref = kpi.explore_report_id
     ? `/explore/${kpi.snapshot_id}?report=${kpi.explore_report_id}`
     : `/explore/${kpi.snapshot_id}`;
 
   const workstreamName = workstreamDisplayName(kpi.workstream);
+  const lenses = kpi.lenses ?? [];
+  // Segmented control up to a handful of short labels; a select past that. 5 lenses of
+  // 6 characters read fine in a row, 9 of "Program management contacts" do not.
+  const asDropdown =
+    lenses.length > 5 || lenses.reduce((n, l) => n + l.label.length, 0) > 48;
   // Reference-dashboard panel headers lead with a small rounded icon chip, coloured per
   // category. Chip hue cycles through the chart palette keyed by the workstream name.
   const CHIP_VARS = ["--chart-1", "--chart-2", "--chart-3", "--chart-4", "--chart-5"];
@@ -49,8 +56,13 @@ export function DashboardWidget({
           <div className="flex items-start gap-2.5">
             <span
               aria-hidden
-              className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[11px] font-bold text-white"
-              style={{ background: `var(${chipVar})` }}
+              // The hue carries the category in the chip's GROUND; the letter stays
+              // ordinary text. White on the hue measured 1.83:1 once the chart palette
+              // inverted for dark mode, and the hue as text is no better -- chart
+              // colours are chosen to be distinct from EACH OTHER, and two of the five
+              // (--chart-4, --chart-5) are dark enough to fail on a dark card at 3.59:1.
+              className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[11px] font-bold text-fg"
+              style={{ background: `color-mix(in srgb, var(${chipVar}) 22%, transparent)` }}
             >
               {workstreamName.charAt(0)}
             </span>
@@ -67,6 +79,73 @@ export function DashboardWidget({
         <p className={`mt-3 font-bold tracking-tight tabular-nums text-heading ${compact ? "text-2xl" : "text-3xl"}`}>
           {formatted}
         </p>
+        {/* The lens picker sits UNDER the number it changes, so the reader sees which
+            population produced it. The subtitle above re-states the choice in words. */}
+        {lenses.length > 1 && onLensChange ? (
+          asDropdown ? (
+            // Many lenses, or long ones: a segmented control would wrap to three lines
+            // of chips and swamp the number it belongs to. Discovered lenses carry the
+            // client's own wording ("Credit and collection contacts"), so the width is
+            // not ours to control -- past a handful, a select is the honest shape.
+            <label className="mt-2 block">
+              <span className="sr-only">{kpi.label}: which population to count</span>
+              <select
+                value={kpi.lens ?? ""}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onLensChange(kpi.id, e.target.value);
+                }}
+                className="w-full min-w-0 max-w-full truncate rounded-lg border border-edge-subtle bg-chip px-2 py-1 text-[11px] font-medium text-fg"
+              >
+                {lenses.map((lens) => (
+                  <option key={lens.id} value={lens.id}>
+                    {lens.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <div
+              role="group"
+              aria-label={`${kpi.label}: which population to count`}
+              className="mt-2 inline-flex flex-wrap gap-0.5 rounded-lg bg-chip p-0.5"
+            >
+              {lenses.map((lens) => {
+                const active = lens.id === kpi.lens;
+                return (
+                  <button
+                    key={lens.id}
+                    type="button"
+                    aria-pressed={active}
+                    title={lens.subtitle}
+                    onClick={(e) => {
+                      // the whole card is a link to the canvas
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onLensChange(kpi.id, lens.id);
+                    }}
+                    className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition ${
+ active
+ ? "bg-surface text-heading shadow-sm"
+ : "text-fg-muted hover:text-heading"
+ }`}
+                  >
+                    {lens.label}
+                  </button>
+                );
+              })}
+            </div>
+          )
+        ) : null}
+        {/* A bare 0 cannot say whether nothing happened or the window missed the data.
+            When the canvas has rows but none in range, say so and name the last date. */}
+        {kpi.empty_window ? (
+          <p className="mt-1 text-xs text-warn">
+            No data in this window — latest {formatDate(kpi.empty_window.latest.slice(0, 10))}
+          </p>
+        ) : null}
         {showCompare ? (
           <div className="mt-2">
             <KpiCompareBadge changePct={kpi.change_pct} priorLabel={kpi.compare_label ?? undefined} />
@@ -79,9 +158,15 @@ export function DashboardWidget({
       {!compact ? (
         <div className="px-2 pb-2 pt-1">
           <MiniSparkChart
-            points={kpi.trend}
+            points={orderChartRows(
+              kpi.trend,
+              "label",
+              ["value"],
+              isOrderedAxis(kpi.trend_dimension),
+            )}
             format={kpi.format}
             height={130}
+            ordered={isOrderedAxis(kpi.trend_dimension)}
             selectedLabel={selectedTrendLabel}
             onBarClick={
               onTrendClick && kpi.trend_dimension
@@ -98,9 +183,26 @@ export function DashboardWidget({
     return (
       <div className="group glass-panel block overflow-hidden transition hover:border-edge">
         {inner}
-        <Link href={exploreHref} className="block border-t border-edge-subtle px-4 py-2 text-xs text-primary">
-          Open full report →
-        </Link>
+        <div className="flex items-center justify-between gap-2 border-t border-edge-subtle px-4 py-2 text-xs">
+          <Link href={exploreHref} className="text-primary">
+            Open full report →
+          </Link>
+          {kpi.value != null && !kpi.error ? (
+            <button
+              type="button"
+              className="text-fg-muted hover:text-primary"
+              onClick={() =>
+                requestAsk({
+                  question: explainQuestion(kpi, formatted, periodLabel),
+                  context: { canvas_id: kpi.snapshot_id, label: kpi.label, period: periodLabel,
+                             filters: kpi.subtitle ? [kpi.subtitle] : [] },
+                })
+              }
+            >
+              Explain this number
+            </button>
+          ) : null}
+        </div>
       </div>
     );
   }

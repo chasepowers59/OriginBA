@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="dashlet-image" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ada31481-4de5-444b-a06c-1004e0887c20">
+	<property name="net.sf.jasperreports.export.xls.ignore.graphics" value="false"/>
+	<style name="Sans_Normal" isDefault="true" fontName="DejaVu Sans" fontSize="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="FilterLabel" fontSize="16" isBold="true"/>
+	<style name="FilterValue" fontSize="14"/>
+	<subDataset name="Values" uuid="36df7e82-6590-4c91-b51d-b3c57825a476">
+		<field name="value" class="java.lang.Object">
+			<property name="net.sf.jasperreports.javabean.field.property" value="_THIS"/>
+		</field>
+	</subDataset>
+	<parameter name="FilterGroupID" class="java.lang.String"/>
+	<parameter name="ComponentsJSON" class="java.lang.String"/>
+	<parameter name="JSON_INPUT_STREAM" class="java.io.InputStream" isForPrompting="false">
+		<defaultValueExpression><![CDATA[new ByteArrayInputStream($P{ComponentsJSON}.getBytes("UTF-8"))]]></defaultValueExpression>
+	</parameter>
+	<queryString language="json">
+		<![CDATA[.]]>
+	</queryString>
+	<field name="type" class="java.lang.String"/>
+	<field name="parentId" class="java.lang.String"/>
+	<field name="position" class="java.lang.Integer"/>
+	<field name="label" class="java.lang.String"/>
+	<field name="resourceId" class="java.lang.String"/>
+	<sortField name="position"/>
+	<variable name="filterValue" class="java.lang.Object">
+		<variableExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get($F{resourceId})]]></variableExpression>
+	</variable>
+	<filterExpression><![CDATA[$F{type}.equals("inputControl") && $F{parentId}.equals($P{FilterGroupID})]]></filterExpression>
+	<detail>
+		<band height="46">
+			<textField textAdjust="StretchHeight">
+				<reportElement style="FilterLabel" x="0" y="0" width="572" height="20" uuid="6d66528b-7e7c-4163-b75b-c493e31d53b4"/>
+				<textFieldExpression><![CDATA[$F{label}]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement x="20" y="23" width="552" height="20" uuid="be97b060-e421-4e4d-8398-058b06a94e49">
+					<printWhenExpression><![CDATA[$V{filterValue} != null]]></printWhenExpression>
+				</reportElement>
+				<c:list xmlns:c="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="Values" uuid="55bb2809-5e0c-44f4-b1f2-5586c47d0a05">
+						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($V{filterValue} instanceof Collection ? (Collection) $V{filterValue} : Collections.singletonList($V{filterValue}))]]></dataSourceExpression>
+					</datasetRun>
+					<c:listContents height="18">
+						<textField textAdjust="StretchHeight">
+							<reportElement style="FilterValue" x="0" y="0" width="552" height="18" uuid="13fe0785-1632-419f-bc96-36ecb590b286"/>
+							<textFieldExpression><![CDATA[$F{value}]]></textFieldExpression>
+						</textField>
+					</c:listContents>
+				</c:list>
+			</componentElement>
+		</band>
+	</detail>
+</jasperReport>

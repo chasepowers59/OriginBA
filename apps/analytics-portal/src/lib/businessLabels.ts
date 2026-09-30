@@ -1,14 +1,19 @@
 import type { SnapshotMetadata } from "./types";
 
-/** Utility industry workstream names and display order (9 workstreams). */
+/**
+ * Fallback names and display order for the workstreams, used when the API has not
+ * supplied a label. There is ONE catalog and this is its `workstream_order`, verbatim;
+ * businessLabels.test.ts pins the two against each other so a hand-kept copy cannot
+ * drift -- the last drift left /workstream/assets a 404 while the catalog carried it.
+ */
 export const WORKSTREAM_ORDER = [
-  "finance",
   "billing",
-  "meter_ops",
+  "finance",
   "cashiering",
   "debt",
   "customer_ops",
-  "new_services",
+  "meter_ops",
+  "assets",
   "field_ops",
   "common",
 ] as const;
@@ -22,17 +27,19 @@ export const WORKSTREAM_LABELS: Record<string, string> = {
   field_ops: "Field Operations",
   debt: "Collections & Debt",
   cashiering: "Cashiering & Payments",
-  new_services: "New Services",
+  assets: "Asset Operations",
 };
 
 export const WORKSTREAM_DESCRIPTIONS: Record<string, string> = {
   billing: "Bill segments, determinant usage, cycles, and rate performance",
   finance: "Transactions, GL distribution, billable charges, and revenue",
-  meter_ops: "Usage, measurements, scalar detail, and device assets",
+  // Device assets moved out to their own workstream when assets became a data set;
+  // leaving them named here sent people to the wrong workstream for them.
+  meter_ops: "Usage, measurements, and scalar detail",
   cashiering: "Payments, tenders, and cashiering activity",
   debt: "Aged balances, collections, and write-off processes",
   customer_ops: "Accounts, customers, cases, and service locations",
-  new_services: "New services pipeline and start-service tracking",
+  assets: "Meter and device assets, and the locations they serve",
   field_ops: "Field activities, crews, and BODA field work",
   common: "Workflow queues, batch jobs, and cross-cutting exceptions",
 };
@@ -53,59 +60,8 @@ export const AGGREGATION_LABELS: Record<string, string> = {
   sum: "Total",
   min: "Minimum",
   max: "Maximum",
-};
-
-/** Chart style labels for end users */
-export const CHART_TYPE_LABELS: Record<string, string> = {
-  bar: "Comparison bars",
-  line: "Trend over time",
-  pie: "Share breakdown",
-  horizontal: "Ranked bars",
-  table: "Data table",
-};
-
-export const DATE_PRESET_LABELS: Record<number, string> = {
-  30: "Last 30 days",
-  90: "Last quarter",
-  180: "Last 6 months",
-  365: "Last 12 months",
-};
-
-/** Snapshot-level business copy (fallback when catalog omits fields) */
-export const SNAPSHOT_BUSINESS: Record<
-  string,
-  { headline?: string; summary: string; grainDescription: string; dateLabel: string }
-> = {
-  WORKFLOW_QUEUE_RPT_CURR: {
-    summary:
-      "Monitor staff to-dos, assignments, aging, and overnight batch runs from a single operational dashboard.",
-    grainDescription: "One row per to-do item or batch processing thread",
-    dateLabel: "To-do created date",
-  },
-  BSEG_BILLED_USAGE_RPT_CURR: {
-    summary:
-      "Analyze billed charges on completed bills — by customer class, cycle, rate, and service type.",
-    grainDescription: "One row per completed bill segment",
-    dateLabel: "Bill date",
-  },
-  FT_RPT_CURR: {
-    summary:
-      "Track financial transaction volume, revenue mix, adjustments, and GL distribution status.",
-    grainDescription: "One row per financial transaction (non-redundant)",
-    dateLabel: "Accounting date",
-  },
-  CASE_PREM_CONTACT_RPT_CURR: {
-    summary:
-      "Understand customer case workload by type, status, division, and service location.",
-    grainDescription: "One row per customer case",
-    dateLabel: "Case opened date",
-  },
-  OPS_EXCEPTION_RPT_CURR: {
-    summary:
-      "Prioritize billing, usage, and validation exceptions — open workload by source and severity.",
-    grainDescription: "One row per operational exception",
-    dateLabel: "Exception created date",
-  },
+  avg: "Average",
+  share: "Share of rows (%)",
 };
 
 export function workstreamDisplayName(key: string): string {
@@ -116,25 +72,14 @@ export function aggregationLabel(agg: string): string {
   return AGGREGATION_LABELS[agg.toLowerCase()] ?? agg;
 }
 
-export function chartTypeLabel(type: string): string {
-  return CHART_TYPE_LABELS[type] ?? type;
-}
-
-export function snapshotSummary(meta: Pick<SnapshotMetadata, "id" | "summary">): string {
-  return meta.summary ?? SNAPSHOT_BUSINESS[meta.id]?.summary ?? "";
+export function snapshotSummary(meta: Pick<SnapshotMetadata, "summary">): string {
+  return meta.summary ?? "";
 }
 
 export function snapshotGrainDescription(
-  meta: Pick<SnapshotMetadata, "id" | "grain_description" | "grain">,
+  meta: Pick<SnapshotMetadata, "grain_description" | "grain">,
 ): string {
-  return meta.grain_description ?? SNAPSHOT_BUSINESS[meta.id]?.grainDescription ?? meta.grain;
-}
-
-export function requiredDateLabel(meta: SnapshotMetadata): string {
-  if (meta.required_date_label) return meta.required_date_label;
-  const field = meta.date_fields.find((d) => d.id === meta.required_date_field);
-  if (field?.label) return field.label;
-  return SNAPSHOT_BUSINESS[meta.id]?.dateLabel ?? "Reporting period";
+  return meta.grain_description ?? meta.grain;
 }
 
 /** Build friendly table/chart column headers from metadata + query shape */
@@ -166,25 +111,106 @@ export function buildColumnLabels(
   return labels;
 }
 
+/** Kept upper when a word is one of these; everything else gets Title Case. */
+const ACRONYMS = new Set([
+  "ID", "SA", "SP", "GL", "FT", "BS", "BX", "MC", "SQ", "UOM", "TOU", "AMI", "CIS",
+  "PO", "AR", "QA", "US",
+]);
+
+function capitalize(word: string): string {
+  // Split on "/" so a suffix expansion like "date/time" reads "Date/Time".
+  return word
+    .split("/")
+    .map((part) =>
+      ACRONYMS.has(part.toUpperCase())
+        ? part.toUpperCase()
+        : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
+    )
+    .join("/");
+}
+
+/**
+ * A column identifier as a human would write it.
+ *
+ * This must be safe on BOTH forms an id arrives in: a canvas field is already a
+ * business name ("Bill Date"), while the SQL workspace passes raw CISADM columns
+ * ("ACCOUNTING_DT") and raw Postgres columns ("bill_id"). The previous version only
+ * upper-cased each word's FIRST letter and never lowered the rest, so the all-caps form
+ * — the one it was written for — came out shouting: "ACCOUNTING Date", "CUSTOMER CLASS".
+ *
+ * A name that already contains a SPACE was authored for people and is returned
+ * untouched. That is what protects "Service Agreement ID" from being lowered to
+ * "Service Agreement Id" — the reason a blanket toLowerCase is wrong here.
+ */
 export function prettifyFieldName(fieldId: string): string {
+  if (/\s/.test(fieldId)) return fieldId;
   return fieldId
-    .replace(/^FK_/, "")
-    .replace(/_DESC$/, "")
-    .replace(/_FLG$/, " status")
-    .replace(/_CD$/, "")
-    .replace(/_DTTM$/, " date/time")
-    .replace(/_DT$/, " date")
-    .replace(/_AMT$/, " amount")
-    .replace(/_NBR$/, " number")
-    .replace(/_ID$/, "")
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .replace(/^FK_/i, "")
+    .replace(/_DESC$/i, "")
+    // Absorb a STATUS/STAT stem into the one expanded word: 22 CISADM column ids end
+    // _STATUS_FLG or _STAT_FLG (BILL_STAT_FLG, SA_STATUS_FLG, PAY_STATUS_FLG among
+    // them) and appending to those produced "Adj Status Status".
+    .replace(/(?:_(?:STATUS|STAT))?_FLG$/i, "_status")
+    .replace(/_CD$/i, "")
+    .replace(/_DTTM$/i, "_date/time")
+    .replace(/_DT$/i, "_date")
+    .replace(/_AMT$/i, "_amount")
+    .replace(/_NBR$/i, "_number")
+    .replace(/_ID$/i, "")
+    .split("_")
+    .filter(Boolean)
+    .map(capitalize)
+    .join(" ")
     .trim();
 }
 
+/** Whole words that mean money. Matched as TOKENS, never as substrings — see below. */
+const CURRENCY_WORDS = new Set([
+  "AMT", "AMOUNT", "AMOUNTS", "BALANCE", "REVENUE", "DEBT", "ARREARS",
+  "PRICE", "COST", "FEE", "FEES",
+]);
+
+/** Words that mean this is a tally or a ratio, whatever money word sits beside it. */
+const NOT_CURRENCY_WORDS = new Set(["COUNT", "COUNTS", "PERCENT", "PCT", "RATE", "RATIO"]);
+
+/**
+ * Whether a measure holds money, in EITHER naming world.
+ *
+ * This was `includes("AMT") || includes("DEBT") || includes("REVENUE")` -- written for
+ * CISADM's `_AMT` suffix, and "AMOUNT" does not contain "AMT" (A-M-O-U-N-T). Measured:
+ * of 47 money-ish measures in catalog_dbt, exactly ONE was detected, so nearly every
+ * money column on the 38 canvases rendered as a bare number. CISADM-style names such as
+ * GL_AMOUNT miss for the same reason.
+ *
+ * Matching TOKENS rather than substrings is the actual fix; widening the substring list
+ * just reproduces the bug pointing the other way. Three false positives that a wider
+ * substring rule would have introduced, each found by reading what it newly matched:
+ * "Days Unbalanced" (UNBALANCED contains BALANCE, and it counts days), "% of Arrears
+ * Collected", and GOVERNED_ARREARS_FT_COUNT. Splitting on non-alphanumerics is what
+ * makes BILL_AMT work where a \b regex would not -- underscore is a word character.
+ *
+ * The negative set is specific on purpose: "Arrears 0-30 Days" IS currency, so
+ * excluding on "Days" would have been the lazy version of the same mistake.
+ */
 export function measureIsCurrency(fieldId: string): boolean {
-  const upper = fieldId.toUpperCase();
-  return upper.includes("AMT") || upper.includes("DEBT") || upper.includes("REVENUE");
+  if (fieldId.includes("%")) return false;
+  const words = fieldId.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
+  if (words.some((w) => NOT_CURRENCY_WORDS.has(w))) return false;
+  return words.some((w) => CURRENCY_WORDS.has(w));
+}
+
+/**
+ * Whether a column names a unit of measure (kWh, therms, gallons), in either naming world.
+ * Tokens, for the reason measureIsCurrency gives; a COUNT of units is a number, not a unit.
+ */
+export function isUnitOfMeasureField(fieldId: string): boolean {
+  const words = fieldId.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
+  if (words.includes("COUNT") || words.includes("COUNTS")) return false;
+  if (words.includes("UOM")) return true;
+  const phrase = words.join(" ");
+  if (phrase.includes("UNIT OF MEASURE") || phrase.includes("MEASURE UNIT")) return true;
+  const bare = words.filter((w) => w !== "CODE" && w !== "CD");
+  return bare.length === 1 && (bare[0] === "UNIT" || bare[0] === "UNITS");
 }
 
 /** Dollar formatting only for sum/min/max on amount-like fields — never for counts. */
@@ -222,19 +248,20 @@ export function measureColumnLabel(
     return measureAgg === "count" ? "Number of records" : aggregationLabel(measureAgg);
   }
   const base = measureLabel ?? prettifyFieldName(measureField);
-  if (measureAgg === "sum" && measureIsCurrency(measureField)) {
-    return `Total ${base.toLowerCase()}`;
-  }
-  if (measureAgg === "sum") {
-    return `Total ${base.toLowerCase()}`;
-  }
-  if (measureAgg === "count") {
-    return `Rows with ${base.toLowerCase()}`;
-  }
-  if (measureAgg === "count_distinct") {
-    return `Distinct ${base.toLowerCase()}`;
-  }
+  if (measureAgg === "sum") return withoutRepeatedLeadingWord(`Total ${base.toLowerCase()}`);
+  if (measureAgg === "count") return `Rows with ${base.toLowerCase()}`;
+  if (measureAgg === "count_distinct") return withoutRepeatedLeadingWord(`Distinct ${base.toLowerCase()}`);
+  if (measureAgg === "avg") return withoutRepeatedLeadingWord(`Average ${base.toLowerCase()}`);
+  if (measureAgg === "share") return `% ${base}`;
   return `${aggregationLabel(measureAgg)} — ${base}`;
+}
+
+/**
+ * "Total" + "Total Balance" reads "Total Balance". Six catalog measures already start
+ * with their aggregate's word, and the server's labels prefix it too ("Total Total Balance").
+ */
+export function withoutRepeatedLeadingWord(label: string): string {
+  return label.replace(/^(\S+)\s+\1\b/i, "$1");
 }
 
 export function kpiLabelsForMeasure(measureField: string, measureAgg: string) {

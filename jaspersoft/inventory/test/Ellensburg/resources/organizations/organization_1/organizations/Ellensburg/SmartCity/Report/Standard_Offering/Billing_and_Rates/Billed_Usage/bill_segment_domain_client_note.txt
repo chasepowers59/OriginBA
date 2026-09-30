@@ -1,0 +1,155 @@
+Bill Segment Domain — Simple Client Note
+========================================
+
+What this domain is
+-------------------
+The Bill Segment Domain is a live CISADM view. It works like writing a SQL
+query: tables are joined together behind the scenes. That is useful, but it
+also means row counts can multiply (fan-out) if you pull fields from the wrong
+mix of folders at the same time.
+
+Think of each numbered folder as a different “level” of detail:
+
+  1.)   Bill / Bill Segment / Account
+  1.1)  Calc Header          — rate schedule + total calc amount
+  1.1.1) Calc Line           — each charge line on the bill
+  1.2)  Register Read        — meter read details
+  1.3)  Service Quantity     — billed determinants (GAL, kWh, etc.)
+
+Folders marked “(Mutually Exclusive)” should normally be used one detail
+path at a time. Mixing 1.1 + 1.2 + 1.3 in one Ad Hoc is the most common cause
+of duplicate rows.
+
+
+The big rule
+------------
+Pick ONE question, then stay in ONE detail folder.
+
+  Question                              Use these folders
+  ------------------------------------  ------------------------------------
+  How much was charged / calc lines?    1.1 + 1.1.1 (Calc Header / Calc Line)
+  What gallons / kWh / CF were billed?  1.3 (Service Quantity)
+  What did the meter read?              1.2 (Register Read)
+  Bill / account context only           1.) Bill, Bill Segment, Account
+
+Safe: Bill + Segment + Account + Descriptions from that same path.
+Not safe: Calc Line fields + Read fields + Service Quantity fields together,
+unless you carefully filter and accept that rows will multiply.
+
+
+Why fan-out happens
+-------------------
+One bill segment usually has:
+
+  - several calc lines
+  - several service quantity rows (GAL, tier values, days, etc.)
+  - several register read rows (different UOM/SQI/time windows)
+
+If Ad Hoc joins those together with no filter, rows multiply:
+
+  2 calc lines x 3 gallon SQ rows x 3 read windows = many duplicate-looking rows
+
+Filters are essential. Folder names tell you which table a field came from —
+always check the folder, not just the field label. There can be more than one
+“Unit of Measure” or “SQI” field (Calc Line vs BSEG SQ vs BSEG Read).
+
+
+Required / recommended filters
+------------------------------
+Always start with:
+
+  - Bill Status = Complete (often already applied by the domain)
+  - Bill Segment Status = Frozen (or the status you intend)
+  - Date range on Bill Segment End Date (or Bill Date)
+  - Account / person filters when exploring a single customer
+
+Then add ONE detail filter for the grain you want:
+
+  Calc Line view:
+    - Calc Line Service Quantity Description (SQI)
+    - and/or Calc Line Unit of Measure Description
+    - optional: Rate Schedule Description
+
+  Service Quantity view (best place for Gallons / kWh / CF):
+    - Unit of Measure Description (BSEG SQ)
+    - and/or SQI Description (BSEG SQ)
+
+  Register Read view:
+    - Unit of Measure Description (BSEG Read)
+    - and usually one clear read (for example register UOM with a real
+      start/end reading), not every read row
+
+
+How to find Gallons, kWh, Kilowatts, Gas, etc.
+----------------------------------------------
+Use folder 1.3) Bill Segment Service Quantity.
+
+  Field to filter:  Unit of Measure Description (BSEG SQ)
+  Examples:         Gallons, Kilowatt-Hours, Kilowatts, 100 Cubic Feet (Gas)
+
+  Quantity field:   Billable Service Quantity (from BSEG SQ)
+
+Do NOT expect Gallons to appear as Calc Line UOM on water rates. On Ellensburg
+water calc lines, UOM is usually blank. The charge is driven by SQI instead
+(Days, Tier 1 Multiplier, Tier 2 Multiplier, etc.).
+
+
+Important utility nuance (Water vs Electric / Gas)
+--------------------------------------------------
+Water (typical):
+  - Calc Line UOM is usually empty
+  - Calc Line SQI carries the meaning: Days, Tier 1 Multiplier, Tier 2
+    Multiplier, etc.
+  - Actual Gallons live in Service Quantity (BSEG SQ) and/or Register Read
+  - So: use Calc Line for charge dollars / tier math; use BSEG SQ for gallons
+
+Electric / Gas (typical):
+  - Usage charge lines often carry UOM on the Calc Line itself
+    (for example Kilowatt-Hours, 100 Cubic Feet)
+  - Days / demand-style lines may still have SQI and no UOM
+  - You can often filter Calc Line UOM for kWh / CF, but BSEG SQ is still the
+    cleanest place for “how many units were billed”
+
+Quick test:
+  If Calc Line Unit of Measure is blank, look at Calc Line SQI Description.
+  If you need the commodity unit (GAL / kWh / CF), go to BSEG SQ UOM.
+
+
+Quick recipes
+-------------
+1) Two water calc lines for one segment (Days + Tier 1 Multiplier)
+   - Fields from: Bill, Bill Segment, Calc Header, Calc Line, Descriptions
+   - Do NOT add Register Read or Service Quantity fields
+   - Filters: Segment ID (or account + dates), Segment Status = Frozen,
+     Calc Line SQI in (Days, Tier 1 Multiplier)
+   - Expected grain: one row per calc line
+
+2) Gallons billed for a segment
+   - Fields from: Bill, Bill Segment, Service Quantity (1.3), Descriptions
+   - Filter: Unit of Measure Description (BSEG SQ) = Gallons
+   - Optional: also filter SQI if you need total vs tier value rows
+   - Do NOT mix in Calc Line or Read fields
+
+3) kWh / kW / gas CF
+   - Prefer Service Quantity (1.3) filtered by UOM description
+   - Or, for charge lines that store UOM on the calc line, use Calc Line UOM
+     alone (no Read / SQ folders)
+
+
+How to know you got it right
+----------------------------
+- Count of rows matches what you expect for that grain
+  (example: 2 calc lines => 2 rows, not 6)
+- Amounts are not repeated across identical-looking rows
+- The UOM/SQI description you filtered came from the SAME folder as the
+  quantity/amount you are using
+
+If counts look too high, remove fields from the other mutually exclusive
+folders first, then re-check filters.
+
+
+One-sentence summary
+--------------------
+Stay in one detail folder, filter hard, and remember: water gallons usually
+live in Service Quantity, while water calc lines use Days / tier SQIs with no
+UOM — electric and gas more often put kWh / CF on the calc line itself.

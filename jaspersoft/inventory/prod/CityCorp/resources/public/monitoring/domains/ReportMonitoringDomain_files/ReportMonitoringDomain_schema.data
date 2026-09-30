@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2005 - 2025 Cloud Software Group, Inc. All Rights Reserved. Confidential & Proprietary.
+  ~ Licensed pursuant to commercial Cloud Software Group, Inc End User License Agreement.
+  -->
+
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.0">
+    <dataSources>
+        <jdbcDataSource id="ReportMonitoringDataSource">
+            <schemaMap>
+                <entry key="defaultSchema">
+                    <string></string>
+                </entry>
+                <entry key="schema1">
+                    <string>{attribute('auditDB')}</string>
+                </entry>
+            </schemaMap>
+        </jdbcDataSource>
+    </dataSources>
+    <itemGroups>
+        <itemGroup description="jireportmonitoringfact" descriptionId="" id="jireportmonitoringfact" label="jireportmonitoringfact" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT">
+            <items>
+                <item defaultMask="0" description="date_day" descriptionId="" dimensionOrMeasure="Dimension" id="date_day" label="Day" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.DATE_DAY" />
+                <item defaultMask="0" description="date_month" descriptionId="" dimensionOrMeasure="Dimension" id="date_month" label="Month" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.DATE_MONTH" />
+                <item defaultMask="0" description="date_year" descriptionId="" dimensionOrMeasure="Dimension" id="date_year" label="Year" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.DATE_YEAR" />
+                <item description="editing_action" descriptionId="" dimensionOrMeasure="Dimension" id="editing_action" label="Editing Action" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.EDITING_ACTION" />
+                <item description="event_context" descriptionId="" dimensionOrMeasure="Dimension" id="event_context" label="Event Context" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.EVENT_CONTEXT" />
+                <item description="event_type" descriptionId="" dimensionOrMeasure="Dimension" id="event_type" label="Event Type" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.EVENT_TYPE" />
+                <item description="id" descriptionId="" dimensionOrMeasure="Dimension" id="id" label="id" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.ID" />
+                <item defaultAgg="Average" defaultMask="0" description="query_execution_time" descriptionId="" dimensionOrMeasure="Measure" id="query_execution_time" label="Query Execution Time" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.QUERY_EXECUTION_TIME" />
+                <item defaultAgg="Average" defaultMask="0" description="report_rendering_time" descriptionId="" dimensionOrMeasure="Measure" id="report_rendering_time" label="Report Rendering Time" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.REPORT_RENDERING_TIME" />
+                <item description="report_uri" descriptionId="" dimensionOrMeasure="Dimension" id="report_uri" label="Report URI" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.REPORT_URI" />
+                <item defaultMask="0" description="time_hour" descriptionId="" dimensionOrMeasure="Dimension" id="time_hour" label="Hour" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.TIME_HOUR" />
+                <item defaultMask="0" description="time_minute" descriptionId="" dimensionOrMeasure="Dimension" id="time_minute" label="Minute" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.TIME_MINUTE" />
+                <item defaultMask="medium,medium" description="time_stamp" descriptionId="" dimensionOrMeasure="Measure" id="time_stamp" label="Time Stamp" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.TIME_STAMP" />
+                <item defaultAgg="Average" defaultMask="0" description="total_report_execution_time" descriptionId="" dimensionOrMeasure="Measure" id="total_report_execution_time" label="Total Report Execution Time" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.TOTAL_REPORT_EXECUTION_TIME" />
+                <item description="user_name" descriptionId="" dimensionOrMeasure="Dimension" id="user_name" label="User Name" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.USER_NAME" />
+                <item description="user_organization" descriptionId="" dimensionOrMeasure="Dimension" id="user_organization" label="User Organization" labelId="" resourceId="JASPERSERVER_JIREPORTMONITORINGFACT.USER_ORGANIZATION" />
+            </items>
+        </itemGroup>
+    </itemGroups>
+    <resources>
+        <jdbcTable id="JASPERSERVER_JIREPORTMONITORINGFACT" datasourceId="ReportMonitoringDataSource" tableName="schema1.JIREPORTMONITORINGFACT">
+            <fieldList>
+                <field id="DATE_DAY" fieldDBName="DATE_DAY" type="java.lang.Short" />
+                <field id="DATE_MONTH" fieldDBName="DATE_MONTH" type="java.lang.Short" />
+                <field id="DATE_YEAR" fieldDBName="DATE_YEAR" type="java.lang.Short" />
+                <field id="EDITING_ACTION" fieldDBName="EDITING_ACTION" type="java.lang.String" />
+                <field id="EVENT_CONTEXT" fieldDBName="EVENT_CONTEXT" type="java.lang.String" />
+                <field id="EVENT_TYPE" fieldDBName="EVENT_TYPE" type="java.lang.String" />
+                <field id="ID" fieldDBName="ID" type="java.lang.Long" />
+                <field id="QUERY_EXECUTION_TIME" fieldDBName="QUERY_EXECUTION_TIME" type="java.lang.Integer" />
+                <field id="REPORT_RENDERING_TIME" fieldDBName="REPORT_RENDERING_TIME" type="java.lang.Integer" />
+                <field id="REPORT_URI" fieldDBName="REPORT_URI" type="java.lang.String" />
+                <field id="TIME_HOUR" fieldDBName="TIME_HOUR" type="java.lang.Short" />
+                <field id="TIME_MINUTE" fieldDBName="TIME_MINUTE" type="java.lang.Short" />
+                <field id="TIME_STAMP" fieldDBName="TIME_STAMP" type="java.sql.Timestamp" />
+                <field id="TOTAL_REPORT_EXECUTION_TIME" fieldDBName="TOTAL_REPORT_EXECUTION_TIME" type="java.lang.Integer" />
+                <field id="USER_NAME" fieldDBName="USER_NAME" type="java.lang.String" />
+                <field id="USER_ORGANIZATION" fieldDBName="USER_ORGANIZATION" type="java.lang.String" />
+            </fieldList>
+        </jdbcTable>
+    </resources>
+</schema>
+

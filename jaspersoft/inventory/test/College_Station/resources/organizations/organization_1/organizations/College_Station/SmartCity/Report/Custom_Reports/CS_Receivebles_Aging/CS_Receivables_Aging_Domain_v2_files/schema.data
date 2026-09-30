@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Receivables_Aging" label="Receivables_Aging" resourceId="Receivables_Aging"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="ACCT_ID" resourceId="Receivables_Aging.ACCT_ID"></item>
+    <item id="BKT2" label="21-30 DAYS" resourceId="Receivables_Aging.BKT2"></item>
+    <item id="BKT3" label="31-60 DAYS" resourceId="Receivables_Aging.BKT3"></item>
+    <item id="BKT4" label="OVER 60 DAYS" resourceId="Receivables_Aging.BKT4"></item>
+    <item id="CUST_CL_CD" label="CUST_CL_CD" resourceId="Receivables_Aging.CUST_CL_CD"></item>
+    <item id="CUTOFF_DATE" label="RUN_DATE" resourceId="Receivables_Aging.CUTOFF_DATE"></item>
+    <item id="ENTITY_NAME" label="ACCOUNT_OWNER" resourceId="Receivables_Aging.ENTITY_NAME"></item>
+    <item id="TOT_AR" label="TOTAL_BALANCE" resourceId="Receivables_Aging.TOT_AR"></item>
+    <item id="UB_AR_BKT1" label="CURRENT_CHARGES + 0-20 DAYS" resourceId="Receivables_Aging.UB_AR_BKT1"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Receivables_Aging" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="CUTOFF_DATE" type="java.sql.Timestamp"></field>
+        <field id="CUST_CL_CD" type="java.lang.String"></field>
+        <field id="TOT_AR" type="java.math.BigDecimal"></field>
+        <field id="UB_AR_BKT1" type="java.math.BigDecimal"></field>
+        <field id="BKT2" type="java.math.BigDecimal"></field>
+        <field id="BKT3" type="java.math.BigDecimal"></field>
+        <field id="BKT4" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>SELECT
+    ACCT_ID,
+    ENTITY_NAME,
+    CUTOFF_DATE,
+    CUST_CL_CD,
+    TOT_AR,
+    ( UB_AR + BKT1 ) AS UB_AR_BKT1,
+    BKT2,
+    BKT3,
+    BKT4
+FROM
+    TABLE ( CISADM.CIRCVAGAFN2('SYSUSER', 20, 31, 60) )</query>
+    </jdbcQuery>
+  </resources>
+</schema>

@@ -10,6 +10,9 @@ import { DashboardWidget } from "./DashboardWidget";
 import { DashboardControls, type CompareMode } from "./DashboardControls";
 import { CrossFilterProvider, useCrossFilter } from "./CrossFilterContext";
 import { PresentationToolbar } from "./PresentationToolbar";
+import { kpiSections } from "@/lib/dashboardPdf";
+import { formatDateTime, formatNumber } from "@/lib/format";
+import { CrossFilterBanner } from "@/components/CrossFilterBanner";
 
 type ExecutiveDashboardProps = {
   variant?: "home" | "full";
@@ -32,36 +35,40 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
   const [showAlerts, setShowAlerts] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
   const [loading, setLoading] = useState(true);
+  // Which lens each card is showing, by kpi id. Empty means every card keeps its
+  // default, so the URL stays clean until the reader actually switches one.
+  const [lenses, setLenses] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    // Only the answer to the reader's latest choice lands: a slower one to an earlier choice
+    // (30 -> 90 -> 30 days) replaced it (e2e/dashboard-modes.spec.ts).
+    let latest = true;
     setLoading(true);
     fetchExecutiveSummary(
       days,
       compare,
       filter ? { field: filter.field, value: filter.value } : undefined,
       compareMode,
+      lenses,
     )
-      .then(setSummary)
-      .catch(() => setSummary(null))
-      .finally(() => setLoading(false));
-  }, [days, compare, compareMode, filter, reloadKey]);
+      .then((s) => { if (latest) setSummary(s); })
+      .catch(() => { if (latest) setSummary(null); })
+      .finally(() => { if (latest) setLoading(false); });
+    return () => { latest = false; };
+  }, [days, compare, compareMode, filter, reloadKey, lenses]);
+
+  const handleLensChange = useCallback((kpiId: string, lensId: string) => {
+    setLenses((prev) => (prev[kpiId] === lensId ? prev : { ...prev, [kpiId]: lensId }));
+  }, []);
 
   const isHome = variant === "home";
 
-  const exportSections = useMemo(
-    () =>
-      (summary?.kpis ?? []).map((kpi) => ({
-        name: kpi.label,
-        headers: ["Category", "Value"],
-        rows: kpi.trend.map((t) => ({ Category: t.label, Value: t.value })),
-      })),
-    [summary],
-  );
+  const exportSections = useMemo(() => kpiSections(summary?.kpis ?? []), [summary]);
 
   const handleTrendClick = useCallback(
     (kpi: { trend_dimension?: string | null }, label: string) => {
       if (kpi.trend_dimension) {
-        toggleFilter(kpi.trend_dimension, label, label);
+        toggleFilter(kpi.trend_dimension, label);
       }
     },
     [toggleFilter],
@@ -82,8 +89,8 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
             {summary?.period.label ?? `Last ${days} days`}
             {summary?.refresh?.last_refresh ? (
               <span className="ml-2 text-xs text-fg-muted">
-                · data refreshed {new Date(summary.refresh.last_refresh).toLocaleString()} (
-                {summary.refresh.tables.reduce((a, t) => a + t.batch_rows, 0).toLocaleString()}{" "}
+                · data refreshed {formatDateTime(summary.refresh.last_refresh)} (
+                {formatNumber(summary.refresh.tables.reduce((a, t) => a + t.batch_rows, 0))}{" "}
                 rows in latest batch)
               </span>
             ) : null}
@@ -121,14 +128,7 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
       </div>
 
       {filter && !isHome ? (
-        <div className="flex items-center justify-between rounded-xl border border-warn bg-warn-bg px-4 py-2 text-sm text-warn">
-          <span>
-            Cross-filter active: <strong>{filter.label ?? filter.field}</strong> = {filter.value}
-          </span>
-          <button type="button" onClick={clearFilter} className="btn-ghost text-xs">
-            Clear
-          </button>
-        </div>
+        <CrossFilterBanner field={filter.field} value={filter.value} onClear={clearFilter} />
       ) : null}
 
       {!summary?.db_configured && !loading ? (
@@ -160,12 +160,14 @@ function ExecutiveDashboardInner({ variant = "full", initialDays = 30 }: Executi
                   filter && filter.field === kpi.trend_dimension ? filter.value : null
                 }
                 onTrendClick={isHome ? undefined : handleTrendClick}
+                onLensChange={handleLensChange}
+                periodLabel={summary.period.label}
               />
             ))}
           </div>
         ) : summary?.catalog_note ? (
-          // A legacy-catalog org has none of the governed canvases the KPIs read — one
-          // clear explanation instead of a grid of per-KPI errors.
+          // An org whose warehouse is not built yet resolves none of the canvases the
+          // KPIs read — one clear explanation instead of a grid of per-KPI errors.
           <div className="glass-panel px-6 py-8 text-center">
             <p className="text-sm font-medium text-heading">
               Executive KPIs aren&apos;t available for this organization

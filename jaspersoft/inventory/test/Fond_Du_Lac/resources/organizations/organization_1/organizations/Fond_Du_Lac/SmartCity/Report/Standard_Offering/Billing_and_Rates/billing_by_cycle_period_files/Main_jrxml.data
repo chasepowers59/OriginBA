@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="billing_by_cycle_period" pageWidth="842" pageHeight="595" orientation="Landscape"
+    columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+    whenNoDataType="AllSectionsNoDetail">
+    <property name="net.sf.jasperreports.query.timeout" value="600"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+    <style name="Base" default="true" fontName="SansSerif" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
+    <style name="H3" style="Base" fontSize="9" forecolor="#0F4761"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="RowBand" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="SubHeader" style="Base" fontSize="8" forecolor="#5B6470"/>
+    <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
+    <style name="SubTotal" style="Base" fontSize="8" bold="true" forecolor="#0F4761"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
+    <query language="SQL"><![CDATA[
+SELECT COALESCE(NULLIF(TRIM(b.bill_cyc_cd), ''), '(none)') AS BILL_CYC_CD,
+       COALESCE(cl.descr, CASE WHEN NULLIF(TRIM(b.bill_cyc_cd), '') IS NULL THEN 'Off-cycle / no bill cycle' ELSE TRIM(b.bill_cyc_cd) END) AS BILL_CYC_DESCR,
+       COUNT(DISTINCT b.bill_id)  AS BILLS,
+       COUNT(DISTINCT b.acct_id)  AS ACCOUNTS,
+       COUNT(DISTINCT s.bseg_id)  AS SEGMENTS,
+       COUNT(DISTINCT CASE WHEN TRIM(s.est_sw) = 'Y' THEN s.bseg_id END) AS ESTIMATED_SEGMENTS,
+       COALESCE(SUM(h.calc_amt), 0) AS BILLED_AMT
+FROM CISADM.CI_BILL b
+JOIN CISADM.CI_BSEG s ON s.bill_id = b.bill_id AND TRIM(s.bseg_stat_flg) = '50'
+LEFT JOIN CISADM.CI_BSEG_CALC h ON h.bseg_id = s.bseg_id
+LEFT JOIN CISADM.CI_BILL_CYC_L cl ON cl.bill_cyc_cd = b.bill_cyc_cd AND cl.language_cd = 'ENG'
+WHERE TRIM(b.bill_stat_flg) = 'C' AND b.bill_dt >= $P{FROM_DT} AND b.bill_dt < $P{TO_DT} + INTERVAL '1' DAY
+  AND $X{IN, TRIM(b.bill_cyc_cd), BILL_CYC_CD_F}
+  AND ($P{SVC_TYPE_CD_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa JOIN CISADM.CI_SA_TYPE ft ON ft.sa_type_cd = fsa.sa_type_cd AND ft.cis_division = fsa.cis_division WHERE fsa.sa_id = s.sa_id AND TRIM(ft.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F})))
+  AND ($P{CIS_DIVISION_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_ACCT fa WHERE fa.acct_id = b.acct_id AND TRIM(fa.cis_division) = TRIM($P{CIS_DIVISION_F})))
+  AND ($P{ACCT_ID_F} IS NULL OR TRIM(b.acct_id) = TRIM($P{ACCT_ID_F}))
+GROUP BY COALESCE(NULLIF(TRIM(b.bill_cyc_cd), ''), '(none)'),
+         COALESCE(cl.descr, CASE WHEN NULLIF(TRIM(b.bill_cyc_cd), '') IS NULL THEN 'Off-cycle / no bill cycle' ELSE TRIM(b.bill_cyc_cd) END)
+ORDER BY BILLED_AMT DESC
+]]></query>
+    <parameter name="FROM_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusMonths(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TO_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfMonth(1).minusDays(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="BILL_CYC_CD_F" class="java.util.Collection">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="SVC_TYPE_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CIS_DIVISION_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ACCT_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <field name="BILL_CYC_CD" class="java.lang.String"/>
+    <field name="BILL_CYC_DESCR" class="java.lang.String"/>
+    <field name="BILLS" class="java.lang.Long"/>
+    <field name="ACCOUNTS" class="java.lang.Long"/>
+    <field name="SEGMENTS" class="java.lang.Long"/>
+    <field name="ESTIMATED_SEGMENTS" class="java.lang.Long"/>
+    <field name="BILLED_AMT" class="java.math.BigDecimal"/>
+    <variable name="SUM_BILLS" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{BILLS}]]></expression>
+    </variable>
+    <variable name="SUM_ACCOUNTS" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{ACCOUNTS}]]></expression>
+    </variable>
+    <variable name="SUM_SEGMENTS" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{SEGMENTS}]]></expression>
+    </variable>
+    <variable name="SUM_ESTIMATED_SEGMENTS" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{ESTIMATED_SEGMENTS}]]></expression>
+    </variable>
+    <variable name="SUM_BILLED_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{BILLED_AMT}]]></expression>
+    </variable>
+    <title height="52">
+            <element kind="textField" x="0" y="0" width="802" height="26" style="TitleSapphire" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Billing by Cycle"]]></expression></element>
+            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Bill date " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  completed bills, frozen segments; billed = calc headers" + ($P{BILL_CYC_CD_F} == null || $P{BILL_CYC_CD_F}.isEmpty() ? "" : "  |  Bill cycles: " + String.join(", ", $P{BILL_CYC_CD_F})) + ($P{SVC_TYPE_CD_F} == null ? "" : "  |  Service type: " + $P{SVC_TYPE_CD_F}) + ($P{CIS_DIVISION_F} == null ? "" : "  |  CIS division: " + $P{CIS_DIVISION_F}) + ($P{ACCT_ID_F} == null ? "" : "  |  Account ID: " + $P{ACCT_ID_F})]]></expression></element>
+    </title>
+    <columnHeader height="18">
+            <element kind="staticText" x="0" y="0" width="70" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Cycle]]></text></element>
+            <element kind="staticText" x="70" y="0" width="252" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Bill Cycle]]></text></element>
+            <element kind="staticText" x="322" y="0" width="90" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Bills]]></text></element>
+            <element kind="staticText" x="412" y="0" width="90" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Accounts]]></text></element>
+            <element kind="staticText" x="502" y="0" width="90" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Segments]]></text></element>
+            <element kind="staticText" x="592" y="0" width="90" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Estimated]]></text></element>
+            <element kind="staticText" x="682" y="0" width="120" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Billed Amount]]></text></element>
+    </columnHeader>
+    <detail>
+        <band height="22" splitType="Prevent">
+            <element kind="line" x="0" y="2" width="802" height="1"><pen lineWidth="0.75" lineColor="#006FAC"/></element>
+            <element kind="textField" x="0" y="3" width="70" height="18" style="RowBand" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{BILL_CYC_CD}]]></expression></element>
+            <element kind="textField" x="70" y="3" width="252" height="18" style="RowBand" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{BILL_CYC_DESCR}]]></expression></element>
+            <element kind="textField" x="322" y="3" width="90" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{BILLS}]]></expression></element>
+            <element kind="textField" x="412" y="3" width="90" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{ACCOUNTS}]]></expression></element>
+            <element kind="textField" x="502" y="3" width="90" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{SEGMENTS}]]></expression></element>
+            <element kind="textField" x="592" y="3" width="90" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{ESTIMATED_SEGMENTS}]]></expression></element>
+            <element kind="textField" x="682" y="3" width="120" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{BILLED_AMT}]]></expression></element>
+        </band>
+        <band height="20" splitType="Stretch">
+            <element kind="subreport" x="24" y="0" width="778" height="20" positionType="Float" removeLineWhenBlank="true" usingCache="false">
+                <parameter name="FROM_DT"><expression><![CDATA[$P{FROM_DT}]]></expression></parameter>
+                <parameter name="TO_DT"><expression><![CDATA[$P{TO_DT}]]></expression></parameter>
+                <parameter name="BILL_CYC_CD_F"><expression><![CDATA[$P{BILL_CYC_CD_F}]]></expression></parameter>
+                <parameter name="SVC_TYPE_CD_F"><expression><![CDATA[$P{SVC_TYPE_CD_F}]]></expression></parameter>
+                <parameter name="CIS_DIVISION_F"><expression><![CDATA[$P{CIS_DIVISION_F}]]></expression></parameter>
+                <parameter name="ACCT_ID_F"><expression><![CDATA[$P{ACCT_ID_F}]]></expression></parameter>
+                <parameter name="BILL_CYC_CD"><expression><![CDATA[$F{BILL_CYC_CD}]]></expression></parameter>
+                <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                <expression><![CDATA["repo:billing_by_cycle_service_type"]]></expression>
+            </element>
+        </band>
+    </detail>
+    <pageFooter height="14">
+            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential"]]></expression></element>
+            <element kind="textField" x="600" y="0" width="150" height="14" style="FooterConfidential" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Page " + $V{PAGE_NUMBER} + " of"]]></expression></element>
+            <element kind="textField" x="750" y="0" width="52" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report"><expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression></element>
+    </pageFooter>
+    <summary height="24">
+            <element kind="line" x="0" y="2" width="802" height="1"><pen lineWidth="1.0" lineColor="#006FAC"/></element>
+            <element kind="staticText" x="0" y="4" width="70" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Total]]></text></element>
+            <element kind="staticText" x="70" y="4" width="252" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="textField" x="322" y="4" width="90" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_BILLS}]]></expression></element>
+            <element kind="textField" x="412" y="4" width="90" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_ACCOUNTS}]]></expression></element>
+            <element kind="textField" x="502" y="4" width="90" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_SEGMENTS}]]></expression></element>
+            <element kind="textField" x="592" y="4" width="90" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_ESTIMATED_SEGMENTS}]]></expression></element>
+            <element kind="textField" x="682" y="4" width="120" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_BILLED_AMT}]]></expression></element>
+    </summary>
+</jasperReport>

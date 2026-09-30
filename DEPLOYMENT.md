@@ -30,7 +30,9 @@ and, for Oracle orgs, needs Instant Client — neither fits Vercel serverless);
   libraries, enable RLS first: `ALTER TABLE portal_state.records ENABLE ROW LEVEL
   SECURITY;` plus an org-scoped policy.
 
-### 2. API container (Fly.io / Render / Railway / OKE)
+### 2. API container (Fly.io / Render / OKE)
+
+Railway was retired 2026-09-08: its root `Dockerfile`/`railway.toml` are archived; `deploy/Dockerfile.api` is the only API image.
 - Build `deploy/Dockerfile.api` (Postgres-serving base). For Oracle orgs, rebuild
   FROM an Instant Client base and add `oracledb` to `deploy/requirements-api.txt`.
 - Env:
@@ -55,7 +57,12 @@ and, for Oracle orgs, needs Instant Client — neither fits Vercel serverless);
     just-in-time provisioned users — always role `user`; SSO never mints admins) and
     `OIDC_POST_LOGIN_URL` (the portal login page, which receives `#sso_token=`).
     The login page shows "Sign in with Microsoft" automatically once `/auth/status`
-    reports `oidc_enabled`.
+    reports `oidc_enabled`. Optional `OIDC_GROUP_MAP` (JSON list of `{group, role,
+    organization_id, access_groups?, row_rules?}`; claim name `OIDC_GROUPS_CLAIM`, default
+    `groups`) makes access follow IdP groups at every sign-in: someone in no mapped group
+    is refused and their account deactivated; row rules change only where a group
+    declares `row_rules` (`[]` = unrestricted); the map never grants admin. Contract:
+    `tests/test_oidc_group_map.py`.
   - Scheduled report delivery (optional): `SMTP_HOST`/`SMTP_PORT`/`SMTP_USERNAME`/
     `SMTP_PASSWORD`/`SMTP_FROM`/`SMTP_STARTTLS`, then add an hourly cron job running
     `python -m api.report_schedule_runner` with the same env (`--dry-run` to verify).
@@ -101,6 +108,14 @@ cold-start after idle; use the Starter plan or Fly for always-on. The API comes 
   (team `chase-powers-projects`). It builds the repo's production branch.
 - Set env `NEXT_PUBLIC_API_URL` = the API container URL, then redeploy.
 - CORS: the API must allow the Vercel origin (`FRONTEND_ORIGINS` / CORS config).
+- Cache warming: when a client's warehouse is rebuilt, each API process rebuilds the home
+  and workstream summaries in the background within a minute (`api/cache_warmer.py`), so
+  the first reader of the morning does not wait. `PORTAL_WARM_CACHE=false` switches it off.
+- Embedding (optional): `EMBED_ALLOWED_ORIGINS` = the https origins (space-separated) that
+  may frame `/embed/<token>` pages. An owner or admin makes the link from a saved view's
+  "Embed" action (`POST /portal/embed-tokens`, signed with `PORTAL_AUTH_SECRET`, at most a
+  day); it serves that one view with its creator's current access, and stops when the view
+  is deleted or the creator deactivated. Every other page refuses framing.
 
 ### 4. Warehouse data (what the `dev` org reads)
 - Quick start / fabricated demo: `deploy/load_test_data.sh` dumps the local fixture
@@ -148,3 +163,7 @@ The warehouse is NOT backed up here (dbt rebuilds it).
 - Supabase project is provisioned + schema applied; supply its pooled connection
   string to the API host (the password is the remaining secret).
 - Pick + provision the API container host.
+
+## Client registry copy
+
+`config/clients.export.json` and `deploy/jaspersoft_client_promotion/client_org_mapping.csv` are generated from `~/originba_dbt/clients.yml` (`scripts/client_registry.py export` there, run by its `regenerate_all.sh`). Refresh them before building the API image; the sibling checkout is read first on a dev machine, the bundled copy in the container.

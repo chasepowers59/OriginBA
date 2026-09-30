@@ -6,12 +6,15 @@ Every field name was verified against output/catalog_dbt.json or lifted from a
 live-verified dashboard KPI spec before it was written here -- never guess a
 canvas column, the allow-list holds queries to the real names.
 
-The legacy *_RPT_CURR metric set this replaces lives in git history; a
-cisadm-catalog org simply gets no NLQ metrics (snapshot_analytics_nlq filters
-the catalog per org), which is honest until that org migrates.
+snapshot_analytics_nlq filters the metric set per org to the canvases that org's
+catalog actually carries, so a metric is never offered where it cannot run.
 """
 
 from __future__ import annotations
+
+from api.money_rules import MONEY_FILTERS, STANDING_ADJUSTMENT
+from api.row_security import rule_filters
+from api.reporting_dates import reporting_today, window_date_field
 
 import re
 from dataclasses import dataclass, field
@@ -34,11 +37,14 @@ class NlqMetric:
     param_keys: list[str] = field(default_factory=lambda: ["days"])
     example: str = ""
     build: Callable[[dict[str, Any]], dict[str, Any]] | None = None
+    # False where the groups cannot be added: units of measure, or a double-entry ledger (zero
+    # by construction); the answer then lists the groups with no headline total
+    total: bool = True
 
 
-def _window(days: int) -> tuple[str, str]:
+def _window(days: int, organization_id: str | None = None) -> tuple[str, str]:
     capped = max(1, min(int(days), 730))
-    end = date.today()
+    end = reporting_today(organization_id)
     start = end - timedelta(days=capped)
     return start.isoformat(), end.isoformat()
 
@@ -74,20 +80,23 @@ def _scalar(
     # The catalog is per-org; resolving without it looks up ids in the wrong
     # catalog and misses (this had NLQ erroring for every tenant).
     snap = get_snapshot(snapshot_id, organization_id)
-    field_name = None if windowless else (
-        date_field or snap.get("required_date_field") or snap.get("default_date_field"))
+    field_name = None if windowless else (date_field or window_date_field(snap))
     if not field_name and not windowless:
         raise ValueError(f"No date field for {snapshot_id}")
     days = int(params.get("days") or 90)
-    start, end = _window(days)
+    start, end = _window(days, organization_id)
     filters = list(query.get("filters") or [])
     filters.extend(_extra(params, allowed_fields(snap)))
     payload = {**query, "filters": filters}
     cols, rows = run_kpi_query(
         snapshot_id, payload, field_name, start, end, organization_id=organization_id
     )
-    value = float(rows[0][-1] or 0) if rows else 0.0
     table = trend_from_rows(cols, rows) if len(cols) >= 2 and rows else []
+    if query.get("dimensions"):
+        # the headline is the TOTAL, never the largest group (tests/test_vetted_totals.py)
+        _, rows = run_kpi_query(snapshot_id, {**payload, "dimensions": []}, field_name, start, end,
+                                organization_id=organization_id)
+    value = float(rows[0][-1] or 0) if rows else 0.0
     return value, table
 
 
@@ -101,10 +110,9 @@ def _trend(
     windowless: bool = False,
 ) -> list[dict[str, Any]]:
     snap = get_snapshot(snapshot_id, organization_id)
-    field_name = None if windowless else (
-        date_field or snap.get("required_date_field") or snap.get("default_date_field"))
+    field_name = None if windowless else (date_field or window_date_field(snap))
     days = int(params.get("days") or 90)
-    start, end = _window(days)
+    start, end = _window(days, organization_id)
     filters = list(query.get("filters") or [])
     filters.extend(_extra(params, allowed_fields(snap)))
     payload = {**query, "filters": filters}
@@ -138,7 +146,7 @@ def parse_params(question: str, overrides: dict[str, Any] | None = None) -> dict
 
 def _fmt(value: float, fmt: str) -> str:
     if fmt == "currency":
-        return f"${value:,.2f}"
+        return f"{'-' if value < 0 else ''}${abs(value):,.2f}"
     return f"{value:,.0f}"
 
 
@@ -164,18 +172,18 @@ def _source_label(snapshot_id: str) -> str:
 def _result(
     metric: NlqMetric,
     params: dict[str, Any],
-    value: float,
+    value: float | None,
     table: list[dict[str, Any]] | None = None,
     *,
     narrative_extra: str = "",
     spec: dict[str, Any] | None = None,
+    source_label: str | None = None,
 ) -> dict[str, Any]:
     days = int(params.get("days") or metric.default_days)
     window_txt = "as of now" if (spec or {}).get("windowless") else f"last {days} days"
-    narrative = (
-        f"{metric.label}: {_fmt(value, metric.format)} "
-        f"({window_txt} on {_source_label(metric.snapshot_id)})."
-    )
+    source = source_label or _source_label(metric.snapshot_id)
+    headline = metric.label if value is None else f"{metric.label}: {_fmt(value, metric.format)}"
+    narrative = f"{headline} ({window_txt} on {source})."
     if narrative_extra:
         narrative += " " + narrative_extra
     if table:
@@ -195,6 +203,7 @@ def _result(
         "narrative": narrative,
         "metrics": {"value": value, "period_days": days},
         "resolved_from": metric.snapshot_id,
+        "source_label": source,
         "source": "snapshot_analytics",
         "param_schema": metric.param_keys,
         "params_used": {k: params.get(k) for k in metric.param_keys if params.get(k) is not None},
@@ -209,26 +218,28 @@ def _result(
     return out
 
 
-def _run_metric(metric: NlqMetric, params: dict[str, Any], *, organization_id: str) -> dict[str, Any]:
+def _run_metric(metric: NlqMetric, params: dict[str, Any], *, organization_id: str,
+                row_rules: tuple | list = ()) -> dict[str, Any]:
     if not metric.build:
         raise ValueError(f"Metric {metric.id} has no builder")
     spec = metric.build(params)
+    if row_rules:   # row-level security: the person's rows only (api/row_security.py)
+        spec["query"] = {**spec["query"], "filters": [*(spec["query"].get("filters") or []), *rule_filters(row_rules)]}
     kind = spec.get("kind", "scalar")
     kwargs = {
         "organization_id": organization_id,
         "date_field": spec.get("date_field"),
         "windowless": bool(spec.get("windowless")),
     }
+    label = get_snapshot(metric.snapshot_id, organization_id).get("label")
     if kind == "trend":
         table = _trend(metric.snapshot_id, spec["query"], params, **kwargs)
-        total = sum(float(r["value"]) for r in table)
-        return _result(
-            metric, params, total, table, narrative_extra=spec.get("note", ""), spec=spec
-        )
+        total = sum(float(r["value"]) for r in table) if metric.total else None
+        return _result(metric, params, total, table, narrative_extra=spec.get("note", ""), spec=spec,
+                       source_label=label)
     value, table = _scalar(metric.snapshot_id, spec["query"], params, **kwargs)
-    return _result(
-        metric, params, value, table or None, narrative_extra=spec.get("note", ""), spec=spec
-    )
+    return _result(metric, params, value, table or None, narrative_extra=spec.get("note", ""), spec=spec,
+                   source_label=label)
 
 
 def _count(filters: list[dict[str, Any]] | None = None,
@@ -242,6 +253,11 @@ def _sum(field_name: str, filters: list[dict[str, Any]] | None = None,
     return {"dimensions": dims or [], "measures": [{"field": field_name, "agg": "sum"}],
             "filters": filters or []}
 
+
+# What counts as money on each canvas: api/money_rules.py, checked by tests/test_money_rules.py.
+BILLED = MONEY_FILTERS["rpt_bill_segment"]
+FROZEN = MONEY_FILTERS["rpt_financial_txn"]
+NOT_CANCELLED = MONEY_FILTERS["rpt_payment_tender"]
 
 METRICS: list[NlqMetric] = [
     # ------------------------------------------------------------- Customers
@@ -278,7 +294,7 @@ METRICS: list[NlqMetric] = [
     ),
     NlqMetric(
         id="estimate_streaks",
-        label="SAs with 3+ consecutive estimated bills",
+        label="Service agreements with 3+ consecutive estimated bills",
         category="Customers",
         patterns=[r"estimat(e|ed)\s+streaks?", r"consecutive\s+estimated"],
         snapshot_id="rpt_service_agreement",
@@ -297,7 +313,7 @@ METRICS: list[NlqMetric] = [
         format="currency",
         param_keys=["days", "customer_class", "bill_cycle"],
         example="Total billed revenue last 90 days",
-        build=lambda _p: {"kind": "scalar", "query": _sum("Billed Amount")},
+        build=lambda _p: {"kind": "scalar", "query": _sum("Billed Amount", BILLED)},
     ),
     NlqMetric(
         id="billed_by_class",
@@ -308,7 +324,7 @@ METRICS: list[NlqMetric] = [
         format="currency",
         example="Billed revenue by customer class",
         build=lambda _p: {"kind": "trend",
-                          "query": _sum("Billed Amount", dims=["Customer Class"])},
+                          "query": _sum("Billed Amount", BILLED, dims=["Customer Class"])},
     ),
     NlqMetric(
         id="billed_by_cycle",
@@ -319,7 +335,7 @@ METRICS: list[NlqMetric] = [
         format="currency",
         example="Billed revenue by bill cycle",
         build=lambda _p: {"kind": "trend",
-                          "query": _sum("Billed Amount", dims=["Bill Cycle"])},
+                          "query": _sum("Billed Amount", BILLED, dims=["Bill Cycle"])},
     ),
     NlqMetric(
         id="bills_completed",
@@ -329,7 +345,9 @@ METRICS: list[NlqMetric] = [
         snapshot_id="rpt_bill",
         example="How many bills completed last 30 days?",
         default_days=30,
-        build=lambda _p: {"kind": "scalar", "date_field": "Window Start Date",
+        # completed bills by completion, as the Billing page counts them (Window Start Date
+        # is empty at clients that do not use bill windows; tests/test_kpi_window_fields.py)
+        build=lambda _p: {"kind": "scalar", "date_field": "Completed Date/Time",
                           "query": _count(
                               [{"field": "Is Completed", "op": "eq", "value": True}])},
     ),
@@ -354,8 +372,10 @@ METRICS: list[NlqMetric] = [
         example="Billed usage by unit of measure",
         # Usage is only additive WITHIN a unit of measure -- always grouped, never
         # a bare total (the cisadm-sql never-sum-across-UOMs rule).
+        total=False,
         build=lambda _p: {"kind": "trend",
-                          "query": _sum("Billed Quantity", dims=["Unit of Measure"])},
+                          "query": _sum("Billed Quantity", MONEY_FILTERS["rpt_billed_usage"],
+                                        dims=["Unit of Measure"])},
     ),
     # -------------------------------------------------------------- Payments
     NlqMetric(
@@ -370,7 +390,7 @@ METRICS: list[NlqMetric] = [
         example="Payments collected last 30 days",
         default_days=30,
         build=lambda _p: {"kind": "scalar", "date_field": "Payment Date",
-                          "query": _sum("Tender Amount")},
+                          "query": _sum("Tender Amount", NOT_CANCELLED)},
     ),
     NlqMetric(
         id="payments_by_type",
@@ -381,7 +401,7 @@ METRICS: list[NlqMetric] = [
         format="currency",
         example="Payments by tender type",
         build=lambda _p: {"kind": "trend", "date_field": "Payment Date",
-                          "query": _sum("Tender Amount", dims=["Tender Type"])},
+                          "query": _sum("Tender Amount", NOT_CANCELLED, dims=["Tender Type"])},
     ),
     NlqMetric(
         id="cancelled_tenders",
@@ -537,8 +557,10 @@ METRICS: list[NlqMetric] = [
         snapshot_id="rpt_field_activity",
         example="Field activities last 30 days",
         default_days=30,
-        build=lambda _p: {"kind": "scalar", "date_field": "Event Date/Time",
-                          "query": _count(dims=["Activity Type"])},
+        # Created, not Event: an activity gets an event date only once worked (Ellensburg
+        # 2026-09-29, 30 days: 647 on Event Date/Time, 1,573 created -- the home card's count)
+        build=lambda _p: {"kind": "scalar", "date_field": "Created Date/Time",
+                          "query": _count(dims=["Field Task Type"])},
     ),
     NlqMetric(
         id="open_todos",
@@ -583,8 +605,7 @@ METRICS: list[NlqMetric] = [
         format="currency",
         example="Adjustment dollars last 90 days",
         build=lambda _p: {"kind": "scalar", "date_field": "Accounting Date",
-                          "query": _sum("Current Amount",
-                                        [{"field": "Is Adjustment", "op": "eq", "value": True}])},
+                          "query": _sum("Current Amount", [*STANDING_ADJUSTMENT, *FROZEN])},
     ),
     NlqMetric(
         id="gl_by_account",
@@ -594,8 +615,9 @@ METRICS: list[NlqMetric] = [
         snapshot_id="rpt_gl",
         format="currency",
         example="GL dollars by account last 90 days",
+        total=False,
         build=lambda _p: {"kind": "trend", "date_field": "Accounting Date",
-                          "query": _sum("GL Amount", dims=["GL Account"])},
+                          "query": {**_sum("GL Amount", dims=["GL Account"]), "rank": "magnitude"}},
     ),
 ]
 
@@ -637,6 +659,7 @@ def run_metric_nlq(
     metric_id: str | None = None,
     params: dict[str, Any] | None = None,
     organization_id: str,
+    row_rules: tuple | list = (),
 ) -> dict[str, Any] | None:
     metric = match_metric(question, metric_id)
     if not metric:
@@ -644,4 +667,4 @@ def run_metric_nlq(
     merged = parse_params(question, params)
     if merged.get("days") is None:
         merged["days"] = metric.default_days
-    return _run_metric(metric, merged, organization_id=organization_id)
+    return _run_metric(metric, merged, organization_id=organization_id, row_rules=row_rules)

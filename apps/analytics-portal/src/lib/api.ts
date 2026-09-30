@@ -1,3 +1,4 @@
+import type { Freshness } from "@/lib/freshness";
 import type {
   DashboardTileDef,
   DataSourcePayload,
@@ -20,8 +21,18 @@ import type {
   SnapshotsIndex,
   WorkstreamSummary,
 } from "./types";
+import { dashboardPdfSections, type ExportSection } from "./dashboardPdf";
+import type { PackImportResult } from "./contentPack";
+import type { SystemHealth } from "./systemHealth";
+import { ORI } from "./ori";
+import type { ScheduleRun } from "./scheduleHistory";
+import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview, AssistantSpend } from "@/lib/types";
 import { authHeaders, activeOrganizationHeader } from "./auth";
-import { parseApiError } from "@/lib/apiErrors";
+import { localIsoDate, saveBlob } from "@/lib/format";
+import { ApiError, parseApiError } from "@/lib/apiErrors";
+import type { LetterDetail, LetterList, LetterPdf } from "@/lib/letters";
+import type { LetterRun, RunFilters } from "@/lib/letterRuns";
+import { parseSse } from "@/lib/sse";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -59,7 +70,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
     cache: "no-store",
   });
   if (!res.ok) {
-    throw new Error(parseApiError(await res.text(), res.statusText));
+    throw new ApiError(parseApiError(await res.text(), res.statusText), res.status);
   }
   return res.json() as Promise<T>;
 }
@@ -143,6 +154,7 @@ export function fetchExecutiveSummary(
   compare = false,
   crossFilter?: { field: string; value: string },
   compareMode: "prior_period" | "mom" | "yoy" = "prior_period",
+  lenses?: Record<string, string>,
 ): Promise<ExecutiveSummary> {
   const params = new URLSearchParams({
     days: String(days),
@@ -152,6 +164,10 @@ export function fetchExecutiveSummary(
   if (crossFilter) {
     params.set("cross_field", crossFilter.field);
     params.set("cross_value", crossFilter.value);
+  }
+  // one `lens=<kpi>:<lens>` per card the reader has switched; the rest keep their default
+  for (const [kpiId, lensId] of Object.entries(lenses ?? {})) {
+    params.append("lens", `${kpiId}:${lensId}`);
   }
   return fetchJson<ExecutiveSummary>(`/snapshots/executive-summary?${params}`);
 }
@@ -194,6 +210,11 @@ export function createSavedView(
   });
 }
 
+/** Move a view to another folder; an empty folder takes it out of any. */
+export function moveSavedView(viewId: string, folder: string): Promise<SavedView> {
+  return fetchJson(`/portal/saved-views/${viewId}`, { method: "PATCH", body: JSON.stringify({ folder }) });
+}
+
 export function deleteSavedView(viewId: string): Promise<void> {
   return fetchJson(`/portal/saved-views/${viewId}`, { method: "DELETE" });
 }
@@ -207,9 +228,11 @@ export type ReportSchedule = {
   weekday: number;
   hour_utc: number;
   window_days: number;
+  format?: "csv" | "xlsx" | "pdf";
   enabled: boolean;
   last_run_at?: string | null;
   last_status?: string | null;
+  history?: ScheduleRun[];
 };
 
 export function fetchReportSchedules(): Promise<{
@@ -226,8 +249,14 @@ export function createReportSchedule(body: {
   weekday?: number;
   hour_utc?: number;
   window_days?: number;
+  format?: "csv" | "xlsx" | "pdf";
 }): Promise<ReportSchedule> {
   return fetchJson("/report-schedules", { method: "POST", body: JSON.stringify(body) });
+}
+
+/** Render and send one schedule now: proof the address, filters and format are right. */
+export function runReportScheduleNow(scheduleId: string): Promise<{ row_count?: number; status?: string }> {
+  return fetchJson(`/report-schedules/${scheduleId}/run-now`, { method: "POST" });
 }
 
 export function deleteReportSchedule(scheduleId: string): Promise<void> {
@@ -236,7 +265,8 @@ export function deleteReportSchedule(scheduleId: string): Promise<void> {
 
 export type KpiAlert = {
   id: string;
-  kpi_id: string;
+  kpi_id: string | null;
+  saved_view_id?: string | null;
   kpi_label: string;
   condition: "above" | "below" | "pct_change_above" | "pct_change_below";
   threshold: number;
@@ -258,7 +288,8 @@ export function fetchKpiAlerts(): Promise<{
 }
 
 export function createKpiAlert(body: {
-  kpi_id: string;
+  kpi_id?: string;
+  saved_view_id?: string;
   condition: string;
   threshold: number;
   window_days?: number;
@@ -309,13 +340,6 @@ export function importSavedViews(
   });
 }
 
-export function runNlqQuery(query: string): Promise<NlqResponse> {
-  return fetchJson<NlqResponse>("/nlq", {
-    method: "POST",
-    body: JSON.stringify({ query }),
-  });
-}
-
 export function runAnalyticsNlq(
   query: string,
   params?: {
@@ -351,13 +375,16 @@ export function createDashboard(body: {
   description?: string;
   days?: number;
   tiles: DashboardTileDef[];
+  visibility?: "organization" | "private";
+  folder?: string | null;
 }): Promise<SavedDashboard> {
   return fetchJson("/portal/dashboards", { method: "POST", body: JSON.stringify(body) });
 }
 
 export function updateDashboard(
   id: string,
-  body: Partial<{ title: string; description: string; days: number; tiles: DashboardTileDef[] }>,
+  body: Partial<{ title: string; description: string; days: number; tiles: DashboardTileDef[];
+    visibility: "organization" | "private"; folder: string | null }>,
 ): Promise<SavedDashboard> {
   return fetchJson(`/portal/dashboards/${id}`, { method: "PUT", body: JSON.stringify(body) });
 }
@@ -377,18 +404,23 @@ export function fetchSnapshotMetadata(snapshotId: string): Promise<SnapshotMetad
 export function runSnapshotQuery(
   snapshotId: string,
   body: QueryRequest,
+  signal?: AbortSignal,
 ): Promise<QueryResponse> {
   return fetchJson<QueryResponse>(`/snapshots/${snapshotId}/query`, {
     method: "POST",
     body: JSON.stringify(body),
+    signal,
   });
 }
 
 export function fetchScopeOptions(
   snapshotId: string,
   fieldId: string,
+  /** Only the values occurring under these filters (cascading report parameters). */
+  where?: { field: string; op: string; value: unknown }[],
 ): Promise<ScopeOptionsResponse> {
-  return fetchJson<ScopeOptionsResponse>(`/snapshots/${snapshotId}/scope-options/${fieldId}`);
+  const qs = where?.length ? `?where=${encodeURIComponent(JSON.stringify(where))}` : "";
+  return fetchJson<ScopeOptionsResponse>(`/snapshots/${snapshotId}/scope-options/${fieldId}${qs}`);
 }
 
 export function fetchSnapshotStats(snapshotId: string): Promise<SnapshotStats> {
@@ -402,47 +434,48 @@ export function fetchSnapshotSampleRows(
   return fetchJson<SampleRowsResponse>(`/snapshots/${snapshotId}/sample-rows?limit=${limit}`);
 }
 
-export function runSnapshotRawSql(
-  snapshotId: string,
-  sql: string,
-  limit = 100,
-): Promise<QueryResponse> {
-  return fetchJson<QueryResponse>(`/snapshots/${snapshotId}/raw-sql`, {
-    method: "POST",
-    body: JSON.stringify({ sql, limit }),
-  });
+// Every boundary below is formatted with localIsoDate, never toISOString(). See that
+// helper: these ranges filter BUSINESS dates, so they belong in the viewer's calendar.
+// Two failures were live before this, both invisible on a UTC machine -- west of UTC
+// (every US utility here) the END rolled to TOMORROW for the last hours of each
+// evening, and "Prior month" ENDED on the 1st of the CURRENT month, including a day of
+// the very month it exists to exclude.
+// `asOf` is the org's data-as-of date (a frozen copy such as Ellensburg TEST): when
+// present, every range ends there instead of today, which would read the empty tail.
+export function anchorDate(asOf?: string | null): Date {
+  const m = asOf?.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date();
 }
 
-export function defaultDateRange(days = 90): [string, string] {
-  const end = new Date();
-  const start = new Date();
+export function defaultDateRange(days = 90, asOf?: string | null): [string, string] {
+  const end = anchorDate(asOf);
+  const start = new Date(end);
   start.setDate(end.getDate() - days);
-  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+  return [localIsoDate(start), localIsoDate(end)];
 }
 
-export function defaultDateRangeYtd(): [string, string] {
-  const end = new Date();
+export function defaultDateRangeYtd(asOf?: string | null): [string, string] {
+  const end = anchorDate(asOf);
   const start = new Date(end.getFullYear(), 0, 1);
-  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+  return [localIsoDate(start), localIsoDate(end)];
 }
 
-export function defaultDateRangeLastMonth(): [string, string] {
-  const end = new Date();
-  end.setDate(0);
+export function defaultDateRangeLastMonth(asOf?: string | null): [string, string] {
+  const end = anchorDate(asOf);
+  end.setDate(0); // day 0 of this month == the last day of the previous one
   const start = new Date(end.getFullYear(), end.getMonth(), 1);
-  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+  return [localIsoDate(start), localIsoDate(end)];
 }
 
 export function fetchDatabaseTables(
-  // Empty = let the API pick the engine's own schema (reporting for the warehouse,
-  // CISADM for a legacy Oracle tenant).
+  // Empty = let the API pick the engine's own schema (reporting for Postgres, CISADM
+  // for an Oracle tenant).
   schema = "",
   search = "",
-  opts?: { snapshotsOnly?: boolean; includeStats?: boolean },
+  opts?: { includeStats?: boolean },
 ): Promise<DatabaseTablesResponse> {
   const params = new URLSearchParams(schema ? { schema } : {});
   if (search.trim()) params.set("search", search.trim());
-  if (opts?.snapshotsOnly === false) params.set("snapshots_only", "false");
   if (opts?.includeStats) params.set("include_stats", "true");
   return fetchJson<DatabaseTablesResponse>(`/database/tables?${params}`);
 }
@@ -464,4 +497,219 @@ export function countDatabaseSql(sql: string): Promise<DatabaseSqlCountResponse>
     method: "POST",
     body: JSON.stringify({ sql, offset: 0, page_size: 50 }),
   });
+}
+
+export function fetchIntegrity(): Promise<IntegrityOverview> {
+  return fetchJson<IntegrityOverview>("/portal/integrity");
+}
+
+export function fetchAssistantSpend(): Promise<AssistantSpend> {
+  return fetchJson<AssistantSpend>("/portal/assistant/spend");
+}
+
+export function fetchAssistantStatus(): Promise<AssistantStatus> {
+  return fetchJson<AssistantStatus>("/portal/assistant/status");
+}
+
+/**
+ * The same ask as askAssistant, streamed: onStep hears each tool step as the model takes it,
+ * and the promise resolves with the full answer. Falls back to the plain ask when the API
+ * has no streaming route.
+ */
+export async function askAssistantStream(
+  question: string,
+  thread: AssistantMessage[],
+  context: { canvas_id: string; period?: string; filters?: string[] } | null,
+  onStep: (event: { type: string; data: Record<string, unknown> }) => void,
+): Promise<AssistantResponse> {
+  const res = await fetch(`${API_BASE}/portal/assistant/stream`, {
+    method: "POST",
+    headers: await resolveRequestHeaders(),
+    body: JSON.stringify({ question, thread, context: context ?? null }),
+    cache: "no-store",
+  });
+  if (res.status === 404 || res.status === 405) return askAssistant(question, thread, context);
+  if (!res.ok || !res.body) throw new Error(parseApiError(await res.text(), res.statusText));
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    const { events, rest } = parseSse(buffer + decoder.decode(value, { stream: true }));
+    buffer = rest;
+    for (const e of events) {
+      if (e.type === "answer") return e.data as unknown as AssistantResponse;
+      if (e.type === "error") throw new Error(String(e.data.detail ?? ORI.cannotAnswer));
+      onStep(e);
+    }
+  }
+  throw new Error("The answer stream ended early. Try again.");
+}
+
+/**
+ * The rows on screen as the server-built PDF (the one schedules send): Origin mark, table,
+ * page numbers, and a bar chart when the result is one label against one number.
+ */
+export async function downloadPdf(body: {
+  title: string;
+  note?: string;
+  columns: string[];
+  labels?: Record<string, string>;
+  rows: Record<string, unknown>[];
+}): Promise<void> {
+  await savePdf("/portal/export/pdf", { ...body, rows: body.rows.slice(0, 5000) });
+}
+
+/** A dashboard's tiles as one server-built PDF (api/export_routes.py). */
+export async function downloadDashboardPdf(title: string, sections: ExportSection[]): Promise<void> {
+  await savePdf("/portal/export/dashboard-pdf", { title, sections: dashboardPdfSections(sections) });
+}
+
+async function savePdf(path: string, body: unknown): Promise<void> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    headers: await resolveRequestHeaders(),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(parseApiError(await res.text(), res.statusText));
+  const name = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? "report.pdf";
+  saveBlob(await res.blob(), name);
+}
+
+export type EmbedData = {
+  title: string;
+  columns: string[];
+  rows: Record<string, unknown>[];
+};
+
+/** An embedded view's rows: public, authorised by the signed link alone (api/embed.py). */
+export async function fetchEmbed(token: string): Promise<EmbedData> {
+  const res = await fetch(`${API_BASE}/embed/${encodeURIComponent(token)}/data`, { cache: "no-store" });
+  if (!res.ok) throw new Error(parseApiError(await res.text(), res.statusText));
+  return res.json();
+}
+
+/** A signed link that embeds one organization-visible saved view (owner or admin). */
+export function createEmbedToken(viewId: string, ttlMinutes = 24 * 60): Promise<{ token: string; expires_at: string }> {
+  return fetchJson("/portal/embed-tokens", { method: "POST", body: JSON.stringify({ view_id: viewId, ttl_minutes: ttlMinutes }) });
+}
+
+export function askAssistant(
+  question: string,
+  thread: AssistantMessage[],
+  context?: { canvas_id: string; period?: string; filters?: string[] } | null,
+): Promise<AssistantResponse> {
+  return fetchJson<AssistantResponse>("/portal/assistant", {
+    method: "POST",
+    body: JSON.stringify({ question, thread, context: context ?? null }),
+  });
+}
+
+/** The organization's shared views and dashboards (one folder, or all) as a content pack. */
+export function fetchContentPack(folder: string | null): Promise<Record<string, unknown>> {
+  return fetchJson(`/portal/content-pack${folder ? `?folder=${encodeURIComponent(folder)}` : ""}`);
+}
+
+/** Import a pack into the active organization (admins). A dry run only reports. */
+export function importContentPack(pack: unknown, dryRun: boolean): Promise<PackImportResult> {
+  return fetchJson(`/portal/content-pack/import?dry_run=${dryRun}`, { method: "POST", body: JSON.stringify({ pack }) });
+}
+
+/** What this API process has been doing (administrators). */
+export function fetchSystemHealth(): Promise<SystemHealth> {
+  return fetchJson("/portal/health");
+}
+
+export type OriFinding = { kpi_id: string; change_pct: number; headline: string; detail: string; question: string };
+
+/** Ori's read of the home cards: the large moves, and a short brief of the period (null when there is none). */
+export type OriRead = { findings: OriFinding[]; brief?: string | null };
+
+/** A month unusually high or low against the months before it. Months are "YYYY-MM". */
+export type OriAnomaly = {
+  kpi_id: string; month: string; direction: "high" | "low";
+  headline: string; detail: string; question: string;
+};
+
+/** Where a home card is heading: the actual months, then a projection with its likely range. */
+export type OriForecast = {
+  kpi_id: string; label: string; format: "currency" | "number";
+  history: { month: string; value: number }[];
+  forecast: { month: string; value: number; low: number; high: number }[];
+  total: number; total_low: number; total_high: number;
+  typical_error_pct: number; checks: number;
+  headline: string; detail: string; question: string;
+};
+
+export type OriTrends = { through: string; anomalies: OriAnomaly[]; forecasts: OriForecast[] };
+
+/** When the organization's reporting tables were last built, and whether that is stale (api/freshness.py). */
+export function fetchFreshness(): Promise<Freshness> {
+  return fetchJson("/portal/freshness");
+}
+
+/** "Ori found something worth investigating": the large moves in the home cards (api/ori_routes.py). */
+export function fetchOriFindings(signal?: AbortSignal, workstream?: string): Promise<OriRead> {
+  const query = workstream ? `?${new URLSearchParams({ workstream })}` : "";
+  return fetchJson(`/portal/ori/findings${query}`, { signal });
+}
+
+/** Unusual months and projections for the home cards; slow on a cold cache, so callers abort it. */
+export function fetchOriTrends(signal?: AbortSignal): Promise<OriTrends> {
+  return fetchJson("/portal/ori/trends", { signal });
+}
+
+/** The organization's collections letters dated within the window (at most 366 days). */
+export function fetchLetters(from: string, to: string): Promise<LetterList> {
+  return fetchJson(`/portal/letters?${new URLSearchParams({ from, to })}`);
+}
+
+/** Where the organization's data ends (null for a live copy): the letters page opens on the month before. */
+export function fetchLettersAsOf(): Promise<{ data_as_of: string | null }> {
+  return fetchJson("/portal/letters/as-of");
+}
+
+/** One letter with its words and the process facts behind it. */
+export function fetchLetter(letterId: string): Promise<LetterDetail> {
+  return fetchJson(`/portal/letters/${encodeURIComponent(letterId)}`);
+}
+
+/** The organization's letter runs, newest first. */
+export function fetchLetterRuns(): Promise<{ organization_id: string; runs: LetterRun[] }> {
+  return fetchJson("/portal/letters/runs");
+}
+
+/** Freeze the window's letters (by type and printed status) into a draft run. */
+export function createLetterRun(from: string, to: string, filters: RunFilters): Promise<LetterRun> {
+  return fetchJson("/portal/letters/runs", { method: "POST", body: JSON.stringify({ from, to, filters }) });
+}
+
+export function approveLetterRun(runId: string): Promise<LetterRun> {
+  return fetchJson(`/portal/letters/runs/${encodeURIComponent(runId)}/approve`, { method: "POST" });
+}
+
+export function cancelLetterRun(runId: string): Promise<LetterRun> {
+  return fetchJson(`/portal/letters/runs/${encodeURIComponent(runId)}/cancel`, { method: "POST" });
+}
+
+/** The approved run as one PDF; the server refuses (409) when any letter changed since it was created. */
+export async function releaseLetterRun(runId: string): Promise<Blob> {
+  const res = await fetch(`${API_BASE}/portal/letters/runs/${encodeURIComponent(runId)}/release`, {
+    method: "POST",
+    headers: await resolveRequestHeaders(),
+    cache: "no-store",
+  });
+  if (!res.ok) throw new ApiError(parseApiError(await res.text(), res.statusText), res.status);
+  return res.blob();
+}
+
+/** The letter's one-page PDF, fetched with the signed-in headers: a bare link would carry neither. */
+export async function fetchLetterPdf(letterId: string): Promise<LetterPdf> {
+  const res = await fetch(`${API_BASE}/portal/letters/${encodeURIComponent(letterId)}/pdf`, {
+    headers: await resolveRequestHeaders(),
+    cache: "no-store",
+  });
+  if (!res.ok) throw new ApiError(parseApiError(await res.text(), res.statusText), res.status);
+  return { blob: await res.blob(), font: res.headers.get("X-Letter-Font") ?? "", fontNote: res.headers.get("X-Letter-Font-Note") };
 }

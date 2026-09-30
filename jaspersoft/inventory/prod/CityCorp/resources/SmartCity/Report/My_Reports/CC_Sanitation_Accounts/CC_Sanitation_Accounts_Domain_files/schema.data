@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CC_SANITATION_ACCOUNTS" label="Sanitation Accounts" resourceId="CC_SANITATION_ACCOUNTS"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account Id" resourceId="CC_SANITATION_ACCOUNTS.ACCT_ID"></item>
+    <item id="SR_DISC" label="Senior Discount" resourceId="CC_SANITATION_ACCOUNTS.SR_DISC"></item>
+    <item id="ENTITY_NAME" label="Entity Name" resourceId="CC_SANITATION_ACCOUNTS.ENTITY_NAME"></item>
+    <item id="BILL_CYC_CD" label="Bill Cycle" resourceId="CC_SANITATION_ACCOUNTS.BILL_CYC_CD"></item>
+    <item id="CUSTOMER_CLASS" label="Customer Class" resourceId="CC_SANITATION_ACCOUNTS.CUSTOMER_CLASS"></item>
+    <item id="EXTRA_RECYCLE_CANS" label="Extra Recycle Cans" resourceId="CC_SANITATION_ACCOUNTS.EXTRA_RECYCLE_CANS"></item>
+    <item id="EXTRA_TRASH_CANS" label="Extra Trash Cans" resourceId="CC_SANITATION_ACCOUNTS.EXTRA_TRASH_CANS"></item>
+    <item id="PREM_ID" label="Premise Id" resourceId="CC_SANITATION_ACCOUNTS.PREM_ID"></item>
+    <item id="ADDRESS1" label="Address 1" resourceId="CC_SANITATION_ACCOUNTS.ADDRESS1"></item>
+    <item id="CITY" label="City" resourceId="CC_SANITATION_ACCOUNTS.CITY"></item>
+    <item id="COUNTY" label="County" resourceId="CC_SANITATION_ACCOUNTS.COUNTY"></item>
+    <item id="POSTAL" label="Postal" resourceId="CC_SANITATION_ACCOUNTS.POSTAL"></item>
+    <item id="STATE" label="State" resourceId="CC_SANITATION_ACCOUNTS.STATE"></item>
+    <item id="PREM_TYPE_CD" label="Premise Type" resourceId="CC_SANITATION_ACCOUNTS.PREM_TYPE_CD"></item>
+    <item id="SA_ID" label="Service Agreement" resourceId="CC_SANITATION_ACCOUNTS.SA_ID"></item>
+    <item id="SA_TYPE_CD" label="SA Type" resourceId="CC_SANITATION_ACCOUNTS.SA_TYPE_CD"></item>
+    <item id="START_DT" label="Start Date" resourceId="CC_SANITATION_ACCOUNTS.START_DT"></item>
+    <item id="END_DT" label="End Date" resourceId="CC_SANITATION_ACCOUNTS.END_DT"></item>
+    <item id="STATUS" label="SA Status" resourceId="CC_SANITATION_ACCOUNTS.STATUS"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CC_SANITATION_ACCOUNTS" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="CUSTOMER_CLASS" type="java.lang.String"></field>
+        <field id="BILL_CYC_CD" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="STATUS" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="PREM_TYPE_CD" type="java.lang.String"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="CITY" type="java.lang.String"></field>
+        <field id="COUNTY" type="java.lang.String"></field>
+        <field id="STATE" type="java.lang.String"></field>
+        <field id="POSTAL" type="java.lang.String"></field>
+        <field id="SR_DISC" type="java.lang.String"></field>
+        <field id="EXTRA_TRASH_CANS" type="java.lang.String"></field>
+        <field id="EXTRA_RECYCLE_CANS" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+DISTINCT AC.ACCT_ID,CC.DESCR CUSTOMER_CLASS,AC.BILL_CYC_CD,PN.ENTITY_NAME,
+SA.SA_ID,SA.SA_TYPE_CD,L.DESCR STATUS,SA.START_DT,SA.END_DT,
+PR.PREM_ID,PR.PREM_TYPE_CD,PR.ADDRESS1,PR.CITY,PR.COUNTY,PR.STATE,PR.POSTAL,
+CASE WHEN EXISTS (SELECT 'X' FROM CISADM.CI_PER_CHAR PC WHERE PC.CHAR_TYPE_CD='SCFLG' AND PC.PER_ID = P.PER_ID) 
+     THEN 'SENIOR_DISC' END AS SR_DISC,
+EXTRACTVALUE(XMLTYPE(CONCAT(CONCAT('&lt;x&gt;',SP.BO_DATA_AREA),'&lt;/x&gt;')),'x/multiItems/multiItemList/multiItemCounts/multiItemCountList[itemType=''TRASHCAN'']/count') EXTRA_TRASH_CANS,
+EXTRACTVALUE(XMLTYPE(CONCAT(CONCAT('&lt;x&gt;',SP.BO_DATA_AREA),'&lt;/x&gt;')),'x/multiItems/multiItemList/multiItemCounts/multiItemCountList[itemType=''RECYCLECAN'']/count') EXTRA_RECYCLE_CANS
+FROM 
+CISADM.CI_ACCT AC,
+CISADM.CI_CUST_CL_L CC,
+CISADM.CI_ACCT_PER AP,
+CISADM.CI_PER P,
+CISADM.CI_PER_NAME PN,
+CISADM.CI_SA SA,
+CISADM.CI_SA_SP SASP,
+CISADM.D1_SP SP,
+CISADM.D1_SP_IDENTIFIER SPID,
+CISADM.D1_SP_IDENTIFIER SPID2,
+CISADM.CI_PREM PR,
+CISADM.CI_LOOKUP L
+WHERE
+AC.ACCT_ID=AP.ACCT_ID
+AND AC.CUST_CL_CD=CC.CUST_CL_CD
+AND AP.PER_ID=P.PER_ID
+AND P.PER_ID=PN.PER_ID
+AND AC.ACCT_ID=SA.ACCT_ID
+AND SA.SA_ID=SASP.SA_ID
+AND SASP.SP_ID=SPID.ID_VALUE
+AND SPID.SP_ID_TYPE_FLG='D1EI'
+AND SPID2.ID_VALUE=PR.PREM_ID
+AND SPID2.SP_ID_TYPE_FLG='D1EP'
+AND SP.D1_SP_ID=SPID.D1_SP_ID
+AND SP.D1_SP_ID=SPID2.D1_SP_ID
+AND SA.SA_STATUS_FLG=L.FIELD_VALUE
+AND L.FIELD_NAME='SA_STATUS_FLG'
+AND SA.SA_TYPE_CD='SN-PROV'
+AND PN.PRIM_NAME_SW='Y'
+AND AP.MAIN_CUST_SW='Y'</query>
+    </jdbcQuery>
+  </resources>
+</schema>

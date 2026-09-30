@@ -1,0 +1,78 @@
+OriginBA v15 - Color standardization pass (2026-08-12)
+
+overrides_custom.css only. Aligned to canonical OriginBA palette:
+  #006FAC -> #0078BD   (Blue 600; incl. --origin-sapphire + header gradient)
+  #005C8D -> #01529A   (Blue 700)
+  #0B5CAB -> #01529A   (gradient dark end)
+  #084C78 -> #01529A   (header border)
+  #7B8794 -> #64748B   (WCAG AA fix: search placeholder + 2 hint labels; 3.5:1 -> 4.8:1)
+
+Intentionally UNCHANGED:
+  - Border/outline grays (#9FB0C0, #B8C3CE, #AEB8C2) - structural, not text.
+  - Unused CSS vars (--origin-blue, --origin-indigo, --origin-muted).
+  - All stock base CSS (pageSpecific.css, lists.css, controls.css, etc.).
+
+No structural/selector changes. Safe, reversible color-only diff.
+
+--- v16 addendum (2026-08-12): Branded login + home ---
+overrides_custom.css only, additive:
+  - Login: branded blue split-screen. Left 42% brand-blue panel
+    (gradient + white logo_reverse.svg + tagline); login form floated
+    into a white elevated card in the right zone. Collapses to a
+    centered card under 860px. Replaces stock bg_signin.jpg photo.
+  - Home: brand-blue gradient section-header bars + white titles;
+    thin #0078BD accent on the top edge of resource cards.
+No new image files. All WCAG AA. Fully reversible (single CSS block).
+
+--- v17 addendum (2026-08-12): Typography + focus/dialog/table/toolbar ---
+overrides_custom.css only, additive:
+  - Fonts: unified on the bundled Source Sans Pro (removed the Aptos
+    shell override; Aptos was never bundled and fell back per-machine).
+    Icon fonts (icons/operators) untouched.
+  - Focus rings: activated brand-blue keyboard focus outlines site-wide
+    (WCAG 2.4.7); light (#BDE7FF) rings on the blue banner/nav for contrast.
+  - Dialogs: overlay dialog headers -> brand gradient bar + white title;
+    close glyph inverted to stay readable.
+  - Tables: repository/list headers -> light blue tint + #062E79 text;
+    even rows zebra-striped #F4F7FA.
+  - Dashboard toolbar: light brand tint + #0078BD accent edge.
+Not changed (selectors not present under expected names): secondary-button
+and empty-state styling - to be confirmed against the live UI.
+
+--- v18 addendum (2026-08-12): Screenshot QA corrections ---
+overrides_custom.css only:
+  - Removed resource-card blue top accent (unwanted blue bars on Home sidebar).
+  - Focus rings scoped to real controls (links/buttons/inputs); removed the
+    list-row/tree-node/card outlines that read as a blue bar under selections.
+  - Dialog brand-navy scoped to the .header.mover TITLE bar only -> stops the
+    bleed that mis-colored the Data Chooser rail AND unifies the dashboard
+    Filter Group dialog to the same brand blue (it was Jasper default before).
+  - List header tint scoped to .list.tabular.resources (repository) only;
+    zebra kept (confirmed good).
+  - Dashboard toolbar reverted to stock (blue edge looked out of place).
+
+--- v18.1 addendum (2026-08-12): Login split-screen bar fix ---
+The global header/footer branding was painting the login page's banner and
+footer, capping the blue/white split with full-width blue bars top & bottom.
+Fix (login page only):
+  - #loginPage banner -> transparent (blue left panel now runs to the top,
+    right zone clean white from the top). Meta links darkened for the white zone.
+  - #frameFooter hidden on the login splash (sibling/descendant/:has covered).
+
+--- v18.4 (2026-08-12): Search bar autofill fill ---
+Chrome autofill painted the search input periwinkle (#E8F0FE) but not the
+.right button area -> "blue fill + white notch". Added the inset-shadow
+autofill override (scoped to #globalSearch) so the field stays uniform white.
+
+--- v18.6 (2026-08-12): Restore theme.css to stock (ChatGPT cleanup) ---
+Compared against the clean SmartCity Analytics reference theme. Findings:
+  - ChatGPT only altered theme.css, overrides_custom.css, and logo images.
+    ALL base component CSS (pageSpecific/controls/lists/jasper-ui/dashboard)
+    is byte-identical to stock -> Data Chooser blue-on-blue is inherent to the
+    base theme, correctly handled by v18.5 (not a ChatGPT bug).
+  - ChatGPT wrongly APPENDED custom OriginBA rules into theme.css (v13/v14/v15
+    blocks: header logo, global-search placeholder, empty-state) - duplicating
+    older/buggier copies (Aptos font, #7B8794) of rules that belong in, and now
+    live correctly in, overrides_custom.css.
+  - Fix: theme.css restored to the stock reference (append-only removal, lossless).
+    All customization remains in overrides_custom.css. Logo images kept (branding).

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="CC_CONT_QTY_HIST" label="CC_CONT_QTY_HIST" resourceId="CC_CONT_QTY_HIST"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account Id" resourceId="CC_CONT_QTY_HIST.ACCT_ID"></item>
+    <item id="SA_ID" label="SA Id" resourceId="CC_CONT_QTY_HIST.SA_ID"></item>
+    <item id="SA_TYPE_CD" label="SA Type" resourceId="CC_CONT_QTY_HIST.SA_TYPE_CD"></item>
+    <item id="CONT_TYP_CD" label="Contract Quantity Type" resourceId="CC_CONT_QTY_HIST.CONT_TYP_CD"></item>
+    <item id="HIST_QTY" label="Historic Contact Quantity" resourceId="CC_CONT_QTY_HIST.HIST_QTY"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="CC_CONT_QTY_HIST" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="CONT_TYP_CD" type="java.lang.String"></field>
+        <field id="HIST_QTY" type="java.lang.String"></field>
+      </fieldList>
+      <query>select UNIQUE(NVL((SELECT LISTAGG((QTY.CONT_QTY || ','|| QTY.EFFDT ), ' | ') WITHIN GROUP ( ORDER BY QTY.SA_ID,QTY.EFFDT) from CISADM.CI_SA_CONT_QTY QTY WHERE QTY.SA_ID = SA.SA_ID and CONT_QTY_TYPE_CD = 'OVAVCONG' group by QTY.SA_ID), ' ')) AS HIST_QTY,
+SA.ACCT_ID, SA.SA_ID,SA.SA_TYPE_CD, NVL(CT.CONT_QTY_TYPE_CD,' ') AS CONT_TYP_CD
+from cisadm.CI_SA SA left join cisadm.CI_SA_CONT_QTY ct on SA.sa_id = CT.sa_id</query>
+    </jdbcQuery>
+  </resources>
+</schema>

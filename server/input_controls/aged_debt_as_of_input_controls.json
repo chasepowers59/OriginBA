@@ -1,0 +1,67 @@
+{
+  "reportUnitUri": "/SmartCity/Report/Standard_Offering/Standardized_Reports/aged_debt_as_of",
+  "label": "Aged Debt As Of Date",
+  "description": "The arrears position on a chosen day, by service agreement type: SAs with a balance, current balance and the 0-30 / 31-60 / 61-90 / 91-120 / 120+ buckets, with the largest balances (account, customer) under each type. The same arithmetic as CMS_SA_SNAPSHOT, for any date.",
+  "dataSources": {
+    "DEV": "ORIGIN_DEV_DS",
+    "QA": "C2M_QA_DS",
+    "PROD": "C2M_PROD_DS"
+  },
+  "subreport": "reports/subreports/aged_debt_as_of_top.jrxml  (a local jrxml resource of the unit named aged_debt_as_of_top; the main says repo:aged_debt_as_of_top)",
+  "inputControls": [
+    {
+      "id": "AS_OF_DT",
+      "label": "Position as of",
+      "type": "singleValueDate",
+      "mandatory": true,
+      "visible": true
+    },
+    {
+      "id": "TOP_N",
+      "label": "Top N",
+      "type": "singleValueNumber",
+      "mandatory": false,
+      "visible": true,
+      "defaultValue": "10"
+    },
+    {
+      "id": "AGE_BY",
+      "label": "Age By",
+      "type": "singleValueText",
+      "mandatory": false,
+      "visible": true,
+      "defaultValue": "ARS"
+    },
+    {
+      "id": "AS_KNOWN_TODAY",
+      "label": "As Known Today",
+      "type": "singleValueText",
+      "mandatory": false,
+      "visible": true,
+      "defaultValue": "N"
+    },
+    {
+      "id": "CUST_CL_F",
+      "label": "Customer class (blank = all)",
+      "type": "singleSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "query": "SELECT TRIM(cust_cl_cd) AS CODE, TRIM(cust_cl_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_CUST_CL_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ACCT a JOIN CISADM.CI_SA sa ON sa.acct_id = a.acct_id WHERE a.cust_cl_cd = l.cust_cl_cd AND (sa.end_dt IS NULL OR sa.end_dt >= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1"
+    },
+    {
+      "id": "CIS_DIVISION_F",
+      "label": "CIS division (blank = all)",
+      "type": "singleSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "query": "SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_SA sa WHERE sa.cis_division = l.cis_division AND (sa.end_dt IS NULL OR sa.end_dt >= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1"
+    },
+    {
+      "id": "ACCT_ID_F",
+      "label": "Account ID (blank = all)",
+      "type": "singleValueText",
+      "mandatory": false,
+      "visible": true
+    }
+  ]
+}

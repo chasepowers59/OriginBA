@@ -212,17 +212,20 @@ class PostgresCatalogAndFunctionTests(unittest.TestCase):
                 self.assertFalse(self._blocked(sql), sql)
 
 
-class LegacyOracleEngineFenceTests(unittest.TestCase):
-    """C1 (2026-09-01): the legacy `oracle` engine had NO fence.
+class EngineFenceTests(unittest.TestCase):
+    """Every engine the router knows applies a fence, and an engine it does not know is
+    REFUSED rather than waved through (audit C1).
 
-    `database_routes._validate` fenced only 'postgres' and 'oracle_dbt', so six of
-    eight orgs — every org whose catalog is not 'dbt', with `database:sql` held by
-    the lowest role — reached MICR_ID, the data dictionary, other schemas, dblinks
-    and UTL_HTTP. These tests pin the ROUTING, not just the validator, because the
-    routing is where the hole was.
+    The `oracle` engine used to be a third case: the legacy CISADM snapshot catalog,
+    fenced to CISADM alone. That catalog is retired (tests/test_single_catalog_shape.py),
+    and with it the engine -- an Oracle org now runs the dbt canvases inside its own
+    instance as `oracle_dbt`, fenced to CISADM + ORIGINBA_REPORTING. A caller still
+    naming the old engine must be refused outright, which is exactly what a missing
+    fence entry does; that refusal is asserted here so it cannot quietly become a
+    lenient default again.
     """
 
-    def _validate(self, engine: str, sql: str):
+    def _validate(self, engine: str, sql: str) -> str:
         from api.database_routes import _validate
 
         return _validate(engine, sql)
@@ -234,14 +237,20 @@ class LegacyOracleEngineFenceTests(unittest.TestCase):
         except SqlWorkspaceValidationError:
             return True
 
-    def test_every_engine_applies_a_fence(self):
-        # A fenced statement must be refused on EVERY engine the router knows.
-        for engine in ("postgres", "oracle", "oracle_dbt"):
+    def test_every_known_engine_applies_a_fence(self):
+        from api.database_routes import _SCOPE_FENCES
+        self.assertEqual(set(_SCOPE_FENCES), {"postgres", "oracle_dbt"})
+        for engine in _SCOPE_FENCES:
             with self.subTest(engine=engine):
                 self.assertTrue(
                     self._blocked(engine, "SELECT micr_id FROM cisadm.ci_pay_tndr"))
 
-    def test_legacy_oracle_blocks_the_audited_bypasses(self):
+    def test_the_retired_engine_is_refused_not_served(self):
+        for sql in ("SELECT 1 FROM DUAL", "SELECT ACCT_ID FROM CISADM.CI_ACCT"):
+            with self.subTest(sql=sql):
+                self.assertTrue(self._blocked("oracle", sql), sql)
+
+    def test_oracle_dbt_blocks_the_audited_bypasses(self):
         for sql in (
             "SELECT micr_id FROM cisadm.ci_pay_tndr",
             "SELECT username FROM dba_users",
@@ -251,26 +260,21 @@ class LegacyOracleEngineFenceTests(unittest.TestCase):
             "SELECT utl_http.request('http://x') FROM dual",
             "SELECT * FROM scott.emp",
             'SELECT * FROM "CISADM"."CI_ACCT"',
+            "SELECT * FROM ORIGINBA_STAGING.STG_BILL",
         ):
             with self.subTest(sql=sql):
-                self.assertTrue(self._blocked("oracle", sql), sql)
+                self.assertTrue(self._blocked("oracle_dbt", sql), sql)
 
-    def test_legacy_oracle_still_serves_its_own_snapshots(self):
-        # The legacy orgs read *_RPT_CURR in CISADM — that must keep working.
+    def test_oracle_dbt_serves_cisadm_and_the_reporting_canvases(self):
+        """CISADM is the schema analysts know; the canvases sit beside it."""
         for sql in (
-            "SELECT ACCT_ID, CUR_AMT FROM CISADM.FT_RPT_CURR WHERE ROWNUM < 50",
-            "SELECT COUNT(*) FROM FT_RPT_CURR",
-            "SELECT a.ACCT_ID FROM CISADM.ACCT_CUSTOMER_RPT_CURR a "
-            "JOIN CISADM.FT_RPT_CURR f ON f.ACCT_ID = a.ACCT_ID",
+            "SELECT ACCT_ID FROM CISADM.CI_ACCT WHERE ROWNUM < 50",
+            "SELECT COUNT(*) FROM CI_FT",
+            'SELECT "Bill ID" FROM ORIGINBA_REPORTING.RPT_BILL',
+            "SELECT a.ACCT_ID FROM CISADM.CI_ACCT a JOIN CISADM.CI_SA s ON s.ACCT_ID = a.ACCT_ID",
         ):
             with self.subTest(sql=sql):
-                self.assertEqual(self._validate("oracle", sql), sql.strip())
-
-    def test_legacy_oracle_refuses_a_reporting_schema_it_does_not_have(self):
-        # A legacy CISADM org has no ORIGINBA_REPORTING; naming it is a mistake,
-        # and allowing it would widen the fence for no reason.
-        self.assertTrue(
-            self._blocked("oracle", "SELECT * FROM ORIGINBA_REPORTING.RPT_BILL_SEGMENT"))
+                self.assertEqual(self._validate("oracle_dbt", sql), sql.strip())
 
 
 if __name__ == "__main__":

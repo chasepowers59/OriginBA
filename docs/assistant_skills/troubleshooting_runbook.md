@@ -41,7 +41,7 @@ Failing XML snippet:
 <paste smallest relevant XML block>
 
 Follow:
-- skills/jrxml_report_builder/SKILL.md
+- .claude/skills/originba-jrxml-report-builder/SKILL.md
 - docs/assistant_skills/jrxml_schema_guardrails.md
 - docs/assistant_skills/past_mistakes_and_prevention.md
 

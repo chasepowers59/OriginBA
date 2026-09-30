@@ -85,6 +85,25 @@ class WarehouseUrlIsolationTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 warehouse_db._pool("citycorp")
 
+    def test_tolerates_a_pasted_key_equals_value(self):
+        """A whole KEY=value line pasted into a dashboard's value box.
+
+        psycopg2 then reports `invalid dsn: invalid connection option
+        "WAREHOUSE_DATABASE_URL_DEMO25"`, which names the variable and says nothing
+        about the actual mistake -- it cost a deploy cycle on 2026-09-01. The prefix
+        is stripped (a DSN can never legitimately start with one) and warned about.
+        """
+        pasted = f"WAREHOUSE_DATABASE_URL_DEV={SHARED}"
+        with _env(WAREHOUSE_DATABASE_URL_DEV=pasted):
+            with mock.patch.object(warehouse_db, "org_backend", return_value=("postgres", "dbt")):
+                with self.assertLogs("api.warehouse_db", level="WARNING") as logs:
+                    self.assertEqual(warehouse_db.warehouse_url("dev"), SHARED)
+                self.assertIn("WAREHOUSE_DATABASE_URL_DEV", "".join(logs.output))
+
+    def test_a_clean_url_is_untouched(self):
+        with _env(WAREHOUSE_DATABASE_URL=SHARED):
+            self.assertEqual(warehouse_db.warehouse_url("dev"), SHARED)
+
     def test_no_hardcoded_default_url_remains(self):
         self.assertFalse(
             hasattr(warehouse_db, "DEFAULT_URL"),

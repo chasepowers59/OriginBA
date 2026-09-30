@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="usage_device_dashboard"
+    whenNoDataType="AllSectionsNoDetail"
+    pageWidth="1190"
+    pageHeight="842"
+    orientation="Landscape"
+    columnWidth="1150"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="4e2fb101-9cd8-4c76-b5d9-588ee0477150">
+
+    <property name="ireport.domainUri" value="/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Workstreams/Meter_Operations/Unbilled_Usage/Device_Usage___Domain"/>
+    <property name="com.jaspersoft.jrs.data.source" value="/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Workstreams/Meter_Operations/Unbilled_Usage/Device_Usage___Domain"/>
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="ORIGIN_DEV_DS"/>
+    <property name="net.sf.jasperreports.default.font.name" value="Aptos"/>
+    <property name="net.sf.jasperreports.default.font.size" value="10"/>
+
+    <style name="Base" isDefault="true" fontName="Aptos" fontSize="10"/>
+    <style name="TitleBlue" style="Base" forecolor="#F8FAFC" fontSize="20" isBold="true"/>
+    <style name="MetaBlue" style="Base" forecolor="#E2E8F0" fontSize="10"/>
+    <style name="HeaderBlue" style="Base" backcolor="#0B4F84" forecolor="#FFFFFF" mode="Opaque" isBold="true"/>
+    <style name="DetailText" style="Base" forecolor="#0F172A"/>
+    <style name="SummaryBlue" style="Base" backcolor="#E2E8F0" mode="Opaque" forecolor="#0F172A"/>
+    <style name="FlagCell" style="Base" mode="Opaque" backcolor="#047857" forecolor="#FFFFFF" isBold="true">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$F{ACCT_ID} == null]]></conditionExpression>
+            <style backcolor="#C2410C" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$F{USAGE_QTY_PER_DAY} != null && $F{USAGE_QTY_PER_DAY}.doubleValue() >= ($P{HIGH_USAGE_PER_DAY} == null ? 0d : $P{HIGH_USAGE_PER_DAY}.doubleValue())]]></conditionExpression>
+            <style backcolor="#B91C1C" forecolor="#FFFFFF"/>
+        </conditionalStyle>
+    </style>
+
+    <parameter name="LoggedInUser" class="com.jaspersoft.jasperserver.api.metadata.user.domain.User" isForPrompting="false"/>
+    <parameter name="LoggedInUsername" class="java.lang.String" isForPrompting="false"/>
+    <parameter name="DEVICE_DRILL_URL_PREFIX" class="java.lang.String" isForPrompting="false">
+        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+    </parameter>
+    <parameter name="SP_DRILL_URL_PREFIX" class="java.lang.String" isForPrompting="false">
+        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+    </parameter>
+    <parameter name="DEVICE_TYPE_TEXT" class="java.lang.String"/>
+    <parameter name="ACCOUNT_ID_TEXT" class="java.lang.String"/>
+    <parameter name="CUSTOMER_NAME_TEXT" class="java.lang.String"/>
+    <parameter name="START_TS" class="java.sql.Timestamp"/>
+    <parameter name="END_TS" class="java.sql.Timestamp"/>
+    <parameter name="HIGH_USAGE_PER_DAY" class="java.lang.Double">
+        <defaultValueExpression><![CDATA[100.0d]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ONLY_HIGH_USAGE" class="java.lang.Boolean">
+        <defaultValueExpression><![CDATA[Boolean.FALSE]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ONLY_MISSING_ACCOUNT" class="java.lang.Boolean">
+        <defaultValueExpression><![CDATA[Boolean.FALSE]]></defaultValueExpression>
+    </parameter>
+    <parameter name="MAX_EXCEPTION_ROWS" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[120]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CLIENT_NAME" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Origin_DEV"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="domain"><![CDATA[
+<query>
+  <queryFields>
+    <queryField id="D1_USAGE_ID"/>
+    <queryField id="USAGE_START_DTTM"/>
+    <queryField id="USAGE_END_DTTM"/>
+    <queryField id="USAGE_QTY"/>
+    <queryField id="USAGE_QTY_PER_DAY"/>
+    <queryField id="UOM_DESCR"/>
+    <queryField id="US_TYPE_DESCR"/>
+    <queryField id="USG_SRC_FLG"/>
+    <queryField id="D1_DEVICE_ID"/>
+    <queryField id="DEVICE_TYPE_DESCR"/>
+    <queryField id="DVC_STATUS_CODE"/>
+    <queryField id="MEASR_COMP_USAGE_FLG"/>
+    <queryField id="D1_SP_ID"/>
+    <queryField id="SP_CITY"/>
+    <queryField id="SP_DIVISION_CD"/>
+    <queryField id="ACCT_ID"/>
+    <queryField id="SA_ID"/>
+    <queryField id="CUSTOMER_NAME"/>
+    <queryField id="LINK_DEVICE_ACCT_KEY"/>
+  </queryFields>
+</query>
+    ]]></queryString>
+
+    <field name="D1_USAGE_ID" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="D1_USAGE_ID"/>
+    </field>
+    <field name="USAGE_START_DTTM" class="java.sql.Timestamp">
+        <property name="net.sf.jasperreports.query.field.id" value="USAGE_START_DTTM"/>
+    </field>
+    <field name="USAGE_END_DTTM" class="java.sql.Timestamp">
+        <property name="net.sf.jasperreports.query.field.id" value="USAGE_END_DTTM"/>
+    </field>
+    <field name="USAGE_QTY" class="java.math.BigDecimal">
+        <property name="net.sf.jasperreports.query.field.id" value="USAGE_QTY"/>
+    </field>
+    <field name="USAGE_QTY_PER_DAY" class="java.math.BigDecimal">
+        <property name="net.sf.jasperreports.query.field.id" value="USAGE_QTY_PER_DAY"/>
+    </field>
+    <field name="UOM_DESCR" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="UOM_DESCR"/>
+    </field>
+    <field name="US_TYPE_DESCR" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="US_TYPE_DESCR"/>
+    </field>
+    <field name="USG_SRC_FLG" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="USG_SRC_FLG"/>
+    </field>
+    <field name="D1_DEVICE_ID" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="D1_DEVICE_ID"/>
+    </field>
+    <field name="DEVICE_TYPE_DESCR" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="DEVICE_TYPE_DESCR"/>
+    </field>
+    <field name="DVC_STATUS_CODE" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="DVC_STATUS_CODE"/>
+    </field>
+    <field name="MEASR_COMP_USAGE_FLG" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="MEASR_COMP_USAGE_FLG"/>
+    </field>
+    <field name="D1_SP_ID" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="D1_SP_ID"/>
+    </field>
+    <field name="SP_CITY" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="SP_CITY"/>
+    </field>
+    <field name="SP_DIVISION_CD" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="SP_DIVISION_CD"/>
+    </field>
+    <field name="ACCT_ID" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="ACCT_ID"/>
+    </field>
+    <field name="SA_ID" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="SA_ID"/>
+    </field>
+    <field name="CUSTOMER_NAME" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="CUSTOMER_NAME"/>
+    </field>
+    <field name="LINK_DEVICE_ACCT_KEY" class="java.lang.String">
+        <property name="net.sf.jasperreports.query.field.id" value="LINK_DEVICE_ACCT_KEY"/>
+    </field>
+
+    <sortField name="USAGE_QTY_PER_DAY" order="Descending"/>
+
+    <variable name="TOTAL_ROWS" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{D1_USAGE_ID}]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="DISTINCT_DEVICES" class="java.lang.Long" calculation="DistinctCount">
+        <variableExpression><![CDATA[$F{D1_DEVICE_ID}]]></variableExpression>
+        <initialValueExpression><![CDATA[0L]]></initialValueExpression>
+    </variable>
+    <variable name="DISTINCT_ACCOUNTS" class="java.lang.Long" calculation="DistinctCount">
+        <variableExpression><![CDATA[$F{ACCT_ID}]]></variableExpression>
+        <initialValueExpression><![CDATA[0L]]></initialValueExpression>
+    </variable>
+    <variable name="DISTINCT_SPS" class="java.lang.Long" calculation="DistinctCount">
+        <variableExpression><![CDATA[$F{D1_SP_ID}]]></variableExpression>
+        <initialValueExpression><![CDATA[0L]]></initialValueExpression>
+    </variable>
+    <variable name="DISTINCT_DEVICE_ACCT" class="java.lang.Long" calculation="DistinctCount">
+        <variableExpression><![CDATA[$F{LINK_DEVICE_ACCT_KEY}]]></variableExpression>
+        <initialValueExpression><![CDATA[0L]]></initialValueExpression>
+    </variable>
+    <variable name="TOTAL_USAGE_QTY" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{USAGE_QTY}]]></variableExpression>
+        <initialValueExpression><![CDATA[new java.math.BigDecimal(0)]]></initialValueExpression>
+    </variable>
+    <variable name="AVG_USAGE_QTY_PER_DAY" class="java.lang.Double" calculation="Average">
+        <variableExpression><![CDATA[$F{USAGE_QTY_PER_DAY} == null ? null : Double.valueOf($F{USAGE_QTY_PER_DAY}.doubleValue())]]></variableExpression>
+    </variable>
+    <variable name="HIGH_USAGE_ROWS" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[
+($F{USAGE_QTY_PER_DAY} != null && $F{USAGE_QTY_PER_DAY}.doubleValue() >= ($P{HIGH_USAGE_PER_DAY} == null ? 0d : $P{HIGH_USAGE_PER_DAY}.doubleValue())) ? 1 : 0
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="MISSING_ACCOUNT_ROWS" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[$F{ACCT_ID} == null ? 1 : 0]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="DISTINCT_OUTLIER_DEVICES" class="java.lang.Long" calculation="DistinctCount">
+        <variableExpression><![CDATA[
+($F{USAGE_QTY_PER_DAY} != null && $F{USAGE_QTY_PER_DAY}.doubleValue() >= ($P{HIGH_USAGE_PER_DAY} == null ? 0d : $P{HIGH_USAGE_PER_DAY}.doubleValue())) ? $F{D1_DEVICE_ID} : null
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0L]]></initialValueExpression>
+    </variable>
+    <variable name="DISTINCT_OUTLIER_ACCOUNTS" class="java.lang.Long" calculation="DistinctCount">
+        <variableExpression><![CDATA[
+($F{USAGE_QTY_PER_DAY} != null && $F{USAGE_QTY_PER_DAY}.doubleValue() >= ($P{HIGH_USAGE_PER_DAY} == null ? 0d : $P{HIGH_USAGE_PER_DAY}.doubleValue())) ? $F{ACCT_ID} : null
+        ]]></variableExpression>
+        <initialValueExpression><![CDATA[0L]]></initialValueExpression>
+    </variable>
+
+    <filterExpression><![CDATA[
+($F{D1_USAGE_ID} != null)
+&& ($P{DEVICE_TYPE_TEXT} == null || $P{DEVICE_TYPE_TEXT}.trim().length() == 0 || ($F{DEVICE_TYPE_DESCR} != null && $F{DEVICE_TYPE_DESCR}.toUpperCase().contains($P{DEVICE_TYPE_TEXT}.trim().toUpperCase())))
+&& ($P{ACCOUNT_ID_TEXT} == null || $P{ACCOUNT_ID_TEXT}.trim().length() == 0 || ($F{ACCT_ID} != null && $F{ACCT_ID}.toUpperCase().contains($P{ACCOUNT_ID_TEXT}.trim().toUpperCase())))
+&& ($P{CUSTOMER_NAME_TEXT} == null || $P{CUSTOMER_NAME_TEXT}.trim().length() == 0 || ($F{CUSTOMER_NAME} != null && $F{CUSTOMER_NAME}.toUpperCase().contains($P{CUSTOMER_NAME_TEXT}.trim().toUpperCase())))
+&& ($P{START_TS} == null || ($F{USAGE_START_DTTM} != null && !$F{USAGE_START_DTTM}.before($P{START_TS})))
+&& ($P{END_TS} == null || ($F{USAGE_START_DTTM} != null && $F{USAGE_START_DTTM}.before($P{END_TS})))
+&& ($P{ONLY_HIGH_USAGE} == null || !$P{ONLY_HIGH_USAGE}.booleanValue() || ($F{USAGE_QTY_PER_DAY} != null && $F{USAGE_QTY_PER_DAY}.doubleValue() >= ($P{HIGH_USAGE_PER_DAY} == null ? 0d : $P{HIGH_USAGE_PER_DAY}.doubleValue())))
+&& ($P{ONLY_MISSING_ACCOUNT} == null || !$P{ONLY_MISSING_ACCOUNT}.booleanValue() || $F{ACCT_ID} == null)
+    ]]></filterExpression>
+
+    <title>
+        <band height="278">
+            <frame>
+                <reportElement x="0" y="0" width="1150" height="64" uuid="f3ed69f7-a861-4f0a-8612-9886ed5f4236" mode="Opaque" backcolor="#3B82C4"/>
+            </frame>
+            <staticText>
+                <reportElement style="TitleBlue" x="18" y="12" width="900" height="24" uuid="1fead050-4708-43b2-8f34-70decb8058ec"/>
+                <text><![CDATA[Usage Device Exception Report]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="MetaBlue" x="18" y="40" width="1115" height="18" uuid="cf621971-c240-4208-be7c-2420671f96d6"/>
+                <textFieldExpression><![CDATA[
+"DEVICE_TYPE=" + (($P{DEVICE_TYPE_TEXT} == null || $P{DEVICE_TYPE_TEXT}.trim().length()==0) ? "ALL" : $P{DEVICE_TYPE_TEXT}.trim())
++ " | ACCOUNT=" + (($P{ACCOUNT_ID_TEXT} == null || $P{ACCOUNT_ID_TEXT}.trim().length()==0) ? "ALL" : $P{ACCOUNT_ID_TEXT}.trim())
++ " | CUSTOMER=" + (($P{CUSTOMER_NAME_TEXT} == null || $P{CUSTOMER_NAME_TEXT}.trim().length()==0) ? "ALL" : $P{CUSTOMER_NAME_TEXT}.trim())
++ " | HIGH_USAGE_PER_DAY=" + ($P{HIGH_USAGE_PER_DAY} == null ? "N/A" : new java.text.DecimalFormat("#0.00").format($P{HIGH_USAGE_PER_DAY}))
+                ]]></textFieldExpression>
+            </textField>
+
+            <frame>
+                <reportElement style="SummaryBlue" x="0" y="74" width="560" height="196" uuid="d17a6133-feb7-4108-bfc8-e7cebc4d0cd9"/>
+                <box><pen lineWidth="0.5"/></box>
+                <staticText><reportElement x="10" y="8" width="540" height="16" uuid="85f95873-2d0b-4d54-bd9d-9019bd567511"/><textElement><font isBold="true"/></textElement><text><![CDATA[Usage-Meter Snapshot (Business KPIs)]]></text></staticText>
+                <textField evaluationTime="Report"><reportElement x="10" y="32" width="260" height="16" uuid="90dded81-3ee2-4450-a9e1-4e9287950046"/><textFieldExpression><![CDATA["Usage Rows: " + $V{TOTAL_ROWS}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="10" y="52" width="260" height="16" uuid="f6dc27cc-d38a-4f22-99cd-543227b2f0d8"/><textFieldExpression><![CDATA["Distinct Devices: " + $V{DISTINCT_DEVICES}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="10" y="72" width="260" height="16" uuid="dbe19d2f-001f-4262-8c86-a68d2be95e9f"/><textFieldExpression><![CDATA["Distinct Accounts: " + $V{DISTINCT_ACCOUNTS}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="10" y="92" width="260" height="16" uuid="6a09100d-29fd-476f-aeb7-2c8f245ba904"/><textFieldExpression><![CDATA["Distinct Device-Account Pairs: " + $V{DISTINCT_DEVICE_ACCT}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="10" y="112" width="540" height="16" uuid="95ad7c2e-3f24-47c5-a3ac-1a3f4d5f31e1"/><textFieldExpression><![CDATA["Outlier Device / Account Reach: " + $V{DISTINCT_OUTLIER_DEVICES} + " devices | " + $V{DISTINCT_OUTLIER_ACCOUNTS} + " accounts"]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="280" y="32" width="260" height="16" uuid="f4eb93f8-c1a8-4696-ad7b-1333ecb7786a"/><textFieldExpression><![CDATA["Distinct Service Points: " + $V{DISTINCT_SPS}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="280" y="52" width="260" height="16" uuid="d84d3651-823e-4b13-b03c-312f0ad444f4"/><textFieldExpression><![CDATA["Total Usage Qty: " + ($V{TOTAL_USAGE_QTY} == null ? "0" : new java.text.DecimalFormat("#,##0.00").format($V{TOTAL_USAGE_QTY}))]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="280" y="72" width="260" height="16" uuid="5a3073dd-f06d-4459-a3d8-460e9316439b"/><textFieldExpression><![CDATA["Avg Usage Qty/Day: " + ($V{AVG_USAGE_QTY_PER_DAY} == null ? "N/A" : new java.text.DecimalFormat("#,##0.00").format($V{AVG_USAGE_QTY_PER_DAY}))]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="280" y="92" width="260" height="16" uuid="664bbca5-f890-4346-97da-54104f7f6eb1"/><textFieldExpression><![CDATA["High Usage Rows: " + $V{HIGH_USAGE_ROWS} + " | Missing Account Rows: " + $V{MISSING_ACCOUNT_ROWS}]]></textFieldExpression></textField>
+                <textField evaluationTime="Report"><reportElement x="280" y="112" width="260" height="16" uuid="80d7c00a-f23a-4e8a-b7d4-40f0b95f6189"/><textFieldExpression><![CDATA[
+"Link Coverage: " + (($V{TOTAL_ROWS} == null || $V{TOTAL_ROWS}.intValue() == 0) ? "N/A" : new java.text.DecimalFormat("0.0'%'").format((($V{TOTAL_ROWS}.doubleValue() - $V{MISSING_ACCOUNT_ROWS}.doubleValue()) * 100.0) / $V{TOTAL_ROWS}.doubleValue()))
++ " | High Usage Incidence: " + (($V{TOTAL_ROWS} == null || $V{TOTAL_ROWS}.intValue() == 0) ? "N/A" : new java.text.DecimalFormat("0.0'%'").format(($V{HIGH_USAGE_ROWS}.doubleValue() * 100.0) / $V{TOTAL_ROWS}.doubleValue()))
+                ]]></textFieldExpression></textField>
+            </frame>
+
+            <barChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="570" y="74" width="580" height="196" uuid="83395a06-4f47-42b0-bd7e-8db5e6f405b6" mode="Opaque" backcolor="#EAF4FF" forecolor="#3B82C4"/>
+                    <chartTitle><titleExpression><![CDATA["Usage Quantity by Device Type"]]></titleExpression></chartTitle>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Usage Qty"]]></seriesExpression>
+                        <categoryExpression><![CDATA[$F{DEVICE_TYPE_DESCR} == null ? "UNKNOWN" : $F{DEVICE_TYPE_DESCR}]]></categoryExpression>
+                        <valueExpression><![CDATA[$F{USAGE_QTY} == null ? new java.math.BigDecimal(0) : $F{USAGE_QTY}]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <barPlot><plot/><categoryAxisFormat><axisFormat/></categoryAxisFormat><valueAxisFormat><axisFormat/></valueAxisFormat></barPlot>
+            </barChart>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="24">
+            <staticText><reportElement style="HeaderBlue" x="0" y="0" width="70" height="24" uuid="2f3d4628-f7c2-4cc8-8f09-bae02ec4e8eb"/><text><![CDATA[FLAG]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="70" y="0" width="130" height="24" uuid="c65f21d1-5f27-4992-8093-ae2997787a3f"/><text><![CDATA[EXCEPTION_REASON]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="200" y="0" width="100" height="24" uuid="d4cf2977-2ebf-4488-9b97-1f57f3c945ef"/><text><![CDATA[DEVICE_ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="300" y="0" width="145" height="24" uuid="f5461ca6-cf80-4b53-8b16-d589a6fa0f3d"/><text><![CDATA[DEVICE_TYPE]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="445" y="0" width="90" height="24" uuid="15f9007a-42f6-4439-8fa6-f2e421fda13b"/><text><![CDATA[SP_ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="535" y="0" width="120" height="24" uuid="7418d43f-4e2d-4fbe-8927-dfbd3bcf5740"/><text><![CDATA[ACCT_ID]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="655" y="0" width="220" height="24" uuid="7bf9fc24-c7e1-43b9-b07e-3ce49e6333eb"/><text><![CDATA[CUSTOMER]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="875" y="0" width="105" height="24" uuid="d2775c0e-31f8-4ba8-b170-fbbdc9afecad"/><text><![CDATA[QTY_PER_DAY]]></text></staticText>
+            <staticText><reportElement style="HeaderBlue" x="980" y="0" width="170" height="24" uuid="92ea9be6-7a95-428e-b76a-4460fa592f7e"/><text><![CDATA[USAGE_START]]></text></staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="20">
+            <printWhenExpression><![CDATA[
+(($F{ACCT_ID} == null) || ($F{USAGE_QTY_PER_DAY} != null && $F{USAGE_QTY_PER_DAY}.doubleValue() >= ($P{HIGH_USAGE_PER_DAY} == null ? 0d : $P{HIGH_USAGE_PER_DAY}.doubleValue())))
+&& ($P{MAX_EXCEPTION_ROWS} == null || $V{REPORT_COUNT}.intValue() <= $P{MAX_EXCEPTION_ROWS}.intValue())
+            ]]></printWhenExpression>
+            <textField>
+                <reportElement style="FlagCell" x="0" y="2" width="70" height="16" uuid="8a56275d-2a54-4589-80f9-7f193b96f95f"/>
+                <textFieldExpression><![CDATA[
+($F{ACCT_ID} == null) ? "NO_ACCT" : "OUTLIER"
+                ]]></textFieldExpression>
+            </textField>
+            <textField><reportElement style="DetailText" x="70" y="2" width="130" height="16" uuid="d6f7c8b5-f93f-42d8-b31f-bfce6f5b8dc6"/><textFieldExpression><![CDATA[$F{ACCT_ID} == null ? "Missing Account Link" : "High Usage Threshold"]]></textFieldExpression></textField>
+            <textField hyperlinkType="Reference" hyperlinkTarget="Blank">
+                <reportElement style="DetailText" x="200" y="2" width="100" height="16" uuid="40f3f949-642d-49ec-b4f9-75aebf52befa" forecolor="#2563EB"/>
+                <textElement><font isUnderline="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{D1_DEVICE_ID}]]></textFieldExpression>
+                <hyperlinkReferenceExpression><![CDATA[
+($P{DEVICE_DRILL_URL_PREFIX} == null || $P{DEVICE_DRILL_URL_PREFIX}.trim().length() == 0 || $F{D1_DEVICE_ID} == null) ? null : $P{DEVICE_DRILL_URL_PREFIX} + $F{D1_DEVICE_ID}
+                ]]></hyperlinkReferenceExpression>
+            </textField>
+            <textField><reportElement style="DetailText" x="300" y="2" width="145" height="16" uuid="80ffd36d-73aa-44f8-8b77-c934f86a667e"/><textFieldExpression><![CDATA[$F{DEVICE_TYPE_DESCR} == null ? "UNKNOWN" : $F{DEVICE_TYPE_DESCR}]]></textFieldExpression></textField>
+            <textField hyperlinkType="Reference" hyperlinkTarget="Blank">
+                <reportElement style="DetailText" x="445" y="2" width="90" height="16" uuid="9b88f2d0-0b17-4f58-b273-f5ab5d9ad8dd" forecolor="#2563EB"/>
+                <textElement><font isUnderline="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{D1_SP_ID}]]></textFieldExpression>
+                <hyperlinkReferenceExpression><![CDATA[
+($P{SP_DRILL_URL_PREFIX} == null || $P{SP_DRILL_URL_PREFIX}.trim().length() == 0 || $F{D1_SP_ID} == null) ? null : $P{SP_DRILL_URL_PREFIX} + $F{D1_SP_ID}
+                ]]></hyperlinkReferenceExpression>
+            </textField>
+            <textField><reportElement style="DetailText" x="535" y="2" width="120" height="16" uuid="f2f0ea74-2cee-4f8b-9bb9-a9f9e38766f5"/><textFieldExpression><![CDATA[$F{ACCT_ID} == null ? "" : $F{ACCT_ID}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="655" y="2" width="220" height="16" uuid="9903938f-c5ea-45a0-bc32-72b42354a0dd"/><textFieldExpression><![CDATA[$F{CUSTOMER_NAME} == null ? "" : $F{CUSTOMER_NAME}]]></textFieldExpression></textField>
+            <textField pattern="#,##0.00"><reportElement style="DetailText" x="875" y="2" width="105" height="16" uuid="f9f6e7e3-1ae6-48d7-87ff-3196d0e1414c"/><textElement textAlignment="Center"/><textFieldExpression><![CDATA[$F{USAGE_QTY_PER_DAY}]]></textFieldExpression></textField>
+            <textField><reportElement style="DetailText" x="980" y="2" width="170" height="16" uuid="2d4f16cf-b75e-47ae-9359-fb4f4163f9b3"/><textElement textAlignment="Center"/><textFieldExpression><![CDATA[$F{USAGE_START_DTTM} == null ? "" : new java.text.SimpleDateFormat("MMM d yyyy").format($F{USAGE_START_DTTM}).toLowerCase()]]></textFieldExpression></textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="1150" height="16" uuid="16a27040-be65-4a4f-be14-60d8667945e3"/>
+                <textElement textAlignment="Center"><font fontName="Aptos" size="9"/></textElement>
+                <textFieldExpression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential / Expressly for " + $P{CLIENT_NAME}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <summary>
+        <band height="290">
+            <frame>
+                <reportElement style="SummaryBlue" x="0" y="0" width="1150" height="100" uuid="e6dfce10-f8fb-4f68-8f4a-cc8abbd5baac"/>
+                <box><pen lineWidth="0.5"/></box>
+                <textField>
+                    <reportElement x="10" y="12" width="1130" height="18" uuid="ca0d963d-739b-4fd4-a567-ab445dfcda80"/>
+                    <textFieldExpression><![CDATA[
+"Rows=" + $V{TOTAL_ROWS}
++ " | Devices=" + $V{DISTINCT_DEVICES}
++ " | Accounts=" + $V{DISTINCT_ACCOUNTS}
++ " | Device-Account Pairs=" + $V{DISTINCT_DEVICE_ACCT}
++ " | High Usage Rows=" + $V{HIGH_USAGE_ROWS}
++ " | Missing Account Rows=" + $V{MISSING_ACCOUNT_ROWS}
++ " | Link Coverage=" + (($V{TOTAL_ROWS} == null || $V{TOTAL_ROWS}.intValue() == 0) ? "N/A" : new java.text.DecimalFormat("0.0'%'").format((($V{TOTAL_ROWS}.doubleValue() - $V{MISSING_ACCOUNT_ROWS}.doubleValue()) * 100.0) / $V{TOTAL_ROWS}.doubleValue()))
+                    ]]></textFieldExpression>
+                </textField>
+                <staticText>
+                    <reportElement x="10" y="36" width="1130" height="52" uuid="28850601-7e55-4f11-8256-4ecf3f500126"/>
+                    <text><![CDATA[Action workflow: (1) Resolve NO_ACCT exceptions first to protect downstream billing; (2) investigate OUTLIER rows by device type for abnormal consumption patterns; (3) trend high-usage growth month-over-month to prioritize meter operations workload.]]></text>
+                </staticText>
+            </frame>
+
+            <barChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="0" y="110" width="570" height="180" uuid="664ef13f-6826-4f32-ae59-b621f4af643b" mode="Opaque" backcolor="#EAF4FF" forecolor="#3B82C4"/>
+                    <chartTitle><titleExpression><![CDATA["High Usage Rows by Device Type"]]></titleExpression></chartTitle>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["High Usage Rows"]]></seriesExpression>
+                        <categoryExpression><![CDATA[$F{DEVICE_TYPE_DESCR} == null ? "UNKNOWN" : $F{DEVICE_TYPE_DESCR}]]></categoryExpression>
+                        <valueExpression><![CDATA[
+($F{USAGE_QTY_PER_DAY} != null && $F{USAGE_QTY_PER_DAY}.doubleValue() >= ($P{HIGH_USAGE_PER_DAY} == null ? 0d : $P{HIGH_USAGE_PER_DAY}.doubleValue())) ? 1 : 0
+                        ]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <barPlot><plot/><categoryAxisFormat><axisFormat/></categoryAxisFormat><valueAxisFormat><axisFormat/></valueAxisFormat></barPlot>
+            </barChart>
+
+            <lineChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="580" y="110" width="570" height="180" uuid="464b417e-cf77-4d81-80d2-79f9e8a5dd2f" mode="Opaque" backcolor="#EAF4FF" forecolor="#3B82C4"/>
+                    <chartTitle><titleExpression><![CDATA["Usage Quantity Trend by Month"]]></titleExpression></chartTitle>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Usage Qty"]]></seriesExpression>
+                        <categoryExpression><![CDATA[$F{USAGE_START_DTTM} == null ? "UNKNOWN" : new java.text.SimpleDateFormat("yyyy-MM").format($F{USAGE_START_DTTM})]]></categoryExpression>
+                        <valueExpression><![CDATA[$F{USAGE_QTY} == null ? new java.math.BigDecimal(0) : $F{USAGE_QTY}]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <linePlot><plot/><categoryAxisFormat><axisFormat/></categoryAxisFormat><valueAxisFormat><axisFormat/></valueAxisFormat></linePlot>
+            </lineChart>
+        </band>
+    </summary>
+
+    <noData>
+        <band height="60">
+            <staticText>
+                <reportElement x="0" y="10" width="1150" height="40" uuid="2b2f94a7-ad52-4b66-93fc-44bb12650a35"/>
+                <text><![CDATA[No rows returned from the Usage/Device domain for current filters.]]></text>
+            </staticText>
+        </band>
+    </noData>
+
+</jasperReport>

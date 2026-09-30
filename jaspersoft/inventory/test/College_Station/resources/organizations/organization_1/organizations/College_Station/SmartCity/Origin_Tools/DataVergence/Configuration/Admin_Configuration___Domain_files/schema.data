@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="JoinTree_1" label="JoinTree_1" resourceId="JoinTree_1"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="CollegeStation_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <itemGroups>
+    <itemGroup id="CMS_ADMIN_CONFIG_VW" label="1.) Admin Configuration" resourceId="JoinTree_1">
+      <items>
+        <item id="DESCR" label="Key Description" resourceId="JoinTree_1.CMS_ADMIN_CONFIG_VW.DESCR"></item>
+        <item id="KEY" label="Key Value" resourceId="JoinTree_1.CMS_ADMIN_CONFIG_VW.KEY"></item>
+        <item id="LANG_TBL_NAME" label="Language Table" resourceId="JoinTree_1.CMS_ADMIN_CONFIG_VW.LANG_TBL_NAME"></item>
+        <item id="MAINT_OBJ_CD" label="Maintenance Object" resourceId="JoinTree_1.CMS_ADMIN_CONFIG_VW.MAINT_OBJ_CD"></item>
+        <item id="OWNER_FLG" label="Owner" resourceId="JoinTree_1.CMS_ADMIN_CONFIG_VW.OWNER_FLG"></item>
+        <item id="TBL_DESCR" label="Table Description" resourceId="JoinTree_1.CMS_ADMIN_CONFIG_VW.TBL_DESCR"></item>
+        <item id="TBL_NAME" label="Table Name" resourceId="JoinTree_1.CMS_ADMIN_CONFIG_VW.TBL_NAME"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet1" label="1.) Descriptions" resourceId="JoinTree_1">
+      <items>
+        <item id="DESCR_1" label="Maintenance Object Description" resourceId="JoinTree_1.CI_MD_MO_L.DESCR"></item>
+        <item id="DESCR_3" label="Table Name Description" resourceId="JoinTree_1.CI_MD_TBL_L.DESCR"></item>
+        <item id="DESCR_2" label="Owner Description" resourceId="JoinTree_1.CI_LOOKUP_VAL_L.DESCR"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="NewSet2" label="1.) Formulas" resourceId="JoinTree_1">
+      <items>
+        <item id="MO_KEY_DIST" label="Distinct MO/Key" resourceId="JoinTree_1.MO_KEY_DIST"></item>
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable id="CMS_ADMIN_CONFIG_VW" datasourceId="CollegeStation_DS" datasourceTableName="CMS_ADMIN_CONFIG_VW" schemaAlias="CISADM">
+      <fieldList>
+        <field id="TBL_NAME" type="java.lang.String"></field>
+        <field id="TBL_DESCR" type="java.lang.String"></field>
+        <field id="LANG_TBL_NAME" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="MAINT_OBJ_CD" type="java.lang.String"></field>
+        <field id="ENVIRONMENT" type="java.lang.String"></field>
+        <field id="KEY" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_MD_TBL_L" datasourceId="CollegeStation_DS" datasourceTableName="CI_MD_TBL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="TBL_NAME" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_MD_MO_L" datasourceId="CollegeStation_DS" datasourceTableName="CI_MD_MO_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="MAINT_OBJ_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="CollegeStation_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+        <field id="OWNER_FLG" type="java.lang.String"></field>
+        <field id="DESCR_OVRD" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcQuery id="ENV_NAME" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="MAX_INST_MSG_TEXT_" fieldDBName="MAX(INST_MSG_TEXT)" type="java.lang.String"></field>
+      </fieldList>
+      <query>select 
+  max(inst_msg_text)
+from 
+  cisadm.ci_install_msg_l iml
+where
+  inst_msg_type_flg = 'F1DN'</query>
+    </jdbcQuery>
+    <jdbcTable id="JoinTree_1" datasourceId="CollegeStation_DS" datasourceTableName="CMS_ADMIN_CONFIG_VW" schemaAlias="CISADM">
+      <fieldList>
+        <field id="CI_MD_TBL_L.TBL_NAME" type="java.lang.String"></field>
+        <field id="CI_MD_TBL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_MD_TBL_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_MD_TBL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_MD_TBL_L.DESCRLONG" type="java.lang.String"></field>
+        <field id="CI_MD_TBL_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CMS_ADMIN_CONFIG_VW.TBL_NAME" type="java.lang.String"></field>
+        <field id="CMS_ADMIN_CONFIG_VW.TBL_DESCR" type="java.lang.String"></field>
+        <field id="CMS_ADMIN_CONFIG_VW.LANG_TBL_NAME" type="java.lang.String"></field>
+        <field id="CMS_ADMIN_CONFIG_VW.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CMS_ADMIN_CONFIG_VW.MAINT_OBJ_CD" type="java.lang.String"></field>
+        <field id="CMS_ADMIN_CONFIG_VW.ENVIRONMENT" type="java.lang.String"></field>
+        <field id="CMS_ADMIN_CONFIG_VW.KEY" type="java.lang.String"></field>
+        <field id="CMS_ADMIN_CONFIG_VW.DESCR" type="java.lang.String"></field>
+        <field id="CI_MD_MO_L.MAINT_OBJ_CD" type="java.lang.String"></field>
+        <field id="CI_MD_MO_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_MD_MO_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_MD_MO_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_MD_MO_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.OWNER_FLG" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCR_OVRD" type="java.lang.String"></field>
+        <field id="CI_LOOKUP_VAL_L.DESCRLONG" type="java.lang.String"></field>
+        <field id="MO_KEY_DIST" dataSetExpression="CountDistinct(Concatenate(CMS_ADMIN_CONFIG_VW.MAINT_OBJ_CD, '_', CMS_ADMIN_CONFIG_VW.KEY), 'Current')" type="java.lang.Long"></field>
+      </fieldList>
+      <joinInfo alias="CMS_ADMIN_CONFIG_VW" referenceId="CMS_ADMIN_CONFIG_VW"></joinInfo>
+      <joinList>
+        <join expr="CMS_ADMIN_CONFIG_VW.MAINT_OBJ_CD == CI_MD_MO_L.MAINT_OBJ_CD" left="CMS_ADMIN_CONFIG_VW" right="CI_MD_MO_L" type="inner" weight="1"></join>
+        <join expr="CMS_ADMIN_CONFIG_VW.OWNER_FLG == CI_LOOKUP_VAL_L.FIELD_VALUE and CI_LOOKUP_VAL_L.FIELD_NAME == 'OWNER_FLG' and CI_LOOKUP_VAL_L.LANGUAGE_CD == 'ENG'" left="CMS_ADMIN_CONFIG_VW" right="CI_LOOKUP_VAL_L" type="leftOuter" weight="1"></join>
+        <join expr="CMS_ADMIN_CONFIG_VW.TBL_NAME == CI_MD_TBL_L.TBL_NAME and CI_MD_TBL_L.LANGUAGE_CD == 'ENG'" left="CMS_ADMIN_CONFIG_VW" right="CI_MD_TBL_L" type="inner" weight="1"></join>
+      </joinList>
+      <joinOptions></joinOptions>
+      <tableRefList>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_MD_TBL_L" tableId="CI_MD_TBL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CMS_ADMIN_CONFIG_VW" tableId="CMS_ADMIN_CONFIG_VW"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_MD_MO_L" tableId="CI_MD_MO_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+      </tableRefList>
+    </jdbcTable>
+  </resources>
+</schema>

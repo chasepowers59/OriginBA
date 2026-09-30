@@ -25,7 +25,6 @@ def _build(dialect, schema, **kw):
         table_name="rpt_financial_txn",
         allowed_fields=FIELDS,
         trusted_measures=TRUSTED,
-        required_date_field=None,
         dimensions=kw.get("dimensions", []),
         measures=kw.get("measures", [{"field": "*", "agg": "count"}]),
         filters=kw.get("filters", []),
@@ -45,8 +44,8 @@ class MultiMeasureBuilderTests(unittest.TestCase):
         )
         self.assertIn('"FT Type"', sql)
         self.assertIn('"CIS Division"', sql)
-        self.assertIn("COUNT(*) AS m0", sql)
-        self.assertIn('SUM("Current Amount") AS m1', sql)
+        self.assertIn('COUNT(*) AS "m0"', sql)
+        self.assertIn('SUM("Current Amount") AS "m1"', sql)
         self.assertIn("GROUP BY", sql)
         self.assertIn('reporting."rpt_financial_txn"', sql)
 

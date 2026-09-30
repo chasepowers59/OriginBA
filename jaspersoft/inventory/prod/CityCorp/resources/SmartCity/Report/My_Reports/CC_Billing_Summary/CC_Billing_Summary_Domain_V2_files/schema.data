@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="BILL_SUM" label="Billed Summary" resourceId="BILL_SUM"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="BILL_ID" label="Bill Id" resourceId="BILL_SUM.BILL_ID"></item>
+    <item id="CRE_DTTM" label="Create Date/Time" resourceId="BILL_SUM.CRE_DTTM"></item>
+    <item id="END_DT" label="End Date" resourceId="BILL_SUM.END_DT"></item>
+    <item id="START_DT" label="Start Date" resourceId="BILL_SUM.START_DT"></item>
+    <item id="CALC_AMT_1" label="Calculated Amount" resourceId="BILL_SUM.CALC_AMT"></item>
+    <item id="CUST_CL" label="Customer Class" resourceId="BILL_SUM.CUST_CL"></item>
+    <item id="DESR_ON_BILL" label="Description on Bill" resourceId="BILL_SUM.DESR_ON_BILL"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="BILLING_SUMMARY" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="BILL_DT" type="java.sql.Timestamp"></field>
+        <field id="DUE_DT" type="java.sql.Timestamp"></field>
+        <field id="DESCR_ON_BILL" type="java.lang.String"></field>
+        <field id="CALC_AMT" type="java.math.BigDecimal"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="REV_CL_CD" type="java.lang.String"></field>
+        <field id="FT_TYPE_FLG" type="java.lang.String"></field>
+        <field id="DST_ID" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT 
+    BSC.DST_ID,
+    SA.SA_TYPE_CD,
+    SAT.REV_CL_CD, 
+    FT.FT_TYPE_FLG,
+    B.BILL_ID,
+    B.BILL_DT,
+    B.DUE_DT,
+    B.ACCT_ID,
+    CASE 
+        WHEN BSC.CALC_GRP_CD IN ('COMWCHG','INDWCHG','MUNWCHG','PAWCHG','WHOWCHG','RESWTIERCHG') 
+            THEN 'Water Consumption' 
+        WHEN BSC.CALC_GRP_CD IN ('WMTRCHG') 
+            THEN CONCAT('Meter - ', BSC.CHAR_VAL)
+        WHEN BSC.CALC_GRP_CD IN ('WSPRCHG') 
+            THEN CONCAT('Sprinkler - ', BSC.CHAR_VAL) 
+        WHEN BSC.CALC_GRP_CD IN ('FRLNMTRSZCHG') 
+            THEN CONCAT('Fire Hydrant - ', BSC.CHAR_VAL) 
+        WHEN BSC.CALC_GRP_CD IN ('REGSTIERCHG','RESSTIERCHG','WHOSTIERCHGCTY','WHOSTIERCHGRU') 
+            THEN 'Sewer'
+        ELSE BSC.DESCR_ON_BILL 
+    END AS DESCR_ON_BILL,
+    BSC.CALC_AMT
+FROM CISADM.CI_BILL B
+INNER JOIN CISADM.CI_FT FT ON FT.BILL_ID = B.BILL_ID AND FT.FT_TYPE_FLG IN ('BS','BX') AND FT.FREEZE_SW = 'Y'
+INNER JOIN CISADM.CI_BSEG BS ON BS.BSEG_ID = FT.SIBLING_ID
+INNER JOIN CISADM.CI_SA SA ON SA.SA_ID = BS.SA_ID AND SA.SA_ID = FT.SA_ID
+INNER JOIN CISADM.CI_SA_TYPE SAT ON SAT.SA_TYPE_CD = SA.SA_TYPE_CD AND SAT.CIS_DIVISION = SA.CIS_DIVISION
+INNER JOIN CISADM.CI_BSEG_CALC_LN BSC ON BSC.BSEG_ID = BS.BSEG_ID AND BSC.DST_ID != ' '
+UNION
+SELECT 
+    ADT.DST_ID,
+    SA.SA_TYPE_CD, 
+    SAT.REV_CL_CD, 
+    FT.FT_TYPE_FLG,
+    B.BILL_ID,
+    B.BILL_DT,
+    B.DUE_DT,
+    B.ACCT_ID,
+    ADTL.DESCR_ON_BILL, 
+    AD.ADJ_AMT AS CALC_AMT
+FROM CISADM.CI_BILL B 
+INNER JOIN CISADM.CI_FT FT ON FT.BILL_ID = B.BILL_ID AND FT.FT_TYPE_FLG IN ('AD','AX')
+INNER JOIN CISADM.CI_ADJ AD ON AD.ADJ_ID = FT.SIBLING_ID
+INNER JOIN CISADM.CI_SA SA ON SA.SA_ID = AD.SA_ID AND SA.SA_ID = FT.SA_ID
+INNER JOIN CISADM.CI_SA_TYPE SAT ON SAT.SA_TYPE_CD = SA.SA_TYPE_CD AND SAT.CIS_DIVISION = SA.CIS_DIVISION
+INNER JOIN CISADM.CI_ADJ_TYPE_L ADTL ON ADTL.ADJ_TYPE_CD = AD.ADJ_TYPE_CD
+INNER JOIN CISADM.CI_ADJ_TYPE ADT ON ADT.ADJ_TYPE_CD = AD.ADJ_TYPE_CD</query>
+    </jdbcQuery>
+    <jdbcQuery id="BILL_SUM" datasourceId="CityCorp_DS">
+      <fieldList>
+        <field id="DESR_ON_BILL" type="java.lang.String"></field>
+        <field id="CALC_AMT" type="java.math.BigDecimal"></field>
+        <field id="CUST_CL" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT BS.START_DT,BS.END_DT, BS.CRE_DTTM, BS.BILL_ID,
+CASE 
+        WHEN BC.DESCR_ON_BILL like '%Water%TGAL%' THEN 'Water Consumption'
+        WHEN BC.DESCR_ON_BILL LIKE 'Sprinkler%TGAL%'  THEN 'Sprinkler'
+        WHEN BC.DESCR_ON_BILL LIKE 'Sewer -%' THEN 'Sewer'
+        ELSE BC.DESCR_ON_BILL
+     END AS DESR_ON_BILL,
+	CASE 
+        WHEN A.CUST_CL_CD = 'R' THEN 'Residential'
+        WHEN A.CUST_CL_CD = 'I' THEN 'Industrial'
+        WHEN A.CUST_CL_CD = 'C' THEN 'Commercial'
+        WHEN A.CUST_CL_CD = 'P' THEN 'Preferred Plumber &amp; Contractor'
+        WHEN A.CUST_CL_CD = 'V' THEN 'VIP'
+        WHEN A.CUST_CL_CD = 'F' THEN 'Facility'
+        WHEN A.CUST_CL_CD = 'W' THEN 'Wholesale'
+        WHEN A.CUST_CL_CD = 'PA' THEN 'Public Authority'
+        WHEN A.CUST_CL_CD = 'M' THEN 'Municipal'
+        else ' '
+     END as CUST_CL   ,
+    BC.CALC_AMT
+	FROM CISADM.CI_ACCT A,
+	CISADM.CI_BILL B,
+	CISADM.CI_BSEG BS,
+	CISADM.CI_BSEG_CALC_LN BC
+	WHERE A.ACCT_ID=B.ACCT_ID
+	AND B.BILL_ID=BS.BILL_ID
+	AND BS.BSEG_ID=BC.BSEG_ID
+	AND BS.BSEG_STAT_FLG=50</query>
+    </jdbcQuery>
+  </resources>
+</schema>

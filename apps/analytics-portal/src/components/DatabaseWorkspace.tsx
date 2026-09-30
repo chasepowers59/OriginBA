@@ -7,6 +7,7 @@ import {
   fetchDatabaseTables,
 } from "@/lib/api";
 import { suggestChart } from "@/lib/databaseChartUtils";
+import { workspaceScope } from "@/lib/workspaceScope";
 import {
   categoriesForEngine,
   templatesForEngine,
@@ -14,7 +15,7 @@ import {
   type DatabaseQueryTemplate,
   type WorkspaceEngine,
 } from "@/lib/databaseQueryTemplates";
-import { exportRowsCsv, formatBoolean, formatCurrency, formatNumber, isIdentifierColumn } from "@/lib/format";
+import { exportRowsCsv, formatBoolean, formatCellValue, formatCurrency, formatNumber, isIdentifierColumn } from "@/lib/format";
 import { prettifyFieldName } from "@/lib/businessLabels";
 import { cisadmTableGuide } from "@/lib/cisadmTableGuide";
 import { DatabaseResultChart } from "@/components/DatabaseResultChart";
@@ -35,6 +36,7 @@ function formatCell(value: unknown, isNumericCol = false, columnId?: string): st
   if (isNumericCol && value !== "" && !Number.isNaN(Number(value))) {
     return formatNumber(Number(value));
   }
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}/.test(value)) return formatCellValue(value, { columnId });
   const text = String(value);
   if (text.length > 200) return `${text.slice(0, 200)}…`;
   return text;
@@ -67,6 +69,17 @@ export function DatabaseWorkspace({
   initialTable?: string;
 }) {
   const [sql, setSql] = useState("");
+  // A query handed over from the assistant ("Open in SQL workspace"): read once, then cleared,
+  // so a reload does not resurrect it.
+  useEffect(() => {
+    try {
+      const handed = sessionStorage.getItem("portal.assistant.sql");
+      if (handed) {
+        setSql(handed);
+        sessionStorage.removeItem("portal.assistant.sql");
+      }
+    } catch { /* storage unavailable */ }
+  }, []);
   const [activeTemplate, setActiveTemplate] = useState<DatabaseQueryTemplate | null>(null);
   const [pageSize, setPageSize] = useState<number>(50);
   const [loading, setLoading] = useState(false);
@@ -84,8 +97,8 @@ export function DatabaseWorkspace({
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("starters");
   const [templateCategory, setTemplateCategory] = useState("All");
   const [resultView, setResultView] = useState<ResultView>("table");
-  // The warehouse is where the fleet is going; the first /database/tables response
-  // corrects this for a legacy Oracle tenant.
+  // Postgres is the default guess; the first /database/tables response corrects this
+  // for an Oracle tenant.
   const [engine, setEngine] = useState<WorkspaceEngine>("postgres");
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
@@ -121,7 +134,6 @@ export function DatabaseWorkspace({
     setTablesLoading(true);
     try {
       const response = await fetchDatabaseTables("", search, {
-        snapshotsOnly: !search.trim(),
         includeStats: Boolean(search.trim()),
       });
       if (response.engine) setEngine(response.engine);
@@ -267,9 +279,7 @@ export function DatabaseWorkspace({
     const snippet =
       engine === "postgres"
         ? `SELECT ${cols}\nFROM cisadm.${tableName}\nLIMIT ${pageSize}`
-        : engine === "oracle_dbt"
-          ? `SELECT ${cols}\nFROM ${tableName}\nFETCH FIRST ${pageSize} ROWS ONLY`
-          : `SELECT ${cols}\nFROM CISADM.${tableName}\nWHERE ROWNUM <= ${pageSize}`;
+        : `SELECT ${cols}\nFROM ${tableName}\nFETCH FIRST ${pageSize} ROWS ONLY`;
     setSql(snippet);
     setActiveTemplate(null);
     editorRef.current?.focus();
@@ -290,9 +300,9 @@ export function DatabaseWorkspace({
     if (fetchingMore) return "Fetching next page…";
     if (fetchingAll) return "Fetching all remaining rows…";
     if (!fetchedTotal) return "Ready";
-    const parts = [`${fetchedTotal.toLocaleString()} row${fetchedTotal === 1 ? "" : "s"} fetched`];
-    if (lastExecutionMs) parts.push(`${lastExecutionMs.toLocaleString()} ms`);
-    if (totalCount != null) parts.push(`of ${totalCount.toLocaleString()} total`);
+    const parts = [`${formatNumber(fetchedTotal)} row${fetchedTotal === 1 ? "" : "s"} fetched`];
+    if (lastExecutionMs) parts.push(`${formatNumber(lastExecutionMs)} ms`);
+    if (totalCount != null) parts.push(`of ${formatNumber(totalCount)} total`);
     else if (hasMore) parts.push("(more available)");
     return parts.join(" · ");
   }, [loading, fetchingMore, fetchingAll, fetchedTotal, lastExecutionMs, totalCount, hasMore]);
@@ -319,7 +329,12 @@ export function DatabaseWorkspace({
   }
 
   return (
-    <div className="flex h-[calc(100vh-8.5rem)] min-h-[560px] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-solid)] shadow-lg">
+    <>
+      {/* Says what this org's workspace can actually reach; the engine is learned on
+          mount, so until then it promises no schema at all. */}
+      <p className="portal-text-muted -mt-2 mb-3 max-w-3xl text-sm">{workspaceScope(engine)}</p>
+      {/* one screen tall from lg; below it the panels stack at natural height, so results get room */}
+    <div className="flex flex-col overflow-hidden rounded-2xl lg:h-[calc(100vh-8.5rem)] lg:min-h-[560px] border border-[var(--border)] bg-[var(--surface-solid)] shadow-lg">
       <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border)] bg-[var(--surface-subtle)] px-3 py-2">
         <button
           type="button"
@@ -389,6 +404,7 @@ export function DatabaseWorkspace({
           <label className="portal-text-muted flex items-center gap-1.5 text-xs">
             Page size
             <select
+              aria-label="Rows per page"
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
               className="input-modern py-1 text-xs"
@@ -410,9 +426,14 @@ export function DatabaseWorkspace({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1">
+      {/* Stacked until lg. Side by side, the 288px sidebar left ~55px for the editor on
+          a 375px viewport: the placeholder wrapped to one character per line and
+          "Results" clipped to "Resu", so the page's whole purpose was unreachable on a
+          phone. The sidebar is capped in height when stacked so the editor stays above
+          the fold. */}
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {sidebarOpen ? (
-          <aside className="flex w-72 shrink-0 flex-col border-r border-[var(--border)] bg-[var(--surface-subtle)]">
+          <aside className="flex max-h-64 w-full shrink-0 flex-col border-b border-[var(--border)] bg-[var(--surface-subtle)] lg:max-h-none lg:w-72 lg:border-b-0 lg:border-r">
             <div className="flex border-b border-[var(--border)]">
               {(
                 [
@@ -440,6 +461,7 @@ export function DatabaseWorkspace({
               {sidebarTab === "starters" ? (
                 <div className="space-y-2">
                   <select
+                    aria-label="Starter query category"
                     value={templateCategory}
                     onChange={(e) => setTemplateCategory(e.target.value)}
                     className="input-modern w-full py-1.5 text-xs"
@@ -508,7 +530,7 @@ export function DatabaseWorkspace({
                                 <span className="font-mono text-primary">{t.table_name}</span>
                                 {t.num_rows != null ? (
                                   <span className="shrink-0 tabular-nums text-fg-subtle">
-                                    {Number(t.num_rows).toLocaleString()}
+                                    {formatNumber(t.num_rows)}
                                   </span>
                                 ) : null}
                               </span>
@@ -565,7 +587,8 @@ export function DatabaseWorkspace({
               }}
               onKeyDown={handleKeyDown}
               spellCheck={false}
-              placeholder="Pick a starter query from the left panel, or write your own SELECT…"
+              // Not "the left panel": the panel stacks ABOVE the editor below lg.
+              placeholder="Pick a starter query from the Starters panel, or write your own SELECT…"
               rows={8}
               className="w-full resize-y border-0 bg-[var(--surface-input)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none"
               style={{ minHeight: "120px", maxHeight: "34vh" }}
@@ -578,7 +601,7 @@ export function DatabaseWorkspace({
             </div>
           ) : null}
 
-          <div className="flex min-h-0 flex-1 flex-col">
+          <div data-testid="sql-results" className="flex min-h-[320px] flex-1 flex-col lg:min-h-0">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--chip-bg)] px-3 py-1">
               <span className="text-[10px] font-semibold uppercase tracking-widest text-fg-muted">
                 Results
@@ -679,6 +702,7 @@ export function DatabaseWorkspace({
         </span>
       </div>
     </div>
+    </>
   );
 }
 

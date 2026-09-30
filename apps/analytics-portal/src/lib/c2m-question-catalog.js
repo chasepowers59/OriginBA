@@ -41,6 +41,7 @@ export const QUESTIONS = [
   q({
     id: "accounts-by-class",
     process: "customer", workstream: "Customer Information",
+    folder: "customer_service", essential: true,
     kind: "count",
     title: "How many accounts, by customer class?",
     why: "The denominator behind almost every other number. A class with a handful of accounts is usually a configuration left over from implementation.",
@@ -56,11 +57,12 @@ export const QUESTIONS = [
   q({
     id: "self-service-adoption",
     process: "customer", workstream: "Customer Information",
+    folder: "customer_service",
     kind: "distribution",
     title: "What is self-service adoption, by customer class?",
     why: "Self-service take-up is the cheapest lever on contact volume. Splitting by class shows where a campaign would land.",
     canvas: "rpt_customer_account",
-    axis: "Customer Class", value: "Self-Service %",
+    axis: "Customer Class", value: "Self-Service Enabled", agg: "share",
     sql: `select coalesce("Customer Class", '(unset)') as "Customer Class",
                  count(*)::bigint as "Accounts",
                  count(*) filter (where "Self-Service Enabled")::bigint as "Self-Service",
@@ -72,6 +74,7 @@ export const QUESTIONS = [
   q({
     id: "accounts-no-email",
     process: "customer", workstream: "Customer Contact",
+    folder: "customer_service",
     kind: "count",
     title: "How many accounts have no email address on file?",
     why: "An account with no email cannot be sent a bill-ready notification, so every one of them is a paper bill and a phone call waiting to happen.",
@@ -88,6 +91,7 @@ export const QUESTIONS = [
   q({
     id: "notification-outcomes",
     process: "customer", workstream: "Customer Notification",
+    folder: "customer_service", essential: true,
     kind: "distribution",
     title: "Did the customer actually get told? Notification outcomes by type.",
     why: "A cancelled notification is normal; a RATE of cancellation is a signal. Errors are customers who were never reached at all.",
@@ -107,7 +111,8 @@ export const QUESTIONS = [
   q({
     id: "notifications-stuck",
     process: "customer", workstream: "Customer Notification",
-    kind: "outlier",
+    folder: "customer_service",
+    kind: "outlier", all_dates: true,
     title: "Which notifications have been outstanding longest?",
     why: "A task pending for weeks is not pending, it is stuck. These are the ones a person has to look at.",
     canvas: "rpt_customer_notification",
@@ -125,6 +130,7 @@ export const QUESTIONS = [
   q({
     id: "device-estate",
     process: "meter", workstream: "Device Management",
+    folder: "assets_devices", essential: true,
     kind: "count",
     title: "What is the device estate, by type and attachment?",
     why: "Meters reach a service point through an install event; communication modules through service point equipment. Counting only one route hides half the estate.",
@@ -142,6 +148,7 @@ export const QUESTIONS = [
   q({
     id: "asset-disposition",
     process: "meter", workstream: "Asset Management",
+    folder: "assets_devices", essential: true,
     kind: "distribution",
     title: "Where is the physical estate sitting?",
     why: "Disposition is the asset-side status: installed, in store, in receipt, retired. In-store stock that never moves is capital doing nothing.",
@@ -157,21 +164,25 @@ export const QUESTIONS = [
   q({
     id: "meters-not-registered",
     process: "meter", workstream: "Device Management",
+    folder: "assets_devices", essential: true,
     kind: "outlier",
     title: "Which installed meters never registered with the head-end?",
     why: "An installed meter the network has never heard from is an AMI rollout failure. It bills on estimates until someone visits it.",
     canvas: "rpt_device_asset",
+    filters: [{"field": "Never Registered At Head-End", "op": "eq", "value": true},
+              {"field": "Is Attached To Service Point", "op": "eq", "value": true}],
     axis: "Device Type", value: "Devices",
     sql: `select coalesce("Device Type", "Device Type Code") as "Device Type",
                  coalesce("Head-End Registration Status Code", '(none)') as "Head-End Status",
                  count(*)::bigint as "Devices"
           from reporting.rpt_device_asset
-          where "Is Attached To Service Point"
+          where "Is Attached To Service Point" and "Never Registered At Head-End"
           group by 1, 2 order by 3 desc`,
   }),
   q({
     id: "service-off-but-installed",
     process: "meter", workstream: "Service Point",
+    folder: "field_operations", essential: true,
     kind: "count",
     title: "How many premises have a meter installed but service switched off?",
     why: "Present but disconnected. A meter can be asset-INSTALLED and install-OFF at the same time, and only one of those two statuses says whether anyone is being served.",
@@ -190,7 +201,8 @@ export const QUESTIONS = [
   q({
     id: "usage-no-active-sa",
     process: "meter", workstream: "Service Point",
-    kind: "outlier",
+    folder: "usage_metering",
+    kind: "outlier", all_dates: true,
     title: "Which service points are recording usage with no active agreement?",
     why: "Consumption nobody is being billed for. Either service started without an agreement or one was stopped while the meter kept running.",
     canvas: "rpt_premise_sp",
@@ -208,6 +220,7 @@ export const QUESTIONS = [
   q({
     id: "billed-revenue-by-type",
     process: "usage", workstream: "Billing",
+    folder: "billing_revenue", essential: true,
     kind: "total",
     // Declared for the portal, which builds its own governed query and never runs the
     // SQL below. Without these the tile showed the unrestricted total under a caption
@@ -234,6 +247,7 @@ export const QUESTIONS = [
   q({
     id: "billed-not-revenue",
     process: "financial", workstream: "Revenue",
+    folder: "billing_revenue",
     kind: "total", unit: "money",
     filters: [{"field": "Is Frozen", "op": "eq", "value": true},
               {"field": "Is Cancelled", "op": "eq", "value": false},
@@ -253,10 +267,12 @@ export const QUESTIONS = [
   q({
     id: "charge-basis-split",
     process: "usage", workstream: "Billing",
+    folder: "billing_revenue",
     kind: "distribution",
     title: "How does a bill split between consumption, demand, service quantity and flat charges?",
     why: "The charge basis split is what tells you whether a rate is volumetric or fixed. It is also the split that goes wrong first when a rate is reconfigured.",
     canvas: "rpt_bill_segment",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "SA Type", value: "Consumption Charge Amount",
     sql: `select coalesce("SA Type", "SA Type Code") as "SA Type",
                  round(sum("Consumption Charge Amount")::numeric, 2) as "Consumption Charge Amount",
@@ -272,11 +288,13 @@ export const QUESTIONS = [
   q({
     id: "estimated-billing",
     process: "usage", workstream: "Billing",
+    folder: "billing_revenue",
     kind: "distribution",
     title: "How much billing is running on estimates?",
     why: "An estimated bill is a read that did not arrive. A rising rate here is a metering problem showing up as a billing number.",
     canvas: "rpt_bill_segment",
-    axis: "SA Type", value: "Estimated %",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}],
+    axis: "SA Type", value: "Estimated Segment", agg: "share",
     sql: `select coalesce("SA Type", "SA Type Code") as "SA Type",
                  count(*)::bigint as "Segments",
                  count(*) filter (where "Estimated Segment")::bigint as "Estimated",
@@ -288,7 +306,11 @@ export const QUESTIONS = [
   }),
   q({
     id: "rebilled-segments",
+    // Declared for the portal's governed query (rebilled segments only: without it every never-cancelled segment drew a null bar; demo25, 2026-09-04).
+    // every rebilled segment is cancelled (Ellensburg 9,143 of 9,143): both declared, the result is the rebills
+    filters: [{"field": "Is Cancelled", "op": "eq", "value": true}, {"field": "Is Rebilled", "op": "eq", "value": true}],
     process: "usage", workstream: "Billing",
+    folder: "billing_revenue", essential: true,
     kind: "count",
     title: "How much is being rebilled, and why?",
     why: "Every rebill is a bill the utility got wrong the first time. The cancel reason is where the pattern is.",
@@ -299,16 +321,18 @@ export const QUESTIONS = [
                  count(distinct "Account ID")::bigint as "Accounts",
                  round(sum(abs("Billed Amount"))::numeric, 2) as "Absolute Amount"
           from reporting.rpt_bill_segment
-          where "Is Cancelled"
+          where "Is Cancelled" and "Is Rebilled"
           group by 1 order by 2 desc`,
   }),
   q({
     id: "highest-bills",
     process: "usage", workstream: "Billing",
+    folder: "billing_revenue",
     kind: "outlier",
     title: "Which bill segments are the largest?",
     why: "The top of the distribution is where billing errors surface first, and where a high-bill complaint is about to come from.",
     canvas: "rpt_bill_segment",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "Main Customer Name", value: "Billed Amount",
     sql: `select "Bill Segment ID", "Bill Date", "Billed Amount", "Billed Usage",
                  "Billed Usage UOM" as "UOM", "Average Price Per Unit",
@@ -322,10 +346,12 @@ export const QUESTIONS = [
   q({
     id: "price-per-unit-outliers",
     process: "usage", workstream: "Rates",
+    folder: "billing_revenue",
     kind: "outlier",
     title: "Where is the price per unit furthest from its rate's norm?",
     why: "A segment priced far from every other segment on the same rate is either a proration, a rate change mid-period, or a mistake. All three are worth seeing.",
     canvas: "rpt_bill_segment",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "Sole Rate Schedule Code", value: "Average Price Per Unit",
     sql: `with priced as (
             select "Bill Segment ID", "Bill Date", "Sole Rate Schedule Code" as rs,
@@ -352,7 +378,8 @@ export const QUESTIONS = [
   q({
     id: "unbilled-revenue",
     process: "usage", workstream: "Billing",
-    kind: "outlier",
+    folder: "billing_revenue", essential: true,
+    kind: "outlier", all_dates: true,
     title: "What service is going unbilled?",
     why: "Revenue earned and not invoiced. A stopped agreement awaiting a final bill is the expensive kind — the customer has gone.",
     canvas: "rpt_unbilled_revenue",
@@ -370,6 +397,7 @@ export const QUESTIONS = [
   q({
     id: "rate-configuration-shape",
     process: "usage", workstream: "Rates",
+    folder: "billing_revenue",
     kind: "count",
     title: "How complicated is each rate?",
     why: "Rule count is the honest measure of a rate's complexity, and complexity is what makes a rate change risky. Conditional rules are the ones that only apply sometimes.",
@@ -391,10 +419,12 @@ export const QUESTIONS = [
   q({
     id: "financial-position",
     process: "financial", workstream: "Financial Transactions",
+    folder: "finance_adjustments", essential: true,
     kind: "total",
     title: "What is the financial position, by transaction type?",
     why: "Every movement of money in C2M is a financial transaction. Splitting by type separates what was charged from what was paid from what was reversed.",
     canvas: "rpt_financial_txn",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}],
     axis: "FT Type", value: "Current Amount",
     sql: `select coalesce("FT Type", "FT Type Code") as "FT Type",
                  count(*)::bigint as "Transactions",
@@ -408,22 +438,25 @@ export const QUESTIONS = [
   q({
     id: "payments-by-tender",
     process: "financial", workstream: "Payments",
+    folder: "payments_cashiering", essential: true,
     kind: "distribution",
     title: "How are customers paying?",
     why: "Tender mix drives cashiering cost. A channel that is growing tells you where to invest, and one that is shrinking tells you what to retire.",
     canvas: "rpt_payment_tender",
+    filters: [{"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "Tender Type", value: "Tender Amount",
     sql: `select coalesce("Tender Type", "Tender Type Code") as "Tender Type",
                  count(*)::bigint as "Tenders",
                  round(sum("Tender Amount")::numeric, 2) as "Tender Amount",
-                 round(avg("Tender Amount")::numeric, 2) as "Average Tender",
-                 count(*) filter (where "Is Cancelled")::bigint as "Cancelled"
+                 round(avg("Tender Amount")::numeric, 2) as "Average Tender"
           from reporting.rpt_payment_tender
+          where not "Is Cancelled"
           group by 1 order by 3 desc nulls last`,
   }),
   q({
     id: "unbalanced-tender-controls",
     process: "financial", workstream: "Cashiering",
+    folder: "payments_cashiering", essential: true,
     kind: "outlier",
     title: "Which tender controls have not been balanced?",
     why: "An unbalanced tender control is cash the utility cannot yet account for. Days unbalanced is the aging on that.",
@@ -440,22 +473,25 @@ export const QUESTIONS = [
   q({
     id: "gl-not-extracted",
     process: "financial", workstream: "General Ledger",
-    kind: "count",
+    folder: "finance_adjustments", essential: true,
+    kind: "count", all_dates: true,
     title: "How much has not yet reached the general ledger?",
     why: "Financial transactions post to the GL on a schedule. Anything sitting unextracted is a reconciliation difference between C2M and the finance system.",
     canvas: "rpt_gl",
+    filters: [{"field": "Is Extracted to GL", "op": "eq", "value": false}, {"field": "Is Debit", "op": "eq", "value": true}],
     axis: "GL Distribution Status", value: "GL Amount",
     sql: `select coalesce("GL Distribution Status", "GL Distribution Status Code", '(unset)') as "GL Distribution Status",
                  count(*)::bigint as "GL Lines",
                  count(distinct "FT ID")::bigint as "Transactions",
-                 round(sum("GL Amount")::numeric, 2) as "GL Amount",
-                 count(*) filter (where "Is Extracted to GL")::bigint as "Extracted"
+                 round(sum("GL Amount")::numeric, 2) as "GL Amount (Debits)"
           from reporting.rpt_gl
+          where not "Is Extracted to GL" and "Is Debit"
           group by 1 order by 4 desc nulls last`,
   }),
   q({
     id: "revenue-reconciliation",
     process: "financial", workstream: "General Ledger",
+    folder: "finance_adjustments",
     kind: "outlier",
     title: "Where does calculated revenue disagree with the financial transactions?",
     why: "The calc lines say what the rate produced; the financial transactions say what was posted. They should agree to the cent, and where they do not there is a real variance.",
@@ -477,6 +513,7 @@ export const QUESTIONS = [
   q({
     id: "arrears-by-band",
     process: "credit", workstream: "Collections",
+    folder: "ar_collections", essential: true,
     kind: "total",
     title: "What is owed, and how old is it?",
     why: "Aged debt is the collections work queue and the bad-debt provision at the same time. The oldest band is the one that stops being collectable.",
@@ -500,6 +537,7 @@ export const QUESTIONS = [
   q({
     id: "arrears-by-class",
     process: "credit", workstream: "Collections",
+    folder: "ar_collections",
     kind: "distribution",
     title: "Which customer classes carry the arrears?",
     why: "Total arrears is one number; who owes it decides which collection approach applies. Commercial debt and residential debt are not worked the same way.",
@@ -516,6 +554,7 @@ export const QUESTIONS = [
   q({
     id: "largest-debtors",
     process: "credit", workstream: "Collections",
+    folder: "ar_collections", essential: true,
     kind: "outlier",
     title: "Who owes the most?",
     why: "Collections effort follows the money. The top of this list is worth a phone call before it is worth a process.",
@@ -534,6 +573,7 @@ export const QUESTIONS = [
   q({
     id: "collection-effectiveness",
     process: "credit", workstream: "Collections",
+    folder: "ar_collections",
     kind: "distribution",
     title: "Are collection processes actually collecting?",
     why: "A process that runs to completion without reducing arrears has cost money and recovered nothing. Percent of arrears collected is the measure that matters.",
@@ -551,6 +591,7 @@ export const QUESTIONS = [
   q({
     id: "pay-plan-health",
     process: "credit", workstream: "Pay Plans",
+    folder: "ar_collections",
     kind: "distribution",
     title: "Are customers keeping their pay plans?",
     why: "A broken pay plan is a customer who tried and could not. The kept-versus-broken split is the honest measure of whether the plans are set at affordable amounts.",
@@ -571,12 +612,16 @@ export const QUESTIONS = [
   q({
     id: "field-activity-backlog",
     process: "field", workstream: "Field Operations",
-    kind: "count",
+    folder: "field_operations", essential: true,
+    kind: "count", all_dates: true,
     title: "What is the field activity backlog, by type?",
     why: "Field work is the most expensive thing a utility does. Backlog by type shows which work is accumulating faster than the crews clear it.",
     canvas: "rpt_field_activity",
-    axis: "Activity Type", value: "Activities",
-    sql: `select coalesce("Activity Type", "Activity Type Code") as "Activity Type",
+    // the business type: "Activity Type" is MDM's category, "Field Activity" on every row
+    axis: "Field Activity Type", value: "Activities",
+    // open work only: Is Open is C2M's final-status condition (F1_BUS_OBJ_STATUS)
+    filters: [{"field": "Is Open", "op": "eq", "value": true}],
+    sql: `select coalesce("Field Activity Type", "Field Activity Type Code") as "Field Activity Type",
                  coalesce("Activity Status Code", '(unset)') as "Status",
                  count(*)::bigint as "Activities",
                  count(*) filter (where trim("Appointment Required") = 'Y')::bigint as "Appointment Required",
@@ -584,12 +629,14 @@ export const QUESTIONS = [
                  -- column and the canvas carries the source shape faithfully.
                  round(avg(nullif(trim("Number of Retries"),'')::numeric), 2) as "Avg Retries"
           from reporting.rpt_field_activity
+          where "Is Open"
           group by 1, 2 order by 3 desc`,
   }),
   q({
     id: "exceptions-open",
     process: "field", workstream: "Data Quality",
-    kind: "outlier",
+    folder: "data_quality", essential: true,
+    kind: "outlier", all_dates: true,
     title: "Which data exceptions are open longest?",
     why: "A VEE or usage exception blocks a read from becoming a bill. Days open is how long that revenue has been stuck.",
     canvas: "rpt_exception",
@@ -606,6 +653,7 @@ export const QUESTIONS = [
   q({
     id: "device-events",
     process: "field", workstream: "Device Events",
+    folder: "assets_devices", essential: true,
     kind: "distribution",
     title: "What are the meters reporting?",
     why: "Device events are the meter's own account of what happened to it — tamper, outage, reverse flow. The mix is an early warning the billing data will not give you.",
@@ -622,6 +670,7 @@ export const QUESTIONS = [
   q({
     id: "batch-failures",
     process: "field", workstream: "Batch Operations",
+    folder: "data_quality", essential: true,
     kind: "outlier",
     title: "Which overnight batches failed or ran long?",
     why: "Batch is what makes bills exist. A failed billing batch is tomorrow's missed bill run, and a slow one is the reason the window is closing.",
@@ -637,6 +686,7 @@ export const QUESTIONS = [
   q({
     id: "todo-backlog",
     process: "field", workstream: "Work Queues",
+    folder: "data_quality", essential: true,
     kind: "count",
     title: "What is sitting in the to-do queues?",
     why: "A to-do is work the system could not finish on its own. The oldest open entries are the exceptions nobody owns.",
@@ -660,27 +710,28 @@ export const QUESTIONS = [
   q({
     id: "kpi-billing-accuracy",
     process: "usage", workstream: "Billing Performance",
-    kind: "distribution", unit: "percent", target: "above 95%",
-    title: "Billing accuracy rate — what share of bills were not rebilled?",
-    why: "The headline meter-to-cash KPI. Every cancelled and rebilled segment is a bill the utility got wrong and had to redo, and the industry target is above 95% right first time.",
+    folder: "billing_revenue",
+    kind: "distribution", unit: "percent", target: "below 5%",
+    title: "Billing accuracy — what share of bill segments had to be cancelled and redone, by cycle?",
+    why: "The headline meter-to-cash KPI. Every cancelled segment is a bill the utility got wrong and had to redo; the industry target is above 95% right first time, so below 5% here.",
     canvas: "rpt_bill_segment",
-    axis: "Bill Cycle", value: "Accuracy %",
+    axis: "Bill Cycle", value: "Is Cancelled", agg: "share",
     sql: `select coalesce("Bill Cycle", "Bill Cycle Code", '(unset)') as "Bill Cycle",
                  count(*)::bigint as "Segments",
-                 count(*) filter (where "Is Cancelled" or "Is Rebilled")::bigint as "Rebilled or Cancelled",
-                 round(100.0 * (count(*) - count(*) filter (where "Is Cancelled" or "Is Rebilled"))
-                       / nullif(count(*),0), 2) as "Accuracy %"
+                 count(*) filter (where "Is Cancelled")::bigint as "Cancelled",
+                 round(100.0 * count(*) filter (where "Is Cancelled") / nullif(count(*),0), 2) as "Cancelled %"
           from reporting.rpt_bill_segment
           group by 1 order by 2 desc`,
   }),
   q({
     id: "kpi-exception-rate",
     process: "field", workstream: "Data Quality",
+    folder: "data_quality", essential: true,
     kind: "distribution", unit: "percent", target: "under 10%",
-    title: "Exception rate — what share of usage is stuck behind an exception?",
+    title: "Exception backlog — what share of exceptions are still open, by domain?",
     why: "An exception blocks a read from becoming a bill. The MDM benchmark is under 10%; above that the exception queue grows faster than anyone clears it and the billing window starts closing.",
     canvas: "rpt_exception",
-    axis: "Exception Domain", value: "Open",
+    axis: "Exception Domain", value: "Is Open", agg: "share",
     sql: `select "Exception Domain",
                  count(*)::bigint as "Exceptions",
                  count(*) filter (where "Is Open")::bigint as "Open",
@@ -693,11 +744,13 @@ export const QUESTIONS = [
   q({
     id: "kpi-estimation-rate",
     process: "usage", workstream: "Billing Performance",
+    folder: "billing_revenue",
     kind: "distribution", unit: "percent", target: "as low as possible",
-    title: "Estimation rate — how much revenue is billed on estimates?",
+    title: "Estimation rate — what share of bill segments were estimated, by cycle?",
     why: "Estimated bills generate disputes, and disputes generate calls. A rising estimation rate is an AMI reliability problem arriving as a customer-service cost.",
     canvas: "rpt_bill_segment",
-    axis: "Bill Cycle", value: "Estimated %",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}],
+    axis: "Bill Cycle", value: "Estimated Segment", agg: "share",
     sql: `select coalesce("Bill Cycle", "Bill Cycle Code", '(unset)') as "Bill Cycle",
                  count(*)::bigint as "Frozen Segments",
                  count(*) filter (where "Estimated Segment")::bigint as "Estimated",
@@ -710,11 +763,12 @@ export const QUESTIONS = [
   q({
     id: "kpi-write-off-exposure",
     process: "credit", workstream: "Credit Risk",
+    folder: "ar_collections", essential: true,
     kind: "total", unit: "money", target: "under 1% of billed revenue",
     title: "Write-off exposure — how much debt is past the point of collection?",
     why: "Debt beyond 120 days is the bad-debt provision in waiting. The benchmark is under 1% of billed revenue; this is the number a finance director asks for first.",
     canvas: "rpt_customer_account",
-    axis: "Customer Class", value: "120+ Days",
+    axis: "Customer Class", value: "Arrears 120+ Days", agg: "sum",
     sql: `select coalesce("Customer Class", '(unset)') as "Customer Class",
                  count(*) filter (where coalesce("Arrears 120+ Days",0) > 0)::bigint as "Accounts At Risk",
                  round(sum("Arrears 120+ Days")::numeric, 2) as "120+ Days",
@@ -726,6 +780,7 @@ export const QUESTIONS = [
   q({
     id: "kpi-days-unbilled",
     process: "usage", workstream: "Billing Performance",
+    folder: "billing_revenue",
     kind: "outlier", unit: "days", target: "billing cycle under 30 days",
     title: "Billing cycle health — which agreements are furthest past their window?",
     why: "The benchmark is a billing cycle under 30 days. Every day past that is revenue earned and not invoiced, and the tail is where the real money sits.",
@@ -745,6 +800,8 @@ export const QUESTIONS = [
     id: "kpi-first-time-fix",
     process: "field", workstream: "Field Performance",
     kind: "distribution", unit: "percent", target: "high is good",
+    // not ready to run: rpt_field_activity carries no repeat-visit flag or count
+    ready_to_run: false,
     title: "First-time fix — which field work needed more than one visit?",
     why: "First-time fix rate is the field KPI that moves cost and satisfaction together. Retries are the inverse: every one is a truck sent twice for the same job.",
     canvas: "rpt_field_activity",
@@ -761,7 +818,11 @@ export const QUESTIONS = [
   q({
     id: "kpi-call-deflection",
     process: "customer", workstream: "Channel & Deflection",
+    folder: "customer_service",
     kind: "distribution", unit: "percent", target: "high is good",
+    // not ready to run: CI_CC records no channel at any client (contact method on 235 of
+    // Ellensburg's 150,336 contacts, 6 of Newark's 993,294; contact source on none), 2026-09-30
+    ready_to_run: false,
     title: "Channel mix — how much customer contact came through self-service?",
     why: "Call deflection is the cheapest lever a utility has on contact cost. The contact method is what says whether a customer solved it themselves or needed a person.",
     canvas: "rpt_customer_contact",
@@ -779,6 +840,7 @@ export const QUESTIONS = [
   q({
     id: "accounts-multi-utility",
     process: "customer", workstream: "Customer Information",
+    folder: "customer_service",
     kind: "distribution",
     title: "How many customers take more than one utility service?",
     why: "A multi-service customer is worth more and is harder to lose. It also means one billing failure affects several services at once.",
@@ -796,7 +858,10 @@ export const QUESTIONS = [
   }),
   q({
     id: "accounts-on-alerts",
+    // Declared for the portal's governed query (accounts with a typed CI_ACCT_ALERT; "Has Alert Text" is the redacted ALERT_INFO free text, a different thing; demo25, 2026-09-04).
+    filters: [{"field": "Active Alert Count", "op": "gte", "value": 1}],
     process: "customer", workstream: "Customer Information",
+    folder: "customer_service",
     kind: "count",
     title: "Which accounts carry active alerts?",
     why: "An alert is a flag someone put on the account for a reason — a dispute, a vulnerability, a payment arrangement. It should be visible before anyone contacts the customer.",
@@ -807,12 +872,13 @@ export const QUESTIONS = [
                  round(sum("Total Arrears")::numeric, 2) as "Total Arrears",
                  count(*) filter (where "Is On Active Pay Plan")::bigint as "On Pay Plan"
           from reporting.rpt_customer_account
-          where "Has Alert"
+          where "Active Alert Count" >= 1
           group by 1 order by 2 desc`,
   }),
   q({
     id: "bill-routing-mix",
     process: "customer", workstream: "Channel & Deflection",
+    folder: "customer_service",
     kind: "distribution",
     title: "How are bills actually being delivered?",
     why: "Every paper bill has a print, post and handling cost. Route type is the only place that says which customers still get one.",
@@ -828,6 +894,7 @@ export const QUESTIONS = [
   q({
     id: "contact-reasons",
     process: "customer", workstream: "Customer Contact",
+    folder: "customer_service", essential: true,
     kind: "distribution",
     title: "Why are customers getting in touch?",
     why: "Contact reason is the demand signal. The type that grows fastest is the process that is failing upstream.",
@@ -843,11 +910,13 @@ export const QUESTIONS = [
   q({
     id: "case-resolution-time",
     process: "customer", workstream: "Cases",
+    folder: "customer_service", essential: true,
     kind: "distribution", unit: "days",
     title: "How long do cases take to close, by type?",
     why: "Case duration is the customer's experience of the utility's back office. The types that take longest are where the process, not the person, is slow.",
     canvas: "rpt_case",
-    axis: "Case Type", value: "Avg Hours",
+    filters: [{"field": "Is Closed", "op": "eq", "value": true}],
+    axis: "Case Type", value: "Case Duration Hours", agg: "avg",
     sql: `select coalesce("Case Type", "Case Type Code") as "Case Type",
                  count(*)::bigint as "Cases",
                  count(*) filter (where "Is Closed")::bigint as "Closed",
@@ -860,11 +929,12 @@ export const QUESTIONS = [
   q({
     id: "notification-error-detail",
     process: "customer", workstream: "Customer Notification",
+    folder: "customer_service",
     kind: "outlier",
     title: "Which notification types fail most often?",
     why: "An errored notification is a customer who was never told. Ranking by error rate rather than error count stops the highest-volume type hiding a worse one.",
     canvas: "rpt_customer_notification",
-    axis: "Task Type", value: "Error %",
+    axis: "Task Type", value: "Is Error", agg: "share",
     sql: `select coalesce("Task Type", "Task Type Code") as "Task Type",
                  "Task Class Code" as "Task Class",
                  count(*)::bigint as "Total",
@@ -880,11 +950,12 @@ export const QUESTIONS = [
   q({
     id: "read-coverage",
     process: "meter", workstream: "Meter Reading",
+    folder: "usage_metering", essential: true,
     kind: "distribution", unit: "percent",
-    title: "Read quality — how many measurements are estimated or missing?",
+    title: "Read quality — what share of measurements are estimated, by device type?",
     why: "A read that is estimated or missing is the root of an estimated bill and a future dispute. This is the number that should be watched daily during an AMI rollout.",
     canvas: "rpt_measurement",
-    axis: "Device Type", value: "Estimated %",
+    axis: "Device Type", value: "Is Estimated Measurement", agg: "share",
     sql: `select coalesce("Device Type", "Device Type Code", '(unset)') as "Device Type",
                  count(*)::bigint as "Measurements",
                  count(*) filter (where "Is Regular Measurement")::bigint as "Regular",
@@ -897,23 +968,26 @@ export const QUESTIONS = [
   q({
     id: "meter-read-routes",
     process: "meter", workstream: "Meter Reading",
+    folder: "usage_metering", essential: true,
     kind: "count",
     title: "How is the meter reading workload distributed across routes?",
     why: "Route size is the daily workload of a reader or the daily load on the head-end. A route far larger than its neighbours is the one that runs late.",
     canvas: "rpt_premise_sp",
-    axis: "Meter Read Route Code", value: "Service Points",
-    sql: `select coalesce("Meter Read Cycle Code", '(unset)') as "Cycle",
-                 coalesce("Meter Read Route Code", '(unset)') as "Meter Read Route Code",
+    // MDM's route: CI_SP's meter-read route is empty at all six clients (2026-09-30)
+    axis: "Measurement Cycle Route", value: "Service Points",
+    sql: `select coalesce("Measurement Cycle Route", '(unset)') as "Measurement Cycle Route",
                  count(*)::bigint as "Service Points",
                  count(*) filter (where "Has Installed Device")::bigint as "With Device",
                  count(*) filter (where "Service Is On")::bigint as "Service On"
           from reporting.rpt_premise_sp
-          group by 1, 2 order by 3 desc`,
+          group by 1 order by 2 desc`,
   }),
   q({
     id: "meter-age-replacement",
     process: "meter", workstream: "Asset Management",
-    kind: "outlier", unit: "days",
+    kind: "outlier", unit: "days", all_dates: true,
+    // not ready to run: rpt_device_asset has no years-in-service measure; install age is a date, not a number to rank
+    ready_to_run: false,
     title: "Which meters are oldest relative to their useful life?",
     why: "A meter past its useful life drifts, and a drifting meter under-reads. This is the replacement programme's work queue and its capital case at once.",
     canvas: "rpt_device_asset",
@@ -932,7 +1006,11 @@ export const QUESTIONS = [
   q({
     id: "asset-replacement-value",
     process: "meter", workstream: "Asset Management",
+    folder: "assets_devices",
     kind: "total", unit: "money",
+    // not ready to run: Replacement Cost is 0 on every asset and asset type at all six
+    // clients (2026-09-30); the column stays on the canvas for a client that records it
+    ready_to_run: false,
     title: "What would it cost to replace the estate?",
     why: "Replacement cost by asset type is the capital plan. Splitting it by disposition shows how much of it is already sitting in a warehouse.",
     canvas: "rpt_device_asset",
@@ -950,6 +1028,8 @@ export const QUESTIONS = [
     id: "device-model-reliability",
     process: "meter", workstream: "Device Events",
     kind: "outlier",
+    // not ready to run: events per device needs a distinct device count beside the events; the builder divides nothing
+    ready_to_run: false,
     title: "Which meter models report the most events per device?",
     why: "Events per device normalises for fleet size, which is what turns a device-event count into a reliability comparison between models.",
     canvas: "rpt_device_event",
@@ -967,6 +1047,7 @@ export const QUESTIONS = [
   q({
     id: "service-on-off-churn",
     process: "meter", workstream: "Service Point",
+    folder: "field_operations", essential: true,
     kind: "outlier",
     title: "Which service points are switched on and off most?",
     why: "Repeated on/off at one point is either a rental property turning over or a disconnection cycle. Both are expensive and both look the same in this list until you open one.",
@@ -986,6 +1067,7 @@ export const QUESTIONS = [
   q({
     id: "life-support-premises",
     process: "meter", workstream: "Service Point",
+    folder: "customer_service",
     kind: "count",
     title: "Which premises are flagged life support or sensitive load?",
     why: "These customers must never be disconnected by an automated process. The flag exists so that every collections and field workflow can check it, which means someone has to know the list.",
@@ -1004,10 +1086,12 @@ export const QUESTIONS = [
   q({
     id: "revenue-by-cycle",
     process: "usage", workstream: "Billing",
+    folder: "billing_revenue", essential: true,
     kind: "total", unit: "money",
     title: "What does each bill cycle bring in?",
     why: "Cycle is how the billing calendar is actually organised. A cycle whose revenue moves without its customer count moving is a rate or a read problem.",
     canvas: "rpt_bill_segment",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "Bill Cycle", value: "Billed Amount",
     sql: `select coalesce("Bill Cycle", "Bill Cycle Code", '(unset)') as "Bill Cycle",
                  count(distinct "Bill ID")::bigint as "Bills",
@@ -1021,10 +1105,13 @@ export const QUESTIONS = [
   q({
     id: "consumption-by-uom",
     process: "usage", workstream: "Usage",
+    folder: "usage_metering", essential: true,
     kind: "total",
     title: "How much was consumed, by unit of measure?",
     why: "Volume is the physical side of revenue. Splitting by unit keeps kWh, therms and gallons apart, which is the mistake that makes a usage total meaningless.",
     canvas: "rpt_billed_usage",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false},
+              {"field": "Is Usage", "op": "eq", "value": true}],
     axis: "Unit of Measure", value: "Billed Quantity",
     sql: `select coalesce("Unit of Measure", "Unit of Measure Code") as "Unit of Measure",
                  "UOM Class",
@@ -1032,12 +1119,13 @@ export const QUESTIONS = [
                  round(sum("Billed Quantity")::numeric, 2) as "Billed Quantity",
                  round(avg("Billed Quantity")::numeric, 2) as "Average Per Line"
           from reporting.rpt_billed_usage
-          where "Is Frozen" and not "Is Cancelled"
+          where "Is Frozen" and not "Is Cancelled" and "Is Usage"
           group by 1, 2 order by 4 desc nulls last`,
   }),
   q({
     id: "usage-vs-read",
     process: "usage", workstream: "Usage",
+    folder: "usage_metering", essential: true,
     kind: "outlier",
     title: "Where does billed usage disagree with the meter reads behind it?",
     why: "Billed usage should be derivable from the reads. A gap means a correction, an override or an estimate — and the customer will notice before the utility does.",
@@ -1057,10 +1145,12 @@ export const QUESTIONS = [
   q({
     id: "zero-and-negative-bills",
     process: "usage", workstream: "Billing",
+    folder: "billing_revenue",
     kind: "outlier", unit: "money",
     title: "Which bills came out zero or negative?",
     why: "A zero bill is usually a missing read; a negative one is a credit the customer will ring about. Neither should appear without a reason attached.",
     canvas: "rpt_bill_segment",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "Main Customer Name", value: "Billed Amount",
     sql: `select "Bill Segment ID", "Bill Date", "Billed Amount", "Billed Usage",
                  coalesce("SA Type", "SA Type Code") as "SA Type",
@@ -1075,9 +1165,12 @@ export const QUESTIONS = [
     id: "consumption-outliers",
     process: "usage", workstream: "Usage",
     kind: "outlier",
+    // not ready to run: a distance from the rate's mean is a statistic the governed builder does not compute
+    ready_to_run: false,
     title: "Which premises consumed far more than others on the same rate?",
     why: "High consumption is a leak, a theft, a faulty meter or a genuinely large customer. Comparing within a rate schedule is what separates the fourth from the first three.",
     canvas: "rpt_bill_segment",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "Premise Address", value: "Std Devs From Mean",
     sql: `with u as (
             select "Bill Segment ID", "Bill Date", "Sole Rate Schedule Code" as rs,
@@ -1102,6 +1195,7 @@ export const QUESTIONS = [
   q({
     id: "rate-migration",
     process: "usage", workstream: "Rates",
+    folder: "billing_revenue",
     kind: "count",
     title: "Who moved rate, and to what?",
     why: "A rate change alters a customer's bill without them doing anything. The volume of moves is a risk register for the next bill run.",
@@ -1119,6 +1213,7 @@ export const QUESTIONS = [
   q({
     id: "bill-factor-prices",
     process: "usage", workstream: "Rates",
+    folder: "billing_revenue",
     kind: "count",
     title: "What prices are in force, and which are stale?",
     why: "A bill factor nobody has updated is charging last year's price. A bill factor no rule references is dead configuration that still looks live.",
@@ -1135,18 +1230,22 @@ export const QUESTIONS = [
   q({
     id: "billable-charges",
     process: "usage", workstream: "Billing",
+    folder: "billing_revenue",
     kind: "distribution", unit: "money",
     title: "What is being charged outside the rate engine?",
     why: "A billable charge is a one-off the rate did not produce — a fee, a reconnection, a deposit. High volumes here mean manual work happening every cycle.",
     canvas: "rpt_billable_charge",
-    axis: "Charge Template Code", value: "Charge Amount",
-    sql: `select coalesce("Charge Template Code", '(none)') as "Charge Template Code",
+    filters: [{"field": "Is Cancelled", "op": "eq", "value": false}],
+    // what the bill says: the template code is blank at Ellensburg (0 of 18,110 lines) and Fond
+    // du Lac, the line description is on every line at every client with charges (2026-09-30)
+    axis: "Charge Description", value: "Charge Amount",
+    sql: `select coalesce("Charge Description", '(none)') as "Charge Description",
                  count(*)::bigint as "Lines",
                  count(distinct "Billable Charge ID")::bigint as "Charges",
                  round(sum("Charge Amount")::numeric, 2) as "Charge Amount",
-                 count(*) filter (where "Is Cancelled")::bigint as "Cancelled",
                  count(*) filter (where not "Is Billed")::bigint as "Not Yet Billed"
           from reporting.rpt_billable_charge
+          where not "Is Cancelled"
           group by 1 order by 4 desc nulls last`,
   }),
 
@@ -1155,6 +1254,8 @@ export const QUESTIONS = [
     id: "payment-timing",
     process: "financial", workstream: "Payments",
     kind: "distribution", unit: "days",
+    // not ready to run: rpt_customer_account has no days-to-pay column; a row count is not a payment speed
+    ready_to_run: false,
     title: "How promptly are bills being paid?",
     why: "Days between the bill and the payment is DSO in its rawest form. It is also the number that tells you whether a due-date change worked.",
     canvas: "rpt_customer_account",
@@ -1171,7 +1272,10 @@ export const QUESTIONS = [
   }),
   q({
     id: "cancelled-payments",
+    // Declared for the portal's governed query (cancelled payments only: without it the not-cancelled majority drew a null bar; demo25, 2026-09-04).
+    filters: [{"field": "Is Cancelled", "op": "eq", "value": true}],
     process: "financial", workstream: "Payments",
+    folder: "payments_cashiering", essential: true,
     kind: "outlier", unit: "money",
     title: "Which payments were cancelled, and why?",
     why: "A cancelled payment is usually a returned item, and a returned item is money the utility counted and then lost. The reason code is where the pattern is.",
@@ -1188,6 +1292,7 @@ export const QUESTIONS = [
   q({
     id: "unbalanced-pay-events",
     process: "financial", workstream: "Cashiering",
+    folder: "payments_cashiering", essential: true,
     kind: "outlier", unit: "money",
     title: "Which payment events do not balance?",
     why: "The tenders taken and the payments applied should equal each other. Where they do not, cash has been recorded that was never applied to an account.",
@@ -1206,23 +1311,26 @@ export const QUESTIONS = [
   q({
     id: "adjustments-by-type",
     process: "financial", workstream: "Adjustments",
-    kind: "distribution", unit: "money",
+    folder: "finance_adjustments", essential: true,
+    kind: "distribution", unit: "money", chart: "horizontal",
     title: "What is being adjusted, and by how much?",
     why: "Adjustments are the manual override on an automated system. A type that grows is a process people have stopped trusting.",
     canvas: "rpt_financial_txn",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Adjustment", "op": "eq", "value": true},
+              {"field": "Adjustment Status Code", "op": "eq", "value": "50"}],
     axis: "Adjustment Type", value: "Adjustment Amount",
     sql: `select coalesce("Adjustment Type", "Adjustment Type Code", '(unset)') as "Adjustment Type",
                  count(*)::bigint as "Adjustments",
                  round(sum("Adjustment Amount")::numeric, 2) as "Adjustment Amount",
-                 count(distinct "Account ID")::bigint as "Accounts",
-                 count(*) filter (where "Is Adjustment Cancellation")::bigint as "Cancellations"
+                 count(distinct "Account ID")::bigint as "Accounts"
           from reporting.rpt_financial_txn
-          where "Is Adjustment" or "Is Adjustment Cancellation"
+          where "Is Frozen" and "Is Adjustment" and "Adjustment Status Code" = '50'
           group by 1 order by 3 desc nulls last`,
   }),
   q({
     id: "gl-by-account",
     process: "financial", workstream: "General Ledger",
+    folder: "finance_adjustments", essential: true,
     kind: "total", unit: "money",
     title: "What is posting to each general ledger account?",
     why: "This is the bridge between the billing system and the finance system. Finance reconciles to these numbers, so they are the ones that get questioned.",
@@ -1241,6 +1349,7 @@ export const QUESTIONS = [
   q({
     id: "revenue-by-class",
     process: "financial", workstream: "Revenue",
+    folder: "finance_adjustments",
     kind: "total", unit: "money",
     filters: [{"field": "Is Frozen", "op": "eq", "value": true},
               {"field": "Is Bill Segment", "op": "eq", "value": true},
@@ -1262,6 +1371,7 @@ export const QUESTIONS = [
   q({
     id: "credit-rating-movement",
     process: "credit", workstream: "Credit Risk",
+    folder: "ar_collections",
     kind: "distribution",
     title: "How is customer credit standing moving?",
     why: "Credit rating points are what drive deposits and collection severity. The events that create them tell you which process is downgrading customers.",
@@ -1278,6 +1388,7 @@ export const QUESTIONS = [
   q({
     id: "severance-pipeline",
     process: "credit", workstream: "Collections",
+    folder: "ar_collections", essential: true,
     kind: "distribution",
     title: "What is in the disconnection pipeline?",
     why: "Severance is the end of the collections path and the point of no return for the customer relationship. Knowing the volume before it executes is the whole value of watching it.",
@@ -1295,6 +1406,7 @@ export const QUESTIONS = [
   q({
     id: "arrears-without-process",
     process: "credit", workstream: "Collections",
+    folder: "ar_collections",
     kind: "outlier", unit: "money",
     title: "Who is in arrears with no collection process running?",
     why: "Debt nobody is chasing. Every account here is either an oversight or an exclusion somebody applied and never reviewed.",
@@ -1312,6 +1424,7 @@ export const QUESTIONS = [
   q({
     id: "pay-plan-vs-actual",
     process: "credit", workstream: "Pay Plans",
+    folder: "ar_collections",
     kind: "outlier", unit: "money",
     title: "Which pay plans are furthest behind schedule?",
     why: "The variance between what was scheduled and what was paid is the early warning that a plan is about to break, while there is still time to renegotiate it.",
@@ -1331,6 +1444,7 @@ export const QUESTIONS = [
   q({
     id: "sa-aged-balance",
     process: "credit", workstream: "Credit Risk",
+    folder: "ar_collections",
     kind: "total", unit: "money",
     title: "What does the aged balance look like at agreement level?",
     why: "Account-level arrears can hide a single agreement in deep debt behind others in credit. The agreement is where collections actually acts.",
@@ -1350,11 +1464,12 @@ export const QUESTIONS = [
   q({
     id: "batch-runtime-trend",
     process: "field", workstream: "Batch Operations",
+    folder: "data_quality",
     kind: "distribution", unit: "days",
     title: "Which batch jobs take the longest, on average?",
     why: "The overnight window is finite. The jobs at the top of this list are the ones that decide whether the window holds when volumes grow.",
     canvas: "rpt_batch",
-    axis: "Batch Code", value: "Avg Duration (min)",
+    axis: "Batch Code", value: "Duration (min)", agg: "avg",
     sql: `select "Batch Code", max("Program") as "Program",
                  count(*)::bigint as "Runs",
                  count(*) filter (where "Run Status Code" = '30')::bigint as "Errored",
@@ -1366,10 +1481,12 @@ export const QUESTIONS = [
   q({
     id: "todo-oldest",
     process: "field", workstream: "Work Queues",
-    kind: "outlier", unit: "days",
+    folder: "data_quality",
+    kind: "outlier", unit: "days", all_dates: true,
     title: "Which to-do entries have been open longest?",
     why: "A to-do is work the system could not finish alone. The oldest ones are the exceptions nobody has been made responsible for.",
     canvas: "rpt_todo",
+    filters: [{"field": "Is Complete", "op": "eq", "value": false}],
     axis: "To Do Type", value: "Hours Open",
     sql: `select "To Do Entry ID", coalesce("To Do Type", "To Do Type Code") as "To Do Type",
                  "Entry Status", "Priority Code", round("Hours Open"::numeric, 1) as "Hours Open",
@@ -1382,12 +1499,16 @@ export const QUESTIONS = [
   q({
     id: "field-appointments",
     process: "field", workstream: "Field Performance",
+    folder: "field_operations", essential: true,
     kind: "count",
+    // not ready to run: "appointment necessary" is N on every field activity at Ellensburg,
+    // College Station (84,652) and Newark (21,426), 2026-09-30
+    ready_to_run: false,
     title: "How much field work needs an appointment?",
     why: "An appointment is a commitment to a customer and a constraint on the crew's day. The proportion needing one is what makes a route plannable or not.",
     canvas: "rpt_field_activity",
-    axis: "Activity Type", value: "Appointment Required",
-    sql: `select coalesce("Activity Type", "Activity Type Code") as "Activity Type",
+    axis: "Field Activity Type", value: "Appointment Required",
+    sql: `select coalesce("Field Activity Type", "Field Activity Type Code") as "Field Activity Type",
                  count(*)::bigint as "Activities",
                  count(*) filter (where trim("Appointment Required") = 'Y')::bigint as "Appointment Required",
                  count(*) filter (where "Appointment Taken Date/Time" is not null)::bigint as "Appointment Booked",
@@ -1398,6 +1519,7 @@ export const QUESTIONS = [
   q({
     id: "exception-by-rule",
     process: "field", workstream: "Data Quality",
+    folder: "data_quality",
     kind: "distribution",
     title: "Which validation rules are firing most?",
     why: "A single VEE rule producing most of the exceptions is usually mis-tuned rather than right. Tuning it clears the queue faster than working it does.",
@@ -1414,6 +1536,7 @@ export const QUESTIONS = [
   q({
     id: "usage-transactions",
     process: "field", workstream: "Data Quality",
+    folder: "data_quality",
     kind: "distribution",
     title: "Are usage transactions reaching a bill?",
     why: "A usage transaction that never gets used on a bill is measurement that produced no revenue. It is the cleanest definition of leakage in the meter-to-cash chain.",
@@ -1435,6 +1558,7 @@ export const QUESTIONS = [
   q({
     id: "bills-by-status",
     process: "usage", workstream: "Billing",
+    folder: "billing_revenue",
     kind: "count",
     title: "How many bills, by status?",
     why: "Pending bills past their window are billing throughput problems; completed is the denominator for close.",
@@ -1447,8 +1571,11 @@ export const QUESTIONS = [
   }),
   q({
     id: "bills-longest-open",
+    // Declared for the portal's governed query (pending bills only: a completed bill has no open clock; demo25, 2026-09-04).
+    filters: [{"field": "Is Completed", "op": "eq", "value": false}],
     process: "usage", workstream: "Billing",
-    kind: "outlier", chart: "horizontal",
+    folder: "billing_revenue",
+    kind: "outlier", chart: "horizontal", all_dates: true,
     title: "Which bill cycles have the longest-open bills?",
     why: "A cycle whose bills sit open for weeks is where billing close is actually stuck.",
     canvas: "rpt_bill",
@@ -1461,6 +1588,7 @@ export const QUESTIONS = [
   q({
     id: "sas-by-type",
     process: "customer", workstream: "Customer Information",
+    folder: "customer_service",
     kind: "ranking", chart: "horizontal",
     title: "How many service agreements, by SA type?",
     why: "The service portfolio at a glance — and a type with a handful of SAs is usually leftover configuration.",
@@ -1474,6 +1602,7 @@ export const QUESTIONS = [
   q({
     id: "sa-balance-by-type",
     process: "credit", workstream: "Credit & Collections",
+    folder: "ar_collections",
     kind: "total", chart: "horizontal",
     title: "Where do balances sit, by SA type?",
     why: "Receivables concentrated in one service type changes who you call and how.",
@@ -1487,6 +1616,7 @@ export const QUESTIONS = [
   q({
     id: "links-by-relationship",
     process: "customer", workstream: "Customer Information",
+    folder: "customer_service",
     kind: "count",
     title: "How are people linked to accounts, by relationship?",
     why: "Account-person links drive who gets billed and who gets told; an unexpected relationship mix is a data-entry pattern worth seeing.",
@@ -1500,6 +1630,7 @@ export const QUESTIONS = [
   q({
     id: "financially-responsible-split",
     process: "customer", workstream: "Customer Information",
+    folder: "customer_service",
     kind: "distribution",
     title: "Who on the account is financially responsible?",
     why: "Responsibility drives collections contact; third-party-only accounts behave differently in arrears.",
@@ -1513,58 +1644,164 @@ export const QUESTIONS = [
   q({
     id: "billed-by-class-calc-lines",
     process: "usage", workstream: "Billing",
+    folder: "billing_revenue",
     kind: "total", chart: "horizontal",
     title: "What was billed, by customer class (charge lines)?",
     why: "The charge-line view of billed dollars — the level rate analysts reconcile at.",
     canvas: "rpt_billed_charge",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "Customer Class", value: "Billed Amount",
     sql: `select coalesce("Customer Class", "Customer Class Code", '(unset)') as "Customer Class",
                  sum("Billed Amount")::numeric(18,2) as "Billed Amount"
           from reporting.rpt_billed_charge
+          where "Is Frozen" and not "Is Cancelled"
           group by 1 order by 2 desc`,
   }),
   q({
     id: "billed-by-budget-plan",
     process: "usage", workstream: "Billing",
     kind: "total",
+    // not ready to run: grouped by the budget plan CODE, which sits on accounts that are not on
+    // budget (College Station: 104,826 carry one, 965 are on budget); the Budget Billing folder
+    // reads "Is On Budget" instead
+    ready_to_run: false,
     title: "How much was billed under each budget plan?",
     why: "Budget billing shifts cash timing; the split shows how much revenue rides on it.",
     canvas: "rpt_billed_charge",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "Budget Plan", value: "Billed Amount",
     sql: `select coalesce("Budget Plan", '(none)') as "Budget Plan",
                  sum("Billed Amount")::numeric(18,2) as "Billed Amount"
           from reporting.rpt_billed_charge
+          where "Is Frozen" and not "Is Cancelled"
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "budget-accounts-by-class",
+    process: "credit", workstream: "Budget Billing",
+    folder: "budget_billing", essential: true,
+    kind: "count",
+    title: "Who is on budget billing, by customer class?",
+    why: "Budget billing evens out a customer's payments across the year. Who is on it tells you whose cash arrives flat and whose true-up is coming.",
+    canvas: "rpt_customer_account",
+    filters: [{"field": "Is On Budget", "op": "eq", "value": true}],
+    axis: "Customer Class", value: "Accounts",
+    sql: `select coalesce("Customer Class", "Customer Class Code", '(unset)') as "Customer Class",
+                 count(*)::bigint as "Accounts",
+                 round(sum("Monthly Budget Amount")::numeric, 2) as "Monthly Budget Amount"
+          from reporting.rpt_customer_account
+          where "Is On Budget"
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "budget-amount-by-class",
+    process: "credit", workstream: "Budget Billing",
+    folder: "budget_billing", essential: true,
+    kind: "total", unit: "money",
+    title: "What do budget customers pay each month, by customer class?",
+    why: "The monthly budget amount is cash the utility can count on. A class whose budget total drifts from its billed charges is heading for a large true-up.",
+    canvas: "rpt_customer_account",
+    filters: [{"field": "Is On Budget", "op": "eq", "value": true}],
+    axis: "Customer Class", value: "Monthly Budget Amount", agg: "sum",
+    sql: `select coalesce("Customer Class", "Customer Class Code", '(unset)') as "Customer Class",
+                 round(sum("Monthly Budget Amount")::numeric, 2) as "Monthly Budget Amount"
+          from reporting.rpt_customer_account
+          where "Is On Budget"
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "budget-agreements-by-sa-type",
+    process: "credit", workstream: "Budget Billing",
+    folder: "budget_billing", essential: true,
+    kind: "count", chart: "horizontal",
+    title: "Which services are on budget billing?",
+    why: "Budget plans usually cover the large, seasonal services. An SA type on budget that should not be is a configuration question worth asking.",
+    canvas: "rpt_service_agreement",
+    filters: [{"field": "Is On Budget", "op": "eq", "value": true}],
+    axis: "SA Type", value: "Service Agreements",
+    sql: `select coalesce("SA Type", "SA Type Code") as "SA Type",
+                 count(*)::bigint as "Service Agreements",
+                 round(sum("Monthly Budget Amount")::numeric, 2) as "Monthly Budget Amount"
+          from reporting.rpt_service_agreement
+          where "Is On Budget"
+          group by 1 order by 2 desc`,
+  }),
+  q({
+    id: "budget-late-fees",
+    process: "credit", workstream: "Budget Billing",
+    folder: "budget_billing", essential: true,
+    kind: "distribution", unit: "money", chart: "horizontal",
+    title: "What are budget accounts being charged in late fees and other adjustments?",
+    why: "A late fee on a budget account means the level payment is not being kept. Covers accounts on budget today, including fees from before they joined; filter to your late-fee adjustment type.",
+    canvas: "rpt_financial_txn",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Adjustment", "op": "eq", "value": true},
+              {"field": "Adjustment Status Code", "op": "eq", "value": "50"},
+              {"field": "Account Is On Budget", "op": "eq", "value": true}],
+    axis: "Adjustment Type", value: "Adjustment Amount",
+    sql: `select coalesce("Adjustment Type", "Adjustment Type Code", '(unset)') as "Adjustment Type",
+                 count(*)::bigint as "Adjustments",
+                 count(distinct "Account ID")::bigint as "Accounts",
+                 round(sum("Adjustment Amount")::numeric, 2) as "Adjustment Amount"
+          from reporting.rpt_financial_txn
+          where "Is Frozen" and "Is Adjustment" and "Adjustment Status Code" = '50' and "Account Is On Budget"
+          group by 1 order by 4 desc nulls last`,
+  }),
+  q({
+    id: "budget-accounts-by-cycle",
+    process: "credit", workstream: "Budget Billing",
+    folder: "budget_billing",
+    kind: "count",
+    title: "Which bill cycles carry the budget accounts?",
+    why: "Budget reviews and true-ups run with the bill cycle. A cycle heavy with budget accounts is where the review workload lands.",
+    canvas: "rpt_customer_account",
+    filters: [{"field": "Is On Budget", "op": "eq", "value": true}],
+    axis: "Bill Cycle", value: "Accounts",
+    sql: `select coalesce("Bill Cycle", "Bill Cycle Code", '(unset)') as "Bill Cycle",
+                 count(*)::bigint as "Accounts"
+          from reporting.rpt_customer_account
+          where "Is On Budget"
           group by 1 order by 2 desc`,
   }),
   q({
     id: "measured-by-uom",
     process: "usage", workstream: "Usage",
+    folder: "usage_metering",
     kind: "total", chart: "horizontal",
     title: "What was measured on bills, by unit of measure?",
     why: "Per-UOM totals are the safe way to look at quantity — never sum across units.",
     canvas: "rpt_bill_segment_read",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false},
+              {"field": "Is Segment Level", "op": "eq", "value": true}, {"field": "Usage Flag", "op": "eq", "value": "S"},
+              {"field": "Read Row Kind", "op": "eq", "value": "measured"}],
     axis: "Unit of Measure", value: "Measured Quantity",
     sql: `select coalesce("Unit of Measure", "Unit of Measure Code", '(unset)') as "Unit of Measure",
                  sum("Measured Quantity")::numeric(18,2) as "Measured Quantity"
           from reporting.rpt_bill_segment_read
+          where "Is Frozen" and not "Is Cancelled"
+            and "Is Segment Level" and "Usage Flag" = 'S' and "Read Row Kind" = 'measured'
           group by 1 order by 2 desc`,
   }),
   q({
     id: "reads-by-row-kind",
     process: "usage", workstream: "Usage",
+    folder: "usage_metering",
     kind: "distribution",
     title: "Where do billed reads come from?",
     why: "Register reads vs derived rows tells you how much of billing rests on actual measurement.",
     canvas: "rpt_bill_segment_read",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false},
+              {"field": "Is Segment Level", "op": "eq", "value": true}, {"field": "Usage Flag", "op": "eq", "value": "S"}],
     axis: "Read Row Kind", value: "Read Rows",
     sql: `select coalesce("Read Row Kind", '(unset)') as "Read Row Kind",
                  count(*)::bigint as "Read Rows"
           from reporting.rpt_bill_segment_read
+          where "Is Frozen" and not "Is Cancelled" and "Is Segment Level" and "Usage Flag" = 'S'
           group by 1 order by 2 desc`,
   }),
   q({
     id: "locations-by-type",
     process: "meter", workstream: "Assets",
+    folder: "assets_devices",
     kind: "ranking", chart: "horizontal",
     title: "How many asset locations, by type?",
     why: "The shape of the location estate — and types with one node are usually setup artifacts.",
@@ -1578,6 +1815,7 @@ export const QUESTIONS = [
   q({
     id: "deepest-location-trees",
     process: "meter", workstream: "Assets",
+    folder: "assets_devices",
     kind: "outlier", chart: "horizontal",
     title: "Which location trees run deepest?",
     why: "Very deep hierarchies slow navigation and usually mean an import created nesting nobody designed.",
@@ -1592,6 +1830,7 @@ export const QUESTIONS = [
   q({
     id: "characteristics-by-entity",
     process: "field", workstream: "Operations",
+    folder: "customer_service",
     kind: "count",
     title: "Which entities carry characteristics?",
     why: "Characteristics are the free-form extension surface; where they pile up is where configuration lives.",
@@ -1605,6 +1844,7 @@ export const QUESTIONS = [
   q({
     id: "top-characteristic-types",
     process: "field", workstream: "Operations",
+    folder: "customer_service",
     kind: "ranking", chart: "horizontal",
     title: "Which characteristic types are most used?",
     why: "The top of this list is this client's real extension model — worth knowing before any report asks for 'that extra field'.",

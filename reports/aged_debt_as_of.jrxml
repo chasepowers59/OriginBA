@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="aged_debt_as_of" pageWidth="842" pageHeight="595" orientation="Landscape"
+    columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+    whenNoDataType="AllSectionsNoDetail">
+    <property name="net.sf.jasperreports.query.timeout" value="600"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+    <style name="Base" default="true" fontName="SansSerif" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
+    <style name="H3" style="Base" fontSize="9" forecolor="#0F4761"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="RowBand" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="SubHeader" style="Base" fontSize="8" forecolor="#5B6470"/>
+    <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
+    <style name="SubTotal" style="Base" fontSize="8" bold="true" forecolor="#0F4761"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
+    <query language="SQL"><![CDATA[
+WITH base AS (
+  SELECT ft.sa_id, ft.ft_id, TRUNC(ft.ars_dt) AS ars_dt,
+         COALESCE(ft.cur_amt, 0) AS cur_amt, COALESCE(ft.tot_amt, 0) AS tot_amt,
+         CASE WHEN COALESCE(ft.cur_amt, 0) > 0 THEN ft.cur_amt ELSE 0 END AS debt_amt,
+         CASE WHEN COALESCE(ft.cur_amt, 0) < 0 THEN -ft.cur_amt ELSE 0 END AS credit_amt,
+         CASE WHEN $P{AGE_BY} = 'DUE' AND TRIM(ft.ft_type_flg) IN ('BS', 'BX') THEN COALESCE(TRUNC(b.due_dt), TRUNC(ft.ars_dt)) ELSE TRUNC(ft.ars_dt) END AS aging_dt
+  FROM CISADM.CI_FT ft
+  JOIN CISADM.CI_SA sa ON sa.sa_id = ft.sa_id
+  JOIN CISADM.CI_ACCT ac ON ac.acct_id = sa.acct_id
+  LEFT JOIN CISADM.CI_BSEG bs ON TRIM(ft.ft_type_flg) IN ('BS', 'BX') AND bs.bseg_id = ft.sibling_id
+  LEFT JOIN CISADM.CI_BILL b ON b.bill_id = bs.bill_id
+  WHERE TRIM(ft.freeze_sw) = 'Y' AND TRIM(ft.not_in_ars_sw) = 'N' AND ft.ars_dt IS NOT NULL
+    AND TRUNC(ft.ars_dt) <= $P{AS_OF_DT}
+    AND ($P{AS_KNOWN_TODAY} = 'Y' OR ft.freeze_dttm < $P{AS_OF_DT} + INTERVAL '1' DAY)
+      AND ($P{CUST_CL_F} IS NULL OR TRIM(ac.cust_cl_cd) = TRIM($P{CUST_CL_F}))
+  AND ($P{CIS_DIVISION_F} IS NULL OR TRIM(sa.cis_division) = TRIM($P{CIS_DIVISION_F}))
+  AND ($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))
+),
+sa_tot AS (
+  SELECT sa_id, SUM(cur_amt) AS cur_bal, SUM(tot_amt) AS tot_bal, SUM(debt_amt) AS total_debt, SUM(credit_amt) AS total_credit
+  FROM base
+  GROUP BY sa_id
+),
+debt_rows AS (
+  SELECT sa_id, aging_dt, debt_amt,
+         SUM(debt_amt) OVER (PARTITION BY sa_id ORDER BY ars_dt, ft_id ROWS UNBOUNDED PRECEDING) AS cum_debt
+  FROM base
+  WHERE debt_amt > 0
+),
+unpaid AS (
+  SELECT d.sa_id, d.aging_dt,
+         GREATEST(0, d.cum_debt - t.total_credit) - GREATEST(0, d.cum_debt - d.debt_amt - t.total_credit) AS unpaid_amt
+  FROM debt_rows d
+  JOIN sa_tot t ON t.sa_id = d.sa_id
+),
+aged AS (
+  SELECT sa_id,
+         SUM(CASE WHEN GREATEST(0, $P{AS_OF_DT} - aging_dt) BETWEEN 0 AND 30 THEN unpaid_amt ELSE 0 END) AS ars_amt1,
+         SUM(CASE WHEN GREATEST(0, $P{AS_OF_DT} - aging_dt) BETWEEN 31 AND 60 THEN unpaid_amt ELSE 0 END) AS ars_amt2,
+         SUM(CASE WHEN GREATEST(0, $P{AS_OF_DT} - aging_dt) BETWEEN 61 AND 90 THEN unpaid_amt ELSE 0 END) AS ars_amt3,
+         SUM(CASE WHEN GREATEST(0, $P{AS_OF_DT} - aging_dt) BETWEEN 91 AND 120 THEN unpaid_amt ELSE 0 END) AS ars_amt4,
+         SUM(CASE WHEN GREATEST(0, $P{AS_OF_DT} - aging_dt) > 120 THEN unpaid_amt ELSE 0 END) AS ars_amt5
+  FROM unpaid
+  GROUP BY sa_id
+),
+sa_pos AS (
+  SELECT t.sa_id, t.cur_bal, t.tot_bal,
+         COALESCE(a.ars_amt1, 0) - GREATEST(0, t.total_credit - t.total_debt) AS ars_amt1,
+         COALESCE(a.ars_amt2, 0) AS ars_amt2, COALESCE(a.ars_amt3, 0) AS ars_amt3,
+         COALESCE(a.ars_amt4, 0) AS ars_amt4, COALESCE(a.ars_amt5, 0) AS ars_amt5
+  FROM sa_tot t
+  LEFT JOIN aged a ON a.sa_id = t.sa_id
+)
+SELECT TRIM(sa.cis_division) AS SA_CIS_DIVISION, TRIM(sa.sa_type_cd) AS SA_TYPE_CD, COALESCE(stl.descr, TRIM(sa.sa_type_cd)) AS SA_TYPE_DESCR,
+       COUNT(*) AS SA_COUNT, SUM(p.cur_bal) AS CUR_BAL,
+       SUM(p.ars_amt1) AS ARS_AMT1, SUM(p.ars_amt2) AS ARS_AMT2, SUM(p.ars_amt3) AS ARS_AMT3, SUM(p.ars_amt4) AS ARS_AMT4, SUM(p.ars_amt5) AS ARS_AMT5
+FROM sa_pos p
+JOIN CISADM.CI_SA sa ON sa.sa_id = p.sa_id
+LEFT JOIN CISADM.CI_SA_TYPE_L stl ON stl.sa_type_cd = sa.sa_type_cd AND stl.cis_division = sa.cis_division AND stl.language_cd = 'ENG'
+WHERE p.cur_bal <> 0
+GROUP BY TRIM(sa.cis_division), TRIM(sa.sa_type_cd), COALESCE(stl.descr, TRIM(sa.sa_type_cd))
+ORDER BY SUM(p.cur_bal) DESC
+]]></query>
+    <parameter name="AS_OF_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TOP_N" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[10]]></defaultValueExpression>
+    </parameter>
+    <parameter name="AGE_BY" class="java.lang.String">
+        <defaultValueExpression><![CDATA["ARS"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="AS_KNOWN_TODAY" class="java.lang.String">
+        <defaultValueExpression><![CDATA["N"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CUST_CL_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CIS_DIVISION_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ACCT_ID_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <field name="SA_CIS_DIVISION" class="java.lang.String"/>
+    <field name="SA_TYPE_CD" class="java.lang.String"/>
+    <field name="SA_TYPE_DESCR" class="java.lang.String"/>
+    <field name="SA_COUNT" class="java.lang.Long"/>
+    <field name="CUR_BAL" class="java.math.BigDecimal"/>
+    <field name="ARS_AMT1" class="java.math.BigDecimal"/>
+    <field name="ARS_AMT2" class="java.math.BigDecimal"/>
+    <field name="ARS_AMT3" class="java.math.BigDecimal"/>
+    <field name="ARS_AMT4" class="java.math.BigDecimal"/>
+    <field name="ARS_AMT5" class="java.math.BigDecimal"/>
+    <variable name="SUM_SA_COUNT" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{SA_COUNT}]]></expression>
+    </variable>
+    <variable name="SUM_CUR_BAL" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{CUR_BAL}]]></expression>
+    </variable>
+    <variable name="SUM_ARS_AMT1" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{ARS_AMT1}]]></expression>
+    </variable>
+    <variable name="SUM_ARS_AMT2" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{ARS_AMT2}]]></expression>
+    </variable>
+    <variable name="SUM_ARS_AMT3" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{ARS_AMT3}]]></expression>
+    </variable>
+    <variable name="SUM_ARS_AMT4" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{ARS_AMT4}]]></expression>
+    </variable>
+    <variable name="SUM_ARS_AMT5" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{ARS_AMT5}]]></expression>
+    </variable>
+    <title height="52">
+            <element kind="textField" x="0" y="0" width="802" height="26" style="TitleSapphire" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Aged Debt As Of Date"]]></expression></element>
+            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Position as of " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{AS_OF_DT}) + "  |  frozen arrears FTs as they stood on that day (Age By: ARS = arrears date like the snapshot, DUE = bill due date like the CIS zone; As Known Today = Y counts later cancellations back into history)" + ($P{CUST_CL_F} == null ? "" : "  |  Customer class: " + $P{CUST_CL_F}) + ($P{CIS_DIVISION_F} == null ? "" : "  |  CIS division: " + $P{CIS_DIVISION_F}) + ($P{ACCT_ID_F} == null ? "" : "  |  Account ID: " + $P{ACCT_ID_F})]]></expression></element>
+    </title>
+    <columnHeader height="18">
+            <element kind="staticText" x="0" y="0" width="40" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Div]]></text></element>
+            <element kind="staticText" x="40" y="0" width="56" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[SA Type]]></text></element>
+            <element kind="staticText" x="96" y="0" width="136" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Service Agreement Type]]></text></element>
+            <element kind="staticText" x="232" y="0" width="60" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[SAs]]></text></element>
+            <element kind="staticText" x="292" y="0" width="90" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Balance]]></text></element>
+            <element kind="staticText" x="382" y="0" width="84" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[0-30]]></text></element>
+            <element kind="staticText" x="466" y="0" width="84" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[31-60]]></text></element>
+            <element kind="staticText" x="550" y="0" width="84" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[61-90]]></text></element>
+            <element kind="staticText" x="634" y="0" width="84" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[91-120]]></text></element>
+            <element kind="staticText" x="718" y="0" width="84" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[120+]]></text></element>
+    </columnHeader>
+    <detail>
+        <band height="22" splitType="Prevent">
+            <element kind="line" x="0" y="2" width="802" height="1"><pen lineWidth="0.75" lineColor="#006FAC"/></element>
+            <element kind="textField" x="0" y="3" width="40" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{SA_CIS_DIVISION}]]></expression></element>
+            <element kind="textField" x="40" y="3" width="56" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{SA_TYPE_CD}]]></expression></element>
+            <element kind="textField" x="96" y="3" width="136" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{SA_TYPE_DESCR}]]></expression></element>
+            <element kind="textField" x="232" y="3" width="60" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{SA_COUNT}]]></expression></element>
+            <element kind="textField" x="292" y="3" width="90" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{CUR_BAL}]]></expression></element>
+            <element kind="textField" x="382" y="3" width="84" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{ARS_AMT1}]]></expression></element>
+            <element kind="textField" x="466" y="3" width="84" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{ARS_AMT2}]]></expression></element>
+            <element kind="textField" x="550" y="3" width="84" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{ARS_AMT3}]]></expression></element>
+            <element kind="textField" x="634" y="3" width="84" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{ARS_AMT4}]]></expression></element>
+            <element kind="textField" x="718" y="3" width="84" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{ARS_AMT5}]]></expression></element>
+        </band>
+        <band height="20" splitType="Stretch">
+            <element kind="subreport" x="24" y="0" width="778" height="20" positionType="Float" removeLineWhenBlank="true" usingCache="false">
+                <parameter name="AS_OF_DT"><expression><![CDATA[$P{AS_OF_DT}]]></expression></parameter>
+                <parameter name="TOP_N"><expression><![CDATA[$P{TOP_N}]]></expression></parameter>
+                <parameter name="AGE_BY"><expression><![CDATA[$P{AGE_BY}]]></expression></parameter>
+                <parameter name="AS_KNOWN_TODAY"><expression><![CDATA[$P{AS_KNOWN_TODAY}]]></expression></parameter>
+                <parameter name="CUST_CL_F"><expression><![CDATA[$P{CUST_CL_F}]]></expression></parameter>
+                <parameter name="CIS_DIVISION_F"><expression><![CDATA[$P{CIS_DIVISION_F}]]></expression></parameter>
+                <parameter name="ACCT_ID_F"><expression><![CDATA[$P{ACCT_ID_F}]]></expression></parameter>
+                <parameter name="SA_TYPE_CD"><expression><![CDATA[$F{SA_TYPE_CD}]]></expression></parameter>
+                <parameter name="SA_CIS_DIVISION"><expression><![CDATA[$F{SA_CIS_DIVISION}]]></expression></parameter>
+                <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                <expression><![CDATA["repo:aged_debt_as_of_top"]]></expression>
+            </element>
+        </band>
+    </detail>
+    <pageFooter height="14">
+            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential"]]></expression></element>
+            <element kind="textField" x="600" y="0" width="150" height="14" style="FooterConfidential" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Page " + $V{PAGE_NUMBER} + " of"]]></expression></element>
+            <element kind="textField" x="750" y="0" width="52" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report"><expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression></element>
+    </pageFooter>
+    <summary height="24">
+            <element kind="line" x="0" y="2" width="802" height="1"><pen lineWidth="1.0" lineColor="#006FAC"/></element>
+            <element kind="staticText" x="0" y="4" width="40" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Total]]></text></element>
+            <element kind="staticText" x="40" y="4" width="56" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="staticText" x="96" y="4" width="136" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="textField" x="232" y="4" width="60" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_SA_COUNT}]]></expression></element>
+            <element kind="textField" x="292" y="4" width="90" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_CUR_BAL}]]></expression></element>
+            <element kind="textField" x="382" y="4" width="84" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_ARS_AMT1}]]></expression></element>
+            <element kind="textField" x="466" y="4" width="84" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_ARS_AMT2}]]></expression></element>
+            <element kind="textField" x="550" y="4" width="84" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_ARS_AMT3}]]></expression></element>
+            <element kind="textField" x="634" y="4" width="84" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_ARS_AMT4}]]></expression></element>
+            <element kind="textField" x="718" y="4" width="84" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_ARS_AMT5}]]></expression></element>
+    </summary>
+</jasperReport>

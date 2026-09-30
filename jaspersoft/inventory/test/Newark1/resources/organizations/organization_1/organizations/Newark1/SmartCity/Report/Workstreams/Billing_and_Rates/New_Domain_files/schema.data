@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="SA_DERIVED_TABLE" label="SA_DERIVED_TABLE" resourceId="SA_DERIVED_TABLE"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="ACCT_ID" resourceId="SA_DERIVED_TABLE.ACCT_ID"></item>
+    <item id="ADDRESS1" label="ADDRESS1" resourceId="SA_DERIVED_TABLE.ADDRESS1"></item>
+    <item id="BILL_ID" label="BILL_ID" resourceId="SA_DERIVED_TABLE.BILL_ID"></item>
+    <item id="BILL_SQ" label="BILL_SQ" resourceId="SA_DERIVED_TABLE.BILL_SQ"></item>
+    <item id="BSEG_ID" label="BSEG_ID" resourceId="SA_DERIVED_TABLE.BSEG_ID"></item>
+    <item id="CHAR_PREM_ID" label="CHAR_PREM_ID" resourceId="SA_DERIVED_TABLE.CHAR_PREM_ID"></item>
+    <item id="END_DT" label="END_DT" resourceId="SA_DERIVED_TABLE.END_DT"></item>
+    <item id="OLD_ACCT_ID" label="OLD_ACCT_ID" resourceId="SA_DERIVED_TABLE.OLD_ACCT_ID"></item>
+    <item id="OOT_SA_TYP_CD" label="OOT_SA_TYP_CD" resourceId="SA_DERIVED_TABLE.OOT_SA_TYP_CD"></item>
+    <item id="SA_ID" label="SA_ID" resourceId="SA_DERIVED_TABLE.SA_ID"></item>
+    <item id="SA_TYPE_CD" label="SA_TYPE_CD" resourceId="SA_DERIVED_TABLE.SA_TYPE_CD"></item>
+    <item id="START_DT" label="START_DT" resourceId="SA_DERIVED_TABLE.START_DT"></item>
+    <item id="ACCT_ID_DISTINCT" label="ACCT_ID_DISTINCT" resourceId="SA_DERIVED_TABLE.ACCT_ID_DISTINCT"></item>
+    <item id="BILL_ID_DISTINCT" label="BILL_ID_DISTINCT" resourceId="SA_DERIVED_TABLE.BILL_ID_DISTINCT"></item>
+    <item id="BSEG_ID_DISTINCT" label="BSEG_ID_DISTINCT" resourceId="SA_DERIVED_TABLE.BSEG_ID_DISTINCT"></item>
+    <item id="SA_ID_DISTINCT" label="SA_ID_DISTINCT" resourceId="SA_DERIVED_TABLE.SA_ID_DISTINCT"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="SA_DERIVED_TABLE" datasourceId="Newark1_DS">
+      <fieldList>
+        <field id="SA_ID" type="java.lang.String"></field>
+        <field id="SA_TYPE_CD" type="java.lang.String"></field>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="OLD_ACCT_ID" type="java.lang.String"></field>
+        <field id="CHAR_PREM_ID" type="java.lang.String"></field>
+        <field id="OOT_SA_TYP_CD" type="java.lang.String"></field>
+        <field id="BILL_ID" type="java.lang.String"></field>
+        <field id="BSEG_ID" type="java.lang.String"></field>
+        <field id="START_DT" type="java.sql.Timestamp"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="BILL_SQ" type="java.math.BigDecimal"></field>
+        <field id="ADDRESS1" type="java.lang.String"></field>
+        <field id="ACCT_ID_DISTINCT" dataSetExpression="CountDistinct(ACCT_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="BILL_ID_DISTINCT" dataSetExpression="CountDistinct(BILL_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="BSEG_ID_DISTINCT" dataSetExpression="CountDistinct(BSEG_ID, 'Current')" type="java.lang.Long"></field>
+        <field id="SA_ID_DISTINCT" dataSetExpression="CountDistinct(SA_ID, 'Current')" type="java.lang.Long"></field>
+      </fieldList>
+      <query>SELECT
+        BSEG.BILL_ID ,
+        BSEG.BSEG_ID ,
+        BSEG.SA_ID   ,
+        BSEG.START_DT,
+        BSEG.END_DT  ,
+        BSQ.BILL_SQ  ,
+        CASE
+        WHEN
+                PC.CHAR_VAL = 'M1'
+        THEN
+                'M1'
+        WHEN
+                PC.CHAR_VAL = 'MS1'
+        THEN
+                'MS1'
+        ELSE
+                SA.SA_TYPE_CD
+        END AS SA_TYPE_CD,
+        CASE
+        WHEN
+                SA.OLD_ACCT_ID IN ('0000013924',
+                                   '0000013925',
+                                   '0000051670',
+                                   '0000013928',
+                                   '0000006867')
+        THEN
+                'BELLEVILLE'
+        WHEN
+                SA.OLD_ACCT_ID IN ('0000013927',
+                                   '0000013931',
+                                   '0000051057')
+        THEN
+                'COE'
+        WHEN
+                SA.OLD_ACCT_ID IN ('0000013934',
+                                   '0000013935',
+                                   '0000013936',
+                                   '0000013940',
+                                   '0000013941',
+                                   '0000013942')
+        THEN
+                'WAYNE'
+        WHEN
+                SA.OLD_ACCT_ID = '0000013943'
+        THEN
+                'BLOOMFIELD'
+        WHEN
+                SA.OLD_ACCT_ID IN ('0000013945',
+                                   '0000013948',
+                                   '0000045781')
+        THEN
+                'PEQUANNOCK'
+        WHEN
+                SA.OLD_ACCT_ID = '0000013951'
+        THEN
+                'ELIZABETH'
+        WHEN
+                SA.OLD_ACCT_ID IN ('0000050719',
+                                   '0000052861')
+        THEN
+                'ORANGE'
+        ELSE
+                SA.SA_TYPE_CD
+        END AS OOT_SA_TYP_CD,
+        SA.ACCT_ID          ,
+        SA.OLD_ACCT_ID      ,
+        SA.CHAR_PREM_ID     ,
+        PREM.ADDRESS1
+FROM
+        CISADM.CI_SA SA
+INNER JOIN
+        CISADM.CI_PREM_CHAR PC
+ON
+        PC.PREM_ID = SA.CHAR_PREM_ID
+AND     PC.CHAR_TYPE_CD = 'PVSCRATE'
+INNER JOIN
+        CISADM.CI_PREM PREM
+ON
+        PREM.PREM_ID = SA.CHAR_PREM_ID
+INNER JOIN
+        CISADM.CI_BSEG BSEG
+ON
+        BSEG.SA_ID = SA.SA_ID
+AND     BSEG.BSEG_STAT_FLG = '50'
+INNER JOIN
+        CISADM.CI_BSEG_SQ BSQ
+ON
+        BSQ.BSEG_ID = BSEG.BSEG_ID
+AND     BSQ.UOM_CD  = 'CF'
+AND     BSQ.TOU_CD  = ' '
+AND     BSQ.SQI_CD  = ' '</query>
+    </jdbcQuery>
+  </resources>
+</schema>

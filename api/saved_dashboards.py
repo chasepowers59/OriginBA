@@ -11,10 +11,13 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 STORE_PATH = ROOT / "data" / "analytics_portal" / "saved_dashboards.json"
-MAX_DASHBOARDS = 12
-MAX_TILES = 4
+# Per organization; past it a save is refused out loud, never an old dashboard dropped.
+MAX_DASHBOARDS = 50
+# Must match apps/analytics-portal/src/lib/dashboardSlots.ts MAX_TILES.
+MAX_TILES = 8
 
 from api import portal_state_store as _pss  # noqa: E402
+from api.ownership import clean_folder  # noqa: E402
 _COLLECTION = "saved_dashboards"
 
 
@@ -47,7 +50,10 @@ def _validate_tiles(tiles: list[dict[str, Any]]) -> list[dict[str, Any]]:
         raise DashboardError(f"Maximum {MAX_TILES} tiles allowed")
     cleaned: list[dict[str, Any]] = []
     for raw in tiles:
-        snapshot_id = str(raw.get("snapshot_id", "")).upper()
+        # AS GIVEN. Upper-casing was right while every snapshot was an Oracle table;
+        # a dbt canvas is lowercase rpt_*, so this stored RPT_BILL_SEGMENT and the tile
+        # then 404'd on lookup -- the dashboard saved and could not render.
+        snapshot_id = str(raw.get("snapshot_id", "")).strip()
         if not snapshot_id:
             raise DashboardError("Each tile requires snapshot_id")
         visual = str(raw.get("visual", "chart")).lower()
@@ -100,17 +106,22 @@ def create_dashboard(payload: dict[str, Any], *, organization_id: str) -> dict[s
         "description": payload.get("description") or "",
         "days": int(payload.get("days") or 30),
         "tiles": tiles,
+        "owner_id": payload.get("owner_id"),
+        "owner_email": payload.get("owner_email"),
+        "visibility": payload.get("visibility") or "organization",
+        "folder": clean_folder(payload.get("folder")),
         "created_at": now,
         "updated_at": now,
     }
+    if len(list_dashboards(organization_id)) >= MAX_DASHBOARDS:
+        raise DashboardError(f"This organization has reached its limit of {MAX_DASHBOARDS} dashboards. "
+                             "Delete one you no longer need, then create the new one.")
     if _pss.enabled():
         _pss.upsert(_COLLECTION, entry["id"], organization_id, entry)
-        for stale in _pss.list_records(_COLLECTION, organization_id)[MAX_DASHBOARDS:]:
-            _pss.delete(_COLLECTION, stale["id"], organization_id)
         return entry
     store = _load_store()
     boards = [d for d in store.get("dashboards", []) if _matches_scope(d, organization_id)]
-    boards = [entry, *boards][:MAX_DASHBOARDS]
+    boards = [entry, *boards]
     other = [d for d in store.get("dashboards", []) if not _matches_scope(d, organization_id)]
     store["dashboards"] = other + boards
     _save_store(store)
@@ -126,6 +137,10 @@ def _apply_update(found: dict[str, Any], payload: dict[str, Any]) -> dict[str, A
         found["days"] = int(payload["days"])
     if "tiles" in payload:
         found["tiles"] = _validate_tiles(list(payload["tiles"] or []))
+    if payload.get("visibility"):
+        found["visibility"] = payload["visibility"]
+    if "folder" in payload:
+        found["folder"] = clean_folder(payload["folder"])
     found["updated_at"] = datetime.now(timezone.utc).isoformat()
     return found
 

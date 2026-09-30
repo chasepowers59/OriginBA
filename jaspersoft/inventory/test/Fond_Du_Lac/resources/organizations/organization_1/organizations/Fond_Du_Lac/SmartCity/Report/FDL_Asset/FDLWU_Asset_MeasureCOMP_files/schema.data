@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="D1_MEASR_COMP" label="D1_MEASR_COMP" resourceId="D1_MEASR_COMP"></itemGroup>
+    <itemGroup id="W1_ASSET" label="W1_ASSET" resourceId="W1_ASSET"></itemGroup>
+  </dataIslands>
+  <dataSources>
+    <jdbcDataSource id="FondDuLac_DS">
+      <schemaMap>
+        <entry key="defaultSchema">
+          <string></string>
+        </entry>
+        <entry key="CISADM">
+          <string>CISADM</string>
+        </entry>
+      </schemaMap>
+    </jdbcDataSource>
+  </dataSources>
+  <items>
+    <item id="D1_FULL_SCALE" label="D1_FULL_SCALE" resourceId="D1_MEASR_COMP.D1_FULL_SCALE"></item>
+    <item id="D1_NBR_OF_DGTS_LFT" label="D1_NBR_OF_DGTS_LFT" resourceId="D1_MEASR_COMP.D1_NBR_OF_DGTS_LFT"></item>
+    <item id="D1_NBR_OF_DGTS_RGT" label="D1_NBR_OF_DGTS_RGT" resourceId="D1_MEASR_COMP.D1_NBR_OF_DGTS_RGT"></item>
+    <item id="ASSET_ID" label="ASSET_ID" resourceId="W1_ASSET.ASSET_ID"></item>
+  </items>
+  <resources>
+    <jdbcTable id="D1_MEASR_COMP" datasourceId="FondDuLac_DS" datasourceTableName="D1_MEASR_COMP" schemaAlias="CISADM">
+      <fieldList>
+        <field id="MEASR_COMP_ID" type="java.lang.String"></field>
+        <field id="DEVICE_CONFIG_ID" type="java.lang.String"></field>
+        <field id="MEASR_COMP_TYPE_CD" type="java.lang.String"></field>
+        <field id="BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="MEASR_COMP_USAGE_FLG" type="java.lang.String"></field>
+        <field id="D1_NBR_OF_DGTS_LFT" type="java.math.BigDecimal"></field>
+        <field id="D1_NBR_OF_DGTS_RGT" type="java.math.BigDecimal"></field>
+        <field id="MEASR_COMP_MULTIPLIER" type="java.math.BigDecimal"></field>
+        <field id="TIME_ZONE_CD" type="java.lang.String"></field>
+        <field id="LATEST_MSRMT_DTTM" type="java.sql.Timestamp"></field>
+        <field id="D1_READ_SEQ" type="java.math.BigDecimal"></field>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="BO_STATUS_REASON_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="D1_FULL_SCALE" type="java.math.BigDecimal"></field>
+        <field id="BO_DATA_AREA" type="java.lang.String"></field>
+        <field id="MOST_RECENT_MSRMT_DTTM" type="java.sql.Timestamp"></field>
+        <field id="MOST_RECENT_NON_EST_MSRMT_DTTM" type="java.sql.Timestamp"></field>
+        <field id="ADJ_LATEST_MSRMT_DTTM" type="java.sql.Timestamp"></field>
+        <field id="MOST_RECENT_MSRMT_READING_VAL" type="java.math.BigDecimal"></field>
+        <field id="MOST_RECENT_MSRMT_READING_COND" type="java.lang.String"></field>
+        <field id="ATTR_VAL_ID" type="java.lang.String"></field>
+        <field id="ACCESS_GRP_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="W1_ASSET" datasourceId="FondDuLac_DS" datasourceTableName="W1_ASSET" schemaAlias="CISADM">
+      <fieldList>
+        <field id="ASSET_ID" type="java.lang.String"></field>
+        <field id="ASSET_TYPE_CD" type="java.lang.String"></field>
+        <field id="BUS_OBJ_CD" type="java.lang.String"></field>
+        <field id="BO_STATUS_CD" type="java.lang.String"></field>
+        <field id="STATUS_UPD_DTTM" type="java.sql.Timestamp"></field>
+        <field id="BO_STATUS_REASON_CD" type="java.lang.String"></field>
+        <field id="ASSET_COND_FLG" type="java.lang.String"></field>
+        <field id="SPECIFICATION_CD" type="java.lang.String"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="BO_DATA_AREA" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+        <field id="ACT_ID" type="java.lang.String"></field>
+        <field id="FINAL_DTTM" type="java.sql.Timestamp"></field>
+        <field id="OWNING_ACCESS_GRP_CD" type="java.lang.String"></field>
+        <field id="CONDITION_RATING" type="java.math.BigDecimal"></field>
+        <field id="CONFIDENCE_RATING" type="java.math.BigDecimal"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+        <field id="BOM_PART_ID" type="java.lang.String"></field>
+        <field id="UNIT_PRICE" type="java.math.BigDecimal"></field>
+        <field id="VENDOR_LOC_ID" type="java.lang.String"></field>
+        <field id="MAINT_SPEC_CD" type="java.lang.String"></field>
+        <field id="PROPERTY_UNIT_CD" type="java.lang.String"></field>
+        <field id="ACQUISITION_DT" type="java.sql.Timestamp"></field>
+        <field id="ACQUISITION_COST" type="java.math.BigDecimal"></field>
+        <field id="IN_SERVICE_DT" type="java.sql.Timestamp"></field>
+        <field id="CONTRIBUTED_FLG" type="java.lang.String"></field>
+        <field id="SALVAGE_COST" type="java.math.BigDecimal"></field>
+        <field id="BOOK_VALUE" type="java.math.BigDecimal"></field>
+        <field id="USEFUL_LIFE" type="java.math.BigDecimal"></field>
+        <field id="ECO_LIFE" type="java.math.BigDecimal"></field>
+        <field id="PREDCTD_WEAR_OUT_DT" type="java.sql.Timestamp"></field>
+        <field id="AVG_OUT_REPR_COST" type="java.math.BigDecimal"></field>
+        <field id="HOURLY_OUT_COST" type="java.math.BigDecimal"></field>
+        <field id="REPLACEMENT_COST" type="java.math.BigDecimal"></field>
+        <field id="DISPOSAL_COST" type="java.math.BigDecimal"></field>
+        <field id="CORE_CHARGE" type="java.math.BigDecimal"></field>
+        <field id="CORE_CHRG_EXP_DT" type="java.sql.Timestamp"></field>
+        <field id="ASSET_OWNERSHIP_FLG" type="java.lang.String"></field>
+        <field id="CALENDAR_PM_RESET_DT" type="java.sql.Timestamp"></field>
+      </fieldList>
+    </jdbcTable>
+  </resources>
+</schema>

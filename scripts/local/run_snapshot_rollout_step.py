@@ -71,43 +71,8 @@ STEPS = {
     "run-baseline-remaining": (
         "sql/performance/snapshots/deployment_steps/clients/demo/run_remaining_baseline_refreshes_now.sql"
     ),
-    # Consolidation snapshots (12 tables) — see docs/smartcity_consolidation_snapshot_rollout_runbook.md
-    "consolidation-create-tables": (
-        "sql/performance/snapshots/deployment_steps/21_create_all_consolidation_snapshot_tables.sql"
-    ),
-    "consolidation-deploy-baseline-procs": (
-        "sql/performance/snapshots/deployment_steps/22_deploy_all_consolidation_baseline_procedures.sql"
-    ),
-    "consolidation-run-baseline": (
-        "sql/performance/snapshots/deployment_steps/23_run_all_consolidation_baseline_refreshes.sql"
-    ),
-    "consolidation-schedule-baseline": (
-        "sql/performance/snapshots/deployment_steps/23a_schedule_all_consolidation_baseline_refreshes.sql"
-    ),
-    "consolidation-baseline-status": (
-        "sql/performance/snapshots/deployment_steps/23b_capture_consolidation_baseline_job_status.sql"
-    ),
-    "consolidation-baseline-jobs-gate": (
-        "sql/performance/snapshots/deployment_steps/23d_consolidation_baseline_jobs_ready_gate.sql"
-    ),
-    "consolidation-validate": (
-        "sql/performance/snapshots/deployment_steps/24_validate_all_consolidation_snapshots.sql"
-    ),
-    "consolidation-install-validation-gate": (
-        "sql/performance/snapshots/deployment_steps/24b_consolidation_install_validation_gate.sql"
-    ),
-    "consolidation-deploy-rolling-procs": (
-        "sql/performance/snapshots/deployment_steps/25_deploy_all_consolidation_rolling_procedures.sql"
-    ),
-    "consolidation-run-operational": (
-        "sql/performance/snapshots/deployment_steps/26_run_all_consolidation_operational_refreshes.sql"
-    ),
-    "consolidation-schedule-operational": (
-        "sql/performance/snapshots/deployment_steps/27_schedule_all_consolidation_snapshots.sql"
-    ),
-    "consolidation-latest-runs": (
-        "sql/performance/snapshots/deployment_steps/28_capture_latest_consolidation_snapshot_runs.sql"
-    ),
+    # The 12 consolidation snapshots and their steps 21-28 were archived on 2026-09-08
+    # (the dated archive tree; its INDEX.md says why): designed 2026-06-11, never deployed.
 }
 
 
@@ -148,23 +113,6 @@ COMPOUND_STEPS: dict[str, list[StepAction]] = {
         StepAction("run-domain-support-refresh"),
         StepAction("validate-domain-support", log_label="domain_support_validate"),
         StepAction("domain-support-install-gate", fail_if_any_rows=True),
-    ],
-    "consolidation-baseline-and-validate": [
-        StepAction("consolidation-baseline-status", log_label="baseline_status"),
-        StepAction("consolidation-baseline-jobs-gate", fail_if_any_rows=True),
-        StepAction("consolidation-validate", log_label="full_validate"),
-        StepAction("consolidation-install-validation-gate", fail_if_any_rows=True),
-    ],
-    "consolidation-operational-and-validate": [
-        StepAction("consolidation-run-operational"),
-        StepAction("consolidation-validate", log_label="full_validate"),
-        StepAction("consolidation-install-validation-gate", fail_if_any_rows=True),
-    ],
-    "consolidation-cutover-and-validate": [
-        StepAction("consolidation-deploy-rolling-procs"),
-        StepAction("consolidation-run-operational"),
-        StepAction("consolidation-validate", log_label="full_validate"),
-        StepAction("consolidation-install-validation-gate", fail_if_any_rows=True),
     ],
     "internal-7-baseline-and-validate": [
         StepAction("create-tables"),

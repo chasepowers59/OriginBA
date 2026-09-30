@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 8.2.0.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Letter-CM04INA1NOTC" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4c516a84-2bc8-4fb6-aa9f-74bc4b108917">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="NO_DATA_ADAPTER"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://origin-c2m-demo.originsmartops.com:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="gcinco@originconsults.com|Origin_DEMO"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Letter/Letter_CM04INA1NOTC"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="First Notice - Inactive Account"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Letter/Letter_CM04INA1NOTC_files/main_jrxml"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="495"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="491"/>
+	<parameter name="net.sf.jasperreports.xml.source" class="java.lang.String"/>
+	<parameter name="customerContactId" class="java.lang.String"/>
+	<parameter name="query" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{customerContactId}==null?"/root/C1-LetterPrintRecord/letter":"/root/C1-LetterPrintRecord[./customerContactId='"+$P{customerContactId}+"']/letter"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="XPath">
+		<![CDATA[$P{query}]]>
+	</queryString>
+	<field name="customerContactId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="/root/C1-LetterPrintRecord/customerContactId"/>
+		<fieldDescription><![CDATA[/root/C1-LetterPrintRecord/customerContactId]]></fieldDescription>
+	</field>
+	<field name="mailingAddress1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingAddress1"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingAddress1]]></fieldDescription>
+	</field>
+	<field name="mailingAddress2" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingAddress2"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingAddress2]]></fieldDescription>
+	</field>
+	<field name="mailingAddress3" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingAddress3"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingAddress3]]></fieldDescription>
+	</field>
+	<field name="mailingAddress4" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingAddress4"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingAddress4]]></fieldDescription>
+	</field>
+	<field name="mailingCity" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingCity"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingCity]]></fieldDescription>
+	</field>
+	<field name="mailingCounty" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingCounty"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingCounty]]></fieldDescription>
+	</field>
+	<field name="mailingState" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingState"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingState]]></fieldDescription>
+	</field>
+	<field name="mailingPostal" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingPostal"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingPostal]]></fieldDescription>
+	</field>
+	<field name="mailingCountry" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingCountry"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingCountry]]></fieldDescription>
+	</field>
+	<field name="Account Number" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billDetails/accountId"/>
+		<fieldDescription><![CDATA[billDetails/accountId]]></fieldDescription>
+	</field>
+	<field name="billId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billDetails/billId"/>
+		<fieldDescription><![CDATA[billDetails/billId]]></fieldDescription>
+	</field>
+	<field name="Due Date" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billDetails/dueDate"/>
+		<fieldDescription><![CDATA[billDetails/dueDate]]></fieldDescription>
+	</field>
+	<field name="Total Amount Due" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="billDetails/totalBilledAmount"/>
+		<fieldDescription><![CDATA[billDetails/totalBilledAmount]]></fieldDescription>
+	</field>
+	<group name="AccountIDGroup" footerPosition="ForceAtBottom">
+		<groupExpression><![CDATA[$F{customerContactId}+"-"+$F{Account Number}]]></groupExpression>
+		<groupHeader>
+			<band height="100">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement x="0" y="0" width="572" height="100" uuid="2525b303-4e16-41ab-bb49-6108a6b8f957"/>
+					<image scaleImage="RetainShape" hAlign="Center" vAlign="Middle">
+						<reportElement x="0" y="0" width="250" height="100" uuid="fb6c9df7-3ca1-4137-8b8f-3c42f4fac3b9">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<box topPadding="5" bottomPadding="10"/>
+						<imageExpression><![CDATA["repo:Los_Alamos_County_Logo"]]></imageExpression>
+					</image>
+					<textField>
+						<reportElement x="250" y="0" width="322" height="25" uuid="639695ce-a254-4461-97d8-1bd2920cbb6f">
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font size="19" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Los Alamos"]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="250" y="25" width="322" height="75" uuid="d49fa736-7b6b-4ec2-8ab6-1242869facab">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Center" verticalAlignment="Top">
+							<font size="14" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Department of Public Utilities\n"+
+"1000 Central Ave, Suite 130\n"+
+"Los Alamos, NM 87544\n"+
+"Phone: (505) 662-8333 "]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+			<band height="30">
+				<frame>
+					<reportElement x="0" y="0" width="572" height="30" uuid="91a0ed1f-dfa6-4c8e-a4b8-40174d778359">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textField>
+						<reportElement x="0" y="0" width="572" height="30" uuid="acde0d22-60fb-45a2-aba5-a63b5e7e8b56"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font size="18" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA["*** FIRST NOTICE ***"]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="40">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement x="0" y="0" width="572" height="40" uuid="421680d6-e214-4381-b698-532449f2cb32"/>
+					<textField>
+						<reportElement x="0" y="0" width="572" height="40" uuid="aea46529-6296-4bfc-8a1f-7ef508123285"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font size="18" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA["*** FIRST NOTICE ***"]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="70">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement x="0" y="0" width="572" height="65" uuid="74ae1019-4fdf-4002-85fc-f304a0db1a59"/>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="5" width="572" height="60" isPrintWhenDetailOverflows="true" uuid="49cd1201-d61a-45b0-b1b2-5d6ef91f88e2">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="5" leftPadding="10" rightPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+						<font fontName="SansSerif" size="10" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Service Address:     "+($F{mailingAddress1}==null?"":$F{mailingAddress1})+
+($F{mailingAddress2}==null?"":", "+$F{mailingAddress2})+
+($F{mailingCity}==null?"":", "+$F{mailingCity})+" "+
+($F{mailingState}==null?"":" "+$F{mailingState})+
+($F{mailingPostal}==null?"":" "+$F{mailingPostal})+"<br />"+
+"Account Number:     "+($F{Account Number}==null?"":$F{Account Number})+"<br />"+
+"Total Amount Due:   "+($F{Total Amount Due}==null?"":$F{Total Amount Due})]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="280" y="5" width="290" height="60" isPrintWhenDetailOverflows="true" uuid="716f7dcf-cc15-4503-8c42-466535836ee0">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="10" rightPadding="0"/>
+					<textElement textAlignment="Left" verticalAlignment="Bottom" markup="html">
+						<font fontName="SansSerif" size="10" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Due Date:     "+($F{Due Date}==null?"":new SimpleDateFormat("MMMM dd, yyyy").format($F{Due Date}))]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="60" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement x="0" y="0" width="572" height="60" uuid="74b851a6-3e32-4786-90d4-2334cdaa2287"/>
+				<textField textAdjust="StretchHeight">
+					<reportElement x="0" y="0" width="572" height="60" uuid="95d0e317-8ea0-48bb-ba9e-992431a4ad6e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="10" bottomPadding="2" rightPadding="10">
+						<pen lineWidth="1.0" lineStyle="Dotted"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Justified" verticalAlignment="Top" markup="html">
+						<font fontName="SansSerif" size="10"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Our records indicate there is still a balance outstanding for utility service at the above service location. Please make payment in full or call our office to make arrangements by the due date of this letter to avoid referral to our collection agency. Reference the above account number on your check and on any correspondence to our office to insure accuracy.<br />"]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="60">
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="-2" width="180" height="20" uuid="9b58f7b6-9aa8-4024-b2f5-af0b6a3e18f6">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="2" leftPadding="10" bottomPadding="2" rightPadding="10">
+					<pen lineWidth="1.0" lineStyle="Dotted"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Top" markup="html">
+					<font fontName="SansSerif" size="10"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Please make checks payable to:"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="180" y="-2" width="392" height="60" uuid="4980abac-b196-4926-9b26-16d50fdb51f2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="2" leftPadding="10" bottomPadding="2" rightPadding="10">
+					<pen lineWidth="1.0" lineStyle="Dotted"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Top" markup="html">
+					<font fontName="SansSerif" size="10"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Los Alamos Department of Public Utilities <br />"+
+"Los Alamos Municipal Building <bs/>"+
+"1000 Central Ave, Suite 130 <br />"+
+"Los Alamos, NM 87544"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="90">
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="572" height="90" uuid="9debaea2-00a2-4e30-8c88-f61db66ecab6">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="2" leftPadding="10" bottomPadding="10" rightPadding="10">
+					<pen lineWidth="1.0" lineStyle="Dotted"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Top" markup="html">
+					<font fontName="SansSerif" size="10"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["We accept VISA and MasterCard by calling (505) 662-8333.<br />"+
+
+"If you have any questions or would like to make payment arrangements, please call us at (505) 662-8333.. Thank you for your attention to this matter. If payment has been made, thank you for your payment and please disregard this notice. <br /><br />"+
+
+"Los Alamos Department of Public Utilitites<br />"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="132">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="10" width="572" height="32" isPrintWhenDetailOverflows="true" uuid="caf209ab-6e8d-4aa5-99e7-bce8857dcd31">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="5" rightPadding="5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Please tear off and return this portion with your payment"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="5" width="572" height="1" uuid="7e1977a2-1f18-4030-aa5d-3cc3856547fa">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="42" width="280" height="90" isPrintWhenDetailOverflows="true" uuid="779e20c8-fd38-41a4-9a68-5f5d955a1531">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="5" leftPadding="10" rightPadding="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+					<paragraph lineSpacing="Double" lineSpacingSize="3.0"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Customer Name:    "+($F{customerContactId}==null?"":$F{customerContactId})+"<br/>"+
+"Account Number:  "+($F{Account Number}==null?"":$F{Account Number})+"<br/>"+
+"Service Location:   "+($F{mailingAddress1}==null?"":$F{mailingAddress1})+" "+($F{mailingAddress2}==null?"":$F{mailingAddress2})+"<br/>"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="280" y="42" width="292" height="90" isPrintWhenDetailOverflows="true" uuid="3df33390-44e7-4f0e-86f5-bfa26e07a8ce">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="5" leftPadding="10" rightPadding="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+					<paragraph lineSpacing="Double" lineSpacingSize="3.0"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Due Date:  "+($F{Due Date}==null?"":new SimpleDateFormat("MMMM dd, yyyy").format($F{Due Date}))+"<br/>"+
+"Amount Due: "+($F{Total Amount Due}==null?"":$F{Total Amount Due}) +"<br/>"+
+"Amount Paid: <u>__________________________</u>"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

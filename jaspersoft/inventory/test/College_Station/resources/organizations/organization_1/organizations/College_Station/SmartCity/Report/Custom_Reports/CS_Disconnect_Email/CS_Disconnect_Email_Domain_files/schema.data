@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <dataIslands>
+    <itemGroup id="Disconnect_Email" label="Disconnect_Email" resourceId="Disconnect_Email"></itemGroup>
+  </dataIslands>
+  <items>
+    <item id="ACCT_ID" label="Account ID" resourceId="Disconnect_Email.ACCT_ID"></item>
+    <item id="ADDRESS" label="Premise Address" resourceId="Disconnect_Email.ADDRESS"></item>
+    <item id="CRE_DT" label="Create Date" resourceId="Disconnect_Email.CRE_DT"></item>
+    <item id="EMAIL_ADDRESS" label="Email Address" resourceId="Disconnect_Email.EMAIL_ADDRESS"></item>
+    <item id="END_DT" label="Stop Date" resourceId="Disconnect_Email.END_DT"></item>
+    <item id="ENTITY_NAME" label="Person Name" resourceId="Disconnect_Email.ENTITY_NAME"></item>
+    <item id="IS_CREATED_ON_PREV_DAY" label="Created on Previous Day" resourceId="Disconnect_Email.IS_CREATED_ON_PREV_DAY"></item>
+  </items>
+  <resources>
+    <jdbcQuery id="Disconnect_Email" datasourceId="CollegeStation_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="ADDRESS" type="java.lang.String"></field>
+        <field id="ENTITY_NAME" type="java.lang.String"></field>
+        <field id="END_DT" type="java.sql.Timestamp"></field>
+        <field id="EMAIL_ADDRESS" type="java.lang.String"></field>
+        <field id="CRE_DT" type="java.sql.Timestamp"></field>
+        <field id="IS_CREATED_ON_PREV_DAY" type="java.lang.String"></field>
+      </fieldList>
+      <query>SELECT
+    B.ACCT_ID,
+    PREM2.ADDRESS1 ||', '|| PREM2.CITY || ', ' 
+        || DECODE(PREM2.COUNTY, ' ', '', TRIM(PREM2.COUNTY))  
+        || TRIM(PREM2.STATE) || ', ' || TRIM(PREM2.POSTAL) || ', ' 
+        || TRIM(PREM2.COUNTRY) AS ADDRESS,
+    PNAME.ENTITY_NAME_UPR AS ENTITY_NAME,
+    B.END_DT,
+    (
+        SELECT
+            CONTDET.CONTACT_VALUE
+        FROM
+            CISADM.C1_PER_CONTDET CONTDET
+        WHERE 
+            CONTDET.PER_ID = ACTP.PER_ID
+            AND CONTDET.COMM_RTE_TYPE_CD = 'PRIMARYEMAIL'
+            AND CONTDET.CND_PRIMARY_FLG = 'C1YS'
+    ) AS EMAIL_ADDRESS,
+    B.CRE_DT,
+    B.IS_CREATED_ON_PREV_DAY
+FROM
+    (
+    SELECT
+        A.*,
+        DECODE(CRE_DT, TRUNC(SYSDATE) - 1, 'Y', 'N') AS IS_CREATED_ON_PREV_DAY
+    FROM
+        (
+        SELECT
+            ACCT.ACCT_ID,
+            PREM.PREM_ID,
+            SA.SA_ID,
+            SA.SA_TYPE_CD,
+            SA.END_DT,
+            TRUNC(FA.CRE_DTTM) AS CRE_DT,
+            ROW_NUMBER() OVER (PARTITION BY ACCT.ACCT_ID, PREM.PREM_ID ORDER BY SA.END_DT DESC, FA.CRE_DTTM ASC) RN
+        FROM
+            CISADM.CI_ACCT ACCT,
+            CISADM.CI_SA SA,
+            CISADM.CI_SA_TYPE SATY,
+            CISADM.CI_PREM PREM,
+            CISADM.CI_SA_SP_FA SASPFA,
+            CISADM.CI_FA FA
+        WHERE
+            SA.ACCT_ID = ACCT.ACCT_ID
+            AND SA.SA_STATUS_FLG in ('30','40')
+            AND SA.END_DT &gt;= TRUNC(SYSDATE)
+            AND SATY.SA_TYPE_CD = SA.SA_TYPE_CD
+            AND SATY.CIS_DIVISION = SA.CIS_DIVISION
+            AND SATY.SVC_TYPE_CD IN ('E', 'W', 'WW', 'SW', 'R', 'D')
+            AND PREM.PREM_ID = SA.CHAR_PREM_ID
+            AND SASPFA.SA_ID = SA.SA_ID
+            AND SASPFA.SA_SP_FA_TYPE_FLG = 'SP'
+            AND FA.FA_ID = SASPFA.FA_ID
+            AND FA.FA_TYPE_CD IN ('SOM-STOP','SOM-STST')
+            AND FA.FA_STATUS_FLG = 'P'
+            AND SA.END_DT = TRUNC(FA.SCHED_DTTM)
+        ) A
+    WHERE
+        A.RN = 1 ) B,
+    CISADM.CI_PREM PREM2,
+    CISADM.CI_ACCT_PER ACTP,
+    CISADM.CI_PER_NAME PNAME
+WHERE
+    PREM2.PREM_ID = B.PREM_ID
+    AND ACTP.ACCT_ID = B.ACCT_ID
+    AND ACTP.MAIN_CUST_SW = 'Y'
+    AND PNAME.PER_ID = ACTP.PER_ID
+    AND PNAME.NAME_TYPE_FLG = 'PRIM'
+ORDER BY
+    B.END_DT,
+    B.CRE_DT</query>
+    </jdbcQuery>
+  </resources>
+</schema>

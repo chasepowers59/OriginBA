@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { swapTileSlots } from "./dashboardSlots";
+import { MAX_TILES, swapTileSlots, visibleSlots } from "./dashboardSlots";
 
 /**
- * Pure slot-swap logic for the 2x2 dashboard pinboard, extracted from the old native
+ * Pure slot-swap logic for the dashboard pinboard, extracted from the old native
  * drag-and-drop handler so it can be unit-tested and reused under @dnd-kit. Dragging a
  * tile onto another slot swaps them; dropping onto an empty slot moves the tile.
  */
@@ -46,5 +46,21 @@ describe("swapTileSlots", () => {
   it("is a no-op when the source slot is empty", () => {
     const input = [{ slot: 1, id: "b" }];
     expect(swapTileSlots(input, 0, 1)).toEqual(input);
+  });
+});
+
+describe("the dashboard grid", () => {
+  it("holds up to eight tiles", () => {
+    expect(MAX_TILES).toBe(8);
+  });
+
+  it("shows the tiles there are and one place to add the next", () => {
+    expect(visibleSlots([0, 1, 2])).toEqual([0, 1, 2, 3]);
+    expect(visibleSlots([0, 2])).toEqual([0, 1, 2]);
+    expect(visibleSlots([])).toEqual([0]);
+  });
+
+  it("shows no add slot when the board is full", () => {
+    expect(visibleSlots([0, 1, 2, 3, 4, 5, 6, 7])).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
   });
 });

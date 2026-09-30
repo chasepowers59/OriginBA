@@ -2,13 +2,23 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 from typing import Any
 
 from api.demo_db import demo_configured
 from api.warehouse_db import warehouse_configured
+from api.executive_dashboard import present_card_errors, unavailable_note
+from api.money_rules import MONEY_FILTERS, STANDING_ADJUSTMENT
+from api.row_security import only_readable, rule_filters
+from api.reporting_dates import data_as_of
 from api.kpi_runner import date_windows, execute_kpi_definition
 from api.snapshot_catalog import load_catalog
 
+
+CHARGE_FTS = [{"field": "Is Frozen", "op": "eq", "value": True},
+              {"field": "Is Payment", "op": "eq", "value": False},
+              {"field": "Is Payment Cancellation", "op": "eq", "value": False}]
 
 WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
     # DBT-CANVAS section dashboards (2026-08-26): every snapshot is a governed
@@ -18,16 +28,16 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
     # (field_ops), Customer Operations (customer_ops), Finance (finance). Filters
     # use base-product constants or canvas flags only -- never client config.
     "billing": [
-        {"id": "billed_amount", "label": "Billed amount", "subtitle": "Frozen bill segments",
+        {"id": "billed_amount", "label": "Billed amount", "subtitle": "Frozen bill segments, by bill date",
          "snapshot_id": "rpt_bill_segment", "format": "currency", "workstream": "billing",
          "explore_report_id": None, "date_field": "Bill Date",
          "value": {"dimensions": [], "measures": [{"field": "Billed Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Frozen", "op": "eq", "value": True}]},
+                   "filters": MONEY_FILTERS["rpt_bill_segment"]},
          "trend": {"dimensions": ["SA Type"], "measures": [{"field": "Billed Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Frozen", "op": "eq", "value": True}], "limit": 6}},
-        {"id": "bills_completed", "label": "Bills completed", "subtitle": "Cycled throughput",
+                   "filters": MONEY_FILTERS["rpt_bill_segment"], "limit": 6}},
+        {"id": "bills_completed", "label": "Bills completed", "subtitle": "Completed in the period",
          "snapshot_id": "rpt_bill", "format": "number", "workstream": "billing",
-         "explore_report_id": None, "date_field": "Window Start Date",
+         "explore_report_id": None, "date_field": "Completed Date/Time",
          "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}],
                    "filters": [{"field": "Is Completed", "op": "eq", "value": True}]},
          "trend": {"dimensions": ["Bill Cycle"], "measures": [{"field": "*", "agg": "count"}],
@@ -48,18 +58,19 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
                    "filters": [{"field": "Is Cancelled", "op": "eq", "value": True}], "limit": 6}},
     ],
     "cashiering": [
-        {"id": "payments_collected", "label": "Payments collected", "subtitle": "Frozen pay segments",
+        {"id": "payments_collected", "label": "Payments collected", "subtitle": "Payments on frozen pay segments",
          "snapshot_id": "rpt_payment", "format": "currency", "workstream": "cashiering",
          "explore_report_id": None, "date_field": "Payment Date",
-         "value": {"dimensions": [], "measures": [{"field": "Pay Segment Amount", "agg": "sum"}], "filters": []},
-         "trend": {"dimensions": ["Payment Status"], "measures": [{"field": "Pay Segment Amount", "agg": "sum"}],
-                   "filters": [], "limit": 6}},
-        {"id": "tender_amount", "label": "Tenders received", "subtitle": "By tender type",
+         "value": {"dimensions": [], "measures": [{"field": "Pay Segment Amount", "agg": "sum"}], "filters": MONEY_FILTERS["rpt_payment"]},
+         # by utility: the money filter pins the status (tests/test_kpi_breakdowns.py)
+         "trend": {"dimensions": ["Utility Type"], "measures": [{"field": "Pay Segment Amount", "agg": "sum"}],
+                   "filters": MONEY_FILTERS["rpt_payment"], "limit": 6}},
+        {"id": "tender_amount", "label": "Tenders received", "subtitle": "Not cancelled, by tender type",
          "snapshot_id": "rpt_payment_tender", "format": "currency", "workstream": "cashiering",
          "explore_report_id": None, "date_field": "Payment Date",
-         "value": {"dimensions": [], "measures": [{"field": "Tender Amount", "agg": "sum"}], "filters": []},
+         "value": {"dimensions": [], "measures": [{"field": "Tender Amount", "agg": "sum"}], "filters": MONEY_FILTERS["rpt_payment_tender"]},
          "trend": {"dimensions": ["Tender Type"], "measures": [{"field": "Tender Amount", "agg": "sum"}],
-                   "filters": [], "limit": 6}},
+                   "filters": MONEY_FILTERS["rpt_payment_tender"], "limit": 6}},
         {"id": "unbalanced_events", "label": "Unbalanced pay events", "subtitle": "Cashiering exceptions",
          "snapshot_id": "rpt_payment", "format": "number", "workstream": "cashiering",
          "explore_report_id": None, "windowless": True,
@@ -82,7 +93,7 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
          "value": {"dimensions": [], "measures": [{"field": "Total Balance", "agg": "sum"}], "filters": []},
          "trend": {"dimensions": ["Oldest Debt Band"], "measures": [{"field": "Total Balance", "agg": "sum"}],
                    "filters": [], "limit": 6}},
-        {"id": "past_due", "label": "Past-due balance", "subtitle": "SAs past due",
+        {"id": "past_due", "label": "Past-due balance", "subtitle": "Service agreements past due",
          "snapshot_id": "rpt_sa_aged_balance", "format": "currency", "workstream": "debt",
          "explore_report_id": None, "windowless": True,
          "value": {"dimensions": [], "measures": [{"field": "Total Balance", "agg": "sum"}],
@@ -128,7 +139,7 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
          "snapshot_id": "rpt_usage_txn", "format": "number", "workstream": "meter_ops",
          "explore_report_id": None, "date_field": "Start Date/Time",
          "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
-         "trend": {"dimensions": ["Usage Status Code"], "measures": [{"field": "*", "agg": "count"}],
+         "trend": {"dimensions": ["Usage Status"], "measures": [{"field": "*", "agg": "count"}],
                    "filters": [], "limit": 6}},
         {"id": "never_registered", "label": "Never registered at head-end", "subtitle": "AMI rollout worklist",
          "snapshot_id": "rpt_device_asset", "format": "number", "workstream": "meter_ops",
@@ -146,11 +157,11 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
                    "filters": [{"field": "Days Switched Off", "op": "gte", "value": 60}], "limit": 6}},
     ],
     "field_ops": [
-        {"id": "field_activities", "label": "Field activities", "subtitle": "MDM activity volume",
+        {"id": "field_activities", "label": "Field activities", "subtitle": "Field activities created in the period",
          "snapshot_id": "rpt_field_activity", "format": "number", "workstream": "field_ops",
-         "explore_report_id": None, "date_field": "Event Date/Time",
+         "explore_report_id": None, "date_field": "Created Date/Time",
          "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
-         "trend": {"dimensions": ["Activity Type"], "measures": [{"field": "*", "agg": "count"}],
+         "trend": {"dimensions": ["Field Task Type"], "measures": [{"field": "*", "agg": "count"}],
                    "filters": [], "limit": 6}},
         {"id": "open_todos", "label": "Open To Do entries", "subtitle": "The operational queue",
          "snapshot_id": "rpt_todo", "format": "number", "workstream": "field_ops",
@@ -195,20 +206,26 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
                    "filters": [], "limit": 6}},
     ],
     "finance": [
-        {"id": "frozen_charge_fts", "label": "Frozen charge FTs", "subtitle": "Bill segments + adjustments",
+        # Bill segments and adjustments net of their cancellations; payments are not charges
+        # (summing every FT showed -$414K at Ellensburg for $3.24M of charges, 2026-09-29).
+        {"id": "frozen_charge_fts", "label": "Charges posted", "subtitle": "Bills and adjustments, net of cancellations",
          "snapshot_id": "rpt_financial_txn", "format": "currency", "workstream": "finance",
          "explore_report_id": None, "date_field": "Accounting Date",
          "value": {"dimensions": [], "measures": [{"field": "Current Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Frozen", "op": "eq", "value": True}]},
+                   "filters": CHARGE_FTS},
          "trend": {"dimensions": ["FT Type"], "measures": [{"field": "Current Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Frozen", "op": "eq", "value": True}], "limit": 6}},
-        {"id": "adjustments", "label": "Adjustment dollars", "subtitle": "AD/AX in window",
+                   "filters": CHARGE_FTS, "limit": 6, "rank": "magnitude"}},
+        # CI_FT.CUR_AMT of frozen AD transactions (cancellations are AX, excluded). By adjustment
+        # type, ranked by size: at Ellensburg 7,198 of 9,874 were transfers netting $0 whose legs,
+        # drawn by SA Type, made the bars sum ~$127K over a $17,350 net (2026-09-29).
+        {"id": "adjustments", "label": "Adjustment dollars", "subtitle": "Frozen adjustments, charges net of credits",
          "snapshot_id": "rpt_financial_txn", "format": "currency", "workstream": "finance",
          "explore_report_id": None, "date_field": "Accounting Date",
          "value": {"dimensions": [], "measures": [{"field": "Current Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Adjustment", "op": "eq", "value": True}]},
-         "trend": {"dimensions": ["SA Type"], "measures": [{"field": "Current Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Adjustment", "op": "eq", "value": True}], "limit": 6}},
+                   "filters": [*STANDING_ADJUSTMENT, *MONEY_FILTERS["rpt_financial_txn"]]},
+         "trend": {"dimensions": ["Adjustment Type"], "measures": [{"field": "Current Amount", "agg": "sum"}],
+                   "filters": [*STANDING_ADJUSTMENT, *MONEY_FILTERS["rpt_financial_txn"]],
+                   "limit": 6, "rank": "magnitude"}},
         {"id": "gl_lines", "label": "GL distribution lines", "subtitle": "Posting detail rows",
          "snapshot_id": "rpt_gl", "format": "number", "workstream": "finance",
          "explore_report_id": None, "date_field": "Accounting Date",
@@ -218,6 +235,51 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
     ],
 }
 
+# Asset Operations and Operations & Shared Services had no cards: their summary route
+# returned 404 and the page showed a cross-filter hint over nothing (2026-09-04). The
+# device cards are the meter_ops definitions re-homed, not re-written, so the two pages
+# cannot disagree; the copies carry this workstream's id for the card's badge and links.
+
+def _rehomed(workstream, kpi_id, new_workstream):
+    spec = next(k for k in WORKSTREAM_KPIS[workstream] if k["id"] == kpi_id)
+    return {**spec, "workstream": new_workstream}
+
+
+WORKSTREAM_KPIS["assets"] = [
+    {"id": "installed_devices", "label": "Installed devices", "subtitle": "Meters installed today",
+     "snapshot_id": "rpt_device_asset", "format": "number", "workstream": "assets",
+     "explore_report_id": None, "windowless": True,
+     "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}],
+               "filters": [{"field": "Is Installed", "op": "eq", "value": True}]},
+     "trend": {"dimensions": ["Device Type"], "measures": [{"field": "*", "agg": "count"}],
+               "filters": [{"field": "Is Installed", "op": "eq", "value": True}], "limit": 6}},
+    {"id": "devices_switched_off", "label": "Installed but switched off", "subtitle": "Installed, service off",
+     "snapshot_id": "rpt_device_asset", "format": "number", "workstream": "assets",
+     "explore_report_id": None, "windowless": True,
+     "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}],
+               "filters": [{"field": "Installed But Switched Off", "op": "eq", "value": True}]},
+     "trend": {"dimensions": ["Device Type"], "measures": [{"field": "*", "agg": "count"}],
+               "filters": [{"field": "Installed But Switched Off", "op": "eq", "value": True}], "limit": 6}},
+    _rehomed("meter_ops", "never_registered", "assets"),
+    _rehomed("meter_ops", "devices_dark_60d", "assets"),
+]
+
+WORKSTREAM_KPIS["common"] = [
+    {"id": "batch_runs", "label": "Batch runs", "subtitle": "Runs started in the period, by outcome",
+     "snapshot_id": "rpt_batch", "format": "number", "workstream": "common",
+     "explore_report_id": None, "date_field": "Start Time",
+     "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
+     "trend": {"dimensions": ["Run Status"], "measures": [{"field": "*", "agg": "count"}],
+               "filters": [], "limit": 6}},
+    {"id": "todos_created", "label": "To Do entries created", "subtitle": "Created in the period",
+     "snapshot_id": "rpt_todo", "format": "number", "workstream": "common",
+     "explore_report_id": None, "date_field": "Created Date/Time",
+     "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
+     "trend": {"dimensions": ["To Do Type"], "measures": [{"field": "*", "agg": "count"}],
+               "filters": [], "limit": 6}},
+    _rehomed("field_ops", "open_todos", "common"),
+]
+
 def build_workstream_summary(
     workstream_id: str,
     days: int = 30,
@@ -226,14 +288,19 @@ def build_workstream_summary(
     compare_mode: str = "prior_period",
     extra_filters: list[dict[str, Any]] | None = None,
     organization_id: str | None = None,
+    row_rules: tuple | list = (),
 ) -> dict[str, Any]:
     catalog = load_catalog()
     labels = catalog.get("workstream_labels", {})
     ws = workstream_id.lower()
-    kpis_def = WORKSTREAM_KPIS.get(ws, [])
+    kpis_def = only_readable(WORKSTREAM_KPIS.get(ws, []), row_rules, organization_id)
+    extra_filters = [*(extra_filters or []), *rule_filters(row_rules)]
 
-    (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode)
+    (date_start, date_end), (prior_start, prior_end), compare_label = date_windows(days, compare_mode, organization_id)
+    as_of = data_as_of(organization_id)
     period_label = f"Last {days} days" if compare_mode != "mom" else "Month to date"
+    if as_of:   # a frozen copy: say where the window ends instead of implying it is live
+        period_label = f"{period_label} to {date.fromisoformat(as_of).strftime('%b %-d, %Y')}"
     client_id = organization_id or catalog.get("client", "demo")
 
     if ws not in WORKSTREAM_KPIS:
@@ -251,7 +318,7 @@ def build_workstream_summary(
             "compare_label": compare_label,
             "workstream": ws,
             "workstream_label": labels.get(ws, ws),
-            "period": {"start": date_start, "end": date_end, "label": period_label, "days": days},
+            "period": {"start": date_start, "end": date_end, "label": period_label, "days": days, "data_as_of": as_of},
             "prior_period": {
                 "start": prior_start,
                 "end": prior_end,
@@ -272,8 +339,12 @@ def build_workstream_summary(
             ],
         }
 
-    kpis = [
-        execute_kpi_definition(
+    # Concurrent, like the executive dashboard: each KPI is one or more round-trips
+    # to Oracle over the VPN at client volume, and a sequential loop was ~20s.
+    from concurrent.futures import ThreadPoolExecutor
+
+    def _run(kpi: dict[str, Any]) -> dict[str, Any]:
+        return execute_kpi_definition(
             kpi,
             days=days,
             compare=compare,
@@ -281,9 +352,15 @@ def build_workstream_summary(
             extra_filters=extra_filters,
             organization_id=organization_id,
         )
-        for kpi in kpis_def
-    ]
+
+    with ThreadPoolExecutor(max_workers=min(8, max(1, len(kpis_def)))) as pool:
+        kpis = list(pool.map(_run, kpis_def))
+    # An org whose warehouse is unbuilt or unconnected fails every KPI the same way.
+    # One sentence, not a grid of driver errors -- the same collapse the home page does.
+    note = unavailable_note(kpis)
+    kpis = [] if note else present_card_errors(kpis)
     return {
+        "note": note,
         "client": client_id,
         "db_configured": True,
         "compare_enabled": compare,
@@ -291,7 +368,7 @@ def build_workstream_summary(
         "compare_label": compare_label,
         "workstream": ws,
         "workstream_label": labels.get(ws, ws),
-        "period": {"start": date_start, "end": date_end, "label": period_label, "days": days},
+        "period": {"start": date_start, "end": date_end, "label": period_label, "days": days, "data_as_of": as_of},
         "prior_period": {
             "start": prior_start,
             "end": prior_end,
@@ -323,7 +400,7 @@ WORKSTREAM_ABOUT: dict[str, dict[str, Any]] = {
             "Aged balances and arrears -- Collections & Debt",
         ],
         "related": [
-            {"workstream": "finance", "via": "Bill Segment ID -> frozen bill-segment FTs (the revenue tie the reconciliation canvas asserts)"},
+            {"workstream": "finance", "via": "Bill Segment ID -> frozen bill-segment FTs (the revenue tie the reconciliation data set asserts)"},
             {"workstream": "cashiering", "via": "Account ID / Bill ID -> payments applied against billed balances"},
             {"workstream": "meter_ops", "via": "Bill Segment ID -> the usage and service-quantity lines behind each segment"},
             {"workstream": "customer_ops", "via": "SA ID -> the agreement and customer context on every segment"},
@@ -345,8 +422,8 @@ WORKSTREAM_ABOUT: dict[str, dict[str, Any]] = {
     },
     "debt": {
         "summary": "What is owed and what is being done about it: aged balances "
-                   "(rederived from raw FTs and verified 100% against the client's own "
-                   "snapshot), collection/severance processes, pay plans, credit rating.",
+                   "(rederived from raw FTs and verified 100% against the aged balances the "
+                   "client's own reports read), collection/severance processes, pay plans, credit rating.",
         "not_included": [
             "Current bill production -- Billing & Rates",
             "The cash drawer itself -- Cashiering & Payments",
@@ -404,7 +481,7 @@ WORKSTREAM_ABOUT: dict[str, dict[str, Any]] = {
     "finance": {
         "summary": "The ledger view: every financial transaction (bill segments, "
                    "payments, adjustments) net of cancellation, GL distribution "
-                   "lines, and the revenue reconciliation control canvas.",
+                   "lines, and the revenue reconciliation control data set.",
         "not_included": [
             "Tender-level cash detail -- Cashiering & Payments",
             "Calc-line pricing itemization -- Billing & Rates",
@@ -421,7 +498,7 @@ WORKSTREAM_ABOUT: dict[str, dict[str, Any]] = {
                    "lifecycle header, batch runs, To Do queues, and characteristics "
                    "for every entity type.",
         "not_included": [
-            "Domain detail -- each canvas here cross-links into its owning workstream by id",
+            "Workstream detail -- each data set here links into its owning workstream by ID",
         ],
         "related": [
             {"workstream": "billing", "via": "Bill ID -> the segments inside each bill"},

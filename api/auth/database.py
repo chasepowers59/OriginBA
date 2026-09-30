@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
@@ -37,6 +39,28 @@ def get_session_factory():
     if _SessionLocal is None:
         _SessionLocal = sessionmaker(bind=get_engine(), autoflush=False, autocommit=False, future=True)
     return _SessionLocal
+
+
+@contextmanager
+def temporary_engine():
+    """Bind a fresh engine from the CURRENT env for the block, then restore the old one.
+
+    The engine is built once per process, so a caller that points
+    PORTAL_AUTH_DATABASE_URL at another database otherwise keeps writing to whichever
+    one was opened first. Restoring rather than merely clearing matters: several
+    callers use `sqlite:///:memory:`, and a cleared engine rebuilds that as an EMPTY
+    database, silently discarding everything they had set up.
+    """
+    global _engine, _SessionLocal
+    previous_engine, previous_factory = _engine, _SessionLocal
+    _engine = None
+    _SessionLocal = None
+    try:
+        yield
+    finally:
+        if _engine is not None:
+            _engine.dispose()
+        _engine, _SessionLocal = previous_engine, previous_factory
 
 
 def session_scope():

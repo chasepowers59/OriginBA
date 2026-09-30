@@ -21,7 +21,7 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
-CATALOG_PATH = ROOT / "output" / "snapshot_explorer_catalog.json"
+CATALOG_PATH = ROOT / "output" / "catalog_dbt.json"
 
 WORKSTREAM_ORDER = [
     "finance",

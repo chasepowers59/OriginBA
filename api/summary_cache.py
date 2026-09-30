@@ -1,0 +1,82 @@
+"""A cache for page summaries and report results, which change only when the warehouse is
+rebuilt. With the warehouse's build stamp (api/data_version.py) a result is kept until the
+stamp moves, at most twelve hours; without one, five minutes.
+
+The key is everything a summary depends on (org, window, comparison, filters, lenses, the
+caller's grants, and the day, so a window never outlives its date). A summary with any
+failed card is never kept: a transient error must not be served to the next visitor.
+"""
+from __future__ import annotations
+
+import threading
+import time
+from datetime import date
+from typing import Any, Callable
+
+TTL_SECONDS = 300
+VERSIONED_TTL_SECONDS = 12 * 3600
+# Report results ride here too; the oldest entry goes first past this many.
+MAX_ENTRIES = 500
+_entries: dict[tuple, tuple[float, Any]] = {}
+_lock = threading.Lock()
+_counts = {"hits": 0, "misses": 0}
+_building: dict[tuple, threading.Lock] = {}
+
+
+def _no_failed_card(result: Any) -> bool:
+    # A page whose every card failed collapses to one note and no cards; that note (not
+    # connected, not built) is as transient as the failures, so it is never kept either.
+    from api.executive_dashboard import (DATABASE_UNREACHABLE_NOTE, WAREHOUSE_NOT_BUILT_NOTE,
+                                         WAREHOUSE_NOT_CONNECTED_NOTE)
+    transient = {WAREHOUSE_NOT_BUILT_NOTE, WAREHOUSE_NOT_CONNECTED_NOTE, DATABASE_UNREACHABLE_NOTE}
+    return (not any(k.get("error") for k in result.get("kpis") or []) and not result.get("error")
+            and result.get("catalog_note") not in transient and result.get("note") not in transient)
+
+
+def cached(key: tuple, build: Callable[[], Any], keep: Callable[[Any], bool] = _no_failed_card,
+           version: str | None = None) -> Any:
+    full = (date.today().isoformat(), version, *key)
+    ttl = VERSIONED_TTL_SECONDS if version else TTL_SECONDS
+
+    def fresh() -> tuple[bool, Any]:
+        with _lock:
+            hit = _entries.get(full)
+        if hit and time.monotonic() - hit[0] < ttl:
+            _counts["hits"] += 1
+            return True, hit[1]
+        return False, None
+
+    found, value = fresh()
+    if found:
+        return value
+    # One build per key at a time: a second caller waits and reads what the first kept, rather
+    # than taking more of the organization's database sessions for the same answer.
+    with _lock:
+        key_lock = _building.setdefault(full, threading.Lock())
+    with key_lock:
+        found, value = fresh()
+        if found:
+            return value
+        _counts["misses"] += 1
+        try:
+            result = build()
+            with _lock:
+                if keep(result):
+                    _entries[full] = (time.monotonic(), result)
+                    while len(_entries) > MAX_ENTRIES:
+                        _entries.pop(next(iter(_entries)))
+        finally:
+            with _lock:
+                _building.pop(full, None)
+    return result
+
+
+def stats() -> dict[str, int]:
+    with _lock:
+        return {**_counts, "entries": len(_entries)}
+
+
+def clear() -> None:
+    with _lock:
+        _entries.clear()
+        _counts.update(hits=0, misses=0)

@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 8.2.0.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Letter-CM-DELINQ" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4c516a84-2bc8-4fb6-aa9f-74bc4b108917">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="NSI_CM-DELINQ"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://smartcity-jrs-test.originsmartops.com/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="gcinco@originutility.com|Newark1"/>
+	<property name="ireport.jasperserver.reportUnit" value="/SmartCity/Letter/Letter_CM_DELINQ"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="CM-DELINNQ"/>
+	<property name="ireport.jasperserver.report.resource" value="/SmartCity/Letter/Letter_CM_DELINQ_files/main_jrxml"/>
+	<parameter name="net.sf.jasperreports.xml.source" class="java.lang.String"/>
+	<parameter name="customerContactId" class="java.lang.String"/>
+	<parameter name="query" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{customerContactId}==null?"/root/C1-LetterPrintRecord/letter":"/root/C1-LetterPrintRecord[./customerContactId='"+$P{customerContactId}+"']/letter"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="XPath">
+		<![CDATA[$P{query}]]>
+	</queryString>
+	<field name="customerContactId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="../customerContactId"/>
+		<fieldDescription><![CDATA[../customerContactId]]></fieldDescription>
+	</field>
+	<field name="personId" class="java.lang.Long">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/personId"/>
+		<fieldDescription><![CDATA[customerContactDetails/personId]]></fieldDescription>
+	</field>
+	<field name="contactDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/contactDate"/>
+		<fieldDescription><![CDATA[customerContactDetails/contactDate]]></fieldDescription>
+	</field>
+	<field name="contactTime" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/contactTime"/>
+		<fieldDescription><![CDATA[customerContactDetails/contactTime]]></fieldDescription>
+	</field>
+	<field name="contactClass" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/contactClass"/>
+		<fieldDescription><![CDATA[customerContactDetails/contactClass]]></fieldDescription>
+	</field>
+	<field name="contactType" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/contactType"/>
+		<fieldDescription><![CDATA[customerContactDetails/contactType]]></fieldDescription>
+	</field>
+	<field name="letterTemplate" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/letterTemplate"/>
+		<fieldDescription><![CDATA[customerContactDetails/letterTemplate]]></fieldDescription>
+	</field>
+	<field name="letterDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactDetails/letterDate"/>
+		<fieldDescription><![CDATA[customerContactDetails/letterDate]]></fieldDescription>
+	</field>
+	<field name="entityName1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/entityName1"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/entityName1]]></fieldDescription>
+	</field>
+	<field name="entityName2" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/entityName2"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/entityName2]]></fieldDescription>
+	</field>
+	<field name="entityName3" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/entityName3"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/entityName3]]></fieldDescription>
+	</field>
+	<field name="mailingCountry" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingCountry"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingCountry]]></fieldDescription>
+	</field>
+	<field name="mailingAddress1" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingAddress1"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingAddress1]]></fieldDescription>
+	</field>
+	<field name="mailingAddress2" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingAddress2"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingAddress2]]></fieldDescription>
+	</field>
+	<field name="mailingAddress3" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingAddress3"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingAddress3]]></fieldDescription>
+	</field>
+	<field name="mailingAddress4" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingAddress4"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingAddress4]]></fieldDescription>
+	</field>
+	<field name="mailingCity" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingCity"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingCity]]></fieldDescription>
+	</field>
+	<field name="mailingState" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingState"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingState]]></fieldDescription>
+	</field>
+	<field name="mailingPostal" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingPostal"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingPostal]]></fieldDescription>
+	</field>
+	<field name="mailingCounty" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="mailingInformationDetails/mailingCounty"/>
+		<fieldDescription><![CDATA[mailingInformationDetails/mailingCounty]]></fieldDescription>
+	</field>
+	<field name="accountId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="severanceDetails/accountId"/>
+		<fieldDescription><![CDATA[severanceDetails/accountId]]></fieldDescription>
+	</field>
+	<field name="amountStillOwed" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="severanceDetails/amountStillOwed"/>
+		<fieldDescription><![CDATA[severanceDetails/amountStillOwed]]></fieldDescription>
+	</field>
+	<field name="collectionArrearsDate" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="severanceDetails/collectionArrearsDate"/>
+		<fieldDescription><![CDATA[severanceDetails/collectionArrearsDate]]></fieldDescription>
+	</field>
+	<field name="collectionProcessId" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="severanceDetails/collectionProcessId"/>
+		<fieldDescription><![CDATA[severanceDetails/collectionProcessId]]></fieldDescription>
+	</field>
+	<field name="CMTXDT" class="java.sql.Date">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="customerContactCharacteristics//CMTXDT"/>
+		<fieldDescription><![CDATA[customerContactCharacteristics/CMTXDT]]></fieldDescription>
+	</field>
+	<group name="AccountIDGroup" footerPosition="ForceAtBottom">
+		<groupExpression><![CDATA[$F{customerContactId}+"-"+$F{personId}]]></groupExpression>
+		<groupHeader>
+			<band height="120">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement x="0" y="0" width="572" height="100" uuid="98fd0b21-f0c0-4823-b7bc-83d0154cd312"/>
+					<frame>
+						<reportElement x="20" y="1" width="529" height="111" uuid="ac651f15-88de-40fe-b4ab-87ca1c9b00de"/>
+						<staticText>
+							<reportElement x="154" y="0" width="225" height="40" uuid="b1e00097-db52-43cc-91a9-be04b0f3036c"/>
+							<textElement textAlignment="Center" verticalAlignment="Top">
+								<font fontName="Arial Black" size="22"/>
+							</textElement>
+							<text><![CDATA[CITY OF NEWARK]]></text>
+						</staticText>
+						<staticText>
+							<reportElement x="90" y="30" width="360" height="30" uuid="39c9d32a-2804-49d4-9445-c020a672ae72"/>
+							<textElement textAlignment="Center">
+								<font fontName="Calibri" size="18"/>
+							</textElement>
+							<text><![CDATA[DEPARTMENT OF WATER AND SEWER UTILITIES]]></text>
+						</staticText>
+						<staticText>
+							<reportElement x="180" y="50" width="170" height="40" uuid="e5cbfa43-835f-419e-95da-d65557d34119"/>
+							<textElement textAlignment="Center" markup="none">
+								<font fontName="Calibri" size="12"/>
+							</textElement>
+							<text><![CDATA[920 Broad Street. Room 117 Newark, New Jersey 07102]]></text>
+						</staticText>
+						<image>
+							<reportElement x="0" y="5" width="110" height="102" uuid="335a8998-78fe-4c73-b85d-dade5eb0f913"/>
+							<imageExpression><![CDATA["repo:City_Of_Newark.png"]]></imageExpression>
+						</image>
+						<image>
+							<reportElement x="430" y="0" width="99" height="111" uuid="a54fef65-4095-4a3b-8966-bd8e156252ea"/>
+							<imageExpression><![CDATA["repo:Newark_Water_And_Sewer.png"]]></imageExpression>
+						</image>
+						<textField>
+							<reportElement x="107" y="80" width="333" height="18" uuid="7504c296-085f-41f2-9b5e-b8e3022acfdd"/>
+							<textElement textAlignment="Center" markup="html"/>
+							<textFieldExpression><![CDATA["973-733-6370 – <u><font color='blue'>watersewer.customerservice@ci.newark.nj.us</font></u>"]]></textFieldExpression>
+						</textField>
+					</frame>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="56">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="480" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement x="62" y="10" width="278" height="145" uuid="32cf220f-8b94-41fd-88b8-925414d77043"/>
+				<textField>
+					<reportElement x="0" y="60" width="158" height="15" uuid="2cea51b1-fce6-4a9a-bc2f-0ada45e128dc">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA[DATEFORMAT($F{letterDate}, "MMMM dd, yyyy")]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="0" width="200" height="15" uuid="478d93ef-4e48-4bfa-91f1-2208a12b147c">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{entityName1}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="30" width="258" height="15" uuid="e13614e0-df9f-4452-a15d-2df0cdfcb8ad"/>
+					<textElement>
+						<font fontName="Calibri" size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($F{mailingCity}!=null?$F{mailingCity}:"")  + ", " +  ($F{mailingState}!=null?$F{mailingState}:"") + " " + ($F{mailingPostal}!=null?$F{mailingPostal}:"")]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="15" width="200" height="15" uuid="cd420a69-1d7d-4794-bd7d-e905b0a4d54b">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{mailingAddress1}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="65" y="98" width="160" height="15" uuid="30d679f5-6c54-45a2-9d9b-0414ffb4b5dd">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="11" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Invoice/Delinquent Notice]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="98" width="28" height="15" uuid="23ce8ed6-a6d0-48b4-ba4f-73b5ff5c258e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="11"/>
+					</textElement>
+					<text><![CDATA[Re:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="113" width="68" height="15" uuid="de12fcf0-908b-496e-84ed-3f4a0de1e601">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="11"/>
+					</textElement>
+					<text><![CDATA[Account No:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="128" width="48" height="15" uuid="224410f4-7261-48a4-bbd3-bb8378e031c4">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="11"/>
+					</textElement>
+					<text><![CDATA[Address:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="65" y="113" width="100" height="15" uuid="a734af48-8f42-456b-8ca2-5fa17b8c7696">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{accountId}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="65" y="128" width="210" height="15" uuid="f7302dfe-8299-4aff-b5e4-4eabc7d9ec09">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{mailingAddress1}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="62" y="171" width="470" height="210" uuid="da0a1309-a57b-4920-85cc-e0201b9dd6cc"/>
+				<textField>
+					<reportElement x="0" y="-7" width="200" height="20" uuid="a4a2a8d0-ba66-49a4-9be2-459c2933e677"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Dear " + $F{entityName1} + ":"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="29" width="470" height="265" uuid="c71099fa-15a9-4829-bd49-2edcc4fd6c17">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Top" markup="html">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA["After reviewing our records, it appears that a payment has not been received for the account referenced above. The account currently shows an overdue balance of $" + $F{amountStillOwed} + ". If you have already made a payment, no further action is required. <br/><br/>We will maintain water service to the above address and allow you time to make a payment on this overdue account. Please make sure the outstanding balance is paid within 30 days of the date of this letter to avoid an interruption in service. If service is disconnected, a reconnection fee of $25.00 will be added to your next bill.<br/><br/>Please note that a late fee of 1.5% of the total due balance will be applied to the next bill.<br/><br/>For assistance, please call our customer service unit Monday to Friday, from 9:00am to 4:00pm: (973)733-6370 EXT 0.<br/><br/>In addition, you can request for a payment arrangement and/or make a payment via our self-service portal: <u><font color='blue'><a href='https://mywateraccount.newarknj.gov/user/login' target='_blank'>https://mywateraccount.newarknj.gov/user/login</a></font></u> you have two choices: enroll for full access to manage your account or use the Quick Pay option to pay your bill. <br/><br/><br/>Sincerely,<br/><br/>City of Newark<br/>Department of Water and Sewer Utilities"]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+</jasperReport>
