@@ -420,13 +420,14 @@ export const QUESTIONS = [
     title: "How are customers paying?",
     why: "Tender mix drives cashiering cost. A channel that is growing tells you where to invest, and one that is shrinking tells you what to retire.",
     canvas: "rpt_payment_tender",
+    filters: [{"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "Tender Type", value: "Tender Amount",
     sql: `select coalesce("Tender Type", "Tender Type Code") as "Tender Type",
                  count(*)::bigint as "Tenders",
                  round(sum("Tender Amount")::numeric, 2) as "Tender Amount",
-                 round(avg("Tender Amount")::numeric, 2) as "Average Tender",
-                 count(*) filter (where "Is Cancelled")::bigint as "Cancelled"
+                 round(avg("Tender Amount")::numeric, 2) as "Average Tender"
           from reporting.rpt_payment_tender
+          where not "Is Cancelled"
           group by 1 order by 3 desc nulls last`,
   }),
   q({
@@ -1224,18 +1225,19 @@ export const QUESTIONS = [
   q({
     id: "adjustments-by-type",
     process: "financial", workstream: "Adjustments",
-    kind: "distribution", unit: "money",
+    kind: "distribution", unit: "money", chart: "horizontal",
     title: "What is being adjusted, and by how much?",
     why: "Adjustments are the manual override on an automated system. A type that grows is a process people have stopped trusting.",
     canvas: "rpt_financial_txn",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Adjustment", "op": "eq", "value": true},
+              {"field": "Adjustment Status Code", "op": "eq", "value": "50"}],
     axis: "Adjustment Type", value: "Adjustment Amount",
     sql: `select coalesce("Adjustment Type", "Adjustment Type Code", '(unset)') as "Adjustment Type",
                  count(*)::bigint as "Adjustments",
                  round(sum("Adjustment Amount")::numeric, 2) as "Adjustment Amount",
-                 count(distinct "Account ID")::bigint as "Accounts",
-                 count(*) filter (where "Is Adjustment Cancellation")::bigint as "Cancellations"
+                 count(distinct "Account ID")::bigint as "Accounts"
           from reporting.rpt_financial_txn
-          where "Is Adjustment" or "Is Adjustment Cancellation"
+          where "Is Frozen" and "Is Adjustment" and "Adjustment Status Code" = '50'
           group by 1 order by 3 desc nulls last`,
   }),
   q({

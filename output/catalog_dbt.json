@@ -17108,6 +17108,7 @@
     "dimensions": [
      "FT Type",
      "Adjustment Type",
+     "Adjustment Status Code",
      "Revenue Class",
      "SA Type",
      "Service Type",
@@ -17879,7 +17880,7 @@
      "type": "text"
     },
     {
-     "description": "Currency measure, additive at this canvas's grain.",
+     "description": "The adjustment's amount (CI_ADJ.ADJ_AMT), on its AD transaction AND, with the SAME sign, on the AX transaction that cancels it -- so a plain sum counts every cancelled adjustment twice. Sum it with Is Adjustment = true and Adjustment Status Code = '50' (standing adjustments; 60 is cancelled). For the ledger net of charge and cancel, sum Current Amount instead. Ellensburg 2026-09-30: $15,572,430.42 unfiltered, $15,096,751.09 standing.",
      "group": "finance",
      "id": "Adjustment Amount",
      "label": "Adjustment Amount",
@@ -17887,7 +17888,7 @@
      "type": "numeric(15,2)"
     },
     {
-     "description": "Currency measure, additive at this canvas's grain.",
+     "description": "The adjustment's base amount (CI_ADJ.BASE_AMT), carried like Adjustment Amount on both the AD transaction and its AX cancellation: sum it only with Is Adjustment = true and Adjustment Status Code = '50'.",
      "group": "finance",
      "id": "Adjustment Base Amount",
      "label": "Adjustment Base Amount",
@@ -18314,12 +18315,28 @@
      "workstream_label": "Financial Transactions"
     },
     {
-     "chart_type": "pie",
+     "chart_type": "horizontal",
      "description": "Adjustments are the manual override on an automated system. A type that grows is a process people have stopped trusting.",
      "dimensions": [
       "Adjustment Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Adjustment",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Adjustment Status Code",
+       "op": "eq",
+       "value": "50"
+      }
+     ],
      "id": "adjustments_by_type",
      "measures": [
       {
@@ -22047,7 +22064,13 @@
      "dimensions": [
       "Tender Type"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "payments_by_tender",
      "measures": [
       {

@@ -1,11 +1,12 @@
 """Every sum shown over a money canvas carries that canvas's money filters (api/money_rules.py).
 
 Checked everywhere a sum is defined: the home page KPIs, every workstream KPI (card value
-and its trend), and every governed metric. Before 2026-09-28 three of them summed
+and its trend), every governed metric and every ready-to-run report in the catalog. Before 2026-09-28 three of them summed
 cancelled or unfrozen rows, each found by a different route; one table and one test now.
 """
 from __future__ import annotations
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -14,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from api.executive_dashboard import EXECUTIVE_KPIS  # noqa: E402
-from api.money_rules import missing_money_filters  # noqa: E402
+from api.money_rules import FROZEN, missing_money_filters  # noqa: E402
 from api.nlq_metrics import METRICS  # noqa: E402
 from api.workstream_dashboard import WORKSTREAM_KPIS  # noqa: E402
 
@@ -46,6 +47,37 @@ class MoneyRuleTests(unittest.TestCase):
             q = m.build({}).get("query", {})
             with self.subTest(metric=m.id):
                 self.assertEqual(missing_money_filters(m.snapshot_id, q), [])
+
+    def test_ready_to_run_reports(self):
+        snapshots = json.loads((ROOT / "output" / "catalog_dbt.json").read_text())["snapshots"]
+        for sid, snap in snapshots.items():
+            for r in snap.get("premade_reports") or []:
+                with self.subTest(report=f"{sid}.{r['id']}"):
+                    self.assertEqual(missing_money_filters(sid, r), [])
+
+
+class MeasureRuleTests(unittest.TestCase):
+    """Some measures carry their own rule beyond the canvas's. A cancellation FT (AX) carries
+    the cancelled adjustment's Adjustment Amount with the SAME sign, so a sum over the canvas
+    counts every cancelled adjustment twice (Ellensburg 2026-09-30: $15,572,430.42 shown,
+    $15,096,751.09 standing)."""
+
+    def sums(self, field, filters):
+        return missing_money_filters("rpt_financial_txn",
+                                     {"measures": [{"field": field, "agg": "sum"}], "filters": filters})
+
+    def test_adjustment_amount_needs_standing_adjustments(self):
+        for field in ("Adjustment Amount", "Adjustment Base Amount"):
+            with self.subTest(field=field):
+                self.assertEqual(self.sums(field, [FROZEN]), ["Is Adjustment", "Adjustment Status Code"])
+
+    def test_standing_adjustments_satisfy_it(self):
+        standing = [FROZEN, {"field": "Is Adjustment", "op": "eq", "value": True},
+                    {"field": "Adjustment Status Code", "op": "eq", "value": "50"}]
+        self.assertEqual(self.sums("Adjustment Amount", standing), [])
+
+    def test_other_measures_on_the_canvas_are_untouched(self):
+        self.assertEqual(self.sums("Current Amount", [FROZEN]), [])
 
 
 # The one sum over every FT type on purpose: its label says it is the net of everything posted.

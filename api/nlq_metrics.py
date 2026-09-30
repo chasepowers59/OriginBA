@@ -376,7 +376,8 @@ METRICS: list[NlqMetric] = [
         # a bare total (the cisadm-sql never-sum-across-UOMs rule).
         total=False,
         build=lambda _p: {"kind": "trend",
-                          "query": _sum("Billed Quantity", BILLED, dims=["Unit of Measure"])},
+                          "query": _sum("Billed Quantity", MONEY_FILTERS["rpt_billed_usage"],
+                                        dims=["Unit of Measure"])},
     ),
     # -------------------------------------------------------------- Payments
     NlqMetric(
