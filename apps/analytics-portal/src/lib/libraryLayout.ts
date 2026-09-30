@@ -7,6 +7,13 @@ import type { ReportLibraryEntry, ReportLibraryFolder } from "./types";
  * component only draws it.
  */
 
+/** The reader's own saved views: a folder at the top of the rail, not in the catalog. */
+export const SAVED_VIEWS = "saved";
+
+export function showsSavedViews(requested: string | null, savedCount: number): boolean {
+  return requested === SAVED_VIEWS && savedCount > 0;
+}
+
 /** The folder the URL asks for, or the first one with reports in it; never an empty folder. */
 export function folderToShow(folders: ReportLibraryFolder[], requested: string | null): ReportLibraryFolder | null {
   const withReports = folders.filter((f) => f.reports.length > 0);

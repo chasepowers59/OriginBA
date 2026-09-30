@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { folderToShow, libraryHref, searchLibrary, shapeLine, splitFolder } from "./libraryLayout";
+import { SAVED_VIEWS, folderToShow, libraryHref, searchLibrary, shapeLine, showsSavedViews, splitFolder } from "./libraryLayout";
 import type { ReportLibraryEntry, ReportLibraryFolder } from "./types";
 
 const report = (report_id: string, essential: boolean, extra: Partial<ReportLibraryEntry> = {}): ReportLibraryEntry => ({
@@ -108,5 +108,20 @@ describe("library links", () => {
     expect(libraryHref({ folder: "billing" })).toBe("/reports?folder=billing");
     expect(libraryHref({ folder: "billing", q: "arrears band" })).toBe("/reports?folder=billing&q=arrears+band");
     expect(libraryHref({ folder: null, q: " " })).toBe("/reports");
+  });
+});
+
+// A reader's own saved views are a folder of the library too, at the top of the rail, shown
+// only when they have some; the catalog folders are unchanged by it.
+describe("showsSavedViews", () => {
+  it("only when asked for and there is something to show", () => {
+    expect(showsSavedViews(SAVED_VIEWS, 3)).toBe(true);
+    expect(showsSavedViews(SAVED_VIEWS, 0)).toBe(false);
+    expect(showsSavedViews("billing_revenue", 3)).toBe(false);
+    expect(showsSavedViews(null, 3)).toBe(false);
+  });
+
+  it("is a link like any folder", () => {
+    expect(libraryHref({ folder: SAVED_VIEWS })).toBe("/reports?folder=saved");
   });
 });

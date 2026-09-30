@@ -5,7 +5,11 @@ import { ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { fetchReportLibrary } from "@/lib/api";
-import { folderToShow, libraryHref, searchLibrary, shapeLine, splitFolder, type SearchGroup } from "@/lib/libraryLayout";
+import { FavoritesPanel } from "@/components/FavoritesPanel";
+import { loadSavedViews } from "@/lib/savedViews";
+import {
+  SAVED_VIEWS, folderToShow, libraryHref, searchLibrary, shapeLine, showsSavedViews, splitFolder, type SearchGroup,
+} from "@/lib/libraryLayout";
 import type { ReportLibraryEntry, ReportLibraryFolder } from "@/lib/types";
 
 /**
@@ -23,6 +27,11 @@ export function ReportLibrary() {
   const [query, setQuery] = useState(urlQuery);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [savedCount, setSavedCount] = useState(0);
+  useEffect(() => {
+    loadSavedViews().then((views) => setSavedCount(views.length)).catch(() => setSavedCount(0));
+  }, []);
 
   useEffect(() => {
     fetchReportLibrary()
@@ -93,10 +102,20 @@ export function ReportLibrary() {
         </div>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-          <FolderRail folders={folders} current={searching ? null : folder.id} onPick={() => setQuery("")} />
+          <FolderRail
+            folders={folders}
+            savedCount={savedCount}
+            current={searching ? null : showsSavedViews(requested, savedCount) ? SAVED_VIEWS : folder.id}
+            onPick={() => setQuery("")}
+          />
           <div className="min-w-0">
             {searching ? (
               <SearchResults query={query.trim()} results={results} onClear={() => onSearch("")} />
+            ) : showsSavedViews(requested, savedCount) ? (
+              <section className="glass-panel p-6">
+                <h2 className="mb-4 text-xl font-semibold text-heading">Your saved views</h2>
+                <FavoritesPanel compact />
+              </section>
             ) : (
               <FolderView folder={folder} />
             )}
@@ -120,8 +139,9 @@ function inPlace(href: string, then?: () => void) {
   };
 }
 
-function FolderRail({ folders, current, onPick }: {
+function FolderRail({ folders, savedCount, current, onPick }: {
   folders: ReportLibraryFolder[];
+  savedCount: number;
   current: string | null;
   /** a folder click leaves search: its link carries no ?q */
   onPick: () => void;
@@ -130,7 +150,7 @@ function FolderRail({ folders, current, onPick }: {
     <nav aria-label="Report folders" className="glass-panel self-start p-3 lg:sticky lg:top-24">
       <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-widest text-heading-accent">Folders</p>
       <ul className="space-y-0.5">
-        {folders.map((f) => {
+        {[...(savedCount ? [{ id: SAVED_VIEWS, title: "Your saved views", report_count: savedCount }] : []), ...folders].map((f) => {
           const active = f.id === current;
           const href = libraryHref({ folder: f.id });
           return (
