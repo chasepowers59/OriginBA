@@ -37,10 +37,13 @@ test("folders lead with their essentials and a search looks across every folder"
 
 test("a folder opens as a dashboard, and a canvas of what exists now is not windowed", async ({ page }) => {
   const windows = new Map<string, boolean>();
+  const allDates = new Map<string, boolean>();
   page.on("request", (req) => {
     const m = req.url().match(/\/snapshots\/(rpt_[a-z_]+)\/query$/);
     if (m && req.method() === "POST") {
-      windows.set(m[1], (req.postDataJSON()?.filters ?? []).some((f: { op: string }) => f.op === "between"));
+      const body = req.postDataJSON() ?? {};
+      windows.set(m[1], (body.filters ?? []).some((f: { op: string }) => f.op === "between"));
+      allDates.set(m[1], Boolean(body.all_dates));
     }
   });
   await page.goto("/reports?folder=budget_billing");
@@ -51,5 +54,8 @@ test("a folder opens as a dashboard, and a canvas of what exists now is not wind
   await expect.poll(() => windows.size, { timeout: 30_000 }).toBeGreaterThanOrEqual(3);
   // accounts are not "accounts opened in the last 180 days"; adjustments still are windowed
   expect(windows.get("rpt_customer_account")).toBe(false);
+  // said outright: the server windows any query it is not told to leave alone
+  expect(allDates.get("rpt_customer_account")).toBe(true);
   expect(windows.get("rpt_financial_txn")).toBe(true);
+  expect(allDates.get("rpt_financial_txn")).toBe(false);
 });

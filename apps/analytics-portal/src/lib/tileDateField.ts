@@ -1,5 +1,5 @@
 import { canvasOpensOnAllDates } from "@/lib/datePresets";
-import type { DatePresetConfig } from "@/lib/types";
+import type { DatePresetConfig, FilterDef } from "@/lib/types";
 
 type DateFieldSource = {
   default_date_field?: string | null;
@@ -36,4 +36,19 @@ export function tileWindowField(
 ): string | null {
   if (canvasOpensOnAllDates(meta?.default_date_preset) || report?.all_dates) return null;
   return resolveDateField(meta);
+}
+
+/**
+ * The dates a tile asks for: the board's window where it applies, otherwise all dates
+ * said outright. The server windows any unfiltered query it is not told to leave alone.
+ */
+export function tileWindow(
+  meta: DateFieldSource | undefined | null,
+  report: { all_dates?: boolean } | null | undefined,
+  range: [string, string],
+): { filters: FilterDef[]; all_dates: boolean } {
+  const field = tileWindowField(meta, report);
+  return field
+    ? { filters: [{ field, op: "between", value: range }], all_dates: false }
+    : { filters: [], all_dates: true };
 }

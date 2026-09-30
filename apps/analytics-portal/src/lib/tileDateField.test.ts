@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveDateField, tileWindowField } from "./tileDateField";
+import { resolveDateField, tileWindow, tileWindowField } from "./tileDateField";
 
 /**
  * The ONE resolver for the date a canvas works in. Every canvas with a date declares a
@@ -51,5 +51,27 @@ describe("tileWindowField", () => {
 
   it("has nothing to window without a date", () => {
     expect(tileWindowField({ default_date_field: null, date_fields: [] }, null)).toBeNull();
+  });
+});
+
+/**
+ * What a tile tells the server about dates. Sending no window is not enough: the server
+ * applies its own trailing window to any unfiltered query unless told all_dates, so a
+ * backlog tile ("open exceptions, however old") quietly lost every old exception.
+ */
+describe("tileWindow", () => {
+  const dated = { default_date_field: "Created Date/Time", date_fields: [{ id: "Created Date/Time" }] };
+  const range: [string, string] = ["2026-04-01", "2026-09-30"];
+
+  it("windows a dated tile and leaves all_dates off", () => {
+    expect(tileWindow(dated, null, range)).toEqual({
+      filters: [{ field: "Created Date/Time", op: "between", value: range }], all_dates: false,
+    });
+  });
+
+  it("asks for all dates outright when the tile is not windowed", () => {
+    expect(tileWindow(dated, { all_dates: true }, range)).toEqual({ filters: [], all_dates: true });
+    expect(tileWindow({ ...dated, default_date_preset: "all_dates" }, null, range))
+      .toEqual({ filters: [], all_dates: true });
   });
 });

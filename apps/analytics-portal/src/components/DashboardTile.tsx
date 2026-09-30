@@ -7,7 +7,7 @@ import {
   runSnapshotQuery,
 } from "@/lib/api";
 import { chartedMeasureColumn, kpiHeadline, tileHeadline, tileIsUnset, tileSeriesLabel } from "@/lib/dashboardTileMath";
-import { resolveDateField, tileWindowField } from "@/lib/tileDateField";
+import { resolveDateField, tileWindow } from "@/lib/tileDateField";
 import { measureDisplaysAsCurrency } from "@/lib/businessLabels";
 import type { DashboardTileDef, QueryResponse } from "@/lib/types";
 import { BuilderChart } from "./builder/BuilderChart";
@@ -56,16 +56,10 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
         const groupDate = resolveDateField(meta);
         const timeDimensions =
           tile.time_grain && groupDate ? [{ field: groupDate, grain: tile.time_grain }] : [];
-        const windowDate = tileWindowField(meta, report);
-        const filters: import("@/lib/types").FilterDef[] = [
-          // The dashboard's day window applies on the same date the tile groups by.
-          // It used to key off a mandatory-window field no canvas sets, so the
-          // "last N days" control changed nothing on any tile.
-          ...(windowDate
-            ? [{ field: windowDate, op: "between" as const, value: [start, end] }]
-            : []),
-          ...(report?.filters ?? []),
-        ];
+        // The board's day window applies on the same date the tile groups by. It once keyed
+        // off a mandatory-window field no canvas sets, so "last N days" changed no tile.
+        const dates = tileWindow(meta, report, [start, end]);
+        const filters: import("@/lib/types").FilterDef[] = [...dates.filters, ...(report?.filters ?? [])];
         if (filter) {
           filters.push({ field: filter.field, op: "eq", value: filter.value });
         }
@@ -74,6 +68,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
           measures,
           filters,
           time_dimensions: timeDimensions,
+          all_dates: dates.all_dates,
           limit: 500,
         });
         if (cancelled) return;
@@ -85,7 +80,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
         setMeasureKey(chartedMeasureColumn(response.columns, measures.length));
         setQueryMeasureField(primaryMeasure.field ?? "*");
         setQueryMeasureAgg(primaryMeasure.agg ?? "count");
-        setUnwindowed(Boolean(groupDate) && !windowDate);
+        setUnwindowed(Boolean(groupDate) && dates.all_dates);
         setError(null);
       } catch (err) {
         if (!cancelled) {
