@@ -820,6 +820,9 @@ export const QUESTIONS = [
     process: "customer", workstream: "Channel & Deflection",
     folder: "customer_service",
     kind: "distribution", unit: "percent", target: "high is good",
+    // not ready to run: CI_CC records no channel at any client (contact method on 235 of
+    // Ellensburg's 150,336 contacts, 6 of Newark's 993,294; contact source on none), 2026-09-30
+    ready_to_run: false,
     title: "Channel mix — how much customer contact came through self-service?",
     why: "Call deflection is the cheapest lever a utility has on contact cost. The contact method is what says whether a customer solved it themselves or needed a person.",
     canvas: "rpt_customer_contact",
@@ -1233,8 +1236,10 @@ export const QUESTIONS = [
     why: "A billable charge is a one-off the rate did not produce — a fee, a reconnection, a deposit. High volumes here mean manual work happening every cycle.",
     canvas: "rpt_billable_charge",
     filters: [{"field": "Is Cancelled", "op": "eq", "value": false}],
-    axis: "Charge Template Code", value: "Charge Amount",
-    sql: `select coalesce("Charge Template Code", '(none)') as "Charge Template Code",
+    // what the bill says: the template code is blank at Ellensburg (0 of 18,110 lines) and Fond
+    // du Lac, the line description is on every line at every client with charges (2026-09-30)
+    axis: "Charge Description", value: "Charge Amount",
+    sql: `select coalesce("Charge Description", '(none)') as "Charge Description",
                  count(*)::bigint as "Lines",
                  count(distinct "Billable Charge ID")::bigint as "Charges",
                  round(sum("Charge Amount")::numeric, 2) as "Charge Amount",
