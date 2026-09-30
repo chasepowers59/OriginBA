@@ -36,6 +36,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-30 | Dashboard tiles still windowed canvases of what exists now: a Budget Billing board counted accounts by Account Setup Date in the last N days (the explorer fix of 9f62d0fe missed the tile) | 7792f23c | tileDateField.test.ts, e2e/library.spec.ts (fails with the fix reverted) |
 | 2026-09-30 | A saved view of a report ran a stale function: it saw the pre-favorite window, and an all-dates report dropped the saved window (found by review) | be0b3ee1 | datePresets.test.ts (keepWindow), verified live |
 | 2026-09-30 | "Oldest open to-dos" ranked closed ones; "meters never registered" charted every device; the builder offered Total/Average on measures the server refuses (found by review) | be0b3ee1 (+ dbt 4675732) | originba_dbt scripts/test_portal_catalog_reports.py |
 | 2026-09-30 | Library search could revert a fast typist (router applies each keystroke's URL in a transition); found in review of the folder-tree library | fafda7cc | verified live (16 chars typed at machine speed, folder click, Back) |
