@@ -192,21 +192,27 @@ export function VisualBuilder({
       return;
     }
     if (runTimer.current) clearTimeout(runTimer.current);
+    // Each change supersedes the query in flight: an older, slower answer landing last put
+    // Average numbers under a Total label (e2e/builder-modes.spec.ts). Cancel it, and ignore it
+    // if it answers anyway.
+    const run = new AbortController();
     runTimer.current = setTimeout(async () => {
       setRunning(true);
       setError(null);
       try {
-        const res = await runSnapshotQuery(snapshotId, req);
-        setResult(res);
+        const res = await runSnapshotQuery(snapshotId, req, run.signal);
+        if (!run.signal.aborted) setResult(res);
       } catch (err) {
+        if (run.signal.aborted) return;
         setError(err instanceof Error ? err.message : "Query failed");
         setResult(null);
       } finally {
-        setRunning(false);
+        if (!run.signal.aborted) setRunning(false);
       }
     }, 350);
     return () => {
       if (runTimer.current) clearTimeout(runTimer.current);
+      run.abort();
     };
   }, [snapshotId, meta, buildRequest]);
 
