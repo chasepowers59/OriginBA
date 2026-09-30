@@ -81,6 +81,528 @@
   "rpt_unbilled_revenue",
   "rpt_usage_txn"
  ],
+ "report_library": [
+  {
+   "description": "What was billed, by whom and when, and what went wrong on the way.",
+   "id": "billing_revenue",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "billed_revenue_by_type",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": true,
+     "report_id": "rebilled_segments",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": true,
+     "report_id": "unbilled_revenue",
+     "snapshot_id": "rpt_unbilled_revenue"
+    },
+    {
+     "essential": true,
+     "report_id": "revenue_by_cycle",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "billed_not_revenue",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "charge_basis_split",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "estimated_billing",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "highest_bills",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "price_per_unit_outliers",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "rate_configuration_shape",
+     "snapshot_id": "rpt_rate_configuration"
+    },
+    {
+     "essential": false,
+     "report_id": "kpi_billing_accuracy",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "kpi_estimation_rate",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "kpi_days_unbilled",
+     "snapshot_id": "rpt_unbilled_revenue"
+    },
+    {
+     "essential": false,
+     "report_id": "zero_and_negative_bills",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "rate_migration",
+     "snapshot_id": "rpt_rate_schedule_history"
+    },
+    {
+     "essential": false,
+     "report_id": "bill_factor_prices",
+     "snapshot_id": "rpt_bill_factor_price"
+    },
+    {
+     "essential": false,
+     "report_id": "billable_charges",
+     "snapshot_id": "rpt_billable_charge"
+    },
+    {
+     "essential": false,
+     "report_id": "bills_by_status",
+     "snapshot_id": "rpt_bill"
+    },
+    {
+     "essential": false,
+     "report_id": "bills_longest_open",
+     "snapshot_id": "rpt_bill"
+    },
+    {
+     "essential": false,
+     "report_id": "billed_by_class_calc_lines",
+     "snapshot_id": "rpt_billed_charge"
+    }
+   ],
+   "title": "Billing & Revenue"
+  },
+  {
+   "description": "The financial position, adjustments, and what reached the general ledger.",
+   "id": "finance_adjustments",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "financial_position",
+     "snapshot_id": "rpt_financial_txn"
+    },
+    {
+     "essential": true,
+     "report_id": "gl_not_extracted",
+     "snapshot_id": "rpt_gl"
+    },
+    {
+     "essential": true,
+     "report_id": "adjustments_by_type",
+     "snapshot_id": "rpt_financial_txn"
+    },
+    {
+     "essential": true,
+     "report_id": "gl_by_account",
+     "snapshot_id": "rpt_gl"
+    },
+    {
+     "essential": false,
+     "report_id": "revenue_reconciliation",
+     "snapshot_id": "rpt_revenue_reconciliation"
+    },
+    {
+     "essential": false,
+     "report_id": "revenue_by_class",
+     "snapshot_id": "rpt_financial_txn"
+    }
+   ],
+   "title": "Finance & Adjustments"
+  },
+  {
+   "description": "What is owed, how old it is, and whether collection is working.",
+   "id": "ar_collections",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "arrears_by_band",
+     "snapshot_id": "rpt_sa_aged_balance"
+    },
+    {
+     "essential": true,
+     "report_id": "largest_debtors",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": true,
+     "report_id": "kpi_write_off_exposure",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": true,
+     "report_id": "severance_pipeline",
+     "snapshot_id": "rpt_debt_process"
+    },
+    {
+     "essential": false,
+     "report_id": "arrears_by_class",
+     "snapshot_id": "rpt_sa_aged_balance"
+    },
+    {
+     "essential": false,
+     "report_id": "collection_effectiveness",
+     "snapshot_id": "rpt_debt_process"
+    },
+    {
+     "essential": false,
+     "report_id": "pay_plan_health",
+     "snapshot_id": "rpt_pay_plan"
+    },
+    {
+     "essential": false,
+     "report_id": "credit_rating_movement",
+     "snapshot_id": "rpt_credit_rating_history"
+    },
+    {
+     "essential": false,
+     "report_id": "arrears_without_process",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": false,
+     "report_id": "pay_plan_vs_actual",
+     "snapshot_id": "rpt_pay_plan"
+    },
+    {
+     "essential": false,
+     "report_id": "sa_aged_balance",
+     "snapshot_id": "rpt_sa_aged_balance"
+    },
+    {
+     "essential": false,
+     "report_id": "sa_balance_by_type",
+     "snapshot_id": "rpt_service_agreement"
+    }
+   ],
+   "title": "Accounts Receivable & Collections"
+  },
+  {
+   "description": "How customers paid, and what still has to balance.",
+   "id": "payments_cashiering",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "payments_by_tender",
+     "snapshot_id": "rpt_payment_tender"
+    },
+    {
+     "essential": true,
+     "report_id": "unbalanced_tender_controls",
+     "snapshot_id": "rpt_tender_control"
+    },
+    {
+     "essential": true,
+     "report_id": "cancelled_payments",
+     "snapshot_id": "rpt_payment"
+    },
+    {
+     "essential": true,
+     "report_id": "unbalanced_pay_events",
+     "snapshot_id": "rpt_payment"
+    }
+   ],
+   "title": "Payments & Cashiering"
+  },
+  {
+   "description": "Who is on a budget plan, what they pay monthly, and by which agreements.",
+   "id": "budget_billing",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "budget_accounts_by_class",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": true,
+     "report_id": "budget_amount_by_class",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": true,
+     "report_id": "budget_agreements_by_sa_type",
+     "snapshot_id": "rpt_service_agreement"
+    },
+    {
+     "essential": false,
+     "report_id": "budget_accounts_by_cycle",
+     "snapshot_id": "rpt_customer_account"
+    }
+   ],
+   "title": "Budget Billing"
+  },
+  {
+   "description": "What was consumed and measured, and how good the reads are.",
+   "id": "usage_metering",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "read_coverage",
+     "snapshot_id": "rpt_measurement"
+    },
+    {
+     "essential": true,
+     "report_id": "meter_read_routes",
+     "snapshot_id": "rpt_premise_sp"
+    },
+    {
+     "essential": true,
+     "report_id": "consumption_by_uom",
+     "snapshot_id": "rpt_billed_usage"
+    },
+    {
+     "essential": true,
+     "report_id": "usage_vs_read",
+     "snapshot_id": "rpt_bill_segment"
+    },
+    {
+     "essential": false,
+     "report_id": "usage_no_active_sa",
+     "snapshot_id": "rpt_premise_sp"
+    },
+    {
+     "essential": false,
+     "report_id": "measured_by_uom",
+     "snapshot_id": "rpt_bill_segment_read"
+    },
+    {
+     "essential": false,
+     "report_id": "reads_by_row_kind",
+     "snapshot_id": "rpt_bill_segment_read"
+    }
+   ],
+   "title": "Usage & Metering"
+  },
+  {
+   "description": "Field work waiting, and service switched on and off.",
+   "id": "field_operations",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "service_off_but_installed",
+     "snapshot_id": "rpt_premise_sp"
+    },
+    {
+     "essential": true,
+     "report_id": "field_activity_backlog",
+     "snapshot_id": "rpt_field_activity"
+    },
+    {
+     "essential": true,
+     "report_id": "service_on_off_churn",
+     "snapshot_id": "rpt_on_off_history"
+    },
+    {
+     "essential": true,
+     "report_id": "field_appointments",
+     "snapshot_id": "rpt_field_activity"
+    }
+   ],
+   "title": "Field Operations"
+  },
+  {
+   "description": "The meter and asset estate, and what the meters report.",
+   "id": "assets_devices",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "device_estate",
+     "snapshot_id": "rpt_device_asset"
+    },
+    {
+     "essential": true,
+     "report_id": "asset_disposition",
+     "snapshot_id": "rpt_device_asset"
+    },
+    {
+     "essential": true,
+     "report_id": "meters_not_registered",
+     "snapshot_id": "rpt_device_asset"
+    },
+    {
+     "essential": true,
+     "report_id": "device_events",
+     "snapshot_id": "rpt_device_event"
+    },
+    {
+     "essential": false,
+     "report_id": "asset_replacement_value",
+     "snapshot_id": "rpt_device_asset"
+    },
+    {
+     "essential": false,
+     "report_id": "locations_by_type",
+     "snapshot_id": "rpt_asset_location"
+    },
+    {
+     "essential": false,
+     "report_id": "deepest_location_trees",
+     "snapshot_id": "rpt_asset_location"
+    }
+   ],
+   "title": "Assets & Devices"
+  },
+  {
+   "description": "Accounts, contacts, cases and notifications.",
+   "id": "customer_service",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "accounts_by_class",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": true,
+     "report_id": "notification_outcomes",
+     "snapshot_id": "rpt_customer_notification"
+    },
+    {
+     "essential": true,
+     "report_id": "contact_reasons",
+     "snapshot_id": "rpt_customer_contact"
+    },
+    {
+     "essential": true,
+     "report_id": "case_resolution_time",
+     "snapshot_id": "rpt_case"
+    },
+    {
+     "essential": false,
+     "report_id": "self_service_adoption",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": false,
+     "report_id": "accounts_no_email",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": false,
+     "report_id": "notifications_stuck",
+     "snapshot_id": "rpt_customer_notification"
+    },
+    {
+     "essential": false,
+     "report_id": "kpi_call_deflection",
+     "snapshot_id": "rpt_customer_contact"
+    },
+    {
+     "essential": false,
+     "report_id": "accounts_multi_utility",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": false,
+     "report_id": "accounts_on_alerts",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": false,
+     "report_id": "bill_routing_mix",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "essential": false,
+     "report_id": "notification_error_detail",
+     "snapshot_id": "rpt_customer_notification"
+    },
+    {
+     "essential": false,
+     "report_id": "life_support_premises",
+     "snapshot_id": "rpt_premise_sp"
+    },
+    {
+     "essential": false,
+     "report_id": "sas_by_type",
+     "snapshot_id": "rpt_service_agreement"
+    },
+    {
+     "essential": false,
+     "report_id": "links_by_relationship",
+     "snapshot_id": "rpt_account_person"
+    },
+    {
+     "essential": false,
+     "report_id": "financially_responsible_split",
+     "snapshot_id": "rpt_account_person"
+    },
+    {
+     "essential": false,
+     "report_id": "characteristics_by_entity",
+     "snapshot_id": "rpt_characteristics"
+    },
+    {
+     "essential": false,
+     "report_id": "top_characteristic_types",
+     "snapshot_id": "rpt_characteristics"
+    }
+   ],
+   "title": "Customer Service"
+  },
+  {
+   "description": "Exceptions, batch runs and work queues that need attention.",
+   "id": "data_quality",
+   "reports": [
+    {
+     "essential": true,
+     "report_id": "exceptions_open",
+     "snapshot_id": "rpt_exception"
+    },
+    {
+     "essential": true,
+     "report_id": "batch_failures",
+     "snapshot_id": "rpt_batch"
+    },
+    {
+     "essential": true,
+     "report_id": "todo_backlog",
+     "snapshot_id": "rpt_todo"
+    },
+    {
+     "essential": true,
+     "report_id": "kpi_exception_rate",
+     "snapshot_id": "rpt_exception"
+    },
+    {
+     "essential": false,
+     "report_id": "batch_runtime_trend",
+     "snapshot_id": "rpt_batch"
+    },
+    {
+     "essential": false,
+     "report_id": "todo_oldest",
+     "snapshot_id": "rpt_todo"
+    },
+    {
+     "essential": false,
+     "report_id": "exception_by_rule",
+     "snapshot_id": "rpt_exception"
+    },
+    {
+     "essential": false,
+     "report_id": "usage_transactions",
+     "snapshot_id": "rpt_usage_txn"
+    }
+   ],
+   "title": "Data Quality & Operations"
+  }
+ ],
  "report_library_packs": [
   {
    "audience": "Customer service and billing operations",
@@ -296,10 +818,6 @@
      "snapshot_id": "rpt_billed_charge"
     },
     {
-     "report_id": "billed_by_budget_plan",
-     "snapshot_id": "rpt_billed_charge"
-    },
-    {
      "report_id": "measured_by_uom",
      "snapshot_id": "rpt_bill_segment_read"
     },
@@ -414,6 +932,22 @@
     {
      "report_id": "sa_balance_by_type",
      "snapshot_id": "rpt_service_agreement"
+    },
+    {
+     "report_id": "budget_accounts_by_class",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "report_id": "budget_amount_by_class",
+     "snapshot_id": "rpt_customer_account"
+    },
+    {
+     "report_id": "budget_agreements_by_sa_type",
+     "snapshot_id": "rpt_service_agreement"
+    },
+    {
+     "report_id": "budget_accounts_by_cycle",
+     "snapshot_id": "rpt_customer_account"
     }
    ],
    "title": "Credit & Collections"
@@ -7813,34 +8347,6 @@
      ],
      "title": "What was billed, by customer class (charge lines)?",
      "workstream_label": "Billing"
-    },
-    {
-     "chart_type": "bar",
-     "description": "Budget billing shifts cash timing; the split shows how much revenue rides on it.",
-     "dimensions": [
-      "Budget Plan"
-     ],
-     "filters": [
-      {
-       "field": "Is Frozen",
-       "op": "eq",
-       "value": true
-      },
-      {
-       "field": "Is Cancelled",
-       "op": "eq",
-       "value": false
-      }
-     ],
-     "id": "billed_by_budget_plan",
-     "measures": [
-      {
-       "agg": "sum",
-       "field": "Billed Amount"
-      }
-     ],
-     "title": "How much was billed under each budget plan?",
-     "workstream_label": "Billing"
     }
    ],
    "related_snapshot": null,
@@ -10019,6 +10525,9 @@
        "Bill Cycle Code",
        "Budget Plan",
        "Budget Plan Code",
+       "Is On Budget",
+       "Monthly Budget Amount",
+       "Budget Service Agreements",
        "CIS Division",
        "Currency Code",
        "Bill Route Types",
@@ -10088,6 +10597,13 @@
     "grain_description": "One row per account",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
+     {
+      "alias": "b",
+      "join_type": "left join",
+      "on": "b.sa_id = sa.sa_id",
+      "role": "model",
+      "table": "int_sa_budget"
+     },
      {
       "alias": "sa",
       "join_type": "join",
@@ -10209,6 +10725,8 @@
     "trusted_measures": [
      "Linked Person Count",
      "Financially Responsible Person Count",
+     "Monthly Budget Amount",
+     "Budget Service Agreements",
      "Self-Service Person Count",
      "Account Characteristic Count",
      "Active Alert Count",
@@ -10350,6 +10868,10 @@
     {
      "id": "Budget Plan Code",
      "label": "Budget Plan Code"
+    },
+    {
+     "id": "Is On Budget",
+     "label": "Is On Budget"
     },
     {
      "id": "CIS Division",
@@ -10560,6 +11082,30 @@
      "label": "Budget Plan Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "On budget billing by C2M's own rule: a budget-ELIGIBLE SA type (ELIG_BUDGET_SW), Active or Pending Stop, with a current recurring charge above zero; on an account, any of its agreements. Not the Budget Plan code, which also sits on accounts that are not on budget (College Station: 104,826 carry a code, 965 are on budget).",
+     "group": "customer_ops",
+     "id": "Is On Budget",
+     "label": "Is On Budget",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "The current monthly budget charge (the latest CI_SA_RCHG_HIST amount not in the future) of the agreements on budget; on an account, their sum. Blank when not on budget. Additive.",
+     "group": "customer_ops",
+     "id": "Monthly Budget Amount",
+     "label": "Monthly Budget Amount",
+     "role": "measure",
+     "type": "numeric"
+    },
+    {
+     "description": "How many of the account's service agreements are on budget billing.",
+     "group": "customer_ops",
+     "id": "Budget Service Agreements",
+     "label": "Budget Service Agreements",
+     "role": "measure",
+     "type": "bigint"
     },
     {
      "description": "",
@@ -11082,6 +11628,26 @@
       "min",
       "max"
      ],
+     "id": "Monthly Budget Amount",
+     "label": "Monthly Budget Amount"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Budget Service Agreements",
+     "label": "Budget Service Agreements"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
      "id": "Self-Service Person Count",
      "label": "Self-Service Person Count"
     },
@@ -11508,6 +12074,75 @@
      ],
      "title": "Who is in arrears with no collection process running?",
      "workstream_label": "Collections"
+    },
+    {
+     "chart_type": "bar",
+     "description": "Budget billing evens out a customer's payments across the year. Who is on it tells you whose cash arrives flat and whose true-up is coming.",
+     "dimensions": [
+      "Customer Class"
+     ],
+     "filters": [
+      {
+       "field": "Is On Budget",
+       "op": "eq",
+       "value": true
+      }
+     ],
+     "id": "budget_accounts_by_class",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "Who is on budget billing, by customer class?",
+     "workstream_label": "Budget Billing"
+    },
+    {
+     "chart_type": "bar",
+     "description": "The monthly budget amount is cash the utility can count on. A class whose budget total drifts from its billed charges is heading for a large true-up.",
+     "dimensions": [
+      "Customer Class"
+     ],
+     "filters": [
+      {
+       "field": "Is On Budget",
+       "op": "eq",
+       "value": true
+      }
+     ],
+     "id": "budget_amount_by_class",
+     "measures": [
+      {
+       "agg": "sum",
+       "field": "Monthly Budget Amount"
+      }
+     ],
+     "title": "What do budget customers pay each month, by customer class?",
+     "workstream_label": "Budget Billing"
+    },
+    {
+     "chart_type": "bar",
+     "description": "Budget reviews and true-ups run with the bill cycle. A cycle heavy with budget accounts is where the review workload lands.",
+     "dimensions": [
+      "Bill Cycle"
+     ],
+     "filters": [
+      {
+       "field": "Is On Budget",
+       "op": "eq",
+       "value": true
+      }
+     ],
+     "id": "budget_accounts_by_cycle",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "Which bill cycles carry the budget accounts?",
+     "workstream_label": "Budget Billing"
     }
    ],
    "related_snapshot": null,
@@ -11519,6 +12154,8 @@
    "trusted_measures": [
     "Linked Person Count",
     "Financially Responsible Person Count",
+    "Monthly Budget Amount",
+    "Budget Service Agreements",
     "Self-Service Person Count",
     "Account Characteristic Count",
     "Active Alert Count",
@@ -25026,7 +25663,9 @@
        "Collection Class",
        "Collection Class Code",
        "Bill Cycle",
-       "Budget Plan"
+       "Budget Plan",
+       "Is On Budget",
+       "Monthly Budget Amount"
       ],
       "id": "billing",
       "label": "Billing & Rates"
@@ -25093,6 +25732,13 @@
       "table": "dim_account"
      },
      {
+      "alias": "bud",
+      "join_type": "left join",
+      "on": "bud.sa_id = sa.sa_id",
+      "role": "model",
+      "table": "int_sa_budget"
+     },
+     {
       "alias": "pch",
       "join_type": "left join",
       "on": "pch.prem_id = sa.characteristic_prem_id",
@@ -25131,7 +25777,8 @@
      "Total Arrears",
      "Days Unbilled",
      "Pay Plan Count",
-     "Active Pay Plan Count"
+     "Active Pay Plan Count",
+     "Monthly Budget Amount"
     ]
    },
    "date_fields": [
@@ -25318,6 +25965,10 @@
     {
      "id": "Budget Plan",
      "label": "Budget Plan"
+    },
+    {
+     "id": "Is On Budget",
+     "label": "Is On Budget"
     }
    ],
    "fields": [
@@ -25800,6 +26451,22 @@
      "label": "Budget Plan",
      "role": "dimension",
      "type": "varchar(60)"
+    },
+    {
+     "description": "On budget billing by C2M's own rule: a budget-ELIGIBLE SA type (ELIG_BUDGET_SW), Active or Pending Stop, with a current recurring charge above zero; on an account, any of its agreements. Not the Budget Plan code, which also sits on accounts that are not on budget (College Station: 104,826 carry a code, 965 are on budget).",
+     "group": "billing",
+     "id": "Is On Budget",
+     "label": "Is On Budget",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "The current monthly budget charge (the latest CI_SA_RCHG_HIST amount not in the future) of the agreements on budget; on an account, their sum. Blank when not on budget. Additive.",
+     "group": "billing",
+     "id": "Monthly Budget Amount",
+     "label": "Monthly Budget Amount",
+     "role": "measure",
+     "type": "numeric"
     }
    ],
    "grain": "service agreement",
@@ -25964,6 +26631,16 @@
      ],
      "id": "Active Pay Plan Count",
      "label": "Active Pay Plan Count"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Monthly Budget Amount",
+     "label": "Monthly Budget Amount"
     }
    ],
    "poc_enabled": true,
@@ -26002,6 +26679,29 @@
      ],
      "title": "Where do balances sit, by SA type?",
      "workstream_label": "Credit & Collections"
+    },
+    {
+     "chart_type": "horizontal",
+     "description": "Budget plans usually cover the large, seasonal services. An SA type on budget that should not be is a configuration question worth asking.",
+     "dimensions": [
+      "SA Type"
+     ],
+     "filters": [
+      {
+       "field": "Is On Budget",
+       "op": "eq",
+       "value": true
+      }
+     ],
+     "id": "budget_agreements_by_sa_type",
+     "measures": [
+      {
+       "agg": "count",
+       "field": "*"
+      }
+     ],
+     "title": "Which services are on budget billing?",
+     "workstream_label": "Budget Billing"
     }
    ],
    "related_snapshot": null,
@@ -26025,7 +26725,8 @@
     "Total Arrears",
     "Days Unbilled",
     "Pay Plan Count",
-    "Active Pay Plan Count"
+    "Active Pay Plan Count",
+    "Monthly Budget Amount"
    ],
    "usage_guidance": null,
    "use_case": "Service agreements with their lifecycle, balance, arrears and pay plan, for collections and account questions.",
