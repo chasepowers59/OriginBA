@@ -36,6 +36,7 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-30 | Library search could revert a fast typist (router applies each keystroke's URL in a transition); found in review of the folder-tree library | fafda7cc | verified live (16 chars typed at machine speed, folder click, Back) |
 | 2026-09-30 | Canvases of what exists now were windowed on their creation date: "How many accounts?" counted 2,114 of Ellensburg's 92,832; device estate 2,484 of 55,084; service points 371 of 33,092 | 9f62d0fe (+ dbt 59e1cae) | tests/test_state_canvases.py, originba_dbt scripts/test_portal_catalog_reports.py |
 | 2026-09-30 | Nothing checked that a report's numbers agree as the reader moves (breakdown vs total, month trend, cross-filter click, a second shelf field) | b26ed1f7, 91144027 | tests/test_report_invariants.py |
 | 2026-09-30 | Fifteen ready-to-run reports promised a rate or an average ("Estimation rate", "Avg Days To Pay") and charted a row count | be7205a3 (+ dbt 5907624) | tests/test_average_and_share.py, originba_dbt scripts/test_portal_catalog_reports.py |
