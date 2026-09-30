@@ -25,6 +25,11 @@ const NAMED: Record<string, DatePresetConfig> = {
   last_12_months: { kind: "days", days: 365, label: "Last 12 months" },
 };
 
+/** A canvas of what exists now (the catalog's "all_dates") has no default window. */
+export function canvasOpensOnAllDates(preset: DatePresetConfig | string | undefined): boolean {
+  return preset === "all_dates";
+}
+
 export function applyDatePresetConfig(preset: DatePresetConfig | string | undefined, asOf?: string | null): {
   range: [string, string];
   label: string;

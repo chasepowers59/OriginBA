@@ -21,6 +21,7 @@ import { getViewRemote, saveViewRemote } from "@/lib/savedViews";
 import {
   ALL_DATES,
   applyDatePresetConfig,
+  canvasOpensOnAllDates,
   canWidenDateRange,
   estimatePeriodDays,
   explorerPeriodLabel,
@@ -314,10 +315,11 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       measures,
       trusted_measures: metadata.trusted_measures,
     });
+    const allByDefault = canvasOpensOnAllDates(metadata.default_date_preset);
     setDateStart(range[0]);
     setDateEnd(range[1]);
-    setActivePreset(label);
-    setAllDates(false);
+    setActivePreset(allByDefault ? ALL_DATES : label);
+    setAllDates(allByDefault);
     setFellBackFrom(null);
     firstRun.current = true;
     setActiveReportId(null);

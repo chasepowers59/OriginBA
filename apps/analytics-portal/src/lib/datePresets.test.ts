@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { defaultDateRange, defaultDateRangeLastMonth, defaultDateRangeYtd } from "./api";
-import { anchoredLabel, applyDatePresetConfig, fallBackToAllDates, opensOnAllDates, widenDateRange, windowFilter } from "./datePresets";
+import { anchoredLabel, applyDatePresetConfig, canvasOpensOnAllDates, fallBackToAllDates, opensOnAllDates, widenDateRange, windowFilter } from "./datePresets";
 
 // A frozen copy declares where its data ends (Ellensburg TEST: 18 Jun 2026). The explorer's
 // presets were computed from the browser's today, so "Last 6 months" there read mostly the
@@ -86,5 +86,16 @@ describe("opensOnAllDates", () => {
 
   it("an ordinary report keeps the window", () => {
     expect(opensOnAllDates({ ...base, report: { id: "gl_by_account" } })).toBe(false);
+  });
+});
+
+// A canvas of what exists now (accounts, devices) dates rows by when they were created, so its
+// default window counted only newcomers: 2,114 of Ellensburg's 92,832 accounts. The catalog
+// marks such a canvas "all_dates" and the explorer opens it there.
+describe("canvasOpensOnAllDates", () => {
+  it("a state canvas opens on All dates, an event canvas on its window", () => {
+    expect(canvasOpensOnAllDates("all_dates")).toBe(true);
+    expect(canvasOpensOnAllDates("last_12_months")).toBe(false);
+    expect(canvasOpensOnAllDates(undefined)).toBe(false);
   });
 });

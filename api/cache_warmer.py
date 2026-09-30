@@ -20,7 +20,7 @@ from typing import Any
 
 from api.data_version import data_version
 from api.date_presets import preset_range
-from api.reporting_dates import data_as_of
+from api.reporting_dates import data_as_of, window_date_field
 
 log = logging.getLogger("originba.api")
 INTERVAL_SECONDS = 60
@@ -57,7 +57,7 @@ def _opening_reports(org_id: str) -> list[tuple[str, Any]]:
         reports = snapshot.get("premade_reports") or []
         if snapshot_id not in enabled or not reports or (se._row_estimate(snapshot, org_id) or 0) < WARM_MIN_ROWS:
             continue
-        field = snapshot.get("default_date_field") or ((snapshot.get("date_fields") or [{}])[0] or {}).get("id")
+        field = window_date_field(snapshot)
         window = [{"field": field, "op": "between", "value": preset_range(snapshot.get("default_date_preset"), end)}] if field else []
         body = se.QueryRequest(dimensions=reports[0]["dimensions"], measures=reports[0]["measures"],
                                filters=window + list(reports[0].get("filters") or []), time_dimensions=[], limit=500)

@@ -45,6 +45,10 @@ def window_date_field(snapshot: dict[str, Any]) -> str | None:
     from the retired snapshot catalog first, and the copies of that fallback are what
     windowed some canvases and not others. The measured default is the only source now.
     """
+    # A canvas of what exists now (accounts, agreements, devices) dates each row by when it
+    # was created; windowing on that counts only the newcomers (tests/test_state_canvases.py).
+    if snapshot.get("default_date_preset") == "all_dates":
+        return None
     return snapshot.get("default_date_field") or None
 
 
