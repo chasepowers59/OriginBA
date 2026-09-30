@@ -258,3 +258,20 @@ describe("minBarPx: a small value still draws a bar you can see", () => {
     expect(minBarPx(undefined)).toBe(0);
   });
 });
+
+describe("ordered bands keep their columns", () => {
+  // design review 2026-09-30: the same aging buckets drew as rows on Accounts receivable (6) and
+  // as columns on Past-due balance (4), side by side on the home page
+  const bands = ["Current", "0-30 Days", "31-60 Days", "61-90 Days", "91-120 Days", "120+ Days"];
+  const values = [5, 4, 3, 2, 1, 1];
+  it("six aging bands stay columns when the axis is ordered", () => {
+    expect(chartLayout({ ...SPARK_AXIS, labels: bands, values, width: 420, ordered: true }).orientation).toBe("vertical");
+  });
+  it("six unordered categories still become rows", () => {
+    expect(chartLayout({ ...SPARK_AXIS, labels: bands, values, width: 420 }).orientation).toBe("horizontal");
+  });
+  it("an ordered axis still turns to rows once it is too long to read as columns", () => {
+    const many = Array.from({ length: 9 }, (_, i) => `Band ${i}`);
+    expect(chartLayout({ ...SPARK_AXIS, labels: many, values: many.map(() => 1), width: 420, ordered: true }).orientation).toBe("horizontal");
+  });
+});

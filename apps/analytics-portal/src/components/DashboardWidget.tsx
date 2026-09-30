@@ -166,6 +166,7 @@ export function DashboardWidget({
             )}
             format={kpi.format}
             height={130}
+            ordered={isOrderedAxis(kpi.trend_dimension)}
             selectedLabel={selectedTrendLabel}
             onBarClick={
               onTrendClick && kpi.trend_dimension

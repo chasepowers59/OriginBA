@@ -20,6 +20,8 @@ type MiniSparkChartProps = {
   points: ExecutiveTrendPoint[];
   format: "currency" | "number";
   height?: number;
+  /** The breakdown has an inherent order (aging bands, months): keep it in columns. */
+  ordered?: boolean;
   selectedLabel?: string | null;
   onBarClick?: (label: string) => void;
 };
@@ -53,6 +55,7 @@ export function MiniSparkChart({
   points,
   format,
   height = 120,
+  ordered = false,
   selectedLabel,
   onBarClick,
 }: MiniSparkChartProps) {
@@ -69,7 +72,7 @@ export function MiniSparkChart({
   }));
 
   const labels = points.map((p) => p.label);
-  const layout = chartLayout({ ...SPARK_AXIS, labels, values: points.map((p) => p.value), width });
+  const layout = chartLayout({ ...SPARK_AXIS, labels, values: points.map((p) => p.value), width, ordered });
   const ticks: TickText = new Map(labels.map((label, i) => [label, { lines: layout.tickLines[i], title: label }]));
   const tick = <AxisTick ticks={ticks} fontSize={SPARK_AXIS.fontSize} />;
   const rows = layout.orientation === "horizontal";

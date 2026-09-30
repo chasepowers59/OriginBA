@@ -41,6 +41,8 @@ function labelEm(labels: string[]): number {
   );
 }
 
+/** How many ordered bands still read as columns (the home cards' aging buckets run to six). */
+const ORDERED_MAX_COLUMNS = 8;
 /** Columns narrower than this many characters cannot carry a readable label. */
 const MIN_LINE_CHARS = 8;
 /** Before the chart is measured: the budgets the fixed layouts used. */
@@ -69,6 +71,7 @@ export function chartLayout({
   values,
   width,
   horizontal = false,
+  ordered = false,
   maxColumns,
   fontSize,
   valueAxisWidth,
@@ -81,6 +84,9 @@ export function chartLayout({
   width: number;
   /** The reader chose horizontal bars. */
   horizontal?: boolean;
+  /** An axis with an inherent order (aging bands, months): read left to right, so it keeps
+   *  columns up to ORDERED_MAX_COLUMNS while every label still fits. */
+  ordered?: boolean;
 }): ChartLayout {
   const note = chartNote(labels, values);
   const charPx = fontSize * labelEm(labels);
@@ -88,7 +94,7 @@ export function chartLayout({
     width > 0 && labels.length ? Math.floor((width - valueAxisWidth) / labels.length / charPx) : null;
   const rows =
     horizontal ||
-    labels.length > maxColumns ||
+    labels.length > (ordered ? Math.max(maxColumns, ORDERED_MAX_COLUMNS) : maxColumns) ||
     (columnChars != null && columnChars < Math.min(MIN_LINE_CHARS, wholeLabelChars(labels)));
 
   if (!rows) {
