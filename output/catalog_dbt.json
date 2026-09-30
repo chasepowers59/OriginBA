@@ -4943,6 +4943,8 @@
        "Bill ID",
        "Bill Date",
        "Bill Segment Status Code",
+       "Is Frozen",
+       "Is Cancelled",
        "Service Period Start",
        "Service Period End",
        "SA Type",
@@ -5163,6 +5165,14 @@
      "label": "Bill Segment Status Code"
     },
     {
+     "id": "Is Frozen",
+     "label": "Is Frozen"
+    },
+    {
+     "id": "Is Cancelled",
+     "label": "Is Cancelled"
+    },
+    {
      "id": "SA Type",
      "label": "SA Type"
     },
@@ -5357,7 +5367,7 @@
      "type": "numeric"
     },
     {
-     "description": "Quantity measure, additive at this canvas's grain.",
+     "description": "The register quantity on this copy of the read. One reading is carried at segment level, per service point and as an audit copy (Usage Flag 'X'), beside tier breakdowns and unit-less derived rows, and a cancelled segment keeps its reads: total it only with Is Frozen = true, Is Cancelled = false, Is Segment Level = true, Usage Flag = 'S' and Read Row Kind = 'measured', and never across units. That copy ties rpt_billed_usage's usage per unit exactly (Ellensburg 2026-09-30).",
      "group": "billing",
      "id": "Measured Quantity",
      "label": "Measured Quantity",
@@ -5459,6 +5469,22 @@
      "label": "Bill Segment Status Code",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "Flag. Filter on it; do not sum it.",
+     "group": "billing",
+     "id": "Is Frozen",
+     "label": "Is Frozen",
+     "role": "dimension",
+     "type": "boolean"
+    },
+    {
+     "description": "Flag. Filter on it; do not sum it.",
+     "group": "billing",
+     "id": "Is Cancelled",
+     "label": "Is Cancelled",
+     "role": "dimension",
+     "type": "boolean"
     },
     {
      "description": "",
@@ -5728,7 +5754,33 @@
      "dimensions": [
       "Unit of Measure"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      },
+      {
+       "field": "Is Segment Level",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Usage Flag",
+       "op": "eq",
+       "value": "S"
+      },
+      {
+       "field": "Read Row Kind",
+       "op": "eq",
+       "value": "measured"
+      }
+     ],
      "id": "measured_by_uom",
      "measures": [
       {
@@ -5745,7 +5797,28 @@
      "dimensions": [
       "Read Row Kind"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      },
+      {
+       "field": "Is Segment Level",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Usage Flag",
+       "op": "eq",
+       "value": "S"
+      }
+     ],
      "id": "reads_by_row_kind",
      "measures": [
       {
@@ -6551,7 +6624,13 @@
      "dimensions": [
       "Charge Template Code"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "billable_charges",
      "measures": [
       {
@@ -7760,7 +7839,18 @@
      "dimensions": [
       "Customer Class"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "billed_by_class_calc_lines",
      "measures": [
       {
@@ -7777,7 +7867,18 @@
      "dimensions": [
       "Budget Plan"
      ],
-     "filters": [],
+     "filters": [
+      {
+       "field": "Is Frozen",
+       "op": "eq",
+       "value": true
+      },
+      {
+       "field": "Is Cancelled",
+       "op": "eq",
+       "value": false
+      }
+     ],
      "id": "billed_by_budget_plan",
      "measures": [
       {

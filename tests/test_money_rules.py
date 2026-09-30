@@ -76,6 +76,16 @@ class MeasureRuleTests(unittest.TestCase):
                     {"field": "Adjustment Status Code", "op": "eq", "value": "50"}]
         self.assertEqual(self.sums("Adjustment Amount", standing), [])
 
+    def test_a_read_quantity_needs_one_copy_of_each_read(self):
+        # one reading rides the segment level, each service point and an audit ('X') copy;
+        # tier breakdowns and unit-less derived rows sit beside it (fct_bseg_read's header)
+        for field in ("Measured Quantity", "Final Register Quantity"):
+            with self.subTest(field=field):
+                q = {"measures": [{"field": field, "agg": "sum"}], "filters": [
+                    FROZEN, {"field": "Is Cancelled", "op": "eq", "value": False}]}
+                self.assertEqual(missing_money_filters("rpt_bill_segment_read", q),
+                                 ["Is Segment Level", "Usage Flag", "Read Row Kind"])
+
     def test_other_measures_on_the_canvas_are_untouched(self):
         self.assertEqual(self.sums("Current Amount", [FROZEN]), [])
 

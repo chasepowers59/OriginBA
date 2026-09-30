@@ -24,6 +24,11 @@ IS_USAGE = {"field": "Is Usage", "op": "eq", "value": True}
 # canvas -> the filters any SUM over it must carry
 MONEY_FILTERS: dict[str, list[dict[str, Any]]] = {
     "rpt_bill_segment": [FROZEN, NOT_CANCELLED],
+    # a cancelled segment keeps its calc lines and reads beside the rebill's (Ellensburg
+    # 2026-09-30: calc lines $167.9M summed vs $117.0M billed; reads 3.6x the frozen quantity)
+    "rpt_billed_charge": [FROZEN, NOT_CANCELLED],
+    "rpt_bill_segment_read": [FROZEN, NOT_CANCELLED],
+    "rpt_billable_charge": [NOT_CANCELLED],
     "rpt_billed_usage": [FROZEN, NOT_CANCELLED, IS_USAGE],
     "rpt_financial_txn": [FROZEN],
     "rpt_payment": [PAYMENT_FROZEN],
@@ -36,9 +41,18 @@ MONEY_FILTERS: dict[str, list[dict[str, Any]]] = {
 # Ellensburg 2026-09-30: $15,572,430.42 shown, $15,096,751.09 standing.
 STANDING_ADJUSTMENT = [{"field": "Is Adjustment", "op": "eq", "value": True},
                        {"field": "Adjustment Status Code", "op": "eq", "value": "50"}]
+# One reading rides the segment level, each service point and an audit copy (usage flag
+# 'X'); tier breakdowns and unit-less derived rows sit beside it (fct_bseg_read's header).
+# The segment-level 'S' measured copy ties rpt_billed_usage's usage per unit exactly
+# (Ellensburg 2026-09-30, 12 months: Gallons 2,042,241,085; kWh 215,424,139).
+ONE_READ_COPY = [{"field": "Is Segment Level", "op": "eq", "value": True},
+                 {"field": "Usage Flag", "op": "eq", "value": "S"},
+                 {"field": "Read Row Kind", "op": "eq", "value": "measured"}]
 MEASURE_FILTERS: dict[tuple[str, str], list[dict[str, Any]]] = {
     ("rpt_financial_txn", "Adjustment Amount"): STANDING_ADJUSTMENT,
     ("rpt_financial_txn", "Adjustment Base Amount"): STANDING_ADJUSTMENT,
+    ("rpt_bill_segment_read", "Measured Quantity"): ONE_READ_COPY,
+    ("rpt_bill_segment_read", "Final Register Quantity"): ONE_READ_COPY,
 }
 
 

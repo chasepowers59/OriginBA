@@ -1156,14 +1156,15 @@ export const QUESTIONS = [
     title: "What is being charged outside the rate engine?",
     why: "A billable charge is a one-off the rate did not produce — a fee, a reconnection, a deposit. High volumes here mean manual work happening every cycle.",
     canvas: "rpt_billable_charge",
+    filters: [{"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "Charge Template Code", value: "Charge Amount",
     sql: `select coalesce("Charge Template Code", '(none)') as "Charge Template Code",
                  count(*)::bigint as "Lines",
                  count(distinct "Billable Charge ID")::bigint as "Charges",
                  round(sum("Charge Amount")::numeric, 2) as "Charge Amount",
-                 count(*) filter (where "Is Cancelled")::bigint as "Cancelled",
                  count(*) filter (where not "Is Billed")::bigint as "Not Yet Billed"
           from reporting.rpt_billable_charge
+          where not "Is Cancelled"
           group by 1 order by 4 desc nulls last`,
   }),
 
@@ -1539,10 +1540,12 @@ export const QUESTIONS = [
     title: "What was billed, by customer class (charge lines)?",
     why: "The charge-line view of billed dollars — the level rate analysts reconcile at.",
     canvas: "rpt_billed_charge",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "Customer Class", value: "Billed Amount",
     sql: `select coalesce("Customer Class", "Customer Class Code", '(unset)') as "Customer Class",
                  sum("Billed Amount")::numeric(18,2) as "Billed Amount"
           from reporting.rpt_billed_charge
+          where "Is Frozen" and not "Is Cancelled"
           group by 1 order by 2 desc`,
   }),
   q({
@@ -1552,10 +1555,12 @@ export const QUESTIONS = [
     title: "How much was billed under each budget plan?",
     why: "Budget billing shifts cash timing; the split shows how much revenue rides on it.",
     canvas: "rpt_billed_charge",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false}],
     axis: "Budget Plan", value: "Billed Amount",
     sql: `select coalesce("Budget Plan", '(none)') as "Budget Plan",
                  sum("Billed Amount")::numeric(18,2) as "Billed Amount"
           from reporting.rpt_billed_charge
+          where "Is Frozen" and not "Is Cancelled"
           group by 1 order by 2 desc`,
   }),
   q({
@@ -1565,10 +1570,15 @@ export const QUESTIONS = [
     title: "What was measured on bills, by unit of measure?",
     why: "Per-UOM totals are the safe way to look at quantity — never sum across units.",
     canvas: "rpt_bill_segment_read",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false},
+              {"field": "Is Segment Level", "op": "eq", "value": true}, {"field": "Usage Flag", "op": "eq", "value": "S"},
+              {"field": "Read Row Kind", "op": "eq", "value": "measured"}],
     axis: "Unit of Measure", value: "Measured Quantity",
     sql: `select coalesce("Unit of Measure", "Unit of Measure Code", '(unset)') as "Unit of Measure",
                  sum("Measured Quantity")::numeric(18,2) as "Measured Quantity"
           from reporting.rpt_bill_segment_read
+          where "Is Frozen" and not "Is Cancelled"
+            and "Is Segment Level" and "Usage Flag" = 'S' and "Read Row Kind" = 'measured'
           group by 1 order by 2 desc`,
   }),
   q({
@@ -1578,10 +1588,13 @@ export const QUESTIONS = [
     title: "Where do billed reads come from?",
     why: "Register reads vs derived rows tells you how much of billing rests on actual measurement.",
     canvas: "rpt_bill_segment_read",
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false},
+              {"field": "Is Segment Level", "op": "eq", "value": true}, {"field": "Usage Flag", "op": "eq", "value": "S"}],
     axis: "Read Row Kind", value: "Read Rows",
     sql: `select coalesce("Read Row Kind", '(unset)') as "Read Row Kind",
                  count(*)::bigint as "Read Rows"
           from reporting.rpt_bill_segment_read
+          where "Is Frozen" and not "Is Cancelled" and "Is Segment Level" and "Usage Flag" = 'S'
           group by 1 order by 2 desc`,
   }),
   q({
