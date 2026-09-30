@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fieldGlyph, shelfDimensions } from "./builderShelves";
+import { fieldGlyph, shelfDimensions, startingQuestions } from "./builderShelves";
 
 /**
  * Dragging a date onto the Columns shelf used to WIPE every other column: the
@@ -66,5 +66,18 @@ describe("the type chip on a field", () => {
     expect(fieldGlyph({ role: "measure", type: "numeric(17,2)" })).toBe("#");
     expect(fieldGlyph({ role: "date", type: "timestamp" })).toBe("YMD");
     expect(fieldGlyph({ role: "other", type: "text" })).toBe("?");
+  });
+});
+
+describe("the builder's starting questions", () => {
+  // design review 2026-09-30: the builder opened as a blank panel and one sentence
+  // one per WORKSTREAM: one per data set gave six billing questions, the gallery's first section
+  const q = (id: string, workstream: string) => ({ id, workstream, title: id }) as never;
+  it("one question per workstream, in the gallery's order, at most six", () => {
+    const qs = [q("a1", "A"), q("a2", "A"), q("b1", "B"), q("c1", "C"), q("d1", "D"), q("e1", "E"), q("f1", "F"), q("g1", "G")];
+    expect(startingQuestions(qs).map((x: { id: string }) => x.id)).toEqual(["a1", "b1", "c1", "d1", "e1", "f1"]);
+  });
+  it("is empty when there are no questions", () => {
+    expect(startingQuestions([])).toEqual([]);
   });
 });

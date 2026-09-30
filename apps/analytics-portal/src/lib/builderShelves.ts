@@ -37,3 +37,9 @@ export function fieldGlyph(field: { role: string; type: string }): string {
   if (field.type === "boolean") return "T/F";
   return ROLE_GLYPH[field.role] ?? "?";
 }
+
+/** What the empty builder offers to start from: one ready-to-run question per workstream. */
+export function startingQuestions<T extends { workstream: string }>(questions: T[], shown = 6): T[] {
+  const seen = new Set<string>();
+  return questions.filter((q) => !seen.has(q.workstream) && seen.add(q.workstream)).slice(0, shown);
+}

@@ -39,7 +39,7 @@ import type {
 import { FieldPalette } from "./FieldPalette";
 import { Shelf } from "./Shelf";
 import { VisualPicker, type VisualChoice } from "./VisualPicker";
-import { shelfDimensions } from "@/lib/builderShelves";
+import { shelfDimensions, startingQuestions } from "@/lib/builderShelves";
 import { BuilderChart, type ChartSeries } from "./BuilderChart";
 import { QuestionGallery } from "./QuestionGallery";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
@@ -397,9 +397,28 @@ export function VisualBuilder({
           </div>
 
           {!meta ? (
-            <div className="glass-panel flex items-center justify-center px-6 py-16 text-center text-sm" style={{ color: "var(--foreground-subtle)" }}>
-              Pick a data set to see its columns, or open “Start from a question”
-              for a ready-to-run report.
+            <div className="glass-panel px-6 py-8">
+              <p className="text-sm text-fg-muted">
+                Pick a data set on the left to see its columns, or start from a ready-to-run question:
+              </p>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {startingQuestions(questions).map((q) => (
+                  <button
+                    key={q.id}
+                    type="button"
+                    onClick={() => applyQuestion(q)}
+                    className="rounded-xl border border-edge-subtle bg-surface-subtle p-3 text-left transition hover:border-edge hover:bg-chip"
+                  >
+                    <span className="block text-sm font-medium text-heading">{q.title}</span>
+                    <span className="mt-0.5 block text-xs text-fg-muted">{q.snapshot_label}</span>
+                  </button>
+                ))}
+              </div>
+              {questions.length ? (
+                <button type="button" className="btn-ghost mt-3 text-sm" onClick={() => setGalleryOpen(true)}>
+                  See all {questions.length} questions
+                </button>
+              ) : null}
             </div>
           ) : (
             <div className="space-y-4">
