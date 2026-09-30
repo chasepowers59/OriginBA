@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 import time
 
@@ -37,6 +38,7 @@ from api.snapshot_catalog import (CatalogError, allowed_fields, get_snapshot,
                                   load_catalog, snapshot_backend)
 
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/snapshots", tags=["snapshots"])
 
 
@@ -759,15 +761,22 @@ def cached_query(org_id: str, snapshot: dict[str, Any], body: QueryRequest,
         # Routing is decided on a miss: it reads the aggregate's build once per miss, and the
         # answer is the canvas's either way, so the canvas statement stays the key.
         from api.aggregate_routing import routed_query
-        statement, statement_binds, served_from = (
-            routed_query(org_id, snapshot, dialect=dialect, schema=schema, **request)
-            or (sql, binds, snapshot["table_name"]))
         if backend == "postgres":
-            from api.warehouse_db import execute_query as run_warehouse
-            columns, rows = run_warehouse(statement, statement_binds, organization_id=org_id, max_rows=body.limit)
+            from api.warehouse_db import execute_query as run
         else:
-            columns, rows = execute_query(statement, statement_binds, organization_id=org_id, max_rows=body.limit)
-        return statement, columns, rows, served_from
+            run = execute_query
+        routed = routed_query(org_id, snapshot, dialect=dialect, schema=schema, **request)
+        if routed:
+            statement, statement_binds, served_from = routed
+            try:
+                columns, rows = run(statement, statement_binds, organization_id=org_id, max_rows=body.limit)
+                return statement, columns, rows, served_from
+            except Exception:  # noqa: BLE001 -- an aggregate older than the catalog (a
+                # dimension the nightly has not added yet) passes the identity check and
+                # fails here; the canvas still holds the answer
+                logger.warning("aggregate %s could not answer; reading %s", served_from, snapshot["table_name"])
+        columns, rows = run(sql, binds, organization_id=org_id, max_rows=body.limit)
+        return sql, columns, rows, snapshot["table_name"]
 
     return cached(("query", org_id, backend, sql, repr(sorted(binds.items())), body.limit),
                   run, keep=lambda _: True, version=data_version(org_id))

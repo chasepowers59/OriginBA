@@ -189,9 +189,12 @@ class CachedQueryHook(unittest.TestCase):
             self.ran.append(sql)
             if "SELECT DISTINCT" in sql:
                 return ["b", "live"], [list(self.identity)]
+            if self.aggregate_fails and f'"{AGG}"' in sql:
+                raise RuntimeError('column "Is Usage" does not exist')
             return ["Customer Class", "m0"], [["Residential", 5]]
 
         self.identity = (BUILD, BUILD)
+        self.aggregate_fails = False
         self.patches = [
             mock.patch.object(se, "snapshot_backend", return_value=("postgres", "postgres", "reporting")),
             mock.patch.object(ar, "snapshot_backend", return_value=("postgres", "postgres", "reporting")),
@@ -228,6 +231,15 @@ class CachedQueryHook(unittest.TestCase):
         self.assertEqual(served_from, "rpt_billed_charge")
         self.assertIn('FROM reporting."rpt_billed_charge"', sql)
         self.assertIn('COUNT(*) AS "m0"', sql)
+
+    def test_an_aggregate_that_cannot_run_the_statement_reads_the_canvas(self):
+        # a catalog deployed ahead of the nightly names a dimension the live aggregate
+        # does not have yet; its identity still matches, so only running it can tell
+        self.aggregate_fails = True
+        sql, _, rows, served_from = self.query()
+        self.assertEqual(served_from, "rpt_billed_charge")
+        self.assertIn('FROM reporting."rpt_billed_charge"', sql)
+        self.assertEqual(rows, [["Residential", 5]])
 
     def test_the_identity_is_read_once_per_cache_miss(self):
         self.query()

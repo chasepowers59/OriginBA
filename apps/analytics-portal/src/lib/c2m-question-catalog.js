@@ -1037,7 +1037,8 @@ export const QUESTIONS = [
     title: "How much was consumed, by unit of measure?",
     why: "Volume is the physical side of revenue. Splitting by unit keeps kWh, therms and gallons apart, which is the mistake that makes a usage total meaningless.",
     canvas: "rpt_billed_usage",
-    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false}],
+    filters: [{"field": "Is Frozen", "op": "eq", "value": true}, {"field": "Is Cancelled", "op": "eq", "value": false},
+              {"field": "Is Usage", "op": "eq", "value": true}],
     axis: "Unit of Measure", value: "Billed Quantity",
     sql: `select coalesce("Unit of Measure", "Unit of Measure Code") as "Unit of Measure",
                  "UOM Class",
@@ -1045,7 +1046,7 @@ export const QUESTIONS = [
                  round(sum("Billed Quantity")::numeric, 2) as "Billed Quantity",
                  round(avg("Billed Quantity")::numeric, 2) as "Average Per Line"
           from reporting.rpt_billed_usage
-          where "Is Frozen" and not "Is Cancelled"
+          where "Is Frozen" and not "Is Cancelled" and "Is Usage"
           group by 1, 2 order by 4 desc nulls last`,
   }),
   q({

@@ -22,7 +22,8 @@ of these hold:
   6. the aggregate's "Canvas Build" is single-valued and equals the canvas's live identity
      (Postgres oid:relfilenode, Oracle all_objects.object_id). A canvas rebuilt without its
      aggregate -- a partial or killed run, a failed parity test -- is read directly. Any
-     error reading it is a refusal.
+     error reading it is a refusal, and so is a routed statement that fails to run
+     (api/snapshot_explorer.py reads the canvas instead).
 """
 from __future__ import annotations
 
