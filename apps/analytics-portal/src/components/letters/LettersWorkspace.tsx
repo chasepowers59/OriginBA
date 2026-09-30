@@ -229,7 +229,12 @@ export function LettersWorkspace() {
             {selectedLetter ? (
               <LetterDetailPane key={selectedLetter.letter_id} letter={selectedLetter} tab={tab} onTab={setTab} />
             ) : (
-              <p className="p-8 text-center text-sm text-fg-muted">Choose a letter to see its PDF and the data behind it.</p>
+              // the size of the preview it stands in for, shaped like the letter page
+              <div className="flex h-[70vh] items-center justify-center p-8">
+                <div className="flex aspect-[8.5/11] h-full max-h-[60vh] items-center justify-center rounded-md border-2 border-dashed border-edge-subtle p-6">
+                  <p className="text-center text-sm text-fg-muted">Choose a letter to see its PDF and the data behind it.</p>
+                </div>
+              </div>
             )}
           </section>
         </div>
