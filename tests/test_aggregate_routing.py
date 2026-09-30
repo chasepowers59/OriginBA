@@ -7,9 +7,9 @@ Each test here names one way an aggregate would give a different number, and pro
 router sends that query to the canvas instead. The numbers themselves are compared
 routed vs unrouted in tests/test_aggregate_parity.py.
 
-The catalog block comes from a copy of catalog_dbt.json with the block added by hand
-(tests/fixtures/catalog_dbt_aggregate.json): output/catalog_dbt.json gets it when
-originba_dbt's scripts/build_portal_catalog.py next regenerates it.
+The catalog blocks come from a copy of the aggregated canvases in output/catalog_dbt.json
+(tests/fixtures/catalog_dbt_aggregate.json), which originba_dbt's
+scripts/build_portal_catalog.py generates; CatalogCopy keeps the two in step.
 """
 from __future__ import annotations
 
@@ -169,12 +169,13 @@ class CatalogCopy(unittest.TestCase):
     """The fixture is a copy; it must not drift from the catalog the portal serves."""
 
     def test_the_copy_matches_the_real_catalog_where_routing_reads_it(self):
-        real = json.loads((ROOT / "output" / "catalog_dbt.json").read_text())["snapshots"]["rpt_billed_charge"]
-        for key in ("table_name", "default_date_field", "default_date_preset", "premade_reports", "trusted_measures"):
-            self.assertEqual(CANVAS[key], real[key], key)
-        self.assertEqual([f["id"] for f in CANVAS["fields"]], [f["id"] for f in real["fields"]])
-        if "aggregate" in real:
-            self.assertEqual(CANVAS["aggregate"], real["aggregate"])
+        real = json.loads((ROOT / "output" / "catalog_dbt.json").read_text())["snapshots"]
+        self.assertEqual(sorted(FIXTURE["snapshots"]), sorted(s for s, v in real.items() if "aggregate" in v))
+        for canvas, copy in FIXTURE["snapshots"].items():
+            for key in ("table_name", "default_date_field", "default_date_preset", "premade_reports",
+                        "trusted_measures", "aggregate"):
+                self.assertEqual(copy[key], real[canvas][key], f"{canvas} {key}")
+            self.assertEqual([f["id"] for f in copy["fields"]], [f["id"] for f in real[canvas]["fields"]], canvas)
 
 
 class CachedQueryHook(unittest.TestCase):

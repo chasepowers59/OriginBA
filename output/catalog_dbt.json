@@ -7808,6 +7808,22 @@
    "workstream_label": "Billing & Rates"
   },
   "rpt_billed_usage": {
+   "aggregate": {
+    "build_column": "Canvas Build",
+    "count": "Record Count",
+    "date": "Bill Date",
+    "dimensions": [
+     "Unit of Measure",
+     "Customer Class",
+     "Service Type",
+     "Is Frozen",
+     "Is Cancelled"
+    ],
+    "measures": {
+     "Billed Quantity": "sum"
+    },
+    "table": "agg_billed_usage_daily"
+   },
    "data_model": {
     "columns_traced_to_cisadm": 30,
     "domain_table": "rpt_billed_usage",
@@ -17079,6 +17095,29 @@
    "workstream_label": "Field Operations"
   },
   "rpt_financial_txn": {
+   "aggregate": {
+    "build_column": "Canvas Build",
+    "count": "Record Count",
+    "date": "Accounting Date",
+    "dimensions": [
+     "FT Type",
+     "Adjustment Type",
+     "Revenue Class",
+     "SA Type",
+     "Service Type",
+     "Is Frozen",
+     "Is Bill Segment",
+     "Is Revenue Bearing",
+     "Is Adjustment",
+     "Is Payment",
+     "Is Payment Cancellation"
+    ],
+    "measures": {
+     "Adjustment Amount": "sum",
+     "Current Amount": "sum"
+    },
+    "table": "agg_financial_txn_daily"
+   },
    "data_model": {
     "columns_traced_to_cisadm": 48,
     "domain_table": "rpt_financial_txn",
@@ -18338,6 +18377,20 @@
    "workstream_label": "Finance"
   },
   "rpt_gl": {
+   "aggregate": {
+    "build_column": "Canvas Build",
+    "count": "Record Count",
+    "date": "Accounting Date",
+    "dimensions": [
+     "GL Distribution Status",
+     "GL Account",
+     "Service Type"
+    ],
+    "measures": {
+     "GL Amount": "sum"
+    },
+    "table": "agg_gl_daily"
+   },
    "data_model": {
     "columns_traced_to_cisadm": 31,
     "domain_table": "rpt_gl",
