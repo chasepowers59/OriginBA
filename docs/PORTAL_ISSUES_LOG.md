@@ -36,6 +36,9 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-30 | "How are customers paying?" summed cancelled tenders: +$379,901 over 12 months, +$12.35B all time (a cancelled keying error) | b480f049 | tests/test_money_rules.py (every ready-to-run report) |
+| 2026-09-30 | "What is being adjusted?" counted every cancelled adjustment twice (AX carries the same-signed amount): $15,572,430.42 shown, $15,096,751.09 standing | b480f049 (+ dbt 7e3d7e5) | tests/test_money_rules.py (MeasureRuleTests) |
+| 2026-09-30 | Governed "Billed usage by unit of measure" summed tier repeats and non-usage lines | b480f049 | tests/test_money_rules.py |
 | 2026-09-30 | "Consumption by unit of measure" summed tier repeats and unit-less SQI lines: a 31.85M blank bar, Gallons 47% high, kW demand and power factor counted as consumption (Ellensburg) | 610ade71 (+ dbt c52e6df: Is Usage on agg_billed_usage_daily) | originba_dbt scripts/test_portal_catalog_aggregate.py |
 | 2026-09-30 | A catalog ahead of the nightly could route to an aggregate missing the new column: the query failed instead of reading the canvas | 610ade71 | tests/test_aggregate_routing.py |
 | 2026-09-29 | A dropped Oracle connection: explorer 502 with driver text ("Demo query failed: DPY-4011 ..."), data quality 22 rule errors, home "connect it under Settings" for a configured org | 1ff792d0 | tests/test_oracle_outage.py |
