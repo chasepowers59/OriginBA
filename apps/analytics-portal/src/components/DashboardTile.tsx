@@ -6,8 +6,7 @@ import {
   fetchSnapshotMetadata,
   runSnapshotQuery,
 } from "@/lib/api";
-import { formatCompact } from "@/lib/format";
-import { chartedMeasureColumn, kpiHeadline, tileIsUnset } from "@/lib/dashboardTileMath";
+import { chartedMeasureColumn, kpiHeadline, tileHeadline, tileIsUnset, tileSeriesLabel } from "@/lib/dashboardTileMath";
 import { resolveDateField, tileWindowField } from "@/lib/tileDateField";
 import { measureDisplaysAsCurrency } from "@/lib/businessLabels";
 import type { DashboardTileDef, QueryResponse } from "@/lib/types";
@@ -143,12 +142,11 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
   }
 
   if (tile.visual === "kpi") {
-    const formatted =
-      total === null ? null : formatCompact(total, { currency: isCurrency });
+    const formatted = tileHeadline(total, queryMeasureField, queryMeasureAgg);
     return (
       <div className="glass-panel flex h-full flex-col justify-center p-6">
         <p className="text-xs uppercase tracking-wide text-fg-muted">{tile.title}</p>
-        <p className="mt-2 text-4xl font-bold text-heading">{formatted ?? "—"}</p>
+        <p className="mt-2 text-4xl font-bold text-heading">{formatted}</p>
       </div>
     );
   }
@@ -200,7 +198,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
           series={[
             {
               key: measureKey,
-              label: queryMeasureField === "*" ? "Count" : queryMeasureField,
+              label: tileSeriesLabel(result.column_labels, measureKey, queryMeasureField, queryMeasureAgg),
               currency: isCurrency,
             },
           ]}

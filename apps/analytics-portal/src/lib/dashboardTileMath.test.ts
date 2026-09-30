@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { chartedMeasureColumn, kpiHeadline, tileIsUnset } from "./dashboardTileMath";
+import { chartedMeasureColumn, kpiHeadline, tileHeadline, tileIsUnset, tileSeriesLabel } from "./dashboardTileMath";
+import { formatCompact } from "./format";
 
 /**
  * UX-backlog fixes, tests first:
@@ -68,5 +69,32 @@ describe("a tile nobody has set up yet", () => {
   });
   it("a KPI needs no breakdown: it is one number", () => {
     expect(tileIsUnset({ ...base, visual: "kpi" })).toBe(false);
+  });
+});
+
+/**
+ * A tile names its series the way the builder does: the server's label for the column
+ * first, then the same wording the builder falls back to. Naming it after the raw field
+ * turned "% of segments estimated" (12.3) into "Estimated Segment" 12.3, read as a count.
+ */
+describe("tileSeriesLabel", () => {
+  it("uses the server's label for the charted column", () => {
+    expect(tileSeriesLabel({ m0: "% Estimated Segment" }, "m0", "Estimated Segment", "share"))
+      .toBe("% Estimated Segment");
+  });
+
+  it("falls back to the builder's wording, never the bare field", () => {
+    expect(tileSeriesLabel(undefined, "m0", "Estimated Segment", "share")).toBe("% Estimated Segment");
+    expect(tileSeriesLabel({}, "m0", "Billed Amount", "avg")).toBe("Average billed amount");
+    expect(tileSeriesLabel(undefined, "m0", "*", "count")).toBe("Number of records");
+  });
+});
+
+describe("tileHeadline", () => {
+  it("reads a share as a percentage and money as money", () => {
+    expect(tileHeadline(12.345, "Estimated Segment", "share")).toBe("12.3%");
+    expect(tileHeadline(90580, "Monthly Budget Amount", "sum")).toBe(formatCompact(90580, { currency: true }));
+    expect(tileHeadline(389, "*", "count")).toBe(formatCompact(389));
+    expect(tileHeadline(null, "*", "count")).toBe("—");
   });
 });
