@@ -299,6 +299,8 @@
     FROM ORIGINBA_REPORTING.RPT_BILLED_CHARGE
     WHERE
       REGEXP_LIKE("Charge Description", 'tax', 'i')
+      AND "Is Frozen" = 1
+      AND NOT "Is Cancelled" = 1
     GROUP BY
       "Charge Description"
     ORDER BY

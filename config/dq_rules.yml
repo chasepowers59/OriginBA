@@ -249,7 +249,7 @@
     select "Charge Description", count(*) as "Charge Lines",
            sum("Billed Amount") as "Total Amount"
     from reporting.rpt_billed_charge
-    where "Charge Description" ~* 'tax'
+    where "Charge Description" ~* 'tax' and "Is Frozen" and not "Is Cancelled"
     group by "Charge Description"
     order by "Charge Lines" desc
 
