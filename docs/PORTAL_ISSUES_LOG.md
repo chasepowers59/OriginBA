@@ -36,6 +36,8 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-09-30 | Charge-line billed reports summed cancelled and unfrozen calc lines: $167.9M vs $117.0M all time (12 months +$3.83M) | 65d8db72 | tests/test_money_rules.py |
+| 2026-09-30 | "What was measured on bills" summed every copy of every read and cancelled segments (3.6x); "Where do billed reads come from?" counted copies | 65d8db72 (+ dbt 46aac18: Is Frozen / Is Cancelled on rpt_bill_segment_read) | tests/test_money_rules.py (MeasureRuleTests) |
 | 2026-09-30 | "How are customers paying?" summed cancelled tenders: +$379,901 over 12 months, +$12.35B all time (a cancelled keying error) | b480f049 | tests/test_money_rules.py (every ready-to-run report) |
 | 2026-09-30 | "What is being adjusted?" counted every cancelled adjustment twice (AX carries the same-signed amount): $15,572,430.42 shown, $15,096,751.09 standing | b480f049 (+ dbt 7e3d7e5) | tests/test_money_rules.py (MeasureRuleTests) |
 | 2026-09-30 | Governed "Billed usage by unit of measure" summed tier repeats and non-usage lines | b480f049 | tests/test_money_rules.py |
