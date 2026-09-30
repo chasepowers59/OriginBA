@@ -47,6 +47,7 @@ import { VisibilityToggle } from "@/components/VisibilityToggle";
 import { FilterValuePicker } from "./FilterValuePicker";
 import { ReportParameters } from "./ReportParameters";
 import { FolderInput } from "@/components/FolderInput";
+import { aggIsAdditive } from "@/lib/chartLayout";
 
 type ColItem = { field: string; label: string; kind: "dim" | "time"; grain?: string };
 type ValItem = { field: string; label: string; agg: string; trusted: boolean };
@@ -237,6 +238,7 @@ export function VisualBuilder({
       key: `m${i}`,
       label: result?.column_labels?.[`m${i}`] ?? measureColumnLabel(v.field, v.agg, v.label),
       currency: v.field !== "*" && measureDisplaysAsCurrency(v.field, v.agg),
+      additive: aggIsAdditive(v.agg),
     }));
   }, [vals, result]);
 

@@ -26,6 +26,7 @@ import { AppliedWindowNote } from "@/components/AppliedWindowNote";
 import { downloadPdf } from "@/lib/api";
 import { isMeasureColumn, summarizeResult, totalRow } from "@/lib/resultSummary";
 import { POPOVER_PANEL, menuFocusIndex, usePopover } from "@/lib/popover";
+import { aggIsAdditive } from "@/lib/chartLayout";
 
 type SortDir = "asc" | "desc";
 
@@ -320,6 +321,7 @@ export function ResultsPanel({
                 key: measureKey,
                 label: columnLabels[measureKey] ?? "Value",
                 currency: isCurrency,
+                additive: aggIsAdditive(measureAgg),
               },
             ]}
             selectedCategory={drillFilter?.value ?? null}

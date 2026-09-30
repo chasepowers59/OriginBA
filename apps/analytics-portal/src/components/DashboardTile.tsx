@@ -12,6 +12,7 @@ import { measureDisplaysAsCurrency } from "@/lib/businessLabels";
 import type { DashboardTileDef, QueryResponse } from "@/lib/types";
 import { BuilderChart } from "./builder/BuilderChart";
 import { useCrossFilter } from "./CrossFilterContext";
+import { aggIsAdditive } from "@/lib/chartLayout";
 
 type DashboardTileProps = {
   tile: DashboardTileDef;
@@ -200,6 +201,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
               key: measureKey,
               label: tileSeriesLabel(result.column_labels, measureKey, queryMeasureField, queryMeasureAgg),
               currency: isCurrency,
+              additive: aggIsAdditive(queryMeasureAgg),
             },
           ]}
           sortTimeSeries={isTimeSeries}

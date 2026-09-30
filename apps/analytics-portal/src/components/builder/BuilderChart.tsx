@@ -48,7 +48,8 @@ export type BuilderVisual =
   | "stacked-area"
   | "pie";
 
-export type ChartSeries = { key: string; label: string; currency?: boolean };
+/** `additive: false` (an average, a share, a distinct count) never draws as a pie. */
+export type ChartSeries = { key: string; label: string; currency?: boolean; additive?: boolean };
 
 type BuilderChartProps = {
   rows: Record<string, unknown>[];
@@ -180,7 +181,8 @@ export function BuilderChart({
   });
   const pie =
     visual === "pie" && series.length
-      ? piePlan(data.map((d) => String(d[xKey])), data.map((d) => Number(d[series[0].key])))
+      ? piePlan(data.map((d) => String(d[xKey])), data.map((d) => Number(d[series[0].key])),
+          { additive: series[0].additive !== false })
       : null;
   const shown: BuilderVisual = visual === "pie" && !pie?.slices ? "bar" : visual;
   const asRows =

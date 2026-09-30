@@ -275,3 +275,16 @@ describe("ordered bands keep their columns", () => {
     expect(chartLayout({ ...SPARK_AXIS, labels: many, values: many.map(() => 1), width: 420, ordered: true }).orientation).toBe("horizontal");
   });
 });
+
+describe("piePlan over a rate or an average", () => {
+  it("draws bars, because the groups are not parts of a whole", () => {
+    const plan = piePlan(["Electric", "Water", "Gas"], [1.5, 1.4, 1.1], { additive: false });
+    expect(plan.slices).toBeNull();
+    expect(plan.note).toMatch(/rates and averages/);
+  });
+
+  it("still draws a pie of counts and sums", () => {
+    expect(piePlan(["A", "B"], [3, 1], { additive: true }).slices).toHaveLength(2);
+    expect(piePlan(["A", "B"], [3, 1]).slices).toHaveLength(2);
+  });
+});

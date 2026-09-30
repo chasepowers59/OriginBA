@@ -190,10 +190,19 @@ const PIE_NAMED_SLICES = 4;
  * means nothing, and adjustments and refunds go negative routinely. "Other" is only
  * honest while it is no bigger than the smallest slice named beside it.
  */
+/** Whether groups of this aggregation add up to a whole: only sums and counts do. */
+export function aggIsAdditive(agg: string): boolean {
+  return agg === "sum" || agg === "count";
+}
+
 export function piePlan(
   labels: string[],
   values: number[],
+  { additive = true }: { additive?: boolean } = {},
 ): { slices: PieSlice[]; note: null } | { slices: null; note: string } {
+  if (!additive) {
+    return { slices: null, note: "Shown as bars: rates and averages are not parts of a whole." };
+  }
   if (values.some((v) => v < 0)) {
     return { slices: null, note: "Shown as bars: a pie cannot show negative values." };
   }
