@@ -86,6 +86,12 @@ class MeasureRuleTests(unittest.TestCase):
                 self.assertEqual(missing_money_filters("rpt_bill_segment_read", q),
                                  ["Is Segment Level", "Usage Flag", "Read Row Kind"])
 
+    def test_a_sum_over_adjustment_rows_counts_standing_adjustments(self):
+        # the AD row of a cancelled adjustment stays frozen; only its AX offsets it, so a
+        # sum kept to AD rows needs the status (Ellensburg: $14,324,169.42 vs $14,086,669.56)
+        adjustments = [FROZEN, {"field": "Is Adjustment", "op": "eq", "value": True}]
+        self.assertEqual(self.sums("Current Amount", adjustments), ["Adjustment Status Code"])
+
     def test_other_measures_on_the_canvas_are_untouched(self):
         self.assertEqual(self.sums("Current Amount", [FROZEN]), [])
 

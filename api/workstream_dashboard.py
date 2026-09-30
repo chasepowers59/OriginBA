@@ -9,7 +9,7 @@ from typing import Any
 from api.demo_db import demo_configured
 from api.warehouse_db import warehouse_configured
 from api.executive_dashboard import present_card_errors, unavailable_note
-from api.money_rules import MONEY_FILTERS
+from api.money_rules import MONEY_FILTERS, STANDING_ADJUSTMENT
 from api.row_security import only_readable, rule_filters
 from api.reporting_dates import data_as_of
 from api.kpi_runner import date_windows, execute_kpi_definition
@@ -222,9 +222,9 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
          "snapshot_id": "rpt_financial_txn", "format": "currency", "workstream": "finance",
          "explore_report_id": None, "date_field": "Accounting Date",
          "value": {"dimensions": [], "measures": [{"field": "Current Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Adjustment", "op": "eq", "value": True}, *MONEY_FILTERS["rpt_financial_txn"]]},
+                   "filters": [*STANDING_ADJUSTMENT, *MONEY_FILTERS["rpt_financial_txn"]]},
          "trend": {"dimensions": ["Adjustment Type"], "measures": [{"field": "Current Amount", "agg": "sum"}],
-                   "filters": [{"field": "Is Adjustment", "op": "eq", "value": True}, *MONEY_FILTERS["rpt_financial_txn"]],
+                   "filters": [*STANDING_ADJUSTMENT, *MONEY_FILTERS["rpt_financial_txn"]],
                    "limit": 6, "rank": "magnitude"}},
         {"id": "gl_lines", "label": "GL distribution lines", "subtitle": "Posting detail rows",
          "snapshot_id": "rpt_gl", "format": "number", "workstream": "finance",

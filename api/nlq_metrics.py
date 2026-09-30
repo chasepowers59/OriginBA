@@ -12,7 +12,7 @@ catalog actually carries, so a metric is never offered where it cannot run.
 
 from __future__ import annotations
 
-from api.money_rules import MONEY_FILTERS
+from api.money_rules import MONEY_FILTERS, STANDING_ADJUSTMENT
 from api.row_security import rule_filters
 from api.reporting_dates import reporting_today
 
@@ -607,8 +607,7 @@ METRICS: list[NlqMetric] = [
         format="currency",
         example="Adjustment dollars last 90 days",
         build=lambda _p: {"kind": "scalar", "date_field": "Accounting Date",
-                          "query": _sum("Current Amount",
-                                        [{"field": "Is Adjustment", "op": "eq", "value": True}, *FROZEN])},
+                          "query": _sum("Current Amount", [*STANDING_ADJUSTMENT, *FROZEN])},
     ),
     NlqMetric(
         id="gl_by_account",

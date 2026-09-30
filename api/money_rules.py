@@ -55,6 +55,13 @@ MEASURE_FILTERS: dict[tuple[str, str], list[dict[str, Any]]] = {
     ("rpt_bill_segment_read", "Final Register Quantity"): ONE_READ_COPY,
 }
 
+# (canvas, filter) -> the filters a SUM kept to that filter also needs. The AD row of a
+# cancelled adjustment stays frozen and only its AX row offsets it, so a sum kept to AD
+# rows counts standing adjustments only (Ellensburg: $14,324,169.42 vs $14,086,669.56).
+FILTER_RULES: dict[tuple[str, tuple[str, str, Any]], list[dict[str, Any]]] = {
+    ("rpt_financial_txn", ("Is Adjustment", "eq", True)): STANDING_ADJUSTMENT[1:],
+}
+
 
 def missing_money_filters(snapshot_id: str, query: dict[str, Any],
                           default_lens: list[dict[str, Any]] | None = None) -> list[str]:
@@ -66,6 +73,7 @@ def missing_money_filters(snapshot_id: str, query: dict[str, Any],
     have = {(f.get("field"), f.get("op"), f.get("value"))
             for f in [*(query.get("filters") or []), *(default_lens or [])]}
     required = [*MONEY_FILTERS.get(snapshot_id, []),
-                *(f for field in summed for f in MEASURE_FILTERS.get((snapshot_id, field), []))]
+                *(f for field in summed for f in MEASURE_FILTERS.get((snapshot_id, field), [])),
+                *(f for key in have for f in FILTER_RULES.get((snapshot_id, key), []))]
     missing = [f["field"] for f in required if (f["field"], f["op"], f["value"]) not in have]
     return list(dict.fromkeys(missing))
