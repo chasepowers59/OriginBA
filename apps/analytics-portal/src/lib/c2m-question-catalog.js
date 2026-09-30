@@ -966,14 +966,14 @@ export const QUESTIONS = [
     title: "How is the meter reading workload distributed across routes?",
     why: "Route size is the daily workload of a reader or the daily load on the head-end. A route far larger than its neighbours is the one that runs late.",
     canvas: "rpt_premise_sp",
-    axis: "Meter Read Route Code", value: "Service Points",
-    sql: `select coalesce("Meter Read Cycle Code", '(unset)') as "Cycle",
-                 coalesce("Meter Read Route Code", '(unset)') as "Meter Read Route Code",
+    // MDM's route: CI_SP's meter-read route is empty at all six clients (2026-09-30)
+    axis: "Measurement Cycle Route", value: "Service Points",
+    sql: `select coalesce("Measurement Cycle Route", '(unset)') as "Measurement Cycle Route",
                  count(*)::bigint as "Service Points",
                  count(*) filter (where "Has Installed Device")::bigint as "With Device",
                  count(*) filter (where "Service Is On")::bigint as "Service On"
           from reporting.rpt_premise_sp
-          group by 1, 2 order by 3 desc`,
+          group by 1 order by 2 desc`,
   }),
   q({
     id: "meter-age-replacement",

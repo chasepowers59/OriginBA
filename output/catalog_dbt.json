@@ -15154,7 +15154,7 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "CI_SP.MR_RTE_CD, CCB's own meter-read route. Empty at all six clients measured (0 of 502,622 service points, 2026-09-30): they read through MDM, whose route is Measurement Cycle Route. Kept for a client that routes in CCB.",
      "group": "assets",
      "id": "Meter Read Route Code",
      "label": "Meter Read Route Code",
@@ -22811,7 +22811,7 @@
   },
   "rpt_premise_sp": {
    "data_model": {
-    "columns_traced_to_cisadm": 38,
+    "columns_traced_to_cisadm": 41,
     "domain_table": "rpt_premise_sp",
     "driving_table": "CI_LOOKUP_VAL_L",
     "field_groups": [
@@ -22826,6 +22826,10 @@
        "Meter Read Cycle Code",
        "Meter Read Route Code",
        "Meter Read Route Sequence",
+       "Measurement Cycle Code",
+       "Measurement Cycle Route Code",
+       "Measurement Cycle Route Sequence",
+       "Measurement Cycle Route",
        "Meter Location Code",
        "Meter Location Details",
        "Meter Read Instruction Code",
@@ -22929,6 +22933,13 @@
       "table": "int_sp_device"
      },
      {
+      "alias": "d1sp",
+      "join_type": "left join",
+      "on": "d1sp.d1_sp_id = dev.d1_sp_id",
+      "role": "model",
+      "table": "stg_d1_service_point"
+     },
+     {
       "alias": "rec",
       "join_type": "left join",
       "on": "rec.d1_sp_id = dev.d1_sp_id",
@@ -22982,10 +22993,12 @@
      "D1_DVC_CFG",
      "D1_DVC_TYPE_L",
      "D1_MANUFACTURER_L",
-     "D1_MODEL_L"
+     "D1_MODEL_L",
+     "D1_SP"
     ],
     "trusted_measures": [
      "Meter Read Route Sequence",
+     "Measurement Cycle Route Sequence",
      "Service Point Count (Premise)",
      "SA Count (Premise)",
      "Billed Segment Count (Premise)",
@@ -23050,6 +23063,18 @@
     {
      "id": "Meter Read Route Code",
      "label": "Meter Read Route Code"
+    },
+    {
+     "id": "Measurement Cycle Code",
+     "label": "Measurement Cycle Code"
+    },
+    {
+     "id": "Measurement Cycle Route Code",
+     "label": "Measurement Cycle Route Code"
+    },
+    {
+     "id": "Measurement Cycle Route",
+     "label": "Measurement Cycle Route"
     },
     {
      "id": "Meter Location Code",
@@ -23270,7 +23295,7 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "CI_SP.MR_RTE_CD, CCB's own meter-read route. Empty at all six clients measured (0 of 502,622 service points, 2026-09-30): they read through MDM, whose route is Measurement Cycle Route. Kept for a client that routes in CCB.",
      "group": "meter_ops",
      "id": "Meter Read Route Code",
      "label": "Meter Read Route Code",
@@ -23284,6 +23309,38 @@
      "label": "Meter Read Route Sequence",
      "role": "measure",
      "type": "numeric(8,0)"
+    },
+    {
+     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "group": "meter_ops",
+     "id": "Measurement Cycle Code",
+     "label": "Measurement Cycle Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Measurement Cycle Route\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "Measurement Cycle Route Code",
+     "label": "Measurement Cycle Route Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Ordering sequence within its parent. Part of the grain, not a measure.",
+     "group": "meter_ops",
+     "id": "Measurement Cycle Route Sequence",
+     "label": "Measurement Cycle Route Sequence",
+     "role": "measure",
+     "type": "numeric(9,0)"
+    },
+    {
+     "description": "The MDM route the point is read on, as 'cycle / route' (D1_SP.MSRMT_CYC_CD and MSRMT_CYC_RTE_CD): the one to group a reading workload by, because route codes repeat across cycles (College Station: 53 codes on 376 routes, 2026-09-30). Null when the point has no route.",
+     "group": "meter_ops",
+     "id": "Measurement Cycle Route",
+     "label": "Measurement Cycle Route",
+     "role": "dimension",
+     "type": "text"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -23724,6 +23781,16 @@
       "min",
       "max"
      ],
+     "id": "Measurement Cycle Route Sequence",
+     "label": "Measurement Cycle Route Sequence"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
      "id": "Service Point Count (Premise)",
      "label": "Service Point Count (Premise)"
     },
@@ -23820,7 +23887,7 @@
      "chart_type": "bar",
      "description": "Route size is the daily workload of a reader or the daily load on the head-end. A route far larger than its neighbours is the one that runs late.",
      "dimensions": [
-      "Meter Read Route Code"
+      "Measurement Cycle Route"
      ],
      "filters": [],
      "id": "meter_read_routes",
@@ -23859,6 +23926,7 @@
    "table_name": "rpt_premise_sp",
    "trusted_measures": [
     "Meter Read Route Sequence",
+    "Measurement Cycle Route Sequence",
     "Service Point Count (Premise)",
     "SA Count (Premise)",
     "Billed Segment Count (Premise)",
