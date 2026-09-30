@@ -14,10 +14,11 @@ import domain_schema  # noqa: E402
 import patch_field_activity_domain as p  # noqa: E402
 
 NS = "{http://www.jaspersoft.com/2007/SL/XMLSchema}"
-SNAP = ROOT / "jaspersoft/inventory/test/Origin_DEV/resources/organizations/organization_1/organizations/Origin_DEV/SmartCity/Report/Standard_Offering/Field_Operations/Field_Activity/Field_Activity___Domain_files/schema.data"
+# the Origin_DEV schema as exported BEFORE the patch; the live inventory carries it applied
+SNAP = ROOT / "domains/manual_imports/field_activity_domain/schema.reference.xml"
 
 
-@unittest.skipUnless(SNAP.exists(), "needs the Origin_DEV inventory snapshot")
+@unittest.skipUnless(SNAP.exists(), "needs the pre-patch reference schema")
 class Patch(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

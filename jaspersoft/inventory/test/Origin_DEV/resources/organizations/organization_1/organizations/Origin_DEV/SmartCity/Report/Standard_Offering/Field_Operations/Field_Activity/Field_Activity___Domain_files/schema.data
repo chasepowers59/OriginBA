@@ -142,6 +142,45 @@
         <item id="REQUESTER_USER_NAME" label="Requester User (Name)" resourceId="JoinTree_1.REQUESTER_USER_NAME"></item>
       </items>
     </itemGroup>
+    <itemGroup id="SET_CIS_FA" label="1.) Field Activity - CIS" resourceId="JoinTree_1">
+      <items>
+        <item id="CIS_FA_ID" label="CIS Field Activity ID" resourceId="JoinTree_1.CIS_FA.FA_ID"></item>
+        <item id="CIS_FA_TYPE_CD" label="CIS Field Activity Type Code" resourceId="JoinTree_1.CIS_FA.FA_TYPE_CD"></item>
+        <item id="CIS_FA_TYPE_DESCR" label="CIS Field Activity Type" resourceId="JoinTree_1.CIS_FA_TYPE_L.DESCR"></item>
+        <item id="CIS_FA_STATUS_FLG" label="CIS Field Activity Status Code" resourceId="JoinTree_1.CIS_FA.FA_STATUS_FLG"></item>
+        <item id="CIS_FA_STATUS_DESCR" label="CIS Field Activity Status" resourceId="JoinTree_1.CIS_FA_STAT_L.DESCR"></item>
+        <item id="CIS_FA_PRIORITY_FLG" label="CIS Field Activity Priority" resourceId="JoinTree_1.CIS_FA.FA_PRIORITY_FLG"></item>
+        <item id="CIS_FA_SCHED_DTTM" label="CIS Scheduled Date/Time" resourceId="JoinTree_1.CIS_FA.SCHED_DTTM"></item>
+        <item id="CIS_FA_CRE_DTTM" label="CIS Created Date/Time" resourceId="JoinTree_1.CIS_FA.CRE_DTTM"></item>
+        <item id="CIS_FA_DISP_GRP_CD" label="Dispatch Group Code" resourceId="JoinTree_1.CIS_FA.DISP_GRP_CD"></item>
+        <item id="CIS_FA_DISP_GRP_DESCR" label="Dispatch Group" resourceId="JoinTree_1.CIS_DISP_GRP_L.DESCR"></item>
+        <item id="CIS_FA_CAN_RSN_CD" label="CIS Cancel Reason Code" resourceId="JoinTree_1.CIS_FA.FA_CAN_RSN_CD"></item>
+        <item id="CIS_FA_CAN_RSN_DESCR" label="CIS Cancel Reason" resourceId="JoinTree_1.CIS_FA_CAN_RSN_L.DESCR"></item>
+        <item id="CIS_FA_RESCHED_RSN_CD" label="CIS Reschedule Reason Code" resourceId="JoinTree_1.CIS_FA.FA_RESCHED_RSN_CD"></item>
+        <item id="CIS_FA_CREATED_BY_FLG" label="CIS Created By" resourceId="JoinTree_1.CIS_FA.FA_CREATED_BY_FLG"></item>
+        <item id="CIS_FA_ELIG_DISPATCH_SW" label="Eligible For Dispatch Switch" resourceId="JoinTree_1.CIS_FA.ELIG_DISPATCH_SW"></item>
+        <item id="CIS_FA_USER_ID" label="CIS Field Activity User" resourceId="JoinTree_1.CIS_FA.USER_ID"></item>
+        <item id="CIS_FA_INT_STATUS_FLG" label="CIS Intermediate Status" resourceId="JoinTree_1.CIS_FA.FA_INT_STATUS_FLG"></item>
+        <item id="CIS_FA_SP_ID" label="CIS Service Point ID" resourceId="JoinTree_1.CIS_FA.SP_ID"></item>
+        <item id="CIS_FA_INSTRUCTIONS" label="CIS Instructions" resourceId="JoinTree_1.CIS_FA.INSTRUCTIONS"></item>
+        <item id="CIS_FA_DESCRLONG" label="CIS Description" resourceId="JoinTree_1.CIS_FA.DESCRLONG"></item>
+        <item id="CIS_FA_LINKED" label="Activity Has A CIS Field Activity" resourceId="JoinTree_1.CIS_FA_LINKED"></item>
+        <item id="CIS_FA_DAYS_ACTIVITY_TO_SCHEDULE" label="Days From Activity Created To CIS Schedule" resourceId="JoinTree_1.CIS_FA_DAYS_ACTIVITY_TO_SCHEDULE"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SET_CIS_FO" label="1.) Field Order - CIS" resourceId="JoinTree_1">
+      <items>
+        <item id="CIS_FO_ID" label="Field Order ID" resourceId="JoinTree_1.CIS_FO.FO_ID"></item>
+        <item id="CIS_FO_PREM_ID" label="Field Order Premise ID" resourceId="JoinTree_1.CIS_FO.PREM_ID"></item>
+        <item id="CIS_FO_WORKED_BY" label="Field Order Worked By" resourceId="JoinTree_1.CIS_FO.WORKED_BY"></item>
+        <item id="CIS_FO_REP_CD" label="Field Order Representative" resourceId="JoinTree_1.CIS_FO.REP_CD"></item>
+        <item id="CIS_FO_DISP_GRP_CD" label="Field Order Dispatch Group Code" resourceId="JoinTree_1.CIS_FO.DISP_GRP_CD"></item>
+        <item id="CIS_FO_SCHED_DTTM" label="Field Order Scheduled Date/Time" resourceId="JoinTree_1.CIS_FO.SCHED_DTTM"></item>
+        <item id="CIS_FO_SCHED_END_DTTM" label="Field Order Scheduled End Date/Time" resourceId="JoinTree_1.CIS_FO.SCHED_END_DTTM"></item>
+        <item id="CIS_FO_STATUS_FLG" label="Field Order Status Code" resourceId="JoinTree_1.CIS_FO.FO_STATUS_FLG"></item>
+        <item id="CIS_FO_WORK_DTTM" label="Field Order Worked Date/Time" resourceId="JoinTree_1.CIS_FO.WORK_DTTM"></item>
+      </items>
+    </itemGroup>
   </itemGroups>
   <resources>
     <jdbcTable id="D1_ACTIVITY" datasourceId="Origin_DEV_DS" datasourceTableName="D1_ACTIVITY" schemaAlias="CISADM">
@@ -548,6 +587,78 @@ FROM(
 GROUP BY
   D1_ACTIVITY_ID</query>
     </jdbcQuery>
+    <jdbcTable id="CIS_FA_IDENTIFIER" datasourceId="Origin_DEV_DS" datasourceTableName="D1_ACTIVITY_IDENTIFIER" schemaAlias="CISADM">
+      <fieldList>
+        <field id="D1_ACTIVITY_ID" type="java.lang.String"></field>
+        <field id="ACTIVITY_ID_TYPE_FLG" type="java.lang.String"></field>
+        <field id="ID_VALUE" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CIS_FA" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FA" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FA_ID" type="java.lang.String"></field>
+        <field id="FA_TYPE_CD" type="java.lang.String"></field>
+        <field id="FA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="FA_PRIORITY_FLG" type="java.lang.String"></field>
+        <field id="SCHED_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="DISP_GRP_CD" type="java.lang.String"></field>
+        <field id="FO_ID" type="java.lang.String"></field>
+        <field id="FA_CAN_RSN_CD" type="java.lang.String"></field>
+        <field id="FA_RESCHED_RSN_CD" type="java.lang.String"></field>
+        <field id="FA_CREATED_BY_FLG" type="java.lang.String"></field>
+        <field id="ELIG_DISPATCH_SW" type="java.lang.String"></field>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="FA_INT_STATUS_FLG" type="java.lang.String"></field>
+        <field id="SP_ID" type="java.lang.String"></field>
+        <field id="INSTRUCTIONS" type="java.lang.String"></field>
+        <field id="DESCRLONG" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CIS_FA_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FA_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FA_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CIS_FA_STAT_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CIS_DISP_GRP_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_DISP_GRP_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="DISP_GRP_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CIS_FA_CAN_RSN_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FA_CAN_RSN_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FA_CAN_RSN_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CIS_FO" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FO" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FO_ID" type="java.lang.String"></field>
+        <field id="PREM_ID" type="java.lang.String"></field>
+        <field id="WORKED_BY" type="java.lang.String"></field>
+        <field id="REP_CD" type="java.lang.String"></field>
+        <field id="DISP_GRP_CD" type="java.lang.String"></field>
+        <field id="SCHED_DTTM" type="java.sql.Timestamp"></field>
+        <field id="SCHED_END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="FO_STATUS_FLG" type="java.lang.String"></field>
+        <field id="WORK_DTTM" type="java.sql.Timestamp"></field>
+        <field id="FA_RESCHED_RSN_CD" type="java.lang.String"></field>
+        <field id="FA_CAN_RSN_CD" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
     <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="D1_ACTIVITY" schemaAlias="CISADM">
       <fieldList>
         <field id="CI_LOOKUP_VAL_L_2.FIELD_NAME" type="java.lang.String"></field>
@@ -814,6 +925,52 @@ GROUP BY
         <field id="DAYS_COMPLETED" dataSetExpression="ElapsedDays(D1_ACTIVITY.END_DTTM, D1_ACTIVITY.CRE_DTTM)" type="java.math.BigDecimal"></field>
         <field id="DAYS_STARTED_SINCE_CREATE" dataSetExpression="ElapsedDays(D1_ACTIVITY.START_DTTM, D1_ACTIVITY.CRE_DTTM)" type="java.math.BigDecimal"></field>
         <field id="DISTINCT_COMPLETED_ACTIVITY_ID" dataSetExpression="CountDistinct(IF(&quot;D1_ACTIVITY.BO_STATUS_CD&quot; in ('COMPLETED', 'DISCARDED'), D1_ACTIVITY.D1_ACTIVITY_ID, NULL), 'Current')" type="java.lang.Long"></field>
+        <field id="CIS_FA_IDENTIFIER.D1_ACTIVITY_ID" type="java.lang.String"></field>
+        <field id="CIS_FA_IDENTIFIER.ACTIVITY_ID_TYPE_FLG" type="java.lang.String"></field>
+        <field id="CIS_FA_IDENTIFIER.ID_VALUE" type="java.lang.String"></field>
+        <field id="CIS_FA.FA_ID" type="java.lang.String"></field>
+        <field id="CIS_FA.FA_TYPE_CD" type="java.lang.String"></field>
+        <field id="CIS_FA.FA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CIS_FA.FA_PRIORITY_FLG" type="java.lang.String"></field>
+        <field id="CIS_FA.SCHED_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CIS_FA.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CIS_FA.DISP_GRP_CD" type="java.lang.String"></field>
+        <field id="CIS_FA.FO_ID" type="java.lang.String"></field>
+        <field id="CIS_FA.FA_CAN_RSN_CD" type="java.lang.String"></field>
+        <field id="CIS_FA.FA_RESCHED_RSN_CD" type="java.lang.String"></field>
+        <field id="CIS_FA.FA_CREATED_BY_FLG" type="java.lang.String"></field>
+        <field id="CIS_FA.ELIG_DISPATCH_SW" type="java.lang.String"></field>
+        <field id="CIS_FA.USER_ID" type="java.lang.String"></field>
+        <field id="CIS_FA.FA_INT_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CIS_FA.SP_ID" type="java.lang.String"></field>
+        <field id="CIS_FA.INSTRUCTIONS" type="java.lang.String"></field>
+        <field id="CIS_FA.DESCRLONG" type="java.lang.String"></field>
+        <field id="CIS_FA_TYPE_L.FA_TYPE_CD" type="java.lang.String"></field>
+        <field id="CIS_FA_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CIS_FA_TYPE_L.DESCR" type="java.lang.String"></field>
+        <field id="CIS_FA_STAT_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="CIS_FA_STAT_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="CIS_FA_STAT_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CIS_FA_STAT_L.DESCR" type="java.lang.String"></field>
+        <field id="CIS_DISP_GRP_L.DISP_GRP_CD" type="java.lang.String"></field>
+        <field id="CIS_DISP_GRP_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CIS_DISP_GRP_L.DESCR" type="java.lang.String"></field>
+        <field id="CIS_FA_CAN_RSN_L.FA_CAN_RSN_CD" type="java.lang.String"></field>
+        <field id="CIS_FA_CAN_RSN_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CIS_FA_CAN_RSN_L.DESCR" type="java.lang.String"></field>
+        <field id="CIS_FO.FO_ID" type="java.lang.String"></field>
+        <field id="CIS_FO.PREM_ID" type="java.lang.String"></field>
+        <field id="CIS_FO.WORKED_BY" type="java.lang.String"></field>
+        <field id="CIS_FO.REP_CD" type="java.lang.String"></field>
+        <field id="CIS_FO.DISP_GRP_CD" type="java.lang.String"></field>
+        <field id="CIS_FO.SCHED_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CIS_FO.SCHED_END_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CIS_FO.FO_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CIS_FO.WORK_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CIS_FO.FA_RESCHED_RSN_CD" type="java.lang.String"></field>
+        <field id="CIS_FO.FA_CAN_RSN_CD" type="java.lang.String"></field>
+        <field id="CIS_FA_LINKED" dataSetExpression="CaseWhen(IsNull(CIS_FA.FA_ID), 'N', 'Y')" type="java.lang.String"></field>
+        <field id="CIS_FA_DAYS_ACTIVITY_TO_SCHEDULE" dataSetExpression="ElapsedDays(CIS_FA.SCHED_DTTM, D1_ACTIVITY.CRE_DTTM)" type="java.math.BigDecimal"></field>
       </fieldList>
       <filterString>D1_ACTIVITY_TYPE.ACTIVITY_TYPE_CAT_FLG == 'D1FA' and F1_BUS_OBJ_L.LANGUAGE_CD == 'ENG' and D1_ACTIVITY_TYPE_L.LANGUAGE_CD == 'ENG' and F1_BUS_OBJ_STATUS_L.LANGUAGE_CD == 'ENG'</filterString>
       <joinInfo alias="D1_ACTIVITY" referenceId="D1_ACTIVITY"></joinInfo>
@@ -846,6 +1003,13 @@ GROUP BY
         <join expr="CMS_ACTIVITY_ML.FA_INT_STATUS_FLG == CI_LOOKUP_VAL_L_3.FIELD_VALUE and CI_LOOKUP_VAL_L_3.FIELD_NAME == 'FA_INT_STATUS_FLG' and CI_LOOKUP_VAL_L_3.LANGUAGE_CD == 'ENG'" left="CMS_ACTIVITY_ML" right="CI_LOOKUP_VAL_L_3" type="leftOuter" weight="1"></join>
         <join expr="CMS_ACTIVITY_ML.THRD_PTY_REP_CD == C1_REPRESENTATIVE_L.C1_REPRESENTATIVE_CD and C1_REPRESENTATIVE_L.LANGUAGE_CD == 'ENG'" left="CMS_ACTIVITY_ML" right="C1_REPRESENTATIVE_L" type="leftOuter" weight="1"></join>
         <join expr="CMS_D1_ACTIVITY_D1FA_BODA_VW.CR_REQUESTER_USER == SC_USER.USER_ID" left="CMS_D1_ACTIVITY_D1FA_BODA_VW" right="SC_USER" type="leftOuter" weight="1"></join>
+        <join expr="D1_ACTIVITY.D1_ACTIVITY_ID == CIS_FA_IDENTIFIER.D1_ACTIVITY_ID and CIS_FA_IDENTIFIER.ACTIVITY_ID_TYPE_FLG == 'D1RI'" left="D1_ACTIVITY" right="CIS_FA_IDENTIFIER" type="leftOuter" weight="1"></join>
+        <join expr="CIS_FA_IDENTIFIER.ID_VALUE == CIS_FA.FA_ID" left="CIS_FA_IDENTIFIER" right="CIS_FA" type="leftOuter" weight="1"></join>
+        <join expr="CIS_FA.FA_TYPE_CD == CIS_FA_TYPE_L.FA_TYPE_CD and CIS_FA_TYPE_L.LANGUAGE_CD == 'ENG'" left="CIS_FA" right="CIS_FA_TYPE_L" type="leftOuter" weight="1"></join>
+        <join expr="CIS_FA.FA_STATUS_FLG == CIS_FA_STAT_L.FIELD_VALUE and CIS_FA_STAT_L.FIELD_NAME == 'FA_STATUS_FLG' and CIS_FA_STAT_L.LANGUAGE_CD == 'ENG'" left="CIS_FA" right="CIS_FA_STAT_L" type="leftOuter" weight="1"></join>
+        <join expr="CIS_FA.DISP_GRP_CD == CIS_DISP_GRP_L.DISP_GRP_CD and CIS_DISP_GRP_L.LANGUAGE_CD == 'ENG'" left="CIS_FA" right="CIS_DISP_GRP_L" type="leftOuter" weight="1"></join>
+        <join expr="CIS_FA.FA_CAN_RSN_CD == CIS_FA_CAN_RSN_L.FA_CAN_RSN_CD and CIS_FA_CAN_RSN_L.LANGUAGE_CD == 'ENG'" left="CIS_FA" right="CIS_FA_CAN_RSN_L" type="leftOuter" weight="1"></join>
+        <join expr="CIS_FA.FO_ID == CIS_FO.FO_ID" left="CIS_FA" right="CIS_FO" type="leftOuter" weight="1"></join>
       </joinList>
       <joinOptions></joinOptions>
       <tableRefList>
@@ -878,6 +1042,13 @@ GROUP BY
         <tableRef alwaysIncludeTable="false" tableAlias="D1_ACTIVITY_REL" tableId="D1_ACTIVITY_REL"></tableRef>
         <tableRef alwaysIncludeTable="false" tableAlias="F1_EXT_LOOKUP_VAL_L" tableId="F1_EXT_LOOKUP_VAL_L"></tableRef>
         <tableRef alwaysIncludeTable="false" tableAlias="D1_SP" tableId="D1_SP"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CIS_FA_IDENTIFIER" tableId="CIS_FA_IDENTIFIER"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CIS_FA" tableId="CIS_FA"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CIS_FA_TYPE_L" tableId="CIS_FA_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CIS_FA_STAT_L" tableId="CIS_FA_STAT_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CIS_DISP_GRP_L" tableId="CIS_DISP_GRP_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CIS_FA_CAN_RSN_L" tableId="CIS_FA_CAN_RSN_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CIS_FO" tableId="CIS_FO"></tableRef>
       </tableRefList>
     </jdbcTable>
   </resources>

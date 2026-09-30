@@ -7,6 +7,7 @@ no empty <filterString>; the join tree's joinInfo alias is the ROOT TABLE id; a 
 """
 from __future__ import annotations
 
+import re
 from xml.sax.saxutils import escape
 
 Fields = list[tuple[str, str]]                 # (column, java type)
@@ -125,4 +126,62 @@ def add_to_schema(schema: str, tables: Tables, joins: list[tuple[str, str, str]]
     groups = "".join(f'    <itemGroup id="{sid}" label="{_esc(label)}" resourceId="JoinTree_1">\n      <items>\n'
                      + "".join(f'        <item id="{i}" label="{_esc(l)}" resourceId="JoinTree_1.{r}"></item>\n' for i, l, r in items) + "      </items>\n    </itemGroup>\n"
                      for sid, label, items in sets)
+    return schema.replace("  </itemGroups>", groups + "  </itemGroups>", 1)
+
+
+def add_columns(schema: str, table_id: str, fields: Fields, tree: str = "JoinTree_1") -> str:
+    """Expose more columns of a table already in the domain: the table's own fieldList and the
+    join tree's "<table>.<column>" fields grow; nothing existing moves (additions_only holds)."""
+    t0 = schema.index(f'<jdbcTable id="{table_id}"'); t1 = schema.index("</fieldList>", t0)
+    have = set(re.findall(r'<field id="([^"]+)"', schema[t0:t1]))
+    new = [(f, t) for f, t in fields if f not in have]
+    schema = schema[:t1] + "".join(f'  <field id="{f}" type="{t}"></field>\n      ' for f, t in new) + schema[t1:]
+    j0 = schema.index(f'<jdbcTable id="{tree}"'); j1 = schema.index("      </fieldList>", j0)
+    return schema[:j1] + "".join(f'        <field id="{table_id}.{f}" type="{t}"></field>\n' for f, t in new) + schema[j1:]
+
+
+def add_join_tree(schema: str, tree: str, label: str, root: str, tables: Tables, derived: Derived,
+                  joins: list[tuple[str, str, str, str]], calculated: Calculated, sets: Sets,
+                  measures: dict[str, str] | None = None, always_include: tuple[str, ...] = ()) -> str:
+    """Add a whole new join tree (a data island): its own table copies and derived tables, the tree
+    table rooted at `root`, and its item groups. A table can belong to ONE tree, so a second tree
+    over the same CISADM table takes a copy under a new id. joins: (DomEL, left, right, type).
+    measures: item id -> default aggregation, for the items Ad Hoc should total.
+    always_include: tables joined into every query whatever fields are picked -- the derived table
+    that DEFINES the tree's population (Ad Hoc otherwise drops an unselected inner join, and the
+    filter it carries with it). The root is a CISADM table: no exported domain roots a tree on a
+    derived query, so none is invented here."""
+    measures = measures or {}
+    if f'<jdbcTable id="{tree}"' in schema:
+        raise ValueError(f"the schema already carries {tree}: not patching twice")
+    ds = re.search(r'<jdbcDataSource id="([^"]+)"', schema).group(1)
+    root_table = tables[root][0]
+    res = "".join(f'    <jdbcTable id="{tid}" datasourceId="{ds}" datasourceTableName="{tb}" schemaAlias="CISADM">\n      <fieldList>\n'
+                  + "".join(f'        <field id="{f}" type="{t}"></field>\n' for f, t in fs) + "      </fieldList>\n    </jdbcTable>\n"
+                  for tid, (tb, fs) in tables.items())
+    res += "".join(f'    <jdbcQuery id="{qid}" datasourceId="{ds}">\n      <fieldList>\n'
+                   + "".join(f'        <field id="{f}" type="{t}"></field>\n' for f, t in fs)
+                   + f"      </fieldList>\n      <query>{escape(sql.strip())}</query>\n    </jdbcQuery>\n"
+                   for qid, (sql, fs) in derived.items())
+    everything = list(tables.items()) + [(q, (None, f)) for q, (_, f) in derived.items()]
+    res += (f'    <jdbcTable id="{tree}" datasourceId="{ds}" datasourceTableName="{root_table}" schemaAlias="CISADM">\n      <fieldList>\n'
+            + "".join(f'        <field id="{tid}.{f}" type="{t}"></field>\n' for tid, (_, fs) in everything for f, t in fs)
+            + "".join(f'        <field id="{fid}" dataSetExpression="{escape(expr)}" type="{t}"></field>\n' for fid, expr, t in calculated)
+            + f'      </fieldList>\n      <joinInfo alias="{root}" referenceId="{root}"></joinInfo>\n      <joinList>\n'
+            + "".join(f'        <join expr="{escape(e)}" left="{l}" right="{r}" type="{ty}" weight="1"></join>\n' for e, l, r, ty in joins)
+            + "      </joinList>\n      <joinOptions></joinOptions>\n      <tableRefList>\n"
+            + "".join(f'        <tableRef alwaysIncludeTable="{str(tid in always_include).lower()}" tableAlias="{tid}" tableId="{tid}"></tableRef>\n'
+                      for tid, _ in everything)
+            + "      </tableRefList>\n    </jdbcTable>\n")
+    end = schema.rindex("  </resources>")
+    schema = schema[:end] + res + schema[end:]
+    island = f'    <itemGroup id="{tree}" label="{escape(label)}" resourceId="{tree}"></itemGroup>\n'
+    schema = schema.replace("  </dataIslands>", island + "  </dataIslands>", 1)
+
+    def item(i, l, r):
+        agg = f' defaultAgg="{measures[i]}" dimensionOrMeasure="Measure"' if i in measures else ""
+        return f'        <item{agg} id="{i}" label="{escape(l)}" resourceId="{tree}.{r}"></item>\n'
+    groups = "".join(f'    <itemGroup id="{sid}" label="{escape(sl)}" resourceId="{tree}">\n      <items>\n'
+                     + "".join(item(i, l, r) for i, l, r in items) + "      </items>\n    </itemGroup>\n"
+                     for sid, sl, items in sets)
     return schema.replace("  </itemGroups>", groups + "  </itemGroups>", 1)

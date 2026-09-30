@@ -56,6 +56,10 @@
         <item id="RECOVERY_AMT_EST_ROW" label="Recovery Amount Est (Row)" resourceId="JoinTree_1.RECOVERY_AMT_EST_ROW"></item>
         <item id="PAY_SEG_AMT_IN_WINDOW_ROW" label="Payment Amount In Process Window (Row)" resourceId="JoinTree_1.PAY_SEG_AMT_IN_WINDOW_ROW"></item>
         <item id="RECOVERY_RATE_EST_ROW" label="Estimated Recovery Rate (Row)" resourceId="JoinTree_1.RECOVERY_RATE_EST_ROW"></item>
+        <item id="WO_ARS_AMT_ROW" label="Write Off Arrears Amount (Row)" resourceId="JoinTree_1.WO_PROC_ARS.ARS_AMT"></item>
+        <item id="RUNNING_ARS_ROW" label="Running Arrears Net Of Payments (Row)" resourceId="JoinTree_1.RUNNING_ARS_ROW"></item>
+        <item id="ACCT_CUR_BAL_ROW" label="Account Current Balance (Row)" resourceId="JoinTree_1.WO_ACCT_BAL.CUR_BAL"></item>
+        <item id="ACCT_PAYOFF_BAL_ROW" label="Account Payoff Balance (Row)" resourceId="JoinTree_1.WO_ACCT_BAL.PAYOFF_BAL"></item>
       </items>
     </itemGroup>
     <itemGroup id="SET_PROCESS_COUNTS" label="Process Counters" resourceId="JoinTree_1">
@@ -98,6 +102,8 @@
         <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="TOTAL_SA_COUNT_TOTAL" label="Total SA Count Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_TOT_SA_CNT"></item>
         <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="ACTIVE_SA_COUNT_TOTAL" label="Active SA Count Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_ACT_SA_CNT"></item>
         <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="INACTIVE_SA_COUNT_TOTAL" label="Inactive SA Count Total" resourceId="JoinTree_1.C1_BI_WOPROC_VW.WO_PROC_INACT_SA_CNT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="WO_ARS_AMT_TOTAL" label="Write Off Arrears Amount Total" resourceId="JoinTree_1.WO_PROC_ARS.ARS_AMT"></item>
+        <item defaultAgg="Sum" dimensionOrMeasure="Measure" id="RUNNING_ARS_TOTAL" label="Running Arrears Net Of Payments Total" resourceId="JoinTree_1.RUNNING_ARS_ROW"></item>
       </items>
     </itemGroup>
   </itemGroups>
@@ -204,7 +210,47 @@
         <field id="FIRST_PAY_DT" type="java.sql.Timestamp"></field>
         <field id="LAST_PAY_DT" type="java.sql.Timestamp"></field>
       </fieldList>
-      <query>select w.uncoll_proc_id, count(distinct ps.pay_seg_id) as pay_segment_count, count(distinct pe.pay_event_id) as payment_event_count, nvl(sum(case when pe.pay_event_id is not null then nvl(ps.pay_seg_amt, 0) else 0 end), 0) as pay_seg_amt_total, nvl(sum(case when pe.pay_dt &gt;= w.cre_dttm and (w.wo_proc_compl_dt is null or pe.pay_dt &lt;= w.wo_proc_compl_dt) then nvl(ps.pay_seg_amt, 0) else 0 end), 0) as pay_seg_amt_in_window, min(pe.pay_dt) as first_pay_dt, max(pe.pay_dt) as last_pay_dt from cisadm.c1_bi_woproc_vw w left join cisadm.ci_wo_proc_sa s on s.wo_proc_id = w.uncoll_proc_id left join cisadm.ci_pay_seg ps on ps.sa_id = s.sa_id left join cisadm.ci_pay_tndr pt on pt.pay_tender_id = ps.pay_id left join cisadm.ci_pay_event pe on pe.pay_event_id = pt.pay_event_id and pe.pay_dt &gt;= date '2025-09-01' where w.cre_dttm &gt;= date '2025-09-01' group by w.uncoll_proc_id</query>
+      <query>select w.uncoll_proc_id,
+       count(distinct case when pe.pay_event_id is not null then ps.pay_seg_id end) as pay_segment_count,
+       count(distinct pe.pay_event_id) as payment_event_count,
+       nvl(sum(case when pe.pay_event_id is not null then nvl(ps.pay_seg_amt, 0) else 0 end), 0) as pay_seg_amt_total,
+       nvl(sum(case when pe.pay_event_id is not null and (w.wo_proc_compl_dt is null or pe.pay_dt &lt;= w.wo_proc_compl_dt) then nvl(ps.pay_seg_amt, 0) else 0 end), 0) as pay_seg_amt_in_window,
+       min(pe.pay_dt) as first_pay_dt,
+       max(pe.pay_dt) as last_pay_dt
+from cisadm.c1_bi_woproc_vw w
+left join cisadm.ci_wo_proc_sa s on s.wo_proc_id = w.uncoll_proc_id
+left join cisadm.ci_pay_seg ps on ps.sa_id = s.sa_id
+left join cisadm.ci_pay p on p.pay_id = ps.pay_id and p.pay_status_flg = '50'
+left join cisadm.ci_pay_event pe on pe.pay_event_id = p.pay_event_id and pe.pay_dt &gt;= trunc(w.cre_dttm)
+group by w.uncoll_proc_id</query>
+    </jdbcQuery>
+    <jdbcQuery id="WO_ACCT_BAL" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="ACCT_ID" type="java.lang.String"></field>
+        <field id="CUR_BAL" type="java.math.BigDecimal"></field>
+        <field id="PAYOFF_BAL" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select sa.acct_id,
+       sum(ft.cur_amt) as cur_bal,
+       sum(ft.tot_amt) as payoff_bal
+from cisadm.ci_ft ft
+join cisadm.ci_sa sa on sa.sa_id = ft.sa_id
+where ft.freeze_sw = 'Y'
+  and ft.not_in_ars_sw = 'N'
+  and ft.ars_dt is not null
+  and ft.ars_dt &lt;= trunc(sysdate)
+  and sa.acct_id in (select wp.acct_id from cisadm.ci_wo_proc wp)
+group by sa.acct_id</query>
+    </jdbcQuery>
+    <jdbcQuery id="WO_PROC_ARS" datasourceId="Origin_DEV_DS">
+      <fieldList>
+        <field id="WO_PROC_ID" type="java.lang.String"></field>
+        <field id="ARS_AMT" type="java.math.BigDecimal"></field>
+      </fieldList>
+      <query>select wps.wo_proc_id,
+       nvl(sum(wps.ars_amt), 0) as ars_amt
+from cisadm.ci_wo_proc_sa wps
+group by wps.wo_proc_id</query>
     </jdbcQuery>
     <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="C1_BI_WOPROC_VW" schemaAlias="CISADM">
       <fieldList>
@@ -215,6 +261,11 @@
         <field id="WO_PAY_AGG.PAY_SEG_AMT_IN_WINDOW" type="java.math.BigDecimal"></field>
         <field id="WO_PAY_AGG.FIRST_PAY_DT" type="java.sql.Timestamp"></field>
         <field id="WO_PAY_AGG.LAST_PAY_DT" type="java.sql.Timestamp"></field>
+        <field id="WO_ACCT_BAL.ACCT_ID" type="java.lang.String"></field>
+        <field id="WO_ACCT_BAL.CUR_BAL" type="java.math.BigDecimal"></field>
+        <field id="WO_ACCT_BAL.PAYOFF_BAL" type="java.math.BigDecimal"></field>
+        <field id="WO_PROC_ARS.WO_PROC_ID" type="java.lang.String"></field>
+        <field id="WO_PROC_ARS.ARS_AMT" type="java.math.BigDecimal"></field>
         <field id="CI_WO_EVT_TYP_L.WO_EVT_TYP_CD" type="java.lang.String"></field>
         <field id="CI_WO_EVT_TYP_L.LANGUAGE_CD" type="java.lang.String"></field>
         <field id="CI_WO_EVT_TYP_L.DESCR" type="java.lang.String"></field>
@@ -273,6 +324,7 @@
         <field id="CI_WO_PROC_TMPL_L.DESCR" type="java.lang.String"></field>
         <field id="RECOVERY_AMT_EST_ROW" dataSetExpression="CaseWhen(C1_BI_WOPROC_VW.ARS_AT_START - C1_BI_WOPROC_VW.ARS_AT_END &gt;= 0, C1_BI_WOPROC_VW.ARS_AT_START - C1_BI_WOPROC_VW.ARS_AT_END, 0)" type="java.math.BigDecimal"></field>
         <field id="PAY_SEG_AMT_IN_WINDOW_ROW" dataSetExpression="WO_PAY_AGG.PAY_SEG_AMT_IN_WINDOW" type="java.math.BigDecimal"></field>
+        <field id="RUNNING_ARS_ROW" dataSetExpression="WO_PROC_ARS.ARS_AMT - IF(IsNull(WO_PAY_AGG.PAY_SEG_AMT_TOTAL), 0, WO_PAY_AGG.PAY_SEG_AMT_TOTAL)" type="java.math.BigDecimal"></field>
         <field id="RECOVERY_RATE_EST_ROW" dataSetExpression="CaseWhen(C1_BI_WOPROC_VW.ARS_AT_START &gt; 0, CaseWhen(C1_BI_WOPROC_VW.ARS_AT_START - C1_BI_WOPROC_VW.ARS_AT_END &gt;= 0, C1_BI_WOPROC_VW.ARS_AT_START - C1_BI_WOPROC_VW.ARS_AT_END, 0) / C1_BI_WOPROC_VW.ARS_AT_START, 0)" type="java.math.BigDecimal"></field>
       </fieldList>
       <filterString>C1_BI_WOPROC_VW.CRE_DTTM &gt;= ts'2025-09-01'</filterString>
@@ -287,10 +339,14 @@
         <join expr="C1_BI_WOPROC_VW.EFF_WO_EVT_TYP_CD == CI_WO_EVT_TYP_L.WO_EVT_TYP_CD and CI_WO_EVT_TYP_L.LANGUAGE_CD == 'ENG'" left="C1_BI_WOPROC_VW" right="CI_WO_EVT_TYP_L" type="leftOuter" weight="1"></join>
         <join expr="C1_BI_WOPROC_VW.NEXT_WO_EVT_TYP_CD == CI_WO_EVT_TYP_L_1.WO_EVT_TYP_CD and CI_WO_EVT_TYP_L_1.LANGUAGE_CD == 'ENG'" left="C1_BI_WOPROC_VW" right="CI_WO_EVT_TYP_L_1" type="leftOuter" weight="1"></join>
         <join expr="C1_BI_WOPROC_VW.UNCOLL_PROC_ID == WO_PAY_AGG.UNCOLL_PROC_ID" left="C1_BI_WOPROC_VW" right="WO_PAY_AGG" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_WOPROC_VW.ACCT_ID == WO_ACCT_BAL.ACCT_ID" left="C1_BI_WOPROC_VW" right="WO_ACCT_BAL" type="leftOuter" weight="1"></join>
+        <join expr="C1_BI_WOPROC_VW.UNCOLL_PROC_ID == WO_PROC_ARS.WO_PROC_ID" left="C1_BI_WOPROC_VW" right="WO_PROC_ARS" type="leftOuter" weight="1"></join>
       </joinList>
       <joinOptions></joinOptions>
       <tableRefList>
         <tableRef alwaysIncludeTable="false" tableAlias="WO_PAY_AGG" tableId="WO_PAY_AGG"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="WO_ACCT_BAL" tableId="WO_ACCT_BAL"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="WO_PROC_ARS" tableId="WO_PROC_ARS"></tableRef>
         <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_1" tableId="CI_LOOKUP_VAL_L_1"></tableRef>
         <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L_2" tableId="CI_LOOKUP_VAL_L_2"></tableRef>
         <tableRef alwaysIncludeTable="false" tableAlias="CI_WO_PROC_TMPL_L" tableId="CI_WO_PROC_TMPL_L"></tableRef>

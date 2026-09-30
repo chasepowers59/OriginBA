@@ -183,6 +183,37 @@
         <item id="ENTITY_NAME_UPR_1" label="Name" resourceId="JoinTree_1.CI_PER_NAME.ENTITY_NAME_UPR"></item>
       </items>
     </itemGroup>
+    <itemGroup id="SET_SEV_FA" label="1.) Severance Field Activity" resourceId="JoinTree_1">
+      <items>
+        <item id="SEV_FA_ID" label="Field Activity ID" resourceId="JoinTree_1.CI_SEV_EVT_FA.FA_ID"></item>
+        <item id="SEV_FA_TYPE_CD" label="Field Activity Type Code" resourceId="JoinTree_1.CI_FA.FA_TYPE_CD"></item>
+        <item id="SEV_FA_TYPE_DESCR" label="Field Activity Type" resourceId="JoinTree_1.CI_FA_TYPE_L.DESCR"></item>
+        <item id="SEV_FA_STATUS_FLG" label="Field Activity Status Code" resourceId="JoinTree_1.CI_FA.FA_STATUS_FLG"></item>
+        <item id="SEV_FA_STATUS_DESCR" label="Field Activity Status" resourceId="JoinTree_1.SEV_FA_STAT_L.DESCR"></item>
+        <item id="SEV_FA_PRIORITY_FLG" label="Field Activity Priority" resourceId="JoinTree_1.CI_FA.FA_PRIORITY_FLG"></item>
+        <item id="SEV_FA_SCHED_DTTM" label="Field Activity Scheduled Date/Time" resourceId="JoinTree_1.CI_FA.SCHED_DTTM"></item>
+        <item id="SEV_FA_CRE_DTTM" label="Field Activity Created Date/Time" resourceId="JoinTree_1.CI_FA.CRE_DTTM"></item>
+        <item id="SEV_FA_DISP_GRP_CD" label="Dispatch Group" resourceId="JoinTree_1.CI_FA.DISP_GRP_CD"></item>
+        <item id="SEV_FA_FO_ID" label="Field Order ID" resourceId="JoinTree_1.CI_FA.FO_ID"></item>
+        <item id="SEV_FA_CAN_RSN_CD" label="Field Activity Cancel Reason Code" resourceId="JoinTree_1.CI_FA.FA_CAN_RSN_CD"></item>
+        <item id="SEV_FA_CREATED_BY_FLG" label="Field Activity Created By" resourceId="JoinTree_1.CI_FA.FA_CREATED_BY_FLG"></item>
+        <item id="SEV_FA_ELIG_DISPATCH_SW" label="Eligible For Dispatch Switch" resourceId="JoinTree_1.CI_FA.ELIG_DISPATCH_SW"></item>
+        <item id="SEV_FA_USER_ID" label="Field Activity User" resourceId="JoinTree_1.CI_FA.USER_ID"></item>
+        <item id="SEV_FA_EXT_ID" label="Field Activity External ID" resourceId="JoinTree_1.CI_FA.FA_EXT_ID"></item>
+        <item id="SEV_FA_INT_STATUS_FLG" label="Field Activity Intermediate Status" resourceId="JoinTree_1.CI_FA.FA_INT_STATUS_FLG"></item>
+        <item id="SEV_FA_SP_ID" label="Field Activity Service Point ID" resourceId="JoinTree_1.CI_FA.SP_ID"></item>
+        <item id="SEV_FA_INSTRUCTIONS" label="Field Activity Instructions" resourceId="JoinTree_1.CI_FA.INSTRUCTIONS"></item>
+        <item id="SEV_EVT_HAS_FA" label="Event Created A Field Activity" resourceId="JoinTree_1.SEV_EVT_HAS_FA"></item>
+        <item id="SEV_FA_DAYS_TRIGGER_TO_SCHEDULE" label="Days From Event Trigger To FA Schedule" resourceId="JoinTree_1.SEV_FA_DAYS_TRIGGER_TO_SCHEDULE"></item>
+      </items>
+    </itemGroup>
+    <itemGroup id="SET_SEV_TEMPLATE" label="1.) Severance Template Rules" resourceId="JoinTree_1">
+      <items>
+        <item id="SEV_TMPL_AUTO_CANCEL_SW" label="Template Auto Cancel Switch" resourceId="JoinTree_1.CI_SEV_PROC_TMP.AUTO_CANCEL_SW"></item>
+        <item id="SEV_TMPL_CAN_CRIT_ALG_CD" label="Template Cancel Criteria Algorithm" resourceId="JoinTree_1.CI_SEV_PROC_TMP.CAN_CRIT_ALG_CD"></item>
+        <item id="SEV_TMPL_POST_CAN_ALG_CD" label="Template Post Cancel Algorithm" resourceId="JoinTree_1.CI_SEV_PROC_TMP.POST_CAN_ALG_CD"></item>
+      </items>
+    </itemGroup>
   </itemGroups>
   <resources>
     <jdbcTable id="CI_LOOKUP_VAL_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
@@ -570,6 +601,58 @@ where
 group by
   se.sev_proc_id</query>
     </jdbcQuery>
+    <jdbcTable id="CI_SEV_PROC_TMP" datasourceId="Origin_DEV_DS" datasourceTableName="CI_SEV_PROC_TMP" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SEV_PROC_TMPL_CD" type="java.lang.String"></field>
+        <field id="AUTO_CANCEL_SW" type="java.lang.String"></field>
+        <field id="CAN_CRIT_ALG_CD" type="java.lang.String"></field>
+        <field id="POST_CAN_ALG_CD" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_SEV_EVT_FA" datasourceId="Origin_DEV_DS" datasourceTableName="CI_SEV_EVT_FA" schemaAlias="CISADM">
+      <fieldList>
+        <field id="SEV_PROC_ID" type="java.lang.String"></field>
+        <field id="EVT_SEQ" type="java.math.BigDecimal"></field>
+        <field id="FA_ID" type="java.lang.String"></field>
+        <field id="VERSION" type="java.math.BigDecimal"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_FA" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FA" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FA_ID" type="java.lang.String"></field>
+        <field id="FA_TYPE_CD" type="java.lang.String"></field>
+        <field id="FA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="FA_PRIORITY_FLG" type="java.lang.String"></field>
+        <field id="SCHED_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="DISP_GRP_CD" type="java.lang.String"></field>
+        <field id="FO_ID" type="java.lang.String"></field>
+        <field id="FA_CAN_RSN_CD" type="java.lang.String"></field>
+        <field id="FA_CREATED_BY_FLG" type="java.lang.String"></field>
+        <field id="ELIG_DISPATCH_SW" type="java.lang.String"></field>
+        <field id="USER_ID" type="java.lang.String"></field>
+        <field id="FA_EXT_ID" type="java.lang.String"></field>
+        <field id="FA_INT_STATUS_FLG" type="java.lang.String"></field>
+        <field id="SP_ID" type="java.lang.String"></field>
+        <field id="INSTRUCTIONS" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="CI_FA_TYPE_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_FA_TYPE_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FA_TYPE_CD" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable id="SEV_FA_STAT_L" datasourceId="Origin_DEV_DS" datasourceTableName="CI_LOOKUP_VAL_L" schemaAlias="CISADM">
+      <fieldList>
+        <field id="FIELD_NAME" type="java.lang.String"></field>
+        <field id="FIELD_VALUE" type="java.lang.String"></field>
+        <field id="LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="DESCR" type="java.lang.String"></field>
+      </fieldList>
+    </jdbcTable>
     <jdbcTable id="JoinTree_1" datasourceId="Origin_DEV_DS" datasourceTableName="CI_SEV_PROC" schemaAlias="CISADM">
       <fieldList>
         <field id="CI_ACCT_MGMT_GR_L.ACCT_MGMT_GRP_CD" type="java.lang.String"></field>
@@ -827,6 +910,40 @@ group by
         <field id="ACCT_ID_DISTINCT" dataSetExpression="CountDistinct(CI_ACCT.ACCT_ID, 'Current')" type="java.lang.Long"></field>
         <field id="SEV_EVT_DISTINCT" dataSetExpression="CountDistinct(Concatenate(CI_SEV_EVT.SEV_PROC_ID, '_', CI_SEV_EVT.EVT_SEQ), 'Current')" type="java.lang.Long"></field>
         <field id="IS_NEXT_SEV_EVT" dataSetExpression="IF(IsNull(CMS_IS_NEXT_SEV_EVT.IS_NEXT), 'N', 'Y')" type="java.lang.String"></field>
+        <field id="CI_SEV_PROC_TMP.SEV_PROC_TMPL_CD" type="java.lang.String"></field>
+        <field id="CI_SEV_PROC_TMP.AUTO_CANCEL_SW" type="java.lang.String"></field>
+        <field id="CI_SEV_PROC_TMP.CAN_CRIT_ALG_CD" type="java.lang.String"></field>
+        <field id="CI_SEV_PROC_TMP.POST_CAN_ALG_CD" type="java.lang.String"></field>
+        <field id="CI_SEV_PROC_TMP.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_SEV_EVT_FA.SEV_PROC_ID" type="java.lang.String"></field>
+        <field id="CI_SEV_EVT_FA.EVT_SEQ" type="java.math.BigDecimal"></field>
+        <field id="CI_SEV_EVT_FA.FA_ID" type="java.lang.String"></field>
+        <field id="CI_SEV_EVT_FA.VERSION" type="java.math.BigDecimal"></field>
+        <field id="CI_FA.FA_ID" type="java.lang.String"></field>
+        <field id="CI_FA.FA_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_FA.FA_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CI_FA.FA_PRIORITY_FLG" type="java.lang.String"></field>
+        <field id="CI_FA.SCHED_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_FA.CRE_DTTM" type="java.sql.Timestamp"></field>
+        <field id="CI_FA.DISP_GRP_CD" type="java.lang.String"></field>
+        <field id="CI_FA.FO_ID" type="java.lang.String"></field>
+        <field id="CI_FA.FA_CAN_RSN_CD" type="java.lang.String"></field>
+        <field id="CI_FA.FA_CREATED_BY_FLG" type="java.lang.String"></field>
+        <field id="CI_FA.ELIG_DISPATCH_SW" type="java.lang.String"></field>
+        <field id="CI_FA.USER_ID" type="java.lang.String"></field>
+        <field id="CI_FA.FA_EXT_ID" type="java.lang.String"></field>
+        <field id="CI_FA.FA_INT_STATUS_FLG" type="java.lang.String"></field>
+        <field id="CI_FA.SP_ID" type="java.lang.String"></field>
+        <field id="CI_FA.INSTRUCTIONS" type="java.lang.String"></field>
+        <field id="CI_FA_TYPE_L.FA_TYPE_CD" type="java.lang.String"></field>
+        <field id="CI_FA_TYPE_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="CI_FA_TYPE_L.DESCR" type="java.lang.String"></field>
+        <field id="SEV_FA_STAT_L.FIELD_NAME" type="java.lang.String"></field>
+        <field id="SEV_FA_STAT_L.FIELD_VALUE" type="java.lang.String"></field>
+        <field id="SEV_FA_STAT_L.LANGUAGE_CD" type="java.lang.String"></field>
+        <field id="SEV_FA_STAT_L.DESCR" type="java.lang.String"></field>
+        <field id="SEV_EVT_HAS_FA" dataSetExpression="CaseWhen(IsNull(CI_SEV_EVT_FA.FA_ID), 'N', 'Y')" type="java.lang.String"></field>
+        <field id="SEV_FA_DAYS_TRIGGER_TO_SCHEDULE" dataSetExpression="ElapsedDays(CI_FA.SCHED_DTTM, CI_SEV_EVT.TRIGGER_DT)" type="java.math.BigDecimal"></field>
       </fieldList>
       <filterString>CI_LOOKUP_VAL_L.FIELD_NAME == 'SEV_STATUS_FLG                ' and CI_LOOKUP_VAL_L_1.FIELD_NAME == 'SEV_STAT_RSN_FLG              '</filterString>
       <joinInfo alias="CI_SEV_PROC" referenceId="CI_SEV_PROC"></joinInfo>
@@ -855,6 +972,11 @@ group by
         <join expr="CI_PREM.MR_WARN_CD == CI_MR_WARN_L.MR_WARN_CD and CI_MR_WARN_L.LANGUAGE_CD == 'ENG'" left="CI_PREM" right="CI_MR_WARN_L" type="leftOuter" weight="1"></join>
         <join expr="CI_PREM.MR_INSTR_CD == CI_MR_INSTR_L.MR_INSTR_CD and CI_MR_INSTR_L.LANGUAGE_CD == 'ENG'" left="CI_PREM" right="CI_MR_INSTR_L" type="leftOuter" weight="1"></join>
         <join expr="CI_PREM.TIME_ZONE_CD == CI_TIME_ZONE_L.TIME_ZONE_CD and CI_TIME_ZONE_L.LANGUAGE_CD == 'ENG'" left="CI_PREM" right="CI_TIME_ZONE_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_SEV_PROC.SEV_PROC_TMPL_CD == CI_SEV_PROC_TMP.SEV_PROC_TMPL_CD" left="CI_SEV_PROC" right="CI_SEV_PROC_TMP" type="leftOuter" weight="1"></join>
+        <join expr="CI_SEV_EVT.SEV_PROC_ID == CI_SEV_EVT_FA.SEV_PROC_ID and CI_SEV_EVT.EVT_SEQ == CI_SEV_EVT_FA.EVT_SEQ" left="CI_SEV_EVT" right="CI_SEV_EVT_FA" type="leftOuter" weight="1"></join>
+        <join expr="CI_SEV_EVT_FA.FA_ID == CI_FA.FA_ID" left="CI_SEV_EVT_FA" right="CI_FA" type="leftOuter" weight="1"></join>
+        <join expr="CI_FA.FA_TYPE_CD == CI_FA_TYPE_L.FA_TYPE_CD and CI_FA_TYPE_L.LANGUAGE_CD == 'ENG'" left="CI_FA" right="CI_FA_TYPE_L" type="leftOuter" weight="1"></join>
+        <join expr="CI_FA.FA_STATUS_FLG == SEV_FA_STAT_L.FIELD_VALUE and SEV_FA_STAT_L.FIELD_NAME == 'FA_STATUS_FLG' and SEV_FA_STAT_L.LANGUAGE_CD == 'ENG'" left="CI_FA" right="SEV_FA_STAT_L" type="leftOuter" weight="1"></join>
       </joinList>
       <joinOptions suppressCircularJoins="true"></joinOptions>
       <tableRefList>
@@ -883,6 +1005,11 @@ group by
         <tableRef alwaysIncludeTable="false" tableAlias="CI_BILL_CYC_L" tableId="CI_BILL_CYC_L"></tableRef>
         <tableRef alwaysIncludeTable="false" tableAlias="CI_SEV_EVT" tableId="CI_SEV_EVT"></tableRef>
         <tableRef alwaysIncludeTable="false" tableAlias="CI_LOOKUP_VAL_L" tableId="CI_LOOKUP_VAL_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_SEV_PROC_TMP" tableId="CI_SEV_PROC_TMP"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_SEV_EVT_FA" tableId="CI_SEV_EVT_FA"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_FA" tableId="CI_FA"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="CI_FA_TYPE_L" tableId="CI_FA_TYPE_L"></tableRef>
+        <tableRef alwaysIncludeTable="false" tableAlias="SEV_FA_STAT_L" tableId="SEV_FA_STAT_L"></tableRef>
       </tableRefList>
     </jdbcTable>
   </resources>
