@@ -129,7 +129,7 @@ export function AppShell({
           </div>
 
           <nav className="hidden flex-1 items-center justify-center gap-0.5 md:flex">
-            {visibleNav(NAV, user, can).map((item) => {
+            {visibleNav(NAV, user, can, portal?.modules).map((item) => {
               const active = activeNav === item.id || (!activeNav && item.id === "home");
               return (
                 <Link
@@ -158,7 +158,7 @@ export function AppShell({
                 ☰
               </summary>
               <div className="glass-panel absolute right-0 top-full z-50 mt-2 w-56 p-2 shadow-xl">
-                {visibleNav(NAV, user, can).map((item) => (
+                {visibleNav(NAV, user, can, portal?.modules).map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}

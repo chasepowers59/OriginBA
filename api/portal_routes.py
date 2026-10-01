@@ -130,7 +130,9 @@ def report_library(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, An
     org_id = ctx.effective_organization_id()
     # Packs and folders are scoped by the same two rules: the caller's workstreams, then
     # their row rules, which drop any canvas that does not carry a rule's column.
-    return scope_library(get_report_library(org_id), lambda cards: only_readable(
+    from api.client_capabilities import hide_unused_reports
+
+    return scope_library(hide_unused_reports(get_report_library(org_id), org_id), lambda cards: only_readable(
         [c for c in cards if ctx.can_access_workstream(c.get("workstream") or "")], ctx.row_rules, org_id))
 
 

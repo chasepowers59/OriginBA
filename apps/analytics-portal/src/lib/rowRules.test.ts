@@ -33,6 +33,15 @@ describe("row rules in the interface", () => {
     expect(visibleNav([{ id: "letters", permission: "letters:read" }], restricted, () => true)).toEqual([]);
   });
 
+  it("a module the client does not use is not offered (api/client_capabilities.py)", () => {
+    const withLetters = [{ id: "home" }, { id: "letters", permission: "letters:read" }];
+    const ids = (modules?: Record<string, boolean>) =>
+      visibleNav(withLetters, { row_rules: [] }, () => true, modules).map((n) => n.id);
+    expect(ids({ letters: false })).toEqual(["home"]);
+    expect(ids({ letters: true })).toEqual(["home", "letters"]);
+    expect(ids(undefined)).toEqual(["home", "letters"]);   // not measured: nothing hidden
+  });
+
   it("reads as a sentence", () => {
     expect(describeRules([{ field: "Service Type", values: ["Water", "Sewer"] }])).toBe("Service Type is Water or Sewer");
     expect(describeRules([])).toBe("All rows");
