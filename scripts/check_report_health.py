@@ -36,6 +36,11 @@ KNOWN = {
         "kpi_exception_rate": ("ALL-ZERO", "none of the 943,090 exceptions created in the year to "
                                            "2026-06-18 is still open; the 9,338 open ones are older or newer"),
     },
+    "citycorp": {   # measured 2026-10-01 on ORIGINBA_REPORTING at CityCorp TEST
+        "bills_by_status": ("ONE-GROUP", "the 2,579 pending bills carry no bill date, so a dated "
+                                         "window holds only the 937,882 complete ones"),
+        "life_support_premises": ("ONE-GROUP", "one person flagged life support in all of CityCorp"),
+    },
 }
 
 
@@ -68,11 +73,18 @@ def main() -> int:
 
     catalog = json.loads((ROOT / "output" / "catalog_dbt.json").read_text())
     known = KNOWN.get(args.org, {})
-    results, unexplained = [], []
+    # only what this organization's users are offered: a module it does not use is hidden
+    # (api/client_capabilities.py), and a hidden report opening empty is not a finding
+    library = _post(args.api, args.org, "/portal/report-library")
+    offered = {(c["snapshot_id"], c["report_id"]) for f in library["folders"] for c in f["reports"]}
+    results, unexplained, hidden = [], [], []
     meta_cache: dict[str, dict] = {}
     for folder in catalog["report_library"]:
         for entry in folder["reports"]:
             sid, rid = entry["snapshot_id"], entry["report_id"]
+            if (sid, rid) not in offered:
+                hidden.append(rid)
+                continue
             snap = catalog["snapshots"][sid]
             report = next(r for r in snap["premade_reports"] if r["id"] == rid)
             meta = meta_cache.setdefault(sid, _post(args.api, args.org, f"/snapshots/{sid}/metadata"))
@@ -98,13 +110,14 @@ def main() -> int:
             print(f"{'ok  ' if ok else 'FAIL'} {folder['id']:20} {rid:32} {got or 'answers':18} {note}", flush=True)
             results.append({"folder": folder["id"], "report": rid, "verdict": got, "expected": expected,
                             "groups": len(rows)})
-    stale = sorted(set(known) - {r["report"] for r in results})
+    stale = sorted(set(known) - {r["report"] for r in results} - set(hidden))
     for rid in stale:
         unexplained.append(rid)
         print(f"FAIL {rid}: recorded in KNOWN but no longer in the Library")
     if args.out:
         Path(args.out).write_text(json.dumps(results, indent=1))
-    print(f"\n{len(results)} reports, {len(unexplained)} unexplained")
+    print(f"\n{len(results)} reports, {len(unexplained)} unexplained"
+          + (f"; {len(hidden)} not offered to {args.org} (modules it does not use)" if hidden else ""))
     return 1 if unexplained else 0
 
 
