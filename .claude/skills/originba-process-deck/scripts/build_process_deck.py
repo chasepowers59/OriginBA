@@ -73,8 +73,15 @@ def _box(slide, x, y, w, h, fill, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.12
     return s
 
 
+# "app" (default): the app's dark page over the template art; "template": the original Origin blue
+# gradient shows through (Chase, 2026-10-01, for proposal decks)
+BACKGROUND = {"mode": "app"}
+
+
 def _ground(slide):
     """The app's dark page behind every slide: covers the template's gradient art, sits behind the placeholders."""
+    if BACKGROUND["mode"] == "template":
+        return
     r = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(22.0), Inches(12.375))
     r.fill.solid(); r.fill.fore_color.rgb = rgb(PAGE); r.line.fill.background(); r.shadow.inherit = False
     tree = slide.shapes._spTree; tree.remove(r._element); tree.insert(2, r._element)
@@ -626,6 +633,7 @@ BUILDERS = {"layers": slide_layers, "compare": slide_compare, "title": slide_tit
 def build(spec: dict, out: pathlib.Path) -> pathlib.Path:
     prs = Presentation(str(TEMPLATE)); _clear_slides(prs)
     footer = spec.get("footer", FOOTER)
+    BACKGROUND["mode"] = spec.get("background", "app")
     for s in spec["slides"]:
         BUILDERS[s["type"]](prs, s, footer)
     out.parent.mkdir(parents=True, exist_ok=True); prs.save(str(out))
