@@ -10,15 +10,18 @@ export function isRestricted(user: { row_rules?: RowRule[] | null } | null | und
 }
 
 /** The pages to offer: none a person's row rules cannot cover, none behind a permission they
- *  lack. A list of permissions means any one of them opens the page. */
+ *  lack, none the client does not use (portal config "modules"). A list of permissions means
+ *  any one of them opens the page. */
 export function visibleNav<T extends { id: string; permission?: string | readonly string[] }>(
   items: T[],
   user: { row_rules?: RowRule[] | null } | null,
   can: (permission: string) => boolean = () => true,
+  modules?: Record<string, boolean>,
 ): T[] {
   const restricted = isRestricted(user);
   const allowed = (p: T["permission"]) => !p || (typeof p === "string" ? can(p) : p.some(can));
-  return items.filter((i) => !(restricted && UNRESTRICTABLE.has(i.id)) && allowed(i.permission));
+  return items.filter((i) => !(restricted && UNRESTRICTABLE.has(i.id)) && allowed(i.permission)
+    && modules?.[i.id] !== false);
 }
 
 export function describeRules(rules: RowRule[] | null | undefined): string {

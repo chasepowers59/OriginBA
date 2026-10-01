@@ -8,6 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from api.client_capabilities import modules_for_organization
 from api.organizations import get_organization
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -72,6 +73,7 @@ def config_for_organization(organization_id: str | None) -> dict[str, Any]:
         return config
     config["organization_id"] = organization_id
     config["organization_name"] = org["display_name"]
+    config["modules"] = modules_for_organization(organization_id)
     branding = org.get("branding") or {}
     for key, value in (branding.get("brand") or {}).items():
         if key in config["brand"] and isinstance(value, str) and value.strip() \

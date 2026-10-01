@@ -18,6 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from api.summary_cache import cached
 from api.access_audit import record_access_event
+from api.client_capabilities import module_enabled
 from api.reporting_dates import data_as_of
 from api.auth.dependencies import AuthContext, require_permission
 from api.demo_db import demo_configured
@@ -67,6 +68,8 @@ RELEASE = Depends(require_permission("letters:release"))
 def _org(ctx: AuthContext) -> str:
     require_unrestricted(ctx)          # a letter cannot be cut down to a person's row rules
     org_id = require_org_for_data(ctx)
+    if not module_enabled(org_id, "letters"):     # measured: C2M prints no letters here
+        raise HTTPException(status_code=404, detail="This organization does not use letters.")
     engine, _ = org_backend(org_id)
     if engine == "postgres":
         configured = warehouse_configured(org_id)

@@ -429,6 +429,8 @@ export type PortalConfig = {
   client_id: string;
   organization_id?: string;
   organization_name: string;
+  /** false = measured: this client does not use the module (api/client_capabilities.py) */
+  modules?: Record<string, boolean>;
   brand: PortalBrandConfig;
   theme: PortalThemeConfig;
 };
