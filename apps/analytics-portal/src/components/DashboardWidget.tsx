@@ -8,6 +8,7 @@ import { workstreamDisplayName } from "@/lib/businessLabels";
 import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
 import type { ExecutiveKpi } from "@/lib/types";
 import { explainQuestion, requestAsk } from "@/lib/assistantContext";
+import { kpiExploreHref } from "@/lib/kpiLinks";
 
 type DashboardWidgetProps = {
   kpi: ExecutiveKpi;
@@ -31,9 +32,8 @@ export function DashboardWidget({
 }: DashboardWidgetProps) {
   const formatted = formatCompact(kpi.value, { currency: kpi.format === "currency" });
 
-  const exploreHref = kpi.explore_report_id
-    ? `/explore/${kpi.snapshot_id}?report=${kpi.explore_report_id}`
-    : `/explore/${kpi.snapshot_id}`;
+  // the card's number, seen again: its report, or the builder on the card's own question
+  const exploreHref = kpiExploreHref(kpi);
 
   const workstreamName = workstreamDisplayName(kpi.workstream);
   const lenses = kpi.lenses ?? [];
@@ -185,7 +185,7 @@ export function DashboardWidget({
         {inner}
         <div className="flex items-center justify-between gap-2 border-t border-edge-subtle px-4 py-2 text-xs">
           <Link href={exploreHref} className="text-primary">
-            Open full report →
+            {kpi.explore_report_id ? "Open full report →" : "See where this number comes from →"}
           </Link>
           {kpi.value != null && !kpi.error ? (
             <button

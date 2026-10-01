@@ -43,6 +43,7 @@ import { VisualPicker, type VisualChoice } from "./VisualPicker";
 import { dropShelf, parseSortableId, reorderShelf, shelfDimensions, sortableId, startingQuestions, valueKey } from "@/lib/builderShelves";
 import { SortableContext, rectSortingStrategy, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { SortableChip } from "./SortableChip";
+import { parseCardQuestion } from "@/lib/kpiLinks";
 import { BuilderChart, type ChartSeries } from "./BuilderChart";
 import { QuestionGallery } from "./QuestionGallery";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
@@ -60,10 +61,13 @@ const GRAINS = ["month", "quarter", "year"];
 
 export function VisualBuilder({
   initialCanvas,
+  initialQuestion,
   initialReport,
   initialView,
 }: {
   initialCanvas?: string;
+  /** a KPI card's own question (JSON, lib/kpiLinks): the builder opens on the card's number */
+  initialQuestion?: string;
   initialReport?: string;
   /** A saved custom view's id — reopens it with shelves and visual restored. */
   initialView?: string;
@@ -78,6 +82,7 @@ export function VisualBuilder({
   const [asking, setAsking] = useState(false);
   const [visual, setVisual] = useState<VisualChoice>("bar");
   const [limit] = useState(200);
+  const [allDates, setAllDates] = useState(false);
   const [result, setResult] = useState<QueryResponse | null>(null);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +104,7 @@ export function VisualBuilder({
 
   const loadCanvas = useCallback(async (id: string, reset = true) => {
     setSnapshotId(id);
-    if (reset) { setCols([]); setVals([]); setFils([]); setResult(null); }
+    if (reset) { setCols([]); setVals([]); setFils([]); setResult(null); setAllDates(false); }
     const m = await fetchSnapshotMetadata(id);
     setMeta(m);
     return m;
@@ -197,8 +202,10 @@ export function VisualBuilder({
       filters,
       time_dimensions: timeDims.length ? timeDims : undefined,
       limit,
+      // a card's stock figure (a balance, a population) opened here keeps no window
+      all_dates: allDates || undefined,
     };
-  }, [meta, cols, vals, fils, limit, asking]);
+  }, [meta, cols, vals, fils, limit, asking, allDates]);
 
   // debounced auto-run
   const runTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -276,7 +283,8 @@ export function VisualBuilder({
         });
       setCols(nextCols);
       setVals(nextVals);
-      setFils(questionFilters(question.filters, m.fields, m.suggested_default_filter));
+      setFils(questionFilters(question.filters, m.fields, question.all_dates ? null : m.suggested_default_filter));
+      setAllDates(Boolean(question.all_dates));
       const ct = question.chart_type;
       setVisual((ct === "line" ? "line" : ct === "pie" ? "pie" : ct === "horizontal" ? "horizontal" : "bar") as VisualChoice);
     },
@@ -338,6 +346,12 @@ export function VisualBuilder({
   // &report=<id> also prefills that governed report. Apply once, after the catalog loads.
   useEffect(() => {
     if (initialApplied.current || !index.length) return;
+    const asked = parseCardQuestion(initialQuestion);
+    if (asked) {
+      initialApplied.current = true;
+      void applyQuestion(asked);
+      return;
+    }
     if (initialReport && questions.length) {
       // The catalog id is composite (canvas:report); the Library's own report_id also resolves.
       const q = questions.find((x) => x.id === initialReport || x.report_id === initialReport);
@@ -352,7 +366,7 @@ export function VisualBuilder({
       initialApplied.current = true;
       void loadCanvas(initialCanvas);
     }
-  }, [index, questions, initialCanvas, initialReport, applyQuestion, loadCanvas]);
+  }, [index, questions, initialCanvas, initialReport, initialQuestion, applyQuestion, loadCanvas]);
 
   const [privateOnly, setPrivateOnly] = useState(false);
   const [folder, setFolder] = useState("");

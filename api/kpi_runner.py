@@ -400,6 +400,19 @@ def execute_kpi_definition(
             "empty_window": empty_window_note(
                 value=value, windowless=windowless, snapshot_id=snapshot_id,
                 date_field=date_field, organization_id=organization_id),
+            # the question that produced the number, so the card can open it (the builder
+            # shows the same figure): its filters, the lens, any cross-filter, the window
+            "explore_question": {
+                "snapshot_id": snapshot_id,
+                "dimensions": [],
+                "measures": kpi["value"].get("measures") or [{"field": "*", "agg": "count"}],
+                "filters": [*(kpi["value"].get("filters") or []), *extra_filters,
+                            *([{"field": date_field, "op": "between", "value": [cur_start, cur_end]}]
+                              if date_field else [])],
+                "chart_type": "bar",
+                # a stock figure (a balance, a population) has no window: none may be added
+                "all_dates": windowless,
+            },
             "error": None,
         }
     except (QueryValidationError, ValueError) as exc:

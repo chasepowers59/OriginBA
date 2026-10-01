@@ -207,6 +207,8 @@ export type BuilderQuestion = {
   measures: BuilderMeasure[];
   filters: FilterDef[];
   chart_type: string;
+  /** a stock figure (a KPI card's balance or population): no window may be added */
+  all_dates?: boolean;
 };
 
 export type BuilderQuestionsResponse = {
@@ -343,6 +345,8 @@ export type ExecutiveKpi = {
   format: "currency" | "number";
   workstream: string;
   explore_report_id?: string | null;
+  /** the question behind the number (api/kpi_runner.py), opened by the card's link */
+  explore_question?: import("./kpiLinks").CardQuestion | null;
   value: number | null;
   prior_value?: number | null;
   change_pct?: number | null;
