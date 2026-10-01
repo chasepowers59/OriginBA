@@ -13,13 +13,13 @@ describe("fallback pages", () => {
     expect(html).toContain('href="/reports"');
   });
 
-  it("a page error offers a retry and home, and the reference to quote", () => {
+  it("a page error offers a retry and home, and the error code to quote", () => {
     const err = Object.assign(new Error("boom: ORA-00942 internal detail"), { digest: "abc123" });
     const html = renderToStaticMarkup(<RouteError error={err} reset={() => {}} />);
     expect(html).toContain("Something went wrong");
     expect(html).toContain("Try again");
     expect(html).toContain('href="/"');
-    expect(html).toContain("abc123");
+    expect(html).toContain("Error code: abc123");
     expect(html).not.toContain("ORA-00942");
   });
 });
