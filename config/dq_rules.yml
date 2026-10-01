@@ -12,9 +12,9 @@
   severity: action
   title: AMI device never registered at head-end
   action: >
-    The head-end has never seen this installed meter — it measures nothing over the
-    network. In CIS: Main Menu > Device > search the Device ID; verify commissioning
-    and the head-end registration; re-commission or replace.
+    This installed meter has never registered at the head-end and no actual reading
+    has arrived since it was installed. In CIS: Main Menu > Device > search the Device
+    ID; verify commissioning and the head-end registration; re-commission or replace.
   # measured: 1,646 at college_station (real AMI); honestly empty at manual clients.
   # GUARDED (measured 2026-08-26): a per-device worklist only means something when the
   # client demonstrably HAS a head-end feed. On full INT_DEV, 794 of 797 attached
@@ -22,11 +22,19 @@
   # device defects, and it drowned every other finding. The guard: at least 1% of
   # attached devices must be registered for the per-device list to fire; below that,
   # head_end_integration_absent (next rule) reports the systemic fact as ONE row.
+  # SILENT TOO (measured 2026-10-01): D1NR alone is not a fault where the head-end
+  # registers a paired module (CityCorp's ERTs) instead of the meter. 13,021 CityCorp
+  # meters were D1NR and every one had actual measurements; requiring no actual reading
+  # since THIS device's install (not ever: the point's reading may be its predecessor's)
+  # left 2. scripts/test_dq_head_end_rule.py.
   sql: >
     select "Device ID", "Meter Badge Number", "Device Type", "Premise Address",
            "Install Date/Time"
-    from reporting.rpt_device_asset
+    from reporting.rpt_device_asset d
     where "Never Registered At Head-End" and "Is Attached To Service Point"
+      and not exists (select 1 from reporting.rpt_premise_sp p
+                      where p."MDM Service Point ID" = d."MDM Service Point ID"
+                        and p."Last Actual Measurement Date/Time" >= d."Install Date/Time")
       and (select count(*) filter (where not "Never Registered At Head-End")
            from reporting.rpt_device_asset where "Is Attached To Service Point")
           >= 0.01 * (select count(*) from reporting.rpt_device_asset

@@ -8,9 +8,9 @@
   severity: action
   title: AMI device never registered at head-end
   action: >
-    The head-end has never seen this installed meter — it measures nothing over the network.
-    In CIS: Main Menu > Device > search the Device ID; verify commissioning and the head-end
-    registration; re-commission or replace.
+    This installed meter has never registered at the head-end and no actual reading has arrived
+    since it was installed. In CIS: Main Menu > Device > search the Device ID; verify commissioning
+    and the head-end registration; re-commission or replace.
   sql: |
     SELECT
       "Device ID",
@@ -18,10 +18,18 @@
       "Device Type",
       "Premise Address",
       "Install Date/Time"
-    FROM ORIGINBA_REPORTING.RPT_DEVICE_ASSET
+    FROM ORIGINBA_REPORTING.RPT_DEVICE_ASSET d
     WHERE
       "Never Registered At Head-End" = 1
       AND "Is Attached To Service Point" = 1
+      AND NOT EXISTS(
+        SELECT
+          1
+        FROM ORIGINBA_REPORTING.RPT_PREMISE_SP p
+        WHERE
+          p."MDM Service Point ID" = d."MDM Service Point ID"
+          AND p."Last Actual Measurement Date/Time" >= d."Install Date/Time"
+      )
       AND (
         SELECT
           COUNT(CASE WHEN NOT "Never Registered At Head-End" = 1 THEN 1 END)
