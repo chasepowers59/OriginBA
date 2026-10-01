@@ -44,6 +44,8 @@ type ResultsPanelProps = {
   measureField?: string;
   measureAgg?: string;
   periodLabel?: string;
+  /** everything the result is filtered to, in plain words (lib/filterDisclosure.ts) */
+  disclosure?: string[];
   scopeLabel?: string;
   dateRange?: [string, string];
   drillFilter?: { field: string; value: string } | null;
@@ -76,6 +78,7 @@ export function ResultsPanel({
   measureField = "*",
   measureAgg = "count",
   periodLabel,
+  disclosure,
   scopeLabel,
   dateRange,
   drillFilter,
@@ -238,6 +241,7 @@ export function ResultsPanel({
           {dateRange ? ` · ${formatDate(dateRange[0])} to ${formatDate(dateRange[1])}` : ""}
           {scopeLabel ? ` · ${scopeLabel}` : ""}
         </p>
+        {disclosure?.length ? <p className="mt-1 text-xs text-fg-muted">This shows: {disclosure.join(" · ")}</p> : null}
         <p className="mt-1 text-xs text-fg-muted">
           Generated {formatDateTime(new Date())} · {brand.connection_label}
         </p>
@@ -254,6 +258,9 @@ export function ResultsPanel({
             {formatNumber(result.row_count)} {result.row_count === 1 ? "row" : "rows"}
             {loading ? " · updating…" : ""}
           </p>
+          {disclosure?.length ? (
+            <p className="mt-0.5 text-xs text-fg-muted">This shows: {disclosure.join(" · ")}</p>
+          ) : null}
           <AppliedWindowNote result={result} />
         </div>
         {/* relative: below sm a toolbar popup spans this row, not its button. */}
