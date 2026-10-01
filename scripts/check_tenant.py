@@ -215,7 +215,9 @@ def _check_oracle_dbt(org_id: str, ok: bool, snaps: dict) -> bool:
     try:
         eng = _engine(org_id)
         tables = _list_oracle_reporting_tables(org_id, "")
-        sql = _validate(eng, "select count(*) from rpt_financial_txn")
+        # unqualified names resolve to CISADM (database_routes._run): name the canvas as an
+        # analyst on the SQL page would
+        sql = _validate(eng, "select count(*) from ORIGINBA_REPORTING.rpt_financial_txn")
         _, rows = _run(eng, sql, org_id, 1)
         ok &= _p(PASS, "database workspace",
                  f"engine={eng}, {len(tables)} canvases listed, "
