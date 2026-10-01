@@ -36,7 +36,8 @@ export function WorkstreamHeroLinks({
                   href={`/explore/${item.snapshotId}${reportQs}`}
                   className="text-xs text-primary hover:text-primary"
                 >
-                  Run report →
+                  {/* without a report the data set page asks the reader to choose one */}
+                  {item.reportId ? "Run report →" : "Open reports →"}
                 </Link>
                 <Link
                   href={`/explore/${item.snapshotId}?tab=model`}

@@ -154,6 +154,14 @@ function WorkstreamDashboardInner({
         onCompareModeChange={setCompareMode}
       />
 
+      {summary?.period?.label ? (
+        // the cards' window, said once (Home says it under its title); balances ignore it
+        <p className="text-sm text-fg-muted">
+          Activity covers <span className="font-medium text-heading">{summary.period.label}</span>;
+          balances and totals of what exists now are as they stand.
+        </p>
+      ) : null}
+
       <WorkstreamHeroLinks workstreamId={workstreamId} workstreams={workstreams} />
 
       {filter ? (
