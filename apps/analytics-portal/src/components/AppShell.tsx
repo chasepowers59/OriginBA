@@ -10,8 +10,6 @@ import { useAuth } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { roleLabel } from "@/lib/auth";
 import OrgSwitcher from "@/components/OrgSwitcher";
-import { getActiveOrganization } from "@/lib/auth";
-import { viewingAnotherClient } from "@/lib/orgContext";
 import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 import { isRestricted, visibleNav } from "@/lib/rowRules";
@@ -54,11 +52,6 @@ export function AppShell({
   const portal = usePortalConfig();
   const { user, logout, can } = useAuth();
   // the active-organization cookie exists only in the browser: read after hydration
-  const [otherClient, setOtherClient] = useState(false);
-  useEffect(() => {
-    setOtherClient(user?.role === "admin" && viewingAnotherClient(getActiveOrganization(), user.organization_id));
-  }, [user]);
-
   // Every page says when the reporting data stopped refreshing (19 days unnoticed, 2026-09-29)
   const [freshness, setFreshness] = useState<Freshness | null>(null);
   useEffect(() => {
@@ -111,13 +104,8 @@ export function AppShell({
             {portal.organization_name ? (
               <span
                 data-testid="org-chip"
-                className={`inline-flex min-w-0 max-w-[42vw] items-center gap-1.5 truncate rounded-full border px-2.5 py-1 text-xs font-medium sm:hidden ${
- otherClient ? "border-warn bg-warn-bg text-warn" : "border-edge-subtle bg-chip text-fg"
- }`}
+                className="inline-flex min-w-0 max-w-[42vw] items-center truncate rounded-full border border-edge-subtle bg-chip px-2.5 py-1 text-xs font-medium text-fg sm:hidden"
               >
-                {otherClient ? (
-                  <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-warn" />
-                ) : null}
                 <span className="truncate">{portal.organization_name}</span>
               </span>
             ) : null}

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { getActiveOrganization, setActiveOrganization } from "../lib/auth";
-import { viewingAnotherClient } from "../lib/orgContext";
 import type { PortalOrganization } from "../lib/auth";
 
 /**
@@ -60,18 +59,10 @@ export default function OrgSwitcher({
     window.location.reload();
   }
 
-  const viewingOther = viewingAnotherClient(active, homeOrganizationId);
-
+  // One look for every client (2026-10-01): an amber picker for all but the admin's home org read
+  // as a warning about the client; the name in the picker already says whose data this is.
   return (
-    <label
-      className={className}
-      title={viewingOther ? "Admin: viewing another client's organization" : "Admin: view another client"}
-    >
-      {/* Viewing someone else's organization should never look like the default state:
-          the select itself turns amber, plus a dot for colour-blind redundancy. */}
-      {viewingOther && (
-        <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-warn" />
-      )}
+    <label className={className} title="Admin: choose which client organization to view">
       <select
         value={active}
         onChange={(e) => choose(e.target.value)}
@@ -79,11 +70,7 @@ export default function OrgSwitcher({
         // min-w-0 is load-bearing: a select defaults to min-width:auto, so it refuses to
         // shrink below its longest option and overflows the header's flex box instead of
         // truncating -- it sat on top of the Home and Explore nav links between lg and 2xl.
-        className={`w-full min-w-[7.5rem] max-w-[180px] truncate rounded-lg border px-2 py-1.5 text-sm ${
- viewingOther
- ? "border-warn bg-warn-bg font-medium text-warn"
- : "border-edge-subtle bg-chip text-fg"
- }`}
+        className="w-full min-w-[7.5rem] max-w-[180px] truncate rounded-lg border border-edge-subtle bg-chip px-2 py-1.5 text-sm text-fg"
       >
         {orgs.map((o) => (
           <option key={o.id} value={o.id}>
