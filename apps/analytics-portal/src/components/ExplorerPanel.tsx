@@ -42,6 +42,7 @@ import { GlobalFilterBar } from "./GlobalFilterBar";
 import { ResultsPanel } from "./ResultsPanel";
 import { CompareSummary } from "./CompareSummary";
 import { canCompare, priorWindow } from "@/lib/periodCompare";
+import { filterDisclosure } from "@/lib/filterDisclosure";
 import { ScopeFilterSelect } from "./ScopeFilterSelect";
 import { SnapshotDataModelPanel } from "./SnapshotDataModelPanel";
 import { VisibilityToggle } from "./VisibilityToggle";
@@ -90,7 +91,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const premadeReports = scoped.guidedPremadeReports;
   const measures = scoped.guidedMeasures;
   const processGuide = scoped.processGuide;
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   // Ad-hoc building and SQL now live at the single /build and /database surfaces (see the
   // CTAs + the ?tab redirects below); the canvas page keeps only Reports + Data model.
   const tabOptions = (
@@ -563,6 +564,15 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     metadata.date_fields.find((d) => d.id === resolvedDateField)?.label ??
     resolvedDateField ??
     "";
+  // everything the result is filtered to, said on the page (lib/filterDisclosure.ts)
+  const disclosure = filterDisclosure({
+    allDates: Boolean(dateFieldLabel) && allDates,
+    window: dateFieldLabel && !allDates ? { field: dateFieldLabel, start: dateStart, end: dateEnd } : null,
+    reportFilters: activeReport?.filters,
+    scope: scopeLabel ? { field: scopeLabel, value: scopeValue } : null,
+    drill: drillFilter,
+    rowRules: user?.row_rules,
+  });
 
   return (
     <div className="space-y-6">
@@ -771,6 +781,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             measureField={measureField}
             measureAgg={measureAgg}
             periodLabel={periodLabel}
+            disclosure={disclosure}
             scopeLabel={scopeLabel ? `${scopeLabel}: ${scopeValue}` : undefined}
             dateRange={allDates ? undefined : [dateStart, dateEnd]}
             drillFilter={drillFilter}
