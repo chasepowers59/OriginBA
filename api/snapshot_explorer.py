@@ -450,11 +450,19 @@ def snapshot_metadata(
     org_id = require_org_for_data(ctx)
     snapshot = _require_snapshot_access(ctx, snapshot_id)
     default_filter = _default_date_filter(snapshot, org_id)
+    # the table where THIS org's warehouse holds it (the shared catalog writes the Postgres
+    # shape): ORIGINBA_REPORTING.RPT_X in an in-database client's own Oracle
+    data_model = dict(snapshot.get("data_model") or {})
+    if snapshot.get("table_name"):
+        backend, _dialect, schema = snapshot_backend(snapshot, org_id)
+        table = snapshot["table_name"].upper() if backend == "oracle" else snapshot["table_name"]
+        data_model["snapshot_table"] = f"{schema}.{table}"
     return {
         "id": snapshot_id,
         "client": org_id,
         "organization_id": org_id,
         **snapshot,
+        "data_model": data_model,
         "suggested_default_filter": default_filter.model_dump() if default_filter else None,
         # The browser computes its date presets; a frozen copy's presets end here.
         "data_as_of": data_as_of(org_id),
