@@ -46,7 +46,12 @@ class KpiLogicTests(unittest.TestCase):
         home = {k["id"]: k for k in EXECUTIVE_KPIS}["accounts_receivable"]
         self.assertEqual(home["value"]["filters"], [])
         self.assertEqual(home["lenses"][0]["id"], "owing")
-        self.assertIn({"field": "Has Credit Balance", "op": "eq", "value": False}, home["lenses"][0]["filters"])
+        # split by the SIGN of the Total Balance the card sums, so Owing equals the debt card's
+        # receivables: by the Current-Balance credit flag it read $731,460 against $1,254,198
+        lenses = {lens["id"]: lens["filters"] for lens in home["lenses"]}
+        self.assertEqual(lenses["owing"], [OWED])
+        self.assertEqual(lenses["credit"], [{"field": "Total Balance", "op": "lte", "value": -0.01}])
+        self.assertEqual(lenses["net"], [])
         ori = {m.id: m.build({})["query"] for m in METRICS}
         self.assertIn(OWED, ori["accounts_receivable"]["filters"])
         self.assertEqual(ori["collection_processes"]["measures"], [{"field": "Process ID", "agg": "count_distinct"}])

@@ -156,15 +156,16 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         # question, and that the choice "belongs to the Ad Hoc user, which is why
         # 'Is In Arrears' and 'Has Credit Balance' exist as flags instead". The card
         # simply never made the choice; these lenses are it, using that same flag.
-        # The flag reads Current Balance while the measure sums Total Balance, so the
-        # subtitles name the flag rather than implying a clean sign split.
+        # Split by the SIGN of the Total Balance the card sums: the Has Credit Balance flag
+        # reads Current Balance, so "Owing" by the flag was $731,460 at CityCorp beside the
+        # debt card's $1,254,198 receivables (2026-10-01). Owing + In credit = Net, exactly.
         "lenses": [
             {"id": "owing", "label": "Owing",
-             "subtitle": "Service agreements not in credit",
-             "filters": [{"field": "Has Credit Balance", "op": "eq", "value": False}]},
+             "subtitle": "Balances owed to the utility",
+             "filters": [{"field": "Total Balance", "op": "gte", "value": 0.01}]},
             {"id": "credit", "label": "In credit",
              "subtitle": "Credit balances — what the utility owes",
-             "filters": [{"field": "Has Credit Balance", "op": "eq", "value": True}]},
+             "filters": [{"field": "Total Balance", "op": "lte", "value": -0.01}]},
             {"id": "net", "label": "Net", "subtitle": "Every balance, credits netted off",
              "filters": []},
         ],
