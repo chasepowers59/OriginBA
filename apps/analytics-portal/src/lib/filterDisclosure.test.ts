@@ -14,6 +14,13 @@ describe("describeFilter", () => {
       .toBe("Bill Date from Jun 18, 2025 to Jun 18, 2026");
     expect(describeFilter({ field: "Days Open", op: "gt", value: 90 })).toBe("Days Open over 90");
   });
+
+  it("says what a base-product code means, keeping the code", () => {
+    expect(describeFilter({ field: "Adjustment Status Code", op: "eq", value: "50" }))
+      .toBe("standing adjustments only (Adjustment Status Code 50)");
+    expect(describeFilter({ field: "Usage Flag", op: "eq", value: "S" }))
+      .toBe("the read billing used (Usage Flag S)");
+  });
 });
 
 describe("filterDisclosure", () => {

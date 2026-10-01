@@ -4,9 +4,19 @@ import type { RowRule } from "@/lib/rowRules";
 
 const val = (v: unknown) => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}/.test(v) ? formatDate(v) : String(v));
 
+// What a C2M base-product code means where a report filters on one (the only two, 2026-10-01):
+// CI_ADJ status 50 is Frozen, the standing adjustments (api/money_rules.py); USAGE_FLG 'S' marks
+// the read a segment billed on.
+const CODE_MEANINGS: Record<string, string> = {
+  "Adjustment Status Code|50": "standing adjustments only",
+  "Usage Flag|S": "the read billing used",
+};
+
 /** One filter as a reader would say it. */
 export function describeFilter(f: FilterDef): string {
   const v = f.value;
+  const meaning = (f.op === "eq" || f.op === "=") ? CODE_MEANINGS[`${f.field}|${String(v)}`] : undefined;
+  if (meaning) return `${meaning} (${f.field} ${String(v)})`;
   if (typeof v === "boolean" && (f.op === "eq" || f.op === "=")) return `${f.field}: ${v ? "yes" : "no"}`;
   if (f.op === "between" && Array.isArray(v)) return `${f.field} from ${val(v[0])} to ${val(v[1])}`;
   if (f.op === "in" && Array.isArray(v)) return `${f.field} is ${v.map(val).join(" or ")}`;
