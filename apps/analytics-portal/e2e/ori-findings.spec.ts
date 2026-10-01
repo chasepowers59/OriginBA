@@ -65,6 +65,21 @@ test("home shows Ori's read and hands a finding's question to Ori", async ({ pag
   await expect(page.getByRole("region", { name: "Ask Ori" }).getByText(FINDING.question)).toBeVisible();
 });
 
+test("home shows the top three things worth investigating and the rest on request", async ({ page }) => {
+  const second = { ...FINDING, kpi_id: "payments", headline: "Payments: down 97% vs prior 30 days" };
+  const later = { ...ANOMALY, kpi_id: "contacts", headline: "Customer contacts for May 2026: unusually high" };
+  await stubOri(page, { findings: [FINDING, second] }, { through: "2026-05", anomalies: [ANOMALY, later], forecasts: [] });
+  await page.goto("/");
+  const found = page.getByRole("region", { name: "Ori found something worth investigating" });
+  await expect(found.getByRole("listitem")).toHaveCount(3);
+  await expect(found.getByText(later.headline)).toHaveCount(0);
+  await found.getByRole("button", { name: "Show 1 more" }).click();
+  await expect(found.getByRole("listitem")).toHaveCount(4);
+  await expect(found.getByText(later.headline)).toBeVisible();
+  await found.getByRole("button", { name: "Show fewer" }).click();
+  await expect(found.getByRole("listitem")).toHaveCount(3);
+});
+
 test("home lists each forecast in one line and leads to the Forecasts page", async ({ page }) => {
   await stubOri(page, { findings: [] }, { through: "2026-05", anomalies: [], forecasts: [FORECAST] });
   await page.goto("/");
@@ -72,7 +87,7 @@ test("home lists each forecast in one line and leads to the Forecasts page", asy
   await expect(forecasts.getByText(FORECAST.headline)).toBeVisible();
   await expect(forecasts.getByRole("img")).toHaveCount(0);   // the charts live on the Forecasts page
   await forecasts.getByRole("link", { name: /See all forecasts/ }).click();
-  await expect(page).toHaveURL(/\/forecasts$/);
+  await expect(page).toHaveURL(/\/forecasts$/, { timeout: 30_000 });   // a cold dev server compiles the page first
 });
 
 test("the Forecasts page: each forecast, its chart, how it is made, and a question to Ori", async ({ page }) => {

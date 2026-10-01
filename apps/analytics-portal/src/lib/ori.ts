@@ -18,6 +18,8 @@ export const ORI = {
     "Ori is not set up for this deployment yet (no model key). The governed metrics below still answer everyday questions.",
   worthInvestigating: "Ori found something worth investigating",
   askWhy: "Ask Ori why",
+  showMore: (n: number) => `Show ${n} more`,
+  showFewer: "Show fewer",
   read: "Ori's read",
   heading: "Forecasts",
   actual: "Actual",

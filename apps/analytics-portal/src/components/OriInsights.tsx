@@ -10,6 +10,7 @@ import { OriMark } from "@/components/OriMark";
 
 const NO_READ: OriRead = { findings: [] };
 const NO_TRENDS: OriTrends = { through: "", anomalies: [], forecasts: [] };
+const TOP_ITEMS = 3;
 
 /**
  * Ori's read on home (and, with `workstream`, on that page from its own cards): a brief of the period, what is worth investigating (large moves against the
@@ -19,6 +20,7 @@ const NO_TRENDS: OriTrends = { through: "", anomalies: [], forecasts: [] };
 export function OriInsights({ workstream }: { workstream?: string } = {}) {
   const [read, setRead] = useState<OriRead | null>(null);
   const [trends, setTrends] = useState<OriTrends | null>(null);
+  const [everything, setEverything] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -35,6 +37,8 @@ export function OriInsights({ workstream }: { workstream?: string } = {}) {
 
   const brief = read.brief?.trim();
   const items = investigations(read.findings, trends?.anomalies ?? []);
+  // Home stays light: the top three, the rest on request (moves first, largest first)
+  const shown = everything ? items : items.slice(0, TOP_ITEMS);
   const forecasts = trends?.forecasts ?? [];
 
   return (
@@ -49,7 +53,7 @@ export function OriInsights({ workstream }: { workstream?: string } = {}) {
         <section aria-label={ORI.worthInvestigating} className="mt-6">
           <h3 className="text-base font-semibold text-heading">{ORI.worthInvestigating}</h3>
           <ul className="mt-1 divide-y divide-edge-subtle">
-            {items.map((item) => (
+            {shown.map((item) => (
               <li key={item.key} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-heading">{item.headline}</p>
@@ -61,6 +65,11 @@ export function OriInsights({ workstream }: { workstream?: string } = {}) {
               </li>
             ))}
           </ul>
+          {items.length > TOP_ITEMS ? (
+            <button type="button" className="btn-ghost mt-2 text-xs" onClick={() => setEverything((v) => !v)}>
+              {everything ? ORI.showFewer : ORI.showMore(items.length - TOP_ITEMS)}
+            </button>
+          ) : null}
         </section>
       ) : null}
 
