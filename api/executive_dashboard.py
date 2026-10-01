@@ -190,7 +190,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     {
         "id": "bills_completed",
         "label": "Bills",
-        "subtitle": "Bills completed in the period",
+        "subtitle": "Bills created in the period",
         "snapshot_id": "rpt_bill",
         "format": "number",
         "workstream": "billing",
@@ -211,11 +211,11 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         # 'C'/'P', so no code is written down at all -- the model already owns that
         # mapping and is tested on it. Demo 25.4: 1,963 complete, 15 pending.
         "lenses": [
-            {"id": "complete", "label": "Complete", "subtitle": "Completed bills",
+            {"id": "complete", "label": "Complete", "subtitle": "Created in the period, now complete",
              "filters": [{"field": "Is Completed", "op": "eq", "value": True}]},
-            {"id": "pending", "label": "Pending", "subtitle": "Bills not yet completed",
+            {"id": "pending", "label": "Pending", "subtitle": "Created in the period, not yet complete",
              "filters": [{"field": "Is Completed", "op": "eq", "value": False}]},
-            {"id": "all", "label": "All", "subtitle": "Every bill, any status", "filters": []},
+            {"id": "all", "label": "All", "subtitle": "Created in the period, any status", "filters": []},
         ],
     },
     {
