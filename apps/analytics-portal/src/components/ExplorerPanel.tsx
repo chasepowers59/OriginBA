@@ -90,6 +90,9 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const scopeFilters = scoped.guidedScopeFilters;
   const premadeReports = scoped.guidedPremadeReports;
   const measures = scoped.guidedMeasures;
+  const scopeKey = scopeFilters.map((f) => f.field).join("|");
+  const measuresKey = measures.map((m) => m.id).join("|");
+  const trustedKey = (metadata.trusted_measures ?? []).join("|");
   const processGuide = scoped.processGuide;
   const { can, user } = useAuth();
   // Ad-hoc building and SQL now live at the single /build and /database surfaces (see the
@@ -363,13 +366,16 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     setResult(null);
     setFavoriteApplied(false);
   }, [
+    // VALUES, not objects: the page re-fetches metadata on every URL change (a cross-filter is
+    // in the URL), and a new array here reset the view as if the data set had changed:
+    // clearing a cross-filter left "Choose a standard report" (2026-10-01)
     metadata.id,
     processId,
-    scopeFilters,
+    scopeKey,
     metadata.default_date_preset,
     metadata.data_as_of,
-    metadata.trusted_measures,
-    measures,
+    trustedKey,
+    measuresKey,
   ]);
 
   useEffect(() => {
