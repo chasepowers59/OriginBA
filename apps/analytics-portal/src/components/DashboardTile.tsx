@@ -8,6 +8,7 @@ import {
 } from "@/lib/api";
 import { chartedMeasureColumn, kpiHeadline, tileHeadline, tileIsUnset, tileSeriesLabel } from "@/lib/dashboardTileMath";
 import { resolveDateField, tileWindow } from "@/lib/tileDateField";
+import { filterDisclosure } from "@/lib/filterDisclosure";
 import { measureDisplaysAsCurrency } from "@/lib/businessLabels";
 import type { DashboardTileDef, QueryResponse } from "@/lib/types";
 import { BuilderChart } from "./builder/BuilderChart";
@@ -34,8 +35,8 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
   const [measureKey, setMeasureKey] = useState("");
   const [queryMeasureField, setQueryMeasureField] = useState("*");
   const [queryMeasureAgg, setQueryMeasureAgg] = useState("count");
-  // the board's day window skipped this tile: say so beside the title
-  const [unwindowed, setUnwindowed] = useState(false);
+  // everything the tile is filtered to, said under its title (lib/filterDisclosure.ts)
+  const [shows, setShows] = useState<string[]>([]);
 
   const unset = tileIsUnset(tile);
   useEffect(() => {
@@ -80,7 +81,12 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
         setMeasureKey(chartedMeasureColumn(response.columns, measures.length));
         setQueryMeasureField(primaryMeasure.field ?? "*");
         setQueryMeasureAgg(primaryMeasure.agg ?? "count");
-        setUnwindowed(Boolean(groupDate) && dates.all_dates);
+        setShows(filterDisclosure({
+          allDates: Boolean(groupDate) && dates.all_dates,
+          window: dates.filters[0] ? { field: dates.filters[0].field, start, end } : null,
+          reportFilters: report?.filters,
+          drill: filter ? { field: filter.field, value: String(filter.value) } : null,
+        }));
         setError(null);
       } catch (err) {
         if (!cancelled) {
@@ -118,6 +124,12 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
     onCrossSelect?.(dimensionKey, category);
   };
 
+  const showsLine = shows.length ? (
+    <p className="mb-2 truncate text-[11px] text-fg-subtle" title={`This shows: ${shows.join(" · ")}`}>
+      {shows.join(" · ")}
+    </p>
+  ) : <div className="mb-2" />;
+
   if (unset) {
     return (
       <div className="glass-panel flex h-full min-h-[160px] flex-col items-center justify-center gap-1 p-6 text-center">
@@ -142,6 +154,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
     return (
       <div className="glass-panel flex h-full flex-col justify-center p-6">
         <p className="text-xs uppercase tracking-wide text-fg-muted">{tile.title}</p>
+        {showsLine}
         <p className="mt-2 text-4xl font-bold text-heading">{formatted}</p>
       </div>
     );
@@ -150,7 +163,10 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
   if (tile.visual === "table") {
     return (
       <div className="glass-panel flex h-full flex-col overflow-hidden">
-        <p className="border-b border-edge-subtle px-4 py-2 text-sm font-medium text-heading">{tile.title}</p>
+        <div className="border-b border-edge-subtle px-4 pt-2">
+          <p className="text-sm font-medium text-heading">{tile.title}</p>
+          {showsLine}
+        </div>
         <div className="max-h-64 overflow-auto">
           <table className="min-w-full text-left text-xs">
             <thead>
@@ -181,10 +197,8 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
 
   return (
     <div className="glass-panel flex h-full flex-col p-4">
-      <p className="mb-2 flex items-baseline justify-between gap-2 text-sm font-medium text-heading">
-        {tile.title}
-        {unwindowed ? <span className="shrink-0 text-xs font-normal text-fg-subtle">All dates</span> : null}
-      </p>
+      <p className="text-sm font-medium text-heading">{tile.title}</p>
+      {showsLine}
       <div className="flex-1">
         <BuilderChart
           visual={effectiveChart}
