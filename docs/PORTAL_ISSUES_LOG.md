@@ -36,6 +36,11 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-10-01 | Build: a data set opened in the field list could not be closed again (its arrow re-selected it; "open" and "selected" were one state) | qa/build-crawl | e2e/builder-drag.spec.ts "closes again from its own arrow" |
+| 2026-10-01 | Build: fields on the Columns / Values / Filters shelves could not be rearranged (shelf chips were plain labels) | qa/build-crawl: sortable chips (grip handle, keyboard too) | src/lib/builderShelves.test.ts, e2e/builder-drag.spec.ts "rearrange by drag and drop" |
+| 2026-10-01 | Build: a field dropped ONTO a chip already on a shelf was ignored (the drop target was the chip, not the shelf) | qa/build-crawl: `dropShelf` | src/lib/builderShelves.test.ts |
+| 2026-10-01 | Build: the same measure twice (e.g. Sum and Max) shared one key, so changing or removing one changed or removed both | qa/build-crawl: `valueKey` = field + aggregation; an aggregation already on the shelf is disabled for its twin | src/lib/builderShelves.test.ts |
+| 2026-10-01 | Dashboards: tile drag-to-swap had unit tests but no proof the drag reached them | works; now pinned | e2e/dashboard-drag.spec.ts (stubbed dashboard, never writes the store) |
 | 2026-09-30 | The first production deploy (no API hosted) sat on 'Loading session…' forever: the bootstrap awaited /auth/status outside any try, so an unreachable API never settled the page; same for any outage | this branch (fix/session-unreachable) | src/lib/sessionBootstrap.test.ts; verified live with the API stopped, then Try again |
 | 2026-09-30 | Auth writes (password change, create/update user, groups) committed AFTER the 200 was sent (FastAPI runs yield-dependency exit code after the response): signing in with a just-changed password failed 401 | this commit | tests/test_auth_commit_before_response.py, scripts/check_tenant_isolation.py |
 | 2026-09-30 | A dashboard backlog tile with no filters of its own sent no window and got the server's trailing 90 days: 'Which data exceptions are open longest?' lost every old open exception | d3dad1f7 | tileDateField.test.ts (tileWindow), e2e/library.spec.ts |

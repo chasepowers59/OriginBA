@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
+  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
@@ -39,7 +40,9 @@ import type {
 import { FieldPalette } from "./FieldPalette";
 import { Shelf } from "./Shelf";
 import { VisualPicker, type VisualChoice } from "./VisualPicker";
-import { shelfDimensions, startingQuestions } from "@/lib/builderShelves";
+import { dropShelf, parseSortableId, reorderShelf, shelfDimensions, sortableId, startingQuestions, valueKey } from "@/lib/builderShelves";
+import { SortableContext, rectSortingStrategy, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { SortableChip } from "./SortableChip";
 import { BuilderChart, type ChartSeries } from "./BuilderChart";
 import { QuestionGallery } from "./QuestionGallery";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
@@ -83,7 +86,11 @@ export function VisualBuilder({
   const [saved, setSaved] = useState<string | null>(null);
   const initialApplied = useRef(false);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    // a chip on a shelf reorders from the keyboard too: focus its grip, Space, arrows, Space
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   useEffect(() => {
     fetchSnapshots().then((r) => setIndex(r.snapshots)).catch(() => setIndex([]));
@@ -148,10 +155,20 @@ export function VisualBuilder({
   const onDragEnd = useCallback(
     (e: DragEndEvent) => {
       setDragging(null);
-      const overId = e.over?.id;
+      const overId = e.over ? String(e.over.id) : null;
+      if (!overId) return;
+      // a chip already on a shelf: move it within that shelf (onto a chip, or the shelf's end)
+      const chip = parseSortableId(String(e.active.id));
+      if (chip) {
+        if (dropShelf(overId) !== chip.shelf) return;
+        const overKey = parseSortableId(overId)?.key ?? null;
+        if (chip.shelf === "columns") setCols((c) => reorderShelf(c, (x) => x.field, chip.key, overKey));
+        else if (chip.shelf === "values") setVals((v) => reorderShelf(v, valueKey, chip.key, overKey));
+        else if (chip.shelf === "filters") setFils((f) => reorderShelf(f, (x) => x.field, chip.key, overKey));
+        return;
+      }
       const field = e.active.data.current?.field as FieldDef | undefined;
-      if (!overId || !field) return;
-      addField(String(overId), field);
+      if (field) addField(dropShelf(overId), field);
     },
     [addField],
   );
@@ -432,8 +449,9 @@ export function VisualBuilder({
             <div className="space-y-4">
               <div className="glass-panel grid gap-3 p-3 md:grid-cols-3">
                 <Shelf id="columns" label="Columns / Group" hint="dimensions + dates" accent="var(--chart-2)" empty={!cols.length}>
+                  <SortableContext items={cols.map((c) => sortableId("columns", c.field))} strategy={rectSortingStrategy}>
                   {cols.map((c) => (
-                    <span key={c.field} className="chip flex items-center gap-1.5">
+                    <SortableChip key={c.field} id={sortableId("columns", c.field)} label={c.label}>
                       {c.label}
                       {c.kind === "time" ? (
                         <select
@@ -451,35 +469,40 @@ export function VisualBuilder({
                         </select>
                       ) : null}
                       <button type="button" onClick={() => setCols((cc) => cc.filter((x) => x.field !== c.field))} aria-label="remove" className="-my-2 -mr-1 rounded p-2 leading-none hover:text-heading">×</button>
-                    </span>
+                    </SortableChip>
                   ))}
+                  </SortableContext>
                 </Shelf>
                 <Shelf id="values" label="Values" hint="measures" accent="var(--chart-1)" empty={!vals.length}>
+                  <SortableContext items={vals.map((v) => sortableId("values", valueKey(v)))} strategy={rectSortingStrategy}>
                   {vals.map((v) => {
                     const aggs = allowedAggsForMeasure(meta, v.field);
+                    const key = valueKey(v);
                     return (
-                      <span key={v.field} className="chip flex items-center gap-1.5">
+                      <SortableChip key={key} id={sortableId("values", key)} label={`${aggregationLabel(v.agg)} ${v.label}`}>
                         <select
                           value={v.agg}
-                          onChange={(e) => setVals((vv) => vv.map((x) => (x.field === v.field ? { ...x, agg: e.target.value } : x)))}
+                          onChange={(e) => setVals((vv) => vv.map((x) => (valueKey(x) === key ? { ...x, agg: e.target.value } : x)))}
                           className="rounded bg-transparent text-[10px] font-semibold"
                           style={{ color: "var(--chart-1)" }}
                         >
                           {aggs.map((a) => (
-                            <option key={a} value={a} disabled={a === "sum" && !v.trusted}>
+                            <option key={a} value={a} disabled={(a === "sum" && !v.trusted) || (a !== v.agg && vals.some((x) => x.field === v.field && x.agg === a))}>
                               {aggregationLabel(a)}
                             </option>
                           ))}
                         </select>
                         {v.label}
-                        <button type="button" onClick={() => setVals((vv) => vv.filter((x) => x.field !== v.field))} aria-label="remove" className="-my-2 -mr-1 rounded p-2 leading-none hover:text-heading">×</button>
-                      </span>
+                        <button type="button" onClick={() => setVals((vv) => vv.filter((x) => valueKey(x) !== key))} aria-label="remove" className="-my-2 -mr-1 rounded p-2 leading-none hover:text-heading">×</button>
+                      </SortableChip>
                     );
                   })}
+                  </SortableContext>
                 </Shelf>
                 <Shelf id="filters" label="Filters" hint="scope the data" accent="var(--chart-4)" empty={!fils.length}>
+                  <SortableContext items={fils.map((f) => sortableId("filters", f.field))} strategy={rectSortingStrategy}>
                   {fils.map((f) => (
-                    <span key={f.field} className="chip flex items-center gap-1.5">
+                    <SortableChip key={f.field} id={sortableId("filters", f.field)} label={f.label}>
                       {f.label}
                       {f.role === "date" ? (
                         <span className="text-[10px]" style={{ color: "var(--foreground-subtle)" }}>
@@ -503,8 +526,9 @@ export function VisualBuilder({
                         Ask
                       </button>
                       <button type="button" onClick={() => setFils((ff) => ff.filter((x) => x.field !== f.field))} aria-label="remove" className="-my-2 -mr-1 rounded p-2 leading-none hover:text-heading">×</button>
-                    </span>
+                    </SortableChip>
                   ))}
+                  </SortableContext>
                 </Shelf>
               </div>
 

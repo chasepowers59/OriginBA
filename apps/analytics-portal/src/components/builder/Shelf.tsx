@@ -33,6 +33,7 @@ export function Shelf({
       </div>
       <div
         ref={setNodeRef}
+        data-testid={`shelf-${id}`}
         className="flex min-h-[46px] flex-wrap items-center gap-2 rounded-xl border border-dashed p-2 transition"
         style={{
           borderColor: isOver ? accent : "var(--border)",

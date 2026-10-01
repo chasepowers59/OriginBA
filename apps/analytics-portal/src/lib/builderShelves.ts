@@ -43,3 +43,40 @@ export function startingQuestions<T extends { workstream: string }>(questions: T
   const seen = new Set<string>();
   return questions.filter((q) => !seen.has(q.workstream) && seen.add(q.workstream)).slice(0, shown);
 }
+
+// --- reordering what sits on a shelf -------------------------------------------------------
+// A chip on a shelf is sortable under the id "<shelf>::<key>"; the shelves themselves are
+// droppable under their bare names. The palette's pills use "palette:<field>".
+const SEP = "::";
+
+export function sortableId(shelf: string, key: string): string {
+  return `${shelf}${SEP}${key}`;
+}
+
+export function parseSortableId(id: string): { shelf: string; key: string } | null {
+  const at = id.indexOf(SEP);
+  return at > 0 ? { shelf: id.slice(0, at), key: id.slice(at + SEP.length) } : null;
+}
+
+/** The shelf a drop landed on, whether the pointer was over the shelf or over a chip in it. */
+export function dropShelf(overId: string): string {
+  return parseSortableId(overId)?.shelf ?? overId;
+}
+
+/** Move the item keyed `activeKey` to where `overKey` sits, or to the end when the drop
+ *  was on the shelf itself (`overKey` null). Unchanged (same array) when nothing moves. */
+export function reorderShelf<T>(items: T[], keyOf: (t: T) => string, activeKey: string, overKey: string | null): T[] {
+  const from = items.findIndex((t) => keyOf(t) === activeKey);
+  const to = overKey === null ? items.length - 1 : items.findIndex((t) => keyOf(t) === overKey);
+  if (from < 0 || to < 0 || from === to) return items;
+  const out = items.slice();
+  const [moved] = out.splice(from, 1);
+  out.splice(to, 0, moved);
+  return out;
+}
+
+/** A measure on the Values shelf is the field AND its aggregation: the same column summed
+ *  and maxed is two items. */
+export function valueKey(v: { field: string; agg: string }): string {
+  return `${v.field}|${v.agg}`;
+}
