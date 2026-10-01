@@ -89,7 +89,7 @@ export function AppShell({
   useEffect(closeMenus, [pathname]);
 
   return (
-    <div className="mesh-bg min-h-screen">
+    <div className="mesh-bg flex min-h-screen flex-col">
       {/* Three-zone app bar: brand + org context | nav | compact controls. The meta
           that used to crowd the bar (workstream counts, role, org, sign out) lives in
           the user menu, so the bar itself stays one clean row at every width. */}
@@ -233,7 +233,7 @@ export function AppShell({
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1700px] px-6 py-8 2xl:px-10">
+      <div className="mx-auto w-full max-w-[1700px] flex-1 px-6 py-8 2xl:px-10">
         {staleNotice ? (
           <p role="status" data-testid="stale-data"
              className="mb-6 rounded-xl border border-warn bg-warn-bg px-4 py-3 text-sm text-warn">
