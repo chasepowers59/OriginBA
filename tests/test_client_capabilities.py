@@ -98,3 +98,40 @@ class CapabilityTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EverySurfaceHidesTheSameThings(unittest.TestCase):
+    """The Library hid an unused module's reports, but the data-set list (Build, Explore) and
+    the builder's question gallery still offered them, opening on "No data for this view"
+    (CityCorp's billable charges, 2026-10-01 crawl). One definition serves all three."""
+
+    def setUp(self):
+        self.tmp = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
+        json.dump(MEASURED, self.tmp)
+        self.tmp.close()
+        self.path = mock.patch.object(caps, "CAPABILITIES_PATH", Path(self.tmp.name))
+        self.path.start()
+
+    def tearDown(self):
+        self.path.stop()
+        Path(self.tmp.name).unlink()
+
+    def ctx(self, org):
+        return AuthContext(id="u1", email="u1@utility.gov", display_name="u1", role="editor", client_id="smartcity",
+                           organization_id=org, organization_name=org,
+                           permissions=set(permissions_for_role("editor")), workstreams=["*"], row_rules=())
+
+    def test_the_data_set_list_drops_a_canvas_the_client_never_used(self):
+        from api import snapshot_explorer as se
+        ids = lambda org: {s["id"] for s in se.snapshots_index(self.ctx(org))["snapshots"]}
+        self.assertNotIn("rpt_billable_charge", ids("odessa"))
+        self.assertIn("rpt_billable_charge", ids("fond_du_lac"))
+        self.assertIn("rpt_bill", ids("odessa"))
+
+    def test_the_question_gallery_drops_the_same_reports_as_the_library(self):
+        from api import snapshot_explorer as se
+        qs = lambda org: {(q["snapshot_id"], q["report_id"]) for q in se.snapshot_questions(self.ctx(org))["questions"]}
+        odessa, fdl = qs("odessa"), qs("fond_du_lac")
+        self.assertFalse(any(s == "rpt_billable_charge" for s, _ in odessa))
+        self.assertNotIn(("rpt_customer_account", "budget_accounts_by_class"), odessa)
+        self.assertIn(("rpt_customer_account", "budget_accounts_by_class"), fdl)

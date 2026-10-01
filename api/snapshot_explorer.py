@@ -266,6 +266,9 @@ def snapshots_index(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, A
     catalog = load_catalog(organization_id=org_id)
     workstreams = filter_workstreams_for_auth(list_workstreams(org_id), ctx)
     snapshots = filter_snapshots_for_auth(list_snapshots(organization_id=org_id), ctx)
+    from api.client_capabilities import hidden_canvases
+    unused = hidden_canvases(org_id)   # a data set the client never used opens empty
+    snapshots = [s for s in snapshots if s["id"] not in unused]
     if ctx.row_rules:
         snapshots = [s for s in snapshots if readable(ctx.row_rules, get_snapshot(s["id"], org_id))]
     return {
@@ -301,6 +304,8 @@ def snapshot_questions(ctx: AuthContext = Depends(get_auth_context)) -> dict[str
     labels = catalog.get("workstream_labels", {})
     order_index = {ws: i for i, ws in enumerate(order)}
 
+    from api.client_capabilities import hidden_reports
+    unused = hidden_reports(org_id, catalog)   # the same reports the Library hides
     questions: list[dict[str, Any]] = []
     for snapshot_id, meta in catalog.get("snapshots", {}).items():
         if not meta.get("portal_enabled", True):
@@ -309,6 +314,8 @@ def snapshot_questions(ctx: AuthContext = Depends(get_auth_context)) -> dict[str
         if not ctx.can_access_workstream(workstream) or not readable(ctx.row_rules, meta):
             continue
         for report in meta.get("premade_reports", []) or []:
+            if (snapshot_id, report.get("id")) in unused:
+                continue
             questions.append({
                 "id": f"{snapshot_id}:{report.get('id')}",
                 "report_id": report.get("id"),
