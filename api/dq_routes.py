@@ -52,6 +52,10 @@ ROW_CAP = 100
 # Oracle rules run side by side: serially the 22 took 101 s on Ellensburg over the VPN
 # (2026-09-29). Bounded well under the org's 8-session pool, which serves every page.
 ORACLE_RULE_WORKERS = 4
+# A rule run is a once-per-build job, not an interactive query: at CityCorp (6.2M charge lines)
+# two rules full-scan RPT_BILLED_CHARGE side by side and one crossed the 60 s interactive
+# ceiling on every run, so nothing was ever kept (measured 2026-10-01: 16-27 s each alone).
+ORACLE_RULE_TIMEOUT_MS = 300_000
 ACK_DIR = ROOT / "data" / "dq_acks"
 
 
@@ -145,7 +149,8 @@ def _run_rules(org: str, engine: str, path: Path) -> list[dict[str, Any]]:
     rules = yaml.safe_load(path.read_text())
     if engine == "oracle":
         def run_oracle(sql: str):
-            return oracle_query(sql, organization_id=org, max_rows=ROW_CAP + 1)
+            return oracle_query(sql, organization_id=org, max_rows=ROW_CAP + 1,
+                                timeout_ms=ORACLE_RULE_TIMEOUT_MS)
 
         with ThreadPoolExecutor(max_workers=ORACLE_RULE_WORKERS) as pool:
             return list(pool.map(lambda r: _run_rule(r, run_oracle), rules))
