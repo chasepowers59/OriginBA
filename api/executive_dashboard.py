@@ -132,19 +132,19 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     {
         "id": "accounts_receivable",
         "label": "Accounts receivable",
-        "subtitle": "Balances owed (credits excluded)",
+        "subtitle": "Total SA balances",
         "snapshot_id": "rpt_sa_aged_balance",
         "format": "currency",
         "workstream": "finance",
         "explore_report_id": None,
         "windowless": True,
-        # balances owed, as on the debt workstream (api/workstream_dashboard.py)
+        # the base is every balance; the LENSES below choose (Owing by default). A base filter
+        # here would make "In credit" always $0 and "Net" equal "Owing" (2026-10-01)
         "value": {"dimensions": [],
-                  "measures": [{"field": "Total Balance", "agg": "sum"}],
-                  "filters": [{"field": "Total Balance", "op": "gte", "value": 0.01}]},
+                  "measures": [{"field": "Total Balance", "agg": "sum"}], "filters": []},
         "trend": {"dimensions": ["Oldest Debt Band"],
                   "measures": [{"field": "Total Balance", "agg": "sum"}],
-                  "filters": [{"field": "Total Balance", "op": "gte", "value": 0.01}], "limit": 6},
+                  "filters": [], "limit": 6},
         # The card summed every row and reported the NET: -$6,333.30 on Demo 25.4, which
         # is arithmetically right and reads as broken. "Accounts receivable" means what
         # customers owe -- 130 SAs at +$23,854.69 -- and netting 66 credit balances of

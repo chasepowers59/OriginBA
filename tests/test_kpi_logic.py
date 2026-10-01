@@ -41,8 +41,12 @@ class KpiLogicTests(unittest.TestCase):
 
     def test_every_surface_asks_the_same_question(self):
         # the Home card and Ori answer "accounts receivable" and "collection processes" too
-        home = {k["id"]: k for k in EXECUTIVE_KPIS}["accounts_receivable"]["value"]
-        self.assertIn(OWED, home["filters"])
+        # the Home card chooses with lenses over every balance: Owing first (the default),
+        # In credit and Net mean what they say only if the base is unfiltered
+        home = {k["id"]: k for k in EXECUTIVE_KPIS}["accounts_receivable"]
+        self.assertEqual(home["value"]["filters"], [])
+        self.assertEqual(home["lenses"][0]["id"], "owing")
+        self.assertIn({"field": "Has Credit Balance", "op": "eq", "value": False}, home["lenses"][0]["filters"])
         ori = {m.id: m.build({})["query"] for m in METRICS}
         self.assertIn(OWED, ori["accounts_receivable"]["filters"])
         self.assertEqual(ori["collection_processes"]["measures"], [{"field": "Process ID", "agg": "count_distinct"}])
