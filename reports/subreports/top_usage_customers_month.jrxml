@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="top_usage_customers_month" pageWidth="778" pageHeight="595" orientation="Landscape"
+    columnWidth="778" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0"
+    whenNoDataType="AllSectionsNoDetail">
+    <property name="net.sf.jasperreports.query.timeout" value="600"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+    <style name="Base" default="true" fontName="SansSerif" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
+    <style name="H3" style="Base" fontSize="9" forecolor="#0F4761"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="RowBand" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="SubHeader" style="Base" fontSize="8" forecolor="#5B6470"/>
+    <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
+    <style name="SubTotal" style="Base" fontSize="8" bold="true" forecolor="#0F4761"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
+    <query language="SQL"><![CDATA[
+SELECT TO_CHAR(x.end_dt, 'YYYY-MM') AS USAGE_MONTH, COUNT(x.usage_qty) AS BILLS,
+       SUM(x.usage_qty) AS USAGE_QTY, COALESCE(SUM(x.billed_amt), 0) AS BILLED_AMT
+FROM (
+  SELECT b.bseg_id, b.end_dt,
+         (SELECT SUM(q.bill_sq) FROM CISADM.CI_BSEG_SQ q
+          WHERE q.bseg_id = b.bseg_id AND TRIM(q.sqi_cd) IS NULL
+            AND INSTR(', ' || $P{UNITS} || ',', ', ' || TRIM(q.uom_cd) || ',') > 0
+            AND $X{IN, TRIM(q.uom_cd), UOM_CODES_F}) AS usage_qty,
+         (SELECT SUM(c.calc_amt) FROM CISADM.CI_BSEG_CALC c WHERE c.bseg_id = b.bseg_id) AS billed_amt
+  FROM CISADM.CI_SA s
+  JOIN CISADM.CI_SA_TYPE t ON t.sa_type_cd = s.sa_type_cd AND t.cis_division = s.cis_division
+  JOIN CISADM.CI_BSEG b ON b.sa_id = s.sa_id
+  JOIN CISADM.CI_BILL bl ON bl.bill_id = b.bill_id
+  WHERE s.acct_id = $P{ACCT_ID}
+    AND TRIM(b.bseg_stat_flg) = '50' AND TRIM(bl.bill_stat_flg) = 'C'
+    AND b.end_dt >= $P{FROM_DT} AND b.end_dt < $P{TO_DT} + INTERVAL '1' DAY
+      AND TRIM(t.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F})
+  AND $X{IN, TRIM(s.sa_type_cd), SA_TYPE_CD_F}
+  AND ($P{CUST_CL_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_ACCT fa WHERE fa.acct_id = s.acct_id AND TRIM(fa.cust_cl_cd) = TRIM($P{CUST_CL_F})))
+  AND ($P{CIS_DIVISION_F} IS NULL OR TRIM(s.cis_division) = TRIM($P{CIS_DIVISION_F}))
+) x
+GROUP BY TO_CHAR(x.end_dt, 'YYYY-MM')
+ORDER BY 1
+]]></query>
+    <parameter name="FROM_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().minusYears(1).withDayOfYear(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TO_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfYear(1).minusDays(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ACCT_ID" class="java.lang.String">
+        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+    </parameter>
+    <parameter name="UNITS" class="java.lang.String">
+        <defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TOP_N" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[10]]></defaultValueExpression>
+    </parameter>
+    <parameter name="SVC_TYPE_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="UOM_CODES_F" class="java.util.Collection">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="SA_TYPE_CD_F" class="java.util.Collection">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CUST_CL_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CIS_DIVISION_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <field name="USAGE_MONTH" class="java.lang.String"/>
+    <field name="BILLS" class="java.lang.Long"/>
+    <field name="USAGE_QTY" class="java.math.BigDecimal"/>
+    <field name="BILLED_AMT" class="java.math.BigDecimal"/>
+    <variable name="SUM_BILLS" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{BILLS}]]></expression>
+    </variable>
+    <variable name="SUM_USAGE_QTY" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{USAGE_QTY}]]></expression>
+    </variable>
+    <variable name="SUM_BILLED_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{BILLED_AMT}]]></expression>
+    </variable>
+    <detail>
+        <band height="12">
+            <element kind="textField" x="86" y="0" width="150" height="12" style="SubText" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{USAGE_MONTH}]]></expression></element>
+            <element kind="textField" x="446" y="0" width="50" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{BILLS}]]></expression></element>
+            <element kind="textField" x="496" y="0" width="90" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.##"><expression><![CDATA[$F{USAGE_QTY}]]></expression></element>
+            <element kind="textField" x="686" y="0" width="92" height="12" style="SubText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{BILLED_AMT}]]></expression></element>
+        </band>
+    </detail>
+    <summary height="20">
+            <element kind="line" x="0" y="1" width="778" height="1"><pen lineWidth="0.5" lineColor="#B9C6D2"/></element>
+            <element kind="staticText" x="0" y="2" width="86" height="12" style="SubTotal" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Subtotal]]></text></element>
+            <element kind="textField" x="446" y="2" width="50" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_BILLS}]]></expression></element>
+            <element kind="textField" x="496" y="2" width="90" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.##"><expression><![CDATA[$V{SUM_USAGE_QTY}]]></expression></element>
+            <element kind="textField" x="686" y="2" width="92" height="12" style="SubTotal" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_BILLED_AMT}]]></expression></element>
+    </summary>
+</jasperReport>

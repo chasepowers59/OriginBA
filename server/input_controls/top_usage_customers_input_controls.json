@@ -1,0 +1,75 @@
+{
+  "reportUnitUri": "/SmartCity/Report/Standard_Offering/Standardized_Reports/top_usage_customers",
+  "label": "Top Usage Customers",
+  "description": "The N accounts that used the most of a service in a window, by billed usage: frozen segments of completed bills, one unit of measure at a time, with each account's month-by-month usage and billed amount underneath.",
+  "dataSources": {
+    "DEV": "ORIGIN_DEV_DS",
+    "QA": "C2M_QA_DS",
+    "PROD": "C2M_PROD_DS"
+  },
+  "subreport": "reports/subreports/top_usage_customers_month.jrxml  (a local jrxml resource of the unit named top_usage_customers_month; the main says repo:top_usage_customers_month)",
+  "inputControls": [
+    {
+      "id": "FROM_DT",
+      "label": "Service period end date from (inclusive)",
+      "type": "singleValueDate",
+      "mandatory": true,
+      "visible": true
+    },
+    {
+      "id": "TO_DT",
+      "label": "Service period end date to (inclusive)",
+      "type": "singleValueDate",
+      "mandatory": true,
+      "visible": true
+    },
+    {
+      "id": "TOP_N",
+      "label": "Top N",
+      "type": "singleValueNumber",
+      "mandatory": false,
+      "visible": true,
+      "defaultValue": "10"
+    },
+    {
+      "id": "SVC_TYPE_CD_F",
+      "label": "Service type",
+      "type": "singleSelectQuery",
+      "mandatory": true,
+      "visible": true,
+      "query": "SELECT TRIM(l.svc_type_cd) AS CODE, TRIM(l.svc_type_cd) || ' - ' || l.descr AS DESCR FROM CISADM.CI_SVC_TYPE_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_UOM u WHERE u.svc_type_cd = l.svc_type_cd) AND EXISTS (SELECT 1 FROM CISADM.CI_SA_TYPE t JOIN CISADM.CI_SA sa ON sa.sa_type_cd = t.sa_type_cd AND sa.cis_division = t.cis_division WHERE t.svc_type_cd = l.svc_type_cd AND (sa.end_dt IS NULL OR sa.end_dt >= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1"
+    },
+    {
+      "id": "UOM_CODES_F",
+      "label": "Units of measure (blank = all)",
+      "type": "multiSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "query": "SELECT TRIM(u.uom_cd) AS CODE, TRIM(u.uom_cd) || ' - ' || l.descr AS DESCR FROM CISADM.CI_UOM u JOIN CISADM.CI_UOM_L l ON l.uom_cd = u.uom_cd AND l.language_cd = 'ENG' WHERE TRIM(u.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F}) AND COALESCE(TRIM(u.msr_peak_qty_sw), 'N') <> 'Y' ORDER BY 1"
+    },
+    {
+      "id": "SA_TYPE_CD_F",
+      "label": "SA types (blank = all)",
+      "type": "multiSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "query": "SELECT DISTINCT TRIM(t.sa_type_cd) AS CODE, TRIM(t.sa_type_cd) || ' - ' || l.descr AS DESCR FROM CISADM.CI_SA_TYPE t JOIN CISADM.CI_SA_TYPE_L l ON l.cis_division = t.cis_division AND l.sa_type_cd = t.sa_type_cd AND l.language_cd = 'ENG' WHERE TRIM(t.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F}) AND EXISTS (SELECT 1 FROM CISADM.CI_SA sa WHERE sa.sa_type_cd = t.sa_type_cd AND sa.cis_division = t.cis_division AND (sa.end_dt IS NULL OR sa.end_dt >= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1"
+    },
+    {
+      "id": "CUST_CL_F",
+      "label": "Customer class (blank = all)",
+      "type": "singleSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "query": "SELECT TRIM(cust_cl_cd) AS CODE, TRIM(cust_cl_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_CUST_CL_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ACCT a JOIN CISADM.CI_SA sa ON sa.acct_id = a.acct_id WHERE a.cust_cl_cd = l.cust_cl_cd AND (sa.end_dt IS NULL OR sa.end_dt >= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1"
+    },
+    {
+      "id": "CIS_DIVISION_F",
+      "label": "CIS division (blank = all)",
+      "type": "singleSelectQuery",
+      "mandatory": false,
+      "visible": true,
+      "query": "SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_SA sa WHERE sa.cis_division = l.cis_division AND (sa.end_dt IS NULL OR sa.end_dt >= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1"
+    }
+  ]
+}

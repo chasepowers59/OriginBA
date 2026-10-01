@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="top_usage_customers" pageWidth="842" pageHeight="595" orientation="Landscape"
+    columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+    whenNoDataType="AllSectionsNoDetail">
+    <property name="net.sf.jasperreports.query.timeout" value="600"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+    <style name="Base" default="true" fontName="SansSerif" fontSize="9"/>
+    <style name="TitleSapphire" style="Base" fontSize="18" bold="true" forecolor="#006FAC"/>
+    <style name="H3" style="Base" fontSize="9" forecolor="#0F4761"/>
+    <style name="HeaderSapphire" style="Base" fontSize="9" bold="true" forecolor="#FFFFFF" backcolor="#006FAC" mode="Opaque"/>
+    <style name="RowBand" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="SubHeader" style="Base" fontSize="8" forecolor="#5B6470"/>
+    <style name="SubText" style="Base" fontSize="8" forecolor="#000000"/>
+    <style name="SubTotal" style="Base" fontSize="8" bold="true" forecolor="#0F4761"/>
+    <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
+    <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
+    <query language="SQL"><![CDATA[
+SELECT * FROM (
+WITH seg AS (
+  SELECT b.bseg_id, b.end_dt, s.sa_id, s.acct_id, s.char_prem_id
+  FROM CISADM.CI_BSEG b
+  JOIN CISADM.CI_BILL bl ON bl.bill_id = b.bill_id
+  JOIN CISADM.CI_SA s ON s.sa_id = b.sa_id
+  JOIN CISADM.CI_SA_TYPE t ON t.sa_type_cd = s.sa_type_cd AND t.cis_division = s.cis_division
+  WHERE TRIM(b.bseg_stat_flg) = '50' AND TRIM(bl.bill_stat_flg) = 'C'
+    AND b.end_dt >= $P{FROM_DT} AND b.end_dt < $P{TO_DT} + INTERVAL '1' DAY
+      AND TRIM(t.svc_type_cd) = TRIM($P{SVC_TYPE_CD_F})
+  AND $X{IN, TRIM(s.sa_type_cd), SA_TYPE_CD_F}
+  AND ($P{CUST_CL_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_ACCT fa WHERE fa.acct_id = s.acct_id AND TRIM(fa.cust_cl_cd) = TRIM($P{CUST_CL_F})))
+  AND ($P{CIS_DIVISION_F} IS NULL OR TRIM(s.cis_division) = TRIM($P{CIS_DIVISION_F}))
+),
+qty AS (
+  SELECT g.acct_id, g.sa_id, g.bseg_id, TRIM(q.uom_cd) AS uom_cd, q.bill_sq
+  FROM seg g
+  JOIN CISADM.CI_BSEG_SQ q ON q.bseg_id = g.bseg_id
+  LEFT JOIN CISADM.CI_UOM u ON u.uom_cd = q.uom_cd
+  WHERE TRIM(q.sqi_cd) IS NULL AND TRIM(q.uom_cd) IS NOT NULL
+    AND COALESCE(TRIM(u.msr_peak_qty_sw), 'N') <> 'Y'
+),
+units AS (
+  SELECT uom_cd, ROW_NUMBER() OVER (ORDER BY COUNT(*) DESC, uom_cd) AS rn FROM qty GROUP BY uom_cd
+),
+chosen AS (
+  SELECT uom_cd FROM units
+  WHERE CASE WHEN $X{IN, '#', UOM_CODES_F} THEN CASE WHEN rn = 1 THEN 1 ELSE 0 END
+             WHEN $X{IN, uom_cd, UOM_CODES_F} THEN 1 ELSE 0 END = 1
+),
+by_acct AS (
+  SELECT q.acct_id, SUM(q.bill_sq) AS usage_qty, COUNT(DISTINCT q.bseg_id) AS bills
+  FROM qty q JOIN chosen c ON c.uom_cd = q.uom_cd
+  GROUP BY q.acct_id
+),
+ranked AS (
+  SELECT acct_id, usage_qty, bills,
+         usage_qty * 100 / NULLIF(SUM(usage_qty) OVER (), 0) AS share_pct,
+         ROW_NUMBER() OVER (ORDER BY usage_qty DESC, acct_id) AS rank_no
+  FROM by_acct
+),
+top_acct AS (SELECT acct_id, usage_qty, bills, share_pct, rank_no FROM ranked WHERE rank_no <= $P{TOP_N}),
+top_sa AS (
+  SELECT q.acct_id, q.sa_id, ROW_NUMBER() OVER (PARTITION BY q.acct_id ORDER BY SUM(q.bill_sq) DESC, q.sa_id) AS rn
+  FROM qty q JOIN chosen c ON c.uom_cd = q.uom_cd JOIN top_acct ta ON ta.acct_id = q.acct_id
+  GROUP BY q.acct_id, q.sa_id
+),
+prem AS (
+  SELECT g.acct_id, COUNT(DISTINCT g.char_prem_id) AS premises
+  FROM seg g JOIN top_acct ta ON ta.acct_id = g.acct_id GROUP BY g.acct_id
+),
+billed AS (
+  SELECT g.acct_id, SUM(c.calc_amt) AS billed_amt
+  FROM seg g JOIN top_acct ta ON ta.acct_id = g.acct_id
+  JOIN CISADM.CI_BSEG_CALC c ON c.bseg_id = g.bseg_id
+  GROUP BY g.acct_id
+),
+unit_list AS (SELECT LISTAGG(uom_cd, ', ') WITHIN GROUP (ORDER BY uom_cd) AS uoms FROM chosen)
+SELECT ta.rank_no AS RANK_NO, TRIM(ta.acct_id) AS ACCT_ID, pn.entity_name AS CUSTOMER_NAME,
+       TRIM(p.address1) || CASE WHEN TRIM(p.city) IS NOT NULL THEN ', ' || TRIM(p.city) END
+         || CASE WHEN pr.premises > 1 THEN ' (+' || (pr.premises - 1) || ' more)' END AS SERVICE_ADDRESS,
+       COALESCE(cl.descr, TRIM(a.cust_cl_cd)) AS CUSTOMER_CLASS,
+       ta.bills AS BILLS, ta.usage_qty AS USAGE_QTY, ul.uoms AS UOM, ta.share_pct AS SHARE_PCT,
+       COALESCE(bd.billed_amt, 0) AS BILLED_AMT
+FROM top_acct ta
+CROSS JOIN unit_list ul
+JOIN CISADM.CI_ACCT a ON a.acct_id = ta.acct_id
+LEFT JOIN CISADM.CI_CUST_CL_L cl ON cl.cust_cl_cd = a.cust_cl_cd AND cl.language_cd = 'ENG'
+LEFT JOIN CISADM.CI_ACCT_PER ap ON ap.acct_id = ta.acct_id AND TRIM(ap.main_cust_sw) = 'Y'
+LEFT JOIN CISADM.CI_PER_NAME pn ON pn.per_id = ap.per_id AND TRIM(pn.name_type_flg) = 'PRIM'
+LEFT JOIN top_sa ts ON ts.acct_id = ta.acct_id AND ts.rn = 1
+LEFT JOIN CISADM.CI_SA sa ON sa.sa_id = ts.sa_id
+LEFT JOIN CISADM.CI_PREM p ON p.prem_id = sa.char_prem_id
+LEFT JOIN prem pr ON pr.acct_id = ta.acct_id
+LEFT JOIN billed bd ON bd.acct_id = ta.acct_id
+ORDER BY ta.rank_no
+) q
+]]></query>
+    <parameter name="FROM_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().minusYears(1).withDayOfYear(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TO_DT" class="java.sql.Date">
+        <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().withDayOfYear(1).minusDays(1).toString())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="TOP_N" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[10]]></defaultValueExpression>
+    </parameter>
+    <parameter name="SVC_TYPE_CD_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="UOM_CODES_F" class="java.util.Collection">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="SA_TYPE_CD_F" class="java.util.Collection">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CUST_CL_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CIS_DIVISION_F" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <field name="RANK_NO" class="java.lang.Long"/>
+    <field name="ACCT_ID" class="java.lang.String"/>
+    <field name="CUSTOMER_NAME" class="java.lang.String"/>
+    <field name="SERVICE_ADDRESS" class="java.lang.String"/>
+    <field name="CUSTOMER_CLASS" class="java.lang.String"/>
+    <field name="BILLS" class="java.lang.Long"/>
+    <field name="USAGE_QTY" class="java.math.BigDecimal"/>
+    <field name="UOM" class="java.lang.String"/>
+    <field name="SHARE_PCT" class="java.math.BigDecimal"/>
+    <field name="BILLED_AMT" class="java.math.BigDecimal"/>
+    <variable name="SUM_BILLS" class="java.lang.Long" calculation="Sum">
+        <expression><![CDATA[$F{BILLS}]]></expression>
+    </variable>
+    <variable name="SUM_USAGE_QTY" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{USAGE_QTY}]]></expression>
+    </variable>
+    <variable name="SUM_SHARE_PCT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{SHARE_PCT}]]></expression>
+    </variable>
+    <variable name="SUM_BILLED_AMT" class="java.math.BigDecimal" calculation="Sum">
+        <expression><![CDATA[$F{BILLED_AMT}]]></expression>
+    </variable>
+    <title height="52">
+            <element kind="textField" x="0" y="0" width="802" height="26" style="TitleSapphire" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Top Usage Customers"]]></expression></element>
+            <element kind="textField" x="0" y="28" width="802" height="16" style="H3" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Service period end date " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DT}) + " to " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DT}) + "  |  billed usage on frozen segments of completed bills" + ($P{SVC_TYPE_CD_F} == null ? "" : "  |  Service type: " + $P{SVC_TYPE_CD_F}) + ($P{UOM_CODES_F} == null || $P{UOM_CODES_F}.isEmpty() ? "" : "  |  Units of measure: " + String.join(", ", $P{UOM_CODES_F})) + ($P{SA_TYPE_CD_F} == null || $P{SA_TYPE_CD_F}.isEmpty() ? "" : "  |  SA types: " + String.join(", ", $P{SA_TYPE_CD_F})) + ($P{CUST_CL_F} == null ? "" : "  |  Customer class: " + $P{CUST_CL_F}) + ($P{CIS_DIVISION_F} == null ? "" : "  |  CIS division: " + $P{CIS_DIVISION_F})]]></expression></element>
+    </title>
+    <columnHeader height="18">
+            <element kind="staticText" x="0" y="0" width="30" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Rank]]></text></element>
+            <element kind="staticText" x="30" y="0" width="80" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Account]]></text></element>
+            <element kind="staticText" x="110" y="0" width="150" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Main Customer]]></text></element>
+            <element kind="staticText" x="260" y="0" width="150" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Service Address]]></text></element>
+            <element kind="staticText" x="410" y="0" width="60" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Class]]></text></element>
+            <element kind="staticText" x="470" y="0" width="50" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Bills]]></text></element>
+            <element kind="staticText" x="520" y="0" width="90" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Billed Usage]]></text></element>
+            <element kind="staticText" x="610" y="0" width="50" height="18" style="HeaderSapphire" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Unit]]></text></element>
+            <element kind="staticText" x="660" y="0" width="50" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Share %]]></text></element>
+            <element kind="staticText" x="710" y="0" width="92" height="18" style="HeaderSapphire" hTextAlign="Right" vTextAlign="Middle"><text><![CDATA[Billed Amount]]></text></element>
+    </columnHeader>
+    <detail>
+        <band height="22" splitType="Prevent">
+            <element kind="line" x="0" y="2" width="802" height="1"><pen lineWidth="0.75" lineColor="#006FAC"/></element>
+            <element kind="textField" x="0" y="3" width="30" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{RANK_NO}]]></expression></element>
+            <element kind="textField" x="30" y="3" width="80" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{ACCT_ID}]]></expression></element>
+            <element kind="textField" x="110" y="3" width="150" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{CUSTOMER_NAME}]]></expression></element>
+            <element kind="textField" x="260" y="3" width="150" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{SERVICE_ADDRESS}]]></expression></element>
+            <element kind="textField" x="410" y="3" width="60" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{CUSTOMER_CLASS}]]></expression></element>
+            <element kind="textField" x="470" y="3" width="50" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$F{BILLS}]]></expression></element>
+            <element kind="textField" x="520" y="3" width="90" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.##"><expression><![CDATA[$F{USAGE_QTY}]]></expression></element>
+            <element kind="textField" x="610" y="3" width="50" height="18" style="RowBand" hTextAlign="Center" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA[$F{UOM}]]></expression></element>
+            <element kind="textField" x="660" y="3" width="50" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="0.00"><expression><![CDATA[$F{SHARE_PCT}]]></expression></element>
+            <element kind="textField" x="710" y="3" width="92" height="18" style="RowBand" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$F{BILLED_AMT}]]></expression></element>
+        </band>
+        <band height="20" splitType="Stretch">
+            <element kind="subreport" x="24" y="0" width="778" height="20" positionType="Float" removeLineWhenBlank="true" usingCache="false">
+                <parameter name="FROM_DT"><expression><![CDATA[$P{FROM_DT}]]></expression></parameter>
+                <parameter name="TO_DT"><expression><![CDATA[$P{TO_DT}]]></expression></parameter>
+                <parameter name="TOP_N"><expression><![CDATA[$P{TOP_N}]]></expression></parameter>
+                <parameter name="SVC_TYPE_CD_F"><expression><![CDATA[$P{SVC_TYPE_CD_F}]]></expression></parameter>
+                <parameter name="UOM_CODES_F"><expression><![CDATA[$P{UOM_CODES_F}]]></expression></parameter>
+                <parameter name="SA_TYPE_CD_F"><expression><![CDATA[$P{SA_TYPE_CD_F}]]></expression></parameter>
+                <parameter name="CUST_CL_F"><expression><![CDATA[$P{CUST_CL_F}]]></expression></parameter>
+                <parameter name="CIS_DIVISION_F"><expression><![CDATA[$P{CIS_DIVISION_F}]]></expression></parameter>
+                <parameter name="ACCT_ID"><expression><![CDATA[$F{ACCT_ID}]]></expression></parameter>
+                <parameter name="UNITS"><expression><![CDATA[$F{UOM}]]></expression></parameter>
+                <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                <expression><![CDATA["repo:top_usage_customers_month"]]></expression>
+            </element>
+        </band>
+    </detail>
+    <pageFooter height="14">
+            <element kind="textField" x="0" y="0" width="600" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["@2026, Origin Utility, Inc / Proprietary & Confidential"]]></expression></element>
+            <element kind="textField" x="600" y="0" width="150" height="14" style="FooterConfidential" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight"><expression><![CDATA["Page " + $V{PAGE_NUMBER} + " of"]]></expression></element>
+            <element kind="textField" x="750" y="0" width="52" height="14" style="FooterConfidential" hTextAlign="Left" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" evaluationTime="Report"><expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression></element>
+    </pageFooter>
+    <summary height="24">
+            <element kind="line" x="0" y="2" width="802" height="1"><pen lineWidth="1.0" lineColor="#006FAC"/></element>
+            <element kind="staticText" x="0" y="4" width="30" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[Total]]></text></element>
+            <element kind="staticText" x="30" y="4" width="80" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="staticText" x="110" y="4" width="150" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="staticText" x="260" y="4" width="150" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="staticText" x="410" y="4" width="60" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="textField" x="470" y="4" width="50" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0"><expression><![CDATA[$V{SUM_BILLS}]]></expression></element>
+            <element kind="textField" x="520" y="4" width="90" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.##"><expression><![CDATA[$V{SUM_USAGE_QTY}]]></expression></element>
+            <element kind="staticText" x="610" y="4" width="50" height="18" style="TotalText" hTextAlign="Left" vTextAlign="Middle"><text><![CDATA[]]></text></element>
+            <element kind="textField" x="660" y="4" width="50" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="0.00"><expression><![CDATA[$V{SUM_SHARE_PCT}]]></expression></element>
+            <element kind="textField" x="710" y="4" width="92" height="18" style="TotalText" hTextAlign="Right" vTextAlign="Middle" blankWhenNull="true" textAdjust="StretchHeight" pattern="#,##0.00;(#,##0.00)"><expression><![CDATA[$V{SUM_BILLED_AMT}]]></expression></element>
+    </summary>
+</jasperReport>

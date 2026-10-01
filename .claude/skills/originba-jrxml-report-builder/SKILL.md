@@ -152,6 +152,12 @@ Rules that are not obvious from the schema:
   Y/N flags stay `java.lang.String`.
 - **A dummy main query needs a real field**: REP8 uses `SELECT 1 FROM CISADM.CI_ACCT WHERE ROWNUM=1`
   with `<field name="1">` -- Oracle names the column `1`. Alias it (`SELECT 1 AS DUMMY`) in new work.
+- **Never start a report query with `WITH` on JRS 10** (measured 2026-10-01, Origin_DEV): the
+  server fails it with a generic "An error has occurred ... contact your system administrator"
+  before the query runs (a real SQL error reads "Error executing SQL statement for: <unit>"). Wrap
+  the CTEs: `SELECT * FROM (WITH ... SELECT ...) q`. The pack emitter does it and its test holds
+  every emitted query to `SELECT`. To find a server-only failure, fill the JRXML locally with
+  JasperReports 7.0.7 and ojdbc11 from the letterprint classpath, then bisect on the server.
 - **Heavy logic belongs in Oracle.** A JRXML query is a thin `SELECT` over a view or refreshed
   table; REP8 went from a giant inline query to `SELECT ... FROM JRS2C2M.REP8_AGED_BALANCE`
   (refreshed by `REFRESH_NEWARK_REP8_AGED_BALANCE`, `sql/clients/newark/rep8_aged_balance/`).

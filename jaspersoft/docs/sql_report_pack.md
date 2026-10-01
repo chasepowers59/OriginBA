@@ -56,6 +56,51 @@ first cut listed every code ever *configured*, and Ellensburg's carried Auto Pay
 Cloud tender types no tender has ever used (18 configured, 10 used); Chase asked for activity
 only (2026-09-17). The `EXISTS` compares CHAR to CHAR untrimmed so Oracle keeps its indexes.
 
+## Top Usage Customers (College Station's request, 2026-10-01)
+
+`top_usage_customers` ranks the N accounts that used the most of ONE service in a window (default:
+last calendar year, on the bill segment's service period end date), each with its month-by-month
+usage and billed amount underneath. Parameters: **Service type** (required pick-list of service
+types with a unit configured), **Top N** (default 10), optional **Units of measure** (multi,
+follows the service), **SA types** (multi, follows the service), **Customer class**, **CIS division**.
+
+- **Billed usage, not meter reads.** What the customer was billed for, after VEE and estimation,
+  with rebills replacing cancels: frozen segments (`50`) of completed bills (`C`), `CI_BSEG_SQ`
+  measured rows (`TRIM(sqi_cd) IS NULL`), `BILL_SQ`. Meter-side tables carry unbilled and
+  re-estimated reads and, at College Station TEST, a partial `D1_MSRMT` load.
+- **One unit at a time.** Usage adds only within a unit. Left blank, the report uses the service's
+  most-billed unit that is not a peak unit (`CI_UOM.MSR_PEAK_QTY_SW`); every row prints the unit.
+  The unit list shows the units configured for the service (an activity check would scan
+  `CI_BSEG_SQ`, which has no index on the unit).
+- **Account grain.** An account's usage of the service across all its agreements; the address is
+  the agreement with the most usage (`+n more` when the account has several premises). Share % is
+  of all accounts in the same filters; the Total row is the top N's combined share.
+- **Billed amount** is the calc headers of the same frozen segments, so a month's subtotal equals
+  its row.
+
+Measured on College Station TEST (2025, 2026-10-01):
+- every `CI_BSEG_SQ` row carries a padded blank SQI (Oracle `IS NULL` alone matches nothing);
+- electric bills **KWH** (consumption) beside **KW** (peak), and KW has more rows (559,454 vs
+  559,331), which is why the peak flag decides the default; **KWHR** is "Renewable Energy Credit";
+- water bills **MGW** ("Mille Gallons", thousands) and **MGW2** (second register of compound
+  meters, 206 segments a year): pick both to include compound meters;
+- **residential sewer is priced in gallons under the same MGW code commercial sewer prices in
+  thousands** ("$4.50/1000", capped at 10,000 vs "$5.35 per MGW"), so a Wastewater ranking mixes
+  scales there: rank Water, or rank sewer within one SA type;
+- the top 10 water accounts tied to the client's own `BSEG_SQ_USAGE_RPT_CURR` exactly (usage and
+  segment counts), and the monthly subtotal of the top account equals its row (49,891 MGW,
+  $169,764.52);
+- the main query takes about 80 s there (no date index on `CI_BSEG`/`CI_BILL`); the monthly
+  subreports use the account and agreement indexes.
+
+On Origin_DEV (Ellensburg TEST data) the defaults resolve to KWH, GAL and CCF; the report renders
+for E, W and G and matched the direct query to the cent (#1 electric 22,906,800 KWH, $1,363,434.78).
+
+**JRS 10 refuses a report query that starts with `WITH`** (a generic "An error has occurred ...
+contact your system administrator" before the query runs; a real SQL error says "Error executing
+SQL statement"). The emitter wraps CTE queries as `SELECT * FROM (...) q`; a test holds every
+emitted query to `SELECT`.
+
 ## Semantics, so the totals reconcile
 
 - **Billed amount** is calc headers of frozen segments, the same figure as

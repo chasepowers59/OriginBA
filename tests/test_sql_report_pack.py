@@ -63,6 +63,14 @@ class Sql(unittest.TestCase):
             for lit, why in s.constants.items():
                 self.assertTrue(why and ("lifecycle" in why or "lookup field name" in why or "PYMNT_SEL_STAT_FLG" in why), f"{s.name}: literal {lit!r} needs a base-product reason")
 
+    def test_every_emitted_query_starts_with_select(self):
+        # JRS 10 refuses a report query that starts with WITH: a generic "An error has occurred"
+        # before the query runs (measured on Origin_DEV 2026-10-01; the same CTE as an inline view ran)
+        for s in g.SPECS:
+            for jrxml in (g.main_jrxml(s), g.sub_jrxml(s)):
+                q = re.search(r'<query language="SQL"><!\[CDATA\[(.*?)\]\]></query>', jrxml, re.S).group(1)
+                self.assertTrue(q.lstrip().upper().startswith("SELECT"), f"{s.name}: {q.strip()[:40]}")
+
     def test_subreport_wiring(self):
         for s in g.SPECS:
             main = g.main_jrxml(s)
@@ -79,6 +87,10 @@ class Sql(unittest.TestCase):
             self.assertGreaterEqual(len(s.filters), 3, s.name)
             main, sub = s.main_sql(), s.sub_sql()
             for f in s.filters:
+                if f.required:   # a choice the report cannot run without: mandatory, never "blank = all"
+                    self.assertIn(f"$P{{{f.param}}}", main); self.assertIn(f"$P{{{f.param}}}", sub)
+                    self.assertNotIn(f"$P{{{f.param}}} IS NULL", main + sub)
+                    continue
                 # optional either way: a null single value, or a null/empty collection ($X{IN} is then true)
                 opt = f"$X{{IN, " if f.multi else f"$P{{{f.param}}} IS NULL OR"
                 self.assertIn(opt, main, f"{s.name}: {f.param} not optional in main")
@@ -153,6 +165,15 @@ if __name__ == "__main__":
     unittest.main()
 
 
+# Lists that show configuration rather than activity, each with its reason.
+CONFIGURATION_LISTS = {
+    # the units configured for the chosen service (CI_UOM, 2-14 rows); "billed in 3 years" would scan
+    # CI_BSEG_SQ, which has no index on the unit (20.6M rows at College Station) every time the prompt
+    # opens; left blank the report uses the service's most-billed unit, and peak units are not offered
+    ("top_usage_customers", "UOM_CODES_F"): "units configured for the service",
+}
+
+
 class RestDescriptor(unittest.TestCase):
     """What jrs_deploy_report_units.py PUTs: the shape JRS 10 accepted on 2026-09-17."""
 
@@ -173,6 +194,8 @@ class RestDescriptor(unittest.TestCase):
                     q = ic["query"]["query"]
                     self.assertTrue(q["value"].upper().startswith("SELECT ") and " AS CODE" in q["value"] and " AS DESCR" in q["value"])
                     self.assertIn("LANGUAGE_CD = 'ENG'", q["value"].upper())
+                    if (s.name, ic["uri"].rsplit("/", 1)[-1]) in CONFIGURATION_LISTS:
+                        continue
                     self.assertIn("EXISTS (SELECT 1 FROM CISADM.", q["value"], f"{s.name}.{ic['uri']}: a pick-list shows codes with activity")
                     self.assertIn("CURRENT_DATE - INTERVAL '3' YEAR", q["value"], f"{s.name}.{ic['uri']}: activity means the last 3 years")
                     self.assertEqual((ic["valueColumn"], ic["visibleColumns"]), ("CODE", ["DESCR"]))
@@ -193,7 +216,8 @@ class MultiSelect(unittest.TestCase):
     def test_bill_cycles_and_tender_types_take_several_values(self):
         import jrs_deploy_report_units as d
         multi = {(s.name, f.param) for s in g.SPECS for f in s.filters if f.multi}
-        self.assertEqual(multi, {("billing_by_cycle_period", "BILL_CYC_CD_F"), ("payments_by_tender_type_period", "TENDER_TYPE_CD_F")})
+        self.assertEqual(multi, {("billing_by_cycle_period", "BILL_CYC_CD_F"), ("payments_by_tender_type_period", "TENDER_TYPE_CD_F"),
+                                 ("top_usage_customers", "UOM_CODES_F"), ("top_usage_customers", "SA_TYPE_CD_F")})
         for s in g.SPECS:
             desc = d.descriptor(s, "/x/DataSource/X_DS")
             for c in desc["inputControls"]:
@@ -223,3 +247,48 @@ class AsOf(unittest.TestCase):
             self.assertIn("$P{AS_KNOWN_TODAY} = 'Y' OR", sql, "the switch that counts later cancellations back into history")
             self.assertIn("COALESCE(TRUNC(b.due_dt), TRUNC(ft.ars_dt))", sql, "Age By DUE uses the bill's real due date, never a shifted constant")
         self.assertIn("TRIM($P{SA_CIS_DIVISION})", self.s.sub_sql(), "SA types are division-qualified: the sub takes both keys")
+
+
+class TopUsage(unittest.TestCase):
+    """College Station asked for the top N users of a service for a year (2026-10-01). Billed usage,
+    not meter reads: frozen segments on completed bills, the measured rows (blank SQI) of ONE unit
+    at a time, never a peak (demand) unit. Measured on College Station TEST: every service-quantity
+    row carries a padded blank SQI, KW out-counts KWH on electric, and residential sewer is billed
+    in gallons under the same code commercial sewer bills in thousands."""
+
+    def setUp(self):
+        self.s = next(x for x in g.SPECS if x.name == "top_usage_customers")
+
+    def test_the_service_type_is_required_and_the_rest_optional(self):
+        doc, _ = g.controls(self.s)
+        ics = {c["id"]: c for c in doc["inputControls"]}
+        self.assertTrue(ics["SVC_TYPE_CD_F"]["mandatory"])
+        self.assertNotIn("blank = all", ics["SVC_TYPE_CD_F"]["label"])
+        for name in ("UOM_CODES_F", "SA_TYPE_CD_F", "CUST_CL_F", "CIS_DIVISION_F"):
+            self.assertFalse(ics[name]["mandatory"], name)
+        self.assertEqual(ics["TOP_N"]["type"], "singleValueNumber")
+        self.assertEqual(ics["TOP_N"]["defaultValue"], "10")
+
+    def test_unit_and_sa_type_lists_follow_the_chosen_service(self):
+        for f in self.s.filters:
+            if f.param in ("UOM_CODES_F", "SA_TYPE_CD_F"):
+                self.assertIn("$P{SVC_TYPE_CD_F}", f.lov_sql, f.param)
+        uom = next(f for f in self.s.filters if f.param == "UOM_CODES_F")
+        self.assertIn("msr_peak_qty_sw", uom.lov_sql, "a demand unit is never offered as a total")
+
+    def test_one_unit_of_measured_billed_usage(self):
+        main, sub = self.s.main_sql(), self.s.sub_sql()
+        for sql in (main, sub):
+            for must in ("TRIM(b.bseg_stat_flg) = '50'", "TRIM(bl.bill_stat_flg) = 'C'", "TRIM(q.sqi_cd) IS NULL"):
+                self.assertIn(must, sql, must)
+        self.assertIn("COALESCE(TRIM(u.msr_peak_qty_sw), 'N') <> 'Y'", main)
+        self.assertIn("ROW_NUMBER() OVER (ORDER BY COUNT(*) DESC", main, "blank units = the service's most-billed unit")
+        self.assertIn("$X{IN, '#', UOM_CODES_F}", main, "an empty unit list is detected, not treated as every unit")
+        self.assertIn("rank_no <= $P{TOP_N}", main)
+        self.assertIn("$P{UNITS}", sub, "the month breakdown sums the units the main row summed")
+
+    def test_a_year_window_by_default(self):
+        main = g.main_jrxml(self.s)
+        self.assertIn("minusYears(1).withDayOfYear(1)", main)
+        self.assertIn("withDayOfYear(1).minusDays(1)", main)
+        self.assertEqual(g.FOLDERS[self.s.name], "/SmartCity/Report/Standard_Offering/Standardized_Reports")

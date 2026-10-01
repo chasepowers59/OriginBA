@@ -15,6 +15,7 @@
     <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
     <query language="SQL"><![CDATA[
+SELECT * FROM (
 WITH base AS (
   SELECT ft.sa_id, ft.ft_id, TRUNC(ft.ars_dt) AS ars_dt,
          COALESCE(ft.cur_amt, 0) AS cur_amt, COALESCE(ft.tot_amt, 0) AS tot_amt,
@@ -78,6 +79,7 @@ LEFT JOIN CISADM.CI_PER_NAME pn ON pn.per_id = ap.per_id AND TRIM(pn.name_type_f
 WHERE p.cur_bal <> 0
 ORDER BY p.cur_bal DESC
 FETCH FIRST $P{TOP_N} ROWS ONLY
+) q
 ]]></query>
     <parameter name="AS_OF_DT" class="java.sql.Date">
         <defaultValueExpression><![CDATA[java.sql.Date.valueOf(java.time.LocalDate.now().toString())]]></defaultValueExpression>
