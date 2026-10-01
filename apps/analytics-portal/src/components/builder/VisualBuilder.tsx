@@ -554,7 +554,7 @@ export function VisualBuilder({
                     ) : null}
                     {result ? (
                       <span className="text-xs" style={{ color: "var(--foreground-subtle)" }}>
-                        {result.row_count} {result.row_count === 1 ? "row" : "rows"}
+                        {result.truncated ? `top ${result.row_count} rows (more groups than are listed)` : `${result.row_count} ${result.row_count === 1 ? "row" : "rows"}`}
                       </span>
                     ) : null}
                     <AppliedWindowNote result={result} />

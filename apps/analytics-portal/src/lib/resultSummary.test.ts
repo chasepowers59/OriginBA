@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { isUnitOfMeasureField } from "./businessLabels";
-import { MIXED_UNITS_NOTE, summarizeResult, NOT_ADDITIVE_NOTE, totalRow } from "./resultSummary";
+import { TRUNCATED_NOTE, leaderParts, MIXED_UNITS_NOTE, summarizeResult, NOT_ADDITIVE_NOTE, totalRow } from "./resultSummary";
 
 /**
  * "Billed usage by unit of measure" showed a Combined total of kWh + therms + gallons and
@@ -135,5 +135,45 @@ describe("the detail table's total row", () => {
   it("has no row when the result is not totalled", () => {
     expect(totalRow(["d0", "m0"], "m0", null)).toBeNull();
     expect(totalRow(["d0", "m0"], "", 5)).toBeNull();
+  });
+});
+
+describe("the leader sentence names the leader's amount AND the total (2026-10-01)", () => {
+  it("never reads as though the leader's amount were the total", () => {
+    // was "Water Residential leads this view at 19.8% of the total ($2,886,283.15)", and
+    // $2,886,283.15 was Water Residential's amount; the total was $14,606,601.93
+    const parts = leaderParts({ label: "Water Residential", share: 19.76, value: 2886283.15 }, 14606601.93,
+      (n) => `$${n.toFixed(2)}`, (p) => `${p.toFixed(1)}%`);
+    expect(Object.values(parts).join("|")).toBe("Water Residential|$2886283.15|19.8%|$14606601.93");
+    expect(`${parts.label} leads this view with ${parts.value}, ${parts.share} of the ${parts.total} total.`)
+      .toBe("Water Residential leads this view with $2886283.15, 19.8% of the $14606601.93 total.");
+  });
+});
+
+describe("one group has no leader (2026-10-01: 'Sewer Residential leads ... 100.0% of the total')", () => {
+  it("a single row, e.g. after clicking a bar to cross-filter, is totalled but leads nothing", () => {
+    const s = summarizeResult({ columns: ["SA Type", "m0"], rows: [{ "SA Type": "Sewer Residential", m0: 2808607.08 }],
+      measureKey: "m0", dimensionKey: "SA Type", measureField: "Billed Amount", measureAgg: "sum" });
+    expect(s.total).toBe(2808607.08);
+    expect(s.leader).toBeNull();
+  });
+});
+
+describe("a breakdown cut to its top groups is totalled over every group (2026-10-01)", () => {
+  // CityCorp on/off churn: 500 premises summing 1,971 out of 3,591 events in the period
+  const top = [{ "Premise Address": "1605 S KNOXVILLE AVE", m0: 12 }, { "Premise Address": "604 E M ST", m0: 11 }];
+  const base = { columns: ["Premise Address", "m0"], rows: top, measureKey: "m0", dimensionKey: "Premise Address",
+    measureField: "*", measureAgg: "count" };
+
+  it("takes the total from the unbroken answer, and every share from that total", () => {
+    const s = summarizeResult({ ...base, grandTotal: 3591 });
+    expect(s.total).toBe(3591);
+    expect(s.leader?.share).toBeCloseTo((12 / 3591) * 100, 6);
+  });
+
+  it("without the unbroken answer, a cut breakdown is not totalled at all", () => {
+    const s = summarizeResult({ ...base, truncated: true });
+    expect(s.total).toBeNull();
+    expect(s.notTotalled).toBe(TRUNCATED_NOTE);
   });
 });

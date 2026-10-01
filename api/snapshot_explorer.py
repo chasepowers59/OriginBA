@@ -835,6 +835,17 @@ def snapshot_query(
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}
         for row in rows
     ]
+    # A breakdown cut to its top groups must not be totalled by the reader: CityCorp's
+    # on/off churn (2026-10-01) showed 1,971 for a period that held 3,591. Say it was cut,
+    # and answer the same question unbroken so the total and every share are the real ones.
+    truncated = bool(body.dimensions or body.time_dimensions) \
+        and len(rows) >= min(body.limit, snapshot.get("max_rows", 500))
+    totals = None
+    if truncated:
+        whole = body.model_copy(update={"dimensions": [], "time_dimensions": [], "limit": 1})
+        _, total_columns, total_rows, _ = cached_query(org_id, snapshot, whole, filters)
+        if total_rows:
+            totals = {c: _serialize_value(v) for c, v in zip(total_columns, total_rows[0])}
     from api.access_audit import record_access_event
     record_access_event(
         actor_email=ctx.email, actor_id=ctx.id, action="report_run",
@@ -855,6 +866,8 @@ def snapshot_query(
             [t.model_dump() for t in body.time_dimensions]),
         "rows": serialized_rows,
         "row_count": len(serialized_rows),
+        "truncated": truncated,
+        "totals": totals,
         "sql": sql,
         # None when the caller set their own filters: only a window WE chose is ours to
         # announce, and labelling the caller's own range as a default would misreport it.

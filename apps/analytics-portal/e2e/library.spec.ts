@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
-import { asOrg } from "./org";
+import { ORG, asOrg } from "./org";
+
+const API = process.env.PORTAL_API_URL ?? "http://127.0.0.1:8010";
 
 /**
  * The report library is a folder tree: the rail lists the folders, the selected one leads with
@@ -36,6 +38,9 @@ test("folders lead with their essentials and a search looks across every folder"
 });
 
 test("a folder opens as a dashboard, and a canvas of what exists now is not windowed", async ({ page }) => {
+  // Budget Billing is hidden where no account is on budget (api/client_capabilities.py): CityCorp
+  const lib = await (await page.request.get(`${API}/portal/report-library`, { headers: { "X-Organization-Id": ORG } })).json();
+  test.skip(!lib.folders.some((f: { id: string }) => f.id === "budget_billing"), `${ORG} does not use budget billing`);
   const windows = new Map<string, boolean>();
   const allDates = new Map<string, boolean>();
   page.on("request", (req) => {

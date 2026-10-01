@@ -243,6 +243,10 @@ export type QueryResponse = {
   columns: string[];
   rows: Record<string, unknown>[];
   row_count: number;
+  /** The breakdown was cut to its top groups (the API's row cap)... */
+  truncated?: boolean;
+  /** ...and this is the same question answered unbroken: the true total per measure column. */
+  totals?: Record<string, unknown> | null;
   sql: string;
   /** Set ONLY when the server chose the window itself, because the request carried no
    *  filters. An unfiltered aggregate scans the whole canvas — the row cap cannot stop

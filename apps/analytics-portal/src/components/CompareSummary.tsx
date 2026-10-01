@@ -16,7 +16,9 @@ export function CompareSummary({ current, prior, priorRange, dimensionKey, measu
   measureField: string;
   measureAgg: string;
 }) {
-  const c = comparePeriods(current.rows, prior.rows, dimensionKey, measureKey);
+  const unbroken = (r: QueryResponse) => (r.totals?.[measureKey] == null ? null : Number(r.totals[measureKey]));
+  const c = comparePeriods(current.rows, prior.rows, dimensionKey, measureKey, 3,
+    { current: unbroken(current), prior: unbroken(prior) });
   const currency = measureDisplaysAsCurrency(measureField, measureAgg);
   const money = (v: number) => formatCompact(v, { currency });
   const signed = (v: number) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${money(Math.abs(v))}`;

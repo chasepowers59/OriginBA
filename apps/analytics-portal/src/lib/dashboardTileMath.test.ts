@@ -98,3 +98,11 @@ describe("tileHeadline", () => {
     expect(tileHeadline(null, "*", "count")).toBe("—");
   });
 });
+
+describe("a KPI over a cut breakdown shows the true total (2026-10-01)", () => {
+  it("uses the API's unbroken total, not the sum of the top groups it listed", () => {
+    const top = [{ k: "a", m0: 12 }, { k: "b", m0: 11 }];
+    expect(kpiHeadline(top, "m0", "count", 3591)).toBe(3591);
+    expect(kpiHeadline(top, "m0", "count")).toBe(23);
+  });
+});

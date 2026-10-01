@@ -225,16 +225,21 @@
     volumes. Per SA Type below: segments that billed usage vs how many of their calc
     lines carry a UOM. Review the rate component configuration in CIS (Rate Schedule
     > components) for the SA types where uom_lines is zero.
+  # charge lines are totalled per segment BEFORE the join: joining 6.2M lines to segments and
+  # counting distinct segments ran 208 s at CityCorp and hit the 60 s rule timeout (2026-10-01)
   sql: >
     select bs."SA Type",
-           count(distinct bs."Bill Segment ID")            as "Usage Bill Segments",
-           count(cl."Unit of Measure Code")                as "Charge Lines With a Unit",
-           count(*)                                        as "Charge Lines"
+           count(*)                                        as "Usage Bill Segments",
+           sum(cl.with_unit)                               as "Charge Lines With a Unit",
+           sum(cl.lines)                                   as "Charge Lines"
     from reporting.rpt_bill_segment bs
-    join reporting.rpt_billed_charge cl on cl."Bill Segment ID" = bs."Bill Segment ID"
+    join (select "Bill Segment ID" as bseg_id,
+                 count("Unit of Measure Code") as with_unit, count(*) as lines
+          from reporting.rpt_billed_charge
+          group by "Bill Segment ID") cl on cl.bseg_id = bs."Bill Segment ID"
     where bs."Billed Usage" is not null
     group by bs."SA Type"
-    having count(cl."Unit of Measure Code") = 0
+    having sum(cl.with_unit) = 0
 
 - id: config_tax_in_calc_lines
   object: Rate configuration
