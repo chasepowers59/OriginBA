@@ -3,7 +3,7 @@
 export type RowRule = { field: string; values: string[] };
 
 /** Pages the portal cannot restrict to a person's rows: free SQL, and letters (refused by the API). */
-const UNRESTRICTABLE = new Set(["database", "dq", "letters"]);
+const UNRESTRICTABLE = new Set(["database", "dq", "letters", "forecasts"]);
 
 export function isRestricted(user: { row_rules?: RowRule[] | null } | null | undefined): boolean {
   return Boolean(user?.row_rules?.length);

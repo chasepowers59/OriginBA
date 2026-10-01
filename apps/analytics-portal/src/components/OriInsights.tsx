@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { fetchOriFindings, fetchOriTrends, type OriRead, type OriTrends } from "@/lib/api";
 import { requestAsk } from "@/lib/assistantContext";
 import { ORI } from "@/lib/ori";
-import { investigations, oriAsk, oriPanelShows } from "@/lib/oriPanel";
-import { OriForecastChart } from "@/components/OriForecastChart";
+import { investigations, oriPanelShows } from "@/lib/oriPanel";
+import Link from "next/link";
 import { OriMark } from "@/components/OriMark";
 
 const NO_READ: OriRead = { findings: [] };
@@ -13,7 +13,7 @@ const NO_TRENDS: OriTrends = { through: "", anomalies: [], forecasts: [] };
 
 /**
  * Ori's read on home (and, with `workstream`, on that page from its own cards): a brief of the period, what is worth investigating (large moves against the
- * prior period from api/ori_insights.py, and unusual months) and where each card is heading. The
+ * prior period from api/ori_insights.py, and unusual months), and one line per forecast with the way to the Forecasts page. The
  * findings are fast and the trends can take half a minute cold, so each arrives on its own.
  */
 export function OriInsights({ workstream }: { workstream?: string } = {}) {
@@ -66,22 +66,17 @@ export function OriInsights({ workstream }: { workstream?: string } = {}) {
 
       {forecasts.length ? (
         <section aria-label={ORI.heading} className="mt-6">
-          <h3 className="text-base font-semibold text-heading">{ORI.heading}</h3>
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h3 className="text-base font-semibold text-heading">{ORI.heading}</h3>
+            <Link href="/forecasts" className="text-sm font-medium text-primary hover:underline">
+              {ORI.seeAllForecasts}
+            </Link>
+          </div>
           <ul className="mt-1 divide-y divide-edge-subtle">
             {forecasts.map((f) => (
-              <li key={f.kpi_id} className="grid items-center gap-x-8 gap-y-3 py-4 md:grid-cols-[minmax(0,1fr)_minmax(0,26rem)]">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-heading">{f.headline}</p>
-                  <p className="mt-0.5 text-sm tabular-nums text-fg-muted">{f.detail}</p>
-                  <button type="button" className="btn-ghost mt-3 text-xs" onClick={() => requestAsk(oriAsk(f, "forecast"))}>
-                    {ORI.askAbout}
-                  </button>
-                </div>
-                <OriForecastChart forecast={f} />
-              </li>
+              <li key={f.kpi_id} className="py-2 text-sm font-medium text-heading">{f.headline}</li>
             ))}
           </ul>
-          <p className="mt-1 text-xs text-fg-muted">{ORI.projectionNote}</p>
         </section>
       ) : null}
 

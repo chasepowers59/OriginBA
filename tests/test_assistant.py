@@ -520,11 +520,11 @@ class OriItemContext(unittest.TestCase):
         g.assert_not_called()
         self.assertEqual(asked, "Why?")
 
-    def test_the_prompt_knows_ori_publishes_projections(self):
+    def test_the_prompt_knows_ori_publishes_forecasts(self):
         from api.assistant import system_prompt
         with mock.patch("api.assistant.org_backend", return_value=("postgres", "dbt")):
             text = system_prompt("dev", "Dev", "postgres")[0]["text"]
-        self.assertIn("projection", text)
+        self.assertIn("forecasts", text)
 
 
 class TheStub(unittest.TestCase):

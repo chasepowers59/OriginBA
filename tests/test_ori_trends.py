@@ -174,6 +174,7 @@ class ForecastTests(unittest.TestCase):
         self.assertEqual(f["headline"], "Billed revenue: about $284K over Jun to Aug 2026")
         self.assertIn("same months last year", f["detail"])
         self.assertIn("Jun to Aug 2026", f["question"])
+        self.assertIn("forecast", f["question"])   # the word the page uses (2026-10-01)
 
     def test_a_level_series_without_a_season_uses_the_twelve_month_average(self):
         # Ellensburg payments, 2026-09-29: last year's months missed by 17.7%, the 12-month average by 14.6%
@@ -360,7 +361,8 @@ class GroundingTests(unittest.TestCase):
         hist = {"billed": series(seasonal(3), start=(2023, 6))}
         [f] = forecasts(hist, self.meta)
         text = grounding("forecast", "billed", hist, self.meta)
-        self.assertIn("projection", text)
+        self.assertIn("forecast", text)
+        self.assertNotIn("projection", text)
         self.assertIn(f["headline"], text)
         self.assertIn("same months last year", text)
         for month in ("Jun 2026", "Jul 2026", "Aug 2026"):

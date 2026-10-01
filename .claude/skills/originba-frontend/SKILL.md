@@ -102,7 +102,8 @@ Home (exec KPIs) · Build `/build` (THE builder; deep links `?canvas=&report=`) 
 Dashboards `/dashboards` (@dnd-kit pinboard) · Library `/reports` (reports grouped by
 workstream, the one grouping, beside the workstream rail) · Letters `/letters` (collections letters: the PDF beside the data behind it, and runs approved by a second person and released as one print file; nav
 behind `letters:read`, hidden from row-restricted people) · SQL `/database` (CISADM
-workspace; `?table=` seeds a query) · Data Quality · Settings. A new top-level route
+workspace; `?table=` seeds a query) · Data Quality · Forecasts `/forecasts` (every Home card's three-month
+forecast with its chart, method and accuracy bar; hidden from row-restricted people) · Settings. A new top-level route
 must also join `APP_ROUTES` in `middleware.ts`, or signed-in people are sent home from it. `/explore/[snapshotId]` is the data set overview, under Library (Reports + Data model only —
 builder/SQL tabs redirect out). Never add a second builder/SQL/chart surface.
 
@@ -548,9 +549,12 @@ will be Ori too, so they never need renaming.
   moves of 15% or more with a volume floor (count 20, money 1,000), windowed cards only, at most
   three, plus a one-paragraph `brief`; "Ask Ori why" hands the question to Ori via `requestAsk`.
 - **Ori's trends** (2026-09-29): the same panel reads `GET /portal/ori/trends` for unusual
-  months (listed after the findings, one list) and projections ("Where it's heading", one row
-  and one `OriForecastChart` each, "Ask Ori about this", footnote "A projection from past months,
-  not a promise."). Up to ~30 s cold, so it loads on its own, shows `ORI.thinking` meanwhile, is
+  months (listed after the findings, one list) and FORECASTS (Chase 2026-10-01: say "forecast",
+  never "projection", and keep Home light): Home shows one line per forecast under "Forecasts"
+  with "See all forecasts →"; the `/forecasts` page (`ForecastsBoard`) carries the charts
+  (`OriForecastChart`, 220px), the method and accuracy bar in plain words, "Ask Ori about this"
+  (the ask names the item, `oriAsk`, and the server restates its figures), footnote "A forecast
+  from past months, not a promise." Up to ~30 s cold, so it loads on its own, shows `ORI.thinking` meanwhile, is
   aborted on unmount, and shows nothing on error. The panel is absent only when the brief,
   findings, unusual months and projections are all empty (`lib/oriPanel.oriPanelShows`). The
   rules (`api/ori_insights.py`, `api/ori_series.py`, pinned by `tests/test_ori_trends.py`):

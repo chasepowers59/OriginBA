@@ -28,6 +28,7 @@ const NAV = [
   { href: "/build", label: "Build", id: "build" as const },
   { href: "/dashboards", label: "Dashboards", id: "custom" as const },
   { href: "/reports", label: "Library", id: "reports" as const },
+  { href: "/forecasts", label: "Forecasts", id: "forecasts" as const },
   { href: "/letters", label: "Letters", id: "letters" as const, permission: "letters:read" },
   { href: "/database", label: "SQL", id: "database" as const },
   { href: "/data-quality", label: "Data Quality", id: "dq" as const },
@@ -46,7 +47,7 @@ export function AppShell({
   snapshots: SnapshotSummary[];
   workstreams: WorkstreamGroup[];
   activeId?: string;
-  activeNav?: "home" | "reports" | "build" | "dashboard" | "custom" | "letters" | "database" | "dq" | "settings";
+  activeNav?: "home" | "reports" | "build" | "dashboard" | "custom" | "letters" | "database" | "dq" | "settings" | "forecasts";
   dbConfigured: boolean;
 }) {
   const brand = useBrand();

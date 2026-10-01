@@ -7,7 +7,7 @@ import { formatCurrency, formatMonth, formatNumber, valueAxis } from "@/lib/form
 import { ORI } from "@/lib/ori";
 import { FORECAST_FRAME, forecastRows, type ForecastRow } from "@/lib/oriPanel";
 
-// One series, one hue: the actual line, its dashed projection and the likely band are all --chart-1.
+// One series, one hue: the actual line, its dashed forecast and the likely band are all --chart-1.
 const HUE = "var(--chart-1)";
 
 function ForecastTooltip({
@@ -21,7 +21,7 @@ function ForecastTooltip({
   return (
     <div className="chart-tooltip pointer-events-none min-w-[140px] rounded-xl px-3 py-2 ring-1 ring-black/5 dark:ring-white/10">
       <p className="text-xs font-medium text-[var(--tooltip-muted)]">
-        {formatMonth(row.month)} · {actual ? ORI.actual : ORI.projection}
+        {formatMonth(row.month)} · {actual ? ORI.actual : ORI.forecast}
       </p>
       <p className="mt-1 text-base font-bold tabular-nums leading-none text-[var(--tooltip-text)]">
         {formatValue(actual ? row.actual : row.projected)}
@@ -35,8 +35,8 @@ function ForecastTooltip({
   );
 }
 
-/** The actual months as a solid line, the projection dashed on from the last of them, its likely range a light band. */
-export function OriForecastChart({ forecast }: { forecast: OriForecast }) {
+/** The actual months as a solid line, the forecast dashed on from the last of them, its likely range a light band. */
+export function OriForecastChart({ forecast, height = 140 }: { forecast: OriForecast; height?: number }) {
   const rows = forecastRows(forecast);
   const currency = forecast.format === "currency";
   const formatValue = currency ? formatCurrency : formatNumber;
@@ -46,7 +46,7 @@ export function OriForecastChart({ forecast }: { forecast: OriForecast }) {
   );
 
   return (
-    <ChartContainer config={{}} style={{ height: 140 }} className="w-full min-w-0" role="img" aria-label={ORI.forecastChart(forecast.label)}>
+    <ChartContainer config={{}} style={{ height }} className="w-full min-w-0" role="img" aria-label={ORI.forecastChart(forecast.label)}>
       <ComposedChart data={rows} margin={FORECAST_FRAME.margin}>
         <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />
         <XAxis

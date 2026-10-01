@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
 import { config, middleware } from "./middleware";
@@ -57,6 +59,19 @@ describe("app routes are not tenant slugs", () => {
     const res = signedIn("/letters");
     expect(res.headers.get("location")).toBeNull();
     expect(res.headers.get("x-middleware-next")).toBe("1");
+  });
+
+  it("opens every top-level page in src/app for a signed-in person", () => {
+    // /forecasts shipped without its entry (2026-10-01); every page folder is checked, not a list
+    const app = path.join(__dirname, "app");
+    const pages = fs.readdirSync(app, { withFileTypes: true })
+      .filter((d) => d.isDirectory() && !d.name.startsWith("[") && !d.name.startsWith("(") && d.name !== "api"
+        && fs.existsSync(path.join(app, d.name, "page.tsx")))
+      .map((d) => `/${d.name}`);
+    expect(pages).toContain("/forecasts");
+    for (const page of pages) {
+      expect(signedIn(page).headers.get("location"), `${page} is missing from APP_ROUTES`).toBeNull();
+    }
   });
 
   it("still treats an unknown single segment as a tenant landing", () => {

@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { describeRules, isRestricted, parseRuleInput, visibleNav } from "./rowRules";
 
-const nav = [{ id: "home" }, { id: "database" }, { id: "dq" }, { id: "reports" }];
+const nav = [{ id: "home" }, { id: "database" }, { id: "dq" }, { id: "reports" }, { id: "forecasts" }];
 
 describe("row rules in the interface", () => {
   it("a restricted person is not offered what runs SQL the portal cannot restrict", () => {
     expect(visibleNav(nav, { row_rules: [{ field: "Service Type", values: ["Water"] }] }).map((n) => n.id))
       .toEqual(["home", "reports"]);
-    expect(visibleNav(nav, { row_rules: [] }).map((n) => n.id)).toEqual(["home", "database", "dq", "reports"]);
+    expect(visibleNav(nav, { row_rules: [] }).map((n) => n.id)).toEqual(["home", "database", "dq", "reports", "forecasts"]);
     expect(isRestricted(null)).toBe(false);
   });
 

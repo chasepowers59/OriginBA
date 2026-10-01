@@ -2,8 +2,9 @@ import { test, expect, type Page } from "@playwright/test";
 import { asOrg } from "./org";
 
 /**
- * Ori's read on home: the brief, what is worth investigating (large moves in the home cards and
- * unusual months), and where each card is heading, each with a one-click question to Ori. Both
+ * Ori's read on home: the brief and what is worth investigating (large moves in the home cards and
+ * unusual months), each with a one-click question to Ori; forecasts get one line each on home and
+ * their own page with the charts and how they are made (2026-10-01, Chase: say "forecast"). Both
  * responses are stubbed so the test does not depend on Ellensburg's data moving this month (the
  * rules are pinned in tests/test_ori_insights.py and tests/test_ori_trends.py).
  */
@@ -38,7 +39,7 @@ const FORECAST = {
   total: 12_600_000, total_low: 11_700_000, total_high: 13_500_000, typical_error_pct: 6.2, checks: 24,
   headline: "Billed revenue: about $12,600,000.00 over Jun to Aug 2026",
   detail: "Likely between $11,700,000.00 and $13,500,000.00.",
-  question: "What is driving the billed revenue projection for Jun to Aug 2026?",
+  question: "What is driving the billed revenue forecast for Jun to Aug 2026?",
 };
 
 async function stubOri(page: Page, read: object, trends: object) {
@@ -64,16 +65,33 @@ test("home shows Ori's read and hands a finding's question to Ori", async ({ pag
   await expect(page.getByRole("region", { name: "Ask Ori" }).getByText(FINDING.question)).toBeVisible();
 });
 
-test("where it's heading: the projection, its chart, and a question to Ori", async ({ page }) => {
+test("home lists each forecast in one line and leads to the Forecasts page", async ({ page }) => {
   await stubOri(page, { findings: [] }, { through: "2026-05", anomalies: [], forecasts: [FORECAST] });
   await page.goto("/");
-  const heading = page.getByRole("region", { name: "Where it's heading" });
-  await expect(heading.getByText(FORECAST.headline)).toBeVisible();
-  await expect(heading.getByRole("img", { name: "Billed revenue by month: actual, then projected" })).toBeVisible();
-  await expect(heading.locator(".recharts-line")).toHaveCount(2);
-  await expect(heading.getByText("A projection from past months, not a promise.")).toBeVisible();
-  await heading.getByRole("button", { name: "Ask Ori about this" }).click();
+  const forecasts = page.getByRole("region", { name: "Ori's read" }).getByRole("region", { name: "Forecasts" });
+  await expect(forecasts.getByText(FORECAST.headline)).toBeVisible();
+  await expect(forecasts.getByRole("img")).toHaveCount(0);   // the charts live on the Forecasts page
+  await forecasts.getByRole("link", { name: /See all forecasts/ }).click();
+  await expect(page).toHaveURL(/\/forecasts$/);
+});
+
+test("the Forecasts page: each forecast, its chart, how it is made, and a question to Ori", async ({ page }) => {
+  await stubOri(page, { findings: [] }, { through: "2026-05", anomalies: [], forecasts: [FORECAST] });
+  await page.goto("/forecasts");
+  await expect(page.getByRole("heading", { name: "Forecasts", level: 1 })).toBeVisible();
+  await expect(page.getByText(/whichever was more accurate on your own past months/)).toBeVisible();
+  const item = page.getByRole("region", { name: FORECAST.headline });
+  await expect(item.getByRole("img", { name: "Billed revenue by month: actual, then forecast" })).toBeVisible();
+  await expect(item.locator(".recharts-line")).toHaveCount(2);
+  await expect(page.getByText("A forecast from past months, not a promise.")).toBeVisible();
+  await item.getByRole("button", { name: "Ask Ori about this" }).click();
   await expect(page.getByRole("region", { name: "Ask Ori" }).getByText(FORECAST.question)).toBeVisible();
+});
+
+test("the Forecasts page says why when no forecast is accurate enough to show", async ({ page }) => {
+  await stubOri(page, { findings: [] }, { through: "2026-05", anomalies: [], forecasts: [] });
+  await page.goto("/forecasts");
+  await expect(page.getByText(/No forecast is accurate enough to show/)).toBeVisible();
 });
 
 test("while the trends load Ori says it is looking; a failed trends request shows nothing for them", async ({ page }) => {
@@ -90,7 +108,7 @@ test("while the trends load Ori says it is looking; a failed trends request show
   release();
   await expect(panel.getByRole("status")).toHaveCount(0);
   await expect(panel.getByText(FINDING.headline)).toBeVisible();
-  await expect(panel.getByRole("region", { name: "Where it's heading" })).toHaveCount(0);
+  await expect(panel.getByRole("region", { name: "Forecasts" })).toHaveCount(0);
 });
 
 test("nothing to say, no panel", async ({ page }) => {
@@ -101,7 +119,7 @@ test("nothing to say, no panel", async ({ page }) => {
   await expect(page.getByRole("region", { name: "Ori found something worth investigating" })).toHaveCount(0);
 });
 
-test("a workstream page reads its own cards, with no projections", async ({ page }) => {
+test("a workstream page reads its own cards, with no forecasts", async ({ page }) => {
   const asked: string[] = [];
   await page.route("**/portal/ori/findings?workstream=billing", (route) =>
     route.fulfill({ json: { findings: [FINDING], brief: BRIEF } }));
@@ -113,7 +131,7 @@ test("a workstream page reads its own cards, with no projections", async ({ page
   const panel = page.getByRole("region", { name: "Ori's read" });
   await expect(panel.getByText(BRIEF)).toBeVisible({ timeout: 60_000 });
   await expect(panel.getByText(FINDING.headline)).toBeVisible();
-  await expect(page.getByRole("region", { name: "Where it's heading" })).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Forecasts" })).toHaveCount(0);
   expect(asked).toEqual([]);
 });
 

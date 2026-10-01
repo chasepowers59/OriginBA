@@ -209,7 +209,7 @@ def forecasts(history: dict[str, list[dict[str, Any]]], meta: dict[str, dict[str
             "detail": f"Likely between {_approx(low, fmt)} and {_approx(high, fmt)}. {how}; replayed on past "
                       f"months, its three-month total was off by {typical:.0f}% in a typical case "
                       f"({len(totals)} checks).",
-            "question": f"What is driving the {_lower_first(label)} projection for {span}?",
+            "question": f"What is driving the {_lower_first(label)} forecast for {span}?",
         })
     return out
 
@@ -250,8 +250,8 @@ def brief(summary: dict[str, Any]) -> str | None:
 def grounding(kind: str, kpi_id: str, history: dict[str, list[dict[str, Any]]],
               meta: dict[str, dict[str, Any]]) -> str | None:
     """What Ori showed for one item, restated for the assistant from the same history. Without
-    it a question about a projection reached a model told never to state a figure no data set
-    holds, and it answered that no projection exists (2026-10-01)."""
+    it a question about a forecast reached a model told never to state a figure no data set
+    holds, and it answered that no forecast exists (2026-10-01)."""
     if kpi_id not in history or kpi_id not in meta:
         return None
     one = {kpi_id: history[kpi_id]}
@@ -262,7 +262,7 @@ def grounding(kind: str, kpi_id: str, history: dict[str, list[dict[str, Any]]],
         f, fmt = found[0], meta[kpi_id]["format"]
         months = "; ".join(f"{_month_label(p['month'])} about {_approx(p['value'], fmt)} "
                            f"(likely {_approx(p['low'], fmt)} to {_approx(p['high'], fmt)})" for p in f["forecast"])
-        return (f"Ori's projection shown on Home, computed by the portal from the monthly history of the "
+        return (f"Ori's forecast on the Forecasts page, computed by the portal from the monthly history of the "
                 f"{f['label']} card through {_month_label(history[kpi_id][-1]['month'])} (it is not a data set): "
                 f"{f['headline']}. {f['detail']} By month: {months}. Explain what drives it from that history "
                 f"(query the months it is built on); it is an estimate, not a figure in the data.")
