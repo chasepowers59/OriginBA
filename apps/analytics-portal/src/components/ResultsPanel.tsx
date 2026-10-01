@@ -12,6 +12,7 @@ import {
   formatPercent,
   formatDateTime,
 } from "@/lib/format";
+import { exportAbout, exportNote } from "@/lib/exportAbout";
 import { EmptyStateIcon } from "@/components/EmptyStateIcon";
 import {
   kpiLabelsForMeasure,
@@ -203,17 +204,30 @@ export function ResultsPanel({
       return out;
     });
     downloadWorkbook(
-      [{ name: reportTitle ?? snapshotLabel ?? snapshotId, columns: friendlyHeaders, rows: labeledRows }],
+      [{ name: reportTitle ?? snapshotLabel ?? snapshotId, columns: friendlyHeaders, rows: labeledRows },
+       // what the rows are: report, filters, and whether the list is cut (lib/exportAbout)
+       { name: "About this export", columns: ["Field", "Value"], rows: exportAbout(exportContext()) }],
       `${snapshotId}_analysis.xlsx`,
     );
   };
+
+  const exportContext = () => ({
+    title: reportTitle ?? snapshotLabel ?? snapshotId,
+    dataSet: snapshotLabel ?? snapshotId,
+    period: periodLabel ?? null,
+    disclosure,
+    rowCount: result.row_count,
+    total: summary?.total == null ? null : formatMeasure(summary.total),
+    truncated: result.truncated,
+    exportedAt: formatDateTime(new Date()),
+  });
 
   const handlePdf = async () => {
     setPdfState("Preparing…");
     try {
       await downloadPdf({
         title: reportTitle ?? snapshotLabel ?? snapshotId,
-        note: [periodLabel, dateRange ? `${formatDate(dateRange[0])} to ${formatDate(dateRange[1])}` : null].filter(Boolean).join(" · "),
+        note: exportNote(exportContext()),
         columns: result.columns,
         labels: Object.fromEntries(result.columns.map((c) => [c, columnLabels[c] ?? prettifyFieldName(c)])),
         rows: result.rows,
