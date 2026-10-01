@@ -11,10 +11,12 @@ import json
 from pathlib import Path
 
 CAPABILITIES_PATH = Path(__file__).resolve().parent.parent / "config" / "client_capabilities.json"
-MODULES = ("letters", "budget_billing")
+MODULES = ("letters", "budget_billing", "billable_charges")
 # A library folder that IS a module: its reports filter on the module's population, so where
 # the client has none they open empty (every Budget Billing report filters "Is On Budget").
 FOLDER_MODULES = {"budget_billing": "budget_billing"}
+# A canvas that IS a module: every report on it is empty where the client never used it.
+CANVAS_MODULES = {"rpt_billable_charge": "billable_charges"}
 
 
 def _features(organization_id: str | None) -> dict:
@@ -38,13 +40,15 @@ def modules_for_organization(organization_id: str | None) -> dict[str, bool]:
 
 
 def hide_unused_reports(library: dict, organization_id: str | None) -> dict:
-    """Drop the folders of modules this client does not use, and their reports from packs."""
+    """Drop the folders and canvases of modules this client does not use, from folders and packs."""
     off = {f for f, m in FOLDER_MODULES.items() if not module_enabled(organization_id, m)}
-    if not off:
+    off_canvases = {c for c, m in CANVAS_MODULES.items() if not module_enabled(organization_id, m)}
+    if not off and not off_canvases:
         return library
     key = lambda c: (c.get("snapshot_id"), c.get("report_id"))
     gone = {key(c) for f in library.get("folders") or [] if f.get("id") in off for c in f.get("reports") or []}
-    packs = [{**p, "reports": [c for c in p.get("reports") or [] if key(c) not in gone]}
-             for p in library.get("packs") or []]
-    return {**library, "packs": [p for p in packs if p["reports"]],
-            "folders": [f for f in library.get("folders") or [] if f.get("id") not in off]}
+    keep = lambda c: key(c) not in gone and c.get("snapshot_id") not in off_canvases
+    narrowed = lambda groups: [g for g in ({**g, "reports": [c for c in g.get("reports") or [] if keep(c)]}
+                                           for g in groups if g.get("id") not in off) if g["reports"]]
+    return {**library, "packs": narrowed(library.get("packs") or []),
+            "folders": narrowed(library.get("folders") or [])}

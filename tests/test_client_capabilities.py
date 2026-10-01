@@ -29,7 +29,8 @@ from api.letters import routes  # noqa: E402
 from api.portal_config import config_for_organization  # noqa: E402
 
 MEASURED = {
-    "odessa": {"portal_org_id": "odessa", "features": {"letters": False, "budget_billing": False}},
+    "odessa": {"portal_org_id": "odessa", "features": {"letters": False, "budget_billing": False,
+                                                        "billable_charges": False}},
     "fond_du_lac": {"portal_org_id": "fond_du_lac", "features": {"letters": True}},
     "newark": {"portal_org_id": "newark", "features": {"letters": None}},
     "unreached": {"last_error": "DPY-6005"},
@@ -62,7 +63,7 @@ class CapabilityTests(unittest.TestCase):
     def test_the_portal_config_carries_the_switches(self):
         with mock.patch("api.portal_config.get_organization", return_value={"display_name": "Odessa"}):
             self.assertEqual(config_for_organization("odessa")["modules"],
-                             {"letters": False, "budget_billing": False})
+                             {"letters": False, "budget_billing": False, "billable_charges": False})
 
     def test_the_library_drops_reports_of_a_module_the_client_does_not_use(self):
         card = lambda i: {"snapshot_id": "rpt_x", "report_id": i}
@@ -73,6 +74,14 @@ class CapabilityTests(unittest.TestCase):
         self.assertEqual([f["id"] for f in kept["folders"]], ["billing_revenue"])
         self.assertEqual([c["report_id"] for c in kept["packs"][0]["reports"]], ["billed"])
         self.assertEqual(caps.hide_unused_reports(library, "fond_du_lac"), library)
+
+    def test_a_canvas_the_client_never_used_drops_its_reports_wherever_they_sit(self):
+        # CityCorp and Odessa never created a billable charge (CI_BILL_CHG: 0 rows)
+        library = {"packs": [], "folders": [{"id": "billing_revenue", "reports": [
+            {"snapshot_id": "rpt_billable_charge", "report_id": "billable_charges"},
+            {"snapshot_id": "rpt_bill", "report_id": "bills_by_status"}]}]}
+        kept = caps.hide_unused_reports(library, "odessa")
+        self.assertEqual([c["report_id"] for c in kept["folders"][0]["reports"]], ["bills_by_status"])
 
     def test_the_letters_api_refuses_a_client_that_does_not_use_letters(self):
         app = FastAPI()
