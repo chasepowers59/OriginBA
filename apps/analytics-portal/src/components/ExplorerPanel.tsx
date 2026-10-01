@@ -40,6 +40,8 @@ import { POPOVER_PANEL, usePopover } from "@/lib/popover";
 import { FavoritesPanel } from "./FavoritesPanel";
 import { GlobalFilterBar } from "./GlobalFilterBar";
 import { ResultsPanel } from "./ResultsPanel";
+import { CompareSummary } from "./CompareSummary";
+import { canCompare, priorWindow } from "@/lib/periodCompare";
 import { ScopeFilterSelect } from "./ScopeFilterSelect";
 import { SnapshotDataModelPanel } from "./SnapshotDataModelPanel";
 import { VisibilityToggle } from "./VisibilityToggle";
@@ -125,6 +127,10 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<QueryResponse | null>(null);
+  // the same question over the previous window of equal length, when the reader asks for it
+  const [compare, setCompare] = useState(false);
+  const [prior, setPrior] = useState<{ result: QueryResponse; range: [string, string] } | null>(null);
+  const [comparing, setComparing] = useState(false);
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [favoriteApplied, setFavoriteApplied] = useState(false);
   const [openAbout, setOpenAbout] = useState<string | null>(null);
@@ -209,12 +215,12 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     // nothing -- the query ran unwindowed and the reader had no way to tell. A canvas
     // with no date at all (the price list, asset locations) gets no window, which is
     // correct: a transaction window means nothing on a dimension table.
-    (report: PremadeReport) =>
+    (report: PremadeReport, range?: [string, string]) =>
       explorerQuery({
         dateField: resolveDateField(metadata),
         allDates,
-        dateStart,
-        dateEnd,
+        dateStart: range?.[0] ?? dateStart,
+        dateEnd: range?.[1] ?? dateEnd,
         reportFilters: report.filters,
         scope: { field: scopeField, value: scopeValue },
         drill: drillFilter,
@@ -262,6 +268,13 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
       const run = new AbortController();
       abortRef.current = run;
       try {
+        const priorRange = compare && canCompare({ allDates, dateField: resolveDateField(metadata), measures: report.measures })
+          ? priorWindow(dateStart, dateEnd) : null;
+        // Asked at the same time, but the report never waits for it: a cold previous window on a
+        // multi-million-row data set takes 15-20 s (Ellensburg rpt_bill_segment, 2026-10-01).
+        const priorPromise = priorRange
+          ? runSnapshotQuery(metadata.id, buildQuery(report, priorRange), run.signal).catch(() => null)
+          : null;
         const response = await runSnapshotQuery(metadata.id, buildQuery(report), run.signal);
         const fallBack = fallBackToAllDates({
           rowCount: response.row_count,
@@ -277,7 +290,18 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
           return;
         }
         setResult(response);
+        setPrior(null);
         shownRef.current = shown;
+        if (priorPromise && priorRange) {
+          setComparing(true);
+          void priorPromise.then((priorResponse) => {
+            if (run.signal.aborted) return;
+            setPrior(priorResponse ? { result: priorResponse, range: priorRange } : null);
+            setComparing(false);
+          });
+        } else {
+          setComparing(false);
+        }
       } catch (err) {
         if (run.signal.aborted) return;
         setError(err instanceof Error ? err.message : "Unable to run this report");
@@ -289,7 +313,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
         }
       }
     },
-    [metadata, allDates, activePreset, activeReportId, buildQuery, showReport],
+    [metadata, allDates, activePreset, activeReportId, buildQuery, showReport, compare, dateStart, dateEnd],
   );
 
   const cancelRun = () => {
@@ -416,7 +440,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
     const fromFavorite = !linked && report.id === favorite;
     if (fromFavorite) favoriteRun.current = favorite;
     runPremade(report, { keepWindow: fromFavorite });
-  }, [allDates, dateStart, dateEnd, scopeField, scopeValue, drillFilter, metadata.id, tab, favoriteReportId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [allDates, dateStart, dateEnd, scopeField, scopeValue, drillFilter, metadata.id, tab, favoriteReportId, compare]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeReport = premadeReports.find((r) => r.id === activeReportId) ?? null;
 
@@ -650,6 +674,12 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
               </button>
             ) : null}
           </div>
+          {activeReport && canCompare({ allDates, dateField: resolvedDateField, measures: activeReport.measures }) ? (
+            <label className="mb-3 flex items-center gap-2 text-xs text-fg-muted">
+              <input type="checkbox" checked={compare} onChange={(e) => setCompare(e.target.checked)} />
+              Compare with the previous period
+            </label>
+          ) : null}
           <div className="grid grid-cols-2 gap-2">
             <label className="block text-xs text-fg-muted">
               Start date
@@ -720,6 +750,13 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
             <div className="loading-shimmer h-64 rounded-xl" />
           </div>
         ) : (
+          <>
+          {result && prior && !loading ? (
+            <CompareSummary current={result} prior={prior.result} priorRange={prior.range}
+              dimensionKey={dimensionKey} measureKey={measureKey} measureField={measureField} measureAgg={measureAgg} />
+          ) : result && comparing && !loading ? (
+            <p role="status" className="glass-panel px-5 py-3 text-sm text-fg-muted">Comparing with the previous period…</p>
+          ) : null}
           <ResultsPanel
             result={result}
             dimensionKey={dimensionKey}
@@ -782,6 +819,7 @@ export function ExplorerPanel({ metadata }: ExplorerPanelProps) {
               </SaveMenu>
             }
           />
+          </>
         )}
         {/* Always mounted, so a screen reader hears the running count and a cancel. */}
         <p role="status" aria-live="polite" className="sr-only">
