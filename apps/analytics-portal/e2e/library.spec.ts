@@ -53,7 +53,7 @@ test("a folder opens as a dashboard, and a canvas of what exists now is not wind
   });
   await page.goto("/reports?folder=budget_billing");
   await page.getByRole("link", { name: "Make a dashboard" }).click();
-  await expect(page).toHaveURL(/\/dashboards\/new$/);
+  await expect(page).toHaveURL(/\/dashboards\/new$/, { timeout: 30_000 });   // a cold dev server compiles the page first
   await expect(page.getByText("Who is on budget billing, by customer class?")).toBeVisible();
   await expect(page.getByText("All dates").first()).toBeVisible();
   await expect.poll(() => windows.size, { timeout: 30_000 }).toBeGreaterThanOrEqual(3);

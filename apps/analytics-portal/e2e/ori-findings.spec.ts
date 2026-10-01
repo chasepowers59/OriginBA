@@ -161,7 +161,7 @@ test("switching workstreams never shows the previous page's read", async ({ page
   await expect(page.getByText("Billing read.")).toBeVisible({ timeout: 60_000 });
   // an in-app move keeps the page component mounted, as the library's links do
   await page.evaluate(() => (window as unknown as { next: { router: { push: (u: string) => void } } }).next.router.push("/workstream/finance"));
-  await expect(page).toHaveURL(/workstream\/finance/);
+  await expect(page).toHaveURL(/workstream\/finance/, { timeout: 30_000 });
   await expect(page.getByText("Billing read.")).toHaveCount(0);
   await expect(page.getByText("Finance read.")).toBeVisible({ timeout: 60_000 });
 });

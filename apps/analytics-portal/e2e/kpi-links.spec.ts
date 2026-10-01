@@ -22,7 +22,7 @@ for (const [ws, label] of [["billing", "Billed amount"], ["debt", "Accounts rece
     const answered = page.waitForResponse((r) => r.url().includes("/query") && r.request().method() === "POST" && r.ok(), { timeout: 120_000 });
     await page.locator(".glass-panel").filter({ has: page.getByRole("heading", { name: label, exact: true }) })
       .getByRole("link", { name: /comes from|full report/ }).first().click({ timeout: 120_000 });
-    await expect(page).toHaveURL(/\/build\?question=/);
+    await expect(page).toHaveURL(/\/build\?question=/, { timeout: 30_000 });   // a cold dev server compiles /build first
     const rows = (await (await answered).json()).rows as Record<string, number>[];
     expect(rows).toHaveLength(1);
     expect(Math.abs(Number(rows[0].m0) - card.value)).toBeLessThan(0.005);
