@@ -11,7 +11,10 @@ import json
 from pathlib import Path
 
 CAPABILITIES_PATH = Path(__file__).resolve().parent.parent / "config" / "client_capabilities.json"
-MODULES = ("letters",)
+MODULES = ("letters", "budget_billing")
+# A library folder that IS a module: its reports filter on the module's population, so where
+# the client has none they open empty (every Budget Billing report filters "Is On Budget").
+FOLDER_MODULES = {"budget_billing": "budget_billing"}
 
 
 def _features(organization_id: str | None) -> dict:
@@ -32,3 +35,16 @@ def module_enabled(organization_id: str | None, module: str) -> bool:
 def modules_for_organization(organization_id: str | None) -> dict[str, bool]:
     features = _features(organization_id)
     return {m: features.get(m) is not False for m in MODULES}
+
+
+def hide_unused_reports(library: dict, organization_id: str | None) -> dict:
+    """Drop the folders of modules this client does not use, and their reports from packs."""
+    off = {f for f, m in FOLDER_MODULES.items() if not module_enabled(organization_id, m)}
+    if not off:
+        return library
+    key = lambda c: (c.get("snapshot_id"), c.get("report_id"))
+    gone = {key(c) for f in library.get("folders") or [] if f.get("id") in off for c in f.get("reports") or []}
+    packs = [{**p, "reports": [c for c in p.get("reports") or [] if key(c) not in gone]}
+             for p in library.get("packs") or []]
+    return {**library, "packs": [p for p in packs if p["reports"]],
+            "folders": [f for f in library.get("folders") or [] if f.get("id") not in off]}

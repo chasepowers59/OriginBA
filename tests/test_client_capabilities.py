@@ -29,7 +29,7 @@ from api.letters import routes  # noqa: E402
 from api.portal_config import config_for_organization  # noqa: E402
 
 MEASURED = {
-    "odessa": {"portal_org_id": "odessa", "features": {"letters": False}},
+    "odessa": {"portal_org_id": "odessa", "features": {"letters": False, "budget_billing": False}},
     "fond_du_lac": {"portal_org_id": "fond_du_lac", "features": {"letters": True}},
     "newark": {"portal_org_id": "newark", "features": {"letters": None}},
     "unreached": {"last_error": "DPY-6005"},
@@ -61,7 +61,18 @@ class CapabilityTests(unittest.TestCase):
 
     def test_the_portal_config_carries_the_switches(self):
         with mock.patch("api.portal_config.get_organization", return_value={"display_name": "Odessa"}):
-            self.assertEqual(config_for_organization("odessa")["modules"], {"letters": False})
+            self.assertEqual(config_for_organization("odessa")["modules"],
+                             {"letters": False, "budget_billing": False})
+
+    def test_the_library_drops_reports_of_a_module_the_client_does_not_use(self):
+        card = lambda i: {"snapshot_id": "rpt_x", "report_id": i}
+        library = {"packs": [{"id": "p", "reports": [card("budget_who"), card("billed")]}],
+                   "folders": [{"id": "budget_billing", "reports": [card("budget_who")]},
+                               {"id": "billing_revenue", "reports": [card("billed")]}]}
+        kept = caps.hide_unused_reports(library, "odessa")
+        self.assertEqual([f["id"] for f in kept["folders"]], ["billing_revenue"])
+        self.assertEqual([c["report_id"] for c in kept["packs"][0]["reports"]], ["billed"])
+        self.assertEqual(caps.hide_unused_reports(library, "fond_du_lac"), library)
 
     def test_the_letters_api_refuses_a_client_that_does_not_use_letters(self):
         app = FastAPI()
