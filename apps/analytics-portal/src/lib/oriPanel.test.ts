@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { OriAnomaly, OriFinding, OriForecast } from "./api";
-import { FORECAST_FRAME, forecastRows, investigations, oriPanelShows } from "./oriPanel";
+import { FORECAST_FRAME, forecastRows, investigations, oriAsk, oriPanelShows } from "./oriPanel";
 
 const FINDING: OriFinding = {
   kpi_id: "billed_revenue", change_pct: -17.9,
@@ -70,7 +70,7 @@ describe("what Ori found worth investigating", () => {
   });
 
   it("keeps each item's question for Ori", () => {
-    expect(investigations([FINDING], [ANOMALY]).map((i) => i.question)).toEqual([FINDING.question, ANOMALY.question]);
+    expect(investigations([FINDING], [ANOMALY]).map((i) => i.ask.question)).toEqual([FINDING.question, ANOMALY.question]);
   });
 
   it("keys stay unique when one measure has both a move and an unusual month", () => {
@@ -116,5 +116,24 @@ describe("the forecast chart's frame", () => {
   it("lifts the lowest value tick off the month labels", () => {
     expect(FORECAST_FRAME.valuePadding.bottom).toBeGreaterThanOrEqual(6);
     expect(FORECAST_FRAME.margin.bottom).toBeGreaterThanOrEqual(4);
+  });
+});
+
+// "Ask Ori about this" on a projection sent the bare question and Ori denied the projection
+// existed (2026-10-01). The ask now names the item; the server restates its figures.
+describe("asking Ori about one of its own items", () => {
+  it("a projection names its data set and itself", () => {
+    const ask = oriAsk({ ...FORECAST, snapshot_id: "rpt_payment" }, "forecast");
+    expect(ask.question).toBe(FORECAST.question);
+    expect(ask.context).toMatchObject({ canvas_id: "rpt_payment", ori_item: { kind: "forecast", kpi_id: "billed_revenue" } });
+  });
+
+  it("an unusual month names itself", () => {
+    const ask = oriAsk({ ...ANOMALY, snapshot_id: "rpt_bill_segment" }, "anomaly");
+    expect(ask.context?.ori_item).toEqual({ kind: "anomaly", kpi_id: "billed_revenue" });
+  });
+
+  it("without a data set the question goes alone", () => {
+    expect(oriAsk(FORECAST, "forecast").context).toBeNull();
   });
 });

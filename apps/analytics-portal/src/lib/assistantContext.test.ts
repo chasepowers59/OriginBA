@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { contextLabel, explainQuestion, getPageContext, loadTurns, requestAsk, saveTurns, setPageContext, subscribeAsk, subscribePageContext, takeAsk } from "./assistantContext";
+import { askPayload, contextLabel, explainQuestion, getPageContext, loadTurns, requestAsk, saveTurns, setPageContext, subscribeAsk, subscribePageContext, takeAsk } from "./assistantContext";
 
 describe("the page the assistant is asked from", () => {
   it("is published by the page and heard by the panel", () => {
@@ -49,5 +49,13 @@ describe("asking from somewhere else on the page", () => {
     expect(q).toContain("$3,660,439.03");
     expect(q).toContain("Collected on frozen pay segments");
     expect(q).toContain("Last 30 days to 18 Jun 2026");
+  });
+});
+
+describe("what the panel sends about the page", () => {
+  it("keeps Ori's item and drops the display label", () => {
+    expect(askPayload({ canvas_id: "rpt_payment", label: "Payment", ori_item: { kind: "forecast", kpi_id: "pay" } }))
+      .toEqual({ canvas_id: "rpt_payment", period: undefined, filters: undefined, ori_item: { kind: "forecast", kpi_id: "pay" } });
+    expect(askPayload(null)).toBeNull();
   });
 });

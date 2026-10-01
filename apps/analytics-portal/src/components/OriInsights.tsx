@@ -4,14 +4,12 @@ import { useEffect, useState } from "react";
 import { fetchOriFindings, fetchOriTrends, type OriRead, type OriTrends } from "@/lib/api";
 import { requestAsk } from "@/lib/assistantContext";
 import { ORI } from "@/lib/ori";
-import { investigations, oriPanelShows } from "@/lib/oriPanel";
+import { investigations, oriAsk, oriPanelShows } from "@/lib/oriPanel";
 import { OriForecastChart } from "@/components/OriForecastChart";
 import { OriMark } from "@/components/OriMark";
 
 const NO_READ: OriRead = { findings: [] };
 const NO_TRENDS: OriTrends = { through: "", anomalies: [], forecasts: [] };
-
-const ask = (question: string) => requestAsk({ question, context: null });
 
 /**
  * Ori's read on home (and, with `workstream`, on that page from its own cards): a brief of the period, what is worth investigating (large moves against the
@@ -57,7 +55,7 @@ export function OriInsights({ workstream }: { workstream?: string } = {}) {
                   <p className="text-sm font-medium text-heading">{item.headline}</p>
                   <p className="text-sm tabular-nums text-fg-muted">{item.detail}</p>
                 </div>
-                <button type="button" className="btn-ghost shrink-0 text-xs" onClick={() => ask(item.question)}>
+                <button type="button" className="btn-ghost shrink-0 text-xs" onClick={() => requestAsk(item.ask)}>
                   {ORI.askWhy}
                 </button>
               </li>
@@ -75,7 +73,7 @@ export function OriInsights({ workstream }: { workstream?: string } = {}) {
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-heading">{f.headline}</p>
                   <p className="mt-0.5 text-sm tabular-nums text-fg-muted">{f.detail}</p>
-                  <button type="button" className="btn-ghost mt-3 text-xs" onClick={() => ask(f.question)}>
+                  <button type="button" className="btn-ghost mt-3 text-xs" onClick={() => requestAsk(oriAsk(f, "forecast"))}>
                     {ORI.askAbout}
                   </button>
                 </div>

@@ -629,7 +629,7 @@ export type OriRead = { findings: OriFinding[]; brief?: string | null };
 /** A month unusually high or low against the months before it. Months are "YYYY-MM". */
 export type OriAnomaly = {
   kpi_id: string; month: string; direction: "high" | "low";
-  headline: string; detail: string; question: string;
+  headline: string; detail: string; question: string; snapshot_id?: string | null;
 };
 
 /** Where a home card is heading: the actual months, then a projection with its likely range. */
@@ -639,7 +639,7 @@ export type OriForecast = {
   forecast: { month: string; value: number; low: number; high: number }[];
   total: number; total_low: number; total_high: number;
   typical_error_pct: number; checks: number;
-  headline: string; detail: string; question: string;
+  headline: string; detail: string; question: string; snapshot_id?: string | null;
 };
 
 export type OriTrends = { through: string; anomalies: OriAnomaly[]; forecasts: OriForecast[] };

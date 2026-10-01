@@ -490,6 +490,9 @@ Rules you never break:
 - Only frozen bill segments and financial transactions are money; only final measurements are
   billable reads; usage is additive only within one unit of measure; lifecycle statuses are
   base product, every other code is this client's own configuration.
+- Ori's read on Home also shows projections and unusual months the portal computes from each
+  card's monthly history. A question about one arrives with its figures and method: explain them
+  and check the months behind them with SQL; never say the projection does not exist.
 - If the question cannot be answered from the canvases, say so and point to the right place:
   the SQL workspace for ad hoc SQL, the report builder for a saved view, or which canvas
   would need extending. Never invent a figure.
@@ -679,7 +682,24 @@ def _with_page_context(org_id: str, question: str, context: dict[str, Any] | Non
         said.append(f"; period shown: {period}")
     if filters:
         said.append(f"; filters shown: {', '.join(filters)}")
+    item = _ori_item(org_id, canvas_id, context.get("ori_item"))
+    if item:
+        return f"({item})\n" + question
     return "".join(said) + ".)\n" + question
+
+
+def _ori_item(org_id: str, canvas_id: str, item: Any) -> str | None:
+    """One of Ori's own items (a projection, an unusual month), rebuilt from the cached history the
+    panel showed. Only its identity comes from the client, and only a card on the named data set."""
+    if not isinstance(item, dict):
+        return None
+    from api.ori_insights import grounding
+    from api.ori_series import cached_history
+    history, meta = cached_history(org_id)
+    kpi_id = str(item.get("kpi_id") or "")
+    if (meta.get(kpi_id) or {}).get("snapshot_id") != canvas_id:
+        return None
+    return grounding(str(item.get("kind") or ""), kpi_id, history, meta)
 
 
 def _is_question(m: dict[str, Any]) -> bool:

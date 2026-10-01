@@ -9,7 +9,7 @@ import { STARTER_QUESTIONS, WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadl
 import { useAuth } from "@/components/AuthProvider";
 import { ORI } from "@/lib/ori";
 import { OriMark } from "@/components/OriMark";
-import { contextLabel, getPageContext, loadTurns, saveTurns, subscribeAsk, subscribePageContext, takeAsk, type PageContext } from "@/lib/assistantContext";
+import { askPayload, contextLabel, getPageContext, loadTurns, saveTurns, subscribeAsk, subscribePageContext, takeAsk, type PageContext } from "@/lib/assistantContext";
 import { DatabaseResultChart } from "@/components/DatabaseResultChart";
 import type { NlqResponse, AssistantQuery, AssistantResponse, AssistantSpend, AssistantStatus, IntegrityOverview } from "@/lib/types";
 import { parseAnswer, parseInline, type Inline } from "@/lib/answerMarkdown";
@@ -81,10 +81,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
       }
     }
     try {
-      const context = onPage
-        ? { canvas_id: onPage.canvas_id, period: onPage.period, filters: onPage.filters }
-        : null;
-      const response = await askAssistantStream(q, threadFor(turns), context, (e) => {
+      const response = await askAssistantStream(q, threadFor(turns), askPayload(onPage), (e) => {
         if (e.type === "step") {
           setSteps((s) => [...s, { label: stepLabel(e.data), done: false, ok: true }]);
         } else if (e.type === "step_done") {

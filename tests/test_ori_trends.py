@@ -345,3 +345,39 @@ class WarmTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GroundingTests(unittest.TestCase):
+    """"Ask Ori about this" on a projection got "I don't have a payments projection" (2026-10-01):
+    the button sent the bare question, and Ori's rules say a figure not in a data set is not to be
+    invented. The question now carries Ori's own figures and method, rebuilt on the server from
+    the same history the panel showed, so the answer explains the number instead of denying it."""
+
+    meta = {"billed": {"label": "Billed revenue", "format": "currency", "snapshot_id": "rpt_bill_segment"}}
+
+    def test_a_projection_is_restated_with_its_months_range_method_and_record(self):
+        from api.ori_insights import grounding
+        hist = {"billed": series(seasonal(3), start=(2023, 6))}
+        [f] = forecasts(hist, self.meta)
+        text = grounding("forecast", "billed", hist, self.meta)
+        self.assertIn("projection", text)
+        self.assertIn(f["headline"], text)
+        self.assertIn("same months last year", text)
+        for month in ("Jun 2026", "Jul 2026", "Aug 2026"):
+            self.assertIn(month, text)
+        self.assertIn(f"{f['checks']} checks", text)
+        self.assertIn("through May 2026", text)   # the last actual month it is built on
+        self.assertIn("not a data set", text)
+
+    def test_an_unusual_month_is_restated(self):
+        from api.ori_insights import grounding
+        hist = {"billed": series(BASE12 + [153])}
+        text = grounding("anomaly", "billed", hist, self.meta)
+        self.assertIn("unusually low", text)
+
+    def test_nothing_to_restate_is_none(self):
+        from api.ori_insights import grounding
+        hist = {"billed": series(BASE12 + [2000])}
+        self.assertIsNone(grounding("anomaly", "billed", hist, self.meta))
+        self.assertIsNone(grounding("forecast", "nope", hist, self.meta))
+        self.assertIsNone(grounding("brief", "billed", hist, self.meta))
