@@ -116,6 +116,12 @@ scratchpad; June 2026 is the last complete month there, bills stop 2026-09-11):
 | Adjustment / AP requests | Jun 2026 | 609 requests, $86,768.05 |
 | Top Usage Customers (Water, top 10) | 2025 | 348 bills, 254,967 MGW, 5.47% share; #1 = 49,891 MGW, the same as the client's `BSEG_SQ_USAGE_RPT_CURR` |
 
+Server-side timings on College Station test after the fixes below (June 2026; Top Usage 2025;
+the server's own PDF run, queue empty, cache warm): Payments 16 s · AP requests 11 s · GL 22 s
+(was a 600 s timeout) · Billing by Cycle 26 s (19 min cold, until the client adds the index below)
+· Adjustments 32 s (was 160 s) · Top Usage 211 s · Aged Debt 308 s (was over 15 min and failing).
+Origin_DEV (Ellensburg data): every unit under 35 s, Aged Debt 45 s.
+
 What College Station's volume (3.47M bills, 16.5M segments, 35.8M FTs) adds, measured the same day:
 
 - **The first run of a window is disk-bound.** Billing by Cycle for one month is 50,568 bills and
