@@ -1,4 +1,5 @@
-import { test, expect, type APIRequestContext, type Page, type ConsoleMessage } from "@playwright/test";
+import { test, expect, type Page, type ConsoleMessage } from "@playwright/test";
+import { waitForWarm } from "./warm";
 import fs from "node:fs";
 import path from "node:path";
 import { ORG } from "./org";
@@ -122,23 +123,6 @@ async function audit(page: Page) {
       text,
     };
   }, viewportWidth);
-}
-
-/**
- * A page opened while the warmer is still building its organization pays the cold cost of a
- * >1M-row data set and can time out: a false red (CityCorp 2026-10-02, /explore/rpt_bill_segment_read
- * failed in the crawl and passed alone 4 s later; the warm finished one minute after). The crawl
- * waits, bounded, for the organization's last warm before it opens anything.
- */
-async function waitForWarm(request: APIRequestContext, org: string, maxMs = 10 * 60_000): Promise<void> {
-  const t0 = Date.now();
-  while (Date.now() - t0 < maxMs) {
-    const health = await request.get(`${API}/portal/health`).then((r) => (r.ok() ? r.json() : null)).catch(() => null);
-    if (!health) return;                       // warming off, or no health route: crawl as before
-    if (health.warmed?.[org]?.at) return;
-    await new Promise((r) => setTimeout(r, 10_000));
-  }
-  console.warn(`crawl: ${org} not warmed after ${maxMs / 60_000} min; crawling cold`);
 }
 
 for (const org of ORGS) {

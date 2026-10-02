@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { asOrg } from "./org";
+import { asOrg, ORG } from "./org";
+import { waitForWarm } from "./warm";
 import AxeBuilder from "@axe-core/playwright";
 import fs from "node:fs";
 import path from "node:path";
@@ -12,6 +13,8 @@ import path from "node:path";
  */
 const PAGES = ["/", "/reports", "/dashboards", "/dashboards/new", "/build", "/database", "/data-quality", "/settings", "/forecasts",
   "/workstream/billing", "/explore/rpt_bill_segment"];
+
+test.beforeAll(async ({ request }) => { await waitForWarm(request, ORG); });
 
 for (const route of PAGES) {
   test(`accessible: ${route}`, async ({ page, context }, info) => {
