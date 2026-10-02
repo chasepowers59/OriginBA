@@ -614,6 +614,8 @@ export type AssistantQuery = {
 };
 export type AssistantMessage = { role: "user" | "assistant"; content: unknown };
 export type AssistantResponse = {
+  /** The organization this thread belongs to; sent back with a follow-up. */
+  thread_organization?: string | null;
   answer: string;
   steps: AssistantStep[];
   queries: AssistantQuery[];

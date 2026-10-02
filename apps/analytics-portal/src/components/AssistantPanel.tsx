@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { askAssistantStream, createSavedView, fetchAssistantSpend, fetchAssistantStatus, fetchIntegrity, runAnalyticsNlq } from "@/lib/api";
 import { stepLabel } from "@/lib/sse";
 import { exportRowsCsv, formatCurrency, formatNumber } from "@/lib/format";
-import { STARTER_QUESTIONS, WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, savedViewFromSpec, spendLabel, summarise, threadFor, tryGovernedFirst, type Turn } from "@/lib/assistant";
+import { STARTER_QUESTIONS, WORKSPACE_SQL_KEY, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, savedViewFromSpec, spendLabel, summarise, threadFor, threadOrganizationFor, tryGovernedFirst, type Turn } from "@/lib/assistant";
 import { useAuth } from "@/components/AuthProvider";
 import { ORI } from "@/lib/ori";
 import { OriMark } from "@/components/OriMark";
@@ -81,7 +81,7 @@ export function AssistantPanel({ compact }: { compact?: boolean }) {
       }
     }
     try {
-      const response = await askAssistantStream(q, threadFor(turns), askPayload(onPage), (e) => {
+      const response = await askAssistantStream(q, threadFor(turns), threadOrganizationFor(turns), askPayload(onPage), (e) => {
         if (e.type === "step") {
           setSteps((s) => [...s, { label: stepLabel(e.data), done: false, ok: true }]);
         } else if (e.type === "step_done") {

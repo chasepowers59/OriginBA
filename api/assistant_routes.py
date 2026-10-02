@@ -25,6 +25,10 @@ router = APIRouter(prefix="/portal/assistant", tags=["assistant"])
 class AskRequest(BaseModel):
     question: str = Field(min_length=1, max_length=4000)
     thread: list[dict[str, Any]] = Field(default_factory=list)
+    # The organization the thread came from, as the last answer stamped it. A thread sent
+    # back under another organization is dropped: a browser keeps the conversation across the
+    # organization switch (2026-10-02), and no tenant's figures may enter another's context.
+    thread_organization: str | None = None
     # The page the question was asked from: {canvas_id, period, filters}. Optional.
     context: dict[str, Any] | None = None
 
@@ -67,11 +71,18 @@ def _model_api_failure(exc: Exception) -> str | None:
     return f"The model API failed ({type(exc).__name__}): {said[:300]}"
 
 
+def scoped_thread(thread: list[dict[str, Any]], stamped: str | None, org_id: str) -> list[dict[str, Any]]:
+    """The thread to continue: only one stamped with this organization. Unstamped is untrusted."""
+    return thread if thread and stamped == org_id else []
+
+
 @router.post("")
 def ask(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     assistant = _assistant_for(ctx)
+    org_id = require_org_for_data(ctx)
+    thread = scoped_thread(body.thread, body.thread_organization, org_id)
     try:
-        return assistant.ask(body.question, body.thread, body.context)
+        return {**assistant.ask(body.question, thread, body.context), "thread_organization": org_id}
     except Exception as exc:  # noqa: BLE001 -- the model API is an external dependency
         detail = _model_api_failure(exc)
         if detail:
@@ -84,12 +95,14 @@ def ask_streaming(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)
     """The same question as POST, as server-sent events: a `step` and `step_done` per tool
     call while the model works, then one `answer` (the POST body) or one `error`."""
     assistant = _assistant_for(ctx)
+    org_id = require_org_for_data(ctx)
+    thread = scoped_thread(body.thread, body.thread_organization, org_id)
     events: queue.Queue = queue.Queue()
 
     def work() -> None:
         try:
-            result = assistant.ask(body.question, body.thread, body.context, on_event=events.put)
-            events.put({"type": "answer", **result})
+            result = assistant.ask(body.question, thread, body.context, on_event=events.put)
+            events.put({"type": "answer", **result, "thread_organization": org_id})
         except Exception as exc:  # noqa: BLE001
             events.put({"type": "error", "detail": _model_api_failure(exc) or "Ori could not answer."})
         events.put(None)

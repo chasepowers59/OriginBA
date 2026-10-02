@@ -83,6 +83,15 @@ Evidence: `tests/test_client_admin.py`, and live `scripts/check_tenant_isolation
    `_validate_organization_id` forbids. When you add a rule, grep for every writer that
    bypasses the function holding it.
 
+4. **Client-held state is per organization, and the server never trusts it across one.**
+   The browser keeps Ori's conversation in session storage so it follows the reader
+   between pages; the organization switch is a full reload that storage survives, and on
+   2026-10-02 the Ellensburg thread showed on CityCorp's Home and would have been sent
+   into CityCorp's model context. The store is keyed by organization, every answer's
+   thread is stamped `thread_organization`, and `scoped_thread` drops a thread sent back
+   under another organization. Any new client-held state (drafts, pins, threads) gets the
+   same two halves: a per-org key, and a server that checks the stamp.
+
 ## What the fences must block (test these, not just the happy path)
 
 Postgres: internal schemas qualified AND unqualified (`pg_catalog`, `pg_class`,

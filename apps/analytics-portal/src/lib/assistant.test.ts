@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { STARTER_QUESTIONS, ageLabel, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, savedViewFromSpec, spendLabel, tryGovernedFirst, summarise, threadFor, type Turn } from "./assistant";
+import { STARTER_QUESTIONS, ageLabel, appendTurns, cell, integrityHeadline, integrityLabel, resultChart, savedViewFromSpec, spendLabel, tryGovernedFirst, summarise, threadFor, threadOrganizationFor, type Turn } from "./assistant";
 import type { AssistantResponse, CanvasIntegrity, IntegrityOverview } from "./types";
 
 const answer = (thread: unknown[] = []): AssistantResponse => ({
@@ -185,5 +185,14 @@ describe("saving an answer as a view", () => {
     const spec = { canvas_id: "rpt_gl", canvas_label: "General Ledger", dimensions: [], measures: [{ field: "Amount", agg: "sum" }], filters: [] };
     expect(savedViewFromSpec(spec, "").title).toBe("General Ledger");
     expect(savedViewFromSpec(spec, "x".repeat(200)).title.length).toBe(80);
+  });
+});
+
+
+describe("the thread sent back names the organization it came from", () => {
+  it("is the last answer's organization, or none before any answer", () => {
+    const response = { answer: "x", thread: [], thread_organization: "ellensburg" } as never;
+    expect(threadOrganizationFor([{ role: "user", text: "hi" }, { role: "assistant", response }])).toBe("ellensburg");
+    expect(threadOrganizationFor([{ role: "user", text: "hi" }])).toBeNull();
   });
 });
